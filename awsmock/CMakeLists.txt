@@ -9,7 +9,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 set(CMAKE_INSTALL_PREFIX "/usr/local" CACHE STRING " " FORCE)
 
-set(SOURCES src/config/Configuration.cpp src/resource/Exception.cpp src/handling/JsonAPIAbstractRelatedResourceBuilder.cpp
+set(SOURCES src/config/Configuration.cpp src/resource/HandlerException.cpp src/handling/JsonAPIAbstractRelatedResourceBuilder.cpp
         src/handling/JsonAPIAbstractResourceBuilder.cpp src/handling/JsonAPIAbstractRootResourceBuilder.cpp
         src/handling/JsonAPIErrorBuilder.cpp src/handling/JsonAPIResourceBuilder.cpp
         src/handling/JsonAPIResourceCollectionBuilder.cpp src/resource/AbstractResource.cpp

@@ -7,7 +7,11 @@
 namespace AwsMock::Resource::Factory {
 
     Poco::Net::HTTPRequestHandler *S3Factory::createResource(Core::Configuration &configuration, Core::MetricService &metricService) {
-        return new S3Handler(configuration, metricService);
+        auto resource = new S3Handler(configuration, metricService);
+        resource->setApplicationService(
+            Application::PollServiceFactory::createService()
+        );
+        return resource;
     }
 }
 

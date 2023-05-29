@@ -11,6 +11,7 @@
 #include "Poco/Net/HTTPServer.h"
 
 // Libri includes
+#include "awsmock/core/Logger.h"
 #include "awsmock/core/Configuration.h"
 
 #define DEFAULT_PORT 4567

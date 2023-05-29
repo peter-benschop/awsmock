@@ -9,6 +9,8 @@ namespace AwsMock {
     RestService::RestService(Core::Configuration &configuration)
         : _logger(Poco::Logger::get("RestService")), _configuration(configuration), _port(DEFAULT_PORT), _host(DEFAULT_HOST) {
 
+        Core::Logger::SetDefaultConsoleLogger("RestService");
+
         _port = _configuration.getInt("awsmock.rest.port", DEFAULT_PORT);
         _host = _configuration.getString("awsmock.rest.host", DEFAULT_HOST);
     }

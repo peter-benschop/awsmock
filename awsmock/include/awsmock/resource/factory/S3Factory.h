@@ -27,6 +27,6 @@ namespace AwsMock::Resource::Factory {
       Poco::Net::HTTPRequestHandler *createResource(Core::Configuration &configuration, Core::MetricService &metricService) override;
     };
 
-}// namespace AwsMock
+}// namespace AwsMock::Resource::Factory
 
-#endif // AWSMOCK_FACTORY_S3FACTORY_H
+#endif // AWSMOCK_RESOURCE_FACTORY_S3FACTORY_H

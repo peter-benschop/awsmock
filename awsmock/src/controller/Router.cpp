@@ -7,13 +7,12 @@
 namespace AwsMock {
 
     Router::Router() : _logger(Poco::Logger::get("Router")) {
+        Core::Logger::SetDefaultConsoleLogger("Router");
     }
 
     void Router::Initialize(Configuration *configuration, Core::MetricService *metricService) {
         _configuration = configuration;
         _metricService = metricService;
-
-        Core::Logger::SetDefaultConsoleLogger("Router");
 
         AddRoute("s3", "AwsMock::Resource::Factory::S3Factory");
         AddRoute("sqs", "AwsMock::Resource::Factory::SQSFactory");

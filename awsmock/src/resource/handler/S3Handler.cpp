@@ -3,8 +3,9 @@
 
 namespace AwsMock {
 
-    S3Handler::S3Handler(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractResource(), _logger(Poco::Logger::get("S3Handler")),
-                                                                                                   _configuration(configuration), _metricService(metricService) {
+    S3Handler::S3Handler(Core::Configuration &configuration, Core::MetricService &metricService)
+        : AbstractResource(), _logger(Poco::Logger::get("S3Handler")), _configuration(configuration), _metricService(metricService) {
+        Core::Logger::SetDefaultConsoleLogger("S3Handler");
     }
 
     void S3Handler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
@@ -49,24 +50,22 @@ namespace AwsMock {
         poco_debug(_logger, "S3 PUT request, address: " + request.clientAddress().toString());
 
         try {
-            std::string jsonPayload;
+            std::string xmlPayload;
             std::istream &inputStream = request.stream();
-            Poco::StreamCopier::copyToString(inputStream, jsonPayload);
+            Poco::StreamCopier::copyToString(inputStream, xmlPayload);
+            poco_trace(_logger, "S3 Payload: " + xmlPayload);
 
-            auto attributesSectionObject = getJsonAttributesSectionObject(jsonPayload);
+            Poco::XML::DOMParser parser;
+            Poco::AutoPtr<Poco::XML::Document> pDoc = parser.parseString(xmlPayload);
 
-            std::list<std::string> attributesNames = {"starts_at", "ends_at", "details", "label", "text"};
-            assertPayloadAttributes(attributesSectionObject, attributesNames);
-
-            //auto assembledQuestion = _entityAssembler.assembleEntity(attributesSectionObject);
-            //_imageApplicationService->changeQuestion(assembledQuestion);
+            Poco::XML::Node *node = pDoc->getNodeByPath("/CreateBucketConfiguration/LocationConstraint");
+            std::string locationConstraint = node->innerText();
 
             handleHttpStatusCode(200, response);
             std::ostream &outputStream = response.send();
             outputStream.flush();
 
         } catch (HandlerException &exception) {
-
             handleHttpStatusCode(exception.code(), response);
             std::ostream &outputStream = response.send();
             //outputStream << toJson(exception);

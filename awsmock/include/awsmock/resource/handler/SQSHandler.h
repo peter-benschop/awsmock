@@ -2,8 +2,8 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_RESOURCE_S3HANDLER_H
-#define AWSMOCK_RESOURCE_S3HANDLER_H
+#ifndef AWSMOCK_RESOURCE_SQSHANDLER_H
+#define AWSMOCK_RESOURCE_SQSHANDLER_H
 
 // Poco includes
 #include "Poco/Logger.h"
@@ -37,11 +37,6 @@ namespace AwsMock {
       SQSHandler(Core::Configuration &configuration,Core::MetricService &metricService);
 
     protected:
-
-      /**
-       * Logger
-       */
-      Poco::Logger &_logger;
 
       /**
        * HTTP GET request.
@@ -91,6 +86,11 @@ namespace AwsMock {
     private:
 
       /**
+       * Logger
+       */
+      Poco::Logger &_logger;
+
+      /**
        * ImageHandler import configuration
        */
       Core::Configuration &_configuration;
@@ -102,4 +102,4 @@ namespace AwsMock {
     };
 } // namespace AwsMock
 
-#endif // AWSMOCK_RESOURCE_S3HANDLER_H
+#endif // AWSMOCK_RESOURCE_SQSHANDLER_H

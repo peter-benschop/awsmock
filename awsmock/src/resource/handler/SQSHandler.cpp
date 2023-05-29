@@ -3,8 +3,8 @@
 
 namespace AwsMock {
 
-    SQSHandler::SQSHandler(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractResource(), _logger(Poco::Logger::get("SQSHandler")),
-                                                                                                   _configuration(configuration), _metricService(metricService) {
+    SQSHandler::SQSHandler(Core::Configuration &configuration, Core::MetricService &metricService)
+        : AbstractResource(), _logger(Poco::Logger::get("SQSHandler")), _configuration(configuration), _metricService(metricService) {
     }
 
     void SQSHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {

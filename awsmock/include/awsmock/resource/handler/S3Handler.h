@@ -10,6 +10,9 @@
 #include "Poco/StreamCopier.h"
 #include "Poco/Net/MediaType.h"
 #include "Poco/JSON/Parser.h"
+#include "Poco/DOM/DOMParser.h"
+#include "Poco/DOM/Document.h"
+#include "Poco/DOM/Node.h"
 
 // Libri includes
 #include "awsmock/core/Configuration.h"
@@ -37,11 +40,6 @@ namespace AwsMock {
       S3Handler(Core::Configuration &configuration, Core::MetricService &metricService);
 
     protected:
-
-      /**
-       * Logger
-       */
-      Poco::Logger &_logger;
 
       /**
        * HTTP GET request.
@@ -91,7 +89,12 @@ namespace AwsMock {
     private:
 
       /**
-       * ImageHandler import configuration
+       * Logger
+       */
+      Poco::Logger &_logger;
+
+      /**
+       * S3 handler configuration
        */
       Core::Configuration &_configuration;
 

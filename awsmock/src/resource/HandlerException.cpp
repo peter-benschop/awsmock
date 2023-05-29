@@ -2,10 +2,7 @@
 
 namespace AwsMock {
 
-    HandlerException::HandlerException(std::string type, std::string message, int statusCode)
-            : _statusCode(statusCode),
-              _type(std::move(type)),
-              _message(std::move(message)) {}
+    HandlerException::HandlerException(std::string type, std::string message, int statusCode) : _statusCode(statusCode), _type(std::move(type)), _message(std::move(message)) {}
 
     int HandlerException::code() const {
         return _statusCode;

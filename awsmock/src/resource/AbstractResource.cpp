@@ -2,7 +2,9 @@
 
 namespace AwsMock::Resource {
 
-    AbstractResource::AbstractResource() : _logger(Poco::Logger::get("AbstractResource")), _baseUrl(), _requestURI(), _requestHost() {}
+    AbstractResource::AbstractResource() : _logger(Poco::Logger::get("AbstractResource")), _baseUrl(), _requestURI(), _requestHost() {
+        Core::Logger::SetDefaultConsoleLogger("AbstractResource");
+    }
 
     AbstractResource::~AbstractResource() = default;
 
@@ -16,30 +18,34 @@ namespace AwsMock::Resource {
             if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_PUT || request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST) {
                 if (request.getContentType() != "application/json") {
                     poco_error(_logger, "Invalid content type, contentType: " + request.getContentType());
-                    throw Exception("Unsupported Media Type", "The only media type supported is application/json and image/jpg.", 415);
+                    throw HandlerException("Unsupported Media Type", "The only media type supported is application/json and image/jpg.", 415);
                 }
             }
         }*/
 
-        if (request.getMethod() != Poco::Net::HTTPRequest::HTTP_GET &&
-            request.getMethod() != Poco::Net::HTTPRequest::HTTP_PUT &&
-            request.getMethod() != Poco::Net::HTTPRequest::HTTP_POST &&
-            request.getMethod() != Poco::Net::HTTPRequest::HTTP_DELETE &&
-            request.getMethod() != Poco::Net::HTTPRequest::HTTP_OPTIONS) {
+        if (request.getMethod() != Poco::Net::HTTPRequest::HTTP_GET && request.getMethod() != Poco::Net::HTTPRequest::HTTP_PUT
+            && request.getMethod() != Poco::Net::HTTPRequest::HTTP_POST && request.getMethod() != Poco::Net::HTTPRequest::HTTP_DELETE
+            && request.getMethod() != Poco::Net::HTTPRequest::HTTP_OPTIONS) {
             poco_error(_logger, "Invalid request method, method: " + request.getMethod());
             throw HandlerException("Not Implemented", "The request method is not supported by the server and cannot be handled.", 501);
         }
 
-        if (!request.get("Accept").empty()) {
-            response.setContentType(request.get("Accept"));
+        if(request.has("Accept")) {
+            if (!request.get("Accept").empty()) {
+                response.setContentType(request.get("Accept"));
+            }
         }
+        poco_debug(_logger, "Header checked");
     }
 
     void AbstractResource::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
 
         try {
             handleHttpHeaders(request, response);
+            poco_debug(_logger, "Header checked");
         } catch (HandlerException &exception) {
+
+            poco_error(_logger, "Exception: msg: " + exception.message());
 
             handleHttpStatusCode(exception.code(), response);
 
@@ -56,7 +62,6 @@ namespace AwsMock::Resource {
             errorStream.flush();
             return;
         }
-        poco_debug(_logger, "Header checked");
 
         Poco::URI uri = Poco::URI(request.getURI());
 

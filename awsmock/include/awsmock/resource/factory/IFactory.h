@@ -30,8 +30,7 @@ namespace AwsMock::Resource::Factory {
        * @param database  database connection
        * @return HTTP request handler
        */
-      virtual Poco::Net::HTTPRequestHandler *createResource(Core::Configuration &configuration,
-                                                            Core::MetricService &metricService) = 0;
+      virtual Poco::Net::HTTPRequestHandler *createResource(Core::Configuration &configuration, Core::MetricService &metricService) = 0;
     };
 
 } // namespace AwsMock

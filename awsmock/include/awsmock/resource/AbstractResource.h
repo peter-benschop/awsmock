@@ -15,6 +15,7 @@
 #include "Poco/Net/HTTPRequestHandler.h"
 
 // Libri includes
+#include "awsmock/core/Logger.h"
 #include <awsmock/core/ResourceNotFoundException.h>
 #include <awsmock/resource/HandlerException.h>
 #include <awsmock/resource/handling/JsonAPIErrorBuilder.h>
@@ -26,6 +27,7 @@ namespace AwsMock::Resource {
      * Abstract HTTP request handler
      */
     class AbstractResource : public Poco::Net::HTTPRequestHandler {
+
     public:
       /**
        * Default User-defined Constructor
@@ -167,6 +169,7 @@ namespace AwsMock::Resource {
       std::string GetBody(Poco::Net::HTTPServerRequest &request);
 
     private:
+
       /**
        * Logger
        */
