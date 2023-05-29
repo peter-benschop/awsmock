@@ -36,3 +36,5 @@
 **/*.cbp
 **/CMakeCache.*
 **/Makefile
+**/cmake-build-debug
+**/cmake-build-release
