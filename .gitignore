@@ -38,3 +38,14 @@
 **/Makefile
 **/cmake-build-debug
 **/cmake-build-release
+**/CMakeFiles
+**/aws-mock
+**/install_manifest.txt
+
+# Idea
+.idea
+**/*.iml
+**/*.xml
+
+# Tests
+Testing/*
