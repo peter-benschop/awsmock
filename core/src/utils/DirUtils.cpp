@@ -20,6 +20,12 @@ namespace AwsMock::Core {
         return tempDir.path();
     }
 
+    std::string DirUtils::CreateTempDir(const std::string &parent) {
+        Poco::File tempDir = Poco::File(parent + GetTempDir());
+        tempDir.createDirectories();
+        return tempDir.path();
+    }
+
     bool DirUtils::DirectoryExists(const std::string &dirName) {
         Poco::File tempDir = Poco::File(dirName);
         return tempDir.exists();
@@ -60,6 +66,20 @@ namespace AwsMock::Core {
         return fileNames;
     }
 
+    std::vector<std::string> DirUtils::ListFilesByPrefix(const std::string &dirName, const std::string &prefix) {
+        Poco::DirectoryIterator it(dirName);
+        Poco::DirectoryIterator end;
+        std::vector<std::string> fileNames;
+        while (it != end) {
+            if(Core::StringUtils::StartsWith(it.name(), prefix)) {
+                fileNames.push_back(it.name());
+            }
+            ++it;
+        }
+        std::sort(fileNames.begin(), fileNames.end());
+        return fileNames;
+    }
+
     std::vector<std::string> DirUtils::ListFiles(const std::string &dirName, const std::string &pattern) {
         Poco::RegularExpression re(pattern);
         Poco::DirectoryIterator it(dirName);
@@ -78,6 +98,16 @@ namespace AwsMock::Core {
         if (DirectoryExists(dirName)) {
             Poco::File tempDir = Poco::File(dirName);
             tempDir.remove(recursive);
+        }
+    }
+
+    void DirUtils::DeleteFilesInDirectory(const std::string &dirName) {
+        if (DirectoryExists(dirName)) {
+            std::vector<std::string> files = ListFiles(dirName);
+            for(auto &it:files) {
+                Poco::File tempFile = Poco::File(dirName + Poco::Path::separator() + it);
+                tempFile.remove();
+            }
         }
     }
 }

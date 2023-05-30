@@ -31,6 +31,23 @@ namespace AwsMock::Core {
         return file.getSize();
     }
 
+    void FileUtils::AppendBinaryFiles(const std::string &outFile, const std::string &inDir, const std::vector<std::string> &files) {
+        std::ofstream ofs(outFile, std::ios::trunc | std::ios::out | std::ios::app | std::ios::binary);
+
+        for(auto &it : files) {
+            char ch;
+            std::string inFile = inDir + Poco::Path::separator() + it;
+            std::ifstream in(inFile, std::ios::in | std::ios::binary);
+            while(in) {
+                in.get(ch);
+                if(in) {
+                    ofs.put(ch);
+                }
+            }
+        }
+        ofs.close();
+    }
+
     std::string FileUtils::CreateTempFile(const std::string &extension) {
         std::string tempFilename = GetTempFile(extension);
         std::ofstream tempFile;

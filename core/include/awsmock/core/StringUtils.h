@@ -108,6 +108,25 @@ namespace AwsMock::Core {
       static bool Contains(const std::string &s1, const std::string &s2);
 
       /**
+       * Check whether the given string start wit the given prefix
+       *
+       * @param s1 string to check
+       * @param s2 probe string
+       * @return true if the string s1 starts with s2.
+       */
+      static bool StartsWith(const std::string &s1, const std::string &s2);
+
+      /**
+       * Returns a substring by index.
+       *
+       * @param string string to process
+       * @param beginIndex begin index
+       * @param endIndex end index
+       * @return substring
+       */
+      static std::string SubString(const std::string& string, int beginIndex, int endIndex);
+
+      /**
        * Left trim a string.
        *
        * @param s input string

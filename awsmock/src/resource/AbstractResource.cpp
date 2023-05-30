@@ -43,7 +43,6 @@ namespace AwsMock::Resource {
 
         try {
             handleHttpHeaders(request, response);
-            poco_debug(_logger, "Header checked");
         } catch (HandlerException &exception) {
 
             poco_error(_logger, "Exception: msg: " + exception.message());
@@ -74,19 +73,19 @@ namespace AwsMock::Resource {
         request.getCredentials(scheme, authInfo);
         GetRegionUser(authInfo, region, user);
 
-        //_queryStringParameters = uri.getQueryParameters();
+        _queryStringParameters = uri.getQueryParameters();
         uri.getPathSegments(_pathParameter);
 
         if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET) {
-            this->handleGet(request, response);
+            this->handleGet(request, response, region, user);
         }
 
         if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_PUT) {
-            this->handlePut(request, response);
+            this->handlePut(request, response, region, user);
         }
 
         if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST) {
-            this->handlePost(request, response);
+            this->handlePost(request, response, region, user);
         }
 
         if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_DELETE) {
@@ -99,29 +98,41 @@ namespace AwsMock::Resource {
 
     }
 
-    void AbstractResource::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
-        poco_trace(_logger, "Request, method: " + request.getMethod());
+    void AbstractResource::handleGet(Poco::Net::HTTPServerRequest &request,
+                                     Poco::Net::HTTPServerResponse &response,
+                                     const std::string &region,
+                                     const std::string &user) {
+        poco_trace(_logger, "Request, method: " + request.getMethod() + " region: " + region + " user: " + user);
         handleHttpStatusCode(501, response);
         std::ostream &errorStream = response.send();
         errorStream.flush();
     }
 
-    void AbstractResource::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
-        poco_trace(_logger, "Request, method: " + request.getMethod());
+    void AbstractResource::handlePut(Poco::Net::HTTPServerRequest &request,
+                                     Poco::Net::HTTPServerResponse &response,
+                                     const std::string &region,
+                                     const std::string &user) {
+        poco_trace(_logger, "Request, method: " + request.getMethod() + " region: " + region + " user: " + user);
         handleHttpStatusCode(501, response);
         std::ostream &errorStream = response.send();
         errorStream.flush();
     }
 
-    void AbstractResource::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
-        poco_trace(_logger, "Request, method: " + request.getMethod());
+    void AbstractResource::handlePost(Poco::Net::HTTPServerRequest &request,
+                                      Poco::Net::HTTPServerResponse &response,
+                                      const std::string &region,
+                                      const std::string &user) {
+        poco_trace(_logger, "Request, method: " + request.getMethod() + " region: " + region + " user: " + user);
         handleHttpStatusCode(501, response);
         std::ostream &errorStream = response.send();
         errorStream.flush();
     }
 
-    void AbstractResource::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-        poco_trace(_logger, "Request, method: " + request.getMethod());
+    void AbstractResource::handleDelete(Poco::Net::HTTPServerRequest &request,
+                                        Poco::Net::HTTPServerResponse &response,
+                                        const std::string &region,
+                                        const std::string &user) {
+        poco_trace(_logger, "Request, method: " + request.getMethod() + " region: " + region + " user: " + user);
         handleHttpStatusCode(501, response);
         std::ostream &errorStream = response.send();
         errorStream.flush();
@@ -302,7 +313,7 @@ namespace AwsMock::Resource {
         return errorBuilder.build().toString();
     }
 
-    std::string AbstractResource::getQueryParameter(const std::string &parameterKey) {
+    std::string AbstractResource::GetQueryParameter(const std::string &parameterKey, bool optional) {
 
         auto iterator = std::find_if(_queryStringParameters.begin(), _queryStringParameters.end(),
                                      [&parameterKey](const std::pair<std::string, std::string> &item) {
@@ -311,15 +322,29 @@ namespace AwsMock::Resource {
         );
 
         if (iterator == _queryStringParameters.end()) {
-            throw HandlerException(Poco::Net::HTTPResponse::HTTP_REASON_BAD_REQUEST,
-                                   "Attribute '" + parameterKey + "' is missing at URL.",
-                                   Poco::Net::HTTPResponse::HTTP_BAD_REQUEST
-            );
+            if(optional){
+                return {};
+            } else {
+                throw HandlerException(Poco::Net::HTTPResponse::HTTP_REASON_BAD_REQUEST,
+                                       "Attribute '" + parameterKey + "' is missing at URL.",
+                                       Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+            }
         }
         return iterator->second;
     }
 
-    std::string AbstractResource::getPathParameter(int pos) {
+    bool AbstractResource::QueryParameterExists(const std::string &parameterKey) {
+
+        auto iterator = std::find_if(_queryStringParameters.begin(), _queryStringParameters.end(),
+                                     [&parameterKey](const std::pair<std::string, std::string> &item) {
+                                       return item.first == parameterKey;
+                                     }
+        );
+
+        return iterator != _queryStringParameters.end();
+    }
+
+    std::string AbstractResource::GetPathParameter(int pos) {
         return _pathParameter[pos];
     }
 

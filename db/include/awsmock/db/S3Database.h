@@ -51,9 +51,10 @@ namespace AwsMock::Database {
        *
        * @param region AWS region
        * @param name bucket name
+       * @param owner bucket owner
        * @throws DatabaseException
        */
-      void CreateBucket(std::string &region, std::string &name);
+      void CreateBucket(const std::string &region, const std::string &name, const std::string &owner);
 
       /**
        * List all buckets

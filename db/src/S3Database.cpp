@@ -18,7 +18,7 @@ namespace AwsMock::Database {
 
         int count = 0;
         Poco::Data::Statement stmt(session);
-        stmt << "SELECT count(*) FROM s3_bucket WHERE region='" + region + "' AND name='" + name + "'", into(count), now;;
+        stmt << "SELECT count(*) FROM s3_bucket WHERE region=? AND name=?", bind(region), bind(name), into(count), now;;
         stmt.execute();
 
         session.close();
@@ -27,13 +27,13 @@ namespace AwsMock::Database {
         return count > 0;
     }
 
-    void S3Database::CreateBucket(std::string &region, std::string &name) {
+    void S3Database::CreateBucket(const std::string &region, const std::string &name, const std::string &owner) {
 
         Poco::Data::Session session = GetSession();
 
         // Select database
         Poco::Data::Statement stmt(session);
-        stmt << "INSERT INTO s3_bucket(region, name) VALUES(?,?)", use(region), use(name);
+        stmt << "INSERT INTO s3_bucket(region, name, owner) VALUES(?,?,?)", bind(region), bind(name), bind(owner);
 
         poco_trace(_logger, "Bucket created, region: " + region + " name: " + name);
 
@@ -65,7 +65,7 @@ namespace AwsMock::Database {
 
         // Select database
         Poco::Data::Statement stmt(session);
-        stmt << "DELETE FROM s3_bucket WHERE region='" + region + "' AND name='" + name + "'";
+        stmt << "DELETE FROM s3_bucket WHERE region=? AND name=?", bind(region), bind(name);
         stmt.execute();
     }
 

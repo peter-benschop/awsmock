@@ -45,7 +45,7 @@ namespace AwsMock {
        * @param response HTTP response
        * @see AbstractResource::handleGet(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
        */
-      void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
+      void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
       /**
        * HTTP PUT request.
@@ -54,7 +54,7 @@ namespace AwsMock {
        * @param response HTTP response
        * @see AbstractResource::handlePut(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
        */
-      void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
+      void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
       /**
        * HTTP POST request.
@@ -63,7 +63,7 @@ namespace AwsMock {
        * @param response HTTP response
        * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
        */
-      void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
+      void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
       /**
        * Delete DELETE request.

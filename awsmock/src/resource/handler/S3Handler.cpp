@@ -8,9 +8,9 @@ namespace AwsMock {
         Core::Logger::SetDefaultConsoleLogger("S3Handler");
     }
 
-    void S3Handler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+    void S3Handler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_GET_TIMER);
-        poco_debug(_logger, "S3 GET request, address: " + request.clientAddress().toString());
+        poco_debug(_logger, "S3 GET request, URI: " + request.getURI() + " region: " + region + " user: " + user);
 
         try {
             std::string name = Core::DirUtils::RelativePath(request.getURI());
@@ -22,7 +22,6 @@ namespace AwsMock {
                 outputStream << s3Response.ToXml();
                 outputStream.flush();
             }
-
 
         } catch (AwsMock::HandlerException &exception) {
             poco_error(_logger, "Server error, exception: " + exception.message());
@@ -37,58 +36,98 @@ namespace AwsMock {
         }
     }
 
-    void S3Handler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+    void S3Handler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_PUT_TIMER);
-        poco_debug(_logger, "S3 PUT request, address: " + request.clientAddress().toString());
+        poco_debug(_logger, "S3 PUT request, URI: " + request.getURI() + " region: " + region + " user: " + user);
 
         try {
-            std::string name = Core::DirUtils::RelativePath(request.getURI());
-            std::string payload = GetPayload(request);
-            Dto::S3::CreateBucketRequest s3Request(payload);
-            Dto::S3::CreateBucketResponse s3Response = _s3Service.CreateBucket(name, s3Request);
+            bool isMultipartUpload = QueryParameterExists("uploadId");
 
-            handleHttpStatusCode(200, response);
-            response.set("Location", s3Response.GetLocation());
-            std::ostream &outputStream = response.send();
-            outputStream << s3Response.ToXml();
-            outputStream.flush();
+            if(isMultipartUpload) {
 
-        } catch (Core::ServiceException &exception) {
-            handleHttpStatusCode(exception.code(), response);
+                std::string partNumber = GetQueryParameter("partNumber", false);
+                std::string uploadId = GetQueryParameter("uploadId", false);
+                poco_debug(_logger, "S3 Multipart upload part: " + partNumber);
+
+                std::string eTag = _s3Service.UploadPart(request.stream(), std::stoi(partNumber), uploadId);
+
+                Poco::DateTime now;
+                response.set("ETag", eTag);
+                response.set("Date", Poco::DateTimeFormatter::format(now, Poco::DateTimeFormat::HTTP_FORMAT));
+                response.set("Content-Length", "0");
+                response.set("Connection", "keep-alive");
+                response.set("Server", "AmazonS3");
+
+                handleHttpStatusCode(200, response);
+                std::ostream &outputStream = response.send();
+                outputStream.flush();
+
+            } else {
+
+                std::string name = Core::DirUtils::RelativePath(request.getURI());
+                std::string payload = GetPayload(request);
+                Dto::S3::CreateBucketRequest s3Request(payload);
+                Dto::S3::CreateBucketResponse s3Response = _s3Service.CreateBucket(name, user, s3Request);
+
+                handleHttpStatusCode(200, response);
+                response.set("Location", s3Response.GetLocation());
+                std::ostream &outputStream = response.send();
+                outputStream << s3Response.ToXml();
+                outputStream.flush();
+            }
+
+        } catch (Poco::Exception &exc) {
+            poco_error(_logger, "Exception: " + exc.message());
+            handleHttpStatusCode(exc.code(), response);
             std::ostream &outputStream = response.send();
-            outputStream << toJson(exception);
+            //outputStream << toJson(exc);
             outputStream.flush();
         }
     }
 
-    void S3Handler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+    void S3Handler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_POST_TIMER);
-        poco_debug(_logger, "S3 POST request, address: " + request.clientAddress().toString());
+        poco_debug(_logger, "S3 POST request, URI: " + request.getURI() + " region: " + region + " user: " + user);
 
         try {
 
-            std::string jsonPayload;
-            std::istream &inputStream = request.stream();
-            Poco::StreamCopier::copyToString(inputStream, jsonPayload);
+            std::string bucket = GetBucketFromUri(request.getURI());
+            std::string key = GetKeyFromUri(request.getURI());
+            bool isMultipartUpload = QueryParameterExists("uploads");
 
-            auto attributesSectionObject = getJsonAttributesSectionObject(jsonPayload);
+            if(isMultipartUpload) {
 
-            std::list<std::string> attributesNames = {"starts_at", "ends_at", "details", "label", "text", "options"};
-            assertPayloadAttributes(attributesSectionObject, attributesNames);
+                poco_debug(_logger, "Starting multipart upload");
 
-            //auto assembledQuestion = _entityAssembler.assembleEntity(attributesSectionObject);
-            //std::string newQuestionIdentity = _imageApplicationService->newQuestion(assembledQuestion);
+                Poco::DateTime now;
+                response.set("Date", Poco::DateTimeFormatter::format(now, Poco::DateTimeFormat::HTTP_FORMAT));
+                response.set("Transfer-Encoding", "chunked");
+                response.set("Connection", "keep-alive");
+                response.set("Server", "AmazonS3");
 
-            //response.set("Location", getUrl("?question_id=" + newQuestionIdentity));
-            //response.set("Content-Location", getUrl("?question_id=" + newQuestionIdentity));
+                Dto::S3::InitiateMultipartUploadResult result = _s3Service.CreateMultipartUpload(bucket, key, region, user);
+                handleHttpStatusCode(200, response);
+                std::ostream &outputStream = response.send();
+                outputStream << result.ToXml();
+                outputStream.flush();
 
-            handleHttpStatusCode(201, response);
-            std::ostream &outputStream = response.send();
-            outputStream.flush();
+            } else {
 
-        } catch (HandlerException &exception) {
+                std::string uploadId = GetQueryParameter("uploadId", true);
+                poco_debug(_logger, "Finish multipart upload request, uploadId: " + uploadId);
 
-            handleHttpStatusCode(exception.code(), response);
+                Dto::S3::CompleteMultipartUploadResult result = _s3Service.CompleteMultipartUpload(uploadId, bucket, key, region, user);
+                handleHttpStatusCode(200, response);
+                std::ostream &outputStream = response.send();
+                outputStream << result.ToXml();
+                outputStream.flush();
+
+            }
+
+        } catch (Poco::Exception &exc) {
+
+            poco_error(_logger, "Exception: " + exc.message());
+            handleHttpStatusCode(exc.code(), response);
             std::ostream &outputStream = response.send();
             //outputStream << toJson(exception);
             outputStream.flush();
@@ -137,5 +176,13 @@ namespace AwsMock {
         Poco::StreamCopier::copyToString(inputStream, payload);
         poco_trace(_logger, "S3 Payload: " + payload);
         return payload;
+    }
+
+    std::string S3Handler::GetBucketFromUri(const std::string &uri) {
+        return Core::StringUtils::SubString(uri, 1, uri.find_first_of('/', 1) - 1);
+    }
+
+    std::string S3Handler::GetKeyFromUri(const std::string &uri) {
+        return Core::StringUtils::SubString(uri, uri.find_first_of('/', 1) + 1, uri.find_first_of('?') - 1);
     }
 }

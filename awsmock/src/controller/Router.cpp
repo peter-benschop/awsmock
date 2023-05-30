@@ -40,7 +40,7 @@ namespace AwsMock {
             return new AwsMock::ResourceNotFound();
         }
 
-        poco_debug(_logger, "Found request handler for route: " + route);
+        poco_debug(_logger, "Found request handler for route: " + route + " factory: " + factoryIndex->second);
 
         Resource::Factory::IFactory *factory = Resource::Factory::Factory::createResourceFactory(factoryIndex->second);
 

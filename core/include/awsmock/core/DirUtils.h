@@ -17,11 +17,15 @@
 #include "Poco/RegularExpression.h"
 #include "Poco/DirectoryIterator.h"
 
+// AwsMOck includes
+#include <awsmock/core/StringUtils.h>
+
 namespace AwsMock::Core {
 
     class DirUtils {
 
     public:
+
       /**
        * Returns a thread safe temp directory name.
        *
@@ -43,6 +47,14 @@ namespace AwsMock::Core {
        * @return name of the directory
        */
       static std::string CreateTempDir();
+
+      /**
+       * Creates an empty temporary directory within the given parent directory
+       *
+       * @param parent parent directory for the temporary directory
+       * @return thread safe temp directory name
+       */
+      static std::string CreateTempDir(const std::string &parent);
 
       /**
        * Checks the existence of a directory
@@ -85,7 +97,16 @@ namespace AwsMock::Core {
       static std::vector<std::string> ListFiles(const std::string &dirName);
 
       /**
-       * Get list of files
+       * Get a sorted list of files with the given prefix.
+       *
+       * @param dirName name of the directory
+       * @param pattern regular expression which must match the filename
+       * @return vector of file names
+       */
+      static std::vector<std::string> ListFilesByPrefix(const std::string &dirName, const std::string &prefix);
+
+      /**
+       * Get a list of files with the given pattern.
        *
        * @param dirName name of the directory
        * @param pattern regular expression which must match the filename
@@ -100,6 +121,13 @@ namespace AwsMock::Core {
        * @param recursive if true deletes also all files in all directories recursively.
        */
       static void DeleteDirectory(const std::string &dirName, bool recursive = true);
+
+      /**
+       * Deletes all files in the directory, but not the directory itself.
+       *
+       * @param dirName directory name.
+       */
+      static void DeleteFilesInDirectory(const std::string &dirName);
     };
 
 } // namespace AwsMOck::Core

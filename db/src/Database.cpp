@@ -26,8 +26,6 @@ namespace AwsMock::Database {
         if(!Core::FileUtils::FileExists(_dbFile)) {
             CreateDatabase(dataDir, dbFile);
         }
-
-        poco_debug(_logger, "Database initialized,dir: " + dataDir + " file: " + _dbFile);
     }
 
     void Database::CreateDatabase(const std::string &dataDir, const std::string &dbFile){
@@ -43,10 +41,17 @@ namespace AwsMock::Database {
         session << "CREATE INDEX service_idx1 ON service(name)", Poco::Data::Keywords::now;
         poco_debug(_logger, "Service table created");
 
-        session << "CREATE TABLE s3_bucket (id INTEGER NOT NULL PRIMARY KEY, name VARCHAR(255), region VARCHAR(32),"
+        session << "CREATE TABLE s3_bucket (id INTEGER NOT NULL PRIMARY KEY, name VARCHAR(255), region VARCHAR(32), owner VARCHAR(32), "
                    "creation_date DATETIME DEFAULT CURRENT_TIMESTAMP)", Poco::Data::Keywords::now;
         session << "CREATE UNIQUE INDEX s3_bucket_idx1 ON s3_bucket(name, region)", Poco::Data::Keywords::now;
-        poco_debug(_logger, "Bucket table created");
+        poco_debug(_logger, "S3 bucket table created");
+
+        session << "CREATE TABLE s3_object (id INTEGER NOT NULL PRIMARY KEY, bucket VARCHAR(255), key VARCHAR(255), region VARCHAR(32), owner VARCHAR(32), "
+                   "creation_date DATETIME DEFAULT CURRENT_TIMESTAMP)", Poco::Data::Keywords::now;
+        session << "CREATE UNIQUE INDEX s3_object_idx1 ON s3_object(bucket, key, region)", Poco::Data::Keywords::now;
+        poco_debug(_logger, "S3 object table created");
+
+        poco_debug(_logger, "Database initialized, dbFile: " + _dbFile);
         session.close();
     }
 

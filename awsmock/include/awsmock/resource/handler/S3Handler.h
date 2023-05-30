@@ -7,6 +7,9 @@
 
 // Poco includes
 #include "Poco/Logger.h"
+#include "Poco/DateTime.h"
+#include "Poco/DateTimeFormat.h"
+#include "Poco/DateTimeFormatter.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Net/MediaType.h"
 #include "Poco/JSON/Parser.h"
@@ -16,11 +19,13 @@
 #include "awsmock/core/MetricService.h"
 #include "awsmock/core/MetricServiceTimer.h"
 #include "awsmock/core/MetricDefinition.h"
-#include "awsmock/dto/s3/CreateBucketRequest.h"
-#include "awsmock/dto/s3/ListAllBucketResponse.h"
 #include "awsmock/resource/HandlerException.h"
 #include "awsmock/resource/AbstractResource.h"
 #include "awsmock/service/S3Service.h"
+#include "awsmock/dto/s3/CreateBucketRequest.h"
+#include "awsmock/dto/s3/ListAllBucketResponse.h"
+#include "awsmock/dto/s3/InitiateMultipartUploadResult.h"
+#include "awsmock/dto/s3/CompleteMultipartUploadResult.h"
 
 namespace AwsMock {
 
@@ -48,7 +53,7 @@ namespace AwsMock {
        * @param response HTTP response
        * @see AbstractResource::handleGet(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
        */
-      void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
+      void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
       /**
        * HTTP PUT request.
@@ -57,7 +62,7 @@ namespace AwsMock {
        * @param response HTTP response
        * @see AbstractResource::handlePut(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
        */
-      void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
+      void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
       /**
        * HTTP POST request.
@@ -66,7 +71,7 @@ namespace AwsMock {
        * @param response HTTP response
        * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
        */
-      void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
+      void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
       /**
        * Delete DELETE request.
@@ -95,6 +100,22 @@ namespace AwsMock {
        * @return payload as a string,
        */
       std::string GetPayload(Poco::Net::HTTPServerRequest &request);
+
+      /**
+       * Returns the bucket name from the URI
+       *
+       * @param uri request URI
+       * @return bucket name
+       */
+      static std::string GetBucketFromUri(const std::string &uri);
+
+      /**
+       * Returns the object key from the URI
+       *
+       * @param uri request URI
+       * @return object key
+       */
+      static std::string GetKeyFromUri(const std::string &uri);
 
       /**
        * Logger

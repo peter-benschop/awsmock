@@ -37,7 +37,7 @@ namespace AwsMock::Dto::S3 {
     }
 
     std::ostream &operator<<(std::ostream &os, const CreateBucketResponse &r) {
-        os << "CreateBucketRequest={locationConstraint='" + r._location + "', arn='" + r._arn + "'}";
+        os << "CreateBucketResponse={bucket='" + r._location + "', arn='" + r._arn + "'}";
         return os;
     }
 

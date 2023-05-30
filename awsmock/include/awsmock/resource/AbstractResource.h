@@ -56,30 +56,38 @@ namespace AwsMock::Resource {
        *
        * @param request HTTP request
        * @param response HTTP response
+       * @param region AWS region
+       * @param user current user
        */
-      virtual void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response);
+      virtual void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user);
 
       /**
        * It handles to Http verb PUT.
        *
        * @param request HTTP request
        * @param response HTTP response
+       * @param region AWS region
+       * @param user current user
        */
-      virtual void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response);
+      virtual void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user);
 
       /**
        * It handles to Http verb POST.
        *
        * @param request HTTP request
        * @param response HTTP response
+       * @param region AWS region
+       * @param user current user
        */
-      virtual void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response);
+      virtual void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user);
 
       /**
        * It handles to Http verb DELETE.
        *
        * @param request HTTP request
        * @param response HTTP response
+       * @param region AWS region
+       * @param user current user
        */
       virtual void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user);
 
@@ -154,12 +162,21 @@ namespace AwsMock::Resource {
       std::string toJson(const Core::ServiceException &exception);
 
       /**
+       * CHecks whether a query parameter exists
+       *
+       * @param parameterKey parameter name.
+       * @return true if parameter exists, otherwise false
+       */
+      bool QueryParameterExists(const std::string &parameterKey);
+
+      /**
        * Returns a query parameter by name.
        *
-       * @param name The parameter name.
-       * @return The parameter value.
+       * @param name parameter name.
+       * @param optional parameter is optional.
+       * @return  arameter value.
        */
-      std::string getQueryParameter(const std::string &);
+      std::string GetQueryParameter(const std::string &name, bool optional = true);
 
       /**
        * Returns a path parameter by position.
@@ -167,7 +184,7 @@ namespace AwsMock::Resource {
        * @param pos parameter position.
        * @return The parameter value.
        */
-      std::string getPathParameter(int pos);
+      std::string GetPathParameter(int pos);
 
       /**
        * Returns the region and the user

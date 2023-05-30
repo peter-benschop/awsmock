@@ -7,9 +7,9 @@ namespace AwsMock {
         : AbstractResource(), _logger(Poco::Logger::get("SQSHandler")), _configuration(configuration), _metricService(metricService) {
     }
 
-    void SQSHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+    void SQSHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_GET_TIMER);
-        poco_debug(_logger, "S3 GET request, address: " + request.clientAddress().toString());
+        poco_debug(_logger, "SQS GET request, URI: " + request.getURI() + " region: " + region + " user: " + user);
 
         try {
             /*std::string lieferantenId = getPathParameter(2);
@@ -44,9 +44,9 @@ namespace AwsMock {
         }
     }
 
-    void SQSHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+    void SQSHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_PUT_TIMER);
-        poco_debug(_logger, "S3 PUT request, address: " + request.clientAddress().toString());
+        poco_debug(_logger, "SQS PUT request, URI: " + request.getURI() + " region: " + region + " user: " + user);
 
         try {
             std::string jsonPayload;
@@ -74,9 +74,9 @@ namespace AwsMock {
         }
     }
 
-    void SQSHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+    void SQSHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_POST_TIMER);
-        poco_debug(_logger, "S3 POST request, address: " + request.clientAddress().toString());
+        poco_debug(_logger, "SQS POST request, URI: " + request.getURI() + " region: " + region + " user: " + user);
 
         try {
 
@@ -110,11 +110,11 @@ namespace AwsMock {
 
     void SQSHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_DELETE_TIMER);
-        poco_debug(_logger, "SQS DELETE request, address: " + request.clientAddress().toString());
+        poco_debug(_logger, "SQS DELETE request, URI: " + request.getURI() + " region: " + region + " user: " + user);
 
         try {
-            std::string lieferantenId = getPathParameter(2);
-            std::string fileName = getPathParameter(3);
+            std::string lieferantenId = GetPathParameter(2);
+            std::string fileName = GetPathParameter(3);
             poco_debug(_logger, "Handling image DELETE request, lieferantenId: " + lieferantenId + " fileName: " + fileName);
 
             /*Database::ImageEntity entity = _database->findByLieferantenIdFileName(lieferantenId, fileName);
@@ -135,7 +135,7 @@ namespace AwsMock {
 
     void SQSHandler::handleOptions(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
         Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
-        poco_debug(_logger, "S3 OPTIONS request, address: " + request.clientAddress().toString());
+        poco_debug(_logger, "SQS OPTIONS request, address: " + request.clientAddress().toString());
 
         response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
         response.setContentType("text/plain; charset=utf-8");

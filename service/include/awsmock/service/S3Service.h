@@ -10,6 +10,8 @@
 
 // Poco includes
 #include <Poco/Logger.h>
+#include "Poco/UUID.h"
+#include "Poco/UUIDGenerator.h"
 #include "Poco/DOM/DOMParser.h"
 #include "Poco/DOM/Document.h"
 #include "Poco/DOM/Node.h"
@@ -20,8 +22,12 @@
 #include "awsmock/dto/s3/CreateBucketRequest.h"
 #include "awsmock/dto/s3/CreateBucketResponse.h"
 #include "awsmock/dto/s3/ListAllBucketResponse.h"
+#include "awsmock/dto/s3/InitiateMultipartUploadResult.h"
+#include "awsmock/dto/s3/CompleteMultipartUploadResult.h"
 
 namespace AwsMock::Service {
+
+    typedef std::map<std::string, std::ofstream> MultiPartUploads;
 
     class S3Service {
 
@@ -38,10 +44,11 @@ namespace AwsMock::Service {
        * Creates a new bucket
        *
        * @param name name of the bucket
+       * @param owner owner of the bucket
        * @param s3Request S3 create request
        * @return CreateBucketResponse
        */
-      Dto::S3::CreateBucketResponse CreateBucket(std::string &name, const Dto::S3::CreateBucketRequest &s3Request);
+      Dto::S3::CreateBucketResponse CreateBucket(const std::string &name, const std::string &owner, const Dto::S3::CreateBucketRequest &s3Request);
 
       /**
        * Creates a new bucket
@@ -51,6 +58,43 @@ namespace AwsMock::Service {
        * @return CreateBucketResponse
        */
       Dto::S3::ListAllBucketResponse ListAllBuckets();
+
+      /**
+       * Creates a new bucket
+       *
+       * @param bucket bucket name
+       * @param key object key
+       * @param region AWS region
+       * @param user AWS user
+       * @return Dto::S3::InitiateMultipartUploadResult
+       */
+      Dto::S3::InitiateMultipartUploadResult CreateMultipartUpload(std::string &bucket, std::string &key, const std::string &region, const std::string &user);
+
+      /**
+       * Upload a partial file
+       *
+       * @param stream input stream
+       * @param part part number
+       * @param updateId upload ID
+       * @return ETag
+       */
+      std::string UploadPart(std::istream &stream, int part, const std::string &updateId);
+
+      /**
+       * Completes a multipart upload.
+       *
+       * @param uploadId upload ID
+       * @param bucket bucket name
+       * @param key object key
+       * @param region AWS region
+       * @param user AWS user
+       * @return Dto::S3::InitiateMultipartUploadResult
+       */
+      Dto::S3::CompleteMultipartUploadResult CompleteMultipartUpload(const std::string &uploadId,
+                                                                     const std::string &bucket,
+                                                                     const std::string &key,
+                                                                     const std::string &region,
+                                                                     const std::string &user);
 
       /**
        * Delete a bucket
@@ -72,6 +116,11 @@ namespace AwsMock::Service {
       std::string _dataDir;
 
       /**
+       * Temp directory
+       */
+      std::string _tempDir;
+
+      /**
        * Configuration
        */
       const Core::Configuration &_configuration;
@@ -80,6 +129,11 @@ namespace AwsMock::Service {
        * Database connection
        */
       std::unique_ptr<Database::S3Database> _database;
+
+      /**
+       * Multipart uploads map
+       */
+      MultiPartUploads _uploads;
     };
 
 } //namespace AwsMock::Service
