@@ -13,24 +13,16 @@ namespace AwsMock {
         poco_debug(_logger, "S3 GET request, address: " + request.clientAddress().toString());
 
         try {
-            /*std::string lieferantenId = getPathParameter(2);
-            std::string fileName = getPathParameter(3);
-            poco_debug(_logger, "Handling image GET request, key: " + lieferantenId + " fileName: " + fileName);
+            std::string name = Core::DirUtils::RelativePath(request.getURI());
+            if(name.empty()) {
+                Dto::S3::ListAllBucketResponse s3Response = _s3Service.ListAllBuckets();
 
-            Database::ImageEntity entity = _database->findByLieferantenIdFileName(lieferantenId, fileName);
+                handleHttpStatusCode(200, response);
+                std::ostream &outputStream = response.send();
+                outputStream << s3Response.ToXml();
+                outputStream.flush();
+            }
 
-            std::string key = lieferantenId + "/" + fileName;
-            long contentLength = _s3Adapter->GetContentLength(_bucket, key);
-
-            response.setContentType(Poco::Net::MediaType("image", Poco::toLower(entity.getFormat())));
-            response.setContentLength((std::streamsize) contentLength);
-
-            handleHttpStatusCode(200, response);
-            std::ostream &outputStream = response.send();
-
-            Aws::IOStream &stream = _s3Adapter->GetObjectStream(_configuration.GetS3OutputBucket(), lieferantenId + "/" + fileName);
-            outputStream << stream.rdbuf();
-            outputStream.flush();*/
 
         } catch (AwsMock::HandlerException &exception) {
             poco_error(_logger, "Server error, exception: " + exception.message());
@@ -106,10 +98,10 @@ namespace AwsMock {
     void S3Handler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         try {
             Core::MetricServiceTimer measure(_metricService, HTTP_DELETE_TIMER);
-            poco_debug(_logger, "S3 DELETE request, URI: " + request.getURI() + " region: " + region);
+            poco_debug(_logger, "S3 DELETE request, URI: " + request.getURI() + " region: " + region + " user: " + user);
 
             try {
-                const std::string& name = Core::DirUtils::RelativePath(request.getURI());
+                const std::string &name = Core::DirUtils::RelativePath(request.getURI());
                 _s3Service.DeleteBucket(region, name);
 
                 handleHttpStatusCode(200, response);

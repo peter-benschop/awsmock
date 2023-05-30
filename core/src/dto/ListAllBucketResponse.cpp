@@ -6,7 +6,8 @@
 
 namespace AwsMock::Dto::S3 {
 
-    ListAllBucketResponse::ListAllBucketResponse(BucketList bucketList) : _bucketList(bucketList) {
+    ListAllBucketResponse::ListAllBucketResponse(BucketList bucketList) {
+        _bucketList = bucketList;
     }
 
     std::string ListAllBucketResponse::ToXml() {
@@ -14,16 +15,21 @@ namespace AwsMock::Dto::S3 {
         Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("ListAllMyBucketsResult");
         pDoc->appendChild(pRoot);
 
+        Poco::XML::AutoPtr<Poco::XML::Element> pBuckets;
+        pBuckets = pDoc->createElement("Buckets");
+        pRoot->appendChild(pBuckets);
+
         Poco::XML::AutoPtr<Poco::XML::Element> pBucket;
         Poco::XML::AutoPtr<Poco::XML::Element> pName;
         Poco::XML::AutoPtr<Poco::XML::Element> pCreated;
         Poco::XML::AutoPtr<Poco::XML::Text> pNameText;
         Poco::XML::AutoPtr<Poco::XML::Text> pCreatedText;
         for (auto &it : _bucketList) {
-            pBucket = pDoc->createElement("Bucket");
-            pRoot->appendChild(pBucket);
 
-            pName = pDoc->createElement("String");
+            pBucket = pDoc->createElement("Bucket");
+            pBuckets->appendChild(pBucket);
+
+            pName = pDoc->createElement("Name");
             pBucket->appendChild(pName);
 
             pCreated = pDoc->createElement("CreationDate");

@@ -22,8 +22,7 @@
 
 namespace AwsMock::Dto::S3 {
 
-    class BucketRecord {
-    public:
+    struct BucketRecord {
       std::string name;
       Poco::DateTime creationDatetime;
     };
@@ -36,15 +35,10 @@ namespace AwsMock::Dto::S3 {
 
       /**
        * Constructor
-       */
-      ListAllBucketResponse() = delete;
-
-      /**
-       * Constructor
        *
        * @param bucketList list of bucket record.
        */
-      ListAllBucketResponse(BucketList bucketList);
+      explicit ListAllBucketResponse(BucketList bucketList);
 
       /**
        * Convert to XML representation
@@ -65,7 +59,7 @@ namespace AwsMock::Dto::S3 {
       /**
        * List of buckets
        */
-      BucketList &_bucketList;
+      BucketList _bucketList;
 
       /**
        * Stream provider.

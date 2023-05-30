@@ -40,6 +40,25 @@ namespace AwsMock::Database {
         stmt.execute();
     }
 
+    Dto::S3::BucketList S3Database::ListBuckets() {
+
+        Poco::Data::Session session = GetSession();
+
+        // Select database
+        Dto::S3::BucketRecord bucketRecord;
+        Dto::S3::BucketList bucketList;
+
+        Poco::Data::Statement stmt(session);
+        stmt << "SELECT name,creation_date FROM s3_bucket", into(bucketRecord.name), into(bucketRecord.creationDatetime), range(0, 1);
+        while (!stmt.done())
+        {
+            stmt.execute();
+            bucketList.push_back(bucketRecord);
+        }
+        poco_trace(_logger, "Bucket list created, size:" + std::to_string(bucketList.size()));
+        return bucketList;
+    }
+
     void S3Database::DeleteBucket(const std::string &region, const std::string &name) {
 
         Poco::Data::Session session = GetSession();

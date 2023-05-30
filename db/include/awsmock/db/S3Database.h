@@ -20,6 +20,7 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
+#include <awsmock/dto/s3/ListAllBucketResponse.h>
 #include <awsmock/db/Database.h>
 
 namespace AwsMock::Database {
@@ -53,6 +54,13 @@ namespace AwsMock::Database {
        * @throws DatabaseException
        */
       void CreateBucket(std::string &region, std::string &name);
+
+      /**
+       * List all buckets
+       *
+       * @return ListAllBucketResponse
+       */
+      Dto::S3::BucketList ListBuckets();
 
       /**
        * Delete a bucket.

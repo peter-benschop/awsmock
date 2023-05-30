@@ -2,8 +2,8 @@
 set(LIBRARY awsmockcore)
 set(LIBRARY_STATIC awsmockcore_static)
 
-set(DTO_SOURCES src/dto/CreateBucketRequest.cpp src/dto/CreateBucketResponse.cpp)
-set(DTO_HEADERS src/dto/CreateBucketRequest.cpp src/dto/CreateBucketResponse.cpp)
+set(DTO_SOURCES src/dto/CreateBucketRequest.cpp src/dto/CreateBucketResponse.cpp  src/dto/ListAllBucketResponse.cpp)
+set(DTO_HEADERS src/dto/CreateBucketRequest.cpp src/dto/CreateBucketResponse.cpp src/dto/ListAllBucketResponse.cpp)
 
 set(SOURCES src/utils/StringUtils.cpp src/utils/FileUtils.cpp src/utils/DirUtils.cpp src/exception/CoreException.cpp
         src/exception/ServiceException.cpp src/exception/ResourceNotFoundException.cpp src/config/Configuration.cpp

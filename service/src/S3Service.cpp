@@ -51,40 +51,25 @@ namespace AwsMock::Service {
         return createBucketResponse;
     }
 
-    Dto::S3::ListAllBucketResponse S3Service::ListBuckets(std::string &bucketName, const Dto::S3::CreateBucketRequest &s3Request) {
-        poco_trace(_logger, "Create bucket request, s3Request: " + s3Request.ToString());
+    Dto::S3::ListAllBucketResponse S3Service::ListAllBuckets() {
+        poco_trace(_logger, "List bucket request");
 
-        Dto::S3::CreateBucketResponse createBucketResponse;
         Poco::Data::Session session = _database->GetSession();
         try {
-            // Get region
-            std::string region = s3Request.GetLocationConstraint();
 
-            // Check existence
-            if (_database->BucketExists(region, bucketName)) {
-                throw Core::ServiceException("Bucket exists already", 500);
-            }
+            Dto::S3::BucketList bucketList = _database->ListBuckets();
+            Dto::S3::ListAllBucketResponse listAllBucketResponse = Dto::S3::ListAllBucketResponse(bucketList);
+            poco_trace(_logger, "S3 Create Bucket List outcome: " + listAllBucketResponse.ToXml());
 
-            // Create directory
-            std::string bucketDir = _dataDir + Poco::Path::separator() + "s3" + Poco::Path::separator() + bucketName;
-            if (!Core::DirUtils::DirectoryExists(bucketDir)) {
-                Core::DirUtils::MakeDirectory(bucketDir);
-            }
+            session.close();
 
-            // Update database
-            _database->CreateBucket(region, bucketName);
-
-            createBucketResponse = Dto::S3::CreateBucketResponse(region, "arn");
-            poco_trace(_logger, "S3 Create Bucket outcome: " + createBucketResponse.ToXml());
+            return listAllBucketResponse;
 
         } catch (Poco::Exception &ex) {
             session.close();
             poco_error(_logger, "S3 Create Bucket failed, message: " + ex.message());
             throw Core::ServiceException(ex.message(), 500);
         }
-        session.close();
-
-        return createBucketResponse;
     }
 
     void S3Service::DeleteBucket(const std::string &region, const std::string &name) {

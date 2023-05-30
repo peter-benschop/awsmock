@@ -19,6 +19,7 @@
 #include "awsmock/db/S3Database.h"
 #include "awsmock/dto/s3/CreateBucketRequest.h"
 #include "awsmock/dto/s3/CreateBucketResponse.h"
+#include "awsmock/dto/s3/ListAllBucketResponse.h"
 
 namespace AwsMock::Service {
 
@@ -41,6 +42,15 @@ namespace AwsMock::Service {
        * @return CreateBucketResponse
        */
       Dto::S3::CreateBucketResponse CreateBucket(std::string &name, const Dto::S3::CreateBucketRequest &s3Request);
+
+      /**
+       * Creates a new bucket
+       *
+       * @param name name of the bucket
+       * @param s3Request S3 create request
+       * @return CreateBucketResponse
+       */
+      Dto::S3::ListAllBucketResponse ListAllBuckets();
 
       /**
        * Delete a bucket

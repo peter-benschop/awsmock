@@ -17,6 +17,7 @@
 #include "awsmock/core/MetricServiceTimer.h"
 #include "awsmock/core/MetricDefinition.h"
 #include "awsmock/dto/s3/CreateBucketRequest.h"
+#include "awsmock/dto/s3/ListAllBucketResponse.h"
 #include "awsmock/resource/HandlerException.h"
 #include "awsmock/resource/AbstractResource.h"
 #include "awsmock/service/S3Service.h"

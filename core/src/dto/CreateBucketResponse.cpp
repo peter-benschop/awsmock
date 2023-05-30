@@ -2,11 +2,13 @@
 // Created by vogje01 on 30/05/2023.
 //
 
+#include <utility>
+
 #include "awsmock/dto/s3/CreateBucketResponse.h"
 
 namespace AwsMock::Dto::S3 {
 
-    CreateBucketResponse::CreateBucketResponse(std::vector<Dto::Bucket>) : {
+    CreateBucketResponse::CreateBucketResponse(std::string location, std::string arn) : _location(std::move(location)), _arn(std::move(arn)) {
     }
 
     std::string CreateBucketResponse::ToXml() {

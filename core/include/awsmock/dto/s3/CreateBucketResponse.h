@@ -34,7 +34,7 @@ namespace AwsMock::Dto::S3 {
        * @param location bucket location
        * @param arn bucket ARN
        */
-      CreateBucketResponse(const std::string &location, const std::string &arn);
+      CreateBucketResponse(std::string location, std::string arn);
 
       /**
        * Convert to XML representation

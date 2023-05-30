@@ -43,7 +43,8 @@ namespace AwsMock::Database {
         session << "CREATE INDEX service_idx1 ON service(name)", Poco::Data::Keywords::now;
         poco_debug(_logger, "Service table created");
 
-        session << "CREATE TABLE s3_bucket (id INTEGER NOT NULL PRIMARY KEY, name VARCHAR(255), region VARCHAR(32))", Poco::Data::Keywords::now;
+        session << "CREATE TABLE s3_bucket (id INTEGER NOT NULL PRIMARY KEY, name VARCHAR(255), region VARCHAR(32),"
+                   "creation_date DATETIME DEFAULT CURRENT_TIMESTAMP)", Poco::Data::Keywords::now;
         session << "CREATE UNIQUE INDEX s3_bucket_idx1 ON s3_bucket(name, region)", Poco::Data::Keywords::now;
         poco_debug(_logger, "Bucket table created");
         session.close();
