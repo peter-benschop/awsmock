@@ -10,17 +10,16 @@
 #include "Poco/StreamCopier.h"
 #include "Poco/Net/MediaType.h"
 #include "Poco/JSON/Parser.h"
-#include "Poco/DOM/DOMParser.h"
-#include "Poco/DOM/Document.h"
-#include "Poco/DOM/Node.h"
 
 // Libri includes
 #include "awsmock/core/Configuration.h"
 #include "awsmock/core/MetricService.h"
 #include "awsmock/core/MetricServiceTimer.h"
 #include "awsmock/core/MetricDefinition.h"
+#include "awsmock/dto/s3/CreateBucketRequest.h"
 #include "awsmock/resource/HandlerException.h"
 #include "awsmock/resource/AbstractResource.h"
+#include "awsmock/service/S3Service.h"
 
 namespace AwsMock {
 
@@ -75,7 +74,7 @@ namespace AwsMock {
        * @param response HTTP response
        * @see AbstractResource::handleDelete(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
        */
-      void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
+      void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
       /**
        * Options request.
@@ -87,6 +86,14 @@ namespace AwsMock {
       void handleOptions(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
 
     private:
+
+      /**
+       * Returns the payload as a string
+       *
+       * @param request HTTP request
+       * @return payload as a string,
+       */
+      std::string GetPayload(Poco::Net::HTTPServerRequest &request);
 
       /**
        * Logger
@@ -102,6 +109,11 @@ namespace AwsMock {
        * Metric service
        */
       Core::MetricService &_metricService;
+
+      /**
+       * S3 service
+       */
+      Service::S3Service _s3Service;
     };
 } // namespace AwsMock
 

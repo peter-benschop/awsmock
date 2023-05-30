@@ -16,7 +16,7 @@
 #include "Poco/Data/SQLite/Connector.h"
 
 // AwsMock includes
-#include "awsmock/core/Logger.h"
+#include <awsmock/core/Logger.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
@@ -67,7 +67,7 @@ namespace AwsMock::Database {
       const Core::Configuration &_configuration;
 
       /**
-       * Logger
+       * SQLite database file
        */
       std::string _dbFile;
     };

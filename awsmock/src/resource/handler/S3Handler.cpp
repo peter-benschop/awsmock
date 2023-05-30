@@ -4,7 +4,7 @@
 namespace AwsMock {
 
     S3Handler::S3Handler(Core::Configuration &configuration, Core::MetricService &metricService)
-        : AbstractResource(), _logger(Poco::Logger::get("S3Handler")), _configuration(configuration), _metricService(metricService) {
+        : AbstractResource(), _logger(Poco::Logger::get("S3Handler")), _configuration(configuration), _metricService(metricService), _s3Service(configuration) {
         Core::Logger::SetDefaultConsoleLogger("S3Handler");
     }
 
@@ -50,25 +50,21 @@ namespace AwsMock {
         poco_debug(_logger, "S3 PUT request, address: " + request.clientAddress().toString());
 
         try {
-            std::string xmlPayload;
-            std::istream &inputStream = request.stream();
-            Poco::StreamCopier::copyToString(inputStream, xmlPayload);
-            poco_trace(_logger, "S3 Payload: " + xmlPayload);
-
-            Poco::XML::DOMParser parser;
-            Poco::AutoPtr<Poco::XML::Document> pDoc = parser.parseString(xmlPayload);
-
-            Poco::XML::Node *node = pDoc->getNodeByPath("/CreateBucketConfiguration/LocationConstraint");
-            std::string locationConstraint = node->innerText();
+            std::string name = Core::DirUtils::RelativePath(request.getURI());
+            std::string payload = GetPayload(request);
+            Dto::S3::CreateBucketRequest s3Request(payload);
+            Dto::S3::CreateBucketResponse s3Response = _s3Service.CreateBucket(name, s3Request);
 
             handleHttpStatusCode(200, response);
+            response.set("Location", s3Response.GetLocation());
             std::ostream &outputStream = response.send();
+            outputStream << s3Response.ToXml();
             outputStream.flush();
 
-        } catch (HandlerException &exception) {
+        } catch (Core::ServiceException &exception) {
             handleHttpStatusCode(exception.code(), response);
             std::ostream &outputStream = response.send();
-            //outputStream << toJson(exception);
+            outputStream << toJson(exception);
             outputStream.flush();
         }
     }
@@ -107,28 +103,27 @@ namespace AwsMock {
         }
     }
 
-    void S3Handler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
-        Core::MetricServiceTimer measure(_metricService, HTTP_DELETE_TIMER);
-        poco_debug(_logger, "S3 DELETE request, address: " + request.clientAddress().toString());
-
+    void S3Handler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         try {
-            std::string lieferantenId = getPathParameter(2);
-            std::string fileName = getPathParameter(3);
-            poco_debug(_logger, "Handling image DELETE request, lieferantenId: " + lieferantenId + " fileName: " + fileName);
+            Core::MetricServiceTimer measure(_metricService, HTTP_DELETE_TIMER);
+            poco_debug(_logger, "S3 DELETE request, URI: " + request.getURI() + " region: " + region);
 
-            /*Database::ImageEntity entity = _database->findByLieferantenIdFileName(lieferantenId, fileName);
+            try {
+                const std::string& name = Core::DirUtils::RelativePath(request.getURI());
+                _s3Service.DeleteBucket(region, name);
 
-            _database->deleteEntity(entity);*/
+                handleHttpStatusCode(200, response);
+                std::ostream &outputStream = response.send();
+                outputStream.flush();
 
-            handleHttpStatusCode(204, response);
-            std::ostream &outputStream = response.send();
-            outputStream.flush();
-
-        } catch (HandlerException &exception) {
-            handleHttpStatusCode(exception.code(), response);
-            std::ostream &outputStream = response.send();
-            //outputStream << toJson(exception);
-            outputStream.flush();
+            } catch (HandlerException &exception) {
+                handleHttpStatusCode(exception.code(), response);
+                std::ostream &outputStream = response.send();
+                //outputStream << toJson(exception);
+                outputStream.flush();
+            }
+        }catch(Poco::Exception &ex) {
+            poco_error(_logger, "Exception: " + ex.message());
         }
     }
 
@@ -142,5 +137,13 @@ namespace AwsMock {
         handleHttpStatusCode(200, response);
         std::ostream &outputStream = response.send();
         outputStream.flush();
+    }
+
+    std::string S3Handler::GetPayload(Poco::Net::HTTPServerRequest &request) {
+        std::string payload;
+        std::istream &inputStream = request.stream();
+        Poco::StreamCopier::copyToString(inputStream, payload);
+        poco_trace(_logger, "S3 Payload: " + payload);
+        return payload;
     }
 }

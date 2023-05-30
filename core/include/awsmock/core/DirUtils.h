@@ -23,11 +23,19 @@ namespace AwsMock::Core {
 
     public:
       /**
-         * Returns a thread safe temp directory name.
-         *
-         * @return thread safe temp directory name
-         */
+       * Returns a thread safe temp directory name.
+       *
+       * @return thread safe temp directory name
+       */
       static std::string GetTempDir();
+
+      /**
+       * Returns relative path for the given directory.
+       *
+       * @param dir directory name
+       * @return relative path to dir
+       */
+      static std::string RelativePath(const std::string &dir);
 
       /**
        * Creates an empty temporary directory

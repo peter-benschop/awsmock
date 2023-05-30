@@ -18,7 +18,7 @@
 #include <awsmock/config/Configuration.h>
 #include <awsmock/controller/Router.h>
 #include <awsmock/controller/RestService.h>
-#include "../../db/include/awsmock/db/Database.h"
+#include <awsmock/db/Database.h>
 
 namespace AwsMock {
 

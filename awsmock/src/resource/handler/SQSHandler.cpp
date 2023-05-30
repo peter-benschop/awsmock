@@ -108,9 +108,9 @@ namespace AwsMock {
         }
     }
 
-    void SQSHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+    void SQSHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_DELETE_TIMER);
-        poco_debug(_logger, "S3 DELETE request, address: " + request.clientAddress().toString());
+        poco_debug(_logger, "SQS DELETE request, address: " + request.clientAddress().toString());
 
         try {
             std::string lieferantenId = getPathParameter(2);

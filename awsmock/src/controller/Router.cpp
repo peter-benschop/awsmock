@@ -55,14 +55,13 @@ namespace AwsMock {
     std::string Router::GetService(const std::string &authorization) {
         Poco::RegularExpression::MatchVec posVec;
 
-        Poco::RegularExpression pattern(R"(Credential=([a-zA-Z]+)\/[0-9]{8}\/([a-zA-Z0-9\-]+)\/([a-zA-Z0-9]+)\/aws4_request,.*$)");
-        if(!pattern.match(authorization, 0, posVec)) {
+        Poco::RegularExpression pattern(R"(Credential=[a-zA-Z]+\/[0-9]{8}\/[a-zA-Z0-9\-]+\/([a-zA-Z0-9]+)\/aws4_request,.*$)");
+        if (!pattern.match(authorization, 0, posVec)) {
             throw Core::ResourceNotFoundException("Could not extract service");
         }
-        std::string user = authorization.substr(posVec[1].offset, posVec[1].length);
-        std::string region = authorization.substr(posVec[2].offset, posVec[2].length);
-        std::string service = authorization.substr(posVec[3].offset, posVec[3].length);
-        poco_debug(_logger, "Found user: " + user + " region: " + region + " service: " + service);
+
+        std::string service = authorization.substr(posVec[1].offset, posVec[1].length);
+        poco_debug(_logger, "Found service: " + service);
         return service;
     }
 }

@@ -7,5 +7,6 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_subdirectory(core)
 add_subdirectory(db)
+add_subdirectory(service)
 add_subdirectory(awsmock)
 #add_subdirectory(tst)

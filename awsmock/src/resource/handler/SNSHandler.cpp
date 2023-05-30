@@ -108,7 +108,7 @@ namespace AwsMock {
         }
     }
 
-    void SNSHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+    void SNSHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_DELETE_TIMER);
         poco_debug(_logger, "S3 DELETE request, address: " + request.clientAddress().toString());
 

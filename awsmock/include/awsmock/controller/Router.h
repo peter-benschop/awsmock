@@ -13,6 +13,7 @@
 #include "Poco/URI.h"
 #include "Poco/Logger.h"
 #include "Poco/ClassLibrary.h"
+#include "Poco/DynamicFactory.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 
@@ -21,7 +22,6 @@
 #include "awsmock/config/Configuration.h"
 #include "awsmock/resource/factory/IFactory.h"
 #include "awsmock/resource/factory/Factory.h"
-#include "awsmock/resource/handler/S3Handler.h"
 #include "awsmock/controller/ResourceNotFound.h"
 
 namespace AwsMock {
@@ -71,12 +71,12 @@ namespace AwsMock {
       Poco::Net::HTTPRequestHandler *GetResource(const std::string &service, const std::string &uri);
 
       /**
-       * Returns the AWS service from the authorization string.
+       * Returns the AWS service, region and user from the authorization string.
        *
-       * @param authorization authorization string
-       * @return AWS service name
+       * @param authInfo authorization string
+       * @return service name
        */
-      std::string GetService(const std::string &);
+      std::string GetService(const std::string &authInfo);
 
       /**
        * Logger

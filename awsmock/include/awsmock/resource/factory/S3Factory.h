@@ -10,6 +10,7 @@
 #include <awsmock/resource/factory/IFactory.h>
 #include <awsmock/resource/factory/S3Factory.h>
 #include <awsmock/resource/handler/S3Handler.h>
+#include <awsmock/service/S3Service.h>
 
 namespace AwsMock::Resource::Factory {
 
@@ -22,6 +23,7 @@ namespace AwsMock::Resource::Factory {
        *
        * @param configuration application configuration
        * @param metricService monitoring service
+       * @param service AWS S3 service
        * @return resource handler
        */
       Poco::Net::HTTPRequestHandler *createResource(Core::Configuration &configuration, Core::MetricService &metricService) override;

@@ -16,6 +16,7 @@
 
 // Libri includes
 #include "awsmock/core/Logger.h"
+#include <awsmock/core/ServiceException.h>
 #include <awsmock/core/ResourceNotFoundException.h>
 #include <awsmock/resource/HandlerException.h>
 #include <awsmock/resource/handling/JsonAPIErrorBuilder.h>
@@ -80,7 +81,7 @@ namespace AwsMock::Resource {
        * @param request HTTP request
        * @param response HTTP response
        */
-      virtual void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response);
+      virtual void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user);
 
       /**
        * It handles to Http VERB OPTIONS.
@@ -102,7 +103,7 @@ namespace AwsMock::Resource {
        * @param payload The string containing the Json data.
        * @return Only part of the payload with attributes in Poco Json Object format.
        */
-      Poco::JSON::Object::Ptr getJsonAttributesSectionObject(const std::string &);
+      static Poco::JSON::Object::Ptr getJsonAttributesSectionObject(const std::string &);
 
       /*!
        * It validates a set of parameters have been set in a Json payload.
@@ -110,7 +111,7 @@ namespace AwsMock::Resource {
        * @param jsonObject        Poco Json Object that contains payload data.
        * @param attributesNames   Attributes list to be validated.
        */
-      void assertPayloadAttributes(const Poco::JSON::Object::Ptr &, const std::list<std::string> &);
+      static void assertPayloadAttributes(const Poco::JSON::Object::Ptr &, const std::list<std::string> &);
 
       /*!
        * It sets all the HTTP Response information based on the HTTP Code.
@@ -118,7 +119,7 @@ namespace AwsMock::Resource {
        * @param statusCode    The HTTP Status Code.
        * @param response      Response to be handled.
        */
-      void handleHttpStatusCode(int statusCode, Poco::Net::HTTPServerResponse &);
+      static void handleHttpStatusCode(int statusCode, Poco::Net::HTTPServerResponse &);
 
       /**
        * Return the URL.
@@ -142,7 +143,15 @@ namespace AwsMock::Resource {
        * @param exception the exception thrown.
        * @return the exception Json API formatted.
        */
-      std::string toJson(const AwsMock::Core::ResourceNotFoundException &);
+      std::string toJson(const Core::ResourceNotFoundException &);
+
+      /**
+       * It converts an service exception to Json API format.
+       *
+       * @param exception the exception thrown.
+       * @return the exception Json API formatted.
+       */
+      std::string toJson(const Core::ServiceException &exception);
 
       /**
        * Returns a query parameter by name.
@@ -161,12 +170,14 @@ namespace AwsMock::Resource {
       std::string getPathParameter(int pos);
 
       /**
-       * Returns the request body
+       * Returns the region and the user
        *
-       * @param request HTTP request
+       * @param authorization HTTP authorization string
+       * @param region AWS region
+       * @param user AWS user
        * @return body string
        */
-      std::string GetBody(Poco::Net::HTTPServerRequest &request);
+      void GetRegionUser(const std::string &authorization, std::string &region, std::string &user);
 
     private:
 

@@ -6,6 +6,10 @@
 
 namespace AwsMock::Core {
 
+    std::string DirUtils::RelativePath(const std::string &dir) {
+        return dir.substr(1);
+    }
+
     std::string DirUtils::GetTempDir() {
         return Poco::replace(Poco::toLower(Poco::Path::temp() + Poco::UUIDGenerator().createRandom().toString()), "-", "");
     }

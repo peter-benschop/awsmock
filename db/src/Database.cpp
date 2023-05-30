@@ -20,11 +20,11 @@ namespace AwsMock::Database {
         std::string dataDir = _configuration.getString("awsmock.db.dir", "/tmp/data");
         std::string dbFile = _configuration.getString("awsmock.db.file", "awsmock.db");
 
-        _dbFile = dataDir + "/db/" + dbFile;
+        _dbFile = dataDir + Poco::Path::separator() + dbFile;
         poco_debug(_logger, "Using database, file: " + _dbFile);
 
         if(!Core::FileUtils::FileExists(_dbFile)) {
-            CreateDatabase(dataDir + "/db", dbFile);
+            CreateDatabase(dataDir, dbFile);
         }
 
         poco_debug(_logger, "Database initialized,dir: " + dataDir + " file: " + _dbFile);
@@ -43,13 +43,14 @@ namespace AwsMock::Database {
         session << "CREATE INDEX service_idx1 ON service(name)", Poco::Data::Keywords::now;
         poco_debug(_logger, "Service table created");
 
-        session << "CREATE TABLE bucket (id INTEGER NOT NULL PRIMARY KEY, name VARCHAR(255))", Poco::Data::Keywords::now;
-        session << "CREATE INDEX bucket_idx1 ON bucket(name)", Poco::Data::Keywords::now;
+        session << "CREATE TABLE s3_bucket (id INTEGER NOT NULL PRIMARY KEY, name VARCHAR(255), region VARCHAR(32))", Poco::Data::Keywords::now;
+        session << "CREATE UNIQUE INDEX s3_bucket_idx1 ON s3_bucket(name, region)", Poco::Data::Keywords::now;
         poco_debug(_logger, "Bucket table created");
+        session.close();
     }
 
     Poco::Data::Session Database::GetSession(){
         return {"SQLite", _dbFile};
     }
 
-} // namespave AwsMock::Database
+} // namespace AwsMock::Database

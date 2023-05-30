@@ -1,3 +1,4 @@
+#include <Poco/RegularExpression.h>
 #include "awsmock/resource/AbstractResource.h"
 
 namespace AwsMock::Resource {
@@ -30,7 +31,7 @@ namespace AwsMock::Resource {
             throw HandlerException("Not Implemented", "The request method is not supported by the server and cannot be handled.", 501);
         }
 
-        if(request.has("Accept")) {
+        if (request.has("Accept")) {
             if (!request.get("Accept").empty()) {
                 response.setContentType(request.get("Accept"));
             }
@@ -68,6 +69,11 @@ namespace AwsMock::Resource {
         _requestURI = request.getURI();
         _requestHost = request.getHost();
         _baseUrl = "http://" + _requestHost + _requestURI;
+
+        std::string scheme, authInfo,region,user;
+        request.getCredentials(scheme, authInfo);
+        GetRegionUser(authInfo, region, user);
+
         //_queryStringParameters = uri.getQueryParameters();
         uri.getPathSegments(_pathParameter);
 
@@ -84,7 +90,7 @@ namespace AwsMock::Resource {
         }
 
         if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_DELETE) {
-            this->handleDelete(request, response);
+            this->handleDelete(request, response, region, user);
         }
 
         if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_OPTIONS) {
@@ -94,30 +100,35 @@ namespace AwsMock::Resource {
     }
 
     void AbstractResource::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+        poco_trace(_logger, "Request, method: " + request.getMethod());
         handleHttpStatusCode(501, response);
         std::ostream &errorStream = response.send();
         errorStream.flush();
     }
 
     void AbstractResource::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+        poco_trace(_logger, "Request, method: " + request.getMethod());
         handleHttpStatusCode(501, response);
         std::ostream &errorStream = response.send();
         errorStream.flush();
     }
 
     void AbstractResource::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+        poco_trace(_logger, "Request, method: " + request.getMethod());
         handleHttpStatusCode(501, response);
         std::ostream &errorStream = response.send();
         errorStream.flush();
     }
 
-    void AbstractResource::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+    void AbstractResource::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
+        poco_trace(_logger, "Request, method: " + request.getMethod());
         handleHttpStatusCode(501, response);
         std::ostream &errorStream = response.send();
         errorStream.flush();
     }
 
     void AbstractResource::handleOptions(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+        poco_trace(_logger, "Request, method: " + request.getMethod());
         response.setStatusAndReason(
             Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED,
             Poco::Net::HTTPResponse::HTTP_REASON_NOT_IMPLEMENTED
@@ -173,59 +184,82 @@ namespace AwsMock::Resource {
 
         switch (statusCode) {
 
-        case 200:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_OK);
+        case 200:
+            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_OK);
             break;
 
-        case 201:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_CREATED);
+        case 201:
+            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_CREATED);
             break;
 
-        case 202:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_ACCEPTED);
+        case 202:
+            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_ACCEPTED);
             break;
 
         case 204:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NO_CONTENT);
             break;
 
-        case 205:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_RESET_CONTENT);
+        case 205:
+            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_RESET_CONTENT);
             break;
 
-        case 206:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_PARTIAL_CONTENT);
+        case 206:
+            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_PARTIAL_CONTENT);
             break;
 
-        case 400:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+        case 400:
+            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
             break;
 
-        case 401:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED);
+        case 401:
+            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED);
             break;
 
-        case 403:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_FORBIDDEN);
+        case 403:
+            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_FORBIDDEN);
             break;
 
-        case 404:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+        case 404:
+            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
             break;
 
-        case 405:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_METHOD_NOT_ALLOWED);
+        case 405:
+            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_METHOD_NOT_ALLOWED);
             break;
 
-        case 406:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_ACCEPTABLE);
+        case 406:
+            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_ACCEPTABLE);
             break;
 
-        case 409:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_CONFLICT);
+        case 409:
+            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_CONFLICT);
             break;
 
-        case 410:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_GONE);
+        case 410:
+            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_GONE);
             break;
 
-        case 415:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_UNSUPPORTEDMEDIATYPE);
+        case 415:
+            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_UNSUPPORTEDMEDIATYPE);
+            break;
 
-        case 500:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+        case 500:
+            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            break;
 
-        case 501:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
+        case 501:
+            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
+            break;
 
-        case 503:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_SERVICE_UNAVAILABLE);
+        case 503:
+            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_SERVICE_UNAVAILABLE);
+            break;
 
             // Validating routines throw exceptions all over the program, but are not able to specify
             // an exception code compatible with HTTP. So, the code is left zero. This routine can catch this.
-        default:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+        default:
+            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+            break;
         }
     }
 
@@ -244,7 +278,20 @@ namespace AwsMock::Resource {
         return errorBuilder.build().toString();
     }
 
+    std::string AbstractResource::toJson(const Core::ServiceException &exception) {
+        AwsMock::JsonAPIErrorBuilder errorBuilder(_requestHost);
+
+        errorBuilder.withType("Service");
+        errorBuilder.sourceAt(_requestURI);
+        errorBuilder.withStatusCode(exception.code());
+        errorBuilder.withDetails(exception.message());
+
+        return errorBuilder.build().toString();
+    }
+
     std::string AbstractResource::toJson(const AwsMock::Core::ResourceNotFoundException &exception) {
+        poco_error(_logger, "Exception: " + exception.message());
+
         AwsMock::JsonAPIErrorBuilder errorBuilder(_requestHost);
 
         errorBuilder.withType("Server exception");
@@ -276,11 +323,17 @@ namespace AwsMock::Resource {
         return _pathParameter[pos];
     }
 
-    std::string AbstractResource::GetBody(Poco::Net::HTTPServerRequest &request) {
-        std::istream &i = request.stream();
-        int len = request.getContentLength();
-        char *buffer = new char[len];
-        i.read(buffer, len);
-        return {buffer};
+    void AbstractResource::GetRegionUser(const std::string &authorization, std::string &region, std::string &user) {
+        Poco::RegularExpression::MatchVec posVec;
+
+        Poco::RegularExpression pattern(R"(Credential=([a-zA-Z]+)\/[0-9]{8}\/([a-zA-Z0-9\-]+)\/[a-zA-Z0-9]+\/aws4_request,.*$)");
+        if (!pattern.match(authorization, 0, posVec)) {
+            throw Core::ResourceNotFoundException("Could not extract region and user");
+        }
+
+        user = authorization.substr(posVec[1].offset, posVec[1].length);
+        region = authorization.substr(posVec[2].offset, posVec[2].length);
+        poco_debug(_logger, "Found user: " + user + " region: " + region);
     }
+
 }
