@@ -57,6 +57,16 @@ namespace AwsMock::Database {
       void CreateBucket(const std::string &region, const std::string &name, const std::string &owner);
 
       /**
+       * Create a new S3 object in the S3 object table
+       *
+       * @param bucket bucket name
+       * @param key object name
+       * @param owner bucket owner
+       * @throws DatabaseException
+       */
+      void CreateObject(const std::string &bucket, const std::string &key, const std::string &owner);
+
+      /**
        * List all buckets
        *
        * @return ListAllBucketResponse

@@ -108,13 +108,19 @@ namespace AwsMock::Service {
                                                                               const std::string &user) {
         poco_trace(_logger, "CompleteMultipartUpload request, updateId: " + updateId + " bucket: " + bucket + " key: " + key + " region: " + region + " user: " + user);
 
+        // Get all fie parts
         std::vector<std::string> files = Core::DirUtils::ListFilesByPrefix(_tempDir, updateId);
 
+        // Output file
         std::string outFile = _dataDir + Poco::Path::separator() + "s3" + Poco::Path::separator() + bucket + Poco::Path::separator() + key;
         poco_trace(_logger, "Output file, outFile: " + outFile);
 
+        // Append all parts to the output file
         Core::FileUtils::AppendBinaryFiles(outFile, _tempDir, files);
         poco_trace(_logger, "Input files appended to outfile, outFile: " + outFile);
+
+        // Create database object
+        _database->CreateObject(bucket, key, user);
 
         // Cleanup
         Core::DirUtils::DeleteFilesInDirectory(_tempDir);

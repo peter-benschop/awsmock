@@ -59,6 +59,19 @@ namespace AwsMock::Database {
         return bucketList;
     }
 
+    void S3Database::CreateObject(const std::string &bucket, const std::string &key, const std::string &owner) {
+
+        Poco::Data::Session session = GetSession();
+
+        // Select database
+        Poco::Data::Statement stmt(session);
+        stmt << "INSERT INTO s3_object(bucket, key, owner) VALUES(?,?,?)", bind(bucket), bind(key), bind(owner);
+
+        poco_trace(_logger, "Object created, bucket: " + bucket + " key: " + key + " owner: " + owner);
+
+        stmt.execute();
+    }
+
     void S3Database::DeleteBucket(const std::string &region, const std::string &name) {
 
         Poco::Data::Session session = GetSession();
