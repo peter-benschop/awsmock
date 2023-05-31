@@ -62,7 +62,7 @@ namespace AwsMock::Dto::S3 {
             // StorageClass
             Poco::XML::AutoPtr<Poco::XML::Element> pStorageClass = pDoc->createElement("StorageClass");
             pContents->appendChild(pStorageClass);
-            Poco::XML::AutoPtr<Poco::XML::Text> pStorageClassText = pDoc->createTextNode(it.GetStorageClass()));
+            Poco::XML::AutoPtr<Poco::XML::Text> pStorageClassText = pDoc->createTextNode(it.GetStorageClass());
             pStorageClass->appendChild(pStorageClassText);
         }
 

@@ -14,7 +14,7 @@
 #include "Poco/Net/MediaType.h"
 #include "Poco/JSON/Parser.h"
 
-// Libri includes
+// AwsMock includes
 #include "awsmock/core/Configuration.h"
 #include "awsmock/core/MetricService.h"
 #include "awsmock/core/MetricServiceTimer.h"
@@ -23,6 +23,7 @@
 #include "awsmock/resource/AbstractResource.h"
 #include "awsmock/service/S3Service.h"
 #include "awsmock/dto/s3/CreateBucketRequest.h"
+#include "awsmock/dto/s3/ListBucketResult.h"
 #include "awsmock/dto/s3/ListAllBucketResponse.h"
 #include "awsmock/dto/s3/InitiateMultipartUploadResult.h"
 #include "awsmock/dto/s3/CompleteMultipartUploadResult.h"

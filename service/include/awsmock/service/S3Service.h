@@ -21,6 +21,7 @@
 #include "awsmock/db/S3Database.h"
 #include "awsmock/dto/s3/CreateBucketRequest.h"
 #include "awsmock/dto/s3/CreateBucketResponse.h"
+#include "awsmock/dto/s3/ListBucketResult.h"
 #include "awsmock/dto/s3/ListAllBucketResponse.h"
 #include "awsmock/dto/s3/InitiateMultipartUploadResult.h"
 #include "awsmock/dto/s3/CompleteMultipartUploadResult.h"
@@ -51,13 +52,20 @@ namespace AwsMock::Service {
       Dto::S3::CreateBucketResponse CreateBucket(const std::string &name, const std::string &owner, const Dto::S3::CreateBucketRequest &s3Request);
 
       /**
-       * Creates a new bucket
+       * Lists all buckets
+       *
+       * @return ListAllBucketResponse
+       */
+      Dto::S3::ListAllBucketResponse ListAllBuckets();
+
+      /**
+       * Lists contents of bucket
        *
        * @param name name of the bucket
        * @param s3Request S3 create request
        * @return CreateBucketResponse
        */
-      Dto::S3::ListAllBucketResponse ListAllBuckets();
+      Dto::S3::ListBucketResult ListBucket(const std::string &bucket);
 
       /**
        * Creates a new bucket

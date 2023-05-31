@@ -65,7 +65,7 @@ namespace AwsMock::Service {
     }
 
     Dto::S3::ListAllBucketResponse S3Service::ListAllBuckets() {
-        poco_trace(_logger, "List bucket request");
+        poco_trace(_logger, "List all buckets request");
 
         Poco::Data::Session session = _database->GetSession();
         try {
@@ -81,6 +81,27 @@ namespace AwsMock::Service {
         } catch (Poco::Exception &ex) {
             session.close();
             poco_error(_logger, "S3 Create Bucket failed, message: " + ex.message());
+            throw Core::ServiceException(ex.message(), 500);
+        }
+    }
+
+    Dto::S3::ListBucketResult S3Service::ListBucket(const std::string &bucket) {
+        poco_trace(_logger, "List bucket request");
+
+        Poco::Data::Session session = _database->GetSession();
+        try {
+
+            Dto::S3::BucketList bucketList = _database->ListBuckets();
+            Dto::S3::ListBucketResult listBucketResult;
+            poco_trace(_logger, "S3 list bucket result: " + listBucketResult.ToXml());
+
+            session.close();
+
+            return listBucketResult;
+
+        } catch (Poco::Exception &ex) {
+            session.close();
+            poco_error(_logger, "S3 list bucket failed, message: " + ex.message());
             throw Core::ServiceException(ex.message(), 500);
         }
     }

@@ -13,10 +13,11 @@ set(EXCEPTION_HEADERS include/awsmock/core/CoreException.h include/awsmock/core/
 
 set(DTO_SOURCES src/dto/s3/CreateBucketRequest.cpp src/dto/s3/CreateBucketResponse.cpp src/dto/s3/ListAllBucketResponse.cpp
         src/dto/s3/InitiateMultipartUploadResult.cpp src/dto/s3/CompleteMultipartUploadResult.cpp
-        src/dto/s3/RestErrorResponse.cpp)
+        src/dto/s3/RestErrorResponse.cpp src/dto/s3/ListBucketResult.cpp)
 set(DTO_HEADERS include/awsmock/dto/s3/CreateBucketRequest.h include/awsmock/dto/s3/CreateBucketResponse.h
         include/awsmock/dto/s3/ListAllBucketResponse.h include/awsmock/dto/s3/ListAllBucketResponse.h
-        include/awsmock/dto/s3/CompleteMultipartUploadResult.h include/awsmock/dto/s3/RestErrorResponse.h)
+        include/awsmock/dto/s3/CompleteMultipartUploadResult.h include/awsmock/dto/s3/RestErrorResponse.h
+        include/awsmock/dto/s3/ListBucketResult.h)
 
 set(SOURCES src/config/Configuration.cpp src/logging/Logger.cpp src/monitoring/MetricService.cpp
         src/monitoring/MetricSystemCollector.cpp ${UTILS_SOURCES} ${EXCEPTION_SOURCES} ${DTO_SOURCES})

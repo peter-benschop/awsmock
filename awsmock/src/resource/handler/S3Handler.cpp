@@ -24,7 +24,10 @@ namespace AwsMock {
                 SendOkResponse(response, s3Response.ToXml());
 
             } else {
-                _s3Service.ListBuckets(bucket);
+
+                // Return object list
+                Dto::S3::ListBucketResult result = _s3Service.ListBucket(bucket);
+                SendOkResponse(response, result.ToXml());
             }
 
         } catch (Core::ServiceException &exc) {
