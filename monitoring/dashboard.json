@@ -274,7 +274,7 @@
               }
             ]
           },
-          "unit": "deckbytes"
+          "unit": "none"
         },
         "overrides": []
       },
@@ -482,6 +482,6 @@
   "timezone": "",
   "title": "AWS-Mock",
   "uid": "cdae61d8-610f-49e4-bd3f-e7f1bf336d20",
-  "version": 6,
+  "version": 7,
   "weekStart": ""
 }

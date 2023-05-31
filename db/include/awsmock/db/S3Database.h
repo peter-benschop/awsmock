@@ -66,6 +66,16 @@ namespace AwsMock::Database {
       void CreateObject(const Entity::S3::Object& object);
 
       /**
+       * Gets an object from an bucket
+       *
+       * @param bucket object bucket
+       * @param key object key
+       * @return S3 object
+       * @throws DatabaseException
+       */
+      Entity::S3::Object GetObject(const std::string &bucket, const std::string &key);
+
+      /**
        * List all buckets
        *
        * @return BucketList

@@ -8,11 +8,21 @@ namespace AwsMock::Dto::S3 {
 
     ListBucketResult::ListBucketResult(Database::Entity::S3::ObjectList objectList) {
 
+        _maxKeys = 1000;
+        _name = objectList[0].bucket;
+
         for(auto &it : objectList) {
+            Owner owner;
+            owner.SetDisplayName(it.owner);
+            owner.SetId(it.owner);
+
             Content content;
             content.SetKey(it.key);
-            content.SetEtag(it.bucket);
-            content.SetLastModified(Poco::DateTimeFormatter::format(it.modified, Poco::DateTimeFormat::HTTP_FORMAT));
+            content.SetEtag(it.md5sum);
+            content.SetSize(it.size);
+            content.SetOwner(owner);
+            content.SetStorageClass("STANDARD");
+            content.SetLastModified(Poco::DateTimeFormatter::format(it.modified, Poco::DateTimeFormat::ISO8601_FRAC_FORMAT));
             _contents.push_back(content);
         }
     }
@@ -30,17 +40,30 @@ namespace AwsMock::Dto::S3 {
         pTruncated->appendChild(pTruncatedText);
 
         // Contents
-        Poco::XML::AutoPtr<Poco::XML::Element> pContents = pDoc->createElement("Contents");
-        pRoot->appendChild(pContents);
         for(auto &it : _contents) {
 
+            Poco::XML::AutoPtr<Poco::XML::Element> pContents = pDoc->createElement("Contents");
+            pRoot->appendChild(pContents);
+
             // Check sum algorithms
-            for(auto &cs : it.GetChecksumAlgorithms()) {
+            /*for(auto &cs : it.GetChecksumAlgorithms()) {
                 Poco::XML::AutoPtr<Poco::XML::Element> pCsAlgorithm = pDoc->createElement("ChecksumAlgorithm");
                 pContents->appendChild(pCsAlgorithm);
                 Poco::XML::AutoPtr<Poco::XML::Text> pCsAlgorithmText = pDoc->createTextNode(cs);
                 pCsAlgorithm->appendChild(pCsAlgorithmText);
-            }
+            }*/
+
+            // Key
+            Poco::XML::AutoPtr<Poco::XML::Element> pKey = pDoc->createElement("Key");
+            pContents->appendChild(pKey);
+            Poco::XML::AutoPtr<Poco::XML::Text> pKeyText = pDoc->createTextNode(it.GetKey());
+            pKey->appendChild(pKeyText);
+
+            // LastModified
+            Poco::XML::AutoPtr<Poco::XML::Element> pLastModified = pDoc->createElement("LastModified");
+            pContents->appendChild(pLastModified);
+            Poco::XML::AutoPtr<Poco::XML::Text> pLastModifiedText = pDoc->createTextNode(it.GetLastModified());
+            pLastModified->appendChild(pLastModifiedText);
 
             // ETag
             Poco::XML::AutoPtr<Poco::XML::Element> pEtag = pDoc->createElement("ETag");

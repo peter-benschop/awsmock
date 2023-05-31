@@ -22,6 +22,8 @@
 #include "awsmock/dto/s3/CompleteMultipartUploadResult.h"
 #include "awsmock/dto/s3/CreateBucketRequest.h"
 #include "awsmock/dto/s3/CreateBucketResponse.h"
+#include "awsmock/dto/s3/GetMetadataRequest.h"
+#include "awsmock/dto/s3/GetMetadataResponse.h"
 #include "awsmock/dto/s3/InitiateMultipartUploadResult.h"
 #include "awsmock/dto/s3/ListBucketResult.h"
 #include "awsmock/dto/s3/ListAllBucketResponse.h"
@@ -42,6 +44,16 @@ namespace AwsMock::Service {
        * @param configuration service configuration
        */
       explicit S3Service(const Core::Configuration &configuration);
+
+      /**
+       * Returns the meta data of an S3 object
+       *
+       * @param name name of the bucket
+       * @param owner owner of the bucket
+       * @param s3Request S3 create request
+       * @return CreateBucketResponse
+       */
+      Dto::S3::GetMetadataResponse GetMetadata(Dto::S3::GetMetadataRequest &request);
 
       /**
        * Creates a new bucket

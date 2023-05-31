@@ -38,11 +38,25 @@ namespace AwsMock::Dto::S3 {
       std::string GetDisplayName() { return _displayName; }
 
       /**
+       * Sets the display name
+       *
+       * @param displayName display name
+       */
+      void SetDisplayName(const std::string &displayName) { _displayName = displayName; }
+
+      /**
        * Returns the display name
        *
        * @return ID
        */
       std::string GetId() { return _id; }
+
+      /**
+       * Sets the ID
+       *
+       * @param id ID
+       */
+      void SetId(const std::string &id) { _id = id; }
 
     private:
 
@@ -118,11 +132,25 @@ namespace AwsMock::Dto::S3 {
       Owner GetOwner() { return _owner; }
 
       /**
+       * Sets the owner
+       *
+       * @param owner object owner
+       */
+      void SetOwner(const Owner &owner) { _owner = owner; }
+
+      /**
        * Returns the size
        *
        * @return size
        */
-      int GetSize() const { return _size; }
+      [[nodiscard]] int GetSize() const { return _size; }
+
+      /**
+       * Returns the last modified
+       *
+       * @return last modified
+       */
+      void SetSize(int size) { _size = size; }
 
       /**
        * Returns the storage class
@@ -130,6 +158,13 @@ namespace AwsMock::Dto::S3 {
        * @return storage class
        */
       std::string GetStorageClass() { return _storageClass; }
+
+      /**
+       * Sets the storage class
+       *
+       * @param storageClass storage class
+       */
+      void SetStorageClass(const std::string &storageClass) {  _storageClass = storageClass; }
 
     private:
 
@@ -161,7 +196,7 @@ namespace AwsMock::Dto::S3 {
       /**
        * Size
        */
-      long _size;
+      long _size = 0;
 
       /**
        * Storage class
@@ -200,7 +235,7 @@ namespace AwsMock::Dto::S3 {
       /**
        * Truncation flag
        */
-      bool _isTruncated;
+      bool _isTruncated = false;
 
       /**
        * Contents
@@ -225,7 +260,7 @@ namespace AwsMock::Dto::S3 {
       /**
        * Maximal keys
        */
-      int _maxKeys;
+      int _maxKeys = 1000;
 
       /**
        * Encoding type
@@ -235,7 +270,7 @@ namespace AwsMock::Dto::S3 {
       /**
        * Key count
        */
-      int _keyCount;
+      int _keyCount = 0;
 
       /**
        * Continuation token

@@ -12,16 +12,25 @@ namespace AwsMock {
         Core::MetricServiceTimer measure(_metricService, HTTP_GET_TIMER);
         poco_debug(_logger, "S3 GET request, URI: " + request.getURI() + " region: " + region + " user: " + user);
 
+        DumpRequest(request);
+
         try {
 
             std::string bucket, key;
             GetBucketKeyFromUri(request.getURI(), bucket, key);
+            //bool isGetRequest = QueryParameterExists("list-type");
 
             if(bucket.empty()) {
 
                 // Return bucket list
                 Dto::S3::ListAllBucketResponse s3Response = _s3Service.ListAllBuckets();
                 SendOkResponse(response, s3Response.ToXml());
+
+            } else if(!bucket.empty() && !key.empty()) {
+
+                // Get object request
+                poco_debug(_logger, "S3 get object request, bucket: " + bucket + " key: " + key);
+                //_s3Service.GetObject(bucket. key);
 
             } else {
 
@@ -167,7 +176,22 @@ namespace AwsMock {
 
             std::string bucket, key;
             GetBucketKeyFromUri(request.getURI(), bucket, key);
-            poco_debug(_logger, "S3 HEAD request, bucket: " + bucket + "key: " + key);
+            poco_debug(_logger, "S3 HEAD request, bucket: " + bucket + " key: " + key);
+
+            Dto::S3::GetMetadataRequest s3Request;
+            s3Request.SetBucket(bucket);
+            s3Request.SetKey(key);
+            Dto::S3::GetMetadataResponse s3Response = _s3Service.GetMetadata(s3Request);
+
+            Resource::HeaderMap headerMap;
+            headerMap.emplace_back("Last-Modified", s3Response.GetLastModified());
+            headerMap.emplace_back("Content-Length", std::to_string(s3Response.GetSize()));
+            headerMap.emplace_back("Content-Type", s3Response.GetContentType());
+            headerMap.emplace_back("Connection", "closed");
+            headerMap.emplace_back("Server", "AmazonS3");
+
+            SendOkResponse(response, {}, &headerMap);
+
 
         } catch (Poco::Exception &exc) {
             SendErrorResponse(response, exc);

@@ -61,7 +61,6 @@ namespace AwsMock::Database {
 
     Entity::S3::ObjectList S3Database::ListBucket(const std::string &bucket) {
 
-        int count;
         Poco::Data::Session session = GetSession();
 
         // Select database
@@ -69,10 +68,10 @@ namespace AwsMock::Database {
         Entity::S3::ObjectList objectList;
 
         Poco::Data::Statement stmt(session);
-        stmt << "SELECT id,key,created,modified FROM s3_object WHERE bucket=?", bind(bucket), into(object.id), into(object.key), into(object.created),
-            into(object.modified), range(0, 1);
+        stmt << "SELECT id,bucket,key,size,md5sum,content_type,created,modified FROM s3_object WHERE bucket=?", bind(bucket), into(object.id), into(object.bucket), into(object.key),
+        into(object.size), into(object.md5sum), into(object.contentType), into(object.created), into(object.modified), range(0, 1);
 
-        while (!stmt.done() && count < MAX_FILES) {
+        while (!stmt.done() && objectList.size() < MAX_FILES) {
             stmt.execute();
             objectList.push_back(object);
         }
@@ -96,6 +95,27 @@ namespace AwsMock::Database {
         } catch(Poco::Exception &exc){
             poco_error(_logger, "DB exception: " + exc.message());
         }
+    }
+
+    Entity::S3::Object S3Database::GetObject(const std::string &bucket, const std::string &key) {
+
+        Entity::S3::Object object;
+        try {
+            Poco::Data::Session session = GetSession();
+
+            // Select database
+            Poco::Data::Statement stmt(session);
+            stmt << "SELECT id,bucket,key,owner,size,md5sum,content_type,modified FROM s3_object WHERE bucket=? AND key=?",
+                bind(bucket), bind(key), into(object.id), into(object.bucket), into(object.key), into(object.owner), into(object.size), into(object.md5sum),
+                into(object.contentType), into(object.modified);
+
+            poco_trace(_logger, "Git object, bucket: " + object.bucket + " key: " + object.key);
+
+            stmt.execute();
+        } catch(Poco::Exception &exc){
+            poco_error(_logger, "DB exception: " + exc.message());
+        }
+        return object;
     }
 
     void S3Database::DeleteBucket(const Entity::S3::Bucket &bucket) {
