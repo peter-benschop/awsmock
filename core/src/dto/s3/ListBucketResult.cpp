@@ -7,6 +7,7 @@
 namespace AwsMock::Dto::S3 {
 
     std::string ListBucketResult::ToXml() {
+
         Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
         Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("ListBucketResult");
         pDoc->appendChild(pRoot);
@@ -14,14 +15,55 @@ namespace AwsMock::Dto::S3 {
         // IsTruncated
         Poco::XML::AutoPtr<Poco::XML::Element> pTruncated = pDoc->createElement("IsTruncated");
         pRoot->appendChild(pTruncated);
-        Poco::XML::AutoPtr<Poco::XML::Text> pTruncatedText = pDoc->createTextNode(_isTruncated?"true":"false");
+        Poco::XML::AutoPtr<Poco::XML::Text> pTruncatedText = pDoc->createTextNode(_isTruncated ? "true" : "false");
         pTruncated->appendChild(pTruncatedText);
 
         // Contents
         Poco::XML::AutoPtr<Poco::XML::Element> pContents = pDoc->createElement("Contents");
         pRoot->appendChild(pContents);
-        for(auto &it:contents) {
-            //it.getNode()
+        for(auto &it : _contents) {
+
+            // Check sum algorithms
+            for(auto &cs : it.GetChecksumAlgorithms()) {
+                Poco::XML::AutoPtr<Poco::XML::Element> pCsAlgorithm = pDoc->createElement("ChecksumAlgorithm");
+                pContents->appendChild(pCsAlgorithm);
+                Poco::XML::AutoPtr<Poco::XML::Text> pCsAlgorithmText = pDoc->createTextNode(cs);
+                pCsAlgorithm->appendChild(pCsAlgorithmText);
+            }
+
+            // ETag
+            Poco::XML::AutoPtr<Poco::XML::Element> pEtag = pDoc->createElement("ETag");
+            pContents->appendChild(pEtag);
+            Poco::XML::AutoPtr<Poco::XML::Text> pEtagText = pDoc->createTextNode(it.GetEtag());
+            pEtag->appendChild(pEtagText);
+
+            // Owner
+            Poco::XML::AutoPtr<Poco::XML::Element> pOwner = pDoc->createElement("Owner");
+            pContents->appendChild(pOwner);
+
+            // DisplayName
+            Poco::XML::AutoPtr<Poco::XML::Element> pDisplayName = pDoc->createElement("DisplayName");
+            pOwner->appendChild(pDisplayName);
+            Poco::XML::AutoPtr<Poco::XML::Text> pDisplayText = pDoc->createTextNode(it.GetOwner().GetDisplayName());
+            pDisplayName->appendChild(pDisplayText);
+
+            // ID
+            Poco::XML::AutoPtr<Poco::XML::Element> pId = pDoc->createElement("ID");
+            pOwner->appendChild(pId);
+            Poco::XML::AutoPtr<Poco::XML::Text> pIdText = pDoc->createTextNode(it.GetOwner().GetId());
+            pId->appendChild(pIdText);
+
+            // Size
+            Poco::XML::AutoPtr<Poco::XML::Element> pSize = pDoc->createElement("Size");
+            pContents->appendChild(pSize);
+            Poco::XML::AutoPtr<Poco::XML::Text> pSizeText = pDoc->createTextNode(std::to_string(it.GetSize()));
+            pSize->appendChild(pSizeText);
+
+            // StorageClass
+            Poco::XML::AutoPtr<Poco::XML::Element> pStorageClass = pDoc->createElement("StorageClass");
+            pContents->appendChild(pStorageClass);
+            Poco::XML::AutoPtr<Poco::XML::Text> pStorageClassText = pDoc->createTextNode(it.GetStorageClass()));
+            pStorageClass->appendChild(pStorageClassText);
         }
 
         // Name

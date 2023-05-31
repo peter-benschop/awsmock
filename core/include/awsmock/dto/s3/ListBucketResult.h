@@ -25,6 +25,22 @@ namespace AwsMock::Dto::S3 {
 
     class Owner {
 
+    public:
+
+      /**
+       * Returns the display name
+       *
+       * @return display name
+       */
+      std::string GetDisplayName() { return _displayName; }
+
+      /**
+       * Returns the display name
+       *
+       * @return ID
+       */
+      std::string GetId() { return _id; }
+
     private:
 
       /**
@@ -39,6 +55,57 @@ namespace AwsMock::Dto::S3 {
     };
 
     class Content {
+
+    public:
+
+      /**
+       * Returns the checksum algorithms.
+       *
+       * @return checksum algorithms
+       */
+      std::vector<std::string> GetChecksumAlgorithms() { return _checksumAlgorithms; }
+
+      /**
+       * Returns the ETag
+       *
+       * @return ETag
+       */
+      std::string GetEtag() { return _etag; }
+
+      /**
+       * Returns the key
+       *
+       * @return object key
+       */
+      std::string GetKey() { return _key; }
+
+      /**
+       * Returns the last modified
+       *
+       * @return last modified
+       */
+      std::string GetLastModified() { return _lastModified; }
+
+      /**
+       * Returns the owner
+       *
+       * @return owner
+       */
+      Owner GetOwner() { return _owner; }
+
+      /**
+       * Returns the size
+       *
+       * @return size
+       */
+      int GetSize() { return _size; }
+
+      /**
+       * Returns the storage class
+       *
+       * @return storage class
+       */
+      std::string GetStorageClass() { return _storageClass; }
 
     private:
 
@@ -71,6 +138,11 @@ namespace AwsMock::Dto::S3 {
        * Size
        */
       long _size;
+
+      /**
+       * Storage class
+       */
+      std::string _storageClass;
     };
 
     class CommonPrefix {
@@ -104,7 +176,7 @@ namespace AwsMock::Dto::S3 {
       /**
        * Contents
        */
-      std::vector<Content> contents;
+      std::vector<Content> _contents;
 
       /**
        * Name
