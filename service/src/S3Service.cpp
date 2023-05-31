@@ -115,6 +115,12 @@ namespace AwsMock::Service {
                                                                               const std::string &user) {
         poco_trace(_logger, "CompleteMultipartUpload request, updateId: " + updateId + " bucket: " + bucket + " key: " + key + " region: " + region + " user: " + user);
 
+        // Create directory, if not existing
+        std::string fileDir = _dataDir + Poco::Path::separator() + "s3" + Poco::Path::separator() + bucket + Poco::Path::separator() + GetDirFromKey(key);
+        if (!Core::DirUtils::DirectoryExists(fileDir)) {
+            Core::DirUtils::MakeDirectory(fileDir);
+        }
+
         // Get all fie parts
         std::vector<std::string> files = Core::DirUtils::ListFilesByPrefix(_tempDir, updateId);
 
@@ -132,10 +138,7 @@ namespace AwsMock::Service {
         // Cleanup
         Core::DirUtils::DeleteFilesInDirectory(_tempDir);
 
-        std::string etag = Core::StringUtils::GenerateRandomString(40);
-        Dto::S3::CompleteMultipartUploadResult result = Dto::S3::CompleteMultipartUploadResult(region, bucket, key, etag);
-
-        return result;
+        return {region, bucket, key, Core::StringUtils::GenerateRandomString(40)};
     }
 
     std::string S3Service::PutObject(const std::string &bucket, const std::string &key, std::istream &stream, const std::string &region, const std::string &user) {

@@ -41,9 +41,6 @@ namespace AwsMock {
         poco_debug(_logger, "S3 PUT request, URI: " + request.getURI() + " region: " + region + " user: " + user);
 
         try {
-            DumpRequest(request);
-
-            std::string tmp = GetKeyFromUri(request.getURI());
 
             bool isMultipartUpload = QueryParameterExists("uploadId");
 

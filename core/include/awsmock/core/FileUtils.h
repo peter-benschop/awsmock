@@ -16,6 +16,8 @@
 #include "Poco/File.h"
 #include "Poco/String.h"
 #include "Poco/Logger.h"
+#include "Poco/BinaryReader.h"
+#include "Poco/BinaryWriter.h"
 #include "Poco/UUIDGenerator.h"
 #include "Poco/Zip/Decompress.h"
 #include "Poco/Zip/Compress.h"

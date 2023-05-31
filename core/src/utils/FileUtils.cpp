@@ -32,18 +32,13 @@ namespace AwsMock::Core {
     }
 
     void FileUtils::AppendBinaryFiles(const std::string &outFile, const std::string &inDir, const std::vector<std::string> &files) {
-        std::ofstream ofs(outFile, std::ios::trunc | std::ios::out | std::ios::app | std::ios::binary);
-
+        std::ofstream ofs(outFile, std::ios::out |std::ios::trunc | std::ios::binary);
         for(auto &it : files) {
-            char ch;
-            std::string inFile = inDir + Poco::Path::separator() + it;
-            std::ifstream in(inFile, std::ios::in | std::ios::binary);
-            while(in) {
-                in.get(ch);
-                if(in) {
-                    ofs.put(ch);
-                }
-            }
+            std::string inFile = inDir;
+            inFile.append(Poco::Path::separator() + it);
+            std::ifstream ifs(inFile, std::ios::in | std::ios::binary);
+            ofs << ifs.rdbuf();
+            ifs.close();
         }
         ofs.close();
     }
