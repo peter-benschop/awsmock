@@ -2,11 +2,11 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include "awsmock/dto/s3/ListAllBucketResponse.h"
+#include <awsmock/dto/s3/ListAllBucketResponse.h>
 
 namespace AwsMock::Dto::S3 {
 
-    ListAllBucketResponse::ListAllBucketResponse(BucketList bucketList) {
+    ListAllBucketResponse::ListAllBucketResponse(AwsMock::Database::Entity::S3::BucketList bucketList) {
         _bucketList = bucketList;
     }
 
@@ -38,7 +38,7 @@ namespace AwsMock::Dto::S3 {
             pNameText = pDoc->createTextNode(it.name);
             pName->appendChild(pNameText);
 
-            pCreatedText = pDoc->createTextNode(Poco::DateTimeFormatter::format(it.creationDatetime, Poco::DateTimeFormat::HTTP_FORMAT));
+            pCreatedText = pDoc->createTextNode(Poco::DateTimeFormatter::format(it.created, Poco::DateTimeFormat::HTTP_FORMAT));
             pCreated->appendChild(pCreatedText);
         }
 

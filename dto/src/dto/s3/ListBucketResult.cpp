@@ -2,9 +2,20 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include "awsmock/dto/s3/ListBucketResult.h"
+#include <awsmock/dto/s3/ListBucketResult.h>
 
 namespace AwsMock::Dto::S3 {
+
+    ListBucketResult::ListBucketResult(Database::Entity::S3::ObjectList objectList) {
+
+        for(auto &it : objectList) {
+            Content content;
+            content.SetKey(it.key);
+            content.SetEtag(it.bucket);
+            content.SetLastModified(Poco::DateTimeFormatter::format(it.modified, Poco::DateTimeFormat::HTTP_FORMAT));
+            _contents.push_back(content);
+        }
+    }
 
     std::string ListBucketResult::ToXml() {
 

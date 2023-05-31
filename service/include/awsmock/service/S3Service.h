@@ -25,6 +25,7 @@
 #include "awsmock/dto/s3/ListAllBucketResponse.h"
 #include "awsmock/dto/s3/InitiateMultipartUploadResult.h"
 #include "awsmock/dto/s3/CompleteMultipartUploadResult.h"
+#include "awsmock/dto/s3/PutObjectRequest.h"
 
 namespace AwsMock::Service {
 
@@ -107,14 +108,11 @@ namespace AwsMock::Service {
       /**
        * Delete a bucket
        *
-       * @param bucket name of the bucket
-       * @param key key of the object
+       * @param request put object request
        * @param stream input stream
-       * @param region AWS region
-       * @param user AWS user
        * @param return ETag
        */
-      std::string PutObject(const std::string &bucket, const std::string &key, std::istream &stream, const std::string &region, const std::string &name);
+      std::string PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream);
 
       /**
        * Delete a bucket

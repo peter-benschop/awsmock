@@ -20,8 +20,11 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/dto/s3/ListAllBucketResponse.h>
 #include <awsmock/db/Database.h>
+#include <awsmock/entity/s3/Bucket.h>
+#include <awsmock/entity/s3/Object.h>
+
+#define MAX_FILES 100
 
 namespace AwsMock::Database {
 
@@ -49,38 +52,40 @@ namespace AwsMock::Database {
       /**
        * Create a new bucket in the S3 bucket table
        *
-       * @param region AWS region
-       * @param name bucket name
-       * @param owner bucket owner
+       * @param bucket bucket entity
        * @throws DatabaseException
        */
-      void CreateBucket(const std::string &region, const std::string &name, const std::string &owner);
+      void CreateBucket(const Entity::S3::Bucket& bucket);
 
       /**
        * Create a new S3 object in the S3 object table
        *
-       * @param bucket bucket name
-       * @param key object name
-       * @param owner bucket owner
+       * @param object object entity
        * @throws DatabaseException
        */
-      void CreateObject(const std::string &bucket, const std::string &key, const std::string &owner);
+      void CreateObject(const Entity::S3::Object& object);
 
       /**
        * List all buckets
        *
-       * @return ListAllBucketResponse
+       * @return BucketList
        */
-      Dto::S3::BucketList ListBuckets();
+      Entity::S3::BucketList ListBuckets();
+
+      /**
+       * List all objects of a bucket
+       *
+       * @return ObjectList
+       */
+      Entity::S3::ObjectList ListBucket(const std::string &bucket);
 
       /**
        * Delete a bucket.
        *
-       * @param region AWS region
-       * @param name bucket name
+       * @param bucket bucket entity
        * @throws DatabaseException
        */
-      void DeleteBucket(const std::string &region, const std::string &name);
+      void DeleteBucket(const Entity::S3::Bucket& bucket);
 
     private:
 

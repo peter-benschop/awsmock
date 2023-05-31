@@ -43,6 +43,10 @@ namespace AwsMock {
 
         try {
 
+            std::string bucket, key;
+            GetBucketKeyFromUri(request.getURI(), bucket, key);
+            poco_debug(_logger, "S3 put request, bucket: " + bucket + " key: " + key);
+
             bool isMultipartUpload = QueryParameterExists("uploadId");
 
             if (isMultipartUpload) {
@@ -59,21 +63,27 @@ namespace AwsMock {
 
                 SendOkResponse(response, {}, &headerMap);
 
-            } else if(!GetKeyFromUri(request.getURI()).empty()) {
+            } else if(!key.empty()) {
 
                 // S3 put object request
-                std::string bucket = GetBucketFromUri(request.getURI());
-                std::string key = Core::DirUtils::RelativePath(GetKeyFromUri(request.getURI()));
-                poco_debug(_logger, "S3 put object request, bucket: " + bucket + " key: " + key);
+                Dto::S3::PutObjectRequest putObjectRequest;
 
-                std::string eTag = _s3Service.PutObject(bucket, key, request.stream(), region, user);
+                putObjectRequest.SetBucket(bucket);
+                putObjectRequest.SetKey(key);
+                putObjectRequest.SetOwner(user);
+                putObjectRequest.SetRegion(region);
+                putObjectRequest.SetContentType(request.get("Content-Type"));
+                putObjectRequest.SetMd5Sum(request.get("Content-MD5"));
+                putObjectRequest.SetSize(std::stol(request.get("Content-Length")));
+
+                std::string eTag = _s3Service.PutObject(putObjectRequest, request.stream());
 
                 Resource::HeaderMap headerMap;
                 headerMap.emplace_back("ETag", eTag);
 
                 SendOkResponse(response, {}, &headerMap);
 
-            } else {
+            } else if(!bucket.empty()){
 
                 // S3 create bucket request
                 std::string name = Core::DirUtils::RelativePath(request.getURI());
@@ -171,7 +181,7 @@ namespace AwsMock {
 
     void S3Handler::GetBucketKeyFromUri(const std::string &uri, std::string &bucket, std::string &key) {
         Poco::RegularExpression::MatchVec posVec;
-        Poco::RegularExpression pattern(R"(\/(\w+)?\/?(\w+)?\??.*$)");
+        Poco::RegularExpression pattern(R"(/([a-z0-9-.]+)?/?([a-zA-Z0-9-_/.*'()]+)?\??.*$)");
         if (!pattern.match(uri, 0, posVec)) {
             throw Core::ResourceNotFoundException("Could not extract bucket and key");
         }

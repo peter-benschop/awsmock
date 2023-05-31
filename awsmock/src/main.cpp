@@ -40,8 +40,7 @@ namespace AwsMock {
           InitializeErrorHandler();
           InitializeDatabase();
           poco_information(_logger,
-                           "Starting onix-splitting-service v" + Configuration::GetVersion() + " pid: " + std::to_string(getpid()) + " loglevel: "
-                               + _configuration.GetLogLevel());
+                           "Starting aws-mock v" + Configuration::GetVersion() + " pid: " + std::to_string(getpid()) + " loglevel: " + _configuration.GetLogLevel());
           Poco::Util::ServerApplication::initialize(self);
       }
 
@@ -52,11 +51,13 @@ namespace AwsMock {
           poco_debug(_logger, "Starting system shutdown");
 
           Poco::ThreadPool::defaultPool().stopAll();
+          poco_debug(_logger, "Default threadpool stopped");
 
           // Shutdown monitoring
           if (_metricService) {
               _metricService->ShutdownServer();
               delete _metricService;
+              poco_debug(_logger, "Metric server stopped");
           }
 
           Poco::Util::Application::uninitialize();
@@ -126,7 +127,7 @@ namespace AwsMock {
        * Initialize database
        */
       void InitializeDatabase() {
-          _database = std::make_shared<Database::Database>(_configuration);
+          std::make_shared<Database::Database>(_configuration);
           poco_debug(_logger, "Database initialized");
       }
 

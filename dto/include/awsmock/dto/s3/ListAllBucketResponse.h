@@ -20,14 +20,10 @@
 #include "Poco/DOM/DOMWriter.h"
 #include "Poco/XML/XMLWriter.h"
 
+// AwsMock includes
+#include "awsmock/entity/s3/Bucket.h"
+
 namespace AwsMock::Dto::S3 {
-
-    struct BucketRecord {
-      std::string name;
-      Poco::DateTime creationDatetime;
-    };
-
-    typedef std::vector<BucketRecord> BucketList;
 
     class ListAllBucketResponse {
 
@@ -36,9 +32,9 @@ namespace AwsMock::Dto::S3 {
       /**
        * Constructor
        *
-       * @param bucketList list of bucket record.
+       * @param bucketList list of bucket entities.
        */
-      explicit ListAllBucketResponse(BucketList bucketList);
+      explicit ListAllBucketResponse(Database::Entity::S3::BucketList bucketList);
 
       /**
        * Convert to XML representation
@@ -59,7 +55,7 @@ namespace AwsMock::Dto::S3 {
       /**
        * List of buckets
        */
-      BucketList _bucketList;
+      Database::Entity::S3::BucketList _bucketList;
 
       /**
        * Stream provider.
@@ -69,6 +65,6 @@ namespace AwsMock::Dto::S3 {
       friend std::ostream &operator<<(std::ostream &, const ListAllBucketResponse &);
     };
 
-} // namespace AwsMock::Dto
+} // namespace AwsMock::Dto::S3
 
-#endif //AWSMOCK_DTO_S3_LISTALLBUCKETRESPONSE_H
+#endif // AWSMOCK_DTO_S3_LISTALLBUCKETRESPONSE_H

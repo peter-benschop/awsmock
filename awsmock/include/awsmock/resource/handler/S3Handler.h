@@ -25,6 +25,7 @@
 #include "awsmock/dto/s3/CreateBucketRequest.h"
 #include "awsmock/dto/s3/ListBucketResult.h"
 #include "awsmock/dto/s3/ListAllBucketResponse.h"
+#include "awsmock/dto/s3/PutObjectRequest.h"
 #include "awsmock/dto/s3/InitiateMultipartUploadResult.h"
 #include "awsmock/dto/s3/CompleteMultipartUploadResult.h"
 

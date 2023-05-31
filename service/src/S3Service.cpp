@@ -49,14 +49,14 @@ namespace AwsMock::Service {
             }
 
             // Update database
-            _database->CreateBucket(region, name, owner);
+            _database->CreateBucket({.name=name, .region=region, .owner=owner});
 
             createBucketResponse = Dto::S3::CreateBucketResponse(region, "arn");
-            poco_trace(_logger, "S3 Create Bucket outcome: " + createBucketResponse.ToXml());
+            poco_trace(_logger, "S3 create bucket response: " + createBucketResponse.ToXml());
 
         } catch (Poco::Exception &ex) {
             session.close();
-            poco_error(_logger, "S3 Create Bucket failed, message: " + ex.message());
+            poco_error(_logger, "S3 create bucket failed, message: " + ex.message());
             throw Core::ServiceException(ex.message(), 500);
         }
         session.close();
@@ -70,7 +70,7 @@ namespace AwsMock::Service {
         Poco::Data::Session session = _database->GetSession();
         try {
 
-            Dto::S3::BucketList bucketList = _database->ListBuckets();
+            Database::Entity::S3::BucketList bucketList = _database->ListBuckets();
             Dto::S3::ListAllBucketResponse listAllBucketResponse = Dto::S3::ListAllBucketResponse(bucketList);
             poco_trace(_logger, "S3 Create Bucket List outcome: " + listAllBucketResponse.ToXml());
 
@@ -91,8 +91,8 @@ namespace AwsMock::Service {
         Poco::Data::Session session = _database->GetSession();
         try {
 
-            Dto::S3::BucketList bucketList = _database->ListBuckets();
-            Dto::S3::ListBucketResult listBucketResult;
+            Database::Entity::S3::ObjectList objectList = _database->ListBucket(bucket);
+            Dto::S3::ListBucketResult listBucketResult = Dto::S3::ListBucketResult(objectList);
             poco_trace(_logger, "S3 list bucket result: " + listBucketResult.ToXml());
 
             session.close();
@@ -154,7 +154,7 @@ namespace AwsMock::Service {
         poco_trace(_logger, "Input files appended to outfile, outFile: " + outFile);
 
         // Create database object
-        _database->CreateObject(bucket, key, user);
+        _database->CreateObject({.bucket=bucket, .key=key, .owner=user});
 
         // Cleanup
         Core::DirUtils::DeleteFilesInDirectory(_tempDir);
@@ -162,30 +162,31 @@ namespace AwsMock::Service {
         return {region, bucket, key, Core::StringUtils::GenerateRandomString(40)};
     }
 
-    std::string S3Service::PutObject(const std::string &bucket, const std::string &key, std::istream &stream, const std::string &region, const std::string &user) {
-        poco_trace(_logger, "Put object, bucket: " + bucket + " key: " + key);
+    std::string S3Service::PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream) {
+        poco_trace(_logger, "Put object request: " + request.ToString());
 
         Poco::Data::Session session = _database->GetSession();
         try {
             // Check existence
-            if (!_database->BucketExists(region, bucket)) {
+            if (!_database->BucketExists(request.GetRegion(), request.GetBucket())) {
                 throw Core::ServiceException("Bucket does not exist", 500);
             }
 
             // Create directory, if not existing
-            std::string fileDir = _dataDir + Poco::Path::separator() + "s3" + Poco::Path::separator() + bucket + Poco::Path::separator() + GetDirFromKey(key);
+            std::string fileDir = _dataDir + Poco::Path::separator() + "s3" + Poco::Path::separator() + request.GetBucket() + Poco::Path::separator() + GetDirFromKey(request.GetKey());
             if (!Core::DirUtils::DirectoryExists(fileDir)) {
                 Core::DirUtils::MakeDirectory(fileDir);
             }
 
             // Write file
-            std::string fileName = _dataDir + Poco::Path::separator() + "s3" + Poco::Path::separator() + bucket + Poco::Path::separator() + key;
+            std::string fileName = _dataDir + Poco::Path::separator() + "s3" + Poco::Path::separator() + request.GetBucket() + Poco::Path::separator() + request.GetKey();
             std::ofstream ofs(fileName);
             ofs << stream.rdbuf();
             ofs.close();
 
             // Update database
-            _database->CreateObject(bucket, key, user);
+            _database->CreateObject({.bucket=request.GetBucket(), .key=request.GetKey(), .owner=request.GetOwner(), .size=request.GetSize(),
+                                     .md5sum=request.GetMd5Sum(), .contentType=request.GetContentType()});
 
         } catch (Poco::Exception &ex) {
             session.close();
@@ -213,7 +214,7 @@ namespace AwsMock::Service {
             }
 
             // Update database
-            _database->DeleteBucket(region, name);
+            _database->DeleteBucket({.name=name,.region=region});
 
         } catch (Poco::Exception &ex) {
             session.close();

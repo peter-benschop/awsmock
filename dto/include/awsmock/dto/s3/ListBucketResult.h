@@ -21,6 +21,9 @@
 #include "Poco/DOM/DOMWriter.h"
 #include "Poco/XML/XMLWriter.h"
 
+// AwsMock includes
+#include <awsmock/entity/s3/Object.h>
+
 namespace AwsMock::Dto::S3 {
 
     class Owner {
@@ -73,6 +76,13 @@ namespace AwsMock::Dto::S3 {
       std::string GetEtag() { return _etag; }
 
       /**
+       * Sets the ETag
+       *
+       * @param ETag AWS ETag
+       */
+      void SetEtag(const std::string &etag) { _etag = etag; }
+
+      /**
        * Returns the key
        *
        * @return object key
@@ -80,11 +90,25 @@ namespace AwsMock::Dto::S3 {
       std::string GetKey() { return _key; }
 
       /**
+       * Sets the key
+       *
+       * @param object key
+       */
+      void SetKey(const std::string &key) { _key = key; }
+
+      /**
        * Returns the last modified
        *
        * @return last modified
        */
       std::string GetLastModified() { return _lastModified; }
+
+      /**
+       * Returns the last modified
+       *
+       * @return last modified
+       */
+      void SetLastModified(const std::string &lastModified) { _lastModified = lastModified; }
 
       /**
        * Returns the owner
@@ -98,7 +122,7 @@ namespace AwsMock::Dto::S3 {
        *
        * @return size
        */
-      int GetSize() { return _size; }
+      int GetSize() const { return _size; }
 
       /**
        * Returns the storage class
@@ -160,11 +184,16 @@ namespace AwsMock::Dto::S3 {
     public:
 
       /**
+       * Constructor
+       */
+      ListBucketResult(Database::Entity::S3::ObjectList objectList);
+
+      /**
        * Return XML string
        *
        * @return XML string representation.
        */
-        std::string ToXml();
+      std::string ToXml();
 
     private:
 

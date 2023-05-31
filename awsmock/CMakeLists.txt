@@ -18,7 +18,7 @@ set(SOURCES src/config/Configuration.cpp src/resource/HandlerException.cpp src/h
         src/resource/handler/SNSHandler.cpp src/controller/ResourceNotFound.cpp src/controller/Router.cpp
         src/controller/RestService.cpp src/main.cpp)
 
-include_directories(include ../core/include ../db/include ../service/include)
+include_directories(include ../core/include ../db/include ../dto/include ../service/include)
 link_directories(/usr/lib /usr/lib/x86_64-linux-gnu /usr/local/lib ../core ../db ../service)
 
 # External includes
@@ -28,10 +28,10 @@ add_executable(${BINARY} ${SOURCES})
 
 if (USE_HEAPCHECK)
     add_definitions(-DHEAPCHECK)
-    target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdb awsmocksrv PocoDataPostgreSQL PocoData PocoDataSQLite
+    target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdb awsmockdto awsmocksrv PocoDataPostgreSQL PocoData PocoDataSQLite
             PocoPrometheus PocoNet PocoNetSSL PocoUtil PocoJSON PocoXML PocoZip PocoFoundation pthread crypto ssl z)
 else ()
-    target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdb awsmocksrv PocoDataPostgreSQL PocoData PocoDataSQLite
+    target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdb awsmocksrv awsmockdto PocoDataPostgreSQL PocoData PocoDataSQLite
             PocoPrometheus PocoNet PocoNetSSL PocoUtil PocoJSON PocoXML PocoZip PocoFoundation pthread crypto ssl z
             tbbmalloc)
 
