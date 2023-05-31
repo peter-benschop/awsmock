@@ -11,22 +11,9 @@ namespace AwsMock::Resource {
 
     void AbstractResource::handleHttpHeaders(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
 
-        response.setContentType("application/json; charset=utf-8");
-        /*std::streamsize contentLength = request.getContentLength();
-        std::string contentType = request.getContentType();
-        if (contentLength > 0) {
-            std::string body = GetBody(request);
-            if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_PUT || request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST) {
-                if (request.getContentType() != "application/json") {
-                    poco_error(_logger, "Invalid content type, contentType: " + request.getContentType());
-                    throw HandlerException("Unsupported Media Type", "The only media type supported is application/json and image/jpg.", 415);
-                }
-            }
-        }*/
-
         if (request.getMethod() != Poco::Net::HTTPRequest::HTTP_GET && request.getMethod() != Poco::Net::HTTPRequest::HTTP_PUT
             && request.getMethod() != Poco::Net::HTTPRequest::HTTP_POST && request.getMethod() != Poco::Net::HTTPRequest::HTTP_DELETE
-            && request.getMethod() != Poco::Net::HTTPRequest::HTTP_OPTIONS) {
+            && request.getMethod() != Poco::Net::HTTPRequest::HTTP_OPTIONS && request.getMethod() != Poco::Net::HTTPRequest::HTTP_HEAD) {
             poco_error(_logger, "Invalid request method, method: " + request.getMethod());
             throw HandlerException("Not Implemented", "The request method is not supported by the server and cannot be handled.", 501);
         }
@@ -96,6 +83,9 @@ namespace AwsMock::Resource {
             this->handleOptions(request, response);
         }
 
+        if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_HEAD) {
+            this->handleHead(request, response);
+        }
     }
 
     void AbstractResource::handleGet(Poco::Net::HTTPServerRequest &request,
@@ -139,6 +129,17 @@ namespace AwsMock::Resource {
     }
 
     void AbstractResource::handleOptions(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+        poco_trace(_logger, "Request, method: " + request.getMethod());
+        response.setStatusAndReason(
+            Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED,
+            Poco::Net::HTTPResponse::HTTP_REASON_NOT_IMPLEMENTED
+        );
+
+        std::ostream &errorStream = response.send();
+        errorStream.flush();
+    }
+
+    void AbstractResource::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
         poco_trace(_logger, "Request, method: " + request.getMethod());
         response.setStatusAndReason(
             Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED,

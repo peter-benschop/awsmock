@@ -108,6 +108,15 @@ namespace AwsMock {
        */
       void handleOptions(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
 
+      /**
+       * Head request.
+       *
+       * @param request HTTP request
+       * @param response HTTP response
+       * @see AbstractResource::handleHead(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+       */
+      void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
+
     private:
 
       /**
@@ -119,22 +128,13 @@ namespace AwsMock {
       std::string GetPayload(Poco::Net::HTTPServerRequest &request);
 
       /**
-       * Returns the bucket name from the URI
+       * Returns the bucket and key from the URI
        *
        * @param uri request URI
-       * @return bucket name
+       * @param bucket S3 bucket name
+       * @param key S3 object key
        */
-      static std::string GetBucketFromUri(const std::string &uri);
-
-      /**
-       * Returns the object key from the URI
-       *
-       * @param uri request URI
-       * @return object key
-       */
-      static std::string GetKeyFromUri(const std::string &uri);
-
-      void GetBucketKeyFromUri(const std::string &uri, std::string &bucket, std::string &key);
+      static void GetBucketKeyFromUri(const std::string &uri, std::string &bucket, std::string &key);
 
       /**
        * Logger

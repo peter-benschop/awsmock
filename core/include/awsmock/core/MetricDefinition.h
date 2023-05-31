@@ -11,6 +11,7 @@
 #define HTTP_POST_TIMER "http_post_time"
 #define HTTP_DELETE_TIMER "http_delete_time"
 #define HTTP_OPTIONS_TIMER "http_options_time"
+#define HTTP_HEAD_TIMER "http_head_time"
 
 // Misc
 #define WORKER_THREADS "worker_thread_count"

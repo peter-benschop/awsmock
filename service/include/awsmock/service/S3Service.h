@@ -19,13 +19,14 @@
 // AwsMock includes
 #include "awsmock/core/ServiceException.h"
 #include "awsmock/db/S3Database.h"
+#include "awsmock/dto/s3/CompleteMultipartUploadResult.h"
 #include "awsmock/dto/s3/CreateBucketRequest.h"
 #include "awsmock/dto/s3/CreateBucketResponse.h"
+#include "awsmock/dto/s3/InitiateMultipartUploadResult.h"
 #include "awsmock/dto/s3/ListBucketResult.h"
 #include "awsmock/dto/s3/ListAllBucketResponse.h"
-#include "awsmock/dto/s3/InitiateMultipartUploadResult.h"
-#include "awsmock/dto/s3/CompleteMultipartUploadResult.h"
 #include "awsmock/dto/s3/PutObjectRequest.h"
+#include "awsmock/dto/s3/PutObjectResponse.h"
 
 namespace AwsMock::Service {
 
@@ -106,13 +107,13 @@ namespace AwsMock::Service {
                                                                      const std::string &user);
 
       /**
-       * Delete a bucket
+       * Put object
        *
        * @param request put object request
        * @param stream input stream
-       * @param return ETag
+       * @return PutObjectResponse
        */
-      std::string PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream);
+      Dto::S3::PutObjectResponse PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream);
 
       /**
        * Delete a bucket

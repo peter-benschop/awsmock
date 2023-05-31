@@ -76,10 +76,10 @@ namespace AwsMock {
                 putObjectRequest.SetMd5Sum(request.get("Content-MD5"));
                 putObjectRequest.SetSize(std::stol(request.get("Content-Length")));
 
-                std::string eTag = _s3Service.PutObject(putObjectRequest, request.stream());
+                Dto::S3::PutObjectResponse putObjectResponse = _s3Service.PutObject(putObjectRequest, request.stream());
 
                 Resource::HeaderMap headerMap;
-                headerMap.emplace_back("ETag", eTag);
+                headerMap.emplace_back("ETag", putObjectResponse.GetETag());
 
                 SendOkResponse(response, {}, &headerMap);
 
@@ -106,8 +106,8 @@ namespace AwsMock {
 
         try {
 
-            std::string bucket = GetBucketFromUri(request.getURI());
-            std::string key = GetKeyFromUri(request.getURI());
+            std::string bucket, key;
+            GetBucketKeyFromUri(request.getURI(), bucket, key);
             bool isMultipartUpload = QueryParameterExists("uploads");
 
             if (isMultipartUpload) {
@@ -159,24 +159,27 @@ namespace AwsMock {
         outputStream.flush();
     }
 
+    void S3Handler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+        Core::MetricServiceTimer measure(_metricService, HTTP_HEAD_TIMER);
+        poco_debug(_logger, "S3 HEAD request, address: " + request.clientAddress().toString());
+
+        try {
+
+            std::string bucket, key;
+            GetBucketKeyFromUri(request.getURI(), bucket, key);
+            poco_debug(_logger, "S3 HEAD request, bucket: " + bucket + "key: " + key);
+
+        } catch (Poco::Exception &exc) {
+            SendErrorResponse(response, exc);
+        }
+    }
+
     std::string S3Handler::GetPayload(Poco::Net::HTTPServerRequest &request) {
         std::string payload;
         std::istream &inputStream = request.stream();
         Poco::StreamCopier::copyToString(inputStream, payload);
         poco_trace(_logger, "S3 Payload: " + payload);
         return payload;
-    }
-
-    std::string S3Handler::GetBucketFromUri(const std::string &uri) {
-        return Core::StringUtils::SubString(uri, 1, uri.find_first_of('/', 1) - 1);
-    }
-
-    std::string S3Handler::GetKeyFromUri(const std::string &uri) {
-        if (Core::StringUtils::Contains(uri, "?")) {
-            return Core::StringUtils::SubString(uri, uri.find_first_of('/', 1) + 1, uri.find_first_of('?') - 1);
-        } else {
-            return uri.substr(uri.find_first_of('/', 1));
-        }
     }
 
     void S3Handler::GetBucketKeyFromUri(const std::string &uri, std::string &bucket, std::string &key) {

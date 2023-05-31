@@ -162,9 +162,10 @@ namespace AwsMock::Service {
         return {region, bucket, key, Core::StringUtils::GenerateRandomString(40)};
     }
 
-    std::string S3Service::PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream) {
+    Dto::S3::PutObjectResponse S3Service::PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream) {
         poco_trace(_logger, "Put object request: " + request.ToString());
 
+        Dto::S3::PutObjectResponse response;
         Poco::Data::Session session = _database->GetSession();
         try {
             // Check existence
@@ -188,13 +189,15 @@ namespace AwsMock::Service {
             _database->CreateObject({.bucket=request.GetBucket(), .key=request.GetKey(), .owner=request.GetOwner(), .size=request.GetSize(),
                                      .md5sum=request.GetMd5Sum(), .contentType=request.GetContentType()});
 
+            response.SetETag(request.GetContentType());
+
         } catch (Poco::Exception &ex) {
             session.close();
             poco_error(_logger, "S3 Delete Bucket failed, message: " + ex.message());
             throw Core::ServiceException(ex.message(), 500);
         }
         session.close();
-        return Core::StringUtils::GenerateRandomString(40);
+        return response;
     }
 
     void S3Service::DeleteBucket(const std::string &region, const std::string &name) {

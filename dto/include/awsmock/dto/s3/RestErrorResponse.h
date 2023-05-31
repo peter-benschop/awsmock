@@ -2,8 +2,8 @@
 // Created by vogje01 on 31/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_COMMON_RESTERRORRESPONSE_H
-#define AWSMOCK_DTO_COMMON_RESTERRORRESPONSE_H
+#ifndef AWSMOCK_DTO_S3_RESTERRORRESPONSE_H
+#define AWSMOCK_DTO_S3_RESTERRORRESPONSE_H
 
 // C++ standard includes
 #include <string>
@@ -65,6 +65,6 @@ namespace AwsMock::Dto::Common {
       std::string _requestId;
     };
 
-} // namespace AwsMock::Dto::Common
+} // namespace AwsMock::Dto::S3
 
-#endif
+#endif // AWSMOCK_DTO_S3_RESTERRORRESPONSE_H

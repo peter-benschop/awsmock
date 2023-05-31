@@ -56,7 +56,7 @@ namespace AwsMock::Resource {
     protected:
 
       /**
-       * It handles to Http verb GET.
+       * Handles the HTTP method GET.
        *
        * @param request HTTP request
        * @param response HTTP response
@@ -66,7 +66,7 @@ namespace AwsMock::Resource {
       virtual void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user);
 
       /**
-       * It handles to Http verb PUT.
+       * Handles the HTTP method PUT.
        *
        * @param request HTTP request
        * @param response HTTP response
@@ -76,7 +76,7 @@ namespace AwsMock::Resource {
       virtual void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user);
 
       /**
-       * It handles to Http verb POST.
+       * Handles the HTTP method POST.
        *
        * @param request HTTP request
        * @param response HTTP response
@@ -86,7 +86,7 @@ namespace AwsMock::Resource {
       virtual void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user);
 
       /**
-       * It handles to Http verb DELETE.
+       * Handles the HTTP method DELETE.
        *
        * @param request HTTP request
        * @param response HTTP response
@@ -96,12 +96,20 @@ namespace AwsMock::Resource {
       virtual void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user);
 
       /**
-       * It handles to Http VERB OPTIONS.
+       * Handles the HTTP OPTIONS method.
        *
        * @param request HTTP request
        * @param response HTTP response
        */
       virtual void handleOptions(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response);
+
+      /**
+       * Handles the HTTP HEAD method.
+       *
+       * @param request HTTP request
+       * @param response HTTP response
+       */
+      virtual void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response);
 
       /**
        * It validates required information into the Http headers.
