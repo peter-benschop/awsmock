@@ -1,0 +1,104 @@
+//
+// Created by vogje01 on 30/05/2023.
+//
+
+#include "awsmock/dto/s3/ListBucketResult.h"
+
+namespace AwsMock::Dto::S3 {
+
+    std::string ListBucketResult::ToXml() {
+        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
+        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("ListBucketResult");
+        pDoc->appendChild(pRoot);
+
+        // IsTruncated
+        Poco::XML::AutoPtr<Poco::XML::Element> pTruncated = pDoc->createElement("IsTruncated");
+        pRoot->appendChild(pTruncated);
+        Poco::XML::AutoPtr<Poco::XML::Text> pTruncatedText = pDoc->createTextNode(_isTruncated?"true":"false");
+        pTruncated->appendChild(pTruncatedText);
+
+        // Contents
+        Poco::XML::AutoPtr<Poco::XML::Element> pContents = pDoc->createElement("Contents");
+        pRoot->appendChild(pContents);
+        for(auto &it:contents) {
+            //it.getNode()
+        }
+
+        // Name
+        Poco::XML::AutoPtr<Poco::XML::Element> pName = pDoc->createElement("Name");
+        pRoot->appendChild(pName);
+        Poco::XML::AutoPtr<Poco::XML::Text> pNameText = pDoc->createTextNode(_name);
+        pName->appendChild(pNameText);
+
+        // Prefix
+        Poco::XML::AutoPtr<Poco::XML::Element> pPrefix = pDoc->createElement("Prefix");
+        pRoot->appendChild(pPrefix);
+        Poco::XML::AutoPtr<Poco::XML::Text> pPrefixText = pDoc->createTextNode(_prefix);
+        pPrefix->appendChild(pPrefixText);
+
+        // Delimiter
+        Poco::XML::AutoPtr<Poco::XML::Element> pDelimiter = pDoc->createElement("Delimiter");
+        pRoot->appendChild(pPrefix);
+        Poco::XML::AutoPtr<Poco::XML::Text> pDelimiterText = pDoc->createTextNode(_delimiter);
+        pDelimiter->appendChild(pDelimiterText);
+
+        // MaxKeys
+        Poco::XML::AutoPtr<Poco::XML::Element> pMaxKeys = pDoc->createElement("MaxKeys");
+        pRoot->appendChild(pMaxKeys);
+        Poco::XML::AutoPtr<Poco::XML::Text> pMaxKeysText = pDoc->createTextNode(std::to_string(_maxKeys));
+        pMaxKeys->appendChild(pMaxKeysText);
+
+        // TODO: CommonPrefixes
+
+        // EncodingType
+        Poco::XML::AutoPtr<Poco::XML::Element> pEncodingType = pDoc->createElement("EncodingType");
+        pRoot->appendChild(pEncodingType);
+        Poco::XML::AutoPtr<Poco::XML::Text> pEncodingTypeText = pDoc->createTextNode(_encodingType);
+        pEncodingType->appendChild(pEncodingTypeText);
+
+        // KeyCount
+        Poco::XML::AutoPtr<Poco::XML::Element> pKeyCount = pDoc->createElement("KeyCount");
+        pRoot->appendChild(pKeyCount);
+        Poco::XML::AutoPtr<Poco::XML::Text> pKeyCountText = pDoc->createTextNode(std::to_string(_keyCount));
+        pKeyCount->appendChild(pKeyCountText);
+
+        // ContinuationToken
+        Poco::XML::AutoPtr<Poco::XML::Element> pContinuationToken = pDoc->createElement("ContinuationToken");
+        pRoot->appendChild(pContinuationToken);
+        Poco::XML::AutoPtr<Poco::XML::Text> pContinuationTokenText = pDoc->createTextNode(_continuationToken);
+        pContinuationToken->appendChild(pContinuationTokenText);
+
+        // NextContinuationToken
+        Poco::XML::AutoPtr<Poco::XML::Element> pNextContinuationToken = pDoc->createElement("NextContinuationToken");
+        pRoot->appendChild(pNextContinuationToken);
+        Poco::XML::AutoPtr<Poco::XML::Text> pNextContinuationTokenText = pDoc->createTextNode(_nextContinuationToken);
+        pNextContinuationToken->appendChild(pNextContinuationTokenText);
+
+        // StartAfter
+        Poco::XML::AutoPtr<Poco::XML::Element> pStartAfter = pDoc->createElement("StartAfter");
+        pRoot->appendChild(pStartAfter);
+        Poco::XML::AutoPtr<Poco::XML::Text> pStartAfterText = pDoc->createTextNode(_startAfter);
+        pStartAfter->appendChild(pStartAfterText);
+
+        std::stringstream output;
+        Poco::XML::DOMWriter writer;
+        writer.setNewLine("\n");
+        writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
+        writer.writeNode(output, pDoc);
+
+        std::string outStr = output.str();
+        return outStr;
+    }
+
+    /*std::string ListBucketResult::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
+    }
+
+    std::ostream &operator<<(std::ostream &os, const ListBucketResult &r) {
+        os << "ListBucketResult={bucket='" + r._bucket + "', key='" + r._key + "', uploadId='" + r._uploadId + "'}";
+        return os;
+    }*/
+
+}

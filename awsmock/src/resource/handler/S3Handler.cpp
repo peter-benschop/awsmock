@@ -13,26 +13,24 @@ namespace AwsMock {
         poco_debug(_logger, "S3 GET request, URI: " + request.getURI() + " region: " + region + " user: " + user);
 
         try {
-            std::string name = Core::DirUtils::RelativePath(request.getURI());
-            if (name.empty()) {
-                Dto::S3::ListAllBucketResponse s3Response = _s3Service.ListAllBuckets();
 
-                handleHttpStatusCode(200, response);
-                std::ostream &outputStream = response.send();
-                outputStream << s3Response.ToXml();
-                outputStream.flush();
+            std::string bucket, key;
+            GetBucketKeyFromUri(request.getURI(), bucket, key);
+
+            if(bucket.empty()) {
+
+                // Return bucket list
+                Dto::S3::ListAllBucketResponse s3Response = _s3Service.ListAllBuckets();
+                SendOkResponse(response, s3Response.ToXml());
+
+            } else {
+                _s3Service.ListBuckets(bucket);
             }
 
-        } catch (AwsMock::HandlerException &exception) {
-            poco_error(_logger, "Server error, exception: " + exception.message());
-            handleHttpStatusCode(exception.code(), response);
-            std::ostream &outputStream = response.send();
-            outputStream << toJson(exception);
-        } catch (Core::ResourceNotFoundException &exception) {
-            poco_error(_logger, "Server error, exception: " + exception.displayText());
-            handleHttpStatusCode(500, response);
-            std::ostream &outputStream = response.send();
-            outputStream << toJson(exception);
+        } catch (Core::ServiceException &exc) {
+            SendErrorResponse(response, exc);
+        } catch (Core::ResourceNotFoundException &exc) {
+            SendErrorResponse(response, exc);
         }
     }
 
@@ -161,10 +159,25 @@ namespace AwsMock {
     }
 
     std::string S3Handler::GetKeyFromUri(const std::string &uri) {
-        if(Core::StringUtils::Contains(uri, "?")) {
+        if (Core::StringUtils::Contains(uri, "?")) {
             return Core::StringUtils::SubString(uri, uri.find_first_of('/', 1) + 1, uri.find_first_of('?') - 1);
         } else {
             return uri.substr(uri.find_first_of('/', 1));
+        }
+    }
+
+    void S3Handler::GetBucketKeyFromUri(const std::string &uri, std::string &bucket, std::string &key) {
+        Poco::RegularExpression::MatchVec posVec;
+        Poco::RegularExpression pattern(R"(\/(\w+)?\/?(\w+)?\??.*$)");
+        if (!pattern.match(uri, 0, posVec)) {
+            throw Core::ResourceNotFoundException("Could not extract bucket and key");
+        }
+
+        if (posVec.size() > 1) {
+            bucket = uri.substr(posVec[1].offset, posVec[1].length);
+        }
+        if (posVec.size() > 2) {
+            key = uri.substr(posVec[2].offset, posVec[2].length);
         }
     }
 }

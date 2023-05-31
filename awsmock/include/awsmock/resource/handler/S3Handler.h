@@ -132,6 +132,8 @@ namespace AwsMock {
        */
       static std::string GetKeyFromUri(const std::string &uri);
 
+      void GetBucketKeyFromUri(const std::string &uri, std::string &bucket, std::string &key);
+
       /**
        * Logger
        */
