@@ -16,13 +16,17 @@
 
 // Libri includes
 #include "awsmock/core/Logger.h"
+#include <awsmock/core/StringUtils.h>
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/core/ResourceNotFoundException.h>
+#include "awsmock/dto/s3/RestErrorResponse.h"
 #include <awsmock/resource/HandlerException.h>
 #include <awsmock/resource/handling/JsonAPIErrorBuilder.h>
 #include <awsmock/resource/handling/JsonAPIResourceBuilder.h>
 
 namespace AwsMock::Resource {
+
+    typedef std::vector<std::pair<std::string, std::string>> HeaderMap;
 
     /**
      * Abstract HTTP request handler
@@ -196,7 +200,40 @@ namespace AwsMock::Resource {
        */
       void GetRegionUser(const std::string &authorization, std::string &region, std::string &user);
 
+      /**
+       * Send a OK response (HTTP status code 200).
+       *
+       * @param response HTTP response object
+       * @param payload HTTP body payload
+       * @param extraHeader HTTP header map values, added to the default headers
+       */
+      void SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &payload = {}, HeaderMap *extraHeader = nullptr);
+
+      /**
+       * Send a OK response (HTTP status code 200).
+       *
+       * @param response HTTP response object
+       * @param exc exception object
+       */
+      void SendErrorResponse(Poco::Net::HTTPServerResponse &response, Poco::Exception &exc);
+
+      /**
+       * Dump the request to std::cerr
+       *
+       * @param request HTTP request
+       */
+      void DumpRequest(Poco::Net::HTTPServerRequest &request);
+
     private:
+
+      /**
+       * Set the header values
+       *
+       * @param response HTTP response object
+       * @param contentLength payload content length
+       * @param headerMap vector of header key/values pairs
+       */
+      void SetHeaders(Poco::Net::HTTPServerResponse &response, unsigned long contentLength, HeaderMap *headerMap = nullptr);
 
       /**
        * Logger
@@ -227,7 +264,13 @@ namespace AwsMock::Resource {
        * Path parameters
        */
       std::vector<std::string> _pathParameter;
-    };
-} // namespace AwsMock
 
-#endif // AWSMOCK_ABSTRACTRESOURCE_H
+      /**
+       * Header map
+       */
+      HeaderMap _headerMap;
+    };
+
+} // namespace AwsMock::Resource
+
+#endif // AWSMOCK_RESOURCE_ABSTRACTRESOURCE_H

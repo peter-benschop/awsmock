@@ -11,11 +11,12 @@ set(EXCEPTION_SOURCES src/exception/CoreException.cpp src/exception/ServiceExcep
 set(EXCEPTION_HEADERS include/awsmock/core/CoreException.h include/awsmock/core/ServiceException.h
         include/awsmock/core/ResourceNotFoundException.h)
 
-set(DTO_SOURCES src/dto/CreateBucketRequest.cpp src/dto/CreateBucketResponse.cpp  src/dto/ListAllBucketResponse.cpp
-        src/dto/InitiateMultipartUploadResult.cpp src/dto/CompleteMultipartUploadResult.cpp)
-set(DTO_HEADERS include/awsmock/dto/s3/CreateBucketRequest.h include/awsmock/dto/S3/CreateBucketResponse.h
+set(DTO_SOURCES src/dto/s3/CreateBucketRequest.cpp src/dto/s3/CreateBucketResponse.cpp src/dto/s3/ListAllBucketResponse.cpp
+        src/dto/s3/InitiateMultipartUploadResult.cpp src/dto/s3/CompleteMultipartUploadResult.cpp
+        src/dto/s3/RestErrorResponse.cpp)
+set(DTO_HEADERS include/awsmock/dto/s3/CreateBucketRequest.h include/awsmock/dto/s3/CreateBucketResponse.h
         include/awsmock/dto/s3/ListAllBucketResponse.h include/awsmock/dto/s3/ListAllBucketResponse.h
-        include/awsmock/dto/s3/CompleteMultipartUploadResult.h)
+        include/awsmock/dto/s3/CompleteMultipartUploadResult.h include/awsmock/dto/s3/RestErrorResponse.h)
 
 set(SOURCES src/config/Configuration.cpp src/logging/Logger.cpp src/monitoring/MetricService.cpp
         src/monitoring/MetricSystemCollector.cpp ${UTILS_SOURCES} ${EXCEPTION_SOURCES} ${DTO_SOURCES})

@@ -99,11 +99,36 @@ namespace AwsMock::Service {
       /**
        * Delete a bucket
        *
+       * @param bucket name of the bucket
+       * @param key key of the object
+       * @param stream input stream
+       * @param region AWS region
+       * @param user AWS user
+       * @param return ETag
+       */
+      std::string PutObject(const std::string &bucket, const std::string &key, std::istream &stream, const std::string &region, const std::string &name);
+
+      /**
+       * Delete a bucket
+       *
        * @param name name of the bucket
        */
       void DeleteBucket(const std::string &region, const std::string &name);
 
     private:
+
+      /**
+       * Initialize the service
+       */
+      void Initialize();
+
+      /**
+       * Get the directory from the object key.
+       *
+       * @param key S3 object key
+       * @return all directories before file
+       */
+      static std::string GetDirFromKey(const std::string &key);
 
       /**
        * Logger

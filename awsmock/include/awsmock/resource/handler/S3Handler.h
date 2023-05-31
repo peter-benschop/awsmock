@@ -31,6 +31,21 @@ namespace AwsMock {
 
     /**
      * AWS S3 mock handler
+     *
+     * <p>AWS S3 HTTP request handler. All S3 related REST call are ending here. Depending on the request header the S3 service will be selected in case the
+     * authorization header contains the S3 service.<p>
+     *
+     * <p><h3>GET Requests</h3>
+     * <ul>
+     * <li>S3 list command</li>
+     * </ul>
+     * </p>
+     * <p><h3>POST Requests</h3>
+     * <ul>
+     * <li>Initial Multipart upload</li>
+     * <li>Complete Multipart upload</li>
+     * </ul>
+     * <p>
      */
     class S3Handler : public AwsMock::Resource::AbstractResource {
 

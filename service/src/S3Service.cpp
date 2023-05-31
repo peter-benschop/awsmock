@@ -9,14 +9,21 @@ namespace AwsMock::Service {
     using namespace Poco::Data::Keywords;
 
     S3Service::S3Service(const Core::Configuration &configuration) : _logger(Poco::Logger::get("S3Service")), _configuration(configuration) {
+        Initialize();
+    }
+
+    void S3Service::Initialize() {
+
+        // Set console logger
         Core::Logger::SetDefaultConsoleLogger("S3Service");
 
+        // Initialize environment
         _database = std::make_unique<Database::S3Database>(_configuration);
         _dataDir = _configuration.getString("awsmock.data.dir", "/tmp/awsmock/data");
         _tempDir = _dataDir + Poco::Path::separator() + "tmp";
 
         // Create temp directory
-        if(!Core::DirUtils::DirectoryExists(_tempDir)) {
+        if (!Core::DirUtils::DirectoryExists(_tempDir)) {
             Core::DirUtils::MakeDirectory(_tempDir);
         }
     }
@@ -131,6 +138,40 @@ namespace AwsMock::Service {
         return result;
     }
 
+    std::string S3Service::PutObject(const std::string &bucket, const std::string &key, std::istream &stream, const std::string &region, const std::string &user) {
+        poco_trace(_logger, "Put object, bucket: " + bucket + " key: " + key);
+
+        Poco::Data::Session session = _database->GetSession();
+        try {
+            // Check existence
+            if (!_database->BucketExists(region, bucket)) {
+                throw Core::ServiceException("Bucket does not exist", 500);
+            }
+
+            // Create directory, if not existing
+            std::string fileDir = _dataDir + Poco::Path::separator() + "s3" + Poco::Path::separator() + bucket + Poco::Path::separator() + GetDirFromKey(key);
+            if (!Core::DirUtils::DirectoryExists(fileDir)) {
+                Core::DirUtils::MakeDirectory(fileDir);
+            }
+
+            // Write file
+            std::string fileName = _dataDir + Poco::Path::separator() + "s3" + Poco::Path::separator() + bucket + Poco::Path::separator() + key;
+            std::ofstream ofs(fileName);
+            ofs << stream.rdbuf();
+            ofs.close();
+
+            // Update database
+            _database->CreateObject(bucket, key, user);
+
+        } catch (Poco::Exception &ex) {
+            session.close();
+            poco_error(_logger, "S3 Delete Bucket failed, message: " + ex.message());
+            throw Core::ServiceException(ex.message(), 500);
+        }
+        session.close();
+        return Core::StringUtils::GenerateRandomString(40);
+    }
+
     void S3Service::DeleteBucket(const std::string &region, const std::string &name) {
         poco_trace(_logger, "Delete bucket request, name: " + name);
 
@@ -156,5 +197,12 @@ namespace AwsMock::Service {
             throw Core::ServiceException(ex.message(), 500);
         }
         session.close();
+    }
+
+    std::string S3Service::GetDirFromKey(const std::string &key) {
+        if (key.find('/') != std::string::npos) {
+            return key.substr(0, key.find_last_of('/'));
+        }
+        return {};
     }
 } // namespace AwsMock::Service

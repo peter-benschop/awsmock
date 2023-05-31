@@ -361,4 +361,62 @@ namespace AwsMock::Resource {
         poco_debug(_logger, "Found user: " + user + " region: " + region);
     }
 
+    void AbstractResource::SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &payload, HeaderMap *extraHeader) {
+        poco_trace(_logger, "Sending OK response, status: 200 payload: " + payload);
+
+        // Get content length
+        unsigned long contentLength = 0;
+        if (!payload.empty()) {
+            contentLength = payload.length();
+        }
+
+        // Set headers
+        SetHeaders(response, contentLength, extraHeader);
+
+        // Send response
+        handleHttpStatusCode(200, response);
+        std::ostream &outputStream = response.send();
+        if (!payload.empty()) {
+            outputStream << payload;
+        }
+        outputStream.flush();
+    }
+
+    void AbstractResource::SendErrorResponse(Poco::Net::HTTPServerResponse &response, Poco::Exception &exc) {
+
+        std::string payload = Dto::Common::RestErrorResponse("code", "message", "resource", "requestId").ToXml();
+
+        SetHeaders(response, payload.length());
+
+        poco_error(_logger, "Exception, code: " + std::to_string(exc.code()) + " message: " + exc.message());
+        handleHttpStatusCode(exc.code(), response);
+        std::ostream &outputStream = response.send();
+        outputStream << payload;
+        outputStream.flush();
+    }
+
+    void AbstractResource::SetHeaders(Poco::Net::HTTPServerResponse &response, unsigned long contentLength, HeaderMap *extraHeader) {
+        poco_trace(_logger, "Setting header values, contentLength: " + std::to_string(contentLength));
+
+        // Default headers
+        Poco::DateTime now;
+        response.set("Date", Poco::DateTimeFormatter::format(now, Poco::DateTimeFormat::HTTP_FORMAT));
+        response.set("Content-Length", std::to_string(contentLength));
+        response.set("Content-Type", "text/html; charset=utf-8");
+        response.set("Connection", "open");
+        response.set("Server", "AmazonS3");
+
+        // Extra headers
+        if (extraHeader != nullptr) {
+            poco_trace(_logger, "Setting extra header values, count: " + std::to_string(extraHeader->size()));
+            for (auto &it : *extraHeader) {
+                response.set(it.first, it.second);
+            }
+        }
+    }
+
+    void AbstractResource::DumpRequest(Poco::Net::HTTPServerRequest &request) {
+        poco_trace(_logger, "Dump request");
+        request.write(std::cerr);
+    }
 }
