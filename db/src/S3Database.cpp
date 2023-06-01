@@ -73,7 +73,7 @@ namespace AwsMock::Database {
 
         Poco::Data::Statement stmt(session);
         stmt << "SELECT id,bucket,key,size,md5sum,content_type,created,modified FROM s3_object WHERE bucket=?", bind(bucket), into(object.id), into(object.bucket), into(object.key),
-        into(object.size), into(object.md5sum), into(object.contentType), into(object.created), into(object.modified), range(0, 1);
+            into(object.size), into(object.md5sum), into(object.contentType), into(object.created), into(object.modified), range(0, 1);
 
         while (!stmt.done() && objectList.size() < MAX_FILES) {
             stmt.execute();
@@ -83,21 +83,25 @@ namespace AwsMock::Database {
         return objectList;
     }
 
-    void S3Database::CreateObject(const Entity::S3::Object &object) {
+    Entity::S3::Object S3Database::CreateObject(const Entity::S3::Object &object) {
 
+        Entity::S3::Object result;
         try {
             Poco::Data::Session session = GetSession();
 
-            // Select database
-            Poco::Data::Statement stmt(session);
-            stmt << "INSERT INTO s3_object(bucket, key, owner, size, md5sum, content_type) VALUES(?,?,?,?,?,?)",
-                bind(object.bucket), bind(object.key), bind(object.owner), bind(object.size), bind(object.md5sum), bind(object.contentType);
+            long id = 0;
+            Poco::Data::Statement insert(session);
+            insert << "INSERT INTO s3_object(bucket,key,owner,size,md5sum,content_type) VALUES(?,?,?,?,?,?) returning id",
+                bind(object.bucket), bind(object.key), bind(object.owner), bind(object.size), bind(object.md5sum), bind(object.contentType), into(id), now;
 
+            Poco::Data::Statement select(session);
+            select << "SELECT id,bucket,key,owner,size,md5sum,content_type,modified FROM s3_object WHERE bucket=? AND key=?",
+                bind(result.id), bind(result.bucket), into(result.key), into(result.owner), into(result.size), into(result.md5sum), into(result.contentType),
+                into(result.created), into(result.modified), now;
             poco_trace(_logger, "Object created, bucket: " + object.bucket + " key: " + object.key);
 
-            stmt.execute();
         } catch(Poco::Exception &exc){
-            poco_error(_logger, "DB exception: " + exc.message());
+            poco_error(_logger, "Database exception: " + exc.message());
         }
     }
 
