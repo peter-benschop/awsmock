@@ -10,7 +10,6 @@
 #include "Poco/DateTime.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTimeFormatter.h"
-#include "Poco/StreamCopier.h"
 #include "Poco/Net/MediaType.h"
 #include "Poco/JSON/Parser.h"
 
@@ -39,12 +38,14 @@ namespace AwsMock {
      *
      * <p><h3>GET Requests</h3>
      * <ul>
-     * <li>S3 list command</li>
+     * <li>S3 bucket list command: <pre>aws s3 ls --endpoint http://localhost:4567</pre></li>
+     * <li>S3 object list command: <pre>aws s3 ls s3://example-bucket --recursive --endpoint http://localhost:4567</pre></li>
      * </ul>
      * </p>
      * <p><h3>POST Requests</h3>
      * <ul>
-     * <li>Initial Multipart upload</li>
+     * <li>Bigfile (>4MB) Initial Multipart upload: <pre>aws cp example.txt s3://example-bucket/test/example.txt --endpoint http://localhost:4567</pre></li>
+     * <li>Upload part</li>
      * <li>Complete Multipart upload</li>
      * </ul>
      * <p>
@@ -118,14 +119,6 @@ namespace AwsMock {
       void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
 
     private:
-
-      /**
-       * Returns the payload as a string
-       *
-       * @param request HTTP request
-       * @return payload as a string,
-       */
-      std::string GetPayload(Poco::Net::HTTPServerRequest &request);
 
       /**
        * Returns the bucket and key from the URI

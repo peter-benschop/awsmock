@@ -34,10 +34,9 @@ namespace AwsMock::Database {
         // Select database
         Poco::Data::Statement stmt(session);
         stmt << "INSERT INTO s3_bucket(region, name, owner) VALUES(?,?,?)", bind(bucket.region), bind(bucket.name), bind(bucket.owner);
+        stmt.execute();
 
         poco_trace(_logger, "Bucket created, region: " + bucket.region + " name: " + bucket.name + " owner: " + bucket.owner);
-
-        stmt.execute();
     }
 
     Entity::S3::BucketList S3Database::ListBuckets() {

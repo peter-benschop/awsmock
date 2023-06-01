@@ -362,6 +362,14 @@ namespace AwsMock::Resource {
         poco_debug(_logger, "Found user: " + user + " region: " + region);
     }
 
+
+    std::string AbstractResource::GetPayload(Poco::Net::HTTPServerRequest &request) {
+        std::string payload;
+        Poco::StreamCopier::copyToString(request.stream(), payload);
+        poco_trace(_logger, "Request payload: " + payload);
+        return payload;
+    }
+
     void AbstractResource::SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &payload, HeaderMap *extraHeader) {
         poco_trace(_logger, "Sending OK response, status: 200 payload: " + payload);
 
@@ -439,11 +447,22 @@ namespace AwsMock::Resource {
 
     void AbstractResource::DumpRequest(Poco::Net::HTTPServerRequest &request) {
         poco_trace(_logger, "Dump request");
+        std::cerr << "==================== Request =====================" << std::endl;
         request.write(std::cerr);
+        std::cerr << "==================================================" << std::endl;
     }
 
     void AbstractResource::DumpResponse(Poco::Net::HTTPServerResponse &response) {
         poco_trace(_logger, "Dump response");
+        std::cerr << "==================== Response ====================" << std::endl;
         response.write(std::cerr);
+        std::cerr << "==================================================" << std::endl;
+    }
+
+    void AbstractResource::DumpBody(Poco::Net::HTTPServerRequest &request) {
+        poco_trace(_logger, "Dump response");
+        std::cerr << "================== Request Body ==================" << std::endl;
+        std::cerr << request.stream().rdbuf();
+        std::cerr << "==================================================" << std::endl;
     }
 }

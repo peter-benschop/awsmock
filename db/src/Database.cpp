@@ -48,9 +48,15 @@ namespace AwsMock::Database {
 
         session << "CREATE TABLE s3_object (id INTEGER NOT NULL PRIMARY KEY, bucket VARCHAR(255), key VARCHAR(255), owner VARCHAR(32), "
                    "size INTEGER, md5sum VARCHAR(32), content_type VARCHAR(64), created DATETIME DEFAULT CURRENT_TIMESTAMP, modified DATETIME DEFAULT CURRENT_TIMESTAMP)",
-                   Poco::Data::Keywords::now;
+            Poco::Data::Keywords::now;
         session << "CREATE UNIQUE INDEX s3_object_idx1 ON s3_object(bucket, key)", Poco::Data::Keywords::now;
         poco_debug(_logger, "S3 object table created");
+
+        session << "CREATE TABLE sqs_queue (id INTEGER NOT NULL PRIMARY KEY, name VARCHAR(255), region VARCHAR(255), owner VARCHAR(32), url VARCHAR(255), "
+                   "created DATETIME DEFAULT CURRENT_TIMESTAMP, modified DATETIME DEFAULT CURRENT_TIMESTAMP)",
+            Poco::Data::Keywords::now;
+        session << "CREATE UNIQUE INDEX sqs_queue_idx1 ON sqs_queue(name, region)", Poco::Data::Keywords::now;
+        poco_debug(_logger, "SQS queue table created");
 
         poco_debug(_logger, "Database initialized, dbFile: " + _dbFile);
         session.close();

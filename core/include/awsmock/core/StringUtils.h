@@ -182,6 +182,14 @@ namespace AwsMock::Core {
       static std::string UrlEncode(const std::string &input);
 
       /**
+       * Returns a decoded string as plain text.
+       *
+       * @param input input string
+       * @return URL decoded string.
+       */
+      static std::string UrlDecode(const std::string &input);
+
+      /**
        * Convert to hex string
        *
        * @param input input byte array

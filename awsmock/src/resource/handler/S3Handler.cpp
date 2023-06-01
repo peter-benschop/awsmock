@@ -210,14 +210,6 @@ namespace AwsMock {
         }
     }
 
-    std::string S3Handler::GetPayload(Poco::Net::HTTPServerRequest &request) {
-        std::string payload;
-        std::istream &inputStream = request.stream();
-        Poco::StreamCopier::copyToString(inputStream, payload);
-        poco_trace(_logger, "S3 Payload: " + payload);
-        return payload;
-    }
-
     void S3Handler::GetBucketKeyFromUri(const std::string &uri, std::string &bucket, std::string &key) {
         Poco::RegularExpression::MatchVec posVec;
         Poco::RegularExpression pattern(R"(/([a-z0-9-.]+)?/?([a-zA-Z0-9-_/.*'()]+)?\??.*$)");

@@ -14,6 +14,7 @@
 #include "Poco/URI.h"
 #include "Poco/JSON/Parser.h"
 #include "Poco/JSON/Object.h"
+#include "Poco/StreamCopier.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/HTTPRequestHandler.h"
@@ -213,6 +214,14 @@ namespace AwsMock::Resource {
       void GetRegionUser(const std::string &authorization, std::string &region, std::string &user);
 
       /**
+       * Returns the payload as a string
+       *
+       * @param request HTTP request
+       * @return payload as a string,
+       */
+      std::string GetPayload(Poco::Net::HTTPServerRequest &request);
+
+      /**
        * Send a OK response (HTTP status code 200).
        *
        * @param response HTTP response object
@@ -252,6 +261,13 @@ namespace AwsMock::Resource {
        * @param response HTTP response
        */
       void DumpResponse(Poco::Net::HTTPServerResponse &response);
+
+      /**
+       * Dump the request body to std::cerr
+       *
+       * @param request HTTP request
+       */
+      void DumpBody(Poco::Net::HTTPServerRequest &request);
 
     private:
 

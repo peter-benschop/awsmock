@@ -18,6 +18,11 @@
 #include "awsmock/core/MetricDefinition.h"
 #include "awsmock/resource/HandlerException.h"
 #include "awsmock/resource/AbstractResource.h"
+#include "awsmock/service/SQSService.h"
+#include "awsmock/dto/sqs/CreateQueueRequest.h"
+#include "awsmock/dto/sqs/CreateQueueResponse.h"
+
+#define DEFAULT_USERID "000000000000"
 
 namespace AwsMock {
 
@@ -83,7 +88,42 @@ namespace AwsMock {
        */
       void handleOptions(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
 
+      /**
+       * Head request.
+       *
+       * @param request HTTP request
+       * @param response HTTP response
+       * @see AbstractResource::handleOption(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+       */
+      void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
+
     private:
+
+      /**
+       * Get the action from the request body
+       *
+       * @param body HTTP request body (in)
+       * @param action SQS action (out)
+       * @param version SQS version (out)
+       */
+      static void GetActionVersion(const std::string &body, std::string &action, std::string &version);
+
+      /**
+       * Get the action from the request body
+       *
+       * @param body HTTP request body (in)
+       * @param name parameter name (out)
+       * @param value parameter value (out)
+       */
+      static void GetParameter(const std::string &body, std::string &name, std::string &value);
+
+      /**
+       * Get the endpoint from the request header
+       *
+       * @param request HTTP request
+       * @return endpoint
+       */
+      static std::string GetEndpoint(Poco::Net::HTTPServerRequest &request);
 
       /**
        * Logger
@@ -99,6 +139,11 @@ namespace AwsMock {
        * Metric service
        */
       Core::MetricService &_metricService;
+
+      /**
+       * SQS service
+       */
+      Service::SQSService _sqsService;
     };
 } // namespace AwsMock
 

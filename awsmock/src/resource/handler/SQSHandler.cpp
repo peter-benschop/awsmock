@@ -4,43 +4,22 @@
 namespace AwsMock {
 
     SQSHandler::SQSHandler(Core::Configuration &configuration, Core::MetricService &metricService)
-        : AbstractResource(), _logger(Poco::Logger::get("SQSHandler")), _configuration(configuration), _metricService(metricService) {
+        : AbstractResource(), _logger(Poco::Logger::get("SQSHandler")), _configuration(configuration), _metricService(metricService), _sqsService(configuration) {
+        Core::Logger::SetDefaultConsoleLogger("SQSHandler");
     }
 
     void SQSHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_GET_TIMER);
         poco_debug(_logger, "SQS GET request, URI: " + request.getURI() + " region: " + region + " user: " + user);
 
+        DumpRequest(request);
+
         try {
-            /*std::string lieferantenId = getPathParameter(2);
-            std::string fileName = getPathParameter(3);
-            poco_debug(_logger, "Handling image GET request, key: " + lieferantenId + " fileName: " + fileName);
 
-            Database::ImageEntity entity = _database->findByLieferantenIdFileName(lieferantenId, fileName);
-
-            std::string key = lieferantenId + "/" + fileName;
-            long contentLength = _s3Adapter->GetContentLength(_bucket, key);
-
-            response.setContentType(Poco::Net::MediaType("image", Poco::toLower(entity.getFormat())));
-            response.setContentLength((std::streamsize) contentLength);
-
-            handleHttpStatusCode(200, response);
-            std::ostream &outputStream = response.send();
-
-            Aws::IOStream &stream = _s3Adapter->GetObjectStream(_configuration.GetS3OutputBucket(), lieferantenId + "/" + fileName);
-            outputStream << stream.rdbuf();
-            outputStream.flush();*/
-
-        } catch (AwsMock::HandlerException &exception) {
-            poco_error(_logger, "Server error, exception: " + exception.message());
-            handleHttpStatusCode(exception.code(), response);
-            std::ostream &outputStream = response.send();
-            outputStream << toJson(exception);
-        } catch (Core::ResourceNotFoundException &exception) {
-            poco_error(_logger, "Server error, exception: " + exception.displayText());
-            handleHttpStatusCode(500, response);
-            std::ostream &outputStream = response.send();
-            outputStream << toJson(exception);
+        } catch (Core::ServiceException &exc) {
+            SendErrorResponse(response, exc);
+        } catch (Core::ResourceNotFoundException &exc) {
+            SendErrorResponse(response, exc);
         }
     }
 
@@ -80,31 +59,39 @@ namespace AwsMock {
 
         try {
 
-            std::string jsonPayload;
-            std::istream &inputStream = request.stream();
-            Poco::StreamCopier::copyToString(inputStream, jsonPayload);
+            std::string endpoint = GetEndpoint(request);
+            std::string payload = GetPayload(request);
+            std::string action, version;
 
-            auto attributesSectionObject = getJsonAttributesSectionObject(jsonPayload);
+            GetActionVersion(payload, action, version);
 
-            std::list<std::string> attributesNames = {"starts_at", "ends_at", "details", "label", "text", "options"};
-            assertPayloadAttributes(attributesSectionObject, attributesNames);
+            if (action == "CreateQueue") {
 
-            //auto assembledQuestion = _entityAssembler.assembleEntity(attributesSectionObject);
-            //std::string newQuestionIdentity = _imageApplicationService->newQuestion(assembledQuestion);
+                std::string name, nameParameter = "QueueName";
+                GetParameter(payload, nameParameter, name);
+                Dto::SQS::CreateQueueRequest sqsRequest = {.name = name, .region=region, .owner=user, .url="http://" + endpoint + "/" + DEFAULT_USERID + "/" + name};
 
-            //response.set("Location", getUrl("?question_id=" + newQuestionIdentity));
-            //response.set("Content-Location", getUrl("?question_id=" + newQuestionIdentity));
+                Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
+                SendOkResponse(response, sqsResponse.ToXml());
 
-            handleHttpStatusCode(201, response);
-            std::ostream &outputStream = response.send();
-            outputStream.flush();
+            } else if (action == "ListQueues") {
 
-        } catch (HandlerException &exception) {
+                Dto::SQS::ListQueueResponse sqsResponse = _sqsService.ListQueues(region);
+                SendOkResponse(response, sqsResponse.ToXml());
 
-            handleHttpStatusCode(exception.code(), response);
-            std::ostream &outputStream = response.send();
-            //outputStream << toJson(exception);
-            outputStream.flush();
+            } else if (action == "DeleteQueue") {
+
+                std::string url, urlParameter = "QueueUrl";
+                GetParameter(payload, urlParameter, url);
+                url = Core::StringUtils::UrlDecode(url);
+
+                Dto::SQS::DeleteQueueRequest sqsRequest = {.url=url};
+                Dto::SQS::DeleteQueueResponse sqsResponse = _sqsService.DeleteQueue(sqsRequest);
+                SendOkResponse(response, sqsResponse.ToXml());
+            }
+
+        } catch (Core::ServiceException &exc) {
+            SendErrorResponse(response, exc);
         }
     }
 
@@ -143,5 +130,44 @@ namespace AwsMock {
         handleHttpStatusCode(200, response);
         std::ostream &outputStream = response.send();
         outputStream.flush();
+    }
+
+    void SQSHandler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+        Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
+        poco_debug(_logger, "SQS HEAD request, address: " + request.clientAddress().toString());
+
+        handleHttpStatusCode(200, response);
+        std::ostream &outputStream = response.send();
+        outputStream.flush();
+    }
+
+    void SQSHandler::GetActionVersion(const std::string &body, std::string &action, std::string &version) {
+        std::vector<std::string> bodyParts = Core::StringUtils::Split(body, '&');
+        for (auto &it : bodyParts) {
+            std::vector<std::string> parts = Core::StringUtils::Split(it, '=');
+            if (parts.size() < 2) {
+                throw Core::ServiceException("Invalid request body", 400);
+            }
+            if (parts[0] == "Action") {
+                action = parts[1];
+            }
+            if (parts[0] == "Version") {
+                version = parts[1];
+            }
+        }
+    }
+
+    void SQSHandler::GetParameter(const std::string &body, std::string &name, std::string &value) {
+        std::vector<std::string> bodyParts = Core::StringUtils::Split(body, '&');
+        for (auto &it : bodyParts) {
+            std::vector<std::string> parts = Core::StringUtils::Split(it, '=');
+            if (parts[0] == name) {
+                value = parts[1];
+            }
+        }
+    }
+
+    std::string SQSHandler::GetEndpoint(Poco::Net::HTTPServerRequest &request) {
+        return request.get("Host");
     }
 }
