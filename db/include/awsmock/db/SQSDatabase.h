@@ -23,6 +23,7 @@
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/db/Database.h>
 #include <awsmock/entity/sqs/Queue.h>
+#include <awsmock/entity/sqs/Message.h>
 
 namespace AwsMock::Database {
 
@@ -73,6 +74,14 @@ namespace AwsMock::Database {
        * @throws DatabaseException
        */
       Entity::SQS::QueueList ListQueues(const std::string &region);
+
+      /**
+       * Creates a new message in the SQS message table
+       *
+       * @param message SQS message entity
+       * @return saved message entity
+       */
+      Entity::SQS::Message CreateMessage(const Entity::SQS::Message &message);
 
       /**
        * Delete a queue.

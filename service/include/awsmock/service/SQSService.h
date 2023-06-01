@@ -17,8 +17,11 @@
 #include "Poco/DOM/Node.h"
 
 // AwsMock includes
+#include "awsmock/core/CryptoUtils.h"
 #include "awsmock/core/ServiceException.h"
 #include "awsmock/dto/sqs/ListQueueResponse.h"
+#include "awsmock/dto/sqs/CreateMessageRequest.h"
+#include "awsmock/dto/sqs/CreateMessageResponse.h"
 #include "awsmock/dto/sqs/CreateQueueRequest.h"
 #include "awsmock/dto/sqs/CreateQueueResponse.h"
 #include "awsmock/dto/sqs/DeleteQueueRequest.h"
@@ -53,7 +56,16 @@ namespace AwsMock::Service {
        * @param region AWS region
        * @return ListQueuesResponse
        */
-      Dto::SQS::ListQueueResponse ListQueues(const std::string region);
+      Dto::SQS::ListQueueResponse ListQueues(const std::string &region);
+
+      /**
+       * Creates a new queue
+       *
+       * @param region AWS region
+       * @param region AWS region
+       * @return CreateQueueResponse
+       */
+      Dto::SQS::CreateMessageResponse CreateMessage(const Dto::SQS::CreateMessageRequest &request);
 
       /**
        * Delete a queue

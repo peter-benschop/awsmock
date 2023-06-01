@@ -11,46 +11,11 @@ namespace AwsMock {
     void SQSHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_GET_TIMER);
         poco_debug(_logger, "SQS GET request, URI: " + request.getURI() + " region: " + region + " user: " + user);
-
-        DumpRequest(request);
-
-        try {
-
-        } catch (Core::ServiceException &exc) {
-            SendErrorResponse(response, exc);
-        } catch (Core::ResourceNotFoundException &exc) {
-            SendErrorResponse(response, exc);
-        }
     }
 
     void SQSHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_PUT_TIMER);
         poco_debug(_logger, "SQS PUT request, URI: " + request.getURI() + " region: " + region + " user: " + user);
-
-        try {
-            std::string jsonPayload;
-            std::istream &inputStream = request.stream();
-            Poco::StreamCopier::copyToString(inputStream, jsonPayload);
-
-            auto attributesSectionObject = getJsonAttributesSectionObject(jsonPayload);
-
-            std::list<std::string> attributesNames = {"starts_at", "ends_at", "details", "label", "text"};
-            assertPayloadAttributes(attributesSectionObject, attributesNames);
-
-            //auto assembledQuestion = _entityAssembler.assembleEntity(attributesSectionObject);
-            //_imageApplicationService->changeQuestion(assembledQuestion);
-
-            handleHttpStatusCode(200, response);
-            std::ostream &outputStream = response.send();
-            outputStream.flush();
-
-        } catch (HandlerException &exception) {
-
-            handleHttpStatusCode(exception.code(), response);
-            std::ostream &outputStream = response.send();
-            //outputStream << toJson(exception);
-            outputStream.flush();
-        }
     }
 
     void SQSHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
@@ -72,7 +37,7 @@ namespace AwsMock {
                 Dto::SQS::CreateQueueRequest sqsRequest = {.name = name, .region=region, .owner=user, .url="http://" + endpoint + "/" + DEFAULT_USERID + "/" + name};
 
                 Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
-                SendOkResponse(response, sqsResponse.ToXml());
+                SendOkResponse(response, sqsResponse.ToXml());;
 
             } else if (action == "ListQueues") {
 
@@ -88,6 +53,20 @@ namespace AwsMock {
                 Dto::SQS::DeleteQueueRequest sqsRequest = {.url=url};
                 Dto::SQS::DeleteQueueResponse sqsResponse = _sqsService.DeleteQueue(sqsRequest);
                 SendOkResponse(response, sqsResponse.ToXml());
+
+            } else if (action == "SendMessage") {
+
+                std::string url, urlParameter = "QueueUrl";
+                GetParameter(payload, urlParameter, url);
+                url = Core::StringUtils::UrlDecode(url);
+
+                std::string body, bodyParameter = "MessageBody";
+                GetParameter(payload, bodyParameter, body);
+                body = Core::StringUtils::UrlDecode(body);
+
+                Dto::SQS::CreateMessageRequest sqsRequest = {.url=url, .body=body};
+                Dto::SQS::CreateMessageResponse sqsResponse = _sqsService.CreateMessage(sqsRequest);
+                SendOkResponse(response, sqsResponse.ToXml());
             }
 
         } catch (Core::ServiceException &exc) {
@@ -98,26 +77,6 @@ namespace AwsMock {
     void SQSHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_DELETE_TIMER);
         poco_debug(_logger, "SQS DELETE request, URI: " + request.getURI() + " region: " + region + " user: " + user);
-
-        try {
-            std::string lieferantenId = GetPathParameter(2);
-            std::string fileName = GetPathParameter(3);
-            poco_debug(_logger, "Handling image DELETE request, lieferantenId: " + lieferantenId + " fileName: " + fileName);
-
-            /*Database::ImageEntity entity = _database->findByLieferantenIdFileName(lieferantenId, fileName);
-
-            _database->deleteEntity(entity);*/
-
-            handleHttpStatusCode(204, response);
-            std::ostream &outputStream = response.send();
-            outputStream.flush();
-
-        } catch (HandlerException &exception) {
-            handleHttpStatusCode(exception.code(), response);
-            std::ostream &outputStream = response.send();
-            //outputStream << toJson(exception);
-            outputStream.flush();
-        }
     }
 
     void SQSHandler::handleOptions(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {

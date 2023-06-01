@@ -2,9 +2,10 @@
 set(LIBRARY awsmockcore)
 set(LIBRARY_STATIC awsmockcore_static)
 
-set(UTILS_SOURCES src/utils/StringUtils.cpp src/utils/FileUtils.cpp src/utils/DirUtils.cpp src/utils/DateTimeUtils.cpp)
+set(UTILS_SOURCES src/utils/StringUtils.cpp src/utils/FileUtils.cpp src/utils/DirUtils.cpp src/utils/DateTimeUtils.cpp
+        src/utils/CryptoUtils.cpp)
 set(UTILS_HEADERS include/awsmock/core/StringUtils.h include/awsmock/core/FileUtils.h include/awsmock/core/DirUtils.h
-        include/awsmock/core/DateTimeUtils.h)
+        include/awsmock/core/DateTimeUtils.h include/awsmock/core/CryptoUtils.h)
 
 set(EXCEPTION_SOURCES src/exception/CoreException.cpp src/exception/ServiceException.cpp
         src/exception/ResourceNotFoundException.cpp)

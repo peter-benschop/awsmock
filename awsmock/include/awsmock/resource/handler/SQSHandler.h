@@ -19,6 +19,8 @@
 #include "awsmock/resource/HandlerException.h"
 #include "awsmock/resource/AbstractResource.h"
 #include "awsmock/service/SQSService.h"
+#include "awsmock/dto/sqs/CreateMessageRequest.h"
+#include "awsmock/dto/sqs/CreateMessageResponse.h"
 #include "awsmock/dto/sqs/CreateQueueRequest.h"
 #include "awsmock/dto/sqs/CreateQueueResponse.h"
 

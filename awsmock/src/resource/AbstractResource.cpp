@@ -462,7 +462,7 @@ namespace AwsMock::Resource {
     void AbstractResource::DumpBody(Poco::Net::HTTPServerRequest &request) {
         poco_trace(_logger, "Dump response");
         std::cerr << "================== Request Body ==================" << std::endl;
-        std::cerr << request.stream().rdbuf();
+        std::cerr << request.stream().rdbuf() << std::endl;
         std::cerr << "==================================================" << std::endl;
     }
 }
