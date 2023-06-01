@@ -68,6 +68,7 @@ namespace AwsMock {
             poco_debug(_logger, "S3 put request, bucket: " + bucket + " key: " + key);
 
             bool isMultipartUpload = QueryParameterExists("uploadId");
+            bool isNotification = QueryParameterExists("notification");
 
             if (isMultipartUpload) {
 
@@ -82,6 +83,19 @@ namespace AwsMock {
                 headerMap.emplace_back("ETag", eTag);
 
                 SendOkResponse(response, {}, &headerMap);
+
+            } else if(isNotification) {
+
+                poco_debug(_logger, "Bucket notification request, bucket: " + bucket);
+
+                // S3 notification setup
+                //DumpBody(request);
+
+                Dto::S3::PutBucketNotificationRequest s3Request = Dto::S3::PutBucketNotificationRequest(GetPayload(request), region, bucket);
+
+                _s3Service.PutBucketNotification(s3Request);
+
+                SendOkResponse(response);
 
             } else if(!key.empty()) {
 

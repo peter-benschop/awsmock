@@ -29,6 +29,7 @@
 #include "awsmock/dto/s3/InitiateMultipartUploadResult.h"
 #include "awsmock/dto/s3/ListBucketResult.h"
 #include "awsmock/dto/s3/ListAllBucketResponse.h"
+#include "awsmock/dto/s3/PutBucketNotificationRequest.h"
 #include "awsmock/dto/s3/PutObjectRequest.h"
 #include "awsmock/dto/s3/PutObjectResponse.h"
 
@@ -136,6 +137,13 @@ namespace AwsMock::Service {
        * @return PutObjectResponse
        */
       Dto::S3::PutObjectResponse PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream);
+
+      /**
+       * Adds a bucket notification
+       *
+       * @param request bucket notification request.
+       */
+      void PutBucketNotification(const Dto::S3::PutBucketNotificationRequest& request);
 
       /**
        * Delete a bucket

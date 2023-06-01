@@ -23,6 +23,7 @@
 #include <awsmock/db/Database.h>
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/Object.h>
+#include "awsmock/entity/s3/BucketNotification.h"
 
 #define MAX_FILES 100
 
@@ -53,9 +54,10 @@ namespace AwsMock::Database {
        * Create a new bucket in the S3 bucket table
        *
        * @param bucket bucket entity
+       * @return created bucket entity
        * @throws DatabaseException
        */
-      void CreateBucket(const Entity::S3::Bucket& bucket);
+      Entity::S3::Bucket CreateBucket(const Entity::S3::Bucket& bucket);
 
       /**
        * Create a new S3 object in the S3 object table
@@ -88,6 +90,14 @@ namespace AwsMock::Database {
        * @return ObjectList
        */
       Entity::S3::ObjectList ListBucket(const std::string &bucket);
+
+      /**
+       * Creates a bucket notification
+       *
+       * @param bucketNotification bucket notification
+       * @return created BucketNotification entity
+       */
+      Entity::S3::BucketNotification CreateBucketNotification(const Entity::S3::BucketNotification &bucketNotification);
 
       /**
        * Delete a bucket.

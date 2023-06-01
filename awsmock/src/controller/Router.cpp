@@ -15,6 +15,7 @@ namespace AwsMock {
         _metricService = metricService;
 
         AddRoute("s3", "AwsMock::Resource::Factory::S3Factory");
+        AddRoute("s3api", "AwsMock::Resource::Factory::S3ApiFactory");
         AddRoute("sqs", "AwsMock::Resource::Factory::SQSFactory");
         AddRoute("sns", "AwsMock::Resource::Factory::SNSFactory");
     }

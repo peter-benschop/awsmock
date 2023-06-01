@@ -32,7 +32,6 @@ namespace AwsMock::Service {
         poco_trace(_logger, "Create bucket request, s3Request: " + s3Request.ToString());
 
         Dto::S3::CreateBucketResponse createBucketResponse;
-        Poco::Data::Session session = _database->GetSession();
         try {
             // Get region
             std::string region = s3Request.GetLocationConstraint();
@@ -55,12 +54,9 @@ namespace AwsMock::Service {
             poco_trace(_logger, "S3 create bucket response: " + createBucketResponse.ToXml());
 
         } catch (Poco::Exception &ex) {
-            session.close();
             poco_error(_logger, "S3 create bucket failed, message: " + ex.message());
             throw Core::ServiceException(ex.message(), 500);
         }
-        session.close();
-
         return createBucketResponse;
     }
 
@@ -68,7 +64,6 @@ namespace AwsMock::Service {
         poco_trace(_logger, "Get metadata request, s3Request: " + request.ToString());
 
         Dto::S3::GetMetadataResponse getMetadataResponse;
-        Poco::Data::Session session = _database->GetSession();
         try {
 
             Database::Entity::S3::Object object = _database->GetObject(request.GetBucket(), request.GetKey());
@@ -81,12 +76,9 @@ namespace AwsMock::Service {
             poco_trace(_logger, "S3 get metadata response: " + getMetadataResponse.ToString());
 
         } catch (Poco::Exception &ex) {
-            session.close();
             poco_error(_logger, "S3 create bucket failed, message: " + ex.message());
             throw Core::ServiceException(ex.message(), 500);
         }
-        session.close();
-
         return getMetadataResponse;
     }
 
@@ -94,7 +86,6 @@ namespace AwsMock::Service {
         poco_trace(_logger, "Get object request, s3Request: " + request.ToString());
 
         Dto::S3::GetObjectResponse getObjectResponse;
-        Poco::Data::Session session = _database->GetSession();
         try {
 
             Database::Entity::S3::Object object = _database->GetObject(request.GetBucket(), request.GetKey());
@@ -109,31 +100,23 @@ namespace AwsMock::Service {
             poco_trace(_logger, "S3 get object response: " + getObjectResponse.ToString());
 
         } catch (Poco::Exception &ex) {
-            session.close();
             poco_error(_logger, "S3 create bucket failed, message: " + ex.message());
             throw Core::ServiceException(ex.message(), 500);
         }
-        session.close();
-
         return getObjectResponse;
     }
 
     Dto::S3::ListAllBucketResponse S3Service::ListAllBuckets() {
         poco_trace(_logger, "List all buckets request");
 
-        Poco::Data::Session session = _database->GetSession();
         try {
 
             Database::Entity::S3::BucketList bucketList = _database->ListBuckets();
             Dto::S3::ListAllBucketResponse listAllBucketResponse = Dto::S3::ListAllBucketResponse(bucketList);
             poco_trace(_logger, "S3 Create Bucket List outcome: " + listAllBucketResponse.ToXml());
-
-            session.close();
-
             return listAllBucketResponse;
 
         } catch (Poco::Exception &ex) {
-            session.close();
             poco_error(_logger, "S3 Create Bucket failed, message: " + ex.message());
             throw Core::ServiceException(ex.message(), 500);
         }
@@ -142,19 +125,14 @@ namespace AwsMock::Service {
     Dto::S3::ListBucketResult S3Service::ListBucket(const std::string &bucket) {
         poco_trace(_logger, "List bucket request");
 
-        Poco::Data::Session session = _database->GetSession();
         try {
 
             Database::Entity::S3::ObjectList objectList = _database->ListBucket(bucket);
             Dto::S3::ListBucketResult listBucketResult = Dto::S3::ListBucketResult(objectList);
             poco_trace(_logger, "S3 list bucket result: " + listBucketResult.ToXml());
-
-            session.close();
-
             return listBucketResult;
 
         } catch (Poco::Exception &ex) {
-            session.close();
             poco_error(_logger, "S3 list bucket failed, message: " + ex.message());
             throw Core::ServiceException(ex.message(), 500);
         }
@@ -220,7 +198,6 @@ namespace AwsMock::Service {
         poco_trace(_logger, "Put object request: " + request.ToString());
 
         Dto::S3::PutObjectResponse response;
-        Poco::Data::Session session = _database->GetSession();
         try {
             // Check existence
             if (!_database->BucketExists(request.GetRegion(), request.GetBucket())) {
@@ -246,18 +223,34 @@ namespace AwsMock::Service {
             response.SetETag(request.GetContentType());
 
         } catch (Poco::Exception &ex) {
-            session.close();
             poco_error(_logger, "S3 Delete Bucket failed, message: " + ex.message());
             throw Core::ServiceException(ex.message(), 500);
         }
-        session.close();
         return response;
+    }
+
+    void S3Service::PutBucketNotification(const Dto::S3::PutBucketNotificationRequest &request) {
+        poco_trace(_logger, "Put bucket notification request, id: " + std::to_string(request.notificationId));
+
+        try {
+            // Check existence
+            if (!_database->BucketExists(request.region, request.bucket)) {
+                throw Core::ServiceException("Bucket does not exist", 500);
+            }
+
+            Database::Entity::S3::BucketNotification
+                bucketNotification = _database->CreateBucketNotification({.bucket=request.bucket, .region=request.region, .notificationId=request.notificationId,
+                                                                             .function=request.function, .event=request.event});
+
+        } catch (Poco::Exception &ex) {
+            poco_error(_logger, "S3 put bucket notification request failed, message: " + ex.message());
+            throw Core::ServiceException(ex.message(), 500);
+        }
     }
 
     void S3Service::DeleteBucket(const std::string &region, const std::string &name) {
         poco_trace(_logger, "Delete bucket request, name: " + name);
 
-        Poco::Data::Session session = _database->GetSession();
         try {
             // Check existence
             if (!_database->BucketExists(region, name)) {
@@ -274,11 +267,9 @@ namespace AwsMock::Service {
             _database->DeleteBucket({.name=name,.region=region});
 
         } catch (Poco::Exception &ex) {
-            session.close();
             poco_error(_logger, "S3 Delete Bucket failed, message: " + ex.message());
             throw Core::ServiceException(ex.message(), 500);
         }
-        session.close();
     }
 
     std::string S3Service::GetDirFromKey(const std::string &key) {
@@ -287,4 +278,5 @@ namespace AwsMock::Service {
         }
         return {};
     }
+
 } // namespace AwsMock::Service
