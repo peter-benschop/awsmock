@@ -103,6 +103,7 @@ namespace AwsMock::Database {
         } catch(Poco::Exception &exc){
             poco_error(_logger, "Database exception: " + exc.message());
         }
+        return result;
     }
 
     Entity::S3::Object S3Database::GetObject(const std::string &bucket, const std::string &key) {
