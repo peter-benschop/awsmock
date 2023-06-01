@@ -5,6 +5,10 @@
 #ifndef AWSMOCK_RESOURCE_ABSTRACTRESOURCE_H
 #define AWSMOCK_RESOURCE_ABSTRACTRESOURCE_H
 
+// C++ includes
+#include <string>
+#include <fstream>
+
 // Poco includes
 #include "Poco/Logger.h"
 #include "Poco/URI.h"
@@ -218,6 +222,16 @@ namespace AwsMock::Resource {
       void SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &payload = {}, HeaderMap *extraHeader = nullptr);
 
       /**
+       * Send a OK response (HTTP status code 200) with an output stream.
+       *
+       * @param response HTTP response object
+       * @param stream HTTP body stream
+       * @param contentLength content length of the stream in bytes
+       * @param extraHeader HTTP header map values, added to the default headers
+       */
+      void SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long contentLength, HeaderMap *extraHeader = nullptr);
+
+      /**
        * Send a OK response (HTTP status code 200).
        *
        * @param response HTTP response object
@@ -231,6 +245,13 @@ namespace AwsMock::Resource {
        * @param request HTTP request
        */
       void DumpRequest(Poco::Net::HTTPServerRequest &request);
+
+      /**
+       * Dump the response to std::cerr
+       *
+       * @param response HTTP response
+       */
+      void DumpResponse(Poco::Net::HTTPServerResponse &response);
 
     private:
 

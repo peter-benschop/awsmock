@@ -24,6 +24,8 @@
 #include "awsmock/dto/s3/CreateBucketResponse.h"
 #include "awsmock/dto/s3/GetMetadataRequest.h"
 #include "awsmock/dto/s3/GetMetadataResponse.h"
+#include "awsmock/dto/s3/GetObjectRequest.h"
+#include "awsmock/dto/s3/GetObjectResponse.h"
 #include "awsmock/dto/s3/InitiateMultipartUploadResult.h"
 #include "awsmock/dto/s3/ListBucketResult.h"
 #include "awsmock/dto/s3/ListAllBucketResponse.h"
@@ -117,6 +119,14 @@ namespace AwsMock::Service {
                                                                      const std::string &key,
                                                                      const std::string &region,
                                                                      const std::string &user);
+
+      /**
+       * Get object
+       *
+       * @param request put object request
+       * @return GetObjectResponse
+       */
+      Dto::S3::GetObjectResponse GetObject(Dto::S3::GetObjectRequest &request);
 
       /**
        * Put object

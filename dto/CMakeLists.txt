@@ -5,13 +5,15 @@ set(LIBRARY_STATIC awsmockdto_static)
 set(SOURCES ./src/dto/s3/CreateBucketRequest.cpp ./src/dto/s3/CreateBucketResponse.cpp ./src/dto/s3/ListAllBucketResponse.cpp
         ./src/dto/s3/InitiateMultipartUploadResult.cpp ./src/dto/s3/CompleteMultipartUploadResult.cpp
         ./src/dto/s3/RestErrorResponse.cpp ./src/dto/s3/ListBucketResult.cpp ./src/dto/s3/PutObjectRequest.cpp
-        ./src/dto/s3/PutObjectResponse.cpp ./src/dto/s3/GetMetadataRequest.cpp ./src/dto/s3/GetMetadataResponse.cpp)
+        ./src/dto/s3/PutObjectResponse.cpp ./src/dto/s3/GetMetadataRequest.cpp ./src/dto/s3/GetMetadataResponse.cpp
+        ./src/dto/s3/GetObjectRequest.cpp ./src/dto/s3/GetObjectResponse.cpp)
 set(HEADERS ./include/awsmock/dto/s3/CreateBucketRequest.h ./include/awsmock/dto/s3/CreateBucketResponse.h
         ./include/awsmock/dto/s3/ListAllBucketResponse.h ./include/awsmock/dto/s3/ListAllBucketResponse.h
         ./include/awsmock/dto/s3/CompleteMultipartUploadResult.h ./include/awsmock/dto/s3/RestErrorResponse.h
         ./include/awsmock/dto/s3/ListBucketResult.h ./include/awsmock/dto/s3/PutObjectRequest.h
         ./include/awsmock/dto/s3/PutObjectResponse.h include/awsmock/dto/s3/GetMetadataRequest.h
-        include/awsmock/dto/s3/GetMetadataResponse.h)
+        include/awsmock/dto/s3/GetMetadataResponse.h include/awsmock/dto/s3/GetObjectRequest.h
+        include/awsmock/dto/s3/GetObjectResponse.h)
 
 # Includes
 include_directories(include ../core/include ../db/include /usr/include /usr/local/include)

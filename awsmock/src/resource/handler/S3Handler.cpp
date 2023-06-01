@@ -12,13 +12,11 @@ namespace AwsMock {
         Core::MetricServiceTimer measure(_metricService, HTTP_GET_TIMER);
         poco_debug(_logger, "S3 GET request, URI: " + request.getURI() + " region: " + region + " user: " + user);
 
-        DumpRequest(request);
-
         try {
 
+            DumpRequest(request);
             std::string bucket, key;
             GetBucketKeyFromUri(request.getURI(), bucket, key);
-            //bool isGetRequest = QueryParameterExists("list-type");
 
             if(bucket.empty()) {
 
@@ -30,7 +28,20 @@ namespace AwsMock {
 
                 // Get object request
                 poco_debug(_logger, "S3 get object request, bucket: " + bucket + " key: " + key);
-                //_s3Service.GetObject(bucket. key);
+                Dto::S3::GetObjectRequest s3Request;
+                s3Request.SetBucket(bucket);
+                s3Request.SetKey(key);
+
+                Dto::S3::GetObjectResponse s3Response = _s3Service.GetObject(s3Request);
+                std::ifstream ifs (s3Response.GetFilename());
+
+                Resource::HeaderMap headerMap;
+                headerMap.emplace_back("ETag", Core::StringUtils::GenerateRandomString(32));
+                headerMap.emplace_back("Content-Type", s3Response.GetContentType());
+                headerMap.emplace_back("Content-Length", std::to_string(s3Response.GetSize()));
+                headerMap.emplace_back("Last-Modified", s3Response.GetLastModified());
+
+                SendOkResponse(response, s3Response.GetFilename(), s3Response.GetSize(), &headerMap);
 
             } else {
 
@@ -145,6 +156,7 @@ namespace AwsMock {
         Core::MetricServiceTimer measure(_metricService, HTTP_DELETE_TIMER);
         poco_debug(_logger, "S3 DELETE request, URI: " + request.getURI() + " region: " + region + " user: " + user);
 
+        DumpRequest(request);
         try {
             const std::string &name = Core::DirUtils::RelativePath(request.getURI());
             _s3Service.DeleteBucket(region, name);

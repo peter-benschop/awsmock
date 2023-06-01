@@ -383,6 +383,27 @@ namespace AwsMock::Resource {
         outputStream.flush();
     }
 
+    void AbstractResource::SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long contentLength, HeaderMap *extraHeader) {
+        poco_trace(_logger, "Sending OK response, status: 200, filename: " + fileName + " contentLength: " + std::to_string(contentLength));
+        try {
+
+            // Set headers
+            SetHeaders(response, contentLength, extraHeader);
+
+            std::ifstream ifs(fileName);
+
+            // Send response
+            handleHttpStatusCode(200, response);
+            std::ostream &outputStream = response.send();
+            outputStream << ifs.rdbuf();
+            outputStream.flush();
+            ifs.close();
+
+        } catch (Poco::Exception &exc) {
+            poco_error(_logger, "Exception: " + exc.message());
+        }
+    }
+
     void AbstractResource::SendErrorResponse(Poco::Net::HTTPServerResponse &response, Poco::Exception &exc) {
 
         std::string payload = Dto::Common::RestErrorResponse("code", "message", "resource", "requestId").ToXml();
@@ -404,7 +425,7 @@ namespace AwsMock::Resource {
         response.set("Date", Poco::DateTimeFormatter::format(now, Poco::DateTimeFormat::HTTP_FORMAT));
         response.set("Content-Length", std::to_string(contentLength));
         response.set("Content-Type", "text/html; charset=utf-8");
-        response.set("Connection", "open");
+        response.set("Connection", "close");
         response.set("Server", "AmazonS3");
 
         // Extra headers
@@ -419,5 +440,10 @@ namespace AwsMock::Resource {
     void AbstractResource::DumpRequest(Poco::Net::HTTPServerRequest &request) {
         poco_trace(_logger, "Dump request");
         request.write(std::cerr);
+    }
+
+    void AbstractResource::DumpResponse(Poco::Net::HTTPServerResponse &response) {
+        poco_trace(_logger, "Dump response");
+        response.write(std::cerr);
     }
 }

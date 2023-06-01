@@ -90,6 +90,34 @@ namespace AwsMock::Service {
         return getMetadataResponse;
     }
 
+    Dto::S3::GetObjectResponse S3Service::GetObject(Dto::S3::GetObjectRequest &request) {
+        poco_trace(_logger, "Get object request, s3Request: " + request.ToString());
+
+        Dto::S3::GetObjectResponse getObjectResponse;
+        Poco::Data::Session session = _database->GetSession();
+        try {
+
+            Database::Entity::S3::Object object = _database->GetObject(request.GetBucket(), request.GetKey());
+
+            std::string filename = _dataDir + Poco::Path::separator() + "s3" + Poco::Path::separator() + request.GetBucket() + Poco::Path::separator() + request.GetKey();
+            getObjectResponse.SetBucket(object.bucket);
+            getObjectResponse.SetKey(object.key);
+            getObjectResponse.SetSize(object.size);
+            getObjectResponse.SetContentType(object.contentType);
+            getObjectResponse.SetFilename(filename);
+            getObjectResponse.SetLastModified(Poco::DateTimeFormatter::format(object.modified, Poco::DateTimeFormat::HTTP_FORMAT));
+            poco_trace(_logger, "S3 get object response: " + getObjectResponse.ToString());
+
+        } catch (Poco::Exception &ex) {
+            session.close();
+            poco_error(_logger, "S3 create bucket failed, message: " + ex.message());
+            throw Core::ServiceException(ex.message(), 500);
+        }
+        session.close();
+
+        return getObjectResponse;
+    }
+
     Dto::S3::ListAllBucketResponse S3Service::ListAllBuckets() {
         poco_trace(_logger, "List all buckets request");
 
