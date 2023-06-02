@@ -36,6 +36,7 @@ namespace AwsMock {
        * @param self application reference.
        */
       [[maybe_unused]] void initialize(Application &self) override {
+
           InitializeLogging();
           InitializeMonitoring();
           InitializeErrorHandler();
@@ -49,6 +50,7 @@ namespace AwsMock {
        * Shutdown the application. Gets called when the application is about to stop.
        */
       [[maybe_unused]] void uninitialize() override {
+
           poco_debug(_logger, "Starting system shutdown");
 
           Poco::ThreadPool::defaultPool().stopAll();
@@ -71,6 +73,7 @@ namespace AwsMock {
        * @param options Poco options class.
        */
       [[maybe_unused]] void defineOptions(Poco::Util::OptionSet &options) override {
+
           Poco::Util::ServerApplication::defineOptions(options);
           options.addOption(Poco::Util::Option("config", "", "set the configuration file").required(false).repeatable(false).argument("value").callback(
               Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
@@ -87,6 +90,7 @@ namespace AwsMock {
        * @param value command line option value.
        */
       void handleOption(const std::string &name, const std::string &value) override {
+
           if (name == "help") {
               Poco::Util::HelpFormatter helpFormatter(options());
               helpFormatter.setCommand(commandName());
@@ -108,6 +112,7 @@ namespace AwsMock {
        * Initialize the logging system
        */
       static void InitializeLogging() {
+
           Core::Logger::SetDefaultConsoleLogger("root");
       }
 
@@ -115,6 +120,7 @@ namespace AwsMock {
        * Initialize the Prometheus monitoring counters and start the prometheus server.
        */
       void InitializeMonitoring() {
+
           _metricService = new Core::MetricService(_configuration);
           _metricService->Initialize();
           _metricService->StartServer();
@@ -124,8 +130,10 @@ namespace AwsMock {
        * Initialize error handler
        */
       void InitializeErrorHandler() {
-//          _processErrorHandler = new ProcessErrorHandler(*_metricService);
-//          poco_debug(_logger, "Process error handler initialized");
+
+          // Install error handler
+          Poco::ErrorHandler::set(&_threadErrorHandler);
+          poco_debug(_logger, "Error handler initialized");
       }
 
       /**
@@ -145,10 +153,6 @@ namespace AwsMock {
       int main([[maybe_unused]]const ArgVec &args) override {
 
           poco_debug(_logger, "Entering main routine");
-
-          // Install error handler
-          Poco::ErrorHandler::set(&_threadErrorHandler);
-          poco_debug(_logger, "Error handler initialized");
 
           // Start REST service
           _router = std::make_shared<Router>();

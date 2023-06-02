@@ -50,6 +50,7 @@
 # Tests
 Testing/*
 **/*_tst
+**/*.txt
 
 # Docker
 docker/libs

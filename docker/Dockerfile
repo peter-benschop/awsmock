@@ -2,7 +2,16 @@ FROM debian:latest
 
 # Install basics
 RUN apt-get update && apt-get -y install build-essential cmake git openssl libssl-dev supervisor
-RUN apt-get  -y install libiodbc2 libiodbc2-dev libpq-dev libpqxx-dev zlib1g-dev && mkdir -p /usr/src
+RUN apt-get  -y install libiodbc2 libiodbc2-dev libpq-dev libpqxx-dev zlib1g-dev libcurl4 && mkdir -p /usr/src
+
+# Install google test
+RUN mkdir -p /usr/src && \
+    cd /usr/src && \
+    git clone https://github.com/google/googletest.git && \
+    cd /usr/src/googletest && \
+    cmake -DBUILD_SHARED_LIBS=ON . &&\
+    make && \
+    make install
 
 # Install Poco libraries \
 RUN cd /usr/src && \
@@ -30,7 +39,7 @@ RUN mkdir -p /tmp/awsmock/data && \
     mkdir -p /tmp/awsmock/data/db && \
     mkdir -p /tmp/awsmock/log
 
-RUN cp /usr/src/awsmock/etc/aws-mock.properties /etc
+RUN cp /usr/src/aws-mock/etc/aws-mock.properties /etc
 
 EXPOSE 4567 4567
 
