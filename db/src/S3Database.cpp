@@ -53,10 +53,11 @@ namespace AwsMock::Database {
         Entity::S3::BucketList bucketList;
 
         Poco::Data::Statement stmt(session);
-        stmt << "SELECT name,created,modified FROM s3_bucket", into(bucket.name), into(bucket.created), into(bucket.modified), range(0, 1);
+        stmt << "SELECT id,name,created,modified FROM s3_bucket", into(bucket.id), into(bucket.name), into(bucket.created), into(bucket.modified), range(0, 1);
 
         while (!stmt.done()) {
             stmt.execute();
+            if(bucket.id > 0)
             bucketList.push_back(bucket);
         }
         poco_trace(_logger, "Bucket list created, size:" + std::to_string(bucketList.size()));
@@ -77,7 +78,9 @@ namespace AwsMock::Database {
 
         while (!stmt.done() && objectList.size() < MAX_FILES) {
             stmt.execute();
-            objectList.push_back(object);
+            if(object.id > 0) {
+                objectList.push_back(object);
+            }
         }
         poco_trace(_logger, "Bucket list created, size:" + std::to_string(objectList.size()));
         return objectList;

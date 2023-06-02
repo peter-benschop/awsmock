@@ -49,3 +49,6 @@
 
 # Tests
 Testing/*
+
+# Docker
+docker/libs

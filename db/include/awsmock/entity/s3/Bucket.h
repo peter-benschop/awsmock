@@ -18,7 +18,7 @@ namespace AwsMock::Database::Entity::S3 {
       /**
        * ID
        */
-      long id;
+      long id = 0;
 
       /**
        * Bucket name
