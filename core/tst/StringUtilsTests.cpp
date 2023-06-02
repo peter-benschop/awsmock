@@ -16,8 +16,7 @@
 
 namespace AwsMock::Core
 {
-    class StringUtilsTest : public ::testing::Test
-    {
+    class StringUtilsTest : public ::testing::Test {
 
     protected:
         void SetUp() override
