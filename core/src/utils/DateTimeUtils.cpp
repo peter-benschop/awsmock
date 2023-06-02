@@ -6,7 +6,7 @@
 
 namespace AwsMock::Core {
 
-    std::string DateTimeUtils::AwsDatetime(Poco::DateTime dateTime) {
+    std::string DateTimeUtils::AwsDatetime(const Poco::DateTime& dateTime) {
         return Poco::DateTimeFormatter::format(dateTime, Poco::DateTimeFormat::ISO8601_FRAC_FORMAT);
     }
 

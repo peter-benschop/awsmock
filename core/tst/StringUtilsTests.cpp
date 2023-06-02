@@ -1,19 +1,20 @@
-#ifndef LIBRI_COM_STRINGUTILSTEST_H
-#define LIBRI_COM_STRINGUTILSTEST_H
+//
+// Created by vogje01 on 02/06/2023.
+//
+
+#ifndef AWSMOCK_CORE_STRINGUTILSTEST_H
+#define AWSMOCK_CORE_STRINGUTILSTEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
 
 // Poco includes
 #include "Poco/Path.h"
-#include "Poco/File.h"
 
 // Local includes
-#include "../include/libricom/FileUtils.h"
-#include "../include/libricom/StreamFilter.h"
+#include <awsmock/core/StringUtils.h>
 
-namespace Libri::COM
+namespace AwsMock::Core
 {
     class StringUtilsTest : public ::testing::Test
     {
@@ -35,8 +36,8 @@ namespace Libri::COM
         std::string value2 = "abcdef";
 
         // act
-        bool result1 = StringUtils::isNumeric(value1);
-        bool result2 = StringUtils::isNumeric(value2);
+        bool result1 = StringUtils::IsNumeric(value1);
+        bool result2 = StringUtils::IsNumeric(value2);
 
         // assert
         EXPECT_TRUE(result1);
@@ -50,8 +51,8 @@ namespace Libri::COM
         std::string value2 = "123\n456\n789";
 
         // act
-        std::vector<std::string> result1 = StringUtils::split(value1, ' ');
-        std::vector<std::string> result2 = StringUtils::split(value2, '\n');
+        std::vector<std::string> result1 = StringUtils::Split(value1, ' ');
+        std::vector<std::string> result2 = StringUtils::Split(value2, '\n');
 
         // assert
         EXPECT_EQ(result1.size(), 3);
@@ -66,9 +67,9 @@ namespace Libri::COM
         std::string value3 = "abscdef";
 
         // act
-        bool result1 = StringUtils::isUuid(value1);
-        bool result2 = StringUtils::isUuid(value2);
-        bool result3 = StringUtils::isUuid(value3);
+        bool result1 = StringUtils::IsUuid(value1);
+        bool result2 = StringUtils::IsUuid(value2);
+        bool result3 = StringUtils::IsUuid(value3);
 
         // assert
         EXPECT_TRUE(result1);
@@ -82,7 +83,7 @@ namespace Libri::COM
         std::string value = "   \r\n\r\n\n   ";
 
         // act
-        std::string result = StringUtils::stripWhiteSpaces(value);
+        std::string result = StringUtils::StripWhiteSpaces(value);
 
         // assert
         EXPECT_EQ(result.length(), 0);
@@ -94,7 +95,7 @@ namespace Libri::COM
         std::string value = "   \r\n\r\n\n   aksjdh";
 
         // act
-        std::string result = StringUtils::stripWhiteSpaces(value);
+        std::string result = StringUtils::StripWhiteSpaces(value);
 
         // assert
         EXPECT_EQ(result.length(), 17);
@@ -109,8 +110,8 @@ namespace Libri::COM
         std::string s3 = "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG";
 
         // act
-        bool result1 = StringUtils::equals(s1, s2);
-        bool result2 = StringUtils::equalsIgnoreCase(s1, s3);
+        bool result1 = StringUtils::Equals(s1, s2);
+        bool result2 = StringUtils::EqualsIgnoreCase(s1, s3);
 
         // assert
         EXPECT_TRUE(result1);
@@ -124,7 +125,7 @@ namespace Libri::COM
         std::string s2 = "quick brown fox";
 
         // act
-        bool result = StringUtils::contains(s1, s2);
+        bool result = StringUtils::Contains(s1, s2);
 
         // assert
         EXPECT_TRUE(result);
@@ -137,9 +138,9 @@ namespace Libri::COM
         std::string s2 = "   80    ";
 
         // act
-        std::string result1 = StringUtils::split(s1, ':')[1];
-        std::string result2 = StringUtils::trim(StringUtils::split(s1, ':')[1]);
-        std::string result3 = StringUtils::trim(s2);
+        std::string result1 = StringUtils::Split(s1, ':')[1];
+        std::string result2 = StringUtils::Trim(StringUtils::Split(s1, ':')[1]);
+        std::string result3 = StringUtils::Trim(s2);
 
         // assert
         EXPECT_STREQ(result1.c_str(), "        80");
@@ -153,7 +154,7 @@ namespace Libri::COM
         std::string s1 = " 80 ";
 
         // act
-        double result1 = std::stod(StringUtils::trim(s1));
+        double result1 = std::stod(StringUtils::Trim(s1));
 
         // assert
         EXPECT_EQ(80.0, result1);
@@ -194,5 +195,7 @@ namespace Libri::COM
         // assert
         EXPECT_STREQ("/abc/xyz/", result.c_str());
     }
-} // namespace Libri::COM
-#endif // LIBRI_COM_STRINGUTILSTEST_H
+
+} // namespace AwsMock::Core
+
+#endif // AWSMOCK_CORE_STRINGUTILSTEST_H

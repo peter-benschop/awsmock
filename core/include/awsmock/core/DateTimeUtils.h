@@ -18,7 +18,7 @@ namespace AwsMock::Core {
     class DateTimeUtils {
     public:
 
-      static std::string AwsDatetime(Poco::DateTime dateTime);
+      static std::string AwsDatetime(const Poco::DateTime& dateTime);
 
       static std::string AwsDatetimeNow();
 
