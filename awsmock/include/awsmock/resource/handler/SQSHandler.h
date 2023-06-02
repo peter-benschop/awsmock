@@ -16,15 +16,8 @@
 #include "awsmock/core/MetricService.h"
 #include "awsmock/core/MetricServiceTimer.h"
 #include "awsmock/core/MetricDefinition.h"
-#include "awsmock/resource/HandlerException.h"
 #include "awsmock/resource/AbstractResource.h"
 #include "awsmock/service/SQSService.h"
-#include "awsmock/dto/sqs/CreateMessageRequest.h"
-#include "awsmock/dto/sqs/CreateMessageResponse.h"
-#include "awsmock/dto/sqs/CreateQueueRequest.h"
-#include "awsmock/dto/sqs/CreateQueueResponse.h"
-#include "awsmock/dto/sqs/PurgeQueueRequest.h"
-#include "awsmock/dto/sqs/PurgeQueueResponse.h"
 
 #define DEFAULT_USERID "000000000000"
 

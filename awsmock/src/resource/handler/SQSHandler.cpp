@@ -41,7 +41,7 @@ namespace AwsMock {
                 Dto::SQS::CreateQueueRequest sqsRequest = {.name = name, .region=region, .owner=user, .url="http://" + endpoint + "/" + DEFAULT_USERID + "/" + name};
 
                 Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
-                SendOkResponse(response, sqsResponse.ToXml());;
+                SendOkResponse(response, sqsResponse.ToXml());
 
             } else if (action == "ListQueues") {
 
@@ -67,6 +67,21 @@ namespace AwsMock {
 
                 Dto::SQS::CreateMessageRequest sqsRequest = {.url=url, .body=body};
                 Dto::SQS::CreateMessageResponse sqsResponse = _sqsService.CreateMessage(sqsRequest);
+                SendOkResponse(response, sqsResponse.ToXml());
+
+            } else if (action == "ReceiveMessage") {
+
+                std::string max, maxParameter = "MaxNumberOfMessages";
+                GetParameter(payload, maxParameter, max);
+                int maxMessages = std::stoi(max);
+
+                std::string visibilityTimeout, visibilityParameter = "VisibilityTimeout";
+                GetParameter(payload, visibilityParameter, visibilityTimeout);
+                int visibility = std::stoi(visibilityTimeout);
+
+                Dto::SQS::ReceiveMessageRequest sqsRequest = {.maxMessages=maxMessages, .visibility=visibility};
+                Dto::SQS::ReceiveMessageResponse sqsResponse = _sqsService.ReceiveMessages(sqsRequest);
+
                 SendOkResponse(response, sqsResponse.ToXml());
 
             } else if (action == "PurgeQueue") {

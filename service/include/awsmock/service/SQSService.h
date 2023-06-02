@@ -28,6 +28,8 @@
 #include "awsmock/dto/sqs/DeleteQueueResponse.h"
 #include "awsmock/dto/sqs/PurgeQueueRequest.h"
 #include "awsmock/dto/sqs/PurgeQueueResponse.h"
+#include "awsmock/dto/sqs/ReceiveMessageRequest.h"
+#include "awsmock/dto/sqs/ReceiveMessageResponse.h"
 #include "awsmock/db/SQSDatabase.h"
 
 namespace AwsMock::Service {
@@ -63,8 +65,7 @@ namespace AwsMock::Service {
       /**
        * Purge a queue.
        *
-       * @param region AWS region
-       * @param queueUrl queue URL
+       * @param request purge queue request
        * @return PurgeQueueResponse
        * @throws ServiceException
        */
@@ -73,17 +74,27 @@ namespace AwsMock::Service {
       /**
        * Creates a new queue
        *
-       * @param region AWS region
-       * @param region AWS region
-       * @return CreateQueueResponse
+       * @param request create message request
+       * @return CreateMessageResponse
+       * @throws ServiceException
        */
       Dto::SQS::CreateMessageResponse CreateMessage(const Dto::SQS::CreateMessageRequest &request);
+
+      /**
+       * Receive a list of messages
+       *
+       * @param request receive message request
+       * @return ReceiveMessageResponse
+       * @throws ServiceException
+       */
+      Dto::SQS::ReceiveMessageResponse ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request);
 
       /**
        * Delete a queue
        *
        * @param request delete request DTO
        * @return DeleteQueueResponse
+       * @throws ServiceException
        */
       Dto::SQS::DeleteQueueResponse DeleteQueue(const Dto::SQS::DeleteQueueRequest &request);
 

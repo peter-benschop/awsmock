@@ -12,6 +12,9 @@
 // Poco includes
 #include <Poco/DateTime.h>
 
+// AwsMock includes
+#include "Attribute.h"
+
 namespace AwsMock::Database::Entity::SQS {
 
     enum STATUS { CREATED, SEND, RESEND };
@@ -67,6 +70,11 @@ namespace AwsMock::Database::Entity::SQS {
        * MD5 sum attributes
        */
       std::string md5Attr;
+
+      /**
+       * List of attributes
+       */
+      AttributeList attributeList;
 
       /**
        * Creation date
