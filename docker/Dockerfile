@@ -1,8 +1,8 @@
 FROM debian:latest
 
 # Install basics
-RUN apt-get update && apt-get -y install build-essential cmake git openssl libssl-dev supervisor libiodbc2 libiodbc2-dev libpq-dev libpqxx-dev && \
-    mkdir -p /usr/src
+RUN apt-get update && apt-get -y install build-essential cmake git openssl libssl-dev supervisor
+RUN apt-get  -y install libiodbc2 libiodbc2-dev libpq-dev libpqxx-dev libz3-4 && mkdir -p /usr/src
 
 # Install Poco libraries \
 RUN cd /usr/src && \
