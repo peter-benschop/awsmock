@@ -42,4 +42,4 @@ namespace AwsMock::Core {
 
     void ResourceNotFoundException::rethrow() const { throw *this; }
 
-} // namespace Libri::AWS
+} // namespace AwsMock::Core

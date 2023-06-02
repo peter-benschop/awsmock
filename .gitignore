@@ -49,6 +49,7 @@
 
 # Tests
 Testing/*
+**/*_tst
 
 # Docker
 docker/libs

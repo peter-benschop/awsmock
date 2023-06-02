@@ -34,53 +34,32 @@ namespace AwsMock {
      * <p>
      * AWS properties:
      * <pre>
-     * aws.region=eu-central-1
-     * aws.endpoint=http://localhost:4566
-     * aws.request.timeout=300000
-     * aws.connect.timeout=10000
-     * </pre>
-     * </p>
-     * <p>
-     * AWS Queues und S3 buckets
-     * <pre>
-     * libri.sqs.input.queue.name=ftp-file-distribution-onix-queue
-     * libri.sqs.input.messages.max=10
-     * libri.sqs.input.messages.waittime=5
-     * libri.sqs.input.messages.request.timeout=30000
-     * libri.sqs.input.messages.connect.timeout=30000
-     * libri.sns.topic.name=file-logging-topic
-     * libri.s3.input.bucket=pim-dev-file-delivery
-     * libri.s3.full.parsing.output.bucket=pim-dev-splitter-test
-     * </pre>
-     * </p>
-     * <p>
-     * XSLT configuration
-     * <pre>
-     * libri.xslt.ref.to.short.v2=/etc/Onix2RefToShort.xsl
-     * libri.xslt.ref.to.short.v3=etc/Onix3RefToShort.xsl
-     * libri.xslt.onix2.onix3=/etc/Onix2ToOnix3.xsl
+     * awsmock.region=eu-central-1
+     * awsmock.endpoint=http://localhost:4566
+     * awsmock.request.timeout=300000
+     * awsmock.connect.timeout=10000
      * </pre>
      * </p>
      * <p>
      * Thread pool configuration:
      * <pre>
-     * libri.threadpool.initial=1
-     * libri.threadpool.max=32
-     * libri.threadpool.timeout=60
-     * libri.processor.timeout=300000
+     * awsmock.threadpool.initial=1
+     * awsmock.threadpool.max=32
+     * awsmock.threadpool.timeout=60
+     * awsmock.processor.timeout=300000
      * </pre>
      * </p>
      * Prometheus monitoring:
      * <p>
      * <pre>
-     * libri.prometheus.port=8081
-     * libri.prometheus.system.collector.timeout=60000
+     * awsmock.monitoring.port=8081
+     * awsmock.monitoring.timeout=60000
      * </pre>
      * </p>
      * <p>
      * Logging properties:
      * <pre>
-     * libri.logging.level=debug
+     * monitoring.log.level=debug
      * </pre>
      * </p>
      */

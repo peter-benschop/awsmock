@@ -23,6 +23,10 @@ namespace AwsMock::Database {
         _dbFile = dataDir + Poco::Path::separator() + dbFile;
         poco_debug(_logger, "Using database, file: " + _dbFile);
 
+        // Create session pool
+        _sessionPool = new Poco::Data::SessionPool("SQLite", _dbFile);
+        poco_debug(_logger, "Database session pool initialized");
+
         if(!Core::FileUtils::FileExists(_dbFile)) {
             CreateDatabase(dataDir, dbFile);
         }
@@ -91,7 +95,13 @@ namespace AwsMock::Database {
     }
 
     Poco::Data::Session Database::GetSession(){
-        return {"SQLite", _dbFile};
+        if (!_sessionPool->available()) {
+            poco_warning(_logger, "Session pool exhausted, will wait for next available session");
+            while (!_sessionPool->available()) {
+                Poco::Thread::sleep(1000);
+            }
+        }
+        return _sessionPool->get();
     }
 
 } // namespace AwsMock::Database

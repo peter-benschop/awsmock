@@ -31,10 +31,10 @@ namespace AwsMock::Core {
     }
 
     void Logger::SetJsonConsoleLogger() {
-        /*Poco::AutoPtr<Poco::ConsoleChannel> pCons(new Poco::ConsoleChannel);
-        Poco::AutoPtr<LibriJsonFormatter> pPF(new LibriJsonFormatter());
+        Poco::AutoPtr<Poco::ConsoleChannel> pCons(new Poco::ConsoleChannel);
+        Poco::AutoPtr<JsonLogFormatter> pPF(new JsonLogFormatter());
         Poco::AutoPtr<Poco::FormattingChannel> pFC(new Poco::FormattingChannel(pPF, pCons));
-        Poco::Logger::root().setChannel(pFC);*/
+        Poco::Logger::root().setChannel(pFC);
     }
 
     void Logger::SetProfile(const std::string &profile) {

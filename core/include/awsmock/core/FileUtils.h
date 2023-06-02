@@ -2,8 +2,8 @@
 // Created by vogje01 on 22/08/2022.
 //
 
-#ifndef LIBRI_COM_FILEUTILS_H
-#define LIBRI_COM_FILEUTILS_H
+#ifndef AWSMOCK_CORE_FILEUTILS_H
+#define AWSMOCK_CORE_FILEUTILS_H
 
 // Standard C++ includes
 #include <string>
@@ -24,7 +24,7 @@
 #include "Poco/DirectoryIterator.h"
 #include "Poco/RegularExpression.h"
 
-// Libri includes
+// AwsMock includes
 #include "awsmock/core/StringUtils.h"
 
 namespace AwsMock::Core {
@@ -170,5 +170,5 @@ namespace AwsMock::Core {
        */
       static void zipFiles(const std::string &zipFile, const std::string &dirName);
     };
-} // namespace Libri::COM
-#endif // LIBRI_COM_FILEUTILS_H
+} // namespace AwsMock::Core
+#endif // AWSMOCK_CORE_FILEUTILS_H

@@ -11,7 +11,7 @@
 // Poco includes
 #include "Poco/DynamicStruct.h"
 
-// Libri includes
+// AwsMock includes
 #include "awsmock/resource/handling/IJsonAPIResourceBuilder.h"
 
 namespace AwsMock {

@@ -5,7 +5,7 @@
 #ifndef AWSMOCK_RESOURCE_FACTORY_S3FACTORY_H
 #define AWSMOCK_RESOURCE_FACTORY_S3FACTORY_H
 
-// Libri includes
+// AwsMock includes
 #include <awsmock/core/MetricService.h>
 #include <awsmock/resource/factory/IFactory.h>
 #include <awsmock/resource/factory/S3Factory.h>

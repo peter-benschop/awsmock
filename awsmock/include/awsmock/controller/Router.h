@@ -17,7 +17,7 @@
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 
-// Libri includes
+// AwsMock includes
 #include "awsmock/core/Logger.h"
 #include "awsmock/config/Configuration.h"
 #include "awsmock/resource/factory/IFactory.h"

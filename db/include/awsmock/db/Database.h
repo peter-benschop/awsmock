@@ -11,8 +11,11 @@
 #include <iostream>
 
 // Poco includes
+#include "Poco/AutoPtr.h"
 #include "Poco/Logger.h"
 #include "Poco/Data/Session.h"
+#include <Poco/Data/SessionPool.h>
+#include <Poco/Data/SessionFactory.h>
 #include "Poco/Data/SQLite/Connector.h"
 
 // AwsMock includes
@@ -70,6 +73,12 @@ namespace AwsMock::Database {
        * SQLite database file
        */
       std::string _dbFile;
+
+      /**
+       * Session pool
+       */
+      Poco::AutoPtr<Poco::Data::SessionPool> _sessionPool;
+
     };
 
 } // namespace AwsMock::Database

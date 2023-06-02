@@ -116,4 +116,4 @@ namespace AwsMock::Core {
         lastUserCPU = timeSample.tms_utime;
     }
 
-} // namespace Libri::COM::Monitoring
+} // namespace AwsMock::Core

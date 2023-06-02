@@ -35,4 +35,4 @@ namespace AwsMock::Core {
 
     void ServiceException::rethrow() const { throw *this; }
 
-} // namespace Libri::AWS
+} // namespace AwsMock::Core

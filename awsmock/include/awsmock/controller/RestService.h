@@ -10,7 +10,7 @@
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 #include "Poco/Net/HTTPServer.h"
 
-// Libri includes
+// AwsMock includes
 #include "awsmock/core/Logger.h"
 #include "awsmock/core/Configuration.h"
 

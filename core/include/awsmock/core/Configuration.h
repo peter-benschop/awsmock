@@ -32,18 +32,18 @@ namespace AwsMock::Core {
      * Configuration handler. Configuration are read from the given configuration file and can be overruled by environment variables. Supported environment variables
      * are:
      * <ul>
-     * <li>LIBRI_COM_BASENAME: the base name of the configuration file</li>
-     * <li>LIBRI_COM_PROFILE: the profile of the configuration file</li>
-     * <li>LIBRI_COM_METRIC_PORT: the port for the prometheus server (default: 8081)</li>
-     * <li>LIBRI_COM_METRIC_TIMEOUT: the timeout for the prometheus system monitoring (default: 60000)</li>
-     * <li>LIBRI_COM_LOGLEVEL: the logging level (default: information, possible values: debug, information, warning, error, fatal)</li>
+     * <li>AWSMOCK_COM_BASENAME: the base name of the configuration file</li>
+     * <li>AWSMOCK_COM_PROFILE: the profile of the configuration file</li>
+     * <li>AWSMOCK_COM_METRIC_PORT: the port for the prometheus server (default: 8081)</li>
+     * <li>AWSMOCK_COM_METRIC_TIMEOUT: the timeout for the prometheus system monitoring (default: 60000)</li>
+     * <li>AWSMOCK_COM_LOGLEVEL: the logging level (default: information, possible values: debug, information, warning, error, fatal)</li>
      * </ul>
      *
      * Properties in a configuration file are key-vale pairs. The following list shows all supported keys with their default values:
      * <pre>
-     * libri.monitoring.port=8081
-     * libri.monitoring.timeout=60000
-     * libri.logging.level=debug
+     * awsmock.monitoring.port=8081
+     * awsmock.monitoring.timeout=60000
+     * awsmock.logging.level=debug
      * </pre>
      */
     class Configuration : public Poco::Util::PropertyFileConfiguration {

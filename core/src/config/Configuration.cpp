@@ -10,9 +10,9 @@ namespace AwsMock::Core {
         Initialize();
     }
 
-    Configuration::Configuration(const std::string &basename) : _logger(Poco::Logger::get("Configuration")) {
+    Configuration::Configuration(const std::string &filename) : _logger(Poco::Logger::get("Configuration")) {
         Initialize();
-        SetFilename(basename);
+        SetFilename(filename);
     }
 
     void Configuration::Initialize() {
@@ -21,7 +21,6 @@ namespace AwsMock::Core {
         DefineProperty("awsmock.core.monitoring.timeout", "AWSMOCK_CORE_METRIC_TIMEOUT", "60000");
 
         // Logging
-        DefineProperty("awsmock.core.log.level", "AWSMOCK_CORE_LOG_LEVEL", "information");
         DefineProperty("awsmock.core.log.level", "AWSMOCK_CORE_LOG_LEVEL", "information");
 
         // Database
@@ -39,7 +38,7 @@ namespace AwsMock::Core {
 
     std::string Configuration::GetFilename() const {
         if (_filename.empty()) {
-            throw CoreException("Base name not set");
+            throw CoreException("Filename not set");
         }
         return _filename;
     }
@@ -74,7 +73,7 @@ namespace AwsMock::Core {
     }
 
     void Configuration::SetLogLevel(const std::string &logLevel) {
-        setString("libri.logging.level", logLevel);
+        setString("awsmock.log.level", logLevel);
     }
 
     void Configuration::SetValue(const std::string &key, const std::string &value) {
@@ -103,4 +102,4 @@ namespace AwsMock::Core {
         return os;
     }
 
-} // namespace Libri::AWS
+} // namespace AwsMock::Core

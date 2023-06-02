@@ -11,7 +11,7 @@
 #include "Poco/Net/MediaType.h"
 #include "Poco/JSON/Parser.h"
 
-// Libri includes
+// AwsMock includes
 #include "awsmock/core/Configuration.h"
 #include "awsmock/core/MetricService.h"
 #include "awsmock/core/MetricServiceTimer.h"

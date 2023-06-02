@@ -10,13 +10,13 @@
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/HTTPRequestHandler.h"
 
-// Libri includes
+// AwsMock includes
 #include "awsmock/resource/handling/JsonAPIErrorBuilder.h"
 
 namespace AwsMock {
 
     /**
-     * Libri image not found response.
+     * AwsMock resource not found response.
      *
      * @author jens.vogt@opitz-consulting.com
      */
