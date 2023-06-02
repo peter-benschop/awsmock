@@ -80,6 +80,12 @@ namespace AwsMock::Database {
         session << "CREATE UNIQUE INDEX sqs_message_idx1 ON sqs_message(message_id)", Poco::Data::Keywords::now;
         poco_debug(_logger, "SQS message table created");
 
+        session << "CREATE TABLE sqs_attribute (id INTEGER NOT NULL PRIMARY KEY, message_id VARCHAR(100), name VARCHAR(128), value VARCHAR(255), "
+                   "created DATETIME DEFAULT CURRENT_TIMESTAMP, modified DATETIME DEFAULT CURRENT_TIMESTAMP)",
+            Poco::Data::Keywords::now;
+        session << "CREATE UNIQUE INDEX sqs_attribute_idx1 ON sqs_attribute(message_id,name)", Poco::Data::Keywords::now;
+        poco_debug(_logger, "SQS message attribute table created");
+
         poco_debug(_logger, "Database initialized, dbFile: " + _dbFile);
         session.close();
     }

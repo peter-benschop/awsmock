@@ -9,8 +9,9 @@
 #include <string>
 #include <sstream>
 
-// AwsMock includes
-#include "awsmock/dto/common/Common.h"
+// Poco includes
+#include "Poco/UUID.h"
+#include "Poco/UUIDGenerator.h"
 
 namespace AwsMock::Dto::SQS {
 

@@ -101,6 +101,19 @@ namespace AwsMock::Service {
         return {message};
     }
 
+    Dto::SQS::ReceiveMessageResponse SQSService::ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request) {
+
+        Dto::SQS::ReceiveMessageResponse response;
+        try {
+            Database::Entity::SQS::MessageList messageList;
+
+        } catch (Poco::Exception &ex) {
+            poco_error(_logger, "SQS create message failed, message: " + ex.message());
+            throw Core::ServiceException(ex.message(), 500);
+        }
+        return {response};
+    }
+
     Dto::SQS::DeleteQueueResponse SQSService::DeleteQueue(const Dto::SQS::DeleteQueueRequest &request) {
         poco_trace(_logger, "Delete queue request, url: " + request.url);
 
