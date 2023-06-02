@@ -33,12 +33,12 @@ namespace AwsMock {
 
         } catch (AwsMock::HandlerException &exception) {
             poco_error(_logger, "Server error, exception: " + exception.message());
-            handleHttpStatusCode(exception.code(), response);
+            handleHttpStatusCode(response,exception.code());
             std::ostream &outputStream = response.send();
             outputStream << toJson(exception);
         } catch (Core::ResourceNotFoundException &exception) {
             poco_error(_logger, "Server error, exception: " + exception.displayText());
-            handleHttpStatusCode(500, response);
+            handleHttpStatusCode(response, 500);
             std::ostream &outputStream = response.send();
             outputStream << toJson(exception);
         }
@@ -61,13 +61,13 @@ namespace AwsMock {
             //auto assembledQuestion = _entityAssembler.assembleEntity(attributesSectionObject);
             //_imageApplicationService->changeQuestion(assembledQuestion);
 
-            handleHttpStatusCode(200, response);
+            handleHttpStatusCode(response, 200);
             std::ostream &outputStream = response.send();
             outputStream.flush();
 
         } catch (HandlerException &exception) {
 
-            handleHttpStatusCode(exception.code(), response);
+            handleHttpStatusCode(response, exception.code());
             std::ostream &outputStream = response.send();
             //outputStream << toJson(exception);
             outputStream.flush();
@@ -95,13 +95,13 @@ namespace AwsMock {
             //response.set("Location", getUrl("?question_id=" + newQuestionIdentity));
             //response.set("Content-Location", getUrl("?question_id=" + newQuestionIdentity));
 
-            handleHttpStatusCode(201, response);
+            handleHttpStatusCode(response, 201);
             std::ostream &outputStream = response.send();
             outputStream.flush();
 
         } catch (HandlerException &exception) {
 
-            handleHttpStatusCode(exception.code(), response);
+            handleHttpStatusCode(response, exception.code());
             std::ostream &outputStream = response.send();
             //outputStream << toJson(exception);
             outputStream.flush();
@@ -121,12 +121,12 @@ namespace AwsMock {
 
             _database->deleteEntity(entity);*/
 
-            handleHttpStatusCode(204, response);
+            handleHttpStatusCode(response, 204);
             std::ostream &outputStream = response.send();
             outputStream.flush();
 
         } catch (HandlerException &exception) {
-            handleHttpStatusCode(exception.code(), response);
+            handleHttpStatusCode(response, exception.code());
             std::ostream &outputStream = response.send();
             //outputStream << toJson(exception);
             outputStream.flush();
@@ -140,7 +140,7 @@ namespace AwsMock {
         response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
         response.setContentType("text/plain; charset=utf-8");
 
-        handleHttpStatusCode(200, response);
+        handleHttpStatusCode(response, 200);
         std::ostream &outputStream = response.send();
         outputStream.flush();
     }

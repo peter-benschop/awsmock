@@ -141,10 +141,11 @@ namespace AwsMock::Resource {
       /*!
        * It sets all the HTTP Response information based on the HTTP Code.
        *
-       * @param statusCode    The HTTP Status Code.
-       * @param response      Response to be handled.
+       * @param response response to be handled.
+       * @param statusCode HTTP Status Code.
+       * @param reason status reason.
        */
-      static void handleHttpStatusCode(int statusCode, Poco::Net::HTTPServerResponse &);
+      static void handleHttpStatusCode(Poco::Net::HTTPServerResponse &response, int statusCode, const char* reason = nullptr);
 
       /**
        * Return the URL.
@@ -241,12 +242,20 @@ namespace AwsMock::Resource {
       void SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long contentLength, HeaderMap *extraHeader = nullptr);
 
       /**
-       * Send a OK response (HTTP status code 200).
+       * Send an error response (HTTP status code 200).
        *
        * @param response HTTP response object
        * @param exc exception object
        */
       void SendErrorResponse(Poco::Net::HTTPServerResponse &response, Poco::Exception &exc);
+
+      /**
+       * Send an error response (HTTP status code 200).
+       *
+       * @param response HTTP response object
+       * @param exc service exception object
+       */
+      void SendErrorResponse(Poco::Net::HTTPServerResponse &response, Core::ServiceException &exc);
 
       /**
        * Dump the request to std::cerr

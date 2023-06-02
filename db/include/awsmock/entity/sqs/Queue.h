@@ -19,7 +19,7 @@ namespace AwsMock::Database::Entity::SQS {
       /**
        * ID
        */
-      long id;
+      long id = 0;
 
       /**
        * Queue name

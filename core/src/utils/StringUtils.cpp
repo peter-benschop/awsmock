@@ -102,8 +102,8 @@ namespace AwsMock::Core {
 
     std::string StringUtils::UrlDecode(const std::string &input) {
         std::string decoded;
-        Poco::URI::decode(input, decoded);
-        return decoded;
+        Poco::URI::decode(input, decoded, true);
+        return Poco::replace(decoded, '+', ' ');
     }
 
     std::string StringUtils::ToHexString(unsigned char *input, size_t length) {

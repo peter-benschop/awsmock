@@ -23,6 +23,8 @@
 #include "awsmock/dto/sqs/CreateMessageResponse.h"
 #include "awsmock/dto/sqs/CreateQueueRequest.h"
 #include "awsmock/dto/sqs/CreateQueueResponse.h"
+#include "awsmock/dto/sqs/PurgeQueueRequest.h"
+#include "awsmock/dto/sqs/PurgeQueueResponse.h"
 
 #define DEFAULT_USERID "000000000000"
 

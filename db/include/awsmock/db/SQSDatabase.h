@@ -19,6 +19,7 @@
 // AwsMock includes
 #include <awsmock/core/Logger.h>
 #include <awsmock/core/Configuration.h>
+#include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/db/Database.h>
@@ -51,11 +52,11 @@ namespace AwsMock::Database {
       /**
        * Check existence of queue
        *
-       * @param url AWS region
+       * @param queueUrl AWS region
        * @return true if queue already exists
        * @throws DatabaseException
        */
-      bool QueueExists(const std::string &url);
+      bool QueueExists(const std::string &queueUrl);
 
       /**
        * Create a new queue in the SQS queue table
@@ -76,12 +77,30 @@ namespace AwsMock::Database {
       Entity::SQS::QueueList ListQueues(const std::string &region);
 
       /**
+       * Purge a given queueUrl.
+       *
+       * @param region AWS region
+       * @param queueUrl queueUrl name
+       */
+      void PurgeQueue(const std::string &region, const std::string &queueUrl);
+
+      /**
        * Creates a new message in the SQS message table
        *
        * @param message SQS message entity
        * @return saved message entity
+       * @throws Core::DatabaseException
        */
       Entity::SQS::Message CreateMessage(const Entity::SQS::Message &message);
+
+      /**
+       * Returns a message by ID.
+       *
+       * @param id message ID
+       * @return message entity
+       * @throws Core::DatabaseException
+       */
+      Entity::SQS::Message GetMessageById(long id);
 
       /**
        * Delete a queue.
@@ -90,6 +109,14 @@ namespace AwsMock::Database {
        * @throws DatabaseException
        */
       void DeleteQueue(const Entity::SQS::Queue & queue);
+
+      /**
+       * Deletes a message.
+       *
+       * @param message message to delete
+       * @throws Core::DatabaseException
+       */
+      void DeleteMessage(const Entity::SQS::Message &message);
 
     private:
 

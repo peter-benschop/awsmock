@@ -41,7 +41,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::ListQueueResponse SQSService::ListQueues(const std::string &region) {
-        poco_trace(_logger, "List all queues request");
+        poco_trace(_logger, "List all queues request, region: " + region);
 
         try {
 
@@ -53,8 +53,28 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             poco_error(_logger, "SQS list queues failed, message: " + ex.message());
-            throw Core::ServiceException(ex.message(), 500);
+            throw Core::ServiceException(ex.message(), 500, "SQS", Poco::UUIDGenerator().createRandom().toString().c_str());
         }
+    }
+
+    Dto::SQS::PurgeQueueResponse SQSService::PurgeQueue(const Dto::SQS::PurgeQueueRequest &request) {
+        poco_trace(_logger, "Purge queue request, region: " + request.region + " queueUrl: " + request.queueUrl);
+
+        Dto::SQS::PurgeQueueResponse response = {.resource=request.resource, .requestId=request.requestId};
+        try {
+            // Check existence
+            if (!_database->QueueExists(request.queueUrl)) {
+                throw Core::ServiceException("SQS queue does not exists", 500, request.resource.c_str(), request.requestId.c_str());
+            }
+
+            _database->PurgeQueue(request.region, request.queueUrl);
+            poco_trace(_logger, "SQS queue purged, region: " + request.region + " queueUrl: " + request.queueUrl);
+
+        } catch (Poco::Exception &ex) {
+            poco_error(_logger, "SQS purge queue failed, message: " + ex.message());
+            throw Core::ServiceException(ex.message(), 500, request.resource.c_str(), request.requestId.c_str());
+        }
+        return response;
     }
 
     Dto::SQS::CreateMessageResponse SQSService::CreateMessage(const Dto::SQS::CreateMessageRequest &request) {
@@ -68,15 +88,17 @@ namespace AwsMock::Service {
 
             // Update database
             std::string messageId = Core::StringUtils::GenerateRandomString(100);
+            std::string receiptHandle = Core::StringUtils::GenerateRandomString(512);
             std::string md5Body = Core::Crypto::GetMd5FromString(request.body);
             std::string md5Attr = Core::Crypto::GetMd5FromString(request.body);
-            message = _database->CreateMessage({.queue=request.url, .body=request.body, .messageId=messageId, .md5Body=md5Body, .md5Attr=md5Attr});
+            message =
+                _database->CreateMessage({.queue=request.url, .body=request.body, .messageId=messageId, .receiptHandle=receiptHandle, .md5Body=md5Body, .md5Attr=md5Attr});
 
         } catch (Poco::Exception &ex) {
             poco_error(_logger, "SQS create message failed, message: " + ex.message());
             throw Core::ServiceException(ex.message(), 500);
         }
-        return Dto::SQS::CreateMessageResponse(message);
+        return {message};
     }
 
     Dto::SQS::DeleteQueueResponse SQSService::DeleteQueue(const Dto::SQS::DeleteQueueRequest &request) {

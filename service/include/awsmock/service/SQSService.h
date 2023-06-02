@@ -26,6 +26,8 @@
 #include "awsmock/dto/sqs/CreateQueueResponse.h"
 #include "awsmock/dto/sqs/DeleteQueueRequest.h"
 #include "awsmock/dto/sqs/DeleteQueueResponse.h"
+#include "awsmock/dto/sqs/PurgeQueueRequest.h"
+#include "awsmock/dto/sqs/PurgeQueueResponse.h"
 #include "awsmock/db/SQSDatabase.h"
 
 namespace AwsMock::Service {
@@ -57,6 +59,16 @@ namespace AwsMock::Service {
        * @return ListQueuesResponse
        */
       Dto::SQS::ListQueueResponse ListQueues(const std::string &region);
+
+      /**
+       * Purge a queue.
+       *
+       * @param region AWS region
+       * @param queueUrl queue URL
+       * @return PurgeQueueResponse
+       * @throws ServiceException
+       */
+      Dto::SQS::PurgeQueueResponse PurgeQueue(const Dto::SQS::PurgeQueueRequest &request);
 
       /**
        * Creates a new queue

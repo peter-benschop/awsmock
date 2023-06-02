@@ -8,6 +8,7 @@
 // C++ standard includes
 #include <string>
 #include <sstream>
+#include <iostream>
 
 // Poco includes
 #include "Poco/DOM/AutoPtr.h"
@@ -31,7 +32,7 @@ namespace AwsMock::Dto::Common {
        * @param resource resource name
        * @param requestId request ID
        */
-      RestErrorResponse(const std::string &code, const std::string &message, const std::string &resource, const std::string &requestId);
+      RestErrorResponse(std::string code, std::string message, std::string resource, std::string requestId);
 
       /**
        * Converts the DTO to a XML string representation.

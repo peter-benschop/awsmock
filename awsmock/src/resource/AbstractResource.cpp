@@ -34,7 +34,7 @@ namespace AwsMock::Resource {
 
             poco_error(_logger, "Exception: msg: " + exception.message());
 
-            handleHttpStatusCode(exception.code(), response);
+            handleHttpStatusCode(response, exception.code());
 
             AwsMock::JsonAPIErrorBuilder errorBuilder = AwsMock::JsonAPIErrorBuilder(request.getHost());
 
@@ -56,7 +56,7 @@ namespace AwsMock::Resource {
         _requestHost = request.getHost();
         _baseUrl = "http://" + _requestHost + _requestURI;
 
-        std::string scheme, authInfo,region,user;
+        std::string scheme, authInfo, region, user;
         request.getCredentials(scheme, authInfo);
         GetRegionUser(authInfo, region, user);
 
@@ -93,7 +93,7 @@ namespace AwsMock::Resource {
                                      const std::string &region,
                                      const std::string &user) {
         poco_trace(_logger, "Request, method: " + request.getMethod() + " region: " + region + " user: " + user);
-        handleHttpStatusCode(501, response);
+        handleHttpStatusCode(response, 501);
         std::ostream &errorStream = response.send();
         errorStream.flush();
     }
@@ -103,7 +103,7 @@ namespace AwsMock::Resource {
                                      const std::string &region,
                                      const std::string &user) {
         poco_trace(_logger, "Request, method: " + request.getMethod() + " region: " + region + " user: " + user);
-        handleHttpStatusCode(501, response);
+        handleHttpStatusCode(response, 501);
         std::ostream &errorStream = response.send();
         errorStream.flush();
     }
@@ -113,7 +113,7 @@ namespace AwsMock::Resource {
                                       const std::string &region,
                                       const std::string &user) {
         poco_trace(_logger, "Request, method: " + request.getMethod() + " region: " + region + " user: " + user);
-        handleHttpStatusCode(501, response);
+        handleHttpStatusCode(response, 501);
         std::ostream &errorStream = response.send();
         errorStream.flush();
     }
@@ -123,7 +123,7 @@ namespace AwsMock::Resource {
                                         const std::string &region,
                                         const std::string &user) {
         poco_trace(_logger, "Request, method: " + request.getMethod() + " region: " + region + " user: " + user);
-        handleHttpStatusCode(501, response);
+        handleHttpStatusCode(response, 501);
         std::ostream &errorStream = response.send();
         errorStream.flush();
     }
@@ -192,85 +192,69 @@ namespace AwsMock::Resource {
         }
     }
 
-    void AbstractResource::handleHttpStatusCode(int statusCode, Poco::Net::HTTPServerResponse &response) {
+    void AbstractResource::handleHttpStatusCode(Poco::Net::HTTPServerResponse &response, int statusCode, const char *reason) {
 
         switch (statusCode) {
 
-        case 200:
-            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_OK);
+        case 200:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_OK, reason != nullptr ? reason : Poco::Net::HTTPResponse::HTTP_REASON_OK);
             break;
 
-        case 201:
-            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_CREATED);
+        case 201:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_CREATED, reason != nullptr ? reason : Poco::Net::HTTPResponse::HTTP_REASON_CREATED);
             break;
 
-        case 202:
-            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_ACCEPTED);
+        case 202:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_ACCEPTED);
             break;
 
         case 204:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NO_CONTENT);
             break;
 
-        case 205:
-            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_RESET_CONTENT);
+        case 205:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_RESET_CONTENT);
             break;
 
-        case 206:
-            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_PARTIAL_CONTENT);
+        case 206:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_PARTIAL_CONTENT);
             break;
 
-        case 400:
-            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+        case 400:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
             break;
 
-        case 401:
-            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED);
+        case 401:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED);
             break;
 
-        case 403:
-            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_FORBIDDEN);
+        case 403:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_FORBIDDEN);
             break;
 
-        case 404:
-            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+        case 404:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
             break;
 
-        case 405:
-            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_METHOD_NOT_ALLOWED);
+        case 405:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_METHOD_NOT_ALLOWED);
             break;
 
-        case 406:
-            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_ACCEPTABLE);
+        case 406:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_ACCEPTABLE);
             break;
 
-        case 409:
-            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_CONFLICT);
+        case 409:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_CONFLICT);
             break;
 
-        case 410:
-            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_GONE);
+        case 410:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_GONE);
             break;
 
-        case 415:
-            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_UNSUPPORTEDMEDIATYPE);
+        case 415:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_UNSUPPORTEDMEDIATYPE);
             break;
 
         case 500:
-            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR,
+                                        reason != nullptr ? reason : Poco::Net::HTTPResponse::HTTP_REASON_INTERNAL_SERVER_ERROR);
             break;
 
-        case 501:
-            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
+        case 501:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
             break;
 
-        case 503:
-            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_SERVICE_UNAVAILABLE);
+        case 503:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_SERVICE_UNAVAILABLE);
             break;
 
             // Validating routines throw exceptions all over the program, but are not able to specify
             // an exception code compatible with HTTP. So, the code is left zero. This routine can catch this.
-        default:
-            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+        default:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
             break;
         }
     }
@@ -323,7 +307,7 @@ namespace AwsMock::Resource {
         );
 
         if (iterator == _queryStringParameters.end()) {
-            if(optional){
+            if (optional) {
                 return {};
             } else {
                 throw HandlerException(Poco::Net::HTTPResponse::HTTP_REASON_BAD_REQUEST,
@@ -362,7 +346,6 @@ namespace AwsMock::Resource {
         poco_debug(_logger, "Found user: " + user + " region: " + region);
     }
 
-
     std::string AbstractResource::GetPayload(Poco::Net::HTTPServerRequest &request) {
         std::string payload;
         Poco::StreamCopier::copyToString(request.stream(), payload);
@@ -383,7 +366,7 @@ namespace AwsMock::Resource {
         SetHeaders(response, contentLength, extraHeader);
 
         // Send response
-        handleHttpStatusCode(200, response);
+        handleHttpStatusCode(response, 200);
         std::ostream &outputStream = response.send();
         if (!payload.empty()) {
             outputStream << payload;
@@ -401,7 +384,7 @@ namespace AwsMock::Resource {
             std::ifstream ifs(fileName);
 
             // Send response
-            handleHttpStatusCode(200, response);
+            handleHttpStatusCode(response, 200);
             std::ostream &outputStream = response.send();
             outputStream << ifs.rdbuf();
             outputStream.flush();
@@ -414,12 +397,25 @@ namespace AwsMock::Resource {
 
     void AbstractResource::SendErrorResponse(Poco::Net::HTTPServerResponse &response, Poco::Exception &exc) {
 
-        std::string payload = Dto::Common::RestErrorResponse("code", "message", "resource", "requestId").ToXml();
+        std::string payload = Dto::Common::RestErrorResponse(std::to_string(exc.code()), exc.message(), "", "").ToXml();
 
         SetHeaders(response, payload.length());
 
         poco_error(_logger, "Exception, code: " + std::to_string(exc.code()) + " message: " + exc.message());
-        handleHttpStatusCode(exc.code(), response);
+        handleHttpStatusCode(response, exc.code());
+        std::ostream &outputStream = response.send();
+        outputStream << payload;
+        outputStream.flush();
+    }
+
+    void AbstractResource::SendErrorResponse(Poco::Net::HTTPServerResponse &response, Core::ServiceException &exc) {
+
+        std::string payload = Dto::Common::RestErrorResponse(std::to_string(exc.code()), exc.message(), exc.resource(), exc.requestId()).ToXml();
+
+        SetHeaders(response, payload.length());
+
+        poco_error(_logger, "Exception, code: " + std::to_string(exc.code()) + " message: " + exc.message());
+        handleHttpStatusCode(response, exc.code());
         std::ostream &outputStream = response.send();
         outputStream << payload;
         outputStream.flush();

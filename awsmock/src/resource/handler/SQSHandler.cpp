@@ -52,7 +52,6 @@ namespace AwsMock {
 
                 std::string url, urlParameter = "QueueUrl";
                 GetParameter(payload, urlParameter, url);
-                url = Core::StringUtils::UrlDecode(url);
 
                 Dto::SQS::DeleteQueueRequest sqsRequest = {.url=url};
                 Dto::SQS::DeleteQueueResponse sqsResponse = _sqsService.DeleteQueue(sqsRequest);
@@ -62,14 +61,22 @@ namespace AwsMock {
 
                 std::string url, urlParameter = "QueueUrl";
                 GetParameter(payload, urlParameter, url);
-                url = Core::StringUtils::UrlDecode(url);
 
                 std::string body, bodyParameter = "MessageBody";
                 GetParameter(payload, bodyParameter, body);
-                body = Core::StringUtils::UrlDecode(body);
 
                 Dto::SQS::CreateMessageRequest sqsRequest = {.url=url, .body=body};
                 Dto::SQS::CreateMessageResponse sqsResponse = _sqsService.CreateMessage(sqsRequest);
+                SendOkResponse(response, sqsResponse.ToXml());
+
+            } else if (action == "PurgeQueue") {
+
+                std::string queueUrl, queueUrlParameter = "QueueUrl";
+                GetParameter(payload, queueUrlParameter, queueUrl);
+
+                Dto::SQS::PurgeQueueRequest sqsRequest = {.queueUrl=queueUrl, .region=region};
+                Dto::SQS::PurgeQueueResponse sqsResponse = _sqsService.PurgeQueue(sqsRequest);
+
                 SendOkResponse(response, sqsResponse.ToXml());
             }
 
@@ -92,7 +99,7 @@ namespace AwsMock {
         response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
         response.setContentType("text/plain; charset=utf-8");
 
-        handleHttpStatusCode(200, response);
+        handleHttpStatusCode(response, 200);
         std::ostream &outputStream = response.send();
         outputStream.flush();
     }
@@ -101,7 +108,7 @@ namespace AwsMock {
         Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
         poco_debug(_logger, "SQS HEAD request, address: " + request.clientAddress().toString());
 
-        handleHttpStatusCode(200, response);
+        handleHttpStatusCode(response, 200);
         std::ostream &outputStream = response.send();
         outputStream.flush();
     }
@@ -127,7 +134,7 @@ namespace AwsMock {
         for (auto &it : bodyParts) {
             std::vector<std::string> parts = Core::StringUtils::Split(it, '=');
             if (parts[0] == name) {
-                value = parts[1];
+                value = Core::StringUtils::UrlDecode(parts[1]);
             }
         }
     }

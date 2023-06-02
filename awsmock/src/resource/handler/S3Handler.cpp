@@ -14,7 +14,6 @@ namespace AwsMock {
 
         try {
 
-            DumpRequest(request);
             std::string bucket, key;
             GetBucketKeyFromUri(request.getURI(), bucket, key);
 
@@ -170,7 +169,6 @@ namespace AwsMock {
         Core::MetricServiceTimer measure(_metricService, HTTP_DELETE_TIMER);
         poco_debug(_logger, "S3 DELETE request, URI: " + request.getURI() + " region: " + region + " user: " + user);
 
-        DumpRequest(request);
         try {
             const std::string &name = Core::DirUtils::RelativePath(request.getURI());
             _s3Service.DeleteBucket(region, name);
@@ -189,7 +187,7 @@ namespace AwsMock {
         response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
         response.setContentType("text/plain; charset=utf-8");
 
-        handleHttpStatusCode(200, response);
+        handleHttpStatusCode(response, 200);
         std::ostream &outputStream = response.send();
         outputStream.flush();
     }
