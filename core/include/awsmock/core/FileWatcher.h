@@ -200,7 +200,7 @@ namespace AwsMock::Core {
       std::thread _callback_thread;
 
       std::promise<void> _running;
-      std::atomic<bool> _destory = {false};
+      std::atomic<bool> _destroy = {false};
       bool _watching_single_file = {false};
 
       struct FolderInfo {
@@ -244,7 +244,7 @@ namespace AwsMock::Core {
       }
 
       void destroy() {
-          _destory = true;
+          _destroy = true;
           _running = std::promise<void>();
 
           inotify_rm_watch(_directory.folder, _directory.watch);
@@ -318,7 +318,7 @@ namespace AwsMock::Core {
           std::vector<char> buffer(_buffer_size);
 
           _running.set_value();
-          while (_destory == false) {
+          while (!_destroy) {
               const auto length = read(_directory.folder, static_cast<void *>(buffer.data()), buffer.size());
               if (length > 0) {
                   int i = 0;
@@ -381,10 +381,10 @@ namespace AwsMock::Core {
       }
 
       void callback_thread() {
-          while (!_destory) {
+          while (!_destroy) {
               std::unique_lock<std::mutex> lock(_callback_mutex);
-              if (_callback_information.empty() && !_destory) {
-                  _cv.wait(lock, [this] { return _callback_information.size() > 0 || _destory; });
+              if (_callback_information.empty() && !_destroy) {
+                  _cv.wait(lock, [this] { return _callback_information.size() > 0 || _destroy; });
               }
               decltype(_callback_information) callback_information = {};
               std::swap(callback_information, _callback_information);
