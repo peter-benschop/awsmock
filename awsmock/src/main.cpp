@@ -15,6 +15,7 @@
 
 // AwsMock includes
 #include <awsmock/core/Logger.h>
+#include <awsmock/core/ThreadErrorHandler.h>
 #include <awsmock/config/Configuration.h>
 #include <awsmock/controller/Router.h>
 #include <awsmock/controller/RestService.h>
@@ -71,9 +72,11 @@ namespace AwsMock {
        */
       [[maybe_unused]] void defineOptions(Poco::Util::OptionSet &options) override {
           Poco::Util::ServerApplication::defineOptions(options);
-          options.addOption(Poco::Util::Option("level", "l", "set the log level").required(false).repeatable(false).argument("value").callback(
+          options.addOption(Poco::Util::Option("config", "", "set the configuration file").required(false).repeatable(false).argument("value").callback(
               Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
-          options.addOption(Poco::Util::Option("help", "h", "display argument help information").required(false).repeatable(false).callback(
+          options.addOption(Poco::Util::Option("level", "", "set the log level").required(false).repeatable(false).argument("value").callback(
+              Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
+          options.addOption(Poco::Util::Option("help", "", "display help information").required(false).repeatable(false).callback(
               Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
       }
 
@@ -88,10 +91,12 @@ namespace AwsMock {
               Poco::Util::HelpFormatter helpFormatter(options());
               helpFormatter.setCommand(commandName());
               helpFormatter.setUsage("OPTIONS");
-              helpFormatter.setHeader("AwsMock AWS simulation written in C++.");
+              helpFormatter.setHeader("AwsMock - AWS simulation written in C++.");
               helpFormatter.format(std::cout);
               stopOptionsProcessing();
               exit(0);
+          } else if (name == "config") {
+              _configuration.SetFilename(value);
           } else if (name == "level") {
               _configuration.SetLogLevel(value);
               _logger.setLevel(value);
@@ -142,8 +147,8 @@ namespace AwsMock {
           poco_debug(_logger, "Entering main routine");
 
           // Install error handler
-          //Poco::ErrorHandler::set(&_threadErrorHandler);
-          //poco_debug(_logger, "Error handler initialized");
+          Poco::ErrorHandler::set(&_threadErrorHandler);
+          poco_debug(_logger, "Error handler initialized");
 
           // Start REST service
           _router = std::make_shared<Router>();
@@ -180,7 +185,7 @@ namespace AwsMock {
       /**
        * Thread error handler
        */
-      //ThreadErrorHandler _threadErrorHandler;
+      Core::ThreadErrorHandler _threadErrorHandler;
 
       /**
        * Process error handler

@@ -39,7 +39,7 @@ namespace AwsMock::Core {
 
     std::string Configuration::GetFilename() const {
         if (_filename.empty()) {
-            throw CoreException("Base name not set");
+            throw CoreException("Filename not set");
         }
         return _filename;
     }

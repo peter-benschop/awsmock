@@ -13,9 +13,9 @@
 #include <awsmock/core/Configuration.h>
 
 #define CONFIG_NAME_TAG "awsmock.threadpool.name"
-#define CONFIG_INITIAL_TAG "awsmock.threadpool.initial"
+#define CONFIG_INITIAL_TAG "awsmock.threadpool.min"
 #define CONFIG_MAX_TAG "awsmock.threadpool.max"
-#define CONFIG_WAIT_TIME_TAG "awsmock.threadpool.waittime"
+#define CONFIG_WAIT_TIME_TAG "awsmock.threadpool.idletime"
 
 #define DEFAULT_NAME "worker-pool"
 #define DEFAULT_INITIAL 4

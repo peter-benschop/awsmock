@@ -30,6 +30,8 @@ RUN mkdir -p /tmp/awsmock/data && \
     mkdir -p /tmp/awsmock/data/db && \
     mkdir -p /tmp/awsmock/log
 
+RUN cp /usr/src/awsmock/etc/aws-mock.properties /etc
+
 EXPOSE 4567 4567
 
 CMD ["/usr/bin/supervisord"]
