@@ -19,7 +19,7 @@
 #include <Poco/Prometheus/Gauge.h>
 #include <Poco/Prometheus/MetricsServer.h>
 
-// Libri includes
+// AwsMock includes
 #include "awsmock/core/StringUtils.h"
 
 // System counter

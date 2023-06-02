@@ -2,7 +2,7 @@ FROM debian:latest
 
 # Install basics
 RUN apt-get update && apt-get -y install build-essential cmake git openssl libssl-dev supervisor
-RUN apt-get  -y install libiodbc2 libiodbc2-dev libpq-dev libpqxx-dev libz3-4 && mkdir -p /usr/src
+RUN apt-get  -y install libiodbc2 libiodbc2-dev libpq-dev libpqxx-dev zlib1g-dev && mkdir -p /usr/src
 
 # Install Poco libraries \
 RUN cd /usr/src && \
@@ -25,11 +25,6 @@ RUN apt-get update && \
     apt-get install -y supervisor
 RUN mkdir -p /var/log/supervisor
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-
-COPY aws-mock.properties /etc
-COPY aws-mock /usr/bin
-COPY libs/*.94 /usr/lib
-COPY libs/libawsmock* /usr/lib
 
 RUN mkdir -p /tmp/awsmock/data && \
     mkdir -p /tmp/awsmock/data/db && \

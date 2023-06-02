@@ -13,7 +13,7 @@
 #include <Poco/Util/OptionSet.h>
 #include <Poco/Util/ServerApplication.h>
 
-// Libri includes
+// AwsMock includes
 #include <awsmock/core/Logger.h>
 #include <awsmock/config/Configuration.h>
 #include <awsmock/controller/Router.h>
@@ -88,7 +88,7 @@ namespace AwsMock {
               Poco::Util::HelpFormatter helpFormatter(options());
               helpFormatter.setCommand(commandName());
               helpFormatter.setUsage("OPTIONS");
-              helpFormatter.setHeader("Libri ONIX splitting service written in C++.");
+              helpFormatter.setHeader("AwsMock AWS simulation written in C++.");
               helpFormatter.format(std::cout);
               stopOptionsProcessing();
               exit(0);

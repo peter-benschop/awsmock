@@ -28,4 +28,4 @@ namespace AwsMock::Core {
 
     void CoreException::rethrow() const { throw *this; }
 
-} // namespace Libri::AWS
+} // namespace AwsMock::Core

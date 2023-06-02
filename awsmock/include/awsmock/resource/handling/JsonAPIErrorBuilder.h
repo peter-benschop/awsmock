@@ -8,7 +8,7 @@
 // C++ standard includes
 #include <utility>
 
-// Libri includes
+// AwsMock includes
 #include "awsmock/resource/handling/IResourceBuilder.h"
 #include "awsmock/resource/handling/IJsonAPIErrorBuilder.h"
 

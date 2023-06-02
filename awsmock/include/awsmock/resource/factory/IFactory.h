@@ -8,7 +8,7 @@
 // Poco includes
 #include "Poco/Net/HTTPRequestHandler.h"
 
-// Libri includes
+// AwsMock includes
 #include <awsmock/core/MetricService.h>
 #include <awsmock/core/Configuration.h>
 

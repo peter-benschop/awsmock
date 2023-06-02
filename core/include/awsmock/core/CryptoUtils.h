@@ -21,7 +21,7 @@
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
 
-// Libri includes
+// AwsMock includes
 #include <awsmock/core/StringUtils.h>
 
 // 64kB buffer

@@ -74,7 +74,7 @@ namespace AwsMock::Core {
     }
 
     void Configuration::SetLogLevel(const std::string &logLevel) {
-        setString("libri.logging.level", logLevel);
+        setString("awsmock.log.level", logLevel);
     }
 
     void Configuration::SetValue(const std::string &key, const std::string &value) {
@@ -103,4 +103,4 @@ namespace AwsMock::Core {
         return os;
     }
 
-} // namespace Libri::AWS
+} // namespace AwsMock::Core

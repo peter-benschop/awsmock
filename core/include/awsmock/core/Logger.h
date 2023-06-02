@@ -15,8 +15,8 @@
 #include <Poco/PatternFormatter.h>
 #include <Poco/FormattingChannel.h>
 
-// Libri includes
-//#include <libricom/LibriJsonFormatter.h>
+// AwsMock includes
+#include <awsmock/core/JsonLogFormatter.h>
 
 namespace AwsMock::Core {
 
@@ -73,11 +73,14 @@ namespace AwsMock::Core {
       static void SetJsonConsoleLogger();
 
     private:
+
       /**
        * Default log pattern
        */
       static const std::string DEFAULT_LOG_PATTERN;
+
     };
+
 } // namespace AwsMock::Core
 
 #endif // AWSMOCK_CORE_LOGGER_H

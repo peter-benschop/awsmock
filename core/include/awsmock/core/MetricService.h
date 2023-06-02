@@ -24,7 +24,7 @@
 #include <Poco/Prometheus/MetricsServer.h>
 #include "Poco/Util/ServerApplication.h"
 
-// Libri utils
+// AwsMock utils
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/MetricSystemCollector.h>
 

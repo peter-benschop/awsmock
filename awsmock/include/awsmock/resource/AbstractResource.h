@@ -19,7 +19,7 @@
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/HTTPRequestHandler.h"
 
-// Libri includes
+// AwsMock includes
 #include "awsmock/core/Logger.h"
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/ServiceException.h>
@@ -164,7 +164,7 @@ namespace AwsMock::Resource {
       std::string toJson(const HandlerException &);
 
       /**
-       * It converts an Libri exception to Json API format.
+       * It converts an AwsMock exception to Json API format.
        *
        * @param exception the exception thrown.
        * @return the exception Json API formatted.
