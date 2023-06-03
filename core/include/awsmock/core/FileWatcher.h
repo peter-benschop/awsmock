@@ -25,9 +25,9 @@
 
 #include <cstdio>
 #include <fstream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cerrno>
 #include <sys/types.h>
 #include <sys/inotify.h>
 #include <sys/stat.h>
@@ -352,7 +352,7 @@ namespace AwsMock::Core {
       static StringType absolute_path_of(const StringType &path) {
           char buf[PATH_MAX];
           const char *str = buf;
-          struct stat stat;
+          struct stat stat{};
           mbstate_t state;
 
           realpath((const char *) path.c_str(), buf);

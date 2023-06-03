@@ -37,7 +37,7 @@ namespace AwsMock::Service {
             std::string region = s3Request.GetLocationConstraint();
 
             // Check existence
-            if (_database->BucketExists(region, name)) {
+            if (_database->BucketExists({.name=name, .region=region})) {
                 throw Core::ServiceException("Bucket exists already", 500);
             }
 
@@ -142,7 +142,7 @@ namespace AwsMock::Service {
         poco_trace(_logger, "CreateMultipartUpload request, bucket: " + bucket + " key: " + key + " region: " + region + " user: " + user);
 
         // Check existence
-        if (!_database->BucketExists(region, bucket)) {
+        if (!_database->BucketExists({.name=bucket, .region=region})) {
             throw Core::ServiceException("Bucket does not exist", 500);
         }
 
@@ -200,7 +200,7 @@ namespace AwsMock::Service {
         Dto::S3::PutObjectResponse response;
         try {
             // Check existence
-            if (!_database->BucketExists(request.GetRegion(), request.GetBucket())) {
+            if (!_database->BucketExists({.name=request.GetBucket(), .region=request.GetRegion()})) {
                 throw Core::ServiceException("Bucket does not exist", 500);
             }
 
@@ -234,7 +234,7 @@ namespace AwsMock::Service {
 
         try {
             // Check existence
-            if (!_database->BucketExists(request.region, request.bucket)) {
+            if (!_database->BucketExists({.name=request.bucket, .region=request.region})) {
                 throw Core::ServiceException("Bucket does not exist", 500);
             }
 
@@ -253,7 +253,7 @@ namespace AwsMock::Service {
 
         try {
             // Check existence
-            if (!_database->BucketExists(region, name)) {
+            if (!_database->BucketExists({.name=name, .region=region})) {
                 throw Core::ServiceException("Bucket does not exist", 500);
             }
 

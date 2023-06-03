@@ -35,6 +35,7 @@
 #include <awsmock/controller/Router.h>
 #include <awsmock/controller/RestService.h>
 #include <awsmock/db/Database.h>
+#include <awsmock/worker/S3Worker.h>
 
 namespace AwsMock {
 
@@ -161,6 +162,9 @@ namespace AwsMock {
       int main([[maybe_unused]]const ArgVec &args) override {
 
           poco_debug(_logger, "Entering main routine");
+
+          Worker::S3Worker _s3Worker = Worker::S3Worker(_configuration);
+          Poco::ThreadPool::defaultPool().start(_s3Worker);
 
           // Start HTTP server
           _restService.setRouter(&_router);

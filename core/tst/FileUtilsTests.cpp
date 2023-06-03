@@ -19,23 +19,18 @@
 
 #define FILE_SIZE (100*1024)
 
-namespace AwsMock::Core
-{
-    class FileUtilsTest : public ::testing::Test
-    {
+namespace AwsMock::Core {
+    class FileUtilsTest : public ::testing::Test {
 
     protected:
-        void SetUp() override
-        {
-        }
+      void SetUp() override {
+      }
 
-        void TearDown() override
-        {
-        }
+      void TearDown() override {
+      }
     };
 
-    TEST_F(FileUtilsTest, BasenameTest)
-    {
+    TEST_F(FileUtilsTest, BasenameTest) {
         // arrange
         std::string fileName = "/tmp/example.gif";
 
@@ -47,8 +42,7 @@ namespace AwsMock::Core
         EXPECT_EQ(result, "example");
     }
 
-    TEST_F(FileUtilsTest, ExtensionTest)
-    {
+    TEST_F(FileUtilsTest, ExtensionTest) {
         // arrange
         std::string fileName = FileUtils::CreateTempFile("gif");
 
@@ -60,8 +54,7 @@ namespace AwsMock::Core
         EXPECT_EQ(result, "gif");
     }
 
-    TEST_F(FileUtilsTest, FileSizeTest)
-    {
+    TEST_F(FileUtilsTest, FileSizeTest) {
         // arrange
         std::string fileName = FileUtils::CreateTempFile("gif", 100);
 
@@ -72,8 +65,7 @@ namespace AwsMock::Core
         EXPECT_EQ(result, 100);
     }
 
-    TEST_F(FileUtilsTest, DeleteFileTest)
-    {
+    TEST_F(FileUtilsTest, DeleteFileTest) {
         // arrange
         std::string fileName = FileUtils::CreateTempFile("gif");
 
@@ -84,8 +76,7 @@ namespace AwsMock::Core
         EXPECT_FALSE(FileUtils::FileExists(fileName));
     }
 
-    TEST_F(FileUtilsTest, StripBasenameTest)
-    {
+    TEST_F(FileUtilsTest, StripBasenameTest) {
         // arrange
         std::string fileName = "/tmp/testFile.txt";
 
@@ -98,46 +89,41 @@ namespace AwsMock::Core
         EXPECT_STREQ(basename.c_str(), "testFile.txt");
     }
 
-    TEST_F(FileUtilsTest, CompressTest)
-    {
+    TEST_F(FileUtilsTest, CompressTest) {
         // arrange
         std::string zipName = FileUtils::GetTempFile("zip");
         std::string dirName = DirUtils::CreateTempDir();
-        for (int i = 0; i < 3; i++)
-        {
+        for (int i = 0; i < 3; i++) {
             FileUtils::CreateTempFile(dirName, "json", 100);
         }
 
         // act
-        EXPECT_NO_THROW({ FileUtils::zipFiles(zipName, dirName); });
+        EXPECT_NO_THROW({ FileUtils::ZipFiles(zipName, dirName); });
 
         // assert
         EXPECT_TRUE(FileUtils::FileExists(zipName));
         EXPECT_TRUE(FileUtils::FileSize(zipName) > 0);
     }
 
-    TEST_F(FileUtilsTest, UncompressTest)
-    {
+    TEST_F(FileUtilsTest, UncompressTest) {
         // arrange
         std::string zipName = FileUtils::GetTempFile("zip");
         std::string dirName = DirUtils::CreateTempDir();
         std::string outputDirName = DirUtils::CreateTempDir();
-        for (int i = 0; i < 3; i++)
-        {
+        for (int i = 0; i < 3; i++) {
             FileUtils::CreateTempFile(dirName, "json", 100);
         }
 
         // act
-        EXPECT_NO_THROW({ FileUtils::zipFiles(zipName, dirName); });
-        EXPECT_NO_THROW({ FileUtils::unzipFiles(zipName, outputDirName); });
+        EXPECT_NO_THROW({ FileUtils::ZipFiles(zipName, dirName); });
+        EXPECT_NO_THROW({ FileUtils::UnzipFiles(zipName, outputDirName); });
 
         // assert
         EXPECT_TRUE(DirUtils::DirectoryExists(outputDirName));
         EXPECT_FALSE(DirUtils::DirectoryEmpty(outputDirName));
     }
 
-    TEST_F(FileUtilsTest, CreateTempFileTest)
-    {
+    TEST_F(FileUtilsTest, CreateTempFileTest) {
         // arrange
 
         // act

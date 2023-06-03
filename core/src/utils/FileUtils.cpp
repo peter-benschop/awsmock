@@ -26,9 +26,9 @@ namespace AwsMock::Core {
             + Poco::replace(Poco::toLower(Poco::Path::temp() + Poco::UUIDGenerator().createRandom().toString() + "." + extension), "-", "");
     }
 
-    unsigned long FileUtils::FileSize(const std::string &fileName) {
+    long FileUtils::FileSize(const std::string &fileName) {
         Poco::File file(fileName);
-        return file.getSize();
+        return (long)file.getSize();
     }
 
     void FileUtils::AppendBinaryFiles(const std::string &outFile, const std::string &inDir, const std::vector<std::string> &files) {
@@ -91,14 +91,28 @@ namespace AwsMock::Core {
         return Poco::format("%s.%s", GetBasename(fileName), GetExtension(fileName));
     }
 
+    std::string FileUtils::GetOwner(const std::string &fileName) {
+        struct stat info{};
+        stat(fileName.c_str(), &info);  // Error check omitted
+        struct passwd *pw = getpwuid(info.st_uid);
+        //struct group  *gr = getgrgid(info.st_gid);
+        if(pw) {
+            return pw->pw_name;
+        }
+        return {};
+    }
+
     void FileUtils::DeleteFile(const std::string &fileName) {
+        if(fileName.empty()) {
+            return;
+        }
         Poco::File file(fileName);
         if (file.exists()) {
             file.remove();
         }
     }
 
-    void FileUtils::unzipFiles(const std::string &zipFile, const std::string &dirName) {
+    void FileUtils::UnzipFiles(const std::string &zipFile, const std::string &dirName) {
         Poco::File tempDir = Poco::File(dirName);
         tempDir.createDirectories();
         poco_debug(Poco::Logger::get("FileUtils"), "Using output directory: " + dirName);
@@ -114,7 +128,7 @@ namespace AwsMock::Core {
         poco_debug(Poco::Logger::get("FileUtils"), "File uncompressed, zipFile: " + zipFile + " directory:" + dirName);
     }
 
-    void FileUtils::zipFiles(const std::string &zipFile, const std::string &dirName) {
+    void FileUtils::ZipFiles(const std::string &zipFile, const std::string &dirName) {
         poco_debug(Poco::Logger::get("FileUtils"), "Using directory: " + dirName);
 
         std::ofstream out(zipFile, std::ios::binary);

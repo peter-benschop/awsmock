@@ -5,6 +5,11 @@
 #ifndef AWSMOCK_CORE_FILEUTILS_H
 #define AWSMOCK_CORE_FILEUTILS_H
 
+// Standard C includes
+#include <pwd.h>
+#include <grp.h>
+#include <sys/stat.h>
+
 // Standard C++ includes
 #include <string>
 #include <cstdio>
@@ -126,7 +131,7 @@ namespace AwsMock::Core {
        * @param fileName name of the file.
        * @return size of the in bytes.
        */
-      static unsigned long FileSize(const std::string &fileName);
+      static long FileSize(const std::string &fileName);
 
       /**
        * Append several binary files to a single output file.
@@ -148,6 +153,13 @@ namespace AwsMock::Core {
       static std::string StripBasePath(const std::string &fileName);
 
       /**
+       * Returns the file owner.
+       *
+       * @param fileName name of the file to delete
+       */
+      static std::string GetOwner(const std::string &fileName);
+
+      /**
        * Delete the file with the given file name
        *
        * @param fileName name of the file to delete
@@ -160,7 +172,7 @@ namespace AwsMock::Core {
        * @param zipFile zip file to decompress.
        * @param dirName output directory.
        */
-      static void unzipFiles(const std::string &zipFile, const std::string &dirName);
+      static void UnzipFiles(const std::string &zipFile, const std::string &dirName);
 
       /**
        * Unzip the given file to the given directory.
@@ -168,7 +180,7 @@ namespace AwsMock::Core {
        * @param zipFile zip file to decompress.
        * @param dirName directory to zip.
        */
-      static void zipFiles(const std::string &zipFile, const std::string &dirName);
+      static void ZipFiles(const std::string &zipFile, const std::string &dirName);
     };
 } // namespace AwsMock::Core
 #endif // AWSMOCK_CORE_FILEUTILS_H
