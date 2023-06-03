@@ -34,7 +34,7 @@ namespace AwsMock {
        * @param configuration application configuration
        * @param metricService monitoring service
        */
-      SNSHandler(Core::Configuration &configuration,Core::MetricService &metricService);
+      SNSHandler(Core::Configuration &configuration, Core::MetricService &metricService);
 
     protected:
 
@@ -100,6 +100,7 @@ namespace AwsMock {
        */
       Core::MetricService &_metricService;
     };
+
 } // namespace AwsMock::Resource::Factory
 
 #endif // AWSMOCK_RESOURCE_SNSHANDLER_H

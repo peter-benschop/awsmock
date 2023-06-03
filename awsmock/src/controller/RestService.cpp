@@ -7,17 +7,20 @@
 namespace AwsMock {
 
     RestService::RestService(Core::Configuration &configuration)
-        : _logger(Poco::Logger::get("RestService")), _configuration(configuration), _port(DEFAULT_PORT), _host(DEFAULT_HOST) {
+        : _port(DEFAULT_PORT), _host(DEFAULT_HOST), _logger(Poco::Logger::get("RestService")), _configuration(configuration) {
 
         Core::Logger::SetDefaultConsoleLogger("RestService");
 
         _port = _configuration.getInt("awsmock.rest.port", DEFAULT_PORT);
         _host = _configuration.getString("awsmock.rest.host", DEFAULT_HOST);
+        poco_debug(_logger, "Rest service initialized, endpoint: " + _host  + ":" + std::to_string(_port));
     }
 
     RestService::~RestService() {
-        httpServer->stop();
         delete _router;
+
+        _httpServer->stopAll(true);
+        delete _httpServer;
     }
 
     void RestService::setPort(int port) {
@@ -38,9 +41,9 @@ namespace AwsMock {
         httpServerParams->setMaxQueued(250);
         httpServerParams->setMaxThreads(50);
 
-        httpServer = new Poco::Net::HTTPServer(getRouter(), Poco::Net::ServerSocket(Poco::UInt16(_port)), httpServerParams);
+        _httpServer = new Poco::Net::HTTPServer(getRouter(), Poco::Net::ServerSocket(Poco::UInt16(_port)), httpServerParams);
 
-        httpServer->start();
+        _httpServer->start();
         poco_information(_logger, "Restful Web Service started, endpoint: http://" + _host + ":" + std::to_string(_port));
     }
 

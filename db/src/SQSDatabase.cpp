@@ -70,7 +70,6 @@ namespace AwsMock::Database {
             poco_trace(_logger, "Queue created, region: " + result.region + " name: " + result.name + " owner: " + result.owner);
 
         } catch (Poco::Exception &exc) {
-            std::cerr << exc.message() << std::endl;
             poco_error(_logger, "Database exception: " + exc.message());
         }
 

@@ -38,6 +38,11 @@ namespace AwsMock::Database {
       explicit Database(const Core::Configuration &configuration);
 
       /**
+       * Destructor
+       */
+      ~Database();
+
+      /**
        * Returns a session
        *
        * @return returns a database session

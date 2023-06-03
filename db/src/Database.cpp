@@ -11,6 +11,10 @@ namespace AwsMock::Database {
         Initialize();
     }
 
+    Database::~Database(){
+        _sessionPool->shutdown();
+    }
+
     void Database::Initialize() {
 
         // Register SQLite connector

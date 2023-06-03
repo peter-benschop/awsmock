@@ -68,15 +68,9 @@ namespace AwsMock {
 
           poco_debug(_logger, "Starting system shutdown");
 
-          Poco::ThreadPool::defaultPool().stopAll();
-          poco_debug(_logger, "Default threadpool stopped");
-
           // Shutdown monitoring
-          if (_metricService) {
-              _metricService->ShutdownServer();
-              delete _metricService;
-              poco_debug(_logger, "Metric server stopped");
-          }
+          _metricService.ShutdownServer();
+          poco_debug(_logger, "Metric server stopped");
 
           Poco::Util::Application::uninitialize();
           poco_debug(_logger, "Bye, bye, and thanks for all the fish");
@@ -136,9 +130,8 @@ namespace AwsMock {
        */
       void InitializeMonitoring() {
 
-          _metricService = new Core::MetricService(_configuration);
-          _metricService->Initialize();
-          _metricService->StartServer();
+          _metricService.Initialize();
+          _metricService.StartServer();
       }
 
       /**
@@ -155,7 +148,7 @@ namespace AwsMock {
        * Initialize database
        */
       void InitializeDatabase() {
-          std::make_shared<Database::Database>(_configuration);
+          //std::make_shared<Database::Database>(_configuration);
           poco_debug(_logger, "Database initialized");
       }
 
@@ -169,16 +162,9 @@ namespace AwsMock {
 
           poco_debug(_logger, "Entering main routine");
 
-          // Start REST service
-          _router = std::make_shared<Router>();
-          _router->Initialize(&_configuration, _metricService);
-
-          _restService = std::make_shared<RestService>(_configuration);
-          _restService->setRouter(_router.get());
-          _restService->start();
-          poco_debug(_logger,
-                     "Rest service initialized, endpoint: " + _configuration.getString("awsmock.rest.host")
-                         + ":" + std::to_string(_configuration.getInt("awsmock.rest.port")));
+          // Start HTTP server
+          _restService.setRouter(&_router);
+          _restService.start();
 
           // Wait for termination
           this->waitForTerminationRequest();
@@ -199,7 +185,17 @@ namespace AwsMock {
       /**
        * Monitoring service
        */
-      Core::MetricService *_metricService;
+      Core::MetricService _metricService = Core::MetricService(_configuration);
+
+      /**
+       * Gateway router
+       */
+      Controller::Router _router = Controller::Router(_configuration, _metricService);
+
+      /**
+       * Gateway controller
+       */
+      RestService _restService = RestService(_configuration);
 
       /**
        * Thread error handler
@@ -207,24 +203,9 @@ namespace AwsMock {
       Core::ThreadErrorHandler _threadErrorHandler;
 
       /**
-       * Process error handler
-       */
-      //ProcessErrorHandler *_processErrorHandler;
-
-      /**
-       * Gateway router
-       */
-      std::shared_ptr<Router> _router;
-
-      /**
-       * Gateway controller
-       */
-      std::shared_ptr<RestService> _restService;
-
-      /**
        * Database
        */
-      std::shared_ptr<Database::Database> _database;
+      Database::Database _database = Database::Database(_configuration);
     };
 
 } // namespace AwsMock

@@ -38,16 +38,6 @@ namespace AwsMock {
       ~RestService();
 
       /**
-       * Return singleton instance
-       *
-       * @return singleton instance.
-       */
-      /*static RestService &instance() {
-          static Poco::SingletonHolder<RestService> _restServerInstance;
-          return *_restServerInstance.get();
-      }*/
-
-      /**
        * Sets the REST port.
        *
        * @param port REST port.
@@ -86,16 +76,6 @@ namespace AwsMock {
     private:
 
       /**
-       * Logger
-       */
-      Poco::Logger &_logger;
-
-      /**
-      * Logger
-      */
-      Core::Configuration &_configuration;
-
-      /**
        * Rest port
        */
       int _port;
@@ -106,6 +86,16 @@ namespace AwsMock {
       std::string _host;
 
       /**
+       * Logger
+       */
+      Poco::Logger &_logger;
+
+      /**
+      * Logger
+      */
+      Core::Configuration &_configuration;
+
+      /**
        * REST router
        */
       Poco::Net::HTTPRequestHandlerFactory *_router;
@@ -113,7 +103,7 @@ namespace AwsMock {
       /**
        * HTTP server instance
        */
-      Poco::Net::HTTPServer *httpServer;
+      Poco::Net::HTTPServer *_httpServer;
     };
 } // namespace AwsMock
 
