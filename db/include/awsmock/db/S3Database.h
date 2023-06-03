@@ -51,6 +51,15 @@ namespace AwsMock::Database {
       bool BucketExists(const std::string &region, const std::string &name);
 
       /**
+       * Returns the bucket by id
+       *
+       * @param id bucket id
+       * @return bucket, if existing
+       * @throws DatabaseException
+       */
+      Entity::S3::Bucket GetBucketById(long id);
+
+      /**
        * Create a new bucket in the S3 bucket table
        *
        * @param bucket bucket entity
@@ -77,6 +86,15 @@ namespace AwsMock::Database {
        * @throws DatabaseException
        */
       Entity::S3::Object GetObject(const std::string &bucket, const std::string &key);
+
+      /**
+       * Gets an object from an bucket
+       *
+       * @param id object ID
+       * @return S3 object
+       * @throws DatabaseException
+       */
+      Entity::S3::Object GetObjectById(long id);
 
       /**
        * List all buckets

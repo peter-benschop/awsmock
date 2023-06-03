@@ -6,6 +6,9 @@ set(SOURCES src/Database.cpp src/S3Database.cpp src/SQSDatabase.cpp)
 set(HEADERS include/awsmock/db/Database.h include/awsmock/db/S3Database.h include/awsmock/db/SQSDatabase.h
         include/awsmock/entity/s3/Bucket.h include/awsmock/entity/s3/Object.h include/awsmock/entity/sqs/Queue.h)
 
+# Test directory
+add_subdirectory(tst)
+
 # Includes
 include_directories(/usr/include /usr/local/include include ../core/include)
 
