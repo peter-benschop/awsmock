@@ -43,6 +43,8 @@ namespace AwsMock::Database {
                 into(result.owner), into(result.created), into(result.modified), now;
             poco_trace(_logger, "Bucket created, id: " + std::to_string(result.id) + " region: " + result.region + " name: " + result.name + " owner: " + result.owner);
 
+            session.close();
+
         } catch (Poco::Exception &exc) {
             poco_error(_logger, "Database exception: " + exc.message());
         }

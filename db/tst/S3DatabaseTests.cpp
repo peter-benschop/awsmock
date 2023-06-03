@@ -2,8 +2,8 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_CORE_DATABASETEST_H
-#define AWMOCK_CORE_DATABASETEST_H
+#ifndef AWMOCK_CORE_S3DATABASETEST_H
+#define AWMOCK_CORE_S3DATABASETEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
@@ -13,7 +13,6 @@
 
 // Local includes
 #include <awsmock/core/Configuration.h>
-#include <awsmock/core/FileUtils.h>
 #include <awsmock/db/S3Database.h>
 
 #define REGION "eu-central-1"
@@ -197,4 +196,4 @@ namespace AwsMock::Database {
 
 } // namespace AwsMock::Core
 
-#endif // AWMOCK_CORE_DIRUTILSTEST_H
+#endif // AWMOCK_CORE_S3DATABASETEST_H
