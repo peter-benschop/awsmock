@@ -1,13 +1,8 @@
 set(BINARY ${CMAKE_PROJECT_NAME})
 
-if (NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
-endif ()
-
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
-set(CMAKE_INSTALL_PREFIX "/usr/local" CACHE STRING " " FORCE)
 
 set(SOURCES src/config/Configuration.cpp src/resource/HandlerException.cpp src/resource/AbstractResource.cpp
         src/handling/JsonAPIAbstractRelatedResourceBuilder.cpp src/handling/JsonAPIAbstractRootResourceBuilder.cpp
