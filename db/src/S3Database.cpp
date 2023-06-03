@@ -14,11 +14,10 @@ namespace AwsMock::Database {
 
     bool S3Database::BucketExists(const std::string &region, const std::string &name) {
 
+        int count = 0;
         Poco::Data::Session session = GetSession();
 
-        int count = 0;
-        Poco::Data::Statement stmt(session);
-        stmt << "SELECT count(*) FROM s3_bucket WHERE region=? AND name=?", bind(region), bind(name), into(count), now;
+        session << "SELECT COUNT(*) FROM s3_bucket WHERE region=? AND name=?", bind(region), bind(name), into(count), now;
 
         session.close();
         poco_trace(_logger, "Bucket exists: " + std::to_string(count));
@@ -223,9 +222,10 @@ namespace AwsMock::Database {
         try {
             Poco::Data::Session session = GetSession();
 
+            std::string event = Poco::replace(bucketNotification.event, "*", "%");
             session << "INSERT INTO s3_notification(bucket,region,notification_id,function,event) VALUES(?,?,?,?,?) returning id",
                 bind(bucketNotification.bucket), bind(bucketNotification.region), bind(bucketNotification.notificationId), bind(bucketNotification.function),
-                bind(bucketNotification.event), into(id), now;
+                bind(event), into(id), now;
 
             poco_trace(_logger,
                        "Bucket notification added, bucket: " + bucketNotification.bucket + " function: " + bucketNotification.function + " event: "
@@ -254,6 +254,47 @@ namespace AwsMock::Database {
             session.close();
 
         } catch (Poco::Exception &exc) {
+            poco_error(_logger, "Database exception: " + exc.message());
+        }
+        return result;
+    }
+
+    bool S3Database::HasBucketNotification(const Entity::S3::BucketNotification &bucketNotification) {
+
+        int count = 0;
+        try {
+            Poco::Data::Session session = GetSession();
+
+            session << "SELECT COUNT(*) FROM s3_notification WHERE region=? AND bucket=?",
+                bind(bucketNotification.region), bind(bucketNotification.bucket), into(count), now;
+
+            poco_trace(_logger, "Check bucket notification added, count: " + std::to_string(count));
+
+            session.close();
+
+        } catch (Poco::Exception &exc) {
+            poco_error(_logger, "Database exception: " + exc.message());
+        }
+        return count > 0;
+    }
+
+    Entity::S3::BucketNotification S3Database::GetBucketNotification(const Entity::S3::BucketNotification &bucketNotification) {
+
+        Entity::S3::BucketNotification result;
+        try {
+            Poco::Data::Session session = GetSession();
+
+            session << "SELECT id,bucket,region,notification_id,function,event,created,modified FROM s3_notification WHERE region=? AND bucket=? AND '" +
+                bucketNotification.event + "' like event",
+                bind(bucketNotification.region), bind(bucketNotification.bucket), bind(bucketNotification.event), into(result.id), into(result.bucket), into(result.region),
+                into(result.notificationId), into(result.function), into(result.event), into(result.created), into(result.modified), now;
+
+            poco_trace(_logger, "Bucket notification added, bucket: " + result.bucket + " function: " + result.function + " event: " + result.event);
+
+            session.close();
+
+        } catch (Poco::Exception &exc) {
+            std::cerr << exc.message() << std::endl;
             poco_error(_logger, "Database exception: " + exc.message());
         }
         return result;

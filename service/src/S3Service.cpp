@@ -211,16 +211,23 @@ namespace AwsMock::Service {
             }
 
             // Write file
-            std::string fileName = _dataDir + Poco::Path::separator() + "s3" + Poco::Path::separator() + request.GetBucket() + Poco::Path::separator() + request.GetKey();
+            std::string
+                fileName = _dataDir + Poco::Path::separator() + "s3" + Poco::Path::separator() + request.GetBucket() + Poco::Path::separator() + request.GetKey();
             std::ofstream ofs(fileName);
             ofs << stream.rdbuf();
             ofs.close();
 
             // Update database
-            _database->CreateObject({.bucket=request.GetBucket(), .key=request.GetKey(), .owner=request.GetOwner(), .size=request.GetSize(),
-                                     .md5sum=request.GetMd5Sum(), .contentType=request.GetContentType()});
+            Database::Entity::S3::Object object;
+            object = _database->CreateObject({.bucket=request.GetBucket(), .key=request.GetKey(), .owner=request.GetOwner(), .size=request.GetSize(),
+                                                 .md5sum=request.GetMd5Sum(), .contentType=request.GetContentType()});
 
-            response.SetETag(request.GetContentType());
+            response.SetETag(request.GetMd5Sum());
+
+            // Check notification
+            if(_database->HasBucketNotification({.bucket=request.GetBucket(), .region=request.GetRegion()})) {
+                CheckNotifications(object, request.GetRegion(), "s3:ObjectCreated:Put");
+            }
 
         } catch (Poco::Exception &ex) {
             poco_error(_logger, "S3 Delete Bucket failed, message: " + ex.message());
@@ -246,6 +253,24 @@ namespace AwsMock::Service {
             poco_error(_logger, "S3 put bucket notification request failed, message: " + ex.message());
             throw Core::ServiceException(ex.message(), 500);
         }
+    }
+
+    bool S3Service::HasEventNotification(const std::string &region, const std::string &bucket, const std::string &event) {
+        poco_trace(_logger, "Has event notification, region: " + region + " bucket: " + bucket);
+
+        Database::Entity::S3::BucketNotification notification = {.bucket=bucket, .region=region, .event=event};
+        return _database->HasBucketNotification(notification);
+    }
+
+    void S3Service::CheckNotifications(Database::Entity::S3::Object object, const std::string &region, const std::string &event) {
+
+        Database::Entity::S3::BucketNotification notification = _database->GetBucketNotification({.bucket=object.bucket, .region=region, .event=event});
+
+        // Create the event record
+        Dto::S3::Record record = {.s3.bucket=notification.bucket, .s3.object.key=object.key, .s3.object.etag=object.md5sum, .s3.object.size=object.size};
+        Dto::S3::EventNotification eventNotification;
+        eventNotification.records.push_back(record);
+
     }
 
     void S3Service::DeleteBucket(const std::string &region, const std::string &name) {

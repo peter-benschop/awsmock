@@ -139,7 +139,9 @@ namespace AwsMock::Database {
       Entity::S3::ObjectList ListBucket(const std::string &bucket);
 
       /**
-       * Creates a bucket notification
+       * Creates a bucket notification-
+       *
+       * <p>Replaces the wildcard characters '*' with the SQLite wildcard '%'.</p>
        *
        * @param bucketNotification bucket notification
        * @return created BucketNotification entity
@@ -153,6 +155,24 @@ namespace AwsMock::Database {
        * @return BucketNotification
        */
       Entity::S3::BucketNotification GetBucketNotificationById(long id);
+
+      /**
+       * Returns a notification.
+       *
+       * <p>Event matching uses inverse wildcard matching, as the wildcard patterns are stored in the database.</p>
+       *
+       * @param bucketNotification bucket notification.
+       * @return BucketNotification
+       */
+      Entity::S3::BucketNotification GetBucketNotification(const Entity::S3::BucketNotification &bucketNotification);
+
+      /**
+       * Checks for a bucket notification
+       *
+       * @param bucketNotification notification
+       * @return true if bucket notification exists
+       */
+      bool HasBucketNotification(const Entity::S3::BucketNotification &bucketNotification);
 
       /**
        * Delete a bucket.

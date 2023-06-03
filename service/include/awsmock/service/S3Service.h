@@ -22,6 +22,7 @@
 #include "awsmock/dto/s3/CompleteMultipartUploadResult.h"
 #include "awsmock/dto/s3/CreateBucketRequest.h"
 #include "awsmock/dto/s3/CreateBucketResponse.h"
+#include "awsmock/dto/s3/EventNotification.h"
 #include "awsmock/dto/s3/GetMetadataRequest.h"
 #include "awsmock/dto/s3/GetMetadataResponse.h"
 #include "awsmock/dto/s3/GetObjectRequest.h"
@@ -166,6 +167,33 @@ namespace AwsMock::Service {
        * @return all directories before file
        */
       static std::string GetDirFromKey(const std::string &key);
+
+      /**
+       * Check for bucket notifications.
+       *
+       * @param object S3 object.
+       * @param region AWS region.
+       * @param event S3 event type.
+       */
+      void CheckNotifications(Database::Entity::S3::Object object, const std::string &region, const std::string &event);
+
+      /**
+       * Checks for a event notification.
+       *
+       * @param region AWS region
+       * @param bucket bucket name
+       * @param event event to check
+       * @return true, if the bucket has event notification settings
+       */
+      bool HasEventNotification(const std::string &region, const std::string &bucket, const std::string &event);
+
+      /**
+       * Returns a event notification.
+       *
+       * @param key S3 object key
+       * @return all directories before file
+       */
+      static std::string GetEventNotification(const std::string &key);
 
       /**
        * Logger

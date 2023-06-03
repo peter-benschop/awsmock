@@ -56,7 +56,6 @@ namespace AwsMock {
           InitializeLogging();
           InitializeMonitoring();
           InitializeErrorHandler();
-          InitializeDatabase();
           poco_information(_logger,
                            "Starting aws-mock v" + Configuration::GetVersion() + " pid: " + std::to_string(getpid()) + " loglevel: " + _configuration.GetLogLevel());
           Poco::Util::ServerApplication::initialize(self);
@@ -146,14 +145,6 @@ namespace AwsMock {
       }
 
       /**
-       * Initialize database
-       */
-      void InitializeDatabase() {
-          //std::make_shared<Database::Database>(_configuration);
-          poco_debug(_logger, "Database initialized");
-      }
-
-      /**
        * Main routine.
        *
        * @param args command line arguments.
@@ -163,6 +154,7 @@ namespace AwsMock {
 
           poco_debug(_logger, "Entering main routine");
 
+          // Start the S3 worker
           Worker::S3Worker _s3Worker = Worker::S3Worker(_configuration);
           Poco::ThreadPool::defaultPool().start(_s3Worker);
 

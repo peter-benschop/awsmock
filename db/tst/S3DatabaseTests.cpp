@@ -185,13 +185,55 @@ namespace AwsMock::Database {
     TEST_F(S3DatabaseTest, CreateNotificationTest) {
 
         // arrange
-        Entity::S3::BucketNotification notification = {.bucket=BUCKET, .region=REGION, .function="aws:arn:000000000:lambda:test", .event="Created:*"};
+        Entity::S3::BucketNotification notification = {.bucket=BUCKET, .region=REGION, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
 
         // act
         Entity::S3::BucketNotification result = _database.CreateBucketNotification(notification);
 
         // assert
         EXPECT_TRUE(result.id > 0);
+    }
+
+    TEST_F(S3DatabaseTest, HasNotificationTest) {
+
+        // arrange
+        Entity::S3::BucketNotification notification = {.bucket=BUCKET, .region=REGION, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
+        notification = _database.CreateBucketNotification(notification);
+
+        // act
+        bool result = _database.HasBucketNotification(notification);
+
+        // assert
+        EXPECT_TRUE(result);
+    }
+
+    TEST_F(S3DatabaseTest, GetNotificationTest) {
+
+        // arrange
+        Entity::S3::BucketNotification notification = {.bucket=BUCKET, .region=REGION, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
+        notification = _database.CreateBucketNotification(notification);
+
+        // act
+        Entity::S3::BucketNotification result = _database.GetBucketNotification(notification);
+
+        // assert
+        EXPECT_TRUE(result.region == notification.region);
+        EXPECT_TRUE(Core::StringUtils::Contains(result.event, "%"));
+    }
+
+    TEST_F(S3DatabaseTest, GetNotificationPutTest) {
+
+        // arrange
+        Entity::S3::BucketNotification notification = {.bucket=BUCKET, .region=REGION, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
+        notification = _database.CreateBucketNotification(notification);
+
+        // act
+        Entity::S3::BucketNotification search = {.bucket=BUCKET, .region=REGION, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:Put"};
+        Entity::S3::BucketNotification result = _database.GetBucketNotification(search);
+
+        // assert
+        EXPECT_TRUE(result.region == notification.region);
+        EXPECT_TRUE(result.event == "s3:ObjectCreated:%");
     }
 
 } // namespace AwsMock::Core
