@@ -78,6 +78,15 @@ namespace AwsMock::Database {
       Entity::S3::Object CreateObject(const Entity::S3::Object& object);
 
       /**
+       * Check the existence of an object
+       *
+       * @param object object entity
+       * @return true if existing otherwise false
+       * @throws DatabaseException
+       */
+      bool ObjectExists(const Entity::S3::Object& object);
+
+      /**
        * Gets an object from an bucket
        *
        * @param bucket object bucket

@@ -101,12 +101,27 @@ namespace AwsMock::Database {
 
         while (!stmt.done() && objectList.size() < MAX_FILES) {
             stmt.execute();
-            if(object.id > 0) {
+            if (object.id > 0) {
                 objectList.push_back(object);
             }
         }
         poco_trace(_logger, "Bucket list created, size:" + std::to_string(objectList.size()));
         return objectList;
+    }
+
+    bool S3Database::ObjectExists(const Entity::S3::Object &object) {
+
+        int count = 0;
+        Poco::Data::Session session = GetSession();
+        try {
+            session << "SELECT count(*) FROM s3_object WHERE bucket=? AND key=?", bind(object.bucket), bind(object.key), into(count), now;
+            session.close();
+            poco_trace(_logger, "Object exists: " + std::to_string(count));
+
+        } catch (Poco::Exception &exc) {
+            poco_error(_logger, "Database exception: " + exc.message());
+        }
+        return count > 0;
     }
 
     Entity::S3::Object S3Database::CreateObject(const Entity::S3::Object &object) {
@@ -121,8 +136,8 @@ namespace AwsMock::Database {
                 bind(object.bucket), bind(object.key), bind(object.owner), bind(object.size), bind(object.md5sum), bind(object.contentType), into(id), now;
 
             Poco::Data::Statement select(session);
-            select << "SELECT id,bucket,key,owner,size,md5sum,content_type,modified FROM s3_object WHERE bucket=? AND key=?",
-                bind(result.id), bind(result.bucket), into(result.key), into(result.owner), into(result.size), into(result.md5sum), into(result.contentType),
+            select << "SELECT id,bucket,key,owner,size,md5sum,content_type,created,modified FROM s3_object WHERE id=?",
+                bind(id), into(result.id), into(result.bucket), into(result.key), into(result.owner), into(result.size), into(result.md5sum), into(result.contentType),
                 into(result.created), into(result.modified), now;
             poco_trace(_logger, "Object created, bucket: " + object.bucket + " key: " + object.key);
 

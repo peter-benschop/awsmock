@@ -18,6 +18,7 @@
 
 #define REGION "eu-central-1"
 #define BUCKET "test-bucket"
+#define OBJECT "test-object"
 #define OWNER "test-owner"
 
 namespace AwsMock::Database {
@@ -113,7 +114,7 @@ namespace AwsMock::Database {
         // arrange
         Entity::S3::Bucket bucket = {.name=BUCKET, .region=REGION, .owner=OWNER};
         _database.CreateBucket(bucket);
-        Entity::S3::Object object = {.bucket=bucket.name, .owner=OWNER, .size=5};
+        Entity::S3::Object object = {.bucket=bucket.name, .key=OBJECT, .owner=OWNER, .size=5};
         _database.CreateObject(object);
 
         // act
@@ -135,6 +136,21 @@ namespace AwsMock::Database {
 
         // assert
         EXPECT_FALSE(result);
+    }
+
+    TEST_F(S3DatabaseTest, ObjectExistsTest) {
+
+        // arrange
+        Entity::S3::Bucket bucket = {.name=BUCKET, .region=REGION, .owner=OWNER};
+        bucket = _database.CreateBucket(bucket);
+        Entity::S3::Object object = {.bucket=bucket.name, .key=OBJECT, .owner=OWNER, .size=5};
+        object = _database.CreateObject(object);
+
+        // act
+        bool result = _database.ObjectExists(object);
+
+        // assert
+        EXPECT_TRUE(result);
     }
 
     TEST_F(S3DatabaseTest, ObjectCreateTest) {
