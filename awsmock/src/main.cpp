@@ -1,6 +1,21 @@
 //
-// Created by vogje01 on 21/01/2023.
+// Created by vogje01 on 21/12/2022.
+// Copyright 2022, 2023 Jens Vogt
 //
+// This file is part of aws-mock.
+//
+// aws-mock is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// aws-mock is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with aws-mock.  If not, see <http://www.gnu.org/licenses/>.
 
 // C++ standard includes
 #include <iostream>
@@ -20,6 +35,7 @@
 #include <awsmock/controller/Router.h>
 #include <awsmock/controller/RestService.h>
 #include <awsmock/db/Database.h>
+#include <awsmock/worker/S3Worker.h>
 
 namespace AwsMock {
 
@@ -53,15 +69,9 @@ namespace AwsMock {
 
           poco_debug(_logger, "Starting system shutdown");
 
-          Poco::ThreadPool::defaultPool().stopAll();
-          poco_debug(_logger, "Default threadpool stopped");
-
           // Shutdown monitoring
-          if (_metricService) {
-              _metricService->ShutdownServer();
-              delete _metricService;
-              poco_debug(_logger, "Metric server stopped");
-          }
+          _metricService.ShutdownServer();
+          poco_debug(_logger, "Metric server stopped");
 
           Poco::Util::Application::uninitialize();
           poco_debug(_logger, "Bye, bye, and thanks for all the fish");
@@ -121,9 +131,8 @@ namespace AwsMock {
        */
       void InitializeMonitoring() {
 
-          _metricService = new Core::MetricService(_configuration);
-          _metricService->Initialize();
-          _metricService->StartServer();
+          _metricService.Initialize();
+          _metricService.StartServer();
       }
 
       /**
@@ -140,7 +149,7 @@ namespace AwsMock {
        * Initialize database
        */
       void InitializeDatabase() {
-          std::make_shared<Database::Database>(_configuration);
+          //std::make_shared<Database::Database>(_configuration);
           poco_debug(_logger, "Database initialized");
       }
 
@@ -154,16 +163,12 @@ namespace AwsMock {
 
           poco_debug(_logger, "Entering main routine");
 
-          // Start REST service
-          _router = std::make_shared<Router>();
-          _router->Initialize(&_configuration, _metricService);
+          Worker::S3Worker _s3Worker = Worker::S3Worker(_configuration);
+          Poco::ThreadPool::defaultPool().start(_s3Worker);
 
-          _restService = std::make_shared<RestService>(_configuration);
-          _restService->setRouter(_router.get());
-          _restService->start();
-          poco_debug(_logger,
-                     "Rest service initialized, endpoint: " + _configuration.getString("awsmock.rest.host")
-                         + ":" + std::to_string(_configuration.getInt("awsmock.rest.port")));
+          // Start HTTP server
+          _restService.setRouter(&_router);
+          _restService.start();
 
           // Wait for termination
           this->waitForTerminationRequest();
@@ -184,7 +189,17 @@ namespace AwsMock {
       /**
        * Monitoring service
        */
-      Core::MetricService *_metricService;
+      Core::MetricService _metricService = Core::MetricService(_configuration);
+
+      /**
+       * Gateway router
+       */
+      Controller::Router _router = Controller::Router(_configuration, _metricService);
+
+      /**
+       * Gateway controller
+       */
+      RestService _restService = RestService(_configuration);
 
       /**
        * Thread error handler
@@ -192,24 +207,9 @@ namespace AwsMock {
       Core::ThreadErrorHandler _threadErrorHandler;
 
       /**
-       * Process error handler
-       */
-      //ProcessErrorHandler *_processErrorHandler;
-
-      /**
-       * Gateway router
-       */
-      std::shared_ptr<Router> _router;
-
-      /**
-       * Gateway controller
-       */
-      std::shared_ptr<RestService> _restService;
-
-      /**
        * Database
        */
-      std::shared_ptr<Database::Database> _database;
+      Database::Database _database = Database::Database(_configuration);
     };
 
 } // namespace AwsMock

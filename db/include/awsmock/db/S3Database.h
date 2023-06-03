@@ -48,7 +48,26 @@ namespace AwsMock::Database {
        * @return true if bucket exists
        * @throws DatabaseException
        */
+      [[deprecated("Use BucketExists(const Entity::S3::Bucket &bucket)")]]
       bool BucketExists(const std::string &region, const std::string &name);
+
+      /**
+       * Bucket exists
+       *
+       * @param bucket bucket entity
+       * @return true if bucket exists
+       * @throws DatabaseException
+       */
+      bool BucketExists(const Entity::S3::Bucket &bucket);
+
+      /**
+       * Returns the bucket by id
+       *
+       * @param id bucket id
+       * @return bucket, if existing
+       * @throws DatabaseException
+       */
+      Entity::S3::Bucket GetBucketById(long id);
 
       /**
        * Create a new bucket in the S3 bucket table
@@ -69,6 +88,24 @@ namespace AwsMock::Database {
       Entity::S3::Object CreateObject(const Entity::S3::Object& object);
 
       /**
+       * Updates an existing object in the S3 object table
+       *
+       * @param object object entity
+       * @return updated object entity
+       * @throws DatabaseException
+       */
+      Entity::S3::Object UpdateObject(const Entity::S3::Object& object);
+
+      /**
+       * Check the existence of an object
+       *
+       * @param object object entity
+       * @return true if existing otherwise false
+       * @throws DatabaseException
+       */
+      bool ObjectExists(const Entity::S3::Object& object);
+
+      /**
        * Gets an object from an bucket
        *
        * @param bucket object bucket
@@ -77,6 +114,15 @@ namespace AwsMock::Database {
        * @throws DatabaseException
        */
       Entity::S3::Object GetObject(const std::string &bucket, const std::string &key);
+
+      /**
+       * Gets an object from an bucket
+       *
+       * @param id object ID
+       * @return S3 object
+       * @throws DatabaseException
+       */
+      Entity::S3::Object GetObjectById(long id);
 
       /**
        * List all buckets
@@ -101,12 +147,28 @@ namespace AwsMock::Database {
       Entity::S3::BucketNotification CreateBucketNotification(const Entity::S3::BucketNotification &bucketNotification);
 
       /**
+       * Returns a bucket notification by ID
+       *
+       * @param id notification ID
+       * @return BucketNotification
+       */
+      Entity::S3::BucketNotification GetBucketNotificationById(long id);
+
+      /**
        * Delete a bucket.
        *
        * @param bucket bucket entity
        * @throws DatabaseException
        */
       void DeleteBucket(const Entity::S3::Bucket& bucket);
+
+      /**
+       * Delete an object.
+       *
+       * @param object object entity
+       * @throws DatabaseException
+       */
+      void DeleteObject(const Entity::S3::Object &object);
 
     private:
 

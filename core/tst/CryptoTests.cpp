@@ -2,15 +2,14 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef LIBRI_COM_CRYPTOTEST_H
-#define LIBRI_COM_CRYPTOTEST_H
+#ifndef AWSMOCK_CORE_CRYPTOTEST_H
+#define AWSMOCK_CORE_CRYPTOTEST_H
 
 // GTest includes
 #include "gtest/gtest.h"
 
 // Poco includes
 #include "Poco/Path.h"
-#include "Poco/File.h"
 
 // Local includes
 #include "awsmock/core/FileUtils.h"
@@ -151,5 +150,6 @@ namespace AwsMock::Core
         EXPECT_EQ(result, TEST_STRING);
     }
 
-} // namespace Libri::COM
-#endif // LIBRI_COM_CRYPTOTEST_H
+} // namespace AwsMock::Core
+
+#endif // AWSMOCK_CORE_CRYPTOTEST_H

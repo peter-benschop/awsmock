@@ -7,6 +7,8 @@
 
 #include <awsmock/core/MetricService.h>
 
+#include <utility>
+
 namespace AwsMock::Core {
 
     template<class M>
@@ -22,7 +24,7 @@ namespace AwsMock::Core {
        * @param metricService metric service
        * @param name name of the underlying timer
        */
-      explicit MetricServiceTimer(M &metricService, const std::string &name) : _metricService(metricService), _name(name) {
+      explicit MetricServiceTimer(M &metricService, std::string name) : _metricService(metricService), _name(std::move(name)) {
           if (!_metricService.TimerExists(_name)) {
               _metricService.AddTimer(_name);
           }

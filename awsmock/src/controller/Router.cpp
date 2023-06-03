@@ -4,23 +4,23 @@
 
 #include "awsmock/controller/Router.h"
 
-namespace AwsMock {
+namespace AwsMock::Controller {
 
-    Router::Router() : _logger(Poco::Logger::get("Router")) {
+    Router::Router(Configuration &configuration, Core::MetricService &metricService)
+        : _logger(Poco::Logger::get("Router")), _configuration(configuration), _metricService(metricService) {
         Core::Logger::SetDefaultConsoleLogger("Router");
-    }
-
-    void Router::Initialize(Configuration *configuration, Core::MetricService *metricService) {
-        _configuration = configuration;
-        _metricService = metricService;
 
         AddRoute("s3", "AwsMock::Resource::Factory::S3Factory");
-        AddRoute("s3api", "AwsMock::Resource::Factory::S3ApiFactory");
+        AddRoute("s3api", "AwsMock::Resource::Factory::S3Factory");
         AddRoute("sqs", "AwsMock::Resource::Factory::SQSFactory");
         AddRoute("sns", "AwsMock::Resource::Factory::SNSFactory");
     }
 
-    Poco::Net::HTTPRequestHandler* Router::createRequestHandler(const Poco::Net::HTTPServerRequest &request) {
+    Router::~Router() {
+        _routingTable.clear();
+    }
+
+    Poco::Net::HTTPRequestHandler *Router::createRequestHandler(const Poco::Net::HTTPServerRequest &request) {
         std::string scheme;
         std::string authInfo;
         request.getCredentials(scheme, authInfo);
@@ -45,7 +45,7 @@ namespace AwsMock {
 
         Resource::Factory::IFactory *factory = Resource::Factory::Factory::createResourceFactory(factoryIndex->second);
 
-        return factory->createResource(*_configuration, *_metricService);
+        return factory->createResource(_configuration, _metricService);
     }
 
     void Router::AddRoute(const std::string &route, const std::string &factory) {
@@ -65,9 +65,5 @@ namespace AwsMock {
         poco_debug(_logger, "Found service: " + service);
         return service;
     }
-}
 
-// add support to Poco ApacheConnector
-POCO_BEGIN_MANIFEST(Poco::Net::HTTPRequestHandlerFactory)
-        POCO_EXPORT_CLASS(AwsMock::Router)
-POCO_END_MANIFEST
+} // namespace AwsMock::Controller

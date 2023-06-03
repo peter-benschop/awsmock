@@ -11,7 +11,6 @@
 
 // Poco includes
 #include "Poco/Path.h"
-#include "Poco/File.h"
 
 // Local includes
 #include <awsmock/core/DirUtils.h>

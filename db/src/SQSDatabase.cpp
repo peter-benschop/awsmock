@@ -58,10 +58,12 @@ namespace AwsMock::Database {
 
             // Select database
             int id = 0;
-            Poco::Data::Statement stmt(session);
-            stmt << "INSERT INTO sqs_queue(region,name,owner,url) VALUES(?,?,?,?) returning id", bind(queue.region), bind(queue.name), bind(queue.owner),
+            Poco::Data::Statement insert(session);
+            insert << "INSERT INTO sqs_queue(region,name,owner,url) VALUES(?,?,?,?) returning id", bind(queue.region), bind(queue.name), bind(queue.owner),
                 bind(queue.url), into(id), now;
-            stmt << "SELECT id,region,name,owner,created,modified FROM sqs_queue WHERE id=?", bind(id), into(result.id), into(result.region), into(result.name),
+
+            Poco::Data::Statement select(session);
+            select << "SELECT id,region,name,owner,created,modified FROM sqs_queue WHERE id=?", bind(id), into(result.id), into(result.region), into(result.name),
                 into(result.owner), into(result.created), into(result.modified), now;
 
             session.close();

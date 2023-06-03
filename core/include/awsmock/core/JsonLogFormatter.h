@@ -25,7 +25,7 @@ namespace AwsMock::Core {
     /**
      * JSON log formatter.
      * <p>
-     * This formatter s used to generate JSON output for all log messages, which ic needed by the Libri Kibana implementation.
+     * This formatter s used to generate JSON output for all log messages, which is needed by the Kibana implementation.
      * </p>
      *
      * @author jens.vogt@opitz-consulting.com

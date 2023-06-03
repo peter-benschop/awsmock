@@ -24,7 +24,7 @@
 #include "awsmock/resource/factory/Factory.h"
 #include "awsmock/controller/ResourceNotFound.h"
 
-namespace AwsMock {
+namespace AwsMock::Controller {
 
     class Router : public Poco::Net::HTTPRequestHandlerFactory {
 
@@ -32,16 +32,16 @@ namespace AwsMock {
 
       /**
        * Constructor
-       */
-      Router();
-
-      /**
-       * Initialization
        *
        * @param configuration application configuration
        * @param metricService common monitoring service
        */
-      void Initialize(Configuration *configuration, Core::MetricService *metricService);
+      Router(Configuration &configuration, Core::MetricService &metricService);
+
+      /**
+       * Destructor
+       */
+      ~Router() override;
 
       /**
        * Add a route
@@ -86,24 +86,20 @@ namespace AwsMock {
       /**
        * Configuration
        */
-      Configuration *_configuration{};
+      Configuration &_configuration;
 
       /**
        * Metric service
        */
-      Core::MetricService *_metricService{};
+      Core::MetricService &_metricService;
 
       /**
        * Routing table
        */
       std::map<std::string, std::string> _routingTable;
 
-      /**
-       * Routing table
-       */
-      std::map<std::string, Resource::Factory::IFactory *> _factoryTable;
     };
 
-} // namespace AwsMock
+} // namespace AwsMock::Controller
 
 #endif // AWSMOCK_CONTROLLER_ROUTER_H

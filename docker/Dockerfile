@@ -25,6 +25,7 @@ RUN cd /usr/src && \
 RUN cd /usr/src && \
     git clone https://github.com/jensvogt/aws-mock.git && \
     cd /usr/src/aws-mock && \
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr . && \
     cmake --build . --config Release && \
     cmake --install . --prefix /usr
 
