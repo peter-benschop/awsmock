@@ -243,6 +243,16 @@ namespace AwsMock::Resource {
       void SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long contentLength, HeaderMap *extraHeader = nullptr);
 
       /**
+       * Send a DELETE response (HTTP status code 204) with an output stream.
+       *
+       * @param response HTTP response object
+       * @param stream HTTP body stream
+       * @param contentLength content length of the stream in bytes
+       * @param extraHeader HTTP header map values, added to the default headers
+       */
+      void SendDeleteResponse(Poco::Net::HTTPServerResponse &response, HeaderMap *extraHeader = nullptr);
+
+      /**
        * Send an error response (HTTP status code 200).
        *
        * @param service service name

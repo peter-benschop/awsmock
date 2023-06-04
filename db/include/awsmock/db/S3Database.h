@@ -194,6 +194,13 @@ namespace AwsMock::Database {
       bool HasBucketNotification(const Entity::S3::BucketNotification &bucketNotification);
 
       /**
+       * Delete a bucket notification
+       *
+       * @param notification bucket notification
+       */
+      void DeleteBucketNotifications(const Entity::S3::BucketNotification& notification);
+
+      /**
        * Delete a bucket.
        *
        * @param bucket bucket entity

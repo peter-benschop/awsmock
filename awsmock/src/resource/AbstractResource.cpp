@@ -395,6 +395,21 @@ namespace AwsMock::Resource {
         }
     }
 
+    void AbstractResource::SendDeleteResponse(Poco::Net::HTTPServerResponse &response, HeaderMap *extraHeader) {
+        poco_trace(_logger, "Sending DELETE response, status: 204");
+
+        // Get content length
+        unsigned long contentLength = 0;
+
+        // Set headers
+        SetHeaders(response, contentLength, extraHeader);
+
+        // Send response
+        handleHttpStatusCode(response, 204);
+        std::ostream &outputStream = response.send();
+        outputStream.flush();
+    }
+
     void AbstractResource::SendErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Poco::Exception &exc) {
 
         Core::ServiceException serviceException = Core::ServiceException(exc.message(), exc.code());

@@ -187,10 +187,10 @@ namespace AwsMock {
 
             if(!bucket.empty() && !key.empty()) {
                 _s3Service.DeleteObject({.region=region, .bucket=bucket, .key=key});
-                SendOkResponse(response);
+                SendDeleteResponse(response);
             } else if(!bucket.empty()) {
                 _s3Service.DeleteBucket(region, bucket);
-                SendOkResponse(response);
+                SendDeleteResponse(response);
             }
 
         } catch (Core::ServiceException &exc) {
