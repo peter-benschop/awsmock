@@ -23,6 +23,8 @@
 #include "awsmock/service/S3Service.h"
 #include "awsmock/dto/s3/CreateBucketRequest.h"
 #include "awsmock/dto/s3/CompleteMultipartUploadResult.h"
+#include "awsmock/dto/s3/DeleteObjectsRequest.h"
+#include "awsmock/dto/s3/DeleteObjectsResponse.h"
 #include "awsmock/dto/s3/InitiateMultipartUploadResult.h"
 #include "awsmock/dto/s3/ListBucketResult.h"
 #include "awsmock/dto/s3/ListAllBucketResponse.h"

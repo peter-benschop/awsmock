@@ -18,6 +18,7 @@
 // AwsMock includes
 #include <awsmock/core/Logger.h>
 #include <awsmock/core/Configuration.h>
+#include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/db/Database.h>
@@ -77,6 +78,15 @@ namespace AwsMock::Database {
        * @throws DatabaseException
        */
       Entity::S3::Bucket CreateBucket(const Entity::S3::Bucket& bucket);
+
+      /**
+       * CHeck whether the bucket has still objects
+       *
+       * @param bucket bucket entity
+       * @return true if bucket exists
+       * @throws DatabaseException
+       */
+      bool HasObjects(const Entity::S3::Bucket &bucket);
 
       /**
        * Create a new S3 object in the S3 object table
@@ -189,6 +199,15 @@ namespace AwsMock::Database {
        * @throws DatabaseException
        */
       void DeleteObject(const Entity::S3::Object &object);
+
+      /**
+       * Updates an existing object in the S3 object table
+       *
+       * @param bucket bucket to delete from
+       * @param keys vector of object keys
+       * @throws DatabaseException
+       */
+      void DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys);
 
     private:
 

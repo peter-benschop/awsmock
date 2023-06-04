@@ -32,7 +32,7 @@ namespace AwsMock::Worker {
 
         // Create environment
         _region = _configuration.getString("awsmock.region");
-        _s3Database = std::make_unique<Database::S3Database>(_configuration);
+        _s3Service = std::make_unique<Service::S3Service>(_configuration);
 
         // Start watcher
         _watcher = new Core::DirectoryWatcher(_dataDir);
@@ -40,6 +40,15 @@ namespace AwsMock::Worker {
         _watcher->itemModified += Poco::delegate(this, &S3Worker::OnFileModified);
         _watcher->itemDeleted += Poco::delegate(this, &S3Worker::OnFileDeleted);
         poco_debug(_logger, "Directory watcher added, path: " + _dataDir);
+    }
+
+    [[noreturn]] void S3Worker::run() {
+
+        _watcherThread.start(_watcher);
+
+        while (true) {
+            Poco::Thread::sleep(10000);
+        }
     }
 
     void S3Worker::OnFileAdded(const Core::DirectoryEvent &addedEvent) {
@@ -50,19 +59,12 @@ namespace AwsMock::Worker {
         GetBucketKeyFromFile(addedEvent.item.path(), bucketName, key);
 
         // Get file size, MD5 sum
-        long fileSize = Core::FileUtils::FileSize(addedEvent.item.path());
+        long size = Core::FileUtils::FileSize(addedEvent.item.path());
         std::string md5sum = Core::Crypto::GetMd5FromFile(addedEvent.item.path());
         std::string owner = Core::FileUtils::GetOwner(addedEvent.item.path());
 
-        Database::Entity::S3::Bucket bucket = {.name=bucketName, .region=_region, .owner=owner};
-        if (!_s3Database->BucketExists(bucket)) {
-            _s3Database->CreateBucket(bucket);
-        }
-
-        Database::Entity::S3::Object object = {.bucket=bucketName, .key=key, .owner=owner,.size=fileSize, .md5sum=md5sum};
-        if (!_s3Database->ObjectExists(object)){
-            _s3Database->CreateObject(object);
-        }
+        Dto::S3::PutObjectRequest request = {.region=_region, .bucket=bucketName, .key=key, .md5Sum=md5sum, .size=size, .owner=owner};
+        _s3Service->PutObject(request);
     }
 
     void S3Worker::OnFileModified(const Core::DirectoryEvent &modifiedEvent) {
@@ -78,11 +80,11 @@ namespace AwsMock::Worker {
         std::string owner = Core::FileUtils::GetOwner(modifiedEvent.item.path());
 
         Database::Entity::S3::Object object = {.bucket=bucketName, .key=key, .owner=owner, .size=fileSize, .md5sum=md5sum};
-        if (_s3Database->ObjectExists(object)){
+        /*if (_s3Database->ObjectExists(object)){
             _s3Database->UpdateObject(object);
         } else {
             _s3Database->CreateObject(object);
-        }
+        }*/
     }
 
     void S3Worker::OnFileDeleted(const Core::DirectoryEvent &deleteEvent) {
@@ -91,20 +93,15 @@ namespace AwsMock::Worker {
         std::string bucketName, key;
         GetBucketKeyFromFile(deleteEvent.item.path(), bucketName, key);
 
-        Database::Entity::S3::Bucket bucket = {.name=bucketName, .region=_region};
+        Database::Entity::S3::Bucket bucket = {.region=_region, .name=bucketName};
         Database::Entity::S3::Object object = {.bucket=bucketName, .key = key};
-        if (_s3Database->BucketExists(bucket) && _s3Database->ObjectExists(object)){
+
+        //Dto::S3::PutObjectRequest request = {.region=_region, .bucket=bucketName, .key=key, .md5Sum=md5sum, .size=size, .owner=owner};
+        //_s3Service->PutObject(request);
+
+        /*if (_s3Database->BucketExists(bucket) && _s3Database->ObjectExists(object)){
             _s3Database->DeleteObject(object);
-        }
-    }
-
-    [[noreturn]] void S3Worker::run() {
-
-        _watcherThread.start(_watcher);
-
-        while (true) {
-            Poco::Thread::sleep(10000);
-        }
+        }*/
     }
 
     void S3Worker::GetBucketKeyFromFile(const std::string &fileName, std::string &bucket, std::string &key) {
@@ -124,4 +121,5 @@ namespace AwsMock::Worker {
             key = file.substr(posVec[2].offset, posVec[2].length);
         }
     }
+
 } // namespace AwsMock::Worker

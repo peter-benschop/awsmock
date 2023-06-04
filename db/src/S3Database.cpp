@@ -27,15 +27,18 @@ namespace AwsMock::Database {
 
     bool S3Database::BucketExists(const Entity::S3::Bucket &bucket) {
 
-        Poco::Data::Session session = GetSession();
-
         int count = 0;
-        Poco::Data::Statement stmt(session);
-        stmt << "SELECT count(*) FROM s3_bucket WHERE region=? AND name=?", bind(bucket.region), bind(bucket.name), into(count), now;
+        try {
+            Poco::Data::Session session = GetSession();
+            session << "SELECT count(*) FROM s3_bucket WHERE region=? AND name=?", bind(bucket.region), bind(bucket.name), into(count), now;
 
-        session.close();
-        poco_trace(_logger, "Bucket exists: " + (count > 0 ? std::string("true") : std::string("false")));
+            session.close();
+            poco_trace(_logger, "Bucket exists: " + (count > 0 ? std::string("true") : std::string("false")));
 
+        } catch(Poco::Exception &exc) {
+            poco_error(_logger, "Database exception: " + exc.message());
+            throw Core::DatabaseException(exc.message());
+        }
         return count > 0;
     }
 
@@ -60,8 +63,26 @@ namespace AwsMock::Database {
 
         } catch (Poco::Exception &exc) {
             poco_error(_logger, "Database exception: " + exc.message());
+            throw Core::DatabaseException(exc.message());
         }
         return result;
+    }
+
+    bool S3Database::HasObjects(const Entity::S3::Bucket &bucket) {
+
+        int count = 0;
+        try {
+            Poco::Data::Session session = GetSession();
+            session << "SELECT count(*) FROM s3_object WHERE bucket=?", bind(bucket.name), into(count), now;
+
+            session.close();
+            poco_trace(_logger, "Bucket has objects: " + (count > 0 ? std::string("true") : std::string("false")));
+
+        } catch(Poco::Exception &exc) {
+            poco_error(_logger, "Database exception: " + exc.message());
+            throw Core::DatabaseException(exc.message());
+        }
+        return count > 0;
     }
 
     Entity::S3::Bucket S3Database::GetBucketById(long id) {
@@ -235,6 +256,7 @@ namespace AwsMock::Database {
 
         } catch (Poco::Exception &exc) {
             poco_error(_logger, "Database exception: " + exc.message());
+            throw Core::DatabaseException(exc.message(), 500);
         }
         return GetBucketNotificationById(id);
     }
@@ -322,6 +344,23 @@ namespace AwsMock::Database {
 
             session << "DELETE FROM s3_object WHERE bucket=? AND key=?", bind(object.bucket), bind(object.key), now;
             poco_trace(_logger, "Object deleted, bucket: " + object.bucket + " key: " + object.key);
+
+            session.close();
+
+        } catch (Poco::Exception &exc) {
+            poco_error(_logger, "Database exception: " + exc.message());
+        }
+    }
+
+    void S3Database::DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys) {
+
+        try {
+            Poco::Data::Session session = GetSession();
+
+            for(auto it : keys) {
+                session << "DELETE FROM s3_object WHERE bucket=? AND key=?", bind(bucket), bind(it), now;
+            }
+            poco_trace(_logger, "Objects deleted, bucket: " + bucket + " count: " + std::to_string(keys.size()));
 
             session.close();
 

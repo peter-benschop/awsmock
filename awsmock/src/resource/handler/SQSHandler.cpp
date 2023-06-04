@@ -96,6 +96,7 @@ namespace AwsMock {
             }
 
         } catch (Core::ServiceException &exc) {
+            poco_error(_logger, "Service exception: " + exc.message());
             SendErrorResponse(response, exc);
         }
     }

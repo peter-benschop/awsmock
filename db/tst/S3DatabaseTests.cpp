@@ -76,7 +76,7 @@ namespace AwsMock::Database {
         _database.CreateBucket(bucket);
 
         // act
-        bool result = _database.BucketExists(bucket.region, bucket.name);
+        bool result = _database.BucketExists({.name=BUCKET, .region=REGION});
 
         // assert
         EXPECT_TRUE(result);
@@ -86,13 +86,13 @@ namespace AwsMock::Database {
 
         // arrange
         Entity::S3::Bucket bucket = {.name=BUCKET, .region=REGION, .owner=OWNER};
-        _database.CreateBucket(bucket);
+        bucket = _database.CreateBucket(bucket);
 
         // act
-        bool result = _database.BucketExists(bucket.region, bucket.name);
+        Entity::S3::Bucket result = _database.GetBucketById(bucket.id);
 
         // assert
-        EXPECT_TRUE(result);
+        EXPECT_EQ(result.id, bucket.id);
     }
 
     TEST_F(S3DatabaseTest, BucketListTest) {
@@ -131,7 +131,7 @@ namespace AwsMock::Database {
 
         // act
         EXPECT_NO_THROW({ _database.DeleteBucket(bucket); });
-        bool result = _database.BucketExists(bucket.region, bucket.name);
+        bool result = _database.BucketExists({.name=bucket.name, .region=bucket.region});
 
         // assert
         EXPECT_FALSE(result);

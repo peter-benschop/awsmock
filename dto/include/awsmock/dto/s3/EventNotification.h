@@ -17,7 +17,7 @@
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
 
-namespace AwsMock::Dto::S3 {
+namespace AwsMock::Dto::S3::EventNotification {
 
     /**
      * {

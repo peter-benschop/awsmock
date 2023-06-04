@@ -19,7 +19,7 @@ namespace AwsMock::Core {
        *
        * @param code exception code, default: 0
        */
-      explicit ServiceException(int code = 0, const char* resource = nullptr, const char* requestId = nullptr);
+      explicit ServiceException(int code = 0, const char *resource = nullptr, const char *requestId = nullptr);
 
       /**
        * Constructor.
@@ -27,7 +27,7 @@ namespace AwsMock::Core {
        * @param msg exception message
        * @param code exception code, default: 0
        */
-      explicit ServiceException(const std::string &msg, int code = 0, const char* resource = nullptr, const char* requestId = nullptr);
+      explicit ServiceException(const std::string &msg, int code = 0, const char *resource = nullptr, const char *requestId = nullptr);
 
       /**
        * Constructor.
@@ -36,7 +36,7 @@ namespace AwsMock::Core {
        * @param arg exception argument, will be appended to the message, separated with a ':'.
        * @param code exception code, default: 0
        */
-      ServiceException(const std::string &msg, const std::string &arg, int code = 0, const char* resource = nullptr, const char* requestId = nullptr);
+      ServiceException(const std::string &msg, const std::string &arg, int code = 0, const char *resource = nullptr, const char *requestId = nullptr);
 
       /**
        * Constructor.
@@ -45,7 +45,7 @@ namespace AwsMock::Core {
        * @param exc parent exception.
        * @param code exception code, default: 0
        */
-      ServiceException(const std::string &msg, const Poco::Exception &exc, int code = 0, const char* resource = nullptr, const char* requestId = nullptr);
+      ServiceException(const std::string &msg, const Poco::Exception &exc, int code = 0, const char *resource = nullptr, const char *requestId = nullptr);
 
       /**
        * Copy constructor.
@@ -99,12 +99,13 @@ namespace AwsMock::Core {
       /**
        * Resource
        */
-       const char* _resource;
+      const char *_resource;
 
       /**
        * Request ID
        */
-      const char* _requestId;
+      const char *_requestId;
+
     };
 
 } // namespace AwsMock::Core

@@ -22,6 +22,8 @@
 #include "awsmock/dto/s3/CompleteMultipartUploadResult.h"
 #include "awsmock/dto/s3/CreateBucketRequest.h"
 #include "awsmock/dto/s3/CreateBucketResponse.h"
+#include "awsmock/dto/s3/DeleteObjectsRequest.h"
+#include "awsmock/dto/s3/DeleteObjectsResponse.h"
 #include "awsmock/dto/s3/EventNotification.h"
 #include "awsmock/dto/s3/GetMetadataRequest.h"
 #include "awsmock/dto/s3/GetMetadataResponse.h"
@@ -137,7 +139,15 @@ namespace AwsMock::Service {
        * @param stream input stream
        * @return PutObjectResponse
        */
-      Dto::S3::PutObjectResponse PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream);
+      Dto::S3::PutObjectResponse PutObject(Dto::S3::PutObjectRequest &request, std::istream *stream = nullptr);
+
+      /**
+       * Delete objects
+       *
+       * @param request delete objects request
+       * @return DeleteObjectsResponse
+       */
+      Dto::S3::DeleteObjectsResponse DeleteObjects(Dto::S3::DeleteObjectsRequest &request);
 
       /**
        * Adds a bucket notification
@@ -169,6 +179,24 @@ namespace AwsMock::Service {
       static std::string GetDirFromKey(const std::string &key);
 
       /**
+       * Get the directory for a given bucket/key combination.
+       *
+       * @param bucket S3 bucket name
+       * @param key S3 object key.
+       * @return directory path.
+       */
+      std::string GetDirectory(const std::string &bucket, const std::string &key);
+
+      /**
+       * Get the absolute filename for a given bucket/key combination.
+       *
+       * @param bucket S3 bucket name
+       * @param key S3 object key.
+       * @return absolute filename path.
+       */
+      std::string GetFilename(const std::string &bucket, const std::string &key);
+
+      /**
        * Check for bucket notifications.
        *
        * @param object S3 object.
@@ -176,16 +204,6 @@ namespace AwsMock::Service {
        * @param event S3 event type.
        */
       void CheckNotifications(Database::Entity::S3::Object object, const std::string &region, const std::string &event);
-
-      /**
-       * Checks for a event notification.
-       *
-       * @param region AWS region
-       * @param bucket bucket name
-       * @param event event to check
-       * @return true, if the bucket has event notification settings
-       */
-      bool HasEventNotification(const std::string &region, const std::string &bucket, const std::string &event);
 
       /**
        * Returns a event notification.
