@@ -180,9 +180,8 @@ namespace AwsMock::Database {
         return result;
     }
 
-    Entity::SQS::MessageList SQSDatabase::ReceiveMessages(const std::string &region, const std::string &queueUrl, int maxMessages) {
+    void SQSDatabase::ReceiveMessages(const std::string &region, const std::string &queueUrl, Entity::SQS::MessageList &messageList) {
 
-        Entity::SQS::MessageList resultList;
         try {
             Entity::SQS::Message result;
 
@@ -196,14 +195,14 @@ namespace AwsMock::Database {
                 bind(queueUrl), bind(Entity::SQS::INITIAL), into(result.id), into(result.queueUrl), into(result.body), into(result.messageId), into(result.receiptHandle),
                 into(result.status), into(result.retries), into(result.md5Body), into(result.md5Attr), into(result.created), into(result.modified), range(0, 1);
 
-            while (!select.done() && resultList.size() < maxMessages) {
+            while (!select.done() && messageList.size() < 10) {
                 select.execute();
                 if (result.id > 0) {
-                    resultList.push_back(result);
+                    messageList.push_back(result);
                 }
             }
 
-            for (const auto &m : resultList) {
+            for (const auto &m : messageList) {
                 Poco::DateTime now;
                 Poco::Data::Statement update(session);
                 update << "UPDATE sqs_message SET status=?,retries=?,last_send=? WHERE id=?",
@@ -212,13 +211,12 @@ namespace AwsMock::Database {
             }
 
             session.commit();
-            poco_trace(_logger, "Messages received, region: " + region + " queue: " + queueUrl + " count: " + std::to_string(resultList.size()));
+            poco_trace(_logger, "Messages received, region: " + region + " queue: " + queueUrl + " count: " + std::to_string(messageList.size()));
 
         } catch (Poco::Exception &exc) {
             poco_error(_logger, "Database exception: " + exc.message());
             throw Core::DatabaseException(exc.message(), 500);
         }
-        return resultList;
     }
 
     [[maybe_unused]] void SQSDatabase::ResetMessages(const std::string &queueUrl, long visibility) {

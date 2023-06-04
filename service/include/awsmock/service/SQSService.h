@@ -30,6 +30,8 @@
 #include "awsmock/dto/sqs/DeleteQueueRequest.h"
 #include "awsmock/dto/sqs/DeleteQueueResponse.h"
 #include "awsmock/dto/sqs/ListQueueResponse.h"
+#include "awsmock/dto/sqs/PutQueueAttributesRequest.h"
+#include "awsmock/dto/sqs/PutQueueAttributesResponse.h"
 #include "awsmock/dto/sqs/PurgeQueueRequest.h"
 #include "awsmock/dto/sqs/PurgeQueueResponse.h"
 #include "awsmock/dto/sqs/ReceiveMessageRequest.h"
@@ -73,6 +75,15 @@ namespace AwsMock::Service {
        * @throws ServiceException
        */
       Dto::SQS::PurgeQueueResponse PurgeQueue(const Dto::SQS::PurgeQueueRequest &request);
+
+      /**
+       * PUt queue attributes
+       *
+       * @param request put queue attributes request
+       * @return PutQueueAttributesResponse
+       * @throws ServiceException
+       */
+      Dto::SQS::PutQueueAttributesResponse PutQueueAttributes(const Dto::SQS::PutQueueAttributesRequest &request);
 
       /**
        * Delete a queue

@@ -52,7 +52,7 @@ namespace AwsMock {
 
                 std::string url = GetStringParameter(payload, "QueueUrl");
 
-                Dto::SQS::DeleteQueueRequest sqsRequest = {.url=url};
+                Dto::SQS::DeleteQueueRequest sqsRequest = {.queueUrl=url};
                 Dto::SQS::DeleteQueueResponse sqsResponse = _sqsService.DeleteQueue(sqsRequest);
                 SendOkResponse(response, sqsResponse.ToXml());
 
@@ -84,6 +84,25 @@ namespace AwsMock {
 
                 Dto::SQS::PurgeQueueRequest sqsRequest = {.queueUrl=queueUrl, .region=region};
                 Dto::SQS::PurgeQueueResponse sqsResponse = _sqsService.PurgeQueue(sqsRequest);
+
+                SendOkResponse(response, sqsResponse.ToXml());
+
+            } else if (action == "SetQueueAttributes") {
+
+                std::string queueUrl = GetStringParameter(payload, "QueueUrl");
+
+                int count = GetAttributeCount(payload, "Attribute");
+                poco_trace(_logger, "Got attribute count, count: " + std::to_string(count));
+
+                AttributeList attributes;
+                for(int i = 1; i <= count; i++) {
+                    std::string attributeName = GetStringParameter(payload, "Attribute." + std::to_string(i) + ".Name");
+                    std::string attributeValue = GetStringParameter(payload, "Attribute." + std::to_string(i) + ".Value");
+                    attributes.emplace_back(attributeName, attributeValue);
+                }
+
+                Dto::SQS::PutQueueAttributesRequest sqsRequest = {.queueUrl=queueUrl, .attributes=attributes};
+                Dto::SQS::PutQueueAttributesResponse sqsResponse = _sqsService.PutQueueAttributes(sqsRequest);
 
                 SendOkResponse(response, sqsResponse.ToXml());
 
@@ -168,6 +187,17 @@ namespace AwsMock {
             value = value > min && value < max ? value : max;
         }
         return value;
+    }
+
+    int SQSHandler::GetAttributeCount(const std::string &body, const std::string &parameter) {
+        int count = 0;
+        std::vector<std::string> bodyParts = Core::StringUtils::Split(body, '&');
+        for (auto &it : bodyParts) {
+            if(it.starts_with(parameter)) {
+                count++;
+            }
+        }
+        return count;
     }
 
     std::string SQSHandler::GetEndpoint(Poco::Net::HTTPServerRequest &request) {

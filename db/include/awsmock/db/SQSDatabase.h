@@ -116,10 +116,10 @@ namespace AwsMock::Database {
        *
        * @param region AWS region
        * @param queueUrl queue URL
-       * @param maxMessages maximal number of messages
+       * @param messageList message list
        * @return MessageList
        */
-      Entity::SQS::MessageList ReceiveMessages(const std::string &region, const std::string &queueUrl, int maxMessages);
+      void ReceiveMessages(const std::string &region, const std::string &queueUrl, Entity::SQS::MessageList &messageList);
 
       /**
        * Reset expired messages

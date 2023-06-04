@@ -2,15 +2,20 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_DELETEQUEUEREQUEST_H
-#define AWSMOCK_DTO_SQS_DELETEQUEUEREQUEST_H
+#ifndef AWSMOCK_DTO_SQS_PUTQUEUEATTRIBUTEREQUEST_H
+#define AWSMOCK_DTO_SQS_PUTQUEUEATTRIBUTEREQUEST_H
 
 // C++ standard includes
 #include <string>
+#include <sstream>
+
+// Poco includes
+#include "Poco/UUID.h"
+#include "Poco/UUIDGenerator.h"
 
 namespace AwsMock::Dto::SQS {
 
-    struct DeleteQueueRequest {
+    struct PutQueueAttributesRequest {
 
       /**
        * Queue URL
@@ -18,9 +23,14 @@ namespace AwsMock::Dto::SQS {
       std::string queueUrl;
 
       /**
+       * Receipt handle
+       */
+      std::vector<std::pair<std::string,std::string>> attributes;
+
+      /**
        * Resource
        */
-      std::string resource = "Unknown resource";
+      std::string resource = "SQS";
 
       /**
        * Resource
@@ -43,8 +53,8 @@ namespace AwsMock::Dto::SQS {
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const DeleteQueueRequest &r) {
-          os << "DeleteQueueRequest={queueUrl='" + r.queueUrl + "' resource='" + r.resource + "' requestId='" + r.requestId + "'}";
+      friend std::ostream &operator<<(std::ostream &os, const PutQueueAttributesRequest &r) {
+          os << "PutQueueAttributesRequest={queueUrl='" + r.queueUrl + "' resource='" + r.resource + "' requestId='" + r.requestId + "'}";
           return os;
       }
 
@@ -52,4 +62,4 @@ namespace AwsMock::Dto::SQS {
 
 } // namespace AwsMock::Dto::SQS
 
-#endif // AWSMOCK_DTO_SQS_DELETEQUEUEREQUEST_H
+#endif // AWSMOCK_DTO_SQS_PUTQUEUEATTRIBUTEREQUEST_H
