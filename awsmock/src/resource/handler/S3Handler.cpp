@@ -52,9 +52,9 @@ namespace AwsMock {
             }
 
         } catch (Core::ServiceException &exc) {
-            SendErrorResponse(response, exc);
+            SendErrorResponse("S3", response, exc);
         } catch (Core::ResourceNotFoundException &exc) {
-            SendErrorResponse(response, exc);
+            SendErrorResponse("S3", response, exc);
         }
     }
 
@@ -129,7 +129,7 @@ namespace AwsMock {
             }
 
         } catch (Poco::Exception &exc) {
-            SendErrorResponse(response, exc);
+            SendErrorResponse("S3", response, exc);
         }
     }
 
@@ -173,7 +173,7 @@ namespace AwsMock {
             }
 
         } catch (Poco::Exception &exc) {
-            SendErrorResponse(response, exc);
+            SendErrorResponse("S3", response, exc);
         }
     }
 
@@ -185,13 +185,16 @@ namespace AwsMock {
             std::string bucket, key;
             GetBucketKeyFromUri(request.getURI(), bucket, key);
 
-            if(!bucket.empty()) {
+            if(!bucket.empty() && !key.empty()) {
+                _s3Service.DeleteObject({.region=region, .bucket=bucket, .key=key});
+                SendOkResponse(response);
+            } else if(!bucket.empty()) {
                 _s3Service.DeleteBucket(region, bucket);
                 SendOkResponse(response);
             }
 
         } catch (Core::ServiceException &exc) {
-            SendErrorResponse(response, exc);
+            SendErrorResponse("S3", response, exc);
         }
     }
 
@@ -233,11 +236,12 @@ namespace AwsMock {
 
 
         } catch (Poco::Exception &exc) {
-            SendErrorResponse(response, exc);
+            SendErrorResponse("S3", response, exc);
         }
     }
 
     void S3Handler::GetBucketKeyFromUri(const std::string &uri, std::string &bucket, std::string &key) {
+
         Poco::RegularExpression::MatchVec posVec;
         Poco::RegularExpression pattern(R"(/([a-z0-9-.]+)?/?([a-zA-Z0-9-_/.*'()]+)?\??.*$)");
         if (!pattern.match(uri, 0, posVec)) {

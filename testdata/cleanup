@@ -1,62 +1,23 @@
 #!/bin/bash
 
 #
-# Create S3 buckets
+# Delete S3 objects
 #
-awsmock s3 rb s3://file-delivery
-awsmock s3 rb s3://json-parsing-results
-awsmock s3 rb s3://onix3-produktmeldungen
-awsmock s3 rb s3://transfer-server
-awsmock s3 rb s3://transformed-images
-awsmock s3 rb s3://inventory-reports
-awsmock s3 rb s3://onix3-tmp-parsing-input
-awsmock s3 rb s3://onix3-tmp-anreicherungs-input
-awsmock s3 rb s3://product-export-bucket
+awsmock s3 rm s3://file-delivery1 --recursive
+awsmock s3 rm s3://file-delivery2 --recursive
+awsmock s3 rm s3://file-delivery3 --recursive
 
 #
-# Create SQS Queues
+# Delete S3 buckets
 #
-awsmock sqs create-queue --queue-name=file-logging-queue
-awsmock sqs create-queue --queue-name=file-logging-dlqueue
-awsmock sqs create-queue --queue-name=ftp-file-distribution-epub-queue
-awsmock sqs create-queue --queue-name=ftp-file-distribution-image-dlqueue
-awsmock sqs create-queue --queue-name=ftp-file-distribution-image-queue
-awsmock sqs create-queue --queue-name=ftp-file-distribution-onix-queue
-awsmock sqs create-queue --queue-name=ftp-file-distribution-onix3-dlqueue
-awsmock sqs create-queue --queue-name=image-result-queue
-awsmock sqs create-queue --queue-name=parsing-result-queue
-awsmock sqs create-queue --queue-name=artikel-transformations-service-artikel-ausgang-queue
-awsmock sqs create-queue --queue-name=daten-lieferanten-service-daten-eingang
-awsmock sqs create-queue --queue-name=daten-datenlieferanten-notification-queue
-awsmock sqs create-queue --queue-name=textannotation-result-queue
-awsmock sqs create-queue --queue-name=bilderlink-queue
-awsmock sqs create-queue --queue-name=basisdaten-queue
-awsmock sqs create-queue --queue-name=basisdaten-dlqueue
-awsmock sqs create-queue --queue-name=produktmeldung-parsing-queue
-awsmock sqs create-queue --queue-name=produktmeldung-parsing-dlqueue
-awsmock sqs create-queue --queue-name=image-delete-notification-queue
-awsmock sqs create-queue --queue-name=image-delete-notification-dlqueue
-awsmock sqs create-queue --queue-name=onix3-datenlieferant-updates-queue
-awsmock sqs create-queue --queue-name=protokollierung-datenlieferant-updates-queue
-awsmock sqs create-queue --queue-name=productdb-queue
-awsmock sqs create-queue --queue-name=productdb-dlqueue
-awsmock sqs create-queue --queue-name=onix3-tmp-parsing-input-event-queue
-awsmock sqs create-queue --queue-name=onix3-tmp-parsing-input-event-dlqueue
-awsmock sqs create-queue --queue-name=onix3-tmp-anreicherungs-input-event-queue
-awsmock sqs create-queue --queue-name=onix3-tmp-anreicherungs-input-event-dlqueue
+awsmock s3 rb s3://file-delivery1
+awsmock s3 rb s3://file-delivery2
+awsmock s3 rb s3://file-delivery3
 
-# Configure S3 versioning
-#awsmock s3api put-bucket-versioning --bucket onix3-produktmeldungen --versioning-configuration Status=Enabled
+#
+# Delete SQS Queues
+#
+awsmock sqs delete-queue --queue-url=http://localost:4567/000000000000/file-delivery1-queue
+awsmock sqs delete-queue --queue-url=http://localost:4567/000000000000/file-delivery2-queue
+awsmock sqs delete-queue --queue-url=http://localost:4567/000000000000/file-delivery3-queue
 
-# Connect FTP-S3 bucket events to lambda function
-awsmock s3api put-bucket-notification-configuration \
---bucket transfer-server \
---notification-configuration file://./hook/transfer-server-hook.json
-
-awsmock s3api put-bucket-notification-configuration \
---bucket onix3-tmp-parsing-input \
---notification-configuration file://./hook/onix3-tmp-parsing-input-hook.json
-
-awsmock s3api put-bucket-notification-configuration \
---bucket onix3-tmp-anreicherungs-input \
---notification-configuration file://./hook/onix3-tmp-anreicherungs-input-hook.json

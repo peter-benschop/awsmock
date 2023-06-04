@@ -237,6 +237,21 @@ namespace AwsMock::Database {
         return object;
     }
 
+    bool S3Database::BucketNotificationExists(const Entity::S3::BucketNotification &bucketNotification) {
+
+        int count = 0;
+        Poco::Data::Session session = GetSession();
+
+        std::string event = Poco::replace(bucketNotification.event, "*", "%");
+        session << "SELECT COUNT(*) FROM s3_notification WHERE region=? AND bucket=? AND event=?",
+            bind(bucketNotification.region), bind(bucketNotification.bucket), bind(event), into(count), now;
+
+        session.close();
+        poco_trace(_logger, "Bucket notification exists: " + std::string(count > 0 ? "true" : "false"));
+
+        return count > 0;
+    }
+
     Entity::S3::BucketNotification S3Database::CreateBucketNotification(const Entity::S3::BucketNotification &bucketNotification) {
 
         long id = 0;

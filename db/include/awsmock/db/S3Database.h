@@ -149,6 +149,15 @@ namespace AwsMock::Database {
       Entity::S3::ObjectList ListBucket(const std::string &bucket);
 
       /**
+       * Bucket notification exists
+       *
+       * @param bucketNotification bucket notification entity
+       * @return true if bucket notification exists
+       * @throws DatabaseException
+       */
+      bool BucketNotificationExists(const Entity::S3::BucketNotification &bucketNotification);
+
+      /**
        * Creates a bucket notification-
        *
        * <p>Replaces the wildcard characters '*' with the SQLite wildcard '%'.</p>

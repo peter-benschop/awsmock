@@ -211,7 +211,7 @@ namespace AwsMock::Service {
             }
 
             // Write file
-            if(*stream) {
+            if (stream) {
                 std::string fileName = GetFilename(request.bucket, request.key);
                 std::ofstream ofs(fileName);
                 ofs << stream->rdbuf();
@@ -231,18 +231,48 @@ namespace AwsMock::Service {
             response.SetETag(request.md5Sum);
 
             // Check notification
-            if (_database->HasBucketNotification({.bucket=request.bucket, .region=request.region})) {
+            if (_database->HasBucketNotification({.region=request.region, .bucket=request.bucket})) {
                 CheckNotifications(object, request.region, "s3:ObjectCreated:Put");
             }
 
         } catch (Poco::Exception &ex) {
-            poco_error(_logger, "S3 Delete Bucket failed, message: " + ex.message());
+            poco_error(_logger, "S3 put object failed, message: " + ex.message());
             throw Core::ServiceException(ex.message(), 500);
         }
         return response;
     }
 
-    Dto::S3::DeleteObjectsResponse S3Service::DeleteObjects(Dto::S3::DeleteObjectsRequest &request) {
+    void S3Service::DeleteObject(const Dto::S3::DeleteObjectRequest &request) {
+        poco_trace(_logger, "Delete object request: " + request.ToString());
+
+        try {
+            // Check bucket existence
+            if (!_database->BucketExists({.region=request.region, .name=request.bucket})) {
+                throw Core::ServiceException("Bucket does not exist", 500);
+            }
+
+            if (!_database->ObjectExists({.bucket=request.bucket, .key=request.key})) {
+                throw Core::ServiceException("Object does not exist", 500);
+            }
+
+            // Delete from database
+            _database->DeleteObject({.bucket=request.bucket, .key=request.key});
+
+            // Delete file system object
+            DeleteObject(request.bucket, request.key);
+
+            // Check notification
+            if (_database->HasBucketNotification({.region=request.region, .bucket=request.bucket})) {
+                //CheckNotifications(object, request.region, "s3:ObjectCreated:Put");
+            }
+
+        } catch (Poco::Exception &ex) {
+            poco_error(_logger, "S3 delete object failed, message: " + ex.message());
+            throw Core::ServiceException(ex.message(), 500);
+        }
+    }
+
+    Dto::S3::DeleteObjectsResponse S3Service::DeleteObjects(const Dto::S3::DeleteObjectsRequest &request) {
         poco_trace(_logger, "Delete objects request: " + request.ToString());
 
         Dto::S3::DeleteObjectsResponse response;
@@ -255,13 +285,18 @@ namespace AwsMock::Service {
             // Delete from database
             _database->DeleteObjects(request.bucket, request.keys);
 
+            // Delete file system objects
+            for(const auto &key: request.keys) {
+                DeleteObject(request.bucket, key);
+            }
+
             // Check notification
-            if (_database->HasBucketNotification({.bucket=request.bucket, .region=request.region})) {
+            if (_database->HasBucketNotification({.region=request.region, .bucket=request.bucket})) {
                 //CheckNotifications(object, request.region, "s3:ObjectCreated:Put");
             }
 
         } catch (Poco::Exception &ex) {
-            poco_error(_logger, "S3 Delete Bucket failed, message: " + ex.message());
+            poco_error(_logger, "S3 delete objects failed, message: " + ex.message());
             throw Core::ServiceException(ex.message(), 500);
         }
         return response;
@@ -271,13 +306,18 @@ namespace AwsMock::Service {
         poco_trace(_logger, "Put bucket notification request, id: " + std::to_string(request.notificationId));
 
         try {
-            // Check existence
+            // Check bucket existence
             if (!_database->BucketExists({.region=request.region, .name=request.bucket})) {
                 throw Core::ServiceException("Bucket does not exist", 500);
             }
 
+            // Check notification existence
+            if (_database->BucketNotificationExists({.region=request.region, .bucket=request.bucket, .event=request.event})) {
+                throw Core::ServiceException("Bucket notification exists already", 500);
+            }
+
             Database::Entity::S3::BucketNotification
-                bucketNotification = _database->CreateBucketNotification({.bucket=request.bucket, .region=request.region, .notificationId=request.notificationId,
+                bucketNotification = _database->CreateBucketNotification({.region=request.region, .bucket=request.bucket, .notificationId=request.notificationId,
                                                                              .function=request.function, .event=request.event});
 
         } catch (Poco::Exception &ex) {
@@ -303,10 +343,7 @@ namespace AwsMock::Service {
             }
 
             // Delete directory
-            std::string bucketDir = _dataDir + Poco::Path::separator() + "s3" + Poco::Path::separator() + name;
-            if (Core::DirUtils::DirectoryExists(bucketDir)) {
-                Core::DirUtils::DeleteDirectory(bucketDir);
-            }
+            DeleteBucket(name);
 
             // Update database
             _database->DeleteBucket(bucket);
@@ -317,16 +354,15 @@ namespace AwsMock::Service {
         }
     }
 
-    void S3Service::CheckNotifications(Database::Entity::S3::Object object, const std::string &region, const std::string &event) {
+    void S3Service::CheckNotifications(const Database::Entity::S3::Object& object, const std::string &region, const std::string &event) {
 
-        Database::Entity::S3::BucketNotification notification = _database->GetBucketNotification({.bucket=object.bucket, .region=region, .event=event});
+        Database::Entity::S3::BucketNotification notification = _database->GetBucketNotification({.region=region, .bucket=object.bucket, .event=event});
 
         // Create the event record
         Dto::S3::EventNotification::Object obj = {.key=object.key, .etag=object.md5sum};
         Dto::S3::EventNotification::Bucket bucket = {.name=notification.bucket};
 
         Dto::S3::EventNotification::S3 s3 = {.bucket=bucket, .object=obj};
-
 
         Dto::S3::EventNotification::Record record = {.s3=s3};
         Dto::S3::EventNotification::EventNotification eventNotification;
@@ -335,6 +371,7 @@ namespace AwsMock::Service {
     }
 
     std::string S3Service::GetDirFromKey(const std::string &key) {
+
         if (key.find('/') != std::string::npos) {
             return key.substr(0, key.find_last_of('/'));
         }
@@ -342,11 +379,31 @@ namespace AwsMock::Service {
     }
 
     std::string S3Service::GetDirectory(const std::string &bucket, const std::string &key) {
+
         return _dataDir + Poco::Path::separator() + "s3" + Poco::Path::separator() + bucket + Poco::Path::separator() + GetDirFromKey(key);
     }
 
     std::string S3Service::GetFilename(const std::string &bucket, const std::string &key) {
+
         return _dataDir + Poco::Path::separator() + "s3" + Poco::Path::separator() + bucket + Poco::Path::separator() + key;
+    }
+
+    void S3Service::DeleteObject(const std::string &bucket, const std::string &key) {
+
+        std::string filename = _dataDir + Poco::Path::separator() + "s3" + Poco::Path::separator() + bucket + Poco::Path::separator() + GetDirFromKey(key);
+        if(Core::FileUtils::FileExists(filename)) {
+            Core::FileUtils::DeleteFile(filename);
+        }
+
+    }
+
+    void S3Service::DeleteBucket(const std::string &bucket) {
+
+        std::string dirname = _dataDir + Poco::Path::separator() + "s3" + Poco::Path::separator() + bucket;
+        if(Core::DirUtils::DirectoryExists(dirname)) {
+            Core::DirUtils::DeleteDirectory(dirname, true);
+        }
+
     }
 
 } // namespace AwsMock::Service

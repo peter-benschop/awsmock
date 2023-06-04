@@ -2,8 +2,8 @@
 // Created by vogje01 on 31/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_S3_RESTERRORRESPONSE_H
-#define AWSMOCK_DTO_S3_RESTERRORRESPONSE_H
+#ifndef AWSMOCK_DTO_SQS_RESTERRORRESPONSE_H
+#define AWSMOCK_DTO_SQS_RESTERRORRESPONSE_H
 
 // C++ standard includes
 #include <string>
@@ -21,20 +21,9 @@
 // AwsMok includes
 #include "awsmock/core/ServiceException.h"
 
-namespace AwsMock::Dto::S3 {
+namespace AwsMock::Dto::SQS {
 
     struct RestErrorResponse {
-
-      /**
-       * Constructor
-       *
-       * @param code error code
-       * @param message error message
-       * @param resource resource name
-       * @param requestId request ID
-       */
-       [[deprecated("Use RestErrorResponse(const Core::ServiceException &exc)")]]
-      RestErrorResponse(std::string code, std::string message, std::string resource, std::string requestId) {}
 
       /**
        * Constructor.
@@ -82,19 +71,29 @@ namespace AwsMock::Dto::S3 {
       [[nodiscard]] std::string ToXml() const {
           Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
 
-          // Root <Error>
-          Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("Error");
+          // ErrorResponse
+          Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("ErrorResponse");
           pDoc->appendChild(pRoot);
 
-          // Code <Code>
+          // Error
+          Poco::XML::AutoPtr<Poco::XML::Element> pError = pDoc->createElement("Error");
+          pRoot->appendChild(pError);
+
+          // Type
+          Poco::XML::AutoPtr<Poco::XML::Element> pType = pDoc->createElement("Type");
+          pError->appendChild(pType);
+          Poco::XML::AutoPtr<Poco::XML::Text> pTypeText = pDoc->createTextNode("Sender");
+          pType->appendChild(pTypeText);
+
+          // Code
           Poco::XML::AutoPtr<Poco::XML::Element> pCode = pDoc->createElement("Code");
-          pRoot->appendChild(pCode);
+          pError->appendChild(pCode);
           Poco::XML::AutoPtr<Poco::XML::Text> pCodeText = pDoc->createTextNode(std::to_string(code));
           pCode->appendChild(pCodeText);
 
           // Message <Message>
           Poco::XML::AutoPtr<Poco::XML::Element> pMessage = pDoc->createElement("Message");
-          pRoot->appendChild(pMessage);
+          pError->appendChild(pMessage);
           Poco::XML::AutoPtr<Poco::XML::Text> pMessageText = pDoc->createTextNode(message);
           pMessage->appendChild(pMessageText);
 
@@ -146,6 +145,6 @@ namespace AwsMock::Dto::S3 {
 
     };
 
-} // namespace AwsMock::Dto::S3
+} // namespace AwsMock::Dto::SQS
 
-#endif // AWSMOCK_DTO_S3_RESTERRORRESPONSE_H
+#endif // AWSMOCK_DTO_SQS_RESTERRORRESPONSE_H

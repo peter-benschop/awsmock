@@ -395,16 +395,20 @@ namespace AwsMock::Resource {
         }
     }
 
-    void AbstractResource::SendErrorResponse(Poco::Net::HTTPServerResponse &response, Poco::Exception &exc) {
+    void AbstractResource::SendErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Poco::Exception &exc) {
 
         Core::ServiceException serviceException = Core::ServiceException(exc.message(), exc.code());
-        SendErrorResponse(response, serviceException);
+        SendErrorResponse(service, response, serviceException);
     }
 
-    void AbstractResource::SendErrorResponse(Poco::Net::HTTPServerResponse &response, Core::ServiceException &exc) {
+    void AbstractResource::SendErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Core::ServiceException &exc) {
 
-        std::string payload = Dto::Common::RestErrorResponse(exc).ToXml();
-
+        std::string payload;
+        if (service == "SQS") {
+            payload = Dto::SQS::RestErrorResponse(exc).ToXml();
+        } else if(service == "S3") {
+            payload = Dto::S3::RestErrorResponse(exc).ToXml();
+        }
         SetHeaders(response, payload.length());
 
         poco_error(_logger, "Exception, code: " + std::to_string(exc.code()) + " message: " + exc.message());

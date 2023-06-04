@@ -22,6 +22,7 @@
 #include "awsmock/dto/s3/CompleteMultipartUploadResult.h"
 #include "awsmock/dto/s3/CreateBucketRequest.h"
 #include "awsmock/dto/s3/CreateBucketResponse.h"
+#include "awsmock/dto/s3/DeleteObjectRequest.h"
 #include "awsmock/dto/s3/DeleteObjectsRequest.h"
 #include "awsmock/dto/s3/DeleteObjectsResponse.h"
 #include "awsmock/dto/s3/EventNotification.h"
@@ -142,12 +143,20 @@ namespace AwsMock::Service {
       Dto::S3::PutObjectResponse PutObject(Dto::S3::PutObjectRequest &request, std::istream *stream = nullptr);
 
       /**
+       * Delete object
+       *
+       * @param request delete object request
+       * @return DeleteObjectResponse
+       */
+      void DeleteObject(const Dto::S3::DeleteObjectRequest &request);
+
+      /**
        * Delete objects
        *
        * @param request delete objects request
        * @return DeleteObjectsResponse
        */
-      Dto::S3::DeleteObjectsResponse DeleteObjects(Dto::S3::DeleteObjectsRequest &request);
+      Dto::S3::DeleteObjectsResponse DeleteObjects(const Dto::S3::DeleteObjectsRequest &request);
 
       /**
        * Adds a bucket notification
@@ -203,7 +212,7 @@ namespace AwsMock::Service {
        * @param region AWS region.
        * @param event S3 event type.
        */
-      void CheckNotifications(Database::Entity::S3::Object object, const std::string &region, const std::string &event);
+      void CheckNotifications(const Database::Entity::S3::Object& object, const std::string &region, const std::string &event);
 
       /**
        * Returns a event notification.
@@ -212,6 +221,23 @@ namespace AwsMock::Service {
        * @return all directories before file
        */
       static std::string GetEventNotification(const std::string &key);
+
+      /**
+       * Deletes an object
+       *
+       * @param bucket S3 bucket name
+       * @param key S3 object key
+       */
+      void DeleteObject(const std::string &bucket, const std::string &key);
+
+      /**
+       * Deletes an bucket
+       *
+       * <p>This method is recursive, if the bucket contains objects, also all object are removed </p>
+       *
+       * @param bucket S3 bucket name
+       */
+      void DeleteBucket(const std::string &bucket);
 
       /**
        * Logger

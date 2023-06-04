@@ -32,14 +32,14 @@ namespace AwsMock::Dto::S3 {
        *
        * @return XML string
        */
-      std::string ToXml() const {
+      [[nodiscard]] std::string ToXml() const {
 
           // Root
           Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
           Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("DeleteResult");
           pDoc->appendChild(pRoot);
 
-          for(auto it:keys) {
+          for (const auto& it : keys) {
 
               // Deleted
               Poco::XML::AutoPtr<Poco::XML::Element> pDeleted = pDoc->createElement("Deleted");
@@ -51,6 +51,14 @@ namespace AwsMock::Dto::S3 {
               Poco::XML::AutoPtr<Poco::XML::Text> pKeyText = pDoc->createTextNode(it);
               pKey->appendChild(pKeyText);
           }
+
+          std::stringstream output;
+          Poco::XML::DOMWriter writer;
+          writer.setNewLine("\n");
+          writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
+          writer.writeNode(output, pDoc);
+
+          return output.str();
       }
 
       /**

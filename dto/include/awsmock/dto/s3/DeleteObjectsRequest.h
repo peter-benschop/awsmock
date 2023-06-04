@@ -73,7 +73,7 @@ namespace AwsMock::Dto::S3 {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const DeleteObjectsRequest &r) {
-          os << "PutObjectRequest={region='" + r.region + "' bucket='" + r.bucket;
+          os << "DeleteObjectsRequest={region='" + r.region + "' bucket='" + r.bucket;
           for (auto &it : r.keys) {
               os << "' key='" + it;
           }
