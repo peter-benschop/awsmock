@@ -185,8 +185,12 @@ namespace AwsMock::Service {
         Core::FileUtils::AppendBinaryFiles(outFile, _tempDir, files);
         poco_trace(_logger, "Input files appended to outfile, outFile: " + outFile);
 
+        // Get file size, MD5 sum
+        long fileSize = Core::FileUtils::FileSize(outFile);
+        std::string md5sum = Core::Crypto::GetMd5FromFile(outFile);
+
         // Create database object
-        _database->CreateObject({.bucket=bucket, .key=key, .owner=user});
+        Database::Entity::S3::Object object = _database->CreateObject({.bucket=bucket, .key=key, .owner=user, .size=fileSize, .md5sum=md5sum});
 
         // Cleanup
         Core::DirUtils::DeleteFilesInDirectory(_tempDir);

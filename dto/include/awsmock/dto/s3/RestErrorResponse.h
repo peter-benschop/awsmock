@@ -26,17 +26,6 @@ namespace AwsMock::Dto::S3 {
     struct RestErrorResponse {
 
       /**
-       * Constructor
-       *
-       * @param code error code
-       * @param message error message
-       * @param resource resource name
-       * @param requestId request ID
-       */
-       [[deprecated("Use RestErrorResponse(const Core::ServiceException &exc)")]]
-      RestErrorResponse(std::string code, std::string message, std::string resource, std::string requestId) {}
-
-      /**
        * Constructor.
        *
        * @param exc service exception

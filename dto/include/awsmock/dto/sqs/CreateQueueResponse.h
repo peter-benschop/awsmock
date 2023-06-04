@@ -8,7 +8,6 @@
 // C++ standard includes
 #include <string>
 #include <sstream>
-#include <utility>
 
 // Poco includes
 #include "Poco/DateTime.h"
@@ -23,33 +22,36 @@
 #include "Poco/DOM/DOMWriter.h"
 #include "Poco/XML/XMLWriter.h"
 
-// AwsMock includes
-#include "awsmock/entity/sqs/Queue.h"
-
 namespace AwsMock::Dto::SQS {
 
-    class CreateQueueResponse {
-
-    public:
+    struct CreateQueueResponse {
 
       /**
-       * Constructor
+       * Region
        */
-      explicit CreateQueueResponse() = default;
+      std::string region;
 
       /**
-       * Constructor
-       *
-       * @param queue queue entity.
+       * Name
        */
-      explicit CreateQueueResponse(Database::Entity::SQS::Queue queue) : _queue(std::move(queue)) {}
+      std::string name;
+
+      /**
+       * Owner
+       */
+      std::string owner;
+
+      /**
+       * URL
+       */
+      std::string url;
 
       /**
        * Convert to XML representation
        *
        * @return XML string
        */
-      std::string ToXml() {
+      [[nodiscard]] std::string ToXml() const {
 
           // Root
           Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
@@ -62,7 +64,7 @@ namespace AwsMock::Dto::SQS {
 
           Poco::XML::AutoPtr<Poco::XML::Element> pQueueUrl = pDoc->createElement("QueueUrl");
           pListQueueResult->appendChild(pQueueUrl);
-          Poco::XML::AutoPtr<Poco::XML::Text> pQueueUrlText = pDoc->createTextNode("http://localhost:4567/000000000000/" + _queue.name);
+          Poco::XML::AutoPtr<Poco::XML::Text> pQueueUrlText = pDoc->createTextNode(url);
           pQueueUrl->appendChild(pQueueUrlText);
 
           // Metadata
@@ -95,19 +97,15 @@ namespace AwsMock::Dto::SQS {
       }
 
       /**
-       * Queue entity
-       */
-      Database::Entity::SQS::Queue _queue;
-
-      /**
        * Stream provider.
        *
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const CreateQueueResponse &r) {
-          os << "CreateQueueResponse={name='" + r._queue.name + "'}";
+          os << "CreateQueueResponse={region='" + r.region + "' name='" + r.name + "' owner='" + r.owner + "' url='" + r.url + "'}";
           return os;
       }
+
     };
 
 } // namespace AwsMock::Dto::SQS

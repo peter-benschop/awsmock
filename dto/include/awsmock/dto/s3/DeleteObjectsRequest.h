@@ -21,6 +21,10 @@ namespace AwsMock::Dto::S3 {
 
     struct DeleteObjectsRequest {
 
+      explicit DeleteObjectsRequest(const std::string &xmlString) {
+          FromXml(xmlString);
+      }
+
       /**
        * Region
        */

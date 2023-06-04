@@ -48,8 +48,7 @@ namespace AwsMock::Service {
       /**
        * Creates a new queue
        *
-       * @param region AWS region
-       * @param region AWS region
+       * @param request create queue request
        * @return CreateQueueResponse
        */
       Dto::SQS::CreateQueueResponse CreateQueue(const Dto::SQS::CreateQueueRequest & request);

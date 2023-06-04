@@ -22,14 +22,14 @@ namespace AwsMock::Database::Entity::SQS {
       long id = 0;
 
       /**
-       * Queue name
-       */
-      std::string name;
-
-      /**
        * AWS region
        */
       std::string region;
+
+      /**
+       * Queue name
+       */
+      std::string name;
 
       /**
        * Owner

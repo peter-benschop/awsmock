@@ -158,9 +158,9 @@ namespace AwsMock {
 
                 std::string payload = GetPayload(request);
 
-                auto request = Dto::S3::DeleteObjectsRequest(payload);
-                Dto::S3::DeleteObjectsResponse result = _s3Service.DeleteObjects(request);
-                SendOkResponse(response, result.ToXml());
+                auto s3Request = Dto::S3::DeleteObjectsRequest(payload);
+                Dto::S3::DeleteObjectsResponse s3Response = _s3Service.DeleteObjects(s3Request);
+                SendOkResponse(response, s3Response.ToXml());
 
             } else {
 

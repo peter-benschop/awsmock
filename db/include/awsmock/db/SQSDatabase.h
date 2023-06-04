@@ -68,6 +68,15 @@ namespace AwsMock::Database {
       Entity::SQS::Queue CreateQueue(const Entity::SQS::Queue& queue);
 
       /**
+       * Returns a queue by primary key
+       *
+       * @param id queue primary key
+       * @return queue entity
+       * @throws DatabaseException
+       */
+      Entity::SQS::Queue GetQueueById(long id);
+
+      /**
        * List all available queues
        *
        * @param region AWS region

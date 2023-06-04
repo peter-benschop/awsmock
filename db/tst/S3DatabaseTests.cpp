@@ -59,7 +59,7 @@ namespace AwsMock::Database {
     TEST_F(S3DatabaseTest, BucketCreateTest) {
 
         // arrange
-        Entity::S3::Bucket bucket = {.name=BUCKET, .region=REGION, .owner=OWNER};
+        Entity::S3::Bucket bucket = {.region=REGION, .name=BUCKET, .owner=OWNER};
 
         // act
         Entity::S3::Bucket result = _database.CreateBucket(bucket);
@@ -72,11 +72,11 @@ namespace AwsMock::Database {
     TEST_F(S3DatabaseTest, BucketExistsTest) {
 
         // arrange
-        Entity::S3::Bucket bucket = {.name=BUCKET, .region=REGION, .owner=OWNER};
+        Entity::S3::Bucket bucket = {.region=REGION, .name=BUCKET, .owner=OWNER};
         _database.CreateBucket(bucket);
 
         // act
-        bool result = _database.BucketExists({.name=BUCKET, .region=REGION});
+        bool result = _database.BucketExists({.region=REGION, .name=BUCKET});
 
         // assert
         EXPECT_TRUE(result);
@@ -85,7 +85,7 @@ namespace AwsMock::Database {
     TEST_F(S3DatabaseTest, BucketGetByIdTest) {
 
         // arrange
-        Entity::S3::Bucket bucket = {.name=BUCKET, .region=REGION, .owner=OWNER};
+        Entity::S3::Bucket bucket = {.region=REGION, .name=BUCKET, .owner=OWNER};
         bucket = _database.CreateBucket(bucket);
 
         // act
@@ -98,7 +98,7 @@ namespace AwsMock::Database {
     TEST_F(S3DatabaseTest, BucketListTest) {
 
         // arrange
-        Entity::S3::Bucket bucket = {.name=BUCKET, .region=REGION, .owner=OWNER};
+        Entity::S3::Bucket bucket = {.region=REGION, .name=BUCKET, .owner=OWNER};
         _database.CreateBucket(bucket);
 
         // act
@@ -111,7 +111,7 @@ namespace AwsMock::Database {
     TEST_F(S3DatabaseTest, BucketListObjectTest) {
 
         // arrange
-        Entity::S3::Bucket bucket = {.name=BUCKET, .region=REGION, .owner=OWNER};
+        Entity::S3::Bucket bucket = {.region=REGION, .name=BUCKET, .owner=OWNER};
         _database.CreateBucket(bucket);
         Entity::S3::Object object = {.bucket=bucket.name, .key=OBJECT, .owner=OWNER, .size=5};
         _database.CreateObject(object);
@@ -126,12 +126,12 @@ namespace AwsMock::Database {
     TEST_F(S3DatabaseTest, BucketDeleteTest) {
 
         // arrange
-        Entity::S3::Bucket bucket = {.name=BUCKET, .region=REGION, .owner=OWNER};
+        Entity::S3::Bucket bucket = {.region=REGION, .name=BUCKET, .owner=OWNER};
         bucket = _database.CreateBucket(bucket);
 
         // act
         EXPECT_NO_THROW({ _database.DeleteBucket(bucket); });
-        bool result = _database.BucketExists({.name=bucket.name, .region=bucket.region});
+        bool result = _database.BucketExists({.region=bucket.region, .name=bucket.name});
 
         // assert
         EXPECT_FALSE(result);
@@ -140,7 +140,7 @@ namespace AwsMock::Database {
     TEST_F(S3DatabaseTest, ObjectExistsTest) {
 
         // arrange
-        Entity::S3::Bucket bucket = {.name=BUCKET, .region=REGION, .owner=OWNER};
+        Entity::S3::Bucket bucket = {.region=REGION, .name=BUCKET, .owner=OWNER};
         bucket = _database.CreateBucket(bucket);
         Entity::S3::Object object = {.bucket=bucket.name, .key=OBJECT, .owner=OWNER, .size=5};
         object = _database.CreateObject(object);
@@ -155,7 +155,7 @@ namespace AwsMock::Database {
     TEST_F(S3DatabaseTest, ObjectCreateTest) {
 
         // arrange
-        Entity::S3::Bucket bucket = {.name=BUCKET, .region=REGION, .owner=OWNER};
+        Entity::S3::Bucket bucket = {.region=REGION, .name=BUCKET, .owner=OWNER};
         bucket = _database.CreateBucket(bucket);
         Entity::S3::Object object = {.bucket=bucket.name, .owner=OWNER, .size=5};
         object = _database.CreateObject(object);
@@ -170,7 +170,7 @@ namespace AwsMock::Database {
     TEST_F(S3DatabaseTest, ObjectByIdTest) {
 
         // arrange
-        Entity::S3::Bucket bucket = {.name=BUCKET, .region=REGION, .owner=OWNER};
+        Entity::S3::Bucket bucket = {.region=REGION, .name=BUCKET, .owner=OWNER};
         bucket = _database.CreateBucket(bucket);
         Entity::S3::Object object = {.bucket=bucket.name, .owner=OWNER, .size=5};
         object = _database.CreateObject(object);
@@ -185,7 +185,7 @@ namespace AwsMock::Database {
     TEST_F(S3DatabaseTest, CreateNotificationTest) {
 
         // arrange
-        Entity::S3::BucketNotification notification = {.bucket=BUCKET, .region=REGION, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
+        Entity::S3::BucketNotification notification = {.region=REGION, .bucket=BUCKET, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
 
         // act
         Entity::S3::BucketNotification result = _database.CreateBucketNotification(notification);
@@ -197,7 +197,7 @@ namespace AwsMock::Database {
     TEST_F(S3DatabaseTest, HasNotificationTest) {
 
         // arrange
-        Entity::S3::BucketNotification notification = {.bucket=BUCKET, .region=REGION, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
+        Entity::S3::BucketNotification notification = {.region=REGION, .bucket=BUCKET, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
         notification = _database.CreateBucketNotification(notification);
 
         // act
@@ -210,7 +210,7 @@ namespace AwsMock::Database {
     TEST_F(S3DatabaseTest, GetNotificationTest) {
 
         // arrange
-        Entity::S3::BucketNotification notification = {.bucket=BUCKET, .region=REGION, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
+        Entity::S3::BucketNotification notification = {.region=REGION, .bucket=BUCKET, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
         notification = _database.CreateBucketNotification(notification);
 
         // act
@@ -224,11 +224,11 @@ namespace AwsMock::Database {
     TEST_F(S3DatabaseTest, GetNotificationPutTest) {
 
         // arrange
-        Entity::S3::BucketNotification notification = {.bucket=BUCKET, .region=REGION, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
+        Entity::S3::BucketNotification notification = {.region=REGION, .bucket=BUCKET, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
         notification = _database.CreateBucketNotification(notification);
 
         // act
-        Entity::S3::BucketNotification search = {.bucket=BUCKET, .region=REGION, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:Put"};
+        Entity::S3::BucketNotification search = {.region=REGION, .bucket=BUCKET, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:Put"};
         Entity::S3::BucketNotification result = _database.GetBucketNotification(search);
 
         // assert
