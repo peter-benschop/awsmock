@@ -77,18 +77,24 @@ namespace AwsMock::Service {
         return response;
     }
 
+    Dto::SQS::PutQueueAttributesResponse SQSService::PutQueueAttributes(const Dto::SQS::PutQueueAttributesRequest &request) {
+        poco_trace(_logger, "Put queue attributes request, request: " + request.ToString());
+        Dto::SQS::PutQueueAttributesResponse response;
+        return response;
+    }
+
     Dto::SQS::DeleteQueueResponse SQSService::DeleteQueue(const Dto::SQS::DeleteQueueRequest &request) {
-        poco_trace(_logger, "Delete queue request, url: " + request.url);
+        poco_trace(_logger, "Delete queue request, request: " + request.ToString());
 
         Dto::SQS::DeleteQueueResponse response;
         try {
             // Check existence
-            if (!_database->QueueExists(request.url)) {
+            if (!_database->QueueExists(request.queueUrl)) {
                 throw Core::ServiceException("Queue does not exist", 500);
             }
 
             // Update database
-            _database->DeleteQueue({.url=request.url});
+            _database->DeleteQueue({.url=request.queueUrl});
 
         } catch (Poco::Exception &ex) {
             poco_error(_logger, "SQS delete queue failed, message: " + ex.message());
@@ -127,13 +133,12 @@ namespace AwsMock::Service {
         try {
             Database::Entity::SQS::MessageList messageList;
 
-            auto begin = std::chrono::high_resolution_clock::now();
             long elapsed = 0;
+            auto begin = std::chrono::high_resolution_clock::now();
+
             while (elapsed < request.waitTimeSeconds * 1000) {
 
-                int limit = request.maxMessages - (int)messageList.size();
-                Database::Entity::SQS::MessageList tmpList = _database->ReceiveMessages(request.region, request.queueUrl, limit);
-                messageList.insert(std::end(messageList), std::begin(tmpList), std::end(tmpList));
+                _database->ReceiveMessages(request.region, request.queueUrl, messageList);
 
                 if(!messageList.empty()) {
                     break;

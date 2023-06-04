@@ -11,11 +11,35 @@ awsmock s3 mb s3://file-delivery3
 # Create SQS Queues
 #
 awsmock sqs create-queue --queue-name=file-delivery1-queue
+awsmock sqs create-queue --queue-name=file-delivery1-dlqueue
 awsmock sqs create-queue --queue-name=file-delivery2-queue
+awsmock sqs create-queue --queue-name=file-delivery2-dlqueue
 awsmock sqs create-queue --queue-name=file-delivery3-queue
+awsmock sqs create-queue --queue-name=file-delivery3-dlqueue
 
-# Configure S3 versioning
-#awsmock s3api put-bucket-versioning --bucket onix3-produktmeldungen --versioning-configuration Status=Enabled
+awsmock sqs set-queue-attributes \
+--queue-url http://localstack:4567/000000000000/file-delivery1-queue \
+--attributes '{
+    "RedrivePolicy": "{\"deadLetterTargetArn\":\"arn:aws:sqs:eu-central-1:000000000000:file-delivery1-dlqueue\",\"maxReceiveCount\":\"3\"}",
+    "MessageRetentionPeriod": "259200",
+    "VisibilityTimeout": "90"
+}'
+
+awsmock sqs set-queue-attributes \
+--queue-url http://localstack:4567/000000000000/file-delivery2-queue \
+--attributes '{
+    "RedrivePolicy": "{\"deadLetterTargetArn\":\"arn:aws:sqs:eu-central-1:000000000000:file-delivery2-dlqueue\",\"maxReceiveCount\":\"3\"}",
+    "MessageRetentionPeriod": "259200",
+    "VisibilityTimeout": "90"
+}'
+
+awsmock sqs set-queue-attributes \
+--queue-url http://localstack:4567/000000000000/file-delivery3-queue \
+--attributes '{
+    "RedrivePolicy": "{\"deadLetterTargetArn\":\"arn:aws:sqs:eu-central-1:000000000000:file-delivery3-dlqueue\",\"maxReceiveCount\":\"3\"}",
+    "MessageRetentionPeriod": "259200",
+    "VisibilityTimeout": "90"
+}'
 
 # Connect FTP-S3 bucket events to lambda function
 awsmock s3api put-bucket-notification-configuration \

@@ -23,6 +23,8 @@
 
 namespace AwsMock {
 
+    typedef std::vector<std::pair<std::string, std::string>> AttributeList;
+
     /**
      * AWS S3 mock handler
      */
@@ -124,6 +126,15 @@ namespace AwsMock {
        * @return integer parameter
        */
       int GetIntParameter(const std::string &body, const std::string &parameter, int min, int max);
+
+      /**
+       * Returns the attribute count.
+       *
+       * @param body HTTP message body
+       * @param parameter parameter name
+       * @return number of attributes
+       */
+      int GetAttributeCount(const std::string &body, const std::string &parameter);
 
       /**
        * Get the endpoint from the request header
