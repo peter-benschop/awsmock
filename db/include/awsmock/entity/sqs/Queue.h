@@ -42,6 +42,11 @@ namespace AwsMock::Database::Entity::SQS {
       std::string url;
 
       /**
+       * Visibility timeout
+       */
+      int visibilityTimeout;
+
+      /**
        * Creation date
        */
       Poco::DateTime created;

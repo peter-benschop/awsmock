@@ -1,4 +1,5 @@
 {
-	"lieferantenId": "ftpuser1",
-	"dateiname": "originalFile"
+	"is": 1,
+	"productId": "productId",
+	"dateiname": "dateiname"
 }

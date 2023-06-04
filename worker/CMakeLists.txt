@@ -2,8 +2,8 @@
 set(LIBRARY awsmockwrk)
 set(LIBRARY_STATIC awsmockwrk_static)
 
-set(SOURCES src/S3Worker.cpp )
-set(HEADERS include/awsmock/worker/S3Worker.h)
+set(SOURCES src/S3Worker.cpp src/SQSWorker.cpp )
+set(HEADERS include/awsmock/worker/S3Worker.h include/awsmock/worker/SQSWorker.h)
 
 # Includes
 include_directories(include ../core/include ../db/include ../dto/include ../service/include /usr/include /usr/local/include)

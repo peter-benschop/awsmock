@@ -112,12 +112,30 @@ namespace AwsMock::Database {
       Entity::SQS::Message GetMessageById(long id);
 
       /**
+       * Receive messages from an queue.
+       *
+       * @param region AWS region
+       * @param queueUrl queue URL
+       * @param maxMessages maximal number of messages
+       * @return MessageList
+       */
+      Entity::SQS::MessageList ReceiveMessages(const std::string &region, const std::string &queueUrl, int maxMessages);
+
+      /**
+       * Reset expired messages
+       *
+       * @param queueUrl URL of the queue
+       * @param visibility visibility period in seconds
+       */
+      [[maybe_unused]] void ResetMessages(const std::string& queueUrl, long visibility);
+
+      /**
        * Delete a queue.
        *
        * @param queue queue entity
        * @throws DatabaseException
        */
-      void DeleteQueue(const Entity::SQS::Queue & queue);
+      void DeleteQueue(const Entity::SQS::Queue &queue);
 
       /**
        * Deletes a message.

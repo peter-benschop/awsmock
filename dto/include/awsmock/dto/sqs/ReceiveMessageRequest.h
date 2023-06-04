@@ -27,6 +27,16 @@ namespace AwsMock::Dto::SQS {
     struct ReceiveMessageRequest {
 
       /**
+       * AWS region
+       */
+      std::string region;
+
+      /**
+       * Queue URL
+       */
+      std::string queueUrl;
+
+      /**
        * Maximal number of messages
        */
       int maxMessages = 10;
@@ -35,6 +45,11 @@ namespace AwsMock::Dto::SQS {
        * Visibility
        */
       int visibility = 15;
+
+      /**
+       * Wait time in seconds
+       */
+      int waitTimeSeconds = 1;
 
       /**
        * Attribute names
@@ -68,7 +83,8 @@ namespace AwsMock::Dto::SQS {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const ReceiveMessageRequest &r) {
-          os << "ReceiveMessageRequest={maxMessages='" + std::to_string(r.maxMessages) + "' visibility='" + std::to_string(r.visibility) + "' resource='" + r.resource +
+          os << "ReceiveMessageRequest={region='" + r.region + "' queueUrl='" + r.queueUrl + "' maxMessages='" + std::to_string(r.maxMessages) +
+              "' visibility='" + std::to_string(r.visibility) + "' waitTimeSeconds='" + std::to_string(r.waitTimeSeconds) + "' resource='" + r.resource +
               "' requestId: '" + r.requestId + "'}";
           return os;
       }

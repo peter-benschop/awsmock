@@ -91,7 +91,7 @@ namespace AwsMock::Database {
         // arrange
         Entity::SQS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .url=QUEUE_URL};
         queue = _database.CreateQueue(queue);
-        Entity::SQS::Message message = {.queue=queue.name, .body=BODY,};
+        Entity::SQS::Message message = {.queueUrl=queue.name, .body=BODY,};
 
         // act
         Entity::SQS::Message result = _database.CreateMessage(message);

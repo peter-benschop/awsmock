@@ -74,7 +74,6 @@ namespace AwsMock::Core {
       /// Disables all event types.
     };
 
-
     struct DirectoryEvent
     {
       DirectoryEvent(const Poco::File& f, DirectoryEventType ev): item(f), event(ev) {}

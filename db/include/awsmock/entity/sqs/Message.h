@@ -17,19 +17,19 @@
 
 namespace AwsMock::Database::Entity::SQS {
 
-    enum STATUS { CREATED, SEND, RESEND };
+    enum STATUS { INITIAL, SEND, RESEND };
 
     struct Message {
 
       /**
        * ID
        */
-      long id;
+      long id = 0;
 
       /**
-       * Queue name
+       * Queue URL
        */
-      std::string queue;
+      std::string queueUrl;
 
       /**
        * Message body
@@ -39,7 +39,7 @@ namespace AwsMock::Database::Entity::SQS {
       /**
        * Status
        */
-      int status = CREATED;
+      int status = INITIAL;
 
       /**
        * Last send datetime
@@ -85,6 +85,29 @@ namespace AwsMock::Database::Entity::SQS {
        * Last modification date
        */
       Poco::DateTime modified;
+
+      /**
+       * Converts the DTO to a string representation.
+       *
+       * @return DTO as string for logging.
+       */
+      [[nodiscard]] std::string ToString() const {
+          std::stringstream ss;
+          ss << (*this);
+          return ss.str();
+      }
+
+      /**
+       * Stream provider.
+       *
+       * @return output stream
+       */
+      friend std::ostream &operator<<(std::ostream &os, const Message &m) {
+          os << "Message={id='" + std::to_string(m.id) + "' queueUrl='" + m.queueUrl + "'body='" + m.body + "' status='" + std::to_string(m.status) + "' lastSend='" +
+              Poco::DateTimeFormatter().format(m.lastSend, Poco::DateTimeFormat::HTTP_FORMAT) + "' retries='" + std::to_string(m.retries) +
+              "' messageId='" + m.messageId + "' receiptHandle='" + m.receiptHandle + "' md5body='" + m.md5Body + "' md5Attr='" + m.md5Attr + "'}";
+          return os;
+      }
     };
 
     typedef struct Message Message;

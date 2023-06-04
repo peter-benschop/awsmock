@@ -27,6 +27,7 @@ namespace AwsMock {
         poco_debug(_logger, "SQS POST request, URI: " + request.getURI() + " region: " + region + " user: " + user);
 
         try {
+            //DumpBody(request);
 
             std::string endpoint = GetEndpoint(request);
             std::string payload = GetPayload(request);
@@ -36,8 +37,8 @@ namespace AwsMock {
 
             if (action == "CreateQueue") {
 
-                std::string name, nameParameter = "QueueName";
-                GetParameter(payload, nameParameter, name);
+                std::string name = GetStringParameter(payload, "QueueName");
+
                 Dto::SQS::CreateQueueRequest sqsRequest = {.name = name, .region=region, .owner=user, .url="http://" + endpoint + "/" + DEFAULT_USERID + "/" + name};
                 Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
                 SendOkResponse(response, sqsResponse.ToXml());
@@ -49,8 +50,7 @@ namespace AwsMock {
 
             } else if (action == "DeleteQueue") {
 
-                std::string url, urlParameter = "QueueUrl";
-                GetParameter(payload, urlParameter, url);
+                std::string url = GetStringParameter(payload, "QueueUrl");
 
                 Dto::SQS::DeleteQueueRequest sqsRequest = {.url=url};
                 Dto::SQS::DeleteQueueResponse sqsResponse = _sqsService.DeleteQueue(sqsRequest);
@@ -58,11 +58,8 @@ namespace AwsMock {
 
             } else if (action == "SendMessage") {
 
-                std::string url, urlParameter = "QueueUrl";
-                GetParameter(payload, urlParameter, url);
-
-                std::string body, bodyParameter = "MessageBody";
-                GetParameter(payload, bodyParameter, body);
+                std::string url = GetStringParameter(payload, "QueueUrl");
+                std::string body = GetStringParameter(payload, "MessageBody");
 
                 Dto::SQS::CreateMessageRequest sqsRequest = {.url=url, .body=body};
                 Dto::SQS::CreateMessageResponse sqsResponse = _sqsService.CreateMessage(sqsRequest);
@@ -70,26 +67,33 @@ namespace AwsMock {
 
             } else if (action == "ReceiveMessage") {
 
-                std::string max, maxParameter = "MaxNumberOfMessages";
-                GetParameter(payload, maxParameter, max);
-                int maxMessages = std::stoi(max);
+                std::string queueUrl = GetStringParameter(payload, "QueueUrl");
+                int maxMessages = GetIntParameter(payload, "MaxNumberOfMessages", 1, 10);
+                int waitTimeSeconds = GetIntParameter(payload, "WaitTimeSeconds", 1, 900);
+                int visibility = GetIntParameter(payload, "VisibilityTimeout", 1, 900);
 
-                std::string visibilityTimeout, visibilityParameter = "VisibilityTimeout";
-                GetParameter(payload, visibilityParameter, visibilityTimeout);
-                int visibility = std::stoi(visibilityTimeout);
-
-                Dto::SQS::ReceiveMessageRequest sqsRequest = {.maxMessages=maxMessages, .visibility=visibility};
+                Dto::SQS::ReceiveMessageRequest sqsRequest = {.region=region, .queueUrl=queueUrl, .maxMessages=maxMessages, .visibility=visibility,
+                    .waitTimeSeconds=waitTimeSeconds};
                 Dto::SQS::ReceiveMessageResponse sqsResponse = _sqsService.ReceiveMessages(sqsRequest);
 
                 SendOkResponse(response, sqsResponse.ToXml());
 
             } else if (action == "PurgeQueue") {
 
-                std::string queueUrl, queueUrlParameter = "QueueUrl";
-                GetParameter(payload, queueUrlParameter, queueUrl);
+                std::string queueUrl = GetStringParameter(payload, "QueueUrl");
 
                 Dto::SQS::PurgeQueueRequest sqsRequest = {.queueUrl=queueUrl, .region=region};
                 Dto::SQS::PurgeQueueResponse sqsResponse = _sqsService.PurgeQueue(sqsRequest);
+
+                SendOkResponse(response, sqsResponse.ToXml());
+
+            } else if (action == "DeleteMessage") {
+
+                std::string queueUrl = GetStringParameter(payload, "QueueUrl");
+                std::string receiptHandle = GetStringParameter(payload, "ReceiptHandle");
+
+                Dto::SQS::DeleteMessageRequest sqsRequest = {.queueUrl=queueUrl, .receiptHandle=receiptHandle};
+                Dto::SQS::DeleteMessageResponse sqsResponse = _sqsService.DeleteMessage(sqsRequest);
 
                 SendOkResponse(response, sqsResponse.ToXml());
             }
@@ -144,7 +148,8 @@ namespace AwsMock {
         }
     }
 
-    void SQSHandler::GetParameter(const std::string &body, std::string &name, std::string &value) {
+    std::string SQSHandler::GetStringParameter(const std::string &body, const std::string &name) {
+        std::string value;
         std::vector<std::string> bodyParts = Core::StringUtils::Split(body, '&');
         for (auto &it : bodyParts) {
             std::vector<std::string> parts = Core::StringUtils::Split(it, '=');
@@ -152,6 +157,17 @@ namespace AwsMock {
                 value = Core::StringUtils::UrlDecode(parts[1]);
             }
         }
+        return value;
+    }
+
+    int SQSHandler::GetIntParameter(const std::string &body, const std::string &parameter, int min, int max) {
+        int value = max;
+        std::string parameterValue = GetStringParameter(body, parameter);
+        if (!parameterValue.empty()) {
+            value = std::stoi(parameterValue);
+            value = value > min && value < max ? value : max;
+        }
+        return value;
     }
 
     std::string SQSHandler::GetEndpoint(Poco::Net::HTTPServerRequest &request) {
