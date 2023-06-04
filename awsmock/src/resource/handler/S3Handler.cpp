@@ -17,6 +17,8 @@ namespace AwsMock {
             std::string bucket, key;
             GetBucketKeyFromUri(request.getURI(), bucket, key);
 
+            bool isListRequest = QueryParameterExists("list-type");
+
             if(bucket.empty()) {
 
                 // Return bucket list
@@ -42,7 +44,7 @@ namespace AwsMock {
 
                 SendOkResponse(response, s3Response.GetFilename(), s3Response.GetSize(), &headerMap);
 
-            } else {
+            } else if(isListRequest) {
 
                 // Return object list
                 Dto::S3::ListBucketResult result = _s3Service.ListBucket(bucket);
@@ -50,9 +52,9 @@ namespace AwsMock {
             }
 
         } catch (Core::ServiceException &exc) {
-            SendErrorResponse(response, exc);
+            SendErrorResponse("S3", response, exc);
         } catch (Core::ResourceNotFoundException &exc) {
-            SendErrorResponse(response, exc);
+            SendErrorResponse("S3", response, exc);
         }
     }
 
@@ -88,8 +90,6 @@ namespace AwsMock {
                 poco_debug(_logger, "Bucket notification request, bucket: " + bucket);
 
                 // S3 notification setup
-                //DumpBody(request);
-
                 Dto::S3::PutBucketNotificationRequest s3Request = Dto::S3::PutBucketNotificationRequest(GetPayload(request), region, bucket);
 
                 _s3Service.PutBucketNotification(s3Request);
@@ -101,15 +101,15 @@ namespace AwsMock {
                 // S3 put object request
                 Dto::S3::PutObjectRequest putObjectRequest;
 
-                putObjectRequest.SetBucket(bucket);
-                putObjectRequest.SetKey(key);
-                putObjectRequest.SetOwner(user);
-                putObjectRequest.SetRegion(region);
-                putObjectRequest.SetContentType(request.get("Content-Type"));
-                putObjectRequest.SetMd5Sum(request.get("Content-MD5"));
-                putObjectRequest.SetSize(std::stol(request.get("Content-Length")));
+                putObjectRequest.bucket = bucket;
+                putObjectRequest.key = key;
+                putObjectRequest.owner = user;
+                putObjectRequest.region = region;
+                putObjectRequest.contentType = request.get("Content-Type");
+                putObjectRequest.md5Sum = request.get("Content-MD5");
+                putObjectRequest.size = std::stol(request.get("Content-Length"));
 
-                Dto::S3::PutObjectResponse putObjectResponse = _s3Service.PutObject(putObjectRequest, request.stream());
+                Dto::S3::PutObjectResponse putObjectResponse = _s3Service.PutObject(putObjectRequest, &request.stream());
 
                 Resource::HeaderMap headerMap;
                 headerMap.emplace_back("ETag", putObjectResponse.GetETag());
@@ -129,7 +129,7 @@ namespace AwsMock {
             }
 
         } catch (Poco::Exception &exc) {
-            SendErrorResponse(response, exc);
+            SendErrorResponse("S3", response, exc);
         }
     }
 
@@ -141,13 +141,25 @@ namespace AwsMock {
 
             std::string bucket, key;
             GetBucketKeyFromUri(request.getURI(), bucket, key);
+
             bool isMultipartUpload = QueryParameterExists("uploads");
+            bool isDeleteObjects = QueryParameterExists("delete");
 
             if (isMultipartUpload) {
 
                 poco_debug(_logger, "Starting multipart upload");
 
                 Dto::S3::InitiateMultipartUploadResult result = _s3Service.CreateMultipartUpload(bucket, key, region, user);
+                SendOkResponse(response, result.ToXml());
+
+            } else if(isDeleteObjects) {
+
+                poco_debug(_logger, "Starting delete objects request");
+
+                std::string payload = GetPayload(request);
+
+                auto request = Dto::S3::DeleteObjectsRequest(payload);
+                Dto::S3::DeleteObjectsResponse result = _s3Service.DeleteObjects(request);
                 SendOkResponse(response, result.ToXml());
 
             } else {
@@ -161,7 +173,7 @@ namespace AwsMock {
             }
 
         } catch (Poco::Exception &exc) {
-            SendErrorResponse(response, exc);
+            SendErrorResponse("S3", response, exc);
         }
     }
 
@@ -170,13 +182,19 @@ namespace AwsMock {
         poco_debug(_logger, "S3 DELETE request, URI: " + request.getURI() + " region: " + region + " user: " + user);
 
         try {
-            const std::string &name = Core::DirUtils::RelativePath(request.getURI());
-            _s3Service.DeleteBucket(region, name);
+            std::string bucket, key;
+            GetBucketKeyFromUri(request.getURI(), bucket, key);
 
-            SendOkResponse(response);
+            if(!bucket.empty() && !key.empty()) {
+                _s3Service.DeleteObject({.region=region, .bucket=bucket, .key=key});
+                SendOkResponse(response);
+            } else if(!bucket.empty()) {
+                _s3Service.DeleteBucket(region, bucket);
+                SendOkResponse(response);
+            }
 
         } catch (Core::ServiceException &exc) {
-            SendErrorResponse(response, exc);
+            SendErrorResponse("S3", response, exc);
         }
     }
 
@@ -218,11 +236,12 @@ namespace AwsMock {
 
 
         } catch (Poco::Exception &exc) {
-            SendErrorResponse(response, exc);
+            SendErrorResponse("S3", response, exc);
         }
     }
 
     void S3Handler::GetBucketKeyFromUri(const std::string &uri, std::string &bucket, std::string &key) {
+
         Poco::RegularExpression::MatchVec posVec;
         Poco::RegularExpression pattern(R"(/([a-z0-9-.]+)?/?([a-zA-Z0-9-_/.*'()]+)?\??.*$)");
         if (!pattern.match(uri, 0, posVec)) {

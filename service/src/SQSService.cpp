@@ -8,14 +8,14 @@ namespace AwsMock::Service {
 
     using namespace Poco::Data::Keywords;
 
-    SQSService::SQSService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("S3Service")), _configuration(configuration) {
+    SQSService::SQSService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("SQSService")), _configuration(configuration) {
         Initialize();
     }
 
     void SQSService::Initialize() {
 
         // Set console logger
-        Core::Logger::SetDefaultConsoleLogger("S3Service");
+        Core::Logger::SetDefaultConsoleLogger("SQSService");
 
         // Initialize environment
         _database = std::make_unique<Database::SQSDatabase>(_configuration);
@@ -33,9 +33,9 @@ namespace AwsMock::Service {
             // Update database
             Database::Entity::SQS::Queue queue = _database->CreateQueue({.name=request.name, .region=request.region, .owner=request.owner, .url=request.url});
 
-        } catch (Poco::Exception &ex) {
-            poco_error(_logger, "SQS create queue failed, message: " + ex.message());
-            throw Core::ServiceException(ex.message(), 500);
+        } catch (Poco::Exception &exc) {
+            poco_error(_logger, "SQS create queue failed, message: " + exc.message());
+            throw Core::ServiceException(exc.message(), 500);
         }
         return createQueueResponse;
     }

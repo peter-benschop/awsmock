@@ -39,7 +39,6 @@ namespace AwsMock {
                 std::string name, nameParameter = "QueueName";
                 GetParameter(payload, nameParameter, name);
                 Dto::SQS::CreateQueueRequest sqsRequest = {.name = name, .region=region, .owner=user, .url="http://" + endpoint + "/" + DEFAULT_USERID + "/" + name};
-
                 Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
                 SendOkResponse(response, sqsResponse.ToXml());
 
@@ -96,7 +95,8 @@ namespace AwsMock {
             }
 
         } catch (Core::ServiceException &exc) {
-            SendErrorResponse(response, exc);
+            poco_error(_logger, "Service exception: " + exc.message());
+            SendErrorResponse("SQS", response, exc);
         }
     }
 

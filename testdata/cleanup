@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#
+# Delete S3 objects
+#
+awsmock s3 rm s3://file-delivery1 --recursive
+awsmock s3 rm s3://file-delivery2 --recursive
+awsmock s3 rm s3://file-delivery3 --recursive
+
+#
+# Delete S3 buckets
+#
+awsmock s3 rb s3://file-delivery1
+awsmock s3 rb s3://file-delivery2
+awsmock s3 rb s3://file-delivery3
+
+#
+# Delete SQS Queues
+#
+awsmock sqs delete-queue --queue-url=http://localost:4567/000000000000/file-delivery1-queue
+awsmock sqs delete-queue --queue-url=http://localost:4567/000000000000/file-delivery2-queue
+awsmock sqs delete-queue --queue-url=http://localost:4567/000000000000/file-delivery3-queue
+

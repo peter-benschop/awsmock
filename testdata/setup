@@ -1,0 +1,39 @@
+#!/bin/bash
+
+#
+# Create S3 buckets
+#
+awsmock s3 mb s3://file-delivery1
+awsmock s3 mb s3://file-delivery2
+awsmock s3 mb s3://file-delivery3
+
+#
+# Create SQS Queues
+#
+awsmock sqs create-queue --queue-name=file-delivery1-queue
+awsmock sqs create-queue --queue-name=file-delivery2-queue
+awsmock sqs create-queue --queue-name=file-delivery3-queue
+
+# Configure S3 versioning
+#awsmock s3api put-bucket-versioning --bucket onix3-produktmeldungen --versioning-configuration Status=Enabled
+
+# Connect FTP-S3 bucket events to lambda function
+awsmock s3api put-bucket-notification-configuration \
+--bucket file-delivery1 \
+--notification-configuration file://./hook/file-delivery1-hook.json
+
+awsmock s3api put-bucket-notification-configuration \
+--bucket file-delivery2 \
+--notification-configuration file://./hook/file-delivery2-hook.json
+
+awsmock s3api put-bucket-notification-configuration \
+--bucket file-delivery3 \
+--notification-configuration file://./hook/file-delivery3-hook.json
+
+# Put some objects
+awsmock s3 cp ./0036089631545_ANNO_OBILD.jpg s3://file-delivery1
+awsmock s3 cp ./9781406379990_ANNO_OBILD.jpg s3://file-delivery1
+awsmock s3 cp ./0036089631545_ANNO_OBILD.jpg s3://file-delivery2/folder1/0036089631545_ANNO_OBILD.jpg
+awsmock s3 cp ./9781406379990_ANNO_OBILD.jpg s3://file-delivery2/folder1/9781406379990_ANNO_OBILD.jpg
+awsmock s3 cp ./0036089631545_ANNO_OBILD.jpg s3://file-delivery3/folder1/folder2/9781406379990_ANNO_OBILD.jpg
+awsmock s3 cp ./9781406379990_ANNO_OBILD.jpg s3://file-delivery3/folder1/folder2/9781406379990_ANNO_OBILD.jpg

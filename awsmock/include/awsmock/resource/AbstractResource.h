@@ -25,6 +25,7 @@
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/core/ResourceNotFoundException.h>
 #include "awsmock/dto/s3/RestErrorResponse.h"
+#include "awsmock/dto/sqs/RestErrorResponse.h"
 #include <awsmock/resource/HandlerException.h>
 #include <awsmock/resource/handling/JsonAPIErrorBuilder.h>
 #include <awsmock/resource/handling/JsonAPIResourceBuilder.h>
@@ -244,18 +245,20 @@ namespace AwsMock::Resource {
       /**
        * Send an error response (HTTP status code 200).
        *
+       * @param service service name
        * @param response HTTP response object
        * @param exc exception object
        */
-      void SendErrorResponse(Poco::Net::HTTPServerResponse &response, Poco::Exception &exc);
+      void SendErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Poco::Exception &exc);
 
       /**
        * Send an error response (HTTP status code 200).
        *
+       * @param service service name
        * @param response HTTP response object
        * @param exc service exception object
        */
-      void SendErrorResponse(Poco::Net::HTTPServerResponse &response, Core::ServiceException &exc);
+      void SendErrorResponse(const std::string &service,Poco::Net::HTTPServerResponse &response, Core::ServiceException &exc);
 
       /**
        * Dump the request to std::cerr

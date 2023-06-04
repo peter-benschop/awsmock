@@ -97,7 +97,7 @@ namespace AwsMock::Worker {
       /**
        * S3 service
        */
-      std::unique_ptr<Database::S3Database> _s3Database;
+      std::unique_ptr<Service::S3Service> _s3Service;
 
       /**
        * Data dir

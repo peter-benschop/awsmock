@@ -18,6 +18,7 @@
 // AwsMock includes
 #include <awsmock/core/Logger.h>
 #include <awsmock/core/Configuration.h>
+#include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/db/Database.h>
@@ -77,6 +78,15 @@ namespace AwsMock::Database {
        * @throws DatabaseException
        */
       Entity::S3::Bucket CreateBucket(const Entity::S3::Bucket& bucket);
+
+      /**
+       * CHeck whether the bucket has still objects
+       *
+       * @param bucket bucket entity
+       * @return true if bucket exists
+       * @throws DatabaseException
+       */
+      bool HasObjects(const Entity::S3::Bucket &bucket);
 
       /**
        * Create a new S3 object in the S3 object table
@@ -139,7 +149,18 @@ namespace AwsMock::Database {
       Entity::S3::ObjectList ListBucket(const std::string &bucket);
 
       /**
-       * Creates a bucket notification
+       * Bucket notification exists
+       *
+       * @param bucketNotification bucket notification entity
+       * @return true if bucket notification exists
+       * @throws DatabaseException
+       */
+      bool BucketNotificationExists(const Entity::S3::BucketNotification &bucketNotification);
+
+      /**
+       * Creates a bucket notification-
+       *
+       * <p>Replaces the wildcard characters '*' with the SQLite wildcard '%'.</p>
        *
        * @param bucketNotification bucket notification
        * @return created BucketNotification entity
@@ -153,6 +174,24 @@ namespace AwsMock::Database {
        * @return BucketNotification
        */
       Entity::S3::BucketNotification GetBucketNotificationById(long id);
+
+      /**
+       * Returns a notification.
+       *
+       * <p>Event matching uses inverse wildcard matching, as the wildcard patterns are stored in the database.</p>
+       *
+       * @param bucketNotification bucket notification.
+       * @return BucketNotification
+       */
+      Entity::S3::BucketNotification GetBucketNotification(const Entity::S3::BucketNotification &bucketNotification);
+
+      /**
+       * Checks for a bucket notification
+       *
+       * @param bucketNotification notification
+       * @return true if bucket notification exists
+       */
+      bool HasBucketNotification(const Entity::S3::BucketNotification &bucketNotification);
 
       /**
        * Delete a bucket.
@@ -169,6 +208,15 @@ namespace AwsMock::Database {
        * @throws DatabaseException
        */
       void DeleteObject(const Entity::S3::Object &object);
+
+      /**
+       * Updates an existing object in the S3 object table
+       *
+       * @param bucket bucket to delete from
+       * @param keys vector of object keys
+       * @throws DatabaseException
+       */
+      void DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys);
 
     private:
 

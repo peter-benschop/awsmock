@@ -21,14 +21,14 @@ namespace AwsMock::Database::Entity::S3 {
       long id = 0;
 
       /**
-       * Bucket name
-       */
-      std::string name;
-
-      /**
        * Bucket region
        */
       std::string region;
+
+      /**
+       * Bucket name
+       */
+      std::string name;
 
       /**
        * Bucket owner

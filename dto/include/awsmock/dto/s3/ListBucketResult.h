@@ -219,9 +219,12 @@ namespace AwsMock::Dto::S3 {
     public:
 
       /**
-       * Constructor
+       * Constructor.
+       *
+       * @param bucket nucket name
+       * @param objectList list of S3 objects
        */
-      ListBucketResult(Database::Entity::S3::ObjectList objectList);
+      ListBucketResult(const std::string &bucket, Database::Entity::S3::ObjectList objectList);
 
       /**
        * Return XML string
