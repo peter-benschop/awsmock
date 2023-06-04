@@ -17,6 +17,7 @@
 #include "Poco/DOM/Node.h"
 
 // AwsMock includes
+#include "awsmock/core/CryptoUtils.h"
 #include "awsmock/core/ServiceException.h"
 #include "awsmock/db/S3Database.h"
 #include "awsmock/dto/s3/CompleteMultipartUploadResult.h"

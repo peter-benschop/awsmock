@@ -23,7 +23,7 @@ namespace AwsMock::Service {
 
     Dto::SQS::CreateQueueResponse SQSService::CreateQueue(const Dto::SQS::CreateQueueRequest &request) {
 
-        Dto::SQS::CreateQueueResponse createQueueResponse;
+        Database::Entity::SQS::Queue queue;
         try {
             // Check existence
             if (_database->QueueExists(request.region, request.name)) {
@@ -31,13 +31,13 @@ namespace AwsMock::Service {
             }
 
             // Update database
-            Database::Entity::SQS::Queue queue = _database->CreateQueue({.name=request.name, .region=request.region, .owner=request.owner, .url=request.url});
+            queue = _database->CreateQueue({.region=request.region, .name=request.name, .owner=request.owner, .url=request.url});
 
         } catch (Poco::Exception &exc) {
             poco_error(_logger, "SQS create queue failed, message: " + exc.message());
             throw Core::ServiceException(exc.message(), 500);
         }
-        return createQueueResponse;
+        return {.region=queue.region, .name=queue.name, .owner=queue.owner, .url=queue.url};
     }
 
     Dto::SQS::ListQueueResponse SQSService::ListQueues(const std::string &region) {
