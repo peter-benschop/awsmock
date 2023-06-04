@@ -270,9 +270,9 @@ namespace AwsMock::Service {
                 //CheckNotifications(object, request.region, "s3:ObjectCreated:Put");
             }
 
-        } catch (Poco::Exception &ex) {
-            poco_error(_logger, "S3 delete object failed, message: " + ex.message());
-            throw Core::ServiceException(ex.message(), 500);
+        } catch (Poco::Exception &exc) {
+            poco_error(_logger, "S3 delete object failed, message: " + exc.message());
+            throw Core::ServiceException(exc.message(), 500);
         }
     }
 
@@ -349,8 +349,11 @@ namespace AwsMock::Service {
             // Delete directory
             DeleteBucket(name);
 
-            // Update database
+            // Delete from database
             _database->DeleteBucket(bucket);
+
+            // Delete notification
+            _database->DeleteBucketNotifications({.region=region, .bucket=name});
 
         } catch (Poco::Exception &ex) {
             poco_error(_logger, "S3 Delete Bucket failed, message: " + ex.message());

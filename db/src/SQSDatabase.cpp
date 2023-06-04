@@ -94,8 +94,9 @@ namespace AwsMock::Database {
             Entity::SQS::QueueList queueList;
 
             Poco::Data::Statement stmt(session);
-            stmt << "SELECT id,name,region,url,created,modified FROM sqs_queue WHERE region=?", bind(region), into(queue.id), into(queue.name), into(queue.region),
-                into(queue.url), into(queue.created), into(queue.modified), range(0, 1);
+            stmt << "SELECT id,name,region,url,visibility_timeout,created,modified FROM sqs_queue WHERE region=?",
+                bind(region), into(queue.id), into(queue.name), into(queue.region), into(queue.url), into(queue.visibilityTimeout), into(queue.created),
+                into(queue.modified), range(0, 1);
 
             while (!stmt.done()) {
                 stmt.execute();
@@ -122,6 +123,7 @@ namespace AwsMock::Database {
             poco_trace(_logger, "Queue purged, url: " + queueUrl);
 
         } catch (Poco::Exception &exc) {
+            poco_error(_logger, "Database exception: " + exc.message());
             throw Core::DatabaseException(exc.message(), 500);
         }
     }
@@ -136,20 +138,21 @@ namespace AwsMock::Database {
             int id = 0;
             Poco::Data::Statement insert(session);
             insert << "INSERT INTO sqs_message(queue_url,body,message_id,receipt_handle,status,retries,md5_body,md5_attr) VALUES(?,?,?,?,?,?,?,?) returning id",
-                bind(message.queue), bind(message.body), bind(message.messageId), bind(message.receiptHandle), bind(message.status), bind(message.retries),
+                bind(message.queueUrl), bind(message.body), bind(message.messageId), bind(message.receiptHandle), bind(message.status), bind(message.retries),
                 bind(message.md5Body), bind(message.md5Attr), into(id), now;
 
             Poco::Data::Statement select(session);
             select
                 << "SELECT id,queue_url,body,message_id,receipt_handle,status,retries,md5_body,md5_attr,created,modified FROM sqs_message WHERE id=?",
-                bind(id), into(result.id), into(result.queue), into(result.body), into(result.messageId), into(result.receiptHandle), into(result.status),
+                bind(id), into(result.id), into(result.queueUrl), into(result.body), into(result.messageId), into(result.receiptHandle), into(result.status),
                 into(result.retries), into(result.md5Body), into(result.md5Attr), into(result.created), into(result.modified), now;
 
             session.close();
-            poco_trace(_logger, "Message created, queue: " + result.queue + " id: " + std::to_string(result.id));
+            poco_trace(_logger, "Message created, queue: " + result.queueUrl + " id: " + std::to_string(result.id));
 
         } catch (Poco::Exception &exc) {
             poco_error(_logger, "Database exception: " + exc.message());
+            throw Core::DatabaseException(exc.message(), 500);
         }
 
         return result;
@@ -164,31 +167,91 @@ namespace AwsMock::Database {
             // Select database
             Poco::Data::Statement select(session);
             select << "SELECT id,queue_url,body,message_id,status,retries,md5_body,md5_attr,created,modified FROM sqs_message WHERE id=?", bind(id), into(result.id),
-                into(result.queue), into(result.body), into(result.messageId), into(result.status), into(result.retries), into(result.md5Body), into(result.md5Attr),
+                into(result.queueUrl), into(result.body), into(result.messageId), into(result.status), into(result.retries), into(result.md5Body), into(result.md5Attr),
                 into(result.created), into(result.modified), now;
 
             session.close();
-            poco_trace(_logger, "Message selected, queue: " + result.queue + " id: " + std::to_string(result.id));
+            poco_trace(_logger, "Message selected, queue: " + result.queueUrl + " id: " + std::to_string(result.id));
 
         } catch (Poco::Exception &exc) {
             poco_error(_logger, "Database exception: " + exc.message());
+            throw Core::DatabaseException(exc.message(), 500);
         }
         return result;
+    }
+
+    Entity::SQS::MessageList SQSDatabase::ReceiveMessages(const std::string &region, const std::string &queueUrl, int maxMessages) {
+
+        Entity::SQS::MessageList resultList;
+        try {
+            Entity::SQS::Message result;
+
+            Poco::Data::Session session = GetSession();
+
+            // TODO: Add region to messages
+            session.begin();
+            Poco::Data::Statement select(session);
+            select << "SELECT id,queue_url,body,message_id,receipt_handle,status,retries,md5_body,md5_attr,created,modified FROM sqs_message "
+                      "WHERE queue_url=? AND status=?",
+                bind(queueUrl), bind(Entity::SQS::INITIAL), into(result.id), into(result.queueUrl), into(result.body), into(result.messageId), into(result.receiptHandle),
+                into(result.status), into(result.retries), into(result.md5Body), into(result.md5Attr), into(result.created), into(result.modified), range(0, 1);
+
+            while (!select.done() && resultList.size() < maxMessages) {
+                select.execute();
+                if (result.id > 0) {
+                    resultList.push_back(result);
+                }
+            }
+
+            for (const auto &m : resultList) {
+                Poco::DateTime now;
+                Poco::Data::Statement update(session);
+                update << "UPDATE sqs_message SET status=?,retries=?,last_send=? WHERE id=?",
+                    bind(Entity::SQS::SEND), bind(m.retries + 1), bind(now), bind(m.id);
+                update.execute();
+            }
+
+            session.commit();
+            poco_trace(_logger, "Messages received, region: " + region + " queue: " + queueUrl + " count: " + std::to_string(resultList.size()));
+
+        } catch (Poco::Exception &exc) {
+            poco_error(_logger, "Database exception: " + exc.message());
+            throw Core::DatabaseException(exc.message(), 500);
+        }
+        return resultList;
+    }
+
+    [[maybe_unused]] void SQSDatabase::ResetMessages(const std::string &queueUrl, long visibility) {
+
+        try {
+            Poco::Data::Session session = GetSession();
+            session.begin();
+            session
+                << "UPDATE sqs_message SET status=?, modified=CURRENT_TIMESTAMP WHERE queue_url=? AND status=? AND "
+                   "(strftime('%s', CURRENT_TIMESTAMP) - strftime('%s', last_send)) > ?",
+                bind(Entity::SQS::INITIAL), bind(queueUrl), bind(Entity::SQS::SEND), bind(visibility), now;
+
+            session.commit();
+            poco_trace(_logger, "Message reset, visibility: " + std::to_string(visibility));
+
+        } catch (Poco::Exception &exc) {
+            poco_error(_logger, "Database exception: " + exc.message());
+            throw Core::DatabaseException(exc.message(), 500);
+        }
     }
 
     void SQSDatabase::DeleteMessage(const Entity::SQS::Message &message) {
 
         try {
             Poco::Data::Session session = GetSession();
-
-            Poco::Data::Statement stmt(session);
-            stmt << "DELETE FROM sqs_message WHERE id=?", bind(message.id), now;
-
-            session.close();
+            session.begin();
+            session << "DELETE FROM sqs_message WHERE queue_url=? AND receipt_handle=?", bind(message.queueUrl), bind(message.receiptHandle), now;
+            session.commit();
             poco_trace(_logger, "Message deleted, queue: " + std::to_string(message.id));
 
         } catch (Poco::Exception &exc) {
             poco_error(_logger, "Database exception: " + exc.message());
+            throw Core::DatabaseException(exc.message(), 500);
         }
     }
 
@@ -204,6 +267,7 @@ namespace AwsMock::Database {
 
         } catch (Poco::Exception &exc) {
             poco_error(_logger, "Database exception: " + exc.message());
+            throw Core::DatabaseException(exc.message(), 500);
         }
     }
 

@@ -108,11 +108,22 @@ namespace AwsMock {
       /**
        * Get the action from the request body
        *
-       * @param body HTTP request body (in)
-       * @param name parameter name (out)
-       * @param value parameter value (out)
+       * @param body HTTP request body
+       * @param name parameter name
+       * @return parameter value
        */
-      static void GetParameter(const std::string &body, std::string &name, std::string &value);
+      std::string GetStringParameter(const std::string &body, const std::string &name);
+
+      /**
+       * Return an integer parameter.
+       *
+       * @param body HTTP message body
+       * @param parameter parameter name
+       * @param min minimum value
+       * @param max maximum value
+       * @return integer parameter
+       */
+      int GetIntParameter(const std::string &body, const std::string &parameter, int min, int max);
 
       /**
        * Get the endpoint from the request header

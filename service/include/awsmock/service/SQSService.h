@@ -7,6 +7,8 @@
 
 // C++ standard includes
 #include <string>
+#include <chrono>
+#include <ctime>
 
 // Poco includes
 #include <Poco/Logger.h>
@@ -19,13 +21,15 @@
 // AwsMock includes
 #include "awsmock/core/CryptoUtils.h"
 #include "awsmock/core/ServiceException.h"
-#include "awsmock/dto/sqs/ListQueueResponse.h"
 #include "awsmock/dto/sqs/CreateMessageRequest.h"
 #include "awsmock/dto/sqs/CreateMessageResponse.h"
 #include "awsmock/dto/sqs/CreateQueueRequest.h"
 #include "awsmock/dto/sqs/CreateQueueResponse.h"
+#include "awsmock/dto/sqs/DeleteMessageRequest.h"
+#include "awsmock/dto/sqs/DeleteMessageResponse.h"
 #include "awsmock/dto/sqs/DeleteQueueRequest.h"
 #include "awsmock/dto/sqs/DeleteQueueResponse.h"
+#include "awsmock/dto/sqs/ListQueueResponse.h"
 #include "awsmock/dto/sqs/PurgeQueueRequest.h"
 #include "awsmock/dto/sqs/PurgeQueueResponse.h"
 #include "awsmock/dto/sqs/ReceiveMessageRequest.h"
@@ -71,6 +75,15 @@ namespace AwsMock::Service {
       Dto::SQS::PurgeQueueResponse PurgeQueue(const Dto::SQS::PurgeQueueRequest &request);
 
       /**
+       * Delete a queue
+       *
+       * @param request delete request DTO
+       * @return DeleteQueueResponse
+       * @throws ServiceException
+       */
+      Dto::SQS::DeleteQueueResponse DeleteQueue(const Dto::SQS::DeleteQueueRequest &request);
+
+      /**
        * Creates a new queue
        *
        * @param request create message request
@@ -89,13 +102,13 @@ namespace AwsMock::Service {
       Dto::SQS::ReceiveMessageResponse ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request);
 
       /**
-       * Delete a queue
+       * Delete a message
        *
-       * @param request delete request DTO
-       * @return DeleteQueueResponse
+       * @param request delete message request DTO
+       * @return DeleteMessageResponse
        * @throws ServiceException
        */
-      Dto::SQS::DeleteQueueResponse DeleteQueue(const Dto::SQS::DeleteQueueRequest &request);
+      Dto::SQS::DeleteMessageResponse DeleteMessage(const Dto::SQS::DeleteMessageRequest &request);
 
     private:
 

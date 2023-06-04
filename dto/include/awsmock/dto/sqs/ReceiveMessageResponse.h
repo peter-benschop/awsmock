@@ -64,7 +64,7 @@ namespace AwsMock::Dto::SQS {
               Poco::XML::AutoPtr<Poco::XML::Element> pMessageId = pDoc->createElement("MessageId");
               pMessage->appendChild(pMessageId);
               Poco::XML::AutoPtr<Poco::XML::Text> pMessageIdText = pDoc->createTextNode(it.messageId);
-              pMessage->appendChild(pMessageIdText);
+              pMessageId->appendChild(pMessageIdText);
 
               // ReceiptHandle
               Poco::XML::AutoPtr<Poco::XML::Element> pReceiptHandle = pDoc->createElement("ReceiptHandle");
@@ -76,7 +76,7 @@ namespace AwsMock::Dto::SQS {
               Poco::XML::AutoPtr<Poco::XML::Element> pMd5Body = pDoc->createElement("MD5OfBody");
               pMessage->appendChild(pMd5Body);
               Poco::XML::AutoPtr<Poco::XML::Text> pMd5BodyText = pDoc->createTextNode(it.md5Body);
-              pMd5Body->appendChild(pReceiptHandleText);
+              pMd5Body->appendChild(pMd5BodyText);
 
               // Body
               Poco::XML::AutoPtr<Poco::XML::Element> pBody = pDoc->createElement("Body");
