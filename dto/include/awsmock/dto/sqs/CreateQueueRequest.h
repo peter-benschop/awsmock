@@ -13,24 +13,24 @@ namespace AwsMock::Dto::SQS {
     struct CreateQueueRequest {
 
       /**
-       * Name
-       */
-      std::string name;
-
-      /**
        * AWS region
        */
       std::string region;
 
       /**
+       * Name
+       */
+      std::string name;
+
+      /**
+       * Queue URL
+       */
+      std::string queueUrl;
+
+      /**
        * Owner
        */
       std::string owner;
-
-      /**
-       * URL
-       */
-      std::string url;
     };
 
 } // namespace AwsMock::Dto::SQS

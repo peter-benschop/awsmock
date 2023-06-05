@@ -34,12 +34,12 @@ namespace AwsMock::Worker {
         _region = _configuration.getString("awsmock.region");
         _s3Service = std::make_unique<Service::S3Service>(_configuration);
 
-        // Start watcher
+        // Start _watcher
         _watcher = new Core::DirectoryWatcher(_dataDir);
         _watcher->itemAdded += Poco::delegate(this, &S3Worker::OnFileAdded);
         _watcher->itemModified += Poco::delegate(this, &S3Worker::OnFileModified);
         _watcher->itemDeleted += Poco::delegate(this, &S3Worker::OnFileDeleted);
-        poco_debug(_logger, "Directory watcher added, path: " + _dataDir);
+        poco_debug(_logger, "Directory _watcher added, path: " + _dataDir);
     }
 
     [[noreturn]] void S3Worker::run() {

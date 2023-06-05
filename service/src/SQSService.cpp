@@ -31,7 +31,13 @@ namespace AwsMock::Service {
             }
 
             // Update database
-            queue = _database->CreateQueue({.region=request.region, .name=request.name, .owner=request.owner, .url=request.url});
+            queue = _database->CreateQueue({.region=request.region, .name=request.name, .owner=request.owner, .queueUrl=request.queueUrl});
+            poco_trace(_logger, "SQS queue created: " + queue.ToString());
+
+            // Create queue attributes with default values
+            Database::Entity::SQS::QueueAttribute queueAttribute = {.queueUrl=queue.queueUrl};
+            queueAttribute = _database->CreateQueueAttributes(queueAttribute);
+            poco_trace(_logger, "SQS queue default attributes created: " + queueAttribute.ToString());
 
         } catch (Poco::Exception &exc) {
             poco_error(_logger, "SQS create queue failed, message: " + exc.message());
@@ -94,7 +100,7 @@ namespace AwsMock::Service {
             }
 
             // Update database
-            _database->DeleteQueue({.url=request.queueUrl});
+            _database->DeleteQueue({.queueUrl=request.queueUrl});
 
         } catch (Poco::Exception &ex) {
             poco_error(_logger, "SQS delete queue failed, message: " + ex.message());

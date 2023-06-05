@@ -75,11 +75,19 @@ namespace AwsMock::Database {
         poco_debug(_logger, "SQS message table created");
 
         // SQS
-        session << "CREATE TABLE sqs_queue (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, name VARCHAR(255), region VARCHAR(255), owner VARCHAR(32), url VARCHAR(255), "
-                   "visibility_timeout INT DEFAULT 30, created DATETIME DEFAULT CURRENT_TIMESTAMP, modified DATETIME DEFAULT CURRENT_TIMESTAMP)",
+        session << "CREATE TABLE sqs_queue (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, name VARCHAR(255), region VARCHAR(255), owner VARCHAR(32), queue_url VARCHAR(255), "
+                   "queue_arn VARCHAR(255), created DATETIME DEFAULT CURRENT_TIMESTAMP, modified DATETIME DEFAULT CURRENT_TIMESTAMP)",
             Poco::Data::Keywords::now;
         session << "CREATE UNIQUE INDEX sqs_queue_idx1 ON sqs_queue(name, region)", Poco::Data::Keywords::now;
         poco_debug(_logger, "SQS queue table created");
+
+        session
+            << "CREATE TABLE sqs_queue_attribute (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, queue_url VARCHAR(255), delay_seconds INT, max_message_size INT DEFAULT 262144, "
+               "message_retension_period INT DEFAULT 345600, policy TEXT, receive_message_wait_time INT DEFAULT 20, visibility_timeout INT DEFAULT 30, redrive_policy TEXT, "
+               "redrive_allow_policy TEXT, created DATETIME DEFAULT CURRENT_TIMESTAMP, modified DATETIME DEFAULT CURRENT_TIMESTAMP)",
+            Poco::Data::Keywords::now;
+        session << "CREATE UNIQUE INDEX sqs_queue_attribute_idx1 ON sqs_queue_attribute(queue_url)", Poco::Data::Keywords::now;
+        poco_debug(_logger, "SQS queue attribute table created");
 
         session << "CREATE TABLE sqs_message (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, queue_url VARCHAR(255), body BLOB, status INT, message_id VARCHAR(100), "
                    "receipt_handle TEXT, md5_body VARCHAR(32), md5_attr VARCHAR(32), last_send DATETIME, retries INT, created DATETIME DEFAULT CURRENT_TIMESTAMP, "
@@ -88,12 +96,10 @@ namespace AwsMock::Database {
         session << "CREATE UNIQUE INDEX sqs_message_idx1 ON sqs_message(message_id)", Poco::Data::Keywords::now;
         poco_debug(_logger, "SQS message table created");
 
-        session
-            << "CREATE TABLE sqs_attribute (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, queue_url VARCHAR(255), delay_seconds INT, max_message_size INT DEFAULT 262144, "
-               "message_retension_period INT, DEFAULT 345600, policy TEXT, receive_message_wait_time INT DEFAULT 20, visibility_timeout INT DEFAULT 30, redrive_policy TEXT"
-               "redrive_allow_policy TEXT, created DATETIME DEFAULT CURRENT_TIMESTAMP, modified DATETIME DEFAULT CURRENT_TIMESTAMP)",
+        session << "CREATE TABLE sqs_message_attribute (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, name VARCHAR(255), value BLOB, "
+                   "created DATETIME DEFAULT CURRENT_TIMESTAMP, modified DATETIME DEFAULT CURRENT_TIMESTAMP)",
             Poco::Data::Keywords::now;
-        session << "CREATE UNIQUE INDEX sqs_attribute_idx1 ON sqs_attribute(message_id,name)", Poco::Data::Keywords::now;
+        //session << "CREATE UNIQUE INDEX sqs_message_attribute_idx1 ON sqs_message(message_id)", Poco::Data::Keywords::now;
         poco_debug(_logger, "SQS message attribute table created");
 
         poco_debug(_logger, "Database initialized, dbFile: " + _dbFile);

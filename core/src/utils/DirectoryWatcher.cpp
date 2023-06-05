@@ -25,7 +25,7 @@ namespace AwsMock::Core {
             _watcherMap[wd] = it.path().toString();
             ++it;
         }
-        poco_debug(_logger, "File watcher initialized, path: " + _rootDir);
+        poco_debug(_logger, "File _watcher initialized, path: " + _rootDir);
     }
 
     [[noreturn]] void DirectoryWatcher::run() {
@@ -37,7 +37,7 @@ namespace AwsMock::Core {
             i = 0;
             ssize_t length = read(fd, buffer, BUF_LEN);
             if (length < 0) {
-                poco_debug(_logger, "Invalid watcher struct length, path: " + std::to_string(length));
+                poco_debug(_logger, "Invalid _watcher struct length, path: " + std::to_string(length));
             }
             while (i < length) {
                 auto *event = (struct inotify_event *) &buffer[i];

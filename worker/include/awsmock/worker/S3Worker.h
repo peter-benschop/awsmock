@@ -55,23 +55,23 @@ namespace AwsMock::Worker {
       void Initialize();
 
       /**
-       * Callback for the directory watcher add events.
+       * Callback for the directory _watcher add events.
        *
-       * @param addEvent directory watcher add event.
+       * @param addEvent directory _watcher add event.
        */
       void OnFileAdded(const Core::DirectoryEvent &addEvent);
 
       /**
-       * Callback for the directory watcher change events.
+       * Callback for the directory _watcher change events.
        *
-       * @param changeEvent directory watcher change event.
+       * @param changeEvent directory _watcher change event.
        */
       void OnFileModified(const Core::DirectoryEvent &modifiedEvent);
 
       /**
-       * Callback for the directory watcher delete events.
+       * Callback for the directory _watcher delete events.
        *
-       * @param deleteEvent directory watcher delete event.
+       * @param deleteEvent directory _watcher delete event.
        */
       void OnFileDeleted(const Core::DirectoryEvent &deleteEvent);
 
@@ -105,7 +105,7 @@ namespace AwsMock::Worker {
       std::string _dataDir;
 
       /**
-       * Directory watcher thread
+       * Directory _watcher thread
        */
       Poco::Thread _watcherThread;
 
@@ -115,7 +115,7 @@ namespace AwsMock::Worker {
       std::string _region;
 
       /**
-       * Directory watcher
+       * Directory _watcher
        */
       Core::DirectoryWatcher *_watcher;
     };

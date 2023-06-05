@@ -27,7 +27,6 @@ public:
       ofs << "awsmock.monitoring.port=8081" << std::endl;
       ofs << "awsmock.monitoring.timeout=60000" << std::endl;
       ofs << "awsmock.log.level=debug" << std::endl;
-      ofs.close();
   }
 };
 

@@ -42,6 +42,11 @@ namespace AwsMock::Database::Entity::SQS {
       std::string queueUrl;
 
       /**
+       * Queue ARN
+       */
+      std::string queueArn;
+
+      /**
        * Creation date
        */
       Poco::DateTime created;
@@ -69,7 +74,7 @@ namespace AwsMock::Database::Entity::SQS {
        */
       friend std::ostream &operator<<(std::ostream &os, const Queue &q) {
           os << "Queue={id='" + std::to_string(q.id) + "' region='" + q.region + "' name='" + q.name + "' owner='" + q.owner + "' queueUrl='" + q.queueUrl +
-          "' messageRetensionPeriod='" + "' created='" + Poco::DateTimeFormatter().format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) +
+          "' queueArn='" + q.queueArn + "' created='" + Poco::DateTimeFormatter().format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) +
               "' modified='" + Poco::DateTimeFormatter().format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) + "'}";
           return os;
       }

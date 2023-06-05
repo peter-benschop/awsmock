@@ -35,7 +35,8 @@ namespace AwsMock::Database {
       void TearDown() override {
           try {
               Poco::Data::Statement stmt(_session);
-              stmt << "DELETE FROM sqs_attribute;"
+              stmt << "DELETE FROM sqs_queue_attribute;"
+                      "DELETE FROM sqs_message_attribute;"
                       "DELETE FROM sqs_message;"
                       "DELETE FROM sqs_queue;", now;
           } catch(Poco::Exception &exc){

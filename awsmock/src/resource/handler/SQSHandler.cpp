@@ -39,7 +39,7 @@ namespace AwsMock {
 
                 std::string name = GetStringParameter(payload, "QueueName");
 
-                Dto::SQS::CreateQueueRequest sqsRequest = {.name = name, .region=region, .owner=user, .url="http://" + endpoint + "/" + DEFAULT_USERID + "/" + name};
+                Dto::SQS::CreateQueueRequest sqsRequest = {.name = name, .region=region, .owner=user, .queueUrl="http://" + endpoint + "/" + DEFAULT_USERID + "/" + name};
                 Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
                 SendOkResponse(response, sqsResponse.ToXml());
 
