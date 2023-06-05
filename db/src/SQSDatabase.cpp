@@ -19,7 +19,7 @@ namespace AwsMock::Database {
 
             Poco::Data::Session session = GetSession();
             session.begin();
-            session << "SELECT COUNT(*) FROM sqs_queue WHERE url=?", bind(queueUrl), into(count), now;
+            session << "SELECT COUNT(*) FROM sqs_queue WHERE queue_url=?", bind(queueUrl), into(count), now;
             session.close();
             poco_trace(_logger, "Queue exists: " + std::string(count > 0 ? "true" : "false"));
 
@@ -134,11 +134,11 @@ namespace AwsMock::Database {
         try {
             Poco::Data::Session session = GetSession();
             session.begin();
-            session << "INSERT INTO sqs_queue_attribute(queue_url,delay_seconds,max_message_size,message_retension_period,policy,receive_message_wait_time,"
-                       "visibility_timeout,redrive_policy,redrive_allow_policy) VALUES(?,?,?,?,?,?,?,?,?) returning id",
-                bind(queueAttribute.queueUrl), bind(queueAttribute.delaySeconds), bind(queueAttribute.maxMessageSize), bind(queueAttribute.messageRetensionPeriod),
-                bind(queueAttribute.policy), bind(queueAttribute.policy), bind(queueAttribute.receiveMessageWaitTime), bind(queueAttribute.receiveMessageWaitTime),
-                bind(queueAttribute.visibilityTimeout), bind(queueAttribute.redrivePolicy), bind(queueAttribute.redriveAllowPolicy), into(id), now;
+            session << "INSERT INTO sqs_queue_attribute(queue_url,delay_seconds,max_message_size,message_retention_period,policy,redrive_policy,redrive_allow_policy,"
+                       "receive_message_wait_time,visibility_timeout) VALUES(?,?,?,?,?,?,?,?,?) returning id",
+                bind(queueAttribute.queueUrl), bind(queueAttribute.delaySeconds), bind(queueAttribute.maxMessageSize), bind(queueAttribute.messageRetentionPeriod),
+                bind(queueAttribute.policy), bind(queueAttribute.redrivePolicy), bind(queueAttribute.redriveAllowPolicy), bind(queueAttribute.receiveMessageWaitTime),
+                bind(queueAttribute.visibilityTimeout), into(id), now;
             session.commit();
 
             poco_trace(_logger, "Queue created, queueAttribute: " + queueAttribute.ToString());
@@ -155,11 +155,12 @@ namespace AwsMock::Database {
         try {
             Poco::Data::Session session = GetSession();
             session.begin();
-            session << "SELECT id,queue_url,delay_seconds,max_message_size,message_retension_period,policy,receive_message_wait_time,visibility_timeout,redrive_policy,"
-                       "redrive_allow_policy,created,modified FROM sqs_queue_attribute WHERE id=?", bind(id), into(result.id),
-                into(result.queueUrl), into(result.delaySeconds), into(result.maxMessageSize), into(result.messageRetensionPeriod), into(result.policy),
-                into(result.receiveMessageWaitTime), into(result.visibilityTimeout), into(result.redrivePolicy), into(result.redriveAllowPolicy), into(result.created),
-                into(result.modified), now;
+            session
+                << "SELECT id,queue_url,delay_seconds,max_message_size,message_retention_period,policy,redrive_policy,redrive_allow_policy,receive_message_wait_time,"
+                   "visibility_timeout,created,modified FROM sqs_queue_attribute WHERE id=?",
+                bind(id), into(result.id), into(result.queueUrl), into(result.delaySeconds), into(result.maxMessageSize), into(result.messageRetentionPeriod),
+                into(result.policy), into(result.redrivePolicy), into(result.redriveAllowPolicy), into(result.receiveMessageWaitTime), into(result.visibilityTimeout),
+                into(result.created), into(result.modified), now;
             session.commit();
 
             poco_trace(_logger, "Got queue attributes, " + result.ToString());
@@ -176,11 +177,11 @@ namespace AwsMock::Database {
         try {
             Poco::Data::Session session = GetSession();
             session.begin();
-            session << "SELECT id,sqs_queue_attribute(queue_url,delay_seconds,max_message_size,message_retension_period,policy,receive_message_wait_time,"
-                       "visibility_timeout,redrive_policy,redrive_allow_policy,created,modified FROM sqs_queue_attribute WHERE queue_url=?", bind(queueUrl), into(result.id),
-                into(result.queueUrl), into(result.delaySeconds), into(result.maxMessageSize), into(result.messageRetensionPeriod), into(result.policy),
-                into(result.receiveMessageWaitTime), into(result.visibilityTimeout), into(result.redrivePolicy), into(result.redriveAllowPolicy), into(result.created),
-                into(result.modified), now;
+            session << "SELECT id,queue_url,delay_seconds,max_message_size,message_retention_period,policy,redrive_policy,redrive_allow_policy,receive_message_wait_time,"
+                       "visibility_timeout,created,modified FROM sqs_queue_attribute WHERE queue_url=?",
+                into(result.id), into(result.queueUrl), into(result.delaySeconds), into(result.maxMessageSize), into(result.messageRetentionPeriod),
+                into(result.policy), into(result.redrivePolicy), into(result.redriveAllowPolicy), into(result.receiveMessageWaitTime), into(result.visibilityTimeout),
+                into(result.created), into(result.modified),bind(queueUrl), now;
             session.commit();
 
             poco_trace(_logger, "Got queue attributes, " + result.ToString());

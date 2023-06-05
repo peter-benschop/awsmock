@@ -35,7 +35,15 @@ namespace AwsMock::Worker {
     void SQSWorker::ResetMessages() {
         Database::Entity::SQS::QueueList queueList = _sqsDatabase->ListQueues(_region);
         for(const auto &q:queueList) {
-            //_sqsDatabase->ResetMessages(q.queueUrl, q.visibilityTimeout);
+
+            // Get the queue attributes
+            Database::Entity::SQS::QueueAttribute queueAttributes = _sqsDatabase->GetQueueAttributesByQueueUrl(q.queueUrl);
+
+            // Reset messages which have expired
+            _sqsDatabase->ResetMessages(q.queueUrl, queueAttributes.visibilityTimeout);
+
+            // Delete messages which are over the retention period
+            _sqsDatabase->ResetMessages(q.queueUrl, queueAttributes.visibilityTimeout);
         }
     }
 } // namespace AwsMock::Worker

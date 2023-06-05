@@ -82,9 +82,10 @@ namespace AwsMock::Database {
         poco_debug(_logger, "SQS queue table created");
 
         session
-            << "CREATE TABLE sqs_queue_attribute (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, queue_url VARCHAR(255), delay_seconds INT, max_message_size INT DEFAULT 262144, "
-               "message_retension_period INT DEFAULT 345600, policy TEXT, receive_message_wait_time INT DEFAULT 20, visibility_timeout INT DEFAULT 30, redrive_policy TEXT, "
-               "redrive_allow_policy TEXT, created DATETIME DEFAULT CURRENT_TIMESTAMP, modified DATETIME DEFAULT CURRENT_TIMESTAMP)",
+            << "CREATE TABLE sqs_queue_attribute (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, queue_url VARCHAR(255), delay_seconds INT, "
+               "max_message_size INT DEFAULT 262144, message_retention_period INT DEFAULT 345600, policy TEXT, redrive_policy TEXT, redrive_allow_policy TEXT, "
+               "receive_message_wait_time INT DEFAULT 20, visibility_timeout INT DEFAULT 30, created DATETIME DEFAULT CURRENT_TIMESTAMP, "
+               "modified DATETIME DEFAULT CURRENT_TIMESTAMP)",
             Poco::Data::Keywords::now;
         session << "CREATE UNIQUE INDEX sqs_queue_attribute_idx1 ON sqs_queue_attribute(queue_url)", Poco::Data::Keywords::now;
         poco_debug(_logger, "SQS queue attribute table created");

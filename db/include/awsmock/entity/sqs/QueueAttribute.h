@@ -40,9 +40,9 @@ namespace AwsMock::Database::Entity::SQS {
       int maxMessageSize = 262144;
 
       /**
-       * Max retension period (4d)
+       * Max retention period (4d)
        */
-      int messageRetensionPeriod = 345600;
+      int messageRetentionPeriod = 345600;
 
       /**
        * Policy
@@ -59,7 +59,7 @@ namespace AwsMock::Database::Entity::SQS {
       /**
        * Visibility timeout
        */
-      int visibilityTimeout = 20;
+      int visibilityTimeout = 30;
 
       /**
        * Redrive policy
@@ -103,7 +103,7 @@ namespace AwsMock::Database::Entity::SQS {
        */
       friend std::ostream &operator<<(std::ostream &os, const QueueAttribute &r) {
           os << "QueueAttribute={id='" + std::to_string(r.id) + "' queueUrl='" + r.queueUrl + "' delaySeconds='" + std::to_string(r.delaySeconds) +
-              "' maxMessageSize='" + std::to_string(r.maxMessageSize) + "' messageRetensionPeriod='" + std::to_string(r.messageRetensionPeriod) +
+              "' maxMessageSize='" + std::to_string(r.maxMessageSize) + "' messageRetentionPeriod='" + std::to_string(r.messageRetentionPeriod) +
               "' policy='" + r.policy + "' receiveMessageWaitTime='" + std::to_string(r.receiveMessageWaitTime) + "' visibilityTimeout='"
               + std::to_string(r.visibilityTimeout) + "' redrivePolicy='" + r.redrivePolicy + "' redriveAllowPolicy='" + r.redriveAllowPolicy +
               "' created='" + Poco::DateTimeFormatter().format(r.created, Poco::DateTimeFormat::HTTP_FORMAT) +
