@@ -71,6 +71,15 @@ namespace AwsMock::Database {
       Entity::S3::Bucket GetBucketById(long id);
 
       /**
+       * Returns the bucket by region and name.
+       *
+       * @param region AWS region
+       * @param name bucket name
+       * @return bucket entity
+       */
+      Entity::S3::Bucket GetBucketByRegionName(const std::string &region, const std::string &name);
+
+      /**
        * Create a new bucket in the S3 bucket table
        *
        * @param bucket bucket entity

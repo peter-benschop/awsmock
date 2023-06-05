@@ -127,7 +127,7 @@ namespace AwsMock::Resource {
 
       /**
        * @param payload The string containing the Json data.
-       * @return Only part of the payload with attributes in Poco Json Object format.
+       * @return Only part of the payload with sqs in Poco Json Object format.
        */
       static Poco::JSON::Object::Ptr getJsonAttributesSectionObject(const std::string &);
 

@@ -132,7 +132,7 @@ namespace AwsMock {
        *
        * @param body HTTP message body
        * @param parameter parameter name
-       * @return number of attributes
+       * @return number of sqs
        */
       int GetAttributeCount(const std::string &body, const std::string &parameter);
 

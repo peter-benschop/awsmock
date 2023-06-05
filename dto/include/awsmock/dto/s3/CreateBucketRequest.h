@@ -17,44 +17,7 @@
 
 namespace AwsMock::Dto::S3 {
 
-    class CreateBucketRequest {
-
-    public:
-
-      /**
-       * Constructor
-       */
-      CreateBucketRequest() = default;
-
-      /**
-       * Constructor
-       *
-       * @param xmlString HTTP request payload
-       */
-      explicit CreateBucketRequest(const std::string &xmlString);
-
-      /**
-       * Convert from XML representation
-       *
-       * @param xmlString XML string
-       */
-      void FromXml(const std::string &xmlString);
-
-      /**
-       * Returns the location
-       *
-       * @return location name
-       */
-      [[nodiscard]] std::string GetLocationConstraint() const { return _locationConstraint; }
-
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
-
-    private:
+    struct CreateBucketRequest {
 
       /**
        * Bucket location
@@ -62,11 +25,49 @@ namespace AwsMock::Dto::S3 {
       std::string _locationConstraint;
 
       /**
+       * Constructor
+       *
+       * @param xmlString XML string
+       */
+      CreateBucketRequest(const std::string &xmlString) {
+          FromXml(xmlString);
+      }
+
+      /**
+       * Convert from XML representation
+       *
+       * @param xmlString XML string
+       */
+      void FromXml(const std::string &xmlString) {
+
+          Poco::XML::DOMParser parser;
+          Poco::AutoPtr<Poco::XML::Document> pDoc = parser.parseString(xmlString);
+
+          Poco::XML::Node *node = pDoc->getNodeByPath("/CreateBucketConfiguration/LocationConstraint");
+          _locationConstraint = node->innerText();
+      }
+
+      /**
+       * Converts the DTO to a string representation.
+       *
+       * @return DTO as string for logging.
+       */
+      [[nodiscard]] std::string ToString() const {
+          std::stringstream ss;
+          ss << (*this);
+          return ss.str();
+      }
+
+      /**
        * Stream provider.
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &, const CreateBucketRequest &);
+      friend std::ostream &operator<<(std::ostream &os, const CreateBucketRequest &r) {
+          os << "CreateBucketRequest={locationConstraint='" + r._locationConstraint + "'}";
+          return os;
+      }
+
     };
 
 } // namespace AwsMock::Dto::s3

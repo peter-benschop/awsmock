@@ -112,7 +112,7 @@ namespace AwsMock {
                 Dto::S3::PutObjectResponse putObjectResponse = _s3Service.PutObject(putObjectRequest, &request.stream());
 
                 Resource::HeaderMap headerMap;
-                headerMap.emplace_back("ETag", putObjectResponse.GetETag());
+                headerMap.emplace_back("ETag", putObjectResponse.etag);
 
                 SendOkResponse(response, {}, &headerMap);
 

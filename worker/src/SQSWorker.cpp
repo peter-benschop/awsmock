@@ -36,7 +36,7 @@ namespace AwsMock::Worker {
         Database::Entity::SQS::QueueList queueList = _sqsDatabase->ListQueues(_region);
         for(const auto &q:queueList) {
 
-            // Get the queue attributes
+            // Get the queue sqs
             Database::Entity::SQS::QueueAttribute queueAttributes = _sqsDatabase->GetQueueAttributesByQueueUrl(q.queueUrl);
 
             // Reset messages which have expired

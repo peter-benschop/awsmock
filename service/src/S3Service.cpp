@@ -34,7 +34,7 @@ namespace AwsMock::Service {
         Dto::S3::CreateBucketResponse createBucketResponse;
         try {
             // Get region
-            std::string region = s3Request.GetLocationConstraint();
+            std::string region = s3Request._locationConstraint;
 
             // Check existence
             if (_database->BucketExists({.region=region, .name=name})) {
@@ -232,8 +232,6 @@ namespace AwsMock::Service {
                 .contentType=request.contentType};
             object = _database->CreateObject(object);
 
-            response.SetETag(request.md5Sum);
-
             // Check notification
             if (_database->HasBucketNotification({.region=request.region, .bucket=request.bucket})) {
                 CheckNotifications(object, request.region, "s3:ObjectCreated:Put");
@@ -243,7 +241,7 @@ namespace AwsMock::Service {
             poco_error(_logger, "S3 put object failed, message: " + ex.message());
             throw Core::ServiceException(ex.message(), 500);
         }
-        return response;
+        return {.bucket=request.bucket, .key=request.key, .etag=request.md5Sum};
     }
 
     void S3Service::DeleteObject(const Dto::S3::DeleteObjectRequest &request) {
@@ -261,9 +259,11 @@ namespace AwsMock::Service {
 
             // Delete from database
             _database->DeleteObject({.bucket=request.bucket, .key=request.key});
+            poco_debug(_logger, "Database object deleted, key: " + request.key);
 
             // Delete file system object
             DeleteObject(request.bucket, request.key);
+            poco_debug(_logger, "File system object deleted, key: " + request.key);
 
             // Check notification
             if (_database->HasBucketNotification({.region=request.region, .bucket=request.bucket})) {
@@ -288,10 +288,12 @@ namespace AwsMock::Service {
 
             // Delete from database
             _database->DeleteObjects(request.bucket, request.keys);
+            poco_debug(_logger, "Database object deleted, count: " + std::to_string(request.keys.size()));
 
             // Delete file system objects
             for(const auto &key: request.keys) {
                 DeleteObject(request.bucket, key);
+                poco_debug(_logger, "File system object deleted: " + key);
             }
 
             // Check notification
@@ -397,7 +399,7 @@ namespace AwsMock::Service {
 
     void S3Service::DeleteObject(const std::string &bucket, const std::string &key) {
 
-        std::string filename = _dataDir + Poco::Path::separator() + "s3" + Poco::Path::separator() + bucket + Poco::Path::separator() + GetDirFromKey(key);
+        std::string filename = _dataDir + Poco::Path::separator() + "s3" + Poco::Path::separator() + bucket + Poco::Path::separator() + key;
         if(Core::FileUtils::FileExists(filename)) {
             Core::FileUtils::DeleteFile(filename);
         }

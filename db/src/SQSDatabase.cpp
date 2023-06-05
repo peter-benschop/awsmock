@@ -163,7 +163,7 @@ namespace AwsMock::Database {
                 into(result.created), into(result.modified), now;
             session.commit();
 
-            poco_trace(_logger, "Got queue attributes, " + result.ToString());
+            poco_trace(_logger, "Got queue sqs, " + result.ToString());
 
         } catch (Poco::Exception &exc) {
             poco_error(_logger, "Database exception: " + exc.message());
@@ -184,7 +184,7 @@ namespace AwsMock::Database {
                 into(result.created), into(result.modified),bind(queueUrl), now;
             session.commit();
 
-            poco_trace(_logger, "Got queue attributes, " + result.ToString());
+            poco_trace(_logger, "Got queue sqs, " + result.ToString());
 
         } catch (Poco::Exception &exc) {
             poco_error(_logger, "Database exception: " + exc.message());
@@ -196,10 +196,10 @@ namespace AwsMock::Database {
 
         try {
             Poco::Data::Session session = GetSession();
+            session.begin();
+            session << "DELETE FROM sqs_queue WHERE queue_url=?", bind(queue.queueUrl), now;
+            session.commit();
 
-            // Select database
-            Poco::Data::Statement stmt(session);
-            stmt << "DELETE FROM sqs_queue WHERE url=?", bind(queue.queueUrl), now;
             poco_trace(_logger, "Queue deleted, region: " + queue.region + " name: " + queue.name);
 
         } catch (Poco::Exception &exc) {

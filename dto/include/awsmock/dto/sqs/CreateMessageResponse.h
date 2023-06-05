@@ -56,7 +56,7 @@ namespace AwsMock::Dto::SQS {
       std::string md5Body;
 
       /**
-       * MD5 sum of attributes
+       * MD5 sum of sqs
        */
       std::string md5Attr;
 
@@ -88,7 +88,7 @@ namespace AwsMock::Dto::SQS {
           Poco::XML::AutoPtr<Poco::XML::Text> pMd5BodyText = pDoc->createTextNode(md5Body);
           pMd5Body->appendChild(pMd5BodyText);
 
-          // MD5 attributes
+          // MD5 sqs
           Poco::XML::AutoPtr<Poco::XML::Element> pMd5Attr = pDoc->createElement("MD5OfMessageAttributes");
           pSendMessageResult->appendChild(pMd5Attr);
           Poco::XML::AutoPtr<Poco::XML::Text> pMd5AttrText = pDoc->createTextNode(md5Attr);

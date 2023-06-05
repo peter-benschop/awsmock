@@ -17,44 +17,39 @@ awsmock sqs create-queue --queue-name=file-delivery2-dlqueue
 awsmock sqs create-queue --queue-name=file-delivery3-queue
 awsmock sqs create-queue --queue-name=file-delivery3-dlqueue
 
+#
+# Setup SQS queue attributes
+#
 awsmock sqs set-queue-attributes \
 --queue-url http://localstack:4567/000000000000/file-delivery1-queue \
---attributes '{
-    "RedrivePolicy": "{\"deadLetterTargetArn\":\"arn:aws:sqs:eu-central-1:000000000000:file-delivery1-dlqueue\",\"maxReceiveCount\":\"3\"}",
-    "MessageRetentionPeriod": "259200",
-    "VisibilityTimeout": "90"
-}'
+--attributes file://./sqs/file-delivery1-queue.json
 
 awsmock sqs set-queue-attributes \
 --queue-url http://localstack:4567/000000000000/file-delivery2-queue \
---attributes '{
-    "RedrivePolicy": "{\"deadLetterTargetArn\":\"arn:aws:sqs:eu-central-1:000000000000:file-delivery2-dlqueue\",\"maxReceiveCount\":\"3\"}",
-    "MessageRetentionPeriod": "259200",
-    "VisibilityTimeout": "90"
-}'
+--attributes file://./sqs/file-delivery3-queue.json
 
 awsmock sqs set-queue-attributes \
 --queue-url http://localstack:4567/000000000000/file-delivery3-queue \
---attributes '{
-    "RedrivePolicy": "{\"deadLetterTargetArn\":\"arn:aws:sqs:eu-central-1:000000000000:file-delivery3-dlqueue\",\"maxReceiveCount\":\"3\"}",
-    "MessageRetentionPeriod": "259200",
-    "VisibilityTimeout": "90"
-}'
+--attributes file://./sqs/file-delivery3-queue.json
 
-# Connect FTP-S3 bucket events to lambda function
+#
+# Setup S3 bucket notification events
+#
 awsmock s3api put-bucket-notification-configuration \
 --bucket file-delivery1 \
---notification-configuration file://./hook/file-delivery1-hook.json
+--notification-configuration file://./s3/file-delivery1-hook.json
 
 awsmock s3api put-bucket-notification-configuration \
 --bucket file-delivery2 \
---notification-configuration file://./hook/file-delivery2-hook.json
+--notification-configuration file://./s3/file-delivery2-hook.json
 
 awsmock s3api put-bucket-notification-configuration \
 --bucket file-delivery3 \
---notification-configuration file://./hook/file-delivery3-hook.json
+--notification-configuration file://./s3/file-delivery3-hook.json
 
+#
 # Put some objects
+#
 awsmock s3 cp ./0036089631545_ANNO_OBILD.jpg s3://file-delivery1
 awsmock s3 cp ./9781406379990_ANNO_OBILD.jpg s3://file-delivery1
 awsmock s3 cp ./0036089631545_ANNO_OBILD.jpg s3://file-delivery2/folder1/0036089631545_ANNO_OBILD.jpg

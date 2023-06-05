@@ -17,57 +17,44 @@
 
 namespace AwsMock::Dto::S3 {
 
-    class PutObjectResponse {
-
-    public:
+    struct PutObjectResponse {
 
       /**
-       * Constructor
+       * Bucket
        */
-      PutObjectResponse() = default;
+      std::string bucket;
 
-      void SetBucket(const std::string &bucket) { _bucket = bucket; }
+      /**
+       * Key
+       */
+      std::string key;
 
-      std::string GetBucket() { return _bucket; }
-
-      void SetKey(const std::string &key) { _key = key; }
-
-      std::string GetKey() { return _key; }
-
-      void SetETag(const std::string &etag) { _etag = etag; }
-
-      std::string GetETag() { return _etag; }
+      /**
+       * ETag
+       */
+      std::string etag;
 
       /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.
        */
-      [[nodiscard]] std::string ToString() const;
-
-    private:
-
-      /**
-       * Bucket
-       */
-      std::string _bucket;
-
-      /**
-       * Key
-       */
-      std::string _key;
-
-      /**
-       * ETag
-       */
-      std::string _etag;
+      [[nodiscard]] std::string ToString() const {
+            std::stringstream ss;
+            ss << (*this);
+            return ss.str();
+      }
 
       /**
        * Stream provider.
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &, const PutObjectResponse &);
+      friend std::ostream &operator<<(std::ostream &os, const PutObjectResponse &p) {
+            os << "PutObjectResponse={bucket='" + p.bucket + "' key='" + p.key + "' etag='" + p.etag + "''}";
+            return os;
+      }
+
     };
 
 } // namespace AwsMock::Dto::S3

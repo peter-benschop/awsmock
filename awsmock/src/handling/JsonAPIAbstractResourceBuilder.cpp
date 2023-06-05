@@ -17,7 +17,7 @@ namespace AwsMock {
             resourceBasic.insert("links", links);
 
         if (!attributes.empty())
-            resourceBasic.insert("attributes", attributes);
+            resourceBasic.insert("sqs", attributes);
 
         dataArrayRoot.emplace_back(resourceBasic);
 

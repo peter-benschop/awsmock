@@ -59,6 +59,31 @@ namespace AwsMock::Database::Entity::S3 {
        * Last modification date
        */
       Poco::DateTime modified;
+
+      /**
+       * Converts the DTO to a string representation.
+       *
+       * @return DTO as string for logging.
+       */
+      [[nodiscard]] std::string ToString() const {
+          std::stringstream ss;
+          ss << (*this);
+          return ss.str();
+      }
+
+      /**
+       * Stream provider.
+       *
+       * @return output stream
+       */
+      friend std::ostream &operator<<(std::ostream &os, const Object &o) {
+          os << "Object={id='" + std::to_string(o.id) + "' bucket='" + o.bucket + "' key='" + o.key + "' owner='" + o.owner + "' size='" + std::to_string(o.size) +
+              "' md5sum='" + o.md5sum + "' contentType='" + o.contentType + "' created='"
+              + Poco::DateTimeFormatter().format(o.created, Poco::DateTimeFormat::HTTP_FORMAT) +
+              "' modified='" + Poco::DateTimeFormatter().format(o.created, Poco::DateTimeFormat::HTTP_FORMAT) + "'}";
+          return os;
+      }
+
     };
 
     typedef struct Object Object;

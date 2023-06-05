@@ -78,6 +78,19 @@ namespace AwsMock::Service {
         EXPECT_EQ(attributes.visibilityTimeout, 30);
     }
 
+    TEST_F(SQSServiceTest, QueueDeleteTest) {
+
+        // arrange
+        Dto::SQS::CreateQueueRequest queueRequest = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+        Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
+        Dto::SQS::DeleteQueueRequest deleteRequest = {.queueUrl=QUEUE_URL};
+
+        // act
+        EXPECT_NO_THROW({ _service.DeleteQueue(deleteRequest);});
+
+        // assert
+    }
+
     TEST_F(SQSServiceTest, MessageCreateTest) {
 
         // arrange
