@@ -31,19 +31,14 @@ namespace AwsMock::Dto::SQS {
     struct CreateMessageResponse {
 
       /**
-       * Constructor
-       */
-      CreateMessageResponse(const Database::Entity::SQS::Message &message) :_message(message){}
-
-      /**
        * ID
        */
       long id;
 
       /**
-       * URL
+       * Queue URL
        */
-      std::string url;
+      std::string queueUrl;
 
       /**
        * Message ID
@@ -56,9 +51,14 @@ namespace AwsMock::Dto::SQS {
       std::string receiptHandle;
 
       /**
-       * Message entity
+       * MD5 sum of body
        */
-      Database::Entity::SQS::Message _message;
+      std::string md5Body;
+
+      /**
+       * MD5 sum of sqs
+       */
+      std::string md5Attr;
 
       /**
        * Convert to XML representation
@@ -79,19 +79,19 @@ namespace AwsMock::Dto::SQS {
           // MessageID
           Poco::XML::AutoPtr<Poco::XML::Element> pMessageId = pDoc->createElement("MessageId");
           pSendMessageResult->appendChild(pMessageId);
-          Poco::XML::AutoPtr<Poco::XML::Text> pMessageIdText = pDoc->createTextNode(_message.messageId);
+          Poco::XML::AutoPtr<Poco::XML::Text> pMessageIdText = pDoc->createTextNode(messageId);
           pMessageId->appendChild(pMessageIdText);
 
           // MD5 body
           Poco::XML::AutoPtr<Poco::XML::Element> pMd5Body = pDoc->createElement("MD5OfMessageBody");
           pSendMessageResult->appendChild(pMd5Body);
-          Poco::XML::AutoPtr<Poco::XML::Text> pMd5BodyText = pDoc->createTextNode(_message.md5Body);
+          Poco::XML::AutoPtr<Poco::XML::Text> pMd5BodyText = pDoc->createTextNode(md5Body);
           pMd5Body->appendChild(pMd5BodyText);
 
-          // MD5 attributes
+          // MD5 sqs
           Poco::XML::AutoPtr<Poco::XML::Element> pMd5Attr = pDoc->createElement("MD5OfMessageAttributes");
           pSendMessageResult->appendChild(pMd5Attr);
-          Poco::XML::AutoPtr<Poco::XML::Text> pMd5AttrText = pDoc->createTextNode(_message.md5Attr);
+          Poco::XML::AutoPtr<Poco::XML::Text> pMd5AttrText = pDoc->createTextNode(md5Attr);
           pMd5Attr->appendChild(pMd5AttrText);
 
           // Metadata
@@ -129,8 +129,8 @@ namespace AwsMock::Dto::SQS {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const CreateMessageResponse &r) {
-          os << "CreateMessageResponse={id='" + std::to_string(r.id) + "' url='"+ r.url + "' messageId='" + r.messageId + "' receiptHandle='" + r.receiptHandle +
-          "' md5body='"+r._message.md5Body + "' md5attr='" +r._message.md5Attr +"'}";
+          os << "CreateMessageResponse={id='" + std::to_string(r.id) + "' url='" + r.queueUrl + "' messageId='" + r.messageId + "' receiptHandle='" + r.receiptHandle +
+              "' md5body='" + r.md5Body + "' md5attr='" + r.md5Attr + "'}";
           return os;
       }
 

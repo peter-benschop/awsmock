@@ -19,7 +19,7 @@ namespace AwsMock::Database {
 
             Poco::Data::Session session = GetSession();
             session.begin();
-            session << "SELECT COUNT(*) FROM sqs_queue WHERE url=?", bind(queueUrl), into(count), now;
+            session << "SELECT COUNT(*) FROM sqs_queue WHERE queue_url=?", bind(queueUrl), into(count), now;
             session.close();
             poco_trace(_logger, "Queue exists: " + std::string(count > 0 ? "true" : "false"));
 
@@ -54,8 +54,8 @@ namespace AwsMock::Database {
         try {
             Poco::Data::Session session = GetSession();
             session.begin();
-            session << "INSERT INTO sqs_queue(region,name,owner,url) VALUES(?,?,?,?) returning id", bind(queue.region), bind(queue.name), bind(queue.owner),
-                bind(queue.url), into(id), now;
+            session << "INSERT INTO sqs_queue(region,name,owner,queue_url,queue_arn) VALUES(?,?,?,?,?) returning id",
+            bind(queue.region), bind(queue.name), bind(queue.owner), bind(queue.queueUrl), bind(queue.queueArn), into(id), now;
             session.commit();
 
             poco_trace(_logger, "Queue created, region: " + queue.region + " name: " + queue.name + " owner: " + queue.owner);
@@ -72,8 +72,8 @@ namespace AwsMock::Database {
         try {
             Poco::Data::Session session = GetSession();
             session.begin();
-            session << "SELECT id,region,name,owner,url,created,modified FROM sqs_queue WHERE id=?", bind(id), into(result.id), into(result.region), into(result.name),
-                into(result.owner), into(result.url), into(result.created), into(result.modified), now;
+            session << "SELECT id,region,name,owner,queue_url,queue_arn,created,modified FROM sqs_queue WHERE id=?", bind(id), into(result.id), into(result.region), into(result.name),
+                into(result.owner), into(result.queueUrl), into(result.queueArn), into(result.created), into(result.modified), now;
             session.commit();
 
             poco_trace(_logger, "Queue created, region: " + result.region + " name: " + result.name + " owner: " + result.owner);
@@ -94,8 +94,8 @@ namespace AwsMock::Database {
             Entity::SQS::QueueList queueList;
 
             Poco::Data::Statement stmt(session);
-            stmt << "SELECT id,name,region,url,visibility_timeout,created,modified FROM sqs_queue WHERE region=?",
-                bind(region), into(queue.id), into(queue.name), into(queue.region), into(queue.url), into(queue.visibilityTimeout), into(queue.created),
+            stmt << "SELECT id,name,region,queue_url,queue_arn,created,modified FROM sqs_queue WHERE region=?",
+                bind(region), into(queue.id), into(queue.name), into(queue.region), into(queue.queueUrl), into(queue.queueArn), into(queue.created),
                 into(queue.modified), range(0, 1);
 
             while (!stmt.done()) {
@@ -128,26 +128,98 @@ namespace AwsMock::Database {
         }
     }
 
+    Entity::SQS::QueueAttribute SQSDatabase::CreateQueueAttributes(const Entity::SQS::QueueAttribute &queueAttribute) {
+
+        int id = 0;
+        try {
+            Poco::Data::Session session = GetSession();
+            session.begin();
+            session << "INSERT INTO sqs_queue_attribute(queue_url,delay_seconds,max_message_size,message_retention_period,policy,redrive_policy,redrive_allow_policy,"
+                       "receive_message_wait_time,visibility_timeout) VALUES(?,?,?,?,?,?,?,?,?) returning id",
+                bind(queueAttribute.queueUrl), bind(queueAttribute.delaySeconds), bind(queueAttribute.maxMessageSize), bind(queueAttribute.messageRetentionPeriod),
+                bind(queueAttribute.policy), bind(queueAttribute.redrivePolicy), bind(queueAttribute.redriveAllowPolicy), bind(queueAttribute.receiveMessageWaitTime),
+                bind(queueAttribute.visibilityTimeout), into(id), now;
+            session.commit();
+
+            poco_trace(_logger, "Queue created, queueAttribute: " + queueAttribute.ToString());
+
+        } catch (Poco::Exception &exc) {
+            poco_error(_logger, "Database exception: " + exc.message());
+        }
+        return GetQueueAttributesById(id);
+    }
+
+    Entity::SQS::QueueAttribute SQSDatabase::GetQueueAttributesById(long id) {
+
+        Entity::SQS::QueueAttribute result;
+        try {
+            Poco::Data::Session session = GetSession();
+            session.begin();
+            session
+                << "SELECT id,queue_url,delay_seconds,max_message_size,message_retention_period,policy,redrive_policy,redrive_allow_policy,receive_message_wait_time,"
+                   "visibility_timeout,created,modified FROM sqs_queue_attribute WHERE id=?",
+                bind(id), into(result.id), into(result.queueUrl), into(result.delaySeconds), into(result.maxMessageSize), into(result.messageRetentionPeriod),
+                into(result.policy), into(result.redrivePolicy), into(result.redriveAllowPolicy), into(result.receiveMessageWaitTime), into(result.visibilityTimeout),
+                into(result.created), into(result.modified), now;
+            session.commit();
+
+            poco_trace(_logger, "Got queue sqs, " + result.ToString());
+
+        } catch (Poco::Exception &exc) {
+            poco_error(_logger, "Database exception: " + exc.message());
+        }
+        return result;
+    }
+
+    Entity::SQS::QueueAttribute SQSDatabase::GetQueueAttributesByQueueUrl(const std::string &queueUrl) {
+
+        Entity::SQS::QueueAttribute result;
+        try {
+            Poco::Data::Session session = GetSession();
+            session.begin();
+            session << "SELECT id,queue_url,delay_seconds,max_message_size,message_retention_period,policy,redrive_policy,redrive_allow_policy,receive_message_wait_time,"
+                       "visibility_timeout,created,modified FROM sqs_queue_attribute WHERE queue_url=?",
+                into(result.id), into(result.queueUrl), into(result.delaySeconds), into(result.maxMessageSize), into(result.messageRetentionPeriod),
+                into(result.policy), into(result.redrivePolicy), into(result.redriveAllowPolicy), into(result.receiveMessageWaitTime), into(result.visibilityTimeout),
+                into(result.created), into(result.modified),bind(queueUrl), now;
+            session.commit();
+
+            poco_trace(_logger, "Got queue sqs, " + result.ToString());
+
+        } catch (Poco::Exception &exc) {
+            poco_error(_logger, "Database exception: " + exc.message());
+        }
+        return result;
+    }
+
+    void SQSDatabase::DeleteQueue(const Entity::SQS::Queue &queue) {
+
+        try {
+            Poco::Data::Session session = GetSession();
+            session.begin();
+            session << "DELETE FROM sqs_queue WHERE queue_url=?", bind(queue.queueUrl), now;
+            session.commit();
+
+            poco_trace(_logger, "Queue deleted, region: " + queue.region + " name: " + queue.name);
+
+        } catch (Poco::Exception &exc) {
+            poco_error(_logger, "Database exception: " + exc.message());
+            throw Core::DatabaseException(exc.message(), 500);
+        }
+    }
+
     Entity::SQS::Message SQSDatabase::CreateMessage(const Entity::SQS::Message &message) {
 
+        long id = 0;
         Entity::SQS::Message result;
         try {
             Poco::Data::Session session = GetSession();
-
-            // Select database
-            int id = 0;
-            Poco::Data::Statement insert(session);
-            insert << "INSERT INTO sqs_message(queue_url,body,message_id,receipt_handle,status,retries,md5_body,md5_attr) VALUES(?,?,?,?,?,?,?,?) returning id",
+            session.begin();
+            session << "INSERT INTO sqs_message(queue_url,body,message_id,receipt_handle,status,retries,md5_body,md5_attr) VALUES(?,?,?,?,?,?,?,?) returning id",
                 bind(message.queueUrl), bind(message.body), bind(message.messageId), bind(message.receiptHandle), bind(message.status), bind(message.retries),
                 bind(message.md5Body), bind(message.md5Attr), into(id), now;
+            session.commit();
 
-            Poco::Data::Statement select(session);
-            select
-                << "SELECT id,queue_url,body,message_id,receipt_handle,status,retries,md5_body,md5_attr,created,modified FROM sqs_message WHERE id=?",
-                bind(id), into(result.id), into(result.queueUrl), into(result.body), into(result.messageId), into(result.receiptHandle), into(result.status),
-                into(result.retries), into(result.md5Body), into(result.md5Attr), into(result.created), into(result.modified), now;
-
-            session.close();
             poco_trace(_logger, "Message created, queue: " + result.queueUrl + " id: " + std::to_string(result.id));
 
         } catch (Poco::Exception &exc) {
@@ -155,7 +227,7 @@ namespace AwsMock::Database {
             throw Core::DatabaseException(exc.message(), 500);
         }
 
-        return result;
+        return GetMessageById(id);
     }
 
     Entity::SQS::Message SQSDatabase::GetMessageById(long id) {
@@ -163,14 +235,12 @@ namespace AwsMock::Database {
         Entity::SQS::Message result;
         try {
             Poco::Data::Session session = GetSession();
-
-            // Select database
-            Poco::Data::Statement select(session);
-            select << "SELECT id,queue_url,body,message_id,status,retries,md5_body,md5_attr,created,modified FROM sqs_message WHERE id=?", bind(id), into(result.id),
+            session.begin();
+            session << "SELECT id,queue_url,body,message_id,status,retries,md5_body,md5_attr,created,modified FROM sqs_message WHERE id=?", bind(id), into(result.id),
                 into(result.queueUrl), into(result.body), into(result.messageId), into(result.status), into(result.retries), into(result.md5Body), into(result.md5Attr),
                 into(result.created), into(result.modified), now;
-
             session.close();
+
             poco_trace(_logger, "Message selected, queue: " + result.queueUrl + " id: " + std::to_string(result.id));
 
         } catch (Poco::Exception &exc) {
@@ -246,22 +316,6 @@ namespace AwsMock::Database {
             session << "DELETE FROM sqs_message WHERE queue_url=? AND receipt_handle=?", bind(message.queueUrl), bind(message.receiptHandle), now;
             session.commit();
             poco_trace(_logger, "Message deleted, queue: " + std::to_string(message.id));
-
-        } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
-            throw Core::DatabaseException(exc.message(), 500);
-        }
-    }
-
-    void SQSDatabase::DeleteQueue(const Entity::SQS::Queue &queue) {
-
-        try {
-            Poco::Data::Session session = GetSession();
-
-            // Select database
-            Poco::Data::Statement stmt(session);
-            stmt << "DELETE FROM sqs_queue WHERE url=?", bind(queue.url), now;
-            poco_trace(_logger, "Queue deleted, region: " + queue.region + " name: " + queue.name);
 
         } catch (Poco::Exception &exc) {
             poco_error(_logger, "Database exception: " + exc.message());

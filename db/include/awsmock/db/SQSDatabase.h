@@ -23,8 +23,10 @@
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/db/Database.h>
-#include <awsmock/entity/sqs/Queue.h>
 #include <awsmock/entity/sqs/Message.h>
+#include <awsmock/entity/sqs/MessageAttribute.h>
+#include <awsmock/entity/sqs/Queue.h>
+#include <awsmock/entity/sqs/QueueAttribute.h>
 
 namespace AwsMock::Database {
 
@@ -94,6 +96,41 @@ namespace AwsMock::Database {
       void PurgeQueue(const std::string &region, const std::string &queueUrl);
 
       /**
+       * Create a new queue attribute
+       *
+       * @param queueAttribute queue attribute entity
+       * @return created SQS queue attribute entity
+       * @throws DatabaseException
+       */
+      Entity::SQS::QueueAttribute CreateQueueAttributes(const Entity::SQS::QueueAttribute& queueAttribute);
+
+      /**
+       * Returns a queue attribute by primary key
+       *
+       * @param id queue ID
+       * @return queue attribute entity
+       * @throws DatabaseException
+       */
+      Entity::SQS::QueueAttribute GetQueueAttributesById(long id);
+
+      /**
+       * Returns a queue attribute by queue URL
+       *
+       * @param queueUrl queue URL
+       * @return queue attribute entity
+       * @throws DatabaseException
+       */
+      Entity::SQS::QueueAttribute GetQueueAttributesByQueueUrl(const std::string &queueUrl);
+
+      /**
+       * Delete a queue.
+       *
+       * @param queue queue entity
+       * @throws DatabaseException
+       */
+      void DeleteQueue(const Entity::SQS::Queue &queue);
+
+      /**
        * Creates a new message in the SQS message table
        *
        * @param message SQS message entity
@@ -128,14 +165,6 @@ namespace AwsMock::Database {
        * @param visibility visibility period in seconds
        */
       [[maybe_unused]] void ResetMessages(const std::string& queueUrl, long visibility);
-
-      /**
-       * Delete a queue.
-       *
-       * @param queue queue entity
-       * @throws DatabaseException
-       */
-      void DeleteQueue(const Entity::SQS::Queue &queue);
 
       /**
        * Deletes a message.

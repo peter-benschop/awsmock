@@ -77,9 +77,9 @@ namespace AwsMock::Service {
       Dto::SQS::PurgeQueueResponse PurgeQueue(const Dto::SQS::PurgeQueueRequest &request);
 
       /**
-       * PUt queue attributes
+       * PUt queue sqs
        *
-       * @param request put queue attributes request
+       * @param request put queue sqs request
        * @return PutQueueAttributesResponse
        * @throws ServiceException
        */

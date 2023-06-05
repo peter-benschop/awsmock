@@ -8,9 +8,6 @@
 // GTest includes
 #include <gtest/gtest.h>
 
-// Poco includes
-#include "Poco/Path.h"
-
 // Local includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/db/S3Database.h>
@@ -90,6 +87,19 @@ namespace AwsMock::Database {
 
         // act
         Entity::S3::Bucket result = _database.GetBucketById(bucket.id);
+
+        // assert
+        EXPECT_EQ(result.id, bucket.id);
+    }
+
+    TEST_F(S3DatabaseTest, BucketGetByRegionNameTest) {
+
+        // arrange
+        Entity::S3::Bucket bucket = {.region=REGION, .name=BUCKET, .owner=OWNER};
+        bucket = _database.CreateBucket(bucket);
+
+        // act
+        Entity::S3::Bucket result = _database.GetBucketByRegionName(REGION, BUCKET);
 
         // assert
         EXPECT_EQ(result.id, bucket.id);

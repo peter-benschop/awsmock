@@ -37,14 +37,14 @@ namespace AwsMock::Database::Entity::SQS {
       std::string owner;
 
       /**
-       * URL
+       * Queue URL
        */
-      std::string url;
+      std::string queueUrl;
 
       /**
-       * Visibility timeout
+       * Queue ARN
        */
-      int visibilityTimeout;
+      std::string queueArn;
 
       /**
        * Creation date
@@ -55,6 +55,30 @@ namespace AwsMock::Database::Entity::SQS {
        * Last modification date
        */
       Poco::DateTime modified;
+
+      /**
+       * Converts the DTO to a string representation.
+       *
+       * @return DTO as string for logging.
+       */
+      [[nodiscard]] std::string ToString() const {
+          std::stringstream ss;
+          ss << (*this);
+          return ss.str();
+      }
+
+      /**
+       * Stream provider.
+       *
+       * @return output stream
+       */
+      friend std::ostream &operator<<(std::ostream &os, const Queue &q) {
+          os << "Queue={id='" + std::to_string(q.id) + "' region='" + q.region + "' name='" + q.name + "' owner='" + q.owner + "' queueUrl='" + q.queueUrl +
+          "' queueArn='" + q.queueArn + "' created='" + Poco::DateTimeFormatter().format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) +
+              "' modified='" + Poco::DateTimeFormatter().format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) + "'}";
+          return os;
+      }
+
     };
 
     typedef struct Queue Queue;

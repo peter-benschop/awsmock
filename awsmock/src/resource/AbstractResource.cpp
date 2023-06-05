@@ -166,14 +166,14 @@ namespace AwsMock::Resource {
         //
         Poco::JSON::Object::Ptr dataObject = jsonObject->getObject("data");
 
-        if (!dataObject->has("attributes")) {
+        if (!dataObject->has("sqs")) {
             throw HandlerException(Poco::Net::HTTPResponse::HTTP_REASON_BAD_REQUEST,
-                                   "The payload has no an 'attributes' section.",
+                                   "The payload has no an 'sqs' section.",
                                    Poco::Net::HTTPResponse::HTTP_BAD_REQUEST
             );
         }
 
-        return dataObject->getObject("attributes");
+        return dataObject->getObject("sqs");
 
     }
 
@@ -185,7 +185,7 @@ namespace AwsMock::Resource {
             if (!payloadObject->has(attribute)) {
                 throw HandlerException(
                     Poco::Net::HTTPResponse::HTTP_REASON_BAD_REQUEST,
-                    "One or more attributes are is missing at the payload.",
+                    "One or more sqs are is missing at the payload.",
                     Poco::Net::HTTPResponse::HTTP_BAD_REQUEST
                 );
             }
@@ -311,7 +311,7 @@ namespace AwsMock::Resource {
                 return {};
             } else {
                 throw HandlerException(Poco::Net::HTTPResponse::HTTP_REASON_BAD_REQUEST,
-                                       "Attribute '" + parameterKey + "' is missing at URL.",
+                                       "MessageAttribute '" + parameterKey + "' is missing at URL.",
                                        Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
             }
         }

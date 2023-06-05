@@ -55,6 +55,29 @@ namespace AwsMock::Database::Entity::S3 {
        */
       Poco::DateTime modified;
 
+      /**
+       * Converts the DTO to a string representation.
+       *
+       * @return DTO as string for logging.
+       */
+      [[nodiscard]] std::string ToString() const {
+          std::stringstream ss;
+          ss << (*this);
+          return ss.str();
+      }
+
+      /**
+       * Stream provider.
+       *
+       * @return output stream
+       */
+      friend std::ostream &operator<<(std::ostream &os, const BucketNotification &q) {
+          os << "BucketNotification={id='" + std::to_string(q.id) + "' region='" + q.region + "' notificationId='" + std::to_string(q.notificationId) +
+              "' function='" + q.function + "' event='" + q.event + "' created='" + Poco::DateTimeFormatter().format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) +
+              "' modified='" + Poco::DateTimeFormatter().format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) + "'}";
+          return os;
+      }
+
     };
 
     typedef struct BucketNotification BucketNotification;

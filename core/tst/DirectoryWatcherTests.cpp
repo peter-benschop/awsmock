@@ -27,7 +27,7 @@
 #include <awsmock/core/DirectoryWatcher.h>
 #include <awsmock/core/FileUtils.h>
 
-#define TEST_DIR "/tmp/awsmock/data/s3"
+#define TEST_DIR "/tmp/s3"
 
 namespace AwsMock::Core {
 
@@ -35,14 +35,16 @@ namespace AwsMock::Core {
 
     protected:
       void SetUp() override {
-          watcher->itemAdded += Poco::delegate(this, &DirectoryWatcherTest::OnFileAdded);
-          watcher->itemModified += Poco::delegate(this, &DirectoryWatcherTest::OnFileModified);
-          watcher->itemDeleted += Poco::delegate(this, &DirectoryWatcherTest::OnFileDeleted);
+          tempDir = DirUtils::CreateTempDir("/tmp");
+          _watcher= new DirectoryWatcher(tempDir);
+          _watcher->itemAdded += Poco::delegate(this, &DirectoryWatcherTest::OnFileAdded);
+          _watcher->itemModified += Poco::delegate(this, &DirectoryWatcherTest::OnFileModified);
+          _watcher->itemDeleted += Poco::delegate(this, &DirectoryWatcherTest::OnFileDeleted);
       }
 
       void TearDown() override {
           Poco::ThreadPool::defaultPool().stopAll();
-          FileUtils::DeleteFile(tempFile);
+          DirUtils::DeleteDirectory(tempDir, true);
           added = 0;
           deleted = 0;
           modified = 0;
@@ -55,29 +57,29 @@ namespace AwsMock::Core {
           thread.wakeUp();
       }
 
-      void OnFileModified(const DirectoryEvent &addedEvent) {
+      void OnFileModified(const DirectoryEvent &modifiedEvent) {
           modified++;
           thread.wakeUp();
       }
 
-      void OnFileDeleted(const DirectoryEvent &addedEvent) {
+      void OnFileDeleted(const DirectoryEvent &deletedEvent) {
           deleted++;
           thread.wakeUp();
       }
 
       int added = 0, deleted = 0, modified = 0;
-      DirectoryWatcher *watcher = new DirectoryWatcher(TEST_DIR);
-      std::string tempFile;
+      DirectoryWatcher *_watcher;
+      std::string tempFile, tempDir;
       Poco::Thread thread;
     };
 
     TEST_F(DirectoryWatcherTest, FileAddedTest) {
 
         // arrange
-        thread.start(*watcher);
+        thread.start(*_watcher);
 
         // act
-        tempFile = Core::FileUtils::CreateTempFile(TEST_DIR, "txt", 10);
+        tempFile = Core::FileUtils::CreateTempFile(tempDir, "txt", 10);
 
         // assert
         while (added == 0) {
@@ -89,10 +91,10 @@ namespace AwsMock::Core {
     TEST_F(DirectoryWatcherTest, FileModifiedTest) {
 
         // arrange
-        thread.start(*watcher);
+        thread.start(*_watcher);
 
         // act
-        tempFile = Core::FileUtils::CreateTempFile(TEST_DIR, "txt", 10);
+        tempFile = Core::FileUtils::CreateTempFile(tempDir, "txt", 10);
         std::ofstream ofs(tempFile, std::ios::app);
         ofs << "Test";
 
@@ -106,8 +108,8 @@ namespace AwsMock::Core {
     TEST_F(DirectoryWatcherTest, FileDeletedTest) {
 
         // arrange
-        thread.start(*watcher);
-        tempFile = Core::FileUtils::CreateTempFile(TEST_DIR, "txt", 10);
+        thread.start(*_watcher);
+        tempFile = Core::FileUtils::CreateTempFile(tempDir, "txt", 10);
 
         // act
         Core::FileUtils::DeleteFile(tempFile);
@@ -122,10 +124,10 @@ namespace AwsMock::Core {
     TEST_F(DirectoryWatcherTest, DirectoryAddedTest) {
 
         // arrange
-        thread.start(*watcher);
+        thread.start(*_watcher);
 
         // act
-        Core::DirUtils::MakeDirectory(std::string(TEST_DIR) + "/tmp");
+        Core::DirUtils::MakeDirectory(std::string(tempDir) + "/tmptest");
 
         // assert
         while (added == 0) {

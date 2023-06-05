@@ -42,9 +42,9 @@ namespace AwsMock::Dto::SQS {
       std::string owner;
 
       /**
-       * URL
+       * Queue URL
        */
-      std::string url;
+      std::string queueUrl;
 
       /**
        * Convert to XML representation
@@ -64,7 +64,7 @@ namespace AwsMock::Dto::SQS {
 
           Poco::XML::AutoPtr<Poco::XML::Element> pQueueUrl = pDoc->createElement("QueueUrl");
           pListQueueResult->appendChild(pQueueUrl);
-          Poco::XML::AutoPtr<Poco::XML::Text> pQueueUrlText = pDoc->createTextNode(url);
+          Poco::XML::AutoPtr<Poco::XML::Text> pQueueUrlText = pDoc->createTextNode(queueUrl);
           pQueueUrl->appendChild(pQueueUrlText);
 
           // Metadata
@@ -102,7 +102,7 @@ namespace AwsMock::Dto::SQS {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const CreateQueueResponse &r) {
-          os << "CreateQueueResponse={region='" + r.region + "' name='" + r.name + "' owner='" + r.owner + "' url='" + r.url + "'}";
+          os << "CreateQueueResponse={region='" + r.region + "' name='" + r.name + "' owner='" + r.owner + "' url='" + r.queueUrl + "'}";
           return os;
       }
 

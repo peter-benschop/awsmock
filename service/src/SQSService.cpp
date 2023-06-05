@@ -31,13 +31,19 @@ namespace AwsMock::Service {
             }
 
             // Update database
-            queue = _database->CreateQueue({.region=request.region, .name=request.name, .owner=request.owner, .url=request.url});
+            queue = _database->CreateQueue({.region=request.region, .name=request.name, .owner=request.owner, .queueUrl=request.queueUrl});
+            poco_trace(_logger, "SQS queue created: " + queue.ToString());
+
+            // Create queue sqs with default values
+            Database::Entity::SQS::QueueAttribute queueAttribute = {.queueUrl=queue.queueUrl};
+            queueAttribute = _database->CreateQueueAttributes(queueAttribute);
+            poco_trace(_logger, "SQS queue default sqs created: " + queueAttribute.ToString());
 
         } catch (Poco::Exception &exc) {
             poco_error(_logger, "SQS create queue failed, message: " + exc.message());
             throw Core::ServiceException(exc.message(), 500);
         }
-        return {.region=queue.region, .name=queue.name, .owner=queue.owner, .url=queue.url};
+        return {.region=queue.region, .name=queue.name, .owner=queue.owner, .queueUrl=queue.queueUrl};
     }
 
     Dto::SQS::ListQueueResponse SQSService::ListQueues(const std::string &region) {
@@ -78,7 +84,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::PutQueueAttributesResponse SQSService::PutQueueAttributes(const Dto::SQS::PutQueueAttributesRequest &request) {
-        poco_trace(_logger, "Put queue attributes request, request: " + request.ToString());
+        poco_trace(_logger, "Put queue sqs request, request: " + request.ToString());
         Dto::SQS::PutQueueAttributesResponse response;
         return response;
     }
@@ -94,7 +100,7 @@ namespace AwsMock::Service {
             }
 
             // Update database
-            _database->DeleteQueue({.url=request.queueUrl});
+            _database->DeleteQueue({.queueUrl=request.queueUrl});
 
         } catch (Poco::Exception &ex) {
             poco_error(_logger, "SQS delete queue failed, message: " + ex.message());
@@ -124,7 +130,7 @@ namespace AwsMock::Service {
             poco_error(_logger, "SQS create message failed, message: " + ex.message());
             throw Core::ServiceException(ex.message(), 500);
         }
-        return {message};
+        return {.id=message.id, .queueUrl=message.queueUrl, .messageId=message.messageId, .receiptHandle=message.receiptHandle, .md5Body=message.md5Body, .md5Attr=message.md5Attr};
     }
 
     Dto::SQS::ReceiveMessageResponse SQSService::ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request) {
