@@ -2,8 +2,8 @@
 // Created by vogje01 on 01/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_SQS_QUEUE_H
-#define AWSMOCK_DB_ENTITY_SQS_QUEUE_H
+#ifndef AWSMOCK_DB_ENTITY_SQS_MESSAGEATTRIBUTE_H
+#define AWSMOCK_DB_ENTITY_SQS_MESSAGEATTRIBUTE_H
 
 // C++ includes
 #include <string>
@@ -14,7 +14,7 @@
 
 namespace AwsMock::Database::Entity::SQS {
 
-    struct Queue {
+    struct MessageAttribute {
 
       /**
        * ID
@@ -22,24 +22,14 @@ namespace AwsMock::Database::Entity::SQS {
       long id = 0;
 
       /**
-       * AWS region
-       */
-      std::string region;
-
-      /**
-       * Queue name
+       * MessageAttribute name
        */
       std::string name;
 
       /**
-       * Owner
+       * MessageAttribute value
        */
-      std::string owner;
-
-      /**
-       * Queue URL
-       */
-      std::string queueUrl;
+      std::string value;
 
       /**
        * Creation date
@@ -67,17 +57,18 @@ namespace AwsMock::Database::Entity::SQS {
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const Queue &q) {
-          os << "Queue={id='" + std::to_string(q.id) + "' region='" + q.region + "' name='" + q.name + "' owner='" + q.owner + "' queueUrl='" + q.queueUrl +
-          "' messageRetensionPeriod='" + "' created='" + Poco::DateTimeFormatter().format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) +
-              "' modified='" + Poco::DateTimeFormatter().format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) + "'}";
+      friend std::ostream &operator<<(std::ostream &os, const MessageAttribute &m) {
+          os << "MessageAttribute={id='" + std::to_string(m.id) + "' name='" + m.name + "'value='" + m.value +
+              "' created='" + Poco::DateTimeFormatter().format(m.created, Poco::DateTimeFormat::HTTP_FORMAT) +
+              "' modified='" + Poco::DateTimeFormatter().format(m.created, Poco::DateTimeFormat::HTTP_FORMAT) + "'}";
           return os;
       }
 
     };
 
-    typedef struct Queue Queue;
-    typedef std::vector<Queue> QueueList;
+    typedef struct MessageAttribute MessageAttribute;
+    typedef std::vector<MessageAttribute> MessageAttributeList;
 
 } // namespace AwsMock::Database::Entity::S3
-#endif // AWSMOCK_DB_ENTITY_SQS_QUEUE_H
+
+#endif // AWSMOCK_DB_ENTITY_SQS_MESSAGEATTRIBUTE_H

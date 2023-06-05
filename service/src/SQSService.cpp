@@ -37,7 +37,7 @@ namespace AwsMock::Service {
             poco_error(_logger, "SQS create queue failed, message: " + exc.message());
             throw Core::ServiceException(exc.message(), 500);
         }
-        return {.region=queue.region, .name=queue.name, .owner=queue.owner, .url=queue.url};
+        return {.region=queue.region, .name=queue.name, .owner=queue.owner, .url=queue.queueUrl};
     }
 
     Dto::SQS::ListQueueResponse SQSService::ListQueues(const std::string &region) {

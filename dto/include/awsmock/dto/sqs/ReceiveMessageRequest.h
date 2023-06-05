@@ -52,7 +52,7 @@ namespace AwsMock::Dto::SQS {
       int waitTimeSeconds = 1;
 
       /**
-       * Attribute names
+       * MessageAttribute names
        */
       std::vector<std::string> AttributeName = {"All"};
 

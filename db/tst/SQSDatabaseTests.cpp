@@ -63,7 +63,7 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, QueueCreateTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .url=QUEUE_URL};
+        Entity::SQS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
 
         // act
         Entity::SQS::Queue result = _database.CreateQueue(queue);
@@ -76,7 +76,7 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, QueueListTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .url=QUEUE_URL};
+        Entity::SQS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
         queue = _database.CreateQueue(queue);
 
         // act
@@ -89,7 +89,7 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, MessageCreateTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .url=QUEUE_URL};
+        Entity::SQS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
         queue = _database.CreateQueue(queue);
         Entity::SQS::Message message = {.queueUrl=queue.name, .body=BODY,};
 

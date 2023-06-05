@@ -311,7 +311,7 @@ namespace AwsMock::Resource {
                 return {};
             } else {
                 throw HandlerException(Poco::Net::HTTPResponse::HTTP_REASON_BAD_REQUEST,
-                                       "Attribute '" + parameterKey + "' is missing at URL.",
+                                       "MessageAttribute '" + parameterKey + "' is missing at URL.",
                                        Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
             }
         }

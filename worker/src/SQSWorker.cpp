@@ -35,7 +35,7 @@ namespace AwsMock::Worker {
     void SQSWorker::ResetMessages() {
         Database::Entity::SQS::QueueList queueList = _sqsDatabase->ListQueues(_region);
         for(const auto &q:queueList) {
-            _sqsDatabase->ResetMessages(q.url, q.visibilityTimeout);
+            _sqsDatabase->ResetMessages(q.queueUrl, q.visibilityTimeout);
         }
     }
 } // namespace AwsMock::Worker

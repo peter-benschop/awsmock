@@ -13,7 +13,7 @@
 #include <Poco/DateTime.h>
 
 // AwsMock includes
-#include "Attribute.h"
+#include "MessageAttribute.h"
 
 namespace AwsMock::Database::Entity::SQS {
 
@@ -74,7 +74,7 @@ namespace AwsMock::Database::Entity::SQS {
       /**
        * List of attributes
        */
-      AttributeList attributeList;
+      MessageAttributeList attributeList;
 
       /**
        * Creation date
@@ -108,6 +108,7 @@ namespace AwsMock::Database::Entity::SQS {
               "' messageId='" + m.messageId + "' receiptHandle='" + m.receiptHandle + "' md5body='" + m.md5Body + "' md5Attr='" + m.md5Attr + "'}";
           return os;
       }
+
     };
 
     typedef struct Message Message;

@@ -55,7 +55,7 @@ namespace AwsMock::Database {
             Poco::Data::Session session = GetSession();
             session.begin();
             session << "INSERT INTO sqs_queue(region,name,owner,url) VALUES(?,?,?,?) returning id", bind(queue.region), bind(queue.name), bind(queue.owner),
-                bind(queue.url), into(id), now;
+                bind(queue.queueUrl), into(id), now;
             session.commit();
 
             poco_trace(_logger, "Queue created, region: " + queue.region + " name: " + queue.name + " owner: " + queue.owner);
@@ -73,7 +73,7 @@ namespace AwsMock::Database {
             Poco::Data::Session session = GetSession();
             session.begin();
             session << "SELECT id,region,name,owner,url,created,modified FROM sqs_queue WHERE id=?", bind(id), into(result.id), into(result.region), into(result.name),
-                into(result.owner), into(result.url), into(result.created), into(result.modified), now;
+                into(result.owner), into(result.queueUrl), into(result.created), into(result.modified), now;
             session.commit();
 
             poco_trace(_logger, "Queue created, region: " + result.region + " name: " + result.name + " owner: " + result.owner);
@@ -95,7 +95,7 @@ namespace AwsMock::Database {
 
             Poco::Data::Statement stmt(session);
             stmt << "SELECT id,name,region,url,visibility_timeout,created,modified FROM sqs_queue WHERE region=?",
-                bind(region), into(queue.id), into(queue.name), into(queue.region), into(queue.url), into(queue.visibilityTimeout), into(queue.created),
+                bind(region), into(queue.id), into(queue.name), into(queue.region), into(queue.queueUrl), into(queue.visibilityTimeout), into(queue.created),
                 into(queue.modified), range(0, 1);
 
             while (!stmt.done()) {
@@ -260,7 +260,7 @@ namespace AwsMock::Database {
 
             // Select database
             Poco::Data::Statement stmt(session);
-            stmt << "DELETE FROM sqs_queue WHERE url=?", bind(queue.url), now;
+            stmt << "DELETE FROM sqs_queue WHERE url=?", bind(queue.queueUrl), now;
             poco_trace(_logger, "Queue deleted, region: " + queue.region + " name: " + queue.name);
 
         } catch (Poco::Exception &exc) {

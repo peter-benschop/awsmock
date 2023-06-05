@@ -91,13 +91,13 @@ namespace AwsMock {
 
                 std::string queueUrl = GetStringParameter(payload, "QueueUrl");
 
-                int count = GetAttributeCount(payload, "Attribute");
+                int count = GetAttributeCount(payload, "MessageAttribute");
                 poco_trace(_logger, "Got attribute count, count: " + std::to_string(count));
 
                 AttributeList attributes;
                 for(int i = 1; i <= count; i++) {
-                    std::string attributeName = GetStringParameter(payload, "Attribute." + std::to_string(i) + ".Name");
-                    std::string attributeValue = GetStringParameter(payload, "Attribute." + std::to_string(i) + ".Value");
+                    std::string attributeName = GetStringParameter(payload, "MessageAttribute." + std::to_string(i) + ".Name");
+                    std::string attributeValue = GetStringParameter(payload, "MessageAttribute." + std::to_string(i) + ".Value");
                     attributes.emplace_back(attributeName, attributeValue);
                 }
 
