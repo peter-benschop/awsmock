@@ -2,8 +2,8 @@
 set(LIBRARY awsmocksrv)
 set(LIBRARY_STATIC awsmocksrv_static)
 
-set(SOURCES src/S3Service.cpp src/SQSService.cpp)
-set(HEADERS include/awsmock/service/S3Service.h include/awsmock/service/SQSService.h)
+set(SOURCES src/S3Service.cpp src/SQSService.cpp src/LambdaService.cpp)
+#set(HEADERS include/awsmock/service/S3Service.h include/awsmock/service/SQSService.h)
 
 # Test directory
 add_subdirectory(tst)

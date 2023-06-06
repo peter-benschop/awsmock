@@ -10,8 +10,6 @@
 #include "Poco/DateTime.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTimeFormatter.h"
-#include "Poco/Net/MediaType.h"
-#include "Poco/JSON/Parser.h"
 
 // AwsMock includes
 #include "awsmock/core/Configuration.h"
@@ -20,16 +18,7 @@
 #include "awsmock/core/MetricDefinition.h"
 #include "awsmock/resource/HandlerException.h"
 #include "awsmock/resource/AbstractResource.h"
-#include "awsmock/service/S3Service.h"
-#include "awsmock/dto/s3/CreateBucketRequest.h"
-#include "awsmock/dto/s3/CompleteMultipartUploadResult.h"
-#include "awsmock/dto/s3/DeleteObjectsRequest.h"
-#include "awsmock/dto/s3/DeleteObjectsResponse.h"
-#include "awsmock/dto/s3/InitiateMultipartUploadResult.h"
-#include "awsmock/dto/s3/ListBucketResult.h"
-#include "awsmock/dto/s3/ListAllBucketResponse.h"
-#include "awsmock/dto/s3/PutObjectRequest.h"
-#include "awsmock/dto/s3/PutBucketNotificationRequest.h"
+#include "awsmock/service/LambdaService.h"
 
 namespace AwsMock {
 
@@ -148,9 +137,9 @@ namespace AwsMock {
       Core::MetricService &_metricService;
 
       /**
-       * S3 service
+       * Lambda service
        */
-      //Service::S3Service _s3Service;
+      Service::LambdaService _lambdaService;
     };
 } // namespace AwsMock
 

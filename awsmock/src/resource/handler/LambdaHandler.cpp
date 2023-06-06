@@ -4,7 +4,7 @@
 namespace AwsMock {
 
     LambdaHandler::LambdaHandler(Core::Configuration &configuration, Core::MetricService &metricService)
-        : AbstractResource(), _logger(Poco::Logger::get("LambdaHandler")), _configuration(configuration), _metricService(metricService) {
+        : AbstractResource(), _logger(Poco::Logger::get("LambdaHandler")), _configuration(configuration), _metricService(metricService), _lambdaService(configuration) {
         Core::Logger::SetDefaultConsoleLogger("LambdaHandler");
     }
 
@@ -14,11 +14,8 @@ namespace AwsMock {
 
         try {
 
-            DumpRequest(request);
-            std::string bucket, key;
-            //GetBucketKeyFromUri(request.getURI(), bucket, key);
-
-            bool isListRequest = QueryParameterExists("list-type");
+            std::string version, action;
+            GetVersionActionFromUri(request.getURI(), version, action);
 
         } catch (Core::ServiceException &exc) {
             SendErrorResponse("S3", response, exc);
@@ -32,7 +29,8 @@ namespace AwsMock {
         poco_debug(_logger, "Lambda PUT request, URI: " + request.getURI() + " region: " + region + " user: " + user);
 
         try {
-            std::string bucket, key;
+            std::string version, action;
+            GetVersionActionFromUri(request.getURI(), version, action);
 
         } catch (Poco::Exception &exc) {
             SendErrorResponse("Lambda", response, exc);
@@ -47,10 +45,15 @@ namespace AwsMock {
             std::string version, action;
             GetVersionActionFromUri(request.getURI(), version, action);
 
-            DumpRequest(request);
+            //DumpBodyToFile(request, "/tmp/body");
 
             if(action == "functions") {
 
+                Dto::Lambda::CreateFunctionRequest lambdaRequest;
+                lambdaRequest.FromJson(request.stream());
+
+                Dto::Lambda::CreateFunctionResponse lambdaResponse = _lambdaService.CreateFunction(lambdaRequest);
+                SendOkResponse(response, lambdaResponse.ToJson());
             }
 
         } catch (Poco::Exception &exc) {
@@ -66,7 +69,8 @@ namespace AwsMock {
         poco_debug(_logger, "Lambda DELETE request, URI: " + request.getURI() + " region: " + region + " user: " + user);
 
         try {
-            std::string bucket, key;
+            std::string version, action;
+            GetVersionActionFromUri(request.getURI(), version, action);
 
         } catch (Core::ServiceException &exc) {
             SendErrorResponse("Lambda", response, exc);
@@ -91,7 +95,8 @@ namespace AwsMock {
 
         try {
 
-            std::string bucket, key;
+            std::string version, action;
+            GetVersionActionFromUri(request.getURI(), version, action);
 
             Resource::HeaderMap headerMap;
             headerMap.emplace_back("Connection", "closed");

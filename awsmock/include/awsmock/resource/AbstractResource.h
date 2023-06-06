@@ -289,7 +289,15 @@ namespace AwsMock::Resource {
        *
        * @param request HTTP request
        */
-      void DumpBody(Poco::Net::HTTPServerRequest &request);
+      [[maybe_unused]] void DumpBody(Poco::Net::HTTPServerRequest &request);
+
+      /**
+       * Dump the request body to a file
+       *
+       * @param request HTTP request
+       * @param filename name fo the file
+       */
+      void DumpBodyToFile(Poco::Net::HTTPServerRequest &request, const std::string &filename);
 
     private:
 
