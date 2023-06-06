@@ -9,7 +9,9 @@ set(SOURCES src/config/Configuration.cpp src/resource/HandlerException.cpp src/r
         src/handling/JsonAPIErrorBuilder.cpp src/handling/JsonAPIResourceBuilder.cpp src/resource/factory/Factory.cpp
         src/handling/JsonAPIAbstractResourceBuilder.cpp src/handling/JsonAPIResourceCollectionBuilder.cpp
         src/resource/factory/S3Factory.cpp src/resource/handler/S3Handler.cpp src/resource/factory/SQSFactory.cpp
+        src/resource/factory/LambdaFactory.cpp
         src/resource/handler/SQSHandler.cpp src/resource/factory/SNSFactory.cpp src/resource/handler/SNSHandler.cpp
+        src/resource/handler/LambdaHandler.cpp
         src/controller/ResourceNotFound.cpp src/controller/Router.cpp src/controller/RestService.cpp src/main.cpp)
 
 include_directories(include ../core/include ../db/include ../dto/include ../service/include ../worker/include)

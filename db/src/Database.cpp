@@ -59,6 +59,8 @@ namespace AwsMock::Database {
             Poco::Data::Keywords::now;
         session << "INSERT INTO service(name, active) VALUES(?,1)", bind("SNS"),
             Poco::Data::Keywords::now;
+        session << "INSERT INTO service(name, active) VALUES(?,1)", bind("Lambda"),
+            Poco::Data::Keywords::now;
         poco_debug(_logger, "Service table created");
 
         // S3
