@@ -23,6 +23,7 @@
 #include <awsmock/core/DirectoryWatcher.h>
 #include <awsmock/core/FileWatcher.h>
 #include <awsmock/core/Logger.h>
+#include <awsmock/db/ServiceDatabase.h>
 #include <awsmock/dto/s3/PutObjectRequest.h>
 #include <awsmock/service/S3Service.h>
 
@@ -45,7 +46,7 @@ namespace AwsMock::Worker {
       /**
        * Main method
        */
-      [[noreturn]] void run() override;
+      void run() override;
 
     private:
 
@@ -95,6 +96,11 @@ namespace AwsMock::Worker {
       const Core::Configuration &_configuration;
 
       /**
+       * Service database
+       */
+      std::unique_ptr<Database::ServiceDatabase> _serviceDatabase;
+
+      /**
        * S3 service
        */
       std::unique_ptr<Service::S3Service> _s3Service;
@@ -118,6 +124,11 @@ namespace AwsMock::Worker {
        * Directory _watcher
        */
       Core::DirectoryWatcher *_watcher;
+
+      /**
+       * Running flag
+       */
+      bool _running;
     };
 
 } // namespace AwsMock::Worker

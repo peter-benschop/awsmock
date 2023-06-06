@@ -2,7 +2,7 @@
 set(LIBRARY awsmockdb)
 set(LIBRARY_STATIC awsmockdb_static)
 
-set(SOURCES src/Database.cpp src/S3Database.cpp src/SQSDatabase.cpp)
+set(SOURCES src/Database.cpp src/ServiceDatabase.cpp src/S3Database.cpp src/SQSDatabase.cpp)
 set(HEADERS include/awsmock/db/Database.h include/awsmock/db/S3Database.h include/awsmock/db/SQSDatabase.h
         include/awsmock/entity/s3/Bucket.h include/awsmock/entity/s3/Object.h include/awsmock/entity/sqs/Queue.h)
 

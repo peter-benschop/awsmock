@@ -7,8 +7,7 @@
 
 // C++ standard includes
 #include <string>
-#include <vector>
-#include <iostream>
+
 
 // Poco includes
 #include "Poco/Logger.h"
@@ -33,12 +32,21 @@ namespace AwsMock::Database {
        */
       explicit ServiceDatabase(const Core::Configuration &configuration);
 
+      /**
+       * Checks the active flag.
+       *
+       * @param name service name
+       * @return true if active
+       */
+      bool IsActive(const std::string &name);
+
     private:
 
       /**
        * Logger
        */
       Poco::Logger &_logger;
+
     };
 
 } // namespace AwsMock::Database

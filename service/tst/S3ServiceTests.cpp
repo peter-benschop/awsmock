@@ -62,7 +62,7 @@ namespace AwsMock::Service {
         Dto::S3::CreateBucketResponse response = _service.CreateBucket(REGION, BUCKET, request);
 
         // assert
-        EXPECT_TRUE(response.GetLocation() == "eu-central-1");
+        EXPECT_TRUE(response.location == "eu-central-1");
     }
 
     TEST_F(S3ServiceTest, ObjectPutTest) {

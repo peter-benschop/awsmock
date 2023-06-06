@@ -23,9 +23,6 @@
 #include "Poco/DOM/DOMWriter.h"
 #include "Poco/XML/XMLWriter.h"
 
-// AwsMock includes
-#include "awsmock/entity/sqs/Message.h"
-
 namespace AwsMock::Dto::SQS {
 
     struct CreateMessageResponse {

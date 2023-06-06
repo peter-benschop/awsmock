@@ -19,62 +19,63 @@
 
 namespace AwsMock::Dto::S3 {
 
-    class CreateBucketResponse {
-
-    public:
+    struct CreateBucketResponse {
 
       /**
-       * Constructor
+       * Bucket location
        */
-      CreateBucketResponse() = default;
+      std::string location;
 
       /**
-       * Constructor
-       *
-       * @param location bucket location
-       * @param arn bucket ARN
+       * Bucket ARN
        */
-      CreateBucketResponse(std::string location, std::string arn);
+      std::string arn;
 
       /**
        * Convert to XML representation
        *
        * @return XML string
        */
-      std::string ToXml();
+      [[nodiscard]] std::string ToXml() const {
+          Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
+          Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("CreateBucketResult");
+          pDoc->appendChild(pRoot);
+          Poco::XML::AutoPtr<Poco::XML::Element> pChild1 = pDoc->createElement("BuckerArn");
+          pRoot->appendChild(pChild1);
+          Poco::XML::AutoPtr<Poco::XML::Text> pText1 = pDoc->createTextNode(arn);
+          pChild1->appendChild(pText1);
 
-      /**
-       * Returns the location
-       *
-       * @return location name
-       */
-      std::string GetLocation() { return _location; }
+          std::stringstream output;
+          Poco::XML::DOMWriter writer;
+          writer.setNewLine("\n");
+          writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
+          writer.writeNode(output, pDoc);
+
+          std::string outStr = output.str();
+          return outStr;
+      }
 
       /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.
        */
-      [[nodiscard]] std::string ToString() const;
-
-    private:
-
-      /**
-       * Bucket location
-       */
-      std::string _location;
-
-      /**
-       * Bucket ARN
-       */
-      std::string _arn;
+      [[nodiscard]] std::string ToString() const {
+          std::stringstream ss;
+          ss << (*this);
+          return ss.str();
+      }
 
       /**
        * Stream provider.
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &, const CreateBucketResponse &);
+      friend std::ostream &operator<<(std::ostream &os, const CreateBucketResponse &r) {
+          os << "CreateBucketResponse={bucket='" + r.location + "', arn='" + r.arn + "'}";
+          return os;
+      }
+
     };
 
 } // namespace AwsMock::Dto

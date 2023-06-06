@@ -2,11 +2,10 @@
 set(LIBRARY awsmockdto)
 set(LIBRARY_STATIC awsmockdto_static)
 
-set(S3_SOURCES ./src/dto/s3/CreateBucketResponse.cpp ./src/dto/s3/ListAllBucketResponse.cpp
+set(S3_SOURCES ./src/dto/s3/ListAllBucketResponse.cpp
         ./src/dto/s3/InitiateMultipartUploadResult.cpp ./src/dto/s3/CompleteMultipartUploadResult.cpp
-        ./src/dto/s3/ListBucketResult.cpp
         ./src/dto/s3/GetMetadataRequest.cpp ./src/dto/s3/GetMetadataResponse.cpp
-        ./src/dto/s3/GetObjectRequest.cpp ./src/dto/s3/GetObjectResponse.cpp)
+        )
 set(S3_HEADERS ./include/awsmock/dto/s3/CreateBucketRequest.h ./include/awsmock/dto/s3/CreateBucketResponse.h
         ./include/awsmock/dto/s3/ListAllBucketResponse.h ./include/awsmock/dto/s3/ListAllBucketResponse.h
         ./include/awsmock/dto/s3/CompleteMultipartUploadResult.h ./include/awsmock/dto/s3/RestErrorResponse.h
@@ -15,7 +14,7 @@ set(S3_HEADERS ./include/awsmock/dto/s3/CreateBucketRequest.h ./include/awsmock/
         include/awsmock/dto/s3/GetMetadataResponse.h include/awsmock/dto/s3/GetObjectRequest.h
         include/awsmock/dto/s3/GetObjectResponse.h)
 
-set(SQS_SOURCES ./src/dto/sqs/ListQueueResponse.cpp)
+set(SQS_SOURCES  )
 set(SQS_HEADERS ./include/awsmock/dto/sqs/CreateQueueRequest.h ./include/awsmock/dto/sqs/CreateQueueResponse.h
         ListQueueResponse.h ./include/awsmock/dto/sqs/ListQueueResponse.h)
 

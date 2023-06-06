@@ -30,19 +30,19 @@ namespace AwsMock {
                 // Get object request
                 poco_debug(_logger, "S3 get object request, bucket: " + bucket + " key: " + key);
                 Dto::S3::GetObjectRequest s3Request;
-                s3Request.SetBucket(bucket);
-                s3Request.SetKey(key);
+                s3Request.bucket=bucket;
+                s3Request.key=key;
 
                 Dto::S3::GetObjectResponse s3Response = _s3Service.GetObject(s3Request);
-                std::ifstream ifs (s3Response.GetFilename());
+                std::ifstream ifs (s3Response.filename);
 
                 Resource::HeaderMap headerMap;
                 headerMap.emplace_back("ETag", Core::StringUtils::GenerateRandomString(32));
-                headerMap.emplace_back("Content-Type", s3Response.GetContentType());
-                headerMap.emplace_back("Content-Length", std::to_string(s3Response.GetSize()));
-                headerMap.emplace_back("Last-Modified", s3Response.GetLastModified());
+                headerMap.emplace_back("Content-Type", s3Response.contentType);
+                headerMap.emplace_back("Content-Length", std::to_string(s3Response.size));
+                headerMap.emplace_back("Last-Modified", Poco::DateTimeFormatter().format(s3Response.modified, Poco::DateTimeFormat::HTTP_FORMAT));
 
-                SendOkResponse(response, s3Response.GetFilename(), s3Response.GetSize(), &headerMap);
+                SendOkResponse(response, s3Response.filename, s3Response.size, &headerMap);
 
             } else if(isListRequest) {
 

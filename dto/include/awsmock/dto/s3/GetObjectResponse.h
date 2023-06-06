@@ -10,86 +10,72 @@
 #include <sstream>
 
 // Poco includes
-#include "Poco/DOM/AutoPtr.h"
-#include "Poco/DOM/DOMParser.h"
-#include "Poco/DOM/Document.h"
-#include "Poco/DOM/Element.h"
+#include "Poco/DateTime.h"
+#include "Poco/DateTimeFormat.h"
+#include "Poco/DateTimeFormatter.h"
 
 namespace AwsMock::Dto::S3 {
 
-    class GetObjectResponse {
+    struct GetObjectResponse {
 
-    public:
+      /**
+       * Bucket
+       */
+      std::string bucket;
 
-      void SetBucket(const std::string &bucket) { _bucket = bucket; }
+      /**
+       * Key
+       */
+      std::string key;
 
-      std::string GetBucket() { return _bucket; }
+      /**
+       * Content length
+       */
+      long size;
 
-      void SetKey(const std::string &key) { _key = key; }
+      /**
+       * File name
+       */
+      std::string filename;
 
-      std::string GetKey() { return _key; }
+      /**
+       * Content type
+       */
+      std::string contentType;
 
-      void SetSize(long size) { _size = size; }
+      /**
+       * Created
+       */
+      Poco::DateTime created;
 
-      long GetSize() { return _size; }
-
-      void SetFilename(std::string filename) { _filename = filename; };
-
-      std::string GetFilename() { return _filename; }
-
-      void SetContentType(const std::string &contentType) { _contentType = contentType; };
-
-      std::string GetContentType() { return _contentType; }
-
-      void SetLastModified(const std::string &lastModified) { _lastModified = lastModified; };
-
-      std::string GetLastModified() { return _lastModified; }
+      /**
+       * Modified
+       */
+      Poco::DateTime modified;
 
       /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.
        */
-      [[nodiscard]] std::string ToString() const;
-
-    private:
-
-      /**
-       * Bucket
-       */
-      std::string _bucket;
-
-      /**
-       * Key
-       */
-      std::string _key;
-
-      /**
-       * Content length
-       */
-      long _size;
-
-      /**
-       * File name
-       */
-      std::string _filename;
-
-      /**
-       * Content type
-       */
-      std::string _contentType;
-
-      /**
-       * Last modified
-       */
-      std::string _lastModified;
+      [[nodiscard]] std::string ToString() const {
+          std::stringstream ss;
+          ss << (*this);
+          return ss.str();
+      }
 
       /**
        * Stream provider.
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &, const GetObjectResponse &);
+      friend std::ostream &operator<<(std::ostream &os, const GetObjectResponse &r) {
+          os << "GetObjectResponse={bucket='" + r.bucket + "' key='" + r.key + "' size='"+ std::to_string(r.size) + "' filename='" + r.filename  +
+          "' contentType='"+ r.contentType + "' created='" + Poco::DateTimeFormatter().format(r.created, Poco::DateTimeFormat::HTTP_FORMAT) +
+          "' modified='" + Poco::DateTimeFormatter().format(r.modified, Poco::DateTimeFormat::HTTP_FORMAT) +"'}";
+          return os;
+      }
+
     };
 
 } // namespace AwsMock::Dto::S3

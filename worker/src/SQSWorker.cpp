@@ -6,7 +6,7 @@
 
 namespace AwsMock::Worker {
 
-    SQSWorker::SQSWorker(const Core::Configuration &configuration) : _logger(Poco::Logger::get("SQSWorker")), _configuration(configuration) {
+    SQSWorker::SQSWorker(const Core::Configuration &configuration) : _logger(Poco::Logger::get("SQSWorker")), _configuration(configuration), _running(false) {
         Core::Logger::SetDefaultConsoleLogger("SQSWorker");
 
         Initialize();
@@ -14,19 +14,23 @@ namespace AwsMock::Worker {
         poco_debug(_logger, "SQSWorker initialized");
     }
 
-    SQSWorker::~SQSWorker() {
-    }
-
     void SQSWorker::Initialize() {
 
         // Create environment
         _region = _configuration.getString("awsmock.region");
         _sqsDatabase = std::make_unique<Database::SQSDatabase>(_configuration);
+        _serviceDatabase = std::make_unique<Database::ServiceDatabase>(_configuration);
     }
 
-    [[noreturn]] void SQSWorker::run() {
+    void SQSWorker::run() {
 
-        while (true) {
+        // Check service active
+        if (!_serviceDatabase->IsActive("SQS")) {
+            return;
+        }
+
+        _running = true;
+        while (_running) {
             ResetMessages();
             Poco::Thread::sleep(1000);
         }
@@ -34,7 +38,7 @@ namespace AwsMock::Worker {
 
     void SQSWorker::ResetMessages() {
         Database::Entity::SQS::QueueList queueList = _sqsDatabase->ListQueues(_region);
-        for(const auto &q:queueList) {
+        for (const auto &q : queueList) {
 
             // Get the queue sqs
             Database::Entity::SQS::QueueAttribute queueAttributes = _sqsDatabase->GetQueueAttributesByQueueUrl(q.queueUrl);

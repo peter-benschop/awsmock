@@ -88,19 +88,19 @@ namespace AwsMock::Service {
         Dto::S3::GetObjectResponse getObjectResponse;
         try {
 
-            Database::Entity::S3::Object object = _database->GetObject(request.GetBucket(), request.GetKey());
+            Database::Entity::S3::Object object = _database->GetObject(request.bucket, request.key);
 
-            std::string filename = _dataDir + Poco::Path::separator() + "s3" + Poco::Path::separator() + request.GetBucket() + Poco::Path::separator() + request.GetKey();
-            getObjectResponse.SetBucket(object.bucket);
-            getObjectResponse.SetKey(object.key);
-            getObjectResponse.SetSize(object.size);
-            getObjectResponse.SetContentType(object.contentType);
-            getObjectResponse.SetFilename(filename);
-            getObjectResponse.SetLastModified(Poco::DateTimeFormatter::format(object.modified, Poco::DateTimeFormat::HTTP_FORMAT));
+            std::string filename = _dataDir + Poco::Path::separator() + "s3" + Poco::Path::separator() + request.bucket + Poco::Path::separator() + request.key;
+            getObjectResponse.bucket = object.bucket;
+            getObjectResponse.key = object.key;
+            getObjectResponse.size = object.size;
+            getObjectResponse.contentType = object.contentType;
+            getObjectResponse.filename = filename;
+            getObjectResponse.modified = object.modified;
             poco_trace(_logger, "S3 get object response: " + getObjectResponse.ToString());
 
         } catch (Poco::Exception &ex) {
-            poco_error(_logger, "S3 create bucket failed, message: " + ex.message());
+            poco_error(_logger, "S3 get object failed, message: " + ex.message());
             throw Core::ServiceException(ex.message(), 500);
         }
         return getObjectResponse;
@@ -351,10 +351,10 @@ namespace AwsMock::Service {
             // Delete directory
             DeleteBucket(name);
 
-            // Delete from database
+            // Delete bucket from database
             _database->DeleteBucket(bucket);
 
-            // Delete notification
+            // Delete bucket notifications
             _database->DeleteBucketNotifications({.region=region, .bucket=name});
 
         } catch (Poco::Exception &ex) {

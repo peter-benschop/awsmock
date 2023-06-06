@@ -7,7 +7,7 @@
 
 namespace AwsMock::Worker {
 
-    S3Worker::S3Worker(const Core::Configuration &configuration) : _logger(Poco::Logger::get("S3Worker")), _configuration(configuration) {
+    S3Worker::S3Worker(const Core::Configuration &configuration) : _logger(Poco::Logger::get("S3Worker")), _configuration(configuration), _running(false) {
         Core::Logger::SetDefaultConsoleLogger("S3Worker");
 
         Initialize();
@@ -33,6 +33,7 @@ namespace AwsMock::Worker {
         // Create environment
         _region = _configuration.getString("awsmock.region");
         _s3Service = std::make_unique<Service::S3Service>(_configuration);
+        _serviceDatabase = std::make_unique<Database::ServiceDatabase>(_configuration);
 
         // Start _watcher
         _watcher = new Core::DirectoryWatcher(_dataDir);
@@ -42,11 +43,18 @@ namespace AwsMock::Worker {
         poco_debug(_logger, "Directory _watcher added, path: " + _dataDir);
     }
 
-    [[noreturn]] void S3Worker::run() {
+    void S3Worker::run() {
 
+        // Check service active
+        if (!_serviceDatabase->IsActive("S3")) {
+            return;
+        }
+
+        // Start file watcher, they will call the delegate methods, if they find a file system event.
         _watcherThread.start(_watcher);
 
-        while (true) {
+        _running = true;
+        while (_running) {
             Poco::Thread::sleep(10000);
         }
     }
