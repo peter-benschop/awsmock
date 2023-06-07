@@ -196,6 +196,16 @@ namespace AwsMock::Dto::Lambda {
       std::string modified = Core::DateTimeUtils::AwsDatetimeNow();
 
       /**
+       * Docker image ID
+       */
+      std::string dockerImageId;
+
+      /**
+       * Docker container ID
+       */
+      std::string dockerContainerId;
+
+      /**
        * Convert to a JSON string
        *
        * @return JSON string
@@ -248,9 +258,8 @@ namespace AwsMock::Dto::Lambda {
        */
       friend std::ostream &operator<<(std::ostream &os, const CreateFunctionResponse &r) {
           os << "CreateFunctionResponse={functionName='" + r.functionName + "' runtime: '" + r.runtime + "' role='" + r.role + "' handler='" + r.handler +
-              "' memorySize='" + std::to_string(r.memorySize) + "' {";
-          os << r.environment.ToString();
-          os << "}";
+              "' memorySize='" + std::to_string(r.memorySize) + "' {"+ r.environment.ToString() + "}" + " dockerImageId='" + r.dockerImageId +
+              "' dockerContainerId='" + r.dockerImageId + "'}";
           return os;
       }
     };

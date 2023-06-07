@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/service/DockerService.h>
-#include <fstream>
 
 namespace AwsMock::Service {
 
@@ -12,46 +11,176 @@ namespace AwsMock::Service {
     }
 
     void DockerService::Initialize() {
-
+        // Set console logger
+        Core::Logger::SetDefaultConsoleLogger("LambdaService");
     }
 
-    // curl --unix-socket /var/run/docker.sock --data-binary '@docker.tar.gz' -XPOST -H "Content-Type: application/octet-stream" http://localhost/v1.42/build
-    long DockerService::BuildImage(const std::string &dockerFile, const std::string &tag) {
-        poco_debug(_logger, "Build image request, dockerFile: " + dockerFile + " tag: " + tag);
+    bool DockerService::ImageExists(const std::string &name, const std::string &tag) {
 
-        std::ifstream ifs(dockerFile, std::ios::binary);
+        std::string jsonBody = {};
+        std::string header = Core::SystemUtils::SetHeader("GET", "/" + DOCKER_VERSION + "/images/json?all=true", JSON_CONTENT_TYPE, jsonBody.size());
+        poco_debug(_logger, "Header: " + header);
 
-        long size = ifs.tellg();
-        ifs.seekg(0,  std::ios::beg);
-        std::vector<char> buffer;
-        buffer.reserve(size);
-        ifs.read(buffer.data(), size);
-        ifs.close();
+        std::string output = Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
+        poco_trace(_logger, "List images request send to docker daemon, output: " + output);
 
-        long status = 0;
-        std::string url = "http://" + std::string(DOCKER_VERSION) + "/build?t=" + tag;
+        Dto::Docker::ListImageResponse response;
+        response.FromJson(output);
 
-        struct curl_slist *headers = nullptr;
-        //headers = curl_slist_append(headers, "Content-Type: application/gzip");
+        // Find image
+        std::string imageName = name + ":" + tag;
+        bool found = find_if(response.imageList.begin(), response.imageList.end(), [&imageName](const Dto::Docker::Image &image) {
+          return find_if(image.repoTags.begin(), image.repoTags.end(), [&imageName](const std::string &repoTag) {
+            return repoTag == imageName;
+          }) != image.repoTags.end();
+        }) != response.imageList.end();
+        poco_debug(_logger, "Docker image found, result: " + std::string(found ? "true" : "false"));
 
-/*        curl_easy_setopt(client->curl, CURLOPT_HTTPHEADER, headers);
-        curl_easy_setopt(client->curl, CURLOPT_POSTFIELDS, &buffer);
-        CURLcode response = SendRequest((char *) url.c_str(), &status);
-        curl_slist_free_all(headers);
-        poco_debug(_logger, "Send to docker daemon, response: " + std::to_string(response));*/
-
-        return status;
+        return found;
     }
 
-    CURLcode DockerService::SendRequest(char *url, long *httpStatus) {
+    Dto::Docker::Image DockerService::GetImageByName(const std::string &name, const std::string &tag) {
 
-       /* curl_easy_setopt(client->curl, CURLOPT_URL, url);
-        CURLcode response = curl_easy_perform(client->curl);
-        if (httpStatus) {
-            curl_easy_getinfo(client->curl, CURLINFO_RESPONSE_CODE, httpStatus);
+        std::string jsonBody = {};
+        std::string header = Core::SystemUtils::SetHeader("GET", "/" + DOCKER_VERSION + "/images/json?all=true", JSON_CONTENT_TYPE, jsonBody.size());
+        poco_debug(_logger, "Header: " + header);
+
+        std::string output = Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
+        poco_debug(_logger, "List container request send to docker daemon, output: " + output);
+
+        Dto::Docker::ListImageResponse response;
+        response.FromJson(output);
+
+        // Find container
+        std::string imageName = name + ":" + tag;
+        for (const auto& image : response.imageList) {
+            for (const auto& repoTag : image.repoTags) {
+                if (repoTag == imageName)
+                    return image;
+            }
         }
-        curl_easy_reset(client->curl);
-
-        return response;*/
+        return {};
     }
+
+    void DockerService::BuildImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler) {
+        poco_debug(_logger, "Build image request, name: " + name + " tag: " + tag + " codeDir: " + codeDir);
+
+        std::string dockerFile = WriteDockerFile(codeDir, handler);
+
+        std::string imageFile = BuildImageFile(codeDir, name);
+
+        std::string header = Core::SystemUtils::SetHeader("POST", "/" + DOCKER_VERSION + "/build?t=" + name + ":" + tag + "&q=true", TAR_CONTENT_TYPE,
+                                                          Core::FileUtils::FileSize(imageFile));
+        std::string output = Core::SystemUtils::SendFileViaDomainSocket(DOCKER_SOCKET, header, imageFile);
+        poco_debug(_logger, "Docker image build, image: " + name + ":" + tag);
+        poco_trace(_logger, "Output: " + output);
+    }
+
+    bool DockerService::ContainerExists(const std::string &name, const std::string &tag) {
+
+        std::string jsonBody = {};
+        std::string header = Core::SystemUtils::SetHeader("GET", "/" + DOCKER_VERSION + "/containers/json?all=true", JSON_CONTENT_TYPE, jsonBody.size());
+        poco_debug(_logger, "Header: " + header);
+
+        std::string output = Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
+        poco_trace(_logger, "List container request send to docker daemon, output: " + output);
+
+        Dto::Docker::ListContainerResponse response;
+        response.FromJson(output);
+
+        // Find container
+        std::string imageName = name + ":" + tag;
+        auto it = find_if(response.containerList.begin(), response.containerList.end(), [&imageName](const Dto::Docker::Container &container) {
+          return container.image == imageName;
+        });
+        poco_debug(_logger, "Docker container found, result: " + std::string(it != response.containerList.end() ? "true" : "false"));
+
+        return it != response.containerList.end();
+    }
+
+    Dto::Docker::Container DockerService::GetContainerByName(const std::string &name, const std::string &tag) {
+
+        std::string jsonBody = {};
+        std::string header = Core::SystemUtils::SetHeader("GET", "/" + DOCKER_VERSION + "/containers/json?all=true", JSON_CONTENT_TYPE, jsonBody.size());
+        poco_debug(_logger, "Header: " + header);
+
+        std::string output = Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
+        poco_debug(_logger, "List container request send to docker daemon, output: " + output);
+
+        Dto::Docker::ListContainerResponse response;
+        response.FromJson(output);
+
+        // Find container
+        std::string imageName = name + ":" + tag;
+        auto it = find_if(response.containerList.begin(), response.containerList.end(), [&name, &tag](const Dto::Docker::Container &container) {
+          return container.image == name + ":" + tag;
+        });
+        poco_debug(_logger, "Docker container found, id: " + it->id);
+
+        if (it != response.containerList.end()) {
+            return *it;
+        }
+        return {};
+    }
+
+    Dto::Docker::CreateContainerResponse DockerService::CreateContainer(const std::string &name, const std::string &tag) {
+
+        Dto::Docker::CreateContainerRequest request = {.hostName=name, .domainName=name + ".dockerhost.net", .user="root", .image=name + ":" + tag};
+
+        std::string jsonBody = request.ToJson();
+        std::string header = Core::SystemUtils::SetHeader("POST", "/" + DOCKER_VERSION + "/containers/create?name=" + name, JSON_CONTENT_TYPE, jsonBody.size());
+        poco_debug(_logger, "Header: " + header);
+
+        std::string output = Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
+        poco_debug(_logger, "Create container request send to docker daemon: " + header);
+
+        Dto::Docker::CreateContainerResponse response;
+        response.FromJson(output);
+
+        return response;
+    }
+
+    std::string DockerService::StartContainer(const std::string &id) {
+
+        std::string jsonBody = {};
+        std::string header = Core::SystemUtils::SetHeader("POST", "/" + DOCKER_VERSION + "/containers/" + id + "/start", JSON_CONTENT_TYPE, jsonBody.size());
+
+        return Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
+    }
+
+    std::string DockerService::StartContainer(const Dto::Docker::Container &container) {
+        return StartContainer(container.id);
+    }
+
+    std::string DockerService::StopContainer(const Dto::Docker::Container &container) {
+
+        std::string jsonBody = {};
+        std::string header = Core::SystemUtils::SetHeader("POST", "/" + DOCKER_VERSION + "/containers/" + container.id + "/start", JSON_CONTENT_TYPE, jsonBody.size());
+
+        std::string output = Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
+        return output;
+    }
+
+    std::string DockerService::WriteDockerFile(const std::string &codeDir, const std::string &handler) {
+
+        std::string dockerFilename = codeDir + "Dockerfile";
+
+        std::ofstream ofs(dockerFilename);
+        ofs << "FROM public.ecr.aws/lambda/java:17" << std::endl;
+        ofs << "COPY classes/* ${LAMBDA_TASK_ROOT}/lib/" << std::endl;
+        ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
+        poco_debug(_logger, "Dockerfile written, filename: " + dockerFilename);
+
+        return dockerFilename;
+    }
+
+    std::string DockerService::BuildImageFile(const std::string &codeDir, const std::string &functionName) {
+
+        std::string tarFileName = codeDir + functionName + ".tgz";
+        Core::TarUtils::TarDirectory(tarFileName, codeDir);
+        poco_debug(_logger, "Gzip file written: " + tarFileName);
+
+        return tarFileName;
+    }
+
 }

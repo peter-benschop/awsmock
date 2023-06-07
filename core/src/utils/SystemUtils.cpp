@@ -40,11 +40,11 @@ namespace AwsMock::Core {
     }
 
     std::string SystemUtils::SetHeader(const std::string &method, const std::string &url, const std::string &contentType, long contentLength) {
-        return Poco::toUpper(method) + " " + url + " HTTP/1.1\nHost:localhost\nConnection:close\nContentType:" + contentType + "\nContent-Length:"
+        return Poco::toUpper(method) + " " + url + " HTTP/1.1\nHost:localhost\nConnection:close\nContent-Type:" + contentType + "\nContent-Length:"
             + std::to_string(contentLength) + "\n\n";
     }
 
-    std::string SystemUtils::SendFileViaDomainSocket(const std::string &socketPath, const std::string &header, const std::string &fileName) {
+    std::string SystemUtils::SendFileViaDomainSocket(const char *socketPath, const std::string &header, const std::string &fileName) {
 
         int sock = 0;
         unsigned long data_len = 0;
@@ -57,14 +57,14 @@ namespace AwsMock::Core {
         }
 
         remote.sun_family = AF_UNIX;
-        strcpy(remote.sun_path, socketPath.c_str());
+        strcpy(remote.sun_path, socketPath);
         data_len = strlen(remote.sun_path) + sizeof(remote.sun_family);
 
         if (connect(sock, (struct sockaddr *) &remote, data_len) == -1) {
             poco_error(Poco::Logger::get("SystemUtils"), "Client: Error on connect call");
             return "Client: Error on connect call";
         }
-        poco_debug(Poco::Logger::get("SystemUtils"), "Client: Connected to docker daemon");
+        poco_trace(Poco::Logger::get("SystemUtils"), "Client: Connected to docker daemon");
 
         std::ifstream file(fileName, std::ios::binary);
         file.seekg(0, std::ios::end);
@@ -76,6 +76,10 @@ namespace AwsMock::Core {
         file.seekg(0, std::ios::beg);
         file.read(fileBuffer, fileSize);
         file.close();
+
+        /* std::cout << "========================== Header ==========================" << std::endl;
+         std::cout << header << std::endl;
+         std::cout << "========================== Header ==========================" << std::endl;*/
 
         // Send header
         if (send(sock, header.c_str(), header.size(), 0) == -1) {
@@ -96,12 +100,78 @@ namespace AwsMock::Core {
         }
 
         // Get response
-        std::string output;
+        std::stringstream output;
         memset(recv_msg, 0, s_recv_len * sizeof(char));
         while (recv(sock, recv_msg, s_recv_len, 0) > 0) {
-            output += std::string(recv_msg);
+            output << recv_msg;
+        }
+        /*std::cout << "========================== Response ==========================" << std::endl;
+        std::cout << output << std::endl;
+        std::cout << "========================== Response ==========================" << std::endl;*/
+        close(sock);
+        return GetBody(output.str());
+    }
+
+    std::string SystemUtils::SendMessageViaDomainSocket(const char *socketPath, const std::string &header, const std::string &body) {
+
+        int sock = 0;
+        unsigned long data_len = 0;
+        struct sockaddr_un remote{};
+        char recv_msg[s_recv_len];
+
+        if ((sock = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
+            poco_error(Poco::Logger::get("SystemUtils"), "Client: Error on socket() call");
+            return "Client: Error on socket() call";
+        }
+
+        remote.sun_family = AF_UNIX;
+        strcpy(remote.sun_path, socketPath);
+        data_len = strlen(remote.sun_path) + sizeof(remote.sun_family);
+
+        if (connect(sock, (struct sockaddr *) &remote, data_len) == -1) {
+            poco_error(Poco::Logger::get("SystemUtils"), "Client: Error on connect call");
+            return "Client: Error on connect call";
+        }
+        poco_trace(Poco::Logger::get("SystemUtils"), "Client: Connected to docker daemon");
+
+        /*std::cout << "========================== Header ==========================" << std::endl;
+        std::cout << header << std::endl;
+        std::cout << "========================== Header ==========================" << std::endl;
+
+        std::cout << "=========================== Body ===========================" << std::endl;
+        std::cout << body << std::endl;
+        std::cout << "=========================== Body ===========================" << std::endl;*/
+
+        // Send message
+        std::string message = header + body;
+        if (send(sock, message.c_str(), message.size(), 0) == -1) {
+            poco_error(Poco::Logger::get("SystemUtils"), "Client: Error on send() call");
+        }
+
+        // Get response
+        std::stringstream output;
+        memset(recv_msg, 0, s_recv_len * sizeof(char));
+        while (recv(sock, recv_msg, s_recv_len, 0) > 0) {
+            output << recv_msg;
         }
         close(sock);
-        return output;
+        /*
+        std::cout << "========================== Response ==========================" << std::endl;
+        std::cout << output.str() << std::endl;
+        std::cout << "========================== Response ==========================" << std::endl;
+         */
+        return GetBody(output.str());
+    }
+
+    std::string SystemUtils::GetBody(const std::string &output) {
+
+        Poco::RegularExpression regex(R"(.*[\r?|\n?]{2}([0-9a-f]+)[\r?|\n?]{1}(.*)[\r?|\n?]{2}.*)");
+        Poco::RegularExpression::MatchVec posVec;
+        int matches = regex.match(output, 0, posVec);
+
+        if (matches == 3) {
+            return output.substr(posVec[2].offset + 1, posVec[2].length - 1);
+        }
+        return "Match not found";
     }
 }

@@ -110,24 +110,6 @@ namespace AwsMock::Service {
       std::string BuildDockerImage(const std::string &codeDir, const std::string &functionName, const std::string &handler);
 
       /**
-       * Write the compressed docker imagefile.
-       *
-       * @param codeDir code directory
-       * @param name function name
-       * @return return docker file path
-       */
-      std::string BuildImageFile(const std::string &codeDir, const std::string &name);
-
-      /**
-       * Write the docker file.
-       *
-       * @param codeDir code directory
-       * @param handler handler function
-       * @return return docker file path
-       */
-      std::string WriteDockerFile(const std::string &codeDir, const std::string &handler);
-
-      /**
        * Logger
        */
       Poco::Logger &_logger;

@@ -23,10 +23,12 @@
 #include <unistd.h>
 #include <cstdlib>
 #include <filesystem>
+#include <regex>
 
 // Poco includes
 #include <Poco/Logger.h>
 #include <Poco/String.h>
+#include <Poco/RegularExpression.h>
 
 // AwsMock includes
 #include "awsmock/core/CoreException.h"
@@ -35,7 +37,7 @@
 
 namespace AwsMock::Core {
 
-    static const unsigned int s_recv_len = 1024;
+    static const unsigned int s_recv_len = 8192;
 
     struct ExecResult {
       int status = -1;
@@ -81,22 +83,23 @@ namespace AwsMock::Core {
        * @param socketPath name of the UNIX domain socket
        * @param header HTTP header to send.
        * @param fileName name of the file to send as body.
-       * @return output from socket opertion
+       * @return output from socket operation
        */
-      static std::string SendFileViaDomainSocket(const std::string &socketPath, const std::string &header, const std::string &fileName);
+      static std::string SendFileViaDomainSocket(const char* socketPath, const std::string &header, const std::string &fileName);
 
       /**
        * Send a message string over a UNIX domain socket
        *
        * @param socketPath name of the UNIX domain socket
-       * @param header HTTP header to send.
-       * @param message name of the file to send as body.
-       * @return output from socket opertion
+       * @param header header string.
+       * @param body message body.
+       * @return output from socket operation
        */
-      static std::string SendMessageViaDomainSocket(const std::string &socketPath, const std::string &header, const std::string &message);
+      static std::string SendMessageViaDomainSocket(const char* socketPath, const std::string &header, const std::string &body);
 
       /**
        * Set a HTTP header string in the correct format, to be used for a UNIX domain socket connection.
+       *
        * @param method
        * @param url
        * @param contentType
@@ -106,6 +109,14 @@ namespace AwsMock::Core {
       static std::string SetHeader(const std::string &method, const std::string &url, const std::string &contentType, long contentLength);
 
     private:
+
+      /**
+       * Extract the body of the message
+       *
+       * @param body body string
+       * @return body string
+       */
+      static std::string GetBody(const std::string &output);
 
       /**
        * Logger
