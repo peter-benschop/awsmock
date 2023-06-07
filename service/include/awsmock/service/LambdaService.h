@@ -12,20 +12,56 @@
 #include <Poco/Logger.h>
 #include <Poco/UUID.h>
 #include <Poco/UUIDGenerator.h>
+#include <Poco/RecursiveDirectoryIterator.h>
+
+// Easyzip
+#include <easyzip/easyzip.h>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/ServiceException.h>
+#include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
+#include <awsmock/core/TarUtils.h>
 #include <awsmock/db/LambdaDatabase.h>
 #include <awsmock/dto/lambda/CreateFunctionRequest.h>
 #include <awsmock/dto/lambda/CreateFunctionResponse.h>
+#include <awsmock/service/DockerService.h>
 
-#define DOCKER_FILE_JAVA17(x,y) "FROM public.ecr.aws/lambda/java:17\n\n" \
-                                "COPY classes/* ${LAMBDA_TASK_ROOT}/lib/\n\n" \
-                                "CMD [ \"(x)::handleRequest\" ]\n"
 namespace AwsMock::Service {
+
+    class DockerRunner : public Poco::Runnable {
+
+    public:
+
+      /**
+       * Thread main method
+       */
+      void run() {
+
+          _running = true;
+          while (_running) {
+              Poco::Thread::sleep(1000);
+          }
+      }
+
+      void stop() {
+          _running = false;
+      }
+
+    private:
+
+      /**
+       * Start the docker image
+       */
+      void StartDockerImage();
+
+      /**
+       * Running flag
+       */
+      bool _running = false;
+    };
 
     class LambdaService {
 
@@ -74,6 +110,15 @@ namespace AwsMock::Service {
       std::string BuildDockerImage(const std::string &codeDir, const std::string &functionName, const std::string &handler);
 
       /**
+       * Write the compressed docker imagefile.
+       *
+       * @param codeDir code directory
+       * @param name function name
+       * @return return docker file path
+       */
+      std::string BuildImageFile(const std::string &codeDir, const std::string &name);
+
+      /**
        * Write the docker file.
        *
        * @param codeDir code directory
@@ -117,6 +162,10 @@ namespace AwsMock::Service {
        */
       std::unique_ptr<Database::LambdaDatabase> _database;
 
+      /**
+       * Database connection
+       */
+      std::unique_ptr<Service::DockerService> _dockerService;
     };
 
 } //namespace AwsMock::Service

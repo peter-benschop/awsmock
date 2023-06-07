@@ -21,7 +21,6 @@
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/DirectoryWatcher.h>
-#include <awsmock/core/FileWatcher.h>
 #include <awsmock/core/Logger.h>
 #include <awsmock/db/ServiceDatabase.h>
 #include <awsmock/dto/s3/PutObjectRequest.h>

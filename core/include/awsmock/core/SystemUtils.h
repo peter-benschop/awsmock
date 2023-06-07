@@ -5,37 +5,43 @@
 #ifndef AWSMOCK_CORE_SYSTEMUTILS_H_
 #define AWSMOCK_CORE_SYSTEMUTILS_H_
 
+// C includes
+#include <fcntl.h>
+#include <pwd.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+
 // C++ includes
 #include <cstdio>
 #include <string>
 #include <iostream>
-#include <memory>
+#include <fstream>
 #include <stdexcept>
 #include <string>
 #include <array>
 #include <climits>
 #include <unistd.h>
-#include <csignal>
 #include <cstdlib>
-#include <chrono>
-#include <pwd.h>
-#include <fstream>
 #include <filesystem>
 
 // Poco includes
 #include <Poco/Logger.h>
+#include <Poco/String.h>
 
 // AwsMock includes
 #include "awsmock/core/CoreException.h"
 
+#define CHUNK_SIZE 65536
+
 namespace AwsMock::Core {
 
-    typedef std::chrono::time_point<std::chrono::high_resolution_clock> TimePoint;
+    static const unsigned int s_recv_len = 1024;
 
     struct ExecResult {
       int status = -1;
       std::string output;
     };
+    typedef struct ExecResult ExecResult;
 
     /**
      * System utils for command line execution and other system routines.
@@ -70,37 +76,36 @@ namespace AwsMock::Core {
       static std::string GetHomeDir();
 
       /**
-       * Install a signal handler.
+       * Send a file over a UNIX domain socket
+       *
+       * @param socketPath name of the UNIX domain socket
+       * @param header HTTP header to send.
+       * @param fileName name of the file to send as body.
+       * @return output from socket opertion
        */
-      static void InstallSignalHandler();
+      static std::string SendFileViaDomainSocket(const std::string &socketPath, const std::string &header, const std::string &fileName);
 
       /**
-       * Start timer
+       * Send a message string over a UNIX domain socket
        *
-       * @return time point of now()
+       * @param socketPath name of the UNIX domain socket
+       * @param header HTTP header to send.
+       * @param message name of the file to send as body.
+       * @return output from socket opertion
        */
-      static TimePoint StartTimer() {
-          return std::chrono::high_resolution_clock::now();
-      }
+      static std::string SendMessageViaDomainSocket(const std::string &socketPath, const std::string &header, const std::string &message);
 
       /**
-       * Stop timer
-       *
-       * @param msg message to print
-       * @param startTime start time point
+       * Set a HTTP header string in the correct format, to be used for a UNIX domain socket connection.
+       * @param method
+       * @param url
+       * @param contentType
+       * @param contentLength
+       * @return
        */
-      static void StopTimer(const std::string &msg, TimePoint startTime) {
-          std::cerr << msg << ": " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - startTime).count() << "ms"
-                    << std::endl;
-      }
+      static std::string SetHeader(const std::string &method, const std::string &url, const std::string &contentType, long contentLength);
 
     private:
-      /**
-       * Posix signal handler.
-       *
-       * @param signum signal number.
-       */
-      static void SignalHandler(int signum);
 
       /**
        * Logger

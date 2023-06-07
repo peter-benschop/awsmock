@@ -2,7 +2,7 @@
 set(LIBRARY awsmocksrv)
 set(LIBRARY_STATIC awsmocksrv_static)
 
-set(SOURCES src/S3Service.cpp src/SQSService.cpp src/LambdaService.cpp)
+set(SOURCES src/S3Service.cpp src/SQSService.cpp src/LambdaService.cpp src/DockerService.cpp)
 #set(HEADERS include/awsmock/service/S3Service.h include/awsmock/service/SQSService.h)
 
 # Test directory

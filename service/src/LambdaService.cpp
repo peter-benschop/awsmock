@@ -23,6 +23,7 @@ namespace AwsMock::Service {
         _dataDir = _configuration.getString("awsmock.data.dir", "/tmp/awsmock/data");
         _tempDir = _dataDir + Poco::Path::separator() + "tmp";
         _database = std::make_unique<Database::LambdaDatabase>(_configuration);
+        _dockerService = std::make_unique<Service::DockerService>(_configuration);
 
         // Create temp directory
         if (!Core::DirUtils::DirectoryExists(_tempDir)) {
@@ -40,7 +41,7 @@ namespace AwsMock::Service {
         }
 
         // Build the docker image
-        BuildDockerImage(codeDir, request.functionName, request.handler);
+        std::string output = BuildDockerImage(codeDir, request.functionName, request.handler);
 
         // Create ARN
         std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, request.functionName);
@@ -49,6 +50,10 @@ namespace AwsMock::Service {
         Dto::Lambda::CreateFunctionResponse
             response{.functionArn=arn, .functionName=request.functionName, .runtime=request.runtime, .role=request.role, .handler=request.handler,
             .environment=request.environment, .memorySize=request.memorySize};
+
+        // Cleanup
+        Core::DirUtils::DeleteDirectory(codeDir);
+
         return response;
     }
 
@@ -77,19 +82,21 @@ namespace AwsMock::Service {
 
         std::string dockerFile = WriteDockerFile(codeDir, handler);
 
-        std::string output;
-        std::string cmd = "docker build -t " + name + ":latest -f " + dockerFile + " " + codeDir;
-        poco_debug(_logger, "Executing command, cmd: " + cmd);
+        std::string imageFile = BuildImageFile(codeDir, name);
 
-        Core::ExecResult result = Core::SystemUtils::Exec(cmd);
-        poco_debug(_logger, "Build docker image exit code: " + std::to_string(result.status) + " output: " + result.output);
+        std::string tag = "latest";
+        std::string
+            header = Core::SystemUtils::SetHeader("POST", "/v1.42/build?t=" + name + ":" + tag + "&q=true", "application/x-tar", Core::FileUtils::FileSize(imageFile));
+        std::string output = Core::SystemUtils::SendFileViaDomainSocket("/var/run/docker.sock", header, imageFile);
+        poco_debug(_logger, "Docker image build, image: " + name + ":" + tag);
+        poco_debug(_logger, "Output: " + output);
 
-        return result.output;
+        return output;
     }
 
     std::string LambdaService::WriteDockerFile(const std::string &codeDir, const std::string &handler) {
 
-        std::string dockerFilename=codeDir + "Dockerfile";
+        std::string dockerFilename = codeDir + "Dockerfile";
 
         std::ofstream ofs(dockerFilename);
         ofs << "FROM public.ecr.aws/lambda/java:17" << std::endl;
@@ -100,5 +107,13 @@ namespace AwsMock::Service {
         return dockerFilename;
     }
 
+    std::string LambdaService::BuildImageFile(const std::string &codeDir, const std::string &functionName) {
+
+        std::string tarFileName = codeDir + functionName + ".tgz";
+        Core::TarUtils::TarDirectory(tarFileName, codeDir);
+        poco_debug(_logger, "Gzip file written: " + tarFileName);
+
+        return tarFileName;
+    }
 
 } // namespace AwsMock::Service
