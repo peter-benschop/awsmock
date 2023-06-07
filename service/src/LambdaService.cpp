@@ -36,7 +36,6 @@ namespace AwsMock::Service {
         poco_debug(_logger, "Create function request: " + request.ToString());
 
         // Build the docker image, if not existing
-        Dto::Docker::Image image;
         if (!_dockerService->ImageExists(request.functionName, "latest")) {
 
             // Unzip provided zip-file
@@ -48,22 +47,21 @@ namespace AwsMock::Service {
             // Build the docker image
             _dockerService->BuildImage(codeDir, request.functionName, "latest", request.handler);
 
-            // Get the image struct
-            image = _dockerService->GetImageByName(request.functionName +":latest");
-
             // Cleanup
             Core::DirUtils::DeleteDirectory(codeDir);
         }
+
+        // Get the image struct
+        Dto::Docker::Image image = _dockerService->GetImageByName(request.functionName, "latest");
 
         // Create the container, if not existing
         std::string id = {};
         if (!_dockerService->ContainerExists(request.functionName, "latest")) {
             Dto::Docker::CreateContainerResponse containerCreateResponse = _dockerService->CreateContainer(request.functionName, "latest");
-            id = containerCreateResponse.id;
-        } else {
-            Dto::Docker::Container container = _dockerService->GetContainerByName(request.functionName, "latest");
-            id = container.id;
         }
+
+        // Get the container
+        Dto::Docker::Container container = _dockerService->GetContainerByName(request.functionName, "latest");
 
         // Start container
         _dockerService->StartContainer(id);
@@ -72,7 +70,7 @@ namespace AwsMock::Service {
         std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, request.functionName);
         Dto::Lambda::CreateFunctionResponse
             response{.functionArn=arn, .functionName=request.functionName, .runtime=request.runtime, .role=request.role, .handler=request.handler,
-            .environment=request.environment, .memorySize=request.memorySize};
+            .environment=request.environment, .memorySize=request.memorySize, .dockerImageId=image.id, .dockerContainerId=container.id};
 
         return response;
     }
