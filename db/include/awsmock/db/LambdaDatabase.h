@@ -23,10 +23,7 @@
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/db/Database.h>
-#include <awsmock/entity/sqs/Message.h>
-#include <awsmock/entity/sqs/MessageAttribute.h>
-#include <awsmock/entity/sqs/Queue.h>
-#include <awsmock/entity/sqs/QueueAttribute.h>
+#include <awsmock/entity/lambda/Lambda.h>
 
 namespace AwsMock::Database {
 
@@ -44,14 +41,38 @@ namespace AwsMock::Database {
       /**
        * Check existence of lambda
        *
-       * @param region AWS region
-       * @param name lambda name
+       * @param function AWS function
+       * @param runtime lambda runtime
        * @return true if lambda already exists
        * @throws DatabaseException
        */
-      bool LambdaExists(const std::string &region, const std::string &name);
+      bool LambdaExists(const std::string &function, const std::string &runtime);
 
-      bool CreateLambda(const std::string &region, const std::string &name);
+      /**
+       * Create a new lambda function
+       *
+       * @param lambda lambda entity
+       * @return created lambda entity.
+       */
+      Entity::Lambda::Lambda CreateLambda(const Entity::Lambda::Lambda &lambda);
+
+      /**
+       * Returns a lambda entity by primary key
+       *
+       * @param id lambda primary key
+       * @return lambda entity
+       * @throws DatabaseException
+       */
+      Entity::Lambda::Lambda GetLambdaById(long id);
+
+      /**
+       * Returns a lambda entity by ARN
+       *
+       * @param arn lambda ARN
+       * @return lambda entity
+       * @throws DatabaseException
+       */
+      Entity::Lambda::Lambda GetLambdaByArn(const std::string &arn);
 
     private:
 

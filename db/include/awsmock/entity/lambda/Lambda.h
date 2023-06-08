@@ -14,7 +14,7 @@
 #include <Poco/DateTimeFormat.h>
 #include <Poco/DateTimeFormatter.h>
 
-namespace AwsMock::Database::Entity {
+namespace AwsMock::Database::Entity::Lambda {
 
     struct Lambda {
 

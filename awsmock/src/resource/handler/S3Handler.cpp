@@ -220,15 +220,13 @@ namespace AwsMock {
             GetBucketKeyFromUri(request.getURI(), bucket, key);
             poco_debug(_logger, "S3 HEAD request, bucket: " + bucket + " key: " + key);
 
-            Dto::S3::GetMetadataRequest s3Request;
-            s3Request.SetBucket(bucket);
-            s3Request.SetKey(key);
+            Dto::S3::GetMetadataRequest s3Request = {.bucket=bucket, .key=key};
             Dto::S3::GetMetadataResponse s3Response = _s3Service.GetMetadata(s3Request);
 
             Resource::HeaderMap headerMap;
-            headerMap.emplace_back("Last-Modified", s3Response.GetLastModified());
-            headerMap.emplace_back("Content-Length", std::to_string(s3Response.GetSize()));
-            headerMap.emplace_back("Content-Type", s3Response.GetContentType());
+            headerMap.emplace_back("Last-Modified", Poco::DateTimeFormatter().format(s3Response.modified, Poco::DateTimeFormat::HTTP_FORMAT));
+            headerMap.emplace_back("Content-Length", std::to_string(s3Response.size));
+            headerMap.emplace_back("Content-Type", s3Response.contentType);
             headerMap.emplace_back("Connection", "closed");
             headerMap.emplace_back("Server", "AmazonS3");
 

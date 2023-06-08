@@ -1,4 +1,4 @@
-//
+    //
 // Created by vogje01 on 30/05/2023.
 //
 
@@ -25,37 +25,12 @@
 
 namespace AwsMock::Dto::S3 {
 
-    class ListAllBucketResponse {
-
-    public:
-
-      /**
-       * Constructor
-       *
-       * @param bucketList list of bucket entities.
-       */
-      explicit ListAllBucketResponse(Database::Entity::S3::BucketList bucketList);
-
-      /**
-       * Convert to XML representation
-       *
-       * @return XML string
-       */
-      std::string ToXml();
-
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
-
-    private:
+    struct ListAllBucketResponse {
 
       /**
        * List of buckets
        */
-      Database::Entity::S3::BucketList _bucketList;
+      Database::Entity::S3::BucketList bucketList;
 
       /**
        * Stream provider.
@@ -63,6 +38,79 @@ namespace AwsMock::Dto::S3 {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &, const ListAllBucketResponse &);
+
+      /**
+       * Convert to XML representation
+       *
+       * @return XML string
+       */
+      std::string ToXml() const {
+
+          Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
+          Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("ListAllMyBucketsResult");
+          pDoc->appendChild(pRoot);
+
+          Poco::XML::AutoPtr<Poco::XML::Element> pBuckets;
+          pBuckets = pDoc->createElement("Buckets");
+          pRoot->appendChild(pBuckets);
+
+          Poco::XML::AutoPtr<Poco::XML::Element> pBucket;
+          Poco::XML::AutoPtr<Poco::XML::Element> pName;
+          Poco::XML::AutoPtr<Poco::XML::Element> pCreated;
+          Poco::XML::AutoPtr<Poco::XML::Text> pNameText;
+          Poco::XML::AutoPtr<Poco::XML::Text> pCreatedText;
+          for (auto &it : bucketList) {
+
+              pBucket = pDoc->createElement("Bucket");
+              pBuckets->appendChild(pBucket);
+
+              pName = pDoc->createElement("Name");
+              pBucket->appendChild(pName);
+
+              pCreated = pDoc->createElement("CreationDate");
+              pBucket->appendChild(pCreated);
+
+              pNameText = pDoc->createTextNode(it.name);
+              pName->appendChild(pNameText);
+
+              pCreatedText = pDoc->createTextNode(Poco::DateTimeFormatter::format(it.created, Poco::DateTimeFormat::HTTP_FORMAT));
+              pCreated->appendChild(pCreatedText);
+          }
+
+          std::stringstream output;
+          Poco::XML::DOMWriter writer;
+          writer.setNewLine("\n");
+          writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
+          writer.writeNode(output, pDoc);
+
+          std::string outStr = output.str();
+          return outStr;
+      }
+
+      /**
+       * Converts the DTO to a string representation.
+       *
+       * @return DTO as string for logging.
+       */
+      [[nodiscard]] std::string ToString() const {
+          std::stringstream ss;
+          ss << (*this);
+          return ss.str();
+      }
+
+      /**
+       * Stream provider.
+       *
+       * @return output stream
+       */
+      friend std::ostream &operator<<(std::ostream &os, const ListAllBucketResponse &r) {
+          os << "ListAllBucketResponse={bucketList='";
+          for (const auto &it : r.bucketList) {
+              os << it.ToString() + ", ";
+          }
+          os << "'}";
+          return os;
+      }
     };
 
 } // namespace AwsMock::Dto::S3

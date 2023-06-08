@@ -51,7 +51,7 @@ namespace AwsMock::Service {
         Dto::Docker::ListImageResponse response;
         response.FromJson(output);
 
-        // Find container
+        // Find image
         std::string imageName = name + ":" + tag;
         for (const auto& image : response.imageList) {
             for (const auto& repoTag : image.repoTags) {
@@ -89,13 +89,18 @@ namespace AwsMock::Service {
         response.FromJson(output);
 
         // Find container
-        std::string imageName = name + ":" + tag;
-        auto it = find_if(response.containerList.begin(), response.containerList.end(), [&imageName](const Dto::Docker::Container &container) {
-          return container.image == imageName;
-        });
-        poco_debug(_logger, "Docker container found, result: " + std::string(it != response.containerList.end() ? "true" : "false"));
+        std::string containerName = "/" + name;
+        for (const auto &container : response.containerList) {
+            for (const auto &n : container.names) {
+                if (n == containerName) {
+                    poco_debug(_logger, "Docker container found");
+                    return true;
+                }
+            }
+        }
+        poco_debug(_logger, "Docker container not found");
 
-        return it != response.containerList.end();
+        return false;
     }
 
     Dto::Docker::Container DockerService::GetContainerByName(const std::string &name, const std::string &tag) {
@@ -111,15 +116,17 @@ namespace AwsMock::Service {
         response.FromJson(output);
 
         // Find container
-        std::string imageName = name + ":" + tag;
-        auto it = find_if(response.containerList.begin(), response.containerList.end(), [&name, &tag](const Dto::Docker::Container &container) {
-          return container.image == name + ":" + tag;
-        });
-        poco_debug(_logger, "Docker container found, id: " + it->id);
-
-        if (it != response.containerList.end()) {
-            return *it;
+        std::string containerName = "/" + name;
+        for (const auto &container : response.containerList) {
+            for (const auto &n : container.names) {
+                if (n == containerName) {
+                    poco_debug(_logger, "Docker container found");
+                    return container;
+                }
+            }
         }
+        poco_debug(_logger, "Docker container not found");
+
         return {};
     }
 

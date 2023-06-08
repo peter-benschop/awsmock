@@ -55,7 +55,6 @@ namespace AwsMock::Service {
         Dto::Docker::Image image = _dockerService->GetImageByName(request.functionName, "latest");
 
         // Create the container, if not existing
-        std::string id = {};
         if (!_dockerService->ContainerExists(request.functionName, "latest")) {
             Dto::Docker::CreateContainerResponse containerCreateResponse = _dockerService->CreateContainer(request.functionName, "latest");
         }
@@ -64,10 +63,14 @@ namespace AwsMock::Service {
         Dto::Docker::Container container = _dockerService->GetContainerByName(request.functionName, "latest");
 
         // Start container
-        _dockerService->StartContainer(id);
+        _dockerService->StartContainer(container.id);
+
+        // Update database
+        std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, request.functionName);
+        _database->CreateLambda({.function=request.functionName, .runtime=request.runtime, .role=request.role, .handler=request.handler,
+                                 .size=image.size, .image_id=image.id, .container_id=container.id, .tag="latest", .arn=arn});
 
         // Create response
-        std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, request.functionName);
         Dto::Lambda::CreateFunctionResponse
             response{.functionArn=arn, .functionName=request.functionName, .runtime=request.runtime, .role=request.role, .handler=request.handler,
             .environment=request.environment, .memorySize=request.memorySize, .dockerImageId=image.id, .dockerContainerId=container.id};

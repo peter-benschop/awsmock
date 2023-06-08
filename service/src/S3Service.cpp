@@ -66,13 +66,15 @@ namespace AwsMock::Service {
         Dto::S3::GetMetadataResponse getMetadataResponse;
         try {
 
-            Database::Entity::S3::Object object = _database->GetObject(request.GetBucket(), request.GetKey());
-            getMetadataResponse.SetBucket(object.bucket);
-            getMetadataResponse.SetKey(object.key);
-            getMetadataResponse.SetSize(object.size);
-            getMetadataResponse.SetMd5Sum(object.md5sum);
-            getMetadataResponse.SetContentType(object.contentType);
-            getMetadataResponse.SetLastModified(Poco::DateTimeFormatter::format(object.modified, Poco::DateTimeFormat::HTTP_FORMAT));
+            Database::Entity::S3::Object object = _database->GetObject(request.bucket, request.key);
+
+            getMetadataResponse.bucket = object.bucket;
+            getMetadataResponse.key = object.key;
+            getMetadataResponse.size = object.size;
+            getMetadataResponse.md5Sum = object.md5sum;
+            getMetadataResponse.contentType=object.contentType;
+            getMetadataResponse.modified = object.modified;
+            getMetadataResponse.created = object.modified;
             poco_trace(_logger, "S3 get metadata response: " + getMetadataResponse.ToString());
 
         } catch (Poco::Exception &ex) {
@@ -147,9 +149,8 @@ namespace AwsMock::Service {
         }
 
         std::string uploadId = Core::StringUtils::GenerateRandomString(58);
-        Dto::S3::InitiateMultipartUploadResult result = Dto::S3::InitiateMultipartUploadResult(bucket, key, uploadId);
 
-        return result;
+        return {.bucket=bucket, .key=key, .uploadId=uploadId};
     }
 
     std::string S3Service::UploadPart(std::istream &stream, int part, const std::string &updateId) {
@@ -195,7 +196,7 @@ namespace AwsMock::Service {
         // Cleanup
         Core::DirUtils::DeleteFilesInDirectory(_tempDir);
 
-        return {region, bucket, key, Core::StringUtils::GenerateRandomString(40)};
+        return {.location=region, .bucket=bucket, .key=key, .etag=Core::StringUtils::GenerateRandomString(40)};
     }
 
     Dto::S3::PutObjectResponse S3Service::PutObject(Dto::S3::PutObjectRequest &request, std::istream *stream) {

@@ -12,12 +12,12 @@ namespace AwsMock::Database {
         Core::Logger::SetDefaultConsoleLogger("LambdaDatabase");
     }
 
-    bool LambdaDatabase::LambdaExists(const std::string &region, const std::string &name) {
+    bool LambdaDatabase::LambdaExists(const std::string &function, const std::string &runtime) {
 
         int count = 0;
         Poco::Data::Session session = GetSession();
 
-        session << "SELECT COUNT(*) FROM lambda WHERE region=? AND name=?", bind(region), bind(name), into(count), now;
+        session << "SELECT COUNT(*) FROM lambda WHERE function=? AND runtime=?", bind(function), bind(runtime), into(count), now;
 
         session.close();
         poco_trace(_logger, "Lambda exists: " + std::to_string(count));
@@ -25,17 +25,62 @@ namespace AwsMock::Database {
         return count > 0;
     }
 
-    bool LambdaDatabase::CreateLambda(const std::string &region, const std::string &name) {
+    Entity::Lambda::Lambda LambdaDatabase::CreateLambda(const Entity::Lambda::Lambda &lambda) {
 
-        int count = 0;
-        Poco::Data::Session session = GetSession();
+        long id = 0;
+        Entity::Lambda::Lambda result;
+        try {
+            Poco::Data::Session session = GetSession();
+            session.begin();
+            session << "INSERT INTO lambda(function,runtime,role,handler,size,image_id,container_id,tag,arn) VALUES(?,?,?,?,?,?,?,?,?) returning id",
+                bind(lambda.function), bind(lambda.runtime), bind(lambda.role), bind(lambda.handler), bind(lambda.size), bind(lambda.image_id), bind(lambda.container_id),
+                bind(lambda.tag), bind(lambda.arn), into(id), now;
+            session.commit();
 
-        session << "SELECT COUNT(*) FROM lambda WHERE region=? AND name=?", bind(region), bind(name), into(count), now;
+            poco_trace(_logger, "Lambda created: " + lambda.ToString());
 
-        session.close();
-        poco_trace(_logger, "Lambda exists: " + std::to_string(count));
-
-        return count > 0;
+        } catch (Poco::Exception &exc) {
+            poco_error(_logger, "Database exception: " + exc.message());
+            throw Core::DatabaseException(exc.message());
+        }
+        return GetLambdaById(id);
     }
 
+    Entity::Lambda::Lambda LambdaDatabase::GetLambdaById(long id) {
+
+        Entity::Lambda::Lambda result;
+        try {
+            Poco::Data::Session session = GetSession();
+            session.begin();
+            session << "SELECT id,function,runtime,role,handler,size,image_id,container_id,tag,arn FROM lambda WHERE id=?",
+                bind(id), into(result.id), into(result.function), into(result.runtime), into(result.role), into(result.handler), into(result.size),
+                into(result.image_id), into(result.container_id), into(result.tag), into(result.arn), into(result.created), into(result.modified), now;
+            session.commit();
+
+            poco_trace(_logger, "Got lambda: " + result.ToString());
+
+        } catch (Poco::Exception &exc) {
+            poco_error(_logger, "Database exception: " + exc.message());
+        }
+        return result;
+    }
+
+    Entity::Lambda::Lambda LambdaDatabase::GetLambdaByArn(const std::string &arn) {
+
+        Entity::Lambda::Lambda result;
+        try {
+            Poco::Data::Session session = GetSession();
+            session.begin();
+            session << "SELECT id,function,runtime,role,handler,size,image_id,container_id,tag,arn FROM lambda WHERE arn=?",
+                bind(arn), into(result.id), into(result.function), into(result.runtime), into(result.role), into(result.handler), into(result.size),
+                into(result.image_id), into(result.container_id), into(result.tag), into(result.arn), into(result.created), into(result.modified), now;
+            session.commit();
+
+            poco_trace(_logger, "Got lambda: " + result.ToString());
+
+        } catch (Poco::Exception &exc) {
+            poco_error(_logger, "Database exception: " + exc.message());
+        }
+        return result;
+    }
 } // namespace AwsMock::Database

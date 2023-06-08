@@ -115,7 +115,7 @@ namespace AwsMock::Database {
         poco_debug(_logger, "SQS message attribute table created");
 
         session << "CREATE TABLE lambda (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, function VARCHAR(255), runtime VARCHAR(128), role VARCHAR(128), "
-                   "handler VARCHAR(255), size INT, image_id VARCHAR(255), container_id VARCHAR(255), tag VARCHAR(32), arn VARCHAR(64)"
+                   "handler VARCHAR(255), size INT, image_id VARCHAR(255), container_id VARCHAR(255), tag VARCHAR(32), arn VARCHAR(64),"
                    "created DATETIME DEFAULT CURRENT_TIMESTAMP, modified DATETIME DEFAULT CURRENT_TIMESTAMP)",
             Poco::Data::Keywords::now;
         session << "CREATE UNIQUE INDEX lambda_idx1 ON lambda(function, runtime)", Poco::Data::Keywords::now;
