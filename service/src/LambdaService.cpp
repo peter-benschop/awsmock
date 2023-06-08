@@ -93,7 +93,6 @@ namespace AwsMock::Service {
         std::stringstream input(decodedZipFile);
         Poco::Zip::Decompress dec(input, Poco::Path(classesDir));
         dec.decompressAllFiles();
-
         input.clear();
 
         return codeDir;

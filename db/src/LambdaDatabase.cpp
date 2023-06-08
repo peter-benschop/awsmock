@@ -66,10 +66,10 @@ namespace AwsMock::Database {
         try {
             Poco::Data::Session session = GetSession();
             session.begin();
-            session << "UPDATE lambda SET function=?,runtime=?,role=?,handler=?,size=?,image_id=?,container_id=?,tag=?,arn=?,modified=CURRENT_TIMESTAMP "
-                       "WHERE bucket=? AND key=? returning id",
-                bind(lambda.function), bind(lambda.runtime), bind(lambda.role), bind(lambda.handler), bind(lambda.size), bind(lambda.imageId), bind(lambda.containerId),
-                bind(lambda.tag), bind(lambda.arn), into(id), now;
+            session << "UPDATE lambda SET role=?,handler=?,size=?,image_id=?,container_id=?,tag=?,arn=?,modified=CURRENT_TIMESTAMP "
+                       "WHERE function=? AND runtime=? returning id",
+                bind(lambda.role), bind(lambda.handler), bind(lambda.size), bind(lambda.imageId), bind(lambda.containerId), bind(lambda.tag), bind(lambda.arn),
+                bind(lambda.function), bind(lambda.runtime), into(id), now;
             session.commit();
 
             poco_trace(_logger, "Lambda updated, lambda: " + lambda.ToString());

@@ -71,11 +71,17 @@ namespace AwsMock::Core {
         long fileSize = file.tellg();
         file.close();
 
-        char *fileBuffer = new char[fileSize];
+        int filefd = open(fileName.c_str(), O_RDONLY);
+        if (filefd == -1) {
+            perror("open");
+            exit(EXIT_FAILURE);
+        }
+
+        /*char *fileBuffer = new char[fileSize];
         file.open(fileName, std::ios::binary);
         file.seekg(0, std::ios::beg);
         file.read(fileBuffer, fileSize);
-        file.close();
+        file.close();*/
 
         /* std::cout << "========================== Header ==========================" << std::endl;
          std::cout << header << std::endl;
@@ -87,7 +93,10 @@ namespace AwsMock::Core {
         }
 
         // Send body
-        unsigned int bytesSent = 0;
+        off_t offset = 0;
+        ssize_t bytesSend = sendfile(sock, filefd, &offset, fileSize);
+
+        /*unsigned int bytesSent = 0;
         long bytesToSend = 0;
 
         while (bytesSent < fileSize) {
@@ -97,7 +106,7 @@ namespace AwsMock::Core {
                 bytesToSend = fileSize - bytesSent;
             send(sock, fileBuffer + bytesSent, bytesToSend, 0);
             bytesSent += bytesToSend;
-        }
+        }*/
 
         // Get response
         std::stringstream output;
@@ -105,9 +114,10 @@ namespace AwsMock::Core {
         while (recv(sock, recv_msg, s_recv_len, 0) > 0) {
             output << recv_msg;
         }
-        /*std::cout << "========================== Response ==========================" << std::endl;
-        std::cout << output << std::endl;
-        std::cout << "========================== Response ==========================" << std::endl;*/
+        std::cout << "========================== Response ==========================" << std::endl;
+        std::cout << std::to_string(bytesSend) << std::endl;
+        std::cout << output.str() << std::endl;
+        std::cout << "========================== Response ==========================" << std::endl;
         close(sock);
         return GetBody(output.str());
     }

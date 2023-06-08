@@ -384,28 +384,34 @@ namespace AwsMock::Service {
 
         Database::Entity::S3::BucketNotification notification = _database->GetBucketNotification({.region=region, .bucket=object.bucket, .event=event});
 
-        // Create the event record
-        Dto::S3::EventNotification::Object obj = {.key=object.key, .etag=object.md5sum};
-        Dto::S3::EventNotification::Bucket bucket = {.name=notification.bucket};
+        if(!notification.function.empty()) {
 
-        Dto::S3::EventNotification::S3 s3 = {.bucket=bucket, .object=obj};
+            // Lambda notification
 
-        Dto::S3::EventNotification::Record record = {.s3=s3};
-        Dto::S3::EventNotification::EventNotification eventNotification;
-        eventNotification.records.push_back(record);
+        } else if(!notification.function.empty()) {
 
+            // Create the event record
+            Dto::S3::EventNotification::Object obj = {.key=object.key, .etag=object.md5sum};
+            Dto::S3::EventNotification::Bucket bucket = {.name=notification.bucket};
+
+            Dto::S3::EventNotification::S3 s3 = {.bucket=bucket, .object=obj};
+
+            Dto::S3::EventNotification::Record record = {.s3=s3};
+            Dto::S3::EventNotification::EventNotification eventNotification;
+            eventNotification.records.push_back(record);
+        }
     }
 
-    void S3Service::CreateQueueConfiguration(const Dto::S3::PutBucketNotificationRequest &request) {
+    Database::Entity::S3::BucketNotification S3Service::CreateQueueConfiguration(const Dto::S3::PutBucketNotificationRequest &request) {
         Database::Entity::S3::BucketNotification bucketNotification = {.region=request.region, .bucket=request.bucket, .notificationId=request.notificationId,
             .queueArn = request.queueArn, .event=request.event};
-        bucketNotification = _database->CreateBucketNotification(bucketNotification);
+        return _database->CreateBucketNotification(bucketNotification);
     }
 
-    void S3Service::CreateFunctionConfiguration(const Dto::S3::PutBucketNotificationRequest &request) {
+    Database::Entity::S3::BucketNotification S3Service::CreateFunctionConfiguration(const Dto::S3::PutBucketNotificationRequest &request) {
         Database::Entity::S3::BucketNotification bucketNotification = {.region=request.region, .bucket=request.bucket, .notificationId=request.notificationId,
             .function=request.function, .queueArn = request.queueArn, .event=request.event};
-        bucketNotification = _database->CreateBucketNotification(bucketNotification);
+        return _database->CreateBucketNotification(bucketNotification);
     }
 
     std::string S3Service::GetDirFromKey(const std::string &key) {

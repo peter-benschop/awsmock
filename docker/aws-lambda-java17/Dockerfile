@@ -1,7 +1,8 @@
-FROM public.ecr.aws/lambda/java:17
+FROM public.ecr.aws/lambda/java:11
 
-# Copy function code and runtime dependencies from Maven layout
-COPY $JARFILE ${LAMBDA_TASK_ROOT}/lib/
+  # Copy function code and runtime dependencies from Maven layout
+COPY target/classes ${LAMBDA_TASK_ROOT}
+COPY target/dependency/* ${LAMBDA_TASK_ROOT}/lib/
 
-# Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
-CMD [ "org.springframework.cloud.function.adapter.aws.FunctionInvoker::handleRequest" ]
+  # Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
+CMD [ "com.example.myapp.App::handleRequest" ]

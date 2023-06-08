@@ -1,9 +1,11 @@
 {
-  "QueueConfigurations": [
+  "LambdaFunctionConfigurations": [
     {
-      "Id": "1234567890125",
-      "QueueArn": "arn:aws:sqs:eu-central-1:000000000000:file-delivery1-queue",
-      "Events": ["s3:ObjectCreated:*"]
+      "Id": "1234567890123",
+      "LambdaFunctionArn": "arn:aws:lambda:eu-central-1:000000000000:function:ftp-file-copy",
+      "Events": [
+        "s3:ObjectCreated:*"
+      ]
     }
   ]
 }

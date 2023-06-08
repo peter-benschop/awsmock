@@ -235,15 +235,17 @@ namespace AwsMock::Service {
        * Create a queue notification
        *
        * @param request put bucket notification request.
+       * @return BucketNotification.
        */
-      void CreateQueueConfiguration(const Dto::S3::PutBucketNotificationRequest &request);
+      Database::Entity::S3::BucketNotification CreateQueueConfiguration(const Dto::S3::PutBucketNotificationRequest &request);
 
       /**
        * Create a lambda function notification
        *
        * @param request put bucket notification request.
+       * @return BucketNotification.
        */
-      void CreateFunctionConfiguration(const Dto::S3::PutBucketNotificationRequest &request);
+      Database::Entity::S3::BucketNotification CreateFunctionConfiguration(const Dto::S3::PutBucketNotificationRequest &request);
 
       /**
        * Deletes an object

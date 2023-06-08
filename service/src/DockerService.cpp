@@ -11,8 +11,10 @@ namespace AwsMock::Service {
     }
 
     void DockerService::Initialize() {
+
         // Set console logger
         Core::Logger::SetDefaultConsoleLogger("LambdaService");
+        poco_debug(_logger, "DOcker service initialized");
     }
 
     bool DockerService::ImageExists(const std::string &name, const std::string &tag) {
@@ -174,7 +176,7 @@ namespace AwsMock::Service {
 
         std::ofstream ofs(dockerFilename);
         ofs << "FROM public.ecr.aws/lambda/java:17" << std::endl;
-        ofs << "COPY classes/* ${LAMBDA_TASK_ROOT}/lib/" << std::endl;
+        ofs << "COPY classes ${LAMBDA_TASK_ROOT}" << std::endl;
         ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
         poco_debug(_logger, "Dockerfile written, filename: " + dockerFilename);
 
