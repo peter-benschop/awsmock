@@ -56,21 +56,23 @@ namespace AwsMock::Core {
     }
 
     std::vector<std::string> DirUtils::ListFiles(const std::string &dirName, bool recursive) {
-        Poco::DirectoryIterator it(dirName);
-        Poco::DirectoryIterator end;
         std::vector<std::string> fileNames;
-        while (it != end) {
-            ListFiles(it.name(), fileNames, recursive);
-            ++it;
+        if( recursive) {
+            Poco::RecursiveDirectoryIterator it(dirName);
+            Poco::RecursiveDirectoryIterator end;
+            while (it != end) {
+                fileNames.push_back(it->path());
+                ++it;
+            }
+        } else {
+            Poco::DirectoryIterator it(dirName);
+            Poco::DirectoryIterator end;
+            while (it != end) {
+                fileNames.push_back(it->path());
+                ++it;
+            }
         }
         return fileNames;
-    }
-
-    void DirUtils::ListFiles(const std::string &dirName, std::vector<std::string> &list, bool recursive){
-        list.push_back(dirName);
-        if(recursive && Poco::File(dirName).isDirectory()) {
-            ListFiles(dirName, list, recursive);
-        }
     }
 
     std::vector<std::string> DirUtils::ListFilesByPrefix(const std::string &dirName, const std::string &prefix) {
@@ -112,7 +114,7 @@ namespace AwsMock::Core {
         if (DirectoryExists(dirName)) {
             std::vector<std::string> files = ListFiles(dirName);
             for(auto &it:files) {
-                Poco::File tempFile = Poco::File(dirName + Poco::Path::separator() + it);
+                Poco::File tempFile = Poco::File(it);
                 tempFile.remove();
             }
         }

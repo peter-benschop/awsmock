@@ -29,6 +29,7 @@ namespace AwsMock::Service {
     }
 
     Dto::S3::CreateBucketResponse S3Service::CreateBucket(const std::string &name, const std::string &owner, const Dto::S3::CreateBucketRequest &s3Request) {
+        Poco::Mutex::ScopedLock lock(_mutex);
         poco_trace(_logger, "Create bucket request, s3Request: " + s3Request.ToString());
 
         Dto::S3::CreateBucketResponse createBucketResponse;
@@ -150,36 +151,47 @@ namespace AwsMock::Service {
 
         std::string uploadId = Core::StringUtils::GenerateRandomString(58);
 
+        // Create upload directory, if not existing
+        std::string uploadDir = GetMultipartUploadDirectory(uploadId);
+        if (!Core::DirUtils::DirectoryExists(uploadDir)) {
+            Core::DirUtils::MakeDirectory(uploadDir);
+        }
+
         return {.bucket=bucket, .key=key, .uploadId=uploadId};
     }
 
-    std::string S3Service::UploadPart(std::istream &stream, int part, const std::string &updateId) {
-        poco_trace(_logger, "UploadPart request, part: " + std::to_string(part) + " updateId: " + updateId);
+    std::string S3Service::UploadPart(std::istream &stream, int part, const std::string &uploadId) {
+        poco_trace(_logger, "UploadPart request, part: " + std::to_string(part) + " updateId: " + uploadId);
 
-        std::ofstream ofs(_tempDir + Poco::Path::separator() + updateId + "-" + std::to_string(part));
+        std::string uploadDir = GetMultipartUploadDirectory(uploadId);
+        poco_trace(_logger, "Using uploadDir: " + uploadDir);
+
+        std::ofstream ofs(uploadDir + Poco::Path::separator() + uploadId + "-" + std::to_string(part));
         ofs << stream.rdbuf();
+        poco_trace(_logger, "Part uploaded, part: " + std::to_string(part) + " dir: " + uploadDir);
 
         return Core::StringUtils::GenerateRandomString(40);
     }
 
-    Dto::S3::CompleteMultipartUploadResult S3Service::CompleteMultipartUpload(const std::string &updateId,
+    Dto::S3::CompleteMultipartUploadResult S3Service::CompleteMultipartUpload(const std::string &uploadId,
                                                                               const std::string &bucket,
                                                                               const std::string &key,
                                                                               const std::string &region,
                                                                               const std::string &user) {
-        poco_trace(_logger, "CompleteMultipartUpload request, updateId: " + updateId + " bucket: " + bucket + " key: " + key + " region: " + region + " user: " + user);
+        poco_trace(_logger, "CompleteMultipartUpload request, uploadId: " + uploadId + " bucket: " + bucket + " key: " + key + " region: " + region + " user: " + user);
 
-        // Create directory, if not existing
-        std::string fileDir = _dataDir + Poco::Path::separator() + "s3" + Poco::Path::separator() + bucket + Poco::Path::separator() + GetDirFromKey(key);
-        if (!Core::DirUtils::DirectoryExists(fileDir)) {
-            Core::DirUtils::MakeDirectory(fileDir);
+        // Get all file parts
+        std::string uploadDir = GetMultipartUploadDirectory(uploadId);
+        std::vector<std::string> files = Core::DirUtils::ListFilesByPrefix(uploadDir, uploadId);
+
+        // Create bucket directory, if not existing
+        std::string bucketDir = _dataDir + Poco::Path::separator() + "s3" + Poco::Path::separator() + bucket;
+        if (!Core::DirUtils::DirectoryExists(bucketDir)) {
+            Core::DirUtils::MakeDirectory(bucketDir);
         }
 
-        // Get all fie parts
-        std::vector<std::string> files = Core::DirUtils::ListFilesByPrefix(_tempDir, updateId);
-
         // Output file
-        std::string outFile = _dataDir + Poco::Path::separator() + "s3" + Poco::Path::separator() + bucket + Poco::Path::separator() + key;
+        std::string outFile = bucketDir + Poco::Path::separator() + GetDirFromKey(key);
         poco_trace(_logger, "Output file, outFile: " + outFile);
 
         // Append all parts to the output file
@@ -189,17 +201,19 @@ namespace AwsMock::Service {
         // Get file size, MD5 sum
         long fileSize = Core::FileUtils::FileSize(outFile);
         std::string md5sum = Core::Crypto::GetMd5FromFile(outFile);
+        poco_trace(_logger, "Got file metadata, md5sum: " + md5sum + " size: " + std::to_string(fileSize) + " outFile: " + outFile);
 
         // Create database object
-        Database::Entity::S3::Object object = _database->CreateObject({.bucket=bucket, .key=key, .owner=user, .size=fileSize, .md5sum=md5sum});
+        Database::Entity::S3::Object object = _database->CreateOrUpdateObject({.bucket=bucket, .key=key, .owner=user, .size=fileSize, .md5sum=md5sum});
 
         // Cleanup
-        Core::DirUtils::DeleteFilesInDirectory(_tempDir);
+        Core::DirUtils::DeleteDirectory(uploadDir);
 
         return {.location=region, .bucket=bucket, .key=key, .etag=Core::StringUtils::GenerateRandomString(40)};
     }
 
     Dto::S3::PutObjectResponse S3Service::PutObject(Dto::S3::PutObjectRequest &request, std::istream *stream) {
+        Poco::Mutex::ScopedLock lock(_mutex);
         poco_trace(_logger, "Put object request: " + request.ToString());
 
         Dto::S3::PutObjectResponse response;
@@ -231,7 +245,7 @@ namespace AwsMock::Service {
                 .size=request.size,
                 .md5sum=request.md5Sum,
                 .contentType=request.contentType};
-            object = _database->CreateObject(object);
+            object = _database->CreateOrUpdateObject(object);
 
             // Check notification
             if (_database->HasBucketNotification({.region=request.region, .bucket=request.bucket})) {
@@ -413,7 +427,10 @@ namespace AwsMock::Service {
         if(Core::DirUtils::DirectoryExists(dirname)) {
             Core::DirUtils::DeleteDirectory(dirname, true);
         }
+    }
 
+    std::string S3Service::GetMultipartUploadDirectory(const std::string &uploadId) {
+        return _tempDir + Poco::Path::separator() + uploadId;
     }
 
 } // namespace AwsMock::Service

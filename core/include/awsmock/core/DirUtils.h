@@ -16,8 +16,9 @@
 #include "Poco/UUIDGenerator.h"
 #include "Poco/RegularExpression.h"
 #include "Poco/DirectoryIterator.h"
+#include "Poco/RecursiveDirectoryIterator.h"
 
-// AwsMOck includes
+// AwsMock includes
 #include <awsmock/core/StringUtils.h>
 
 namespace AwsMock::Core {
@@ -96,8 +97,6 @@ namespace AwsMock::Core {
        * @return vector of file names
        */
       static std::vector<std::string> ListFiles(const std::string &dirName, bool recursive = true);
-
-      static void ListFiles(const std::string &dirName, std::vector<std::string> &list, bool recursive);
 
       /**
        * Get a sorted list of files with the given prefix.

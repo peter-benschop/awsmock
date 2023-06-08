@@ -13,8 +13,10 @@
 #include "Poco/Delegate.h"
 #include <Poco/DirectoryWatcher.h>
 #include <Poco/Logger.h>
+#include <Poco/Mutex.h>
 #include <Poco/Path.h>
 #include <Poco/Runnable.h>
+#include <Poco/ScopedLock.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>

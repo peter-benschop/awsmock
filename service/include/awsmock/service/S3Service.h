@@ -216,6 +216,14 @@ namespace AwsMock::Service {
       void CheckNotifications(const Database::Entity::S3::Object& object, const std::string &region, const std::string &event);
 
       /**
+       * Get the temporary upload directory for a uploadId.
+       *
+       * @param uploadId S3 multipart uplaod ID
+       * @return temporary directory path.
+       */
+      std::string GetMultipartUploadDirectory(const std::string &uploadId);
+
+      /**
        * Returns a event notification.
        *
        * @param key S3 object key
@@ -269,6 +277,12 @@ namespace AwsMock::Service {
        * Multipart uploads map
        */
       MultiPartUploads _uploads;
+
+      /**
+       * Lock
+       */
+      Poco::Mutex _mutex;
+
     };
 
 } //namespace AwsMock::Service
