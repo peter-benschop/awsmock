@@ -11,7 +11,7 @@
 #include "Poco/Net/HTTPRequestHandler.h"
 
 // AwsMock includes
-//#include "awsmock/resource/handling/JsonAPIErrorBuilder.h"
+#include "awsmock/dto/common/ResourceNotFounResponse.h"
 
 namespace AwsMock {
 
