@@ -8,9 +8,7 @@
 // AwsMock includes
 #include <awsmock/core/MetricService.h>
 #include <awsmock/resource/factory/IFactory.h>
-#include <awsmock/resource/factory/S3Factory.h>
 #include <awsmock/resource/handler/S3Handler.h>
-#include <awsmock/service/S3Service.h>
 
 namespace AwsMock::Resource::Factory {
 

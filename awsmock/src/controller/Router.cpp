@@ -14,6 +14,7 @@ namespace AwsMock::Controller {
         AddRoute("s3api", "AwsMock::Resource::Factory::S3Factory");
         AddRoute("sqs", "AwsMock::Resource::Factory::SQSFactory");
         AddRoute("sns", "AwsMock::Resource::Factory::SNSFactory");
+        AddRoute("lambda", "AwsMock::Resource::Factory::LambdaFactory");
     }
 
     Router::~Router() {
@@ -21,12 +22,12 @@ namespace AwsMock::Controller {
     }
 
     Poco::Net::HTTPRequestHandler *Router::createRequestHandler(const Poco::Net::HTTPServerRequest &request) {
-        std::string scheme;
-        std::string authInfo;
+        std::string scheme, authInfo;
         request.getCredentials(scheme, authInfo);
         poco_debug(_logger, "Schema: " + scheme + " Authorization: " + authInfo);
         poco_debug(_logger, "URI: " + request.getURI() + " Method: " + request.getMethod());
 
+        // Get the service from the request authorization header. Currently no credentials checks are made.
         std::string service = GetService(authInfo);
 
         return GetResource(service, request.getURI());
@@ -36,14 +37,19 @@ namespace AwsMock::Controller {
 
         Poco::URI uri = Poco::URI(route);
 
+        // Get the resource factory index for the service
         auto factoryIndex = _routingTable.find(service);
         if (factoryIndex == _routingTable.end()) {
             return new AwsMock::ResourceNotFound();
         }
 
-        poco_debug(_logger, "Found request handler for route: " + route + " factory: " + factoryIndex->second);
-
+        // Get the resource factory for the service
         Resource::Factory::IFactory *factory = Resource::Factory::Factory::createResourceFactory(factoryIndex->second);
+        if(!factory) {
+            poco_error(_logger, "Request handler for route: " + route + " not found");
+            return new AwsMock::ResourceNotFound();
+        }
+        poco_debug(_logger, "Found request handler for route: " + route + " factory: " + factoryIndex->second);
 
         return factory->createResource(_configuration, _metricService);
     }

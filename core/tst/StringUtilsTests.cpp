@@ -195,6 +195,22 @@ namespace AwsMock::Core
         EXPECT_STREQ("/abc/xyz/", result.c_str());
     }
 
+    TEST_F(StringUtilsTest, GetBodyTestTest)
+    {
+        // arrange
+        std::string output = "HTTP/1.1 200 OK\r\nApi-Version: 1.42\r\nContent-Type: application/json\r\nDate: Wed, 07 Jun 2023 18:33:56 GMT\r\nDocker-Experimental: false\r\nOstype: linux\r\nServer: Docker/23.0.5 (linux)\r\nConnection: close\r\nTransfer-Encoding: chunked\r\n\r\n2fc\r\n[{\"Id\":\"e1d2c2c69edcc8967ff69f44913fd7160cc2046ab751cc65fe00b83ead81d2e8\",\"Names\":[\"/ftp-file-copy\"],\"Image\":\"ftp-file-copy:latest\",\"ImageID\":\"sha256:fe7db6fa4195ba42f40608245a841abdae1fc3dbb1c51ffc017f195f4000bdea\",\"Command\":\"/lambda-entrypoint.sh org.springframework.cloud.function.adapter.aws.FunctionInvoker::handleRequest\",\"Created\":1686158110,\"Ports\":[],\"Labels\":{\"desktop.docker.io/wsl-distro\":\"Debian\"},\"State\":\"created\",\"Status\":\"Created\",\"HostConfig\":{\"NetworkMode\":\"default\"},\"NetworkSettings\":{\"Networks\":{\"bridge\":{\"IPAMConfig\":null,\"Links\":null,\"Aliases\":null,\"NetworkID\":\"\",\"EndpointID\":\"\",\"Gateway\":\"\",\"IPAddress\":\"\",\"IPPrefixLen\":0,\"IPv6Gateway\":\"\",\"GlobalIPv6Address\":\"\",\"GlobalIPv6PrefixLen\":0,\"MacAddress\":\"\",\"DriverOpts\":null}}},\"Mounts\":[]}]\n\r\n0\r\n\r\n[{\"Id\":\"e1d2c2c69edcc8967ff69f44913fd7160cc2046ab751cc65fe00b83ead81d2e8\",\"Names\":[\"/ftp-file-copy\"],\"Image\":\"ftp-file-copy:latest\",\"ImageID\":\"sha256:fe7db6fa4195ba42f40608245a841abdae1fc3dbb1c51ffc017f195f4000bdea\",\"Command\":\"/lambda-entrypoint.sh org.springframework.cloud.function.adapter.aws.FunctionInvoker::handleRequest\",\"Created\":1686158110,\"Ports\":[],\"Labels\":{\"desktop.docker.io/wsl-distro\":\"Debian\"},\"State\":\"created\",\"Status\":\"Created\",\"HostConfig\":{\"NetworkMode\":\"default\"},\"NetworkSettings\":{\"Networks\":{\"bridge\":{\"IPAMConfig\":null,\"Links\":null,\"Aliases\":null,\"NetworkID\":\"\",\"EndpointID\":\"\",\"Gateway\":\"\",\"IPAddress\":\"\",\"IPPrefixLen\":0,\"IPv6Gateway\":\"\",\"GlobalIPv6Address\":\"\",\"GlobalIPv6PrefixLen\":0,\"MacAddress\":\"\",\"DriverOpts\":null}}},\"Mounts\":[]}]\n\r\n";
+
+        // act
+        Poco::RegularExpression regex(R"(.*[\r?|\n?]{2}([0-9a-f]+)[\r?|\n?]{1}(.*)[\r?|\n?]{2}.*)");
+        Poco::RegularExpression::MatchVec mvec;
+        int matches = regex.match(output, 0, mvec);
+
+        // assert
+        EXPECT_EQ(matches,3);
+    }
+
+
+
 } // namespace AwsMock::Core
 
 #endif // AWSMOCK_CORE_STRINGUTILSTEST_H

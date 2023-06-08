@@ -11,7 +11,7 @@ enable_testing()
 
 add_subdirectory(core)
 add_subdirectory(db)
-add_subdirectory(dto)
+#add_subdirectory(dto)
 add_subdirectory(service)
 add_subdirectory(worker)
 add_subdirectory(awsmock)

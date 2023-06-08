@@ -8,7 +8,7 @@ namespace AwsMock {
         response.setReason(Poco::Net::HTTPResponse::HTTP_REASON_NOT_FOUND);
         response.setContentType("application/json; charset=utf-8");
 
-        AwsMock::JsonAPIErrorBuilder errorBuilder = AwsMock::JsonAPIErrorBuilder(request.getHost());
+        /*AwsMock::JsonAPIErrorBuilder errorBuilder = AwsMock::JsonAPIErrorBuilder(request.getHost());
 
         errorBuilder.withStatusCode(404);
         errorBuilder.sourceAt(request.getURI());
@@ -17,6 +17,6 @@ namespace AwsMock {
 
         std::ostream &outputStream = response.send();
         outputStream << errorBuilder.build().toString();
-        outputStream.flush();
+        outputStream.flush();*/
     }
 }

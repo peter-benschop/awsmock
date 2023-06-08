@@ -92,9 +92,12 @@ namespace AwsMock::Core {
        * Get list of files
        *
        * @param dirName name of the directory
+       * @param recursive recursively list files
        * @return vector of file names
        */
-      static std::vector<std::string> ListFiles(const std::string &dirName);
+      static std::vector<std::string> ListFiles(const std::string &dirName, bool recursive = true);
+
+      static void ListFiles(const std::string &dirName, std::vector<std::string> &list, bool recursive);
 
       /**
        * Get a sorted list of files with the given prefix.

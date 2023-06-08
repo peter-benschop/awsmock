@@ -9,56 +9,41 @@
 #include <string>
 #include <sstream>
 
-// Poco includes
-#include "Poco/DOM/AutoPtr.h"
-#include "Poco/DOM/DOMParser.h"
-#include "Poco/DOM/Document.h"
-#include "Poco/DOM/Element.h"
-
 namespace AwsMock::Dto::S3 {
 
-    class GetObjectRequest {
-
-    public:
+    struct GetObjectRequest {
 
       /**
-       * Constructor
+       * Bucket
        */
-      GetObjectRequest() = default;
+      std::string bucket;
 
-      void SetBucket(const std::string &bucket) { _bucket = bucket; }
-
-      std::string GetBucket() { return _bucket; }
-
-      void SetKey(const std::string &key) { _key = key; }
-
-      std::string GetKey() { return _key; }
+      /**
+       * Key
+       */
+      std::string key;
 
       /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.
        */
-      [[nodiscard]] std::string ToString() const;
-
-    private:
-
-      /**
-       * Bucket
-       */
-      std::string _bucket;
-
-      /**
-       * Key
-       */
-      std::string _key;
+      [[nodiscard]] std::string ToString() const {
+          std::stringstream ss;
+          ss << (*this);
+          return ss.str();
+      }
 
       /**
        * Stream provider.
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &, const GetObjectRequest &);
+      friend std::ostream &operator<<(std::ostream &os, const GetObjectRequest &r) {
+          os << "GetObjectRequest={bucket='" + r.bucket + "' key='" + r.key + "'}";
+          return os;
+      }
+
     };
 
 } // namespace AwsMock::Dto::S3

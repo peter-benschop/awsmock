@@ -7,18 +7,15 @@
 
 // C++ standard includes
 #include <string>
-#include <sys/inotify.h>
 
 // Poco includes
-#include "Poco/Delegate.h"
-#include <Poco/DirectoryWatcher.h>
 #include <Poco/Logger.h>
-#include <Poco/Path.h>
 #include <Poco/Runnable.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/Logger.h>
+#include <awsmock/db/ServiceDatabase.h>
 #include <awsmock/db/SQSDatabase.h>
 
 namespace AwsMock::Worker {
@@ -33,14 +30,9 @@ namespace AwsMock::Worker {
       explicit SQSWorker(const Core::Configuration &configuration);
 
       /**
-       * Destructor
-       */
-      ~SQSWorker() override;
-
-      /**
        * Main method
        */
-      [[noreturn]] void run() override;
+      void run() override;
 
     private:
 
@@ -68,6 +60,11 @@ namespace AwsMock::Worker {
       const Core::Configuration &_configuration;
 
       /**
+       * Service database
+       */
+      std::unique_ptr<Database::ServiceDatabase> _serviceDatabase;
+
+      /**
        * S3 service
        */
       std::unique_ptr<Database::SQSDatabase> _sqsDatabase;
@@ -76,6 +73,11 @@ namespace AwsMock::Worker {
        * AWS region
        */
       std::string _region;
+
+      /**
+       * Running flag
+       */
+      bool _running;
     };
 
 } // namespace AwsMock::Worker

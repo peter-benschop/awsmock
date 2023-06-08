@@ -6,6 +6,8 @@
 
 namespace AwsMock::Database {
 
+    using namespace Poco::Data::Keywords;
+
     Database::Database(const Core::Configuration &configuration) : _logger(Poco::Logger::get("Database")), _configuration(configuration) {
         Core::Logger::SetDefaultConsoleLogger("Database");
         Initialize();
@@ -44,11 +46,20 @@ namespace AwsMock::Database {
 
         // Create a session
         Poco::Data::Session session("SQLite", _dbFile);
+        session.begin();
 
         // Service
-        session << "CREATE TABLE service (id INTEGER NOT NULL PRIMARY KEY, name VARCHAR(30), active INTEGER)",
+        session << "CREATE TABLE service (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, name VARCHAR(30), active INTEGER)",
             Poco::Data::Keywords::now;
         session << "CREATE INDEX service_idx1 ON service(name)",
+            Poco::Data::Keywords::now;
+        session << "INSERT INTO service(name, active) VALUES(?,1)", bind("S3"),
+            Poco::Data::Keywords::now;
+        session << "INSERT INTO service(name, active) VALUES(?,1)", bind("SQS"),
+            Poco::Data::Keywords::now;
+        session << "INSERT INTO service(name, active) VALUES(?,1)", bind("SNS"),
+            Poco::Data::Keywords::now;
+        session << "INSERT INTO service(name, active) VALUES(?,1)", bind("Lambda"),
             Poco::Data::Keywords::now;
         poco_debug(_logger, "Service table created");
 
@@ -103,8 +114,17 @@ namespace AwsMock::Database {
         //session << "CREATE UNIQUE INDEX sqs_message_attribute_idx1 ON sqs_message(message_id)", Poco::Data::Keywords::now;
         poco_debug(_logger, "SQS message attribute table created");
 
+        session << "CREATE TABLE lambda (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, function VARCHAR(255), runtime VARCHAR(128), role VARCHAR(128), "
+                   "handler VARCHAR(255), size INT, image_id VARCHAR(255), container_id VARCHAR(255), tag VARCHAR(32), arn VARCHAR(64),"
+                   "created DATETIME DEFAULT CURRENT_TIMESTAMP, modified DATETIME DEFAULT CURRENT_TIMESTAMP)",
+            Poco::Data::Keywords::now;
+        session << "CREATE UNIQUE INDEX lambda_idx1 ON lambda(function, runtime)", Poco::Data::Keywords::now;
+        poco_debug(_logger, "Lambda table created");
+
+        session.commit();
+
         poco_debug(_logger, "Database initialized, dbFile: " + _dbFile);
-        session.close();
+
     }
 
     Poco::Data::Session Database::GetSession(){

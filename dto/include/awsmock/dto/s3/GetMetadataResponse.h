@@ -10,6 +10,9 @@
 #include <sstream>
 
 // Poco includes
+#include "Poco/DateTime.h"
+#include "Poco/DateTimeFormat.h"
+#include "Poco/DateTimeFormatter.h"
 #include "Poco/DOM/AutoPtr.h"
 #include "Poco/DOM/DOMParser.h"
 #include "Poco/DOM/Document.h"
@@ -17,84 +20,65 @@
 
 namespace AwsMock::Dto::S3 {
 
-    class GetMetadataResponse {
-
-    public:
+    struct GetMetadataResponse {
 
       /**
-       * Constructor
+       * Bucket
        */
-      GetMetadataResponse() = default;
+      std::string bucket;
 
-      void SetBucket(const std::string &bucket) { _bucket = bucket; }
+      /**
+       * Key
+       */
+      std::string key;
 
-      std::string GetBucket() { return _bucket; }
+      /**
+       * MD5 sum
+       */
+      std::string md5Sum;
 
-      void SetKey(const std::string &key) { _key = key; }
+      /**
+       * Content type
+       */
+      std::string contentType;
 
-      std::string GetKey() { return _key; }
+      /**
+       * Size
+       */
+      long size;
 
-      void SetMd5Sum(const std::string &md5Sum) { _md5Sum = md5Sum; }
+      /**
+       * Created
+       */
+      Poco::DateTime created;
 
-      std::string GetMd5Sum() { return _md5Sum; }
-
-      void SetContentType(const std::string &contentType) { _contentType = contentType; }
-
-      std::string GetContentType() { return _contentType; }
-
-      void SetSize(long size) { _size = size; }
-
-      long GetSize() { return _size; }
-
-      void SetLastModified(const std::string &lastModified) { _lastModified = lastModified; }
-
-      std::string GetLastModified() { return _lastModified; }
+      /**
+       * Last modified
+       */
+      Poco::DateTime modified;
 
       /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.
        */
-      std::string ToString() const;
-
-    private:
-
-      /**
-       * Bucket
-       */
-      std::string _bucket;
-
-      /**
-       * Key
-       */
-      std::string _key;
-
-      /**
-       * MD5 sum
-       */
-      std::string _md5Sum;
-
-      /**
-       * Content type
-       */
-      std::string _contentType;
-
-      /**
-       * Size
-       */
-      long _size;
-
-      /**
-       * Last modified
-       */
-      std::string _lastModified;
+      [[nodiscard]] std::string ToString() const {
+          std::stringstream ss;
+          ss << (*this);
+          return ss.str();
+      }
 
       /**
        * Stream provider.
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &, const GetMetadataResponse &);
+      friend std::ostream &operator<<(std::ostream &os, const GetMetadataResponse &r) {
+          os << "GetMetadataResponse={bucket='" + r.bucket + "' key='" + r.key + "' md5sum='" + r.md5Sum + "' contentType='" + r.contentType
+              + "' size='" + std::to_string(r.size) + " created='" + Poco::DateTimeFormatter().format(r.created, Poco::DateTimeFormat::HTTP_FORMAT)
+              + " modified='" + Poco::DateTimeFormatter().format(r.modified, Poco::DateTimeFormat::HTTP_FORMAT) + "'}";
+          return os;
+      }
     };
 
 } // namespace AwsMock::Dto::S3

@@ -27,8 +27,6 @@
 #include "awsmock/dto/s3/RestErrorResponse.h"
 #include "awsmock/dto/sqs/RestErrorResponse.h"
 #include <awsmock/resource/HandlerException.h>
-#include <awsmock/resource/handling/JsonAPIErrorBuilder.h>
-#include <awsmock/resource/handling/JsonAPIResourceBuilder.h>
 
 namespace AwsMock::Resource {
 
@@ -289,7 +287,15 @@ namespace AwsMock::Resource {
        *
        * @param request HTTP request
        */
-      void DumpBody(Poco::Net::HTTPServerRequest &request);
+      [[maybe_unused]] void DumpBody(Poco::Net::HTTPServerRequest &request);
+
+      /**
+       * Dump the request body to a file
+       *
+       * @param request HTTP request
+       * @param filename name fo the file
+       */
+      void DumpBodyToFile(Poco::Net::HTTPServerRequest &request, const std::string &filename);
 
     private:
 
