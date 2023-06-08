@@ -36,9 +36,9 @@ namespace AwsMock::Resource {
 
             handleHttpStatusCode(response, exception.code());
 
-            AwsMock::JsonAPIErrorBuilder errorBuilder = AwsMock::JsonAPIErrorBuilder(request.getHost());
+            //AwsMock::JsonAPIErrorBuilder errorBuilder = AwsMock::JsonAPIErrorBuilder(request.getHost());
 
-            errorBuilder.sourceAt(request.getURI());
+           /* errorBuilder.sourceAt(request.getURI());
             errorBuilder.withType(exception.type());
             errorBuilder.withStatusCode(exception.code());
             errorBuilder.withDetails(exception.message());
@@ -46,7 +46,7 @@ namespace AwsMock::Resource {
             std::ostream &errorStream = response.send();
             errorStream << errorBuilder.build().toString();
 
-            errorStream.flush();
+            errorStream.flush();*/
             return;
         }
 
@@ -263,7 +263,7 @@ namespace AwsMock::Resource {
         return _baseUrl + fragment;
     }
 
-    std::string AbstractResource::toJson(const HandlerException &exception) {
+    /*std::string AbstractResource::toJson(const HandlerException &exception) {
         AwsMock::JsonAPIErrorBuilder errorBuilder(_requestHost);
 
         errorBuilder.withType(exception.type());
@@ -296,7 +296,7 @@ namespace AwsMock::Resource {
         errorBuilder.withDetails("Resource not found");
 
         return errorBuilder.build().toString();
-    }
+    }*/
 
     std::string AbstractResource::GetQueryParameter(const std::string &parameterKey, bool optional) {
 

@@ -27,8 +27,6 @@
 #include "awsmock/dto/s3/RestErrorResponse.h"
 #include "awsmock/dto/sqs/RestErrorResponse.h"
 #include <awsmock/resource/HandlerException.h>
-#include <awsmock/resource/handling/JsonAPIErrorBuilder.h>
-#include <awsmock/resource/handling/JsonAPIResourceBuilder.h>
 
 namespace AwsMock::Resource {
 
