@@ -23,6 +23,19 @@
 
 namespace AwsMock::Dto::Docker {
 
+    struct ExposedPort {
+      /**
+       * Internal port
+       */
+      std::string internalPort;
+
+      /**
+       * Internal protocol
+       */
+      std::string protocol;
+
+    };
+
     struct CreateContainerRequest {
 
       /**
@@ -41,20 +54,28 @@ namespace AwsMock::Dto::Docker {
       std::string user;
 
       /**
-       * Environment
-       */
-      std::vector<std::string> environment;
-
-      /**
        * Image
        */
       std::string image;
 
       /**
-      * Convert to a JSON string
-      *
-      * @return JSON string
-      */
+       * Environment
+       */
+      std::vector<std::string> environment;
+
+      /**
+       * Exposed ports
+       *
+       * <p>Default is port 8080, which is the lambda internal port for invoking the lambda function. This will be mapped to the host network on port 9020 during the
+       * start of the container.</p>
+       */
+      std::string exposedPorts;
+
+      /**
+       * Convert to a JSON string
+       *
+       * @return JSON string
+       */
       std::string ToJson() {
 
           try {
@@ -68,9 +89,17 @@ namespace AwsMock::Dto::Docker {
               for(unsigned long i = 0; i < environment.size(); i++) {
                   envArray.set(i, environment[i]);
               }
+              rootJson.set("Env", envArray);
+
+              Poco::JSON::Object exposedPortsObject;
+              exposedPortsObject.set(exposedPorts, Poco::JSON::Object());
+              rootJson.set("ExposedPorts", exposedPortsObject);
 
               std::ostringstream os;
               rootJson.stringify(os);
+
+              Poco::Logger::get("root").information("Container JSON: " + os.str());
+
               return os.str();
 
           } catch (Poco::Exception &exc) {
@@ -95,7 +124,7 @@ namespace AwsMock::Dto::Docker {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const CreateContainerRequest &r) {
-          os << "CreateContainerRequest={hostName='" + r.hostName + "' domainName='" + r.domainName + "' user='" + r.user;
+          os << "CreateContainerRequest={hostName='" + r.hostName + "' domainName='" + r.domainName + "' user='" + r.user + "' exposedPorts='" + r.exposedPorts + "' ";
           for(auto &it:r.environment) {
               os <<  it + ",";
           };
