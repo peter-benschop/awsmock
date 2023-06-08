@@ -32,8 +32,8 @@ namespace AwsMock::Service {
         poco_information(_logger, "Lambda service initialized");
     }
 
-    Dto::Lambda::CreateFunctionResponse LambdaService::CreateFunction(Dto::Lambda::CreateFunctionRequest &request) {
-        poco_debug(_logger, "Create function request: " + request.ToString());
+    Dto::Lambda::CreateFunctionResponse LambdaService::CreateFunctionConfiguration(Dto::Lambda::CreateFunctionRequest &request) {
+        poco_debug(_logger, "Create function configuration request: " + request.ToString());
 
         // Build the docker image, if not existing
         if (!_dockerService->ImageExists(request.functionName, "latest")) {
@@ -67,8 +67,8 @@ namespace AwsMock::Service {
 
         // Update database
         std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, request.functionName);
-        _database->CreateLambda({.function=request.functionName, .runtime=request.runtime, .role=request.role, .handler=request.handler,
-                                 .size=image.size, .image_id=image.id, .container_id=container.id, .tag="latest", .arn=arn});
+        _database->CreateOrUpdateLambda({.function=request.functionName, .runtime=request.runtime, .role=request.role, .handler=request.handler,
+                                            .size=image.size, .imageId=image.id, .containerId=container.id, .tag="latest", .arn=arn, .lastStarted=Poco::DateTime()});
 
         // Create response
         Dto::Lambda::CreateFunctionResponse

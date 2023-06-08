@@ -232,6 +232,20 @@ namespace AwsMock::Service {
       static std::string GetEventNotification(const std::string &key);
 
       /**
+       * Create a queue notification
+       *
+       * @param request put bucket notification request.
+       */
+      void CreateQueueConfiguration(const Dto::S3::PutBucketNotificationRequest &request);
+
+      /**
+       * Create a lambda function notification
+       *
+       * @param request put bucket notification request.
+       */
+      void CreateFunctionConfiguration(const Dto::S3::PutBucketNotificationRequest &request);
+
+      /**
        * Deletes an object
        *
        * @param bucket S3 bucket name

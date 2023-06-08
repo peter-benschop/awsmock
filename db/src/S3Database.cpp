@@ -301,17 +301,14 @@ namespace AwsMock::Database {
         long id = 0;
         try {
             Poco::Data::Session session = GetSession();
-
+            session.begin();
             std::string event = Poco::replace(bucketNotification.event, "*", "%");
-            session << "INSERT INTO s3_notification(bucket,region,notification_id,function,event) VALUES(?,?,?,?,?) returning id",
+            session << "INSERT INTO s3_notification(bucket,region,notification_id,function,queue_arn,event) VALUES(?,?,?,?,?,?) returning id",
                 bind(bucketNotification.bucket), bind(bucketNotification.region), bind(bucketNotification.notificationId), bind(bucketNotification.function),
-                bind(event), into(id), now;
+                bind(bucketNotification.queueArn), bind(event), into(id), now;
+            session.commit();
 
-            poco_trace(_logger,
-                       "Bucket notification added, bucket: " + bucketNotification.bucket + " function: " + bucketNotification.function + " event: "
-                           + bucketNotification.event);
-
-            session.close();
+            poco_trace(_logger, "Bucket notification added, bucketNotification: " + bucketNotification.ToString());
 
         } catch (Poco::Exception &exc) {
             poco_error(_logger, "Database exception: " + exc.message());

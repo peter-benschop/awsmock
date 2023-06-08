@@ -79,7 +79,7 @@ namespace AwsMock::Database {
         poco_debug(_logger, "S3 object table created");
 
         session << "CREATE TABLE s3_notification (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, region VARCHAR(255), bucket VARCHAR(255), notification_id INT, "
-                   "function VARCHAR(128), event VARCHAR(128), created DATETIME DEFAULT CURRENT_TIMESTAMP, modified DATETIME DEFAULT CURRENT_TIMESTAMP)",
+                   "function VARCHAR(255), queue_arn VARCHAR(255), event VARCHAR(128), created DATETIME DEFAULT CURRENT_TIMESTAMP, modified DATETIME DEFAULT CURRENT_TIMESTAMP)",
             Poco::Data::Keywords::now;
         session << "CREATE UNIQUE INDEX s3_notification_idx1 ON s3_notification(region,bucket,event)",
             Poco::Data::Keywords::now;
@@ -116,7 +116,7 @@ namespace AwsMock::Database {
 
         session << "CREATE TABLE lambda (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, function VARCHAR(255), runtime VARCHAR(128), role VARCHAR(128), "
                    "handler VARCHAR(255), size INT, image_id VARCHAR(255), container_id VARCHAR(255), tag VARCHAR(32), arn VARCHAR(64),"
-                   "created DATETIME DEFAULT CURRENT_TIMESTAMP, modified DATETIME DEFAULT CURRENT_TIMESTAMP)",
+                   "last_started DATETIME, created DATETIME DEFAULT CURRENT_TIMESTAMP, modified DATETIME DEFAULT CURRENT_TIMESTAMP)",
             Poco::Data::Keywords::now;
         session << "CREATE UNIQUE INDEX lambda_idx1 ON lambda(function, runtime)", Poco::Data::Keywords::now;
         poco_debug(_logger, "Lambda table created");

@@ -52,7 +52,7 @@ namespace AwsMock {
                 Dto::Lambda::CreateFunctionRequest lambdaRequest;
                 lambdaRequest.FromJson(request.stream());
 
-                Dto::Lambda::CreateFunctionResponse lambdaResponse = _lambdaService.CreateFunction(lambdaRequest);
+                Dto::Lambda::CreateFunctionResponse lambdaResponse = _lambdaService.CreateFunctionConfiguration(lambdaRequest);
                 SendOkResponse(response, lambdaResponse.ToJson());
             }
 

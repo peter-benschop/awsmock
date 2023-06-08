@@ -20,4 +20,9 @@ namespace AwsMock::Core {
 
         return CreateArn("lambda", region, accountId, "function:" + function);
     }
+
+    std::string AwsUtils::CreateSQSArn(const std::string &region, const std::string &accountId, const std::string &queueName) {
+
+        return CreateArn("s3", region, accountId, queueName);
+    }
 }

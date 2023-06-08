@@ -337,9 +337,11 @@ namespace AwsMock::Service {
                 throw Core::ServiceException("Bucket notification exists already", 500);
             }
 
-            Database::Entity::S3::BucketNotification
-                bucketNotification = _database->CreateBucketNotification({.region=request.region, .bucket=request.bucket, .notificationId=request.notificationId,
-                                                                             .function=request.function, .event=request.event});
+            if (!request.function.empty()) {
+                CreateFunctionConfiguration(request);
+            } else if (!request.queueArn.empty()) {
+                CreateQueueConfiguration(request);
+            }
 
         } catch (Poco::Exception &ex) {
             poco_error(_logger, "S3 put bucket notification request failed, message: " + ex.message());
@@ -392,6 +394,18 @@ namespace AwsMock::Service {
         Dto::S3::EventNotification::EventNotification eventNotification;
         eventNotification.records.push_back(record);
 
+    }
+
+    void S3Service::CreateQueueConfiguration(const Dto::S3::PutBucketNotificationRequest &request) {
+        Database::Entity::S3::BucketNotification bucketNotification = {.region=request.region, .bucket=request.bucket, .notificationId=request.notificationId,
+            .queueArn = request.queueArn, .event=request.event};
+        bucketNotification = _database->CreateBucketNotification(bucketNotification);
+    }
+
+    void S3Service::CreateFunctionConfiguration(const Dto::S3::PutBucketNotificationRequest &request) {
+        Database::Entity::S3::BucketNotification bucketNotification = {.region=request.region, .bucket=request.bucket, .notificationId=request.notificationId,
+            .function=request.function, .queueArn = request.queueArn, .event=request.event};
+        bucketNotification = _database->CreateBucketNotification(bucketNotification);
     }
 
     std::string S3Service::GetDirFromKey(const std::string &key) {

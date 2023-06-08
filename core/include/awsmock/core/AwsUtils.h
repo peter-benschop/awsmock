@@ -43,6 +43,15 @@ namespace AwsMock::Core {
        * @param key object key
        */
       static std::string CreateLambdaArn(const std::string &region, const std::string &accountId, const std::string &function);
+
+      /**
+       * Create Lambda function ARN
+       *
+       * @param service AWS service name
+       * @param region AWS region
+       * @param queueName name of the queue
+       */
+      static std::string CreateSQSArn(const std::string &region, const std::string &accountId, const std::string &queueName);
     };
 }
 #endif //AWSMOCK_CORE_AWSUTILS_H

@@ -3,11 +3,5 @@
 #
 # Create lambda function
 #
-awsmock lambda create-function \
---function-name ftp-file-copy \
---runtime java17 \
---environment file://env.json \
---handler org.springframework.cloud.function.adapter.aws.FunctionInvoker \
---region eu-central-1 \
---zip-file fileb:////tmp/awsmock/data/lambda/file-copy-service-1.13.2-SNAPSHOT-aws.jar \
---role arn:aws:iam::000000000000:role/ignoreme
+awsmock s3api put-bucket-notification-configuration --bucket file-delivery1 --notification-configuration file://./s3/file-delivery1-hook.json
+
