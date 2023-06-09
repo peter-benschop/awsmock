@@ -16,7 +16,7 @@ namespace AwsMock {
             std::string fileName = getPathParameter(3);
             poco_debug(_logger, "Handling image GET request, key: " + lieferantenId + " fileName: " + fileName);
 
-            Database::ImageEntity entity = _database->findByLieferantenIdFileName(lieferantenId, fileName);
+            Database::ImageEntity entity = _lambdaDatabase->findByLieferantenIdFileName(lieferantenId, fileName);
 
             std::string key = lieferantenId + "/" + fileName;
             long contentLength = _s3Adapter->GetContentLength(_bucket, key);
@@ -117,9 +117,9 @@ namespace AwsMock {
             std::string fileName = GetPathParameter(3);
             poco_debug(_logger, "Handling image DELETE request, lieferantenId: " + lieferantenId + " fileName: " + fileName);
 
-            /*Database::ImageEntity entity = _database->findByLieferantenIdFileName(lieferantenId, fileName);
+            /*Database::ImageEntity entity = _lambdaDatabase->findByLieferantenIdFileName(lieferantenId, fileName);
 
-            _database->deleteEntity(entity);*/
+            _lambdaDatabase->deleteEntity(entity);*/
 
             handleHttpStatusCode(response, 204);
             std::ostream &outputStream = response.send();

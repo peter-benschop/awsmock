@@ -175,7 +175,7 @@ namespace AwsMock::Service {
         Dto::SQS::DeleteMessageResponse response;
         try {
             // TODO: Check existence
-            /*if (!_database->MessageExists(request.url)) {
+            /*if (!_lambdaDatabase->MessageExists(request.url)) {
                 throw Core::ServiceException("Queue does not exist", 500);
             }*/
 

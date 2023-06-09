@@ -86,10 +86,10 @@ namespace AwsMock::Database {
 
         // arrange
         Entity::S3::Bucket bucket = {.region=REGION, .name=BUCKET, .owner=OWNER};
-        bucket = _database.CreateBucket(bucket);
+        bucket = _lambdaDatabase.CreateBucket(bucket);
 
         // act
-        Entity::S3::Bucket result = _database.GetBucketByRegionName(REGION, BUCKET);
+        Entity::S3::Bucket result = _lambdaDatabase.GetBucketByRegionName(REGION, BUCKET);
 
         // assert
         EXPECT_EQ(result.id, bucket.id);
@@ -99,10 +99,10 @@ namespace AwsMock::Database {
 
         // arrange
         Entity::S3::Bucket bucket = {.region=REGION, .name=BUCKET, .owner=OWNER};
-        _database.CreateBucket(bucket);
+        _lambdaDatabase.CreateBucket(bucket);
 
         // act
-        Entity::S3::BucketList result = _database.ListBuckets();
+        Entity::S3::BucketList result = _lambdaDatabase.ListBuckets();
 
         // assert
         EXPECT_EQ(result.size() ,1);
@@ -112,12 +112,12 @@ namespace AwsMock::Database {
 
         // arrange
         Entity::S3::Bucket bucket = {.region=REGION, .name=BUCKET, .owner=OWNER};
-        _database.CreateBucket(bucket);
+        _lambdaDatabase.CreateBucket(bucket);
         Entity::S3::Object object = {.bucket=bucket.name, .key=OBJECT, .owner=OWNER, .size=5};
-        _database.CreateObject(object);
+        _lambdaDatabase.CreateObject(object);
 
         // act
-        Entity::S3::ObjectList result = _database.ListBucket(bucket.name);
+        Entity::S3::ObjectList result = _lambdaDatabase.ListBucket(bucket.name);
 
         // assert
         EXPECT_EQ(result.size() ,1);
@@ -127,11 +127,11 @@ namespace AwsMock::Database {
 
         // arrange
         Entity::S3::Bucket bucket = {.region=REGION, .name=BUCKET, .owner=OWNER};
-        bucket = _database.CreateBucket(bucket);
+        bucket = _lambdaDatabase.CreateBucket(bucket);
 
         // act
-        EXPECT_NO_THROW({ _database.DeleteBucket(bucket); });
-        bool result = _database.BucketExists({.region=bucket.region, .name=bucket.name});
+        EXPECT_NO_THROW({ _lambdaDatabase.DeleteBucket(bucket); });
+        bool result = _lambdaDatabase.BucketExists({.region=bucket.region, .name=bucket.name});
 
         // assert
         EXPECT_FALSE(result);
@@ -141,12 +141,12 @@ namespace AwsMock::Database {
 
         // arrange
         Entity::S3::Bucket bucket = {.region=REGION, .name=BUCKET, .owner=OWNER};
-        bucket = _database.CreateBucket(bucket);
+        bucket = _lambdaDatabase.CreateBucket(bucket);
         Entity::S3::Object object = {.bucket=bucket.name, .key=OBJECT, .owner=OWNER, .size=5};
-        object = _database.CreateObject(object);
+        object = _lambdaDatabase.CreateObject(object);
 
         // act
-        bool result = _database.ObjectExists(object);
+        bool result = _lambdaDatabase.ObjectExists(object);
 
         // assert
         EXPECT_TRUE(result);
@@ -156,12 +156,12 @@ namespace AwsMock::Database {
 
         // arrange
         Entity::S3::Bucket bucket = {.region=REGION, .name=BUCKET, .owner=OWNER};
-        bucket = _database.CreateBucket(bucket);
+        bucket = _lambdaDatabase.CreateBucket(bucket);
         Entity::S3::Object object = {.bucket=bucket.name, .owner=OWNER, .size=5};
-        object = _database.CreateObject(object);
+        object = _lambdaDatabase.CreateObject(object);
 
         // act
-        Entity::S3::Object result = _database.GetObject(object.bucket, object.key);
+        Entity::S3::Object result = _lambdaDatabase.GetObject(object.bucket, object.key);
 
         // assert
         EXPECT_STREQ(result.key.c_str(), object.key.c_str());
@@ -171,12 +171,12 @@ namespace AwsMock::Database {
 
         // arrange
         Entity::S3::Bucket bucket = {.region=REGION, .name=BUCKET, .owner=OWNER};
-        bucket = _database.CreateBucket(bucket);
+        bucket = _lambdaDatabase.CreateBucket(bucket);
         Entity::S3::Object object = {.bucket=bucket.name, .owner=OWNER, .size=5};
-        object = _database.CreateObject(object);
+        object = _lambdaDatabase.CreateObject(object);
 
         // act
-        Entity::S3::Object result = _database.GetObjectById(object.id);
+        Entity::S3::Object result = _lambdaDatabase.GetObjectById(object.id);
 
         // assert
         EXPECT_EQ(result.id, object.id);
@@ -188,7 +188,7 @@ namespace AwsMock::Database {
         Entity::S3::BucketNotification notification = {.region=REGION, .bucket=BUCKET, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
 
         // act
-        Entity::S3::BucketNotification result = _database.CreateBucketNotification(notification);
+        Entity::S3::BucketNotification result = _lambdaDatabase.CreateBucketNotification(notification);
 
         // assert
         EXPECT_TRUE(result.id > 0);
@@ -198,10 +198,10 @@ namespace AwsMock::Database {
 
         // arrange
         Entity::S3::BucketNotification notification = {.region=REGION, .bucket=BUCKET, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
-        notification = _database.CreateBucketNotification(notification);
+        notification = _lambdaDatabase.CreateBucketNotification(notification);
 
         // act
-        bool result = _database.HasBucketNotification(notification);
+        bool result = _lambdaDatabase.HasBucketNotification(notification);
 
         // assert
         EXPECT_TRUE(result);
@@ -211,10 +211,10 @@ namespace AwsMock::Database {
 
         // arrange
         Entity::S3::BucketNotification notification = {.region=REGION, .bucket=BUCKET, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
-        notification = _database.CreateBucketNotification(notification);
+        notification = _lambdaDatabase.CreateBucketNotification(notification);
 
         // act
-        Entity::S3::BucketNotification result = _database.GetBucketNotification(notification);
+        Entity::S3::BucketNotification result = _lambdaDatabase.GetBucketNotification(notification);
 
         // assert
         EXPECT_TRUE(result.region == notification.region);
@@ -225,11 +225,11 @@ namespace AwsMock::Database {
 
         // arrange
         Entity::S3::BucketNotification notification = {.region=REGION, .bucket=BUCKET, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
-        notification = _database.CreateBucketNotification(notification);
+        notification = _lambdaDatabase.CreateBucketNotification(notification);
 
         // act
         Entity::S3::BucketNotification search = {.region=REGION, .bucket=BUCKET, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:Put"};
-        Entity::S3::BucketNotification result = _database.GetBucketNotification(search);
+        Entity::S3::BucketNotification result = _lambdaDatabase.GetBucketNotification(search);
 
         // assert
         EXPECT_TRUE(result.region == notification.region);

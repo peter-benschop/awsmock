@@ -22,7 +22,8 @@ namespace AwsMock::Service {
         _accountId = _configuration.getString("awsmock.account.id", "000000000000");
         _dataDir = _configuration.getString("awsmock.data.dir", "/tmp/awsmock/data");
         _tempDir = _dataDir + Poco::Path::separator() + "tmp";
-        _database = std::make_unique<Database::LambdaDatabase>(_configuration);
+        _lambdaDatabase = std::make_unique<Database::LambdaDatabase>(_configuration);
+        _s3Database = std::make_unique<Database::S3Database>(_configuration);
         _dockerService = std::make_unique<Service::DockerService>(_configuration);
 
         // Create temp directory
@@ -75,7 +76,7 @@ namespace AwsMock::Service {
 
         // Update database
         lambdaEntity.arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, request.functionName);
-        lambdaEntity = _database->CreateOrUpdateLambda(lambdaEntity);
+        lambdaEntity = _lambdaDatabase->CreateOrUpdateLambda(lambdaEntity);
 
         // Create response
         Dto::Lambda::CreateFunctionResponse
@@ -83,6 +84,10 @@ namespace AwsMock::Service {
             .environment=request.environment, .memorySize=request.memorySize, .dockerImageId=image.id, .dockerContainerId=container.id};
 
         return response;
+    }
+
+    Dto::Lambda::CreateFunctionResponse InvokeEventFunction(const Dto::S3::EventNotification &notification){
+
     }
 
     std::string LambdaService::UnpackZipFile(const std::string &zipFile) {

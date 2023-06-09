@@ -14,9 +14,6 @@
 #include <Poco/UUIDGenerator.h>
 #include <Poco/RecursiveDirectoryIterator.h>
 
-// Easyzip
-#include <easyzip/easyzip.h>
-
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
@@ -25,8 +22,10 @@
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
 #include <awsmock/db/LambdaDatabase.h>
-#include <awsmock/dto/lambda/CreateFunctionRequest.h>
+#include <awsmock/db/S3Database.h>
+#include <awsmock/dto/s3/EventNotification.h>
 #include <awsmock/dto/lambda/CreateFunctionResponse.h>
+#include <awsmock/dto/lambda/CreateFunctionRequest.h>
 #include <awsmock/service/DockerService.h>
 
 namespace AwsMock::Service {
@@ -82,6 +81,14 @@ namespace AwsMock::Service {
        */
       Dto::Lambda::CreateFunctionResponse CreateFunctionConfiguration(Dto::Lambda::CreateFunctionRequest &request);
 
+      /**
+       * Invoke lambda function
+       *
+       * @param notification S3 event notification
+       * @return CreateFunctionResponse
+       */
+      Dto::Lambda::CreateFunctionResponse InvokeEventFunction(const Dto::S3::EventNotification &notification);
+
     private:
 
       /**
@@ -98,16 +105,6 @@ namespace AwsMock::Service {
        * @return code directory
        */
       std::string UnpackZipFile(const std::string &zipFile);
-
-      /**
-       * Create the docker image.
-       *
-       * @param codeDir code directory
-       * @param functionName function name
-       * @param handler function handler
-       * @return location of docker file
-       */
-      std::string BuildDockerImage(const std::string &codeDir, const std::string &functionName, const std::string &handler);
 
       /**
        * Logger
@@ -140,9 +137,14 @@ namespace AwsMock::Service {
       const Core::Configuration &_configuration;
 
       /**
-       * Database connection
+       * Lambda database connection
        */
-      std::unique_ptr<Database::LambdaDatabase> _database;
+      std::unique_ptr<Database::LambdaDatabase> _lambdaDatabase;
+
+      /**
+       * S3 database connection
+       */
+      std::unique_ptr<Database::S3Database> _s3Database;
 
       /**
        * Database connection
