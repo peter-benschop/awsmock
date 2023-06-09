@@ -102,12 +102,9 @@ namespace AwsMock::Core {
 
         // assert
         EXPECT_FALSE(result.empty());
-        std::string basename1 = FileUtils::StripBasePath(fileName1);
-        std::string basename2 = FileUtils::StripBasePath(fileName2);
-        std::string basename3 = FileUtils::StripBasePath(fileName3);
-        EXPECT_THAT(result, ::testing::Contains(::testing::Eq(::std::string(basename1))));
-        EXPECT_THAT(result, ::testing::Contains(::testing::Eq(::std::string(basename2))));
-        EXPECT_THAT(result, ::testing::Contains(::testing::Eq(::std::string(basename3))));
+        EXPECT_THAT(result, ::testing::Contains(::testing::Eq(::std::string(fileName1))));
+        EXPECT_THAT(result, ::testing::Contains(::testing::Eq(::std::string(fileName2))));
+        EXPECT_THAT(result, ::testing::Contains(::testing::Eq(::std::string(fileName3))));
     }
 
     TEST_F(DirUtilsTest, ListFilesPatternTest)
@@ -120,15 +117,12 @@ namespace AwsMock::Core {
 
         // act
         std::vector<std::string> result;
-        EXPECT_NO_THROW({ result = DirUtils::ListFiles(dirName, "^.*\\.(json|xml)$"); });
+        EXPECT_NO_THROW({ result = DirUtils::ListFilesByPattern(dirName, "^\\/tmp.*\\.xml$"); });
 
         // assert
         EXPECT_FALSE(result.empty());
-        EXPECT_EQ(result.size(), 2);
-        std::string basename1 = FileUtils::StripBasePath(fileName1);
-        std::string basename2 = FileUtils::StripBasePath(fileName3);
-        EXPECT_THAT(result, ::testing::Contains(::testing::Eq(::std::string(basename1))));
-        EXPECT_THAT(result, ::testing::Contains(::testing::Eq(::std::string(basename2))));
+        EXPECT_EQ(result.size(), 1);
+        EXPECT_THAT(result, ::testing::Contains(::testing::Eq(::std::string(fileName3))));
     }
 
 } // namespace AwsMock::Core

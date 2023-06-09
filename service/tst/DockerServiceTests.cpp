@@ -31,24 +31,26 @@ namespace AwsMock::Service {
       DockerService _service = DockerService(_configuration);
     };
 
-    TEST_F(DockerServiceTest, CreateContainerDtoTest) {
+    TEST_F(DockerServiceTest, ContainerCreateDtoTest) {
 
         // arrange
-        std::string exposedPorts = "8080/tcp";
-        std::string domainName = std::string(NAME) + ".dockerhost.net";
-        std::vector<std::string> environment = {"ENVIRONMENT=localstack", "JAVA_TOOL_OPTIONS=-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localstack"};
+        std::string exposedPorts = CONTAINER_PORT;
+        std::string domainName = std::string(NAME) + NETWORK_NAME;
+        std::vector<std::string> environment = {"AWS_EC2_METADATA_DISABLED=true", "JAVA_TOOL_OPTIONS=-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localstack"};
 
         // act
         Dto::Docker::CreateContainerRequest request = {.hostName=NAME, .domainName=domainName, .user="root", .image=IMAGE,
-            .environment=environment, .exposedPorts=exposedPorts};
+            .environment=environment, .containerPort=exposedPorts};
         std::string jsonString = request.ToJson();
 
         // assert
         EXPECT_FALSE(jsonString.empty());
-        EXPECT_TRUE(Core::StringUtils::Contains(jsonString, "\"Env\":[\"ENVIRONMENT=localstack\",\"JAVA_TOOL_OPTIONS=-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localstack\"]"));
+        EXPECT_TRUE(Core::StringUtils::Contains(jsonString, "{\"Domainname\":\"test-container.dockerhost.net\",\"Env\":[\"AWS_EC2_METADATA_DISABLED=true\","
+                                                            "\"JAVA_TOOL_OPTIONS=-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localstack\"],"
+                                                            "\"ExposedPorts\":{\"8080/tcp\":{}},\"HostConfig\":{\"PortBindings\":{\"8080/tcp\":[{\"HostPort\":\"\"}]}},"
+                                                            "\"Hostname\":\"test-container\",\"Image\":\"test-image:latest\",\"User\":\"root\"}"));
         EXPECT_TRUE(Core::StringUtils::Contains(jsonString, "\"ExposedPorts\":{\"8080/tcp\":{}}"));
     }
-
 
 } // namespace AwsMock::Core
 

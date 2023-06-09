@@ -15,6 +15,8 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/db/Database.h>
 
+#define CONFIG_FILE "/tmp/aws-mock.properties"
+
 namespace AwsMock::Database {
 
     using namespace Poco::Data::Keywords;
@@ -29,7 +31,7 @@ namespace AwsMock::Database {
       void TearDown() override {
       }
 
-      Core::Configuration _configuration = Core::Configuration("/tmp/aws-mock.properties");
+      Core::Configuration _configuration = Core::Configuration(CONFIG_FILE);
       Database _database = Database(_configuration);
     };
 
@@ -44,7 +46,7 @@ namespace AwsMock::Database {
         stmt << "SELECT COUNT(*) FROM service", into(count), now;
 
         // assert
-        EXPECT_EQ(count, 0);
+        EXPECT_EQ(count, 4);
     }
 
 } // namespace AwsMock::Core

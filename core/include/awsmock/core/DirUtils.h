@@ -112,9 +112,10 @@ namespace AwsMock::Core {
        *
        * @param dirName name of the directory
        * @param pattern regular expression which must match the filename
+       * @param recursive recursively list files
        * @return vector of file names
        */
-      static std::vector<std::string> ListFiles(const std::string &dirName, const std::string &pattern);
+      static std::vector<std::string> ListFilesByPattern(const std::string &dirName, const std::string &pattern, bool recursive = true);
 
       /**
        * Deletes an whole directory tree.

@@ -17,8 +17,8 @@ public:
       ofs << "awsmock.region=eu-central-1" << std::endl;
       ofs << "awsmock.rest.host=localhost" << std::endl;
       ofs << "awsmock.rest.port=4567" << std::endl;
-      ofs << "awsmock.data.dir=/tmp/awsmock/data" << std::endl;
-      ofs << "awsmock.db.dir=/tmp/awsmock/data/db" << std::endl;
+      ofs << "awsmock.data.dir=/tmp/test/data" << std::endl;
+      ofs << "awsmock.db.dir=/tmp/test/data/db" << std::endl;
       ofs << "awsmock.db.file=awsmock.db" << std::endl;
       ofs << "awsmock.threadpool.name=srv-worker" << std::endl;
       ofs << "awsmock.threadpool.min=8" << std::endl;

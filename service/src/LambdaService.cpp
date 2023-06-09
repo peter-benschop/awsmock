@@ -35,6 +35,9 @@ namespace AwsMock::Service {
     Dto::Lambda::CreateFunctionResponse LambdaService::CreateFunctionConfiguration(Dto::Lambda::CreateFunctionRequest &request) {
         poco_debug(_logger, "Create function configuration request: " + request.ToString());
 
+        Database::Entity::Lambda::Lambda lambdaEntity = {.function=request.functionName, .runtime=request.runtime, .role=request.role, .handler=request.handler,
+            .tag=IMAGE_TAG};
+
         // Build the docker image, if not existing
         if (!_dockerService->ImageExists(request.functionName, "latest")) {
 
@@ -53,26 +56,30 @@ namespace AwsMock::Service {
 
         // Get the image struct
         Dto::Docker::Image image = _dockerService->GetImageByName(request.functionName, "latest");
+        lambdaEntity.size = image.size;
+        lambdaEntity.imageId = image.id;
 
         // Create the container, if not existing
         if (!_dockerService->ContainerExists(request.functionName, "latest")) {
             Dto::Docker::CreateContainerResponse containerCreateResponse = _dockerService->CreateContainer(request.functionName, "latest");
+            lambdaEntity.hostPort = containerCreateResponse.hostPort;
         }
 
         // Get the container
         Dto::Docker::Container container = _dockerService->GetContainerByName(request.functionName, "latest");
+        lambdaEntity.containerId = container.id;
 
         // Start container
         _dockerService->StartContainer(container.id);
+        lambdaEntity.lastStarted = Poco::DateTime();
 
         // Update database
-        std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, request.functionName);
-        _database->CreateOrUpdateLambda({.function=request.functionName, .runtime=request.runtime, .role=request.role, .handler=request.handler,
-                                            .size=image.size, .imageId=image.id, .containerId=container.id, .tag="latest", .arn=arn, .lastStarted=Poco::DateTime()});
+        lambdaEntity.arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, request.functionName);
+        lambdaEntity = _database->CreateOrUpdateLambda(lambdaEntity);
 
         // Create response
         Dto::Lambda::CreateFunctionResponse
-            response{.functionArn=arn, .functionName=request.functionName, .runtime=request.runtime, .role=request.role, .handler=request.handler,
+            response{.functionArn=lambdaEntity.arn, .functionName=request.functionName, .runtime=request.runtime, .role=request.role, .handler=request.handler,
             .environment=request.environment, .memorySize=request.memorySize, .dockerImageId=image.id, .dockerContainerId=container.id};
 
         return response;

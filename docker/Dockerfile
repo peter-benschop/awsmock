@@ -1,8 +1,8 @@
 FROM debian:latest
 
 # Install basics
-RUN apt-get update && apt-get -y install build-essential cmake git openssl libssl-dev supervisor
-RUN apt-get  -y install libiodbc2 libiodbc2-dev libpq-dev libpqxx-dev zlib1g-dev libcurl4 && mkdir -p /usr/src
+RUN apt-get update && apt-get -y install build-essential cmake git openssl libssl-dev supervisor libarchive-dev
+RUN apt-get -y install libiodbc2 libiodbc2-dev libpq-dev libpqxx-dev zlib1g-dev libcurl4 && mkdir -p /usr/src
 
 # Install google test
 RUN mkdir -p /usr/src && \
@@ -35,9 +35,11 @@ RUN apt-get update && \
 RUN mkdir -p /var/log/supervisor
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-RUN mkdir -p /tmp/awsmock/data && \
-    mkdir -p /tmp/awsmock/data/db && \
-    mkdir -p /tmp/awsmock/log
+RUN mkdir -p /tmp/awsmock/data/db && \
+    mkdir -p /tmp/awsmock/data/s3 && \
+    mkdir -p /tmp/awsmock/data/sqs && \
+    mkdir -p /tmp/awsmock/data/lambda && \
+    mkdir -p /tmp/awsmock/data/tmp
 
 RUN cp /usr/src/aws-mock/etc/aws-mock.properties /etc
 

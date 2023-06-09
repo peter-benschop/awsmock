@@ -336,7 +336,6 @@ namespace AwsMock::Service {
             if (_database->BucketNotificationExists({.region=request.region, .bucket=request.bucket, .event=request.event})) {
                 throw Core::ServiceException("Bucket notification exists already", 500);
             }
-
             if (!request.function.empty()) {
                 CreateFunctionConfiguration(request);
             } else if (!request.queueArn.empty()) {

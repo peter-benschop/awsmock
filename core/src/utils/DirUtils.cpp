@@ -89,17 +89,10 @@ namespace AwsMock::Core {
         return fileNames;
     }
 
-    std::vector<std::string> DirUtils::ListFiles(const std::string &dirName, const std::string &pattern) {
+    std::vector<std::string> DirUtils::ListFilesByPattern(const std::string &dirName, const std::string &pattern, bool recursive) {
         Poco::RegularExpression re(pattern);
-        Poco::DirectoryIterator it(dirName);
-        Poco::DirectoryIterator end;
-        std::vector<std::string> fileNames;
-        while (it != end) {
-            if (re.match(it.name())) {
-                fileNames.push_back(it.name());
-            }
-            ++it;
-        }
+        std::vector<std::string> fileNames = ListFiles(dirName, recursive);
+        std::erase_if(fileNames, [&re](const std::string& fileName){return !re.match(fileName);} );
         return fileNames;
     }
 

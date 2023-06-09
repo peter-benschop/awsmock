@@ -37,9 +37,10 @@ namespace AwsMock::Database {
         try {
             Poco::Data::Session session = GetSession();
             session.begin();
-            session << "INSERT INTO lambda(function,runtime,role,handler,size,image_id,container_id,tag,arn) VALUES(?,?,?,?,?,?,?,?,?) returning id",
+            session
+                << "INSERT INTO lambda(function,runtime,role,handler,size,image_id,container_id,tag,arn,host_port,last_started) VALUES(?,?,?,?,?,?,?,?,?,?,?) returning id",
                 bind(lambda.function), bind(lambda.runtime), bind(lambda.role), bind(lambda.handler), bind(lambda.size), bind(lambda.imageId), bind(lambda.containerId),
-                bind(lambda.tag), bind(lambda.arn), into(id), now;
+                bind(lambda.tag), bind(lambda.arn), bind(lambda.hostPort), bind(lambda.lastStarted), into(id), now;
             session.commit();
 
             poco_trace(_logger, "Lambda created: " + lambda.ToString());
@@ -66,10 +67,10 @@ namespace AwsMock::Database {
         try {
             Poco::Data::Session session = GetSession();
             session.begin();
-            session << "UPDATE lambda SET role=?,handler=?,size=?,image_id=?,container_id=?,tag=?,arn=?,modified=CURRENT_TIMESTAMP "
+            session << "UPDATE lambda SET role=?,handler=?,size=?,image_id=?,container_id=?,tag=?,arn=?,host_port=?,last_started=?,modified=CURRENT_TIMESTAMP "
                        "WHERE function=? AND runtime=? returning id",
                 bind(lambda.role), bind(lambda.handler), bind(lambda.size), bind(lambda.imageId), bind(lambda.containerId), bind(lambda.tag), bind(lambda.arn),
-                bind(lambda.function), bind(lambda.runtime), into(id), now;
+                bind(lambda.hostPort), bind(lambda.lastStarted), bind(lambda.function), bind(lambda.runtime), into(id), now;
             session.commit();
 
             poco_trace(_logger, "Lambda updated, lambda: " + lambda.ToString());
@@ -87,9 +88,10 @@ namespace AwsMock::Database {
         try {
             Poco::Data::Session session = GetSession();
             session.begin();
-            session << "SELECT id,function,runtime,role,handler,size,image_id,container_id,tag,arn FROM lambda WHERE id=?",
+            session << "SELECT id,function,runtime,role,handler,size,image_id,container_id,tag,arn,host_port,last_started,created,modified FROM lambda WHERE id=?",
                 bind(id), into(result.id), into(result.function), into(result.runtime), into(result.role), into(result.handler), into(result.size),
-                into(result.imageId), into(result.containerId), into(result.tag), into(result.arn), into(result.created), into(result.modified), now;
+                into(result.imageId), into(result.containerId), into(result.tag), into(result.arn), into(result.hostPort), into(result.lastStarted),
+                into(result.created), into(result.modified), now;
             session.commit();
 
             poco_trace(_logger, "Got lambda: " + result.ToString());
@@ -106,9 +108,10 @@ namespace AwsMock::Database {
         try {
             Poco::Data::Session session = GetSession();
             session.begin();
-            session << "SELECT id,function,runtime,role,handler,size,image_id,container_id,tag,arn FROM lambda WHERE arn=?",
+            session << "SELECT id,function,runtime,role,handler,size,image_id,container_id,tag,arn,host_port,last_started,created,modified FROM lambda WHERE arn=?",
                 bind(arn), into(result.id), into(result.function), into(result.runtime), into(result.role), into(result.handler), into(result.size),
-                into(result.imageId), into(result.containerId), into(result.tag), into(result.arn), into(result.created), into(result.modified), now;
+                into(result.imageId), into(result.containerId), into(result.tag), into(result.arn), into(result.hostPort), into(result.lastStarted),
+                into(result.created), into(result.modified), now;
             session.commit();
 
             poco_trace(_logger, "Got lambda: " + result.ToString());

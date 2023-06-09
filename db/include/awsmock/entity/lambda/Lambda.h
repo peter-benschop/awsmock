@@ -69,6 +69,11 @@ namespace AwsMock::Database::Entity::Lambda {
       std::string arn;
 
       /**
+       * Random host port
+       */
+      int hostPort;
+
+      /**
        * Last function start
        */
       Poco::DateTime lastStarted;
@@ -102,7 +107,7 @@ namespace AwsMock::Database::Entity::Lambda {
       friend std::ostream &operator<<(std::ostream &os, const Lambda &m) {
           os << "Lambda={id='" + std::to_string(m.id) + "' function='" + m.function + "'runtime='" + m.runtime + "' role='" + m.role + "' handler='" +
               m.handler + "' imageId='" + m.imageId + "' containerId='" + m.containerId + "' tag='" + m.tag + "' arn='" + m.arn +
-              "' lastStarted='" + Poco::DateTimeFormatter().format(m.lastStarted, Poco::DateTimeFormat::HTTP_FORMAT) +
+              "' hostPort='" + std::to_string(m.hostPort) + "' lastStarted='" + Poco::DateTimeFormatter().format(m.lastStarted, Poco::DateTimeFormat::HTTP_FORMAT) +
               "' created='" + Poco::DateTimeFormatter().format(m.created, Poco::DateTimeFormat::HTTP_FORMAT) +
               "' modified='" + Poco::DateTimeFormatter().format(m.modified, Poco::DateTimeFormat::HTTP_FORMAT) + "'}";
           return os;

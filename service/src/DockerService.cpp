@@ -13,15 +13,15 @@ namespace AwsMock::Service {
     void DockerService::Initialize() {
 
         // Set console logger
-        Core::Logger::SetDefaultConsoleLogger("LambdaService");
-        poco_debug(_logger, "DOcker service initialized");
+        Core::Logger::SetDefaultConsoleLogger("DockerService");
+        poco_debug(_logger, "Docker service initialized");
     }
 
     bool DockerService::ImageExists(const std::string &name, const std::string &tag) {
 
         std::string jsonBody = {};
         std::string header = Core::SystemUtils::SetHeader("GET", "/" + DOCKER_VERSION + "/images/json?all=true", JSON_CONTENT_TYPE, jsonBody.size());
-        poco_debug(_logger, "Header: " + header);
+        poco_debug(_logger, "Header: " + Core::StringUtils::StripLineEndings(header));
 
         std::string output = Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
         poco_trace(_logger, "List images request send to docker daemon, output: " + output);
@@ -45,18 +45,18 @@ namespace AwsMock::Service {
 
         std::string jsonBody = {};
         std::string header = Core::SystemUtils::SetHeader("GET", "/" + DOCKER_VERSION + "/images/json?all=true", JSON_CONTENT_TYPE, jsonBody.size());
-        poco_debug(_logger, "Header: " + header);
+        poco_debug(_logger, "Header: " + Core::StringUtils::StripLineEndings(header));
 
         std::string output = Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
-        poco_debug(_logger, "List container request send to docker daemon, output: " + output);
+        poco_debug(_logger, "List container request send to docker daemon, output: " + Core::StringUtils::StripLineEndings(output));
 
         Dto::Docker::ListImageResponse response;
         response.FromJson(output);
 
         // Find image
         std::string imageName = name + ":" + tag;
-        for (const auto& image : response.imageList) {
-            for (const auto& repoTag : image.repoTags) {
+        for (const auto &image : response.imageList) {
+            for (const auto &repoTag : image.repoTags) {
                 if (repoTag == imageName)
                     return image;
             }
@@ -82,7 +82,7 @@ namespace AwsMock::Service {
 
         std::string jsonBody = {};
         std::string header = Core::SystemUtils::SetHeader("GET", "/" + DOCKER_VERSION + "/containers/json?all=true", JSON_CONTENT_TYPE, jsonBody.size());
-        poco_debug(_logger, "Header: " + header);
+        poco_debug(_logger, "Header: " + Core::StringUtils::StripLineEndings(header));
 
         std::string output = Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
         poco_trace(_logger, "List container request send to docker daemon, output: " + output);
@@ -109,10 +109,10 @@ namespace AwsMock::Service {
 
         std::string jsonBody = {};
         std::string header = Core::SystemUtils::SetHeader("GET", "/" + DOCKER_VERSION + "/containers/json?all=true", JSON_CONTENT_TYPE, jsonBody.size());
-        poco_debug(_logger, "Header: " + header);
+        poco_debug(_logger, "Header: " + Core::StringUtils::StripLineEndings(header));
 
         std::string output = Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
-        poco_debug(_logger, "List container request send to docker daemon, output: " + output);
+        poco_debug(_logger, "List container request send to docker daemon, output: " + Core::StringUtils::StripLineEndings(output));
 
         Dto::Docker::ListContainerResponse response;
         response.FromJson(output);
@@ -134,16 +134,25 @@ namespace AwsMock::Service {
 
     Dto::Docker::CreateContainerResponse DockerService::CreateContainer(const std::string &name, const std::string &tag) {
 
-        Dto::Docker::CreateContainerRequest request = {.hostName=name, .domainName=name + ".dockerhost.net", .user="root", .image=name + ":" + tag};
+        int hostPort = GetHostPort();
+        std::string containerPort = CONTAINER_PORT;
+        std::string imageName = std::string(name) + IMAGE_TAG;
+        std::string domainName = std::string(name) + NETWORK_NAME;
+        std::vector<std::string> environment =
+            {"AWS_ACCESS_KEY_ID=none", "AWS_SECRET_ACCESS_KEY=none", "JAVA_TOOL_OPTIONS=-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localstack"};
+
+        // Create the request
+        Dto::Docker::CreateContainerRequest request = {.hostName=name, .domainName=domainName, .user="root", .image=imageName, .environment=environment,
+            .containerPort=containerPort, .hostPort=std::to_string(hostPort)};
 
         std::string jsonBody = request.ToJson();
         std::string header = Core::SystemUtils::SetHeader("POST", "/" + DOCKER_VERSION + "/containers/create?name=" + name, JSON_CONTENT_TYPE, jsonBody.size());
-        poco_debug(_logger, "Header: " + header);
+        poco_debug(_logger, "Header: " + Core::StringUtils::StripLineEndings(header));
 
         std::string output = Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
-        poco_debug(_logger, "Create container request send to docker daemon: " + header);
+        poco_debug(_logger, "Create container request send to docker daemon: " + Core::StringUtils::StripLineEndings(header));
 
-        Dto::Docker::CreateContainerResponse response;
+        Dto::Docker::CreateContainerResponse response = {.hostPort=hostPort};
         response.FromJson(output);
 
         return response;
@@ -153,6 +162,8 @@ namespace AwsMock::Service {
 
         std::string jsonBody = {};
         std::string header = Core::SystemUtils::SetHeader("POST", "/" + DOCKER_VERSION + "/containers/" + id + "/start", JSON_CONTENT_TYPE, jsonBody.size());
+
+        poco_debug(_logger, "Sending start container request");
 
         return Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
     }
@@ -165,6 +176,8 @@ namespace AwsMock::Service {
 
         std::string jsonBody = {};
         std::string header = Core::SystemUtils::SetHeader("POST", "/" + DOCKER_VERSION + "/containers/" + container.id + "/start", JSON_CONTENT_TYPE, jsonBody.size());
+
+        poco_debug(_logger, "Sending stop container request, payload: " + jsonBody);
 
         std::string output = Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
         return output;
@@ -192,4 +205,9 @@ namespace AwsMock::Service {
         return tarFileName;
     }
 
+    int DockerService::GetHostPort() {
+        int port = Core::RandomUtils::NextInt(HOST_PORT_MIN, HOST_PORT_MAX);
+        poco_debug(_logger, "Assigned port: " + std::to_string(port));
+        return port;
+    }
 }

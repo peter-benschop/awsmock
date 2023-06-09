@@ -35,11 +35,16 @@ namespace AwsMock::Dto::Docker {
        */
       std::vector<std::string> warnings;
 
-     /**
-      * Convert to a JSON string
-      *
-      * @param body JSON string
-      */
+      /**
+       * Assigned random port
+       */
+      int hostPort;
+
+      /**
+       * Convert to a JSON string
+       *
+       * @param body JSON string
+       */
       void FromJson(const std::string &body) {
 
           Poco::JSON::Parser parser;
@@ -75,7 +80,7 @@ namespace AwsMock::Dto::Docker {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const CreateContainerResponse &r) {
-          os << "CreateContainerResponse={id='" + r.id + "'}";
+          os << "CreateContainerResponse={id='" + r.id + "' hostPort='" + std::to_string(r.hostPort) + "'}";
           return os;
       }
 
