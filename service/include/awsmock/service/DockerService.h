@@ -41,10 +41,9 @@
 namespace AwsMock::Service {
 
     /**
-     * Invokation:
-     * <pre>
-     * curl -XPOST "http://localhost:8080/2015-03-31/functions/function/invocations" -d '{}'
-     * </pre>
+     * The DockerService controls the connection to the docker daemon.
+     *
+     * <p>All docker related commands will be executed by the different methods.</p>
      */
     class DockerService {
 
