@@ -6,7 +6,7 @@ static const char charset[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklm
 namespace AwsMock::Core {
 
     template<typename T = std::mt19937>
-    auto random_generator() -> T {
+    auto RandomGenerator() -> T {
         auto constexpr seed_bytes = sizeof(typename T::result_type) * T::state_size;
         auto constexpr seed_len = seed_bytes / sizeof(std::seed_seq::result_type);
         auto seed = std::array<std::seed_seq::result_type, seed_len>();
@@ -18,7 +18,7 @@ namespace AwsMock::Core {
 
     auto randomString(std::size_t len) -> std::string {
         static constexpr auto chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-        thread_local auto rng = random_generator<>();
+        thread_local auto rng = RandomGenerator<>();
         auto dist = std::uniform_int_distribution{{}, std::strlen(chars) - 1};
         auto result = std::string(len, '\0');
         std::generate_n(begin(result), len, [&]() { return chars[dist(rng)]; });

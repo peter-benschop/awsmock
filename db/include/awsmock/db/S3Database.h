@@ -107,6 +107,15 @@ namespace AwsMock::Database {
       Entity::S3::Object CreateObject(const Entity::S3::Object& object);
 
       /**
+       * Create a new S3 object in the S3 object table, if it does not exist, otherwise update the exiting object.
+       *
+       * @param object object entity
+       * @return created or updated object entity
+       * @throws DatabaseException
+       */
+      Entity::S3::Object CreateOrUpdateObject(const Entity::S3::Object& object);
+
+      /**
        * Updates an existing object in the S3 object table
        *
        * @param object object entity

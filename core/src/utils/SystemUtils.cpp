@@ -39,7 +39,7 @@ namespace AwsMock::Core {
         return homeDir;
     }
 
-    std::string SystemUtils::SetHeader(const std::string &method, const std::string &url, const std::string &contentType, long contentLength) {
+    std::string SystemUtils::SetHeader(const std::string &method, const std::string &url, const std::string &contentType, unsigned long contentLength) {
         return Poco::toUpper(method) + " " + url + " HTTP/1.1\nHost:localhost\nConnection:close\nContent-Type:" + contentType + "\nContent-Length:"
             + std::to_string(contentLength) + "\n\n";
     }
@@ -71,11 +71,11 @@ namespace AwsMock::Core {
         long fileSize = file.tellg();
         file.close();
 
-        char *fileBuffer = new char[fileSize];
-        file.open(fileName, std::ios::binary);
-        file.seekg(0, std::ios::beg);
-        file.read(fileBuffer, fileSize);
-        file.close();
+        int filefd = open(fileName.c_str(), O_RDONLY);
+        if (filefd == -1) {
+            perror("open");
+            exit(EXIT_FAILURE);
+        }
 
         /* std::cout << "========================== Header ==========================" << std::endl;
          std::cout << header << std::endl;
@@ -87,17 +87,8 @@ namespace AwsMock::Core {
         }
 
         // Send body
-        unsigned int bytesSent = 0;
-        long bytesToSend = 0;
-
-        while (bytesSent < fileSize) {
-            if (fileSize - bytesSent >= CHUNK_SIZE)
-                bytesToSend = CHUNK_SIZE;
-            else
-                bytesToSend = fileSize - bytesSent;
-            send(sock, fileBuffer + bytesSent, bytesToSend, 0);
-            bytesSent += bytesToSend;
-        }
+        off_t offset = 0;
+        ssize_t bytesSend = sendfile(sock, filefd, &offset, fileSize);
 
         // Get response
         std::stringstream output;
@@ -106,7 +97,8 @@ namespace AwsMock::Core {
             output << recv_msg;
         }
         /*std::cout << "========================== Response ==========================" << std::endl;
-        std::cout << output << std::endl;
+        std::cout << std::to_string(bytesSend) << std::endl;
+        std::cout << output.str() << std::endl;
         std::cout << "========================== Response ==========================" << std::endl;*/
         close(sock);
         return GetBody(output.str());

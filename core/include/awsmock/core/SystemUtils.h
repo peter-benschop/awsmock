@@ -10,6 +10,7 @@
 #include <pwd.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <sys/sendfile.h>
 
 // C++ includes
 #include <cstdio>
@@ -106,7 +107,7 @@ namespace AwsMock::Core {
        * @param contentLength
        * @return
        */
-      static std::string SetHeader(const std::string &method, const std::string &url, const std::string &contentType, long contentLength);
+      static std::string SetHeader(const std::string &method, const std::string &url, const std::string &contentType, unsigned long contentLength);
 
     private:
 

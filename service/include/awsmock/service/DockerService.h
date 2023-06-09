@@ -22,6 +22,7 @@
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
+#include <awsmock/core/RandomUtils.h>
 #include <awsmock/dto/docker/CreateContainerRequest.h>
 #include <awsmock/dto/docker/CreateContainerResponse.h>
 #include <awsmock/dto/docker/ListImageResponse.h>
@@ -31,9 +32,20 @@
 #define DOCKER_SOCKET "/var/run/docker.sock"
 #define TAR_CONTENT_TYPE std::string("application/x-tar")
 #define JSON_CONTENT_TYPE std::string("application/json")
+#define NETWORK_NAME ".dockerhost.net"
+#define HOST_PORT_MIN 32768
+#define HOST_PORT_MAX 65536
+#define IMAGE_TAG ":latest"
+#define CONTAINER_PORT "8080/tcp"
 
 namespace AwsMock::Service {
 
+    /**
+     * Invokation:
+     * <pre>
+     * curl -XPOST "http://localhost:8080/2015-03-31/functions/function/invocations" -d '{}'
+     * </pre>
+     */
     class DockerService {
 
     public:
@@ -138,6 +150,14 @@ namespace AwsMock::Service {
        */
       std::string StopContainer(const Dto::Docker::Container &container);
 
+      /**
+       * Invoke the lambda function
+       *
+       * @param container container
+       * @return output string
+       */
+      //std::string InvokeLambda(const Dto::Lambda::InvokeLambdaRequest &container);
+
     private:
 
       /**
@@ -162,6 +182,13 @@ namespace AwsMock::Service {
        * @return return docker file path
        */
       std::string BuildImageFile(const std::string &codeDir, const std::string &name);
+
+      /**
+       * Returns a random host port in the range 32768 - 65536 for the host port of the docker container which is running the lambda function.
+       *
+       * @return random port between 32768 and 65536 as string
+       */
+      int GetHostPort();
 
       /**
        * Logger

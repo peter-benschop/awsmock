@@ -1,0 +1,39 @@
+{
+  "Records":[
+    {
+      "eventVersion":"2.2",
+      "eventSource":"aws:s3",
+      "awsRegion":"eu-central-1",
+      "eventTime":"2023-01-01T00:00:00.000Z",
+      "eventName":"event-type",
+      "userIdentity":{
+        "principalId":"root"
+      },
+      "requestParameters":{
+        "sourceIPAddress":"ip-address-where-request-came-from"
+      },
+      "responseElements":{
+        "x-amz-request-id":"Amazon S3 generated request ID",
+        "x-amz-id-2":"Amazon S3 host that processed the request"
+      },
+      "s3":{
+        "s3SchemaVersion":"1.0",
+        "configurationId":"1234567890",
+        "bucket":{
+          "name":"file-delivery1",
+          "ownerIdentity":{
+            "principalId":"root"
+          },
+          "arn":"aws:arn:s3:eu-central-1:000000000000:file-delivery1"
+        },
+        "object":{
+          "key":"DLI145/9781406379990_ANNO_OBILD.jpg",
+          "size": 35713,
+          "eTag":"9781406379990_ANNO_OBILD.jpg",
+          "versionId": null,
+          "sequencer": "astringrepresentation"
+        }
+      }
+    }
+  ]
+}

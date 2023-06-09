@@ -8,15 +8,13 @@ namespace AwsMock {
         response.setReason(Poco::Net::HTTPResponse::HTTP_REASON_NOT_FOUND);
         response.setContentType("application/json; charset=utf-8");
 
-        /*AwsMock::JsonAPIErrorBuilder errorBuilder = AwsMock::JsonAPIErrorBuilder(request.getHost());
-
-        errorBuilder.withStatusCode(404);
-        errorBuilder.sourceAt(request.getURI());
-        errorBuilder.withDetails("This route does not exist.");
-        errorBuilder.withType(Poco::Net::HTTPResponse::HTTP_REASON_NOT_FOUND);
+        Dto::Common::RestErrorResponse errorResponse;
+        errorResponse.code = 404;
+        errorResponse.message = "Resource not found";
+        errorResponse.resource = request.getURI();
 
         std::ostream &outputStream = response.send();
-        outputStream << errorBuilder.build().toString();
-        outputStream.flush();*/
+        outputStream << errorResponse.ToXml();
+        outputStream.flush();
     }
 }

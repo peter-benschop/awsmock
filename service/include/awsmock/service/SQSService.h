@@ -21,6 +21,7 @@
 // AwsMock includes
 #include "awsmock/core/CryptoUtils.h"
 #include "awsmock/core/ServiceException.h"
+#include "awsmock/core/AwsUtils.h"
 #include "awsmock/dto/sqs/CreateMessageRequest.h"
 #include "awsmock/dto/sqs/CreateMessageResponse.h"
 #include "awsmock/dto/sqs/CreateQueueRequest.h"
@@ -37,6 +38,8 @@
 #include "awsmock/dto/sqs/ReceiveMessageRequest.h"
 #include "awsmock/dto/sqs/ReceiveMessageResponse.h"
 #include "awsmock/db/SQSDatabase.h"
+
+#define DEFAULT_ACCOUNT_ID "000000000000"
 
 namespace AwsMock::Service {
 
@@ -132,6 +135,11 @@ namespace AwsMock::Service {
        * Logger
        */
       Poco::Logger &_logger;
+
+      /**
+       * Account ID
+       */
+      std::string _accountId;
 
       /**
        * Configuration

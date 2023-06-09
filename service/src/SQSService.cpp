@@ -19,6 +19,7 @@ namespace AwsMock::Service {
 
         // Initialize environment
         _database = std::make_unique<Database::SQSDatabase>(_configuration);
+        _accountId = DEFAULT_ACCOUNT_ID;
     }
 
     Dto::SQS::CreateQueueResponse SQSService::CreateQueue(const Dto::SQS::CreateQueueRequest &request) {
@@ -31,7 +32,8 @@ namespace AwsMock::Service {
             }
 
             // Update database
-            queue = _database->CreateQueue({.region=request.region, .name=request.name, .owner=request.owner, .queueUrl=request.queueUrl});
+            std::string queueArn = Core::AwsUtils::CreateSQSArn(request.region, _accountId, request.name);
+            queue = _database->CreateQueue({.region=request.region, .name=request.name, .owner=request.owner, .queueUrl=request.queueUrl, .queueArn=queueArn});
             poco_trace(_logger, "SQS queue created: " + queue.ToString());
 
             // Create queue sqs with default values

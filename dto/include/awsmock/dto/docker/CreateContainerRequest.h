@@ -23,6 +23,19 @@
 
 namespace AwsMock::Dto::Docker {
 
+    struct ExposedPort {
+      /**
+       * Internal port
+       */
+      std::string internalPort;
+
+      /**
+       * Internal protocol
+       */
+      std::string protocol;
+
+    };
+
     struct CreateContainerRequest {
 
       /**
@@ -41,20 +54,30 @@ namespace AwsMock::Dto::Docker {
       std::string user;
 
       /**
-       * Environment
-       */
-      std::vector<std::string> environment;
-
-      /**
        * Image
        */
       std::string image;
 
       /**
-      * Convert to a JSON string
-      *
-      * @return JSON string
-      */
+       * Environment
+       */
+      std::vector<std::string> environment;
+
+      /**
+       * Container ports
+       */
+      std::string containerPort;
+
+      /**
+       * Host ports
+       */
+      std::string hostPort;
+
+      /**
+       * Convert to a JSON string
+       *
+       * @return JSON string
+       */
       std::string ToJson() {
 
           try {
@@ -68,6 +91,27 @@ namespace AwsMock::Dto::Docker {
               for(unsigned long i = 0; i < environment.size(); i++) {
                   envArray.set(i, environment[i]);
               }
+              rootJson.set("Env", envArray);
+
+              // Exposed ports
+              Poco::JSON::Object exposedPortsObject;
+              exposedPortsObject.set(containerPort, Poco::JSON::Object());
+              rootJson.set("ExposedPorts", exposedPortsObject);
+
+              // Host config
+              Poco::JSON::Object hostConfigObject;
+
+              Poco::JSON::Object hostPortObject;
+              hostPortObject.set("HostPort", hostPort);
+
+              Poco::JSON::Array hostArray;
+              hostArray.add(hostPortObject);
+
+              Poco::JSON::Object portBindingsObject;
+              portBindingsObject.set(containerPort, hostArray);
+
+              hostConfigObject.set("PortBindings", portBindingsObject);
+              rootJson.set("HostConfig", hostConfigObject);
 
               std::ostringstream os;
               rootJson.stringify(os);
@@ -95,7 +139,7 @@ namespace AwsMock::Dto::Docker {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const CreateContainerRequest &r) {
-          os << "CreateContainerRequest={hostName='" + r.hostName + "' domainName='" + r.domainName + "' user='" + r.user;
+          os << "CreateContainerRequest={hostName='" + r.hostName + "' domainName='" + r.domainName + "' user='" + r.user + "' containerPort='" + r.containerPort + "' ";
           for(auto &it:r.environment) {
               os <<  it + ",";
           };

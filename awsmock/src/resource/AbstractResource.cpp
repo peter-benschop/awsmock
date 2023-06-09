@@ -437,8 +437,7 @@ namespace AwsMock::Resource {
         poco_trace(_logger, "Setting header values, contentLength: " + std::to_string(contentLength));
 
         // Default headers
-        Poco::DateTime now;
-        response.set("Date", Poco::DateTimeFormatter::format(now, Poco::DateTimeFormat::HTTP_FORMAT));
+        response.set("Date", Poco::DateTimeFormatter::format(Poco::DateTime(), Poco::DateTimeFormat::HTTP_FORMAT));
         response.set("Content-Length", std::to_string(contentLength));
         response.set("Content-Type", "text/html; charset=utf-8");
         response.set("Connection", "close");

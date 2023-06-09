@@ -11,10 +11,12 @@ namespace AwsMock::Core {
         struct archive *a;
         a = archive_write_new();
         archive_write_add_filter_gzip(a);
-        archive_write_set_format_pax_restricted(a); // Note 1
+        //archive_write_set_format_ustar(a);
+        //archive_write_set_format_pax(a); // Note 1
+        archive_write_set_format_gnutar(a);
         archive_write_open_filename(a, tarFile.c_str());
 
-        Poco::RecursiveDirectoryIterator it((std::string(directory)));
+        Poco::RecursiveDirectoryIterator it(directory);
         Poco::RecursiveDirectoryIterator end;
         int count = 0;
         while (it != end) {
@@ -44,11 +46,16 @@ namespace AwsMock::Core {
         archive_entry_set_pathname(entry, entryName.c_str());
         archive_entry_set_size(entry, st.st_size);
         if (isDir) {
-            archive_entry_set_filetype(entry, AE_IFDIR);
+            archive_entry_set_filetype(entry, S_IFDIR);
+            archive_entry_set_perm(entry, 0755);
+            archive_entry_set_uid(entry, 0);
+            archive_entry_set_gid(entry, 0);
         } else {
-            archive_entry_set_filetype(entry, AE_IFREG);
+            archive_entry_set_filetype(entry, S_IFREG);
+            archive_entry_set_perm(entry, 0644);
+            archive_entry_set_uid(entry, 0);
+            archive_entry_set_gid(entry, 0);
         }
-        archive_entry_set_perm(entry, 0644);
         archive_write_header(archive, entry);
         fd = open(fileName.c_str(), O_RDONLY);
         len = read(fd, buff, sizeof(buff));

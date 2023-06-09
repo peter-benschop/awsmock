@@ -80,7 +80,7 @@ namespace AwsMock::Service {
        * @param request create lambda request
        * @return CreateFunctionResponse
        */
-      Dto::Lambda::CreateFunctionResponse CreateFunction(Dto::Lambda::CreateFunctionRequest &request);
+      Dto::Lambda::CreateFunctionResponse CreateFunctionConfiguration(Dto::Lambda::CreateFunctionRequest &request);
 
     private:
 

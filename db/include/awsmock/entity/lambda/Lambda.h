@@ -51,12 +51,12 @@ namespace AwsMock::Database::Entity::Lambda {
       /**
        * Image ID
        */
-      std::string image_id;
+      std::string imageId;
 
       /**
        * Container ID
        */
-      std::string container_id;
+      std::string containerId;
 
       /**
        * Tag
@@ -67,6 +67,16 @@ namespace AwsMock::Database::Entity::Lambda {
        * ARN
        */
       std::string arn;
+
+      /**
+       * Random host port
+       */
+      int hostPort;
+
+      /**
+       * Last function start
+       */
+      Poco::DateTime lastStarted;
 
       /**
        * Creation date
@@ -96,7 +106,8 @@ namespace AwsMock::Database::Entity::Lambda {
        */
       friend std::ostream &operator<<(std::ostream &os, const Lambda &m) {
           os << "Lambda={id='" + std::to_string(m.id) + "' function='" + m.function + "'runtime='" + m.runtime + "' role='" + m.role + "' handler='" +
-              m.handler + "' image_id='" + m.image_id + "' container_id='" + m.container_id + "' tag='" + m.tag + "' arn='" + m.arn +
+              m.handler + "' imageId='" + m.imageId + "' containerId='" + m.containerId + "' tag='" + m.tag + "' arn='" + m.arn +
+              "' hostPort='" + std::to_string(m.hostPort) + "' lastStarted='" + Poco::DateTimeFormatter().format(m.lastStarted, Poco::DateTimeFormat::HTTP_FORMAT) +
               "' created='" + Poco::DateTimeFormatter().format(m.created, Poco::DateTimeFormat::HTTP_FORMAT) +
               "' modified='" + Poco::DateTimeFormatter().format(m.modified, Poco::DateTimeFormat::HTTP_FORMAT) + "'}";
           return os;
