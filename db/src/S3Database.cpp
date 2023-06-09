@@ -136,7 +136,7 @@ namespace AwsMock::Database {
         return bucketList;
     }
 
-    Entity::S3::ObjectList S3Database::ListBucket(const std::string &bucket) {
+    Entity::S3::ObjectList S3Database::ListBucket(const std::string &bucket, const std::string &prefix) {
 
         // Select database
         Entity::S3::Object object;
@@ -145,10 +145,10 @@ namespace AwsMock::Database {
 
             Poco::Data::Session session = GetSession();
             Poco::Data::Statement stmt(session);
-            stmt
-                << "SELECT id,bucket,key,size,md5sum,content_type,created,modified FROM s3_object WHERE bucket=?", bind(bucket), into(object.id), into(object.bucket), into(
-                object.key),
-                into(object.size), into(object.md5sum), into(object.contentType), into(object.created), into(object.modified), range(0, 1);
+            session.begin();
+            stmt << "SELECT id,bucket,key,size,md5sum,content_type,created,modified FROM s3_object WHERE bucket=? AND key like '" + prefix + "/%'",
+                into(object.id), into(object.bucket), into(object.key), into(object.size), into(object.md5sum), into(object.contentType),
+                into(object.created), into(object.modified), bind(bucket), range(0, 1);
 
             while (!stmt.done() && objectList.size() < MAX_FILES) {
                 stmt.execute();
@@ -158,7 +158,7 @@ namespace AwsMock::Database {
             }
             session.close();
 
-            poco_trace(_logger, "Bucket list created, size:" + std::to_string(objectList.size()));
+            poco_trace(_logger, "Object list created, size:" + std::to_string(objectList.size()));
 
         } catch (Poco::Exception &exc) {
             poco_error(_logger, "Database exception: " + exc.message());

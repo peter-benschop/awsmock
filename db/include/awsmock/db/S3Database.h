@@ -162,9 +162,11 @@ namespace AwsMock::Database {
       /**
        * List all objects of a bucket
        *
+       * @param bucket S3 bucket name
+       * @param prefix S3 key prefix
        * @return ObjectList
        */
-      Entity::S3::ObjectList ListBucket(const std::string &bucket);
+      Entity::S3::ObjectList ListBucket(const std::string &bucket, const std::string &prefix);
 
       /**
        * Bucket notification exists

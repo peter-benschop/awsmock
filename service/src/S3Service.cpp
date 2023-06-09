@@ -125,13 +125,13 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::S3::ListBucketResult S3Service::ListBucket(const std::string &bucket) {
-        poco_trace(_logger, "List bucket request");
+    Dto::S3::ListBucketResult S3Service::ListBucket(const Dto::S3::ListBucketRequest &request) {
+        poco_trace(_logger, "List bucket request: " + request.ToString());
 
         try {
 
-            Database::Entity::S3::ObjectList objectList = _database->ListBucket(bucket);
-            Dto::S3::ListBucketResult listBucketResult = Dto::S3::ListBucketResult(bucket, objectList);
+            Database::Entity::S3::ObjectList objectList = _database->ListBucket(request.name, request.prefix);
+            Dto::S3::ListBucketResult listBucketResult = Dto::S3::ListBucketResult(request.name, objectList);
             poco_trace(_logger, "S3 list bucket result: " + listBucketResult.ToXml());
             return listBucketResult;
 

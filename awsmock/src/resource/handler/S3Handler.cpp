@@ -46,8 +46,14 @@ namespace AwsMock {
 
             } else if(isListRequest) {
 
+                std::string prefix;
+                if(QueryParameterExists("prefix")) {
+                    prefix = GetQueryParameter("prefix");
+                }
+
                 // Return object list
-                Dto::S3::ListBucketResult result = _s3Service.ListBucket(bucket);
+                Dto::S3::ListBucketRequest s3Request = {.name=bucket, .prefix=prefix};
+                Dto::S3::ListBucketResult result = _s3Service.ListBucket(s3Request);
                 SendOkResponse(response, result.ToXml());
             }
 

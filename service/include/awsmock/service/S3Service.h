@@ -32,6 +32,7 @@
 #include "awsmock/dto/s3/GetObjectRequest.h"
 #include "awsmock/dto/s3/GetObjectResponse.h"
 #include "awsmock/dto/s3/InitiateMultipartUploadResult.h"
+#include "awsmock/dto/s3/ListBucketRequest.h"
 #include "awsmock/dto/s3/ListBucketResult.h"
 #include "awsmock/dto/s3/ListAllBucketResponse.h"
 #include "awsmock/dto/s3/PutBucketNotificationRequest.h"
@@ -88,7 +89,7 @@ namespace AwsMock::Service {
        * @param s3Request S3 create request
        * @return CreateBucketResponse
        */
-      Dto::S3::ListBucketResult ListBucket(const std::string &bucket);
+      Dto::S3::ListBucketResult ListBucket(const Dto::S3::ListBucketRequest &s3Request);
 
       /**
        * Creates a new bucket
