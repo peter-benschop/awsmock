@@ -16,23 +16,24 @@ namespace AwsMock::Dto::S3 {
      *
      * <p>Notification for a lambda function:
      * <pre>
-     * &le;NotificationConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/"&gt;
-     *   &le;CloudFunctionConfiguration&gt;
-     *     &le;Id&gt;1234567890123&le;/Id&gt;
-     *     &le;CloudFunction&gt;arn:aws:lambda:eu-central-1:000000000000:function:ftp-file-copy&le;/CloudFunction&gt;
-     *     &le;Event&gt;s3:ObjectCreated:*&le;/Event&gt;
-     *   &le;/CloudFunctionConfiguration&gt;
-     * &le;/NotificationConfiguration&gt;
-     * &le;/pre&gt;
-     * &le;/p&gt;
-     * &le;p&gt;Notification for a SMS queue event:
-     * &le;NotificationConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\"&gt;
-	 *   &le;QueueConfiguration&gt;
-	 *     &le;Id&gt;1234567890125&le;/Id&gt;
-	 *	   &le;Queue&gt;arn:aws:sqs:eu-central-1:000000000000:onix3-tmp-parsing-input-event-queue&le;/Queue&gt;
-	 *     &le;Event&gt;s3:ObjectCreated:*&le;/Event&gt;
-	 *   &le;/QueueConfiguration&gt;
-     * &le;/NotificationConfiguration&gt;
+     * <NotificationConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+     *   <CloudFunctionConfiguration>
+     *     <Id>1234567890123</Id>
+     *     <CloudFunction>arn:aws:lambda:eu-central-1:000000000000:function:ftp-file-copy</CloudFunction>
+     *     <Event>s3:ObjectCreated:*</Event>
+     *   </CloudFunctionConfiguration>
+     * </NotificationConfiguration>
+     * </pre>
+     * </p>
+     * <p>Notification for a SQS queue event:
+     * <pre>
+     * <NotificationConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">
+	 *   <QueueConfiguration>
+	 *     <Id>1234567890125</Id>
+	 *	   <Queue>arn:aws:sqs:eu-central-1:000000000000:onix3-tmp-parsing-input-event-queue</Queue>
+	 *     <Event>s3:ObjectCreated:*</Event>
+	 *   </QueueConfiguration>
+     * </NotificationConfiguration>
      * </pre>
      * </p>
      */

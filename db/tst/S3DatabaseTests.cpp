@@ -127,7 +127,7 @@ namespace AwsMock::Database {
         _database.CreateObject(object);
 
         // act
-        Entity::S3::ObjectList result = _database.ListBucket(bucket.name);
+        Entity::S3::ObjectList result = _database.ListBucket(bucket.name, "");
 
         // assert
         EXPECT_EQ(result.size() ,1);
