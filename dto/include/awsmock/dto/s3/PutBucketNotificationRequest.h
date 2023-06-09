@@ -2,8 +2,8 @@
 // Created by vogje01 on 01/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_S3_NOTIFICATIONCONFIGURATION_H
-#define AWSMOCK_DTO_S3_NOTIFICATIONCONFIGURATION_H
+#ifndef AWSMOCK_DTO_S3_PUTBUCKETNOTIFICATIONREQUEST_H
+#define AWSMOCK_DTO_S3_PUTBUCKETNOTIFICATIONREQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -16,23 +16,24 @@ namespace AwsMock::Dto::S3 {
      *
      * <p>Notification for a lambda function:
      * <pre>
-     * <NotificationConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
-     *   <CloudFunctionConfiguration>
-     *     <Id>1234567890123</Id>
-     *     <CloudFunction>arn:aws:lambda:eu-central-1:000000000000:function:ftp-file-copy</CloudFunction>
-     *     <Event>s3:ObjectCreated:*</Event>
-     *   </CloudFunctionConfiguration>
-     * </NotificationConfiguration>
+     * &le;NotificationConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/"&gt;
+     *   &le;CloudFunctionConfiguration&gt;
+     *     &le;Id&gt;1234567890123&le;/Id&gt;
+     *     &le;CloudFunction&gt;arn:aws:lambda:eu-central-1:000000000000:function:ftp-file-copy&le;/CloudFunction&gt;
+     *     &le;Event&gt;s3:ObjectCreated:*&le;/Event&gt;
+     *   &le;/CloudFunctionConfiguration&gt;
+     * &le;/NotificationConfiguration&gt;
+     * &le;/pre&gt;
+     * &le;/p&gt;
+     * &le;p&gt;Notification for a SMS queue event:
+     * &le;NotificationConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\"&gt;
+	 *   &le;QueueConfiguration&gt;
+	 *     &le;Id&gt;1234567890125&le;/Id&gt;
+	 *	   &le;Queue&gt;arn:aws:sqs:eu-central-1:000000000000:onix3-tmp-parsing-input-event-queue&le;/Queue&gt;
+	 *     &le;Event&gt;s3:ObjectCreated:*&le;/Event&gt;
+	 *   &le;/QueueConfiguration&gt;
+     * &le;/NotificationConfiguration&gt;
      * </pre>
-     * </p>
-     * <p>Notification for a SMS queue event:
-     * <NotificationConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">
-	 *   <QueueConfiguration>
-	 *     <Id>1234567890125</Id>
-	 *	   <Queue>arn:aws:sqs:eu-central-1:000000000000:onix3-tmp-parsing-input-event-queue</Queue>
-	 *     <Event>s3:ObjectCreated:*</Event>
-	 *   </QueueConfiguration>
-     *</NotificationConfiguration>
      * </p>
      */
     struct PutBucketNotificationRequest {
@@ -41,6 +42,8 @@ namespace AwsMock::Dto::S3 {
        * Constructor
        *
        * @param xmlString XML string
+       * @param region AWS region name
+       * @param bucket AWS S3 bucket name
        */
       explicit PutBucketNotificationRequest(const std::string &xmlString, const std::string &region, const std::string &bucket) {
 
@@ -141,4 +144,4 @@ namespace AwsMock::Dto::S3 {
 
 } // namespace AwsMock::Dto::S3
 
-#endif // AWS_MOCK_DTO_INCLUDE_AWSMOCK_DTO_S3_NOTIFICATIONCONFIGURATION_H
+#endif // AWSMOCK_DTO_S3_PUTBUCKETNOTIFICATIONREQUEST_H

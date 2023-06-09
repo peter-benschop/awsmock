@@ -58,9 +58,7 @@ namespace AwsMock::Service {
       /**
        * Returns the meta data of an S3 object
        *
-       * @param name name of the bucket
-       * @param owner owner of the bucket
-       * @param s3Request S3 create request
+       * @param request get metadata request
        * @return CreateBucketResponse
        */
       Dto::S3::GetMetadataResponse GetMetadata(Dto::S3::GetMetadataRequest &request);
@@ -85,7 +83,6 @@ namespace AwsMock::Service {
       /**
        * Lists contents of bucket
        *
-       * @param name name of the bucket
        * @param s3Request S3 create request
        * @return CreateBucketResponse
        */
@@ -171,6 +168,7 @@ namespace AwsMock::Service {
       /**
        * Delete a bucket
        *
+       * @param region AWS region name
        * @param name name of the bucket
        */
       void DeleteBucket(const std::string &region, const std::string &name);

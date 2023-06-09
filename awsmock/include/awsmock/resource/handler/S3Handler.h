@@ -73,6 +73,8 @@ namespace AwsMock {
        *
        * @param request HTTP request
        * @param response HTTP response
+       * @param region AWS region name
+       * @param user AWS user
        * @see AbstractResource::handleGet(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
        */
       void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
@@ -82,6 +84,8 @@ namespace AwsMock {
        *
        * @param request HTTP request
        * @param response HTTP response
+       * @param region AWS region name
+       * @param user AWS user
        * @see AbstractResource::handlePut(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
        */
       void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
@@ -91,6 +95,8 @@ namespace AwsMock {
        *
        * @param request HTTP request
        * @param response HTTP response
+       * @param region AWS region name
+       * @param user AWS user
        * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
        */
       void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
@@ -100,6 +106,8 @@ namespace AwsMock {
        *
        * @param request HTTP request
        * @param response HTTP response
+       * @param region AWS region name
+       * @param user AWS user
        * @see AbstractResource::handleDelete(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
        */
       void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;

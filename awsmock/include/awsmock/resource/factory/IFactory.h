@@ -26,8 +26,6 @@ namespace AwsMock::Resource::Factory {
        *
        * @param configuration configuration
        * @param metricService monitoring
-       * @param s3Adapter AWS S3 adapter
-       * @param database  database connection
        * @return HTTP request handler
        */
       virtual Poco::Net::HTTPRequestHandler *createResource(Core::Configuration &configuration, Core::MetricService &metricService) = 0;

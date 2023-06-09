@@ -113,7 +113,7 @@ namespace AwsMock::Database {
       /**
        * Deletes an existing lambda function
        *
-       * @param lambda lambda entity
+       * @param functionName lambda function name
        * @throws DatabaseException
        */
       void DeleteLambda(const std::string &functionName);

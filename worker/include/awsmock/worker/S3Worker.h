@@ -57,23 +57,23 @@ namespace AwsMock::Worker {
       void Initialize();
 
       /**
-       * Callback for the directory _watcher add events.
+       * Callback for the directory watcher add events.
        *
-       * @param addEvent directory _watcher add event.
+       * @param addEvent directory watcher add event.
        */
       void OnFileAdded(const Core::DirectoryEvent &addEvent);
 
       /**
-       * Callback for the directory _watcher change events.
+       * Callback for the directory watcher change events.
        *
-       * @param changeEvent directory _watcher change event.
+       * @param modifiedEvent directory watcher change event.
        */
       void OnFileModified(const Core::DirectoryEvent &modifiedEvent);
 
       /**
-       * Callback for the directory _watcher delete events.
+       * Callback for the directory watcher delete events.
        *
-       * @param deleteEvent directory _watcher delete event.
+       * @param deleteEvent directory watcher delete event.
        */
       void OnFileDeleted(const Core::DirectoryEvent &deleteEvent);
 

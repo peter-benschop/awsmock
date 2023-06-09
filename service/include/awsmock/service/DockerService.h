@@ -77,12 +77,6 @@ namespace AwsMock::Service {
       /**
        * Build a docker image for a lambda
        *
-       * <p>Curl example:
-       * <pre>
-       * curl --unix-socket /var/run/docker.sock --data-binary '@docker.tar.gz' -XPOST -H "Content-Type: application/octet-stream" http://localhost/v1.42/build
-       * </pre>
-       * </p>
-       *
        * @param codeDir code directory
        * @param name lambda function name, used as image name
        * @param tag image tag
@@ -160,7 +154,7 @@ namespace AwsMock::Service {
       /**
        * Deletes the container
        *
-       * @param name container name
+       * @param container container DTO
        */
       void DeleteContainer(const Dto::Docker::Container &container);
 

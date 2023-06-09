@@ -83,16 +83,12 @@ namespace AwsMock::Worker {
         GetBucketKeyFromFile(modifiedEvent.item.path(), bucketName, key);
 
         // Get file size, MD5 sum
-        long fileSize = Core::FileUtils::FileSize(modifiedEvent.item.path());
+        long size = Core::FileUtils::FileSize(modifiedEvent.item.path());
         std::string md5sum = Core::Crypto::GetMd5FromFile(modifiedEvent.item.path());
         std::string owner = Core::FileUtils::GetOwner(modifiedEvent.item.path());
 
-        Database::Entity::S3::Object object = {.bucket=bucketName, .key=key, .owner=owner, .size=fileSize, .md5sum=md5sum};
-        /*if (_s3Database->ObjectExists(object)){
-            _s3Database->UpdateObject(object);
-        } else {
-            _s3Database->CreateObject(object);
-        }*/
+        Dto::S3::PutObjectRequest request = {.region=_region, .bucket=bucketName, .key=key, .md5Sum=md5sum, .size=size, .owner=owner};
+        _s3Service->PutObject(request);
     }
 
     void S3Worker::OnFileDeleted(const Core::DirectoryEvent &deleteEvent) {
@@ -104,12 +100,8 @@ namespace AwsMock::Worker {
         Database::Entity::S3::Bucket bucket = {.region=_region, .name=bucketName};
         Database::Entity::S3::Object object = {.bucket=bucketName, .key = key};
 
-        //Dto::S3::PutObjectRequest request = {.region=_region, .bucket=bucketName, .key=key, .md5Sum=md5sum, .size=size, .owner=owner};
-        //_s3Service->PutObject(request);
-
-        /*if (_s3Database->BucketExists(bucket) && _s3Database->ObjectExists(object)){
-            _s3Database->DeleteObject(object);
-        }*/
+        Dto::S3::DeleteObjectRequest request = {.region=_region, .bucket=bucketName, .key=key};
+        _s3Service->DeleteObject(request);
     }
 
     void S3Worker::GetBucketKeyFromFile(const std::string &fileName, std::string &bucket, std::string &key) {

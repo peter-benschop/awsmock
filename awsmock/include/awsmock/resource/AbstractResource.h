@@ -127,7 +127,7 @@ namespace AwsMock::Resource {
        * @param payload The string containing the Json data.
        * @return Only part of the payload with sqs in Poco Json Object format.
        */
-      static Poco::JSON::Object::Ptr getJsonAttributesSectionObject(const std::string &);
+      static Poco::JSON::Object::Ptr getJsonAttributesSectionObject(const std::string &payload);
 
       /*!
        * It validates a set of parameters have been set in a Json payload.
@@ -135,7 +135,7 @@ namespace AwsMock::Resource {
        * @param jsonObject        Poco Json Object that contains payload data.
        * @param attributesNames   Attributes list to be validated.
        */
-      static void assertPayloadAttributes(const Poco::JSON::Object::Ptr &, const std::list<std::string> &);
+      static void assertPayloadAttributes(const Poco::JSON::Object::Ptr &jsonObject, const std::list<std::string> &attributesNames);
 
       /*!
        * It sets all the HTTP Response information based on the HTTP Code.
@@ -153,30 +153,6 @@ namespace AwsMock::Resource {
        * @return A complete URL with a fragment added to its end.
        */
       std::string getUrl(const std::string &fragment);
-
-      /**
-       * It converts an exception to Json API format.
-       *
-       * @param exception The exception thrown.
-       * @return The exception Json API formatted.
-       */
-      std::string toJson(const HandlerException &);
-
-      /**
-       * It converts an AwsMock exception to Json API format.
-       *
-       * @param exception the exception thrown.
-       * @return the exception Json API formatted.
-       */
-      std::string toJson(const Core::ResourceNotFoundException &);
-
-      /**
-       * It converts an service exception to Json API format.
-       *
-       * @param exception the exception thrown.
-       * @return the exception Json API formatted.
-       */
-      std::string toJson(const Core::ServiceException &exception);
 
       /**
        * CHecks whether a query parameter exists
@@ -234,7 +210,7 @@ namespace AwsMock::Resource {
        * Send a OK response (HTTP status code 200) with an output stream.
        *
        * @param response HTTP response object
-       * @param stream HTTP body stream
+       * @param fileName file to send
        * @param contentLength content length of the stream in bytes
        * @param extraHeader HTTP header map values, added to the default headers
        */
@@ -244,8 +220,6 @@ namespace AwsMock::Resource {
        * Send a DELETE response (HTTP status code 204) with an output stream.
        *
        * @param response HTTP response object
-       * @param stream HTTP body stream
-       * @param contentLength content length of the stream in bytes
        * @param extraHeader HTTP header map values, added to the default headers
        */
       void SendDeleteResponse(Poco::Net::HTTPServerResponse &response, HeaderMap *extraHeader = nullptr);
