@@ -74,6 +74,21 @@ namespace AwsMock::Dto::S3 {
       std::string principalId;
 
       /**
+       * Converts the DTO to a JSON representation.
+       *
+       * @return DTO as string for logging.
+       */
+      [[nodiscard]] Poco::JSON::Object ToJsonObject() const {
+          try {
+              Poco::JSON::Object rootJson;
+              rootJson.set("principalId", principalId);
+              return rootJson;
+          } catch (Poco::Exception &exc) {
+              throw Core::ServiceException(exc.message(), 500);
+          }
+      }
+
+      /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.
@@ -170,6 +185,24 @@ namespace AwsMock::Dto::S3 {
       std::string principalId;
 
       /**
+       * Converts the DTO to a JSON representation.
+       *
+       * @return DTO as string for logging.
+       */
+      [[nodiscard]] Poco::JSON::Object ToJsonObject() const {
+
+          try {
+
+              Poco::JSON::Object rootJson;
+              rootJson.set("principalId", principalId);
+              return rootJson;
+
+          } catch (Poco::Exception &exc) {
+              throw Core::ServiceException(exc.message(), 500);
+          }
+      }
+
+      /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.
@@ -208,6 +241,26 @@ namespace AwsMock::Dto::S3 {
        * ARN
        */
       std::string arn;
+
+      /**
+       * Converts the DTO to a JSON representation.
+       *
+       * @return DTO as string for logging.
+       */
+      [[nodiscard]] Poco::JSON::Object ToJsonObject() const {
+
+          try {
+
+              Poco::JSON::Object rootJson;
+              rootJson.set("name", name);
+              rootJson.set("ownerIdentity", ownerIdentity.ToJsonObject());
+              rootJson.set("arn", arn);
+              return rootJson;
+
+          } catch (Poco::Exception &exc) {
+              throw Core::ServiceException(exc.message(), 500);
+          }
+      }
 
       /**
        * Converts the DTO to a string representation.
@@ -260,6 +313,28 @@ namespace AwsMock::Dto::S3 {
       std::string sequencer;
 
       /**
+       * Converts the DTO to a JSON representation.
+       *
+       * @return DTO as string for logging.
+       */
+      [[nodiscard]] Poco::JSON::Object ToJsonObject() const {
+
+          try {
+              Poco::JSON::Object rootJson;
+
+              rootJson.set("key", key);
+              rootJson.set("size", size);
+              rootJson.set("etag", etag);
+              rootJson.set("versionId", versionId);
+              rootJson.set("sequencer", sequencer);
+
+              return rootJson;
+          } catch (Poco::Exception &exc) {
+              throw Core::ServiceException(exc.message(), 500);
+          }
+      }
+
+      /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.
@@ -306,6 +381,27 @@ namespace AwsMock::Dto::S3 {
       Object object;
 
       /**
+       * Converts the DTO to a JSON representation.
+       *
+       * @return DTO as string for logging.
+       */
+      [[nodiscard]] Poco::JSON::Object ToJsonObject() const {
+
+          try {
+
+              Poco::JSON::Object rootJson;
+              rootJson.set("s3SchemaVersion", s3SchemaVersion);
+              rootJson.set("configurationId", configurationId);
+              rootJson.set("bucket", bucket.ToJsonObject());
+              rootJson.set("object", object.ToJsonObject());
+              return rootJson;
+
+          } catch (Poco::Exception &exc) {
+              throw Core::ServiceException(exc.message(), 500);
+          }
+      }
+
+      /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.
@@ -342,6 +438,11 @@ namespace AwsMock::Dto::S3 {
       std::string eventSource = "aws:s3";
 
       /**
+       * Region
+       */
+      std::string region;
+
+      /**
        * Event time
        */
       std::string eventTime = Core::DateTimeUtils::AwsDatetimeNow();
@@ -372,6 +473,30 @@ namespace AwsMock::Dto::S3 {
       S3 s3;
 
       /**
+       * Converts the DTO to a JSON representation.
+       *
+       * @return DTO as string for logging.
+       */
+      [[nodiscard]] Poco::JSON::Object ToJsonObject() const {
+
+          try {
+
+              Poco::JSON::Object rootJson;
+              rootJson.set("eventVersion", eventVersion);
+              rootJson.set("eventSource", eventSource);
+              rootJson.set("awsRegion", region);
+              rootJson.set("eventTime", eventTime);
+              rootJson.set("eventName", eventName);
+              rootJson.set("userIdentity", userIdentity.ToJsonObject());
+              rootJson.set("s3", s3.ToJsonObject());
+              return rootJson;
+
+          } catch (Poco::Exception &exc) {
+              throw Core::ServiceException(exc.message(), 500);
+          }
+      }
+
+      /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.
@@ -388,8 +513,8 @@ namespace AwsMock::Dto::S3 {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const Record &r) {
-          os << "Record={eventVersion='" + r.eventVersion + "' eventSource='" + r.eventSource + "' eventTime='" + r.eventTime + "' eventName='" + r.eventName +
-              "' userIdentity='" + r.userIdentity.ToString() + "' requestParameter='" + r.requestParameter.ToString() +
+          os << "Record={eventVersion='" + r.eventVersion + "' eventSource='" + r.eventSource + "' region='" + r.region + "' eventTime='" + r.eventTime +
+              "' eventName='" + r.eventName + "' userIdentity='" + r.userIdentity.ToString() + "' requestParameter='" + r.requestParameter.ToString() +
               "' responseElements='" + r.responseElements.ToString() + "' s3='" + r.s3.ToString() + "'}";
           return os;
       }
@@ -402,6 +527,30 @@ namespace AwsMock::Dto::S3 {
        * S3 event record
        */
       std::vector<Record> records;
+
+      /**
+       * Converts the DTO to a JSON representation.
+       *
+       * @return DTO as string for logging.
+       */
+      [[nodiscard]] std::string ToJson() const {
+
+          try {
+              Poco::JSON::Object rootJson;
+              Poco::JSON::Array recordsJsonArray;
+              for (const auto &record : records) {
+                  recordsJsonArray.add(record.ToJsonObject());
+              }
+              rootJson.set("Records", recordsJsonArray);
+
+              std::ostringstream os;
+              rootJson.stringify(os);
+              return os.str();
+
+          } catch (Poco::Exception &exc) {
+              throw Core::ServiceException(exc.message(), 500);
+          }
+      }
 
       /**
        * Converts the DTO to a string representation.

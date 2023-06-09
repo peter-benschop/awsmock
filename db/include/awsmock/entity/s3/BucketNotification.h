@@ -18,7 +18,7 @@ namespace AwsMock::Database::Entity::S3 {
       /**
        * ID
        */
-      long id;
+      long id = 0;
 
       /**
        * Bucket region
@@ -33,17 +33,17 @@ namespace AwsMock::Database::Entity::S3 {
       /**
        * Notification ID
        */
-      long notificationId;
-
-      /**
-       * Function
-       */
-      std::string function;
+      std::string notificationId;
 
       /**
        * Queue ARN
        */
       std::string queueArn;
+
+      /**
+       * Lambda ARN
+       */
+      std::string lambdaArn;
 
       /**
        * Event
@@ -77,9 +77,8 @@ namespace AwsMock::Database::Entity::S3 {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const BucketNotification &q) {
-          os << "BucketNotification={id='" + std::to_string(q.id) + "' region='" + q.region + "' notificationId='" + std::to_string(q.notificationId) +
-              "' function='" + q.function + "' queueArn='" + q.queueArn + "' event='" + q.event +
-              "' created='" + Poco::DateTimeFormatter().format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) +
+          os << "BucketNotification={id='" + std::to_string(q.id) + "' region='" + q.region + "' notificationId='" + q.notificationId + "' queueArn='" + q.queueArn +
+              "' lambdaArn='" + q.lambdaArn + "' event='" + q.event + "' created='" + Poco::DateTimeFormatter().format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) +
               "' modified='" + Poco::DateTimeFormatter().format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) + "'}";
           return os;
       }

@@ -86,8 +86,22 @@ namespace AwsMock::Service {
         return response;
     }
 
-    Dto::Lambda::CreateFunctionResponse InvokeEventFunction(const Dto::S3::EventNotification &notification){
+    void LambdaService::InvokeEventFunction(const Dto::S3::EventNotification &notification) {
+        poco_debug(_logger, "Invoke event function notification: " + notification.ToString());
 
+        for (const auto &record : notification.records) {
+
+            // Get the bucket notification
+            Database::Entity::S3::BucketNotification
+                bucketNotification = _s3Database->GetBucketNotificationByNotificationId(record.region, record.s3.bucket.name, record.s3.configurationId);
+            poco_debug(_logger, "Got bucket notification: " + bucketNotification.ToString());
+
+            // Get the lambda entity
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->GetLambdaByArn(bucketNotification.lambdaArn);
+            poco_debug(_logger, "Got lambda entity notification: " + lambda.ToString());
+
+            SendInvokeRequest(lambda.hostPort, notification.ToJson());
+        }
     }
 
     std::string LambdaService::UnpackZipFile(const std::string &zipFile) {
@@ -110,4 +124,27 @@ namespace AwsMock::Service {
         return codeDir;
     }
 
+    void LambdaService::SendInvokeRequest(int port, const std::string &body) {
+
+        Poco::URI uri("http://localhost:" + std::to_string(port) + "/2015-03-31/functions/function/invocations");
+        std::string path(uri.getPathAndQuery());
+
+        // Create HTTP request and set headers
+        Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
+        Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, path, Poco::Net::HTTPMessage::HTTP_1_1);
+        request.add("Content-Type","application/json");
+        request.setContentLength((long)body.length());
+        poco_debug(_logger, "Invocation request defined, body: " + body);
+
+        // Send request
+        std::ostream& os = session.sendRequest(request);
+        os << body;
+
+        // Get the response sttaus
+        Poco::Net::HTTPResponse response;
+        if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
+            poco_error(_logger, "HTTP error, status: " + std::to_string(response.getStatus()) + " reason: "+ response.getReason());
+        }
+        poco_debug(_logger, "Invocation request send, status: " + std::to_string(response.getStatus()));
+    }
 } // namespace AwsMock::Service

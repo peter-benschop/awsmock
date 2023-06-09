@@ -37,6 +37,7 @@
 #include "awsmock/dto/s3/PutBucketNotificationRequest.h"
 #include "awsmock/dto/s3/PutObjectRequest.h"
 #include "awsmock/dto/s3/PutObjectResponse.h"
+#include "awsmock/service/LambdaService.h"
 
 namespace AwsMock::Service {
 
@@ -245,7 +246,7 @@ namespace AwsMock::Service {
        * @param request put bucket notification request.
        * @return BucketNotification.
        */
-      Database::Entity::S3::BucketNotification CreateFunctionConfiguration(const Dto::S3::PutBucketNotificationRequest &request);
+      Database::Entity::S3::BucketNotification CreateLambdaConfiguration(const Dto::S3::PutBucketNotificationRequest &request);
 
       /**
        * Deletes an object
@@ -290,14 +291,14 @@ namespace AwsMock::Service {
       std::unique_ptr<Database::S3Database> _database;
 
       /**
+       * Lambda service, needed for the cloud function S3 notifications
+       */
+      std::unique_ptr<LambdaService> _lambdaService;
+
+      /**
        * Multipart uploads map
        */
       MultiPartUploads _uploads;
-
-      /**
-       * Lock
-       */
-      Poco::Mutex _mutex;
 
     };
 

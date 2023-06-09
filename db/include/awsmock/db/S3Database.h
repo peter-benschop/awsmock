@@ -194,6 +194,16 @@ namespace AwsMock::Database {
       Entity::S3::BucketNotification GetBucketNotificationById(long id);
 
       /**
+       * Returns a bucket notification by configuration ID
+       *
+       * @param region AWS region
+       * @param bucket S3 bucket
+       * @param notificationId configuration ID
+       * @return BucketNotification
+       */
+      Entity::S3::BucketNotification GetBucketNotificationByNotificationId(const std::string &region, const std::string &bucket, const std::string &notificationId);
+
+      /**
        * Returns a notification.
        *
        * <p>Event matching uses inverse wildcard matching, as the wildcard patterns are stored in the database.</p>
@@ -249,6 +259,8 @@ namespace AwsMock::Database {
        * Logger
        */
       Poco::Logger &_logger;
+
+      static std::map<std::string, std::vector<std::string>> allowedEventTypes;
 
     };
 

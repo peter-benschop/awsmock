@@ -21,6 +21,7 @@ namespace AwsMock::Service {
         _database = std::make_unique<Database::S3Database>(_configuration);
         _dataDir = _configuration.getString("awsmock.data.dir", "/tmp/awsmock/data");
         _tempDir = _dataDir + Poco::Path::separator() + "tmp";
+        _lambdaService = std::make_unique<Service::LambdaService>(_configuration);
 
         // Create temp directory
         if (!Core::DirUtils::DirectoryExists(_tempDir)) {
@@ -29,7 +30,6 @@ namespace AwsMock::Service {
     }
 
     Dto::S3::CreateBucketResponse S3Service::CreateBucket(const std::string &name, const std::string &owner, const Dto::S3::CreateBucketRequest &s3Request) {
-        Poco::Mutex::ScopedLock lock(_mutex);
         poco_trace(_logger, "Create bucket request, s3Request: " + s3Request.ToString());
 
         Dto::S3::CreateBucketResponse createBucketResponse;
@@ -115,7 +115,7 @@ namespace AwsMock::Service {
         try {
 
             Database::Entity::S3::BucketList bucketList = _database->ListBuckets();
-            Dto::S3::ListAllBucketResponse listAllBucketResponse = Dto::S3::ListAllBucketResponse(bucketList);
+            auto listAllBucketResponse = Dto::S3::ListAllBucketResponse(bucketList);
             poco_trace(_logger, "S3 Create Bucket List outcome: " + listAllBucketResponse.ToXml());
             return listAllBucketResponse;
 
@@ -213,13 +213,13 @@ namespace AwsMock::Service {
     }
 
     Dto::S3::PutObjectResponse S3Service::PutObject(Dto::S3::PutObjectRequest &request, std::istream *stream) {
-        Poco::Mutex::ScopedLock lock(_mutex);
         poco_trace(_logger, "Put object request: " + request.ToString());
 
         Dto::S3::PutObjectResponse response;
         try {
             // Check existence
             if (!_database->BucketExists({.region=request.region, .name=request.bucket})) {
+                poco_error(_logger, "Bucket does not exist, region: " + request.region + " bucket: " + request.bucket);
                 throw Core::ServiceException("Bucket does not exist", 500);
             }
 
@@ -227,6 +227,7 @@ namespace AwsMock::Service {
             std::string directory = GetDirectory(request.bucket, request.key);
             if (!Core::DirUtils::DirectoryExists(directory)) {
                 Core::DirUtils::MakeDirectory(directory);
+                poco_debug(_logger, "Local bucket directory created, path: " + directory);
             }
 
             // Write file
@@ -324,7 +325,7 @@ namespace AwsMock::Service {
     }
 
     void S3Service::PutBucketNotification(const Dto::S3::PutBucketNotificationRequest &request) {
-        poco_trace(_logger, "Put bucket notification request, id: " + std::to_string(request.notificationId));
+        poco_trace(_logger, "Put bucket notification request, id: " + request.notificationId);
 
         try {
             // Check bucket existence
@@ -336,8 +337,8 @@ namespace AwsMock::Service {
             if (_database->BucketNotificationExists({.region=request.region, .bucket=request.bucket, .event=request.event})) {
                 throw Core::ServiceException("Bucket notification exists already", 500);
             }
-            if (!request.function.empty()) {
-                CreateFunctionConfiguration(request);
+            if (!request.lambdaArn.empty()) {
+                CreateLambdaConfiguration(request);
             } else if (!request.queueArn.empty()) {
                 CreateQueueConfiguration(request);
             }
@@ -383,21 +384,26 @@ namespace AwsMock::Service {
 
         Database::Entity::S3::BucketNotification notification = _database->GetBucketNotification({.region=region, .bucket=object.bucket, .event=event});
 
-        if(!notification.function.empty()) {
+        if (!notification.queueArn.empty()) {
 
             // Lambda notification
 
-        } else if(!notification.function.empty()) {
+        } else if (!notification.lambdaArn.empty()) {
 
             // Create the event record
-            Dto::S3::EventNotification::Object obj = {.key=object.key, .etag=object.md5sum};
-            Dto::S3::EventNotification::Bucket bucket = {.name=notification.bucket};
+            Dto::S3::Object obj = {.key=object.key, .etag=object.md5sum};
+            Dto::S3::Bucket bucket = {.name=notification.bucket};
 
-            Dto::S3::EventNotification::S3 s3 = {.bucket=bucket, .object=obj};
+            Dto::S3::S3 s3 = {.configurationId=notification.notificationId, .bucket=bucket, .object=obj,};
 
-            Dto::S3::EventNotification::Record record = {.s3=s3};
-            Dto::S3::EventNotification::EventNotification eventNotification;
+            Dto::S3::Record record = {.region=region, .s3=s3};
+            Dto::S3::EventNotification eventNotification;
+
             eventNotification.records.push_back(record);
+            poco_debug(_logger, "Found record, count: " + std::to_string(eventNotification.records.size()));
+
+            _lambdaService->InvokeEventFunction(eventNotification);
+            poco_debug(_logger, "Lambda function invoked, eventNotification: " + eventNotification.ToString());
         }
     }
 
@@ -407,9 +413,9 @@ namespace AwsMock::Service {
         return _database->CreateBucketNotification(bucketNotification);
     }
 
-    Database::Entity::S3::BucketNotification S3Service::CreateFunctionConfiguration(const Dto::S3::PutBucketNotificationRequest &request) {
+    Database::Entity::S3::BucketNotification S3Service::CreateLambdaConfiguration(const Dto::S3::PutBucketNotificationRequest &request) {
         Database::Entity::S3::BucketNotification bucketNotification = {.region=request.region, .bucket=request.bucket, .notificationId=request.notificationId,
-            .function=request.function, .queueArn = request.queueArn, .event=request.event};
+            .queueArn = request.queueArn, .lambdaArn=request.lambdaArn, .event=request.event};
         return _database->CreateBucketNotification(bucketNotification);
     }
 

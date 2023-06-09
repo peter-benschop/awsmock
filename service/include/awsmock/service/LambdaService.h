@@ -7,9 +7,14 @@
 
 // C++ standard includes
 #include <string>
+#include <sstream>
 
 // Poco includes
 #include <Poco/Logger.h>
+#include <Poco/Net/HTTPClientSession.h>
+#include <Poco/Net/HTTPRequest.h>
+#include <Poco/Net/HTTPResponse.h>
+#include <Poco/StreamCopier.h>
 #include <Poco/UUID.h>
 #include <Poco/UUIDGenerator.h>
 #include <Poco/RecursiveDirectoryIterator.h>
@@ -85,9 +90,8 @@ namespace AwsMock::Service {
        * Invoke lambda function
        *
        * @param notification S3 event notification
-       * @return CreateFunctionResponse
        */
-      Dto::Lambda::CreateFunctionResponse InvokeEventFunction(const Dto::S3::EventNotification &notification);
+      void InvokeEventFunction(const Dto::S3::EventNotification &notification);
 
     private:
 
@@ -105,6 +109,14 @@ namespace AwsMock::Service {
        * @return code directory
        */
       std::string UnpackZipFile(const std::string &zipFile);
+
+      /**
+       * Send the invocation request via HTTP to the lambda function.
+       *
+       * @param port host port of the docker image, running the lambda function.
+       * @param body message body containing the S3 event in JSON representation.
+       */
+      void SendInvokeRequest(int port, const std::string &body);
 
       /**
        * Logger

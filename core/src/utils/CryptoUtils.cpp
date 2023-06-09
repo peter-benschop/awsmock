@@ -27,7 +27,7 @@ namespace AwsMock::Core {
 
     std::string Crypto::GetMd5FromFile(const std::string &fileName) {
 
-        char *buffer = new char[BUFFER_SIZE];
+        char *buffer = new char[AWSMOCK_BUFFER_SIZE];
 
         EVP_MD_CTX *context = EVP_MD_CTX_new();
         const EVP_MD *md = EVP_md5();
@@ -41,7 +41,7 @@ namespace AwsMock::Core {
         EVP_DigestInit_ex(context, md, nullptr);
 
         while (is.good()) {
-            is.read(buffer, BUFFER_SIZE);
+            is.read(buffer, AWSMOCK_BUFFER_SIZE);
             EVP_DigestUpdate(context, buffer, is.gcount());
         }
 
@@ -75,7 +75,7 @@ namespace AwsMock::Core {
 
     std::string Crypto::GetSha1FromFile(const std::string &fileName) {
 
-        char *buffer = new char[BUFFER_SIZE];
+        char *buffer = new char[AWSMOCK_BUFFER_SIZE];
 
         EVP_MD_CTX *context = EVP_MD_CTX_new();
         const EVP_MD *md = EVP_sha1();
@@ -89,7 +89,7 @@ namespace AwsMock::Core {
         EVP_DigestInit_ex(context, md, nullptr);
 
         while (is.good()) {
-            is.read(buffer, BUFFER_SIZE);
+            is.read(buffer, AWSMOCK_BUFFER_SIZE);
             EVP_DigestUpdate(context, buffer, is.gcount());
         }
 
@@ -142,7 +142,7 @@ namespace AwsMock::Core {
 
     std::string Crypto::GetSha256FromFile(const std::string &fileName) {
 
-        char *buffer = new char[BUFFER_SIZE];
+        char *buffer = new char[AWSMOCK_BUFFER_SIZE];
 
         EVP_MD_CTX *context = EVP_MD_CTX_new();
         const EVP_MD *md = EVP_sha256();
@@ -156,7 +156,7 @@ namespace AwsMock::Core {
         EVP_DigestInit_ex(context, md, nullptr);
 
         while (is.good()) {
-            is.read(buffer, BUFFER_SIZE);
+            is.read(buffer, AWSMOCK_BUFFER_SIZE);
             EVP_DigestUpdate(context, buffer, is.gcount());
         }
 

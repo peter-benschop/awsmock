@@ -61,19 +61,19 @@ namespace AwsMock::Dto::S3 {
       std::string bucket;
 
       /**
-       * Function
+       * Lambda ARN
        */
-      std::string function;
+      std::string lambdaArn;
 
       /**
-       * Qeuue ARN
+       * Queue ARN
        */
       std::string queueArn;
 
       /**
        * Id
        */
-      long notificationId = 0;
+      std::string notificationId;
 
       /**
        * Event
@@ -93,10 +93,10 @@ namespace AwsMock::Dto::S3 {
           Poco::XML::Node *cloudNode = pDoc->getNodeByPath("/NotificationConfiguration/CloudFunctionConfiguration");
           if (cloudNode) {
               Poco::XML::Node *idNode = pDoc->getNodeByPath("/NotificationConfiguration/CloudFunctionConfiguration/Id");
-              notificationId = std::stol(idNode->innerText());
+              notificationId = idNode->innerText();
 
               Poco::XML::Node *functionNode = pDoc->getNodeByPath("/NotificationConfiguration/CloudFunctionConfiguration/CloudFunction");
-              function = functionNode->innerText();
+              lambdaArn = functionNode->innerText();
 
               Poco::XML::Node *eventNode = pDoc->getNodeByPath("/NotificationConfiguration/CloudFunctionConfiguration/Event");
               event = eventNode->innerText();
@@ -105,7 +105,7 @@ namespace AwsMock::Dto::S3 {
           Poco::XML::Node *queueNode = pDoc->getNodeByPath("/NotificationConfiguration/QueueConfiguration");
           if (queueNode) {
               Poco::XML::Node *idNode = pDoc->getNodeByPath("/NotificationConfiguration/QueueConfiguration/Id");
-              notificationId = std::stol(idNode->innerText());
+              notificationId = idNode->innerText();
 
               Poco::XML::Node *queueArnNode = pDoc->getNodeByPath("/NotificationConfiguration/QueueConfiguration/Queue");
               queueArn = queueArnNode->innerText();
@@ -132,8 +132,8 @@ namespace AwsMock::Dto::S3 {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const PutBucketNotificationRequest &r) {
-          os << "PutBucketNotificationRequest={region='" + r.region + "' bucket='" + r.bucket + "' function='" + r.function + "' event='" + r.event + "'id='"
-              + std::to_string(r.notificationId) + "'}";
+          os << "PutBucketNotificationRequest={region='" + r.region + "' bucket='" + r.bucket + "' queueArn='" + r.queueArn + "' lambdaArn='" + r.lambdaArn +
+              "' event='" + r.event + "'id='" + r.notificationId + "'}";
           return os;
       }
 
