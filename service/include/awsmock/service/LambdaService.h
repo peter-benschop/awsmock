@@ -7,15 +7,17 @@
 
 // C++ standard includes
 #include <string>
+#include <sstream>
 
 // Poco includes
 #include <Poco/Logger.h>
+#include <Poco/Net/HTTPClientSession.h>
+#include <Poco/Net/HTTPRequest.h>
+#include <Poco/Net/HTTPResponse.h>
+#include <Poco/StreamCopier.h>
 #include <Poco/UUID.h>
 #include <Poco/UUIDGenerator.h>
 #include <Poco/RecursiveDirectoryIterator.h>
-
-// Easyzip
-#include <easyzip/easyzip.h>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
@@ -25,43 +27,14 @@
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
 #include <awsmock/db/LambdaDatabase.h>
-#include <awsmock/dto/lambda/CreateFunctionRequest.h>
+#include <awsmock/db/S3Database.h>
+#include <awsmock/dto/s3/EventNotification.h>
 #include <awsmock/dto/lambda/CreateFunctionResponse.h>
+#include <awsmock/dto/lambda/CreateFunctionRequest.h>
+#include <awsmock/dto/lambda/DeleteFunctionRequest.h>
 #include <awsmock/service/DockerService.h>
 
 namespace AwsMock::Service {
-
-    class DockerRunner : public Poco::Runnable {
-
-    public:
-
-      /**
-       * Thread main method
-       */
-      void run() {
-
-          _running = true;
-          while (_running) {
-              Poco::Thread::sleep(1000);
-          }
-      }
-
-      void stop() {
-          _running = false;
-      }
-
-    private:
-
-      /**
-       * Start the docker image
-       */
-      void StartDockerImage();
-
-      /**
-       * Running flag
-       */
-      bool _running = false;
-    };
 
     class LambdaService {
 
@@ -82,6 +55,24 @@ namespace AwsMock::Service {
        */
       Dto::Lambda::CreateFunctionResponse CreateFunctionConfiguration(Dto::Lambda::CreateFunctionRequest &request);
 
+      /**
+       * Invoke lambda function
+       *
+       * @param notification S3 event notification
+       */
+      void InvokeEventFunction(const Dto::S3::EventNotification &notification);
+
+      /**
+       * Delete lambda function
+       *
+       * <p>This method will also delete the corresponding container and images.
+       *
+       * @param request create lambda request
+       * @return CreateFunctionResponse
+       * @throws ServiceException
+       */
+      void DeleteFunction(Dto::Lambda::DeleteFunctionRequest &request);
+
     private:
 
       /**
@@ -100,14 +91,12 @@ namespace AwsMock::Service {
       std::string UnpackZipFile(const std::string &zipFile);
 
       /**
-       * Create the docker image.
+       * Send the invocation request via HTTP to the lambda function.
        *
-       * @param codeDir code directory
-       * @param functionName function name
-       * @param handler function handler
-       * @return location of docker file
+       * @param port host port of the docker image, running the lambda function.
+       * @param body message body containing the S3 event in JSON representation.
        */
-      std::string BuildDockerImage(const std::string &codeDir, const std::string &functionName, const std::string &handler);
+      void SendInvocationRequest(int port, const std::string &body);
 
       /**
        * Logger
@@ -140,9 +129,14 @@ namespace AwsMock::Service {
       const Core::Configuration &_configuration;
 
       /**
-       * Database connection
+       * Lambda database connection
        */
-      std::unique_ptr<Database::LambdaDatabase> _database;
+      std::unique_ptr<Database::LambdaDatabase> _lambdaDatabase;
+
+      /**
+       * S3 database connection
+       */
+      std::unique_ptr<Database::S3Database> _s3Database;
 
       /**
        * Database connection

@@ -21,7 +21,6 @@ namespace AwsMock::Resource::Factory {
        *
        * @param configuration application configuration
        * @param metricService monitoring service
-       * @param service AWS S3 service
        * @return resource handler
        */
       Poco::Net::HTTPRequestHandler *createResource(Core::Configuration &configuration, Core::MetricService &metricService) override;

@@ -32,11 +32,13 @@
 #include "awsmock/dto/s3/GetObjectRequest.h"
 #include "awsmock/dto/s3/GetObjectResponse.h"
 #include "awsmock/dto/s3/InitiateMultipartUploadResult.h"
+#include "awsmock/dto/s3/ListBucketRequest.h"
 #include "awsmock/dto/s3/ListBucketResult.h"
 #include "awsmock/dto/s3/ListAllBucketResponse.h"
 #include "awsmock/dto/s3/PutBucketNotificationRequest.h"
 #include "awsmock/dto/s3/PutObjectRequest.h"
 #include "awsmock/dto/s3/PutObjectResponse.h"
+#include "awsmock/service/LambdaService.h"
 
 namespace AwsMock::Service {
 
@@ -56,9 +58,7 @@ namespace AwsMock::Service {
       /**
        * Returns the meta data of an S3 object
        *
-       * @param name name of the bucket
-       * @param owner owner of the bucket
-       * @param s3Request S3 create request
+       * @param request get metadata request
        * @return CreateBucketResponse
        */
       Dto::S3::GetMetadataResponse GetMetadata(Dto::S3::GetMetadataRequest &request);
@@ -83,11 +83,10 @@ namespace AwsMock::Service {
       /**
        * Lists contents of bucket
        *
-       * @param name name of the bucket
        * @param s3Request S3 create request
        * @return CreateBucketResponse
        */
-      Dto::S3::ListBucketResult ListBucket(const std::string &bucket);
+      Dto::S3::ListBucketResult ListBucket(const Dto::S3::ListBucketRequest &s3Request);
 
       /**
        * Creates a new bucket
@@ -169,6 +168,7 @@ namespace AwsMock::Service {
       /**
        * Delete a bucket
        *
+       * @param region AWS region name
        * @param name name of the bucket
        */
       void DeleteBucket(const std::string &region, const std::string &name);
@@ -245,7 +245,7 @@ namespace AwsMock::Service {
        * @param request put bucket notification request.
        * @return BucketNotification.
        */
-      Database::Entity::S3::BucketNotification CreateFunctionConfiguration(const Dto::S3::PutBucketNotificationRequest &request);
+      Database::Entity::S3::BucketNotification CreateLambdaConfiguration(const Dto::S3::PutBucketNotificationRequest &request);
 
       /**
        * Deletes an object
@@ -290,14 +290,14 @@ namespace AwsMock::Service {
       std::unique_ptr<Database::S3Database> _database;
 
       /**
+       * Lambda service, needed for the cloud function S3 notifications
+       */
+      std::unique_ptr<LambdaService> _lambdaService;
+
+      /**
        * Multipart uploads map
        */
       MultiPartUploads _uploads;
-
-      /**
-       * Lock
-       */
-      Poco::Mutex _mutex;
 
     };
 

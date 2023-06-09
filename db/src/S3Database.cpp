@@ -136,7 +136,7 @@ namespace AwsMock::Database {
         return bucketList;
     }
 
-    Entity::S3::ObjectList S3Database::ListBucket(const std::string &bucket) {
+    Entity::S3::ObjectList S3Database::ListBucket(const std::string &bucket, const std::string &prefix) {
 
         // Select database
         Entity::S3::Object object;
@@ -145,10 +145,10 @@ namespace AwsMock::Database {
 
             Poco::Data::Session session = GetSession();
             Poco::Data::Statement stmt(session);
-            stmt
-                << "SELECT id,bucket,key,size,md5sum,content_type,created,modified FROM s3_object WHERE bucket=?", bind(bucket), into(object.id), into(object.bucket), into(
-                object.key),
-                into(object.size), into(object.md5sum), into(object.contentType), into(object.created), into(object.modified), range(0, 1);
+            session.begin();
+            stmt << "SELECT id,bucket,key,size,md5sum,content_type,created,modified FROM s3_object WHERE bucket=? AND key like '" + prefix + "/%'",
+                into(object.id), into(object.bucket), into(object.key), into(object.size), into(object.md5sum), into(object.contentType),
+                into(object.created), into(object.modified), bind(bucket), range(0, 1);
 
             while (!stmt.done() && objectList.size() < MAX_FILES) {
                 stmt.execute();
@@ -158,7 +158,7 @@ namespace AwsMock::Database {
             }
             session.close();
 
-            poco_trace(_logger, "Bucket list created, size:" + std::to_string(objectList.size()));
+            poco_trace(_logger, "Object list created, size:" + std::to_string(objectList.size()));
 
         } catch (Poco::Exception &exc) {
             poco_error(_logger, "Database exception: " + exc.message());
@@ -303,8 +303,8 @@ namespace AwsMock::Database {
             Poco::Data::Session session = GetSession();
             session.begin();
             std::string event = Poco::replace(bucketNotification.event, "*", "%");
-            session << "INSERT INTO s3_notification(bucket,region,notification_id,function,queue_arn,event) VALUES(?,?,?,?,?,?) returning id",
-                bind(bucketNotification.bucket), bind(bucketNotification.region), bind(bucketNotification.notificationId), bind(bucketNotification.function),
+            session << "INSERT INTO s3_notification(region,bucket,notification_id,lambda_arn,queue_arn,event) VALUES(?,?,?,?,?,?) returning id",
+                bind(bucketNotification.region), bind(bucketNotification.bucket), bind(bucketNotification.notificationId), bind(bucketNotification.lambdaArn),
                 bind(bucketNotification.queueArn), bind(event), into(id), now;
             session.commit();
 
@@ -323,13 +323,33 @@ namespace AwsMock::Database {
         try {
             Poco::Data::Session session = GetSession();
 
-            session << "SELECT id,bucket,region,notification_id,function,event,created,modified FROM s3_notification WHERE id=?", bind(id), into(result.id),
-                into(result.bucket), into(result.region), into(result.notificationId), into(result.function), into(result.event), into(result.created),
-                into(result.modified), now;
-
-            poco_trace(_logger, "Bucket notification added, bucket: " + result.bucket + " function: " + result.function + " event: " + result.event);
-
+            session << "SELECT id,region,bucket,event,notification_id,lambda_arn,queue_arn,created,modified FROM s3_notification WHERE id=?",
+                into(result.id), into(result.region), into(result.bucket), into(result.event), into(result.notificationId), into(result.lambdaArn),
+                into(result.queueArn), into(result.created), into(result.modified), bind(id), now;
             session.close();
+
+            poco_trace(_logger, "Got bucket notification: " + result.ToString());
+
+        } catch (Poco::Exception &exc) {
+            poco_error(_logger, "Database exception: " + exc.message());
+            throw Core::DatabaseException(exc.message(), 500);
+        }
+        return result;
+    }
+
+    Entity::S3::BucketNotification S3Database::GetBucketNotificationByNotificationId(const std::string &region,
+                                                                                     const std::string &bucket,
+                                                                                     const std::string &notificationId) {
+        Entity::S3::BucketNotification result;
+        try {
+            Poco::Data::Session session = GetSession();
+            session << "SELECT id,region,bucket,event,notification_id,lambda_arn,queue_arn,created,modified FROM s3_notification "
+                       "WHERE region=? AND bucket=? AND notification_id=?",
+                into(result.id), into(result.region), into(result.bucket), into(result.event), into(result.notificationId), into(result.lambdaArn),
+                into(result.queueArn), into(result.created), into(result.modified), bind(region), bind(bucket), bind(notificationId), now;
+            session.close();
+
+            poco_trace(_logger, "Got bucket notification: " + result.ToString());
 
         } catch (Poco::Exception &exc) {
             poco_error(_logger, "Database exception: " + exc.message());
@@ -363,12 +383,13 @@ namespace AwsMock::Database {
         try {
             Poco::Data::Session session = GetSession();
 
-            session << "SELECT id,bucket,region,notification_id,function,event,created,modified FROM s3_notification WHERE region=? AND bucket=? AND '" +
-                bucketNotification.event + "' like event",
-                bind(bucketNotification.region), bind(bucketNotification.bucket), bind(bucketNotification.event), into(result.id), into(result.bucket), into(result.region),
-                into(result.notificationId), into(result.function), into(result.event), into(result.created), into(result.modified), now;
+            session << "SELECT id,region,bucket,notification_id,event,lambda_arn,queue_arn,created,modified FROM s3_notification "
+                       "WHERE region=? AND bucket=? AND '" + bucketNotification.event + "' like event",
+                into(result.id), into(result.region), into(result.bucket), into(result.notificationId), into(result.event), into(result.lambdaArn),
+                into(result.queueArn), into(result.created), into(result.modified), bind(bucketNotification.region), bind(bucketNotification.bucket),
+                bind(bucketNotification.event), now;
 
-            poco_trace(_logger, "Bucket notification added, bucket: " + result.bucket + " function: " + result.function + " event: " + result.event);
+            poco_trace(_logger, "Got bucket notification: " + result.ToString());
 
             session.close();
 

@@ -138,9 +138,9 @@ namespace AwsMock::Core {
        *
        * <p>The out file will be truncated, before its used </p>
        *
-       * @param outName output file name
+       * @param outFile output file name
        * @param inDir input directory
-       * @param files vector of binary file sto append to output file
+       * @param files string vector of binary files to append to output file
        */
       static void AppendBinaryFiles(const std::string &outFile, const std::string &inDir, const std::vector<std::string> &files);
 

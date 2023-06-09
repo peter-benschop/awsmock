@@ -78,6 +78,17 @@ namespace AwsMock::Service {
         poco_trace(_logger, "Output: " + output);
     }
 
+    void DockerService::DeleteImage(const std::string &name, const std::string &tag) {
+
+        std::string jsonBody = {};
+        std::string
+            header = Core::SystemUtils::SetHeader("DELETE", "/" + DOCKER_VERSION + "/images/" + name + ":" + tag + "?force=true", JSON_CONTENT_TYPE, jsonBody.size());
+
+        poco_debug(_logger, "Sending delete image request");
+
+        Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
+    }
+
     bool DockerService::ContainerExists(const std::string &name, const std::string &tag) {
 
         std::string jsonBody = {};
@@ -181,6 +192,17 @@ namespace AwsMock::Service {
 
         std::string output = Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
         return output;
+    }
+
+    void DockerService::DeleteContainer(const Dto::Docker::Container &container) {
+
+        std::string jsonBody = {};
+        std::string
+            header = Core::SystemUtils::SetHeader("DELETE", "/" + DOCKER_VERSION + "/containers/" + container.id + "?force=true", JSON_CONTENT_TYPE, jsonBody.size());
+
+        poco_debug(_logger, "Sending delete container request");
+
+        Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
     }
 
     std::string DockerService::WriteDockerFile(const std::string &codeDir, const std::string &handler) {

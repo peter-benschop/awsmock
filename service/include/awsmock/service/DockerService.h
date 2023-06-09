@@ -41,10 +41,9 @@
 namespace AwsMock::Service {
 
     /**
-     * Invokation:
-     * <pre>
-     * curl -XPOST "http://localhost:8080/2015-03-31/functions/function/invocations" -d '{}'
-     * </pre>
+     * The DockerService controls the connection to the docker daemon.
+     *
+     * <p>All docker related commands will be executed by the different methods.</p>
      */
     class DockerService {
 
@@ -78,12 +77,6 @@ namespace AwsMock::Service {
       /**
        * Build a docker image for a lambda
        *
-       * <p>Curl example:
-       * <pre>
-       * curl --unix-socket /var/run/docker.sock --data-binary '@docker.tar.gz' -XPOST -H "Content-Type: application/octet-stream" http://localhost/v1.42/build
-       * </pre>
-       * </p>
-       *
        * @param codeDir code directory
        * @param name lambda function name, used as image name
        * @param tag image tag
@@ -91,6 +84,14 @@ namespace AwsMock::Service {
        * @return CreateFunctionResponse
        */
       void BuildImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler);
+
+      /**
+       * Delete an image by name/tag.
+       *
+       * @param name container name
+       * @param tag container tag
+       */
+      void DeleteImage(const std::string &name, const std::string &tag);
 
       /**
        * Checks whether a container exists.
@@ -151,12 +152,11 @@ namespace AwsMock::Service {
       std::string StopContainer(const Dto::Docker::Container &container);
 
       /**
-       * Invoke the lambda function
+       * Deletes the container
        *
-       * @param container container
-       * @return output string
+       * @param container container DTO
        */
-      //std::string InvokeLambda(const Dto::Lambda::InvokeLambdaRequest &container);
+      void DeleteContainer(const Dto::Docker::Container &container);
 
     private:
 

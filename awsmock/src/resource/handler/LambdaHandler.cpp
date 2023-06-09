@@ -45,8 +45,6 @@ namespace AwsMock {
             std::string version, action;
             GetVersionActionFromUri(request.getURI(), version, action);
 
-            //DumpBodyToFile(request, "/tmp/body");
-
             if(action == "functions") {
 
                 Dto::Lambda::CreateFunctionRequest lambdaRequest;
@@ -72,6 +70,26 @@ namespace AwsMock {
             std::string version, action;
             GetVersionActionFromUri(request.getURI(), version, action);
 
+            if(Core::StringUtils::StartsWith(action, "functions")) {
+
+                Poco::RegularExpression::MatchVec posVec;
+                Poco::RegularExpression pattern(R"(/([a-z0-9-.]+)?/?([a-zA-Z0-9-_/.*'()]+)?\??.*$)");
+                if (!pattern.match(action, 0, posVec)) {
+                    throw Core::ResourceNotFoundException("Could not extract function name");
+                }
+
+                std::string functionName, qualifier;
+                if (posVec.size() > 1) {
+                    functionName = action.substr(posVec[1].offset, posVec[1].length);
+                }
+                if (posVec.size() > 2) {
+                    qualifier = action.substr(posVec[2].offset, posVec[2].length);
+                }
+
+                Dto::Lambda::DeleteFunctionRequest lambdaRequest = {.functionName=functionName, .qualifier=qualifier};
+                _lambdaService.DeleteFunction(lambdaRequest);
+                SendOkResponse(response);
+            }
         } catch (Core::ServiceException &exc) {
             SendErrorResponse("Lambda", response, exc);
         }

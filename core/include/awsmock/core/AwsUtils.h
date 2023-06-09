@@ -27,8 +27,8 @@ namespace AwsMock::Core {
       /**
        * Create S3 Amazon bucket/key ARN
        *
-       * @param service AWS service name
        * @param region AWS region
+       * @param accountId AWS account ID
        * @param bucket bucket name
        * @param key object key
        */
@@ -37,18 +37,17 @@ namespace AwsMock::Core {
       /**
        * Create Lambda function ARN
        *
-       * @param service AWS service name
        * @param region AWS region
-       * @param bucket bucket name
-       * @param key object key
+       * @param accountId AWS account ID
+       * @param function lambda function name
        */
       static std::string CreateLambdaArn(const std::string &region, const std::string &accountId, const std::string &function);
 
       /**
        * Create Lambda function ARN
        *
-       * @param service AWS service name
        * @param region AWS region
+       * @param accountId AWS account ID
        * @param queueName name of the queue
        */
       static std::string CreateSQSArn(const std::string &region, const std::string &accountId, const std::string &queueName);

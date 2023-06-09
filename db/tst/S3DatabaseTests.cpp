@@ -127,7 +127,7 @@ namespace AwsMock::Database {
         _database.CreateObject(object);
 
         // act
-        Entity::S3::ObjectList result = _database.ListBucket(bucket.name);
+        Entity::S3::ObjectList result = _database.ListBucket(bucket.name, "");
 
         // assert
         EXPECT_EQ(result.size() ,1);
@@ -195,7 +195,7 @@ namespace AwsMock::Database {
     TEST_F(S3DatabaseTest, CreateNotificationTest) {
 
         // arrange
-        Entity::S3::BucketNotification notification = {.region=REGION, .bucket=BUCKET, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
+        Entity::S3::BucketNotification notification = {.region=REGION, .bucket=BUCKET, .lambdaArn="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
 
         // act
         Entity::S3::BucketNotification result = _database.CreateBucketNotification(notification);
@@ -207,7 +207,7 @@ namespace AwsMock::Database {
     TEST_F(S3DatabaseTest, HasNotificationTest) {
 
         // arrange
-        Entity::S3::BucketNotification notification = {.region=REGION, .bucket=BUCKET, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
+        Entity::S3::BucketNotification notification = {.region=REGION, .bucket=BUCKET, .lambdaArn="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
         notification = _database.CreateBucketNotification(notification);
 
         // act
@@ -220,7 +220,7 @@ namespace AwsMock::Database {
     TEST_F(S3DatabaseTest, GetNotificationTest) {
 
         // arrange
-        Entity::S3::BucketNotification notification = {.region=REGION, .bucket=BUCKET, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
+        Entity::S3::BucketNotification notification = {.region=REGION, .bucket=BUCKET, .lambdaArn="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
         notification = _database.CreateBucketNotification(notification);
 
         // act
@@ -234,11 +234,11 @@ namespace AwsMock::Database {
     TEST_F(S3DatabaseTest, GetNotificationPutTest) {
 
         // arrange
-        Entity::S3::BucketNotification notification = {.region=REGION, .bucket=BUCKET, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
+        Entity::S3::BucketNotification notification = {.region=REGION, .bucket=BUCKET, .lambdaArn="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
         notification = _database.CreateBucketNotification(notification);
 
         // act
-        Entity::S3::BucketNotification search = {.region=REGION, .bucket=BUCKET, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:Put"};
+        Entity::S3::BucketNotification search = {.region=REGION, .bucket=BUCKET, .lambdaArn="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:Put"};
         Entity::S3::BucketNotification result = _database.GetBucketNotification(search);
 
         // assert

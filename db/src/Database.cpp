@@ -78,8 +78,9 @@ namespace AwsMock::Database {
             Poco::Data::Keywords::now;
         poco_debug(_logger, "S3 object table created");
 
-        session << "CREATE TABLE s3_notification (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, region VARCHAR(255), bucket VARCHAR(255), notification_id INT, "
-                   "function VARCHAR(255), queue_arn VARCHAR(255), event VARCHAR(128), created DATETIME DEFAULT CURRENT_TIMESTAMP, modified DATETIME DEFAULT CURRENT_TIMESTAMP)",
+        session << "CREATE TABLE s3_notification (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, region VARCHAR(255), bucket VARCHAR(255), notification_id VARCHAR(128), "
+                   "queue_arn VARCHAR(255), lambda_arn VARCHAR(255), event VARCHAR(128), created DATETIME DEFAULT CURRENT_TIMESTAMP, "
+                   "modified DATETIME DEFAULT CURRENT_TIMESTAMP)",
             Poco::Data::Keywords::now;
         session << "CREATE UNIQUE INDEX s3_notification_idx1 ON s3_notification(region,bucket,event)",
             Poco::Data::Keywords::now;

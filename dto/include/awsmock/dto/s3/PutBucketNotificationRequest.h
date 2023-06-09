@@ -2,8 +2,8 @@
 // Created by vogje01 on 01/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_S3_NOTIFICATIONCONFIGURATION_H
-#define AWSMOCK_DTO_S3_NOTIFICATIONCONFIGURATION_H
+#ifndef AWSMOCK_DTO_S3_PUTBUCKETNOTIFICATIONREQUEST_H
+#define AWSMOCK_DTO_S3_PUTBUCKETNOTIFICATIONREQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -25,14 +25,16 @@ namespace AwsMock::Dto::S3 {
      * </NotificationConfiguration>
      * </pre>
      * </p>
-     * <p>Notification for a SMS queue event:
+     * <p>Notification for a SQS queue event:
+     * <pre>
      * <NotificationConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">
 	 *   <QueueConfiguration>
 	 *     <Id>1234567890125</Id>
 	 *	   <Queue>arn:aws:sqs:eu-central-1:000000000000:onix3-tmp-parsing-input-event-queue</Queue>
 	 *     <Event>s3:ObjectCreated:*</Event>
 	 *   </QueueConfiguration>
-     *</NotificationConfiguration>
+     * </NotificationConfiguration>
+     * </pre>
      * </p>
      */
     struct PutBucketNotificationRequest {
@@ -41,6 +43,8 @@ namespace AwsMock::Dto::S3 {
        * Constructor
        *
        * @param xmlString XML string
+       * @param region AWS region name
+       * @param bucket AWS S3 bucket name
        */
       explicit PutBucketNotificationRequest(const std::string &xmlString, const std::string &region, const std::string &bucket) {
 
@@ -61,19 +65,19 @@ namespace AwsMock::Dto::S3 {
       std::string bucket;
 
       /**
-       * Function
+       * Lambda ARN
        */
-      std::string function;
+      std::string lambdaArn;
 
       /**
-       * Qeuue ARN
+       * Queue ARN
        */
       std::string queueArn;
 
       /**
        * Id
        */
-      long notificationId = 0;
+      std::string notificationId;
 
       /**
        * Event
@@ -93,10 +97,10 @@ namespace AwsMock::Dto::S3 {
           Poco::XML::Node *cloudNode = pDoc->getNodeByPath("/NotificationConfiguration/CloudFunctionConfiguration");
           if (cloudNode) {
               Poco::XML::Node *idNode = pDoc->getNodeByPath("/NotificationConfiguration/CloudFunctionConfiguration/Id");
-              notificationId = std::stol(idNode->innerText());
+              notificationId = idNode->innerText();
 
               Poco::XML::Node *functionNode = pDoc->getNodeByPath("/NotificationConfiguration/CloudFunctionConfiguration/CloudFunction");
-              function = functionNode->innerText();
+              lambdaArn = functionNode->innerText();
 
               Poco::XML::Node *eventNode = pDoc->getNodeByPath("/NotificationConfiguration/CloudFunctionConfiguration/Event");
               event = eventNode->innerText();
@@ -105,7 +109,7 @@ namespace AwsMock::Dto::S3 {
           Poco::XML::Node *queueNode = pDoc->getNodeByPath("/NotificationConfiguration/QueueConfiguration");
           if (queueNode) {
               Poco::XML::Node *idNode = pDoc->getNodeByPath("/NotificationConfiguration/QueueConfiguration/Id");
-              notificationId = std::stol(idNode->innerText());
+              notificationId = idNode->innerText();
 
               Poco::XML::Node *queueArnNode = pDoc->getNodeByPath("/NotificationConfiguration/QueueConfiguration/Queue");
               queueArn = queueArnNode->innerText();
@@ -132,8 +136,8 @@ namespace AwsMock::Dto::S3 {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const PutBucketNotificationRequest &r) {
-          os << "PutBucketNotificationRequest={region='" + r.region + "' bucket='" + r.bucket + "' function='" + r.function + "' event='" + r.event + "'id='"
-              + std::to_string(r.notificationId) + "'}";
+          os << "PutBucketNotificationRequest={region='" + r.region + "' bucket='" + r.bucket + "' queueArn='" + r.queueArn + "' lambdaArn='" + r.lambdaArn +
+              "' event='" + r.event + "'id='" + r.notificationId + "'}";
           return os;
       }
 
@@ -141,4 +145,4 @@ namespace AwsMock::Dto::S3 {
 
 } // namespace AwsMock::Dto::S3
 
-#endif // AWS_MOCK_DTO_INCLUDE_AWSMOCK_DTO_S3_NOTIFICATIONCONFIGURATION_H
+#endif // AWSMOCK_DTO_S3_PUTBUCKETNOTIFICATIONREQUEST_H

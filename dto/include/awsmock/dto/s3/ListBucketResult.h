@@ -149,7 +149,7 @@ namespace AwsMock::Dto::S3 {
        * @param bucket bucket
        * @param objectList object list
        */
-      ListBucketResult(const std::string &bucket, Database::Entity::S3::ObjectList objectList) {
+      ListBucketResult(const std::string &bucket, const Database::Entity::S3::ObjectList& objectList) {
 
           maxKeys = 1000;
           name = bucket;
@@ -173,6 +173,7 @@ namespace AwsMock::Dto::S3 {
               contents.push_back(content);
           }
       }
+
       /**
        * Convert to XML representation
        *

@@ -114,7 +114,7 @@ namespace AwsMock::Core {
       /**
        * Extract the body of the message
        *
-       * @param body body string
+       * @param output HTTP response output
        * @return body string
        */
       static std::string GetBody(const std::string &output);

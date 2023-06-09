@@ -25,7 +25,7 @@
 #include <awsmock/core/StringUtils.h>
 
 // 64kB buffer
-#define BUFFER_SIZE 64000
+#define AWSMOCK_BUFFER_SIZE 64000
 
 namespace AwsMock::Core {
 

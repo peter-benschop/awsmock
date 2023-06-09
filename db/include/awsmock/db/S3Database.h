@@ -162,9 +162,11 @@ namespace AwsMock::Database {
       /**
        * List all objects of a bucket
        *
+       * @param bucket S3 bucket name
+       * @param prefix S3 key prefix
        * @return ObjectList
        */
-      Entity::S3::ObjectList ListBucket(const std::string &bucket);
+      Entity::S3::ObjectList ListBucket(const std::string &bucket, const std::string &prefix);
 
       /**
        * Bucket notification exists
@@ -192,6 +194,16 @@ namespace AwsMock::Database {
        * @return BucketNotification
        */
       Entity::S3::BucketNotification GetBucketNotificationById(long id);
+
+      /**
+       * Returns a bucket notification by configuration ID
+       *
+       * @param region AWS region
+       * @param bucket S3 bucket
+       * @param notificationId configuration ID
+       * @return BucketNotification
+       */
+      Entity::S3::BucketNotification GetBucketNotificationByNotificationId(const std::string &region, const std::string &bucket, const std::string &notificationId);
 
       /**
        * Returns a notification.
@@ -249,6 +261,8 @@ namespace AwsMock::Database {
        * Logger
        */
       Poco::Logger &_logger;
+
+      static std::map<std::string, std::vector<std::string>> allowedEventTypes;
 
     };
 

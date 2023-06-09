@@ -190,7 +190,7 @@ namespace AwsMock::Core {
       static std::string UrlDecode(const std::string &input);
 
       /**
-       * Convert to hex string
+       * Convert the given string to a hex encoded string.
        *
        * @param input input byte array
        * @param length length of the byte array

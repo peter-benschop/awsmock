@@ -13,11 +13,14 @@ namespace AwsMock::Core {
      * COM exception class. In case of a COM request failure a COMException is thrown.
      */
     class ServiceException : public Poco::Exception {
+
     public:
       /**
        * Constructor.
        *
        * @param code exception code, default: 0
+       * @param resource exception resource
+       * @param requestId exception resource ID
        */
       explicit ServiceException(int code = 0, const char *resource = nullptr, const char *requestId = nullptr);
 
@@ -26,6 +29,8 @@ namespace AwsMock::Core {
        *
        * @param msg exception message
        * @param code exception code, default: 0
+       * @param resource exception resource
+       * @param requestId exception resource ID
        */
       explicit ServiceException(const std::string &msg, int code = 0, const char *resource = nullptr, const char *requestId = nullptr);
 
@@ -35,6 +40,8 @@ namespace AwsMock::Core {
        * @param msg exception message
        * @param arg exception argument, will be appended to the message, separated with a ':'.
        * @param code exception code, default: 0
+       * @param resource exception resource
+       * @param requestId exception resource ID
        */
       ServiceException(const std::string &msg, const std::string &arg, int code = 0, const char *resource = nullptr, const char *requestId = nullptr);
 
@@ -44,6 +51,8 @@ namespace AwsMock::Core {
        * @param msg exception message
        * @param exc parent exception.
        * @param code exception code, default: 0
+       * @param resource exception resource
+       * @param requestId exception resource ID
        */
       ServiceException(const std::string &msg, const Poco::Exception &exc, int code = 0, const char *resource = nullptr, const char *requestId = nullptr);
 

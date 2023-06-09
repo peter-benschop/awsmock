@@ -52,5 +52,8 @@ Testing/*
 **/*_tst
 core/tst/*.txt
 
-# Docker
-docker/libs
+# Docs
+docs/html
+docs/xml
+docs/docs
+

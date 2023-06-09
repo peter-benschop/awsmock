@@ -22,7 +22,8 @@ namespace AwsMock::Service {
         _accountId = _configuration.getString("awsmock.account.id", "000000000000");
         _dataDir = _configuration.getString("awsmock.data.dir", "/tmp/awsmock/data");
         _tempDir = _dataDir + Poco::Path::separator() + "tmp";
-        _database = std::make_unique<Database::LambdaDatabase>(_configuration);
+        _lambdaDatabase = std::make_unique<Database::LambdaDatabase>(_configuration);
+        _s3Database = std::make_unique<Database::S3Database>(_configuration);
         _dockerService = std::make_unique<Service::DockerService>(_configuration);
 
         // Create temp directory
@@ -75,7 +76,7 @@ namespace AwsMock::Service {
 
         // Update database
         lambdaEntity.arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, request.functionName);
-        lambdaEntity = _database->CreateOrUpdateLambda(lambdaEntity);
+        lambdaEntity = _lambdaDatabase->CreateOrUpdateLambda(lambdaEntity);
 
         // Create response
         Dto::Lambda::CreateFunctionResponse
@@ -83,6 +84,49 @@ namespace AwsMock::Service {
             .environment=request.environment, .memorySize=request.memorySize, .dockerImageId=image.id, .dockerContainerId=container.id};
 
         return response;
+    }
+
+    void LambdaService::InvokeEventFunction(const Dto::S3::EventNotification &notification) {
+        poco_debug(_logger, "Invocation event function notification: " + notification.ToString());
+
+        for (const auto &record : notification.records) {
+
+            // Get the bucket notification
+            Database::Entity::S3::BucketNotification
+                bucketNotification = _s3Database->GetBucketNotificationByNotificationId(record.region, record.s3.bucket.name, record.s3.configurationId);
+            poco_debug(_logger, "Got bucket notification: " + bucketNotification.ToString());
+
+            // Get the lambda entity
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->GetLambdaByArn(bucketNotification.lambdaArn);
+            poco_debug(_logger, "Got lambda entity notification: " + lambda.ToString());
+
+            SendInvocationRequest(lambda.hostPort, notification.ToJson());
+        }
+    }
+
+    void LambdaService::DeleteFunction(Dto::Lambda::DeleteFunctionRequest &request){
+        poco_debug(_logger, "Invocation event function notification: " + request.ToString());
+
+        if(_lambdaDatabase->LambdaExists(request.functionName)) {
+            poco_error(_logger, "Lambda function does not exist, function: " + request.functionName);
+            throw Core::ServiceException("Lambda function does not exist", 500);
+        }
+
+        _lambdaDatabase->DeleteLambda(request.functionName);
+        poco_information(_logger, "Lambda function deleted, function: " + request.functionName);
+
+        // Delete the container, if existing
+        if (_dockerService->ContainerExists(request.functionName, "latest")) {
+            Dto::Docker::Container container = _dockerService->GetContainerByName(request.functionName, "latest");
+            _dockerService->DeleteContainer(container);
+            poco_debug(_logger, "Docker container deleted, function: " + request.functionName);
+        }
+
+        // Delete the image, if existing
+        if (_dockerService->ImageExists(request.functionName, "latest")) {
+            _dockerService->DeleteImage(request.functionName, "latest");
+            poco_debug(_logger, "Docker image deleted, function: " + request.functionName);
+        }
     }
 
     std::string LambdaService::UnpackZipFile(const std::string &zipFile) {
@@ -105,4 +149,27 @@ namespace AwsMock::Service {
         return codeDir;
     }
 
+    void LambdaService::SendInvocationRequest(int port, const std::string &body) {
+
+        Poco::URI uri("http://localhost:" + std::to_string(port) + "/2015-03-31/functions/function/invocations");
+        std::string path(uri.getPathAndQuery());
+
+        // Create HTTP request and set headers
+        Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
+        Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, path, Poco::Net::HTTPMessage::HTTP_1_1);
+        request.add("Content-Type","application/json");
+        request.setContentLength((long)body.length());
+        poco_debug(_logger, "Invocation request defined, body: " + body);
+
+        // Send request
+        std::ostream& os = session.sendRequest(request);
+        os << body;
+
+        // Get the response sttaus
+        Poco::Net::HTTPResponse response;
+        if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
+            poco_error(_logger, "HTTP error, status: " + std::to_string(response.getStatus()) + " reason: "+ response.getReason());
+        }
+        poco_debug(_logger, "Invocation request send, status: " + std::to_string(response.getStatus()));
+    }
 } // namespace AwsMock::Service

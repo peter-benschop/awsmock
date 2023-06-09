@@ -49,6 +49,7 @@ namespace AwsMock::Dto::S3 {
           os << "GetMetadataRequest={bucket='" + r.bucket + "' key='" + r.key + "'}";
           return os;
       }
+
     };
 
 } // namespace AwsMock::Dto::S3
