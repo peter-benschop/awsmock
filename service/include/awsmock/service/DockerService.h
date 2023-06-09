@@ -93,6 +93,14 @@ namespace AwsMock::Service {
       void BuildImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler);
 
       /**
+       * Delete an image by name/tag.
+       *
+       * @param name container name
+       * @param tag container tag
+       */
+      void DeleteImage(const std::string &name, const std::string &tag);
+
+      /**
        * Checks whether a container exists.
        *
        * @param name container name
@@ -151,12 +159,11 @@ namespace AwsMock::Service {
       std::string StopContainer(const Dto::Docker::Container &container);
 
       /**
-       * Invoke the lambda function
+       * Deletes the container
        *
-       * @param container container
-       * @return output string
+       * @param name container name
        */
-      //std::string InvokeLambda(const Dto::Lambda::InvokeLambdaRequest &container);
+      void DeleteContainer(const Dto::Docker::Container &container);
 
     private:
 

@@ -87,7 +87,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::InvokeEventFunction(const Dto::S3::EventNotification &notification) {
-        poco_debug(_logger, "Invoke event function notification: " + notification.ToString());
+        poco_debug(_logger, "Invocation event function notification: " + notification.ToString());
 
         for (const auto &record : notification.records) {
 
@@ -100,7 +100,32 @@ namespace AwsMock::Service {
             Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->GetLambdaByArn(bucketNotification.lambdaArn);
             poco_debug(_logger, "Got lambda entity notification: " + lambda.ToString());
 
-            SendInvokeRequest(lambda.hostPort, notification.ToJson());
+            SendInvocationRequest(lambda.hostPort, notification.ToJson());
+        }
+    }
+
+    void LambdaService::DeleteFunction(Dto::Lambda::DeleteFunctionRequest &request){
+        poco_debug(_logger, "Invocation event function notification: " + request.ToString());
+
+        if(_lambdaDatabase->LambdaExists(request.functionName)) {
+            poco_error(_logger, "Lambda function does not exist, function: " + request.functionName);
+            throw Core::ServiceException("Lambda function does not exist", 500);
+        }
+
+        _lambdaDatabase->DeleteLambda(request.functionName);
+        poco_information(_logger, "Lambda function deleted, function: " + request.functionName);
+
+        // Delete the container, if existing
+        if (_dockerService->ContainerExists(request.functionName, "latest")) {
+            Dto::Docker::Container container = _dockerService->GetContainerByName(request.functionName, "latest");
+            _dockerService->DeleteContainer(container);
+            poco_debug(_logger, "Docker container deleted, function: " + request.functionName);
+        }
+
+        // Delete the image, if existing
+        if (_dockerService->ImageExists(request.functionName, "latest")) {
+            _dockerService->DeleteImage(request.functionName, "latest");
+            poco_debug(_logger, "Docker image deleted, function: " + request.functionName);
         }
     }
 
@@ -124,7 +149,7 @@ namespace AwsMock::Service {
         return codeDir;
     }
 
-    void LambdaService::SendInvokeRequest(int port, const std::string &body) {
+    void LambdaService::SendInvocationRequest(int port, const std::string &body) {
 
         Poco::URI uri("http://localhost:" + std::to_string(port) + "/2015-03-31/functions/function/invocations");
         std::string path(uri.getPathAndQuery());

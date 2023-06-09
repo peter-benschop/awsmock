@@ -58,6 +58,15 @@ namespace AwsMock::Database {
       bool LambdaExists(const Entity::Lambda::Lambda &lambda);
 
       /**
+       * Check existence of lambda
+       *
+       * @param function AWS function
+       * @return true if lambda already exists
+       * @throws DatabaseException
+       */
+      bool LambdaExists(const std::string &function);
+
+      /**
        * Create a new lambda function
        *
        * @param lambda lambda entity
@@ -76,7 +85,7 @@ namespace AwsMock::Database {
 
 
       /**
-       * Created or updates an existing lambda lambda function
+       * Created or updates an existing lambda function
        *
        * @param lambda lambda entity
        * @return created or updated lambda entity.
@@ -100,6 +109,14 @@ namespace AwsMock::Database {
        * @throws DatabaseException
        */
       Entity::Lambda::Lambda GetLambdaByArn(const std::string &arn);
+
+      /**
+       * Deletes an existing lambda function
+       *
+       * @param lambda lambda entity
+       * @throws DatabaseException
+       */
+      void DeleteLambda(const std::string &functionName);
 
     private:
 

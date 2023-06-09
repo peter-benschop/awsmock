@@ -31,41 +31,10 @@
 #include <awsmock/dto/s3/EventNotification.h>
 #include <awsmock/dto/lambda/CreateFunctionResponse.h>
 #include <awsmock/dto/lambda/CreateFunctionRequest.h>
+#include <awsmock/dto/lambda/DeleteFunctionRequest.h>
 #include <awsmock/service/DockerService.h>
 
 namespace AwsMock::Service {
-
-    class DockerRunner : public Poco::Runnable {
-
-    public:
-
-      /**
-       * Thread main method
-       */
-      void run() {
-
-          _running = true;
-          while (_running) {
-              Poco::Thread::sleep(1000);
-          }
-      }
-
-      void stop() {
-          _running = false;
-      }
-
-    private:
-
-      /**
-       * Start the docker image
-       */
-      void StartDockerImage();
-
-      /**
-       * Running flag
-       */
-      bool _running = false;
-    };
 
     class LambdaService {
 
@@ -93,6 +62,17 @@ namespace AwsMock::Service {
        */
       void InvokeEventFunction(const Dto::S3::EventNotification &notification);
 
+      /**
+       * Delete lambda function
+       *
+       * <p>This method will also delete the corresponding container and images.
+       *
+       * @param request create lambda request
+       * @return CreateFunctionResponse
+       * @throws ServiceException
+       */
+      void DeleteFunction(Dto::Lambda::DeleteFunctionRequest &request);
+
     private:
 
       /**
@@ -116,7 +96,7 @@ namespace AwsMock::Service {
        * @param port host port of the docker image, running the lambda function.
        * @param body message body containing the S3 event in JSON representation.
        */
-      void SendInvokeRequest(int port, const std::string &body);
+      void SendInvocationRequest(int port, const std::string &body);
 
       /**
        * Logger

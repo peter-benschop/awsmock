@@ -30,6 +30,19 @@ namespace AwsMock::Database {
         return LambdaExists(lambda.function, lambda.runtime);
     }
 
+    bool LambdaDatabase::LambdaExists(const std::string &functionName) {
+
+        int count = 0;
+        Poco::Data::Session session = GetSession();
+
+        session << "SELECT COUNT(*) FROM lambda WHERE function=?", bind(functionName), into(count), now;
+
+        session.close();
+        poco_trace(_logger, "Lambda exists: " + std::to_string(count));
+
+        return count > 0;
+    }
+
     Entity::Lambda::Lambda LambdaDatabase::CreateLambda(const Entity::Lambda::Lambda &lambda) {
 
         long id = 0;
@@ -120,5 +133,23 @@ namespace AwsMock::Database {
             poco_error(_logger, "Database exception: " + exc.message());
         }
         return result;
+    }
+
+    void LambdaDatabase::DeleteLambda(const std::string &functionName) {
+
+        int id = 0;
+        try {
+            Poco::Data::Session session = GetSession();
+            session.begin();
+            session << "DELETE from lambda WHERE function=?",
+                bind(functionName), now;
+            session.commit();
+
+            poco_trace(_logger, "Lambda deleted, lambda: " + functionName);
+
+        } catch (Poco::Exception &exc) {
+            poco_error(_logger, "Database exception: " + exc.message());
+            throw Core::DatabaseException(exc.message(), 500);
+        }
     }
 } // namespace AwsMock::Database
