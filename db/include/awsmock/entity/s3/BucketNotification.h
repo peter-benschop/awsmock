@@ -61,6 +61,24 @@ namespace AwsMock::Database::Entity::S3 {
       Poco::DateTime modified;
 
       /**
+       * Converts the DTO to a MongoDB document
+       *
+       * @return DTO as MongoDB document.
+       */
+/*      [[maybe_unused]] Poco::MongoDB::Document::Ptr ToDocument() {
+          Poco::MongoDB::Document::Ptr bucketNotificationDoc = new Poco::MongoDB::Document();
+          bucketNotificationDoc->add("region", region);
+          bucketNotificationDoc->add("bucket", bucket);
+          bucketNotificationDoc->add("notificationId", notificationId);
+          bucketNotificationDoc->add("queueArn", queueArn);
+          bucketNotificationDoc->add("lambdaArn", lambdaArn);
+          bucketNotificationDoc->add("event", event);
+          bucketNotificationDoc->add("created", created.timestamp());
+          bucketNotificationDoc->add("modified", modified.timestamp());
+          return bucketNotificationDoc;
+      };*/
+
+      /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.

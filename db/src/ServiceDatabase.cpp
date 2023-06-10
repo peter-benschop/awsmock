@@ -15,7 +15,7 @@ namespace AwsMock::Database {
     bool ServiceDatabase::IsActive(const std::string &name) {
 
         int count = 0;
-        try {
+        /*try {
 
             Poco::Data::Session session = GetSession();
             session.begin();
@@ -26,7 +26,7 @@ namespace AwsMock::Database {
 
         } catch (Poco::Exception &exc) {
             poco_error(_logger, "Database exception: " + exc.message());
-        }
+        }*/
         return count > 0;
     }
 } // namespace AwsMock::Database

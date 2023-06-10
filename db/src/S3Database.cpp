@@ -6,100 +6,80 @@
 
 namespace AwsMock::Database {
 
-    using namespace Poco::Data::Keywords;
+    //using namespace Poco::Data::Keywords;
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
 
     S3Database::S3Database(const Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("S3Database")) {
         Core::Logger::SetDefaultConsoleLogger("S3Database");
+
+        CreateCollection("s3_bucket");
+        CreateCollection("s3_object");
+
+        _bucketCollection = _database["s3_bucket"];
+        _objectCollection = _database["s3_object"];
     }
 
     bool S3Database::BucketExists(const std::string &region, const std::string &name) {
 
-        int count = 0;
-        Poco::Data::Session session = GetSession();
-
-        session << "SELECT COUNT(*) FROM s3_bucket WHERE region=? AND name=?", bind(region), bind(name), into(count), now;
-
-        session.close();
-        poco_trace(_logger, "Bucket exists: " + std::to_string(count));
-
+        int64_t count = _bucketCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
+        _logger.trace() << "Bucket exists: " << (count > 0 ? "true" : "false");
         return count > 0;
     }
 
     bool S3Database::BucketExists(const Entity::S3::Bucket &bucket) {
-
-        int count = 0;
-        try {
-            Poco::Data::Session session = GetSession();
-            session.begin();
-            session << "SELECT count(*) FROM s3_bucket WHERE region=? AND name=?", bind(bucket.region), bind(bucket.name), into(count), now;
-            session.close();
-
-            poco_trace(_logger, "Bucket exists: " + (count > 0 ? std::string("true") : std::string("false")));
-
-        } catch(Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
-            throw Core::DatabaseException(exc.message());
-        }
-        return count > 0;
+        return BucketExists(bucket.region, bucket.name);
     }
 
     Entity::S3::Bucket S3Database::CreateBucket(const Entity::S3::Bucket &bucket) {
 
-        long id = 0;
-        Entity::S3::Bucket result;
-        try {
-            Poco::Data::Session session = GetSession();
-            session.begin();
-            session << "INSERT INTO s3_bucket(region, name, owner) VALUES(?,?,?) returning id", bind(bucket.region), bind(bucket.name), bind(bucket.owner),
-                into(id), now;
-            session.commit();
+        auto insert_one_result = _bucketCollection.insert_one(bucket.ToDocument());
+        _logger.trace() << "Bucket created, oid: " << insert_one_result->inserted_id().get_oid().value.to_string();
 
-        } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
-            throw Core::DatabaseException(exc.message());
-        }
-        return GetBucketById(id);
+        return GetBucketById(insert_one_result->inserted_id().get_oid().value);
     }
 
-    Entity::S3::Bucket S3Database::GetBucketById(long id) {
+    Entity::S3::Bucket S3Database::GetBucketById(bsoncxx::oid oid) {
 
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _bucketCollection.find_one(make_document(kvp("_id", oid)));
         Entity::S3::Bucket result;
-        try {
-            Poco::Data::Session session = GetSession();
-            session.begin();
-            session << "SELECT id,region,name,owner,created,modified FROM s3_bucket WHERE id=?", bind(id), into(result.id), into(result.region), into(result.name),
-                into(result.owner), into(result.created), into(result.modified), now;
-            session.close();
+        result.FromDocument(mResult);
 
-            poco_trace(_logger, "Got bucket: " + result.ToString());
-
-        } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
-            throw Core::DatabaseException(exc.message());
-        }
         return result;
+    }
+
+    Entity::S3::Bucket S3Database::GetBucketById(const std::string &oid) {
+        return GetBucketById(bsoncxx::oid(oid));
     }
 
     Entity::S3::Bucket S3Database::GetBucketByRegionName(const std::string &region, const std::string &name) {
 
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
         Entity::S3::Bucket result;
-        try {
-            Poco::Data::Session session = GetSession();
-            session.begin();
-            session << "SELECT id,region,name,owner,created,modified FROM s3_bucket WHERE region=? AND name=?",
-                bind(region), bind(name), into(result.id), into(result.region), into(result.name), into(result.owner), into(result.created), into(result.modified), now;
-            session.close();
+        result.FromDocument(mResult);
 
-            poco_trace(_logger, "Got bucket: " + result.ToString());
+        _logger.trace() << "Got bucket: " << result.ToString();
 
-        } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
-            throw Core::DatabaseException(exc.message());
-        }
         return result;
     }
 
-    bool S3Database::HasObjects(const Entity::S3::Bucket &bucket) {
+    Entity::S3::BucketList S3Database::ListBuckets() {
+
+        Entity::S3::BucketList bucketList;
+        auto bucketCursor = _bucketCollection.find({});
+        for (auto bucket : bucketCursor) {
+            Entity::S3::Bucket result;
+            result.FromDocument(bucket);
+            bucketList.push_back(result);
+        }
+
+        _logger.trace() << "Got bucket list, size:" << bucketList.size();
+        return bucketList;
+    }
+
+
+    /*bool S3Database::HasObjects(const Entity::S3::Bucket &bucket) {
 
         int count = 0;
         try {
@@ -107,33 +87,13 @@ namespace AwsMock::Database {
             session << "SELECT count(*) FROM s3_object WHERE bucket=?", bind(bucket.name), into(count), now;
 
             session.close();
-            poco_trace(_logger, "Bucket has objects: " + (count > 0 ? std::string("true") : std::string("false")));
+            _logger.trace() << "Bucket has objects: " << (count > 0 ? std::string("true") : std::string("false"));
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
             throw Core::DatabaseException(exc.message());
         }
         return count > 0;
-    }
-
-    Entity::S3::BucketList S3Database::ListBuckets() {
-
-        Poco::Data::Session session = GetSession();
-
-        // Select database
-        Entity::S3::Bucket bucket;
-        Entity::S3::BucketList bucketList;
-
-        Poco::Data::Statement stmt(session);
-        stmt << "SELECT id,name,created,modified FROM s3_bucket", into(bucket.id), into(bucket.name), into(bucket.created), into(bucket.modified), range(0, 1);
-
-        while (!stmt.done()) {
-            stmt.execute();
-            if(bucket.id > 0)
-            bucketList.push_back(bucket);
-        }
-        poco_trace(_logger, "Bucket list created, size:" + std::to_string(bucketList.size()));
-        return bucketList;
     }
 
     Entity::S3::ObjectList S3Database::ListBucket(const std::string &bucket, const std::string &prefix) {
@@ -146,7 +106,7 @@ namespace AwsMock::Database {
             Poco::Data::Session session = GetSession();
             Poco::Data::Statement stmt(session);
             session.begin();
-            stmt << "SELECT id,bucket,key,size,md5sum,content_type,created,modified FROM s3_object WHERE bucket=? AND key like '" + prefix + "/%'",
+            stmt << "SELECT id,bucket,key,size,md5sum,content_type,created,modified FROM s3_object WHERE bucket=? AND key like '" + prefix + "%'",
                 into(object.id), into(object.bucket), into(object.key), into(object.size), into(object.md5sum), into(object.contentType),
                 into(object.created), into(object.modified), bind(bucket), range(0, 1);
 
@@ -157,35 +117,24 @@ namespace AwsMock::Database {
                 }
             }
             session.close();
-
-            poco_trace(_logger, "Object list created, size:" + std::to_string(objectList.size()));
+            _logger.trace() << "Object list created, size:" << objectList.size();
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
+
             throw Core::DatabaseException(exc.message(), 500);
         }
         return objectList;
-    }
+    }*/
 
     bool S3Database::ObjectExists(const Entity::S3::Object &object) {
 
-        int count = 0;
-        try {
-            Poco::Data::Session session = GetSession();
-            session.begin();
-            session << "SELECT count(*) FROM s3_object WHERE bucket=? AND key=?", bind(object.bucket), bind(object.key), into(count), now;
-            session.close();
-
-            poco_trace(_logger, "Object exists: " + std::to_string(count) + " object: " + object.ToString());
-
-        } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
-            throw Core::DatabaseException(exc.message(), 500);
-        }
+        int64_t count = _objectCollection.count_documents(make_document(kvp("bucket", object.bucket), kvp("key", object.key)));
+        _logger.trace() << "Object exists: " << (count > 0 ? "true" : "false");
         return count > 0;
     }
 
-    Entity::S3::Object S3Database::CreateObject(const Entity::S3::Object &object) {
+    /*Entity::S3::Object S3Database::CreateObject(const Entity::S3::Object &object) {
 
         int id = 0;
         try {
@@ -196,10 +145,10 @@ namespace AwsMock::Database {
                 bind(object.bucket), bind(object.key), bind(object.owner), bind(object.size), bind(object.md5sum), bind(object.contentType), into(id), now;
             session.commit();
 
-            poco_trace(_logger, "Object created, id: " + std::to_string(id) + " object: " + object.ToString());
+            _logger.trace() << "Object created, id: " << id << " object: " << object.ToString();
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
             throw Core::DatabaseException(exc.message(), 500);
         }
         return GetObjectById(id);
@@ -224,10 +173,10 @@ namespace AwsMock::Database {
                 bind(object.owner), bind(object.size), bind(object.md5sum), bind(object.contentType), bind(object.bucket), bind(object.key), into(id), now;
             session.commit();
 
-            poco_trace(_logger, "Object updated, bucket: " + object.bucket + " key: " + object.key);
+            _logger.trace() << "Object updated, bucket: " << object.bucket << " key: " << object.key;
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
             throw Core::DatabaseException(exc.message(), 500);
         }
         return GetObjectById(id);
@@ -243,12 +192,12 @@ namespace AwsMock::Database {
                 bind(bucket), bind(key), into(object.id), into(object.bucket), into(object.key), into(object.owner), into(object.size), into(object.md5sum),
                 into(object.contentType), into(object.modified), now;
 
-            poco_trace(_logger, "S3 object, bucket: " + object.bucket + " key: " + object.key);
+            _logger.trace() << "S3 object, bucket: " << object.bucket + " key: " << object.key;
 
             session.close();
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
             throw Core::DatabaseException(exc.message(), 500);
         }
         return object;
@@ -264,12 +213,12 @@ namespace AwsMock::Database {
                 bind(id), into(object.id), into(object.bucket), into(object.key), into(object.owner), into(object.size), into(object.md5sum), into(object.contentType),
                 into(object.modified), now;
 
-            poco_trace(_logger, "Get S3 object by id, object: " + object.ToString());
+            _logger.trace() << "Get S3 object by id, object: " + object.ToString();
 
             session.close();
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
             throw Core::DatabaseException(exc.message(), 500);
         }
         return object;
@@ -287,10 +236,10 @@ namespace AwsMock::Database {
                 bind(bucketNotification.region), bind(bucketNotification.bucket), bind(event), into(count), now;
             session.close();
 
-            poco_trace(_logger, "Bucket notification exists: " + std::string(count > 0 ? "true" : "false"));
+            _logger.trace() << "Bucket notification exists: " << (count > 0 ? "true" : "false");
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
             throw Core::DatabaseException(exc.message(), 500);
         }
         return count > 0;
@@ -308,10 +257,10 @@ namespace AwsMock::Database {
                 bind(bucketNotification.queueArn), bind(event), into(id), now;
             session.commit();
 
-            poco_trace(_logger, "Bucket notification added, bucketNotification: " + bucketNotification.ToString());
+            _logger.trace() << "Bucket notification added, bucketNotification: " << bucketNotification.ToString();
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
             throw Core::DatabaseException(exc.message(), 500);
         }
         return GetBucketNotificationById(id);
@@ -328,10 +277,10 @@ namespace AwsMock::Database {
                 into(result.queueArn), into(result.created), into(result.modified), bind(id), now;
             session.close();
 
-            poco_trace(_logger, "Got bucket notification: " + result.ToString());
+            _logger.trace() << "Got bucket notification: " << result.ToString();
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
             throw Core::DatabaseException(exc.message(), 500);
         }
         return result;
@@ -349,10 +298,10 @@ namespace AwsMock::Database {
                 into(result.queueArn), into(result.created), into(result.modified), bind(region), bind(bucket), bind(notificationId), now;
             session.close();
 
-            poco_trace(_logger, "Got bucket notification: " + result.ToString());
+            _logger.trace() << "Got bucket notification: " + result.ToString();
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
             throw Core::DatabaseException(exc.message(), 500);
         }
         return result;
@@ -368,10 +317,10 @@ namespace AwsMock::Database {
                 bind(bucketNotification.region), bind(bucketNotification.bucket), into(count), now;
             session.close();
 
-            poco_trace(_logger, "Check bucket notification added, count: " + std::to_string(count));
+            _logger.trace() << "Check bucket notification added, count: " << count;
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
             throw Core::DatabaseException(exc.message(), 500);
         }
         return count > 0;
@@ -389,13 +338,13 @@ namespace AwsMock::Database {
                 into(result.queueArn), into(result.created), into(result.modified), bind(bucketNotification.region), bind(bucketNotification.bucket),
                 bind(bucketNotification.event), now;
 
-            poco_trace(_logger, "Got bucket notification: " + result.ToString());
+            _logger.trace() << "Got bucket notification: " << result.ToString();
 
             session.close();
 
         } catch (Poco::Exception &exc) {
-            std::cerr << exc.message() << std::endl;
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
+            throw Core::DatabaseException(exc.message(), 500);
         }
         return result;
     }
@@ -410,10 +359,10 @@ namespace AwsMock::Database {
                 bind(notification.region), bind(notification.bucket), now;
             session.commit();
 
-            poco_trace(_logger, "Bucket notification deleted, region: " + notification.region + " bucket: " + notification.bucket);
+            _logger.trace() << "Bucket notification deleted, region: " << notification.region << " bucket: " << notification.bucket;
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
             throw Core::DatabaseException(exc.message(), 500);
         }
     }
@@ -424,12 +373,12 @@ namespace AwsMock::Database {
             Poco::Data::Session session = GetSession();
 
             session << "DELETE FROM s3_bucket WHERE region=? AND name=?", bind(bucket.region), bind(bucket.name), now;
-            poco_trace(_logger, "Bucket deleted, bucket: " + bucket.name + " region: " + bucket.region);
+            _logger.trace() << "Bucket deleted, bucket: " << bucket.name << " region: " << bucket.region;
 
             session.close();
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
             throw Core::DatabaseException(exc.message(), 500);
         }
     }
@@ -442,10 +391,10 @@ namespace AwsMock::Database {
             session << "DELETE FROM s3_object WHERE bucket=? AND key=?", bind(object.bucket), bind(object.key), now;
             session.commit();
 
-            poco_trace(_logger, "Object deleted: " + object.ToString());
+            _logger.trace() << "Object deleted: " << object.ToString();
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
             throw Core::DatabaseException(exc.message(), 500);
         }
     }
@@ -460,12 +409,19 @@ namespace AwsMock::Database {
             }
             session.commit();
 
-            poco_trace(_logger, "Objects deleted, bucket: " + bucket + " count: " + std::to_string(keys.size()));
+            _logger.trace() << "Objects deleted, bucket: " << bucket << " count: " << keys.size();
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
             throw Core::DatabaseException(exc.message(), 500);
         }
+    }
+    */
+
+    void S3Database::DeleteAllBuckets() {
+        auto  delete_many_result =
+            _bucketCollection.delete_many({});
+        _logger.debug() << "All buckets deleted, count: " << delete_many_result->deleted_count();
     }
 
 } // namespace AwsMock::Database

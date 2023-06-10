@@ -12,7 +12,7 @@ namespace AwsMock::Database {
         Core::Logger::SetDefaultConsoleLogger("LambdaDatabase");
     }
 
-    bool LambdaDatabase::LambdaExists(const std::string &function, const std::string &runtime) {
+    /*bool LambdaDatabase::LambdaExists(const std::string &function, const std::string &runtime) {
 
         int count = 0;
         Poco::Data::Session session = GetSession();
@@ -151,5 +151,5 @@ namespace AwsMock::Database {
             poco_error(_logger, "Database exception: " + exc.message());
             throw Core::DatabaseException(exc.message(), 500);
         }
-    }
+    }*/
 } // namespace AwsMock::Database

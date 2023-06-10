@@ -13,32 +13,32 @@ namespace AwsMock::Database {
         Initialize();
     }
 
-    Database::~Database(){
-        _sessionPool->shutdown();
-    }
-
     void Database::Initialize() {
 
-        // Register SQLite connector
-        Poco::Data::SQLite::Connector::registerConnector();
+        _client = mongocxx::client(mongocxx::uri(
+            "mongodb://" + _configuration.getString("awsmock.mongodb.host", "localhost") + ":" + std::to_string(_configuration.getInt("awsmock.mongodb.port", 27017))));
+        _database = _client["awsmock"];
 
-        // Create the directory
-        std::string dataDir = _configuration.getString("awsmock.db.dir", "/tmp/data");
-        std::string dbFile = _configuration.getString("awsmock.db.file", "awsmock.db");
-
-        _dbFile = dataDir + Poco::Path::separator() + dbFile;
-        poco_debug(_logger, "Using database, file: " + _dbFile);
-
-        if(!Core::FileUtils::FileExists(_dbFile)) {
-            CreateDatabase(dataDir, dbFile);
-        }
-
-        // Create session pool
+        /*        // Create session pool
         _sessionPool = new Poco::Data::SessionPool("SQLite", _dbFile);
-        poco_debug(_logger, "Database session pool initialized");
+        poco_debug(_logger, "Database session pool initialized");*/
     }
 
-    void Database::CreateDatabase(const std::string &dataDir, const std::string &dbFile){
+    void Database::CreateCollection(const std::string &name) {
+        if (!_database.has_collection(name)) {
+            _database.create_collection(name);
+            _logger.debug() << "Collection created, name: " << name;
+        }
+    }
+
+    void Database::DropCollection(const std::string &name) {
+        if (!_database.has_collection(name)) {
+            _database.drop();
+            _logger.debug() << "Collection dropped, name: " << name;
+        }
+    }
+
+    /*void Database::CreateDatabase(const std::string &dataDir, const std::string &dbFile){
 
         if (!Core::DirUtils::DirectoryExists(dataDir)) {
             Core::DirUtils::MakeDirectory(dataDir);
@@ -136,6 +136,6 @@ namespace AwsMock::Database {
             }
         }
         return _sessionPool->get();
-    }
+    }*/
 
 } // namespace AwsMock::Database

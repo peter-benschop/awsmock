@@ -21,6 +21,11 @@ namespace AwsMock::Database::Entity::S3 {
       long id = 0;
 
       /**
+       * Aws region name
+       */
+      std::string region;
+
+      /**
        * Bucket name
        */
       std::string bucket;
@@ -59,6 +64,25 @@ namespace AwsMock::Database::Entity::S3 {
        * Last modification date
        */
       Poco::DateTime modified;
+
+      /**
+       * Converts the DTO to a MongoDB document
+       *
+       * @return DTO as MongoDB document.
+       */
+/*      [[nodiscard]] Poco::MongoDB::Document::Ptr ToDocument() const {
+          Poco::MongoDB::Document::Ptr objectDoc = new Poco::MongoDB::Document();
+          objectDoc->add("region", region);
+          objectDoc->add("bucket", bucket);
+          objectDoc->add("key", key);
+          objectDoc->add("owner", owner);
+          objectDoc->add("size", size);
+          objectDoc->add("md5sum", md5sum);
+          objectDoc->add("contentType", contentType);
+          objectDoc->add("created", created.timestamp());
+          objectDoc->add("modified", modified.timestamp());
+          return objectDoc;
+      };*/
 
       /**
        * Converts the DTO to a string representation.

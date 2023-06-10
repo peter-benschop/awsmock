@@ -12,7 +12,7 @@ namespace AwsMock::Database {
         Core::Logger::SetDefaultConsoleLogger("SQSDatabase");
     }
 
-    bool SQSDatabase::QueueExists(const std::string &queueUrl) {
+    /*bool SQSDatabase::QueueExists(const std::string &queueUrl) {
 
         int count = 0;
         try {
@@ -21,10 +21,10 @@ namespace AwsMock::Database {
             session.begin();
             session << "SELECT COUNT(*) FROM sqs_queue WHERE queue_url=?", bind(queueUrl), into(count), now;
             session.close();
-            poco_trace(_logger, "Queue exists: " + std::string(count > 0 ? "true" : "false"));
+            _logger.trace() << "Queue exists: " + std::string(count > 0 ? "true" : "false");
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
         }
         return count > 0;
     }
@@ -40,10 +40,10 @@ namespace AwsMock::Database {
             stmt << "SELECT count(*) FROM sqs_queue WHERE region=? AND name=?", bind(region), bind(name), into(count), now;
 
             session.close();
-            poco_trace(_logger, "Queue exists: " + std::to_string(count));
+            _logger.trace() << "Queue exists: " + std::to_string(count);
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
         }
         return count > 0;
     }
@@ -58,10 +58,10 @@ namespace AwsMock::Database {
             bind(queue.region), bind(queue.name), bind(queue.owner), bind(queue.queueUrl), bind(queue.queueArn), into(id), now;
             session.commit();
 
-            poco_trace(_logger, "Queue created, region: " + queue.region + " name: " + queue.name + " owner: " + queue.owner);
+            _logger.trace() << "Queue created: " << queue.ToString();
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
         }
         return GetQueueById(id);
     }
@@ -76,10 +76,10 @@ namespace AwsMock::Database {
                 into(result.owner), into(result.queueUrl), into(result.queueArn), into(result.created), into(result.modified), now;
             session.commit();
 
-            poco_trace(_logger, "Queue created, region: " + result.region + " name: " + result.name + " owner: " + result.owner);
+            _logger.trace() << "Got queue " << result.ToDocument();
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
         }
         return result;
     }
@@ -104,7 +104,7 @@ namespace AwsMock::Database {
                     queueList.push_back(queue);
                 }
             }
-            poco_trace(_logger, "Queue list created, size:" + std::to_string(queueList.size()));
+            _logger.trace() << "Got queue list created, size:" << queueList.size();
             return queueList;
 
         } catch (Poco::Exception &exc) {
@@ -120,10 +120,10 @@ namespace AwsMock::Database {
             // Delete messages
             Poco::Data::Statement stmt(session);
             stmt << "DELETE from sqs_message WHERE queue_url=?", bind(queueUrl), now;
-            poco_trace(_logger, "Queue purged, url: " + queueUrl);
+            _logger.trace() << "Queue purged, url: " << queueUrl;
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
             throw Core::DatabaseException(exc.message(), 500);
         }
     }
@@ -141,10 +141,10 @@ namespace AwsMock::Database {
                 bind(queueAttribute.visibilityTimeout), into(id), now;
             session.commit();
 
-            poco_trace(_logger, "Queue created, queueAttribute: " + queueAttribute.ToString());
+            _logger.trace() << "Queue created, queueAttribute: " << queueAttribute.ToString();
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
         }
         return GetQueueAttributesById(id);
     }
@@ -163,10 +163,10 @@ namespace AwsMock::Database {
                 into(result.created), into(result.modified), now;
             session.commit();
 
-            poco_trace(_logger, "Got queue sqs, " + result.ToString());
+            _logger.trace() << "Got queue: " << result.ToString();
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
         }
         return result;
     }
@@ -184,10 +184,10 @@ namespace AwsMock::Database {
                 into(result.created), into(result.modified),bind(queueUrl), now;
             session.commit();
 
-            poco_trace(_logger, "Got queue sqs, " + result.ToString());
+            _logger.trace() << "Got queue sqs, " + result.ToString();
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
         }
         return result;
     }
@@ -200,10 +200,10 @@ namespace AwsMock::Database {
             session << "DELETE FROM sqs_queue WHERE queue_url=?", bind(queue.queueUrl), now;
             session.commit();
 
-            poco_trace(_logger, "Queue deleted, region: " + queue.region + " name: " + queue.name);
+            _logger.trace() << "Queue deleted: " << queue.ToString();
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
             throw Core::DatabaseException(exc.message(), 500);
         }
     }
@@ -220,10 +220,10 @@ namespace AwsMock::Database {
                 bind(message.md5Body), bind(message.md5Attr), into(id), now;
             session.commit();
 
-            poco_trace(_logger, "Message created, queue: " + result.queueUrl + " id: " + std::to_string(result.id));
+            _logger.trace() << "Message created, queue: " + result.queueUrl + " id: " + std::to_string(result.id);
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
             throw Core::DatabaseException(exc.message(), 500);
         }
 
@@ -241,10 +241,10 @@ namespace AwsMock::Database {
                 into(result.created), into(result.modified), now;
             session.close();
 
-            poco_trace(_logger, "Message selected, queue: " + result.queueUrl + " id: " + std::to_string(result.id));
+            _logger.trace() << "Message selected, queue: " + result.queueUrl + " id: " + std::to_string(result.id);
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
             throw Core::DatabaseException(exc.message(), 500);
         }
         return result;
@@ -281,10 +281,10 @@ namespace AwsMock::Database {
             }
 
             session.commit();
-            poco_trace(_logger, "Messages received, region: " + region + " queue: " + queueUrl + " count: " + std::to_string(messageList.size()));
+            _logger.trace() << "Messages received, region: " << region << " queue: " << queueUrl + " count: " << messageList.size();
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
             throw Core::DatabaseException(exc.message(), 500);
         }
     }
@@ -300,10 +300,10 @@ namespace AwsMock::Database {
                 bind(Entity::SQS::INITIAL), bind(queueUrl), bind(Entity::SQS::SEND), bind(visibility), now;
 
             session.commit();
-            poco_trace(_logger, "Message reset, visibility: " + std::to_string(visibility));
+            _logger.trace() << "Message reset, visibility: " << visibility;
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
             throw Core::DatabaseException(exc.message(), 500);
         }
     }
@@ -315,12 +315,12 @@ namespace AwsMock::Database {
             session.begin();
             session << "DELETE FROM sqs_message WHERE queue_url=? AND receipt_handle=?", bind(message.queueUrl), bind(message.receiptHandle), now;
             session.commit();
-            poco_trace(_logger, "Message deleted, queue: " + std::to_string(message.id));
+            _logger.trace() << "Message deleted, queue: " << message.id;
 
         } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
+            _logger.error() << "Database exception: " << exc.message();
             throw Core::DatabaseException(exc.message(), 500);
         }
-    }
+    }*/
 
 } // namespace AwsMock::Database

@@ -11,6 +11,7 @@
 
 // Poco includes
 #include <Poco/DateTime.h>
+#include <Poco/MongoDB/Document.h>
 
 // AwsMock includes
 #include "MessageAttribute.h"
@@ -25,6 +26,11 @@ namespace AwsMock::Database::Entity::SQS {
        * ID
        */
       long id = 0;
+
+      /**
+       * Aws region name
+       */
+      std::string region;
 
       /**
        * Queue URL
@@ -85,6 +91,31 @@ namespace AwsMock::Database::Entity::SQS {
        * Last modification date
        */
       Poco::DateTime modified;
+
+      /**
+       * Converts the DTO to a MongoDB document
+       *
+       * @return DTO as MongoDB document.
+       */
+      [[nodiscard]] Poco::MongoDB::Document::Ptr ToDocument() const {
+          Poco::MongoDB::Document::Ptr messageDoc = new Poco::MongoDB::Document();
+          messageDoc->add("region", region);
+          messageDoc->add("queueUrl", queueUrl);
+          messageDoc->add("body", body);
+          messageDoc->add("status", status);
+          messageDoc->add("retries", retries);
+          messageDoc->add("messageId", messageId);
+          messageDoc->add("receiptHandle", receiptHandle);
+          messageDoc->add("md5Body", md5Body);
+          messageDoc->add("md5Attr", md5Attr);
+          for (const auto &it : attributeList) {
+              messageDoc->add("attributeList", it.ToDocument());
+          }
+          messageDoc->add("lastSend", lastSend.timestamp());
+          messageDoc->add("created", created.timestamp());
+          messageDoc->add("modified", modified.timestamp());
+          return messageDoc;
+      };
 
       /**
        * Converts the DTO to a string representation.

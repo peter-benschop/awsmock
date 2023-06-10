@@ -12,6 +12,7 @@
 
 // Poco includes
 #include "Poco/Logger.h"
+#include "Poco/LogStream.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/SQLite/Connector.h"
@@ -179,7 +180,7 @@ namespace AwsMock::Database {
       /**
        * Logger
        */
-      Poco::Logger &_logger;
+      Poco::LogStream _logger;
 
     };
 

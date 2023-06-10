@@ -12,6 +12,7 @@
 
 // Poco includes
 #include "Poco/Logger.h"
+#include "Poco/LogStream.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/SQLite/Connector.h"
 
@@ -25,6 +26,8 @@
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/Object.h>
 #include "awsmock/entity/s3/BucketNotification.h"
+
+#include <mongocxx/stdx.hpp>
 
 #define MAX_FILES 100
 
@@ -49,7 +52,6 @@ namespace AwsMock::Database {
        * @return true if bucket exists
        * @throws DatabaseException
        */
-      [[deprecated("Use BucketExists(const Entity::S3::Bucket &bucket)")]]
       bool BucketExists(const std::string &region, const std::string &name);
 
       /**
@@ -64,11 +66,20 @@ namespace AwsMock::Database {
       /**
        * Returns the bucket by id
        *
-       * @param id bucket id
+       * @param oid bucket oid
        * @return bucket, if existing
        * @throws DatabaseException
        */
-      Entity::S3::Bucket GetBucketById(long id);
+      Entity::S3::Bucket GetBucketById(bsoncxx::oid oid);
+
+      /**
+       * Returns the bucket by id
+       *
+       * @param oid bucket oid
+       * @return bucket, if existing
+       * @throws DatabaseException
+       */
+      Entity::S3::Bucket GetBucketById(const std::string &oid);
 
       /**
        * Returns the bucket by region and name.
@@ -166,7 +177,7 @@ namespace AwsMock::Database {
        * @param prefix S3 key prefix
        * @return ObjectList
        */
-      Entity::S3::ObjectList ListBucket(const std::string &bucket, const std::string &prefix);
+      Entity::S3::ObjectList ListBucket(const std::string &bucket, const std::string &prefix = {});
 
       /**
        * Bucket notification exists
@@ -239,6 +250,11 @@ namespace AwsMock::Database {
       void DeleteBucket(const Entity::S3::Bucket& bucket);
 
       /**
+       * Deletes all buckets
+       */
+      void DeleteAllBuckets();
+
+      /**
        * Delete an object.
        *
        * @param object object entity
@@ -260,8 +276,21 @@ namespace AwsMock::Database {
       /**
        * Logger
        */
-      Poco::Logger &_logger;
+      Poco::LogStream _logger;
 
+      /**
+       * S3 bucket collection
+       */
+      mongocxx::collection _bucketCollection{};
+
+      /**
+       * S3 object collection
+       */
+      mongocxx::collection _objectCollection{};
+
+      /**
+       * Allowed event types
+       */
       static std::map<std::string, std::vector<std::string>> allowedEventTypes;
 
     };
