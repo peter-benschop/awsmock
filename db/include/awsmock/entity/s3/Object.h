@@ -7,9 +7,7 @@
 
 // C++ includes
 #include <string>
-
-// Poco includes
-#include <Poco/DateTime.h>
+#include <chrono>
 
 namespace AwsMock::Database::Entity::S3 {
 
@@ -18,7 +16,7 @@ namespace AwsMock::Database::Entity::S3 {
       /**
        * ID
        */
-      long id = 0;
+      std::string oid;
 
       /**
        * Aws region name
@@ -66,23 +64,65 @@ namespace AwsMock::Database::Entity::S3 {
       Poco::DateTime modified;
 
       /**
-       * Converts the DTO to a MongoDB document
+       * Converts the entity to a MongoDB document
        *
-       * @return DTO as MongoDB document.
+       * @return entity as MongoDB document.
        */
-/*      [[nodiscard]] Poco::MongoDB::Document::Ptr ToDocument() const {
-          Poco::MongoDB::Document::Ptr objectDoc = new Poco::MongoDB::Document();
-          objectDoc->add("region", region);
-          objectDoc->add("bucket", bucket);
-          objectDoc->add("key", key);
-          objectDoc->add("owner", owner);
-          objectDoc->add("size", size);
-          objectDoc->add("md5sum", md5sum);
-          objectDoc->add("contentType", contentType);
-          objectDoc->add("created", created.timestamp());
-          objectDoc->add("modified", modified.timestamp());
-          return objectDoc;
-      };*/
+      [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
+
+          view_or_value<view, value> bucketDoc = make_document(
+              kvp("region", region),
+              kvp("bucket", bucket),
+              kvp("key", key),
+              kvp("owner", owner),
+              kvp("size", size),
+              kvp("md5sum", md5sum),
+              kvp("contentType", contentType),
+              kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds()))),
+              kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds()))));
+
+          return bucketDoc;
+      }
+
+      /**
+       * Converts the MongoDB document to an entity
+       *
+       * @return entity.
+       */
+      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
+
+          oid = mResult.value()["_id"].get_oid().value.to_string();
+          region = mResult.value()["region"].get_string().value.to_string();
+          bucket = mResult.value()["bucket"].get_string().value.to_string();
+          key = mResult.value()["key"].get_string().value.to_string();
+          owner = mResult.value()["owner"].get_string().value.to_string();
+          size = mResult.value()["size"].get_int64().value;
+          md5sum = mResult.value()["md5sum"].get_string().value.to_string();
+          contentType = mResult.value()["contentType"].get_string().value.to_string();
+          owner = mResult.value()["owner"].get_string().value.to_string();
+          created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value)/1000000));
+          modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value)/1000000));
+      }
+
+      /**
+       * Converts the MongoDB document to an entity
+       *
+       * @return entity.
+       */
+      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+
+          oid = mResult.value()["_id"].get_oid().value.to_string();
+          region = mResult.value()["region"].get_string().value.to_string();
+          bucket = mResult.value()["bucket"].get_string().value.to_string();
+          key = mResult.value()["key"].get_string().value.to_string();
+          owner = mResult.value()["owner"].get_string().value.to_string();
+          size = mResult.value()["size"].get_int64().value;
+          md5sum = mResult.value()["md5sum"].get_string().value.to_string();
+          contentType = mResult.value()["contentType"].get_string().value.to_string();
+          owner = mResult.value()["owner"].get_string().value.to_string();
+          created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value)/1000000));
+          modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value)/1000000));
+      }
 
       /**
        * Converts the DTO to a string representation.
@@ -101,10 +141,8 @@ namespace AwsMock::Database::Entity::S3 {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const Object &o) {
-          os << "Object={id='" + std::to_string(o.id) + "' bucket='" + o.bucket + "' key='" + o.key + "' owner='" + o.owner + "' size='" + std::to_string(o.size) +
-              "' md5sum='" + o.md5sum + "' contentType='" + o.contentType + "' created='"
-              + Poco::DateTimeFormatter().format(o.created, Poco::DateTimeFormat::HTTP_FORMAT) +
-              "' modified='" + Poco::DateTimeFormatter().format(o.created, Poco::DateTimeFormat::HTTP_FORMAT) + "'}";
+          os << "Object={id='" + o.oid + "' bucket='" + o.bucket + "' key='" + o.key + "' owner='" + o.owner + "' size='" + std::to_string(o.size) +
+              "' md5sum='" + o.md5sum + "' contentType='" + o.contentType + "'}";
           return os;
       }
 

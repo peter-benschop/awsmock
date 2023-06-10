@@ -22,6 +22,69 @@ namespace AwsMock::Database::Entity::S3 {
     using bsoncxx::document::view;
     using bsoncxx::document::value;
 
+    struct BucketNotification {
+
+      /**
+       * Event
+       */
+      std::string event;
+
+      /**
+       * Notification ID
+       */
+      std::string notificationId;
+
+      /**
+       * Queue ARN
+       */
+      std::string queueArn;
+
+      /**
+       * Lambda ARN
+       */
+      std::string lambdaArn;
+
+      /**
+       * Converts the entity to a MongoDB document
+       *
+       * @return entity as MongoDB document.
+       */
+      [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
+
+          view_or_value<view, value> notificationDoc = make_document(
+              kvp("notificationId", notificationId),
+              kvp("event", event),
+              kvp("queueArn", queueArn),
+              kvp("lambdaArn", lambdaArn));
+
+          return notificationDoc;
+      }
+
+      /**
+       * Converts the DTO to a string representation.
+       *
+       * @return DTO as string for logging.
+       */
+      [[nodiscard]] std::string ToString() const {
+          std::stringstream ss;
+          ss << (*this);
+          return ss.str();
+      }
+
+      /**
+       * Stream provider.
+       *
+       * @return output stream
+       */
+      friend std::ostream &operator<<(std::ostream &os, const BucketNotification &q) {
+          os << "BucketNotification={notificationId='" + q.notificationId + "' queueArn='" + q.queueArn + "' lambdaArn='" + q.lambdaArn + "' event='" + q.event + "'}";
+          return os;
+      }
+
+    };
+
+    typedef struct BucketNotification BucketNotification;
+
     struct Bucket {
 
       /**
@@ -45,14 +108,19 @@ namespace AwsMock::Database::Entity::S3 {
       std::string owner;
 
       /**
+       * Bucket notifications
+       */
+      std::vector<BucketNotification> notifications;
+
+      /**
        * Creation date
        */
-      std::chrono::time_point<std::chrono::system_clock> created = std::chrono::system_clock::now();
+      Poco::DateTime created;
 
       /**
        * Last modification date
        */
-      std::chrono::time_point<std::chrono::system_clock> modified = std::chrono::system_clock::now();
+      Poco::DateTime modified;
 
       /**
        * Converts the entity to a MongoDB document
@@ -61,12 +129,18 @@ namespace AwsMock::Database::Entity::S3 {
        */
       [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
+          auto notificationsDoc = bsoncxx::builder::basic::array{};
+          for (const auto &notification : notifications) {
+              notificationsDoc.append(notification.ToDocument());
+          }
+
           view_or_value<view, value> bucketDoc = make_document(
               kvp("region", region),
               kvp("name", name),
               kvp("owner", owner),
-              kvp("created", bsoncxx::types::b_date(created)),
-              kvp("modified", bsoncxx::types::b_date(modified)));
+              kvp("notifications", notificationsDoc),
+              kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds()))),
+              kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds()))));
 
           return bucketDoc;
       }
@@ -82,8 +156,19 @@ namespace AwsMock::Database::Entity::S3 {
           region = mResult.value()["region"].get_string().value.to_string();
           name = mResult.value()["name"].get_string().value.to_string();
           owner = mResult.value()["owner"].get_string().value.to_string();
-          created = bsoncxx::types::b_date(mResult.value()["created"].get_date());
-          modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date());
+          created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value)/1000000));
+          modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value)/1000000));
+
+          bsoncxx::array::view notificationView{mResult.value()["notifications"].get_array().value};
+          for (bsoncxx::array::element notificationElement : notificationView) {
+              BucketNotification notification{
+                  .event=notificationElement["event"].get_string().value.to_string(),
+                  .notificationId=notificationElement["notificationId"].get_string().value.to_string(),
+                  .queueArn=notificationElement["queueArn"].get_string().value.to_string(),
+                  .lambdaArn=notificationElement["lambdaArn"].get_string().value.to_string()
+              };
+              notifications.push_back(notification);
+          }
       }
 
       /**
@@ -97,8 +182,19 @@ namespace AwsMock::Database::Entity::S3 {
           region = mResult.value()["region"].get_string().value.to_string();
           name = mResult.value()["name"].get_string().value.to_string();
           owner = mResult.value()["owner"].get_string().value.to_string();
-          created = bsoncxx::types::b_date(mResult.value()["created"].get_date());
-          modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date());
+          created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value)/1000000));
+          modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value)/1000000));
+
+          bsoncxx::array::view notificationView{mResult.value()["notifications"].get_array().value};
+          for (bsoncxx::array::element notificationElement : notificationView) {
+              BucketNotification notification{
+                  .event=notificationElement["event"].get_string().value.to_string(),
+                  .notificationId=notificationElement["notificationId"].get_string().value.to_string(),
+                  .queueArn=notificationElement["queueArn"].get_string().value.to_string(),
+                  .lambdaArn=notificationElement["lambdaArn"].get_string().value.to_string()
+              };
+              notifications.push_back(notification);
+          }
       }
 
       /**
@@ -118,10 +214,9 @@ namespace AwsMock::Database::Entity::S3 {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const Bucket &q) {
-          os << "Bucket={oid='" + q.oid + "' region='" + q.region + "' name='" + q.name + "' owner='" + q.owner + " created='";
-       //   os << std::put_time(std::localtime(reinterpret_cast<const time_t *>(&(q.created))), "%F %T.");
-//          os << std::put_time(std::localtime(reinterpret_cast<const time_t *>(&(q.modified))), "%Y/%m/%d %I:%M:%S %p");
-          os << "}";
+          os << "Bucket={oid='" + q.oid + "' region='" + q.region + "' name='" + q.name + "' owner='" + q.owner +
+              "' created='" + Poco::DateTimeFormatter().format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) +
+              "' modified='" + Poco::DateTimeFormatter().format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) + "'}";
           return os;
       }
 

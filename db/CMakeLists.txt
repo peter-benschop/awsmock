@@ -10,7 +10,7 @@ set(HEADERS include/awsmock/db/Database.h include/awsmock/db/S3Database.h includ
 add_subdirectory(tst)
 
 # Includes
-include_directories(include ../core/include /usr/include /usr/include/bsoncxx/v_noabi/ /usr/include/mongocxx/v_noabi/)
+include_directories(include ../core/include /usr/include /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
 
 add_library(${LIBRARY} SHARED ${SOURCES})
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
