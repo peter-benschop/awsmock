@@ -10,7 +10,7 @@ namespace AwsMock {
 
     void LambdaHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_GET_TIMER);
-        poco_debug(_logger, "Lambda GET request, URI: " + request.getURI() + " region: " + region + " user: " + user);
+        _logger.debug() << "Lambda GET request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 
         try {
 
@@ -26,7 +26,7 @@ namespace AwsMock {
 
     void LambdaHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_PUT_TIMER);
-        poco_debug(_logger, "Lambda PUT request, URI: " + request.getURI() + " region: " + region + " user: " + user);
+        _logger.debug() << "Lambda PUT request, URI: " << request.getURI() << " region: " << region << " user: " + user;
 
         try {
             std::string version, action;
@@ -39,7 +39,7 @@ namespace AwsMock {
 
     void LambdaHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_POST_TIMER);
-        poco_debug(_logger, "Lambda POST request, URI: " + request.getURI() + " region: " + region + " user: " + user);
+        _logger.debug() << "Lambda POST request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 
         try {
             std::string version, action;
@@ -64,7 +64,7 @@ namespace AwsMock {
                                      [[maybe_unused]]const std::string &region,
                                      [[maybe_unused]]const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_DELETE_TIMER);
-        poco_debug(_logger, "Lambda DELETE request, URI: " + request.getURI() + " region: " + region + " user: " + user);
+        _logger.debug() << "Lambda DELETE request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 
         try {
             std::string version, action;
@@ -97,7 +97,7 @@ namespace AwsMock {
 
     void LambdaHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
         Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
-        poco_debug(_logger, "Lambda OPTIONS request, address: " + request.clientAddress().toString());
+        _logger.debug() << "Lambda OPTIONS request";
 
         response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
         response.setContentType("text/plain; charset=utf-8");
@@ -109,7 +109,7 @@ namespace AwsMock {
 
     void LambdaHandler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
         Core::MetricServiceTimer measure(_metricService, HTTP_HEAD_TIMER);
-        poco_debug(_logger, "Lambda HEAD request, address: " + request.clientAddress().toString());
+        _logger.debug() << "Lambda HEAD request, address: " << request.clientAddress().toString();
 
         try {
 
@@ -141,6 +141,6 @@ namespace AwsMock {
         if (posVec.size() > 2) {
             action = uri.substr(posVec[2].offset, posVec[2].length);
         }
-        poco_debug(_logger, "Found version and action, version: " + version + " action: " + action);
+        _logger.debug() << "Found version and action, version: " << version << " action: " << action;
     }
 }

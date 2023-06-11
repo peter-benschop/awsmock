@@ -7,11 +7,13 @@
 
 // Poco includes
 #include "Poco/Logger.h"
+#include "Poco/LogStream.h"
 #include "Poco/DateTime.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTimeFormatter.h"
-#include "Poco/Net/MediaType.h"
-#include "Poco/JSON/Parser.h"
+#include "Poco/NotificationCenter.h"
+#include "Poco/Notification.h"
+#include "Poco/Observer.h"
 
 // AwsMock includes
 #include "awsmock/core/Configuration.h"
@@ -143,7 +145,7 @@ namespace AwsMock {
       /**
        * Logger
        */
-      Poco::Logger &_logger;
+      Poco::LogStream _logger;
 
       /**
        * S3 handler configuration
@@ -159,6 +161,8 @@ namespace AwsMock {
        * S3 service
        */
       Service::S3Service _s3Service;
+
+      Poco::NotificationCenter nc;
     };
 } // namespace AwsMock
 

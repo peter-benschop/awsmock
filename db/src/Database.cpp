@@ -11,7 +11,7 @@ namespace AwsMock::Database {
 
         mongocxx::uri uri = mongocxx::uri("mongodb://" + _configuration.getString("awsmock.mongodb.host", "localhost") + ":"
                                               + std::to_string(_configuration.getInt("awsmock.mongodb.port", 27017))
-                                              + "/?minPoolSize=4&maxPoolSize=32");
+                                              + "/?maxPoolSize=32");
         _connectionPool = std::make_shared<mongocxx::pool>(uri);
         poco_debug(_logger, "MongoDB connection pool initialized");
     }

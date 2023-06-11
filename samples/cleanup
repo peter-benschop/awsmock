@@ -24,3 +24,7 @@ awsmock sqs delete-queue --queue-url=http://localhost:4567/000000000000/file-del
 awsmock sqs delete-queue --queue-url=http://localhost:4567/000000000000/file-delivery3-queue
 awsmock sqs delete-queue --queue-url=http://localhost:4567/000000000000/file-delivery3-dlqueue
 
+#
+# Delete lambda function
+#
+awsmock lambda delete-function --function-name ftp-file-copy

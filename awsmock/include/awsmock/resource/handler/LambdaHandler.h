@@ -7,6 +7,7 @@
 
 // Poco includes
 #include "Poco/Logger.h"
+#include "Poco/LogStream.h"
 #include "Poco/DateTime.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTimeFormatter.h"
@@ -127,12 +128,12 @@ namespace AwsMock {
        * @param version version string
        * @param action action
        */
-      static void GetVersionActionFromUri(const std::string &uri, std::string &version, std::string &action);
+      void GetVersionActionFromUri(const std::string &uri, std::string &version, std::string &action);
 
       /**
        * Logger
        */
-      Poco::Logger &_logger;
+      Poco::LogStream _logger;
 
       /**
        * S3 handler configuration

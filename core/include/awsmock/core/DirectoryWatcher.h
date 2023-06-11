@@ -23,6 +23,7 @@
 // C standard includes
 #include <sys/inotify.h>
 #include <unistd.h>
+#include <utility>
 
 // C++ standard includes
 #include <string>
@@ -33,6 +34,7 @@
 #include <Poco/BasicEvent.h>
 #include <Poco/File.h>
 #include <Poco/Logger.h>
+#include <Poco/LogStream.h>
 #include <Poco/Runnable.h>
 #include <Poco/Delegate.h>
 #include <Poco/DirectoryIterator.h>
@@ -97,7 +99,7 @@ namespace AwsMock::Core {
       /**
        * Constructor
        */
-      explicit DirectoryWatcher(const std::string &rootDir);
+      explicit DirectoryWatcher(std::string rootDir);
 
       /**
        * Initialization
@@ -126,12 +128,18 @@ namespace AwsMock::Core {
 
     private:
 
+      /**
+       * Returns th file name
+       * @param rootDir root directory
+       * @param fileName name of the file
+       * @return absolute file name
+       */
       static std::string GetFilename(const std::string &rootDir, const char* fileName);
 
       /**
        * Logger
        */
-      Poco::Logger &_logger;
+      Poco::LogStream _logger;
 
       /**
        * Root directory

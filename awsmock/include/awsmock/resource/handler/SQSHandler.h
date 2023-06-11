@@ -7,9 +7,7 @@
 
 // Poco includes
 #include "Poco/Logger.h"
-#include "Poco/StreamCopier.h"
-#include "Poco/Net/MediaType.h"
-#include "Poco/JSON/Parser.h"
+#include "Poco/LogStream.h"
 
 // AwsMock includes
 #include "awsmock/core/Configuration.h"
@@ -155,7 +153,7 @@ namespace AwsMock {
       /**
        * Logger
        */
-      Poco::Logger &_logger;
+      Poco::LogStream _logger;
 
       /**
        * ImageHandler import configuration

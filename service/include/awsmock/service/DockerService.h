@@ -11,8 +11,7 @@
 
 // Poco includes
 #include <Poco/Logger.h>
-#include <Poco/UUID.h>
-#include <Poco/UUIDGenerator.h>
+#include <Poco/LogStream.h>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
@@ -161,11 +160,6 @@ namespace AwsMock::Service {
     private:
 
       /**
-       * Initialize the service
-       */
-      void Initialize();
-
-      /**
        * Write the docker file.
        *
        * @param codeDir code directory
@@ -193,7 +187,7 @@ namespace AwsMock::Service {
       /**
        * Logger
        */
-      Poco::Logger &_logger;
+      Poco::LogStream _logger;
 
       /**
        * Configuration

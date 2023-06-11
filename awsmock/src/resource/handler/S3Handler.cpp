@@ -5,7 +5,12 @@ namespace AwsMock {
 
     S3Handler::S3Handler(Core::Configuration &configuration, Core::MetricService &metricService)
         : AbstractResource(), _logger(Poco::Logger::get("S3Handler")), _configuration(configuration), _metricService(metricService), _s3Service(configuration) {
+
+        // Set console logger
         Core::Logger::SetDefaultConsoleLogger("S3Handler");
+/*
+        nc.addObserver(Poco::Observer<Service::S3Service, Service::S3CreateBucketNotification>(_s3Service, &Service::S3Service::handleCreateBucket));
+        nc.addObserver(Poco::Observer<Service::S3Service, Service::S3DeleteBucketNotification>(_s3Service, &Service::S3Service::handleDeleteBucket));*/
     }
 
     void S3Handler::handleGet(Poco::Net::HTTPServerRequest &request,
@@ -13,7 +18,7 @@ namespace AwsMock {
                               [[maybe_unused]]const std::string &region,
                               [[maybe_unused]]const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_GET_TIMER);
-        poco_debug(_logger, "S3 GET request, URI: " + request.getURI() + " region: " + region + " user: " + user);
+        _logger.debug() << "S3 GET request, URI: " + request.getURI() << " region: " << region << " user: " + user;
 
         try {
 
@@ -31,7 +36,7 @@ namespace AwsMock {
             } else if(!bucket.empty() && !key.empty()) {
 
                 // Get object request
-                poco_debug(_logger, "S3 get object request, bucket: " + bucket + " key: " + key);
+                _logger.debug() << "S3 get object request, bucket: " << bucket << " key: " << key;
                 Dto::S3::GetObjectRequest s3Request = {.region=region, .bucket=bucket, .key=key};
 
                 Dto::S3::GetObjectResponse s3Response = _s3Service.GetObject(s3Request);
@@ -65,15 +70,15 @@ namespace AwsMock {
         }
     }
 
-    void S3Handler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
+    void S3Handler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_PUT_TIMER);
-        poco_debug(_logger, "S3 PUT request, URI: " + request.getURI() + " region: " + region + " user: " + user);
+        _logger.debug() << "S3 PUT request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 
         try {
 
             std::string bucket, key;
             GetBucketKeyFromUri(request.getURI(), bucket, key);
-            poco_debug(_logger, "S3 put request, bucket: " + bucket + " key: " + key);
+            _logger.debug() << "S3 put request, bucket: " << bucket << " key: " << key;
 
             bool isMultipartUpload = QueryParameterExists("uploadId");
             bool isNotification = QueryParameterExists("notification");
@@ -83,7 +88,7 @@ namespace AwsMock {
                 // S3 initial multipart upload
                 std::string partNumber = GetQueryParameter("partNumber", false);
                 std::string uploadId = GetQueryParameter("uploadId", false);
-                poco_debug(_logger, "Initial S3 multipart upload part: " + partNumber);
+                _logger.debug() << "Initial S3 multipart upload part: " << partNumber;
 
                 std::string eTag = _s3Service.UploadPart(request.stream(), std::stoi(partNumber), uploadId);
 
@@ -94,7 +99,7 @@ namespace AwsMock {
 
             } else if(isNotification) {
 
-                poco_debug(_logger, "Bucket notification request, bucket: " + bucket);
+                _logger.debug() << "Bucket notification request, bucket: " << bucket;
 
                 // S3 notification setup
                 Dto::S3::PutBucketNotificationRequest s3Request = Dto::S3::PutBucketNotificationRequest(GetPayload(request), region, bucket);
@@ -140,9 +145,9 @@ namespace AwsMock {
         }
     }
 
-    void S3Handler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
+    void S3Handler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_POST_TIMER);
-        poco_debug(_logger, "S3 POST request, URI: " + request.getURI() + " region: " + region + " user: " + user);
+        _logger.debug() << "S3 POST request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 
         try {
 
@@ -154,14 +159,14 @@ namespace AwsMock {
 
             if (isMultipartUpload) {
 
-                poco_debug(_logger, "Starting multipart upload");
+                _logger.debug() << "Starting multipart upload";
 
                 Dto::S3::InitiateMultipartUploadResult result = _s3Service.CreateMultipartUpload(bucket, key, region, user);
                 SendOkResponse(response, result.ToXml());
 
             } else if(isDeleteObjects) {
 
-                poco_debug(_logger, "Starting delete objects request");
+                _logger.debug() << "Starting delete objects request";
 
                 std::string payload = GetPayload(request);
 
@@ -172,7 +177,7 @@ namespace AwsMock {
             } else {
 
                 std::string uploadId = GetQueryParameter("uploadId", true);
-                poco_debug(_logger, "Finish multipart upload request, uploadId: " + uploadId);
+                _logger.debug() << "Finish multipart upload request, uploadId: " << uploadId;
 
                 Dto::S3::CompleteMultipartUploadResult result = _s3Service.CompleteMultipartUpload(uploadId, bucket, key, region, user);
                 SendOkResponse(response, result.ToXml());
@@ -184,9 +189,9 @@ namespace AwsMock {
         }
     }
 
-    void S3Handler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
+    void S3Handler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_DELETE_TIMER);
-        poco_debug(_logger, "S3 DELETE request, URI: " + request.getURI() + " region: " + region + " user: " + user);
+        _logger.debug() << "S3 DELETE request, URI: " + request.getURI() << " region: " << region << " user: " << user;
 
         try {
             std::string bucket, key;
@@ -207,7 +212,7 @@ namespace AwsMock {
 
     void S3Handler::handleOptions(Poco::Net::HTTPServerResponse &response) {
         Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
-        poco_debug(_logger, "S3 OPTIONS request, address: " + request.clientAddress().toString());
+        _logger.debug() << "S3 OPTIONS request";
 
         response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
         response.setContentType("text/plain; charset=utf-8");
@@ -219,13 +224,13 @@ namespace AwsMock {
 
     void S3Handler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
         Core::MetricServiceTimer measure(_metricService, HTTP_HEAD_TIMER);
-        poco_debug(_logger, "S3 HEAD request, address: " + request.clientAddress().toString());
+        _logger.debug() << "S3 HEAD request, address: " << request.clientAddress().toString();
 
         try {
 
             std::string bucket, key;
             GetBucketKeyFromUri(request.getURI(), bucket, key);
-            poco_debug(_logger, "S3 HEAD request, bucket: " + bucket + " key: " + key);
+            _logger.debug() << "S3 HEAD request, bucket: " << bucket << " key: " << key;
 
             Dto::S3::GetMetadataRequest s3Request = {.bucket=bucket, .key=key};
             Dto::S3::GetMetadataResponse s3Response = _s3Service.GetMetadata(s3Request);
