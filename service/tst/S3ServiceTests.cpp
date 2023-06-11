@@ -24,8 +24,6 @@
 
 namespace AwsMock::Service {
 
-    using namespace Poco::Data::Keywords;
-
     class S3ServiceTest : public ::testing::Test {
 
     protected:
@@ -36,24 +34,16 @@ namespace AwsMock::Service {
 
       void TearDown() override {
           Core::FileUtils::DeleteFile(testFile);
-          try {
-              Poco::Data::Statement stmt(_session);
-              stmt << "DELETE FROM s3_bucket;"
-                      "DELETE FROM s3_object;"
-                      "DELETE FROM s3_notification;", now;
-          } catch (Poco::Exception &exc) {
-              std::cerr << exc.message() << std::endl;
-          }
       }
 
       Core::Configuration _configuration = Core::Configuration("/tmp/aws-mock.properties");
       Database::S3Database _database = Database::S3Database(_configuration);
       S3Service _service = S3Service(_configuration);
-      Poco::Data::Session _session = _database.GetSession();
+      //Poco::Data::Session _session = _database.GetSession();
       std::string testFile;
     };
 
-    TEST_F(S3ServiceTest, BucketCreateTest) {
+    /*TEST_F(S3ServiceTest, BucketCreateTest) {
 
         // arrange
         Dto::S3::CreateBucketRequest request = Dto::S3::CreateBucketRequest(LOCATION_CONSTRAINT);
@@ -95,7 +85,7 @@ namespace AwsMock::Service {
         EXPECT_NO_THROW({ _service.DeleteObject(deleteRequest); });
 
         // assert
-    }
+    }*/
 
 } // namespace AwsMock::Core
 

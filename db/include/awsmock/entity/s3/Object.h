@@ -78,8 +78,8 @@ namespace AwsMock::Database::Entity::S3 {
               kvp("size", size),
               kvp("md5sum", md5sum),
               kvp("contentType", contentType),
-              kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds()))),
-              kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds()))));
+              kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds()/1000))),
+              kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds()/1000))));
 
           return bucketDoc;
       }

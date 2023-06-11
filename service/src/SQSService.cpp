@@ -132,7 +132,7 @@ namespace AwsMock::Service {
             poco_error(_logger, "SQS create message failed, message: " + ex.message());
             throw Core::ServiceException(ex.message(), 500);
         }
-        return {.id=message.id, .queueUrl=message.queueUrl, .messageId=message.messageId, .receiptHandle=message.receiptHandle, .md5Body=message.md5Body, .md5Attr=message.md5Attr};
+        return {.queueUrl=message.queueUrl, .messageId=message.messageId, .receiptHandle=message.receiptHandle, .md5Body=message.md5Body, .md5Attr=message.md5Attr};
     }
 
     Dto::SQS::ReceiveMessageResponse SQSService::ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request) {

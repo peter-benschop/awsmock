@@ -9,10 +9,11 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
+#include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/db/LambdaDatabase.h>
 
-#define REGION "eu-central-1"
+#define CONFIG_FILE "/tmp/aws-mock.properties"
 #define ARN "arn:aws:lambda:eu-central-1:000000000000:function:ftp-file-copy"
 #define FUNCTION "ftp-file-copy"
 #define RUNTIME "Java11"
@@ -21,33 +22,32 @@
 
 namespace AwsMock::Database {
 
-    using namespace Poco::Data::Keywords;
-
     class LambdaDatabaseTest : public ::testing::Test {
 
     protected:
 
       void SetUp() override {
+          _region = _configuration.getString("awsmock.region");
+          _accountId = _configuration.getString("awsmock.account.id");
       }
 
       void TearDown() override {
-          /*_session.begin();
-          _session << "DELETE FROM lambda;", now;
-          _session.commit();*/
+          _lambdaDatabase.DeleteAllLambdas();
       }
 
-      Core::Configuration _configuration = Core::Configuration("/tmp/aws-mock.properties");
-      LambdaDatabase _database = LambdaDatabase(_configuration);
-      //Poco::Data::Session _session = _s3database.GetSession();
+      std::string _region;
+      std::string _accountId;
+      Core::Configuration _configuration = Core::Configuration(CONFIG_FILE);
+      LambdaDatabase _lambdaDatabase = LambdaDatabase(_configuration);
     };
 
-    /*TEST_F(LambdaDatabaseTest, LambdaCreateTest) {
+    TEST_F(LambdaDatabaseTest, LambdaCreateTest) {
 
         // arrange
-        Entity::Lambda::Lambda lambda = {.function=FUNCTION, .runtime=RUNTIME, .role=ROLE, .handler=HANDLER, .size=1000};
+        Entity::Lambda::Lambda lambda = {.region=_region, .function=FUNCTION, .runtime=RUNTIME, .role=ROLE, .handler=HANDLER, .size=1000};
 
         // act
-        Entity::Lambda::Lambda result = _s3database.CreateLambda(lambda);
+        Entity::Lambda::Lambda result = _lambdaDatabase.CreateLambda(lambda);
 
         // assert
         EXPECT_TRUE(result.function == FUNCTION);
@@ -60,10 +60,10 @@ namespace AwsMock::Database {
 
         // arrange
         Entity::Lambda::Lambda lambda = {.function=FUNCTION, .runtime=RUNTIME, .role=ROLE, .handler=HANDLER, .size=1000};
-        _s3database.CreateLambda(lambda);
+        _lambdaDatabase.CreateLambda(lambda);
 
         // act
-        bool result = _s3database.LambdaExists(FUNCTION,RUNTIME);
+        bool result = _lambdaDatabase.LambdaExists(FUNCTION, RUNTIME);
 
         // assert
         EXPECT_TRUE(result);
@@ -73,168 +73,58 @@ namespace AwsMock::Database {
 
         // arrange
         Entity::Lambda::Lambda lambda = {.function=FUNCTION, .runtime=RUNTIME, .role=ROLE, .handler=HANDLER, .size=1000};
-        lambda = _s3database.CreateLambda(lambda);
+        lambda = _lambdaDatabase.CreateLambda(lambda);
 
         // act
-        Entity::Lambda::Lambda result = _s3database.GetLambdaById(lambda.id);
+        Entity::Lambda::Lambda result = _lambdaDatabase.GetLambdaById(lambda.oid);
 
         // assert
-        EXPECT_EQ(result.id, lambda.id);
+        EXPECT_EQ(result.oid, lambda.oid);
     }
 
- /*   TEST_F(S3DatabaseTest, BucketGetByRegionNameTest) {
+    TEST_F(LambdaDatabaseTest, LambdaGetByArnTest) {
 
         // arrange
-        Entity::S3::Bucket bucket = {.region=REGION, .name=BUCKET, .owner=OWNER};
-        bucket = _lambdaDatabase.CreateBucket(bucket);
+        std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, FUNCTION);
+        Entity::Lambda::Lambda lambda = {.function=FUNCTION, .runtime=RUNTIME, .role=ROLE, .handler=HANDLER, .arn=arn};
+        lambda = _lambdaDatabase.CreateLambda(lambda);
 
         // act
-        Entity::S3::Bucket result = _lambdaDatabase.GetBucketByRegionName(REGION, BUCKET);
+        Entity::Lambda::Lambda result = _lambdaDatabase.GetLambdaByArn(arn);
 
         // assert
-        EXPECT_EQ(result.id, bucket.id);
+        EXPECT_EQ(result.arn, lambda.arn);
     }
 
-    TEST_F(S3DatabaseTest, BucketListTest) {
+    TEST_F(LambdaDatabaseTest, LambdaUpdateTest) {
 
         // arrange
-        Entity::S3::Bucket bucket = {.region=REGION, .name=BUCKET, .owner=OWNER};
-        _lambdaDatabase.CreateBucket(bucket);
+        std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, FUNCTION);
+        Entity::Lambda::Lambda lambda = {.region=_region, .function=FUNCTION, .runtime=RUNTIME, .role=ROLE, .handler=HANDLER, .arn=arn};
+        lambda = _lambdaDatabase.CreateLambda(lambda);
 
         // act
-        Entity::S3::BucketList result = _lambdaDatabase.ListBuckets();
+        lambda.role = "new_role";
+        Entity::Lambda::Lambda result = _lambdaDatabase.UpdateLambda(lambda);
 
         // assert
-        EXPECT_EQ(result.size() ,1);
+        EXPECT_EQ(result.role, lambda.role);
     }
 
-    TEST_F(S3DatabaseTest, BucketListObjectTest) {
+    TEST_F(LambdaDatabaseTest, LambdaDeleteTest) {
 
         // arrange
-        Entity::S3::Bucket bucket = {.region=REGION, .name=BUCKET, .owner=OWNER};
-        _lambdaDatabase.CreateBucket(bucket);
-        Entity::S3::Object object = {.bucket=bucket.name, .key=OBJECT, .owner=OWNER, .size=5};
-        _lambdaDatabase.CreateObject(object);
+        std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, FUNCTION);
+        Entity::Lambda::Lambda lambda = {.region=_region, .function=FUNCTION, .runtime=RUNTIME, .role=ROLE, .handler=HANDLER, .arn=arn};
+        lambda = _lambdaDatabase.CreateLambda(lambda);
 
         // act
-        Entity::S3::ObjectList result = _lambdaDatabase.ListBucket(bucket.name);
-
-        // assert
-        EXPECT_EQ(result.size() ,1);
-    }
-
-    TEST_F(S3DatabaseTest, BucketDeleteTest) {
-
-        // arrange
-        Entity::S3::Bucket bucket = {.region=REGION, .name=BUCKET, .owner=OWNER};
-        bucket = _lambdaDatabase.CreateBucket(bucket);
-
-        // act
-        EXPECT_NO_THROW({ _lambdaDatabase.DeleteBucket(bucket); });
-        bool result = _lambdaDatabase.BucketExists({.region=bucket.region, .name=bucket.name});
+        _lambdaDatabase.DeleteLambda(lambda.function);
+        bool result = _lambdaDatabase.LambdaExists(FUNCTION, RUNTIME);
 
         // assert
         EXPECT_FALSE(result);
     }
-
-    TEST_F(S3DatabaseTest, ObjectExistsTest) {
-
-        // arrange
-        Entity::S3::Bucket bucket = {.region=REGION, .name=BUCKET, .owner=OWNER};
-        bucket = _lambdaDatabase.CreateBucket(bucket);
-        Entity::S3::Object object = {.bucket=bucket.name, .key=OBJECT, .owner=OWNER, .size=5};
-        object = _lambdaDatabase.CreateObject(object);
-
-        // act
-        bool result = _lambdaDatabase.ObjectExists(object);
-
-        // assert
-        EXPECT_TRUE(result);
-    }
-
-    TEST_F(S3DatabaseTest, ObjectCreateTest) {
-
-        // arrange
-        Entity::S3::Bucket bucket = {.region=REGION, .name=BUCKET, .owner=OWNER};
-        bucket = _lambdaDatabase.CreateBucket(bucket);
-        Entity::S3::Object object = {.bucket=bucket.name, .owner=OWNER, .size=5};
-        object = _lambdaDatabase.CreateObject(object);
-
-        // act
-        Entity::S3::Object result = _lambdaDatabase.GetObject(object.bucket, object.key);
-
-        // assert
-        EXPECT_STREQ(result.key.c_str(), object.key.c_str());
-    }
-
-    TEST_F(S3DatabaseTest, ObjectByIdTest) {
-
-        // arrange
-        Entity::S3::Bucket bucket = {.region=REGION, .name=BUCKET, .owner=OWNER};
-        bucket = _lambdaDatabase.CreateBucket(bucket);
-        Entity::S3::Object object = {.bucket=bucket.name, .owner=OWNER, .size=5};
-        object = _lambdaDatabase.CreateObject(object);
-
-        // act
-        Entity::S3::Object result = _lambdaDatabase.GetObjectById(object.id);
-
-        // assert
-        EXPECT_EQ(result.id, object.id);
-    }
-
-    TEST_F(S3DatabaseTest, CreateNotificationTest) {
-
-        // arrange
-        Entity::S3::BucketNotification notification = {.region=REGION, .bucket=BUCKET, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
-
-        // act
-        Entity::S3::BucketNotification result = _lambdaDatabase.CreateBucketNotification(notification);
-
-        // assert
-        EXPECT_TRUE(result.id > 0);
-    }
-
-    TEST_F(S3DatabaseTest, HasNotificationTest) {
-
-        // arrange
-        Entity::S3::BucketNotification notification = {.region=REGION, .bucket=BUCKET, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
-        notification = _lambdaDatabase.CreateBucketNotification(notification);
-
-        // act
-        bool result = _lambdaDatabase.HasBucketNotification(notification);
-
-        // assert
-        EXPECT_TRUE(result);
-    }
-
-    TEST_F(S3DatabaseTest, GetNotificationTest) {
-
-        // arrange
-        Entity::S3::BucketNotification notification = {.region=REGION, .bucket=BUCKET, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
-        notification = _lambdaDatabase.CreateBucketNotification(notification);
-
-        // act
-        Entity::S3::BucketNotification result = _lambdaDatabase.GetBucketNotification(notification);
-
-        // assert
-        EXPECT_TRUE(result.region == notification.region);
-        EXPECT_TRUE(Core::StringUtils::Contains(result.event, "%"));
-    }
-
-    TEST_F(S3DatabaseTest, GetNotificationPutTest) {
-
-        // arrange
-        Entity::S3::BucketNotification notification = {.region=REGION, .bucket=BUCKET, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:*"};
-        notification = _lambdaDatabase.CreateBucketNotification(notification);
-
-        // act
-        Entity::S3::BucketNotification search = {.region=REGION, .bucket=BUCKET, .function="aws:arn:000000000:lambda:test", .event="s3:ObjectCreated:Put"};
-        Entity::S3::BucketNotification result = _lambdaDatabase.GetBucketNotification(search);
-
-        // assert
-        EXPECT_TRUE(result.region == notification.region);
-        EXPECT_TRUE(result.event == "s3:ObjectCreated:%");
-    }*/
 
 } // namespace AwsMock::Core
 

@@ -167,6 +167,20 @@ namespace AwsMock::Database {
         EXPECT_FALSE(result);
     }
 
+    TEST_F(S3DatabaseTest, BucketDeleteAllTest) {
+
+        // arrange
+        Entity::S3::Bucket bucket = {.region=_region, .name=BUCKET, .owner=OWNER};
+        bucket = _s3database.CreateBucket(bucket);
+
+        // act
+        EXPECT_NO_THROW({ _s3database.DeleteAllBuckets(); });
+        bool result = _s3database.BucketExists({.region=bucket.region, .name=bucket.name});
+
+        // assert
+        EXPECT_FALSE(result);
+    }
+
     TEST_F(S3DatabaseTest, ObjectExistsTest) {
 
         // arrange
@@ -226,6 +240,38 @@ namespace AwsMock::Database {
 
         // assert
         EXPECT_TRUE(result.oid == object.oid);
+    }
+
+    TEST_F(S3DatabaseTest, ObjectDeleteTest) {
+
+        // arrange
+        Entity::S3::Bucket bucket = {.region=_region, .name=BUCKET, .owner=OWNER};
+        bucket = _s3database.CreateBucket(bucket);
+        Entity::S3::Object object = {.bucket=bucket.name, .owner=OWNER, .size=5};
+        object = _s3database.CreateObject(object);
+
+        // act
+        EXPECT_NO_THROW({ _s3database.DeleteObject(object); });
+        bool result = _s3database.ObjectExists({.region=object.region, .bucket=object.bucket, .key=object.key});
+
+        // assert
+        EXPECT_FALSE(result);
+    }
+
+    TEST_F(S3DatabaseTest, ObjectDeleteAllTest) {
+
+        // arrange
+        Entity::S3::Bucket bucket = {.region=_region, .name=BUCKET, .owner=OWNER};
+        bucket = _s3database.CreateBucket(bucket);
+        Entity::S3::Object object = {.bucket=bucket.name, .owner=OWNER, .size=5};
+        object = _s3database.CreateObject(object);
+
+        // act
+        EXPECT_NO_THROW({ _s3database.DeleteAllObjects(); });
+        bool result = _s3database.ObjectExists({.region=object.region, .bucket=object.bucket, .key=object.key});
+
+        // assert
+        EXPECT_FALSE(result);
     }
 
     TEST_F(S3DatabaseTest, CreateNotificationTest) {

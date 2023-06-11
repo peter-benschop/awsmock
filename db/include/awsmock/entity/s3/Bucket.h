@@ -164,8 +164,8 @@ namespace AwsMock::Database::Entity::S3 {
               kvp("name", name),
               kvp("owner", owner),
               kvp("notifications", notificationsDoc),
-              kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds()))),
-              kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds()))));
+              kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds()/1000))),
+              kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds()/1000))));
 
           return bucketDoc;
       }

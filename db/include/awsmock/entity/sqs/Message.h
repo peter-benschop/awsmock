@@ -15,6 +15,7 @@
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
+#include <mongocxx/stdx.hpp>
 
 namespace AwsMock::Database::Entity::SQS {
 
@@ -144,19 +145,19 @@ namespace AwsMock::Database::Entity::SQS {
       /**
        * Creation date
        */
-      Poco::DateTime created;
+      Poco::DateTime created = Poco::DateTime();
 
       /**
        * Last modification date
        */
-      Poco::DateTime modified;
+      Poco::DateTime modified = Poco::DateTime();
 
       /**
        * Converts the entity to a MongoDB document
        *
        * @return entity as MongoDB document.
        */
-      [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
+      view_or_value<view, value> ToDocument() const {
 
           auto messageAttributesDoc = bsoncxx::builder::basic::array{};
           for (const auto &attribute : attributeList) {
@@ -173,9 +174,9 @@ namespace AwsMock::Database::Entity::SQS {
               kvp("receiptHandle", receiptHandle),
               kvp("md5Body", md5Body),
               kvp("md5Attr", md5Attr),
-              kvp("lastSend", bsoncxx::types::b_date(std::chrono::milliseconds(lastSend.timestamp().epochMicroseconds()))),
-              kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds()))),
-              kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds()))));
+              kvp("lastSend", bsoncxx::types::b_date(std::chrono::milliseconds(lastSend.timestamp().epochMicroseconds()/1000))),
+              kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds()/1000))),
+              kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds()/1000))));
 
           return messageDoc;
       }
@@ -185,7 +186,7 @@ namespace AwsMock::Database::Entity::SQS {
        *
        * @return entity.
        */
-      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
+      void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
 
           oid = mResult.value()["_id"].get_oid().value.to_string();
           region = mResult.value()["region"].get_string().value.to_string();
@@ -207,13 +208,13 @@ namespace AwsMock::Database::Entity::SQS {
        *
        * @return entity.
        */
-      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+     void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
           oid = mResult.value()["_id"].get_oid().value.to_string();
           region = mResult.value()["region"].get_string().value.to_string();
           queueUrl = mResult.value()["queueUrl"].get_string().value.to_string();
           body = mResult.value()["body"].get_string().value.to_string();
-          status = mResult.value()["queueUrl"].get_int32().value;
+          status = mResult.value()["status"].get_int32().value;
           retries = mResult.value()["retries"].get_int32().value;
           messageId = mResult.value()["messageId"].get_string().value.to_string();
           receiptHandle = mResult.value()["receiptHandle"].get_string().value.to_string();

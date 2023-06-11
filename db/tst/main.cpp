@@ -16,6 +16,7 @@ public:
   void SetUp() override {
       std::ofstream ofs("/tmp/aws-mock.properties");
       ofs << "awsmock.region=eu-central-1" << std::endl;
+      ofs << "awsmock.account.id=000000000000" << std::endl;
       ofs << "awsmock.rest.host=localhost" << std::endl;
       ofs << "awsmock.rest.port=4567" << std::endl;
       ofs << "awsmock.mongodb.name=test" << std::endl;

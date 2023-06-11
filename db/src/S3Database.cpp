@@ -6,7 +6,6 @@
 
 namespace AwsMock::Database {
 
-    //using namespace Poco::Data::Keywords;
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
@@ -92,7 +91,7 @@ namespace AwsMock::Database {
 
     Entity::S3::Bucket S3Database::UpdateBucket(const Entity::S3::Bucket &bucket) {
 
-        auto update_one_result = _bucketCollection.replace_one(make_document(kvp("region", bucket.region), kvp("name", bucket.name)), bucket.ToDocument());
+        auto result = _bucketCollection.replace_one(make_document(kvp("region", bucket.region), kvp("name", bucket.name)), bucket.ToDocument());
 
         _logger.trace() << "Bucket updated: " << bucket.ToString();
 
@@ -194,10 +193,20 @@ namespace AwsMock::Database {
         return result;
     }
 
+    void S3Database::DeleteObject(const Entity::S3::Object &object) {
+        auto result = _objectCollection.delete_many(make_document(kvp("region", object.region), kvp("bucket", object.bucket), kvp("key", object.key)));
+        _logger.debug() << "Objects deleted, count: " << result->deleted_count();
+    }
+
+    // TODO: do it!
+    /*void S3Database::DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys) {
+        auto result = _objectCollection.delete_many(make_document(kvp("bucket", bucket), make_document(kvp("$in", make_array(keys))));
+        _logger.debug() << "Objects deleted, count: " << result->deleted_count();
+    }*/
+
     void S3Database::DeleteAllObjects() {
-        auto delete_many_result =
-            _objectCollection.delete_many({});
-        _logger.debug() << "All objects deleted, count: " << delete_many_result->deleted_count();
+        auto result = _objectCollection.delete_many({});
+        _logger.debug() << "All objects deleted, count: " << result->deleted_count();
     }
 
     Entity::S3::Bucket S3Database::CreateBucketNotification(const Entity::S3::Bucket &bucket, const Entity::S3::BucketNotification &bucketNotification) {

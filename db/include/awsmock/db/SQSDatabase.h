@@ -172,6 +172,15 @@ namespace AwsMock::Database {
       Entity::SQS::Message GetMessageById(const std::string & oid);
 
       /**
+       * Returns a message by receipt handle.
+       *
+       * @param receiptHandle message receipt handle
+       * @return message entity
+       * @throws Core::DatabaseException
+       */
+      Entity::SQS::Message GetMessageByReceiptHandle(const std::string &receiptHandle);
+
+      /**
        * Receive messages from an queue.
        *
        * @param region AWS region
@@ -188,6 +197,22 @@ namespace AwsMock::Database {
        * @param visibility visibility period in seconds
        */
       [[maybe_unused]] void ResetMessages(const std::string& queueUrl, long visibility);
+
+      /**
+       * Count the number of message by status
+       *
+       * @param queueUrl URL of the queue
+       * @param visibility visibility period in seconds
+       */
+      [[maybe_unused]] long CountMessages(const std::string &region, const std::string& queueUrl);
+
+      /**
+       * Count the number of message by status
+       *
+       * @param queueUrl URL of the queue
+       * @param visibility visibility period in seconds
+       */
+      [[maybe_unused]] long CountMessagesByStatus(const std::string &region, const std::string& queueUrl, int status);
 
       /**
        * Deletes a message.

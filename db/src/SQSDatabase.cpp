@@ -189,82 +189,67 @@ namespace AwsMock::Database {
         return result;
     }
 
+    Entity::SQS::Message SQSDatabase::GetMessageByReceiptHandle(const std::string &receiptHandle) {
+
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle)));
+        Entity::SQS::Message result;
+        result.FromDocument(mResult);
+
+        return result;
+    }
+
     Entity::SQS::Message SQSDatabase::GetMessageById(const std::string &oid) {
         return GetMessageById(bsoncxx::oid(oid));
     }
 
-/*    void SQSDatabase::ReceiveMessages(const std::string &region, const std::string &queueUrl, Entity::SQS::MessageList &messageList) {
+    void SQSDatabase::ReceiveMessages(const std::string &region, const std::string &queueUrl, Entity::SQS::MessageList &messageList) {
+        auto now = std::chrono::high_resolution_clock::now();
 
-        try {
+        auto messageCursor = _messageCollection.find(make_document(kvp("queueUrl", queueUrl), kvp("status", Entity::SQS::INITIAL)));
+        for (auto message : messageCursor) {
             Entity::SQS::Message result;
-
-            Poco::Data::Session session = GetSession();
-
-            // TODO: Add region to messages
-            session.begin();
-            Poco::Data::Statement select(session);
-            select << "SELECT id,queue_url,body,message_id,receipt_handle,status,retries,md5_body,md5_attr,created,modified FROM sqs_message "
-                      "WHERE queue_url=? AND status=?",
-                bind(queueUrl), bind(Entity::SQS::INITIAL), into(result.id), into(result.queueUrl), into(result.body), into(result.messageId), into(result.receiptHandle),
-                into(result.status), into(result.retries), into(result.md5Body), into(result.md5Attr), into(result.created), into(result.modified), range(0, 1);
-
-            while (!select.done() && messageList.size() < 10) {
-                select.execute();
-                if (result.id > 0) {
-                    messageList.push_back(result);
-                }
-            }
-
-            for (const auto &m : messageList) {
-                Poco::DateTime now;
-                Poco::Data::Statement update(session);
-                update << "UPDATE sqs_message SET status=?,retries=?,last_send=? WHERE id=?",
-                    bind(Entity::SQS::SEND), bind(m.retries + 1), bind(now), bind(m.id);
-                update.execute();
-            }
-
-            session.commit();
-            _logger.trace() << "Messages received, region: " << region << " queue: " << queueUrl + " count: " << messageList.size();
-
-        } catch (Poco::Exception &exc) {
-            _logger.error() << "Database exception: " << exc.message();
-            throw Core::DatabaseException(exc.message(), 500);
+            result.FromDocument(message);
+            result.receiptHandle = Core::StringUtils::GenerateRandomString(120);
+            messageList.push_back(result);
+            _messageCollection.update_one(make_document(kvp("_id", message["_id"].get_oid())),
+                                          make_document(kvp("$set", make_document(kvp("status", Entity::SQS::SEND),
+                                                                                  kvp("lastSend", bsoncxx::types::b_date(now)),
+                                                                                  kvp("receiptHandle", result.receiptHandle)))));
         }
+        _logger.trace() << "Messages received, region: " << region << " queue: " << queueUrl + " count: " << messageList.size();
     }
 
-    [[maybe_unused]] void SQSDatabase::ResetMessages(const std::string &queueUrl, long visibility) {
+    void SQSDatabase::ResetMessages(const std::string &queueUrl, long visibility) {
 
-        try {
-            Poco::Data::Session session = GetSession();
-            session.begin();
-            session
-                << "UPDATE sqs_message SET status=?, modified=CURRENT_TIMESTAMP WHERE queue_url=? AND status=? AND "
-                   "(strftime('%s', CURRENT_TIMESTAMP) - strftime('%s', last_send)) > ?",
-                bind(Entity::SQS::INITIAL), bind(queueUrl), bind(Entity::SQS::SEND), bind(visibility), now;
-
-            session.commit();
-            _logger.trace() << "Message reset, visibility: " << visibility;
-
-        } catch (Poco::Exception &exc) {
-            _logger.error() << "Database exception: " << exc.message();
-            throw Core::DatabaseException(exc.message(), 500);
+        long updated = 0;
+        auto messageCursor = _messageCollection.find(make_document(kvp("queueUrl", queueUrl), kvp("status", Entity::SQS::SEND)));
+        for (auto message : messageCursor) {
+            _messageCollection.update_one(make_document(kvp("_id", message["_id"].get_oid())),
+                                          make_document(kvp("$set",
+                                                            make_document(kvp("status", Entity::SQS::INITIAL), kvp("receiptHandle", "")))));
+            updated++;
         }
+        _logger.trace() << "Message reset, visibility: " << visibility << " updated: " << updated;
+    }
+
+    long SQSDatabase::CountMessages(const std::string &region, const std::string &queueUrl) {
+
+        long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
+        _logger.trace() << "Count messages, result: " << count;
+        return count;
+    }
+
+    long SQSDatabase::CountMessagesByStatus(const std::string &region, const std::string &queueUrl, int status) {
+
+        long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl), kvp("status", status)));
+        _logger.trace() << "Count messages by status, status: " << status << " result: " << count;
+        return count;
     }
 
     void SQSDatabase::DeleteMessage(const Entity::SQS::Message &message) {
-
-        try {
-            Poco::Data::Session session = GetSession();
-            session.begin();
-            session << "DELETE FROM sqs_message WHERE queue_url=? AND receipt_handle=?", bind(message.queueUrl), bind(message.receiptHandle), now;
-            session.commit();
-            _logger.trace() << "Message deleted, queue: " << message.id;
-
-        } catch (Poco::Exception &exc) {
-            _logger.error() << "Database exception: " << exc.message();
-            throw Core::DatabaseException(exc.message(), 500);
-        }
-    }*/
+        auto result = _messageCollection.delete_one(make_document(kvp("receiptHandle", message.receiptHandle)));
+        _logger.debug() << "Messages deleted, receiptHandle: " << message.receiptHandle << " count: " << result->deleted_count();
+    }
 
     void SQSDatabase::DeleteAllMessages() {
         auto result = _messageCollection.delete_many({});
