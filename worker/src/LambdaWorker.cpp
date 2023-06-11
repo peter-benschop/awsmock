@@ -6,7 +6,10 @@
 
 namespace AwsMock::Worker {
 
-    LambdaWorker::LambdaWorker(const Core::Configuration &configuration) : _logger(Poco::Logger::get("LambdaWorker")), _configuration(configuration), _running(false) {
+    [[maybe_unused]] LambdaWorker::LambdaWorker(const Core::Configuration &configuration)
+        : _logger(Poco::Logger::get("LambdaWorker")), _configuration(configuration), _running(false) {
+
+        // Set console logger
         Core::Logger::SetDefaultConsoleLogger("LambdaWorker");
 
         Initialize();
@@ -15,7 +18,7 @@ namespace AwsMock::Worker {
     void LambdaWorker::Initialize() {
 
         _dataDir = _configuration.getString("awsmock.data.dir") + Poco::Path::separator() + "lambda";
-        poco_debug(_logger, "Lambda directory: " + _dataDir);
+        _logger.debug() << "Lambda directory: " << _dataDir;
 
         // Create lambda directory
         if (!Core::DirUtils::DirectoryExists(_dataDir)) {
@@ -27,7 +30,7 @@ namespace AwsMock::Worker {
         _s3Service = std::make_unique<Service::S3Service>(_configuration);
         _lambdaDatabase = std::make_unique<Database::LambdaDatabase>(_configuration);
 
-        poco_information(_logger, "LambdaWorker initialized");
+        _logger.debug() << "LambdaWorker initialized";
     }
 
     void LambdaWorker::run() {

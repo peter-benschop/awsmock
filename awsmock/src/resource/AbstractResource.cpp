@@ -40,9 +40,6 @@ namespace AwsMock::Resource {
 
         Poco::URI uri = Poco::URI(request.getURI());
 
-        _requestURI = request.getURI();
-        _requestHost = request.getHost();
-
         std::string scheme, authInfo, region, user;
         request.getCredentials(scheme, authInfo);
         GetRegionUser(authInfo, region, user);
