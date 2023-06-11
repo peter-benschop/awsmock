@@ -10,7 +10,8 @@ set(SOURCES src/config/Configuration.cpp src/resource/HandlerException.cpp src/r
         src/resource/factory/SNSFactory.cpp src/resource/handler/SNSHandler.cpp src/resource/handler/LambdaHandler.cpp
         src/controller/ResourceNotFound.cpp src/controller/Router.cpp src/controller/RestService.cpp src/main.cpp)
 
-include_directories(include ../core/include ../db/include ../dto/include ../service/include ../worker/include)
+include_directories(include ../core/include ../db/include ../dto/include ../service/include ../worker/include
+        /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi )
 link_directories(/usr/lib /usr/lib/x86_64-linux-gnu /usr/local/lib ../core ../db ../service ../worker)
 
 # External includes
@@ -18,8 +19,8 @@ include_directories(/usr/include /usr/local/include)
 
 add_executable(${BINARY} ${SOURCES})
 
-target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdb awsmocksrv awsmockwrk PocoData PocoDataSQLite PocoMongoDB
-        PocoPrometheus PocoNet PocoNetSSL PocoUtil PocoJSON PocoXML PocoZip PocoFoundation pthread crypto ssl z archive)
+target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdb awsmocksrv awsmockwrk mongocxx bsoncxx PocoPrometheus
+        PocoNet PocoNetSSL PocoUtil PocoJSON PocoXML PocoZip PocoFoundation pthread crypto ssl z archive)
 add_library(${BINARY}_lib STATIC ${SOURCES})
 
 install(TARGETS ${BINARY} DESTINATION bin)

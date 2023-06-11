@@ -32,15 +32,7 @@ namespace AwsMock::Service {
       }
 
       void TearDown() override {
-          try {
-              Poco::Data::Statement stmt(_session);
-              stmt << "DELETE FROM sqs_queue_attribute;"
-                      "DELETE FROM sqs_message_attribute;"
-                      "DELETE FROM sqs_message;"
-                      "DELETE FROM sqs_queue;", now;
-          } catch(Poco::Exception &exc){
-              std::cerr << exc.message() << std::endl;
-          }
+
       }
 
       Core::Configuration _configuration = Core::Configuration("/tmp/aws-mock.properties");

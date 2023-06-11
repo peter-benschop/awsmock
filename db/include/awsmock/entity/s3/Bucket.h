@@ -123,18 +123,43 @@ namespace AwsMock::Database::Entity::S3 {
       Poco::DateTime modified;
 
       /**
+       * Checks whether a notification with the given event name exists.
+       *
+       * @param eventName name of the event
+       * @return true if notification with the given event name exists.
+       */
+      bool HasNotification(const std::string &eventName) {
+          return find_if(notifications.begin(), notifications.end(), [eventName](const BucketNotification &eventNotification) {
+            return eventNotification.event == eventName;
+          }) != notifications.end();
+      }
+
+      /**
+       * Returns a given notification by name
+       *
+       * @param eventName name of the event
+       * @return found notification or notifications.end().
+       */
+      BucketNotification GetNotification(const std::string &eventName) {
+          auto it = find_if(notifications.begin(), notifications.end(), [eventName](const BucketNotification &eventNotification) {
+            return eventNotification.event == eventName;
+          });
+          return *it;
+      }
+
+      /**
        * Converts the entity to a MongoDB document
        *
        * @return entity as MongoDB document.
        */
-      [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
+      [[maybe_unused]] [[nodiscard]] view_or_value <view, value> ToDocument() const {
 
           auto notificationsDoc = bsoncxx::builder::basic::array{};
           for (const auto &notification : notifications) {
               notificationsDoc.append(notification.ToDocument());
           }
 
-          view_or_value<view, value> bucketDoc = make_document(
+          view_or_value < view, value > bucketDoc = make_document(
               kvp("region", region),
               kvp("name", name),
               kvp("owner", owner),

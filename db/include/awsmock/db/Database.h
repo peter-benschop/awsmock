@@ -7,28 +7,19 @@
 
 // C++ standard includes
 #include <string>
-#include <vector>
-#include <iostream>
 
 // Poco includes
 #include "Poco/Logger.h"
 #include "Poco/LogStream.h"
-#include "Poco/Data/Session.h"
-#include <Poco/Data/SessionPool.h>
-#include <Poco/Data/SessionFactory.h>
-#include "Poco/Data/SQLite/Connector.h"
 
 // MongoDB includes
 #include <mongocxx/client.hpp>
-#include <mongocxx/instance.hpp>
+#include <mongocxx/pool.hpp>
 #include <mongocxx/uri.hpp>
-#include <mongocxx/stdx.hpp>
 
 // AwsMock includes
 #include <awsmock/core/Logger.h>
 #include <awsmock/core/Configuration.h>
-#include <awsmock/core/DirUtils.h>
-#include <awsmock/core/FileUtils.h>
 
 namespace AwsMock::Database {
 
@@ -44,18 +35,13 @@ namespace AwsMock::Database {
       explicit Database(const Core::Configuration &configuration);
 
       /**
-       * Returns a session
+       * Returns a MongoDB connection from the pool
        *
-       * @return returns a database session
+       * @return MongoDB database client
        */
-      //Poco::Data::Session GetSession();
+      mongocxx::database GetConnection();
 
     protected:
-
-      /**
-       * MongoDB database
-       */
-      mongocxx::database _database{};
 
       /**
        * Create a collection.
@@ -78,11 +64,6 @@ namespace AwsMock::Database {
     private:
 
       /**
-       * Initialize the database
-       */
-      void Initialize();
-
-      /**
        * Logger
        */
       Poco::LogStream _logger;
@@ -93,9 +74,9 @@ namespace AwsMock::Database {
       const Core::Configuration &_configuration;
 
       /**
-       * MongoDB client
+       * MongoDB connection pool
        */
-      mongocxx::client _client{};
+      std::shared_ptr<mongocxx::pool> _connectionPool;
 
     };
 

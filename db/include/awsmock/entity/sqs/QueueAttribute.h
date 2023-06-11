@@ -90,7 +90,7 @@ namespace AwsMock::Database::Entity::SQS {
        *
        * @return DTO as MongoDB document.
        */
-      [[nodiscard]] Poco::MongoDB::Document::Ptr ToDocument() const {
+      /*[[nodiscard]] Poco::MongoDB::Document::Ptr ToDocument() const {
           Poco::MongoDB::Document::Ptr queueAttributeDoc = new Poco::MongoDB::Document();
           queueAttributeDoc->add("queueUrl", queueUrl);
           queueAttributeDoc->add("delaySeconds", delaySeconds);
@@ -104,7 +104,7 @@ namespace AwsMock::Database::Entity::SQS {
           queueAttributeDoc->add("created", created.timestamp());
           queueAttributeDoc->add("modified", modified.timestamp());
           return queueAttributeDoc;
-      }
+      }*/
 
       /**
        * Converts the DTO to a string representation.

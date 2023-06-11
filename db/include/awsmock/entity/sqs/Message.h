@@ -11,21 +11,80 @@
 
 // Poco includes
 #include <Poco/DateTime.h>
-#include <Poco/MongoDB/Document.h>
 
-// AwsMock includes
-#include "MessageAttribute.h"
+// MongoDB includes
+#include <bsoncxx/builder/basic/array.hpp>
+#include <bsoncxx/builder/basic/document.hpp>
 
 namespace AwsMock::Database::Entity::SQS {
 
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
+    using bsoncxx::view_or_value;
+    using bsoncxx::document::view;
+    using bsoncxx::document::value;
+
     enum STATUS { INITIAL, SEND, RESEND };
+
+    struct MessageAttribute {
+
+      /**
+       * MessageAttribute name
+       */
+      std::string attributeName;
+
+      /**
+       * MessageAttribute value
+       */
+      std::string attributeValue;
+
+      /**
+       * Converts the entity to a MongoDB document
+       *
+       * @return entity as MongoDB document.
+       */
+      [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
+
+          view_or_value<view, value> messageAttributeDoc = make_document(
+              kvp("name", attributeName),
+              kvp("value", attributeValue));
+
+          return messageAttributeDoc;
+      }
+
+      /**
+       * Converts the DTO to a string representation.
+       *
+       * @return DTO as string for logging.
+       */
+      [[nodiscard]] std::string ToString() const {
+          std::stringstream ss;
+          ss << (*this);
+          return ss.str();
+      }
+
+      /**
+       * Stream provider.
+       *
+       * @return output stream
+       */
+      friend std::ostream &operator<<(std::ostream &os, const MessageAttribute &m) {
+          os << "MessageAttribute={name='" + m.attributeValue + "'value='" + m.attributeValue + "'}";
+          return os;
+      }
+
+    };
+
+    typedef struct MessageAttribute MessageAttribute;
+    typedef std::vector<MessageAttribute> MessageAttributeList;
 
     struct Message {
 
       /**
        * ID
        */
-      long id = 0;
+      std::string oid;
 
       /**
        * Aws region name
@@ -93,29 +152,77 @@ namespace AwsMock::Database::Entity::SQS {
       Poco::DateTime modified;
 
       /**
-       * Converts the DTO to a MongoDB document
+       * Converts the entity to a MongoDB document
        *
-       * @return DTO as MongoDB document.
+       * @return entity as MongoDB document.
        */
-      [[nodiscard]] Poco::MongoDB::Document::Ptr ToDocument() const {
-          Poco::MongoDB::Document::Ptr messageDoc = new Poco::MongoDB::Document();
-          messageDoc->add("region", region);
-          messageDoc->add("queueUrl", queueUrl);
-          messageDoc->add("body", body);
-          messageDoc->add("status", status);
-          messageDoc->add("retries", retries);
-          messageDoc->add("messageId", messageId);
-          messageDoc->add("receiptHandle", receiptHandle);
-          messageDoc->add("md5Body", md5Body);
-          messageDoc->add("md5Attr", md5Attr);
-          for (const auto &it : attributeList) {
-              messageDoc->add("attributeList", it.ToDocument());
+      [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
+
+          auto messageAttributesDoc = bsoncxx::builder::basic::array{};
+          for (const auto &attribute : attributeList) {
+              messageAttributesDoc.append(attribute.ToDocument());
           }
-          messageDoc->add("lastSend", lastSend.timestamp());
-          messageDoc->add("created", created.timestamp());
-          messageDoc->add("modified", modified.timestamp());
+
+          view_or_value<view, value> messageDoc = make_document(
+              kvp("region", region),
+              kvp("queueUrl", queueUrl),
+              kvp("body", body),
+              kvp("status", status),
+              kvp("retries", retries),
+              kvp("messageId", messageId),
+              kvp("receiptHandle", receiptHandle),
+              kvp("md5Body", md5Body),
+              kvp("md5Attr", md5Attr),
+              kvp("lastSend", bsoncxx::types::b_date(std::chrono::milliseconds(lastSend.timestamp().epochMicroseconds()))),
+              kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds()))),
+              kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds()))));
+
           return messageDoc;
-      };
+      }
+
+      /**
+       * Converts the MongoDB document to an entity
+       *
+       * @return entity.
+       */
+      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
+
+          oid = mResult.value()["_id"].get_oid().value.to_string();
+          region = mResult.value()["region"].get_string().value.to_string();
+          queueUrl = mResult.value()["queueUrl"].get_string().value.to_string();
+          body = mResult.value()["body"].get_string().value.to_string();
+          status = mResult.value()["status"].get_int32().value;
+          retries = mResult.value()["retries"].get_int32().value;
+          messageId = mResult.value()["messageId"].get_string().value.to_string();
+          receiptHandle = mResult.value()["receiptHandle"].get_string().value.to_string();
+          md5Body = mResult.value()["md5Body"].get_string().value.to_string();
+          md5Attr = mResult.value()["md5Attr"].get_string().value.to_string();
+          lastSend = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastSend"].get_date().value) / 1000000));
+          created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000000));
+          modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000000));
+      }
+
+      /**
+       * Converts the MongoDB document to an entity
+       *
+       * @return entity.
+       */
+      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+
+          oid = mResult.value()["_id"].get_oid().value.to_string();
+          region = mResult.value()["region"].get_string().value.to_string();
+          queueUrl = mResult.value()["queueUrl"].get_string().value.to_string();
+          body = mResult.value()["body"].get_string().value.to_string();
+          status = mResult.value()["queueUrl"].get_int32().value;
+          retries = mResult.value()["retries"].get_int32().value;
+          messageId = mResult.value()["messageId"].get_string().value.to_string();
+          receiptHandle = mResult.value()["receiptHandle"].get_string().value.to_string();
+          md5Body = mResult.value()["md5Body"].get_string().value.to_string();
+          md5Attr = mResult.value()["md5Attr"].get_string().value.to_string();
+          lastSend = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastSend"].get_date().value) / 1000000));
+          created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value)/1000000));
+          modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value)/1000000));
+      }
 
       /**
        * Converts the DTO to a string representation.
@@ -134,7 +241,7 @@ namespace AwsMock::Database::Entity::SQS {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const Message &m) {
-          os << "Message={id='" + std::to_string(m.id) + "' queueUrl='" + m.queueUrl + "'body='" + m.body + "' status='" + std::to_string(m.status) + "' lastSend='" +
+          os << "Message={oid='" + m.oid + "' queueUrl='" + m.queueUrl + "'body='" + m.body + "' status='" + std::to_string(m.status) + "' lastSend='" +
               Poco::DateTimeFormatter().format(m.lastSend, Poco::DateTimeFormat::HTTP_FORMAT) + "' retries='" + std::to_string(m.retries) +
               "' messageId='" + m.messageId + "' receiptHandle='" + m.receiptHandle + "' md5body='" + m.md5Body + "' md5Attr='" + m.md5Attr + "'}";
           return os;

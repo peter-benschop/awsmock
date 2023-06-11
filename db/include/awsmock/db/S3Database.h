@@ -13,8 +13,6 @@
 // Poco includes
 #include "Poco/Logger.h"
 #include "Poco/LogStream.h"
-#include "Poco/Data/Session.h"
-#include "Poco/Data/SQLite/Connector.h"
 
 // AwsMock includes
 #include <awsmock/core/Logger.h>
@@ -26,6 +24,7 @@
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/Object.h>
 
+// MongoDB includes
 #include <mongocxx/stdx.hpp>
 
 #define MAX_FILES 100
@@ -200,22 +199,24 @@ namespace AwsMock::Database {
       /**
        * Creates a bucket notification-
        *
-       * <p>Replaces the wildcard characters '*' with the SQLite wildcard '%'.</p>
+       * <p>In case of a wildcard notification all notifications are added.</p>
        *
        * @param bucket S3 bucket
        * @param bucketNotification bucket notification
-       * @return upated Bucket entity
+       * @return updated Bucket entity
        */
       Entity::S3::Bucket CreateBucketNotification(const Entity::S3::Bucket &bucket, const Entity::S3::BucketNotification &bucketNotification);
 
       /**
-       * Checks for a notification notification
+       * Creates a bucket notification-
        *
-       * @param notification S3 notification
-       * @param event S3 notification event to look for
-       * @return true if notification notification exists for the given bucket
+       * <p>Replaces the wildcard characters '*' with the SQLite wildcard '%'.</p>
+       *
+       * @param bucket S3 bucket
+       * @param bucketNotification bucket notification
+       * @return updated Bucket entity
        */
-      bool HasBucketNotification(const Entity::S3::Bucket &notification, const std::string &event);
+      Entity::S3::Bucket DeleteBucketNotifications(const Entity::S3::Bucket &bucket, const Entity::S3::BucketNotification &bucketNotification);
 
       /**
        * Delete a bucket.

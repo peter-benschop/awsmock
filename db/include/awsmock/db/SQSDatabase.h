@@ -25,7 +25,6 @@
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/db/Database.h>
 #include <awsmock/entity/sqs/Message.h>
-#include <awsmock/entity/sqs/MessageAttribute.h>
 #include <awsmock/entity/sqs/Queue.h>
 #include <awsmock/entity/sqs/QueueAttribute.h>
 
@@ -73,11 +72,20 @@ namespace AwsMock::Database {
       /**
        * Returns a queue by primary key
        *
-       * @param id queue primary key
+       * @param oid queue primary key
        * @return queue entity
        * @throws DatabaseException
        */
-      Entity::SQS::Queue GetQueueById(long id);
+      Entity::SQS::Queue GetQueueById(bsoncxx::oid oid);
+
+      /**
+       * Returns a queue by primary key
+       *
+       * @param oid queue primary key
+       * @return queue entity
+       * @throws DatabaseException
+       */
+      Entity::SQS::Queue GetQueueById(const std::string &oid);
 
       /**
        * List all available queues
@@ -132,6 +140,11 @@ namespace AwsMock::Database {
       void DeleteQueue(const Entity::SQS::Queue &queue);
 
       /**
+       * Deletes all queues
+       */
+      void DeleteAllQueues();
+
+      /**
        * Creates a new message in the SQS message table
        *
        * @param message SQS message entity
@@ -143,11 +156,20 @@ namespace AwsMock::Database {
       /**
        * Returns a message by ID.
        *
-       * @param id message ID
+       * @param oid message objectId
        * @return message entity
        * @throws Core::DatabaseException
        */
-      Entity::SQS::Message GetMessageById(long id);
+      Entity::SQS::Message GetMessageById(bsoncxx::oid oid);
+
+      /**
+       * Returns a message by ID.
+       *
+       * @param oid message objectId
+       * @return message entity
+       * @throws Core::DatabaseException
+       */
+      Entity::SQS::Message GetMessageById(const std::string & oid);
 
       /**
        * Receive messages from an queue.
@@ -175,6 +197,13 @@ namespace AwsMock::Database {
        */
       void DeleteMessage(const Entity::SQS::Message &message);
 
+      /**
+       * Deletes a messages.
+       *
+       * @throws Core::DatabaseException
+       */
+      void DeleteAllMessages();
+
     private:
 
       /**
@@ -182,6 +211,15 @@ namespace AwsMock::Database {
        */
       Poco::LogStream _logger;
 
+      /**
+       * SQS queue collection
+       */
+      mongocxx::collection _queueCollection{};
+
+      /**
+       * SQS message collection
+       */
+      mongocxx::collection _messageCollection{};
     };
 
 } // namespace AwsMock::Database

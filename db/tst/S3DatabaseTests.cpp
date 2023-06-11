@@ -239,10 +239,39 @@ namespace AwsMock::Database {
         Entity::S3::Bucket result = _s3database.CreateBucketNotification(bucket, notification);
 
         // assert
+        EXPECT_EQ(4, result.notifications.size());
+    }
+
+    TEST_F(S3DatabaseTest, CreateNotificationPutTest) {
+
+        // arrange
+        Entity::S3::Bucket bucket = {.region=_region, .name=BUCKET, .owner=OWNER};
+        bucket = _s3database.CreateBucket(bucket);
+        Entity::S3::BucketNotification notification = {.event="s3:ObjectCreated:Put", .lambdaArn="aws:arn:000000000:lambda:test"};
+
+        // act
+        Entity::S3::Bucket result = _s3database.CreateBucketNotification(bucket, notification);
+
+        // assert
         EXPECT_EQ(1, result.notifications.size());
     }
 
-    TEST_F(S3DatabaseTest, HasNotificationTest) {
+    TEST_F(S3DatabaseTest, CreateNotificationTwiceTest) {
+
+        // arrange
+        Entity::S3::Bucket bucket = {.region=_region, .name=BUCKET, .owner=OWNER};
+        bucket = _s3database.CreateBucket(bucket);
+        Entity::S3::BucketNotification notification = {.event="s3:ObjectCreated:Put", .lambdaArn="aws:arn:000000000:lambda:test"};
+        bucket = _s3database.CreateBucketNotification(bucket, notification);
+
+        // act
+        Entity::S3::Bucket result = _s3database.CreateBucketNotification(bucket, notification);
+
+        // assert
+        EXPECT_EQ(1, result.notifications.size());
+    }
+
+    TEST_F(S3DatabaseTest, DeleteNotificationTest) {
 
         // arrange
         Entity::S3::Bucket bucket = {.region=_region, .name=BUCKET, .owner=OWNER};
@@ -251,10 +280,26 @@ namespace AwsMock::Database {
         bucket = _s3database.CreateBucketNotification(bucket, notification);
 
         // act
-        bool result = _s3database.HasBucketNotification(bucket, notification.event);
+        Entity::S3::Bucket result = _s3database.DeleteBucketNotifications(bucket, notification);
 
         // assert
-        EXPECT_TRUE(result);
+        EXPECT_TRUE(result.notifications.empty());
+    }
+
+    TEST_F(S3DatabaseTest, DeleteNotificationPutTest) {
+
+        // arrange
+        Entity::S3::Bucket bucket = {.region=_region, .name=BUCKET, .owner=OWNER};
+        bucket = _s3database.CreateBucket(bucket);
+        Entity::S3::BucketNotification notification = {.event="s3:ObjectCreated:*", .lambdaArn="aws:arn:000000000:lambda:test"};
+        bucket = _s3database.CreateBucketNotification(bucket, notification);
+        Entity::S3::BucketNotification deleteNotification = {.event="s3:ObjectCreated:Put", .lambdaArn="aws:arn:000000000:lambda:test"};
+
+        // act
+        Entity::S3::Bucket result = _s3database.DeleteBucketNotifications(bucket, deleteNotification);
+
+        // assert
+        EXPECT_EQ(3, result.notifications.size());
     }
 
 } // namespace AwsMock::Core

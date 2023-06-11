@@ -11,14 +11,19 @@ namespace AwsMock::Database {
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
 
+    std::map<std::string, std::vector<std::string>> S3Database::allowedEventTypes = {
+        {"Created", {"s3:ObjectCreated:Put", "s3:ObjectCreated:Post", "s3:ObjectCreated:Copy", "s3:ObjectCreated:CompleteMultipartUpload"}},
+        {"Deleted", {"s3:ObjectRemoved:Delete", "s3:ObjectRemoved:DeleteMarkerCreated"}}
+    };
+
     S3Database::S3Database(const Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("S3Database")) {
         Core::Logger::SetDefaultConsoleLogger("S3Database");
 
         CreateCollection("s3_bucket");
         CreateCollection("s3_object");
 
-        _bucketCollection = _database["s3_bucket"];
-        _objectCollection = _database["s3_object"];
+        _bucketCollection = GetConnection()["s3_bucket"];
+        _objectCollection = GetConnection()["s3_object"];
     }
 
     bool S3Database::BucketExists(const std::string &region, const std::string &name) {
@@ -180,7 +185,8 @@ namespace AwsMock::Database {
 
     Entity::S3::Object S3Database::GetObject(const std::string &region, const std::string &bucket, const std::string &key) {
 
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _objectCollection.find_one(make_document(kvp("region", region), kvp("bucket", bucket),  kvp("key", key)));
+        mongocxx::stdx::optional<bsoncxx::document::value>
+            mResult = _objectCollection.find_one(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key)));
         Entity::S3::Object result;
         result.FromDocument(mResult);
 
@@ -196,43 +202,74 @@ namespace AwsMock::Database {
 
     Entity::S3::Bucket S3Database::CreateBucketNotification(const Entity::S3::Bucket &bucket, const Entity::S3::BucketNotification &bucketNotification) {
 
-        Entity::S3::Bucket intBucket = GetBucketByRegionName(bucket.region, bucket.name);
+        Entity::S3::Bucket internBucket = GetBucketByRegionName(bucket.region, bucket.name);
 
-        intBucket.notifications.emplace_back(bucketNotification);
+        if (Core::StringUtils::Contains(bucketNotification.event, "*")) {
 
-        return UpdateBucket(intBucket);
-    }
+            std::vector<std::string> allowedEvents;
+            if (Core::StringUtils::StartsWith(bucketNotification.event, "s3:ObjectCreated:")) {
+                allowedEvents = allowedEventTypes["Created"];
+            } else if (Core::StringUtils::StartsWith(bucketNotification.event, "s3:ObjectRemoved:")) {
+                allowedEvents = allowedEventTypes["Deleted"];
+            }
 
-    bool S3Database::HasBucketNotification(const Entity::S3::Bucket &bucket, const std::string &event) {
+            for (const auto &it : allowedEvents) {
 
-        Entity::S3::Bucket intBucket = GetBucketByRegionName(bucket.region, bucket.name);
-        auto it = find_if(intBucket.notifications.begin(), intBucket.notifications.end(),
-                          [&event](const Entity::S3::BucketNotification &notification) {
-                            return notification.event == event;
-                          });
+                if (!internBucket.HasNotification(bucketNotification.event)) {
 
-        return it != intBucket.notifications.end();
-    }
+                    Entity::S3::BucketNotification notification = {
+                        .event=it,
+                        .notificationId=bucketNotification.notificationId,
+                        .queueArn=bucketNotification.queueArn,
+                        .lambdaArn=bucketNotification.lambdaArn};
+                    internBucket.notifications.emplace_back(notification);
+                }
+            }
 
-/*    void S3Database::DeleteBucketNotifications(const Entity::S3::BucketNotification &notification) {
+        } else if (!internBucket.HasNotification(bucketNotification.event)) {
 
-        try {
-            Poco::Data::Session session = GetSession();
-
-            session.begin();
-            session << "DELETE FROM s3_notification WHERE region=? AND bucket=?",
-                bind(notification.region), bind(notification.bucket), now;
-            session.commit();
-
-            _logger.trace() << "Bucket notification deleted, region: " << notification.region << " bucket: " << notification.bucket;
-
-        } catch (Poco::Exception &exc) {
-            _logger.error() << "Database exception: " << exc.message();
-            throw Core::DatabaseException(exc.message(), 500);
+            internBucket.notifications.emplace_back(bucketNotification);
         }
+
+        _logger.trace() << "Bucket notification added, notification: " << bucketNotification.ToString();
+
+        return UpdateBucket(internBucket);
     }
 
+    Entity::S3::Bucket S3Database::DeleteBucketNotifications(const Entity::S3::Bucket &bucket, const Entity::S3::BucketNotification &bucketNotification) {
 
+        Entity::S3::Bucket internBucket = GetBucketByRegionName(bucket.region, bucket.name);
+
+        if (Core::StringUtils::Contains(bucketNotification.event, "*")) {
+
+            std::vector<std::string> allowedEvents;
+            if (Core::StringUtils::StartsWith(bucketNotification.event, "s3:ObjectCreated:")) {
+                allowedEvents = allowedEventTypes["Created"];
+            } else if (Core::StringUtils::StartsWith(bucketNotification.event, "s3:ObjectRemoved:")) {
+                allowedEvents = allowedEventTypes["Deleted"];
+            }
+
+            for (const auto &it : allowedEvents) {
+                internBucket.notifications.erase(std::remove_if(internBucket.notifications.begin(),
+                                                                internBucket.notifications.end(),
+                                                                [it](const Entity::S3::BucketNotification &notification) {
+                                                                  return it == notification.event;
+                                                                }), internBucket.notifications.end());
+            }
+        } else {
+            internBucket.notifications.erase(std::remove_if(internBucket.notifications.begin(),
+                                                            internBucket.notifications.end(),
+                                                            [bucketNotification](const Entity::S3::BucketNotification &notification) {
+                                                              return bucketNotification.event == notification.event;
+                                                            }), internBucket.notifications.end());
+        }
+
+        _logger.trace() << "Bucket notification deleted, notification: " << bucketNotification.ToString();
+
+        return UpdateBucket(internBucket);
+    }
+
+    /*
     void S3Database::DeleteObject(const Entity::S3::Object &object) {
 
         try {

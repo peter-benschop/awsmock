@@ -12,14 +12,25 @@
 // Poco includes
 #include <Poco/DateTime.h>
 
+// MongoDB includes
+#include <bsoncxx/builder/basic/array.hpp>
+#include <bsoncxx/builder/basic/document.hpp>
+
 namespace AwsMock::Database::Entity::SQS {
+
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
+    using bsoncxx::view_or_value;
+    using bsoncxx::document::view;
+    using bsoncxx::document::value;
 
     struct Queue {
 
       /**
        * ID
        */
-      long id = 0;
+      std::string oid;
 
       /**
        * AWS region
@@ -57,20 +68,62 @@ namespace AwsMock::Database::Entity::SQS {
       Poco::DateTime modified;
 
       /**
-       * Converts the DTO to a MongoDB document
+       * Converts the entity to a MongoDB document
        *
-       * @return DTO as MongoDB document.
+       * @return entity as MongoDB document.
        */
-      [[nodiscard]] Poco::MongoDB::Document::Ptr ToDocument() const {
-          Poco::MongoDB::Document::Ptr queueDoc = new Poco::MongoDB::Document();
-          queueDoc->add("region", region);
-          queueDoc->add("name", name);
-          queueDoc->add("owner", owner);
-          queueDoc->add("queueUrl", queueUrl);
-          queueDoc->add("queueArn", queueArn);
-          queueDoc->add("created", created.timestamp());
-          queueDoc->add("modified", modified.timestamp());
-          return queueDoc;
+      [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
+
+          /*auto notificationsDoc = bsoncxx::builder::basic::array{};
+          for (const auto &notification : notifications) {
+              notificationsDoc.append(notification.ToDocument());
+          }*/
+
+          view_or_value<view, value> bucketDoc = make_document(
+              kvp("region", region),
+              kvp("name", name),
+              kvp("owner", owner),
+              kvp("queueUrl", queueUrl),
+              kvp("queueArn", queueArn),
+              kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds()))),
+              kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds()))));
+
+          return bucketDoc;
+      }
+
+      /**
+       * Converts the MongoDB document to an entity
+       *
+       * @return entity.
+       */
+      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
+
+          oid = mResult.value()["_id"].get_oid().value.to_string();
+          region = mResult.value()["region"].get_string().value.to_string();
+          name = mResult.value()["name"].get_string().value.to_string();
+          owner = mResult.value()["owner"].get_string().value.to_string();
+          queueUrl = mResult.value()["queueUrl"].get_string().value.to_string();
+          queueArn = mResult.value()["queueArn"].get_string().value.to_string();
+          created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000000));
+          modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000000));
+      }
+
+      /**
+       * Converts the MongoDB document to an entity
+       *
+       * @return entity.
+       */
+      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+
+          oid = mResult.value()["_id"].get_oid().value.to_string();
+          region = mResult.value()["region"].get_string().value.to_string();
+          name = mResult.value()["name"].get_string().value.to_string();
+          owner = mResult.value()["owner"].get_string().value.to_string();
+          queueUrl = mResult.value()["queueUrl"].get_string().value.to_string();
+          queueArn = mResult.value()["queueArn"].get_string().value.to_string();
+          created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value)/1000000));
+          modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value)/1000000));
+
       }
 
       /**
@@ -90,8 +143,8 @@ namespace AwsMock::Database::Entity::SQS {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const Queue &q) {
-          os << "Queue={id='" + std::to_string(q.id) + "' region='" + q.region + "' name='" + q.name + "' owner='" + q.owner + "' queueUrl='" + q.queueUrl +
-          "' queueArn='" + q.queueArn + "' created='" + Poco::DateTimeFormatter().format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) +
+          os << "Queue={id='" + q.oid + "' region='" + q.region + "' name='" + q.name + "' owner='" + q.owner + "' queueUrl='" + q.queueUrl +
+              "' queueArn='" + q.queueArn + "' created='" + Poco::DateTimeFormatter().format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) +
               "' modified='" + Poco::DateTimeFormatter().format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) + "'}";
           return os;
       }

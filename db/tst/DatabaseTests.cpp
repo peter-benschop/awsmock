@@ -19,8 +19,6 @@
 
 namespace AwsMock::Database {
 
-    using namespace Poco::Data::Keywords;
-
     class DatabaseTest : public ::testing::Test {
 
     protected:
