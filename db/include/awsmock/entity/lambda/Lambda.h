@@ -108,7 +108,7 @@ namespace AwsMock::Database::Entity::Lambda {
       view_or_value<view, value> ToDocument() const {
 /*
           auto messageAttributesDoc = bsoncxx::builder::basic::array{};
-          for (const auto &attribute : attributeList) {
+          for (const auto &attribute : attributes) {
               messageAttributesDoc.append(attribute.ToDocument());
           }*/
 

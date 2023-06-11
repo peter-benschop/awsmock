@@ -70,6 +70,36 @@ namespace AwsMock::Database {
         EXPECT_EQ(result.size(), 1);
     }
 
+    TEST_F(SQSDatabaseTest, QueuePurgeTest) {
+
+        // arrange
+        Entity::SQS::Queue queue = {.region=_region, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
+        queue = _sqsDatabase.CreateQueue(queue);
+        Entity::SQS::Message message = {.region=_region, .queueUrl=queue.name, .body=BODY};
+        _sqsDatabase.CreateMessage(message);
+
+        // act
+        _sqsDatabase.PurgeQueue(queue.region, queue.queueUrl);
+        long result = _sqsDatabase.CountMessages(queue.region, queue.queueUrl);
+
+        // assert
+        EXPECT_EQ(0, result);
+    }
+
+    TEST_F(SQSDatabaseTest, QueueDeleteTest) {
+
+        // arrange
+        Entity::SQS::Queue queue = {.region=_region, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
+        queue = _sqsDatabase.CreateQueue(queue);
+
+        // act
+        _sqsDatabase.DeleteQueue(queue);
+        bool result = _sqsDatabase.QueueExists(queue.region, queue.queueUrl);
+
+        // assert
+        EXPECT_FALSE(result);
+    }
+
     TEST_F(SQSDatabaseTest, MessageCreateTest) {
 
         // arrange

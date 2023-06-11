@@ -130,7 +130,7 @@ namespace AwsMock {
         DumpResponse(response);
     }
 
-    void SQSHandler::handleOptions(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+    void SQSHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
         Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
         poco_debug(_logger, "SQS OPTIONS request, address: " + request.clientAddress().toString());
 

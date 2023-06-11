@@ -93,7 +93,7 @@ namespace AwsMock {
        * @param response HTTP response
        * @see AbstractResource::handleOption(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
        */
-      void handleOptions(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
+      void handleOptions(Poco::Net::HTTPServerResponse &response) override;
 
       /**
        * Head request.

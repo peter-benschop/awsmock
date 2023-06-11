@@ -98,7 +98,7 @@ namespace AwsMock::Core {
             Poco::RecursiveDirectoryIterator it(dirName);
             Poco::RecursiveDirectoryIterator end;
             while (it != end) {
-                if(re.match(it.name())) {
+                if(re.match(it.path().toString())) {
                     fileNames.push_back(it->path());
                 }
                 ++it;
@@ -107,7 +107,7 @@ namespace AwsMock::Core {
             Poco::DirectoryIterator it(dirName);
             Poco::DirectoryIterator end;
             while (it != end) {
-                if(re.match(it.name())) {
+                if(re.match(it.path().toString())) {
                     fileNames.push_back(it->path());
                 }
                 ++it;

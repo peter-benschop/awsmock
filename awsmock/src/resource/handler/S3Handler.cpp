@@ -8,7 +8,10 @@ namespace AwsMock {
         Core::Logger::SetDefaultConsoleLogger("S3Handler");
     }
 
-    void S3Handler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
+    void S3Handler::handleGet(Poco::Net::HTTPServerRequest &request,
+                              Poco::Net::HTTPServerResponse &response,
+                              [[maybe_unused]]const std::string &region,
+                              [[maybe_unused]]const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_GET_TIMER);
         poco_debug(_logger, "S3 GET request, URI: " + request.getURI() + " region: " + region + " user: " + user);
 
@@ -29,9 +32,7 @@ namespace AwsMock {
 
                 // Get object request
                 poco_debug(_logger, "S3 get object request, bucket: " + bucket + " key: " + key);
-                Dto::S3::GetObjectRequest s3Request;
-                s3Request.bucket=bucket;
-                s3Request.key=key;
+                Dto::S3::GetObjectRequest s3Request = {.region=region, .bucket=bucket, .key=key};
 
                 Dto::S3::GetObjectResponse s3Response = _s3Service.GetObject(s3Request);
                 std::ifstream ifs (s3Response.filename);
@@ -52,7 +53,7 @@ namespace AwsMock {
                 }
 
                 // Return object list
-                Dto::S3::ListBucketRequest s3Request = {.name=bucket, .prefix=prefix};
+                Dto::S3::ListBucketRequest s3Request = {.region=region, .name=bucket, .prefix=prefix};
                 Dto::S3::ListBucketResult result = _s3Service.ListBucket(s3Request);
                 SendOkResponse(response, result.ToXml());
             }
@@ -192,7 +193,7 @@ namespace AwsMock {
             GetBucketKeyFromUri(request.getURI(), bucket, key);
 
             if(!bucket.empty() && !key.empty()) {
-                _s3Service.DeleteObject({.region=region, .bucket=bucket, .key=key});
+                _s3Service.DeleteObject({.region=region, .user=user, .bucket=bucket, .key=key});
                 SendDeleteResponse(response);
             } else if(!bucket.empty()) {
                 _s3Service.DeleteBucket(region, bucket);
@@ -204,7 +205,7 @@ namespace AwsMock {
         }
     }
 
-    void S3Handler::handleOptions(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+    void S3Handler::handleOptions(Poco::Net::HTTPServerResponse &response) {
         Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
         poco_debug(_logger, "S3 OPTIONS request, address: " + request.clientAddress().toString());
 

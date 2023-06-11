@@ -32,7 +32,7 @@ namespace AwsMock {
         poco_debug(_logger, "SNS GET request, URI: " + std::to_string(response.getContentLength()));
     }
 
-    void SNSHandler::handleOptions(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+    void SNSHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
         Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
         poco_debug(_logger, "S3 OPTIONS request, address: " + request.clientAddress().toString());
 

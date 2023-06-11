@@ -71,106 +71,22 @@ namespace AwsMock::Database {
         return queueList;
     }
 
-   /* void SQSDatabase::PurgeQueue(const std::string &region, const std::string &queueUrl) {
+    void SQSDatabase::PurgeQueue(const std::string &region, const std::string &queueUrl) {
 
-        try {
-            Poco::Data::Session session = GetSession();
+        auto result = _messageCollection.delete_many(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
 
-            // Delete messages
-            Poco::Data::Statement stmt(session);
-            stmt << "DELETE from sqs_message WHERE queue_url=?", bind(queueUrl), now;
-            _logger.trace() << "Queue purged, url: " << queueUrl;
-
-        } catch (Poco::Exception &exc) {
-            _logger.error() << "Database exception: " << exc.message();
-            throw Core::DatabaseException(exc.message(), 500);
-        }
-    }
-
-    Entity::SQS::QueueAttribute SQSDatabase::CreateQueueAttributes(const Entity::SQS::QueueAttribute &queueAttribute) {
-
-        int id = 0;
-        try {
-            Poco::Data::Session session = GetSession();
-            session.begin();
-            session << "INSERT INTO sqs_queue_attribute(queue_url,delay_seconds,max_message_size,message_retention_period,policy,redrive_policy,redrive_allow_policy,"
-                       "receive_message_wait_time,visibility_timeout) VALUES(?,?,?,?,?,?,?,?,?) returning id",
-                bind(queueAttribute.queueUrl), bind(queueAttribute.delaySeconds), bind(queueAttribute.maxMessageSize), bind(queueAttribute.messageRetentionPeriod),
-                bind(queueAttribute.policy), bind(queueAttribute.redrivePolicy), bind(queueAttribute.redriveAllowPolicy), bind(queueAttribute.receiveMessageWaitTime),
-                bind(queueAttribute.visibilityTimeout), into(id), now;
-            session.commit();
-
-            _logger.trace() << "Queue created, queueAttribute: " << queueAttribute.ToString();
-
-        } catch (Poco::Exception &exc) {
-            _logger.error() << "Database exception: " << exc.message();
-        }
-        return GetQueueAttributesById(id);
-    }
-
-    Entity::SQS::QueueAttribute SQSDatabase::GetQueueAttributesById(long id) {
-
-        Entity::SQS::QueueAttribute result;
-        try {
-            Poco::Data::Session session = GetSession();
-            session.begin();
-            session
-                << "SELECT id,queue_url,delay_seconds,max_message_size,message_retention_period,policy,redrive_policy,redrive_allow_policy,receive_message_wait_time,"
-                   "visibility_timeout,created,modified FROM sqs_queue_attribute WHERE id=?",
-                bind(id), into(result.id), into(result.queueUrl), into(result.delaySeconds), into(result.maxMessageSize), into(result.messageRetentionPeriod),
-                into(result.policy), into(result.redrivePolicy), into(result.redriveAllowPolicy), into(result.receiveMessageWaitTime), into(result.visibilityTimeout),
-                into(result.created), into(result.modified), now;
-            session.commit();
-
-            _logger.trace() << "Got queue: " << result.ToString();
-
-        } catch (Poco::Exception &exc) {
-            _logger.error() << "Database exception: " << exc.message();
-        }
-        return result;
-    }
-
-    Entity::SQS::QueueAttribute SQSDatabase::GetQueueAttributesByQueueUrl(const std::string &queueUrl) {
-
-        Entity::SQS::QueueAttribute result;
-        try {
-            Poco::Data::Session session = GetSession();
-            session.begin();
-            session << "SELECT id,queue_url,delay_seconds,max_message_size,message_retention_period,policy,redrive_policy,redrive_allow_policy,receive_message_wait_time,"
-                       "visibility_timeout,created,modified FROM sqs_queue_attribute WHERE queue_url=?",
-                into(result.id), into(result.queueUrl), into(result.delaySeconds), into(result.maxMessageSize), into(result.messageRetentionPeriod),
-                into(result.policy), into(result.redrivePolicy), into(result.redriveAllowPolicy), into(result.receiveMessageWaitTime), into(result.visibilityTimeout),
-                into(result.created), into(result.modified),bind(queueUrl), now;
-            session.commit();
-
-            _logger.trace() << "Got queue sqs, " + result.ToString();
-
-        } catch (Poco::Exception &exc) {
-            _logger.error() << "Database exception: " << exc.message();
-        }
-        return result;
+        _logger.debug() << "Purged queue, count: " << result->deleted_count();
     }
 
     void SQSDatabase::DeleteQueue(const Entity::SQS::Queue &queue) {
-
-        try {
-            Poco::Data::Session session = GetSession();
-            session.begin();
-            session << "DELETE FROM sqs_queue WHERE queue_url=?", bind(queue.queueUrl), now;
-            session.commit();
-
-            _logger.trace() << "Queue deleted: " << queue.ToString();
-
-        } catch (Poco::Exception &exc) {
-            _logger.error() << "Database exception: " << exc.message();
-            throw Core::DatabaseException(exc.message(), 500);
-        }
-    }*/
-
-   void SQSDatabase::DeleteAllQueues() {
-       auto result = _queueCollection.delete_many({});
-       _logger.debug() << "All queues deleted, count: " << result->deleted_count();
+       auto result = _queueCollection.delete_many(make_document(kvp("queueUrl", queue.queueUrl)));
+       _logger.debug() << "Queues deleted, count: " << result->deleted_count();
    }
+
+    void SQSDatabase::DeleteAllQueues() {
+        auto result = _queueCollection.delete_many({});
+        _logger.debug() << "All queues deleted, count: " << result->deleted_count();
+    }
 
     Entity::SQS::Message SQSDatabase::CreateMessage(const Entity::SQS::Message &message) {
 

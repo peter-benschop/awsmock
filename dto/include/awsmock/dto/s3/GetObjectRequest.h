@@ -14,6 +14,11 @@ namespace AwsMock::Dto::S3 {
     struct GetObjectRequest {
 
       /**
+       * AWS region name
+       */
+      std::string region;
+
+      /**
        * Bucket
        */
       std::string bucket;

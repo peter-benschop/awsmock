@@ -84,7 +84,7 @@ namespace AwsMock::Dto::SQS {
               Poco::XML::AutoPtr<Poco::XML::Text> pBodyText = pDoc->createTextNode(it.body);
               pBody->appendChild(pBodyText);
 
-                for(auto &at : it.attributeList) {
+                for(auto &at : it.attributes) {
 
                     // MessageAttribute
                     Poco::XML::AutoPtr<Poco::XML::Element> pAttribute = pDoc->createElement("MessageAttribute");
