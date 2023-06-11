@@ -12,8 +12,7 @@
 
 // Poco includes
 #include "Poco/Logger.h"
-#include "Poco/Data/Session.h"
-#include "Poco/Data/SQLite/Connector.h"
+#include "Poco/LogStream.h"
 
 // AwsMock includes
 #include <awsmock/core/Logger.h>
@@ -24,7 +23,9 @@
 #include <awsmock/db/Database.h>
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/Object.h>
-#include "awsmock/entity/s3/BucketNotification.h"
+
+// MongoDB includes
+#include <mongocxx/stdx.hpp>
 
 #define MAX_FILES 100
 
@@ -49,7 +50,6 @@ namespace AwsMock::Database {
        * @return true if bucket exists
        * @throws DatabaseException
        */
-      [[deprecated("Use BucketExists(const Entity::S3::Bucket &bucket)")]]
       bool BucketExists(const std::string &region, const std::string &name);
 
       /**
@@ -64,11 +64,20 @@ namespace AwsMock::Database {
       /**
        * Returns the bucket by id
        *
-       * @param id bucket id
+       * @param oid bucket oid
        * @return bucket, if existing
        * @throws DatabaseException
        */
-      Entity::S3::Bucket GetBucketById(long id);
+      Entity::S3::Bucket GetBucketById(bsoncxx::oid oid);
+
+      /**
+       * Returns the bucket by id
+       *
+       * @param oid bucket oid
+       * @return bucket, if existing
+       * @throws DatabaseException
+       */
+      Entity::S3::Bucket GetBucketById(const std::string &oid);
 
       /**
        * Returns the bucket by region and name.
@@ -89,6 +98,13 @@ namespace AwsMock::Database {
       Entity::S3::Bucket CreateBucket(const Entity::S3::Bucket& bucket);
 
       /**
+       * List all buckets
+       *
+       * @return BucketList
+       */
+      Entity::S3::BucketList ListBuckets();
+
+      /**
        * CHeck whether the bucket has still objects
        *
        * @param bucket bucket entity
@@ -96,6 +112,15 @@ namespace AwsMock::Database {
        * @throws DatabaseException
        */
       bool HasObjects(const Entity::S3::Bucket &bucket);
+
+      /**
+       * Updates a bucket
+       *
+       * @param bucket bucket entity
+       * @return created bucket entity
+       * @throws DatabaseException
+       */
+      Entity::S3::Bucket UpdateBucket(const Entity::S3::Bucket& bucket);
 
       /**
        * Create a new S3 object in the S3 object table
@@ -136,28 +161,31 @@ namespace AwsMock::Database {
       /**
        * Gets an object from an bucket
        *
+       * @param region AWS S3 regsion name
        * @param bucket object bucket
        * @param key object key
        * @return S3 object
        * @throws DatabaseException
        */
-      Entity::S3::Object GetObject(const std::string &bucket, const std::string &key);
+      Entity::S3::Object GetObject(const std::string &region, const std::string &bucket, const std::string &key);
 
       /**
        * Gets an object from an bucket
        *
-       * @param id object ID
+       * @param oid object ID
        * @return S3 object
        * @throws DatabaseException
        */
-      Entity::S3::Object GetObjectById(long id);
+      Entity::S3::Object GetObjectById(bsoncxx::oid oid);
 
       /**
-       * List all buckets
+       * Gets an object from an bucket
        *
-       * @return BucketList
+       * @param oid object ID
+       * @return S3 object
+       * @throws DatabaseException
        */
-      Entity::S3::BucketList ListBuckets();
+      Entity::S3::Object GetObjectById(const std::string &oid);
 
       /**
        * List all objects of a bucket
@@ -166,69 +194,29 @@ namespace AwsMock::Database {
        * @param prefix S3 key prefix
        * @return ObjectList
        */
-      Entity::S3::ObjectList ListBucket(const std::string &bucket, const std::string &prefix);
+      Entity::S3::ObjectList ListBucket(const std::string &bucket, const std::string &prefix = {});
 
       /**
-       * Bucket notification exists
+       * Creates a bucket notification-
        *
-       * @param bucketNotification bucket notification entity
-       * @return true if bucket notification exists
-       * @throws DatabaseException
+       * <p>In case of a wildcard notification all notifications are added.</p>
+       *
+       * @param bucket S3 bucket
+       * @param bucketNotification bucket notification
+       * @return updated Bucket entity
        */
-      bool BucketNotificationExists(const Entity::S3::BucketNotification &bucketNotification);
+      Entity::S3::Bucket CreateBucketNotification(const Entity::S3::Bucket &bucket, const Entity::S3::BucketNotification &bucketNotification);
 
       /**
        * Creates a bucket notification-
        *
        * <p>Replaces the wildcard characters '*' with the SQLite wildcard '%'.</p>
        *
-       * @param bucketNotification bucket notification
-       * @return created BucketNotification entity
-       */
-      Entity::S3::BucketNotification CreateBucketNotification(const Entity::S3::BucketNotification &bucketNotification);
-
-      /**
-       * Returns a bucket notification by ID
-       *
-       * @param id notification ID
-       * @return BucketNotification
-       */
-      Entity::S3::BucketNotification GetBucketNotificationById(long id);
-
-      /**
-       * Returns a bucket notification by configuration ID
-       *
-       * @param region AWS region
        * @param bucket S3 bucket
-       * @param notificationId configuration ID
-       * @return BucketNotification
+       * @param bucketNotification bucket notification
+       * @return updated Bucket entity
        */
-      Entity::S3::BucketNotification GetBucketNotificationByNotificationId(const std::string &region, const std::string &bucket, const std::string &notificationId);
-
-      /**
-       * Returns a notification.
-       *
-       * <p>Event matching uses inverse wildcard matching, as the wildcard patterns are stored in the database.</p>
-       *
-       * @param bucketNotification bucket notification.
-       * @return BucketNotification
-       */
-      Entity::S3::BucketNotification GetBucketNotification(const Entity::S3::BucketNotification &bucketNotification);
-
-      /**
-       * Checks for a bucket notification
-       *
-       * @param bucketNotification notification
-       * @return true if bucket notification exists
-       */
-      bool HasBucketNotification(const Entity::S3::BucketNotification &bucketNotification);
-
-      /**
-       * Delete a bucket notification
-       *
-       * @param notification bucket notification
-       */
-      void DeleteBucketNotifications(const Entity::S3::BucketNotification& notification);
+      Entity::S3::Bucket DeleteBucketNotifications(const Entity::S3::Bucket &bucket, const Entity::S3::BucketNotification &bucketNotification);
 
       /**
        * Delete a bucket.
@@ -237,6 +225,11 @@ namespace AwsMock::Database {
        * @throws DatabaseException
        */
       void DeleteBucket(const Entity::S3::Bucket& bucket);
+
+      /**
+       * Deletes all buckets
+       */
+      void DeleteAllBuckets();
 
       /**
        * Delete an object.
@@ -253,15 +246,34 @@ namespace AwsMock::Database {
        * @param keys vector of object keys
        * @throws DatabaseException
        */
-      void DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys);
+      // TODO: do it!
+      //void DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys);
+
+      /**
+       * Deletes all objects
+       */
+      void DeleteAllObjects();
 
     private:
 
       /**
        * Logger
        */
-      Poco::Logger &_logger;
+      Poco::LogStream _logger;
 
+      /**
+       * S3 bucket collection
+       */
+      mongocxx::collection _bucketCollection{};
+
+      /**
+       * S3 object collection
+       */
+      mongocxx::collection _objectCollection{};
+
+      /**
+       * Allowed event types
+       */
       static std::map<std::string, std::vector<std::string>> allowedEventTypes;
 
     };

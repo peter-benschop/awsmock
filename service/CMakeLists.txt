@@ -3,13 +3,13 @@ set(LIBRARY awsmocksrv)
 set(LIBRARY_STATIC awsmocksrv_static)
 
 set(SOURCES src/S3Service.cpp src/SQSService.cpp src/LambdaService.cpp src/DockerService.cpp)
-#set(HEADERS include/awsmock/service/S3Service.h include/awsmock/service/SQSService.h)
 
 # Test directory
 add_subdirectory(tst)
 
 # Includes
-include_directories(include ../core/include ../db/include ../dto/include ../dto/include /usr/include /usr/local/include)
+include_directories(include ../core/include ../db/include ../dto/include ../dto/include /usr/include
+        /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
 
 add_library(${LIBRARY} SHARED ${SOURCES})
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})

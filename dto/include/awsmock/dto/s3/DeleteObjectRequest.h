@@ -19,6 +19,11 @@ namespace AwsMock::Dto::S3 {
       std::string region;
 
       /**
+       * Region
+       */
+      std::string user;
+
+      /**
        * Bucket
        */
       std::string bucket;
@@ -45,7 +50,7 @@ namespace AwsMock::Dto::S3 {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const DeleteObjectRequest &r) {
-          os << "DeleteObjectRequest={region='" + r.region + "' bucket='" + r.bucket + "' key='" + r.key + "'}";
+          os << "DeleteObjectRequest={region='" + r.region + "' user='" + r.user + "' bucket='" + r.bucket + "' key='" + r.key + "'}";
           return os;
       }
 

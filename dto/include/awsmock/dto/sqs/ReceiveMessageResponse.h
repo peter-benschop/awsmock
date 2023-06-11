@@ -84,7 +84,7 @@ namespace AwsMock::Dto::SQS {
               Poco::XML::AutoPtr<Poco::XML::Text> pBodyText = pDoc->createTextNode(it.body);
               pBody->appendChild(pBodyText);
 
-                for(auto &at : it.attributeList) {
+                for(auto &at : it.attributes) {
 
                     // MessageAttribute
                     Poco::XML::AutoPtr<Poco::XML::Element> pAttribute = pDoc->createElement("MessageAttribute");
@@ -93,13 +93,13 @@ namespace AwsMock::Dto::SQS {
                     // Name
                     Poco::XML::AutoPtr<Poco::XML::Element> pAttrName = pDoc->createElement("Name");
                     pAttribute->appendChild(pAttrName);
-                    Poco::XML::AutoPtr<Poco::XML::Text> pAttrNameText = pDoc->createTextNode(at.name);
-                    pAttrName->appendChild(pDoc->createTextNode(at.name));
+                    Poco::XML::AutoPtr<Poco::XML::Text> pAttrNameText = pDoc->createTextNode(at.attributeValue);
+                    pAttrName->appendChild(pAttrNameText);
 
                     // Value
                     Poco::XML::AutoPtr<Poco::XML::Element> pAttrValue = pDoc->createElement("Value");
                     pAttribute->appendChild(pAttrValue);
-                    Poco::XML::AutoPtr<Poco::XML::Text> pAttrValueText = pDoc->createTextNode(at.value);
+                    Poco::XML::AutoPtr<Poco::XML::Text> pAttrValueText = pDoc->createTextNode(at.attributeValue);
                     pAttrValue->appendChild(pAttrValueText);
                 }
           }

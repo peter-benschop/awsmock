@@ -12,9 +12,7 @@
 
 // Poco includes
 #include "Poco/Logger.h"
-#include "Poco/Data/Session.h"
-#include "Poco/Data/RecordSet.h"
-#include "Poco/Data/SQLite/Connector.h"
+#include "Poco/LogStream.h"
 
 // AwsMock includes
 #include <awsmock/core/Logger.h>
@@ -95,11 +93,20 @@ namespace AwsMock::Database {
       /**
        * Returns a lambda entity by primary key
        *
-       * @param id lambda primary key
+       * @param oid lambda primary key
        * @return lambda entity
        * @throws DatabaseException
        */
-      Entity::Lambda::Lambda GetLambdaById(long id);
+      Entity::Lambda::Lambda GetLambdaById(bsoncxx::oid oid);
+
+      /**
+       * Returns a lambda entity by primary key
+       *
+       * @param oid lambda primary key
+       * @return lambda entity
+       * @throws DatabaseException
+       */
+      Entity::Lambda::Lambda GetLambdaById(const std::string &oid);
 
       /**
        * Returns a lambda entity by ARN
@@ -118,12 +125,24 @@ namespace AwsMock::Database {
        */
       void DeleteLambda(const std::string &functionName);
 
+      /**
+       * Deletes all existing lambda functions
+       *
+       * @throws DatabaseException
+       */
+      void DeleteAllLambdas();
+
     private:
 
       /**
        * Logger
        */
-      Poco::Logger &_logger;
+      Poco::LogStream _logger;
+
+      /**
+       * Lambda collection
+       */
+      mongocxx::collection _lambdaCollection{};
 
     };
 

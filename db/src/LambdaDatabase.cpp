@@ -6,22 +6,22 @@
 
 namespace AwsMock::Database {
 
-    using namespace Poco::Data::Keywords;
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
 
     LambdaDatabase::LambdaDatabase(const Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("LambdaDatabase")) {
         Core::Logger::SetDefaultConsoleLogger("LambdaDatabase");
+
+        CreateCollection("lambda");
+
+        _lambdaCollection = GetConnection()["lambda"];
     }
 
     bool LambdaDatabase::LambdaExists(const std::string &function, const std::string &runtime) {
 
-        int count = 0;
-        Poco::Data::Session session = GetSession();
-
-        session << "SELECT COUNT(*) FROM lambda WHERE function=? AND runtime=?", bind(function), bind(runtime), into(count), now;
-
-        session.close();
-        poco_trace(_logger, "Lambda exists: " + std::to_string(count));
-
+        int64_t count = _lambdaCollection.count_documents(make_document(kvp("function", function), kvp("runtime", runtime)));
+        _logger.trace() << "Lambda function exists: " << (count > 0 ? "true" : "false");
         return count > 0;
     }
 
@@ -32,37 +32,30 @@ namespace AwsMock::Database {
 
     bool LambdaDatabase::LambdaExists(const std::string &functionName) {
 
-        int count = 0;
-        Poco::Data::Session session = GetSession();
-
-        session << "SELECT COUNT(*) FROM lambda WHERE function=?", bind(functionName), into(count), now;
-
-        session.close();
-        poco_trace(_logger, "Lambda exists: " + std::to_string(count));
-
+        int64_t count = _lambdaCollection.count_documents(make_document(kvp("function", functionName)));
+        _logger.trace() << "Lambda function exists: " << (count > 0 ? "true" : "false");
         return count > 0;
     }
 
     Entity::Lambda::Lambda LambdaDatabase::CreateLambda(const Entity::Lambda::Lambda &lambda) {
 
-        long id = 0;
+        auto result = _lambdaCollection.insert_one(lambda.ToDocument());
+        _logger.trace() << "Bucket created, oid: " << result->inserted_id().get_oid().value.to_string();
+
+        return GetLambdaById(result->inserted_id().get_oid().value);
+    }
+
+    Entity::Lambda::Lambda LambdaDatabase::GetLambdaById(bsoncxx::oid oid) {
+
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _lambdaCollection.find_one(make_document(kvp("_id", oid)));
         Entity::Lambda::Lambda result;
-        try {
-            Poco::Data::Session session = GetSession();
-            session.begin();
-            session
-                << "INSERT INTO lambda(function,runtime,role,handler,size,image_id,container_id,tag,arn,host_port,last_started) VALUES(?,?,?,?,?,?,?,?,?,?,?) returning id",
-                bind(lambda.function), bind(lambda.runtime), bind(lambda.role), bind(lambda.handler), bind(lambda.size), bind(lambda.imageId), bind(lambda.containerId),
-                bind(lambda.tag), bind(lambda.arn), bind(lambda.hostPort), bind(lambda.lastStarted), into(id), now;
-            session.commit();
+        result.FromDocument(mResult);
 
-            poco_trace(_logger, "Lambda created: " + lambda.ToString());
+        return result;
+    }
 
-        } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
-            throw Core::DatabaseException(exc.message());
-        }
-        return GetLambdaById(id);
+    Entity::Lambda::Lambda LambdaDatabase::GetLambdaById(const std::string &oid) {
+        return GetLambdaById(bsoncxx::oid(oid));
     }
 
     Entity::Lambda::Lambda LambdaDatabase::CreateOrUpdateLambda(const Entity::Lambda::Lambda &lambda) {
@@ -76,80 +69,32 @@ namespace AwsMock::Database {
 
     Entity::Lambda::Lambda LambdaDatabase::UpdateLambda(const Entity::Lambda::Lambda &lambda) {
 
-        int id = 0;
-        try {
-            Poco::Data::Session session = GetSession();
-            session.begin();
-            session << "UPDATE lambda SET role=?,handler=?,size=?,image_id=?,container_id=?,tag=?,arn=?,host_port=?,last_started=?,modified=CURRENT_TIMESTAMP "
-                       "WHERE function=? AND runtime=? returning id",
-                bind(lambda.role), bind(lambda.handler), bind(lambda.size), bind(lambda.imageId), bind(lambda.containerId), bind(lambda.tag), bind(lambda.arn),
-                bind(lambda.hostPort), bind(lambda.lastStarted), bind(lambda.function), bind(lambda.runtime), into(id), now;
-            session.commit();
+        auto result = _lambdaCollection.replace_one(make_document(kvp("region", lambda.region), kvp("function", lambda.function), kvp("runtime", lambda.runtime)),
+                                                    lambda.ToDocument());
 
-            poco_trace(_logger, "Lambda updated, lambda: " + lambda.ToString());
+        _logger.trace() << "Lambda updated: " << lambda.ToString();
 
-        } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
-            throw Core::DatabaseException(exc.message(), 500);
-        }
-        return GetLambdaById(id);
-    }
-
-    Entity::Lambda::Lambda LambdaDatabase::GetLambdaById(long id) {
-
-        Entity::Lambda::Lambda result;
-        try {
-            Poco::Data::Session session = GetSession();
-            session.begin();
-            session << "SELECT id,function,runtime,role,handler,size,image_id,container_id,tag,arn,host_port,last_started,created,modified FROM lambda WHERE id=?",
-                bind(id), into(result.id), into(result.function), into(result.runtime), into(result.role), into(result.handler), into(result.size),
-                into(result.imageId), into(result.containerId), into(result.tag), into(result.arn), into(result.hostPort), into(result.lastStarted),
-                into(result.created), into(result.modified), now;
-            session.commit();
-
-            poco_trace(_logger, "Got lambda: " + result.ToString());
-
-        } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
-        }
-        return result;
+        return GetLambdaByArn(lambda.arn);
     }
 
     Entity::Lambda::Lambda LambdaDatabase::GetLambdaByArn(const std::string &arn) {
 
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _lambdaCollection.find_one(make_document(kvp("arn", arn)));
         Entity::Lambda::Lambda result;
-        try {
-            Poco::Data::Session session = GetSession();
-            session.begin();
-            session << "SELECT id,function,runtime,role,handler,size,image_id,container_id,tag,arn,host_port,last_started,created,modified FROM lambda WHERE arn=?",
-                bind(arn), into(result.id), into(result.function), into(result.runtime), into(result.role), into(result.handler), into(result.size),
-                into(result.imageId), into(result.containerId), into(result.tag), into(result.arn), into(result.hostPort), into(result.lastStarted),
-                into(result.created), into(result.modified), now;
-            session.commit();
+        result.FromDocument(mResult);
 
-            poco_trace(_logger, "Got lambda: " + result.ToString());
-
-        } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
-        }
         return result;
     }
 
     void LambdaDatabase::DeleteLambda(const std::string &functionName) {
 
-        int id = 0;
-        try {
-            Poco::Data::Session session = GetSession();
-            session.begin();
-            session << "DELETE from lambda WHERE function=?",
-                bind(functionName), now;
-            session.commit();
-
-            poco_trace(_logger, "Lambda deleted, lambda: " + functionName);
-
-        } catch (Poco::Exception &exc) {
-            poco_error(_logger, "Database exception: " + exc.message());
-            throw Core::DatabaseException(exc.message(), 500);
-        }
+        auto result = _lambdaCollection.delete_many(make_document(kvp("function", functionName)));
+        _logger.debug() << "Lambda deleted, function: " << functionName << " count: " << result->deleted_count();
     }
+
+    void LambdaDatabase::DeleteAllLambdas() {
+        auto result = _lambdaCollection.delete_many({});
+        _logger.debug() << "All lambdas deleted, count: " << result->deleted_count();
+    }
+
 } // namespace AwsMock::Database

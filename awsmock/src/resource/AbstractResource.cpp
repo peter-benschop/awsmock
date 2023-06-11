@@ -80,7 +80,7 @@ namespace AwsMock::Resource {
         }
 
         if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_OPTIONS) {
-            this->handleOptions(request, response);
+            this->handleOptions(response);
         }
 
         if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_HEAD) {
@@ -128,7 +128,7 @@ namespace AwsMock::Resource {
         errorStream.flush();
     }
 
-    void AbstractResource::handleOptions(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+    void AbstractResource::handleOptions(Poco::Net::HTTPServerResponse &response) {
         poco_trace(_logger, "Request, method: " + request.getMethod());
         response.setStatusAndReason(
             Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED,

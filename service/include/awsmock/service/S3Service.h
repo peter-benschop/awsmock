@@ -224,28 +224,22 @@ namespace AwsMock::Service {
       std::string GetMultipartUploadDirectory(const std::string &uploadId);
 
       /**
-       * Returns a event notification.
-       *
-       * @param key S3 object key
-       * @return all directories before file
-       */
-      static std::string GetEventNotification(const std::string &key);
-
-      /**
        * Create a queue notification
        *
+       * @param bucket bucket to modify
        * @param request put bucket notification request.
-       * @return BucketNotification.
+       * @return updated bucket.
        */
-      Database::Entity::S3::BucketNotification CreateQueueConfiguration(const Dto::S3::PutBucketNotificationRequest &request);
+      Database::Entity::S3::Bucket CreateQueueConfiguration(const Database::Entity::S3::Bucket &bucket, const Dto::S3::PutBucketNotificationRequest &request);
 
       /**
        * Create a lambda function notification
        *
+       * @param bucket bucket to modify
        * @param request put bucket notification request.
-       * @return BucketNotification.
+       * @return updated bucket.
        */
-      Database::Entity::S3::BucketNotification CreateLambdaConfiguration(const Dto::S3::PutBucketNotificationRequest &request);
+      Database::Entity::S3::Bucket CreateLambdaConfiguration(const Database::Entity::S3::Bucket &bucket, const Dto::S3::PutBucketNotificationRequest &request);
 
       /**
        * Deletes an object

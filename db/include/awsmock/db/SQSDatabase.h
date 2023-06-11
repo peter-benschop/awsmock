@@ -12,6 +12,7 @@
 
 // Poco includes
 #include "Poco/Logger.h"
+#include "Poco/LogStream.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/SQLite/Connector.h"
@@ -24,9 +25,7 @@
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/db/Database.h>
 #include <awsmock/entity/sqs/Message.h>
-#include <awsmock/entity/sqs/MessageAttribute.h>
 #include <awsmock/entity/sqs/Queue.h>
-#include <awsmock/entity/sqs/QueueAttribute.h>
 
 namespace AwsMock::Database {
 
@@ -72,11 +71,20 @@ namespace AwsMock::Database {
       /**
        * Returns a queue by primary key
        *
-       * @param id queue primary key
+       * @param oid queue primary key
        * @return queue entity
        * @throws DatabaseException
        */
-      Entity::SQS::Queue GetQueueById(long id);
+      Entity::SQS::Queue GetQueueById(bsoncxx::oid oid);
+
+      /**
+       * Returns a queue by primary key
+       *
+       * @param oid queue primary key
+       * @return queue entity
+       * @throws DatabaseException
+       */
+      Entity::SQS::Queue GetQueueById(const std::string &oid);
 
       /**
        * List all available queues
@@ -96,39 +104,17 @@ namespace AwsMock::Database {
       void PurgeQueue(const std::string &region, const std::string &queueUrl);
 
       /**
-       * Create a new queue attribute
-       *
-       * @param queueAttribute queue attribute entity
-       * @return created SQS queue attribute entity
-       * @throws DatabaseException
-       */
-      Entity::SQS::QueueAttribute CreateQueueAttributes(const Entity::SQS::QueueAttribute& queueAttribute);
-
-      /**
-       * Returns a queue attribute by primary key
-       *
-       * @param id queue ID
-       * @return queue attribute entity
-       * @throws DatabaseException
-       */
-      Entity::SQS::QueueAttribute GetQueueAttributesById(long id);
-
-      /**
-       * Returns a queue attribute by queue URL
-       *
-       * @param queueUrl queue URL
-       * @return queue attribute entity
-       * @throws DatabaseException
-       */
-      Entity::SQS::QueueAttribute GetQueueAttributesByQueueUrl(const std::string &queueUrl);
-
-      /**
-       * Delete a queue.
+       * Deletes a queue.
        *
        * @param queue queue entity
        * @throws DatabaseException
        */
       void DeleteQueue(const Entity::SQS::Queue &queue);
+
+      /**
+       * Deletes all queues
+       */
+      void DeleteAllQueues();
 
       /**
        * Creates a new message in the SQS message table
@@ -142,11 +128,29 @@ namespace AwsMock::Database {
       /**
        * Returns a message by ID.
        *
-       * @param id message ID
+       * @param oid message objectId
        * @return message entity
        * @throws Core::DatabaseException
        */
-      Entity::SQS::Message GetMessageById(long id);
+      Entity::SQS::Message GetMessageById(bsoncxx::oid oid);
+
+      /**
+       * Returns a message by ID.
+       *
+       * @param oid message objectId
+       * @return message entity
+       * @throws Core::DatabaseException
+       */
+      Entity::SQS::Message GetMessageById(const std::string & oid);
+
+      /**
+       * Returns a message by receipt handle.
+       *
+       * @param receiptHandle message receipt handle
+       * @return message entity
+       * @throws Core::DatabaseException
+       */
+      Entity::SQS::Message GetMessageByReceiptHandle(const std::string &receiptHandle);
 
       /**
        * Receive messages from an queue.
@@ -167,6 +171,22 @@ namespace AwsMock::Database {
       [[maybe_unused]] void ResetMessages(const std::string& queueUrl, long visibility);
 
       /**
+       * Count the number of message by status
+       *
+       * @param queueUrl URL of the queue
+       * @param visibility visibility period in seconds
+       */
+      [[maybe_unused]] long CountMessages(const std::string &region, const std::string& queueUrl);
+
+      /**
+       * Count the number of message by status
+       *
+       * @param queueUrl URL of the queue
+       * @param visibility visibility period in seconds
+       */
+      [[maybe_unused]] long CountMessagesByStatus(const std::string &region, const std::string& queueUrl, int status);
+
+      /**
        * Deletes a message.
        *
        * @param message message to delete
@@ -174,13 +194,29 @@ namespace AwsMock::Database {
        */
       void DeleteMessage(const Entity::SQS::Message &message);
 
+      /**
+       * Deletes a messages.
+       *
+       * @throws Core::DatabaseException
+       */
+      void DeleteAllMessages();
+
     private:
 
       /**
        * Logger
        */
-      Poco::Logger &_logger;
+      Poco::LogStream _logger;
 
+      /**
+       * SQS queue collection
+       */
+      mongocxx::collection _queueCollection{};
+
+      /**
+       * SQS message collection
+       */
+      mongocxx::collection _messageCollection{};
     };
 
 } // namespace AwsMock::Database

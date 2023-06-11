@@ -58,9 +58,9 @@ namespace AwsMock::Service {
       /**
        * Invoke lambda function
        *
-       * @param notification S3 event notification
+       * @param eventNotification S3 event eventNotification
        */
-      void InvokeEventFunction(const Dto::S3::EventNotification &notification);
+      void InvokeEventFunction(const Dto::S3::EventNotification &eventNotification);
 
       /**
        * Delete lambda function

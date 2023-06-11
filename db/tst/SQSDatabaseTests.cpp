@@ -15,8 +15,9 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/db/SQSDatabase.h>
 
+#define CONFIG_FILE "/tmp/aws-mock.properties"
 #define REGION "eu-central-1"
-#define QUEUE "test-QUEUE"
+#define QUEUE "test-queue"
 #define QUEUE_URL "http://localhost:4567/000000000000/test-QUEUE"
 #define BODY "{\"TestObject\": \"TestValue\"}"
 #define OWNER "test-owner"
@@ -30,36 +31,18 @@ namespace AwsMock::Database {
     protected:
 
       void SetUp() override {
+          _region = _configuration.getString("awsmock.region");
       }
 
       void TearDown() override {
-          try {
-              Poco::Data::Statement stmt(_session);
-              stmt << "DELETE FROM sqs_queue_attribute;"
-                      "DELETE FROM sqs_message_attribute;"
-                      "DELETE FROM sqs_message;"
-                      "DELETE FROM sqs_queue;", now;
-          } catch(Poco::Exception &exc){
-              std::cerr << exc.message() << std::endl;
-          }
+          _sqsDatabase.DeleteAllQueues();
+          _sqsDatabase.DeleteAllMessages();
       }
 
-      Core::Configuration _configuration = Core::Configuration("/tmp/aws-mock.properties");
-      SQSDatabase _database = SQSDatabase(_configuration);
-      Poco::Data::Session _session = _database.GetSession();
+      std::string _region;
+      Core::Configuration _configuration = Core::Configuration(CONFIG_FILE);
+      SQSDatabase _sqsDatabase = SQSDatabase(_configuration);
     };
-
-    TEST_F(SQSDatabaseTest, ConstructorTest) {
-
-        // arrange
-        int count = 0;
-
-        // act
-        _session << "SELECT COUNT(*) FROM sqs_queue", into(count), now;
-
-        // assert
-        EXPECT_EQ(count, 0);
-    }
 
     TEST_F(SQSDatabaseTest, QueueCreateTest) {
 
@@ -67,7 +50,7 @@ namespace AwsMock::Database {
         Entity::SQS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
 
         // act
-        Entity::SQS::Queue result = _database.CreateQueue(queue);
+        Entity::SQS::Queue result = _sqsDatabase.CreateQueue(queue);
 
         // assert
         EXPECT_TRUE(result.name == QUEUE);
@@ -78,28 +61,160 @@ namespace AwsMock::Database {
 
         // arrange
         Entity::SQS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
-        queue = _database.CreateQueue(queue);
+        queue = _sqsDatabase.CreateQueue(queue);
 
         // act
-        Entity::SQS::QueueList result = _database.ListQueues(queue.region);
+        Entity::SQS::QueueList result = _sqsDatabase.ListQueues(queue.region);
 
         // assert
         EXPECT_EQ(result.size(), 1);
+    }
+
+    TEST_F(SQSDatabaseTest, QueuePurgeTest) {
+
+        // arrange
+        Entity::SQS::Queue queue = {.region=_region, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
+        queue = _sqsDatabase.CreateQueue(queue);
+        Entity::SQS::Message message = {.region=_region, .queueUrl=queue.name, .body=BODY};
+        _sqsDatabase.CreateMessage(message);
+
+        // act
+        _sqsDatabase.PurgeQueue(queue.region, queue.queueUrl);
+        long result = _sqsDatabase.CountMessages(queue.region, queue.queueUrl);
+
+        // assert
+        EXPECT_EQ(0, result);
+    }
+
+    TEST_F(SQSDatabaseTest, QueueDeleteTest) {
+
+        // arrange
+        Entity::SQS::Queue queue = {.region=_region, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
+        queue = _sqsDatabase.CreateQueue(queue);
+
+        // act
+        _sqsDatabase.DeleteQueue(queue);
+        bool result = _sqsDatabase.QueueExists(queue.region, queue.queueUrl);
+
+        // assert
+        EXPECT_FALSE(result);
     }
 
     TEST_F(SQSDatabaseTest, MessageCreateTest) {
 
         // arrange
         Entity::SQS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
-        queue = _database.CreateQueue(queue);
-        Entity::SQS::Message message = {.queueUrl=queue.name, .body=BODY,};
+        queue = _sqsDatabase.CreateQueue(queue);
+        Entity::SQS::Message message = {.region=REGION, .queueUrl=queue.name, .body=BODY};
 
         // act
-        Entity::SQS::Message result = _database.CreateMessage(message);
+        Entity::SQS::Message result = _sqsDatabase.CreateMessage(message);
 
         // assert
-        EXPECT_GT(result.id, 0);
+        EXPECT_FALSE(result.oid.empty());
         EXPECT_TRUE(result.body == BODY);
+    }
+
+    TEST_F(SQSDatabaseTest, MessageReceiveTest) {
+
+        // arrange
+        Entity::SQS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
+        queue = _sqsDatabase.CreateQueue(queue);
+        Entity::SQS::Message message = {.region=REGION, .queueUrl=queue.name, .body=BODY};
+        _sqsDatabase.CreateMessage(message);
+
+        // act
+        Entity::SQS::MessageList messageList;
+        _sqsDatabase.ReceiveMessages(REGION, QUEUE, messageList);
+
+        // assert
+        EXPECT_FALSE(messageList.empty());
+    }
+
+    TEST_F(SQSDatabaseTest, MessageCountTest) {
+
+        // arrange
+        Entity::SQS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
+        queue = _sqsDatabase.CreateQueue(queue);
+        Entity::SQS::Message message = {.region=REGION, .queueUrl=queue.name, .body=BODY};
+        _sqsDatabase.CreateMessage(message);
+
+        // act
+        long result = _sqsDatabase.CountMessages(REGION, QUEUE);
+
+        // assert
+        EXPECT_EQ(1, result);
+    }
+
+    TEST_F(SQSDatabaseTest, MessageCountStatusTest) {
+
+        // arrange
+        Entity::SQS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
+        queue = _sqsDatabase.CreateQueue(queue);
+        Entity::SQS::Message message = {.region=REGION, .queueUrl=queue.name, .body=BODY};
+        _sqsDatabase.CreateMessage(message);
+
+        // act
+        long result = _sqsDatabase.CountMessagesByStatus(REGION, QUEUE, Entity::SQS::INITIAL);
+
+        // assert
+        EXPECT_EQ(1, result);
+    }
+
+    TEST_F(SQSDatabaseTest, MessageResetTest) {
+
+        // arrange
+        Entity::SQS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
+        queue = _sqsDatabase.CreateQueue(queue);
+        Entity::SQS::Message message = {.region=REGION, .queueUrl=queue.name, .body=BODY};
+        _sqsDatabase.CreateMessage(message);
+        Entity::SQS::MessageList messageList;
+        _sqsDatabase.ReceiveMessages(REGION, QUEUE, messageList);
+        Poco::Thread().sleep(1000);
+
+        // act
+        _sqsDatabase.ResetMessages(QUEUE, 1);
+        long result = _sqsDatabase.CountMessagesByStatus(REGION, QUEUE, Entity::SQS::INITIAL);
+
+        // assert
+        EXPECT_EQ(1, result);
+    }
+
+    TEST_F(SQSDatabaseTest, MessageGetByReceiptHandleTest) {
+
+        // arrange
+        Entity::SQS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
+        queue = _sqsDatabase.CreateQueue(queue);
+        Entity::SQS::Message message = {.region=REGION, .queueUrl=queue.name, .body=BODY};
+        _sqsDatabase.CreateMessage(message);
+        Entity::SQS::MessageList messageList;
+        _sqsDatabase.ReceiveMessages(REGION, QUEUE, messageList);
+
+        // act
+        Entity::SQS::Message result = messageList[0];
+        result = _sqsDatabase.GetMessageByReceiptHandle(result.receiptHandle);
+
+        // assert
+        EXPECT_EQ(result.receiptHandle, messageList[0].receiptHandle);
+    }
+
+    TEST_F(SQSDatabaseTest, MessageDeleteTest) {
+
+        // arrange
+        Entity::SQS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
+        queue = _sqsDatabase.CreateQueue(queue);
+        Entity::SQS::Message message = {.region=REGION, .queueUrl=queue.name, .body=BODY};
+        _sqsDatabase.CreateMessage(message);
+        Entity::SQS::MessageList messageList;
+        _sqsDatabase.ReceiveMessages(REGION, QUEUE, messageList);
+
+        // act
+        Entity::SQS::Message resultMessage = messageList[0];
+        _sqsDatabase.DeleteMessage(resultMessage);
+        long result = _sqsDatabase.CountMessages(REGION, QUEUE);
+
+        // assert
+        EXPECT_EQ(0, result);
     }
 
 } // namespace AwsMock::Core

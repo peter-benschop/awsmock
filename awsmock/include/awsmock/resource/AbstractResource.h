@@ -102,10 +102,9 @@ namespace AwsMock::Resource {
       /**
        * Handles the HTTP OPTIONS method.
        *
-       * @param request HTTP request
        * @param response HTTP response
        */
-      virtual void handleOptions(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response);
+      virtual void handleOptions(Poco::Net::HTTPServerResponse &response);
 
       /**
        * Handles the HTTP HEAD method.

@@ -7,22 +7,19 @@
 
 // C++ standard includes
 #include <string>
-#include <vector>
-#include <iostream>
 
 // Poco includes
-#include "Poco/AutoPtr.h"
 #include "Poco/Logger.h"
-#include "Poco/Data/Session.h"
-#include <Poco/Data/SessionPool.h>
-#include <Poco/Data/SessionFactory.h>
-#include "Poco/Data/SQLite/Connector.h"
+#include "Poco/LogStream.h"
+
+// MongoDB includes
+#include <mongocxx/client.hpp>
+#include <mongocxx/pool.hpp>
+#include <mongocxx/uri.hpp>
 
 // AwsMock includes
 #include <awsmock/core/Logger.h>
 #include <awsmock/core/Configuration.h>
-#include <awsmock/core/DirUtils.h>
-#include <awsmock/core/FileUtils.h>
 
 namespace AwsMock::Database {
 
@@ -38,51 +35,48 @@ namespace AwsMock::Database {
       explicit Database(const Core::Configuration &configuration);
 
       /**
-       * Destructor
+       * Returns a MongoDB connection from the pool
+       *
+       * @return MongoDB database client
        */
-      ~Database();
+      mongocxx::database GetConnection();
+
+    protected:
 
       /**
-       * Returns a session
+       * Create a collection.
        *
-       * @return returns a database session
+       * <p>The collection is only created, in case the collection does not exist already.</p>
+       *
+       * @param name collection name
        */
-      Poco::Data::Session GetSession();
+      void CreateCollection(const std::string &name);
+
+      /**
+       * Create a collection.
+       *
+       * <p>The collection is only dropped, in case the collection exists.</p>
+       *
+       * @param name collection name
+       */
+      void DropCollection(const std::string &name);
 
     private:
 
       /**
-       * Initialize the database
-       */
-      void Initialize();
-
-      /**
-       * Create database tables
-       *
-       * @param dataDir database directory
-       * @param dbFile database file
-       */
-      void CreateDatabase(const std::string &dataDir, const std::string &dbFile);
-
-      /**
        * Logger
        */
-      Poco::Logger &_logger;
+      Poco::LogStream _logger;
 
       /**
-       * Logger
+       * Application configuration
        */
       const Core::Configuration &_configuration;
 
       /**
-       * SQLite database file
+       * MongoDB connection pool
        */
-      std::string _dbFile;
-
-      /**
-       * Session pool
-       */
-      Poco::AutoPtr<Poco::Data::SessionPool> _sessionPool;
+      std::shared_ptr<mongocxx::pool> _connectionPool;
 
     };
 

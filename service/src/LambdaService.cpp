@@ -6,8 +6,6 @@
 
 namespace AwsMock::Service {
 
-    using namespace Poco::Data::Keywords;
-
     LambdaService::LambdaService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("LambdaService")), _configuration(configuration) {
         Initialize();
     }
@@ -86,21 +84,27 @@ namespace AwsMock::Service {
         return response;
     }
 
-    void LambdaService::InvokeEventFunction(const Dto::S3::EventNotification &notification) {
-        poco_debug(_logger, "Invocation event function notification: " + notification.ToString());
+    void LambdaService::InvokeEventFunction(const Dto::S3::EventNotification &eventNotification) {
+        poco_debug(_logger, "Invocation event function eventNotification: " + eventNotification.ToString());
 
-        for (const auto &record : notification.records) {
+        for (const auto &record : eventNotification.records) {
 
-            // Get the bucket notification
-            Database::Entity::S3::BucketNotification
-                bucketNotification = _s3Database->GetBucketNotificationByNotificationId(record.region, record.s3.bucket.name, record.s3.configurationId);
-            poco_debug(_logger, "Got bucket notification: " + bucketNotification.ToString());
+            // Get the bucket eventNotification
+            Database::Entity::S3::Bucket bucket = _s3Database->GetBucketByRegionName(record.region, record.s3.bucket.name);
+            auto notification =
+                find_if(bucket.notifications.begin(), bucket.notifications.end(), [&record](const Database::Entity::S3::BucketNotification eventNotification) {
+                  return record.eventName == eventNotification.event;
+                });
+            if (notification != bucket.notifications.end()) {
 
-            // Get the lambda entity
-            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->GetLambdaByArn(bucketNotification.lambdaArn);
-            poco_debug(_logger, "Got lambda entity notification: " + lambda.ToString());
+                poco_debug(_logger, "Got bucket eventNotification: " + bucketNotification.ToString());
 
-            SendInvocationRequest(lambda.hostPort, notification.ToJson());
+                // Get the lambda entity
+                Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->GetLambdaByArn(notification->lambdaArn);
+                poco_debug(_logger, "Got lambda entity eventNotification: " + lambda.ToString());
+
+                SendInvocationRequest(lambda.hostPort, eventNotification.ToJson());
+            }
         }
     }
 

@@ -14,6 +14,11 @@ namespace AwsMock::Dto::S3 {
     struct ListBucketRequest {
 
       /**
+       * Region
+       */
+      std::string region;
+
+      /**
        * Name
        */
       std::string name;
