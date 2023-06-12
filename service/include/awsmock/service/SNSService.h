@@ -21,6 +21,7 @@
 #include "awsmock/dto/sns/CreateTopicRequest.h"
 #include "awsmock/dto/sns/CreateTopicResponse.h"
 #include "awsmock/dto/sns/ListTopicsResponse.h"
+#include "awsmock/dto/sns/DeleteTopicResponse.h"
 #include "awsmock/db/SNSDatabase.h"
 
 #define DEFAULT_ACCOUNT_ID "000000000000"
@@ -75,11 +76,12 @@ namespace AwsMock::Service {
       /**
        * Delete a queue
        *
-       * @param request delete request DTO
+       * @param region AWS region name
+       * @param topicArn topic ARN
        * @return DeleteQueueResponse
        * @throws ServiceException
        */
-      //Dto::SQS::DeleteQueueResponse DeleteQueue(const Dto::SQS::DeleteQueueRequest &request);
+      Dto::SNS::DeleteTopicResponse DeleteTopic(const std::string &region, const std::string &topicArn);
 
       /**
        * Creates a new queue

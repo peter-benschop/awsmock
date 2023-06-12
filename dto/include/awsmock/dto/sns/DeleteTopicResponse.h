@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_LISTTOPICSRESPONSE_H
-#define AWSMOCK_DTO_SQS_LISTTOPICSRESPONSE_H
+#ifndef AWSMOCK_DTO_SQS_DELETETOPICSRESPONSE_H
+#define AWSMOCK_DTO_SQS_DELETETOPICSRESPONSE_H
 
 // C++ standard includes
 #include <string>
@@ -31,12 +31,7 @@
 
 namespace AwsMock::Dto::SNS {
 
-    struct ListTopicsResponse {
-
-      /**
-       * List of topics
-       */
-      Database::Entity::SNS::TopicList topicList;
+    struct DeleteTopicResponse {
 
       /**
        * Convert to XML representation
@@ -49,26 +44,8 @@ namespace AwsMock::Dto::SNS {
           Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
 
           // Root element
-          Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("ListTopicsResponse");
+          Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("DeleteTopicResponse");
           pDoc->appendChild(pRoot);
-
-          // ListTopicsResult
-          Poco::XML::AutoPtr<Poco::XML::Element> pListTopicResult = pDoc->createElement("ListTopicsResult");
-          pRoot->appendChild(pListTopicResult);
-
-          Poco::XML::AutoPtr<Poco::XML::Element> pTopics = pDoc->createElement("Topics");
-          pListTopicResult->appendChild(pTopics);
-
-          for (auto &it : topicList) {
-
-              Poco::XML::AutoPtr<Poco::XML::Element> pTopicMember = pDoc->createElement("member");
-              pTopics->appendChild(pTopicMember);
-
-              Poco::XML::AutoPtr<Poco::XML::Element> pTopicArn = pDoc->createElement("TopicArn");
-              pTopicMember->appendChild(pTopicArn);
-              Poco::XML::AutoPtr<Poco::XML::Text> pTopicArnText = pDoc->createTextNode(it.topicArn);
-              pTopicArn->appendChild(pTopicArnText);
-          }
 
           // Metadata
           Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = pDoc->createElement("ResponseMetadata");
@@ -104,12 +81,8 @@ namespace AwsMock::Dto::SNS {
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const ListTopicsResponse &r) {
-          os << "ListTopicsResponse={topicList=[";
-          for (auto &l : r.topicList) {
-              os << l.ToString();
-          }
-          os << "]}";
+      friend std::ostream &operator<<(std::ostream &os, const DeleteTopicResponse &r) {
+          os << "DeleteTopicResponse={topicList=[]}";
           return os;
       }
 
@@ -117,4 +90,4 @@ namespace AwsMock::Dto::SNS {
 
 } // namespace AwsMock::Dto::SNS
 
-#endif // AWSMOCK_DTO_SQS_LISTTOPICSRESPONSE_H
+#endif // AWSMOCK_DTO_SQS_DELETETOPICSRESPONSE_H

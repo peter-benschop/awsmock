@@ -5,6 +5,7 @@ namespace AwsMock {
 
     SNSHandler::SNSHandler(Core::Configuration &configuration, Core::MetricService &metricService)
         : AbstractResource(), _logger(Poco::Logger::get("SNSHandler")), _configuration(configuration), _metricService(metricService), _snsService(configuration) {
+        Core::Logger::SetDefaultConsoleLogger("SNSHandler");
     }
 
     void SNSHandler::handleGet(Poco::Net::HTTPServerRequest &request,
@@ -54,11 +55,19 @@ namespace AwsMock {
 
                 Dto::SNS::ListTopicsResponse snsResponse = _snsService.ListTopics(region);
                 SendOkResponse(response, snsResponse.ToXml());
+
+            } else if(action == "DeleteTopic") {
+
+                std::string topicArn = GetStringParameter(payload, "TopicArn");
+                _logger.debug() << "Topic ARN: " << topicArn;
+
+                Dto::SNS::DeleteTopicResponse snsResponse = _snsService.DeleteTopic(region, topicArn);
+                SendOkResponse(response, snsResponse.ToXml());
             }
 
         } catch (Core::ServiceException &exc) {
             _logger.error() << "Service exception: " << exc.message();
-            SendErrorResponse("SQS", response, exc);
+            SendErrorResponse("SNS", response, exc);
         }
     }
 

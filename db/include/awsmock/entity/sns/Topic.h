@@ -127,21 +127,6 @@ namespace AwsMock::Database::Entity::SNS {
       }
 
       /**
-       * Converts the DTO to a JSON representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] Poco::JSON::Object ToJsonObject() const {
-          try {
-              Poco::JSON::Object rootJson;
-              rootJson.set("topicName", topicName);
-              return rootJson;
-          } catch (Poco::Exception &exc) {
-              throw Core::ServiceException(exc.message(), 500);
-          }
-      }
-
-      /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.

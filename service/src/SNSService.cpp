@@ -51,7 +51,7 @@ namespace AwsMock::Service {
 
             Database::Entity::SNS::TopicList topicList = _database->ListTopics(region);
             auto listTopicsResponse = Dto::SNS::ListTopicsResponse(topicList);
-            _logger.trace() << "SNS list topics response: " << listTopicsResponse.ToJson();
+            _logger.trace() << "SNS list topics response: " << listTopicsResponse.ToXml();
 
             return listTopicsResponse;
 
@@ -85,29 +85,29 @@ namespace AwsMock::Service {
         _logger.trace() << "Put queue sqs request, request: " << request.ToString();
         Dto::SQS::PutQueueAttributesResponse response;
         return response;
-    }
+    }*/
 
-    Dto::SQS::DeleteQueueResponse SNSService::DeleteQueue(const Dto::SQS::DeleteQueueRequest &request) {
-        _logger.trace() << "Delete queue request, request: " << request.ToString();
+    Dto::SNS::DeleteTopicResponse SNSService::DeleteTopic(const std::string &region, const std::string &topicArn) {
+        _logger.trace() << "Delete topic request, region: " << region << " topicArn: " << topicArn;
 
-        Dto::SQS::DeleteQueueResponse response;
+        Dto::SNS::DeleteTopicResponse response;
         try {
             // Check existence
-            if (!_database->QueueExists(request.queueUrl)) {
-                throw Core::ServiceException("Queue does not exist", 500);
+            if (!_database->TopicExists(topicArn)) {
+                throw Core::ServiceException("Topic does not exist", 500);
             }
 
             // Update database
-            _database->DeleteQueue({.queueUrl=request.queueUrl});
+            _database->DeleteTopic({.region=region, .topicArn=topicArn});
 
         } catch (Poco::Exception &ex) {
-            _logger.error() << "SQS delete queue failed, message: " << ex.message();
+            _logger.error() << "SNS delete topic failed, message: " << ex.message();
             throw Core::ServiceException(ex.message(), 500);
         }
         return response;
     }
 
-    Dto::SQS::CreateMessageResponse SNSService::CreateMessage(const Dto::SQS::CreateMessageRequest &request) {
+    /*Dto::SQS::CreateMessageResponse SNSService::CreateMessage(const Dto::SQS::CreateMessageRequest &request) {
 
         Database::Entity::SQS::Message message;
         try {
