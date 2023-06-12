@@ -50,7 +50,12 @@ namespace AwsMock {
                 Dto::SNS::CreateTopicResponse snsResponse = _snsService.CreateTopic(snsRequest);
                 SendOkResponse(response, snsResponse.ToXml());
 
+            } else if(action == "ListTopics") {
+
+                Dto::SNS::ListTopicsResponse snsResponse = _snsService.ListTopics(region);
+                SendOkResponse(response, snsResponse.ToXml());
             }
+
         } catch (Core::ServiceException &exc) {
             _logger.error() << "Service exception: " << exc.message();
             SendErrorResponse("SQS", response, exc);

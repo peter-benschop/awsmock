@@ -33,35 +33,35 @@ namespace AwsMock::Service {
             }
 
             // Update database
-            std::string queueArn = Core::AwsUtils::CreateSQSArn(request.region, _accountId, request.name);
-            queue = _database->CreateQueue({.region=request.region, .name=request.name, .owner=request.owner, .queueUrl=request.queueUrl, .queueArn=queueArn});
-            _logger.trace() << "SQS queue created: " << queue.ToString();
+            std::string topicArn = Core::AwsUtils::CreateSNSArn(request.region, _accountId, request.topicName);
+            topic = _database->CreateTopic({.region=request.region, .topicName=request.topicName, .owner=request.owner, .topicArn=topicArn});
+            _logger.trace() << "SNS topic created: " << topic.ToString();
 
         } catch (Poco::Exception &exc) {
-            _logger.error() << "SQS create queue failed, message: " << exc.message();
+            _logger.error() << "SNS create topic failed, message: " << exc.message();
             throw Core::ServiceException(exc.message(), 500);
-        }*/
-        return {};//{.region=queue.region, .name=queue.name, .owner=queue.owner, .queueUrl=queue.queueUrl};
+        }
+        return {.region=topic.region, .name=topic.topicName, .owner=topic.owner, .topicArn=topic.topicArn};
     }
-/*
-    Dto::SQS::ListQueueResponse SNSService::ListQueues(const std::string &region) {
-        _logger.trace() << "List all queues request, region: " << region;
+
+    Dto::SNS::ListTopicsResponse SNSService::ListTopics(const std::string &region) {
+        _logger.trace() << "List all topics request, region: " << region;
 
         try {
 
-            Database::Entity::SQS::QueueList queueList = _database->ListQueues(region);
-            Dto::SQS::ListQueueResponse listQueueResponse = Dto::SQS::ListQueueResponse(queueList);
-            _logger.trace() << "SQS create queue list response: " << listQueueResponse.ToXml();
+            Database::Entity::SNS::TopicList topicList = _database->ListTopics(region);
+            auto listTopicsResponse = Dto::SNS::ListTopicsResponse(topicList);
+            _logger.trace() << "SNS list topics response: " << listTopicsResponse.ToJson();
 
-            return listQueueResponse;
+            return listTopicsResponse;
 
         } catch (Poco::Exception &ex) {
-            _logger.error() << "SQS list queues failed, message: " << ex.message();
+            _logger.error() << "SNS list topics request failed, message: " << ex.message();
             throw Core::ServiceException(ex.message(), 500, "SQS", Poco::UUIDGenerator().createRandom().toString().c_str());
         }
     }
 
-    Dto::SQS::PurgeQueueResponse SNSService::PurgeQueue(const Dto::SQS::PurgeQueueRequest &request) {
+/*    Dto::SQS::PurgeQueueResponse SNSService::PurgeQueue(const Dto::SQS::PurgeQueueRequest &request) {
         _logger.trace() << "Purge queue request, region: " << request.region << " queueUrl: " << request.queueUrl;
 
         Dto::SQS::PurgeQueueResponse response = {.resource=request.resource, .requestId=request.requestId};

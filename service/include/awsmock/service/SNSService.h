@@ -20,6 +20,7 @@
 #include "awsmock/core/AwsUtils.h"
 #include "awsmock/dto/sns/CreateTopicRequest.h"
 #include "awsmock/dto/sns/CreateTopicResponse.h"
+#include "awsmock/dto/sns/ListTopicsResponse.h"
 #include "awsmock/db/SNSDatabase.h"
 
 #define DEFAULT_ACCOUNT_ID "000000000000"
@@ -51,7 +52,7 @@ namespace AwsMock::Service {
        * @param region AWS region
        * @return ListQueuesResponse
        */
-      //Dto::SQS::ListQueueResponse ListQueues(const std::string &region);
+      Dto::SNS::ListTopicsResponse ListTopics(const std::string &region);
 
       /**
        * Purge a queue.

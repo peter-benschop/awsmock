@@ -19,6 +19,9 @@
 #include <bsoncxx/builder/basic/document.hpp>
 #include <mongocxx/stdx.hpp>
 
+// AwsMock includes
+#include <awsmock/core/ServiceException.h>
+
 namespace AwsMock::Database::Entity::SNS {
 
     using bsoncxx::builder::basic::kvp;
@@ -121,6 +124,21 @@ namespace AwsMock::Database::Entity::SNS {
           topicArn = mResult.value()["topicArn"].get_string().value.to_string();
           created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000000));
           modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000000));
+      }
+
+      /**
+       * Converts the DTO to a JSON representation.
+       *
+       * @return DTO as string for logging.
+       */
+      [[nodiscard]] Poco::JSON::Object ToJsonObject() const {
+          try {
+              Poco::JSON::Object rootJson;
+              rootJson.set("topicName", topicName);
+              return rootJson;
+          } catch (Poco::Exception &exc) {
+              throw Core::ServiceException(exc.message(), 500);
+          }
       }
 
       /**
