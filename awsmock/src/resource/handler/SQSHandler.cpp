@@ -177,6 +177,7 @@ namespace AwsMock {
                 version = parts[1];
             }
         }
+        _logger.debug() << "Found action: " << action << "version: " << version;
     }
 
     std::string SQSHandler::GetStringParameter(const std::string &body, const std::string &name) {
@@ -188,16 +189,18 @@ namespace AwsMock {
                 value = Core::StringUtils::UrlDecode(parts[1]);
             }
         }
+        _logger.debug() << "Found string parameter, name: " << name << "value: " << value;
         return value;
     }
 
-    int SQSHandler::GetIntParameter(const std::string &body, const std::string &parameter, int min, int max) {
+    int SQSHandler::GetIntParameter(const std::string &body, const std::string &name, int min, int max) {
         int value = max;
-        std::string parameterValue = GetStringParameter(body, parameter);
+        std::string parameterValue = GetStringParameter(body, name);
         if (!parameterValue.empty()) {
             value = std::stoi(parameterValue);
             value = value > min && value < max ? value : max;
         }
+        _logger.debug() << "Found integer name, name: " << name << "value: " << value;
         return value;
     }
 

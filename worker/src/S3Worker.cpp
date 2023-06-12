@@ -40,7 +40,7 @@ namespace AwsMock::Worker {
         _watcher->itemAdded += Poco::delegate(this, &S3Worker::OnFileAdded);
         _watcher->itemModified += Poco::delegate(this, &S3Worker::OnFileModified);
         _watcher->itemDeleted += Poco::delegate(this, &S3Worker::OnFileDeleted);
-        _logger.debug() << "Directory _watcher added, path: " + _dataDir);
+        _logger.debug() << "Directory _watcher added, path: " << _dataDir;
     }
 
     void S3Worker::run() {

@@ -9,9 +9,9 @@ namespace AwsMock::Database {
     Database::Database(const Core::Configuration &configuration) : _logger(Poco::Logger::get("Database")), _configuration(configuration) {
         Core::Logger::SetDefaultConsoleLogger("Database");
 
-        mongocxx::uri uri = mongocxx::uri("mongodb://" + _configuration.getString("awsmock.mongodb.host", "localhost") + ":"
-                                              + std::to_string(_configuration.getInt("awsmock.mongodb.port", 27017))
-                                              + "/?maxPoolSize=32");
+        uri = mongocxx::uri("mongodb://" + _configuration.getString("awsmock.mongodb.host", "localhost") + ":"
+                                + std::to_string(_configuration.getInt("awsmock.mongodb.port", 27017))
+                                + "/?maxPoolSize=32");
         _connectionPool = std::make_shared<mongocxx::pool>(uri);
         poco_debug(_logger, "MongoDB connection pool initialized");
     }
@@ -35,6 +35,11 @@ namespace AwsMock::Database {
     mongocxx::database Database::GetConnection() {
         auto client = _connectionPool->acquire();
         return client->database("awsmock");
+    }
+
+    mongocxx::database Database::GetCollection() {
+        mongocxx::client client{ uri };
+        return client["awsmock"];
     }
 
 } // namespace AwsMock::Database

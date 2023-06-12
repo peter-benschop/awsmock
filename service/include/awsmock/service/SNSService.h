@@ -1,0 +1,140 @@
+//
+// Created by vogje01 on 30/05/2023.
+//
+
+#ifndef AWSMOCK_SERVICE_SNSSERVICE_H
+#define AWSMOCK_SERVICE_SNSSERVICE_H
+
+// C++ standard includes
+#include <string>
+#include <chrono>
+#include <ctime>
+
+// Poco includes
+#include <Poco/Logger.h>
+#include <Poco/LogStream.h>
+
+// AwsMock includes
+#include "awsmock/core/CryptoUtils.h"
+#include "awsmock/core/ServiceException.h"
+#include "awsmock/core/AwsUtils.h"
+#include "awsmock/dto/sns/CreateTopicRequest.h"
+#include "awsmock/dto/sns/CreateTopicResponse.h"
+#include "awsmock/db/SNSDatabase.h"
+
+#define DEFAULT_ACCOUNT_ID "000000000000"
+
+namespace AwsMock::Service {
+
+    class SNSService {
+
+    public:
+
+      /**
+       * Constructor
+       *
+       * @param configuration service configuration
+       */
+      explicit SNSService(const Core::Configuration &configuration);
+
+      /**
+       * Creates a new queue
+       *
+       * @param request create queue request
+       * @return CreateQueueResponse
+       */
+      Dto::SNS::CreateTopicResponse CreateTopic(const Dto::SNS::CreateTopicRequest &request);
+
+      /**
+       * Returns a list of all available queues
+       *
+       * @param region AWS region
+       * @return ListQueuesResponse
+       */
+      //Dto::SQS::ListQueueResponse ListQueues(const std::string &region);
+
+      /**
+       * Purge a queue.
+       *
+       * @param request purge queue request
+       * @return PurgeQueueResponse
+       * @throws ServiceException
+       */
+      //Dto::SQS::PurgeQueueResponse PurgeQueue(const Dto::SQS::PurgeQueueRequest &request);
+
+      /**
+       * PUt queue sqs
+       *
+       * @param request put queue sqs request
+       * @return PutQueueAttributesResponse
+       * @throws ServiceException
+       */
+      //Dto::SQS::PutQueueAttributesResponse PutQueueAttributes(const Dto::SQS::PutQueueAttributesRequest &request);
+
+      /**
+       * Delete a queue
+       *
+       * @param request delete request DTO
+       * @return DeleteQueueResponse
+       * @throws ServiceException
+       */
+      //Dto::SQS::DeleteQueueResponse DeleteQueue(const Dto::SQS::DeleteQueueRequest &request);
+
+      /**
+       * Creates a new queue
+       *
+       * @param request create message request
+       * @return CreateMessageResponse
+       * @throws ServiceException
+       */
+      //Dto::SQS::CreateMessageResponse CreateMessage(const Dto::SQS::CreateMessageRequest &request);
+
+      /**
+       * Receive a list of messages
+       *
+       * @param request receive message request
+       * @return ReceiveMessageResponse
+       * @throws ServiceException
+       */
+      //Dto::SQS::ReceiveMessageResponse ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request);
+
+      /**
+       * Delete a message
+       *
+       * @param request delete message request DTO
+       * @return DeleteMessageResponse
+       * @throws ServiceException
+       */
+      //Dto::SQS::DeleteMessageResponse DeleteMessage(const Dto::SQS::DeleteMessageRequest &request);
+
+    private:
+
+      /**
+       * Initialize the service
+       */
+      void Initialize();
+
+      /**
+       * Logger
+       */
+      Poco::LogStream _logger;
+
+      /**
+       * Account ID
+       */
+      std::string _accountId;
+
+      /**
+       * Configuration
+       */
+      const Core::Configuration &_configuration;
+
+      /**
+       * Database connection
+       */
+      std::unique_ptr<Database::SNSDatabase> _database;
+    };
+
+} // namespace AwsMock::Service
+
+#endif // AWSMOCK_SERVICE_SNSSERVICE_H
