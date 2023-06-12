@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_CREATETOPICREQUEST_H
-#define AWSMOCK_DTO_SQS_CREATETOPICREQUEST_H
+#ifndef AWSMOCK_DTO_SNS_CREATETOPICREQUEST_H
+#define AWSMOCK_DTO_SNS_CREATETOPICREQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -52,4 +52,4 @@ namespace AwsMock::Dto::SNS {
 
 } // namespace AwsMock::Dto::SNS
 
-#endif // AWSMOCK_DTO_SQS_CREATETOPICREQUEST_H
+#endif // AWSMOCK_DTO_SNS_CREATETOPICREQUEST_H

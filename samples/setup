@@ -10,12 +10,9 @@ awsmock s3 mb s3://file-delivery3
 #
 # Create SQS Queues
 #
-awsmock sqs create-queue --queue-name=file-delivery1-queue
-awsmock sqs create-queue --queue-name=file-delivery1-dlqueue
-awsmock sqs create-queue --queue-name=file-delivery2-queue
-awsmock sqs create-queue --queue-name=file-delivery2-dlqueue
-awsmock sqs create-queue --queue-name=file-delivery3-queue
-awsmock sqs create-queue --queue-name=file-delivery3-dlqueue
+awsmock sqs create-queue --queue-name=file-delivery-queue
+awsmock sqs create-queue --queue-name=file-delivery-dlqueue
+awsmock sqs create-queue --queue-name=file-logging-queue
 
 #
 # Setup SQS queue attributes
@@ -56,4 +53,12 @@ awsmock lambda create-function \
 #
 # Create SNS topic
 #
-awslocal sns create-topic --name file-logging-topic
+awsmock sns create-topic --name file-logging-topic
+
+#
+# SNS -> SQS subscription
+#
+awsmock sns subscribe \
+--topic-arn arn:aws:sns:eu-central-1:000000000000:file-logging-topic \
+--protocol sqs \
+--notification-endpoint arn:aws:sqs:eu-central-1:000000000000:file-logging-queue

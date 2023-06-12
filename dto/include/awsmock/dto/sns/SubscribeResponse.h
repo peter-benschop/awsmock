@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SNS_CREATETOPICRESPONSE_H
-#define AWSMOCK_DTO_SNS_CREATETOPICRESPONSE_H
+#ifndef AWSMOCK_DTO_SNS_SUBSCRIBERESPONSE_H
+#define AWSMOCK_DTO_SNS_SUBSCRIBERESPONSE_H
 
 // C++ standard includes
 #include <string>
@@ -24,27 +24,12 @@
 
 namespace AwsMock::Dto::SNS {
 
-    struct CreateTopicResponse {
+    struct SubscribeResponse {
 
       /**
-       * Region
+       * Subscription ARN
        */
-      std::string region;
-
-      /**
-       * Name
-       */
-      std::string name;
-
-      /**
-       * Owner
-       */
-      std::string owner;
-
-      /**
-       * Topic ARN
-       */
-      std::string topicArn;
+      std::string subscriptionArn;
 
       /**
        * Convert to XML representation
@@ -55,17 +40,17 @@ namespace AwsMock::Dto::SNS {
 
           // Root
           Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-          Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("CreateTopicResponse");
+          Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("SubscribeResponse");
           pDoc->appendChild(pRoot);
 
           // CreateQueueResult
-          Poco::XML::AutoPtr<Poco::XML::Element> pListQueueResult = pDoc->createElement("CreateTopicResult");
+          Poco::XML::AutoPtr<Poco::XML::Element> pListQueueResult = pDoc->createElement("SubscribeResult");
           pRoot->appendChild(pListQueueResult);
 
-          Poco::XML::AutoPtr<Poco::XML::Element> pQueueUrl = pDoc->createElement("TopicArn");
-          pListQueueResult->appendChild(pQueueUrl);
-          Poco::XML::AutoPtr<Poco::XML::Text> pQueueUrlText = pDoc->createTextNode(topicArn);
-          pQueueUrl->appendChild(pQueueUrlText);
+          Poco::XML::AutoPtr<Poco::XML::Element> pSubscriptionArn = pDoc->createElement("SubscriptionArn");
+          pListQueueResult->appendChild(pSubscriptionArn);
+          Poco::XML::AutoPtr<Poco::XML::Text> pSubscriptionArnText = pDoc->createTextNode(subscriptionArn);
+          pSubscriptionArn->appendChild(pSubscriptionArnText);
 
           // Metadata
           Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = pDoc->createElement("ResponseMetadata");
@@ -101,8 +86,8 @@ namespace AwsMock::Dto::SNS {
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const CreateTopicResponse &r) {
-          os << "CreateTopicResponse={region='" + r.region + "' name='" + r.name + "' owner='" + r.owner + "' topicArn='" + r.topicArn + "'}";
+      friend std::ostream &operator<<(std::ostream &os, const SubscribeResponse &r) {
+          os << "SubscribeResponse={subscriptionArn='" + r.subscriptionArn + "'}";
           return os;
       }
 
@@ -110,4 +95,4 @@ namespace AwsMock::Dto::SNS {
 
 } // namespace AwsMock::Dto::SNS
 
-#endif // AWSMOCK_DTO_SNS_CREATETOPICRESPONSE_H
+#endif // AWSMOCK_DTO_SNS_SUBSCRIBERESPONSE_H

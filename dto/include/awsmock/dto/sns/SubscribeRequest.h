@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SNS_PUBLISHREQUEST_H
-#define AWSMOCK_DTO_SNS_PUBLISHREQUEST_H
+#ifndef AWSMOCK_DTO_SNS_SUBSCRIBEREQUEST_H
+#define AWSMOCK_DTO_SNS_SUBSCRIBEREQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -11,10 +11,10 @@
 
 namespace AwsMock::Dto::SNS {
 
-    struct PublishRequest {
+    struct SubscribeRequest {
 
       /**
-       * Region
+       * AWS region
        */
       std::string region;
 
@@ -24,14 +24,19 @@ namespace AwsMock::Dto::SNS {
       std::string topicArn;
 
       /**
-       * Target ARN
+       * Protocol
        */
-      std::string targetArn;
+      std::string protocol;
 
       /**
-       * Message body
+       * Endpoint
        */
-      std::string message;
+      std::string endpoint;
+
+      /**
+       * Owner
+       */
+      std::string owner;
 
       /**
        * Converts the DTO to a string representation.
@@ -49,12 +54,14 @@ namespace AwsMock::Dto::SNS {
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const PublishRequest &r) {
-          os << "PublishRequest={region='" + r.region + "' topicArn='" + r.topicArn + "' targetArn: '" + r.targetArn + "' message='" + r.message + "'}";
+      friend std::ostream &operator<<(std::ostream &os, const SubscribeRequest &r) {
+          os << "SubscribeRequest={region='" + r.region + "' topicArn='" + r.topicArn + "' owner='" + r.owner + "' protocol='" + r.protocol +
+              "' endpoint='" + r.endpoint + "'}";
           return os;
       }
+
     };
 
 } // namespace AwsMock::Dto::SNS
 
-#endif // AWSMOCK_DTO_SNS_PUBLISHREQUEST_H
+#endif // AWSMOCK_DTO_SNS_SUBSCRIBEREQUEST_H

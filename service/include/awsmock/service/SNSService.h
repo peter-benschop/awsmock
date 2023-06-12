@@ -24,6 +24,8 @@
 #include "awsmock/dto/sns/DeleteTopicResponse.h"
 #include "awsmock/dto/sns/PublishRequest.h"
 #include "awsmock/dto/sns/PublishResponse.h"
+#include "awsmock/dto/sns/SubscriptionRequest.h"
+#include "awsmock/dto/sns/SubscriptionResponse.h"
 #include "awsmock/db/SNSDatabase.h"
 
 #define DEFAULT_ACCOUNT_ID "000000000000"

@@ -111,6 +111,11 @@ namespace AwsMock::Database::Entity::SNS {
       std::string message;
 
       /**
+       * Message ID
+       */
+      std::string messageId;
+
+      /**
        * List of sqs
        */
       MessageAttributeList attributes;
@@ -147,10 +152,11 @@ namespace AwsMock::Database::Entity::SNS {
               kvp("topicArn", topicArn),
               kvp("targetArn", targetArn),
               kvp("message", message),
+              kvp("messageId", messageId),
               kvp("attributes", messageAttributesDoc),
-              kvp("lastSend", bsoncxx::types::b_date(std::chrono::milliseconds(lastSend.timestamp().epochMicroseconds()/1000))),
-              kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds()/1000))),
-              kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds()/1000))));
+              kvp("lastSend", bsoncxx::types::b_date(std::chrono::milliseconds(lastSend.timestamp().epochMicroseconds() / 1000))),
+              kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
+              kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
 
           return messageDoc;
       }
@@ -167,6 +173,7 @@ namespace AwsMock::Database::Entity::SNS {
           topicArn = mResult.value()["topicArn"].get_string().value.to_string();
           targetArn = mResult.value()["targetArn"].get_string().value.to_string();
           message = mResult.value()["message"].get_string().value.to_string();
+          messageId = mResult.value()["messageId"].get_string().value.to_string();
           lastSend = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastSend"].get_date().value) / 1000000));
           created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000000));
           modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000000));
@@ -193,6 +200,7 @@ namespace AwsMock::Database::Entity::SNS {
           topicArn = mResult.value()["topicArn"].get_string().value.to_string();
           targetArn = mResult.value()["targetArn"].get_string().value.to_string();
           message = mResult.value()["message"].get_string().value.to_string();
+          messageId = mResult.value()["messageId"].get_string().value.to_string();
           lastSend = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastSend"].get_date().value) / 1000000));
           created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000000));
           modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000000));
@@ -224,8 +232,8 @@ namespace AwsMock::Database::Entity::SNS {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const Message &m) {
-          os << "Message={oid='" + m.oid + "' topicArn: " + m.topicArn + "' targetArn='" + m.targetArn + "'message='" + m.message + "' lastSend='" +
-              Poco::DateTimeFormatter().format(m.lastSend, Poco::DateTimeFormat::HTTP_FORMAT) + "' created='" +
+          os << "Message={oid='" + m.oid + "' topicArn: " + m.topicArn + "' targetArn='" + m.targetArn + "'message='" + m.message + "'messageId='" + m.messageId
+              + "' lastSend='" + Poco::DateTimeFormatter().format(m.lastSend, Poco::DateTimeFormat::HTTP_FORMAT) + "' created='" +
               Poco::DateTimeFormatter().format(m.created, Poco::DateTimeFormat::HTTP_FORMAT) + "' modified='" +
               Poco::DateTimeFormatter().format(m.modified, Poco::DateTimeFormat::HTTP_FORMAT) + "'}";
           return os;
