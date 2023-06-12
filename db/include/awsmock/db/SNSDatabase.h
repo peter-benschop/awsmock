@@ -97,12 +97,12 @@ namespace AwsMock::Database {
       Entity::SNS::TopicList ListTopics(const std::string &region);
 
       /**
-       * Purge a given topicUrl.
+       * Counts the number of topics
        *
        * @param region AWS region
-       * @param topicUrl topicUrl name
+       * @return number of topics
        */
-      //void Purgetopic(const std::string &region, const std::string &topicUrl);
+      long CountTopics(const std::string &region);
 
       /**
        * Deletes a topic.
@@ -142,34 +142,7 @@ namespace AwsMock::Database {
        * @return message entity
        * @throws Core::DatabaseException
        */
-      //Entity::SQS::Message GetMessageById(const std::string & oid);
-
-      /**
-       * Returns a message by receipt handle.
-       *
-       * @param receiptHandle message receipt handle
-       * @return message entity
-       * @throws Core::DatabaseException
-       */
-      //Entity::SQS::Message GetMessageByReceiptHandle(const std::string &receiptHandle);
-
-      /**
-       * Receive messages from an topic.
-       *
-       * @param region AWS region
-       * @param topicUrl topic URL
-       * @param messageList message list
-       * @return MessageList
-       */
-      //void ReceiveMessages(const std::string &region, const std::string &topicUrl, Entity::SQS::MessageList &messageList);
-
-      /**
-       * Reset expired messages
-       *
-       * @param topicUrl URL of the topic
-       * @param visibility visibility period in seconds
-       */
-      //[[maybe_unused]] void ResetMessages(const std::string& topicUrl, long visibility);
+      [[maybe_unused]] Entity::SNS::Message GetMessageById(const std::string & oid);
 
       /**
        * Count the number of message by status
@@ -177,7 +150,7 @@ namespace AwsMock::Database {
        * @param topicUrl URL of the topic
        * @param visibility visibility period in seconds
        */
-      //[[maybe_unused]] long CountMessages(const std::string &region, const std::string& topicUrl);
+      long CountMessages(const std::string &region, const std::string& topicUrl);
 
       /**
        * Count the number of message by status
@@ -193,14 +166,14 @@ namespace AwsMock::Database {
        * @param message message to delete
        * @throws Core::DatabaseException
        */
-      //void DeleteMessage(const Entity::SQS::Message &message);
+      void DeleteMessage(const Entity::SNS::Message &message);
 
       /**
        * Deletes a messages.
        *
        * @throws Core::DatabaseException
        */
-      //void DeleteAllMessages();
+      void DeleteAllMessages();
 
     private:
 

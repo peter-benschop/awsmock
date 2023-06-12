@@ -24,8 +24,8 @@
 #include "awsmock/dto/sns/DeleteTopicResponse.h"
 #include "awsmock/dto/sns/PublishRequest.h"
 #include "awsmock/dto/sns/PublishResponse.h"
-#include "awsmock/dto/sns/SubscriptionRequest.h"
-#include "awsmock/dto/sns/SubscriptionResponse.h"
+#include "awsmock/dto/sns/SubscribeRequest.h"
+#include "awsmock/dto/sns/SubscribeResponse.h"
 #include "awsmock/db/SNSDatabase.h"
 
 #define DEFAULT_ACCOUNT_ID "000000000000"
@@ -68,22 +68,12 @@ namespace AwsMock::Service {
       Dto::SNS::PublishResponse Publish(const Dto::SNS::PublishRequest &request);
 
       /**
-       * Purge a queue.
+       * Publish a message to a SNS topic
        *
-       * @param request purge queue request
-       * @return PurgeQueueResponse
-       * @throws ServiceException
+       * @param request AWS region
+       * @return PublishResponse
        */
-      //Dto::SQS::PurgeQueueResponse PurgeQueue(const Dto::SQS::PurgeQueueRequest &request);
-
-      /**
-       * PUt queue sqs
-       *
-       * @param request put queue sqs request
-       * @return PutQueueAttributesResponse
-       * @throws ServiceException
-       */
-      //Dto::SQS::PutQueueAttributesResponse PutQueueAttributes(const Dto::SQS::PutQueueAttributesRequest &request);
+      Dto::SNS::SubscribeResponse Subscribe(const Dto::SNS::SubscribeRequest &request);
 
       /**
        * Delete a queue
@@ -94,33 +84,6 @@ namespace AwsMock::Service {
        * @throws ServiceException
        */
       Dto::SNS::DeleteTopicResponse DeleteTopic(const std::string &region, const std::string &topicArn);
-
-      /**
-       * Creates a new queue
-       *
-       * @param request create message request
-       * @return CreateMessageResponse
-       * @throws ServiceException
-       */
-      //Dto::SQS::CreateMessageResponse CreateMessage(const Dto::SQS::CreateMessageRequest &request);
-
-      /**
-       * Receive a list of messages
-       *
-       * @param request receive message request
-       * @return ReceiveMessageResponse
-       * @throws ServiceException
-       */
-      //Dto::SQS::ReceiveMessageResponse ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request);
-
-      /**
-       * Delete a message
-       *
-       * @param request delete message request DTO
-       * @return DeleteMessageResponse
-       * @throws ServiceException
-       */
-      //Dto::SQS::DeleteMessageResponse DeleteMessage(const Dto::SQS::DeleteMessageRequest &request);
 
     private:
 

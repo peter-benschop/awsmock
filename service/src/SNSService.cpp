@@ -33,7 +33,7 @@ namespace AwsMock::Service {
             }
 
             // Update database
-            std::string topicArn = Core::AwsUtils::CreateSNSArn(request.region, _accountId, request.topicName);
+            std::string topicArn = Core::AwsUtils::CreateSNSTopicArn(request.region, _accountId, request.topicName);
             topic = _database->CreateTopic({.region=request.region, .topicName=request.topicName, .owner=request.owner, .topicArn=topicArn});
             _logger.trace() << "SNS topic created: " << topic.ToString();
 
@@ -103,7 +103,36 @@ namespace AwsMock::Service {
             return {.messageId=message.messageId};
 
         } catch (Poco::Exception &ex) {
-            _logger.error() << "SQS create message failed, message: " << ex.message();
+            _logger.error() << "SNS create message failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message(), 500);
+        }
+    }
+
+    Dto::SNS::SubscribeResponse SNSService::Subscribe(const Dto::SNS::SubscribeRequest &request) {
+
+        //Database::Entity::SNS::Message message;
+        try {
+            // TODO: Get topic from DB
+            std::string subscriptionArn = Core::AwsUtils::CreateSNSSubscriptionArn(request.region, _accountId, request.topicArn);
+            // Check topic/target ARN
+          /*  if (request.topicArn.empty() && request.targetArn.empty()) {
+                throw Core::ServiceException("Either topicARN or targetArn must exist", 500);
+            }
+
+            // Check existence
+            if (!_database->TopicExists(request.topicArn)) {
+                throw Core::ServiceException("SNS topic does not exists", 500);
+            }
+
+            // Update database
+            std::string messageId = Core::StringUtils::GenerateRandomString(100);
+            message =
+                _database->CreateMessage({.region=request.region, .topicArn=request.topicArn, .targetArn=request.targetArn, .message=request.message, .messageId=messageId});*/
+
+            return {.subscriptionArn=subscriptionArn};
+
+        } catch (Poco::Exception &ex) {
+            _logger.error() << "SNS subscription failed, message: " << ex.message();
             throw Core::ServiceException(ex.message(), 500);
         }
     }

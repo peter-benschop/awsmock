@@ -31,6 +31,68 @@ namespace AwsMock::Database::Entity::SNS {
     using bsoncxx::document::view;
     using bsoncxx::document::value;
 
+    struct Subscription {
+
+      /**
+       * Protocol
+       */
+      std::string protocol;
+
+      /**
+       * Endpoint
+       */
+      std::string endpoint;
+
+      /**
+       * Converts the entity to a MongoDB document
+       *
+       * @return entity as MongoDB document.
+       */
+      [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
+
+          view_or_value<view, value> subscriptionDoc = make_document(
+              kvp("protocol", protocol),
+              kvp("endpoint", endpoint));
+
+          return subscriptionDoc;
+      }
+
+      /**
+       * Converts the MongoDB document to an entity
+       *
+       * @return entity.
+       */
+      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view_or_value> mResult) {
+
+          protocol = mResult.value().view()["protocol"].get_string().value.to_string();
+          endpoint = mResult.value().view()["endpoint"].get_string().value.to_string();
+      }
+
+      /**
+       * Converts the DTO to a string representation.
+       *
+       * @return DTO as string for logging.
+       */
+      [[nodiscard]] std::string ToString() const {
+          std::stringstream ss;
+          ss << (*this);
+          return ss.str();
+      }
+
+      /**
+       * Stream provider.
+       *
+       * @return output stream
+       */
+      friend std::ostream &operator<<(std::ostream &os, const Subscription &q) {
+          os << "Subscription={protocol='" << q.protocol << "' endpoint='" << q.endpoint << "'}";
+          return os;
+      }
+
+    };
+
+    typedef std::vector<Subscription> SubscriptionList;
+
     struct Topic {
 
       /**
@@ -64,6 +126,11 @@ namespace AwsMock::Database::Entity::SNS {
       std::string topicArn;
 
       /**
+       * Subscriptions
+       */
+      SubscriptionList subscriptions;
+
+      /**
        * Creation date
        */
       Poco::DateTime created = Poco::DateTime();
@@ -80,14 +147,20 @@ namespace AwsMock::Database::Entity::SNS {
        */
       [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
+          auto subscriptionDocs = bsoncxx::builder::basic::array{};
+          for (const auto &subscription : subscriptions) {
+              subscriptionDocs.append(subscription.ToDocument());
+          }
+
           view_or_value<view, value> topicDoc = make_document(
               kvp("region", region),
               kvp("topicName", topicName),
               kvp("owner", owner),
               kvp("topicUrl", topicUrl),
               kvp("topicArn", topicArn),
-              kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds()/1000))),
-              kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds()/1000))));
+              kvp("subscriptions", subscriptionDocs),
+              kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
+              kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
 
           return topicDoc;
       }
@@ -107,6 +180,15 @@ namespace AwsMock::Database::Entity::SNS {
           topicArn = mResult.value()["topicArn"].get_string().value.to_string();
           created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000000));
           modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000000));
+
+          bsoncxx::array::view subscriptionsView{mResult.value()["subscriptions"].get_array().value};
+          for (bsoncxx::array::element subscriptionElement : subscriptionsView) {
+              Subscription subscription {
+                  .protocol=subscriptionElement["protocol"].get_string().value.to_string(),
+                  .endpoint=subscriptionElement["endpoint"].get_string().value.to_string()
+              };
+              subscriptions.push_back(subscription);
+          }
       }
 
       /**
@@ -124,6 +206,15 @@ namespace AwsMock::Database::Entity::SNS {
           topicArn = mResult.value()["topicArn"].get_string().value.to_string();
           created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000000));
           modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000000));
+
+          bsoncxx::array::view subscriptionsView{mResult.value()["subscriptions"].get_array().value};
+          for (bsoncxx::array::element subscriptionElement : subscriptionsView) {
+              Subscription subscription {
+                  .protocol=subscriptionElement["protocol"].get_string().value.to_string(),
+                  .endpoint=subscriptionElement["endpoint"].get_string().value.to_string()
+              };
+              subscriptions.push_back(subscription);
+          }
       }
 
       /**

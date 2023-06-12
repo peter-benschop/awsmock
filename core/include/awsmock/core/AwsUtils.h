@@ -8,6 +8,9 @@
 // C++ standard includes
 #include <string>
 
+// Poco includes
+#include <Poco/UUIDGenerator.h>
+
 namespace AwsMock::Core {
 
     class AwsUtils {
@@ -59,7 +62,18 @@ namespace AwsMock::Core {
        * @param accountId AWS account ID
        * @param topicName name of the topic
        */
-      static std::string CreateSNSArn(const std::string &region, const std::string &accountId, const std::string &topicName);
+      static std::string CreateSNSTopicArn(const std::string &region, const std::string &accountId, const std::string &topicName);
+
+      /**
+       * Create SNS subscription ARN
+       *
+       * <p>Syntax arn:aws:sns:us-west-2:123456789012:MyTopic:6b0e71bd-7e97-4d97-80ce-4a0994e55286</p>
+       *
+       * @param region AWS region
+       * @param accountId AWS account ID
+       * @param topicName name of the topic
+       */
+      static std::string CreateSNSSubscriptionArn(const std::string &region, const std::string &accountId, const std::string &topicName);
     };
 }
 #endif //AWSMOCK_CORE_AWSUTILS_H
