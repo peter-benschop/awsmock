@@ -18,7 +18,7 @@ namespace AwsMock::Database {
         CreateCollection("sns_message");
 
         _topicCollection = GetConnection()["sns_topic"];
-        _messageCollection = GetCollection()["sns_message"];
+        _messageCollection = GetConnection()["sns_message"];
     }
 
     bool SNSDatabase::TopicExists(const std::string &topicArn) {
@@ -87,24 +87,32 @@ namespace AwsMock::Database {
         _logger.debug() << "All topics deleted, count: " << result->deleted_count();
     }
 
-    /*Entity::SQS::Message SNSDatabase::CreateMessage(const Entity::SQS::Message &message) {
+    Entity::SNS::Message SNSDatabase::CreateMessage(const Entity::SNS::Message &message) {
 
-        auto result = _messageCollection.insert_one(message.ToDocument());
-        _logger.trace() << "Message created, oid: " << result->inserted_id().get_oid().value.to_string();
+        try {
 
-        return GetMessageById(result->inserted_id().get_oid().value);
+            auto result = _messageCollection.insert_one(message.ToDocument());
+            _logger.trace() << "Message created, oid: " << result->inserted_id().get_oid().value.to_string();
+
+            return GetMessageById(result->inserted_id().get_oid().value);
+
+        } catch (const mongocxx::exception& exc) {
+            std::cerr << exc.what() << std::endl;
+            _logger.error() << "Database exception " << exc.what();
+            throw Core::DatabaseException(exc.what(), 500);
+        }
     }
 
-    Entity::SQS::Message SNSDatabase::GetMessageById(bsoncxx::oid oid) {
+    Entity::SNS::Message SNSDatabase::GetMessageById(bsoncxx::oid oid) {
 
         mongocxx::stdx::optional<bsoncxx::document::value> mResult = _messageCollection.find_one(make_document(kvp("_id", oid)));
-        Entity::SQS::Message result;
+        Entity::SNS::Message result;
         result.FromDocument(mResult);
 
         return result;
     }
 
-    Entity::SQS::Message SNSDatabase::GetMessageByReceiptHandle(const std::string &receiptHandle) {
+    /*Entity::SQS::Message SNSDatabase::GetMessageByReceiptHandle(const std::string &receiptHandle) {
 
         mongocxx::stdx::optional<bsoncxx::document::value> mResult = _messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle)));
         Entity::SQS::Message result;

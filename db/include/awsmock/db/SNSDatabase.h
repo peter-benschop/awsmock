@@ -25,7 +25,7 @@
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/db/Database.h>
 #include <awsmock/db/SNSDatabase.h>
-//#include <awsmock/entity/sqs/Message.h>
+#include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sns/Topic.h>
 
 namespace AwsMock::Database {
@@ -124,7 +124,7 @@ namespace AwsMock::Database {
        * @return saved message entity
        * @throws Core::DatabaseException
        */
-      //Entity::SQS::Message CreateMessage(const Entity::SQS::Message &message);
+      Entity::SNS::Message CreateMessage(const Entity::SNS::Message &message);
 
       /**
        * Returns a message by ID.
@@ -133,7 +133,7 @@ namespace AwsMock::Database {
        * @return message entity
        * @throws Core::DatabaseException
        */
-      //Entity::SQS::Message GetMessageById(bsoncxx::oid oid);
+      Entity::SNS::Message GetMessageById(bsoncxx::oid oid);
 
       /**
        * Returns a message by ID.

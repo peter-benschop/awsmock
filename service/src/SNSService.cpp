@@ -107,20 +107,22 @@ namespace AwsMock::Service {
         return response;
     }
 
-    /*Dto::SQS::CreateMessageResponse SNSService::CreateMessage(const Dto::SQS::CreateMessageRequest &request) {
+    Dto::SNS::PublishResponse SNSService::Publish(const Dto::SNS::PublishRequest &request) {
 
-        Database::Entity::SQS::Message message;
+        Database::Entity::SNS::Message message;
         try {
+            // Check topic/target ARN
+            if (request.topicArn.empty() && request.targetArn.empty()) {
+                throw Core::ServiceException("Either topicARN or targetArn must exist", 500);
+            }
+
             // Check existence
-            if (!_database->QueueExists(request.url)) {
-                throw Core::ServiceException("SQS queue does not exists", 500);
+            if (!_database->TopicExists(request.topicArn)) {
+                throw Core::ServiceException("SNS topic does not exists", 500);
             }
 
             // Update database
             std::string messageId = Core::StringUtils::GenerateRandomString(100);
-            std::string receiptHandle = Core::StringUtils::GenerateRandomString(512);
-            std::string md5Body = Core::Crypto::GetMd5FromString(request.body);
-            std::string md5Attr = Core::Crypto::GetMd5FromString(request.body);
             message =
                 _database->CreateMessage({.queueUrl=request.url, .body=request.body, .messageId=messageId, .receiptHandle=receiptHandle, .md5Body=md5Body, .md5Attr=md5Attr});
 
@@ -130,7 +132,7 @@ namespace AwsMock::Service {
         }
         return {.queueUrl=message.queueUrl, .messageId=message.messageId, .receiptHandle=message.receiptHandle, .md5Body=message.md5Body, .md5Attr=message.md5Attr};
     }
-
+/*
     Dto::SQS::ReceiveMessageResponse SNSService::ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request) {
 
         Dto::SQS::ReceiveMessageResponse response;

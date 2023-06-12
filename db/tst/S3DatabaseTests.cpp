@@ -266,11 +266,11 @@ namespace AwsMock::Database {
 
         // Create objects
         for (int i = 0; i < 10; i++) {
-            _s3database.CreateObject({.bucket=bucket.name, .key=std::string(OBJECT) + std::to_string(i), .owner=OWNER});
+            _s3database.CreateObject({.region=_region, .bucket=bucket.name, .key=std::string(OBJECT) + std::to_string(i), .owner=OWNER});
         }
 
         // act
-        bool result = _s3database.ObjectCount(bucket);
+        int result = _s3database.ObjectCount(bucket);
 
         // assert
         EXPECT_EQ(10, result);

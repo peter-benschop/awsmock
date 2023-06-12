@@ -2,13 +2,13 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_DELETETOPICSRESPONSE_H
-#define AWSMOCK_DTO_SQS_DELETETOPICSRESPONSE_H
+#ifndef AWSMOCK_DTO_SNS_PUBLISRESPONSE_H
+#define AWSMOCK_DTO_SNS_PUBLISRESPONSE_H
 
 // C++ standard includes
 #include <string>
 #include <sstream>
-#include <iostream>
+#include <utility>
 
 // Poco includes
 #include "Poco/DateTime.h"
@@ -22,16 +22,15 @@
 #include "Poco/DOM/Text.h"
 #include "Poco/DOM/DOMWriter.h"
 #include "Poco/XML/XMLWriter.h"
-#include "Poco/JSON/Object.h"
-#include "Poco/JSON/Array.h"
-
-// AwsMock includes
-#include "awsmock/core/ServiceException.h"
-#include "awsmock/entity/sns/Topic.h"
 
 namespace AwsMock::Dto::SNS {
 
-    struct DeleteTopicResponse {
+    struct PublishResponse {
+
+      /**
+       * Message ID
+       */
+      std::string messageId;
 
       /**
        * Convert to XML representation
@@ -40,12 +39,20 @@ namespace AwsMock::Dto::SNS {
        */
       [[nodiscard]] std::string ToXml() const {
 
-          // XML Document
+          // Root
           Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-
-          // Root element
-          Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("DeleteTopicResponse");
+          Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("PublishResponse");
           pDoc->appendChild(pRoot);
+
+          // SendMessageResult
+          Poco::XML::AutoPtr<Poco::XML::Element> pSendMessageResult = pDoc->createElement("PublishResult");
+          pRoot->appendChild(pSendMessageResult);
+
+          // MessageID
+          Poco::XML::AutoPtr<Poco::XML::Element> pMessageId = pDoc->createElement("MessageId");
+          pSendMessageResult->appendChild(pMessageId);
+          Poco::XML::AutoPtr<Poco::XML::Text> pMessageIdText = pDoc->createTextNode(messageId);
+          pMessageId->appendChild(pMessageIdText);
 
           // Metadata
           Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = pDoc->createElement("ResponseMetadata");
@@ -64,8 +71,30 @@ namespace AwsMock::Dto::SNS {
 
           return output.str();
       }
+
+      /**
+       * Converts the DTO to a string representation.
+       *
+       * @return DTO as string for logging.
+       */
+      [[nodiscard]] std::string ToString() const {
+          std::stringstream ss;
+          ss << (*this);
+          return ss.str();
+      }
+
+      /**
+       * Stream provider.
+       *
+       * @return output stream
+       */
+      friend std::ostream &operator<<(std::ostream &os, const PublishResponse &r) {
+          os << "PublishResponse={messageId='" + r.messageId + "'}";
+          return os;
+      }
+
     };
 
 } // namespace AwsMock::Dto::SNS
 
-#endif // AWSMOCK_DTO_SQS_DELETETOPICSRESPONSE_H
+#endif // AWSMOCK_DTO_SNS_PUBLISRESPONSE_H

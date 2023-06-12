@@ -20,7 +20,7 @@
 #include <bsoncxx/builder/basic/document.hpp>
 #include <mongocxx/stdx.hpp>
 
-namespace AwsMock::Database::Entity::SQS {
+namespace AwsMock::Database::Entity::SNS {
 
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
@@ -96,7 +96,12 @@ namespace AwsMock::Database::Entity::SQS {
       std::string region;
 
       /**
-       * Target topic ARN
+       * Topic ARN
+       */
+      std::string topicArn;
+
+      /**
+       * Target ARN
        */
       std::string targetArn;
 
@@ -139,6 +144,7 @@ namespace AwsMock::Database::Entity::SQS {
 
           view_or_value<view, value> messageDoc = make_document(
               kvp("region", region),
+              kvp("topicArn", topicArn),
               kvp("targetArn", targetArn),
               kvp("message", message),
               kvp("attributes", messageAttributesDoc),
@@ -158,6 +164,7 @@ namespace AwsMock::Database::Entity::SQS {
 
           oid = mResult.value()["_id"].get_oid().value.to_string();
           region = mResult.value()["region"].get_string().value.to_string();
+          topicArn = mResult.value()["topicArn"].get_string().value.to_string();
           targetArn = mResult.value()["targetArn"].get_string().value.to_string();
           message = mResult.value()["message"].get_string().value.to_string();
           lastSend = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastSend"].get_date().value) / 1000000));
@@ -183,14 +190,12 @@ namespace AwsMock::Database::Entity::SQS {
 
           oid = mResult.value()["_id"].get_oid().value.to_string();
           region = mResult.value()["region"].get_string().value.to_string();
+          topicArn = mResult.value()["topicArn"].get_string().value.to_string();
           targetArn = mResult.value()["targetArn"].get_string().value.to_string();
           message = mResult.value()["message"].get_string().value.to_string();
           lastSend = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastSend"].get_date().value) / 1000000));
           created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000000));
           modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000000));
-          lastSend = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastSend"].get_date().value) / 1000000));
-          created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value)/1000000));
-          modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value)/1000000));
 
           bsoncxx::array::view attributesView{mResult.value()["attributes"].get_array().value};
           for (bsoncxx::array::element attributeElement : attributesView) {
@@ -219,8 +224,10 @@ namespace AwsMock::Database::Entity::SQS {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const Message &m) {
-          os << "Message={oid='" + m.oid + "' targetArn='" + m.targetArn + "'message='" + m.message + "' lastSend='" +
-              Poco::DateTimeFormatter().format(m.lastSend, Poco::DateTimeFormat::HTTP_FORMAT) + "'}";
+          os << "Message={oid='" + m.oid + "' topicArn: " + m.topicArn + "' targetArn='" + m.targetArn + "'message='" + m.message + "' lastSend='" +
+              Poco::DateTimeFormatter().format(m.lastSend, Poco::DateTimeFormat::HTTP_FORMAT) + "' created='" +
+              Poco::DateTimeFormatter().format(m.created, Poco::DateTimeFormat::HTTP_FORMAT) + "' modified='" +
+              Poco::DateTimeFormatter().format(m.modified, Poco::DateTimeFormat::HTTP_FORMAT) + "'}";
           return os;
       }
 
@@ -229,6 +236,6 @@ namespace AwsMock::Database::Entity::SQS {
     typedef struct Message Message;
     typedef std::vector<Message> MessageList;
 
-} // AwsMock::Database::Entity::SQS
+} // namespace AwsMock::Database::Entity::SNS
 
 #endif // AWSMOCK_DB_ENTITY_SNS_MESSAGE_H

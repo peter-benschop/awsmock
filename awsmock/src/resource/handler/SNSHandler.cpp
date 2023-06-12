@@ -56,6 +56,15 @@ namespace AwsMock {
                 Dto::SNS::ListTopicsResponse snsResponse = _snsService.ListTopics(region);
                 SendOkResponse(response, snsResponse.ToXml());
 
+            } else if(action == "Publish") {
+
+                std::string topicArn = GetStringParameter(payload, "TopicArn");
+                std::string targetArn = GetStringParameter(payload, "TargetArn");
+                std::string message = GetStringParameter(payload, "Message");
+
+                Dto::SNS::PublishMessageResponse snsResponse = _snsService.Publish({});
+                //SendOkResponse(response, snsResponse.ToXml());
+
             } else if(action == "DeleteTopic") {
 
                 std::string topicArn = GetStringParameter(payload, "TopicArn");

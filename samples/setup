@@ -52,3 +52,8 @@ awsmock lambda create-function \
 --region eu-central-1 \
 --zip-file fileb:///tmp/awsmock/data/lambda/file-copy-service-1.14.0-SNAPSHOT-aws.jar \
 --role arn:aws:iam::000000000000:role/ignoreme
+
+#
+# Create SNS topic
+#
+awslocal sns create-topic --name file-logging-topic

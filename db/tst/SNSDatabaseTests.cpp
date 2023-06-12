@@ -100,22 +100,22 @@ namespace AwsMock::Database {
         EXPECT_FALSE(result);
     }
 
-    /*TEST_F(SNSDatabaseTest, MessageCreateTest) {
+    TEST_F(SNSDatabaseTest, MessageCreateTest) {
 
         // arrange
-        Entity::SNS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
-        queue = _snsDatabase.CreateQueue(queue);
-        Entity::SNS::Message message = {.region=REGION, .queueUrl=queue.name, .body=BODY};
+        Entity::SNS::Topic topic = {.region=_region, .topicName=TOPIC, .owner=OWNER, .topicArn=TOPIC_ARN};
+        topic = _snsDatabase.CreateTopic(topic);
+        Entity::SNS::Message message = {.region=_region, .topicArn=topic.topicArn, .message=BODY};
 
         // act
         Entity::SNS::Message result = _snsDatabase.CreateMessage(message);
 
         // assert
         EXPECT_FALSE(result.oid.empty());
-        EXPECT_TRUE(result.body == BODY);
+        EXPECT_TRUE(result.message == BODY);
     }
 
-    TEST_F(SNSDatabaseTest, MessageReceiveTest) {
+    /*TEST_F(SNSDatabaseTest, MessageReceiveTest) {
 
         // arrange
         Entity::SNS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};

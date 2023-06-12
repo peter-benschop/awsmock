@@ -196,7 +196,7 @@ namespace AwsMock::Database {
     long S3Database::ObjectCount(const Entity::S3::Bucket &bucket) {
 
         long count = _objectCollection.count_documents(make_document(kvp("region", bucket.region), kvp("bucket", bucket.name)));
-        _logger.trace() << "Bucket exists: " << (count > 0 ? "true" : "false");
+        _logger.trace() << "Object count: " << count;
         return count;
     }
 

@@ -80,7 +80,7 @@ namespace AwsMock::Database::Entity::SNS {
        */
       [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
-          view_or_value<view, value> queueDoc = make_document(
+          view_or_value<view, value> topicDoc = make_document(
               kvp("region", region),
               kvp("topicName", topicName),
               kvp("owner", owner),
@@ -89,7 +89,7 @@ namespace AwsMock::Database::Entity::SNS {
               kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds()/1000))),
               kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds()/1000))));
 
-          return queueDoc;
+          return topicDoc;
       }
 
       /**

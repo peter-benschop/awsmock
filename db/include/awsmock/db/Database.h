@@ -16,6 +16,7 @@
 #include <mongocxx/client.hpp>
 #include <mongocxx/pool.hpp>
 #include <mongocxx/uri.hpp>
+#include <mongocxx/exception/exception.hpp>
 
 // AwsMock includes
 #include <awsmock/core/Logger.h>

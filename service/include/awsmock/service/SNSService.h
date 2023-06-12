@@ -22,6 +22,8 @@
 #include "awsmock/dto/sns/CreateTopicResponse.h"
 #include "awsmock/dto/sns/ListTopicsResponse.h"
 #include "awsmock/dto/sns/DeleteTopicResponse.h"
+#include "awsmock/dto/sns/PublishRequest.h"
+#include "awsmock/dto/sns/PublishResponse.h"
 #include "awsmock/db/SNSDatabase.h"
 
 #define DEFAULT_ACCOUNT_ID "000000000000"
@@ -54,6 +56,14 @@ namespace AwsMock::Service {
        * @return ListQueuesResponse
        */
       Dto::SNS::ListTopicsResponse ListTopics(const std::string &region);
+
+      /**
+       * Publish a message to a SNS topic
+       *
+       * @param request AWS region
+       * @return PublishResponse
+       */
+      Dto::SNS::PublishResponse Publish(const Dto::SNS::PublishRequest &request);
 
       /**
        * Purge a queue.
