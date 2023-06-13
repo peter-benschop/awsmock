@@ -66,6 +66,15 @@ namespace AwsMock::Database {
         return result;
     }
 
+    Entity::SQS::Queue SQSDatabase::GetQueueByUrl(const std::string &queueUrl) {
+
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("queueUrl", queueUrl)));
+        Entity::SQS::Queue result;
+        result.FromDocument(mResult);
+
+        return result;
+    }
+
     Entity::SQS::QueueList SQSDatabase::ListQueues(const std::string &region) {
 
         Entity::SQS::QueueList queueList;

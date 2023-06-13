@@ -96,6 +96,24 @@ namespace AwsMock {
 
                 SendOkResponse(response, sqsResponse.ToXml());
 
+            } else if (action == "GetQueueAttributes") {
+
+                std::string queueUrl = GetStringParameter(payload, "QueueUrl");
+
+                int count = GetAttributeCount(payload, "AttributeName");
+                _logger.trace() << "Got attribute names count: " << count << std::endl;
+
+                std::vector<std::string> attributeNames;
+                for(int i = 1; i <= count; i++) {
+                    std::string attributeName = GetStringParameter(payload, "AttributeName." + std::to_string(i));
+                    attributeNames.emplace_back(attributeName);
+                }
+
+                Dto::SQS::GetQueueAttributesRequest sqsRequest = {.queueUrl=queueUrl, .attributeNames=attributeNames};
+                Dto::SQS::GetQueueAttributesResponse sqsResponse = _sqsService.GetQueueAttributes(sqsRequest);
+
+                SendOkResponse(response, sqsResponse.ToXml());
+
             } else if (action == "SetQueueAttributes") {
 
                 std::string queueUrl = GetStringParameter(payload, "QueueUrl");

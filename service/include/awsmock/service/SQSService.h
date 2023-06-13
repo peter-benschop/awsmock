@@ -22,6 +22,8 @@
 #include "awsmock/dto/sqs/CreateMessageResponse.h"
 #include "awsmock/dto/sqs/CreateQueueRequest.h"
 #include "awsmock/dto/sqs/CreateQueueResponse.h"
+#include "awsmock/dto/sqs/GetQueueAttributesRequest.h"
+#include "awsmock/dto/sqs/GetQueueAttributesResponse.h"
 #include "awsmock/dto/sqs/DeleteMessageRequest.h"
 #include "awsmock/dto/sqs/DeleteMessageResponse.h"
 #include "awsmock/dto/sqs/DeleteQueueRequest.h"
@@ -76,7 +78,16 @@ namespace AwsMock::Service {
       Dto::SQS::PurgeQueueResponse PurgeQueue(const Dto::SQS::PurgeQueueRequest &request);
 
       /**
-       * PUt queue sqs
+       * Return the queue attributes
+       *
+       * @param request get queue sqs request
+       * @return GetQueueAttributesResponse
+       * @throws ServiceException
+       */
+      Dto::SQS::GetQueueAttributesResponse GetQueueAttributes(const Dto::SQS::GetQueueAttributesRequest &request);
+
+      /**
+       * Put queue attributes
        *
        * @param request put queue sqs request
        * @return PutQueueAttributesResponse

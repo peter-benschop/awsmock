@@ -49,7 +49,7 @@ namespace AwsMock::Service {
         try {
 
             Database::Entity::SQS::QueueList queueList = _database->ListQueues(region);
-            Dto::SQS::ListQueueResponse listQueueResponse = Dto::SQS::ListQueueResponse(queueList);
+            auto listQueueResponse = Dto::SQS::ListQueueResponse(queueList);
             _logger.trace() << "SQS create queue list response: " << listQueueResponse.ToXml() << std::endl;
 
             return listQueueResponse;
@@ -76,6 +76,30 @@ namespace AwsMock::Service {
         } catch (Poco::Exception &ex) {
             _logger.error() << "SQS purge queue failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500, request.resource.c_str(), request.requestId.c_str());
+        }
+        return response;
+    }
+
+    Dto::SQS::GetQueueAttributesResponse SQSService::GetQueueAttributes(const Dto::SQS::GetQueueAttributesRequest &request) {
+        _logger.trace() << "Get queue attributes request, request: " << request.ToString() << std::endl;
+
+        Database::Entity::SQS::Queue queue = _database->GetQueueByUrl(request.queueUrl);
+        _logger.debug() << "Got queue: " << queue.ToString() << std::endl;
+
+        Dto::SQS::GetQueueAttributesResponse response;
+        if(request.attributeNames.size()==1 && request.attributeNames[0]=="All") {
+            response.attributes.emplace_back("ApproximateNumberOfMessages", "1");
+            response.attributes.emplace_back("ApproximateNumberOfMessagesDelayed", "1");
+            response.attributes.emplace_back("ApproximateNumberOfMessagesNotVisible", "1");
+            response.attributes.emplace_back("CreatedTimestamp", std::to_string(queue.created.timestamp().epochTime()));
+            response.attributes.emplace_back("DelaySeconds", std::to_string(queue.attributes.delaySeconds));
+            response.attributes.emplace_back("LastModifiedTimestamp", std::to_string(queue.modified.timestamp().epochTime()));
+            response.attributes.emplace_back("MaximumMessageSize", std::to_string(queue.attributes.maxMessageSize));
+            response.attributes.emplace_back("MessageRetentionPeriod", std::to_string(queue.attributes.messageRetentionPeriod));
+            response.attributes.emplace_back("Policy", queue.attributes.policy);
+            response.attributes.emplace_back("QueueArn", queue.queueArn);
+            response.attributes.emplace_back("ReceiveMessageWaitTimeSeconds", std::to_string(queue.attributes.receiveMessageWaitTime));
+            response.attributes.emplace_back("VisibilityTimeout", std::to_string(queue.attributes.visibilityTimeout));
         }
         return response;
     }
