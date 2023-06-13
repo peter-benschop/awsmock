@@ -31,8 +31,11 @@ namespace AwsMock::Service {
                 throw Core::ServiceException("SQS Queue exists already", 500);
             }
 
-            // Update database
+            // Set default attributes
             std::string queueArn = Core::AwsUtils::CreateSQSQueueArn(request.region, _accountId, request.name);
+            Database::Entity::SQS::QueueAttribute attribute {};
+
+            // Update database
             queue = _database->CreateQueue({.region=request.region, .name=request.name, .owner=request.owner, .queueUrl=request.queueUrl, .queueArn=queueArn});
             _logger.trace() << "SQS queue created: " << queue.ToString() << std::endl;
 
@@ -88,9 +91,9 @@ namespace AwsMock::Service {
 
         Dto::SQS::GetQueueAttributesResponse response;
         if(request.attributeNames.size()==1 && request.attributeNames[0]=="All") {
-            response.attributes.emplace_back("ApproximateNumberOfMessages", "1");
-            response.attributes.emplace_back("ApproximateNumberOfMessagesDelayed", "1");
-            response.attributes.emplace_back("ApproximateNumberOfMessagesNotVisible", "1");
+            response.attributes.emplace_back("ApproximateNumberOfMessages", std::to_string(queue.attributes.approximateNumberOfMessages));
+            response.attributes.emplace_back("ApproximateNumberOfMessagesDelayed", std::to_string(queue.attributes.approximateNumberOfMessagesDelayed));
+            response.attributes.emplace_back("ApproximateNumberOfMessagesNotVisible", std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible));
             response.attributes.emplace_back("CreatedTimestamp", std::to_string(queue.created.timestamp().epochTime()));
             response.attributes.emplace_back("DelaySeconds", std::to_string(queue.attributes.delaySeconds));
             response.attributes.emplace_back("LastModifiedTimestamp", std::to_string(queue.modified.timestamp().epochTime()));

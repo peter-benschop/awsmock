@@ -26,7 +26,7 @@ namespace AwsMock::Database::Entity::SQS {
     using bsoncxx::document::view;
     using bsoncxx::document::value;
 
-    enum STATUS { INITIAL, SEND, RESEND };
+    enum STATUS { INITIAL, SEND, RESEND, DELAYED };
 
     struct MessageAttribute {
 

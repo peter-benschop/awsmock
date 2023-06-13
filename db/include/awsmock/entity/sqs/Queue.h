@@ -74,6 +74,21 @@ namespace AwsMock::Database::Entity::SQS {
       std::string redriveAllowPolicy;
 
       /**
+       * Number of message counter
+       */
+      long approximateNumberOfMessages = 0;
+
+      /**
+       * Delay counter
+       */
+      long approximateNumberOfMessagesDelayed = 0;
+
+      /**
+       * Not visible counter
+       */
+      long approximateNumberOfMessagesNotVisible = 0;
+
+      /**
        * Converts the entity to a MongoDB document
        *
        * @return entity as MongoDB document.
@@ -88,7 +103,10 @@ namespace AwsMock::Database::Entity::SQS {
               kvp("receiveMessageWaitTime", receiveMessageWaitTime),
               kvp("visibilityTimeout", visibilityTimeout),
               kvp("redrivePolicy", redrivePolicy),
-              kvp("redriveAllowPolicy", redriveAllowPolicy));
+              kvp("redriveAllowPolicy", redriveAllowPolicy),
+              kvp("approximateNumberOfMessages", approximateNumberOfMessages),
+              kvp("approximateNumberOfMessagesDelayed", approximateNumberOfMessagesDelayed),
+              kvp("approximateNumberOfMessagesNotVisible", approximateNumberOfMessagesNotVisible));
 
           return queueAttributetDoc;
       }
@@ -108,6 +126,9 @@ namespace AwsMock::Database::Entity::SQS {
           visibilityTimeout = mResult.value()["visibilityTimeout"].get_int32().value;
           redrivePolicy = mResult.value()["redrivePolicy"].get_string().value.to_string();
           redriveAllowPolicy = mResult.value()["redriveAllowPolicy"].get_string().value.to_string();
+          approximateNumberOfMessages = mResult.value()["visibilityTimeout"].get_int64().value;
+          approximateNumberOfMessagesDelayed = mResult.value()["visibilityTimeout"].get_int64().value;
+          approximateNumberOfMessagesNotVisible = mResult.value()["visibilityTimeout"].get_int64().value;
       }
 
       /**
@@ -125,6 +146,9 @@ namespace AwsMock::Database::Entity::SQS {
           visibilityTimeout = mResult.value()["visibilityTimeout"].get_int32().value;
           redrivePolicy = mResult.value()["redrivePolicy"].get_string().value.to_string();
           redriveAllowPolicy = mResult.value()["redriveAllowPolicy"].get_string().value.to_string();
+          approximateNumberOfMessages = mResult.value()["visibilityTimeout"].get_int64().value;
+          approximateNumberOfMessagesDelayed = mResult.value()["visibilityTimeout"].get_int64().value;
+          approximateNumberOfMessagesNotVisible = mResult.value()["visibilityTimeout"].get_int64().value;
       }
 
       /**
@@ -146,14 +170,15 @@ namespace AwsMock::Database::Entity::SQS {
       friend std::ostream &operator<<(std::ostream &os, const QueueAttribute &r) {
           os << "QueueAttribute={delaySeconds='" << r.delaySeconds << "' maxMessageSize='" << r.maxMessageSize << "' messageRetentionPeriod='"
              << r.messageRetentionPeriod << "' policy='" << r.policy << "' receiveMessageWaitTime='" << r.receiveMessageWaitTime <<
-             "' visibilityTimeout='" << r.visibilityTimeout << "' redrivePolicy='" << r.redrivePolicy << "' redriveAllowPolicy='" << r.redriveAllowPolicy << "'}";
+             "' visibilityTimeout='" << r.visibilityTimeout << "' redrivePolicy='" << r.redrivePolicy << "' redriveAllowPolicy='" << r.redriveAllowPolicy <<
+             "' approximateNumberOfMessages='" << r.approximateNumberOfMessages << "' approximateNumberOfMessagesDelayed='" << r.approximateNumberOfMessagesDelayed <<
+             "' approximateNumberOfMessagesNotVisible='" << r.approximateNumberOfMessagesNotVisible << "'}";
           return os;
       }
 
     };
 
     typedef struct QueueAttribute QueueAttribute;
-    typedef std::vector<QueueAttribute> QueueAttributeList;
 
     struct Queue {
 
