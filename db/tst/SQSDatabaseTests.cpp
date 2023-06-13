@@ -127,6 +127,21 @@ namespace AwsMock::Database {
         EXPECT_EQ(0, result);
     }
 
+    TEST_F(SQSDatabaseTest, QueueUpdateTest) {
+
+        // arrange
+        Entity::SQS::Queue queue = {.region=_region, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
+        queue = _sqsDatabase.CreateQueue(queue);
+
+        // act
+        queue.owner = "root";
+        Entity::SQS::Queue result = _sqsDatabase.UpdateQueue(queue);
+
+        // assert
+        EXPECT_TRUE(result.oid == queue.oid);
+        EXPECT_TRUE(result.owner == queue.owner);
+    }
+
     TEST_F(SQSDatabaseTest, QueueDeleteTest) {
 
         // arrange
@@ -166,7 +181,7 @@ namespace AwsMock::Database {
 
         // act
         Entity::SQS::MessageList messageList;
-        _sqsDatabase.ReceiveMessages(_region, QUEUE, messageList);
+        _sqsDatabase.ReceiveMessages(_region, QUEUE, 30, messageList);
 
         // assert
         EXPECT_FALSE(messageList.empty());
@@ -210,8 +225,9 @@ namespace AwsMock::Database {
         Entity::SQS::Message message = {.region=_region, .queueUrl=queue.name, .body=BODY};
         _sqsDatabase.CreateMessage(message);
         Entity::SQS::MessageList messageList;
-        _sqsDatabase.ReceiveMessages(_region, QUEUE, messageList);
-        Poco::Thread().sleep(1000);
+        _sqsDatabase.ReceiveMessages(_region, QUEUE, 1, messageList);
+        Poco::Thread().sleep(2000);
+        _sqsDatabase.ResetMessages(QUEUE_URL, 1);
 
         // act
         _sqsDatabase.ResetMessages(QUEUE, 1);
@@ -229,7 +245,7 @@ namespace AwsMock::Database {
         Entity::SQS::Message message = {.region=_region, .queueUrl=queue.name, .body=BODY};
         _sqsDatabase.CreateMessage(message);
         Entity::SQS::MessageList messageList;
-        _sqsDatabase.ReceiveMessages(_region, QUEUE, messageList);
+        _sqsDatabase.ReceiveMessages(_region, QUEUE, 30, messageList);
 
         // act
         Entity::SQS::Message result = messageList[0];
@@ -247,7 +263,7 @@ namespace AwsMock::Database {
         Entity::SQS::Message message = {.region=_region, .queueUrl=queue.name, .body=BODY};
         _sqsDatabase.CreateMessage(message);
         Entity::SQS::MessageList messageList;
-        _sqsDatabase.ReceiveMessages(_region, QUEUE, messageList);
+        _sqsDatabase.ReceiveMessages(_region, QUEUE, 30, messageList);
 
         // act
         Entity::SQS::Message resultMessage = messageList[0];

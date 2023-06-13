@@ -22,6 +22,11 @@ awsmock sqs set-queue-attributes --queue-url http://localhost:4567/000000000000/
 awsmock sqs set-queue-attributes --queue-url http://localhost:4567/000000000000/file-delivery3-queue --attributes file://./sqs/file-delivery3-queue.json
 
 #
+# DLQ definition
+#
+awsmock sqs set-queue-attributes --queue-url http://localhost:4567/000000000000/file-delivery-queue --attributes file://./sqs/file-delivery1-queue-attributes.json
+
+#
 # Setup S3 bucket notification events
 #
 awsmock s3api put-bucket-notification-configuration --bucket file-delivery1 --notification-configuration file://./s3/file-delivery1-hook.json

@@ -13,6 +13,11 @@ namespace AwsMock::Dto::SQS {
     struct CreateMessageRequest {
 
       /**
+       * Region
+       */
+      std::string region;
+
+      /**
        * Queue URL
        */
       std::string url;
@@ -39,7 +44,7 @@ namespace AwsMock::Dto::SQS {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const CreateMessageRequest &r) {
-          os << "CreateMessageRequest={url='" + r.url + "' body: '" + r.body + "'}";
+          os << "CreateMessageRequest={region='" + r.region + "' url='" + r.url + "' body: '" + r.body + "'}";
           return os;
       }
     };

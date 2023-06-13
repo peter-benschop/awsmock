@@ -46,9 +46,9 @@ namespace AwsMock::Worker {
     void S3Worker::run() {
 
         // Check service active
-        if (!_serviceDatabase->IsActive("S3")) {
-            return;
-        }
+//        if (!_serviceDatabase->IsActive("S3")) {
+//            return;
+//        }
 
         // Start file watcher, they will call the delegate methods, if they find a file system event.
         _watcherThread.start(_watcher);

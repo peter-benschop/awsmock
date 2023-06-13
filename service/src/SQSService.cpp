@@ -107,9 +107,35 @@ namespace AwsMock::Service {
         return response;
     }
 
-    Dto::SQS::PutQueueAttributesResponse SQSService::PutQueueAttributes(const Dto::SQS::PutQueueAttributesRequest &request) {
+    Dto::SQS::SetQueueAttributesResponse SQSService::SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request) {
         _logger.trace() << "Put queue sqs request, request: " << request.ToString() << std::endl;
-        Dto::SQS::PutQueueAttributesResponse response;
+
+        Dto::SQS::SetQueueAttributesResponse response;
+        try {
+            // Check existence
+            if (!_database->QueueExists(request.queueUrl)) {
+                throw Core::ServiceException("Queue does not exist", 500);
+            }
+
+            // Get the queue
+            Database::Entity::SQS::Queue queue = _database->GetQueueByUrl(request.queueUrl);
+            _logger.debug() << "Got queue: " << queue.ToString() << std::endl;
+
+            // Reset all attributes
+            queue.attributes.policy = request.attributes["Policy"];
+            queue.attributes.redrivePolicy = request.attributes["RedrivePolicy"];
+            queue.attributes.redriveAllowPolicy = request.attributes["RedriveAllowPolicy"];
+            queue.attributes.messageRetentionPeriod = std::stoi(request.attributes["MessageRetentionPeriod"]);
+            queue.attributes.visibilityTimeout = std::stoi(request.attributes["VisibilityTimeout"]);
+
+            // Update database
+            queue = _database->UpdateQueue(queue);
+            _logger.debug() << "Queue updated: " << queue.ToString() << std::endl;
+
+        } catch (Poco::Exception &ex) {
+            _logger.error() << "SQS delete queue failed, message: " << ex.message() << std::endl;
+            throw Core::ServiceException(ex.message(), 500);
+        }
         return response;
     }
 
@@ -147,8 +173,8 @@ namespace AwsMock::Service {
             std::string receiptHandle = Core::StringUtils::GenerateRandomString(512);
             std::string md5Body = Core::Crypto::GetMd5FromString(request.body);
             std::string md5Attr = Core::Crypto::GetMd5FromString(request.body);
-            message =
-                _database->CreateMessage({.queueUrl=request.url, .body=request.body, .messageId=messageId, .receiptHandle=receiptHandle, .md5Body=md5Body, .md5Attr=md5Attr});
+            message = _database->CreateMessage({.region= request.region, .queueUrl=request.url, .body=request.body, .messageId=messageId, .receiptHandle=receiptHandle,
+                                                .md5Body=md5Body, .md5Attr=md5Attr});
 
         } catch (Poco::Exception &ex) {
             _logger.error() << "SQS create message failed, message: " << ex.message() << std::endl;
@@ -163,12 +189,14 @@ namespace AwsMock::Service {
         try {
             Database::Entity::SQS::MessageList messageList;
 
+            Database::Entity::SQS::Queue queue = _database->GetQueueByUrl(request.queueUrl);
+
             long elapsed = 0;
             auto begin = std::chrono::high_resolution_clock::now();
 
             while (elapsed < request.waitTimeSeconds * 1000) {
 
-                _database->ReceiveMessages(request.region, request.queueUrl, messageList);
+                _database->ReceiveMessages(request.region, request.queueUrl, queue.attributes.visibilityTimeout, messageList);
 
                 if(!messageList.empty()) {
                     break;

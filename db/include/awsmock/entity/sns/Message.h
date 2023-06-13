@@ -154,7 +154,7 @@ namespace AwsMock::Database::Entity::SNS {
               kvp("message", message),
               kvp("messageId", messageId),
               kvp("attributes", messageAttributesDoc),
-              kvp("lastSend", bsoncxx::types::b_date(std::chrono::milliseconds(lastSend.timestamp().epochMicroseconds() / 1000))),
+              kvp("reset", bsoncxx::types::b_date(std::chrono::milliseconds(lastSend.timestamp().epochMicroseconds() / 1000))),
               kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
               kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
 
@@ -174,7 +174,7 @@ namespace AwsMock::Database::Entity::SNS {
           targetArn = mResult.value()["targetArn"].get_string().value.to_string();
           message = mResult.value()["message"].get_string().value.to_string();
           messageId = mResult.value()["messageId"].get_string().value.to_string();
-          lastSend = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastSend"].get_date().value) / 1000000));
+          lastSend = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["reset"].get_date().value) / 1000000));
           created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000000));
           modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000000));
 
@@ -201,7 +201,7 @@ namespace AwsMock::Database::Entity::SNS {
           targetArn = mResult.value()["targetArn"].get_string().value.to_string();
           message = mResult.value()["message"].get_string().value.to_string();
           messageId = mResult.value()["messageId"].get_string().value.to_string();
-          lastSend = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastSend"].get_date().value) / 1000000));
+          lastSend = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["reset"].get_date().value) / 1000000));
           created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000000));
           modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000000));
 
@@ -233,7 +233,7 @@ namespace AwsMock::Database::Entity::SNS {
        */
       friend std::ostream &operator<<(std::ostream &os, const Message &m) {
           os << "Message={oid='" + m.oid + "' topicArn: " + m.topicArn + "' targetArn='" + m.targetArn + "'message='" + m.message + "'messageId='" + m.messageId
-              + "' lastSend='" + Poco::DateTimeFormatter().format(m.lastSend, Poco::DateTimeFormat::HTTP_FORMAT) + "' created='" +
+              + "' reset='" + Poco::DateTimeFormatter().format(m.lastSend, Poco::DateTimeFormat::HTTP_FORMAT) + "' created='" +
               Poco::DateTimeFormatter().format(m.created, Poco::DateTimeFormat::HTTP_FORMAT) + "' modified='" +
               Poco::DateTimeFormatter().format(m.modified, Poco::DateTimeFormat::HTTP_FORMAT) + "'}";
           return os;

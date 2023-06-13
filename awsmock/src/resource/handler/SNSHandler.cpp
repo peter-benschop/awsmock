@@ -137,11 +137,7 @@ namespace AwsMock {
                 value = Core::StringUtils::UrlDecode(parts[1]);
             }
         }
-        _logger.debug() << "Found string parameter, name: " << name << "value: " << value << std::endl;
+        _logger.debug() << "Found string parameter, name: " << name << " value: " << value << std::endl;
         return value;
-    }
-
-    std::string SNSHandler::GetEndpoint(Poco::Net::HTTPServerRequest &request) {
-        return request.get("Host");
     }
 }
