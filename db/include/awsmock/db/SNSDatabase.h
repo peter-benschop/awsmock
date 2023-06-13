@@ -88,6 +88,24 @@ namespace AwsMock::Database {
       Entity::SNS::Topic GetTopicById(const std::string &oid);
 
       /**
+       * Returns a topic by is ARN
+       *
+       * @param topicArn topic ARN
+       * @return topic entity
+       * @throws DatabaseException
+       */
+      Entity::SNS::Topic GetTopicByArn(const std::string &topicArn);
+
+      /**
+       * Updates an existing topic in the SNS topic table
+       *
+       * @param topic topic entity
+       * @return updated SNS topic entity
+       * @throws DatabaseException
+       */
+      Entity::SNS::Topic UpdateTopic(const Entity::SNS::Topic& topic);
+
+      /**
        * List all available topics
        *
        * @param region AWS region

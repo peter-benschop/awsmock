@@ -11,9 +11,6 @@
 #include "Poco/DateTime.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTimeFormatter.h"
-#include "Poco/NotificationCenter.h"
-#include "Poco/Notification.h"
-#include "Poco/Observer.h"
 
 // AwsMock includes
 #include "awsmock/core/Configuration.h"
@@ -162,7 +159,6 @@ namespace AwsMock {
        */
       Service::S3Service _s3Service;
 
-      Poco::NotificationCenter nc;
     };
 } // namespace AwsMock
 

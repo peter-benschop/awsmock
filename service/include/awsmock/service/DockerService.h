@@ -8,6 +8,7 @@
 // C++ standard includes
 #include <string>
 #include <fstream>
+#include <iostream>
 
 // Poco includes
 #include <Poco/Logger.h>
@@ -22,6 +23,7 @@
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
 #include <awsmock/core/RandomUtils.h>
+#include <awsmock/core/StreamFilter.h>
 #include <awsmock/dto/docker/CreateContainerRequest.h>
 #include <awsmock/dto/docker/CreateContainerResponse.h>
 #include <awsmock/dto/docker/ListImageResponse.h>

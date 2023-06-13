@@ -56,6 +56,15 @@ namespace AwsMock::Database {
         return GetTopicById(bsoncxx::oid(oid));
     }
 
+    Entity::SNS::Topic SNSDatabase::GetTopicByArn(const std::string &topicArn) {
+
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("topicArn", topicArn)));
+        Entity::SNS::Topic result;
+        result.FromDocument(mResult);
+
+        return result;
+    }
+
     Entity::SNS::TopicList SNSDatabase::ListTopics(const std::string &region) {
 
         Entity::SNS::TopicList topicList;
@@ -68,6 +77,15 @@ namespace AwsMock::Database {
 
         _logger.trace() << "Got topic list, size:" << topicList.size();
         return topicList;
+    }
+
+    Entity::SNS::Topic SNSDatabase::UpdateTopic(const Entity::SNS::Topic &topic) {
+
+        auto result = _topicCollection.replace_one(make_document(kvp("region", topic.region), kvp("topicArn", topic.topicArn)), topic.ToDocument());
+
+        _logger.trace() << "Topic updated: " << topic.ToString();
+
+        return GetTopicByArn(topic.topicArn);
     }
 
     long SNSDatabase::CountTopics(const std::string &region) {

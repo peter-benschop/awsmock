@@ -38,7 +38,7 @@ namespace AwsMock::Service {
       Core::Configuration _configuration = Core::Configuration("/tmp/aws-mock.properties");
       Database::SQSDatabase _database = Database::SQSDatabase(_configuration);
       SQSService _service = SQSService(_configuration);
-      //Poco::Data::Session _session = _database.GetSession();
+      //Poco::Data::Session _session = _snsDatabase.GetSession();
     };
 
     /*TEST_F(SQSServiceTest, QueueCreateTest) {
@@ -61,7 +61,7 @@ namespace AwsMock::Service {
 
         // act
         Dto::SQS::CreateQueueResponse response = _service.CreateQueue(request);
-        Database::Entity::SQS::QueueAttribute attributes = _database.GetQueueAttributesByQueueUrl(response.queueUrl);
+        Database::Entity::SQS::QueueAttribute attributes = _snsDatabase.GetQueueAttributesByQueueUrl(response.queueUrl);
 
         // assert
         EXPECT_TRUE(response.name == QUEUE);

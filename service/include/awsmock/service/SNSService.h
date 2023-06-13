@@ -15,20 +15,23 @@
 #include <Poco/LogStream.h>
 
 // AwsMock includes
-#include "awsmock/core/CryptoUtils.h"
-#include "awsmock/core/ServiceException.h"
-#include "awsmock/core/AwsUtils.h"
-#include "awsmock/dto/sns/CreateTopicRequest.h"
-#include "awsmock/dto/sns/CreateTopicResponse.h"
-#include "awsmock/dto/sns/ListTopicsResponse.h"
-#include "awsmock/dto/sns/DeleteTopicResponse.h"
-#include "awsmock/dto/sns/PublishRequest.h"
-#include "awsmock/dto/sns/PublishResponse.h"
-#include "awsmock/dto/sns/SubscribeRequest.h"
-#include "awsmock/dto/sns/SubscribeResponse.h"
-#include "awsmock/db/SNSDatabase.h"
+#include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/ServiceException.h>
+#include <awsmock/core/AwsUtils.h>
+#include <awsmock/dto/sns/CreateTopicRequest.h>
+#include <awsmock/dto/sns/CreateTopicResponse.h>
+#include <awsmock/dto/sns/ListTopicsResponse.h>
+#include <awsmock/dto/sns/DeleteTopicResponse.h>
+#include <awsmock/dto/sns/PublishRequest.h>
+#include <awsmock/dto/sns/PublishResponse.h>
+#include <awsmock/dto/sns/SubscribeRequest.h>
+#include <awsmock/dto/sns/SubscribeResponse.h>
+#include <awsmock/dto/sqs/CreateMessageRequest.h>
+#include <awsmock/dto/sqs/CreateMessageResponse.h>
+#include <awsmock/db/SNSDatabase.h>
+#include <awsmock/service/SQSService.h>
 
-#define DEFAULT_ACCOUNT_ID "000000000000"
+#define SQS_PROTOCOL "sqs"
 
 namespace AwsMock::Service {
 
@@ -93,6 +96,21 @@ namespace AwsMock::Service {
       void Initialize();
 
       /**
+       * Checks the subscriptions.
+       *
+       * <p>If a SQS queue subscription is found send the message to the SQS queue.</p>
+       */
+      void CheckSubscriptions(const Dto::SNS::PublishRequest &request);
+
+      /**
+       * Send a SNS message to an SQS queue
+       *
+       * @param subscription SNS subscription
+       * @param message message body
+       */
+      void SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const std::string &message);
+
+      /**
        * Logger
        */
       Poco::LogStream _logger;
@@ -108,9 +126,19 @@ namespace AwsMock::Service {
       const Core::Configuration &_configuration;
 
       /**
-       * Database connection
+       * SNS database connection
        */
-      std::unique_ptr<Database::SNSDatabase> _database;
+      std::unique_ptr<Database::SNSDatabase> _snsDatabase;
+
+      /**
+       * SQS database connection
+       */
+      std::unique_ptr<Database::SQSDatabase> _sqsDatabase;
+
+      /**
+       * SQS service
+       */
+      std::unique_ptr<SQSService> _sqsService;
     };
 
 } // namespace AwsMock::Service

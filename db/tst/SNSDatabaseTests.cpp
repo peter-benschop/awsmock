@@ -59,6 +59,44 @@ namespace AwsMock::Database {
         EXPECT_FALSE(result.oid.empty());
     }
 
+    TEST_F(SNSDatabaseTest, TopicGetByIdTest) {
+
+        // arrange
+        Entity::SNS::Topic topic = _snsDatabase.CreateTopic({.region=_region, .topicName=TOPIC, .owner=OWNER});
+
+        // act
+        Entity::SNS::Topic result = _snsDatabase.GetTopicById(topic.oid);
+
+        // assert
+        EXPECT_TRUE(result.topicArn == topic.topicArn);
+    }
+
+    TEST_F(SNSDatabaseTest, TopicGetByArnTest) {
+
+        // arrange
+        Entity::SNS::Topic topic = _snsDatabase.CreateTopic({.region=_region, .topicName=TOPIC, .owner=OWNER});
+
+        // act
+        Entity::SNS::Topic result = _snsDatabase.GetTopicByArn(topic.topicArn);
+
+        // assert
+        EXPECT_TRUE(result.topicArn == topic.topicArn);
+    }
+
+    TEST_F(SNSDatabaseTest, TopicUpdateTest) {
+
+        // arrange
+        Entity::SNS::Topic topic = _snsDatabase.CreateTopic({.region=_region, .topicName=TOPIC, .owner=OWNER});
+
+        // act
+        std::string url = "http://localhost:4567/" + topic.topicName;
+        topic.topicUrl = url;
+        Entity::SNS::Topic result = _snsDatabase.UpdateTopic(topic);
+
+        // assert
+        EXPECT_TRUE(result.topicUrl == topic.topicUrl);
+    }
+
     TEST_F(SNSDatabaseTest, TopicCountTest) {
 
         // arrange

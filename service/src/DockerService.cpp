@@ -94,8 +94,15 @@ namespace AwsMock::Service {
         std::string output = Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
         _logger.trace() << "List container request send to docker daemon, output: " << output;
 
+        // Remove unwanted characters
+        std::stringstream sin, sout;
+        sin << output << std::endl;
+        Core::StreamFilter::XmlCharacterStreamFilter(sin, sout);
+
+        std::string tmp = sout.str();
+
         Dto::Docker::ListContainerResponse response;
-        response.FromJson(output);
+        response.FromJson(sout.str());
 
         // Find container
         std::string containerName = "/" + name;

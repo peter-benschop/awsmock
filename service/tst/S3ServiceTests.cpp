@@ -39,7 +39,7 @@ namespace AwsMock::Service {
       Core::Configuration _configuration = Core::Configuration("/tmp/aws-mock.properties");
       Database::S3Database _database = Database::S3Database(_configuration);
       S3Service _service = S3Service(_configuration);
-      //Poco::Data::Session _session = _database.GetSession();
+      //Poco::Data::Session _session = _snsDatabase.GetSession();
       std::string testFile;
     };
 

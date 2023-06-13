@@ -8,9 +8,6 @@ namespace AwsMock {
 
         // Set console logger
         Core::Logger::SetDefaultConsoleLogger("S3Handler");
-/*
-        nc.addObserver(Poco::Observer<Service::S3Service, Service::S3CreateBucketNotification>(_s3Service, &Service::S3Service::handleCreateBucket));
-        nc.addObserver(Poco::Observer<Service::S3Service, Service::S3DeleteBucketNotification>(_s3Service, &Service::S3Service::handleDeleteBucket));*/
     }
 
     void S3Handler::handleGet(Poco::Net::HTTPServerRequest &request,

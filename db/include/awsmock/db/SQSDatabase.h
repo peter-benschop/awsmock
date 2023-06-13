@@ -87,6 +87,15 @@ namespace AwsMock::Database {
       Entity::SQS::Queue GetQueueById(const std::string &oid);
 
       /**
+       * Returns a queue by primary key
+       *
+       * @param arn queue ARN
+       * @return queue entity
+       * @throws DatabaseException
+       */
+      Entity::SQS::Queue GetQueueByArn(const std::string &arn);
+
+      /**
        * List all available queues
        *
        * @param region AWS region

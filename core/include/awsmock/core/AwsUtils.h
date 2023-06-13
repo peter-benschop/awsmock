@@ -53,7 +53,7 @@ namespace AwsMock::Core {
        * @param accountId AWS account ID
        * @param queueName name of the queue
        */
-      static std::string CreateSQSArn(const std::string &region, const std::string &accountId, const std::string &queueName);
+      static std::string CreateSQSQueueArn(const std::string &region, const std::string &accountId, const std::string &queueName);
 
       /**
        * Create SNS topic ARN
@@ -74,6 +74,15 @@ namespace AwsMock::Core {
        * @param topicName name of the topic
        */
       static std::string CreateSNSSubscriptionArn(const std::string &region, const std::string &accountId, const std::string &topicName);
+
+      /**
+       * Returns the default account ID, which will be used, in case no account ID is provided by the caller.
+       *
+       * @return default account ID
+       */
+      static std::string GetDefaultAccountId() {
+          return "000000000000";
+      }
     };
 }
 #endif //AWSMOCK_CORE_AWSUTILS_H

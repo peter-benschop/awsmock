@@ -32,7 +32,7 @@ namespace AwsMock::Service {
             }
 
             // Update database
-            std::string queueArn = Core::AwsUtils::CreateSQSArn(request.region, _accountId, request.name);
+            std::string queueArn = Core::AwsUtils::CreateSQSQueueArn(request.region, _accountId, request.name);
             queue = _database->CreateQueue({.region=request.region, .name=request.name, .owner=request.owner, .queueUrl=request.queueUrl, .queueArn=queueArn});
             _logger.trace() << "SQS queue created: " << queue.ToString();
 

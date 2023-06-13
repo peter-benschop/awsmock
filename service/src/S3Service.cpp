@@ -309,7 +309,7 @@ namespace AwsMock::Service {
             }
 
             // Delete from database
-            //_database->DeleteObjects(request.bucket, request.keys);
+            //_snsDatabase->DeleteObjects(request.bucket, request.keys);
             poco_debug(_logger, "Database object deleted, count: " + std::to_string(request.keys.size()));
 
             // Delete file system objects

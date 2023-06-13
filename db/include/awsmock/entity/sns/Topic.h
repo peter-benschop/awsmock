@@ -141,6 +141,18 @@ namespace AwsMock::Database::Entity::SNS {
       Poco::DateTime modified = Poco::DateTime();
 
       /**
+       * Checks whether a subscription with the given protocol/endpoint exists already.
+       *
+       * @param subscription name of the event
+       * @return true if notification with the given event name exists.
+       */
+      bool HasSubscription(const Subscription subscription) {
+          return find_if(subscriptions.begin(), subscriptions.end(), [subscription](const Subscription &s) {
+            return s.protocol == subscription.protocol && s.endpoint == subscription.endpoint;
+          }) != subscriptions.end();
+      }
+
+      /**
        * Converts the entity to a MongoDB document
        *
        * @return entity as MongoDB document.

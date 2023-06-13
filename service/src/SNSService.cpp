@@ -17,9 +17,13 @@ namespace AwsMock::Service {
         // Set console logger
         Core::Logger::SetDefaultConsoleLogger("SNSService");
 
+        int level = Poco::Logger::get("SNSService").getLevel();
+
         // Initialize environment
-        _database = std::make_unique<Database::SNSDatabase>(_configuration);
-        _accountId = DEFAULT_ACCOUNT_ID;
+        _snsDatabase = std::make_unique<Database::SNSDatabase>(_configuration);
+        _sqsDatabase = std::make_unique<Database::SQSDatabase>(_configuration);
+        _sqsService = std::make_unique<SQSService>(_configuration);
+        _accountId = Core::AwsUtils::GetDefaultAccountId();
     }
 
     Dto::SNS::CreateTopicResponse SNSService::CreateTopic(const Dto::SNS::CreateTopicRequest &request) {
@@ -28,13 +32,13 @@ namespace AwsMock::Service {
         Database::Entity::SNS::Topic topic;
         try {
             // Check existence
-            if (_database->TopicExists(request.region, request.topicName)) {
+            if (_snsDatabase->TopicExists(request.region, request.topicName)) {
                 throw Core::ServiceException("SQS Queue exists already", 500);
             }
 
             // Update database
             std::string topicArn = Core::AwsUtils::CreateSNSTopicArn(request.region, _accountId, request.topicName);
-            topic = _database->CreateTopic({.region=request.region, .topicName=request.topicName, .owner=request.owner, .topicArn=topicArn});
+            topic = _snsDatabase->CreateTopic({.region=request.region, .topicName=request.topicName, .owner=request.owner, .topicArn=topicArn});
             _logger.trace() << "SNS topic created: " << topic.ToString();
 
         } catch (Poco::Exception &exc) {
@@ -49,7 +53,7 @@ namespace AwsMock::Service {
 
         try {
 
-            Database::Entity::SNS::TopicList topicList = _database->ListTopics(region);
+            Database::Entity::SNS::TopicList topicList = _snsDatabase->ListTopics(region);
             auto listTopicsResponse = Dto::SNS::ListTopicsResponse(topicList);
             _logger.trace() << "SNS list topics response: " << listTopicsResponse.ToXml();
 
@@ -67,12 +71,12 @@ namespace AwsMock::Service {
         Dto::SNS::DeleteTopicResponse response;
         try {
             // Check existence
-            if (!_database->TopicExists(topicArn)) {
+            if (!_snsDatabase->TopicExists(topicArn)) {
                 throw Core::ServiceException("Topic does not exist", 500);
             }
 
             // Update database
-            _database->DeleteTopic({.region=region, .topicArn=topicArn});
+            _snsDatabase->DeleteTopic({.region=region, .topicArn=topicArn});
 
         } catch (Poco::Exception &ex) {
             _logger.error() << "SNS delete topic failed, message: " << ex.message();
@@ -91,14 +95,17 @@ namespace AwsMock::Service {
             }
 
             // Check existence
-            if (!_database->TopicExists(request.topicArn)) {
+            if (!_snsDatabase->TopicExists(request.topicArn)) {
                 throw Core::ServiceException("SNS topic does not exists", 500);
             }
 
             // Update database
             std::string messageId = Core::StringUtils::GenerateRandomString(100);
             message =
-                _database->CreateMessage({.region=request.region, .topicArn=request.topicArn, .targetArn=request.targetArn, .message=request.message, .messageId=messageId});
+                _snsDatabase->CreateMessage({.region=request.region, .topicArn=request.topicArn, .targetArn=request.targetArn, .message=request.message, .messageId=messageId});
+
+            // Check subscriptions
+            CheckSubscriptions(request);
 
             return {.messageId=message.messageId};
 
@@ -110,24 +117,32 @@ namespace AwsMock::Service {
 
     Dto::SNS::SubscribeResponse SNSService::Subscribe(const Dto::SNS::SubscribeRequest &request) {
 
-        //Database::Entity::SNS::Message message;
         try {
-            // TODO: Get topic from DB
-            std::string subscriptionArn = Core::AwsUtils::CreateSNSSubscriptionArn(request.region, _accountId, request.topicArn);
+
             // Check topic/target ARN
-          /*  if (request.topicArn.empty() && request.targetArn.empty()) {
-                throw Core::ServiceException("Either topicARN or targetArn must exist", 500);
+            if (request.topicArn.empty()) {
+                throw Core::ServiceException("Topic ARN missing", 500);
             }
 
             // Check existence
-            if (!_database->TopicExists(request.topicArn)) {
+            if (!_snsDatabase->TopicExists(request.topicArn)) {
                 throw Core::ServiceException("SNS topic does not exists", 500);
             }
 
-            // Update database
-            std::string messageId = Core::StringUtils::GenerateRandomString(100);
-            message =
-                _database->CreateMessage({.region=request.region, .topicArn=request.topicArn, .targetArn=request.targetArn, .message=request.message, .messageId=messageId});*/
+            // Create new subscription
+            Database::Entity::SNS::Topic topic = _snsDatabase->GetTopicByArn(request.topicArn);
+            std::string subscriptionArn = Core::AwsUtils::CreateSNSSubscriptionArn(request.region, _accountId, topic.topicName);
+
+            Database::Entity::SNS::Subscription subscription = {.protocol=request.protocol, .endpoint=request.endpoint};
+            if (!topic.HasSubscription(subscription)) {
+
+                // Add subscription
+                topic.subscriptions.push_back({.protocol=request.protocol, .endpoint=request.endpoint});
+
+                // Save to database
+                topic = _snsDatabase->UpdateTopic(topic);
+                _logger.debug() << "Subscription added, topic: " << topic.ToString();
+            }
 
             return {.subscriptionArn=subscriptionArn};
 
@@ -135,6 +150,27 @@ namespace AwsMock::Service {
             _logger.error() << "SNS subscription failed, message: " << ex.message();
             throw Core::ServiceException(ex.message(), 500);
         }
+    }
+
+    void SNSService::CheckSubscriptions(const Dto::SNS::PublishRequest &request) {
+
+        Database::Entity::SNS::Topic topic = _snsDatabase->GetTopicByArn(request.topicArn);
+        if (!topic.subscriptions.empty()) {
+
+            for (const auto &it : topic.subscriptions) {
+
+                if (it.protocol == SQS_PROTOCOL) {
+                    SendSQSMessage(it, request.message);
+
+                }
+            }
+        }
+    }
+
+    void SNSService::SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const std::string &message) {
+
+        Database::Entity::SQS::Queue sqsQueue = _sqsDatabase->GetQueueByArn(subscription.endpoint);
+        _sqsService->CreateMessage({.url = sqsQueue.queueUrl, .body=message});
     }
 
 } // namespace AwsMock::Service
