@@ -258,6 +258,47 @@ namespace AwsMock::Database {
         EXPECT_FALSE(result);
     }
 
+    TEST_F(S3DatabaseTest, ObjectCountTest) {
+
+        // arrange
+        Entity::S3::Bucket bucket = {.region=_region, .name=BUCKET, .owner=OWNER};
+        bucket = _s3database.CreateBucket(bucket);
+
+        // Create objects
+        for (int i = 0; i < 10; i++) {
+            _s3database.CreateObject({.region=_region, .bucket=bucket.name, .key=std::string(OBJECT) + std::to_string(i), .owner=OWNER});
+        }
+
+        // act
+        int result = _s3database.ObjectCount(bucket);
+
+        // assert
+        EXPECT_EQ(10, result);
+    }
+
+    TEST_F(S3DatabaseTest, ObjectDeleteManyTest) {
+
+        // arrange
+        Entity::S3::Bucket bucket = {.region=_region, .name=BUCKET, .owner=OWNER};
+        bucket = _s3database.CreateBucket(bucket);
+
+        // Create objects
+        std::vector<std::string> keys;
+        for (int i = 0; i < 10; i++) {
+            std::string key = std::string(OBJECT) + "-" + std::to_string(i);
+            keys.push_back(key);
+            Entity::S3::Object object = {.bucket=bucket.name, .key=key, .owner=OWNER};
+            _s3database.CreateObject(object);
+        }
+
+        // act
+        EXPECT_NO_THROW({ _s3database.DeleteObjects(bucket.name, keys); });
+        bool result = _s3database.ObjectCount(bucket);
+
+        // assert
+        EXPECT_EQ(0, result);
+    }
+
     TEST_F(S3DatabaseTest, ObjectDeleteAllTest) {
 
         // arrange

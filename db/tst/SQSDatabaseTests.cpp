@@ -11,14 +11,15 @@
 // Poco includes
 #include "Poco/Path.h"
 
-// Local includes
+// AwsMock includes
 #include <awsmock/core/Configuration.h>
+#include <awsmock/core/AwsUtils.h>
 #include <awsmock/db/SQSDatabase.h>
 
 #define CONFIG_FILE "/tmp/aws-mock.properties"
-#define REGION "eu-central-1"
+
 #define QUEUE "test-queue"
-#define QUEUE_URL "http://localhost:4567/000000000000/test-QUEUE"
+#define QUEUE_URL "http://localhost:4567/000000000000/test-queue"
 #define BODY "{\"TestObject\": \"TestValue\"}"
 #define OWNER "test-owner"
 
@@ -32,6 +33,7 @@ namespace AwsMock::Database {
 
       void SetUp() override {
           _region = _configuration.getString("awsmock.region");
+          _queueArn = Core::AwsUtils::CreateSQSQueueArn(_region, Core::AwsUtils::GetDefaultAccountId(), QUEUE);
       }
 
       void TearDown() override {
@@ -39,7 +41,7 @@ namespace AwsMock::Database {
           _sqsDatabase.DeleteAllMessages();
       }
 
-      std::string _region;
+      std::string _region, _queueArn;
       Core::Configuration _configuration = Core::Configuration(CONFIG_FILE);
       SQSDatabase _sqsDatabase = SQSDatabase(_configuration);
     };
@@ -47,20 +49,47 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, QueueCreateTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
+        Entity::SQS::Queue queue = {.region=_region, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL, .queueArn=_queueArn};
 
         // act
         Entity::SQS::Queue result = _sqsDatabase.CreateQueue(queue);
 
         // assert
         EXPECT_TRUE(result.name == QUEUE);
-        EXPECT_TRUE(result.region == REGION);
+        EXPECT_TRUE(result.region == _region);
+    }
+
+    TEST_F(SQSDatabaseTest, QueueByIdTest) {
+
+        // arrange
+        Entity::SQS::Queue queue = _sqsDatabase.CreateQueue({.region=_region, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL, .queueArn=_queueArn});
+
+        // act
+        Entity::SQS::Queue result = _sqsDatabase.GetQueueById(queue.oid);
+
+        // assert
+        EXPECT_TRUE(result.name == QUEUE);
+        EXPECT_TRUE(result.region == _region);
+    }
+
+    TEST_F(SQSDatabaseTest, QueueByArnTest) {
+
+        // arrange
+        std::string queueArn = Core::AwsUtils::CreateSQSQueueArn(_region, Core::AwsUtils::GetDefaultAccountId(), QUEUE);
+        Entity::SQS::Queue queue = _sqsDatabase.CreateQueue({.region=_region, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL, .queueArn=_queueArn});
+
+        // act
+        Entity::SQS::Queue result = _sqsDatabase.GetQueueByArn(queue.queueArn);
+
+        // assert
+        EXPECT_TRUE(result.name == QUEUE);
+        EXPECT_TRUE(result.region == _region);
     }
 
     TEST_F(SQSDatabaseTest, QueueListTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
+        Entity::SQS::Queue queue = {.region=_region, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
         queue = _sqsDatabase.CreateQueue(queue);
 
         // act
@@ -103,9 +132,9 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, MessageCreateTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
+        Entity::SQS::Queue queue = {.region=_region, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
         queue = _sqsDatabase.CreateQueue(queue);
-        Entity::SQS::Message message = {.region=REGION, .queueUrl=queue.name, .body=BODY};
+        Entity::SQS::Message message = {.region=_region, .queueUrl=queue.name, .body=BODY};
 
         // act
         Entity::SQS::Message result = _sqsDatabase.CreateMessage(message);
@@ -118,14 +147,14 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, MessageReceiveTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
+        Entity::SQS::Queue queue = {.region=_region, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
         queue = _sqsDatabase.CreateQueue(queue);
-        Entity::SQS::Message message = {.region=REGION, .queueUrl=queue.name, .body=BODY};
+        Entity::SQS::Message message = {.region=_region, .queueUrl=queue.name, .body=BODY};
         _sqsDatabase.CreateMessage(message);
 
         // act
         Entity::SQS::MessageList messageList;
-        _sqsDatabase.ReceiveMessages(REGION, QUEUE, messageList);
+        _sqsDatabase.ReceiveMessages(_region, QUEUE, messageList);
 
         // assert
         EXPECT_FALSE(messageList.empty());
@@ -134,13 +163,13 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, MessageCountTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
+        Entity::SQS::Queue queue = {.region=_region, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
         queue = _sqsDatabase.CreateQueue(queue);
-        Entity::SQS::Message message = {.region=REGION, .queueUrl=queue.name, .body=BODY};
+        Entity::SQS::Message message = {.region=_region, .queueUrl=queue.name, .body=BODY};
         _sqsDatabase.CreateMessage(message);
 
         // act
-        long result = _sqsDatabase.CountMessages(REGION, QUEUE);
+        long result = _sqsDatabase.CountMessages(_region, QUEUE);
 
         // assert
         EXPECT_EQ(1, result);
@@ -149,13 +178,13 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, MessageCountStatusTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
+        Entity::SQS::Queue queue = {.region=_region, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
         queue = _sqsDatabase.CreateQueue(queue);
-        Entity::SQS::Message message = {.region=REGION, .queueUrl=queue.name, .body=BODY};
+        Entity::SQS::Message message = {.region=_region, .queueUrl=queue.name, .body=BODY};
         _sqsDatabase.CreateMessage(message);
 
         // act
-        long result = _sqsDatabase.CountMessagesByStatus(REGION, QUEUE, Entity::SQS::INITIAL);
+        long result = _sqsDatabase.CountMessagesByStatus(_region, QUEUE, Entity::SQS::INITIAL);
 
         // assert
         EXPECT_EQ(1, result);
@@ -164,17 +193,17 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, MessageResetTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
+        Entity::SQS::Queue queue = {.region=_region, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
         queue = _sqsDatabase.CreateQueue(queue);
-        Entity::SQS::Message message = {.region=REGION, .queueUrl=queue.name, .body=BODY};
+        Entity::SQS::Message message = {.region=_region, .queueUrl=queue.name, .body=BODY};
         _sqsDatabase.CreateMessage(message);
         Entity::SQS::MessageList messageList;
-        _sqsDatabase.ReceiveMessages(REGION, QUEUE, messageList);
+        _sqsDatabase.ReceiveMessages(_region, QUEUE, messageList);
         Poco::Thread().sleep(1000);
 
         // act
         _sqsDatabase.ResetMessages(QUEUE, 1);
-        long result = _sqsDatabase.CountMessagesByStatus(REGION, QUEUE, Entity::SQS::INITIAL);
+        long result = _sqsDatabase.CountMessagesByStatus(_region, QUEUE, Entity::SQS::INITIAL);
 
         // assert
         EXPECT_EQ(1, result);
@@ -183,12 +212,12 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, MessageGetByReceiptHandleTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
+        Entity::SQS::Queue queue = {.region=_region, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
         queue = _sqsDatabase.CreateQueue(queue);
-        Entity::SQS::Message message = {.region=REGION, .queueUrl=queue.name, .body=BODY};
+        Entity::SQS::Message message = {.region=_region, .queueUrl=queue.name, .body=BODY};
         _sqsDatabase.CreateMessage(message);
         Entity::SQS::MessageList messageList;
-        _sqsDatabase.ReceiveMessages(REGION, QUEUE, messageList);
+        _sqsDatabase.ReceiveMessages(_region, QUEUE, messageList);
 
         // act
         Entity::SQS::Message result = messageList[0];
@@ -201,17 +230,17 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, MessageDeleteTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region=REGION, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
+        Entity::SQS::Queue queue = {.region=_region, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL};
         queue = _sqsDatabase.CreateQueue(queue);
-        Entity::SQS::Message message = {.region=REGION, .queueUrl=queue.name, .body=BODY};
+        Entity::SQS::Message message = {.region=_region, .queueUrl=queue.name, .body=BODY};
         _sqsDatabase.CreateMessage(message);
         Entity::SQS::MessageList messageList;
-        _sqsDatabase.ReceiveMessages(REGION, QUEUE, messageList);
+        _sqsDatabase.ReceiveMessages(_region, QUEUE, messageList);
 
         // act
         Entity::SQS::Message resultMessage = messageList[0];
         _sqsDatabase.DeleteMessage(resultMessage);
-        long result = _sqsDatabase.CountMessages(REGION, QUEUE);
+        long result = _sqsDatabase.CountMessages(_region, QUEUE);
 
         // assert
         EXPECT_EQ(0, result);

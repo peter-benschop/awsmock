@@ -21,8 +21,18 @@ namespace AwsMock::Core {
         return CreateArn("lambda", region, accountId, "function:" + function);
     }
 
-    std::string AwsUtils::CreateSQSArn(const std::string &region, const std::string &accountId, const std::string &queueName) {
+    std::string AwsUtils::CreateSQSQueueArn(const std::string &region, const std::string &accountId, const std::string &queueName) {
 
-        return CreateArn("s3", region, accountId, queueName);
+        return CreateArn("sqs", region, accountId, queueName);
+    }
+
+    std::string AwsUtils::CreateSNSTopicArn(const std::string &region, const std::string &accountId, const std::string &topicName) {
+
+        return CreateArn("sns", region, accountId, topicName);
+    }
+
+    std::string AwsUtils::CreateSNSSubscriptionArn(const std::string &region, const std::string &accountId, const std::string &topicName) {
+
+        return CreateArn("sns", region, accountId, topicName + ":" + Poco::UUIDGenerator().createRandom().toString());
     }
 }

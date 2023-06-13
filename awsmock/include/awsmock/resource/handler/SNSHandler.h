@@ -7,9 +7,7 @@
 
 // Poco includes
 #include "Poco/Logger.h"
-#include "Poco/StreamCopier.h"
-#include "Poco/Net/MediaType.h"
-#include "Poco/JSON/Parser.h"
+#include "Poco/LogStream.h"
 
 // AwsMock includes
 #include "awsmock/core/Configuration.h"
@@ -18,6 +16,7 @@
 #include "awsmock/core/MetricDefinition.h"
 #include "awsmock/resource/HandlerException.h"
 #include "awsmock/resource/AbstractResource.h"
+#include "awsmock/service/SNSService.h"
 
 namespace AwsMock {
 
@@ -37,11 +36,6 @@ namespace AwsMock {
       SNSHandler(Core::Configuration &configuration, Core::MetricService &metricService);
 
     protected:
-
-      /**
-       * Logger
-       */
-      Poco::Logger &_logger;
 
       /**
        * HTTP GET request.
@@ -99,6 +93,37 @@ namespace AwsMock {
     private:
 
       /**
+       * Get the action from the request body
+       *
+       * @param body HTTP request body (in)
+       * @param action SQS action (out)
+       * @param version SQS version (out)
+       */
+      static void GetActionVersion(const std::string &body, std::string &action, std::string &version);
+
+      /**
+       * Get the action from the request body
+       *
+       * @param body HTTP request body
+       * @param name parameter name
+       * @return parameter value
+       */
+      std::string GetStringParameter(const std::string &body, const std::string &name);
+
+      /**
+       * Get the endpoint from the request header
+       *
+       * @param request HTTP request
+       * @return endpoint
+       */
+      static std::string GetEndpoint(Poco::Net::HTTPServerRequest &request);
+
+      /**
+       * Logger
+       */
+      Poco::LogStream _logger;
+
+      /**
        * ImageHandler import configuration
        */
       Core::Configuration &_configuration;
@@ -107,6 +132,11 @@ namespace AwsMock {
        * Metric service
        */
       Core::MetricService &_metricService;
+
+      /**
+       * SNS service
+       */
+      Service::SNSService _snsService;
     };
 
 } // namespace AwsMock::Resource::Factory

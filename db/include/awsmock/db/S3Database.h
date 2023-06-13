@@ -197,6 +197,15 @@ namespace AwsMock::Database {
       Entity::S3::ObjectList ListBucket(const std::string &bucket, const std::string &prefix = {});
 
       /**
+       * Counts the number of keys in a bucket
+       *
+       * @param bucket bucket entity
+       * @return number of object in bucket
+       * @throws DatabaseException
+       */
+      long ObjectCount(const Entity::S3::Bucket& bucket);
+
+      /**
        * Creates a bucket notification-
        *
        * <p>In case of a wildcard notification all notifications are added.</p>
@@ -246,8 +255,7 @@ namespace AwsMock::Database {
        * @param keys vector of object keys
        * @throws DatabaseException
        */
-      // TODO: do it!
-      //void DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys);
+      void DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys);
 
       /**
        * Deletes all objects

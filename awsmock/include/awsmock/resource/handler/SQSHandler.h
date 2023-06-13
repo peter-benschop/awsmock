@@ -7,9 +7,7 @@
 
 // Poco includes
 #include "Poco/Logger.h"
-#include "Poco/StreamCopier.h"
-#include "Poco/Net/MediaType.h"
-#include "Poco/JSON/Parser.h"
+#include "Poco/LogStream.h"
 
 // AwsMock includes
 #include "awsmock/core/Configuration.h"
@@ -113,7 +111,7 @@ namespace AwsMock {
        * @param action SQS action (out)
        * @param version SQS version (out)
        */
-      static void GetActionVersion(const std::string &body, std::string &action, std::string &version);
+      void GetActionVersion(const std::string &body, std::string &action, std::string &version);
 
       /**
        * Get the action from the request body
@@ -125,15 +123,15 @@ namespace AwsMock {
       std::string GetStringParameter(const std::string &body, const std::string &name);
 
       /**
-       * Return an integer parameter.
+       * Return an integer name.
        *
        * @param body HTTP message body
-       * @param parameter parameter name
+       * @param name name name
        * @param min minimum value
        * @param max maximum value
-       * @return integer parameter
+       * @return integer name
        */
-      int GetIntParameter(const std::string &body, const std::string &parameter, int min, int max);
+      int GetIntParameter(const std::string &body, const std::string &name, int min, int max);
 
       /**
        * Returns the attribute count.
@@ -155,7 +153,7 @@ namespace AwsMock {
       /**
        * Logger
        */
-      Poco::Logger &_logger;
+      Poco::LogStream _logger;
 
       /**
        * ImageHandler import configuration

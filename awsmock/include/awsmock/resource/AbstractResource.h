@@ -11,9 +11,8 @@
 
 // Poco includes
 #include "Poco/Logger.h"
+#include "Poco/LogStream.h"
 #include "Poco/URI.h"
-#include "Poco/JSON/Parser.h"
-#include "Poco/JSON/Object.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
@@ -123,20 +122,6 @@ namespace AwsMock::Resource {
       virtual void handleHttpHeaders(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response);
 
       /**
-       * @param payload The string containing the Json data.
-       * @return Only part of the payload with sqs in Poco Json Object format.
-       */
-      static Poco::JSON::Object::Ptr getJsonAttributesSectionObject(const std::string &payload);
-
-      /*!
-       * It validates a set of parameters have been set in a Json payload.
-       *
-       * @param jsonObject        Poco Json Object that contains payload data.
-       * @param attributesNames   Attributes list to be validated.
-       */
-      static void assertPayloadAttributes(const Poco::JSON::Object::Ptr &jsonObject, const std::list<std::string> &attributesNames);
-
-      /*!
        * It sets all the HTTP Response information based on the HTTP Code.
        *
        * @param response response to be handled.
@@ -144,14 +129,6 @@ namespace AwsMock::Resource {
        * @param reason status reason.
        */
       static void handleHttpStatusCode(Poco::Net::HTTPServerResponse &response, int statusCode, const char* reason = nullptr);
-
-      /**
-       * Return the URL.
-       *
-       * @param fragment Part that it wishes to add to a URL.
-       * @return A complete URL with a fragment added to its end.
-       */
-      std::string getUrl(const std::string &fragment);
 
       /**
        * CHecks whether a query parameter exists
@@ -284,7 +261,7 @@ namespace AwsMock::Resource {
       /**
        * Logger
        */
-      Poco::Logger &_logger;
+      Poco::LogStream _logger;
 
       /**
        * Base URL

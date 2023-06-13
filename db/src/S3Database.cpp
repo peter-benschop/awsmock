@@ -28,7 +28,7 @@ namespace AwsMock::Database {
     bool S3Database::BucketExists(const std::string &region, const std::string &name) {
 
         int64_t count = _bucketCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
-        _logger.trace() << "Bucket exists: " << (count > 0 ? "true" : "false");
+        _logger.trace() << "Bucket exists: " << (count > 0 ? "true" : "false") << std::endl;
         return count > 0;
     }
 
@@ -39,7 +39,7 @@ namespace AwsMock::Database {
     Entity::S3::Bucket S3Database::CreateBucket(const Entity::S3::Bucket &bucket) {
 
         auto insert_one_result = _bucketCollection.insert_one(bucket.ToDocument());
-        _logger.trace() << "Bucket created, oid: " << insert_one_result->inserted_id().get_oid().value.to_string();
+        _logger.trace() << "Bucket created, oid: " << insert_one_result->inserted_id().get_oid().value.to_string() << std::endl;
 
         return GetBucketById(insert_one_result->inserted_id().get_oid().value);
     }
@@ -63,7 +63,7 @@ namespace AwsMock::Database {
         Entity::S3::Bucket result;
         result.FromDocument(mResult);
 
-        _logger.trace() << "Got bucket: " << result.ToString();
+        _logger.trace() << "Got bucket: " << result.ToString() << std::endl;
 
         return result;
     }
@@ -78,14 +78,14 @@ namespace AwsMock::Database {
             bucketList.push_back(result);
         }
 
-        _logger.trace() << "Got bucket list, size:" << bucketList.size();
+        _logger.trace() << "Got bucket list, size:" << bucketList.size() << std::endl;
         return bucketList;
     }
 
     bool S3Database::HasObjects(const Entity::S3::Bucket &bucket) {
 
         int64_t count = _objectCollection.count_documents(make_document(kvp("region", bucket.region), kvp("bucket", bucket.name)));
-        _logger.trace() << "Objects exists: " << (count > 0 ? "true" : "false");
+        _logger.trace() << "Objects exists: " << (count > 0 ? "true" : "false") << std::endl;
         return count > 0;
     }
 
@@ -93,7 +93,7 @@ namespace AwsMock::Database {
 
         auto result = _bucketCollection.replace_one(make_document(kvp("region", bucket.region), kvp("name", bucket.name)), bucket.ToDocument());
 
-        _logger.trace() << "Bucket updated: " << bucket.ToString();
+        _logger.trace() << "Bucket updated: " << bucket.ToString() << std::endl;
 
         return GetBucketByRegionName(bucket.region, bucket.name);
     }
@@ -117,7 +117,7 @@ namespace AwsMock::Database {
             }
         }
 
-        _logger.trace() << "Got object list, size:" << objectList.size();
+        _logger.trace() << "Got object list, size:" << objectList.size() << std::endl;
 
         return objectList;
     }
@@ -126,26 +126,26 @@ namespace AwsMock::Database {
 
         auto delete_many_result =
             _bucketCollection.delete_one(make_document(kvp("name", bucket.name)));
-        _logger.debug() << "Bucket deleted, count: " << delete_many_result->deleted_count();
+        _logger.debug() << "Bucket deleted, count: " << delete_many_result->deleted_count() << std::endl;
     }
 
     void S3Database::DeleteAllBuckets() {
         auto delete_many_result =
             _bucketCollection.delete_many({});
-        _logger.debug() << "All buckets deleted, count: " << delete_many_result->deleted_count();
+        _logger.debug() << "All buckets deleted, count: " << delete_many_result->deleted_count() << std::endl;
     }
 
     bool S3Database::ObjectExists(const Entity::S3::Object &object) {
 
         int64_t count = _objectCollection.count_documents(make_document(kvp("bucket", object.bucket), kvp("key", object.key)));
-        _logger.trace() << "Object exists: " << (count > 0 ? "true" : "false");
+        _logger.trace() << "Object exists: " << (count > 0 ? "true" : "false") << std::endl;
         return count > 0;
     }
 
     Entity::S3::Object S3Database::CreateObject(const Entity::S3::Object &object) {
 
         auto insert_one_result = _objectCollection.insert_one(object.ToDocument());
-        _logger.trace() << "Object created, oid: " << insert_one_result->inserted_id().get_oid().value.to_string();
+        _logger.trace() << "Object created, oid: " << insert_one_result->inserted_id().get_oid().value.to_string() << std::endl;
 
         return GetObjectById(insert_one_result->inserted_id().get_oid().value);
     }
@@ -177,7 +177,7 @@ namespace AwsMock::Database {
         auto update_one_result =
             _objectCollection.replace_one(make_document(kvp("region", object.region), kvp("bucket", object.bucket), kvp("key", object.key)), object.ToDocument());
 
-        _logger.trace() << "Object updated: " << object.ToString();
+        _logger.trace() << "Object updated: " << object.ToString() << std::endl;
 
         return GetObject(object.region, object.bucket, object.key);
     }
@@ -189,24 +189,36 @@ namespace AwsMock::Database {
         Entity::S3::Object result;
         result.FromDocument(mResult);
 
-        _logger.trace() << "Got object: " << result.ToString();
+        _logger.trace() << "Got object: " << result.ToString() << std::endl;
         return result;
+    }
+
+    long S3Database::ObjectCount(const Entity::S3::Bucket &bucket) {
+
+        long count = _objectCollection.count_documents(make_document(kvp("region", bucket.region), kvp("bucket", bucket.name)));
+        _logger.trace() << "Object count: " << count << std::endl;
+        return count;
     }
 
     void S3Database::DeleteObject(const Entity::S3::Object &object) {
         auto result = _objectCollection.delete_many(make_document(kvp("region", object.region), kvp("bucket", object.bucket), kvp("key", object.key)));
-        _logger.debug() << "Objects deleted, count: " << result->deleted_count();
+        _logger.debug() << "Objects deleted, count: " << result->deleted_count() << std::endl;
     }
 
-    // TODO: do it!
-    /*void S3Database::DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys) {
-        auto result = _objectCollection.delete_many(make_document(kvp("bucket", bucket), make_document(kvp("$in", make_array(keys))));
-        _logger.debug() << "Objects deleted, count: " << result->deleted_count();
-    }*/
+    void S3Database::DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys) {
+
+        // TODO: use $in with array
+        int count = 0;
+        for (const auto &key : keys) {
+            _objectCollection.delete_one(make_document(kvp("bucket", bucket), kvp("key", key)));
+            count++;
+        }
+        _logger.debug() << "Objects deleted, count: " << count << std::endl;
+    }
 
     void S3Database::DeleteAllObjects() {
         auto result = _objectCollection.delete_many({});
-        _logger.debug() << "All objects deleted, count: " << result->deleted_count();
+        _logger.debug() << "All objects deleted, count: " << result->deleted_count() << std::endl;
     }
 
     Entity::S3::Bucket S3Database::CreateBucketNotification(const Entity::S3::Bucket &bucket, const Entity::S3::BucketNotification &bucketNotification) {
@@ -240,7 +252,7 @@ namespace AwsMock::Database {
             internBucket.notifications.emplace_back(bucketNotification);
         }
 
-        _logger.trace() << "Bucket notification added, notification: " << bucketNotification.ToString();
+        _logger.trace() << "Bucket notification added, notification: " << bucketNotification.ToString() << std::endl;
 
         return UpdateBucket(internBucket);
     }
@@ -273,45 +285,9 @@ namespace AwsMock::Database {
                                                             }), internBucket.notifications.end());
         }
 
-        _logger.trace() << "Bucket notification deleted, notification: " << bucketNotification.ToString();
+        _logger.trace() << "Bucket notification deleted, notification: " << bucketNotification.ToString() << std::endl;
 
         return UpdateBucket(internBucket);
     }
-
-    /*
-    void S3Database::DeleteObject(const Entity::S3::Object &object) {
-
-        try {
-            Poco::Data::Session session = GetSession();
-            session.begin();
-            session << "DELETE FROM s3_object WHERE bucket=? AND key=?", bind(object.bucket), bind(object.key), now;
-            session.commit();
-
-            _logger.trace() << "Object deleted: " << object.ToString();
-
-        } catch (Poco::Exception &exc) {
-            _logger.error() << "Database exception: " << exc.message();
-            throw Core::DatabaseException(exc.message(), 500);
-        }
-    }
-
-    void S3Database::DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys) {
-
-        try {
-            Poco::Data::Session session = GetSession();
-            session.begin();
-            for(const auto &it : keys) {
-                session << "DELETE FROM s3_object WHERE bucket=? AND key=?", bind(bucket), bind(it), now;
-            }
-            session.commit();
-
-            _logger.trace() << "Objects deleted, bucket: " << bucket << " count: " << keys.size();
-
-        } catch (Poco::Exception &exc) {
-            _logger.error() << "Database exception: " << exc.message();
-            throw Core::DatabaseException(exc.message(), 500);
-        }
-    }
-    */
 
 } // namespace AwsMock::Database

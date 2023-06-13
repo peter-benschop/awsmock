@@ -13,7 +13,7 @@
 #include "Poco/Delegate.h"
 #include <Poco/DirectoryWatcher.h>
 #include <Poco/Logger.h>
-#include <Poco/Mutex.h>
+#include <Poco/LogStream.h>
 #include <Poco/Path.h>
 #include <Poco/Runnable.h>
 #include <Poco/ScopedLock.h>
@@ -89,7 +89,7 @@ namespace AwsMock::Worker {
       /**
        * Logger
        */
-      Poco::Logger &_logger;
+      Poco::LogStream _logger;
 
       /**
        * Configuration

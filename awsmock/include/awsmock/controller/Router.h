@@ -12,6 +12,7 @@
 // Poco includes
 #include "Poco/URI.h"
 #include "Poco/Logger.h"
+#include "Poco/LogStream.h"
 #include "Poco/ClassLibrary.h"
 #include "Poco/DynamicFactory.h"
 #include "Poco/Net/HTTPServerRequest.h"
@@ -81,7 +82,7 @@ namespace AwsMock::Controller {
       /**
        * Logger
        */
-      Poco::Logger &_logger;
+      Poco::LogStream _logger;
 
       /**
        * Configuration
@@ -97,7 +98,6 @@ namespace AwsMock::Controller {
        * Routing table
        */
       std::map<std::string, std::string> _routingTable;
-
     };
 
 } // namespace AwsMock::Controller

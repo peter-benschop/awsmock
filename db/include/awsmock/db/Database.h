@@ -16,6 +16,7 @@
 #include <mongocxx/client.hpp>
 #include <mongocxx/pool.hpp>
 #include <mongocxx/uri.hpp>
+#include <mongocxx/exception/exception.hpp>
 
 // AwsMock includes
 #include <awsmock/core/Logger.h>
@@ -40,6 +41,13 @@ namespace AwsMock::Database {
        * @return MongoDB database client
        */
       mongocxx::database GetConnection();
+
+      /**
+       * Returns a MongoDB collection connection, without pool
+       *
+       * @return MongoDB database collection client
+       */
+      mongocxx::database GetCollection();
 
     protected:
 
@@ -72,6 +80,8 @@ namespace AwsMock::Database {
        * Application configuration
        */
       const Core::Configuration &_configuration;
+
+      mongocxx::uri uri;
 
       /**
        * MongoDB connection pool

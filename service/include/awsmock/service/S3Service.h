@@ -10,11 +10,7 @@
 
 // Poco includes
 #include <Poco/Logger.h>
-#include "Poco/UUID.h"
-#include "Poco/UUIDGenerator.h"
-#include "Poco/DOM/DOMParser.h"
-#include "Poco/DOM/Document.h"
-#include "Poco/DOM/Node.h"
+#include <Poco/LogStream.h>
 
 // AwsMock includes
 #include "awsmock/core/CryptoUtils.h"
@@ -176,11 +172,6 @@ namespace AwsMock::Service {
     private:
 
       /**
-       * Initialize the service
-       */
-      void Initialize();
-
-      /**
        * Get the directory from the object key.
        *
        * @param key S3 object key
@@ -261,7 +252,7 @@ namespace AwsMock::Service {
       /**
        * Logger
        */
-      Poco::Logger &_logger;
+      Poco::LogStream _logger;
 
       /**
        * Data directory

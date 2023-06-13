@@ -11,12 +11,11 @@
 
 // Poco includes
 #include <Poco/Logger.h>
+#include <Poco/LogStream.h>
 #include <Poco/Net/HTTPClientSession.h>
 #include <Poco/Net/HTTPRequest.h>
 #include <Poco/Net/HTTPResponse.h>
 #include <Poco/StreamCopier.h>
-#include <Poco/UUID.h>
-#include <Poco/UUIDGenerator.h>
 #include <Poco/RecursiveDirectoryIterator.h>
 
 // AwsMock includes
@@ -101,7 +100,7 @@ namespace AwsMock::Service {
       /**
        * Logger
        */
-      Poco::Logger &_logger;
+      Poco::LogStream _logger;
 
       /**
        * Data directory

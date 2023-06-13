@@ -10,6 +10,7 @@
 
 // Poco includes
 #include <Poco/Logger.h>
+#include <Poco/LogStream.h>
 #include <Poco/Runnable.h>
 
 // AwsMock includes
@@ -52,7 +53,7 @@ namespace AwsMock::Worker {
       /**
        * Logger
        */
-      Poco::Logger &_logger;
+      Poco::LogStream _logger;
 
       /**
        * Configuration

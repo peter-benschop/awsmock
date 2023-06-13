@@ -7,11 +7,11 @@
 namespace AwsMock::Worker {
 
     SQSWorker::SQSWorker(const Core::Configuration &configuration) : _logger(Poco::Logger::get("SQSWorker")), _configuration(configuration), _running(false) {
+
+        // Set console logger
         Core::Logger::SetDefaultConsoleLogger("SQSWorker");
 
         Initialize();
-
-        poco_debug(_logger, "SQSWorker initialized");
     }
 
     void SQSWorker::Initialize() {
@@ -20,6 +20,8 @@ namespace AwsMock::Worker {
         _region = _configuration.getString("awsmock.region");
         _sqsDatabase = std::make_unique<Database::SQSDatabase>(_configuration);
         _serviceDatabase = std::make_unique<Database::ServiceDatabase>(_configuration);
+
+        _logger.debug() << "SQSWorker initialized" << std::endl;
     }
 
     void SQSWorker::run() {

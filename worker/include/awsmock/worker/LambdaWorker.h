@@ -10,6 +10,7 @@
 
 // Poco includes
 #include <Poco/Logger.h>
+#include <Poco/LogStream.h>
 #include <Poco/Runnable.h>
 
 // AwsMock includes
@@ -28,7 +29,7 @@ namespace AwsMock::Worker {
       /**
        * Constructor
        */
-      explicit LambdaWorker(const Core::Configuration &configuration);
+      [[maybe_unused]] explicit LambdaWorker(const Core::Configuration &configuration);
 
       /**
        * Main method
@@ -45,7 +46,7 @@ namespace AwsMock::Worker {
       /**
        * Logger
        */
-      Poco::Logger &_logger;
+      Poco::LogStream _logger;
 
       /**
        * Configuration
