@@ -1,36 +1,31 @@
-name: AWS Mock
+name: AWS Mock Release
+
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-  workflow_dispatch:
-  
+  workflow_run:
+    workflows: [AWSMockBuild]
+    types:
+      - completed
+
 jobs:
-  build:
+  release:
+    if: ${{ github.ref_name == 'main' && github.event.workflow_run.conclusion == 'success' }}
     runs-on: self-hosted
     steps:
       - name: Checkout
-        uses: actions/checkout@v2.0.0
-      - name: Build project
-        run: cmake -E make_directory ${{github.workspace}}/build
-      - name: Configure CMake
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-      - name: Build
-        run: cmake --build ./build --config Release
-      - name: Run tests
-        run: cd build && ctest -V
-      - name: Create docs
-        run: cd build && make docs
-      - name: Create Artifact
-        run: |
-          mkdir release
-          cp build/src/aws-mock release
-          cp -R docs release
-      - name: Publish Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/checkout@v3
         with:
-          name: aws-mock-release
-          path: release
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Setup package.json
+        run: echo '{"name":"aws-mock", "devDependencies":{"@semantic-release/git":"^10.0.1","@semantic-release/exec":"^6.0.3","semantic-release":"^19.0.5"}}' > package.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Release
+        run: npx semantic-release
