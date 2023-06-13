@@ -18,7 +18,7 @@ namespace AwsMock::Worker {
     void LambdaWorker::Initialize() {
 
         _dataDir = _configuration.getString("awsmock.data.dir") + Poco::Path::separator() + "lambda";
-        _logger.debug() << "Lambda directory: " << _dataDir;
+        _logger.debug() << "Lambda directory: " << _dataDir << std::endl;
 
         // Create lambda directory
         if (!Core::DirUtils::DirectoryExists(_dataDir)) {
@@ -30,7 +30,7 @@ namespace AwsMock::Worker {
         _s3Service = std::make_unique<Service::S3Service>(_configuration);
         _lambdaDatabase = std::make_unique<Database::LambdaDatabase>(_configuration);
 
-        _logger.debug() << "LambdaWorker initialized";
+        _logger.debug() << "LambdaWorker initialized" << std::endl;
     }
 
     void LambdaWorker::run() {

@@ -20,12 +20,12 @@ namespace AwsMock::Core {
         Poco::DirectoryIterator it(_rootDir);
         Poco::DirectoryIterator end;
         while (it != end) {
-            _logger.debug() << "Adding directory, path: " << it.name();
+            _logger.debug() << "Adding directory, path: " << it.name() << std::endl;
             wd = inotify_add_watch(fd, it.path().toString().c_str(), IN_CREATE | IN_MODIFY | IN_DELETE);
             _watcherMap[wd] = it.path().toString();
             ++it;
         }
-        _logger.debug() << "File _watcher initialized, path: " << _rootDir;
+        _logger.debug() << "File _watcher initialized, path: " << _rootDir << std::endl;
     }
 
     [[noreturn]] void DirectoryWatcher::run() {
@@ -37,7 +37,7 @@ namespace AwsMock::Core {
             i = 0;
             ssize_t length = read(fd, buffer, BUF_LEN);
             if (length < 0) {
-                _logger.debug() << "Invalid _watcher struct length, path: " << length;
+                _logger.debug() << "Invalid _watcher struct length, path: " << length << std::endl;
             }
             while (i < length) {
                 auto *event = (struct inotify_event *) &buffer[i];

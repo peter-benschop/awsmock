@@ -17,9 +17,6 @@
 #include "Poco/DynamicFactory.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
-#include "Poco/NotificationCenter.h"
-#include "Poco/Notification.h"
-#include "Poco/Observer.h"
 
 // AwsMock includes
 #include "awsmock/core/Logger.h"
@@ -101,8 +98,6 @@ namespace AwsMock::Controller {
        * Routing table
        */
       std::map<std::string, std::string> _routingTable;
-
-      Poco::NotificationCenter dispatcher;
     };
 
 } // namespace AwsMock::Controller

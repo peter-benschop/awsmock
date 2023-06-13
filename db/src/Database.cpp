@@ -13,14 +13,14 @@ namespace AwsMock::Database {
                                 + std::to_string(_configuration.getInt("awsmock.mongodb.port", 27017))
                                 + "/?maxPoolSize=32");
         _connectionPool = std::make_shared<mongocxx::pool>(uri);
-        poco_debug(_logger, "MongoDB connection pool initialized");
+        _logger.debug() << "MongoDB connection pool initialized" << std::endl;
     }
 
     void Database::CreateCollection(const std::string &name) {
         mongocxx::database _database = GetConnection();
         if (!_database.has_collection(name)) {
             _database.create_collection(name);
-            _logger.debug() << "Collection created, name: " << name;
+            _logger.debug() << "Collection created, name: " << name << std::endl << std::endl;
         }
     }
 
@@ -28,7 +28,7 @@ namespace AwsMock::Database {
         mongocxx::database _database = GetConnection();
         if (!_database.has_collection(name)) {
             _database.drop();
-            _logger.debug() << "Collection dropped, name: " << name;
+            _logger.debug() << "Collection dropped, name: " << name << std::endl << std::endl;
         }
     }
 

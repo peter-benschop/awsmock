@@ -13,8 +13,8 @@ namespace AwsMock {
                                [[maybe_unused]]const std::string &region,
                                [[maybe_unused]]const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_GET_TIMER);
-        _logger.debug() << "SNS GET request, URI: " << request.getURI() << " region: " << region << " user: " << user;
-        _logger.debug() << "SNS GET request, URI: " << response.getContentLength();
+        _logger.debug() << "SNS GET request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+        _logger.debug() << "SNS GET request, URI: " << response.getContentLength() << std::endl;
         DumpRequest(request);
     }
 
@@ -23,14 +23,14 @@ namespace AwsMock {
                                [[maybe_unused]]const std::string &region,
                                [[maybe_unused]]const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_PUT_TIMER);
-        _logger.debug() << "SNS PUT request, URI: " << request.getURI() << " region: " << region << " user: " << user;
-        _logger.debug() << "SNS PUT request, URI: " << response.getContentLength();
+        _logger.debug() << "SNS PUT request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+        _logger.debug() << "SNS PUT request, URI: " << response.getContentLength() << std::endl;
         DumpRequest(request);
     }
 
     void SNSHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_POST_TIMER);
-        _logger.trace() << "SNS POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << " length: " << response.getContentLength();
+        _logger.trace() << "SNS POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << " length: " << response.getContentLength() << std::endl;
 
         //DumpRequest(request);
         //DumpBody(request);
@@ -45,7 +45,7 @@ namespace AwsMock {
             if (action == "CreateTopic") {
 
                 std::string name = GetStringParameter(payload, "Name");
-                _logger.debug() << "Topic name: " << name;
+                _logger.debug() << "Topic name: " << name << std::endl;
 
                 Dto::SNS::CreateTopicRequest snsRequest = {.region=region, .topicName = name, .owner=user};
                 Dto::SNS::CreateTopicResponse snsResponse = _snsService.CreateTopic(snsRequest);
@@ -78,14 +78,14 @@ namespace AwsMock {
             } else if(action == "DeleteTopic") {
 
                 std::string topicArn = GetStringParameter(payload, "TopicArn");
-                _logger.debug() << "Topic ARN: " << topicArn;
+                _logger.debug() << "Topic ARN: " << topicArn << std::endl;
 
                 Dto::SNS::DeleteTopicResponse snsResponse = _snsService.DeleteTopic(region, topicArn);
                 SendOkResponse(response, snsResponse.ToXml());
             }
 
         } catch (Core::ServiceException &exc) {
-            _logger.error() << "Service exception: " << exc.message();
+            _logger.error() << "Service exception: " << exc.message() << std::endl;
             SendErrorResponse("SNS", response, exc);
         }
     }
@@ -95,14 +95,14 @@ namespace AwsMock {
                                   [[maybe_unused]]const std::string &region,
                                   [[maybe_unused]]const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_DELETE_TIMER);
-        _logger.debug() << "SNS DELETE request, URI: " << request.getURI() << " region: " << region << " user: " << user;
-        _logger.debug() << "SNS DELETE request, URI: " << response.getContentLength();
+        _logger.debug() << "SNS DELETE request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+        _logger.debug() << "SNS DELETE request, URI: " << response.getContentLength() << std::endl;
         DumpRequest(request);
     }
 
     void SNSHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
         Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
-        _logger.debug() << "S3 OPTIONS request";
+        _logger.debug() << "S3 OPTIONS request" << std::endl;
 
         response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
         response.setContentType("text/plain; charset=utf-8");
@@ -137,7 +137,7 @@ namespace AwsMock {
                 value = Core::StringUtils::UrlDecode(parts[1]);
             }
         }
-        _logger.debug() << "Found string parameter, name: " << name << "value: " << value;
+        _logger.debug() << "Found string parameter, name: " << name << "value: " << value << std::endl;
         return value;
     }
 

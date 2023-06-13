@@ -21,7 +21,7 @@ namespace AwsMock::Worker {
         _sqsDatabase = std::make_unique<Database::SQSDatabase>(_configuration);
         _serviceDatabase = std::make_unique<Database::ServiceDatabase>(_configuration);
 
-        _logger.debug() << "SQSWorker initialized";
+        _logger.debug() << "SQSWorker initialized" << std::endl;
     }
 
     void SQSWorker::run() {

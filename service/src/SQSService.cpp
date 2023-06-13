@@ -34,34 +34,34 @@ namespace AwsMock::Service {
             // Update database
             std::string queueArn = Core::AwsUtils::CreateSQSQueueArn(request.region, _accountId, request.name);
             queue = _database->CreateQueue({.region=request.region, .name=request.name, .owner=request.owner, .queueUrl=request.queueUrl, .queueArn=queueArn});
-            _logger.trace() << "SQS queue created: " << queue.ToString();
+            _logger.trace() << "SQS queue created: " << queue.ToString() << std::endl;
 
         } catch (Poco::Exception &exc) {
-            _logger.error() << "SQS create queue failed, message: " << exc.message();
+            _logger.error() << "SQS create queue failed, message: " << exc.message() << std::endl;
             throw Core::ServiceException(exc.message(), 500);
         }
         return {.region=queue.region, .name=queue.name, .owner=queue.owner, .queueUrl=queue.queueUrl};
     }
 
     Dto::SQS::ListQueueResponse SQSService::ListQueues(const std::string &region) {
-        _logger.trace() << "List all queues request, region: " << region;
+        _logger.trace() << "List all queues request, region: " << region << std::endl;
 
         try {
 
             Database::Entity::SQS::QueueList queueList = _database->ListQueues(region);
             Dto::SQS::ListQueueResponse listQueueResponse = Dto::SQS::ListQueueResponse(queueList);
-            _logger.trace() << "SQS create queue list response: " << listQueueResponse.ToXml();
+            _logger.trace() << "SQS create queue list response: " << listQueueResponse.ToXml() << std::endl;
 
             return listQueueResponse;
 
         } catch (Poco::Exception &ex) {
-            _logger.error() << "SQS list queues failed, message: " << ex.message();
+            _logger.error() << "SQS list queues failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500, "SQS", Poco::UUIDGenerator().createRandom().toString().c_str());
         }
     }
 
     Dto::SQS::PurgeQueueResponse SQSService::PurgeQueue(const Dto::SQS::PurgeQueueRequest &request) {
-        _logger.trace() << "Purge queue request, region: " << request.region << " queueUrl: " << request.queueUrl;
+        _logger.trace() << "Purge queue request, region: " << request.region << " queueUrl: " << request.queueUrl << std::endl;
 
         Dto::SQS::PurgeQueueResponse response = {.resource=request.resource, .requestId=request.requestId};
         try {
@@ -71,23 +71,23 @@ namespace AwsMock::Service {
             }
 
             _database->PurgeQueue(request.region, request.queueUrl);
-            _logger.trace() << "SQS queue purged, region: " << request.region << " queueUrl: " << request.queueUrl;
+            _logger.trace() << "SQS queue purged, region: " << request.region << " queueUrl: " << request.queueUrl << std::endl;
 
         } catch (Poco::Exception &ex) {
-            _logger.error() << "SQS purge queue failed, message: " << ex.message();
+            _logger.error() << "SQS purge queue failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500, request.resource.c_str(), request.requestId.c_str());
         }
         return response;
     }
 
     Dto::SQS::PutQueueAttributesResponse SQSService::PutQueueAttributes(const Dto::SQS::PutQueueAttributesRequest &request) {
-        _logger.trace() << "Put queue sqs request, request: " << request.ToString();
+        _logger.trace() << "Put queue sqs request, request: " << request.ToString() << std::endl;
         Dto::SQS::PutQueueAttributesResponse response;
         return response;
     }
 
     Dto::SQS::DeleteQueueResponse SQSService::DeleteQueue(const Dto::SQS::DeleteQueueRequest &request) {
-        _logger.trace() << "Delete queue request, request: " << request.ToString();
+        _logger.trace() << "Delete queue request, request: " << request.ToString() << std::endl;
 
         Dto::SQS::DeleteQueueResponse response;
         try {
@@ -100,7 +100,7 @@ namespace AwsMock::Service {
             _database->DeleteQueue({.queueUrl=request.queueUrl});
 
         } catch (Poco::Exception &ex) {
-            _logger.error() << "SQS delete queue failed, message: " << ex.message();
+            _logger.error() << "SQS delete queue failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500);
         }
         return response;
@@ -124,7 +124,7 @@ namespace AwsMock::Service {
                 _database->CreateMessage({.queueUrl=request.url, .body=request.body, .messageId=messageId, .receiptHandle=receiptHandle, .md5Body=md5Body, .md5Attr=md5Attr});
 
         } catch (Poco::Exception &ex) {
-            _logger.error() << "SQS create message failed, message: " << ex.message();
+            _logger.error() << "SQS create message failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500);
         }
         return {.queueUrl=message.queueUrl, .messageId=message.messageId, .receiptHandle=message.receiptHandle, .md5Body=message.md5Body, .md5Attr=message.md5Attr};
@@ -158,14 +158,14 @@ namespace AwsMock::Service {
             }
 
         } catch (Poco::Exception &ex) {
-            _logger.error() << "SQS create message failed, message: " << ex.message();
+            _logger.error() << "SQS create message failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500);
         }
         return {response};
     }
 
     Dto::SQS::DeleteMessageResponse SQSService::DeleteMessage(const Dto::SQS::DeleteMessageRequest &request) {
-        _logger.trace() << "Delete message request, url: " << request.receiptHandle;
+        _logger.trace() << "Delete message request, url: " << request.receiptHandle << std::endl;
 
         Dto::SQS::DeleteMessageResponse response;
         try {
@@ -178,7 +178,7 @@ namespace AwsMock::Service {
             _database->DeleteMessage({.queueUrl=request.queueUrl, .receiptHandle=request.receiptHandle});
 
         } catch (Poco::Exception &ex) {
-            _logger.error() << "SQS delete message failed, message: " << ex.message();
+            _logger.error() << "SQS delete message failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500);
         }
         return response;

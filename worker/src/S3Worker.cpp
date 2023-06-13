@@ -12,7 +12,7 @@ namespace AwsMock::Worker {
 
         Initialize();
 
-        _logger.debug() << "S3Worker initialized";
+        _logger.debug() << "S3Worker initialized" << std::endl;
     }
 
     S3Worker::~S3Worker() {
@@ -23,7 +23,7 @@ namespace AwsMock::Worker {
     void S3Worker::Initialize() {
 
         _dataDir = _configuration.getString("awsmock.data.dir") + Poco::Path::separator() + "s3";
-        _logger.debug() << "Watching path: " << _dataDir;
+        _logger.debug() << "Watching path: " << _dataDir << std::endl;
 
         // Create S3 directory
         if (!Core::DirUtils::DirectoryExists(_dataDir)) {
@@ -40,7 +40,7 @@ namespace AwsMock::Worker {
         _watcher->itemAdded += Poco::delegate(this, &S3Worker::OnFileAdded);
         _watcher->itemModified += Poco::delegate(this, &S3Worker::OnFileModified);
         _watcher->itemDeleted += Poco::delegate(this, &S3Worker::OnFileDeleted);
-        _logger.debug() << "Directory _watcher added, path: " << _dataDir;
+        _logger.debug() << "Directory _watcher added, path: " << _dataDir << std::endl;
     }
 
     void S3Worker::run() {
@@ -60,7 +60,7 @@ namespace AwsMock::Worker {
     }
 
     void S3Worker::OnFileAdded(const Core::DirectoryEvent &addedEvent) {
-        _logger.debug() << "Added path: " << addedEvent.item.path();
+        _logger.debug() << "Added path: " << addedEvent.item.path() << std::endl;
 
         // Get bucketName, key
         std::string bucketName, key;
@@ -76,7 +76,7 @@ namespace AwsMock::Worker {
     }
 
     void S3Worker::OnFileModified(const Core::DirectoryEvent &modifiedEvent) {
-        _logger.debug() << "Changed path: " << modifiedEvent.item.path();
+        _logger.debug() << "Changed path: " << modifiedEvent.item.path() << std::endl;
 
         // Get bucketName, key
         std::string bucketName, key;
@@ -92,7 +92,7 @@ namespace AwsMock::Worker {
     }
 
     void S3Worker::OnFileDeleted(const Core::DirectoryEvent &deleteEvent) {
-        _logger.debug() << "Deleted path: " << deleteEvent.item.path();
+        _logger.debug() << "Deleted path: " << deleteEvent.item.path() << std::endl;
 
         std::string bucketName, key;
         GetBucketKeyFromFile(deleteEvent.item.path(), bucketName, key);

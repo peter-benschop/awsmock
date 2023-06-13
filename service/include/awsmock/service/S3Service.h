@@ -38,25 +38,11 @@
 
 namespace AwsMock::Service {
 
-    /*class S3CreateBucketNotification : public Poco::Notification {
-    };
-
-    class S3DeleteBucketNotification : public Poco::Notification {
-    };*/
-
     typedef std::map<std::string, std::ofstream> MultiPartUploads;
 
     class S3Service {
 
     public:
-
-      /*void handleCreateBucket(S3CreateBucketNotification* pNf) {
-
-      }
-
-      void handleDeleteBucket(S3DeleteBucketNotification* pNf) {
-
-      }*/
 
       /**
        * Constructor

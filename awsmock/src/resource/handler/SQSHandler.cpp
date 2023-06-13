@@ -13,7 +13,7 @@ namespace AwsMock {
                                [[maybe_unused]] const std::string &region,
                                [[maybe_unused]]const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_GET_TIMER);
-        _logger.debug() << "SQS GET request, URI: " << request.getURI() << " region: " << region << " user: " + user;
+        _logger.debug() << "SQS GET request, URI: " << request.getURI() << " region: " << region << " user: " + user << std::endl;
         DumpRequest(request);
         DumpResponse(response);
     }
@@ -23,7 +23,7 @@ namespace AwsMock {
                                [[maybe_unused]]const std::string &region,
                                [[maybe_unused]]const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_PUT_TIMER);
-        _logger.debug() << "SQS PUT request, URI: " << request.getURI() << " region: " << region << " user: " << user;
+        _logger.debug() << "SQS PUT request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
         DumpRequest(request);
         DumpResponse(response);
     }
@@ -33,7 +33,7 @@ namespace AwsMock {
                                 [[maybe_unused]]const std::string &region,
                                 [[maybe_unused]]const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_POST_TIMER);
-        _logger.debug() << "SQS POST request, URI: " << request.getURI() << " region: " << region << " user: " << user;
+        _logger.debug() << "SQS POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
         try {
             //DumpBody(request);
@@ -101,7 +101,7 @@ namespace AwsMock {
                 std::string queueUrl = GetStringParameter(payload, "QueueUrl");
 
                 int count = GetAttributeCount(payload, "MessageAttribute");
-                poco_trace(_logger, "Got attribute count, count: " + std::to_string(count));
+                _logger.trace() << "Got attribute count, count: " << count << std::endl;
 
                 AttributeList attributes;
                 for(int i = 1; i <= count; i++) {
@@ -127,7 +127,7 @@ namespace AwsMock {
             }
 
         } catch (Core::ServiceException &exc) {
-            _logger.error() << "Service exception: " << exc.message();
+            _logger.error() << "Service exception: " << exc.message() << std::endl;
             SendErrorResponse("SQS", response, exc);
         }
     }
@@ -137,14 +137,14 @@ namespace AwsMock {
                                   [[maybe_unused]]const std::string &region,
                                   [[maybe_unused]]const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_DELETE_TIMER);
-        _logger.debug() << "SQS DELETE request, URI: " + request.getURI() << " region: " << region << " user: " << user;
+        _logger.debug() << "SQS DELETE request, URI: " + request.getURI() << " region: " << region << " user: " << user << std::endl;
         DumpRequest(request);
         DumpResponse(response);
     }
 
     void SQSHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
         Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
-        _logger.debug() << "SQS OPTIONS request";
+        _logger.debug() << "SQS OPTIONS request" << std::endl;
 
         response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
         response.setContentType("text/plain; charset=utf-8");
@@ -156,7 +156,7 @@ namespace AwsMock {
 
     void SQSHandler::handleHead([[maybe_unused]]Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
         Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
-        _logger.debug() << "SQS HEAD request, address: " << request.clientAddress().toString();
+        _logger.debug() << "SQS HEAD request, address: " << request.clientAddress().toString() << std::endl;
 
         handleHttpStatusCode(response, 200);
         std::ostream &outputStream = response.send();
@@ -177,7 +177,7 @@ namespace AwsMock {
                 version = parts[1];
             }
         }
-        _logger.debug() << "Found action: " << action << "version: " << version;
+        _logger.debug() << "Found action: " << action << "version: " << version << std::endl;
     }
 
     std::string SQSHandler::GetStringParameter(const std::string &body, const std::string &name) {
@@ -189,7 +189,7 @@ namespace AwsMock {
                 value = Core::StringUtils::UrlDecode(parts[1]);
             }
         }
-        _logger.debug() << "Found string parameter, name: " << name << "value: " << value;
+        _logger.debug() << "Found string parameter, name: " << name << "value: " << value << std::endl;
         return value;
     }
 
@@ -200,7 +200,7 @@ namespace AwsMock {
             value = std::stoi(parameterValue);
             value = value > min && value < max ? value : max;
         }
-        _logger.debug() << "Found integer name, name: " << name << "value: " << value;
+        _logger.debug() << "Found integer name, name: " << name << "value: " << value << std::endl;
         return value;
     }
 
