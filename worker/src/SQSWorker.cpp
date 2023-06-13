@@ -27,21 +27,21 @@ namespace AwsMock::Worker {
     void SQSWorker::run() {
 
         // Check service active
-        if (!_serviceDatabase->IsActive("SQS")) {
-            return;
-        }
+//        if (!_serviceDatabase->IsActive("SQS")) {
+//            return;
+//        }
 
         _running = true;
         while (_running) {
             ResetMessages();
-            Poco::Thread::sleep(1000);
+            Poco::Thread::sleep(10000);
         }
     }
 
     void SQSWorker::ResetMessages() {
 
         Database::Entity::SQS::QueueList queueList = _sqsDatabase->ListQueues(_region);
-        _logger.debug() << "Working oon queue list, count" << queueList.size() << std::endl;
+        _logger.trace() << "Working on queue list, count" << queueList.size() << std::endl;
 
         for (auto &queue : queueList) {
 
@@ -52,6 +52,9 @@ namespace AwsMock::Worker {
             queue.attributes.approximateNumberOfMessages = _sqsDatabase->CountMessages(queue.region, queue.queueUrl);
             queue.attributes.approximateNumberOfMessagesDelayed = _sqsDatabase->CountMessagesByStatus(queue.region, queue.queueUrl, Database::Entity::SQS::DELAYED);
             queue.attributes.approximateNumberOfMessagesNotVisible = _sqsDatabase->CountMessagesByStatus(queue.region, queue.queueUrl, Database::Entity::SQS::SEND);
+
+            _sqsDatabase->UpdateQueue(queue);
+            _logger.trace() << "Queue updated, name" << queue.name << std::endl;
         }
     }
 } // namespace AwsMock::Worker

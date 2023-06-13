@@ -21,7 +21,7 @@
 
 namespace AwsMock {
 
-    typedef std::vector<std::pair<std::string, std::string>> AttributeList;
+    typedef std::map<std::string, std::string> AttributeList;
 
     /**
      * AWS S3 mock handler
@@ -129,9 +129,10 @@ namespace AwsMock {
        * @param name name name
        * @param min minimum value
        * @param max maximum value
+       * @param def default value
        * @return integer name
        */
-      int GetIntParameter(const std::string &body, const std::string &name, int min, int max);
+      int GetIntParameter(const std::string &body, const std::string &name, int min, int max, int def);
 
       /**
        * Returns the attribute count.

@@ -28,3 +28,8 @@ awsmock sqs delete-queue --queue-url=http://localhost:4567/000000000000/file-del
 # Delete lambda function
 #
 awsmock lambda delete-function --function-name ftp-file-copy
+
+#
+# Delete SNS topic
+#
+awsmock sns delete-topic --topic-arn arn:aws:sns:eu-central-1:000000000000:file-logging-topic

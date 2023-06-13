@@ -122,6 +122,14 @@ namespace AwsMock::Database {
       void PurgeQueue(const std::string &region, const std::string &queueUrl);
 
       /**
+       * Updates a given queue.
+       *
+       * @param queue AWS region
+       * @return updated queue
+       */
+      Entity::SQS::Queue UpdateQueue(const Entity::SQS::Queue &queue);
+
+      /**
        * Deletes a queue.
        *
        * @param queue queue entity
@@ -175,10 +183,11 @@ namespace AwsMock::Database {
        *
        * @param region AWS region
        * @param queueUrl queue URL
+       * @param visibility in seconds
        * @param messageList message list
        * @return MessageList
        */
-      void ReceiveMessages(const std::string &region, const std::string &queueUrl, Entity::SQS::MessageList &messageList);
+      void ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, Entity::SQS::MessageList &messageList);
 
       /**
        * Reset expired messages

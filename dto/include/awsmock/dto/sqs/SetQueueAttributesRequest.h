@@ -15,7 +15,7 @@
 
 namespace AwsMock::Dto::SQS {
 
-    struct PutQueueAttributesRequest {
+    struct SetQueueAttributesRequest {
 
       /**
        * Queue URL
@@ -25,7 +25,7 @@ namespace AwsMock::Dto::SQS {
       /**
        * Attributes
        */
-      std::vector<std::pair<std::string,std::string>> attributes;
+      std::map<std::string,std::string> attributes;
 
       /**
        * Resource
@@ -53,8 +53,8 @@ namespace AwsMock::Dto::SQS {
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const PutQueueAttributesRequest &r) {
-          os << "PutQueueAttributesRequest={queueUrl='" + r.queueUrl + "' resource='" + r.resource + "' requestId='" + r.requestId + "'}";
+      friend std::ostream &operator<<(std::ostream &os, const SetQueueAttributesRequest &r) {
+          os << "SetQueueAttributesRequest={queueUrl='" + r.queueUrl + "' resource='" + r.resource + "' requestId='" + r.requestId + "'}";
           return os;
       }
 

@@ -158,7 +158,7 @@ namespace AwsMock::Database {
             messageList.push_back(result);
             _messageCollection.update_one(make_document(kvp("_id", message["_id"].get_oid())),
                                           make_document(kvp("$set", make_document(kvp("status", Entity::SQS::SEND),
-                                                                                  kvp("lastSend", bsoncxx::types::b_date(now)),
+                                                                                  kvp("reset", bsoncxx::types::b_date(now)),
                                                                                   kvp("receiptHandle", result.receiptHandle)))));
         }
         _logger.trace() << "Messages received, region: " << region << " queue: " << queueUrl + " count: " << messageList.size() << std::endl;

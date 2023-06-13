@@ -110,7 +110,7 @@ namespace AwsMock::Database::Entity::SQS {
       /**
        * Last send datetime
        */
-      Poco::DateTime lastSend;
+      Poco::DateTime reset;
 
       /**
        * Send retries
@@ -175,9 +175,9 @@ namespace AwsMock::Database::Entity::SQS {
               kvp("md5Body", md5Body),
               kvp("md5Attr", md5Attr),
               kvp("attributes", messageAttributesDoc),
-              kvp("lastSend", bsoncxx::types::b_date(std::chrono::milliseconds(lastSend.timestamp().epochMicroseconds()/1000))),
-              kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds()/1000))),
-              kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds()/1000))));
+              kvp("reset", bsoncxx::types::b_date(std::chrono::milliseconds(reset.timestamp().epochMicroseconds() / 1000))),
+              kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
+              kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
 
           return messageDoc;
       }
@@ -199,7 +199,7 @@ namespace AwsMock::Database::Entity::SQS {
           receiptHandle = mResult.value()["receiptHandle"].get_string().value.to_string();
           md5Body = mResult.value()["md5Body"].get_string().value.to_string();
           md5Attr = mResult.value()["md5Attr"].get_string().value.to_string();
-          lastSend = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastSend"].get_date().value) / 1000000));
+          reset = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["reset"].get_date().value) / 1000000));
           created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000000));
           modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000000));
 
@@ -218,7 +218,7 @@ namespace AwsMock::Database::Entity::SQS {
        *
        * @return entity.
        */
-     void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+      void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
           oid = mResult.value()["_id"].get_oid().value.to_string();
           region = mResult.value()["region"].get_string().value.to_string();
@@ -230,9 +230,9 @@ namespace AwsMock::Database::Entity::SQS {
           receiptHandle = mResult.value()["receiptHandle"].get_string().value.to_string();
           md5Body = mResult.value()["md5Body"].get_string().value.to_string();
           md5Attr = mResult.value()["md5Attr"].get_string().value.to_string();
-          lastSend = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastSend"].get_date().value) / 1000000));
-          created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value)/1000000));
-          modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value)/1000000));
+          reset = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["reset"].get_date().value) / 1000000));
+          created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000000));
+          modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000000));
 
           bsoncxx::array::view attributesView{mResult.value()["attributes"].get_array().value};
           for (bsoncxx::array::element attributeElement : attributesView) {
@@ -261,8 +261,8 @@ namespace AwsMock::Database::Entity::SQS {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const Message &m) {
-          os << "Message={oid='" + m.oid + "' queueUrl='" + m.queueUrl + "'body='" + m.body + "' status='" + std::to_string(m.status) + "' lastSend='" +
-              Poco::DateTimeFormatter().format(m.lastSend, Poco::DateTimeFormat::HTTP_FORMAT) + "' retries='" + std::to_string(m.retries) +
+          os << "Message={oid='" + m.oid + "' queueUrl='" + m.queueUrl + "'body='" + m.body + "' status='" + std::to_string(m.status) + "' reset='" +
+              Poco::DateTimeFormatter().format(m.reset, Poco::DateTimeFormat::HTTP_FORMAT) + "' retries='" + std::to_string(m.retries) +
               "' messageId='" + m.messageId + "' receiptHandle='" + m.receiptHandle + "' md5body='" + m.md5Body + "' md5Attr='" + m.md5Attr + "'}";
           return os;
       }

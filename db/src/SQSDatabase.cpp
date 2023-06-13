@@ -96,10 +96,19 @@ namespace AwsMock::Database {
         _logger.debug() << "Purged queue, count: " << result->deleted_count() << std::endl;
     }
 
+    Entity::SQS::Queue SQSDatabase::UpdateQueue(const Entity::SQS::Queue &queue) {
+
+        auto result = _queueCollection.replace_one(make_document(kvp("region", queue.region), kvp("name", queue.name)), queue.ToDocument());
+
+        _logger.trace() << "Queue updated: " << queue.ToString() << std::endl;
+
+        return GetQueueById(queue.oid);
+    }
+
     void SQSDatabase::DeleteQueue(const Entity::SQS::Queue &queue) {
-       auto result = _queueCollection.delete_many(make_document(kvp("queueUrl", queue.queueUrl)));
-       _logger.debug() << "Queues deleted, count: " << result->deleted_count() << std::endl;
-   }
+        auto result = _queueCollection.delete_many(make_document(kvp("queueUrl", queue.queueUrl)));
+        _logger.debug() << "Queues deleted, count: " << result->deleted_count() << std::endl;
+    }
 
     void SQSDatabase::DeleteAllQueues() {
         auto result = _queueCollection.delete_many({});
@@ -136,34 +145,39 @@ namespace AwsMock::Database {
         return GetMessageById(bsoncxx::oid(oid));
     }
 
-    void SQSDatabase::ReceiveMessages(const std::string &region, const std::string &queueUrl, Entity::SQS::MessageList &messageList) {
-        auto now = std::chrono::high_resolution_clock::now();
+    void SQSDatabase::ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, Entity::SQS::MessageList &messageList) {
+
+        auto reset = std::chrono::high_resolution_clock::now() + std::chrono::seconds {visibility};
 
         auto messageCursor = _messageCollection.find(make_document(kvp("queueUrl", queueUrl), kvp("status", Entity::SQS::INITIAL)));
         for (auto message : messageCursor) {
+
             Entity::SQS::Message result;
             result.FromDocument(message);
+
+            result.retries++;
             result.receiptHandle = Core::StringUtils::GenerateRandomString(120);
             messageList.push_back(result);
+
+            // Update values
             _messageCollection.update_one(make_document(kvp("_id", message["_id"].get_oid())),
                                           make_document(kvp("$set", make_document(kvp("status", Entity::SQS::SEND),
-                                                                                  kvp("lastSend", bsoncxx::types::b_date(now)),
-                                                                                  kvp("receiptHandle", result.receiptHandle)))));
+                                                                                  kvp("reset", bsoncxx::types::b_date(reset)),
+                                                                                  kvp("receiptHandle", result.receiptHandle))),
+                                                        kvp("$inc", make_document(kvp("retries", 1)))));
         }
-        _logger.trace() << "Messages received, region: " << region << " queue: " << queueUrl + " count: " << messageList.size() << std::endl;
+        _logger.debug() << "Messages received, region: " << region << " queue: " << queueUrl + " count: " << messageList.size() << std::endl;
     }
 
     void SQSDatabase::ResetMessages(const std::string &queueUrl, long visibility) {
 
-        long updated = 0;
-        auto messageCursor = _messageCollection.find(make_document(kvp("queueUrl", queueUrl), kvp("status", Entity::SQS::SEND)));
-        for (auto message : messageCursor) {
-            _messageCollection.update_one(make_document(kvp("_id", message["_id"].get_oid())),
-                                          make_document(kvp("$set",
-                                                            make_document(kvp("status", Entity::SQS::INITIAL), kvp("receiptHandle", "")))));
-            updated++;
-        }
-        _logger.trace() << "Message reset, visibility: " << visibility << " updated: " << updated << std::endl;
+        auto now = std::chrono::high_resolution_clock::now();
+        auto result = _messageCollection.update_many(make_document(kvp("queueUrl", queueUrl),
+                                                                   kvp("status", Entity::SQS::SEND),
+                                                                   kvp("reset", make_document(kvp("$lt", bsoncxx::types::b_date(now))))),
+                                                     make_document(kvp("$set", make_document(kvp("status", Entity::SQS::INITIAL),
+                                                                                             kvp("receiptHandle", "")))));
+        _logger.debug() << "Message reset, visibility: " << visibility << " updated: " << result->upserted_count() << std::endl;
     }
 
     long SQSDatabase::CountMessages(const std::string &region, const std::string &queueUrl) {

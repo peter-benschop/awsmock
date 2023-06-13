@@ -126,9 +126,9 @@ namespace AwsMock::Database::Entity::SQS {
           visibilityTimeout = mResult.value()["visibilityTimeout"].get_int32().value;
           redrivePolicy = mResult.value()["redrivePolicy"].get_string().value.to_string();
           redriveAllowPolicy = mResult.value()["redriveAllowPolicy"].get_string().value.to_string();
-          approximateNumberOfMessages = mResult.value()["visibilityTimeout"].get_int64().value;
-          approximateNumberOfMessagesDelayed = mResult.value()["visibilityTimeout"].get_int64().value;
-          approximateNumberOfMessagesNotVisible = mResult.value()["visibilityTimeout"].get_int64().value;
+          approximateNumberOfMessages = mResult.value()["approximateNumberOfMessages"].get_int64().value;
+          approximateNumberOfMessagesDelayed = mResult.value()["approximateNumberOfMessagesDelayed"].get_int64().value;
+          approximateNumberOfMessagesNotVisible = mResult.value()["approximateNumberOfMessagesNotVisible"].get_int64().value;
       }
 
       /**
@@ -146,9 +146,9 @@ namespace AwsMock::Database::Entity::SQS {
           visibilityTimeout = mResult.value()["visibilityTimeout"].get_int32().value;
           redrivePolicy = mResult.value()["redrivePolicy"].get_string().value.to_string();
           redriveAllowPolicy = mResult.value()["redriveAllowPolicy"].get_string().value.to_string();
-          approximateNumberOfMessages = mResult.value()["visibilityTimeout"].get_int64().value;
-          approximateNumberOfMessagesDelayed = mResult.value()["visibilityTimeout"].get_int64().value;
-          approximateNumberOfMessagesNotVisible = mResult.value()["visibilityTimeout"].get_int64().value;
+          approximateNumberOfMessages = mResult.value()["approximateNumberOfMessages"].get_int64().value;
+          approximateNumberOfMessagesDelayed = mResult.value()["approximateNumberOfMessagesDelayed"].get_int64().value;
+          approximateNumberOfMessagesNotVisible = mResult.value()["approximateNumberOfMessagesNotVisible"].get_int64().value;
       }
 
       /**

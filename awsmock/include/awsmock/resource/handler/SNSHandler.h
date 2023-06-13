@@ -111,14 +111,6 @@ namespace AwsMock {
       std::string GetStringParameter(const std::string &body, const std::string &name);
 
       /**
-       * Get the endpoint from the request header
-       *
-       * @param request HTTP request
-       * @return endpoint
-       */
-      static std::string GetEndpoint(Poco::Net::HTTPServerRequest &request);
-
-      /**
        * Logger
        */
       Poco::LogStream _logger;

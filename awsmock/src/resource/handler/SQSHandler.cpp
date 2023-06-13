@@ -70,16 +70,16 @@ namespace AwsMock {
                 std::string url = GetStringParameter(payload, "QueueUrl");
                 std::string body = GetStringParameter(payload, "MessageBody");
 
-                Dto::SQS::CreateMessageRequest sqsRequest = {.url=url, .body=body};
+                Dto::SQS::CreateMessageRequest sqsRequest = {.region=region, .url=url, .body=body};
                 Dto::SQS::CreateMessageResponse sqsResponse = _sqsService.CreateMessage(sqsRequest);
                 SendOkResponse(response, sqsResponse.ToXml());
 
             } else if (action == "ReceiveMessage") {
 
                 std::string queueUrl = GetStringParameter(payload, "QueueUrl");
-                int maxMessages = GetIntParameter(payload, "MaxNumberOfMessages", 1, 10);
-                int waitTimeSeconds = GetIntParameter(payload, "WaitTimeSeconds", 1, 900);
-                int visibility = GetIntParameter(payload, "VisibilityTimeout", 1, 900);
+                int maxMessages = GetIntParameter(payload, "MaxNumberOfMessages", 1, 10, 3);
+                int waitTimeSeconds = GetIntParameter(payload, "WaitTimeSeconds", 1, 900, 5);
+                int visibility = GetIntParameter(payload, "VisibilityTimeout", 1, 900, 30);
 
                 Dto::SQS::ReceiveMessageRequest sqsRequest = {.region=region, .queueUrl=queueUrl, .maxMessages=maxMessages, .visibility=visibility,
                     .waitTimeSeconds=waitTimeSeconds};
@@ -118,18 +118,18 @@ namespace AwsMock {
 
                 std::string queueUrl = GetStringParameter(payload, "QueueUrl");
 
-                int count = GetAttributeCount(payload, "MessageAttribute");
+                int count = GetAttributeCount(payload, "Attribute");
                 _logger.trace() << "Got attribute count, count: " << count << std::endl;
 
                 AttributeList attributes;
                 for(int i = 1; i <= count; i++) {
-                    std::string attributeName = GetStringParameter(payload, "MessageAttribute." + std::to_string(i) + ".Name");
-                    std::string attributeValue = GetStringParameter(payload, "MessageAttribute." + std::to_string(i) + ".Value");
-                    attributes.emplace_back(attributeName, attributeValue);
+                    std::string attributeName = GetStringParameter(payload, "Attribute." + std::to_string(i) + ".Name");
+                    std::string attributeValue = GetStringParameter(payload, "Attribute." + std::to_string(i) + ".Value");
+                    attributes[attributeName] = attributeValue;
                 }
 
-                Dto::SQS::PutQueueAttributesRequest sqsRequest = {.queueUrl=queueUrl, .attributes=attributes};
-                Dto::SQS::PutQueueAttributesResponse sqsResponse = _sqsService.PutQueueAttributes(sqsRequest);
+                Dto::SQS::SetQueueAttributesRequest sqsRequest = {.queueUrl=queueUrl, .attributes=attributes};
+                Dto::SQS::SetQueueAttributesResponse sqsResponse = _sqsService.SetQueueAttributes(sqsRequest);
 
                 SendOkResponse(response, sqsResponse.ToXml());
 
@@ -195,7 +195,7 @@ namespace AwsMock {
                 version = parts[1];
             }
         }
-        _logger.debug() << "Found action: " << action << "version: " << version << std::endl;
+        _logger.debug() << "Found action: " << action << " version: " << version << std::endl;
     }
 
     std::string SQSHandler::GetStringParameter(const std::string &body, const std::string &name) {
@@ -207,18 +207,18 @@ namespace AwsMock {
                 value = Core::StringUtils::UrlDecode(parts[1]);
             }
         }
-        _logger.debug() << "Found string parameter, name: " << name << "value: " << value << std::endl;
+        _logger.debug() << "Found string parameter, name: " << name << " value: " << value << std::endl;
         return value;
     }
 
-    int SQSHandler::GetIntParameter(const std::string &body, const std::string &name, int min, int max) {
-        int value = max;
+    int SQSHandler::GetIntParameter(const std::string &body, const std::string &name, int min, int max, int def) {
+        int value = def;
         std::string parameterValue = GetStringParameter(body, name);
         if (!parameterValue.empty()) {
             value = std::stoi(parameterValue);
-            value = value > min && value < max ? value : max;
+            value = value > min && value < max ? value : def;
         }
-        _logger.debug() << "Found integer name, name: " << name << "value: " << value << std::endl;
+        _logger.debug() << "Found integer name, name: " << name << " value: " << value << std::endl;
         return value;
     }
 
@@ -230,7 +230,7 @@ namespace AwsMock {
                 count++;
             }
         }
-        return count;
+        return count / 2;
     }
 
     std::string SQSHandler::GetEndpoint(Poco::Net::HTTPServerRequest &request) {

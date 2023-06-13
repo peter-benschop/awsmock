@@ -373,7 +373,6 @@ namespace AwsMock::Service {
             }
 
             // Check empty
-
             if (_database->HasObjects(bucket)) {
                 throw Core::ServiceException("Bucket is not empty", 500);
             }
