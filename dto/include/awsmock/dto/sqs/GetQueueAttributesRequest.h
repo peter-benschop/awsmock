@@ -2,12 +2,13 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_PUTQUEUEATTRIBUTEREQUEST_H
-#define AWSMOCK_DTO_SQS_PUTQUEUEATTRIBUTEREQUEST_H
+#ifndef AWSMOCK_DTO_SQS_GETQUEUEATTRIBUTEREQUEST_H
+#define AWSMOCK_DTO_SQS_GETQUEUEATTRIBUTEREQUEST_H
 
 // C++ standard includes
 #include <string>
 #include <sstream>
+#include <vector>
 
 // Poco includes
 #include "Poco/UUID.h"
@@ -15,7 +16,7 @@
 
 namespace AwsMock::Dto::SQS {
 
-    struct PutQueueAttributesRequest {
+    struct GetQueueAttributesRequest {
 
       /**
        * Queue URL
@@ -23,9 +24,9 @@ namespace AwsMock::Dto::SQS {
       std::string queueUrl;
 
       /**
-       * Attributes
+       * Attribute names list
        */
-      std::vector<std::pair<std::string,std::string>> attributes;
+      std::vector<std::string> attributeNames;
 
       /**
        * Resource
@@ -53,8 +54,12 @@ namespace AwsMock::Dto::SQS {
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const PutQueueAttributesRequest &r) {
-          os << "PutQueueAttributesRequest={queueUrl='" + r.queueUrl + "' resource='" + r.resource + "' requestId='" + r.requestId + "'}";
+      friend std::ostream &operator<<(std::ostream &os, const GetQueueAttributesRequest &r) {
+          os << "GetQueueAttributesRequest={queueUrl='" + r.queueUrl + "' resource='" + r.resource + "' requestId='" + r.requestId + "' attributeNames=[";
+          for(const auto &it : r.attributeNames) {
+              os << it;
+          }
+          os << "]}";
           return os;
       }
 
@@ -62,4 +67,4 @@ namespace AwsMock::Dto::SQS {
 
 } // namespace AwsMock::Dto::SQS
 
-#endif // AWSMOCK_DTO_SQS_PUTQUEUEATTRIBUTEREQUEST_H
+#endif // AWSMOCK_DTO_SQS_GETQUEUEATTRIBUTEREQUEST_H

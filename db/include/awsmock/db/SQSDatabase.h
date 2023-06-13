@@ -87,13 +87,22 @@ namespace AwsMock::Database {
       Entity::SQS::Queue GetQueueById(const std::string &oid);
 
       /**
-       * Returns a queue by primary key
+       * Returns a queue by ARN
        *
        * @param queueArn queue ARN
        * @return queue entity
        * @throws DatabaseException
        */
       Entity::SQS::Queue GetQueueByArn(const std::string &queueArn);
+
+      /**
+       * Returns a queue by URL
+       *
+       * @param queueArn queue URL
+       * @return queue entity
+       * @throws DatabaseException
+       */
+      Entity::SQS::Queue GetQueueByUrl(const std::string &queueUrl);
 
       /**
        * List all available queues
