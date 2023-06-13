@@ -75,7 +75,6 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, QueueByArnTest) {
 
         // arrange
-        std::string queueArn = Core::AwsUtils::CreateSQSQueueArn(_region, Core::AwsUtils::GetDefaultAccountId(), QUEUE);
         Entity::SQS::Queue queue = _sqsDatabase.CreateQueue({.region=_region, .name=QUEUE, .owner=OWNER, .queueUrl=QUEUE_URL, .queueArn=_queueArn});
 
         // act

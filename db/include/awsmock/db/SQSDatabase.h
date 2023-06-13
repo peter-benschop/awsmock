@@ -89,11 +89,11 @@ namespace AwsMock::Database {
       /**
        * Returns a queue by primary key
        *
-       * @param arn queue ARN
+       * @param queueArn queue ARN
        * @return queue entity
        * @throws DatabaseException
        */
-      Entity::SQS::Queue GetQueueByArn(const std::string &arn);
+      Entity::SQS::Queue GetQueueByArn(const std::string &queueArn);
 
       /**
        * List all available queues

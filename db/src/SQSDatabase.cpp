@@ -57,9 +57,9 @@ namespace AwsMock::Database {
         return GetQueueById(bsoncxx::oid(oid));
     }
 
-    Entity::SQS::Queue SQSDatabase::GetQueueByArn(const std::string &arn) {
+    Entity::SQS::Queue SQSDatabase::GetQueueByArn(const std::string &queueArn) {
 
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("arn", arn)));
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("queueArn", queueArn)));
         Entity::SQS::Queue result;
         result.FromDocument(mResult);
 
