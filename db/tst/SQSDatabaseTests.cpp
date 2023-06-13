@@ -225,8 +225,9 @@ namespace AwsMock::Database {
         Entity::SQS::Message message = {.region=_region, .queueUrl=queue.name, .body=BODY};
         _sqsDatabase.CreateMessage(message);
         Entity::SQS::MessageList messageList;
-        _sqsDatabase.ReceiveMessages(_region, QUEUE, 30, messageList);
-        Poco::Thread().sleep(1000);
+        _sqsDatabase.ReceiveMessages(_region, QUEUE, 1, messageList);
+        Poco::Thread().sleep(2000);
+        _sqsDatabase.ResetMessages(QUEUE_URL, 1);
 
         // act
         _sqsDatabase.ResetMessages(QUEUE, 1);

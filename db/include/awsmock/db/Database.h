@@ -81,13 +81,27 @@ namespace AwsMock::Database {
        */
       const Core::Configuration &_configuration;
 
-      mongocxx::uri uri;
+      mongocxx::uri _uri;
 
       /**
        * MongoDB connection pool
        */
       std::shared_ptr<mongocxx::pool> _connectionPool;
 
+      /**
+       * Database name
+       */
+      std::string _name;
+
+      /**
+       * Database host
+       */
+      std::string _host;
+
+      /**
+       * Database port
+       */
+      int _port;
     };
 
 } // namespace AwsMock::Database
