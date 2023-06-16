@@ -28,7 +28,7 @@ jobs:
         run: /usr/local/bin/versiontag patch
       - name: Build docker image
         run: |
-          $VERSION=${cat .semver}
+          $VERSION=$(/usr/local/bin/versiontag current)
           cd docker
-          docker build -t aws-mock:$VERSION
+          docker build -t aws-mock:$VERSION Dockerfile
           
