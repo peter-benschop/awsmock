@@ -23,6 +23,7 @@ awsmock sqs delete-queue --queue-url=http://localhost:4567/000000000000/file-del
 awsmock sqs delete-queue --queue-url=http://localhost:4567/000000000000/file-delivery2-dlqueue
 awsmock sqs delete-queue --queue-url=http://localhost:4567/000000000000/file-delivery3-queue
 awsmock sqs delete-queue --queue-url=http://localhost:4567/000000000000/file-delivery3-dlqueue
+awsmock sqs delete-queue --queue-url=http://localhost:4567/000000000000/file-logging-queue
 
 #
 # Delete lambda function

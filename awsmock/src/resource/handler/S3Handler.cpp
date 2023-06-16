@@ -252,7 +252,8 @@ namespace AwsMock {
         Poco::RegularExpression::MatchVec posVec;
         Poco::RegularExpression pattern(R"(/([a-z0-9-.]+)?/?([a-zA-Z0-9-_/.*'()]+)?\??.*$)");
         if (!pattern.match(uri, 0, posVec)) {
-            throw Core::ResourceNotFoundException("Could not extract bucket and key");
+            _logger.error() << "Could not get bucket/key from URI, uri: " << uri << std::endl;
+            throw Core::ResourceNotFoundException("Could not extract bucket/key from URI");
         }
 
         if (posVec.size() > 1) {

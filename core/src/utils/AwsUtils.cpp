@@ -26,6 +26,11 @@ namespace AwsMock::Core {
         return CreateArn("sqs", region, accountId, queueName);
     }
 
+    std::string AwsUtils::ConvertSQSQueueArnToUrl(const std::string &queueArn) {
+        std::vector<std::string> parts = StringUtils::Split(queueArn, ':');
+        return "http://localhost:4567/000000000000/" + parts[5];
+    }
+
     std::string AwsUtils::CreateSNSTopicArn(const std::string &region, const std::string &accountId, const std::string &topicName) {
 
         return CreateArn("sns", region, accountId, topicName);

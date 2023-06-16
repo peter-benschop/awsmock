@@ -137,7 +137,7 @@ namespace AwsMock {
        * @param bucket S3 bucket name
        * @param key S3 object key
        */
-      static void GetBucketKeyFromUri(const std::string &uri, std::string &bucket, std::string &key);
+      void GetBucketKeyFromUri(const std::string &uri, std::string &bucket, std::string &key);
 
       /**
        * Logger

@@ -53,6 +53,11 @@ namespace AwsMock::Worker {
             queue.attributes.approximateNumberOfMessagesDelayed = _sqsDatabase->CountMessagesByStatus(queue.region, queue.queueUrl, Database::Entity::SQS::DELAYED);
             queue.attributes.approximateNumberOfMessagesNotVisible = _sqsDatabase->CountMessagesByStatus(queue.region, queue.queueUrl, Database::Entity::SQS::SEND);
 
+            // Check retries
+            if(!queue.attributes.redrivePolicy.deadLetterTargetArn.empty()) {
+                _sqsDatabase->RedriveMessages(queue.queueUrl, queue.attributes.redrivePolicy);
+            }
+
             _sqsDatabase->UpdateQueue(queue);
             _logger.trace() << "Queue updated, name" << queue.name << std::endl;
         }

@@ -123,7 +123,7 @@ namespace AwsMock::Service {
 
             // Reset all attributes
             queue.attributes.policy = request.attributes["Policy"];
-            queue.attributes.redrivePolicy = request.attributes["RedrivePolicy"];
+            queue.attributes.redrivePolicy.FromJson(request.attributes["RedrivePolicy"]);
             queue.attributes.redriveAllowPolicy = request.attributes["RedriveAllowPolicy"];
             queue.attributes.messageRetentionPeriod = std::stoi(request.attributes["MessageRetentionPeriod"]);
             queue.attributes.visibilityTimeout = std::stoi(request.attributes["VisibilityTimeout"]);
