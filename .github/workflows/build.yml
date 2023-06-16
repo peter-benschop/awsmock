@@ -25,10 +25,10 @@ jobs:
       - name: Create docs
         run: cd build && make docs
       - name: Semantic release
-        run: /usr/local/bin/versiontag patch
+        run: /usr/bin/semver -f VERSION
       - name: Build docker image
         run: |
-          $VERSION=$(/usr/local/bin/versiontag current)
+          $VERSION=$(cat VERSION)
           cd docker
-          docker build -t aws-mock:$VERSION Dockerfile
+          docker build -t aws-mock:$VERSION .
           
