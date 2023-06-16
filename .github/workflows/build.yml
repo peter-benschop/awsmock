@@ -29,7 +29,7 @@ jobs:
           cd bin 
           mkdir downloads
           cp ../build/core/libawsmockcore.so ../build/db/libawsmockdb.so ../build/service/libawsmocksrv.so ../build/worker/libawsmockwrk.so ./downloads
-          cp ../build/awsmock/awsmock ../etc/aws-mock.properties ./downloads
+          cp ../build/awsmock/aws-mock ../etc/aws-mock.properties ./downloads
           cd ../
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
