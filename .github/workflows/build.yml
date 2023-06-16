@@ -31,8 +31,5 @@ jobs:
           cp ../build/core/libawsmockcore.so ../build/db/libawsmockdb.so ../build/service/libawsmocksrv.so ../build/worker/libawsmockwrk.so ./downloads
           cp ../build/awsmock/awsmock ../etc/aws-mock.properties ./downloads
           cd ../
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: assets-for-download
-          path: bin/downloads
+      - name: Semantic release
+        run: /usr/local/bin/versiontag patch
