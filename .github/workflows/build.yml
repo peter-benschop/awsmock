@@ -25,7 +25,7 @@ jobs:
 #      - name: Create docs
 #        run: cd build && make docs
       - name: Semantic release
-        run: /usr/bin/semver -f ${{github.workspace}}/VERSION
+        run: /usr/bin/semver -f ./VERSION
       - name: Build docker image
         run: |
           VERSION=$(cat ${{github.workspace}}VERSION)
