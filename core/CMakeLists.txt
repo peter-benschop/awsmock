@@ -2,8 +2,6 @@
 set(LIBRARY awsmockcore)
 set(LIBRARY_STATIC awsmockcore_static)
 
-configure_file (include/awsmock/core/Version.h.in include/awsmock/core/Version.h)
-
 set(UTILS_SOURCES src/utils/StringUtils.cpp src/utils/FileUtils.cpp src/utils/DirUtils.cpp src/utils/DateTimeUtils.cpp
         src/utils/CryptoUtils.cpp src/utils/DirectoryWatcher.cpp src/utils/AwsUtils.cpp src/utils/SystemUtils.cpp
         src/logging/LibriJsonFormatter.cpp src/utils/TarUtils.cpp src/utils/RandomUtils.cpp)

@@ -105,7 +105,7 @@ namespace AwsMock {
               Poco::Util::HelpFormatter helpFormatter(options());
               helpFormatter.setCommand(commandName());
               helpFormatter.setUsage("OPTIONS");
-              helpFormatter.setHeader("AwsMock - AWS simulation written in C++.");
+              helpFormatter.setHeader("AwsMock - AWS simulation written in C++ v" + _configuration.GetVersion());
               helpFormatter.format(std::cout);
               stopOptionsProcessing();
               exit(0);

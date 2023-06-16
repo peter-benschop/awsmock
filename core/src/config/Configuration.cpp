@@ -85,7 +85,7 @@ namespace AwsMock::Core {
     }
 
     std::string Configuration::GetVersion() {
-        return VERSION
+        return PROJECT_VER;
     }
 
     std::string Configuration::ToString() const {
