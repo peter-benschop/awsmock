@@ -18,13 +18,7 @@
 
 // AwsMock includes
 #include "CoreException.h"
-
-/**
- * Version
- */
-#define VERSION "1.1.0";
-
-#define CONFIGURATION_EXTENSION std::string(".properties")
+#include "Version.h"
 
 namespace AwsMock::Core {
 

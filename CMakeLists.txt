@@ -7,7 +7,7 @@ string(REGEX MATCH "version=([0-9]*)\\.([0-9]*)\\.([0-9]*)" _ ${ver})
 set(CPACK_PACKAGE_VERSION_MAJOR ${CMAKE_MATCH_1})
 set(CPACK_PACKAGE_VERSION_MINOR ${CMAKE_MATCH_2})
 set(CPACK_PACKAGE_VERSION_PATCH ${CMAKE_MATCH_3})
-message("version: ${CMAKE_MATCH_1}.${CMAKE_MATCH_2}.${CMAKE_MATCH_3}")
+message("version: ${CMAKE_MATCH_1}.${CMAKE_MATCH_2}.${CMAKE_MATCH_3} type: ${CMAKE_BUILD_TYPE}")
 
 project(aws-mock VERSION "${CMAKE_MATCH_1}.${CMAKE_MATCH_2}.${CMAKE_MATCH_3}")
 configure_file (core/include/awsmock/core/Version.h.in core/include/awsmock/core/Version.h)
