@@ -102,6 +102,7 @@ namespace AwsMock {
       void handleOption(const std::string &name, const std::string &value) override {
 
           if (name == "help") {
+
               Poco::Util::HelpFormatter helpFormatter(options());
               helpFormatter.setCommand(commandName());
               helpFormatter.setUsage("OPTIONS");
@@ -109,9 +110,13 @@ namespace AwsMock {
               helpFormatter.format(std::cout);
               stopOptionsProcessing();
               exit(0);
+
           } else if (name == "config") {
+
               _configuration.SetFilename(value);
+
           } else if (name == "level") {
+
               _configuration.SetLogLevel(value);
               _logger.setLevel(value);
               Core::Logger::SetLogLevel(value);
