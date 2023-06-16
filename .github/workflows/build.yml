@@ -52,11 +52,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Setup sv4git
-        run: |
-          curl -s https://api.github.com/repos/bvieira/sv4git/releases/latest | jq -r '.assets[] | select(.browser_download_url | contains("linux")) | .browser_download_url' | wget -O /tmp/sv4git.tar.gz -qi - \
-            && tar -C /usr/local/bin -xzf /tmp/sv4git.tar.gz
-
       - name: Create tag
         id: create-tag
         run: |
