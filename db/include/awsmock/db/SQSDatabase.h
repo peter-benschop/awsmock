@@ -131,6 +131,14 @@ namespace AwsMock::Database {
       Entity::SQS::Queue UpdateQueue(const Entity::SQS::Queue &queue);
 
       /**
+       * Count the number of queues for a given region.
+       *
+       * @param queueUrl URL of the queue
+       * @return number of queues in the given region.
+       */
+      long CountQueues(const std::string &region);
+
+      /**
        * Deletes a queue.
        *
        * @param queue queue entity
@@ -205,7 +213,6 @@ namespace AwsMock::Database {
        * @param visibility visibility period in seconds
        */
       [[maybe_unused]] void RedriveMessages(const std::string& queueUrl, const Entity::SQS::RedrivePolicy &redrivePolicy);
-
 
       /**
        * Count the number of message by status
