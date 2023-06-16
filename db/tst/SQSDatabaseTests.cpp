@@ -147,6 +147,20 @@ namespace AwsMock::Database {
         EXPECT_TRUE(result.owner == queue.owner);
     }
 
+    TEST_F(SQSDatabaseTest, QueueCountTest) {
+
+        // arrange
+        Entity::SQS::Queue queue = {.region=_region, .name=QUEUE_NAME, .owner=OWNER, .queueUrl=QUEUE_URL};
+        queue = _sqsDatabase.CreateQueue(queue);
+
+        // act
+        long result = _sqsDatabase.CountQueues(_region);
+
+        // assert
+        EXPECT_EQ(1, result);
+    }
+
+
     TEST_F(SQSDatabaseTest, QueueDeleteTest) {
 
         // arrange

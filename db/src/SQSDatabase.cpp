@@ -105,6 +105,13 @@ namespace AwsMock::Database {
         return GetQueueById(queue.oid);
     }
 
+    long SQSDatabase::CountQueues(const std::string &region) {
+
+        long count = _queueCollection.count_documents(make_document(kvp("region", region)));
+        _logger.trace() << "Count queues, result: " << count << std::endl;
+        return count;
+    }
+
     void SQSDatabase::DeleteQueue(const Entity::SQS::Queue &queue) {
         auto result = _queueCollection.delete_many(make_document(kvp("queueUrl", queue.queueUrl)));
         _logger.debug() << "Queues deleted, count: " << result->deleted_count() << std::endl;
