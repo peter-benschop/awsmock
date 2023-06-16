@@ -1,11 +1,11 @@
-PROJECT_NAME           = "aws-mock" # Adjust to your needs
-OUTPUT_DIRECTORY       = "docs"              # For the demo repository
+PROJECT_NAME           = "aws-mock"
+OUTPUT_DIRECTORY       = "."
 FILE_PATTERNS          = *.h
 EXTRACT_ALL            = YES
 EXTRACT_PRIVATE        = YES
 RECURSIVE              = YES
 VERBATIM_HEADERS       = NO
-GENERATE_HTML          = YES
+GENERATE_HTML          = NO
 GENERATE_LATEX         = NO
 GENERATE_XML           = YES
 EXCLUDE_SYMBOLS        = _*
