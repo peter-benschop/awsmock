@@ -26,6 +26,8 @@ jobs:
 #        run: cd build && make docs
       - name: Semantic release
         run: git sv tag
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build docker image
         run: |
           VERSION=$(cat VERSION)
