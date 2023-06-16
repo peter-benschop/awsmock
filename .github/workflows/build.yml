@@ -24,3 +24,14 @@ jobs:
         run: cd build && ctest -V
       - name: Create docs
         run: cd build && make docs
+      - name: Save artifacts
+        run: |
+          cd bin 
+          mkdir downloads
+          cp ../core/libawsmockcore.so ../db/libawsmockdb.so ../service/libawsmocksrv.so ../worker/libawsmockwrk.so ./downloads
+          cp ../awsmock/awsmock ../etc/aws-mock.properties ./downloads
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: assets-for-download
+          path: bin/downloads
