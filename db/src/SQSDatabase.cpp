@@ -180,6 +180,18 @@ namespace AwsMock::Database {
         _logger.debug() << "Message reset, visibility: " << visibility << " updated: " << result->upserted_count() << std::endl;
     }
 
+    void SQSDatabase::RedriveMessages(const std::string& queueUrl, const Entity::SQS::RedrivePolicy &redrivePolicy) {
+
+        std::string dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(redrivePolicy.deadLetterTargetArn);
+        auto result = _messageCollection.update_many(make_document(kvp("queueUrl", queueUrl),
+                                                                   kvp("status", Entity::SQS::INITIAL),
+                                                                   kvp("retries", make_document(kvp("$gt", redrivePolicy.maxReceiveCount)))),
+                                                     make_document(kvp("$set", make_document(kvp("retries", 0),
+                                                                                             kvp("queueArn", redrivePolicy.deadLetterTargetArn),
+                                                                                             kvp("queueUrl", dlqQueueUrl)))));
+        _logger.debug() << "Message redrive, arn: " << redrivePolicy.deadLetterTargetArn << " updated: " << result->modified_count() << std::endl;
+    }
+
     long SQSDatabase::CountMessages(const std::string &region, const std::string &queueUrl) {
 
         long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));

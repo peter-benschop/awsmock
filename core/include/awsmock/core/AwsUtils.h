@@ -11,6 +11,9 @@
 // Poco includes
 #include <Poco/UUIDGenerator.h>
 
+// AwsMock includes
+#include "awsmock/core/StringUtils.h"
+
 namespace AwsMock::Core {
 
     class AwsUtils {
@@ -63,6 +66,14 @@ namespace AwsMock::Core {
        * @param topicName name of the topic
        */
       static std::string CreateSNSTopicArn(const std::string &region, const std::string &accountId, const std::string &topicName);
+
+      /**
+       * Converts a queue ARN to a queue URL
+       *
+       * @param queueArn ARN of the queue
+       * @return URL of the queue
+       */
+      static std::string ConvertSQSQueueArnToUrl(const std::string &queueArn);
 
       /**
        * Create SNS subscription ARN

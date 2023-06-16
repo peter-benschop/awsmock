@@ -18,6 +18,7 @@
 #include "Poco/Data/SQLite/Connector.h"
 
 // AwsMock includes
+#include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/Logger.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/DatabaseException.h>
@@ -196,6 +197,15 @@ namespace AwsMock::Database {
        * @param visibility visibility period in seconds
        */
       [[maybe_unused]] void ResetMessages(const std::string& queueUrl, long visibility);
+
+      /**
+       * Redrive expired messages.
+       *
+       * @param queueUrl URL of the queue
+       * @param visibility visibility period in seconds
+       */
+      [[maybe_unused]] void RedriveMessages(const std::string& queueUrl, const Entity::SQS::RedrivePolicy &redrivePolicy);
+
 
       /**
        * Count the number of message by status

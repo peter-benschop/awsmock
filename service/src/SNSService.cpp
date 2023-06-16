@@ -17,8 +17,6 @@ namespace AwsMock::Service {
         // Set console logger
         Core::Logger::SetDefaultConsoleLogger("SNSService");
 
-        int level = Poco::Logger::get("SNSService").getLevel();
-
         // Initialize environment
         _snsDatabase = std::make_unique<Database::SNSDatabase>(_configuration);
         _sqsDatabase = std::make_unique<Database::SQSDatabase>(_configuration);

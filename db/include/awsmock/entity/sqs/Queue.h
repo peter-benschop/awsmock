@@ -11,10 +11,14 @@
 
 // Poco includes
 #include <Poco/DateTime.h>
+#include <Poco/JSON/Parser.h>
 
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
+
+// AwsMock includes
+#include <awsmock/core/ServiceException.h>
 
 namespace AwsMock::Database::Entity::SQS {
 
@@ -24,6 +28,132 @@ namespace AwsMock::Database::Entity::SQS {
     using bsoncxx::view_or_value;
     using bsoncxx::document::view;
     using bsoncxx::document::value;
+
+    struct RedrivePolicy {
+
+      /**
+       * Dead letter queue target ARN
+       */
+      std::string deadLetterTargetArn;
+
+      /**
+       * Maximal number of retries, before the message will be send to the DQL
+       */
+      int maxReceiveCount;
+
+      /**
+       * Parse values from a JSON stream
+       *
+       * @param body json input stream
+       */
+      void FromJson(const std::string &body) {
+
+          if (body.empty()) {
+              return;
+          }
+
+          Poco::JSON::Parser parser;
+          Poco::Dynamic::Var result = parser.parse(body);
+          Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+
+          try {
+              if (rootObject->has("deadLetterTargetArn") && rootObject->get("deadLetterTargetArn").isString()) {
+                  deadLetterTargetArn = rootObject->get("deadLetterTargetArn").convert<std::string>();
+                  maxReceiveCount = rootObject->get("maxReceiveCount").convert<int>();
+              }
+
+              // Cleanup
+              rootObject->clear();
+              parser.reset();
+
+          } catch (Poco::Exception &exc) {
+              throw Core::ServiceException(exc.message(), 500);
+          }
+      }
+
+      /**
+       * Converts the DTO to a JSON representation.
+       *
+       * @return DTO as string for logging.
+       */
+      [[nodiscard]] std::string ToJson() const {
+
+          if (deadLetterTargetArn.empty()) {
+              return {};
+          }
+
+          try {
+              Poco::JSON::Object rootJson;
+              rootJson.set("deadLetterTargetArn", deadLetterTargetArn);
+              rootJson.set("maxReceiveCount", maxReceiveCount);
+
+              std::ostringstream os;
+              rootJson.stringify(os);
+              return os.str();
+
+          } catch (Poco::Exception &exc) {
+              throw Core::ServiceException(exc.message(), 500);
+          }
+      }
+
+      /**
+       * Converts the entity to a MongoDB document
+       *
+       * @return entity as MongoDB document.
+       */
+      [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
+
+          view_or_value<view, value> redrivePolicyDoc = make_document(
+              kvp("deadLetterTargetArn", deadLetterTargetArn),
+              kvp("maxReceiveCount", maxReceiveCount));
+
+          return redrivePolicyDoc;
+      }
+
+      /**
+       * Converts the MongoDB document to an entity
+       *
+       * @return entity.
+       */
+      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
+
+          deadLetterTargetArn = mResult.value()["deadLetterTargetArn"].get_string().value.to_string();
+          maxReceiveCount = mResult.value()["maxReceiveCount"].get_int32().value;
+      }
+
+      /**
+       * Converts the MongoDB document to an entity
+       *
+       * @return entity.
+       */
+      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+
+          deadLetterTargetArn = mResult.value()["deadLetterTargetArn"].get_string().value.to_string();
+          maxReceiveCount = mResult.value()["maxReceiveCount"].get_int32().value;
+      }
+
+      /**
+       * Converts the DTO to a string representation.
+       *
+       * @return DTO as string for logging.
+       */
+      [[nodiscard]] std::string ToString() const {
+          std::stringstream ss;
+          ss << (*this);
+          return ss.str();
+      }
+
+      /**
+       * Stream provider.
+       *
+       * @return output stream
+       */
+      friend std::ostream &operator<<(std::ostream &os, const RedrivePolicy &r) {
+          os << "RedrivePolicy={deadLetterTargetArn='" << r.deadLetterTargetArn << "' maxReceiveCount='" << r.maxReceiveCount << "'}";
+          return os;
+      }
+
+    };
 
     struct QueueAttribute {
 
@@ -64,7 +194,7 @@ namespace AwsMock::Database::Entity::SQS {
        *
        * <p>JSON string</p>
        */
-      std::string redrivePolicy;
+      RedrivePolicy redrivePolicy;
 
       /**
        * Redrive allow policy
@@ -102,7 +232,7 @@ namespace AwsMock::Database::Entity::SQS {
               kvp("policy", policy),
               kvp("receiveMessageWaitTime", receiveMessageWaitTime),
               kvp("visibilityTimeout", visibilityTimeout),
-              kvp("redrivePolicy", redrivePolicy),
+              kvp("redrivePolicy", redrivePolicy.ToDocument()),
               kvp("redriveAllowPolicy", redriveAllowPolicy),
               kvp("approximateNumberOfMessages", approximateNumberOfMessages),
               kvp("approximateNumberOfMessagesDelayed", approximateNumberOfMessagesDelayed),
@@ -124,11 +254,12 @@ namespace AwsMock::Database::Entity::SQS {
           policy = mResult.value()["policy"].get_string().value.to_string();
           receiveMessageWaitTime = mResult.value()["receiveMessageWaitTime"].get_int32().value;
           visibilityTimeout = mResult.value()["visibilityTimeout"].get_int32().value;
-          redrivePolicy = mResult.value()["redrivePolicy"].get_string().value.to_string();
+          redrivePolicy.FromDocument(mResult.value()["redrivePolicy"].get_document().value);
           redriveAllowPolicy = mResult.value()["redriveAllowPolicy"].get_string().value.to_string();
           approximateNumberOfMessages = mResult.value()["approximateNumberOfMessages"].get_int64().value;
           approximateNumberOfMessagesDelayed = mResult.value()["approximateNumberOfMessagesDelayed"].get_int64().value;
           approximateNumberOfMessagesNotVisible = mResult.value()["approximateNumberOfMessagesNotVisible"].get_int64().value;
+
       }
 
       /**
@@ -144,7 +275,7 @@ namespace AwsMock::Database::Entity::SQS {
           policy = mResult.value()["policy"].get_string().value.to_string();
           receiveMessageWaitTime = mResult.value()["receiveMessageWaitTime"].get_int32().value;
           visibilityTimeout = mResult.value()["visibilityTimeout"].get_int32().value;
-          redrivePolicy = mResult.value()["redrivePolicy"].get_string().value.to_string();
+          redrivePolicy.FromDocument(mResult.value()["redrivePolicy"].get_document().value);
           redriveAllowPolicy = mResult.value()["redriveAllowPolicy"].get_string().value.to_string();
           approximateNumberOfMessages = mResult.value()["approximateNumberOfMessages"].get_int64().value;
           approximateNumberOfMessagesDelayed = mResult.value()["approximateNumberOfMessagesDelayed"].get_int64().value;
@@ -170,7 +301,7 @@ namespace AwsMock::Database::Entity::SQS {
       friend std::ostream &operator<<(std::ostream &os, const QueueAttribute &r) {
           os << "QueueAttribute={delaySeconds='" << r.delaySeconds << "' maxMessageSize='" << r.maxMessageSize << "' messageRetentionPeriod='"
              << r.messageRetentionPeriod << "' policy='" << r.policy << "' receiveMessageWaitTime='" << r.receiveMessageWaitTime <<
-             "' visibilityTimeout='" << r.visibilityTimeout << "' redrivePolicy='" << r.redrivePolicy << "' redriveAllowPolicy='" << r.redriveAllowPolicy <<
+             "' visibilityTimeout='" << r.visibilityTimeout << "' redrivePolicy=" << r.redrivePolicy.ToString() << " redriveAllowPolicy='" << r.redriveAllowPolicy <<
              "' approximateNumberOfMessages='" << r.approximateNumberOfMessages << "' approximateNumberOfMessagesDelayed='" << r.approximateNumberOfMessagesDelayed <<
              "' approximateNumberOfMessagesNotVisible='" << r.approximateNumberOfMessagesNotVisible << "'}";
           return os;

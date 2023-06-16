@@ -10,21 +10,20 @@ awsmock s3 mb s3://file-delivery3
 #
 # Create SQS Queues
 #
-awsmock sqs create-queue --queue-name=file-delivery-queue
-awsmock sqs create-queue --queue-name=file-delivery-dlqueue
+awsmock sqs create-queue --queue-name=file-delivery1-queue
+awsmock sqs create-queue --queue-name=file-delivery1-dlqueue
+awsmock sqs create-queue --queue-name=file-delivery2-queue
+awsmock sqs create-queue --queue-name=file-delivery2-dlqueue
+awsmock sqs create-queue --queue-name=file-delivery3-queue
+awsmock sqs create-queue --queue-name=file-delivery3-dlqueue
 awsmock sqs create-queue --queue-name=file-logging-queue
 
 #
-# Setup SQS queue attributes
+# Setup SQS queue attributes (DLQ definition)
 #
-awsmock sqs set-queue-attributes --queue-url http://localhost:4567/000000000000/file-delivery1-queue --attributes file://./sqs/file-delivery1-queue.json
-awsmock sqs set-queue-attributes --queue-url http://localhost:4567/000000000000/file-delivery2-queue --attributes file://./sqs/file-delivery3-queue.json
-awsmock sqs set-queue-attributes --queue-url http://localhost:4567/000000000000/file-delivery3-queue --attributes file://./sqs/file-delivery3-queue.json
-
-#
-# DLQ definition
-#
-awsmock sqs set-queue-attributes --queue-url http://localhost:4567/000000000000/file-delivery-queue --attributes file://./sqs/file-delivery1-queue-attributes.json
+awsmock sqs set-queue-attributes --queue-url http://localhost:4567/000000000000/file-delivery1-queue --attributes file://./sqs/file-delivery1-queue-attributes.json
+awsmock sqs set-queue-attributes --queue-url http://localhost:4567/000000000000/file-delivery2-queue --attributes file://./sqs/file-delivery2-queue-attributes.json
+awsmock sqs set-queue-attributes --queue-url http://localhost:4567/000000000000/file-delivery3-queue --attributes file://./sqs/file-delivery3-queue-attributes.json
 
 #
 # Setup S3 bucket notification events
