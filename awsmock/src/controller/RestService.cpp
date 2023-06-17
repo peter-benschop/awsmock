@@ -7,7 +7,7 @@
 namespace AwsMock {
 
     RestService::RestService(Core::Configuration &configuration)
-        : _port(DEFAULT_PORT), _host(DEFAULT_HOST), _logger(Poco::Logger::get("RestService")), _configuration(configuration),  {
+        : _port(DEFAULT_PORT), _host(DEFAULT_HOST), _logger(Poco::Logger::get("RestService")), _configuration(configuration)  {
 
         Core::Logger::SetDefaultConsoleLogger("RestService");
 

@@ -102,6 +102,16 @@ namespace AwsMock::Database {
        * Database port
        */
       int _port;
+
+      /**
+       * Database user
+       */
+      std::string _user;
+
+      /**
+       * Database password
+       */
+      std::string _password;
     };
 
 } // namespace AwsMock::Database
