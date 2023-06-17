@@ -174,6 +174,71 @@ namespace AwsMock::Service {
        */
       std::string GetPayload(Poco::Net::HTTPServerRequest &request);
 
+
+      /**
+       * Get the action from the request body
+       *
+       * <p>Returns the action/version parameter from the message body. This is mainly used by SQS.</p>
+       *
+       * @param body HTTP request body (in)
+       * @param action SQS action (out)
+       * @param version SQS version (out)
+       */
+      void GetActionVersion(const std::string &body, std::string &action, std::string &version);
+
+      /**
+       * Get the action from the request body
+       *
+       * <p>Returns a string parameter from the message body. This is mainly used by SQS.</p>
+       *
+       * @param body HTTP request body
+       * @param name parameter name
+       * @return parameter value
+       */
+      std::string GetStringParameter(const std::string &body, const std::string &name);
+
+      /**
+       * Return an integer name.
+       *
+       * <p>Returns an integer parameter from the message body. This is mainly used by SQS.</p>
+       *
+       * @param body HTTP message body
+       * @param name name name
+       * @param min minimum value
+       * @param max maximum value
+       * @param def default value
+       * @return integer name
+       */
+      int GetIntParameter(const std::string &body, const std::string &name, int min, int max, int def);
+
+      /**
+       * Returns the attribute count.
+       *
+       * <p>Returns the number of name from the message body. This is mainly used by SQS.</p>
+       *
+       * @param body HTTP message body
+       * @param name name name
+       * @return number of sqs
+       */
+      int GetAttributeCount(const std::string &body, const std::string &name);
+
+      /**
+       * Get the attribute name count
+       *
+       * @param body message body
+       * @param name attribute name
+       * @return number of atributes with the given name
+       */
+      int GetAttributeNameCount(const std::string &body, const std::string &name);
+
+      /**
+       * Get the endpoint from the request header
+       *
+       * @param request HTTP request
+       * @return endpoint
+       */
+      static std::string GetEndpoint(Poco::Net::HTTPServerRequest &request);
+
       /**
        * Send a OK response (HTTP status code 200).
        *

@@ -36,6 +36,7 @@
 #include <awsmock/controller/RestService.h>
 #include <awsmock/db/Database.h>
 #include <awsmock/service/S3Server.h>
+#include <awsmock/service/SQSServer.h>
 //#include <awsmock/worker/SQSWorker.h>
 #include <awsmock/worker/S3Worker.h>
 #include <awsmock/worker/SQSWorker.h>
@@ -166,6 +167,9 @@ namespace AwsMock {
 
           // Start the S3 server
           _s3Server.start();
+
+          // Start the SQS server
+          _sqsServer.start();
       }
 
       /**
@@ -217,11 +221,25 @@ namespace AwsMock {
        */
       RestService _restService = RestService(_configuration);
 
+      /**
+       * S3 worker
+       */
       Worker::S3Worker _s3Worker = Worker::S3Worker(_configuration);
 
+      /**
+       * SQS worker
+       */
+      Worker::SQSWorker _sqsWorker = Worker::SQSWorker(_configuration);
+
+      /**
+       * S3 server
+       */
       Service::S3Server _s3Server = Service::S3Server(_configuration, _metricService);
 
-      Worker::SQSWorker _sqsWorker = Worker::SQSWorker(_configuration);
+      /**
+       * SQS server
+       */
+      Service::SQSServer _sqsServer = Service::SQSServer(_configuration, _metricService);
 
       /**
        * Thread error handler

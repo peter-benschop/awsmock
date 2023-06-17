@@ -32,11 +32,8 @@ namespace AwsMock {
         Core::MetricServiceTimer measure(_metricService, HTTP_POST_TIMER);
         _logger.trace() << "SNS POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << " length: " << response.getContentLength() << std::endl;
 
-        //DumpRequest(request);
-        //DumpBody(request);
 
         try {
-            //std::string endpoint = GetEndpoint(request);
             std::string payload = GetPayload(request);
             std::string action, version;
 

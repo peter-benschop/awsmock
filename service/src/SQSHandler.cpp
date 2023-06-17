@@ -104,7 +104,7 @@ namespace AwsMock::Service {
 
                 std::string queueUrl = GetStringParameter(payload, "QueueUrl");
 
-                int count = GetAttributeCount(payload, "AttributeName");
+                int count = GetAttributeNameCount(payload, "AttributeName");
                 _logger.trace() << "Got attribute names count: " << count << std::endl;
 
                 std::vector<std::string> attributeNames;
@@ -183,61 +183,5 @@ namespace AwsMock::Service {
         handleHttpStatusCode(response, 200);
         std::ostream &outputStream = response.send();
         outputStream.flush();
-    }
-
-    void SQSHandler::GetActionVersion(const std::string &body, std::string &action, std::string &version) {
-        std::vector<std::string> bodyParts = Core::StringUtils::Split(body, '&');
-        for (auto &it : bodyParts) {
-            std::vector<std::string> parts = Core::StringUtils::Split(it, '=');
-            if (parts.size() < 2) {
-                throw Core::ServiceException("Invalid request body", 400);
-            }
-            if (parts[0] == "Action") {
-                action = parts[1];
-            }
-            if (parts[0] == "Version") {
-                version = parts[1];
-            }
-        }
-        _logger.debug() << "Found action: " << action << " version: " << version << std::endl;
-    }
-
-    std::string SQSHandler::GetStringParameter(const std::string &body, const std::string &name) {
-        std::string value;
-        std::vector<std::string> bodyParts = Core::StringUtils::Split(body, '&');
-        for (auto &it : bodyParts) {
-            std::vector<std::string> parts = Core::StringUtils::Split(it, '=');
-            if (parts[0] == name) {
-                value = Core::StringUtils::UrlDecode(parts[1]);
-            }
-        }
-        _logger.debug() << "Found string parameter, name: " << name << " value: " << value << std::endl;
-        return value;
-    }
-
-    int SQSHandler::GetIntParameter(const std::string &body, const std::string &name, int min, int max, int def) {
-        int value = def;
-        std::string parameterValue = GetStringParameter(body, name);
-        if (!parameterValue.empty()) {
-            value = std::stoi(parameterValue);
-            value = value > min && value < max ? value : def;
-        }
-        _logger.debug() << "Found integer name, name: " << name << " value: " << value << std::endl;
-        return value;
-    }
-
-    int SQSHandler::GetAttributeCount(const std::string &body, const std::string &parameter) {
-        int count = 0;
-        std::vector<std::string> bodyParts = Core::StringUtils::Split(body, '&');
-        for (auto &it : bodyParts) {
-            if(it.starts_with(parameter)) {
-                count++;
-            }
-        }
-        return count / 2;
-    }
-
-    std::string SQSHandler::GetEndpoint(Poco::Net::HTTPServerRequest &request) {
-        return request.get("Host");
     }
 }

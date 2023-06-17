@@ -9,6 +9,7 @@ namespace AwsMock::Service {
     S3Server::S3Server(Core::Configuration &configuration, Core::MetricService &metricService)
         : _logger(Poco::Logger::get("S3Server")), _configuration(configuration), _metricService(metricService) {
 
+        // Set default console logger
         Core::Logger::SetDefaultConsoleLogger("S3Server");
 
         _port = _configuration.getInt("awsmock.service.s3.port", S3_DEFAULT_PORT);
