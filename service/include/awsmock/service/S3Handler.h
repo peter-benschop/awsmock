@@ -2,8 +2,8 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_RESOURCE_S3HANDLER_H
-#define AWSMOCK_RESOURCE_S3HANDLER_H
+#ifndef AWSMOCK_SERVICE_S3HANDLER_H
+#define AWSMOCK_SERVICE_S3HANDLER_H
 
 // Poco includes
 #include "Poco/Logger.h"
@@ -17,21 +17,10 @@
 #include "awsmock/core/MetricService.h"
 #include "awsmock/core/MetricServiceTimer.h"
 #include "awsmock/core/MetricDefinition.h"
-#include "awsmock/resource/HandlerException.h"
-#include "awsmock/resource/AbstractResource.h"
+#include "awsmock/service/AbstractHandler.h"
 #include "awsmock/service/S3Service.h"
-#include "awsmock/dto/s3/CreateBucketRequest.h"
-#include "awsmock/dto/s3/CompleteMultipartUploadResult.h"
-#include "awsmock/dto/s3/DeleteObjectsRequest.h"
-#include "awsmock/dto/s3/DeleteObjectsResponse.h"
-#include "awsmock/dto/s3/InitiateMultipartUploadResult.h"
-#include "awsmock/dto/s3/ListBucketRequest.h"
-#include "awsmock/dto/s3/ListBucketResult.h"
-#include "awsmock/dto/s3/ListAllBucketResponse.h"
-#include "awsmock/dto/s3/PutObjectRequest.h"
-#include "awsmock/dto/s3/PutBucketNotificationRequest.h"
 
-namespace AwsMock {
+namespace AwsMock::Service {
 
     /**
      * AWS S3 mock handler
@@ -53,7 +42,7 @@ namespace AwsMock {
      * </ul>
      * <p>
      */
-    class S3Handler : public AwsMock::Resource::AbstractResource {
+    class S3Handler : public AwsMock::Service::AbstractHandler {
 
     public:
 
@@ -159,16 +148,7 @@ namespace AwsMock {
        */
       Service::S3Service _s3Service;
 
-      /**
-       * S3 service port
-       */
-      int _s3ServicePort;
-
-      /**
-       * S3 service host
-       */
-      std::string _s3ServiceHost;
     };
 } // namespace AwsMock
 
-#endif // AWSMOCK_RESOURCE_S3HANDLER_H
+#endif // AWSMOCK_SERVICE_S3HANDLER_H

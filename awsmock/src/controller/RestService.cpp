@@ -7,7 +7,7 @@
 namespace AwsMock {
 
     RestService::RestService(Core::Configuration &configuration)
-        : _port(DEFAULT_PORT), _host(DEFAULT_HOST), _logger(Poco::Logger::get("RestService")), _configuration(configuration) {
+        : _port(DEFAULT_PORT), _host(DEFAULT_HOST), _logger(Poco::Logger::get("RestService")), _configuration(configuration),  {
 
         Core::Logger::SetDefaultConsoleLogger("RestService");
 
@@ -17,10 +17,13 @@ namespace AwsMock {
     }
 
     RestService::~RestService() {
-        delete _router;
-
-        _httpServer->stopAll(true);
-        delete _httpServer;
+        if (_router) {
+            delete _router;
+        }
+        if (_httpServer) {
+            _httpServer->stopAll(true);
+            delete _httpServer;
+        }
     }
 
     void RestService::setPort(int port) {
@@ -44,7 +47,7 @@ namespace AwsMock {
         _httpServer = new Poco::Net::HTTPServer(getRouter(), Poco::Net::ServerSocket(Poco::UInt16(_port)), httpServerParams);
 
         _httpServer->start();
-        poco_information(_logger, "Restful Web Service started, endpoint: http://" + _host + ":" + std::to_string(_port));
+        poco_information(_logger, "AwsMock gateway started, endpoint: http://" + _host + ":" + std::to_string(_port));
     }
 
     void RestService::start(Poco::Net::HTTPRequestHandlerFactory *router, int port) {

@@ -35,6 +35,8 @@
 #include <awsmock/controller/Router.h>
 #include <awsmock/controller/RestService.h>
 #include <awsmock/db/Database.h>
+#include <awsmock/service/S3Server.h>
+//#include <awsmock/worker/SQSWorker.h>
 #include <awsmock/worker/S3Worker.h>
 #include <awsmock/worker/SQSWorker.h>
 
@@ -150,6 +152,21 @@ namespace AwsMock {
           poco_debug(_logger, "Error handler initialized");
       }
 
+      void StartWorker() {
+
+          // Start the S3 worker
+          Poco::ThreadPool::defaultPool().start(_s3Worker);
+
+          // Start the SQS worker
+          Poco::ThreadPool::defaultPool().start(_sqsWorker);
+      }
+
+      void StartServices() {
+
+          // Start the S3 server
+          _s3Server.start();
+      }
+
       /**
        * Main routine.
        *
@@ -160,13 +177,9 @@ namespace AwsMock {
 
           poco_debug(_logger, "Entering main routine");
 
-          // Start the S3 worker
-          Worker::S3Worker _s3Worker = Worker::S3Worker(_configuration);
-          Poco::ThreadPool::defaultPool().start(_s3Worker);
+          StartWorker();
 
-          // Start the SQS worker
-          Worker::SQSWorker _sqsWorker = Worker::SQSWorker(_configuration);
-          Poco::ThreadPool::defaultPool().start(_sqsWorker);
+          StartServices();
 
           // Start HTTP server
           _restService.setRouter(&_router);
@@ -202,6 +215,12 @@ namespace AwsMock {
        * Gateway controller
        */
       RestService _restService = RestService(_configuration);
+
+      Worker::S3Worker _s3Worker = Worker::S3Worker(_configuration);
+
+      Service::S3Server _s3Server = Service::S3Server(_configuration, _metricService);
+
+      Worker::SQSWorker _sqsWorker = Worker::SQSWorker(_configuration);
 
       /**
        * Thread error handler

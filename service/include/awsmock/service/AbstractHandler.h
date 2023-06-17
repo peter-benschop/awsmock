@@ -2,8 +2,8 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_RESOURCE_ABSTRACTRESOURCE_H
-#define AWSMOCK_RESOURCE_ABSTRACTRESOURCE_H
+#ifndef AWSMOCK_SERVICE_ABSTRACTHANDLER_H
+#define AWSMOCK_SERVICE_ABSTRACTHANDLER_H
 
 // C++ includes
 #include <string>
@@ -18,7 +18,6 @@
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/HTTPRequestHandler.h"
-#include <Poco/Net/HTTPClientSession.h>
 
 // AwsMock includes
 #include "awsmock/core/Logger.h"
@@ -27,27 +26,27 @@
 #include <awsmock/core/ResourceNotFoundException.h>
 #include "awsmock/dto/s3/RestErrorResponse.h"
 #include "awsmock/dto/sqs/RestErrorResponse.h"
-#include <awsmock/resource/HandlerException.h>
+//#include <awsmock/resource/HandlerException.h>
 
-namespace AwsMock::Resource {
+namespace AwsMock::Service {
 
     typedef std::vector<std::pair<std::string, std::string>> HeaderMap;
 
     /**
      * Abstract HTTP request handler
      */
-    class AbstractResource : public Poco::Net::HTTPRequestHandler {
+    class AbstractHandler : public Poco::Net::HTTPRequestHandler {
 
     public:
       /**
        * Default User-defined Constructor
        */
-      AbstractResource();
+      AbstractHandler();
 
       /**
        * Default Destructor
        */
-      ~AbstractResource() override;
+      ~AbstractHandler() override;
 
       /**
        * Handle requests.
@@ -195,12 +194,12 @@ namespace AwsMock::Resource {
       void SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long contentLength, HeaderMap *extraHeader = nullptr);
 
       /**
-       * Send an error response.
+       * Send a DELETE response (HTTP status code 204) with an output stream.
        *
        * @param response HTTP response object
-       * @param payload payload of the error message
+       * @param extraHeader HTTP header map values, added to the default headers
        */
-      void SendErrorResponse(Poco::Net::HTTPServerResponse &response, const std::string &payload);
+      void SendDeleteResponse(Poco::Net::HTTPServerResponse &response, HeaderMap *extraHeader = nullptr);
 
       /**
        * Send an error response (HTTP status code 200).
@@ -249,16 +248,6 @@ namespace AwsMock::Resource {
        */
       void DumpBodyToFile(Poco::Net::HTTPServerRequest &request, const std::string &filename);
 
-      /**
-       * Forward request to service port
-       *
-       * @param request HTTP request
-       * @param response HTTP response
-       * @param host forward host
-       * @param port forward port
-       */
-      void ForwardRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &host, int port);
-
     private:
 
       /**
@@ -306,6 +295,6 @@ namespace AwsMock::Resource {
       HeaderMap _headerMap;
     };
 
-} // namespace AwsMock::Resource
+} // namespace AwsMock::Service
 
-#endif // AWSMOCK_RESOURCE_ABSTRACTRESOURCE_H
+#endif // AWSMOCK_SERVICE_ABSTRACTHANDLER_H
