@@ -355,7 +355,7 @@ namespace AwsMock::Resource {
         if (response.getStatus() == Poco::Net::HTTPResponse::HTTP_OK) {
             SendOkResponse(response, body.str(), &headerMap);
         } else {
-            SendErrorResponse("S3", response, body.str());
+            SendErrorResponse(response, body.str());
         }
         _logger.debug() << "S3 service response send back to client" << std::endl;
     }

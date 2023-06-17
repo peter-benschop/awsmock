@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 
+# Semantic versioning (sv4git)
 execute_process (COMMAND bash -c "git sv cv| tr -d '\n'" OUTPUT_VARIABLE GIT_VERSION)
 
 project(aws-mock VERSION "${GIT_VERSION}")

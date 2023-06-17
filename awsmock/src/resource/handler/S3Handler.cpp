@@ -28,7 +28,7 @@ namespace AwsMock {
         Core::MetricServiceTimer measure(_metricService, HTTP_PUT_TIMER);
         _logger.debug() << "S3 PUT request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl << std::endl;
 
-        ForwardRequest(request, response);
+        ForwardRequest(request, response, _s3ServiceHost, _s3ServicePort);
     }
 
     void S3Handler::handlePost(Poco::Net::HTTPServerRequest &request,
