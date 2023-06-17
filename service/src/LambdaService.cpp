@@ -169,7 +169,7 @@ namespace AwsMock::Service {
         std::ostream& os = session.sendRequest(request);
         os << body;
 
-        // Get the response sttaus
+        // Get the response status
         Poco::Net::HTTPResponse response;
         if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
             _logger.error() << "HTTP error, status: " + std::to_string(response.getStatus()) + " reason: "+ response.getReason() << std::endl;

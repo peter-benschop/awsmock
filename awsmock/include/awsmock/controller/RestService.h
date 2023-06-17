@@ -98,12 +98,12 @@ namespace AwsMock {
       /**
        * REST router
        */
-      Poco::Net::HTTPRequestHandlerFactory *_router;
+      Poco::Net::HTTPRequestHandlerFactory *_router = nullptr;
 
       /**
        * HTTP server instance
        */
-      Poco::Net::HTTPServer *_httpServer;
+      Poco::Net::HTTPServer *_httpServer = nullptr;
     };
 } // namespace AwsMock
 

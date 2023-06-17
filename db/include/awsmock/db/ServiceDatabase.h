@@ -8,11 +8,9 @@
 // C++ standard includes
 #include <string>
 
-
 // Poco includes
 #include "Poco/Logger.h"
 #include "Poco/Data/Session.h"
-#include "Poco/Data/SQLite/Connector.h"
 
 // AwsMock includes
 #include <awsmock/core/Logger.h>

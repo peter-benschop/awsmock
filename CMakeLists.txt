@@ -1,15 +1,8 @@
 cmake_minimum_required(VERSION 3.18)
 
-# Version (https://github.com/azatuni/sem-ver-sh)
-include_directories(${PROJECT_BINARY_DIR}/core/)
-file(READ "VERSION" ver)
-string(REGEX MATCH "version=([0-9]*)\\.([0-9]*)\\.([0-9]*)" _ ${ver})
-set(CPACK_PACKAGE_VERSION_MAJOR ${CMAKE_MATCH_1})
-set(CPACK_PACKAGE_VERSION_MINOR ${CMAKE_MATCH_2})
-set(CPACK_PACKAGE_VERSION_PATCH ${CMAKE_MATCH_3})
-message("version: ${CMAKE_MATCH_1}.${CMAKE_MATCH_2}.${CMAKE_MATCH_3} type: ${CMAKE_BUILD_TYPE}")
+execute_process (COMMAND bash -c "git sv cv| tr -d '\n'" OUTPUT_VARIABLE GIT_VERSION)
 
-project(aws-mock VERSION "${CMAKE_MATCH_1}.${CMAKE_MATCH_2}.${CMAKE_MATCH_3}")
+project(aws-mock VERSION "${GIT_VERSION}")
 configure_file (core/include/awsmock/core/Version.h.in core/include/awsmock/core/Version.h)
 
 set(CMAKE_CXX_STANDARD 20)

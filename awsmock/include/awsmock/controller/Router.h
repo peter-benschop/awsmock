@@ -8,6 +8,7 @@
 // C++ standard includes
 #include <map>
 #include <string>
+#include <iostream>
 
 // Poco includes
 #include "Poco/URI.h"

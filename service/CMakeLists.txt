@@ -2,7 +2,10 @@
 set(LIBRARY awsmocksrv)
 set(LIBRARY_STATIC awsmocksrv_static)
 
-set(SOURCES src/S3Service.cpp src/SQSService.cpp src/SNSService.cpp src/LambdaService.cpp src/DockerService.cpp)
+set(S3_SOURCES src/S3Server.cpp src/S3Handler.cpp src/S3Service.cpp)
+
+set(SOURCES src/AbstractHandler.cpp ${S3_SOURCES} src/SQSService.cpp src/SNSService.cpp
+        src/LambdaService.cpp src/DockerService.cpp)
 
 # Test directory
 add_subdirectory(tst)
