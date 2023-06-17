@@ -106,53 +106,6 @@ namespace AwsMock::Service {
     private:
 
       /**
-       * Get the action from the request body
-       *
-       * @param body HTTP request body (in)
-       * @param action SQS action (out)
-       * @param version SQS version (out)
-       */
-      void GetActionVersion(const std::string &body, std::string &action, std::string &version);
-
-      /**
-       * Get the action from the request body
-       *
-       * @param body HTTP request body
-       * @param name parameter name
-       * @return parameter value
-       */
-      std::string GetStringParameter(const std::string &body, const std::string &name);
-
-      /**
-       * Return an integer name.
-       *
-       * @param body HTTP message body
-       * @param name name name
-       * @param min minimum value
-       * @param max maximum value
-       * @param def default value
-       * @return integer name
-       */
-      int GetIntParameter(const std::string &body, const std::string &name, int min, int max, int def);
-
-      /**
-       * Returns the attribute count.
-       *
-       * @param body HTTP message body
-       * @param parameter parameter name
-       * @return number of sqs
-       */
-      int GetAttributeCount(const std::string &body, const std::string &parameter);
-
-      /**
-       * Get the endpoint from the request header
-       *
-       * @param request HTTP request
-       * @return endpoint
-       */
-      static std::string GetEndpoint(Poco::Net::HTTPServerRequest &request);
-
-      /**
        * Logger
        */
       Poco::LogStream _logger;

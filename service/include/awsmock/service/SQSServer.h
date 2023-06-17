@@ -17,8 +17,8 @@
 #include "awsmock/core/MetricService.h"
 #include "awsmock/service/SQSHandlerFactory.h"
 
-#define S3_DEFAULT_PORT 9501
-#define S3_DEFAULT_HOST "localhost"
+#define SQS_DEFAULT_PORT 9501
+#define SQS_DEFAULT_HOST "localhost"
 
 namespace AwsMock::Service {
 

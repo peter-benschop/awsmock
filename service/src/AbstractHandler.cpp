@@ -253,6 +253,75 @@ namespace AwsMock::Service {
         return payload;
     }
 
+    void AbstractHandler::GetActionVersion(const std::string &body, std::string &action, std::string &version) {
+        std::vector<std::string> bodyParts = Core::StringUtils::Split(body, '&');
+        for (auto &it : bodyParts) {
+            std::vector<std::string> parts = Core::StringUtils::Split(it, '=');
+            if (parts.size() < 2) {
+                throw Core::ServiceException("Invalid request body", 400);
+            }
+            if (parts[0] == "Action") {
+                action = parts[1];
+            }
+            if (parts[0] == "Version") {
+                version = parts[1];
+            }
+        }
+        _logger.debug() << "Found action: " << action << " version: " << version << std::endl;
+    }
+
+    std::string AbstractHandler::GetStringParameter(const std::string &body, const std::string &name) {
+        std::string value;
+        std::vector<std::string> bodyParts = Core::StringUtils::Split(body, '&');
+        for (auto &it : bodyParts) {
+            std::vector<std::string> parts = Core::StringUtils::Split(it, '=');
+            if (parts[0] == name) {
+                value = Core::StringUtils::UrlDecode(parts[1]);
+            }
+        }
+        _logger.debug() << "Found string parameter, name: " << name << " value: " << value << std::endl;
+        return value;
+    }
+
+    int AbstractHandler::GetIntParameter(const std::string &body, const std::string &name, int min, int max, int def) {
+        int value = def;
+        std::string parameterValue = GetStringParameter(body, name);
+        if (!parameterValue.empty()) {
+            value = std::stoi(parameterValue);
+            value = value > min && value < max ? value : def;
+        }
+        _logger.debug() << "Found integer name, name: " << name << " value: " << value << std::endl;
+        return value;
+    }
+
+    int AbstractHandler::GetAttributeCount(const std::string &body, const std::string &name) {
+        int count = 0;
+        std::vector<std::string> bodyParts = Core::StringUtils::Split(body, '&');
+        for (auto &it : bodyParts) {
+            if(it.starts_with(name)) {
+                count++;
+            }
+        }
+        _logger.debug() << "Found attribute count, name: " << name << " count: " << count / 2 << std::endl;
+        return count / 2;
+    }
+
+    int AbstractHandler::GetAttributeNameCount(const std::string &body, const std::string &name) {
+        int count = 0;
+        std::vector<std::string> bodyParts = Core::StringUtils::Split(body, '&');
+        for (auto &it : bodyParts) {
+            if(it.starts_with(name)) {
+                count++;
+            }
+        }
+        _logger.debug() << "Found attribute count, name: " << name << " count: " << count / 2 << std::endl;
+        return count;
+    }
+
+    std::string AbstractHandler::GetEndpoint(Poco::Net::HTTPServerRequest &request) {
+        return request.get("Host");
+    }
+
     void AbstractHandler::SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &payload, HeaderMap *extraHeader) {
         _logger.trace() << "Sending OK response, status: 200 payload: " << payload << std::endl;
 

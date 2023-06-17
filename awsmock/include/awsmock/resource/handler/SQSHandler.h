@@ -170,7 +170,19 @@ namespace AwsMock {
        * SQS service
        */
       Service::SQSService _sqsService;
+
+      /**
+       * SQS service port
+       */
+      int _sqsServicePort;
+
+      /**
+       * SQS service host
+       */
+      std::string _sqsServiceHost;
+
     };
+
 } // namespace AwsMock
 
 #endif // AWSMOCK_RESOURCE_SQSHANDLER_H

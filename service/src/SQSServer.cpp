@@ -11,9 +11,9 @@ namespace AwsMock::Service {
 
         Core::Logger::SetDefaultConsoleLogger("S3Server");
 
-        _port = _configuration.getInt("awsmock.service.s3.port", S3_DEFAULT_PORT);
-        _host = _configuration.getString("awsmock.service.s3.host", S3_DEFAULT_HOST);
-        _logger.debug() << "S3 rest service initialized, endpoint: " << _host << ":" << _port << std::endl;
+        _port = _configuration.getInt("awsmock.service.sqs.port", SQS_DEFAULT_PORT);
+        _host = _configuration.getString("awsmock.service.sqs.host", SQS_DEFAULT_HOST);
+        _logger.debug() << "SQS rest service initialized, endpoint: " << _host << ":" << _port << std::endl;
     }
 
     SQSServer::~SQSServer() {
