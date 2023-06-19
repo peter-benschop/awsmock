@@ -230,6 +230,14 @@ namespace AwsMock::Database {
       [[maybe_unused]] long CountMessagesByStatus(const std::string &region, const std::string& queueUrl, int status);
 
       /**
+       * Deletes all messages of a queue
+       *
+       * @param queue message queue to delete messages from
+       * @throws Core::DatabaseException
+       */
+      void DeleteMessages(const std::string &queue);
+
+      /**
        * Deletes a message.
        *
        * @param message message to delete

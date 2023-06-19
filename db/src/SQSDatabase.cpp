@@ -213,6 +213,12 @@ namespace AwsMock::Database {
         return count;
     }
 
+    void SQSDatabase::DeleteMessages(const std::string &queueUrl) {
+
+        auto result = _messageCollection.delete_many(make_document(kvp("queueUrl", queueUrl)));
+        _logger.debug() << "Messages deleted, queue: " << queueUrl << " count: " << result->deleted_count() << std::endl;
+    }
+
     void SQSDatabase::DeleteMessage(const Entity::SQS::Message &message) {
         auto result = _messageCollection.delete_one(make_document(kvp("receiptHandle", message.receiptHandle)));
         _logger.debug() << "Messages deleted, receiptHandle: " << message.receiptHandle << " count: " << result->deleted_count() << std::endl;

@@ -149,6 +149,9 @@ namespace AwsMock::Service {
                 throw Core::ServiceException("Queue does not exist", 500);
             }
 
+            // Delete all messages in queue
+            _database->DeleteMessages(request.queueUrl);
+
             // Update database
             _database->DeleteQueue({.queueUrl=request.queueUrl});
 
