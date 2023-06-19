@@ -25,6 +25,9 @@ namespace AwsMock::Worker {
         _dataDir = _configuration.getString("awsmock.data.dir") + Poco::Path::separator() + "s3";
         _logger.debug() << "Watching path: " << _dataDir << std::endl;
 
+        // Sleeping period
+        _period = _configuration.getInt("awsmock.worker.s3.period", 10000);
+
         // Create S3 directory
         if (!Core::DirUtils::DirectoryExists(_dataDir)) {
             Core::DirUtils::MakeDirectory(_dataDir);
@@ -55,7 +58,7 @@ namespace AwsMock::Worker {
 
         _running = true;
         while (_running) {
-            Poco::Thread::sleep(10000);
+            Poco::Thread::sleep(_period);
         }
     }
 

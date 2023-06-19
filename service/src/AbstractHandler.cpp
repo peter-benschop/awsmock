@@ -267,7 +267,7 @@ namespace AwsMock::Service {
                 version = parts[1];
             }
         }
-        _logger.debug() << "Found action: " << action << " version: " << version << std::endl;
+        _logger.trace() << "Found action: " << action << " version: " << version << std::endl;
     }
 
     std::string AbstractHandler::GetStringParameter(const std::string &body, const std::string &name) {
@@ -279,7 +279,7 @@ namespace AwsMock::Service {
                 value = Core::StringUtils::UrlDecode(parts[1]);
             }
         }
-        _logger.debug() << "Found string parameter, name: " << name << " value: " << value << std::endl;
+        _logger.trace() << "Found string parameter, name: " << name << " value: " << value << std::endl;
         return value;
     }
 
@@ -290,7 +290,7 @@ namespace AwsMock::Service {
             value = std::stoi(parameterValue);
             value = value > min && value < max ? value : def;
         }
-        _logger.debug() << "Found integer name, name: " << name << " value: " << value << std::endl;
+        _logger.trace() << "Found integer name, name: " << name << " value: " << value << std::endl;
         return value;
     }
 
@@ -302,7 +302,7 @@ namespace AwsMock::Service {
                 count++;
             }
         }
-        _logger.debug() << "Found attribute count, name: " << name << " count: " << count / 2 << std::endl;
+        _logger.trace() << "Found attribute count, name: " << name << " count: " << count / 2 << std::endl;
         return count / 2;
     }
 
@@ -314,10 +314,10 @@ namespace AwsMock::Service {
                 count++;
             }
         }
-        _logger.debug() << "Found attribute count, name: " << name << " count: " << count / 2 << std::endl;
+        _logger.trace() << "Found attribute count, name: " << name << " count: " << count / 2 << std::endl;
         return count;
     }
-    
+
     void AbstractHandler::GetVersionActionFromUri(const std::string &uri, std::string &version, std::string &action) {
 
         Poco::RegularExpression::MatchVec posVec;

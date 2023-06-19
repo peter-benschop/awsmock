@@ -42,6 +42,13 @@ namespace AwsMock::Database {
        */
       mongocxx::database GetConnection();
 
+      /**
+       * Check all indexes.
+       *
+       * <p>Normally done during server start.</p>
+       */
+      void CreateIndexes();
+
     private:
 
       /**
