@@ -62,6 +62,7 @@ namespace AwsMock {
           InitializeLogging();
           InitializeMonitoring();
           InitializeErrorHandler();
+          InitializeIndexes();
           poco_information(_logger,
                            "Starting " + Configuration::GetAppName() + " v" + Configuration::GetVersion() + " pid: " + std::to_string(getpid()) + " loglevel: "
                                + _configuration.GetLogLevel());
@@ -154,6 +155,16 @@ namespace AwsMock {
           // Install error handler
           Poco::ErrorHandler::set(&_threadErrorHandler);
           poco_debug(_logger, "Error handler initialized");
+      }
+
+      /**
+       * Initialize database indexes
+       */
+      void InitializeIndexes() {
+
+          // Install error handler
+          _database.CreateIndexes();
+          poco_debug(_logger, "Database indexes created");
       }
 
       void StartWorker() {

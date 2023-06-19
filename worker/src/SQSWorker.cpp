@@ -16,6 +16,9 @@ namespace AwsMock::Worker {
 
     void SQSWorker::Initialize() {
 
+        // Sleeping period
+        _period = _configuration.getInt("awsmock.worker.sqs.period", 10000);
+
         // Create environment
         _region = _configuration.getString("awsmock.region");
         _sqsDatabase = std::make_unique<Database::SQSDatabase>(_configuration);
@@ -34,7 +37,7 @@ namespace AwsMock::Worker {
         _running = true;
         while (_running) {
             ResetMessages();
-            Poco::Thread::sleep(10000);
+            Poco::Thread::sleep(_period);
         }
     }
 

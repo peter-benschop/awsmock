@@ -18,8 +18,6 @@ namespace AwsMock::Database {
         // Get collections
         _queueCollection = GetConnection()["sqs_queue"];
         _messageCollection = GetConnection()["sqs_message"];
-
-        _messageCollection.create_index(make_document(kvp("status", 1)));
     }
 
     bool SQSDatabase::QueueUrlExists(const std::string &queueUrl) {
