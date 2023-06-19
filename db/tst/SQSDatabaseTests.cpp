@@ -334,6 +334,22 @@ namespace AwsMock::Database {
         EXPECT_EQ(0, result);
     }
 
+    TEST_F(SQSDatabaseTest, MessageDeleteQueueTest) {
+
+        // arrange
+        Entity::SQS::Queue queue = {.region=_region, .name=QUEUE_NAME, .owner=OWNER, .queueUrl=QUEUE_URL};
+        queue = _sqsDatabase.CreateQueue(queue);
+        Entity::SQS::Message message = {.region=_region, .queueUrl=QUEUE_URL, .body=BODY};
+        _sqsDatabase.CreateMessage(message);
+
+        // act
+        _sqsDatabase.DeleteMessages(QUEUE_URL);
+        long result = _sqsDatabase.CountMessages(_region, QUEUE_NAME);
+
+        // assert
+        EXPECT_EQ(0, result);
+    }
+
     TEST_F(SQSDatabaseTest, MessageRedriveTest) {
 
         // arrange
