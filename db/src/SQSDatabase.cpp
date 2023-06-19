@@ -18,6 +18,8 @@ namespace AwsMock::Database {
         // Get collections
         _queueCollection = GetConnection()["sqs_queue"];
         _messageCollection = GetConnection()["sqs_message"];
+
+        _messageCollection.create_index(make_document(kvp("status", 1)));
     }
 
     bool SQSDatabase::QueueUrlExists(const std::string &queueUrl) {
@@ -133,6 +135,13 @@ namespace AwsMock::Database {
         _logger.trace() << "Message created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
 
         return GetMessageById(result->inserted_id().get_oid().value);
+    }
+
+    bool SQSDatabase::MessageExists(const std::string &messageId) {
+
+        int64_t count = _messageCollection.count_documents(make_document(kvp("messageId", messageId)));
+        _logger.trace() << "Message exists: " << (count > 0 ? "true" : "false") << std::endl;
+        return count > 0;
     }
 
     Entity::SQS::Message SQSDatabase::GetMessageById(bsoncxx::oid oid) {
