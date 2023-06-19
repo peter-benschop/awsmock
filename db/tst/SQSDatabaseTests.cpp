@@ -372,8 +372,8 @@ namespace AwsMock::Database {
 
         // act
         _sqsDatabase.RedriveMessages(QUEUE_URL, redrivePolicy);
-        long queueResult = _sqsDatabase.CountMessages(_region, QUEUE_URL);
-        long dlqResult = _sqsDatabase.CountMessages(_region, DLQ_URL);
+        long queueResult = _sqsDatabase.CountMessages(_region, queue.queueUrl);
+        long dlqResult = _sqsDatabase.CountMessages(_region, dlQueue.queueUrl);
 
         // assert
         EXPECT_EQ(0, queueResult);
