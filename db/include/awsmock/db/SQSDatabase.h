@@ -57,7 +57,16 @@ namespace AwsMock::Database {
        * @return true if queue already exists
        * @throws DatabaseException
        */
-      bool QueueExists(const std::string &queueUrl);
+      bool QueueUrlExists(const std::string &queueUrl);
+
+      /**
+       * Check existence of queue by ARN
+       *
+       * @param queueArn queue ARN
+       * @return true in case queue exists
+       * @throws DatabaseException
+       */
+      bool QueueArnExists(const std::string &queueArn);
 
       /**
        * Create a new queue in the SQS queue table
@@ -158,6 +167,15 @@ namespace AwsMock::Database {
        * @throws Core::DatabaseException
        */
       Entity::SQS::Message CreateMessage(const Entity::SQS::Message &message);
+
+      /**
+       * Checks whether the message exists.
+       *
+       * @param messageId message ID
+       * @return true if message exists, otherwise false
+       * @throws Core::DatabaseException
+       */
+      bool MessageExists(const std::string &messageId);
 
       /**
        * Returns a message by ID.

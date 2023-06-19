@@ -238,7 +238,7 @@ namespace AwsMock::Resource {
     void AbstractResource::GetRegionUser(const std::string &authorization, std::string &region, std::string &user) {
         Poco::RegularExpression::MatchVec posVec;
 
-        Poco::RegularExpression pattern(R"(Credential=([a-zA-Z]+)\/[0-9]{8}\/([a-zA-Z0-9\-]+)\/[a-zA-Z0-9]+\/aws4_request,.*$)");
+        Poco::RegularExpression pattern(R"(Credential=([a-zA-Z0-9]+)\/[0-9]{8}\/([a-zA-Z0-9\-]+)\/[a-zA-Z0-9]+\/aws4_request,.*$)");
         if (!pattern.match(authorization, 0, posVec)) {
             throw Core::ResourceNotFoundException("Could not extract region and user");
         }
@@ -335,6 +335,7 @@ namespace AwsMock::Resource {
 
         // Create HTTP request and set headers
         Poco::Net::HTTPClientSession session(host, port);
+        _logger.debug() << "Forward session, host: " << host << " port: " << port << std::endl;
 
         // Send request with body
         Poco::StreamCopier::copyStream(request.stream(), session.sendRequest(request));
@@ -377,6 +378,15 @@ namespace AwsMock::Resource {
                 response.set(it.first, it.second);
             }
         }
+    }
+
+    void AbstractResource::SetHeaders(Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user) {
+        _logger.trace() << "Setting request header values, region: " << region << " user: " << user << std::endl;
+
+        // Default headers
+        request.set("Region", region);
+        request.set("User", user);
+        request.set("RequestId", Core::AwsUtils::GetRequestId());
     }
 
     void AbstractResource::DumpRequest(Poco::Net::HTTPServerRequest &request) {

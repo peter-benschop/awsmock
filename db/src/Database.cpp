@@ -6,6 +6,10 @@
 
 namespace AwsMock::Database {
 
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
+
     Database::Database(const Core::Configuration &configuration) : _logger(Poco::Logger::get("Database")), _configuration(configuration) {
         Core::Logger::SetDefaultConsoleLogger("Database");
 
@@ -17,36 +21,23 @@ namespace AwsMock::Database {
 
         // MongoDB URI
         _uri = mongocxx::uri("mongodb://" + _user + ":" + _password + "@" + _host + ":" + std::to_string(_port) + "/?maxPoolSize=32");
-
-        // Define connection pool
-        _connectionPool = std::make_shared<mongocxx::pool>(_uri);
-        _logger.debug() << "MongoDB connection pool initialized" << std::endl;
-    }
-
-    void Database::CreateCollection(const std::string &name) {
-        mongocxx::database _database = GetConnection();
-        if (!_database.has_collection(name)) {
-            _database.create_collection(name);
-            _logger.debug() << "Collection created, name: " << name << std::endl << std::endl;
-        }
-    }
-
-    void Database::DropCollection(const std::string &name) {
-        mongocxx::database _database = GetConnection();
-        if (!_database.has_collection(name)) {
-            _database.drop();
-            _logger.debug() << "Collection dropped, name: " << name << std::endl << std::endl;
-        }
+        _client = mongocxx::client{_uri};
+        _logger.debug() << "MongoDB connection initialized" << std::endl;
     }
 
     mongocxx::database Database::GetConnection() {
-        auto client = _connectionPool->acquire();
-        return client->database(_name);
+        return _client[_name];
     }
 
-    mongocxx::database Database::GetCollection() {
-        mongocxx::client client{_uri };
-        return client[_name];
+    void Database::CreateIndexes() {
+
+        // Message indexes
+        GetConnection()["sqs_message"].create_index(make_document(kvp("queueUrl", 1), kvp("status", 1), kvp("reset", 1)), make_document(kvp("name", "queueurl_status_reset_idx1")));
+        GetConnection()["sqs_message"].create_index(make_document(kvp("queueUrl", 1), kvp("status", 1), kvp("retries", 1)), make_document(kvp("name", "queueurl_status_retries_idx2")));
+
+        // Queue indexes
+        GetConnection()["sqs_queue"].create_index(make_document(kvp("region", 1), kvp("name", 1)), make_document(kvp("name", "region_name_idx1")));
+        GetConnection()["sqs_queue"].create_index(make_document(kvp("region", 1), kvp("url", 1)), make_document(kvp("name", "region_url_idx2")));
     }
 
 } // namespace AwsMock::Database

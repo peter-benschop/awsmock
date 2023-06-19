@@ -79,6 +79,11 @@ namespace AwsMock::Worker {
        * Running flag
        */
       bool _running;
+
+      /**
+       * Sleeping period in ms
+       */
+      bool _period;
     };
 
 } // namespace AwsMock::Worker

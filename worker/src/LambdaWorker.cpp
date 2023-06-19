@@ -20,6 +20,9 @@ namespace AwsMock::Worker {
         _dataDir = _configuration.getString("awsmock.data.dir") + Poco::Path::separator() + "lambda";
         _logger.debug() << "Lambda directory: " << _dataDir << std::endl;
 
+        // Sleeping period
+        _period = _configuration.getInt("awsmock.worker.lambda.period", 10000);
+
         // Create lambda directory
         if (!Core::DirUtils::DirectoryExists(_dataDir)) {
             Core::DirUtils::MakeDirectory(_dataDir);
@@ -42,7 +45,7 @@ namespace AwsMock::Worker {
 
         _running = true;
         while (_running) {
-            Poco::Thread::sleep(10000);
+            Poco::Thread::sleep(_period);
         }
     }
 

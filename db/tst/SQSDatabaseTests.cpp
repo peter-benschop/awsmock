@@ -64,6 +64,32 @@ namespace AwsMock::Database {
         EXPECT_TRUE(result.region == _region);
     }
 
+    TEST_F(SQSDatabaseTest, QueueExistsUrlTest) {
+
+        // arrange
+        Entity::SQS::Queue queue = {.region=_region, .name=QUEUE_NAME, .owner=OWNER, .queueUrl=QUEUE_URL, .queueArn=_queueArn};
+        _sqsDatabase.CreateQueue(queue);
+
+        // act
+        bool result = _sqsDatabase.QueueUrlExists(QUEUE_URL);
+
+        // assert
+        EXPECT_TRUE(result);
+    }
+
+    TEST_F(SQSDatabaseTest, QueueExistsArnTest) {
+
+        // arrange
+        Entity::SQS::Queue queue = {.region=_region, .name=QUEUE_NAME, .owner=OWNER, .queueUrl=QUEUE_URL, .queueArn=_queueArn};
+        _sqsDatabase.CreateQueue(queue);
+
+        // act
+        bool result = _sqsDatabase.QueueArnExists(_queueArn);
+
+        // assert
+        EXPECT_TRUE(result);
+    }
+
     TEST_F(SQSDatabaseTest, QueueByIdTest) {
 
         // arrange
@@ -188,6 +214,21 @@ namespace AwsMock::Database {
         // assert
         EXPECT_FALSE(result.oid.empty());
         EXPECT_TRUE(result.body == BODY);
+    }
+
+    TEST_F(SQSDatabaseTest, MessageExistsTest) {
+
+        // arrange
+        Entity::SQS::Queue queue = {.region=_region, .name=QUEUE_NAME, .owner=OWNER, .queueUrl=QUEUE_URL};
+        queue = _sqsDatabase.CreateQueue(queue);
+        Entity::SQS::Message message = {.region=_region, .queueUrl=queue.name, .body=BODY, .messageId="10bdf54e6f7"};
+        message = _sqsDatabase.CreateMessage(message);
+
+        // act
+        bool result = _sqsDatabase.MessageExists(message.messageId);
+
+        // assert
+        EXPECT_TRUE(result);
     }
 
     TEST_F(SQSDatabaseTest, MessageReceiveTest) {

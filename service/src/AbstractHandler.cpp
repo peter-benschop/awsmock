@@ -267,7 +267,7 @@ namespace AwsMock::Service {
                 version = parts[1];
             }
         }
-        _logger.debug() << "Found action: " << action << " version: " << version << std::endl;
+        _logger.trace() << "Found action: " << action << " version: " << version << std::endl;
     }
 
     std::string AbstractHandler::GetStringParameter(const std::string &body, const std::string &name) {
@@ -279,7 +279,7 @@ namespace AwsMock::Service {
                 value = Core::StringUtils::UrlDecode(parts[1]);
             }
         }
-        _logger.debug() << "Found string parameter, name: " << name << " value: " << value << std::endl;
+        _logger.trace() << "Found string parameter, name: " << name << " value: " << value << std::endl;
         return value;
     }
 
@@ -290,7 +290,7 @@ namespace AwsMock::Service {
             value = std::stoi(parameterValue);
             value = value > min && value < max ? value : def;
         }
-        _logger.debug() << "Found integer name, name: " << name << " value: " << value << std::endl;
+        _logger.trace() << "Found integer name, name: " << name << " value: " << value << std::endl;
         return value;
     }
 
@@ -302,7 +302,7 @@ namespace AwsMock::Service {
                 count++;
             }
         }
-        _logger.debug() << "Found attribute count, name: " << name << " count: " << count / 2 << std::endl;
+        _logger.trace() << "Found attribute count, name: " << name << " count: " << count / 2 << std::endl;
         return count / 2;
     }
 
@@ -314,8 +314,25 @@ namespace AwsMock::Service {
                 count++;
             }
         }
-        _logger.debug() << "Found attribute count, name: " << name << " count: " << count / 2 << std::endl;
+        _logger.trace() << "Found attribute count, name: " << name << " count: " << count / 2 << std::endl;
         return count;
+    }
+
+    void AbstractHandler::GetVersionActionFromUri(const std::string &uri, std::string &version, std::string &action) {
+
+        Poco::RegularExpression::MatchVec posVec;
+        Poco::RegularExpression pattern(R"(/([a-z0-9-.]+)?/?([a-zA-Z0-9-_/.*'()]+)?\??.*$)");
+        if (!pattern.match(uri, 0, posVec)) {
+            throw Core::ResourceNotFoundException("Could not extract version and action");
+        }
+
+        if (posVec.size() > 1) {
+            version = uri.substr(posVec[1].offset, posVec[1].length);
+        }
+        if (posVec.size() > 2) {
+            action = uri.substr(posVec[2].offset, posVec[2].length);
+        }
+        _logger.debug() << "Found version and action, version: " << version << " action: " << action << std::endl;
     }
 
     std::string AbstractHandler::GetEndpoint(Poco::Net::HTTPServerRequest &request) {
