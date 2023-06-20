@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/core/SystemUtils.h>
+#include "awsmock/core/FileUtils.h"
 
 namespace AwsMock::Core {
 
@@ -68,10 +69,7 @@ namespace AwsMock::Core {
         }
         poco_trace(Poco::Logger::get("SystemUtils"), "Client: Connected to docker daemon");
 
-        std::ifstream file(fileName, std::ios::binary);
-        file.seekg(0, std::ios::end);
-        long fileSize = file.tellg();
-        file.close();
+        long fileSize = FileUtils::FileSize(fileName);
 
         int filefd = open(fileName.c_str(), O_RDONLY);
         if (filefd == -1) {
@@ -88,6 +86,7 @@ namespace AwsMock::Core {
         // Send body
         off_t offset = 0;
         ssize_t bytesSend = sendfile(sock, filefd, &offset, fileSize);
+        log_debug_stream(_logger) << "File send, size: " << bytesSend << std::endl;
 
         // Get response
         std::stringstream output;
@@ -95,7 +94,6 @@ namespace AwsMock::Core {
         while (recv(sock, recv_msg, s_recv_len, 0) > 0) {
             output << recv_msg;
         }
-
         log_trace_stream(_logger) << "Response: " << output.str() << std::endl;
 
         // Cleanup
