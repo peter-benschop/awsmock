@@ -29,7 +29,7 @@ namespace AwsMock::Service {
 
         // Check existence
         if (_snsDatabase->TopicExists(request.region, request.topicName)) {
-            throw Core::ServiceException("SNS topic exists already", 400);
+            throw Core::ServiceException("SNS topic exists already", 500);
         }
 
         try {

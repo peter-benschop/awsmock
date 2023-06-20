@@ -8,7 +8,7 @@ namespace AwsMock::Service {
         Core::Logger::SetDefaultConsoleLogger("LambdaHandler");
     }
 
-    void LambdaHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
+    void LambdaHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, [[maybe_unused]]const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_GET_TIMER);
         _logger.debug() << "Lambda GET request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
@@ -16,6 +16,12 @@ namespace AwsMock::Service {
 
             std::string version, action;
             GetVersionActionFromUri(request.getURI(), version, action);
+
+            if(action == "functions/") {
+
+                Dto::Lambda::ListFunctionResponse lambdaResponse = _lambdaService.ListFunctionConfiguration(region);
+                SendOkResponse(response, lambdaResponse.ToJson());
+            }
 
         } catch (Core::ServiceException &exc) {
             SendErrorResponse("S3", response, exc);
