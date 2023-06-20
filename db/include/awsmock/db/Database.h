@@ -8,10 +8,6 @@
 // C++ standard includes
 #include <string>
 
-// Poco includes
-#include "Poco/Logger.h"
-#include "Poco/LogStream.h"
-
 // MongoDB includes
 #include <mongocxx/client.hpp>
 #include <mongocxx/pool.hpp>
@@ -20,6 +16,7 @@
 
 // AwsMock includes
 #include <awsmock/core/Logger.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
 
 namespace AwsMock::Database {
@@ -54,7 +51,7 @@ namespace AwsMock::Database {
       /**
        * Logger
        */
-      Poco::LogStream _logger;
+      Core::LogStream _logger;
 
       /**
        * Application configuration

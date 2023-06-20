@@ -23,7 +23,7 @@ namespace AwsMock::Database {
     bool ServiceDatabase::IsActive(const std::string &name) {
 
         int64_t count = _serviceCollection.count_documents(make_document(kvp("name", name)));
-        _logger.trace() << "Service is active: " << (count > 0 ? "true" : "false") << std::endl;
+        log_trace_stream(_logger) << "Service is active: " << (count > 0 ? "true" : "false") << std::endl;
         return count > 0;
     }
 } // namespace AwsMock::Database

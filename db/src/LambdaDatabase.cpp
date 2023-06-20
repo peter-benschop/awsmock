@@ -22,7 +22,7 @@ namespace AwsMock::Database {
     bool LambdaDatabase::LambdaExists(const std::string &function, const std::string &runtime) {
 
         int64_t count = _lambdaCollection.count_documents(make_document(kvp("function", function), kvp("runtime", runtime)));
-        _logger.trace() << "Lambda function exists: " << (count > 0 ? "true" : "false") << std::endl;
+        log_trace_stream(_logger) << "Lambda function exists: " << (count > 0 ? "true" : "false") << std::endl;
         return count > 0;
     }
 
@@ -34,14 +34,14 @@ namespace AwsMock::Database {
     bool LambdaDatabase::LambdaExists(const std::string &functionName) {
 
         int64_t count = _lambdaCollection.count_documents(make_document(kvp("function", functionName)));
-        _logger.trace() << "Lambda function exists: " << (count > 0 ? "true" : "false") << std::endl;
+        log_trace_stream(_logger) << "Lambda function exists: " << (count > 0 ? "true" : "false") << std::endl;
         return count > 0;
     }
 
     Entity::Lambda::Lambda LambdaDatabase::CreateLambda(const Entity::Lambda::Lambda &lambda) {
 
         auto result = _lambdaCollection.insert_one(lambda.ToDocument());
-        _logger.trace() << "Bucket created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
+        log_trace_stream(_logger) << "Bucket created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
 
         return GetLambdaById(result->inserted_id().get_oid().value);
     }
@@ -73,7 +73,7 @@ namespace AwsMock::Database {
         auto result = _lambdaCollection.replace_one(make_document(kvp("region", lambda.region), kvp("function", lambda.function), kvp("runtime", lambda.runtime)),
                                                     lambda.ToDocument());
 
-        _logger.trace() << "Lambda updated: " << lambda.ToString() << std::endl;
+        log_trace_stream(_logger) << "Lambda updated: " << lambda.ToString() << std::endl;
 
         return GetLambdaByArn(lambda.arn);
     }
@@ -96,7 +96,7 @@ namespace AwsMock::Database {
             result.FromDocument(lambda);
             lambdas.push_back(result);
         }
-        _logger.trace() << "Got lamda list, size:" << lambdas.size() << std::endl;
+        log_trace_stream(_logger) << "Got lamda list, size:" << lambdas.size() << std::endl;
 
         return lambdas;
     }
@@ -104,12 +104,12 @@ namespace AwsMock::Database {
     void LambdaDatabase::DeleteLambda(const std::string &functionName) {
 
         auto result = _lambdaCollection.delete_many(make_document(kvp("function", functionName)));
-        _logger.debug() << "Lambda deleted, function: " << functionName << " count: " << result->deleted_count() << std::endl;
+        log_debug_stream(_logger) << "Lambda deleted, function: " << functionName << " count: " << result->deleted_count() << std::endl;
     }
 
     void LambdaDatabase::DeleteAllLambdas() {
         auto result = _lambdaCollection.delete_many({});
-        _logger.debug() << "All lambdas deleted, count: " << result->deleted_count() << std::endl;
+        log_debug_stream(_logger) << "All lambdas deleted, count: " << result->deleted_count() << std::endl;
     }
 
 } // namespace AwsMock::Database

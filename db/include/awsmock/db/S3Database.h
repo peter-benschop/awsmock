@@ -10,16 +10,13 @@
 #include <vector>
 #include <iostream>
 
-// Poco includes
-#include "Poco/Logger.h"
-#include "Poco/LogStream.h"
-
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 
 // AwsMock includes
 #include <awsmock/core/Logger.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/DirUtils.h>
@@ -264,7 +261,7 @@ namespace AwsMock::Database {
       /**
        * Logger
        */
-      Poco::LogStream _logger;
+      Core::LogStream _logger;
 
       /**
        * S3 bucket collection
