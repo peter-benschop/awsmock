@@ -27,12 +27,13 @@
 #include <regex>
 
 // Poco includes
-#include <Poco/Logger.h>
 #include <Poco/String.h>
 #include <Poco/RegularExpression.h>
 
 // AwsMock includes
 #include "awsmock/core/CoreException.h"
+#include "awsmock/core/LogStream.h"
+#include "awsmock/core/StreamFilter.h"
 
 #define CHUNK_SIZE 65536
 
@@ -52,9 +53,8 @@ namespace AwsMock::Core {
      * @author jens.vogt@opitz-consulting.com
      */
     class SystemUtils {
-    public:
 
-      SystemUtils() : _logger(Poco::Logger::get("root")) {}
+    public:
 
       /**
        * Execute system command and capture the stdout output result.
@@ -109,6 +109,11 @@ namespace AwsMock::Core {
        */
       static std::string SetHeader(const std::string &method, const std::string &url, const std::string &contentType, unsigned long contentLength);
 
+      /**
+       * Logger
+       */
+      static Core::LogStream _logger;
+
     private:
 
       /**
@@ -119,12 +124,8 @@ namespace AwsMock::Core {
        */
       static std::string GetBody(const std::string &output);
 
-      /**
-       * Logger
-       */
-      Poco::Logger &_logger;
     };
 
-} // namespace AwsMOck::Core
+} // namespace AwsMock::Core
 
 #endif //AWSMOCK_CORE_SYSTEMUTILS_H_

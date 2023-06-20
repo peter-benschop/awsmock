@@ -344,7 +344,7 @@ namespace AwsMock::Resource {
         // Get the response
         std::stringstream body;
         Poco::StreamCopier::copyStream(session.receiveResponse(response), body);
-        log_info_stream(_logger) << "Got response from S3 service" << std::endl;
+        log_info_stream(_logger) << "Got response from backend service" << std::endl;
 
         Resource::HeaderMap headerMap;
         auto i = response.begin();
@@ -358,7 +358,7 @@ namespace AwsMock::Resource {
         } else {
             SendErrorResponse(response, body.str());
         }
-        log_info_stream(_logger) << "S3 service response send back to client" << std::endl;
+        log_info_stream(_logger) << "Backend service response send back to client" << std::endl;
     }
 
     void AbstractResource::SetHeaders(Poco::Net::HTTPServerResponse &response, unsigned long contentLength, HeaderMap *extraHeader) {

@@ -79,10 +79,11 @@ namespace AwsMock::Dto::Docker {
               virtualSize = object->get("VirtualSize").convert<long>();
 
               Poco::JSON::Array::Ptr reproTagsArray = object->getArray("RepoTags");
-              for (Poco::JSON::Array::ConstIterator nt = reproTagsArray->begin(); nt != reproTagsArray->end(); ++nt) {
-                  repoTags.push_back(nt->convert<std::string>());
+              if (reproTagsArray != nullptr) {
+                  for (Poco::JSON::Array::ConstIterator nt = reproTagsArray->begin(); nt != reproTagsArray->end(); ++nt) {
+                      repoTags.push_back(nt->convert<std::string>());
+                  }
               }
-
               object->clear();
 
           } catch (Poco::Exception &exc) {
@@ -137,11 +138,12 @@ namespace AwsMock::Dto::Docker {
               Poco::JSON::Parser parser;
               Poco::Dynamic::Var result = parser.parse(body);
               Poco::JSON::Array::Ptr rootArray = result.extract<Poco::JSON::Array::Ptr>();
-
-              for (Poco::JSON::Array::ConstIterator it = rootArray->begin(); it != rootArray->end(); ++it) {
-                  Image image;
-                  image.FromJson(it->extract<Poco::JSON::Object::Ptr>());
-                  imageList.push_back(image);
+              if (rootArray != nullptr) {
+                  for (Poco::JSON::Array::ConstIterator it = rootArray->begin(); it != rootArray->end(); ++it) {
+                      Image image;
+                      image.FromJson(it->extract<Poco::JSON::Object::Ptr>());
+                      imageList.push_back(image);
+                  }
               }
 
               // Cleanup

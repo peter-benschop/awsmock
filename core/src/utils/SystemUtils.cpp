@@ -6,6 +6,8 @@
 
 namespace AwsMock::Core {
 
+    Core::LogStream SystemUtils::_logger = Poco::Logger::get("SystemUtils");
+
     ExecResult SystemUtils::Exec(const std::string &cmd) {
         // set up file redirection
         std::filesystem::path redirection = std::filesystem::absolute(".output.temp");
@@ -52,7 +54,7 @@ namespace AwsMock::Core {
         char recv_msg[s_recv_len];
 
         if ((sock = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
-            poco_error(Poco::Logger::get("SystemUtils"), "Client: Error on socket() call");
+            log_debug_stream(_logger) << "Client: Error on socket() call" << std::endl;
             return "Client: Error on socket() call";
         }
 
@@ -61,7 +63,7 @@ namespace AwsMock::Core {
         data_len = strlen(remote.sun_path) + sizeof(remote.sun_family);
 
         if (connect(sock, (struct sockaddr *) &remote, data_len) == -1) {
-            poco_error(Poco::Logger::get("SystemUtils"), "Client: Error on connect call");
+            log_debug_stream(_logger) << "Client: Error on connect call" << std::endl;
             return "Client: Error on connect call";
         }
         poco_trace(Poco::Logger::get("SystemUtils"), "Client: Connected to docker daemon");
@@ -76,14 +78,11 @@ namespace AwsMock::Core {
             perror("open");
             exit(EXIT_FAILURE);
         }
-
-        /* std::cout << "========================== Header ==========================" << std::endl;
-         std::cout << header << std::endl;
-         std::cout << "========================== Header ==========================" << std::endl;*/
+        log_trace_stream(_logger) << "Header: " << header << std::endl;
 
         // Send header
         if (send(sock, header.c_str(), header.size(), 0) == -1) {
-            poco_error(Poco::Logger::get("SystemUtils"), "Client: Error on send() call");
+            log_error_stream(_logger) << "Client: Error on send() call" << std::endl;
         }
 
         // Send body
@@ -96,11 +95,12 @@ namespace AwsMock::Core {
         while (recv(sock, recv_msg, s_recv_len, 0) > 0) {
             output << recv_msg;
         }
-        /*std::cout << "========================== Response ==========================" << std::endl;
-        std::cout << std::to_string(bytesSend) << std::endl;
-        std::cout << output.str() << std::endl;
-        std::cout << "========================== Response ==========================" << std::endl;*/
+
+        log_trace_stream(_logger) << "Response: " << output.str() << std::endl;
+
+        // Cleanup
         close(sock);
+
         return GetBody(output.str());
     }
 
@@ -112,7 +112,7 @@ namespace AwsMock::Core {
         char recv_msg[s_recv_len];
 
         if ((sock = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
-            poco_error(Poco::Logger::get("SystemUtils"), "Client: Error on socket() call");
+            log_error_stream(_logger) << "Client: Error on socket() call" << std::endl;
             return "Client: Error on socket() call";
         }
 
@@ -121,23 +121,18 @@ namespace AwsMock::Core {
         data_len = strlen(remote.sun_path) + sizeof(remote.sun_family);
 
         if (connect(sock, (struct sockaddr *) &remote, data_len) == -1) {
-            poco_error(Poco::Logger::get("SystemUtils"), "Client: Error on connect call");
+            log_debug_stream(_logger) << "Client: Error on connect call" << std::endl;
             return "Client: Error on connect call";
         }
-        poco_trace(Poco::Logger::get("SystemUtils"), "Client: Connected to docker daemon");
+        log_trace_stream(_logger) << "Client: Connected to docker daemon" << std::endl;
 
-        /*std::cout << "========================== Header ==========================" << std::endl;
-        std::cout << header << std::endl;
-        std::cout << "========================== Header ==========================" << std::endl;
-
-        std::cout << "=========================== Body ===========================" << std::endl;
-        std::cout << body << std::endl;
-        std::cout << "=========================== Body ===========================" << std::endl;*/
+        log_trace_stream(_logger) << "Header: " << header << std::endl;
+        log_trace_stream(_logger) << "Body: " << body << std::endl;
 
         // Send message
         std::string message = header + body;
         if (send(sock, message.c_str(), message.size(), 0) == -1) {
-            poco_error(Poco::Logger::get("SystemUtils"), "Client: Error on send() call");
+            log_error_stream(_logger) << "Client: Error on send() call" << std::endl;
         }
 
         // Get response
@@ -147,22 +142,25 @@ namespace AwsMock::Core {
             output << recv_msg;
         }
         close(sock);
-        /*
-        std::cout << "========================== Response ==========================" << std::endl;
-        std::cout << output.str() << std::endl;
-        std::cout << "========================== Response ==========================" << std::endl;
-         */
+        log_trace_stream(_logger) << "Response: " << output.str() << std::endl;
+
+        std::string temp = GetBody(output.str());
         return GetBody(output.str());
     }
 
     std::string SystemUtils::GetBody(const std::string &output) {
 
-        Poco::RegularExpression regex(R"(.*[\r?|\n?]{2}([0-9a-f]+)[\r?|\n?]{1}(.*)[\r?|\n?]{2}.*)");
+        Poco::RegularExpression regex(R"(.*[\r?|\n?]+([0-9a-f]+)[\r?|\n?]{1}(.*)[\r?|\n?]{2}.*)");
         Poco::RegularExpression::MatchVec posVec;
         int matches = regex.match(output, 0, posVec);
 
         if (matches == 3) {
-            return output.substr(posVec[2].offset + 1, posVec[2].length - 1);
+
+            // Remove unwanted characters
+            std::stringstream sin, sout;
+            sin << output.substr(posVec[2].offset + 1, posVec[2].length - 1) << std::endl;
+            Core::StreamFilter::XmlCharacterStreamFilter(sin, sout);
+            return sout.str();
         }
         return "Match not found";
     }

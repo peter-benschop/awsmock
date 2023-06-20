@@ -20,6 +20,7 @@
 #include <awsmock/core/Logger.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/ServiceException.h>
+#include <awsmock/core/StreamFilter.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
 #include <awsmock/core/RandomUtils.h>
