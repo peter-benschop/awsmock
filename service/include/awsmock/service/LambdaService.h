@@ -10,8 +10,6 @@
 #include <sstream>
 
 // Poco includes
-#include <Poco/Logger.h>
-#include <Poco/LogStream.h>
 #include <Poco/Net/HTTPClientSession.h>
 #include <Poco/Net/HTTPRequest.h>
 #include <Poco/Net/HTTPResponse.h>
@@ -109,7 +107,7 @@ namespace AwsMock::Service {
       /**
        * Logger
        */
-      Poco::LogStream _logger;
+      Core::LogStream _logger;
 
       /**
        * Data directory
