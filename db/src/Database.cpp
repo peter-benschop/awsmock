@@ -22,7 +22,7 @@ namespace AwsMock::Database {
         // MongoDB URI
         _uri = mongocxx::uri("mongodb://" + _user + ":" + _password + "@" + _host + ":" + std::to_string(_port) + "/?maxPoolSize=32");
         _client = mongocxx::client{_uri};
-        _logger.debug() << "MongoDB connection initialized" << std::endl;
+        log_debug_stream(_logger) << "MongoDB connection initialized" << std::endl;
     }
 
     mongocxx::database Database::GetConnection() {
@@ -31,13 +31,12 @@ namespace AwsMock::Database {
 
     void Database::CreateIndexes() {
 
-        // Message indexes
+        // SQS indexes
         GetConnection()["sqs_message"].create_index(make_document(kvp("queueUrl", 1), kvp("status", 1), kvp("reset", 1)), make_document(kvp("name", "queueurl_status_reset_idx1")));
         GetConnection()["sqs_message"].create_index(make_document(kvp("queueUrl", 1), kvp("status", 1), kvp("retries", 1)), make_document(kvp("name", "queueurl_status_retries_idx2")));
-
-        // Queue indexes
         GetConnection()["sqs_queue"].create_index(make_document(kvp("region", 1), kvp("name", 1)), make_document(kvp("name", "region_name_idx1")));
         GetConnection()["sqs_queue"].create_index(make_document(kvp("region", 1), kvp("url", 1)), make_document(kvp("name", "region_url_idx2")));
+        log_debug_stream(_logger) << "SQS indexes created" << std::endl;
     }
 
 } // namespace AwsMock::Database

@@ -23,21 +23,21 @@ namespace AwsMock::Database {
     bool SNSDatabase::TopicExists(const std::string &topicArn) {
 
         int64_t count = _topicCollection.count_documents(make_document(kvp("topicArn", topicArn)));
-        _logger.trace() << "Topic exists: " << (count > 0 ? "true" : "false") << std::endl;
+        log_trace_stream(_logger) << "Topic exists: " << (count > 0 ? "true" : "false") << std::endl;
         return count > 0;
     }
 
     bool SNSDatabase::TopicExists(const std::string &region, const std::string &topicName) {
 
         int64_t count = _topicCollection.count_documents(make_document(kvp("region", region), kvp("topicName", topicName)));
-        _logger.trace() << "Topic exists: " << (count > 0 ? "true" : "false") << std::endl;
+        log_trace_stream(_logger) << "Topic exists: " << (count > 0 ? "true" : "false") << std::endl;
         return count > 0;
     }
 
     Entity::SNS::Topic SNSDatabase::CreateTopic(const Entity::SNS::Topic &topic) {
 
         auto result = _topicCollection.insert_one(topic.ToDocument());
-        _logger.trace() << "Topic created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
+        log_trace_stream(_logger) << "Topic created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
 
         return GetTopicById(result->inserted_id().get_oid().value);
     }
@@ -74,7 +74,7 @@ namespace AwsMock::Database {
             topicList.push_back(result);
         }
 
-        _logger.trace() << "Got topic list, size:" << topicList.size() << std::endl;
+        log_trace_stream(_logger) << "Got topic list, size:" << topicList.size() << std::endl;
         return topicList;
     }
 
@@ -82,7 +82,7 @@ namespace AwsMock::Database {
 
         auto result = _topicCollection.replace_one(make_document(kvp("region", topic.region), kvp("topicArn", topic.topicArn)), topic.ToDocument());
 
-        _logger.trace() << "Topic updated: " << topic.ToString() << std::endl;
+        log_trace_stream(_logger) << "Topic updated: " << topic.ToString() << std::endl;
 
         return GetTopicByArn(topic.topicArn);
     }
@@ -90,18 +90,18 @@ namespace AwsMock::Database {
     long SNSDatabase::CountTopics(const std::string &region) {
 
         long count = _topicCollection.count_documents(make_document(kvp("region", region)));
-        _logger.trace() << "Count topics, result: " << count << std::endl;
+        log_trace_stream(_logger) << "Count topics, result: " << count << std::endl;
         return count;
     }
 
     void SNSDatabase::DeleteTopic(const Entity::SNS::Topic &topic) {
        auto result = _topicCollection.delete_many(make_document(kvp("topicArn", topic.topicArn)));
-       _logger.debug() << "Topic deleted, count: " << result->deleted_count() << std::endl;
+       log_debug_stream(_logger) << "Topic deleted, count: " << result->deleted_count() << std::endl;
    }
 
     void SNSDatabase::DeleteAllTopics() {
         auto result = _topicCollection.delete_many({});
-        _logger.debug() << "All topics deleted, count: " << result->deleted_count() << std::endl;
+        log_debug_stream(_logger) << "All topics deleted, count: " << result->deleted_count() << std::endl;
     }
 
     Entity::SNS::Message SNSDatabase::CreateMessage(const Entity::SNS::Message &message) {
@@ -109,7 +109,7 @@ namespace AwsMock::Database {
         try {
 
             auto result = _messageCollection.insert_one(message.ToDocument());
-            _logger.trace() << "Message created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
+            log_trace_stream(_logger) << "Message created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
 
             return GetMessageById(result->inserted_id().get_oid().value);
 
@@ -160,7 +160,7 @@ namespace AwsMock::Database {
                                                                                   kvp("reset", bsoncxx::types::b_date(now)),
                                                                                   kvp("receiptHandle", result.receiptHandle)))));
         }
-        _logger.trace() << "Messages received, region: " << region << " queue: " << queueUrl + " count: " << messageList.size() << std::endl;
+        log_trace_stream(_logger) << "Messages received, region: " << region << " queue: " << queueUrl + " count: " << messageList.size() << std::endl;
     }
 
     void SNSDatabase::ResetMessages(const std::string &queueUrl, long visibility) {
@@ -173,31 +173,31 @@ namespace AwsMock::Database {
                                                             make_document(kvp("status", Entity::SQS::INITIAL), kvp("receiptHandle", "")))));
             updated++;
         }
-        _logger.trace() << "Message reset, visibility: " << visibility << " updated: " << updated << std::endl;
+        log_trace_stream(_logger) << "Message reset, visibility: " << visibility << " updated: " << updated << std::endl;
     }*/
 
     long SNSDatabase::CountMessages(const std::string &region, const std::string &topicArn) {
 
         long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("topicArn", topicArn)));
-        _logger.trace() << "Count messages, result: " << count << std::endl;
+        log_trace_stream(_logger) << "Count messages, result: " << count << std::endl;
         return count;
     }
 /*
     long SNSDatabase::CountMessagesByStatus(const std::string &region, const std::string &queueUrl, int status) {
 
         long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl), kvp("status", status)));
-        _logger.trace() << "Count messages by status, status: " << status << " result: " << count << std::endl;
+        log_trace_stream(_logger) << "Count messages by status, status: " << status << " result: " << count << std::endl;
         return count;
     }*/
 
     void SNSDatabase::DeleteMessage(const Entity::SNS::Message &message) {
         auto result = _messageCollection.delete_one(make_document(kvp("messageId", message.messageId)));
-        _logger.debug() << "Messages deleted, messageId: " << message.messageId << " count: " << result->deleted_count() << std::endl;
+        log_debug_stream(_logger) << "Messages deleted, messageId: " << message.messageId << " count: " << result->deleted_count() << std::endl;
     }
 
     void SNSDatabase::DeleteAllMessages() {
         auto result = _messageCollection.delete_many({});
-        _logger.debug() << "All messages deleted, count: " << result->deleted_count() << std::endl;
+        log_debug_stream(_logger) << "All messages deleted, count: " << result->deleted_count() << std::endl;
     }
 
 } // namespace AwsMock::Database
