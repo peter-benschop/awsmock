@@ -16,6 +16,7 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/Configuration.h>
+#include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/Logger.h>
 #include <awsmock/core/LogStream.h>
@@ -37,7 +38,7 @@
 #define NETWORK_NAME ".dockerhost.net"
 #define HOST_PORT_MIN 32768
 #define HOST_PORT_MAX 65536
-#define IMAGE_TAG ":latest"
+#define IMAGE_TAG "latest"
 #define CONTAINER_PORT "8080/tcp"
 
 namespace AwsMock::Service {
@@ -83,9 +84,11 @@ namespace AwsMock::Service {
        * @param name lambda function name, used as image name
        * @param tag image tag
        * @param handler lambda function handler
+       * @param fileSize size of the image file in bytes
+       * @param codeSha256 SHA256 of the image file
        * @return CreateFunctionResponse
        */
-      void BuildImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler);
+      void BuildImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler, long &fileSize, std::string &codeSha256);
 
       /**
        * Delete an image by name/tag.

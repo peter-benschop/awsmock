@@ -34,11 +34,22 @@ namespace AwsMock::Service {
     Dto::Lambda::CreateFunctionResponse LambdaService::CreateFunctionConfiguration(Dto::Lambda::CreateFunctionRequest &request) {
         log_debug_stream(_logger) << "Create function configuration request: " + request.ToString() << std::endl;
 
-        Database::Entity::Lambda::Lambda lambdaEntity = {.function=request.functionName, .runtime=request.runtime, .role=request.role, .handler=request.handler,
-            .tag=IMAGE_TAG};
+        Database::Entity::Lambda::Lambda lambdaEntity;
+        std::string lambdaArn = Core::AwsUtils::CreateLambdaArn(request.region, _accountId, request.functionName);
+
+        if (_lambdaDatabase->LambdaExists(request.region, request.functionName, request.runtime)) {
+
+            lambdaEntity = _lambdaDatabase->GetLambdaByArn(lambdaArn);
+
+        } else {
+
+            Database::Entity::Lambda::Environment environment = {.variables=request.environmentVariables.variables};
+            lambdaEntity = {.region=request.region, .user=request.user, .function=request.functionName, .runtime=request.runtime, .role=request.role,
+                .handler=request.handler, .tag=IMAGE_TAG, .arn=lambdaArn, .environment=environment};
+        }
 
         // Build the docker image, if not existing
-        if (!_dockerService->ImageExists(request.functionName, "latest")) {
+        if (!_dockerService->ImageExists(request.functionName, lambdaEntity.tag)) {
 
             // Unzip provided zip-file
             std::string codeDir;
@@ -47,25 +58,25 @@ namespace AwsMock::Service {
             }
 
             // Build the docker image
-            _dockerService->BuildImage(codeDir, request.functionName, "latest", request.handler);
+            _dockerService->BuildImage(codeDir, request.functionName, lambdaEntity.tag, request.handler, lambdaEntity.size, lambdaEntity.codeSha256);
 
             // Cleanup
             Core::DirUtils::DeleteDirectory(codeDir);
         }
 
         // Get the image struct
-        Dto::Docker::Image image = _dockerService->GetImageByName(request.functionName, "latest");
+        Dto::Docker::Image image = _dockerService->GetImageByName(request.functionName, lambdaEntity.tag);
         lambdaEntity.size = image.size;
         lambdaEntity.imageId = image.id;
 
         // Create the container, if not existing
-        if (!_dockerService->ContainerExists(request.functionName, "latest")) {
-            Dto::Docker::CreateContainerResponse containerCreateResponse = _dockerService->CreateContainer(request.functionName, "latest");
+        if (!_dockerService->ContainerExists(request.functionName, lambdaEntity.tag)) {
+            Dto::Docker::CreateContainerResponse containerCreateResponse = _dockerService->CreateContainer(request.functionName, lambdaEntity.tag);
             lambdaEntity.hostPort = containerCreateResponse.hostPort;
         }
 
         // Get the container
-        Dto::Docker::Container container = _dockerService->GetContainerByName(request.functionName, "latest");
+        Dto::Docker::Container container = _dockerService->GetContainerByName(request.functionName, lambdaEntity.tag);
         lambdaEntity.containerId = container.id;
 
         // Start container
@@ -73,13 +84,13 @@ namespace AwsMock::Service {
         lambdaEntity.lastStarted = Poco::DateTime();
 
         // Update database
-        lambdaEntity.arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, request.functionName);
         lambdaEntity = _lambdaDatabase->CreateOrUpdateLambda(lambdaEntity);
 
         // Create response
         Dto::Lambda::CreateFunctionResponse
             response{.functionArn=lambdaEntity.arn, .functionName=request.functionName, .runtime=request.runtime, .role=request.role, .handler=request.handler,
-            .environment=request.environment, .memorySize=request.memorySize, .dockerImageId=image.id, .dockerContainerId=container.id};
+            .environment=request.environmentVariables, .memorySize=request.memorySize, .codeSize=lambdaEntity.size, .codeSha256=lambdaEntity.codeSha256,
+            .dockerImageId=image.id, .dockerContainerId=container.id};
 
         return response;
     }

@@ -73,6 +73,16 @@ namespace AwsMock::Dto::Lambda {
     struct CreateFunctionRequest {
 
       /**
+       * Region
+       */
+      std::string region;
+
+      /**
+       * User
+       */
+      std::string user;
+
+      /**
        * Name of the function
        */
       std::string functionName;
@@ -95,7 +105,7 @@ namespace AwsMock::Dto::Lambda {
       /**
        * Environment
        */
-      Environment environment;
+      EnvironmentVariables environmentVariables;
 
       /**
        * Memory size
@@ -109,7 +119,7 @@ namespace AwsMock::Dto::Lambda {
 
       /**
        * Parse a JSON stream
-       *
+       *"{\"JAVA_TOOL_OPTIONS\":\"-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localhost\"}"
        * @param body jsoninput stream
        * @return
        */
@@ -127,8 +137,7 @@ namespace AwsMock::Dto::Lambda {
 
               // Environment
               Poco::JSON::Object::Ptr envObject = rootObject->getObject("Environment");
-              environment.variables = envObject->get("Variables").convert<std::string>();
-              envObject->clear();
+              environmentVariables.FromJson(envObject);
 
               // Code
               Poco::JSON::Object::Ptr codeObject = rootObject->getObject("Code");
@@ -161,9 +170,9 @@ namespace AwsMock::Dto::Lambda {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const CreateFunctionRequest &r) {
-          os << "CreateFunctionRequest={functionName='" + r.functionName + "' runtime: '" + r.runtime + "' role='" + r.role + "' handler='" + r.handler +
-              "' memorySize='" + std::to_string(r.memorySize) + "' {";
-          os << r.environment.ToString();
+          os << "CreateFunctionRequest={region='" << r.region << "' user='" << r.user << "' functionName='" << r.functionName << "' runtime: '" << r.runtime <<
+          "' role='" << r.role << "' handler='" << r.handler << "' memorySize='" << std::to_string(r.memorySize) << "' {";
+          os << r.environmentVariables.ToString();
           os << r.code.ToString();
           os << "}";
           return os;

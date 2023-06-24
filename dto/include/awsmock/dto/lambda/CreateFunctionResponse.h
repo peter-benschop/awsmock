@@ -17,80 +17,9 @@
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
+#include <awsmock/dto/lambda/Environment.h>
 
 namespace AwsMock::Dto::Lambda {
-
-    struct Error {
-
-      /**
-       * Error code
-       */
-      std::string errorCode;
-
-      /**
-       * Error message
-       */
-      std::string message;
-
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
-
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const Error &r) {
-          os << "Error={errorCode='" + r.errorCode + "' message='" + r.message + "'}";
-          return os;
-      }
-
-    };
-
-    struct Environment {
-
-      /**
-       * Environment variables
-       */
-      std::string variables;
-
-      /**
-       * Error
-       */
-      Error error;
-
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
-
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const Environment &r) {
-          os << "Environment={variables='" + r.variables + "' ";
-          os << r.error.ToString();
-          os << "}";
-          return os;
-      }
-
-    };
 
     /**
      * Create function response
@@ -168,7 +97,7 @@ namespace AwsMock::Dto::Lambda {
       /**
        * Environment
        */
-      Environment environment;
+      EnvironmentVariables environment;
 
       /**
        * Memory size
@@ -183,12 +112,17 @@ namespace AwsMock::Dto::Lambda {
       /**
        * Description
        */
-       std::string description;
+      std::string description;
 
       /**
        * Timeout
        */
       int timeout = 3;
+
+      /**
+       * Code SHA256
+       */
+      std::string codeSha256;
 
       /**
        * Modified
@@ -221,15 +155,9 @@ namespace AwsMock::Dto::Lambda {
               rootJson.set("MemorySize", memorySize);
               rootJson.set("CodeSize", codeSize);
               rootJson.set("Timeout", timeout);
+              rootJson.set("CodeSha256", codeSha256);
               rootJson.set("LastModified", modified);
-
-              Poco::JSON::Object errorJson;
-              errorJson.set("ErrorCode", environment.error.errorCode);
-              errorJson.set("ErrorCode", environment.error.message);
-
-              Poco::JSON::Object environmentJson;
-              environmentJson.set("Variables", environment.variables);
-              environmentJson.set("Error", errorJson);
+              rootJson.set("Environment", environment.ToJson());
 
               std::ostringstream os;
               rootJson.stringify(os);

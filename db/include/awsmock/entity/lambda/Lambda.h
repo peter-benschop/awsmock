@@ -23,6 +23,63 @@ namespace AwsMock::Database::Entity::Lambda {
     using bsoncxx::document::view;
     using bsoncxx::document::value;
 
+    enum LambdaState {
+      Pending,
+      Active,
+      Inactive,
+      Failed
+    };
+
+    enum LambdaStateReasonCode {
+      Idle,
+      Creating,
+      Restoring,
+      EniLimitExceeded,
+      InsufficientRolePermissions,
+      InvalidConfiguration,
+      InternalError,
+      SubnetOutOfIPAddresses,
+      InvalidSubnet,
+      InvalidSecurityGroup,
+      ImageDeleted,
+      ImageAccessDenied,
+      InvalidImage,
+      KMSKeyAccessDenied,
+      KMSKeyNotFound,
+      InvalidStateKMSKey,
+      DisabledKMSKey,
+      EFSIOError,
+      EFSMountConnectivityError,
+      EFSMountFailure,
+      EFSMountTimeout,
+      InvalidRuntime,
+      InvalidZipFileException,
+      FunctionError
+    };
+
+    struct Environment {
+
+      /**
+       * Variables
+       */
+      std::vector<std::pair<std::string, std::string>> variables;
+
+      /**
+       * Converts the MongoDB document to an entity
+       *
+       * @return entity.
+       */
+      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+
+          auto varDoc = mResult.value()["variables"].get_array();
+          for (auto &v : varDoc.value) {
+              for (auto &it : v.get_document().value) {
+                  variables.emplace_back(std::make_pair(it.key().to_string(), it.get_string().value.to_string()));
+              }
+          }
+      }
+    };
+
     struct Lambda {
 
       /**
@@ -34,6 +91,11 @@ namespace AwsMock::Database::Entity::Lambda {
        * AWS region name
        */
       std::string region;
+
+      /**
+       * User
+       */
+      std::string user;
 
       /**
        * Function
@@ -86,6 +148,31 @@ namespace AwsMock::Database::Entity::Lambda {
       int hostPort;
 
       /**
+       * Environment
+       */
+      Environment environment;
+
+      /**
+       * Lambda state
+       */
+      int state = LambdaState::Pending;
+
+      /**
+       * State reason
+       */
+      std::string stateReason;
+
+      /**
+       * State reason code
+       */
+      int stateReasonCode = LambdaStateReasonCode::Creating;
+
+      /**
+       * Code SHA256
+       */
+      std::string codeSha256;
+
+      /**
        * Last function start
        */
       Poco::DateTime lastStarted;
@@ -105,15 +192,18 @@ namespace AwsMock::Database::Entity::Lambda {
        *
        * @return entity as MongoDB document.
        */
-      view_or_value<view, value> ToDocument() const {
-/*
-          auto messageAttributesDoc = bsoncxx::builder::basic::array{};
-          for (const auto &attribute : attributes) {
-              messageAttributesDoc.append(attribute.ToDocument());
-          }*/
+      [[nodiscard]] view_or_value<view, value> ToDocument() const {
+
+          // Convert environment to document
+          auto variablesDoc = bsoncxx::builder::basic::array{};
+          for (const auto &variables : environment.variables) {
+              variablesDoc.append(make_document(kvp(variables.first, variables.second)));
+          }
+          view_or_value<view, value> varDoc = make_document(kvp("variables", variablesDoc));
 
           view_or_value<view, value> lambdaDoc = make_document(
               kvp("region", region),
+              kvp("user", user),
               kvp("function", function),
               kvp("runtime", runtime),
               kvp("role", role),
@@ -124,6 +214,11 @@ namespace AwsMock::Database::Entity::Lambda {
               kvp("tag", tag),
               kvp("arn", arn),
               kvp("hostPort", hostPort),
+              kvp("codeSha256", codeSha256),
+              kvp("environment", varDoc),
+              kvp("state", state),
+              kvp("stateReason", stateReason),
+              kvp("stateReasonCode", stateReasonCode),
               kvp("lastStarted", bsoncxx::types::b_date(std::chrono::milliseconds(lastStarted.timestamp().epochMicroseconds() / 1000))),
               kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
               kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
@@ -140,6 +235,7 @@ namespace AwsMock::Database::Entity::Lambda {
 
           oid = mResult.value()["_id"].get_oid().value.to_string();
           region = mResult.value()["region"].get_string().value.to_string();
+          user = mResult.value()["user"].get_string().value.to_string();
           function = mResult.value()["function"].get_string().value.to_string();
           runtime = mResult.value()["runtime"].get_string().value.to_string();
           role = mResult.value()["role"].get_string().value.to_string();
@@ -149,7 +245,12 @@ namespace AwsMock::Database::Entity::Lambda {
           containerId = mResult.value()["containerId"].get_string().value.to_string();
           tag = mResult.value()["tag"].get_string().value.to_string();
           arn = mResult.value()["arn"].get_string().value.to_string();
+          codeSha256 = mResult.value()["codeSha256"].get_string().value.to_string();
           hostPort = mResult.value()["hostPort"].get_int32().value;
+          environment.FromDocument(mResult.value()["environment"].get_document().value);
+          state = mResult.value()["state"].get_int32().value;
+          stateReason = mResult.value()["stateReason"].get_string().value.to_string();
+          stateReasonCode = mResult.value()["stateReasonCode"].get_int32().value;
           lastStarted = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date().value) / 1000));
           created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
           modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
@@ -164,6 +265,7 @@ namespace AwsMock::Database::Entity::Lambda {
 
           oid = mResult.value()["_id"].get_oid().value.to_string();
           region = mResult.value()["region"].get_string().value.to_string();
+          user = mResult.value()["user"].get_string().value.to_string();
           function = mResult.value()["function"].get_string().value.to_string();
           runtime = mResult.value()["runtime"].get_string().value.to_string();
           role = mResult.value()["role"].get_string().value.to_string();
@@ -173,7 +275,12 @@ namespace AwsMock::Database::Entity::Lambda {
           containerId = mResult.value()["containerId"].get_string().value.to_string();
           tag = mResult.value()["tag"].get_string().value.to_string();
           arn = mResult.value()["arn"].get_string().value.to_string();
+          codeSha256 = mResult.value()["codeSha256"].get_string().value.to_string();
           hostPort = mResult.value()["hostPort"].get_int32().value;
+          environment.FromDocument(mResult.value()["environment"].get_document().value);
+          state = mResult.value()["state"].get_int32().value;
+          stateReason = mResult.value()["stateReason"].get_string().value.to_string();
+          stateReasonCode = mResult.value()["stateReasonCode"].get_int32().value;
           lastStarted = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date().value) / 1000));
           created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
           modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
@@ -198,7 +305,8 @@ namespace AwsMock::Database::Entity::Lambda {
       friend std::ostream &operator<<(std::ostream &os, const Lambda &m) {
           os << "Lambda={oid='" << m.oid << "' region='" << m.region << "' function='" << m.function << "'runtime='" << m.runtime << "' role='" << m.role <<
              "' handler='" << m.handler << "' imageId='" << m.imageId << "' containerId='" << m.containerId << "' tag='" << m.tag << "' arn='" << m.arn <<
-             "' hostPort='" << m.hostPort << "' lastStarted='" << Poco::DateTimeFormatter().format(m.lastStarted, Poco::DateTimeFormat::HTTP_FORMAT) <<
+             "' hostPort='" << m.hostPort << "' state='" << m.state << "' stateReason='" << m.stateReason << "' stateReasonCode='" << m.stateReasonCode <<
+             "' lastStarted='" << Poco::DateTimeFormatter().format(m.lastStarted, Poco::DateTimeFormat::HTTP_FORMAT) <<
              "' created='" << Poco::DateTimeFormatter().format(m.created, Poco::DateTimeFormat::HTTP_FORMAT) <<
              "' modified='" << Poco::DateTimeFormatter().format(m.modified, Poco::DateTimeFormat::HTTP_FORMAT) << "'}";
           return os;

@@ -19,16 +19,16 @@ namespace AwsMock::Database {
         _lambdaCollection = GetConnection()["lambda"];
     }
 
-    bool LambdaDatabase::LambdaExists(const std::string &function, const std::string &runtime) {
+    bool LambdaDatabase::LambdaExists(const std::string &region, const std::string &function, const std::string &runtime) {
 
-        int64_t count = _lambdaCollection.count_documents(make_document(kvp("function", function), kvp("runtime", runtime)));
+        int64_t count = _lambdaCollection.count_documents(make_document(kvp("region", region), kvp("function", function), kvp("runtime", runtime)));
         log_trace_stream(_logger) << "Lambda function exists: " << (count > 0 ? "true" : "false") << std::endl;
         return count > 0;
     }
 
     bool LambdaDatabase::LambdaExists(const Entity::Lambda::Lambda &lambda) {
 
-        return LambdaExists(lambda.function, lambda.runtime);
+        return LambdaExists(lambda.region, lambda.function, lambda.runtime);
     }
 
     bool LambdaDatabase::LambdaExists(const std::string &functionName) {
