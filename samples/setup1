@@ -6,7 +6,7 @@
 awsmock lambda create-function \
 --function-name ftp-file-copy \
 --runtime java17 \
---environment file://env.json \
+--environment file://./lambda/env.json \
 --handler org.springframework.cloud.function.adapter.aws.FunctionInvoker \
 --region eu-central-1 \
 --zip-file fileb:///tmp/awsmock/data/lambda/file-copy-service-1.14.0-SNAPSHOT-aws.jar \

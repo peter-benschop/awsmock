@@ -36,12 +36,13 @@ namespace AwsMock::Database {
       /**
        * Check existence of lambda
        *
+       * @param region AWS region name
        * @param function AWS function
        * @param runtime lambda runtime
        * @return true if lambda already exists
        * @throws DatabaseException
        */
-      bool LambdaExists(const std::string &function, const std::string &runtime);
+      bool LambdaExists(const std::string &region, const std::string &function, const std::string &runtime);
 
       /**
        * Check existence of lambda

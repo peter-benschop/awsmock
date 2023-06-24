@@ -60,16 +60,23 @@ namespace AwsMock::Service {
         return {};
     }
 
-    void DockerService::BuildImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler) {
+    void DockerService::BuildImage(const std::string &codeDir,
+                                   const std::string &name,
+                                   const std::string &tag,
+                                   const std::string &handler,
+                                   long &fileSize,
+                                   std::string &codeSha256) {
         log_debug_stream(_logger) << "Build image request, name: " << name << " tag: " << tag << " codeDir: " << codeDir << std::endl;
 
         std::string dockerFile = WriteDockerFile(codeDir, handler);
 
         std::string imageFile = BuildImageFile(codeDir, name);
+        fileSize = Core::FileUtils::FileSize(imageFile);
+        codeSha256 = Core::Crypto::GetSha256FromFile(imageFile);
 
-        std::string header = Core::SystemUtils::SetHeader("POST", "/" + DOCKER_VERSION + "/build?t=" + name + ":" + tag + "&q=true", TAR_CONTENT_TYPE,
-                                                          Core::FileUtils::FileSize(imageFile));
+        std::string header = Core::SystemUtils::SetHeader("POST", "/" + DOCKER_VERSION + "/build?t=" + name + ":" + tag + "&q=true", TAR_CONTENT_TYPE, fileSize);
         std::string output = Core::SystemUtils::SendFileViaDomainSocket(DOCKER_SOCKET, header, imageFile);
+
         log_debug_stream(_logger) << "Docker image build, image: " << name << ":" << tag << std::endl;
         log_trace_stream(_logger) << "Output: " << output << std::endl;
     }
@@ -143,7 +150,7 @@ namespace AwsMock::Service {
 
         int hostPort = GetHostPort();
         std::string containerPort = CONTAINER_PORT;
-        std::string imageName = std::string(name) + IMAGE_TAG;
+        std::string imageName = std::string(name) + ":" + tag;
         std::string domainName = std::string(name) + NETWORK_NAME;
         std::vector<std::string> environment =
             {"AWS_ACCESS_KEY_ID=none", "AWS_SECRET_ACCESS_KEY=none", "JAVA_TOOL_OPTIONS=-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localstack"};

@@ -16,6 +16,9 @@
 #include <Poco/Dynamic/Var.h>
 #include "CreateFunctionResponse.h"
 
+// AwsMock includes
+#include <awsmock/dto/lambda/Environment.h>
+
 namespace AwsMock::Dto::Lambda {
 
     struct DeadLetterConfig {
@@ -135,6 +138,11 @@ namespace AwsMock::Dto::Lambda {
       std::string version;
 
       /**
+       * Environment
+       */
+      EnvironmentVariables environment;
+
+      /**
        * Converts the DTO to a JSON representation.
        *
        * @return DTO as string for logging.
@@ -162,8 +170,10 @@ namespace AwsMock::Dto::Lambda {
               rootJson.set("LastUpdateStatus", lastUpdateStatusReason);
               rootJson.set("LastUpdateStatusCode", lastUpdateStatusReasonCode);
               rootJson.set("State", state);
-              rootJson.set("StateReson", stateReason);
+              rootJson.set("StateResaon", stateReason);
               rootJson.set("StateReasonCode", stateReasonCode);
+              rootJson.set("Environment", environment.ToJson());
+
               return rootJson;
 
           } catch (Poco::Exception &exc) {
@@ -216,8 +226,9 @@ namespace AwsMock::Dto::Lambda {
        */
       [[nodiscard]] std::string ToJson() {
 
-          for(auto &lambda: lambdaList) {
-              functions.push_back({.functionArn=lambda.arn, .functionName=lambda.function, .handler=lambda.handler});
+          for (auto &lambda : lambdaList) {
+              functions.push_back({.codeSize=lambda.size, .functionArn=lambda.arn, .functionName=lambda.function, .handler=lambda.handler, .lastModified=lambda.modified,
+                                  });
           }
 
           try {
@@ -230,7 +241,6 @@ namespace AwsMock::Dto::Lambda {
 
               std::ostringstream os;
               rootJson.stringify(os);
-              std::string temp = os.str();
               return os.str();
 
           } catch (Poco::Exception &exc) {
@@ -256,7 +266,7 @@ namespace AwsMock::Dto::Lambda {
        */
       friend std::ostream &operator<<(std::ostream &os, const ListFunctionResponse &r) {
           os << "ListFunctionResponse={[";
-          for(const auto &f : r.functions) {
+          for (const auto &f : r.functions) {
               os << f.ToString();
           }
           os << "]}";
