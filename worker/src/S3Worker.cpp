@@ -177,7 +177,7 @@ namespace AwsMock::Worker {
 
         // Get the body
         std::string body = std::string(
-            "<CreateBucketConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">\n<LocationConstraint>" + bucket
+            "<CreateBucketConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">\n<LocationConstraint>" + _region
                 + "</LocationConstraint>\n</CreateBucketConfiguration>");
 
         // Create HTTP request and set headers
