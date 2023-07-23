@@ -27,8 +27,6 @@
 #include <awsmock/core/DirectoryWatcher.h>
 #include <awsmock/core/FileUtils.h>
 
-#define TEST_DIR "/tmp/s3"
-
 namespace AwsMock::Core {
 
     class DirectoryWatcherTest : public ::testing::Test {
@@ -36,7 +34,7 @@ namespace AwsMock::Core {
     protected:
       void SetUp() override {
           tempDir = DirUtils::CreateTempDir("/tmp");
-          _watcher= new DirectoryWatcher(tempDir);
+          _watcher= std::make_shared<DirectoryWatcher>(tempDir);
           _watcher->itemAdded += Poco::delegate(this, &DirectoryWatcherTest::OnFileAdded);
           _watcher->itemModified += Poco::delegate(this, &DirectoryWatcherTest::OnFileModified);
           _watcher->itemDeleted += Poco::delegate(this, &DirectoryWatcherTest::OnFileDeleted);
@@ -68,7 +66,7 @@ namespace AwsMock::Core {
       }
 
       int added = 0, deleted = 0, modified = 0;
-      DirectoryWatcher *_watcher;
+      std::shared_ptr<DirectoryWatcher> _watcher;
       std::string tempFile, tempDir;
       Poco::Thread thread;
     };
