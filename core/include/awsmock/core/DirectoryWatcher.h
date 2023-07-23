@@ -124,20 +124,6 @@ namespace AwsMock::Core {
       [[noreturn]] void run() override;
 
       /**
-       * Lock the watcher.
-       *
-       * <p>Only when the lock is released the watcher escalates the events and calls the callbacks.</p>
-       */
-      void Lock();
-
-      /**
-       * Unlock the watcher.
-       *
-       * <p>Only in unlocked state the watcher events arse escalated.</p>
-       */
-      void Unlock();
-
-      /**
        * Added event
        */
       Poco::BasicEvent<const DirectoryEvent> itemAdded;
@@ -181,11 +167,6 @@ namespace AwsMock::Core {
        * Watcher map with absolute file pathes
        */
       std::map<int, std::string> _watcherMap;
-
-      /**
-       * Locking mechanism
-       */
-      Poco::Mutex _mutex;
     };
 
 } // namespace AwsMock::Core

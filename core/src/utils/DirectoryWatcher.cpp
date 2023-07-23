@@ -28,14 +28,6 @@ namespace AwsMock::Core {
         _logger.debug() << "File _watcher initialized, path: " << _rootDir << std::endl;
     }
 
-    void DirectoryWatcher::Lock() {
-        _mutex.lock();
-    }
-
-    void DirectoryWatcher::Unlock() {
-        _mutex.unlock();
-    }
-
     [[noreturn]] void DirectoryWatcher::run() {
 
         int i, wd;
@@ -50,55 +42,53 @@ namespace AwsMock::Core {
             while (i < length) {
                 auto *event = (struct inotify_event *) &buffer[i];
                 if (event->len) {
-                    if (_mutex.tryLock()) {
-                        FileType ft = DW_FILE_TYPE;
-                        if (event->mask & IN_CREATE) {
-                            std::string rootDir = _watcherMap[event->wd];
-                            std::string fileName = GetFilename(rootDir, event->name);
-                            if (event->mask & IN_ISDIR) {
-                                wd = inotify_add_watch(fd, fileName.c_str(), IN_CREATE | IN_MODIFY | IN_DELETE);
-                                _watcherMap[wd] = fileName;
-                                ft = DW_DIR_TYPE;
-                            }
-                            Poco::File f(fileName);
-                            DirectoryEvent ev(f, DW_ITEM_ADDED, ft);
-                            this->itemAdded(this, ev);
+                    FileType ft = DW_FILE_TYPE;
+                    if (event->mask & IN_CREATE) {
+                        std::string rootDir = _watcherMap[event->wd];
+                        std::string fileName = GetFilename(rootDir, event->name);
+                        if (event->mask & IN_ISDIR) {
+                            wd = inotify_add_watch(fd, fileName.c_str(), IN_CREATE | IN_MODIFY | IN_DELETE);
+                            _watcherMap[wd] = fileName;
+                            ft = DW_DIR_TYPE;
                         }
+                        Poco::File f(fileName);
+                        DirectoryEvent ev(f, DW_ITEM_ADDED, ft);
+                        this->itemAdded(this, ev);
+                    }
 
-                        if (event->mask & IN_MODIFY) {
-                            if (event->mask & IN_ISDIR) {
-                                ft = DW_DIR_TYPE;
-                            }
-                            std::string rootDir = _watcherMap[event->wd];
-                            std::string fileName = GetFilename(rootDir, event->name);
-                            Poco::File f(fileName);
-                            DirectoryEvent ev(f, DW_ITEM_MODIFIED, ft);
-                            this->itemModified(this, ev);
+                    if (event->mask & IN_MODIFY) {
+                        if (event->mask & IN_ISDIR) {
+                            ft = DW_DIR_TYPE;
                         }
+                        std::string rootDir = _watcherMap[event->wd];
+                        std::string fileName = GetFilename(rootDir, event->name);
+                        Poco::File f(fileName);
+                        DirectoryEvent ev(f, DW_ITEM_MODIFIED, ft);
+                        this->itemModified(this, ev);
+                    }
 
-                        if (event->mask & IN_DELETE) {
-                            std::string rootDir = _watcherMap[event->wd];
-                            std::string fileName = GetFilename(rootDir, event->name);
-                            if (event->mask & IN_ISDIR) {
-                                auto it = _watcherMap.find(event->wd);
-                                if (it != _watcherMap.end()) {
-                                    _watcherMap.erase(it);
-                                }
-                                inotify_rm_watch(fd, event->wd);
-                                ft = DW_DIR_TYPE;
+                    if (event->mask & IN_DELETE) {
+                        std::string rootDir = _watcherMap[event->wd];
+                        std::string fileName = GetFilename(rootDir, event->name);
+                        if (event->mask & IN_ISDIR) {
+                            auto it = _watcherMap.find(event->wd);
+                            if (it != _watcherMap.end()) {
+                                _watcherMap.erase(it);
                             }
-                            Poco::File f(fileName);
-                            DirectoryEvent ev(f, DW_ITEM_REMOVED, ft);
-                            this->itemDeleted(this, ev);
+                            inotify_rm_watch(fd, event->wd);
+                            ft = DW_DIR_TYPE;
                         }
+                        Poco::File f(fileName);
+                        DirectoryEvent ev(f, DW_ITEM_REMOVED, ft);
+                        this->itemDeleted(this, ev);
                     }
                 }
-                i += (int)EVENT_SIZE + event->len;
+                i += (int) EVENT_SIZE + event->len;
             }
         }
     }
 
-    std::string DirectoryWatcher::GetFilename(const std::string &rootDir, const char* fileName) {
+    std::string DirectoryWatcher::GetFilename(const std::string &rootDir, const char *fileName) {
         char p[100] = " ";
         strcpy(p, rootDir.c_str());
         strcat(p, "/");
