@@ -20,6 +20,11 @@ namespace AwsMock::Dto::S3 {
     struct GetMetadataRequest {
 
       /**
+       * AWS region
+       */
+      std::string region;
+
+      /**
        * Bucket
        */
       std::string bucket;
@@ -46,7 +51,7 @@ namespace AwsMock::Dto::S3 {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const GetMetadataRequest &r) {
-          os << "GetMetadataRequest={bucket='" + r.bucket + "' key='" + r.key + "'}";
+          os << "GetMetadataRequest={region='" << r.region << " bucket='" << r.bucket << "' key='" << r.key << "'}";
           return os;
       }
 

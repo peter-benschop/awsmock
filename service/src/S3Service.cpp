@@ -75,7 +75,7 @@ namespace AwsMock::Service {
         Dto::S3::GetMetadataResponse getMetadataResponse;
         try {
 
-            Database::Entity::S3::Object object = _database->GetObject(request.bucket, request.bucket, request.key);
+            Database::Entity::S3::Object object = _database->GetObject(request.region, request.bucket, request.key);
 
             getMetadataResponse.bucket = object.bucket;
             getMetadataResponse.key = object.key;
@@ -84,10 +84,10 @@ namespace AwsMock::Service {
             getMetadataResponse.contentType = object.contentType;
             getMetadataResponse.modified = object.modified;
             getMetadataResponse.created = object.modified;
-            log_trace_stream(_logger) << "S3 get metadata response: " + getMetadataResponse.ToString() << std::endl;
+            log_trace_stream(_logger) << "S3 get object metadata response: " + getMetadataResponse.ToString() << std::endl;
 
         } catch (Poco::Exception &ex) {
-            log_error_stream(_logger) << "S3 create bucket failed, message: " << ex.message() << std::endl;
+            log_error_stream(_logger) << "S3 get object metadata failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500);
         }
         return getMetadataResponse;
@@ -297,7 +297,6 @@ namespace AwsMock::Service {
 
             // Delete file system object
             DeleteObject(request.bucket, request.key);
-            log_debug_stream(_logger) << "File system object deleted, key: " << request.key << std::endl;
 
             // Check notification
             Database::Entity::S3::Bucket bucket = _database->GetBucketByRegionName(request.region, request.bucket);
@@ -476,6 +475,7 @@ namespace AwsMock::Service {
         std::string filename = _dataDir + Poco::Path::separator() + bucket + Poco::Path::separator() + key;
         if(Core::FileUtils::FileExists(filename)) {
             Core::FileUtils::DeleteFile(filename);
+            log_debug_stream(_logger) << "File system object deleted, bucket: " << bucket << " key: " << key << std::endl;
         }
 
     }

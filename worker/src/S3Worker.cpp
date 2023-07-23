@@ -22,7 +22,8 @@ namespace AwsMock::Worker {
 
     void S3Worker::Initialize() {
 
-        _dataDir = _configuration.getString("awsmock.data.dir") + Poco::Path::separator() + "s3";
+        _dataDir = _configuration.getString("awsmock.service.s3.date.dir");
+        _tmpDir = _dataDir + Poco::Path::separator() + "tmp";
         _watcherDir = _dataDir + Poco::Path::separator() + "watcher";
         log_debug_stream(_logger) << "Watching path: " << _watcherDir << std::endl;
 
@@ -43,12 +44,13 @@ namespace AwsMock::Worker {
         _clientId = _configuration.getString("awsmock.client.id", "00000000");
         _user = _configuration.getString("awsmock.user", "none");
 
-        // SQS service connection
+        // S3 service connection
         _s3ServiceHost = _configuration.getString("awsmock.service.s3.host", "localhost");
         _s3ServicePort = _configuration.getInt("awsmock.service.s3.port", 9501);
 
-        // Service database
+        // Database connections
         _serviceDatabase = std::make_unique<Database::ServiceDatabase>(_configuration);
+        _s3Database = std::make_unique<Database::S3Database>(_configuration);
 
         // Start _watcher
         _watcher = new Core::DirectoryWatcher(_watcherDir);
@@ -58,12 +60,50 @@ namespace AwsMock::Worker {
         log_debug_stream(_logger) << "Directory _watcher added, path: " << _watcherDir << std::endl;
     }
 
+    void S3Worker::Synchronize() {
+
+        // Check all local files against database
+        for(const std::string& filePath : Core::DirUtils::ListFiles(_dataDir)) {
+
+            // Don't consider directories
+            if (Core::DirUtils::IsDirectory(filePath) || Core::StringUtils::StartsWith(filePath, _watcherDir) || Core::StringUtils::StartsWith(filePath, _tmpDir)) {
+                continue;
+            }
+
+            // Get bucket, key
+            std::string bucket, key;
+            GetBucketKeyFromFile(filePath, bucket, key);
+
+            // Check database
+            if (!ExistsObject(bucket, key)) {
+                CreateObject(filePath);
+            }
+        }
+
+        // Check all database files against file system
+        Database::Entity::S3::ObjectList objects = _s3Database->ListObjects();
+        for(const Database::Entity::S3::Object& object : objects) {
+
+            // Get bucket, key
+            std::string filePath;
+            GetFileFromBucketKey(filePath, object.bucket, object.key);
+
+            // Check database
+            if(!Core::FileUtils::FileExists(filePath)) {
+                DeleteObject(object.bucket, object.key);
+            }
+        }
+    }
+
     void S3Worker::run() {
 
         // Check service active
 //        if (!_serviceDatabase->IsActive("S3")) {
 //            return;
 //        }
+
+        // Synchronize current file system state
+        Synchronize();
 
         // Start file watcher, they will call the delegate methods, if they find a file system event.
         _watcherThread.start(_watcher);
@@ -144,6 +184,10 @@ namespace AwsMock::Worker {
         }
     }
 
+    void S3Worker::GetFileFromBucketKey(std::string &fileName, const std::string &bucket, const std::string &key) {
+        fileName = _dataDir + Poco::Path::separator() + bucket + Poco::Path::separator() + key;
+    }
+
     void S3Worker::CreateBucket(const std::string &dirPath) {
 
         // Get bucket, key
@@ -182,6 +226,18 @@ namespace AwsMock::Worker {
         Core::FileUtils::MoveTo(filePath, _dataDir + Poco::Path::separator() + bucket + Poco::Path::separator() + key, true);
 
         SendPutObjectRequest(bucket, key, md5sum, "application/octet-stream", size);
+    }
+
+    bool S3Worker::ExistsObject(const std::string &bucket, const std::string &key) {
+
+        // Send object metadata request to S3 service, if the object is not existing return false
+        return SendHeadObjectRequest(bucket, key, "application/octet-stream");
+    }
+
+    void S3Worker::DeleteObject(const std::string &bucket, const std::string &key) {
+
+        // Send delete object request to S3 service
+        SendDeleteObjectRequest(bucket, key, "application/octet-stream");
     }
 
     void S3Worker::SendCreateBucketRequest(const std::string &bucket, const std::string &contentType) {
@@ -259,7 +315,56 @@ namespace AwsMock::Worker {
         if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
             log_error_stream(_logger) << "HTTP error, status: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
         }
-        log_debug_stream(_logger) << "S3 put object message request send, status: " << response.getStatus() << std::endl;
+        log_debug_stream(_logger) << "S3 put object request send, status: " << response.getStatus() << std::endl;
+    }
+
+    bool S3Worker::SendHeadObjectRequest(const std::string &bucket, const std::string &key, const std::string &contentType) {
+
+        Poco::URI uri("http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket + "/" + key);
+        std::string path(uri.getPathAndQuery());
+
+        // Create HTTP request and set headers
+        Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
+        Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_HEAD, path, Poco::Net::HTTPMessage::HTTP_1_1);
+        request.add("Content-Type", contentType);
+        request.add("WriteFile", "false");
+        AddAuthorization(request);
+        log_debug_stream(_logger) << "S3 put object message request created, bucket: " + bucket << " key: " << key << std::endl;
+
+        // Send request
+        session.sendRequest(request);
+
+        // Get the response status
+        Poco::Net::HTTPResponse response;
+        log_debug_stream(_logger) << "S3 head object request send, status: " << response.getStatus() << std::endl;
+        if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
+            return false;
+        }
+        return true;
+    }
+
+    void S3Worker::SendDeleteObjectRequest(const std::string &bucket, const std::string &key, const std::string &contentType) {
+
+        Poco::URI uri("http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket + "/" + key);
+        std::string path(uri.getPathAndQuery());
+
+        // Create HTTP request and set headers
+        Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
+        Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_DELETE, path, Poco::Net::HTTPMessage::HTTP_1_1);
+        request.add("Content-Type", contentType);
+        request.add("WriteFile", "false");
+        AddAuthorization(request);
+        log_debug_stream(_logger) << "S3 delete object request created, bucket: " + bucket << " key: " << key << std::endl;
+
+        // Send request
+        session.sendRequest(request);
+
+        // Get the response status
+        Poco::Net::HTTPResponse response;
+        if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
+            log_error_stream(_logger) << "HTTP error, status: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
+        }
+        log_debug_stream(_logger) << "S3 delete object request send, status: " << response.getStatus() << std::endl;
     }
 
     void S3Worker::AddAuthorization(Poco::Net::HTTPRequest &request) {

@@ -62,6 +62,15 @@ namespace AwsMock::Worker {
       void Initialize();
 
       /**
+       * Synchronize the directory layout with the database.
+       * <p>
+       * All files which are in the directory tree will be syncheonized with the database. Files not existing anymore on the file system, will be deleted from the
+       * S3Object collection.
+       * </p>
+       */
+      void Synchronize();
+
+      /**
        * Callback for the directory watcher add events.
        *
        * @param addEvent directory watcher add event.
@@ -104,6 +113,23 @@ namespace AwsMock::Worker {
       void CreateObject(const std::string &filePath);
 
       /**
+       * Checks the existence of an object in database, by sending the corresponding HeadObject request to the S3 service.
+       *
+       * @param bucket S3 bucket name
+       * @param key S3 object key
+       * @return true if object exists
+       */
+      bool ExistsObject(const std::string &bucket, const std::string &key);
+
+      /**
+       * Deletes an existing object, by sending the corresponding DeleteObject request to the S3 service.
+       *
+       * @param bucket S3 bucket name
+       * @param key S3 object key
+       */
+      void DeleteObject(const std::string &bucket, const std::string &key);
+
+      /**
        * Gets the bucket and object key from the file name.
        *
        * @param fileName absolute file file name
@@ -111,6 +137,15 @@ namespace AwsMock::Worker {
        * @param key object key
        */
       void GetBucketKeyFromFile(const std::string &fileName, std::string &bucket, std::string &key);
+
+      /**
+       * Gets the absolute file path from bucket and object key.
+       *
+       * @param fileName absolute file file name
+       * @param bucket bucket name
+       * @param key object key
+       */
+      void GetFileFromBucketKey(std::string &fileName, const std::string &bucket, const std::string &key);
 
       /**
        * Sends a create object request to the S3 service
@@ -140,6 +175,25 @@ namespace AwsMock::Worker {
       void SendPutObjectRequest(const std::string &bucket, const std::string &key, const std::string &md5Sum, const std::string &contentType, long fileSize);
 
       /**
+       * Sends a head object request to the S3 service
+       *
+       * @param bucket S3 bucket name
+       * @param key S3 object key
+       * @param contentType content type
+       * @return true if object exists
+       */
+      bool SendHeadObjectRequest(const std::string &bucket, const std::string &key, const std::string &contentType);
+
+      /**
+       * Sends a delete object request to the S3 service
+       *
+       * @param bucket S3 bucket name
+       * @param key S3 object key
+       * @param contentType content type
+       */
+      void SendDeleteObjectRequest(const std::string &bucket, const std::string &key, const std::string &contentType);
+
+      /**
        * Adds the authorization header.
        *
        * @param request HTTP request
@@ -162,6 +216,11 @@ namespace AwsMock::Worker {
       std::unique_ptr<Database::ServiceDatabase> _serviceDatabase;
 
       /**
+       * S3 database
+       */
+      std::unique_ptr<Database::S3Database> _s3Database;
+
+      /**
        * Data directory
        */
       std::string _dataDir;
@@ -170,6 +229,11 @@ namespace AwsMock::Worker {
        * Watcher directory
        */
       std::string _watcherDir;
+
+      /**
+       * Temp directory
+       */
+      std::string _tmpDir;
 
       /**
        * Directory _watcher thread

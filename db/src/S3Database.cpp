@@ -122,6 +122,31 @@ namespace AwsMock::Database {
         return objectList;
     }
 
+    Entity::S3::ObjectList S3Database::ListObjects(const std::string &prefix) {
+
+        Entity::S3::ObjectList objectList;
+        if (prefix.empty()) {
+            auto objectCursor = _objectCollection.find({});
+            for (auto object : objectCursor) {
+                Entity::S3::Object result;
+                result.FromDocument(object);
+                objectList.push_back(result);
+            }
+        } else {
+            auto objectCursor = _objectCollection.find(make_document(kvp("key", bsoncxx::types::b_regex{"^" + prefix + ".*"})));
+            for (auto object : objectCursor) {
+                Entity::S3::Object result;
+                result.FromDocument(object);
+                objectList.push_back(result);
+            }
+        }
+
+        log_trace_stream(_logger) << "Got object list in all buckets, size:" << objectList.size() << std::endl;
+
+        return objectList;
+    }
+
+
     void S3Database::DeleteBucket(const Entity::S3::Bucket &bucket) {
 
         auto delete_many_result =

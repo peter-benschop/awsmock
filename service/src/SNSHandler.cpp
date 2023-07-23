@@ -96,21 +96,24 @@ namespace AwsMock::Service {
         DumpRequest(request);
     }
 
-    void SNSHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
+    void SNSHandler::handleHead([[maybe_unused]]Poco::Net::HTTPServerRequest &request,
+                                Poco::Net::HTTPServerResponse &response,
+                                [[maybe_unused]]const std::string &region,
+                                [[maybe_unused]]const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
-        log_debug_stream(_logger) << "SNS OPTIONS request" << std::endl;
-
-        response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
-        response.setContentType("text/plain; charset=utf-8");
+        log_debug_stream(_logger) << "SNS HEAD request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
         handleHttpStatusCode(response, 200);
         std::ostream &outputStream = response.send();
         outputStream.flush();
     }
 
-    void SNSHandler::handleHead([[maybe_unused]]Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+    void SNSHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
         Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
-        log_debug_stream(_logger) << "SNS HEAD request, address: " << request.clientAddress().toString() << std::endl;
+        log_debug_stream(_logger) << "SNS OPTIONS request" << std::endl;
+
+        response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
+        response.setContentType("text/plain; charset=utf-8");
 
         handleHttpStatusCode(response, 200);
         std::ostream &outputStream = response.send();
