@@ -7,26 +7,31 @@
 
 // C++ standard includes
 #include <string>
+#include <iostream>
 #include <sys/inotify.h>
 
 // Poco includes
 #include "Poco/Delegate.h"
 #include <Poco/DirectoryWatcher.h>
 #include <Poco/Logger.h>
-#include <Poco/LogStream.h>
 #include <Poco/Path.h>
 #include <Poco/Runnable.h>
 #include <Poco/ScopedLock.h>
+#include <Poco/Net/HTTPClientSession.h>
+#include <Poco/Net/HTTPMessage.h>
+#include <Poco/Net/HTTPRequest.h>
+#include <Poco/Net/HTTPResponse.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/DirectoryWatcher.h>
+#include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/db/ServiceDatabase.h>
+#include <awsmock/db/S3Database.h>
 #include <awsmock/dto/s3/PutObjectRequest.h>
-#include <awsmock/service/S3Service.h>
 
 namespace AwsMock::Worker {
 
@@ -85,6 +90,13 @@ namespace AwsMock::Worker {
       void CreateBucket(const std::string &dirPath);
 
       /**
+       * Deletes an existing bucket, by sending the corresponding DeleteBucket request to the S3 service.
+       *
+       * @param dirPath absolute path of the directory
+       */
+      void DeleteBucket(const std::string &dirPath);
+
+      /**
        * Create a new object, by sending the corresponding PutObject request to the S3 service.
        *
        * @param filePath absolute path of the file
@@ -101,12 +113,20 @@ namespace AwsMock::Worker {
       void GetBucketKeyFromFile(const std::string &fileName, std::string &bucket, std::string &key);
 
       /**
-       * Sends a put object request to the S3 service
+       * Sends a create object request to the S3 service
        *
        * @param bucket S3 bucket name
        * @param contentType content type
        */
       void SendCreateBucketRequest(const std::string &bucket, const std::string &contentType);
+
+      /**
+       * Sends a delete bucket request to the S3 service
+       *
+       * @param bucket S3 bucket name
+       * @param contentType content type
+       */
+      void SendDeleteBucketRequest(const std::string &bucket, const std::string &contentType);
 
       /**
        * Sends a put object request to the S3 service
@@ -118,6 +138,13 @@ namespace AwsMock::Worker {
        * @param fileSize size of the file
        */
       void SendPutObjectRequest(const std::string &bucket, const std::string &key, const std::string &md5Sum, const std::string &contentType, long fileSize);
+
+      /**
+       * Adds the authorization header.
+       *
+       * @param request HTTP request
+       */
+      void AddAuthorization(Poco::Net::HTTPRequest &request);
 
       /**
        * Logger
@@ -133,11 +160,6 @@ namespace AwsMock::Worker {
        * Service database
        */
       std::unique_ptr<Database::ServiceDatabase> _serviceDatabase;
-
-      /**
-       * S3 service
-       */
-      std::unique_ptr<Service::S3Service> _s3Service;
 
       /**
        * Data directory
@@ -158,6 +180,21 @@ namespace AwsMock::Worker {
        * AWS region
        */
       std::string _region;
+
+      /**
+       * AWS account ID
+       */
+      std::string _accountId;
+
+      /**
+       * AWS client ID
+       */
+      std::string _clientId;
+
+      /**
+       * AWS user
+       */
+      std::string _user;
 
       /**
        * Directory _watcher
