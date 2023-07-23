@@ -67,7 +67,7 @@ namespace AwsMock::Service {
         }
 
         if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_HEAD) {
-            this->handleHead(request, response);
+            this->handleHead(request, response, region, user);
         }
     }
 
@@ -122,7 +122,10 @@ namespace AwsMock::Service {
         errorStream.flush();
     }
 
-    void AbstractHandler::handleHead([[maybe_unused]]Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+    void AbstractHandler::handleHead([[maybe_unused]]Poco::Net::HTTPServerRequest &request,
+                                     Poco::Net::HTTPServerResponse &response,
+                                     [[maybe_unused]]const std::string &region,
+                                     [[maybe_unused]]const std::string &user) {
         log_trace_stream(_logger) << "Request, method: " << request.getMethod() << std::endl;
         response.setStatusAndReason(
             Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED,

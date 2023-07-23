@@ -222,7 +222,7 @@ namespace AwsMock::Service {
         outputStream.flush();
     }
 
-    void S3Handler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+    void S3Handler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_HEAD_TIMER);
         log_debug_stream(_logger) << "S3 HEAD request, address: " << request.clientAddress().toString() << std::endl << std::endl;
 
@@ -232,7 +232,7 @@ namespace AwsMock::Service {
             GetBucketKeyFromUri(request.getURI(), bucket, key);
             log_debug_stream(_logger) << "S3 HEAD request, bucket: " << bucket << " key: " << key << std::endl << std::endl;
 
-            Dto::S3::GetMetadataRequest s3Request = {.bucket=bucket, .key=key};
+            Dto::S3::GetMetadataRequest s3Request = {.region=region, .bucket=bucket, .key=key};
             Dto::S3::GetMetadataResponse s3Response = _s3Service.GetMetadata(s3Request);
 
             HeaderMap headerMap;

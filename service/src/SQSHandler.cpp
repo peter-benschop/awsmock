@@ -160,7 +160,7 @@ namespace AwsMock::Service {
                                   [[maybe_unused]]const std::string &region,
                                   [[maybe_unused]]const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_DELETE_TIMER);
-        log_debug_stream(_logger) << "SQS DELETE request, URI: " + request.getURI() << " region: " << region << " user: " << user << std::endl;
+        log_debug_stream(_logger) << "SQS DELETE request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
         DumpRequest(request);
         DumpResponse(response);
     }
@@ -177,9 +177,12 @@ namespace AwsMock::Service {
         outputStream.flush();
     }
 
-    void SQSHandler::handleHead([[maybe_unused]]Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+    void SQSHandler::handleHead([[maybe_unused]]Poco::Net::HTTPServerRequest &request,
+                                Poco::Net::HTTPServerResponse &response,
+                                [[maybe_unused]]const std::string &region,
+                                [[maybe_unused]]const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
-        log_debug_stream(_logger) << "SQS HEAD request, address: " << request.clientAddress().toString() << std::endl;
+        log_debug_stream(_logger) << "SQS HEAD request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
         handleHttpStatusCode(response, 200);
         std::ostream &outputStream = response.send();
