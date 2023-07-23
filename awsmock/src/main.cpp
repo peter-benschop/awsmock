@@ -201,9 +201,9 @@ namespace AwsMock {
 
           log_debug_stream(_logger) << "Entering main routine" << std::endl;
 
-          StartWorker();
-
           StartServices();
+
+          StartWorker();
 
           // Start HTTP server
           _restService.setRouter(&_router);

@@ -276,6 +276,24 @@ namespace AwsMock::Database {
         EXPECT_EQ(10, result);
     }
 
+    TEST_F(S3DatabaseTest, ObjectListTest) {
+
+        // arrange
+        Entity::S3::Bucket bucket = {.region=_region, .name=BUCKET, .owner=OWNER};
+        bucket = _s3database.CreateBucket(bucket);
+
+        // Create objects
+        for (int i = 0; i < 10; i++) {
+            _s3database.CreateObject({.region=_region, .bucket=bucket.name, .key=std::string(OBJECT) + std::to_string(i), .owner=OWNER});
+        }
+
+        // act
+        Entity::S3::ObjectList result = _s3database.ListObjects();
+
+        // assert
+        EXPECT_EQ(10, result.size());
+    }
+
     TEST_F(S3DatabaseTest, ObjectDeleteManyTest) {
 
         // arrange

@@ -297,7 +297,6 @@ namespace AwsMock::Service {
 
             // Delete file system object
             DeleteObject(request.bucket, request.key);
-            log_debug_stream(_logger) << "File system object deleted, key: " << request.key << std::endl;
 
             // Check notification
             Database::Entity::S3::Bucket bucket = _database->GetBucketByRegionName(request.region, request.bucket);
@@ -476,6 +475,7 @@ namespace AwsMock::Service {
         std::string filename = _dataDir + Poco::Path::separator() + bucket + Poco::Path::separator() + key;
         if(Core::FileUtils::FileExists(filename)) {
             Core::FileUtils::DeleteFile(filename);
+            log_debug_stream(_logger) << "File system object deleted, bucket: " << bucket << " key: " << key << std::endl;
         }
 
     }
