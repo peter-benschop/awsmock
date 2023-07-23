@@ -39,7 +39,7 @@
 
 namespace AwsMock::Core {
 
-    static const unsigned int s_recv_len = 8192;
+    static const unsigned int s_recv_len = 1024*1024;
 
     struct ExecResult {
       int status = -1;

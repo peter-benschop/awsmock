@@ -26,12 +26,13 @@
 #include <awsmock/core/TarUtils.h>
 #include <awsmock/core/RandomUtils.h>
 #include <awsmock/core/StreamFilter.h>
+#include <awsmock/core/CurlUtils.h>
 #include <awsmock/dto/docker/CreateContainerRequest.h>
 #include <awsmock/dto/docker/CreateContainerResponse.h>
 #include <awsmock/dto/docker/ListImageResponse.h>
 #include <awsmock/dto/docker/ListContainerResponse.h>
 
-#define DOCKER_VERSION std::string("v1.42")
+#define DOCKER_VERSION std::string("v1.43")
 #define DOCKER_SOCKET "/var/run/docker.sock"
 #define TAR_CONTENT_TYPE std::string("application/x-tar")
 #define JSON_CONTENT_TYPE std::string("application/json")
@@ -199,6 +200,11 @@ namespace AwsMock::Service {
        * Configuration
        */
       const Core::Configuration &_configuration;
+
+      /**
+       * Curl utilities
+       */
+      Core::CurlUtils _curlUtils;
     };
 
 } //namespace AwsMock::Service
