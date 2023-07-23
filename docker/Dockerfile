@@ -2,7 +2,7 @@ FROM debian:bookworm-slim AS build
 
 # Install basics
 RUN apt-get update && apt-get -y install build-essential cmake git openssl libssl-dev supervisor libarchive-dev \
-    zlib1g-dev wget
+    zlib1g-dev wget libarchive13 libz1 libcurl4-openssl-dev
 RUN mkdir -p /usr/src
 
 # Install google test
@@ -54,8 +54,6 @@ RUN cd /usr/src && \
     cmake --install . --prefix /usr
 
 FROM debian:bookworm-slim
-
-RUN apt-get update && apt-get -y install openssl supervisor libarchive13 libz1 curl
 
 COPY --from=build /usr/src/aws-mock/etc/aws-mock.properties /etc
 COPY --from=build /usr/bin/aws-mock /usr/bin
