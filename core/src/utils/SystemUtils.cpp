@@ -148,17 +148,18 @@ namespace AwsMock::Core {
 
     std::string SystemUtils::GetBody(const std::string &output) {
 
+        // Remove unwanted characters
+        std::stringstream sin, sout;
+        sin << output;
+        Core::StreamFilter::XmlCharacterStreamFilter(sin, sout);
+        std::string body = sout.str();
+
         Poco::RegularExpression regex(R"(.*[\r?|\n?]+([0-9a-f]+)[\r?|\n?]{1}(.*)[\r?|\n?]{2}.*)");
         Poco::RegularExpression::MatchVec posVec;
-        int matches = regex.match(output, 0, posVec);
+        int matches = regex.match(body, 0, posVec);
 
         if (matches == 3) {
-
-            // Remove unwanted characters
-            std::stringstream sin, sout;
-            sin << output.substr(posVec[2].offset + 1, posVec[2].length - 1) << std::endl;
-            Core::StreamFilter::XmlCharacterStreamFilter(sin, sout);
-            return sout.str();
+            return body.substr(posVec[2].offset + 1, posVec[2].length - 1);
         }
         return "Match not found";
     }

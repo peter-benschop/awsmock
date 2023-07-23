@@ -11,15 +11,14 @@ namespace AwsMock::Service {
         // Set console logger
         Core::Logger::SetDefaultConsoleLogger("DockerService");
         log_debug_stream(_logger) << "Docker service initialized" << std::endl;
+
+        std::string output = _curlUtils.SendRequest("GET", "/version");
+        log_debug_stream(_logger) << "Docker daemon version: " << output << std::endl;
     }
 
     bool DockerService::ImageExists(const std::string &name, const std::string &tag) {
 
-        std::string jsonBody = {};
-        std::string header = Core::SystemUtils::SetHeader("GET", "/" + DOCKER_VERSION + "/images/json?all=true", JSON_CONTENT_TYPE, jsonBody.size());
-        log_debug_stream(_logger) << "Header: " << Core::StringUtils::StripLineEndings(header) << std::endl;
-
-        std::string output = Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
+        std::string output = _curlUtils.SendRequest("GET", "/" + DOCKER_VERSION + "/images/json?all=true");
         log_trace_stream(_logger) << "List images request send to docker daemon, output: " << output << std::endl;
 
         Dto::Docker::ListImageResponse response;
@@ -39,11 +38,7 @@ namespace AwsMock::Service {
 
     Dto::Docker::Image DockerService::GetImageByName(const std::string &name, const std::string &tag) {
 
-        std::string jsonBody = {};
-        std::string header = Core::SystemUtils::SetHeader("GET", "/" + DOCKER_VERSION + "/images/json?all=true", JSON_CONTENT_TYPE, jsonBody.size());
-        log_debug_stream(_logger) << "Header: " << Core::StringUtils::StripLineEndings(header) << std::endl;
-
-        std::string output = Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
+        std::string output = _curlUtils.SendRequest("GET", "/" + DOCKER_VERSION + "/images/json?all=true");
         log_debug_stream(_logger) << "List container request send to docker daemon, output: " << Core::StringUtils::StripLineEndings(output) << std::endl;
 
         Dto::Docker::ListImageResponse response;
@@ -74,31 +69,18 @@ namespace AwsMock::Service {
         fileSize = Core::FileUtils::FileSize(imageFile);
         codeSha256 = Core::Crypto::GetSha256FromFile(imageFile);
 
-        std::string header = Core::SystemUtils::SetHeader("POST", "/" + DOCKER_VERSION + "/build?t=" + name + ":" + tag + "&q=true", TAR_CONTENT_TYPE, fileSize);
-        std::string output = Core::SystemUtils::SendFileViaDomainSocket(DOCKER_SOCKET, header, imageFile);
-
+        std::string output = _curlUtils.SendFileRequest("POST", "/" + DOCKER_VERSION + "/build?t=" + name + ":" + tag + "&q=true", {}, imageFile);
         log_debug_stream(_logger) << "Docker image build, image: " << name << ":" << tag << std::endl;
         log_trace_stream(_logger) << "Output: " << output << std::endl;
     }
 
     void DockerService::DeleteImage(const std::string &name, const std::string &tag) {
-
-        std::string jsonBody = {};
-        std::string
-            header = Core::SystemUtils::SetHeader("DELETE", "/" + DOCKER_VERSION + "/images/" + name + ":" + tag + "?force=true", JSON_CONTENT_TYPE, jsonBody.size());
-
-        log_debug_stream(_logger) << "Sending delete image request" << std::endl;
-
-        Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
+        std::string output = _curlUtils.SendRequest("DELETE", "/" + DOCKER_VERSION + "/images/" + name + ":" + tag + "?force=true");
     }
 
     bool DockerService::ContainerExists(const std::string &name, const std::string &tag) {
 
-        std::string jsonBody = {};
-        std::string header = Core::SystemUtils::SetHeader("GET", "/" + DOCKER_VERSION + "/containers/json?all=true", JSON_CONTENT_TYPE, jsonBody.size());
-        log_debug_stream(_logger) << "Header: " << Core::StringUtils::StripLineEndings(header) << std::endl;
-
-        std::string output = Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
+        std::string output = _curlUtils.SendRequest("GET", "/" + DOCKER_VERSION + "/containers/json?all=true");
         log_trace_stream(_logger) << "List container request send to docker daemon, output: " << output << std::endl;
 
         Dto::Docker::ListContainerResponse response;
@@ -121,11 +103,7 @@ namespace AwsMock::Service {
 
     Dto::Docker::Container DockerService::GetContainerByName(const std::string &name, const std::string &tag) {
 
-        std::string jsonBody = {};
-        std::string header = Core::SystemUtils::SetHeader("GET", "/" + DOCKER_VERSION + "/containers/json?all=true", JSON_CONTENT_TYPE, jsonBody.size());
-        log_debug_stream(_logger) << "Header: " << Core::StringUtils::StripLineEndings(header) << std::endl;
-
-        std::string output = Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
+        std::string output = _curlUtils.SendRequest("GET", "/" + DOCKER_VERSION + "/containers/json?all=true");
         log_debug_stream(_logger) << "List container request send to docker daemon, output: " << Core::StringUtils::StripLineEndings(output) << std::endl;
 
         Dto::Docker::ListContainerResponse response;
@@ -160,11 +138,8 @@ namespace AwsMock::Service {
             .containerPort=containerPort, .hostPort=std::to_string(hostPort)};
 
         std::string jsonBody = request.ToJson();
-        std::string header = Core::SystemUtils::SetHeader("POST", "/" + DOCKER_VERSION + "/containers/create?name=" + name, JSON_CONTENT_TYPE, jsonBody.size());
-        log_debug_stream(_logger) << "Header: " << Core::StringUtils::StripLineEndings(header) << std::endl;
-
-        std::string output = Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
-        log_debug_stream(_logger) << "Create container request send to docker daemon: " << Core::StringUtils::StripLineEndings(header) << std::endl;
+        std::string output = _curlUtils.SendRequest("POST", "/" + DOCKER_VERSION + "/containers/create?name=" + name, jsonBody);
+        log_debug_stream(_logger) << "Create container request send to docker daemon" << std::endl;
 
         Dto::Docker::CreateContainerResponse response = {.hostPort=hostPort};
         response.FromJson(output);
@@ -174,12 +149,10 @@ namespace AwsMock::Service {
 
     std::string DockerService::StartContainer(const std::string &id) {
 
-        std::string jsonBody = {};
-        std::string header = Core::SystemUtils::SetHeader("POST", "/" + DOCKER_VERSION + "/containers/" + id + "/start", JSON_CONTENT_TYPE, jsonBody.size());
-
+        std::string output = _curlUtils.SendRequest("POST", "/" + DOCKER_VERSION + "/containers/" + id + "/start");
         log_debug_stream(_logger) << "Sending start container request" << std::endl;
 
-        return Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
+        return output;
     }
 
     std::string DockerService::StartContainer(const Dto::Docker::Container &container) {
@@ -188,24 +161,15 @@ namespace AwsMock::Service {
 
     std::string DockerService::StopContainer(const Dto::Docker::Container &container) {
 
-        std::string jsonBody = {};
-        std::string header = Core::SystemUtils::SetHeader("POST", "/" + DOCKER_VERSION + "/containers/" + container.id + "/start", JSON_CONTENT_TYPE, jsonBody.size());
-
-        log_debug_stream(_logger) << "Sending stop container request, payload: " << jsonBody << std::endl;
-
-        std::string output = Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
+        std::string output = _curlUtils.SendRequest("POST", "/" + DOCKER_VERSION + "/containers/" + container.id + "/stop");
+        log_debug_stream(_logger) << "Sending stop container request" << std::endl;
         return output;
     }
 
     void DockerService::DeleteContainer(const Dto::Docker::Container &container) {
 
-        std::string jsonBody = {};
-        std::string
-            header = Core::SystemUtils::SetHeader("DELETE", "/" + DOCKER_VERSION + "/containers/" + container.id + "?force=true", JSON_CONTENT_TYPE, jsonBody.size());
-
+        std::string output = _curlUtils.SendRequest("DELETE", "/" + DOCKER_VERSION + "/containers/" + container.id + "?force=true");
         log_debug_stream(_logger) << "Sending delete container request" << std::endl;
-
-        Core::SystemUtils::SendMessageViaDomainSocket(DOCKER_SOCKET, header, jsonBody);
     }
 
     std::string DockerService::WriteDockerFile(const std::string &codeDir, const std::string &handler) {
