@@ -12,7 +12,7 @@ namespace AwsMock::Worker {
 
         Initialize();
 
-        _logger.debug() << "S3Worker initialized" << std::endl;
+        log_debug_stream(_logger) << "S3Worker initialized" << std::endl;
     }
 
     S3Worker::~S3Worker() {
@@ -24,7 +24,7 @@ namespace AwsMock::Worker {
 
         _dataDir = _configuration.getString("awsmock.data.dir") + Poco::Path::separator() + "s3";
         _watcherDir = _dataDir + Poco::Path::separator() + "watcher";
-        _logger.debug() << "Watching path: " << _watcherDir << std::endl;
+        log_debug_stream(_logger) << "Watching path: " << _watcherDir << std::endl;
 
         // Sleeping period
         _period = _configuration.getInt("awsmock.worker.s3.period", 10000);
@@ -38,13 +38,15 @@ namespace AwsMock::Worker {
         }
 
         // Create environment
-        _region = _configuration.getString("awsmock.region");
+        _region = _configuration.getString("awsmock.region", "eu-central_1");
+        _accountId = _configuration.getString("awsmock.account.id", "000000000000");
+        _clientId = _configuration.getString("awsmock.client.id", "00000000");
+        _user = _configuration.getString("awsmock.user", "none");
 
         // SQS service connection
         _s3ServiceHost = _configuration.getString("awsmock.service.s3.host", "localhost");
         _s3ServicePort = _configuration.getInt("awsmock.service.s3.port", 9501);
 
-        //_s3Service = std::make_unique<Service::S3Service>(_configuration);
         // Service database
         _serviceDatabase = std::make_unique<Database::ServiceDatabase>(_configuration);
 
@@ -52,8 +54,8 @@ namespace AwsMock::Worker {
         _watcher = new Core::DirectoryWatcher(_watcherDir);
         _watcher->itemAdded += Poco::delegate(this, &S3Worker::OnFileAdded);
         //_watcher->itemModified += Poco::delegate(this, &S3Worker::OnFileModified);
-        //_watcher->itemDeleted += Poco::delegate(this, &S3Worker::OnFileDeleted);
-        _logger.debug() << "Directory _watcher added, path: " << _dataDir << std::endl;
+        _watcher->itemDeleted += Poco::delegate(this, &S3Worker::OnFileDeleted);
+        log_debug_stream(_logger) << "Directory _watcher added, path: " << _watcherDir << std::endl;
     }
 
     void S3Worker::run() {
@@ -73,7 +75,7 @@ namespace AwsMock::Worker {
     }
 
     void S3Worker::OnFileAdded(const Core::DirectoryEvent &addedEvent) {
-        _logger.debug() << "Added path: " << addedEvent.item.path() << std::endl;
+        log_debug_stream(_logger) << "Added path: " << addedEvent.item.path() << std::endl;
 
         if (Core::DirUtils::IsDirectory(addedEvent.item.path())) {
             CreateBucket(addedEvent.item.path());
@@ -83,7 +85,7 @@ namespace AwsMock::Worker {
     }
 
     void S3Worker::OnFileModified(const Core::DirectoryEvent &modifiedEvent) {
-        _logger.debug() << "Changed path: " << modifiedEvent.item.path() << std::endl;
+        log_debug_stream(_logger) << "Changed path: " << modifiedEvent.item.path() << std::endl;
 
         if(Core::DirUtils::IsDirectory(modifiedEvent.item.path())) {
             return;
@@ -102,10 +104,11 @@ namespace AwsMock::Worker {
     }
 
     void S3Worker::OnFileDeleted(const Core::DirectoryEvent &deleteEvent) {
-        _logger.debug() << "Deleted path: " << deleteEvent.item.path() << std::endl;
+        log_debug_stream(_logger) << "Deleted path: " << deleteEvent.item.path() << std::endl;
 
+        std::cerr << deleteEvent.item.path() << std::endl;
         if (Core::DirUtils::IsDirectory(deleteEvent.item.path())) {
-            // TODO: Delete bucket
+            DeleteBucket(deleteEvent.item.path());
             return;
         }
         std::string bucketName, key;
@@ -153,6 +156,18 @@ namespace AwsMock::Worker {
         SendCreateBucketRequest(bucket, "application/octet-stream");
     }
 
+    void S3Worker::DeleteBucket(const std::string &dirPath) {
+
+        // Get bucket, key
+        std::string bucket, key;
+        GetBucketKeyFromFile(dirPath, bucket, key);
+
+        // Set parameter
+        std::string owner = Core::FileUtils::GetOwner(dirPath);
+
+        SendDeleteBucketRequest(bucket, "application/octet-stream");
+    }
+
     void S3Worker::CreateObject(const std::string &filePath) {
 
         // Get bucket, key
@@ -171,21 +186,19 @@ namespace AwsMock::Worker {
 
     void S3Worker::SendCreateBucketRequest(const std::string &bucket, const std::string &contentType) {
 
-        //"Credential=none/20230618/eu-central-1/s3/aws4_request, SignedHeaders=content-md5;content-type;host;x-amz-content-sha256;x-amz-date;x-amz-security-token, Signature=fe9766ea2c032ac7b17033a567f6b361192bddcf73f89d25c15019977c544e1c"
         Poco::URI uri("http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket);
         std::string path(uri.getPathAndQuery());
 
         // Get the body
         std::string body = std::string(
-            "<CreateBucketConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">\n<LocationConstraint>" + bucket
+            "<CreateBucketConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">\n<LocationConstraint>" + _region
                 + "</LocationConstraint>\n</CreateBucketConfiguration>");
 
         // Create HTTP request and set headers
         Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
         Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_PUT, path, Poco::Net::HTTPMessage::HTTP_1_1);
         request.add("Content-Type", contentType);
-        request.add("Authorization",
-                    "AWS4-HMAC-SHA256 Credential=none/20230618/eu-central-1/lambda/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840");
+        AddAuthorization(request);
         log_debug_stream(_logger) << "S3 create bucket message request created, bucket: " + bucket << std::endl;
 
         // Send request
@@ -200,9 +213,31 @@ namespace AwsMock::Worker {
         log_debug_stream(_logger) << "S3 create bucket message request send, status: " << response.getStatus() << std::endl;
     }
 
+    void S3Worker::SendDeleteBucketRequest(const std::string &bucket, const std::string &contentType) {
+
+        Poco::URI uri("http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket);
+        std::string path(uri.getPathAndQuery());
+
+        // Create HTTP request and set headers
+        Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
+        Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_DELETE, path, Poco::Net::HTTPMessage::HTTP_1_1);
+        request.add("Content-Type", contentType);
+        AddAuthorization(request);
+        log_debug_stream(_logger) << "S3 delete bucket message request created, bucket: " + bucket << std::endl;
+
+        // Send request
+        session.sendRequest(request);
+
+        // Get the response status
+        Poco::Net::HTTPResponse response;
+        if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
+            log_error_stream(_logger) << "HTTP error, status: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
+        }
+        log_debug_stream(_logger) << "S3 delete bucket message request send, status: " << response.getStatus() << std::endl;
+    }
+
     void S3Worker::SendPutObjectRequest(const std::string &bucket, const std::string &key, const std::string &md5Sum, const std::string &contentType, long fileSize) {
 
-        //"Credential=none/20230618/eu-central-1/s3/aws4_request, SignedHeaders=content-md5;content-type;host;x-amz-content-sha256;x-amz-date;x-amz-security-token, Signature=fe9766ea2c032ac7b17033a567f6b361192bddcf73f89d25c15019977c544e1c"
         Poco::URI uri("http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket + "/" + key);
         std::string path(uri.getPathAndQuery());
 
@@ -213,8 +248,7 @@ namespace AwsMock::Worker {
         request.add("Content-Type", contentType);
         request.add("Content-MD5", md5Sum);
         request.add("WriteFile", "false");
-        request.add("Authorization",
-                    "AWS4-HMAC-SHA256 Credential=none/20230618/eu-central-1/lambda/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840");
+        AddAuthorization(request);
         log_debug_stream(_logger) << "S3 put object message request created, bucket: " + bucket << " key: " << key << std::endl;
 
         // Send request
@@ -226,6 +260,13 @@ namespace AwsMock::Worker {
             log_error_stream(_logger) << "HTTP error, status: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
         }
         log_debug_stream(_logger) << "S3 put object message request send, status: " << response.getStatus() << std::endl;
+    }
+
+    void S3Worker::AddAuthorization(Poco::Net::HTTPRequest &request) {
+        request.add("Authorization",
+                    "AWS4-HMAC-SHA256 Credential=" + _user + "/" + _clientId + "/" + _region
+                        + "/s3/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840");
+
     }
 
 } // namespace AwsMock::Worker

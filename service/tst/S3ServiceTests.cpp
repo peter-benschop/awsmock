@@ -39,11 +39,10 @@ namespace AwsMock::Service {
       Core::Configuration _configuration = Core::Configuration("/tmp/aws-mock.properties");
       Database::S3Database _database = Database::S3Database(_configuration);
       S3Service _service = S3Service(_configuration);
-      //Poco::Data::Session _session = _snsDatabase.GetSession();
       std::string testFile;
     };
 
-    /*TEST_F(S3ServiceTest, BucketCreateTest) {
+    TEST_F(S3ServiceTest, BucketCreateTest) {
 
         // arrange
         Dto::S3::CreateBucketRequest request = Dto::S3::CreateBucketRequest(LOCATION_CONSTRAINT);
@@ -55,7 +54,7 @@ namespace AwsMock::Service {
         EXPECT_TRUE(response.location == "eu-central-1");
     }
 
-    TEST_F(S3ServiceTest, ObjectPutTest) {
+    /*TEST_F(S3ServiceTest, ObjectPutTest) {
 
         // arrange
         Dto::S3::CreateBucketRequest request = Dto::S3::CreateBucketRequest(LOCATION_CONSTRAINT);

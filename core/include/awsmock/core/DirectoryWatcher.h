@@ -78,9 +78,15 @@ namespace AwsMock::Core {
       /// Disables all event types.
     };
 
+    enum FileType
+    {
+      DW_FILE_TYPE = 0,
+      DW_DIR_TYPE = 1
+    };
+
     struct DirectoryEvent
     {
-      DirectoryEvent(const Poco::File& f, DirectoryEventType ev): item(f), event(ev) {}
+      DirectoryEvent(const Poco::File& f, DirectoryEventType ev, FileType ft): item(f), event(ev), type(ft) {}
 
       /**
        * The directory or file that has been changed.
@@ -92,6 +98,10 @@ namespace AwsMock::Core {
        */
       DirectoryEventType event;
 
+      /**
+       * The type of file
+       */
+      FileType type;
     };
 
     class DirectoryWatcher : public Poco::Runnable {
