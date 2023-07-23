@@ -14,16 +14,25 @@ public:
   // Initialise a test configuration.
   void SetUp() override {
       std::ofstream ofs("/tmp/aws-mock.properties");
+      // AWS configuration
       ofs << "awsmock.region=eu-central-1" << std::endl;
       ofs << "awsmock.rest.host=localhost" << std::endl;
       ofs << "awsmock.rest.port=4567" << std::endl;
       ofs << "awsmock.data.dir=/tmp/test/data" << std::endl;
-      ofs << "awsmock.db.dir=/tmp/test/data/db" << std::endl;
-      ofs << "awsmock.db.file=awsmock.db" << std::endl;
+      // Database configuration
+      ofs << "awsmock.mongodb.name=awsmock" << std::endl;
+      ofs << "awsmock.mongodb.host=192.168.178.34" << std::endl;
+      ofs << "awsmock.mongodb.port=27017" << std::endl;
+      ofs << "awsmock.mongodb.user=admin" << std::endl;
+      ofs << "awsmock.mongodb.password=admin" << std::endl;
+      // S3 configuration
+      ofs << "awsmock.service.s3.date.dir=/tmp/test/data/s3" << std::endl;
+      // Thread pool configuration
       ofs << "awsmock.threadpool.name=srv-worker" << std::endl;
       ofs << "awsmock.threadpool.min=8" << std::endl;
       ofs << "awsmock.threadpool.max=32" << std::endl;
       ofs << "awsmock.threadpool.idletime=60" << std::endl;
+      // Monitoring configuration
       ofs << "awsmock.monitoring.port=8081" << std::endl;
       ofs << "awsmock.monitoring.timeout=60000" << std::endl;
       ofs << "awsmock.log.level=debug" << std::endl;

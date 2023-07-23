@@ -33,6 +33,7 @@ namespace AwsMock::Service {
       }
 
       void TearDown() override {
+          _database.DeleteAllBuckets();
           Core::FileUtils::DeleteFile(testFile);
       }
 
@@ -48,7 +49,7 @@ namespace AwsMock::Service {
         Dto::S3::CreateBucketRequest request = Dto::S3::CreateBucketRequest(LOCATION_CONSTRAINT);
 
         // act
-        Dto::S3::CreateBucketResponse response = _service.CreateBucket(REGION, BUCKET, request);
+        Dto::S3::CreateBucketResponse response = _service.CreateBucket(BUCKET, OWNER, request);
 
         // assert
         EXPECT_TRUE(response.location == "eu-central-1");
