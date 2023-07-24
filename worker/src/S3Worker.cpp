@@ -29,6 +29,7 @@ namespace AwsMock::Worker {
 
         // Sleeping period
         _period = _configuration.getInt("awsmock.worker.s3.period", 10000);
+        log_debug_stream(_logger) << "Worker period: " << _period << std::endl;
 
         // Create S3 directories
         if (!Core::DirUtils::DirectoryExists(_dataDir)) {
@@ -47,6 +48,7 @@ namespace AwsMock::Worker {
         // S3 service connection
         _s3ServiceHost = _configuration.getString("awsmock.service.s3.host", "localhost");
         _s3ServicePort = _configuration.getInt("awsmock.service.s3.port", 9501);
+        log_debug_stream(_logger) << "S3 service endpoint: http://" << _s3ServiceHost << ":" << _s3ServicePort << std::endl;
 
         // Database connections
         _serviceDatabase = std::make_unique<Database::ServiceDatabase>(_configuration);
@@ -110,6 +112,7 @@ namespace AwsMock::Worker {
 
         _running = true;
         while (_running) {
+            _logger.debug() << "S3Worker processing started" << std::endl;
             Poco::Thread::sleep(_period);
         }
     }
