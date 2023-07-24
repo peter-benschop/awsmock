@@ -9,9 +9,6 @@ namespace AwsMock::Worker {
     [[maybe_unused]] LambdaWorker::LambdaWorker(const Core::Configuration &configuration)
         : _logger(Poco::Logger::get("LambdaWorker")), _configuration(configuration), _running(false) {
 
-        // Set console logger
-        Core::Logger::SetDefaultConsoleLogger("LambdaWorker");
-
         Initialize();
     }
 

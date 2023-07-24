@@ -7,11 +7,9 @@
 namespace AwsMock::Service {
 
     S3Server::S3Server(Core::Configuration &configuration, Core::MetricService &metricService)
-        : _logger(Poco::Logger::get("S3Server")), _configuration(configuration), _metricService(metricService) {
+        : _logger("S3Server"), _configuration(configuration), _metricService(metricService) {
 
-        // Set default console logger
-        Core::Logger::SetDefaultConsoleLogger("S3Server");
-
+        // Get configuration values
         _port = _configuration.getInt("awsmock.service.s3.port", S3_DEFAULT_PORT);
         _host = _configuration.getString("awsmock.service.s3.host", S3_DEFAULT_HOST);
         _maxQueueLength = _configuration.getInt("awsmock.service.s3.max.queue", 250);

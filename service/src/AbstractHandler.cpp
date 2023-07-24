@@ -3,9 +3,7 @@
 
 namespace AwsMock::Service {
 
-    AbstractHandler::AbstractHandler() : _logger(Poco::Logger::get("AbstractHandler")), _baseUrl(), _requestURI(), _requestHost() {
-        Core::Logger::SetDefaultConsoleLogger("AbstractHandler");
-    }
+    AbstractHandler::AbstractHandler() : _logger("AbstractHandler"), _baseUrl(), _requestURI(), _requestHost() {}
 
     AbstractHandler::~AbstractHandler() = default;
 
@@ -246,7 +244,7 @@ namespace AwsMock::Service {
 
         user = authorization.substr(posVec[1].offset, posVec[1].length);
         region = authorization.substr(posVec[2].offset, posVec[2].length);
-        log_debug_stream(_logger) << "Found user: " << user << " region: " << region << std::endl;
+        log_trace_stream(_logger) << "Found user: " << user << " region: " << region << std::endl;
     }
 
     std::string AbstractHandler::GetPayload(Poco::Net::HTTPServerRequest &request) {

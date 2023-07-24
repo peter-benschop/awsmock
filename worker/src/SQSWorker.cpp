@@ -8,9 +8,6 @@ namespace AwsMock::Worker {
 
     SQSWorker::SQSWorker(const Core::Configuration &configuration) : _logger(Poco::Logger::get("SQSWorker")), _configuration(configuration), _running(false) {
 
-        // Set console logger
-        Core::Logger::SetDefaultConsoleLogger("SQSWorker");
-
         Initialize();
     }
 
@@ -24,7 +21,7 @@ namespace AwsMock::Worker {
         _sqsDatabase = std::make_unique<Database::SQSDatabase>(_configuration);
         _serviceDatabase = std::make_unique<Database::ServiceDatabase>(_configuration);
 
-        _logger.debug() << "SQSWorker initialized" << std::endl;
+        log_debug_stream(_logger) << "SQSWorker initialized" << std::endl;
     }
 
     void SQSWorker::run() {
@@ -36,7 +33,7 @@ namespace AwsMock::Worker {
 
         _running = true;
         while (_running) {
-            _logger.debug() << "SQSWorker processing started" << std::endl;
+            log_debug_stream(_logger) << "SQSWorker processing started" << std::endl;
             ResetMessages();
             Poco::Thread::sleep(_period);
         }
@@ -45,7 +42,7 @@ namespace AwsMock::Worker {
     void SQSWorker::ResetMessages() {
 
         Database::Entity::SQS::QueueList queueList = _sqsDatabase->ListQueues(_region);
-        _logger.trace() << "Working on queue list, count" << queueList.size() << std::endl;
+        log_trace_stream(_logger) << "Working on queue list, count" << queueList.size() << std::endl;
 
         for (auto &queue : queueList) {
 
@@ -63,7 +60,7 @@ namespace AwsMock::Worker {
             }
 
             _sqsDatabase->UpdateQueue(queue);
-            _logger.trace() << "Queue updated, name" << queue.name << std::endl;
+            log_trace_stream(_logger) << "Queue updated, name" << queue.name << std::endl;
         }
     }
 } // namespace AwsMock::Worker

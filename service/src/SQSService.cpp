@@ -6,14 +6,11 @@
 
 namespace AwsMock::Service {
 
-    SQSService::SQSService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("SQSService")), _configuration(configuration) {
+    SQSService::SQSService(const Core::Configuration &configuration) : _logger("SQSService"), _configuration(configuration) {
         Initialize();
     }
 
     void SQSService::Initialize() {
-
-        // Set console logger
-        Core::Logger::SetDefaultConsoleLogger("SQSService");
 
         // Initialize environment
         _database = std::make_unique<Database::SQSDatabase>(_configuration);

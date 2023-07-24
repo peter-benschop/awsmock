@@ -5,10 +5,16 @@
 #ifndef AWSMOCK_CORE_LOGSTREAM_H
 #define AWSMOCK_CORE_LOGSTREAM_H
 
-#include "Poco/Foundation.h"
-#include "Poco/Logger.h"
-#include "Poco/UnbufferedStreamBuf.h"
+// C++ standard includes
 #include <istream>
+
+// Poco includes
+#include <Poco/Foundation.h>
+#include <Poco/Logger.h>
+#include <Poco/UnbufferedStreamBuf.h>
+
+// AwsMock includes
+#include <awsmock/core/Logger.h>
 
 namespace AwsMock::Core {
 
@@ -25,13 +31,13 @@ namespace AwsMock::Core {
       LogStreamBuf(Poco::Logger &logger, Poco::Message::Priority priority, std::size_t bufferCapacity = 0);
       /// Creates the LogStream.
 
-      ~LogStreamBuf();
+      ~LogStreamBuf() override;
       /// Destroys the LogStream.
 
       void setPriority(Poco::Message::Priority priority);
       /// Sets the priority for log messages.
 
-      Poco::Message::Priority getPriority() const;
+      [[nodiscard]] Poco::Message::Priority getPriority() const;
       /// Returns the priority for log messages.
 
       void setFile(const char* file);
@@ -40,17 +46,17 @@ namespace AwsMock::Core {
       void setLine(int line);
       /// Sets the line for log messages.
 
-      Poco::Logger &logger() const;
+      [[nodiscard]] Poco::Logger &logger() const;
       /// Returns a reference to the Logger.
 
-      std::size_t capacity() const;
+      [[nodiscard]] std::size_t capacity() const;
       /// Returns the internal message buffer capacity.
 
       void reserve(std::size_t capacity);
       /// Sets the capacity of the internal message buffer to the given size.
 
     private:
-      int writeToDevice(char c);
+      int writeToDevice(char c) override;
 
     private:
       Poco::Logger &_logger;
@@ -68,7 +74,7 @@ namespace AwsMock::Core {
     {
     public:
       LogIOS(Poco::Logger &logger, Poco::Message::Priority priority, std::size_t bufferCapacity = 0);
-      ~LogIOS();
+      ~LogIOS() override;
       LogStreamBuf *rdbuf();
 
     protected:
@@ -92,14 +98,14 @@ namespace AwsMock::Core {
     public:
       static const std::size_t DEFAULT_BUFFER_CAPACITY = 255;
 
-      LogStream(Poco::Logger &logger, Poco::Message::Priority priority = Poco::Message::PRIO_INFORMATION, std::size_t bufferCapacity = DEFAULT_BUFFER_CAPACITY);
+      explicit LogStream(Poco::Logger &logger, Poco::Message::Priority priority = Poco::Message::PRIO_INFORMATION, std::size_t bufferCapacity = DEFAULT_BUFFER_CAPACITY);
       /// Creates the LogStream, using the given logger and priority.
 
-      LogStream(const std::string &loggerName, Poco::Message::Priority priority = Poco::Message::PRIO_INFORMATION, std::size_t bufferCapacity = DEFAULT_BUFFER_CAPACITY);
+      explicit LogStream(const std::string &loggerName, Poco::Message::Priority priority = Poco::Message::PRIO_INFORMATION, std::size_t bufferCapacity = DEFAULT_BUFFER_CAPACITY);
       /// Creates the LogStream, using the logger identified
       /// by loggerName, and sets the priority.
 
-      ~LogStream();
+      ~LogStream() override;
       /// Destroys the LogStream.
 
       LogStream &level(const std::string &level);

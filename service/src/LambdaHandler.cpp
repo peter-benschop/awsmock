@@ -4,8 +4,7 @@
 namespace AwsMock::Service {
 
     LambdaHandler::LambdaHandler(Core::Configuration &configuration, Core::MetricService &metricService)
-        : AbstractHandler(), _logger(Poco::Logger::get("LambdaHandler")), _configuration(configuration), _metricService(metricService), _lambdaService(configuration) {
-        Core::Logger::SetDefaultConsoleLogger("LambdaHandler");
+        : AbstractHandler(), _logger("LambdaServiceHandler"), _configuration(configuration), _metricService(metricService), _lambdaService(configuration) {
     }
 
     void LambdaHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, [[maybe_unused]]const std::string &user) {

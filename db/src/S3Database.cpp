@@ -17,9 +17,6 @@ namespace AwsMock::Database {
 
     S3Database::S3Database(const Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("S3Database")) {
 
-        // Set default console logger
-        Core::Logger::SetDefaultConsoleLogger("S3Database");
-
         // Get collections
         _bucketCollection = GetConnection()["s3_bucket"];
         _objectCollection = GetConnection()["s3_object"];
@@ -209,13 +206,20 @@ namespace AwsMock::Database {
 
     Entity::S3::Object S3Database::GetObject(const std::string &region, const std::string &bucket, const std::string &key) {
 
-        mongocxx::stdx::optional<bsoncxx::document::value>
-            mResult = _objectCollection.find_one(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key)));
-        Entity::S3::Object result;
-        result.FromDocument(mResult);
+        try {
+            mongocxx::stdx::optional<bsoncxx::document::value>
+                mResult = _objectCollection.find_one(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key)));
+            if (mResult != bsoncxx::stdx::nullopt) {
+                Entity::S3::Object result;
+                result.FromDocument(mResult);
 
-        log_trace_stream(_logger) << "Got object: " << result.ToString() << std::endl;
-        return result;
+                log_trace_stream(_logger) << "Got object: " << result.ToString() << std::endl;
+                return result;
+            }
+        } catch (mongocxx::exception::system_error &e) {
+            log_error_stream(_logger) << "Get object failed, error: " << e.what() << std::endl;
+        }
+        return {};
     }
 
     long S3Database::ObjectCount(const Entity::S3::Bucket &bucket) {

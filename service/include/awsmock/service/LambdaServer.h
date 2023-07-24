@@ -11,7 +11,6 @@
 #include "Poco/Net/HTTPServer.h"
 
 // AwsMock includes
-#include <awsmock/core/Logger.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/MetricService.h>

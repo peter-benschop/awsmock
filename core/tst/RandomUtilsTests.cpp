@@ -32,7 +32,7 @@ namespace AwsMock::Core {
         std::vector<int> result;
         result.reserve(100);
         for (int i = 0; i < 100; i++) {
-            result.push_back(RandomUtils::NextInt(min, max));
+            result.emplace_back(RandomUtils::NextInt(min, max));
         }
 
         // assert
@@ -67,7 +67,7 @@ namespace AwsMock::Core {
         std::vector<double> result;
         result.reserve(100);
         for (int i = 0; i < 100; i++) {
-            result.push_back(RandomUtils::NextDouble(min, max));
+            result.emplace_back(RandomUtils::NextDouble(min, max));
         }
 
         // assert

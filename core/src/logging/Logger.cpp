@@ -14,6 +14,7 @@ namespace AwsMock::Core {
 
     Logger::Logger(const std::string &profile) {
         SetProfile(profile);
+        SetDefaultConsoleLogger();
     }
 
     void Logger::SetDefaultConsoleLogger() {
