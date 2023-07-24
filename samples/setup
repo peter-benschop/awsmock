@@ -1,68 +1,136 @@
 #!/bin/bash
 
 #
+# SQS Queues functions
+#
+function create_redrive_policy() {
+  echo '{"RedrivePolicy": "{\"deadLetterTargetArn\":\"arn:aws:sqs:eu-central-1:000000000000:'$1-dlqueue'\",\"maxReceiveCount\":\"3\"}", "MessageRetentionPeriod": "259200", "VisibilityTimeout": "90"}' > /tmp/$1-attributes.json
+}
+
+function create_attributes() {
+    create_redrive_policy $1
+    awsmock sqs set-queue-attributes --queue-url http://localhost:4567/000000000000/$1-queue --attributes file:///tmp/$1-attributes.json
+}
+
+function create_queue_with_dead_letter_queue() {
+  awsmock sqs create-queue --queue-name=$1-queue
+  awsmock sqs create-queue --queue-name=$1-dlqueue
+
+  create_attributes $1
+}
+
+#
+# SNS function
+#
+function create_sns_topic() {
+  awsmock sns create-topic --name $1
+}
+
+function create_sns_subscription() {
+  awsmock sns subscribe --topic-arn arn:aws:sns:eu-central-1:000000000000:$1-topic \
+    --protocol sqs --notification-endpoint arn:aws:sqs:eu-central-1:000000000000:$1-queue
+}
+
+#
+# S3 functions
+#
+function create_s3_bucket() {
+  awsmock s3 mb s3://$1
+}
+
+function create_s3_object() {
+  awsmock s3 cp $1 s3://$2/$3
+}
+
+#
+# Lambda function
+#
+function create_environment() {
+  echo '{"Variables": {"JAVA_TOOL_OPTIONS": "-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localhost"}}' > /tmp/$1-env.json
+}
+
+function create_lambda_function () {
+  create_environment $1
+
+  awsmock lambda create-function \
+  --function-name $1 \
+  --runtime $2 \
+  --timeout 120 \
+  --memory-size 512 \
+  --environment file:///tmp/$1-env.json \
+  --handler org.springframework.cloud.function.adapter.aws.FunctionInvoker \
+  --region eu-central-1 \
+  --zip-file "fileb:///tmp/awsmock/data/lambda/$1-aws.jar" \
+  --role arn:aws:iam::000000000000:role/lambda-role
+}
+
+#
 # Create S3 buckets
 #
-awsmock s3 mb s3://file-delivery1
-awsmock s3 mb s3://file-delivery2
-awsmock s3 mb s3://file-delivery3
+#create_s3_bucket file-delivery
+#create_s3_bucket json-parsing-results
+#create_s3_bucket onix3-produktmeldungen
+#create_s3_bucket transfer-server
+#create_s3_bucket transformed-images
+#create_s3_bucket inventory-reports
+#create_s3_bucket onix3-tmp-parsing-input
+#create_s3_bucket onix3-tmp-anreicherungs-input
+#create_s3_bucket katalogdaten-export-bucket
+#create_s3_bucket vlb-preisreferenz-parsing-input
+#create_s3_bucket vlb-preisreferenz-parsing-result
 
 #
 # Create SQS Queues
 #
-awsmock sqs create-queue --queue-name=file-delivery1-queue
-awsmock sqs create-queue --queue-name=file-delivery1-dlqueue
-awsmock sqs create-queue --queue-name=file-delivery2-queue
-awsmock sqs create-queue --queue-name=file-delivery2-dlqueue
-awsmock sqs create-queue --queue-name=file-delivery3-queue
-awsmock sqs create-queue --queue-name=file-delivery3-dlqueue
-awsmock sqs create-queue --queue-name=file-logging-queue
-
-#
-# Setup SQS queue attributes (DLQ definition)
-#
-awsmock sqs set-queue-attributes --queue-url http://localhost:4567/000000000000/file-delivery1-queue --attributes file://./sqs/file-delivery1-queue-attributes.json
-awsmock sqs set-queue-attributes --queue-url http://localhost:4567/000000000000/file-delivery2-queue --attributes file://./sqs/file-delivery2-queue-attributes.json
-awsmock sqs set-queue-attributes --queue-url http://localhost:4567/000000000000/file-delivery3-queue --attributes file://./sqs/file-delivery3-queue-attributes.json
-
-#
-# Setup S3 bucket notification events
-#
-awsmock s3api put-bucket-notification-configuration --bucket file-delivery1 --notification-configuration file://./s3/file-delivery1-hook.json
-awsmock s3api put-bucket-notification-configuration --bucket file-delivery2 --notification-configuration file://./s3/file-delivery2-hook.json
-awsmock s3api put-bucket-notification-configuration --bucket file-delivery3 --notification-configuration file://./s3/file-delivery3-hook.json
-
-#
-# Put some objects
-#
-awsmock s3 cp ./images/0036089631545_ANNO_OBILD.jpg s3://file-delivery1
-awsmock s3 cp ./images/9781406379990_ANNO_OBILD.jpg s3://file-delivery1
-awsmock s3 cp ./images/0036089631545_ANNO_OBILD.jpg s3://file-delivery2/folder1/0036089631545_ANNO_OBILD.jpg
-awsmock s3 cp ./images/9781406379990_ANNO_OBILD.jpg s3://file-delivery2/folder1/9781406379990_ANNO_OBILD.jpg
-awsmock s3 cp ./images/0036089631545_ANNO_OBILD.jpg s3://file-delivery3/folder1/folder2/0036089631545_ANNO_OBILD.jpg
-awsmock s3 cp ./images/9781406379990_ANNO_OBILD.jpg s3://file-delivery3/folder1/folder2/9781406379990_ANNO_OBILD.jpg
+#create_queue_with_dead_letter_queue file-logging
+#create_queue_with_dead_letter_queue protokollierung
+#create_queue_with_dead_letter_queue ftp-file-distribution-vlb-preisreferenz
+#create_queue_with_dead_letter_queue ftp-file-distribution-image
+#create_queue_with_dead_letter_queue ftp-file-distribution-onix
+#create_queue_with_dead_letter_queue ftp-file-distribution-inventory-feed
+#create_queue_with_dead_letter_queue image-result
+#create_queue_with_dead_letter_queue vlb-preisreferenz-splitting-result
+#create_queue_with_dead_letter_queue parsing-result
+#create_queue_with_dead_letter_queue artikel-transformations-service-artikel-ausgang
+#create_queue_with_dead_letter_queue daten-lieferanten-service-daten-eingang
+#create_queue_with_dead_letter_queue daten-datenlieferanten-notification
+#create_queue_with_dead_letter_queue textannotation-result
+#create_queue_with_dead_letter_queue bilderlink
+#create_queue_with_dead_letter_queue basisdaten
+#create_queue_with_dead_letter_queue produktmeldung-parsing
+#create_queue_with_dead_letter_queue image-delete-notification
+#create_queue_with_dead_letter_queue onix3-datenlieferant-updates
+#create_queue_with_dead_letter_queue protokollierung-datenlieferant-updates
+#create_queue_with_dead_letter_queue katalogdaten
+#create_queue_with_dead_letter_queue onix3-tmp-parsing-input-event
+#create_queue_with_dead_letter_queue onix3-tmp-anreicherungs-input-event
+#create_queue_with_dead_letter_queue inventory-feed-parsing-result
 
 #
 # Create lambda function
 #
-awsmock lambda create-function \
---function-name ftp-file-copy \
---runtime java17 \
---environment file://./lambda/env.json \
---handler org.springframework.cloud.function.adapter.aws.FunctionInvoker \
---region eu-central-1 \
---zip-file fileb:///tmp/awsmock/data/lambda/file-copy-service-1.14.0-SNAPSHOT-aws.jar \
---role arn:aws:iam::000000000000:role/ignoreme
+create_lambda_function file-copy-service-1.14.0-SNAPSHOT java17
+create_lambda_function file-distribution-service-1.22.1-SNAPSHOT java17
 
 #
 # Create SNS topic
 #
-awsmock sns create-topic --name file-logging-topic
+#create_sns_topic file-logging-topic
+
+#
+# Setup S3 bucket notification events
+#
+#create_bucket_notification file-delivery1 --notification-configuration file://./s3/file-delivery1-hook.json
+#awsmock s3api put-bucket-notification-configuration --bucket file-delivery2 --notification-configuration file://./s3/file-delivery2-hook.json
+#awsmock s3api put-bucket-notification-configuration --bucket file-delivery3 --notification-configuration file://./s3/file-delivery3-hook.json
 
 #
 # SNS -> SQS subscription
 #
-awsmock sns subscribe \
---topic-arn arn:aws:sns:eu-central-1:000000000000:file-logging-topic \
---protocol sqs \
---notification-endpoint arn:aws:sqs:eu-central-1:000000000000:file-logging-queue
+#create_sns_subscription file-logging
+
+#
+# Put some objects
+#
+#create_s3_object ./images/0036089631545_ANNO_OBILD.jpg file-delivery ftpuser1/0036089631545_ANNO_OBILD.jpg
+#create_s3_object ./images/9781406379990_ANNO_OBILD.jpg file-delivery ftpuser1/9781406379990_ANNO_OBILD.jpg

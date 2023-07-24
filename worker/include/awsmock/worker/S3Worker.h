@@ -273,7 +273,7 @@ namespace AwsMock::Worker {
       /**
        * Sleeping period in ms
        */
-      bool _period;
+      int _period;
 
       /**
        * S3 service host

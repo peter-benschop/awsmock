@@ -22,6 +22,7 @@ namespace AwsMock::Worker {
 
         // Sleeping period
         _period = _configuration.getInt("awsmock.worker.lambda.period", 10000);
+        log_debug_stream(_logger) << "Lambda worker period: " << _period << std::endl;
 
         // Create lambda directory
         if (!Core::DirUtils::DirectoryExists(_dataDir)) {
@@ -33,7 +34,7 @@ namespace AwsMock::Worker {
         _s3Service = std::make_unique<Service::S3Service>(_configuration);
         _lambdaDatabase = std::make_unique<Database::LambdaDatabase>(_configuration);
 
-        _logger.debug() << "LambdaWorker initialized" << std::endl;
+        log_debug_stream(_logger) << "LambdaWorker initialized" << std::endl;
     }
 
     void LambdaWorker::run() {
@@ -45,6 +46,7 @@ namespace AwsMock::Worker {
 
         _running = true;
         while (_running) {
+            log_debug_stream(_logger) << "LambdaWorker processing started" << std::endl;
             Poco::Thread::sleep(_period);
         }
     }

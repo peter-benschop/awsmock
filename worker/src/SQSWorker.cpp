@@ -36,6 +36,7 @@ namespace AwsMock::Worker {
 
         _running = true;
         while (_running) {
+            _logger.debug() << "SQSWorker processing started" << std::endl;
             ResetMessages();
             Poco::Thread::sleep(_period);
         }
