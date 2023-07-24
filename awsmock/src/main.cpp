@@ -60,7 +60,6 @@ namespace AwsMock {
        */
       [[maybe_unused]] void initialize(Application &self) override {
 
-          InitializeLogging();
           InitializeMonitoring();
           InitializeErrorHandler();
           InitializeIndexes();
@@ -128,14 +127,6 @@ namespace AwsMock {
               _logger.level(value);
               Core::Logger::SetLogLevel(value);
           }
-      }
-
-      /**
-       * Initialize the logging system
-       */
-      static void InitializeLogging() {
-
-          Core::Logger::SetDefaultConsoleLogger("root");
       }
 
       /**
@@ -218,7 +209,7 @@ namespace AwsMock {
       /**
        * Logger
        */
-      Core::LogStream _logger = Poco::Logger::get("root");
+      Core::LogStream _logger = Core::LogStream(Poco::Logger::get("root"));
 
       /**
        * Application configuration

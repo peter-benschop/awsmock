@@ -7,9 +7,7 @@
 namespace AwsMock::Service {
 
     SNSServer::SNSServer(Core::Configuration &configuration, Core::MetricService &metricService)
-        : _logger(Poco::Logger::get("SNSServer")), _configuration(configuration), _metricService(metricService) {
-
-        Core::Logger::SetDefaultConsoleLogger("SNSServer");
+        : _logger("SNSServer"), _configuration(configuration), _metricService(metricService) {
 
         _port = _configuration.getInt("awsmock.service.sns.port", SNS_DEFAULT_PORT);
         _host = _configuration.getString("awsmock.service.sns.host", SNS_DEFAULT_HOST);

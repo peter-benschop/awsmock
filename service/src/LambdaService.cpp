@@ -6,14 +6,11 @@
 
 namespace AwsMock::Service {
 
-    LambdaService::LambdaService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("LambdaService")), _configuration(configuration) {
+    LambdaService::LambdaService(const Core::Configuration &configuration) : _logger("LambdaService"), _configuration(configuration) {
         Initialize();
     }
 
     void LambdaService::Initialize() {
-
-        // Set console logger
-        Core::Logger::SetDefaultConsoleLogger("LambdaService");
 
         // Initialize environment
         _region = _configuration.getString("awsmock.region", "eu-central-1");

@@ -8,11 +8,8 @@
 namespace AwsMock::Worker {
 
     S3Worker::S3Worker(const Core::Configuration &configuration) : _logger(Poco::Logger::get("S3Worker")), _configuration(configuration), _running(false) {
-        Core::Logger::SetDefaultConsoleLogger("S3Worker");
 
         Initialize();
-
-        log_debug_stream(_logger) << "S3Worker initialized" << std::endl;
     }
 
     S3Worker::~S3Worker() {
@@ -60,6 +57,8 @@ namespace AwsMock::Worker {
         //_watcher->itemModified += Poco::delegate(this, &S3Worker::OnFileModified);
         _watcher->itemDeleted += Poco::delegate(this, &S3Worker::OnFileDeleted);
         log_debug_stream(_logger) << "Directory _watcher added, path: " << _watcherDir << std::endl;
+
+        log_debug_stream(_logger) << "S3Worker initialized" << std::endl;
     }
 
     void S3Worker::Synchronize() {

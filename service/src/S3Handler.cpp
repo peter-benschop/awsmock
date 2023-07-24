@@ -4,10 +4,7 @@
 namespace AwsMock::Service {
 
     S3Handler::S3Handler(Core::Configuration &configuration, Core::MetricService &metricService)
-        : AbstractHandler(), _logger(Poco::Logger::get("S3ServiceHandler")), _configuration(configuration), _metricService(metricService), _s3Service(configuration) {
-
-        // Set console logger
-        Core::Logger::SetDefaultConsoleLogger("S3ServiceHandler");
+        : AbstractHandler(), _logger("S3ServiceHandler"), _configuration(configuration), _metricService(metricService), _s3Service(configuration) {
     }
 
     void S3Handler::handleGet(Poco::Net::HTTPServerRequest &request,
@@ -224,7 +221,7 @@ namespace AwsMock::Service {
 
     void S3Handler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_HEAD_TIMER);
-        log_debug_stream(_logger) << "S3 HEAD request, address: " << request.clientAddress().toString() << std::endl << std::endl;
+        log_trace_stream(_logger) << "S3 HEAD request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
         try {
 

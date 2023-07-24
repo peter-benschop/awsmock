@@ -6,14 +6,11 @@
 
 namespace AwsMock::Service {
 
-    SNSService::SNSService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("SNSService")), _configuration(configuration) {
+    SNSService::SNSService(const Core::Configuration &configuration) : _logger("SNSService"), _configuration(configuration) {
         Initialize();
     }
 
     void SNSService::Initialize() {
-
-        // Set console logger
-        Core::Logger::SetDefaultConsoleLogger("SNSService");
 
         // Initialize environment
         _snsDatabase = std::make_unique<Database::SNSDatabase>(_configuration);

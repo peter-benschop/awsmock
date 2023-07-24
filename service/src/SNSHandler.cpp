@@ -4,10 +4,7 @@
 namespace AwsMock::Service {
 
     SNSHandler::SNSHandler(Core::Configuration &configuration, Core::MetricService &metricService)
-        : AbstractHandler(), _logger(Poco::Logger::get("SNSServiceHandler")), _configuration(configuration), _metricService(metricService), _snsService(configuration) {
-
-        // Set default console logger
-        Core::Logger::SetDefaultConsoleLogger("SNSServiceHandler");
+        : AbstractHandler(), _logger("SNSServiceHandler"), _configuration(configuration), _metricService(metricService), _snsService(configuration) {
     }
 
     void SNSHandler::handleGet(Poco::Net::HTTPServerRequest &request,

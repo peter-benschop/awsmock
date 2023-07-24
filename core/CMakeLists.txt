@@ -5,7 +5,7 @@ set(LIBRARY_STATIC awsmockcore_static)
 set(UTILS_SOURCES src/utils/StringUtils.cpp src/utils/FileUtils.cpp src/utils/DirUtils.cpp src/utils/DateTimeUtils.cpp
         src/utils/CryptoUtils.cpp src/utils/DirectoryWatcher.cpp src/utils/AwsUtils.cpp src/utils/SystemUtils.cpp
         src/utils/CurlUtils.cpp src/logging/LibriJsonFormatter.cpp src/utils/TarUtils.cpp src/utils/RandomUtils.cpp
-        src/utils/LogStream.cpp)
+        src/logging/LogStream.cpp)
 
 set(EXCEPTION_SOURCES src/exception/CoreException.cpp src/exception/DatabaseException.cpp
         src/exception/ServiceException.cpp src/exception/ResourceNotFoundException.cpp)

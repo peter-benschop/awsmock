@@ -4,10 +4,7 @@
 namespace AwsMock::Service {
 
     SQSHandler::SQSHandler(Core::Configuration &configuration, Core::MetricService &metricService)
-        : AbstractHandler(), _logger(Poco::Logger::get("SQSServiceHandler")), _configuration(configuration), _metricService(metricService), _sqsService(configuration) {
-
-        // Set console logger
-        Core::Logger::SetDefaultConsoleLogger("SQSServiceHandler");
+        : AbstractHandler(), _logger("SQSServiceHandler"), _configuration(configuration), _metricService(metricService), _sqsService(configuration) {
 
         _accountId = Core::AwsUtils::GetDefaultAccountId();
     }
