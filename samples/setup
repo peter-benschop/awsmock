@@ -50,79 +50,84 @@ function create_environment() {
 }
 
 function create_lambda_function () {
-  create_environment $1
 
+  function=$1
+  runtime=$2
+  zipfile=$3
+
+  create_environment $function
   awsmock lambda create-function \
-  --function-name $1 \
-  --runtime $2 \
+  --function-name $function \
+  --runtime $runtime \
   --timeout 120 \
   --memory-size 512 \
   --environment file:///tmp/$1-env.json \
   --handler org.springframework.cloud.function.adapter.aws.FunctionInvoker \
   --region eu-central-1 \
-  --zip-file "fileb:///tmp/awsmock/data/lambda/$1-aws.jar" \
+  --zip-file "fileb:///tmp/awsmock/data/lambda/$zipfile" \
   --role arn:aws:iam::000000000000:role/lambda-role
 }
 
 #
 # Create S3 buckets
 #
-#create_s3_bucket file-delivery
-#create_s3_bucket json-parsing-results
-#create_s3_bucket onix3-produktmeldungen
-#create_s3_bucket transfer-server
-#create_s3_bucket transformed-images
-#create_s3_bucket inventory-reports
-#create_s3_bucket onix3-tmp-parsing-input
-#create_s3_bucket onix3-tmp-anreicherungs-input
-#create_s3_bucket katalogdaten-export-bucket
-#create_s3_bucket vlb-preisreferenz-parsing-input
-#create_s3_bucket vlb-preisreferenz-parsing-result
+create_s3_bucket file-delivery
+create_s3_bucket json-parsing-results
+create_s3_bucket onix3-produktmeldungen
+create_s3_bucket transfer-server
+create_s3_bucket transformed-images
+create_s3_bucket inventory-reports
+create_s3_bucket onix3-tmp-parsing-input
+create_s3_bucket onix3-tmp-anreicherungs-input
+create_s3_bucket katalogdaten-export-bucket
+create_s3_bucket vlb-preisreferenz-parsing-input
+create_s3_bucket vlb-preisreferenz-parsing-result
 
 #
 # Create SQS Queues
 #
-#create_queue_with_dead_letter_queue file-logging
-#create_queue_with_dead_letter_queue protokollierung
-#create_queue_with_dead_letter_queue ftp-file-distribution-vlb-preisreferenz
-#create_queue_with_dead_letter_queue ftp-file-distribution-image
-#create_queue_with_dead_letter_queue ftp-file-distribution-onix
-#create_queue_with_dead_letter_queue ftp-file-distribution-inventory-feed
-#create_queue_with_dead_letter_queue image-result
-#create_queue_with_dead_letter_queue vlb-preisreferenz-splitting-result
-#create_queue_with_dead_letter_queue parsing-result
-#create_queue_with_dead_letter_queue artikel-transformations-service-artikel-ausgang
-#create_queue_with_dead_letter_queue daten-lieferanten-service-daten-eingang
-#create_queue_with_dead_letter_queue daten-datenlieferanten-notification
-#create_queue_with_dead_letter_queue textannotation-result
-#create_queue_with_dead_letter_queue bilderlink
-#create_queue_with_dead_letter_queue basisdaten
-#create_queue_with_dead_letter_queue produktmeldung-parsing
-#create_queue_with_dead_letter_queue image-delete-notification
-#create_queue_with_dead_letter_queue onix3-datenlieferant-updates
-#create_queue_with_dead_letter_queue protokollierung-datenlieferant-updates
-#create_queue_with_dead_letter_queue katalogdaten
-#create_queue_with_dead_letter_queue onix3-tmp-parsing-input-event
-#create_queue_with_dead_letter_queue onix3-tmp-anreicherungs-input-event
-#create_queue_with_dead_letter_queue inventory-feed-parsing-result
+create_queue_with_dead_letter_queue file-logging
+create_queue_with_dead_letter_queue protokollierung
+create_queue_with_dead_letter_queue ftp-file-distribution-vlb-preisreferenz
+create_queue_with_dead_letter_queue ftp-file-distribution-image
+create_queue_with_dead_letter_queue ftp-file-distribution-onix
+create_queue_with_dead_letter_queue ftp-file-distribution-inventory-feed
+create_queue_with_dead_letter_queue image-result
+create_queue_with_dead_letter_queue vlb-preisreferenz-splitting-result
+create_queue_with_dead_letter_queue parsing-result
+create_queue_with_dead_letter_queue artikel-transformations-service-artikel-ausgang
+create_queue_with_dead_letter_queue daten-lieferanten-service-daten-eingang
+create_queue_with_dead_letter_queue daten-datenlieferanten-notification
+create_queue_with_dead_letter_queue textannotation-result
+create_queue_with_dead_letter_queue bilderlink
+create_queue_with_dead_letter_queue basisdaten
+create_queue_with_dead_letter_queue produktmeldung-parsing
+create_queue_with_dead_letter_queue image-delete-notification
+create_queue_with_dead_letter_queue onix3-datenlieferant-updates
+create_queue_with_dead_letter_queue protokollierung-datenlieferant-updates
+create_queue_with_dead_letter_queue katalogdaten
+create_queue_with_dead_letter_queue onix3-tmp-parsing-input-event
+create_queue_with_dead_letter_queue onix3-tmp-anreicherungs-input-event
+create_queue_with_dead_letter_queue inventory-feed-parsing-result
 
 #
 # Create lambda function
 #
-create_lambda_function file-copy-service-1.14.0-SNAPSHOT java17
-create_lambda_function file-distribution-service-1.22.1-SNAPSHOT java17
+create_lambda_function file-copy-service-1.14.0-SNAPSHOT java17 file-copy-service-1.14.0-SNAPSHOT-aws.jar
+create_lambda_function file-distribution-service-1.22.1-SNAPSHOT java17 file-distribution-service-1.22.1-SNAPSHOT-aws.jar
+create_lambda_function image-transformation-service provided.al2 image-transformation-service.zip
 
 #
 # Create SNS topic
 #
-#create_sns_topic file-logging-topic
+create_sns_topic file-logging-topic
 
 #
 # Setup S3 bucket notification events
 #
-#create_bucket_notification file-delivery1 --notification-configuration file://./s3/file-delivery1-hook.json
-#awsmock s3api put-bucket-notification-configuration --bucket file-delivery2 --notification-configuration file://./s3/file-delivery2-hook.json
-#awsmock s3api put-bucket-notification-configuration --bucket file-delivery3 --notification-configuration file://./s3/file-delivery3-hook.json
+create_bucket_notification file-delivery1 --notification-configuration file://./s3/file-delivery1-hook.json
+awsmock s3api put-bucket-notification-configuration --bucket file-delivery2 --notification-configuration file://./s3/file-delivery2-hook.json
+awsmock s3api put-bucket-notification-configuration --bucket file-delivery3 --notification-configuration file://./s3/file-delivery3-hook.json
 
 #
 # SNS -> SQS subscription

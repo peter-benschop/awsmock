@@ -1,9 +1,0 @@
-{
-  "QueueConfigurations": [
-    {
-      "Id": "1234567890125",
-      "QueueArn": "arn:aws:sqs:eu-central-1:000000000000:file-delivery3-queue",
-      "Events": ["s3:ObjectCreated:*"]
-    }
-  ]
-}
