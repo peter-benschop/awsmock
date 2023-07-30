@@ -30,7 +30,7 @@ namespace AwsMock::Core {
 
         // act
         std::vector<int> result;
-        result.reserve(200);
+        //result.reserve(200);
         for (int i = 0; i < 100; i++) {
             result.emplace_back(RandomUtils::NextInt(min, max));
         }
@@ -39,6 +39,7 @@ namespace AwsMock::Core {
         for (int i = 0; i < 100; i++) {
             EXPECT_TRUE(result[i] >= min && result[i] <= max);
         }
+        result.clear();
     }
 
     TEST_F(RandomUtilsTest, IntArrayTest) {
@@ -55,6 +56,7 @@ namespace AwsMock::Core {
         for (int i = 0; i < size; i++) {
             EXPECT_TRUE(result[i] > min && result[i] < max);
         }
+        result.clear();
     }
 
     TEST_F(RandomUtilsTest, MinMaxDoubleTest) {
@@ -74,6 +76,7 @@ namespace AwsMock::Core {
         for (int i = 0; i < 100; i++) {
             EXPECT_TRUE(result[i] > min && result[i] < max);
         }
+        result.clear();
     }
 
     TEST_F(RandomUtilsTest, DoubleArrayTest) {
@@ -90,6 +93,7 @@ namespace AwsMock::Core {
         for (int i = 0; i < size; i++) {
             EXPECT_TRUE(result[i] > min && result[i] < max);
         }
+        result.clear();
     }
 
 } // namespace AwsMock::Core
