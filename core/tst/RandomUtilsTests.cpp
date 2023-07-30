@@ -30,7 +30,7 @@ namespace AwsMock::Core {
 
         // act
         std::vector<int> result;
-        result.reserve(100);
+        result.reserve(200);
         for (int i = 0; i < 100; i++) {
             result.emplace_back(RandomUtils::NextInt(min, max));
         }
