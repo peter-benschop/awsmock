@@ -3,6 +3,13 @@
 #
 # SQS Queues functions
 #
+function queue_exists() {
+  if [ `awsmock sqs list-queues | grep $1 | wc -l` -eq 1 ]; then
+    return 1
+  fi
+  return 0
+}
+
 function create_redrive_policy() {
   echo '{"RedrivePolicy": "{\"deadLetterTargetArn\":\"arn:aws:sqs:eu-central-1:000000000000:'$1-dlqueue'\",\"maxReceiveCount\":\"3\"}", "MessageRetentionPeriod": "259200", "VisibilityTimeout": "90"}' > /tmp/$1-attributes.json
 }
@@ -13,17 +20,21 @@ function create_attributes() {
 }
 
 function create_queue_with_dead_letter_queue() {
-  awsmock sqs create-queue --queue-name=$1-queue
-  awsmock sqs create-queue --queue-name=$1-dlqueue
-
-  create_attributes $1
+  if [ `queue_exists $1-queue` -eq 0 ]; then
+    awsmock sqs create-queue --queue-name=$1-queue
+    awsmock sqs create-queue --queue-name=$1-dlqueue
+    create_attributes $1
+  fi
 }
 
 #
 # SNS function
 #
-function create_sns_topic() {
-  awsmock sns create-topic --name $1
+function topic_exists() {
+  if [ `awsmock sns list-topics | grep $1 | wc -l` -eq 1 ]; then
+    return 1
+  fi
+  return 0
 }
 
 function create_sns_subscription() {
@@ -31,11 +42,26 @@ function create_sns_subscription() {
     --protocol sqs --notification-endpoint arn:aws:sqs:eu-central-1:000000000000:$1-queue
 }
 
+function create_sns_topic() {
+ if [ `topic_exists $1` -eq 0 ]; then
+   awsmock sns create-topic --name $1
+ fi
+}
+
 #
 # S3 functions
 #
+function bucket_exists() {
+  if [ `awsmock s3 ls | grep $1 | wc -l` -eq 1 ]; then
+    return 1
+  fi
+  return 0
+}
+
 function create_s3_bucket() {
-  awsmock s3 mb s3://$1
+  if [ `bucket_exists $1` -eq 0 ]; then
+    awsmock s3 mb s3://$1
+  fi
 }
 
 function create_s3_object() {
