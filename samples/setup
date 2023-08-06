@@ -3,6 +3,10 @@
 #
 # SQS Queues functions
 #
+function queue_exists() {
+  echo $(awsmock sqs list-queues | grep $1 | wc -l)
+}
+
 function create_redrive_policy() {
   echo '{"RedrivePolicy": "{\"deadLetterTargetArn\":\"arn:aws:sqs:eu-central-1:000000000000:'$1-dlqueue'\",\"maxReceiveCount\":\"3\"}", "MessageRetentionPeriod": "259200", "VisibilityTimeout": "90"}' > /tmp/$1-attributes.json
 }
@@ -13,17 +17,20 @@ function create_attributes() {
 }
 
 function create_queue_with_dead_letter_queue() {
-  awsmock sqs create-queue --queue-name=$1-queue
-  awsmock sqs create-queue --queue-name=$1-dlqueue
-
-  create_attributes $1
+  if [ `queue_exists $1-queue` -eq 0 ]; then
+    awsmock sqs create-queue --queue-name=$1-queue
+    awsmock sqs create-queue --queue-name=$1-dlqueue
+    create_attributes $1
+  else
+   echo "SQS queue $1 exists already"
+  fi
 }
 
 #
 # SNS function
 #
-function create_sns_topic() {
-  awsmock sns create-topic --name $1
+function topic_exists() {
+  echo $(awsmock sns list-topics | grep $1 | wc -l)
 }
 
 function create_sns_subscription() {
@@ -31,20 +38,48 @@ function create_sns_subscription() {
     --protocol sqs --notification-endpoint arn:aws:sqs:eu-central-1:000000000000:$1-queue
 }
 
+function create_sns_topic() {
+ if [ $(topic_exists $1) -eq 0 ]; then
+   awsmock sns create-topic --name $1
+  else
+   echo "SNS topic $1 exists already"
+ fi
+}
+
 #
 # S3 functions
 #
+function bucket_exists() {
+  echo $(awsmock s3 ls | grep $1 | wc -l)
+}
+
 function create_s3_bucket() {
-  awsmock s3 mb s3://$1
+  if [ $(bucket_exists $1) -eq 0 ]; then
+    awsmock s3 mb s3://$1
+  else
+   echo "S3 bucket $1 exists already"
+  fi
 }
 
 function create_s3_object() {
   awsmock s3 cp $1 s3://$2/$3
 }
 
+function create_bucket_notification() {
+
+  bucket=$1
+  hook=$2
+
+  awsmock s3api put-bucket-notification-configuration --bucket $bucket --notification-configuration file://./s3/$hook
+}
+
 #
 # Lambda function
 #
+function lambda_exists() {
+  echo $(awsmock lambda list-functions | grep arn | grep $1 | wc -l)
+}
+
 function create_environment() {
   echo '{"Variables": {"JAVA_TOOL_OPTIONS": "-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localhost"}}' > /tmp/$1-env.json
 }
@@ -55,17 +90,21 @@ function create_lambda_function () {
   runtime=$2
   zipfile=$3
 
-  create_environment $function
-  awsmock lambda create-function \
-  --function-name $function \
-  --runtime $runtime \
-  --timeout 120 \
-  --memory-size 512 \
-  --environment file:///tmp/$1-env.json \
-  --handler org.springframework.cloud.function.adapter.aws.FunctionInvoker \
-  --region eu-central-1 \
-  --zip-file "fileb:///tmp/awsmock/data/lambda/$zipfile" \
-  --role arn:aws:iam::000000000000:role/lambda-role
+  if [ $(lambda_exists $1) -eq 0 ]; then
+    create_environment $function
+    awsmock lambda create-function \
+    --function-name $function \
+    --runtime $runtime \
+    --timeout 120 \
+    --memory-size 512 \
+    --environment file:///tmp/$1-env.json \
+    --handler org.springframework.cloud.function.adapter.aws.FunctionInvoker \
+    --region eu-central-1 \
+    --zip-file "fileb:///tmp/awsmock/data/lambda/$zipfile" \
+    --role arn:aws:iam::000000000000:role/lambda-role
+  else
+   echo "Lambda function $1 exists already"
+  fi
 }
 
 #
@@ -113,9 +152,9 @@ create_queue_with_dead_letter_queue inventory-feed-parsing-result
 #
 # Create lambda function
 #
-create_lambda_function file-copy-service-1.14.0-SNAPSHOT java17 file-copy-service-1.14.0-SNAPSHOT-aws.jar
-create_lambda_function file-distribution-service-1.22.1-SNAPSHOT java17 file-distribution-service-1.22.1-SNAPSHOT-aws.jar
-create_lambda_function image-transformation-service provided.al2 image-transformation-service.zip
+create_lambda_function file-copy-service java17 file-copy-service-1.14.0-SNAPSHOT-aws.jar
+create_lambda_function file-distribution-service java17 file-distribution-service-1.23.0-SNAPSHOT-aws.jar
+create_lambda_function image-transformation-iservice provided.al2 image-transformation-lambda.zip
 
 #
 # Create SNS topic
@@ -125,17 +164,16 @@ create_sns_topic file-logging-topic
 #
 # Setup S3 bucket notification events
 #
-create_bucket_notification file-delivery1 --notification-configuration file://./s3/file-delivery1-hook.json
-awsmock s3api put-bucket-notification-configuration --bucket file-delivery2 --notification-configuration file://./s3/file-delivery2-hook.json
-awsmock s3api put-bucket-notification-configuration --bucket file-delivery3 --notification-configuration file://./s3/file-delivery3-hook.json
+create_bucket_notification transfer-server file-copy-hook.json
+create_bucket_notification file-delivery file-delivery-hook.json
 
 #
 # SNS -> SQS subscription
 #
-#create_sns_subscription file-logging
+create_sns_subscription file-logging
 
 #
 # Put some objects
 #
-#create_s3_object ./images/0036089631545_ANNO_OBILD.jpg file-delivery ftpuser1/0036089631545_ANNO_OBILD.jpg
-#create_s3_object ./images/9781406379990_ANNO_OBILD.jpg file-delivery ftpuser1/9781406379990_ANNO_OBILD.jpg
+create_s3_object ./images/0036089631545_ANNO_OBILD.jpg file-delivery ftpuser1/0036089631545_ANNO_OBILD.jpg
+create_s3_object ./images/9781406379990_ANNO_OBILD.jpg file-delivery ftpuser1/9781406379990_ANNO_OBILD.jpg
