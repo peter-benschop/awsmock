@@ -19,7 +19,6 @@
 #define OWNER "test-owner"
 #define QUEUE_NAME "test-queue"
 #define QUEUE_URL "http://localhost:4567/000000000000/" QUEUE_NAME
-#define QUEUE_ARN "arn:aws:sqs:eu-central-1:000000000000:" QUEUE_NAME
 
 #define DLQ_NAME "test-dlqueue"
 #define DLQ_URL "http://localhost:4567/000000000000/" DLQ_NAME
@@ -172,7 +171,7 @@ namespace AwsMock::Database {
 
         // arrange
         Entity::SQS::Queue queue = {.region=_region, .name=QUEUE_NAME, .owner=OWNER, .queueUrl=QUEUE_URL};
-        queue = _sqsDatabase.CreateQueue(queue);
+        _sqsDatabase.CreateQueue(queue);
 
         // act
         long result = _sqsDatabase.CountQueues(_region);

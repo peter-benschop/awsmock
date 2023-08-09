@@ -22,7 +22,7 @@ namespace AwsMock::Database {
 
         // Get end point
         _endpoint = configuration.getString("awsmock.rest.host", "localhost") + ":" +
-                    configuration.getString("awsmock.rest.host", "4567");
+                    configuration.getString("awsmock.rest.port", "4567");
     }
 
     bool SQSDatabase::QueueUrlExists(const std::string &queueUrl) {

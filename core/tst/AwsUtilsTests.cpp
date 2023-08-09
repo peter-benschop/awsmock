@@ -32,7 +32,47 @@ namespace AwsMock::Core {
         std::string _endpoint = "localhost:4567";
     };
 
-    TEST_F(AwsUtilsTest, ArnToUrlTest) {
+    TEST_F(AwsUtilsTest, CreateS3ArnTest) {
+
+        // arrange
+        std::string bucket = "testBucket";
+        std::string key = "testKey";
+        std::string s3Arn = "arn:aws:s3:" + _region + ":" + _accountId + ":" + bucket + "/" + key;
+
+        // act
+        std::string result = AwsUtils::CreateS3Arn(_region, _accountId, bucket, key);
+
+        // assert
+        EXPECT_EQ(result, s3Arn);
+    }
+
+    TEST_F(AwsUtilsTest, CreateSqsArnTest) {
+
+        // arrange
+        std::string queueName = "testQueue";
+        std::string sqsQueueArn = "arn:aws:sqs:" + _region + ":" + _accountId + ":" + queueName;
+
+        // act
+        std::string result = AwsUtils::CreateSQSQueueArn(_region, _accountId, queueName);
+
+        // assert
+        EXPECT_EQ(result, sqsQueueArn);
+    }
+
+    TEST_F(AwsUtilsTest, CreateSNSTopicTest) {
+
+        // arrange
+        std::string topicName = "testTopic";
+        std::string snsTopic3Arn = "arn:aws:sns:" + _region + ":" + _accountId + ":" + topicName;
+
+        // act
+        std::string result = AwsUtils::CreateSNSTopicArn(_region, _accountId, topicName);
+
+        // assert
+        EXPECT_EQ(result, snsTopic3Arn);
+    }
+
+    TEST_F(AwsUtilsTest, ConvertArnToUrlTest) {
 
         // arrange
         std::string queueName = "file-delivery1-queue";
