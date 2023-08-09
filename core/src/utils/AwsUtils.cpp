@@ -35,6 +35,7 @@ namespace AwsMock::Core {
         std::vector<std::string> parts = StringUtils::Split(queueArn, ':');
         std::string accountId = parts[4];
         std::string queueName = parts[5];
+        parts.clear();
         return "http://" + endpoint + "/" + accountId + "/" + queueName;
     }
 

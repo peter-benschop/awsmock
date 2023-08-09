@@ -2,11 +2,12 @@
 // Created by vogje01 on 01/09/2022.
 //
 
+// C++ standard includes
+#include <string>
+#include <fstream>
+
 // GTest includes
 #include "gtest/gtest.h"
-
-// AwsMock includes
-#include <awsmock/core/FileUtils.h>
 
 class TestEnvironment : public ::testing::Environment {
 public:
@@ -39,7 +40,5 @@ int main(int argc, char **argv) {
     // Run tests
     ::testing::InitGoogleTest(&argc, argv);
     ::testing::AddGlobalTestEnvironment(new TestEnvironment);
-    int ret = RUN_ALL_TESTS();
-
-    return ret;
+    return RUN_ALL_TESTS();
 }
