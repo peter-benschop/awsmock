@@ -1,0 +1,57 @@
+version: "3.8"
+
+volumes:
+  pgdata:
+
+services:
+
+  # Postgres database
+  postgres:
+    image: postgres:latest
+    container_name: pim-postgres
+    volumes:
+      - ./database-data/postgres:/var/lib/postgresql/data
+    networks:
+      - "local"
+    ports:
+      - 5432:5432
+
+  # Mongo DB can be used for Product DB
+  mongodb:
+    image: mongo:latest
+    container_name: pim-mongodb
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_DATABASE=admin	
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=ausHamburgIsCool
+      - MONGO_USER=admin
+      - MONGO_PASSWORD=admin
+      - MONGO_DB=awsmock
+    ports:
+      - 27017:27017
+    volumes:
+      - ./database-data/mongo:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+
+  # AWS-Mock
+  awsmock:
+    container_name: pim-aws-mock
+    image: aws-mock:latest
+    depends_on:
+      - mongodb
+      - postgres
+    networks:
+      - "local"
+    ports:
+      - "127.0.0.1:4567:4567"
+    environment:
+      - AWS_DEFAULT_REGION=eu-central-1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Initialization script
+      - ./setup:/etc/awsmock/init/ready.d/setup.sh
+
+networks:
+  local:
+    driver: "bridge"
