@@ -71,9 +71,10 @@ namespace AwsMock::Core {
        * Converts a queue ARN to a queue URL
        *
        * @param queueArn ARN of the queue
+       * @param endpoint REST endpoint host:port
        * @return URL of the queue
        */
-      static std::string ConvertSQSQueueArnToUrl(const std::string &queueArn);
+      static std::string ConvertSQSQueueArnToUrl(const std::string &queueArn, const std::string &endpoint);
 
       /**
        * Create SNS subscription ARN

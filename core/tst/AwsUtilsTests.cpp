@@ -21,25 +21,26 @@ namespace AwsMock::Core {
 
     protected:
 
-      void SetUp() override {
-      }
+        void SetUp() override {
+        }
 
-      void TearDown() override {
-      }
+        void TearDown() override {
+        }
 
-      std::string _region = "eu-central-1";
-      std::string _accountId = "000000000000";
+        std::string _region = "eu-central-1";
+        std::string _accountId = "000000000000";
+        std::string _endpoint = "localhost:4567";
     };
 
     TEST_F(AwsUtilsTest, ArnToUrlTest) {
 
         // arrange
         std::string queueName = "file-delivery1-queue";
-        std::string sqsQueueUrl = "http://localhost:4567/" + _accountId + "/" + queueName;
+        std::string sqsQueueUrl = "http://" + _endpoint + "/" + _accountId + "/" + queueName;
         std::string sqsQueueArn = "arn:aws:sqs:" + _region + ":" + _accountId + ":" + queueName;
 
         // act
-        std::string result = AwsUtils::ConvertSQSQueueArnToUrl(sqsQueueArn);
+        std::string result = AwsUtils::ConvertSQSQueueArnToUrl(sqsQueueArn, _endpoint);
 
         // assert
         EXPECT_EQ(result, sqsQueueUrl);
