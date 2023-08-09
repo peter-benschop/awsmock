@@ -57,3 +57,9 @@ docs/html
 docs/xml
 docs/docs
 
+# Ninja
+**/.ninja*
+**/*.ninja
+
+# database
+samples/database-data
