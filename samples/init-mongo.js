@@ -3,6 +3,7 @@ db.createUser(
         user: "admin",
         pwd: "admin",
         roles: [
-            { role: "readWrite", db: "awsmock" }
+            { role: "dbOwner", db: "awsmock" },
+            { role: "dbOwner", db: "test" }
         ]
     })
