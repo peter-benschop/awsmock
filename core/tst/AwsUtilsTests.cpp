@@ -43,7 +43,7 @@ namespace AwsMock::Core {
         std::string result = AwsUtils::CreateS3Arn(_region, _accountId, bucket, key);
 
         // assert
-        EXPECT_EQ(result, s3Arn);
+        EXPECT_STREQ(result.c_str(), s3Arn.c_str());
     }
 
     TEST_F(AwsUtilsTest, CreateSqsArnTest) {
@@ -56,7 +56,7 @@ namespace AwsMock::Core {
         std::string result = AwsUtils::CreateSQSQueueArn(_region, _accountId, queueName);
 
         // assert
-        EXPECT_EQ(result, sqsQueueArn);
+        EXPECT_STREQ(result.c_str(), sqsQueueArn.c_str());
     }
 
     TEST_F(AwsUtilsTest, CreateSNSTopicTest) {
@@ -69,7 +69,7 @@ namespace AwsMock::Core {
         std::string result = AwsUtils::CreateSNSTopicArn(_region, _accountId, topicName);
 
         // assert
-        EXPECT_EQ(result, snsTopic3Arn);
+        EXPECT_STREQ(result.c_str(), snsTopic3Arn.c_str());
     }
 
     TEST_F(AwsUtilsTest, ConvertArnToUrlTest) {
@@ -83,7 +83,7 @@ namespace AwsMock::Core {
         std::string result = AwsUtils::ConvertSQSQueueArnToUrl(sqsQueueArn, _endpoint);
 
         // assert
-        EXPECT_EQ(result, sqsQueueUrl);
+        EXPECT_STREQ(result.c_str(), sqsQueueUrl.c_str());
     }
 
 } // namespace AwsMock::Core
