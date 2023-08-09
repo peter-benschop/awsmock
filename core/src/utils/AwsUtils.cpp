@@ -33,6 +33,10 @@ namespace AwsMock::Core {
 
     std::string AwsUtils::ConvertSQSQueueArnToUrl(const std::string &queueArn, const std::string &endpoint) {
         std::vector<std::string> parts = StringUtils::Split(queueArn, ':');
+        if (parts.size() < 6) {
+            std::cerr << "Error, not enough parts" << std::endl;
+            return {};
+        }
         std::string accountId = parts[4];
         std::string queueName = parts[5];
         parts.clear();

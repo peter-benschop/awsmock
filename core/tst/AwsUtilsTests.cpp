@@ -20,13 +20,6 @@ namespace AwsMock::Core {
     class AwsUtilsTest : public ::testing::Test {
 
     protected:
-
-        void SetUp() override {
-        }
-
-        void TearDown() override {
-        }
-
         std::string _region = "eu-central-1";
         std::string _accountId = "000000000000";
         std::string _endpoint = "localhost:4567";

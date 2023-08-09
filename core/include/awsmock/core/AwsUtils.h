@@ -7,6 +7,7 @@
 
 // C++ standard includes
 #include <string>
+#include <iostream>
 
 // Poco includes
 #include <Poco/UUIDGenerator.h>
