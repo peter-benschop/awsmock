@@ -45,7 +45,7 @@ namespace AwsMock::Dto::S3 {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const GetObjectRequest &r) {
-          os << "GetObjectRequest={bucket='" + r.bucket + "' key='" + r.key + "'}";
+          os << "GetObjectRequest={bucket='" << r.bucket << "' key='" << r.key << "'}";
           return os;
       }
 

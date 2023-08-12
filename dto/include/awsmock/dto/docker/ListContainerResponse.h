@@ -64,8 +64,8 @@ namespace AwsMock::Dto::Docker {
           try {
               Poco::JSON::Array::Ptr namesArray = object->getArray("Names");
               if (namesArray != nullptr) {
-                  for (Poco::JSON::Array::ConstIterator nt = namesArray->begin(); nt != namesArray->end(); ++nt) {
-                      names.push_back(nt->convert<std::string>());
+                  for (const auto &nt : *namesArray) {
+                      names.push_back(nt.convert<std::string>());
                   }
               }
               id = object->get("Id").convert<std::string>();
@@ -130,9 +130,9 @@ namespace AwsMock::Dto::Docker {
               Poco::Dynamic::Var result = parser.parse(body);
               Poco::JSON::Array::Ptr rootArray = result.extract<Poco::JSON::Array::Ptr>();
               if (rootArray != nullptr) {
-                  for (Poco::JSON::Array::ConstIterator it = rootArray->begin(); it != rootArray->end(); ++it) {
+                  for (const auto & it : *rootArray) {
                       Container container;
-                      container.FromJson(it->extract<Poco::JSON::Object::Ptr>());
+                      container.FromJson(it.extract<Poco::JSON::Object::Ptr>());
                       containerList.push_back(container);
                   }
               }

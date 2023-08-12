@@ -14,7 +14,6 @@ namespace AwsMock::Service {
     void LambdaService::Initialize() {
 
         // Initialize environment
-        _region = _configuration.getString("awsmock.region", "eu-central-1");
         _accountId = _configuration.getString("awsmock.account.id", "000000000000");
         _dataDir = _configuration.getString("awsmock.data.dir", "/tmp/awsmock/data");
         _tempDir = _dataDir + Poco::Path::separator() + "tmp";
@@ -109,17 +108,13 @@ namespace AwsMock::Service {
             // Get the bucket eventNotification
             Database::Entity::S3::Bucket bucket = _s3Database->GetBucketByRegionName(record.region,
                                                                                      record.s3.bucket.name);
-            auto notification =
-                find_if(bucket.notifications.begin(), bucket.notifications.end(),
-                        [&record](const Database::Entity::S3::BucketNotification eventNotification) {
-                          return record.eventName == eventNotification.event;
-                        });
-            if (notification != bucket.notifications.end()) {
+            if(bucket.HasNotification(record.eventName)) {
 
-                log_debug_stream(_logger) << "Got bucket eventNotification: " << notification->ToString() << std::endl;
+                Database::Entity::S3::BucketNotification notification = bucket.GetNotification(record.eventName);
+                log_debug_stream(_logger) << "Got bucket eventNotification: " << notification.ToString() << std::endl;
 
                 // Get the lambda entity
-                Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->GetLambdaByArn(notification->lambdaArn);
+                Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->GetLambdaByArn(notification.lambdaArn);
                 log_debug_stream(_logger) << "Got lambda entity eventNotification: " + lambda.ToString() << std::endl;
 
                 SendInvocationRequest(lambda.hostPort, eventNotification.ToJson());
@@ -171,6 +166,7 @@ namespace AwsMock::Service {
 
         // Get the response status
         Poco::Net::HTTPResponse response;
+        session.receiveResponse(response);
         if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
             log_error_stream(_logger) << "HTTP error, status: " << response.getStatus()
                                       << " reason: " + response.getReason() << std::endl;

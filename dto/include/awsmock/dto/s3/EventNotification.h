@@ -13,6 +13,8 @@
 #include "Poco/DateTime.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTimeFormatter.h"
+#include <Poco/JSON/JSON.h>
+#include <Poco/JSON/Parser.h>
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
@@ -37,7 +39,7 @@ namespace AwsMock::Dto::S3 {
      *        "responseElements":{
      *           "x-amz-request-id":"Amazon S3 generated request ID",
      *           "x-amz-id-2":"Amazon S3 host that processed the request"
-     *       },
+     *        },
      *        "s3":{
      *           "s3SchemaVersion":"1.0",
      *           "configurationId":"ID found in the bucket notification configuration",
@@ -203,6 +205,21 @@ namespace AwsMock::Dto::S3 {
       }
 
       /**
+       * Converts a JSON representation to s DTO.
+       *
+       * @param JSON string.
+       */
+      void FromJson(Poco::JSON::Object::Ptr s3Object) {
+
+          try {
+              principalId = s3Object->get(principalId).convert<std::string>();
+          } catch (Poco::Exception &exc) {
+              std::cerr << exc.message() << std::endl;
+              throw Core::ServiceException(exc.message(), 500);
+          }
+      }
+
+      /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.
@@ -258,6 +275,24 @@ namespace AwsMock::Dto::S3 {
               return rootJson;
 
           } catch (Poco::Exception &exc) {
+              throw Core::ServiceException(exc.message(), 500);
+          }
+      }
+
+      /**
+       * Converts a JSON representation to s DTO.
+       *
+       * @param JSON string.
+       */
+      void FromJson(Poco::JSON::Object::Ptr s3Object) {
+
+          try {
+              name = s3Object->get("name").convert<std::string>();
+              arn = s3Object->get("arn").convert<std::string>();
+             // ownerIdentity.FromJson(s3Object->getObject("ownerIdentity"));
+
+          } catch (Poco::Exception &exc) {
+              std::cerr << exc.message() << std::endl;
               throw Core::ServiceException(exc.message(), 500);
           }
       }
@@ -335,6 +370,26 @@ namespace AwsMock::Dto::S3 {
       }
 
       /**
+       * Converts a JSON representation to s DTO.
+       *
+       * @param JSON string.
+       */
+      void FromJson(Poco::JSON::Object::Ptr s3Object) {
+
+          try {
+              key = s3Object->get("key").convert<std::string>();
+              size = s3Object->get("size").convert<long>();
+              etag = s3Object->get("etag").convert<std::string>();
+              versionId = s3Object->get("versionId").convert<std::string>();
+              sequencer = s3Object->get("sequencer").convert<std::string>();
+
+          } catch (Poco::Exception &exc) {
+              std::cerr << exc.message() << std::endl;
+              throw Core::ServiceException(exc.message(), 500);
+          }
+      }
+
+      /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.
@@ -397,6 +452,25 @@ namespace AwsMock::Dto::S3 {
               return rootJson;
 
           } catch (Poco::Exception &exc) {
+              throw Core::ServiceException(exc.message(), 500);
+          }
+      }
+
+      /**
+       * Converts a JSON representation to s DTO.
+       *
+       * @param JSON string.
+       */
+      void FromJson(Poco::JSON::Object::Ptr s3Object) {
+
+          try {
+              s3SchemaVersion = s3Object->get("s3SchemaVersion").convert<std::string>();
+              configurationId = s3Object->get("configurationId").convert<std::string>();
+              bucket.FromJson(s3Object->getObject("bucket"));
+              object.FromJson(s3Object->getObject("object"));
+
+          } catch (Poco::Exception &exc) {
+              std::cerr << exc.message() << std::endl;
               throw Core::ServiceException(exc.message(), 500);
           }
       }
@@ -497,6 +571,27 @@ namespace AwsMock::Dto::S3 {
       }
 
       /**
+       * Converts a JSON representation to s DTO.
+       *
+       * @param JSON string.
+       */
+      void FromJson(Poco::JSON::Object::Ptr object) {
+
+          try {
+              eventVersion = object->get("eventVersion").convert<std::string>();
+              eventSource = object->get("eventSource").convert<std::string>();
+              region = object->get("awsRegion").convert<std::string>();
+              eventTime = object->get("eventTime").convert<std::string>();
+              eventName = object->get("eventName").convert<std::string>();
+              s3.FromJson(object->getObject("s3"));
+
+          } catch (Poco::Exception &exc) {
+              std::cerr << exc.message() << std::endl;
+              throw Core::ServiceException(exc.message(), 500);
+          }
+      }
+
+      /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.
@@ -548,6 +643,37 @@ namespace AwsMock::Dto::S3 {
               return os.str();
 
           } catch (Poco::Exception &exc) {
+              throw Core::ServiceException(exc.message(), 500);
+          }
+      }
+
+      /**
+       * Converts a JSON representation to s DTO.
+       *
+       * @param JSON string.
+       */
+      void FromJson(const std::string &jsonString) {
+
+          try {
+              Poco::JSON::Parser parser;
+              Poco::Dynamic::Var result = parser.parse(jsonString);
+              Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+              Poco::JSON::Array::Ptr recordArray = rootObject->getArray("Records");
+
+              if (recordArray != nullptr) {
+                  for (const auto & it : *recordArray) {
+                      Record record;
+                      record.FromJson(it.extract<Poco::JSON::Object::Ptr>());
+                      records.push_back(record);
+                  }
+              }
+
+              // Cleanup
+              recordArray->clear();
+              parser.reset();
+
+          } catch (Poco::Exception &exc) {
+              std::cerr << exc.message() << std::endl;
               throw Core::ServiceException(exc.message(), 500);
           }
       }
