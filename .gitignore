@@ -45,7 +45,7 @@
 # Idea
 .idea
 **/*.iml
-**/*.xml
+
 
 # Tests
 Testing/*
