@@ -53,17 +53,14 @@ namespace AwsMock::Core {
 
       void OnFileAdded(const DirectoryEvent &addedEvent) {
           added++;
-          thread->wakeUp();
       }
 
       void OnFileModified(const DirectoryEvent &modifiedEvent) {
           modified++;
-          thread->wakeUp();
       }
 
       void OnFileDeleted(const DirectoryEvent &deletedEvent) {
           deleted++;
-          thread->wakeUp();
       }
 
       int added = 0, deleted = 0, modified = 0;

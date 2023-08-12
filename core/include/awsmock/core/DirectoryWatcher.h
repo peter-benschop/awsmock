@@ -112,9 +112,7 @@ namespace AwsMock::Core {
         /**
          * Destructor
          */
-        ~DirectoryWatcher() override {
-            _watcherMap.clear();
-        }
+        ~DirectoryWatcher() override;
 
         /**
          * Initialization
@@ -124,7 +122,7 @@ namespace AwsMock::Core {
         /**
          * Main thread running method
          */
-        [[noreturn]] void run() override;
+        void run() override;
 
         /**
          * Added event
@@ -165,6 +163,16 @@ namespace AwsMock::Core {
          * File descriptor
          */
         int fd = 0;
+
+        /**
+         * Running flag
+         */
+        bool _running = false;
+
+        /**
+         * Poll timeout
+         */
+        int _timeout = 1000;
 
         /**
          * Watcher map with absolute file pathes
