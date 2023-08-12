@@ -3,12 +3,23 @@
 //
 
 #include <awsmock/core/DirectoryWatcher.h>
+#include <sys/poll.h>
 
 namespace AwsMock::Core {
 
-    DirectoryWatcher::DirectoryWatcher(std::string rootDir) : _logger(Poco::Logger::get("DirectoryWatcher")), _rootDir(std::move(rootDir)) {
+    DirectoryWatcher::DirectoryWatcher(std::string rootDir) : _logger(Poco::Logger::get("DirectoryWatcher")),
+                                                              _rootDir(std::move(rootDir)) {
         Core::Logger::SetDefaultConsoleLogger("DirectoryWatcher");
         Initialize();
+    }
+
+    DirectoryWatcher::~DirectoryWatcher() noexcept {
+        _running = false;
+        Poco::Thread::sleep(_timeout);
+        for (const auto& watcher: _watcherMap) {
+            inotify_rm_watch(fd, watcher.first);
+        }
+        _watcherMap.clear();
     }
 
     void DirectoryWatcher::Initialize() {
@@ -28,12 +39,19 @@ namespace AwsMock::Core {
         _logger.debug() << "File _watcher initialized, path: " << _rootDir << std::endl;
     }
 
-    [[noreturn]] void DirectoryWatcher::run() {
+    void DirectoryWatcher::run() {
 
         int i, wd;
         char buffer[BUF_LEN];
+        struct pollfd pollfd = {.fd = fd};
+        _running = true;
 
-        while (true) {
+        while (_running) {
+            while (poll(&pollfd, 1, _timeout) < 0)
+            {
+                if (errno == EAGAIN || errno == EINTR)
+                    continue;
+            }
             i = 0;
             ssize_t length = read(fd, buffer, BUF_LEN);
             if (length < 0) {

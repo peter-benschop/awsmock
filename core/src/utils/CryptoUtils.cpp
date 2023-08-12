@@ -35,15 +35,15 @@ namespace AwsMock::Core {
         unsigned int md_len;
         std::string output;
 
-        std::ifstream is;
-        is.open(fileName.c_str(), std::ios::binary);
-
         EVP_DigestInit_ex(context, md, nullptr);
 
+        std::ifstream is;
+        is.open(fileName.c_str(), std::ios::binary);
         while (is.good()) {
             is.read(buffer, AWSMOCK_BUFFER_SIZE);
             EVP_DigestUpdate(context, buffer, is.gcount());
         }
+        is.close();
 
         EVP_DigestFinal_ex(context, md_value, &md_len);
         EVP_MD_CTX_free(context);
@@ -83,16 +83,16 @@ namespace AwsMock::Core {
         unsigned int md_len;
         std::string output;
 
-        std::ifstream is;
-        is.open(fileName.c_str(), std::ios::binary);
-
         EVP_DigestInit_ex(context, md, nullptr);
 
+        std::ifstream is;
+        is.open(fileName.c_str(), std::ios::binary);
         while (is.good()) {
             is.read(buffer, AWSMOCK_BUFFER_SIZE);
             EVP_DigestUpdate(context, buffer, is.gcount());
         }
-
+        is.close();
+        
         EVP_DigestFinal_ex(context, md_value, &md_len);
         EVP_MD_CTX_free(context);
 
@@ -150,15 +150,15 @@ namespace AwsMock::Core {
         unsigned int md_len;
         std::string output;
 
-        std::ifstream is;
-        is.open(fileName.c_str(), std::ios::binary);
-
         EVP_DigestInit_ex(context, md, nullptr);
 
+        std::ifstream is;
+        is.open(fileName.c_str(), std::ios::binary);
         while (is.good()) {
             is.read(buffer, AWSMOCK_BUFFER_SIZE);
             EVP_DigestUpdate(context, buffer, is.gcount());
         }
+        is.close();
 
         EVP_DigestFinal_ex(context, md_value, &md_len);
         EVP_MD_CTX_free(context);
@@ -181,12 +181,7 @@ namespace AwsMock::Core {
              static_cast<int>(key.size()),
              hash.data(),
              &hashLen);
-
-        std::stringstream ss;
-        for (int i = 0; i < hashLen; i++) {
-            ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(hash[i]);
-        }
-        return ss.str();
+        return HexEncode(hash);
     }
 
     std::array<unsigned char, EVP_MAX_MD_SIZE> Crypto::GetHmacSha256FromStringRaw(const std::string &key, const std::string &msg) {
@@ -240,7 +235,7 @@ namespace AwsMock::Core {
 
     std::string Crypto::Base64Decode(const std::string &encodedString) {
 
-        int in_len = encodedString.size();
+        size_t in_len = encodedString.size();
         int i = 0;
         int j = 0;
         int in_ = 0;
@@ -252,14 +247,14 @@ namespace AwsMock::Core {
             in_++;
             if (i == 4) {
                 for (i = 0; i < 4; i++)
-                    char_array_4[i] = _base64Chars.find(char_array_4[i]);
+                    char_array_4[i] = _base64Chars.find((char)char_array_4[i]);
 
                 char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
                 char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
                 char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
 
                 for (i = 0; (i < 3); i++)
-                    ret += char_array_3[i];
+                    ret += (char)char_array_3[i];
                 i = 0;
             }
         }
@@ -269,14 +264,14 @@ namespace AwsMock::Core {
                 char_array_4[j] = 0;
 
             for (j = 0; j < 4; j++)
-                char_array_4[j] = _base64Chars.find(char_array_4[j]);
+                char_array_4[j] = _base64Chars.find((char)char_array_4[j]);
 
             char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
             char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
             char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
 
             for (j = 0; (j < i - 1); j++)
-                ret += char_array_3[j];
+                ret += (char)char_array_3[j];
         }
 
         return ret;
