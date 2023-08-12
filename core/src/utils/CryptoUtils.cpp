@@ -92,7 +92,7 @@ namespace AwsMock::Core {
             EVP_DigestUpdate(context, buffer, is.gcount());
         }
         is.close();
-        
+
         EVP_DigestFinal_ex(context, md_value, &md_len);
         EVP_MD_CTX_free(context);
 

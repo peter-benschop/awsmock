@@ -38,116 +38,137 @@ namespace AwsMock::Service {
 
     public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration service configuration
-       */
-      explicit LambdaService(const Core::Configuration &configuration);
+        /**
+         * Constructor
+         *
+         * @param configuration service configuration
+         */
+        explicit LambdaService(const Core::Configuration &configuration);
 
-      /**
-       * Create lambda function
-       *
-       * @param request create lambda request
-       * @return CreateFunctionResponse
-       */
-      Dto::Lambda::CreateFunctionResponse CreateFunctionConfiguration(Dto::Lambda::CreateFunctionRequest &request);
+        /**
+         * Create lambda function
+         *
+         * @param request create lambda request
+         * @return CreateFunctionResponse
+         */
+        Dto::Lambda::CreateFunctionResponse CreateFunctionConfiguration(Dto::Lambda::CreateFunctionRequest &request);
 
-      /**
-       * List lambda functions
-       *
-       * @param region AWS region name
-       * @return CreateFunctionResponse
-       */
-      Dto::Lambda::ListFunctionResponse ListFunctionConfiguration(const std::string &region);
+        /**
+         * List lambda functions
+         *
+         * @param region AWS region name
+         * @return CreateFunctionResponse
+         */
+        Dto::Lambda::ListFunctionResponse ListFunctionConfiguration(const std::string &region);
 
-      /**
-       * Invoke lambda function
-       *
-       * @param eventNotification S3 event eventNotification
-       */
-      void InvokeEventFunction(const Dto::S3::EventNotification &eventNotification);
+        /**
+         * Invoke lambda function
+         *
+         * @param eventNotification S3 event eventNotification
+         */
+        void InvokeEventFunction(const Dto::S3::EventNotification &eventNotification);
 
-      /**
-       * Delete lambda function
-       *
-       * <p>This method will also delete the corresponding container and images.
-       *
-       * @param request create lambda request
-       * @return CreateFunctionResponse
-       * @throws ServiceException
-       */
-      void DeleteFunction(Dto::Lambda::DeleteFunctionRequest &request);
+        /**
+         * Delete lambda function
+         *
+         * <p>This method will also delete the corresponding container and images.
+         *
+         * @param request create lambda request
+         * @return CreateFunctionResponse
+         * @throws ServiceException
+         */
+        void DeleteFunction(Dto::Lambda::DeleteFunctionRequest &request);
 
     private:
 
-      /**
-       * Initialize the service
-       */
-      void Initialize();
+        /**
+         * Initialize the service
+         */
+        void Initialize();
 
-      /**
-       * Unpack the provided ZIP file.
-       *
-       * <p>Needed only when the Lambda function is provided as zipped request body.</p>
-       *
-       * @param zipFile Base64 encoded zip file.
-       * @return code directory
-       */
-      std::string UnpackZipFile(const std::string &zipFile);
+        /**
+         * Creates an new image, in case the image does not exists inside the docker daemon.
+         *
+         * <p>It uses the docker service to actually create the image. The image size and the SHA256 are returned
+         * by the docker service.<p>
+         *
+         * @param request create function request.
+         * @param entity lambda entity.
+         */
+        void CreateImage(const Dto::Lambda::CreateFunctionRequest &request,
+                         Database::Entity::Lambda::Lambda &lambdaEntity);
 
-      /**
-       * Send the invocation request via HTTP to the lambda function.
-       *
-       * @param port host port of the docker image, running the lambda function.
-       * @param body message body containing the S3 event in JSON representation.
-       */
-      void SendInvocationRequest(int port, const std::string &body);
+        /**
+         * Creates an new docker container, in case the container does not exists inside the docker daemon.
+         *
+         * @param request create function request.
+         * @param entity lambda entity.
+         */
+        void CreateContainer(const Dto::Lambda::CreateFunctionRequest &request,
+                             Database::Entity::Lambda::Lambda &lambdaEntity);
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+        /**
+         * Unpack the provided ZIP file.
+         *
+         * <p>Needed only when the Lambda function is provided as zipped request body.</p>
+         *
+         * @param zipFile Base64 encoded zip file.
+         * @return code directory
+         */
+        std::string UnpackZipFile(const std::string &zipFile);
 
-      /**
-       * Data directory
-       */
-      std::string _dataDir;
+        /**
+         * Send the invocation request via HTTP to the lambda function.
+         *
+         * @param port host port of the docker image, running the lambda function.
+         * @param body message body containing the S3 event in JSON representation.
+         */
+        void SendInvocationRequest(int port, const std::string &body);
 
-      /**
-       * Temp directory
-       */
-      std::string _tempDir;
+        /**
+         * Logger
+         */
+        Core::LogStream _logger;
 
-      /**
-       * AWS region
-       */
-      std::string _region;
+        /**
+         * Data directory
+         */
+        std::string _dataDir;
 
-      /**
-       * AWS account ID
-       */
-      std::string _accountId;
+        /**
+         * Temp directory
+         */
+        std::string _tempDir;
 
-      /**
-       * Configuration
-       */
-      const Core::Configuration &_configuration;
+        /**
+         * AWS region
+         */
+        std::string _region;
 
-      /**
-       * Lambda database connection
-       */
-      std::unique_ptr<Database::LambdaDatabase> _lambdaDatabase;
+        /**
+         * AWS account ID
+         */
+        std::string _accountId;
 
-      /**
-       * S3 database connection
-       */
-      std::unique_ptr<Database::S3Database> _s3Database;
+        /**
+         * Configuration
+         */
+        const Core::Configuration &_configuration;
 
-      /**
-       * Database connection
-       */
-      std::unique_ptr<Service::DockerService> _dockerService;
+        /**
+         * Lambda database connection
+         */
+        std::unique_ptr<Database::LambdaDatabase> _lambdaDatabase;
+
+        /**
+         * S3 database connection
+         */
+        std::unique_ptr<Database::S3Database> _s3Database;
+
+        /**
+         * Database connection
+         */
+        std::unique_ptr<Service::DockerService> _dockerService;
     };
 
 } //namespace AwsMock::Service

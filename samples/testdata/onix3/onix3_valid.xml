@@ -1,0 +1,760 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ONIXmessage xmlns="http://ns.editeur.org/onix/3.0/short" release="3.0">
+    <header>
+        <sender>
+            <x298>Libri GmbH</x298>
+            <x299>Libri Katalog</x299>
+            <j272>Katalogreklamation@libri.de</j272>
+        </sender>
+    </header>
+    <product>
+        <a001>IntegrationstestRecordReference1</a001>
+        <a002>03</a002>
+        <productidentifier>
+            <b221>03</b221>
+            <b244>EAN1</b244>
+        </productidentifier>
+        <barcode>
+            <x312>01</x312>
+            <x313>00</x313>
+        </barcode>
+        <descriptivedetail>
+            <x314>01</x314>
+            <b012>BA</b012>
+            <measure>
+                <x315>01</x315>
+                <c094>193</c094>
+                <c095>mm</c095>
+            </measure>
+            <measure>
+                <x315>02</x315>
+                <c094>136</c094>
+                <c095>mm</c095>
+            </measure>
+            <measure>
+                <x315>03</x315>
+                <c094>20</c094>
+                <c095>mm</c095>
+            </measure>
+            <productclassification>
+                <b274>02</b274>
+                <b275>85234910</b275>
+            </productclassification>
+            <productclassification>
+                <b274>04</b274>
+                <b275>85234910</b275>
+            </productclassification>
+            <x411/>
+            <titledetail>
+                <b202>01</b202>
+                <titleelement>
+                    <x409>01</x409>
+                    <b203>Ran. Digital Remastered</b203>
+                </titleelement>
+            </titledetail>
+            <titledetail>
+                <b202>05</b202>
+                <titleelement>
+                    <x409>01</x409>
+                    <b203>Ran. Digital Remastered/2 DVD</b203>
+                </titleelement>
+            </titledetail>
+            <contributor>
+                <b034>1</b034>
+                <b035>D01</b035>
+                <b037>Kurosawa, Akira</b037>
+                <b044 language="ger" textformat="05">Florian Huber, geboren 1967</b044>
+                <b044 language="eng" textformat="05">Florian Huber, born 1967</b044>
+            </contributor>
+            <contributor>
+                <b034>2</b034>
+                <b035>A06</b035>
+                <b037>Nakadai, Tatsuya</b037>
+                <b044 textformat="05">Florian Huber, geboren 1967</b044>
+                <b044 textformat="05">Florian Huber, born 1967</b044>
+            </contributor>
+            <contributor>
+                <b034>3</b034>
+                <b035>A06</b035>
+                <b037>Terao, Akira</b037>
+                <b044>Florian Huber, geboren 1967</b044>
+            </contributor>
+            <contributor>
+                <b034>4</b034>
+                <b035>A06</b035>
+                <b037>Nezu, Jinpachi</b037>
+            </contributor>
+            <contributor>
+                <b034>5</b034>
+                <b035>A06</b035>
+                <b037>Ryu, Disuke</b037>
+            </contributor>
+            <contributor>
+                <b034>6</b034>
+                <b035>A06</b035>
+                <b037>Harada, Mieko</b037>
+            </contributor>
+            <contributor>
+                <b034>7</b034>
+                <b035>A06</b035>
+                <b037>Miyazaki, Yashiko</b037>
+            </contributor>
+            <contributor>
+                <b034>8</b034>
+                <b035>A06</b035>
+                <b037>Igawa, Hisashi</b037>
+            </contributor>
+            <contributor>
+                <b034>9</b034>
+                <b035>A06</b035>
+                <b037>Peter</b037>
+            </contributor>
+            <contributor>
+                <b034>10</b034>
+                <b035>A06</b035>
+                <b037>Yui, Masayuki</b037>
+            </contributor>
+            <n386/>
+            <language>
+                <b253>01</b253>
+                <b252>eng</b252>
+            </language>
+            <language>
+                <b253>01</b253>
+                <b252>fre</b252>
+            </language>
+            <language>
+                <b253>01</b253>
+                <b252>ger</b252>
+            </language>
+            <language>
+                <b253>01</b253>
+                <b252>jpn</b252>
+            </language>
+            <language>
+                <b253>09</b253>
+                <b252>eng</b252>
+            </language>
+            <language>
+                <b253>09</b253>
+                <b252>fre</b252>
+            </language>
+            <language>
+                <b253>09</b253>
+                <b252>ger</b252>
+            </language>
+            <language>
+                <b253>08</b253>
+                <b252>eng</b252>
+            </language>
+            <language>
+                <b253>08</b253>
+                <b252>fre</b252>
+            </language>
+            <language>
+                <b253>08</b253>
+                <b252>ger</b252>
+            </language>
+            <language>
+                <b253>08</b253>
+                <b252>jpn</b252>
+            </language>
+            <extent>
+                <b218>09</b218>
+                <b219>155</b219>
+                <b220>05</b220>
+            </extent>
+            <extent>
+                <b218>08</b218>
+                <x421>X</x421>
+                <b219>10</b219>
+                <b220>03</b220>
+            </extent>
+            <extent>
+                <b218>10</b218>
+                <b219>9</b219>
+                <b220>03</b220>
+            </extent>
+            <extent>
+                <b218>09</b218>
+                <b219>6</b219>
+                <b220>12</b220>
+            </extent>
+            <extent>
+                <b218>09</b218>
+                <b219>17</b219>
+                <b220>11</b220>
+            </extent>
+            <b063>2000</b063>
+            <b063>3</b063>
+            <subject>
+                <b067>24</b067>
+                <b171>Schlagworte von Libri</b171>
+                <b069>DVDV2023</b069>
+                <b070>Video / Film / Actionfilm</b070>
+            </subject>
+            <subject>
+                <b067>24</b067>
+                <b171>Schlagworte von Libri</b171>
+                <b069>DVDV2025</b069>
+                <b070>Video / Film / Drama, Liebe</b070>
+            </subject>
+            <subject>
+                <b067>24</b067>
+                <b171>Schlagworte von Libri</b171>
+                <b069>DVDV2040</b069>
+                <b070>Video / Film / Monumentalfilm, Historienfilm</b070>
+            </subject>
+            <subject>
+                <b067>93</b067>
+                <b069>FB</b069>
+                <b070>Belletristik: allgemein und literarisch</b070>
+            </subject>
+            <subject>
+                <b067>93</b067>
+                <b069>FH</b069>
+                <b070>Thriller / Spannung</b070>
+            </subject>
+            <subject>
+                <b067>93</b067>
+                <b069>FV</b069>
+                <b070>Historischer Roman</b070>
+            </subject>
+            <audience>
+      w          <b204>05</b204>
+                <b206>12</b206>
+            </audience>
+            <audiencerange>
+                <b074>18</b074>
+                <b075>03</b075>
+                <b076>14</b076>
+                <b075>04</b075>
+                <b076>18</b076>
+            </audiencerange>
+            <audiencerange>
+                <b074>12</b074>
+                <b075>03</b075>
+                <b076>14</b076>
+            </audiencerange>
+            <audiencerange>
+                <b074>12</b074>
+                <b075>04</b075>
+                <b076>18</b076>
+            </audiencerange>
+            <audiencerange>
+                <b074>11</b074>
+                <b075>01</b075>
+                <b076>99</b076>
+            </audiencerange>
+        </descriptivedetail>
+        <productformfeature>
+            <b334>01</b334>
+            <b335>BLU</b335>
+            <b336 language="ger">Blau wie das Meer</b336>
+        </productformfeature>
+        <productformfeature>
+            <b334>06</b334>
+            <b335>03</b335>
+            <b336>4.1 or later</b336>
+        </productformfeature>
+        <productformfeature>
+            <b334>08</b334>
+            <b335>02</b335>
+            <b336 language="eng">EPUB Accessibility Specification 1.0 A</b336>
+        </productformfeature>
+        <productformfeature>
+            <b334>10</b334>
+            <b335>101A</b335>
+            <b336 language="eng">EPUB 2.0.1</b336>
+        </productformfeature>
+        <productformfeature>
+            <b334>03</b334>
+            Text font
+            <b336>18pt Tiresias LP</b336>
+        </productformfeature>
+        <productformfeature>
+            <b334>20</b334>
+            <b335>aaaa</b335>
+            <b336>Hello World!</b336>
+        </productformfeature>
+        <collateraldetail>
+            <textcontent>
+                <x426>01</x426>
+                <x427>00</x427>
+                <d104>TV-Norm: SDTV 576i (PAL). Sprachversion: Deutsch DD 2.0 Stereo, Englisch DD 5.1, Französisch DD 5.1, Japanisch DD 2.0
+                    Stereo, Japanisch DD 5.1
+                </d104>
+            </textcontent>
+            <textcontent>
+                <x426>03</x426>
+                <x427>03</x427>
+                <d104 textformat="05" language="ger">
+                    <p>Hier ein Test mit Inner-HTML und Sonderzweichen wie &#xD; oder auch &#x9;.</p>
+                    <p>MIT EXKLUSIVEM FARBSCHNITT NUR IN DER ERSTEN AUFLAGE!</p>
+                    <p>
+                        <strong>Ich kann dich nicht hassen</strong>
+                    </p>
+                    <p>
+                        Drei Freundinnen. Drei Städte. Drei Herzensbücher.
+                        <br/>
+                        Enemies to Lovers ... Band 3 der Sturm-Trilogie. Unabhängig lesbar.
+                    </p>
+                </d104>
+            </textcontent>
+            <textcontent>
+                <x426>05</x426>
+                <x427>03</x427>
+                <d104>Japan zu Beginn des 16. Jahrhunderts:&#13;
+                    &#13;
+                    Der greise Fürst Hidetora, einst ein grausamer Feldherr, verteilt auf der Höhe seiner Macht Titel und Güter an seine
+                    drei Söhne. Der älteste Sohn Taro soll seine unmittelbare Nachfolge antreten, ihm aber noch einige Vorrechte des
+                    Clan-Oberhauptes zugestehen. Von seiner Macht &#13;
+                    verblendet erkennt der Alte nicht, daß Taro ein heuchlerisches Spiel betreibt: Hidetora verliert alle Privilegien und
+                    wird verbannt. Seinen jüngsten Sohn Saburo hatte er zuvor schon zusammen mit Tango, dem Ratgeber des Großfürsten,
+                    verstoßen, weil diese ihn aufrichtig vor den Folgen &#13;
+                    seines Plans gewarnt hatten. Jiro, der dritte Sohn, verweigert dem Vater später die Zuflucht, als er bei ihm unterkommen
+                    möchte. Hidetora wird in Armut, Isolation und Wahnsinn getrieben. Seine Leiden sind die Strafe für seine frühere
+                    Machtgier und Gräueltaten. In Begleitung seines &#13;
+                    treuen Hofnarren Kyoami irrt er durch die Länder, die er einst beherrscht hat. Im Kampf um sein Erbe zerfleischen sich
+                    die Söhne - geschürt durch die Intrigen der von Rache getriebenen Kaede, der Frau Taros. &#13;
+                    &#13;
+                    &#13;
+                    &#13;
+                    Ihre Familie wurde früher von Hidetoras Kriegern ausgelöscht, und sie will sein Haus in Schutt und Asche sehen. Taro
+                    beschlagnahmt Saburus Burg. Während Hidetora sich dort aufhält, greift Jiro, der zweitälteste Sohn, an, lässt seinen
+                    Bruder Taro ermorden. Hidetora kommt zwar mit dem &#13;
+                    Leben davon, muß aber mit ansehen wie seine Leute sterben. Tango und der Narr treffen auf den herumirrenden Hidetora;
+                    gemeinsam finden sie Zuflucht bei dem blinden Tsurumaru. In ihm begegnet Hidetora seiner eigenen, grausamen
+                    Vergangenheit: Tsurumaru ist der Bruder von Sue, &#13;
+                    Jiros Frau; der Großfürst hat ihm einst, nach der Eroberung der väterlichen Burg, die Augen ausgestochen. Nun hält Jiro
+                    die Macht in Händen. Auch ihn wiegelt Kaede auf und stiftet ihn dazu an, seine Frau umbringen zu lassen; doch Kurogane
+                    erfüllt den ihm übertragenen Auftrag nicht. &#13;
+                    Saburo reitet mit seinen Leuten aus, um den Vater zu holen. Jiro überfällt ihn, muss aber, weil währenddessen ein
+                    anderer Fürst seine Burg überfallen hat, wieder abrücken. &#13;
+                    &#13;
+                    &#13;
+                    &#13;
+                    Saburo trifft auf seinen Vater, und es kommt zu ersten Anzeichen einer Versöhnung mit dem verstoßenen Sohn. Doch
+                    Sabutoro wird erschossen. Jiro wird mit seinen Truppen von Saburos Schwiegervater in eine Falle gelockt und auf dem
+                    Schlachtfeld getötet. Hidetora stirbt darüber an &#13;
+                    gebrochenem Herzen, sein Reich teilen sich die Nachbarfürsten.
+                </d104>
+            </textcontent>
+        </collateraldetail>
+        <publishingdetail>
+            <imprint>
+                <imprintidentifier>
+                    <b233 language="ger">XYZ Publishers Imprint Code</b233>
+                    <b244>15007</b244>
+                </imprintidentifier>
+                <imprintidentifier>
+                    <x445>04</x445>
+                    <b233 language="ger">nummer 2</b233>
+                    <b244>123435</b244>
+                </imprintidentifier>
+                <b079>STUDIOCANAL GmbH</b079>
+            </imprint>
+            <imprint>
+                <imprintidentifier>
+                    <x445>04</x445>
+                    <b233 language="ger">XYZ Publishers Imprint Code</b233>
+                    <b244>15007</b244>
+                </imprintidentifier>
+                <imprintidentifier>
+                    <x445>04</x445>
+                    <b233 language="ger">nummer 2</b233>
+                    <b244>123435</b244>
+                </imprintidentifier>
+                <b079>nummer1</b079>
+            </imprint>
+            <publisher>
+                <b291>01</b291>
+                <publisheridentifier>
+                    <x447>04</x447>
+                    <b244>62830</b244>
+                </publisheridentifier>
+                <b081>STUDIOCANAL GmbH</b081>
+            </publisher>
+            <publishingdate>
+                <x448>01</x448>
+                <b306 dateformat="00">20160407</b306>
+            </publishingdate>
+            <publishingdate>
+                <x448>10</x448>
+                <b306 dateformat="00">20160407</b306>
+            </publishingdate>
+            <salesrights>
+                <b089>02</b089>
+                <territory>
+                    <x450>WORLD</x450>
+                </territory>
+            </salesrights>
+            <b209>Meschede</b209>
+            <b083>DE</b083>
+        </publishingdetail>
+        <productsupply>
+            <supplydetail>
+                <supplier>
+                    <j292>04</j292>
+                    <supplieridentifier>
+                        <j345>06</j345>
+                        <b244>4026635100003</b244>
+                    </supplieridentifier>
+                    <j137>Libri GmbH</j137>
+                </supplier>
+                <returnsconditions>
+                    <j268>04</j268>
+                    <j269>02</j269>
+                </returnsconditions>
+                <j396>31</j396>
+                <supplydate>
+                    <x461>18</x461>
+                    <b306 dateformat="00">20000101</b306>
+                </supplydate>
+                <price>
+                    <x462>02</x462>
+                    <discount>
+                        <x467>01</x467>
+                        <j267>11.21</j267>
+                    </discount>
+                    <discountcoded>
+                        <j363>02</j363>
+                        <j378>C.H.Beck Produktrabattgruppe</j378>
+                        <j364>W-RSW_Rabatt</j364>
+                    </discountcoded>
+                    <j151>9.88</j151>
+                    <tax>
+                        <x470>01</x470>
+                        <x471>S</x471>
+                        <x472>19.00</x472>
+                    </tax>
+                    <j152>EUR</j152>
+                    <territory>
+                        <x449>DE</x449>
+                    </territory>
+                    <pricedate>
+                        <x476>14</x476>
+                        <b306 dateformat="00">20211122</b306>
+                    </pricedate>
+                </price>
+                <price>
+                    <x462>01</x462>
+                    <j151>8.39</j151>
+                    <tax>
+                        <x470>01</x470>
+                        <x471>S</x471>
+                        <x472>19.00</x472>
+                    </tax>
+                    <j152>EUR</j152>
+                    <territory>
+                        <x449>DE</x449>
+                    </territory>
+                    <pricedate>
+                        <x476>14</x476>
+                        <b306 dateformat="00">20211122</b306>
+                    </pricedate>
+                </price>
+                <price>
+                    <x462>15</x462>
+                    <j151>7.45</j151>
+                    <tax>
+                        <x470>01</x470>
+                        <x471>S</x471>
+                        <x472>19.00</x472>
+                    </tax>
+                    <j152>EUR</j152>
+                    <territory>
+                        <x449>DE</x449>
+                    </territory>
+                    <pricedate>
+                        <x476>14</x476>
+                        <b306 dateformat="00">20211122</b306>
+                    </pricedate>
+                </price>
+            </supplydetail>
+        </productsupply>
+    </product>
+    <product>
+        <a001>IntegrationstestRecordReference2</a001>
+        <a002>03</a002>
+        <productidentifier>
+            <b221>03</b221>
+            <b244>EAN2</b244>
+        </productidentifier>
+        <productidentifier>
+            <b221>02</b221>
+            <b244>ISBN1</b244>
+        </productidentifier>
+        <barcode>
+            <x312>00</x312>
+        </barcode>
+        <descriptivedetail>
+            <x314>01</x314>
+            <b012>BC</b012>
+            <measure>
+                <x315>01</x315>
+                <c094>212</c094>
+                <c095>mm</c095>
+            </measure>
+            <measure>
+                <x315>02</x315>
+                <c094>154</c094>
+                <c095>mm</c095>
+            </measure>
+            <measure>
+                <x315>03</x315>
+                <c094>20</c094>
+                <c095>mm</c095>
+            </measure>
+            <productclassification>
+                <b274>02</b274>
+                <b275>49019900</b275>
+            </productclassification>
+            <productclassification>
+                <b274>04</b274>
+                <b275>49019900</b275>
+            </productclassification>
+            <x411/>
+            <titledetail>
+                <b202>01</b202>
+                <titleelement>
+                    <x409>01</x409>
+                    <b203>Das alte Haus am Omulef</b203>
+                    <b029>Verwehte Spuren - Ostpreußen. Ein autobiographischer Roman</b029>
+                </titleelement>
+            </titledetail>
+            <titledetail>
+                <b202>05</b202>
+                <titleelement>
+                    <x409>01</x409>
+                    <b203>Jondral, W: Das alte Haus am Omulef</b203>
+                </titleelement>
+            </titledetail>
+            <contributor>
+                <b034>1</b034>
+                <b035>A01</b035>
+                <b037>Jondral, Werner</b037>
+                <b044>Werner Jondral wurde 1935 in Eschenwalde in Masuren geboren. Als Kameramann, Naturfilmer und Expeditionsleiter folgte
+                    er den längst verwehten Spuren der großen Entdecker und erlebte Abenteuer auf vielen Extremreisen durch Wildnis, Wüste,
+                    Urwald und Eis.
+                </b044>
+            </contributor>
+            <n386/>
+            <language>
+                <b253>01</b253>
+                <b252>ger</b252>
+            </language>
+            <extent>
+                <b218>00</b218>
+                <b219>246</b219>
+                <b220>03</b220>
+            </extent>
+            <subject>
+                <b067>20</b067>
+                <b070>2. Weltkrieg; Flucht und Vertreibung; Lebenserinnerung; Masuren; Ostpreußen</b070>
+            </subject>
+            <subject>
+                <b067>24</b067>
+                <b171>Schlagworte von Libri</b171>
+                <b069>DEUT3010</b069>
+                <b070>Deutsche Belletristik / Roman, Erzählung</b070>
+            </subject>
+            <subject>
+                <b067>24</b067>
+                <b171>Schlagworte von Libri</b171>
+                <b069>ERIN2057</b069>
+                <b070>Erinnerung / Ostgebiete, Flucht, Vertreibung</b070>
+            </subject>
+            <subject>
+                <b067>24</b067>
+                <b171>Schlagworte von Libri</b171>
+                <b069>MASU5070</b069>
+                <b070>Masuren / Roman, Erzählung</b070>
+            </subject>
+            <subject>
+                <b067>26</b067>
+                <b068>2.0</b068>
+                <b069>1110</b069>
+                <b070>HC/Belletristik/Erzählende Literatur</b070>
+            </subject>
+            <subject>
+                <b067>93</b067>
+                <b069>DNC</b069>
+                <b070>Memoiren, Berichte/Erinnerungen</b070>
+            </subject>
+            <subject>
+                <b067>93</b067>
+                <b069>FC</b069>
+                <b070>Biografischer Roman</b070>
+            </subject>
+            <subject>
+                <b067>93</b067>
+                <b069>FV</b069>
+                <b070>Historischer Roman</b070>
+            </subject>
+            <b207>Technikinteressierte Bastler und Tüftler</b207>
+            <audience>
+                <b204>13</b204>
+                <b205>PIM-Zielgruppe</b205>
+                <b206>BB</b206>
+            </audience>
+            <audience>
+                <b204>13</b204>
+                <b206>BE</b206>
+            </audience>
+            <audience>
+                <b204>13</b204>
+                <b206>BW</b206>
+            </audience>
+            <audience>
+                <b204>13</b204>
+                <b206>BY</b206>
+            </audience>
+            <audience>
+                <b204>13</b204>
+                <b206>HB</b206>
+            </audience>
+            <audience>
+                <b204>13</b204>
+                <b206>HE</b206>
+            </audience>
+            <x422>02</x422>
+            <b125>352</b125>
+            <b062 language="ger">farbig</b062>
+            <b062 language="eng">coloured</b062>
+            <ancillarycontent>
+                <x423>16</x423>
+                <x424 language="ger">Aktivitätsdiagramme und Anwendungsfalldiagramme</x424>
+                <b257>4</b257>
+            </ancillarycontent>
+            <ancillarycontent>
+                <x423>14</x423>
+                <x424>Lageplan</x424>
+                <b257>1</b257>
+            </ancillarycontent>
+        </descriptivedetail>
+        <collateraldetail>
+            <textcontent>
+                <x426>05</x426>
+                <x427>03</x427>
+                <d104>Schon seit Generationen ist die Familie von Werner Jondral fest verankert in Masuren, dem Land der kristallenen Seen
+                    und der unbeschreiblichen Naturwunder, das auch ihm eine unbeschwerte, paradiesische Kindheit am Omulef bescherte. Doch
+                    als sich die friedliche Zeit im Spätsommer 1944 dem Ende neigt und die Flucht unvermeidbar wird, bricht nicht nur eine
+                    Familie auseinander. Einfühlsam schildert der Autor die Erinnerungen an die Sippe der Jondrals, bewegend seine
+                    Erlebnisse
+                    auf der Flucht aus den Augen eines zehnjährigen Jungen und erschreckend und unmittelbar die Eindrücke des Krieges. Nach
+                    einer langen Zeit des Verdrängens und Vergessens bewegten die Erinnerungen den Autor dazu, nicht nur die eigenen
+                    Erfahrungen niederzuschreiben, sondern die traurigen Schicksale der Menschen zu erzählen, die das Leid und den Schmerz
+                    des Krieges auf verschiedene Weise erfuhren: als Offizier der deutschen Luftwaffe, der sich in eine junge Polin
+                    verliebte, als Kriegsgefangener oder auch als Trümmerfrau, und die schließlich eines gemein haben: den Verlust der über
+                    alles geliebten Heimat Ostpreußen. Das alte Haus am Omulef ist nicht nur Zeitzeugenbericht, sondern auch Anklage gegen
+                    den Wahnsinn des Krieges und "ein leidenschaftlicher Aufruf an alle Menschen, jahrzehntelang nur selten erwähnte und oft
+                    bewusst verschwiegene Verbrechen an Deutschen in den Ostgebieten nach dem Gebot der Gerechtigkeit beim Namen zu nennen,
+                    damit jenes furchtbare Geschehen nicht in einem Archiv des Schweigens versinkt".
+                </d104>
+            </textcontent>
+        </collateraldetail>
+        <publishingdetail>
+            <imprint>
+                <imprintidentifier>
+                    <x445>04</x445>
+                    <b244>10076</b244>
+                </imprintidentifier>
+                <b079>Schardt Verlag</b079>
+            </imprint>
+            <publisher>
+                <b291>01</b291>
+                <publisheridentifier>
+                    <x447>04</x447>
+                    <b244>10076</b244>
+                    <b233 language="ger">GBIPublisherCode</b233>
+                </publisheridentifier>
+                <b081>Schardt Verlag</b081>
+            </publisher>
+            <b394>06</b394>
+            <b395>Erscheinungstermin wurde verschoben</b395>
+            <publishingdate>
+                <x448>01</x448>
+                <b306 dateformat="00">20171001</b306>
+            </publishingdate>
+            <publishingdate>
+                <x448>10</x448>
+                <b306 dateformat="00">20171001</b306>
+            </publishingdate>
+            <salesrights>
+                <b089>02</b089>
+                <territory>
+                    <x450>WORLD</x450>
+                </territory>
+            </salesrights>
+        </publishingdetail>
+        <productsupply>
+            <supplydetail>
+                <supplier>
+                    <j292>04</j292>
+                    <supplieridentifier>
+                        <j345>06</j345>
+                        <b244>4026635100003</b244>
+                    </supplieridentifier>
+                    <j137>Libri GmbH</j137>
+                </supplier>
+                <j396>41</j396>
+                <price>
+                    <x462>04</x462>
+                    <discount>
+                        <x467>01</x467>
+                        <j267>42.64</j267>
+                    </discount>
+                    <j151>14.80</j151>
+                    <tax>
+                        <x470>01</x470>
+                        <x471>R</x471>
+                        <x472>7.00</x472>
+                    </tax>
+                    <j152>EUR</j152>
+                    <territory>
+                        <x449>DE</x449>
+                    </territory>
+                    <pricedate>
+                        <x476>14</x476>
+                        <b306 dateformat="00">20210224</b306>
+                    </pricedate>
+                </price>
+                <price>
+                    <x462>03</x462>
+                    <j151>13.83</j151>
+                    <tax>
+                        <x470>01</x470>
+                        <x471>R</x471>
+                        <x472>7.00</x472>
+                    </tax>
+                    <j152>EUR</j152>
+                    <territory>
+                        <x449>DE</x449>
+                    </territory>
+                    <pricedate>
+                        <x476>14</x476>
+                        <b306 dateformat="00">20210224</b306>
+                    </pricedate>
+                </price>
+                <price>
+                    <x462>15</x462>
+                    <j151>7.93</j151>
+                    <tax>
+                        <x470>01</x470>
+                        <x471>R</x471>
+                        <x472>7.00</x472>
+                    </tax>
+                    <j152>EUR</j152>
+                    <territory>
+                        <x449>DE</x449>
+                    </territory>
+                    <pricedate>
+                        <x476>14</x476>
+                        <b306 dateformat="00">20210224</b306>
+                    </pricedate>
+                </price>
+            </supplydetail>
+        </productsupply>
+    </product>
+</ONIXmessage>
