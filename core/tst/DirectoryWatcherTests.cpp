@@ -41,7 +41,8 @@ namespace AwsMock::Core {
       }
 
       void TearDown() override {
-          Poco::ThreadPool::defaultPool().stopAll();
+          thread->wakeUp();
+          delete thread;
           DirUtils::DeleteDirectory(tempDir, true);
           added = 0;
           deleted = 0;
@@ -52,29 +53,29 @@ namespace AwsMock::Core {
 
       void OnFileAdded(const DirectoryEvent &addedEvent) {
           added++;
-          thread.wakeUp();
+          thread->wakeUp();
       }
 
       void OnFileModified(const DirectoryEvent &modifiedEvent) {
           modified++;
-          thread.wakeUp();
+          thread->wakeUp();
       }
 
       void OnFileDeleted(const DirectoryEvent &deletedEvent) {
           deleted++;
-          thread.wakeUp();
+          thread->wakeUp();
       }
 
       int added = 0, deleted = 0, modified = 0;
       std::shared_ptr<DirectoryWatcher> _watcher;
       std::string tempFile, tempDir;
-      Poco::Thread thread;
+      Poco::Thread *thread = new Poco::Thread();
     };
 
     TEST_F(DirectoryWatcherTest, FileAddedTest) {
 
         // arrange
-        thread.start(*_watcher);
+        thread->start(*_watcher);
 
         // act
         tempFile = Core::FileUtils::CreateTempFile(tempDir, "txt", 10);
@@ -89,7 +90,7 @@ namespace AwsMock::Core {
     TEST_F(DirectoryWatcherTest, FileModifiedTest) {
 
         // arrange
-        thread.start(*_watcher);
+        thread->start(*_watcher);
 
         // act
         tempFile = Core::FileUtils::CreateTempFile(tempDir, "txt", 10);
@@ -106,7 +107,7 @@ namespace AwsMock::Core {
     TEST_F(DirectoryWatcherTest, FileDeletedTest) {
 
         // arrange
-        thread.start(*_watcher);
+        thread->start(*_watcher);
         tempFile = Core::FileUtils::CreateTempFile(tempDir, "txt", 10);
 
         // act
@@ -122,10 +123,10 @@ namespace AwsMock::Core {
     TEST_F(DirectoryWatcherTest, DirectoryAddedTest) {
 
         // arrange
-        thread.start(*_watcher);
+        thread->start(*_watcher);
 
         // act
-        Core::DirUtils::MakeDirectory(std::string(tempDir) + "/tmptest");
+        Core::DirUtils::MakeDirectory(tempDir + "/tmptest");
 
         // assert
         while (added == 0) {

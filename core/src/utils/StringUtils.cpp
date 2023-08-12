@@ -38,13 +38,16 @@ namespace AwsMock::Core {
         return std::regex_match(value, regex);
     }
 
-    std::vector<std::string> StringUtils::Split(const std::string &s, char delim) {
+    std::vector<std::string> StringUtils::Split(const std::string &s, char delimiter) {
         std::vector<std::string> elems;
-        std::istringstream iss(s);
-        std::string item;
-        while (std::getline(iss, item, delim)) {
-            elems.push_back(item);
+        size_t pos_start = 0, pos_end;
+        std::string token;
+        while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
+            token = s.substr (pos_start, pos_end - pos_start);
+            pos_start = pos_end + 1;
+            elems.push_back (token);
         }
+        elems.push_back (s.substr (pos_start));
         return elems;
     }
 
