@@ -70,6 +70,7 @@ namespace AwsMock::Service {
 
                 _lambdaService.InvokeEventFunction(eventNotification);
                 log_debug_stream(_logger) << "Lambda function invoked, functions: " << eventNotification.records.size() <<  std::endl;
+                SendOkResponse(response);
 
             }
 
