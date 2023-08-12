@@ -34,8 +34,8 @@ function topic_exists() {
 }
 
 function create_sns_subscription() {
-  awsmock sns subscribe --topic-arn arn:aws:sns:eu-central-1:000000000000:$1-topic \
-    --protocol sqs --notification-endpoint arn:aws:sqs:eu-central-1:000000000000:$1-queue
+  awsmock sns subscribe --topic-arn "arn:aws:sns:eu-central-1:000000000000:$1-topic" \
+    --protocol sqs --notification-endpoint "arn:aws:sqs:eu-central-1:000000000000:$1-queue" > /dev/null
 }
 
 function create_sns_topic() {
@@ -62,7 +62,8 @@ function create_s3_bucket() {
 }
 
 function create_s3_object() {
-  awsmock s3 cp $1 s3://$2/$3
+  awsmock s3 cp "$1" "s3://$2/$3" > /dev/null
+  echo "Uploaded $1"
 }
 
 function create_bucket_notification() {
@@ -71,7 +72,7 @@ function create_bucket_notification() {
   hook=$2
 
   awsmock s3api put-bucket-notification-configuration --bucket "$bucket" --notification-configuration file://./s3/"$hook"
-  printf "{\n\tBucket notification created hook: '%s'\n}" "$hook"
+  echo "Bucket notification created, hook: $hook"
 }
 
 #
@@ -140,7 +141,6 @@ create_queue_with_dead_letter_queue daten-lieferanten-service-daten-eingang
 create_queue_with_dead_letter_queue daten-datenlieferanten-notification
 create_queue_with_dead_letter_queue textannotation-result
 create_queue_with_dead_letter_queue bilderlink
-create_queue_with_dead_letter_queue basisdaten
 create_queue_with_dead_letter_queue produktmeldung-parsing
 create_queue_with_dead_letter_queue image-delete-notification
 create_queue_with_dead_letter_queue onix3-datenlieferant-updates
@@ -153,9 +153,9 @@ create_queue_with_dead_letter_queue inventory-feed-parsing-result
 #
 # Create lambda function
 #
-create_lambda_function file-copy-service java17 file-copy-service-1.14.3-SNAPSHOT-aws.jar
-create_lambda_function file-distribution-service java17 file-distribution-service-1.24.0-SNAPSHOT-aws.jar
-create_lambda_function image-transformation-iservice provided.al2 image-transformation-lambda.zip
+create_lambda_function ftp-file-copy java17 file-copy-service-1.14.3-SNAPSHOT-aws.jar
+create_lambda_function ftp-file-distribution java17 file-distribution-service-1.24.0-SNAPSHOT-aws.jar
+create_lambda_function image-transformation provided.al2 image-transformation-lambda.zip
 
 #
 # Create SNS topic
@@ -167,6 +167,7 @@ create_sns_topic file-logging-topic
 #
 create_bucket_notification transfer-server file-copy-hook.json
 create_bucket_notification file-delivery file-delivery-hook.json
+create_bucket_notification file-delivery file-delivery-hook.json
 
 #
 # SNS -> SQS subscription
@@ -176,5 +177,5 @@ create_sns_subscription file-logging
 #
 # Put some objects
 #
-create_s3_object ./images/0036089631545_ANNO_OBILD.jpg file-delivery ftpuser1/0036089631545_ANNO_OBILD.jpg
-create_s3_object ./images/9781406379990_ANNO_OBILD.jpg file-delivery ftpuser1/9781406379990_ANNO_OBILD.jpg
+create_s3_object ./testdata/images/0036089631545_ANNO_OBILD.jpg file-delivery ftpuser1/0036089631545_ANNO_OBILD.jpg
+create_s3_object ./testdata/images/9781406379990_ANNO_OBILD.jpg file-delivery ftpuser1/9781406379990_ANNO_OBILD.jpg

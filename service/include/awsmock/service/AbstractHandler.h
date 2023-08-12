@@ -249,12 +249,20 @@ namespace AwsMock::Service {
       static std::string GetEndpoint(Poco::Net::HTTPServerRequest &request);
 
       /**
-       * Send a OK response (HTTP status code 200).
+       * Returns the HTTP request body as string.
        *
-       * @param response HTTP response object
-       * @param payload HTTP body payload
-       * @param extraHeader HTTP header map values, added to the default headers
+       * @param request HTTP request
+       * @return request body as string
        */
+      static std::string GetBodyAsString(Poco::Net::HTTPServerRequest &request);
+
+        /**
+         * Send a OK response (HTTP status code 200).
+         *
+         * @param response HTTP response object
+         * @param payload HTTP body payload
+         * @param extraHeader HTTP header map values, added to the default headers
+         */
       void SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &payload = {}, HeaderMap *extraHeader = nullptr);
 
       /**

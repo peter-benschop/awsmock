@@ -64,7 +64,7 @@ namespace AwsMock::Dto::Lambda {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const Code &r) {
-          os << "Code={imageUri='" + r.s3Bucket + "' imageUri='" + r.s3Bucket + "' s3Key='" + r.s3Key + "' s3ObjectVersion='" + r.s3ObjectVersion + "'}";
+          os << "Code={imageUri='" << r.s3Bucket << "' imageUri='" << r.s3Bucket << "' s3Key='" << r.s3Key << "' s3ObjectVersion='" << r.s3ObjectVersion + "'}";
           return os;
       }
 

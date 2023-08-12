@@ -336,6 +336,12 @@ namespace AwsMock::Service {
         log_debug_stream(_logger) << "Found version and action, version: " << version << " action: " << action << std::endl;
     }
 
+    std::string AbstractHandler::GetBodyAsString(Poco::Net::HTTPServerRequest &request) {
+        std::stringstream sstream;
+        sstream << request.stream().rdbuf();
+        return sstream.str();
+    }
+
     std::string AbstractHandler::GetEndpoint(Poco::Net::HTTPServerRequest &request) {
         return request.get("Host");
     }
