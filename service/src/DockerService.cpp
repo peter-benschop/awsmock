@@ -8,10 +8,7 @@ namespace AwsMock::Service {
 
     DockerService::DockerService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("DockerService")), _configuration(configuration) {
 
-        // Set console logger
-        Core::Logger::SetDefaultConsoleLogger("DockerService");
-        log_debug_stream(_logger) << "Docker service initialized" << std::endl;
-
+        // Get version
         std::string output = _curlUtils.SendRequest("GET", "/version");
         log_debug_stream(_logger) << "Docker daemon version: " << output << std::endl;
     }

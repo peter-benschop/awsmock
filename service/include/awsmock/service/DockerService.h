@@ -34,8 +34,6 @@
 
 #define DOCKER_VERSION std::string("v1.43")
 #define DOCKER_SOCKET "/var/run/docker.sock"
-#define TAR_CONTENT_TYPE std::string("application/x-tar")
-#define JSON_CONTENT_TYPE std::string("application/json")
 #define NETWORK_NAME ".dockerhost.net"
 #define HOST_PORT_MIN 32768
 #define HOST_PORT_MAX 65536

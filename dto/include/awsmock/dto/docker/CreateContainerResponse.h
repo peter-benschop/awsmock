@@ -19,6 +19,7 @@
 #include <Poco/Dynamic/Var.h>
 
 // AwsMock includes
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/ServiceException.h>
 
 namespace AwsMock::Dto::Docker {
@@ -52,7 +53,7 @@ namespace AwsMock::Dto::Docker {
           Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
           try {
-              id = rootObject->get("Id").convert<std::string>();
+              Core::JsonUtils::GetJsonValueString("Id", rootObject, id);
 
               // Cleanup
               rootObject->clear();

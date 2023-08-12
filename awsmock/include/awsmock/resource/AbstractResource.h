@@ -40,7 +40,7 @@ namespace AwsMock::Resource {
      */
     class AbstractResource : public Poco::Net::HTTPRequestHandler {
 
-    public:
+     public:
       /**
        * Default User-defined Constructor
        */
@@ -60,7 +60,7 @@ namespace AwsMock::Resource {
        */
       void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
 
-    protected:
+     protected:
 
       /**
        * Handles the HTTP method GET.
@@ -70,7 +70,10 @@ namespace AwsMock::Resource {
        * @param region AWS region
        * @param user current user
        */
-      virtual void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user);
+      virtual void handleGet(Poco::Net::HTTPServerRequest &request,
+                             Poco::Net::HTTPServerResponse &response,
+                             const std::string &region,
+                             const std::string &user);
 
       /**
        * Handles the HTTP method PUT.
@@ -80,7 +83,10 @@ namespace AwsMock::Resource {
        * @param region AWS region
        * @param user current user
        */
-      virtual void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user);
+      virtual void handlePut(Poco::Net::HTTPServerRequest &request,
+                             Poco::Net::HTTPServerResponse &response,
+                             const std::string &region,
+                             const std::string &user);
 
       /**
        * Handles the HTTP method POST.
@@ -90,7 +96,10 @@ namespace AwsMock::Resource {
        * @param region AWS region
        * @param user current user
        */
-      virtual void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user);
+      virtual void handlePost(Poco::Net::HTTPServerRequest &request,
+                              Poco::Net::HTTPServerResponse &response,
+                              const std::string &region,
+                              const std::string &user);
 
       /**
        * Handles the HTTP method DELETE.
@@ -100,7 +109,10 @@ namespace AwsMock::Resource {
        * @param region AWS region
        * @param user current user
        */
-      virtual void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user);
+      virtual void handleDelete(Poco::Net::HTTPServerRequest &request,
+                                Poco::Net::HTTPServerResponse &response,
+                                const std::string &region,
+                                const std::string &user);
 
       /**
        * Handles the HTTP OPTIONS method.
@@ -132,32 +144,9 @@ namespace AwsMock::Resource {
        * @param statusCode HTTP Status Code.
        * @param reason status reason.
        */
-      static void handleHttpStatusCode(Poco::Net::HTTPServerResponse &response, int statusCode, const char* reason = nullptr);
-
-      /**
-       * CHecks whether a query parameter exists
-       *
-       * @param parameterKey parameter name.
-       * @return true if parameter exists, otherwise false
-       */
-      bool QueryParameterExists(const std::string &parameterKey);
-
-      /**
-       * Returns a query parameter by name.
-       *
-       * @param name parameter name.
-       * @param optional parameter is optional.
-       * @return  arameter value.
-       */
-      std::string GetQueryParameter(const std::string &name, bool optional = true);
-
-      /**
-       * Returns a path parameter by position.
-       *
-       * @param pos parameter position.
-       * @return The parameter value.
-       */
-      std::string GetPathParameter(int pos);
+      static void handleHttpStatusCode(Poco::Net::HTTPServerResponse &response,
+                                       int statusCode,
+                                       const char *reason = nullptr);
 
       /**
        * Returns the region and the user
@@ -184,17 +173,9 @@ namespace AwsMock::Resource {
        * @param payload HTTP body payload
        * @param extraHeader HTTP header map values, added to the default headers
        */
-      void SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &payload = {}, HeaderMap *extraHeader = nullptr);
-
-      /**
-       * Send a OK response (HTTP status code 200) with an output stream.
-       *
-       * @param response HTTP response object
-       * @param fileName file to send
-       * @param contentLength content length of the stream in bytes
-       * @param extraHeader HTTP header map values, added to the default headers
-       */
-      void SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long contentLength, HeaderMap *extraHeader = nullptr);
+      void SendOkResponse(Poco::Net::HTTPServerResponse &response,
+                          const std::string &payload = {},
+                          HeaderMap *extraHeader = nullptr);
 
       /**
        * Send an error response.
@@ -220,7 +201,9 @@ namespace AwsMock::Resource {
        * @param response HTTP response object
        * @param exc service exception object
        */
-      void SendErrorResponse(const std::string &service,Poco::Net::HTTPServerResponse &response, Core::ServiceException &exc);
+      void SendErrorResponse(const std::string &service,
+                             Poco::Net::HTTPServerResponse &response,
+                             Core::ServiceException &exc);
 
       /**
        * Dump the request to std::cerr
@@ -249,7 +232,7 @@ namespace AwsMock::Resource {
        * @param request HTTP request
        * @param filename name fo the file
        */
-      void DumpBodyToFile(Poco::Net::HTTPServerRequest &request, const std::string &filename);
+      [[maybe_unused]] void DumpBodyToFile(Poco::Net::HTTPServerRequest &request, const std::string &filename);
 
       /**
        * Forward request to service port
@@ -259,8 +242,10 @@ namespace AwsMock::Resource {
        * @param host forward host
        * @param port forward port
        */
-      void ForwardRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &host, int port);
-
+      void ForwardRequest(Poco::Net::HTTPServerRequest &request,
+                          Poco::Net::HTTPServerResponse &response,
+                          const std::string &host,
+                          int port);
 
       /**
        * Set default request header values
@@ -271,7 +256,7 @@ namespace AwsMock::Resource {
        */
       void SetHeaders(Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user);
 
-    private:
+     private:
 
       /**
        * Set the header values
@@ -280,7 +265,9 @@ namespace AwsMock::Resource {
        * @param contentLength payload content length
        * @param headerMap vector of header key/values pairs
        */
-      void SetHeaders(Poco::Net::HTTPServerResponse &response, unsigned long contentLength, HeaderMap *headerMap = nullptr);
+      void SetHeaders(Poco::Net::HTTPServerResponse &response,
+                      unsigned long contentLength,
+                      HeaderMap *headerMap = nullptr);
 
       /**
        * Logger
@@ -317,8 +304,6 @@ namespace AwsMock::Resource {
        */
       HeaderMap _headerMap;
     };
-
-#define awsmock_debug(logger) logger.debug() << __FILE__ << ":" << __LINE__
 
 } // namespace AwsMock::Resource
 

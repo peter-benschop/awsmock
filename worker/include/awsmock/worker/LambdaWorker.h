@@ -44,6 +44,26 @@ namespace AwsMock::Worker {
       void Initialize();
 
       /**
+       * Start all lambdas if they are not existing
+       */
+      void StartLambdaFunctions();
+
+      /**
+       * Send a lambda create function request.
+       *
+       * @param request HTTP request
+       * @param contentType HTTP content type
+       */
+      void SendCreateFunctionRequest(Dto::Lambda::CreateFunctionRequest &request, const std::string &contentType);
+
+      /**
+       * Adds the authorization header.
+       *
+       * @param request HTTP request
+       */
+      void AddAuthorization(Poco::Net::HTTPRequest &request);
+
+      /**
        * Logger
        */
       Core::LogStream _logger;
@@ -69,6 +89,11 @@ namespace AwsMock::Worker {
       std::unique_ptr<Service::S3Service> _s3Service;
 
       /**
+       * Lambda service
+       */
+      std::unique_ptr<Service::LambdaService> _lambdaService;
+
+      /**
        * Data dir
        */
       std::string _dataDir;
@@ -87,6 +112,26 @@ namespace AwsMock::Worker {
        * Sleeping period in ms
        */
       int _period;
+
+      /**
+       * AWS client ID
+       */
+      std::string _clientId;
+
+      /**
+       * AWS user
+       */
+      std::string _user;
+
+      /**
+       * Lambda service host
+       */
+      std::string _lambdaServiceHost;
+
+      /**
+       * Lambda service port
+       */
+      int _lambdaServicePort;
     };
 
 } // namespace AwsMock::Worker

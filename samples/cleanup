@@ -4,16 +4,17 @@
 # S3 function
 #
 function delete_s3_bucket(){
-  awsmock s3 rm s3://$1 --recursive
-  awsmock s3 rb s3://$1
+  awsmock s3 rm "s3://$1" --recursive
+  awsmock s3 rb "s3://$1"
 }
 
 #
 # SQS function
 #
 function delete_sqs_queue(){
-  awsmock sqs delete-queue --queue-url=http://localhost:4567/000000000000/$1-queue
-  awsmock sqs delete-queue --queue-url=http://localhost:4567/000000000000/$1-dlqueue
+  awsmock sqs delete-queue --queue-url "http://localhost:4567/000000000000/$1-queue" > /dev/null
+  awsmock sqs delete-queue --queue-url "http://localhost:4567/000000000000/$1-dlqueue" > /dev/null
+  echo "Queue $1 deleted"
 }
 
 #
@@ -27,7 +28,7 @@ function delete_sns_topic(){
 # Lambda function
 #
 function delete_lambda_function(){
-  awsmock lambda delete-function --function-name $1
+  awsmock lambda delete-function --function-name "$1" > /dev/null
 }
 
 #
@@ -67,7 +68,6 @@ delete_sqs_queue daten-lieferanten-service-daten-eingang
 delete_sqs_queue daten-datenlieferanten-notification
 delete_sqs_queue textannotation-result
 delete_sqs_queue bilderlink
-delete_sqs_queue basisdaten
 delete_sqs_queue produktmeldung-parsing
 delete_sqs_queue image-delete-notification
 delete_sqs_queue onix3-datenlieferant-updates
@@ -82,10 +82,10 @@ delete_sqs_queue inventory-feed-parsing-result
 #
 delete_lambda_function ftp-file-copy
 delete_lambda_function ftp-file-distribution
+create_lambda_function image-transformation
 
 #
 # Delete SNS topic
 #
-delete_sns_topic file-logging-topic
 delete_sns_topic protokollierung-topic
 delete_sns_topic datenlieferant-updates

@@ -51,122 +51,133 @@
 
 namespace AwsMock::Core {
 
-    enum DirectoryEventType
-    {
-      DW_ITEM_ADDED = 1,
-      /// A new item has been created and added to the directory.
+    enum DirectoryEventType {
+        DW_ITEM_ADDED = 1,
+        /// A new item has been created and added to the directory.
 
-      DW_ITEM_REMOVED = 2,
-      /// An item has been removed from the directory.
+        DW_ITEM_REMOVED = 2,
+        /// An item has been removed from the directory.
 
-      DW_ITEM_MODIFIED = 4,
-      /// An item has been modified.
+        DW_ITEM_MODIFIED = 4,
+        /// An item has been modified.
 
-      DW_ITEM_MOVED_FROM = 8,
-      /// An item has been renamed or moved. This event delivers the old name.
+        DW_ITEM_MOVED_FROM = 8,
+        /// An item has been renamed or moved. This event delivers the old name.
 
-      DW_ITEM_MOVED_TO = 16
-      /// An item has been renamed or moved. This event delivers the new name.
+        DW_ITEM_MOVED_TO = 16
+        /// An item has been renamed or moved. This event delivers the new name.
     };
 
-    enum DirectoryEventMask
-    {
-      DW_FILTER_ENABLE_ALL = 31,
-      /// Enables all event types.
+    enum DirectoryEventMask {
+        DW_FILTER_ENABLE_ALL = 31,
+        /// Enables all event types.
 
-      DW_FILTER_DISABLE_ALL = 0
-      /// Disables all event types.
+        DW_FILTER_DISABLE_ALL = 0
+        /// Disables all event types.
     };
 
-    enum FileType
-    {
-      DW_FILE_TYPE = 0,
-      DW_DIR_TYPE = 1
+    enum FileType {
+        DW_FILE_TYPE = 0,
+        DW_DIR_TYPE = 1
     };
 
-    struct DirectoryEvent
-    {
-      DirectoryEvent(const Poco::File& f, DirectoryEventType ev, FileType ft): item(f), event(ev), type(ft) {}
+    struct DirectoryEvent {
+        DirectoryEvent(const Poco::File &f, DirectoryEventType ev, FileType ft) : item(f), event(ev), type(ft) {}
 
-      /**
-       * The directory or file that has been changed.
-       */
-      const Poco::File& item;
+        /**
+         * The directory or file that has been changed.
+         */
+        const Poco::File &item;
 
-      /**
-       * The kind of event.
-       */
-      DirectoryEventType event;
+        /**
+         * The kind of event.
+         */
+        DirectoryEventType event;
 
-      /**
-       * The type of file
-       */
-      FileType type;
+        /**
+         * The type of file
+         */
+        FileType type;
     };
 
     class DirectoryWatcher : public Poco::Runnable {
 
     public:
 
-      /**
-       * Constructor
-       */
-      explicit DirectoryWatcher(std::string rootDir);
+        /**
+         * Constructor
+         */
+        explicit DirectoryWatcher(std::string rootDir);
 
-      /**
-       * Initialization
-       */
-      void Initialize();
+        /**
+         * Destructor
+         */
+        ~DirectoryWatcher() override;
 
-      /**
-       * Main thread running method
-       */
-      [[noreturn]] void run() override;
+        /**
+         * Initialization
+         */
+        void Initialize();
 
-      /**
-       * Added event
-       */
-      Poco::BasicEvent<const DirectoryEvent> itemAdded;
+        /**
+         * Main thread running method
+         */
+        void run() override;
 
-      /**
-       * Modified event
-       */
-      Poco::BasicEvent<const DirectoryEvent> itemModified;
+        /**
+         * Added event
+         */
+        Poco::BasicEvent<const DirectoryEvent> itemAdded;
 
-      /**
-       * Deleted event
-       */
-      Poco::BasicEvent<const DirectoryEvent> itemDeleted;
+        /**
+         * Modified event
+         */
+        Poco::BasicEvent<const DirectoryEvent> itemModified;
+
+        /**
+         * Deleted event
+         */
+        Poco::BasicEvent<const DirectoryEvent> itemDeleted;
 
     private:
 
-      /**
-       * Returns th file name
-       * @param rootDir root directory
-       * @param fileName name of the file
-       * @return absolute file name
-       */
-      static std::string GetFilename(const std::string &rootDir, const char* fileName);
+        /**
+         * Returns th file name
+         * @param rootDir root directory
+         * @param fileName name of the file
+         * @return absolute file name
+         */
+        static std::string GetFilename(const std::string &rootDir, const char *fileName);
 
-      /**
-       * Logger
-       */
-      Poco::LogStream _logger;
+        /**
+         * Logger
+         */
+        Poco::LogStream _logger;
 
-      /**
-       * Root directory
-       */
-      std::string _rootDir;
+        /**
+         * Root directory
+         */
+        std::string _rootDir;
 
-      /**
-       * File descriptor
-       */
-      int fd = 0;
+        /**
+         * File descriptor
+         */
+        int fd = 0;
 
-      /**
-       * Watcher map with absolute file pathes
-       */
-      std::map<int, std::string> _watcherMap;
+        /**
+         * Running flag
+         */
+        bool _running = false;
+
+        /**
+         * Poll timeout
+         */
+        int _timeout = 1000;
+
+        /**
+         * Watcher map with absolute file pathes
+         */
+        std::map<int, std::string> _watcherMap;
     };
 
 } // namespace AwsMock::Core

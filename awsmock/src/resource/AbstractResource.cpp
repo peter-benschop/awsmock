@@ -200,41 +200,6 @@ namespace AwsMock::Resource {
         }
     }
 
-    std::string AbstractResource::GetQueryParameter(const std::string &parameterKey, bool optional) {
-
-        auto iterator = std::find_if(_queryStringParameters.begin(), _queryStringParameters.end(),
-                                     [&parameterKey](const std::pair<std::string, std::string> &item) {
-                                       return item.first == parameterKey;
-                                     }
-        );
-
-        if (iterator == _queryStringParameters.end()) {
-            if (optional) {
-                return {};
-            } else {
-                throw HandlerException(Poco::Net::HTTPResponse::HTTP_REASON_BAD_REQUEST,
-                                       "MessageAttribute '" + parameterKey + "' is missing at URL.",
-                                       Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
-            }
-        }
-        return iterator->second;
-    }
-
-    bool AbstractResource::QueryParameterExists(const std::string &parameterKey) {
-
-        auto iterator = std::find_if(_queryStringParameters.begin(), _queryStringParameters.end(),
-                                     [&parameterKey](const std::pair<std::string, std::string> &item) {
-                                       return item.first == parameterKey;
-                                     }
-        );
-
-        return iterator != _queryStringParameters.end();
-    }
-
-    std::string AbstractResource::GetPathParameter(int pos) {
-        return _pathParameter[pos];
-    }
-
     void AbstractResource::GetRegionUser(const std::string &authorization, std::string &region, std::string &user) {
         Poco::RegularExpression::MatchVec posVec;
 
@@ -245,7 +210,7 @@ namespace AwsMock::Resource {
 
         user = authorization.substr(posVec[1].offset, posVec[1].length);
         region = authorization.substr(posVec[2].offset, posVec[2].length);
-        log_info_stream(_logger) << "Found user: " << user << " region: " << region << std::endl;
+        log_debug_stream(_logger) << "Found user: " << user << " region: " << region << std::endl;
     }
 
     std::string AbstractResource::GetPayload(Poco::Net::HTTPServerRequest &request) {
@@ -274,27 +239,6 @@ namespace AwsMock::Resource {
             outputStream << payload;
         }
         outputStream.flush();
-    }
-
-    void AbstractResource::SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long contentLength, HeaderMap *extraHeader) {
-        log_trace_stream(_logger) << "Sending OK response, status: 200, filename: " << fileName << " contentLength: " << contentLength << std::endl;
-        try {
-
-            // Set headers
-            SetHeaders(response, contentLength, extraHeader);
-
-            std::ifstream ifs(fileName);
-
-            // Send response
-            handleHttpStatusCode(response, 200);
-            std::ostream &outputStream = response.send();
-            outputStream << ifs.rdbuf();
-            outputStream.flush();
-            ifs.close();
-
-        } catch (Poco::Exception &exc) {
-            log_error_stream(_logger) << "Exception: " << exc.message() << std::endl;
-        }
     }
 
     void AbstractResource::SendErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Poco::Exception &exc) {
@@ -335,16 +279,16 @@ namespace AwsMock::Resource {
 
         // Create HTTP request and set headers
         Poco::Net::HTTPClientSession session(host, port);
-        log_info_stream(_logger) << "Forward session, host: " << host << " port: " << port << std::endl;
+        log_debug_stream(_logger) << "Forward session, host: " << host << " port: " << port << std::endl;
 
         // Send request with body
         Poco::StreamCopier::copyStream(request.stream(), session.sendRequest(request));
-        log_info_stream(_logger) << "Forward request send" << std::endl;
+        log_debug_stream(_logger) << "Forward request send" << std::endl;
 
         // Get the response
         std::stringstream body;
         Poco::StreamCopier::copyStream(session.receiveResponse(response), body);
-        log_info_stream(_logger) << "Got response from backend service" << std::endl;
+        log_debug_stream(_logger) << "Got response from backend service" << std::endl;
 
         Resource::HeaderMap headerMap;
         auto i = response.begin();
@@ -358,7 +302,7 @@ namespace AwsMock::Resource {
         } else {
             SendErrorResponse(response, body.str());
         }
-        log_info_stream(_logger) << "Backend service response send back to client" << std::endl;
+        log_debug_stream(_logger) << "Backend service response send back to client" << std::endl;
     }
 
     void AbstractResource::SetHeaders(Poco::Net::HTTPServerResponse &response, unsigned long contentLength, HeaderMap *extraHeader) {

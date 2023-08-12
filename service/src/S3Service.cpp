@@ -63,6 +63,7 @@ namespace AwsMock::Service {
             log_error_stream(_logger) << "S3 create bucket failed, message: " << exc.message() << std::endl;
             throw Core::ServiceException(exc.message(), 500);
         }
+        log_info_stream(_logger) << "CreateBucket succeeded, bucket: " << name << std::endl;
         return createBucketResponse;
     }
 
@@ -87,6 +88,7 @@ namespace AwsMock::Service {
             log_error_stream(_logger) << "S3 get object metadata failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500);
         }
+        log_info_stream(_logger) << "GetMetadata succeeded, bucket: " << request.bucket << " key: " << request.key << std::endl;
         return getMetadataResponse;
     }
 
@@ -111,6 +113,7 @@ namespace AwsMock::Service {
             log_error_stream(_logger) << "S3 get object failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500);
         }
+        log_info_stream(_logger) << "GetObject succeeded, bucket: " << request.bucket << " key: " << request.key << std::endl;
         return getObjectResponse;
     }
 
@@ -121,7 +124,7 @@ namespace AwsMock::Service {
 
             Database::Entity::S3::BucketList bucketList = _database->ListBuckets();
             auto listAllBucketResponse = Dto::S3::ListAllBucketResponse(bucketList);
-            log_trace_stream(_logger) << "S3 Create Bucket List outcome: " + listAllBucketResponse.ToXml() << std::endl;
+            log_info_stream(_logger) << "ListAllBuckets succeeded, size: " << bucketList.size() << std::endl;
             return listAllBucketResponse;
 
         } catch (Poco::Exception &ex) {
@@ -137,7 +140,7 @@ namespace AwsMock::Service {
 
             Database::Entity::S3::ObjectList objectList = _database->ListBucket(request.name, request.prefix);
             Dto::S3::ListBucketResult listBucketResult = Dto::S3::ListBucketResult(request.name, objectList);
-            log_trace_stream(_logger) << "S3 list bucket result: " << listBucketResult.ToXml() << std::endl;
+            log_info_stream(_logger) << "ListBucket succeeded, size: " << objectList.size() << std::endl;
             return listBucketResult;
 
         } catch (Poco::Exception &ex) {
@@ -161,7 +164,7 @@ namespace AwsMock::Service {
         if (!Core::DirUtils::DirectoryExists(uploadDir)) {
             Core::DirUtils::MakeDirectory(uploadDir);
         }
-
+        log_info_stream(_logger) << "CreateMultipartUpload succeeded, bucket: " << bucket << " key: " << key << std::endl;
         return {.bucket=bucket, .key=key, .uploadId=uploadId};
     }
 
@@ -175,6 +178,7 @@ namespace AwsMock::Service {
         ofs << stream.rdbuf();
         log_trace_stream(_logger) << "Part uploaded, part: " << part << " dir: " << uploadDir << std::endl;
 
+        log_info_stream(_logger) << "UploadPart succeeded, part: " << part << std::endl;
         return Core::StringUtils::GenerateRandomString(40);
     }
 
@@ -216,6 +220,10 @@ namespace AwsMock::Service {
         // Cleanup
         Core::DirUtils::DeleteDirectory(uploadDir);
 
+        // Check notifications
+        CheckNotifications(region, bucket, key, "s3:ObjectCreated:Put");
+
+        log_info_stream(_logger) << "CompleteMultipartUpload succeeded, bucket: " << bucket << " key: " << key << std::endl;
         return {.location=region, .bucket=bucket, .key=key, .etag=Core::StringUtils::GenerateRandomString(40)};
     }
 
@@ -255,22 +263,16 @@ namespace AwsMock::Service {
                 .md5sum=request.md5Sum,
                 .contentType=request.contentType};
             object = _database->CreateOrUpdateObject(object);
-            log_debug_stream(_logger) << "Database updated, bucket: " << request.bucket << " key: " << request.key << std::endl;
+            log_debug_stream(_logger) << "Database updated, bucket: " << object.bucket << " key: " << object.key << std::endl;
 
             // Check notification
-            Database::Entity::S3::Bucket bucket = _database->GetBucketByRegionName(request.region, request.bucket);
-            auto notification =
-                find_if(bucket.notifications.begin(), bucket.notifications.end(), [](const Database::Entity::S3::BucketNotification eventNotification) {
-                  return eventNotification.event == "s3:ObjectCreated:Put";
-                });
-            if (notification != bucket.notifications.end()) {
-                CheckNotifications(object, request.region, "s3:ObjectCreated:Put");
-            }
+            CheckNotifications(request.region, request.bucket, request.key, "s3:ObjectCreated:Put");
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "S3 put object failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500);
         }
+        log_info_stream(_logger) << "PutObject succeeded, bucket: " << request.bucket << " key: " << request.key << std::endl;
         return {.bucket=request.bucket, .key=request.key, .etag=request.md5Sum};
     }
 
@@ -296,19 +298,13 @@ namespace AwsMock::Service {
             DeleteObject(request.bucket, request.key);
 
             // Check notification
-            Database::Entity::S3::Bucket bucket = _database->GetBucketByRegionName(request.region, request.bucket);
-            auto notification =
-                find_if(bucket.notifications.begin(), bucket.notifications.end(), [](const Database::Entity::S3::BucketNotification &eventNotification) {
-                  return eventNotification.event == "s3:ObjectRemoved:Delete";
-                });
-            if (notification != bucket.notifications.end()) {
-                CheckNotifications(object, request.region, "s3:ObjectRemoved:Delete");
-            }
+            CheckNotifications(request.region, request.bucket, request.key, "s3:ObjectRemoved:Delete");
 
         } catch (Poco::Exception &exc) {
             log_error_stream(_logger) << "S3 delete object failed, message: " + exc.message() << std::endl;
             throw Core::ServiceException(exc.message(), 500);
         }
+        log_info_stream(_logger) << "DeleteObject succeeded, bucket: " << request.bucket << " key: " << request.key << std::endl;
     }
 
     Dto::S3::DeleteObjectsResponse S3Service::DeleteObjects(const Dto::S3::DeleteObjectsRequest &request) {
@@ -326,24 +322,20 @@ namespace AwsMock::Service {
             log_debug_stream(_logger) << "Database object deleted, count: " << request.keys.size() << std::endl;
 
             // Delete file system objects
-            for(const auto &key: request.keys) {
+            for (const auto &key : request.keys) {
 
                 DeleteObject(request.bucket, key);
                 log_debug_stream(_logger) << "File system object deleted: " << key << std::endl;
 
                 // Check notifications
-                Database::Entity::S3::Object object = _database->GetObject(request.region, request.bucket, key);
-                Database::Entity::S3::Bucket bucket = _database->GetBucketByRegionName(request.region, request.bucket);
-                if (bucket.HasNotification("s3:ObjectRemoved:Delete")) {
-                    CheckNotifications(object, request.region, "s3:ObjectRemoved:Delete");
-                }
-
+                CheckNotifications(request.region, request.bucket, key, "s3:ObjectRemoved:Delete");
             }
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "S3 delete objects failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500);
         }
+        log_info_stream(_logger) << "DeleteObjects succeeded, bucket: " << request.bucket << std::endl;
         return response;
     }
 
@@ -372,6 +364,7 @@ namespace AwsMock::Service {
             log_error_stream(_logger) << "S3 put bucket notification request failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500);
         }
+        log_info_stream(_logger) << "PutBucketNotification succeeded, bucket: " << request.bucket << std::endl;
     }
 
     void S3Service::DeleteBucket(const std::string &region, const std::string &name) {
@@ -400,23 +393,24 @@ namespace AwsMock::Service {
             log_error_stream(_logger) << "S3 Delete Bucket failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500);
         }
+        log_info_stream(_logger) << "DeleteBucket succeeded, bucket: " << name << std::endl;
     }
 
-    void S3Service::CheckNotifications(const Database::Entity::S3::Object& object, const std::string &region, const std::string &event) {
+    void S3Service::CheckNotifications(const std::string &region, const std::string &bucketName, const std::string &key, const std::string &event) {
 
-        Database::Entity::S3::Bucket dbBucket = _database->GetBucketByRegionName(region, object.bucket);
+        Database::Entity::S3::Bucket dbBucket = _database->GetBucketByRegionName(region, bucketName);
 
         if (dbBucket.HasNotification(event)) {
 
             Database::Entity::S3::BucketNotification notification = dbBucket.GetNotification(event);
 
             // Create the event record
-            Dto::S3::Object obj = {.key=object.key, .etag=object.md5sum};
+            Dto::S3::Object obj = {.key=key, .etag=Poco::UUIDGenerator().createRandom().toString()};
             Dto::S3::Bucket bucket = {.name=dbBucket.name};
 
             Dto::S3::S3 s3 = {.configurationId=notification.notificationId, .bucket=bucket, .object=obj,};
 
-            Dto::S3::Record record = {.region=region, .s3=s3};
+            Dto::S3::Record record = {.region=region, .eventName=event, .s3=s3 };
             Dto::S3::EventNotification eventNotification;
 
             eventNotification.records.push_back(record);
@@ -434,6 +428,8 @@ namespace AwsMock::Service {
                 SendLambdaInvocationRequest(eventNotification);
                 log_debug_stream(_logger) << "Lambda function invoked, eventNotification: " + eventNotification.ToString() << std::endl;
             }
+        } else {
+            log_debug_stream(_logger) << "No notifications found, bucket: " << bucketName << " key: " << key << std::endl;
         }
     }
 
@@ -443,7 +439,8 @@ namespace AwsMock::Service {
         return _database->CreateBucketNotification(bucket, bucketNotification);
     }
 
-    Database::Entity::S3::Bucket S3Service::CreateLambdaConfiguration(const Database::Entity::S3::Bucket &bucket, const Dto::S3::PutBucketNotificationRequest &request) {
+    Database::Entity::S3::Bucket S3Service::CreateLambdaConfiguration(const Database::Entity::S3::Bucket &bucket,
+                                                                      const Dto::S3::PutBucketNotificationRequest &request) {
 
         Database::Entity::S3::BucketNotification bucketNotification = {.event=request.event, .notificationId=request.notificationId, .lambdaArn=request.lambdaArn};
         return _database->CreateBucketNotification(bucket, bucketNotification);
@@ -470,7 +467,7 @@ namespace AwsMock::Service {
     void S3Service::DeleteObject(const std::string &bucket, const std::string &key) {
 
         std::string filename = _dataDir + Poco::Path::separator() + bucket + Poco::Path::separator() + key;
-        if(Core::FileUtils::FileExists(filename)) {
+        if (Core::FileUtils::FileExists(filename)) {
             Core::FileUtils::DeleteFile(filename);
             log_debug_stream(_logger) << "File system object deleted, bucket: " << bucket << " key: " << key << std::endl;
         }
@@ -520,6 +517,7 @@ namespace AwsMock::Service {
 
         // Get the response status
         Poco::Net::HTTPResponse response;
+        session.receiveResponse(response);
         if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
             log_error_stream(_logger) << "HTTP error, status: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
         }
@@ -540,7 +538,8 @@ namespace AwsMock::Service {
         Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, path, Poco::Net::HTTPMessage::HTTP_1_1);
         request.setContentLength((long) body.length());
         request.add("Content-Type", "application/json");
-        request.add("Authorization", "AWS4-HMAC-SHA256 Credential=none/20230618/eu-central-1/lambda/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840");
+        request.add("Authorization",
+                    "AWS4-HMAC-SHA256 Credential=none/20230618/eu-central-1/lambda/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840");
         log_debug_stream(_logger) << "Invocation request created, body: " + body << std::endl;
 
         // Send request
@@ -549,6 +548,7 @@ namespace AwsMock::Service {
 
         // Get the response status
         Poco::Net::HTTPResponse response;
+        session.receiveResponse(response);
         if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
             log_error_stream(_logger) << "HTTP error, status: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
         }

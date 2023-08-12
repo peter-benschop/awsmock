@@ -26,6 +26,8 @@ namespace AwsMock::Worker {
 
     void SQSWorker::run() {
 
+        log_info_stream(_logger) << "SQS worker started" << std::endl;
+
         // Check service active
 //        if (!_serviceDatabase->IsActive("SQS")) {
 //            return;

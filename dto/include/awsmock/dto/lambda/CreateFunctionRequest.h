@@ -14,7 +14,10 @@
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
 #include <Poco/Dynamic/Var.h>
-#include "CreateFunctionResponse.h"
+
+// AwsMock includes
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/lambda/CreateFunctionResponse.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -47,6 +50,14 @@ namespace AwsMock::Dto::Lambda {
        */
       std::string zipFile;
 
+      void FromJson(Poco::JSON::Object::Ptr jsonObject) {
+          Core::JsonUtils::GetJsonValueString("ZipFile", jsonObject, zipFile);
+          Core::JsonUtils::GetJsonValueString("S3Bucket", jsonObject, s3Bucket);
+          Core::JsonUtils::GetJsonValueString("S3Key", jsonObject, s3Key);
+          Core::JsonUtils::GetJsonValueString("S3ObjectVersion", jsonObject, s3ObjectVersion);
+          Core::JsonUtils::GetJsonValueString("ImageUri", jsonObject, imageUri);
+      }
+
       /**
        * Converts the DTO to a string representation.
        *
@@ -64,7 +75,7 @@ namespace AwsMock::Dto::Lambda {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const Code &r) {
-          os << "Code={imageUri='" + r.s3Bucket + "' imageUri='" + r.s3Bucket + "' s3Key='" + r.s3Key + "' s3ObjectVersion='" + r.s3ObjectVersion + "'}";
+          os << "Code={imageUri='" << r.s3Bucket << "' imageUri='" << r.s3Bucket << "' s3Key='" << r.s3Key << "' s3ObjectVersion='" << r.s3ObjectVersion + "'}";
           return os;
       }
 
@@ -118,31 +129,55 @@ namespace AwsMock::Dto::Lambda {
       Code code;
 
       /**
+       * Creates a JSON string from the object.
+       *
+       * @return JSON string
+       */
+      std::string ToJson() {
+
+          try {
+              Poco::JSON::Object rootJson;
+              rootJson.set("FunctionName", functionName);
+              rootJson.set("Runtime", runtime);
+              rootJson.set("Role", role);
+              rootJson.set("MemorySize", memorySize);
+
+              std::ostringstream os;
+              rootJson.stringify(os);
+              return os.str();
+
+          } catch (Poco::Exception &exc) {
+              throw Core::ServiceException(exc.message(), 500);
+          }
+      }
+
+      /**
        * Parse a JSON stream
        *"{\"JAVA_TOOL_OPTIONS\":\"-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localhost\"}"
        * @param body jsoninput stream
        * @return
        */
-      void FromJson(std::istream &body) {
+      void FromJson(const std::string &body) {
 
           Poco::JSON::Parser parser;
           Poco::Dynamic::Var result = parser.parse(body);
           Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
           try {
-              functionName = rootObject->get("FunctionName").convert<std::string>();
-              runtime = rootObject->get("Runtime").convert<std::string>();
-              role = rootObject->get("Role").convert<std::string>();
-              handler = rootObject->get("Handler").convert<std::string>();
+              Core::JsonUtils::GetJsonValueString("FunctionName", rootObject, functionName);
+              Core::JsonUtils::GetJsonValueString("Runtime", rootObject, runtime);
+              Core::JsonUtils::GetJsonValueString("Role", rootObject, role);
+              Core::JsonUtils::GetJsonValueString("Handler", rootObject, handler);
 
               // Environment
-              Poco::JSON::Object::Ptr envObject = rootObject->getObject("Environment");
-              environmentVariables.FromJson(envObject);
+              if (rootObject->has("Environment")) {
+                  environmentVariables.FromJson(rootObject->getObject("Environment"));
+              }
 
               // Code
-              Poco::JSON::Object::Ptr codeObject = rootObject->getObject("Code");
-              code.zipFile = codeObject->get("ZipFile").convert<std::string>();
-              codeObject->clear();
+              if (rootObject->has("Code")) {
+                  code.FromJson(rootObject->getObject("Code"));
+              }
 
               // Cleanup
               rootObject->clear();

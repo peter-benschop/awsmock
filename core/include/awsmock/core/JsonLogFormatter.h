@@ -40,7 +40,7 @@ namespace AwsMock::Core {
         /**
          * Default destructor
          */
-        ~JsonLogFormatter();
+        ~JsonLogFormatter() override;
 
         /**
          * Format the message.
@@ -48,7 +48,7 @@ namespace AwsMock::Core {
          * @param msg logging message
          * @param text JSON string of message
          */
-        void format(const Poco::Message &msg, std::string &text);
+        void format(const Poco::Message &msg, std::string &text) override;
 
         /**
          * Sets an additional property.

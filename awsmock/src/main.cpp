@@ -42,7 +42,7 @@
 #include <awsmock/service/LambdaServer.h>
 #include <awsmock/worker/SQSWorker.h>
 #include <awsmock/worker/S3Worker.h>
-#include <awsmock/worker/SQSWorker.h>
+#include <awsmock/worker/LambdaWorker.h>
 
 namespace AwsMock {
 
@@ -165,6 +165,9 @@ namespace AwsMock {
 
           // Start the SQS worker
           Poco::ThreadPool::defaultPool().start(_sqsWorker);
+
+          // Start the Lambda worker
+          Poco::ThreadPool::defaultPool().start(_lambdaWorker);
       }
 
       void StartServices() {
@@ -240,6 +243,11 @@ namespace AwsMock {
        * SQS worker
        */
       Worker::SQSWorker _sqsWorker = Worker::SQSWorker(_configuration);
+
+      /**
+       * SQS worker
+       */
+      Worker::LambdaWorker _lambdaWorker = Worker::LambdaWorker(_configuration);
 
       /**
        * S3 server
