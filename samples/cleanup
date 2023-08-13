@@ -87,6 +87,5 @@ create_lambda_function image-transformation
 #
 # Delete SNS topic
 #
-delete_sns_topic file-logging-topic
 delete_sns_topic protokollierung-topic
 delete_sns_topic datenlieferant-updates

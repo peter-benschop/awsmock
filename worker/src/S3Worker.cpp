@@ -98,6 +98,8 @@ namespace AwsMock::Worker {
 
     void S3Worker::run() {
 
+        log_info_stream(_logger) << "S3 worker started" << std::endl;
+
         // Check service active
 //        if (!_serviceDatabase->IsActive("S3")) {
 //            return;

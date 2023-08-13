@@ -18,6 +18,7 @@
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
+#include <awsmock/core/JsonUtils.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -209,10 +210,10 @@ namespace AwsMock::Dto::S3 {
        *
        * @param JSON string.
        */
-      void FromJson(Poco::JSON::Object::Ptr s3Object) {
+      void FromJson(Poco::JSON::Object::Ptr jsonObject) {
 
           try {
-              principalId = s3Object->get(principalId).convert<std::string>();
+              Core::JsonUtils::GetJsonValueString("principalId", jsonObject, principalId);
           } catch (Poco::Exception &exc) {
               std::cerr << exc.message() << std::endl;
               throw Core::ServiceException(exc.message(), 500);
@@ -284,12 +285,14 @@ namespace AwsMock::Dto::S3 {
        *
        * @param JSON string.
        */
-      void FromJson(Poco::JSON::Object::Ptr s3Object) {
+      void FromJson(Poco::JSON::Object::Ptr jsonObject) {
 
           try {
-              name = s3Object->get("name").convert<std::string>();
-              arn = s3Object->get("arn").convert<std::string>();
-             // ownerIdentity.FromJson(s3Object->getObject("ownerIdentity"));
+              Core::JsonUtils::GetJsonValueString("name", jsonObject, name);
+              Core::JsonUtils::GetJsonValueString("arn", jsonObject, arn);
+              if (jsonObject->has("ownerIdentity")) {
+                  ownerIdentity.FromJson(jsonObject->getObject("ownerIdentity"));
+              }
 
           } catch (Poco::Exception &exc) {
               std::cerr << exc.message() << std::endl;
@@ -372,17 +375,16 @@ namespace AwsMock::Dto::S3 {
       /**
        * Converts a JSON representation to s DTO.
        *
-       * @param JSON string.
+       * @param jsonObject JSON object
        */
-      void FromJson(Poco::JSON::Object::Ptr s3Object) {
+      void FromJson(Poco::JSON::Object::Ptr jsonObject) {
 
           try {
-              key = s3Object->get("key").convert<std::string>();
-              size = s3Object->get("size").convert<long>();
-              etag = s3Object->get("etag").convert<std::string>();
-              versionId = s3Object->get("versionId").convert<std::string>();
-              sequencer = s3Object->get("sequencer").convert<std::string>();
-
+              Core::JsonUtils::GetJsonValueString("key", jsonObject, key);
+              Core::JsonUtils::GetJsonValueLong("size", jsonObject, size);
+              Core::JsonUtils::GetJsonValueString("etag", jsonObject, etag);
+              Core::JsonUtils::GetJsonValueString("versionId", jsonObject, versionId);
+              Core::JsonUtils::GetJsonValueString("sequencer", jsonObject, sequencer);
           } catch (Poco::Exception &exc) {
               std::cerr << exc.message() << std::endl;
               throw Core::ServiceException(exc.message(), 500);
@@ -461,13 +463,17 @@ namespace AwsMock::Dto::S3 {
        *
        * @param JSON string.
        */
-      void FromJson(Poco::JSON::Object::Ptr s3Object) {
+      void FromJson(Poco::JSON::Object::Ptr jsonObject) {
 
           try {
-              s3SchemaVersion = s3Object->get("s3SchemaVersion").convert<std::string>();
-              configurationId = s3Object->get("configurationId").convert<std::string>();
-              bucket.FromJson(s3Object->getObject("bucket"));
-              object.FromJson(s3Object->getObject("object"));
+              Core::JsonUtils::GetJsonValueString("s3SchemaVersion", jsonObject, s3SchemaVersion);
+              Core::JsonUtils::GetJsonValueString("configurationId", jsonObject, configurationId);
+              if (jsonObject->has("bucket")) {
+                  bucket.FromJson(jsonObject->getObject("bucket"));
+              }
+              if (jsonObject->has("object")) {
+                  object.FromJson(jsonObject->getObject("object"));
+              }
 
           } catch (Poco::Exception &exc) {
               std::cerr << exc.message() << std::endl;
@@ -578,11 +584,11 @@ namespace AwsMock::Dto::S3 {
       void FromJson(Poco::JSON::Object::Ptr object) {
 
           try {
-              eventVersion = object->get("eventVersion").convert<std::string>();
-              eventSource = object->get("eventSource").convert<std::string>();
-              region = object->get("awsRegion").convert<std::string>();
-              eventTime = object->get("eventTime").convert<std::string>();
-              eventName = object->get("eventName").convert<std::string>();
+              Core::JsonUtils::GetJsonValueString("eventVersion", object, eventVersion);
+              Core::JsonUtils::GetJsonValueString("eventSource", object, eventSource);
+              Core::JsonUtils::GetJsonValueString("awsRegion", object, region);
+              Core::JsonUtils::GetJsonValueString("eventTime", object, eventTime);
+              Core::JsonUtils::GetJsonValueString("eventName", object, eventName);
               s3.FromJson(object->getObject("s3"));
 
           } catch (Poco::Exception &exc) {
@@ -661,7 +667,7 @@ namespace AwsMock::Dto::S3 {
               Poco::JSON::Array::Ptr recordArray = rootObject->getArray("Records");
 
               if (recordArray != nullptr) {
-                  for (const auto & it : *recordArray) {
+                  for (const auto &it : *recordArray) {
                       Record record;
                       record.FromJson(it.extract<Poco::JSON::Object::Ptr>());
                       records.push_back(record);

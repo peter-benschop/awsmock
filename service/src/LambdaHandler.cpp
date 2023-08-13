@@ -50,10 +50,12 @@ namespace AwsMock::Service {
             std::string version, action;
             GetVersionActionFromUri(request.getURI(), version, action);
 
+            std::string body = GetBodyAsString(request);
+
             if(action == "functions") {
 
                 Dto::Lambda::CreateFunctionRequest lambdaRequest;
-                lambdaRequest.FromJson(request.stream());
+                lambdaRequest.FromJson(body);
                 lambdaRequest.region = region;
                 lambdaRequest.user = user;
 
@@ -62,11 +64,8 @@ namespace AwsMock::Service {
 
             } else  if(action == "functions/function/invocations") {
 
-                std::string jsonString = GetBodyAsString(request);
-                log_trace_stream(_logger) << "Lambda POST request, URI: " << request.getURI() << " body: " << jsonString <<  std::endl;
-
                 Dto::S3::EventNotification eventNotification;
-                eventNotification.FromJson(jsonString);
+                eventNotification.FromJson(body);
 
                 _lambdaService.InvokeEventFunction(eventNotification);
                 log_debug_stream(_logger) << "Lambda function invoked, functions: " << eventNotification.records.size() <<  std::endl;

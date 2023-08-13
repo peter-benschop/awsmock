@@ -31,11 +31,9 @@
 #include <awsmock/dto/docker/CreateContainerResponse.h>
 #include <awsmock/dto/docker/ListImageResponse.h>
 #include <awsmock/dto/docker/ListContainerResponse.h>
+#include <awsmock/dto/docker/VersionResponse.h>
 
-#define DOCKER_VERSION std::string("v1.43")
 #define DOCKER_SOCKET "/var/run/docker.sock"
-#define TAR_CONTENT_TYPE std::string("application/x-tar")
-#define JSON_CONTENT_TYPE std::string("application/json")
 #define NETWORK_NAME ".dockerhost.net"
 #define HOST_PORT_MIN 32768
 #define HOST_PORT_MAX 65536
@@ -85,11 +83,12 @@ namespace AwsMock::Service {
        * @param name lambda function name, used as image name
        * @param tag image tag
        * @param handler lambda function handler
+       * @param runtime lambda AWS runtime
        * @param fileSize size of the image file in bytes
        * @param codeSha256 SHA256 of the image file
        * @return CreateFunctionResponse
        */
-      void BuildImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler, long &fileSize, std::string &codeSha256);
+      void BuildImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler, const std::string &runtime, long &fileSize, std::string &codeSha256);
 
       /**
        * Delete an image by name/tag.
@@ -171,9 +170,10 @@ namespace AwsMock::Service {
        *
        * @param codeDir code directory
        * @param handler handler function
+       * @param runtime docker image runtime
        * @return return docker file path
        */
-      std::string WriteDockerFile(const std::string &codeDir, const std::string &handler);
+      std::string WriteDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime);
 
       /**
        * Write the compressed docker imagefile.
@@ -205,6 +205,16 @@ namespace AwsMock::Service {
        * Curl utilities
        */
       Core::CurlUtils _curlUtils;
+
+      /**
+       * Docker version
+       */
+      std::string _dockerVersion;
+
+      /**
+       * Docker API version
+       */
+      std::string _apiVersion;
     };
 
 } //namespace AwsMock::Service

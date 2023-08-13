@@ -11,8 +11,6 @@ services:
     container_name: pim-postgres
     volumes:
       - ./database-data/postgres:/var/lib/postgresql/data
-    networks:
-      - "local"
     ports:
       - 5432:5432
 
@@ -42,8 +40,6 @@ services:
     depends_on:
       - mongodb
       - postgres
-    networks:
-      - "local"
     ports:
       - "127.0.0.1:4567:4567"
     environment:
@@ -53,7 +49,3 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       # Initialization script
       - ./setup:/etc/awsmock/init/ready.d/setup.sh
-
-networks:
-  local:
-    driver: "bridge"
