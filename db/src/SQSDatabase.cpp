@@ -10,8 +10,7 @@ namespace AwsMock::Database {
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
 
-    SQSDatabase::SQSDatabase(const Core::Configuration &configuration) : Database(configuration),
-                                                                         _logger(Poco::Logger::get("SQSDatabase")) {
+    SQSDatabase::SQSDatabase(const Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("SQSDatabase")) {
 
         // Set default console logger
         Core::Logger::SetDefaultConsoleLogger("SQSDatabase");
@@ -49,16 +48,14 @@ namespace AwsMock::Database {
     Entity::SQS::Queue SQSDatabase::CreateQueue(const Entity::SQS::Queue &queue) {
 
         auto result = _queueCollection.insert_one(queue.ToDocument());
-        log_trace_stream(_logger) << "Queue created, oid: " << result->inserted_id().get_oid().value.to_string()
-                                  << std::endl;
+        log_trace_stream(_logger) << "Queue created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
 
         return GetQueueById(result->inserted_id().get_oid().value);
     }
 
     Entity::SQS::Queue SQSDatabase::GetQueueById(bsoncxx::oid oid) {
 
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(
-                make_document(kvp("_id", oid)));
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("_id", oid)));
         Entity::SQS::Queue result;
         result.FromDocument(mResult);
 
@@ -71,8 +68,7 @@ namespace AwsMock::Database {
 
     Entity::SQS::Queue SQSDatabase::GetQueueByArn(const std::string &queueArn) {
 
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(
-                make_document(kvp("queueArn", queueArn)));
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("queueArn", queueArn)));
         Entity::SQS::Queue result;
         result.FromDocument(mResult);
 
@@ -81,8 +77,16 @@ namespace AwsMock::Database {
 
     Entity::SQS::Queue SQSDatabase::GetQueueByUrl(const std::string &queueUrl) {
 
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(
-                make_document(kvp("queueUrl", queueUrl)));
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("queueUrl", queueUrl)));
+        Entity::SQS::Queue result;
+        result.FromDocument(mResult);
+
+        return result;
+    }
+
+    Entity::SQS::Queue SQSDatabase::GetQueueByName(const std::string &region, const std::string &queueName) {
+
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("region", region), kvp("name", queueName)));
         Entity::SQS::Queue result;
         result.FromDocument(mResult);
 
@@ -133,6 +137,7 @@ namespace AwsMock::Database {
     }
 
     void SQSDatabase::DeleteAllQueues() {
+
         auto result = _queueCollection.delete_many({});
         log_debug_stream(_logger) << "All queues deleted, count: " << result->deleted_count() << std::endl;
     }
@@ -140,9 +145,7 @@ namespace AwsMock::Database {
     Entity::SQS::Message SQSDatabase::CreateMessage(const Entity::SQS::Message &message) {
 
         auto result = _messageCollection.insert_one(message.ToDocument());
-        log_trace_stream(_logger) << "Message created, oid: " << result->inserted_id().get_oid().value.to_string()
-                                  << std::endl;
-
+        log_trace_stream(_logger) << "Message created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
         return GetMessageById(result->inserted_id().get_oid().value);
     }
 
@@ -155,8 +158,7 @@ namespace AwsMock::Database {
 
     Entity::SQS::Message SQSDatabase::GetMessageById(bsoncxx::oid oid) {
 
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _messageCollection.find_one(
-                make_document(kvp("_id", oid)));
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _messageCollection.find_one(make_document(kvp("_id", oid)));
         Entity::SQS::Message result;
         result.FromDocument(mResult);
 
@@ -165,8 +167,7 @@ namespace AwsMock::Database {
 
     Entity::SQS::Message SQSDatabase::GetMessageByReceiptHandle(const std::string &receiptHandle) {
 
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _messageCollection.find_one(
-                make_document(kvp("receiptHandle", receiptHandle)));
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle)));
         Entity::SQS::Message result;
         result.FromDocument(mResult);
 
@@ -177,13 +178,11 @@ namespace AwsMock::Database {
         return GetMessageById(bsoncxx::oid(oid));
     }
 
-    void SQSDatabase::ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility,
-                                      Entity::SQS::MessageList &messageList) {
+    void SQSDatabase::ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, Entity::SQS::MessageList &messageList) {
 
         auto reset = std::chrono::high_resolution_clock::now() + std::chrono::seconds{visibility};
 
-        auto messageCursor = _messageCollection.find(
-                make_document(kvp("queueUrl", queueUrl), kvp("status", Entity::SQS::INITIAL)));
+        auto messageCursor = _messageCollection.find(make_document(kvp("queueUrl", queueUrl), kvp("status", Entity::SQS::INITIAL)));
         for (auto message: messageCursor) {
 
             Entity::SQS::Message result;
@@ -238,35 +237,31 @@ namespace AwsMock::Database {
 
     long SQSDatabase::CountMessages(const std::string &region, const std::string &queueUrl) {
 
-        long count = _messageCollection.count_documents(
-                make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
+        long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
         log_trace_stream(_logger) << "Count messages, result: " << count << std::endl;
         return count;
     }
 
     long SQSDatabase::CountMessagesByStatus(const std::string &region, const std::string &queueUrl, int status) {
 
-        long count = _messageCollection.count_documents(
-                make_document(kvp("region", region), kvp("queueUrl", queueUrl), kvp("status", status)));
-        log_trace_stream(_logger) << "Count messages by status, status: " << status << " result: " << count
-                                  << std::endl;
+        long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl), kvp("status", status)));
+        log_trace_stream(_logger) << "Count messages by status, status: " << status << " result: " << count << std::endl;
         return count;
     }
 
     void SQSDatabase::DeleteMessages(const std::string &queueUrl) {
 
         auto result = _messageCollection.delete_many(make_document(kvp("queueUrl", queueUrl)));
-        log_debug_stream(_logger) << "Messages deleted, queue: " << queueUrl << " count: " << result->deleted_count()
-                                  << std::endl;
+        log_debug_stream(_logger) << "Messages deleted, queue: " << queueUrl << " count: " << result->deleted_count() << std::endl;
     }
 
     void SQSDatabase::DeleteMessage(const Entity::SQS::Message &message) {
         auto result = _messageCollection.delete_one(make_document(kvp("receiptHandle", message.receiptHandle)));
-        log_debug_stream(_logger) << "Messages deleted, receiptHandle: " << message.receiptHandle << " count: "
-                                  << result->deleted_count() << std::endl;
+        log_debug_stream(_logger) << "Messages deleted, receiptHandle: " << message.receiptHandle << " count: " << result->deleted_count() << std::endl;
     }
 
     void SQSDatabase::DeleteAllMessages() {
+
         auto result = _messageCollection.delete_many({});
         log_debug_stream(_logger) << "All messages deleted, count: " << result->deleted_count() << std::endl;
     }

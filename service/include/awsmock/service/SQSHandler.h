@@ -11,13 +11,15 @@
 #include "Poco/DateTimeFormatter.h"
 
 // AwsMock includes
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/MetricService.h"
-#include "awsmock/core/MetricServiceTimer.h"
-#include "awsmock/core/MetricDefinition.h"
-#include "awsmock/service/AbstractHandler.h"
-#include "awsmock/service/SQSService.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/core/MetricServiceTimer.h>
+#include <awsmock/core/MetricDefinition.h>
+#include <awsmock/dto/sqs/GetQueueUrlRequest.h>
+#include <awsmock/dto/sqs/GetQueueUrlResponse.h>
+#include <awsmock/service/AbstractHandler.h>
+#include <awsmock/service/SQSService.h>
 
 namespace AwsMock::Service {
 

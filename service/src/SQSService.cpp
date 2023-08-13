@@ -79,6 +79,24 @@ namespace AwsMock::Service {
         return response;
     }
 
+    Dto::SQS::GetQueueUrlResponse SQSService::GetQueueUrl(const Dto::SQS::GetQueueUrlRequest &request) {
+        log_trace_stream(_logger) << "Get queue URL request, region: " << request.region << " name: " << request.queueName << std::endl;
+
+        Dto::SQS::GetQueueUrlResponse response;
+        try {
+
+            // Get queue
+            Database::Entity::SQS::Queue queue = _database->GetQueueByName(request.region, request.queueName);
+            response.queueUrl = queue.queueUrl;
+            log_debug_stream(_logger) << "SQS queue URL received, region: " << request.region << " name: " << queue.queueUrl << std::endl;
+
+        } catch (Poco::Exception &ex) {
+            log_error_stream(_logger) << "SQS purge queue failed, message: " << ex.message() << std::endl;
+            throw Core::ServiceException(ex.message(), 500, request.region.c_str(), request.queueName.c_str());
+        }
+        return response;
+    }
+
     Dto::SQS::GetQueueAttributesResponse SQSService::GetQueueAttributes(const Dto::SQS::GetQueueAttributesRequest &request) {
         log_trace_stream(_logger) << "Get queue attributes request, request: " << request.ToString() << std::endl;
 

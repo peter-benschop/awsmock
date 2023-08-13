@@ -221,7 +221,7 @@ namespace AwsMock::Service {
 
         std::string tarFileName = codeDir + functionName + ".tgz";
         Core::TarUtils::TarDirectory(tarFileName, codeDir);
-        log_debug_stream(_logger) << "Gzip file written: " << tarFileName << std::endl;
+        log_debug_stream(_logger) << "Zipped TAR file written: " << tarFileName << std::endl;
 
         return tarFileName;
     }
