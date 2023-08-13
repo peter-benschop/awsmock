@@ -139,9 +139,9 @@ namespace AwsMock::Dto::Docker {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const CreateContainerRequest &r) {
-          os << "CreateContainerRequest={hostName='" + r.hostName + "' domainName='" + r.domainName + "' user='" + r.user + "' containerPort='" + r.containerPort + "' ";
+          os << "CreateContainerRequest={hostName='" << r.hostName << "' domainName='" << r.domainName << "' user='" << r.user << "' containerPort='" << r.containerPort + "' ";
           for(auto &it:r.environment) {
-              os <<  it + ",";
+              os <<  it << ",";
           };
           os << "}";
           return os;

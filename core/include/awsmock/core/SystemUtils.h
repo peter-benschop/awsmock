@@ -34,6 +34,7 @@
 #include "awsmock/core/CoreException.h"
 #include "awsmock/core/LogStream.h"
 #include "awsmock/core/StreamFilter.h"
+#include "awsmock/core/FileUtils.h"
 
 #define CHUNK_SIZE 65536
 

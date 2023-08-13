@@ -63,10 +63,11 @@ namespace AwsMock::Service {
                                    const std::string &handler,
                                    const std::string &runtime,
                                    long &fileSize,
-                                   std::string &codeSha256) {
+                                   std::string &codeSha256,
+                                   const std::vector<std::pair<std::string, std::string>> &environment) {
         log_debug_stream(_logger) << "Build image request, name: " << name << " tag: " << tag << " runtime: " << runtime << std::endl;
 
-        std::string dockerFile = WriteDockerFile(codeDir, handler, runtime);
+        std::string dockerFile = WriteDockerFile(codeDir, handler, runtime, environment);
 
         std::string imageFile = BuildImageFile(codeDir, name);
         fileSize = Core::FileUtils::FileSize(imageFile);
@@ -182,23 +183,34 @@ namespace AwsMock::Service {
         log_trace_stream(_logger) << "Response: " << output << std::endl;
     }
 
-    std::string DockerService::WriteDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime) {
+    std::string DockerService::WriteDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime,
+                                               const std::vector<std::pair<std::string, std::string>> &environment) {
 
         std::string dockerFilename = codeDir + "Dockerfile";
 
+        // TODO: Fix environment
         std::ofstream ofs(dockerFilename);
-        if (runtime == "Java17") {
-            ofs << "FROM public.ecr.aws/lambda/java:17" << std::endl;
+        if (runtime == "Java11") {
+            ofs << "FROM public.ecr.aws/lambda/java:11" << std::endl;
             ofs << "COPY classes ${LAMBDA_TASK_ROOT}" << std::endl;
             ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
-        } else if (runtime == "Java11") {
-            ofs << "FROM public.ecr.aws/lambda/java:11" << std::endl;
+        } else if (runtime == "Java17") {
+            ofs << "FROM public.ecr.aws/lambda/java:17" << std::endl;
             ofs << "COPY classes ${LAMBDA_TASK_ROOT}" << std::endl;
             ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
         } else if (runtime == "provided.al2") {
             ofs << "FROM public.ecr.aws/lambda/provided:al2" << std::endl;
-            ofs << "COPY classes ${LAMBDA_TASK_ROOT}" << std::endl;
-            ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
+            for (auto &env : environment) {
+                ofs << "ENV " << env.first << "=\"" << env.second << "\"" << std::endl;
+            }
+            ofs << "COPY bootstrap ${LAMBDA_RUNTIME_DIR}" << std::endl;
+            ofs << "RUN chmod 755 ${LAMBDA_RUNTIME_DIR}/bootstrap" << std::endl;
+            ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/lib" << std::endl;
+            ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/bin" << std::endl;
+            ofs << "COPY bin/* ${LAMBDA_TASK_ROOT}/bin/" << std::endl;
+            ofs << "COPY lib/* ${LAMBDA_TASK_ROOT}/lib/" << std::endl;
+            ofs << "RUN chmod 755 ${LAMBDA_TASK_ROOT}/lib/ld-linux-x86-64.so.2" << std::endl;
+            ofs << "CMD [ \"" + handler + "\" ]" << std::endl;
         }
         log_debug_stream(_logger) << "Dockerfile written, filename: " << dockerFilename << std::endl;
 
@@ -209,7 +221,7 @@ namespace AwsMock::Service {
 
         std::string tarFileName = codeDir + functionName + ".tgz";
         Core::TarUtils::TarDirectory(tarFileName, codeDir);
-        log_debug_stream(_logger) << "Gzip file written: " << tarFileName << std::endl;
+        log_debug_stream(_logger) << "Zipped TAR file written: " << tarFileName << std::endl;
 
         return tarFileName;
     }

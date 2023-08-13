@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/core/SystemUtils.h>
-#include "awsmock/core/FileUtils.h"
 
 namespace AwsMock::Core {
 

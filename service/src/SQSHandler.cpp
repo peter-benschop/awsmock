@@ -44,6 +44,7 @@ namespace AwsMock::Service {
             std::string action, version;
 
             GetActionVersion(payload, action, version);
+            log_debug_stream(_logger) << "SQS POST request, action: " << action << " version: " << version << std::endl;
 
             if (action == "CreateQueue") {
 
@@ -74,6 +75,14 @@ namespace AwsMock::Service {
 
                 Dto::SQS::CreateMessageRequest sqsRequest = {.region=region, .queueUrl=queueUrl, .queueArn=queueArn,  .body=body};
                 Dto::SQS::CreateMessageResponse sqsResponse = _sqsService.CreateMessage(sqsRequest);
+                SendOkResponse(response, sqsResponse.ToXml());
+
+            } else if (action == "GetQueueUrl") {
+
+                std::string queueName = GetStringParameter(payload, "QueueName");
+
+                Dto::SQS::GetQueueUrlRequest sqsRequest = {.region=region, .queueName=queueName};
+                Dto::SQS::GetQueueUrlResponse sqsResponse = _sqsService.GetQueueUrl(sqsRequest);
                 SendOkResponse(response, sqsResponse.ToXml());
 
             } else if (action == "ReceiveMessage") {

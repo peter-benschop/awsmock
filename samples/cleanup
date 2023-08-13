@@ -3,32 +3,67 @@
 #
 # S3 function
 #
+function bucket_exists() {
+  awsmock s3 ls | grep $1 | wc -l
+}
+
 function delete_s3_bucket(){
-  awsmock s3 rm "s3://$1" --recursive
-  awsmock s3 rb "s3://$1"
+  if [ "$(bucket_exists "$1")" -gt 0 ]; then
+    awsmock s3 rm "s3://$1" --recursive > /dev/null 2>&1
+    awsmock s3 rb "s3://$1" > /dev/null 2>&1
+    echo "Bucket $1 deleted"
+  else
+    echo "Bucket $1 does not exist"
+  fi
 }
 
 #
 # SQS function
 #
+function queue_exists() {
+  awsmock sqs list-queues | grep $1 | wc -l
+}
+
 function delete_sqs_queue(){
-  awsmock sqs delete-queue --queue-url "http://localhost:4567/000000000000/$1-queue" > /dev/null
-  awsmock sqs delete-queue --queue-url "http://localhost:4567/000000000000/$1-dlqueue" > /dev/null
-  echo "Queue $1 deleted"
+  if [ "$(queue_exists "$1")" -gt 0 ]; then
+    awsmock sqs delete-queue --queue-url "http://localhost:4567/000000000000/$1-queue" > /dev/null 2>&1
+    awsmock sqs delete-queue --queue-url "http://localhost:4567/000000000000/$1-dlqueue" > /dev/null 2>&1
+    echo "Queue $1 deleted"
+  else
+    echo "Queue $1 does not exist"
+  fi
 }
 
 #
 # SNS function
 #
+function topic_exists() {
+  awsmock sns list-topics | grep $1 | wc -l
+}
+
 function delete_sns_topic(){
-  awsmock sns delete-topic --topic-arn arn:aws:sns:eu-central-1:000000000000:$1
+  if [ "$(topic_exists "$1")" -gt 0 ]; then
+    awsmock sns delete-topic --topic-arn arn:aws:sns:eu-central-1:000000000000:$1 > /dev/null 2>&1
+    echo "Topic $1 deleted"
+  else
+    echo "Topic $1 does not exist"
+  fi
 }
 
 #
 # Lambda function
 #
+function lambda_exists() {
+  awsmock lambda list-functions | grep arn | grep $1 | wc -l
+}
+
 function delete_lambda_function(){
-  awsmock lambda delete-function --function-name "$1" > /dev/null
+  if [ "$(lambda_exists "$1")" -gt 0 ]; then
+    awsmock lambda delete-function --function-name "$1" > /dev/null 2>&1
+    echo "Lambda $1 deleted"
+  else
+    echo "Lambda $1 does not exist"
+  fi
 }
 
 #
@@ -39,6 +74,7 @@ function delete_lambda_function(){
 # Delete S3 objects
 #
 delete_s3_bucket file-delivery
+delete_s3_bucket file-delivery-origin
 delete_s3_bucket json-parsing-results
 delete_s3_bucket onix3-produktmeldungen
 delete_s3_bucket transfer-server
@@ -53,13 +89,13 @@ delete_s3_bucket vlb-preisreferenz-parsing-result
 #
 # Delete SQS Queues
 #
-delete_sqs_queue file-delivery
 delete_sqs_queue file-logging
 delete_sqs_queue protokollierung
 delete_sqs_queue ftp-file-distribution-vlb-preisreferenz
 delete_sqs_queue ftp-file-distribution-image
 delete_sqs_queue ftp-file-distribution-onix
 delete_sqs_queue ftp-file-distribution-inventory-feed
+delete_sqs_queue image-input
 delete_sqs_queue image-result
 delete_sqs_queue vlb-preisreferenz-splitting-result
 delete_sqs_queue parsing-result
@@ -82,7 +118,8 @@ delete_sqs_queue inventory-feed-parsing-result
 #
 delete_lambda_function ftp-file-copy
 delete_lambda_function ftp-file-distribution
-create_lambda_function image-transformation
+delete_lambda_function image-transformation
+delete_lambda_function vlb-preisreferenz-splitting
 
 #
 # Delete SNS topic

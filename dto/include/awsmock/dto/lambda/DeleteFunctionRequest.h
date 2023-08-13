@@ -44,8 +44,10 @@ namespace AwsMock::Dto::Lambda {
           Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
           try {
-              functionName = rootObject->get("FunctionName").convert<std::string>();
-              qualifier = rootObject->get("Qualifier").convert<std::string>();
+
+              // Attributes
+              Core::JsonUtils::GetJsonValueString("FunctionName", rootObject, functionName);
+              Core::JsonUtils::GetJsonValueString("Qualifier", rootObject, qualifier);
 
               // Cleanup
               rootObject->clear();

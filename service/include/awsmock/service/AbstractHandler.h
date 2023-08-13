@@ -19,12 +19,12 @@
 #include "Poco/Net/HTTPRequestHandler.h"
 
 // AwsMock includes
-#include "awsmock/core/LogStream.h"
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/core/ResourceNotFoundException.h>
-#include "awsmock/dto/s3/RestErrorResponse.h"
-#include "awsmock/dto/sqs/RestErrorResponse.h"
+#include <awsmock/dto/s3/RestErrorResponse.h>
+#include <awsmock/dto/sqs/RestErrorResponse.h>
 
 namespace AwsMock::Service {
 

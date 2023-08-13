@@ -144,7 +144,7 @@ namespace AwsMock::Dto::Lambda {
        *
        * @return JSON string
        */
-      std::string ToJson() {
+      std::string ToJson() const {
 
           try {
               Poco::JSON::Object rootJson;

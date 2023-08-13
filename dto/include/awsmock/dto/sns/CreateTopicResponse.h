@@ -102,7 +102,7 @@ namespace AwsMock::Dto::SNS {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const CreateTopicResponse &r) {
-          os << "CreateTopicResponse={region='" + r.region + "' name='" + r.name + "' owner='" + r.owner + "' topicArn='" + r.topicArn + "'}";
+          os << "CreateTopicResponse={region='" << r.region << "' name='" << r.name << "' owner='" << r.owner << "' topicArn='" << r.topicArn << "'}";
           return os;
       }
 
