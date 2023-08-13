@@ -32,7 +32,6 @@ namespace AwsMock::Core {
        */
       static void GetJsonValueString(const std::string &name, Poco::JSON::Object::Ptr jsonObject, std::string &attribute);
 
-    public:
       /**
        * Extracts the supplied JSON value from the object.
        *
@@ -41,6 +40,51 @@ namespace AwsMock::Core {
        * @param attribute JSON attribute
        */
       static void GetJsonValueLong(const std::string &name, Poco::JSON::Object::Ptr jsonObject, long &attribute);
+
+      /**
+       * Extracts the supplied JSON value from the object.
+       *
+       * @param name name of the JSON attribute
+       * @param jsonObject JSON parentObject
+       * @param attribute JSON attribute
+       */
+      static void GetJsonValueDouble(const std::string &name, Poco::JSON::Object::Ptr jsonObject, double &attribute);
+
+      /**
+       * Extracts the supplied JSON value from the object.
+       *
+       * @param name name of the JSON attribute
+       * @param jsonObject JSON parentObject
+       * @param attribute JSON attribute
+       */
+      static void GetJsonValueFloat(const std::string &name, Poco::JSON::Object::Ptr jsonObject, float &attribute);
+
+      /**
+       * Extracts the supplied JSON value from the object.
+       *
+       * @param name name of the JSON attribute
+       * @param jsonObject JSON parentObject
+       * @param attribute JSON attribute
+       */
+      static void GetJsonValueInt(const std::string &name, Poco::JSON::Object::Ptr jsonObject, int &attribute);
+
+      /**
+       * Extracts the supplied JSON value from the object.
+       *
+       * @param name name of the JSON attribute
+       * @param jsonObject JSON parentObject
+       * @param attribute JSON attribute
+       */
+      static void GetJsonValueBool(const std::string &name, Poco::JSON::Object::Ptr jsonObject, bool &attribute);
+
+      /**
+       * Extracts the supplied JSON value from the object.
+       *
+       * @param name name of the JSON attribute
+       * @param jsonObject JSON parentObject
+       * @param attribute JSON attribute
+       */
+      static void GetJsonValueDate(const std::string &name, Poco::JSON::Object::Ptr jsonObject, Poco::DateTime &attribute);
     };
 
 } // namespace AwsMock::Core

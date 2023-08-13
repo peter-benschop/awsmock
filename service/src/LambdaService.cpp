@@ -108,7 +108,7 @@ namespace AwsMock::Service {
             // Get the bucket eventNotification
             Database::Entity::S3::Bucket bucket = _s3Database->GetBucketByRegionName(record.region,
                                                                                      record.s3.bucket.name);
-            if(bucket.HasNotification(record.eventName)) {
+            if (bucket.HasNotification(record.eventName)) {
 
                 Database::Entity::S3::BucketNotification notification = bucket.GetNotification(record.eventName);
                 log_debug_stream(_logger) << "Got bucket eventNotification: " << notification.ToString() << std::endl;
@@ -182,8 +182,13 @@ namespace AwsMock::Service {
             std::string codeDir = UnpackZipFile(request.code.zipFile);
 
             // Build the docker image using the docker service
-            _dockerService->BuildImage(codeDir, request.functionName, lambdaEntity.tag, request.handler,
-                                       lambdaEntity.size, lambdaEntity.codeSha256);
+            _dockerService->BuildImage(codeDir,
+                                       request.functionName,
+                                       lambdaEntity.tag,
+                                       request.handler,
+                                       lambdaEntity.runtime,
+                                       lambdaEntity.size,
+                                       lambdaEntity.codeSha256);
 
             // Cleanup
             Core::DirUtils::DeleteDirectory(codeDir);

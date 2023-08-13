@@ -210,10 +210,10 @@ namespace AwsMock::Dto::S3 {
        *
        * @param JSON string.
        */
-      void FromJson(Poco::JSON::Object::Ptr s3Object) {
+      void FromJson(Poco::JSON::Object::Ptr jsonObject) {
 
           try {
-              principalId = s3Object->get(principalId).convert<std::string>();
+              Core::JsonUtils::GetJsonValueString("principalId", jsonObject, principalId);
           } catch (Poco::Exception &exc) {
               std::cerr << exc.message() << std::endl;
               throw Core::ServiceException(exc.message(), 500);

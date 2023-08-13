@@ -10,12 +10,16 @@ namespace AwsMock::Service {
 
         // Get version
         std::string output = _curlUtils.SendRequest("GET", "/version");
-        log_debug_stream(_logger) << "Docker daemon version: " << output << std::endl;
+        Dto::Docker::Version version;
+        version.FromJson(output);
+        _dockerVersion = "v" + version.components[0].version;
+        _apiVersion = "v" + version.components[0].details.apiVersion;
+        log_debug_stream(_logger) << "Docker daemon version: " << _dockerVersion << " apiVersion:" << _apiVersion << std::endl;
     }
 
     bool DockerService::ImageExists(const std::string &name, const std::string &tag) {
 
-        std::string output = _curlUtils.SendRequest("GET", "/" + DOCKER_VERSION + "/images/json?all=true");
+        std::string output = _curlUtils.SendRequest("GET", "/" + _apiVersion + "/images/json?all=true");
         log_trace_stream(_logger) << "List images request send to docker daemon, output: " << output << std::endl;
 
         Dto::Docker::ListImageResponse response;
@@ -28,15 +32,16 @@ namespace AwsMock::Service {
             return repoTag == imageName;
           }) != image.repoTags.end();
         }) != response.imageList.end();
-        log_debug_stream(_logger) << "Docker image found, result: " << (found ? "true" : "false") << std::endl;
+        log_debug_stream(_logger) << "Docker image found, result: " << found << std::endl;
 
         return found;
     }
 
     Dto::Docker::Image DockerService::GetImageByName(const std::string &name, const std::string &tag) {
 
-        std::string output = _curlUtils.SendRequest("GET", "/" + DOCKER_VERSION + "/images/json?all=true");
-        log_debug_stream(_logger) << "List container request send to docker daemon, output: " << Core::StringUtils::StripLineEndings(output) << std::endl;
+        std::string output = _curlUtils.SendRequest("GET", "/" + _apiVersion + "/images/json?all=true");
+        log_debug_stream(_logger) << "List container request send to docker daemon, name: " << name << " tag: " << tag << std::endl;
+        log_trace_stream(_logger) << "Response: " << Core::StringUtils::StripLineEndings(output) << std::endl;
 
         Dto::Docker::ListImageResponse response;
         response.FromJson(output);
@@ -56,29 +61,31 @@ namespace AwsMock::Service {
                                    const std::string &name,
                                    const std::string &tag,
                                    const std::string &handler,
+                                   const std::string &runtime,
                                    long &fileSize,
                                    std::string &codeSha256) {
-        log_debug_stream(_logger) << "Build image request, name: " << name << " tag: " << tag << " codeDir: " << codeDir << std::endl;
+        log_debug_stream(_logger) << "Build image request, name: " << name << " tag: " << tag << " runtime: " << runtime << std::endl;
 
-        std::string dockerFile = WriteDockerFile(codeDir, handler);
+        std::string dockerFile = WriteDockerFile(codeDir, handler, runtime);
 
         std::string imageFile = BuildImageFile(codeDir, name);
         fileSize = Core::FileUtils::FileSize(imageFile);
         codeSha256 = Core::Crypto::GetSha256FromFile(imageFile);
 
-        std::string output = _curlUtils.SendFileRequest("POST", "/" + DOCKER_VERSION + "/build?t=" + name + ":" + tag + "&q=true", {}, imageFile);
+        std::string output = _curlUtils.SendFileRequest("POST", "/" + _apiVersion + "/build?t=" + name + ":" + tag + "&q=true", {}, imageFile);
         log_debug_stream(_logger) << "Docker image build, image: " << name << ":" << tag << std::endl;
-        log_trace_stream(_logger) << "Output: " << output << std::endl;
+        log_trace_stream(_logger) << "Response: " << output << std::endl;
     }
 
     void DockerService::DeleteImage(const std::string &name, const std::string &tag) {
-        std::string output = _curlUtils.SendRequest("DELETE", "/" + DOCKER_VERSION + "/images/" + name + ":" + tag + "?force=true");
+        std::string output = _curlUtils.SendRequest("DELETE", "/" + _apiVersion + "/images/" + name + ":" + tag + "?force=true");
     }
 
     bool DockerService::ContainerExists(const std::string &name, const std::string &tag) {
 
-        std::string output = _curlUtils.SendRequest("GET", "/" + DOCKER_VERSION + "/containers/json?all=true");
-        log_trace_stream(_logger) << "List container request send to docker daemon, output: " << output << std::endl;
+        std::string output = _curlUtils.SendRequest("GET", "/" + _apiVersion + "/containers/json?all=true");
+        log_debug_stream(_logger) << "List container request send to docker daemon" << std::endl;
+        log_trace_stream(_logger) << "Response: " << output << std::endl;
 
         Dto::Docker::ListContainerResponse response;
         response.FromJson(output);
@@ -100,8 +107,9 @@ namespace AwsMock::Service {
 
     Dto::Docker::Container DockerService::GetContainerByName(const std::string &name, const std::string &tag) {
 
-        std::string output = _curlUtils.SendRequest("GET", "/" + DOCKER_VERSION + "/containers/json?all=true");
-        log_debug_stream(_logger) << "List container request send to docker daemon, output: " << Core::StringUtils::StripLineEndings(output) << std::endl;
+        std::string output = _curlUtils.SendRequest("GET", "/" + _apiVersion + "/containers/json?all=true");
+        log_debug_stream(_logger) << "List container request send to docker daemon" << std::endl;
+        log_trace_stream(_logger) << "Response: " << output << std::endl;
 
         Dto::Docker::ListContainerResponse response;
         response.FromJson(output);
@@ -135,8 +143,9 @@ namespace AwsMock::Service {
             .containerPort=containerPort, .hostPort=std::to_string(hostPort)};
 
         std::string jsonBody = request.ToJson();
-        std::string output = _curlUtils.SendRequest("POST", "/" + DOCKER_VERSION + "/containers/create?name=" + name, jsonBody);
+        std::string output = _curlUtils.SendRequest("POST", "/" + _apiVersion + "/containers/create?name=" + name, jsonBody);
         log_debug_stream(_logger) << "Create container request send to docker daemon" << std::endl;
+        log_trace_stream(_logger) << "Response: " << output << std::endl;
 
         Dto::Docker::CreateContainerResponse response = {.hostPort=hostPort};
         response.FromJson(output);
@@ -146,8 +155,9 @@ namespace AwsMock::Service {
 
     std::string DockerService::StartContainer(const std::string &id) {
 
-        std::string output = _curlUtils.SendRequest("POST", "/" + DOCKER_VERSION + "/containers/" + id + "/start");
+        std::string output = _curlUtils.SendRequest("POST", "/" + _apiVersion + "/containers/" + id + "/start");
         log_debug_stream(_logger) << "Sending start container request" << std::endl;
+        log_trace_stream(_logger) << "Response: " << output << std::endl;
 
         return output;
     }
@@ -158,25 +168,38 @@ namespace AwsMock::Service {
 
     std::string DockerService::StopContainer(const Dto::Docker::Container &container) {
 
-        std::string output = _curlUtils.SendRequest("POST", "/" + DOCKER_VERSION + "/containers/" + container.id + "/stop");
+        std::string output = _curlUtils.SendRequest("POST", "/" + _apiVersion + "/containers/" + container.id + "/stop");
         log_debug_stream(_logger) << "Sending stop container request" << std::endl;
+        log_trace_stream(_logger) << "Response: " << output << std::endl;
+
         return output;
     }
 
     void DockerService::DeleteContainer(const Dto::Docker::Container &container) {
 
-        std::string output = _curlUtils.SendRequest("DELETE", "/" + DOCKER_VERSION + "/containers/" + container.id + "?force=true");
+        std::string output = _curlUtils.SendRequest("DELETE", "/" + _apiVersion + "/containers/" + container.id + "?force=true");
         log_debug_stream(_logger) << "Sending delete container request" << std::endl;
+        log_trace_stream(_logger) << "Response: " << output << std::endl;
     }
 
-    std::string DockerService::WriteDockerFile(const std::string &codeDir, const std::string &handler) {
+    std::string DockerService::WriteDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime) {
 
         std::string dockerFilename = codeDir + "Dockerfile";
 
         std::ofstream ofs(dockerFilename);
-        ofs << "FROM public.ecr.aws/lambda/java:17" << std::endl;
-        ofs << "COPY classes ${LAMBDA_TASK_ROOT}" << std::endl;
-        ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
+        if (runtime == "Java17") {
+            ofs << "FROM public.ecr.aws/lambda/java:17" << std::endl;
+            ofs << "COPY classes ${LAMBDA_TASK_ROOT}" << std::endl;
+            ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
+        } else if (runtime == "Java11") {
+            ofs << "FROM public.ecr.aws/lambda/java:11" << std::endl;
+            ofs << "COPY classes ${LAMBDA_TASK_ROOT}" << std::endl;
+            ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
+        } else if (runtime == "provided.al2") {
+            ofs << "FROM public.ecr.aws/lambda/provided:al2" << std::endl;
+            ofs << "COPY classes ${LAMBDA_TASK_ROOT}" << std::endl;
+            ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
+        }
         log_debug_stream(_logger) << "Dockerfile written, filename: " << dockerFilename << std::endl;
 
         return dockerFilename;

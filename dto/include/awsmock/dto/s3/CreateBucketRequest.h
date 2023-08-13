@@ -29,7 +29,7 @@ namespace AwsMock::Dto::S3 {
        *
        * @param xmlString XML string
        */
-      CreateBucketRequest(const std::string &xmlString) {
+      explicit CreateBucketRequest(const std::string &xmlString) {
           FromXml(xmlString);
       }
 

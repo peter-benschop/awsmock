@@ -217,9 +217,10 @@ namespace AwsMock::Service {
        * @param region AWS region.
        * @param bucket bucket name.
        * @param key S3 object key.
+       * @param size S3 object size in bytes.
        * @param event S3 event type.
        */
-      void CheckNotifications(const std::string &region, const std::string &bucket, const std::string &key,  const std::string &event);
+      void CheckNotifications(const std::string &region, const std::string &bucket, const std::string &key, long size, const std::string &event);
 
       /**
        * Get the temporary upload directory for a uploadId.
