@@ -21,7 +21,7 @@ namespace AwsMock::Core {
         int count = 0;
         while (it != end) {
             if (it.path().toString() != tarFile) {
-                WriteFile(a, it->path(), directory, it->isDirectory());
+                WriteFile(a, it->path(), directory, it->isDirectory(), it->isLink());
                 count++;
             }
             ++it;
@@ -30,7 +30,7 @@ namespace AwsMock::Core {
         archive_write_free(a);
     }
 
-    void TarUtils::WriteFile(struct archive *archive, const std::string &fileName, const std::string &removeDir, bool isDir) {
+    void TarUtils::WriteFile(struct archive *archive, const std::string &fileName, const std::string &removeDir, bool isDir, bool isLink) {
 
         struct stat st{};
         struct archive_entry *entry;
@@ -45,9 +45,17 @@ namespace AwsMock::Core {
         entry = archive_entry_new(); // Note 2
         archive_entry_set_pathname(entry, entryName.c_str());
         archive_entry_set_size(entry, st.st_size);
+        std::string link;
         if (isDir) {
             archive_entry_set_filetype(entry, S_IFDIR);
             archive_entry_set_perm(entry, 0755);
+            archive_entry_set_uid(entry, 0);
+            archive_entry_set_gid(entry, 0);
+        } else if (isLink) {
+            link = Readsymlink(fileName);
+            archive_entry_set_filetype(entry, AE_IFLNK);
+            archive_entry_set_symlink(entry, link.c_str());
+            archive_entry_set_perm(entry, 0644);
             archive_entry_set_uid(entry, 0);
             archive_entry_set_gid(entry, 0);
         } else {
@@ -66,5 +74,15 @@ namespace AwsMock::Core {
         }
         close(fd);
         archive_entry_free(entry);
-    };
+    }
+
+    std::string TarUtils::Readsymlink(const std::string &path) {
+        char buf[1024];
+        ssize_t len;
+        if ((len = readlink(path.c_str(), buf, sizeof(buf) - 1)) != -1) {
+            buf[len] = '\0';
+            return {buf};
+        }
+        return "";
+    }
 }

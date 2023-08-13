@@ -18,11 +18,12 @@ function create_attributes() {
 
 function create_queue_with_dead_letter_queue() {
   if [ "$(queue_exists $1-queue)" -eq 0 ]; then
-    awsmock sqs create-queue --queue-name=$1-queue
-    awsmock sqs create-queue --queue-name=$1-dlqueue
+    awsmock sqs create-queue --queue-name=$1-queue > /dev/null 2>&1
+    awsmock sqs create-queue --queue-name=$1-dlqueue > /dev/null 2>&1
     create_attributes $1
+    echo "SQS queue $1 created"
   else
-   echo "SQS queue $1 exists already"
+    echo "SQS queue $1 exists already"
   fi
 }
 
@@ -39,8 +40,9 @@ function create_sns_subscription() {
 }
 
 function create_sns_topic() {
- if [ "$(topic_exists $1)" -eq 0 ]; then
-   awsmock sns create-topic --name $1
+  if [ "$(topic_exists $1)" -eq 0 ]; then
+    awsmock sns create-topic --name $1 > /dev/null 2>&1
+    echo "SNS topic $1 created"
   else
    echo "SNS topic $1 exists already"
  fi
@@ -55,14 +57,15 @@ function bucket_exists() {
 
 function create_s3_bucket() {
   if [ "$(bucket_exists $1)" -eq 0 ]; then
-    awsmock s3 mb s3://$1
+    awsmock s3 mb s3://$1 > /dev/null 2>&1
+    echo "S3 bucket $1 created"
   else
-   echo "S3 bucket $1 exists already"
+    echo "S3 bucket $1 exists already"
   fi
 }
 
 function create_s3_object() {
-  awsmock s3 cp "$1" "s3://$2/$3" > /dev/null
+  awsmock s3 cp "$1" "s3://$2/$3" > /dev/null 2>&1
   echo "Uploaded $1"
 }
 
@@ -71,7 +74,7 @@ function create_bucket_notification() {
   bucket=$1
   hook=$2
 
-  awsmock s3api put-bucket-notification-configuration --bucket "$bucket" --notification-configuration file://./s3/"$hook"
+  awsmock s3api put-bucket-notification-configuration --bucket "$bucket" --notification-configuration file://./s3/"$hook" > /dev/null 2>&1
   echo "Bucket notification created, hook: $hook"
 }
 
@@ -83,7 +86,11 @@ function lambda_exists() {
 }
 
 function create_environment() {
-  echo '{"Variables": {"JAVA_TOOL_OPTIONS": "-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localhost"}}' > /tmp/$1-env.json
+  if [ "$2" = "java17" ]; then
+    echo '{"Variables": {"JAVA_TOOL_OPTIONS": "-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localhost"}}' > /tmp/$1-env.json
+  else
+    echo '{"Variables": {"AWS_REGION": "eu-central-1", "AWS_ENDPOINT": "http://host.docker.internal:4567", "AWS_ACCOUNT_ID": "000000000000", "AWS_SECRET_ACCESS_KEY": "none", "AWS_SESSION_TOKEN": "none", "AWS_CA_FILE": "/etc/pki/tls/certs/ca-bundle.crt", "LIBRI_MONITORING_PORT": "8081" }}' > /tmp/$1-env.json
+  fi
 }
 
 function create_lambda_function () {
@@ -91,21 +98,23 @@ function create_lambda_function () {
   function=$1
   runtime=$2
   zipfile=$3
+  handler=$4
 
-  if [ "$(lambda_exists "$function")" -eq 0 ]; then
-    create_environment "$function"
+  if [ "$(lambda_exists $function)" -eq 0 ]; then
+    create_environment "$function" "$runtime"
     awsmock lambda create-function \
     --function-name "$function" \
     --runtime "$runtime" \
     --timeout 120 \
     --memory-size 512 \
     --environment file:///tmp/$1-env.json \
-    --handler org.springframework.cloud.function.adapter.aws.FunctionInvoker \
+    --handler "$handler" \
     --region eu-central-1 \
     --zip-file "fileb:///tmp/awsmock/data/lambda/$zipfile" \
     --role arn:aws:iam::000000000000:role/lambda-role
+    echo "Lambda function $1 created"
   else
-   echo "Lambda function $1 exists already"
+    echo "Lambda function $1 exists already"
   fi
 }
 
@@ -113,6 +122,7 @@ function create_lambda_function () {
 # Create S3 buckets
 #
 #create_s3_bucket file-delivery
+#create_s3_bucket file-delivery-origin
 #create_s3_bucket json-parsing-results
 #create_s3_bucket onix3-produktmeldungen
 #create_s3_bucket transfer-server
@@ -133,6 +143,7 @@ function create_lambda_function () {
 #create_queue_with_dead_letter_queue ftp-file-distribution-image
 #create_queue_with_dead_letter_queue ftp-file-distribution-onix
 #create_queue_with_dead_letter_queue ftp-file-distribution-inventory-feed
+#create_queue_with_dead_letter_queue image-input
 #create_queue_with_dead_letter_queue image-result
 #create_queue_with_dead_letter_queue vlb-preisreferenz-splitting-result
 #create_queue_with_dead_letter_queue parsing-result
@@ -153,10 +164,10 @@ function create_lambda_function () {
 #
 # Create lambda function
 #
-create_lambda_function ftp-file-copy java17 file-copy-service-1.14.3-SNAPSHOT-aws.jar
-create_lambda_function ftp-file-distribution java17 file-distribution-service-1.24.0-SNAPSHOT-aws.jar
-create_lambda_function vlb-preisreferenz-splitting java17 vlb-preisreferenz-splitting-1.2.1-SNAPSHOT-aws.jar
-create_lambda_function image-transformation provided.al2 image-transformation-lambda.zip
+#create_lambda_function ftp-file-copy java17 file-copy-service-1.14.3-SNAPSHOT-aws.jar org.springframework.cloud.function.adapter.aws.FunctionInvoker
+#create_lambda_function ftp-file-distribution java17 file-distribution-service-1.24.0-SNAPSHOT-aws.jar org.springframework.cloud.function.adapter.aws.FunctionInvoker
+#create_lambda_function vlb-preisreferenz-splitting java17 vlb-preisreferenz-splitting-1.2.1-SNAPSHOT-aws.jar org.springframework.cloud.function.adapter.aws.FunctionInvoker
+create_lambda_function image-transformation provided.al2 image-transformation-lambda.zip image-transformation-lambda
 
 #
 # Create SNS topic

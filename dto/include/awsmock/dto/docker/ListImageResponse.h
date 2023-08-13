@@ -72,11 +72,11 @@ namespace AwsMock::Dto::Docker {
       void FromJson(Poco::JSON::Object::Ptr object) {
 
           try {
-              id = object->get("Id").convert<std::string>();
-              parentId = object->get("ParentId").convert<std::string>();
-              size = object->get("Size").convert<long>();
-              sharedSize = object->get("SharedSize").convert<long>();
-              virtualSize = object->get("VirtualSize").convert<long>();
+              Core::JsonUtils::GetJsonValueString("id", object, id);
+              Core::JsonUtils::GetJsonValueString("ParentId", object, parentId);
+              Core::JsonUtils::GetJsonValueLong("Size", object, size);
+              Core::JsonUtils::GetJsonValueLong("SharedSize", object, sharedSize);
+              Core::JsonUtils::GetJsonValueLong("VirtualSize", object, virtualSize);
 
               Poco::JSON::Array::Ptr reproTagsArray = object->getArray("RepoTags");
               if (reproTagsArray != nullptr) {
@@ -110,10 +110,10 @@ namespace AwsMock::Dto::Docker {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const Image &i) {
-          os << "Image={id='" + i.id + "' parentId='" + i.parentId + "' size='" + std::to_string(i.size) + "' sharedSize='" + std::to_string(i.sharedSize) +
-              "' virtualSize='" + std::to_string(i.virtualSize) + "' labels='";
+          os << "Image={id='" << i.id << "' parentId='" << i.parentId << "' size='" << i.size << "' sharedSize='" << i.sharedSize << "' virtualSize='" << i.virtualSize
+             << "' labels='";
           for (auto &it : i.labels) {
-              os << it + ",";
+              os << it << ",";
           }
           os << "'}";
           return os;

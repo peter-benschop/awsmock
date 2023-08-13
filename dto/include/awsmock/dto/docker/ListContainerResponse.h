@@ -68,12 +68,12 @@ namespace AwsMock::Dto::Docker {
                       names.push_back(nt.convert<std::string>());
                   }
               }
-              id = object->get("Id").convert<std::string>();
-              image = object->get("Image").convert<std::string>();
-              imageId = object->get("ImageID").convert<std::string>();
-              command = object->get("Command").convert<std::string>();
-              state = object->get("State").convert<std::string>();
-              status = object->get("Status").convert<std::string>();
+              Core::JsonUtils::GetJsonValueString("Id", object, id);
+              Core::JsonUtils::GetJsonValueString("Image", object, image);
+              Core::JsonUtils::GetJsonValueString("ImageID", object, imageId);
+              Core::JsonUtils::GetJsonValueString("Command", object, command);
+              Core::JsonUtils::GetJsonValueString("State", object, state);
+              Core::JsonUtils::GetJsonValueString("Status", object, status);
               object->clear();
 
           } catch (Poco::Exception &exc) {
@@ -100,10 +100,10 @@ namespace AwsMock::Dto::Docker {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const Container &c) {
-          os << "ListContainerResponse={id='" + c.id + "' image='" + c.image + "' imageId='" + c.imageId + "' command='" + c.command + "' state='" + c.state +
-              "' status='" + c.status + "' names='";
+          os << "ListContainerResponse={id='" << c.id << "' image='" << c.image << "' imageId='" << c.imageId << "' command='" << c.command << "' state='" << c.state <<
+              "' status='" << c.status << "' names='";
           for (auto &it : c.names) {
-              os << it + ",";
+              os << it << ",";
           }
           os << "'}";
           return os;

@@ -69,7 +69,7 @@ namespace AwsMock::Dto::Docker {
       /**
        * Experimental
        */
-      bool experimental;
+      bool experimental = false;
 
       /**
        * Git commit id

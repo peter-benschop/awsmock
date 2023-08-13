@@ -104,7 +104,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::SetQueueAttributesResponse SQSService::SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request) {
-        log_trace_stream(_logger) << "Put queue sqs request, request: " << request.ToString() << std::endl;
+        log_trace_stream(_logger) << "Put queue sqs request, queue: " << request.queueUrl << std::endl;
 
         Dto::SQS::SetQueueAttributesResponse response;
         try {

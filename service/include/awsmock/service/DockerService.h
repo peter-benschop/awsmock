@@ -86,9 +86,17 @@ namespace AwsMock::Service {
        * @param runtime lambda AWS runtime
        * @param fileSize size of the image file in bytes
        * @param codeSha256 SHA256 of the image file
+       * @param environment runtime environment
        * @return CreateFunctionResponse
        */
-      void BuildImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler, const std::string &runtime, long &fileSize, std::string &codeSha256);
+      void BuildImage(const std::string &codeDir,
+                      const std::string &name,
+                      const std::string &tag,
+                      const std::string &handler,
+                      const std::string &runtime,
+                      long &fileSize,
+                      std::string &codeSha256,
+                     const std::vector<std::pair<std::string, std::string>> &environment);
 
       /**
        * Delete an image by name/tag.
@@ -171,9 +179,11 @@ namespace AwsMock::Service {
        * @param codeDir code directory
        * @param handler handler function
        * @param runtime docker image runtime
+       * @param environment runtime environment
        * @return return docker file path
        */
-      std::string WriteDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime);
+      std::string WriteDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime,
+                                  const std::vector<std::pair<std::string, std::string>> &environment);
 
       /**
        * Write the compressed docker imagefile.

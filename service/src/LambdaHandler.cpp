@@ -62,13 +62,14 @@ namespace AwsMock::Service {
                 Dto::Lambda::CreateFunctionResponse lambdaResponse = _lambdaService.CreateFunctionConfiguration(lambdaRequest);
                 SendOkResponse(response, lambdaResponse.ToJson());
 
-            } else  if(action == "functions/function/invocations") {
+            } else if(Core::StringUtils::Contains(action, "invocations")) {
 
-                Dto::S3::EventNotification eventNotification;
-                eventNotification.FromJson(body);
+                std::vector<std::string> parts = Core::StringUtils::Split(action, '/');
+                std::string functionName = parts[1];
+                log_debug_stream(_logger) << "Lambda function invocation, name: " << functionName <<  std::endl;
 
-                _lambdaService.InvokeEventFunction(eventNotification);
-                log_debug_stream(_logger) << "Lambda function invoked, functions: " << eventNotification.records.size() <<  std::endl;
+                _lambdaService.InvokeSqsFunction(functionName, body, region, user);
+                log_debug_stream(_logger) << "Lambda function invoked, name: " << functionName <<  std::endl;
                 SendOkResponse(response);
 
             }
