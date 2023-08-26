@@ -42,9 +42,11 @@ RUN cd /usr/src && \
 # Install fineftp
 RUN cd /usr/src && \
     git clone https://github.com/eclipse-ecal/fineftp-server.git && \
-    cd fineftp-server && \
+    cd fineftp-server &&  \
+    git submodule init && \
+    git submodule update && \
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr . && \
-    sed -i 's/add_library (${PROJECT_NAME}/add_library (${PROJECT_NAME} SHARED/g' fineftp-server/CMakeLists.txt \
+    sed -i 's/add_library (${PROJECT_NAME}/add_library (${PROJECT_NAME} SHARED/g' fineftp-server/CMakeLists.txt && \
     make && \
     make install
 
