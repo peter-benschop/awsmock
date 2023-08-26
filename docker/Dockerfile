@@ -39,6 +39,15 @@ RUN cd /usr/src && \
     make && \
     make install
 
+# Install fineftp
+RUN cd /usr/src && \
+    git clone https://github.com/eclipse-ecal/fineftp-server.git && \
+    cd /usr/src/finedtp-server && \
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr . && \
+    sed -i 's/add_library (${PROJECT_NAME}/add_library (${PROJECT_NAME} SHARED/g' fineftp-server/CMakeLists.txt \
+    make && \
+    make install
+
 # Install sv4git
 RUN cd /usr/src && \
     wget https://github.com/bvieira/sv4git/releases/download/v2.9.0/git-sv_2.9.0_linux_amd64.tar.gz && \
