@@ -36,7 +36,14 @@ namespace AwsMock::Worker {
 
             // Create transfer server thread
             std::shared_ptr<Service::FtpServer> ftpserver = std::make_shared<Service::FtpServer>(_configuration);
-            _transferServerList[transfer.name] = ftpserver;
+            _transferServerList[transfer.serverId] = ftpserver;
+
+            // Add users
+            for(const auto &user : transfer.users) {
+                if(user.userName != "anonymous") {
+                    ftpserver->AddUser(user.userName, user.password, user.homeDirectory);
+                }
+            }
             Poco::ThreadPool::defaultPool().start(*ftpserver);
         }
     }

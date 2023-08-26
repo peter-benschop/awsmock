@@ -29,6 +29,32 @@ namespace AwsMock::Core {
         return randomString(length);
     }
 
+    auto randomHexString(std::size_t len) -> std::string {
+        static constexpr auto chars = "0123456789abcdef";
+        thread_local auto rng = RandomGenerator<>();
+        auto dist = std::uniform_int_distribution{{}, std::strlen(chars) - 1};
+        auto result = std::string(len, '\0');
+        std::generate_n(begin(result), len, [&]() { return chars[dist(rng)]; });
+        return result;
+    }
+
+    std::string StringUtils::GenerateRandomHexString(int length) {
+        return randomHexString(length);
+    }
+
+    auto randomPasswordString(std::size_t len) -> std::string {
+        static constexpr auto chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@$%&<>+";
+        thread_local auto rng = RandomGenerator<>();
+        auto dist = std::uniform_int_distribution{{}, std::strlen(chars) - 1};
+        auto result = std::string(len, '\0');
+        std::generate_n(begin(result), len, [&]() { return chars[dist(rng)]; });
+        return result;
+    }
+
+    std::string StringUtils::GenerateRandomPassword(int length) {
+        return randomPasswordString(length);
+    }
+
     bool StringUtils::IsNumeric(const std::string &value) {
         return !value.empty() && std::find_if(value.begin(), value.end(), [](unsigned char c) { return !std::isdigit(c); }) == value.end();
     }

@@ -50,9 +50,23 @@ namespace AwsMock::Service {
         try {
             std::string body = GetBodyAsString(request);
 
-            Dto::Transfer::CreateTransferRequest transferRequest = {.region=region};
-            Dto::Transfer::CreateTransferResponse transferResponse = _transferService.CreateTransferServer(transferRequest);
-            SendOkResponse(response, transferResponse.ToJson());
+            std::string requestType = GetRequestType(body);
+
+            if (requestType == "CreateServer") {
+
+                Dto::Transfer::CreateTransferRequest transferRequest = {.region=region};
+                transferRequest.FromJson(body);
+                Dto::Transfer::CreateTransferResponse transferResponse = _transferService.CreateTransferServer(transferRequest);
+                SendOkResponse(response, transferResponse.ToJson());
+
+            } else if (requestType == "CreateUser") {
+
+                Dto::Transfer::CreateUserRequest transferRequest = {.region=region};
+                transferRequest.FromJson(body);
+
+                Dto::Transfer::CreateUserResponse transferResponse = _transferService.CreateUser(transferRequest);
+                SendOkResponse(response, transferResponse.ToJson());
+            }
 
         } catch (Poco::Exception &exc) {
             SendErrorResponse("Lambda", response, exc);
@@ -107,5 +121,15 @@ namespace AwsMock::Service {
         } catch (Poco::Exception &exc) {
             SendErrorResponse("Lambda", response, exc);
         }
+    }
+
+    std::string TransferHandler::GetRequestType(const std::string &body) {
+        if (Core::StringUtils::Contains(body, "Protocols")) {
+            return "CreateServer";
+        } else if (Core::StringUtils::Contains(body, "Role") && Core::StringUtils::Contains(body, "UserName") && Core::StringUtils::Contains(body, "ServerId")) {
+            return "CreateUser";
+        }
+        log_warning_stream(_logger) << "Could not determine request type, body: " << body << std::endl;
+        return "Unknown";
     }
 }

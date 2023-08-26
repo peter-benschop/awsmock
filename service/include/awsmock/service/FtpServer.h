@@ -22,7 +22,7 @@
 
 #define FTP_DEFAULT_PORT 21
 #define FTP_DEFAULT_HOST "localhost"
-#define FTP_ANONYMOUS_DIR "/tmp/awsmock/data/ftp"
+#define FTP_BASE_DIR "/tmp/awsmock/data/ftp"
 
 namespace AwsMock::Service {
 
@@ -32,6 +32,7 @@ namespace AwsMock::Service {
     class FtpServer : public Poco::Runnable {
 
     public:
+
       /**
        * Constructor
        *
@@ -43,6 +44,15 @@ namespace AwsMock::Service {
        * Destructor
        */
       ~FtpServer();
+
+      /**
+       * Add a user to the FTP server
+       *
+       * @param userName name of the user
+       * @param password password of the user
+       * @param homeDirectory home directory of the user
+       */
+      void AddUser(const std::string &userName, const std::string &password, const std::string &homeDirectory);
 
       /**
        * Run main routine
@@ -82,9 +92,9 @@ namespace AwsMock::Service {
       std::shared_ptr<fineftp::FtpServer> _ftpServer;
 
       /**
-       * Anonymous directory
+       * Base directory
        */
-      std::string _anonymousDir;
+      std::string _baseDir;
 
       /**
        * FTP max concurrent connections

@@ -26,6 +26,8 @@
 #include <awsmock/db/TransferDatabase.h>
 #include <awsmock/dto/transfer/CreateTransferRequest.h>
 #include <awsmock/dto/transfer/CreateTransferResponse.h>
+#include <awsmock/dto/transfer/CreateUserRequest.h>
+#include <awsmock/dto/transfer/CreateUserResponse.h>
 #include <awsmock/service/FtpServer.h>
 
 namespace AwsMock::Service {
@@ -48,6 +50,14 @@ namespace AwsMock::Service {
        * @return CreateTransferResponse
        */
       Dto::Transfer::CreateTransferResponse CreateTransferServer(Dto::Transfer::CreateTransferRequest &request);
+
+      /**
+       * Create a user for the transfer server.
+       *
+       * @param request create user request
+       * @return CreateUserResponse
+       */
+      Dto::Transfer::CreateUserResponse CreateUser(Dto::Transfer::CreateUserRequest &request);
 
     private:
 

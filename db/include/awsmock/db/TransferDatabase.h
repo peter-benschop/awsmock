@@ -106,6 +106,15 @@ namespace AwsMock::Database {
       Entity::Transfer::Transfer GetTransferById(const std::string &oid);
 
       /**
+       * Returns a transfer server entity by server ID
+       *
+       * @param serverId transfer server ID
+       * @return transfer server entity
+       * @throws DatabaseException
+       */
+      Entity::Transfer::Transfer GetTransferByServerId(const std::string &serverId);
+
+      /**
        * Returns a transfer server entity by ARN
        *
        * @param arn transfer server ARN
