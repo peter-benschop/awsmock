@@ -17,6 +17,8 @@ namespace AwsMock::Resource::Factory {
             factory = new SNSFactory();
         } else if (index == "AwsMock::Resource::Factory::LambdaFactory") {
             factory = new LambdaFactory();
+        } else if (index == "AwsMock::Resource::Factory::TransferFactory") {
+            factory = new TransferFactory();
         }
         return factory;
     }

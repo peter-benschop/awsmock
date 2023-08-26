@@ -93,24 +93,6 @@ namespace AwsMock {
     private:
 
       /**
-       * Get the action from the request body
-       *
-       * @param body HTTP request body (in)
-       * @param action SQS action (out)
-       * @param version SQS version (out)
-       */
-      static void GetActionVersion(const std::string &body, std::string &action, std::string &version);
-
-      /**
-       * Get the action from the request body
-       *
-       * @param body HTTP request body
-       * @param name parameter name
-       * @return parameter value
-       */
-      std::string GetStringParameter(const std::string &body, const std::string &name);
-
-      /**
        * Logger
        */
       Poco::LogStream _logger;

@@ -4,13 +4,10 @@
 namespace AwsMock {
 
     S3Handler::S3Handler(Core::Configuration &configuration, Core::MetricService &metricService)
-        : AbstractResource(), _logger(Poco::Logger::get("S3Handler")), _configuration(configuration), _metricService(metricService), _s3Service(configuration) {
+        : AbstractResource(), _logger(Poco::Logger::get("S3Handler")), _configuration(configuration), _metricService(metricService) {
 
-        // Set console logger
-        Core::Logger::SetDefaultConsoleLogger("S3Handler");
-
-        _s3ServiceHost = _configuration.getString("awsmock.service.s3.host", "localhost");
-        _s3ServicePort = _configuration.getInt("awsmock.service.s3.port", 9500);
+        _s3ServiceHost = _configuration.getString("awsmock.service.s3.host", S3_DEFAULT_HOST);
+        _s3ServicePort = _configuration.getInt("awsmock.service.s3.port", S3_DEFAULT_PORT);
     }
 
     void S3Handler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {

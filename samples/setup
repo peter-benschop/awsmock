@@ -89,7 +89,7 @@ function create_environment() {
   if [ "$2" = "java17" ]; then
     echo '{"Variables": {"JAVA_TOOL_OPTIONS": "-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localhost"}}' > /tmp/$1-env.json
   else
-    echo '{"Variables": {"AWS_REGION": "eu-central-1", "AWS_ENDPOINT": "http://host.docker.internal:4567", "AWS_ACCOUNT_ID": "000000000000", "AWS_SECRET_ACCESS_KEY": "none", "AWS_SESSION_TOKEN": "none", "AWS_CA_FILE": "/etc/pki/tls/certs/ca-bundle.crt", "LIBRI_MONITORING_PORT": "8081" }}' > /tmp/$1-env.json
+    echo '{"Variables": {"AWS_REGION": "eu-central-1", "AWS_ENDPOINT": "http://172.24.65.214:4567", "AWS_ACCOUNT_ID": "000000000000", "AWS_SECRET_ACCESS_KEY": "none", "AWS_SESSION_TOKEN": "none", "AWS_CA_FILE": "/etc/pki/tls/certs/ca-bundle.crt", "LIBRI_MONITORING_PORT": "8081" }}' > /tmp/$1-env.json
   fi
 }
 

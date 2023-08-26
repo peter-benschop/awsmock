@@ -8,6 +8,7 @@ set(SOURCES src/config/Configuration.cpp src/resource/HandlerException.cpp src/r
         src/resource/factory/S3Factory.cpp src/resource/handler/S3Handler.cpp src/resource/factory/Factory.cpp
         src/resource/factory/SQSFactory.cpp src/resource/factory/LambdaFactory.cpp src/resource/handler/SQSHandler.cpp
         src/resource/factory/SNSFactory.cpp src/resource/handler/SNSHandler.cpp src/resource/handler/LambdaHandler.cpp
+        src/resource/factory/TransferFactory.cpp src/resource/handler/TransferHandler.cpp
         src/controller/ResourceNotFound.cpp src/controller/Router.cpp src/controller/RestService.cpp src/main.cpp)
 
 include_directories(include ../core/include ../db/include ../dto/include ../service/include ../worker/include
@@ -20,7 +21,8 @@ include_directories(/usr/include /usr/local/include)
 add_executable(${BINARY} ${SOURCES})
 
 target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdb awsmocksrv awsmockwrk mongocxx bsoncxx PocoPrometheus
-        PocoNet PocoNetSSL PocoUtil PocoJSON PocoXML PocoZip PocoFoundation pthread crypto ssl z archive curl)
+        PocoNet PocoNetSSL PocoUtil PocoJSON PocoXML PocoZip PocoFoundation pthread crypto ssl z archive curl
+        fineftp-server)
 add_library(${BINARY}_lib STATIC ${SOURCES})
 
 install(TARGETS ${BINARY} DESTINATION bin)

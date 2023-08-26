@@ -211,6 +211,19 @@ namespace AwsMock::Service {
             ofs << "COPY lib/* ${LAMBDA_TASK_ROOT}/lib/" << std::endl;
             ofs << "RUN chmod 755 ${LAMBDA_TASK_ROOT}/lib/ld-linux-x86-64.so.2" << std::endl;
             ofs << "CMD [ \"" + handler + "\" ]" << std::endl;
+        } else if (runtime == "provided.latest") {
+            ofs << "FROM public.ecr.aws/lambda/provided:latest" << std::endl;
+            for (auto &env : environment) {
+                ofs << "ENV " << env.first << "=\"" << env.second << "\"" << std::endl;
+            }
+            ofs << "COPY bootstrap ${LAMBDA_RUNTIME_DIR}" << std::endl;
+            ofs << "RUN chmod 755 ${LAMBDA_RUNTIME_DIR}/bootstrap" << std::endl;
+            ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/lib" << std::endl;
+            ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/bin" << std::endl;
+            ofs << "COPY bin/* ${LAMBDA_TASK_ROOT}/bin/" << std::endl;
+            ofs << "COPY lib/* ${LAMBDA_TASK_ROOT}/lib/" << std::endl;
+            ofs << "RUN chmod 755 ${LAMBDA_TASK_ROOT}/lib/ld-linux-x86-64.so.2" << std::endl;
+            ofs << "CMD [ \"" + handler + "\" ]" << std::endl;
         }
         log_debug_stream(_logger) << "Dockerfile written, filename: " << dockerFilename << std::endl;
 
