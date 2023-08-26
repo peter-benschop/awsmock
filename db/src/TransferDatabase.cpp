@@ -16,16 +16,16 @@ namespace AwsMock::Database {
         _transferCollection = GetConnection()["transfer"];
     }
 
-    bool TransferDatabase::TransferExists(const std::string &region, const std::string &transferName) {
+    bool TransferDatabase::TransferExists(const std::string &region, const std::string &serverId) {
 
-        int64_t count = _transferCollection.count_documents(make_document(kvp("region", region), kvp("name", transferName)));
-        log_trace_stream(_logger) << "Transfer function exists: " << (count > 0 ? "true" : "false") << std::endl;
+        int64_t count = _transferCollection.count_documents(make_document(kvp("region", region), kvp("serverId", serverId)));
+        log_trace_stream(_logger) << "Transfer server exists: " << (count > 0 ? "true" : "false") << std::endl;
         return count > 0;
     }
 
     bool TransferDatabase::TransferExists(const Entity::Transfer::Transfer &transfer) {
 
-        return TransferExists(transfer.region, transfer.name);
+        return TransferExists(transfer.region, transfer.serverId);
     }
 
     bool TransferDatabase::TransferExists(const std::string &functionName) {
@@ -35,9 +35,9 @@ namespace AwsMock::Database {
         return count > 0;
     }
 
-    Entity::Transfer::Transfer TransferDatabase::CreateTransfer(const Entity::Transfer::Transfer &lambda) {
+    Entity::Transfer::Transfer TransferDatabase::CreateTransfer(const Entity::Transfer::Transfer &transfer) {
 
-        auto result = _transferCollection.insert_one(lambda.ToDocument());
+        auto result = _transferCollection.insert_one(transfer.ToDocument());
         log_trace_stream(_logger) << "Bucket created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
 
         return GetTransferById(result->inserted_id().get_oid().value);
@@ -56,6 +56,15 @@ namespace AwsMock::Database {
         return GetTransferById(bsoncxx::oid(oid));
     }
 
+    Entity::Transfer::Transfer TransferDatabase::GetTransferByServerId(const std::string &serverId) {
+
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _transferCollection.find_one(make_document(kvp("serverId", serverId)));
+        Entity::Transfer::Transfer result;
+        result.FromDocument(mResult);
+
+        return result;
+    }
+
     Entity::Transfer::Transfer TransferDatabase::CreateOrUpdateTransfer(const Entity::Transfer::Transfer &lambda) {
 
         if (TransferExists(lambda)) {
@@ -65,14 +74,14 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::Transfer::Transfer TransferDatabase::UpdateTransfer(const Entity::Transfer::Transfer &lambda) {
+    Entity::Transfer::Transfer TransferDatabase::UpdateTransfer(const Entity::Transfer::Transfer &transfer) {
 
-        auto result = _transferCollection.replace_one(make_document(kvp("region", lambda.region), kvp("name", lambda.name)),
-                                                    lambda.ToDocument());
+        auto result = _transferCollection.replace_one(make_document(kvp("region", transfer.region), kvp("serverId", transfer.serverId)),
+                                                      transfer.ToDocument());
 
-        log_trace_stream(_logger) << "Transfer updated: " << lambda.ToString() << std::endl;
+        log_trace_stream(_logger) << "Transfer updated: " << transfer.ToString() << std::endl;
 
-        return GetTransferByArn(lambda.arn);
+        return GetTransferByServerId(transfer.serverId);
     }
 
     Entity::Transfer::Transfer TransferDatabase::GetTransferByArn(const std::string &arn) {
@@ -86,16 +95,16 @@ namespace AwsMock::Database {
 
     std::vector<Entity::Transfer::Transfer> TransferDatabase::ListTransfers(const std::string &region) {
 
-        std::vector<Entity::Transfer::Transfer> lambdas;
-        auto lamdaCursor = _transferCollection.find(make_document(kvp("region", region)));
-        for (auto lambda : lamdaCursor) {
+        std::vector<Entity::Transfer::Transfer> transfers;
+        auto transferCursor = _transferCollection.find(make_document(kvp("region", region)));
+        for (auto transfer : transferCursor) {
             Entity::Transfer::Transfer result;
-            result.FromDocument(lambda);
-            lambdas.push_back(result);
+            result.FromDocument(transfer);
+            transfers.push_back(result);
         }
-        log_trace_stream(_logger) << "Got lamda list, size:" << lambdas.size() << std::endl;
+        log_trace_stream(_logger) << "Got transfer list, size:" << transfers.size() << std::endl;
 
-        return lambdas;
+        return transfers;
     }
 
     void TransferDatabase::DeleteTransfer(const std::string &functionName) {
@@ -106,7 +115,7 @@ namespace AwsMock::Database {
 
     void TransferDatabase::DeleteAllTransfers() {
         auto result = _transferCollection.delete_many({});
-        log_debug_stream(_logger) << "All lambdas deleted, count: " << result->deleted_count() << std::endl;
+        log_debug_stream(_logger) << "All transfers deleted, count: " << result->deleted_count() << std::endl;
     }
 
 } // namespace AwsMock::Database

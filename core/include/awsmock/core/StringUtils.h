@@ -31,6 +31,7 @@ namespace AwsMock::Core {
     class StringUtils {
 
     public:
+
       /**
        * Generates a random string with the given length.
        *
@@ -38,6 +39,22 @@ namespace AwsMock::Core {
        * @return generated random string with the given length.
        */
       static std::string GenerateRandomString(int length);
+
+      /**
+       * Generates a random hexadecimal string with the given length.
+       *
+       * @param length length of the string
+       * @return generated random hexadecimal string with the given length.
+       */
+      static std::string GenerateRandomHexString(int length);
+
+      /**
+       * Generates a random password string with the given length.
+       *
+       * @param length length of the string
+       * @return generated random password string with the given length.
+       */
+      static std::string GenerateRandomPassword(int length);
 
       /**
        * Check whether the provided string is a number.
