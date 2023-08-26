@@ -9,7 +9,7 @@ RUN mkdir -p /usr/src
 RUN mkdir -p /usr/src && \
     cd /usr/src && \
     git clone https://github.com/google/googletest.git && \
-    cd /usr/src/googletest && \
+    cd googletest && \
     cmake -DBUILD_SHARED_LIBS=ON . &&\
     make && \
     make install
@@ -17,7 +17,7 @@ RUN mkdir -p /usr/src && \
 # Install Poco libraries
 RUN cd /usr/src && \
     git clone -b master https://github.com/pocoproject/poco.git && \
-    cd /usr/src/poco && \
+    cd poco && \
     cmake -DENABLE_PAGECOMPILER=OFF -DENABLE_DATA_SQLITE=OFF -DENABLE_REDIS=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF \
     -DENABLE_NETSSL=ON -DENABLE_MONGODB=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr . && \
     make && \
@@ -26,7 +26,7 @@ RUN cd /usr/src && \
 # Install mongo-c-driver
 RUN cd /usr/src && \
     git clone -b r1.24 https://github.com/mongodb/mongo-c-driver.git && \
-    cd /usr/src/mongo-c-driver && \
+    cd mongo-c-driver && \
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr . && \
     make && \
     make install
@@ -34,7 +34,7 @@ RUN cd /usr/src && \
 # Install mongo-c-driver
 RUN cd /usr/src && \
     git clone -b releases/v3.8 https://github.com/mongodb/mongo-cxx-driver.git && \
-    cd /usr/src/mongo-cxx-driver && \
+    cd mongo-cxx-driver && \
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr . && \
     make && \
     make install
@@ -42,7 +42,7 @@ RUN cd /usr/src && \
 # Install fineftp
 RUN cd /usr/src && \
     git clone https://github.com/eclipse-ecal/fineftp-server.git && \
-    cd /usr/src/finedtp-server && \
+    cd fineftp-server && \
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr . && \
     sed -i 's/add_library (${PROJECT_NAME}/add_library (${PROJECT_NAME} SHARED/g' fineftp-server/CMakeLists.txt \
     make && \
