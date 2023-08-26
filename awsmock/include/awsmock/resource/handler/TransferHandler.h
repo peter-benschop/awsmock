@@ -2,8 +2,8 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_RESOURCE_S3HANDLER_H
-#define AWSMOCK_RESOURCE_S3HANDLER_H
+#ifndef AWSMOCK_RESOURCE_TRANSFERHANDLER_H
+#define AWSMOCK_RESOURCE_TRANSFERHANDLER_H
 
 // Poco includes
 #include "Poco/Logger.h"
@@ -31,16 +31,16 @@
 #include "awsmock/dto/s3/PutObjectRequest.h"
 #include "awsmock/dto/s3/PutBucketNotificationRequest.h"
 
-#define S3_DEFAULT_HOST "localhost"
-#define S3_DEFAULT_PORT 9500
+#define TRANSFER_DEFAULT_HOST "localhost"
+#define TRANSFER_DEFAULT_PORT 9504
 
 namespace AwsMock {
 
     /**
-     * AWS S3 mock handler
+     * AWS Transfer mock handler
      *
-     * <p>AWS S3 HTTP request handler. All S3 related REST call are ending here. Depending on the request header the S3 service will be selected in case the
-     * authorization header contains the S3 service.<p>
+     * <p>AWS Transfer HTTP request handler. All Transfer related REST call are ending here. Depending on the request header the Transfer service will be selected in case the
+     * authorization header contains the Transfer service. Default port is 9504.<p>
      *
      * <p><h3>GET Requests</h3>
      * <ul>
@@ -56,7 +56,7 @@ namespace AwsMock {
      * </ul>
      * <p>
      */
-    class S3Handler : public AwsMock::Resource::AbstractResource {
+    class TransferHandler : public AwsMock::Resource::AbstractResource {
 
     public:
 
@@ -66,7 +66,7 @@ namespace AwsMock {
        * @param configuration application configuration
        * @param metricService monitoring service
        */
-      S3Handler(Core::Configuration &configuration, Core::MetricService &metricService);
+      TransferHandler(Core::Configuration &configuration, Core::MetricService &metricService);
 
     protected:
 
@@ -134,6 +134,15 @@ namespace AwsMock {
     private:
 
       /**
+       * Returns the bucket and key from the URI
+       *
+       * @param uri request URI
+       * @param bucket S3 bucket name
+       * @param key S3 object key
+       */
+      void GetBucketKeyFromUri(const std::string &uri, std::string &bucket, std::string &key);
+
+      /**
        * Logger
        */
       Poco::LogStream _logger;
@@ -149,15 +158,15 @@ namespace AwsMock {
       Core::MetricService &_metricService;
 
       /**
-       * S3 service port
+       * Transfer service port
        */
-      int _s3ServicePort;
+      int _transferServicePort;
 
       /**
-       * S3 service host
+       * Transfer service host
        */
-      std::string _s3ServiceHost;
+      std::string _transferServiceHost;
     };
 } // namespace AwsMock
 
-#endif // AWSMOCK_RESOURCE_S3HANDLER_H
+#endif // AWSMOCK_RESOURCE_TRANSFERHANDLER_H

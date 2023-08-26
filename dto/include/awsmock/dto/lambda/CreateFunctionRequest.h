@@ -50,7 +50,7 @@ namespace AwsMock::Dto::Lambda {
        */
       std::string zipFile;
 
-      void FromJson(Poco::JSON::Object::Ptr jsonObject) {
+      void FromJson(const Poco::JSON::Object::Ptr& jsonObject) {
           Core::JsonUtils::GetJsonValueString("ZipFile", jsonObject, zipFile);
           Core::JsonUtils::GetJsonValueString("S3Bucket", jsonObject, s3Bucket);
           Core::JsonUtils::GetJsonValueString("S3Key", jsonObject, s3Key);

@@ -170,7 +170,7 @@ namespace AwsMock::Service {
         Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, path, Poco::Net::HTTPMessage::HTTP_1_1);
         request.add("Content-Type", "application/json");
         request.setContentLength((long) body.length());
-        log_debug_stream(_logger) << "Invocation request defined, body: " + body << std::endl;
+        log_trace_stream(_logger) << "Invocation request defined, body: " + body << std::endl;
 
         // Send request
         std::ostream &os = session.sendRequest(request);

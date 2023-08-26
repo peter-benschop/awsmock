@@ -13,6 +13,7 @@
 #include "awsmock/resource/factory/SQSFactory.h"
 #include "awsmock/resource/factory/SNSFactory.h"
 #include "awsmock/resource/factory/LambdaFactory.h"
+#include "awsmock/resource/factory/TransferFactory.h"
 
 namespace AwsMock::Resource::Factory {
 

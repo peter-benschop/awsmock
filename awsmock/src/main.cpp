@@ -36,13 +36,15 @@
 #include <awsmock/controller/Router.h>
 #include <awsmock/controller/RestService.h>
 #include <awsmock/db/Database.h>
+#include <awsmock/service/LambdaServer.h>
 #include <awsmock/service/S3Server.h>
 #include <awsmock/service/SQSServer.h>
 #include <awsmock/service/SNSServer.h>
-#include <awsmock/service/LambdaServer.h>
+#include <awsmock/service/TransferServer.h>
 #include <awsmock/worker/SQSWorker.h>
 #include <awsmock/worker/S3Worker.h>
 #include <awsmock/worker/LambdaWorker.h>
+#include <awsmock/worker/TransferWorker.h>
 
 namespace AwsMock {
 
@@ -168,6 +170,9 @@ namespace AwsMock {
 
           // Start the Lambda worker
           Poco::ThreadPool::defaultPool().start(_lambdaWorker);
+
+          // Start the Transfer worker
+          Poco::ThreadPool::defaultPool().start(_transferWorker);
       }
 
       void StartServices() {
@@ -183,6 +188,9 @@ namespace AwsMock {
 
           // Start the lambda server
           _lambdaServer.start();
+
+          // Start the transfer server
+          _transferServer.start();
       }
 
       /**
@@ -245,9 +253,14 @@ namespace AwsMock {
       Worker::SQSWorker _sqsWorker = Worker::SQSWorker(_configuration);
 
       /**
-       * SQS worker
+       * Lambda worker
        */
       Worker::LambdaWorker _lambdaWorker = Worker::LambdaWorker(_configuration);
+
+      /**
+       * Transfer worker
+       */
+      Worker::TransferWorker _transferWorker = Worker::TransferWorker(_configuration);
 
       /**
        * S3 server
@@ -268,6 +281,11 @@ namespace AwsMock {
        * Lambda server
        */
       Service::LambdaServer _lambdaServer = Service::LambdaServer(_configuration, _metricService);
+
+      /**
+       * Transfer server
+       */
+      Service::TransferServer _transferServer = Service::TransferServer(_configuration, _metricService);
 
       /**
        * Thread error handler

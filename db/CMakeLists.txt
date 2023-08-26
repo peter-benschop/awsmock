@@ -3,7 +3,7 @@ set(LIBRARY awsmockdb)
 set(LIBRARY_STATIC awsmockdb_static)
 
 set(SOURCES src/Database.cpp src/ServiceDatabase.cpp src/S3Database.cpp src/SQSDatabase.cpp src/SNSDatabase.cpp
-        src/LambdaDatabase.cpp)
+        src/LambdaDatabase.cpp src/TransferDatabase.cpp)
 
 # Test directory
 add_subdirectory(tst)

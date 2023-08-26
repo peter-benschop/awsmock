@@ -210,7 +210,7 @@ namespace AwsMock::Dto::S3 {
        *
        * @param JSON string.
        */
-      void FromJson(Poco::JSON::Object::Ptr jsonObject) {
+      void FromJson(const Poco::JSON::Object::Ptr &jsonObject) {
 
           try {
               Core::JsonUtils::GetJsonValueString("principalId", jsonObject, principalId);
