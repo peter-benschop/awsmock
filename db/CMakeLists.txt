@@ -10,7 +10,7 @@ add_subdirectory(tst)
 
 # Includes
 include_directories(include ../core/include /usr/include /usr/include/mongo /usr/include/bsoncxx/v_noabi
-        /usr/include/mongocxx/v_noabi)
+        /usr/include/mongocxx/v_noabi tbb)
 
 add_library(${LIBRARY} SHARED ${SOURCES})
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
