@@ -4,7 +4,7 @@
 namespace AwsMock::Service {
 
     TransferHandler::TransferHandler(Core::Configuration &configuration, Core::MetricService &metricService)
-        : AbstractHandler(), _logger("LambdaServiceHandler"), _configuration(configuration), _metricService(metricService), _transferService(configuration) {
+        : AbstractHandler(), _logger("TransferServiceHandler"), _configuration(configuration), _metricService(metricService), _transferService(configuration) {
     }
 
     void TransferHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, [[maybe_unused]]const std::string &user) {
@@ -50,26 +50,51 @@ namespace AwsMock::Service {
         try {
             std::string body = GetBodyAsString(request);
 
-            std::string requestType = GetRequestType(body);
+            //DumpRequest(request);
 
-            if (requestType == "CreateServer") {
+            std::string target = GetTarget(request);
+
+            if (target == "TransferService.CreateServer") {
 
                 Dto::Transfer::CreateTransferRequest transferRequest = {.region=region};
                 transferRequest.FromJson(body);
                 Dto::Transfer::CreateTransferResponse transferResponse = _transferService.CreateTransferServer(transferRequest);
                 SendOkResponse(response, transferResponse.ToJson());
 
-            } else if (requestType == "CreateUser") {
+            } else if (target == "TransferService.CreateUser") {
 
                 Dto::Transfer::CreateUserRequest transferRequest = {.region=region};
                 transferRequest.FromJson(body);
 
                 Dto::Transfer::CreateUserResponse transferResponse = _transferService.CreateUser(transferRequest);
                 SendOkResponse(response, transferResponse.ToJson());
+
+            } else if (target == "TransferService.ListServers") {
+
+                Dto::Transfer::ListServerRequest transferRequest = {.region=region};
+                transferRequest.FromJson(body);
+                Dto::Transfer::ListServerResponse transferResponse = _transferService.ListServers(transferRequest);
+                std::string tmp = transferResponse.ToJson();
+                SendOkResponse(response, transferResponse.ToJson());
+
+            } else if (target == "TransferService.StartServer") {
+
+                Dto::Transfer::StartServerRequest transferRequest = {.region=region};
+                transferRequest.FromJson(body);
+                _transferService.StartServer(transferRequest);
+                SendOkResponse(response);
+
+            } else if (target == "TransferService.StopServer") {
+
+                Dto::Transfer::StopServerRequest transferRequest = {.region=region};
+                transferRequest.FromJson(body);
+                _transferService.StopServer(transferRequest);
+                SendOkResponse(response);
+
             }
 
         } catch (Poco::Exception &exc) {
-            SendErrorResponse("Lambda", response, exc);
+            SendErrorResponse("Transfer", response, exc);
         }
     }
 
@@ -123,7 +148,14 @@ namespace AwsMock::Service {
         }
     }
 
+    std::string TransferHandler::GetTarget(const Poco::Net::HTTPServerRequest &request) {
+        return request.get("X-Amz-Target");
+    }
+
     std::string TransferHandler::GetRequestType(const std::string &body) {
+        if(Core::StringUtils::IsNullOrEmpty(&body)) {
+            return "CreateServer";
+        }
         if (Core::StringUtils::Contains(body, "Protocols")) {
             return "CreateServer";
         } else if (Core::StringUtils::Contains(body, "Role") && Core::StringUtils::Contains(body, "UserName") && Core::StringUtils::Contains(body, "ServerId")) {

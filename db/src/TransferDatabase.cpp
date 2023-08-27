@@ -93,7 +93,7 @@ namespace AwsMock::Database {
         return result;
     }
 
-    std::vector<Entity::Transfer::Transfer> TransferDatabase::ListTransfers(const std::string &region) {
+    std::vector<Entity::Transfer::Transfer> TransferDatabase::ListServers(const std::string &region) {
 
         std::vector<Entity::Transfer::Transfer> transfers;
         auto transferCursor = _transferCollection.find(make_document(kvp("region", region)));

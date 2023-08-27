@@ -103,7 +103,7 @@ namespace AwsMock {
       /**
        * Logger
        */
-      Poco::LogStream _logger;
+      Core::LogStream _logger;
 
       /**
        * ImageHandler import configuration

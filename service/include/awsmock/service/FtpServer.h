@@ -57,7 +57,12 @@ namespace AwsMock::Service {
       /**
        * Run main routine
        */
-      void run();
+      void run() override;
+
+      /**
+       * Stop server
+       */
+      void StopServer();
 
     private:
 

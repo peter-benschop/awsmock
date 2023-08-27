@@ -105,6 +105,8 @@ namespace AwsMock::Service {
        */
       void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
+    private:
+
       /**
        * Get the request type.
        *
@@ -113,7 +115,13 @@ namespace AwsMock::Service {
        */
       std::string GetRequestType(const std::string &body);
 
-    private:
+      /**
+       * Get the request target.
+       *
+       * @param request HTTP request
+       * @return target string
+       */
+      std::string GetTarget(const Poco::Net::HTTPServerRequest &request);
 
       /**
        * Logger

@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_TRANSFER_CREATETRANSFERREQUEST_H
-#define AWSMOCK_DTO_TRANSFER_CREATETRANSFERREQUEST_H
+#ifndef AWSMOCK_DTO_TRANSFER_LISTSERVERREQUEST_H
+#define AWSMOCK_DTO_TRANSFER_LISTSERVERREQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -17,44 +17,10 @@
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/dto/lambda/CreateFunctionResponse.h>
 
 namespace AwsMock::Dto::Transfer {
 
-    struct Tag {
-      /**
-       * Key
-       */
-      std::string key;
-
-      /**
-       * Value
-       */
-      std::string value;
-
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
-
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const Tag &r) {
-          os << "Tag={key='" << r.key << "' value='" << r.value << "}";
-          return os;
-      }
-    };
-
-    struct CreateTransferRequest {
+    struct ListServerRequest {
 
       /**
        * Region
@@ -62,14 +28,14 @@ namespace AwsMock::Dto::Transfer {
       std::string region;
 
       /**
-       * Protocols
+       * Maximal number of results
        */
-      std::vector<std::string> protocols = {"ftp"};
+      int maxResults;
 
       /**
-       * Tags
+       * Token
        */
-      std::vector<Tag> tags;
+      std::string nextToken;
 
       /**
        * Creates a JSON string from the object.
@@ -80,7 +46,9 @@ namespace AwsMock::Dto::Transfer {
 
           try {
               Poco::JSON::Object rootJson;
-              rootJson.set("region", region);
+              rootJson.set("Region", region);
+              rootJson.set("MaxResults", maxResults);
+              rootJson.set("NextToken", nextToken);
 
               std::ostringstream os;
               rootJson.stringify(os);
@@ -103,13 +71,11 @@ namespace AwsMock::Dto::Transfer {
           Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
           try {
+
+              // Get root values
               Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-              Poco::JSON::Array::Ptr protocolsArray = rootObject->getArray("Protocols");
-              if (protocolsArray != nullptr) {
-                  for (const auto &protocol : *protocolsArray) {
-                      protocols.push_back(protocol.convert<std::string>());
-                  }
-              }
+              Core::JsonUtils::GetJsonValueInt("MaxResults", rootObject, maxResults);
+              Core::JsonUtils::GetJsonValueString("NextToken", rootObject, nextToken);
 
               // Cleanup
               rootObject->clear();
@@ -136,16 +102,12 @@ namespace AwsMock::Dto::Transfer {
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const CreateTransferRequest &r) {
-          os << "CreateTransferRequest={region='" << r.region << "' {";
-          for(const auto &tag : r.tags) {
-              os << tag.ToString();
-          }
-          os << "}";
+      friend std::ostream &operator<<(std::ostream &os, const ListServerRequest &r) {
+          os << "ListServerRequest={region='" << r.region << "' maxResults='" << r.maxResults << "' nextToken='" << r.nextToken << "'}";
           return os;
       }
     };
 
 } // namespace AwsMock::Dto::Lambda
 
-#endif // AWSMOCK_DTO_TRANSFER_CREATETRANSFERREQUEST_H
+#endif // AWSMOCK_DTO_TRANSFER_LISTSERVERREQUEST_H

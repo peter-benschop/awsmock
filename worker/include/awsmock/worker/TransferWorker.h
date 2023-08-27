@@ -44,9 +44,28 @@ namespace AwsMock::Worker {
       void Initialize();
 
       /**
-       * Start all lambdas if they are not existing
+       * Starts a single transfer server
+       *
+       * @param server transfer server entity
+       */
+      void StartTransferServer(Database::Entity::Transfer::Transfer &server);
+
+      /**
+       * Stops a single transfer server
+       *
+       * @param server transfer server entity
+       */
+      void StopTransferServer(Database::Entity::Transfer::Transfer &server);
+
+      /**
+       * Start all transfer servers, if they are not existing
        */
       void StartTransferServers();
+
+      /**
+       * Check transfer servers
+       */
+      void CheckTransferServers();
 
       /**
        * Logger

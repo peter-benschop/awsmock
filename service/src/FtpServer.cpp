@@ -47,13 +47,18 @@ namespace AwsMock::Service {
         _ftpServer->addUser(userName, password, homeDir, fineftp::Permission::All);
     }
 
+    void FtpServer::StopServer() {
+        _ftpServer->stop();
+        _running = false;
+    }
+
     void FtpServer::run() {
 
         _ftpServer->start(_maxThreads);
         log_info_stream(_logger) << "FTP service started, endpoint: ftp://" << _host << ":" << _port << std::endl;
 
         _running = true;
-        while(_running) {
+        while (_running) {
             Poco::Thread::sleep(1000);
         }
     }

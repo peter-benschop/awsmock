@@ -119,6 +119,24 @@ function create_lambda_function () {
 }
 
 #
+# Transfer functions
+#
+function transfer_exists() {
+  awsmock transfer list-server | grep arn | grep $1 | wc -l
+}
+
+function create_transfer_server {
+  if [ "$(transfer_exists)" -eq 0 ]; then
+    server_id=$(awsmock transfer create-server --protocols ftp | jq -r '.ServerId')
+  done
+}
+
+function transfer_create_user {
+  role="arn:aws:iam::000000000000:role/$2"
+  awsmock transfer create-user --server-id $1 --role $2 --user-name $3 --home-directory $4
+}
+
+#
 # Create S3 buckets
 #
 #create_s3_bucket file-delivery
@@ -191,3 +209,9 @@ create_lambda_function image-transformation provided.al2 image-transformation-la
 #
 #create_s3_object ./testdata/images/0036089631545_ANNO_OBILD.jpg file-delivery ftpuser1/0036089631545_ANNO_OBILD.jpg
 #create_s3_object ./testdata/images/9781406379990_ANNO_OBILD.jpg file-delivery ftpuser1/9781406379990_ANNO_OBILD.jpg
+
+#
+# Create FTP server
+#
+create_transfer_server
+create_transfer_user $server_id transfer_role ftpuser1 ftpuser1
