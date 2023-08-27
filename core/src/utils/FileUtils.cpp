@@ -1,3 +1,4 @@
+#include <execution>
 #include "awsmock/core/FileUtils.h"
 #include "awsmock/core/ResourceNotFoundException.h"
 
@@ -32,25 +33,35 @@ namespace AwsMock::Core {
         return path.parent_path();
     }
 
-    long FileUtils::FileSize(const std::string &fileName) {
-        Poco::File file(fileName);
-        return (long)file.getSize();
+    unsigned long FileUtils::FileSize(const std::string &fileName) {
+        return std::filesystem::file_size({fileName.c_str()});
     }
 
     void FileUtils::MoveTo(const std::string &sourceFileName, const std::string &targetFileName, bool createDir) {
         Poco::File sourceFile(sourceFileName);
         Poco::File targetFile(targetFileName);
         std::string parentPath = GetParentPath(targetFileName);
-        if(createDir && !Core::DirUtils::DirectoryExists(parentPath)) {
+        if (createDir && !Core::DirUtils::DirectoryExists(parentPath)) {
             Poco::File parentFile(parentPath);
             parentFile.createDirectories();
         }
         sourceFile.renameTo(targetFileName);
     }
 
+    void FileUtils::CopyTo(const std::string &sourceFileName, const std::string &targetFileName, bool createDir) {
+        Poco::File sourceFile(sourceFileName);
+        Poco::File targetFile(targetFileName);
+        std::string parentPath = GetParentPath(targetFileName);
+        if (createDir && !Core::DirUtils::DirectoryExists(parentPath)) {
+            Poco::File parentFile(parentPath);
+            parentFile.createDirectories();
+        }
+        sourceFile.copyTo(targetFileName);
+    }
+
     void FileUtils::AppendBinaryFiles(const std::string &outFile, const std::string &inDir, const std::vector<std::string> &files) {
-        std::ofstream ofs(outFile, std::ios::out |std::ios::trunc | std::ios::binary);
-        for(auto &it : files) {
+        std::ofstream ofs(outFile, std::ios::out | std::ios::trunc | std::ios::binary);
+        for (auto &it : files) {
             std::string inFile = inDir;
             inFile.append(Poco::Path::separator() + it);
             std::ifstream ifs(inFile, std::ios::in | std::ios::binary);
@@ -153,5 +164,21 @@ namespace AwsMock::Core {
         com.addRecursive(Poco::Path(dirName));
         com.close();
         poco_debug(Poco::Logger::get("FileUtils"), "Files compressed, zipFile: " + zipFile + " directory:" + dirName);
+    }
+
+    bool FileUtils::Touch(const std::string &fileName) {
+
+        int fd = open(fileName.c_str(), O_WRONLY | O_CREAT | O_NOCTTY | O_NONBLOCK, 0666);
+        if (fd < 0) {
+            poco_error(Poco::Logger::get("FileUtils"), "Could not open file: " + fileName);
+            return false;
+        }
+        int rc = utimensat(AT_FDCWD, fileName.c_str(), nullptr, 0);
+        if (rc) {
+            poco_error(Poco::Logger::get("FileUtils"), "Could not utimensat file: " + fileName);
+            return false;
+        }
+        close(fd);
+        return true;
     }
 }

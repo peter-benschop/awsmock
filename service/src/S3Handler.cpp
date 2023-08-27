@@ -115,9 +115,6 @@ namespace AwsMock::Service {
                 putObjectRequest.md5Sum = request.get("Content-MD5");
                 putObjectRequest.size = std::stol(request.get("Content-Length"));
 
-                // Set the write file = true, as the file is coming over the REST interface and not from the file watcher.
-                putObjectRequest.writeFile = request.get("WriteFile") == "true";
-
                 Dto::S3::PutObjectResponse putObjectResponse = _s3Service.PutObject(putObjectRequest, &request.stream());
 
                 HeaderMap headerMap;

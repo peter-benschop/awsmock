@@ -91,6 +91,13 @@ namespace AwsMock::Service {
                 _transferService.StopServer(transferRequest);
                 SendOkResponse(response);
 
+            } else if (target == "TransferService.DeleteServer") {
+
+                Dto::Transfer::DeleteServerRequest transferRequest = {.region=region};
+                transferRequest.FromJson(body);
+                _transferService.DeleteServer(transferRequest);
+                SendOkResponse(response);
+
             }
 
         } catch (Poco::Exception &exc) {

@@ -26,7 +26,7 @@ public:
       ofs << "awsmock.mongodb.user=admin" << std::endl;
       ofs << "awsmock.mongodb.password=admin" << std::endl;
       // S3 configuration
-      ofs << "awsmock.service.s3.date.dir=/tmp/test/data/s3" << std::endl;
+      ofs << "awsmock.service.s3.data.dir=/tmp/test/data/s3" << std::endl;
       // Thread pool configuration
       ofs << "awsmock.threadpool.name=srv-worker" << std::endl;
       ofs << "awsmock.threadpool.min=8" << std::endl;

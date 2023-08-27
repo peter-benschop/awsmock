@@ -122,18 +122,22 @@ function create_lambda_function () {
 # Transfer functions
 #
 function transfer_exists() {
-  awsmock transfer list-server | grep arn | grep $1 | wc -l
+  awsmock transfer list-servers | grep ftp | wc -l
 }
 
 function create_transfer_server {
   if [ "$(transfer_exists)" -eq 0 ]; then
     server_id=$(awsmock transfer create-server --protocols ftp | jq -r '.ServerId')
-  done
+  fi
 }
 
 function transfer_create_user {
   role="arn:aws:iam::000000000000:role/$2"
   awsmock transfer create-user --server-id $1 --role $2 --user-name $3 --home-directory $4
+}
+
+function start_transfer_server {
+  awsmock transfer start-server --server-id $1
 }
 
 #
@@ -215,3 +219,4 @@ create_lambda_function image-transformation provided.al2 image-transformation-la
 #
 create_transfer_server
 create_transfer_user $server_id transfer_role ftpuser1 ftpuser1
+start_transfer_server $server_id

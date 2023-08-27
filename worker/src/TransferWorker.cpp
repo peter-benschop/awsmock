@@ -24,6 +24,14 @@ namespace AwsMock::Worker {
         _user = _configuration.getString("awsmock.user", "none");
         _transferDatabase = std::make_unique<Database::TransferDatabase>(_configuration);
 
+        // Bucket
+        _bucket = _configuration.getString("awsmock.service.ftp.bucket", DEFAULT_TRANSFER_BUCKET);
+
+        // S3 service connection
+        _s3ServiceHost = _configuration.getString("awsmock.service.s3.host", "localhost");
+        _s3ServicePort = _configuration.getInt("awsmock.service.s3.port", 9501);
+        log_debug_stream(_logger) << "S3 service endpoint: http://" << _s3ServiceHost << ":" << _s3ServicePort << std::endl;
+
         log_debug_stream(_logger) << "TransferWorker initialized" << std::endl;
     }
 
@@ -89,7 +97,13 @@ namespace AwsMock::Worker {
                     StopTransferServer(transfer);
                 }
             }
+        }
 
+        for(auto &transfer : _transferServerList) {
+            if(!_transferDatabase->TransferExists(transfer.first)) {
+                Database::Entity::Transfer::Transfer server = _transferDatabase->GetTransferByServerId(transfer.first);
+                StopTransferServer(server);
+            }
         }
     }
 
@@ -102,6 +116,10 @@ namespace AwsMock::Worker {
             return;
         }*/
 
+        // Send create bucket request
+        SendCreateBucketRequest(_bucket, "application/json");
+        log_debug_stream(_logger) << "Sending S3 create bucket: " << _bucket << std::endl;
+
         // Start all lambda functions
         StartTransferServers();
 
@@ -111,6 +129,42 @@ namespace AwsMock::Worker {
             Poco::Thread::sleep(_period);
             CheckTransferServers();
         }
+    }
+
+    void TransferWorker::SendCreateBucketRequest(const std::string &bucket, const std::string &contentType) {
+
+        Poco::URI uri("http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket);
+        std::string path(uri.getPathAndQuery());
+
+        // Get the body
+        std::string body = std::string(
+            "<CreateBucketConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">\n<LocationConstraint>" + _region
+                + "</LocationConstraint>\n</CreateBucketConfiguration>");
+
+        // Create HTTP request and set headers
+        Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
+        Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_PUT, path, Poco::Net::HTTPMessage::HTTP_1_1);
+        request.add("Content-Type", contentType);
+        AddAuthorization(request);
+        log_debug_stream(_logger) << "S3 create bucket message request created, bucket: " + bucket << std::endl;
+
+        // Send request
+        std::ostream &os = session.sendRequest(request);
+        os << body;
+
+        // Get the response status
+        Poco::Net::HTTPResponse response;
+        if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
+            log_error_stream(_logger) << "HTTP error, status: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
+        }
+        log_debug_stream(_logger) << "S3 create bucket message request send, status: " << response.getStatus() << std::endl;
+    }
+
+    void TransferWorker::AddAuthorization(Poco::Net::HTTPRequest &request) {
+        request.add("Authorization",
+                    "AWS4-HMAC-SHA256 Credential=" + _user + "/" + _clientId + "/" + _region
+                        + "/s3/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840");
+
     }
 
 } // namespace AwsMock::Worker

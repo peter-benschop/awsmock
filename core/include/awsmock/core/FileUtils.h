@@ -9,12 +9,21 @@
 #include <pwd.h>
 #include <grp.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/time.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <utime.h>
 
 // Standard C++ includes
 #include <string>
 #include <cstdio>
 #include <fstream>
 #include <sstream>
+#include <filesystem>
+#include <iostream>
+#include <cstdlib>
 #include <filesystem>
 
 // Poco includes
@@ -141,7 +150,7 @@ namespace AwsMock::Core {
        * @param fileName name of the file.
        * @return size of the in bytes.
        */
-      static long FileSize(const std::string &fileName);
+      static unsigned long FileSize(const std::string &fileName);
 
       /**
        * Moves a file to a new directory.
@@ -151,6 +160,15 @@ namespace AwsMock::Core {
        * @param createDir if true, create directory tree if it does not exist.
        */
       static void MoveTo(const std::string &sourceFileName, const std::string &targetFileName, bool createDir = true);
+
+      /**
+       * Copies a file to a new directory.
+       *
+       * @param sourceFileName name of the source file.
+       * @param targetFileName name of the target file.
+       * @param createDir if true, create directory tree if it does not exist.
+       */
+      static void CopyTo(const std::string &sourceFileName, const std::string &targetFileName, bool createDir = true);
 
       /**
        * Append several binary files to a single output file.
@@ -200,6 +218,13 @@ namespace AwsMock::Core {
        * @param dirName directory to zip.
        */
       static void ZipFiles(const std::string &zipFile, const std::string &dirName);
+
+      /**
+       * Touch an existing file
+       *
+       * @param fileName absolute file name of the file
+       */
+      static bool Touch(const std::string &fileName);
     };
 } // namespace AwsMock::Core
 #endif // AWSMOCK_CORE_FILEUTILS_H

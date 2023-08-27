@@ -9,7 +9,6 @@ namespace AwsMock::Core {
 
     DirectoryWatcher::DirectoryWatcher(std::string rootDir) : _logger(Poco::Logger::get("DirectoryWatcher")),
                                                               _rootDir(std::move(rootDir)) {
-        Core::Logger::SetDefaultConsoleLogger("DirectoryWatcher");
         Initialize();
     }
 
@@ -28,15 +27,17 @@ namespace AwsMock::Core {
         int wd = inotify_add_watch(fd, _rootDir.c_str(), IN_CREATE | IN_MODIFY | IN_DELETE);
         _watcherMap[wd] = _rootDir;
 
-        Poco::DirectoryIterator it(_rootDir);
-        Poco::DirectoryIterator end;
+        Poco::RecursiveDirectoryIterator it(_rootDir);
+        Poco::RecursiveDirectoryIterator end;
         while (it != end) {
-            _logger.debug() << "Adding directory, path: " << it.name() << std::endl;
-            wd = inotify_add_watch(fd, it.path().toString().c_str(), IN_CREATE | IN_MODIFY | IN_DELETE);
-            _watcherMap[wd] = it.path().toString();
+            if(it->isDirectory()) {
+                log_debug_stream(_logger) << "Adding directory, path: " << it.name() << std::endl;
+                wd = inotify_add_watch(fd, it.path().toString().c_str(), IN_CREATE | IN_MODIFY | IN_DELETE);
+                _watcherMap[wd] = it.path().toString();
+            }
             ++it;
         }
-        _logger.debug() << "File _watcher initialized, path: " << _rootDir << std::endl;
+        log_debug_stream(_logger) << "File _watcher initialized, path: " << _rootDir << std::endl;
     }
 
     void DirectoryWatcher::run() {
@@ -55,7 +56,7 @@ namespace AwsMock::Core {
             i = 0;
             ssize_t length = read(fd, buffer, BUF_LEN);
             if (length < 0) {
-                _logger.debug() << "Invalid _watcher struct length, path: " << length << std::endl;
+                log_error_stream(_logger) << "Invalid _watcher struct length, path: " << length << std::endl;
             }
             while (i < length) {
                 auto *event = (struct inotify_event *) &buffer[i];
@@ -101,7 +102,7 @@ namespace AwsMock::Core {
                         this->itemDeleted(this, ev);
                     }
                 }
-                i += (int) EVENT_SIZE + event->len;
+                i += (int) (EVENT_SIZE + event->len);
             }
         }
     }
