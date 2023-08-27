@@ -58,12 +58,12 @@ namespace AwsMock::Service {
 
             createBucketResponse = Dto::S3::CreateBucketResponse(region, "arn");
             log_trace_stream(_logger) << "S3 create bucket response: " << createBucketResponse.ToXml() << std::endl;
+            log_info_stream(_logger) << "Bucket created, bucket: " << name << std::endl;
 
         } catch (Poco::Exception &exc) {
             log_error_stream(_logger) << "S3 create bucket failed, message: " << exc.message() << std::endl;
             throw Core::ServiceException(exc.message(), 500);
         }
-        log_info_stream(_logger) << "CreateBucket succeeded, bucket: " << name << std::endl;
         return createBucketResponse;
     }
 
@@ -83,12 +83,12 @@ namespace AwsMock::Service {
             getMetadataResponse.modified = object.modified;
             getMetadataResponse.created = object.modified;
             log_trace_stream(_logger) << "S3 get object metadata response: " + getMetadataResponse.ToString() << std::endl;
+            log_info_stream(_logger) << "Metadata returned, bucket: " << request.bucket << " key: " << request.key << std::endl;
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "S3 get object metadata failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500);
         }
-        log_info_stream(_logger) << "GetMetadata succeeded, bucket: " << request.bucket << " key: " << request.key << std::endl;
         return getMetadataResponse;
     }
 
@@ -108,12 +108,12 @@ namespace AwsMock::Service {
             getObjectResponse.filename = filename;
             getObjectResponse.modified = object.modified;
             log_trace_stream(_logger) << "S3 get object response: " << getObjectResponse.ToString() << std::endl;
+            log_info_stream(_logger) << "Object returned, bucket: " << request.bucket << " key: " << request.key << std::endl;
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "S3 get object failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500);
         }
-        log_info_stream(_logger) << "GetObject succeeded, bucket: " << request.bucket << " key: " << request.key << std::endl;
         return getObjectResponse;
     }
 
@@ -124,7 +124,8 @@ namespace AwsMock::Service {
 
             Database::Entity::S3::BucketList bucketList = _database->ListBuckets();
             auto listAllBucketResponse = Dto::S3::ListAllBucketResponse(bucketList);
-            log_info_stream(_logger) << "ListAllBuckets succeeded, size: " << bucketList.size() << std::endl;
+            log_info_stream(_logger) << "Count all buckets, size: " << bucketList.size() << std::endl;
+
             return listAllBucketResponse;
 
         } catch (Poco::Exception &ex) {
@@ -140,7 +141,8 @@ namespace AwsMock::Service {
 
             Database::Entity::S3::ObjectList objectList = _database->ListBucket(request.name, request.prefix);
             Dto::S3::ListBucketResult listBucketResult = Dto::S3::ListBucketResult(request.name, objectList);
-            log_info_stream(_logger) << "ListBucket succeeded, size: " << objectList.size() << std::endl;
+            log_info_stream(_logger) << "Bucket list returned, count: " << objectList.size() << std::endl;
+
             return listBucketResult;
 
         } catch (Poco::Exception &ex) {
@@ -164,7 +166,7 @@ namespace AwsMock::Service {
         if (!Core::DirUtils::DirectoryExists(uploadDir)) {
             Core::DirUtils::MakeDirectory(uploadDir);
         }
-        log_info_stream(_logger) << "CreateMultipartUpload succeeded, bucket: " << bucket << " key: " << key << std::endl;
+        log_info_stream(_logger) << "Multipart upload started, bucket: " << bucket << " key: " << key << std::endl;
         return {.bucket=bucket, .key=key, .uploadId=uploadId};
     }
 
@@ -178,7 +180,7 @@ namespace AwsMock::Service {
         ofs << stream.rdbuf();
         log_trace_stream(_logger) << "Part uploaded, part: " << part << " dir: " << uploadDir << std::endl;
 
-        log_info_stream(_logger) << "UploadPart succeeded, part: " << part << std::endl;
+        log_info_stream(_logger) << "Upload part succeeded, part: " << part << std::endl;
         return Core::StringUtils::GenerateRandomString(40);
     }
 
@@ -222,7 +224,7 @@ namespace AwsMock::Service {
         // Check notifications
         CheckNotifications(region, bucket, key, object.size,"s3:ObjectCreated:Put");
 
-        log_info_stream(_logger) << "CompleteMultipartUpload succeeded, bucket: " << bucket << " key: " << key << std::endl;
+        log_info_stream(_logger) << "Multipart upload finished, bucket: " << bucket << " key: " << key << std::endl;
         return {.location=region, .bucket=bucket, .key=key, .etag=Core::StringUtils::GenerateRandomString(40)};
     }
 
@@ -267,12 +269,12 @@ namespace AwsMock::Service {
 
             // Check notification
             CheckNotifications(request.region, request.bucket, request.key, object.size, "s3:ObjectCreated:Put");
+            log_info_stream(_logger) << "Put object succeeded, bucket: " << request.bucket << " key: " << request.key << std::endl;
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "S3 put object failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500);
         }
-        log_info_stream(_logger) << "PutObject succeeded, bucket: " << request.bucket << " key: " << request.key << std::endl;
         return {.bucket=request.bucket, .key=request.key, .etag=request.md5Sum};
     }
 
@@ -299,6 +301,8 @@ namespace AwsMock::Service {
 
             // Check notification
             CheckNotifications(request.region, request.bucket, request.key, 0, "s3:ObjectRemoved:Delete");
+
+            log_info_stream(_logger) << "Object deleted, bucket: " << request.bucket << " key: " << request.key << std::endl;
 
         } catch (Poco::Exception &exc) {
             log_error_stream(_logger) << "S3 delete object failed, message: " + exc.message() << std::endl;
@@ -330,6 +334,7 @@ namespace AwsMock::Service {
                 // Check notifications
                 CheckNotifications(request.region, request.bucket, key, 0, "s3:ObjectRemoved:Delete");
             }
+            log_info_stream(_logger) << "Objects deleted, bucket: " << request.bucket << " count: " << request.keys.size() << std::endl;
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "S3 delete objects failed, message: " << ex.message() << std::endl;
@@ -359,12 +364,12 @@ namespace AwsMock::Service {
             } else if (!request.queueArn.empty()) {
                 CreateQueueConfiguration(bucket, request);
             }
+            log_info_stream(_logger) << "PutBucketNotification succeeded, bucket: " << request.bucket << std::endl;
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "S3 put bucket notification request failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500);
         }
-        log_info_stream(_logger) << "PutBucketNotification succeeded, bucket: " << request.bucket << std::endl;
     }
 
     void S3Service::DeleteBucket(const std::string &region, const std::string &name) {
@@ -388,12 +393,12 @@ namespace AwsMock::Service {
 
             // Delete bucket from database
             _database->DeleteBucket(bucket);
+            log_info_stream(_logger) << "Bucket deleted, bucket: " << bucket << std::endl;
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "S3 Delete Bucket failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500);
         }
-        log_info_stream(_logger) << "DeleteBucket succeeded, bucket: " << name << std::endl;
     }
 
     void S3Service::CheckNotifications(const std::string &region, const std::string &bucketName, const std::string &key, long size, const std::string &event) {

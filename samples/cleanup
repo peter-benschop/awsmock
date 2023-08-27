@@ -67,6 +67,23 @@ function delete_lambda_function(){
 }
 
 #
+# Transfer server
+#
+function transfer_exists() {
+  awsmock transfer list-servers | grep ftp | wc -l
+}
+
+function delete_transfer_server {
+  if [ "$(transfer_exists)" -gt 0 ]; then
+    server_id=$(awsmock transfer create-server --protocols ftp | jq -r '.ServerId') > /dev/null 2>&1
+    awsmock transfer delete-server --server-name "$server_id" > /dev/null 2>&1
+    echo "Transfer server $server_id deleted"
+  else
+    echo "Transfer server does not exist"
+  fi
+}
+
+#
 # Main
 #
 
@@ -126,3 +143,8 @@ delete_lambda_function vlb-preisreferenz-splitting
 #
 delete_sns_topic protokollierung-topic
 delete_sns_topic datenlieferant-updates
+
+#
+# Delete transfer server
+#
+delete_transfer_server

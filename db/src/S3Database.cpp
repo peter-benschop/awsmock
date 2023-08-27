@@ -253,7 +253,7 @@ namespace AwsMock::Database {
     Entity::S3::Bucket S3Database::CreateBucketNotification(const Entity::S3::Bucket &bucket, const Entity::S3::BucketNotification &bucketNotification) {
 
         Entity::S3::Bucket internBucket = GetBucketByRegionName(bucket.region, bucket.name);
-
+        internBucket.notifications.clear();
         if (Core::StringUtils::Contains(bucketNotification.event, "*")) {
 
             std::vector<std::string> allowedEvents;
@@ -265,23 +265,20 @@ namespace AwsMock::Database {
 
             for (const auto &it : allowedEvents) {
 
-                if (!internBucket.HasNotification(bucketNotification.event)) {
-
-                    Entity::S3::BucketNotification notification = {
-                        .event=it,
-                        .notificationId=bucketNotification.notificationId,
-                        .queueArn=bucketNotification.queueArn,
-                        .lambdaArn=bucketNotification.lambdaArn};
-                    internBucket.notifications.emplace_back(notification);
-                }
+                Entity::S3::BucketNotification notification = {
+                    .event=it,
+                    .notificationId=bucketNotification.notificationId,
+                    .queueArn=bucketNotification.queueArn,
+                    .lambdaArn=bucketNotification.lambdaArn};
+                internBucket.notifications.emplace_back(notification);
             }
 
-        } else if (!internBucket.HasNotification(bucketNotification.event)) {
+        } else {
 
             internBucket.notifications.emplace_back(bucketNotification);
         }
 
-        log_trace_stream(_logger) << "Bucket notification added, notification: " << bucketNotification.ToString() << std::endl;
+        log_info_stream(_logger) << "Bucket notification added, notification: " << bucketNotification.ToString() << std::endl;
 
         return UpdateBucket(internBucket);
     }
