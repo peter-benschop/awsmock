@@ -20,6 +20,8 @@
 #include <awsmock/db/TransferDatabase.h>
 #include <awsmock/service/FtpServer.h>
 
+#define DEFAULT_TRANSFER_BUCKET "transfer-server"
+
 namespace AwsMock::Worker {
 
     class TransferWorker : public Poco::Runnable {
@@ -68,6 +70,21 @@ namespace AwsMock::Worker {
       void CheckTransferServers();
 
       /**
+       * Sends a create object request to the S3 service
+       *
+       * @param bucket S3 bucket name
+       * @param contentType content type
+       */
+      void SendCreateBucketRequest(const std::string &bucket, const std::string &contentType);
+
+      /**
+       * Adds the authorization header.
+       *
+       * @param request HTTP request
+       */
+      void AddAuthorization(Poco::Net::HTTPRequest &request);
+
+      /**
        * Logger
        */
       Core::LogStream _logger;
@@ -113,9 +130,24 @@ namespace AwsMock::Worker {
       std::string _user;
 
       /**
+       * AWS S3 bucket
+       */
+      std::string _bucket;
+
+      /**
        * List of transfer servers
        */
       std::map<std::string, std::shared_ptr<Service::FtpServer>> _transferServerList;
+
+      /**
+       * S3 service host
+       */
+      std::string _s3ServiceHost;
+
+      /**
+       * S3 service port
+       */
+      int _s3ServicePort;
     };
 
 } // namespace AwsMock::Worker

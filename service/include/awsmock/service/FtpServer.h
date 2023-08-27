@@ -102,6 +102,16 @@ namespace AwsMock::Service {
       std::string _baseDir;
 
       /**
+       * File watcher directory
+       */
+      std::string _watcherDir;
+
+      /**
+       * S3 bucket
+       */
+      std::string _bucket;
+
+      /**
        * FTP max concurrent connections
        */
       int _maxThreads;

@@ -166,13 +166,19 @@ namespace AwsMock::Worker {
       /**
        * Sends a put object request to the S3 service
        *
+       * @param fileName name of the file
        * @param bucket S3 bucket name
        * @param key S3 object key
        * @param md5Sum MD5 hash
        * @param contentType content type
        * @param fileSize size of the file
        */
-      void SendPutObjectRequest(const std::string &bucket, const std::string &key, const std::string &md5Sum, const std::string &contentType, long fileSize);
+      void SendPutObjectRequest(const std::string &fileName,
+                                const std::string &bucket,
+                                const std::string &key,
+                                const std::string &md5Sum,
+                                const std::string &contentType,
+                                unsigned long fileSize);
 
       /**
        * Sends a head object request to the S3 service

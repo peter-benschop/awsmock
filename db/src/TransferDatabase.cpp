@@ -28,10 +28,10 @@ namespace AwsMock::Database {
         return TransferExists(transfer.region, transfer.serverId);
     }
 
-    bool TransferDatabase::TransferExists(const std::string &functionName) {
+    bool TransferDatabase::TransferExists(const std::string &serverId) {
 
-        int64_t count = _transferCollection.count_documents(make_document(kvp("function", functionName)));
-        log_trace_stream(_logger) << "Transfer function exists: " << (count > 0 ? "true" : "false") << std::endl;
+        int64_t count = _transferCollection.count_documents(make_document(kvp("serverId", serverId)));
+        log_trace_stream(_logger) << "Transfer server exists: " << (count > 0 ? "true" : "false") << std::endl;
         return count > 0;
     }
 
@@ -107,10 +107,10 @@ namespace AwsMock::Database {
         return transfers;
     }
 
-    void TransferDatabase::DeleteTransfer(const std::string &functionName) {
+    void TransferDatabase::DeleteTransfer(const std::string &serverId) {
 
-        auto result = _transferCollection.delete_many(make_document(kvp("function", functionName)));
-        log_debug_stream(_logger) << "Transfer deleted, function: " << functionName << " count: " << result->deleted_count() << std::endl;
+        auto result = _transferCollection.delete_many(make_document(kvp("serverId", serverId)));
+        log_debug_stream(_logger) << "Transfer deleted, serverId: " << serverId << " count: " << result->deleted_count() << std::endl;
     }
 
     void TransferDatabase::DeleteAllTransfers() {

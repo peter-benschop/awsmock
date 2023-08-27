@@ -12,7 +12,9 @@ namespace AwsMock::Service {
         _port = _configuration.getInt("awsmock.service.ftp.port", FTP_DEFAULT_PORT);
         _host = _configuration.getString("awsmock.service.ftp.host", FTP_DEFAULT_HOST);
         _maxThreads = _configuration.getInt("awsmock.service.ftp.max.threads", 4);
-        _baseDir = _configuration.getString("awsmock.service.ftp.base.dir", FTP_BASE_DIR);
+        _baseDir = _configuration.getString("awsmock.service.s3.data.dir", FTP_BASE_DIR);
+        _watcherDir = _baseDir + Poco::Path::separator() + "watcher";
+        _bucket = _configuration.getString("awsmock.service.ftp.bucket", FTP_BASE_DIR);
         log_debug_stream(_logger) << "FTP rest service initialized, endpoint: " << _host << ":" << _port << std::endl;
 
         // Create anonymous directory
@@ -24,7 +26,7 @@ namespace AwsMock::Service {
         _ftpServer = std::make_shared<fineftp::FtpServer>(_port);
 
         // Create anonymous directory
-        std::string anonymousDir = _baseDir + Poco::Path::separator() + "anonymous";
+        std::string anonymousDir = _baseDir + Poco::Path::separator() + _bucket + Poco::Path::separator() + "anonymous";
         if (!Core::DirUtils::DirectoryExists(anonymousDir)) {
             Core::DirUtils::MakeDirectory(anonymousDir);
         }
@@ -38,7 +40,7 @@ namespace AwsMock::Service {
     void FtpServer::AddUser(const std::string &userName, const std::string &password, const std::string &homeDirectory) {
 
         // Create home directory
-        std::string homeDir = _baseDir + Poco::Path::separator() + homeDirectory;
+        std::string homeDir = _watcherDir + Poco::Path::separator() + _bucket + Poco::Path::separator() + homeDirectory;
         if (!Core::DirUtils::DirectoryExists(homeDir)) {
             Core::DirUtils::MakeDirectory(homeDir);
         }

@@ -188,8 +188,7 @@ namespace AwsMock::Service {
                                                                               const std::string &region,
                                                                               const std::string &user) {
         log_trace_stream(_logger) << "CompleteMultipartUpload request, uploadId: " << uploadId << " bucket: " << bucket << " key: " << key << " region: " << region
-                                  << " user: "
-                                  << user;
+                                  << " user: " << user;
 
         // Get all file parts
         std::string uploadDir = GetMultipartUploadDirectory(uploadId);
@@ -210,7 +209,7 @@ namespace AwsMock::Service {
         log_trace_stream(_logger) << "Input files appended to outfile, outFile: " << outFile << std::endl;
 
         // Get file size, MD5 sum
-        long fileSize = Core::FileUtils::FileSize(outFile);
+        long fileSize = (long)Core::FileUtils::FileSize(outFile);
         std::string md5sum = Core::Crypto::GetMd5FromFile(outFile);
         log_trace_stream(_logger) << "Got file metadata, md5sum: " << md5sum << " size: " << fileSize << " outFile: " << outFile << std::endl;
 
@@ -246,10 +245,11 @@ namespace AwsMock::Service {
             }
 
             // Write file
-            if (request.writeFile && stream) {
+            if (stream) {
                 std::string fileName = GetFilename(request.bucket, request.key);
                 std::ofstream ofs(fileName);
                 ofs << stream->rdbuf();
+                ofs.flush();
                 ofs.close();
             }
 

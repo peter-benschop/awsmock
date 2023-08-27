@@ -154,7 +154,7 @@ namespace AwsMock::Service {
             // Update state, rest will be done by transfer worker
             server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::OFFLINE);
             server = _transferDatabase->UpdateTransfer(server);
-            log_info_stream(_logger) << "Transfer server stoped, serverId: " << server.serverId << std::endl;
+            log_info_stream(_logger) << "Transfer server stopped, serverId: " << server.serverId << std::endl;
 
         } catch (Poco::Exception &ex) {
 
@@ -163,6 +163,36 @@ namespace AwsMock::Service {
             server = _transferDatabase->UpdateTransfer(server);
 
             log_error_stream(_logger) << "Stop server request failed, serverId: " << server.serverId << " message: " << ex.message() << std::endl;
+            throw Core::ServiceException(ex.message(), 500);
+        }
+    }
+
+    void TransferService::DeleteServer(const Dto::Transfer::DeleteServerRequest &request) {
+
+        Database::Entity::Transfer::Transfer server;
+        try {
+            if (!_transferDatabase->TransferExists(request.region, request.serverId)) {
+                throw Core::ServiceException("Server with ID '" + request.serverId + "' does not exist", 500);
+            }
+
+            // Get the server
+            server = _transferDatabase->GetTransferByServerId(request.serverId);
+
+            // Update state, rest will be done by transfer worker
+            server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::OFFLINE);
+            server = _transferDatabase->UpdateTransfer(server);
+            log_info_stream(_logger) << "Transfer server stopped, serverId: " << server.serverId << std::endl;
+
+            _transferDatabase->DeleteTransfer(request.serverId);
+            log_info_stream(_logger) << "Transfer server deleted, serverId: " << server.serverId << std::endl;
+
+        } catch (Poco::Exception &ex) {
+
+            // Update state
+            server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::STOP_FAILED);
+            server = _transferDatabase->UpdateTransfer(server);
+
+            log_error_stream(_logger) << "Start server request failed, serverId: " << server.serverId << " message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500);
         }
     }

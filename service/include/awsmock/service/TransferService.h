@@ -28,6 +28,7 @@
 #include <awsmock/dto/transfer/CreateTransferResponse.h>
 #include <awsmock/dto/transfer/CreateUserRequest.h>
 #include <awsmock/dto/transfer/CreateUserResponse.h>
+#include <awsmock/dto/transfer/DeleteServerRequest.h>
 #include <awsmock/dto/transfer/ListServerRequest.h>
 #include <awsmock/dto/transfer/ListServerResponse.h>
 #include <awsmock/dto/transfer/StartServerRequest.h>
@@ -84,6 +85,13 @@ namespace AwsMock::Service {
        * @param request stop server request
        */
       void StopServer(const Dto::Transfer::StopServerRequest &request);
+
+      /**
+       * Deleted an server.
+       *
+       * @param request delete server request
+       */
+      void DeleteServer(const Dto::Transfer::DeleteServerRequest &request);
 
     private:
 

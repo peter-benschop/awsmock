@@ -19,7 +19,7 @@ namespace AwsMock::Worker {
 
     void S3Worker::Initialize() {
 
-        _dataDir = _configuration.getString("awsmock.service.s3.date.dir");
+        _dataDir = _configuration.getString("awsmock.service.s3.data.dir");
         _tmpDir = _dataDir + Poco::Path::separator() + "tmp";
         _watcherDir = _dataDir + Poco::Path::separator() + "watcher";
         log_debug_stream(_logger) << "Watching path: " << _watcherDir << std::endl;
@@ -54,7 +54,7 @@ namespace AwsMock::Worker {
         // Start _watcher
         _watcher = new Core::DirectoryWatcher(_watcherDir);
         _watcher->itemAdded += Poco::delegate(this, &S3Worker::OnFileAdded);
-        //_watcher->itemModified += Poco::delegate(this, &S3Worker::OnFileModified);
+        _watcher->itemModified += Poco::delegate(this, &S3Worker::OnFileModified);
         _watcher->itemDeleted += Poco::delegate(this, &S3Worker::OnFileDeleted);
         log_debug_stream(_logger) << "Directory _watcher added, path: " << _watcherDir << std::endl;
 
@@ -71,6 +71,7 @@ namespace AwsMock::Worker {
                 continue;
             }
 
+            //Core::FileUtils::Touch(filePath);
             // Get bucket, key
             std::string bucket, key;
             GetBucketKeyFromFile(filePath, bucket, key);
@@ -79,6 +80,7 @@ namespace AwsMock::Worker {
             if (!ExistsObject(bucket, key)) {
                 CreateObject(filePath);
             }
+            Poco::Thread::sleep(1000);
         }
 
         // Check all database files against file system
@@ -89,7 +91,7 @@ namespace AwsMock::Worker {
             std::string filePath;
             GetFileFromBucketKey(filePath, object.bucket, object.key);
 
-            // Check database
+            // Check file system
             if(!Core::FileUtils::FileExists(filePath)) {
                 DeleteObject(object.bucket, object.key);
             }
@@ -105,11 +107,11 @@ namespace AwsMock::Worker {
 //            return;
 //        }
 
-        // Synchronize current file system state
-        Synchronize();
-
         // Start file watcher, they will call the delegate methods, if they find a file system event.
         _watcherThread.start(_watcher);
+
+        // Synchronize current file system state
+        Synchronize();
 
         _running = true;
         while (_running) {
@@ -144,25 +146,17 @@ namespace AwsMock::Worker {
         std::string md5sum = Core::Crypto::GetMd5FromFile(modifiedEvent.item.path());
         std::string owner = Core::FileUtils::GetOwner(modifiedEvent.item.path());
 
-        SendPutObjectRequest(bucket, key, md5sum, "application/octet-stream", size);
+        SendPutObjectRequest(modifiedEvent.item.path(), bucket, key, md5sum, "application/octet-stream", size);
     }
 
     void S3Worker::OnFileDeleted(const Core::DirectoryEvent &deleteEvent) {
         log_debug_stream(_logger) << "Deleted path: " << deleteEvent.item.path() << std::endl;
 
-        std::cerr << deleteEvent.item.path() << std::endl;
-        if (Core::DirUtils::IsDirectory(deleteEvent.item.path())) {
-            DeleteBucket(deleteEvent.item.path());
-            return;
-        }
+        // Get bucket, key
         std::string bucketName, key;
         GetBucketKeyFromFile(deleteEvent.item.path(), bucketName, key);
 
-        Database::Entity::S3::Bucket bucket = {.region=_region, .name=bucketName};
-        Database::Entity::S3::Object object = {.bucket=bucketName, .key = key};
-
-        //Dto::S3::DeleteObjectRequest request = {.region=_region, .bucket=bucketName, .key=key};
-        //_s3Service->DeleteObject(request);
+        SendDeleteObjectRequest(bucketName, key, "application/octet-stream");
     }
 
     void S3Worker::GetBucketKeyFromFile(const std::string &fileName, std::string &bucket, std::string &key) {
@@ -223,13 +217,11 @@ namespace AwsMock::Worker {
         GetBucketKeyFromFile(filePath, bucket, key);
 
         // Get file size, MD5 sum
-        long size = Core::FileUtils::FileSize(filePath);
+        unsigned long size = Core::FileUtils::FileSize(filePath);
         std::string md5sum = Core::Crypto::GetMd5FromFile(filePath);
         std::string owner = Core::FileUtils::GetOwner(filePath);
 
-        Core::FileUtils::MoveTo(filePath, _dataDir + Poco::Path::separator() + bucket + Poco::Path::separator() + key, true);
-
-        SendPutObjectRequest(bucket, key, md5sum, "application/octet-stream", size);
+        SendPutObjectRequest(filePath, bucket, key, md5sum, "application/octet-stream", size);
     }
 
     bool S3Worker::ExistsObject(const std::string &bucket, const std::string &key) {
@@ -296,7 +288,12 @@ namespace AwsMock::Worker {
         log_debug_stream(_logger) << "S3 delete bucket message request send, status: " << response.getStatus() << std::endl;
     }
 
-    void S3Worker::SendPutObjectRequest(const std::string &bucket, const std::string &key, const std::string &md5Sum, const std::string &contentType, long fileSize) {
+    void S3Worker::SendPutObjectRequest(const std::string &fileName,
+                                        const std::string &bucket,
+                                        const std::string &key,
+                                        const std::string &md5Sum,
+                                        const std::string &contentType,
+                                        unsigned long fileSize) {
 
         Poco::URI uri("http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket + "/" + key);
         std::string path(uri.getPathAndQuery());
@@ -307,12 +304,14 @@ namespace AwsMock::Worker {
         request.add("Content-Length", std::to_string(fileSize));
         request.add("Content-Type", contentType);
         request.add("Content-MD5", md5Sum);
-        request.add("WriteFile", "false");
         AddAuthorization(request);
         log_debug_stream(_logger) << "S3 put object message request created, bucket: " + bucket << " key: " << key << std::endl;
 
         // Send request
-        session.sendRequest(request);
+        std::ifstream ifs(fileName);
+        std::ostream &os = session.sendRequest(request);
+        os << ifs.rdbuf();
+        ifs.close();
 
         // Get the response status
         Poco::Net::HTTPResponse response;
@@ -344,7 +343,7 @@ namespace AwsMock::Worker {
         if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
             return false;
         }
-        return true;
+        return response.getContentLength() > 0;
     }
 
     void S3Worker::SendDeleteObjectRequest(const std::string &bucket, const std::string &key, const std::string &contentType) {

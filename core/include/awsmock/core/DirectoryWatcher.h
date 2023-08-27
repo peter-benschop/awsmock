@@ -34,15 +34,15 @@
 #include <Poco/BasicEvent.h>
 #include <Poco/File.h>
 #include <Poco/Logger.h>
-#include <Poco/LogStream.h>
 #include <Poco/Mutex.h>
 #include <Poco/Thread.h>
 #include <Poco/Runnable.h>
 #include <Poco/Delegate.h>
-#include <Poco/DirectoryIterator.h>
+#include <Poco/RecursiveDirectoryIterator.h>
 
 // AwsMock includes
 #include <awsmock/core/Logger.h>
+#include <awsmock/core/LogStream.h>
 
 #define MAX_EVENTS 1024 // Max. number of events to process at one go
 #define LEN_NAME 16 // Assuming that the length of the filename won't exceed 16 bytes
@@ -152,7 +152,7 @@ namespace AwsMock::Core {
         /**
          * Logger
          */
-        Poco::LogStream _logger;
+        Core::LogStream _logger;
 
         /**
          * Root directory
