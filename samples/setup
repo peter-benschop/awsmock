@@ -127,13 +127,17 @@ function transfer_exists() {
 
 function create_transfer_server {
   if [ "$(transfer_exists)" -eq 0 ]; then
-    server_id=$(awsmock transfer create-server --protocols ftp | jq -r '.ServerId')
+    server_id=$(awsmock transfer create-server --protocols ftp | jq -r '.ServerId') > /dev/null 2>&1
+    echo "Transfer server $server_id created"
+  else
+    echo "Transfer server exists already"
   fi
 }
 
-function transfer_create_user {
+function create_transfer_user {
   role="arn:aws:iam::000000000000:role/$2"
-  awsmock transfer create-user --server-id $1 --role $2 --user-name $3 --home-directory $4
+  awsmock transfer create-user --server-id $1 --role $2 --user-name $3 --home-directory $4 > /dev/null 2>&1
+  echo "Transfer server user $3 created"
 }
 
 function start_transfer_server {
@@ -143,80 +147,73 @@ function start_transfer_server {
 #
 # Create S3 buckets
 #
-#create_s3_bucket file-delivery
-#create_s3_bucket file-delivery-origin
-#create_s3_bucket json-parsing-results
-#create_s3_bucket onix3-produktmeldungen
-#create_s3_bucket transfer-server
-#create_s3_bucket transformed-images
-#create_s3_bucket inventory-reports
-#create_s3_bucket onix3-tmp-parsing-input
-#create_s3_bucket onix3-tmp-anreicherungs-input
-#create_s3_bucket katalogdaten-export-bucket
-#create_s3_bucket vlb-preisreferenz-parsing-input
-#create_s3_bucket vlb-preisreferenz-parsing-result
+create_s3_bucket file-delivery
+create_s3_bucket file-delivery-origin
+create_s3_bucket json-parsing-results
+create_s3_bucket onix3-produktmeldungen
+create_s3_bucket transformed-images
+create_s3_bucket inventory-reports
+create_s3_bucket onix3-tmp-parsing-input
+create_s3_bucket onix3-tmp-anreicherungs-input
+create_s3_bucket katalogdaten-export-bucket
+create_s3_bucket vlb-preisreferenz-parsing-input
+create_s3_bucket vlb-preisreferenz-parsing-result
 
 #
 # Create SQS Queues
 #
-#create_queue_with_dead_letter_queue file-logging
-#create_queue_with_dead_letter_queue protokollierung
-#create_queue_with_dead_letter_queue ftp-file-distribution-vlb-preisreferenz
-#create_queue_with_dead_letter_queue ftp-file-distribution-image
-#create_queue_with_dead_letter_queue ftp-file-distribution-onix
-#create_queue_with_dead_letter_queue ftp-file-distribution-inventory-feed
-#create_queue_with_dead_letter_queue image-input
-#create_queue_with_dead_letter_queue image-result
-#create_queue_with_dead_letter_queue vlb-preisreferenz-splitting-result
-#create_queue_with_dead_letter_queue parsing-result
-#create_queue_with_dead_letter_queue artikel-transformations-service-artikel-ausgang
-#create_queue_with_dead_letter_queue daten-lieferanten-service-daten-eingang
-#create_queue_with_dead_letter_queue daten-datenlieferanten-notification
-#create_queue_with_dead_letter_queue textannotation-result
-#create_queue_with_dead_letter_queue bilderlink
-#create_queue_with_dead_letter_queue produktmeldung-parsing
-#create_queue_with_dead_letter_queue image-delete-notification
-#create_queue_with_dead_letter_queue onix3-datenlieferant-updates
-#create_queue_with_dead_letter_queue protokollierung-datenlieferant-updates
-#create_queue_with_dead_letter_queue katalogdaten
-#create_queue_with_dead_letter_queue onix3-tmp-parsing-input-event
-#create_queue_with_dead_letter_queue onix3-tmp-anreicherungs-input-event
-#create_queue_with_dead_letter_queue inventory-feed-parsing-result
+create_queue_with_dead_letter_queue file-logging
+create_queue_with_dead_letter_queue protokollierung
+create_queue_with_dead_letter_queue ftp-file-distribution-vlb-preisreferenz
+create_queue_with_dead_letter_queue ftp-file-distribution-image
+create_queue_with_dead_letter_queue ftp-file-distribution-onix
+create_queue_with_dead_letter_queue ftp-file-distribution-inventory-feed
+create_queue_with_dead_letter_queue image-input
+create_queue_with_dead_letter_queue image-result
+create_queue_with_dead_letter_queue vlb-preisreferenz-splitting-result
+create_queue_with_dead_letter_queue parsing-result
+create_queue_with_dead_letter_queue artikel-transformations-service-artikel-ausgang
+create_queue_with_dead_letter_queue daten-lieferanten-service-daten-eingang
+create_queue_with_dead_letter_queue daten-datenlieferanten-notification
+create_queue_with_dead_letter_queue textannotation-result
+create_queue_with_dead_letter_queue bilderlink
+create_queue_with_dead_letter_queue produktmeldung-parsing
+create_queue_with_dead_letter_queue image-delete-notification
+create_queue_with_dead_letter_queue onix3-datenlieferant-updates
+create_queue_with_dead_letter_queue protokollierung-datenlieferant-updates
+create_queue_with_dead_letter_queue katalogdaten
+create_queue_with_dead_letter_queue onix3-tmp-parsing-input-event
+create_queue_with_dead_letter_queue onix3-tmp-anreicherungs-input-event
+create_queue_with_dead_letter_queue inventory-feed-parsing-result
 
 #
 # Create lambda function
 #
-#create_lambda_function ftp-file-copy java17 file-copy-service-1.14.3-SNAPSHOT-aws.jar org.springframework.cloud.function.adapter.aws.FunctionInvoker
-#create_lambda_function ftp-file-distribution java17 file-distribution-service-1.24.0-SNAPSHOT-aws.jar org.springframework.cloud.function.adapter.aws.FunctionInvoker
+create_lambda_function ftp-file-copy java17 file-copy-service-1.14.3-SNAPSHOT-aws.jar org.springframework.cloud.function.adapter.aws.FunctionInvoker
+create_lambda_function ftp-file-distribution java17 file-distribution-service-1.24.0-SNAPSHOT-aws.jar org.springframework.cloud.function.adapter.aws.FunctionInvoker
 #create_lambda_function vlb-preisreferenz-splitting java17 vlb-preisreferenz-splitting-1.2.1-SNAPSHOT-aws.jar org.springframework.cloud.function.adapter.aws.FunctionInvoker
 create_lambda_function image-transformation provided.al2 image-transformation-lambda.zip image-transformation-lambda
 
 #
 # Create SNS topic
 #
-#create_sns_topic protokollierung-topic
-#create_sns_topic datenlieferant-updates
-
-#
-# Setup S3 bucket notification events
-#
-#create_bucket_notification transfer-server file-copy-hook.json
-#create_bucket_notification file-delivery file-delivery-hook.json
+create_sns_topic protokollierung-topic
+create_sns_topic datenlieferant-updates
 
 #
 # SNS -> SQS subscription
 #
-#create_sns_subscription protokollierung
+create_sns_subscription protokollierung
 
 #
-# Put some objects
-#
-#create_s3_object ./testdata/images/0036089631545_ANNO_OBILD.jpg file-delivery ftpuser1/0036089631545_ANNO_OBILD.jpg
-#create_s3_object ./testdata/images/9781406379990_ANNO_OBILD.jpg file-delivery ftpuser1/9781406379990_ANNO_OBILD.jpg
-
-#
-# Create FTP server
+# Create FTP server, creates also the transfer-server S3 bucket
 #
 create_transfer_server
 create_transfer_user $server_id transfer_role ftpuser1 ftpuser1
 start_transfer_server $server_id
+
+#
+# Setup S3 bucket notification events
+#
+create_bucket_notification transfer-server file-copy-hook.json
+create_bucket_notification file-delivery file-delivery-hook.json
