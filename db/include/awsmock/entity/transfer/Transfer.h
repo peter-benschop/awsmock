@@ -25,11 +25,34 @@ namespace AwsMock::Database::Entity::Transfer {
     using bsoncxx::document::value;
 
     enum ServerState {
-      Stopped,
-      Started,
-      Inactive,
-      Failed
+      OFFLINE,
+      ONLINE,
+      STARTING,
+      STOPPING,
+      START_FAILED,
+      STOP_FAILED
     };
+    static std::map<ServerState,std::string> ServerStateNames{
+        {ServerState::OFFLINE, "OFFLINE"},
+        {ServerState::ONLINE, "ONLINE"},
+        {ServerState::STARTING, "STARTING"},
+        {ServerState::STOPPING, "STOPPING"},
+        {ServerState::START_FAILED, "START_FAILED"},
+        {ServerState::STOP_FAILED, "STOP_FAILED"}
+    };
+
+    static std::string ServerStateToString(const ServerState &serverState) {
+        return ServerStateNames[serverState];
+    }
+
+    /*static ServerState ServerStateFromString(const std::string &serverState) {
+        for(auto &it : ServerStateNames) {
+            if(it.second == serverState) {
+                return it.first;
+            }
+        }
+        return ServerState::OFFLINE;
+    }*/
 
     struct User {
 
@@ -119,7 +142,7 @@ namespace AwsMock::Database::Entity::Transfer {
       /**
        * State
        */
-      int state = ServerState::Inactive;
+      std::string state = ServerStateToString(ServerState::OFFLINE);
 
       /**
        * Last transfer server start
@@ -202,7 +225,7 @@ namespace AwsMock::Database::Entity::Transfer {
           region = mResult.value()["region"].get_string().value.to_string();
           serverId = mResult.value()["serverId"].get_string().value.to_string();
           arn = mResult.value()["arn"].get_string().value.to_string();
-          state = mResult.value()["state"].get_int32().value;
+          state = mResult.value()["state"].get_string().value.to_string();
           lastStarted = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date().value) / 1000));
           created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
           modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
@@ -234,7 +257,7 @@ namespace AwsMock::Database::Entity::Transfer {
           region = mResult.value()["region"].get_string().value.to_string();
           serverId = mResult.value()["serverId"].get_string().value.to_string();
           arn = mResult.value()["arn"].get_string().value.to_string();
-          state = mResult.value()["state"].get_int32().value;
+          state = mResult.value()["state"].get_string().value.to_string();
           lastStarted = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date().value) / 1000));
           created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
           modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));

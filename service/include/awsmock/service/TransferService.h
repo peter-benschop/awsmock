@@ -28,6 +28,10 @@
 #include <awsmock/dto/transfer/CreateTransferResponse.h>
 #include <awsmock/dto/transfer/CreateUserRequest.h>
 #include <awsmock/dto/transfer/CreateUserResponse.h>
+#include <awsmock/dto/transfer/ListServerRequest.h>
+#include <awsmock/dto/transfer/ListServerResponse.h>
+#include <awsmock/dto/transfer/StartServerRequest.h>
+#include <awsmock/dto/transfer/StopServerRequest.h>
 #include <awsmock/service/FtpServer.h>
 
 namespace AwsMock::Service {
@@ -58,6 +62,28 @@ namespace AwsMock::Service {
        * @return CreateUserResponse
        */
       Dto::Transfer::CreateUserResponse CreateUser(Dto::Transfer::CreateUserRequest &request);
+
+      /**
+       * Returns a list of available servers
+       *
+       * @param request list server request
+       * @return ListServerResponse
+       */
+      Dto::Transfer::ListServerResponse ListServers(const Dto::Transfer::ListServerRequest &request);
+
+      /**
+       * Starts an server.
+       *
+       * @param request start server request
+       */
+      void StartServer(const Dto::Transfer::StartServerRequest &request);
+
+      /**
+       * Stops an server.
+       *
+       * @param request stop server request
+       */
+      void StopServer(const Dto::Transfer::StopServerRequest &request);
 
     private:
 

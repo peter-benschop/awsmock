@@ -136,7 +136,7 @@ namespace AwsMock {
       /**
        * Logger
        */
-      Poco::LogStream _logger;
+      Core::LogStream _logger;
 
       /**
        * S3 handler configuration

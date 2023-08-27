@@ -27,24 +27,69 @@ namespace AwsMock::Worker {
         log_debug_stream(_logger) << "TransferWorker initialized" << std::endl;
     }
 
+    void TransferWorker::StartTransferServer(Database::Entity::Transfer::Transfer &server) {
+
+        // Create transfer server thread
+        std::shared_ptr<Service::FtpServer> ftpserver = std::make_shared<Service::FtpServer>(_configuration);
+        _transferServerList[server.serverId] = ftpserver;
+
+        // Add users
+        for (const auto &user : server.users) {
+            if (user.userName != "anonymous") {
+                ftpserver->AddUser(user.userName, user.password, user.homeDirectory);
+            }
+        }
+        Poco::ThreadPool::defaultPool().start(*ftpserver);
+
+        // Update database
+        server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::ONLINE);
+
+        log_debug_stream(_logger) << "Transfer server " << server.serverId << " started " << std::endl;
+    }
+
+    void TransferWorker::StopTransferServer(Database::Entity::Transfer::Transfer &server) {
+
+        // Create transfer server thread
+        std::shared_ptr<Service::FtpServer> ftpserver = _transferServerList[server.serverId];
+
+        ftpserver->StopServer();
+
+        // Update database
+        server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::OFFLINE);
+
+        log_debug_stream(_logger) << "Transfer server " << server.serverId << " stopped " << std::endl;
+    }
+
     void TransferWorker::StartTransferServers() {
 
         log_debug_stream(_logger) << "Starting transfer servers" << std::endl;
-        std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase->ListTransfers(_region);
+        std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase->ListServers(_region);
 
-        for(auto &transfer : transfers){
+        for (auto &transfer : transfers) {
+            if(transfer.state == Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::ONLINE)) {
+                StartTransferServer(transfer);
+            }
+        }
+    }
 
-            // Create transfer server thread
-            std::shared_ptr<Service::FtpServer> ftpserver = std::make_shared<Service::FtpServer>(_configuration);
-            _transferServerList[transfer.serverId] = ftpserver;
+    void TransferWorker::CheckTransferServers() {
 
-            // Add users
-            for(const auto &user : transfer.users) {
-                if(user.userName != "anonymous") {
-                    ftpserver->AddUser(user.userName, user.password, user.homeDirectory);
+        log_debug_stream(_logger) << "Checking transfer servers" << std::endl;
+        std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase->ListServers(_region);
+
+        for (auto &transfer : transfers) {
+            if(transfer.state == Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::ONLINE)) {
+                std::map<std::string, std::shared_ptr<Service::FtpServer>>::iterator it = _transferServerList.find(transfer.serverId);
+                if (it == _transferServerList.end()) {
+                    StartTransferServer(transfer);
+                }
+            } else  if(transfer.state == Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::OFFLINE)) {
+                std::map<std::string, std::shared_ptr<Service::FtpServer>>::iterator it = _transferServerList.find(transfer.serverId);
+                if (it != _transferServerList.end()) {
+                    StopTransferServer(transfer);
                 }
             }
-            Poco::ThreadPool::defaultPool().start(*ftpserver);
+
         }
     }
 
@@ -64,6 +109,7 @@ namespace AwsMock::Worker {
         while (_running) {
             log_debug_stream(_logger) << "TransferWorker processing started" << std::endl;
             Poco::Thread::sleep(_period);
+            CheckTransferServers();
         }
     }
 

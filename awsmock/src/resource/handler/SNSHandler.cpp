@@ -6,9 +6,6 @@ namespace AwsMock {
     SNSHandler::SNSHandler(Core::Configuration &configuration, Core::MetricService &metricService)
         : AbstractResource(), _logger(Poco::Logger::get("SNSHandler")), _configuration(configuration), _metricService(metricService) {
 
-        // Set default console logger
-        Core::Logger::SetDefaultConsoleLogger("SNSHandler");
-
         // Service parameter
         _snsServiceHost = _configuration.getString("awsmock.service.sns.host", "localhost");
         _snsServicePort = _configuration.getInt("awsmock.service.sns.port", 9502);
@@ -17,7 +14,7 @@ namespace AwsMock {
     void SNSHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
 
         Core::MetricServiceTimer measure(_metricService, HTTP_GET_TIMER);
-        _logger.debug() << "SNS GET request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+        log_debug_stream(_logger) << "SNS GET request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
         SetHeaders(request, region, user);
         DumpRequest(request);
@@ -27,7 +24,7 @@ namespace AwsMock {
     void SNSHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
 
         Core::MetricServiceTimer measure(_metricService, HTTP_PUT_TIMER);
-        _logger.debug() << "SNS PUT request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+        log_debug_stream(_logger) << "SNS PUT request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
         SetHeaders(request, region, user);
         DumpRequest(request);
@@ -46,7 +43,7 @@ namespace AwsMock {
     void SNSHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
 
         Core::MetricServiceTimer measure(_metricService, HTTP_DELETE_TIMER);
-        _logger.debug() << "SNS DELETE request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+        log_debug_stream(_logger) << "SNS DELETE request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
         SetHeaders(request, region, user);
         DumpRequest(request);
@@ -55,7 +52,7 @@ namespace AwsMock {
 
     void SNSHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
         Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
-        _logger.debug() << "SNS OPTIONS request" << std::endl;
+        log_debug_stream(_logger) << "SNS OPTIONS request" << std::endl;
 
         response.set("Allow", "GET, PUT, POST, DELETE, HEAD, OPTIONS");
         response.setContentType("text/plain; charset=utf-8");
