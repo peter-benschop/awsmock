@@ -18,7 +18,7 @@ add_subdirectory(tst)
 
 # Includes
 include_directories(include ../core/include ../db/include ../dto/include ../dto/include /usr/include
-        /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
+        /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi tbb)
 
 add_library(${LIBRARY} SHARED ${SOURCES})
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
