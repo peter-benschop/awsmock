@@ -24,11 +24,31 @@ namespace AwsMock::Database::Entity::Lambda {
     using bsoncxx::document::value;
 
     enum LambdaState {
-      Pending,
-      Active,
-      Inactive,
-      Failed
+      PENDING,
+      ACTIVE,
+      INACTIVE,
+      FAILED
     };
+
+    static std::map<LambdaState,std::string> LambdaStateNames{
+        {LambdaState::PENDING, "PENDING"},
+        {LambdaState::ACTIVE, "ACTIVE"},
+        {LambdaState::INACTIVE, "INACTIVE"},
+        {LambdaState::FAILED, "FAILED"},
+    };
+
+    static std::string LambdaStateToString(LambdaState lambdaState) {
+        return LambdaStateNames[lambdaState];
+    }
+
+    static LambdaState LambdaStateFromString(const std::string &lambdaState) {
+        for(auto &it : LambdaStateNames) {
+            if(it.second == lambdaState) {
+                return it.first;
+            }
+        }
+        return LambdaState::INACTIVE;
+    }
 
     enum LambdaStateReasonCode {
       Idle,
@@ -56,6 +76,46 @@ namespace AwsMock::Database::Entity::Lambda {
       InvalidZipFileException,
       FunctionError
     };
+
+    static std::map<LambdaStateReasonCode,std::string> LambdaStateReasonCodeNames{
+        {LambdaStateReasonCode::Idle, "Idle"},
+        {LambdaStateReasonCode::Creating, "Creating"},
+        {LambdaStateReasonCode::Restoring, "Restoring"},
+        {LambdaStateReasonCode::EniLimitExceeded, "EniLimitExceeded"},
+        {LambdaStateReasonCode::InsufficientRolePermissions, "InsufficientRolePermissions"},
+        {LambdaStateReasonCode::InvalidConfiguration, "InvalidConfiguration"},
+        {LambdaStateReasonCode::InternalError, "InternalError"},
+        {LambdaStateReasonCode::SubnetOutOfIPAddresses, "SubnetOutOfIPAddresses"},
+        {LambdaStateReasonCode::InvalidSubnet, "InvalidSubnet"},
+        {LambdaStateReasonCode::InvalidSecurityGroup, "InvalidSecurityGroup"},
+        {LambdaStateReasonCode::ImageDeleted, "ImageDeleted"},
+        {LambdaStateReasonCode::ImageAccessDenied, "ImageAccessDenied"},
+        {LambdaStateReasonCode::InvalidImage, "InvalidImage"},
+        {LambdaStateReasonCode::KMSKeyAccessDenied, "KMSKeyAccessDenied"},
+        {LambdaStateReasonCode::KMSKeyNotFound, "KMSKeyNotFound"},
+        {LambdaStateReasonCode::InvalidStateKMSKey, "InvalidStateKMSKey"},
+        {LambdaStateReasonCode::DisabledKMSKey, "DisabledKMSKey"},
+        {LambdaStateReasonCode::EFSIOError, "EFSIOError"},
+        {LambdaStateReasonCode::EFSMountConnectivityError, "EFSMountConnectivityError"},
+        {LambdaStateReasonCode::EFSMountFailure, "EFSMountFailure"},
+        {LambdaStateReasonCode::EFSMountTimeout, "EFSMountTimeout"},
+        {LambdaStateReasonCode::InvalidRuntime, "InvalidRuntime"},
+        {LambdaStateReasonCode::InvalidZipFileException, "InvalidZipFileException"},
+        {LambdaStateReasonCode::FunctionError, "FunctionError"},
+    };
+
+    static std::string LambdaStateReasonCodeToString(LambdaStateReasonCode lambdaStateReasonCode) {
+        return LambdaStateReasonCodeNames[lambdaStateReasonCode];
+    }
+
+    static LambdaStateReasonCode LambdaStateReasonCodeFromString(const std::string &lambdaStateReasonCode) {
+        for(auto &it : LambdaStateReasonCodeNames) {
+            if(it.second == lambdaStateReasonCode) {
+                return it.first;
+            }
+        }
+        return LambdaStateReasonCode::Idle;
+    }
 
     struct Environment {
 
@@ -155,7 +215,7 @@ namespace AwsMock::Database::Entity::Lambda {
       /**
        * Lambda state
        */
-      int state = LambdaState::Pending;
+      LambdaState state = LambdaState::PENDING;
 
       /**
        * State reason
@@ -165,7 +225,7 @@ namespace AwsMock::Database::Entity::Lambda {
       /**
        * State reason code
        */
-      int stateReasonCode = LambdaStateReasonCode::Creating;
+      LambdaStateReasonCode stateReasonCode = LambdaStateReasonCode::Creating;
 
       /**
        * Code SHA256
@@ -216,9 +276,9 @@ namespace AwsMock::Database::Entity::Lambda {
               kvp("hostPort", hostPort),
               kvp("codeSha256", codeSha256),
               kvp("environment", varDoc),
-              kvp("state", state),
+              kvp("state", LambdaStateToString(state)),
               kvp("stateReason", stateReason),
-              kvp("stateReasonCode", stateReasonCode),
+              kvp("stateReasonCode", LambdaStateReasonCodeToString(stateReasonCode)),
               kvp("lastStarted", bsoncxx::types::b_date(std::chrono::milliseconds(lastStarted.timestamp().epochMicroseconds() / 1000))),
               kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
               kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
@@ -248,9 +308,9 @@ namespace AwsMock::Database::Entity::Lambda {
           codeSha256 = mResult.value()["codeSha256"].get_string().value.to_string();
           hostPort = mResult.value()["hostPort"].get_int32().value;
           environment.FromDocument(mResult.value()["environment"].get_document().value);
-          state = mResult.value()["state"].get_int32().value;
+          state = LambdaStateFromString(mResult.value()["state"].get_string().value.to_string());
           stateReason = mResult.value()["stateReason"].get_string().value.to_string();
-          stateReasonCode = mResult.value()["stateReasonCode"].get_int32().value;
+          stateReasonCode = LambdaStateReasonCodeFromString(mResult.value()["stateReasonCode"].get_string().value.to_string());
           lastStarted = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date().value) / 1000));
           created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
           modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
@@ -278,9 +338,9 @@ namespace AwsMock::Database::Entity::Lambda {
           codeSha256 = mResult.value()["codeSha256"].get_string().value.to_string();
           hostPort = mResult.value()["hostPort"].get_int32().value;
           environment.FromDocument(mResult.value()["environment"].get_document().value);
-          state = mResult.value()["state"].get_int32().value;
+          state = LambdaStateFromString(mResult.value()["state"].get_string().value.to_string());
           stateReason = mResult.value()["stateReason"].get_string().value.to_string();
-          stateReasonCode = mResult.value()["stateReasonCode"].get_int32().value;
+          stateReasonCode = LambdaStateReasonCodeFromString(mResult.value()["stateReasonCode"].get_string().value.to_string());
           lastStarted = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date().value) / 1000));
           created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
           modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));

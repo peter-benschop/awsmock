@@ -103,6 +103,10 @@ namespace AwsMock::Core {
         return s1.find(s2) != std::string::npos;
     }
 
+    bool StringUtils::ContainsIgnoreCase(const std::string &s1, const std::string &s2) {
+        return Poco::toLower(s1).find(Poco::toLower(s2)) != std::string::npos;
+    }
+
     bool StringUtils::StartsWith(const std::string &s1, const std::string &s2) {
         return s1.rfind(s2, 0) == 0;
     }

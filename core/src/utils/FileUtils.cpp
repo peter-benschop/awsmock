@@ -33,8 +33,8 @@ namespace AwsMock::Core {
         return path.parent_path();
     }
 
-    unsigned long FileUtils::FileSize(const std::string &fileName) {
-        return std::filesystem::file_size({fileName.c_str()});
+    long FileUtils::FileSize(const std::string &fileName) {
+        return (long)std::filesystem::file_size({fileName.c_str()});
     }
 
     void FileUtils::MoveTo(const std::string &sourceFileName, const std::string &targetFileName, bool createDir) {

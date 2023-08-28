@@ -39,7 +39,7 @@ namespace AwsMock::Core {
         int fd;
 
         std::string entryName = Poco::replace(fileName, removeDir.c_str(), "");
-        poco_trace(Poco::Logger::get("SystemUtils"), "Removed directory, name: " + entryName);
+        //poco_trace(Poco::Logger::get("SystemUtils"), "Removed directory, name: " + entryName);
 
         stat(fileName.c_str(), &st);
         entry = archive_entry_new(); // Note 2
@@ -70,7 +70,7 @@ namespace AwsMock::Core {
         while (len > 0) {
             archive_write_data(archive, buff, len);
             len = read(fd, buff, sizeof(buff));
-            poco_trace(Poco::Logger::get("TarUtils"), "File written to archive, name: " + entryName);
+            //poco_trace(Poco::Logger::get("TarUtils"), "File written to archive, name: " + entryName);
         }
         close(fd);
         archive_entry_free(entry);

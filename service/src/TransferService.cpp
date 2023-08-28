@@ -100,7 +100,11 @@ namespace AwsMock::Service {
             auto response = Dto::Transfer::ListServerResponse();
             response.nextToken = Poco::UUIDGenerator().createRandom().toString();
             for (const auto &s : servers) {
-                Dto::Transfer::Server server = {.arn=s.arn, .serverId=s.serverId, .state=s.state};
+                Dto::Transfer::Server server = {
+                    .arn=s.arn,
+                    .serverId=s.serverId,
+                    .state=s.state,
+                    .userCount=static_cast<int>(s.users.size())};
                 response.servers.emplace_back(server);
             }
 

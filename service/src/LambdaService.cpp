@@ -70,6 +70,7 @@ namespace AwsMock::Service {
         // Start container
         _dockerService->StartContainer(container.id);
         lambdaEntity.lastStarted = Poco::DateTime();
+        lambdaEntity.state = Database::Entity::Lambda::LambdaState::ACTIVE;
 
         // Update database
         lambdaEntity = _lambdaDatabase->CreateOrUpdateLambda(lambdaEntity);
@@ -225,7 +226,7 @@ namespace AwsMock::Service {
 
         // Create directory
         std::string codeDir = _tempDir + Poco::Path::separator() + Poco::UUIDGenerator().createRandom().toString() + Poco::Path::separator();
-        if (Core::StringUtils::Contains(runtime, "Java")) {
+        if (Core::StringUtils::ContainsIgnoreCase(runtime, "java")) {
             std::string classesDir = codeDir + "classes";
             if (!Core::DirUtils::DirectoryExists(classesDir)) {
                 Core::DirUtils::MakeDirectory(classesDir);

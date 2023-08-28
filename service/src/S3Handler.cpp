@@ -111,9 +111,9 @@ namespace AwsMock::Service {
                 putObjectRequest.key = key;
                 putObjectRequest.owner = user;
                 putObjectRequest.region = region;
-                putObjectRequest.contentType = request.get("Content-Type");
-                putObjectRequest.md5Sum = request.get("Content-MD5");
-                putObjectRequest.size = std::stol(request.get("Content-Length"));
+                putObjectRequest.contentType = GetHeaderValue(request, "Content-Type", "application/octet-stream");
+                putObjectRequest.md5Sum = GetHeaderValue(request, "Content-MD5", "");
+                putObjectRequest.size = std::stol(GetHeaderValue(request, "Content-Length", "0"));
 
                 Dto::S3::PutObjectResponse putObjectResponse = _s3Service.PutObject(putObjectRequest, &request.stream());
 

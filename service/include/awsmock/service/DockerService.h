@@ -96,7 +96,7 @@ namespace AwsMock::Service {
                       const std::string &runtime,
                       long &fileSize,
                       std::string &codeSha256,
-                     const std::vector<std::pair<std::string, std::string>> &environment);
+                      const std::vector<std::pair<std::string, std::string>> &environment);
 
       /**
        * Delete an image by name/tag.

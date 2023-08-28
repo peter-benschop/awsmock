@@ -136,7 +136,7 @@ function create_transfer_server {
 
 function create_transfer_user {
   role="arn:aws:iam::000000000000:role/$2"
-  awsmock transfer create-user --server-id $1 --role $2 --user-name $3 --home-directory $4 > /dev/null 2>&1
+  awsmock transfer create-user --server-id $1 --role $role --user-name $3 --home-directory $4 > /dev/null 2>&1
   echo "Transfer server user $3 created"
 }
 

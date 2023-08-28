@@ -32,6 +32,7 @@ namespace AwsMock::Database::Entity::Transfer {
       START_FAILED,
       STOP_FAILED
     };
+
     static std::map<ServerState,std::string> ServerStateNames{
         {ServerState::OFFLINE, "OFFLINE"},
         {ServerState::ONLINE, "ONLINE"},

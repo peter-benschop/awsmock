@@ -446,6 +446,11 @@ namespace AwsMock::Service {
         }
     }
 
+    std::string AbstractHandler::GetHeaderValue(Poco::Net::HTTPServerRequest &request, const std::string &name, const std::string &defaultValue) {
+        log_trace_stream(_logger) << "Getting header values, name: " << name << std::endl;
+        return request.get(name, defaultValue);
+    }
+
     void AbstractHandler::DumpRequest(Poco::Net::HTTPServerRequest &request) {
         log_trace_stream(_logger) << "Dump request" << std::endl;
         std::cerr << "==================== Request =====================" << std::endl;

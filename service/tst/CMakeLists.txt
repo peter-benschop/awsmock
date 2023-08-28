@@ -9,6 +9,6 @@ link_directories(/usr/lib /usr/lib/x86_64-linux-gnu /usr/local/lib ../ ../../cor
 add_executable(${BINARY} SQSServiceTests.cpp S3ServiceTests.cpp DockerServiceTests.cpp main.cpp)
 target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore awsmockdb mongocxx bsoncxx PocoUtil PocoFoundation
         PocoNetSSL PocoNet PocoJSON PocoXML PocoZip PocoPrometheus gtest pthread ssl crypto z archive curl
-        fineftp-server)
+        fineftp-server tbb)
 
 add_test(NAME ${BINARY} COMMAND ${BINARY})

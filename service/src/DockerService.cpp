@@ -190,15 +190,21 @@ namespace AwsMock::Service {
 
         // TODO: Fix environment
         std::ofstream ofs(dockerFilename);
-        if (runtime == "Java11") {
+        if (Core::StringUtils::EqualsIgnoreCase(runtime, "java11")) {
             ofs << "FROM public.ecr.aws/lambda/java:11" << std::endl;
+            for (auto &env : environment) {
+                ofs << "ENV " << env.first << "=\"" << env.second << "\"" << std::endl;
+            }
             ofs << "COPY classes ${LAMBDA_TASK_ROOT}" << std::endl;
             ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
-        } else if (runtime == "Java17") {
+        } else if (Core::StringUtils::EqualsIgnoreCase(runtime, "java17")) {
             ofs << "FROM public.ecr.aws/lambda/java:17" << std::endl;
+            for (auto &env : environment) {
+                ofs << "ENV " << env.first << "=\"" << env.second << "\"" << std::endl;
+            }
             ofs << "COPY classes ${LAMBDA_TASK_ROOT}" << std::endl;
             ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
-        } else if (runtime == "provided.al2") {
+        } else if (Core::StringUtils::EqualsIgnoreCase(runtime, "provided.al2")) {
             ofs << "FROM public.ecr.aws/lambda/provided:al2" << std::endl;
             for (auto &env : environment) {
                 ofs << "ENV " << env.first << "=\"" << env.second << "\"" << std::endl;
@@ -211,7 +217,7 @@ namespace AwsMock::Service {
             ofs << "COPY lib/* ${LAMBDA_TASK_ROOT}/lib/" << std::endl;
             ofs << "RUN chmod 755 ${LAMBDA_TASK_ROOT}/lib/ld-linux-x86-64.so.2" << std::endl;
             ofs << "CMD [ \"" + handler + "\" ]" << std::endl;
-        } else if (runtime == "provided.latest") {
+        } else if (Core::StringUtils::EqualsIgnoreCase(runtime, "provided.latest")) {
             ofs << "FROM public.ecr.aws/lambda/provided:latest" << std::endl;
             for (auto &env : environment) {
                 ofs << "ENV " << env.first << "=\"" << env.second << "\"" << std::endl;

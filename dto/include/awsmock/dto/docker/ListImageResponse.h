@@ -72,7 +72,7 @@ namespace AwsMock::Dto::Docker {
       void FromJson(Poco::JSON::Object::Ptr object) {
 
           try {
-              Core::JsonUtils::GetJsonValueString("id", object, id);
+              Core::JsonUtils::GetJsonValueString("Id", object, id);
               Core::JsonUtils::GetJsonValueString("ParentId", object, parentId);
               Core::JsonUtils::GetJsonValueLong("Size", object, size);
               Core::JsonUtils::GetJsonValueLong("SharedSize", object, sharedSize);

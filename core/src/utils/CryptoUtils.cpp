@@ -51,6 +51,7 @@ namespace AwsMock::Core {
         output.resize(md_len * 2);
         for (unsigned int i = 0; i < md_len; ++i)
             std::sprintf(&output[i * 2], "%02x", md_value[i]);
+        delete[] buffer;
         return output;
     }
 
@@ -99,6 +100,7 @@ namespace AwsMock::Core {
         output.resize(md_len * 2);
         for (unsigned int i = 0; i < md_len; ++i)
             std::sprintf(&output[i * 2], "%02x", md_value[i]);
+        delete[] buffer;
         return output;
     }
 
@@ -166,6 +168,9 @@ namespace AwsMock::Core {
         output.resize(md_len * 2);
         for (unsigned int i = 0; i < md_len; ++i)
             std::sprintf(&output[i * 2], "%02x", md_value[i]);
+
+        delete[] buffer;
+
         return output;
     }
 

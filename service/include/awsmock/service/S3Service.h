@@ -182,8 +182,9 @@ namespace AwsMock::Service {
        * notification request to the lambda function.</p>
        *
        * @param eventNotification S3 event notification
+       * @param bucketNotification S3 bucket notification
        */
-      void SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification);
+      void SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::BucketNotification &bucketNotification);
 
       /**
        * Get the directory from the object key.
