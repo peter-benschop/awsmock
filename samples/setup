@@ -85,14 +85,6 @@ function lambda_exists() {
   awsmock lambda list-functions | grep arn | grep $1 | wc -l
 }
 
-function create_environment() {
-  if [ "$2" = "java17" ]; then
-    echo '{"Variables": {"JAVA_TOOL_OPTIONS": "-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localhost"}}' > /tmp/$1-env.json
-  else
-    echo '{"Variables": {"AWS_REGION": "eu-central-1", "AWS_ENDPOINT": "http://172.24.65.214:4567", "AWS_ACCOUNT_ID": "000000000000", "AWS_SECRET_ACCESS_KEY": "none", "AWS_SESSION_TOKEN": "none", "AWS_CA_FILE": "/etc/pki/tls/certs/ca-bundle.crt", "LIBRI_MONITORING_PORT": "8081" }}' > /tmp/$1-env.json
-  fi
-}
-
 function create_lambda_function () {
 
   function=$1
@@ -100,14 +92,13 @@ function create_lambda_function () {
   zipfile=$3
   handler=$4
 
-  if [ "$(lambda_exists $function)" -eq 0 ]; then
-    create_environment "$function" "$runtime"
+  if [ "$(lambda_exists "$function")" -eq 0 ]; then
     awsmock lambda create-function \
     --function-name "$function" \
     --runtime "$runtime" \
     --timeout 120 \
     --memory-size 512 \
-    --environment file:///tmp/$1-env.json \
+    --environment "file://./lambda/$1-env.json" \
     --handler "$handler" \
     --region eu-central-1 \
     --zip-file "fileb:///tmp/awsmock/data/lambda/$zipfile" \
@@ -136,7 +127,7 @@ function create_transfer_server {
 
 function create_transfer_user {
   role="arn:aws:iam::000000000000:role/$2"
-  awsmock transfer create-user --server-id $1 --role $2 --user-name $3 --home-directory $4 > /dev/null 2>&1
+  awsmock transfer create-user --server-id $1 --role $role --user-name $3 --home-directory $4 > /dev/null 2>&1
   echo "Transfer server user $3 created"
 }
 

@@ -302,6 +302,25 @@ namespace AwsMock::Service {
       void SendErrorResponse(const std::string &service,Poco::Net::HTTPServerResponse &response, Core::ServiceException &exc);
 
       /**
+       * CHecks whether the request has a header with the given key
+       *
+       * @param request HTTP request
+       * @param name header key
+       * @return true if header with the specified key exists, otherwise false
+       */
+      bool HeaderExists(Poco::Net::HTTPServerRequest &request, const std::string &name);
+
+      /**
+       * Gets a header values
+       *
+       * @param request HTTP request
+       * @param name header name
+       * @param defaultValue default value
+       * @return value or default value
+       */
+      std::string GetHeaderValue(Poco::Net::HTTPServerRequest &request, const std::string &name, const std::string &defaultValue);
+
+      /**
        * Dump the request to std::cerr
        *
        * @param request HTTP request

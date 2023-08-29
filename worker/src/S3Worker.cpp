@@ -53,7 +53,7 @@ namespace AwsMock::Worker {
 
         // Start _watcher
         _watcher = new Core::DirectoryWatcher(_watcherDir);
-        _watcher->itemAdded += Poco::delegate(this, &S3Worker::OnFileAdded);
+        //_watcher->itemAdded += Poco::delegate(this, &S3Worker::OnFileAdded);
         _watcher->itemModified += Poco::delegate(this, &S3Worker::OnFileModified);
         _watcher->itemDeleted += Poco::delegate(this, &S3Worker::OnFileDeleted);
         log_debug_stream(_logger) << "Directory _watcher added, path: " << _watcherDir << std::endl;
@@ -131,22 +131,13 @@ namespace AwsMock::Worker {
     }
 
     void S3Worker::OnFileModified(const Core::DirectoryEvent &modifiedEvent) {
-        log_debug_stream(_logger) << "Changed path: " << modifiedEvent.item.path() << std::endl;
+        log_debug_stream(_logger) << "Added path: " << modifiedEvent.item.path() << std::endl;
 
-        if(Core::DirUtils::IsDirectory(modifiedEvent.item.path())) {
-            return;
+        if (Core::DirUtils::IsDirectory(modifiedEvent.item.path())) {
+            CreateBucket(modifiedEvent.item.path());
+        } else {
+            CreateObject(modifiedEvent.item.path());
         }
-
-        // Get bucket, key
-        std::string bucket, key;
-        GetBucketKeyFromFile(modifiedEvent.item.path(), bucket, key);
-
-        // Get file size, MD5 sum
-        long size = Core::FileUtils::FileSize(modifiedEvent.item.path());
-        std::string md5sum = Core::Crypto::GetMd5FromFile(modifiedEvent.item.path());
-        std::string owner = Core::FileUtils::GetOwner(modifiedEvent.item.path());
-
-        SendPutObjectRequest(modifiedEvent.item.path(), bucket, key, md5sum, "application/octet-stream", size);
     }
 
     void S3Worker::OnFileDeleted(const Core::DirectoryEvent &deleteEvent) {
@@ -343,7 +334,7 @@ namespace AwsMock::Worker {
         if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
             return false;
         }
-        return response.getContentLength() > 0;
+        return true;
     }
 
     void S3Worker::SendDeleteObjectRequest(const std::string &bucket, const std::string &key, const std::string &contentType) {

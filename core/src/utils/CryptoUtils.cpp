@@ -51,6 +51,7 @@ namespace AwsMock::Core {
         output.resize(md_len * 2);
         for (unsigned int i = 0; i < md_len; ++i)
             std::sprintf(&output[i * 2], "%02x", md_value[i]);
+        delete[] buffer;
         return output;
     }
 
@@ -99,6 +100,7 @@ namespace AwsMock::Core {
         output.resize(md_len * 2);
         for (unsigned int i = 0; i < md_len; ++i)
             std::sprintf(&output[i * 2], "%02x", md_value[i]);
+        delete[] buffer;
         return output;
     }
 
@@ -166,6 +168,9 @@ namespace AwsMock::Core {
         output.resize(md_len * 2);
         for (unsigned int i = 0; i < md_len; ++i)
             std::sprintf(&output[i * 2], "%02x", md_value[i]);
+
+        delete[] buffer;
+
         return output;
     }
 
@@ -277,7 +282,15 @@ namespace AwsMock::Core {
         return ret;
     }
 
-    std::string Crypto::HexEncode(const std::array<unsigned char, 64> hash) {
+    std::string Crypto::HexEncode(const std::array<unsigned char, EVP_MAX_MD_SIZE> hash) {
+        std::stringstream ss;
+        for (unsigned char i : hash) {
+            ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(i);
+        }
+        return {ss.str(), 0, hash.size()};
+    }
+
+    std::string Crypto::HexEncode(const std::string &hash) {
         std::stringstream ss;
         for (unsigned char i : hash) {
             ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(i);

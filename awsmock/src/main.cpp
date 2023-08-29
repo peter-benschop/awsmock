@@ -65,6 +65,7 @@ namespace AwsMock {
           InitializeMonitoring();
           InitializeErrorHandler();
           InitializeIndexes();
+          InitializeCurl();
           log_info_stream(_logger) << "Starting " << Configuration::GetAppName() << " v" << Configuration::GetVersion() << " pid: " << getpid() << " loglevel: "
                                    << _configuration.GetLogLevel() << std::endl;
           Poco::Util::ServerApplication::initialize(self);
@@ -158,6 +159,13 @@ namespace AwsMock {
           // Install error handler
           _database.CreateIndexes();
           log_debug_stream(_logger) << "Database indexes created" << std::endl;
+      }
+
+      /**
+       * Initialize CURL library
+       */
+      void InitializeCurl() {
+          curl_global_init(CURL_GLOBAL_ALL);
       }
 
       void StartWorker() {

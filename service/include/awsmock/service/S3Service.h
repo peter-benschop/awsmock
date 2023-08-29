@@ -8,6 +8,11 @@
 // C++ standard includes
 #include <string>
 
+// Poco includes
+#include "Poco/DateTime.h"
+#include "Poco/DateTimeFormat.h"
+#include "Poco/DateTimeFormatter.h"
+
 // AwsMock includes
 #include "awsmock/core/CryptoUtils.h"
 #include "awsmock/core/ServiceException.h"
@@ -15,6 +20,8 @@
 #include "awsmock/dto/s3/CompleteMultipartUploadResult.h"
 #include "awsmock/dto/s3/CreateBucketRequest.h"
 #include "awsmock/dto/s3/CreateBucketResponse.h"
+#include "awsmock/dto/s3/CopyObjectRequest.h"
+#include "awsmock/dto/s3/CopyObjectResponse.h"
 #include "awsmock/dto/s3/DeleteObjectRequest.h"
 #include "awsmock/dto/s3/DeleteObjectsRequest.h"
 #include "awsmock/dto/s3/DeleteObjectsResponse.h"
@@ -135,6 +142,14 @@ namespace AwsMock::Service {
       Dto::S3::PutObjectResponse PutObject(Dto::S3::PutObjectRequest &request, std::istream *stream = nullptr);
 
       /**
+       * Copy object
+       *
+       * @param request put object request
+       * @return PutObjectResponse
+       */
+      Dto::S3::CopyObjectResponse CopyObject(Dto::S3::CopyObjectRequest &request);
+
+      /**
        * Delete object
        *
        * @param request delete object request
@@ -182,8 +197,9 @@ namespace AwsMock::Service {
        * notification request to the lambda function.</p>
        *
        * @param eventNotification S3 event notification
+       * @param bucketNotification S3 bucket notification
        */
-      void SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification);
+      void SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::BucketNotification &bucketNotification);
 
       /**
        * Get the directory from the object key.

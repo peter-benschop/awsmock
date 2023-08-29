@@ -234,6 +234,10 @@ namespace AwsMock::Service {
         return _pathParameter[pos];
     }
 
+    bool AbstractHandler::HeaderExists(Poco::Net::HTTPServerRequest &request, const std::string &name) {
+        return request.has(name);
+    }
+
     void AbstractHandler::GetRegionUser(const std::string &authorization, std::string &region, std::string &user) {
         Poco::RegularExpression::MatchVec posVec;
 
@@ -444,6 +448,11 @@ namespace AwsMock::Service {
                 response.set(it.first, it.second);
             }
         }
+    }
+
+    std::string AbstractHandler::GetHeaderValue(Poco::Net::HTTPServerRequest &request, const std::string &name, const std::string &defaultValue) {
+        log_trace_stream(_logger) << "Getting header values, name: " << name << std::endl;
+        return request.get(name, defaultValue);
     }
 
     void AbstractHandler::DumpRequest(Poco::Net::HTTPServerRequest &request) {

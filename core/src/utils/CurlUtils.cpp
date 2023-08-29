@@ -9,7 +9,6 @@ namespace AwsMock::Core {
     CurlUtils::CurlUtils() : _logger(Poco::Logger::get("CurlUtils")), _hostUri("http:/v1.24") {
 
         _isRemote = false;
-        curl_global_init(CURL_GLOBAL_ALL);
         log_debug_stream(_logger) << "Curl utilities initialized" << std::endl;
     }
 

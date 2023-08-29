@@ -43,9 +43,7 @@ namespace AwsMock::Worker {
 
         // Add users
         for (const auto &user : server.users) {
-            if (user.userName != "anonymous") {
-                ftpserver->AddUser(user.userName, user.password, user.homeDirectory);
-            }
+            ftpserver->AddUser(user.userName, user.password, user.homeDirectory);
         }
         Poco::ThreadPool::defaultPool().start(*ftpserver);
 
@@ -74,7 +72,7 @@ namespace AwsMock::Worker {
         std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase->ListServers(_region);
 
         for (auto &transfer : transfers) {
-            if(transfer.state == Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::ONLINE)) {
+            if (transfer.state == Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::ONLINE)) {
                 StartTransferServer(transfer);
             }
         }
@@ -86,12 +84,12 @@ namespace AwsMock::Worker {
         std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase->ListServers(_region);
 
         for (auto &transfer : transfers) {
-            if(transfer.state == Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::ONLINE)) {
+            if (transfer.state == Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::ONLINE)) {
                 std::map<std::string, std::shared_ptr<Service::FtpServer>>::iterator it = _transferServerList.find(transfer.serverId);
                 if (it == _transferServerList.end()) {
                     StartTransferServer(transfer);
                 }
-            } else  if(transfer.state == Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::OFFLINE)) {
+            } else if (transfer.state == Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::OFFLINE)) {
                 std::map<std::string, std::shared_ptr<Service::FtpServer>>::iterator it = _transferServerList.find(transfer.serverId);
                 if (it != _transferServerList.end()) {
                     StopTransferServer(transfer);
@@ -99,8 +97,8 @@ namespace AwsMock::Worker {
             }
         }
 
-        for(auto &transfer : _transferServerList) {
-            if(!_transferDatabase->TransferExists(transfer.first)) {
+        for (auto &transfer : _transferServerList) {
+            if (!_transferDatabase->TransferExists(transfer.first)) {
                 Database::Entity::Transfer::Transfer server = _transferDatabase->GetTransferByServerId(transfer.first);
                 StopTransferServer(server);
             }
@@ -117,8 +115,10 @@ namespace AwsMock::Worker {
         }*/
 
         // Send create bucket request
-        SendCreateBucketRequest(_bucket, "application/json");
-        log_debug_stream(_logger) << "Sending S3 create bucket: " << _bucket << std::endl;
+        if (!SendExistsBucketRequest(_bucket, "application/json")) {
+            SendCreateBucketRequest(_bucket, "application/json");
+            log_debug_stream(_logger) << "Sending S3 create bucket: " << _bucket << std::endl;
+        }
 
         // Start all lambda functions
         StartTransferServers();
@@ -158,6 +158,28 @@ namespace AwsMock::Worker {
             log_error_stream(_logger) << "HTTP error, status: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
         }
         log_debug_stream(_logger) << "S3 create bucket message request send, status: " << response.getStatus() << std::endl;
+    }
+
+    bool TransferWorker::SendExistsBucketRequest(const std::string &bucket, const std::string &contentType) {
+
+        Poco::URI uri("http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket);
+        std::string path(uri.getPathAndQuery());
+
+        // Create HTTP request and set headers
+        Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
+        Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_HEAD, path, Poco::Net::HTTPMessage::HTTP_1_1);
+        request.add("Content-Type", contentType);
+        AddAuthorization(request);
+        log_debug_stream(_logger) << "S3 exists bucket message request created, bucket: " + bucket << std::endl;
+
+        // Get the response status
+        Poco::Net::HTTPResponse response;
+        if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
+            log_debug_stream(_logger) << "HTTP error, status: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
+            return false;
+        }
+        log_debug_stream(_logger) << "S3 exists bucket message request send, status: " << response.getStatus() << std::endl;
+        return true;
     }
 
     void TransferWorker::AddAuthorization(Poco::Net::HTTPRequest &request) {

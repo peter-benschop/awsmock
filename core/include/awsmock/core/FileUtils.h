@@ -150,7 +150,7 @@ namespace AwsMock::Core {
        * @param fileName name of the file.
        * @return size of the in bytes.
        */
-      static unsigned long FileSize(const std::string &fileName);
+      static long FileSize(const std::string &fileName);
 
       /**
        * Moves a file to a new directory.

@@ -43,7 +43,7 @@ namespace AwsMock::Service {
       /**
        * Destructor
        */
-      ~FtpServer();
+      ~FtpServer() override;
 
       /**
        * Add a user to the FTP server
@@ -60,11 +60,24 @@ namespace AwsMock::Service {
       void run() override;
 
       /**
+       * Restart server
+       */
+      void RestartServer();
+
+      /**
        * Stop server
        */
       void StopServer();
 
     private:
+
+      /**
+       * Creates the home directory for a user
+       *
+       * @param userName name of the user
+       * @return absolute path to the home directory
+       */
+      std::string CreateHomeDir(const std::string &userName);
 
       /**
        * Rest port

@@ -59,6 +59,11 @@ namespace AwsMock::Dto::Docker {
       std::string image;
 
       /**
+       * Network mode
+       */
+      std::string networkMode;
+
+      /**
        * Environment
        */
       std::vector<std::string> environment;
@@ -86,6 +91,7 @@ namespace AwsMock::Dto::Docker {
               rootJson.set("Domainname", domainName);
               rootJson.set("User", user);
               rootJson.set("Image", image);
+              rootJson.set("NetworkMode", networkMode);
 
               Poco::JSON::Array envArray;
               for(unsigned long i = 0; i < environment.size(); i++) {

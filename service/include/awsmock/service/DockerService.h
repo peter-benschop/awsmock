@@ -96,7 +96,7 @@ namespace AwsMock::Service {
                       const std::string &runtime,
                       long &fileSize,
                       std::string &codeSha256,
-                     const std::vector<std::pair<std::string, std::string>> &environment);
+                      const std::vector<std::pair<std::string, std::string>> &environment);
 
       /**
        * Delete an image by name/tag.
@@ -127,9 +127,10 @@ namespace AwsMock::Service {
        *
        * @param name image name
        * @param tag image tag
+       * @param environment runtime environment variables
        * @return CreateContainerResponse
        */
-      Dto::Docker::CreateContainerResponse CreateContainer(const std::string &name, const std::string &tag);
+      Dto::Docker::CreateContainerResponse CreateContainer(const std::string &name, const std::string &tag, const std::vector<std::string> &environment);
 
       /**
        * Returns a container by name/tag.

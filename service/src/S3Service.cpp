@@ -231,7 +231,6 @@ namespace AwsMock::Service {
     Dto::S3::PutObjectResponse S3Service::PutObject(Dto::S3::PutObjectRequest &request, std::istream *stream) {
         log_trace_stream(_logger) << "Put object request: " << request.ToString() << std::endl;
 
-        Dto::S3::PutObjectResponse response;
         try {
             // Check existence
             if (!_database->BucketExists({.region=request.region, .name=request.bucket})) {
@@ -247,13 +246,18 @@ namespace AwsMock::Service {
             }
 
             // Write file
+            std::string fileName = GetFilename(request.bucket, request.key);
             if (stream) {
-                std::string fileName = GetFilename(request.bucket, request.key);
                 std::ofstream ofs(fileName);
                 ofs << stream->rdbuf();
                 ofs.flush();
                 ofs.close();
             }
+
+            // Meta data
+            long size = Core::FileUtils::FileSize(fileName);
+            std::string md5sum = size > 0 ? Core::Crypto::GetMd5FromFile(fileName) :"d41d8cd98f00b204e9800998ecf8427e";
+            log_info_stream(_logger) << "MD5sum: " << md5sum << " bucket: " << request.bucket << " key: " << request.key << std::endl;
 
             // Update database
             Database::Entity::S3::Object object = {
@@ -261,8 +265,8 @@ namespace AwsMock::Service {
                 .bucket=request.bucket,
                 .key=request.key,
                 .owner=request.owner,
-                .size=request.size,
-                .md5sum=request.md5Sum,
+                .size=size,
+                .md5sum=md5sum,
                 .contentType=request.contentType};
             object = _database->CreateOrUpdateObject(object);
             log_debug_stream(_logger) << "Database updated, bucket: " << object.bucket << " key: " << object.key << std::endl;
@@ -271,11 +275,68 @@ namespace AwsMock::Service {
             CheckNotifications(request.region, request.bucket, request.key, object.size, "s3:ObjectCreated:Put");
             log_info_stream(_logger) << "Put object succeeded, bucket: " << request.bucket << " key: " << request.key << std::endl;
 
+            return {.bucket=request.bucket, .key=request.key, .etag=md5sum, .contentLength=size};
+
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "S3 put object failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500);
         }
-        return {.bucket=request.bucket, .key=request.key, .etag=request.md5Sum};
+    }
+
+    Dto::S3::CopyObjectResponse S3Service::CopyObject(Dto::S3::CopyObjectRequest &request) {
+        log_trace_stream(_logger) << "Copy object request: " << request.ToString() << std::endl;
+
+        Dto::S3::CopyObjectResponse response;
+        Database::Entity::S3::Object sourceObject, targetObject;
+        try {
+            // Check existence of source bucket
+            if (!_database->BucketExists({.region=request.region, .name=request.sourceBucket})) {
+                log_error_stream(_logger) << "Source bucket does not exist, region: " << request.region + " bucket: " << request.sourceBucket << std::endl;
+                throw Core::ServiceException("Source bucket does not exist", 500);
+            }
+
+            // Check existence of source key
+            if (!_database->ObjectExists({.region=request.region, .bucket=request.sourceBucket, .key=request.sourceKey})) {
+                log_error_stream(_logger) << "Source object does not exist, region: " << request.region + " bucket: " << request.sourceBucket << " key: "
+                                          << request.sourceKey << std::endl;
+                throw Core::ServiceException("Source object does not exist", 500);
+            }
+
+            // Check existence of target bucket
+            if (!_database->BucketExists({.region=request.region, .name=request.targetBucket})) {
+                log_error_stream(_logger) << "Target bucket does not exist, region: " << request.region + " bucket: " << request.targetBucket << std::endl;
+                throw Core::ServiceException("Target bucket does not exist", 500);
+            }
+
+            sourceObject = _database->GetObject(request.region, request.sourceBucket, request.sourceKey);
+
+            // Update database
+            targetObject = {
+                .region=request.region,
+                .bucket=request.targetBucket,
+                .key=request.targetKey,
+                .owner=sourceObject.owner,
+                .size=sourceObject.size,
+                .md5sum=sourceObject.md5sum,
+                .contentType=sourceObject.contentType};
+            targetObject = _database->CreateObject(targetObject);
+            log_debug_stream(_logger) << "Database updated, bucket: " << targetObject.bucket << " key: " << targetObject.key << std::endl;
+
+            // Copy physical file
+            std::string sourcePath = GetFilename(request.sourceBucket, request.sourceKey);
+            std::string targetPath = GetFilename(request.targetBucket, request.targetKey);
+            Core::FileUtils::CopyTo(sourcePath, targetPath);
+
+            // Check notification
+            CheckNotifications(targetObject.region, targetObject.bucket, targetObject.key, targetObject.size, "s3:ObjectCreated:Put");
+            log_info_stream(_logger) << "Copy object succeeded, sourceBucket: " << request.sourceBucket << " sourceKey: " << request.sourceKey << " targetBucket: "
+                                     << request.targetBucket << " targetKey: " << request.targetKey << std::endl;
+
+        } catch (Poco::Exception &ex) {
+            log_error_stream(_logger) << "S3 copy object request failed, message: " << ex.message() << std::endl;
+            throw Core::ServiceException(ex.message(), 500);
+        }
+        return {.eTag=targetObject.md5sum, .lastModified=Poco::DateTimeFormatter::format(Poco::DateTime(), Poco::DateTimeFormat::ISO8601_FRAC_FORMAT)};
     }
 
     void S3Service::DeleteObject(const Dto::S3::DeleteObjectRequest &request) {
@@ -430,7 +491,7 @@ namespace AwsMock::Service {
             } else if (!notification.lambdaArn.empty()) {
 
                 // Lambda notification
-                SendLambdaInvocationRequest(eventNotification);
+                SendLambdaInvocationRequest(eventNotification, notification);
                 log_debug_stream(_logger) << "Lambda function invoked, eventNotification: " + eventNotification.ToString() << std::endl;
             }
         } else {
@@ -529,10 +590,14 @@ namespace AwsMock::Service {
         log_debug_stream(_logger) << "SQS message request send, status: " << response.getStatus() << std::endl;
     }
 
-    void S3Service::SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification) {
+    void S3Service::SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification,
+                                                const Database::Entity::S3::BucketNotification &bucketNotification) {
+
+        std::vector<std::string> parts = Core::StringUtils::Split(bucketNotification.lambdaArn, ':');
+        std::string functionName = parts[6];
 
         //"Credential=none/20230618/eu-central-1/s3/aws4_request, SignedHeaders=content-md5;content-type;host;x-amz-content-sha256;x-amz-date;x-amz-security-token, Signature=fe9766ea2c032ac7b17033a567f6b361192bddcf73f89d25c15019977c544e1c"
-        Poco::URI uri("http://" + _lambdaServiceHost + ":" + std::to_string(_lambdaServicePort) + "/2015-03-31/functions/function/invocations");
+        Poco::URI uri("http://" + _lambdaServiceHost + ":" + std::to_string(_lambdaServicePort) + "/2015-03-31/functions/" + functionName + "/invocations");
         std::string path(uri.getPathAndQuery());
 
         // Set payload

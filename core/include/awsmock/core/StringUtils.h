@@ -125,6 +125,15 @@ namespace AwsMock::Core {
       static bool Contains(const std::string &s1, const std::string &s2);
 
       /**
+       * Returns true in case the string s1 contains string s1, both string are compares case insensitive
+       *
+       * @param s1 string to check
+       * @param s2 probe string
+       * @return true if the string s1 contains string s2.
+       */
+      static bool ContainsIgnoreCase(const std::string &s1, const std::string &s2);
+
+      /**
        * Check whether the given string start wit the given prefix
        *
        * @param s1 string to check
@@ -142,6 +151,15 @@ namespace AwsMock::Core {
        * @return substring
        */
       static std::string SubString(const std::string& string, int beginIndex, int endIndex);
+
+      /**
+       * Returns a substring by from 0 until a certain character.
+       *
+       * @param string string to process
+       * @param delimiter delimiter character
+       * @return substring
+       */
+      static std::string SubStringUntil(const std::string& string, char delimiter);
 
       /**
        * Left trim a string.

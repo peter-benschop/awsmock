@@ -17,9 +17,9 @@ namespace AwsMock::Service {
         _accountId = _configuration.getString("awsmock.account.id", "000000000000");
         _dataDir = _configuration.getString("awsmock.data.dir", "/tmp/awsmock/data");
         _tempDir = _dataDir + Poco::Path::separator() + "tmp";
-        _lambdaDatabase = std::make_unique<Database::LambdaDatabase>(_configuration);
-        _s3Database = std::make_unique<Database::S3Database>(_configuration);
-        _dockerService = std::make_unique<Service::DockerService>(_configuration);
+        _lambdaDatabase = std::make_shared<Database::LambdaDatabase>(_configuration);
+        _s3Database = std::make_shared<Database::S3Database>(_configuration);
+        _dockerService = std::make_shared<Service::DockerService>(_configuration);
 
         // Create temp directory
         if (!Core::DirUtils::DirectoryExists(_tempDir)) {
@@ -70,6 +70,7 @@ namespace AwsMock::Service {
         // Start container
         _dockerService->StartContainer(container.id);
         lambdaEntity.lastStarted = Poco::DateTime();
+        lambdaEntity.state = Database::Entity::Lambda::LambdaState::ACTIVE;
 
         // Update database
         lambdaEntity = _lambdaDatabase->CreateOrUpdateLambda(lambdaEntity);
@@ -212,11 +213,13 @@ namespace AwsMock::Service {
         }
     }
 
-    void LambdaService::CreateContainer(const Dto::Lambda::CreateFunctionRequest &request,
-                                        Database::Entity::Lambda::Lambda &lambdaEntity) {
-        Dto::Docker::CreateContainerResponse containerCreateResponse = _dockerService->CreateContainer(
-            request.functionName, lambdaEntity.tag);
+    void LambdaService::CreateContainer(const Dto::Lambda::CreateFunctionRequest &request, Database::Entity::Lambda::Lambda &lambdaEntity) {
+
+        std::vector<std::string> environment = GetEnvironment(lambdaEntity.environment);
+        Dto::Docker::CreateContainerResponse containerCreateResponse = _dockerService->CreateContainer(request.functionName, lambdaEntity.tag, environment);
+
         lambdaEntity.hostPort = containerCreateResponse.hostPort;
+        log_debug_stream(_logger) << "Lambda container created, hostPort: " << lambdaEntity.hostPort << std::endl;
     }
 
     std::string LambdaService::UnpackZipFile(const std::string &zipFile, const std::string &runtime) {
@@ -225,7 +228,7 @@ namespace AwsMock::Service {
 
         // Create directory
         std::string codeDir = _tempDir + Poco::Path::separator() + Poco::UUIDGenerator().createRandom().toString() + Poco::Path::separator();
-        if (Core::StringUtils::Contains(runtime, "Java")) {
+        if (Core::StringUtils::ContainsIgnoreCase(runtime, "java")) {
             std::string classesDir = codeDir + "classes";
             if (!Core::DirUtils::DirectoryExists(classesDir)) {
                 Core::DirUtils::MakeDirectory(classesDir);
@@ -256,4 +259,16 @@ namespace AwsMock::Service {
 
         return codeDir;
     }
+
+    std::vector<std::string> LambdaService::GetEnvironment(const Database::Entity::Lambda::Environment &lambdaEnvironment) {
+
+        std::vector<std::string> environment;
+        environment.reserve(lambdaEnvironment.variables.size());
+        for (const std::pair<std::string, std::string> &variable : lambdaEnvironment.variables) {
+            environment.emplace_back(variable.first + "=" + variable.second);
+        }
+        log_debug_stream(_logger) << "Lambda runtime environment converted, size: " << environment.size() << std::endl;
+        return environment;
+    }
+
 } // namespace AwsMock::Service
