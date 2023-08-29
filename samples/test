@@ -1,0 +1,34 @@
+#/bin/bash
+
+#
+# Lambda function
+#
+function lambda_exists() {
+  awsmock lambda list-functions | grep arn | grep $1 | wc -l
+}
+
+function create_lambda_function () {
+
+  function=$1
+  runtime=$2
+  zipfile=$3
+  handler=$4
+
+  if [ "$(lambda_exists $function)" -eq 0 ]; then
+    awsmock lambda create-function \
+      --function-name "$function" \
+      --runtime "$runtime" \
+      --timeout 900 \
+      --memory-size 2024 \
+      --environment "file://./lambda/$1-env.json" \
+      --handler "$handler" \
+      --region eu-central-1 \
+      --zip-file "fileb:///tmp/awsmock/data/lambda/$zipfile" \
+      --role arn:aws:iam::000000000000:role/lambda-role
+    echo "Lambda function $1 created"
+  else
+    echo "Lambda function $1 exists already"
+  fi
+}
+
+create_lambda_function ftp-file-copy java17 file-copy-service-1.15.0-SNAPSHOT-aws.jar org.springframework.cloud.function.adapter.aws.FunctionInvoker
