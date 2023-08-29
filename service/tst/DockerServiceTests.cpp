@@ -36,7 +36,8 @@ namespace AwsMock::Service {
         // arrange
         std::string exposedPorts = CONTAINER_PORT;
         std::string domainName = std::string(NAME) + NETWORK_NAME;
-        std::vector<std::string> environment = {"AWS_EC2_METADATA_DISABLED=true", "JAVA_TOOL_OPTIONS=-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localstack"};
+        std::vector<std::string>
+            environment = {"AWS_EC2_METADATA_DISABLED=true", "JAVA_TOOL_OPTIONS=-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localstack"};
 
         // act
         Dto::Docker::CreateContainerRequest request = {.hostName=NAME, .domainName=domainName, .user="root", .image=IMAGE,
@@ -45,11 +46,11 @@ namespace AwsMock::Service {
 
         // assert
         EXPECT_FALSE(jsonString.empty());
-        EXPECT_TRUE(Core::StringUtils::Contains(jsonString, "{\"Domainname\":\"test-container.dockerhost.net\",\"Env\":[\"AWS_EC2_METADATA_DISABLED=true\","
-                                                            "\"JAVA_TOOL_OPTIONS=-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localstack\"],"
-                                                            "\"ExposedPorts\":{\"8080/tcp\":{}},\"HostConfig\":{\"PortBindings\":{\"8080/tcp\":[{\"HostPort\":\"\"}]}},"
-                                                            "\"Hostname\":\"test-container\",\"Image\":\"test-image:latest\",\"User\":\"root\"}"));
-        EXPECT_TRUE(Core::StringUtils::Contains(jsonString, "\"ExposedPorts\":{\"8080/tcp\":{}}"));
+        EXPECT_TRUE(Core::StringUtils::Contains(jsonString,
+                                                "{\"Domainname\":\"test-container.dockerhost.net\",\"Env\":[\"AWS_EC2_METADATA_DISABLED=true\","
+                                                "\"JAVA_TOOL_OPTIONS=-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localstack\"],"
+                                                "\"ExposedPorts\":{\"8080/tcp\":{}},\"HostConfig\":{\"PortBindings\":{\"8080/tcp\":[{\"HostPort\":\"\"}]}},"
+                                                "\"Hostname\":\"test-container\",\"Image\":\"test-image:latest\",\"NetworkMode\":\"\",\"User\":\"root\"}"));
     }
 
 } // namespace AwsMock::Core
