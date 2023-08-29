@@ -35,8 +35,8 @@ namespace AwsMock::Core {
         if (c == '\n' || c == '\r') {
             if (_message.find_first_not_of("\r\n") != std::string::npos) {
                 Poco::Message msg(_logger.name(), _message, _priority, _file, _line);
-                _message.clear();
                 _logger.log(msg);
+                _message.clear();
             }
         } else
             _message += c;

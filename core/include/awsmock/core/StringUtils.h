@@ -153,6 +153,15 @@ namespace AwsMock::Core {
       static std::string SubString(const std::string& string, int beginIndex, int endIndex);
 
       /**
+       * Returns a substring by from 0 until a certain character.
+       *
+       * @param string string to process
+       * @param delimiter delimiter character
+       * @return substring
+       */
+      static std::string SubStringUntil(const std::string& string, char delimiter);
+
+      /**
        * Left trim a string.
        *
        * @param s input string

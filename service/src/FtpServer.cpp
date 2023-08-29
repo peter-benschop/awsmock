@@ -17,36 +17,38 @@ namespace AwsMock::Service {
         _bucket = _configuration.getString("awsmock.service.ftp.bucket", FTP_BASE_DIR);
         log_debug_stream(_logger) << "FTP rest service initialized, endpoint: " << _host << ":" << _port << std::endl;
 
-        // Create anonymous directory
-        if (!Core::DirUtils::DirectoryExists(_baseDir)) {
-            Core::DirUtils::MakeDirectory(_baseDir);
-        }
-
         // Create server
         _ftpServer = std::make_shared<fineftp::FtpServer>(_port);
-
-        // Create anonymous directory
-        std::string anonymousDir = _baseDir + Poco::Path::separator() + _bucket + Poco::Path::separator() + "anonymous";
-        if (!Core::DirUtils::DirectoryExists(anonymousDir)) {
-            Core::DirUtils::MakeDirectory(anonymousDir);
-        }
-        _ftpServer->addUserAnonymous(anonymousDir, fineftp::Permission::All);
     }
 
     FtpServer::~FtpServer() {
         _ftpServer->stop();
     }
 
-    void FtpServer::AddUser(const std::string &userName, const std::string &password, const std::string &homeDirectory) {
-
-        // Create home directory
+    std::string FtpServer::CreateHomeDir(const std::string &homeDirectory) {
         std::string homeDir = _watcherDir + Poco::Path::separator() + _bucket + Poco::Path::separator() + homeDirectory;
         if (!Core::DirUtils::DirectoryExists(homeDir)) {
             Core::DirUtils::MakeDirectory(homeDir);
         }
+        return homeDir;
+    }
 
-        // Add user to FTP server
-        _ftpServer->addUser(userName, password, homeDir, fineftp::Permission::All);
+    void FtpServer::AddUser(const std::string &userName, const std::string &password, const std::string &homeDirectory) {
+
+        // Create home directory
+        std::string homeDir = CreateHomeDir(homeDirectory);
+
+        if(userName == "anonymous") {
+            _ftpServer->addUserAnonymous(homeDir, fineftp::Permission::All);
+        } else {
+            _ftpServer->addUser(userName, password, homeDir, fineftp::Permission::All);
+        }
+        //RestartServer();
+    }
+
+    void FtpServer::RestartServer() {
+        _ftpServer->stop();
+        _ftpServer->start();
     }
 
     void FtpServer::StopServer() {

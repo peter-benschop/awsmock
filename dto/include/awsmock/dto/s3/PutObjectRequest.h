@@ -39,9 +39,9 @@ namespace AwsMock::Dto::S3 {
       std::string contentType;
 
       /**
-       * Size
+       * Content type
        */
-      long size;
+      long contentLength;
 
       /**
        * Owner
@@ -72,8 +72,8 @@ namespace AwsMock::Dto::S3 {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const PutObjectRequest &r) {
-          os << "PutObjectRequest={bucket='" + r.bucket + "' key='" + r.key + "' md5sum='" + r.md5Sum + "' contentType='" + r.contentType + "' size='" +
-              std::to_string(r.size) + "' owner='" + r.owner + "' region=' " + r.region + "'}";
+          os << "PutObjectRequest={bucket='" + r.bucket + "' key='" + r.key + "' md5sum='" + r.md5Sum + "' contentType='" + r.contentType + "' contentLength='" +
+              std::to_string(r.contentLength) + "' owner='" + r.owner + "' region=' " + r.region + "'}";
           return os;
       }
 

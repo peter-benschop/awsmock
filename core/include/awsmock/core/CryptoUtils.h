@@ -146,6 +146,13 @@ namespace AwsMock::Core {
        */
       static std::string HexEncode(std::array<unsigned char, EVP_MAX_MD_SIZE> input);
 
+      /**
+       * Convert to hex string
+       *
+       * @param input input byte array
+       * @return hex encoded string
+       */
+      static std::string HexEncode(const std::string &input);
     };
 
     static inline bool IsBase64(unsigned char c) {

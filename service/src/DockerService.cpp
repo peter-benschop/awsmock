@@ -130,18 +130,25 @@ namespace AwsMock::Service {
         return {};
     }
 
-    Dto::Docker::CreateContainerResponse DockerService::CreateContainer(const std::string &name, const std::string &tag) {
+    Dto::Docker::CreateContainerResponse DockerService::CreateContainer(const std::string &name, const std::string &tag, const std::vector<std::string> &environment) {
 
         int hostPort = GetHostPort();
         std::string containerPort = CONTAINER_PORT;
         std::string imageName = std::string(name) + ":" + tag;
         std::string domainName = std::string(name) + NETWORK_NAME;
-        std::vector<std::string> environment =
-            {"AWS_ACCESS_KEY_ID=none", "AWS_SECRET_ACCESS_KEY=none", "JAVA_TOOL_OPTIONS=-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localstack"};
+        std::string networkMode = "bridge";
 
         // Create the request
-        Dto::Docker::CreateContainerRequest request = {.hostName=name, .domainName=domainName, .user="root", .image=imageName, .environment=environment,
-            .containerPort=containerPort, .hostPort=std::to_string(hostPort)};
+        Dto::Docker::CreateContainerRequest request = {
+            .hostName=name,
+            .domainName=domainName,
+            .user="root",
+            .image=imageName,
+            .networkMode=networkMode,
+            .environment=environment,
+            .containerPort=containerPort,
+            .hostPort=std::to_string(hostPort)
+        };
 
         std::string jsonBody = request.ToJson();
         std::string output = _curlUtils.SendRequest("POST", "/" + _apiVersion + "/containers/create?name=" + name, jsonBody);
@@ -198,7 +205,7 @@ namespace AwsMock::Service {
             ofs << "COPY classes ${LAMBDA_TASK_ROOT}" << std::endl;
             ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
         } else if (Core::StringUtils::EqualsIgnoreCase(runtime, "java17")) {
-            ofs << "FROM public.ecr.aws/lambda/java:17" << std::endl;
+            ofs << "FROM public.ecr.aws/lambda/java:latest" << std::endl;
             for (auto &env : environment) {
                 ofs << "ENV " << env.first << "=\"" << env.second << "\"" << std::endl;
             }
@@ -231,6 +238,7 @@ namespace AwsMock::Service {
             ofs << "RUN chmod 755 ${LAMBDA_TASK_ROOT}/lib/ld-linux-x86-64.so.2" << std::endl;
             ofs << "CMD [ \"" + handler + "\" ]" << std::endl;
         }
+        ofs.close();
         log_debug_stream(_logger) << "Dockerfile written, filename: " << dockerFilename << std::endl;
 
         return dockerFilename;

@@ -26,6 +26,7 @@ namespace AwsMock::Core {
         fd = inotify_init();
         int wd = inotify_add_watch(fd, _rootDir.c_str(), IN_CREATE | IN_MODIFY | IN_DELETE);
         _watcherMap[wd] = _rootDir;
+        log_debug_stream(_logger) << "Root dir: " << _rootDir << std::endl;
 
         Poco::RecursiveDirectoryIterator it(_rootDir);
         Poco::RecursiveDirectoryIterator end;

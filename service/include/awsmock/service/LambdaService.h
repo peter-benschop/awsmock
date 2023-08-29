@@ -114,8 +114,7 @@ namespace AwsMock::Service {
        * @param request create function request.
        * @param entity lambda entity.
        */
-      void CreateContainer(const Dto::Lambda::CreateFunctionRequest &request,
-                           Database::Entity::Lambda::Lambda &lambdaEntity);
+      void CreateContainer(const Dto::Lambda::CreateFunctionRequest &request, Database::Entity::Lambda::Lambda &lambdaEntity);
 
       /**
        * Unpack the provided ZIP file.
@@ -127,6 +126,14 @@ namespace AwsMock::Service {
        * @return code directory
        */
       std::string UnpackZipFile(const std::string &zipFile, const std::string &runtime);
+
+      /**
+       * Converts the lambda environment to a vector of string, which is needed by the docker API
+       *
+       * @param lambdaEnvironment lambda environment
+       * @return vector of strings containing the runtime environment
+       */
+      std::vector<std::string> GetEnvironment(const Database::Entity::Lambda::Environment &lambdaEnvironment);
 
       /**
        * Send the invocation request via HTTP to the lambda function.
@@ -169,17 +176,17 @@ namespace AwsMock::Service {
       /**
        * Lambda database connection
        */
-      std::unique_ptr<Database::LambdaDatabase> _lambdaDatabase;
+      std::shared_ptr<Database::LambdaDatabase> _lambdaDatabase;
 
       /**
        * S3 database connection
        */
-      std::unique_ptr<Database::S3Database> _s3Database;
+      std::shared_ptr<Database::S3Database> _s3Database;
 
       /**
        * Database connection
        */
-      std::unique_ptr<Service::DockerService> _dockerService;
+      std::shared_ptr<Service::DockerService> _dockerService;
     };
 
 } //namespace AwsMock::Service

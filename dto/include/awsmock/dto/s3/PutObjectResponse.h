@@ -35,6 +35,11 @@ namespace AwsMock::Dto::S3 {
       std::string etag;
 
       /**
+       * Content length
+       */
+      long contentLength;
+
+      /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.
@@ -51,7 +56,7 @@ namespace AwsMock::Dto::S3 {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const PutObjectResponse &p) {
-            os << "PutObjectResponse={bucket='" + p.bucket + "' key='" + p.key + "' etag='" + p.etag + "''}";
+            os << "PutObjectResponse={bucket='" << p.bucket << "' key='" << p.key << "' etag='" << p.etag << "' contentLength: '" << p.contentLength << "'}";
             return os;
       }
 

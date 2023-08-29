@@ -234,6 +234,10 @@ namespace AwsMock::Service {
         return _pathParameter[pos];
     }
 
+    bool AbstractHandler::HeaderExists(Poco::Net::HTTPServerRequest &request, const std::string &name) {
+        return request.has(name);
+    }
+
     void AbstractHandler::GetRegionUser(const std::string &authorization, std::string &region, std::string &user) {
         Poco::RegularExpression::MatchVec posVec;
 

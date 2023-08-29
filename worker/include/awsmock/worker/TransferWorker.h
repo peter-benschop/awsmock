@@ -70,12 +70,21 @@ namespace AwsMock::Worker {
       void CheckTransferServers();
 
       /**
-       * Sends a create object request to the S3 service
+       * Sends a create bucket request to the S3 service
        *
        * @param bucket S3 bucket name
        * @param contentType content type
        */
       void SendCreateBucketRequest(const std::string &bucket, const std::string &contentType);
+
+      /**
+       * Sends a exists bucket request to the S3 service
+       *
+       * @param bucket S3 bucket name
+       * @param contentType content type
+       * @return true when bucket exists
+       */
+      bool SendExistsBucketRequest(const std::string &bucket, const std::string &contentType);
 
       /**
        * Adds the authorization header.
