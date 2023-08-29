@@ -73,12 +73,16 @@ namespace AwsMock::Worker {
       /**
        * Callback for the directory watcher add events.
        *
+       * <p>Actually, this is not used, as on Linux systems a added and afterwards a modified event is issued. We only use the modified event.</p>
+       *
        * @param addEvent directory watcher add event.
        */
       void OnFileAdded(const Core::DirectoryEvent &addEvent);
 
       /**
        * Callback for the directory watcher change events.
+       *
+       * <p>Actually, this is used, for all create/modified events, as on Linux systems a added and afterwards a modified event is issued.</p>
        *
        * @param modifiedEvent directory watcher change event.
        */
