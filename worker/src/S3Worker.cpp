@@ -7,7 +7,8 @@
 
 namespace AwsMock::Worker {
 
-    S3Worker::S3Worker(const Core::Configuration &configuration) : _logger(Poco::Logger::get("S3Worker")), _configuration(configuration), _running(false) {
+    S3Worker::S3Worker(const Core::Configuration &configuration)
+        : AbstractWorker(configuration), _logger(Poco::Logger::get("S3Worker")), _configuration(configuration), _running(false) {
 
         Initialize();
     }
@@ -229,54 +230,19 @@ namespace AwsMock::Worker {
 
     void S3Worker::SendCreateBucketRequest(const std::string &bucket, const std::string &contentType) {
 
-        Poco::URI uri("http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket);
-        std::string path(uri.getPathAndQuery());
-
-        // Get the body
+        std::string url = "http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket;
         std::string body = std::string(
             "<CreateBucketConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">\n<LocationConstraint>" + _region
                 + "</LocationConstraint>\n</CreateBucketConfiguration>");
-
-        // Create HTTP request and set headers
-        Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
-        Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_PUT, path, Poco::Net::HTTPMessage::HTTP_1_1);
-        request.add("Content-Type", contentType);
-        AddAuthorization(request);
-        log_debug_stream(_logger) << "S3 create bucket message request created, bucket: " + bucket << std::endl;
-
-        // Send request
-        std::ostream &os = session.sendRequest(request);
-        os << body;
-
-        // Get the response status
-        Poco::Net::HTTPResponse response;
-        if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
-            log_error_stream(_logger) << "HTTP error, status: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
-        }
-        log_debug_stream(_logger) << "S3 create bucket message request send, status: " << response.getStatus() << std::endl;
+        SendPutRequest(url, body, contentType);
+        log_debug_stream(_logger) << "S3 create bucket message request send" << std::endl;
     }
 
     void S3Worker::SendDeleteBucketRequest(const std::string &bucket, const std::string &contentType) {
 
-        Poco::URI uri("http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket);
-        std::string path(uri.getPathAndQuery());
-
-        // Create HTTP request and set headers
-        Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
-        Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_DELETE, path, Poco::Net::HTTPMessage::HTTP_1_1);
-        request.add("Content-Type", contentType);
-        AddAuthorization(request);
-        log_debug_stream(_logger) << "S3 delete bucket message request created, bucket: " + bucket << std::endl;
-
-        // Send request
-        session.sendRequest(request);
-
-        // Get the response status
-        Poco::Net::HTTPResponse response;
-        if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
-            log_error_stream(_logger) << "HTTP error, status: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
-        }
-        log_debug_stream(_logger) << "S3 delete bucket message request send, status: " << response.getStatus() << std::endl;
+        std::string url = "http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket;
+        SendDeleteRequest(url, {}, contentType);
+        log_debug_stream(_logger) << "S3 delete bucket message request send" << std::endl;
     }
 
     void S3Worker::SendPutObjectRequest(const std::string &fileName,
@@ -286,86 +252,29 @@ namespace AwsMock::Worker {
                                         const std::string &contentType,
                                         unsigned long fileSize) {
 
-        Poco::URI uri("http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket + "/" + key);
-        std::string path(uri.getPathAndQuery());
+        std::string url = "http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket + "/" + key;
+        std::map<std::string, std::string> headers;
 
-        // Create HTTP request and set headers
-        Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
-        Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_PUT, path, Poco::Net::HTTPMessage::HTTP_1_1);
-        request.add("Content-Length", std::to_string(fileSize));
-        request.add("Content-Type", contentType);
-        request.add("Content-MD5", md5Sum);
-        AddAuthorization(request);
-        log_debug_stream(_logger) << "S3 put object message request created, bucket: " + bucket << " key: " << key << std::endl;
+        headers["Content-Length"] = std::to_string(fileSize);
+        headers["Content-Type"] = contentType;
+        headers["Content-MD5"] = md5Sum;
 
-        // Send request
         std::ifstream ifs(fileName);
-        std::ostream &os = session.sendRequest(request);
-        os << ifs.rdbuf();
-        ifs.close();
-
-        // Get the response status
-        Poco::Net::HTTPResponse response;
-        if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
-            log_error_stream(_logger) << "HTTP error, status: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
-        }
-        log_debug_stream(_logger) << "S3 put object request send, status: " << response.getStatus() << std::endl;
+        SendFile(url, ifs, contentType, headers);
+        log_debug_stream(_logger) << "S3 put object request send" << std::endl;
     }
 
     bool S3Worker::SendHeadObjectRequest(const std::string &bucket, const std::string &key, const std::string &contentType) {
 
-        Poco::URI uri("http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket + "/" + key);
-        std::string path(uri.getPathAndQuery());
-
-        // Create HTTP request and set headers
-        Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
-        Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_HEAD, path, Poco::Net::HTTPMessage::HTTP_1_1);
-        request.add("Content-Type", contentType);
-        request.add("WriteFile", "false");
-        AddAuthorization(request);
-        log_debug_stream(_logger) << "S3 put object message request created, bucket: " + bucket << " key: " << key << std::endl;
-
-        // Send request
-        session.sendRequest(request);
-
-        // Get the response status
-        Poco::Net::HTTPResponse response;
-        log_debug_stream(_logger) << "S3 head object request send, status: " << response.getStatus() << std::endl;
-        if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
-            return false;
-        }
-        return true;
+        std::string url = "http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket + "/" + key;
+        return SendHeadRequest(url, contentType);
     }
 
     void S3Worker::SendDeleteObjectRequest(const std::string &bucket, const std::string &key, const std::string &contentType) {
 
-        Poco::URI uri("http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket + "/" + key);
-        std::string path(uri.getPathAndQuery());
-
-        // Create HTTP request and set headers
-        Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
-        Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_DELETE, path, Poco::Net::HTTPMessage::HTTP_1_1);
-        request.add("Content-Type", contentType);
-        request.add("WriteFile", "false");
-        AddAuthorization(request);
-        log_debug_stream(_logger) << "S3 delete object request created, bucket: " + bucket << " key: " << key << std::endl;
-
-        // Send request
-        session.sendRequest(request);
-
-        // Get the response status
-        Poco::Net::HTTPResponse response;
-        if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
-            log_error_stream(_logger) << "HTTP error, status: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
-        }
-        log_debug_stream(_logger) << "S3 delete object request send, status: " << response.getStatus() << std::endl;
-    }
-
-    void S3Worker::AddAuthorization(Poco::Net::HTTPRequest &request) {
-        request.add("Authorization",
-                    "AWS4-HMAC-SHA256 Credential=" + _user + "/" + _clientId + "/" + _region
-                        + "/s3/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840");
-
+        std::string url = "http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket + "/" + key;
+        SendDeleteRequest(url, {}, contentType);
+        log_debug_stream(_logger) << "S3 delete object request send" << std::endl;
     }
 
 } // namespace AwsMock::Worker

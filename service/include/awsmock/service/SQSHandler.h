@@ -132,7 +132,6 @@ namespace AwsMock::Service {
        * Default account ID
        */
       std::string _accountId;
-
     };
 
 } // namespace AwsMock::Service

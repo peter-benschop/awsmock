@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
 
     SQSServer::SQSServer(Core::Configuration &configuration, Core::MetricService &metricService)
-        : _logger("SQSServer"), _configuration(configuration), _metricService(metricService) {
+        : _logger(Poco::Logger::get("SQSServer")), _configuration(configuration), _metricService(metricService) {
 
         _port = _configuration.getInt("awsmock.service.sqs.port", SQS_DEFAULT_PORT);
         _host = _configuration.getString("awsmock.service.sqs.host", SQS_DEFAULT_HOST);

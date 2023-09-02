@@ -4,7 +4,7 @@
 namespace AwsMock::Service {
 
     S3Handler::S3Handler(Core::Configuration &configuration, Core::MetricService &metricService)
-        : AbstractHandler(), _logger("S3ServiceHandler"), _configuration(configuration), _metricService(metricService), _s3Service(configuration) {
+        : AbstractHandler(), _logger(Poco::Logger::get("S3ServiceHandler")), _configuration(configuration), _metricService(metricService), _s3Service(configuration) {
     }
 
     void S3Handler::handleGet(Poco::Net::HTTPServerRequest &request,

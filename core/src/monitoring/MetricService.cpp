@@ -22,17 +22,17 @@ namespace AwsMock::Core {
         for (auto &it : _timerMap) {
             delete it.second;
         }
-        if(_server != nullptr) {
+        if (_server != nullptr) {
             _server->stop();
         }
-        if(_metricSystemTimer != nullptr) {
+        if (_metricSystemTimer != nullptr) {
             _metricSystemTimer->stop();
         }
         _timerStartMap.clear();
         delete _server;
         delete _metricSystemTimer;
         delete _metricSystemCollector;
-        poco_debug(_logger, "MetricService cleaned up");
+        log_debug_stream(_logger) << "MetricService cleaned up" << std::endl;
     }
 
     [[maybe_unused]]
@@ -40,7 +40,7 @@ namespace AwsMock::Core {
         _server = new Poco::Prometheus::MetricsServer(_port);
         _metricSystemTimer = new Poco::Timer(0, _timeout);
         _metricSystemCollector = new MetricSystemCollector();
-        poco_debug(_logger, "Prometheus server initialized, port: " + std::to_string(_port));
+        log_debug_stream(_logger) << "Prometheus server initialized, port: " << _port << std::endl;
     }
 
     [[maybe_unused]] void MetricService::StartServer() {
@@ -48,11 +48,11 @@ namespace AwsMock::Core {
         if (_server != nullptr) {
             _server->start();
         }
-        poco_information(_logger, "Monitoring server started, port: " + std::to_string(_port));
+        log_info_stream(_logger) << "Monitoring server started, port: " << _port << std::endl;;
     }
 
     void MetricService::ShutdownServer() {
-        poco_debug(_logger, "Starting MetricService shutdown");
+        log_debug_stream(_logger) << "Starting MetricService shutdown" << std::endl;
         if (_server != nullptr) {
             _server->stop();
         }
@@ -66,10 +66,10 @@ namespace AwsMock::Core {
         if (!CounterExists(name)) {
             _counterMap[name] = new Poco::Prometheus::Counter(name);
             _counterMap[name]->clear();
-            poco_trace(_logger, "Counter added, name: " + name);
+            log_trace_stream(_logger) << "Counter added, name: " + name << std::endl;
             return;
         }
-        poco_error(_logger, "Gauge exists already, name: " + name);
+        log_error_stream(_logger) << "Gauge exists already, name: " + name << std::endl;
     }
 
     bool MetricService::CounterExists(const std::string &name) {
@@ -82,10 +82,10 @@ namespace AwsMock::Core {
         Poco::Mutex::ScopedLock lock(_mutex);
         if (CounterExists(name)) {
             _counterMap[name]->clear();
-            poco_trace(_logger, "Counter cleared, name: " + name);
+            log_trace_stream(_logger) << "Counter cleared, name: " + name << std::endl;
             return;
         }
-        poco_error(_logger, "Counter not found, name: " + name);
+        log_error_stream(_logger) << "Counter not found, name: " + name << std::endl;
     }
 
     void MetricService::IncrementCounter(const std::string &name, int value) {
@@ -94,17 +94,17 @@ namespace AwsMock::Core {
             AddCounter(name);
         }
         _counterMap[name]->inc((double) value);
-        poco_trace(_logger, "Counter incremented, name: " + name);
+        log_trace_stream(_logger) << "Counter incremented, name: " + name << std::endl;
     }
 
     void MetricService::AddGauge(const std::string &name) {
         Poco::Mutex::ScopedLock lock(_mutex);
         if (!GaugeExists(name)) {
             _gaugeMap[name] = new Poco::Prometheus::Gauge(name);
-            poco_trace(_logger, "Gauge added, name: " + name);
+            log_trace_stream(_logger) << "Gauge added, name: " + name << std::endl;
             return;
         }
-        poco_error(_logger, "Gauge exists already, name: " + name);
+        log_error_stream(_logger) << "Gauge exists already, name: " + name << std::endl;
     }
 
     void MetricService::IncrementGauge(const std::string &name, int value) {
@@ -113,7 +113,7 @@ namespace AwsMock::Core {
             AddGauge(name);
         }
         _gaugeMap[name]->inc((double) value);
-        poco_trace(_logger, "Gauge incremented, name: " + name);
+        log_trace_stream(_logger) << "Gauge incremented, name: " + name << std::endl;
     }
 
     void MetricService::SetGauge(const std::string &name, int value) {
@@ -122,7 +122,7 @@ namespace AwsMock::Core {
             AddGauge(name);
         }
         _gaugeMap[name]->set((double) value);
-        poco_trace(_logger, "Gauge value set, name: " + name);
+        log_trace_stream(_logger) << "Gauge value set, name: " + name << std::endl;
     }
 
     void MetricService::SetGauge(const std::string &name, long value) {
@@ -131,7 +131,7 @@ namespace AwsMock::Core {
             AddGauge(name);
         }
         _gaugeMap[name]->set((double) value);
-        poco_trace(_logger, "Gauge value set, name: " + name);
+        log_trace_stream(_logger) << "Gauge value set, name: " + name << std::endl;
     }
 
     void MetricService::SetGauge(const std::string &name, unsigned long value) {
@@ -140,7 +140,7 @@ namespace AwsMock::Core {
             AddGauge(name);
         }
         _gaugeMap[name]->set((double) value);
-        poco_trace(_logger, "Gauge value set, name: " + name);
+        log_trace_stream(_logger) << "Gauge value set, name: " + name << std::endl;
     }
 
     void MetricService::SetGauge(const std::string &name, float value) {
@@ -149,7 +149,7 @@ namespace AwsMock::Core {
             AddGauge(name);
         }
         _gaugeMap[name]->set((double) value);
-        poco_trace(_logger, "Gauge value set, name: " + name);
+        log_trace_stream(_logger) << "Gauge value set, name: " + name << std::endl;
     }
 
     void MetricService::SetGauge(const std::string &name, double value) {
@@ -158,7 +158,7 @@ namespace AwsMock::Core {
             AddGauge(name);
         }
         _gaugeMap[name]->set(value);
-        poco_trace(_logger, "Gauge value set, name: " + name);
+        log_trace_stream(_logger) << "Gauge value set, name: " + name << std::endl;
     }
 
     bool MetricService::GaugeExists(const std::string &name) {
@@ -171,10 +171,10 @@ namespace AwsMock::Core {
         Poco::Mutex::ScopedLock lock(_mutex);
         if (!TimerExists(name)) {
             _timerMap[name] = new Poco::Prometheus::Gauge(name);
-            poco_trace(_logger, "Timer added, name: " + name);
+            log_trace_stream(_logger) << "Timer added, name: " + name << std::endl;
             return;
         }
-        poco_error(_logger, "Timer exists already, name: " + name);
+        log_error_stream(_logger) << "Timer exists already, name: " + name << std::endl;
     }
 
     void MetricService::StartTimer(const std::string &name) {
@@ -184,7 +184,7 @@ namespace AwsMock::Core {
         }
         if (_timerStartMap.find(GetTimerKey(name)) == _timerStartMap.end()) {
             _timerStartMap[GetTimerKey(name)] = std::chrono::high_resolution_clock::now();
-            poco_trace(_logger, "Timer started, name: " + name);
+            log_trace_stream(_logger) << "Timer started, name: " + name << std::endl;
         }
     }
 
@@ -197,7 +197,7 @@ namespace AwsMock::Core {
         if (it != _timerStartMap.end()) {
             _timerStartMap.erase(it);
         }
-        poco_trace(_logger, "Timer stopped, name: " + name);
+        log_trace_stream(_logger) << "Timer stopped, name: " + name << std::endl;
     }
 
     bool MetricService::TimerExists(const std::string &name) {
@@ -211,7 +211,7 @@ namespace AwsMock::Core {
             StopTimer(name);
             _timerMap.find(name)->second->set(0.0);
         }
-        poco_trace(_logger, "Timer cleared, name: " + name);
+        log_trace_stream(_logger) << "Timer cleared, name: " + name << std::endl;
     }
 
     void MetricService::ResetAllTimer() {
@@ -223,16 +223,16 @@ namespace AwsMock::Core {
 
     std::string MetricService::GetTimerKey(const std::string &name) {
         uint32_t threadID = std::hash<std::thread::id>{}(std::this_thread::get_id());
-        poco_trace(_logger, "Timer key returned, name: " + name);
+        log_trace_stream(_logger) << "Timer key returned, name: " + name << std::endl;
         return name + "::" + std::to_string(threadID);
     }
 
     void MetricService::StartSystemCounter() {
         if (_metricSystemTimer != nullptr && _metricSystemCollector != nullptr) {
             _metricSystemTimer->start(Poco::TimerCallback<MetricSystemCollector>(*_metricSystemCollector, &MetricSystemCollector::onTimer));
-            poco_debug(_logger, "System collector started, timeout: " + std::to_string(_timeout) + "ms");
+            log_debug_stream(_logger) << "System collector started, timeout: " << _timeout << "ms" << std::endl;
         } else {
-            poco_error(_logger, "Metric system timer not defined");
+            log_error_stream(_logger) << "Metric system timer not defined" << std::endl;
         }
     }
 }

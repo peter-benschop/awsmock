@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    SNSService::SNSService(const Core::Configuration &configuration) : _logger("SNSService"), _configuration(configuration) {
+    SNSService::SNSService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("SNSService")), _configuration(configuration) {
         Initialize();
     }
 

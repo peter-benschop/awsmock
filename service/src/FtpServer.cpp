@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
 
     FtpServer::FtpServer(const Core::Configuration &configuration)
-        : _logger("FtpServer"), _configuration(configuration) {
+        : _logger(Poco::Logger::get("FtpServer")), _configuration(configuration) {
 
         _port = _configuration.getInt("awsmock.service.ftp.port", FTP_DEFAULT_PORT);
         _host = _configuration.getString("awsmock.service.ftp.host", FTP_DEFAULT_HOST);

@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    TransferService::TransferService(const Core::Configuration &configuration) : _logger("TransferService"), _configuration(configuration) {
+    TransferService::TransferService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("TransferService")), _configuration(configuration) {
         Initialize();
     }
 

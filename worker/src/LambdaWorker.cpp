@@ -7,7 +7,7 @@
 namespace AwsMock::Worker {
 
     [[maybe_unused]] LambdaWorker::LambdaWorker(const Core::Configuration &configuration)
-        : _logger(Poco::Logger::get("LambdaWorker")), _configuration(configuration), _running(false) {
+        : AbstractWorker(configuration), _logger(Poco::Logger::get("LambdaWorker")), _configuration(configuration), _running(false) {
 
         Initialize();
     }
@@ -28,9 +28,6 @@ namespace AwsMock::Worker {
 
         // Create environment
         _region = _configuration.getString("awsmock.region");
-        _clientId = _configuration.getString("awsmock.client.id", "00000000");
-        _user = _configuration.getString("awsmock.user", "none");
-        _s3Service = std::make_unique<Service::S3Service>(_configuration);
         _lambdaDatabase = std::make_unique<Database::LambdaDatabase>(_configuration);
 
         // Lambda service connection
@@ -76,36 +73,10 @@ namespace AwsMock::Worker {
 
     void LambdaWorker::SendCreateFunctionRequest(Dto::Lambda::CreateFunctionRequest &lambdaRequest, const std::string &contentType) {
 
-        Poco::URI uri("http://" + _lambdaServiceHost + ":" + std::to_string(_lambdaServicePort) + "/2015-03-31/functions");
-        std::string path(uri.getPathAndQuery());
-
-        // Get the body
+        std::string url = "http://" + _lambdaServiceHost + ":" + std::to_string(_lambdaServicePort) + "/2015-03-31/functions";
         std::string body = lambdaRequest.ToJson();
-
-        // Create HTTP request and set headers
-        Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
-        Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, path, Poco::Net::HTTPMessage::HTTP_1_1);
-        request.add("Content-Type", contentType);
-        AddAuthorization(request);
-        log_debug_stream(_logger) << "Lambda create function request created, name: " + lambdaRequest.functionName << std::endl;
-
-        // Send request
-        std::ostream &os = session.sendRequest(request);
-        os << body;
-
-        // Get the response status
-        Poco::Net::HTTPResponse response;
-        if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
-            log_error_stream(_logger) << "HTTP error, status: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
-        }
-        log_debug_stream(_logger) << "Lambda create function request send, status: " << response.getStatus() << std::endl;
-    }
-
-    void LambdaWorker::AddAuthorization(Poco::Net::HTTPRequest &request) {
-        request.add("Authorization",
-                    "AWS4-HMAC-SHA256 Credential=" + _user + "/" + _clientId + "/" + _region
-                        + "/s3/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840");
-
+        SendPostRequest(url, body, contentType);
+        log_debug_stream(_logger) << "Lambda create function request send" << std::endl;
     }
 
 } // namespace AwsMock::Worker

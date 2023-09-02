@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    SQSService::SQSService(const Core::Configuration &configuration) : _logger("SQSService"), _configuration(configuration) {
+    SQSService::SQSService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("SQSService")), _configuration(configuration) {
         Initialize();
     }
 
