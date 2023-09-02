@@ -35,6 +35,19 @@ namespace AwsMock::Database {
         return count > 0;
     }
 
+    bool TransferDatabase::TransferExists(const std::string &region, std::vector<std::string> protocols) {
+
+        bsoncxx::builder::basic::array mProtocol{};
+        for (const auto &p : protocols) {
+            mProtocol.append(p);
+        }
+        int64_t count = _transferCollection.count_documents(make_document(kvp("region", region),
+                                                                          kvp("protocols",
+                                                                              make_document(kvp("$all", mProtocol)))));
+        log_trace_stream(_logger) << "Transfer server exists: " << (count > 0 ? "true" : "false") << std::endl;
+        return count > 0;
+    }
+
     Entity::Transfer::Transfer TransferDatabase::CreateTransfer(const Entity::Transfer::Transfer &transfer) {
 
         auto result = _transferCollection.insert_one(transfer.ToDocument());

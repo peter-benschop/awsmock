@@ -62,6 +62,16 @@ namespace AwsMock::Database {
       bool TransferExists(const std::string &transferName);
 
       /**
+       * Check existence of lambda
+       *
+       * @param region AWS region name
+       * @param protocols list of protocols
+       * @return true if transfer server already exists
+       * @throws DatabaseException
+       */
+      bool TransferExists(const std::string &region, std::vector<std::string> protocols);
+
+      /**
        * Create a new lambda function
        *
        * @param lambda lambda entity
