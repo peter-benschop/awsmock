@@ -174,6 +174,25 @@ namespace AwsMock::Database {
         EXPECT_EQ(0, result);
     }
 
+    TEST_F(SNSDatabaseTest, MessagesDeleteTest) {
+
+        // arrange
+        Entity::SNS::Topic topic = _snsDatabase.CreateTopic({.region=_region, .topicName=TOPIC, .owner=OWNER, .topicArn=TOPIC_ARN});
+
+        std::vector<std::string> receipts;
+        for(int i = 0; i < 10; i++) {
+            Entity::SNS::Message message = _snsDatabase.CreateMessage({.region=_region, .topicArn=topic.topicArn, .message=BODY, .messageId="test"+std::to_string(i)});
+            receipts.emplace_back(message.messageId);
+        }
+
+        // act
+        _snsDatabase.DeleteMessages(TOPIC, receipts);
+        long result = _snsDatabase.CountMessages(_region, topic.topicArn);
+
+        // assert
+        EXPECT_EQ(0, result);
+    }
+
     TEST_F(SNSDatabaseTest, MessageDeleteAllTest) {
 
         // arrange

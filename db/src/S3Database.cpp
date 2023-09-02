@@ -341,7 +341,7 @@ namespace AwsMock::Database {
             internBucket.notifications.emplace_back(bucketNotification);
         }
 
-        log_info_stream(_logger) << "Bucket notification added, notification: " << bucketNotification.ToString() << std::endl;
+        log_debug_stream(_logger) << "Bucket notification added, notification: " << bucketNotification.ToString() << std::endl;
 
         return UpdateBucket(internBucket);
     }

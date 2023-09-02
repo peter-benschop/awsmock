@@ -186,6 +186,15 @@ namespace AwsMock::Database {
       void DeleteMessage(const Entity::SNS::Message &message);
 
       /**
+       * Bulk delete of messages.
+       *
+       * @param topicArn topic ARN
+       * @param receipts vector of receipts
+       * @throws Core::DatabaseException
+       */
+      void DeleteMessages(const std::string &topicArn, const std::vector<std::string> &receipts);
+
+      /**
        * Deletes a messages.
        *
        * @throws Core::DatabaseException
