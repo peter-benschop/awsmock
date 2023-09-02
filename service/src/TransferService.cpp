@@ -7,12 +7,8 @@
 namespace AwsMock::Service {
 
     TransferService::TransferService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("TransferService")), _configuration(configuration) {
-        Initialize();
-    }
 
-    void TransferService::Initialize() {
-
-        // Initialize environment
+         // Initialize environment
         _accountId = _configuration.getString("awsmock.account.id", "000000000000");
         _transferDatabase = std::make_unique<Database::TransferDatabase>(_configuration);
         log_debug_stream(_logger) << "Transfer service initialized" << std::endl;

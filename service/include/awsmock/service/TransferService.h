@@ -96,18 +96,6 @@ namespace AwsMock::Service {
     private:
 
       /**
-       * Initialize the service
-       */
-      void Initialize();
-
-      /**
-       * Create a new transfer server instance.
-       *
-       * @param transferEntity transfer database entity
-       */
-      void CreateTransferServer(Database::Entity::Transfer::Transfer transferEntity);
-
-      /**
        * Logger
        */
       Core::LogStream _logger;
