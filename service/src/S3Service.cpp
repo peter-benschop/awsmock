@@ -38,7 +38,7 @@ namespace AwsMock::Service {
 
             // Check existence
             if (_database->BucketExists({.region=region, .name=name})) {
-                throw Core::ServiceException("Bucket exists already", 500);
+                throw Core::ServiceException("Bucket exists already", 403);
             }
 
             // Create directory
@@ -74,11 +74,11 @@ namespace AwsMock::Service {
         try {
             // Check existence
             if (!_database->BucketExists({.region=request.region, .name=request.bucket})) {
-                throw Core::ServiceException("Bucket does not exist", 500);
+                throw Core::ServiceException("Bucket does not exist", 403);
             }
 
             if (!_database->ObjectExists({.bucket=request.bucket, .key=request.key})) {
-                throw Core::ServiceException("Object does not exist", 500);
+                throw Core::ServiceException("Object does not exist", 403);
             }
 
             Database::Entity::S3::Object object = _database->GetObject(request.region, request.bucket, request.key);
@@ -95,7 +95,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_warning_stream(_logger) << "S3 get object metadata failed, message: " << ex.message() << std::endl;
-            throw Core::ServiceException(ex.message(), 403);
+            throw Core::ServiceException(ex.message(), 500);
         }
         return getMetadataResponse;
     }
@@ -164,7 +164,7 @@ namespace AwsMock::Service {
 
         // Check existence
         if (!_database->BucketExists({.region=region, .name=bucket})) {
-            throw Core::ServiceException("Bucket does not exist", 500);
+            throw Core::ServiceException("Bucket does not exist", 403);
         }
 
         std::string uploadId = Core::StringUtils::GenerateRandomString(58);
@@ -243,7 +243,7 @@ namespace AwsMock::Service {
             // Check existence
             if (!_database->BucketExists({.region=request.region, .name=request.bucket})) {
                 log_error_stream(_logger) << "Bucket does not exist, region: " << request.region + " bucket: " << request.bucket << std::endl;
-                throw Core::ServiceException("Bucket does not exist", 500);
+                throw Core::ServiceException("Bucket does not exist", 403);
             }
 
             // Create directory, if not existing
@@ -300,20 +300,20 @@ namespace AwsMock::Service {
             // Check existence of source bucket
             if (!_database->BucketExists({.region=request.region, .name=request.sourceBucket})) {
                 log_error_stream(_logger) << "Source bucket does not exist, region: " << request.region + " bucket: " << request.sourceBucket << std::endl;
-                throw Core::ServiceException("Source bucket does not exist", 500);
+                throw Core::ServiceException("Source bucket does not exist", 403);
             }
 
             // Check existence of source key
             if (!_database->ObjectExists({.region=request.region, .bucket=request.sourceBucket, .key=request.sourceKey})) {
                 log_error_stream(_logger) << "Source object does not exist, region: " << request.region + " bucket: " << request.sourceBucket << " key: "
                                           << request.sourceKey << std::endl;
-                throw Core::ServiceException("Source object does not exist", 500);
+                throw Core::ServiceException("Source object does not exist", 403);
             }
 
             // Check existence of target bucket
             if (!_database->BucketExists({.region=request.region, .name=request.targetBucket})) {
                 log_error_stream(_logger) << "Target bucket does not exist, region: " << request.region + " bucket: " << request.targetBucket << std::endl;
-                throw Core::ServiceException("Target bucket does not exist", 500);
+                throw Core::ServiceException("Target bucket does not exist", 403);
             }
 
             sourceObject = _database->GetObject(request.region, request.sourceBucket, request.sourceKey);
@@ -353,11 +353,11 @@ namespace AwsMock::Service {
         try {
             // Check bucket existence
             if (!_database->BucketExists({.region=request.region, .name=request.bucket})) {
-                throw Core::ServiceException("Bucket does not exist", 500);
+                throw Core::ServiceException("Bucket does not exist", 403);
             }
 
             if (!_database->ObjectExists({.bucket=request.bucket, .key=request.key})) {
-                throw Core::ServiceException("Object does not exist", 500);
+                throw Core::ServiceException("Object does not exist", 403);
             }
 
             // Delete from database
@@ -387,7 +387,7 @@ namespace AwsMock::Service {
         try {
             // Check existence
             if (!_database->BucketExists({.region=request.region, .name=request.bucket})) {
-                throw Core::ServiceException("Bucket does not exist", 500);
+                throw Core::ServiceException("Bucket does not exist", 403);
             }
 
             // Delete from database
@@ -419,13 +419,13 @@ namespace AwsMock::Service {
         try {
             // Check bucket existence
             if (!_database->BucketExists({.region=request.region, .name=request.bucket})) {
-                throw Core::ServiceException("Bucket does not exist", 500);
+                throw Core::ServiceException("Bucket does not exist", 403);
             }
 
             // Check notification existence
             Database::Entity::S3::Bucket bucket = _database->GetBucketByRegionName(request.region, request.bucket);
             if (bucket.HasNotification(request.event)) {
-                throw Core::ServiceException("Bucket notification exists already", 500);
+                throw Core::ServiceException("Bucket notification exists already", 403);
             }
 
             if (!request.lambdaArn.empty()) {
@@ -449,12 +449,12 @@ namespace AwsMock::Service {
 
             // Check existence
             if (!_database->BucketExists(bucket)) {
-                throw Core::ServiceException("Bucket does not exist", 500);
+                throw Core::ServiceException("Bucket does not exist", 403);
             }
 
             // Check empty
             if (_database->HasObjects(bucket)) {
-                throw Core::ServiceException("Bucket is not empty", 500);
+                throw Core::ServiceException("Bucket is not empty", 403);
             }
 
             // Delete directory
