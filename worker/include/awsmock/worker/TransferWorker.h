@@ -18,13 +18,15 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/db/ServiceDatabase.h>
 #include <awsmock/db/TransferDatabase.h>
+#include <awsmock/dto/s3/CreateBucketConstraint.h>
 #include <awsmock/service/FtpServer.h>
+#include <awsmock/worker/AbstractWorker.h>
 
 #define DEFAULT_TRANSFER_BUCKET "transfer-server"
 
 namespace AwsMock::Worker {
 
-    class TransferWorker : public Poco::Runnable {
+    class TransferWorker : public Poco::Runnable, public AbstractWorker {
 
     public:
 
@@ -39,11 +41,6 @@ namespace AwsMock::Worker {
       void run() override;
 
     private:
-
-      /**
-       * Initialization
-       */
-      void Initialize();
 
       /**
        * Starts a single transfer server
@@ -85,13 +82,6 @@ namespace AwsMock::Worker {
        * @return true when bucket exists
        */
       bool SendExistsBucketRequest(const std::string &bucket, const std::string &contentType);
-
-      /**
-       * Adds the authorization header.
-       *
-       * @param request HTTP request
-       */
-      void AddAuthorization(Poco::Net::HTTPRequest &request);
 
       /**
        * Logger

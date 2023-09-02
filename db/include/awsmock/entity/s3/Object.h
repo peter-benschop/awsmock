@@ -68,9 +68,20 @@ namespace AwsMock::Database::Entity::S3 {
        *
        * @return entity as MongoDB document.
        */
-      [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
+      bsoncxx::document::value ToDocument() const {
 
-          view_or_value<view, value> bucketDoc = make_document(
+          bsoncxx::builder::stream::document document{};
+          document << "region" << region;
+          document << "bucket" << bucket;
+          document << "key" << key;
+          document << "owner" << owner;
+          document << "size" << size;
+          document << "md5sum" << md5sum;
+          document << "contentType" << contentType;
+          document << "created" << bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000));
+          document << "modified" << bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000));
+
+          /*view_or_value<view, value> bucketDoc = make_document(
               kvp("region", region),
               kvp("bucket", bucket),
               kvp("key", key),
@@ -79,9 +90,9 @@ namespace AwsMock::Database::Entity::S3 {
               kvp("md5sum", md5sum),
               kvp("contentType", contentType),
               kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-              kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+              kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));*/
 
-          return bucketDoc;
+          return document << bsoncxx::builder::stream::finalize;
       }
 
       /**
@@ -91,17 +102,23 @@ namespace AwsMock::Database::Entity::S3 {
        */
       [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
 
-          oid = mResult.value()["_id"].get_oid().value.to_string();
-          region = mResult.value()["region"].get_string().value.to_string();
-          bucket = mResult.value()["bucket"].get_string().value.to_string();
-          key = mResult.value()["key"].get_string().value.to_string();
-          owner = mResult.value()["owner"].get_string().value.to_string();
-          size = mResult.value()["size"].get_int64().value;
-          md5sum = mResult.value()["md5sum"].get_string().value.to_string();
-          contentType = mResult.value()["contentType"].get_string().value.to_string();
-          owner = mResult.value()["owner"].get_string().value.to_string();
-          created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-          modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+          try {
+              if(!mResult->empty()) {
+                  oid = mResult.value()["_id"].get_oid().value.to_string();
+                  region = mResult.value()["region"].get_string().value.to_string();
+                  bucket = mResult.value()["bucket"].get_string().value.to_string();
+                  key = mResult.value()["key"].get_string().value.to_string();
+                  owner = mResult.value()["owner"].get_string().value.to_string();
+                  size = mResult.value()["size"].get_int64().value;
+                  md5sum = mResult.value()["md5sum"].get_string().value.to_string();
+                  contentType = mResult.value()["contentType"].get_string().value.to_string();
+                  owner = mResult.value()["owner"].get_string().value.to_string();
+                  created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
+                  modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+              }
+          } catch (mongocxx::exception::system_error &e) {
+              std::cerr << "Exception: " << e.what() << std::endl;
+          }
       }
 
       /**
@@ -110,18 +127,23 @@ namespace AwsMock::Database::Entity::S3 {
        * @return entity.
        */
       [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
-
-          oid = mResult.value()["_id"].get_oid().value.to_string();
-          region = mResult.value()["region"].get_string().value.to_string();
-          bucket = mResult.value()["bucket"].get_string().value.to_string();
-          key = mResult.value()["key"].get_string().value.to_string();
-          owner = mResult.value()["owner"].get_string().value.to_string();
-          size = mResult.value()["size"].get_int64().value;
-          md5sum = mResult.value()["md5sum"].get_string().value.to_string();
-          contentType = mResult.value()["contentType"].get_string().value.to_string();
-          owner = mResult.value()["owner"].get_string().value.to_string();
-          created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-          modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+          try {
+              if(!mResult->empty()) {
+                  oid = mResult.value()["_id"].get_oid().value.to_string();
+                  region = mResult.value()["region"].get_string().value.to_string();
+                  bucket = mResult.value()["bucket"].get_string().value.to_string();
+                  key = mResult.value()["key"].get_string().value.to_string();
+                  owner = mResult.value()["owner"].get_string().value.to_string();
+                  size = mResult.value()["size"].get_int64().value;
+                  md5sum = mResult.value()["md5sum"].get_string().value.to_string();
+                  contentType = mResult.value()["contentType"].get_string().value.to_string();
+                  owner = mResult.value()["owner"].get_string().value.to_string();
+                  created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
+                  modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+              }
+          } catch (mongocxx::exception::system_error &e) {
+              std::cerr << "Exception: " << e.what() << std::endl;
+          }
       }
 
       /**

@@ -9,6 +9,7 @@ namespace AwsMock::Database {
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
+    using bsoncxx::builder::stream::document;
 
     SNSDatabase::SNSDatabase(const Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("SNSDatabase")) {
 
@@ -22,14 +23,21 @@ namespace AwsMock::Database {
 
     bool SNSDatabase::TopicExists(const std::string &topicArn) {
 
-        int64_t count = _topicCollection.count_documents(make_document(kvp("topicArn", topicArn)));
+        bsoncxx::builder::stream::document filter{};
+        filter << "topicArn" << topicArn << bsoncxx::builder::stream::finalize;
+
+        int64_t count = _topicCollection.count_documents({filter});
         log_trace_stream(_logger) << "Topic exists: " << (count > 0 ? "true" : "false") << std::endl;
+
         return count > 0;
     }
 
     bool SNSDatabase::TopicExists(const std::string &region, const std::string &topicName) {
 
-        int64_t count = _topicCollection.count_documents(make_document(kvp("region", region), kvp("topicName", topicName)));
+        bsoncxx::builder::stream::document filter{};
+        filter << "region" << region << "topicName" << topicName << bsoncxx::builder::stream::finalize;
+
+        int64_t count = _topicCollection.count_documents({filter});
         log_trace_stream(_logger) << "Topic exists: " << (count > 0 ? "true" : "false") << std::endl;
         return count > 0;
     }
@@ -44,10 +52,17 @@ namespace AwsMock::Database {
 
     Entity::SNS::Topic SNSDatabase::GetTopicById(bsoncxx::oid oid) {
 
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("_id", oid)));
+        bsoncxx::builder::stream::document filter{};
+        filter << "_id" << oid << bsoncxx::builder::stream::finalize;
+
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _topicCollection.find_one({filter});
+
+        if (mResult->empty()) {
+            return {};
+        }
+
         Entity::SNS::Topic result;
         result.FromDocument(mResult);
-
         return result;
     }
 
@@ -57,7 +72,10 @@ namespace AwsMock::Database {
 
     Entity::SNS::Topic SNSDatabase::GetTopicByArn(const std::string &topicArn) {
 
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("topicArn", topicArn)));
+        bsoncxx::builder::stream::document filter{};
+        filter << "topicArn" << topicArn << bsoncxx::builder::stream::finalize;
+
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _topicCollection.find_one({filter});
         Entity::SNS::Topic result;
         result.FromDocument(mResult);
 
@@ -66,8 +84,11 @@ namespace AwsMock::Database {
 
     Entity::SNS::TopicList SNSDatabase::ListTopics(const std::string &region) {
 
+        bsoncxx::builder::stream::document filter{};
+        filter << "region" << region << bsoncxx::builder::stream::finalize;
+
         Entity::SNS::TopicList topicList;
-        auto queueCursor = _topicCollection.find(make_document(kvp("region", region)));
+        auto queueCursor = _topicCollection.find({filter});
         for (auto topic : queueCursor) {
             Entity::SNS::Topic result;
             result.FromDocument(topic);
@@ -80,7 +101,10 @@ namespace AwsMock::Database {
 
     Entity::SNS::Topic SNSDatabase::UpdateTopic(const Entity::SNS::Topic &topic) {
 
-        auto result = _topicCollection.replace_one(make_document(kvp("region", topic.region), kvp("topicArn", topic.topicArn)), topic.ToDocument());
+        bsoncxx::builder::stream::document filter{};
+        filter << "region" << topic.region << "topicArn" << topic.topicArn << bsoncxx::builder::stream::finalize;
+
+        auto result = _topicCollection.replace_one({filter}, topic.ToDocument());
 
         log_trace_stream(_logger) << "Topic updated: " << topic.ToString() << std::endl;
 
@@ -89,17 +113,26 @@ namespace AwsMock::Database {
 
     long SNSDatabase::CountTopics(const std::string &region) {
 
-        long count = _topicCollection.count_documents(make_document(kvp("region", region)));
+        bsoncxx::builder::stream::document filter{};
+        filter << "region" << region << bsoncxx::builder::stream::finalize;
+
+        long count = _topicCollection.count_documents({filter});
         log_trace_stream(_logger) << "Count topics, result: " << count << std::endl;
+
         return count;
     }
 
     void SNSDatabase::DeleteTopic(const Entity::SNS::Topic &topic) {
-       auto result = _topicCollection.delete_many(make_document(kvp("topicArn", topic.topicArn)));
-       log_debug_stream(_logger) << "Topic deleted, count: " << result->deleted_count() << std::endl;
-   }
+
+        bsoncxx::builder::stream::document filter{};
+        filter << "topicArn" << topic.topicArn << bsoncxx::builder::stream::finalize;
+
+        auto result = _topicCollection.delete_many({filter});
+        log_debug_stream(_logger) << "Topic deleted, count: " << result->deleted_count() << std::endl;
+    }
 
     void SNSDatabase::DeleteAllTopics() {
+
         auto result = _topicCollection.delete_many({});
         log_debug_stream(_logger) << "All topics deleted, count: " << result->deleted_count() << std::endl;
     }

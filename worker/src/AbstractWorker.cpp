@@ -127,10 +127,7 @@ namespace AwsMock::Worker {
         // Get the response status
         Poco::Net::HTTPResponse response;
         log_debug_stream(_logger) << "HEAD head request send, status: " << response.getStatus() << std::endl;
-        if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
-            return false;
-        }
-        return true;
+        return response.getStatus() == Poco::Net::HTTPResponse::HTTP_OK;
     }
 
     void AbstractWorker::SendFile(const std::string &url, const std::ifstream &ifstream, const std::string &contentType, std::map<std::string, std::string> headers) {
