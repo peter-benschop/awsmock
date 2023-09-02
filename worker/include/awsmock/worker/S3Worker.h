@@ -32,10 +32,11 @@
 #include <awsmock/db/ServiceDatabase.h>
 #include <awsmock/db/S3Database.h>
 #include <awsmock/dto/s3/PutObjectRequest.h>
+#include <awsmock/worker/AbstractWorker.h>
 
 namespace AwsMock::Worker {
 
-    class S3Worker : public Poco::Runnable {
+    class S3Worker : public Poco::Runnable, public AbstractWorker {
 
     public:
 
@@ -202,13 +203,6 @@ namespace AwsMock::Worker {
        * @param contentType content type
        */
       void SendDeleteObjectRequest(const std::string &bucket, const std::string &key, const std::string &contentType);
-
-      /**
-       * Adds the authorization header.
-       *
-       * @param request HTTP request
-       */
-      void AddAuthorization(Poco::Net::HTTPRequest &request);
 
       /**
        * Logger

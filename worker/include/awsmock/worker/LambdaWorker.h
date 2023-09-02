@@ -19,10 +19,11 @@
 #include <awsmock/db/LambdaDatabase.h>
 #include <awsmock/db/ServiceDatabase.h>
 #include <awsmock/service/S3Service.h>
+#include <awsmock/worker/AbstractWorker.h>
 
 namespace AwsMock::Worker {
 
-    class LambdaWorker : public Poco::Runnable {
+    class LambdaWorker : public Poco::Runnable, public AbstractWorker {
 
     public:
 
@@ -57,13 +58,6 @@ namespace AwsMock::Worker {
       void SendCreateFunctionRequest(Dto::Lambda::CreateFunctionRequest &request, const std::string &contentType);
 
       /**
-       * Adds the authorization header.
-       *
-       * @param request HTTP request
-       */
-      void AddAuthorization(Poco::Net::HTTPRequest &request);
-
-      /**
        * Logger
        */
       Core::LogStream _logger;
@@ -82,11 +76,6 @@ namespace AwsMock::Worker {
        * Lambda database
        */
       std::unique_ptr<Database::LambdaDatabase> _lambdaDatabase;
-
-      /**
-       * S3 service
-       */
-      std::unique_ptr<Service::S3Service> _s3Service;
 
       /**
        * Lambda service
@@ -116,12 +105,12 @@ namespace AwsMock::Worker {
       /**
        * AWS client ID
        */
-      std::string _clientId;
+      //std::string _clientId;
 
       /**
        * AWS user
        */
-      std::string _user;
+      //std::string _user;
 
       /**
        * Lambda service host

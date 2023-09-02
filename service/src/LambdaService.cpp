@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    LambdaService::LambdaService(const Core::Configuration &configuration) : _logger("LambdaService"),
+    LambdaService::LambdaService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("LambdaService")),
                                                                              _configuration(configuration) {
         Initialize();
     }

@@ -4,7 +4,7 @@
 namespace AwsMock::Service {
 
     TransferHandler::TransferHandler(Core::Configuration &configuration, Core::MetricService &metricService)
-        : AbstractHandler(), _logger("TransferServiceHandler"), _configuration(configuration), _metricService(metricService), _transferService(configuration) {
+        : AbstractHandler(), _logger(Poco::Logger::get("TransferServiceHandler")), _configuration(configuration), _metricService(metricService), _transferService(configuration) {
     }
 
     void TransferHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, [[maybe_unused]]const std::string &user) {

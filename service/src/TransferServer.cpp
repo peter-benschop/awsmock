@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
 
     TransferServer::TransferServer(Core::Configuration &configuration, Core::MetricService &metricService)
-        : _logger("TransferServer"), _configuration(configuration), _metricService(metricService) {
+        : _logger(Poco::Logger::get("TransferServer")), _configuration(configuration), _metricService(metricService) {
 
         _port = _configuration.getInt("awsmock.service.transfer.port", TRANSFER_DEFAULT_PORT);
         _host = _configuration.getString("awsmock.service.transfer.host", TRANSFER_DEFAULT_HOST);

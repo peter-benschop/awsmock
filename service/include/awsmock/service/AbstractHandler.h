@@ -55,6 +55,20 @@ namespace AwsMock::Service {
        */
       void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
 
+      /**
+       * Return busy flag
+       *
+       * @return true if handler is busy
+       */
+      bool GetBusy() {return _busy;}
+
+      /**
+       * Sets the busy flag
+       *
+       * @param true if handler is busy
+       */
+      void SetBusy(bool busy) { this->_busy = busy;}
+
     protected:
 
       /**
@@ -394,6 +408,12 @@ namespace AwsMock::Service {
        * Header map
        */
       HeaderMap _headerMap;
+
+      /**
+       * Busy flag
+       */
+      bool _busy = false;
+
     };
 
 } // namespace AwsMock::Service

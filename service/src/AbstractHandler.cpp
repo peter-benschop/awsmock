@@ -3,7 +3,7 @@
 
 namespace AwsMock::Service {
 
-    AbstractHandler::AbstractHandler() : _logger("AbstractHandler"), _baseUrl(), _requestURI(), _requestHost() {}
+    AbstractHandler::AbstractHandler() : _logger(Poco::Logger::get("AbstractHandler")), _baseUrl(), _requestURI(), _requestHost() {}
 
     AbstractHandler::~AbstractHandler() = default;
 

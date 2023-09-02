@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    S3Service::S3Service(const Core::Configuration &configuration) : _logger("S3Service"), _configuration(configuration) {
+    S3Service::S3Service(const Core::Configuration &configuration) : _logger(Poco::Logger::get("S3Service")), _configuration(configuration) {
 
         // Initialize environment
         _dataDir = _configuration.getString("awsmock.data.dir", "/tmp/awsmock/data") + Poco::Path::separator() + "s3";

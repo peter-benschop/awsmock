@@ -9,6 +9,9 @@
 #include "Poco/Logger.h"
 #include "Poco/ErrorHandler.h"
 
+// Aws mock includs
+#include <awsmock/core/LogStream.h>
+
 namespace AwsMock::Core {
 
     /**
@@ -28,7 +31,7 @@ namespace AwsMock::Core {
        * @param exc poco exception
        */
       void exception(const Poco::Exception &exc) override {
-          poco_error(_logger, "Unhandled POCO exception: " + exc.displayText() + " in class: " + exc.className());
+          log_error_stream(_logger) << "Unhandled POCO exception: " + exc.displayText() + " in class: " + exc.className() << std::endl;
       }
 
       /**
@@ -37,14 +40,14 @@ namespace AwsMock::Core {
        * @param exc standard exception
        */
       void exception(const std::exception &exc) override {
-          poco_error(_logger, "Unhandled STD exception: " + std::string(exc.what()));
+          log_error_stream(_logger) << "Unhandled STD exception: " << std::string(exc.what()) << std::endl;
       }
 
       /**
        * All other exceptions
        */
       void exception() override {
-          poco_error(_logger, "Unknown exception");
+          log_error_stream(_logger) << "Unknown exception" << std::endl;
       }
 
     private:
@@ -52,7 +55,7 @@ namespace AwsMock::Core {
       /**
        * Logger
        */
-      Poco::Logger &_logger;
+      Core::LogStream _logger;
 
     };
 

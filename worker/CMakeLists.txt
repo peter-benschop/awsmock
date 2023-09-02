@@ -2,7 +2,7 @@
 set(LIBRARY awsmockwrk)
 set(LIBRARY_STATIC awsmockwrk_static)
 
-set(SOURCES src/S3Worker.cpp src/SQSWorker.cpp src/LambdaWorker.cpp src/TransferWorker.cpp)
+set(SOURCES src/AbstractWorker.cpp src/S3Worker.cpp src/SQSWorker.cpp src/LambdaWorker.cpp src/TransferWorker.cpp)
 
 # Includes
 include_directories(include ../core/include ../db/include ../dto/include ../service/include

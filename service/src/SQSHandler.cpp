@@ -4,7 +4,7 @@
 namespace AwsMock::Service {
 
     SQSHandler::SQSHandler(Core::Configuration &configuration, Core::MetricService &metricService)
-        : AbstractHandler(), _logger("SQSServiceHandler"), _configuration(configuration), _metricService(metricService), _sqsService(configuration) {
+        : AbstractHandler(), _logger(Poco::Logger::get("SQSServiceHandler")), _configuration(configuration), _metricService(metricService), _sqsService(configuration) {
 
         _accountId = Core::AwsUtils::GetDefaultAccountId();
     }
@@ -35,6 +35,8 @@ namespace AwsMock::Service {
                                 [[maybe_unused]]const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_POST_TIMER);
         log_debug_stream(_logger) << "SQS POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+
+        SetBusy(true);
 
         try {
             //DumpBody(request);
@@ -159,6 +161,7 @@ namespace AwsMock::Service {
             _logger.error() << "Service exception: " << exc.message() << std::endl;
             SendErrorResponse("SQS", response, exc);
         }
+        SetBusy(false);
     }
 
     void SQSHandler::handleDelete(Poco::Net::HTTPServerRequest &request,
@@ -174,6 +177,7 @@ namespace AwsMock::Service {
     void SQSHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
         Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
         log_debug_stream(_logger) << "SQS OPTIONS request" << std::endl;
+        SetBusy(true);
 
         response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
         response.setContentType("text/plain; charset=utf-8");
@@ -181,6 +185,7 @@ namespace AwsMock::Service {
         handleHttpStatusCode(response, 200);
         std::ostream &outputStream = response.send();
         outputStream.flush();
+        SetBusy(false);
     }
 
     void SQSHandler::handleHead([[maybe_unused]]Poco::Net::HTTPServerRequest &request,

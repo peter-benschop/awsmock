@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
 
     LambdaServer::LambdaServer(Core::Configuration &configuration, Core::MetricService &metricService)
-        : _logger("LambdaServer"), _configuration(configuration), _metricService(metricService) {
+        : _logger(Poco::Logger::get("LambdaServer")), _configuration(configuration), _metricService(metricService) {
 
         _port = _configuration.getInt("awsmock.service.lambda.port", LAMBDA_DEFAULT_PORT);
         _host = _configuration.getString("awsmock.service.lambda.host", LAMBDA_DEFAULT_HOST);
