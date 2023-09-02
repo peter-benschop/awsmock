@@ -23,7 +23,7 @@ namespace AwsMock::Service {
         Database::Entity::Transfer::Transfer transferEntity;
         std::string transferArn = Core::AwsUtils::CreateTransferArn(request.region, _accountId, serverId);
 
-        if (_transferDatabase->TransferExists(request.region, serverId)) {
+        if (_transferDatabase->TransferExists(request.region, request.protocols)) {
 
             transferEntity = _transferDatabase->GetTransferByArn(transferArn);
 

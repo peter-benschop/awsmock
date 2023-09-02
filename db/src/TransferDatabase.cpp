@@ -41,10 +41,9 @@ namespace AwsMock::Database {
         for (const auto &p : protocols) {
             mProtocol.append(p);
         }
-
         int64_t count = _transferCollection.count_documents(make_document(kvp("region", region),
                                                                           kvp("protocols",
-                                                                              make_document(kvp("$in", mProtocol)))));
+                                                                              make_document(kvp("$all", mProtocol)))));
         log_trace_stream(_logger) << "Transfer server exists: " << (count > 0 ? "true" : "false") << std::endl;
         return count > 0;
     }
