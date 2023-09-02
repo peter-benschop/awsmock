@@ -266,13 +266,21 @@ namespace AwsMock::Service {
             Dto::S3::GetMetadataResponse s3Response = _s3Service.GetMetadata(s3Request);
 
             HeaderMap headerMap;
-            headerMap.emplace_back("Last-Modified", Poco::DateTimeFormatter().format(s3Response.modified, Poco::DateTimeFormat::HTTP_FORMAT));
-            headerMap.emplace_back("Content-Length", std::to_string(s3Response.size));
-            headerMap.emplace_back("Content-Type", s3Response.contentType);
             headerMap.emplace_back("Connection", "closed");
             headerMap.emplace_back("Server", "AmazonS3");
 
-            SendOkResponse(response, {}, &headerMap);
+            if(s3Response.bucket.empty()) {
+
+                Core::ServiceException exc("Bucket not found");
+                SendErrorResponse("S3", response, exc);
+
+            } else {
+
+                headerMap.emplace_back("Last-Modified", Poco::DateTimeFormatter().format(s3Response.modified, Poco::DateTimeFormat::HTTP_FORMAT));
+                headerMap.emplace_back("Content-Length", std::to_string(s3Response.size));
+                headerMap.emplace_back("Content-Type", s3Response.contentType);
+                SendOkResponse(response, {}, &headerMap);
+            }
 
         } catch (Poco::Exception &exc) {
             SendErrorResponse("S3", response, exc);

@@ -10,6 +10,11 @@
 #include <vector>
 #include <iostream>
 
+// MongoDB includes
+#include <bsoncxx/builder/basic/array.hpp>
+#include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/builder/stream/document.hpp>
+
 // AwsMock includes
 #include <awsmock/core/Logger.h>
 #include <awsmock/core/LogStream.h>

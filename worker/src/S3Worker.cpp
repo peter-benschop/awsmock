@@ -148,7 +148,11 @@ namespace AwsMock::Worker {
         std::string bucketName, key;
         GetBucketKeyFromFile(deleteEvent.item.path(), bucketName, key);
 
-        SendDeleteObjectRequest(bucketName, key, "application/octet-stream");
+        if(key.empty()) {
+            SendDeleteBucketRequest(bucketName, "application/octet-stream");
+        } else {
+            SendDeleteObjectRequest(bucketName, key, "application/octet-stream");
+        }
     }
 
     void S3Worker::GetBucketKeyFromFile(const std::string &fileName, std::string &bucket, std::string &key) {
@@ -230,19 +234,19 @@ namespace AwsMock::Worker {
 
     void S3Worker::SendCreateBucketRequest(const std::string &bucket, const std::string &contentType) {
 
+        Dto::S3::CreateBucketConstraint constraint = {.location=_region};
         std::string url = "http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket;
-        std::string body = std::string(
-            "<CreateBucketConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">\n<LocationConstraint>" + _region
-                + "</LocationConstraint>\n</CreateBucketConfiguration>");
+        std::string body = constraint.ToXml();
+
         SendPutRequest(url, body, contentType);
-        log_debug_stream(_logger) << "S3 create bucket message request send" << std::endl;
+        log_debug_stream(_logger) << "S3 create bucket request send" << std::endl;
     }
 
     void S3Worker::SendDeleteBucketRequest(const std::string &bucket, const std::string &contentType) {
 
         std::string url = "http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket;
         SendDeleteRequest(url, {}, contentType);
-        log_debug_stream(_logger) << "S3 delete bucket message request send" << std::endl;
+        log_debug_stream(_logger) << "S3 delete bucket request send" << std::endl;
     }
 
     void S3Worker::SendPutObjectRequest(const std::string &fileName,

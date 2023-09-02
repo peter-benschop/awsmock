@@ -9,6 +9,7 @@ namespace AwsMock::Database {
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
+    using bsoncxx::builder::stream::document;
 
     std::map<std::string, std::vector<std::string>> S3Database::allowedEventTypes = {
         {"Created", {"s3:ObjectCreated:Put", "s3:ObjectCreated:Post", "s3:ObjectCreated:Copy", "s3:ObjectCreated:CompleteMultipartUpload"}},
@@ -56,12 +57,18 @@ namespace AwsMock::Database {
 
     Entity::S3::Bucket S3Database::GetBucketByRegionName(const std::string &region, const std::string &name) {
 
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
+        bsoncxx::builder::stream::document filter{};
+        filter << "region" << region << "name" << name << bsoncxx::builder::stream::finalize;
+
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _bucketCollection.find_one({filter});
+
+        if (mResult->empty()) {
+            return {};
+        }
+
         Entity::S3::Bucket result;
         result.FromDocument(mResult);
-
         log_trace_stream(_logger) << "Got bucket: " << result.ToString() << std::endl;
-
         return result;
     }
 
@@ -81,15 +88,21 @@ namespace AwsMock::Database {
 
     bool S3Database::HasObjects(const Entity::S3::Bucket &bucket) {
 
-        int64_t count = _objectCollection.count_documents(make_document(kvp("region", bucket.region), kvp("bucket", bucket.name)));
+        bsoncxx::builder::stream::document filter{};
+        filter << "region" << bucket.region << "name" << bucket.name << bsoncxx::builder::stream::finalize;
+
+        int64_t count = _objectCollection.count_documents({filter});
         log_trace_stream(_logger) << "Objects exists: " << (count > 0 ? "true" : "false") << std::endl;
+
         return count > 0;
     }
 
     Entity::S3::Bucket S3Database::UpdateBucket(const Entity::S3::Bucket &bucket) {
 
-        auto result = _bucketCollection.replace_one(make_document(kvp("region", bucket.region), kvp("name", bucket.name)), bucket.ToDocument());
+        bsoncxx::builder::stream::document filter{};
+        filter << "region" << bucket.region << "name" << bucket.name << bsoncxx::builder::stream::finalize;
 
+        auto result = _bucketCollection.replace_one({filter}, bucket.ToDocument());
         log_trace_stream(_logger) << "Bucket updated: " << bucket.ToString() << std::endl;
 
         return GetBucketByRegionName(bucket.region, bucket.name);
@@ -159,26 +172,48 @@ namespace AwsMock::Database {
 
     bool S3Database::ObjectExists(const Entity::S3::Object &object) {
 
-        int64_t count = _objectCollection.count_documents(make_document(kvp("bucket", object.bucket), kvp("key", object.key)));
+        bsoncxx::builder::stream::document filter{};
+        filter << "region" << object.region << "key" << object.key << bsoncxx::builder::stream::finalize;
+
+        int64_t count = _objectCollection.count_documents({filter});
         log_trace_stream(_logger) << "Object exists: " << (count > 0 ? "true" : "false") << std::endl;
+
         return count > 0;
     }
 
     Entity::S3::Object S3Database::CreateObject(const Entity::S3::Object &object) {
 
-        auto insert_one_result = _objectCollection.insert_one(object.ToDocument());
-        log_trace_stream(_logger) << "Object created, oid: " << insert_one_result->inserted_id().get_oid().value.to_string() << std::endl;
+        try {
 
-        return GetObjectById(insert_one_result->inserted_id().get_oid().value);
+            auto insert_one_result = _objectCollection.insert_one(object.ToDocument().view());
+            log_trace_stream(_logger) << "Object created, oid: " << insert_one_result->inserted_id().get_oid().value.to_string() << std::endl;
+            return GetObjectById(insert_one_result->inserted_id().get_oid().value);
+
+        } catch (mongocxx::exception::system_error &e) {
+            log_error_stream(_logger) << "Get object by ID failed, error: " << e.what() << std::endl;
+        }
+        return {};
     }
 
     Entity::S3::Object S3Database::GetObjectById(bsoncxx::oid oid) {
 
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _objectCollection.find_one(make_document(kvp("_id", oid)));
-        Entity::S3::Object result;
-        result.FromDocument(mResult);
+        try {
+            bsoncxx::builder::stream::document filter{};
+            filter << "_id" << oid << bsoncxx::builder::stream::finalize;
 
-        return result;
+            mongocxx::stdx::optional<bsoncxx::document::value> mResult = _objectCollection.find_one({filter});
+
+            if (mResult->empty()) {
+                return {};
+            }
+
+            Entity::S3::Object result;
+            result.FromDocument(mResult);
+            return result;
+        } catch (mongocxx::exception::system_error &e) {
+            log_error_stream(_logger) << "Get object by ID failed, error: " << e.what() << std::endl;
+        }
+        return {};
     }
 
     Entity::S3::Object S3Database::GetObjectById(const std::string &oid) {
@@ -196,26 +231,34 @@ namespace AwsMock::Database {
 
     Entity::S3::Object S3Database::UpdateObject(const Entity::S3::Object &object) {
 
-        auto update_one_result =
-            _objectCollection.replace_one(make_document(kvp("region", object.region), kvp("bucket", object.bucket), kvp("key", object.key)), object.ToDocument());
+        try {
+            bsoncxx::builder::stream::document filter{};
+            filter << "region" << object.region << "bucket" << object.bucket << "key" << object.key << bsoncxx::builder::stream::finalize;
 
-        log_trace_stream(_logger) << "Object updated: " << object.ToString() << std::endl;
+            auto update_one_result = _objectCollection.replace_one({filter}, object.ToDocument());
+            log_trace_stream(_logger) << "Object updated: " << object.ToString() << std::endl;
 
+        } catch (mongocxx::exception::system_error &e) {
+            log_error_stream(_logger) << "Update object failed, error: " << e.what() << std::endl;
+        }
         return GetObject(object.region, object.bucket, object.key);
     }
 
     Entity::S3::Object S3Database::GetObject(const std::string &region, const std::string &bucket, const std::string &key) {
 
         try {
-            mongocxx::stdx::optional<bsoncxx::document::value>
-                mResult = _objectCollection.find_one(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key)));
-            if (mResult != bsoncxx::stdx::nullopt) {
+            bsoncxx::builder::stream::document filter{};
+            filter << "region" << region << "bucket" << bucket << "key" << key << bsoncxx::builder::stream::finalize;
+
+            mongocxx::stdx::optional<bsoncxx::document::value> mResult = _objectCollection.find_one({filter});
+            if (!mResult->empty()) {
                 Entity::S3::Object result;
                 result.FromDocument(mResult);
 
                 log_trace_stream(_logger) << "Got object: " << result.ToString() << std::endl;
                 return result;
             }
+
         } catch (mongocxx::exception::system_error &e) {
             log_error_stream(_logger) << "Get object failed, error: " << e.what() << std::endl;
         }
@@ -224,25 +267,45 @@ namespace AwsMock::Database {
 
     long S3Database::ObjectCount(const Entity::S3::Bucket &bucket) {
 
-        long count = _objectCollection.count_documents(make_document(kvp("region", bucket.region), kvp("bucket", bucket.name)));
-        log_trace_stream(_logger) << "Object count: " << count << std::endl;
-        return count;
+        try {
+            bsoncxx::builder::stream::document filter{};
+            filter << "region" << bucket.region << "bucket" << bucket.name << bsoncxx::builder::stream::finalize;
+
+            long count = _objectCollection.count_documents({filter});
+            log_trace_stream(_logger) << "Object count: " << count << std::endl;
+            return count;
+
+        } catch (mongocxx::exception::system_error &e) {
+            log_error_stream(_logger) << "Object count failed, error: " << e.what() << std::endl;
+        }
+        return {};
     }
 
     void S3Database::DeleteObject(const Entity::S3::Object &object) {
-        auto result = _objectCollection.delete_many(make_document(kvp("region", object.region), kvp("bucket", object.bucket), kvp("key", object.key)));
-        log_debug_stream(_logger) << "Objects deleted, count: " << result->deleted_count() << std::endl;
+
+        try {
+            bsoncxx::builder::stream::document filter{};
+            filter << "region" << object.region << "bucket" << object.bucket << "key" << object.key << bsoncxx::builder::stream::finalize;
+
+            auto result = _objectCollection.delete_many({filter});
+            log_debug_stream(_logger) << "Objects deleted, count: " << result->deleted_count() << std::endl;
+
+        } catch (mongocxx::exception::system_error &e) {
+            log_error_stream(_logger) << "Delete object failed, error: " << e.what() << std::endl;
+        }
     }
 
     void S3Database::DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys) {
 
-        // TODO: use $in with array
-        int count = 0;
+        bsoncxx::builder::basic::array array{};
         for (const auto &key : keys) {
-            _objectCollection.delete_one(make_document(kvp("bucket", bucket), kvp("key", key)));
-            count++;
+            array.append(key);
         }
-        log_debug_stream(_logger) << "Objects deleted, count: " << count << std::endl;
+        bsoncxx::builder::stream::document filter{};
+        filter << "$in" << array << bsoncxx::builder::stream::finalize;
+
+        auto result = _objectCollection.delete_many({filter});
+        log_debug_stream(_logger) << "Objects deleted, count: " << result->result().deleted_count() << std::endl;
     }
 
     void S3Database::DeleteAllObjects() {

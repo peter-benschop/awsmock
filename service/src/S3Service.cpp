@@ -72,6 +72,14 @@ namespace AwsMock::Service {
 
         Dto::S3::GetMetadataResponse getMetadataResponse;
         try {
+            // Check existence
+            if (!_database->BucketExists({.region=request.region, .name=request.bucket})) {
+                throw Core::ServiceException("Bucket does not exist", 500);
+            }
+
+            if (!_database->ObjectExists({.bucket=request.bucket, .key=request.key})) {
+                throw Core::ServiceException("Object does not exist", 500);
+            }
 
             Database::Entity::S3::Object object = _database->GetObject(request.region, request.bucket, request.key);
 
