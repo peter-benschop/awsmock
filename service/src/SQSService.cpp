@@ -65,7 +65,7 @@ namespace AwsMock::Service {
         Dto::SQS::PurgeQueueResponse response = {.resource=request.resource, .requestId=request.requestId};
         try {
             // Check existence
-            if (!_database->QueueUrlExists(request.queueUrl)) {
+            if (!_database->QueueUrlExists(request.region, request.queueUrl)) {
                 throw Core::ServiceException("SQS queue does not exists", 500, request.resource.c_str(), request.requestId.c_str());
             }
 
@@ -127,7 +127,7 @@ namespace AwsMock::Service {
         Dto::SQS::SetQueueAttributesResponse response;
         try {
             // Check existence
-            if (!_database->QueueUrlExists(request.queueUrl)) {
+            if (!_database->QueueUrlExists(request.region, request.queueUrl)) {
                 throw Core::ServiceException("Queue does not exist", 500);
             }
 
@@ -159,7 +159,7 @@ namespace AwsMock::Service {
         Dto::SQS::DeleteQueueResponse response;
         try {
             // Check existence
-            if (!_database->QueueUrlExists(request.queueUrl)) {
+            if (!_database->QueueUrlExists(request.region, request.queueUrl)) {
                 throw Core::ServiceException("Queue does not exist", 500);
             }
 
@@ -180,7 +180,7 @@ namespace AwsMock::Service {
 
         Database::Entity::SQS::Message message;
         try {
-            if (!request.queueUrl.empty() && !_database->QueueUrlExists(request.queueUrl)) {
+            if (!request.queueUrl.empty() && !_database->QueueUrlExists(request.region, request.queueUrl)) {
                 throw Core::ServiceException("SQS queue does not exists", 500);
             } else if (!request.queueArn.empty() && !_database->QueueArnExists(request.queueArn)) {
                 throw Core::ServiceException("SQS queue does not exists", 500);

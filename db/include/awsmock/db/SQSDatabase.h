@@ -10,6 +10,11 @@
 #include <vector>
 #include <iostream>
 
+// MongoDB includes
+#include <bsoncxx/builder/basic/array.hpp>
+#include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/builder/stream/document.hpp>
+
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/Logger.h>
@@ -48,11 +53,12 @@ namespace AwsMock::Database {
       /**
        * Check existence of queue
        *
+       * @param region AWS region
        * @param queueUrl AWS region
        * @return true if queue already exists
        * @throws DatabaseException
        */
-      bool QueueUrlExists(const std::string &queueUrl);
+      bool QueueUrlExists(const std::string &region, const std::string &queueUrl);
 
       /**
        * Check existence of queue by ARN

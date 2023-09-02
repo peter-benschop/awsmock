@@ -13,6 +13,11 @@ namespace AwsMock::Dto::SQS {
     struct DeleteQueueRequest {
 
       /**
+       * AWS region
+       */
+      std::string region;
+
+      /**
        * Queue URL
        */
       std::string queueUrl;
@@ -23,7 +28,7 @@ namespace AwsMock::Dto::SQS {
       std::string resource = "Unknown resource";
 
       /**
-       * Resource
+       * Request ID
        */
       std::string requestId = Poco::UUIDGenerator().createRandom().toString();
 

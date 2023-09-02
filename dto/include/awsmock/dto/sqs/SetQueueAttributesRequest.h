@@ -18,6 +18,11 @@ namespace AwsMock::Dto::SQS {
     struct SetQueueAttributesRequest {
 
       /**
+       * AWS region
+       */
+      std::string region;
+
+      /**
        * Queue URL
        */
       std::string queueUrl;

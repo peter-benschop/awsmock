@@ -155,7 +155,10 @@ namespace AwsMock::Database {
 
     Entity::SNS::Message SNSDatabase::GetMessageById(bsoncxx::oid oid) {
 
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _messageCollection.find_one(make_document(kvp("_id", oid)));
+        bsoncxx::builder::stream::document filter{};
+        filter << "_id" << oid << bsoncxx::builder::stream::finalize;
+
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _messageCollection.find_one({filter});
         Entity::SNS::Message result;
         result.FromDocument(mResult);
 
@@ -166,66 +169,37 @@ namespace AwsMock::Database {
         return GetMessageById(bsoncxx::oid(oid));
     }
 
-    /*Entity::SQS::Message SNSDatabase::GetMessageByReceiptHandle(const std::string &receiptHandle) {
-
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle)));
-        Entity::SQS::Message result;
-        result.FromDocument(mResult);
-
-        return result;
-    }
-
-    Entity::SQS::Message SNSDatabase::GetMessageById(const std::string &oid) {
-        return GetMessageById(bsoncxx::oid(oid));
-    }
-
-    void SNSDatabase::ReceiveMessages(const std::string &region, const std::string &queueUrl, Entity::SQS::MessageList &messageList) {
-        auto now = std::chrono::high_resolution_clock::now();
-
-        auto messageCursor = _messageCollection.find(make_document(kvp("queueUrl", queueUrl), kvp("status", Entity::SQS::INITIAL)));
-        for (auto message : messageCursor) {
-            Entity::SQS::Message result;
-            result.FromDocument(message);
-            result.receiptHandle = Core::StringUtils::GenerateRandomString(120);
-            messageList.push_back(result);
-            _messageCollection.update_one(make_document(kvp("_id", message["_id"].get_oid())),
-                                          make_document(kvp("$set", make_document(kvp("status", Entity::SQS::SEND),
-                                                                                  kvp("reset", bsoncxx::types::b_date(now)),
-                                                                                  kvp("receiptHandle", result.receiptHandle)))));
-        }
-        log_trace_stream(_logger) << "Messages received, region: " << region << " queue: " << queueUrl + " count: " << messageList.size() << std::endl;
-    }
-
-    void SNSDatabase::ResetMessages(const std::string &queueUrl, long visibility) {
-
-        long updated = 0;
-        auto messageCursor = _messageCollection.find(make_document(kvp("queueUrl", queueUrl), kvp("status", Entity::SQS::SEND)));
-        for (auto message : messageCursor) {
-            _messageCollection.update_one(make_document(kvp("_id", message["_id"].get_oid())),
-                                          make_document(kvp("$set",
-                                                            make_document(kvp("status", Entity::SQS::INITIAL), kvp("receiptHandle", "")))));
-            updated++;
-        }
-        log_trace_stream(_logger) << "Message reset, visibility: " << visibility << " updated: " << updated << std::endl;
-    }*/
-
     long SNSDatabase::CountMessages(const std::string &region, const std::string &topicArn) {
 
-        long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("topicArn", topicArn)));
+        bsoncxx::builder::stream::document filter{};
+        filter << "region" << region << "topicArn" << topicArn << bsoncxx::builder::stream::finalize;
+
+        long count = _messageCollection.count_documents({filter});
         log_trace_stream(_logger) << "Count messages, result: " << count << std::endl;
+
         return count;
     }
-/*
-    long SNSDatabase::CountMessagesByStatus(const std::string &region, const std::string &queueUrl, int status) {
-
-        long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl), kvp("status", status)));
-        log_trace_stream(_logger) << "Count messages by status, status: " << status << " result: " << count << std::endl;
-        return count;
-    }*/
 
     void SNSDatabase::DeleteMessage(const Entity::SNS::Message &message) {
-        auto result = _messageCollection.delete_one(make_document(kvp("messageId", message.messageId)));
+
+        bsoncxx::builder::stream::document filter{};
+        filter << "messageId" << message.messageId << bsoncxx::builder::stream::finalize;
+
+        auto result = _messageCollection.delete_one({filter});
         log_debug_stream(_logger) << "Messages deleted, messageId: " << message.messageId << " count: " << result->deleted_count() << std::endl;
+    }
+
+    void SNSDatabase::DeleteMessages(const std::string &topicArn, const std::vector<std::string> &receipts) {
+
+        bsoncxx::builder::basic::array array{};
+        for (const auto &receipt : receipts) {
+            array.append(receipt);
+        }
+        bsoncxx::builder::stream::document filter{};
+        filter << "$in" << array << bsoncxx::builder::stream::finalize;
+
+        auto result = _messageCollection.delete_many({filter});
+        log_debug_stream(_logger) << "Messages deleted, count: " << result->result().deleted_count() << std::endl;
     }
 
     void SNSDatabase::DeleteAllMessages() {

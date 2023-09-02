@@ -58,20 +58,20 @@ namespace AwsMock::Database {
         EXPECT_TRUE(result.region == _region);
     }
 
-    TEST_F(SQSDatabaseTest, QueueExistsUrlTest) {
+    TEST_F(SQSDatabaseTest, QueueUrlExistsTest) {
 
         // arrange
         Entity::SQS::Queue queue = {.region=_region, .name=QUEUE_NAME, .owner=OWNER, .queueUrl=QUEUE_URL, .queueArn=_queueArn};
         _sqsDatabase.CreateQueue(queue);
 
         // act
-        bool result = _sqsDatabase.QueueUrlExists(QUEUE_URL);
+        bool result = _sqsDatabase.QueueUrlExists(_region, QUEUE_URL);
 
         // assert
         EXPECT_TRUE(result);
     }
 
-    TEST_F(SQSDatabaseTest, QueueExistsArnTest) {
+    TEST_F(SQSDatabaseTest, QueueArnExistsTest) {
 
         // arrange
         Entity::SQS::Queue queue = {.region=_region, .name=QUEUE_NAME, .owner=OWNER, .queueUrl=QUEUE_URL, .queueArn=_queueArn};
@@ -349,10 +349,13 @@ namespace AwsMock::Database {
         // arrange
         Entity::SQS::RedrivePolicy redrivePolicy = {.deadLetterTargetArn=DLQ_ARN, .maxReceiveCount=1};
         Entity::SQS::QueueAttribute attribute = { .visibilityTimeout=1, .redrivePolicy=redrivePolicy};
+
         Entity::SQS::Queue queue = {.region=_region, .name=QUEUE_NAME, .owner=OWNER, .queueUrl=QUEUE_URL, .attributes=attribute};
         queue = _sqsDatabase.CreateQueue(queue);
+
         Entity::SQS::Queue dlQueue = {.region=_region, .name=DLQ_NAME, .owner=OWNER, .queueUrl=DLQ_URL, .attributes=attribute};
         dlQueue = _sqsDatabase.CreateQueue(dlQueue);
+
         Entity::SQS::Message message = {.region=_region, .queueUrl=queue.queueUrl, .body=BODY};
         _sqsDatabase.CreateMessage(message);
 
