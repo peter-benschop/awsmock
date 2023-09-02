@@ -143,7 +143,7 @@ namespace AwsMock::Service {
        * @param statusCode HTTP Status Code.
        * @param reason status reason.
        */
-      static void handleHttpStatusCode(Poco::Net::HTTPServerResponse &response, int statusCode, const char* reason = nullptr);
+      void handleHttpStatusCode(Poco::Net::HTTPServerResponse &response, int statusCode, const char* reason = nullptr);
 
       /**
        * CHecks whether a query parameter exists

@@ -160,12 +160,15 @@ namespace AwsMock::Service {
             break;
 
         case 401:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED);
+            log_error_stream(_logger) << "HTTP status code: 401 message: " << reason << std::endl;
             break;
 
         case 403:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_FORBIDDEN);
+            log_warning_stream(_logger) << "HTTP status code: 403 message: " << reason << std::endl;
             break;
 
         case 404:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+            log_warning_stream(_logger) << "HTTP status code: 404 message: " << reason << std::endl;
             break;
 
         case 405:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_METHOD_NOT_ALLOWED);
@@ -424,8 +427,7 @@ namespace AwsMock::Service {
         }
         SetHeaders(response, payload.length());
 
-        log_error_stream(_logger) << "Exception, code: " << exc.code() << " message: " << exc.message() << std::endl;
-        handleHttpStatusCode(response, exc.code());
+        handleHttpStatusCode(response, exc.code(), exc.message().c_str());
         std::ostream &outputStream = response.send();
         outputStream << payload;
         outputStream.flush();

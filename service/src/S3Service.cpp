@@ -94,8 +94,8 @@ namespace AwsMock::Service {
             log_info_stream(_logger) << "Metadata returned, bucket: " << request.bucket << " key: " << request.key << std::endl;
 
         } catch (Poco::Exception &ex) {
-            log_error_stream(_logger) << "S3 get object metadata failed, message: " << ex.message() << std::endl;
-            throw Core::ServiceException(ex.message(), 500);
+            log_warning_stream(_logger) << "S3 get object metadata failed, message: " << ex.message() << std::endl;
+            throw Core::ServiceException(ex.message(), 403);
         }
         return getMetadataResponse;
     }
