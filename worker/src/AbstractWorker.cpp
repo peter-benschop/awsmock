@@ -130,7 +130,10 @@ namespace AwsMock::Worker {
         return response.getStatus() == Poco::Net::HTTPResponse::HTTP_OK;
     }
 
-    void AbstractWorker::SendFile(const std::string &url, const std::ifstream &ifstream, const std::string &contentType, std::map<std::string, std::string> headers) {
+    void AbstractWorker::SendFile(const std::string &url,
+                                  const std::ifstream &ifstream,
+                                  const std::string &contentType,
+                                  const std::map<std::string, std::string> &headers) {
 
         Poco::URI uri(url);
         std::string path(uri.getPathAndQuery());
@@ -139,6 +142,9 @@ namespace AwsMock::Worker {
         Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
         Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, path, Poco::Net::HTTPMessage::HTTP_1_1);
         request.add("Content-Type", contentType);
+        for (const auto &it : headers) {
+            request.add(it.first, it.second);
+        }
         AddAuthorization(request);
         log_debug_stream(_logger) << "Request send, url: " << url << std::endl;
 

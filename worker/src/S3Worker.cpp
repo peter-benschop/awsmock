@@ -122,7 +122,7 @@ namespace AwsMock::Worker {
     }
 
     void S3Worker::OnFileAdded(const Core::DirectoryEvent &addedEvent) {
-        log_debug_stream(_logger) << "Added path: " << addedEvent.item.path() << std::endl;
+        log_info_stream(_logger) << "File added, path: " << addedEvent.item.path() << std::endl;
 
         if (Core::DirUtils::IsDirectory(addedEvent.item.path())) {
             CreateBucket(addedEvent.item.path());
@@ -132,7 +132,7 @@ namespace AwsMock::Worker {
     }
 
     void S3Worker::OnFileModified(const Core::DirectoryEvent &modifiedEvent) {
-        log_debug_stream(_logger) << "Added path: " << modifiedEvent.item.path() << std::endl;
+        log_info_stream(_logger) << "File modified, path: " << modifiedEvent.item.path() << std::endl;
 
         if (Core::DirUtils::IsDirectory(modifiedEvent.item.path())) {
             CreateBucket(modifiedEvent.item.path());
@@ -142,7 +142,7 @@ namespace AwsMock::Worker {
     }
 
     void S3Worker::OnFileDeleted(const Core::DirectoryEvent &deleteEvent) {
-        log_debug_stream(_logger) << "Deleted path: " << deleteEvent.item.path() << std::endl;
+        log_info_stream(_logger) << "File deleted path: " << deleteEvent.item.path() << std::endl;
 
         // Get bucket, key
         std::string bucketName, key;
