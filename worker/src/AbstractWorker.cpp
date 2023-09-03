@@ -140,7 +140,7 @@ namespace AwsMock::Worker {
 
         // Create HTTP request and set headers
         Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
-        Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, path, Poco::Net::HTTPMessage::HTTP_1_1);
+        Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_PUT, path, Poco::Net::HTTPMessage::HTTP_1_1);
         request.add("Content-Type", contentType);
         for (const auto &it : headers) {
             request.add(it.first, it.second);
