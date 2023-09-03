@@ -67,7 +67,7 @@ namespace AwsMock::Service {
                 std::string functionName = parts[1];
                 log_debug_stream(_logger) << "Lambda function invocation, name: " << functionName <<  std::endl;
 
-                _lambdaService.InvokeSqsFunction(functionName, body, region, user);
+                _lambdaService.InvokeLambdaFunction(functionName, body, region, user);
                 log_debug_stream(_logger) << "Lambda function invoked, name: " << functionName <<  std::endl;
                 SendOkResponse(response);
 

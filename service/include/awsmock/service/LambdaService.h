@@ -76,7 +76,7 @@ namespace AwsMock::Service {
        * @param region AWS region
        * @param user user
        */
-      void InvokeSqsFunction(const std::string &functionName, const std::string &payload, const std::string &region, const std::string &user);
+      void InvokeLambdaFunction(const std::string &functionName, const std::string &payload, const std::string &region, const std::string &user);
 
       /**
        * Delete lambda function

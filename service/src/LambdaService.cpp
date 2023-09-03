@@ -128,14 +128,12 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::InvokeEventFunction(const Dto::S3::EventNotification &eventNotification) {
-        log_debug_stream(_logger) << "Invocation event function eventNotification: " + eventNotification.ToString()
-                                  << std::endl;
+        log_debug_stream(_logger) << "Invocation event function eventNotification: " + eventNotification.ToString() << std::endl;
 
         for (const auto &record : eventNotification.records) {
 
             // Get the bucket eventNotification
-            Database::Entity::S3::Bucket bucket = _s3Database->GetBucketByRegionName(record.region,
-                                                                                     record.s3.bucket.name);
+            Database::Entity::S3::Bucket bucket = _s3Database->GetBucketByRegionName(record.region, record.s3.bucket.name);
             if (bucket.HasNotification(record.eventName)) {
 
                 Database::Entity::S3::BucketNotification notification = bucket.GetNotification(record.eventName);
@@ -150,8 +148,8 @@ namespace AwsMock::Service {
         }
     }
 
-    void LambdaService::InvokeSqsFunction(const std::string &functionName, const std::string &payload, const std::string &region, const std::string &user) {
-        log_debug_stream(_logger) << "Invocation SQS function, functionName: " + functionName << std::endl;
+    void LambdaService::InvokeLambdaFunction(const std::string &functionName, const std::string &payload, const std::string &region, const std::string &user) {
+        log_debug_stream(_logger) << "Invocation lambda function, functionName: " + functionName << std::endl;
 
         std::string lambdaArn = Core::AwsUtils::CreateLambdaArn(region, _accountId, functionName);
 
@@ -163,12 +161,11 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::DeleteFunction(Dto::Lambda::DeleteFunctionRequest &request) {
-        log_debug_stream(_logger) << "Invocation event function notification: " + request.ToString() << std::endl;
+        log_debug_stream(_logger) << "Delete function: " + request.ToString() << std::endl;
 
         if (!_lambdaDatabase->LambdaExists(request.functionName)) {
-            log_error_stream(_logger) << "Lambda function does not exist, function: " + request.functionName
-                                      << std::endl;
-            throw Core::ServiceException("Lambda function does not exist", 500);
+            log_error_stream(_logger) << "Lambda function does not exist, function: " + request.functionName << std::endl;
+            throw Core::ServiceException("Lambda function does not exist", 403);
         }
 
         // Delete the container, if existing
@@ -203,15 +200,15 @@ namespace AwsMock::Service {
         // Send request
         std::ostream &os = session.sendRequest(request);
         os << body;
+        os.flush();
 
         // Get the response status
         Poco::Net::HTTPResponse response;
         session.receiveResponse(response);
         if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
-            log_error_stream(_logger) << "HTTP error, status: " << response.getStatus()
-                                      << " reason: " + response.getReason() << std::endl;
+            log_error_stream(_logger) << "HTTP error, status: " << response.getStatus() << " reason: " + response.getReason() << std::endl;
         }
-        log_debug_stream(_logger) << "Invocation request send, status: " << response.getStatus() << std::endl;
+        log_debug_stream(_logger) << "Lambda invocation request send, status: " << response.getStatus() << std::endl;
     }
 
     void LambdaService::CreateDockerImage(const Dto::Lambda::CreateFunctionRequest &request,

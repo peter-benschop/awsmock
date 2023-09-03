@@ -282,7 +282,9 @@ namespace AwsMock::Service {
                 .owner=request.owner,
                 .size=size,
                 .md5sum=md5sum,
-                .contentType=request.contentType};
+                .contentType=request.contentType
+            };
+
             object = _database->CreateOrUpdateObject(object);
             log_debug_stream(_logger) << "Database updated, bucket: " << object.bucket << " key: " << object.key << std::endl;
 
@@ -290,7 +292,12 @@ namespace AwsMock::Service {
             CheckNotifications(request.region, request.bucket, request.key, object.size, "s3:ObjectCreated:Put");
             log_info_stream(_logger) << "Put object succeeded, bucket: " << request.bucket << " key: " << request.key << std::endl;
 
-            return {.bucket=request.bucket, .key=request.key, .etag=md5sum, .contentLength=size};
+            return {
+                .bucket=request.bucket,
+                .key=request.key,
+                .etag=md5sum,
+                .contentLength=size
+            };
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "S3 put object failed, message: " << ex.message() << std::endl;

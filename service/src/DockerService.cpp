@@ -6,7 +6,11 @@
 
 namespace AwsMock::Service {
 
-    DockerService::DockerService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("DockerService")), _configuration(configuration) {
+    DockerService::DockerService(const Core::Configuration &configuration)
+        : _logger(Poco::Logger::get("DockerService")), _configuration(configuration), _networkMode("bridge") {
+
+        // Get network mode
+        _networkMode = _configuration.getString("awsmock.docker.network.mode", "bridge");
 
         // Get version
         std::string output = _curlUtils.SendRequest("GET", "/version");
@@ -136,7 +140,7 @@ namespace AwsMock::Service {
         std::string containerPort = CONTAINER_PORT;
         std::string imageName = std::string(name) + ":" + tag;
         std::string domainName = std::string(name) + NETWORK_NAME;
-        std::string networkMode = "bridge";
+        std::string networkMode = _networkMode;
 
         // Create the request
         Dto::Docker::CreateContainerRequest request = {
