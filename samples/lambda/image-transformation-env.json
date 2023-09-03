@@ -1,0 +1,11 @@
+{
+  "Variables": {
+    "AWS_REGION": "eu-central-1",
+    "AWS_ENDPOINT": "http://172.24.65.214:4567",
+    "AWS_ACCOUNT_ID": "000000000000",
+    "AWS_SECRET_ACCESS_KEY": "none",
+    "AWS_SESSION_TOKEN": "none",
+    "AWS_CA_FILE": "/etc/pki/tls/certs/ca-bundle.crt",
+    "LIBRI_MONITORING_PORT": "8081"
+  }
+}
