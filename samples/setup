@@ -1,5 +1,7 @@
 #!/bin/bash
 
+SERVER_ID="none"
+
 #
 # SQS Queues functions
 #
@@ -122,7 +124,8 @@ function transfer_exists() {
 function create_transfer_server {
   if [ "$(transfer_exists)" -eq 0 ]; then
     server_id=$(awsmock transfer create-server --protocols ftp | jq -r '.ServerId') > /dev/null 2>&1
-    echo "Transfer server $server_id created"
+    export serverid=$server_id
+    echo "Transfer server $serverid created"
   else
     echo "Transfer server exists already"
   fi
@@ -203,8 +206,8 @@ create_sns_subscription protokollierung
 # Create FTP server, creates also the transfer-server S3 bucket
 #
 create_transfer_server
-create_transfer_user $server_id transfer_role ftpuser1 ftpuser1
-start_transfer_server $server_id
+create_transfer_user $serverid transfer_role ftpuser1 ftpuser1
+start_transfer_server $serverid
 
 #
 # Setup S3 bucket notification events
