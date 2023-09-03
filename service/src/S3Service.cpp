@@ -224,7 +224,14 @@ namespace AwsMock::Service {
         log_trace_stream(_logger) << "Got file metadata, md5sum: " << md5sum << " size: " << fileSize << " outFile: " << outFile << std::endl;
 
         // Create database object
-        Database::Entity::S3::Object object = _database->CreateOrUpdateObject({.region=region, .bucket=bucket, .key=key, .owner=user, .size=fileSize, .md5sum=md5sum});
+        Database::Entity::S3::Object object = _database->CreateOrUpdateObject({
+            .region=region,
+            .bucket=bucket,
+            .key=key,
+            .owner=user,
+            .size=fileSize,
+            .md5sum=md5sum
+        });
 
         // Cleanup
         Core::DirUtils::DeleteDirectory(uploadDir);

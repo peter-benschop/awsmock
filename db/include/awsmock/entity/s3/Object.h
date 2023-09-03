@@ -68,20 +68,9 @@ namespace AwsMock::Database::Entity::S3 {
        *
        * @return entity as MongoDB document.
        */
-      bsoncxx::document::value ToDocument() const {
+      [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
-          bsoncxx::builder::stream::document document{};
-          document << "region" << region;
-          document << "bucket" << bucket;
-          document << "key" << key;
-          document << "owner" << owner;
-          document << "size" << size;
-          document << "md5sum" << md5sum;
-          document << "contentType" << contentType;
-          document << "created" << bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000));
-          document << "modified" << bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000));
-
-          /*view_or_value<view, value> bucketDoc = make_document(
+          view_or_value<view, value> bucketDoc = make_document(
               kvp("region", region),
               kvp("bucket", bucket),
               kvp("key", key),
@@ -90,9 +79,9 @@ namespace AwsMock::Database::Entity::S3 {
               kvp("md5sum", md5sum),
               kvp("contentType", contentType),
               kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-              kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));*/
+              kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
 
-          return document << bsoncxx::builder::stream::finalize;
+          return bucketDoc;
       }
 
       /**

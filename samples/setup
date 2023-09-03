@@ -76,7 +76,7 @@ function create_bucket_notification() {
   bucket=$1
   hook=$2
 
-  awsmock s3api put-bucket-notification-configuration --bucket "$bucket" --notification-configuration file://./s3/"$hook" > /dev/null 2>&1
+  awsmock s3api put-bucket-notification-configuration --bucket $bucket --notification-configuration file://./s3/$hook > /dev/null 2>&1
   echo "Bucket notification created, hook: $hook"
 }
 
