@@ -57,10 +57,7 @@ namespace AwsMock::Database {
 
     Entity::S3::Bucket S3Database::GetBucketByRegionName(const std::string &region, const std::string &name) {
 
-        bsoncxx::builder::stream::document filter{};
-        filter << "region" << region << "name" << name << bsoncxx::builder::stream::finalize;
-
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _bucketCollection.find_one({filter});
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
 
         if (mResult->empty()) {
             return {};
@@ -88,10 +85,7 @@ namespace AwsMock::Database {
 
     bool S3Database::HasObjects(const Entity::S3::Bucket &bucket) {
 
-        bsoncxx::builder::stream::document filter{};
-        filter << "region" << bucket.region << "name" << bucket.name << bsoncxx::builder::stream::finalize;
-
-        int64_t count = _objectCollection.count_documents({filter});
+        int64_t count = _objectCollection.count_documents(make_document(kvp("region", bucket.region), kvp("name", bucket.name)));
         log_trace_stream(_logger) << "Objects exists: " << (count > 0 ? "true" : "false") << std::endl;
 
         return count > 0;
@@ -99,10 +93,7 @@ namespace AwsMock::Database {
 
     Entity::S3::Bucket S3Database::UpdateBucket(const Entity::S3::Bucket &bucket) {
 
-        bsoncxx::builder::stream::document filter{};
-        filter << "region" << bucket.region << "name" << bucket.name << bsoncxx::builder::stream::finalize;
-
-        auto result = _bucketCollection.replace_one({filter}, bucket.ToDocument());
+        auto result = _bucketCollection.replace_one(make_document(kvp("region", bucket.region), kvp("name", bucket.name)), bucket.ToDocument());
         log_trace_stream(_logger) << "Bucket updated: " << bucket.ToString() << std::endl;
 
         return GetBucketByRegionName(bucket.region, bucket.name);
@@ -172,10 +163,7 @@ namespace AwsMock::Database {
 
     bool S3Database::ObjectExists(const Entity::S3::Object &object) {
 
-        bsoncxx::builder::stream::document filter{};
-        filter << "region" << object.region << "key" << object.key << bsoncxx::builder::stream::finalize;
-
-        int64_t count = _objectCollection.count_documents({filter});
+        int64_t count = _objectCollection.count_documents(make_document(kvp("region", object.region), kvp("key", object.key)));
         log_trace_stream(_logger) << "Object exists: " << (count > 0 ? "true" : "false") << std::endl;
 
         return count > 0;
@@ -201,7 +189,7 @@ namespace AwsMock::Database {
             bsoncxx::builder::stream::document filter{};
             filter << "_id" << oid << bsoncxx::builder::stream::finalize;
 
-            mongocxx::stdx::optional<bsoncxx::document::value> mResult = _objectCollection.find_one({filter});
+            mongocxx::stdx::optional<bsoncxx::document::value> mResult = _objectCollection.find_one(make_document(kvp("_id", oid)));
 
             if (mResult->empty()) {
                 return {};
@@ -232,10 +220,8 @@ namespace AwsMock::Database {
     Entity::S3::Object S3Database::UpdateObject(const Entity::S3::Object &object) {
 
         try {
-            bsoncxx::builder::stream::document filter{};
-            filter << "region" << object.region << "bucket" << object.bucket << "key" << object.key << bsoncxx::builder::stream::finalize;
-
-            auto update_one_result = _objectCollection.replace_one({filter}, object.ToDocument());
+            auto update_one_result =
+                _objectCollection.replace_one(make_document(kvp("region", object.region), kvp("bucket", object.bucket), kvp("key", object.key)), object.ToDocument());
             log_trace_stream(_logger) << "Object updated: " << object.ToString() << std::endl;
 
         } catch (mongocxx::exception::system_error &e) {
@@ -247,10 +233,8 @@ namespace AwsMock::Database {
     Entity::S3::Object S3Database::GetObject(const std::string &region, const std::string &bucket, const std::string &key) {
 
         try {
-            bsoncxx::builder::stream::document filter{};
-            filter << "region" << region << "bucket" << bucket << "key" << key << bsoncxx::builder::stream::finalize;
-
-            mongocxx::stdx::optional<bsoncxx::document::value> mResult = _objectCollection.find_one({filter});
+            mongocxx::stdx::optional<bsoncxx::document::value>
+                mResult = _objectCollection.find_one(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key)));
             if (!mResult->empty()) {
                 Entity::S3::Object result;
                 result.FromDocument(mResult);
@@ -268,10 +252,7 @@ namespace AwsMock::Database {
     long S3Database::ObjectCount(const Entity::S3::Bucket &bucket) {
 
         try {
-            bsoncxx::builder::stream::document filter{};
-            filter << "region" << bucket.region << "bucket" << bucket.name << bsoncxx::builder::stream::finalize;
-
-            long count = _objectCollection.count_documents({filter});
+            long count = _objectCollection.count_documents(make_document(kvp("region", bucket.region), kvp("bucket", bucket.name)));
             log_trace_stream(_logger) << "Object count: " << count << std::endl;
             return count;
 
@@ -284,10 +265,7 @@ namespace AwsMock::Database {
     void S3Database::DeleteObject(const Entity::S3::Object &object) {
 
         try {
-            bsoncxx::builder::stream::document filter{};
-            filter << "region" << object.region << "bucket" << object.bucket << "key" << object.key << bsoncxx::builder::stream::finalize;
-
-            auto result = _objectCollection.delete_many({filter});
+            auto result = _objectCollection.delete_many(make_document(kvp("region", object.region), kvp("bucket", object.bucket), kvp("key", object.key)));
             log_debug_stream(_logger) << "Objects deleted, count: " << result->deleted_count() << std::endl;
 
         } catch (mongocxx::exception::system_error &e) {
@@ -332,7 +310,8 @@ namespace AwsMock::Database {
                     .event=it,
                     .notificationId=bucketNotification.notificationId,
                     .queueArn=bucketNotification.queueArn,
-                    .lambdaArn=bucketNotification.lambdaArn};
+                    .lambdaArn=bucketNotification.lambdaArn
+                };
                 internBucket.notifications.emplace_back(notification);
             }
 

@@ -132,7 +132,7 @@ namespace AwsMock::Service {
 
             Database::Entity::S3::BucketList bucketList = _database->ListBuckets();
             auto listAllBucketResponse = Dto::S3::ListAllBucketResponse(bucketList);
-            log_info_stream(_logger) << "Count all buckets, size: " << bucketList.size() << std::endl;
+            log_debug_stream(_logger) << "Count all buckets, size: " << bucketList.size() << std::endl;
 
             return listAllBucketResponse;
 
