@@ -1,4 +1,4 @@
-#/bin/bash
+#!/usr/bin/env bash
 
 #
 # Lambda function
@@ -14,17 +14,20 @@ function create_lambda_function () {
   zipfile=$3
   handler=$4
 
-  if [ "$(lambda_exists $function)" -eq 0 ]; then
+  if [ "$(lambda_exists "$function")" -eq 0 ]; then
     awsmock lambda create-function \
-      --function-name "$function" \
-      --runtime "$runtime" \
-      --timeout 900 \
-      --memory-size 2024 \
-      --environment "file://./lambda/$1-env.json" \
-      --handler "$handler" \
-      --region eu-central-1 \
-      --zip-file "fileb:///tmp/awsmock/data/lambda/$zipfile" \
-      --role arn:aws:iam::000000000000:role/lambda-role
+    --function-name "$function" \
+    --runtime "$runtime" \
+    --timeout 120 \
+    --memory-size 2024 \
+    --environment "file://./lambda/$1-env.json" \
+    --tags tag=latest \
+    --ephemeral-storage Size=10240 \
+    --handler "$handler" \
+    --region eu-central-1 \
+    --zip-file "fileb://./testdata/lambda/$zipfile" \
+    --role arn:aws:iam::000000000000:role/lambda-role \
+    --cli-read-timeout 0
     echo "Lambda function $1 created"
   else
     echo "Lambda function $1 exists already"

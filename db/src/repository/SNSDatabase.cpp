@@ -2,7 +2,7 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#include "awsmock/db/SNSDatabase.h"
+#include "awsmock/repository/SNSDatabase.h"
 
 namespace AwsMock::Database {
 

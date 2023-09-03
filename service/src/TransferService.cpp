@@ -8,7 +8,7 @@ namespace AwsMock::Service {
 
     TransferService::TransferService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("TransferService")), _configuration(configuration) {
 
-         // Initialize environment
+        // Initialize environment
         _accountId = _configuration.getString("awsmock.account.id", "000000000000");
         _transferDatabase = std::make_unique<Database::TransferDatabase>(_configuration);
         log_debug_stream(_logger) << "Transfer service initialized" << std::endl;
@@ -16,29 +16,27 @@ namespace AwsMock::Service {
 
     Dto::Transfer::CreateTransferResponse
     TransferService::CreateTransferServer(Dto::Transfer::CreateTransferRequest &request) {
+
         log_debug_stream(_logger) << "Create transfer server" << std::endl;
+
+        // Check existence
+        if (!_transferDatabase->TransferExists(request.region, request.protocols)) {
+            throw Core::ServiceException("Transfer server exists already", 403);
+        }
 
         std::string serverId = "s-" + Poco::toLower(Core::StringUtils::GenerateRandomHexString(20));
 
         Database::Entity::Transfer::Transfer transferEntity;
         std::string transferArn = Core::AwsUtils::CreateTransferArn(request.region, _accountId, serverId);
 
-        if (_transferDatabase->TransferExists(request.region, request.protocols)) {
+        // Create entity
+        transferEntity = {.region=request.region, .serverId=serverId, .arn=transferArn, .protocols=request.protocols};
 
-            transferEntity = _transferDatabase->GetTransferByArn(transferArn);
+        // Add anonymous user
+        Database::Entity::Transfer::User anonymousUser = {.userName="anonymous", .password="123", .homeDirectory="/"};
+        transferEntity.users.emplace_back(anonymousUser);
 
-        } else {
-
-            // Create entity
-            transferEntity = {.region=request.region, .serverId=serverId, .arn=transferArn, .protocols=request.protocols};
-
-            // Add anonymous user
-            Database::Entity::Transfer::User anonymousUser = {.userName="anonymous", .password="123", .homeDirectory="/"};
-            transferEntity.users.emplace_back(anonymousUser);
-
-            transferEntity = _transferDatabase->CreateTransfer(transferEntity);
-
-        }
+        transferEntity = _transferDatabase->CreateTransfer(transferEntity);
 
         // Create response
         Dto::Transfer::CreateTransferResponse
@@ -68,7 +66,7 @@ namespace AwsMock::Service {
 
             // Get home directory
             std::string homeDirectory = request.userName;
-            if(!Core::StringUtils::IsNullOrEmpty(&request.homeDirectory)) {
+            if (!Core::StringUtils::IsNullOrEmpty(&request.homeDirectory)) {
                 homeDirectory = request.homeDirectory;
             }
 
@@ -91,7 +89,7 @@ namespace AwsMock::Service {
     Dto::Transfer::ListServerResponse TransferService::ListServers(const Dto::Transfer::ListServerRequest &request) {
 
         try {
-            std::vector<Database::Entity::Transfer::Transfer> servers = _transferDatabase->ListServers(request.region);
+            std::vector <Database::Entity::Transfer::Transfer> servers = _transferDatabase->ListServers(request.region);
 
             auto response = Dto::Transfer::ListServerResponse();
             response.nextToken = Poco::UUIDGenerator().createRandom().toString();

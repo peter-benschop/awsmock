@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/Configuration.h>
-#include <awsmock/db/LambdaDatabase.h>
+#include <awsmock/repository/LambdaDatabase.h>
 
 #define CONFIG_FILE "/tmp/aws-mock.properties"
 #define ARN "arn:aws:lambda:eu-central-1:000000000000:function:ftp-file-copy"
@@ -44,7 +44,7 @@ namespace AwsMock::Database {
     TEST_F(LambdaDatabaseTest, LambdaCreateTest) {
 
         // arrange
-        Entity::Lambda::Lambda lambda = {.region=_region, .function=FUNCTION, .runtime=RUNTIME, .role=ROLE, .handler=HANDLER, .size=1000};
+        Entity::Lambda::Lambda lambda = {.region=_region, .function=FUNCTION, .runtime=RUNTIME, .role=ROLE, .handler=HANDLER, .codeSize=1000};
 
         // act
         Entity::Lambda::Lambda result = _lambdaDatabase.CreateLambda(lambda);
@@ -59,7 +59,7 @@ namespace AwsMock::Database {
     TEST_F(LambdaDatabaseTest, LambdaExistsTest) {
 
         // arrange
-        Entity::Lambda::Lambda lambda = {.region=_region, .function=FUNCTION, .runtime=RUNTIME, .role=ROLE, .handler=HANDLER, .size=1000};
+        Entity::Lambda::Lambda lambda = {.region=_region, .function=FUNCTION, .runtime=RUNTIME, .role=ROLE, .handler=HANDLER, .codeSize=1000};
         _lambdaDatabase.CreateLambda(lambda);
 
         // act
@@ -72,7 +72,7 @@ namespace AwsMock::Database {
     TEST_F(LambdaDatabaseTest, LambdaGetByIdTest) {
 
         // arrange
-        Entity::Lambda::Lambda lambda = {.region=_region, .function=FUNCTION, .runtime=RUNTIME, .role=ROLE, .handler=HANDLER, .size=1000};
+        Entity::Lambda::Lambda lambda = {.region=_region, .function=FUNCTION, .runtime=RUNTIME, .role=ROLE, .handler=HANDLER, .codeSize=1000};
         lambda = _lambdaDatabase.CreateLambda(lambda);
 
         // act
@@ -114,7 +114,7 @@ namespace AwsMock::Database {
     TEST_F(LambdaDatabaseTest, LambdaListTest) {
 
         // arrange
-        Entity::Lambda::Lambda lambda = {.region=_region, .function=FUNCTION, .runtime=RUNTIME, .role=ROLE, .handler=HANDLER, .size=1000};
+        Entity::Lambda::Lambda lambda = {.region=_region, .function=FUNCTION, .runtime=RUNTIME, .role=ROLE, .handler=HANDLER, .codeSize=1000};
         lambda = _lambdaDatabase.CreateLambda(lambda);
 
         // act

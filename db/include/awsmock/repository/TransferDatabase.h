@@ -2,8 +2,8 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#ifndef AWSMOCK_DB_TRANSFERDATABASE_H
-#define AWSMOCK_DB_TRANSFERDATABASE_H
+#ifndef AWSMOCK_REPOSITORY_TRANSFERDATABASE_H
+#define AWSMOCK_REPOSITORY_TRANSFERDATABASE_H
 
 // C++ standard includes
 #include <string>
@@ -17,7 +17,7 @@
 #include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/db/Database.h>
+#include <awsmock/repository/Database.h>
 #include <awsmock/entity/transfer/Transfer.h>
 
 namespace AwsMock::Database {
@@ -172,4 +172,4 @@ namespace AwsMock::Database {
 
 } // namespace AwsMock::Database
 
-#endif // AWSMOCK_DB_TRANSFERDATABASE_H
+#endif // AWSMOCK_REPOSITORY_TRANSFERDATABASE_H

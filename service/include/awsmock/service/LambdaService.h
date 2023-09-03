@@ -23,13 +23,13 @@
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
-#include <awsmock/db/LambdaDatabase.h>
-#include <awsmock/db/S3Database.h>
 #include <awsmock/dto/s3/EventNotification.h>
 #include <awsmock/dto/lambda/CreateFunctionRequest.h>
 #include <awsmock/dto/lambda/CreateFunctionResponse.h>
 #include <awsmock/dto/lambda/ListFunctionResponse.h>
 #include <awsmock/dto/lambda/DeleteFunctionRequest.h>
+#include <awsmock/repository/LambdaDatabase.h>
+#include <awsmock/repository/S3Database.h>
 #include <awsmock/service/DockerService.h>
 
 namespace AwsMock::Service {
@@ -51,7 +51,7 @@ namespace AwsMock::Service {
        * @param request create lambda request
        * @return CreateFunctionResponse
        */
-      Dto::Lambda::CreateFunctionResponse CreateFunctionConfiguration(Dto::Lambda::CreateFunctionRequest &request);
+      Dto::Lambda::CreateFunctionResponse CreateFunction(Dto::Lambda::CreateFunctionRequest &request);
 
       /**
        * List lambda functions
@@ -59,7 +59,7 @@ namespace AwsMock::Service {
        * @param region AWS region name
        * @return CreateFunctionResponse
        */
-      Dto::Lambda::ListFunctionResponse ListFunctionConfiguration(const std::string &region);
+      Dto::Lambda::ListFunctionResponse ListFunctions(const std::string &region);
 
       /**
        * Invoke lambda function
@@ -92,11 +92,6 @@ namespace AwsMock::Service {
     private:
 
       /**
-       * Initialize the service
-       */
-      void Initialize();
-
-      /**
        * Creates an new image, in case the image does not exists inside the docker daemon.
        *
        * <p>It uses the docker service to actually create the image. The image size and the SHA256 are returned
@@ -105,8 +100,8 @@ namespace AwsMock::Service {
        * @param request create function request.
        * @param entity lambda entity.
        */
-      void CreateImage(const Dto::Lambda::CreateFunctionRequest &request,
-                       Database::Entity::Lambda::Lambda &lambdaEntity);
+      void CreateDockerImage(const Dto::Lambda::CreateFunctionRequest &request,
+                             Database::Entity::Lambda::Lambda &lambdaEntity);
 
       /**
        * Creates an new docker container, in case the container does not exists inside the docker daemon.
@@ -114,7 +109,7 @@ namespace AwsMock::Service {
        * @param request create function request.
        * @param entity lambda entity.
        */
-      void CreateContainer(const Dto::Lambda::CreateFunctionRequest &request, Database::Entity::Lambda::Lambda &lambdaEntity);
+      void CreateDockerContainer(const Dto::Lambda::CreateFunctionRequest &request, Database::Entity::Lambda::Lambda &lambdaEntity);
 
       /**
        * Unpack the provided ZIP file.
@@ -123,9 +118,10 @@ namespace AwsMock::Service {
        *
        * @param zipFile Base64 encoded zip file.
        * @param runtime AWS lambda runtime name
+       * @param fileName filename of the Base64 encoded and zipped code file
        * @return code directory
        */
-      std::string UnpackZipFile(const std::string &zipFile, const std::string &runtime);
+      std::string UnpackZipFile(const std::string &zipFile, const std::string &runtime, const std::string &fileName);
 
       /**
        * Converts the lambda environment to a vector of string, which is needed by the docker API
@@ -152,6 +148,11 @@ namespace AwsMock::Service {
        * Data directory
        */
       std::string _dataDir;
+
+      /**
+       * Lambda directory
+       */
+      std::string _lambdaDir;
 
       /**
        * Temp directory

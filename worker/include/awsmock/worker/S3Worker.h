@@ -29,8 +29,8 @@
 #include <awsmock/core/DirectoryWatcher.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/db/ServiceDatabase.h>
-#include <awsmock/db/S3Database.h>
+#include <awsmock/repository/ServiceDatabase.h>
+#include <awsmock/repository/S3Database.h>
 #include <awsmock/dto/s3/CreateBucketConstraint.h>
 #include <awsmock/dto/s3/PutObjectRequest.h>
 #include <awsmock/worker/AbstractWorker.h>

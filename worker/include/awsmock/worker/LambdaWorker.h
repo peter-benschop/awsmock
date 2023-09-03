@@ -16,8 +16,8 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/Logger.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/db/LambdaDatabase.h>
-#include <awsmock/db/ServiceDatabase.h>
+#include <awsmock/repository/LambdaDatabase.h>
+#include <awsmock/repository/ServiceDatabase.h>
 #include <awsmock/service/S3Service.h>
 #include <awsmock/worker/AbstractWorker.h>
 
@@ -40,11 +40,6 @@ namespace AwsMock::Worker {
     private:
 
       /**
-       * Initialization
-       */
-      void Initialize();
-
-      /**
        * Start all lambdas if they are not existing
        */
       void StartLambdaFunctions();
@@ -56,6 +51,16 @@ namespace AwsMock::Worker {
        * @param contentType HTTP content type
        */
       void SendCreateFunctionRequest(Dto::Lambda::CreateFunctionRequest &request, const std::string &contentType);
+
+      /**
+       * Returns the code from a local file.
+       *
+       * <p>The code will provided as a Base64 encoded zip file.</p>
+       *
+       * @param lambda lambda to get the code from.
+       * @return Dto::Lambda::Code
+       */
+      Dto::Lambda::Code GetCode(const Database::Entity::Lambda::Lambda &lambda);
 
       /**
        * Logger

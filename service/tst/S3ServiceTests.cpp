@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/db/S3Database.h>
+#include <awsmock/repository/S3Database.h>
 #include <awsmock/service/S3Service.h>
 
 #define REGION "eu-central-1"

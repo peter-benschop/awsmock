@@ -139,5 +139,83 @@ namespace AwsMock::Dto::Lambda {
       }
 
     };
+
+    struct Tags {
+
+      /**
+       * Tags
+       */
+      std::vector<std::pair<std::string, std::string>> tags;
+
+      /**
+       * Checks whether a tags with the given tags key exists.
+       *
+       * @param key key of the tags
+       * @return true if tags with the given key exists.
+       */
+      bool HasTag(const std::string &key) {
+          return find_if(tags.begin(), tags.end(), [key](const std::pair<std::string, std::string> &t) {
+            return t.first == key;
+          }) != tags.end();
+      }
+
+      /**
+       * Returns a given tags value by key
+       *
+       * @param eventName name of the event
+       * @return found notification or notifications.end().
+       */
+      std::string GetTagValue(const std::string &key) {
+          auto it = find_if(tags.begin(), tags.end(), [key](const std::pair<std::string, std::string> &t) {
+            return t.first == key;
+          });
+          return it->second;
+      }
+
+      /**
+       * Convert to a JSON string
+       *
+       * @return JSON string
+       */
+      void FromJson(Poco::JSON::Object::Ptr object) {
+
+          try {
+
+              Poco::JSON::Object::NameList nameList = object->getNames();
+              for (const auto &name : nameList) {
+                  tags.emplace_back(name, object->get(name).convert<std::string>());
+              }
+
+          } catch (Poco::Exception &exc) {
+              throw Core::ServiceException(exc.message(), 500);
+          }
+      }
+
+      /**
+       * Converts the DTO to a string representation.
+       *
+       * @return DTO as string for logging.
+       */
+      [[nodiscard]] std::string ToString() const {
+          std::stringstream ss;
+          ss << (*this);
+          return ss.str();
+      }
+
+      /**
+       * Stream provider.
+       *
+       * @return output stream
+       */
+      friend std::ostream &operator<<(std::ostream &os, const Tags &r) {
+          os << "Tags={tags=['";
+          for (const auto &tag : r.tags) {
+              os << tag.first << tag.second;
+          }
+          os << "]}";
+          return os;
+      }
+
+    };
 }
 #endif //AWSMOCK_DTO_LAMBDA_ENVIRONMENT_H

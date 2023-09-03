@@ -14,10 +14,10 @@
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
 #include <Poco/Dynamic/Var.h>
-#include "CreateFunctionResponse.h"
 
 // AwsMock includes
 #include <awsmock/dto/lambda/Environment.h>
+#include <awsmock/entity/lambda/Lambda.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -232,8 +232,11 @@ namespace AwsMock::Dto::Lambda {
       [[nodiscard]] std::string ToJson() {
 
           for (auto &lambda : lambdaList) {
-              functions.push_back({.codeSize=lambda.size, .functionArn=lambda.arn, .functionName=lambda.function, .handler=lambda.handler, .lastModified=lambda.modified,
-                                  });
+              functions.push_back({.codeSize=lambda.memorySize,
+                                      .functionArn=lambda.arn,
+                                      .functionName=lambda.function,
+                                      .handler=lambda.handler,
+                                      .lastModified=lambda.modified});
           }
 
           try {

@@ -2,8 +2,8 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#ifndef AWSMOCK_DB_SNSDATABASE_H
-#define AWSMOCK_DB_SNSDATABASE_H
+#ifndef AWSMOCK_REPOSITORY_SNSDATABASE_H
+#define AWSMOCK_REPOSITORY_SNSDATABASE_H
 
 // C++ standard includes
 #include <string>
@@ -22,8 +22,7 @@
 #include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/db/Database.h>
-#include <awsmock/db/SNSDatabase.h>
+#include <awsmock/repository/Database.h>
 #include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sns/Topic.h>
 
@@ -221,4 +220,4 @@ namespace AwsMock::Database {
 
 } // namespace AwsMock::Database
 
-#endif // AWSMOCK_DB_SNSDatabase_H
+#endif // AWSMOCK_REPOSITORY_SNSDatabase_H

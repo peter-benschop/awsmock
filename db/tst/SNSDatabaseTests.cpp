@@ -13,7 +13,7 @@
 
 // Local includes
 #include <awsmock/core/Configuration.h>
-#include <awsmock/db/SNSDatabase.h>
+#include <awsmock/repository/SNSDatabase.h>
 
 #define CONFIG_FILE "/tmp/aws-mock.properties"
 #define REGION "eu-central-1"

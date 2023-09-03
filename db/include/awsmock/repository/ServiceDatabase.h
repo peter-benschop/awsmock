@@ -2,22 +2,17 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#ifndef AWSMOCK_DB_SERVICEDATABASE_H
-#define AWSMOCK_DB_SERVICEDATABASE_H
+#ifndef AWSMOCK_REPOSITORY_SERVICEDATABASE_H
+#define AWSMOCK_REPOSITORY_SERVICEDATABASE_H
 
 // C++ standard includes
 #include <string>
-
-// MongoDB includes
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/json.hpp>
-#include <mongocxx/stdx.hpp>
 
 // AwsMock includes
 #include <awsmock/core/Logger.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
-#include <awsmock/db/Database.h>
+#include <awsmock/repository/Database.h>
 
 namespace AwsMock::Database {
 
@@ -56,4 +51,4 @@ namespace AwsMock::Database {
 
 } // namespace AwsMock::Database
 
-#endif //AWSMOCK_DB_SERVICEDATABASE_H
+#endif // AWSMOCK_REPOSITORY_SERVICEDATABASE_H

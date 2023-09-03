@@ -101,7 +101,7 @@ namespace AwsMock::Service {
         log_trace_stream(_logger) << "Get queue attributes request, request: " << request.ToString() << std::endl;
 
         Database::Entity::SQS::Queue queue = _database->GetQueueByUrl(request.queueUrl);
-        _logger.debug() << "Got queue: " << queue.ToString() << std::endl;
+        log_debug_stream(_logger) << "Got queue: " << queue.ToString() << std::endl;
 
         Dto::SQS::GetQueueAttributesResponse response;
         if (request.attributeNames.size() == 1 && request.attributeNames[0] == "All") {
@@ -124,16 +124,17 @@ namespace AwsMock::Service {
     Dto::SQS::SetQueueAttributesResponse SQSService::SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request) {
         log_trace_stream(_logger) << "Put queue sqs request, queue: " << request.queueUrl << std::endl;
 
+        // Check existence
+        if (!_database->QueueUrlExists(request.region, request.queueUrl)) {
+            throw Core::ServiceException("Queue does not exist", 403);
+        }
+
         Dto::SQS::SetQueueAttributesResponse response;
         try {
-            // Check existence
-            if (!_database->QueueUrlExists(request.region, request.queueUrl)) {
-                throw Core::ServiceException("Queue does not exist", 500);
-            }
 
             // Get the queue
             Database::Entity::SQS::Queue queue = _database->GetQueueByUrl(request.queueUrl);
-            _logger.debug() << "Got queue: " << queue.ToString() << std::endl;
+            log_debug_stream(_logger) << "Got queue: " << queue.ToString() << std::endl;
 
             // Reset all attributes
             queue.attributes.policy = request.attributes["Policy"];
@@ -144,7 +145,7 @@ namespace AwsMock::Service {
 
             // Update database
             queue = _database->UpdateQueue(queue);
-            _logger.debug() << "Queue updated: " << queue.ToString() << std::endl;
+            log_debug_stream(_logger) << "Queue updated: " << queue.ToString() << std::endl;
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "SQS delete queue failed, message: " << ex.message() << std::endl;
@@ -160,7 +161,7 @@ namespace AwsMock::Service {
         try {
             // Check existence
             if (!_database->QueueUrlExists(request.region, request.queueUrl)) {
-                throw Core::ServiceException("Queue does not exist", 500);
+                throw Core::ServiceException("Queue does not exist", 403);
             }
 
             // Delete all messages in queue

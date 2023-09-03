@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
-#include <awsmock/db/SQSDatabase.h>
+#include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/SQSService.h>
 
 #define REGION "eu-central-1"

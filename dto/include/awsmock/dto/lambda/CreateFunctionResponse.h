@@ -18,6 +18,7 @@
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/dto/lambda/Environment.h>
+#include <awsmock/dto/lambda/EphemeralStorage.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -123,6 +124,11 @@ namespace AwsMock::Dto::Lambda {
        * Code SHA256
        */
       std::string codeSha256;
+
+      /**
+       * Temporary disk space in MB
+       */
+      EphemeralStorage ephemeralStorage;
 
       /**
        * Modified

@@ -23,7 +23,6 @@
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
-#include <awsmock/db/TransferDatabase.h>
 #include <awsmock/dto/transfer/CreateTransferRequest.h>
 #include <awsmock/dto/transfer/CreateTransferResponse.h>
 #include <awsmock/dto/transfer/CreateUserRequest.h>
@@ -33,6 +32,7 @@
 #include <awsmock/dto/transfer/ListServerResponse.h>
 #include <awsmock/dto/transfer/StartServerRequest.h>
 #include <awsmock/dto/transfer/StopServerRequest.h>
+#include <awsmock/repository/TransferDatabase.h>
 #include <awsmock/service/FtpServer.h>
 
 namespace AwsMock::Service {

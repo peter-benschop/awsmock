@@ -19,7 +19,7 @@ namespace AwsMock::Service {
 
             if(action == "functions/") {
 
-                Dto::Lambda::ListFunctionResponse lambdaResponse = _lambdaService.ListFunctionConfiguration(region);
+                Dto::Lambda::ListFunctionResponse lambdaResponse = _lambdaService.ListFunctions(region);
                 SendOkResponse(response, lambdaResponse.ToJson());
             }*/
 

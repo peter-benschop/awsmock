@@ -8,15 +8,12 @@ namespace AwsMock::Service {
 
     LambdaService::LambdaService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("LambdaService")),
                                                                              _configuration(configuration) {
-        Initialize();
-    }
-
-    void LambdaService::Initialize() {
 
         // Initialize environment
         _accountId = _configuration.getString("awsmock.account.id", "000000000000");
         _dataDir = _configuration.getString("awsmock.data.dir", "/tmp/awsmock/data");
         _tempDir = _dataDir + Poco::Path::separator() + "tmp";
+        _lambdaDir = _dataDir + Poco::Path::separator() + "lambda";
         _lambdaDatabase = std::make_shared<Database::LambdaDatabase>(_configuration);
         _s3Database = std::make_shared<Database::S3Database>(_configuration);
         _dockerService = std::make_shared<Service::DockerService>(_configuration);
@@ -28,9 +25,8 @@ namespace AwsMock::Service {
         log_debug_stream(_logger) << "Lambda service initialized" << std::endl;
     }
 
-    Dto::Lambda::CreateFunctionResponse
-    LambdaService::CreateFunctionConfiguration(Dto::Lambda::CreateFunctionRequest &request) {
-        log_debug_stream(_logger) << "Create function configuration request, name: " + request.functionName << std::endl;
+    Dto::Lambda::CreateFunctionResponse LambdaService::CreateFunction(Dto::Lambda::CreateFunctionRequest &request) {
+        log_debug_stream(_logger) << "Create function request, name: " + request.functionName << std::endl;
 
         Database::Entity::Lambda::Lambda lambdaEntity;
         std::string lambdaArn = Core::AwsUtils::CreateLambdaArn(request.region, _accountId, request.functionName);
@@ -41,34 +37,55 @@ namespace AwsMock::Service {
 
         } else {
 
-            Database::Entity::Lambda::Environment environment = {.variables=request.environmentVariables.variables};
-            lambdaEntity =
-                {.region=request.region, .user=request.user, .function=request.functionName, .runtime=request.runtime, .role=request.role,
-                    .handler=request.handler, .tag=IMAGE_TAG, .arn=lambdaArn, .environment=environment};
+            std::string codeFileName = _lambdaDir + Poco::Path::separator() + request.functionName + "-" + "latest" + ".zip";
+            Database::Entity::Lambda::Environment environment = {
+                .variables=request.environmentVariables.variables
+            };
+            Database::Entity::Lambda::Tags tags = {
+                .tags=request.tags.tags
+            };
+            lambdaEntity = {
+                .region=request.region,
+                .user=request.user,
+                .function=request.functionName,
+                .runtime=request.runtime,
+                .role=request.role,
+                .handler=request.handler,
+                .tags=tags,
+                .arn=lambdaArn,
+                .environment=environment,
+                .fileName=codeFileName
+            };
+        }
+
+        // Docker tag
+        std::string dockerTag = "latest";
+        if(lambdaEntity.tags.HasTag("tag")) {
+            dockerTag = lambdaEntity.tags.GetTagValue("tag");
         }
 
         // Build the docker image, if not existing
-        if (!_dockerService->ImageExists(request.functionName, lambdaEntity.tag)) {
+        if (!_dockerService->ImageExists(request.functionName, dockerTag)) {
 
-            CreateImage(request, lambdaEntity);
+            CreateDockerImage(request, lambdaEntity);
         }
 
         // Get the image struct
-        Dto::Docker::Image image = _dockerService->GetImageByName(request.functionName, lambdaEntity.tag);
-        lambdaEntity.size = image.size;
+        Dto::Docker::Image image = _dockerService->GetImageByName(request.functionName, dockerTag);
+        lambdaEntity.codeSize = image.size;
         lambdaEntity.imageId = image.id;
 
         // Create the container, if not existing
-        if (!_dockerService->ContainerExists(request.functionName, lambdaEntity.tag)) {
-            CreateContainer(request, lambdaEntity);
+        if (!_dockerService->ContainerExists(request.functionName, dockerTag)) {
+            CreateDockerContainer(request, lambdaEntity);
         }
 
         // Get the container
-        Dto::Docker::Container container = _dockerService->GetContainerByName(request.functionName, lambdaEntity.tag);
+        Dto::Docker::Container container = _dockerService->GetContainerByName(request.functionName, dockerTag);
         lambdaEntity.containerId = container.id;
 
         // Start container
-        _dockerService->StartContainer(container.id);
+        _dockerService->StartDockerContainer(container.id);
         lambdaEntity.lastStarted = Poco::DateTime();
         lambdaEntity.state = Database::Entity::Lambda::LambdaState::ACTIVE;
 
@@ -76,16 +93,26 @@ namespace AwsMock::Service {
         lambdaEntity = _lambdaDatabase->CreateOrUpdateLambda(lambdaEntity);
 
         // Create response
-        Dto::Lambda::CreateFunctionResponse
-            response
-            {.functionArn=lambdaEntity.arn, .functionName=request.functionName, .runtime=request.runtime, .role=request.role, .handler=request.handler,
-                .environment=request.environmentVariables, .memorySize=request.memorySize, .codeSize=lambdaEntity.size, .codeSha256=lambdaEntity.codeSha256,
-                .dockerImageId=image.id, .dockerContainerId=container.id};
+        Dto::Lambda::CreateFunctionResponse response{
+            .functionArn=lambdaEntity.arn,
+            .functionName=request.functionName,
+            .runtime=request.runtime,
+            .role=request.role,
+            .handler=request.handler,
+            .environment=request.environmentVariables,
+            .memorySize=request.memorySize,
+            .codeSize=lambdaEntity.codeSize,
+            .codeSha256=lambdaEntity.codeSha256,
+            .ephemeralStorage=request.ephemeralStorage,
+            .dockerImageId=image.id,
+            .dockerContainerId=container.id};
+
+        log_info_stream(_logger) << "Function created, name: " + request.functionName << std::endl;
 
         return response;
     }
 
-    Dto::Lambda::ListFunctionResponse LambdaService::ListFunctionConfiguration(const std::string &region) {
+    Dto::Lambda::ListFunctionResponse LambdaService::ListFunctions(const std::string &region) {
 
         try {
             std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase->ListLambdas(region);
@@ -187,42 +214,50 @@ namespace AwsMock::Service {
         log_debug_stream(_logger) << "Invocation request send, status: " << response.getStatus() << std::endl;
     }
 
-    void LambdaService::CreateImage(const Dto::Lambda::CreateFunctionRequest &request,
-                                    Database::Entity::Lambda::Lambda &lambdaEntity) {
+    void LambdaService::CreateDockerImage(const Dto::Lambda::CreateFunctionRequest &request,
+                                          Database::Entity::Lambda::Lambda &lambdaEntity) {
         if (!request.code.zipFile.empty()) {
 
             // Unzip provided zip-file into a temporary directory
-            std::string codeDir = UnpackZipFile(request.code.zipFile, lambdaEntity.runtime);
+            std::string codeDir = UnpackZipFile(request.code.zipFile, lambdaEntity.runtime, lambdaEntity.fileName);
 
             // Build the docker image using the docker service
             _dockerService->BuildImage(codeDir,
                                        request.functionName,
-                                       lambdaEntity.tag,
+                                       "latest",
                                        request.handler,
                                        lambdaEntity.runtime,
-                                       lambdaEntity.size,
+                                       lambdaEntity.codeSize,
                                        lambdaEntity.codeSha256,
                                        lambdaEntity.environment.variables);
 
             // Cleanup
             Core::DirUtils::DeleteDirectory(codeDir);
-            log_debug_stream(_logger) << "Docker image created, name: " << request.functionName << " size: " << lambdaEntity.size << std::endl;
+            log_debug_stream(_logger) << "Docker image created, name: " << request.functionName << " size: " << lambdaEntity.codeSize << std::endl;
 
         } else {
             log_error_stream(_logger) << "Empty lambda zip file" << std::endl;
         }
     }
 
-    void LambdaService::CreateContainer(const Dto::Lambda::CreateFunctionRequest &request, Database::Entity::Lambda::Lambda &lambdaEntity) {
+    void LambdaService::CreateDockerContainer(const Dto::Lambda::CreateFunctionRequest &request, Database::Entity::Lambda::Lambda &lambdaEntity) {
 
         std::vector<std::string> environment = GetEnvironment(lambdaEntity.environment);
-        Dto::Docker::CreateContainerResponse containerCreateResponse = _dockerService->CreateContainer(request.functionName, lambdaEntity.tag, environment);
+        Dto::Docker::CreateContainerResponse containerCreateResponse = _dockerService->CreateContainer(request.functionName, "latest", environment);
 
         lambdaEntity.hostPort = containerCreateResponse.hostPort;
         log_debug_stream(_logger) << "Lambda container created, hostPort: " << lambdaEntity.hostPort << std::endl;
     }
 
-    std::string LambdaService::UnpackZipFile(const std::string &zipFile, const std::string &runtime) {
+    std::string LambdaService::UnpackZipFile(const std::string &zipFile, const std::string &runtime, const std::string &fileName) {
+
+        // If we do not have a local file already, write the Base64 encoded file to lambda dir
+        if(!Core::FileUtils::FileExists(fileName)) {
+            std::ofstream ofs(fileName);
+            ofs << zipFile;
+            ofs.flush();
+            ofs.close();
+        }
 
         std::string decodedZipFile = Core::Crypto::Base64Decode(zipFile);
 
