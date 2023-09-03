@@ -226,6 +226,11 @@ namespace AwsMock::Service {
        * Docker API version
        */
       std::string _apiVersion;
+
+      /**
+       * Docker network mode, bridge or host
+       */
+      std::string _networkMode;
     };
 
 } //namespace AwsMock::Service
