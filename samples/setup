@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SERVER_ID="none"
+SERVERID="none"
 
 #
 # SQS Queues functions
@@ -118,15 +118,15 @@ function create_lambda_function () {
 # Transfer functions
 #
 function transfer_exists() {
-  awsmock transfer list-servers | grep ftp | wc -l
+  awsmock transfer list-servers | grep "Arn" | wc -l
 }
 
 function create_transfer_server {
   if [ "$(transfer_exists)" -eq 0 ]; then
-    SERVER_ID=$(awsmock transfer create-server --protocols ftp | jq -r '.ServerId') > /dev/null 2>&1
-    echo "Transfer server $SERVER_ID created"
+    SERVERID=$(awsmock transfer create-server --protocols ftp | jq -r '.ServerId') > /dev/null 2>&1
+    echo "Transfer server $SERVERID created"
   else
-    echo "Transfer server exists already"
+    echo "Transfer server $SERVERID exists already"
   fi
 }
 
@@ -145,16 +145,15 @@ function start_transfer_server {
 #
 create_s3_bucket transfer-server
 create_s3_bucket file-delivery
-create_s3_bucket file-delivery-origin
 create_s3_bucket json-parsing-results
 create_s3_bucket onix3-produktmeldungen
-create_s3_bucket transformed-images
-create_s3_bucket inventory-reports
 create_s3_bucket onix3-tmp-parsing-input
 create_s3_bucket onix3-tmp-anreicherungs-input
 create_s3_bucket katalogdaten-export-bucket
-create_s3_bucket vlb-preisreferenz-parsing-input
-create_s3_bucket vlb-preisreferenz-parsing-result
+create_s3_bucket transformed-images
+#create_s3_bucket inventory-reports
+#create_s3_bucket vlb-preisreferenz-parsing-input
+#create_s3_bucket vlb-preisreferenz-parsing-result
 
 #
 # Create SQS Queues
@@ -167,21 +166,21 @@ create_queue_with_dead_letter_queue ftp-file-distribution-onix
 create_queue_with_dead_letter_queue ftp-file-distribution-inventory-feed
 create_queue_with_dead_letter_queue image-input
 create_queue_with_dead_letter_queue image-result
-create_queue_with_dead_letter_queue vlb-preisreferenz-splitting-result
+#create_queue_with_dead_letter_queue image-delete-notification
 create_queue_with_dead_letter_queue parsing-result
-create_queue_with_dead_letter_queue artikel-transformations-service-artikel-ausgang
-create_queue_with_dead_letter_queue daten-lieferanten-service-daten-eingang
-create_queue_with_dead_letter_queue daten-datenlieferanten-notification
-create_queue_with_dead_letter_queue textannotation-result
-create_queue_with_dead_letter_queue bilderlink
 create_queue_with_dead_letter_queue produktmeldung-parsing
-create_queue_with_dead_letter_queue image-delete-notification
-create_queue_with_dead_letter_queue onix3-datenlieferant-updates
-create_queue_with_dead_letter_queue protokollierung-datenlieferant-updates
-create_queue_with_dead_letter_queue katalogdaten
 create_queue_with_dead_letter_queue onix3-tmp-parsing-input-event
 create_queue_with_dead_letter_queue onix3-tmp-anreicherungs-input-event
-create_queue_with_dead_letter_queue inventory-feed-parsing-result
+create_queue_with_dead_letter_queue onix3-datenlieferant-updates
+#create_queue_with_dead_letter_queue vlb-preisreferenz-splitting-result
+create_queue_with_dead_letter_queue artikel-transformations-service-artikel-ausgang
+create_queue_with_dead_letter_queue textannotation-result
+create_queue_with_dead_letter_queue bilderlink
+create_queue_with_dead_letter_queue katalogdaten
+#create_queue_with_dead_letter_queue daten-lieferanten-service-daten-eingang
+#create_queue_with_dead_letter_queue daten-datenlieferanten-notification
+#create_queue_with_dead_letter_queue protokollierung-datenlieferant-updates
+#create_queue_with_dead_letter_queue inventory-feed-parsing-result
 
 #
 # Create lambda function
@@ -206,11 +205,11 @@ create_sns_subscription protokollierung
 # Create FTP server, creates also the transfer-server S3 bucket
 #
 create_transfer_server
-create_transfer_user $SERVER_ID transfer_role ftpuser1 ftpuser1
-create_transfer_user $SERVER_ID transfer_role ftpuser2 ftpuser2
-create_transfer_user $SERVER_ID transfer_role ftpuser3 ftpuser3
-create_transfer_user $SERVER_ID transfer_role ftpuser4 ftpuser4
-start_transfer_server $SERVER_ID
+create_transfer_user $SERVERID transfer_role ftpuser1 ftpuser1
+create_transfer_user $SERVERID transfer_role ftpuser2 ftpuser2
+create_transfer_user $SERVERID transfer_role ftpuser3 ftpuser3
+create_transfer_user $SERVERID transfer_role ftpuser4 ftpuser4
+start_transfer_server $SERVERID
 
 #
 # Setup S3 bucket notification events
