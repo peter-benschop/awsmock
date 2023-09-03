@@ -85,7 +85,7 @@ namespace AwsMock::Database {
 
     bool S3Database::HasObjects(const Entity::S3::Bucket &bucket) {
 
-        int64_t count = _objectCollection.count_documents(make_document(kvp("region", bucket.region), kvp("name", bucket.name)));
+        int64_t count = _objectCollection.count_documents(make_document(kvp("region", bucket.region), kvp("bucket", bucket.name)));
         log_trace_stream(_logger) << "Objects exists: " << (count > 0 ? "true" : "false") << std::endl;
 
         return count > 0;
@@ -279,10 +279,7 @@ namespace AwsMock::Database {
         for (const auto &key : keys) {
             array.append(key);
         }
-        bsoncxx::builder::stream::document filter{};
-        filter << "$in" << array << bsoncxx::builder::stream::finalize;
-
-        auto result = _objectCollection.delete_many({filter});
+        auto result = _objectCollection.delete_many(make_document(kvp("bucket", bucket), kvp("key", make_document(kvp("$in", array)))));
         log_debug_stream(_logger) << "Objects deleted, count: " << result->result().deleted_count() << std::endl;
     }
 
