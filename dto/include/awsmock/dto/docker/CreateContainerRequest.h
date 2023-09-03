@@ -118,11 +118,8 @@ namespace AwsMock::Dto::Docker {
 
               hostConfigObject.set("PortBindings", portBindingsObject);
 
-              Poco::JSON::Object gatewayPortObject;
-              gatewayPortObject.set("host.docker.internal", "172.17.0.1");
-
               Poco::JSON::Array extraHostsArray;
-              extraHostsArray.add(gatewayPortObject);
+              extraHostsArray.add("host.docker.internal:172.17.0.1");
 
               hostConfigObject.set("ExtraHosts", extraHostsArray);
               rootJson.set("HostConfig", hostConfigObject);
