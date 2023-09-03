@@ -123,9 +123,8 @@ function transfer_exists() {
 
 function create_transfer_server {
   if [ "$(transfer_exists)" -eq 0 ]; then
-    server_id=$(awsmock transfer create-server --protocols ftp | jq -r '.ServerId') > /dev/null 2>&1
-    export serverid=$server_id
-    echo "Transfer server $serverid created"
+    SERVER_ID=$(awsmock transfer create-server --protocols ftp | jq -r '.ServerId') > /dev/null 2>&1
+    echo "Transfer server $SERVER_ID created"
   else
     echo "Transfer server exists already"
   fi
@@ -144,6 +143,7 @@ function start_transfer_server {
 #
 # Create S3 buckets
 #
+create_s3_bucket transfer-server
 create_s3_bucket file-delivery
 create_s3_bucket file-delivery-origin
 create_s3_bucket json-parsing-results
@@ -206,8 +206,11 @@ create_sns_subscription protokollierung
 # Create FTP server, creates also the transfer-server S3 bucket
 #
 create_transfer_server
-create_transfer_user $serverid transfer_role ftpuser1 ftpuser1
-start_transfer_server $serverid
+create_transfer_user $SERVER_ID transfer_role ftpuser1 ftpuser1
+create_transfer_user $SERVER_ID transfer_role ftpuser2 ftpuser2
+create_transfer_user $SERVER_ID transfer_role ftpuser3 ftpuser3
+create_transfer_user $SERVER_ID transfer_role ftpuser4 ftpuser4
+start_transfer_server $SERVER_ID
 
 #
 # Setup S3 bucket notification events
