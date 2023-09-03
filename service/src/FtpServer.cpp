@@ -45,7 +45,6 @@ namespace AwsMock::Service {
             _ftpServer->addUser(userName, password, homeDir, fineftp::Permission::All);
         }
         log_info_stream(_logger) << "User added, userName: " << userName << std::endl;
-        RestartServer();
     }
 
     void FtpServer::RestartServer() {
@@ -67,5 +66,6 @@ namespace AwsMock::Service {
         while (_running) {
             Poco::Thread::sleep(1000);
         }
+
     }
 }
