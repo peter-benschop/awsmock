@@ -18,6 +18,11 @@ namespace AwsMock::Dto::SQS {
     struct DeleteMessageRequest {
 
       /**
+       * AWS region
+       */
+      std::string region;
+
+      /**
        * Queue URL
        */
       std::string queueUrl;
@@ -54,7 +59,8 @@ namespace AwsMock::Dto::SQS {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const DeleteMessageRequest &r) {
-          os << "DeleteMessageRequest={queueUrl='" + r.queueUrl + "' receiptHandle='" + r.receiptHandle + "' resource='" + r.resource + "' requestId='" + r.requestId + "'}";
+          os << "DeleteMessageRequest={region='" << r.region
+             << "' queueUrl='" + r.queueUrl + "' receiptHandle='" + r.receiptHandle + "' resource='" + r.resource + "' requestId='" + r.requestId + "'}";
           return os;
       }
 

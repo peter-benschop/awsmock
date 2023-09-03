@@ -62,16 +62,16 @@ namespace AwsMock::Service {
        * Checks whether a image exists.
        *
        * @param name image name
-       * @param tag image tag
+       * @param tag image tags
        * @return true if image exists, otherwise false
        */
       bool ImageExists(const std::string &name, const std::string &tag);
 
       /**
-       * Returns a image by name/tag.
+       * Returns a image by name/tags.
        *
        * @param name container name
-       * @param tag container tag
+       * @param tag container tags
        * @return Image
        */
       Dto::Docker::Image GetImageByName(const std::string &name, const std::string &tag);
@@ -81,7 +81,7 @@ namespace AwsMock::Service {
        *
        * @param codeDir code directory
        * @param name lambda function name, used as image name
-       * @param tag image tag
+       * @param tag image tags
        * @param handler lambda function handler
        * @param runtime lambda AWS runtime
        * @param fileSize size of the image file in bytes
@@ -99,10 +99,10 @@ namespace AwsMock::Service {
                       const std::vector<std::pair<std::string, std::string>> &environment);
 
       /**
-       * Delete an image by name/tag.
+       * Delete an image by name/tags.
        *
        * @param name container name
-       * @param tag container tag
+       * @param tag container tags
        */
       void DeleteImage(const std::string &name, const std::string &tag);
 
@@ -110,7 +110,7 @@ namespace AwsMock::Service {
        * Checks whether a container exists.
        *
        * @param name container name
-       * @param tag container tag
+       * @param tag container tags
        * @return true if container exists, otherwise false
        */
       bool ContainerExists(const std::string &name, const std::string &tag);
@@ -126,17 +126,17 @@ namespace AwsMock::Service {
        * Starts a container
        *
        * @param name image name
-       * @param tag image tag
+       * @param tag image tags
        * @param environment runtime environment variables
        * @return CreateContainerResponse
        */
       Dto::Docker::CreateContainerResponse CreateContainer(const std::string &name, const std::string &tag, const std::vector<std::string> &environment);
 
       /**
-       * Returns a container by name/tag.
+       * Returns a container by name/tags.
        *
        * @param name container name
-       * @param tag container tag
+       * @param tag container tags
        * @return Container
        */
       Dto::Docker::Container GetContainerByName(const std::string &name, const std::string &tag);
@@ -147,7 +147,7 @@ namespace AwsMock::Service {
        * @param id container ID
        * @return output string
        */
-      std::string StartContainer(const std::string &id);
+      std::string StartDockerContainer(const std::string &id);
 
       /**
        * Start the container

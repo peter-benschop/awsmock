@@ -8,11 +8,23 @@
 // C++ includes
 #include <string>
 #include <vector>
+#include <map>
+#include <iostream>
+#include <sstream>
+
+// MongoDB includes
+#include <bsoncxx/builder/basic/array.hpp>
+#include <bsoncxx/builder/basic/document.hpp>
+#include <mongocxx/stdx.hpp>
 
 // Poco includes
 #include <Poco/DateTime.h>
 #include <Poco/DateTimeFormat.h>
 #include <Poco/DateTimeFormatter.h>
+
+// AwsMock includes
+#include <awsmock/entity/lambda/Tags.h>
+#include <awsmock/entity/lambda/Environment.h>
 
 namespace AwsMock::Database::Entity::Lambda {
 
@@ -37,11 +49,11 @@ namespace AwsMock::Database::Entity::Lambda {
         {LambdaState::FAILED, "FAILED"},
     };
 
-    static std::string LambdaStateToString(LambdaState lambdaState) {
+    [[maybe_unused]] static std::string LambdaStateToString(LambdaState lambdaState) {
         return LambdaStateNames[lambdaState];
     }
 
-    static LambdaState LambdaStateFromString(const std::string &lambdaState) {
+    [[maybe_unused]] static LambdaState LambdaStateFromString(const std::string &lambdaState) {
         for(auto &it : LambdaStateNames) {
             if(it.second == lambdaState) {
                 return it.first;
@@ -104,25 +116,25 @@ namespace AwsMock::Database::Entity::Lambda {
         {LambdaStateReasonCode::FunctionError, "FunctionError"},
     };
 
-    static std::string LambdaStateReasonCodeToString(LambdaStateReasonCode lambdaStateReasonCode) {
+    [[maybe_unused]] static std::string LambdaStateReasonCodeToString(LambdaStateReasonCode lambdaStateReasonCode) {
         return LambdaStateReasonCodeNames[lambdaStateReasonCode];
     }
 
-    static LambdaStateReasonCode LambdaStateReasonCodeFromString(const std::string &lambdaStateReasonCode) {
-        for(auto &it : LambdaStateReasonCodeNames) {
-            if(it.second == lambdaStateReasonCode) {
+    [[maybe_unused]] static LambdaStateReasonCode LambdaStateReasonCodeFromString(const std::string &lambdaStateReasonCode) {
+        for (auto &it : LambdaStateReasonCodeNames) {
+            if (it.second == lambdaStateReasonCode) {
                 return it.first;
             }
         }
         return LambdaStateReasonCode::Idle;
     }
 
-    struct Environment {
+    struct EphemeralStorage {
 
       /**
-       * Variables
+       * Temporary disk space in MB. Default: 512 MB, Range: 512 - 10240 MB
        */
-      std::vector<std::pair<std::string, std::string>> variables;
+      long size = 512;
 
       /**
        * Converts the MongoDB document to an entity
@@ -131,12 +143,28 @@ namespace AwsMock::Database::Entity::Lambda {
        */
       [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
-          auto varDoc = mResult.value()["variables"].get_array();
-          for (auto &v : varDoc.value) {
-              for (auto &it : v.get_document().value) {
-                  variables.emplace_back(std::make_pair(it.key().to_string(), it.get_string().value.to_string()));
-              }
-          }
+          size = mResult.value()["size"].get_int64();
+      }
+
+      /**
+       * Converts the DTO to a string representation.
+       *
+       * @return DTO as string for logging.
+       */
+      [[nodiscard]] std::string ToString() const {
+          std::stringstream ss;
+          ss << (*this);
+          return ss.str();
+      }
+
+      /**
+       * Stream provider.
+       *
+       * @return output stream
+       */
+      friend std::ostream &operator<<(std::ostream &os, const EphemeralStorage &m) {
+          os << "EphemeralStorage={size='" << m.size << "'}";
+          return os;
       }
     };
 
@@ -178,9 +206,19 @@ namespace AwsMock::Database::Entity::Lambda {
       std::string handler;
 
       /**
-       * Size
+       * Memory size in MB, Default: 128, Range: 128 - 10240 MB
        */
-      long size;
+      long memorySize = 128;
+
+      /**
+       * Temporary dask space in MB, Default: 512, Range: 512 - 10240 MB
+       */
+      EphemeralStorage ephemeralStorage;
+
+      /**
+       * Size of the code in bytes
+       */
+      long codeSize;
 
       /**
        * Image ID
@@ -193,9 +231,9 @@ namespace AwsMock::Database::Entity::Lambda {
       std::string containerId;
 
       /**
-       * Tag
+       * Tags
        */
-      std::string tag;
+      Tags tags;
 
       /**
        * ARN
@@ -233,6 +271,11 @@ namespace AwsMock::Database::Entity::Lambda {
       std::string codeSha256;
 
       /**
+       * Filename of the code
+       */
+      std::string fileName;
+
+      /**
        * Last function start
        */
       Poco::DateTime lastStarted;
@@ -252,125 +295,35 @@ namespace AwsMock::Database::Entity::Lambda {
        *
        * @return entity as MongoDB document.
        */
-      [[nodiscard]] view_or_value<view, value> ToDocument() const {
-
-          // Convert environment to document
-          auto variablesDoc = bsoncxx::builder::basic::array{};
-          for (const auto &variables : environment.variables) {
-              variablesDoc.append(make_document(kvp(variables.first, variables.second)));
-          }
-          view_or_value<view, value> varDoc = make_document(kvp("variables", variablesDoc));
-
-          view_or_value<view, value> lambdaDoc = make_document(
-              kvp("region", region),
-              kvp("user", user),
-              kvp("function", function),
-              kvp("runtime", runtime),
-              kvp("role", role),
-              kvp("handler", handler),
-              kvp("size", size),
-              kvp("imageId", imageId),
-              kvp("containerId", containerId),
-              kvp("tag", tag),
-              kvp("arn", arn),
-              kvp("hostPort", hostPort),
-              kvp("codeSha256", codeSha256),
-              kvp("environment", varDoc),
-              kvp("state", LambdaStateToString(state)),
-              kvp("stateReason", stateReason),
-              kvp("stateReasonCode", LambdaStateReasonCodeToString(stateReasonCode)),
-              kvp("lastStarted", bsoncxx::types::b_date(std::chrono::milliseconds(lastStarted.timestamp().epochMicroseconds() / 1000))),
-              kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-              kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
-
-          return lambdaDoc;
-      }
+      [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
       /**
        * Converts the MongoDB document to an entity
        *
        * @return entity.
        */
-      void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
-
-          oid = mResult.value()["_id"].get_oid().value.to_string();
-          region = mResult.value()["region"].get_string().value.to_string();
-          user = mResult.value()["user"].get_string().value.to_string();
-          function = mResult.value()["function"].get_string().value.to_string();
-          runtime = mResult.value()["runtime"].get_string().value.to_string();
-          role = mResult.value()["role"].get_string().value.to_string();
-          handler = mResult.value()["handler"].get_string().value.to_string();
-          size = mResult.value()["size"].get_int64().value;
-          imageId = mResult.value()["imageId"].get_string().value.to_string();
-          containerId = mResult.value()["containerId"].get_string().value.to_string();
-          tag = mResult.value()["tag"].get_string().value.to_string();
-          arn = mResult.value()["arn"].get_string().value.to_string();
-          codeSha256 = mResult.value()["codeSha256"].get_string().value.to_string();
-          hostPort = mResult.value()["hostPort"].get_int32().value;
-          environment.FromDocument(mResult.value()["environment"].get_document().value);
-          state = LambdaStateFromString(mResult.value()["state"].get_string().value.to_string());
-          stateReason = mResult.value()["stateReason"].get_string().value.to_string();
-          stateReasonCode = LambdaStateReasonCodeFromString(mResult.value()["stateReasonCode"].get_string().value.to_string());
-          lastStarted = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date().value) / 1000));
-          created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-          modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
-      }
+      void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult);
 
       /**
        * Converts the MongoDB document to an entity
        *
        * @return entity.
        */
-      void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
-
-          oid = mResult.value()["_id"].get_oid().value.to_string();
-          region = mResult.value()["region"].get_string().value.to_string();
-          user = mResult.value()["user"].get_string().value.to_string();
-          function = mResult.value()["function"].get_string().value.to_string();
-          runtime = mResult.value()["runtime"].get_string().value.to_string();
-          role = mResult.value()["role"].get_string().value.to_string();
-          handler = mResult.value()["handler"].get_string().value.to_string();
-          size = mResult.value()["size"].get_int64().value;
-          imageId = mResult.value()["imageId"].get_string().value.to_string();
-          containerId = mResult.value()["containerId"].get_string().value.to_string();
-          tag = mResult.value()["tag"].get_string().value.to_string();
-          arn = mResult.value()["arn"].get_string().value.to_string();
-          codeSha256 = mResult.value()["codeSha256"].get_string().value.to_string();
-          hostPort = mResult.value()["hostPort"].get_int32().value;
-          environment.FromDocument(mResult.value()["environment"].get_document().value);
-          state = LambdaStateFromString(mResult.value()["state"].get_string().value.to_string());
-          stateReason = mResult.value()["stateReason"].get_string().value.to_string();
-          stateReasonCode = LambdaStateReasonCodeFromString(mResult.value()["stateReasonCode"].get_string().value.to_string());
-          lastStarted = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date().value) / 1000));
-          created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-          modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
-      }
+      void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
       /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.
        */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
+      [[nodiscard]] std::string ToString() const;
 
       /**
        * Stream provider.
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const Lambda &m) {
-          os << "Lambda={oid='" << m.oid << "' region='" << m.region << "' function='" << m.function << "'runtime='" << m.runtime << "' role='" << m.role <<
-             "' handler='" << m.handler << "' imageId='" << m.imageId << "' containerId='" << m.containerId << "' tag='" << m.tag << "' arn='" << m.arn <<
-             "' hostPort='" << m.hostPort << "' state='" << m.state << "' stateReason='" << m.stateReason << "' stateReasonCode='" << m.stateReasonCode <<
-             "' lastStarted='" << Poco::DateTimeFormatter().format(m.lastStarted, Poco::DateTimeFormat::HTTP_FORMAT) <<
-             "' created='" << Poco::DateTimeFormatter().format(m.created, Poco::DateTimeFormat::HTTP_FORMAT) <<
-             "' modified='" << Poco::DateTimeFormatter().format(m.modified, Poco::DateTimeFormat::HTTP_FORMAT) << "'}";
-          return os;
-      }
+      friend std::ostream &operator<<(std::ostream &os, const Lambda &m);
 
     };
 

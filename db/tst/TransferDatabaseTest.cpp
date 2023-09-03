@@ -14,7 +14,7 @@
 
 // Local includes
 #include <awsmock/core/Configuration.h>
-#include <awsmock/db/TransferDatabase.h>
+#include <awsmock/repository/TransferDatabase.h>
 
 // MongoDB includes
 #include <bsoncxx/builder/basic/document.hpp>

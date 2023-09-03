@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/db/SQSDatabase.h>
+#include <awsmock/repository/SQSDatabase.h>
 
 #define CONFIG_FILE "/tmp/aws-mock.properties"
 

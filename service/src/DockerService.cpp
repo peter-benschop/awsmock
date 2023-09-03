@@ -40,7 +40,7 @@ namespace AwsMock::Service {
     Dto::Docker::Image DockerService::GetImageByName(const std::string &name, const std::string &tag) {
 
         std::string output = _curlUtils.SendRequest("GET", "/" + _apiVersion + "/images/json?all=true");
-        log_debug_stream(_logger) << "List container request send to docker daemon, name: " << name << " tag: " << tag << std::endl;
+        log_debug_stream(_logger) << "List container request send to docker daemon, name: " << name << " tags: " << tag << std::endl;
         log_trace_stream(_logger) << "Response: " << Core::StringUtils::StripLineEndings(output) << std::endl;
 
         Dto::Docker::ListImageResponse response;
@@ -65,7 +65,7 @@ namespace AwsMock::Service {
                                    long &fileSize,
                                    std::string &codeSha256,
                                    const std::vector<std::pair<std::string, std::string>> &environment) {
-        log_debug_stream(_logger) << "Build image request, name: " << name << " tag: " << tag << " runtime: " << runtime << std::endl;
+        log_debug_stream(_logger) << "Build image request, name: " << name << " tags: " << tag << " runtime: " << runtime << std::endl;
 
         std::string dockerFile = WriteDockerFile(codeDir, handler, runtime, environment);
 
@@ -161,7 +161,7 @@ namespace AwsMock::Service {
         return response;
     }
 
-    std::string DockerService::StartContainer(const std::string &id) {
+    std::string DockerService::StartDockerContainer(const std::string &id) {
 
         std::string output = _curlUtils.SendRequest("POST", "/" + _apiVersion + "/containers/" + id + "/start");
         log_debug_stream(_logger) << "Sending start container request" << std::endl;
@@ -171,7 +171,7 @@ namespace AwsMock::Service {
     }
 
     std::string DockerService::StartContainer(const Dto::Docker::Container &container) {
-        return StartContainer(container.id);
+        return StartDockerContainer(container.id);
     }
 
     std::string DockerService::StopContainer(const Dto::Docker::Container &container) {

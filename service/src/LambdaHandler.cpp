@@ -18,7 +18,7 @@ namespace AwsMock::Service {
 
             if(action == "functions/") {
 
-                Dto::Lambda::ListFunctionResponse lambdaResponse = _lambdaService.ListFunctionConfiguration(region);
+                Dto::Lambda::ListFunctionResponse lambdaResponse = _lambdaService.ListFunctions(region);
                 SendOkResponse(response, lambdaResponse.ToJson());
             }
 
@@ -49,7 +49,6 @@ namespace AwsMock::Service {
         try {
             std::string version, action;
             GetVersionActionFromUri(request.getURI(), version, action);
-
             std::string body = GetBodyAsString(request);
 
             if(action == "functions") {
@@ -59,7 +58,7 @@ namespace AwsMock::Service {
                 lambdaRequest.region = region;
                 lambdaRequest.user = user;
 
-                Dto::Lambda::CreateFunctionResponse lambdaResponse = _lambdaService.CreateFunctionConfiguration(lambdaRequest);
+                Dto::Lambda::CreateFunctionResponse lambdaResponse = _lambdaService.CreateFunction(lambdaRequest);
                 SendOkResponse(response, lambdaResponse.ToJson());
 
             } else if(Core::StringUtils::Contains(action, "invocations")) {

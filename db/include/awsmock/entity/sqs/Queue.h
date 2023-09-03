@@ -16,6 +16,7 @@
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
+#include <mongocxx/stdx.hpp>
 
 // AwsMock includes
 #include <awsmock/core/ServiceException.h>

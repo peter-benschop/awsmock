@@ -9,6 +9,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <utility>
 
 // Poco includes
 #include <Poco/JSON/JSON.h>
@@ -17,7 +18,8 @@
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/dto/lambda/CreateFunctionResponse.h>
+#include <awsmock/dto/lambda/Environment.h>
+#include <awsmock/dto/lambda/EphemeralStorage.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -50,12 +52,42 @@ namespace AwsMock::Dto::Lambda {
        */
       std::string zipFile;
 
-      void FromJson(const Poco::JSON::Object::Ptr& jsonObject) {
-          Core::JsonUtils::GetJsonValueString("ZipFile", jsonObject, zipFile);
-          Core::JsonUtils::GetJsonValueString("S3Bucket", jsonObject, s3Bucket);
-          Core::JsonUtils::GetJsonValueString("S3Key", jsonObject, s3Key);
-          Core::JsonUtils::GetJsonValueString("S3ObjectVersion", jsonObject, s3ObjectVersion);
-          Core::JsonUtils::GetJsonValueString("ImageUri", jsonObject, imageUri);
+      /**
+       * Convert from a JSON object.
+       *
+       * @param jsonObject json object
+       */
+      void FromJson(Poco::JSON::Object::Ptr jsonObject) {
+          try {
+              Core::JsonUtils::GetJsonValueString("S3Bucket", jsonObject, s3Bucket);
+              Core::JsonUtils::GetJsonValueString("S3Key", jsonObject, s3Key);
+              Core::JsonUtils::GetJsonValueString("S3ObjectVersion", jsonObject, s3ObjectVersion);
+              Core::JsonUtils::GetJsonValueString("ImageUri", jsonObject, imageUri);
+              Core::JsonUtils::GetJsonValueString("ZipFile", jsonObject, zipFile);
+          } catch (Poco::Exception &exc) {
+              throw Core::ServiceException(exc.message(), 500);
+          }
+      }
+
+      /**
+       * Creates a JSON string from the object.
+       *
+       * @return JSON string
+       */
+      [[nodiscard]] Poco::JSON::Object ToJson() const {
+
+          Poco::JSON::Object rootObject;
+          try {
+              rootObject.set("ZipFile", zipFile);
+              rootObject.set("S3Bucket", s3Bucket);
+              rootObject.set("S3Key", s3Key);
+              rootObject.set("S3ObjectVersion", s3ObjectVersion);
+              rootObject.set("ImageUri", imageUri);
+
+          } catch (Poco::Exception &exc) {
+              throw Core::ServiceException(exc.message(), 500);
+          }
+          return rootObject;
       }
 
       /**
@@ -119,9 +151,14 @@ namespace AwsMock::Dto::Lambda {
       EnvironmentVariables environmentVariables;
 
       /**
-       * Memory size
+       * Memory size in MB. Default: 128, Range: 128 - 10240 MB
        */
-      long memorySize;
+      long memorySize = 128;
+
+      /**
+       * Temporary disk space in MB
+       */
+      EphemeralStorage ephemeralStorage;
 
       /**
        * Code
@@ -129,18 +166,27 @@ namespace AwsMock::Dto::Lambda {
       Code code;
 
       /**
+       * Tags
+       */
+      Tags tags;
+
+      /**
        * Creates a JSON string from the object.
        *
        * @return JSON string
        */
-      std::string ToJson() {
+      [[nodiscard]] std::string ToJson() const {
 
           try {
               Poco::JSON::Object rootJson;
+              rootJson.set("Region", region);
+              rootJson.set("User", user);
               rootJson.set("FunctionName", functionName);
               rootJson.set("Runtime", runtime);
               rootJson.set("Role", role);
+              rootJson.set("Handler", handler);
               rootJson.set("MemorySize", memorySize);
+              rootJson.set("Code", code.ToJson());
 
               std::ostringstream os;
               rootJson.stringify(os);
@@ -168,6 +214,16 @@ namespace AwsMock::Dto::Lambda {
               Core::JsonUtils::GetJsonValueString("Runtime", rootObject, runtime);
               Core::JsonUtils::GetJsonValueString("Role", rootObject, role);
               Core::JsonUtils::GetJsonValueString("Handler", rootObject, handler);
+
+              // Tags
+              if (rootObject->has("Tags")) {
+                  tags.FromJson(rootObject->getObject("Tags"));
+              }
+
+              // EphemeralStorage
+              if (rootObject->has("EphemeralStorage")) {
+                  ephemeralStorage.FromJson(rootObject->getObject("EphemeralStorage"));
+              }
 
               // Environment
               if (rootObject->has("Environment")) {
@@ -206,10 +262,8 @@ namespace AwsMock::Dto::Lambda {
        */
       friend std::ostream &operator<<(std::ostream &os, const CreateFunctionRequest &r) {
           os << "CreateFunctionRequest={region='" << r.region << "' user='" << r.user << "' functionName='" << r.functionName << "' runtime: '" << r.runtime <<
-          "' role='" << r.role << "' handler='" << r.handler << "' memorySize='" << std::to_string(r.memorySize) << "' {";
-          os << r.environmentVariables.ToString();
-          os << r.code.ToString();
-          os << "}";
+             "' role='" << r.role << "' handler='" << r.handler << "' memorySize='" << r.memorySize << "' ephemeralStorage='" << r.ephemeralStorage << "' tags='"
+             << r.tags << "' environment={" << r.environmentVariables.ToString() << "} code={" << r.code.ToString() << "}}";
           return os;
       }
     };

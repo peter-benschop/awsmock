@@ -13,7 +13,7 @@
 
 // Local includes
 #include <awsmock/core/Configuration.h>
-#include <awsmock/db/Database.h>
+#include <awsmock/repository/Database.h>
 
 #define CONFIG_FILE "/tmp/aws-mock.properties"
 

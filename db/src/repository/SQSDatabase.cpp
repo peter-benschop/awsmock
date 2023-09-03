@@ -2,7 +2,7 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#include "awsmock/db/SQSDatabase.h"
+#include "awsmock/repository/SQSDatabase.h"
 
 namespace AwsMock::Database {
 
@@ -42,10 +42,7 @@ namespace AwsMock::Database {
 
     bool SQSDatabase::QueueArnExists(const std::string &queueArn) {
 
-        bsoncxx::builder::stream::document filter{};
-        filter << "queueArn" << queueArn << bsoncxx::builder::stream::finalize;
-
-        int64_t count = _queueCollection.count_documents({filter});
+        int64_t count = _queueCollection.count_documents(make_document(kvp("queueArn", queueArn)));
         log_trace_stream(_logger) << "Queue exists: " << (count > 0 ? "true" : "false") << std::endl;
 
         return count > 0;

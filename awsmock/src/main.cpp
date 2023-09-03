@@ -35,7 +35,7 @@
 #include <awsmock/config/Configuration.h>
 #include <awsmock/controller/Router.h>
 #include <awsmock/controller/RestService.h>
-#include <awsmock/db/Database.h>
+#include <awsmock/repository/Database.h>
 #include <awsmock/service/LambdaServer.h>
 #include <awsmock/service/S3Server.h>
 #include <awsmock/service/SQSServer.h>

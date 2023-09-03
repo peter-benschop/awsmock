@@ -16,9 +16,9 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/Logger.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/db/ServiceDatabase.h>
-#include <awsmock/db/TransferDatabase.h>
 #include <awsmock/dto/s3/CreateBucketConstraint.h>
+#include <awsmock/repository/ServiceDatabase.h>
+#include <awsmock/repository/TransferDatabase.h>
 #include <awsmock/service/FtpServer.h>
 #include <awsmock/worker/AbstractWorker.h>
 

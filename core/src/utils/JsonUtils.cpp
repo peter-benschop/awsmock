@@ -42,7 +42,7 @@ namespace AwsMock::Core {
     void JsonUtils::GetJsonValueDate(const std::string &name, Poco::JSON::Object::Ptr jsonObject, Poco::DateTime &attribute) {
         if (jsonObject->has(name)) {
             int tz;
-            std::string stringValue = jsonObject->get(name).convert<std::string>();
+            auto stringValue = jsonObject->get(name).convert<std::string>();
             Poco::DateTimeParser::parse(Poco::DateTimeFormat::ISO8601_FRAC_FORMAT, stringValue, attribute, tz);
         }
     }

@@ -2,7 +2,7 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#include "awsmock/db/S3Database.h"
+#include "awsmock/repository/S3Database.h"
 
 namespace AwsMock::Database {
 

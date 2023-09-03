@@ -2,8 +2,8 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#ifndef AWSMOCK_DB_DATABASE_H
-#define AWSMOCK_DB_DATABASE_H
+#ifndef AWSMOCK_REPOSITORY_DATABASE_H
+#define AWSMOCK_REPOSITORY_DATABASE_H
 
 // C++ standard includes
 #include <string>
@@ -97,4 +97,4 @@ namespace AwsMock::Database {
 
 } // namespace AwsMock::Database
 
-#endif //AWSMOCK_DB_DATABASE_H
+#endif // AWSMOCK_REPOSITORY_DATABASE_H

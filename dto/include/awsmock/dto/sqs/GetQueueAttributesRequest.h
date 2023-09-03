@@ -19,6 +19,11 @@ namespace AwsMock::Dto::SQS {
     struct GetQueueAttributesRequest {
 
       /**
+       * AWS region
+       */
+      std::string region;
+
+      /**
        * Queue URL
        */
       std::string queueUrl;
@@ -55,7 +60,8 @@ namespace AwsMock::Dto::SQS {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const GetQueueAttributesRequest &r) {
-          os << "GetQueueAttributesRequest={queueUrl='" + r.queueUrl + "' resource='" + r.resource + "' requestId='" + r.requestId + "' attributeNames=[";
+          os << "GetQueueAttributesRequest={region='" << r.region
+             << "' queueUrl='" + r.queueUrl + "' resource='" + r.resource + "' requestId='" + r.requestId + "' attributeNames=[";
           for(const auto &it : r.attributeNames) {
               os << it;
           }

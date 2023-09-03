@@ -2,7 +2,7 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#include "awsmock/db/TransferDatabase.h"
+#include "awsmock/repository/TransferDatabase.h"
 
 namespace AwsMock::Database {
 

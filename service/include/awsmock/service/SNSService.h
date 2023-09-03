@@ -25,7 +25,7 @@
 #include <awsmock/dto/sns/SubscribeResponse.h>
 #include <awsmock/dto/sqs/CreateMessageRequest.h>
 #include <awsmock/dto/sqs/CreateMessageResponse.h>
-#include <awsmock/db/SNSDatabase.h>
+#include <awsmock/repository/SNSDatabase.h>
 #include <awsmock/service/SQSService.h>
 
 #define SQS_PROTOCOL "sqs"

@@ -19,7 +19,7 @@ namespace AwsMock {
         ForwardRequest(request, response, _lambdaServiceHost, _lambdaServicePort);
     }
 
-    void LambdaHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
+    void LambdaHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
 
         Core::MetricServiceTimer measure(_metricService, HTTP_PUT_TIMER);
         log_debug_stream(_logger) << "Lambda PUT request, URI: " << request.getURI() << " region: " << region << " user: " + user << std::endl;
@@ -28,7 +28,7 @@ namespace AwsMock {
         ForwardRequest(request, response, _lambdaServiceHost, _lambdaServicePort);
     }
 
-    void LambdaHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
+    void LambdaHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
 
         Core::MetricServiceTimer measure(_metricService, HTTP_POST_TIMER);
         log_debug_stream(_logger) << "Lambda POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
@@ -39,8 +39,8 @@ namespace AwsMock {
 
     void LambdaHandler::handleDelete(Poco::Net::HTTPServerRequest &request,
                                      Poco::Net::HTTPServerResponse &response,
-                                     [[maybe_unused]]const std::string &region,
-                                     [[maybe_unused]]const std::string &user) {
+                                     const std::string &region,
+                                     const std::string &user) {
 
         Core::MetricServiceTimer measure(_metricService, HTTP_DELETE_TIMER);
         log_debug_stream(_logger) << "Lambda DELETE request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;

@@ -2,7 +2,7 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#include "awsmock/db/LambdaDatabase.h"
+#include "awsmock/repository/LambdaDatabase.h"
 
 namespace AwsMock::Database {
 

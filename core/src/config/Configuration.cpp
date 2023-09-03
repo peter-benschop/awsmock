@@ -24,7 +24,7 @@ namespace AwsMock::Core {
         DefineProperty("awsmock.core.log.level", "AWSMOCK_CORE_LOG_LEVEL", "information");
 
         // Database
-        DefineProperty("awsmock.db.file", "AWSMOCK_DB_FILE", "/tmp/data/db");
+        DefineProperty("awsmock.repository.file", "AWSMOCK_DB_FILE", "/tmp/data/repository");
     }
 
     void Configuration::DefineProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue) {

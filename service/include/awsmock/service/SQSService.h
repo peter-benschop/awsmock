@@ -34,7 +34,7 @@
 #include "awsmock/dto/sqs/PurgeQueueResponse.h"
 #include "awsmock/dto/sqs/ReceiveMessageRequest.h"
 #include "awsmock/dto/sqs/ReceiveMessageResponse.h"
-#include "awsmock/db/SQSDatabase.h"
+#include "awsmock/repository/SQSDatabase.h"
 
 #define DEFAULT_ACCOUNT_ID "000000000000"
 

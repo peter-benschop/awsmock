@@ -2,7 +2,7 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#include "awsmock/db/Database.h"
+#include "awsmock/repository/Database.h"
 
 namespace AwsMock::Database {
 

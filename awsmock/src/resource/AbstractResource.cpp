@@ -3,9 +3,7 @@
 
 namespace AwsMock::Resource {
 
-    AbstractResource::AbstractResource() : _logger(Poco::Logger::get("AbstractResource")), _baseUrl(), _requestURI(), _requestHost() {
-        Core::Logger::SetDefaultConsoleLogger("AbstractResource");
-    }
+    AbstractResource::AbstractResource() : _logger(Poco::Logger::get("AbstractResource")), _baseUrl(), _requestURI(), _requestHost() {}
 
     AbstractResource::~AbstractResource() = default;
 
@@ -279,16 +277,16 @@ namespace AwsMock::Resource {
 
         // Create HTTP request and set headers
         Poco::Net::HTTPClientSession session(host, port);
-        log_debug_stream(_logger) << "Forward session, host: " << host << " port: " << port << std::endl;
+        log_trace_stream(_logger) << "Forward session, host: " << host << " port: " << port << std::endl;
 
         // Send request with body
         Poco::StreamCopier::copyStream(request.stream(), session.sendRequest(request));
-        log_debug_stream(_logger) << "Forward request send" << std::endl;
+        log_trace_stream(_logger) << "Forward request send" << std::endl;
 
         // Get the response
         std::stringstream body;
         Poco::StreamCopier::copyStream(session.receiveResponse(response), body);
-        log_debug_stream(_logger) << "Got response from backend service" << std::endl;
+        log_trace_stream(_logger) << "Got response from backend service" << std::endl;
 
         Resource::HeaderMap headerMap;
         auto i = response.begin();
@@ -302,7 +300,7 @@ namespace AwsMock::Resource {
         } else {
             SendErrorResponse(response, body.str());
         }
-        log_debug_stream(_logger) << "Backend service response send back to client" << std::endl;
+        log_trace_stream(_logger) << "Backend service response send back to client" << std::endl;
     }
 
     void AbstractResource::SetHeaders(Poco::Net::HTTPServerResponse &response, unsigned long contentLength, HeaderMap *extraHeader) {
