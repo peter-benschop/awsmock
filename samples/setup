@@ -126,6 +126,7 @@ function create_transfer_server {
     SERVERID=$(awsmock transfer create-server --protocols ftp | jq -r '.ServerId') > /dev/null 2>&1
     echo "Transfer server $SERVERID created"
   else
+    SERVERID=$(awsmock transfer list-servers | jq -r '.Servers[].ServerId')
     echo "Transfer server $SERVERID exists already"
   fi
 }

@@ -67,21 +67,21 @@ function delete_lambda_function(){
 }
 
 #
-# Transfer server
-#
-function transfer_exists() {
-  awsmock transfer list-servers | grep ftp | wc -l
-}
+ # Transfer server
+ #
+ function transfer_exists() {
+   awsmock transfer list-servers | grep "Arn" | wc -l
+ }
 
-function delete_transfer_server {
-  if [ "$(transfer_exists)" -gt 0 ]; then
-    server_id=$(awsmock transfer create-server --protocols ftp | jq -r '.ServerId') > /dev/null 2>&1
-    awsmock transfer delete-server --server-name "$server_id" > /dev/null 2>&1
-    echo "Transfer server $server_id deleted"
-  else
-    echo "Transfer server does not exist"
-  fi
-}
+ function delete_transfer_server {
+   if [ "$(transfer_exists)" -gt 0 ]; then
+     SERVERID=$(awsmock transfer list-servers | jq -r '.Servers[].ServerId')
+     awsmock transfer delete-server --server-id "$SERVERID" > /dev/null 2>&1
+     echo "Transfer server $SERVERID deleted"
+   else
+     echo "Transfer server does not exist"
+   fi
+ }
 
 #
 # Main
