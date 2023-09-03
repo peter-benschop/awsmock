@@ -29,6 +29,7 @@ namespace AwsMock::Service {
         std::string homeDir = _watcherDir + Poco::Path::separator() + _bucket + Poco::Path::separator() + homeDirectory;
         if (!Core::DirUtils::DirectoryExists(homeDir)) {
             Core::DirUtils::MakeDirectory(homeDir);
+            log_debug_stream(_logger) << "Home dir created, homeDirectory: " << homeDirectory << std::endl;
         }
         return homeDir;
     }
@@ -43,7 +44,8 @@ namespace AwsMock::Service {
         } else {
             _ftpServer->addUser(userName, password, homeDir, fineftp::Permission::All);
         }
-        //RestartServer();
+        log_info_stream(_logger) << "User added, userName: " << userName << std::endl;
+        RestartServer();
     }
 
     void FtpServer::RestartServer() {
