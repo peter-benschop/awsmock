@@ -20,7 +20,7 @@ namespace AwsMock::Service {
         log_debug_stream(_logger) << "Create transfer server" << std::endl;
 
         // Check existence
-        if (!_transferDatabase->TransferExists(request.region, request.protocols)) {
+        if (_transferDatabase->TransferExists(request.region, request.protocols)) {
             throw Core::ServiceException("Transfer server exists already", 403);
         }
 
