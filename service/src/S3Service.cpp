@@ -205,13 +205,13 @@ namespace AwsMock::Service {
         std::vector<std::string> files = Core::DirUtils::ListFilesByPrefix(uploadDir, uploadId);
 
         // Create bucket directory, if not existing
-        std::string bucketDir = _dataDir + Poco::Path::separator() + bucket;
-        if (!Core::DirUtils::DirectoryExists(bucketDir)) {
-            Core::DirUtils::MakeDirectory(bucketDir);
+        std::string fileDir = _dataDir + Poco::Path::separator() + bucket + Poco::Path::separator() + GetDirFromKey(key);
+        if (!Core::DirUtils::DirectoryExists(fileDir)) {
+            Core::DirUtils::MakeDirectory(fileDir);
         }
 
         // Output file
-        std::string outFile = bucketDir + Poco::Path::separator() + GetDirFromKey(key);
+        std::string outFile = _dataDir + Poco::Path::separator() + bucket + Poco::Path::separator() + key;
         log_trace_stream(_logger) << "Output file, outFile: " << outFile << std::endl;
 
         // Append all parts to the output file
