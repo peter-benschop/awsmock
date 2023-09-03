@@ -101,6 +101,21 @@ namespace AwsMock::Core {
         EXPECT_TRUE(modified == 1);
     }
 
+    TEST_F(DirectoryWatcherTest, FileSeveralModifiedTest) {
+
+        // arrange
+        thread->start(*_watcher);
+
+        // act
+        tempFile = Core::FileUtils::CreateTempFile(tempDir, "txt", 10);
+        std::ofstream ofs(tempFile, std::ios::app);
+        ofs << "Test";
+
+        // assert
+        Poco::Thread::sleep(5000);
+        EXPECT_TRUE(modified == 1);
+    }
+
     TEST_F(DirectoryWatcherTest, FileDeletedTest) {
 
         // arrange
