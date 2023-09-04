@@ -70,16 +70,17 @@ namespace AwsMock::Service {
     Dto::S3::GetMetadataResponse S3Service::GetMetadata(Dto::S3::GetMetadataRequest &request) {
         log_trace_stream(_logger) << "Get metadata request, s3Request: " << request.ToString() << std::endl;
 
+        Dto::S3::GetMetadataResponse getMetadataResponse;
+
         // Check existence
         if (!_database->BucketExists({.region=request.region, .name=request.bucket})) {
-            throw Core::ServiceException("Bucket does not exist", 403);
+            return getMetadataResponse;
         }
 
         if (!_database->ObjectExists({.bucket=request.bucket, .key=request.key})) {
-            throw Core::ServiceException("Object does not exist", 403);
+            return getMetadataResponse;
         }
 
-        Dto::S3::GetMetadataResponse getMetadataResponse;
         try {
             Database::Entity::S3::Object object = _database->GetObject(request.region, request.bucket, request.key);
 
@@ -508,13 +509,15 @@ namespace AwsMock::Service {
 
                 // Queue notification
                 SendQueueNotificationRequest(eventNotification, notification.queueArn);
-                log_debug_stream(_logger) << "SQS message created, eventNotification: " + eventNotification.ToString() << std::endl;
+                log_trace_stream(_logger) << "SQS message created, eventNotification: " + eventNotification.ToString() << std::endl;
+                log_debug_stream(_logger) << "SQS message created" << std::endl;
 
             } else if (!notification.lambdaArn.empty()) {
 
                 // Lambda notification
                 SendLambdaInvocationRequest(eventNotification, notification);
-                log_debug_stream(_logger) << "Lambda function invoked, eventNotification: " + eventNotification.ToString() << std::endl;
+                log_trace_stream(_logger) << "Lambda function invoked, eventNotification: " + eventNotification.ToString() << std::endl;
+                log_debug_stream(_logger) << "Lambda function invoked" << std::endl;
             }
         } else {
             log_debug_stream(_logger) << "No notifications found, bucket: " << bucketName << " key: " << key << std::endl;
@@ -631,7 +634,7 @@ namespace AwsMock::Service {
         request.add("Content-Type", "application/json");
         request.add("Authorization",
                     "AWS4-HMAC-SHA256 Credential=none/20230618/eu-central-1/lambda/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840");
-        log_debug_stream(_logger) << "Invocation request created, body: " + body << std::endl;
+        log_trace_stream(_logger) << "Invocation request created, body: " + body << std::endl;
 
         // Send request
         std::ostream &os = session.sendRequest(request);

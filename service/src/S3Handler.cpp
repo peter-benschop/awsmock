@@ -271,14 +271,15 @@ namespace AwsMock::Service {
 
             if(s3Response.bucket.empty()) {
 
-                Core::ServiceException exc("Bucket not found");
-                SendErrorResponse("S3", response, exc);
+                headerMap.emplace_back("Content-Length", "0");
+                SendOkResponse(response, {}, &headerMap);
 
             } else {
 
                 headerMap.emplace_back("Last-Modified", Poco::DateTimeFormatter().format(s3Response.modified, Poco::DateTimeFormat::HTTP_FORMAT));
                 headerMap.emplace_back("Content-Length", std::to_string(s3Response.size));
                 headerMap.emplace_back("Content-Type", s3Response.contentType);
+                headerMap.emplace_back("ETag", s3Response.md5Sum);
                 SendOkResponse(response, {}, &headerMap);
             }
 

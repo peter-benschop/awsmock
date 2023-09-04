@@ -60,7 +60,7 @@ namespace AwsMock {
         outputStream.flush();
     }
 
-    void LambdaHandler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+    void LambdaHandler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_HEAD_TIMER);
         log_debug_stream(_logger) << "Lambda HEAD request, address: " << request.clientAddress().toString() << std::endl;
 
