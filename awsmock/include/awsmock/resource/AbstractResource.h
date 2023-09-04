@@ -126,8 +126,12 @@ namespace AwsMock::Resource {
        *
        * @param request HTTP request
        * @param response HTTP response
+       * @param region AWS region
+       * @param user current user
        */
-      virtual void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response);
+      virtual void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response,
+                              const std::string &region,
+                              const std::string &user);
 
       /**
        * It validates required information into the Http headers.

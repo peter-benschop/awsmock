@@ -127,20 +127,13 @@ namespace AwsMock {
        *
        * @param request HTTP request
        * @param response HTTP response
+       * @param region AWS region name
+       * @param user AWS user
        * @see AbstractResource::handleHead(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
        */
-      void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
+      void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
     private:
-
-      /**
-       * Returns the bucket and key from the URI
-       *
-       * @param uri request URI
-       * @param bucket S3 bucket name
-       * @param key S3 object key
-       */
-      void GetBucketKeyFromUri(const std::string &uri, std::string &bucket, std::string &key);
 
       /**
        * Logger

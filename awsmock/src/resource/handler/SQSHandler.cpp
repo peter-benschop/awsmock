@@ -60,7 +60,7 @@ namespace AwsMock {
         outputStream.flush();
     }
 
-    void SQSHandler::handleHead([[maybe_unused]]Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+    void SQSHandler::handleHead([[maybe_unused]]Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
         log_debug_stream(_logger) << "SQS HEAD request, address: " << request.clientAddress().toString() << std::endl;
 

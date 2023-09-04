@@ -43,10 +43,11 @@ namespace AwsMock {
         ForwardRequest(request, response, _s3ServiceHost, _s3ServicePort);
     }
 
-    void S3Handler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
+    void S3Handler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_HEAD_TIMER);
         log_debug_stream(_logger) << "S3 HEAD request, address: " << request.clientAddress().toString() << std::endl << std::endl;
 
+        SetHeaders(request, region, user);
         ForwardRequest(request, response, _s3ServiceHost, _s3ServicePort);
     }
 

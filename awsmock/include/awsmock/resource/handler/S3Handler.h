@@ -127,9 +127,11 @@ namespace AwsMock {
        *
        * @param request HTTP request
        * @param response HTTP response
+       * @param region AWS region name
+       * @param user AWS user
        * @see AbstractResource::handleHead(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
        */
-      void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
+      void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
     private:
 
