@@ -63,6 +63,7 @@ namespace AwsMock::Service {
         if(lambdaEntity.tags.HasTag("tag")) {
             dockerTag = lambdaEntity.tags.GetTagValue("tag");
         }
+        log_debug_stream(_logger) << "Using docker tag: " + dockerTag << std::endl;
 
         // Build the docker image, if not existing
         if (!_dockerService->ImageExists(request.functionName, dockerTag)) {

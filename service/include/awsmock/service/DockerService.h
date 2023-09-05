@@ -31,6 +31,7 @@
 #include <awsmock/dto/docker/CreateContainerResponse.h>
 #include <awsmock/dto/docker/ListImageResponse.h>
 #include <awsmock/dto/docker/ListContainerResponse.h>
+#include <awsmock/dto/docker/PruneContainerResponse.h>
 #include <awsmock/dto/docker/VersionResponse.h>
 
 #define DOCKER_SOCKET "/var/run/docker.sock"
@@ -57,6 +58,16 @@ namespace AwsMock::Service {
        * @param configuration service configuration
        */
       explicit DockerService(const Core::Configuration &configuration);
+
+      /**
+       * Creates a simple image
+       *
+       * @param name image name
+       * @param tag image tags
+       * @param imageCode code of the image
+       * @return true if image exists, otherwise false
+       */
+      Dto::Docker::Image CreateImage(const std::string &name, const std::string &tag, const std::string &imageCode);
 
       /**
        * Checks whether a image exists.
@@ -142,6 +153,14 @@ namespace AwsMock::Service {
       Dto::Docker::Container GetContainerByName(const std::string &name, const std::string &tag);
 
       /**
+       * Returns a container by name/tags.
+       *
+       * @param id container ID
+       * @return Container
+       */
+      Dto::Docker::Container GetContainerById(const std::string &id);
+
+      /**
        * Start the container
        *
        * @param id container ID
@@ -158,6 +177,22 @@ namespace AwsMock::Service {
       std::string StartContainer(const Dto::Docker::Container &container);
 
       /**
+       * Restart the container
+       *
+       * @param id container ID
+       * @return output string
+       */
+      std::string RestartDockerContainer(const std::string &id);
+
+      /**
+       * Restart the container
+       *
+       * @param container container
+       * @return output string
+       */
+      std::string RestartContainer(const Dto::Docker::Container &container);
+
+      /**
        * Stops the container
        *
        * @param container container
@@ -172,12 +207,12 @@ namespace AwsMock::Service {
        */
       void DeleteContainer(const Dto::Docker::Container &container);
 
-    private:
-
       /**
-       * Gets the API version from the docker daemon and sets attribute _apiVersion and _dockerVersion accordingly.
+       * Deletes all stopped containers.
        */
-      void GetApiVersion();
+      void PruneContainers();
+
+    private:
 
       /**
        * Write the docker file.
@@ -226,11 +261,6 @@ namespace AwsMock::Service {
        * Docker version
        */
       std::string _dockerVersion;
-
-      /**
-       * Docker API version
-       */
-      std::string _apiVersion;
 
       /**
        * Docker network mode, bridge or host

@@ -25,12 +25,20 @@ namespace AwsMock::Worker {
         _lambdaServicePort = _configuration.getInt("awsmock.service.lambda.port", 9503);
         log_debug_stream(_logger) << "Lambda service endpoint: http://" << _lambdaServiceHost << ":" << _lambdaServicePort << std::endl;
 
+        // Docker service
+        _dockerService = std::make_unique<Service::DockerService>(_configuration);
+
         // Create lambda directory
         if (!Core::DirUtils::DirectoryExists(_dataDir)) {
             Core::DirUtils::MakeDirectory(_dataDir);
         }
 
         log_debug_stream(_logger) << "LambdaWorker initialized" << std::endl;
+    }
+
+    void LambdaWorker::CleanupContainers() {
+        _dockerService->PruneContainers();
+        log_debug_stream(_logger) << "Docker containers cleaned up" << std::endl;
     }
 
     void LambdaWorker::StartLambdaFunctions() {
@@ -85,8 +93,10 @@ namespace AwsMock::Worker {
             return;
         }*/
 
+        // Cleanup
+        CleanupContainers();
+
         // Start all lambda functions
-        Poco::Thread::sleep(5000);
         StartLambdaFunctions();
 
         _running = true;

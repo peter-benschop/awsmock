@@ -6,11 +6,7 @@
 
 namespace AwsMock::Core {
 
-    CurlUtils::CurlUtils() : _logger(Poco::Logger::get("CurlUtils")) {
-
-        _isRemote = false;
-        log_debug_stream(_logger) << "Curl utilities initialized" << std::endl;
-    }
+    CurlUtils::CurlUtils() : _logger(Poco::Logger::get("CurlUtils")) {}
 
     std::string CurlUtils::SendRequest(const std::string &method, const std::string &path) {
 
@@ -27,6 +23,7 @@ namespace AwsMock::Core {
         headers = curl_slist_append(headers, "Content-Type: application/json");
 
         // Set options
+        //std::string url = HOST_URI + path;
         curl_easy_setopt(curl, CURLOPT_UNIX_SOCKET_PATH, DOCKER_SOCKET);
         curl_easy_setopt(curl, CURLOPT_URL, path.c_str());
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, method.c_str());
@@ -36,13 +33,12 @@ namespace AwsMock::Core {
 
         res = curl_easy_perform(curl);
         if(res != CURLE_OK) {
-            log_error_stream(_logger) << "Request send failed, error: " << curl_easy_strerror(res) << std::endl;
+            log_error_stream(_logger) << "Request send failed, url: " << path << " error: " << curl_easy_strerror(res) << std::endl;
         }
 
         unsigned status = 0;
         curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &status);
 
-       // curl_slist_free_all(headers);
         curl_easy_cleanup(curl);
 
         return _readBuffer;
@@ -73,7 +69,7 @@ namespace AwsMock::Core {
 
         res = curl_easy_perform(curl);
         if(res != CURLE_OK) {
-            log_error_stream(_logger) << "Request send failed, error: " << curl_easy_strerror(res) << std::endl;
+            log_error_stream(_logger) << "Request send failed, path: " << path << " error: " << curl_easy_strerror(res) << std::endl;
         }
 
         unsigned status = 0;
@@ -85,7 +81,7 @@ namespace AwsMock::Core {
         return _readBuffer;
     }
 
-    std::string CurlUtils::SendFileRequest(const std::string &method, const std::string &path, const std::string &header, const std::string &fileName) {
+    std::string CurlUtils::SendFileRequest(const std::string &method, const std::string &url, const std::string &header, const std::string &fileName) {
 
         _readBuffer={};
         curl = curl_easy_init();
@@ -112,7 +108,7 @@ namespace AwsMock::Core {
 
         // Set options
         curl_easy_setopt(curl, CURLOPT_UNIX_SOCKET_PATH, DOCKER_SOCKET);
-        curl_easy_setopt(curl, CURLOPT_URL, path.c_str());
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, method.c_str());
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
@@ -123,7 +119,7 @@ namespace AwsMock::Core {
 
         res = curl_easy_perform(curl);
         if(res != CURLE_OK) {
-            log_error_stream(_logger) << "Request send failed, error: " << curl_easy_strerror(res) << std::endl;
+            log_error_stream(_logger) << "Request send failed, url: " << url << " error: " << curl_easy_strerror(res) << std::endl;
         }
 
         unsigned status = 0;

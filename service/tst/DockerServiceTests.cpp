@@ -31,6 +31,39 @@ namespace AwsMock::Service {
       DockerService _service = DockerService(_configuration);
     };
 
+    TEST_F(DockerServiceTest, ImageExistsTest) {
+
+        // arrange
+
+        // act
+        bool result = _service.ImageExists("name", "tag");
+
+        // assert
+        EXPECT_FALSE(result);
+    }
+
+    TEST_F(DockerServiceTest, ImageGetByNameTest) {
+
+        // arrange
+
+        // act
+        Dto::Docker::Image image = _service.GetImageByName("name", "tag");
+
+        // assert
+        EXPECT_TRUE(image.id.empty());
+    }
+
+    TEST_F(DockerServiceTest, ContainerExistsTest) {
+
+        // arrange
+
+        // act
+        bool result = _service.ContainerExists("name", "tag");
+
+        // assert
+        EXPECT_FALSE(result);
+    }
+
     TEST_F(DockerServiceTest, ContainerCreateDtoTest) {
 
         // arrange
@@ -40,17 +73,19 @@ namespace AwsMock::Service {
             environment = {"AWS_EC2_METADATA_DISABLED=true", "JAVA_TOOL_OPTIONS=-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localstack"};
 
         // act
-        Dto::Docker::CreateContainerRequest request = {.hostName=NAME, .domainName=domainName, .user="root", .image=IMAGE,
-            .environment=environment, .containerPort=exposedPorts};
+        Dto::Docker::CreateContainerRequest request = {
+            .hostName=NAME,
+            .domainName=domainName,
+            .user="root",
+            .image=IMAGE,
+            .environment=environment,
+            .containerPort=exposedPorts};
         std::string jsonString = request.ToJson();
 
         // assert
         EXPECT_FALSE(jsonString.empty());
         EXPECT_TRUE(Core::StringUtils::Contains(jsonString,
-                                                "{\"Domainname\":\"test-container.dockerhost.net\",\"Env\":[\"AWS_EC2_METADATA_DISABLED=true\","
-                                                "\"JAVA_TOOL_OPTIONS=-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localstack\"],"
-                                                "\"ExposedPorts\":{\"8080/tcp\":{}},\"HostConfig\":{\"PortBindings\":{\"8080/tcp\":[{\"HostPort\":\"\"}]}},"
-                                                "\"Hostname\":\"test-container\",\"Image\":\"test-image:latest\",\"NetworkMode\":\"\",\"User\":\"root\"}"));
+                                                R"({"Domainname":"test-container.dockerhost.net","Env":["AWS_EC2_METADATA_DISABLED=true","JAVA_TOOL_OPTIONS=-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localstack"],"ExposedPorts":{"8080/tcp":{}},"HostConfig":{"ExtraHosts":["host.docker.internal:172.17.0.1"],"PortBindings":{"8080/tcp":[{"HostPort":""}]}},"Hostname":"test-container","Image":"test-image:latest","NetworkMode":"","User":"root"})"));
     }
 
 } // namespace AwsMock::Core

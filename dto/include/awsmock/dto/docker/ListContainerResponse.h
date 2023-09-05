@@ -77,7 +77,6 @@ namespace AwsMock::Dto::Docker {
               object->clear();
 
           } catch (Poco::Exception &exc) {
-              std::cerr << exc.message() << std::endl;
               throw Core::ServiceException(exc.message(), 500);
           }
       }

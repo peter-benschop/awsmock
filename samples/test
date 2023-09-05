@@ -34,4 +34,4 @@ function create_lambda_function () {
   fi
 }
 
-create_lambda_function ftp-file-copy java17 file-copy-service-1.15.0-SNAPSHOT-aws.jar org.springframework.cloud.function.adapter.aws.FunctionInvoker
+create_lambda_function ftp-file-distribution java17 file-distribution-service-1.24.0-SNAPSHOT-aws.jar org.springframework.cloud.function.adapter.aws.FunctionInvoker

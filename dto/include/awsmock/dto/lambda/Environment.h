@@ -75,16 +75,15 @@ namespace AwsMock::Dto::Lambda {
           Poco::JSON::Object environmentJson;
           try {
 
-              Poco::JSON::Object errorJson;
-              errorJson.set("ErrorCode", error.errorCode);
-              errorJson.set("Message", error.message);
-
               Poco::JSON::Object variableJson;
               for(auto & variable : variables) {
                   variableJson.set(variable.first, variable.second);
               }
-
               environmentJson.set("Variables", variableJson);
+
+              Poco::JSON::Object errorJson;
+              errorJson.set("ErrorCode", error.errorCode);
+              errorJson.set("Message", error.message);
               environmentJson.set("Error", errorJson);
 
           } catch (Poco::Exception &exc) {

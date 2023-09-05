@@ -150,7 +150,7 @@ namespace AwsMock::Dto::Lambda {
        *
        * @return JSON string
        */
-      std::string ToJson() const {
+      [[nodiscard]] std::string ToJson() const {
 
           try {
               Poco::JSON::Object rootJson;
@@ -164,6 +164,7 @@ namespace AwsMock::Dto::Lambda {
               rootJson.set("CodeSha256", codeSha256);
               rootJson.set("LastModified", modified);
               rootJson.set("Environment", environment.ToJson());
+              rootJson.set("EphemeralStorage", ephemeralStorage.ToJson());
 
               std::ostringstream os;
               rootJson.stringify(os);

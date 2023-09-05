@@ -12,10 +12,6 @@ namespace AwsMock::Database {
 
     ServiceDatabase::ServiceDatabase(const Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("ServiceDatabase")) {
 
-        // Set default console logger
-        Core::Logger::SetDefaultConsoleLogger("ServiceDatabase");
-
-
         // Get collections
         _serviceCollection = GetConnection()["service"];
     }

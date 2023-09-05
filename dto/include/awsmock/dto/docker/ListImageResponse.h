@@ -69,6 +69,27 @@ namespace AwsMock::Dto::Docker {
        *
        * @return JSON string
        */
+      void FromJson(const std::string &body) {
+
+          try {
+              Poco::JSON::Parser parser;
+              Poco::Dynamic::Var result = parser.parse(body);
+
+              this->FromJson(result.extract<Poco::JSON::Object::Ptr>());
+
+              // Cleanup
+              parser.reset();
+
+          } catch (Poco::Exception &exc) {
+              throw Core::ServiceException(exc.message(), 500);
+          }
+      }
+
+      /**
+       * Convert to a JSON string
+       *
+       * @return JSON string
+       */
       void FromJson(Poco::JSON::Object::Ptr object) {
 
           try {
@@ -151,7 +172,6 @@ namespace AwsMock::Dto::Docker {
               parser.reset();
 
           } catch (Poco::Exception &exc) {
-              std::cerr << exc.message() << std::endl;
               throw Core::ServiceException(exc.message(), 500);
           }
       }

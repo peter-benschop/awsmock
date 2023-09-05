@@ -19,6 +19,7 @@
 #include "awsmock/core/LogStream.h"
 
 #define DOCKER_SOCKET "/var/run/docker.sock"
+#define HOST_URI std::string("http://v1.43")
 
 typedef enum {
   GET,
@@ -99,11 +100,6 @@ namespace AwsMock::Core {
        * Curl headers
        */
       struct curl_slist *headers = nullptr;
-
-      /**
-       * Remote flag
-       */
-      bool _isRemote = false;
 
       /**
        * Read buffer
