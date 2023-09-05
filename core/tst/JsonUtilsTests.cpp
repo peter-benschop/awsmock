@@ -35,7 +35,7 @@ namespace AwsMock::Core {
         // arrange
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var parsed = parser.parse(TEST_JSON);
-        Poco::JSON::Object::Ptr rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
+        const auto& rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
 
         // act
         bool result;
@@ -50,7 +50,7 @@ namespace AwsMock::Core {
         // arrange
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var parsed = parser.parse(TEST_JSON);
-        Poco::JSON::Object::Ptr rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
+        const auto& rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
 
         // act
         std::string result;
@@ -65,7 +65,7 @@ namespace AwsMock::Core {
         // arrange
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var parsed = parser.parse(TEST_JSON);
-        Poco::JSON::Object::Ptr rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
+        const auto& rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
 
         // act
         long result;
@@ -80,7 +80,7 @@ namespace AwsMock::Core {
         // arrange
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var parsed = parser.parse(TEST_JSON);
-        Poco::JSON::Object::Ptr rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
+        const auto& rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
 
         // act
         int result;
@@ -95,7 +95,7 @@ namespace AwsMock::Core {
         // arrange
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var parsed = parser.parse(TEST_JSON);
-        Poco::JSON::Object::Ptr rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
+        const auto& rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
 
         // act
         float result;
@@ -110,7 +110,7 @@ namespace AwsMock::Core {
         // arrange
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var parsed = parser.parse(TEST_JSON);
-        Poco::JSON::Object::Ptr rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
+        const auto& rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
 
         // act
         double result;
@@ -125,7 +125,7 @@ namespace AwsMock::Core {
         // arrange
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var parsed = parser.parse(TEST_JSON);
-        Poco::JSON::Object::Ptr rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
+        const auto& rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
 
         // act
         Poco::DateTime result;
