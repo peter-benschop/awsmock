@@ -43,16 +43,6 @@ namespace AwsMock::Core {
        */
       CurlUtils();
 
-      /*
-       * Constructor
-       */
-      CurlUtils(std::string host);
-
-      /**
-       * Destructor
-       */
-      ~CurlUtils();
-
       /**
        * Send request
        *
@@ -103,7 +93,7 @@ namespace AwsMock::Core {
       /**
        * Host URI
        */
-      std::string _hostUri;
+      std::string _apiVersion;
 
       /**
        * Curl headers
@@ -115,6 +105,9 @@ namespace AwsMock::Core {
        */
       bool _isRemote = false;
 
+      /**
+       * Read buffer
+       */
       std::string _readBuffer;
 
       /**

@@ -7,18 +7,14 @@
 namespace AwsMock::Service {
 
     DockerService::DockerService(const Core::Configuration &configuration)
-        : _logger(Poco::Logger::get("DockerService")), _configuration(configuration), _networkMode("bridge") {
+        : _logger(Poco::Logger::get("DockerService")), _configuration(configuration), _networkMode(NETWORK_DEFAULT_MODE) {
 
         // Get network mode
-        _networkMode = _configuration.getString("awsmock.docker.network.mode", "bridge");
+        _networkMode = _configuration.getString("awsmock.docker.network.mode", NETWORK_DEFAULT_MODE);
+        log_debug_stream(_logger) << "Network mode: " << _networkMode << std::endl;
 
         // Get version
-        std::string output = _curlUtils.SendRequest("GET", "/version");
-        Dto::Docker::Version version;
-        version.FromJson(output);
-        _dockerVersion = "v" + version.components[0].version;
-        _apiVersion = "v" + version.components[0].details.apiVersion;
-        log_debug_stream(_logger) << "Docker daemon version: " << _dockerVersion << " apiVersion:" << _apiVersion << std::endl;
+        GetApiVersion();
     }
 
     bool DockerService::ImageExists(const std::string &name, const std::string &tag) {
@@ -261,5 +257,17 @@ namespace AwsMock::Service {
         int port = Core::RandomUtils::NextInt(HOST_PORT_MIN, HOST_PORT_MAX);
         log_debug_stream(_logger) << "Assigned port: " << port << std::endl;
         return port;
+    }
+
+    void DockerService::GetApiVersion() {
+
+        // Send request
+        std::string output = _curlUtils.SendRequest("GET", "/version");
+        Dto::Docker::Version version;
+        version.FromJson(output);
+
+        _dockerVersion = "v" + version.components[0].version;
+        _apiVersion = "v" + version.components[0].details.apiVersion;
+        log_debug_stream(_logger) << "Docker daemon version: " << _dockerVersion << " apiVersion:" << _apiVersion << std::endl;
     }
 }

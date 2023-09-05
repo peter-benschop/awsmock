@@ -263,8 +263,7 @@ namespace AwsMock::Worker {
         headers["Content-Type"] = contentType;
         headers["Content-MD5"] = md5Sum;
 
-        std::ifstream ifs(fileName);
-        SendFile(url, ifs, contentType, headers);
+        SendFile(url, fileName, contentType, headers);
         log_debug_stream(_logger) << "S3 put object request send" << std::endl;
     }
 

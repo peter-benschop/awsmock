@@ -37,8 +37,8 @@
 #define NETWORK_NAME ".dockerhost.net"
 #define HOST_PORT_MIN 32768
 #define HOST_PORT_MAX 65536
-#define IMAGE_TAG "latest"
 #define CONTAINER_PORT "8080/tcp"
+#define NETWORK_DEFAULT_MODE "bridge"
 
 namespace AwsMock::Service {
 
@@ -173,6 +173,11 @@ namespace AwsMock::Service {
       void DeleteContainer(const Dto::Docker::Container &container);
 
     private:
+
+      /**
+       * Gets the API version from the docker daemon and sets attribute _apiVersion and _dockerVersion accordingly.
+       */
+      void GetApiVersion();
 
       /**
        * Write the docker file.

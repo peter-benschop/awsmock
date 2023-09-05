@@ -72,11 +72,11 @@ namespace AwsMock::Worker {
        * Send a lambda create function request.
        *
        * @param url HTTP URL
-       * @param ifstream HTTP message body
+       * @param fileName name of the file to send
        * @param contentType HTTP content type
        * @param headers HTTP header map
        */
-      void SendFile(const std::string &url, const std::ifstream &ifstream, const std::string &contentType, const std::map<std::string, std::string>&headers);
+      void SendFile(const std::string &url, const std::string &fileName, const std::string &contentType, const std::map<std::string, std::string>&headers);
 
     private:
 

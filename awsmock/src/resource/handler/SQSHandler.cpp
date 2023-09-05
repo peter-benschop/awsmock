@@ -64,8 +64,7 @@ namespace AwsMock {
         Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
         log_debug_stream(_logger) << "SQS HEAD request, address: " << request.clientAddress().toString() << std::endl;
 
-        handleHttpStatusCode(response, 200);
-        std::ostream &outputStream = response.send();
-        outputStream.flush();
+        SetHeaders(request, region, user);
+        ForwardRequest(request, response, _sqsServiceHost, _sqsServicePort);
     }
 }
