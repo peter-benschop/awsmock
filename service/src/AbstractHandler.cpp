@@ -157,19 +157,19 @@ namespace AwsMock::Service {
             break;
 
         case 400:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
-            log_error_stream(_logger) << "HTTP status code: 401 message: " << reason << std::endl;
+            log_error_stream(_logger) << "HTTP status code: 401 message: " << std::string(reason) << std::endl;
             break;
 
         case 401:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED);
-            log_error_stream(_logger) << "HTTP status code: 401 message: " << reason << std::endl;
+            log_error_stream(_logger) << "HTTP status code: 401 message: " << std::string(reason) << std::endl;
             break;
 
         case 403:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_FORBIDDEN);
-            log_warning_stream(_logger) << "HTTP status code: 403 message: " << reason << std::endl;
+            log_warning_stream(_logger) << "HTTP status code: 403 message: " << std::string(reason) << std::endl;
             break;
 
         case 404:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
-            log_warning_stream(_logger) << "HTTP status code: 404 message: " << reason << std::endl;
+            log_warning_stream(_logger) << "HTTP status code: 404 message: " << std::string(reason) << std::endl;
             break;
 
         case 405:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_METHOD_NOT_ALLOWED);
