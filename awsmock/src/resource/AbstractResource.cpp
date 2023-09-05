@@ -297,7 +297,7 @@ namespace AwsMock::Resource {
             ++i;
         }
 
-        if (response.getStatus() == Poco::Net::HTTPResponse::HTTP_OK) {
+        if (response.getStatus() == Poco::Net::HTTPResponse::HTTP_OK || response.getStatus() == Poco::Net::HTTPResponse::HTTP_NO_CONTENT) {
             SendOkResponse(response, body.str(), &headerMap);
         } else {
             SendErrorResponse(response, body.str());

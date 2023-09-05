@@ -15,8 +15,9 @@
 #include <curl/curl.h>
 
 // AwsMock includes
-#include "awsmock/core/Logger.h"
-#include "awsmock/core/LogStream.h"
+#include <awsmock/core/Logger.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/CurlResponse.h>
 
 #define DOCKER_SOCKET "/var/run/docker.sock"
 
@@ -43,24 +44,14 @@ namespace AwsMock::Core {
        */
       CurlUtils();
 
-      /*
-       * Constructor
-       */
-      CurlUtils(std::string host);
-
-      /**
-       * Destructor
-       */
-      ~CurlUtils();
-
       /**
        * Send request
        *
        * @param method HTTP method
        * @param path request path
-       * @return response string
+       * @return Dto::Curl::CurlResponse
        */
-      std::string SendRequest(const std::string &method, const std::string &path);
+      CurlResponse SendRequest(const std::string &method, const std::string &path);
 
       /**
        * Send request
@@ -68,9 +59,9 @@ namespace AwsMock::Core {
        * @param method HTTP method
        * @param path request path
        * @param body request body
-       * @return response string
+       * @return Dto::Curl::CurlResponse
        */
-      std::string SendRequest(const std::string &method, const std::string &path, const std::string &body);
+      CurlResponse SendRequest(const std::string &method, const std::string &path, const std::string &body);
 
       /**
        * Send request
@@ -79,9 +70,9 @@ namespace AwsMock::Core {
        * @param path request path
        * @param headers request extra headers
        * @param fileName filename to send as request body
-       * @return response string
+       * @return Dto::Curl::CurlResponse
        */
-      std::string SendFileRequest(const std::string &method, const std::string &path, const std::string &header, const std::string &fileName);
+      CurlResponse SendFileRequest(const std::string &method, const std::string &path, const std::string &header, const std::string &fileName);
 
     private:
 
@@ -103,7 +94,7 @@ namespace AwsMock::Core {
       /**
        * Host URI
        */
-      std::string _hostUri;
+      std::string _apiVersion;
 
       /**
        * Curl headers
@@ -111,10 +102,8 @@ namespace AwsMock::Core {
       struct curl_slist *headers = nullptr;
 
       /**
-       * Remote flag
+       * Read buffer
        */
-      bool _isRemote = false;
-
       std::string _readBuffer;
 
       /**

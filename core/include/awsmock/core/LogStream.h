@@ -7,6 +7,7 @@
 
 // C++ standard includes
 #include <istream>
+#include <mutex>
 
 // Poco includes
 #include <Poco/Foundation.h>
@@ -56,6 +57,7 @@ namespace AwsMock::Core {
       /// Sets the capacity of the internal message buffer to the given size.
 
     private:
+      std::mutex mutex;
       int writeToDevice(char c) override;
 
     private:

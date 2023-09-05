@@ -13,9 +13,6 @@ namespace AwsMock::Database {
 
     SNSDatabase::SNSDatabase(const Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("SNSDatabase")) {
 
-        // Set default console logger
-        Core::Logger::SetDefaultConsoleLogger("SNSDatabase");
-
         // Get collections
         _topicCollection = GetConnection()["sns_topic"];
         _messageCollection = GetConnection()["sns_message"];

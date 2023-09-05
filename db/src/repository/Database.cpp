@@ -11,7 +11,6 @@ namespace AwsMock::Database {
     using bsoncxx::builder::basic::make_document;
 
     Database::Database(const Core::Configuration &configuration) : _logger(Poco::Logger::get("Database")), _configuration(configuration) {
-        Core::Logger::SetDefaultConsoleLogger("Database");
 
         _name = _configuration.getString("awsmock.mongodb.name", "awsmock");
         _host = _configuration.getString("awsmock.mongodb.host", "localhost");

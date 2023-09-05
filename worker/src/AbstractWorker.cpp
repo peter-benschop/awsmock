@@ -131,7 +131,7 @@ namespace AwsMock::Worker {
     }
 
     void AbstractWorker::SendFile(const std::string &url,
-                                  const std::ifstream &ifstream,
+                                  const std::string &fileName,
                                   const std::string &contentType,
                                   const std::map<std::string, std::string> &headers) {
 
@@ -149,8 +149,9 @@ namespace AwsMock::Worker {
         log_debug_stream(_logger) << "Request send, url: " << url << std::endl;
 
         // Send request
+        std::ifstream ifs(fileName);
         std::ostream &os = session.sendRequest(request);
-        os << ifstream.rdbuf();
+        os << ifs.rdbuf();
         os.flush();
         os.clear();
 

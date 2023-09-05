@@ -12,9 +12,6 @@ namespace AwsMock::Database {
 
     SQSDatabase::SQSDatabase(const Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("SQSDatabase")) {
 
-        // Set default console logger
-        Core::Logger::SetDefaultConsoleLogger("SQSDatabase");
-
         // Get collections
         _queueCollection = GetConnection()["sqs_queue"];
         _messageCollection = GetConnection()["sqs_message"];

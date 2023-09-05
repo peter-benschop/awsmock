@@ -65,6 +65,32 @@ namespace AwsMock::Dto::Docker {
       std::vector<std::string> labels;
 
       /**
+       * Number of containers using this image
+       */
+      int containers;
+
+      /**
+       * Convert to a JSON string
+       *
+       * @return JSON string
+       */
+      void FromJson(const std::string &body) {
+
+          try {
+              Poco::JSON::Parser parser;
+              Poco::Dynamic::Var result = parser.parse(body);
+
+              this->FromJson(result.extract<Poco::JSON::Object::Ptr>());
+
+              // Cleanup
+              parser.reset();
+
+          } catch (Poco::Exception &exc) {
+              throw Core::ServiceException(exc.message(), 500);
+          }
+      }
+
+      /**
        * Convert to a JSON string
        *
        * @return JSON string
@@ -77,6 +103,7 @@ namespace AwsMock::Dto::Docker {
               Core::JsonUtils::GetJsonValueLong("Size", object, size);
               Core::JsonUtils::GetJsonValueLong("SharedSize", object, sharedSize);
               Core::JsonUtils::GetJsonValueLong("VirtualSize", object, virtualSize);
+              Core::JsonUtils::GetJsonValueInt("Containers", object, containers);
 
               Poco::JSON::Array::Ptr reproTagsArray = object->getArray("RepoTags");
               if (reproTagsArray != nullptr) {
@@ -151,7 +178,6 @@ namespace AwsMock::Dto::Docker {
               parser.reset();
 
           } catch (Poco::Exception &exc) {
-              std::cerr << exc.message() << std::endl;
               throw Core::ServiceException(exc.message(), 500);
           }
       }

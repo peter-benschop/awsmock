@@ -12,9 +12,6 @@ namespace AwsMock::Database {
 
     LambdaDatabase::LambdaDatabase(const Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("LambdaDatabase")) {
 
-        // Set default console logger
-        Core::Logger::SetDefaultConsoleLogger("LambdaDatabase");
-
         // Get collection
         _lambdaCollection = GetConnection()["lambda"];
     }

@@ -6,28 +6,15 @@
 
 namespace AwsMock::Core {
 
-    CurlUtils::CurlUtils() : _logger(Poco::Logger::get("CurlUtils")), _hostUri("http:/v1.24") {
+    CurlUtils::CurlUtils() : _logger(Poco::Logger::get("CurlUtils")) {}
 
-        _isRemote = false;
-        log_debug_stream(_logger) << "Curl utilities initialized" << std::endl;
-    }
-
-    CurlUtils::CurlUtils(std::string host) : _logger(Poco::Logger::get("DockerService")), _hostUri(std::move(host)) {
-        curl_global_init(CURL_GLOBAL_ALL);
-        _isRemote = true;
-    }
-
-    CurlUtils::~CurlUtils() {
-        curl_global_cleanup();
-    }
-
-    std::string CurlUtils::SendRequest(const std::string &method, const std::string &path) {
+    CurlResponse CurlUtils::SendRequest(const std::string &method, const std::string &path) {
 
         _readBuffer={};
         curl = curl_easy_init();
         if (!curl) {
             log_error_stream(_logger) << "Error while initiating curl" << std::endl;
-            curl_global_cleanup();
+            curl_easy_cleanup(curl);
             return {};
         }
 
@@ -36,8 +23,9 @@ namespace AwsMock::Core {
         headers = curl_slist_append(headers, "Content-Type: application/json");
 
         // Set options
+        //std::string url = HOST_URI + path;
         curl_easy_setopt(curl, CURLOPT_UNIX_SOCKET_PATH, DOCKER_SOCKET);
-        curl_easy_setopt(curl, CURLOPT_URL, (_hostUri + path).c_str());
+        curl_easy_setopt(curl, CURLOPT_URL, path.c_str());
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, method.c_str());
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
@@ -45,25 +33,24 @@ namespace AwsMock::Core {
 
         res = curl_easy_perform(curl);
         if(res != CURLE_OK) {
-            log_error_stream(_logger) << "Request send failed, error: " << curl_easy_strerror(res) << std::endl;
+            log_error_stream(_logger) << "Request send failed, url: " << path << " error: " << curl_easy_strerror(res) << std::endl;
         }
 
-        unsigned status = 0;
+        int status = 0;
         curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &status);
 
-       // curl_slist_free_all(headers);
         curl_easy_cleanup(curl);
 
-        return _readBuffer;
+        return {.statusCode = status, .statusReason=curl_easy_strerror(res), .output=_readBuffer};
     }
 
-    std::string CurlUtils::SendRequest(const std::string &method, const std::string &path, const std::string &body) {
+    CurlResponse CurlUtils::SendRequest(const std::string &method, const std::string &path, const std::string &body) {
 
         _readBuffer={};
         curl = curl_easy_init();
         if (!curl) {
             log_error_stream(_logger) << "Error while initiating curl" << std::endl;
-            curl_global_cleanup();
+            curl_easy_cleanup(curl);
             return {};
         }
 
@@ -73,7 +60,7 @@ namespace AwsMock::Core {
 
         // Set options
         curl_easy_setopt(curl, CURLOPT_UNIX_SOCKET_PATH, DOCKER_SOCKET);
-        curl_easy_setopt(curl, CURLOPT_URL, (_hostUri + path).c_str());
+        curl_easy_setopt(curl, CURLOPT_URL, path.c_str());
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, method.c_str());
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
@@ -82,25 +69,24 @@ namespace AwsMock::Core {
 
         res = curl_easy_perform(curl);
         if(res != CURLE_OK) {
-            log_error_stream(_logger) << "Request send failed, error: " << curl_easy_strerror(res) << std::endl;
+            log_error_stream(_logger) << "Request send failed, path: " << path << " error: " << curl_easy_strerror(res) << std::endl;
         }
 
-        unsigned status = 0;
+        int status = 0;
         curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &status);
 
-        //curl_slist_free_all(headers);
         curl_easy_cleanup(curl);
 
-        return _readBuffer;
+        return {.statusCode = status, .statusReason=curl_easy_strerror(res), .output=_readBuffer};
     }
 
-    std::string CurlUtils::SendFileRequest(const std::string &method, const std::string &path, const std::string &header, const std::string &fileName) {
+    CurlResponse CurlUtils::SendFileRequest(const std::string &method, const std::string &url, const std::string &header, const std::string &fileName) {
 
         _readBuffer={};
         curl = curl_easy_init();
         if (!curl) {
             log_error_stream(_logger) << "Error while initiating curl" << std::endl;
-            curl_global_cleanup();
+            curl_easy_cleanup(curl);
             return {};
         }
 
@@ -121,7 +107,7 @@ namespace AwsMock::Core {
 
         // Set options
         curl_easy_setopt(curl, CURLOPT_UNIX_SOCKET_PATH, DOCKER_SOCKET);
-        curl_easy_setopt(curl, CURLOPT_URL, (_hostUri + path).c_str());
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, method.c_str());
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
@@ -132,15 +118,14 @@ namespace AwsMock::Core {
 
         res = curl_easy_perform(curl);
         if(res != CURLE_OK) {
-            log_error_stream(_logger) << "Request send failed, error: " << curl_easy_strerror(res) << std::endl;
+            log_error_stream(_logger) << "Request send failed, url: " << url << " error: " << curl_easy_strerror(res) << std::endl;
         }
 
-        unsigned status = 0;
+        int status = 0;
         curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &status);
 
-       // curl_slist_free_all(headers);
         curl_easy_cleanup(curl);
 
-        return _readBuffer;
+        return {.statusCode = status, .statusReason=curl_easy_strerror(res), .output=_readBuffer};
     }
 }

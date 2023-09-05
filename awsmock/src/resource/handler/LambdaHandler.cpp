@@ -64,16 +64,7 @@ namespace AwsMock {
         Core::MetricServiceTimer measure(_metricService, HTTP_HEAD_TIMER);
         log_debug_stream(_logger) << "Lambda HEAD request, address: " << request.clientAddress().toString() << std::endl;
 
-        try {
-
-            Resource::HeaderMap headerMap;
-            headerMap.emplace_back("Connection", "closed");
-            headerMap.emplace_back("Server", "AmazonS3");
-
-            SendOkResponse(response, {}, &headerMap);
-
-        } catch (Poco::Exception &exc) {
-            SendErrorResponse("Lambda", response, exc);
-        }
+        SetHeaders(request, region, user);
+        ForwardRequest(request, response, _lambdaServiceHost, _lambdaServicePort);
     }
 }

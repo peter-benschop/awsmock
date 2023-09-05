@@ -63,11 +63,12 @@ namespace AwsMock::Service {
         if(lambdaEntity.tags.HasTag("tag")) {
             dockerTag = lambdaEntity.tags.GetTagValue("tag");
         }
+        log_debug_stream(_logger) << "Using docker tag: " + dockerTag << std::endl;
 
         // Build the docker image, if not existing
         if (!_dockerService->ImageExists(request.functionName, dockerTag)) {
 
-            CreateDockerImage(request, lambdaEntity);
+            CreateDockerImage(request, lambdaEntity, dockerTag);
         }
 
         // Get the image struct
@@ -212,7 +213,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::CreateDockerImage(const Dto::Lambda::CreateFunctionRequest &request,
-                                          Database::Entity::Lambda::Lambda &lambdaEntity) {
+                                          Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {
         if (!request.code.zipFile.empty()) {
 
             // Unzip provided zip-file into a temporary directory
@@ -221,7 +222,7 @@ namespace AwsMock::Service {
             // Build the docker image using the docker service
             _dockerService->BuildImage(codeDir,
                                        request.functionName,
-                                       "latest",
+                                       dockerTag,
                                        request.handler,
                                        lambdaEntity.runtime,
                                        lambdaEntity.codeSize,

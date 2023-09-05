@@ -18,7 +18,7 @@ function create_lambda_function () {
     awsmock lambda create-function \
     --function-name "$function" \
     --runtime "$runtime" \
-    --timeout 120 \
+    --timeout 900 \
     --memory-size 2024 \
     --environment "file://./lambda/$1-env.json" \
     --tags tag=latest \

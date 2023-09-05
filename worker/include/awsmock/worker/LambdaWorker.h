@@ -40,6 +40,11 @@ namespace AwsMock::Worker {
     private:
 
       /**
+       * Delete dangling, stopped containers
+       */
+      void CleanupContainers();
+
+      /**
        * Start all lambdas if they are not existing
        */
       void StartLambdaFunctions();
@@ -86,6 +91,11 @@ namespace AwsMock::Worker {
        * Lambda service
        */
       std::unique_ptr<Service::LambdaService> _lambdaService;
+
+      /**
+       * Docker service
+       */
+      std::unique_ptr<Service::DockerService> _dockerService;
 
       /**
        * Data dir
