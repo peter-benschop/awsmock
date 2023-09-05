@@ -11,60 +11,71 @@ namespace AwsMock::Service {
 
         // Get network mode
         _networkMode = _configuration.getString("awsmock.docker.network.mode", NETWORK_DEFAULT_MODE);
+        _networkName = _configuration.getString("awsmock.docker.network.name", NETWORK_NAME);
+        _containerPort = _configuration.getString("awsmock.docker.container.port", CONTAINER_PORT);
+
         log_debug_stream(_logger) << "Network mode: " << _networkMode << std::endl;
     }
 
     bool DockerService::ImageExists(const std::string &name, const std::string &tag) {
 
         std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + "\"]}");
-        std::string output = _curlUtils.SendRequest("GET", "http://localhost/images/json?filters=" + filters);
-        log_trace_stream(_logger) << "List images request send to docker daemon, output: " << output << std::endl;
+        Core::CurlResponse curlResponse = _curlUtils.SendRequest("GET", "http://localhost/images/json?filters=" + filters);
+        log_trace_stream(_logger) << "List images request send to docker daemon, output: " << curlResponse.ToString() << std::endl;
 
-        Dto::Docker::ListImageResponse response;
-        response.FromJson(output);
+        if (curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
 
-        if (response.imageList.empty()) {
-            log_warning_stream(_logger) << "Docker image not found, name: " << name << ":" << tag << std::endl;
-            return false;
+            Dto::Docker::ListImageResponse response;
+            response.FromJson(curlResponse.output);
+
+            if (response.imageList.empty()) {
+                log_warning_stream(_logger) << "Docker image not found, name: " << name << ":" << tag << std::endl;
+                return false;
+            }
+
+            log_debug_stream(_logger) << "Docker image found, name: " << name << ":" << tag << std::endl;
+            return true;
         }
-
-        log_debug_stream(_logger) << "Docker image found, name: " << name << ":" << tag << std::endl;
-        return true;
+        return false;
     }
 
-    Dto::Docker::Image DockerService::CreateImage(const std::string &name, const std::string &tag, const std::string &fromImage) {
+    void DockerService::CreateImage(const std::string &name, const std::string &tag, const std::string &fromImage) {
 
         std::string queryString = Core::StringUtils::UrlEncode("name=" + name + "&tag=" + tag + "&fromImage=" + fromImage);
-        std::string output = _curlUtils.SendRequest("POST", "http://localhost/images/create?" + queryString);
-        log_trace_stream(_logger) << "Create image request send to docker daemon, output: " << output << std::endl;
+        Core::CurlResponse curlResponse = _curlUtils.SendRequest("POST", "http://localhost/images/create?name=" + name + "&tag=" + tag + "&fromImage=" + fromImage);
+        log_trace_stream(_logger) << "Create image request send to docker daemon, output: " << curlResponse.ToString() << std::endl;
 
-        Dto::Docker::Image image;
-        image.FromJson(output);
-
-        log_debug_stream(_logger) << "Docker image created, name: " << name << ":" << tag << std::endl;
-        return image;
+        if (curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
+            log_error_stream(_logger) << "Docker image create failed, status: " << curlResponse.statusCode << std::endl;
+        } else {
+            log_debug_stream(_logger) << "Docker image created, name: " << name << ":" << tag << std::endl;
+        }
     }
 
     Dto::Docker::Image DockerService::GetImageByName(const std::string &name, const std::string &tag) {
 
         std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + "\"]}");
-        std::string output = _curlUtils.SendRequest("GET", "http://localhost/images/json?filters=" + filters);
+        Core::CurlResponse curlResponse = _curlUtils.SendRequest("GET", "http://localhost/images/json?all=true&filters=" + filters);
         log_debug_stream(_logger) << "List container request send to docker daemon, name: " << name << " tags: " << tag << std::endl;
-        log_trace_stream(_logger) << "Response: " << Core::StringUtils::StripLineEndings(output) << std::endl;
+        log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
-        Dto::Docker::ListImageResponse response;
-        response.FromJson(output);
+        if (curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
 
-        if (response.imageList.empty()) {
-            log_warning_stream(_logger) << "Docker image not found, name: " << name << ":" << tag << std::endl;
-            return {};
+            Dto::Docker::ListImageResponse response;
+            response.FromJson(curlResponse.output);
+
+            if (response.imageList.empty()) {
+                log_warning_stream(_logger) << "Docker image not found, name: " << name << ":" << tag << std::endl;
+                return {};
+            }
+
+            if (response.imageList.size() > 1) {
+                log_warning_stream(_logger) << "More than one docker image found, name: " << name << ":" << tag << std::endl;
+                return {};
+            }
+            return response.imageList[0];
         }
-
-        if (response.imageList.size() > 1) {
-            log_warning_stream(_logger) << "More than one docker image found, name: " << name << ":" << tag << std::endl;
-            return {};
-        }
-        return response.imageList[0];
+        return {};
     }
 
     void DockerService::BuildImage(const std::string &codeDir,
@@ -83,24 +94,36 @@ namespace AwsMock::Service {
         fileSize = Core::FileUtils::FileSize(imageFile);
         codeSha256 = Core::Crypto::GetSha256FromFile(imageFile);
 
-        std::string output = _curlUtils.SendFileRequest("POST", "http://localhost/build?t=" + name + ":" + tag + "&q=true", {}, imageFile);
+        Core::CurlResponse curlResponse = _curlUtils.SendFileRequest("POST", "http://localhost/build?t=" + name + ":" + tag + "&q=true", {}, imageFile);
         log_debug_stream(_logger) << "Docker image build, image: " << name << ":" << tag << std::endl;
-        log_trace_stream(_logger) << "Response: " << output << std::endl;
+        log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
+
+        if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
+            log_error_stream(_logger) << "Build image failed, status: " << curlResponse.statusCode << std::endl;
+        }
     }
 
     void DockerService::DeleteImage(const std::string &name, const std::string &tag) {
-        std::string output = _curlUtils.SendRequest("DELETE", "/images/" + name + ":" + tag + "?force=true");
+        Core::CurlResponse curlResponse = _curlUtils.SendRequest("DELETE", "http://localhost/images/" + name + ":" + tag + "?force=true");
+        if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
+            log_error_stream(_logger) << "Delete image failed, status: " << curlResponse.statusCode << std::endl;
+        }
     }
 
     bool DockerService::ContainerExists(const std::string &name, const std::string &tag) {
 
         std::string filters = Core::StringUtils::UrlEncode(R"({"name":[")" + name + "\"]}");
-        std::string output = _curlUtils.SendRequest("GET", "http://localhost/containers/json?filters=" + filters);
+        Core::CurlResponse curlResponse = _curlUtils.SendRequest("GET", "http://localhost/containers/json?filters=" + filters);
         log_debug_stream(_logger) << "List container request send to docker daemon" << std::endl;
-        log_trace_stream(_logger) << "Response: " << output << std::endl;
+        log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
+
+        if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
+            log_warning_stream(_logger) << "Docker container exists failed, status: " << curlResponse.statusCode << std::endl;
+            return false;
+        }
 
         Dto::Docker::ListContainerResponse response;
-        response.FromJson(output);
+        response.FromJson(curlResponse.output);
 
         if (response.containerList.empty()) {
             log_warning_stream(_logger) << "Docker container not found, name: " << name << ":" << tag << std::endl;
@@ -113,13 +136,18 @@ namespace AwsMock::Service {
 
     Dto::Docker::Container DockerService::GetContainerByName(const std::string &name, const std::string &tag) {
 
-        std::string filters = Core::StringUtils::UrlEncode(R"({"name":[")" + std::string("/")+name + "\"]}");
-        std::string output = _curlUtils.SendRequest("GET", "http://localhost/containers/json?all=true&filters=" + filters);
+        std::string filters = Core::StringUtils::UrlEncode(R"({"name":[")" + std::string("/") + name + "\"]}");
+        Core::CurlResponse curlResponse = _curlUtils.SendRequest("GET", "http://localhost/containers/json?all=true&filters=" + filters);
         log_debug_stream(_logger) << "List container request send to docker daemon" << std::endl;
-        log_trace_stream(_logger) << "Response: " << output << std::endl;
+        log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
+
+        if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
+            log_warning_stream(_logger) << "Get docker container by name failed, status: " << curlResponse.statusCode << std::endl;
+            return {};
+        }
 
         Dto::Docker::ListContainerResponse response;
-        response.FromJson(output);
+        response.FromJson(curlResponse.output);
 
         if (response.containerList.empty()) {
             log_warning_stream(_logger) << "Docker container not found, name: " << name << ":" << tag << std::endl;
@@ -137,13 +165,18 @@ namespace AwsMock::Service {
 
     Dto::Docker::Container DockerService::GetContainerById(const std::string &id) {
 
-        std::string filters = Core::StringUtils::UrlEncode(R"({"id":[")" + id +"\"]}");
-        std::string output = _curlUtils.SendRequest("GET", "http://localhost/containers/json?filters=" + filters);
+        std::string filters = Core::StringUtils::UrlEncode(R"({"id":[")" + id + "\"]}");
+        Core::CurlResponse curlResponse = _curlUtils.SendRequest("GET", "http://localhost/containers/json?filters=" + filters);
         log_debug_stream(_logger) << "List container request send to docker daemon" << std::endl;
-        log_trace_stream(_logger) << "Response: " << output << std::endl;
+        log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
+
+        if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
+            log_warning_stream(_logger) << "Get docker container by ID failed, status: " << curlResponse.statusCode << std::endl;
+            return {};
+        }
 
         Dto::Docker::ListContainerResponse response;
-        response.FromJson(output);
+        response.FromJson(curlResponse.output);
 
         if (response.containerList.empty()) {
             log_warning_stream(_logger) << "Docker container not found, id: " << id << std::endl;
@@ -156,83 +189,98 @@ namespace AwsMock::Service {
 
     Dto::Docker::CreateContainerResponse DockerService::CreateContainer(const std::string &name, const std::string &tag, const std::vector<std::string> &environment) {
 
-        int hostPort = GetHostPort();
-        std::string containerPort = CONTAINER_PORT;
-        std::string imageName = std::string(name) + ":" + tag;
-        std::string domainName = std::string(name) + NETWORK_NAME;
-        std::string networkMode = _networkMode;
-
         // Create the request
+        std::string hostPort = GetHostPort();
         Dto::Docker::CreateContainerRequest request = {
             .hostName=name,
-            .domainName=domainName,
+            .domainName=name + _networkName,
             .user="root",
-            .image=imageName,
-            .networkMode=networkMode,
+            .image=name + ":" + tag,
+            .networkMode=_networkMode,
             .environment=environment,
-            .containerPort=containerPort,
-            .hostPort=std::to_string(hostPort)
+            .containerPort=_containerPort,
+            .hostPort=hostPort
         };
 
         std::string jsonBody = request.ToJson();
-        std::string output = _curlUtils.SendRequest("POST", "http://localhost/containers/create?name=" + name, jsonBody);
+        Core::CurlResponse curlResponse = _curlUtils.SendRequest("POST", "http://localhost/containers/create?name=" + name, jsonBody);
         log_debug_stream(_logger) << "Create container request send to docker daemon" << std::endl;
-        log_trace_stream(_logger) << "Response: " << output << std::endl;
+        log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
-        Dto::Docker::CreateContainerResponse response = {.hostPort=hostPort};
-        response.FromJson(output);
+        if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_CREATED) {
+            log_warning_stream(_logger) << "Create container failed, status: " << curlResponse.statusCode << std::endl;
+            return {};
+        }
+
+        Dto::Docker::CreateContainerResponse response = {.hostPort=std::stoi(hostPort)};
+        response.FromJson(curlResponse.output);
 
         return response;
     }
 
-    std::string DockerService::StartDockerContainer(const std::string &id) {
+    void DockerService::StartDockerContainer(const std::string &id) {
 
-        std::string output = _curlUtils.SendRequest("POST", "http://localhost/containers/" + id + "/start");
+        Core::CurlResponse curlResponse = _curlUtils.SendRequest("POST", "http://localhost/containers/" + id + "/start");
         log_debug_stream(_logger) << "Sending start container request" << std::endl;
-        log_trace_stream(_logger) << "Response: " << output << std::endl;
+        log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
-        return output;
+        if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_NO_CONTENT && curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_NOT_MODIFIED) {
+            log_warning_stream(_logger) << "Start container failed, status: " << curlResponse.statusCode << std::endl;
+        }
     }
 
-    std::string DockerService::StartContainer(const Dto::Docker::Container &container) {
-        return StartDockerContainer(container.id);
+    void DockerService::StartContainer(const Dto::Docker::Container &container) {
+        StartDockerContainer(container.id);
     }
 
-    std::string DockerService::RestartDockerContainer(const std::string &id) {
+    void DockerService::RestartDockerContainer(const std::string &id) {
 
-        std::string output = _curlUtils.SendRequest("POST", "http://localhost/containers/" + id + "/restart");
+        Core::CurlResponse curlResponse = _curlUtils.SendRequest("POST", "http://localhost/containers/" + id + "/restart");
         log_debug_stream(_logger) << "Sending restart container request" << std::endl;
-        log_trace_stream(_logger) << "Response: " << output << std::endl;
+        log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
-        return output;
+        if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_NO_CONTENT) {
+            log_warning_stream(_logger) << "Restart container failed, status: " << curlResponse.statusCode << std::endl;
+        }
     }
 
-    std::string DockerService::RestartContainer(const Dto::Docker::Container &container) {
-        return RestartDockerContainer(container.id);
+    void DockerService::RestartContainer(const Dto::Docker::Container &container) {
+        RestartDockerContainer(container.id);
     }
 
-    std::string DockerService::StopContainer(const Dto::Docker::Container &container) {
+    void DockerService::StopContainer(const Dto::Docker::Container &container) {
 
-        std::string output = _curlUtils.SendRequest("POST", "http://localhost/containers/" + container.id + "/stop");
+        Core::CurlResponse curlResponse = _curlUtils.SendRequest("POST", "http://localhost/containers/" + container.id + "/stop");
         log_debug_stream(_logger) << "Sending stop container request" << std::endl;
-        log_trace_stream(_logger) << "Response: " << output << std::endl;
+        log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
-        return output;
+        if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_NO_CONTENT) {
+            log_warning_stream(_logger) << "Stop container failed, status: " << curlResponse.statusCode << std::endl;
+        }
     }
 
     void DockerService::DeleteContainer(const Dto::Docker::Container &container) {
 
-        std::string output = _curlUtils.SendRequest("DELETE", "http://localhost/containers/" + container.id + "?force=true");
+        Core::CurlResponse curlResponse = _curlUtils.SendRequest("DELETE", "http://localhost/containers/" + container.id + "?force=true");
         log_debug_stream(_logger) << "Sending delete container request" << std::endl;
-        log_trace_stream(_logger) << "Response: " << output << std::endl;
+        log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
+
+        if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_NO_CONTENT) {
+            log_warning_stream(_logger) << "Delete container failed, status: " << curlResponse.statusCode << std::endl;
+        }
     }
 
     void DockerService::PruneContainers() {
 
-        std::string output = _curlUtils.SendRequest("POST", "http://localhost/containers/prune");
+        Core::CurlResponse curlResponse = _curlUtils.SendRequest("POST", "http://localhost/containers/prune");
+
+        if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
+            log_warning_stream(_logger) << "Prune containers failed, status: " << curlResponse.statusCode << std::endl;
+            return;
+        }
 
         Dto::Docker::PruneContainerResponse response;
-        response.FromJson(output);
+        response.FromJson(curlResponse.output);
 
         log_debug_stream(_logger) << "Prune containers, count: " << response.containersDeleted.size() << " spaceReclaimed: " << response.spaceReclaimed << std::endl;
     }
@@ -300,9 +348,9 @@ namespace AwsMock::Service {
         return tarFileName;
     }
 
-    int DockerService::GetHostPort() {
+    std::string DockerService::GetHostPort() {
         int port = Core::RandomUtils::NextInt(HOST_PORT_MIN, HOST_PORT_MAX);
         log_debug_stream(_logger) << "Assigned port: " << port << std::endl;
-        return port;
+        return std::to_string(port);
     }
 }

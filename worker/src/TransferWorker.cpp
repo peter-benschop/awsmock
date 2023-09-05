@@ -110,10 +110,10 @@ namespace AwsMock::Worker {
         }*/
 
         // Send create bucket request
-        //if (!SendExistsBucketRequest(_bucket, "application/json")) {
+        if (!SendExistsBucketRequest(_bucket, "application/json")) {
             SendCreateBucketRequest(_bucket, "application/json");
             log_debug_stream(_logger) << "Sending S3 create bucket: " << _bucket << std::endl;
-        //}
+        }
 
         // Start all lambda functions
         StartTransferServers();

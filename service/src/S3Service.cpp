@@ -77,7 +77,7 @@ namespace AwsMock::Service {
             return getMetadataResponse;
         }
 
-        if (!_database->ObjectExists({.bucket=request.bucket, .key=request.key})) {
+        if (!_database->ObjectExists({.region=request.region, .bucket=request.bucket, .key=request.key})) {
             return getMetadataResponse;
         }
 
@@ -367,18 +367,18 @@ namespace AwsMock::Service {
 
         // Check bucket existence
         if (!_database->BucketExists({.region=request.region, .name=request.bucket})) {
-            throw Core::ServiceException("Bucket does not exist", 403);
+            throw Core::ServiceException("Bucket does not exist, bucket: " + request.bucket, 403);
         }
 
-        if (!_database->ObjectExists({.bucket=request.bucket, .key=request.key})) {
-            throw Core::ServiceException("Object does not exist", 403);
+        if (!_database->ObjectExists({.region=request.region, .bucket=request.bucket, .key=request.key})) {
+            throw Core::ServiceException("Object does not exist, bucket: " + request.bucket + " key: " + request.key, 403);
         }
 
         try {
             // Delete from database
             Database::Entity::S3::Object object = {.region=request.region, .bucket=request.bucket, .key=request.key};
             _database->DeleteObject(object);
-            log_debug_stream(_logger) << "Database object deleted, key: " << request.key << std::endl;
+            log_debug_stream(_logger) << "Database object deleted, bucket: " + request.bucket + " key: " << request.key << std::endl;
 
             // Delete file system object
             DeleteObject(request.bucket, request.key);
@@ -560,7 +560,12 @@ namespace AwsMock::Service {
         std::string filename = _dataDir + Poco::Path::separator() + bucket + Poco::Path::separator() + key;
         if (Core::FileUtils::FileExists(filename)) {
             Core::FileUtils::DeleteFile(filename);
-            log_debug_stream(_logger) << "File system object deleted, bucket: " << bucket << " key: " << key << std::endl;
+            log_debug_stream(_logger) << "File system object deleted, filename: " << filename << std::endl;
+        }
+        filename = _watcherDir + Poco::Path::separator() + bucket + Poco::Path::separator() + key;
+        if (Core::FileUtils::FileExists(filename)) {
+            Core::FileUtils::DeleteFile(filename);
+            log_debug_stream(_logger) << "File system object deleted, filename: " << filename << std::endl;
         }
     }
 

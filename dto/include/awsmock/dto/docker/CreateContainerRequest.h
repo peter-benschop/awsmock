@@ -24,6 +24,7 @@
 namespace AwsMock::Dto::Docker {
 
     struct ExposedPort {
+
       /**
        * Internal port
        */
@@ -91,7 +92,6 @@ namespace AwsMock::Dto::Docker {
               rootJson.set("Domainname", domainName);
               rootJson.set("User", user);
               rootJson.set("Image", image);
-              rootJson.set("NetworkMode", networkMode);
 
               Poco::JSON::Array envArray;
               for(unsigned long i = 0; i < environment.size(); i++) {
@@ -115,13 +115,14 @@ namespace AwsMock::Dto::Docker {
 
               Poco::JSON::Object portBindingsObject;
               portBindingsObject.set(containerPort, hostArray);
-
               hostConfigObject.set("PortBindings", portBindingsObject);
 
               Poco::JSON::Array extraHostsArray;
-              extraHostsArray.add("host.docker.internal:172.17.0.1");
+              extraHostsArray.add("host.docker.internal:host-gateway");
+              extraHostsArray.add("localstack:host-gateway");
 
               hostConfigObject.set("ExtraHosts", extraHostsArray);
+              hostConfigObject.set("NetworkMode", networkMode);
               rootJson.set("HostConfig", hostConfigObject);
 
               std::ostringstream os;

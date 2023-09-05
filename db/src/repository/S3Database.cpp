@@ -163,7 +163,7 @@ namespace AwsMock::Database {
 
     bool S3Database::ObjectExists(const Entity::S3::Object &object) {
 
-        int64_t count = _objectCollection.count_documents(make_document(kvp("region", object.region), kvp("key", object.key)));
+        int64_t count = _objectCollection.count_documents(make_document(kvp("region", object.region), kvp("bucket", object.bucket), kvp("key", object.key)));
         log_trace_stream(_logger) << "Object exists: " << (count > 0 ? "true" : "false") << std::endl;
 
         return count > 0;

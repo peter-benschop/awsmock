@@ -99,9 +99,9 @@ namespace AwsMock::Service {
        *
        * @param request create function request.
        * @param entity lambda entity.
+       * @param dockerTag docker tag to use
        */
-      void CreateDockerImage(const Dto::Lambda::CreateFunctionRequest &request,
-                             Database::Entity::Lambda::Lambda &lambdaEntity);
+      void CreateDockerImage(const Dto::Lambda::CreateFunctionRequest &request, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
 
       /**
        * Creates an new docker container, in case the container does not exists inside the docker daemon.

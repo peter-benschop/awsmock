@@ -10,6 +10,7 @@ namespace AwsMock::Core {
         _logger(logger),
         _priority(priority) {
         _message.reserve(bufferCapacity);
+        ;
     }
 
     LogStreamBuf::~LogStreamBuf() {
@@ -34,6 +35,7 @@ namespace AwsMock::Core {
     int LogStreamBuf::writeToDevice(char c) {
         if (c == '\n' || c == '\r') {
             if (_message.find_first_not_of("\r\n") != std::string::npos) {
+                std::scoped_lock lock{mutex};
                 Poco::Message msg(_logger.name(), _message, _priority, _file, _line);
                 _logger.log(msg);
                 _message.clear();

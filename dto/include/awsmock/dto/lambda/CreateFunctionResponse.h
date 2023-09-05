@@ -158,6 +158,7 @@ namespace AwsMock::Dto::Lambda {
               rootJson.set("FunctionName", functionName);
               rootJson.set("Runtime", runtime);
               rootJson.set("Role", role);
+              rootJson.set("Handler", handler);
               rootJson.set("MemorySize", memorySize);
               rootJson.set("CodeSize", codeSize);
               rootJson.set("Timeout", timeout);
@@ -165,6 +166,7 @@ namespace AwsMock::Dto::Lambda {
               rootJson.set("LastModified", modified);
               rootJson.set("Environment", environment.ToJson());
               rootJson.set("EphemeralStorage", ephemeralStorage.ToJson());
+              rootJson.set("MemorySize", memorySize);
 
               std::ostringstream os;
               rootJson.stringify(os);
@@ -192,9 +194,9 @@ namespace AwsMock::Dto::Lambda {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const CreateFunctionResponse &r) {
-          os << "CreateFunctionResponse={functionName='" + r.functionName + "' runtime: '" + r.runtime + "' role='" + r.role + "' handler='" + r.handler +
-              "' memorySize='" + std::to_string(r.memorySize) + "' {"+ r.environment.ToString() + "}" + " dockerImageId='" + r.dockerImageId +
-              "' dockerContainerId='" + r.dockerImageId + "'}";
+          os << "CreateFunctionResponse={functionName='" << r.functionName << "' runtime: '" << r.runtime + "' role='" << r.role << "' handler='" << r.handler +
+              "' memorySize='" << r.memorySize << "' {" << r.environment.ToString() << "}" << " dockerImageId='" << r.dockerImageId << "' dockerContainerId='" <<
+              r.dockerImageId << "'}";
           return os;
       }
     };

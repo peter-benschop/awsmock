@@ -12,6 +12,7 @@
 
 // Poco includes
 #include <Poco/Logger.h>
+#include <Poco/Net/HTTPResponse.h>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
@@ -65,9 +66,8 @@ namespace AwsMock::Service {
        * @param name image name
        * @param tag image tags
        * @param imageCode code of the image
-       * @return true if image exists, otherwise false
        */
-      Dto::Docker::Image CreateImage(const std::string &name, const std::string &tag, const std::string &imageCode);
+      void CreateImage(const std::string &name, const std::string &tag, const std::string &imageCode);
 
       /**
        * Checks whether a image exists.
@@ -134,7 +134,7 @@ namespace AwsMock::Service {
       // Dto::Docker::ListImageResponse ListImages();
 
       /**
-       * Starts a container
+       * Creates a container
        *
        * @param name image name
        * @param tag image tags
@@ -164,41 +164,36 @@ namespace AwsMock::Service {
        * Start the container
        *
        * @param id container ID
-       * @return output string
        */
-      std::string StartDockerContainer(const std::string &id);
+      void StartDockerContainer(const std::string &id);
 
       /**
        * Start the container
        *
        * @param container container
-       * @return output string
        */
-      std::string StartContainer(const Dto::Docker::Container &container);
+      void StartContainer(const Dto::Docker::Container &container);
 
       /**
        * Restart the container
        *
        * @param id container ID
-       * @return output string
        */
-      std::string RestartDockerContainer(const std::string &id);
+      void RestartDockerContainer(const std::string &id);
 
       /**
        * Restart the container
        *
        * @param container container
-       * @return output string
        */
-      std::string RestartContainer(const Dto::Docker::Container &container);
+      void RestartContainer(const Dto::Docker::Container &container);
 
       /**
        * Stops the container
        *
        * @param container container
-       * @return output string
        */
-      std::string StopContainer(const Dto::Docker::Container &container);
+      void StopContainer(const Dto::Docker::Container &container);
 
       /**
        * Deletes the container
@@ -240,7 +235,7 @@ namespace AwsMock::Service {
        *
        * @return random port between 32768 and 65536 as string
        */
-      int GetHostPort();
+      std::string GetHostPort();
 
       /**
        * Logger
@@ -266,6 +261,16 @@ namespace AwsMock::Service {
        * Docker network mode, bridge or host
        */
       std::string _networkMode;
+
+      /**
+       * Docker internal network name
+       */
+      std::string _networkName;
+
+      /**
+       * Docker internal network name
+       */
+      std::string _containerPort;
     };
 
 } //namespace AwsMock::Service

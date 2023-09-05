@@ -65,6 +65,11 @@ namespace AwsMock::Dto::Docker {
       std::vector<std::string> labels;
 
       /**
+       * Number of containers using this image
+       */
+      int containers;
+
+      /**
        * Convert to a JSON string
        *
        * @return JSON string
@@ -98,6 +103,7 @@ namespace AwsMock::Dto::Docker {
               Core::JsonUtils::GetJsonValueLong("Size", object, size);
               Core::JsonUtils::GetJsonValueLong("SharedSize", object, sharedSize);
               Core::JsonUtils::GetJsonValueLong("VirtualSize", object, virtualSize);
+              Core::JsonUtils::GetJsonValueInt("Containers", object, containers);
 
               Poco::JSON::Array::Ptr reproTagsArray = object->getArray("RepoTags");
               if (reproTagsArray != nullptr) {

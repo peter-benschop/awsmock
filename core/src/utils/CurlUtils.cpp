@@ -8,7 +8,7 @@ namespace AwsMock::Core {
 
     CurlUtils::CurlUtils() : _logger(Poco::Logger::get("CurlUtils")) {}
 
-    std::string CurlUtils::SendRequest(const std::string &method, const std::string &path) {
+    CurlResponse CurlUtils::SendRequest(const std::string &method, const std::string &path) {
 
         _readBuffer={};
         curl = curl_easy_init();
@@ -36,15 +36,15 @@ namespace AwsMock::Core {
             log_error_stream(_logger) << "Request send failed, url: " << path << " error: " << curl_easy_strerror(res) << std::endl;
         }
 
-        unsigned status = 0;
+        int status = 0;
         curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &status);
 
         curl_easy_cleanup(curl);
 
-        return _readBuffer;
+        return {.statusCode = status, .statusReason=curl_easy_strerror(res), .output=_readBuffer};
     }
 
-    std::string CurlUtils::SendRequest(const std::string &method, const std::string &path, const std::string &body) {
+    CurlResponse CurlUtils::SendRequest(const std::string &method, const std::string &path, const std::string &body) {
 
         _readBuffer={};
         curl = curl_easy_init();
@@ -72,16 +72,15 @@ namespace AwsMock::Core {
             log_error_stream(_logger) << "Request send failed, path: " << path << " error: " << curl_easy_strerror(res) << std::endl;
         }
 
-        unsigned status = 0;
+        int status = 0;
         curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &status);
 
-        //curl_slist_free_all(headers);
         curl_easy_cleanup(curl);
 
-        return _readBuffer;
+        return {.statusCode = status, .statusReason=curl_easy_strerror(res), .output=_readBuffer};
     }
 
-    std::string CurlUtils::SendFileRequest(const std::string &method, const std::string &url, const std::string &header, const std::string &fileName) {
+    CurlResponse CurlUtils::SendFileRequest(const std::string &method, const std::string &url, const std::string &header, const std::string &fileName) {
 
         _readBuffer={};
         curl = curl_easy_init();
@@ -122,11 +121,11 @@ namespace AwsMock::Core {
             log_error_stream(_logger) << "Request send failed, url: " << url << " error: " << curl_easy_strerror(res) << std::endl;
         }
 
-        unsigned status = 0;
+        int status = 0;
         curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &status);
 
         curl_easy_cleanup(curl);
 
-        return _readBuffer;
+        return {.statusCode = status, .statusReason=curl_easy_strerror(res), .output=_readBuffer};
     }
 }

@@ -42,6 +42,17 @@ namespace AwsMock::Service {
         EXPECT_FALSE(result);
     }
 
+    TEST_F(DockerServiceTest, ImageCreateTest) {
+
+        // arrange
+
+        // act
+        Dto::Docker::Image image = _service.CreateImage("name", "latest", "hello-world");
+
+        // assert
+        EXPECT_TRUE(image.id.empty());
+    }
+
     TEST_F(DockerServiceTest, ImageGetByNameTest) {
 
         // arrange
