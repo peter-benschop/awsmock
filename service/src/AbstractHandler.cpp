@@ -157,6 +157,7 @@ namespace AwsMock::Service {
             break;
 
         case 400:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+            log_error_stream(_logger) << "HTTP status code: 401 message: " << reason << std::endl;
             break;
 
         case 401:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED);
