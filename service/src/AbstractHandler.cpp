@@ -156,20 +156,20 @@ namespace AwsMock::Service {
         case 206:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_PARTIAL_CONTENT);
             break;
 
-        case 400:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
-            log_error_stream(_logger) << "HTTP status code: 401 message: " << reason << std::endl;
+        case 400:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, reason != nullptr ? reason : Poco::Net::HTTPResponse::HTTP_REASON_BAD_REQUEST);
+            log_error_stream(_logger) << "HTTP status code: 401 message: " << Poco::Net::HTTPResponse::HTTP_REASON_BAD_REQUEST << std::endl;
             break;
 
-        case 401:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED);
-            log_error_stream(_logger) << "HTTP status code: 401 message: " << reason << std::endl;
+        case 401:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED, reason != nullptr ? reason : Poco::Net::HTTPResponse::HTTP_REASON_UNAUTHORIZED);
+            log_error_stream(_logger) << "HTTP status code: 401 message: " << Poco::Net::HTTPResponse::HTTP_REASON_UNAUTHORIZED << std::endl;
             break;
 
-        case 403:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_FORBIDDEN);
-            log_warning_stream(_logger) << "HTTP status code: 403 message: " << reason << std::endl;
+        case 403:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_FORBIDDEN, reason != nullptr ? reason : Poco::Net::HTTPResponse::HTTP_REASON_FORBIDDEN);
+            log_warning_stream(_logger) << "HTTP status code: 403 message: " << Poco::Net::HTTPResponse::HTTP_REASON_FORBIDDEN << std::endl;
             break;
 
-        case 404:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
-            log_warning_stream(_logger) << "HTTP status code: 404 message: " << reason << std::endl;
+        case 404:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_FOUND, reason != nullptr ? reason : Poco::Net::HTTPResponse::HTTP_REASON_NOT_FOUND);
+            log_warning_stream(_logger) << "HTTP status code: 404 message: " << Poco::Net::HTTPResponse::HTTP_REASON_NOT_FOUND << std::endl;
             break;
 
         case 405:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_METHOD_NOT_ALLOWED);
