@@ -10,7 +10,6 @@ namespace AwsMock::Core {
         _logger(logger),
         _priority(priority) {
         _message.reserve(bufferCapacity);
-        ;
     }
 
     LogStreamBuf::~LogStreamBuf() {
@@ -50,7 +49,7 @@ namespace AwsMock::Core {
     //
     LogIOS::LogIOS(Poco::Logger &logger, Poco::Message::Priority priority, std::size_t bufferCapacity) :
         _buf(logger, priority, bufferCapacity) {
-        poco_ios_init(&_buf);
+        init(&_buf);
     }
 
     LogIOS::~LogIOS() = default;
