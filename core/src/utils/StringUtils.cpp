@@ -131,6 +131,10 @@ namespace AwsMock::Core {
         return string.substr(0, string.find(delimiter));
     }
 
+    std::string StringUtils::SubStringAfter(const std::string &string, char delimiter) {
+        return string.substr(string.find(delimiter) + 1);
+    }
+
     std::string StringUtils::UrlEncode(const std::string &input) {
         std::string encoded;
         Poco::URI::encode(input, "!*'();:@&=+$,?#[] ", encoded);

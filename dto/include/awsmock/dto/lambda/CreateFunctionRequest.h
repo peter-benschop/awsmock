@@ -168,7 +168,7 @@ namespace AwsMock::Dto::Lambda {
       /**
        * Tags
        */
-      Tags tags;
+      std::map<std::string, std::string> tags;
 
       /**
        * Timeout
@@ -224,7 +224,12 @@ namespace AwsMock::Dto::Lambda {
 
               // Tags
               if (rootObject->has("Tags")) {
-                  tags.FromJson(rootObject->getObject("Tags"));
+                  Poco::JSON::Object::Ptr tagsObject = rootObject->getObject("Tags");
+                  for(const auto &tag : tagsObject->getNames()) {
+                      std::string value;
+                      Core::JsonUtils::GetJsonValueString(tag, tagsObject, value);
+                      tags[tag] = value;
+                  }
               }
 
               // EphemeralStorage
@@ -269,8 +274,11 @@ namespace AwsMock::Dto::Lambda {
        */
       friend std::ostream &operator<<(std::ostream &os, const CreateFunctionRequest &r) {
           os << "CreateFunctionRequest={region='" << r.region << "' user='" << r.user << "' functionName='" << r.functionName << "' runtime: '" << r.runtime <<
-             "' role='" << r.role << "' handler='" << r.handler << "' memorySize='" << r.memorySize << "' ephemeralStorage='" << r.ephemeralStorage << "' tags='"
-             << r.tags << "' timeout='" << r.timeout << "' environment={" << r.environmentVariables.ToString() << "} code={" << r.code.ToString() << "}}";
+             "' role='" << r.role << "' handler='" << r.handler << "' memorySize='" << r.memorySize << "' ephemeralStorage='" << r.ephemeralStorage << "' tags=[";
+             for(const auto &tag : r.tags) {
+                 os << "key='" << tag.first << "' value='" << tag.second << "'";
+             }
+             os << "] timeout='" << r.timeout << "' environment={" << r.environmentVariables.ToString() << "} code={" << r.code.ToString() << "}}";
           return os;
       }
     };
