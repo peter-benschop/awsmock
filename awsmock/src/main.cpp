@@ -53,6 +53,10 @@ namespace AwsMock {
      */
     class AwsMock : public Poco::Util::ServerApplication {
 
+    public:
+
+      AwsMock() : _logger(Poco::Logger::get("root")) {}
+
     protected:
 
       /**

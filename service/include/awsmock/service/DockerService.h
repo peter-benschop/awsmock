@@ -139,9 +139,10 @@ namespace AwsMock::Service {
        * @param name image name
        * @param tag image tags
        * @param environment runtime environment variables
+       * @param hostPort external port of the lambda
        * @return CreateContainerResponse
        */
-      Dto::Docker::CreateContainerResponse CreateContainer(const std::string &name, const std::string &tag, const std::vector<std::string> &environment);
+      Dto::Docker::CreateContainerResponse CreateContainer(const std::string &name, const std::string &tag, const std::vector<std::string> &environment, int hostPort);
 
       /**
        * Returns a container by name/tags.
@@ -229,13 +230,6 @@ namespace AwsMock::Service {
        * @return return docker file path
        */
       std::string BuildImageFile(const std::string &codeDir, const std::string &name);
-
-      /**
-       * Returns a random host port in the range 32768 - 65536 for the host port of the docker container which is running the lambda function.
-       *
-       * @return random port between 32768 and 65536 as string
-       */
-      std::string GetHostPort();
 
       /**
        * Logger

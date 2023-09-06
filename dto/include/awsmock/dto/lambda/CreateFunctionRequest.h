@@ -171,6 +171,11 @@ namespace AwsMock::Dto::Lambda {
       Tags tags;
 
       /**
+       * Timeout
+       */
+      int timeout=3;
+
+      /**
        * Creates a JSON string from the object.
        *
        * @return JSON string
@@ -187,6 +192,7 @@ namespace AwsMock::Dto::Lambda {
               rootJson.set("Handler", handler);
               rootJson.set("MemorySize", memorySize);
               rootJson.set("Code", code.ToJson());
+              rootJson.set("Timeout", timeout);
 
               std::ostringstream os;
               rootJson.stringify(os);
@@ -214,6 +220,7 @@ namespace AwsMock::Dto::Lambda {
               Core::JsonUtils::GetJsonValueString("Runtime", rootObject, runtime);
               Core::JsonUtils::GetJsonValueString("Role", rootObject, role);
               Core::JsonUtils::GetJsonValueString("Handler", rootObject, handler);
+              Core::JsonUtils::GetJsonValueInt("Timeout", rootObject, timeout);
 
               // Tags
               if (rootObject->has("Tags")) {
@@ -263,7 +270,7 @@ namespace AwsMock::Dto::Lambda {
       friend std::ostream &operator<<(std::ostream &os, const CreateFunctionRequest &r) {
           os << "CreateFunctionRequest={region='" << r.region << "' user='" << r.user << "' functionName='" << r.functionName << "' runtime: '" << r.runtime <<
              "' role='" << r.role << "' handler='" << r.handler << "' memorySize='" << r.memorySize << "' ephemeralStorage='" << r.ephemeralStorage << "' tags='"
-             << r.tags << "' environment={" << r.environmentVariables.ToString() << "} code={" << r.code.ToString() << "}}";
+             << r.tags << "' timeout='" << r.timeout << "' environment={" << r.environmentVariables.ToString() << "} code={" << r.code.ToString() << "}}";
           return os;
       }
     };
