@@ -6,6 +6,19 @@
 
 namespace AwsMock::Database::Entity::Lambda {
 
+    bool Lambda::HasTag(const std::string &key) {
+        return find_if(tags.begin(), tags.end(), [key](const std::pair <std::string, std::string> &t) {
+          return t.first == key;
+        }) != tags.end();
+    }
+
+    std::string Lambda::GetTagValue(const std::string &key) {
+        auto it = find_if(tags.begin(), tags.end(), [key](const std::pair <std::string, std::string> &t) {
+          return t.first == key;
+        });
+        return it->second;
+    }
+
     view_or_value <view, value> Lambda::ToDocument() const {
 
         // Convert environment to document
@@ -17,7 +30,7 @@ namespace AwsMock::Database::Entity::Lambda {
 
         // Convert tags to document
         auto tagsDoc = bsoncxx::builder::basic::document{};
-        for (const auto &t : tags.tags) {
+        for (const auto &t : tags) {
             tagsDoc.append(kvp(t.first, t.second));
         }
 
@@ -68,7 +81,6 @@ namespace AwsMock::Database::Entity::Lambda {
         fileName = mResult.value()["fileName"].get_string().value.to_string();
         imageId = mResult.value()["imageId"].get_string().value.to_string();
         containerId = mResult.value()["containerId"].get_string().value.to_string();
-        tags.FromDocument(mResult.value()["tags"].get_document().value);
         arn = mResult.value()["arn"].get_string().value.to_string();
         codeSha256 = mResult.value()["codeSha256"].get_string().value.to_string();
         hostPort = mResult.value()["hostPort"].get_int32().value;
@@ -81,6 +93,14 @@ namespace AwsMock::Database::Entity::Lambda {
         lastInvocation = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastInvocation"].get_date().value) / 1000));
         created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
         modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+
+        // Get tags
+        bsoncxx::document::view tagsView = mResult.value()["tags"].get_document().value;
+        for (bsoncxx::document::element tagElement : tagsView) {
+            std::string key = tagElement.key().to_string();
+            std::string value = tagsView[key].get_string().value.to_string();
+            tags.emplace(key, value);
+        }
     }
 
     void Lambda::FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult) {
@@ -98,7 +118,6 @@ namespace AwsMock::Database::Entity::Lambda {
         fileName = mResult.value()["fileName"].get_string().value.to_string();
         imageId = mResult.value()["imageId"].get_string().value.to_string();
         containerId = mResult.value()["containerId"].get_string().value.to_string();
-        tags.FromDocument(mResult.value()["tags"].get_document().value);
         arn = mResult.value()["arn"].get_string().value.to_string();
         codeSha256 = mResult.value()["codeSha256"].get_string().value.to_string();
         hostPort = mResult.value()["hostPort"].get_int32().value;
@@ -111,6 +130,14 @@ namespace AwsMock::Database::Entity::Lambda {
         lastInvocation = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastInvocation"].get_date().value) / 1000));
         created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
         modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+
+        // Get tags
+        bsoncxx::document::view tagsView = mResult.value()["tags"].get_document().value;
+        for (bsoncxx::document::element tagElement : tagsView) {
+            std::string key = tagElement.key().to_string();
+            std::string value = tagsView[key].get_string().value.to_string();
+            tags.emplace(key, value);
+        }
     }
 
     std::string Lambda::ToString() const {
@@ -121,10 +148,13 @@ namespace AwsMock::Database::Entity::Lambda {
 
     std::ostream &operator<<(std::ostream &os, const Lambda &l) {
         os << "Lambda={oid='" << l.oid << "' region='" << l.region << "' function='" << l.function << "'runtime='" << l.runtime << "' role='" << l.role <<
-           "' handler='" << l.handler << "' imageId='" << l.imageId << "' containerId='" << l.containerId << "'" << l.tags.ToString() << " arn='" << l.arn <<
-           "' hostPort='" << l.hostPort << "' timeout='" << l.timeout << "' state='" << l.state << "' stateReason='" << l.stateReason << "' stateReasonCode='" << l.stateReasonCode <<
-           "' memorySize='" << l.memorySize << "' ephemeralStorage={" << l.ephemeralStorage.ToString() << "}" << "' codeSize='" << l.codeSize << "' fileName "
-           << l.fileName << "' lastStarted='" << Poco::DateTimeFormatter().format(l.lastStarted, Poco::DateTimeFormat::HTTP_FORMAT) <<
+           "' handler='" << l.handler << "' imageId='" << l.imageId << "' containerId='" << l.containerId << "' tags=[";
+           for(const auto &it:l.tags) {
+               os << "key='" << it.first << "' value='" << it.second << "'";
+           }
+           os << "] hostPort='" << l.hostPort << "' timeout='" << l.timeout << "' state='" << l.state << "' stateReason='" << l.stateReason << "' stateReasonCode='" <<
+           l.stateReasonCode << "' memorySize='" << l.memorySize << "' ephemeralStorage={" << l.ephemeralStorage.ToString() << "}" << "' codeSize='" << l.codeSize <<
+           "' fileName " << l.fileName << "' lastStarted='" << Poco::DateTimeFormatter().format(l.lastStarted, Poco::DateTimeFormat::HTTP_FORMAT) <<
            "' created='" << Poco::DateTimeFormatter().format(l.created, Poco::DateTimeFormat::HTTP_FORMAT) <<
            "' modified='" << Poco::DateTimeFormatter().format(l.modified, Poco::DateTimeFormat::HTTP_FORMAT) << "'}";
         return os;

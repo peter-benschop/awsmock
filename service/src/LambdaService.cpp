@@ -46,9 +46,6 @@ namespace AwsMock::Service {
             Database::Entity::Lambda::Environment environment = {
                 .variables=request.environmentVariables.variables
             };
-            Database::Entity::Lambda::Tags tags = {
-                .tags=request.tags.tags
-            };
             lambdaEntity = {
                 .region=request.region,
                 .user=request.user,
@@ -56,7 +53,7 @@ namespace AwsMock::Service {
                 .runtime=request.runtime,
                 .role=request.role,
                 .handler=request.handler,
-                .tags=tags,
+                .tags=request.tags,
                 .arn=lambdaArn,
                 .timeout=request.timeout,
                 .environment=environment,
@@ -69,8 +66,8 @@ namespace AwsMock::Service {
 
         // Docker tag
         std::string dockerTag = "latest";
-        if(lambdaEntity.tags.HasTag("tag")) {
-            dockerTag = lambdaEntity.tags.GetTagValue("tag");
+        if(lambdaEntity.HasTag("tag")) {
+            dockerTag = lambdaEntity.GetTagValue("tag");
         }
         log_debug_stream(_logger) << "Using docker tag: " + dockerTag << std::endl;
 
@@ -179,12 +176,46 @@ namespace AwsMock::Service {
         log_debug_stream(_logger) << "Lambda entity updated, name: " + lambda.function << std::endl;
     }
 
+    void LambdaService::CreateTag(const Dto::Lambda::CreateTagRequest &request) {
+        log_debug_stream(_logger) << "Create tag request, arn: " << request.arn << std::endl;
+
+        if (!_lambdaDatabase->LambdaExistsByArn(request.arn)) {
+            throw Core::ServiceException("Lambda function does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+        }
+
+        // Get the existing entity
+        Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase->GetLambdaByArn(request.arn);
+        for (const auto &it : request.tags) {
+            lambdaEntity.tags.emplace(it.first, it.second);
+        }
+        lambdaEntity = _lambdaDatabase->UpdateLambda(lambdaEntity);
+        log_debug_stream(_logger) << "Create tag request succeeded, arn: " + request.arn << " size: " << lambdaEntity.tags.size() << std::endl;
+    }
+
+    Dto::Lambda::ListTagsResponse LambdaService::ListTags(const std::string &arn) {
+        log_debug_stream(_logger) << "List tags request, arn: " << arn << std::endl;
+
+        if (!_lambdaDatabase->LambdaExistsByArn(arn)) {
+            throw Core::ServiceException("Lambda function does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+        }
+
+        // Get the existing entity
+        Dto::Lambda::ListTagsResponse response;
+        Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase->GetLambdaByArn(arn);
+        for (const auto &it : lambdaEntity.tags) {
+            response.tags.emplace(it.first, it.second);
+        }
+        log_debug_stream(_logger) << "List tag request succeeded, arn: " + arn << " size: " << lambdaEntity.tags.size() << std::endl;
+
+        return response;
+    }
+
     void LambdaService::DeleteFunction(Dto::Lambda::DeleteFunctionRequest &request) {
         log_debug_stream(_logger) << "Delete function: " + request.ToString() << std::endl;
 
         if (!_lambdaDatabase->LambdaExists(request.functionName)) {
             log_error_stream(_logger) << "Lambda function does not exist, function: " + request.functionName << std::endl;
-            throw Core::ServiceException("Lambda function does not exist", 403);
+            throw Core::ServiceException("Lambda function does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
         }
 
         // Delete the container, if existing
@@ -202,6 +233,27 @@ namespace AwsMock::Service {
 
         _lambdaDatabase->DeleteLambda(request.functionName);
         _logger.information() << "Lambda function deleted, function: " + request.functionName << std::endl;
+    }
+
+    void LambdaService::DeleteTags(Dto::Lambda::DeleteTagsRequest &request) {
+        log_trace_stream(_logger) << "Delete tags: " + request.ToString() << std::endl;
+
+        if (!_lambdaDatabase->LambdaExistsByArn(request.arn)) {
+            log_error_stream(_logger) << "Lambda function does not exist, arn: " + request.arn << std::endl;
+            throw Core::ServiceException("Lambda function does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+        }
+
+        // Get the existing entity
+        Dto::Lambda::ListTagsResponse response;
+        Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase->GetLambdaByArn(request.arn);
+        for (const auto &it : request.tags) {
+            if(lambdaEntity.HasTag(it)) {
+                auto key = lambdaEntity.tags.find(it);
+                lambdaEntity.tags.erase(it);
+            }
+        }
+        lambdaEntity = _lambdaDatabase->UpdateLambda(lambdaEntity);
+        log_debug_stream(_logger) << "Delete tag request succeeded, arn: " + request.arn << " size: " << lambdaEntity.tags.size() << std::endl;
     }
 
     void LambdaService::SendInvocationRequest(int port, const std::string &body) {

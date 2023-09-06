@@ -201,15 +201,34 @@ namespace AwsMock::Service {
       void GetActionVersion(const std::string &body, std::string &action, std::string &version);
 
       /**
-       * Get the action from the request body
+       * Get the action from the request path
        *
-       * <p>Returns a string parameter from the message body. This is mainly used by SQS.</p>
+       * <p>Returns a string parameter from the message path. This is mainly used by SQS.</p>
        *
-       * @param body HTTP request body
+       * @param path HTTP request path
        * @param name parameter name
        * @return parameter value
        */
-      std::string GetStringParameter(const std::string &body, const std::string &name);
+      std::string GetStringParameter(const std::string &path, const std::string &name);
+
+      /**
+       * Get a path parameter by index
+       *
+       * @param path HTTP request path
+       * @param index path index
+       * @return parameter value
+       */
+      std::string GetStringPathParameter(const std::string &path, int index);
+
+      /**
+       * Gets a string parameter at position index
+       *
+       * @param path HTTP request path
+       * @param name name of the parameter
+       * @param index index of tke key
+       * @return parameter value at index
+       */
+      std::string GetStringParameter(const std::string &path, const std::string &name, int index);
 
       /**
        * Return an integer name.
@@ -314,6 +333,14 @@ namespace AwsMock::Service {
        * @param exc service exception object
        */
       void SendErrorResponse(const std::string &service,Poco::Net::HTTPServerResponse &response, Core::ServiceException &exc);
+
+      /**
+       * Send a no content response, status: 204.
+       *
+       * @param response HTTP response
+       * @param extraHeader extrac headers
+       */
+      void SendNoContentResponse(Poco::Net::HTTPServerResponse &response, HeaderMap *extraHeader = nullptr);
 
       /**
        * CHecks whether the request has a header with the given key

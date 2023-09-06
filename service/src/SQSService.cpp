@@ -25,16 +25,25 @@ namespace AwsMock::Service {
         }
 
         try {
-            // Set default attributes
+            // Get queue ARN
             std::string queueArn = Core::AwsUtils::CreateSQSQueueArn(request.region, _accountId, request.name);
-            Database::Entity::SQS::QueueAttribute attribute{};
 
             // Update database
-            Database::Entity::SQS::Queue
-                queue = _database->CreateQueue({.region=request.region, .name=request.name, .owner=request.owner, .queueUrl=request.queueUrl, .queueArn=queueArn});
+            Database::Entity::SQS::Queue queue = _database->CreateQueue({
+                                                                            .region=request.region,
+                                                                            .name=request.name,
+                                                                            .owner=request.owner,
+                                                                            .queueUrl=request.queueUrl,
+                                                                            .queueArn=queueArn
+                                                                        });
             log_trace_stream(_logger) << "SQS queue created: " << queue.ToString() << std::endl;
 
-            return {.region=queue.region, .name=queue.name, .owner=queue.owner, .queueUrl=queue.queueUrl};
+            return {
+                .region=queue.region,
+                .name=queue.name,
+                .owner=queue.owner,
+                .queueUrl=queue.queueUrl
+            };
 
         } catch (Core::DatabaseException &exc) {
             log_error_stream(_logger) << "SQS create queue failed, message: " << exc.message() << std::endl;

@@ -279,9 +279,9 @@ namespace AwsMock::Service {
         log_trace_stream(_logger) << "Found action: " << action << " version: " << version << std::endl;
     }
 
-    std::string AbstractHandler::GetStringParameter(const std::string &body, const std::string &name) {
+    std::string AbstractHandler::GetStringParameter(const std::string &path, const std::string &name) {
         std::string value;
-        std::vector<std::string> bodyParts = Core::StringUtils::Split(body, '&');
+        std::vector<std::string> bodyParts = Core::StringUtils::Split(path, '&');
         for (auto &it : bodyParts) {
             std::vector<std::string> parts = Core::StringUtils::Split(it, '=');
             if (parts[0] == name) {
@@ -289,6 +289,35 @@ namespace AwsMock::Service {
             }
         }
         log_trace_stream(_logger) << "Found string parameter, name: " << name << " value: " << value << std::endl;
+        return value;
+    }
+
+    std::string AbstractHandler::GetStringParameter(const std::string &path, const std::string &name, int index) {
+
+        std::string parameters = Core::StringUtils::UrlDecode(Core::StringUtils::SubStringAfter(path, '?'));
+
+        std::vector<std::string> pathParts = Core::StringUtils::Split(path, '&');
+        if(index > pathParts.size()) {
+            log_error_stream(_logger) << "Invalid index, size: " << pathParts.size() << " index: " << index << std::endl;
+            return {};
+        }
+
+        std::string paramString = pathParts[index];
+        std::vector<std::string> parts = Core::StringUtils::Split(paramString, '=');
+        log_trace_stream(_logger) << "Found string parameter, name: " << name << " value: " << parts[1] << std::endl;
+
+        return parts[1];
+    }
+
+    std::string AbstractHandler::GetStringPathParameter(const std::string &path, int index) {
+        std::string value;
+        std::vector<std::string> pathParts = Core::StringUtils::Split(path, '/');
+        if(index >= pathParts.size()) {
+            log_error_stream(_logger) << "Invalid index, size: " << pathParts.size() << " index: " << index << std::endl;
+            return {};
+        }
+        value = pathParts[index];
+        log_trace_stream(_logger) << "Found string path parameter, name: " << index << " value: " << value << std::endl;
         return value;
     }
 
@@ -305,14 +334,15 @@ namespace AwsMock::Service {
 
     int AbstractHandler::GetAttributeCount(const std::string &body, const std::string &name) {
         int count = 0;
-        std::vector<std::string> bodyParts = Core::StringUtils::Split(body, '&');
+        std::string parameters = Core::StringUtils::SubStringAfter(body, '?');
+        std::vector<std::string> bodyParts = Core::StringUtils::Split(parameters, '&');
         for (auto &it : bodyParts) {
             if(it.starts_with(name)) {
                 count++;
             }
         }
         log_trace_stream(_logger) << "Found attribute count, name: " << name << " count: " << count / 2 << std::endl;
-        return count / 2;
+        return count;
     }
 
     int AbstractHandler::GetAttributeNameCount(const std::string &body, const std::string &name) {
@@ -330,7 +360,7 @@ namespace AwsMock::Service {
     void AbstractHandler::GetVersionActionFromUri(const std::string &uri, std::string &version, std::string &action) {
 
         Poco::RegularExpression::MatchVec posVec;
-        Poco::RegularExpression pattern(R"(/([a-z0-9-.]+)?/?([a-zA-Z0-9-_/.*'()]+)?\??.*$)");
+        Poco::RegularExpression pattern(R"(/([a-z0-9-.]+)?/?([a-zA-Z0-9-_.*'()]+)?[\?|/]?.*$)");
         if (!pattern.match(uri, 0, posVec)) {
             throw Core::ResourceNotFoundException("Could not extract version and action");
         }
@@ -367,7 +397,7 @@ namespace AwsMock::Service {
         SetHeaders(response, contentLength, extraHeader);
 
         // Send response
-        handleHttpStatusCode(response, 200);
+        handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_OK);
         std::ostream &os = response.send();
         if (!payload.empty()) {
             os << payload;
@@ -386,11 +416,27 @@ namespace AwsMock::Service {
             std::ifstream ifs(fileName);
 
             // Send response
-            handleHttpStatusCode(response, 200);
+            handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_OK);
             std::ostream &os = response.send();
             os << ifs.rdbuf();
             os.flush();
             ifs.close();
+
+        } catch (Poco::Exception &exc) {
+            log_error_stream(_logger) << "Exception: " << exc.message() << std::endl;
+        }
+    }
+
+    void AbstractHandler::SendNoContentResponse(Poco::Net::HTTPServerResponse &response, HeaderMap *extraHeader) {
+        log_trace_stream(_logger) << "Sending NO_CONTENT response, status: 204" << std::endl;
+        try {
+
+            // Set headers
+            SetHeaders(response, 0, extraHeader);
+
+            // Send response
+            handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NO_CONTENT);
+            response.send();
 
         } catch (Poco::Exception &exc) {
             log_error_stream(_logger) << "Exception: " << exc.message() << std::endl;

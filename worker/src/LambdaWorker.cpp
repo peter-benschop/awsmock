@@ -50,17 +50,13 @@ namespace AwsMock::Worker {
 
             Dto::Lambda::Code code = GetCode(lambda);
 
-            Dto::Lambda::Tags tags = {
-                .tags=lambda.tags.tags
-            };
-
             // Create create function request
             Dto::Lambda::CreateFunctionRequest request = {
                 .region=lambda.region,
                 .functionName=lambda.function,
                 .runtime=lambda.runtime,
                 .code=code,
-                .tags=tags
+                .tags=lambda.tags
             };
             SendCreateFunctionRequest(request, "application/json");
             log_debug_stream(_logger) << "Lambda started, name:" << lambda.function << std::endl;

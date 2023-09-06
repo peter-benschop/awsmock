@@ -233,7 +233,7 @@ namespace AwsMock::Database::Entity::Lambda {
       /**
        * Tags
        */
-      Tags tags;
+      std::map<std::string, std::string> tags;
 
       /**
        * ARN
@@ -299,6 +299,22 @@ namespace AwsMock::Database::Entity::Lambda {
        * Last modification date
        */
       Poco::DateTime modified = Poco::DateTime();
+
+      /**
+       * Checks whether a tags with the given tags key exists.
+       *
+       * @param key key of the tags
+       * @return true if tags with the given key exists.
+       */
+      bool HasTag(const std::string &key);
+
+      /**
+       * Returns a given tags value by key
+       *
+       * @param eventName name of the event
+       * @return found notification or notifications.end().
+       */
+      std::string GetTagValue(const std::string &key);
 
       /**
        * Converts the entity to a MongoDB document

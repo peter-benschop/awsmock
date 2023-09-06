@@ -102,6 +102,8 @@ namespace AwsMock {
               Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
           options.addOption(Poco::Util::Option("level", "", "set the log level").required(false).repeatable(false).argument("value").callback(
               Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
+          options.addOption(Poco::Util::Option("version", "", "display version information").required(false).repeatable(false).callback(
+              Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
           options.addOption(Poco::Util::Option("help", "", "display help information").required(false).repeatable(false).callback(
               Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
       }
@@ -127,6 +129,11 @@ namespace AwsMock {
           } else if (name == "config") {
 
               _configuration.SetFilename(value);
+
+          } else if (name == "version") {
+
+              std::cout << Configuration::GetAppName() << " v" << Configuration::GetVersion() << std::endl;
+              exit(0);
 
           } else if (name == "level") {
 

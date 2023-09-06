@@ -35,6 +35,13 @@ namespace AwsMock::Database {
         return count > 0;
     }
 
+    bool LambdaDatabase::LambdaExistsByArn(const std::string &arn) {
+
+        int64_t count = _lambdaCollection.count_documents(make_document(kvp("arn", arn)));
+        log_trace_stream(_logger) << "Lambda function exists: " << (count > 0 ? "true" : "false") << std::endl;
+        return count > 0;
+    }
+
     Entity::Lambda::Lambda LambdaDatabase::CreateLambda(const Entity::Lambda::Lambda &lambda) {
 
         auto result = _lambdaCollection.insert_one(lambda.ToDocument());
