@@ -108,8 +108,9 @@ namespace AwsMock::Service {
        *
        * @param request create function request.
        * @param entity lambda entity.
+       * @param dockerTag docker tag.
        */
-      void CreateDockerContainer(const Dto::Lambda::CreateFunctionRequest &request, Database::Entity::Lambda::Lambda &lambdaEntity);
+      void CreateDockerContainer(const Dto::Lambda::CreateFunctionRequest &request, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
 
       /**
        * Unpack the provided ZIP file.
@@ -138,6 +139,13 @@ namespace AwsMock::Service {
        * @param body message body containing the S3 event in JSON representation.
        */
       void SendInvocationRequest(int port, const std::string &body);
+
+      /**
+       * Returns a random host port in the range 32768 - 65536 for the host port of the docker container which is running the lambda function.
+       *
+       * @return random port between 32768 and 65536
+       */
+      int GetHostPort();
 
       /**
        * Logger

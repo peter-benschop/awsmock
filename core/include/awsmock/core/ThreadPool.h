@@ -11,6 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
+#include <awsmock/core/LogStream.h>
 
 #define CONFIG_NAME_TAG "awsmock.threadpool.name"
 #define CONFIG_INITIAL_TAG "awsmock.threadpool.min"
@@ -50,16 +51,14 @@ namespace AwsMock::Core {
 x       */
       explicit ThreadPool(const std::string &name = DEFAULT_NAME, int initial = DEFAULT_INITIAL, int max = DEFAULT_MAX, int waitTime = DEFAULT_WAITTIME)
           : _logger(Poco::Logger::get("ThreadPool")), Poco::ThreadPool(name, initial, max, waitTime), _initial(initial), _max(max), _idleTime(waitTime) {
-          poco_debug(_logger,
-                     "Thread pool initialized, name: " + name + " initial: " + std::to_string(initial) + " max: " + std::to_string(max) + " waitTime: "
-                         + std::to_string(waitTime));
+          log_debug_stream(_logger) << "Thread pool initialized, name: " + name + " initial: " << initial << " max: " << max << " waitTime: " << waitTime << std::endl;
       }
 
       /**
        * Destructor
        */
       virtual ~ThreadPool() {
-          poco_debug(_logger,"Shutting down thread pool, name: " + _name);
+          log_debug_stream(_logger) << "Shutting down thread pool, name: " << _name << std::endl;
           joinAll();
           _threads.clear();
       }
@@ -92,7 +91,7 @@ x       */
        */
       void DumpThreads() {
           for (auto &it : _threads) {
-              poco_information(_logger, "Thread, name: " + it.first + " running: " + std::to_string(it.second->GetRunning()));
+              log_info_stream(_logger) << "Thread, name: " << it.first << " running: " << it.second->GetRunning() << std::endl;
           }
       }
 
@@ -114,7 +113,7 @@ x       */
        */
       void WaitForAvailableThread() {
           while (!available()) {
-              poco_debug(_logger, "Waiting for thread");
+              log_debug_stream(_logger) << "Waiting for thread" << std::endl;
               Poco::Thread::sleep(_idleTime);
               collect();
               CleanupThreads();
@@ -124,7 +123,7 @@ x       */
       /**
        * Logger
        */
-      Poco::Logger &_logger;
+      Core::LogStream _logger;
 
       /**
        * Name

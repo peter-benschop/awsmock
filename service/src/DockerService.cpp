@@ -187,10 +187,12 @@ namespace AwsMock::Service {
         return response.containerList[0];
     }
 
-    Dto::Docker::CreateContainerResponse DockerService::CreateContainer(const std::string &name, const std::string &tag, const std::vector<std::string> &environment) {
+    Dto::Docker::CreateContainerResponse DockerService::CreateContainer(const std::string &name,
+                                                                        const std::string &tag,
+                                                                        const std::vector<std::string> &environment,
+                                                                        int hostPort) {
 
         // Create the request
-        std::string hostPort = GetHostPort();
         Dto::Docker::CreateContainerRequest request = {
             .hostName=name,
             .domainName=name + _networkName,
@@ -199,7 +201,7 @@ namespace AwsMock::Service {
             .networkMode=_networkMode,
             .environment=environment,
             .containerPort=_containerPort,
-            .hostPort=hostPort
+            .hostPort=std::to_string(hostPort)
         };
 
         std::string jsonBody = request.ToJson();
@@ -212,7 +214,7 @@ namespace AwsMock::Service {
             return {};
         }
 
-        Dto::Docker::CreateContainerResponse response = {.hostPort=std::stoi(hostPort)};
+        Dto::Docker::CreateContainerResponse response = {.hostPort=hostPort};
         response.FromJson(curlResponse.output);
 
         return response;
@@ -346,11 +348,5 @@ namespace AwsMock::Service {
         log_debug_stream(_logger) << "Zipped TAR file written: " << tarFileName << std::endl;
 
         return tarFileName;
-    }
-
-    std::string DockerService::GetHostPort() {
-        int port = Core::RandomUtils::NextInt(HOST_PORT_MIN, HOST_PORT_MAX);
-        log_debug_stream(_logger) << "Assigned port: " << port << std::endl;
-        return std::to_string(port);
     }
 }

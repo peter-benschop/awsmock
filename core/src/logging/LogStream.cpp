@@ -64,13 +64,13 @@ namespace AwsMock::Core {
     LogStream::LogStream(Poco::Logger &logger, Poco::Message::Priority priority, std::size_t bufferCapacity) :
         LogIOS(logger, priority, bufferCapacity),
         std::ostream(&_buf) {
-        Core::Logger::SetDefaultConsoleLogger(logger.name());
+        Core::Logger::SetDefaultConsoleLogger();
     }
 
     LogStream::LogStream(const std::string &loggerName, Poco::Message::Priority priority, std::size_t bufferCapacity) :
         LogIOS(Poco::Logger::get(loggerName), priority, bufferCapacity),
         std::ostream(&_buf) {
-        Core::Logger::SetDefaultConsoleLogger(loggerName);
+        Core::Logger::SetDefaultConsoleLogger();
     }
 
     LogStream::~LogStream() = default;

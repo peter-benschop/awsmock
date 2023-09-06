@@ -5,7 +5,8 @@ set(LIBRARY_STATIC awsmockdb_static)
 set(SOURCES src/repository/Database.cpp src/repository/ServiceDatabase.cpp src/repository/S3Database.cpp
         src/repository/SQSDatabase.cpp src/repository/SNSDatabase.cpp src/repository/LambdaDatabase.cpp
         src/repository/TransferDatabase.cpp src/entity/lambda/Tags.cpp src/entity/lambda/Environment.cpp
-        src/entity/lambda/EphemeralStorage.cpp src/entity/lambda/Lambda.cpp)
+        src/entity/lambda/EphemeralStorage.cpp src/entity/lambda/Lambda.cpp src/entity/s3/Bucket.cpp
+        src/entity/s3/BucketNotification.cpp)
 
 # Test directory
 add_subdirectory(tst)

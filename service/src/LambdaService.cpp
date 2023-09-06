@@ -33,7 +33,12 @@ namespace AwsMock::Service {
 
         if (_lambdaDatabase->LambdaExists(request.region, request.functionName, request.runtime)) {
 
+            // Get the existing entity
             lambdaEntity = _lambdaDatabase->GetLambdaByArn(lambdaArn);
+
+            // Set pending
+            lambdaEntity.state=Database::Entity::Lambda::LambdaState::Pending;
+            lambdaEntity = _lambdaDatabase->UpdateLambda(lambdaEntity);
 
         } else {
 
@@ -53,10 +58,14 @@ namespace AwsMock::Service {
                 .handler=request.handler,
                 .tags=tags,
                 .arn=lambdaArn,
+                .timeout=request.timeout,
                 .environment=environment,
-                .fileName=codeFileName
+                .state=Database::Entity::Lambda::LambdaState::Pending,
+                .stateReasonCode=Database::Entity::Lambda::LambdaStateReasonCode::Creating,
+                .fileName=codeFileName,
             };
         }
+
 
         // Docker tag
         std::string dockerTag = "latest";
@@ -78,7 +87,8 @@ namespace AwsMock::Service {
 
         // Create the container, if not existing
         if (!_dockerService->ContainerExists(request.functionName, dockerTag)) {
-            CreateDockerContainer(request, lambdaEntity);
+            lambdaEntity.hostPort = GetHostPort();
+            CreateDockerContainer(request, lambdaEntity, dockerTag);
         }
 
         // Get the container
@@ -88,7 +98,8 @@ namespace AwsMock::Service {
         // Start container
         _dockerService->StartDockerContainer(container.id);
         lambdaEntity.lastStarted = Poco::DateTime();
-        lambdaEntity.state = Database::Entity::Lambda::LambdaState::ACTIVE;
+        lambdaEntity.state = Database::Entity::Lambda::LambdaState::Active;
+        lambdaEntity.stateReasonCode = Database::Entity::Lambda::LambdaStateReasonCode::Idle;
 
         // Update database
         lambdaEntity = _lambdaDatabase->CreateOrUpdateLambda(lambdaEntity);
@@ -158,7 +169,14 @@ namespace AwsMock::Service {
         Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->GetLambdaByArn(lambdaArn);
         log_debug_stream(_logger) << "Got lambda entity, name: " + lambda.function << std::endl;
 
+        // Send invocation request
         SendInvocationRequest(lambda.hostPort, payload);
+
+        // Update database
+        lambda.lastInvocation = Poco::DateTime();
+        lambda.state=Database::Entity::Lambda::Active;
+        lambda = _lambdaDatabase->UpdateLambda(lambda);
+        log_debug_stream(_logger) << "Lambda entity updated, name: " + lambda.function << std::endl;
     }
 
     void LambdaService::DeleteFunction(Dto::Lambda::DeleteFunctionRequest &request) {
@@ -238,12 +256,10 @@ namespace AwsMock::Service {
         }
     }
 
-    void LambdaService::CreateDockerContainer(const Dto::Lambda::CreateFunctionRequest &request, Database::Entity::Lambda::Lambda &lambdaEntity) {
+    void LambdaService::CreateDockerContainer(const Dto::Lambda::CreateFunctionRequest &request, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {
 
         std::vector<std::string> environment = GetEnvironment(lambdaEntity.environment);
-        Dto::Docker::CreateContainerResponse containerCreateResponse = _dockerService->CreateContainer(request.functionName, "latest", environment);
-
-        lambdaEntity.hostPort = containerCreateResponse.hostPort;
+        Dto::Docker::CreateContainerResponse containerCreateResponse = _dockerService->CreateContainer(request.functionName, dockerTag, environment, lambdaEntity.hostPort);
         log_debug_stream(_logger) << "Lambda container created, hostPort: " << lambdaEntity.hostPort << std::endl;
     }
 
@@ -302,6 +318,12 @@ namespace AwsMock::Service {
         }
         log_debug_stream(_logger) << "Lambda runtime environment converted, size: " << environment.size() << std::endl;
         return environment;
+    }
+
+    int LambdaService::GetHostPort() {
+        int port = Core::RandomUtils::NextInt(HOST_PORT_MIN, HOST_PORT_MAX);
+        log_debug_stream(_logger) << "Assigned port: " << port << std::endl;
+        return port;
     }
 
 } // namespace AwsMock::Service

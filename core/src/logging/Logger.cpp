@@ -14,7 +14,6 @@ namespace AwsMock::Core {
 
     Logger::Logger(const std::string &profile) {
         SetProfile(profile);
-        SetDefaultConsoleLogger();
     }
 
     void Logger::SetDefaultConsoleLogger() {
@@ -22,13 +21,6 @@ namespace AwsMock::Core {
         Poco::AutoPtr<Poco::PatternFormatter> pPF(new Poco::PatternFormatter(DEFAULT_LOG_PATTERN));
         Poco::AutoPtr<Poco::FormattingChannel> pFC(new Poco::FormattingChannel(pPF, pCons));
         Poco::Logger::root().setChannel(pFC);
-    }
-
-    void Logger::SetDefaultConsoleLogger(const std::string &loggerName) {
-        Poco::AutoPtr<Poco::ConsoleChannel> pCons(new Poco::ConsoleChannel);
-        Poco::AutoPtr<Poco::PatternFormatter> pPF(new Poco::PatternFormatter(DEFAULT_LOG_PATTERN));
-        Poco::AutoPtr<Poco::FormattingChannel> pFC(new Poco::FormattingChannel(pPF, pCons));
-        Poco::Logger::get(loggerName).setChannel(pFC);
     }
 
     void Logger::SetJsonConsoleLogger() {

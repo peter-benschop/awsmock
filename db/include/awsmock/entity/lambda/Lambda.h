@@ -36,17 +36,17 @@ namespace AwsMock::Database::Entity::Lambda {
     using bsoncxx::document::value;
 
     enum LambdaState {
-      PENDING,
-      ACTIVE,
-      INACTIVE,
-      FAILED
+      Pending,
+      Active,
+      Inactive,
+      Failed
     };
 
     static std::map<LambdaState,std::string> LambdaStateNames{
-        {LambdaState::PENDING, "PENDING"},
-        {LambdaState::ACTIVE, "ACTIVE"},
-        {LambdaState::INACTIVE, "INACTIVE"},
-        {LambdaState::FAILED, "FAILED"},
+        {LambdaState::Pending, "Pending"},
+        {LambdaState::Active, "Active"},
+        {LambdaState::Inactive, "Inactive"},
+        {LambdaState::Failed, "Failed"},
     };
 
     [[maybe_unused]] static std::string LambdaStateToString(LambdaState lambdaState) {
@@ -59,7 +59,7 @@ namespace AwsMock::Database::Entity::Lambda {
                 return it.first;
             }
         }
-        return LambdaState::INACTIVE;
+        return LambdaState::Inactive;
     }
 
     enum LambdaStateReasonCode {
@@ -246,6 +246,11 @@ namespace AwsMock::Database::Entity::Lambda {
       int hostPort;
 
       /**
+       * Timeout in seconds
+       */
+      int timeout;
+
+      /**
        * Environment
        */
       Environment environment;
@@ -253,7 +258,7 @@ namespace AwsMock::Database::Entity::Lambda {
       /**
        * Lambda state
        */
-      LambdaState state = LambdaState::PENDING;
+      LambdaState state = LambdaState::Pending;
 
       /**
        * State reason
@@ -279,6 +284,11 @@ namespace AwsMock::Database::Entity::Lambda {
        * Last function start
        */
       Poco::DateTime lastStarted;
+
+      /**
+       * Last function invocation
+       */
+      Poco::DateTime lastInvocation;
 
       /**
        * Creation date

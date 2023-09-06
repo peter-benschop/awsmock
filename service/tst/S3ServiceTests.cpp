@@ -2,8 +2,8 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_CORE_SQSSERVICETEST_H
-#define AWMOCK_CORE_SQSSERVICETEST_H
+#ifndef AWMOCK_CORE_S3SERVICETEST_H
+#define AWMOCK_CORE_S3SERVICETEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
@@ -20,7 +20,7 @@
 #define OWNER "test-owner"
 #define LOCATION_CONSTRAINT "<CreateBucketConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\"> \
                                 <LocationConstraint>eu-central-1</LocationConstraint> \
-                            </CreateBucketConfiguration>"
+                             </CreateBucketConfiguration>"
 
 namespace AwsMock::Service {
 
@@ -89,4 +89,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Core
 
-#endif // AWMOCK_CORE_SQSSERVICETEST_H
+#endif // AWMOCK_CORE_S3SERVICETEST_H

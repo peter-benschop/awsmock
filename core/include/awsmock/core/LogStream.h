@@ -98,7 +98,7 @@ namespace AwsMock::Core {
       ///     ls.error() << "Some error message" << std::endl;
     {
     public:
-      static const std::size_t DEFAULT_BUFFER_CAPACITY = 255;
+      static const std::size_t DEFAULT_BUFFER_CAPACITY = 9092;
 
       explicit LogStream(Poco::Logger &logger, Poco::Message::Priority priority = Poco::Message::PRIO_INFORMATION, std::size_t bufferCapacity = DEFAULT_BUFFER_CAPACITY);
       /// Creates the LogStream, using the given logger and priority.

@@ -40,11 +40,12 @@ namespace AwsMock::Core {
         file = fopen("/proc/cpuinfo", "r");
         numProcessors = 0;
         while (fgets(line, 128, file) != nullptr) {
-            if (strncmp(line, "processor", 9) == 0) numProcessors++;
+            if (strncmp(line, "processor", 9) == 0)
+                numProcessors++;
         }
         fclose(file);
         numProcessors /= 2;
-        poco_debug(_logger, "Got number of processors, numProcs: " + std::to_string(numProcessors));
+        log_debug_stream(_logger) << "Got number of processors, numProcs: " << numProcessors << std::endl;
     }
 
     void MetricSystemCollector::onTimer(Poco::Timer& timer) {
@@ -52,7 +53,7 @@ namespace AwsMock::Core {
     }
 
     void MetricSystemCollector::CollectSystemCounter() {
-        poco_trace(_logger, "System collector starting");
+        log_trace_stream(_logger) << "System collector starting" << std::endl;
 
         std::string line;
         std::ifstream ifs("/proc/self/status");
@@ -62,17 +63,17 @@ namespace AwsMock::Core {
             if (StringUtils::Contains(line, "VmSize:")) {
                 double value = std::stod(StringUtils::Split(line, ':')[1]);
                 _virtualMemory->set(value);
-                poco_trace(_logger, "Virtual memory: " + std::to_string(value));
+                log_trace_stream(_logger) << "Virtual memory: " << value << std::endl;
             }
             if (StringUtils::Contains(line, "VmRSS:")) {
                 double value = std::stod(StringUtils::Split(line, ':')[1]);
                 _realMemory->set(value);
-                poco_trace(_logger, "Real Memory: " + std::to_string(value));
+                log_trace_stream(_logger) << "Real Memory: " << value << std::endl;
             }
             if (StringUtils::Contains(line, "Threads:")) {
                 double value = std::stod(StringUtils::Split(line, ':')[1]);
                 _totalThreads->set(value);
-                poco_trace(_logger, "Total Threads: " + std::to_string(value));
+                log_trace_stream(_logger) << "Total Threads: " << value << std::endl;
             }
         }
         ifs.close();
@@ -82,34 +83,32 @@ namespace AwsMock::Core {
         now = times(&timeSample);
         double totalPercent, userPercent, systemPercent;
 
-        poco_trace(_logger,
-                   "Now: " + std::to_string(now) + "/" + std::to_string(lastCPU) + "/" + std::to_string(lastSysCPU) +
-                       "/" + std::to_string(lastUserCPU));
+        log_trace_stream(_logger) << "Now: " << now << "/" << lastCPU << "/" << lastSysCPU << "/" << lastUserCPU << std::endl;
         if (now <= lastCPU || timeSample.tms_stime < lastSysCPU || timeSample.tms_utime < lastUserCPU) {
             // Overflow detection. Just skip this value.
             totalPercent = -1.0;
-            poco_debug(_logger, "Invalid CPU values, skipping");
+            log_debug_stream(_logger) << "Invalid CPU values, skipping" << std::endl;
         } else {
             totalPercent = (double) ((timeSample.tms_stime - lastSysCPU) + (timeSample.tms_utime - lastUserCPU));
             totalPercent /= (double) (now - lastCPU);
             totalPercent /= numProcessors;
             totalPercent *= 100;
             _totalCpu->set(totalPercent);
-            poco_trace(_logger, "Total CPU: " + std::to_string(totalPercent));
+            log_trace_stream(_logger) << "Total CPU: " << totalPercent << std::endl;
 
             userPercent = (double) (timeSample.tms_utime - lastUserCPU);
             userPercent /= (double) (now - lastCPU);
             userPercent /= numProcessors;
             userPercent *= 100;
             _userCpu->set(userPercent);
-            poco_trace(_logger, "User CPU: " + std::to_string(userPercent));
+            log_trace_stream(_logger) << "User CPU: " << userPercent << std::endl;
 
             systemPercent = (double) (timeSample.tms_stime - lastSysCPU);
             systemPercent /= (double) (now - lastCPU);
             systemPercent /= numProcessors;
             systemPercent *= 100;
             _systemCpu->set(systemPercent);
-            poco_trace(_logger, "System CPU: " + std::to_string(systemPercent));
+            log_trace_stream(_logger) << "System CPU: " << systemPercent << std::endl;
         }
         lastCPU = now;
         lastSysCPU = timeSample.tms_stime;

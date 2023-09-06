@@ -39,12 +39,14 @@ namespace AwsMock::Database::Entity::Lambda {
             kvp("tags", tagsDoc),
             kvp("arn", arn),
             kvp("hostPort", hostPort),
+            kvp("timeout", timeout),
             kvp("codeSha256", codeSha256),
             kvp("environment", varDoc),
             kvp("state", LambdaStateToString(state)),
             kvp("stateReason", stateReason),
             kvp("stateReasonCode", LambdaStateReasonCodeToString(stateReasonCode)),
             kvp("lastStarted", bsoncxx::types::b_date(std::chrono::milliseconds(lastStarted.timestamp().epochMicroseconds() / 1000))),
+            kvp("lastInvocation", bsoncxx::types::b_date(std::chrono::milliseconds(lastInvocation.timestamp().epochMicroseconds() / 1000))),
             kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
             kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
 
@@ -70,11 +72,13 @@ namespace AwsMock::Database::Entity::Lambda {
         arn = mResult.value()["arn"].get_string().value.to_string();
         codeSha256 = mResult.value()["codeSha256"].get_string().value.to_string();
         hostPort = mResult.value()["hostPort"].get_int32().value;
+        timeout = mResult.value()["timeout"].get_int32().value;
         environment.FromDocument(mResult.value()["environment"].get_document().value);
         state = LambdaStateFromString(mResult.value()["state"].get_string().value.to_string());
         stateReason = mResult.value()["stateReason"].get_string().value.to_string();
         stateReasonCode = LambdaStateReasonCodeFromString(mResult.value()["stateReasonCode"].get_string().value.to_string());
         lastStarted = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date().value) / 1000));
+        lastInvocation = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastInvocation"].get_date().value) / 1000));
         created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
         modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
     }
@@ -98,11 +102,13 @@ namespace AwsMock::Database::Entity::Lambda {
         arn = mResult.value()["arn"].get_string().value.to_string();
         codeSha256 = mResult.value()["codeSha256"].get_string().value.to_string();
         hostPort = mResult.value()["hostPort"].get_int32().value;
+        timeout = mResult.value()["timeout"].get_int32().value;
         environment.FromDocument(mResult.value()["environment"].get_document().value);
         state = LambdaStateFromString(mResult.value()["state"].get_string().value.to_string());
         stateReason = mResult.value()["stateReason"].get_string().value.to_string();
         stateReasonCode = LambdaStateReasonCodeFromString(mResult.value()["stateReasonCode"].get_string().value.to_string());
         lastStarted = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date().value) / 1000));
+        lastInvocation = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastInvocation"].get_date().value) / 1000));
         created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
         modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
     }
@@ -113,14 +119,14 @@ namespace AwsMock::Database::Entity::Lambda {
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const Lambda &m) {
-        os << "Lambda={oid='" << m.oid << "' region='" << m.region << "' function='" << m.function << "'runtime='" << m.runtime << "' role='" << m.role <<
-           "' handler='" << m.handler << "' imageId='" << m.imageId << "' containerId='" << m.containerId << "'" << m.tags.ToString() << " arn='" << m.arn <<
-           "' hostPort='" << m.hostPort << "' state='" << m.state << "' stateReason='" << m.stateReason << "' stateReasonCode='" << m.stateReasonCode <<
-           "' memorySize='" << m.memorySize << "' ephemeralStorage={" << m.ephemeralStorage.ToString() << "}" << "' codeSize='" << m.codeSize << "' fileName "
-           << m.fileName << "' lastStarted='" << Poco::DateTimeFormatter().format(m.lastStarted, Poco::DateTimeFormat::HTTP_FORMAT) <<
-           "' created='" << Poco::DateTimeFormatter().format(m.created, Poco::DateTimeFormat::HTTP_FORMAT) <<
-           "' modified='" << Poco::DateTimeFormatter().format(m.modified, Poco::DateTimeFormat::HTTP_FORMAT) << "'}";
+    std::ostream &operator<<(std::ostream &os, const Lambda &l) {
+        os << "Lambda={oid='" << l.oid << "' region='" << l.region << "' function='" << l.function << "'runtime='" << l.runtime << "' role='" << l.role <<
+           "' handler='" << l.handler << "' imageId='" << l.imageId << "' containerId='" << l.containerId << "'" << l.tags.ToString() << " arn='" << l.arn <<
+           "' hostPort='" << l.hostPort << "' timeout='" << l.timeout << "' state='" << l.state << "' stateReason='" << l.stateReason << "' stateReasonCode='" << l.stateReasonCode <<
+           "' memorySize='" << l.memorySize << "' ephemeralStorage={" << l.ephemeralStorage.ToString() << "}" << "' codeSize='" << l.codeSize << "' fileName "
+           << l.fileName << "' lastStarted='" << Poco::DateTimeFormatter().format(l.lastStarted, Poco::DateTimeFormat::HTTP_FORMAT) <<
+           "' created='" << Poco::DateTimeFormatter().format(l.created, Poco::DateTimeFormat::HTTP_FORMAT) <<
+           "' modified='" << Poco::DateTimeFormatter().format(l.modified, Poco::DateTimeFormat::HTTP_FORMAT) << "'}";
         return os;
     }
 }
