@@ -17,7 +17,6 @@
 
 // AwsMock includes
 #include <awsmock/dto/lambda/Environment.h>
-#include <awsmock/entity/lambda/Lambda.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -33,49 +32,22 @@ namespace AwsMock::Dto::Lambda {
        *
        * @return JSON string
        */
-      [[nodiscard]] std::string ToJson() {
-
-          try {
-              Poco::JSON::Object rootJson;
-              Poco::JSON::Object tagsObject;
-              for (const auto &t : tags) {
-                  tagsObject.set(t.first, t.second);
-              }
-              rootJson.set("Tags", tagsObject);
-
-              std::ostringstream os;
-              rootJson.stringify(os);
-              return os.str();
-
-          } catch (Poco::Exception &exc) {
-              throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-          }
-      }
+      [[nodiscard]] std::string ToJson();
 
       /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.
        */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
+      [[nodiscard]] std::string ToString() const;
 
       /**
        * Stream provider.
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const ListTagsResponse &r) {
-          os << "ListTagsResponse={[";
-          for (const auto &t : r.tags) {
-              os << "key='" << t.first << "' value='" << t.second << "'";
-          }
-          os << "]}";
-          return os;
-      }
+      friend std::ostream &operator<<(std::ostream &os, const ListTagsResponse &r);
+
     };
 
 } // namespace AwsMock::Dto::Lambda

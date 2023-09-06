@@ -51,14 +51,10 @@ namespace AwsMock::Dto::Docker {
               Core::JsonUtils::GetJsonValueLong("SpaceReclaimed", rootObject, spaceReclaimed);
               Poco::JSON::Array::Ptr deletedArray = rootObject->getArray("ContainersDeleted");
               if (deletedArray != nullptr) {
-                  for (Poco::JSON::Array::ConstIterator nt = deletedArray->begin(); nt != deletedArray->end(); ++nt) {
-                      containersDeleted.push_back(nt->convert<std::string>());
+                  for (const auto &nt : *deletedArray) {
+                      containersDeleted.push_back(nt.convert<std::string>());
                   }
               }
-              rootObject->clear();
-
-              // Cleanup
-              parser.reset();
 
           } catch (Poco::Exception &exc) {
               throw Core::ServiceException(exc.message(), 500);

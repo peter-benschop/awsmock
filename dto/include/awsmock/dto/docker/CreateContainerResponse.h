@@ -54,11 +54,6 @@ namespace AwsMock::Dto::Docker {
 
           try {
               Core::JsonUtils::GetJsonValueString("Id", rootObject, id);
-
-              // Cleanup
-              rootObject->clear();
-              parser.reset();
-
           } catch (Poco::Exception &exc) {
               throw Core::ServiceException(exc.message(), 500);
           }

@@ -49,10 +49,6 @@ namespace AwsMock::Dto::Lambda {
               Core::JsonUtils::GetJsonValueString("FunctionName", rootObject, functionName);
               Core::JsonUtils::GetJsonValueString("Qualifier", rootObject, qualifier);
 
-              // Cleanup
-              rootObject->clear();
-              parser.reset();
-
           } catch (Poco::Exception &exc) {
               throw Core::ServiceException(exc.message(), 500);
           }

@@ -67,7 +67,7 @@ namespace AwsMock::Dto::Docker {
       /**
        * Number of containers using this image
        */
-      int containers;
+      int containers = 0;
 
       /**
        * Convert to a JSON string
@@ -81,9 +81,6 @@ namespace AwsMock::Dto::Docker {
               Poco::Dynamic::Var result = parser.parse(body);
 
               this->FromJson(result.extract<Poco::JSON::Object::Ptr>());
-
-              // Cleanup
-              parser.reset();
 
           } catch (Poco::Exception &exc) {
               throw Core::ServiceException(exc.message(), 500);
@@ -111,10 +108,8 @@ namespace AwsMock::Dto::Docker {
                       repoTags.push_back(nt->convert<std::string>());
                   }
               }
-              object->clear();
 
           } catch (Poco::Exception &exc) {
-              std::cerr << exc.message() << std::endl;
               throw Core::ServiceException(exc.message(), 500);
           }
       }
@@ -155,6 +150,15 @@ namespace AwsMock::Dto::Docker {
       std::vector<Image> imageList;
 
       /**
+       * Constructor
+       *
+       * @param body HTTP response body
+       */
+      explicit ListImageResponse(const std::string &body) {
+          FromJson(body);
+      }
+
+      /**
        * Convert to a JSON string
        *
        * @return JSON string
@@ -172,10 +176,6 @@ namespace AwsMock::Dto::Docker {
                       imageList.push_back(image);
                   }
               }
-
-              // Cleanup
-              rootArray->clear();
-              parser.reset();
 
           } catch (Poco::Exception &exc) {
               throw Core::ServiceException(exc.message(), 500);

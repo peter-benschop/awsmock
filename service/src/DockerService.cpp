@@ -25,16 +25,9 @@ namespace AwsMock::Service {
 
         if (curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
 
-            Dto::Docker::ListImageResponse response;
-            response.FromJson(curlResponse.output);
-
-            if (response.imageList.empty()) {
-                log_warning_stream(_logger) << "Docker image not found, name: " << name << ":" << tag << std::endl;
-                return false;
-            }
-
-            log_debug_stream(_logger) << "Docker image found, name: " << name << ":" << tag << std::endl;
-            return true;
+            Dto::Docker::ListImageResponse response(curlResponse.output);
+            log_debug_stream(_logger) << "Docker image found, name: " << name << ":" << tag << (response.imageList.empty() ? "true" : "false") << std::endl;
+            return !response.imageList.empty();
         }
         return false;
     }
@@ -45,7 +38,7 @@ namespace AwsMock::Service {
         Core::CurlResponse curlResponse = _curlUtils.SendRequest("POST", "http://localhost/images/create?name=" + name + "&tag=" + tag + "&fromImage=" + fromImage);
         log_trace_stream(_logger) << "Create image request send to docker daemon, output: " << curlResponse.ToString() << std::endl;
 
-        if (curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
+        if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
             log_error_stream(_logger) << "Docker image create failed, status: " << curlResponse.statusCode << std::endl;
         } else {
             log_debug_stream(_logger) << "Docker image created, name: " << name << ":" << tag << std::endl;
@@ -61,9 +54,7 @@ namespace AwsMock::Service {
 
         if (curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
 
-            Dto::Docker::ListImageResponse response;
-            response.FromJson(curlResponse.output);
-
+            Dto::Docker::ListImageResponse response(curlResponse.output);
             if (response.imageList.empty()) {
                 log_warning_stream(_logger) << "Docker image not found, name: " << name << ":" << tag << std::endl;
                 return {};

@@ -74,7 +74,6 @@ namespace AwsMock::Dto::Docker {
               Core::JsonUtils::GetJsonValueString("Command", object, command);
               Core::JsonUtils::GetJsonValueString("State", object, state);
               Core::JsonUtils::GetJsonValueString("Status", object, status);
-              object->clear();
 
           } catch (Poco::Exception &exc) {
               throw Core::ServiceException(exc.message(), 500);
@@ -135,9 +134,6 @@ namespace AwsMock::Dto::Docker {
                       containerList.push_back(container);
                   }
               }
-              // Cleanup
-              rootArray->clear();
-              parser.reset();
 
           } catch (Poco::Exception &exc) {
               std::cerr << exc.message() << std::endl;

@@ -674,10 +674,6 @@ namespace AwsMock::Dto::S3 {
                   }
               }
 
-              // Cleanup
-              recordArray->clear();
-              parser.reset();
-
           } catch (Poco::Exception &exc) {
               std::cerr << exc.message() << std::endl;
               throw Core::ServiceException(exc.message(), 500);

@@ -2,18 +2,21 @@
 // Created by vogje01 on 01/09/2022.
 //
 
+// C++ include
+#include <fstream>
+
 // GTest includes
 #include "gtest/gtest.h"
 
-// AwsMock includes
-#include <awsmock/core/FileUtils.h>
+// Test includes
+#include "TestCommon.h"
 
 class TestEnvironment : public ::testing::Environment {
 public:
 
   // Initialise a test configuration.
   void SetUp() override {
-      std::ofstream ofs("/tmp/aws-mock.properties");
+      std::ofstream ofs(TMP_PROPERTIES_FILE);
       // AWS configuration
       ofs << "awsmock.region=eu-central-1" << std::endl;
       ofs << "awsmock.rest.host=localhost" << std::endl;
@@ -35,7 +38,7 @@ public:
       // Monitoring configuration
       ofs << "awsmock.monitoring.port=8081" << std::endl;
       ofs << "awsmock.monitoring.timeout=60000" << std::endl;
-      ofs << "awsmock.log.level=debug" << std::endl;
+      ofs << "awsmock.log.level=error" << std::endl;
   }
 };
 

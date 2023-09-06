@@ -1,0 +1,21 @@
+
+set(LIBRARY awsmockdto)
+set(LIBRARY_STATIC awsmockdto_static)
+
+set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionResponse.cpp src/lambda/DeadLetterConfig.cpp
+        src/lambda/Function.cpp)
+
+set(SOURCES ${LAMBDA_SOURCES})
+
+# Test directory
+#add_subdirectory(tst)
+
+# Includes
+include_directories(include ../core/include ../db/include /usr/include /usr/include/mongo /usr/include/bsoncxx/v_noabi
+        /usr/include/mongocxx/v_noabi tbb)
+
+add_library(${LIBRARY} SHARED ${SOURCES})
+add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
+set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
+
+install(TARGETS ${LIBRARY} DESTINATION lib)
