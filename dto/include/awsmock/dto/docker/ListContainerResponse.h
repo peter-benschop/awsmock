@@ -117,6 +117,13 @@ namespace AwsMock::Dto::Docker {
       std::vector<Container> containerList;
 
       /**
+       * Constructor
+       */
+      explicit ListContainerResponse(const std::string &body) {
+          FromJson(body);
+      }
+
+      /**
        * Convert to a JSON string
        *
        * @return JSON string
