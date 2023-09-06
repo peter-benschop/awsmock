@@ -16,6 +16,7 @@ namespace AwsMock::Core {
     }
 
     void Configuration::Initialize() {
+
         // Monitoring
         DefineProperty("awsmock.core.monitoring.port", "AWSMOCK_CORE_METRIC_PORT", "8081");
         DefineProperty("awsmock.core.monitoring.timeout", "AWSMOCK_CORE_METRIC_TIMEOUT", "60000");
@@ -33,7 +34,7 @@ namespace AwsMock::Core {
         } else {
             setString(key, defaultValue);
         }
-        poco_trace(_logger, "Defined property, key: " + key + " property: " + envProperty + " default: " + defaultValue);
+        log_trace_stream(_logger) << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue << std::endl;
     }
 
     std::string Configuration::GetFilename() const {
@@ -81,7 +82,7 @@ namespace AwsMock::Core {
             throw CoreException("Property not found, key: " + key);
         }
         setString(key, value);
-        poco_trace(_logger, "Value set, key: " + key);
+        log_trace_stream(_logger) << "Value set, key: " << key << std::endl;
     }
 
     std::string Configuration::GetAppName() {

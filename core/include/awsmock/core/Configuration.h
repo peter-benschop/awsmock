@@ -11,14 +11,14 @@
 #include <utility>
 
 // Poco includes
-#include "Poco/Logger.h"
 #include "Poco/String.h"
 #include "Poco/Util/LayeredConfiguration.h"
 #include "Poco/Util/PropertyFileConfiguration.h"
 
 // AwsMock includes
-#include "CoreException.h"
-#include "Version.h"
+#include <awsmock/core/CoreException.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/Version.h>
 
 namespace AwsMock::Core {
 
@@ -144,7 +144,7 @@ namespace AwsMock::Core {
       /**
        * Logger
        */
-      Poco::Logger &_logger;
+      Core::LogStream _logger;
 
       /**
        * Name of the configuration file

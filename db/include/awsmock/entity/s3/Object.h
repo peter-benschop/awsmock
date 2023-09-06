@@ -9,7 +9,19 @@
 #include <string>
 #include <chrono>
 
+// MongoDB includes
+#include <bsoncxx/builder/basic/array.hpp>
+#include <bsoncxx/builder/basic/document.hpp>
+#include <mongocxx/stdx.hpp>
+
 namespace AwsMock::Database::Entity::S3 {
+
+    using bsoncxx::view_or_value;
+    using bsoncxx::document::view;
+    using bsoncxx::document::value;
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
 
     struct Object {
 

@@ -13,7 +13,6 @@
 #include <sys/times.h>
 
 // Poco includes
-#include <Poco/Logger.h>
 #include <Poco/Timer.h>
 #include <Poco/Prometheus/Counter.h>
 #include <Poco/Prometheus/Gauge.h>
@@ -21,6 +20,7 @@
 
 // AwsMock includes
 #include "awsmock/core/StringUtils.h"
+#include "awsmock/core/LogStream.h"
 
 // System counter
 #define VIRTUAL_MEMORY "virtual_memory_used"
@@ -72,7 +72,7 @@ namespace AwsMock::Core {
       /**
        * Logger
        */
-      Poco::Logger &_logger;
+      Core::LogStream _logger;
 
       /**
        * Virtual memory gauge

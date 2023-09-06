@@ -30,7 +30,6 @@
 #include "Poco/Path.h"
 #include "Poco/File.h"
 #include "Poco/String.h"
-#include "Poco/Logger.h"
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
 #include "Poco/UUIDGenerator.h"
@@ -41,6 +40,7 @@
 
 // AwsMock includes
 #include "awsmock/core/DirUtils.h"
+#include "awsmock/core/LogStream.h"
 #include "awsmock/core/StringUtils.h"
 
 namespace AwsMock::Core {
@@ -225,6 +225,8 @@ namespace AwsMock::Core {
        * @param fileName absolute file name of the file
        */
       static bool Touch(const std::string &fileName);
+
+      static Core::LogStream logger;
     };
 } // namespace AwsMock::Core
 #endif // AWSMOCK_CORE_FILEUTILS_H

@@ -16,6 +16,7 @@
 // AwsMock includes
 #include "awsmock/core/CryptoUtils.h"
 #include "awsmock/core/ServiceException.h"
+#include "awsmock/core/LogStream.h"
 #include "awsmock/repository/S3Database.h"
 #include "awsmock/dto/s3/CompleteMultipartUploadResult.h"
 #include "awsmock/dto/s3/CreateBucketRequest.h"
@@ -338,6 +339,6 @@ namespace AwsMock::Service {
 
     };
 
-} //namespace AwsMock::Service
+} // namespace AwsMock::Service
 
-#endif //AWSMOCK_SERVICE_S3SERVICE_H
+#endif // AWSMOCK_SERVICE_S3SERVICE_H
