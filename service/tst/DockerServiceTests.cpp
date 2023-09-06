@@ -28,6 +28,8 @@ namespace AwsMock::Service {
       }
 
       void TearDown() override {
+          _service.DeleteImage("hello-world", "latest");
+          _service.PruneContainers();
       }
 
       Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
@@ -37,46 +39,27 @@ namespace AwsMock::Service {
     TEST_F(DockerServiceTest, ImageExistsTest) {
 
         // arrange
+        _service.CreateImage("hello-world", "latest", "hello-world");
 
         // act
-        bool result = _service.ImageExists("name", "tag");
+        bool result = _service.ImageExists("hello-world", "latest");
 
         // assert
-        EXPECT_FALSE(result);
-    }
-
-    TEST_F(DockerServiceTest, ImageCreateTest) {
-
-        // arrange
-
-        // act
-        _service.CreateImage("name", "latest", "hello-world");
-        Dto::Docker::Image image = _service.GetImageByName("name", "latest");
-
-        // assert
-        EXPECT_TRUE(image.id.empty());
-    }
-
-    TEST_F(DockerServiceTest, ImageGetByNameTest) {
-
-        // arrange
-
-        // act
-        Dto::Docker::Image image = _service.GetImageByName("name", "tag");
-
-        // assert
-        EXPECT_TRUE(image.id.empty());
+        EXPECT_TRUE(result);
     }
 
     TEST_F(DockerServiceTest, ContainerExistsTest) {
 
         // arrange
+        const std::vector<std::string> environment;
+        _service.CreateImage("hello-world", "latest", "hello-world");
+        _service.CreateContainer("hello-world", "latest", environment, 1025);
 
         // act
-        bool result = _service.ContainerExists("name", "tag");
+        bool result = _service.ContainerExists("hello-world", "latest");
 
         // assert
-        EXPECT_FALSE(result);
+        EXPECT_TRUE(result);
     }
 
     TEST_F(DockerServiceTest, ContainerCreateDtoTest) {

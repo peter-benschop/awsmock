@@ -19,8 +19,8 @@ namespace AwsMock::Service {
 
     bool DockerService::ImageExists(const std::string &name, const std::string &tag) {
 
-        std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + "\"]}");
-        Core::CurlResponse curlResponse = _curlUtils.SendRequest("GET", "http://localhost/images/json?filters=" + filters);
+        std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + ":" + tag + "\"]}");
+        Core::CurlResponse curlResponse = _curlUtils.SendRequest("GET", "http://localhost/images/json?all&true&filters=" + filters);
         log_trace_stream(_logger) << "List images request send to docker daemon, output: " << curlResponse.ToString() << std::endl;
 
         if (curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
@@ -104,7 +104,7 @@ namespace AwsMock::Service {
     bool DockerService::ContainerExists(const std::string &name, const std::string &tag) {
 
         std::string filters = Core::StringUtils::UrlEncode(R"({"name":[")" + name + "\"]}");
-        Core::CurlResponse curlResponse = _curlUtils.SendRequest("GET", "http://localhost/containers/json?filters=" + filters);
+        Core::CurlResponse curlResponse = _curlUtils.SendRequest("GET", "http://localhost/containers/json?all=true&filters=" + filters);
         log_debug_stream(_logger) << "List container request send to docker daemon" << std::endl;
         log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
@@ -113,16 +113,9 @@ namespace AwsMock::Service {
             return false;
         }
 
-        Dto::Docker::ListContainerResponse response;
-        response.FromJson(curlResponse.output);
-
-        if (response.containerList.empty()) {
-            log_warning_stream(_logger) << "Docker container not found, name: " << name << ":" << tag << std::endl;
-            return false;
-        }
-
-        log_debug_stream(_logger) << "Docker container found, name: " << name << ":" << tag << std::endl;
-        return true;
+        Dto::Docker::ListContainerResponse response(curlResponse.output);
+        log_debug_stream(_logger) << "Docker image found, name: " << name << ":" << tag << (response.containerList.empty() ? "true" : "false") << std::endl;
+        return !response.containerList.empty();
     }
 
     Dto::Docker::Container DockerService::GetContainerByName(const std::string &name, const std::string &tag) {
@@ -137,9 +130,7 @@ namespace AwsMock::Service {
             return {};
         }
 
-        Dto::Docker::ListContainerResponse response;
-        response.FromJson(curlResponse.output);
-
+        Dto::Docker::ListContainerResponse response(curlResponse.output);
         if (response.containerList.empty()) {
             log_warning_stream(_logger) << "Docker container not found, name: " << name << ":" << tag << std::endl;
             return {};
@@ -166,8 +157,7 @@ namespace AwsMock::Service {
             return {};
         }
 
-        Dto::Docker::ListContainerResponse response;
-        response.FromJson(curlResponse.output);
+        Dto::Docker::ListContainerResponse response(curlResponse.output);
 
         if (response.containerList.empty()) {
             log_warning_stream(_logger) << "Docker container not found, id: " << id << std::endl;
