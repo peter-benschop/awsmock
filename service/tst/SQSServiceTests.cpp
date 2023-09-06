@@ -13,6 +13,9 @@
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/SQSService.h>
 
+// Test includes
+#include "TestCommon.h"
+
 #define REGION "eu-central-1"
 #define QUEUE "test-queue"
 #define QUEUE_URL "http://localhost:4567/000000000000/test-queue"
@@ -33,7 +36,7 @@ namespace AwsMock::Service {
 
       }
 
-      Core::Configuration _configuration = Core::Configuration("/tmp/aws-mock.properties");
+      Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
       Database::SQSDatabase _database = Database::SQSDatabase(_configuration);
       SQSService _service = SQSService(_configuration);
       //Poco::Data::Session _session = _snsDatabase.GetSession();

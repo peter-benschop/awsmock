@@ -62,10 +62,6 @@ namespace AwsMock::Dto::Lambda {
                   tags[name] = tagsObject->get(name).convert<std::string>();
               }
 
-              // Cleanup
-              rootObject->clear();
-              parser.reset();
-
           } catch (Poco::Exception &exc) {
               throw Core::ServiceException(exc.message(), 500);
           }

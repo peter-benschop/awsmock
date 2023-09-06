@@ -40,8 +40,6 @@ namespace AwsMock::Dto::Docker {
 
           try {
               Core::JsonUtils::GetJsonValueString("Name", jsonObject, name);
-              jsonObject->clear();
-
           } catch (Poco::Exception &exc) {
               std::cerr << exc.message() << std::endl;
               throw Core::ServiceException(exc.message(), 500);
@@ -89,7 +87,6 @@ namespace AwsMock::Dto::Docker {
               Core::JsonUtils::GetJsonValueDate("BuildTime", jsonObject, buildTime);
               Core::JsonUtils::GetJsonValueBool("Experimental", jsonObject, experimental);
               Core::JsonUtils::GetJsonValueString("GitCommit", jsonObject, gitCommit);
-              jsonObject->clear();
 
           } catch (Poco::Exception &exc) {
               std::cerr << exc.message() << std::endl;
@@ -128,7 +125,6 @@ namespace AwsMock::Dto::Docker {
               if(jsonObject->has("Details")) {
                   details.FromJson(jsonObject->getObject("Details"));
               }
-              jsonObject->clear();
 
           } catch (Poco::Exception &exc) {
               std::cerr << exc.message() << std::endl;
@@ -177,10 +173,6 @@ namespace AwsMock::Dto::Docker {
                       }
                   }
               }
-
-              // Cleanup
-              rootObject->clear();
-              parser.reset();
 
           } catch (Poco::Exception &exc) {
               std::cerr << exc.message() << std::endl;

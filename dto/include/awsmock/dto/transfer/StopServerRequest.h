@@ -49,10 +49,6 @@ namespace AwsMock::Dto::Transfer {
               Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
               Core::JsonUtils::GetJsonValueString("ServerId", rootObject, serverId);
 
-              // Cleanup
-              rootObject->clear();
-              parser.reset();
-
           } catch (Poco::Exception &exc) {
               throw Core::ServiceException(exc.message(), 500);
           }

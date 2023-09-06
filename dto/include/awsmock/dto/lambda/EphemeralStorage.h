@@ -49,7 +49,7 @@ namespace AwsMock::Dto::Lambda {
        *
        * @return JSON string
        */
-      void FromJson(Poco::JSON::Object::Ptr jsonObject) {
+      void FromJson(const Poco::JSON::Object::Ptr& jsonObject) {
 
           try {
               Core::JsonUtils::GetJsonValueLong("Size", jsonObject, size);

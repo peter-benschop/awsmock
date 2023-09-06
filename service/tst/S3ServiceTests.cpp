@@ -14,6 +14,9 @@
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/S3Service.h>
 
+// Test includes
+#include "TestCommon.h"
+
 #define REGION "eu-central-1"
 #define BUCKET "test-bucket"
 #define KEY "testfile.json"
@@ -37,7 +40,7 @@ namespace AwsMock::Service {
           Core::FileUtils::DeleteFile(testFile);
       }
 
-      Core::Configuration _configuration = Core::Configuration("/tmp/aws-mock.properties");
+      Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
       Database::S3Database _database = Database::S3Database(_configuration);
       S3Service _service = S3Service(_configuration);
       std::string testFile;

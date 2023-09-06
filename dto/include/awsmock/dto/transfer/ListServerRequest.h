@@ -77,10 +77,6 @@ namespace AwsMock::Dto::Transfer {
               Core::JsonUtils::GetJsonValueInt("MaxResults", rootObject, maxResults);
               Core::JsonUtils::GetJsonValueString("NextToken", rootObject, nextToken);
 
-              // Cleanup
-              rootObject->clear();
-              parser.reset();
-
           } catch (Poco::Exception &exc) {
               throw Core::ServiceException(exc.message(), 500);
           }

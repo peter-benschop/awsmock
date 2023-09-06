@@ -6,6 +6,7 @@
 #define AWSMOCK_CORE_SERVICEEXCEPTION_H
 
 #include "Poco/Exception.h"
+#include "Poco/Net/HTTPResponse.h"
 
 namespace AwsMock::Core {
 

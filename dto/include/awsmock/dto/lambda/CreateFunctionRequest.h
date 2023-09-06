@@ -57,7 +57,7 @@ namespace AwsMock::Dto::Lambda {
        *
        * @param jsonObject json object
        */
-      void FromJson(Poco::JSON::Object::Ptr jsonObject) {
+      void FromJson(const Poco::JSON::Object::Ptr& jsonObject) {
           try {
               Core::JsonUtils::GetJsonValueString("S3Bucket", jsonObject, s3Bucket);
               Core::JsonUtils::GetJsonValueString("S3Key", jsonObject, s3Key);
@@ -246,10 +246,6 @@ namespace AwsMock::Dto::Lambda {
               if (rootObject->has("Code")) {
                   code.FromJson(rootObject->getObject("Code"));
               }
-
-              // Cleanup
-              rootObject->clear();
-              parser.reset();
 
           } catch (Poco::Exception &exc) {
               throw Core::ServiceException(exc.message(), 500);

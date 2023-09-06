@@ -12,6 +12,9 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/service/DockerService.h>
 
+// Test includes
+#include "TestCommon.h"
+
 #define NAME "test-container"
 #define IMAGE "test-image:latest"
 
@@ -27,7 +30,7 @@ namespace AwsMock::Service {
       void TearDown() override {
       }
 
-      Core::Configuration _configuration = Core::Configuration("/tmp/aws-mock.properties");
+      Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
       DockerService _service = DockerService(_configuration);
     };
 

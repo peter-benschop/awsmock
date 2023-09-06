@@ -13,16 +13,16 @@ set(SOURCES src/config/Configuration.cpp src/resource/HandlerException.cpp src/r
 
 include_directories(include ../core/include ../db/include ../dto/include ../service/include ../worker/include
         /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi )
-link_directories(/usr/lib /usr/lib/x86_64-linux-gnu /usr/local/lib ../core ../db ../service ../worker)
+link_directories(/usr/lib /usr/lib/x86_64-linux-gnu /usr/local/lib ../core ../dto ../db ../service ../worker)
 
 # External includes
 include_directories(/usr/include /usr/local/include)
 
 add_executable(${BINARY} ${SOURCES})
 
-target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdb awsmocksrv awsmockwrk mongocxx bsoncxx PocoPrometheus
-        PocoNet PocoNetSSL PocoUtil PocoJSON PocoXML PocoZip PocoFoundation pthread crypto ssl z archive curl
-        fineftp-server tbb)
+target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdb awsmocksrv awsmockwrk awsmockdto mongocxx bsoncxx
+        PocoPrometheus PocoNet PocoNetSSL PocoUtil PocoJSON PocoXML PocoZip PocoFoundation pthread crypto ssl z archive
+        curl fineftp-server tbb)
 add_library(${BINARY}_lib STATIC ${SOURCES})
 
 install(TARGETS ${BINARY} DESTINATION bin)

@@ -24,6 +24,7 @@ option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation 
 enable_testing()
 
 add_subdirectory(core)
+add_subdirectory(dto)
 add_subdirectory(db)
 add_subdirectory(service)
 add_subdirectory(worker)
