@@ -53,7 +53,7 @@ namespace AwsMock::Service {
 
         if (!_transferDatabase->TransferExists(request.region, request.serverId)) {
 
-            throw Core::ServiceException("Transfer server with ID '" + request.serverId + "  does not exist", 500);
+            throw Core::ServiceException("Transfer server with ID '" + request.serverId + "  does not exist", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
 
         } else {
 
@@ -61,7 +61,7 @@ namespace AwsMock::Service {
 
             // Check user
             if (transferEntity.HasUser(request.userName)) {
-                throw Core::ServiceException("Transfer server has already a user with name '" + request.userName + "'", 500);
+                throw Core::ServiceException("Transfer server has already a user with name '" + request.userName + "'", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
             }
 
             // Get home directory
@@ -72,7 +72,11 @@ namespace AwsMock::Service {
 
             // Add user
             Database::Entity::Transfer::User
-                user = {.userName=request.userName, .password=Core::StringUtils::GenerateRandomPassword(8), .homeDirectory=request.homeDirectory};
+                user = {
+                .userName=request.userName,
+                .password=Core::StringUtils::GenerateRandomPassword(8),
+                .homeDirectory=request.homeDirectory
+            };
             transferEntity.users.emplace_back(user);
 
             // Update database
