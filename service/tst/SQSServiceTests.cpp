@@ -14,7 +14,7 @@
 #include <awsmock/service/SQSService.h>
 
 // AwsMOck includes
-#include <awsmock/core/TestUtils.h>"
+#include <awsmock/core/TestUtils.h>
 
 #define REGION "eu-central-1"
 #define QUEUE "test-queue"
@@ -33,16 +33,16 @@ namespace AwsMock::Service {
       }
 
       void TearDown() override {
-
+        _database.DeleteAllQueues();
+          _database.DeleteAllMessages();
       }
 
       Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
       Database::SQSDatabase _database = Database::SQSDatabase(_configuration);
       SQSService _service = SQSService(_configuration);
-      //Poco::Data::Session _session = _snsDatabase.GetSession();
     };
 
-    /*TEST_F(SQSServiceTest, QueueCreateTest) {
+    TEST_F(SQSServiceTest, QueueCreateTest) {
 
         // arrange
         Dto::SQS::CreateQueueRequest request = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
@@ -55,33 +55,34 @@ namespace AwsMock::Service {
         EXPECT_TRUE(response.region == REGION);
     }
 
-    TEST_F(SQSServiceTest, QueueCreateAttributeTest) {
+    /*TEST_F(SQSServiceTest, QueueCreateAttributeTest) {
 
         // arrange
         Dto::SQS::CreateQueueRequest request = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
 
         // act
         Dto::SQS::CreateQueueResponse response = _service.CreateQueue(request);
-        Database::Entity::SQS::QueueAttribute attributes = _snsDatabase.GetQueueAttributesByQueueUrl(response.queueUrl);
+        Database::Entity::SQS::QueueAttribute attributes = _database.GetQueueAttributesByQueueUrl(response.queueUrl);
 
         // assert
         EXPECT_TRUE(response.name == QUEUE);
         EXPECT_TRUE(response.region == REGION);
         EXPECT_EQ(attributes.maxMessageSize, 262144);
         EXPECT_EQ(attributes.visibilityTimeout, 30);
-    }
+    }*/
 
     TEST_F(SQSServiceTest, QueueDeleteTest) {
 
         // arrange
         Dto::SQS::CreateQueueRequest queueRequest = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
-        Dto::SQS::DeleteQueueRequest deleteRequest = {.queueUrl=QUEUE_URL};
+        Dto::SQS::DeleteQueueRequest deleteRequest = {.region=REGION, .queueUrl=QUEUE_URL};
 
         // act
         EXPECT_NO_THROW({ _service.DeleteQueue(deleteRequest);});
 
         // assert
+        EXPECT_EQ(0, _database.ListQueues(REGION).size());
     }
 
     TEST_F(SQSServiceTest, MessageCreateTest) {
@@ -89,13 +90,12 @@ namespace AwsMock::Service {
         // arrange
         Dto::SQS::CreateQueueRequest queueRequest = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
-        Dto::SQS::CreateMessageRequest request = {.url=QUEUE_URL, .body=BODY};
+        Dto::SQS::CreateMessageRequest request = {.region=REGION, .queueUrl=QUEUE_URL, .body=BODY};
 
         // act
         Dto::SQS::CreateMessageResponse response = _service.CreateMessage(request);
 
         // assert
-        EXPECT_TRUE(response.id > 0);
         EXPECT_TRUE(response.messageId.length() > 0);
         EXPECT_TRUE(response.md5Body == BODY_MD5);
     }
@@ -105,7 +105,7 @@ namespace AwsMock::Service {
         // arrange
         Dto::SQS::CreateQueueRequest queueRequest = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
-        Dto::SQS::CreateMessageRequest msgRequest = {.url=QUEUE_URL, .body=BODY};
+        Dto::SQS::CreateMessageRequest msgRequest = {.region=REGION, .queueUrl=QUEUE_URL, .body=BODY};
         Dto::SQS::CreateMessageResponse msgResponse = _service.CreateMessage(msgRequest);
 
         // act
@@ -121,16 +121,17 @@ namespace AwsMock::Service {
         // arrange
         Dto::SQS::CreateQueueRequest queueRequest = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
-        Dto::SQS::CreateMessageRequest msgRequest = {.url=QUEUE_URL, .body=BODY};
+        Dto::SQS::CreateMessageRequest msgRequest = {.region=REGION, .queueUrl=QUEUE_URL, .body=BODY};
         Dto::SQS::CreateMessageResponse msgResponse = _service.CreateMessage(msgRequest);
 
         // act
         Dto::SQS::DeleteMessageRequest delRequest = {.queueUrl=QUEUE, .receiptHandle=msgResponse.receiptHandle};
         Dto::SQS::DeleteMessageResponse delResponse;
-        EXPECT_NO_FATAL_FAILURE({ _service.DeleteMessage(delRequest); });
+        EXPECT_NO_FATAL_FAILURE({ delResponse = _service.DeleteMessage(delRequest); });
 
         // assert
-    }*/
+        EXPECT_EQ(0, _database.CountMessages(REGION, QUEUE_URL));
+    }
 
 } // namespace AwsMock::Core
 
