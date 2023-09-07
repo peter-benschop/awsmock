@@ -5,9 +5,6 @@
 #ifndef AWSMOCK_CORE_CONFIGURATIONTEST_H
 #define AWSMOCK_CORE_CONFIGURATIONTEST_H
 
-// C++ standard includes
-#include <fstream>
-
 // GTest includes
 #include <gtest/gtest.h>
 
@@ -23,7 +20,6 @@ namespace AwsMock::Core {
     protected:
 
       void SetUp() override {
-          setenv("AWSMOCK_CORE_LOG_LEVEL", "error", true);
       }
 
       void TearDown() override {
@@ -33,6 +29,7 @@ namespace AwsMock::Core {
     };
 
     TEST_F(ConfigurationTest, EmptyFilenameTest) {
+
         // arrange
 
         // act
@@ -82,11 +79,13 @@ namespace AwsMock::Core {
 
         // arrange
         setenv("AWSMOCK_CORE_LOG_LEVEL", "error", true);
+        Configuration *configuration = nullptr;
+        EXPECT_NO_THROW({ configuration = new Configuration(TMP_PROPERTIES_FILE); });
 
         // act
 
         // assert
-        EXPECT_STREQ(_configuration.getString("awsmock.log.level").c_str(), "debug");
+        EXPECT_STREQ(configuration->getString("awsmock.log.level").c_str(), "debug");
     }
 
 } // namespace AwsMock::Core
