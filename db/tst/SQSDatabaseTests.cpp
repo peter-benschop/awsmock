@@ -9,19 +9,18 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
 #include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/SQSDatabase.h>
-
-#define CONFIG_FILE "/tmp/aws-mock.properties"
 
 #define BODY "{\"TestObject\": \"TestValue\"}"
 #define OWNER "test-owner"
 #define QUEUE_NAME "test-queue"
-#define QUEUE_URL "http://localhost:4567/000000000000/" QUEUE_NAME
+#define QUEUE_URL "http://localhost:4566/000000000000/" QUEUE_NAME
 
 #define DLQ_NAME "test-dlqueue"
-#define DLQ_URL "http://localhost:4567/000000000000/" DLQ_NAME
+#define DLQ_URL "http://localhost:4566/000000000000/" DLQ_NAME
 #define DLQ_ARN "arn:aws:sqs:eu-central-1:000000000000:" DLQ_NAME
 
 namespace AwsMock::Database {
@@ -41,7 +40,7 @@ namespace AwsMock::Database {
       }
 
       std::string _region, _queueArn;
-      Core::Configuration _configuration = Core::Configuration(CONFIG_FILE);
+      Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
       SQSDatabase _sqsDatabase = SQSDatabase(_configuration);
     };
 
@@ -353,7 +352,7 @@ namespace AwsMock::Database {
         Entity::SQS::Queue queue = {.region=_region, .name=QUEUE_NAME, .owner=OWNER, .queueUrl=QUEUE_URL, .attributes=attribute};
         queue = _sqsDatabase.CreateQueue(queue);
 
-        Entity::SQS::Queue dlQueue = {.region=_region, .name=DLQ_NAME, .owner=OWNER, .queueUrl=DLQ_URL, .attributes=attribute};
+        Entity::SQS::Queue dlQueue = {.region=_region, .name=DLQ_NAME, .owner=OWNER, .queueUrl=DLQ_URL};
         dlQueue = _sqsDatabase.CreateQueue(dlQueue);
 
         Entity::SQS::Message message = {.region=_region, .queueUrl=queue.queueUrl, .body=BODY};
