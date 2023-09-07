@@ -13,6 +13,7 @@
 
 // Local includes
 #include <awsmock/core/Configuration.h>
+#include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/Database.h>
 
 #define CONFIG_FILE "/tmp/aws-mock.properties"
@@ -29,7 +30,7 @@ namespace AwsMock::Database {
       void TearDown() override {
       }
 
-      Core::Configuration _configuration = Core::Configuration(CONFIG_FILE);
+      Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
       Database _database = Database(_configuration);
     };
 

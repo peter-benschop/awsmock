@@ -15,7 +15,7 @@
 #include <awsmock/service/S3Service.h>
 
 // Test includes
-#include "TestCommon.h"
+#include <awsmock/core/TestUtils.h>
 
 #define REGION "eu-central-1"
 #define BUCKET "test-bucket"

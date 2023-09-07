@@ -9,7 +9,6 @@
 #include <mongocxx/instance.hpp>
 
 // AwsMock includes
-#include <awsmock/core/FileUtils.h>
 #include <awsmock/core/TestUtils.h>
 
 class TestEnvironment : public ::testing::Environment {

@@ -10,7 +10,6 @@ namespace AwsMock::Core {
         std::ofstream ofs(TMP_PROPERTIES_FILE);
         // AWS configuration
         ofs << "awsmock.region=eu-central-1" << std::endl;
-        ofs << "awsmock.region=eu-central-1" << std::endl;
         ofs << "awsmock.account.id=000000000000" << std::endl;
         ofs << "awsmock.client.id=00000000" << std::endl;
         ofs << "awsmock.user=none" << std::endl;

@@ -13,9 +13,9 @@
 
 // Local includes
 #include <awsmock/core/Configuration.h>
+#include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/SNSDatabase.h>
 
-#define CONFIG_FILE "/tmp/aws-mock.properties"
 #define REGION "eu-central-1"
 #define TOPIC "test-topic"
 #define TOPIC_ARN "arn:aws:sns:eu-central-1:000000000000:test-topic"
@@ -39,7 +39,7 @@ namespace AwsMock::Database {
       }
 
       std::string _region;
-      Core::Configuration _configuration = Core::Configuration(CONFIG_FILE);
+      Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
       SNSDatabase _snsDatabase = SNSDatabase(_configuration);
     };
 

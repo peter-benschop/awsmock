@@ -13,7 +13,7 @@
 #include <awsmock/service/DockerService.h>
 
 // Test includes
-#include "TestCommon.h"
+#include <awsmock/core/TestUtils.h>
 
 #define NAME "test-container"
 #define IMAGE "test-image:latest"

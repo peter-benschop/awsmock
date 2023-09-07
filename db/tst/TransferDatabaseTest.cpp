@@ -12,17 +12,16 @@
 // GTest includes
 #include <gtest/gtest.h>
 
-// Local includes
+// AwsMock includes
 #include <awsmock/core/Configuration.h>
+#include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/TransferDatabase.h>
 
 // MongoDB includes
 #include <bsoncxx/builder/basic/document.hpp>
 #include <mongocxx/client.hpp>
 
-#define CONFIG_FILE "/tmp/aws-mock.properties"
 #define BUCKET "test-bucket"
-#define OBJECT "test-object"
 #define OWNER "test-owner"
 
 namespace AwsMock::Database {
@@ -44,7 +43,7 @@ namespace AwsMock::Database {
       }
 
       std::string _region;
-      Core::Configuration _configuration = Core::Configuration(CONFIG_FILE);
+      Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
       TransferDatabase _transferDatabase = TransferDatabase(_configuration);
     };
 
