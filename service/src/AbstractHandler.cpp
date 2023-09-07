@@ -360,8 +360,9 @@ namespace AwsMock::Service {
     void AbstractHandler::GetVersionActionFromUri(const std::string &uri, std::string &version, std::string &action) {
 
         Poco::RegularExpression::MatchVec posVec;
-        Poco::RegularExpression pattern(R"(/([a-z0-9-.]+)?/?([a-zA-Z0-9-_.*'()]+)?[\?|/]?.*$)");
+        Poco::RegularExpression pattern(R"(/([a-z0-9-.]+)?/?([a-zA-Z0-9-/_.*'()]+)?\??.*$)");
         if (!pattern.match(uri, 0, posVec)) {
+            log_error_stream(_logger) << "Invalid URI: " << uri << std::endl;
             throw Core::ResourceNotFoundException("Could not extract version and action");
         }
 

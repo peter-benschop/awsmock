@@ -83,12 +83,14 @@ namespace AwsMock::Service {
         Database::Entity::SNS::Message message;
         try {
             // Check topic/target ARN
-            if (request.topicArn.empty() && request.targetArn.empty()) {
+            if (request.topicArn.empty()) {
+                log_error_stream(_logger) << "Either topicARN or targetArn must exist" << std::endl;
                 throw Core::ServiceException("Either topicARN or targetArn must exist", 500);
             }
 
             // Check existence
             if (!_snsDatabase->TopicExists(request.topicArn)) {
+                log_error_stream(_logger) << "Topic does not exist: " << request.topicArn << std::endl;
                 throw Core::ServiceException("SNS topic does not exists", 500);
             }
 
@@ -153,17 +155,17 @@ namespace AwsMock::Service {
             for (const auto &it : topic.subscriptions) {
 
                 if (it.protocol == SQS_PROTOCOL) {
-                    SendSQSMessage(it, request.message);
+                    SendSQSMessage(it, request.message, request.region);
 
                 }
             }
         }
     }
 
-    void SNSService::SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const std::string &message) {
+    void SNSService::SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const std::string &message, const std::string &region) {
 
         Database::Entity::SQS::Queue sqsQueue = _sqsDatabase->GetQueueByArn(subscription.endpoint);
-        _sqsService->CreateMessage({.queueUrl = sqsQueue.queueUrl, .body=message});
+        _sqsService->CreateMessage({.region=region, .queueUrl = sqsQueue.queueUrl, .body=message});
     }
 
 } // namespace AwsMock::Service

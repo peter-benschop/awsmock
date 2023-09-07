@@ -8,6 +8,6 @@
     "AWS_SESSION_TOKEN": "none",
     "ENVIRONMENT": "localstack",
     "SERVICE_NAME": "ftp-file-copy",
-    "JAVA_TOOL_OPTIONS": "-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localhost -Dlibri.aws.sns_logging_topic=arn:aws:sns:eu-central-1:000000000000:file-logging-topic -Dlibri.aws.s3-destination-bucket=file-delivery -Dlibri.aws.use-localstack=true -Dlibri.aws.use-aws-profile=false"
+    "JAVA_TOOL_OPTIONS": "-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localhost -Dlibri.aws.sns-protokollierung-topic-arn=arn:aws:sns:eu-central-1:000000000000:protokollierung-topic -Dlibri.aws.s3-destination-bucket=file-delivery -Dlibri.aws.use-localstack=true -Dlibri.aws.use-aws-profile=false"
   }
 }
