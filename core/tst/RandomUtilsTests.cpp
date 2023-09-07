@@ -22,7 +22,7 @@ namespace AwsMock::Core {
       }
     };
 
-    /*TEST_F(RandomUtilsTest, MinMaxIntTest) {
+    TEST_F(RandomUtilsTest, MinMaxIntTest) {
 
         // arrange
         int min = 32768;
@@ -94,7 +94,7 @@ namespace AwsMock::Core {
             EXPECT_TRUE(result[i] > min && result[i] < max);
         }
         result.clear();
-    }*/
+    }
 
 } // namespace AwsMock::Core
 

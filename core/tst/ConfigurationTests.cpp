@@ -14,26 +14,22 @@
 // Local includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/CoreException.h>
-#include <awsmock/core/FileUtils.h>
-
-#define CONFIGURATION_FILE "/tmp/aws-mock.properties"
+#include <awsmock/core/TestUtils.h>
 
 namespace AwsMock::Core {
 
     class ConfigurationTest : public ::testing::Test {
 
     protected:
+
       void SetUp() override {
           setenv("AWSMOCK_CORE_LOG_LEVEL", "error", true);
-          std::ofstream ofs(CONFIGURATION_FILE);
-          ofs << "awsmock.log.level=debug" << std::endl;
-          ofs.close();
       }
 
       void TearDown() override {
       }
 
-      Configuration _configuration = Configuration(CONFIGURATION_FILE);
+      Configuration _configuration = Configuration(TMP_PROPERTIES_FILE);
     };
 
     TEST_F(ConfigurationTest, EmptyFilenameTest) {
@@ -60,10 +56,10 @@ namespace AwsMock::Core {
         Configuration *configuration = nullptr;
 
         // act
-        EXPECT_NO_THROW({ configuration = new Configuration(CONFIGURATION_FILE); });
+        EXPECT_NO_THROW({ configuration = new Configuration(TMP_PROPERTIES_FILE); });
 
         // assert
-        EXPECT_STREQ(configuration->GetFilename().c_str(), CONFIGURATION_FILE);
+        EXPECT_STREQ(configuration->GetFilename().c_str(), TMP_PROPERTIES_FILE);
         EXPECT_STREQ(configuration->GetLogLevel().c_str(), "debug");
     }
 
@@ -71,7 +67,7 @@ namespace AwsMock::Core {
 
         // arrange
         Configuration *configuration = nullptr;
-        EXPECT_NO_THROW({ configuration = new Configuration(CONFIGURATION_FILE); });
+        EXPECT_NO_THROW({ configuration = new Configuration(TMP_PROPERTIES_FILE); });
 
         // act
         if (configuration != nullptr) {
