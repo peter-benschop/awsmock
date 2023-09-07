@@ -55,19 +55,20 @@ namespace AwsMock::Service {
         log_trace_stream(_logger) << "Lambda POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
         try {
+            std::string tmp = request.getURI();
             std::string version, action;
             GetVersionActionFromUri(request.getURI(), version, action);
             std::string body = GetBodyAsString(request);
 
-            if(action == "functions") {
+            if(Core::StringUtils::Contains(action, "invocations")) {
 
-                Dto::Lambda::CreateFunctionRequest lambdaRequest;
-                lambdaRequest.FromJson(body);
-                lambdaRequest.region = region;
-                lambdaRequest.user = user;
+                std::vector<std::string> parts = Core::StringUtils::Split(action, '/');
+                std::string functionName = parts[1];
+                log_debug_stream(_logger) << "Lambda function invocation, name: " << functionName <<  std::endl;
 
-                Dto::Lambda::CreateFunctionResponse lambdaResponse = _lambdaService.CreateFunction(lambdaRequest);
-                SendOkResponse(response, lambdaResponse.ToJson());
+                _lambdaService.InvokeLambdaFunction(functionName, body, region, user);
+                log_debug_stream(_logger) << "Lambda function invoked, name: " << functionName <<  std::endl;
+                SendOkResponse(response);
 
             } else if(action == "tags") {
 
@@ -79,15 +80,15 @@ namespace AwsMock::Service {
                 _lambdaService.CreateTag(lambdaRequest);
                 SendOkResponse(response, {}, Poco::Net::HTTPResponse::HTTP_NO_CONTENT);
 
-            } else if(Core::StringUtils::Contains(action, "invocations")) {
+            } else if(action == "functions") {
 
-                std::vector<std::string> parts = Core::StringUtils::Split(action, '/');
-                std::string functionName = parts[1];
-                log_debug_stream(_logger) << "Lambda function invocation, name: " << functionName <<  std::endl;
+                Dto::Lambda::CreateFunctionRequest lambdaRequest;
+                lambdaRequest.FromJson(body);
+                lambdaRequest.region = region;
+                lambdaRequest.user = user;
 
-                _lambdaService.InvokeLambdaFunction(functionName, body, region, user);
-                log_debug_stream(_logger) << "Lambda function invoked, name: " << functionName <<  std::endl;
-                SendOkResponse(response);
+                Dto::Lambda::CreateFunctionResponse lambdaResponse = _lambdaService.CreateFunction(lambdaRequest);
+                SendOkResponse(response, lambdaResponse.ToJson());
 
             }
 

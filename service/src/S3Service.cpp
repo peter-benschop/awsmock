@@ -624,6 +624,7 @@ namespace AwsMock::Service {
 
         std::vector<std::string> parts = Core::StringUtils::Split(bucketNotification.lambdaArn, ':');
         std::string functionName = parts[6];
+        log_debug_stream(_logger) << "Invocation request function name: " << functionName << std::endl;
 
         //"Credential=none/20230618/eu-central-1/s3/aws4_request, SignedHeaders=content-md5;content-type;host;x-amz-content-sha256;x-amz-date;x-amz-security-token, Signature=fe9766ea2c032ac7b17033a567f6b361192bddcf73f89d25c15019977c544e1c"
         Poco::URI uri("http://" + _lambdaServiceHost + ":" + std::to_string(_lambdaServicePort) + "/2015-03-31/functions/" + functionName + "/invocations");
