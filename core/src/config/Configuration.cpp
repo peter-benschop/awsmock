@@ -18,14 +18,11 @@ namespace AwsMock::Core {
     void Configuration::Initialize() {
 
         // Monitoring
-        DefineProperty("awsmock.core.monitoring.port", "AWSMOCK_CORE_METRIC_PORT", "8081");
-        DefineProperty("awsmock.core.monitoring.timeout", "AWSMOCK_CORE_METRIC_TIMEOUT", "60000");
+        DefineProperty("awsmock.monitoring.port", "AWSMOCK_CORE_METRIC_PORT", "8081");
+        DefineProperty("awsmock.monitoring.timeout", "AWSMOCK_CORE_METRIC_TIMEOUT", "60000");
 
         // Logging
-        DefineProperty("awsmock.core.log.level", "AWSMOCK_CORE_LOG_LEVEL", "information");
-
-        // Database
-        DefineProperty("awsmock.repository.file", "AWSMOCK_DB_FILE", "/tmp/data/repository");
+        DefineProperty("awsmock.log.level", "AWSMOCK_CORE_LOG_LEVEL", "information");
     }
 
     void Configuration::DefineProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue) {
