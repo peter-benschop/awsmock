@@ -11,9 +11,9 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/Configuration.h>
+#include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/LambdaDatabase.h>
 
-#define CONFIG_FILE "/tmp/aws-mock.properties"
 #define ARN "arn:aws:lambda:eu-central-1:000000000000:function:ftp-file-copy"
 #define FUNCTION "ftp-file-copy"
 #define RUNTIME "Java11"
@@ -37,7 +37,7 @@ namespace AwsMock::Database {
 
       std::string _region;
       std::string _accountId;
-      Core::Configuration _configuration = Core::Configuration(CONFIG_FILE);
+      Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
       LambdaDatabase _lambdaDatabase = LambdaDatabase(_configuration);
     };
 

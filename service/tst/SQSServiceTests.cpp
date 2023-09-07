@@ -13,8 +13,8 @@
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/SQSService.h>
 
-// Test includes
-#include "TestCommon.h"
+// AwsMOck includes
+#include <awsmock/core/TestUtils.h>"
 
 #define REGION "eu-central-1"
 #define QUEUE "test-queue"
