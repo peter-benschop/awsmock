@@ -222,8 +222,9 @@ namespace AwsMock {
 
           log_debug_stream(_logger) << "Entering main routine" << std::endl;
 
+          // Start service and worker. Services needed to start first, as the worker could possibly use the
+          // services.
           StartServices();
-
           StartWorker();
 
           // Start HTTP server
