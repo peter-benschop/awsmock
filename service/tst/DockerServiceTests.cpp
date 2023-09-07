@@ -36,7 +36,7 @@ namespace AwsMock::Service {
       DockerService _service = DockerService(_configuration);
     };
 
-    /*TEST_F(DockerServiceTest, ImageExistsTest) {
+    TEST_F(DockerServiceTest, ImageExistsTest) {
 
         // arrange
         _service.CreateImage("hello-world", "latest", "hello-world");
@@ -84,7 +84,7 @@ namespace AwsMock::Service {
         EXPECT_FALSE(jsonString.empty());
         EXPECT_TRUE(Core::StringUtils::Equals(jsonString,
                                               R"({"Domainname":"test-container.dockerhost.net","Env":["AWS_EC2_METADATA_DISABLED=true","JAVA_TOOL_OPTIONS=-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localstack"],"ExposedPorts":{"8080/tcp":{}},"HostConfig":{"ExtraHosts":["host.docker.internal:host-gateway","localstack:host-gateway"],"NetworkMode":"","PortBindings":{"8080/tcp":[{"HostPort":""}]}},"Hostname":"test-container","Image":"test-image:latest","User":"root"})"));
-    }*/
+    }
 } // namespace AwsMock::Core
 
 #endif // AWMOCK_CORE_SQSSERVICETEST_H
