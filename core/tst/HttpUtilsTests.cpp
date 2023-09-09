@@ -124,6 +124,18 @@ namespace AwsMock::Core {
         EXPECT_TRUE("mix" == result[2]);
     }
 
+    TEST_F(HttpUtilsTest, GetPathParametersFromIndexTest) {
+
+        // arrange
+        std::string uri = "/ftpuser1/incoming/mix/pim123.xml";
+
+        // act
+        std::string key = HttpUtils::GetPathParametersFromIndex(uri, 1);
+
+        // assert
+        EXPECT_TRUE("incoming/mix/pim123.xml" == key);
+    }
+
     TEST_F(HttpUtilsTest, GetQueryParametersByPrefixTest) {
 
         // arrange
