@@ -187,11 +187,12 @@ namespace AwsMock::Database {
       /**
        * Bulk delete of messages.
        *
+       * @param region AWS region
        * @param topicArn topic ARN
        * @param receipts vector of receipts
        * @throws Core::DatabaseException
        */
-      void DeleteMessages(const std::string &topicArn, const std::vector<std::string> &receipts);
+      void DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &receipts);
 
       /**
        * Deletes a messages.
