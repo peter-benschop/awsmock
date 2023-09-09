@@ -53,6 +53,7 @@ namespace AwsMock::Database::Entity::Lambda {
             kvp("arn", arn),
             kvp("hostPort", hostPort),
             kvp("timeout", timeout),
+            kvp("concurrency", concurrency),
             kvp("codeSha256", codeSha256),
             kvp("environment", varDoc),
             kvp("state", LambdaStateToString(state)),
@@ -85,6 +86,7 @@ namespace AwsMock::Database::Entity::Lambda {
         codeSha256 = mResult.value()["codeSha256"].get_string().value.to_string();
         hostPort = mResult.value()["hostPort"].get_int32().value;
         timeout = mResult.value()["timeout"].get_int32().value;
+        concurrency = mResult.value()["concurrency"].get_int32().value;
         environment.FromDocument(mResult.value()["environment"].get_document().value);
         state = LambdaStateFromString(mResult.value()["state"].get_string().value.to_string());
         stateReason = mResult.value()["stateReason"].get_string().value.to_string();
@@ -122,6 +124,7 @@ namespace AwsMock::Database::Entity::Lambda {
         codeSha256 = mResult.value()["codeSha256"].get_string().value.to_string();
         hostPort = mResult.value()["hostPort"].get_int32().value;
         timeout = mResult.value()["timeout"].get_int32().value;
+        concurrency = mResult.value()["concurrency"].get_int32().value;
         environment.FromDocument(mResult.value()["environment"].get_document().value);
         state = LambdaStateFromString(mResult.value()["state"].get_string().value.to_string());
         stateReason = mResult.value()["stateReason"].get_string().value.to_string();
@@ -149,14 +152,15 @@ namespace AwsMock::Database::Entity::Lambda {
     std::ostream &operator<<(std::ostream &os, const Lambda &l) {
         os << "Lambda={oid='" << l.oid << "' region='" << l.region << "' function='" << l.function << "'runtime='" << l.runtime << "' role='" << l.role <<
            "' handler='" << l.handler << "' imageId='" << l.imageId << "' containerId='" << l.containerId << "' tags=[";
-           for(const auto &it:l.tags) {
-               os << "key='" << it.first << "' value='" << it.second << "'";
-           }
-           os << "] hostPort='" << l.hostPort << "' timeout='" << l.timeout << "' state='" << l.state << "' stateReason='" << l.stateReason << "' stateReasonCode='" <<
-           l.stateReasonCode << "' memorySize='" << l.memorySize << "' ephemeralStorage={" << l.ephemeralStorage.ToString() << "}" << "' codeSize='" << l.codeSize <<
-           "' fileName " << l.fileName << "' lastStarted='" << Poco::DateTimeFormatter().format(l.lastStarted, Poco::DateTimeFormat::HTTP_FORMAT) <<
-           "' created='" << Poco::DateTimeFormatter().format(l.created, Poco::DateTimeFormat::HTTP_FORMAT) <<
-           "' modified='" << Poco::DateTimeFormatter().format(l.modified, Poco::DateTimeFormat::HTTP_FORMAT) << "'}";
+        for (const auto &it : l.tags) {
+            os << "key='" << it.first << "' value='" << it.second << "'";
+        }
+        os << "] hostPort='" << l.hostPort << "' timeout='" << l.timeout << "' concurrency='" << l.concurrency << "' state='" << l.state << "' stateReason='"
+           << l.stateReason << "' stateReasonCode='" << l.stateReasonCode << "' memorySize='" << l.memorySize << "' ephemeralStorage={" << l.ephemeralStorage.ToString()
+           << "}" << "' codeSize='" << l.codeSize << "' fileName " << l.fileName
+           << "' lastStarted='" << Poco::DateTimeFormatter().format(l.lastStarted, Poco::DateTimeFormat::HTTP_FORMAT)
+           << "' created='" << Poco::DateTimeFormatter().format(l.created, Poco::DateTimeFormat::HTTP_FORMAT)
+           << "' modified='" << Poco::DateTimeFormatter().format(l.modified, Poco::DateTimeFormat::HTTP_FORMAT) << "'}";
         return os;
     }
 }

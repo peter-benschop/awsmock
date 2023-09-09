@@ -121,15 +121,6 @@ namespace AwsMock::Service {
     private:
 
       /**
-       * Returns the bucket and key from the URI
-       *
-       * @param uri request URI
-       * @param bucket S3 bucket name
-       * @param key S3 object key
-       */
-      void GetBucketKeyFromUri(const std::string &uri, std::string &bucket, std::string &key);
-
-      /**
        * Logger
        */
       Core::LogStream _logger;

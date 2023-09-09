@@ -251,6 +251,11 @@ namespace AwsMock::Database::Entity::Lambda {
       int timeout;
 
       /**
+       * Concurrency
+       */
+      int concurrency = 5;
+
+      /**
        * Environment
        */
       Environment environment;

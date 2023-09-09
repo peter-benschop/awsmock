@@ -255,28 +255,14 @@ namespace AwsMock::Service {
         }
     }
 
-    void S3Handler::handleOptions(Poco::Net::HTTPServerResponse &response) {
-        Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
-        log_debug_stream(_logger) << "S3 OPTIONS request" << std::endl;
-
-        response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
-        response.setContentType("text/plain; charset=utf-8");
-
-        handleHttpStatusCode(response, 200);
-        std::ostream &outputStream = response.send();
-        outputStream.flush();
-    }
-
     void S3Handler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_HEAD_TIMER);
         log_trace_stream(_logger) << "S3 HEAD request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
         try {
 
-            //DumpRequest(request);
-
-            std::string bucket, key;
-            GetBucketKeyFromUri(request.getURI(), bucket, key);
+            std::string bucket = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
+            std::string key = Core::HttpUtils::GetPathParameter(request.getURI(), 1);
             log_debug_stream(_logger) << "S3 HEAD request, bucket: " << bucket << " key: " << key << std::endl;
 
             Dto::S3::GetMetadataRequest s3Request = {.region=region, .bucket=bucket, .key=key};
@@ -301,7 +287,7 @@ namespace AwsMock::Service {
                 headerMap.emplace_back("x-amz-request-id", Poco::UUIDGenerator().createRandom().toString());
                 headerMap.emplace_back("x-amz-version-id", Core::StringUtils::GenerateRandomString(30));
                 SendHeadResponse(response, headerMap);
-                //DumpResponse(response);
+
             }
 
         } catch (Poco::Exception &exc) {
@@ -309,24 +295,15 @@ namespace AwsMock::Service {
         }
     }
 
-    void S3Handler::GetBucketKeyFromUri(const std::string &uri, std::string &bucket, std::string &key) {
+    void S3Handler::handleOptions(Poco::Net::HTTPServerResponse &response) {
+        Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
+        log_debug_stream(_logger) << "S3 OPTIONS request" << std::endl;
 
-        std::string path = uri;
-        if(Core::StringUtils::Contains(path, "?")) {
-            path = Core::StringUtils::SubStringUntil(path, '?');
-        }
-        Poco::RegularExpression::MatchVec posVec;
-        Poco::RegularExpression pattern(R"(/?([a-zA-Z0-9-.]+)?/?([a-zA-Z0-9-_/.*'()]+)?$)");
-        if (!pattern.match(path, 0, posVec)) {
-            log_error_stream(_logger) << "Could not get bucket/key from URI, uri: " << uri << std::endl;
-            throw Core::ResourceNotFoundException("Could not extract bucket/key from URI");
-        }
+        response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
+        response.setContentType("text/plain; charset=utf-8");
 
-        if (posVec.size() > 1) {
-            bucket = uri.substr(posVec[1].offset, posVec[1].length);
-        }
-        if (posVec.size() > 2) {
-            key = uri.substr(posVec[2].offset, posVec[2].length);
-        }
+        handleHttpStatusCode(response, 200);
+        std::ostream &outputStream = response.send();
+        outputStream.flush();
     }
 }
