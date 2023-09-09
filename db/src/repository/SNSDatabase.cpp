@@ -120,7 +120,6 @@ namespace AwsMock::Database {
             return GetMessageById(result->inserted_id().get_oid().value);
 
         } catch (const mongocxx::exception& exc) {
-            std::cerr << exc.what() << std::endl;
             _logger.error() << "Database exception " << exc.what() << std::endl;
             throw Core::DatabaseException(exc.what(), 500);
         }
@@ -153,14 +152,14 @@ namespace AwsMock::Database {
         log_debug_stream(_logger) << "Messages deleted, messageId: " << message.messageId << " count: " << result->deleted_count() << std::endl;
     }
 
-    void SNSDatabase::DeleteMessages(const std::string &topicArn, const std::vector<std::string> &receipts) {
+    void SNSDatabase::DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &receipts) {
 
         bsoncxx::builder::basic::array array{};
         for (const auto &receipt : receipts) {
             array.append(receipt);
         }
 
-        auto result = _messageCollection.delete_many(make_document(kvp("$in", array)));
+        auto result = _messageCollection.delete_many(make_document(kvp("region", region), kvp("topicArn", topicArn), kvp("messageId", make_document(kvp("$in", array)))));
         log_debug_stream(_logger) << "Messages deleted, count: " << result->result().deleted_count() << std::endl;
     }
 

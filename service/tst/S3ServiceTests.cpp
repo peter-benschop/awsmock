@@ -58,7 +58,21 @@ namespace AwsMock::Service {
         EXPECT_TRUE(response.location == "eu-central-1");
     }
 
-    /*TEST_F(S3ServiceTest, ObjectPutTest) {
+    TEST_F(S3ServiceTest, BucketDeleteTest) {
+
+        // arrange
+        Dto::S3::CreateBucketRequest request = Dto::S3::CreateBucketRequest(LOCATION_CONSTRAINT);
+        Dto::S3::CreateBucketResponse response = _service.CreateBucket(BUCKET, OWNER, request);
+
+        // act
+        _service.DeleteBucket(REGION, BUCKET);
+        Dto::S3::ListAllBucketResponse result = _service.ListAllBuckets();
+
+        // assert
+        EXPECT_EQ(0, result.bucketList.size());
+    }
+
+    TEST_F(S3ServiceTest, ObjectPutTest) {
 
         // arrange
         Dto::S3::CreateBucketRequest request = Dto::S3::CreateBucketRequest(LOCATION_CONSTRAINT);
@@ -67,7 +81,7 @@ namespace AwsMock::Service {
 
         // act
         Dto::S3::PutObjectRequest putRequest = {.region=REGION, .bucket=BUCKET, .key=KEY};
-        Dto::S3::PutObjectResponse putResponse = _service.PutObject(putRequest, &ifs);
+        Dto::S3::PutObjectResponse putResponse = _service.PutObject(putRequest, ifs);
 
         // assert
         EXPECT_TRUE(putResponse.bucket == BUCKET);
@@ -81,14 +95,14 @@ namespace AwsMock::Service {
         Dto::S3::CreateBucketResponse response = _service.CreateBucket(BUCKET, OWNER, request);
         std::ifstream ifs(testFile);
         Dto::S3::PutObjectRequest putRequest = {.region=REGION, .bucket=BUCKET, .key=KEY};
-        Dto::S3::PutObjectResponse putResponse = _service.PutObject(putRequest, &ifs);
+        Dto::S3::PutObjectResponse putResponse = _service.PutObject(putRequest, ifs);
 
         // act
         Dto::S3::DeleteObjectRequest deleteRequest = {.region=REGION, .bucket=BUCKET, .key=KEY};
         EXPECT_NO_THROW({ _service.DeleteObject(deleteRequest); });
 
         // assert
-    }*/
+    }
 
 } // namespace AwsMock::Core
 

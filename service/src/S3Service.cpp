@@ -47,12 +47,6 @@ namespace AwsMock::Service {
                 Core::DirUtils::MakeDirectory(bucketDir);
             }
 
-            // Create watcher directory
-            std::string watcherDir = _watcherDir + Poco::Path::separator() + name;
-            if (!Core::DirUtils::DirectoryExists(watcherDir)) {
-                Core::DirUtils::MakeDirectory(watcherDir);
-            }
-
             // Update database
             _database->CreateBucket({.region=region, .name=name, .owner=owner});
 
