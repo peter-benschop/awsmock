@@ -21,7 +21,7 @@ namespace AwsMock::Service {
 
         // Check existence
         if (_database->QueueExists(request.region, request.name)) {
-            throw Core::ServiceException("SQS Queue exists already", 400);
+            throw Core::ServiceException("SQS Queue exists already", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
         }
 
         try {
@@ -135,7 +135,7 @@ namespace AwsMock::Service {
 
         // Check existence
         if (!_database->QueueUrlExists(request.region, request.queueUrl)) {
-            throw Core::ServiceException("Queue does not exist", 403);
+            throw Core::ServiceException("Queue does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
         }
 
         Dto::SQS::SetQueueAttributesResponse response;
@@ -154,7 +154,7 @@ namespace AwsMock::Service {
 
             // Update database
             queue = _database->UpdateQueue(queue);
-            log_debug_stream(_logger) << "Queue updated: " << queue.ToString() << std::endl;
+            log_trace_stream(_logger) << "Queue updated: " << queue.ToString() << std::endl;
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "SQS delete queue failed, message: " << ex.message() << std::endl;
@@ -170,7 +170,7 @@ namespace AwsMock::Service {
         try {
             // Check existence
             if (!_database->QueueUrlExists(request.region, request.queueUrl)) {
-                throw Core::ServiceException("Queue does not exist", 403);
+                throw Core::ServiceException("Queue does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
             }
 
             // Delete all messages in queue
@@ -191,9 +191,9 @@ namespace AwsMock::Service {
         Database::Entity::SQS::Message message;
         try {
             if (!request.queueUrl.empty() && !_database->QueueUrlExists(request.region, request.queueUrl)) {
-                throw Core::ServiceException("SQS queue does not exists", 500);
+                throw Core::ServiceException("SQS queue does not exists", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
             } else if (!request.queueArn.empty() && !_database->QueueArnExists(request.queueArn)) {
-                throw Core::ServiceException("SQS queue does not exists", 500);
+                throw Core::ServiceException("SQS queue does not exists", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
             }
 
             // Get queue in case of ARN
@@ -262,9 +262,9 @@ namespace AwsMock::Service {
         Dto::SQS::DeleteMessageResponse response;
         try {
             // TODO: Check existence
-            /*if (!_database->MessageExists(request.url)) {
-                throw Core::ServiceException("Queue does not exist", 500);
-            }*/
+            if (!_database->MessageExists(request.receiptHandle)) {
+                throw Core::ServiceException("Queue does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+            }
 
             // Delete from database
             _database->DeleteMessage({.queueUrl=request.queueUrl, .receiptHandle=request.receiptHandle});
