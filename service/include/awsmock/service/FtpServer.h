@@ -112,12 +112,7 @@ namespace AwsMock::Service {
       /**
        * Base directory
        */
-      std::string _baseDir;
-
-      /**
-       * File watcher directory
-       */
-      std::string _watcherDir;
+      std::string _dataDir;
 
       /**
        * S3 bucket

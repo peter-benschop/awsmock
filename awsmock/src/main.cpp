@@ -65,6 +65,7 @@ namespace AwsMock {
        * @param self application reference.
        */
       [[maybe_unused]] void initialize(Application &self) override {
+          Core::Logger::SetDefaultConsoleLogger();
 
           InitializeMonitoring();
           InitializeErrorHandler();

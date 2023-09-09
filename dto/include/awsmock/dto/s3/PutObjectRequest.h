@@ -29,6 +29,11 @@ namespace AwsMock::Dto::S3 {
       std::string key;
 
       /**
+       * Owner
+       */
+      std::string owner;
+
+      /**
        * MD5 sum
        */
       std::string md5Sum;
@@ -44,16 +49,11 @@ namespace AwsMock::Dto::S3 {
       long contentLength;
 
       /**
-       * Owner
-       */
-      std::string owner;
-
-      /**
        * Write file
        *
-       * <p>Indicates that the file is part of the body.</p>
+       * <p>Indicates that the file does not need to be written.</p>
        */
-      bool writeFile = true;
+      bool contentIntern = false;
 
       /**
        * Converts the DTO to a string representation.
@@ -72,8 +72,8 @@ namespace AwsMock::Dto::S3 {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const PutObjectRequest &r) {
-          os << "PutObjectRequest={bucket='" + r.bucket + "' key='" + r.key + "' md5sum='" + r.md5Sum + "' contentType='" + r.contentType + "' contentLength='" +
-              std::to_string(r.contentLength) + "' owner='" + r.owner + "' region=' " + r.region + "'}";
+          os << "PutObjectRequest={bucket='" << r.bucket << "' key='" << r.key << "' md5sum='" << r.md5Sum << "' contentType='" << r.contentType << "' contentLength='"
+             << r.contentLength << "' owner='" << r.owner << "' region=' " << r.region << "' contentIntern='" << r.contentIntern << "'}";
           return os;
       }
 

@@ -22,8 +22,7 @@ namespace AwsMock::Worker {
 
         _dataDir = _configuration.getString("awsmock.service.s3.data.dir");
         _tmpDir = _dataDir + Poco::Path::separator() + "tmp";
-        _watcherDir = _dataDir + Poco::Path::separator() + "watcher";
-        log_debug_stream(_logger) << "Watching path: " << _watcherDir << std::endl;
+        log_debug_stream(_logger) << "Data directory path: " << _dataDir << std::endl;
 
         // Sleeping period
         _period = _configuration.getInt("awsmock.worker.s3.period", 10000);
@@ -32,9 +31,6 @@ namespace AwsMock::Worker {
         // Create S3 directories
         if (!Core::DirUtils::DirectoryExists(_dataDir)) {
             Core::DirUtils::MakeDirectory(_dataDir);
-        }
-        if (!Core::DirUtils::DirectoryExists(_watcherDir)) {
-            Core::DirUtils::MakeDirectory(_watcherDir);
         }
 
         // Create environment
@@ -53,7 +49,7 @@ namespace AwsMock::Worker {
         _s3Database = std::make_unique<Database::S3Database>(_configuration);
 
         // Start _watcher
-        _watcher = new Core::DirectoryWatcher(_watcherDir);
+        _watcher = new Core::DirectoryWatcher(_dataDir);
         _watcher->itemAdded += Poco::delegate(this, &S3Worker::OnFileAdded);
         //_watcher->itemModified += Poco::delegate(this, &S3Worker::OnFileModified);
         _watcher->itemDeleted += Poco::delegate(this, &S3Worker::OnFileDeleted);
@@ -68,7 +64,7 @@ namespace AwsMock::Worker {
         for(const std::string& filePath : Core::DirUtils::ListFiles(_dataDir)) {
 
             // Don't consider directories
-            if (Core::DirUtils::IsDirectory(filePath) || Core::StringUtils::StartsWith(filePath, _watcherDir) || Core::StringUtils::StartsWith(filePath, _tmpDir)) {
+            if (Core::DirUtils::IsDirectory(filePath)) {
                 continue;
             }
 
@@ -122,31 +118,35 @@ namespace AwsMock::Worker {
     }
 
     void S3Worker::OnFileAdded(const Core::DirectoryEvent &addedEvent) {
-        log_info_stream(_logger) << "File added, path: " << addedEvent.item.path() << std::endl;
+        log_info_stream(_logger) << "File added, path: " << addedEvent.item << std::endl;
+        _watcher->LockFile(addedEvent.item);
+        log_info_stream(_logger) << "File locked, path: " << addedEvent.item << std::endl;
 
-        if (Core::DirUtils::IsDirectory(addedEvent.item.path())) {
-            CreateBucket(addedEvent.item.path());
+        if (addedEvent.type == Core::FileType::DW_DIR_TYPE) {
+            CreateBucket(addedEvent.item);
         } else {
-            CreateObject(addedEvent.item.path());
+            CreateObject(addedEvent.item);
         }
+        //_watcher->UnlockFile(addedEvent.item);
+        log_info_stream(_logger) << "File unlocked, path: " << addedEvent.item << std::endl;
     }
 
     void S3Worker::OnFileModified(const Core::DirectoryEvent &modifiedEvent) {
-        log_info_stream(_logger) << "File modified, path: " << modifiedEvent.item.path() << std::endl;
+        log_info_stream(_logger) << "File modified, path: " << modifiedEvent.item << std::endl;
 
-        if (Core::DirUtils::IsDirectory(modifiedEvent.item.path())) {
-            CreateBucket(modifiedEvent.item.path());
+        if (Core::DirUtils::IsDirectory(modifiedEvent.item)) {
+            CreateBucket(modifiedEvent.item);
         } else {
-            CreateObject(modifiedEvent.item.path());
+            CreateObject(modifiedEvent.item);
         }
     }
 
     void S3Worker::OnFileDeleted(const Core::DirectoryEvent &deleteEvent) {
-        log_info_stream(_logger) << "File deleted path: " << deleteEvent.item.path() << std::endl;
+        log_info_stream(_logger) << "File deleted path: " << deleteEvent.item << std::endl;
 
         // Get bucket, key
         std::string bucketName, key;
-        GetBucketKeyFromFile(deleteEvent.item.path(), bucketName, key);
+        GetBucketKeyFromFile(deleteEvent.item, bucketName, key);
 
         if(key.empty()) {
             SendDeleteBucketRequest(bucketName, "application/octet-stream");
@@ -262,8 +262,10 @@ namespace AwsMock::Worker {
         headers["Content-Length"] = std::to_string(fileSize);
         headers["Content-Type"] = contentType;
         headers["Content-MD5"] = md5Sum;
+        headers["Content-Type"]= contentType;
+        headers["Content-Intern"]= "true";
 
-        SendFile(url, fileName, contentType, headers);
+        SendFile(url, fileName, headers);
         log_debug_stream(_logger) << "S3 put object request send" << std::endl;
     }
 

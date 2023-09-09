@@ -24,9 +24,24 @@ namespace AwsMock::Dto::S3 {
       std::string name;
 
       /**
+       * List type
+       */
+      int listType;
+
+      /**
        * Prefix
        */
       std::string prefix;
+
+      /**
+       * Delimiter
+       */
+      std::string delimiter;
+
+      /**
+       * Encoding type
+       */
+      std::string encodingType;
 
       /**
        * Converts the DTO to a string representation.
@@ -45,7 +60,8 @@ namespace AwsMock::Dto::S3 {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const ListBucketRequest &r) {
-          os << "ListBucketRequest={name='" + r.name + "' prefix='" + r.prefix + "'}";
+          os << "ListBucketRequest={name='" << r.name << "' prefix='" << r.prefix << "' listType='" << r.listType << "' delimiter='" << r.delimiter
+             << "' encodingType='" << r.encodingType << "'}";
           return os;
       }
 

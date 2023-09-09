@@ -103,10 +103,9 @@ namespace AwsMock::Service {
        * Send a SNS message to an SQS queue
        *
        * @param subscription SNS subscription
-       * @param message message body
-       * @param region AWS region
+       * @param request SNS publish request
        */
-      void SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const std::string &message, const std::string &region);
+      void SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request);
 
       /**
        * Logger
