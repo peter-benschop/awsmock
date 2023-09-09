@@ -41,6 +41,7 @@ namespace AwsMock::Core {
       }
 
       void TearDown() override {
+          _watcher->ClearLocks();
           thread->wakeUp();
           delete thread;
           DirUtils::DeleteDirectory(tempDir, true);
@@ -121,6 +122,7 @@ namespace AwsMock::Core {
         // arrange
         thread->start(*_watcher);
         tempFile = Core::FileUtils::CreateTempFile(tempDir, "txt", 10);
+        _watcher->UnlockFile(tempFile);
 
         // act
         Core::FileUtils::DeleteFile(tempFile);

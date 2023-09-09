@@ -73,10 +73,9 @@ namespace AwsMock::Worker {
        *
        * @param url HTTP URL
        * @param fileName name of the file to send
-       * @param contentType HTTP content type
        * @param headers HTTP header map
        */
-      void SendFile(const std::string &url, const std::string &fileName, const std::string &contentType, const std::map<std::string, std::string>&headers);
+      void SendFile(const std::string &url, const std::string &fileName, const std::map<std::string, std::string>&headers);
 
     private:
 

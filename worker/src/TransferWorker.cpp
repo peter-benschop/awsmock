@@ -122,7 +122,7 @@ namespace AwsMock::Worker {
         while (_running) {
             log_debug_stream(_logger) << "TransferWorker processing started" << std::endl;
             Poco::Thread::sleep(_period);
-            CheckTransferServers();
+            //CheckTransferServers();
         }
     }
 

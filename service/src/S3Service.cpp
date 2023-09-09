@@ -10,7 +10,7 @@ namespace AwsMock::Service {
 
         // Initialize environment
         _dataDir = _configuration.getString("awsmock.data.dir", "/tmp/awsmock/data") + Poco::Path::separator() + "s3";
-        _watcherDir = _dataDir + Poco::Path::separator() + "watcher";
+        //_watcherDir = _dataDir + Poco::Path::separator() + "watcher";
         _tempDir = _dataDir + Poco::Path::separator() + "tmp";
         _database = std::make_unique<Database::S3Database>(_configuration);
 
@@ -62,7 +62,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &exc) {
             log_error_stream(_logger) << "S3 create bucket failed, message: " << exc.message() << std::endl;
-            throw Core::ServiceException(exc.message(), 500);
+            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
         return createBucketResponse;
     }
@@ -70,35 +70,39 @@ namespace AwsMock::Service {
     Dto::S3::GetMetadataResponse S3Service::GetMetadata(Dto::S3::GetMetadataRequest &request) {
         log_trace_stream(_logger) << "Get metadata request, s3Request: " << request.ToString() << std::endl;
 
-        Dto::S3::GetMetadataResponse getMetadataResponse;
-
         // Check existence
         if (!_database->BucketExists({.region=request.region, .name=request.bucket})) {
-            return getMetadataResponse;
+            log_error_stream(_logger) << "Bucket " << request.bucket << " does not exist" << std::endl;
+            throw Core::ServiceException("Bucket does not exist", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         if (!_database->ObjectExists({.region=request.region, .bucket=request.bucket, .key=request.key})) {
-            return getMetadataResponse;
+            log_error_stream(_logger) << "Object " << request.key << " does not exist" << std::endl;
+            throw Core::ServiceException("Object does not exist", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         try {
             Database::Entity::S3::Object object = _database->GetObject(request.region, request.bucket, request.key);
 
-            getMetadataResponse.bucket = object.bucket;
-            getMetadataResponse.key = object.key;
-            getMetadataResponse.size = object.size;
-            getMetadataResponse.md5Sum = object.md5sum;
-            getMetadataResponse.contentType = object.contentType;
-            getMetadataResponse.modified = object.modified;
-            getMetadataResponse.created = object.modified;
-            log_trace_stream(_logger) << "S3 get object metadata response: " + getMetadataResponse.ToString() << std::endl;
+            Dto::S3::GetMetadataResponse response = {
+                .bucket = object.bucket,
+                .key = object.key,
+                .md5Sum = object.md5sum,
+                .contentType = object.contentType,
+                .size = object.size,
+                .created = object.created,
+                .modified = object.modified
+            };
+            
+            log_trace_stream(_logger) << "S3 get object metadata response: " + response.ToString() << std::endl;
             log_info_stream(_logger) << "Metadata returned, bucket: " << request.bucket << " key: " << request.key << std::endl;
+
+            return response;
 
         } catch (Poco::Exception &ex) {
             log_warning_stream(_logger) << "S3 get object metadata failed, message: " << ex.message() << std::endl;
-            throw Core::ServiceException(ex.message(), 500);
+            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
-        return getMetadataResponse;
     }
 
     Dto::S3::GetObjectResponse S3Service::GetObject(Dto::S3::GetObjectRequest &request) {
@@ -121,7 +125,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "S3 get object failed, message: " << ex.message() << std::endl;
-            throw Core::ServiceException(ex.message(), 500);
+            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
         return getObjectResponse;
     }
@@ -139,7 +143,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "S3 Create Bucket failed, message: " << ex.message() << std::endl;
-            throw Core::ServiceException(ex.message(), 500);
+            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -156,7 +160,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "S3 list bucket failed, message: " << ex.message() << std::endl;
-            throw Core::ServiceException(ex.message(), 500);
+            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -244,7 +248,7 @@ namespace AwsMock::Service {
         return {.location=region, .bucket=bucket, .key=key, .etag=Core::StringUtils::GenerateRandomString(40)};
     }
 
-    Dto::S3::PutObjectResponse S3Service::PutObject(Dto::S3::PutObjectRequest &request, std::istream *stream) {
+    Dto::S3::PutObjectResponse S3Service::PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream) {
         log_trace_stream(_logger) << "Put object request: " << request.ToString() << std::endl;
 
         // Check existence
@@ -263,17 +267,16 @@ namespace AwsMock::Service {
 
             // Write file
             std::string fileName = GetFilename(request.bucket, request.key);
-            if (stream) {
+            if (!request.contentIntern) {
                 std::ofstream ofs(fileName);
-                ofs << stream->rdbuf();
-                ofs.flush();
-                ofs.close();
+                long copied = Poco::StreamCopier::copyStream(stream, ofs);
+                log_debug_stream(_logger) << "File received, fileName: " << fileName << " size: " << copied << std::endl;
             }
 
             // Meta data
-            long size = Core::FileUtils::FileSize(fileName);
-            std::string md5sum = size > 0 ? Core::Crypto::GetMd5FromFile(fileName) : "d41d8cd98f00b204e9800998ecf8427e";
-            log_info_stream(_logger) << "MD5sum: " << md5sum << " bucket: " << request.bucket << " key: " << request.key << std::endl;
+            long size = request.contentLength;
+            std::string md5sum = request.md5Sum;
+            log_debug_stream(_logger) << "MD5sum: " << md5sum << " bucket: " << request.bucket << " key: " << request.key << std::endl;
 
             // Update database
             Database::Entity::S3::Object object = {
@@ -302,7 +305,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "S3 put object failed, message: " << ex.message() << std::endl;
-            throw Core::ServiceException(ex.message(), 500);
+            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -357,7 +360,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "S3 copy object request failed, message: " << ex.message() << std::endl;
-            throw Core::ServiceException(ex.message(), 500);
+            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
         return {.eTag=targetObject.md5sum, .lastModified=Poco::DateTimeFormatter::format(Poco::DateTime(), Poco::DateTimeFormat::ISO8601_FRAC_FORMAT)};
     }
@@ -390,7 +393,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &exc) {
             log_error_stream(_logger) << "S3 delete object failed, message: " + exc.message() << std::endl;
-            throw Core::ServiceException(exc.message(), 500);
+            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
         log_info_stream(_logger) << "DeleteObject succeeded, bucket: " << request.bucket << " key: " << request.key << std::endl;
     }
@@ -422,7 +425,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "S3 delete objects failed, message: " << ex.message() << std::endl;
-            throw Core::ServiceException(ex.message(), 500);
+            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
         log_info_stream(_logger) << "DeleteObjects succeeded, bucket: " << request.bucket << std::endl;
         return response;
@@ -452,7 +455,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "S3 put bucket notification request failed, message: " << ex.message() << std::endl;
-            throw Core::ServiceException(ex.message(), 500);
+            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -481,7 +484,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "S3 Delete Bucket failed, message: " << ex.message() << std::endl;
-            throw Core::ServiceException(ex.message(), 500);
+            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 

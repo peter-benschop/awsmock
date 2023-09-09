@@ -140,7 +140,7 @@ namespace AwsMock::Service {
        * @param stream input stream
        * @return PutObjectResponse
        */
-      Dto::S3::PutObjectResponse PutObject(Dto::S3::PutObjectRequest &request, std::istream *stream = nullptr);
+      Dto::S3::PutObjectResponse PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream);
 
       /**
        * Copy object

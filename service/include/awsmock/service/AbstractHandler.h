@@ -309,6 +309,14 @@ namespace AwsMock::Service {
       void SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long contentLength, HeaderMap *extraHeader = nullptr);
 
       /**
+       * Send a HEAD response (HTTP status code 200)
+       *
+       * @param response HTTP response object
+       * @param headerMap HTTP header map values
+       */
+      void SendHeadResponse(Poco::Net::HTTPServerResponse &response, const HeaderMap &headerMap);
+
+      /**
        * Send a DELETE response (HTTP status code 204) with an output stream.
        *
        * @param response HTTP response object
@@ -360,6 +368,14 @@ namespace AwsMock::Service {
        * @return value or default value
        */
       std::string GetHeaderValue(Poco::Net::HTTPServerRequest &request, const std::string &name, const std::string &defaultValue);
+
+      /**
+       * Check for the existence of given header key
+       * @param request HTTP request
+       * @param name header key name
+       * @return true of header exists
+       */
+      bool HasHeaderValue(Poco::Net::HTTPServerRequest &request, const std::string &name);
 
       /**
        * Dump the request to std::cerr

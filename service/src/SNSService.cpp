@@ -24,7 +24,7 @@ namespace AwsMock::Service {
 
         // Check existence
         if (_snsDatabase->TopicExists(request.region, request.topicName)) {
-            throw Core::ServiceException("SNS topic exists already", 500);
+            throw Core::ServiceException("SNS topic exists already", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         try {
@@ -54,7 +54,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "SNS list topics request failed, message: " << ex.message() << std::endl;
-            throw Core::ServiceException(ex.message(), 500, "SQS", Poco::UUIDGenerator().createRandom().toString().c_str());
+            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, "SQS", Poco::UUIDGenerator().createRandom().toString().c_str());
         }
     }
 
@@ -65,7 +65,7 @@ namespace AwsMock::Service {
         try {
             // Check existence
             if (!_snsDatabase->TopicExists(topicArn)) {
-                throw Core::ServiceException("Topic does not exist", 500);
+                throw Core::ServiceException("Topic does not exist", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
             }
 
             // Update database
@@ -73,7 +73,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "SNS delete topic failed, message: " << ex.message() << std::endl;
-            throw Core::ServiceException(ex.message(), 500);
+            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
         return response;
     }
@@ -85,19 +85,24 @@ namespace AwsMock::Service {
             // Check topic/target ARN
             if (request.topicArn.empty()) {
                 log_error_stream(_logger) << "Either topicARN or targetArn must exist" << std::endl;
-                throw Core::ServiceException("Either topicARN or targetArn must exist", 500);
+                throw Core::ServiceException("Either topicARN or targetArn must exist", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
             }
 
             // Check existence
             if (!_snsDatabase->TopicExists(request.topicArn)) {
                 log_error_stream(_logger) << "Topic does not exist: " << request.topicArn << std::endl;
-                throw Core::ServiceException("SNS topic does not exists", 500);
+                throw Core::ServiceException("SNS topic does not exists", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
             }
 
             // Update database
             std::string messageId = Core::StringUtils::GenerateRandomString(100);
-            message =
-                _snsDatabase->CreateMessage({.region=request.region, .topicArn=request.topicArn, .targetArn=request.targetArn, .message=request.message, .messageId=messageId});
+            message = _snsDatabase->CreateMessage({
+                .region=request.region,
+                .topicArn=request.topicArn,
+                .targetArn=request.targetArn,
+                .message=request.message,
+                .messageId=messageId
+            });
 
             // Check subscriptions
             CheckSubscriptions(request);
@@ -106,7 +111,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "SNS create message failed, message: " << ex.message() << std::endl;
-            throw Core::ServiceException(ex.message(), 500);
+            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -116,12 +121,12 @@ namespace AwsMock::Service {
 
             // Check topic/target ARN
             if (request.topicArn.empty()) {
-                throw Core::ServiceException("Topic ARN missing", 500);
+                throw Core::ServiceException("Topic ARN missing", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
             }
 
             // Check existence
             if (!_snsDatabase->TopicExists(request.topicArn)) {
-                throw Core::ServiceException("SNS topic does not exists", 500);
+                throw Core::ServiceException("SNS topic does not exists", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
             }
 
             // Create new subscription
@@ -132,7 +137,10 @@ namespace AwsMock::Service {
             if (!topic.HasSubscription(subscription)) {
 
                 // Add subscription
-                topic.subscriptions.push_back({.protocol=request.protocol, .endpoint=request.endpoint});
+                topic.subscriptions.push_back({
+                    .protocol=request.protocol,
+                    .endpoint=request.endpoint
+                });
 
                 // Save to database
                 topic = _snsDatabase->UpdateTopic(topic);
@@ -143,7 +151,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "SNS subscription failed, message: " << ex.message() << std::endl;
-            throw Core::ServiceException(ex.message(), 500);
+            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -155,17 +163,22 @@ namespace AwsMock::Service {
             for (const auto &it : topic.subscriptions) {
 
                 if (it.protocol == SQS_PROTOCOL) {
-                    SendSQSMessage(it, request.message, request.region);
+
+                    SendSQSMessage(it, request);
 
                 }
             }
         }
     }
 
-    void SNSService::SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const std::string &message, const std::string &region) {
+    void SNSService::SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) {
 
         Database::Entity::SQS::Queue sqsQueue = _sqsDatabase->GetQueueByArn(subscription.endpoint);
-        _sqsService->CreateMessage({.region=region, .queueUrl = sqsQueue.queueUrl, .body=message});
+        _sqsService->CreateMessage({
+            .region=request.region,
+            .queueUrl = sqsQueue.queueUrl,
+            .body=request.message
+        });
     }
 
 } // namespace AwsMock::Service

@@ -14,16 +14,16 @@ namespace AwsMock::Service {
         try {
 
             std::string version, action;
-            GetVersionActionFromUri(request.getURI(), version, action);
+            Core::HttpUtils::GetVersionAction(request.getURI(), version, action);
 
-            if(action == "functions/") {
+            if (action == "functions") {
 
                 Dto::Lambda::ListFunctionResponse lambdaResponse = _lambdaService.ListFunctions(region);
                 SendOkResponse(response, lambdaResponse.ToJson());
 
-            } else if(action == "tags") {
+            } else if (action == "tags") {
 
-                std::string arn = Core::StringUtils::UrlDecode(GetStringPathParameter(request.getURI(), 3));
+                std::string arn = Core::HttpUtils::GetPathParameter(request.getURI(), 2);
                 log_debug_stream(_logger) << "Found lambda arn, arn: " << arn << std::endl;
 
                 Dto::Lambda::ListTagsResponse lambdaResponse = _lambdaService.ListTags(arn);
@@ -31,7 +31,7 @@ namespace AwsMock::Service {
             }
 
         } catch (Core::ServiceException &exc) {
-            SendErrorResponse("S3", response, exc);
+            SendErrorResponse("Lambda", response, exc);
         } catch (Core::ResourceNotFoundException &exc) {
             SendErrorResponse("Lambda", response, exc);
         }
@@ -43,7 +43,7 @@ namespace AwsMock::Service {
 
         try {
             std::string version, action;
-            GetVersionActionFromUri(request.getURI(), version, action);
+            Core::HttpUtils::GetVersionAction(request.getURI(), version, action);
 
         } catch (Poco::Exception &exc) {
             SendErrorResponse("Lambda", response, exc);
@@ -55,40 +55,43 @@ namespace AwsMock::Service {
         log_trace_stream(_logger) << "Lambda POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
         try {
-            std::string tmp = request.getURI();
             std::string version, action;
-            GetVersionActionFromUri(request.getURI(), version, action);
-            std::string body = GetBodyAsString(request);
+            Core::HttpUtils::GetVersionAction(request.getURI(), version, action);
 
-            if(Core::StringUtils::Contains(action, "invocations")) {
+            if (action == "functions") {
 
-                std::vector<std::string> parts = Core::StringUtils::Split(action, '/');
-                std::string functionName = parts[1];
-                log_debug_stream(_logger) << "Lambda function invocation, name: " << functionName <<  std::endl;
+                std::string body = Core::HttpUtils::GetBodyAsString(request);
 
-                _lambdaService.InvokeLambdaFunction(functionName, body, region, user);
-                log_debug_stream(_logger) << "Lambda function invoked, name: " << functionName <<  std::endl;
-                SendOkResponse(response);
+                if (Core::HttpUtils::GetPathParameter(request.getURI(), 4) == "invocations") {
+
+                    std::string functionName = Core::HttpUtils::GetPathParameter(request.getURI(), 1);
+                    log_debug_stream(_logger) << "Lambda function invocation, name: " << functionName << std::endl;
+
+                    _lambdaService.InvokeLambdaFunction(functionName, body, region, user);
+                    log_debug_stream(_logger) << "Lambda function invoked, name: " << functionName << std::endl;
+                    SendOkResponse(response);
+
+                } else {
+
+                    Dto::Lambda::CreateFunctionRequest lambdaRequest;
+                    lambdaRequest.FromJson(body);
+                    lambdaRequest.region = region;
+                    lambdaRequest.user = user;
+
+                    Dto::Lambda::CreateFunctionResponse lambdaResponse = _lambdaService.CreateFunction(lambdaRequest);
+                    SendOkResponse(response, lambdaResponse.ToJson());
+                }
 
             } else if(action == "tags") {
 
-                std::string arn = Core::StringUtils::UrlDecode(GetStringPathParameter(request.getURI(), 3));
+                std::string arn = Core::HttpUtils::GetPathParameter(request.getURI(), 2);
                 log_debug_stream(_logger) << "Found lambda arn, arn: " << arn <<  std::endl;
 
+                std::string body = Core::HttpUtils::GetBodyAsString(request);
                 Dto::Lambda::CreateTagRequest lambdaRequest(arn, body);
 
                 _lambdaService.CreateTag(lambdaRequest);
                 SendOkResponse(response, {}, Poco::Net::HTTPResponse::HTTP_NO_CONTENT);
-
-            } else if(action == "functions") {
-
-                Dto::Lambda::CreateFunctionRequest lambdaRequest;
-                lambdaRequest.FromJson(body);
-                lambdaRequest.region = region;
-                lambdaRequest.user = user;
-
-                Dto::Lambda::CreateFunctionResponse lambdaResponse = _lambdaService.CreateFunction(lambdaRequest);
-                SendOkResponse(response, lambdaResponse.ToJson());
 
             }
 
@@ -105,26 +108,15 @@ namespace AwsMock::Service {
         log_trace_stream(_logger) << "Lambda DELETE request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
         try {
-            std::string tmp=request.getURI();
             std::string version, action;
-            GetVersionActionFromUri(request.getURI(), version, action);
+            Core::HttpUtils::GetVersionAction(request.getURI(), version, action);
             std::string body = GetBodyAsString(request);
 
-            if(Core::StringUtils::StartsWith(action, "functions")) {
+            if (action == "functions") {
 
-                Poco::RegularExpression::MatchVec posVec;
-                Poco::RegularExpression pattern(R"(/([a-z0-9-.]+)?/?([a-zA-Z0-9-_/.*'()]+)?\??.*$)");
-                if (!pattern.match(action, 0, posVec)) {
-                    throw Core::ResourceNotFoundException("Could not extract function name");
-                }
-
-                std::string functionName, qualifier;
-                if (posVec.size() > 1) {
-                    functionName = action.substr(posVec[1].offset, posVec[1].length);
-                }
-                if (posVec.size() > 2) {
-                    qualifier = action.substr(posVec[2].offset, posVec[2].length);
-                }
+                std::string functionName = Core::HttpUtils::GetPathParameter(request.getURI(), 2);
+                std::string qualifier =  Core::HttpUtils::GetPathParameter(request.getURI(), 3);
+                log_debug_stream(_logger) << "Found lambda name, name: " << functionName << " qualifier: " << qualifier <<  std::endl;
 
                 Dto::Lambda::DeleteFunctionRequest lambdaRequest = {.functionName=functionName, .qualifier=qualifier};
                 _lambdaService.DeleteFunction(lambdaRequest);
@@ -132,22 +124,16 @@ namespace AwsMock::Service {
 
             } else if(action == "tags") {
 
-                std::string arn = Core::StringUtils::UrlDecode(GetStringPathParameter(request.getURI(), 3));
-                arn = Core::StringUtils::SubStringUntil(arn, '?');
-                log_debug_stream(_logger) << "Found lambda arn, arn: " << arn << std::endl;
+                std::string arn = Core::HttpUtils::GetPathParameter(request.getURI(), 2);
+                log_debug_stream(_logger) << "Found lambda arn, arn: " << arn <<  std::endl;
 
-                int count = GetAttributeCount(request.getURI(), "tagKeys");
-                log_trace_stream(_logger)<< "Got tags count: " << count << std::endl;
-
-                std::vector<std::string> tagKeys;
-                for(int i = 0; i < count; i++) {
-                    std::string tagKey = GetStringParameter(request.getURI(), "tagKeys", i);
-                    tagKeys.emplace_back(tagKey);
-                }
+                std::vector<std::string> tagKeys = Core::HttpUtils::GetQueryParametersByPrefix(request.getURI(), "tagKeys");
+                log_trace_stream(_logger)<< "Got tags count: " << tagKeys.size() << std::endl;
 
                 Dto::Lambda::DeleteTagsRequest lambdaRequest(arn, tagKeys);
                 _lambdaService.DeleteTags(lambdaRequest);
                 SendNoContentResponse(response);
+
             }
 
         } catch (Core::ServiceException &exc) {

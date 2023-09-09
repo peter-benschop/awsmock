@@ -132,7 +132,6 @@ namespace AwsMock::Worker {
 
     void AbstractWorker::SendFile(const std::string &url,
                                   const std::string &fileName,
-                                  const std::string &contentType,
                                   const std::map<std::string, std::string> &headers) {
 
         Poco::URI uri(url);
@@ -141,7 +140,6 @@ namespace AwsMock::Worker {
         // Create HTTP request and set headers
         Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
         Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_PUT, path, Poco::Net::HTTPMessage::HTTP_1_1);
-        request.add("Content-Type", contentType);
         for (const auto &it : headers) {
             request.add(it.first, it.second);
         }
@@ -151,12 +149,12 @@ namespace AwsMock::Worker {
         // Send request
         std::ifstream ifs(fileName);
         std::ostream &os = session.sendRequest(request);
-        os << ifs.rdbuf();
-        os.flush();
-        os.clear();
+        long copied = Poco::StreamCopier::copyStream(ifs, os);
+        log_debug_stream(_logger) << "Body send, file: " << fileName << " size: " << copied << std::endl;
 
         // Get the response status
         Poco::Net::HTTPResponse response;
+        session.receiveResponse(response);
         if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
             log_error_stream(_logger) << "HTTP error, status: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
         }

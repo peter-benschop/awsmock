@@ -134,27 +134,27 @@ namespace AwsMock::Service {
 
             } else if(!key.empty()) {
 
-                //YTQ5Y2VlNzhhZDBiMDIwOGY5NjczOTliYmJmYjQwZjM=
-                //1B2M2Y8AsgTpgAmY7PhCfg==
                 // S3 put object request
-                Dto::S3::PutObjectRequest putObjectRequest;
+                Dto::S3::PutObjectRequest putObjectRequest = {
+                    .region=region,
+                    .bucket=bucket,
+                    .key=key,
+                    .owner=user,
+                    .md5Sum=GetHeaderValue(request, "Content-MD5", ""),
+                    .contentType=GetHeaderValue(request, "Content-Type", "application/octet-stream"),
+                    .contentLength=std::stol(GetHeaderValue(request, "Content-Length", "0")),
+                    .contentIntern=HasHeaderValue(request, "Content-Intern"),
+                };
+                log_debug_stream(_logger) << "ContentLength: " << putObjectRequest.contentLength << " contentType: " << putObjectRequest.contentType << std::endl;
 
-                putObjectRequest.bucket = bucket;
-                putObjectRequest.key = key;
-                putObjectRequest.owner = user;
-                putObjectRequest.region = region;
-                putObjectRequest.contentType = GetHeaderValue(request, "Content-Type", "application/octet-stream");
-                putObjectRequest.contentLength = std::stol(GetHeaderValue(request, "Content-Length", "0"));
-                putObjectRequest.md5Sum = GetHeaderValue(request, "Content-MD5", "");
-                log_debug_stream(_logger) << "ContentLength: " << putObjectRequest.contentLength << " contentType: " << putObjectRequest.contentType <<  std::endl;
-
-                Dto::S3::PutObjectResponse putObjectResponse = _s3Service.PutObject(putObjectRequest, &request.stream());
+                Dto::S3::PutObjectResponse putObjectResponse = _s3Service.PutObject(putObjectRequest, request.stream());
 
                 HeaderMap headerMap;
                 headerMap.emplace_back("Content-MD5", Core::Crypto::Base64Encode(putObjectResponse.etag));
                 headerMap.emplace_back("Content-Length", std::to_string(putObjectResponse.contentLength));
                 headerMap.emplace_back("ETag", "\"" + putObjectResponse.etag + "\"");
-                log_debug_stream(_logger) << "ETag: " << Core::Crypto::Base64Encode(putObjectResponse.etag) << " size: " << putObjectResponse.contentLength <<  std::endl;
+                log_debug_stream(_logger) << "ETag: " << Core::Crypto::Base64Encode(putObjectResponse.etag) << " size: " << putObjectResponse.contentLength
+                                          << std::endl;
 
                 SendOkResponse(response, {}, &headerMap);
 
@@ -180,6 +180,8 @@ namespace AwsMock::Service {
         log_debug_stream(_logger) << "S3 POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
         try {
+
+            //DumpRequest(request);
 
             std::string bucket, key;
             GetBucketKeyFromUri(request.getURI(), bucket, key);
@@ -258,6 +260,8 @@ namespace AwsMock::Service {
 
         try {
 
+            //DumpRequest(request);
+
             std::string bucket, key;
             GetBucketKeyFromUri(request.getURI(), bucket, key);
             log_debug_stream(_logger) << "S3 HEAD request, bucket: " << bucket << " key: " << key << std::endl;
@@ -266,21 +270,25 @@ namespace AwsMock::Service {
             Dto::S3::GetMetadataResponse s3Response = _s3Service.GetMetadata(s3Request);
 
             HeaderMap headerMap;
-            headerMap.emplace_back("Connection", "closed");
-            headerMap.emplace_back("Server", "AmazonS3");
+            headerMap.emplace_back("Server", "awsmock");
 
             if(s3Response.bucket.empty()) {
 
                 headerMap.emplace_back("Content-Length", "0");
-                SendOkResponse(response, {}, &headerMap);
+                SendHeadResponse(response, headerMap);
 
             } else {
 
                 headerMap.emplace_back("Last-Modified", Poco::DateTimeFormatter().format(s3Response.modified, Poco::DateTimeFormat::HTTP_FORMAT));
                 headerMap.emplace_back("Content-Length", std::to_string(s3Response.size));
-                headerMap.emplace_back("Content-Type", s3Response.contentType);
-                headerMap.emplace_back("ETag", s3Response.md5Sum);
-                SendOkResponse(response, {}, &headerMap);
+                headerMap.emplace_back("Content-Type", "application/json");
+                headerMap.emplace_back("ETag", "\"" + s3Response.md5Sum + "\"");
+                headerMap.emplace_back("accept-ranges", "bytes");
+                headerMap.emplace_back("x-amz-id-2", Core::StringUtils::GenerateRandomString(30));
+                headerMap.emplace_back("x-amz-request-id", Poco::UUIDGenerator().createRandom().toString());
+                headerMap.emplace_back("x-amz-version-id", Core::StringUtils::GenerateRandomString(30));
+                SendHeadResponse(response, headerMap);
+                //DumpResponse(response);
             }
 
         } catch (Poco::Exception &exc) {

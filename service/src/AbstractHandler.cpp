@@ -396,6 +396,7 @@ namespace AwsMock::Service {
 
         // Set headers
         SetHeaders(response, contentLength, extraHeader);
+        //DumpResponse(response);
 
         // Send response
         handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_OK);
@@ -414,14 +415,31 @@ namespace AwsMock::Service {
             // Set headers
             SetHeaders(response, contentLength, extraHeader);
 
-            std::ifstream ifs(fileName);
+            // Set status
+            handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_OK);
 
             // Send response
-            handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_OK);
             std::ostream &os = response.send();
-            os << ifs.rdbuf();
-            os.flush();
-            ifs.close();
+
+            // Send body
+            std::ifstream ifs(fileName);
+            Poco::StreamCopier::copyStream(ifs, os);
+
+        } catch (Poco::Exception &exc) {
+            log_error_stream(_logger) << "Exception: " << exc.message() << std::endl;
+        }
+    }
+
+    void AbstractHandler::SendHeadResponse(Poco::Net::HTTPServerResponse &response, const HeaderMap &extraHeader) {
+        log_trace_stream(_logger) << "Sending Head response, status: 200" << std::endl;
+        try {
+
+            // Set headers
+            for (auto &it : extraHeader) {
+                response.set(it.first, it.second);
+            }
+
+            response.send();
 
         } catch (Poco::Exception &exc) {
             log_error_stream(_logger) << "Exception: " << exc.message() << std::endl;
@@ -489,7 +507,7 @@ namespace AwsMock::Service {
         response.set("Content-Length", std::to_string(contentLength));
         response.set("Content-Type", "text/html; charset=utf-8");
         response.set("Connection", "close");
-        response.set("Server", "AmazonS3");
+        response.set("Server", "awsmock");
 
         // Extra headers
         if (extraHeader != nullptr) {
@@ -503,6 +521,11 @@ namespace AwsMock::Service {
     std::string AbstractHandler::GetHeaderValue(Poco::Net::HTTPServerRequest &request, const std::string &name, const std::string &defaultValue) {
         log_trace_stream(_logger) << "Getting header values, name: " << name << std::endl;
         return request.get(name, defaultValue);
+    }
+
+    bool AbstractHandler::HasHeaderValue(Poco::Net::HTTPServerRequest &request, const std::string &name) {
+        log_trace_stream(_logger) << "Has header value, name: " << name << std::endl;
+        return request.has(name);
     }
 
     void AbstractHandler::DumpRequest(Poco::Net::HTTPServerRequest &request) {
