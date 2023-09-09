@@ -19,8 +19,8 @@ namespace AwsMock::Core {
         std::string basePath = GetBasePath(uri);
 
         std::vector<std::string> parameters = StringUtils::Split(basePath, '/');
-        if (index > (int)parameters.size()) {
-            throw Core::ServiceException("Invalid path parameter index");
+        if (index >= (int)parameters.size()) {
+            return {};
         }
         if(IsUrlEncoded(parameters[index])) {
             return Core::StringUtils::UrlDecode(parameters[index]);

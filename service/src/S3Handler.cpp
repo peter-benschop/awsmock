@@ -15,26 +15,24 @@ namespace AwsMock::Service {
         log_debug_stream(_logger) << "S3 GET request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
 
         try {
+            //std::string tmp = request.getURI();
+            std::string bucket = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
+            std::string key = Core::HttpUtils::GetPathParameter(request.getURI(), 1);
 
-            std::string bucket, key;
-            GetBucketKeyFromUri(request.getURI(), bucket, key);
-
-            bool isListRequest = QueryParameterExists("list-type");
-
-            if(bucket.empty()) {
+            if (bucket.empty()) {
 
                 // Return bucket list
                 Dto::S3::ListAllBucketResponse s3Response = _s3Service.ListAllBuckets();
                 SendOkResponse(response, s3Response.ToXml());
 
-            } else if(!bucket.empty() && !key.empty()) {
+            } else if (!bucket.empty() && !key.empty()) {
 
                 // Get object request
                 log_debug_stream(_logger) << "S3 get object request, bucket: " << bucket << " key: " << key << std::endl;
                 Dto::S3::GetObjectRequest s3Request = {.region=region, .bucket=bucket, .key=key};
 
                 Dto::S3::GetObjectResponse s3Response = _s3Service.GetObject(s3Request);
-                std::ifstream ifs (s3Response.filename);
+                std::ifstream ifs(s3Response.filename);
 
                 HeaderMap headerMap;
                 headerMap.emplace_back("ETag", Core::StringUtils::GenerateRandomString(32));
@@ -44,15 +42,31 @@ namespace AwsMock::Service {
 
                 SendOkResponse(response, s3Response.filename, s3Response.size, &headerMap);
 
-            } else if(isListRequest) {
+            } else if (Core::HttpUtils::HasQueryParameter(request.getURI(), "list-type")) {
+
+                int listType = 1;
+                if (Core::HttpUtils::HasQueryParameter(request.getURI(), "list-type")) {
+                    listType = std::stoi(Core::HttpUtils::GetQueryParameterByName(request.getURI(), "list-type"));
+                }
+
+                std::string delimiter;
+                if (Core::HttpUtils::HasQueryParameter(request.getURI(), "delimiter")) {
+                    delimiter = Core::HttpUtils::GetQueryParameterByName(request.getURI(), "delimiter");
+                }
 
                 std::string prefix;
-                if(QueryParameterExists("prefix")) {
-                    prefix = GetQueryParameter("prefix");
+                if (Core::HttpUtils::HasQueryParameter(request.getURI(), "prefix")) {
+                    prefix = Core::HttpUtils::GetQueryParameterByName(request.getURI(), "prefix");
+                }
+
+                std::string encodingType;
+                if (Core::HttpUtils::HasQueryParameter(request.getURI(), "encoding_type")) {
+                    encodingType = Core::HttpUtils::GetQueryParameterByName(request.getURI(), "encoding_type");
                 }
 
                 // Return object list
-                Dto::S3::ListBucketRequest s3Request = {.region=region, .name=bucket, .prefix=prefix};
+                Dto::S3::ListBucketRequest
+                    s3Request = {.region=region, .name=bucket, .listType=listType, .prefix=prefix, .delimiter=delimiter, .encodingType=encodingType};
                 Dto::S3::ListBucketResult result = _s3Service.ListBucket(s3Request);
                 SendOkResponse(response, result.ToXml());
             }
@@ -69,12 +83,14 @@ namespace AwsMock::Service {
         log_debug_stream(_logger) << "S3 PUT request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
         try {
-            std::string bucket, key;
-            GetBucketKeyFromUri(request.getURI(), bucket, key);
+
+            //std::string tmp = request.getURI();
+            std::string bucket = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
+            std::string key = Core::HttpUtils::GetPathParameter(request.getURI(), 1);
             log_debug_stream(_logger) << "Found bucket/key, bucket: " << bucket << " key: " << key << std::endl;
 
-            bool isMultipartUpload = QueryParameterExists("uploadId");
-            bool isNotification = QueryParameterExists("notification");
+            bool isMultipartUpload = Core::HttpUtils::HasQueryParameter(request.getURI(), "uploadId");
+            bool isNotification = Core::HttpUtils::HasQueryParameter(request.getURI(), "notification");
             bool isCopyRequest = HeaderExists(request, "x-amz-copy-source");
 
             //DumpRequest(request);
@@ -82,8 +98,8 @@ namespace AwsMock::Service {
             if (isMultipartUpload) {
 
                 // S3 initial multipart upload
-                std::string partNumber = GetQueryParameter("partNumber", false);
-                std::string uploadId = GetQueryParameter("uploadId", false);
+                std::string partNumber = Core::HttpUtils::GetQueryParameterByName(request.getURI(), "partNumber");
+                std::string uploadId = Core::HttpUtils::GetQueryParameterByName(request.getURI(), "uploadId");
                 log_debug_stream(_logger) << "Initial S3 multipart upload part: " << partNumber << std::endl;
 
                 std::string eTag = _s3Service.UploadPart(request.stream(), std::stoi(partNumber), uploadId);
@@ -91,7 +107,7 @@ namespace AwsMock::Service {
                 HeaderMap headerMap;
                 headerMap.emplace_back("ETag", eTag);
 
-                SendOkResponse(response, {}, &headerMap);
+                SendNoContentResponse(response, &headerMap);
                 log_debug_stream(_logger) << "Finished S3 multipart upload part: " << partNumber << std::endl;
 
             } else if(isNotification) {
@@ -99,7 +115,8 @@ namespace AwsMock::Service {
                 log_debug_stream(_logger) << "Bucket notification request, bucket: " << bucket << std::endl;
 
                 // S3 notification setup
-                Dto::S3::PutBucketNotificationRequest s3Request = Dto::S3::PutBucketNotificationRequest(GetPayload(request), region, bucket);
+                std::string body = Core::HttpUtils::GetBodyAsString(request);
+                Dto::S3::PutBucketNotificationRequest s3Request = Dto::S3::PutBucketNotificationRequest(body, region, bucket);
 
                 _s3Service.PutBucketNotification(s3Request);
 
@@ -109,26 +126,23 @@ namespace AwsMock::Service {
 
                 log_debug_stream(_logger) << "Object copy request, bucket: " << bucket << " key: " << key << std::endl;
 
-                // Get S3 source, target buckets/keys
-                std::string targetBucket, targetKey;
-                targetBucket=bucket;
-                targetKey=key;
-
-                std::string sourceBucket, sourceKey;
+                // Get S3 source bucket/key
                 std::string sourceHeader = GetHeaderValue(request, "x-amz-copy-source", "empty");
-                GetBucketKeyFromUri(sourceHeader, sourceBucket, sourceKey);
+                std::string sourceBucket = Core::HttpUtils::GetPathParameter(sourceHeader, 0);
+                std::string sourceKey = Core::HttpUtils::GetPathParameter(sourceHeader, 1);
+
                 Dto::S3::CopyObjectRequest s3Request = {
                     .region=region,
                     .user=user,
                     .sourceBucket=sourceBucket,
                     .sourceKey= sourceKey,
-                    .targetBucket=targetBucket,
-                    .targetKey=targetKey};
+                    .targetBucket=bucket,
+                    .targetKey=key};
 
                 Dto::S3::CopyObjectResponse s3Response = _s3Service.CopyObject(s3Request);
 
                 HeaderMap headerMap;
-                headerMap.emplace_back("ETag", Core::StringUtils::GenerateRandomString(32));
+                headerMap.emplace_back("ETag", s3Response.eTag);
 
                 SendOkResponse(response, s3Response.ToXml(), &headerMap);
 
@@ -162,7 +176,7 @@ namespace AwsMock::Service {
 
                 // S3 create bucket request
                 std::string name = Core::DirUtils::RelativePath(request.getURI());
-                std::string payload = GetPayload(request);
+                std::string payload = Core::HttpUtils::GetBodyAsString(request);
                 Dto::S3::CreateBucketRequest s3Request(payload);
                 Dto::S3::CreateBucketResponse s3Response = _s3Service.CreateBucket(name, user, s3Request);
 
@@ -182,12 +196,11 @@ namespace AwsMock::Service {
         try {
 
             //DumpRequest(request);
+            std::string bucket = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
+            std::string key = Core::HttpUtils::GetPathParameter(request.getURI(), 1);
 
-            std::string bucket, key;
-            GetBucketKeyFromUri(request.getURI(), bucket, key);
-
-            bool isMultipartUpload = QueryParameterExists("uploads");
-            bool isDeleteObjects = QueryParameterExists("delete");
+            bool isMultipartUpload = Core::HttpUtils::HasQueryParameter(request.getURI(), "uploads");
+            bool isDeleteObjects = Core::HttpUtils::HasQueryParameter(request.getURI(), "delete");
 
             if (isMultipartUpload) {
 
@@ -196,11 +209,11 @@ namespace AwsMock::Service {
                 Dto::S3::InitiateMultipartUploadResult result = _s3Service.CreateMultipartUpload(bucket, key, region, user);
                 SendOkResponse(response, result.ToXml());
 
-            } else if(isDeleteObjects) {
+            } else if (isDeleteObjects) {
 
                 log_debug_stream(_logger) << "Starting delete objects request" << std::endl;
 
-                std::string payload = GetPayload(request);
+                std::string payload = Core::HttpUtils::GetBodyAsString(request);
 
                 auto s3Request = Dto::S3::DeleteObjectsRequest(payload);
                 Dto::S3::DeleteObjectsResponse s3Response = _s3Service.DeleteObjects(s3Request);
@@ -208,7 +221,7 @@ namespace AwsMock::Service {
 
             } else {
 
-                std::string uploadId = GetQueryParameter("uploadId", true);
+                std::string uploadId = Core::HttpUtils::GetQueryParameterByName(request.getURI(), "uploadId");
                 log_debug_stream(_logger) << "Finish multipart upload request, uploadId: " << uploadId << std::endl;
 
                 Dto::S3::CompleteMultipartUploadResult result = _s3Service.CompleteMultipartUpload(uploadId, bucket, key, region, user);
@@ -226,13 +239,13 @@ namespace AwsMock::Service {
         log_debug_stream(_logger) << "S3 DELETE request, URI: " + request.getURI() << " region: " << region << " user: " << user << std::endl;
 
         try {
-            std::string bucket, key;
-            GetBucketKeyFromUri(request.getURI(), bucket, key);
+            std::string bucket = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
+            std::string key = Core::HttpUtils::GetPathParameter(request.getURI(), 1);
 
-            if(!bucket.empty() && !key.empty()) {
+            if (!bucket.empty() && !key.empty()) {
                 _s3Service.DeleteObject({.region=region, .user=user, .bucket=bucket, .key=key});
                 SendDeleteResponse(response);
-            } else if(!bucket.empty()) {
+            } else if (!bucket.empty()) {
                 _s3Service.DeleteBucket(region, bucket);
                 SendDeleteResponse(response);
             }
