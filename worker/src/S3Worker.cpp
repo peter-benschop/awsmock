@@ -161,8 +161,8 @@ namespace AwsMock::Worker {
         std::string file = Poco::replace(fileName, _dataDir.c_str(), "");
 
         // Remove starting slash
-        bucket = Core::HttpUtils::GetPathParameter(fileName, 0);
-        key = Core::HttpUtils::GetPathParametersFromIndex(fileName, 1);
+        bucket = Core::HttpUtils::GetPathParameter(file, 0);
+        key = Core::HttpUtils::GetPathParametersFromIndex(file, 1);
     }
 
     void S3Worker::GetFileFromBucketKey(std::string &fileName, const std::string &bucket, const std::string &key) {
