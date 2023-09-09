@@ -88,7 +88,7 @@ namespace AwsMock::Database {
         bsoncxx::builder::stream::document filter{};
         filter << "queueUrl" << queueUrl << bsoncxx::builder::stream::finalize;
 
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one({filter});
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("queueUrl", queueUrl)));
 
         if (!mResult) {
             return {};
@@ -101,11 +101,7 @@ namespace AwsMock::Database {
 
     Entity::SQS::Queue SQSDatabase::GetQueueByName(const std::string &region, const std::string &name) {
 
-        bsoncxx::builder::stream::document filter{};
-        filter << "region" << region << "name" << name << bsoncxx::builder::stream::finalize;
-
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one({filter});
-
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
         if (!mResult) {
             return {};
         }
@@ -117,10 +113,7 @@ namespace AwsMock::Database {
 
     Entity::SQS::QueueList SQSDatabase::ListQueues(const std::string &region) {
 
-        bsoncxx::builder::stream::document filter{};
-        filter << "region" << region << bsoncxx::builder::stream::finalize;
-
-        auto queueCursor = _queueCollection.find({filter});
+        auto queueCursor = _queueCollection.find(make_document(kvp("region", region)));
 
         Entity::SQS::QueueList queueList;
         for (auto queue : queueCursor) {
@@ -135,21 +128,13 @@ namespace AwsMock::Database {
 
     void SQSDatabase::PurgeQueue(const std::string &region, const std::string &queueUrl) {
 
-        bsoncxx::builder::stream::document filter{};
-        filter << "region" << region << "queueUrl" << queueUrl << bsoncxx::builder::stream::finalize;
-
-        auto result = _messageCollection.delete_many({filter});
-
+        auto result = _messageCollection.delete_many(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
         log_debug_stream(_logger) << "Purged queue, count: " << result->deleted_count() << std::endl;
     }
 
     Entity::SQS::Queue SQSDatabase::UpdateQueue(const Entity::SQS::Queue &queue) {
 
-        bsoncxx::builder::stream::document filter{};
-        filter << "region" << queue.region << "name" << queue.name << bsoncxx::builder::stream::finalize;
-
-        auto result = _queueCollection.replace_one({filter}, queue.ToDocument());
-
+        auto result = _queueCollection.replace_one(make_document(kvp("region", queue.region), kvp("name", queue.name)), queue.ToDocument());
         log_trace_stream(_logger) << "Queue updated: " << queue.ToString() << std::endl;
 
         return GetQueueById(queue.oid);
@@ -157,10 +142,7 @@ namespace AwsMock::Database {
 
     long SQSDatabase::CountQueues(const std::string &region) {
 
-        bsoncxx::builder::stream::document filter{};
-        filter << "region" << region << bsoncxx::builder::stream::finalize;
-
-        long count = _queueCollection.count_documents({filter});
+        long count = _queueCollection.count_documents(make_document(kvp("region", region)));
         log_trace_stream(_logger) << "Count queues, result: " << count << std::endl;
 
         return count;
@@ -168,10 +150,7 @@ namespace AwsMock::Database {
 
     void SQSDatabase::DeleteQueue(const Entity::SQS::Queue &queue) {
 
-        bsoncxx::builder::stream::document filter{};
-        filter << "queueUrl" << queue.queueUrl << bsoncxx::builder::stream::finalize;
-
-        auto result = _queueCollection.delete_many({filter});
+        auto result = _queueCollection.delete_many(make_document(kvp("region", queue.region), kvp("queueUrl", queue.queueUrl)));
         log_debug_stream(_logger) << "Queues deleted, count: " << result->deleted_count() << std::endl;
     }
 
@@ -194,17 +173,14 @@ namespace AwsMock::Database {
         bsoncxx::builder::stream::document filter{};
         filter << "messageId" << messageId << bsoncxx::builder::stream::finalize;
 
-        int64_t count = _messageCollection.count_documents({filter});
+        int64_t count = _messageCollection.count_documents(make_document(kvp("messageId", messageId)));
         log_trace_stream(_logger) << "Message exists: " << (count > 0 ? "true" : "false") << std::endl;
         return count > 0;
     }
 
     Entity::SQS::Message SQSDatabase::GetMessageById(bsoncxx::oid oid) {
 
-        bsoncxx::builder::stream::document filter{};
-        filter << "_id" << oid << bsoncxx::builder::stream::finalize;
-
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _messageCollection.find_one({filter});
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _messageCollection.find_one(make_document(kvp("_id", oid)));
         Entity::SQS::Message result;
         result.FromDocument(mResult);
 
@@ -213,10 +189,7 @@ namespace AwsMock::Database {
 
     Entity::SQS::Message SQSDatabase::GetMessageByReceiptHandle(const std::string &receiptHandle) {
 
-        bsoncxx::builder::stream::document filter{};
-        filter << "receiptHandle" << receiptHandle << bsoncxx::builder::stream::finalize;
-
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _messageCollection.find_one({filter});
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle)));
         Entity::SQS::Message result;
         result.FromDocument(mResult);
 
@@ -231,10 +204,7 @@ namespace AwsMock::Database {
 
         auto reset = std::chrono::high_resolution_clock::now() + std::chrono::seconds{visibility};
 
-        bsoncxx::builder::stream::document filter{};
-        filter << "queueUrl" << queueUrl << "status" << Entity::SQS::INITIAL << bsoncxx::builder::stream::finalize;
-
-        auto messageCursor = _messageCollection.find({filter});
+        auto messageCursor = _messageCollection.find(make_document(kvp("queueUrl", queueUrl), kvp("status", Entity::SQS::INITIAL)));
         for (auto message : messageCursor) {
 
             Entity::SQS::Message result;
@@ -289,9 +259,6 @@ namespace AwsMock::Database {
 
     long SQSDatabase::CountMessages(const std::string &region, const std::string &queueUrl) {
 
-        bsoncxx::builder::stream::document filter{};
-        filter << "region" << region << "queueUrl" << queueUrl << bsoncxx::builder::stream::finalize;
-
         long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
         log_trace_stream(_logger) << "Count messages, result: " << count << std::endl;
 
@@ -300,10 +267,7 @@ namespace AwsMock::Database {
 
     long SQSDatabase::CountMessagesByStatus(const std::string &region, const std::string &queueUrl, int status) {
 
-        bsoncxx::builder::stream::document filter{};
-        filter << "region" << region << "queueUrl" << queueUrl << "status" << status << bsoncxx::builder::stream::finalize;
-
-        long count = _messageCollection.count_documents({filter});
+        long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl), kvp("status", Entity::SQS::INITIAL)));
         log_trace_stream(_logger) << "Count messages by status, status: " << status << " result: " << count << std::endl;
 
         return count;
@@ -311,21 +275,14 @@ namespace AwsMock::Database {
 
     void SQSDatabase::DeleteMessages(const std::string &queueUrl) {
 
-        bsoncxx::builder::stream::document filter{};
-        filter << "queueUrl" << queueUrl << bsoncxx::builder::stream::finalize;
-
-        auto result = _messageCollection.delete_many({filter});
+        auto result = _messageCollection.delete_many(make_document(kvp("queueUrl", queueUrl)));
 
         log_debug_stream(_logger) << "Messages deleted, queue: " << queueUrl << " count: " << result->deleted_count() << std::endl;
     }
 
     void SQSDatabase::DeleteMessage(const Entity::SQS::Message &message) {
 
-        bsoncxx::builder::stream::document filter{};
-        filter << "receiptHandle" << message.receiptHandle << bsoncxx::builder::stream::finalize;
-
-        auto result = _messageCollection.delete_one({filter});
-
+        auto result = _messageCollection.delete_one(make_document(kvp("receiptHandle", message.receiptHandle)));
         log_debug_stream(_logger) << "Messages deleted, receiptHandle: " << message.receiptHandle << " count: " << result->deleted_count() << std::endl;
     }
 
