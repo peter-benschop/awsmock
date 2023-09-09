@@ -45,6 +45,15 @@ namespace AwsMock::Core {
       static std::string GetPathParameter(const std::string &uri, int index);
 
       /**
+       * Get the rest of the path after index.
+       *
+       * @param uri HTTP request URI
+       * @param index path parameter index
+       * @return rest of the path after index
+       */
+      static std::string GetPathParametersFromIndex(const std::string &uri, int index);
+
+      /**
        * Returns all path parameters.
        *
        * @param uri HTTP request URI

@@ -28,6 +28,7 @@
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/DirectoryWatcher.h>
 #include <awsmock/core/FileUtils.h>
+#include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/repository/ServiceDatabase.h>
 #include <awsmock/repository/S3Database.h>

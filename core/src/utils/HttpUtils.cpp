@@ -19,13 +19,27 @@ namespace AwsMock::Core {
         std::string basePath = GetBasePath(uri);
 
         std::vector<std::string> parameters = StringUtils::Split(basePath, '/');
-        if (index >= (int)parameters.size()) {
+        if (index >= (int) parameters.size()) {
             return {};
         }
-        if(IsUrlEncoded(parameters[index])) {
+        if (IsUrlEncoded(parameters[index])) {
             return Core::StringUtils::UrlDecode(parameters[index]);
         }
         return parameters[index];
+    }
+
+    std::string HttpUtils::GetPathParametersFromIndex(const std::string &uri, int index) {
+
+        std::string basePath = GetBasePath(uri);
+
+        std::vector<std::string> parameters = StringUtils::Split(basePath, '/');
+
+        std::string rest;
+        for (int i = index; i < parameters.size(); i++) {
+            rest += parameters[i] + "/";
+        }
+        rest.pop_back();
+        return rest;
     }
 
     std::vector<std::string> HttpUtils::GetPathParameters(const std::string &uri) {

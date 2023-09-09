@@ -157,25 +157,12 @@ namespace AwsMock::Worker {
 
     void S3Worker::GetBucketKeyFromFile(const std::string &fileName, std::string &bucket, std::string &key) {
 
-        std::string file;
-        if (Core::StringUtils::Contains(fileName, "watcher")) {
-            file = Poco::replace(fileName, _watcherDir.c_str(), "");
-        } else {
-            file = Poco::replace(fileName, _dataDir.c_str(), "");
-        }
+        // Remove data dir
+        std::string file = Poco::replace(fileName, _dataDir.c_str(), "");
 
-        Poco::RegularExpression::MatchVec posVec;
-        Poco::RegularExpression pattern(R"(/([a-zA-Z0-9-.]+)/?([a-zA-Z0-9-_/.*'()]+)?$)");
-        if (!pattern.match(file, 0, posVec)) {
-            throw Core::ResourceNotFoundException("Could not extract bucket and key");
-        }
-
-        if (posVec.size() > 1) {
-            bucket = file.substr(posVec[1].offset, posVec[1].length);
-        }
-        if (posVec.size() > 2) {
-            key = file.substr(posVec[2].offset, posVec[2].length);
-        }
+        // Remove starting slash
+        bucket = Core::HttpUtils::GetPathParameter(fileName, 0);
+        key = Core::HttpUtils::GetPathParametersFromIndex(fileName, 1);
     }
 
     void S3Worker::GetFileFromBucketKey(std::string &fileName, const std::string &bucket, const std::string &key) {

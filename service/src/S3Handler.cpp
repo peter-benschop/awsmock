@@ -17,7 +17,7 @@ namespace AwsMock::Service {
         try {
             //std::string tmp = request.getURI();
             std::string bucket = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
-            std::string key = Core::HttpUtils::GetPathParameter(request.getURI(), 1);
+            std::string key = Core::HttpUtils::GetPathParametersFromIndex(request.getURI(), 1);
 
             if (bucket.empty()) {
 
@@ -86,7 +86,7 @@ namespace AwsMock::Service {
 
             //std::string tmp = request.getURI();
             std::string bucket = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
-            std::string key = Core::HttpUtils::GetPathParameter(request.getURI(), 1);
+            std::string key = Core::HttpUtils::GetPathParametersFromIndex(request.getURI(), 1);
             log_debug_stream(_logger) << "Found bucket/key, bucket: " << bucket << " key: " << key << std::endl;
 
             bool isMultipartUpload = Core::HttpUtils::HasQueryParameter(request.getURI(), "uploadId");
@@ -197,7 +197,7 @@ namespace AwsMock::Service {
 
             //DumpRequest(request);
             std::string bucket = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
-            std::string key = Core::HttpUtils::GetPathParameter(request.getURI(), 1);
+            std::string key = Core::HttpUtils::GetPathParametersFromIndex(request.getURI(), 1);
 
             bool isMultipartUpload = Core::HttpUtils::HasQueryParameter(request.getURI(), "uploads");
             bool isDeleteObjects = Core::HttpUtils::HasQueryParameter(request.getURI(), "delete");
@@ -240,7 +240,7 @@ namespace AwsMock::Service {
 
         try {
             std::string bucket = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
-            std::string key = Core::HttpUtils::GetPathParameter(request.getURI(), 1);
+            std::string key = Core::HttpUtils::GetPathParametersFromIndex(request.getURI(), 1);
 
             if (!bucket.empty() && !key.empty()) {
                 _s3Service.DeleteObject({.region=region, .user=user, .bucket=bucket, .key=key});
