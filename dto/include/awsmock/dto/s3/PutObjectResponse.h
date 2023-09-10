@@ -40,6 +40,16 @@ namespace AwsMock::Dto::S3 {
       long contentLength;
 
       /**
+       * SHA256 checksum
+       */
+      std::string checksumSha256;
+
+      /**
+       * SHA256 checksum algorithm
+       */
+      std::string checksumAlgorithm = "SHA256";
+
+      /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.

@@ -283,7 +283,8 @@ namespace AwsMock::Service {
             ofs << "COPY classes ${LAMBDA_TASK_ROOT}" << std::endl;
             ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
         } else if (Core::StringUtils::EqualsIgnoreCase(runtime, "java17")) {
-            ofs << "FROM public.ecr.aws/lambda/java:latest" << std::endl;
+            // Because of a bug in the latest version of lambda runtime move back to v1.10
+            ofs << "FROM public.ecr.aws/lambda/java:17.2023.03.28.11" << std::endl;
             for (auto &env : environment) {
                 ofs << "ENV " << env.first << "=\"" << env.second << "\"" << std::endl;
             }

@@ -133,7 +133,7 @@ namespace AwsMock::Dto::Docker {
       }
     };
 
-    struct Version {
+    struct DockerVersion {
 
       /**
        * Platform object

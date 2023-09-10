@@ -118,14 +118,9 @@ namespace AwsMock::Worker {
       int _period;
 
       /**
-       * AWS client ID
+       * Docker swarm ID
        */
-      //std::string _clientId;
-
-      /**
-       * AWS user
-       */
-      //std::string _user;
+      std::string _swarmId;
 
       /**
        * Lambda service host

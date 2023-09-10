@@ -129,7 +129,7 @@ namespace AwsMock::Service {
                 // Get S3 source bucket/key
                 std::string sourceHeader = GetHeaderValue(request, "x-amz-copy-source", "empty");
                 std::string sourceBucket = Core::HttpUtils::GetPathParameter(sourceHeader, 0);
-                std::string sourceKey = Core::HttpUtils::GetPathParameter(sourceHeader, 1);
+                std::string sourceKey = Core::HttpUtils::GetPathParametersFromIndex(sourceHeader, 1);
 
                 Dto::S3::CopyObjectRequest s3Request = {
                     .region=region,
@@ -167,8 +167,9 @@ namespace AwsMock::Service {
                 headerMap.emplace_back("Content-MD5", Core::Crypto::Base64Encode(putObjectResponse.etag));
                 headerMap.emplace_back("Content-Length", std::to_string(putObjectResponse.contentLength));
                 headerMap.emplace_back("ETag", "\"" + putObjectResponse.etag + "\"");
-                log_debug_stream(_logger) << "ETag: " << Core::Crypto::Base64Encode(putObjectResponse.etag) << " size: " << putObjectResponse.contentLength
-                                          << std::endl;
+                headerMap.emplace_back("x-amz-sdk-checksum-algorithm", putObjectResponse.checksumAlgorithm);
+                headerMap.emplace_back("x-amz-checksum-sha256", putObjectResponse.checksumSha256);
+                log_debug_stream(_logger) << " size: " << putObjectResponse.contentLength << std::endl;
 
                 SendOkResponse(response, {}, &headerMap);
 
@@ -262,7 +263,7 @@ namespace AwsMock::Service {
         try {
 
             std::string bucket = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
-            std::string key = Core::HttpUtils::GetPathParameter(request.getURI(), 1);
+            std::string key = Core::HttpUtils::GetPathParametersFromIndex(request.getURI(), 1);
             log_debug_stream(_logger) << "S3 HEAD request, bucket: " << bucket << " key: " << key << std::endl;
 
             Dto::S3::GetMetadataRequest s3Request = {.region=region, .bucket=bucket, .key=key};
@@ -292,6 +293,8 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &exc) {
             SendErrorResponse("S3", response, exc);
+        } catch (std::exception &exc) {
+            log_error_stream(_logger) << exc.what() << std::endl;
         }
     }
 

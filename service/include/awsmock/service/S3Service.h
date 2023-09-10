@@ -15,8 +15,9 @@
 
 // AwsMock includes
 #include "awsmock/core/CryptoUtils.h"
-#include "awsmock/core/ServiceException.h"
+#include "awsmock/core/DirectoryWatcher.h"
 #include "awsmock/core/LogStream.h"
+#include "awsmock/core/ServiceException.h"
 #include "awsmock/repository/S3Database.h"
 #include "awsmock/dto/s3/CompleteMultipartUploadResult.h"
 #include "awsmock/dto/s3/CreateBucketRequest.h"

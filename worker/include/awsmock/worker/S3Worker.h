@@ -269,7 +269,7 @@ namespace AwsMock::Worker {
       /**
        * Directory _watcher
        */
-      Core::DirectoryWatcher *_watcher;
+      std::shared_ptr<Core::DirectoryWatcher> _watcher;
 
       /**
        * Running flag

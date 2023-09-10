@@ -13,7 +13,7 @@ namespace AwsMock::Service {
             && request.getMethod() != Poco::Net::HTTPRequest::HTTP_POST && request.getMethod() != Poco::Net::HTTPRequest::HTTP_DELETE
             && request.getMethod() != Poco::Net::HTTPRequest::HTTP_OPTIONS && request.getMethod() != Poco::Net::HTTPRequest::HTTP_HEAD) {
             log_error_stream(_logger) << "Invalid request method, method: " << request.getMethod() << std::endl;
-            throw Core::ServiceException("The request method is not supported by the server and cannot be handled.", 501);
+            throw Core::ServiceException("The request method is not supported by the server and cannot be handled.", Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
         }
 
         if (request.has("Accept")) {
@@ -74,7 +74,7 @@ namespace AwsMock::Service {
                                      [[maybe_unused]]const std::string &region,
                                      [[maybe_unused]]const std::string &user) {
         log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user << std::endl;
-        handleHttpStatusCode(response, 501);
+        handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
         std::ostream &errorStream = response.send();
         errorStream.flush();
     }
@@ -84,7 +84,7 @@ namespace AwsMock::Service {
                                      [[maybe_unused]]const std::string &region,
                                      [[maybe_unused]]const std::string &user) {
         log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user << std::endl;
-        handleHttpStatusCode(response, 501);
+        handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
         std::ostream &errorStream = response.send();
         errorStream.flush();
     }
@@ -94,7 +94,7 @@ namespace AwsMock::Service {
                                       [[maybe_unused]]const std::string &region,
                                       [[maybe_unused]]const std::string &user) {
         log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user << std::endl;
-        handleHttpStatusCode(response, 501);
+        handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
         std::ostream &errorStream = response.send();
         errorStream.flush();
     }
@@ -104,7 +104,7 @@ namespace AwsMock::Service {
                                         [[maybe_unused]]const std::string &region,
                                         [[maybe_unused]]const std::string &user) {
         log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user << std::endl;
-        handleHttpStatusCode(response, 501);
+        handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
         std::ostream &errorStream = response.send();
         errorStream.flush();
     }
@@ -192,7 +192,8 @@ namespace AwsMock::Service {
                                         reason != nullptr ? reason : Poco::Net::HTTPResponse::HTTP_REASON_INTERNAL_SERVER_ERROR);
             break;
 
-        case 501:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
+        case Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED:
+            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
             break;
 
         case 503:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_SERVICE_UNAVAILABLE);
@@ -294,7 +295,7 @@ namespace AwsMock::Service {
 
     std::string AbstractHandler::GetStringParameter(const std::string &path, const std::string &name, int index) {
 
-        std::string parameters = Core::StringUtils::UrlDecode(Core::StringUtils::SubStringAfter(path, '?'));
+        std::string parameters = Core::StringUtils::UrlDecode(Core::StringUtils::SubStringAfter(path, "?"));
 
         std::vector<std::string> pathParts = Core::StringUtils::Split(path, '&');
         if(index > pathParts.size()) {
@@ -334,7 +335,7 @@ namespace AwsMock::Service {
 
     int AbstractHandler::GetAttributeCount(const std::string &body, const std::string &name) {
         int count = 0;
-        std::string parameters = Core::StringUtils::SubStringAfter(body, '?');
+        std::string parameters = Core::StringUtils::SubStringAfter(body, "?");
         std::vector<std::string> bodyParts = Core::StringUtils::Split(parameters, '&');
         for (auto &it : bodyParts) {
             if(it.starts_with(name)) {

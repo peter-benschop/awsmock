@@ -15,7 +15,6 @@ namespace AwsMock::Worker {
 
     S3Worker::~S3Worker() {
         _watcherThread.wakeUp();
-        delete _watcher;
     }
 
     void S3Worker::Initialize() {
@@ -49,7 +48,7 @@ namespace AwsMock::Worker {
         _s3Database = std::make_unique<Database::S3Database>(_configuration);
 
         // Start _watcher
-        _watcher = new Core::DirectoryWatcher(_dataDir);
+        _watcher = std::make_shared<Core::DirectoryWatcher>(_dataDir);
         _watcher->itemAdded += Poco::delegate(this, &S3Worker::OnFileAdded);
         //_watcher->itemModified += Poco::delegate(this, &S3Worker::OnFileModified);
         _watcher->itemDeleted += Poco::delegate(this, &S3Worker::OnFileDeleted);
@@ -105,7 +104,7 @@ namespace AwsMock::Worker {
 //        }
 
         // Start file watcher, they will call the delegate methods, if they find a file system event.
-        _watcherThread.start(_watcher);
+        _watcherThread.start(*_watcher);
 
         // Synchronize current file system state
         Synchronize();
@@ -128,7 +127,7 @@ namespace AwsMock::Worker {
             CreateObject(addedEvent.item);
         }
         //_watcher->UnlockFile(addedEvent.item);
-        log_info_stream(_logger) << "File unlocked, path: " << addedEvent.item << std::endl;
+        //log_info_stream(_logger) << "File unlocked, path: " << addedEvent.item << std::endl;
     }
 
     void S3Worker::OnFileModified(const Core::DirectoryEvent &modifiedEvent) {
@@ -149,9 +148,9 @@ namespace AwsMock::Worker {
         GetBucketKeyFromFile(deleteEvent.item, bucketName, key);
 
         if(key.empty()) {
-            SendDeleteBucketRequest(bucketName, "application/octet-stream");
+            SendDeleteBucketRequest(bucketName, "application/json");
         } else {
-            SendDeleteObjectRequest(bucketName, key, "application/octet-stream");
+            SendDeleteObjectRequest(bucketName, key, "application/json");
         }
     }
 
@@ -200,11 +199,12 @@ namespace AwsMock::Worker {
         GetBucketKeyFromFile(filePath, bucket, key);
 
         // Get file size, MD5 sum
-        unsigned long size = Core::FileUtils::FileSize(filePath);
-        std::string md5sum = Core::Crypto::GetMd5FromFile(filePath);
-        std::string owner = Core::FileUtils::GetOwner(filePath);
-
-        SendPutObjectRequest(filePath, bucket, key, md5sum, "application/octet-stream", size);
+        if (Core::FileUtils::FileExists(filePath)) {
+            unsigned long size = Core::FileUtils::FileSize(filePath);
+            std::string md5sum = Core::Crypto::GetMd5FromFile(filePath);
+            std::string owner = Core::FileUtils::GetOwner(filePath);
+            SendPutObjectRequest(filePath, bucket, key, md5sum, "application/octet-stream", size);
+        }
     }
 
     bool S3Worker::ExistsObject(const std::string &bucket, const std::string &key) {

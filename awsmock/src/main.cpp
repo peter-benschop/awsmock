@@ -17,9 +17,14 @@
 // You should have received a copy of the GNU General Public License
 // along with aws-mock.  If not, see <http://www.gnu.org/licenses/>.
 
+// C includes
+#include <unistd.h>
+#include <execinfo.h>
+#include <signal.h>
+#include <stdlib.h>
+
 // C++ standard includes
 #include <iostream>
-#include <unistd.h>
 
 // Poco includes
 #include <Poco/Logger.h>
@@ -48,14 +53,23 @@
 
 namespace AwsMock {
 
+    void handler(int sig) {
+        void *array[10];
+        size_t size;
+
+        // get void*'s for all entries on the stack
+        size = backtrace(array, 10);
+
+        // print out all the frames to stderr
+        fprintf(stderr, "Error: signal %d:\n", sig);
+        backtrace_symbols_fd(array, size, STDERR_FILENO);
+        exit(1);
+    }
+
     /**
      * Main application class.
      */
     class AwsMock : public Poco::Util::ServerApplication {
-
-    public:
-
-      AwsMock() : _logger(Poco::Logger::get("root")) {}
 
     protected:
 
@@ -65,7 +79,6 @@ namespace AwsMock {
        * @param self application reference.
        */
       [[maybe_unused]] void initialize(Application &self) override {
-          Core::Logger::SetDefaultConsoleLogger();
 
           InitializeMonitoring();
           InitializeErrorHandler();
@@ -139,8 +152,7 @@ namespace AwsMock {
           } else if (name == "level") {
 
               _configuration.SetLogLevel(value);
-              _logger.level(value);
-              Core::Logger::SetLogLevel(value);
+              Poco::Logger::get("root").setLevel(value);
           }
       }
 
@@ -220,6 +232,8 @@ namespace AwsMock {
        * @return system exit code.
        */
       int main([[maybe_unused]]const ArgVec &args) override {
+
+          signal(SIGSEGV, handler);
 
           log_debug_stream(_logger) << "Entering main routine" << std::endl;
 

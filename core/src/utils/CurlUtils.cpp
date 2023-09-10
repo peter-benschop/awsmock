@@ -120,6 +120,9 @@ namespace AwsMock::Core {
         if(res != CURLE_OK) {
             log_error_stream(_logger) << "Request send failed, url: " << url << " error: " << curl_easy_strerror(res) << std::endl;
         }
+        if(fd) {
+            free(fd);
+        }
 
         int status = 0;
         curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &status);

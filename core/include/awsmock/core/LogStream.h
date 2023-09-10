@@ -57,10 +57,16 @@ namespace AwsMock::Core {
       /// Sets the capacity of the internal message buffer to the given size.
 
     private:
-      Poco::Mutex _mutex;
+
+      /**
+       * Write to underlying device
+       *
+       * @param c character to write
+       * @return character
+       */
       int writeToDevice(char c) override;
 
-    private:
+      Poco::Mutex _mutex;
       Poco::Logger &_logger;
       Poco::Message::Priority _priority;
       std::string _message;
@@ -103,12 +109,13 @@ namespace AwsMock::Core {
       explicit LogStream(Poco::Logger &logger, Poco::Message::Priority priority = Poco::Message::PRIO_INFORMATION, std::size_t bufferCapacity = DEFAULT_BUFFER_CAPACITY);
       /// Creates the LogStream, using the given logger and priority.
 
-      explicit LogStream(const std::string &loggerName, Poco::Message::Priority priority = Poco::Message::PRIO_INFORMATION, std::size_t bufferCapacity = DEFAULT_BUFFER_CAPACITY);
-      /// Creates the LogStream, using the logger identified
-      /// by loggerName, and sets the priority.
-
       ~LogStream() override;
       /// Destroys the LogStream.
+
+      /**
+       * Configures the default console logger.
+       */
+      void SetDefaultConsoleLogger(Poco::Logger &logger);
 
       LogStream &level(const std::string &level);
       /// Sets the logging level
@@ -195,7 +202,20 @@ namespace AwsMock::Core {
 
       LogStream &priority(Poco::Message::Priority priority);
       /// Sets the priority for log messages.
+
+      /**
+       * Default log pattern
+       */
+      Poco::AutoPtr<Poco::FormattingChannel> formattingChannel() const;
     };
+
+    inline Poco::AutoPtr<Poco::FormattingChannel> LogStream::formattingChannel() const {
+
+        Poco::AutoPtr<Poco::ConsoleChannel> pCons(new Poco::ConsoleChannel());
+        Poco::AutoPtr<Poco::PatternFormatter> pPF(new Poco::PatternFormatter("%d-%m-%Y %H:%M:%S.%i [%p] %I %s:%u - %t"));
+        Poco::AutoPtr<Poco::FormattingChannel> pFC(new Poco::FormattingChannel(pPF, pCons));
+        return pFC;
+    }
 
     //
     // inlines

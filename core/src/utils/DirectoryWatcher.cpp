@@ -7,9 +7,8 @@
 
 namespace AwsMock::Core {
 
-    DirectoryWatcher::DirectoryWatcher(std::string rootDir) : _logger(Poco::Logger::get("DirectoryWatcher")),
-                                                              _rootDir(std::move(rootDir)) {
-        Initialize();
+    DirectoryWatcher::DirectoryWatcher(const std::string &rootDir) : _logger(Poco::Logger::get("DirectoryWatcher")) {
+        Initialize(rootDir);
     }
 
     DirectoryWatcher::~DirectoryWatcher() noexcept {
@@ -22,24 +21,24 @@ namespace AwsMock::Core {
         _lockedFiles.clear();
     }
 
-    void DirectoryWatcher::Initialize() {
+    void DirectoryWatcher::Initialize(const std::string &rootDir) {
 
         fd = inotify_init();
-        int wd = inotify_add_watch(fd, _rootDir.c_str(), IN_CREATE|IN_CLOSE|IN_MODIFY|IN_DELETE);
-        _watcherMap[wd] = _rootDir;
-        log_debug_stream(_logger) << "Root dir: " << _rootDir << std::endl;
+        int wd = inotify_add_watch(fd, rootDir.c_str(), IN_CREATE | IN_CLOSE | IN_MODIFY | IN_DELETE);
+        _watcherMap[wd] = rootDir;
+        log_debug_stream(_logger) << "Root dir: " << rootDir << std::endl;
 
-        Poco::RecursiveDirectoryIterator it(_rootDir);
+        Poco::RecursiveDirectoryIterator it(rootDir);
         Poco::RecursiveDirectoryIterator end;
         while (it != end) {
-            if(it->isDirectory()) {
+            if (it->isDirectory()) {
                 log_debug_stream(_logger) << "Adding directory, path: " << it.name() << std::endl;
-                wd = inotify_add_watch(fd, it.path().toString().c_str(), IN_CREATE|IN_CLOSE|IN_MODIFY|IN_DELETE);
+                wd = inotify_add_watch(fd, it.path().toString().c_str(), IN_CREATE | IN_CLOSE | IN_MODIFY | IN_DELETE);
                 _watcherMap[wd] = it.path().toString();
             }
             ++it;
         }
-        log_debug_stream(_logger) << "File watcher initialized, path: " << _rootDir << std::endl;
+        log_debug_stream(_logger) << "File watcher initialized, path: " << rootDir << std::endl;
     }
 
     void DirectoryWatcher::run() {
@@ -67,44 +66,45 @@ namespace AwsMock::Core {
                     std::string rootDir = _watcherMap[event->wd];
                     std::string fileName = GetFilename(rootDir, event->name);
 
-                    if(IsLocked(fileName)) {
-                        continue;
-                    }
+                    if (!IsLocked(fileName)) {
 
-                    // Directory added
-                    if (event->mask & IN_CREATE && event->mask & IN_ISDIR) {
-                        wd = inotify_add_watch(fd, fileName.c_str(), IN_ALL_EVENTS | IN_ONESHOT);
-                        _watcherMap[wd] = fileName;
-                        DirectoryEvent ev(fileName, DW_ITEM_ADDED, DW_DIR_TYPE);
-                        this->itemAdded(this, ev);
-                    } else if (event->mask & IN_CLOSE && !(event->mask & IN_ISDIR)) {
-                        // File written
-                        DirectoryEvent ev(fileName, DW_ITEM_ADDED, DW_FILE_TYPE);
-                        this->itemAdded(this, ev);
-                    } else if (event->mask & IN_MODIFY) {
-                        // Directory modified
-                        DirectoryEvent ev(fileName, DW_ITEM_MODIFIED, DW_DIR_TYPE);
-                        this->itemModified(this, ev);
-                    }
-                    if (event->mask & IN_DELETE && event->mask & IN_ISDIR) {
-                        // Directory deleted
-                        auto it = _watcherMap.find(event->wd);
-                        if (it != _watcherMap.end()) {
-                            _watcherMap.erase(it);
+                        // Directory added
+                        if (event->mask & IN_CREATE && event->mask & IN_ISDIR) {
+                            wd = inotify_add_watch(fd, fileName.c_str(), IN_ALL_EVENTS | IN_ONESHOT);
+                            _watcherMap[wd] = fileName;
+                            DirectoryEvent ev(fileName, DW_ITEM_ADDED, DW_DIR_TYPE);
+                            this->itemAdded(this, ev);
+                        } else if (event->mask & IN_CLOSE && !(event->mask & IN_ISDIR)) {
+                            // File written
+                            DirectoryEvent ev(fileName, DW_ITEM_ADDED, DW_FILE_TYPE);
+                            LockFile(fileName);
+                            this->itemAdded(this, ev);
+                        } else if (event->mask & IN_MODIFY) {
+                            // Directory modified
+                            DirectoryEvent ev(fileName, DW_ITEM_MODIFIED, DW_DIR_TYPE);
+                            this->itemModified(this, ev);
                         }
-                        inotify_rm_watch(fd, event->wd);
-                        DirectoryEvent ev(fileName, DW_ITEM_REMOVED, DW_DIR_TYPE);
-                        this->itemDeleted(this, ev);
-                    }
-                    if (event->mask & IN_DELETE && !(event->mask & IN_ISDIR)) {
-                        // File deleted
-                        DirectoryEvent ev(fileName, DW_ITEM_REMOVED, DW_FILE_TYPE);
-                        this->itemDeleted(this, ev);
-                        UnlockFile(fileName);
+                        if (event->mask & IN_DELETE && event->mask & IN_ISDIR) {
+                            // Directory deleted
+                            auto it = _watcherMap.find(event->wd);
+                            if (it != _watcherMap.end()) {
+                                _watcherMap.erase(it);
+                            }
+                            inotify_rm_watch(fd, event->wd);
+                            DirectoryEvent ev(fileName, DW_ITEM_REMOVED, DW_DIR_TYPE);
+                            this->itemDeleted(this, ev);
+                        }
+                        if (event->mask & IN_DELETE && !(event->mask & IN_ISDIR)) {
+                            // File deleted
+                            DirectoryEvent ev(fileName, DW_ITEM_REMOVED, DW_FILE_TYPE);
+                            this->itemDeleted(this, ev);
+                            //UnlockFile(fileName);
+                        }
                     }
                 }
                 i += (int) (EVENT_SIZE + event->len);
             }
+            memset(buffer, 0x00, BUFSIZ);
         }
     }
 
@@ -113,18 +113,30 @@ namespace AwsMock::Core {
     }
 
     void DirectoryWatcher::LockFile(const std::string &fileName) {
-        _lockedFiles.emplace_back(fileName);
-    }
-
-    void DirectoryWatcher::UnlockFile(const std::string &fileName) {
-        _lockedFiles.erase(std::remove(_lockedFiles.begin(), _lockedFiles.end(), fileName), _lockedFiles.end());
+        // Cleanup
+        for (const auto &it : _lockedFiles) {
+            erase_if(_lockedFiles, [](const std::pair<const std::basic_string<char>,
+                                                std::chrono::time_point<std::chrono::system_clock, std::chrono::duration<long, std::ratio<1, 1000000000>>>>& item) {
+              return DURATION(item.second) > 5000;
+            });
+        }
+        _lockedFiles[fileName] = Clock::now();
+        std::cerr << "size: " << _lockedFiles.size() << std::endl;
     }
 
     bool DirectoryWatcher::IsLocked(const std::string &fileName) {
-        return std::find(_lockedFiles.begin(), _lockedFiles.end(), fileName) != _lockedFiles.end();
+        return _lockedFiles.find(fileName) != _lockedFiles.end();
     }
 
     void DirectoryWatcher::ClearLocks() {
         _lockedFiles.clear();
+        std::cerr << "size: " << _lockedFiles.size() << std::endl;
+    }
+
+    void DirectoryWatcher::ClearWatcher() {
+        for (const auto &it : _watcherMap) {
+            inotify_rm_watch(fd, it.first);
+        }
+        _watcherMap.clear();
     }
 }
