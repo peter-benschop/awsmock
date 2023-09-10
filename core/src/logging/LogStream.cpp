@@ -12,8 +12,7 @@ namespace AwsMock::Core {
         _message.reserve(bufferCapacity);
     }
 
-    LogStreamBuf::~LogStreamBuf() {
-    }
+    LogStreamBuf::~LogStreamBuf() = default;
 
     void LogStreamBuf::setPriority(Poco::Message::Priority priority) {
         _priority = priority;
@@ -64,15 +63,14 @@ namespace AwsMock::Core {
     LogStream::LogStream(Poco::Logger &logger, Poco::Message::Priority priority, std::size_t bufferCapacity) :
         LogIOS(logger, priority, bufferCapacity),
         std::ostream(&_buf) {
-    }
-
-    LogStream::LogStream(const std::string &loggerName, Poco::Message::Priority priority, std::size_t bufferCapacity) :
-        LogIOS(Poco::Logger::get(loggerName), priority, bufferCapacity),
-        std::ostream(&_buf) {
-        Core::Logger::SetDefaultConsoleLogger();
+        SetDefaultConsoleLogger(logger);
     }
 
     LogStream::~LogStream() = default;
+
+    void LogStream::SetDefaultConsoleLogger(Poco::Logger &logger) {
+        logger.setChannel(formattingChannel());
+    }
 
     LogStream &LogStream::fatal() {
         return priority(Poco::Message::PRIO_FATAL);

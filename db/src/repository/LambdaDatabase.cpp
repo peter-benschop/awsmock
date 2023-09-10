@@ -84,11 +84,21 @@ namespace AwsMock::Database {
 
     Entity::Lambda::Lambda LambdaDatabase::GetLambdaByArn(const std::string &arn) {
 
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _lambdaCollection.find_one(make_document(kvp("arn", arn)));
-        Entity::Lambda::Lambda result;
-        result.FromDocument(mResult);
+        try {
+            mongocxx::stdx::optional<bsoncxx::document::value> mResult = _lambdaCollection.find_one(make_document(kvp("arn", arn)));
+            if (!mResult) {
+                log_error_stream(_logger) << "GetLambdaByArn failed, arn " << arn << std::endl;
+                return {};
+            }
 
-        return result;
+            Entity::Lambda::Lambda result;
+            result.FromDocument(mResult);
+            return result;
+
+        } catch (mongocxx::exception::system_error &e) {
+            log_error_stream(_logger) << "Get lambda by ARN failed, error: " << e.what() << std::endl;
+        }
+        return {};
     }
 
     std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdas(const std::string &region) {

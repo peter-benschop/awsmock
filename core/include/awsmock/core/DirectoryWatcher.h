@@ -29,6 +29,7 @@
 #include <map>
 #include <iostream>
 #include <utility>
+#include <chrono>
 
 // Poco includes
 #include <Poco/BasicEvent.h>
@@ -38,6 +39,7 @@
 #include <Poco/Thread.h>
 #include <Poco/Runnable.h>
 #include <Poco/Delegate.h>
+#include <Poco/SingletonHolder.h>
 #include <Poco/RecursiveDirectoryIterator.h>
 
 // AwsMock includes
@@ -48,8 +50,11 @@
 #define LEN_NAME 16 // Assuming that the length of the filename won't exceed 16 bytes
 #define EVENT_SIZE  (sizeof (struct inotify_event)) // size of one event
 #define BUF_LEN     (MAX_EVENTS * (EVENT_SIZE + LEN_NAME)) // buffer to store the data of events
+#define DURATION(x) ((double) std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - x).count())
 
 namespace AwsMock::Core {
+
+    typedef std::chrono::high_resolution_clock Clock;
 
     enum DirectoryEventType {
       DW_ITEM_ADDED = 1,
@@ -82,6 +87,7 @@ namespace AwsMock::Core {
     };
 
     struct DirectoryEvent {
+
       DirectoryEvent(const std::string &f, DirectoryEventType ev, FileType ft) : item(f), event(ev), type(ft) {}
 
       /**
@@ -100,6 +106,8 @@ namespace AwsMock::Core {
       FileType type;
     };
 
+    typedef std::map<std::string, std::chrono::time_point<std::chrono::high_resolution_clock>> LockFiles;
+
     class DirectoryWatcher : public Poco::Runnable {
 
     public:
@@ -107,7 +115,7 @@ namespace AwsMock::Core {
       /**
        * Constructor
        */
-      explicit DirectoryWatcher(std::string rootDir);
+      explicit DirectoryWatcher(const std::string &rootDir);
 
       /**
        * Destructor
@@ -117,7 +125,7 @@ namespace AwsMock::Core {
       /**
        * Initialization
        */
-      void Initialize();
+      void Initialize(const std::string &rootDir);
 
       /**
        * Main thread running method
@@ -141,9 +149,9 @@ namespace AwsMock::Core {
 
       void LockFile(const std::string &fileName);
 
-      void UnlockFile(const std::string &fileName);
-
       void ClearLocks();
+
+      void ClearWatcher();
 
     private:
 
@@ -155,17 +163,18 @@ namespace AwsMock::Core {
        */
       static std::string GetFilename(const std::string &rootDir, const char *fileName);
 
+      /**
+       * Check lock state
+       *
+       * @param fileName file name
+       * @return true if file is locked
+       */
       bool IsLocked(const std::string &fileName);
 
       /**
        * Logger
        */
       Core::LogStream _logger;
-
-      /**
-       * Root directory
-       */
-      std::string _rootDir;
 
       /**
        * File descriptor
@@ -190,7 +199,7 @@ namespace AwsMock::Core {
       /**
        * Locked files
        */
-      std::vector<std::string> _lockedFiles;
+      LockFiles _lockedFiles;
     };
 
 } // namespace AwsMock::Core

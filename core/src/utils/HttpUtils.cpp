@@ -7,7 +7,7 @@
 namespace AwsMock::Core {
 
     std::string HttpUtils::GetBasePath(const std::string &uri) {
-        std::string basePath = StringUtils::SubStringUntil(uri, '?');
+        std::string basePath = StringUtils::SubStringUntil(uri, "?");
         if (basePath[0] == '/') {
             basePath = basePath.substr(1);
         }
@@ -49,13 +49,13 @@ namespace AwsMock::Core {
     }
 
     std::string HttpUtils::GetQueryString(const std::string &uri) {
-        return StringUtils::SubStringAfter(uri, '?');
+        return StringUtils::SubStringAfter(uri, "?");
     }
 
     int HttpUtils::CountQueryParameters(const std::string &uri) {
         std::string queryString = GetQueryString(uri);
         std::vector<std::string> parameters = StringUtils::Split(queryString, '&');
-        return parameters.size();
+        return (int)parameters.size();
     }
 
     int HttpUtils::CountQueryParametersByPrefix(const std::string &uri, const std::string &prefix) {

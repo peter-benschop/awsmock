@@ -270,6 +270,7 @@ namespace AwsMock::Service {
             // Meta data
             long size = request.contentLength;
             std::string md5sum = request.md5Sum;
+            std::string sha256sum = Core::Crypto::Base64Encode(Core::Crypto::GetSha256FromFile(fileName));
             log_debug_stream(_logger) << "MD5sum: " << md5sum << " bucket: " << request.bucket << " key: " << request.key << std::endl;
 
             // Update database
@@ -294,7 +295,8 @@ namespace AwsMock::Service {
                 .bucket=request.bucket,
                 .key=request.key,
                 .etag=md5sum,
-                .contentLength=size
+                .contentLength=size,
+                .checksumSha256=sha256sum
             };
 
         } catch (Poco::Exception &ex) {
@@ -364,32 +366,30 @@ namespace AwsMock::Service {
 
         // Check bucket existence
         if (!_database->BucketExists({.region=request.region, .name=request.bucket})) {
-            throw Core::ServiceException("Bucket does not exist, bucket: " + request.bucket, 403);
+            throw Core::ServiceException("Bucket does not exist, bucket: " + request.bucket, Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
         }
 
-        if (!_database->ObjectExists({.region=request.region, .bucket=request.bucket, .key=request.key})) {
-            throw Core::ServiceException("Object does not exist, bucket: " + request.bucket + " key: " + request.key, 403);
+        if (_database->ObjectExists({.region=request.region, .bucket=request.bucket, .key=request.key})) {
+
+            try {
+                // Delete from database
+                Database::Entity::S3::Object object = {.region=request.region, .bucket=request.bucket, .key=request.key};
+                _database->DeleteObject(object);
+                log_debug_stream(_logger) << "Database object deleted, bucket: " + request.bucket + " key: " << request.key << std::endl;
+
+                // Delete file system object
+                DeleteObject(request.bucket, request.key);
+
+                // Check notification
+                CheckNotifications(request.region, request.bucket, request.key, 0, "s3:ObjectRemoved:Delete");
+
+                log_info_stream(_logger) << "Object deleted, bucket: " << request.bucket << " key: " << request.key << std::endl;
+
+            } catch (Poco::Exception &exc) {
+                log_error_stream(_logger) << "S3 delete object failed, message: " + exc.message() << std::endl;
+                throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            }
         }
-
-        try {
-            // Delete from database
-            Database::Entity::S3::Object object = {.region=request.region, .bucket=request.bucket, .key=request.key};
-            _database->DeleteObject(object);
-            log_debug_stream(_logger) << "Database object deleted, bucket: " + request.bucket + " key: " << request.key << std::endl;
-
-            // Delete file system object
-            DeleteObject(request.bucket, request.key);
-
-            // Check notification
-            CheckNotifications(request.region, request.bucket, request.key, 0, "s3:ObjectRemoved:Delete");
-
-            log_info_stream(_logger) << "Object deleted, bucket: " << request.bucket << " key: " << request.key << std::endl;
-
-        } catch (Poco::Exception &exc) {
-            log_error_stream(_logger) << "S3 delete object failed, message: " + exc.message() << std::endl;
-            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-        }
-        log_info_stream(_logger) << "DeleteObject succeeded, bucket: " << request.bucket << " key: " << request.key << std::endl;
     }
 
     Dto::S3::DeleteObjectsResponse S3Service::DeleteObjects(const Dto::S3::DeleteObjectsRequest &request) {

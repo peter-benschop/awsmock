@@ -158,6 +158,13 @@ namespace AwsMock::Service {
       std::vector<std::string> GetEnvironment(const Database::Entity::Lambda::Environment &lambdaEnvironment);
 
       /**
+       * Start the lambda docker container.
+       *
+       * @param lambdaEntity lambda entity.
+       */
+      void CreateSwarm(Database::Entity::Lambda::Lambda &lambdaEntity);
+
+      /**
        * Send the invocation request via HTTP to the lambda function.
        *
        * @param port host port of the docker image, running the lambda function.

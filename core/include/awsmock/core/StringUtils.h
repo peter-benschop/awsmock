@@ -159,7 +159,7 @@ namespace AwsMock::Core {
        * @param delimiter delimiter character
        * @return substring
        */
-      static std::string SubStringUntil(const std::string& string, char delimiter);
+      static std::string SubStringUntil(const std::string& string, const std::string& delimiter);
 
       /**
        * Return the substring starting at delimiter.
@@ -168,7 +168,7 @@ namespace AwsMock::Core {
        * @param delimiter delimiter
        * @return substring after delimiter
        */
-      static std::string SubStringAfter(const std::string &string, char delimiter);
+      static std::string SubStringAfter(const std::string &string, const std::string& delimiter);
 
       /**
        * Left trim a string.

@@ -55,6 +55,7 @@ namespace AwsMock::Service {
         log_trace_stream(_logger) << "Lambda POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
         try {
+            std::string tmp = request.getURI();
             std::string version, action;
             Core::HttpUtils::GetVersionAction(request.getURI(), version, action);
 
@@ -62,9 +63,9 @@ namespace AwsMock::Service {
 
                 std::string body = Core::HttpUtils::GetBodyAsString(request);
 
-                if (Core::HttpUtils::GetPathParameter(request.getURI(), 4) == "invocations") {
+                if (Core::HttpUtils::GetPathParameter(request.getURI(), 3) == "invocations") {
 
-                    std::string functionName = Core::HttpUtils::GetPathParameter(request.getURI(), 1);
+                    std::string functionName = Core::HttpUtils::GetPathParameter(request.getURI(), 2);
                     log_debug_stream(_logger) << "Lambda function invocation, name: " << functionName << std::endl;
 
                     _lambdaService.InvokeLambdaFunction(functionName, body, region, user);

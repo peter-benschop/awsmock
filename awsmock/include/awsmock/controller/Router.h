@@ -40,11 +40,6 @@ namespace AwsMock::Controller {
       Router(Configuration &configuration, Core::MetricService &metricService);
 
       /**
-       * Destructor
-       */
-      ~Router() override;
-
-      /**
        * Add a route
        *
        * @param route request route

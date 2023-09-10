@@ -65,16 +65,13 @@ namespace AwsMock::Core {
     }
 
     std::vector<std::string> StringUtils::Split(const std::string &s, char delimiter) {
-        std::vector<std::string> elems;
-        size_t pos_start = 0, pos_end;
-        std::string token;
-        while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
-            token = s.substr (pos_start, pos_end - pos_start);
-            pos_start = pos_end + 1;
-            elems.push_back (token);
+        std::vector<std::string> tokens;
+        std::stringstream check1(s);
+        std::string intermediate;
+        while (getline(check1, intermediate, delimiter)) {
+            tokens.push_back(intermediate);
         }
-        elems.push_back (s.substr (pos_start));
-        return elems;
+        return tokens;
     }
 
     std::string StringUtils::StripWhiteSpaces(const std::string &str) {
@@ -127,12 +124,18 @@ namespace AwsMock::Core {
         return substr;
     }
 
-    std::string StringUtils::SubStringUntil(const std::string &string, char delimiter) {
-        return string.substr(0, string.find(delimiter));
+    std::string StringUtils::SubStringUntil(const std::string &string, const std::string &delimiter) {
+        if (Contains(string, delimiter)) {
+            return string.substr(0, string.find(delimiter));
+        }
+        return string;
     }
 
-    std::string StringUtils::SubStringAfter(const std::string &string, char delimiter) {
-        return string.substr(string.find(delimiter) + 1);
+    std::string StringUtils::SubStringAfter(const std::string &string, const std::string &delimiter) {
+        if (Contains(string, delimiter)) {
+            return string.substr(string.find(delimiter) + 1);
+        }
+        return {};
     }
 
     std::string StringUtils::UrlEncode(const std::string &input) {

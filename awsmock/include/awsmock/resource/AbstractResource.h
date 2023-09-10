@@ -10,6 +10,9 @@
 #include <fstream>
 
 // Poco includes
+#include "Poco/DateTime.h"
+#include "Poco/DateTimeFormat.h"
+#include "Poco/DateTimeFormatter.h"
 #include "Poco/Logger.h"
 #include "Poco/LogStream.h"
 #include "Poco/URI.h"

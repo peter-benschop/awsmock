@@ -7,9 +7,6 @@ set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionRespon
 
 set(SOURCES ${LAMBDA_SOURCES})
 
-# Test directory
-#add_subdirectory(tst)
-
 # Includes
 include_directories(include ../core/include ../db/include /usr/include /usr/include/mongo /usr/include/bsoncxx/v_noabi
         /usr/include/mongocxx/v_noabi tbb)

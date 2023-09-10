@@ -22,6 +22,7 @@ namespace AwsMock::Service {
         if (!Core::DirUtils::DirectoryExists(_tempDir)) {
             Core::DirUtils::MakeDirectory(_tempDir);
         }
+
         log_debug_stream(_logger) << "Lambda service initialized" << std::endl;
     }
 
@@ -94,6 +95,7 @@ namespace AwsMock::Service {
 
         // Start container
         _dockerService->StartDockerContainer(container.id);
+//        CreateSwarm(lambdaEntity);
         lambdaEntity.lastStarted = Poco::DateTime();
         lambdaEntity.state = Database::Entity::Lambda::LambdaState::Active;
         lambdaEntity.stateReasonCode = Database::Entity::Lambda::LambdaStateReasonCode::Idle;
@@ -114,7 +116,8 @@ namespace AwsMock::Service {
             .codeSha256=lambdaEntity.codeSha256,
             .ephemeralStorage=request.ephemeralStorage,
             .dockerImageId=image.id,
-            .dockerContainerId=container.id};
+            .dockerContainerId=container.id
+        };
 
         log_info_stream(_logger) << "Function created, name: " + request.functionName << std::endl;
 
@@ -171,9 +174,9 @@ namespace AwsMock::Service {
 
         // Update database
         lambda.lastInvocation = Poco::DateTime();
-        lambda.state=Database::Entity::Lambda::Active;
+        lambda.state = Database::Entity::Lambda::Active;
         lambda = _lambdaDatabase->UpdateLambda(lambda);
-        log_debug_stream(_logger) << "Lambda entity updated, name: " + lambda.function << std::endl;
+        log_debug_stream(_logger) << "Lambda entity invoked, name: " + lambda.function << std::endl;
     }
 
     void LambdaService::CreateTag(const Dto::Lambda::CreateTagRequest &request) {
@@ -310,9 +313,14 @@ namespace AwsMock::Service {
 
     void LambdaService::CreateDockerContainer(const Dto::Lambda::CreateFunctionRequest &request, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {
 
-        std::vector<std::string> environment = GetEnvironment(lambdaEntity.environment);
-        Dto::Docker::CreateContainerResponse containerCreateResponse = _dockerService->CreateContainer(request.functionName, dockerTag, environment, lambdaEntity.hostPort);
-        log_debug_stream(_logger) << "Lambda container created, hostPort: " << lambdaEntity.hostPort << std::endl;
+        try {
+            std::vector<std::string> environment = GetEnvironment(lambdaEntity.environment);
+            Dto::Docker::CreateContainerResponse
+                containerCreateResponse = _dockerService->CreateContainer(request.functionName, dockerTag, environment, lambdaEntity.hostPort);
+            log_debug_stream(_logger) << "Lambda container created, hostPort: " << lambdaEntity.hostPort << std::endl;
+        } catch (std::exception &exc) {
+            log_error_stream(_logger) << exc.what() << std::endl;
+        }
     }
 
     std::string LambdaService::UnpackZipFile(const std::string &zipFile, const std::string &runtime, const std::string &fileName) {
