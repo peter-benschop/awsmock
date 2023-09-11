@@ -39,9 +39,10 @@ namespace AwsMock::Core {
         int status = 0;
         curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &status);
 
+        CurlResponse response = {.statusCode = status, .statusReason=curl_easy_strerror(res), .output=_readBuffer};
         curl_easy_cleanup(curl);
 
-        return {.statusCode = status, .statusReason=curl_easy_strerror(res), .output=_readBuffer};
+        return response;
     }
 
     CurlResponse CurlUtils::SendRequest(const std::string &method, const std::string &path, const std::string &body) {
@@ -75,9 +76,10 @@ namespace AwsMock::Core {
         int status = 0;
         curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &status);
 
+        CurlResponse response = {.statusCode = status, .statusReason=curl_easy_strerror(res), .output=_readBuffer};
         curl_easy_cleanup(curl);
 
-        return {.statusCode = status, .statusReason=curl_easy_strerror(res), .output=_readBuffer};
+        return response;
     }
 
     CurlResponse CurlUtils::SendFileRequest(const std::string &method, const std::string &url, const std::string &header, const std::string &fileName) {
@@ -120,15 +122,14 @@ namespace AwsMock::Core {
         if(res != CURLE_OK) {
             log_error_stream(_logger) << "Request send failed, url: " << url << " error: " << curl_easy_strerror(res) << std::endl;
         }
-        if(fd) {
-            free(fd);
-        }
+        free(fd);
 
         int status = 0;
         curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &status);
 
+        CurlResponse response = {.statusCode = status, .statusReason=curl_easy_strerror(res), .output=_readBuffer};
         curl_easy_cleanup(curl);
 
-        return {.statusCode = status, .statusReason=curl_easy_strerror(res), .output=_readBuffer};
+        return response;
     }
 }

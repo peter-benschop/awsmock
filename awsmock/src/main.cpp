@@ -151,7 +151,7 @@ namespace AwsMock {
           } else if (name == "level") {
 
               _configuration.SetLogLevel(value);
-              Poco::Logger::get("root").setLevel(value);
+              Poco::Logger::get("").setLevel(value);
           }
       }
 

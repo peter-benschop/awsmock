@@ -10,11 +10,11 @@
 #include <sstream>
 
 // Poco includes
+#include <Poco/StreamCopier.h>
+#include <Poco/RecursiveDirectoryIterator.h>
 #include <Poco/Net/HTTPClientSession.h>
 #include <Poco/Net/HTTPRequest.h>
 #include <Poco/Net/HTTPResponse.h>
-#include <Poco/StreamCopier.h>
-#include <Poco/RecursiveDirectoryIterator.h>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
@@ -34,10 +34,11 @@
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/DockerService.h>
+#include <awsmock/service/LambdaServiceHelper.h>
 
 namespace AwsMock::Service {
 
-    class LambdaService {
+    class LambdaService : public LambdaServiceHelper {
 
     public:
 
@@ -117,67 +118,12 @@ namespace AwsMock::Service {
     private:
 
       /**
-       * Creates an new image, in case the image does not exists inside the docker daemon.
-       *
-       * <p>It uses the docker service to actually create the image. The image size and the SHA256 are returned
-       * by the docker service.<p>
-       *
-       * @param request create function request.
-       * @param entity lambda entity.
-       * @param dockerTag docker tag to use
-       */
-      void CreateDockerImage(const Dto::Lambda::CreateFunctionRequest &request, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
-
-      /**
-       * Creates an new docker container, in case the container does not exists inside the docker daemon.
-       *
-       * @param request create function request.
-       * @param entity lambda entity.
-       * @param dockerTag docker tag.
-       */
-      void CreateDockerContainer(const Dto::Lambda::CreateFunctionRequest &request, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
-
-      /**
-       * Unpack the provided ZIP file.
-       *
-       * <p>Needed only when the Lambda function is provided as zipped request body.</p>
-       *
-       * @param zipFile Base64 encoded zip file.
-       * @param runtime AWS lambda runtime name
-       * @param fileName filename of the Base64 encoded and zipped code file
-       * @return code directory
-       */
-      std::string UnpackZipFile(const std::string &zipFile, const std::string &runtime, const std::string &fileName);
-
-      /**
-       * Converts the lambda environment to a vector of string, which is needed by the docker API
-       *
-       * @param lambdaEnvironment lambda environment
-       * @return vector of strings containing the runtime environment
-       */
-      std::vector<std::string> GetEnvironment(const Database::Entity::Lambda::Environment &lambdaEnvironment);
-
-      /**
-       * Start the lambda docker container.
-       *
-       * @param lambdaEntity lambda entity.
-       */
-      void CreateSwarm(Database::Entity::Lambda::Lambda &lambdaEntity);
-
-      /**
        * Send the invocation request via HTTP to the lambda function.
        *
        * @param port host port of the docker image, running the lambda function.
        * @param body message body containing the S3 event in JSON representation.
        */
       void SendInvocationRequest(int port, const std::string &body);
-
-      /**
-       * Returns a random host port in the range 32768 - 65536 for the host port of the docker container which is running the lambda function.
-       *
-       * @return random port between 32768 and 65536
-       */
-      int GetHostPort();
 
       /**
        * Logger
@@ -225,7 +171,7 @@ namespace AwsMock::Service {
       std::shared_ptr<Database::S3Database> _s3Database;
 
       /**
-       * Database connection
+       * Docker service
        */
       std::shared_ptr<Service::DockerService> _dockerService;
     };

@@ -69,21 +69,16 @@ namespace AwsMock::Service {
         return {};
     }
 
-    void DockerService::BuildImage(const std::string &codeDir,
-                                   const std::string &name,
-                                   const std::string &tag,
-                                   const std::string &handler,
-                                   const std::string &runtime,
-                                   long &fileSize,
-                                   std::string &codeSha256,
-                                   const std::vector<std::pair<std::string, std::string>> &environment) {
+    std::string DockerService::BuildImage(const std::string &codeDir,
+                                          const std::string &name,
+                                          const std::string &tag,
+                                          const std::string &handler,
+                                          const std::string &runtime,
+                                          const std::vector<std::pair<std::string, std::string>> &environment) {
         log_debug_stream(_logger) << "Build image request, name: " << name << " tags: " << tag << " runtime: " << runtime << std::endl;
 
         std::string dockerFile = WriteDockerFile(codeDir, handler, runtime, environment);
-
         std::string imageFile = BuildImageFile(codeDir, name);
-        fileSize = Core::FileUtils::FileSize(imageFile);
-        codeSha256 = Core::Crypto::GetSha256FromFile(imageFile);
 
         Core::CurlResponse curlResponse = _curlUtils.SendFileRequest("POST", "http://localhost/build?t=" + name + ":" + tag + "&q=true", {}, imageFile);
         log_debug_stream(_logger) << "Docker image build, image: " << name << ":" << tag << std::endl;
@@ -92,6 +87,7 @@ namespace AwsMock::Service {
         if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
             log_error_stream(_logger) << "Build image failed, status: " << curlResponse.statusCode << std::endl;
         }
+        return imageFile;
     }
 
     void DockerService::DeleteImage(const std::string &name, const std::string &tag) {
@@ -271,7 +267,7 @@ namespace AwsMock::Service {
     std::string DockerService::WriteDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime,
                                                const std::vector<std::pair<std::string, std::string>> &environment) {
 
-        std::string dockerFilename = codeDir + "Dockerfile";
+        std::string dockerFilename = codeDir + Poco::Path::separator() + "Dockerfile";
 
         // TODO: Fix environment
         std::ofstream ofs(dockerFilename);
@@ -325,7 +321,7 @@ namespace AwsMock::Service {
 
     std::string DockerService::BuildImageFile(const std::string &codeDir, const std::string &functionName) {
 
-        std::string tarFileName = codeDir + functionName + ".tgz";
+        std::string tarFileName = codeDir + Poco::Path::separator() + functionName + ".tgz";
         Core::TarUtils::TarDirectory(tarFileName, codeDir);
         log_debug_stream(_logger) << "Zipped TAR file written: " << tarFileName << std::endl;
 

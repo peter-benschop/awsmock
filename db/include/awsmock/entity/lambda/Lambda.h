@@ -15,6 +15,7 @@
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/json.hpp>
 #include <mongocxx/stdx.hpp>
 
 // Poco includes
@@ -34,6 +35,7 @@ namespace AwsMock::Database::Entity::Lambda {
     using bsoncxx::view_or_value;
     using bsoncxx::document::view;
     using bsoncxx::document::value;
+    using bsoncxx::to_json;
 
     enum LambdaState {
       Pending,
@@ -311,7 +313,7 @@ namespace AwsMock::Database::Entity::Lambda {
        * @param key key of the tags
        * @return true if tags with the given key exists.
        */
-      bool HasTag(const std::string &key);
+      bool HasTag(const std::string &key) const;
 
       /**
        * Returns a given tags value by key
@@ -319,7 +321,7 @@ namespace AwsMock::Database::Entity::Lambda {
        * @param eventName name of the event
        * @return found notification or notifications.end().
        */
-      std::string GetTagValue(const std::string &key);
+      std::string GetTagValue(const std::string &key) const;
 
       /**
        * Converts the entity to a MongoDB document
@@ -355,7 +357,6 @@ namespace AwsMock::Database::Entity::Lambda {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const Lambda &m);
-
     };
 
     typedef struct Lambda Lambda;

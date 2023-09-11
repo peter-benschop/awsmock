@@ -20,12 +20,14 @@ namespace AwsMock::Database {
 
         // MongoDB URI
         _uri = mongocxx::uri("mongodb://" + _user + ":" + _password + "@" + _host + ":" + std::to_string(_port) + "/?maxPoolSize=32");
-        _client = mongocxx::client{_uri};
+        _pool = new mongocxx::pool{_uri};
         log_debug_stream(_logger) << "MongoDB connection initialized" << std::endl;
     }
 
     mongocxx::database Database::GetConnection() {
-        return _client[_name];
+        //return _client[_name];
+        auto c = _pool->acquire();
+        return (*c)[_name];
     }
 
     void Database::CreateIndexes() {
