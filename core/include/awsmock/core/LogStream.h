@@ -11,11 +11,11 @@
 // Poco includes
 #include <Poco/Foundation.h>
 #include <Poco/Logger.h>
+#include <Poco/ConsoleChannel.h>
+#include <Poco/FormattingChannel.h>
+#include <Poco/PatternFormatter.h>
 #include "Poco/Mutex.h"
 #include <Poco/UnbufferedStreamBuf.h>
-
-// AwsMock includes
-#include <awsmock/core/Logger.h>
 
 namespace AwsMock::Core {
 
