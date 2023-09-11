@@ -39,7 +39,6 @@
 #include <Poco/RecursiveDirectoryIterator.h>
 
 // AwsMock includes
-#include <awsmock/core/Logger.h>
 #include <awsmock/core/LogStream.h>
 
 #define MAX_EVENTS 1024 // Max. number of events to process at one go

@@ -15,7 +15,6 @@
 #include <mongocxx/exception/exception.hpp>
 
 // AwsMock includes
-#include <awsmock/core/Logger.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
 

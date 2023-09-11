@@ -26,7 +26,6 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Logger.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/core/ResourceNotFoundException.h>
