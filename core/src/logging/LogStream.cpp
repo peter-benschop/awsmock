@@ -66,7 +66,6 @@ namespace AwsMock::Core {
         LogIOS(logger, priority, bufferCapacity),
         std::ostream(&_buf) {
         SetDefaultConsoleLogger(logger);
-        //std::cerr << logger.name() << ": "<< logger.getLevel() << std::endl;
     }
 
     LogStream::~LogStream() = default;
