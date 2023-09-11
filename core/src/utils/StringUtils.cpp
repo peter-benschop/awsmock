@@ -81,6 +81,10 @@ namespace AwsMock::Core {
         return str;
     }
 
+    std::string StringUtils::StripBeginning(const std::string &s1, const std::string &s2) {
+        return s1.substr(s2.length());
+    }
+
     bool StringUtils::Equals(const std::string &s1, const std::string &s2) {
         if (s1.empty() || s2.empty()) {
             return false;

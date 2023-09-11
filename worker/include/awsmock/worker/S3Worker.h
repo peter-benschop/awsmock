@@ -48,21 +48,11 @@ namespace AwsMock::Worker {
       explicit S3Worker(const Core::Configuration &configuration);
 
       /**
-       * Destructor
-       */
-      ~S3Worker() override;
-
-      /**
        * Main method
        */
       void run() override;
 
     private:
-
-      /**
-       * Initialization
-       */
-      void Initialize();
 
       /**
        * Synchronize the directory layout with the database.
@@ -72,31 +62,6 @@ namespace AwsMock::Worker {
        * </p>
        */
       void Synchronize();
-
-      /**
-       * Callback for the directory watcher add events.
-       *
-       * <p>Actually, this is not used, as on Linux systems a added and afterwards a modified event is issued. We only use the modified event.</p>
-       *
-       * @param addEvent directory watcher add event.
-       */
-      void OnFileAdded(const Core::DirectoryEvent &addEvent);
-
-      /**
-       * Callback for the directory watcher change events.
-       *
-       * <p>Actually, this is used, for all create/modified events, as on Linux systems a added and afterwards a modified event is issued.</p>
-       *
-       * @param modifiedEvent directory watcher change event.
-       */
-      void OnFileModified(const Core::DirectoryEvent &modifiedEvent);
-
-      /**
-       * Callback for the directory watcher delete events.
-       *
-       * @param deleteEvent directory watcher delete event.
-       */
-      void OnFileDeleted(const Core::DirectoryEvent &deleteEvent);
 
       /**
        * Create a new bucket, by sending the corresponding CreateBucket request to the S3 service.
@@ -265,11 +230,6 @@ namespace AwsMock::Worker {
        * AWS user
        */
       std::string _user;
-
-      /**
-       * Directory _watcher
-       */
-      std::shared_ptr<Core::DirectoryWatcher> _watcher;
 
       /**
        * Running flag

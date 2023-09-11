@@ -1,4 +1,5 @@
 
+#include <iostream>
 #include "awsmock/core/LogStream.h"
 
 namespace AwsMock::Core {
@@ -31,7 +32,8 @@ namespace AwsMock::Core {
     }
 
     int LogStreamBuf::writeToDevice(char c) {
-        Poco::Mutex::ScopedLock lock(_mutex);
+        // TODO: Check
+        //Poco::Mutex::ScopedLock lock(_mutex);
         if (c == '\n' || c == '\r') {
             if (_message.find_first_not_of("\r\n") != std::string::npos) {
                 Poco::Message msg(_logger.name(), _message, _priority, _file, _line);
@@ -64,6 +66,7 @@ namespace AwsMock::Core {
         LogIOS(logger, priority, bufferCapacity),
         std::ostream(&_buf) {
         SetDefaultConsoleLogger(logger);
+        //std::cerr << logger.name() << ": "<< logger.getLevel() << std::endl;
     }
 
     LogStream::~LogStream() = default;

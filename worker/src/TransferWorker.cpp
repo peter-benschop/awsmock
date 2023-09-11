@@ -11,22 +11,33 @@ namespace AwsMock::Worker {
 
         // Sleeping period
         _period = _configuration.getInt("awsmock.worker.transfer.period", 10000);
-        log_debug_stream(_logger) << "Lambda worker period: " << _period << std::endl;
+        log_debug_stream(_logger) << "Transfer server worker period: " << _period << std::endl;
 
         // Create environment
         _region = _configuration.getString("awsmock.region");
-        _clientId = _configuration.getString("awsmock.client.id", "00000000");
-        _user = _configuration.getString("awsmock.user", "none");
         _transferDatabase = std::make_unique<Database::TransferDatabase>(_configuration);
 
         // Bucket
-        _bucket = _configuration.getString("awsmock.service.ftp.bucket", DEFAULT_TRANSFER_BUCKET);
+        _bucket = _configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
+        _baseDir = _configuration.getString("awsmock.worker.transfer.base.dir", DEFAULT_BASE_DIR);
 
         // S3 service connection
         _s3ServiceHost = _configuration.getString("awsmock.service.s3.host", "localhost");
         _s3ServicePort = _configuration.getInt("awsmock.service.s3.port", 9501);
+        _baseUrl = "http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort);
         log_debug_stream(_logger) << "S3 service endpoint: http://" << _s3ServiceHost << ":" << _s3ServicePort << std::endl;
 
+        // Send create bucket request
+        if (!Core::DirUtils::DirectoryExists(_baseDir)) {
+            Core::DirUtils::MakeDirectory(_baseDir);
+            log_debug_stream(_logger) << "Using baseDir: " << _baseDir << std::endl;
+        }
+
+        // Start _watcher
+        _watcher = std::make_shared<Core::DirectoryWatcher>(_baseDir);
+        _watcher->itemAdded += Poco::delegate(this, &TransferWorker::OnFileAdded);
+        _watcher->itemModified += Poco::delegate(this, &TransferWorker::OnFileModified);
+        _watcher->itemDeleted += Poco::delegate(this, &TransferWorker::OnFileDeleted);
         log_debug_stream(_logger) << "TransferWorker initialized" << std::endl;
     }
 
@@ -110,37 +121,107 @@ namespace AwsMock::Worker {
         }*/
 
         // Send create bucket request
-        if (!SendExistsBucketRequest(_bucket, "application/json")) {
-            SendCreateBucketRequest(_bucket, "application/json");
+        if (!SendExistsBucketRequest(_bucket)) {
+            SendCreateBucketRequest(_bucket);
             log_debug_stream(_logger) << "Sending S3 create bucket: " << _bucket << std::endl;
         }
 
         // Start all lambda functions
         StartTransferServers();
 
+        // Start file watcher, they will call the delegate methods, if they find a file system event.
+        _watcherThread.start(*_watcher);
+
         _running = true;
         while (_running) {
             log_debug_stream(_logger) << "TransferWorker processing started" << std::endl;
             Poco::Thread::sleep(_period);
-            //CheckTransferServers();
+            CheckTransferServers();
         }
     }
 
-    void TransferWorker::SendCreateBucketRequest(const std::string &bucket, const std::string &contentType) {
+    void TransferWorker::OnFileAdded(const Core::DirectoryEvent &addedEvent) {
+        log_info_stream(_logger) << "File added, path: " << addedEvent.item << std::endl;
 
-        std::string url = "http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket;
-        Dto::S3::CreateBucketConstraint location = {.location=_region};
-        std::string body = location.ToXml();
-        SendPutRequest(url, body, contentType);
-        log_debug_stream(_logger) << "S3 create bucket message request send" << std::endl;
+        // Get bucket, key
+        std::string relativePath = Core::StringUtils::StripBeginning(addedEvent.item, _baseDir);
+        std::string key = Core::HttpUtils::GetPathParametersFromIndex(relativePath, 1);
+
+        if (addedEvent.type == Core::FileType::DW_DIR_TYPE) {
+            SendCreateBucketRequest(_bucket);
+        } else {
+            SendCreateObjectRequest(_bucket, key, addedEvent.item);
+        }
     }
 
-    bool TransferWorker::SendExistsBucketRequest(const std::string &bucket, const std::string &contentType) {
+    void TransferWorker::OnFileModified(const Core::DirectoryEvent &modifiedEvent) {
+        log_info_stream(_logger) << "File modified, path: " << modifiedEvent.item << std::endl;
 
-        std::string url = "http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket;
-        bool result = SendHeadRequest(url, contentType);
-        log_debug_stream(_logger) << "S3 exists bucket message request send, result: " << result << std::endl;
+        // Get bucket, key
+        std::string relativePath = Core::StringUtils::StripBeginning(modifiedEvent.item, _baseDir);
+        std::string key = Core::HttpUtils::GetPathParametersFromIndex(relativePath, 1);
+
+        if (Core::DirUtils::IsDirectory(modifiedEvent.item)) {
+            SendCreateBucketRequest(_bucket);
+        } else {
+            SendCreateObjectRequest(_bucket, key, modifiedEvent.item);
+        }
+    }
+
+    void TransferWorker::OnFileDeleted(const Core::DirectoryEvent &deleteEvent) {
+        log_info_stream(_logger) << "File deleted path: " << deleteEvent.item << std::endl;
+
+        // Get bucket, key
+        std::string relativePath = Core::StringUtils::StripBeginning(deleteEvent.item, _baseDir);
+        std::string key = Core::HttpUtils::GetPathParametersFromIndex(relativePath, 1);
+
+        if (key.empty()) {
+            SendDeleteBucketRequest(_bucket);
+        } else {
+            SendDeleteObjectRequest(_bucket, key);
+        }
+    }
+
+    void TransferWorker::SendCreateBucketRequest(const std::string &bucket) {
+
+        std::string url = _baseUrl + "/" + bucket;
+        Dto::S3::CreateBucketConstraint location = {.location=_region};
+        std::string body = location.ToXml();
+        SendPutRequest(url, body, CONTENT_TYPE_JSON);
+        log_debug_stream(_logger) << "Create bucket message request send" << std::endl;
+    }
+
+    void TransferWorker::SendCreateObjectRequest(const std::string &bucket, const std::string &key, const std::string &fileName) {
+
+        std::string url = _baseUrl + "/" + bucket + "/" + key;
+        std::map<std::string, std::string> headers;
+        headers["Content-MD5"] = Core::Crypto::Base64Encode(Core::Crypto::GetMd5FromFile(fileName));
+        headers["Content-Length"] = std::to_string(Core::FileUtils::FileSize(fileName));
+        headers["x-amz-sdk-checksum-algorithm"] = "SHA256";
+        headers["x-amz-checksum-sha256"] = Core::Crypto::GetSha256FromFile(fileName);
+        SendFile(url, fileName, headers);
+        log_debug_stream(_logger) << "Create object message request send, url: " << url << std::endl;
+    }
+
+    bool TransferWorker::SendExistsBucketRequest(const std::string &bucket) {
+
+        std::string url = _baseUrl + "/" + bucket;
+        bool result = SendHeadRequest(url, CONTENT_TYPE_JSON);
+        log_debug_stream(_logger) << "Bucket exists message request send, result: " << result << std::endl;
         return result;
     }
 
+    void TransferWorker::SendDeleteBucketRequest(const std::string &bucket) {
+
+        std::string url = _baseUrl + "/" + bucket;
+        SendDeleteRequest(url, {}, CONTENT_TYPE_JSON);
+        log_debug_stream(_logger) << "Delete bucket message request send" << std::endl;
+    }
+
+    void TransferWorker::SendDeleteObjectRequest(const std::string &bucket, const std::string &key) {
+
+        std::string url = _baseUrl + "/" + bucket + "/" + key;
+        SendDeleteRequest(url, {}, CONTENT_TYPE_JSON);
+        log_debug_stream(_logger) << "Delete bucket message request send" << std::endl;
+    }
 } // namespace AwsMock::Worker
