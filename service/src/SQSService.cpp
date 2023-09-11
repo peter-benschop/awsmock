@@ -177,7 +177,7 @@ namespace AwsMock::Service {
             _database->DeleteMessages(request.queueUrl);
 
             // Update database
-            _database->DeleteQueue({.queueUrl=request.queueUrl});
+            _database->DeleteQueue({.region=request.region, .queueUrl=request.queueUrl});
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "SQS delete queue failed, message: " << ex.message() << std::endl;

@@ -168,12 +168,9 @@ namespace AwsMock::Database {
         return GetMessageById(result->inserted_id().get_oid().value);
     }
 
-    bool SQSDatabase::MessageExists(const std::string &messageId) {
+    bool SQSDatabase::MessageExists(const std::string &receiptHandle) {
 
-        bsoncxx::builder::stream::document filter{};
-        filter << "messageId" << messageId << bsoncxx::builder::stream::finalize;
-
-        int64_t count = _messageCollection.count_documents(make_document(kvp("messageId", messageId)));
+        int64_t count = _messageCollection.count_documents(make_document(kvp("receiptHandle", receiptHandle)));
         log_trace_stream(_logger) << "Message exists: " << (count > 0 ? "true" : "false") << std::endl;
         return count > 0;
     }

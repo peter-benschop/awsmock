@@ -18,7 +18,7 @@
 
 #define REGION "eu-central-1"
 #define QUEUE "test-queue"
-#define QUEUE_URL "http://localhost:4567/000000000000/test-queue"
+#define QUEUE_URL "http://localhost:4566/000000000000/test-queue"
 #define BODY "{\"TestObject\": \"TestValue\"}"
 #define BODY_MD5 "bf54bf4281dc11635fcdd2d7d6c9e126"
 #define OWNER "test-owner"
@@ -34,7 +34,7 @@ namespace AwsMock::Service {
 
       void TearDown() override {
         _database.DeleteAllQueues();
-          _database.DeleteAllMessages();
+        _database.DeleteAllMessages();
       }
 
       Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);

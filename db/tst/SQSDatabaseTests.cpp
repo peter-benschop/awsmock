@@ -218,7 +218,7 @@ namespace AwsMock::Database {
         message = _sqsDatabase.CreateMessage(message);
 
         // act
-        bool result = _sqsDatabase.MessageExists(message.messageId);
+        bool result = _sqsDatabase.MessageExists(message.receiptHandle);
 
         // assert
         EXPECT_TRUE(result);
