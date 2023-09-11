@@ -94,19 +94,15 @@ namespace AwsMock::Service {
        * @param tag image tags
        * @param handler lambda function handler
        * @param runtime lambda AWS runtime
-       * @param fileSize size of the image file in bytes
-       * @param codeSha256 SHA256 of the image file
        * @param environment runtime environment
-       * @return CreateFunctionResponse
+       * @return file size in bytes
        */
-      void BuildImage(const std::string &codeDir,
-                      const std::string &name,
-                      const std::string &tag,
-                      const std::string &handler,
-                      const std::string &runtime,
-                      long &fileSize,
-                      std::string &codeSha256,
-                      const std::vector<std::pair<std::string, std::string>> &environment);
+      std::string BuildImage(const std::string &codeDir,
+                             const std::string &name,
+                             const std::string &tag,
+                             const std::string &handler,
+                             const std::string &runtime,
+                             const std::vector<std::pair<std::string, std::string>> &environment);
 
       /**
        * Delete an image by name/tags.

@@ -6,13 +6,13 @@
 
 namespace AwsMock::Database::Entity::Lambda {
 
-    bool Lambda::HasTag(const std::string &key) {
+    bool Lambda::HasTag(const std::string &key) const {
         return find_if(tags.begin(), tags.end(), [key](const std::pair <std::string, std::string> &t) {
           return t.first == key;
         }) != tags.end();
     }
 
-    std::string Lambda::GetTagValue(const std::string &key) {
+    std::string Lambda::GetTagValue(const std::string &key) const {
         auto it = find_if(tags.begin(), tags.end(), [key](const std::pair <std::string, std::string> &t) {
           return t.first == key;
         });
@@ -64,6 +64,7 @@ namespace AwsMock::Database::Entity::Lambda {
             kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
             kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
 
+        //std::string tmp = bsoncxx::to_json(lambdaDoc);
         return lambdaDoc;
     }
 
