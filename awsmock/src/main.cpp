@@ -34,7 +34,6 @@
 #include <Poco/Util/ServerApplication.h>
 
 // AwsMock includes
-#include <awsmock/core/Logger.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/ThreadErrorHandler.h>
 #include <awsmock/config/Configuration.h>

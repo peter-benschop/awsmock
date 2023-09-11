@@ -9,7 +9,6 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/Logger.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/repository/Database.h>

@@ -14,7 +14,6 @@
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
-#include <awsmock/core/Logger.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/ServiceDatabase.h>
