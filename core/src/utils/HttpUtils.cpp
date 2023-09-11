@@ -124,7 +124,12 @@ namespace AwsMock::Core {
     bool HttpUtils::HasQueryParameter(const std::string &uri, const std::string &name) {
         std::string queryString = GetQueryString(uri);
         std::vector<std::string> parameters = StringUtils::Split(queryString, '&');
-        return std::find(parameters.begin(), parameters.end(), name) != parameters.end();
+        for (const auto &it : parameters) {
+            if (GetQueryParameterName(it) == name) {
+                return true;
+            }
+        }
+        return false;
     }
 
     bool HttpUtils::IsUrlEncoded(const std::string &value) {
