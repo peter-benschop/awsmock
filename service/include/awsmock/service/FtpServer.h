@@ -22,7 +22,8 @@
 
 #define FTP_DEFAULT_PORT 21
 #define FTP_DEFAULT_HOST "localhost"
-#define FTP_BASE_DIR "/tmp/awsmock/data/ftp"
+#define FTP_BASE_DIR "/tmp/awsmock/data/transfer"
+#define FTP_BUCKET "transfer-server"
 
 namespace AwsMock::Service {
 

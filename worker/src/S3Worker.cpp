@@ -10,15 +10,6 @@ namespace AwsMock::Worker {
     S3Worker::S3Worker(const Core::Configuration &configuration)
         : AbstractWorker(configuration), _logger(Poco::Logger::get("S3Worker")), _configuration(configuration), _running(false) {
 
-        Initialize();
-    }
-
-    S3Worker::~S3Worker() {
-        _watcherThread.wakeUp();
-    }
-
-    void S3Worker::Initialize() {
-
         _dataDir = _configuration.getString("awsmock.service.s3.data.dir");
         _tmpDir = _dataDir + Poco::Path::separator() + "tmp";
         log_debug_stream(_logger) << "Data directory path: " << _dataDir << std::endl;
@@ -46,15 +37,8 @@ namespace AwsMock::Worker {
         // Database connections
         _serviceDatabase = std::make_unique<Database::ServiceDatabase>(_configuration);
         _s3Database = std::make_unique<Database::S3Database>(_configuration);
-
-        // Start _watcher
-        _watcher = std::make_shared<Core::DirectoryWatcher>(_dataDir);
-        _watcher->itemAdded += Poco::delegate(this, &S3Worker::OnFileAdded);
-        //_watcher->itemModified += Poco::delegate(this, &S3Worker::OnFileModified);
-        _watcher->itemDeleted += Poco::delegate(this, &S3Worker::OnFileDeleted);
-        log_debug_stream(_logger) << "Directory _watcher added, path: " << _watcherDir << std::endl;
-
         log_debug_stream(_logger) << "S3Worker initialized" << std::endl;
+
     }
 
     void S3Worker::Synchronize() {
@@ -103,9 +87,6 @@ namespace AwsMock::Worker {
 //            return;
 //        }
 
-        // Start file watcher, they will call the delegate methods, if they find a file system event.
-        _watcherThread.start(*_watcher);
-
         // Synchronize current file system state
         Synchronize();
 
@@ -113,44 +94,6 @@ namespace AwsMock::Worker {
         while (_running) {
             _logger.debug() << "S3Worker processing started" << std::endl;
             Poco::Thread::sleep(_period);
-        }
-    }
-
-    void S3Worker::OnFileAdded(const Core::DirectoryEvent &addedEvent) {
-        log_info_stream(_logger) << "File added, path: " << addedEvent.item << std::endl;
-        _watcher->LockFile(addedEvent.item);
-        log_info_stream(_logger) << "File locked, path: " << addedEvent.item << std::endl;
-
-        if (addedEvent.type == Core::FileType::DW_DIR_TYPE) {
-            CreateBucket(addedEvent.item);
-        } else {
-            CreateObject(addedEvent.item);
-        }
-        //_watcher->UnlockFile(addedEvent.item);
-        //log_info_stream(_logger) << "File unlocked, path: " << addedEvent.item << std::endl;
-    }
-
-    void S3Worker::OnFileModified(const Core::DirectoryEvent &modifiedEvent) {
-        log_info_stream(_logger) << "File modified, path: " << modifiedEvent.item << std::endl;
-
-        if (Core::DirUtils::IsDirectory(modifiedEvent.item)) {
-            CreateBucket(modifiedEvent.item);
-        } else {
-            CreateObject(modifiedEvent.item);
-        }
-    }
-
-    void S3Worker::OnFileDeleted(const Core::DirectoryEvent &deleteEvent) {
-        log_info_stream(_logger) << "File deleted path: " << deleteEvent.item << std::endl;
-
-        // Get bucket, key
-        std::string bucketName, key;
-        GetBucketKeyFromFile(deleteEvent.item, bucketName, key);
-
-        if(key.empty()) {
-            SendDeleteBucketRequest(bucketName, "application/json");
-        } else {
-            SendDeleteObjectRequest(bucketName, key, "application/json");
         }
     }
 

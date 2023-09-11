@@ -7,11 +7,9 @@
 
 // C++ standard includes
 #include <string>
-#include <regex>
 #include <future>
 #include <algorithm>
 #include <mutex>
-#include <vector>
 #include <set>
 #include <thread>
 
@@ -41,7 +39,6 @@ namespace AwsMock::Core {
       }
 
       void TearDown() override {
-          _watcher->ClearLocks();
           thread->wakeUp();
           delete thread;
           DirUtils::DeleteDirectory(tempDir, true);
@@ -117,14 +114,11 @@ namespace AwsMock::Core {
         EXPECT_TRUE(modified == 1);
     }
 
-    /*TEST_F(DirectoryWatcherTest, FileDeletedTest) {
+    TEST_F(DirectoryWatcherTest, FileDeletedTest) {
 
         // arrange
-        Core::DirectoryWatcher watcher(tempDir);
-        thread->start(watcher);
+        thread->start(*_watcher);
         tempFile = Core::FileUtils::CreateTempFile(tempDir, "txt", 10);
-        Poco::Thread::sleep(1000);
-        _watcher->ClearLocks();
 
         // act
         Core::FileUtils::DeleteFile(tempFile);
@@ -134,13 +128,12 @@ namespace AwsMock::Core {
             Poco::Thread::sleep(100);
         }
         EXPECT_TRUE(deleted == 1);
-    }*/
+    }
 
     TEST_F(DirectoryWatcherTest, DirectoryAddedTest) {
 
         // arrange
-        Core::DirectoryWatcher watcher(tempDir);
-        thread->start(watcher);
+        thread->start(*_watcher);
 
         // act
         Core::DirUtils::MakeDirectory(tempDir + "/tmptest");
@@ -152,6 +145,21 @@ namespace AwsMock::Core {
         EXPECT_TRUE(added == 1);
     }
 
+    TEST_F(DirectoryWatcherTest, DirectoryDeleteTest) {
+
+        // arrange
+        thread->start(*_watcher);
+        Core::DirUtils::MakeDirectory(tempDir + "/tmptest");
+
+        // act
+        Core::DirUtils::DeleteDirectory(tempDir + "/tmptest");
+
+        // assert
+        while (deleted == 0) {
+            Poco::Thread::sleep(100);
+        }
+        EXPECT_TRUE(deleted == 1);
+    }
 } // namespace AwsMock::Core
 
 #endif // AWSMOCK_CORE_DIRECTORYWATCHERTEST_H

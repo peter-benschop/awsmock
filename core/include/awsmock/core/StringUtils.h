@@ -90,6 +90,15 @@ namespace AwsMock::Core {
       static std::string StripWhiteSpaces(const std::string &s);
 
       /**
+       * Strip beginning of string
+       *
+       * @param s1 string to strip
+       * @param s2 substring to strip
+       * @return string with beginning
+       */
+      static std::string StripBeginning(const std::string &s1, const std::string &s2);
+
+      /**
        * Return true if s1 and s2 are equal.
        *
        * @param s1 first input string

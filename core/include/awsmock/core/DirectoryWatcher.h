@@ -29,17 +29,13 @@
 #include <map>
 #include <iostream>
 #include <utility>
-#include <chrono>
 
 // Poco includes
 #include <Poco/BasicEvent.h>
 #include <Poco/File.h>
-#include <Poco/Logger.h>
-#include <Poco/Mutex.h>
 #include <Poco/Thread.h>
 #include <Poco/Runnable.h>
 #include <Poco/Delegate.h>
-#include <Poco/SingletonHolder.h>
 #include <Poco/RecursiveDirectoryIterator.h>
 
 // AwsMock includes
@@ -50,11 +46,9 @@
 #define LEN_NAME 16 // Assuming that the length of the filename won't exceed 16 bytes
 #define EVENT_SIZE  (sizeof (struct inotify_event)) // size of one event
 #define BUF_LEN     (MAX_EVENTS * (EVENT_SIZE + LEN_NAME)) // buffer to store the data of events
-#define DURATION(x) ((double) std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - x).count())
+#define ALL_EVENTS	 (IN_CREATE | IN_MODIFY | IN_CLOSE_WRITE | IN_DELETE)
 
 namespace AwsMock::Core {
-
-    typedef std::chrono::high_resolution_clock Clock;
 
     enum DirectoryEventType {
       DW_ITEM_ADDED = 1,
@@ -106,8 +100,6 @@ namespace AwsMock::Core {
       FileType type;
     };
 
-    typedef std::map<std::string, std::chrono::time_point<std::chrono::high_resolution_clock>> LockFiles;
-
     class DirectoryWatcher : public Poco::Runnable {
 
     public:
@@ -147,13 +139,23 @@ namespace AwsMock::Core {
        */
       Poco::BasicEvent<const DirectoryEvent> itemDeleted;
 
-      void LockFile(const std::string &fileName);
-
-      void ClearLocks();
-
-      void ClearWatcher();
-
     private:
+
+      /**
+       * Process a directory watcher event.
+       *
+       * @param event inotify event
+       * @param filePath file path
+       */
+      void ProcessDir(struct inotify_event *event, const std::string &filePath);
+
+      /**
+       * Process a file watcher event.
+       *
+       * @param event inotify event
+       * @param path file path
+       */
+      void ProcessFile(struct inotify_event *event, const std::string &path);
 
       /**
        * Returns th file name
@@ -162,14 +164,6 @@ namespace AwsMock::Core {
        * @return absolute file name
        */
       static std::string GetFilename(const std::string &rootDir, const char *fileName);
-
-      /**
-       * Check lock state
-       *
-       * @param fileName file name
-       * @return true if file is locked
-       */
-      bool IsLocked(const std::string &fileName);
 
       /**
        * Logger
@@ -195,11 +189,6 @@ namespace AwsMock::Core {
        * Watcher map with absolute file pathes
        */
       std::map<int, std::string> _watcherMap;
-
-      /**
-       * Locked files
-       */
-      LockFiles _lockedFiles;
     };
 
 } // namespace AwsMock::Core
