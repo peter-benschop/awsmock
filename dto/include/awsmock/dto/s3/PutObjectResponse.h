@@ -35,19 +35,24 @@ namespace AwsMock::Dto::S3 {
       std::string etag;
 
       /**
+       * Base64 encoded MD5 sum
+       */
+      std::string md5Sum;
+
+      /**
        * Content length
        */
       long contentLength;
 
       /**
-       * SHA256 checksum
-       */
-      std::string checksumSha256;
-
-      /**
        * SHA256 checksum algorithm
        */
       std::string checksumAlgorithm = "SHA256";
+
+      /**
+       * Base64 encoded SHA256 checksum
+       */
+      std::string checksumSha256;
 
       /**
        * Converts the DTO to a string representation.
