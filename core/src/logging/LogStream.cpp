@@ -32,6 +32,7 @@ namespace AwsMock::Core {
     }
 
     int LogStreamBuf::writeToDevice(char c) {
+        Poco::Mutex::ScopedLock lock(_mutex);
         if (c == '\n' || c == '\r') {
             if (_message.length() > 0) {
                 Poco::Message msg(_logger.name(), _message, _priority, _file, _line);

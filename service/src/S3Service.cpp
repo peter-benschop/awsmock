@@ -8,10 +8,13 @@ namespace AwsMock::Service {
 
     S3Service::S3Service(const Core::Configuration &configuration) : _logger(Poco::Logger::get("S3Service")), _configuration(configuration) {
 
-        // Initialize environment
-        _dataDir = _configuration.getString("awsmock.data.dir", "/tmp/awsmock/data") + Poco::Path::separator() + "s3";
-        //_watcherDir = _dataDir + Poco::Path::separator() + "watcher";
-        _tempDir = _dataDir + Poco::Path::separator() + "tmp";
+        // Initialize directories
+        _dataDir = _configuration.getString("awsmock.data.dir", "/tmp/awsmock/data") + Poco::Path::separator();
+        _dataS3Dir = _dataDir + Poco::Path::separator() + "s3";
+        _dataTsDir = _dataDir + Poco::Path::separator() + "transfer";
+        _tempDir = _dataS3Dir + Poco::Path::separator() + "tmp";
+
+        // Initialize database
         _database = std::make_unique<Database::S3Database>(_configuration);
 
         // SQS service connection
@@ -42,7 +45,7 @@ namespace AwsMock::Service {
         Dto::S3::CreateBucketResponse createBucketResponse;
         try {
             // Create directory
-            std::string bucketDir = _dataDir + Poco::Path::separator() + name;
+            std::string bucketDir = _dataS3Dir + Poco::Path::separator() + name;
             if (!Core::DirUtils::DirectoryExists(bucketDir)) {
                 Core::DirUtils::MakeDirectory(bucketDir);
             }
@@ -107,7 +110,7 @@ namespace AwsMock::Service {
 
             Database::Entity::S3::Object object = _database->GetObject(request.bucket, request.bucket, request.key);
 
-            std::string filename = _dataDir + Poco::Path::separator() + request.bucket + Poco::Path::separator() + request.key;
+            std::string filename = _dataS3Dir + Poco::Path::separator() + request.bucket + Poco::Path::separator() + request.key;
             getObjectResponse.bucket = object.bucket;
             getObjectResponse.key = object.key;
             getObjectResponse.size = object.size;
@@ -204,13 +207,13 @@ namespace AwsMock::Service {
         std::vector<std::string> files = Core::DirUtils::ListFilesByPrefix(uploadDir, uploadId);
 
         // Create bucket directory, if not existing
-        std::string fileDir = _dataDir + Poco::Path::separator() + bucket + Poco::Path::separator() + GetDirFromKey(key);
+        std::string fileDir = _dataS3Dir + Poco::Path::separator() + bucket + Poco::Path::separator() + GetDirFromKey(key);
         if (!Core::DirUtils::DirectoryExists(fileDir)) {
             Core::DirUtils::MakeDirectory(fileDir);
         }
 
         // Output file
-        std::string outFile = _dataDir + Poco::Path::separator() + bucket + Poco::Path::separator() + key;
+        std::string outFile = _dataS3Dir + Poco::Path::separator() + bucket + Poco::Path::separator() + key;
         log_trace_stream(_logger) << "Output file, outFile: " << outFile << std::endl;
 
         // Append all parts to the output file
@@ -482,9 +485,9 @@ namespace AwsMock::Service {
         }
     }
 
-    void S3Service::CheckNotifications(const std::string &region, const std::string &bucketName, const std::string &key, long size, const std::string &event) {
+    void S3Service::CheckNotifications(const std::string &region, const std::string &bucket, const std::string &key, long size, const std::string &event) {
 
-        Database::Entity::S3::Bucket dbBucket = _database->GetBucketByRegionName(region, bucketName);
+        Database::Entity::S3::Bucket dbBucket = _database->GetBucketByRegionName(region, bucket);
 
         if (dbBucket.HasNotification(event)) {
 
@@ -517,7 +520,7 @@ namespace AwsMock::Service {
                 log_debug_stream(_logger) << "Lambda function invoked" << std::endl;
             }
         } else {
-            log_debug_stream(_logger) << "No notifications found, bucket: " << bucketName << " key: " << key << std::endl;
+            log_debug_stream(_logger) << "No notifications found, event: " << event << " bucket: " << bucket << " key: " << key << std::endl;
         }
     }
 
@@ -544,40 +547,36 @@ namespace AwsMock::Service {
 
     std::string S3Service::GetDirectory(const std::string &bucket, const std::string &key) {
 
-        return _dataDir + Poco::Path::separator() + bucket + Poco::Path::separator() + GetDirFromKey(key);
+        return _dataS3Dir + Poco::Path::separator() + bucket + Poco::Path::separator() + GetDirFromKey(key);
     }
 
     std::string S3Service::GetFilename(const std::string &bucket, const std::string &key) {
 
-        return _dataDir + Poco::Path::separator() + bucket + Poco::Path::separator() + key;
+        return _dataS3Dir + Poco::Path::separator() + bucket + Poco::Path::separator() + key;
     }
 
     void S3Service::DeleteObject(const std::string &bucket, const std::string &key) {
 
-        std::string filename = _dataDir + Poco::Path::separator() + bucket + Poco::Path::separator() + key;
+        std::string filename = _dataS3Dir + Poco::Path::separator() + bucket + Poco::Path::separator() + key;
         if (Core::FileUtils::FileExists(filename)) {
             Core::FileUtils::DeleteFile(filename);
             log_debug_stream(_logger) << "File system object deleted, filename: " << filename << std::endl;
         }
-        filename = _watcherDir + Poco::Path::separator() + bucket + Poco::Path::separator() + key;
-        if (Core::FileUtils::FileExists(filename)) {
-            Core::FileUtils::DeleteFile(filename);
-            log_debug_stream(_logger) << "File system object deleted, filename: " << filename << std::endl;
+        if(bucket == "transfer-server") {
+            filename = _dataTsDir + Poco::Path::separator() + key;
+            if (Core::FileUtils::FileExists(filename)) {
+                Core::FileUtils::DeleteFile(filename);
+                log_debug_stream(_logger) << "Transfer file system object deleted, filename: " << filename << std::endl;
+            }
         }
     }
 
     void S3Service::DeleteBucket(const std::string &bucket) {
 
-        std::string bucketDir = _dataDir + Poco::Path::separator() + bucket;
+        std::string bucketDir = _dataS3Dir + Poco::Path::separator() + bucket;
         if (Core::DirUtils::DirectoryExists(bucketDir)) {
             Core::DirUtils::DeleteDirectory(bucketDir, true);
             log_debug_stream(_logger) << "Bucket directory deleted, bucketDir: " + bucketDir << std::endl;
-        }
-
-        std::string watcherDir = _watcherDir + Poco::Path::separator() + bucket;
-        if (Core::DirUtils::DirectoryExists(watcherDir)) {
-            Core::DirUtils::DeleteDirectory(watcherDir, true);
-            log_debug_stream(_logger) << "Watcher directory deleted, watcherDir: " + watcherDir << std::endl;
         }
     }
 
