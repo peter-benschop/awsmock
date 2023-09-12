@@ -94,6 +94,7 @@ function create_lambda_function () {
   runtime=$2
   zipfile=$3
   handler=$4
+  version=$5
 
   if [ "$(lambda_exists "$function")" -eq 0 ]; then
     awsmock lambda create-function \
@@ -102,7 +103,7 @@ function create_lambda_function () {
     --timeout 120 \
     --memory-size 2024 \
     --environment "file://./lambda/$1-env.json" \
-    --tags tag=latest \
+    --tags tag=latest,version=$version \
     --ephemeral-storage Size=10240 \
     --handler "$handler" \
     --region eu-central-1 \
@@ -187,9 +188,9 @@ create_queue_with_dead_letter_queue katalogdaten
 #
 # Create lambda function
 #
-create_lambda_function ftp-file-copy java17 file-copy-service-1.16.0-SNAPSHOT-aws.jar org.springframework.cloud.function.adapter.aws.FunctionInvoker
-create_lambda_function ftp-file-distribution java17 file-distribution-service-1.24.0-SNAPSHOT-aws.jar org.springframework.cloud.function.adapter.aws.FunctionInvoker
-create_lambda_function image-transformation provided.al2 image-transformation-lambda.zip image-transformation-lambda
+create_lambda_function ftp-file-copy java17 file-copy-service-1.16.0-SNAPSHOT-aws.jar org.springframework.cloud.function.adapter.aws.FunctionInvoker 1.16.0
+create_lambda_function ftp-file-distribution java17 file-distribution-service-1.25.1-SNAPSHOT-aws.jar org.springframework.cloud.function.adapter.aws.FunctionInvoker 1.25.1
+create_lambda_function image-transformation provided.al2 image-transformation-lambda.zip image-transformation-lambda 1.0
 #create_lambda_function vlb-preisreferenz-splitting java17 vlb-preisreferenz-splitting-1.2.1-SNAPSHOT-aws.jar org.springframework.cloud.function.adapter.aws.FunctionInvoker
 
 #

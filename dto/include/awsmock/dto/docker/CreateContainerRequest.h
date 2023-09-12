@@ -117,9 +117,10 @@ namespace AwsMock::Dto::Docker {
               portBindingsObject.set(containerPort, hostArray);
               hostConfigObject.set("PortBindings", portBindingsObject);
 
+              // Hosts docker internal and awsmock are routed to the docker host
               Poco::JSON::Array extraHostsArray;
               extraHostsArray.add("host.docker.internal:host-gateway");
-              extraHostsArray.add("localstack:host-gateway");
+              extraHostsArray.add("awsmock:host-gateway");
 
               hostConfigObject.set("ExtraHosts", extraHostsArray);
               hostConfigObject.set("NetworkMode", networkMode);

@@ -65,6 +65,7 @@ namespace AwsMock::Core {
        */
       int writeToDevice(char c) override;
 
+      Poco::Mutex _mutex;
       Poco::Logger &_logger;
       Poco::Message::Priority _priority;
       std::string _message;
