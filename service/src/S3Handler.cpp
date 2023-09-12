@@ -162,15 +162,14 @@ namespace AwsMock::Service {
                     .owner=user,
                     .md5Sum=GetHeaderValue(request, "Content-MD5", ""),
                     .contentType=GetHeaderValue(request, "Content-Type", "application/octet-stream"),
-                    .contentLength=std::stol(GetHeaderValue(request, "Content-Length", "0")),
-                    .contentIntern=HasHeaderValue(request, "Content-Intern"),
+                    .contentLength=std::stol(GetHeaderValue(request, "Content-Length", "0"))
                 };
                 log_debug_stream(_logger) << "ContentLength: " << putObjectRequest.contentLength << " contentType: " << putObjectRequest.contentType << std::endl;
 
                 Dto::S3::PutObjectResponse putObjectResponse = _s3Service.PutObject(putObjectRequest, request.stream());
 
                 HeaderMap headerMap;
-                headerMap.emplace_back("Content-MD5", Core::Crypto::Base64Encode(putObjectResponse.etag));
+                headerMap.emplace_back("Content-MD5", putObjectResponse.md5Sum);
                 headerMap.emplace_back("Content-Length", std::to_string(putObjectResponse.contentLength));
                 headerMap.emplace_back("ETag", "\"" + putObjectResponse.etag + "\"");
                 headerMap.emplace_back("x-amz-sdk-checksum-algorithm", putObjectResponse.checksumAlgorithm);

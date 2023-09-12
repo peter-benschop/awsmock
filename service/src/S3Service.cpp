@@ -87,7 +87,7 @@ namespace AwsMock::Service {
                 .created = object.created,
                 .modified = object.modified
             };
-            
+
             log_trace_stream(_logger) << "S3 get object metadata response: " + response.ToString() << std::endl;
             log_info_stream(_logger) << "Metadata returned, bucket: " << request.bucket << " key: " << request.key << std::endl;
 
@@ -224,13 +224,13 @@ namespace AwsMock::Service {
 
         // Create database object
         Database::Entity::S3::Object object = _database->CreateOrUpdateObject({
-            .region=region,
-            .bucket=bucket,
-            .key=key,
-            .owner=user,
-            .size=fileSize,
-            .md5sum=md5sum
-        });
+                                                                                  .region=region,
+                                                                                  .bucket=bucket,
+                                                                                  .key=key,
+                                                                                  .owner=user,
+                                                                                  .size=fileSize,
+                                                                                  .md5sum=md5sum
+                                                                              });
 
         // Cleanup
         Core::DirUtils::DeleteDirectory(uploadDir);
@@ -261,16 +261,14 @@ namespace AwsMock::Service {
 
             // Write file
             std::string fileName = GetFilename(request.bucket, request.key);
-            if (!request.contentIntern) {
-                std::ofstream ofs(fileName);
-                long copied = Poco::StreamCopier::copyStream(stream, ofs);
-                log_debug_stream(_logger) << "File received, fileName: " << fileName << " size: " << copied << std::endl;
-            }
+            std::ofstream ofs(fileName);
+            long copied = Poco::StreamCopier::copyStream(stream, ofs);
+            log_debug_stream(_logger) << "File received, fileName: " << fileName << " size: " << copied << std::endl;
 
             // Meta data
             long size = request.contentLength;
-            std::string md5sum = request.md5Sum;
-            std::string sha256sum = Core::Crypto::Base64Encode(Core::Crypto::GetSha256FromFile(fileName));
+            std::string md5sum = Core::Crypto::GetMd5FromFile(fileName);
+            std::string sha256sum = Core::Crypto::GetSha256FromFile(fileName);
             log_debug_stream(_logger) << "MD5sum: " << md5sum << " bucket: " << request.bucket << " key: " << request.key << std::endl;
 
             // Update database
@@ -295,7 +293,9 @@ namespace AwsMock::Service {
                 .bucket=request.bucket,
                 .key=request.key,
                 .etag=md5sum,
+                .md5Sum=md5sum,
                 .contentLength=size,
+                .checksumAlgorithm="SHA256",
                 .checksumSha256=sha256sum
             };
 
