@@ -31,15 +31,8 @@ namespace AwsMock::Core {
     std::string HttpUtils::GetPathParametersFromIndex(const std::string &uri, int index) {
 
         std::string basePath = GetBasePath(uri);
-
         std::vector<std::string> parameters = StringUtils::Split(basePath, '/');
-
-        std::string rest;
-        for (int i = index; i < parameters.size(); i++) {
-            rest += parameters[i] + "/";
-        }
-        rest.pop_back();
-        return rest;
+        return Core::StringUtils::Join(parameters, '/', 1);
     }
 
     std::vector<std::string> HttpUtils::GetPathParameters(const std::string &uri) {
@@ -77,11 +70,15 @@ namespace AwsMock::Core {
     }
 
     std::string HttpUtils::GetQueryParameterValue(const std::string &parameter) {
-        std::string value = StringUtils::Split(parameter, '=')[1];
-        if(IsUrlEncoded(value)) {
-            return StringUtils::UrlDecode(value);
+        std::vector<std::string> parts = StringUtils::Split(parameter, '=');
+        if (parts.size() > 1) {
+            std::string value = parts[1];
+            if (IsUrlEncoded(value)) {
+                return StringUtils::UrlDecode(value);
+            }
+            return value;
         }
-        return value;
+        return {};
     }
 
     std::vector<std::string> HttpUtils::GetQueryParametersByPrefix(const std::string &uri, const std::string &prefix) {

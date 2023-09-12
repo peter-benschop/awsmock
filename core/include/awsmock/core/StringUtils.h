@@ -82,6 +82,16 @@ namespace AwsMock::Core {
       static std::vector<std::string> Split(const std::string &s, char delim);
 
       /**
+       * Joins a string array to a string using the given delimiter.
+       *
+       * @param vec vector of strings
+       * @param delimiter delimiter character
+       * @param startIndex starting index default = 0
+       * @return joined string
+       */
+      static std::string Join(const std::vector<std::string> &vec, char delimiter, int startIndex = 0);
+
+      /**
        * Strip whitespaces
        *
        * @param s string to split

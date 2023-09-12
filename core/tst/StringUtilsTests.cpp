@@ -58,6 +58,18 @@ namespace AwsMock::Core
         EXPECT_EQ(result2.size(), 3);
     }
 
+    TEST_F(StringUtilsTest, JoinTest)
+    {
+        // arrange
+        std::vector<std::string> values = {"transfer-server", "ftpuser1", "incoming", "mix"};
+
+        // act
+        std::string result = StringUtils::Join(values, '/', 1);
+
+        // assert
+        EXPECT_TRUE(result == "ftpuser1/incoming/mix");
+    }
+
     TEST_F(StringUtilsTest, IsUUidTest)
     {
         // arrange
@@ -208,8 +220,6 @@ namespace AwsMock::Core
         // assert
         EXPECT_EQ(matches,3);
     }
-
-
 
 } // namespace AwsMock::Core
 

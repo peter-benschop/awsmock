@@ -143,43 +143,25 @@ namespace AwsMock::Worker {
     void TransferWorker::OnFileAdded(const Core::DirectoryEvent &addedEvent) {
         log_info_stream(_logger) << "File added, path: " << addedEvent.item << std::endl;
 
-        // Get bucket, key
-        std::string relativePath = Core::StringUtils::StripBeginning(addedEvent.item, _baseDir);
-        std::string key = Core::HttpUtils::GetPathParametersFromIndex(relativePath, 1);
-
-        if (addedEvent.type == Core::FileType::DW_DIR_TYPE) {
-            SendCreateBucketRequest(_bucket);
-        } else {
-            SendCreateObjectRequest(_bucket, key, addedEvent.item);
-        }
+        // Get key
+        std::string key = GetKey(addedEvent.item);
+        SendCreateObjectRequest(_bucket, key, addedEvent.item);
     }
 
     void TransferWorker::OnFileModified(const Core::DirectoryEvent &modifiedEvent) {
         log_info_stream(_logger) << "File modified, path: " << modifiedEvent.item << std::endl;
 
-        // Get bucket, key
-        std::string relativePath = Core::StringUtils::StripBeginning(modifiedEvent.item, _baseDir);
-        std::string key = Core::HttpUtils::GetPathParametersFromIndex(relativePath, 1);
-
-        if (Core::DirUtils::IsDirectory(modifiedEvent.item)) {
-            SendCreateBucketRequest(_bucket);
-        } else {
-            SendCreateObjectRequest(_bucket, key, modifiedEvent.item);
-        }
+        // Get key
+        std::string key = GetKey(modifiedEvent.item);
+        SendCreateObjectRequest(_bucket, key, modifiedEvent.item);
     }
 
     void TransferWorker::OnFileDeleted(const Core::DirectoryEvent &deleteEvent) {
         log_info_stream(_logger) << "File deleted path: " << deleteEvent.item << std::endl;
 
-        // Get bucket, key
-        std::string relativePath = Core::StringUtils::StripBeginning(deleteEvent.item, _baseDir);
-        std::string key = Core::HttpUtils::GetPathParametersFromIndex(relativePath, 1);
-
-        if (key.empty()) {
-            SendDeleteBucketRequest(_bucket);
-        } else {
-            SendDeleteObjectRequest(_bucket, key);
-        }
+        // Get key
+        std::string key = GetKey(deleteEvent.item);
+        SendDeleteObjectRequest(_bucket, key);
     }
 
     void TransferWorker::SendCreateBucketRequest(const std::string &bucket) {
@@ -211,17 +193,18 @@ namespace AwsMock::Worker {
         return result;
     }
 
-    void TransferWorker::SendDeleteBucketRequest(const std::string &bucket) {
-
-        std::string url = _baseUrl + "/" + bucket;
-        SendDeleteRequest(url, {}, CONTENT_TYPE_JSON);
-        log_debug_stream(_logger) << "Delete bucket message request send" << std::endl;
-    }
-
     void TransferWorker::SendDeleteObjectRequest(const std::string &bucket, const std::string &key) {
 
         std::string url = _baseUrl + "/" + bucket + "/" + key;
         SendDeleteRequest(url, {}, CONTENT_TYPE_JSON);
         log_debug_stream(_logger) << "Delete bucket message request send" << std::endl;
+    }
+
+    std::string TransferWorker::GetKey(const std::string &path) {
+        std::string key = Core::StringUtils::StripBeginning(path, _baseDir);
+        if (!key.empty() && key[0] == '/') {
+            return key.substr(1);
+        }
+        return key;
     }
 } // namespace AwsMock::Worker

@@ -59,14 +59,20 @@ namespace AwsMock::Service {
                     prefix = Core::HttpUtils::GetQueryParameterByName(request.getURI(), "prefix");
                 }
 
-                std::string encodingType;
+                std::string encodingType = "url";
                 if (Core::HttpUtils::HasQueryParameter(request.getURI(), "encoding_type")) {
                     encodingType = Core::HttpUtils::GetQueryParameterByName(request.getURI(), "encoding_type");
                 }
 
                 // Return object list
-                Dto::S3::ListBucketRequest
-                    s3Request = {.region=region, .name=bucket, .listType=listType, .prefix=prefix, .delimiter=delimiter, .encodingType=encodingType};
+                Dto::S3::ListBucketRequest s3Request = {
+                    .region=region,
+                    .name=bucket,
+                    .listType=listType,
+                    .prefix=prefix,
+                    .delimiter=delimiter,
+                    .encodingType=encodingType
+                };
                 Dto::S3::ListBucketResult result = _s3Service.ListBucket(s3Request);
                 SendOkResponse(response, result.ToXml());
             }
