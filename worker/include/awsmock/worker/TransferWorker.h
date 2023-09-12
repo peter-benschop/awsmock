@@ -84,13 +84,6 @@ namespace AwsMock::Worker {
       void SendCreateObjectRequest(const std::string &bucket, const std::string &key, const std::string &fileName);
 
       /**
-       * Sends a delete bucket request to the S3 service
-       *
-       * @param bucket S3 bucket name
-       */
-      void SendDeleteBucketRequest(const std::string &bucket);
-
-      /**
        * Sends a delete object request to the S3 service
        *
        * @param bucket S3 bucket name
@@ -131,6 +124,14 @@ namespace AwsMock::Worker {
        * @param deleteEvent directory watcher delete event.
        */
       void OnFileDeleted(const Core::DirectoryEvent &deleteEvent);
+
+      /**
+       * Extract the S3 key from the file path.
+       *
+       * @param path file system path
+       * @return S3 key
+       */
+      std::string GetKey(const std::string &path);
 
       /**
        * Logger

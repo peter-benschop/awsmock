@@ -14,7 +14,6 @@
 #include <Poco/ConsoleChannel.h>
 #include <Poco/FormattingChannel.h>
 #include <Poco/PatternFormatter.h>
-#include "Poco/Mutex.h"
 #include <Poco/UnbufferedStreamBuf.h>
 
 namespace AwsMock::Core {
@@ -66,7 +65,6 @@ namespace AwsMock::Core {
        */
       int writeToDevice(char c) override;
 
-      Poco::Mutex _mutex;
       Poco::Logger &_logger;
       Poco::Message::Priority _priority;
       std::string _message;
