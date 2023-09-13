@@ -403,6 +403,13 @@ namespace AwsMock::Service {
       void DumpRequestHeaders(Poco::Net::HTTPServerRequest &request);
 
       /**
+       * Dump the request to std::cerr
+       *
+       * @param request HTTP request
+       */
+      void DumpResponseHeaders(Poco::Net::HTTPServerResponse &response);
+
+      /**
        * Dump the response to std::cerr
        *
        * @param response HTTP response

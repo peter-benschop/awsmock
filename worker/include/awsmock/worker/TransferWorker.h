@@ -79,9 +79,10 @@ namespace AwsMock::Worker {
        *
        * @param bucket S3 bucket name
        * @param key S3 file key
+       * @param user file user
        * @param fileName file to send
        */
-      void SendCreateObjectRequest(const std::string &bucket, const std::string &key, const std::string &fileName);
+      void SendCreateObjectRequest(const std::string &bucket, const std::string &key, const std::string &user, const std::string &fileName);
 
       /**
        * Sends a delete object request to the S3 service
@@ -132,6 +133,14 @@ namespace AwsMock::Worker {
        * @return S3 key
        */
       std::string GetKey(const std::string &path);
+
+      /**
+       * Extract the user from the the file path.
+       *
+       * @param path file system path
+       * @return file user
+       */
+      std::string GetUser(const std::string &path);
 
       /**
        * Logger
@@ -199,9 +208,16 @@ namespace AwsMock::Worker {
       std::string _baseUrl;
 
       /**
+       * Server id
+       */
+      std::string _serverId;
+
+      /**
        * List of transfer servers
        */
       std::map<std::string, std::shared_ptr<Service::FtpServer>> _transferServerList;
+
+      std::shared_ptr<Service::FtpServer> _ftpServer;
 
       /**
        * Directory _watcher

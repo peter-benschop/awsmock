@@ -89,7 +89,10 @@ namespace AwsMock::Service {
         }
     }
 
-    void S3Handler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
+    void S3Handler::handlePut(Poco::Net::HTTPServerRequest &request,
+                              Poco::Net::HTTPServerResponse &response,
+                              [[maybe_unused]]const std::string &region,
+                              [[maybe_unused]]const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_PUT_TIMER);
         log_debug_stream(_logger) << "S3 PUT request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
@@ -121,7 +124,7 @@ namespace AwsMock::Service {
                 SendNoContentResponse(response, &headerMap);
                 log_debug_stream(_logger) << "Finished S3 multipart upload part: " << partNumber << std::endl;
 
-            } else if(isNotification) {
+            } else if (isNotification) {
 
                 log_debug_stream(_logger) << "Bucket notification request, bucket: " << bucket << std::endl;
 
@@ -133,9 +136,14 @@ namespace AwsMock::Service {
 
                 SendOkResponse(response);
 
-            } else if(isCopyRequest) {
+            } else if (isCopyRequest) {
 
                 log_debug_stream(_logger) << "Object copy request, bucket: " << bucket << " key: " << key << std::endl;
+
+                // Get the user metadata
+                std::map<std::string, std::string> metadata = GetMetadata(request);
+
+                DumpRequestHeaders(request);
 
                 // Get S3 source bucket/key
                 std::string sourceHeader = GetHeaderValue(request, "x-amz-copy-source", "empty");
@@ -148,7 +156,9 @@ namespace AwsMock::Service {
                     .sourceBucket=sourceBucket,
                     .sourceKey= sourceKey,
                     .targetBucket=bucket,
-                    .targetKey=key};
+                    .targetKey=key,
+                    .metadata=metadata
+                };
 
                 Dto::S3::CopyObjectResponse s3Response = _s3Service.CopyObject(s3Request);
 
@@ -157,7 +167,7 @@ namespace AwsMock::Service {
 
                 SendOkResponse(response, s3Response.ToXml(), &headerMap);
 
-            } else if(!key.empty()) {
+            } else if (!key.empty()) {
 
                 //DumpRequestHeaders(request);
 
@@ -189,7 +199,7 @@ namespace AwsMock::Service {
 
                 SendOkResponse(response, {}, &headerMap);
 
-            } else if(!bucket.empty()){
+            } else if (!bucket.empty()) {
 
                 // S3 create bucket request
                 std::string name = Core::DirUtils::RelativePath(request.getURI());
@@ -206,7 +216,10 @@ namespace AwsMock::Service {
         }
     }
 
-    void S3Handler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
+    void S3Handler::handlePost(Poco::Net::HTTPServerRequest &request,
+                               Poco::Net::HTTPServerResponse &response,
+                               [[maybe_unused]]const std::string &region,
+                               [[maybe_unused]]const std::string &user) {
         Core::MetricServiceTimer measure(_metricService, HTTP_POST_TIMER);
         log_debug_stream(_logger) << "S3 POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
@@ -288,30 +301,19 @@ namespace AwsMock::Service {
             HeaderMap headerMap;
             headerMap.emplace_back("Server", "awsmock");
             headerMap.emplace_back("Content-Type", "application/json");
+            headerMap.emplace_back("Last-Modified", Poco::DateTimeFormatter().format(s3Response.modified, Poco::DateTimeFormat::HTTP_FORMAT));
+            headerMap.emplace_back("Content-Length", std::to_string(s3Response.size));
+            headerMap.emplace_back("ETag", "\"" + s3Response.md5Sum + "\"");
+            headerMap.emplace_back("accept-ranges", "bytes");
+            headerMap.emplace_back("x-amz-id-2", Core::StringUtils::GenerateRandomString(30));
+            headerMap.emplace_back("x-amz-request-id", Poco::UUIDGenerator().createRandom().toString());
+            headerMap.emplace_back("x-amz-version-id", Core::StringUtils::GenerateRandomString(30));
 
-            if(s3Response.bucket.empty()) {
-
-                headerMap.emplace_back("Content-Length", "0");
-                SendHeadResponse(response, headerMap);
-
-            } else {
-
-                headerMap.emplace_back("Last-Modified", Poco::DateTimeFormatter().format(s3Response.modified, Poco::DateTimeFormat::HTTP_FORMAT));
-                headerMap.emplace_back("Content-Length", std::to_string(s3Response.size));
-                headerMap.emplace_back("ETag", "\"" + s3Response.md5Sum + "\"");
-                headerMap.emplace_back("accept-ranges", "bytes");
-                headerMap.emplace_back("x-amz-id-2", Core::StringUtils::GenerateRandomString(30));
-                headerMap.emplace_back("x-amz-request-id", Poco::UUIDGenerator().createRandom().toString());
-                headerMap.emplace_back("x-amz-version-id", Core::StringUtils::GenerateRandomString(30));
-
-                // User supplied metadata
-                for (const auto &m : s3Response.metadata) {
-                    headerMap.emplace_back("x-amz-meta-" + m.first, m.second);
-                }
-                log_info_stream(_logger) << s3Response.ToString() << std::endl;
-                SendHeadResponse(response, headerMap);
-
+            // User supplied metadata
+            for (const auto &m : s3Response.metadata) {
+                headerMap.emplace_back("x-amz-meta-" + m.first, m.second);
             }
+            SendHeadResponse(response, headerMap);
 
         } catch (Poco::Exception &exc) {
             SendErrorResponse("S3", response, exc);

@@ -27,7 +27,6 @@
 
 namespace AwsMock::Controller {
 
-
     class Router : public Poco::Net::HTTPRequestHandlerFactory {
 
     public:

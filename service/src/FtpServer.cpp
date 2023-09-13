@@ -55,6 +55,14 @@ namespace AwsMock::Service {
         _running = false;
     }
 
+    void FtpServer::SetServerName(const std::string &name) {
+        _ftpServer->setName(name);
+    }
+
+    std::string FtpServer::GetServerName() {
+        return _ftpServer->getName();
+    }
+
     void FtpServer::run() {
 
         _ftpServer->start(_maxThreads);

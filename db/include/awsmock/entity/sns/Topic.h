@@ -15,6 +15,8 @@
 #include <Poco/DateTimeFormatter.h>
 
 // MongoDB includes
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/string/to_string.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <mongocxx/stdx.hpp>
@@ -64,8 +66,8 @@ namespace AwsMock::Database::Entity::SNS {
        */
       [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view_or_value> mResult) {
 
-          protocol = mResult.value().view()["protocol"].get_string().value.to_string();
-          endpoint = mResult.value().view()["endpoint"].get_string().value.to_string();
+          protocol = bsoncxx::string::to_string(mResult.value().view()["protocol"].get_string().value);
+          endpoint = bsoncxx::string::to_string(mResult.value().view()["endpoint"].get_string().value);
       }
 
       /**
@@ -185,19 +187,19 @@ namespace AwsMock::Database::Entity::SNS {
       [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
 
           oid = mResult.value()["_id"].get_oid().value.to_string();
-          region = mResult.value()["region"].get_string().value.to_string();
-          topicName = mResult.value()["topicName"].get_string().value.to_string();
-          owner = mResult.value()["owner"].get_string().value.to_string();
-          topicUrl = mResult.value()["topicUrl"].get_string().value.to_string();
-          topicArn = mResult.value()["topicArn"].get_string().value.to_string();
+          region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
+          topicName = bsoncxx::string::to_string(mResult.value()["topicName"].get_string().value);
+          owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
+          topicUrl = bsoncxx::string::to_string(mResult.value()["topicUrl"].get_string().value);
+          topicArn = bsoncxx::string::to_string(mResult.value()["topicArn"].get_string().value);
           created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
           modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
 
           bsoncxx::array::view subscriptionsView{mResult.value()["subscriptions"].get_array().value};
           for (bsoncxx::array::element subscriptionElement : subscriptionsView) {
               Subscription subscription {
-                  .protocol=subscriptionElement["protocol"].get_string().value.to_string(),
-                  .endpoint=subscriptionElement["endpoint"].get_string().value.to_string()
+                  .protocol=bsoncxx::string::to_string(subscriptionElement["protocol"].get_string().value),
+                  .endpoint=bsoncxx::string::to_string(subscriptionElement["endpoint"].get_string().value)
               };
               subscriptions.push_back(subscription);
           }
@@ -211,19 +213,19 @@ namespace AwsMock::Database::Entity::SNS {
       [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
           oid = mResult.value()["_id"].get_oid().value.to_string();
-          region = mResult.value()["region"].get_string().value.to_string();
-          topicName = mResult.value()["topicName"].get_string().value.to_string();
-          owner = mResult.value()["owner"].get_string().value.to_string();
-          topicUrl = mResult.value()["topicUrl"].get_string().value.to_string();
-          topicArn = mResult.value()["topicArn"].get_string().value.to_string();
+          region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
+          topicName = bsoncxx::string::to_string(mResult.value()["topicName"].get_string().value);
+          owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
+          topicUrl = bsoncxx::string::to_string(mResult.value()["topicUrl"].get_string().value);
+          topicArn = bsoncxx::string::to_string(mResult.value()["topicArn"].get_string().value);
           created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
           modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
 
           bsoncxx::array::view subscriptionsView{mResult.value()["subscriptions"].get_array().value};
           for (bsoncxx::array::element subscriptionElement : subscriptionsView) {
               Subscription subscription {
-                  .protocol=subscriptionElement["protocol"].get_string().value.to_string(),
-                  .endpoint=subscriptionElement["endpoint"].get_string().value.to_string()
+                  .protocol=bsoncxx::string::to_string(subscriptionElement["protocol"].get_string().value),
+                  .endpoint=bsoncxx::string::to_string(subscriptionElement["endpoint"].get_string().value)
               };
               subscriptions.push_back(subscription);
           }

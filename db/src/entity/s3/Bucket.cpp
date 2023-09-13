@@ -2,6 +2,7 @@
 // Created by vogje01 on 03/09/2023.
 //
 
+#include <bsoncxx/json.hpp>
 #include "awsmock/entity/s3/Bucket.h"
 
 namespace AwsMock::Database::Entity::S3 {
@@ -9,6 +10,7 @@ namespace AwsMock::Database::Entity::S3 {
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
+    using bsoncxx::builder::basic::kvp;
 
     bool Bucket::HasNotification(const std::string &eventName) {
         return find_if(notifications.begin(), notifications.end(), [eventName](const BucketNotification &eventNotification) {
@@ -43,20 +45,22 @@ namespace AwsMock::Database::Entity::S3 {
 
     void Bucket::FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
 
+        //bsoncxx::to_json(mResult, bsoncxx::ExtendedJsonMode::k_relaxed)
+
         oid = mResult.value()["_id"].get_oid().value.to_string();
-        region = mResult.value()["region"].get_string().value.to_string();
-        name = mResult.value()["name"].get_string().value.to_string();
-        owner = mResult.value()["owner"].get_string().value.to_string();
+        region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
+        name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
+        owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
         created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
         modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
 
         bsoncxx::array::view notificationView{mResult.value()["notifications"].get_array().value};
         for (bsoncxx::array::element notificationElement : notificationView) {
             BucketNotification notification{
-                .event=notificationElement["event"].get_string().value.to_string(),
-                .notificationId=notificationElement["notificationId"].get_string().value.to_string(),
-                .queueArn=notificationElement["queueArn"].get_string().value.to_string(),
-                .lambdaArn=notificationElement["lambdaArn"].get_string().value.to_string()
+                .event=bsoncxx::string::to_string(notificationElement["event"].get_string().value),
+                .notificationId=bsoncxx::string::to_string(notificationElement["notificationId"].get_string().value),
+                .queueArn=bsoncxx::string::to_string(notificationElement["queueArn"].get_string().value),
+                .lambdaArn=bsoncxx::string::to_string(notificationElement["lambdaArn"].get_string().value)
             };
             notifications.push_back(notification);
         }
@@ -65,19 +69,19 @@ namespace AwsMock::Database::Entity::S3 {
     void Bucket::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         oid = mResult.value()["_id"].get_oid().value.to_string();
-        region = mResult.value()["region"].get_string().value.to_string();
-        name = mResult.value()["name"].get_string().value.to_string();
-        owner = mResult.value()["owner"].get_string().value.to_string();
+        region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
+        name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
+        owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
         created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
         modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
 
         bsoncxx::array::view notificationView{mResult.value()["notifications"].get_array().value};
         for (bsoncxx::array::element notificationElement : notificationView) {
             BucketNotification notification{
-                .event=notificationElement["event"].get_string().value.to_string(),
-                .notificationId=notificationElement["notificationId"].get_string().value.to_string(),
-                .queueArn=notificationElement["queueArn"].get_string().value.to_string(),
-                .lambdaArn=notificationElement["lambdaArn"].get_string().value.to_string()
+                .event=bsoncxx::string::to_string(notificationElement["event"].get_string().value),
+                .notificationId=bsoncxx::string::to_string(notificationElement["notificationId"].get_string().value),
+                .queueArn=bsoncxx::string::to_string(notificationElement["queueArn"].get_string().value),
+                .lambdaArn=bsoncxx::string::to_string(notificationElement["lambdaArn"].get_string().value)
             };
             notifications.push_back(notification);
         }

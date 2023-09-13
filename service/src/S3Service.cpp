@@ -347,7 +347,9 @@ namespace AwsMock::Service {
                 .owner=sourceObject.owner,
                 .size=sourceObject.size,
                 .md5sum=sourceObject.md5sum,
-                .contentType=sourceObject.contentType};
+                .contentType=sourceObject.contentType,
+                .metadata=request.metadata
+            };
             targetObject = _database->CreateObject(targetObject);
             log_debug_stream(_logger) << "Database updated, bucket: " << targetObject.bucket << " key: " << targetObject.key << std::endl;
 

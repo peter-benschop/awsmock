@@ -37,23 +37,23 @@ namespace AwsMock::Database::Entity::S3 {
         try {
             if (!mResult->empty()) {
                 oid = mResult.value()["_id"].get_oid().value.to_string();
-                region = mResult.value()["region"].get_string().value.to_string();
-                bucket = mResult.value()["bucket"].get_string().value.to_string();
-                key = mResult.value()["key"].get_string().value.to_string();
-                owner = mResult.value()["owner"].get_string().value.to_string();
+                region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
+                bucket = bsoncxx::string::to_string(mResult.value()["bucket"].get_string().value);
+                key = bsoncxx::string::to_string(mResult.value()["key"].get_string().value);
+                owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
                 size = mResult.value()["size"].get_int64().value;
-                md5sum = mResult.value()["md5sum"].get_string().value.to_string();
-                contentType = mResult.value()["contentType"].get_string().value.to_string();
-                owner = mResult.value()["owner"].get_string().value.to_string();
+                md5sum = bsoncxx::string::to_string(mResult.value()["md5sum"].get_string().value);
+                contentType = bsoncxx::string::to_string(mResult.value()["contentType"].get_string().value);
+                owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
                 created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
                 modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
 
                 // Get metadata
                 bsoncxx::document::view metadataView = mResult.value()["metadata"].get_document().value;
                 for (bsoncxx::document::element metadataElement : metadataView) {
-                    std::string key = metadataElement.key().to_string();
-                    std::string value = metadataView[key].get_string().value.to_string();
-                    metadata.emplace(key, value);
+                    std::string metadataKey = bsoncxx::string::to_string(metadataElement.key());
+                    std::string metadataValue = bsoncxx::string::to_string(metadataView[key].get_string().value);
+                    metadata.emplace(metadataKey, metadataValue);
                 }
             }
         } catch (mongocxx::exception::system_error &e) {
@@ -65,23 +65,23 @@ namespace AwsMock::Database::Entity::S3 {
         try {
             if (!mResult->empty()) {
                 oid = mResult.value()["_id"].get_oid().value.to_string();
-                region = mResult.value()["region"].get_string().value.to_string();
-                bucket = mResult.value()["bucket"].get_string().value.to_string();
-                key = mResult.value()["key"].get_string().value.to_string();
-                owner = mResult.value()["owner"].get_string().value.to_string();
+                region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
+                bucket = bsoncxx::string::to_string(mResult.value()["bucket"].get_string().value);
+                key = bsoncxx::string::to_string(mResult.value()["key"].get_string().value);
+                owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
                 size = mResult.value()["size"].get_int64().value;
-                md5sum = mResult.value()["md5sum"].get_string().value.to_string();
-                contentType = mResult.value()["contentType"].get_string().value.to_string();
-                owner = mResult.value()["owner"].get_string().value.to_string();
+                md5sum = bsoncxx::string::to_string(mResult.value()["md5sum"].get_string().value);
+                contentType = bsoncxx::string::to_string(mResult.value()["contentType"].get_string().value);
+                owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
                 created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
                 modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
 
                 // Get metadata
                 bsoncxx::document::view metadataView = mResult.value()["metadata"].get_document().value;
                 for (bsoncxx::document::element metadataElement : metadataView) {
-                    std::string key = metadataElement.key().to_string();
-                    std::string value = metadataView[key].get_string().value.to_string();
-                    metadata.emplace(key, value);
+                    std::string metadataKey = bsoncxx::string::to_string(metadataElement.key());
+                    std::string metadataValue = bsoncxx::string::to_string(metadataView[key].get_string().value);
+                    metadata.emplace(metadataKey, metadataValue);
                 }
             }
         } catch (mongocxx::exception::system_error &e) {

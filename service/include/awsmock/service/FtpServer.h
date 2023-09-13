@@ -70,6 +70,20 @@ namespace AwsMock::Service {
        */
       void StopServer();
 
+      /**
+       * Sets the server name.
+       *
+       * @param name server name
+       */
+      void SetServerName(const std::string &name);
+
+      /**
+       * Returns the server name.
+       *
+       * @return server name
+       */
+      std::string GetServerName();
+
     private:
 
       /**

@@ -6,7 +6,8 @@ set(SOURCES src/repository/Database.cpp src/repository/ServiceDatabase.cpp src/r
         src/repository/SQSDatabase.cpp src/repository/SNSDatabase.cpp src/repository/LambdaDatabase.cpp
         src/repository/TransferDatabase.cpp src/entity/lambda/Tags.cpp src/entity/lambda/Environment.cpp
         src/entity/lambda/EphemeralStorage.cpp src/entity/lambda/Lambda.cpp src/entity/s3/Bucket.cpp
-        src/entity/s3/BucketNotification.cpp src/entity/s3/Object.cpp)
+        src/entity/s3/BucketNotification.cpp src/entity/s3/Object.cpp src/entity/transfer/User.cpp
+        src/entity/transfer/Transfer.cpp)
 
 # Test directory
 add_subdirectory(tst)
