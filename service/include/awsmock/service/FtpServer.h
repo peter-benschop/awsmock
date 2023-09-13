@@ -11,9 +11,6 @@
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 #include "Poco/Net/HTTPServer.h"
 
-// FineFTP includes
-#include <fineftp/server.h>
-
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
@@ -122,7 +119,7 @@ namespace AwsMock::Service {
       /**
        * FTP server instance
        */
-      std::shared_ptr<fineftp::FtpServer> _ftpServer;
+      std::shared_ptr<FtpServer> _ftpServer;
 
       /**
        * Base directory
