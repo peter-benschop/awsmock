@@ -143,7 +143,7 @@ namespace AwsMock::Service {
                 // Get the user metadata
                 std::map<std::string, std::string> metadata = GetMetadata(request);
 
-                DumpRequestHeaders(request);
+                //DumpRequestHeaders(request);
 
                 // Get S3 source bucket/key
                 std::string sourceHeader = GetHeaderValue(request, "x-amz-copy-source", "empty");

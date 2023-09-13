@@ -126,12 +126,16 @@ namespace AwsMock::Database {
     }
 
     Entity::SNS::Message SNSDatabase::GetMessageById(bsoncxx::oid oid) {
+        try {
+            mongocxx::stdx::optional<bsoncxx::document::value> mResult = _messageCollection.find_one(make_document(kvp("_id", oid)));
+            Entity::SNS::Message result;
+            result.FromDocument(mResult);
 
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _messageCollection.find_one(make_document(kvp("_id", oid)));
-        Entity::SNS::Message result;
-        result.FromDocument(mResult);
-
-        return result;
+            return result;
+        } catch (const mongocxx::exception &exc) {
+            _logger.error() << "Database exception " << exc.what() << std::endl;
+            throw Core::DatabaseException(exc.what(), 500);
+        }
     }
 
     Entity::SNS::Message SNSDatabase::GetMessageById(const std::string &oid) {

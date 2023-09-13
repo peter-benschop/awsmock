@@ -421,7 +421,7 @@ namespace AwsMock::Service {
             for (auto &it : extraHeader) {
                 response.set(it.first, it.second);
             }
-            DumpResponseHeaders(response);
+            //DumpResponseHeaders(response);
 
             response.send();
 

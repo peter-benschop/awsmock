@@ -125,7 +125,6 @@ namespace AwsMock::Database::Entity::S3 {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const Object &o);
-
     };
 
     typedef struct Object Object;
