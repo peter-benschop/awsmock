@@ -2,7 +2,7 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include <awsmock/worker/AbstractWorker.h>
+#include "awsmock/worker/AbstractWorker.h"
 
 namespace AwsMock::Worker {
 

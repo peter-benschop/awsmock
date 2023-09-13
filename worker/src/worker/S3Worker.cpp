@@ -2,7 +2,7 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include <awsmock/worker/S3Worker.h>
+#include "awsmock/worker/S3Worker.h"
 #include "awsmock/core/ResourceNotFoundException.h"
 
 namespace AwsMock::Worker {

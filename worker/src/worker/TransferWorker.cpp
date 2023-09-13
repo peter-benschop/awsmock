@@ -44,15 +44,16 @@ namespace AwsMock::Worker {
     void TransferWorker::StartTransferServer(Database::Entity::Transfer::Transfer &server) {
 
         // Create transfer server thread
-        _ftpServer = std::make_shared<Service::FtpServer>(_configuration);
+        _ftpServer = std::make_shared<FtpServer::FtpServer>(_configuration);
         _transferServerList[server.serverId] = _ftpServer;
-        _ftpServer->SetServerName(server.serverId);
+        _ftpServer->setName(server.serverId);
 
         // Add users
         for (const auto &user : server.users) {
-            _ftpServer->AddUser(user.userName, user.password, user.homeDirectory);
+            std::string homeDir = _baseDir + Poco::Path::separator() + user.homeDirectory;
+            _ftpServer->addUser(user.userName, user.password, homeDir, FtpServer::Permission::All);
         }
-        Poco::ThreadPool::defaultPool().start(*_ftpServer);
+        _ftpServer->start(4);
 
         // Update database
         server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::ONLINE);
@@ -63,9 +64,9 @@ namespace AwsMock::Worker {
     void TransferWorker::StopTransferServer(Database::Entity::Transfer::Transfer &server) {
 
         // Create transfer server thread
-        std::shared_ptr<Service::FtpServer> ftpserver = _transferServerList[server.serverId];
+        std::shared_ptr<FtpServer::FtpServer> ftpserver = _transferServerList[server.serverId];
 
-        ftpserver->StopServer();
+        ftpserver->stop();
 
         // Update database
         server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::OFFLINE);
@@ -178,7 +179,7 @@ namespace AwsMock::Worker {
 
     void TransferWorker::SendCreateObjectRequest(const std::string &bucket, const std::string &key, const std::string &user, const std::string &fileName) {
 
-        std::string serverName = _ftpServer->GetServerName();
+       // std::string serverName = _ftpServer->GetServerName();
         std::string url = _baseUrl + "/" + bucket + "/" + key;
         std::map<std::string, std::string> headers;
         headers["Content-MD5"] = Core::Crypto::Base64Encode(Core::Crypto::GetMd5FromFile(fileName));
@@ -186,7 +187,7 @@ namespace AwsMock::Worker {
         headers["x-amz-sdk-checksum-algorithm"] = "SHA256";
         headers["x-amz-checksum-sha256"] = Core::Crypto::GetSha256FromFile(fileName);
         headers["x-amz-meta-user-agent"] = "AWSTransfer";
-        headers["x-amz-meta-user-agent-id"] = user + "@" + serverName;
+        //headers["x-amz-meta-user-agent-id"] = user + "@" + serverName;
         SendFile(url, fileName, headers);
         log_debug_stream(_logger) << "Create object message request send, url: " << url << std::endl;
     }

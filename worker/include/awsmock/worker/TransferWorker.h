@@ -16,9 +16,9 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/s3/CreateBucketConstraint.h>
+#include <awsmock/ftpserver/FtpServer.h>
 #include <awsmock/repository/ServiceDatabase.h>
 #include <awsmock/repository/TransferDatabase.h>
-#include <awsmock/service/FtpServer.h>
 #include <awsmock/worker/AbstractWorker.h>
 
 #define DEFAULT_TRANSFER_BUCKET "transfer-server"
@@ -215,9 +215,12 @@ namespace AwsMock::Worker {
       /**
        * List of transfer servers
        */
-      std::map<std::string, std::shared_ptr<Service::FtpServer>> _transferServerList;
+      std::map<std::string, std::shared_ptr<FtpServer::FtpServer>> _transferServerList;
 
-      std::shared_ptr<Service::FtpServer> _ftpServer;
+      /**
+       * Actual FTP server
+       */
+      std::shared_ptr<FtpServer::FtpServer> _ftpServer;
 
       /**
        * Directory _watcher

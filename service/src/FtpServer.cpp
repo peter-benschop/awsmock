@@ -2,11 +2,11 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#include "awsmock/service/FtpServer.h"
+//#include "awsmock/service/FtpServer.h"
 
 namespace AwsMock::Service {
 
-    FtpServer::FtpServer(const Core::Configuration &configuration)
+    /*FtpServer::FtpServer(const Core::Configuration &configuration)
         : _logger(Poco::Logger::get("FtpServer")), _configuration(configuration) {
 
         _port = _configuration.getInt("awsmock.service.ftp.port", FTP_DEFAULT_PORT);
@@ -16,7 +16,7 @@ namespace AwsMock::Service {
         log_debug_stream(_logger) << "FTP rest service initialized, endpoint: " << _host << ":" << _port << std::endl;
 
         // Create server
-        _ftpServer = std::make_shared<fineftp::FtpServer>(_port);
+        _ftpServer = std::make_shared<FtpServer>(_port);
     }
 
     FtpServer::~FtpServer() {
@@ -73,5 +73,5 @@ namespace AwsMock::Service {
             Poco::Thread::sleep(1000);
         }
 
-    }
+    }*/
 }
