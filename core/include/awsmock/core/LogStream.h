@@ -7,6 +7,7 @@
 
 // C++ standard includes
 #include <istream>
+#include <iostream>
 
 // Poco includes
 #include <Poco/Foundation.h>
@@ -15,6 +16,9 @@
 #include <Poco/FormattingChannel.h>
 #include <Poco/PatternFormatter.h>
 #include <Poco/UnbufferedStreamBuf.h>
+#include <Poco/DateTime.h>
+#include <Poco/DateTimeFormat.h>
+#include <Poco/DateTimeFormatter.h>
 
 namespace AwsMock::Core {
 
@@ -116,6 +120,11 @@ namespace AwsMock::Core {
        */
       void SetDefaultConsoleLogger(Poco::Logger &logger);
 
+      /**
+       * Priority strings
+       */
+      static const std::string priorities [] ;
+
       LogStream &level(const std::string &level);
       /// Sets the logging level
 
@@ -205,16 +214,13 @@ namespace AwsMock::Core {
       /**
        * Default log pattern
        */
-      Poco::AutoPtr<Poco::FormattingChannel> formattingChannel() const;
+      //Poco::AutoPtr<Poco::FormattingChannel> formattingChannel() const;
     };
 
-    inline Poco::AutoPtr<Poco::FormattingChannel> LogStream::formattingChannel() const {
+/*    inline Poco::AutoPtr<Poco::FormattingChannel> LogStream::formattingChannel() const {
 
-        Poco::AutoPtr<Poco::ConsoleChannel> pCons(new Poco::ConsoleChannel());
-        Poco::AutoPtr<Poco::PatternFormatter> pPF(new Poco::PatternFormatter("%d-%m-%Y %H:%M:%S.%i [%p] %I %s:%u - %t"));
-        Poco::AutoPtr<Poco::FormattingChannel> pFC(new Poco::FormattingChannel(pPF, pCons));
         return pFC;
-    }
+    }*/
 
     //
     // inlines

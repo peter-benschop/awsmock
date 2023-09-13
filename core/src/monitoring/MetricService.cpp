@@ -8,7 +8,7 @@ namespace AwsMock::Core {
 
     MetricService::MetricService(const Configuration &configuration) : MetricService(configuration.GetMetricPort(), configuration.GetMetricTimeout()) {}
 
-    MetricService::MetricService(int port, long timeout) : _logger(Poco::Logger::get("root")), _port(port), _timeout(timeout) {}
+    MetricService::MetricService(int port, long timeout) : _logger(Poco::Logger::root()), _port(port), _timeout(timeout) {}
 
     MetricService::~MetricService() {
         // Delete counters
