@@ -72,7 +72,7 @@ namespace AwsMock::FtpServer {
        */
       // FtpServer(uint16_t port = 21);
 
-      explicit FtpServer(const Core::Configuration &configuration);
+      explicit FtpServer(const Core::Configuration &configuration, std::string serverName);
 
       // Move
       FtpServer(FtpServer &&) noexcept;
@@ -181,6 +181,11 @@ namespace AwsMock::FtpServer {
        * Actual implementation
        */
       std::unique_ptr<FtpServerImpl> _ftp_server;
+
+      /**
+       * Name of the server
+       */
+      std::string _serverName;
 
       /**
        * Hostname for the server

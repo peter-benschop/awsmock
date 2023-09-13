@@ -1,6 +1,6 @@
 #pragma once
 
-// C++ includes
+
 #include <deque>
 #include <fstream>
 #include <iostream>
@@ -10,22 +10,36 @@
 #include <functional>
 #include <fstream>
 #include <sstream>
+#include <utility>
 
 // Asio includes
 #include "asio.hpp"
 
+// Poco includes
+#include "Poco/Net/HTTPClientSession.h"
+#include "Poco/Net/HTTPRequest.h"
+
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/FileUtils.h>
 #include <awsmock/ftpserver/FtpMessage.h>
 #include <awsmock/ftpserver/Filesystem.h>
 #include <awsmock/ftpserver/UserDatabase.h>
 #include <awsmock/ftpserver/FtpUser.h>
+#include <awsmock/worker/AbstractWorker.h>
+
+#define DEFAULT_BASE_DIR "transfer"
+#define DEFAULT_TRANSFER_BUCKET "transfer-server"
 
 namespace AwsMock::FtpServer {
-    class FtpSession : public std::enable_shared_from_this<FtpSession> {
+    class FtpSession : public std::enable_shared_from_this<FtpSession>, public Worker::AbstractWorker {
     private:
       struct IoFile {
-        IoFile(const std::string &filename, std::ios::openmode mode) : file_stream_(filename, mode), stream_buffer_(1024 * 1024) {
+        IoFile(const std::string &filename, std::string user, std::ios::openmode mode) : file_stream_(filename, mode), stream_buffer_(1024 * 1024),
+                                                                                         _fileName(filename), _user(std::move(user)) {
+
             file_stream_.rdbuf()->pubsetbuf(stream_buffer_.data(), static_cast<std::streamsize>(stream_buffer_.size()));
         }
 
@@ -44,13 +58,19 @@ namespace AwsMock::FtpServer {
 
         std::fstream file_stream_;
         std::vector<char> stream_buffer_;
+        std::string _fileName;
+        std::string _user;
       };
 
       ////////////////////////////////////////////////////////
       // Public API
       ////////////////////////////////////////////////////////
     public:
-      FtpSession(asio::io_service &io_service, const UserDatabase &user_database, const std::function<void()> &completion_handler);
+      FtpSession(asio::io_service &io_service,
+                 const UserDatabase &user_database,
+                 const std::string &serverName,
+                 const Core::Configuration &configuration,
+                 const std::function<void()> &completion_handler);
 
       // Copy (disabled, as we are inheriting from shared_from_this)
       FtpSession(const FtpSession &) = delete;
@@ -180,6 +200,24 @@ namespace AwsMock::FtpServer {
 
       FtpMessage executeCWD(const std::string &param);
 
+      /**
+       * Send file to AWS s3
+       *
+       * @param bucket S3 bucket
+       * @param key S3 key
+       * @param user user name
+       * @param fileName filename
+       */
+      void SendCreateObjectRequest(const std::string &user, const std::string &fileName);
+
+      /**
+       * Extract the S3 key from the file path.
+       *
+       * @param path file system path
+       * @return S3 key
+       */
+      std::string GetKey(const std::string &path);
+
       ////////////////////////////////////////////////////////
       // Member variables
       ////////////////////////////////////////////////////////
@@ -190,25 +228,42 @@ namespace AwsMock::FtpServer {
        */
       Core::LogStream _logger;
 
-      // Completion handler
-      const std::function<void()> completion_handler_;
+      /**
+       * Configuration
+       */
+      const Core::Configuration &_configuration;
 
-      // User management
-      const UserDatabase &user_database_;
-      std::shared_ptr<FtpUser> logged_in_user_;
+      /**
+       * Completion handler
+       */
+      const std::function<void()> _completion_handler;
 
-      // "Global" io service
-      asio::io_service &io_service_;
+      /**
+       * User management
+       */
+      const UserDatabase &_user_database;
 
-      // Command Socket
+      /**
+       * Current user
+       */
+      std::shared_ptr<FtpUser> _logged_in_user;
+
+      /**
+       * Global IO service
+       */
+      asio::io_service &_io_service;
+
+      /**
+       * Command Socket
+       */
       asio::ip::tcp::socket command_socket_;
       asio::io_service::strand command_write_strand_;
       asio::streambuf command_input_stream_;
       std::deque<std::string> command_output_queue_;
 
-      std::string last_command_;
-      std::string rename_from_path_;
-      std::string username_for_login_;
+      std::string _lastCommand;
+      std::string _renameFromPath;
+      std::string _usernameForLogin;
 
       // Data Socket (=> passive mode)
       bool data_type_binary_;
@@ -218,7 +273,39 @@ namespace AwsMock::FtpServer {
       asio::io_service::strand data_buffer_strand_;
       asio::io_service::strand file_rw_strand_;
 
-      // Current state
-      std::string ftp_working_directory_;
+      /**
+       * Current state
+       */
+      std::string _ftpWorkingDirectory;
+
+      /**
+       * Server name
+       */
+      std::string _serverName;
+
+      /**
+       * S3 service host
+       */
+      std::string _s3ServiceHost;
+
+      /**
+       * S3 service port
+       */
+      int _s3ServicePort;
+
+      /**
+       * Transfer server base dir
+       */
+      std::string _baseDir;
+
+      /**
+       * S3 service base URL
+       */
+      std::string _baseUrl;
+
+      /**
+       * S3 bucket name
+       */
+      std::string _bucket;
     };
 }

@@ -32,21 +32,14 @@ namespace AwsMock::Worker {
             Core::DirUtils::MakeDirectory(_baseDir);
             log_debug_stream(_logger) << "Using baseDir: " << _baseDir << std::endl;
         }
-
-        // Start _watcher
-        _watcher = std::make_shared<Core::DirectoryWatcher>(_baseDir);
-        _watcher->itemAdded += Poco::delegate(this, &TransferWorker::OnFileAdded);
-        _watcher->itemModified += Poco::delegate(this, &TransferWorker::OnFileModified);
-        _watcher->itemDeleted += Poco::delegate(this, &TransferWorker::OnFileDeleted);
         log_debug_stream(_logger) << "TransferWorker initialized" << std::endl;
     }
 
     void TransferWorker::StartTransferServer(Database::Entity::Transfer::Transfer &server) {
 
         // Create transfer server thread
-        _ftpServer = std::make_shared<FtpServer::FtpServer>(_configuration);
+        _ftpServer = std::make_shared<FtpServer::FtpServer>(_configuration,server.serverId);
         _transferServerList[server.serverId] = _ftpServer;
-        _ftpServer->setName(server.serverId);
 
         // Add users
         for (const auto &user : server.users) {
@@ -132,7 +125,7 @@ namespace AwsMock::Worker {
         StartTransferServers();
 
         // Start file watcher, they will call the delegate methods, if they find a file system event.
-        _watcherThread.start(*_watcher);
+        //_watcherThread.start(*_watcher);
 
         _running = true;
         while (_running) {

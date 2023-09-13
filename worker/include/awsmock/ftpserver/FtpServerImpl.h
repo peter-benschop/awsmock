@@ -19,7 +19,7 @@ namespace AwsMock::FtpServer {
 
     class FtpServerImpl {
     public:
-      FtpServerImpl(const std::string &address, uint16_t port);
+      FtpServerImpl(const std::string &serverName, std::string address, uint16_t port, const Core::Configuration &configuration);
 
       // Copy (disabled)
       FtpServerImpl(const FtpServerImpl &) = delete;
@@ -60,8 +60,18 @@ namespace AwsMock::FtpServer {
       std::atomic<int> open_connection_count_;
 
       /**
+       * Name of the server
+       */
+      std::string _serverName;
+
+      /**
        * Logger
        */
-       Core::LogStream _logger;
+      Core::LogStream _logger;
+
+      /**
+       * Logger
+       */
+      const Core::Configuration &_configuration;
     };
 }

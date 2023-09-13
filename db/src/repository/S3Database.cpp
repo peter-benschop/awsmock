@@ -25,9 +25,14 @@ namespace AwsMock::Database {
 
     bool S3Database::BucketExists(const std::string &region, const std::string &name) {
 
-        int64_t count = _bucketCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
-        log_trace_stream(_logger) << "Bucket exists: " << (count > 0 ? "true" : "false") << std::endl;
-        return count > 0;
+        try {
+            int64_t count = _bucketCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
+            log_trace_stream(_logger) << "Bucket exists: " << (count > 0 ? "true" : "false") << std::endl;
+            return count > 0;
+        } catch (const mongocxx::exception &exc) {
+            _logger.error() << "Database exception " << exc.what() << std::endl;
+            throw Core::DatabaseException(exc.what(), 500);
+        }
     }
 
     bool S3Database::BucketExists(const Entity::S3::Bucket &bucket) {

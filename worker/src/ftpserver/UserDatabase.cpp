@@ -13,14 +13,14 @@ namespace AwsMock::FtpServer {
                                           << "\". The username denotes the anonymous user, which is already present." << std::endl;
                 return false;
             } else {
-                anonymous_user_ = std::make_shared<FtpUser>(password, local_root_path, permissions);
+                anonymous_user_ = std::make_shared<FtpUser>(username, password, local_root_path, permissions);
                 log_debug_stream(_logger) << "Successfully added anonymous user." << std::endl;
                 return true;
             }
         } else {
             auto user_it = database_.find(username);
             if (user_it == database_.end()) {
-                database_.emplace(username, std::make_shared<FtpUser>(password, local_root_path, permissions));
+                database_.emplace(username, std::make_shared<FtpUser>(username, password, local_root_path, permissions));
                 log_debug_stream(_logger) << "Successfully added user: " << username << " home: " << local_root_path << std::endl;
                 return true;
             } else {

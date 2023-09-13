@@ -92,10 +92,6 @@ namespace AwsMock::Database {
        */
       mongocxx::client _client;
 
-      /**
-       * Database connection pool
-       */
-      mongocxx::pool* _pool ;
     };
 
 } // namespace AwsMock::Database

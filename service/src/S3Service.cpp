@@ -73,9 +73,11 @@ namespace AwsMock::Service {
             throw Core::ServiceException("Bucket does not exist", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        if (!_database->ObjectExists({.region=request.region, .bucket=request.bucket, .key=request.key})) {
-            log_error_stream(_logger) << "Object " << request.key << " does not exist" << std::endl;
-            throw Core::ServiceException("Object does not exist", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+        if(!request.key.empty()) {
+            if (!_database->ObjectExists({.region=request.region, .bucket=request.bucket, .key=request.key})) {
+                log_error_stream(_logger) << "Object " << request.key << " does not exist" << std::endl;
+                throw Core::ServiceException("Object does not exist", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            }
         }
 
         try {

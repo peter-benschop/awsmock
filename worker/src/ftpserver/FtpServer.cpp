@@ -1,6 +1,7 @@
 
 // C++ includes
 #include <memory>
+#include <utility>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
@@ -14,13 +15,13 @@ namespace AwsMock::FtpServer {
 
     //FtpServer::FtpServer(uint16_t port) : FtpServer(std::string("0.0.0.0"), port) {}
 
-    FtpServer::FtpServer(const Core::Configuration &configuration) : _configuration(configuration) {
+    FtpServer::FtpServer(const Core::Configuration &configuration, std::string serverName) : _configuration(configuration), _serverName(std::move(serverName)) {
         _port = _configuration.getInt("awsmock.service.ftp.port", FTP_DEFAULT_PORT);
         _address = _configuration.getString("awsmock.service.ftp.address", FTP_DEFAULT_ADDRESS);
         _maxThreads = _configuration.getInt("awsmock.service.ftp.max.threads", 4);
         _dataDir = _configuration.getString("awsmock.worker.transfer.base.dir", FTP_BASE_DIR);
 
-        _ftp_server = std::make_unique<FtpServerImpl>(_address, _port);
+        _ftp_server = std::make_unique<FtpServerImpl>(_serverName, _address, _port, _configuration);
     }
 
     // Move

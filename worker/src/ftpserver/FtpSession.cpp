@@ -3,15 +3,28 @@
 
 namespace AwsMock::FtpServer {
 
-    FtpSession::FtpSession(asio::io_service &io_service, const UserDatabase &user_database, const std::function<void()> &completion_handler)
-        : completion_handler_(completion_handler), user_database_(user_database), io_service_(io_service), command_socket_(io_service),
+    FtpSession::FtpSession(asio::io_service &io_service,
+                           const UserDatabase &user_database,
+                           const std::string &serverName,
+                           const Core::Configuration &configuration,
+                           const std::function<void()> &completion_handler)
+        : AbstractWorker(configuration), _completion_handler(completion_handler), _user_database(user_database), _io_service(io_service), command_socket_(io_service),
           command_write_strand_(io_service), data_type_binary_(false), data_acceptor_(io_service), data_buffer_strand_(io_service), file_rw_strand_(io_service),
-          ftp_working_directory_("/"), _logger(Poco::Logger::get("FtpSession")) {
+          _ftpWorkingDirectory("/"), _logger(Poco::Logger::get("FtpSession")), _configuration(configuration), _serverName(serverName) {
+
+        // S3 service connection
+        _s3ServiceHost = _configuration.getString("awsmock.service.s3.host", "localhost");
+        _s3ServicePort = _configuration.getInt("awsmock.service.s3.port", 9501);
+        _baseUrl = "http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort);
+
+        // Bucket
+        _bucket = _configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
+        _baseDir = _configuration.getString("awsmock.worker.transfer.base.dir", DEFAULT_BASE_DIR);
     }
 
     FtpSession::~FtpSession() {
         log_debug_stream(_logger) << "Ftp Session shutting down" << std::endl;
-        completion_handler_();
+        _completion_handler();
     }
 
     void FtpSession::start() {
@@ -93,9 +106,10 @@ namespace AwsMock::FtpServer {
 
                                  std::istream stream(&(me->command_input_stream_));
                                  std::string packet_string(length - 2, ' ');
-                                 stream.read(&packet_string[0],
-                                             length
-                                                 - 2);  // NOLINT(readability-container-data-pointer) Reason: I need a non-const pointer here, As I am directly reading into the buffer, but .data() returns a const pointer. I don't consider a const_cast to be better. Since C++11 this is safe, as strings are stored in contiguous memeory.
+                                 // NOLINT(readability-container-data-pointer) Reason: I need a non-const pointer here, As I am directly reading into the buffer,
+                                 // but .data() returns a const pointer. I don't consider a const_cast to be better. Since C++11 this is safe, as strings are stored
+                                 // in contiguous memory.
+                                 stream.read(&packet_string[0], length - 2);
 
                                  stream.ignore(2); // Remove the "\r\n"
                                  log_debug_stream(me->_logger) << "FTP << " << packet_string << std::endl;
@@ -168,12 +182,12 @@ namespace AwsMock::FtpServer {
         auto command_it = command_map.find(ftp_command);
         if (command_it != command_map.end()) {
             command_it->second(parameters);
-            last_command_ = ftp_command;
+            _lastCommand = ftp_command;
         } else {
             sendFtpMessage(FtpReplyCode::SYNTAX_ERROR_UNRECOGNIZED_COMMAND, "Unrecognized command");
         }
 
-        if (last_command_ == "QUIT") {
+        if (_lastCommand == "QUIT") {
             // Close command socket
             command_write_strand_.wrap([me = shared_from_this()]() { me->command_socket_.close(); });
         } else {
@@ -190,9 +204,9 @@ namespace AwsMock::FtpServer {
     // Access control commands
 
     void FtpSession::handleFtpCommandUSER(const std::string &param) {
-        logged_in_user_ = nullptr;
-        username_for_login_ = param;
-        ftp_working_directory_ = "/";
+        _logged_in_user = nullptr;
+        _usernameForLogin = param;
+        _ftpWorkingDirectory = "/";
 
         if (param.empty()) {
             sendFtpMessage(FtpReplyCode::SYNTAX_ERROR_PARAMETERS, "Please provide username");
@@ -204,13 +218,13 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::handleFtpCommandPASS(const std::string &param) {
-        if (last_command_ != "USER") {
+        if (_lastCommand != "USER") {
             sendFtpMessage(FtpReplyCode::COMMANDS_BAD_SEQUENCE, "Please specify username first");
             return;
         } else {
-            auto user = user_database_.getUser(username_for_login_, param);
+            auto user = _user_database.getUser(_usernameForLogin, param);
             if (user) {
-                logged_in_user_ = user;
+                _logged_in_user = user;
                 sendFtpMessage(FtpReplyCode::USER_LOGGED_IN, "Login successful");
                 return;
             } else {
@@ -229,16 +243,16 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::handleFtpCommandCDUP(const std::string & /*param*/) {
-        if (!logged_in_user_) {
+        if (!_logged_in_user) {
             sendFtpMessage(FtpReplyCode::NOT_LOGGED_IN, "Not logged in");
             return;
         }
-        if (static_cast<int>(logged_in_user_->permissions_ & Permission::DirList) == 0) {
+        if (static_cast<int>(_logged_in_user->permissions_ & Permission::DirList) == 0) {
             sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Permission denied");
             return;
         }
 
-        if (ftp_working_directory_ != "/") {
+        if (_ftpWorkingDirectory != "/") {
             // Only CDUP when we are not already at the root directory
             auto cwd_reply = executeCWD("..");
             if (cwd_reply.replyCode() == FtpReplyCode::FILE_ACTION_COMPLETED) {
@@ -260,7 +274,7 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::handleFtpCommandQUIT(const std::string & /*param*/) {
-        logged_in_user_ = nullptr;
+        _logged_in_user = nullptr;
         sendFtpMessage(FtpReplyCode::SERVICE_CLOSING_CONTROL_CONNECTION, "Connection shutting down");
     }
 
@@ -271,7 +285,7 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::handleFtpCommandPASV(const std::string & /*param*/) {
-        if (!logged_in_user_) {
+        if (!_logged_in_user) {
             sendFtpMessage(FtpReplyCode::NOT_LOGGED_IN, "Not logged in");
             return;
         }
@@ -330,7 +344,7 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::handleFtpCommandTYPE(const std::string &param) {
-        if (!logged_in_user_) {
+        if (!_logged_in_user) {
             sendFtpMessage(FtpReplyCode::NOT_LOGGED_IN, "Not logged in");
             return;
         }
@@ -362,11 +376,11 @@ namespace AwsMock::FtpServer {
 
     // Ftp service commands
     void FtpSession::handleFtpCommandRETR(const std::string &param) {
-        if (!logged_in_user_) {
+        if (!_logged_in_user) {
             sendFtpMessage(FtpReplyCode::NOT_LOGGED_IN, "Not logged in");
             return;
         }
-        if (static_cast<int>(logged_in_user_->permissions_ & Permission::FileRead) == 0) {
+        if (static_cast<int>(_logged_in_user->permissions_ & Permission::FileRead) == 0) {
             sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Permission denied");
             return;
         }
@@ -378,7 +392,7 @@ namespace AwsMock::FtpServer {
         const std::string local_path = toLocalPath(param);
 
         const std::ios::openmode open_mode = (data_type_binary_ ? (std::ios::in | std::ios::binary) : (std::ios::in));
-        const std::shared_ptr<IoFile> file = std::make_shared<IoFile>(local_path, open_mode);
+        const std::shared_ptr<IoFile> file = std::make_shared<IoFile>(local_path, _logged_in_user->password_, open_mode);
 
         if (!file->file_stream_.good()) {
             sendFtpMessage(FtpReplyCode::ACTION_ABORTED_LOCAL_ERROR, "Error opening file for transfer");
@@ -390,11 +404,11 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::handleFtpCommandSIZE(const std::string &param) {
-        if (!logged_in_user_) {
+        if (!_logged_in_user) {
             sendFtpMessage(FtpReplyCode::NOT_LOGGED_IN, "Not logged in");
             return;
         }
-        if (static_cast<int>(logged_in_user_->permissions_ & Permission::FileRead) == 0) {
+        if (static_cast<int>(_logged_in_user->permissions_ & Permission::FileRead) == 0) {
             sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Permission denied");
             return;
         }
@@ -431,7 +445,7 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::handleFtpCommandSTOR(const std::string &param) {
-        if (!logged_in_user_) {
+        if (!_logged_in_user) {
             sendFtpMessage(FtpReplyCode::NOT_LOGGED_IN, "Not logged in");
             return;
         }
@@ -440,7 +454,7 @@ namespace AwsMock::FtpServer {
         // 1985 nobody anticipated that you might not want anybody uploading files
         // to your server. We use the return code anyways, as the popular FileZilla
         // Server also returns that code as "Permission denied"
-        if (static_cast<int>(logged_in_user_->permissions_ & Permission::FileWrite) == 0) {
+        if (static_cast<int>(_logged_in_user->permissions_ & Permission::FileWrite) == 0) {
             sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Permission denied");
             return;
         }
@@ -454,7 +468,7 @@ namespace AwsMock::FtpServer {
         auto existing_file_filestatus = FileStatus(local_path);
         if (existing_file_filestatus.isOk()) {
             if ((existing_file_filestatus.type() == FileType::RegularFile)
-                && (static_cast<int>(logged_in_user_->permissions_ & Permission::FileDelete) == 0)) {
+                && (static_cast<int>(_logged_in_user->permissions_ & Permission::FileDelete) == 0)) {
                 sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN_FILENAME_NOT_ALLOWED, "File already exists. Permission denied to overwrite file.");
                 return;
             } else if (existing_file_filestatus.type() == FileType::Dir) {
@@ -464,7 +478,7 @@ namespace AwsMock::FtpServer {
         }
 
         const std::ios::openmode open_mode = (data_type_binary_ ? (std::ios::out | std::ios::binary) : (std::ios::out));
-        const std::shared_ptr<IoFile> file = std::make_shared<IoFile>(local_path, open_mode);
+        const std::shared_ptr<IoFile> file = std::make_shared<IoFile>(local_path, _logged_in_user->_username, open_mode);
 
         if (!file->file_stream_.good()) {
             sendFtpMessage(FtpReplyCode::ACTION_ABORTED_LOCAL_ERROR, "Error opening file for transfer");
@@ -473,6 +487,7 @@ namespace AwsMock::FtpServer {
 
         sendFtpMessage(FtpReplyCode::FILE_STATUS_OK_OPENING_DATA_CONNECTION, "Receiving file");
         receiveFile(file);
+        log_debug_stream(_logger) << "STOR ended" << std::endl;
     }
 
     void FtpSession::handleFtpCommandSTOU(const std::string & /*param*/) {
@@ -480,11 +495,11 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::handleFtpCommandAPPE(const std::string &param) {
-        if (!logged_in_user_) {
+        if (!_logged_in_user) {
             sendFtpMessage(FtpReplyCode::NOT_LOGGED_IN, "Not logged in");
             return;
         }
-        if (static_cast<int>(logged_in_user_->permissions_ & Permission::FileAppend) == 0) {
+        if (static_cast<int>(_logged_in_user->permissions_ & Permission::FileAppend) == 0) {
             sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Permission denied");
             return;
         }
@@ -503,7 +518,7 @@ namespace AwsMock::FtpServer {
         }
 
         const std::ios::openmode open_mode = (data_type_binary_ ? (std::ios::out | std::ios::app | std::ios::binary) : (std::ios::out | std::ios::app));
-        const std::shared_ptr<IoFile> file = std::make_shared<IoFile>(local_path, open_mode);
+        const std::shared_ptr<IoFile> file = std::make_shared<IoFile>(local_path, _logged_in_user->_username, open_mode);
 
         if (!file->file_stream_.good()) {
             sendFtpMessage(FtpReplyCode::ACTION_ABORTED_LOCAL_ERROR, "Error opening file for transfer");
@@ -523,12 +538,12 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::handleFtpCommandRNFR(const std::string &param) {
-        rename_from_path_.clear();
+        _renameFromPath.clear();
 
         auto is_renamable_error = checkIfPathIsRenamable(param);
 
         if (is_renamable_error.replyCode() == FtpReplyCode::COMMAND_OK) {
-            rename_from_path_ = param;
+            _renameFromPath = param;
             sendFtpMessage(FtpReplyCode::FILE_ACTION_NEEDS_FURTHER_INFO, "Enter target name");
             return;
         } else {
@@ -538,12 +553,12 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::handleFtpCommandRNTO(const std::string &param) {
-        if (!logged_in_user_) {
+        if (!_logged_in_user) {
             sendFtpMessage(FtpReplyCode::NOT_LOGGED_IN, "Not logged in");
             return;
         }
 
-        if (last_command_ != "RNFR" || rename_from_path_.empty()) {
+        if (_lastCommand != "RNFR" || _renameFromPath.empty()) {
             sendFtpMessage(FtpReplyCode::COMMANDS_BAD_SEQUENCE, "Please specify target file first");
             return;
         }
@@ -554,37 +569,23 @@ namespace AwsMock::FtpServer {
         }
 
         // TODO: returning neiher FILE_ACTION_NOT_TAKEN nor ACTION_NOT_TAKEN are
-        // RFC 959 conform. Aoarently back in 1985 it was assumed that the RNTO
-        //command will always succeed, as long as you enter a valid target file
+        // RFC 959 conform. Apparently back in 1985 it was assumed that the RNTO
+        // command will always succeed, as long as you enter a valid target file
         // name. Thus we use the two return codes anyways, the popular FileZilla
         // FTP Server uses those as well.
-        auto is_renamable_error = checkIfPathIsRenamable(rename_from_path_);
+        auto is_renamable_error = checkIfPathIsRenamable(_renameFromPath);
 
         if (is_renamable_error.replyCode() == FtpReplyCode::COMMAND_OK) {
-            const std::string local_from_path = toLocalPath(rename_from_path_);
+            const std::string local_from_path = toLocalPath(_renameFromPath);
             const std::string local_to_path = toLocalPath(param);
 
             // Check if the source file exists already. We simple disallow overwriting a
-            // file be renaming (the bahavior of the native rename command on Windows
+            // file be renaming (the behavior of the native rename command on Windows
             // and Linux differs; Windows will not overwrite files, Linux will).
             if (FileStatus(local_to_path).isOk()) {
                 sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Target path exists already.");
                 return;
             }
-
-#ifdef WIN32
-
-            if (MoveFileW(StrConvert::Utf8ToWide(local_from_path).c_str(), StrConvert::Utf8ToWide(local_to_path).c_str()) != 0)
-            {
-              sendFtpMessage(FtpReplyCode::FILE_ACTION_COMPLETED, "OK");
-              return;
-            }
-            else
-            {
-              sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Error renaming file: " + GetLastErrorStr());
-              return;
-            }
-#else // WIN32
             if (rename(local_from_path.c_str(), local_to_path.c_str()) == 0) {
                 sendFtpMessage(FtpReplyCode::FILE_ACTION_COMPLETED, "OK");
                 return;
@@ -592,7 +593,6 @@ namespace AwsMock::FtpServer {
                 sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Error renaming file");
                 return;
             }
-#endif // WIN32
         } else {
             sendFtpMessage(is_renamable_error);
             return;
@@ -604,7 +604,7 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::handleFtpCommandDELE(const std::string &param) {
-        if (!logged_in_user_) {
+        if (!_logged_in_user) {
             sendFtpMessage(FtpReplyCode::NOT_LOGGED_IN, "Not logged in");
             return;
         }
@@ -619,22 +619,10 @@ namespace AwsMock::FtpServer {
             sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Resource is not a file");
             return;
         } else {
-            if (static_cast<int>(logged_in_user_->permissions_ & Permission::FileDelete) == 0) {
+            if (static_cast<int>(_logged_in_user->permissions_ & Permission::FileDelete) == 0) {
                 sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Permission denied");
                 return;
             } else {
-#ifdef WIN32
-                if (DeleteFileW(StrConvert::Utf8ToWide(local_path).c_str()) != 0)
-                {
-                  sendFtpMessage(FtpReplyCode::FILE_ACTION_COMPLETED, "Successfully deleted file");
-                  return;
-                }
-                else
-                {
-                  sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Unable to delete file: " + GetLastErrorStr());
-                  return;
-                }
-#else
                 if (unlink(local_path.c_str()) == 0) {
                     sendFtpMessage(FtpReplyCode::FILE_ACTION_COMPLETED, "Successfully deleted file");
                     return;
@@ -642,38 +630,21 @@ namespace AwsMock::FtpServer {
                     sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Unable to delete file");
                     return;
                 }
-#endif
             }
         }
     }
 
     void FtpSession::handleFtpCommandRMD(const std::string &param) {
-        if (!logged_in_user_) {
+        if (!_logged_in_user) {
             sendFtpMessage(FtpReplyCode::NOT_LOGGED_IN, "Not logged in");
             return;
         }
-        if (static_cast<int>(logged_in_user_->permissions_ & Permission::DirDelete) == 0) {
+        if (static_cast<int>(_logged_in_user->permissions_ & Permission::DirDelete) == 0) {
             sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Permission denied");
             return;
         }
 
         const std::string local_path = toLocalPath(param);
-
-#ifdef WIN32
-        if (RemoveDirectoryW(StrConvert::Utf8ToWide(local_path).c_str()) != 0)
-        {
-          sendFtpMessage(FtpReplyCode::FILE_ACTION_COMPLETED, "Successfully removed directory");
-          return;
-        }
-        else
-        {
-          // If would be a good idea to return a 4xx error code here (-> temp error)
-          // (e.g. FILE_ACTION_NOT_TAKEN), but RFC 959 assumes that all directory
-          // errors are permanent.
-          sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Unable to remove directory: " + GetLastErrorStr());
-          return;
-        }
-#else
         if (rmdir(local_path.c_str()) == 0) {
             sendFtpMessage(FtpReplyCode::FILE_ACTION_COMPLETED, "Successfully removed directory");
             return;
@@ -684,38 +655,19 @@ namespace AwsMock::FtpServer {
             sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Unable to remove directory");
             return;
         }
-#endif
-
     }
 
     void FtpSession::handleFtpCommandMKD(const std::string &param) {
-        if (!logged_in_user_) {
+        if (!_logged_in_user) {
             sendFtpMessage(FtpReplyCode::NOT_LOGGED_IN, "Not logged in");
             return;
         }
-        if (static_cast<int>(logged_in_user_->permissions_ & Permission::DirCreate) == 0) {
+        if (static_cast<int>(_logged_in_user->permissions_ & Permission::DirCreate) == 0) {
             sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Permission denied");
             return;
         }
 
         auto local_path = toLocalPath(param);
-
-#ifdef WIN32
-        LPSECURITY_ATTRIBUTES security_attributes = nullptr; // => Default security attributes
-        if (CreateDirectoryW(StrConvert::Utf8ToWide(local_path).c_str(), security_attributes) != 0)
-        {
-          sendFtpMessage(FtpReplyCode::PATHNAME_CREATED, createQuotedFtpPath(toAbsoluteFtpPath(param)) + " Successfully created");
-          return;
-        }
-        else
-        {
-          // If would be a good idea to return a 4xx error code here (-> temp error)
-          // (e.g. FILE_ACTION_NOT_TAKEN), but RFC 959 assumes that all directory
-          // errors are permanent.
-          sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Unable to create directory: " + GetLastErrorStr());
-          return;
-        }
-#else
         const mode_t mode = 0755;
         if (mkdir(local_path.c_str(), mode) == 0) {
             sendFtpMessage(FtpReplyCode::PATHNAME_CREATED, createQuotedFtpPath(toAbsoluteFtpPath(param)) + " Successfully created");
@@ -727,27 +679,26 @@ namespace AwsMock::FtpServer {
             sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Unable to create directory");
             return;
         }
-#endif
     }
 
     void FtpSession::handleFtpCommandPWD(const std::string & /*param*/) {
         // RFC 959 does not allow returning NOT_LOGGED_IN here, so we abuse ACTION_NOT_TAKEN for that.
-        if (!logged_in_user_) {
+        if (!_logged_in_user) {
             sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Not logged in");
             return;
         }
 
-        sendFtpMessage(FtpReplyCode::PATHNAME_CREATED, createQuotedFtpPath(ftp_working_directory_));
+        sendFtpMessage(FtpReplyCode::PATHNAME_CREATED, createQuotedFtpPath(_ftpWorkingDirectory));
     }
 
     void FtpSession::handleFtpCommandLIST(const std::string &param) {
-        if (!logged_in_user_) {
+        if (!_logged_in_user) {
             sendFtpMessage(FtpReplyCode::NOT_LOGGED_IN, "Not logged in");
             return;
         }
 
         // RFC 959 does not allow ACTION_NOT_TAKEN (-> permanent error), so we return a temporary error (FILE_ACTION_NOT_TAKEN).
-        if (static_cast<int>(logged_in_user_->permissions_ & Permission::DirList) == 0) {
+        if (static_cast<int>(_logged_in_user->permissions_ & Permission::DirList) == 0) {
             sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Permission denied");
             return;
         }
@@ -810,13 +761,13 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::handleFtpCommandNLST(const std::string &param) {
-        if (!logged_in_user_) {
+        if (!_logged_in_user) {
             sendFtpMessage(FtpReplyCode::NOT_LOGGED_IN, "Not logged in");
             return;
         }
 
         // RFC 959 does not allow ACTION_NOT_TAKEN (-> permanent error), so we return a temporary error (FILE_ACTION_NOT_TAKEN).
-        if (static_cast<int>(logged_in_user_->permissions_ & Permission::DirList) == 0) {
+        if (static_cast<int>(_logged_in_user->permissions_ & Permission::DirList) == 0) {
             sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Permission denied");
             return;
         }
@@ -904,7 +855,7 @@ namespace AwsMock::FtpServer {
     ////////////////////////////////////////////////////////
 
     void FtpSession::sendDirectoryListing(const std::map<std::string, FileStatus> &directory_content) {
-        auto data_socket = std::make_shared<asio::ip::tcp::socket>(io_service_);
+        auto data_socket = std::make_shared<asio::ip::tcp::socket>(_io_service);
         data_socket_weakptr_ = data_socket;
 
         data_acceptor_.async_accept(*data_socket, [data_socket, directory_content, me = shared_from_this()](auto ec) {
@@ -940,7 +891,7 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::sendNameList(const std::map<std::string, FileStatus> &directory_content) {
-        auto data_socket = std::make_shared<asio::ip::tcp::socket>(io_service_);
+        auto data_socket = std::make_shared<asio::ip::tcp::socket>(_io_service);
         data_socket_weakptr_ = data_socket;
 
         data_acceptor_.async_accept(*data_socket, [data_socket, directory_content, me = shared_from_this()](auto ec) {
@@ -969,7 +920,7 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::sendFile(const std::shared_ptr<IoFile> &file) {
-        auto data_socket = std::make_shared<asio::ip::tcp::socket>(io_service_);
+        auto data_socket = std::make_shared<asio::ip::tcp::socket>(_io_service);
         data_socket_weakptr_ = data_socket;
 
         data_acceptor_.async_accept(*data_socket, [data_socket, file, me = shared_from_this()](auto ec) {
@@ -1057,7 +1008,7 @@ namespace AwsMock::FtpServer {
     ////////////////////////////////////////////////////////
 
     void FtpSession::receiveFile(const std::shared_ptr<IoFile> &file) {
-        auto data_socket = std::make_shared<asio::ip::tcp::socket>(io_service_);
+        auto data_socket = std::make_shared<asio::ip::tcp::socket>(_io_service);
         data_socket_weakptr_ = data_socket;
 
         data_acceptor_.async_accept(*data_socket, [data_socket, file, me = shared_from_this()](auto ec) {
@@ -1102,6 +1053,9 @@ namespace AwsMock::FtpServer {
           file->file_stream_.flush();
           file->file_stream_.close();
           me->sendFtpMessage(FtpReplyCode::CLOSING_DATA_CONNECTION, "Done");
+
+          // Send to AWS S3
+          me->SendCreateObjectRequest(file->_user, file->_fileName);
         });
     }
 
@@ -1115,20 +1069,20 @@ namespace AwsMock::FtpServer {
         if (!rel_or_abs_ftp_path.empty() && (rel_or_abs_ftp_path[0] == '/')) {
             absolute_ftp_path = rel_or_abs_ftp_path;
         } else {
-            absolute_ftp_path = cleanPath(ftp_working_directory_ + "/" + rel_or_abs_ftp_path, false, '/');
+            absolute_ftp_path = cleanPath(_ftpWorkingDirectory + "/" + rel_or_abs_ftp_path, false, '/');
         }
 
         return absolute_ftp_path;
     }
 
     std::string FtpSession::toLocalPath(const std::string &ftp_path) const {
-        assert(logged_in_user_);
+        assert(_logged_in_user);
 
         // First make the ftp path absolute if it isn't already
         const std::string absolute_ftp_path = toAbsoluteFtpPath(ftp_path);
 
         // Now map it to the local filesystem
-        return cleanPathNative(logged_in_user_->local_root_path_ + "/" + absolute_ftp_path);
+        return cleanPathNative(_logged_in_user->local_root_path_ + "/" + absolute_ftp_path);
     }
 
     std::string FtpSession::createQuotedFtpPath(const std::string &unquoted_ftp_path) {
@@ -1148,8 +1102,8 @@ namespace AwsMock::FtpServer {
     }
 
     FtpMessage FtpSession::checkIfPathIsRenamable(const std::string &ftp_path) const {
-        if (!logged_in_user_)
-            return FtpMessage(FtpReplyCode::NOT_LOGGED_IN, "Not logged in");
+        if (!_logged_in_user)
+            return {FtpReplyCode::NOT_LOGGED_IN, "Not logged in"};
 
         if (!ftp_path.empty()) {
             // Is the given path a file or a directory?
@@ -1165,29 +1119,29 @@ namespace AwsMock::FtpServer {
                 }
 
                 // Send error if the permisions are insufficient
-                if ((logged_in_user_->permissions_ & required_permissions) != required_permissions) {
-                    return FtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Permission denied");
+                if ((_logged_in_user->permissions_ & required_permissions) != required_permissions) {
+                    return {FtpReplyCode::ACTION_NOT_TAKEN, "Permission denied"};
                 }
 
-                return FtpMessage(FtpReplyCode::COMMAND_OK, "");
+                return {FtpReplyCode::COMMAND_OK, ""};
             } else {
-                return FtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "File does not exist");
+                return {FtpReplyCode::ACTION_NOT_TAKEN, "File does not exist"};
             }
         } else {
-            return FtpMessage(FtpReplyCode::SYNTAX_ERROR_PARAMETERS, "Empty path");
+            return {FtpReplyCode::SYNTAX_ERROR_PARAMETERS, "Empty path"};
         }
     }
 
     FtpMessage FtpSession::executeCWD(const std::string &param) {
-        if (!logged_in_user_) {
-            return FtpMessage(FtpReplyCode::NOT_LOGGED_IN, "Not logged in");
+        if (!_logged_in_user) {
+            return {FtpReplyCode::NOT_LOGGED_IN, "Not logged in"};
         }
-        if (static_cast<int>(logged_in_user_->permissions_ & Permission::DirList) == 0) {
-            return FtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Permission denied");
+        if (static_cast<int>(_logged_in_user->permissions_ & Permission::DirList) == 0) {
+            return {FtpReplyCode::ACTION_NOT_TAKEN, "Permission denied"};
         }
 
         if (param.empty()) {
-            return FtpMessage(FtpReplyCode::SYNTAX_ERROR_PARAMETERS, "No path given");
+            return {FtpReplyCode::SYNTAX_ERROR_PARAMETERS, "No path given"};
         }
 
         std::string absolute_new_working_dir;
@@ -1196,56 +1150,47 @@ namespace AwsMock::FtpServer {
             // Absolute path given
             absolute_new_working_dir = cleanPath(param, false, '/');
         } else {
-            // Make the path abolute
-            absolute_new_working_dir = cleanPath(ftp_working_directory_ + "/" + param, false, '/');
+            // Make the path absolute
+            absolute_new_working_dir = cleanPath(_ftpWorkingDirectory + "/" + param, false, '/');
         }
 
         auto local_path = toLocalPath(absolute_new_working_dir);
         const FileStatus file_status(local_path);
 
         if (!file_status.isOk()) {
-            return FtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Failed ot change directory: The given resource does not exist or permission denied.");
+            return {FtpReplyCode::ACTION_NOT_TAKEN, "Failed ot change directory: The given resource does not exist or permission denied."};
         }
         if (file_status.type() != FileType::Dir) {
-            return FtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Failed ot change directory: The given resource is not a directory.");
+            return {FtpReplyCode::ACTION_NOT_TAKEN, "Failed ot change directory: The given resource is not a directory."};
         }
         if (!file_status.canOpenDir()) {
-            return FtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Failed ot change directory: Permission denied.");
+            return {FtpReplyCode::ACTION_NOT_TAKEN, "Failed ot change directory: Permission denied."};
         }
-        ftp_working_directory_ = absolute_new_working_dir;
-        return FtpMessage(FtpReplyCode::FILE_ACTION_COMPLETED, "Working directory changed to " + ftp_working_directory_);
+        _ftpWorkingDirectory = absolute_new_working_dir;
+        return {FtpReplyCode::FILE_ACTION_COMPLETED, "Working directory changed to " + _ftpWorkingDirectory};
     }
 
-#ifdef WIN32
-    std::string FtpSession::GetLastErrorStr()
-    {
-      const DWORD error = GetLastError();
-      if (error != 0)
-      {
-        LPVOID lp_msg_buf = nullptr;
-        const DWORD buf_len = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                                            FORMAT_MESSAGE_FROM_SYSTEM |
-                                            FORMAT_MESSAGE_IGNORE_INSERTS,
-                                            nullptr,
-                                            error,
-                                            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                                            reinterpret_cast<LPTSTR>(&lp_msg_buf),
-                                            0, nullptr );
-        if (buf_len != 0)
-        {
-          LPCSTR lp_msg_str = reinterpret_cast<LPCSTR>(lp_msg_buf);
-          std::string result(lp_msg_str, lp_msg_str + buf_len);
-          result.erase(std::remove_if(result.begin(),
-                                      result.end(),
-                                      [](unsigned char x) {return std::iscntrl(x); }),
-                       result.end()); //remove CRLF
-          LocalFree(lp_msg_buf);
+    void FtpSession::SendCreateObjectRequest(const std::string &user, const std::string &fileName) {
 
-          return result;
-        }
-      }
-
-      return "";
+        std::string key = GetKey(fileName);
+        std::string url = _baseUrl + "/" + _bucket + "/" + key;
+        std::map<std::string, std::string> headers;
+        headers["Content-MD5"] = Core::Crypto::Base64Encode(Core::Crypto::GetMd5FromFile(fileName));
+        headers["Content-Length"] = std::to_string(Core::FileUtils::FileSize(fileName));
+        headers["x-amz-sdk-checksum-algorithm"] = "SHA256";
+        headers["x-amz-checksum-sha256"] = Core::Crypto::GetSha256FromFile(fileName);
+        headers["x-amz-meta-user-agent"] = "AWSTransfer";
+        headers["x-amz-meta-user-agent-id"] = user + "@" + _serverName;
+        SendFile(url, fileName, headers);
+        log_debug_stream(_logger) << "Create object message request send, url: " << url << std::endl;
     }
-#endif //WIN32
+
+    std::string FtpSession::GetKey(const std::string &path) {
+        std::string key = Core::StringUtils::StripBeginning(path, _baseDir);
+        if (!key.empty() && key[0] == '/') {
+            return key.substr(1);
+        }
+        return key;
+    }
+
 }
