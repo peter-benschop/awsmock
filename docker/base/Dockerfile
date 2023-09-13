@@ -38,7 +38,3 @@ RUN cd /usr/src && \
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_CXX_STANDARD=17 . && \
     make && \
     make install
-
-COPY libfineftp-server.so.1.3.5 /usr/lib
-RUN ln -s /usr/bin/libfineftp-server.so.1.3.5 /usr/bin/libfineftp-server.so.1
-RUN ln -s /usr/bin/libfineftp-server.so.1 /usr/bin/libfineftp-server.so

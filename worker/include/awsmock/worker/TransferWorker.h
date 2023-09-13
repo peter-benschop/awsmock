@@ -75,24 +75,6 @@ namespace AwsMock::Worker {
       void SendCreateBucketRequest(const std::string &bucket);
 
       /**
-       * Sends a create bucket request to the S3 service
-       *
-       * @param bucket S3 bucket name
-       * @param key S3 file key
-       * @param user file user
-       * @param fileName file to send
-       */
-      void SendCreateObjectRequest(const std::string &bucket, const std::string &key, const std::string &user, const std::string &fileName);
-
-      /**
-       * Sends a delete object request to the S3 service
-       *
-       * @param bucket S3 bucket name
-       * @param key S3 file key
-       */
-      void SendDeleteObjectRequest(const std::string &bucket, const std::string &key);
-
-      /**
        * Sends a exists bucket request to the S3 service
        *
        * @param bucket S3 bucket name
@@ -100,47 +82,6 @@ namespace AwsMock::Worker {
        * @return true when bucket exists
        */
       bool SendExistsBucketRequest(const std::string &bucket);
-
-      /**
-       * Callback for the directory watcher add events.
-       *
-       * <p>Actually, this is not used, as on Linux systems a added and afterwards a modified event is issued. We only use the modified event.</p>
-       *
-       * @param addEvent directory watcher add event.
-       */
-      void OnFileAdded(const Core::DirectoryEvent &addEvent);
-
-      /**
-       * Callback for the directory watcher change events.
-       *
-       * <p>Actually, this is used, for all create/modified events, as on Linux systems a added and afterwards a modified event is issued.</p>
-       *
-       * @param modifiedEvent directory watcher change event.
-       */
-      void OnFileModified(const Core::DirectoryEvent &modifiedEvent);
-
-      /**
-       * Callback for the directory watcher delete events.
-       *
-       * @param deleteEvent directory watcher delete event.
-       */
-      void OnFileDeleted(const Core::DirectoryEvent &deleteEvent);
-
-      /**
-       * Extract the S3 key from the file path.
-       *
-       * @param path file system path
-       * @return S3 key
-       */
-      std::string GetKey(const std::string &path);
-
-      /**
-       * Extract the user from the the file path.
-       *
-       * @param path file system path
-       * @return file user
-       */
-      std::string GetUser(const std::string &path);
 
       /**
        * Logger

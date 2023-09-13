@@ -39,17 +39,6 @@ RUN cd /usr/src && \
     make && \
     make install
 
-# Install fineftp
-RUN cd /usr/src && \
-    git clone https://github.com/eclipse-ecal/fineftp-server.git && \
-    cd fineftp-server &&  \
-    git submodule init && \
-    git submodule update && \
-    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr . && \
-    sed -i 's/add_library (${PROJECT_NAME}/add_library (${PROJECT_NAME} SHARED/g' fineftp-server/CMakeLists.txt && \
-    make && \
-    make install
-
 # Install sv4git
 RUN cd /usr/src && \
     wget https://github.com/bvieira/sv4git/releases/download/v2.9.0/git-sv_2.9.0_linux_amd64.tar.gz && \
@@ -115,6 +104,8 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN mkdir -p /tmp/awsmock/data/s3 && \
     mkdir -p /tmp/awsmock/data/sqs && \
     mkdir -p /tmp/awsmock/data/lambda && \
+    mkdir -p /tmp/awsmock/data/transfer && \
+    mkdir -p /tmp/awsmock/data/tmp && \
     mkdir -p /tmp/awsmock/init
 
 # Add properties
