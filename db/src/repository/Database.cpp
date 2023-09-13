@@ -25,7 +25,6 @@ namespace AwsMock::Database {
     }
 
     mongocxx::database Database::GetConnection() {
-        if(_pool->try_acquire())
         auto c = _pool->acquire();
         return (*c)[_name];
     }
