@@ -16,6 +16,8 @@
 #include <Poco/DateTimeFormatter.h>
 
 // MongoDB includes
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/string/to_string.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <mongocxx/stdx.hpp>
@@ -169,11 +171,11 @@ namespace AwsMock::Database::Entity::SNS {
       void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
 
           oid = mResult.value()["_id"].get_oid().value.to_string();
-          region = mResult.value()["region"].get_string().value.to_string();
-          topicArn = mResult.value()["topicArn"].get_string().value.to_string();
-          targetArn = mResult.value()["targetArn"].get_string().value.to_string();
-          message = mResult.value()["message"].get_string().value.to_string();
-          messageId = mResult.value()["messageId"].get_string().value.to_string();
+          region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
+          topicArn = bsoncxx::string::to_string(mResult.value()["topicArn"].get_string().value);
+          targetArn = bsoncxx::string::to_string(mResult.value()["targetArn"].get_string().value);
+          message = bsoncxx::string::to_string(mResult.value()["message"].get_string().value);
+          messageId = bsoncxx::string::to_string(mResult.value()["messageId"].get_string().value);
           lastSend = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["reset"].get_date().value) / 1000));
           created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
           modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
@@ -181,8 +183,8 @@ namespace AwsMock::Database::Entity::SNS {
           bsoncxx::array::view attributesView{mResult.value()["attributes"].get_array().value};
           for (bsoncxx::array::element attributeElement : attributesView) {
               MessageAttribute attribute{
-                  .attributeName=attributeElement["attributeName"].get_string().value.to_string(),
-                  .attributeValue=attributeElement["attributeValue"].get_string().value.to_string()
+                  .attributeName=bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
+                  .attributeValue=bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value)
               };
               attributes.push_back(attribute);
           }
@@ -196,11 +198,11 @@ namespace AwsMock::Database::Entity::SNS {
      void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
           oid = mResult.value()["_id"].get_oid().value.to_string();
-          region = mResult.value()["region"].get_string().value.to_string();
-          topicArn = mResult.value()["topicArn"].get_string().value.to_string();
-          targetArn = mResult.value()["targetArn"].get_string().value.to_string();
-          message = mResult.value()["message"].get_string().value.to_string();
-          messageId = mResult.value()["messageId"].get_string().value.to_string();
+          region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
+          topicArn = bsoncxx::string::to_string(mResult.value()["topicArn"].get_string().value);
+          targetArn = bsoncxx::string::to_string(mResult.value()["targetArn"].get_string().value);
+          message = bsoncxx::string::to_string(mResult.value()["message"].get_string().value);
+          messageId = bsoncxx::string::to_string(mResult.value()["messageId"].get_string().value);
           lastSend = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["reset"].get_date().value) / 1000));
           created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
           modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
@@ -208,8 +210,8 @@ namespace AwsMock::Database::Entity::SNS {
           bsoncxx::array::view attributesView{mResult.value()["attributes"].get_array().value};
           for (bsoncxx::array::element attributeElement : attributesView) {
               MessageAttribute attribute{
-                  .attributeName=attributeElement["attributeName"].get_string().value.to_string(),
-                  .attributeValue=attributeElement["attributeValue"].get_string().value.to_string()
+                  .attributeName=bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
+                  .attributeValue=bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value)
               };
               attributes.push_back(attribute);
           }

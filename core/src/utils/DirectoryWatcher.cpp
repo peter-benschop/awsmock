@@ -107,8 +107,8 @@ namespace AwsMock::Core {
             DirectoryEvent ev(path, DW_ITEM_ADDED, DW_FILE_TYPE);
             this->itemAdded(this, ev);
         } else if (event->mask & IN_MODIFY) {
-            // Directory modified
-            DirectoryEvent ev(path, DW_ITEM_MODIFIED, DW_DIR_TYPE);
+            // File modified
+            DirectoryEvent ev(path, DW_ITEM_MODIFIED, DW_FILE_TYPE);
             this->itemModified(this, ev);
         }
     }

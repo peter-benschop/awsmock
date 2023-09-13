@@ -44,6 +44,11 @@ namespace AwsMock::Dto::S3 {
       std::string targetKey;
 
       /**
+       * Metadata
+       */
+      std::map<std::string, std::string> metadata;
+      
+      /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.
@@ -60,8 +65,12 @@ namespace AwsMock::Dto::S3 {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const CopyObjectRequest &r) {
-          os << "CopyObjectRequest={region='" + r.region + "' user='" + r.user + "' sourceBucket='" + r.sourceBucket + "' sourceKey='" + r.sourceKey
-              + "' targetBucket='" + r.targetBucket + "' targetKey='" + r.targetKey + "'}";
+          os << "CopyObjectRequest={region='" << r.region << "' user='" << r.user << "' sourceBucket='" << r.sourceBucket << "' sourceKey='" << r.sourceKey
+              << "' targetBucket='" << r.targetBucket << "' targetKey='" << r.targetKey << "' metadata={";
+          for (const auto &m : r.metadata) {
+              os << m.first << "=" << m.second << ", ";
+          }
+          os << '\b' << '\b' << "}}";
           return os;
       }
 

@@ -15,6 +15,8 @@
 #include "Poco/DateTimeFormatter.h"
 
 // MongoDB includes
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/string/to_string.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <mongocxx/stdx.hpp>
@@ -192,15 +194,15 @@ namespace AwsMock::Database::Entity::SQS {
       void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
 
           oid = mResult.value()["_id"].get_oid().value.to_string();
-          region = mResult.value()["region"].get_string().value.to_string();
-          queueUrl = mResult.value()["queueUrl"].get_string().value.to_string();
-          body = mResult.value()["body"].get_string().value.to_string();
+          region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
+          queueUrl = bsoncxx::string::to_string(mResult.value()["queueUrl"].get_string().value);
+          body = bsoncxx::string::to_string(mResult.value()["body"].get_string().value);
           status = mResult.value()["status"].get_int32().value;
           retries = mResult.value()["retries"].get_int32().value;
-          messageId = mResult.value()["messageId"].get_string().value.to_string();
-          receiptHandle = mResult.value()["receiptHandle"].get_string().value.to_string();
-          md5Body = mResult.value()["md5Body"].get_string().value.to_string();
-          md5Attr = mResult.value()["md5Attr"].get_string().value.to_string();
+          messageId = bsoncxx::string::to_string(mResult.value()["messageId"].get_string().value);
+          receiptHandle = bsoncxx::string::to_string(mResult.value()["receiptHandle"].get_string().value);
+          md5Body = bsoncxx::string::to_string(mResult.value()["md5Body"].get_string().value);
+          md5Attr = bsoncxx::string::to_string(mResult.value()["md5Attr"].get_string().value);
           reset = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["reset"].get_date().value) / 1000));
           created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
           modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
@@ -208,8 +210,8 @@ namespace AwsMock::Database::Entity::SQS {
           bsoncxx::array::view attributesView{mResult.value()["attributes"].get_array().value};
           for (bsoncxx::array::element attributeElement : attributesView) {
               MessageAttribute attribute{
-                  .attributeName=attributeElement["attributeName"].get_string().value.to_string(),
-                  .attributeValue=attributeElement["attributeValue"].get_string().value.to_string()
+                  .attributeName=bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
+                  .attributeValue=bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value)
               };
               attributes.push_back(attribute);
           }
@@ -223,15 +225,15 @@ namespace AwsMock::Database::Entity::SQS {
       void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
           oid = mResult.value()["_id"].get_oid().value.to_string();
-          region = mResult.value()["region"].get_string().value.to_string();
-          queueUrl = mResult.value()["queueUrl"].get_string().value.to_string();
-          body = mResult.value()["body"].get_string().value.to_string();
+          region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
+          queueUrl = bsoncxx::string::to_string(mResult.value()["queueUrl"].get_string().value);
+          body = bsoncxx::string::to_string(mResult.value()["body"].get_string().value);
           status = mResult.value()["status"].get_int32().value;
           retries = mResult.value()["retries"].get_int32().value;
-          messageId = mResult.value()["messageId"].get_string().value.to_string();
-          receiptHandle = mResult.value()["receiptHandle"].get_string().value.to_string();
-          md5Body = mResult.value()["md5Body"].get_string().value.to_string();
-          md5Attr = mResult.value()["md5Attr"].get_string().value.to_string();
+          messageId = bsoncxx::string::to_string(mResult.value()["messageId"].get_string().value);
+          receiptHandle = bsoncxx::string::to_string(mResult.value()["receiptHandle"].get_string().value);
+          md5Body = bsoncxx::string::to_string(mResult.value()["md5Body"].get_string().value);
+          md5Attr = bsoncxx::string::to_string(mResult.value()["md5Attr"].get_string().value);
           reset = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["reset"].get_date().value) / 1000));
           created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
           modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
@@ -239,8 +241,8 @@ namespace AwsMock::Database::Entity::SQS {
           bsoncxx::array::view attributesView{mResult.value()["attributes"].get_array().value};
           for (bsoncxx::array::element attributeElement : attributesView) {
               MessageAttribute attribute{
-                  .attributeName=attributeElement["attributeName"].get_string().value.to_string(),
-                  .attributeValue=attributeElement["attributeValue"].get_string().value.to_string()
+                  .attributeName=bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
+                  .attributeValue=bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value)
               };
               attributes.push_back(attribute);
           }
@@ -263,9 +265,9 @@ namespace AwsMock::Database::Entity::SQS {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const Message &m) {
-          os << "Message={oid='" + m.oid + "' queueUrl='" + m.queueUrl + "'body='" + m.body + "' status='" + std::to_string(m.status) + "' reset='" +
-              Poco::DateTimeFormatter().format(m.reset, Poco::DateTimeFormat::HTTP_FORMAT) + "' retries='" + std::to_string(m.retries) +
-              "' messageId='" + m.messageId + "' receiptHandle='" + m.receiptHandle + "' md5body='" + m.md5Body + "' md5Attr='" + m.md5Attr + "'}";
+          os << "Message={oid='" << m.oid << "' queueUrl='" << m.queueUrl << "'body='" << m.body << "' status='" << m.status << "' reset='" <<
+              Poco::DateTimeFormatter().format(m.reset, Poco::DateTimeFormat::HTTP_FORMAT) << "' retries='" << std::to_string(m.retries) <<
+              "' messageId='" << m.messageId << "' receiptHandle='" << m.receiptHandle << "' md5body='" << m.md5Body << "' md5Attr='" << m.md5Attr << "'}";
           return os;
       }
 

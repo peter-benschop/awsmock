@@ -421,6 +421,7 @@ namespace AwsMock::Service {
             for (auto &it : extraHeader) {
                 response.set(it.first, it.second);
             }
+            //DumpResponseHeaders(response);
 
             response.send();
 
@@ -520,8 +521,17 @@ namespace AwsMock::Service {
 
     void AbstractHandler::DumpRequestHeaders(Poco::Net::HTTPServerRequest &request) {
         log_trace_stream(_logger) << "Dump request headers" << std::endl;
-        std::cerr << "==================== Headers =====================" << std::endl;
+        std::cerr << "================ Request Headers =================" << std::endl;
         for (const auto &h : request) {
+            std::cerr << h.first << ": " << h.second << std::endl;
+        }
+        std::cerr << "==================================================" << std::endl;
+    }
+
+    void AbstractHandler::DumpResponseHeaders(Poco::Net::HTTPServerResponse &response) {
+        log_trace_stream(_logger) << "Dump response headers" << std::endl;
+        std::cerr << "============== Response Headers ==================" << std::endl;
+        for (const auto &h : response) {
             std::cerr << h.first << ": " << h.second << std::endl;
         }
         std::cerr << "==================================================" << std::endl;

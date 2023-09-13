@@ -44,14 +44,15 @@ namespace AwsMock::Worker {
     void TransferWorker::StartTransferServer(Database::Entity::Transfer::Transfer &server) {
 
         // Create transfer server thread
-        std::shared_ptr<Service::FtpServer> ftpserver = std::make_shared<Service::FtpServer>(_configuration);
-        _transferServerList[server.serverId] = ftpserver;
+        _ftpServer = std::make_shared<Service::FtpServer>(_configuration);
+        _transferServerList[server.serverId] = _ftpServer;
+        _ftpServer->SetServerName(server.serverId);
 
         // Add users
         for (const auto &user : server.users) {
-            ftpserver->AddUser(user.userName, user.password, user.homeDirectory);
+            _ftpServer->AddUser(user.userName, user.password, user.homeDirectory);
         }
-        Poco::ThreadPool::defaultPool().start(*ftpserver);
+        Poco::ThreadPool::defaultPool().start(*_ftpServer);
 
         // Update database
         server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::ONLINE);
@@ -145,7 +146,8 @@ namespace AwsMock::Worker {
 
         // Get key
         std::string key = GetKey(addedEvent.item);
-        SendCreateObjectRequest(_bucket, key, addedEvent.item);
+        std::string user = GetUser(key);
+        SendCreateObjectRequest(_bucket, key, user, addedEvent.item);
     }
 
     void TransferWorker::OnFileModified(const Core::DirectoryEvent &modifiedEvent) {
@@ -153,7 +155,8 @@ namespace AwsMock::Worker {
 
         // Get key
         std::string key = GetKey(modifiedEvent.item);
-        SendCreateObjectRequest(_bucket, key, modifiedEvent.item);
+        std::string user = GetUser(key);
+        SendCreateObjectRequest(_bucket, key, user, modifiedEvent.item);
     }
 
     void TransferWorker::OnFileDeleted(const Core::DirectoryEvent &deleteEvent) {
@@ -173,14 +176,17 @@ namespace AwsMock::Worker {
         log_debug_stream(_logger) << "Create bucket message request send" << std::endl;
     }
 
-    void TransferWorker::SendCreateObjectRequest(const std::string &bucket, const std::string &key, const std::string &fileName) {
+    void TransferWorker::SendCreateObjectRequest(const std::string &bucket, const std::string &key, const std::string &user, const std::string &fileName) {
 
+        std::string serverName = _ftpServer->GetServerName();
         std::string url = _baseUrl + "/" + bucket + "/" + key;
         std::map<std::string, std::string> headers;
         headers["Content-MD5"] = Core::Crypto::Base64Encode(Core::Crypto::GetMd5FromFile(fileName));
         headers["Content-Length"] = std::to_string(Core::FileUtils::FileSize(fileName));
         headers["x-amz-sdk-checksum-algorithm"] = "SHA256";
         headers["x-amz-checksum-sha256"] = Core::Crypto::GetSha256FromFile(fileName);
+        headers["x-amz-meta-user-agent"] = "AWSTransfer";
+        headers["x-amz-meta-user-agent-id"] = user + "@" + serverName;
         SendFile(url, fileName, headers);
         log_debug_stream(_logger) << "Create object message request send, url: " << url << std::endl;
     }
@@ -206,5 +212,13 @@ namespace AwsMock::Worker {
             return key.substr(1);
         }
         return key;
+    }
+
+    std::string TransferWorker::GetUser(const std::string &path) {
+        std::vector<std::string> parts = Core::StringUtils::Split(path, '/');
+        if(parts.empty()) {
+          return {};
+        }
+        return parts[1];
     }
 } // namespace AwsMock::Worker

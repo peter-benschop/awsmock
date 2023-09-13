@@ -18,6 +18,8 @@
 #include <Poco/DateTimeFormatter.h>
 
 // MongoDB includes
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/string/to_string.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <mongocxx/stdx.hpp>
@@ -123,7 +125,6 @@ namespace AwsMock::Database::Entity::S3 {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const Object &o);
-
     };
 
     typedef struct Object Object;

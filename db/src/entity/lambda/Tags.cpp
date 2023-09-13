@@ -23,11 +23,11 @@ namespace AwsMock::Database::Entity::Lambda {
 
         std::vector <std::string> keys;
         std::transform(mResult->begin(), mResult->end(), std::back_inserter(keys), [](bsoncxx::document::element ele) {
-          return ele.key().to_string();
+          return bsoncxx::string::to_string(ele.key());
         });
 
         for (auto &it : keys) {
-            tags.emplace_back(std::make_pair(it, mResult.value()[it].get_string().value.to_string()));
+            tags.emplace_back(it, bsoncxx::string::to_string(mResult.value()[it].get_string().value));
         }
     }
 

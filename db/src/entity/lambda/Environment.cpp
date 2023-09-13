@@ -11,7 +11,7 @@ namespace AwsMock::Database::Entity::Lambda {
         auto varDoc = mResult.value()["variables"].get_array();
         for (auto &v : varDoc.value) {
             for (auto &it : v.get_document().value) {
-                variables.emplace_back(it.key().to_string(), it.get_string().value.to_string());
+                variables.emplace_back(it.key(), it.get_string().value);
             }
         }
     }

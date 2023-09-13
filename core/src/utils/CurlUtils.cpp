@@ -10,7 +10,7 @@ namespace AwsMock::Core {
 
     CurlResponse CurlUtils::SendRequest(const std::string &method, const std::string &path) {
 
-        _readBuffer={};
+        _readBuffer.clear();
         curl = curl_easy_init();
         if (!curl) {
             log_error_stream(_logger) << "Error while initiating curl" << std::endl;
@@ -19,7 +19,7 @@ namespace AwsMock::Core {
         }
 
         // Set headers
-        headers = curl_slist_append(headers, "Accept: application/json");
+        headers = curl_slist_append(nullptr, "Accept: application/json");
         headers = curl_slist_append(headers, "Content-Type: application/json");
 
         // Set options
@@ -41,13 +41,14 @@ namespace AwsMock::Core {
 
         CurlResponse response = {.statusCode = status, .statusReason=curl_easy_strerror(res), .output=_readBuffer};
         curl_easy_cleanup(curl);
+        curl_slist_free_all(headers);
 
         return response;
     }
 
     CurlResponse CurlUtils::SendRequest(const std::string &method, const std::string &path, const std::string &body) {
 
-        _readBuffer={};
+        _readBuffer.clear();
         curl = curl_easy_init();
         if (!curl) {
             log_error_stream(_logger) << "Error while initiating curl" << std::endl;
@@ -56,7 +57,7 @@ namespace AwsMock::Core {
         }
 
         // Set headers
-        headers = curl_slist_append(headers, "Accept: application/json");
+        headers = curl_slist_append(nullptr, "Accept: application/json");
         headers = curl_slist_append(headers, "Content-Type: application/json");
 
         // Set options
@@ -78,13 +79,14 @@ namespace AwsMock::Core {
 
         CurlResponse response = {.statusCode = status, .statusReason=curl_easy_strerror(res), .output=_readBuffer};
         curl_easy_cleanup(curl);
+        curl_slist_free_all(headers);
 
         return response;
     }
 
     CurlResponse CurlUtils::SendFileRequest(const std::string &method, const std::string &url, const std::string &header, const std::string &fileName) {
 
-        _readBuffer={};
+        _readBuffer.clear();
         curl = curl_easy_init();
         if (!curl) {
             log_error_stream(_logger) << "Error while initiating curl" << std::endl;
@@ -104,7 +106,7 @@ namespace AwsMock::Core {
             return {};
 
         // Set headers
-        headers = curl_slist_append(headers, "Accept: application/json");
+        headers = curl_slist_append(nullptr, "Accept: application/json");
         headers = curl_slist_append(headers, "Content-Type: application/json");
 
         // Set options
@@ -129,6 +131,7 @@ namespace AwsMock::Core {
 
         CurlResponse response = {.statusCode = status, .statusReason=curl_easy_strerror(res), .output=_readBuffer};
         curl_easy_cleanup(curl);
+        curl_slist_free_all(headers);
 
         return response;
     }

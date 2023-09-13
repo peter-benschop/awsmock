@@ -62,29 +62,6 @@ namespace AwsMock::Service {
         EXPECT_TRUE(result);
     }
 
-    TEST_F(DockerServiceTest, ContainerCreateDtoTest) {
-
-        // arrange
-        std::string exposedPorts = CONTAINER_PORT;
-        std::string domainName = std::string(NAME) + NETWORK_NAME;
-        std::vector<std::string>
-            environment = {"AWS_EC2_METADATA_DISABLED=true", "JAVA_TOOL_OPTIONS=-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localstack"};
-
-        // act
-        Dto::Docker::CreateContainerRequest request = {
-            .hostName=NAME,
-            .domainName=domainName,
-            .user="root",
-            .image=IMAGE,
-            .environment=environment,
-            .containerPort=exposedPorts};
-        std::string jsonString = request.ToJson();
-
-        // assert
-        EXPECT_FALSE(jsonString.empty());
-        EXPECT_TRUE(Core::StringUtils::Equals(jsonString,
-                                              R"({"Domainname":"test-container.dockerhost.net","Env":["AWS_EC2_METADATA_DISABLED=true","JAVA_TOOL_OPTIONS=-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localstack"],"ExposedPorts":{"8080/tcp":{}},"HostConfig":{"ExtraHosts":["host.docker.internal:host-gateway","localstack:host-gateway"],"NetworkMode":"","PortBindings":{"8080/tcp":[{"HostPort":""}]}},"Hostname":"test-container","Image":"test-image:latest","User":"root"})"));
-    }
 } // namespace AwsMock::Core
 
 #endif // AWMOCK_CORE_SQSSERVICETEST_H

@@ -19,13 +19,13 @@ namespace AwsMock::Database {
         _password = _configuration.getString("awsmock.mongodb.password", "admin");
 
         // MongoDB URI
-        _uri = mongocxx::uri("mongodb://" + _user + ":" + _password + "@" + _host + ":" + std::to_string(_port) + "/?maxPoolSize=32");
+        _uri = mongocxx::uri("mongodb://" + _user + ":" + _password + "@" + _host + ":" + std::to_string(_port) + "/?maxPoolSize=32&serverSelectionTimeoutMS=5000");
         _pool = new mongocxx::pool{_uri};
         log_debug_stream(_logger) << "MongoDB connection initialized" << std::endl;
     }
 
     mongocxx::database Database::GetConnection() {
-        //return _client[_name];
+        if(_pool->try_acquire())
         auto c = _pool->acquire();
         return (*c)[_name];
     }

@@ -14,6 +14,8 @@
 #include <Poco/JSON/Parser.h>
 
 // MongoDB includes
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/string/to_string.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <mongocxx/stdx.hpp>
@@ -118,7 +120,7 @@ namespace AwsMock::Database::Entity::SQS {
        */
       [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
 
-          deadLetterTargetArn = mResult.value()["deadLetterTargetArn"].get_string().value.to_string();
+          deadLetterTargetArn = bsoncxx::string::to_string(mResult.value()["deadLetterTargetArn"].get_string().value);
           maxReceiveCount = mResult.value()["maxReceiveCount"].get_int32().value;
       }
 
@@ -129,7 +131,7 @@ namespace AwsMock::Database::Entity::SQS {
        */
       [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
-          deadLetterTargetArn = mResult.value()["deadLetterTargetArn"].get_string().value.to_string();
+          deadLetterTargetArn = bsoncxx::string::to_string(mResult.value()["deadLetterTargetArn"].get_string().value);
           maxReceiveCount = mResult.value()["maxReceiveCount"].get_int32().value;
       }
 
@@ -252,11 +254,11 @@ namespace AwsMock::Database::Entity::SQS {
           delaySeconds = mResult.value()["delaySeconds"].get_int32().value;
           maxMessageSize = mResult.value()["maxMessageSize"].get_int32().value;
           messageRetentionPeriod = mResult.value()["messageRetentionPeriod"].get_int32().value;
-          policy = mResult.value()["policy"].get_string().value.to_string();
+          policy = bsoncxx::string::to_string(mResult.value()["policy"].get_string().value);
           receiveMessageWaitTime = mResult.value()["receiveMessageWaitTime"].get_int32().value;
           visibilityTimeout = mResult.value()["visibilityTimeout"].get_int32().value;
           redrivePolicy.FromDocument(mResult.value()["redrivePolicy"].get_document().value);
-          redriveAllowPolicy = mResult.value()["redriveAllowPolicy"].get_string().value.to_string();
+          redriveAllowPolicy = bsoncxx::string::to_string(mResult.value()["redriveAllowPolicy"].get_string().value);
           approximateNumberOfMessages = mResult.value()["approximateNumberOfMessages"].get_int64().value;
           approximateNumberOfMessagesDelayed = mResult.value()["approximateNumberOfMessagesDelayed"].get_int64().value;
           approximateNumberOfMessagesNotVisible = mResult.value()["approximateNumberOfMessagesNotVisible"].get_int64().value;
@@ -273,11 +275,11 @@ namespace AwsMock::Database::Entity::SQS {
           delaySeconds = mResult.value()["delaySeconds"].get_int32().value;
           maxMessageSize = mResult.value()["maxMessageSize"].get_int32().value;
           messageRetentionPeriod = mResult.value()["messageRetentionPeriod"].get_int32().value;
-          policy = mResult.value()["policy"].get_string().value.to_string();
+          policy = bsoncxx::string::to_string(mResult.value()["policy"].get_string().value);
           receiveMessageWaitTime = mResult.value()["receiveMessageWaitTime"].get_int32().value;
           visibilityTimeout = mResult.value()["visibilityTimeout"].get_int32().value;
           redrivePolicy.FromDocument(mResult.value()["redrivePolicy"].get_document().value);
-          redriveAllowPolicy = mResult.value()["redriveAllowPolicy"].get_string().value.to_string();
+          redriveAllowPolicy = bsoncxx::string::to_string(mResult.value()["redriveAllowPolicy"].get_string().value);
           approximateNumberOfMessages = mResult.value()["approximateNumberOfMessages"].get_int64().value;
           approximateNumberOfMessagesDelayed = mResult.value()["approximateNumberOfMessagesDelayed"].get_int64().value;
           approximateNumberOfMessagesNotVisible = mResult.value()["approximateNumberOfMessagesNotVisible"].get_int64().value;
@@ -387,11 +389,11 @@ namespace AwsMock::Database::Entity::SQS {
       [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
 
           oid = mResult.value()["_id"].get_oid().value.to_string();
-          region = mResult.value()["region"].get_string().value.to_string();
-          name = mResult.value()["name"].get_string().value.to_string();
-          owner = mResult.value()["owner"].get_string().value.to_string();
-          queueUrl = mResult.value()["queueUrl"].get_string().value.to_string();
-          queueArn = mResult.value()["queueArn"].get_string().value.to_string();
+          region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
+          name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
+          owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
+          queueUrl = bsoncxx::string::to_string(mResult.value()["queueUrl"].get_string().value);
+          queueArn = bsoncxx::string::to_string(mResult.value()["queueArn"].get_string().value);
           attributes.FromDocument(mResult.value()["attributes"].get_document().value);
           created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
           modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
@@ -405,14 +407,14 @@ namespace AwsMock::Database::Entity::SQS {
       [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
           oid = mResult.value()["_id"].get_oid().value.to_string();
-          region = mResult.value()["region"].get_string().value.to_string();
-          name = mResult.value()["name"].get_string().value.to_string();
-          owner = mResult.value()["owner"].get_string().value.to_string();
-          queueUrl = mResult.value()["queueUrl"].get_string().value.to_string();
-          queueArn = mResult.value()["queueArn"].get_string().value.to_string();
+          region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
+          name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
+          owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
+          queueUrl = bsoncxx::string::to_string(mResult.value()["queueUrl"].get_string().value);
+          queueArn = bsoncxx::string::to_string(mResult.value()["queueArn"].get_string().value);
           attributes.FromDocument(mResult.value()["attributes"].get_document().value);
-          created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value)/1000));
-          modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value)/1000));
+          created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
+          modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
       }
 
       /**
