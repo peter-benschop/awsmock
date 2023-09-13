@@ -7,12 +7,21 @@
 
 // C++ includes
 #include <string>
+#include <sstream>
+#include <iostream>
 #include <chrono>
+#include <map>
+
+// Poco includes
+#include <Poco/DateTime.h>
+#include <Poco/DateTimeFormat.h>
+#include <Poco/DateTimeFormatter.h>
 
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <mongocxx/stdx.hpp>
+#include <mongocxx/exception/exception.hpp>
 
 namespace AwsMock::Database::Entity::S3 {
 
@@ -66,6 +75,11 @@ namespace AwsMock::Database::Entity::S3 {
       std::string contentType;
 
       /**
+       * Metadata
+       */
+      std::map<std::string, std::string> metadata;
+
+      /**
        * Creation date
        */
       Poco::DateTime created;
@@ -80,94 +94,35 @@ namespace AwsMock::Database::Entity::S3 {
        *
        * @return entity as MongoDB document.
        */
-      [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
-
-          view_or_value<view, value> bucketDoc = make_document(
-              kvp("region", region),
-              kvp("bucket", bucket),
-              kvp("key", key),
-              kvp("owner", owner),
-              kvp("size", size),
-              kvp("md5sum", md5sum),
-              kvp("contentType", contentType),
-              kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-              kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
-
-          return bucketDoc;
-      }
+      [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
       /**
        * Converts the MongoDB document to an entity
        *
        * @return entity.
        */
-      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
-
-          try {
-              if(!mResult->empty()) {
-                  oid = mResult.value()["_id"].get_oid().value.to_string();
-                  region = mResult.value()["region"].get_string().value.to_string();
-                  bucket = mResult.value()["bucket"].get_string().value.to_string();
-                  key = mResult.value()["key"].get_string().value.to_string();
-                  owner = mResult.value()["owner"].get_string().value.to_string();
-                  size = mResult.value()["size"].get_int64().value;
-                  md5sum = mResult.value()["md5sum"].get_string().value.to_string();
-                  contentType = mResult.value()["contentType"].get_string().value.to_string();
-                  owner = mResult.value()["owner"].get_string().value.to_string();
-                  created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-                  modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
-              }
-          } catch (mongocxx::exception::system_error &e) {
-              std::cerr << "Exception: " << e.what() << std::endl;
-          }
-      }
+      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult);
 
       /**
        * Converts the MongoDB document to an entity
        *
        * @return entity.
        */
-      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
-          try {
-              if(!mResult->empty()) {
-                  oid = mResult.value()["_id"].get_oid().value.to_string();
-                  region = mResult.value()["region"].get_string().value.to_string();
-                  bucket = mResult.value()["bucket"].get_string().value.to_string();
-                  key = mResult.value()["key"].get_string().value.to_string();
-                  owner = mResult.value()["owner"].get_string().value.to_string();
-                  size = mResult.value()["size"].get_int64().value;
-                  md5sum = mResult.value()["md5sum"].get_string().value.to_string();
-                  contentType = mResult.value()["contentType"].get_string().value.to_string();
-                  owner = mResult.value()["owner"].get_string().value.to_string();
-                  created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-                  modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
-              }
-          } catch (mongocxx::exception::system_error &e) {
-              std::cerr << "Exception: " << e.what() << std::endl;
-          }
-      }
+      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
       /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.
        */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
+      [[nodiscard]] std::string ToString() const;
 
       /**
        * Stream provider.
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const Object &o) {
-          os << "Object={id='" + o.oid + "' bucket='" + o.bucket + "' key='" + o.key + "' owner='" + o.owner + "' size='" + std::to_string(o.size) +
-              "' md5sum='" + o.md5sum + "' contentType='" + o.contentType + "'}";
-          return os;
-      }
+      friend std::ostream &operator<<(std::ostream &os, const Object &o);
 
     };
 

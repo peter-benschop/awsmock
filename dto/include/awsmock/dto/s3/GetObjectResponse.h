@@ -44,6 +44,11 @@ namespace AwsMock::Dto::S3 {
       std::string contentType;
 
       /**
+       * Metadata
+       */
+      std::map<std::string, std::string> metadata;
+
+      /**
        * Created
        */
       Poco::DateTime created;
@@ -70,9 +75,13 @@ namespace AwsMock::Dto::S3 {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const GetObjectResponse &r) {
-          os << "GetObjectResponse={bucket='" + r.bucket + "' key='" + r.key + "' size='"+ std::to_string(r.size) + "' filename='" + r.filename  +
-          "' contentType='"+ r.contentType + "' created='" + Poco::DateTimeFormatter().format(r.created, Poco::DateTimeFormat::HTTP_FORMAT) +
-          "' modified='" + Poco::DateTimeFormatter().format(r.modified, Poco::DateTimeFormat::HTTP_FORMAT) +"'}";
+          os << "GetObjectResponse={bucket='" << r.bucket << "', key='" << r.key << "', size='" << r.size << "', filename='" << r.filename << "', contentType='"
+             << r.contentType << "', metadata={";
+          for (const auto &m : r.metadata) {
+              os << m.first << "=" << m.second << ", ";
+          }
+          os << '\b' << '\b' << "' created='" << Poco::DateTimeFormatter().format(r.created, Poco::DateTimeFormat::HTTP_FORMAT) <<
+             "', modified='" << Poco::DateTimeFormatter().format(r.modified, Poco::DateTimeFormat::HTTP_FORMAT) << "'}";
           return os;
       }
 

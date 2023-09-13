@@ -243,6 +243,17 @@ namespace AwsMock::Service {
         return request.has(name);
     }
 
+    std::map<std::string, std::string> AbstractHandler::GetMetadata(Poco::Net::HTTPServerRequest &request) {
+        std::map<std::string, std::string> metadata;
+        for(const auto &m:request) {
+            if(Core::StringUtils::StartsWith(m.first, "x-amz-meta-")) {
+                std::string name = Core::StringUtils::StripBeginning(m.first, "x-amz-meta-");
+                metadata[name] = m.second;
+            }
+        }
+        return metadata;
+    }
+
     void AbstractHandler::GetRegionUser(const std::string &authorization, std::string &region, std::string &user) {
         Poco::RegularExpression::MatchVec posVec;
 
@@ -290,35 +301,6 @@ namespace AwsMock::Service {
             }
         }
         log_trace_stream(_logger) << "Found string parameter, name: " << name << " value: " << value << std::endl;
-        return value;
-    }
-
-    std::string AbstractHandler::GetStringParameter(const std::string &path, const std::string &name, int index) {
-
-        std::string parameters = Core::StringUtils::UrlDecode(Core::StringUtils::SubStringAfter(path, "?"));
-
-        std::vector<std::string> pathParts = Core::StringUtils::Split(path, '&');
-        if(index > pathParts.size()) {
-            log_error_stream(_logger) << "Invalid index, size: " << pathParts.size() << " index: " << index << std::endl;
-            return {};
-        }
-
-        std::string paramString = pathParts[index];
-        std::vector<std::string> parts = Core::StringUtils::Split(paramString, '=');
-        log_trace_stream(_logger) << "Found string parameter, name: " << name << " value: " << parts[1] << std::endl;
-
-        return parts[1];
-    }
-
-    std::string AbstractHandler::GetStringPathParameter(const std::string &path, int index) {
-        std::string value;
-        std::vector<std::string> pathParts = Core::StringUtils::Split(path, '/');
-        if(index >= pathParts.size()) {
-            log_error_stream(_logger) << "Invalid index, size: " << pathParts.size() << " index: " << index << std::endl;
-            return {};
-        }
-        value = pathParts[index];
-        log_trace_stream(_logger) << "Found string path parameter, name: " << index << " value: " << value << std::endl;
         return value;
     }
 
@@ -533,6 +515,15 @@ namespace AwsMock::Service {
         log_trace_stream(_logger) << "Dump request" << std::endl;
         std::cerr << "==================== Request =====================" << std::endl;
         request.write(std::cerr);
+        std::cerr << "==================================================" << std::endl;
+    }
+
+    void AbstractHandler::DumpRequestHeaders(Poco::Net::HTTPServerRequest &request) {
+        log_trace_stream(_logger) << "Dump request headers" << std::endl;
+        std::cerr << "==================== Headers =====================" << std::endl;
+        for (const auto &h : request) {
+            std::cerr << h.first << ": " << h.second << std::endl;
+        }
         std::cerr << "==================================================" << std::endl;
     }
 

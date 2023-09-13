@@ -36,7 +36,10 @@ namespace AwsMock::Core {
     }
 
     long FileUtils::FileSize(const std::string &fileName) {
-        return (long)std::filesystem::file_size({fileName.c_str()});
+        if(FileExists(fileName)) {
+            return (long) std::filesystem::file_size({fileName.c_str()});
+        }
+        return -1;
     }
 
     void FileUtils::MoveTo(const std::string &sourceFileName, const std::string &targetFileName, bool createDir) {
