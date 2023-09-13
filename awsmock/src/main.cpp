@@ -79,6 +79,7 @@ namespace AwsMock {
        */
       [[maybe_unused]] void initialize(Application &self) override {
 
+          InitializeLogging();
           InitializeMonitoring();
           InitializeErrorHandler();
           InitializeIndexes();
@@ -155,6 +156,14 @@ namespace AwsMock {
           }
       }
 
+      void InitializeLogging() {
+          Poco::AutoPtr<Poco::ConsoleChannel> pCons(new Poco::ConsoleChannel());
+          Poco::AutoPtr<Poco::PatternFormatter> pPF(new Poco::PatternFormatter("%d-%m-%Y %H:%M:%S.%i [%q] %I %s:%u - %t"));
+          Poco::AutoPtr<Poco::FormattingChannel> pFC(new Poco::FormattingChannel(pPF, pCons));
+          Poco::Logger::root().setChannel(pFC);
+          log_info_stream(_logger) << "Logging initialized" << std::endl;
+      }
+
       /**
        * Initialize the Prometheus monitoring counters and start the prometheus server.
        */
@@ -189,6 +198,8 @@ namespace AwsMock {
        */
       void InitializeCurl() {
           curl_global_init(CURL_GLOBAL_ALL);
+          log_debug_stream(_logger) << "CUrl library initialized" << std::endl;
+
       }
 
       void StartWorker() {
@@ -254,7 +265,7 @@ namespace AwsMock {
       /**
        * Logger
        */
-      Core::LogStream _logger = Core::LogStream(Poco::Logger::get("root"));
+      Core::LogStream _logger = Core::LogStream(Poco::Logger::root());
 
       /**
        * Application configuration

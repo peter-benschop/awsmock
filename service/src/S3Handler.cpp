@@ -316,6 +316,7 @@ namespace AwsMock::Service {
             SendHeadResponse(response, headerMap);
 
         } catch (Poco::Exception &exc) {
+            log_error_stream(_logger) << exc.what() << std::endl;
             SendErrorResponse("S3", response, exc);
         } catch (std::exception &exc) {
             log_error_stream(_logger) << exc.what() << std::endl;

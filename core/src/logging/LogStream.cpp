@@ -32,7 +32,7 @@ namespace AwsMock::Core {
     }
 
     int LogStreamBuf::writeToDevice(char c) {
-        Poco::Mutex::ScopedLock lock(_mutex);
+        //Poco::Mutex::ScopedLock lock(_mutex);
         if (c == '\n' || c == '\r') {
             if (_message.length() > 0) {
                 Poco::Message msg(_logger.name(), _message, _priority, _file, _line);
@@ -64,14 +64,13 @@ namespace AwsMock::Core {
     LogStream::LogStream(Poco::Logger &logger, Poco::Message::Priority priority, std::size_t bufferCapacity) :
         LogIOS(logger, priority, bufferCapacity),
         std::ostream(&_buf) {
-        SetDefaultConsoleLogger(logger);
     }
 
     LogStream::~LogStream() = default;
 
-    void LogStream::SetDefaultConsoleLogger(Poco::Logger &logger) {
+    /*void LogStream::SetDefaultConsoleLogger(Poco::Logger &logger) {
         logger.setChannel(formattingChannel());
-    }
+    }*/
 
     LogStream &LogStream::fatal() {
         return priority(Poco::Message::PRIO_FATAL);
