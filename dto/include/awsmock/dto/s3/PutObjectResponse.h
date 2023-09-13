@@ -55,14 +55,19 @@ namespace AwsMock::Dto::S3 {
       std::string checksumSha256;
 
       /**
+       * Metadata
+       */
+      std::map<std::string, std::string> metadata;
+
+      /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.
        */
       [[nodiscard]] std::string ToString() const {
-            std::stringstream ss;
-            ss << (*this);
-            return ss.str();
+          std::stringstream ss;
+          ss << (*this);
+          return ss.str();
       }
 
       /**
@@ -71,8 +76,12 @@ namespace AwsMock::Dto::S3 {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const PutObjectResponse &p) {
-            os << "PutObjectResponse={bucket='" << p.bucket << "' key='" << p.key << "' etag='" << p.etag << "' contentLength: '" << p.contentLength << "'}";
-            return os;
+          os << "PutObjectResponse={bucket='" << p.bucket << "' key='" << p.key << "' etag='" << p.etag << "' contentLength: '" << p.contentLength;
+          for (const auto &m : p.metadata) {
+              os << m.first << "=" << m.second << ", ";
+          }
+          os << '\b' << '\b' << "'}";
+          return os;
       }
 
     };

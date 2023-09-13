@@ -373,6 +373,14 @@ namespace AwsMock::Service {
       std::string GetHeaderValue(Poco::Net::HTTPServerRequest &request, const std::string &name, const std::string &defaultValue);
 
       /**
+       * Gets a header values
+       *
+       * @param request HTTP request
+       * @return string map of metadata
+       */
+      std::map<std::string,std::string> GetMetadata(Poco::Net::HTTPServerRequest &request);
+
+      /**
        * Check for the existence of given header key
        * @param request HTTP request
        * @param name header key name
@@ -386,6 +394,13 @@ namespace AwsMock::Service {
        * @param request HTTP request
        */
       void DumpRequest(Poco::Net::HTTPServerRequest &request);
+
+      /**
+       * Dump the request to std::cerr
+       *
+       * @param request HTTP request
+       */
+      void DumpRequestHeaders(Poco::Net::HTTPServerRequest &request);
 
       /**
        * Dump the response to std::cerr

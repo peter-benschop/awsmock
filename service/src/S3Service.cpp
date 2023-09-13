@@ -87,6 +87,7 @@ namespace AwsMock::Service {
                 .md5Sum = object.md5sum,
                 .contentType = object.contentType,
                 .size = object.size,
+                .metadata = object.metadata,
                 .created = object.created,
                 .modified = object.modified
             };
@@ -105,26 +106,27 @@ namespace AwsMock::Service {
     Dto::S3::GetObjectResponse S3Service::GetObject(Dto::S3::GetObjectRequest &request) {
         log_trace_stream(_logger) << "Get object request, s3Request: " << request.ToString() << std::endl;
 
-        Dto::S3::GetObjectResponse getObjectResponse;
+        Dto::S3::GetObjectResponse response;
         try {
 
             Database::Entity::S3::Object object = _database->GetObject(request.bucket, request.bucket, request.key);
 
             std::string filename = _dataS3Dir + Poco::Path::separator() + request.bucket + Poco::Path::separator() + request.key;
-            getObjectResponse.bucket = object.bucket;
-            getObjectResponse.key = object.key;
-            getObjectResponse.size = object.size;
-            getObjectResponse.contentType = object.contentType;
-            getObjectResponse.filename = filename;
-            getObjectResponse.modified = object.modified;
-            log_trace_stream(_logger) << "S3 get object response: " << getObjectResponse.ToString() << std::endl;
+            response.bucket = object.bucket;
+            response.key = object.key;
+            response.size = object.size;
+            response.contentType = object.contentType;
+            response.filename = filename;
+            response.modified = object.modified;
+            response.metadata = object.metadata;
+            log_trace_stream(_logger) << "S3 get object response: " << response.ToString() << std::endl;
             log_info_stream(_logger) << "Object returned, bucket: " << request.bucket << " key: " << request.key << std::endl;
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "S3 get object failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
-        return getObjectResponse;
+        return response;
     }
 
     Dto::S3::ListAllBucketResponse S3Service::ListAllBuckets() {
@@ -282,7 +284,8 @@ namespace AwsMock::Service {
                 .owner=request.owner,
                 .size=size,
                 .md5sum=md5sum,
-                .contentType=request.contentType
+                .contentType=request.contentType,
+                .metadata=request.metadata
             };
 
             object = _database->CreateOrUpdateObject(object);
@@ -299,7 +302,8 @@ namespace AwsMock::Service {
                 .md5Sum=md5sum,
                 .contentLength=size,
                 .checksumAlgorithm="SHA256",
-                .checksumSha256=sha256sum
+                .checksumSha256=sha256sum,
+                .metadata=request.metadata
             };
 
         } catch (Poco::Exception &ex) {

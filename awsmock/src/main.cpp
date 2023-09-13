@@ -20,8 +20,8 @@
 // C includes
 #include <unistd.h>
 #include <execinfo.h>
-#include <signal.h>
-#include <stdlib.h>
+#include <csignal>
+#include <cstdlib>
 
 // C++ standard includes
 #include <iostream>

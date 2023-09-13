@@ -40,6 +40,11 @@ namespace AwsMock::Service {
                 headerMap.emplace_back("Content-Length", std::to_string(s3Response.size));
                 headerMap.emplace_back("Last-Modified", Poco::DateTimeFormatter().format(s3Response.modified, Poco::DateTimeFormat::HTTP_FORMAT));
 
+                // Set user headers
+                for (const auto &m : s3Response.metadata) {
+                    headerMap.emplace_back("x-amz-meta-" + m.first, m.second);
+                }
+
                 SendOkResponse(response, s3Response.filename, s3Response.size, &headerMap);
 
             } else if (Core::HttpUtils::HasQueryParameter(request.getURI(), "list-type")) {
@@ -154,6 +159,11 @@ namespace AwsMock::Service {
 
             } else if(!key.empty()) {
 
+                //DumpRequestHeaders(request);
+
+                // Get the user metadata
+                std::map<std::string, std::string> metadata = GetMetadata(request);
+
                 // S3 put object request
                 Dto::S3::PutObjectRequest putObjectRequest = {
                     .region=region,
@@ -162,7 +172,8 @@ namespace AwsMock::Service {
                     .owner=user,
                     .md5Sum=GetHeaderValue(request, "Content-MD5", ""),
                     .contentType=GetHeaderValue(request, "Content-Type", "application/octet-stream"),
-                    .contentLength=std::stol(GetHeaderValue(request, "Content-Length", "0"))
+                    .contentLength=std::stol(GetHeaderValue(request, "Content-Length", "0")),
+                    .metadata=metadata
                 };
                 log_debug_stream(_logger) << "ContentLength: " << putObjectRequest.contentLength << " contentType: " << putObjectRequest.contentType << std::endl;
 
@@ -276,6 +287,7 @@ namespace AwsMock::Service {
 
             HeaderMap headerMap;
             headerMap.emplace_back("Server", "awsmock");
+            headerMap.emplace_back("Content-Type", "application/json");
 
             if(s3Response.bucket.empty()) {
 
@@ -286,12 +298,17 @@ namespace AwsMock::Service {
 
                 headerMap.emplace_back("Last-Modified", Poco::DateTimeFormatter().format(s3Response.modified, Poco::DateTimeFormat::HTTP_FORMAT));
                 headerMap.emplace_back("Content-Length", std::to_string(s3Response.size));
-                headerMap.emplace_back("Content-Type", "application/json");
                 headerMap.emplace_back("ETag", "\"" + s3Response.md5Sum + "\"");
                 headerMap.emplace_back("accept-ranges", "bytes");
                 headerMap.emplace_back("x-amz-id-2", Core::StringUtils::GenerateRandomString(30));
                 headerMap.emplace_back("x-amz-request-id", Poco::UUIDGenerator().createRandom().toString());
                 headerMap.emplace_back("x-amz-version-id", Core::StringUtils::GenerateRandomString(30));
+
+                // User supplied metadata
+                for (const auto &m : s3Response.metadata) {
+                    headerMap.emplace_back("x-amz-meta-" + m.first, m.second);
+                }
+                log_info_stream(_logger) << s3Response.ToString() << std::endl;
                 SendHeadResponse(response, headerMap);
 
             }

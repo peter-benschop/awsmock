@@ -49,11 +49,9 @@ namespace AwsMock::Dto::S3 {
       long contentLength;
 
       /**
-       * Write file
-       *
-       * <p>Indicates that the file does not need to be written.</p>
+       * Metadata
        */
-      bool contentIntern = false;
+      std::map<std::string, std::string> metadata;
 
       /**
        * Converts the DTO to a string representation.
@@ -73,7 +71,11 @@ namespace AwsMock::Dto::S3 {
        */
       friend std::ostream &operator<<(std::ostream &os, const PutObjectRequest &r) {
           os << "PutObjectRequest={bucket='" << r.bucket << "' key='" << r.key << "' md5sum='" << r.md5Sum << "' contentType='" << r.contentType << "' contentLength='"
-             << r.contentLength << "' owner='" << r.owner << "' region=' " << r.region << "' contentIntern='" << r.contentIntern << "'}";
+             << r.contentLength << "' owner='" << r.owner << "' region=' " << r.region << "', metadata={";
+          for (const auto &m : r.metadata) {
+              os << m.first << "=" << m.second << ", ";
+          }
+          os << '\b' << '\b' << "}}";
           return os;
       }
 

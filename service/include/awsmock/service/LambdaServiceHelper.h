@@ -47,7 +47,7 @@ namespace AwsMock::Service {
       /**
        * Logger
        */
-      Core::LogStream _logger;
+      //Core::LogStream _logger;
 
       /**
        * Data directory
@@ -88,7 +88,7 @@ namespace AwsMock::Service {
        * @param lambdaEntity lambda entity
        * @param dockerTag docker tag to use
        */
-      void CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
+      void CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag, Core::LogStream &_logger);
 
       /**
        * Creates an new docker container, in case the container does not exists inside the docker daemon.
@@ -96,7 +96,7 @@ namespace AwsMock::Service {
        * @param entity lambda entity.
        * @param dockerTag docker tag.
        */
-      void CreateDockerContainer(Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
+      void CreateDockerContainer(Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag, Core::LogStream &_logger);
 
       /**
        * Converts the lambda environment to a vector of string, which is needed by the docker API
@@ -104,7 +104,7 @@ namespace AwsMock::Service {
        * @param lambdaEnvironment lambda environment
        * @return vector of strings containing the runtime environment
        */
-      std::vector<std::string> GetEnvironment(const Database::Entity::Lambda::Environment &lambdaEnvironment);
+      std::vector<std::string> GetEnvironment(const Database::Entity::Lambda::Environment &lambdaEnvironment, Core::LogStream &_logger);
 
       /**
        * Unpack the provided ZIP file.
@@ -116,7 +116,7 @@ namespace AwsMock::Service {
        * @param fileName filename of the Base64 encoded and zipped code file
        * @return code directory
        */
-      std::string UnpackZipFile(const std::string &zipFile, const std::string &runtime, const std::string &fileName);
+      std::string UnpackZipFile(const std::string &zipFile, const std::string &runtime, const std::string &fileName, Core::LogStream &_logger);
 
       /**
        * Returns a random host port in the range 32768 - 65536 for the host port of the docker container which is running the lambda function.
