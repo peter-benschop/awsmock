@@ -51,7 +51,6 @@ namespace AwsMock::Worker {
                 continue;
             }
 
-            //Core::FileUtils::Touch(filePath);
             // Get bucket, key
             std::string bucket, key;
             GetBucketKeyFromFile(filePath, bucket, key);
@@ -60,7 +59,6 @@ namespace AwsMock::Worker {
             if (!ExistsObject(bucket, key)) {
                 CreateObject(filePath);
             }
-            Poco::Thread::sleep(1000);
         }
 
         // Check all database files against file system
