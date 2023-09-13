@@ -32,7 +32,7 @@ namespace AwsMock::Worker {
     void TransferWorker::StartTransferServer(Database::Entity::Transfer::Transfer &server) {
 
         // Create transfer server thread
-        _ftpServer = std::make_shared<FtpServer::FtpServer>(_configuration,server.serverId);
+        _ftpServer = std::make_shared<FtpServer::FtpServer>(_configuration, server.serverId);
         _transferServerList[server.serverId] = _ftpServer;
 
         // Add users
