@@ -11,10 +11,16 @@ RUN cd /usr/src && \
     cmake --build . --config Release && \
     cmake --install . --prefix /usr
 
+# Copy properties
+RUN cp /usr/src/aws-mock/etc/aws-mock.properties /etc
+
 # Supervisord
 RUN apt-get update && apt-get install -y supervisor
 RUN mkdir -p /var/log/supervisor
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY supervisor.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Cleanup
+RUN rm -rf /usr/src
 
 # Make dirctories
 RUN mkdir -p /tmp/awsmock/data/s3 && \
@@ -28,7 +34,4 @@ EXPOSE 80 80
 EXPOSE 8081 8081
 EXPOSE 27017 27017
 
-# Cleanup
-RUN rm -rf /usr/src
-
-CMD ["/usr/bin/supervisord"]
+CMD ["/usr/bin/supervisord", "-c /etc/supervisor/conf.d/supervisord.conf"]

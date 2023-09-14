@@ -1,0 +1,230 @@
+version: "3.8"
+
+services:
+
+  # Postgres database
+#  postgres:
+#    build:
+#      context: ./postgres
+#      dockerfile: Dockerfile
+#    image: pim-postgres
+#    container_name: pim-postgres
+#    volumes:
+#      - pgdata:/var/lib/postgresql/data
+#    networks:
+#      - "local"
+#    ports:
+#      - 5432:5432
+
+  # AwsMock
+  awsmock:
+    container_name: awsmock
+    image: jensvogt/awsmock:latest
+    hostname: awsmock
+    networks:
+      - "local"
+    ports:
+      - "80:80"
+      - "8081:8081"
+      - "27017:27017"
+#    environment:
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: [ "CMD", "awsmock", "s3",  "ls" ]
+      interval: 60s
+      timeout: 10s
+      retries: 15
+
+#  onix3-parser:
+#    container_name: import-metadaten-onix3-service
+#    depends_on:
+#      postgres:
+#        condition: service_started
+#      localstack:
+#        condition: service_healthy
+#    build:
+#      context: ../
+#      dockerfile: pim-local-dev/docker/Onix3Parser/Dockerfile
+#    environment:
+#      - spring.datasource.driver-class-name=org.postgresql.Driver
+#      - spring.datasource.url=jdbc:postgresql://postgres:5432/onix3
+#      - spring.datasource.username=postgres
+#      - spring.datasource.password=ausHamburgIstCool
+#      - aws.parsing.produktmeldungen=onix3-produktmeldungen
+#      - aws.parsing.orginalmeldungen=file-delivery
+#      - aws.parsing.queue-name-inbox=ftp-file-distribution-onix-queue
+#      - aws.parsing.JsonResult=json-parsing-results
+#      - aws.parsing.JsonQueue=http://localstack:4566/000000000000/parsing-result-queue
+#      - logging.level.de.libri.pim=ERROR
+#      - AWS_REGION=eu-central-1
+#      - AWS_ACCESS_KEY_ID=localAccessKey
+#      - AWS_SECRET_KEY=secretAccessKey
+#    networks:
+#      - local
+
+# image-service:
+#   container_name: pim-import-image-service
+#   depends_on:
+#     postgres:
+#       condition: service_started
+#     localstack:
+#       condition: service_healthy
+#   build:
+#     context: ../
+#     dockerfile: pim-local-dev/docker/ImportImage/Dockerfile
+#   environment:
+#     - spring.datasource.driver-class-name=org.postgresql.Driver
+#     - spring.datasource.url=jdbc:postgresql://postgres:5432/image
+#     - spring.datasource.username=postgres
+#     - spring.datasource.password=ausHamburgIstCool
+#     - aws.image.s3-image=transformed-images
+#     - aws.image.orginalmeldungen=file-delivery
+#     - aws.image.queue-name-inbox=ftp-file-distribution-image-queue
+#     - aws.image.imgaeResult=http://localstack:4566/000000000000/image-result-queue
+#     - AWS_REGION=eu-central-1
+#     - AWS_ACCESS_KEY_ID=localAccessKey
+#     - AWS_SECRET_KEY=secretAccessKey
+#   networks:
+#     - local
+
+#  transformation:
+#    container_name: pim-transformation
+#    depends_on:
+#      localstack:
+#        condition: service_healthy
+#    build:
+#      context: ../
+#      dockerfile: pim-local-dev/docker/Transformation/Dockerfile
+#    environment:
+#      - produkt-form-detailliert-table=pim-product-form-detailiert
+#      - artikel-input-queue=parsing-result-queue
+#      - artikel-output-queue=artikel-transformations-service-artikel-ausgang
+#      - AWS_REGION=eu-central-1
+#      - AWS_ACCESS_KEY_ID=localAccessKey
+#      - AWS_SECRET_KEY=secretAccessKey
+#    networks:
+#      - "local"
+
+#  export-l2000:
+#    container_name: export-l2000
+#    depends_on:
+#      localstack:
+#        condition: service_healthy
+#    build:
+#      context: ../
+#      dockerfile: pim-local-dev/docker/ExportL2000/Dockerfile
+#    environment:
+#      - artikel-input-queue=artikel-transformations-service-artikel-ausgang
+#      - sns-logging-topic=file-logging-queue
+#      - AWS_REGION=eu-central-1
+#      - AWS_ACCESS_KEY_ID=localAccessKey
+#      - AWS_SECRET_KEY=secretAccessKey
+#    networks:
+#      - "local"
+
+#  export-anno:
+#    container_name: export-anno
+#    depends_on:
+#      oracle:
+#        condition: service_started
+#      localstack:
+#        condition: service_healthy
+#    build:
+#      context: ../
+#      dockerfile: pim-local-dev/docker/ExportAnno/Dockerfile
+#    environment:
+#      - spring.datasource.url=jdbc:h2:tcp://oracle:1521/h2_digi;Mode=Oracle
+#      - spring.datasource.username=sa
+#      - spring.datasource.password=
+#      - spring.datasource.hikari.schema=PUBLIC
+#      - spring.datasource.hikari.connection-init-sql=
+#      - aws.export-anno.s3-images=transformed-images
+#      - aws.export-anno.queue-image-inbox=image-result-queue
+#      - aws.export-anno.queue-textannotation-inbox=textannotation-result-queue
+#      - AWS_REGION=eu-central-1
+#      - AWS_ACCESS_KEY_ID=localAccessKey
+#      - AWS_SECRET_KEY=secretAccessKey
+#    networks:
+#      - local
+
+#  export-productdb:
+#    container_name: export-productdb
+#    depends_on:
+#      localstack:
+#        condition: service_healthy
+#    build:
+#      context: ../
+#      dockerfile: pim-local-dev/docker/ExportProductDB/Dockerfile
+#    environment:
+#      - sns-logging-topic=file-logging-queue
+#      - AWS_REGION=eu-central-1
+#      - AWS_ACCESS_KEY_ID=localAccessKey
+#      - AWS_SECRET_KEY=secretAccessKey
+#    networks:
+#      - "local"
+
+#  protocolizing:
+#    container_name: pim-protokollierung-service
+#    depends_on:
+#      postgres:
+#        condition: service_started
+#      localstack:
+#        condition: service_healthy
+#    build:
+#      context: ../
+#      dockerfile: pim-local-dev/docker/Protocolizing/Dockerfile
+#    environment:
+#      - spring.datasource.driver-class-name=org.postgresql.Driver
+#      - spring.datasource.url=jdbc:postgresql://postgres:5432/protokollierung
+#      - spring.datasource.username=postgres
+#      - spring.datasource.password=ausHamburgIstCool
+#      - aws.sqs-queue-file-logging=file-logging-queue
+#      - AWS_REGION=eu-central-1
+#      - AWS_ACCESS_KEY_ID=localAccessKey
+#      - AWS_SECRET_KEY=secretAccessKey
+#    networks:
+#      - local
+
+#  datenlieferant:
+#    container_name: pim-datenlieferant-service
+#    depends_on:
+#      postgres:
+#        condition: service_started
+#      localstack:
+#        condition: service_healthy
+#    build:
+#      context: ../
+#      dockerfile: pim-local-dev/docker/Datenlieferant/Dockerfile
+#    environment:
+#      - spring.datasource.driver-class-name=org.postgresql.Driver
+#      - spring.datasource.url=jdbc:postgresql://postgres:5432/datenlieferant
+#      - spring.datasource.username=postgres
+#      - spring.datasource.password=ausHamburgIstCool
+#      - AWS_REGION=eu-central-1
+#      - AWS_ACCESS_KEY_ID=localAccessKey
+#      - AWS_SECRET_KEY=secretAccessKey
+#    networks:
+#      - local
+
+
+#  queue-eater:
+#    container_name: pim-queue-eater
+#    depends_on:
+#      localstack:
+#        condition: service_healthy
+#    build:
+#      context: ../
+#      dockerfile: pim-local-dev/docker/SQSEater/Dockerfile
+#    environment:
+#      - QUEUES=file-logging-queue image-result-queue artikel-transformations-service-artikel-ausgang textannotation-result-queue bilderlink-output-queue
+#      - AWS_REGION=eu-central-1
+#      - AWS_SECRET_ACCESS_KEY=localAccessKey
+#      - AWS_ACCESS_KEY_ID=localAccessKey
+#      - AWS_SECRET_KEY=secretAccessKey
+#    networks:
+#      - local
+
+networks:
+  local:
+    driver: "bridge"
