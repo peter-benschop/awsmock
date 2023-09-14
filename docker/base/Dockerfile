@@ -11,16 +11,15 @@ RUN mkdir -p /usr/src && \
     git clone https://github.com/google/googletest.git && \
     cd googletest && \
     cmake -DBUILD_SHARED_LIBS=ON . &&\
-    make && \
     make install
 
 # Install Poco libraries
 RUN cd /usr/src && \
     git clone -b master https://github.com/pocoproject/poco.git && \
     cd poco && \
-    cmake -DENABLE_PAGECOMPILER=OFF -DENABLE_DATA_SQLITE=OFF -DENABLE_REDIS=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF \
-    -DENABLE_NETSSL=ON -DENABLE_MONGODB=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr . && \
-    make && \
+    cmake -DENABLE_PAGECOMPILER=OFF -DENABLE_DATA_SQLITE=OFF -DENABLE_REDIS=OFF -DENABLE_DATA_POSTGRESQL=OFF  \
+    -DENABLE_DATA_MYSQL=OFF -DENABLE_NETSSL=ON -DENABLE_MONGODB=OFF -DENABLE_JWT=OFF -DENABLE_DATA=OFF  \
+    -DENABLE_ACTIVERECORD=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr . && \
     make install
 
 # Install mongo-c-driver
@@ -28,7 +27,6 @@ RUN cd /usr/src && \
     git clone -b r1.24 https://github.com/mongodb/mongo-c-driver.git && \
     cd mongo-c-driver && \
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr . && \
-    make && \
     make install
 
 # Install mongo-c-driver
@@ -36,14 +34,7 @@ RUN cd /usr/src && \
     git clone -b releases/v3.8 https://github.com/mongodb/mongo-cxx-driver.git && \
     cd mongo-cxx-driver && \
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_CXX_STANDARD=17 . && \
-    make && \
     make install
-
-# Install sv4git
-RUN cd /usr/src && \
-    wget https://github.com/bvieira/sv4git/releases/download/v2.9.0/git-sv_2.9.0_linux_amd64.tar.gz && \
-    tar -xzf git-sv_2.9.0_linux_amd64.tar.gz && \
-    cp git-sv /usr/bin && chmod 755 /usr/bin/git-sv
 
 # Install libssl 1.1
 RUN wget http://security.debian.org/debian-security/pool/updates/main/o/openssl/libssl1.1_1.1.1n-0+deb11u5_amd64.deb && \

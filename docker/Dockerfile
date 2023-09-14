@@ -15,6 +15,7 @@ RUN cd /usr/src && \
 # Supervisord
 RUN apt-get update && apt-get install -y supervisor
 RUN mkdir -p /var/log/supervisor
+RUN mkdir -p /etc/supervisor/conf.d/
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Cleanup
@@ -32,4 +33,4 @@ EXPOSE 80 80
 EXPOSE 8081 8081
 EXPOSE 27017 27017
 
-CMD ["/usr/bin/supervisord", "-c /etc/supervisor/conf.d/supervisord.conf"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
