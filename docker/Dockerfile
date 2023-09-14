@@ -9,15 +9,13 @@ RUN cd /usr/src && \
     cd /usr/src/aws-mock && \
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr . && \
     cmake --build . --config Release && \
-    cmake --install . --prefix /usr
-
-# Copy properties
-RUN cp /usr/src/aws-mock/etc/aws-mock.properties /etc
+    cmake --install . --prefix /usr &&\
+    cp etc/aws-mock.properties /etc
 
 # Supervisord
 RUN apt-get update && apt-get install -y supervisor
 RUN mkdir -p /var/log/supervisor
-COPY supervisor.conf /etc/supervisor/conf.d/supervisord.conf
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Cleanup
 RUN rm -rf /usr/src
