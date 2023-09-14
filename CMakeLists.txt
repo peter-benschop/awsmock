@@ -1,12 +1,20 @@
 cmake_minimum_required(VERSION 3.18)
+project(aws-mock)
 
 # Semantic versioning (sv4git)
-execute_process (COMMAND bash -c "git sv cv| tr -d '\n'" OUTPUT_VARIABLE GIT_VERSION)
+#execute_process (COMMAND bash -c "git sv cv| tr -d '\n'" OUTPUT_VARIABLE GIT_VERSION)
 
-project(aws-mock VERSION "${GIT_VERSION}")
-configure_file (core/include/awsmock/core/Version.h.in core/include/awsmock/core/Version.h)
+# required modules for our task
 
+set(VERSION_UPDATE_FROM_GIT TRUE)
 set(CMAKE_CXX_STANDARD 20)
+set(GIT_EXECUTABLE /usr/bin/git)
+set(GIT_FOUND TRUE)
+
+# Include versionine
+include(CMakeVersion.cmake)
+configure_file (core/include/awsmock/core/Version.h.in core/include/awsmock/core/Version.h)
+message("Version: ${aws-mock_VERSION_STRING}")
 
 # Set root install directory
 if (NOT CMAKE_BUILD_TYPE)
