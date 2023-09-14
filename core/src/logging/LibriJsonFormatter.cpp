@@ -8,11 +8,9 @@ namespace AwsMock::Core {
 
     const Poco::Net::HostEntry &hostEntry = Poco::Net::DNS::thisHost();
 
-    JsonLogFormatter::JsonLogFormatter() {
-    }
+    JsonLogFormatter::JsonLogFormatter() = default;
 
-    JsonLogFormatter::~JsonLogFormatter() {
-    }
+    JsonLogFormatter::~JsonLogFormatter() = default;
 
     void JsonLogFormatter::format(const Poco::Message &msg, std::string &text) {
 

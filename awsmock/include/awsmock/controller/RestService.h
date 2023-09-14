@@ -13,8 +13,10 @@
 #include "awsmock/core/LogStream.h"
 #include "awsmock/core/Configuration.h"
 
-#define DEFAULT_PORT 4567
-#define DEFAULT_HOST "localhost"
+#define GATEWAY_DEFAULT_PORT 4567
+#define GATEWAY_DEFAULT_HOST "localhost"
+#define GATEWAY_MAX_CONNECTIONS 250
+#define GATEWAY_MAX_THREADS 50
 
 namespace AwsMock {
 
@@ -70,7 +72,7 @@ namespace AwsMock {
        * @param router router to use
        * @param port port to use (default: 9100)
        */
-      void start(Poco::Net::HTTPRequestHandlerFactory *router, int port = DEFAULT_PORT);
+      void start(Poco::Net::HTTPRequestHandlerFactory *router, int port = GATEWAY_DEFAULT_PORT);
 
     private:
 
@@ -103,6 +105,16 @@ namespace AwsMock {
        * HTTP server instance
        */
       Poco::Net::HTTPServer *_httpServer = nullptr;
+
+      /**
+       * HTTP max message queue length
+       */
+      int _maxQueueLength;
+
+      /**
+       * HTTP max concurrent connection
+       */
+      int _maxThreads;
     };
 } // namespace AwsMock
 

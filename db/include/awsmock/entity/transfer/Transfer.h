@@ -105,6 +105,21 @@ namespace AwsMock::Database::Entity::Transfer {
       std::string state = ServerStateToString(ServerState::OFFLINE);
 
       /**
+       * Concurrency, nuber of FTP server threads
+       */
+      int concurrency = 8;
+
+      /**
+       * Port
+       */
+      int port = 21;
+
+      /**
+       * Listen address
+       */
+      std::string listenAddress = "0.0.0.0";
+
+      /**
        * Last transfer server start
        */
       Poco::DateTime lastStarted;

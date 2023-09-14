@@ -7,9 +7,12 @@
 namespace AwsMock {
 
     RestService::RestService(Core::Configuration &configuration)
-        : _port(DEFAULT_PORT), _host(DEFAULT_HOST), _logger(Poco::Logger::get("RestService")), _configuration(configuration)  {
-        _port = _configuration.getInt("awsmock.rest.port", DEFAULT_PORT);
-        _host = _configuration.getString("awsmock.rest.host", DEFAULT_HOST);
+        : _port(GATEWAY_DEFAULT_PORT), _host(GATEWAY_DEFAULT_HOST), _logger(Poco::Logger::get("RestService")), _configuration(configuration) {
+
+        _port = _configuration.getInt("awsmock.gateway.port", GATEWAY_DEFAULT_PORT);
+        _host = _configuration.getString("awsmock.gateway.host", GATEWAY_DEFAULT_HOST);
+        _maxQueueLength = _configuration.getInt("awsmock.gateway.max.queue", GATEWAY_MAX_CONNECTIONS);
+        _maxThreads = _configuration.getInt("awsmock.gateway.max.threads", GATEWAY_MAX_THREADS);
         log_debug_stream(_logger) << "Rest service initialized, endpoint: " << _host << ":" << _port << std::endl;
     }
 
@@ -35,15 +38,19 @@ namespace AwsMock {
     }
 
     void RestService::start() {
+
+        // Configure server
         auto *httpServerParams = new Poco::Net::HTTPServerParams();
 
-        httpServerParams->setMaxQueued(250);
-        httpServerParams->setMaxThreads(50);
+        httpServerParams->setMaxQueued(_maxQueueLength);
+        httpServerParams->setMaxThreads(_maxThreads);
 
         _httpServer = new Poco::Net::HTTPServer(_router, Poco::Net::ServerSocket(Poco::UInt16(_port)), httpServerParams);
 
-        _httpServer->start();
-        log_info_stream(_logger) << "AwsMock gateway started, endpoint: http://" << _host << ":" << _port << std::endl;
+        if (_httpServer) {
+            _httpServer->start();
+            log_info_stream(_logger) << "AwsMock gateway started, endpoint: http://" << _host << ":" << _port << std::endl;
+        }
     }
 
     void RestService::start(Poco::Net::HTTPRequestHandlerFactory *router, int port) {

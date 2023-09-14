@@ -38,3 +38,11 @@ RUN cd /usr/src && \
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_CXX_STANDARD=17 . && \
     make && \
     make install
+
+# Install sv4git
+RUN cd /usr/src && \
+    wget https://github.com/bvieira/sv4git/releases/download/v2.9.0/git-sv_2.9.0_linux_amd64.tar.gz && \
+    tar -xzf git-sv_2.9.0_linux_amd64.tar.gz && \
+    cp git-sv /usr/bin && chmod 755 /usr/bin/git-sv
+
+RUN rm -rf /usr/src
