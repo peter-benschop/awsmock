@@ -1,32 +1,22 @@
 
-// C++ includes
-#include <memory>
-#include <utility>
 
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/ftpserver/FtpServer.h>
 #include <awsmock/ftpserver/FtpServerImpl.h>
 
+#include <utility>
+
 namespace AwsMock::FtpServer {
 
-    //FtpServer::FtpServer(const std::string &address, uint16_t port) : _ftp_server(std::make_unique<FtpServerImpl>(address, port)) {}
+    FtpServer::FtpServer(const Core::Configuration &configuration, std::string serverName, int port, std::string address)
+        : _logger(Poco::Logger::get("FtpServer")), _configuration(configuration), _serverName(std::move(serverName)), _port(port), _address(std::move(address)) {
 
-    //FtpServer::FtpServer(uint16_t port) : FtpServer(std::string("0.0.0.0"), port) {}
-
-    FtpServer::FtpServer(const Core::Configuration &configuration, std::string serverName) : _configuration(configuration), _serverName(std::move(serverName)) {
-        _port = _configuration.getInt("awsmock.service.ftp.port", FTP_DEFAULT_PORT);
-        _address = _configuration.getString("awsmock.service.ftp.address", FTP_DEFAULT_ADDRESS);
-        _maxThreads = _configuration.getInt("awsmock.service.ftp.max.threads", 4);
+        // Get configuration
         _dataDir = _configuration.getString("awsmock.worker.transfer.base.dir", FTP_BASE_DIR);
 
         _ftp_server = std::make_unique<FtpServerImpl>(_serverName, _address, _port, _configuration);
+        log_debug_stream(_logger)<< "FTP server configured, name: " << _serverName << " endpoint: " << _address << ":" << port << std::endl;
     }
-
-    // Move
-    FtpServer::FtpServer(FtpServer &&) noexcept = default;
-    //FtpServer &FtpServer::operator=(FtpServer &&) noexcept = default;
 
     FtpServer::~FtpServer() = default;
 

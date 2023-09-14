@@ -1,15 +1,19 @@
 #pragma once
 
+// C++ includes
 #include <memory>
 #include <string>
-
-#include <awsmock/ftpserver/Permissions.h>
+#include <utility>
 
 #define FTP_DEFAULT_PORT 21
 #define FTP_DEFAULT_HOST "localhost"
 #define FTP_DEFAULT_ADDRESS "0.0.0.0"
 #define FTP_BASE_DIR "/tmp/awsmock/data/transfer"
 #define FTP_BUCKET "transfer-server"
+
+// C++ includes
+#include <awsmock/core/Configuration.h>
+#include <awsmock/ftpserver/Permissions.h>
 
 namespace AwsMock::FtpServer {
 
@@ -72,15 +76,7 @@ namespace AwsMock::FtpServer {
        */
       // FtpServer(uint16_t port = 21);
 
-      explicit FtpServer(const Core::Configuration &configuration, std::string serverName);
-
-      // Move
-      FtpServer(FtpServer &&) noexcept;
-      // FtpServer &operator=(FtpServer &&) noexcept;
-
-      // Non-copyable
-      FtpServer(const FtpServer &) = delete;
-      //FtpServer &operator=(const FtpServer &) = delete;
+      explicit FtpServer(const Core::Configuration &configuration, std::string serverName, int port, std::string address);
 
       // Destructor
       ~FtpServer();
@@ -172,6 +168,12 @@ namespace AwsMock::FtpServer {
       [[nodiscard]] std::string getAddress() const;
 
     private:
+
+      /**
+       * Logger
+       */
+      Core::LogStream _logger;
+
       /**
        * Configuration
        */

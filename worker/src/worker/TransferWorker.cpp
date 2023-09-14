@@ -21,6 +21,12 @@ namespace AwsMock::Worker {
         _bucket = _configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
         _baseDir = _configuration.getString("awsmock.worker.transfer.base.dir", DEFAULT_BASE_DIR);
 
+        // S3 service connection
+        _s3ServiceHost = _configuration.getString("awsmock.service.s3.host", "localhost");
+        _s3ServicePort = _configuration.getInt("awsmock.service.s3.port", 9501);
+        _baseUrl = "http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort);
+        log_debug_stream(_logger) << "S3 service endpoint: http://" << _s3ServiceHost << ":" << _s3ServicePort << std::endl;
+
         // Send create bucket request
         if (!Core::DirUtils::DirectoryExists(_baseDir)) {
             Core::DirUtils::MakeDirectory(_baseDir);
@@ -32,7 +38,7 @@ namespace AwsMock::Worker {
     void TransferWorker::StartTransferServer(Database::Entity::Transfer::Transfer &server) {
 
         // Create transfer server thread
-        _ftpServer = std::make_shared<FtpServer::FtpServer>(_configuration, server.serverId);
+        _ftpServer = std::make_shared<FtpServer::FtpServer>(_configuration, server.serverId, server.port, server.listenAddress);
         _transferServerList[server.serverId] = _ftpServer;
 
         // Add users
@@ -40,7 +46,7 @@ namespace AwsMock::Worker {
             std::string homeDir = _baseDir + Poco::Path::separator() + user.homeDirectory;
             _ftpServer->addUser(user.userName, user.password, homeDir, FtpServer::Permission::All);
         }
-        _ftpServer->start(10);
+        _ftpServer->start(server.concurrency);
 
         // Update database
         server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::ONLINE);
