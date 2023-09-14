@@ -2,7 +2,7 @@ FROM debian:bookworm-slim
 
 # Install basics
 RUN apt-get update && apt-get -y install build-essential cmake git openssl libssl-dev supervisor libarchive-dev \
-    zlib1g-dev wget libarchive13 libz1 libcurl4-openssl-dev libtbb-dev libasio-dev
+    zlib1g-dev wget libarchive13 libz1 libcurl4-openssl-dev libtbb-dev libasio-dev gnupg curl
 RUN mkdir -p /usr/src
 
 # Install google test
@@ -44,5 +44,23 @@ RUN cd /usr/src && \
     wget https://github.com/bvieira/sv4git/releases/download/v2.9.0/git-sv_2.9.0_linux_amd64.tar.gz && \
     tar -xzf git-sv_2.9.0_linux_amd64.tar.gz && \
     cp git-sv /usr/bin && chmod 755 /usr/bin/git-sv
+
+# Install libssl 1.1
+RUN wget http://security.debian.org/debian-security/pool/updates/main/o/openssl/libssl1.1_1.1.1n-0+deb11u5_amd64.deb && \
+    dpkg -i libssl1.1_1.1.1n-0+deb11u5_amd64.deb && \
+    rm libssl1.1_1.1.1n-0+deb11u5_amd64.deb
+
+# Install MongoDB
+RUN apt-get -y install gnupg curl && \
+    curl -fsSL https://pgp.mongodb.com/server-6.0.asc | gpg -o /usr/share/keyrings/mongodb-server-6.0.gpg --dearmor && \
+    echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] http://repo.mongodb.org/apt/debian bullseye/mongodb-org/6.0 main" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list && \
+    apt-get update && \
+    apt-get install -y mongodb-org
+RUN mkdir -p /data/db
+
+# Start MongoDB
+COPY ../mongod.conf /etc/mongod.conf
+RUN mkdir -p /var/log/mongodb && \
+    mkdir -p /var/lib/mongodb
 
 RUN rm -rf /usr/src
