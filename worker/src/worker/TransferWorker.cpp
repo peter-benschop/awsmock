@@ -32,7 +32,7 @@ namespace AwsMock::Worker {
             Core::DirUtils::MakeDirectory(_baseDir);
             log_debug_stream(_logger) << "Using baseDir: " << _baseDir << std::endl;
         }
-        log_debug_stream(_logger) << "TransferWorker initialized" << std::endl;
+        log_info_stream(_logger) << "TransferWorker initialized" << std::endl;
     }
 
     void TransferWorker::StartTransferServer(Database::Entity::Transfer::Transfer &server) {
@@ -51,7 +51,7 @@ namespace AwsMock::Worker {
         // Update database
         server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::ONLINE);
 
-        log_debug_stream(_logger) << "Transfer server " << server.serverId << " started " << std::endl;
+        log_info_stream(_logger) << "Transfer server " << server.serverId << " started " << std::endl;
     }
 
     void TransferWorker::StopTransferServer(Database::Entity::Transfer::Transfer &server) {

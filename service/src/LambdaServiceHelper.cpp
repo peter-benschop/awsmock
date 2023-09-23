@@ -32,7 +32,7 @@ namespace AwsMock::Service {
             CreateDockerImage(lambda.first, lambdaEntity, dockerTag, logger);
         }
 
-        // Create the container, if not existing
+        // Create the container, if not existing. If existing get the current port from the docker container
         if (!_dockerService.ContainerExists(lambdaEntity.function, dockerTag)) {
             lambdaEntity.hostPort = GetHostPort();
             CreateDockerContainer(lambdaEntity, dockerTag, logger);
@@ -40,6 +40,7 @@ namespace AwsMock::Service {
 
         // Get docker container
         Dto::Docker::Container container = _dockerService.GetContainerByName(lambdaEntity.function, dockerTag);
+        lambdaEntity.hostPort = container.ports[0].publicPort;
 
         // Start docker container
         _dockerService.StartDockerContainer(container.id);
