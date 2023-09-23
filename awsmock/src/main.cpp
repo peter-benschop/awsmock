@@ -198,7 +198,7 @@ namespace AwsMock {
        */
       void InitializeCurl() {
           curl_global_init(CURL_GLOBAL_ALL);
-          log_debug_stream(_logger) << "CUrl library initialized" << std::endl;
+          log_debug_stream(_logger) << "Curl library initialized" << std::endl;
 
       }
 

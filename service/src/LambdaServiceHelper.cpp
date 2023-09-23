@@ -40,7 +40,7 @@ namespace AwsMock::Service {
 
         // Get docker container
         Dto::Docker::Container container = _dockerService.GetContainerByName(lambdaEntity.function, dockerTag);
-        lambdaEntity.hostPort = container.ports[0].publicPort;
+        lambdaEntity.hostPort = container.GetLambdaPort();
 
         // Start docker container
         _dockerService.StartDockerContainer(container.id);
