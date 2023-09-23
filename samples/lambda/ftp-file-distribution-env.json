@@ -7,6 +7,6 @@
     "AWS_SESSION_TOKEN": "none",
     "ENVIRONMENT": "localstack",
     "SERVICE_NAME": "ftp-file-distribution",
-    "JAVA_TOOL_OPTIONS": "-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localhost -Dlibri.aws.sns-protokollierung-topic=arn:aws:sns:eu-central-1:000000000000:protokollierung-topic -Dlibri.aws.queue-url-xml=http://localstack:4567/000000000000/ftp-file-distribution-onix-queue -Dlibri.aws.queue-url-image=http://localstack:4567/000000000000/ftp-file-distribution-image-queue -Dlibri.aws.queue-url-vlb-preisreferenz=http://localstack:4567/000000000000/ftp-file-distribution-vlb-preisreferenz-queue -Dlibri.aws.queue-url-inventory-feed=http://localstack:4567/000000000000/ftp-file-distribution-inventory-feed-queue -Dlibri.aws.use-localstack=true -Dlibri.aws.use-aws-profile=false"
+    "JAVA_TOOL_OPTIONS": "-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localhost -Dlibri.aws.sns-protokollierung-topic=arn:aws:sns:eu-central-1:000000000000:protokollierung-topic -Dlibri.aws.queue-url-xml=http://localhost/000000000000/ftp-file-distribution-onix-queue -Dlibri.aws.queue-url-image=http://localhost/000000000000/ftp-file-distribution-image-queue -Dlibri.aws.queue-url-vlb-preisreferenz=http://localhost/000000000000/ftp-file-distribution-vlb-preisreferenz-queue -Dlibri.aws.queue-url-inventory-feed=http://localhost/000000000000/ftp-file-distribution-inventory-feed-queue -Dlibri.aws.use-localhost=true -Dlibri.aws.use-aws-profile=false"
   }
 }
