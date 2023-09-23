@@ -23,6 +23,8 @@
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/dto/docker/Port.h>
 
+#define LAMBDA_INTERNAL_PORT 8080
+
 namespace AwsMock::Dto::Docker {
 
     struct Container {
@@ -66,6 +68,13 @@ namespace AwsMock::Dto::Docker {
        * Ports
        */
       std::vector<Port> ports;
+
+      /**
+       * Returns the lambda host port. The lambda host port is the public port for which the private port is 8080.
+       *
+       * @return lambda public port, or -1 if port does not exist.
+       */
+      int GetLambdaPort();
 
       /**
        * Convert to a JSON string

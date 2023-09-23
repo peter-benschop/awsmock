@@ -1,10 +1,18 @@
 //
-// Created by vogje01 on 06/06/2023.
+// Created by vogje01 on 22/09/2023.
 //
 
 #include <awsmock/dto/docker/Container.h>
 
 namespace AwsMock::Dto::Docker {
+
+    int Container::GetLambdaPort() {
+        auto it = find_if(ports.begin(), ports.end(), [](const Port &port) { return port.privatePort == LAMBDA_INTERNAL_PORT; });
+        if (it != ports.end()) {
+            return it->publicPort;
+        }
+        return -1;
+    }
 
     void Container::FromJson(Poco::JSON::Object::Ptr object) {
 
