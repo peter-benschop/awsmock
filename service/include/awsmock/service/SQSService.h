@@ -119,7 +119,7 @@ namespace AwsMock::Service {
        * @return CreateMessageResponse
        * @throws ServiceException
        */
-      Dto::SQS::CreateMessageResponse CreateMessage(const Dto::SQS::CreateMessageRequest &request);
+      Dto::SQS::CreateMessageResponse SendMessage(const Dto::SQS::SendMessageRequest &request);
 
       /**
        * Receive a list of messages
