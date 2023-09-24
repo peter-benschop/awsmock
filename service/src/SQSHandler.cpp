@@ -206,21 +206,16 @@ namespace AwsMock::Service {
     std::vector<Dto::SQS::MessageAttribute> SQSHandler::GetMessageAttributes(const std::string &payload) {
 
         std::vector<Dto::SQS::MessageAttribute> messageAttributes;
-        int attributeCount = Core::HttpUtils::CountQueryParametersByPrefix(payload, "MessageAttribute");
-        for (int i = 0; i < attributeCount; i++) {
-            std::string attributeName =
-                Core::HttpUtils::GetQueryParameterValue(Core::HttpUtils::GetQueryParameterByName(payload, "MessageAttribute." + std::to_string(i) + ".name"));
-            std::string attributeType = Core::HttpUtils::GetQueryParameterValue(Core::HttpUtils::GetQueryParameterByName(payload,
-                                                                                                                         "MessageAttribute."
-                                                                                                                             + std::to_string(i)
-                                                                                                                             + ".Value.DataType"));
-            if (attributeType == "String") {
-                std::string attributeValue = Core::HttpUtils::GetQueryParameterValue(Core::HttpUtils::GetQueryParameterByName(payload,
-                                                                                                                              "MessageAttribute."
-                                                                                                                                  + std::to_string(i)
-                                                                                                                                  + ".Value.StringValue"));
-                Dto::SQS::MessageAttribute messageAttribute = {.attributeName=attributeName, .attributeValue=attributeValue, .type=attributeType};
+        int attributeCount = Core::HttpUtils::CountQueryParametersByPrefix(payload, "MessageAttribute") / 3;
+        for (int i = 1; i <= attributeCount; i++) {
+            std::string attributeName = Core::HttpUtils::GetQueryParameterByName(payload, "MessageAttribute." + std::to_string(i) + ".Name");
+            std::string attributeType = Core::HttpUtils::GetQueryParameterByName(payload, "MessageAttribute." + std::to_string(i) + ".Value.DataType");
+            std::string attributeValue;
+            if (attributeType == "String" || attributeType == "Number") {
+                attributeValue = Core::HttpUtils::GetQueryParameterByName(payload, "MessageAttribute." + std::to_string(i) + ".Value.StringValue");
             }
+            Dto::SQS::MessageAttribute messageAttribute = {.attributeName=attributeName, .attributeValue=attributeValue, .type=attributeType};
+            messageAttributes.emplace_back(messageAttribute);
         }
         return messageAttributes;
     }
