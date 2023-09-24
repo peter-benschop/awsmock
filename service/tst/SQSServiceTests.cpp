@@ -90,10 +90,10 @@ namespace AwsMock::Service {
         // arrange
         Dto::SQS::CreateQueueRequest queueRequest = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
-        Dto::SQS::CreateMessageRequest request = {.region=REGION, .queueUrl=QUEUE_URL, .body=BODY};
+        Dto::SQS::SendMessageRequest request = {.region=REGION, .queueUrl=QUEUE_URL, .body=BODY};
 
         // act
-        Dto::SQS::CreateMessageResponse response = _service.CreateMessage(request);
+        Dto::SQS::SendMessageResponse response = _service.CreateMessage(request);
 
         // assert
         EXPECT_TRUE(response.messageId.length() > 0);
@@ -105,8 +105,8 @@ namespace AwsMock::Service {
         // arrange
         Dto::SQS::CreateQueueRequest queueRequest = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
-        Dto::SQS::CreateMessageRequest msgRequest = {.region=REGION, .queueUrl=QUEUE_URL, .body=BODY};
-        Dto::SQS::CreateMessageResponse msgResponse = _service.CreateMessage(msgRequest);
+        Dto::SQS::SendMessageRequest msgRequest = {.region=REGION, .queueUrl=QUEUE_URL, .body=BODY};
+        Dto::SQS::SendMessageResponse msgResponse = _service.CreateMessage(msgRequest);
 
         // act
         Dto::SQS::ReceiveMessageRequest receiveRequest = {.queueUrl=QUEUE_URL, .maxMessages=10, .waitTimeSeconds=1};
@@ -121,8 +121,8 @@ namespace AwsMock::Service {
         // arrange
         Dto::SQS::CreateQueueRequest queueRequest = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
-        Dto::SQS::CreateMessageRequest msgRequest = {.region=REGION, .queueUrl=QUEUE_URL, .body=BODY};
-        Dto::SQS::CreateMessageResponse msgResponse = _service.CreateMessage(msgRequest);
+        Dto::SQS::SendMessageRequest msgRequest = {.region=REGION, .queueUrl=QUEUE_URL, .body=BODY};
+        Dto::SQS::SendMessageResponse msgResponse = _service.CreateMessage(msgRequest);
 
         // act
         Dto::SQS::DeleteMessageRequest delRequest = {.queueUrl=QUEUE, .receiptHandle=msgResponse.receiptHandle};
@@ -131,6 +131,49 @@ namespace AwsMock::Service {
 
         // assert
         EXPECT_EQ(0, _database.CountMessages(REGION, QUEUE_URL));
+    }
+
+    TEST_F(SQSServiceTest, GetMd5AttributesTest) {
+
+        // arrange
+        //
+        // MessageAttribute.1.Name=contentType
+        // MessageAttribute.1.Value.StringValue=application/json
+        // MessageAttribute.1.Value.DataType=String
+        //
+        Dto::SQS::MessageAttribute messageAttribute = {.attributeName="contentType", .attributeValue="application/json", .type="String"};
+        std::vector<Dto::SQS::MessageAttribute> messageAttributes;
+        messageAttributes.push_back(messageAttribute);
+
+        // act
+        std::string md5sum = _service.GetMd5Attributes(messageAttributes);
+
+        // assert
+        EXPECT_TRUE("6ed5f16969b625c8d900cbd5da557e9e" == md5sum);
+    }
+
+    TEST_F(SQSServiceTest, GetMd5AttributeListTest) {
+
+        // arrange
+        //
+        // MessageAttribute.1.Name=contentType
+        // MessageAttribute.1.Value.StringValue=application/json
+        // MessageAttribute.1.Value.DataType=String
+        // MessageAttribute.2.Name=contentLength
+        // MessageAttribute.2.Value.StringValue=42
+        // MessageAttribute.2.Value.DataType=Number
+        //
+        Dto::SQS::MessageAttribute messageAttribute1 = {.attributeName="contentType", .attributeValue="application/json", .type="String"};
+        Dto::SQS::MessageAttribute messageAttribute2 = {.attributeName="contentLength", .attributeValue="42", .type="Number"};
+        std::vector<Dto::SQS::MessageAttribute> messageAttributes;
+        messageAttributes.push_back(messageAttribute1);
+        messageAttributes.push_back(messageAttribute2);
+
+        // act
+        std::string md5sum = _service.GetMd5Attributes(messageAttributes);
+
+        // assert
+        EXPECT_TRUE("6ed5f16969b625c8d900cbd5da557e9e" == md5sum);
     }
 
 } // namespace AwsMock::Core

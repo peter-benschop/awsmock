@@ -23,8 +23,8 @@
 #include <awsmock/dto/sns/PublishResponse.h>
 #include <awsmock/dto/sns/SubscribeRequest.h>
 #include <awsmock/dto/sns/SubscribeResponse.h>
-#include <awsmock/dto/sqs/CreateMessageRequest.h>
-#include <awsmock/dto/sqs/CreateMessageResponse.h>
+#include <awsmock/dto/sqs/SendMessageRequest.h>
+#include <awsmock/dto/sqs/SendMessageResponse.h>
 #include <awsmock/repository/SNSDatabase.h>
 #include <awsmock/service/SQSService.h>
 

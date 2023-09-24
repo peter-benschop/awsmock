@@ -6,6 +6,16 @@
 
 namespace AwsMock::Service {
 
+    struct MessageAttributesBuffer {
+      int nameLength;
+      char *name;
+      int typeLength;
+      char *type;
+      char stype;
+      int valueLength;
+      char *value;
+    };
+
     SQSService::SQSService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("SQSService")), _configuration(configuration) {
         Initialize();
     }
@@ -193,7 +203,7 @@ namespace AwsMock::Service {
         return response;
     }
 
-    Dto::SQS::CreateMessageResponse SQSService::CreateMessage(const Dto::SQS::CreateMessageRequest &request) {
+    Dto::SQS::SendMessageResponse SQSService::CreateMessage(const Dto::SQS::SendMessageRequest &request) {
 
         if (!request.queueUrl.empty() && !_database->QueueUrlExists(request.region, request.queueUrl)) {
             throw Core::ServiceException("SQS queue '" + request.queueUrl + "' does not exists", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
@@ -291,12 +301,47 @@ namespace AwsMock::Service {
     }
 
     std::string SQSService::GetMd5Attributes(const Dto::SQS::MessageAttributeList &attributes) {
-        std::stringstream attrString;
-        for (const auto &s : attributes) {
-            attrString << s.attributeName << s.type << s.transportType << s.attributeValue;
+
+        int length = 0;
+        auto *bytes = new unsigned char[4092];
+
+        // Sort the attributes by name
+        std::vector<Dto::SQS::MessageAttribute> sortedAttributes = attributes;
+        std::sort(sortedAttributes.begin(), sortedAttributes.end());
+
+        for (const auto &a : sortedAttributes) {
+
+            GetIntAsByteArray(a.attributeName.length(), bytes, length);
+            length += 4;
+            memcpy(bytes + length, a.attributeName.c_str(), a.attributeName.length());
+            length += a.attributeName.length();
+
+            GetIntAsByteArray(a.type.length(), bytes, length);
+            length += 4;
+            memcpy(bytes + length, a.type.c_str(), a.type.length());
+            length += a.type.length();
+
+            bytes[length] = (1 & 0x000000ff);
+            length += 1;
+
+            GetIntAsByteArray(a.attributeValue.length(), bytes, length);
+            length += 4;
+            memcpy(bytes + length, a.attributeValue.c_str(), a.attributeValue.length());
+            length += a.attributeValue.length();
+
         }
-        std::string md5sum = Core::Crypto::GetMd5FromString(attrString.str());
-        log_trace_stream(_logger) << "MD5 of attributes: " << md5sum << std::endl;
-        return md5sum;
+
+        // Calculate MD5 of byte array
+        unsigned char output[16];
+        MD5(bytes, length, output);
+
+        return Core::Crypto::HexEncode(output, 16);
+    }
+
+    void SQSService::GetIntAsByteArray(int n, unsigned char *bytes, int offset) {
+        bytes[offset + 3] = n & 0x000000ff;
+        bytes[offset + 2] = (n & 0x0000ff00) >> 8;
+        bytes[offset + 1] = (n & 0x00ff0000) >> 16;
+        bytes[offset] = (n & 0xff000000) >> 24;
     }
 } // namespace AwsMock::Service
