@@ -2,12 +2,16 @@
 set(LIBRARY awsmockdb)
 set(LIBRARY_STATIC awsmockdb_static)
 
-set(SOURCES src/repository/Database.cpp src/repository/ServiceDatabase.cpp src/repository/S3Database.cpp
-        src/repository/SQSDatabase.cpp src/repository/SNSDatabase.cpp src/repository/LambdaDatabase.cpp
-        src/repository/TransferDatabase.cpp src/entity/lambda/Tags.cpp src/entity/lambda/Environment.cpp
-        src/entity/lambda/EphemeralStorage.cpp src/entity/lambda/Lambda.cpp src/entity/s3/Bucket.cpp
-        src/entity/s3/BucketNotification.cpp src/entity/s3/Object.cpp src/entity/transfer/User.cpp
-        src/entity/transfer/Transfer.cpp)
+set(SQS_SOURCES src/entity/sqs/MessageAttribute.cpp src/entity/sqs/Message.cpp src/repository/SQSDatabase.cpp)
+set(SNS_SOURCES src/repository/SNSDatabase.cpp)
+set(S3_SOURCES src/entity/s3/Bucket.cpp src/entity/s3/BucketNotification.cpp src/entity/s3/Object.cpp
+        src/repository/S3Database.cpp)
+set(LAMBDA_SOURCES src/entity/lambda/Tags.cpp src/entity/lambda/Environment.cpp
+        src/entity/lambda/EphemeralStorage.cpp src/entity/lambda/Lambda.cpp src/repository/LambdaDatabase.cpp)
+set(TRANSFER_SOURCES src/repository/TransferDatabase.cpp src/entity/transfer/User.cpp src/entity/transfer/Transfer.cpp)
+
+set(SOURCES ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${LAMBDA_SOURCES} ${TRANSFER_SOURCES}
+        src/repository/Database.cpp src/repository/ServiceDatabase.cpp)
 
 # Test directory
 add_subdirectory(tst)

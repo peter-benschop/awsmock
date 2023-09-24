@@ -230,12 +230,12 @@ namespace AwsMock::Service {
             message =
                 _database->CreateMessage({.region= request.region, .queueUrl=queue.queueUrl, .body=request.body, .messageId=messageId, .receiptHandle=receiptHandle,
                                              .md5Body=md5Body, .md5Attr=md5Attr});
+            return {.queueUrl=message.queueUrl, .messageId=messageId, .receiptHandle=receiptHandle, .md5Body=md5Body, .md5Attr=md5Attr};
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "SQS create message failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500);
         }
-        return {.queueUrl=message.queueUrl, .messageId=message.messageId, .receiptHandle=message.receiptHandle, .md5Body=message.md5Body, .md5Attr=message.md5Attr};
     }
 
     Dto::SQS::ReceiveMessageResponse SQSService::ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request) {
