@@ -39,7 +39,8 @@ namespace AwsMock::Service {
         SetBusy(true);
 
         try {
-            //DumpBody(request);
+            DumpBody(request);
+            DumpRequest(request);
 
             std::string endpoint = GetEndpoint(request);
             std::string payload = GetPayload(request);
@@ -71,12 +72,14 @@ namespace AwsMock::Service {
 
             } else if (action == "SendMessage") {
 
-                std::string queueUrl = GetStringParameter(payload, "QueueUrl");
-                std::string queueArn = GetStringParameter(payload, "QueueArn");
-                std::string body = GetStringParameter(payload, "MessageBody");
+                std::string queueUrl = Core::HttpUtils::GetQueryParameterByName(payload, "QueueUrl");
+                std::string queueArn = Core::HttpUtils::GetQueryParameterByName(payload, "QueueArn");
+                std::string body = Core::HttpUtils::GetQueryParameterByName(payload, "MessageBody");
 
-                Dto::SQS::CreateMessageRequest sqsRequest = {.region=region, .queueUrl=queueUrl, .queueArn=queueArn, .body=body};
-                Dto::SQS::CreateMessageResponse sqsResponse = _sqsService.CreateMessage(sqsRequest);
+                std::vector<Dto::SQS::MessageAttribute> attributes = GetMessageAttributes(payload);
+
+                Dto::SQS::SendMessageRequest sqsRequest = {.region=region, .queueUrl=queueUrl, .queueArn=queueArn, .body=body, .messageAttributes=attributes};
+                Dto::SQS::SendMessageResponse sqsResponse = _sqsService.CreateMessage(sqsRequest);
                 SendOkResponse(response, sqsResponse.ToXml());
 
             } else if (action == "GetQueueUrl") {
@@ -198,5 +201,27 @@ namespace AwsMock::Service {
         handleHttpStatusCode(response, 200);
         std::ostream &outputStream = response.send();
         outputStream.flush();
+    }
+
+    std::vector<Dto::SQS::MessageAttribute> SQSHandler::GetMessageAttributes(const std::string &payload) {
+
+        std::vector<Dto::SQS::MessageAttribute> messageAttributes;
+        int attributeCount = Core::HttpUtils::CountQueryParametersByPrefix(payload, "MessageAttribute");
+        for (int i = 0; i < attributeCount; i++) {
+            std::string attributeName =
+                Core::HttpUtils::GetQueryParameterValue(Core::HttpUtils::GetQueryParameterByName(payload, "MessageAttribute." + std::to_string(i) + ".name"));
+            std::string attributeType = Core::HttpUtils::GetQueryParameterValue(Core::HttpUtils::GetQueryParameterByName(payload,
+                                                                                                                         "MessageAttribute."
+                                                                                                                             + std::to_string(i)
+                                                                                                                             + ".Value.DataType"));
+            if (attributeType == "String") {
+                std::string attributeValue = Core::HttpUtils::GetQueryParameterValue(Core::HttpUtils::GetQueryParameterByName(payload,
+                                                                                                                              "MessageAttribute."
+                                                                                                                                  + std::to_string(i)
+                                                                                                                                  + ".Value.StringValue"));
+                Dto::SQS::MessageAttribute messageAttribute = {.attributeName=attributeName, .attributeValue=attributeValue, .type=attributeType};
+            }
+        }
+        return messageAttributes;
     }
 }

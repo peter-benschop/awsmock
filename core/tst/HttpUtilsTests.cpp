@@ -237,6 +237,20 @@ namespace AwsMock::Core {
         EXPECT_TRUE(action == "functions");
     }
 
+    TEST_F(HttpUtilsTest, GetStringParameterTest) {
+
+        // arrange
+        std::string uri = "testqueue?stringParameter1=testvalue";
+
+        // act
+        std::string version, action;
+        HttpUtils::GetVersionAction(uri, version, action);
+
+        // assert
+        EXPECT_TRUE(version == "2016-03-04");
+        EXPECT_TRUE(action == "functions");
+    }
+
 } // namespace AwsMock::Core
 
 #endif // AWMOCK_CORE_HTTPUTILSTEST_H
