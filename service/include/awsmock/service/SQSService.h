@@ -143,13 +143,12 @@ namespace AwsMock::Service {
       Dto::SQS::ReceiveMessageResponse ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request);
 
       /**
-       * Delete a message
+       * Deletes a message
        *
        * @param request delete message request DTO
-       * @return DeleteMessageResponse
        * @throws ServiceException
        */
-      Dto::SQS::DeleteMessageResponse DeleteMessage(const Dto::SQS::DeleteMessageRequest &request);
+      void DeleteMessage(const Dto::SQS::DeleteMessageRequest &request);
 
       /**
        * Returns the MD5 sum of all attributes.

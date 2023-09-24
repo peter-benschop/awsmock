@@ -41,7 +41,7 @@ namespace AwsMock::Dto::SQS {
 
         Poco::XML::AutoPtr<Poco::XML::Element> pRequestId = pDoc->createElement("RequestId");
         pMetaData->appendChild(pRequestId);
-        Poco::XML::AutoPtr<Poco::XML::Text> pRequestText = pDoc->createTextNode(Poco::UUIDGenerator().createRandom().toString());
+        Poco::XML::AutoPtr<Poco::XML::Text> pRequestText = pDoc->createTextNode(requestId);
         pRequestId->appendChild(pRequestText);
 
         std::stringstream output;
@@ -59,8 +59,8 @@ namespace AwsMock::Dto::SQS {
     }
 
     std::ostream &operator<<(std::ostream &os, const SendMessageResponse &r) {
-        os << "SendMessageResponse={id='" << r.id << "', url='" << r.queueUrl << "', messageId='" << r.messageId << "', receiptHandle='" << r.receiptHandle <<
-           "', md5body='" << r.md5Body << "', md5attr='" << r.md5Attr << "'}";
+        os << "SendMessageResponse={id='" << r.id << "', url='" << r.queueUrl << "', messageId='" << r.messageId << "', receiptHandle='" << r.receiptHandle
+           << "', md5body='" << r.md5Body << "', md5attr='" << r.md5Attr << "', requestId: '" << r.requestId << "'}";
         return os;
     }
 

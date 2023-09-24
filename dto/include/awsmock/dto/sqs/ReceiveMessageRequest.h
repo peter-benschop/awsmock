@@ -64,7 +64,7 @@ namespace AwsMock::Dto::SQS {
       /**
        * Resource
        */
-      std::string requestId = Poco::UUIDGenerator().createRandom().toString();
+      std::string requestId;
 
       /**
        * Converts the DTO to a string representation.
