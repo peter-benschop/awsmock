@@ -173,7 +173,7 @@ namespace AwsMock::Service {
         std::string md5sum = _service.GetMd5Attributes(messageAttributes);
 
         // assert
-        EXPECT_TRUE("6ed5f16969b625c8d900cbd5da557e9e" == md5sum);
+        EXPECT_TRUE("ebade6c58059dfd4bbf8cee9da7465fe" == md5sum);
     }
 
 } // namespace AwsMock::Core

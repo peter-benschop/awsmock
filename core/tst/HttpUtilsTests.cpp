@@ -243,12 +243,12 @@ namespace AwsMock::Core {
         std::string uri = "testqueue?stringParameter1=testvalue";
 
         // act
-        std::string version, action;
-        HttpUtils::GetVersionAction(uri, version, action);
+        int count = HttpUtils::CountQueryParametersByPrefix(uri, "stringParameter");
+        std::string parameter = HttpUtils::GetQueryParameterByPrefix(uri, "stringParameter", 1);
 
         // assert
-        EXPECT_TRUE(version == "2016-03-04");
-        EXPECT_TRUE(action == "functions");
+        EXPECT_EQ(1, count);
+        EXPECT_TRUE(parameter == "testvalue");
     }
 
 } // namespace AwsMock::Core
