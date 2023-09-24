@@ -39,8 +39,8 @@ namespace AwsMock::Service {
         SetBusy(true);
 
         try {
-            DumpBody(request);
-            DumpRequest(request);
+            //DumpBody(request);
+            //DumpRequest(request);
 
             std::string endpoint = GetEndpoint(request);
             std::string payload = GetPayload(request);
