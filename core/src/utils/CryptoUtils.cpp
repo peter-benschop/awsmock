@@ -295,6 +295,14 @@ namespace AwsMock::Core {
         for (unsigned char i : hash) {
             ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(i);
         }
-        return {ss.str(), 0, hash.size()};
+        return {ss.str()};
+    }
+
+    std::string Crypto::HexEncode(unsigned char *hash, int size) {
+        std::stringstream ss;
+        for (int i = 0; i < size; i++) {
+            ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(hash[i]);
+        }
+        return {ss.str()};
     }
 }

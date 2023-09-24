@@ -174,11 +174,11 @@ namespace AwsMock::Service {
     void SNSService::SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) {
 
         Database::Entity::SQS::Queue sqsQueue = _sqsDatabase->GetQueueByArn(subscription.endpoint);
-        _sqsService->CreateMessage({
-            .region=request.region,
-            .queueUrl = sqsQueue.queueUrl,
-            .body=request.message
-        });
+        _sqsService->SendMessage({
+                                     .region=request.region,
+                                     .queueUrl = sqsQueue.queueUrl,
+                                     .body=request.message
+                                 });
     }
 
 } // namespace AwsMock::Service

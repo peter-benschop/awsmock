@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ENDPOINT="http://locahost"
+ENDPOINT="http://localhost"
 
 #
 # S3 function
@@ -28,8 +28,8 @@ function queue_exists() {
 
 function delete_sqs_queue(){
   if [ "$(queue_exists "$1")" -gt 0 ]; then
-    awsmock sqs delete-queue --queue-url $ENDPOINT/000000000000/$1-queue" > /dev/null 2>&1
-    awsmock sqs delete-queue --queue-url $ENDPOINT/000000000000/$1-dlqueue" > /dev/null 2>&1
+    awsmock sqs delete-queue --queue-url "$ENDPOINT/000000000000/$1-queue" > /dev/null 2>&1
+    awsmock sqs delete-queue --queue-url "$ENDPOINT/000000000000/$1-dlqueue" > /dev/null 2>&1
     echo "Queue $1 deleted"
   else
     echo "Queue $1 does not exist"

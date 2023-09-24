@@ -7,14 +7,12 @@
 namespace AwsMock::Service {
 
     SQSService::SQSService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("SQSService")), _configuration(configuration) {
-        Initialize();
-    }
-
-    void SQSService::Initialize() {
 
         // Initialize environment
+        _accountId = _configuration.getString("awsmock.account.id", DEFAULT_ACCOUNT_ID);
+
+        // Database connection
         _database = std::make_unique<Database::SQSDatabase>(_configuration);
-        _accountId = DEFAULT_ACCOUNT_ID;
     }
 
     Dto::SQS::CreateQueueResponse SQSService::CreateQueue(const Dto::SQS::CreateQueueRequest &request) {
@@ -193,7 +191,7 @@ namespace AwsMock::Service {
         return response;
     }
 
-    Dto::SQS::CreateMessageResponse SQSService::CreateMessage(const Dto::SQS::CreateMessageRequest &request) {
+    Dto::SQS::SendMessageResponse SQSService::SendMessage(const Dto::SQS::SendMessageRequest &request) {
 
         if (!request.queueUrl.empty() && !_database->QueueUrlExists(request.region, request.queueUrl)) {
             throw Core::ServiceException("SQS queue '" + request.queueUrl + "' does not exists", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
@@ -201,7 +199,6 @@ namespace AwsMock::Service {
             throw Core::ServiceException("SQS queue '" + request.queueUrl + "' does not exists", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
         }
 
-        Database::Entity::SQS::Message message;
         try {
 
             // Get queue in case of ARN
@@ -212,20 +209,35 @@ namespace AwsMock::Service {
                 queue = _database->GetQueueByArn(request.queueArn);
             }
 
-            // Update database
+            // Set attributes
             std::string messageId = Core::StringUtils::GenerateRandomString(100);
             std::string receiptHandle = Core::StringUtils::GenerateRandomString(512);
             std::string md5Body = GetMd5Body(request.body);
             std::string md5Attr = GetMd5Attributes(request.messageAttributes);
-            message =
-                _database->CreateMessage({.region= request.region, .queueUrl=queue.queueUrl, .body=request.body, .messageId=messageId, .receiptHandle=receiptHandle,
-                                             .md5Body=md5Body, .md5Attr=md5Attr});
+
+            // Update database
+            Database::Entity::SQS::Message message = _database->CreateMessage(
+                {
+                    .region= request.region,
+                    .queueUrl=queue.queueUrl,
+                    .body=request.body,
+                    .messageId=messageId,
+                    .receiptHandle=receiptHandle,
+                    .md5Body=md5Body,
+                    .md5Attr=md5Attr
+                });
+            return {
+                .queueUrl=message.queueUrl,
+                .messageId=message.messageId,
+                .receiptHandle=message.receiptHandle,
+                .md5Body=message.md5Body,
+                .md5Attr=message.md5Attr
+            };
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "SQS create message failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500);
         }
-        return {.queueUrl=message.queueUrl, .messageId=message.messageId, .receiptHandle=message.receiptHandle, .md5Body=message.md5Body, .md5Attr=message.md5Attr};
     }
 
     Dto::SQS::ReceiveMessageResponse SQSService::ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request) {
@@ -243,7 +255,7 @@ namespace AwsMock::Service {
 
                 _database->ReceiveMessages(request.region, request.queueUrl, queue.attributes.visibilityTimeout, messageList);
 
-                if(!messageList.empty()) {
+                if (!messageList.empty()) {
                     break;
                 }
 
@@ -291,12 +303,47 @@ namespace AwsMock::Service {
     }
 
     std::string SQSService::GetMd5Attributes(const Dto::SQS::MessageAttributeList &attributes) {
-        std::stringstream attrString;
-        for (const auto &s : attributes) {
-            attrString << s.attributeName << s.type << s.transportType << s.attributeValue;
+
+        int length = 0;
+        auto *bytes = new unsigned char[4092];
+
+        // Sort the attributes by name
+        std::vector<Dto::SQS::MessageAttribute> sortedAttributes = attributes;
+        std::sort(sortedAttributes.begin(), sortedAttributes.end());
+
+        for (const auto &a : sortedAttributes) {
+
+            GetIntAsByteArray(a.attributeName.length(), bytes, length);
+            length += 4;
+            memcpy(bytes + length, a.attributeName.c_str(), a.attributeName.length());
+            length += a.attributeName.length();
+
+            GetIntAsByteArray(a.type.length(), bytes, length);
+            length += 4;
+            memcpy(bytes + length, a.type.c_str(), a.type.length());
+            length += a.type.length();
+
+            bytes[length] = (1 & 0x000000ff);
+            length += 1;
+
+            GetIntAsByteArray(a.attributeValue.length(), bytes, length);
+            length += 4;
+            memcpy(bytes + length, a.attributeValue.c_str(), a.attributeValue.length());
+            length += a.attributeValue.length();
+
         }
-        std::string md5sum = Core::Crypto::GetMd5FromString(attrString.str());
-        log_trace_stream(_logger) << "MD5 of attributes: " << md5sum << std::endl;
-        return md5sum;
+
+        // Calculate MD5 of byte array
+        unsigned char output[16];
+        MD5(bytes, length, output);
+
+        return Core::Crypto::HexEncode(output, 16);
+    }
+
+    void SQSService::GetIntAsByteArray(int n, unsigned char *bytes, int offset) {
+        bytes[offset + 3] = n & 0x000000ff;
+        bytes[offset + 2] = (n & 0x0000ff00) >> 8;
+        bytes[offset + 1] = (n & 0x00ff0000) >> 16;
+        bytes[offset] = (n & 0xff000000) >> 24;
     }
 } // namespace AwsMock::Service

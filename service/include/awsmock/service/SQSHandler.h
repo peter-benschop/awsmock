@@ -12,6 +12,7 @@
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
+#include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/MetricService.h>
 #include <awsmock/core/MetricServiceTimer.h>
@@ -107,6 +108,14 @@ namespace AwsMock::Service {
       void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
     private:
+
+      /**
+       * Get the message attributes.
+       *
+       * @param payload HTTP body
+       * @return list of message attributes
+       */
+      std::vector<Dto::SQS::MessageAttribute> GetMessageAttributes(const std::string &payload);
 
       /**
        * Logger

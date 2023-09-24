@@ -41,6 +41,7 @@
 **/CMakeFiles
 **/aws-mock
 **/install_manifest.txt
+**/_deps
 
 # Idea
 .idea

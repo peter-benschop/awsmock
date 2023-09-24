@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.18)
+project(aws-mock)
 
 # Semantic versioning (sv4git)
-execute_process (COMMAND bash -c "git sv cv| tr -d '\n'" OUTPUT_VARIABLE GIT_VERSION)
-
-project(aws-mock VERSION "${GIT_VERSION}")
+execute_process (COMMAND bash -c "git sv cv | tr -d '\n'" OUTPUT_VARIABLE GIT_VERSION)
 configure_file (core/include/awsmock/core/Version.h.in core/include/awsmock/core/Version.h)
 
+# required modules for our task
 set(CMAKE_CXX_STANDARD 20)
 
 # Set root install directory
@@ -13,7 +13,7 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif ()
 set(CMAKE_INSTALL_PREFIX "/usr" CACHE STRING " " FORCE)
-message("Building ${CMAKE_BUILD_TYPE}, install prefix ${CMAKE_INSTALL_PREFIX}")
+message("Building ${PROJECT_NAME} v${GIT_VERSION} type: ${CMAKE_BUILD_TYPE}, install prefix: ${CMAKE_INSTALL_PREFIX}")
 
 # Doxygen
 set(doxyfile ${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile)

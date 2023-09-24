@@ -9,14 +9,18 @@
 #include <string>
 #include <chrono>
 #include <ctime>
+#include <algorithm>
+
+// Poco includes
+#include "Poco/TextConverter.h"
+#include "Poco/Latin1Encoding.h"
+#include "Poco/UTF8Encoding.h"
 
 // AwsMock includes
 #include "awsmock/core/AwsUtils.h"
 #include "awsmock/core/LogStream.h"
 #include "awsmock/core/CryptoUtils.h"
 #include "awsmock/core/ServiceException.h"
-#include "awsmock/dto/sqs/SendMessageRequest.h"
-#include "awsmock/dto/sqs/SendMessageResponse.h"
 #include "awsmock/dto/sqs/CreateQueueRequest.h"
 #include "awsmock/dto/sqs/CreateQueueResponse.h"
 #include "awsmock/dto/sqs/GetQueueAttributesRequest.h"
@@ -28,15 +32,22 @@
 #include "awsmock/dto/sqs/GetQueueUrlRequest.h"
 #include "awsmock/dto/sqs/GetQueueUrlResponse.h"
 #include "awsmock/dto/sqs/ListQueueResponse.h"
-#include "awsmock/dto/sqs/SetQueueAttributesRequest.h"
-#include "awsmock/dto/sqs/SetQueueAttributesResponse.h"
 #include "awsmock/dto/sqs/PurgeQueueRequest.h"
 #include "awsmock/dto/sqs/PurgeQueueResponse.h"
 #include "awsmock/dto/sqs/ReceiveMessageRequest.h"
 #include "awsmock/dto/sqs/ReceiveMessageResponse.h"
+#include "awsmock/dto/sqs/SendMessageRequest.h"
+#include "awsmock/dto/sqs/SendMessageResponse.h"
+#include "awsmock/dto/sqs/SetQueueAttributesRequest.h"
+#include "awsmock/dto/sqs/SetQueueAttributesResponse.h"
 #include "awsmock/repository/SQSDatabase.h"
 
 #define DEFAULT_ACCOUNT_ID "000000000000"
+#define INTEGER_SIZE_IN_BYTES 4
+#define STRING_TYPE_FIELD_INDEX '1'
+#define BINARY_TYPE_FIELD_INDEX '2'
+#define STRING_LIST_TYPE_FIELD_INDEX '3'
+#define BINARY_LIST_TYPE_FIELD_INDEX '4'
 
 namespace AwsMock::Service {
 
@@ -116,10 +127,11 @@ namespace AwsMock::Service {
        * Creates a new queue
        *
        * @param request create message request
-       * @return CreateMessageResponse
+       * @return SendMessageResponse
        * @throws ServiceException
        */
-      Dto::SQS::CreateMessageResponse SendMessage(const Dto::SQS::SendMessageRequest &request);
+      Dto::SQS::SendMessageResponse SendMessage(const Dto::SQS::SendMessageRequest &request);
+
 
       /**
        * Receive a list of messages
@@ -139,12 +151,15 @@ namespace AwsMock::Service {
        */
       Dto::SQS::DeleteMessageResponse DeleteMessage(const Dto::SQS::DeleteMessageRequest &request);
 
-    private:
-
       /**
-       * Initialize the service
+       * Returns the MD5 sum of all attributes.
+       *
+       * @param attributes vector of attributes
+       * @return MD5 sum of attributes string
        */
-      void Initialize();
+      std::string GetMd5Attributes(const Dto::SQS::MessageAttributeList &attributes);
+
+    private:
 
       /**
        * Returns the MD5 sum of the message body.
@@ -155,12 +170,13 @@ namespace AwsMock::Service {
       std::string GetMd5Body(const std::string &body);
 
       /**
-       * Returns the MD5 sum of all attributes.
+       * Returns a integer as byte array and fill it in the given byte array at position offset.
        *
-       * @param attributes vector of attributes
-       * @return MD5 sum of attributes string
+       * @param n integer value
+       * @param bytes output byte array
+       * @param offset offset of the output byte array
        */
-      std::string GetMd5Attributes(const Dto::SQS::MessageAttributeList &attributes);
+      static void GetIntAsByteArray(int n, unsigned char* bytes, int offset);
 
       /**
        * Logger
