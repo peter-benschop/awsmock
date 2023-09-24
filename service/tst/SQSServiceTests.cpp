@@ -93,7 +93,7 @@ namespace AwsMock::Service {
         Dto::SQS::SendMessageRequest request = {.region=REGION, .queueUrl=QUEUE_URL, .body=BODY};
 
         // act
-        Dto::SQS::SendMessageResponse response = _service.CreateMessage(request);
+        Dto::SQS::SendMessageResponse response = _service.SendMessage(request);
 
         // assert
         EXPECT_TRUE(response.messageId.length() > 0);
@@ -106,7 +106,7 @@ namespace AwsMock::Service {
         Dto::SQS::CreateQueueRequest queueRequest = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
         Dto::SQS::SendMessageRequest msgRequest = {.region=REGION, .queueUrl=QUEUE_URL, .body=BODY};
-        Dto::SQS::SendMessageResponse msgResponse = _service.CreateMessage(msgRequest);
+        Dto::SQS::SendMessageResponse msgResponse = _service.SendMessage(msgRequest);
 
         // act
         Dto::SQS::ReceiveMessageRequest receiveRequest = {.queueUrl=QUEUE_URL, .maxMessages=10, .waitTimeSeconds=1};
@@ -122,7 +122,7 @@ namespace AwsMock::Service {
         Dto::SQS::CreateQueueRequest queueRequest = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
         Dto::SQS::SendMessageRequest msgRequest = {.region=REGION, .queueUrl=QUEUE_URL, .body=BODY};
-        Dto::SQS::SendMessageResponse msgResponse = _service.CreateMessage(msgRequest);
+        Dto::SQS::SendMessageResponse msgResponse = _service.SendMessage(msgRequest);
 
         // act
         Dto::SQS::DeleteMessageRequest delRequest = {.queueUrl=QUEUE, .receiptHandle=msgResponse.receiptHandle};

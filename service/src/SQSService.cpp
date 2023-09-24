@@ -6,25 +6,13 @@
 
 namespace AwsMock::Service {
 
-    struct MessageAttributesBuffer {
-      int nameLength;
-      char *name;
-      int typeLength;
-      char *type;
-      char stype;
-      int valueLength;
-      char *value;
-    };
-
     SQSService::SQSService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("SQSService")), _configuration(configuration) {
-        Initialize();
-    }
-
-    void SQSService::Initialize() {
 
         // Initialize environment
+        _accountId = _configuration.getString("awsmock.account.id", DEFAULT_ACCOUNT_ID);
+
+        // Database connection
         _database = std::make_unique<Database::SQSDatabase>(_configuration);
-        _accountId = DEFAULT_ACCOUNT_ID;
     }
 
     Dto::SQS::CreateQueueResponse SQSService::CreateQueue(const Dto::SQS::CreateQueueRequest &request) {
@@ -203,7 +191,7 @@ namespace AwsMock::Service {
         return response;
     }
 
-    Dto::SQS::SendMessageResponse SQSService::CreateMessage(const Dto::SQS::SendMessageRequest &request) {
+    Dto::SQS::SendMessageResponse SQSService::SendMessage(const Dto::SQS::SendMessageRequest &request) {
 
         if (!request.queueUrl.empty() && !_database->QueueUrlExists(request.region, request.queueUrl)) {
             throw Core::ServiceException("SQS queue '" + request.queueUrl + "' does not exists", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
@@ -211,7 +199,6 @@ namespace AwsMock::Service {
             throw Core::ServiceException("SQS queue '" + request.queueUrl + "' does not exists", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
         }
 
-        Database::Entity::SQS::Message message;
         try {
 
             // Get queue in case of ARN
@@ -222,15 +209,30 @@ namespace AwsMock::Service {
                 queue = _database->GetQueueByArn(request.queueArn);
             }
 
-            // Update database
+            // Set attributes
             std::string messageId = Core::StringUtils::GenerateRandomString(100);
             std::string receiptHandle = Core::StringUtils::GenerateRandomString(512);
             std::string md5Body = GetMd5Body(request.body);
             std::string md5Attr = GetMd5Attributes(request.messageAttributes);
-            message =
-                _database->CreateMessage({.region= request.region, .queueUrl=queue.queueUrl, .body=request.body, .messageId=messageId, .receiptHandle=receiptHandle,
-                                             .md5Body=md5Body, .md5Attr=md5Attr});
-            return {.queueUrl=message.queueUrl, .messageId=messageId, .receiptHandle=receiptHandle, .md5Body=md5Body, .md5Attr=md5Attr};
+
+            // Update database
+            Database::Entity::SQS::Message message = _database->CreateMessage(
+                {
+                    .region= request.region,
+                    .queueUrl=queue.queueUrl,
+                    .body=request.body,
+                    .messageId=messageId,
+                    .receiptHandle=receiptHandle,
+                    .md5Body=md5Body,
+                    .md5Attr=md5Attr
+                });
+            return {
+                .queueUrl=message.queueUrl,
+                .messageId=message.messageId,
+                .receiptHandle=message.receiptHandle,
+                .md5Body=message.md5Body,
+                .md5Attr=message.md5Attr
+            };
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "SQS create message failed, message: " << ex.message() << std::endl;
@@ -253,7 +255,7 @@ namespace AwsMock::Service {
 
                 _database->ReceiveMessages(request.region, request.queueUrl, queue.attributes.visibilityTimeout, messageList);
 
-                if(!messageList.empty()) {
+                if (!messageList.empty()) {
                     break;
                 }
 

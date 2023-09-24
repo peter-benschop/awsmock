@@ -79,7 +79,7 @@ namespace AwsMock::Service {
                 std::vector<Dto::SQS::MessageAttribute> attributes = GetMessageAttributes(payload);
 
                 Dto::SQS::SendMessageRequest sqsRequest = {.region=region, .queueUrl=queueUrl, .queueArn=queueArn, .body=body, .messageAttributes=attributes};
-                Dto::SQS::SendMessageResponse sqsResponse = _sqsService.CreateMessage(sqsRequest);
+                Dto::SQS::SendMessageResponse sqsResponse = _sqsService.SendMessage(sqsRequest);
                 SendOkResponse(response, sqsResponse.ToXml());
 
             } else if (action == "GetQueueUrl") {

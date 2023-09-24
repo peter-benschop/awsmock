@@ -13,11 +13,11 @@ namespace AwsMock::Dto::SQS {
     }
 
     std::ostream &operator<<(std::ostream &os, const SendMessageRequest &r) {
-        os << "SendMessageRequest={region='" + r.region + "' queueUrl='" + r.queueUrl + "' queueArn='" + r.queueArn + "' body: '" + r.body + "' attributes=[";
+        os << "SendMessageRequest={region='" << r.region << "', queueUrl='" << r.queueUrl << "', queueArn='" << r.queueArn << "', body: '" << r.body << "', attributes=[";
         for (const auto &a : r.messageAttributes) {
-            os << "attributeName='" + a.attributeName + "' attributeValue='" + a.attributeValue + "' ";
+            os << a.ToString() << ", ";
         }
-        os << "]}";
+        os << "\b" << "\b" << "]}";
         return os;
     }
 

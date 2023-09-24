@@ -21,8 +21,6 @@
 #include "awsmock/core/LogStream.h"
 #include "awsmock/core/CryptoUtils.h"
 #include "awsmock/core/ServiceException.h"
-#include "awsmock/dto/sqs/SendMessageRequest.h"
-#include "awsmock/dto/sqs/SendMessageResponse.h"
 #include "awsmock/dto/sqs/CreateQueueRequest.h"
 #include "awsmock/dto/sqs/CreateQueueResponse.h"
 #include "awsmock/dto/sqs/GetQueueAttributesRequest.h"
@@ -34,12 +32,14 @@
 #include "awsmock/dto/sqs/GetQueueUrlRequest.h"
 #include "awsmock/dto/sqs/GetQueueUrlResponse.h"
 #include "awsmock/dto/sqs/ListQueueResponse.h"
-#include "awsmock/dto/sqs/SetQueueAttributesRequest.h"
-#include "awsmock/dto/sqs/SetQueueAttributesResponse.h"
 #include "awsmock/dto/sqs/PurgeQueueRequest.h"
 #include "awsmock/dto/sqs/PurgeQueueResponse.h"
 #include "awsmock/dto/sqs/ReceiveMessageRequest.h"
 #include "awsmock/dto/sqs/ReceiveMessageResponse.h"
+#include "awsmock/dto/sqs/SendMessageRequest.h"
+#include "awsmock/dto/sqs/SendMessageResponse.h"
+#include "awsmock/dto/sqs/SetQueueAttributesRequest.h"
+#include "awsmock/dto/sqs/SetQueueAttributesResponse.h"
 #include "awsmock/repository/SQSDatabase.h"
 
 #define DEFAULT_ACCOUNT_ID "000000000000"
@@ -130,7 +130,7 @@ namespace AwsMock::Service {
        * @return SendMessageResponse
        * @throws ServiceException
        */
-      Dto::SQS::SendMessageResponse CreateMessage(const Dto::SQS::SendMessageRequest &request);
+      Dto::SQS::SendMessageResponse SendMessage(const Dto::SQS::SendMessageRequest &request);
 
       /**
        * Receive a list of messages
@@ -159,11 +159,6 @@ namespace AwsMock::Service {
       std::string GetMd5Attributes(const Dto::SQS::MessageAttributeList &attributes);
 
     private:
-
-      /**
-       * Initialize the service
-       */
-      void Initialize();
 
       /**
        * Returns the MD5 sum of the message body.

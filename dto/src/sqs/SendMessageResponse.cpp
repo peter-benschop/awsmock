@@ -49,7 +49,7 @@ namespace AwsMock::Dto::SQS {
         writer.setNewLine("\n");
         writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
         writer.writeNode(output, pDoc);
-
+        std::cerr << output.str()<< std::endl;
         return output.str();
     }
 
@@ -60,8 +60,8 @@ namespace AwsMock::Dto::SQS {
     }
 
     std::ostream &operator<<(std::ostream &os, const SendMessageResponse &r) {
-        os << "SendMessageResponse={id='" + std::to_string(r.id) + "' url='" + r.queueUrl + "' messageId='" + r.messageId + "' receiptHandle='" + r.receiptHandle +
-            "' md5body='" + r.md5Body + "' md5attr='" + r.md5Attr + "'}";
+        os << "SendMessageResponse={id='" << r.id << "', url='" << r.queueUrl << "', messageId='" << r.messageId << "', receiptHandle='" << r.receiptHandle <<
+           "', md5body='" << r.md5Body << "', md5attr='" << r.md5Attr << "'}";
         return os;
     }
 

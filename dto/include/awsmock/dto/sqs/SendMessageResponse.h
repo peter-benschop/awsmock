@@ -8,6 +8,7 @@
 // C++ standard includes
 #include <string>
 #include <sstream>
+#include <iostream>
 #include <utility>
 
 // Poco includes
