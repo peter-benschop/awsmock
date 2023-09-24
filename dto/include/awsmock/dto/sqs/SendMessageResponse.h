@@ -62,6 +62,11 @@ namespace AwsMock::Dto::SQS {
       std::string md5Attr;
 
       /**
+       * Request ID
+       */
+      std::string requestId;
+
+      /**
        * Convert to XML representation
        *
        * @return XML string

@@ -226,12 +226,15 @@ namespace AwsMock::Service {
                     .md5Body=md5Body,
                     .md5Attr=md5Attr
                 });
+            log_info_stream(_logger) << "Message send, messageId: " << messageId << "requestId: " << request.requestId << std::endl;
+
             return {
                 .queueUrl=message.queueUrl,
                 .messageId=message.messageId,
                 .receiptHandle=message.receiptHandle,
                 .md5Body=message.md5Body,
-                .md5Attr=message.md5Attr
+                .md5Attr=message.md5Attr,
+                .requestId=request.requestId
             };
 
         } catch (Poco::Exception &ex) {
@@ -242,15 +245,12 @@ namespace AwsMock::Service {
 
     Dto::SQS::ReceiveMessageResponse SQSService::ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request) {
 
-        Dto::SQS::ReceiveMessageResponse response;
         try {
             Database::Entity::SQS::MessageList messageList;
-
             Database::Entity::SQS::Queue queue = _database->GetQueueByUrl(request.queueUrl);
 
             long elapsed = 0;
             auto begin = std::chrono::high_resolution_clock::now();
-
             while (elapsed < request.waitTimeSeconds * 1000) {
 
                 _database->ReceiveMessages(request.region, request.queueUrl, queue.attributes.visibilityTimeout, messageList);
@@ -264,22 +264,24 @@ namespace AwsMock::Service {
                 Poco::Thread::sleep(500);
             }
 
+            Dto::SQS::ReceiveMessageResponse response;
             if (!messageList.empty()) {
                 response.messageList = messageList;
-                response.requestId = Poco::UUIDGenerator().createRandom().toString();
+                response.requestId = request.requestId;
             }
+            log_info_stream(_logger) << "Message received, count: " << messageList.size() << "requestId: " << request.requestId << std::endl;
+
+            return response;
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "SQS create message failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500);
         }
-        return {response};
     }
 
-    Dto::SQS::DeleteMessageResponse SQSService::DeleteMessage(const Dto::SQS::DeleteMessageRequest &request) {
+    void SQSService::DeleteMessage(const Dto::SQS::DeleteMessageRequest &request) {
         log_trace_stream(_logger) << "Delete message request, url: " << request.receiptHandle << std::endl;
 
-        Dto::SQS::DeleteMessageResponse response;
         try {
             // TODO: Check existence
             if (!_database->MessageExists(request.receiptHandle)) {
@@ -287,13 +289,15 @@ namespace AwsMock::Service {
             }
 
             // Delete from database
-            _database->DeleteMessage({.queueUrl=request.queueUrl, .receiptHandle=request.receiptHandle});
+            _database->DeleteMessage({
+                .queueUrl=request.queueUrl,
+                .receiptHandle=request.receiptHandle
+            });
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "SQS delete message failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500);
         }
-        return response;
     }
 
     std::string SQSService::GetMd5Body(const std::string &body) {

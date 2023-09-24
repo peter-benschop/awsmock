@@ -41,6 +41,11 @@ namespace AwsMock::Dto::SQS {
       MessageAttributeList messageAttributes;
 
       /**
+       * Request ID
+       */
+      std::string requestId;
+
+      /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.

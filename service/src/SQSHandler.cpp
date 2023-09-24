@@ -45,6 +45,7 @@ namespace AwsMock::Service {
             std::string endpoint = GetEndpoint(request);
             std::string payload = GetPayload(request);
             std::string action, version;
+            std::string requestId = GetHeaderValue(request, "RequestId", Poco::UUIDGenerator().createRandom().toString());
 
             GetActionVersion(payload, action, version);
             log_debug_stream(_logger) << "SQS POST request, action: " << action << " version: " << version << std::endl;
@@ -53,7 +54,11 @@ namespace AwsMock::Service {
 
                 std::string name = GetStringParameter(payload, "QueueName");
 
-                Dto::SQS::CreateQueueRequest sqsRequest = {.region=region, .name=name, .queueUrl="http://" + endpoint + "/" + _accountId + "/" + name, .owner=user};
+                Dto::SQS::CreateQueueRequest sqsRequest = {
+                    .region=region,
+                    .name=name,
+                    .queueUrl="http://" + endpoint + "/" + _accountId + "/" + name, .owner=user
+                };
                 Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
                 SendOkResponse(response, sqsResponse.ToXml());
 
@@ -78,7 +83,14 @@ namespace AwsMock::Service {
 
                 std::vector<Dto::SQS::MessageAttribute> attributes = GetMessageAttributes(payload);
 
-                Dto::SQS::SendMessageRequest sqsRequest = {.region=region, .queueUrl=queueUrl, .queueArn=queueArn, .body=body, .messageAttributes=attributes};
+                Dto::SQS::SendMessageRequest sqsRequest = {
+                    .region=region,
+                    .queueUrl=queueUrl,
+                    .queueArn=queueArn,
+                    .body=body,
+                    .messageAttributes=attributes,
+                    .requestId=requestId
+                };
                 Dto::SQS::SendMessageResponse sqsResponse = _sqsService.SendMessage(sqsRequest);
                 SendOkResponse(response, sqsResponse.ToXml());
 
@@ -97,8 +109,14 @@ namespace AwsMock::Service {
                 int waitTimeSeconds = GetIntParameter(payload, "WaitTimeSeconds", 1, 900, 5);
                 int visibility = GetIntParameter(payload, "VisibilityTimeout", 1, 900, 30);
 
-                Dto::SQS::ReceiveMessageRequest sqsRequest = {.region=region, .queueUrl=queueUrl, .maxMessages=maxMessages, .visibility=visibility,
-                    .waitTimeSeconds=waitTimeSeconds};
+                Dto::SQS::ReceiveMessageRequest sqsRequest = {
+                    .region=region,
+                    .queueUrl=queueUrl,
+                    .maxMessages=maxMessages,
+                    .visibility=visibility,
+                    .waitTimeSeconds=waitTimeSeconds,
+                    .requestId=requestId
+                };
                 Dto::SQS::ReceiveMessageResponse sqsResponse = _sqsService.ReceiveMessages(sqsRequest);
 
                 SendOkResponse(response, sqsResponse.ToXml());
@@ -144,7 +162,11 @@ namespace AwsMock::Service {
                     attributes[attributeName] = attributeValue;
                 }
 
-                Dto::SQS::SetQueueAttributesRequest sqsRequest = {.region=region, .queueUrl=queueUrl, .attributes=attributes};
+                Dto::SQS::SetQueueAttributesRequest sqsRequest = {
+                    .region=region,
+                    .queueUrl=queueUrl,
+                    .attributes=attributes
+                };
                 Dto::SQS::SetQueueAttributesResponse sqsResponse = _sqsService.SetQueueAttributes(sqsRequest);
 
                 SendOkResponse(response, sqsResponse.ToXml());
@@ -154,10 +176,14 @@ namespace AwsMock::Service {
                 std::string queueUrl = GetStringParameter(payload, "QueueUrl");
                 std::string receiptHandle = GetStringParameter(payload, "ReceiptHandle");
 
-                Dto::SQS::DeleteMessageRequest sqsRequest = {.region=region, .queueUrl=queueUrl, .receiptHandle=receiptHandle};
-                Dto::SQS::DeleteMessageResponse sqsResponse = _sqsService.DeleteMessage(sqsRequest);
+                Dto::SQS::DeleteMessageRequest sqsRequest = {
+                    .region=region,
+                    .queueUrl=queueUrl,
+                    .receiptHandle=receiptHandle
+                };
+                _sqsService.DeleteMessage(sqsRequest);
 
-                SendOkResponse(response, sqsResponse.ToXml());
+                SendOkResponse(response);
             }
 
         } catch (Core::ServiceException &exc) {
