@@ -127,7 +127,7 @@ namespace AwsMock::Service {
         // act
         Dto::SQS::DeleteMessageRequest delRequest = {.queueUrl=QUEUE, .receiptHandle=msgResponse.receiptHandle};
         Dto::SQS::DeleteMessageResponse delResponse;
-        EXPECT_NO_FATAL_FAILURE({ delResponse = _service.DeleteMessage(delRequest); });
+        EXPECT_NO_FATAL_FAILURE({ _service.DeleteMessage(delRequest); });
 
         // assert
         EXPECT_EQ(0, _database.CountMessages(REGION, QUEUE_URL));
