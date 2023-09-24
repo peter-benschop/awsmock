@@ -210,7 +210,7 @@ namespace AwsMock::Service {
             }
 
             // Set attributes
-            std::string messageId = Core::StringUtils::GenerateRandomString(100);
+            std::string messageId = Poco::UUIDGenerator().createRandom().toString();
             std::string receiptHandle = Core::StringUtils::GenerateRandomString(512);
             std::string md5Body = GetMd5Body(request.body);
             std::string md5Attr = GetMd5Attributes(request.messageAttributes);
