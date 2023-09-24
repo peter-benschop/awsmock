@@ -49,7 +49,6 @@ namespace AwsMock::Dto::SQS {
         writer.setNewLine("\n");
         writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
         writer.writeNode(output, pDoc);
-        std::cerr << output.str()<< std::endl;
         return output.str();
     }
 

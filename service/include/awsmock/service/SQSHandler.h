@@ -115,7 +115,7 @@ namespace AwsMock::Service {
        * @param payload HTTP body
        * @return list of message attributes
        */
-      std::vector<Dto::SQS::MessageAttribute> GetMessageAttributes(const std::string &payload);
+      static std::vector<Dto::SQS::MessageAttribute> GetMessageAttributes(const std::string &payload);
 
       /**
        * Logger

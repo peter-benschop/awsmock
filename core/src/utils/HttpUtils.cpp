@@ -42,7 +42,10 @@ namespace AwsMock::Core {
     }
 
     std::string HttpUtils::GetQueryString(const std::string &uri) {
-        return StringUtils::SubStringAfter(uri, "?");
+        if(StringUtils::Contains(uri, "?")) {
+            return StringUtils::SubStringAfter(uri, "?");
+        }
+        return uri;
     }
 
     int HttpUtils::CountQueryParameters(const std::string &uri) {
