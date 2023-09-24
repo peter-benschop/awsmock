@@ -229,6 +229,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::SendInvocationRequest(int port, const std::string &body) {
+        log_debug_stream(_logger) << "Sending lambda invocation request, port: " << port << std::endl;
 
         Poco::URI uri("http://localhost:" + std::to_string(port) + "/2015-03-31/functions/function/invocations");
         std::string path(uri.getPathAndQuery());

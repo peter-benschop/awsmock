@@ -2,10 +2,12 @@
 set(LIBRARY awsmockdto)
 set(LIBRARY_STATIC awsmockdto_static)
 
+set(SQS_SOURCES src/sqs/ListQueueResponse.cpp)
+set(DOCKER_SOURCES src/docker/Port.cpp src/docker/Container.cpp src/docker/ListContainerResponse.cpp)
 set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionResponse.cpp src/lambda/DeadLetterConfig.cpp
         src/lambda/Function.cpp)
 
-set(SOURCES ${LAMBDA_SOURCES})
+set(SOURCES ${SQS_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES})
 
 # Includes
 include_directories(include ../core/include ../db/include /usr/include /usr/include/mongo /usr/include/bsoncxx/v_noabi
