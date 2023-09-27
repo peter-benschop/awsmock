@@ -90,19 +90,19 @@ namespace AwsMock::Service {
     Dto::SQS::GetQueueUrlResponse SQSService::GetQueueUrl(const Dto::SQS::GetQueueUrlRequest &request) {
         log_trace_stream(_logger) << "Get queue URL request, region: " << request.region << " name: " << request.queueName << std::endl;
 
-        Dto::SQS::GetQueueUrlResponse response;
         try {
 
             // Get queue
+            Dto::SQS::GetQueueUrlResponse response;
             Database::Entity::SQS::Queue queue = _database->GetQueueByName(request.region, request.queueName);
             response.queueUrl = queue.queueUrl;
-            log_debug_stream(_logger) << "SQS queue URL received, region: " << request.region << " name: " << queue.queueUrl << std::endl;
+            log_info_stream(_logger) << "SQS get queue URL, region: " << request.region << " name: " << queue.queueUrl << std::endl;
+            return response;
 
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "SQS purge queue failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500, request.region.c_str(), request.queueName.c_str());
         }
-        return response;
     }
 
     Dto::SQS::GetQueueAttributesResponse SQSService::GetQueueAttributes(const Dto::SQS::GetQueueAttributesRequest &request) {
@@ -142,7 +142,6 @@ namespace AwsMock::Service {
             throw Core::ServiceException("SQS queue '" + request.queueUrl + "' does not exists", 500, request.resource.c_str(), request.requestId.c_str());
         }
 
-        Dto::SQS::SetQueueAttributesResponse response;
         try {
 
             // Get the queue
@@ -160,11 +159,13 @@ namespace AwsMock::Service {
             queue = _database->UpdateQueue(queue);
             log_trace_stream(_logger) << "Queue updated: " << queue.ToString() << std::endl;
 
+            Dto::SQS::SetQueueAttributesResponse response = {.region=queue.region, .requestId=request.requestId};
+            return response;
+
         } catch (Poco::Exception &ex) {
             log_error_stream(_logger) << "SQS delete queue failed, message: " << ex.message() << std::endl;
             throw Core::ServiceException(ex.message(), 500);
         }
-        return response;
     }
 
     Dto::SQS::DeleteQueueResponse SQSService::DeleteQueue(const Dto::SQS::DeleteQueueRequest &request) {
@@ -269,7 +270,7 @@ namespace AwsMock::Service {
                 response.messageList = messageList;
                 response.requestId = request.requestId;
             }
-            log_info_stream(_logger) << "Message received, count: " << messageList.size() << "requestId: " << request.requestId << std::endl;
+            log_info_stream(_logger) << "Message received, count: " << messageList.size() << " requestId: " << request.requestId << std::endl;
 
             return response;
 

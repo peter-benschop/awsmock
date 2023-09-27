@@ -48,26 +48,14 @@ namespace AwsMock::Dto::SQS {
        *
        * @return DTO as string for logging.
        */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
+      [[nodiscard]] std::string ToString() const;
 
       /**
        * Stream provider.
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const GetQueueAttributesRequest &r) {
-          os << "GetQueueAttributesRequest={region='" << r.region
-             << "' queueUrl='" + r.queueUrl + "' resource='" + r.resource + "' requestId='" + r.requestId + "' attributeNames=[";
-          for(const auto &it : r.attributeNames) {
-              os << it;
-          }
-          os << "]}";
-          return os;
-      }
+      friend std::ostream &operator<<(std::ostream &os, const GetQueueAttributesRequest &r);
 
     };
 

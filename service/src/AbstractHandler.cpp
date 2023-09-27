@@ -489,7 +489,7 @@ namespace AwsMock::Service {
         // Default headers
         response.set("Date", Poco::DateTimeFormatter::format(Poco::DateTime(), Poco::DateTimeFormat::HTTP_FORMAT));
         response.set("Content-Length", std::to_string(contentLength));
-        response.set("Content-Type", "text/html; charset=utf-8");
+        response.set("Content-Type", "application/xml");
         response.set("Connection", "close");
         response.set("Server", "awsmock");
 
@@ -546,9 +546,11 @@ namespace AwsMock::Service {
 
     [[maybe_unused]] void AbstractHandler::DumpBody(Poco::Net::HTTPServerRequest &request) {
         log_trace_stream(_logger) << "Dump request body" << std::endl;
+        std::basic_streambuf<char> *cinbuf = request.stream().rdbuf();
         std::cerr << "================== Request Body ==================" << std::endl;
         std::cerr << request.stream().rdbuf() << std::endl;
         std::cerr << "==================================================" << std::endl;
+        request.stream().rdbuf(cinbuf);
     }
 
     void AbstractHandler::DumpBodyToFile(Poco::Net::HTTPServerRequest &request, const std::string &filename) {

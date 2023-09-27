@@ -8,6 +8,7 @@
 // C++ standard includes
 #include <string>
 #include <sstream>
+#include <map>
 
 // Poco includes
 #include "Poco/UUID.h"
@@ -47,21 +48,14 @@ namespace AwsMock::Dto::SQS {
        *
        * @return DTO as string for logging.
        */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
+      [[nodiscard]] std::string ToString() const;
 
       /**
        * Stream provider.
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const SetQueueAttributesRequest &r) {
-          os << "SetQueueAttributesRequest={queueUrl='" + r.queueUrl + "' resource='" + r.resource + "' requestId='" + r.requestId + "'}";
-          return os;
-      }
+      friend std::ostream &operator<<(std::ostream &os, const SetQueueAttributesRequest &r);
 
     };
 
