@@ -172,6 +172,7 @@ create_queue_with_dead_letter_queue image-result
 #create_queue_with_dead_letter_queue image-delete-notification
 create_queue_with_dead_letter_queue parsing-result
 create_queue_with_dead_letter_queue produktmeldung-parsing
+create_queue_with_dead_letter_queue onix3-produktmeldungen-delete-events
 create_queue_with_dead_letter_queue onix3-tmp-parsing-input-event
 create_queue_with_dead_letter_queue onix3-tmp-anreicherungs-input-event
 create_queue_with_dead_letter_queue onix3-datenlieferant-updates
