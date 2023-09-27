@@ -176,6 +176,7 @@ create_queue_with_dead_letter_queue onix3-produktmeldungen-delete-events
 create_queue_with_dead_letter_queue onix3-tmp-parsing-input-event
 create_queue_with_dead_letter_queue onix3-tmp-anreicherungs-input-event
 create_queue_with_dead_letter_queue onix3-datenlieferant-updates
+create_queue_with_dead_letter_queue protokollierung-datenlieferant-updates
 #create_queue_with_dead_letter_queue vlb-preisreferenz-splitting-result
 create_queue_with_dead_letter_queue artikel-transformations-service-artikel-ausgang
 create_queue_with_dead_letter_queue textannotation-result
@@ -183,7 +184,6 @@ create_queue_with_dead_letter_queue bilderlink
 create_queue_with_dead_letter_queue katalogdaten
 #create_queue_with_dead_letter_queue daten-lieferanten-service-daten-eingang
 #create_queue_with_dead_letter_queue daten-datenlieferanten-notification
-#create_queue_with_dead_letter_queue protokollierung-datenlieferant-updates
 #create_queue_with_dead_letter_queue inventory-feed-parsing-result
 
 #
