@@ -146,7 +146,7 @@ namespace AwsMock::Service {
 
             // Get the queue
             Database::Entity::SQS::Queue queue = _database->GetQueueByUrl(request.queueUrl);
-            log_debug_stream(_logger) << "Got queue: " << queue.ToString() << std::endl;
+            log_trace_stream(_logger) << "Got queue: " << queue.ToString() << std::endl;
 
             // Reset all attributes
             queue.attributes.policy = request.attributes["Policy"];

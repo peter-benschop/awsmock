@@ -38,10 +38,6 @@ namespace AwsMock::Service {
             // Get the existing entity
             lambdaEntity = _lambdaDatabase->GetLambdaByArn(lambdaArn);
 
-            // Set pending
-            lambdaEntity.state = Database::Entity::Lambda::LambdaState::Pending;
-            lambdaEntity = _lambdaDatabase->UpdateLambda(lambdaEntity);
-
         } else {
 
             std::string codeFileName = _lambdaDir + Poco::Path::separator() + request.functionName + "-" + "latest" + ".zip";

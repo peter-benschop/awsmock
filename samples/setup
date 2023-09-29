@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SERVERID="none"
-ENDPOINT="http://localhost"
+ENDPOINT="http://localhost:4566"
 
 #
 # SQS Queues functions
@@ -189,7 +189,7 @@ create_queue_with_dead_letter_queue katalogdaten
 #
 # Create lambda function
 #
-create_lambda_function ftp-file-copy java17 file-copy-service-1.16.0-SNAPSHOT-aws.jar org.springframework.cloud.function.adapter.aws.FunctionInvoker 1.16.0
+create_lambda_function ftp-file-copy java17 file-copy-service-1.19.1-SNAPSHOT-aws.jar org.springframework.cloud.function.adapter.aws.FunctionInvoker 1.19.1
 create_lambda_function ftp-file-distribution java17 file-distribution-service-1.26.1-SNAPSHOT-aws.jar org.springframework.cloud.function.adapter.aws.FunctionInvoker 1.26.1
 create_lambda_function image-transformation provided.al2 image-transformation-lambda.zip image-transformation-lambda 1.0
 #create_lambda_function vlb-preisreferenz-splitting java17 vlb-preisreferenz-splitting-1.2.1-SNAPSHOT-aws.jar org.springframework.cloud.function.adapter.aws.FunctionInvoker

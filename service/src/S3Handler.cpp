@@ -51,22 +51,22 @@ namespace AwsMock::Service {
 
                 int listType = 1;
                 if (Core::HttpUtils::HasQueryParameter(request.getURI(), "list-type")) {
-                    listType = std::stoi(Core::HttpUtils::GetQueryParameterByName(request.getURI(), "list-type"));
+                    listType = std::stoi(Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "list-type"));
                 }
 
                 std::string delimiter;
                 if (Core::HttpUtils::HasQueryParameter(request.getURI(), "delimiter")) {
-                    delimiter = Core::HttpUtils::GetQueryParameterByName(request.getURI(), "delimiter");
+                    delimiter = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "delimiter");
                 }
 
                 std::string prefix;
                 if (Core::HttpUtils::HasQueryParameter(request.getURI(), "prefix")) {
-                    prefix = Core::HttpUtils::GetQueryParameterByName(request.getURI(), "prefix");
+                    prefix = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "prefix");
                 }
 
                 std::string encodingType = "url";
                 if (Core::HttpUtils::HasQueryParameter(request.getURI(), "encoding_type")) {
-                    encodingType = Core::HttpUtils::GetQueryParameterByName(request.getURI(), "encoding_type");
+                    encodingType = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "encoding_type");
                 }
 
                 // Return object list
@@ -112,8 +112,8 @@ namespace AwsMock::Service {
             if (isMultipartUpload) {
 
                 // S3 initial multipart upload
-                std::string partNumber = Core::HttpUtils::GetQueryParameterByName(request.getURI(), "partNumber");
-                std::string uploadId = Core::HttpUtils::GetQueryParameterByName(request.getURI(), "uploadId");
+                std::string partNumber = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "partNumber");
+                std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "uploadId");
                 log_debug_stream(_logger) << "Initial S3 multipart upload part: " << partNumber << std::endl;
 
                 std::string eTag = _s3Service.UploadPart(request.stream(), std::stoi(partNumber), uploadId);
@@ -251,7 +251,7 @@ namespace AwsMock::Service {
 
             } else {
 
-                std::string uploadId = Core::HttpUtils::GetQueryParameterByName(request.getURI(), "uploadId");
+                std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "uploadId");
                 log_debug_stream(_logger) << "Finish multipart upload request, uploadId: " << uploadId << std::endl;
 
                 Dto::S3::CompleteMultipartUploadResult result = _s3Service.CompleteMultipartUpload(uploadId, bucket, key, region, user);

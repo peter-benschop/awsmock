@@ -13,18 +13,14 @@ different AWS services.
 
 ## S3
 
-Supported commands are:
+Data is stored as objects within resources called “buckets”, and a single object can be up to 5 terabytes in size. Objects can be accessed through S3 Access Points or directly through 
+the bucket hostname. With cost-effective storage classes and easy-to-use management features, you can optimize costs, organize data, and configure fine-tuned access controls to meet 
+specific business, organizational, and compliance requirements.
 
-| REST Api              | Description                                   | Example                                                                                                                 |
-|-----------------------|-----------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
-| CreateBucket          | Create a new bucket                           | aws s3 create-bucket &lt;bucket&gt; --endpoint http://localhost:4567                                                    |
-| PutObject             | Upload an object to an S3 bucket              | aws s3 cp &lt;file&gt; s3://&lt;bucket&gt; --endpoint http://localhost:4567                                             |
-| GetObject             | Download a object from a S3 bucket            | aws s3 cp s3://bucket &lt;file&gt; --endpoint http://localhost:4567                                                     |
-| ListAllBucket         | List all buckets                              | aws s3 ls --endpoint http://localhost:4567                                                                              |
-| ListBucket            | List the content of a bucket                  | aws s3 ls s3://&lt;bucket&gt; --recursive --endpoint http://localhost:4567                                              |
-| PutBucketNotification | Adds a notification configuration to a bucket | aws put-bucket-notification-configuration --bucket &lt;bucket&gt; --notification-configuration file://&lt;hook-file&gt; --endpoint http://localhost:4567|
-| DeleteObject          | Deletes an object from a bucket               | aws rm &lt;s3Uri&gt; --endpoint http://localhost:4567                                                                                                   |
-| DeleteBucket          | Deletes a bucket and all of its content       | aws rb &lt;s3Uri&gt; --endpoint http://localhost:4567                                                                                                    |
+AwsMock S3 mock simulates a real AWS S3 bucket and its object. They can be copied, added, moved, deleted any some more functions. S3 object are stored on disk and their metadata is part of
+AwsMock Mongo DB collection. Therefore the MongoDB has two collections: Buckets and Objects. Buckets contain the bucket metadata and teh object collection the object data.
+
+See [AwsMock S3 supported commands](docs/S3/S3Functions) for a list of supported commands.
 
 ## SQS
 

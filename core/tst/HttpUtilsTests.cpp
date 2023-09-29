@@ -181,7 +181,7 @@ namespace AwsMock::Core {
         std::string uri = "/ftpuser1/incoming/mix?arg=value";
 
         // act
-        std::string result = HttpUtils::GetQueryParameterByName(uri, "arg");
+        std::string result = HttpUtils::GetQueryParameterValueByName(uri, "arg");
 
         // assert
         EXPECT_TRUE("value" == result);
@@ -217,7 +217,7 @@ namespace AwsMock::Core {
         std::string uri = "/ftpuser1/incoming/mix?arg=This%20is%20an%20encoded%20query%20parameter%20mit%20length%20%3E%201";
 
         // act
-        std::string result = HttpUtils::GetQueryParameterByName(uri, "arg");
+        std::string result = HttpUtils::GetQueryParameterValueByName(uri, "arg");
 
         // assert
         EXPECT_TRUE(result == "This is an encoded query parameter mit length > 1");

@@ -130,7 +130,7 @@ namespace AwsMock::Core {
        * @param name HTTP parameter name
        * @return number of query parameters
        */
-      static std::string GetQueryParameterByName(const std::string &uri, const std::string &name);
+      static std::string GetQueryParameterValueByName(const std::string &uri, const std::string &name);
 
       /**
        * Checks for existence of parameter with the given name.

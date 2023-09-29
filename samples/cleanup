@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ENDPOINT="http://localhost"
+ENDPOINT="http://localhost:4566"
 
 #
 # S3 function
