@@ -20,7 +20,7 @@ specific business, organizational, and compliance requirements.
 AwsMock S3 mock simulates a real AWS S3 bucket and its object. They can be copied, added, moved, deleted any some more functions. S3 object are stored on disk and their metadata is part of
 AwsMock Mongo DB collection. Therefore the MongoDB has two collections: Buckets and Objects. Buckets contain the bucket metadata and teh object collection the object data.
 
-See [AwsMock S3 supported commands](docs/S3/S3Functions) for a list of supported commands.
+See [AwsMock S3 supported commands](docs/S3/S3Functions.md) for a list of supported commands.
 
 ## SQS
 
