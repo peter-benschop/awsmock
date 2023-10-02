@@ -41,309 +41,313 @@
 #include "awsmock/dto/s3/PutObjectResponse.h"
 #include "awsmock/service/LambdaService.h"
 
+#define DEFAULT_DATA_DIR  "/home/awsmock/data"
+#define DEFAULT_S3_DATA_DIR  "/home/awsmock/data/s3"
+#define DEFAULT_TRANSFER_DATA_DIR  "/home/awsmock/data/transfer"
+
 namespace AwsMock::Service {
 
-    typedef std::map<std::string, std::ofstream> MultiPartUploads;
+  typedef std::map<std::string, std::ofstream> MultiPartUploads;
 
-    class S3Service {
+  class S3Service {
 
     public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration service configuration
-       */
-      explicit S3Service(const Core::Configuration &configuration);
+    /**
+     * Constructor
+     *
+     * @param configuration service configuration
+     */
+    explicit S3Service(const Core::Configuration &configuration);
 
-      /**
-       * Returns the meta data of an S3 object
-       *
-       * @param request get metadata request
-       * @return CreateBucketResponse
-       */
-      Dto::S3::GetMetadataResponse GetMetadata(Dto::S3::GetMetadataRequest &request);
+    /**
+     * Returns the meta data of an S3 object
+     *
+     * @param request get metadata request
+     * @return CreateBucketResponse
+     */
+    Dto::S3::GetMetadataResponse GetMetadata(Dto::S3::GetMetadataRequest &request);
 
-      /**
-       * Creates a new bucket
-       *
-       * @param name name of the bucket
-       * @param owner owner of the bucket
-       * @param s3Request S3 create request
-       * @return CreateBucketResponse
-       */
-      Dto::S3::CreateBucketResponse CreateBucket(const std::string &name, const std::string &owner, const Dto::S3::CreateBucketRequest &s3Request);
+    /**
+     * Creates a new bucket
+     *
+     * @param name name of the bucket
+     * @param owner owner of the bucket
+     * @param s3Request S3 create request
+     * @return CreateBucketResponse
+     */
+    Dto::S3::CreateBucketResponse CreateBucket(const std::string &name, const std::string &owner, const Dto::S3::CreateBucketRequest &s3Request);
 
-      /**
-       * Lists all buckets
-       *
-       * @return ListAllBucketResponse
-       */
-      Dto::S3::ListAllBucketResponse ListAllBuckets();
+    /**
+     * Lists all buckets
+     *
+     * @return ListAllBucketResponse
+     */
+    Dto::S3::ListAllBucketResponse ListAllBuckets();
 
-      /**
-       * Lists contents of bucket
-       *
-       * @param s3Request S3 create request
-       * @return CreateBucketResponse
-       */
-      Dto::S3::ListBucketResult ListBucket(const Dto::S3::ListBucketRequest &s3Request);
+    /**
+     * Lists contents of bucket
+     *
+     * @param s3Request S3 create request
+     * @return CreateBucketResponse
+     */
+    Dto::S3::ListBucketResult ListBucket(const Dto::S3::ListBucketRequest &s3Request);
 
-      /**
-       * Creates a new bucket
-       *
-       * @param bucket bucket name
-       * @param key object key
-       * @param region AWS region
-       * @param user AWS user
-       * @return Dto::S3::InitiateMultipartUploadResult
-       */
-      Dto::S3::InitiateMultipartUploadResult CreateMultipartUpload(std::string &bucket, std::string &key, const std::string &region, const std::string &user);
+    /**
+     * Creates a new bucket
+     *
+     * @param bucket bucket name
+     * @param key object key
+     * @param region AWS region
+     * @param user AWS user
+     * @return Dto::S3::InitiateMultipartUploadResult
+     */
+    Dto::S3::InitiateMultipartUploadResult CreateMultipartUpload(std::string &bucket, std::string &key, const std::string &region, const std::string &user);
 
-      /**
-       * Upload a partial file
-       *
-       * @param stream input stream
-       * @param part part number
-       * @param updateId upload ID
-       * @return ETag
-       */
-      std::string UploadPart(std::istream &stream, int part, const std::string &updateId);
+    /**
+     * Upload a partial file
+     *
+     * @param stream input stream
+     * @param part part number
+     * @param updateId upload ID
+     * @return ETag
+     */
+    std::string UploadPart(std::istream &stream, int part, const std::string &updateId);
 
-      /**
-       * Completes a multipart upload.
-       *
-       * @param uploadId upload ID
-       * @param bucket bucket name
-       * @param key object key
-       * @param region AWS region
-       * @param user AWS user
-       * @return Dto::S3::InitiateMultipartUploadResult
-       */
-      Dto::S3::CompleteMultipartUploadResult CompleteMultipartUpload(const std::string &uploadId,
-                                                                     const std::string &bucket,
-                                                                     const std::string &key,
-                                                                     const std::string &region,
-                                                                     const std::string &user);
+    /**
+     * Completes a multipart upload.
+     *
+     * @param uploadId upload ID
+     * @param bucket bucket name
+     * @param key object key
+     * @param region AWS region
+     * @param user AWS user
+     * @return Dto::S3::InitiateMultipartUploadResult
+     */
+    Dto::S3::CompleteMultipartUploadResult CompleteMultipartUpload(const std::string &uploadId,
+                                                                   const std::string &bucket,
+                                                                   const std::string &key,
+                                                                   const std::string &region,
+                                                                   const std::string &user);
 
-      /**
-       * Get object
-       *
-       * @param request put object request
-       * @return GetObjectResponse
-       */
-      Dto::S3::GetObjectResponse GetObject(Dto::S3::GetObjectRequest &request);
+    /**
+     * Get object
+     *
+     * @param request put object request
+     * @return GetObjectResponse
+     */
+    Dto::S3::GetObjectResponse GetObject(Dto::S3::GetObjectRequest &request);
 
-      /**
-       * Put object
-       *
-       * @param request put object request
-       * @param stream input stream
-       * @return PutObjectResponse
-       */
-      Dto::S3::PutObjectResponse PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream);
+    /**
+     * Put object
+     *
+     * @param request put object request
+     * @param stream input stream
+     * @return PutObjectResponse
+     */
+    Dto::S3::PutObjectResponse PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream);
 
-      /**
-       * Copy object
-       *
-       * @param request put object request
-       * @return PutObjectResponse
-       */
-      Dto::S3::CopyObjectResponse CopyObject(Dto::S3::CopyObjectRequest &request);
+    /**
+     * Copy object
+     *
+     * @param request put object request
+     * @return PutObjectResponse
+     */
+    Dto::S3::CopyObjectResponse CopyObject(Dto::S3::CopyObjectRequest &request);
 
-      /**
-       * Delete object
-       *
-       * @param request delete object request
-       * @return DeleteObjectResponse
-       */
-      void DeleteObject(const Dto::S3::DeleteObjectRequest &request);
+    /**
+     * Delete object
+     *
+     * @param request delete object request
+     * @return DeleteObjectResponse
+     */
+    void DeleteObject(const Dto::S3::DeleteObjectRequest &request);
 
-      /**
-       * Delete objects
-       *
-       * @param request delete objects request
-       * @return DeleteObjectsResponse
-       */
-      Dto::S3::DeleteObjectsResponse DeleteObjects(const Dto::S3::DeleteObjectsRequest &request);
+    /**
+     * Delete objects
+     *
+     * @param request delete objects request
+     * @return DeleteObjectsResponse
+     */
+    Dto::S3::DeleteObjectsResponse DeleteObjects(const Dto::S3::DeleteObjectsRequest &request);
 
-      /**
-       * Adds a bucket notification
-       *
-       * @param request bucket notification request.
-       */
-      void PutBucketNotification(const Dto::S3::PutBucketNotificationRequest& request);
+    /**
+     * Adds a bucket notification
+     *
+     * @param request bucket notification request.
+     */
+    void PutBucketNotification(const Dto::S3::PutBucketNotificationRequest &request);
 
-      /**
-       * Delete a bucket
-       *
-       * @param region AWS region name
-       * @param name name of the bucket
-       */
-      void DeleteBucket(const std::string &region, const std::string &name);
+    /**
+     * Delete a bucket
+     *
+     * @param region AWS region name
+     * @param name name of the bucket
+     */
+    void DeleteBucket(const std::string &region, const std::string &name);
 
     private:
 
-      /**
-       * Sends a message to the corresponding SQS queue.
-       *
-       * @param eventNotification S3 event notification.
-       * @param queueArn ARN of the SQS queue.
-       */
-      void SendQueueNotificationRequest(const Dto::S3::EventNotification &eventNotification, const std::string &queueArn);
+    /**
+     * Sends a message to the corresponding SQS queue.
+     *
+     * @param eventNotification S3 event notification.
+     * @param queueArn ARN of the SQS queue.
+     */
+    void SendQueueNotificationRequest(const Dto::S3::EventNotification &eventNotification, const std::string &queueArn);
 
-      /**
-       * Send lambda function invocation request to Lambda service.
-       *
-       * <p>This will send a lambda invocation requst to the lambda service. The Lambda service will start the corresponding lambda function and will send the S3
-       * notification request to the lambda function.</p>
-       *
-       * @param eventNotification S3 event notification
-       * @param bucketNotification S3 bucket notification
-       */
-      void SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::BucketNotification &bucketNotification);
+    /**
+     * Send lambda function invocation request to Lambda service.
+     *
+     * <p>This will send a lambda invocation requst to the lambda service. The Lambda service will start the corresponding lambda function and will send the S3
+     * notification request to the lambda function.</p>
+     *
+     * @param eventNotification S3 event notification
+     * @param bucketNotification S3 bucket notification
+     */
+    void SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::BucketNotification &bucketNotification);
 
-      /**
-       * Get the directory from the object key.
-       *
-       * @param key S3 object key
-       * @return all directories before file
-       */
-      static std::string GetDirFromKey(const std::string &key);
+    /**
+     * Get the directory from the object key.
+     *
+     * @param key S3 object key
+     * @return all directories before file
+     */
+    static std::string GetDirFromKey(const std::string &key);
 
-      /**
-       * Get the directory for a given bucket/key combination.
-       *
-       * @param bucket S3 bucket name
-       * @param key S3 object key.
-       * @return directory path.
-       */
-      std::string GetDirectory(const std::string &bucket, const std::string &key);
+    /**
+     * Get the directory for a given bucket/key combination.
+     *
+     * @param bucket S3 bucket name
+     * @param key S3 object key.
+     * @return directory path.
+     */
+    std::string GetDirectory(const std::string &bucket, const std::string &key);
 
-      /**
-       * Get the absolute filename for a given bucket/key combination.
-       *
-       * @param bucket S3 bucket name
-       * @param key S3 object key.
-       * @return absolute filename path.
-       */
-      std::string GetFilename(const std::string &bucket, const std::string &key);
+    /**
+     * Get the absolute filename for a given bucket/key combination.
+     *
+     * @param bucket S3 bucket name
+     * @param key S3 object key.
+     * @return absolute filename path.
+     */
+    std::string GetFilename(const std::string &bucket, const std::string &key);
 
-      /**
-       * Check for bucket notifications.
-       *
-       * @param region AWS region.
-       * @param bucket bucket name.
-       * @param key S3 object key.
-       * @param size S3 object size in bytes.
-       * @param event S3 event type.
-       */
-      void CheckNotifications(const std::string &region, const std::string &bucket, const std::string &key, long size, const std::string &event);
+    /**
+     * Check for bucket notifications.
+     *
+     * @param region AWS region.
+     * @param bucket bucket name.
+     * @param key S3 object key.
+     * @param size S3 object size in bytes.
+     * @param event S3 event type.
+     */
+    void CheckNotifications(const std::string &region, const std::string &bucket, const std::string &key, long size, const std::string &event);
 
-      /**
-       * Get the temporary upload directory for a uploadId.
-       *
-       * @param uploadId S3 multipart uplaod ID
-       * @return temporary directory path.
-       */
-      std::string GetMultipartUploadDirectory(const std::string &uploadId);
+    /**
+     * Get the temporary upload directory for a uploadId.
+     *
+     * @param uploadId S3 multipart uplaod ID
+     * @return temporary directory path.
+     */
+    std::string GetMultipartUploadDirectory(const std::string &uploadId);
 
-      /**
-       * Create a queue notification
-       *
-       * @param bucket bucket to modify
-       * @param request put bucket notification request.
-       * @return updated bucket.
-       */
-      Database::Entity::S3::Bucket CreateQueueConfiguration(const Database::Entity::S3::Bucket &bucket, const Dto::S3::PutBucketNotificationRequest &request);
+    /**
+     * Create a queue notification
+     *
+     * @param bucket bucket to modify
+     * @param request put bucket notification request.
+     * @return updated bucket.
+     */
+    Database::Entity::S3::Bucket CreateQueueConfiguration(const Database::Entity::S3::Bucket &bucket, const Dto::S3::PutBucketNotificationRequest &request);
 
-      /**
-       * Create a lambda function notification
-       *
-       * @param bucket bucket to modify
-       * @param request put bucket notification request.
-       * @return updated bucket.
-       */
-      Database::Entity::S3::Bucket CreateLambdaConfiguration(const Database::Entity::S3::Bucket &bucket, const Dto::S3::PutBucketNotificationRequest &request);
+    /**
+     * Create a lambda function notification
+     *
+     * @param bucket bucket to modify
+     * @param request put bucket notification request.
+     * @return updated bucket.
+     */
+    Database::Entity::S3::Bucket CreateLambdaConfiguration(const Database::Entity::S3::Bucket &bucket, const Dto::S3::PutBucketNotificationRequest &request);
 
-      /**
-       * Deletes an object
-       *
-       * @param bucket S3 bucket name
-       * @param key S3 object key
-       */
-      void DeleteObject(const std::string &bucket, const std::string &key);
+    /**
+     * Deletes an object
+     *
+     * @param bucket S3 bucket name
+     * @param key S3 object key
+     */
+    void DeleteObject(const std::string &bucket, const std::string &key);
 
-      /**
-       * Deletes an bucket
-       *
-       * <p>This method is recursive, if the bucket contains objects, also all object are removed </p>
-       *
-       * @param bucket S3 bucket name
-       */
-      void DeleteBucket(const std::string &bucket);
+    /**
+     * Deletes an bucket
+     *
+     * <p>This method is recursive, if the bucket contains objects, also all object are removed </p>
+     *
+     * @param bucket S3 bucket name
+     */
+    void DeleteBucket(const std::string &bucket);
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
 
-      /**
-       * Data directory
-       */
-      std::string _dataDir;
+    /**
+     * Data directory
+     */
+    std::string _dataDir;
 
-      /**
-       * Data S3 dir
-       */
-      std::string _dataS3Dir;
+    /**
+     * Data S3 dir
+     */
+    std::string _dataS3Dir;
 
-      /**
-       * Data transfer server directory
-       */
-      std::string _dataTsDir;
+    /**
+     * Transfer server base directory
+     */
+    std::string _transferDir;
 
-      /**
-       * Temp directory
-       */
-      std::string _tempDir;
+    /**
+     * Temp directory
+     */
+    std::string _tempDir;
 
-      /**
-       * Configuration
-       */
-      const Core::Configuration &_configuration;
+    /**
+     * Configuration
+     */
+    const Core::Configuration &_configuration;
 
-      /**
-       * Database connection
-       */
-      std::unique_ptr<Database::S3Database> _database;
+    /**
+     * Database connection
+     */
+    std::unique_ptr<Database::S3Database> _database;
 
-      /**
-       * Multipart uploads map
-       */
-      MultiPartUploads _uploads;
+    /**
+     * Multipart uploads map
+     */
+    MultiPartUploads _uploads;
 
-      /**
-       * SQS service port
-       */
-      int _sqsServicePort;
+    /**
+     * SQS service port
+     */
+    int _sqsServicePort;
 
-      /**
-       * SQS service host
-       */
-      std::string _sqsServiceHost;
+    /**
+     * SQS service host
+     */
+    std::string _sqsServiceHost;
 
-      /**
-       * Lambda service port
-       */
-      int _lambdaServicePort;
+    /**
+     * Lambda service port
+     */
+    int _lambdaServicePort;
 
-      /**
-       * Lambda service host
-       */
-      std::string _lambdaServiceHost;
+    /**
+     * Lambda service host
+     */
+    std::string _lambdaServiceHost;
 
-    };
+  };
 
 } // namespace AwsMock::Service
 

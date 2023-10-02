@@ -20,7 +20,7 @@ namespace AwsMock::Service {
     bool DockerService::ImageExists(const std::string &name, const std::string &tag) {
 
         std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + ":" + tag + "\"]}");
-        Core::CurlResponse curlResponse = _curlUtils.SendRequest("GET", "http://localhost/images/json?all&true&filters=" + filters);
+        Core::CurlResponse curlResponse = _curlUtils.SendRequest("GET", "http://localhost/images/json?all=true&filters=" + filters);
         log_trace_stream(_logger) << "List images request send to docker daemon, output: " << curlResponse.ToString() << std::endl;
 
         if (curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
@@ -90,8 +90,8 @@ namespace AwsMock::Service {
         return imageFile;
     }
 
-    void DockerService::DeleteImage(const std::string &name, const std::string &tag) {
-        Core::CurlResponse curlResponse = _curlUtils.SendRequest("DELETE", "http://localhost/images/" + name + ":" + tag + "?force=true");
+    void DockerService::DeleteImage(const std::string &id) {
+        Core::CurlResponse curlResponse = _curlUtils.SendRequest("DELETE", "http://localhost/images/" + id + "?force=true");
         if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
             log_error_stream(_logger) << "Delete image failed, status: " << curlResponse.statusCode << std::endl;
         }
@@ -280,7 +280,7 @@ namespace AwsMock::Service {
             ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
         } else if (Core::StringUtils::EqualsIgnoreCase(runtime, "java17")) {
             // Because of a bug in the latest version of lambda runtime move back to v1.10
-            ofs << "FROM public.ecr.aws/lambda/java:17.2023.03.28.11" << std::endl;
+            ofs << "FROM public.ecr.aws/lambda/java:latest" << std::endl;
             for (auto &env : environment) {
                 ofs << "ENV " << env.first << "=\"" << env.second << "\"" << std::endl;
             }
