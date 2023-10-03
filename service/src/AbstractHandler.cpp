@@ -365,7 +365,7 @@ namespace AwsMock::Service {
     }
 
     std::string AbstractHandler::GetEndpoint(Poco::Net::HTTPServerRequest &request) {
-        return request.get("Host");
+        return request.get("localstack:4566");
     }
 
     void AbstractHandler::SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &payload, HeaderMap *extraHeader) {

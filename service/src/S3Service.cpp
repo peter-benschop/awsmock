@@ -66,13 +66,13 @@ namespace AwsMock::Service {
     // Check existence
     if (!_database->BucketExists({.region=request.region, .name=request.bucket})) {
       log_error_stream(_logger) << "Bucket " << request.bucket << " does not exist" << std::endl;
-      throw Core::ServiceException("Bucket does not exist", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+      throw Core::ServiceException("Bucket does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
     if (!request.key.empty()) {
       if (!_database->ObjectExists({.region=request.region, .bucket=request.bucket, .key=request.key})) {
         log_error_stream(_logger) << "Object " << request.key << " does not exist" << std::endl;
-        throw Core::ServiceException("Object does not exist", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+        throw Core::ServiceException("Object does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
       }
     }
 
@@ -104,27 +104,28 @@ namespace AwsMock::Service {
   Dto::S3::GetObjectResponse S3Service::GetObject(Dto::S3::GetObjectRequest &request) {
     log_trace_stream(_logger) << "Get object request, s3Request: " << request.ToString() << std::endl;
 
-    Dto::S3::GetObjectResponse response;
     try {
 
       Database::Entity::S3::Object object = _database->GetObject(request.bucket, request.bucket, request.key);
 
       std::string filename = _dataS3Dir + Poco::Path::separator() + request.bucket + Poco::Path::separator() + request.key;
-      response.bucket = object.bucket;
-      response.key = object.key;
-      response.size = object.size;
-      response.contentType = object.contentType;
-      response.filename = filename;
-      response.modified = object.modified;
-      response.metadata = object.metadata;
+      Dto::S3::GetObjectResponse response = {
+          .bucket = object.bucket,
+          .key = object.key,
+          .size = object.size,
+          .filename = filename,
+          .contentType = object.contentType,
+          .metadata = object.metadata,
+          .modified = object.modified,
+      };
       log_trace_stream(_logger) << "S3 get object response: " << response.ToString() << std::endl;
       log_info_stream(_logger) << "Object returned, bucket: " << request.bucket << " key: " << request.key << std::endl;
+      return response;
 
     } catch (Poco::Exception &ex) {
       log_error_stream(_logger) << "S3 get object failed, message: " << ex.message() << std::endl;
       throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
-    return response;
   }
 
   Dto::S3::ListAllBucketResponse S3Service::ListAllBuckets() {
@@ -194,13 +195,8 @@ namespace AwsMock::Service {
     return Core::StringUtils::GenerateRandomString(40);
   }
 
-  Dto::S3::CompleteMultipartUploadResult S3Service::CompleteMultipartUpload(const std::string &uploadId,
-                                                                            const std::string &bucket,
-                                                                            const std::string &key,
-                                                                            const std::string &region,
-                                                                            const std::string &user) {
-    log_trace_stream(_logger) << "CompleteMultipartUpload request, uploadId: " << uploadId << " bucket: " << bucket << " key: " << key << " region: " << region
-                              << " user: " << user;
+  Dto::S3::CompleteMultipartUploadResult S3Service::CompleteMultipartUpload(const std::string &uploadId, const std::string &bucket, const std::string &key, const std::string &region, const std::string &user) {
+    log_trace_stream(_logger) << "CompleteMultipartUpload request, uploadId: " << uploadId << " bucket: " << bucket << " key: " << key << " region: " << region << " user: " << user;
 
     // Get all file parts
     std::string uploadDir = GetMultipartUploadDirectory(uploadId);
@@ -226,14 +222,15 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "Got file metadata, md5sum: " << md5sum << " size: " << fileSize << " outFile: " << outFile << std::endl;
 
     // Create database object
-    Database::Entity::S3::Object object = _database->CreateOrUpdateObject({
-                                                                              .region=region,
-                                                                              .bucket=bucket,
-                                                                              .key=key,
-                                                                              .owner=user,
-                                                                              .size=fileSize,
-                                                                              .md5sum=md5sum
-                                                                          });
+    Database::Entity::S3::Object object = _database->CreateOrUpdateObject(
+        {
+            .region=region,
+            .bucket=bucket,
+            .key=key,
+            .owner=user,
+            .size=fileSize,
+            .md5sum=md5sum
+        });
 
     // Cleanup
     Core::DirUtils::DeleteDirectory(uploadDir);
@@ -599,8 +596,7 @@ namespace AwsMock::Service {
     Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, path, Poco::Net::HTTPMessage::HTTP_1_1);
     request.setContentLength((long) body.length());
     request.add("Content-Type", "application/json");
-    request.add("Authorization",
-                "AWS4-HMAC-SHA256 Credential=none/20230618/eu-central-1/lambda/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840");
+    request.add("Authorization", "AWS4-HMAC-SHA256 Credential=none/20230618/eu-central-1/lambda/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840");
     log_debug_stream(_logger) << "SQS message request created, body: " + body << std::endl;
 
     // Send request

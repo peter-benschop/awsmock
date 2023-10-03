@@ -16,39 +16,39 @@
 
 namespace AwsMock::Service {
 
-    /**
-     * Lambda request handler factory
-     */
-    class LambdaRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
+  /**
+   * Lambda request handler factory
+   */
+  class LambdaRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 
     public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration application configuration
-       * @param metricService  monitoring
-       */
-      LambdaRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService) {}
+    /**
+     * Constructor
+     *
+     * @param configuration application configuration
+     * @param metricService  monitoring
+     */
+    LambdaRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService) {}
 
-      Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &) override {
-          return new LambdaHandler(_configuration, _metricService);
-      }
+    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &) override {
+      return new LambdaHandler(_configuration, _metricService);
+    }
 
     private:
 
-      /**
-       * S3 handler configuration
-       */
-      Core::Configuration &_configuration;
+    /**
+     * S3 handler configuration
+     */
+    Core::Configuration &_configuration;
 
-      /**
-       * Metric service
-       */
-      Core::MetricService &_metricService;
+    /**
+     * Metric service
+     */
+    Core::MetricService &_metricService;
 
-    };
+  };
 
 } // namespace AwsMock::Service
 
-#endif //AWSMOCK_SERVICE_LAMBDAHANDLERFACTORY_H
+#endif // AWSMOCK_SERVICE_LAMBDAHANDLERFACTORY_H

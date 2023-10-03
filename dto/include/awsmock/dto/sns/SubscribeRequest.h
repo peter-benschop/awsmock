@@ -43,22 +43,14 @@ namespace AwsMock::Dto::SNS {
        *
        * @return DTO as string for logging.
        */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
+      [[nodiscard]] std::string ToString() const ;
 
       /**
        * Stream provider.
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const SubscribeRequest &r) {
-          os << "SubscribeRequest={region='" + r.region + "' topicArn='" + r.topicArn + "' owner='" + r.owner + "' protocol='" + r.protocol +
-              "' endpoint='" + r.endpoint + "'}";
-          return os;
-      }
+      friend std::ostream &operator<<(std::ostream &os, const SubscribeRequest &r);
 
     };
 

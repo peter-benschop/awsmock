@@ -3,276 +3,270 @@
 
 namespace AwsMock::Service {
 
-SQSHandler::SQSHandler(Core::Configuration &configuration, Core::MetricService &metricService)
-    : AbstractHandler(), _logger(Poco::Logger::get("SQSServiceHandler")), _configuration(configuration), _metricService(metricService), _sqsService(configuration) {
+  SQSHandler::SQSHandler(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractHandler(), _logger(Poco::Logger::get("SQSServiceHandler")), _configuration(configuration),
+                                                                                                   _metricService(metricService), _sqsService(configuration) {
 
-  _accountId = Core::AwsUtils::GetDefaultAccountId();
-}
+    _accountId = _configuration.getString("awsmock.account.id", DEFAULT_SQS_ACCOUNT_ID);
+    _endpoint = _configuration.getString("awsmock.service.sqs.endpoint", DEFAULT_SQS_ENDPOINT);
+  }
 
-void SQSHandler::handleGet(Poco::Net::HTTPServerRequest &request,
-                           Poco::Net::HTTPServerResponse &response,
-                           [[maybe_unused]] const std::string &region,
-                           [[maybe_unused]]const std::string &user) {
-  Core::MetricServiceTimer measure(_metricService, HTTP_GET_TIMER);
-  log_debug_stream(_logger) << "SQS GET request, URI: " << request.getURI() << " region: " << region << " user: " + user << std::endl;
-  DumpRequest(request);
-  DumpResponse(response);
-}
+  void SQSHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
 
-void SQSHandler::handlePut(Poco::Net::HTTPServerRequest &request,
-                           Poco::Net::HTTPServerResponse &response,
-                           [[maybe_unused]]const std::string &region,
-                           [[maybe_unused]]const std::string &user) {
-  Core::MetricServiceTimer measure(_metricService, HTTP_PUT_TIMER);
-  log_debug_stream(_logger) << "SQS PUT request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
-  DumpRequest(request);
-  DumpResponse(response);
-}
+    Core::MetricServiceTimer measure(_metricService, HTTP_GET_TIMER);
+    log_debug_stream(_logger) << "SQS GET request, URI: " << request.getURI() << " region: " << region << " user: " + user << std::endl;
 
-void SQSHandler::handlePost(Poco::Net::HTTPServerRequest &request,
-                            Poco::Net::HTTPServerResponse &response,
-                            [[maybe_unused]]const std::string &region,
-                            [[maybe_unused]]const std::string &user) {
-  Core::MetricServiceTimer measure(_metricService, HTTP_POST_TIMER);
-  log_debug_stream(_logger) << "SQS POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+    DumpRequest(request);
+    DumpResponse(response);
+  }
 
-  SetBusy(true);
+  void SQSHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
 
-  try {
-    //DumpBody(request);
-    //DumpRequest(request);
+    Core::MetricServiceTimer measure(_metricService, HTTP_PUT_TIMER);
+    log_debug_stream(_logger) << "SQS PUT request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
-    std::string endpoint = GetEndpoint(request);
-    std::string payload = GetPayload(request);
-    std::string requestId = GetHeaderValue(request, "RequestId", Poco::UUIDGenerator().createRandom().toString());
+    DumpRequest(request);
+    DumpResponse(response);
+  }
 
-    std::string action, version;
-    GetActionVersion(payload, action, version);
-    log_debug_stream(_logger) << "SQS POST request, action: " << action << " version: " << version << std::endl;
+  void SQSHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
 
-    if (action == "CreateQueue") {
+    Core::MetricServiceTimer measure(_metricService, HTTP_POST_TIMER);
+    log_debug_stream(_logger) << "SQS POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
-      std::string queueName = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueName");
-      std::string queueUrl = "http://" + endpoint + "/" + _accountId + "/" + queueName;
+    try {
 
-      Dto::SQS::CreateQueueRequest sqsRequest = {
-          .region=region,
-          .name=queueName,
-          .queueUrl=queueUrl,
-          .owner=user
-      };
-      Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
-      SendOkResponse(response, sqsResponse.ToXml());
+      std::string payload = GetPayload(request);
+      std::string requestId = GetHeaderValue(request, "RequestId", Poco::UUIDGenerator().createRandom().toString());
 
-    } else if (action == "ListQueues") {
+      std::string action, version;
+      GetActionVersion(payload, action, version);
+      log_debug_stream(_logger) << "SQS POST request, action: " << action << " version: " << version << std::endl;
 
-      Dto::SQS::ListQueueResponse sqsResponse = _sqsService.ListQueues(region);
-      SendOkResponse(response, sqsResponse.ToXml());
+      if (action == "CreateQueue") {
 
-    } else if (action == "DeleteQueue") {
+        std::string queueName = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueName");
+        std::string queueUrl = "http://" + _endpoint + "/" + _accountId + "/" + queueName;
 
-      std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
+        Dto::SQS::CreateQueueRequest sqsRequest = {
+            .region=region,
+            .name=queueName,
+            .queueUrl=queueUrl,
+            .owner=user
+        };
+        Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
+        SendOkResponse(response, sqsResponse.ToXml());
 
-      Dto::SQS::DeleteQueueRequest sqsRequest = {
-          .region=region,
-          .queueUrl=queueUrl
-      };
-      Dto::SQS::DeleteQueueResponse sqsResponse = _sqsService.DeleteQueue(sqsRequest);
-      SendOkResponse(response, sqsResponse.ToXml());
+      } else if (action == "ListQueues") {
 
-    } else if (action == "SendMessage") {
+        Dto::SQS::ListQueueResponse sqsResponse = _sqsService.ListQueues(region);
+        SendOkResponse(response, sqsResponse.ToXml());
 
-      std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
-      std::string queueArn = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueArn");
-      std::string body = Core::HttpUtils::GetQueryParameterValueByName(payload, "MessageBody");
+      } else if (action == "DeleteQueue") {
 
-      std::vector<Dto::SQS::MessageAttribute> attributes = GetMessageAttributes(payload);
+        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
 
-      Dto::SQS::SendMessageRequest sqsRequest = {
-          .region=region,
-          .queueUrl=queueUrl,
-          .queueArn=queueArn,
-          .body=body,
-          .messageAttributes=attributes,
-          .requestId=requestId
-      };
-      Dto::SQS::SendMessageResponse sqsResponse = _sqsService.SendMessage(sqsRequest);
-      SendOkResponse(response, sqsResponse.ToXml());
+        Dto::SQS::DeleteQueueRequest sqsRequest = {
+            .region=region,
+            .queueUrl=queueUrl
+        };
+        Dto::SQS::DeleteQueueResponse sqsResponse = _sqsService.DeleteQueue(sqsRequest);
+        SendOkResponse(response, sqsResponse.ToXml());
 
-    } else if (action == "GetQueueUrl") {
+      } else if (action == "SendMessage") {
 
-      std::string queueName = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueName");
+        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
+        std::string queueArn = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueArn");
+        std::string body = Core::HttpUtils::GetQueryParameterValueByName(payload, "MessageBody");
 
-      Dto::SQS::GetQueueUrlRequest sqsRequest = {
-          .region=region,
-          .queueName=queueName
-      };
-      Dto::SQS::GetQueueUrlResponse sqsResponse = _sqsService.GetQueueUrl(sqsRequest);
-      SendOkResponse(response, sqsResponse.ToXml());
+        std::vector<Dto::SQS::MessageAttribute> attributes = GetMessageAttributes(payload);
 
-    } else if (action == "ReceiveMessage") {
+        Dto::SQS::SendMessageRequest sqsRequest = {
+            .region=region,
+            .queueUrl=queueUrl,
+            .queueArn=queueArn,
+            .body=body,
+            .messageAttributes=attributes,
+            .requestId=requestId
+        };
+        Dto::SQS::SendMessageResponse sqsResponse = _sqsService.SendMessage(sqsRequest);
+        SendOkResponse(response, sqsResponse.ToXml());
 
-      std::string queueUrl = GetQueueUrl(request, payload, endpoint);
+      } else if (action == "GetQueueUrl") {
 
-      int maxMessages = GetIntParameter(payload, "MaxNumberOfMessages", 1, 10, 3);
-      int waitTimeSeconds = GetIntParameter(payload, "WaitTimeSeconds", 1, 900, 5);
-      int visibility = GetIntParameter(payload, "VisibilityTimeout", 1, 900, 30);
+        std::string queueName = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueName");
 
-      Dto::SQS::ReceiveMessageRequest sqsRequest = {
-          .region=region,
-          .queueUrl=queueUrl,
-          .maxMessages=maxMessages,
-          .visibility=visibility,
-          .waitTimeSeconds=waitTimeSeconds,
-          .requestId=requestId
-      };
-      Dto::SQS::ReceiveMessageResponse sqsResponse = _sqsService.ReceiveMessages(sqsRequest);
+        Dto::SQS::GetQueueUrlRequest sqsRequest = {
+            .region=region,
+            .queueName=queueName
+        };
+        Dto::SQS::GetQueueUrlResponse sqsResponse = _sqsService.GetQueueUrl(sqsRequest);
+        SendOkResponse(response, sqsResponse.ToXml());
 
-      SendOkResponse(response, sqsResponse.ToXml());
+      } else if (action == "ReceiveMessage") {
 
-    } else if (action == "PurgeQueue") {
+        std::string queueUrl = GetQueueUrl(request, payload, _endpoint);
 
-      std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
+        int maxMessages = GetIntParameter(payload, "MaxNumberOfMessages", 1, 10, 3);
+        int waitTimeSeconds = GetIntParameter(payload, "WaitTimeSeconds", 1, 900, 5);
+        int visibility = GetIntParameter(payload, "VisibilityTimeout", 1, 900, 30);
 
-      Dto::SQS::PurgeQueueRequest sqsRequest = {
-          .queueUrl=queueUrl,
-          .region=region
-      };
-      Dto::SQS::PurgeQueueResponse sqsResponse = _sqsService.PurgeQueue(sqsRequest);
+        Dto::SQS::ReceiveMessageRequest sqsRequest = {
+            .region=region,
+            .queueUrl=queueUrl,
+            .maxMessages=maxMessages,
+            .visibility=visibility,
+            .waitTimeSeconds=waitTimeSeconds,
+            .requestId=requestId
+        };
+        Dto::SQS::ReceiveMessageResponse sqsResponse = _sqsService.ReceiveMessages(sqsRequest);
 
-      SendOkResponse(response, sqsResponse.ToXml());
+        std::map<std::string, std::string> extraHeaders = {
+            {"delay", "0"},
+            {"message-group-id", "group"},
+            {"message-deduplication-id", "deduplication"},
+            {"ApproximateFirstReceiveTimestamp", std::to_string(Poco::DateTime().timestamp().epochTime()*1000)},
+            {"ApproximateReceiveCount", "0"},
+            {"SentTimestamp", std::to_string(Poco::DateTime().timestamp().epochTime()*1000)},
+        };
+        SendOkResponse(response, sqsResponse.ToXml(), &extraHeaders);
 
-    } else if (action == "GetQueueAttributes") {
+      } else if (action == "PurgeQueue") {
 
-      std::string queueUrl = GetQueueUrl(request, payload, endpoint);
+        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
 
-      int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "Attribute");
-      log_trace_stream(_logger) << "Got attribute names count: " << count << std::endl;
+        Dto::SQS::PurgeQueueRequest sqsRequest = {
+            .queueUrl=queueUrl,
+            .region=region
+        };
+        Dto::SQS::PurgeQueueResponse sqsResponse = _sqsService.PurgeQueue(sqsRequest);
 
-      std::vector<std::string> attributeNames;
-      for (int i = 1; i <= count; i++) {
-        attributeNames.emplace_back(Core::HttpUtils::GetQueryParameterValueByName(payload, "Attribute." +std::to_string(i)));
+        SendOkResponse(response, sqsResponse.ToXml());
+
+      } else if (action == "GetQueueAttributes") {
+
+        std::string queueUrl = GetQueueUrl(request, payload, _endpoint);
+
+        int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "Attribute");
+        log_trace_stream(_logger) << "Got attribute names count: " << count << std::endl;
+
+        std::vector<std::string> attributeNames;
+        for (int i = 1; i <= count; i++) {
+          attributeNames.emplace_back(Core::HttpUtils::GetQueryParameterValueByName(payload,
+                                                                                    "Attribute." + std::to_string(i)));
+        }
+
+        Dto::SQS::GetQueueAttributesRequest sqsRequest = {
+            .region=region,
+            .queueUrl=queueUrl,
+            .attributeNames=attributeNames
+        };
+        Dto::SQS::GetQueueAttributesResponse sqsResponse = _sqsService.GetQueueAttributes(sqsRequest);
+
+        SendOkResponse(response, sqsResponse.ToXml());
+
+      } else if (action == "SetQueueAttributes") {
+
+        std::string queueUrl = GetQueueUrl(request, payload, _endpoint);
+
+        int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "Attribute");
+        log_trace_stream(_logger) << "Got attribute count, count: " << count << std::endl;
+
+        AttributeList attributes;
+        for (int i = 1; i <= count; i++) {
+          std::string attributeName =
+              Core::HttpUtils::GetQueryParameterValueByName(payload, "Attribute." + std::to_string(i) + ".Name");
+          std::string attributeValue =
+              Core::HttpUtils::GetQueryParameterValueByName(payload, "Attribute." + std::to_string(i) + ".Value");
+          attributes[attributeName] = attributeValue;
+        }
+
+        Dto::SQS::SetQueueAttributesRequest sqsRequest = {
+            .region=region,
+            .queueUrl=queueUrl,
+            .attributes=attributes
+        };
+        Dto::SQS::SetQueueAttributesResponse sqsResponse = _sqsService.SetQueueAttributes(sqsRequest);
+
+        SendOkResponse(response, sqsResponse.ToXml());
+
+      } else if (action == "DeleteMessage") {
+
+        std::string queueUrl = GetStringParameter(payload, "QueueUrl");
+        std::string receiptHandle = GetStringParameter(payload, "ReceiptHandle");
+
+        Dto::SQS::DeleteMessageRequest sqsRequest = {
+            .region=region,
+            .queueUrl=queueUrl,
+            .receiptHandle=receiptHandle
+        };
+        _sqsService.DeleteMessage(sqsRequest);
+
+        SendOkResponse(response);
       }
 
-      Dto::SQS::GetQueueAttributesRequest sqsRequest = {
-          .region=region,
-          .queueUrl=queueUrl,
-          .attributeNames=attributeNames
-      };
-      Dto::SQS::GetQueueAttributesResponse sqsResponse = _sqsService.GetQueueAttributes(sqsRequest);
+    } catch (Core::ServiceException &exc) {
+      _logger.error() << "Service exception: " << exc.message() << std::endl;
+      SendErrorResponse("SQS", response, exc);
+    }
+  }
 
-      SendOkResponse(response, sqsResponse.ToXml());
+  void SQSHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
 
-    } else if (action == "SetQueueAttributes") {
+    Core::MetricServiceTimer measure(_metricService, HTTP_DELETE_TIMER);
+    log_debug_stream(_logger) << "SQS DELETE request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+    DumpRequest(request);
+    DumpResponse(response);
+  }
 
-      std::string queueUrl = GetQueueUrl(request, payload, endpoint);
+  void SQSHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
 
-      int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "Attribute");
-      log_trace_stream(_logger) << "Got attribute count, count: " << count << std::endl;
+    Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
+    log_debug_stream(_logger) << "SQS OPTIONS request" << std::endl;
 
-      AttributeList attributes;
-      for (int i = 1; i <= count; i++) {
-        std::string attributeName = Core::HttpUtils::GetQueryParameterValueByName(payload, "Attribute." + std::to_string(i) +".Name");
-        std::string attributeValue = Core::HttpUtils::GetQueryParameterValueByName(payload, "Attribute." + std::to_string(i) +".Value");
-        attributes[attributeName] = attributeValue;
+    response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
+    response.setContentType("text/plain; charset=utf-8");
+
+    handleHttpStatusCode(response, 200);
+    std::ostream &outputStream = response.send();
+    outputStream.flush();
+  }
+
+  void SQSHandler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
+
+    Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
+    log_debug_stream(_logger) << "SQS HEAD request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+
+    handleHttpStatusCode(response, 200);
+    std::ostream &outputStream = response.send();
+    outputStream.flush();
+  }
+
+  std::vector<Dto::SQS::MessageAttribute> SQSHandler::GetMessageAttributes(const std::string &payload) {
+
+    std::vector<Dto::SQS::MessageAttribute> messageAttributes;
+
+    int attributeCount = Core::HttpUtils::CountQueryParametersByPrefix(payload, "MessageAttribute") / 3;
+    for (int i = 1; i <= attributeCount; i++) {
+
+      std::string attributeName = Core::HttpUtils::GetQueryParameterValueByName(payload, "MessageAttribute." + std::to_string(i) + ".Name");
+      std::string attributeType = Core::HttpUtils::GetQueryParameterValueByName(payload, "MessageAttribute." + std::to_string(i) + ".Value.DataType");
+
+      std::string attributeValue;
+      if (attributeType == "String" || attributeType == "Number") {
+        attributeValue = Core::HttpUtils::GetQueryParameterValueByName(payload, "MessageAttribute." + std::to_string(i) + ".Value.StringValue");
       }
-
-      Dto::SQS::SetQueueAttributesRequest sqsRequest = {
-          .region=region,
-          .queueUrl=queueUrl,
-          .attributes=attributes
-      };
-      Dto::SQS::SetQueueAttributesResponse sqsResponse = _sqsService.SetQueueAttributes(sqsRequest);
-
-      SendOkResponse(response, sqsResponse.ToXml());
-
-    } else if (action == "DeleteMessage") {
-
-      std::string queueUrl = GetStringParameter(payload, "QueueUrl");
-      std::string receiptHandle = GetStringParameter(payload, "ReceiptHandle");
-
-      Dto::SQS::DeleteMessageRequest sqsRequest = {
-          .region=region,
-          .queueUrl=queueUrl,
-          .receiptHandle=receiptHandle
-      };
-      _sqsService.DeleteMessage(sqsRequest);
-
-      SendOkResponse(response);
+      Dto::SQS::MessageAttribute messageAttribute = {.attributeName=attributeName, .attributeValue=attributeValue, .type=attributeType};
+      messageAttributes.emplace_back(messageAttribute);
     }
-
-  } catch (Core::ServiceException &exc) {
-    _logger.error() << "Service exception: " << exc.message() << std::endl;
-    SendErrorResponse("SQS", response, exc);
+    return messageAttributes;
   }
-  SetBusy(false);
-}
 
-void SQSHandler::handleDelete(Poco::Net::HTTPServerRequest &request,
-                              Poco::Net::HTTPServerResponse &response,
-                              [[maybe_unused]]const std::string &region,
-                              [[maybe_unused]]const std::string &user) {
-  Core::MetricServiceTimer measure(_metricService, HTTP_DELETE_TIMER);
-  log_debug_stream(_logger) << "SQS DELETE request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
-  DumpRequest(request);
-  DumpResponse(response);
-}
+  std::string SQSHandler::GetQueueUrl(Poco::Net::HTTPServerRequest &request, const std::string &payload, const std::string &endpoint) {
 
-void SQSHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
-  Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
-  log_debug_stream(_logger) << "SQS OPTIONS request" << std::endl;
-  SetBusy(true);
-
-  response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
-  response.setContentType("text/plain; charset=utf-8");
-
-  handleHttpStatusCode(response, 200);
-  std::ostream &outputStream = response.send();
-  outputStream.flush();
-  SetBusy(false);
-}
-
-void SQSHandler::handleHead([[maybe_unused]]Poco::Net::HTTPServerRequest &request,
-                            Poco::Net::HTTPServerResponse &response,
-                            [[maybe_unused]]const std::string &region,
-                            [[maybe_unused]]const std::string &user) {
-  Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
-  log_debug_stream(_logger) << "SQS HEAD request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
-
-  handleHttpStatusCode(response, 200);
-  std::ostream &outputStream = response.send();
-  outputStream.flush();
-}
-
-std::vector<Dto::SQS::MessageAttribute> SQSHandler::GetMessageAttributes(const std::string &payload) {
-
-  std::vector<Dto::SQS::MessageAttribute> messageAttributes;
-  int attributeCount = Core::HttpUtils::CountQueryParametersByPrefix(payload, "MessageAttribute") / 3;
-  for (int i = 1; i <= attributeCount; i++) {
-    std::string attributeName = Core::HttpUtils::GetQueryParameterValueByName(payload, "MessageAttribute." +
-        std::to_string(i) +
-        ".Name");
-    std::string attributeType = Core::HttpUtils::GetQueryParameterValueByName(payload, "MessageAttribute." +
-        std::to_string(i) +
-        ".Value.DataType");
-    std::string attributeValue;
-    if (attributeType == "String" || attributeType == "Number") {
-      attributeValue = Core::HttpUtils::GetQueryParameterValueByName(payload,
-                                                                     "MessageAttribute." + std::to_string(i) +
-                                                                         ".Value.StringValue");
+    std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
+    if (queueUrl.empty()) {
+      queueUrl = "http://" + endpoint + request.getURI();
     }
-    Dto::SQS::MessageAttribute messageAttribute = {.attributeName=attributeName, .attributeValue=attributeValue, .type=attributeType};
-    messageAttributes.emplace_back(messageAttribute);
+    return queueUrl;
   }
-  return messageAttributes;
-}
-
-std::string SQSHandler::GetQueueUrl(Poco::Net::HTTPServerRequest &request, const std::string &payload, const std::string &endpoint) {
-
-  std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
-  if (queueUrl.empty()) {
-    queueUrl = "http://" + endpoint + request.getURI();
-  }
-  return queueUrl;
-}
 }

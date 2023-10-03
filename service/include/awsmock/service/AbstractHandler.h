@@ -31,7 +31,7 @@
 
 namespace AwsMock::Service {
 
-    typedef std::vector<std::pair<std::string, std::string>> HeaderMap;
+    typedef std::map<std::string, std::string> HeaderMap;
 
     /**
      * Abstract HTTP request handler
@@ -57,20 +57,6 @@ namespace AwsMock::Service {
        * @see Poco::Net::HTTPRequestHandler
        */
       void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
-
-      /**
-       * Return busy flag
-       *
-       * @return true if handler is busy
-       */
-      bool GetBusy() {return _busy;}
-
-      /**
-       * Sets the busy flag
-       *
-       * @param true if handler is busy
-       */
-      void SetBusy(bool busy) { this->_busy = busy;}
 
     protected:
 
@@ -476,11 +462,6 @@ namespace AwsMock::Service {
        * Header map
        */
       HeaderMap _headerMap;
-
-      /**
-       * Busy flag
-       */
-      bool _busy = false;
 
     };
 

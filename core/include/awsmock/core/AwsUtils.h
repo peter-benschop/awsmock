@@ -100,15 +100,6 @@ namespace AwsMock::Core {
       static std::string CreateTransferArn(const std::string &region, const std::string &accountId, const std::string &serverId);
 
       /**
-       * Returns the default account ID, which will be used, in case no account ID is provided by the caller.
-       *
-       * @return default account ID
-       */
-      static std::string GetDefaultAccountId() {
-          return "000000000000";
-      }
-
-      /**
        * Returns a request ID.
        *
        * @return request ID

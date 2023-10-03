@@ -33,17 +33,24 @@ namespace AwsMock::Database::Entity::SQS {
 
     enum STATUS { INITIAL, SEND, RESEND, DELAYED };
 
+    enum MessageAttributeType { STRING, NUMBER };
+
     struct MessageAttribute {
 
       /**
-       * MessageAttribute name
+       * Message attribute name
        */
       std::string attributeName;
 
       /**
-       * MessageAttribute value
+       * Message attribute value
        */
       std::string attributeValue;
+
+      /**
+       * Message attribute value
+       */
+      MessageAttributeType attributeType;
 
       /**
        * Converts the entity to a MongoDB document
