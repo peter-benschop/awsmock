@@ -11,9 +11,9 @@ namespace AwsMock::Dto::SNS {
       Poco::JSON::Object rootJson;
       rootJson.set("Type", type);
       rootJson.set("MessageId", messageId);
-      rootJson.set("MessageId", topicArn);
+      rootJson.set("TopicArn", topicArn);
       rootJson.set("Message", message);
-      rootJson.set("Timestamp", Poco::DateTimeFormatter::format(timestamp, Poco::DateTimeFormat::ISO8601_FRAC_FORMAT));
+      rootJson.set("Timestamp", timestamp);
       rootJson.set("SignatureVersion", signatureVersion);
       rootJson.set("Signature", signature);
       rootJson.set("SignatureCertURL", signingCertURL);
@@ -35,8 +35,8 @@ namespace AwsMock::Dto::SNS {
   }
 
   std::ostream &operator<<(std::ostream &os, const SqsNotificationRequest &r) {
-    os << "SqsNotificationRequest={type='" << r.type << "', topicArn='" << r.topicArn << "', message='" << r.message << "', timestamp='" << Poco::DateTimeFormatter::format(r.timestamp, Poco::DateTimeFormat::HTTP_FORMAT) <<
-       "', signatureVersion='" << r.signatureVersion << "',  signature='" << r.signature << "', signingCertURL='" << r.signingCertURL << "', unsubscribeURL='" << r.unsubscribeURL << "'}";
+    os << "SqsNotificationRequest={type='" << r.type << "', topicArn='" << r.topicArn << "', message='" << r.message << "', timestamp=" << r.timestamp << ", signatureVersion='" << r.signatureVersion << "',  signature='" << r.signature
+       << "', signingCertURL='" << r.signingCertURL << "', unsubscribeURL='" << r.unsubscribeURL << "'}";
     return os;
   }
 

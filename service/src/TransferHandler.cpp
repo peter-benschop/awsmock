@@ -148,7 +148,7 @@ namespace AwsMock::Service {
       headerMap["Connection"] = "closed";
       headerMap["Server"] = "AmazonS3";
 
-      SendOkResponse(response, {}, &headerMap);
+      SendOkResponse(response, {}, headerMap);
 
     } catch (Poco::Exception &exc) {
       SendErrorResponse("Lambda", response, exc);

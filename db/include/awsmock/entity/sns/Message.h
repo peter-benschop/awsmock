@@ -156,7 +156,7 @@ namespace AwsMock::Database::Entity::SNS {
               kvp("message", message),
               kvp("messageId", messageId),
               kvp("attributes", messageAttributesDoc),
-              kvp("reset", bsoncxx::types::b_date(std::chrono::milliseconds(lastSend.timestamp().epochMicroseconds() / 1000))),
+              kvp("reset", bsoncxx::types::b_date(std::chrono::milliseconds(0))),
               kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
               kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
 

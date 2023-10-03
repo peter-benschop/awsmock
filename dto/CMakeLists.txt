@@ -4,7 +4,8 @@ set(LIBRARY_STATIC awsmockdto_static)
 
 set(SQS_SOURCES src/sqs/MessageAttribute.cpp src/sqs/SendMessageRequest.cpp src/sqs/SendMessageResponse.cpp
         src/sqs/ListQueueResponse.cpp src/sqs/GetQueueAttributesRequest.cpp src/sqs/GetQueueAttributesResponse.cpp
-        src/sqs/SetQueueAttributesRequest.cpp src/sqs/SetQueueAttributesResponse.cpp)
+        src/sqs/SetQueueAttributesRequest.cpp src/sqs/SetQueueAttributesResponse.cpp src/sqs/ReceiveMessageRequest.cpp
+        src/sqs/ReceiveMessageResponse.cpp src/sqs/PurgeQueueRequest.cpp src/sqs/PurgeQueueResponse.cpp)
 set(SNS_SOURCES src/sns/SqsNotificationRequest.cpp src/sns/SubscribeRequest.cpp src/sns/SubscribeResponse.cpp)
 set(DOCKER_SOURCES src/docker/Port.cpp src/docker/Container.cpp src/docker/ListContainerResponse.cpp
         src/docker/CreateContainerRequest.cpp)

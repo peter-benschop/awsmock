@@ -45,7 +45,7 @@ namespace AwsMock::Service {
           headerMap["x-amz-meta-" + m.first] = m.second;
         }
 
-        SendOkResponse(response, s3Response.filename, s3Response.size, &headerMap);
+        SendOkResponse(response, s3Response.filename, s3Response.size, headerMap);
 
       } else if (Core::HttpUtils::HasQueryParameter(request.getURI(), "list-type")) {
 
@@ -121,7 +121,7 @@ namespace AwsMock::Service {
         HeaderMap headerMap;
         headerMap["ETag"] = eTag;
 
-        SendNoContentResponse(response, &headerMap);
+        SendNoContentResponse(response, headerMap);
         log_debug_stream(_logger) << "Finished S3 multipart upload part: " << partNumber << std::endl;
 
       } else if (isNotification) {
@@ -165,7 +165,7 @@ namespace AwsMock::Service {
         HeaderMap headerMap;
         headerMap["ETag"] = s3Response.eTag;
 
-        SendOkResponse(response, s3Response.ToXml(), &headerMap);
+        SendOkResponse(response, s3Response.ToXml(), headerMap);
 
       } else if (!key.empty()) {
 
@@ -197,7 +197,7 @@ namespace AwsMock::Service {
         headerMap["x-amz-checksum-sha256"] = putObjectResponse.checksumSha256;
         log_debug_stream(_logger) << " size: " << putObjectResponse.contentLength << std::endl;
 
-        SendOkResponse(response, {}, &headerMap);
+        SendOkResponse(response, {}, headerMap);
 
       } else if (!bucket.empty()) {
 

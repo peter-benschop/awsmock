@@ -13,6 +13,7 @@
 #include <Poco/DateTime.h>
 #include <Poco/DateTimeFormat.h>
 #include <Poco/DateTimeFormatter.h>
+#include <Poco/Timestamp.h>
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
 #include <Poco/Dynamic/Var.h>
@@ -64,7 +65,7 @@ namespace AwsMock::Dto::SNS {
     /**
      * Send time stamp
      */
-    Poco::DateTime timestamp;
+    long timestamp;
 
     /**
      * Signature

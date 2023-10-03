@@ -120,15 +120,7 @@ namespace AwsMock::Service {
         };
         Dto::SQS::ReceiveMessageResponse sqsResponse = _sqsService.ReceiveMessages(sqsRequest);
 
-        std::map<std::string, std::string> extraHeaders = {
-            {"delay", "0"},
-            {"message-group-id", "group"},
-            {"message-deduplication-id", "deduplication"},
-            {"ApproximateFirstReceiveTimestamp", std::to_string(Poco::DateTime().timestamp().epochTime()*1000)},
-            {"ApproximateReceiveCount", "0"},
-            {"SentTimestamp", std::to_string(Poco::DateTime().timestamp().epochTime()*1000)},
-        };
-        SendOkResponse(response, sqsResponse.ToXml(), &extraHeaders);
+        SendOkResponse(response, sqsResponse.ToXml());
 
       } else if (action == "PurgeQueue") {
 

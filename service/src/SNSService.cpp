@@ -179,7 +179,7 @@ namespace AwsMock::Service {
         .messageId=Poco::UUIDGenerator().createRandom().toString(),
         .topicArn=request.topicArn,
         .message=request.message,
-        .timestamp=Poco::Timestamp().epochTime()*1000
+        .timestamp=Poco::Timestamp().epochMicroseconds()/1000
     };
 
     // Wrap it in a SQS message request

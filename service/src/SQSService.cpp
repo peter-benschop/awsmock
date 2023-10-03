@@ -236,6 +236,16 @@ namespace AwsMock::Service {
       }
 
       // Set attributes
+      Database::Entity::SQS::MessageAttributeList attributes;
+      attributes.push_back({.attributeName="SentTimestamp", .attributeValue=std::to_string(Poco::Timestamp().epochMicroseconds() / 1000), .attributeType=Database::Entity::SQS::MessageAttributeType::NUMBER});
+      attributes.push_back({.attributeName="ApproximateFirstReceivedTimestamp", .attributeValue=std::to_string(Poco::Timestamp().epochMicroseconds()-100 / 1000), .attributeType=Database::Entity::SQS::MessageAttributeType::NUMBER});
+      attributes.push_back({.attributeName="ApproximateReceivedCount", .attributeValue=std::to_string(0), .attributeType=Database::Entity::SQS::MessageAttributeType::NUMBER});
+      attributes.push_back({.attributeName="SenderId", .attributeValue=request.region, .attributeType=Database::Entity::SQS::MessageAttributeType::STRING});
+      for (const auto &attribute : request.messageAttributes) {
+        attributes.push_back({.attributeName=attribute.attributeName, .attributeValue=attribute.attributeValue, .attributeType=Database::Entity::SQS::MessageAttributeTypeFromString(attribute.type)});
+      }
+
+      // Set parameters
       std::string messageId = Poco::UUIDGenerator().createRandom().toString();
       std::string receiptHandle = Core::StringUtils::GenerateRandomString(512);
       std::string md5Body = GetMd5Body(request.body);
@@ -250,7 +260,8 @@ namespace AwsMock::Service {
               .messageId=messageId,
               .receiptHandle=receiptHandle,
               .md5Body=md5Body,
-              .md5Attr=md5Attr
+              .md5Attr=md5Attr,
+              .attributes=attributes
           });
       log_info_stream(_logger) << "Message send, messageId: " << messageId << "requestId: " << request.requestId
                                << std::endl;
