@@ -309,7 +309,7 @@ namespace AwsMock {
     /**
      * Lambda worker
      */
-    Worker::LambdaWorker _lambdaWorker = Worker::LambdaWorker(_configuration);
+    Worker::LambdaWorker _lambdaWorker = Worker::LambdaWorker(_configuration, _metricService);
 
     /**
      * Transfer worker

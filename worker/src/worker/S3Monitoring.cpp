@@ -36,7 +36,7 @@ namespace AwsMock::Worker {
     _metricService.SetGauge("s3_object_count_total", objects);
     for(const auto &bucket : _s3Database->ListBuckets()) {
       std::string labelValue = Poco::replace(bucket.name, "-", "_");
-      long objectsPerBucket = _s3Database->ObjectCount(bucket);
+      long objectsPerBucket = _s3Database->ObjectCount(bucket.region, bucket.name);
       _metricService.SetGauge("s3_bucket_count", "bucket", labelValue, objectsPerBucket);
     }
   }

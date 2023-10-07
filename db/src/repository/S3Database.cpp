@@ -266,10 +266,19 @@ namespace AwsMock::Database {
     return {};
   }
 
-  long S3Database::ObjectCount() {
+  long S3Database::ObjectCount(const std::string &region, const std::string &bucket) {
+
+    bsoncxx::builder::basic::document builder;
+    if (!region.empty()) {
+      builder.append(bsoncxx::builder::basic::kvp("region", region));
+    }
+    if (!bucket.empty()) {
+      builder.append(bsoncxx::builder::basic::kvp("bucket", bucket));
+    }
+    bsoncxx::document::value filter = builder.extract();
 
     try {
-      long count = _objectCollection.count_documents(make_document());
+      long count = _objectCollection.count_documents({filter});
       log_trace_stream(_logger) << "Object count: " << count << std::endl;
       return count;
 
@@ -277,19 +286,6 @@ namespace AwsMock::Database {
       log_error_stream(_logger) << "Object count failed, error: " << e.what() << std::endl;
     }
     return -1;
-  }
-
-  long S3Database::ObjectCount(const Entity::S3::Bucket &bucket) {
-
-    try {
-      long count = _objectCollection.count_documents(make_document(kvp("region", bucket.region), kvp("bucket", bucket.name)));
-      log_trace_stream(_logger) << "Object count: " << count << std::endl;
-      return count;
-
-    } catch (mongocxx::exception::system_error &e) {
-      log_error_stream(_logger) << "Object count failed, error: " << e.what() << std::endl;
-    }
-    return {};
   }
 
   void S3Database::DeleteObject(const Entity::S3::Object &object) {

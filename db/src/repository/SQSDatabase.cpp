@@ -147,12 +147,13 @@ namespace AwsMock::Database {
 
   long SQSDatabase::CountQueues(const std::string &region) {
 
-    bsoncxx::builder::basic::document filter{};
-    if(!region.empty()) {
-      filter.append(kvp("region", region));
+    bsoncxx::builder::basic::document builder;
+    if (!region.empty()) {
+      builder.append(bsoncxx::builder::basic::kvp("region", region));
     }
+    bsoncxx::document::value filter = builder.extract();
 
-    long count = _queueCollection.count_documents({filter.view()});
+    long count = _queueCollection.count_documents({filter});
     log_trace_stream(_logger) << "Count queues, result: " << count << std::endl;
 
     return count;
@@ -266,15 +267,17 @@ namespace AwsMock::Database {
 
   long SQSDatabase::CountMessages(const std::string &region, const std::string &queueUrl) {
 
-    bsoncxx::builder::basic::document filter{};
-    if(!region.empty()) {
-      filter.append(kvp("region", region));
+    bsoncxx::builder::basic::document builder;
+    if (!region.empty()) {
+      builder.append(bsoncxx::builder::basic::kvp("region", region));
     }
-    if(!queueUrl.empty()) {
-      filter.append(kvp("queueUrl", queueUrl));
+    if (!queueUrl.empty()) {
+      builder.append(bsoncxx::builder::basic::kvp("queueUrl", queueUrl));
     }
+    bsoncxx::document::value filter = builder.extract();
+    //std::cout << bsoncxx::to_json(filter) << std::endl;
 
-    long count = _messageCollection.count_documents(filter.view());
+    long count = _messageCollection.count_documents({filter});
     log_trace_stream(_logger) << "Count messages, region: " << region << " url: " << queueUrl << " result: " << count << std::endl;
 
     return count;

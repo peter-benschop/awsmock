@@ -209,21 +209,14 @@ namespace AwsMock::Database {
       Entity::S3::ObjectList ListObjects(const std::string &prefix = {});
 
       /**
-       * Counts the total number of keys
-       *
-       * @return total number of object in bucket
-       * @throws DatabaseException
-       */
-      long ObjectCount();
-
-      /**
        * Counts the number of keys in a bucket
        *
-       * @param bucket bucket entity
+       * @param region AWS region
+       * @param bucket bucket name
        * @return number of object in bucket
        * @throws DatabaseException
        */
-      long ObjectCount(const Entity::S3::Bucket& bucket);
+      long ObjectCount(const std::string &region = {}, const std::string &bucket = {});
 
       /**
        * Creates a bucket notification-

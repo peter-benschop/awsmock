@@ -15,123 +15,138 @@
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/MetricService.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/ServiceDatabase.h>
 #include <awsmock/service/S3Service.h>
 #include <awsmock/worker/AbstractWorker.h>
+#include <awsmock/worker/LambdaMonitoring.h>
 
 namespace AwsMock::Worker {
 
-    class LambdaWorker : public Poco::Runnable, public AbstractWorker {
+  class LambdaWorker : public Poco::Runnable, public AbstractWorker {
 
     public:
 
-      /**
-       * Constructor
-       */
-      [[maybe_unused]] explicit LambdaWorker(const Core::Configuration &configuration);
+    /**
+     * Constructor
+     *
+     * @param configuration aws-mock configuration
+     * @param metricService aws-mock monitoring
+     */
+    explicit LambdaWorker(const Core::Configuration &configuration, Core::MetricService & metricService);
 
-      /**
-       * Main method
-       */
-      void run() override;
+    /**
+     * Main method
+     */
+    void run() override;
 
     private:
 
-      /**
-       * Delete dangling, stopped containers
-       */
-      void CleanupContainers();
+    /**
+     * Delete dangling, stopped containers
+     */
+    void CleanupContainers();
 
-      /**
-       * Start all lambdas if they are not existing
-       */
-      void StartLambdaFunctions();
+    /**
+     * Start all lambdas if they are not existing
+     */
+    void StartLambdaFunctions();
 
-      /**
-       * Send a lambda create function request.
-       *
-       * @param request HTTP request
-       * @param contentType HTTP content type
-       */
-      void SendCreateFunctionRequest(Dto::Lambda::CreateFunctionRequest &request, const std::string &contentType);
+    /**
+     * Send a lambda create function request.
+     *
+     * @param request HTTP request
+     * @param contentType HTTP content type
+     */
+    void SendCreateFunctionRequest(Dto::Lambda::CreateFunctionRequest &request, const std::string &contentType);
 
-      /**
-       * Returns the code from a local file.
-       *
-       * <p>The code will provided as a Base64 encoded zip file.</p>
-       *
-       * @param lambda lambda to get the code from.
-       * @return Dto::Lambda::Code
-       */
-      Dto::Lambda::Code GetCode(const Database::Entity::Lambda::Lambda &lambda);
+    /**
+     * Returns the code from a local file.
+     *
+     * <p>The code will provided as a Base64 encoded zip file.</p>
+     *
+     * @param lambda lambda to get the code from.
+     * @return Dto::Lambda::Code
+     */
+    Dto::Lambda::Code GetCode(const Database::Entity::Lambda::Lambda &lambda);
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
 
-      /**
-       * Configuration
-       */
-      const Core::Configuration &_configuration;
+    /**
+     * Configuration
+     */
+    const Core::Configuration &_configuration;
 
-      /**
-       * Service database
-       */
-      std::unique_ptr<Database::ServiceDatabase> _serviceDatabase;
+    /**
+     * Metric service
+     */
+    Core::MetricService &_metricService;
 
-      /**
-       * Lambda database
-       */
-      std::unique_ptr<Database::LambdaDatabase> _lambdaDatabase;
+    /**
+     * Thread pool
+     */
+    AwsMock::Core::ThreadPool<LambdaMonitoring> _threadPool;
 
-      /**
-       * Lambda service
-       */
-      std::unique_ptr<Service::LambdaService> _lambdaService;
+    /**
+     * Service database
+     */
+    std::unique_ptr<Database::ServiceDatabase> _serviceDatabase;
 
-      /**
-       * Docker service
-       */
-      std::unique_ptr<Service::DockerService> _dockerService;
+    /**
+     * Lambda database
+     */
+    std::unique_ptr<Database::LambdaDatabase> _lambdaDatabase;
 
-      /**
-       * Data dir
-       */
-      std::string _dataDir;
+    /**
+     * Lambda service
+     */
+    std::unique_ptr<Service::LambdaService> _lambdaService;
 
-      /**
-       * AWS region
-       */
-      std::string _region;
+    /**
+     * Docker service
+     */
+    std::unique_ptr<Service::DockerService> _dockerService;
 
-      /**
-       * Running flag
-       */
-      bool _running;
+    /**
+     * Data dir
+     */
+    std::string _dataDir;
 
-      /**
-       * Sleeping period in ms
-       */
-      int _period;
+    /**
+     * AWS region
+     */
+    std::string _region;
 
-      /**
-       * Docker swarm ID
-       */
-      std::string _swarmId;
+    /**
+     * Running flag
+     */
+    bool _running;
 
-      /**
-       * Lambda service host
-       */
-      std::string _lambdaServiceHost;
+    /**
+     * Sleeping period in ms
+     */
+    int _period;
 
-      /**
-       * Lambda service port
-       */
-      int _lambdaServicePort;
-    };
+    /**
+     * Docker swarm ID
+     */
+    std::string _swarmId;
+
+    /**
+     * Lambda service host
+     */
+    std::string _lambdaServiceHost;
+
+    /**
+     * Lambda service port
+     */
+    int _lambdaServicePort;
+  };
 
 } // namespace AwsMock::Worker
 
-#endif //AWSMOCK_WORKER_LAMBDAWORKER_H
+#endif // AWSMOCK_WORKER_LAMBDAWORKER_H
