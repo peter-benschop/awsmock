@@ -1,14 +1,14 @@
 
-#include "awsmock/service/LambdaHandler.h"
+#include <awsmock/service/LambdaHandler.h>
 
 namespace AwsMock::Service {
 
   LambdaHandler::LambdaHandler(Core::Configuration &configuration, Core::MetricService &metricService)
-      : AbstractHandler(), _logger(Poco::Logger::get("LambdaServiceHandler")), _configuration(configuration), _metricService(metricService), _lambdaService(configuration) {
+      : AbstractHandler(), _logger(Poco::Logger::get("LambdaServiceHandler")), _configuration(configuration), _metricService(metricService), _lambdaService(configuration, metricService) {
   }
 
   void LambdaHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, [[maybe_unused]]const std::string &user) {
-    Core::MetricServiceTimer measure(_metricService, HTTP_GET_TIMER);
+    _metricService.IncrementCounter("gateway_get_counter");
     log_trace_stream(_logger) << "Lambda GET request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
     try {
@@ -38,7 +38,7 @@ namespace AwsMock::Service {
   }
 
   void LambdaHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
-    Core::MetricServiceTimer measure(_metricService, HTTP_PUT_TIMER);
+    _metricService.IncrementCounter("gateway_put_counter");
     log_trace_stream(_logger) << "Lambda PUT request, URI: " << request.getURI() << " region: " << region << " user: " + user << std::endl;
 
     try {
@@ -51,7 +51,7 @@ namespace AwsMock::Service {
   }
 
   void LambdaHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    Core::MetricServiceTimer measure(_metricService, HTTP_POST_TIMER);
+    _metricService.IncrementCounter("gateway_post_counter");
     log_trace_stream(_logger) << "Lambda POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
     try {
@@ -101,11 +101,8 @@ namespace AwsMock::Service {
     }
   }
 
-  void LambdaHandler::handleDelete(Poco::Net::HTTPServerRequest &request,
-                                   Poco::Net::HTTPServerResponse &response,
-                                   [[maybe_unused]]const std::string &region,
-                                   [[maybe_unused]]const std::string &user) {
-    Core::MetricServiceTimer measure(_metricService, HTTP_DELETE_TIMER);
+  void LambdaHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
+    _metricService.IncrementCounter("gateway_delete_counter");
     log_trace_stream(_logger) << "Lambda DELETE request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
     try {
@@ -143,7 +140,7 @@ namespace AwsMock::Service {
   }
 
   void LambdaHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
-    Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
+    _metricService.IncrementCounter("gateway_options_counter");
     log_trace_stream(_logger) << "Lambda OPTIONS request" << std::endl;
 
     response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
@@ -154,10 +151,8 @@ namespace AwsMock::Service {
     outputStream.flush();
   }
 
-  void LambdaHandler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response,
-                                 [[maybe_unused]]const std::string &region,
-                                 [[maybe_unused]]const std::string &user) {
-    Core::MetricServiceTimer measure(_metricService, HTTP_HEAD_TIMER);
+  void LambdaHandler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
+    _metricService.IncrementCounter("gateway_head_counter");
     log_trace_stream(_logger) << "Lambda HEAD request, address: " << request.clientAddress().toString() << std::endl;
 
     try {

@@ -12,7 +12,6 @@ namespace AwsMock::Service {
 
   void SQSHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
 
-    Core::MetricServiceTimer measure(_metricService, HTTP_GET_TIMER);
     log_debug_stream(_logger) << "SQS GET request, URI: " << request.getURI() << " region: " << region << " user: " + user << std::endl;
 
     DumpRequest(request);
@@ -21,7 +20,6 @@ namespace AwsMock::Service {
 
   void SQSHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
 
-    Core::MetricServiceTimer measure(_metricService, HTTP_PUT_TIMER);
     log_debug_stream(_logger) << "SQS PUT request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
     DumpRequest(request);
@@ -30,7 +28,6 @@ namespace AwsMock::Service {
 
   void SQSHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
 
-    Core::MetricServiceTimer measure(_metricService, HTTP_POST_TIMER);
     log_debug_stream(_logger) << "SQS POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
     try {
@@ -204,7 +201,6 @@ namespace AwsMock::Service {
 
   void SQSHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
 
-    Core::MetricServiceTimer measure(_metricService, HTTP_DELETE_TIMER);
     log_debug_stream(_logger) << "SQS DELETE request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
     DumpRequest(request);
     DumpResponse(response);
@@ -212,7 +208,6 @@ namespace AwsMock::Service {
 
   void SQSHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
 
-    Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
     log_debug_stream(_logger) << "SQS OPTIONS request" << std::endl;
 
     response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
@@ -225,7 +220,6 @@ namespace AwsMock::Service {
 
   void SQSHandler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
 
-    Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
     log_debug_stream(_logger) << "SQS HEAD request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
     handleHttpStatusCode(response, 200);

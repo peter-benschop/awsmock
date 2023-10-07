@@ -8,7 +8,6 @@ namespace AwsMock::Service {
   }
 
   void TransferHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, [[maybe_unused]]const std::string &user) {
-    Core::MetricServiceTimer measure(_metricService, HTTP_GET_TIMER);
     log_trace_stream(_logger) << "Lambda GET request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
     try {
@@ -31,7 +30,6 @@ namespace AwsMock::Service {
   }
 
   void TransferHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
-    Core::MetricServiceTimer measure(_metricService, HTTP_PUT_TIMER);
     log_trace_stream(_logger) << "Lambda PUT request, URI: " << request.getURI() << " region: " << region << " user: " + user << std::endl;
 
     try {
@@ -44,7 +42,6 @@ namespace AwsMock::Service {
   }
 
   void TransferHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    Core::MetricServiceTimer measure(_metricService, HTTP_POST_TIMER);
     log_trace_stream(_logger) << "Lambda POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
     try {
@@ -105,11 +102,7 @@ namespace AwsMock::Service {
     }
   }
 
-  void TransferHandler::handleDelete(Poco::Net::HTTPServerRequest &request,
-                                     Poco::Net::HTTPServerResponse &response,
-                                     [[maybe_unused]]const std::string &region,
-                                     [[maybe_unused]]const std::string &user) {
-    Core::MetricServiceTimer measure(_metricService, HTTP_DELETE_TIMER);
+  void TransferHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
     log_trace_stream(_logger) << "Lambda DELETE request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
     try {
@@ -122,7 +115,6 @@ namespace AwsMock::Service {
   }
 
   void TransferHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
-    Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
     log_trace_stream(_logger) << "Lambda OPTIONS request" << std::endl;
 
     response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
@@ -133,10 +125,7 @@ namespace AwsMock::Service {
     outputStream.flush();
   }
 
-  void TransferHandler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response,
-                                   [[maybe_unused]]const std::string &region,
-                                   [[maybe_unused]]const std::string &user) {
-    Core::MetricServiceTimer measure(_metricService, HTTP_HEAD_TIMER);
+  void TransferHandler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
     log_trace_stream(_logger) << "Lambda HEAD request, address: " << request.clientAddress().toString() << std::endl;
 
     try {

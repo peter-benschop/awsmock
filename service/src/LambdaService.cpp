@@ -6,8 +6,7 @@
 
 namespace AwsMock::Service {
 
-  LambdaService::LambdaService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("LambdaService")),
-                                                                           _configuration(configuration), LambdaServiceHelper(configuration) {
+  LambdaService::LambdaService(const Core::Configuration &configuration, Core::MetricService &metricService) : _logger(Poco::Logger::get("LambdaService")), _configuration(configuration), LambdaServiceHelper(configuration), _metricService(metricService) {
 
     // Initialize environment
     _accountId = _configuration.getString("awsmock.account.id", "000000000000");
@@ -226,6 +225,8 @@ namespace AwsMock::Service {
   }
 
   void LambdaService::SendInvocationRequest(int port, const std::string &body) {
+    Core::MetricServiceTimer measure(_metricService, "lambda_invocation_timer");
+    _metricService.IncrementCounter("lambda_invocation_counter");
     log_debug_stream(_logger) << "Sending lambda invocation request, port: " << port << std::endl;
 
     Poco::URI uri("http://localhost:" + std::to_string(port) + "/2015-03-31/functions/function/invocations");

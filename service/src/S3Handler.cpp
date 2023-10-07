@@ -7,11 +7,7 @@ namespace AwsMock::Service {
       : AbstractHandler(), _logger(Poco::Logger::get("S3ServiceHandler")), _configuration(configuration), _metricService(metricService), _s3Service(configuration) {
   }
 
-  void S3Handler::handleGet(Poco::Net::HTTPServerRequest &request,
-                            Poco::Net::HTTPServerResponse &response,
-                            [[maybe_unused]]const std::string &region,
-                            [[maybe_unused]]const std::string &user) {
-    Core::MetricServiceTimer measure(_metricService, HTTP_GET_TIMER);
+  void S3Handler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
     log_debug_stream(_logger) << "S3 GET request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
 
     try {
@@ -92,11 +88,7 @@ namespace AwsMock::Service {
     }
   }
 
-  void S3Handler::handlePut(Poco::Net::HTTPServerRequest &request,
-                            Poco::Net::HTTPServerResponse &response,
-                            [[maybe_unused]]const std::string &region,
-                            [[maybe_unused]]const std::string &user) {
-    Core::MetricServiceTimer measure(_metricService, HTTP_PUT_TIMER);
+  void S3Handler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
     log_debug_stream(_logger) << "S3 PUT request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
     try {
@@ -219,11 +211,7 @@ namespace AwsMock::Service {
     }
   }
 
-  void S3Handler::handlePost(Poco::Net::HTTPServerRequest &request,
-                             Poco::Net::HTTPServerResponse &response,
-                             [[maybe_unused]]const std::string &region,
-                             [[maybe_unused]]const std::string &user) {
-    Core::MetricServiceTimer measure(_metricService, HTTP_POST_TIMER);
+  void S3Handler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
     log_debug_stream(_logger) << "S3 POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
     try {
@@ -268,7 +256,6 @@ namespace AwsMock::Service {
   }
 
   void S3Handler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    Core::MetricServiceTimer measure(_metricService, HTTP_DELETE_TIMER);
     log_debug_stream(_logger) << "S3 DELETE request, URI: " + request.getURI() << " region: " << region << " user: " << user << std::endl;
 
     try {
@@ -289,7 +276,6 @@ namespace AwsMock::Service {
   }
 
   void S3Handler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    Core::MetricServiceTimer measure(_metricService, HTTP_HEAD_TIMER);
     log_trace_stream(_logger) << "S3 HEAD request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
     try {
@@ -327,7 +313,6 @@ namespace AwsMock::Service {
   }
 
   void S3Handler::handleOptions(Poco::Net::HTTPServerResponse &response) {
-    Core::MetricServiceTimer measure(_metricService, HTTP_OPTIONS_TIMER);
     log_debug_stream(_logger) << "S3 OPTIONS request" << std::endl;
 
     response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");

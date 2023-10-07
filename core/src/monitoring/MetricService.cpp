@@ -72,10 +72,30 @@ namespace AwsMock::Core {
     log_error_stream(_logger) << "Gauge exists already, name: " + name << std::endl;
   }
 
+  void MetricService::AddCounter(const std::string &name, const std::string &label) {
+    Poco::Mutex::ScopedLock lock(_mutex);
+    if (!CounterExists(name, label)) {
+      std::vector<std::string> labels;
+      labels.push_back(label);
+      _counterMap[name] = new Poco::Prometheus::Counter(name);
+      _counterMap[name]->labelNames(labels);
+      _counterMap[name]->clear();
+      log_trace_stream(_logger) << "Counter added, name: " + name << std::endl;
+      return;
+    }
+    log_error_stream(_logger) << "Gauge exists already, name: " + name << std::endl;
+  }
+
   bool MetricService::CounterExists(const std::string &name) {
     Poco::Mutex::ScopedLock lock(_mutex);
     auto it = _counterMap.find(name);
     return it != _counterMap.end();
+  }
+
+  bool MetricService::CounterExists(const std::string &name, const std::string &label) {
+    Poco::Mutex::ScopedLock lock(_mutex);
+    auto it = _counterMap.find(name);
+    return it != _counterMap.end() && std::find(it->second->labelNames().begin(), it->second->labelNames().end(), label) != it->second->labelNames().end();
   }
 
   void MetricService::ClearCounter(const std::string &name) {
@@ -94,6 +114,33 @@ namespace AwsMock::Core {
       AddCounter(name);
     }
     _counterMap[name]->inc((double) value);
+    log_trace_stream(_logger) << "Counter incremented, name: " + name << std::endl;
+  }
+
+  void MetricService::IncrementCounter(const std::string &name, const std::string &labelName, const std::string &labelValue, int value) {
+    Poco::Mutex::ScopedLock lock(_mutex);
+    if (!CounterExists(name, labelName)) {
+      AddCounter(name, labelName);
+    }
+    _counterMap[name]->labels({labelValue}).inc((double) value);
+    log_trace_stream(_logger) << "Counter incremented, name: " + name << " labelName: " << labelName << " labelValue: " << labelValue << std::endl;
+  }
+
+  void MetricService::DecrementCounter(const std::string &name, int value) {
+    Poco::Mutex::ScopedLock lock(_mutex);
+    if (!CounterExists(name)) {
+      AddCounter(name);
+    }
+    _counterMap[name]->inc((double) -value);
+    log_trace_stream(_logger) << "Counter incremented, name: " + name << std::endl;
+  }
+
+  void MetricService::DecrementCounter(const std::string &name, const std::string &labelName, const std::string &labelValue, int value) {
+    Poco::Mutex::ScopedLock lock(_mutex);
+    if (!CounterExists(name, labelName)) {
+      AddCounter(name, labelName);
+    }
+    _counterMap[name]->labels({labelValue}).inc((double) -value);
     log_trace_stream(_logger) << "Counter incremented, name: " + name << std::endl;
   }
 

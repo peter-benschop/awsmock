@@ -98,6 +98,14 @@ namespace AwsMock::Core {
       void AddCounter(const std::string &name);
 
       /**
+       * Adds a counter to the map.
+       *
+       * @param name name of the counter
+       * @param label label name of the counter
+       */
+      void AddCounter(const std::string &name, const std::string &label);
+
+      /**
        * Check whether a counter exists
        *
        * @param name name of the counter.
@@ -106,20 +114,55 @@ namespace AwsMock::Core {
       bool CounterExists(const std::string &name);
 
       /**
+       * Check whether a counter exists
+       *
+       * @param name name of the counter.
+       * @param label label name of the counter
+       * @return true if counter exists.
+       */
+      bool CounterExists(const std::string &name, const std::string &label);
+
+      /**
        * Increments a counter.
        *
        * @param name of the counter
        * @param value value for the incrementation (default: 1), can be negative
        */
-      [[maybe_unused]]
       void IncrementCounter(const std::string &name, int value = 1);
+
+      /**
+       * Increments a labeled counter.
+       *
+       * @param name of the counter
+       * @param labelName name of the label
+       * @param labelValue label value of the counter
+       * @param value value for the incrementation (default: 1), can be negative
+       */
+      void IncrementCounter(const std::string &name, const std::string &labelName, const std::string &labelValue, int value = 1);
+
+      /**
+       * Decrements a counter.
+       *
+       * @param name of the counter
+       * @param value value for the incrementation (default: 1), can be negative
+       */
+      void DecrementCounter(const std::string &name, int value = 1);
+
+      /**
+       * Decrements a labeled counter.
+       *
+       * @param name of the counter
+       * @param labelName name of the label
+       * @param labelValue label value of the counter
+       * @param value value for the incrementation (default: 1), can be negative
+       */
+      void DecrementCounter(const std::string &name, const std::string &labelName, const std::string &labelValue, int value = 1);
 
       /**
        * Clears a counter.
        *
        * @param name of the counter
        */
-      [[maybe_unused]]
       void ClearCounter(const std::string &name);
 
       /**
@@ -251,7 +294,6 @@ namespace AwsMock::Core {
        * @param labelValue label value of the gauge
        * @param value value of the gauge
        */
-      [[maybe_unused]]
       void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, double value);
 
       /**
@@ -260,7 +302,6 @@ namespace AwsMock::Core {
        * @param name of the gauge
        * @param value value for the incrementation (default: 1), can be negative
        */
-      [[maybe_unused]]
       void IncrementGauge(const std::string &name, int value = 1);
 
       /**
@@ -271,7 +312,6 @@ namespace AwsMock::Core {
        * @param labelValue label value of the gauge
        * @param value value for the incrementation (default: 1), can be negative
        */
-      [[maybe_unused]]
       void IncrementGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, int value = 1);
 
       /**
