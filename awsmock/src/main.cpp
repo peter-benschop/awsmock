@@ -45,6 +45,7 @@
 #include <awsmock/service/SQSServer.h>
 #include <awsmock/service/SNSServer.h>
 #include <awsmock/service/TransferServer.h>
+#include <awsmock/worker/SNSWorker.h>
 #include <awsmock/worker/SQSWorker.h>
 #include <awsmock/worker/S3Worker.h>
 #include <awsmock/worker/LambdaWorker.h>
@@ -52,296 +53,304 @@
 
 namespace AwsMock {
 
-    void handler(int sig) {
-        void *array[10];
-        size_t size;
+  void handler(int sig) {
+    void *array[10];
+    size_t size;
 
-        // get void*'s for all entries on the stack
-        size = backtrace(array, 10);
+    // get void*'s for all entries on the stack
+    size = backtrace(array, 10);
 
-        // print out all the frames to stderr
-        fprintf(stderr, "Error: signal %d:\n", sig);
-        backtrace_symbols_fd(array, size, STDERR_FILENO);
-        exit(1);
-    }
+    // print out all the frames to stderr
+    fprintf(stderr, "Error: signal %d:\n", sig);
+    backtrace_symbols_fd(array, size, STDERR_FILENO);
+    exit(1);
+  }
 
-    /**
-     * Main application class.
-     */
-    class AwsMock : public Poco::Util::ServerApplication {
+  /**
+   * Main application class.
+   */
+  class AwsMock : public Poco::Util::ServerApplication {
 
     protected:
 
-      /**
-       * Initialization callback from Poco Application class.
-       *
-       * @param self application reference.
-       */
-      [[maybe_unused]] void initialize(Application &self) override {
+    /**
+     * Initialization callback from Poco Application class.
+     *
+     * @param self application reference.
+     */
+    [[maybe_unused]] void initialize(Application &self) override {
 
-          InitializeLogging();
-          InitializeMonitoring();
-          InitializeErrorHandler();
-          InitializeIndexes();
-          InitializeCurl();
-          log_info_stream(_logger) << "Starting " << Configuration::GetAppName() << " v" << Configuration::GetVersion() << " pid: " << getpid() << " loglevel: "
-                                   << _configuration.GetLogLevel() << std::endl;
-          Poco::Util::ServerApplication::initialize(self);
+      InitializeLogging();
+      InitializeMonitoring();
+      InitializeErrorHandler();
+      InitializeIndexes();
+      InitializeCurl();
+      log_info_stream(_logger) << "Starting " << Configuration::GetAppName() << " v" << Configuration::GetVersion() << " pid: " << getpid() << " loglevel: "
+                               << _configuration.GetLogLevel() << std::endl;
+      Poco::Util::ServerApplication::initialize(self);
+    }
+
+    /**
+     * Shutdown the application. Gets called when the application is about to stop.
+     */
+    [[maybe_unused]] void uninitialize() override {
+
+      log_debug_stream(_logger) << "Starting system shutdown" << std::endl;
+
+      // Shutdown monitoring
+      _metricService.ShutdownServer();
+      log_debug_stream(_logger) << "Metric server stopped" << std::endl;
+
+      Poco::Util::Application::uninitialize();
+      log_debug_stream(_logger) << "Bye, bye, and thanks for all the fish" << std::endl;
+    }
+
+    /**
+     * Define the command line options.
+     *
+     * @param options Poco options class.
+     */
+    [[maybe_unused]] void defineOptions(Poco::Util::OptionSet &options) override {
+
+      Poco::Util::ServerApplication::defineOptions(options);
+      options.addOption(Poco::Util::Option("config", "", "set the configuration file").required(false).repeatable(false).argument("value").callback(
+          Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
+      options.addOption(Poco::Util::Option("level", "", "set the log level").required(false).repeatable(false).argument("value").callback(
+          Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
+      options.addOption(Poco::Util::Option("version", "", "display version information").required(false).repeatable(false).callback(
+          Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
+      options.addOption(Poco::Util::Option("help", "", "display help information").required(false).repeatable(false).callback(
+          Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
+    }
+
+    /**
+     * Handles the command line options. Uses Poco command line optios handling.
+     *
+     * @param name command line option name.
+     * @param value command line option value.
+     */
+    void handleOption(const std::string &name, const std::string &value) override {
+
+      if (name == "help") {
+
+        Poco::Util::HelpFormatter helpFormatter(options());
+        helpFormatter.setCommand(commandName());
+        helpFormatter.setUsage("OPTIONS");
+        helpFormatter.setHeader("AwsMock - AWS simulation written in C++ v" + Configuration::GetVersion());
+        helpFormatter.format(std::cout);
+        stopOptionsProcessing();
+        exit(0);
+
+      } else if (name == "config") {
+
+        _configuration.SetFilename(value);
+
+      } else if (name == "version") {
+
+        std::cout << Configuration::GetAppName() << " v" << Configuration::GetVersion() << std::endl;
+        exit(0);
+
+      } else if (name == "level") {
+
+        _configuration.SetLogLevel(value);
+        Poco::Logger::get("").setLevel(value);
       }
+    }
 
-      /**
-       * Shutdown the application. Gets called when the application is about to stop.
-       */
-      [[maybe_unused]] void uninitialize() override {
+    void InitializeLogging() {
+      Poco::AutoPtr<Poco::ConsoleChannel> pCons(new Poco::ConsoleChannel());
+      Poco::AutoPtr<Poco::PatternFormatter> pPF(new Poco::PatternFormatter("%d-%m-%Y %H:%M:%S.%i [%q] %I %s:%u - %t"));
+      Poco::AutoPtr<Poco::FormattingChannel> pFC(new Poco::FormattingChannel(pPF, pCons));
+      Poco::Logger::root().setChannel(pFC);
+      log_info_stream(_logger) << "Logging initialized" << std::endl;
+    }
 
-          log_debug_stream(_logger) << "Starting system shutdown" << std::endl;
+    /**
+     * Initialize the Prometheus monitoring counters and start the prometheus server.
+     */
+    void InitializeMonitoring() {
 
-          // Shutdown monitoring
-          _metricService.ShutdownServer();
-          log_debug_stream(_logger) << "Metric server stopped" << std::endl;
+      _metricService.Initialize();
+      _metricService.StartServer();
+    }
 
-          Poco::Util::Application::uninitialize();
-          log_debug_stream(_logger) << "Bye, bye, and thanks for all the fish" << std::endl;
-      }
+    /**
+     * Initialize error handler
+     */
+    void InitializeErrorHandler() {
 
-      /**
-       * Define the command line options.
-       *
-       * @param options Poco options class.
-       */
-      [[maybe_unused]] void defineOptions(Poco::Util::OptionSet &options) override {
+      // Install error handler
+      Poco::ErrorHandler::set(&_threadErrorHandler);
+      log_debug_stream(_logger) << "Error handler initialized" << std::endl;
+    }
 
-          Poco::Util::ServerApplication::defineOptions(options);
-          options.addOption(Poco::Util::Option("config", "", "set the configuration file").required(false).repeatable(false).argument("value").callback(
-              Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
-          options.addOption(Poco::Util::Option("level", "", "set the log level").required(false).repeatable(false).argument("value").callback(
-              Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
-          options.addOption(Poco::Util::Option("version", "", "display version information").required(false).repeatable(false).callback(
-              Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
-          options.addOption(Poco::Util::Option("help", "", "display help information").required(false).repeatable(false).callback(
-              Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
-      }
+    /**
+     * Initialize database indexes
+     */
+    void InitializeIndexes() {
 
-      /**
-       * Handles the command line options. Uses Poco command line optios handling.
-       *
-       * @param name command line option name.
-       * @param value command line option value.
-       */
-      void handleOption(const std::string &name, const std::string &value) override {
+      // Install error handler
+      _database.CreateIndexes();
+      log_debug_stream(_logger) << "Database indexes created" << std::endl;
+    }
 
-          if (name == "help") {
+    /**
+     * Initialize CURL library
+     */
+    void InitializeCurl() {
+      curl_global_init(CURL_GLOBAL_ALL);
+      log_debug_stream(_logger) << "Curl library initialized" << std::endl;
 
-              Poco::Util::HelpFormatter helpFormatter(options());
-              helpFormatter.setCommand(commandName());
-              helpFormatter.setUsage("OPTIONS");
-              helpFormatter.setHeader("AwsMock - AWS simulation written in C++ v" + Configuration::GetVersion());
-              helpFormatter.format(std::cout);
-              stopOptionsProcessing();
-              exit(0);
+    }
 
-          } else if (name == "config") {
+    void StartWorker() {
 
-              _configuration.SetFilename(value);
+      // Start the S3 worker
+      Poco::ThreadPool::defaultPool().start(_s3Worker);
 
-          } else if (name == "version") {
+      // Start the SQS worker
+      Poco::ThreadPool::defaultPool().start(_sqsWorker);
 
-              std::cout << Configuration::GetAppName() << " v" << Configuration::GetVersion() << std::endl;
-              exit(0);
+      // Start the SNS worker
+      Poco::ThreadPool::defaultPool().start(_snsWorker);
 
-          } else if (name == "level") {
+      // Start the Lambda worker
+      Poco::ThreadPool::defaultPool().start(_lambdaWorker);
 
-              _configuration.SetLogLevel(value);
-              Poco::Logger::get("").setLevel(value);
-          }
-      }
+      // Start the Transfer worker
+      Poco::ThreadPool::defaultPool().start(_transferWorker);
+    }
 
-      void InitializeLogging() {
-          Poco::AutoPtr<Poco::ConsoleChannel> pCons(new Poco::ConsoleChannel());
-          Poco::AutoPtr<Poco::PatternFormatter> pPF(new Poco::PatternFormatter("%d-%m-%Y %H:%M:%S.%i [%q] %I %s:%u - %t"));
-          Poco::AutoPtr<Poco::FormattingChannel> pFC(new Poco::FormattingChannel(pPF, pCons));
-          Poco::Logger::root().setChannel(pFC);
-          log_info_stream(_logger) << "Logging initialized" << std::endl;
-      }
+    void StartServices() {
 
-      /**
-       * Initialize the Prometheus monitoring counters and start the prometheus server.
-       */
-      void InitializeMonitoring() {
+      // Start the S3 server
+      _s3Server.start();
 
-          _metricService.Initialize();
-          _metricService.StartServer();
-      }
+      // Start the SQS server
+      _sqsServer.start();
 
-      /**
-       * Initialize error handler
-       */
-      void InitializeErrorHandler() {
+      // Start the SNS server
+      _snsServer.start();
 
-          // Install error handler
-          Poco::ErrorHandler::set(&_threadErrorHandler);
-          log_debug_stream(_logger) << "Error handler initialized" << std::endl;
-      }
+      // Start the lambda server
+      _lambdaServer.start();
 
-      /**
-       * Initialize database indexes
-       */
-      void InitializeIndexes() {
+      // Start the transfer server
+      _transferServer.start();
+    }
 
-          // Install error handler
-          _database.CreateIndexes();
-          log_debug_stream(_logger) << "Database indexes created" << std::endl;
-      }
+    /**
+     * Main routine.
+     *
+     * @param args command line arguments.
+     * @return system exit code.
+     */
+    int main([[maybe_unused]]const ArgVec &args) override {
 
-      /**
-       * Initialize CURL library
-       */
-      void InitializeCurl() {
-          curl_global_init(CURL_GLOBAL_ALL);
-          log_debug_stream(_logger) << "Curl library initialized" << std::endl;
+      signal(SIGSEGV, handler);
 
-      }
+      log_debug_stream(_logger) << "Entering main routine" << std::endl;
 
-      void StartWorker() {
+      // Start service and worker. Services needed to start first, as the worker could possibly use the
+      // services.
+      StartServices();
+      StartWorker();
 
-          // Start the S3 worker
-          Poco::ThreadPool::defaultPool().start(_s3Worker);
+      // Start HTTP server
+      _restService.setRouter(&_router);
+      _restService.start();
 
-          // Start the SQS worker
-          Poco::ThreadPool::defaultPool().start(_sqsWorker);
-
-          // Start the Lambda worker
-          Poco::ThreadPool::defaultPool().start(_lambdaWorker);
-
-          // Start the Transfer worker
-          Poco::ThreadPool::defaultPool().start(_transferWorker);
-      }
-
-      void StartServices() {
-
-          // Start the S3 server
-          _s3Server.start();
-
-          // Start the SQS server
-          _sqsServer.start();
-
-          // Start the SNS server
-          _snsServer.start();
-
-          // Start the lambda server
-          _lambdaServer.start();
-
-          // Start the transfer server
-          _transferServer.start();
-      }
-
-      /**
-       * Main routine.
-       *
-       * @param args command line arguments.
-       * @return system exit code.
-       */
-      int main([[maybe_unused]]const ArgVec &args) override {
-
-          signal(SIGSEGV, handler);
-
-          log_debug_stream(_logger) << "Entering main routine" << std::endl;
-
-          // Start service and worker. Services needed to start first, as the worker could possibly use the
-          // services.
-          StartServices();
-          StartWorker();
-
-          // Start HTTP server
-          _restService.setRouter(&_router);
-          _restService.start();
-
-          // Wait for termination
-          this->waitForTerminationRequest();
-          return Application::EXIT_OK;
-      }
+      // Wait for termination
+      this->waitForTerminationRequest();
+      return Application::EXIT_OK;
+    }
 
     private:
-      /**
-       * Logger
-       */
-      Core::LogStream _logger = Core::LogStream(Poco::Logger::root());
+    /**
+     * Logger
+     */
+    Core::LogStream _logger = Core::LogStream(Poco::Logger::root());
 
-      /**
-       * Application configuration
-       */
-      Configuration _configuration = Configuration(CONFIGURATION_BASE_PATH);
+    /**
+     * Application configuration
+     */
+    Configuration _configuration = Configuration(CONFIGURATION_BASE_PATH);
 
-      /**
-       * Monitoring service
-       */
-      Core::MetricService _metricService = Core::MetricService(_configuration);
+    /**
+     * Monitoring service
+     */
+    Core::MetricService _metricService = Core::MetricService(_configuration);
 
-      /**
-       * Gateway router
-       */
-      Controller::Router _router = Controller::Router(_configuration, _metricService);
+    /**
+     * Gateway router
+     */
+    Controller::Router _router = Controller::Router(_configuration, _metricService);
 
-      /**
-       * Gateway controller
-       */
-      RestService _restService = RestService(_configuration);
+    /**
+     * Gateway controller
+     */
+    RestService _restService = RestService(_configuration);
 
-      /**
-       * S3 worker
-       */
-      Worker::S3Worker _s3Worker = Worker::S3Worker(_configuration);
+    /**
+     * S3 worker
+     */
+    Worker::S3Worker _s3Worker = Worker::S3Worker(_configuration, _metricService);
 
-      /**
-       * SQS worker
-       */
-      Worker::SQSWorker _sqsWorker = Worker::SQSWorker(_configuration);
+    /**
+     * SQS worker
+     */
+    Worker::SQSWorker _sqsWorker = Worker::SQSWorker(_configuration, _metricService);
 
-      /**
-       * Lambda worker
-       */
-      Worker::LambdaWorker _lambdaWorker = Worker::LambdaWorker(_configuration);
+    /**
+     * SNS worker
+     */
+    Worker::SNSWorker _snsWorker = Worker::SNSWorker(_configuration, _metricService);
 
-      /**
-       * Transfer worker
-       */
-      Worker::TransferWorker _transferWorker = Worker::TransferWorker(_configuration);
+    /**
+     * Lambda worker
+     */
+    Worker::LambdaWorker _lambdaWorker = Worker::LambdaWorker(_configuration);
 
-      /**
-       * S3 server
-       */
-      Service::S3Server _s3Server = Service::S3Server(_configuration, _metricService);
+    /**
+     * Transfer worker
+     */
+    Worker::TransferWorker _transferWorker = Worker::TransferWorker(_configuration);
 
-      /**
-       * SQS server
-       */
-      Service::SQSServer _sqsServer = Service::SQSServer(_configuration, _metricService);
+    /**
+     * S3 server
+     */
+    Service::S3Server _s3Server = Service::S3Server(_configuration, _metricService);
 
-      /**
-       * SNS server
-       */
-      Service::SNSServer _snsServer = Service::SNSServer(_configuration, _metricService);
+    /**
+     * SQS server
+     */
+    Service::SQSServer _sqsServer = Service::SQSServer(_configuration, _metricService);
 
-      /**
-       * Lambda server
-       */
-      Service::LambdaServer _lambdaServer = Service::LambdaServer(_configuration, _metricService);
+    /**
+     * SNS server
+     */
+    Service::SNSServer _snsServer = Service::SNSServer(_configuration, _metricService);
 
-      /**
-       * Transfer server
-       */
-      Service::TransferServer _transferServer = Service::TransferServer(_configuration, _metricService);
+    /**
+     * Lambda server
+     */
+    Service::LambdaServer _lambdaServer = Service::LambdaServer(_configuration, _metricService);
 
-      /**
-       * Thread error handler
-       */
-      Core::ThreadErrorHandler _threadErrorHandler;
+    /**
+     * Transfer server
+     */
+    Service::TransferServer _transferServer = Service::TransferServer(_configuration, _metricService);
 
-      /**
-       * Database
-       */
-      Database::Database _database = Database::Database(_configuration);
-    };
+    /**
+     * Thread error handler
+     */
+    Core::ThreadErrorHandler _threadErrorHandler;
+
+    /**
+     * Database
+     */
+    Database::Database _database = Database::Database(_configuration);
+  };
 
 } // namespace AwsMock
 

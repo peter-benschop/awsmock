@@ -1,9 +1,9 @@
 //
-// Created by vogje01 on 03/06/2023.
+// Created by vogje01 on 06/10/2023.
 //
 
-#ifndef AWSMOCK_WORKER_SQSWORKER_H
-#define AWSMOCK_WORKER_SQSWORKER_H
+#ifndef AWSMOCK_WORKER_SNSWORKER_H
+#define AWSMOCK_WORKER_SNSWORKER_H
 
 // C++ standard includes
 #include <string>
@@ -16,13 +16,14 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/ThreadPool.h>
+#include <awsmock/core/MetricService.h>
 #include <awsmock/repository/ServiceDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
-#include <awsmock/worker/SQSMonitoring.h>
+#include <awsmock/worker/SNSMonitoring.h>
 
 namespace AwsMock::Worker {
 
-  class SQSWorker : public Poco::Runnable {
+  class SNSWorker : public Poco::Runnable {
 
     public:
 
@@ -32,7 +33,7 @@ namespace AwsMock::Worker {
      * @param configuration aws-mock configuration
      * @param metricService aws-mock monitoring service
      */
-    explicit SQSWorker(const Core::Configuration &configuration, Core::MetricService &metricService);
+    explicit SNSWorker(const Core::Configuration &configuration, Core::MetricService &metricService);
 
     /**
      * Main method
@@ -77,7 +78,7 @@ namespace AwsMock::Worker {
     /**
      * Thread pool
      */
-    AwsMock::Core::ThreadPool<SQSMonitoring> _threadPool;
+    AwsMock::Core::ThreadPool<SNSMonitoring> _threadPool;
 
     /**
      * AWS region

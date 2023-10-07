@@ -106,7 +106,7 @@ namespace AwsMock::Service {
 
     try {
 
-      Database::Entity::S3::Object object = _database->GetObject(request.bucket, request.bucket, request.key);
+      Database::Entity::S3::Object object = _database->GetObject(request.region, request.bucket, request.key);
 
       std::string filename = _dataS3Dir + Poco::Path::separator() + request.bucket + Poco::Path::separator() + request.key;
       Dto::S3::GetObjectResponse response = {
@@ -204,9 +204,7 @@ namespace AwsMock::Service {
 
     // Create bucket directory, if not existing
     std::string fileDir = _dataS3Dir + Poco::Path::separator() + bucket + Poco::Path::separator() + GetDirFromKey(key);
-    if (!Core::DirUtils::DirectoryExists(fileDir)) {
-      Core::DirUtils::MakeDirectory(fileDir);
-    }
+    Core::DirUtils::EnsureDirectory(fileDir);
 
     // Output file
     std::string outFile = _dataS3Dir + Poco::Path::separator() + bucket + Poco::Path::separator() + key;
@@ -219,7 +217,9 @@ namespace AwsMock::Service {
     // Get file size, MD5 sum
     long fileSize = (long) Core::FileUtils::FileSize(outFile);
     std::string md5sum = Core::Crypto::GetMd5FromFile(outFile);
-    log_trace_stream(_logger) << "Got file metadata, md5sum: " << md5sum << " size: " << fileSize << " outFile: " << outFile << std::endl;
+    std::string sha1sum = Core::Crypto::GetSha1FromFile(outFile);
+    std::string sha256sum = Core::Crypto::GetSha256FromFile(outFile);
+    log_debug_stream(_logger) << "Metadata, bucket: " << bucket << " key: " << key << "md5: " << md5sum << " sha256: " << sha256sum << std::endl;
 
     // Create database object
     Database::Entity::S3::Object object = _database->CreateOrUpdateObject(
@@ -239,7 +239,15 @@ namespace AwsMock::Service {
     CheckNotifications(region, bucket, key, object.size, "s3:ObjectCreated:Put");
 
     log_info_stream(_logger) << "Multipart upload finished, bucket: " << bucket << " key: " << key << std::endl;
-    return {.location=region, .bucket=bucket, .key=key, .etag=Core::StringUtils::GenerateRandomString(40)};
+    return {
+      .location=region,
+      .bucket=bucket,
+      .key=key,
+      .etag=md5sum,
+      .md5sum=md5sum,
+      .checksumSha1=sha1sum,
+      .checksumSha256=sha256sum
+    };
   }
 
   Dto::S3::PutObjectResponse S3Service::PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream) {
@@ -254,22 +262,18 @@ namespace AwsMock::Service {
     try {
       // Create directory, if not existing
       std::string directory = GetDirectory(request.bucket, request.key);
-      if (!Core::DirUtils::DirectoryExists(directory)) {
-        Core::DirUtils::MakeDirectory(directory);
-        log_debug_stream(_logger) << "Local bucket directory created, path: " << directory << std::endl;
-      }
+      Core::DirUtils::EnsureDirectory(directory);
 
       // Write file
       std::string fileName = GetFilename(request.bucket, request.key);
       std::ofstream ofs(fileName);
-      long copied = Poco::StreamCopier::copyStream(stream, ofs);
-      log_debug_stream(_logger) << "File received, fileName: " << fileName << " size: " << copied << std::endl;
+      long size = Poco::StreamCopier::copyStream(stream, ofs);
+      log_debug_stream(_logger) << "File received, fileName: " << fileName << " size: " << size << std::endl;
 
       // Meta data
-      long size = request.contentLength;
       std::string md5sum = Core::Crypto::GetMd5FromFile(fileName);
       std::string sha256sum = Core::Crypto::GetSha256FromFile(fileName);
-      log_debug_stream(_logger) << "MD5sum: " << md5sum << " bucket: " << request.bucket << " key: " << request.key << std::endl;
+      log_debug_stream(_logger) << "Metadata, bucket: " << request.bucket << " key: " << request.key << "md5: " << md5sum << " sha256: " << sha256sum << std::endl;
 
       // Update database
       Database::Entity::S3::Object object = {
@@ -283,6 +287,7 @@ namespace AwsMock::Service {
           .metadata=request.metadata
       };
 
+      // Update database
       object = _database->CreateOrUpdateObject(object);
       log_debug_stream(_logger) << "Database updated, bucket: " << object.bucket << " key: " << object.key << std::endl;
 

@@ -143,7 +143,7 @@ namespace AwsMock::Database {
     // arrange
     Entity::SQS::Queue queue = {.region=_region, .name=QUEUE_NAME, .owner=OWNER, .queueUrl=QUEUE_URL};
     queue = _sqsDatabase.CreateQueue(queue);
-    Entity::SQS::Message message = {.region=_region, .queueUrl=queue.name, .body=BODY};
+    Entity::SQS::Message message = {.region=_region, .queueUrl=queue.queueUrl, .body=BODY};
     _sqsDatabase.CreateMessage(message);
 
     // act
@@ -177,6 +177,19 @@ namespace AwsMock::Database {
 
     // act
     long result = _sqsDatabase.CountQueues(_region);
+
+    // assert
+    EXPECT_EQ(1, result);
+  }
+
+  TEST_F(SQSDatabaseTest, QueueCountTotalTest) {
+
+    // arrange
+    Entity::SQS::Queue queue = {.region=_region, .name=QUEUE_NAME, .owner=OWNER, .queueUrl=QUEUE_URL};
+    _sqsDatabase.CreateQueue(queue);
+
+    // act
+    long result = _sqsDatabase.CountQueues();
 
     // assert
     EXPECT_EQ(1, result);

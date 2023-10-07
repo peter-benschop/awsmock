@@ -2,11 +2,11 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include "awsmock/worker/SQSWorker.h"
+#include <awsmock/worker/SNSWorker.h>
 
 namespace AwsMock::Worker {
 
-  SQSWorker::SQSWorker(const Core::Configuration &configuration, Core::MetricService &metricService) : _logger(Poco::Logger::get("SQSWorker")), _configuration(configuration), _metricService(metricService), _running(false) {
+  SNSWorker::SNSWorker(const Core::Configuration &configuration, Core::MetricService &metricService) : _logger(Poco::Logger::get("SQSWorker")), _configuration(configuration), _metricService(metricService), _running(false) {
 
     // Sleeping period
     _period = _configuration.getInt("awsmock.worker.sqs.period", 10000);
@@ -19,7 +19,7 @@ namespace AwsMock::Worker {
     log_debug_stream(_logger) << "SQSWorker initialized" << std::endl;
   }
 
-  void SQSWorker::run() {
+  void SNSWorker::run() {
 
     log_info_stream(_logger) << "SQS worker started" << std::endl;
 
@@ -38,7 +38,7 @@ namespace AwsMock::Worker {
     }
   }
 
-  void SQSWorker::ResetMessages() {
+  void SNSWorker::ResetMessages() {
 
     Database::Entity::SQS::QueueList queueList = _sqsDatabase->ListQueues(_region);
     log_trace_stream(_logger) << "Working on queue list, count" << queueList.size() << std::endl;

@@ -29,10 +29,13 @@ namespace AwsMock::Service {
 
         // Get object request
         log_debug_stream(_logger) << "S3 get object request, bucket: " << bucket << " key: " << key << std::endl;
-        Dto::S3::GetObjectRequest s3Request = {.region=region, .bucket=bucket, .key=key};
+        Dto::S3::GetObjectRequest s3Request = {
+            .region=region,
+            .bucket=bucket,
+            .key=key};
 
+        // Get object
         Dto::S3::GetObjectResponse s3Response = _s3Service.GetObject(s3Request);
-        std::ifstream ifs(s3Response.filename);
 
         HeaderMap headerMap;
         headerMap["ETag"] = Core::StringUtils::GenerateRandomString(32);
