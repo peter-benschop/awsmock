@@ -22,6 +22,9 @@
 #include <awsmock/service/AbstractHandler.h>
 #include <awsmock/service/SQSService.h>
 
+#define DEFAULT_SQS_ENDPOINT "localhost:4566"
+#define DEFAULT_SQS_ACCOUNT_ID "000000000000"
+
 namespace AwsMock::Service {
 
     typedef std::map<std::string, std::string> AttributeList;
@@ -156,6 +159,11 @@ namespace AwsMock::Service {
        * Default account ID
        */
       std::string _accountId;
+
+      /**
+       * Default endpoint
+       */
+      std::string _endpoint;
     };
 
 } // namespace AwsMock::Service

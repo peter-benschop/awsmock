@@ -109,7 +109,7 @@ namespace AwsMock::Database {
        * @return list of SNS topics
        * @throws DatabaseException
        */
-      Entity::SNS::TopicList ListTopics(const std::string &region);
+      Entity::SNS::TopicList ListTopics(const std::string &region = {});
 
       /**
        * Counts the number of topics
@@ -117,7 +117,7 @@ namespace AwsMock::Database {
        * @param region AWS region
        * @return number of topics
        */
-      long CountTopics(const std::string &region);
+      long CountTopics(const std::string &region = {});
 
       /**
        * Deletes a topic.
@@ -165,7 +165,7 @@ namespace AwsMock::Database {
        * @param topicUrl URL of the topic
        * @param visibility visibility period in seconds
        */
-      long CountMessages(const std::string &region, const std::string& topicUrl);
+      long CountMessages(const std::string &region = {}, const std::string& topicUrl = {});
 
       /**
        * Count the number of message by status

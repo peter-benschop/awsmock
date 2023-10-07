@@ -71,26 +71,17 @@ namespace AwsMock::Dto::SQS {
        *
        * @return DTO as string for logging.
        */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
+      [[nodiscard]] std::string ToString() const;
 
       /**
        * Stream provider.
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const ReceiveMessageRequest &r) {
-          os << "ReceiveMessageRequest={region='" + r.region + "' queueUrl='" + r.queueUrl + "' maxMessages='" + std::to_string(r.maxMessages) +
-              "' visibility='" + std::to_string(r.visibility) + "' waitTimeSeconds='" + std::to_string(r.waitTimeSeconds) + "' resource='" + r.resource +
-              "' requestId: '" + r.requestId + "'}";
-          return os;
-      }
+      friend std::ostream &operator<<(std::ostream &os, const ReceiveMessageRequest &r);
 
     };
 
 } // namespace AwsMock::Dto::SQS
 
-#endif // AWSMOCK_DTO_SQS_RECEIVEMESSAGERESPONSE_H
+#endif // AWSMOCK_DTO_SQS_RECEIVEMESSAGEREQUEST_H

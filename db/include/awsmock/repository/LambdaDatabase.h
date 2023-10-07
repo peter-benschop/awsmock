@@ -79,6 +79,14 @@ namespace AwsMock::Database {
       Entity::Lambda::Lambda CreateLambda(const Entity::Lambda::Lambda &lambda);
 
       /**
+       * Count all lambdas
+       *
+       * @param region aws-mock region.
+       * @return total number of lambdas.
+       */
+      long LambdaCount(const std::string &region = {});
+
+      /**
        * Updates an existing lambda lambda function
        *
        * @param lambda lambda entity

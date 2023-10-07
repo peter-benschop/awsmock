@@ -6,196 +6,196 @@
 
 namespace AwsMock::Service {
 
-    TransferService::TransferService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("TransferService")), _configuration(configuration) {
+  TransferService::TransferService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("TransferService")), _configuration(configuration) {
 
-        // Initialize environment
-        _accountId = _configuration.getString("awsmock.account.id", "000000000000");
-        _transferDatabase = std::make_unique<Database::TransferDatabase>(_configuration);
-        log_debug_stream(_logger) << "Transfer service initialized" << std::endl;
+    // Initialize environment
+    _accountId = _configuration.getString("awsmock.account.id", "000000000000");
+    _transferDatabase = std::make_unique<Database::TransferDatabase>(_configuration);
+    log_debug_stream(_logger) << "Transfer service initialized" << std::endl;
+  }
+
+  Dto::Transfer::CreateTransferResponse
+  TransferService::CreateTransferServer(Dto::Transfer::CreateTransferRequest &request) {
+
+    log_debug_stream(_logger) << "Create transfer server" << std::endl;
+
+    // Check existence
+    if (_transferDatabase->TransferExists(request.region, request.protocols)) {
+      throw Core::ServiceException("Transfer server exists already", 403);
     }
 
+    std::string serverId = "s-" + Poco::toLower(Core::StringUtils::GenerateRandomHexString(20));
+
+    Database::Entity::Transfer::Transfer transferEntity;
+    std::string transferArn = Core::AwsUtils::CreateTransferArn(request.region, _accountId, serverId);
+
+    // Create entity
+    transferEntity = {.region=request.region, .serverId=serverId, .arn=transferArn, .protocols=request.protocols};
+
+    // Add anonymous user
+    Database::Entity::Transfer::User anonymousUser = {.userName="anonymous", .password="123", .homeDirectory="/"};
+    transferEntity.users.emplace_back(anonymousUser);
+
+    transferEntity = _transferDatabase->CreateTransfer(transferEntity);
+
+    // Create response
     Dto::Transfer::CreateTransferResponse
-    TransferService::CreateTransferServer(Dto::Transfer::CreateTransferRequest &request) {
+        response{.region=transferEntity.region, .serverId=serverId, .arn=transferArn};
 
-        log_debug_stream(_logger) << "Create transfer server" << std::endl;
+    return response;
+  }
 
-        // Check existence
-        if (_transferDatabase->TransferExists(request.region, request.protocols)) {
-            throw Core::ServiceException("Transfer server exists already", 403);
-        }
+  Dto::Transfer::CreateUserResponse
+  TransferService::CreateUser(Dto::Transfer::CreateUserRequest &request) {
+    log_debug_stream(_logger) << "Create user request" << std::endl;
 
-        std::string serverId = "s-" + Poco::toLower(Core::StringUtils::GenerateRandomHexString(20));
+    Database::Entity::Transfer::Transfer transferEntity;
 
-        Database::Entity::Transfer::Transfer transferEntity;
-        std::string transferArn = Core::AwsUtils::CreateTransferArn(request.region, _accountId, serverId);
+    if (!_transferDatabase->TransferExists(request.region, request.serverId)) {
 
-        // Create entity
-        transferEntity = {.region=request.region, .serverId=serverId, .arn=transferArn, .protocols=request.protocols};
+      throw Core::ServiceException("Transfer server with ID '" + request.serverId + "  does not exist", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
 
-        // Add anonymous user
-        Database::Entity::Transfer::User anonymousUser = {.userName="anonymous", .password="123", .homeDirectory="/"};
-        transferEntity.users.emplace_back(anonymousUser);
+    } else {
 
-        transferEntity = _transferDatabase->CreateTransfer(transferEntity);
+      transferEntity = _transferDatabase->GetTransferByServerId(request.serverId);
 
-        // Create response
-        Dto::Transfer::CreateTransferResponse
-            response{.region=transferEntity.region, .serverId=serverId, .arn=transferArn};
+      // Check user
+      if (transferEntity.HasUser(request.userName)) {
+        throw Core::ServiceException("Transfer server has already a user with name '" + request.userName + "'", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+      }
 
-        return response;
+      // Get home directory
+      std::string homeDirectory = request.userName;
+      if (!Core::StringUtils::IsNullOrEmpty(&request.homeDirectory)) {
+        homeDirectory = request.homeDirectory;
+      }
+
+      // Add user
+      Database::Entity::Transfer::User
+          user = {
+          .userName=request.userName,
+          .password=Core::StringUtils::GenerateRandomPassword(8),
+          .homeDirectory=request.homeDirectory
+      };
+      transferEntity.users.emplace_back(user);
+
+      // Update database
+      transferEntity = _transferDatabase->UpdateTransfer(transferEntity);
+      log_debug_stream(_logger) << "Updated transfer server, serverId: " << transferEntity.serverId << std::endl;
     }
 
-    Dto::Transfer::CreateUserResponse
-    TransferService::CreateUser(Dto::Transfer::CreateUserRequest &request) {
-        log_debug_stream(_logger) << "Create user request" << std::endl;
+    // Create response
+    Dto::Transfer::CreateUserResponse response{.region=transferEntity.region, .serverId=transferEntity.serverId, .userName=request.userName};
 
-        Database::Entity::Transfer::Transfer transferEntity;
+    return response;
+  }
 
-        if (!_transferDatabase->TransferExists(request.region, request.serverId)) {
+  Dto::Transfer::ListServerResponse TransferService::ListServers(const Dto::Transfer::ListServerRequest &request) {
 
-            throw Core::ServiceException("Transfer server with ID '" + request.serverId + "  does not exist", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+    try {
+      std::vector<Database::Entity::Transfer::Transfer> servers = _transferDatabase->ListServers(request.region);
 
-        } else {
+      auto response = Dto::Transfer::ListServerResponse();
+      response.nextToken = Poco::UUIDGenerator().createRandom().toString();
+      for (const auto &s : servers) {
+        Dto::Transfer::Server server = {
+            .arn=s.arn,
+            .serverId=s.serverId,
+            .state=s.state,
+            .userCount=static_cast<int>(s.users.size())};
+        response.servers.emplace_back(server);
+      }
 
-            transferEntity = _transferDatabase->GetTransferByServerId(request.serverId);
+      log_trace_stream(_logger) << "Server list outcome: " + response.ToJson() << std::endl;
+      return response;
 
-            // Check user
-            if (transferEntity.HasUser(request.userName)) {
-                throw Core::ServiceException("Transfer server has already a user with name '" + request.userName + "'", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-            }
-
-            // Get home directory
-            std::string homeDirectory = request.userName;
-            if (!Core::StringUtils::IsNullOrEmpty(&request.homeDirectory)) {
-                homeDirectory = request.homeDirectory;
-            }
-
-            // Add user
-            Database::Entity::Transfer::User
-                user = {
-                .userName=request.userName,
-                .password=Core::StringUtils::GenerateRandomPassword(8),
-                .homeDirectory=request.homeDirectory
-            };
-            transferEntity.users.emplace_back(user);
-
-            // Update database
-            transferEntity = _transferDatabase->UpdateTransfer(transferEntity);
-            log_debug_stream(_logger) << "Updated transfer server, serverId: " << transferEntity.serverId << std::endl;
-        }
-
-        // Create response
-        Dto::Transfer::CreateUserResponse response{.region=transferEntity.region, .serverId=transferEntity.serverId, .userName=request.userName};
-
-        return response;
+    } catch (Poco::Exception &ex) {
+      log_error_stream(_logger) << "Server list request failed, message: " << ex.message() << std::endl;
+      throw Core::ServiceException(ex.message(), 500);
     }
+  }
 
-    Dto::Transfer::ListServerResponse TransferService::ListServers(const Dto::Transfer::ListServerRequest &request) {
+  void TransferService::StartServer(const Dto::Transfer::StartServerRequest &request) {
 
-        try {
-            std::vector <Database::Entity::Transfer::Transfer> servers = _transferDatabase->ListServers(request.region);
+    Database::Entity::Transfer::Transfer server;
+    try {
+      if (!_transferDatabase->TransferExists(request.region, request.serverId)) {
+        throw Core::ServiceException("Server with ID '" + request.serverId + "' does not exist", 500);
+      }
 
-            auto response = Dto::Transfer::ListServerResponse();
-            response.nextToken = Poco::UUIDGenerator().createRandom().toString();
-            for (const auto &s : servers) {
-                Dto::Transfer::Server server = {
-                    .arn=s.arn,
-                    .serverId=s.serverId,
-                    .state=s.state,
-                    .userCount=static_cast<int>(s.users.size())};
-                response.servers.emplace_back(server);
-            }
+      // Get the server
+      server = _transferDatabase->GetTransferByServerId(request.serverId);
 
-            log_trace_stream(_logger) << "Server list outcome: " + response.ToJson() << std::endl;
-            return response;
+      // Update state, rest will be done by transfer worker
+      server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::ONLINE);
+      server = _transferDatabase->UpdateTransfer(server);
+      log_info_stream(_logger) << "Transfer server started, serverId: " << server.serverId << std::endl;
 
-        } catch (Poco::Exception &ex) {
-            log_error_stream(_logger) << "Server list request failed, message: " << ex.message() << std::endl;
-            throw Core::ServiceException(ex.message(), 500);
-        }
+    } catch (Poco::Exception &ex) {
+
+      // Update state
+      server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::START_FAILED);
+      server = _transferDatabase->UpdateTransfer(server);
+
+      log_error_stream(_logger) << "Start server request failed, serverId: " << server.serverId << " message: " << ex.message() << std::endl;
+      throw Core::ServiceException(ex.message(), 500);
     }
+  }
 
-    void TransferService::StartServer(const Dto::Transfer::StartServerRequest &request) {
+  void TransferService::StopServer(const Dto::Transfer::StopServerRequest &request) {
 
-        Database::Entity::Transfer::Transfer server;
-        try {
-            if (!_transferDatabase->TransferExists(request.region, request.serverId)) {
-                throw Core::ServiceException("Server with ID '" + request.serverId + "' does not exist", 500);
-            }
+    Database::Entity::Transfer::Transfer server;
+    try {
+      if (!_transferDatabase->TransferExists(request.region, request.serverId)) {
+        throw Core::ServiceException("Server with ID '" + request.serverId + "' does not exist", 500);
+      }
 
-            // Get the server
-            server = _transferDatabase->GetTransferByServerId(request.serverId);
+      // Get the server
+      server = _transferDatabase->GetTransferByServerId(request.serverId);
 
-            // Update state, rest will be done by transfer worker
-            server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::ONLINE);
-            server = _transferDatabase->UpdateTransfer(server);
-            log_info_stream(_logger) << "Transfer server started, serverId: " << server.serverId << std::endl;
+      // Update state, rest will be done by transfer worker
+      server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::OFFLINE);
+      server = _transferDatabase->UpdateTransfer(server);
+      log_info_stream(_logger) << "Transfer server stopped, serverId: " << server.serverId << std::endl;
 
-        } catch (Poco::Exception &ex) {
+    } catch (Poco::Exception &ex) {
 
-            // Update state
-            server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::START_FAILED);
-            server = _transferDatabase->UpdateTransfer(server);
+      // Update state
+      server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::STOP_FAILED);
+      server = _transferDatabase->UpdateTransfer(server);
 
-            log_error_stream(_logger) << "Start server request failed, serverId: " << server.serverId << " message: " << ex.message() << std::endl;
-            throw Core::ServiceException(ex.message(), 500);
-        }
+      log_error_stream(_logger) << "Stop server request failed, serverId: " << server.serverId << " message: " << ex.message() << std::endl;
+      throw Core::ServiceException(ex.message(), 500);
     }
+  }
 
-    void TransferService::StopServer(const Dto::Transfer::StopServerRequest &request) {
+  void TransferService::DeleteServer(const Dto::Transfer::DeleteServerRequest &request) {
 
-        Database::Entity::Transfer::Transfer server;
-        try {
-            if (!_transferDatabase->TransferExists(request.region, request.serverId)) {
-                throw Core::ServiceException("Server with ID '" + request.serverId + "' does not exist", 500);
-            }
+    Database::Entity::Transfer::Transfer server;
+    try {
+      if (!_transferDatabase->TransferExists(request.region, request.serverId)) {
+        throw Core::ServiceException("Server with ID '" + request.serverId + "' does not exist", 500);
+      }
 
-            // Get the server
-            server = _transferDatabase->GetTransferByServerId(request.serverId);
+      // Get the server
+      server = _transferDatabase->GetTransferByServerId(request.serverId);
 
-            // Update state, rest will be done by transfer worker
-            server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::OFFLINE);
-            server = _transferDatabase->UpdateTransfer(server);
-            log_info_stream(_logger) << "Transfer server stopped, serverId: " << server.serverId << std::endl;
+      // Update state, rest will be done by transfer worker
+      server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::OFFLINE);
+      server = _transferDatabase->UpdateTransfer(server);
+      log_info_stream(_logger) << "Transfer server stopped, serverId: " << server.serverId << std::endl;
 
-        } catch (Poco::Exception &ex) {
+      _transferDatabase->DeleteTransfer(request.serverId);
+      log_info_stream(_logger) << "Transfer server deleted, serverId: " << server.serverId << std::endl;
 
-            // Update state
-            server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::STOP_FAILED);
-            server = _transferDatabase->UpdateTransfer(server);
+    } catch (Poco::Exception &ex) {
 
-            log_error_stream(_logger) << "Stop server request failed, serverId: " << server.serverId << " message: " << ex.message() << std::endl;
-            throw Core::ServiceException(ex.message(), 500);
-        }
+      // Update state
+      server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::STOP_FAILED);
+      server = _transferDatabase->UpdateTransfer(server);
+
+      log_error_stream(_logger) << "Start server request failed, serverId: " << server.serverId << " message: " << ex.message() << std::endl;
+      throw Core::ServiceException(ex.message(), 500);
     }
-
-    void TransferService::DeleteServer(const Dto::Transfer::DeleteServerRequest &request) {
-
-        Database::Entity::Transfer::Transfer server;
-        try {
-            if (!_transferDatabase->TransferExists(request.region, request.serverId)) {
-                throw Core::ServiceException("Server with ID '" + request.serverId + "' does not exist", 500);
-            }
-
-            // Get the server
-            server = _transferDatabase->GetTransferByServerId(request.serverId);
-
-            // Update state, rest will be done by transfer worker
-            server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::OFFLINE);
-            server = _transferDatabase->UpdateTransfer(server);
-            log_info_stream(_logger) << "Transfer server stopped, serverId: " << server.serverId << std::endl;
-
-            _transferDatabase->DeleteTransfer(request.serverId);
-            log_info_stream(_logger) << "Transfer server deleted, serverId: " << server.serverId << std::endl;
-
-        } catch (Poco::Exception &ex) {
-
-            // Update state
-            server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::STOP_FAILED);
-            server = _transferDatabase->UpdateTransfer(server);
-
-            log_error_stream(_logger) << "Start server request failed, serverId: " << server.serverId << " message: " << ex.message() << std::endl;
-            throw Core::ServiceException(ex.message(), 500);
-        }
-    }
+  }
 } // namespace AwsMock::Service

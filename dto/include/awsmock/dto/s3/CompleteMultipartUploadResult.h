@@ -42,6 +42,11 @@ namespace AwsMock::Dto::S3 {
       std::string etag;
 
       /**
+       * MD5 sum
+       */
+      std::string md5sum;
+
+      /**
        * Checksum CRC32
        */
       std::string checksumCrc32;
@@ -66,7 +71,7 @@ namespace AwsMock::Dto::S3 {
        *
        * @return XML string
        */
-      std::string ToXml() const {
+      [[nodiscard]] std::string ToXml() const {
           Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
           Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("CompleteMultipartUploadResult");
           pDoc->appendChild(pRoot);

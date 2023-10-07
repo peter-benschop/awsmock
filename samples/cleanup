@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ENDPOINT="http://localhost:4566"
+ENDPOINT="http://localstack:4566"
 
 #
 # S3 function
@@ -115,20 +115,21 @@ delete_sqs_queue ftp-file-distribution-onix
 delete_sqs_queue ftp-file-distribution-inventory-feed
 delete_sqs_queue image-input
 delete_sqs_queue image-result
-#delete_sqs_queue image-delete-notification
+delete_sqs_queue image-delete-notification
 delete_sqs_queue parsing-result
 delete_sqs_queue onix3-tmp-parsing-input-event
 delete_sqs_queue onix3-tmp-anreicherungs-input-event
 delete_sqs_queue onix3-datenlieferant-updates
+delete_sqs_queue onix3-produktmeldungen-delete-events
 delete_sqs_queue artikel-transformations-service-artikel-ausgang
 delete_sqs_queue textannotation-result
 delete_sqs_queue bilderlink
 delete_sqs_queue katalogdaten
 delete_sqs_queue daten-lieferanten-service-daten-eingang
-#delete_sqs_queue daten-datenlieferanten-notification
-#delete_sqs_queue produktmeldung-parsing
-#delete_sqs_queue protokollierung-datenlieferant-updates
-#delete_sqs_queue inventory-feed-parsing-result
+delete_sqs_queue daten-datenlieferanten-notification
+delete_sqs_queue produktmeldung-parsing
+delete_sqs_queue protokollierung-datenlieferant-updates
+delete_sqs_queue inventory-feed-parsing-result
 
 #
 # Delete lambda function

@@ -2,8 +2,9 @@
 set(LIBRARY awsmockwrk)
 set(LIBRARY_STATIC awsmockwrk_static)
 
-set(WORKER_SOURCES src/worker/AbstractWorker.cpp src/worker/S3Worker.cpp src/worker/SQSWorker.cpp
-        src/worker/LambdaWorker.cpp src/worker/TransferWorker.cpp)
+set(WORKER_SOURCES src/worker/AbstractWorker.cpp src/worker/S3Worker.cpp src/worker/S3Monitoring.cpp
+        src/worker/SQSWorker.cpp src/worker/SQSMonitoring.cpp src/worker/SNSWorker.cpp src/worker/SNSMonitoring.cpp
+        src/worker/LambdaWorker.cpp src/worker/LambdaMonitoring.cpp src/worker/TransferWorker.cpp)
 set(FTP_SOURCES src/ftpserver/Filesystem.cpp src/ftpserver/FtpSession.cpp src/ftpserver/FtpServer.cpp
         src/ftpserver/FtpServerImpl.cpp src/ftpserver/UserDatabase.cpp)
 

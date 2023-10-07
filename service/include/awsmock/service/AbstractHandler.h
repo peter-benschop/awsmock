@@ -31,7 +31,7 @@
 
 namespace AwsMock::Service {
 
-    typedef std::vector<std::pair<std::string, std::string>> HeaderMap;
+    typedef std::map<std::string, std::string> HeaderMap;
 
     /**
      * Abstract HTTP request handler
@@ -57,20 +57,6 @@ namespace AwsMock::Service {
        * @see Poco::Net::HTTPRequestHandler
        */
       void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
-
-      /**
-       * Return busy flag
-       *
-       * @return true if handler is busy
-       */
-      bool GetBusy() {return _busy;}
-
-      /**
-       * Sets the busy flag
-       *
-       * @param true if handler is busy
-       */
-      void SetBusy(bool busy) { this->_busy = busy;}
 
     protected:
 
@@ -299,7 +285,7 @@ namespace AwsMock::Service {
          * @param payload HTTP body payload
          * @param extraHeader HTTP header map values, added to the default headers
          */
-      void SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &payload = {}, HeaderMap *extraHeader = nullptr);
+      void SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &payload = {}, const HeaderMap &extraHeader = {});
 
       /**
        * Send a OK response (HTTP status code 200) with an output stream.
@@ -309,7 +295,7 @@ namespace AwsMock::Service {
        * @param contentLength content length of the stream in bytes
        * @param extraHeader HTTP header map values, added to the default headers
        */
-      void SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long contentLength, HeaderMap *extraHeader = nullptr);
+      void SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long contentLength, const HeaderMap &extraHeader = {});
 
       /**
        * Send a HEAD response (HTTP status code 200)
@@ -325,7 +311,7 @@ namespace AwsMock::Service {
        * @param response HTTP response object
        * @param extraHeader HTTP header map values, added to the default headers
        */
-      void SendDeleteResponse(Poco::Net::HTTPServerResponse &response, HeaderMap *extraHeader = nullptr);
+      void SendDeleteResponse(Poco::Net::HTTPServerResponse &response, const HeaderMap &extraHeader = {});
 
       /**
        * Send an error response (HTTP status code 200).
@@ -351,7 +337,7 @@ namespace AwsMock::Service {
        * @param response HTTP response
        * @param extraHeader extrac headers
        */
-      void SendNoContentResponse(Poco::Net::HTTPServerResponse &response, HeaderMap *extraHeader = nullptr);
+      void SendNoContentResponse(Poco::Net::HTTPServerResponse &response, const HeaderMap &extraHeader = {});
 
       /**
        * CHecks whether the request has a header with the given key
@@ -440,7 +426,7 @@ namespace AwsMock::Service {
        * @param contentLength payload content length
        * @param headerMap vector of header key/values pairs
        */
-      void SetHeaders(Poco::Net::HTTPServerResponse &response, unsigned long contentLength, HeaderMap *headerMap = nullptr);
+      void SetHeaders(Poco::Net::HTTPServerResponse &response, unsigned long contentLength, HeaderMap headerMap = {});
 
       /**
        * Logger
@@ -476,11 +462,6 @@ namespace AwsMock::Service {
        * Header map
        */
       HeaderMap _headerMap;
-
-      /**
-       * Busy flag
-       */
-      bool _busy = false;
 
     };
 

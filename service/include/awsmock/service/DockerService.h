@@ -107,10 +107,9 @@ namespace AwsMock::Service {
       /**
        * Delete an image by name/tags.
        *
-       * @param name container name
-       * @param tag container tags
+       * @param id image ID
        */
-      void DeleteImage(const std::string &name, const std::string &tag);
+      void DeleteImage(const std::string &id);
 
       /**
        * Checks whether a container exists.

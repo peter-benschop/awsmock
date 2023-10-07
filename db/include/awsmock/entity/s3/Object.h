@@ -72,6 +72,16 @@ namespace AwsMock::Database::Entity::S3 {
       std::string md5sum;
 
       /**
+       * Object sha1Sum
+       */
+      std::string sha1sum;
+
+      /**
+       * Object sha256Sum
+       */
+      std::string sha256sum;
+
+      /**
        * Object content type
        */
       std::string contentType;

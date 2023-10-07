@@ -30,227 +30,266 @@
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/repository/ServiceDatabase.h>
-#include <awsmock/repository/S3Database.h>
+#include "awsmock/core/MetricService.h"
+#include "awsmock/core/ResourceNotFoundException.h"
+#include "awsmock/core/ThreadPool.h"
 #include <awsmock/dto/s3/CreateBucketConstraint.h>
 #include <awsmock/dto/s3/PutObjectRequest.h>
+#include <awsmock/repository/ServiceDatabase.h>
+#include <awsmock/repository/S3Database.h>
 #include <awsmock/worker/AbstractWorker.h>
+#include <awsmock/worker/S3Monitoring.h>
 
 namespace AwsMock::Worker {
 
-    class S3Worker : public Poco::Runnable, public AbstractWorker {
+  class S3Worker : public Poco::Runnable, public AbstractWorker {
 
     public:
 
-      /**
-       * Constructor
-       */
-      explicit S3Worker(const Core::Configuration &configuration);
+    /**
+     * Constructor
+     *
+     * @param configuration aws-mock configuration
+     * @param metricService aws-mock monitoring
+     */
+    explicit S3Worker(const Core::Configuration &configuration, Core::MetricService &metricService);
 
-      /**
-       * Main method
-       */
-      void run() override;
+    /**
+     * Main method
+     */
+    void run() override;
 
     private:
 
-      /**
-       * Synchronize the directory layout with the database.
-       * <p>
-       * All files which are in the directory tree will be syncheonized with the database. Files not existing anymore on the file system, will be deleted from the
-       * S3Object collection.
-       * </p>
-       */
-      void Synchronize();
+    /**
+     * Synchronize the directory layout with the database.
+     * <p>
+     * All files which are in the directory tree will be syncheonized with the database. Files not existing anymore on the file system, will be deleted from the
+     * S3Object collection.
+     * </p>
+     */
+    void Synchronize();
 
-      /**
-       * Create a new bucket, by sending the corresponding CreateBucket request to the S3 service.
-       *
-       * @param dirPath absolute path of the directory
-       */
-      void CreateBucket(const std::string &dirPath);
+    /**
+     * Update metric counters
+     */
+    void UpdateCounters();
 
-      /**
-       * Deletes an existing bucket, by sending the corresponding DeleteBucket request to the S3 service.
-       *
-       * @param dirPath absolute path of the directory
-       */
-      void DeleteBucket(const std::string &dirPath);
+    /**
+     * Create a new bucket, by sending the corresponding CreateBucket request to the S3 service.
+     *
+     * @param dirPath absolute path of the directory
+     */
+    void CreateBucket(const std::string &dirPath);
 
-      /**
-       * Create a new object, by sending the corresponding PutObject request to the S3 service.
-       *
-       * @param filePath absolute path of the file
-       */
-      void CreateObject(const std::string &filePath);
+    /**
+     * Deletes an existing bucket, by sending the corresponding DeleteBucket request to the S3 service.
+     *
+     * @param dirPath absolute path of the directory
+     */
+    void DeleteBucket(const std::string &dirPath);
 
-      /**
-       * Checks the existence of an object in database, by sending the corresponding HeadObject request to the S3 service.
-       *
-       * @param bucket S3 bucket name
-       * @param key S3 object key
-       * @return true if object exists
-       */
-      bool ExistsObject(const std::string &bucket, const std::string &key);
+    /**
+     * Create a new object, by sending the corresponding PutObject request to the S3 service.
+     *
+     * @param filePath absolute path of the file
+     */
+    void CreateObject(const std::string &filePath);
 
-      /**
-       * Deletes an existing object, by sending the corresponding DeleteObject request to the S3 service.
-       *
-       * @param bucket S3 bucket name
-       * @param key S3 object key
-       */
-      void DeleteObject(const std::string &bucket, const std::string &key);
+    /**
+     * Checks the existence of a bucket in the database, by sending the corresponding HeadObject request to the S3 service.
+     *
+     * @param bucket S3 bucket name
+     * @return true if object exists
+     */
+    bool ExistsBucket(const std::string &bucket);
 
-      /**
-       * Gets the bucket and object key from the file name.
-       *
-       * @param fileName absolute file file name
-       * @param bucket bucket name
-       * @param key object key
-       */
-      void GetBucketKeyFromFile(const std::string &fileName, std::string &bucket, std::string &key);
+    /**
+     * Checks the existence of an object in database, by sending the corresponding HeadObject request to the S3 service.
+     *
+     * @param bucket S3 bucket name
+     * @param key S3 object key
+     * @return true if object exists
+     */
+    bool ExistsObject(const std::string &bucket, const std::string &key);
 
-      /**
-       * Gets the absolute file path from bucket and object key.
-       *
-       * @param fileName absolute file file name
-       * @param bucket bucket name
-       * @param key object key
-       */
-      void GetFileFromBucketKey(std::string &fileName, const std::string &bucket, const std::string &key);
+    /**
+     * Deletes an existing object, by sending the corresponding DeleteObject request to the S3 service.
+     *
+     * @param bucket S3 bucket name
+     * @param key S3 object key
+     */
+    void DeleteObject(const std::string &bucket, const std::string &key);
 
-      /**
-       * Sends a create object request to the S3 service
-       *
-       * @param bucket S3 bucket name
-       * @param contentType content type
-       */
-      void SendCreateBucketRequest(const std::string &bucket, const std::string &contentType);
+    /**
+     * Gets the bucket and object key from the file name.
+     *
+     * @param fileName absolute file file name
+     * @param bucket bucket name
+     * @param key object key
+     */
+    void GetBucketKeyFromFile(const std::string &fileName, std::string &bucket, std::string &key);
 
-      /**
-       * Sends a delete bucket request to the S3 service
-       *
-       * @param bucket S3 bucket name
-       * @param contentType content type
-       */
-      void SendDeleteBucketRequest(const std::string &bucket, const std::string &contentType);
+    /**
+     * Gets the absolute file path from bucket and object key.
+     *
+     * @param bucket bucket name
+     * @param key object key
+     * @retunr local file path
+     */
+    std::string GetFileFromBucketKey(const std::string &bucket, const std::string &key);
 
-      /**
-       * Sends a put object request to the S3 service
-       *
-       * @param fileName name of the file
-       * @param bucket S3 bucket name
-       * @param key S3 object key
-       * @param md5Sum MD5 hash
-       * @param contentType content type
-       * @param fileSize size of the file
-       */
-      void SendPutObjectRequest(const std::string &fileName,
-                                const std::string &bucket,
-                                const std::string &key,
-                                const std::string &md5Sum,
-                                const std::string &contentType,
-                                unsigned long fileSize);
+    /**
+     * Sends a create object request to the S3 service
+     *
+     * @param bucket S3 bucket name
+     * @param contentType content type
+     */
+    void SendCreateBucketRequest(const std::string &bucket, const std::string &contentType);
 
-      /**
-       * Sends a head object request to the S3 service
-       *
-       * @param bucket S3 bucket name
-       * @param key S3 object key
-       * @param contentType content type
-       * @return true if object exists
-       */
-      bool SendHeadObjectRequest(const std::string &bucket, const std::string &key, const std::string &contentType);
+    /**
+     * Sends a delete bucket request to the S3 service
+     *
+     * @param bucket S3 bucket name
+     * @param contentType content type
+     */
+    void SendDeleteBucketRequest(const std::string &bucket, const std::string &contentType);
 
-      /**
-       * Sends a delete object request to the S3 service
-       *
-       * @param bucket S3 bucket name
-       * @param key S3 object key
-       * @param contentType content type
-       */
-      void SendDeleteObjectRequest(const std::string &bucket, const std::string &key, const std::string &contentType);
+    /**
+     * Sends a put object request to the S3 service
+     *
+     * @param fileName name of the file
+     * @param bucket S3 bucket name
+     * @param key S3 object key
+     * @param md5Sum MD5 hash
+     * @param contentType content type
+     * @param fileSize size of the file
+     */
+    void SendPutObjectRequest(const std::string &fileName,
+                              const std::string &bucket,
+                              const std::string &key,
+                              const std::string &md5Sum,
+                              const std::string &contentType,
+                              unsigned long fileSize);
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+    /**
+     * Sends a head object request to the S3 service
+     *
+     * @param bucket S3 bucket name
+     * @param contentType content type
+     * @return true if object exists
+     */
+    bool SendHeadObjectRequest(const std::string &bucket, const std::string &contentType);
 
-      /**
-       * Configuration
-       */
-      const Core::Configuration &_configuration;
+    /**
+     * Sends a head object request to the S3 service
+     *
+     * @param bucket S3 bucket name
+     * @param key S3 object key
+     * @param contentType content type
+     * @return true if object exists
+     */
+    bool SendHeadObjectRequest(const std::string &bucket, const std::string &key, const std::string &contentType);
 
-      /**
-       * Service database
-       */
-      std::unique_ptr<Database::ServiceDatabase> _serviceDatabase;
+    /**
+     * Sends a delete object request to the S3 service
+     *
+     * @param bucket S3 bucket name
+     * @param key S3 object key
+     * @param contentType content type
+     */
+    void SendDeleteObjectRequest(const std::string &bucket, const std::string &key, const std::string &contentType);
 
-      /**
-       * S3 database
-       */
-      std::unique_ptr<Database::S3Database> _s3Database;
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
 
-      /**
-       * Data directory
-       */
-      std::string _dataDir;
+    /**
+     * Configuration
+     */
+    const Core::Configuration &_configuration;
 
-      /**
-       * Watcher directory
-       */
-      std::string _watcherDir;
+    /**
+     * Metric service
+     */
+    Core::MetricService &_metricService;
 
-      /**
-       * Temp directory
-       */
-      std::string _tmpDir;
+    /**
+     * Service database
+     */
+    std::unique_ptr<Database::ServiceDatabase> _serviceDatabase;
 
-      /**
-       * Directory _watcher thread
-       */
-      Poco::Thread _watcherThread;
+    /**
+     * S3 database
+     */
+    std::unique_ptr<Database::S3Database> _s3Database;
 
-      /**
-       * AWS region
-       */
-      std::string _region;
+    /**
+     * Thread pool
+     */
+    AwsMock::Core::ThreadPool<S3Monitoring> _threadPool;
 
-      /**
-       * AWS account ID
-       */
-      std::string _accountId;
+    /**
+     * Data directory
+     */
+    std::string _dataDir;
 
-      /**
-       * AWS client ID
-       */
-      std::string _clientId;
+    /**
+     * Watcher directory
+     */
+    std::string _watcherDir;
 
-      /**
-       * AWS user
-       */
-      std::string _user;
+    /**
+     * Temp directory
+     */
+    std::string _tmpDir;
 
-      /**
-       * Running flag
-       */
-      bool _running;
+    /**
+     * Directory _watcher thread
+     */
+    Poco::Thread _watcherThread;
 
-      /**
-       * Sleeping period in ms
-       */
-      int _period;
+    /**
+     * AWS region
+     */
+    std::string _region;
 
-      /**
-       * S3 service host
-       */
-      std::string _s3ServiceHost;
+    /**
+     * AWS account ID
+     */
+    std::string _accountId;
 
-      /**
-       * S3 service port
-       */
-      int _s3ServicePort;
-    };
+    /**
+     * AWS client ID
+     */
+    std::string _clientId;
+
+    /**
+     * AWS user
+     */
+    std::string _user;
+
+    /**
+     * Running flag
+     */
+    bool _running;
+
+    /**
+     * Sleeping period in ms
+     */
+    int _period;
+
+    /**
+     * S3 service host
+     */
+    std::string _s3ServiceHost;
+
+    /**
+     * S3 service port
+     */
+    int _s3ServicePort;
+  };
 
 } // namespace AwsMock::Worker
 

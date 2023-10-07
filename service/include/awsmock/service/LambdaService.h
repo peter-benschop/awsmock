@@ -19,6 +19,7 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/MetricServiceTimer.h>
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
@@ -46,8 +47,9 @@ namespace AwsMock::Service {
        * Constructor
        *
        * @param configuration service configuration
+       * @param metricService aws-mock monitoring service
        */
-      explicit LambdaService(const Core::Configuration &configuration);
+      explicit LambdaService(const Core::Configuration &configuration, Core::MetricService &metricService);
 
       /**
        * Create lambda function
@@ -159,6 +161,11 @@ namespace AwsMock::Service {
        * Configuration
        */
       const Core::Configuration &_configuration;
+
+      /**
+       * Monitoring
+       */
+      Core::MetricService &_metricService;
 
       /**
        * Lambda database connection
