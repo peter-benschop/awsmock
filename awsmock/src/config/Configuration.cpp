@@ -16,7 +16,7 @@ namespace AwsMock {
 
     void Configuration::InitializeConfig() {
         // Data directory
-        DefineProperty("awsmock.data.dir", "AWSMOCK_DATA_DIR", "/tmp/awsmock/data");
+        DefineProperty("awsmock.data.dir", "AWSMOCK_DATA_DIR", "/home/awsmock/data");
 
         // Thread pool
         DefineProperty("awsmock.threadpool.min", "AWSMOCK_THREADPOOL_MIN", "4");

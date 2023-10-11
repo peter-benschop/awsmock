@@ -66,6 +66,7 @@ namespace AwsMock::Service {
 
     // Unzip provided zip-file into a temporary directory
     std::string codeDir = UnpackZipFile(zipFile, lambdaEntity.runtime, lambdaEntity.fileName, logger);
+    log_debug_stream(logger) << "Lambda file unzipped, codeDir: " << codeDir << std::endl;
 
     // Build the docker image using the docker service
     std::string imageFile =
@@ -97,8 +98,7 @@ namespace AwsMock::Service {
     }
   }
 
-  std::string LambdaServiceHelper::UnpackZipFile(const std::string &zipFile, const std::string &runtime, const std::string &fileName,
-                                                 Core::LogStream &logger) {
+  std::string LambdaServiceHelper::UnpackZipFile(const std::string &zipFile, const std::string &runtime, const std::string &fileName, Core::LogStream &logger) {
 
     // If we do not have a local file already, write the Base64 encoded file to lambda dir
     if (!Core::FileUtils::FileExists(fileName)) {

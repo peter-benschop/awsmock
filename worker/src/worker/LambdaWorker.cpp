@@ -3,11 +3,12 @@
 //
 
 #include "awsmock/worker/LambdaWorker.h"
+#include "awsmock/worker/LambdaExecutor.h"
 
 namespace AwsMock::Worker {
 
-  [[maybe_unused]] LambdaWorker::LambdaWorker(const Core::Configuration &configuration, Core::MetricService &metricService)
-      : AbstractWorker(configuration), _logger(Poco::Logger::get("LambdaWorker")), _configuration(configuration), _metricService(metricService), _running(false) {
+  LambdaWorker::LambdaWorker(const Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationCenter &notificationCenter)
+      : AbstractWorker(configuration), _logger(Poco::Logger::get("LambdaWorker")), _configuration(configuration), _metricService(metricService), _notificationCenter(notificationCenter), _running(false) {
 
     _dataDir = _configuration.getString("awsmock.data.dir") + Poco::Path::separator() + "lambda";
     _logger.debug() << "Lambda directory: " << _dataDir << std::endl;
@@ -29,10 +30,7 @@ namespace AwsMock::Worker {
     _dockerService = std::make_unique<Service::DockerService>(_configuration);
 
     // Create lambda directory
-    if (!Core::DirUtils::DirectoryExists(_dataDir)) {
-      Core::DirUtils::MakeDirectory(_dataDir);
-    }
-
+    Core::DirUtils::EnsureDirectory(_dataDir);
     log_debug_stream(_logger) << "LambdaWorker initialized" << std::endl;
   }
 
@@ -94,6 +92,9 @@ namespace AwsMock::Worker {
 
     // Start all lambda functions
     StartLambdaFunctions();
+
+    // Subscribe to lambda invocation notifications
+    _notificationCenter.addObserver(Poco::Observer<LambdaExecutor, Dto::Lambda::InvocationNotification>(_lambdaExecutor, &LambdaExecutor::HandleInvocationNotifications));
 
     // Start monitoring thread
     _threadPool.StartThread(_configuration, _metricService);

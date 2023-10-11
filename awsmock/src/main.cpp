@@ -309,7 +309,7 @@ namespace AwsMock {
     /**
      * Lambda worker
      */
-    Worker::LambdaWorker _lambdaWorker = Worker::LambdaWorker(_configuration, _metricService);
+    Worker::LambdaWorker _lambdaWorker = Worker::LambdaWorker(_configuration, _metricService, _notificationCenter);
 
     /**
      * Transfer worker
@@ -334,7 +334,7 @@ namespace AwsMock {
     /**
      * Lambda server
      */
-    Service::LambdaServer _lambdaServer = Service::LambdaServer(_configuration, _metricService);
+    Service::LambdaServer _lambdaServer = Service::LambdaServer(_configuration, _metricService, _notificationCenter);
 
     /**
      * Transfer server
@@ -350,6 +350,11 @@ namespace AwsMock {
      * Database
      */
     Database::Database _database = Database::Database(_configuration);
+
+    /**
+     * Notification center
+     */
+    Poco::NotificationCenter _notificationCenter;
   };
 
 } // namespace AwsMock

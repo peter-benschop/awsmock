@@ -346,7 +346,6 @@ namespace AwsMock::Service {
      * Lambda service host
      */
     std::string _lambdaServiceHost;
-
   };
 
 } // namespace AwsMock::Service
