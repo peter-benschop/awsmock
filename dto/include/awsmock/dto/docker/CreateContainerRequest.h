@@ -62,7 +62,7 @@ namespace AwsMock::Dto::Docker {
     /**
      * Network mode
      */
-    std::string networkMode;
+    std::string networkMode = "bridge";
 
     /**
      * Environment

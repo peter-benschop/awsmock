@@ -6,11 +6,12 @@
 
 namespace AwsMock::Service {
 
-  LambdaService::LambdaService(const Core::Configuration &configuration, Core::MetricService &metricService) : _logger(Poco::Logger::get("LambdaService")), _configuration(configuration), LambdaServiceHelper(configuration), _metricService(metricService) {
+  LambdaService::LambdaService(const Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationCenter &notificationCenter) :
+      _logger(Poco::Logger::get("LambdaService")), _configuration(configuration), LambdaServiceHelper(configuration), _metricService(metricService), _notificationCenter(notificationCenter) {
 
     // Initialize environment
     _accountId = _configuration.getString("awsmock.account.id", "000000000000");
-    _dataDir = _configuration.getString("awsmock.data.dir", "/tmp/awsmock/data");
+    _dataDir = _configuration.getString("awsmock.data.dir", "/home/awsmock/data");
     _tempDir = _dataDir + Poco::Path::separator() + "tmp";
     _lambdaDir = _dataDir + Poco::Path::separator() + "lambda";
     _lambdaDatabase = std::make_shared<Database::LambdaDatabase>(_configuration);
@@ -18,10 +19,7 @@ namespace AwsMock::Service {
     _dockerService = std::make_shared<Service::DockerService>(_configuration);
 
     // Create temp directory
-    if (!Core::DirUtils::DirectoryExists(_tempDir)) {
-      Core::DirUtils::MakeDirectory(_tempDir);
-    }
-
+    Core::DirUtils::EnsureDirectory(_tempDir);
     log_trace_stream(_logger) << "Lambda service initialized" << std::endl;
   }
 
@@ -134,7 +132,9 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Got lambda entity, name: " + lambda.function << std::endl;
 
     // Send invocation request
-    SendInvocationRequest(lambda.hostPort, payload);
+    //SendInvocationRequest(lambda.hostPort, payload);
+    _notificationCenter.postNotification(new Dto::Lambda::InvocationNotification(functionName, payload, region, user, "localhost", lambda.hostPort));
+    log_debug_stream(_logger) << "Lambda executor notification send, name: " + lambda.function << std::endl;
 
     // Update database
     lambda.lastInvocation = Poco::DateTime();
@@ -224,6 +224,7 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Delete tag request succeeded, arn: " + request.arn << " size: " << lambdaEntity.tags.size() << std::endl;
   }
 
+  // TODO: remove
   void LambdaService::SendInvocationRequest(int port, const std::string &body) {
     Core::MetricServiceTimer measure(_metricService, "lambda_invocation_timer");
     _metricService.IncrementCounter("lambda_invocation_counter");

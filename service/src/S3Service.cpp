@@ -617,8 +617,7 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "SQS message request send, status: " << response.getStatus() << std::endl;
   }
 
-  void S3Service::SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification,
-                                              const Database::Entity::S3::BucketNotification &bucketNotification) {
+  void S3Service::SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::BucketNotification &bucketNotification) {
 
     std::vector<std::string> parts = Core::StringUtils::Split(bucketNotification.lambdaArn, ':');
     std::string functionName = parts[6];

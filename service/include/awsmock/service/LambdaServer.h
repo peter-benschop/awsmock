@@ -33,7 +33,7 @@ namespace AwsMock::Service {
        * @param configuration application configuration
        * @param metricService monitoring service
        */
-      explicit LambdaServer(Core::Configuration &configuration, Core::MetricService &metricService);
+      explicit LambdaServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationCenter &notificationCenter);
 
       /**
        * Destructor
@@ -73,6 +73,11 @@ namespace AwsMock::Service {
       Core::MetricService &_metricService;
 
       /**
+       * Notification center
+       */
+      Poco::NotificationCenter &_notificationCenter;
+
+      /**
        * HTTP server instance
        */
       Poco::Net::HTTPServer *_httpServer;
@@ -86,7 +91,6 @@ namespace AwsMock::Service {
        * HTTP max concurrent connection
        */
       int _maxThreads;
-
     };
 
 } // namespace AwsMock::Service

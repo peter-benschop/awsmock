@@ -24,8 +24,7 @@ namespace AwsMock::Controller {
         // Get the authorization header
         std::string scheme, authInfo;
         request.getCredentials(scheme, authInfo);
-        log_debug_stream(_logger) << "Schema: " << scheme << " Authorization: " << authInfo << "URI: " << request.getURI() << " Method: " + request.getMethod()
-                                  << std::endl;
+        log_debug_stream(_logger) << "Schema: " << scheme << " Authorization: " << authInfo << "URI: " << request.getURI() << " Method: " + request.getMethod() << std::endl;
 
         // Get the service from the request authorization header. Currently, no credentials checks are made.
         std::string service = GetService(authInfo);
@@ -51,7 +50,7 @@ namespace AwsMock::Controller {
             return new AwsMock::ResourceNotFound();
         }
         log_debug_stream(_logger) << "Found request handler for route: " << route << " factory: " << factoryIndex->second << std::endl;
-
+        std::cerr << "HTTP default thread pool: " << Poco::ThreadPool::defaultPool().used() << "/" << Poco::ThreadPool::defaultPool().available() << std::endl;
         return factory->createResource(_configuration, _metricService);
     }
 

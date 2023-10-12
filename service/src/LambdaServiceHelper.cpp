@@ -66,6 +66,7 @@ namespace AwsMock::Service {
 
     // Unzip provided zip-file into a temporary directory
     std::string codeDir = UnpackZipFile(zipFile, lambdaEntity.runtime, lambdaEntity.fileName, logger);
+    log_debug_stream(logger) << "Lambda file unzipped, codeDir: " << codeDir << std::endl;
 
     // Build the docker image using the docker service
     std::string imageFile =
@@ -97,8 +98,7 @@ namespace AwsMock::Service {
     }
   }
 
-  std::string LambdaServiceHelper::UnpackZipFile(const std::string &zipFile, const std::string &runtime, const std::string &fileName,
-                                                 Core::LogStream &logger) {
+  std::string LambdaServiceHelper::UnpackZipFile(const std::string &zipFile, const std::string &runtime, const std::string &fileName, Core::LogStream &logger) {
 
     // If we do not have a local file already, write the Base64 encoded file to lambda dir
     if (!Core::FileUtils::FileExists(fileName)) {
@@ -110,8 +110,11 @@ namespace AwsMock::Service {
 
     std::string decodedZipFile = Core::Crypto::Base64Decode(zipFile);
 
+    _dataDir = _configuration.getString("awsmock.data.dir", "/home/awsmock/data");
+    _tempDir = _dataDir + Poco::Path::separator() + "tmp";
+
     // Create directory
-    std::string codeDir = Core::DirUtils::CreateTempDir();
+    std::string codeDir = Core::DirUtils::CreateTempDir(_tempDir);
     if (Core::StringUtils::ContainsIgnoreCase(runtime, "java")) {
 
       // Create classes directory
@@ -127,9 +130,8 @@ namespace AwsMock::Service {
 
     } else {
 
-      if (!Core::DirUtils::DirectoryExists(codeDir)) {
-        Core::DirUtils::MakeDirectory(codeDir);
-      }
+      // Create directory
+      Core::DirUtils::EnsureDirectory(codeDir);
 
       // Write to temp file
       std::ofstream ofs(_tempDir + "/zipfile.zip");
