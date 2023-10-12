@@ -110,8 +110,11 @@ namespace AwsMock::Service {
 
     std::string decodedZipFile = Core::Crypto::Base64Decode(zipFile);
 
+    _dataDir = _configuration.getString("awsmock.data.dir", "/home/awsmock/data");
+    _tempDir = _dataDir + Poco::Path::separator() + "tmp";
+
     // Create directory
-    std::string codeDir = Core::DirUtils::CreateTempDir();
+    std::string codeDir = Core::DirUtils::CreateTempDir(_tempDir);
     if (Core::StringUtils::ContainsIgnoreCase(runtime, "java")) {
 
       // Create classes directory
@@ -127,9 +130,8 @@ namespace AwsMock::Service {
 
     } else {
 
-      if (!Core::DirUtils::DirectoryExists(codeDir)) {
-        Core::DirUtils::MakeDirectory(codeDir);
-      }
+      // Create directory
+      Core::DirUtils::EnsureDirectory(codeDir);
 
       // Write to temp file
       std::ofstream ofs(_tempDir + "/zipfile.zip");

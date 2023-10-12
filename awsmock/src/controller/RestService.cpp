@@ -44,6 +44,7 @@ namespace AwsMock {
 
         httpServerParams->setMaxQueued(_maxQueueLength);
         httpServerParams->setMaxThreads(_maxThreads);
+        Poco::ThreadPool::defaultPool().addCapacity(_maxQueueLength);
 
         _httpServer = new Poco::Net::HTTPServer(_router, Poco::Net::ServerSocket(Poco::UInt16(_port)), httpServerParams);
 

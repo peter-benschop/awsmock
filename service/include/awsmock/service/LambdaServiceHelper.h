@@ -26,107 +26,97 @@
 
 namespace AwsMock::Service {
 
-    class LambdaServiceHelper {
+  class LambdaServiceHelper {
 
     public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration service configuration
-       */
-      explicit LambdaServiceHelper(const Core::Configuration &configuration);
+    /**
+     * Constructor
+     *
+     * @param configuration service configuration
+     */
+    explicit LambdaServiceHelper(const Core::Configuration &configuration);
 
-      /**
-       * Create new lambda function
-       */
-      Poco::ActiveMethod<void, std::pair<std::string, std::string>, LambdaServiceHelper> CreateLambdaFunction;
+    /**
+     * Create new lambda function
+     */
+    Poco::ActiveMethod<void, std::pair<std::string, std::string>, LambdaServiceHelper> CreateLambdaFunction;
 
     private:
 
-      /**
-       * Logger
-       */
-      //Core::LogStream _logger;
+    /**
+     * Data directory
+     */
+    std::string _dataDir;
 
-      /**
-       * Data directory
-       */
-      std::string _dataDir;
+    /**
+     * Temp directory
+     */
+    std::string _tempDir;
 
-      /**
-       * Temp directory
-       */
-      std::string _tempDir;
+    /**
+     * Configuration
+     */
+    const Core::Configuration &_configuration;
 
-      /**
-       * Configuration
-       */
-      const Core::Configuration &_configuration;
+    /**
+     * Docker service
+     */
+    Service::DockerService _dockerService;
 
-      /**
-       * Docker service
-       */
-      Service::DockerService _dockerService;
+    /**
+     * Create a new lambda function.
+     *
+     * @param lambda pair of zip file and oid
+     */
+    void CreateLambdaFunctionImpl(const std::pair<std::string, std::string> &lambda);
 
-      /**
-       * Lambda database connection
-       */
-      // _lambdaDatabase;
+    /**
+     * Save the ZIP file and unpack it in a temporary folder
+     *
+     * @param zipFile Base64 encoded ZIP file
+     * @param lambdaEntity lambda entity
+     * @param dockerTag docker tag to use
+     */
+    void CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag, Core::LogStream &_logger);
 
-      /**
-       * Create a new lambda function.
-       *
-       * @param lambda pair of zip file and oid
-       */
-      void CreateLambdaFunctionImpl(const std::pair<std::string, std::string> &lambda);
+    /**
+     * Creates an new docker container, in case the container does not exists inside the docker daemon.
+     *
+     * @param entity lambda entity.
+     * @param dockerTag docker tag.
+     */
+    void CreateDockerContainer(Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag, Core::LogStream &_logger);
 
-      /**
-       * Save the ZIP file and unpack it in a temporary folder
-       *
-       * @param zipFile Base64 encoded ZIP file
-       * @param lambdaEntity lambda entity
-       * @param dockerTag docker tag to use
-       */
-      void CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag, Core::LogStream &_logger);
+    /**
+     * Converts the lambda environment to a vector of string, which is needed by the docker API
+     *
+     * @param lambdaEnvironment lambda environment
+     * @return vector of strings containing the runtime environment
+     */
+    std::vector<std::string> GetEnvironment(const Database::Entity::Lambda::Environment &lambdaEnvironment, Core::LogStream &_logger);
 
-      /**
-       * Creates an new docker container, in case the container does not exists inside the docker daemon.
-       *
-       * @param entity lambda entity.
-       * @param dockerTag docker tag.
-       */
-      void CreateDockerContainer(Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag, Core::LogStream &_logger);
+    /**
+     * Unpack the provided ZIP file.
+     *
+     * <p>Needed only when the Lambda function is provided as zipped request body.</p>
+     *
+     * @param zipFile Base64 encoded zip file.
+     * @param runtime AWS lambda runtime name
+     * @param fileName filename of the Base64 encoded and zipped code file
+     * @return code directory
+     */
+    std::string UnpackZipFile(const std::string &zipFile, const std::string &runtime, const std::string &fileName, Core::LogStream &_logger);
 
-      /**
-       * Converts the lambda environment to a vector of string, which is needed by the docker API
-       *
-       * @param lambdaEnvironment lambda environment
-       * @return vector of strings containing the runtime environment
-       */
-      std::vector<std::string> GetEnvironment(const Database::Entity::Lambda::Environment &lambdaEnvironment, Core::LogStream &_logger);
+    /**
+     * Returns a random host port in the range 32768 - 65536 for the host port of the docker container which is running the lambda function.
+     *
+     * @return random port between 32768 and 65536
+     */
+    int GetHostPort();
 
-      /**
-       * Unpack the provided ZIP file.
-       *
-       * <p>Needed only when the Lambda function is provided as zipped request body.</p>
-       *
-       * @param zipFile Base64 encoded zip file.
-       * @param runtime AWS lambda runtime name
-       * @param fileName filename of the Base64 encoded and zipped code file
-       * @return code directory
-       */
-      std::string UnpackZipFile(const std::string &zipFile, const std::string &runtime, const std::string &fileName, Core::LogStream &_logger);
-
-      /**
-       * Returns a random host port in the range 32768 - 65536 for the host port of the docker container which is running the lambda function.
-       *
-       * @return random port between 32768 and 65536
-       */
-      int GetHostPort();
-
-    };
+  };
 
 } //namespace AwsMock::Service
 
-#endif //AWSMOCK_SERVICE_LAMBDASERVICE_H
+#endif // AWSMOCK_SERVICE_LAMBDASERVICE_H

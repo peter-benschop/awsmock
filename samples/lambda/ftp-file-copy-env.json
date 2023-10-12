@@ -1,13 +1,15 @@
 {
   "Variables": {
     "AWS_REGION": "eu-central-1",
-    "AWS_DEFAULT_REGION": "en-central-1",
+    "AWS_DEFAULT_REGION": "eu-central-1",
     "AWS_ACCOUNT_ID": "000000000000",
     "AWS_ACCESS_KEY_ID": "none",
     "AWS_SECRET_ACCESS_KEY": "none",
     "AWS_SESSION_TOKEN": "none",
     "ENVIRONMENT": "localstack",
     "SERVICE_NAME": "ftp-file-copy",
-    "JAVA_TOOL_OPTIONS": "-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localhost -Dlibri.aws.sns-protokollierung-topic-arn=arn:aws:sns:eu-central-1:000000000000:protokollierung-topic -Dlibri.aws.s3-destination-bucket=file-delivery -Dlibri.aws.use-localstack=true -Dlibri.aws.use-aws-profile=false"
+    "S3_DESTINATION_BUCKET": "file-delivery",
+    "SNS_PROTOKOLIERUNG_TOPIC": "arn:aws:sns:eu-central-1:000000000000:protokollierung-topic",
+    "JAVA_TOOL_OPTIONS": "-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localstack"
   }
 }
