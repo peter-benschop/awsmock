@@ -26,12 +26,14 @@
 namespace AwsMock::Worker {
 
   /**
-   * AWS Lambda executor.
+   * AWS lambda executor. Listens to a Poco notification queue and send the invocation requests sequentially.
    *
    * <p>
    * As the dockerized lambda runtime using AWS RIE only allows the execution of a lambda function at a time, the lambda function invocation will be queued up in a Poco notification queue and executed one by one. Each invocation will wait for the
-   * finishing of the last invocation request.
+   * finishing of the last invocation request. The lambda image can run on a remote docker instance. In this case the hostname on the invocation request has to be filled in. Default is 'localhost'.
    * </p>
+   *
+   * @author jens.vogt@opitz-consulting.com
    */
   class LambdaExecutor {
 
@@ -58,10 +60,20 @@ namespace AwsMock::Worker {
     /**
      * Send the invocation request to the corresponding port
      *
+     * @param hostName host name of the docker instance
      * @param port lambda docker external port
      * @param body event payload
      */
-    void SendInvocationRequest(int port, const std::string &body);
+    void SendInvocationRequest(const std::string &hostName, int port, const std::string &body);
+
+    /**
+     * Returns the URI for the invocation request.
+     *
+     * @param hostName host name of the docker instance
+     * @param port lambda docker external port
+     * @return URI of the invocation request
+     */
+    static Poco::URI GetRequestUri(const std::string &hostName, int port);
 
     /**
      * Logger

@@ -101,7 +101,7 @@ namespace AwsMock::Service {
     }
   }
 
-  void LambdaService::InvokeEventFunction(const Dto::S3::EventNotification &eventNotification) {
+  void LambdaService::InvokeEventFunction(const Dto::S3::EventNotification &eventNotification, const std::string &region, const std::string &user) {
     log_debug_stream(_logger) << "Invocation event function eventNotification: " + eventNotification.ToString() << std::endl;
 
     for (const auto &record : eventNotification.records) {
@@ -117,7 +117,9 @@ namespace AwsMock::Service {
         Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->GetLambdaByArn(notification.lambdaArn);
         log_debug_stream(_logger) << "Got lambda entity eventNotification: " + lambda.ToString() << std::endl;
 
-        SendInvocationRequest(lambda.hostPort, eventNotification.ToJson());
+        // Send invocation request
+        _notificationCenter.postNotification(new Dto::Lambda::InvocationNotification(lambda.function, eventNotification.ToJson(), region, user, "localhost", lambda.hostPort));
+        log_debug_stream(_logger) << "Lambda executor notification send, name: " + lambda.function << std::endl;
       }
     }
   }
@@ -132,7 +134,6 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Got lambda entity, name: " + lambda.function << std::endl;
 
     // Send invocation request
-    //SendInvocationRequest(lambda.hostPort, payload);
     _notificationCenter.postNotification(new Dto::Lambda::InvocationNotification(functionName, payload, region, user, "localhost", lambda.hostPort));
     log_debug_stream(_logger) << "Lambda executor notification send, name: " + lambda.function << std::endl;
 
@@ -222,35 +223,5 @@ namespace AwsMock::Service {
     }
     lambdaEntity = _lambdaDatabase->UpdateLambda(lambdaEntity);
     log_debug_stream(_logger) << "Delete tag request succeeded, arn: " + request.arn << " size: " << lambdaEntity.tags.size() << std::endl;
-  }
-
-  // TODO: remove
-  void LambdaService::SendInvocationRequest(int port, const std::string &body) {
-    Core::MetricServiceTimer measure(_metricService, "lambda_invocation_timer");
-    _metricService.IncrementCounter("lambda_invocation_counter");
-    log_debug_stream(_logger) << "Sending lambda invocation request, port: " << port << std::endl;
-
-    Poco::URI uri("http://localhost:" + std::to_string(port) + "/2015-03-31/functions/function/invocations");
-    std::string path(uri.getPathAndQuery());
-
-    // Create HTTP request and set headers
-    Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
-    Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, path, Poco::Net::HTTPMessage::HTTP_1_1);
-    request.add("Content-Type", "application/json");
-    request.setContentLength((long) body.length());
-    log_trace_stream(_logger) << "Invocation request defined, body: " + body << std::endl;
-
-    // Send request
-    std::ostream &os = session.sendRequest(request);
-    os << body;
-    os.flush();
-
-    // Get the response status
-    Poco::Net::HTTPResponse response;
-    session.receiveResponse(response);
-    if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
-      log_error_stream(_logger) << "HTTP error, status: " << response.getStatus() << " reason: " + response.getReason() << std::endl;
-    }
-    log_debug_stream(_logger) << "Lambda invocation request send, status: " << response.getStatus() << std::endl;
   }
 } // namespace AwsMock::Service
