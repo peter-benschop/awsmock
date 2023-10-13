@@ -24,131 +24,139 @@
 #define SHA256_SUM_EMPTY "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 #define SHA256_HMAC_SUM  "62025e1d8825e24f50410f8e9b8c40c319f622244baab30265de1d5ee8bf6a19"
 
-namespace AwsMock::Core
-{
-    class CryptoTest : public ::testing::Test
-    {
+namespace AwsMock::Core {
+  class CryptoTest : public ::testing::Test {
 
     protected:
-        void SetUp() override
-        {
-        }
-
-        void TearDown() override
-        {
-        }
-    };
-
-    TEST_F(CryptoTest, Md5StringTest)
-    {
-        // arrange
-
-        // act
-        std::string result = Crypto::GetMd5FromString(TEST_STRING);
-
-        // assert
-        EXPECT_EQ(result, MD5_SUM);
+    void SetUp() override {
     }
 
-    TEST_F(CryptoTest, Md5FileTest)
-    {
-        // arrange
-        std::string file = FileUtils::CreateTempFile("txt", TEST_STRING);
-
-        // act
-        std::string result = Crypto::GetMd5FromFile(file);
-
-        // assert
-        EXPECT_EQ(result, MD5_SUM);
+    void TearDown() override {
     }
+  };
 
-    TEST_F(CryptoTest, Sha1StringTest)
-    {
-        // arrange
+  TEST_F(CryptoTest, Md5StringTest) {
 
-        // act
-        std::string result = Crypto::GetSha1FromString(TEST_STRING);
+    // arrange
 
-        // assert
-        EXPECT_EQ(result, SHA1_SUM);
-    }
+    // act
+    std::string result = Crypto::GetMd5FromString(TEST_STRING);
 
-    TEST_F(CryptoTest, Sha1FileTest)
-    {
-        // arrange
-        std::string file = FileUtils::CreateTempFile("txt", TEST_STRING);
+    // assert
+    EXPECT_EQ(result, MD5_SUM);
+  }
 
-        // act
-        std::string result = Crypto::GetSha1FromFile(file);
+  TEST_F(CryptoTest, Md5StringOpensslTest) {
 
-        // assert
-        EXPECT_EQ(result, SHA1_SUM);
-    }
+    // arrange
+    unsigned char output[16];
+    auto *bytes = new unsigned char[4092];
+    memcpy(bytes, TEST_STRING, std::strlen(TEST_STRING));
 
-    TEST_F(CryptoTest, Sha256StringTest)
-    {
-        // arrange
+    // act
+    // OpenSSL (3.0.x version)
+    std::string result1 = Crypto::GetMd5FromString(std::string(reinterpret_cast<const char *>(bytes), std::strlen(TEST_STRING)));
 
-        // act
-        std::string result = Crypto::GetSha256FromString(TEST_STRING);
+    // Old MD5 (OpenSSL 1.0.x)
+    MD5(bytes, std::strlen(TEST_STRING), output);
+    std::string result2 = Core::Crypto::HexEncode(output, 16);
 
-        // assert
-        EXPECT_EQ(result, SHA256_SUM);
-    }
+    // assert
+    EXPECT_STREQ(result1.c_str(), result2.c_str());
+  }
 
-    TEST_F(CryptoTest, Sha256EmptyStringTest)
-    {
-        // arrange
+  TEST_F(CryptoTest, Md5FileTest) {
+    // arrange
+    std::string file = FileUtils::CreateTempFile("txt", TEST_STRING);
 
-        // act
-        std::string result = Crypto::GetSha256FromString("");
+    // act
+    std::string result = Crypto::GetMd5FromFile(file);
 
-        // assert
-        EXPECT_EQ(result, SHA256_SUM_EMPTY);
-    }
+    // assert
+    EXPECT_EQ(result, MD5_SUM);
+  }
 
-    TEST_F(CryptoTest, Sha256FileTest)
-    {
-        // arrange
-        std::string file = FileUtils::CreateTempFile("txt", TEST_STRING);
+  TEST_F(CryptoTest, Sha1StringTest) {
+    // arrange
 
-        // act
-        std::string result = Crypto::GetSha256FromFile(file);
+    // act
+    std::string result = Crypto::GetSha1FromString(TEST_STRING);
 
-        // assert
-        EXPECT_EQ(result, SHA256_SUM);
-    }
+    // assert
+    EXPECT_EQ(result, SHA1_SUM);
+  }
 
-    TEST_F(CryptoTest, GetHmacSha256Test) {
-        // arrange
+  TEST_F(CryptoTest, Sha1FileTest) {
+    // arrange
+    std::string file = FileUtils::CreateTempFile("txt", TEST_STRING);
 
-        // act
-        std::string result = Crypto::GetHmacSha256FromString("secretKey", TEST_STRING);
+    // act
+    std::string result = Crypto::GetSha1FromFile(file);
 
-        // assert
-        EXPECT_EQ(result, "6a7323506a6493e320d27b6eb5c64e722a314e15ddb753c837738e0c174cdb03");
-    }
+    // assert
+    EXPECT_EQ(result, SHA1_SUM);
+  }
 
-    TEST_F(CryptoTest, Base64EncodeTest) {
-        // arrange
+  TEST_F(CryptoTest, Sha256StringTest) {
+    // arrange
 
-        // act
-        std::string result = Crypto::Base64Encode(TEST_STRING);
+    // act
+    std::string result = Crypto::GetSha256FromString(TEST_STRING);
 
-        // assert
-        EXPECT_EQ(result, BASE64_TEST_STRING);
-    }
+    // assert
+    EXPECT_EQ(result, SHA256_SUM);
+  }
 
-    TEST_F(CryptoTest, Base64DecodeTest)
-    {
-        // arrange
+  TEST_F(CryptoTest, Sha256EmptyStringTest) {
+    // arrange
 
-        // act
-        std::string result = Crypto::Base64Decode(BASE64_TEST_STRING);
+    // act
+    std::string result = Crypto::GetSha256FromString("");
 
-        // assert
-        EXPECT_EQ(result, TEST_STRING);
-    }
+    // assert
+    EXPECT_EQ(result, SHA256_SUM_EMPTY);
+  }
+
+  TEST_F(CryptoTest, Sha256FileTest) {
+    // arrange
+    std::string file = FileUtils::CreateTempFile("txt", TEST_STRING);
+
+    // act
+    std::string result = Crypto::GetSha256FromFile(file);
+
+    // assert
+    EXPECT_EQ(result, SHA256_SUM);
+  }
+
+  TEST_F(CryptoTest, GetHmacSha256Test) {
+    // arrange
+
+    // act
+    std::string result = Crypto::GetHmacSha256FromString("secretKey", TEST_STRING);
+
+    // assert
+    EXPECT_EQ(result, "6a7323506a6493e320d27b6eb5c64e722a314e15ddb753c837738e0c174cdb03");
+  }
+
+  TEST_F(CryptoTest, Base64EncodeTest) {
+    // arrange
+
+    // act
+    std::string result = Crypto::Base64Encode(TEST_STRING);
+
+    // assert
+    EXPECT_EQ(result, BASE64_TEST_STRING);
+  }
+
+  TEST_F(CryptoTest, Base64DecodeTest) {
+    // arrange
+
+    // act
+    std::string result = Crypto::Base64Decode(BASE64_TEST_STRING);
+
+    // assert
+    EXPECT_EQ(result, TEST_STRING);
+  }
 
 } // namespace AwsMock::Core
 

@@ -373,14 +373,14 @@ namespace AwsMock::Service {
       length += 4;
       memcpy(bytes + length, a.attributeValue.c_str(), a.attributeValue.length());
       length += a.attributeValue.length();
-
     }
 
     // Calculate MD5 of byte array
-    unsigned char output[16];
-    MD5(bytes, length, output);
+//    unsigned char output[16];
+//    MD5(bytes, length, output);
+    std::string output = Core::Crypto::GetMd5FromString(std::string(reinterpret_cast<const char *>(bytes), length));
 
-    return Core::Crypto::HexEncode(output, 16);
+    return output;
   }
 
   void SQSService::GetIntAsByteArray(int n, unsigned char *bytes, int offset) {

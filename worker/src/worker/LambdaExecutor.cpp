@@ -8,24 +8,22 @@ namespace AwsMock::Worker {
 
   LambdaExecutor::LambdaExecutor(const Core::Configuration &configuration, Core::MetricService &metricService)
       : _logger(Poco::Logger::get("LambdaExecutor")), _configuration(configuration), _metricService(metricService) {
-
-    // Get configuration parameters
-    //_notificationTimeout = _configuration.getInt("awsmock.lambda.notification.timeout", LAMBDA_NOTIFICATION_TIMEOUT);
   }
 
   void LambdaExecutor::HandleInvocationNotifications(Dto::Lambda::InvocationNotification *invocationNotification) {
     log_debug_stream(_logger) << "Lambda invocation notification received, name:" << invocationNotification->functionName << std::endl;
-    SendInvocationRequest(invocationNotification->port, invocationNotification->payload);
+    SendInvocationRequest(invocationNotification->hostName, invocationNotification->port, invocationNotification->payload);
     invocationNotification->release();
   }
 
-  void LambdaExecutor::SendInvocationRequest(int port, const std::string &body) {
+  void LambdaExecutor::SendInvocationRequest(const std::string &hostName, int port, const std::string &body) {
     Core::MetricServiceTimer measure(_metricService, "lambda_invocation_timer");
     _metricService.IncrementCounter("lambda_invocation_counter");
-    log_debug_stream(_logger) << "Sending lambda invocation request, port: " << port << std::endl;
+    log_debug_stream(_logger) << "Sending lambda invocation request, endpoint: " << hostName << ":" << port << std::endl;
 
-    Poco::URI uri("http://localhost:" + std::to_string(port) + "/2015-03-31/functions/function/invocations");
+    Poco::URI uri = GetRequestUri(hostName, port);
     std::string path(uri.getPathAndQuery());
+    log_debug_stream(_logger) << "Created URI, endpoint: " << path << std::endl;
 
     // Create HTTP request and set headers
     Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
@@ -48,4 +46,10 @@ namespace AwsMock::Worker {
     log_debug_stream(_logger) << "Lambda invocation request send, status: " << response.getStatus() << std::endl;
   }
 
+  Poco::URI LambdaExecutor::GetRequestUri(const std::string &hostName, int port) {
+    if (hostName.empty()) {
+      return Poco::URI("http://localhost:" + std::to_string(port) + "/2015-03-31/functions/function/invocations");
+    }
+    return Poco::URI("http://" + hostName + ":" + std::to_string(port) + "/2015-03-31/functions/function/invocations");
+  }
 }

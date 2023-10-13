@@ -41,6 +41,25 @@
 
 namespace AwsMock::Service {
 
+  /**
+   * AWS lambda service. Handles all lambda related requests:
+   *
+   * <ul>
+   * <li>Create lambda function.</li>
+   * <li>Delete lambda function.</li>
+   * <li>List lambda function.</li>
+   * <li>Create lambda function tags.</li>
+   * <li>List lambda function tags.</li>
+   * <li>Delete lambda function tags.</li>
+   * <li>Invoke lambda function with AWS S3 notification payload.</li>
+   * <li>Invoke lambda function with AWS SQS notification payload.</li>
+   * </ul>
+   *
+   * As the AWS lambda runtime environment (RIE) cannot handle several concurrent requests, the lambda invocation requests are queued and are send sequentially. THe incoming requests are posted to a Poco notification center. The target of the notification
+   * is the LambdaExecutor (@see AwsMock::Worker::LambdaExecutor).
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   class LambdaService : public LambdaServiceHelper {
 
     public:
@@ -74,8 +93,10 @@ namespace AwsMock::Service {
      * Invoke lambda function
      *
      * @param eventNotification S3 event eventNotification
+     * @param region AWS region
+     * @param user user
      */
-    void InvokeEventFunction(const Dto::S3::EventNotification &eventNotification);
+    void InvokeEventFunction(const Dto::S3::EventNotification &eventNotification, const std::string &region, const std::string &user);
 
     /**
      * Invoke SQS function.
@@ -121,14 +142,6 @@ namespace AwsMock::Service {
     void DeleteTags(Dto::Lambda::DeleteTagsRequest &request);
 
     private:
-
-    /**
-     * Send the invocation request via HTTP to the lambda function.
-     *
-     * @param port host port of the docker image, running the lambda function.
-     * @param body message body containing the S3 event in JSON representation.
-     */
-    void SendInvocationRequest(int port, const std::string &body);
 
     /**
      * Logger
