@@ -352,7 +352,7 @@ namespace AwsMock::Service {
 
     // Sort the attributes by name
     std::vector<Dto::SQS::MessageAttribute> sortedAttributes = attributes;
-    std::sort(sortedAttributes.begin(), sortedAttributes.end());
+    std::sort(sortedAttributes.begicd ../mon    n(), sortedAttributes.end());
 
     for (const auto &a : sortedAttributes) {
 
