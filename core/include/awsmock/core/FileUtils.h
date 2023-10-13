@@ -84,6 +84,14 @@ namespace AwsMock::Core {
       static bool FileNameContainsString(const std::string &fileName, const std::string &pattern);
 
       /**
+       * Removes the AWS S3 version from the file.
+       *
+       * @param fileName file name ot process
+       * @return file name without version
+       */
+      static std::string RemoveVersionFromFilename(const std::string &fileName);
+
+      /**
        * Returns a thread safe temp file name.
        *
        * @param extension desired file extension

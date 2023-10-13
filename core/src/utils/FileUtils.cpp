@@ -21,6 +21,12 @@ namespace AwsMock::Core {
         return path.getBaseName().find(pattern) != std::string::npos;
     }
 
+    std::string FileUtils::RemoveVersionFromFilename(const std::string &fileName) {
+        Poco::Path path(fileName);
+        std::string extension = path.getExtension().substr(0,path.getExtension().find_last_of("."));
+        return path.getBaseName() + "." + extension;
+    }
+
     std::string FileUtils::GetTempFile(const std::string &extension) {
         return Poco::replace(Poco::toLower(Poco::Path::temp() + Poco::UUIDGenerator().createRandom().toString() + "." + extension), "-", "");
     }
