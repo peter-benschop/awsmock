@@ -90,6 +90,15 @@ namespace AwsMock::Core {
       static void MakeDirectory(const std::string &dirName, bool recursive = true);
 
       /**
+       * Ensures that a directory exists.
+       *
+       * <p>If it does not exist, it will be created.</p>
+       *
+       * @param dirName name of the directory.
+       */
+      static void EnsureDirectory(const std::string &dirName);
+
+      /**
        * Checks whether the given file name is a directory.
        *
        * @param dirName name of the directory.

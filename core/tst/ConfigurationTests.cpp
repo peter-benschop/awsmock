@@ -57,7 +57,7 @@ namespace AwsMock::Core {
 
         // assert
         EXPECT_STREQ(configuration->GetFilename().c_str(), TMP_PROPERTIES_FILE);
-        EXPECT_STREQ(configuration->GetLogLevel().c_str(), "debug");
+        EXPECT_STREQ(configuration->GetLogLevel().c_str(), "error");
     }
 
     TEST_F(ConfigurationTest, SetValueTest) {
@@ -85,7 +85,7 @@ namespace AwsMock::Core {
         // act
 
         // assert
-        EXPECT_STREQ(configuration->getString("awsmock.log.level").c_str(), "debug");
+        EXPECT_STREQ(configuration->getString("awsmock.log.level").c_str(), "error");
     }
 
 } // namespace AwsMock::Core

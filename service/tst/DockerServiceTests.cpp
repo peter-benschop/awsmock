@@ -20,47 +20,48 @@
 
 namespace AwsMock::Service {
 
-    class DockerServiceTest : public ::testing::Test {
+class DockerServiceTest : public ::testing::Test {
 
-    protected:
+protected:
 
-      void SetUp() override {
-      }
+  void SetUp() override {
+  }
 
-      void TearDown() override {
-          _service.DeleteImage("hello-world", "latest");
-          _service.PruneContainers();
-      }
+  void TearDown() override {
+    Dto::Docker::Image image = _service.GetImageByName("hello-world", "latest");
+    _service.DeleteImage(image.id);
+    _service.PruneContainers();
+  }
 
-      Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
-      DockerService _service = DockerService(_configuration);
-    };
+  Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+  DockerService _service = DockerService(_configuration);
+};
 
-    TEST_F(DockerServiceTest, ImageExistsTest) {
+TEST_F(DockerServiceTest, ImageExistsTest) {
 
-        // arrange
-        _service.CreateImage("hello-world", "latest", "hello-world");
+  // arrange
+  _service.CreateImage("hello-world", "latest", "hello-world");
 
-        // act
-        bool result = _service.ImageExists("hello-world", "latest");
+  // act
+  bool result = _service.ImageExists("hello-world", "latest");
 
-        // assert
-        EXPECT_TRUE(result);
-    }
+  // assert
+  EXPECT_TRUE(result);
+}
 
-    TEST_F(DockerServiceTest, ContainerExistsTest) {
+TEST_F(DockerServiceTest, ContainerExistsTest) {
 
-        // arrange
-        const std::vector<std::string> environment;
-        _service.CreateImage("hello-world", "latest", "hello-world");
-        _service.CreateContainer("hello-world", "latest", environment, 1025);
+  // arrange
+  const std::vector<std::string> environment;
+  _service.CreateImage("hello-world", "latest", "hello-world");
+  _service.CreateContainer("hello-world", "latest", environment, 1025);
 
-        // act
-        bool result = _service.ContainerExists("hello-world", "latest");
+  // act
+  bool result = _service.ContainerExists("hello-world", "latest");
 
-        // assert
-        EXPECT_TRUE(result);
-    }
+  // assert
+  EXPECT_TRUE(result);
+}
 
 } // namespace AwsMock::Core
 

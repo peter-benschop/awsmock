@@ -10,6 +10,9 @@
 #include <chrono>
 #include <ctime>
 
+// Poco includes
+#include <Poco/UUIDGenerator.h>
+
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
@@ -21,6 +24,7 @@
 #include <awsmock/dto/sns/DeleteTopicResponse.h>
 #include <awsmock/dto/sns/PublishRequest.h>
 #include <awsmock/dto/sns/PublishResponse.h>
+#include <awsmock/dto/sns/SqsNotificationRequest.h>
 #include <awsmock/dto/sns/SubscribeRequest.h>
 #include <awsmock/dto/sns/SubscribeResponse.h>
 #include <awsmock/dto/sqs/SendMessageRequest.h>
@@ -29,6 +33,7 @@
 #include <awsmock/service/SQSService.h>
 
 #define SQS_PROTOCOL "sqs"
+#define DEFAULT_SQS_ACCOUNT_ID "000000000000"
 
 namespace AwsMock::Service {
 
@@ -86,11 +91,6 @@ namespace AwsMock::Service {
       Dto::SNS::DeleteTopicResponse DeleteTopic(const std::string &region, const std::string &topicArn);
 
     private:
-
-      /**
-       * Initialize the service
-       */
-      void Initialize();
 
       /**
        * Checks the subscriptions.

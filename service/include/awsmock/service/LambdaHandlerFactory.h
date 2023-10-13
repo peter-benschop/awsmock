@@ -7,6 +7,9 @@
 
 // Poco includes
 #include "Poco/Logger.h"
+#include "Poco/Mutex.h"
+#include "Poco/ScopedLock.h"
+#include "Poco/NotificationCenter.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 
 // AwsMock includes
@@ -16,39 +19,48 @@
 
 namespace AwsMock::Service {
 
-    /**
-     * Lambda request handler factory
-     */
-    class LambdaRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
+  /**
+   * Lambda request handler factory
+   */
+  class LambdaRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 
     public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration application configuration
-       * @param metricService  monitoring
-       */
-      LambdaRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService) {}
+    /**
+     * Constructor
+     *
+     * @param configuration application configuration
+     * @param metricService  monitoring
+     */
+    LambdaRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationCenter &notificationCenter) : _configuration(configuration), _metricService(metricService), _notificationCenter(notificationCenter) {}
 
-      Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &) override {
-          return new LambdaHandler(_configuration, _metricService);
-      }
+    /**
+     * Create new lambda request handler
+     *
+     * @return lambda request handler
+     */
+    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &) override {
+      return new LambdaHandler(_configuration, _metricService, _notificationCenter);
+    }
 
     private:
 
-      /**
-       * S3 handler configuration
-       */
-      Core::Configuration &_configuration;
+    /**
+     * S3 handler configuration
+     */
+    Core::Configuration &_configuration;
 
-      /**
-       * Metric service
-       */
-      Core::MetricService &_metricService;
+    /**
+     * Metric service
+     */
+    Core::MetricService &_metricService;
 
-    };
+    /**
+     * Notification center
+     */
+    Poco::NotificationCenter &_notificationCenter;
+  };
 
 } // namespace AwsMock::Service
 
-#endif //AWSMOCK_SERVICE_LAMBDAHANDLERFACTORY_H
+#endif // AWSMOCK_SERVICE_LAMBDAHANDLERFACTORY_H

@@ -41,3 +41,5 @@ if (BUILD_DOCUMENTATION)
             COMMENT "Generating API documentation with Doxygen"
             VERBATIM)
 endif ()
+
+#install(TARGETS etc/aws-mock.properties DESTINATION /etc)

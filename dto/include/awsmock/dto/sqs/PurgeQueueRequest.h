@@ -9,6 +9,14 @@
 #include <string>
 #include <sstream>
 
+// Poco includes
+#include "Poco/DOM/AutoPtr.h"
+#include "Poco/DOM/Document.h"
+#include "Poco/DOM/Element.h"
+#include "Poco/DOM/Text.h"
+#include "Poco/DOM/DOMWriter.h"
+#include "Poco/XML/XMLWriter.h"
+
 // AwsMock includes
 #include <awsmock/dto/common/Common.h>
 
@@ -41,24 +49,17 @@ namespace AwsMock::Dto::SQS {
        *
        * @return DTO as string for logging.
        */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
+      [[nodiscard]] std::string ToString() const;
 
       /**
        * Stream provider.
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const PurgeQueueRequest &r) {
-          os << "PurgeQueueRequest={queueUrl='" + r.queueUrl + "' region: '" + r.region + "'}";
-          return os;
-      }
+      friend std::ostream &operator<<(std::ostream &os, const PurgeQueueRequest &r);
 
     };
 
 } // namespace AwsMock::Dto::SQS
 
-#endif // AWSMOCK_DTO_SQS_CREATEMESSAGEREQUEST_H
+#endif // AWSMOCK_DTO_SQS_PURGEQUEUEREQUEST_H

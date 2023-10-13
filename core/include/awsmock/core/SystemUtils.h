@@ -8,9 +8,6 @@
 // C includes
 #include <fcntl.h>
 #include <pwd.h>
-#include <sys/socket.h>
-#include <sys/un.h>
-#include <sys/sendfile.h>
 
 // C++ includes
 #include <cstdio>
@@ -36,11 +33,7 @@
 #include "awsmock/core/StreamFilter.h"
 #include "awsmock/core/FileUtils.h"
 
-#define CHUNK_SIZE 65536
-
 namespace AwsMock::Core {
-
-    static const unsigned int s_recv_len = 1024*1024;
 
     struct ExecResult {
       int status = -1;
@@ -80,53 +73,12 @@ namespace AwsMock::Core {
       static std::string GetHomeDir();
 
       /**
-       * Send a file over a UNIX domain socket
-       *
-       * @param socketPath name of the UNIX domain socket
-       * @param header HTTP header to send.
-       * @param fileName name of the file to send as body.
-       * @return output from socket operation
-       */
-      static std::string SendFileViaDomainSocket(const char* socketPath, const std::string &header, const std::string &fileName);
-
-      /**
-       * Send a message string over a UNIX domain socket
-       *
-       * @param socketPath name of the UNIX domain socket
-       * @param header header string.
-       * @param body message body.
-       * @return output from socket operation
-       */
-      static std::string SendMessageViaDomainSocket(const char* socketPath, const std::string &header, const std::string &body);
-
-      /**
-       * Set a HTTP header string in the correct format, to be used for a UNIX domain socket connection.
-       *
-       * @param method
-       * @param url
-       * @param contentType
-       * @param contentLength
-       * @return
-       */
-      static std::string SetHeader(const std::string &method, const std::string &url, const std::string &contentType, unsigned long contentLength);
-
-      /**
        * Logger
        */
       static Core::LogStream _logger;
-
-    private:
-
-      /**
-       * Extract the body of the message
-       *
-       * @param output HTTP response output
-       * @return body string
-       */
-      static std::string GetBody(const std::string &output);
 
     };
 
 } // namespace AwsMock::Core
 
-#endif //AWSMOCK_CORE_SYSTEMUTILS_H_
+#endif // AWSMOCK_CORE_SYSTEMUTILS_H_

@@ -15,76 +15,86 @@
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/ThreadPool.h>
 #include <awsmock/repository/ServiceDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
+#include <awsmock/worker/SQSMonitoring.h>
 
 namespace AwsMock::Worker {
 
-    class SQSWorker : public Poco::Runnable {
+  class SQSWorker : public Poco::Runnable {
 
     public:
 
-      /**
-       * Constructor
-       */
-      explicit SQSWorker(const Core::Configuration &configuration);
+    /**
+     * Constructor
+     *
+     * @param configuration aws-mock configuration
+     * @param metricService aws-mock monitoring service
+     */
+    explicit SQSWorker(const Core::Configuration &configuration, Core::MetricService &metricService);
 
-      /**
-       * Main method
-       */
-      void run() override;
+    /**
+     * Main method
+     */
+    void run() override;
 
     private:
 
-      /**
-       * Initialization
-       */
-      void Initialize();
+    /**
+     * Reset messages
+     *
+     * <p>Loops over all SQS queues and sets the status to INITIAL in case the visibility timeout has been reached. Also the retry count in increased by one.</p>
+     * <p>Checks also the expiration date and removed the messages, which are older than the max retention period.</>
+     */
+    void ResetMessages();
 
-      /**
-       * Reset messages
-       *
-       * <p>Loops over all SQS queues and sets the status to INITIAL in case the visibility timeout has been reached. Also the retry count in increased by one.</p>
-       * <p>Checks also the expiration date and removed the messages, which are older than the max retention period.</>
-       */
-      void ResetMessages();
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+    /**
+     * Configuration
+     */
+    const Core::Configuration &_configuration;
 
-      /**
-       * Configuration
-       */
-      const Core::Configuration &_configuration;
+    /**
+     * Metric service
+     */
+    Core::MetricService &_metricService;
 
-      /**
-       * Service database
-       */
-      std::unique_ptr<Database::ServiceDatabase> _serviceDatabase;
+    /**
+     * Service database
+     */
+    std::unique_ptr<Database::ServiceDatabase> _serviceDatabase;
 
-      /**
-       * S3 service
-       */
-      std::unique_ptr<Database::SQSDatabase> _sqsDatabase;
+    /**
+     * S3 service
+     */
+    std::unique_ptr<Database::SQSDatabase> _sqsDatabase;
 
-      /**
-       * AWS region
-       */
-      std::string _region;
+    /**
+     * Thread pool
+     */
+    AwsMock::Core::ThreadPool<SQSMonitoring> _threadPool;
 
-      /**
-       * Running flag
-       */
-      bool _running;
+    /**
+     * AWS region
+     */
+    std::string _region;
 
-      /**
-       * Sleeping period in ms
-       */
-      int _period;
-    };
+    /**
+     * Running flag
+     */
+    bool _running;
+
+    /**
+     * Sleeping period in ms
+     */
+    int _period;
+  };
 
 } // namespace AwsMock::Worker
 
-#endif //AWSMOCK_WORKER_S3WORKER_H
+#endif // AWSMOCK_WORKER_S3WORKER_H

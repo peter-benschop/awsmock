@@ -58,6 +58,14 @@ namespace AwsMock::Database {
       bool BucketExists(const Entity::S3::Bucket &bucket);
 
       /**
+       * Returns the total number of buckets
+       *
+       * @return total number of buckets
+       * @throws DatabaseException
+       */
+      long BucketCount();
+
+      /**
        * Returns the bucket by id
        *
        * @param oid bucket oid
@@ -203,11 +211,12 @@ namespace AwsMock::Database {
       /**
        * Counts the number of keys in a bucket
        *
-       * @param bucket bucket entity
+       * @param region AWS region
+       * @param bucket bucket name
        * @return number of object in bucket
        * @throws DatabaseException
        */
-      long ObjectCount(const Entity::S3::Bucket& bucket);
+      long ObjectCount(const std::string &region = {}, const std::string &bucket = {});
 
       /**
        * Creates a bucket notification-

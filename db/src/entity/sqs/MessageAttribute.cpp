@@ -4,26 +4,31 @@
 
 #include <awsmock/entity/sqs/MessageAttribute.h>
 
+#include <utility>
+
 namespace AwsMock::Database::Entity::SQS {
 
-    view_or_value<view, value> MessageAttribute::ToDocument() const {
+  //MessageAttribute::MessageAttribute(std::string name, std::string value, const MessageAttributeType &type) : attributeName(std::move(name)), attributeValue(std::move(value)), attributeType(type) {}
 
-        view_or_value<view, value> messageAttributeDoc = make_document(
-            kvp("name", attributeName),
-            kvp("value", attributeValue));
+  view_or_value<view, value> MessageAttribute::ToDocument() const {
 
-        return messageAttributeDoc;
-    }
+    view_or_value<view, value> messageAttributeDoc = make_document(
+        kvp("attributeName", attributeName),
+        kvp("attributeValue", attributeValue),
+        kvp("attributeType", Database::Entity::SQS::MessageAttributeTypeToString(attributeType)));
 
-    std::string MessageAttribute::ToString() const {
-        std::stringstream ss;
-        ss << (*this);
-        return ss.str();
-    }
+    return messageAttributeDoc;
+  }
 
-    std::ostream &operator<<(std::ostream &os, const MessageAttribute &m) {
-        os << "MessageAttribute={name='" + m.attributeValue + "'value='" + m.attributeValue + "'}";
-        return os;
-    }
+  std::string MessageAttribute::ToString() const {
+    std::stringstream ss;
+    ss << (*this);
+    return ss.str();
+  }
+
+  std::ostream &operator<<(std::ostream &os, const MessageAttribute &m) {
+    os << "MessageAttribute={attributeName='" << m.attributeValue << "', attributeValue='" << m.attributeValue + "', attributeType='" << Database::Entity::SQS::MessageAttributeTypeToString(m.attributeType) << "'}";
+    return os;
+  }
 
 } // namespace AwsMock::Database::Entity::S3

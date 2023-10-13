@@ -3,17 +3,17 @@
 #
 # Lambda function
 #
-function lambda_exists() {
+function lambda_exists {
   awsmock lambda list-functions | grep arn | grep $1 | wc -l
 }
 
-function create_lambda_function () {
+function create_lambda_function {
 
-  function=$1
-  runtime=$2
-  zipfile=$3
-  handler=$4
-  version=$5
+  function="$1"
+  runtime="$2"
+  jarfile="$3"
+  handler="$4"
+  version="$5"
 
   if [ "$(lambda_exists "$function")" -eq 0 ]; then
     awsmock lambda create-function \
@@ -26,7 +26,7 @@ function create_lambda_function () {
     --ephemeral-storage Size=10240 \
     --handler "$handler" \
     --region eu-central-1 \
-    --zip-file "fileb://./testdata/lambda/$zipfile" \
+    --zip-file "fileb://$jarfile" \
     --role arn:aws:iam::000000000000:role/lambda-role \
     --cli-read-timeout 0
     echo "Lambda function $1 created"
@@ -35,4 +35,5 @@ function create_lambda_function () {
   fi
 }
 
-create_lambda_function ftp-file-distribution java17 file-distribution-service-1.26.1-SNAPSHOT-aws.jar org.springframework.cloud.function.adapter.aws.FunctionInvoker 1.26.1
+#create_lambda_function ftp-file-copy java17 /home/vogje01/work/libri/Libri.ONE/PIM/ftp-file-copy/target/file-copy-service-1.19.1-SNAPSHOT-aws.jar org.springframework.cloud.function.adapter.aws.FunctionInvoker 1.19.1
+create_lambda_function ftp-file-distribution java17 /home/vogje01/work/libri/Libri.ONE/PIM/ftp-file-distribution-service/target/file-distribution-service-1.26.2-SNAPSHOT-aws.jar org.springframework.cloud.function.adapter.aws.FunctionInvoker 1.26.2

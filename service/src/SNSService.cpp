@@ -6,179 +6,192 @@
 
 namespace AwsMock::Service {
 
-    SNSService::SNSService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("SNSService")), _configuration(configuration) {
-        Initialize();
+  SNSService::SNSService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("SNSService")), _configuration(configuration) {
+
+    // Initialize environment
+    _snsDatabase = std::make_unique<Database::SNSDatabase>(_configuration);
+    _sqsDatabase = std::make_unique<Database::SQSDatabase>(_configuration);
+    _sqsService = std::make_unique<SQSService>(_configuration);
+    _accountId = _configuration.getString("awsmock.account.id", DEFAULT_SQS_ACCOUNT_ID);
+  }
+
+  Dto::SNS::CreateTopicResponse SNSService::CreateTopic(const Dto::SNS::CreateTopicRequest &request) {
+    log_trace_stream(_logger) << "Create topic request: " << request.ToString() << std::endl;
+
+    // Check existence
+    if (_snsDatabase->TopicExists(request.region, request.topicName)) {
+      throw Core::ServiceException("SNS topic exists already", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
 
-    void SNSService::Initialize() {
+    try {
+      // Update database
+      std::string topicArn = Core::AwsUtils::CreateSNSTopicArn(request.region, _accountId, request.topicName);
+      Database::Entity::SNS::Topic topic = _snsDatabase->CreateTopic({.region=request.region, .topicName=request.topicName, .owner=request.owner, .topicArn=topicArn});
+      log_trace_stream(_logger) << "SNS topic created: " << topic.ToString() << std::endl;
 
-        // Initialize environment
-        _snsDatabase = std::make_unique<Database::SNSDatabase>(_configuration);
-        _sqsDatabase = std::make_unique<Database::SQSDatabase>(_configuration);
-        _sqsService = std::make_unique<SQSService>(_configuration);
-        _accountId = Core::AwsUtils::GetDefaultAccountId();
+      return {.region=topic.region, .name=topic.topicName, .owner=topic.owner, .topicArn=topic.topicArn};
+
+    } catch (Core::DatabaseException &exc) {
+      log_error_stream(_logger) << "SNS create topic failed, message: " << exc.message() << std::endl;
+      throw Core::ServiceException(exc.message(), 400);
     }
+  }
 
-    Dto::SNS::CreateTopicResponse SNSService::CreateTopic(const Dto::SNS::CreateTopicRequest &request) {
-        log_trace_stream(_logger) << "Create topic request: " << request.ToString() << std::endl;
+  Dto::SNS::ListTopicsResponse SNSService::ListTopics(const std::string &region) {
+    log_trace_stream(_logger) << "List all topics request, region: " << region << std::endl;
 
-        // Check existence
-        if (_snsDatabase->TopicExists(request.region, request.topicName)) {
-            throw Core::ServiceException("SNS topic exists already", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+    try {
+
+      Database::Entity::SNS::TopicList topicList = _snsDatabase->ListTopics(region);
+      auto listTopicsResponse = Dto::SNS::ListTopicsResponse(topicList);
+      log_trace_stream(_logger) << "SNS list topics response: " << listTopicsResponse.ToXml() << std::endl;
+
+      return listTopicsResponse;
+
+    } catch (Poco::Exception &ex) {
+      log_error_stream(_logger) << "SNS list topics request failed, message: " << ex.message() << std::endl;
+      throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, "SQS", Poco::UUIDGenerator().createRandom().toString().c_str());
+    }
+  }
+
+  Dto::SNS::DeleteTopicResponse SNSService::DeleteTopic(const std::string &region, const std::string &topicArn) {
+    log_trace_stream(_logger) << "Delete topic request, region: " << region << " topicArn: " << topicArn << std::endl;
+
+    Dto::SNS::DeleteTopicResponse response;
+    try {
+      // Check existence
+      if (!_snsDatabase->TopicExists(topicArn)) {
+        throw Core::ServiceException("Topic does not exist", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+      }
+
+      // Update database
+      _snsDatabase->DeleteTopic({.region=region, .topicArn=topicArn});
+
+    } catch (Poco::Exception &ex) {
+      log_error_stream(_logger) << "SNS delete topic failed, message: " << ex.message() << std::endl;
+      throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+    }
+    return response;
+  }
+
+  Dto::SNS::PublishResponse SNSService::Publish(const Dto::SNS::PublishRequest &request) {
+
+    Database::Entity::SNS::Message message;
+    try {
+      // Check topic/target ARN
+      if (request.topicArn.empty()) {
+        log_error_stream(_logger) << "Either topicARN or targetArn must exist" << std::endl;
+        throw Core::ServiceException("Either topicARN or targetArn must exist", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+      }
+
+      // Check existence
+      if (!_snsDatabase->TopicExists(request.topicArn)) {
+        log_error_stream(_logger) << "Topic does not exist: " << request.topicArn << std::endl;
+        throw Core::ServiceException("SNS topic does not exists", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+      }
+
+      // Update database
+      std::string messageId = Core::StringUtils::GenerateRandomString(100);
+      message = _snsDatabase->CreateMessage({
+                                                .region=request.region,
+                                                .topicArn=request.topicArn,
+                                                .targetArn=request.targetArn,
+                                                .message=request.message,
+                                                .messageId=messageId
+                                            });
+
+      // Check subscriptions
+      CheckSubscriptions(request);
+
+      return {.messageId=message.messageId};
+
+    } catch (Poco::Exception &ex) {
+      log_error_stream(_logger) << "SNS create message failed, message: " << ex.message() << std::endl;
+      throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  Dto::SNS::SubscribeResponse SNSService::Subscribe(const Dto::SNS::SubscribeRequest &request) {
+
+    try {
+
+      // Check topic/target ARN
+      if (request.topicArn.empty()) {
+        throw Core::ServiceException("Topic ARN missing", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+      }
+
+      // Check existence
+      if (!_snsDatabase->TopicExists(request.topicArn)) {
+        throw Core::ServiceException("SNS topic does not exists", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+      }
+
+      // Create new subscription
+      Database::Entity::SNS::Topic topic = _snsDatabase->GetTopicByArn(request.topicArn);
+      std::string subscriptionArn = Core::AwsUtils::CreateSNSSubscriptionArn(request.region, _accountId, topic.topicName);
+
+      Database::Entity::SNS::Subscription subscription = {.protocol=request.protocol, .endpoint=request.endpoint};
+      if (!topic.HasSubscription(subscription)) {
+
+        // Add subscription
+        topic.subscriptions.push_back({
+                                          .protocol=request.protocol,
+                                          .endpoint=request.endpoint
+                                      });
+
+        // Save to database
+        topic = _snsDatabase->UpdateTopic(topic);
+        _logger.debug() << "Subscription added, topic: " << topic.ToString() << std::endl;
+      }
+
+      return {.subscriptionArn=subscriptionArn};
+
+    } catch (Poco::Exception &ex) {
+      log_error_stream(_logger) << "SNS subscription failed, message: " << ex.message() << std::endl;
+      throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  void SNSService::CheckSubscriptions(const Dto::SNS::PublishRequest &request) {
+
+    Database::Entity::SNS::Topic topic = _snsDatabase->GetTopicByArn(request.topicArn);
+    if (!topic.subscriptions.empty()) {
+
+      for (const auto &it : topic.subscriptions) {
+
+        if (it.protocol == SQS_PROTOCOL) {
+
+          SendSQSMessage(it, request);
+          _logger.debug() << "Message send to SQS queue, queueArn: " << it.endpoint << std::endl;
+
         }
-
-        try {
-            // Update database
-            std::string topicArn = Core::AwsUtils::CreateSNSTopicArn(request.region, _accountId, request.topicName);
-            Database::Entity::SNS::Topic topic = _snsDatabase->CreateTopic({.region=request.region, .topicName=request.topicName, .owner=request.owner, .topicArn=topicArn});
-            log_trace_stream(_logger) << "SNS topic created: " << topic.ToString() << std::endl;
-
-            return {.region=topic.region, .name=topic.topicName, .owner=topic.owner, .topicArn=topic.topicArn};
-
-        } catch (Core::DatabaseException &exc) {
-            log_error_stream(_logger) << "SNS create topic failed, message: " << exc.message() << std::endl;
-            throw Core::ServiceException(exc.message(), 400);
-        }
+      }
     }
+  }
 
-    Dto::SNS::ListTopicsResponse SNSService::ListTopics(const std::string &region) {
-        log_trace_stream(_logger) << "List all topics request, region: " << region << std::endl;
+  void SNSService::SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) {
 
-        try {
+    // Get queue URL
+    Database::Entity::SQS::Queue sqsQueue = _sqsDatabase->GetQueueByArn(subscription.endpoint);
 
-            Database::Entity::SNS::TopicList topicList = _snsDatabase->ListTopics(region);
-            auto listTopicsResponse = Dto::SNS::ListTopicsResponse(topicList);
-            log_trace_stream(_logger) << "SNS list topics response: " << listTopicsResponse.ToXml() << std::endl;
+    // Create a SQS notification request
+    AwsMock::Dto::SNS::SqsNotificationRequest sqsNotificationRequest = {
+        .type="Notification",
+        .messageId=Poco::UUIDGenerator().createRandom().toString(),
+        .topicArn=request.topicArn,
+        .message=request.message,
+        .timestamp=Poco::Timestamp().epochMicroseconds()/1000
+    };
 
-            return listTopicsResponse;
+    // Wrap it in a SQS message request
+    Dto::SQS::SendMessageRequest sendMessageRequest = {
+        .region=request.region,
+        .queueUrl=sqsQueue.queueUrl,
+        .queueArn=sqsQueue.queueArn,
+        .body=sqsNotificationRequest.ToJson(),
+        .requestId=sqsNotificationRequest.messageId
+    };
 
-        } catch (Poco::Exception &ex) {
-            log_error_stream(_logger) << "SNS list topics request failed, message: " << ex.message() << std::endl;
-            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, "SQS", Poco::UUIDGenerator().createRandom().toString().c_str());
-        }
-    }
-
-    Dto::SNS::DeleteTopicResponse SNSService::DeleteTopic(const std::string &region, const std::string &topicArn) {
-        log_trace_stream(_logger) << "Delete topic request, region: " << region << " topicArn: " << topicArn << std::endl;
-
-        Dto::SNS::DeleteTopicResponse response;
-        try {
-            // Check existence
-            if (!_snsDatabase->TopicExists(topicArn)) {
-                throw Core::ServiceException("Topic does not exist", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-            }
-
-            // Update database
-            _snsDatabase->DeleteTopic({.region=region, .topicArn=topicArn});
-
-        } catch (Poco::Exception &ex) {
-            log_error_stream(_logger) << "SNS delete topic failed, message: " << ex.message() << std::endl;
-            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-        }
-        return response;
-    }
-
-    Dto::SNS::PublishResponse SNSService::Publish(const Dto::SNS::PublishRequest &request) {
-
-        Database::Entity::SNS::Message message;
-        try {
-            // Check topic/target ARN
-            if (request.topicArn.empty()) {
-                log_error_stream(_logger) << "Either topicARN or targetArn must exist" << std::endl;
-                throw Core::ServiceException("Either topicARN or targetArn must exist", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-            }
-
-            // Check existence
-            if (!_snsDatabase->TopicExists(request.topicArn)) {
-                log_error_stream(_logger) << "Topic does not exist: " << request.topicArn << std::endl;
-                throw Core::ServiceException("SNS topic does not exists", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-            }
-
-            // Update database
-            std::string messageId = Core::StringUtils::GenerateRandomString(100);
-            message = _snsDatabase->CreateMessage({
-                .region=request.region,
-                .topicArn=request.topicArn,
-                .targetArn=request.targetArn,
-                .message=request.message,
-                .messageId=messageId
-            });
-
-            // Check subscriptions
-            CheckSubscriptions(request);
-
-            return {.messageId=message.messageId};
-
-        } catch (Poco::Exception &ex) {
-            log_error_stream(_logger) << "SNS create message failed, message: " << ex.message() << std::endl;
-            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    Dto::SNS::SubscribeResponse SNSService::Subscribe(const Dto::SNS::SubscribeRequest &request) {
-
-        try {
-
-            // Check topic/target ARN
-            if (request.topicArn.empty()) {
-                throw Core::ServiceException("Topic ARN missing", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-            }
-
-            // Check existence
-            if (!_snsDatabase->TopicExists(request.topicArn)) {
-                throw Core::ServiceException("SNS topic does not exists", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-            }
-
-            // Create new subscription
-            Database::Entity::SNS::Topic topic = _snsDatabase->GetTopicByArn(request.topicArn);
-            std::string subscriptionArn = Core::AwsUtils::CreateSNSSubscriptionArn(request.region, _accountId, topic.topicName);
-
-            Database::Entity::SNS::Subscription subscription = {.protocol=request.protocol, .endpoint=request.endpoint};
-            if (!topic.HasSubscription(subscription)) {
-
-                // Add subscription
-                topic.subscriptions.push_back({
-                    .protocol=request.protocol,
-                    .endpoint=request.endpoint
-                });
-
-                // Save to database
-                topic = _snsDatabase->UpdateTopic(topic);
-                _logger.debug() << "Subscription added, topic: " << topic.ToString() << std::endl;
-            }
-
-            return {.subscriptionArn=subscriptionArn};
-
-        } catch (Poco::Exception &ex) {
-            log_error_stream(_logger) << "SNS subscription failed, message: " << ex.message() << std::endl;
-            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    void SNSService::CheckSubscriptions(const Dto::SNS::PublishRequest &request) {
-
-        Database::Entity::SNS::Topic topic = _snsDatabase->GetTopicByArn(request.topicArn);
-        if (!topic.subscriptions.empty()) {
-
-            for (const auto &it : topic.subscriptions) {
-
-                if (it.protocol == SQS_PROTOCOL) {
-
-                    SendSQSMessage(it, request);
-
-                }
-            }
-        }
-    }
-
-    void SNSService::SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) {
-
-        Database::Entity::SQS::Queue sqsQueue = _sqsDatabase->GetQueueByArn(subscription.endpoint);
-        _sqsService->SendMessage({
-                                     .region=request.region,
-                                     .queueUrl = sqsQueue.queueUrl,
-                                     .body=request.message
-                                 });
-    }
+    _sqsService->SendMessage(sendMessageRequest);
+  }
 
 } // namespace AwsMock::Service
