@@ -42,4 +42,5 @@ if (BUILD_DOCUMENTATION)
             VERBATIM)
 endif ()
 
-#install(TARGETS etc/aws-mock.properties DESTINATION /etc)
+# Installation
+install(FILES dist/etc/aws-mock.properties DESTINATION /etc)

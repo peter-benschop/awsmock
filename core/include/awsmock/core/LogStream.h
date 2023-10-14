@@ -44,6 +44,9 @@ namespace AwsMock::Core {
       [[nodiscard]] Poco::Message::Priority getPriority() const;
       /// Returns the priority for log messages.
 
+      void setChannel(Poco::Channel::Ptr channel);
+      /// Sets the log channel
+
       void setFile(const char* file);
       /// Sets the file for log messages.
 
@@ -116,14 +119,12 @@ namespace AwsMock::Core {
       /// Destroys the LogStream.
 
       /**
-       * Configures the default console logger.
-       */
-      void SetDefaultConsoleLogger(Poco::Logger &logger);
-
-      /**
        * Priority strings
        */
       static const std::string priorities [] ;
+
+      void setChannel(Poco::Channel::Ptr channel);
+      /// Sets the log channel
 
       LogStream &level(const std::string &level);
       /// Sets the logging level

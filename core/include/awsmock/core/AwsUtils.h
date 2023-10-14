@@ -15,6 +15,9 @@
 // AwsMock includes
 #include "awsmock/core/StringUtils.h"
 
+#define S3_FILE_NAME_LENGTH 64
+#define S3_VERSION_ID_LENGTH 64
+
 namespace AwsMock::Core {
 
     class AwsUtils {
@@ -106,6 +109,24 @@ namespace AwsMock::Core {
        */
       static std::string GetRequestId() {
           return Poco::UUIDGenerator().createRandom().toString();
+      }
+
+      /**
+       * Generate a S3 file name
+       *
+       * @return random file name
+       */
+      static std::string GenerateS3FileName() {
+        return StringUtils::GenerateRandomHexString(S3_FILE_NAME_LENGTH);
+      }
+
+      /**
+       * Generate a S3 version ID
+       *
+       * @return random version ID
+       */
+      static std::string GenerateS3VersionId() {
+        return StringUtils::GenerateRandomVersion(S3_VERSION_ID_LENGTH);
       }
 
     };

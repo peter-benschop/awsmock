@@ -162,6 +162,7 @@ namespace AwsMock {
       Poco::AutoPtr<Poco::PatternFormatter> pPF(new Poco::PatternFormatter("%d-%m-%Y %H:%M:%S.%i [%q] %I %s:%u - %t"));
       Poco::AutoPtr<Poco::FormattingChannel> pFC(new Poco::FormattingChannel(pPF, pCons));
       Poco::Logger::root().setChannel(pFC);
+      _logger.setChannel(pFC);
       log_info_stream(_logger) << "Logging initialized" << std::endl;
     }
 

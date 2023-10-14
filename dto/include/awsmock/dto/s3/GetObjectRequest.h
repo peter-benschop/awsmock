@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_CORE_DTO_GETOBJECTREQUEST_H
-#define AWSMOCK_CORE_DTO_GETOBJECTREQUEST_H
+#ifndef AWSMOCK_DTO_S3_GETOBJECTREQUEST_H
+#define AWSMOCK_DTO_S3_GETOBJECTREQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -29,28 +29,26 @@ namespace AwsMock::Dto::S3 {
       std::string key;
 
       /**
+       * Version ID
+       */
+      std::string versionId;
+
+      /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.
        */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
+      [[nodiscard]] std::string ToString() const;
 
       /**
        * Stream provider.
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const GetObjectRequest &r) {
-          os << "GetObjectRequest={bucket='" << r.bucket << "' key='" << r.key << "'}";
-          return os;
-      }
+      friend std::ostream &operator<<(std::ostream &os, const GetObjectRequest &r);
 
     };
 
 } // namespace AwsMock::Dto::S3
 
-#endif //AWSMOCK_CORE_DTO_GETOBJECTREQUEST_H
+#endif // AWSMOCK_DTO_S3_GETOBJECTREQUEST_H

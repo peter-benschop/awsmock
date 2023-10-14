@@ -252,7 +252,7 @@ namespace AwsMock::Database {
     try {
       mongocxx::stdx::optional<bsoncxx::document::value>
           mResult = _objectCollection.find_one(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key)));
-      if (!mResult->empty()) {
+      if (mResult.has_value()) {
         Entity::S3::Object result;
         result.FromDocument(mResult);
 
@@ -262,6 +262,43 @@ namespace AwsMock::Database {
 
     } catch (mongocxx::exception::system_error &e) {
       log_error_stream(_logger) << "Get object failed, error: " << e.what() << std::endl;
+    }
+    return {};
+  }
+
+  Entity::S3::Object S3Database::GetObjectMd5(const std::string &region, const std::string &bucket, const std::string &key, const std::string &md5sum) {
+
+    try {
+      mongocxx::stdx::optional<bsoncxx::document::value>
+        mResult = _objectCollection.find_one(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key), kvp("md5sum", md5sum)));
+      if (mResult.has_value()) {
+        Entity::S3::Object result;
+        result.FromDocument(mResult);
+
+        log_trace_stream(_logger) << "Got object MD5: " << result.ToString() << std::endl;
+        return result;
+      }
+
+    } catch (mongocxx::exception::system_error &e) {
+      log_error_stream(_logger) << "Get object MD5 failed, error: " << e.what() << std::endl;
+    }
+    return {};
+  }
+
+  Entity::S3::Object S3Database::GetObjectVersion(const std::string &region, const std::string &bucket, const std::string &key, const std::string &versionId) {
+
+    try {
+      auto mResult = _objectCollection.find_one(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key), kvp("versionId", versionId)));
+      if (mResult) {
+        Entity::S3::Object result;
+        result.FromDocument(mResult);
+
+        log_trace_stream(_logger) << "Got object version: " << result.ToString() << std::endl;
+        return result;
+      }
+
+    } catch (mongocxx::exception::system_error &e) {
+      log_error_stream(_logger) << "Get object version failed, error: " << e.what() << std::endl;
     }
     return {};
   }

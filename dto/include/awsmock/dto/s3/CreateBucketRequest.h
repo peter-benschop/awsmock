@@ -29,47 +29,31 @@ namespace AwsMock::Dto::S3 {
        *
        * @param xmlString XML string
        */
-      explicit CreateBucketRequest(const std::string &xmlString) {
-          FromXml(xmlString);
-      }
+      explicit CreateBucketRequest(const std::string &xmlString);
 
       /**
        * Convert from XML representation
        *
        * @param xmlString XML string
        */
-      void FromXml(const std::string &xmlString) {
-
-          Poco::XML::DOMParser parser;
-          Poco::AutoPtr<Poco::XML::Document> pDoc = parser.parseString(xmlString);
-
-          Poco::XML::Node *node = pDoc->getNodeByPath("/CreateBucketConfiguration/LocationConstraint");
-          _locationConstraint = node->innerText();
-      }
+      void FromXml(const std::string &xmlString);
 
       /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.
        */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
+      std::string ToString() const;
 
       /**
        * Stream provider.
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const CreateBucketRequest &r) {
-          os << "CreateBucketRequest={locationConstraint='" + r._locationConstraint + "'}";
-          return os;
-      }
+      friend std::ostream &operator<<(std::ostream &os, const CreateBucketRequest &r);
 
     };
 
 } // namespace AwsMock::Dto::s3
 
-#endif //AWSMOCK_CORE_DTO_S3CREATEBUCKETREQUEST_H
+#endif // AWSMOCK_CORE_DTO_S3CREATEBUCKETREQUEST_H

@@ -28,7 +28,13 @@ namespace AwsMock::Service {
         Dto::S3::GetObjectRequest s3Request = {
             .region=region,
             .bucket=bucket,
-            .key=key};
+            .key=key
+        };
+        // Get version ID
+        std::string versionId = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "versionId");
+        if(!versionId.empty()) {
+          s3Request.versionId = versionId;
+        }
 
         // Get object
         Dto::S3::GetObjectResponse s3Response = _s3Service.GetObject(s3Request);
@@ -100,9 +106,10 @@ namespace AwsMock::Service {
 
       bool isMultipartUpload = Core::HttpUtils::HasQueryParameter(request.getURI(), "uploadId");
       bool isNotification = Core::HttpUtils::HasQueryParameter(request.getURI(), "notification");
+      bool isVersioning = Core::HttpUtils::HasQueryParameter(request.getURI(), "versioning");
       bool isCopyRequest = HeaderExists(request, "x-amz-copy-source");
 
-      //DumpRequest(request);
+      //DumpBody(request);
 
       if (isMultipartUpload) {
 
@@ -162,6 +169,21 @@ namespace AwsMock::Service {
 
         SendOkResponse(response, s3Response.ToXml(), headerMap);
 
+      } else if (isVersioning) {
+
+        log_debug_stream(_logger) << "Bucket versioning request, region: " << region << " bucket: " << bucket << std::endl;
+
+        std::string body = Core::HttpUtils::GetBodyAsString(request);
+
+        Dto::S3::PutBucketVersioningRequest s3Request(body);
+        s3Request.user = user;
+        s3Request.region = region;
+        s3Request.bucket = bucket;
+
+        _s3Service.PutBucketVersioning(s3Request);
+
+        SendNoContentResponse(response);
+
       } else if (!key.empty()) {
 
         //DumpRequestHeaders(request);
@@ -190,6 +212,9 @@ namespace AwsMock::Service {
         headerMap["ETag"] = "\"" + putObjectResponse.etag + "\"";
         headerMap["x-amz-sdk-checksum-algorithm"] = putObjectResponse.checksumAlgorithm;
         headerMap["x-amz-checksum-sha256"] = putObjectResponse.checksumSha256;
+        if(!putObjectResponse.versionId.empty()) {
+          headerMap["x-amz-version-id"] = putObjectResponse.versionId;
+        }
         log_debug_stream(_logger) << " size: " << putObjectResponse.contentLength << std::endl;
 
         SendOkResponse(response, {}, headerMap);

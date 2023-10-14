@@ -60,29 +60,23 @@ namespace AwsMock::Dto::S3 {
       std::map<std::string, std::string> metadata;
 
       /**
+       * Version ID
+       */
+      std::string versionId;
+
+      /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.
        */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
+      std::string ToString() const;
 
       /**
        * Stream provider.
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const PutObjectResponse &p) {
-          os << "PutObjectResponse={bucket='" << p.bucket << "' key='" << p.key << "' etag='" << p.etag << "' contentLength: '" << p.contentLength;
-          for (const auto &m : p.metadata) {
-              os << m.first << "=" << m.second << ", ";
-          }
-          os << '\b' << '\b' << "'}";
-          return os;
-      }
+      friend std::ostream &operator<<(std::ostream &os, const PutObjectResponse &p);
 
     };
 

@@ -57,6 +57,14 @@ namespace AwsMock::Core {
       static std::string GenerateRandomPassword(int length);
 
       /**
+       * Generates a random version string with the given length.
+       *
+       * @param length length of the string
+       * @return generated random password string with the given length.
+       */
+      static std::string GenerateRandomVersion(int length);
+
+      /**
        * Check whether the provided string is a number.
        *
        * @param value string value

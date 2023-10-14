@@ -113,7 +113,7 @@ namespace AwsMock::Service {
      *
      * @return random port between 32768 and 65536
      */
-    int GetHostPort();
+    static int GetHostPort();
 
   };
 

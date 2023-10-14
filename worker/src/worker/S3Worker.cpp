@@ -85,7 +85,7 @@ namespace AwsMock::Worker {
 //        }
 
     // Synchronize current file system state
-    Synchronize();
+    //Synchronize();
 
     // Start monitoring thread
     _threadPool.StartThread(_configuration, _metricService);
