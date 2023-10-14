@@ -92,6 +92,16 @@ namespace AwsMock::Database::Entity::S3 {
       std::map<std::string, std::string> metadata;
 
       /**
+       * Object internal name
+       */
+      std::string internalName;
+
+      /**
+       * Object version ID
+       */
+      std::string versionId;
+
+      /**
        * Creation date
        */
       Poco::DateTime created;
@@ -106,28 +116,28 @@ namespace AwsMock::Database::Entity::S3 {
        *
        * @return entity as MongoDB document.
        */
-      [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
+      view_or_value<view, value> ToDocument() const;
 
       /**
        * Converts the MongoDB document to an entity
        *
        * @return entity.
        */
-      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult);
+      void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult);
 
       /**
        * Converts the MongoDB document to an entity
        *
        * @return entity.
        */
-      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+      void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
       /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.
        */
-      [[nodiscard]] std::string ToString() const;
+      std::string ToString() const;
 
       /**
        * Stream provider.

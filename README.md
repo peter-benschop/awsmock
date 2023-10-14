@@ -51,8 +51,7 @@ To create an out-of-source build:
     cmake --build . --config=Debug
     cmake --install . --config=Debug
     ```
- 
-
+    
 ## SQS
 
 Supported commands are:

@@ -37,6 +37,7 @@
 #include "awsmock/dto/s3/ListBucketResult.h"
 #include "awsmock/dto/s3/ListAllBucketResponse.h"
 #include "awsmock/dto/s3/PutBucketNotificationRequest.h"
+#include "awsmock/dto/s3/PutBucketVersioningRequest.h"
 #include "awsmock/dto/s3/PutObjectRequest.h"
 #include "awsmock/dto/s3/PutObjectResponse.h"
 #include "awsmock/service/LambdaService.h"
@@ -92,6 +93,13 @@ namespace AwsMock::Service {
      * @return CreateBucketResponse
      */
     Dto::S3::ListBucketResult ListBucket(const Dto::S3::ListBucketRequest &s3Request);
+
+    /**
+     * Put bucket versioning
+     *
+     * @param s3Request S3 put versioning request
+     */
+    void PutBucketVersioning(const Dto::S3::PutBucketVersioningRequest &s3Request);
 
     /**
      * Creates a new bucket
@@ -286,6 +294,27 @@ namespace AwsMock::Service {
      * @param bucket S3 bucket name
      */
     void DeleteBucket(const std::string &bucket);
+
+    private:
+
+    /**
+     * Save a versioned S3 object.
+     *
+     * @param request put object request
+     * @param stream input stream
+     * @param bucket bucket entity
+     * @return file name
+     */
+    Dto::S3::PutObjectResponse SaveVersionedObject(Dto::S3::PutObjectRequest &request, std::istream &stream, Database::Entity::S3::Bucket &bucket);
+
+    /**
+     * Save a unversioned S3 object.
+     *
+     * @param request put object request
+     * @param stream input stream
+     * @return file name
+     */
+    Dto::S3::PutObjectResponse SaveUnversionedObject(Dto::S3::PutObjectRequest &request, std::istream &stream);
 
     /**
      * Logger

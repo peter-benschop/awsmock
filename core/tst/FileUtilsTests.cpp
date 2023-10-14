@@ -58,19 +58,6 @@ namespace AwsMock::Core {
         EXPECT_EQ(result, "gif");
     }
 
-    TEST_F(FileUtilsTest, VersioningTest) {
-
-        // arrange
-        std::string fileName = tempDir + Poco::Path::separator() + "example.gif.1";
-
-        // act
-        std::string result = FileUtils::RemoveVersionFromFilename(fileName);
-
-        // assert
-        EXPECT_EQ(result.length(), 14);
-        EXPECT_EQ(result, "/tmp/example.gif");
-}
-
     TEST_F(FileUtilsTest, FileSizeTest) {
         // arrange
         std::string fileName = FileUtils::CreateTempFile(tempDir, "gif", 100);

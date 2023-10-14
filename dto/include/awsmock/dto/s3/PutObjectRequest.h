@@ -8,6 +8,7 @@
 // C++ standard includes
 #include <string>
 #include <sstream>
+#include <map>
 
 namespace AwsMock::Dto::S3 {
 
@@ -58,26 +59,14 @@ namespace AwsMock::Dto::S3 {
        *
        * @return DTO as string for logging.
        */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
+      [[nodiscard]] std::string ToString() const;
 
       /**
        * Stream provider.
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const PutObjectRequest &r) {
-          os << "PutObjectRequest={bucket='" << r.bucket << "' key='" << r.key << "' md5sum='" << r.md5Sum << "' contentType='" << r.contentType << "' contentLength='"
-             << r.contentLength << "' owner='" << r.owner << "' region=' " << r.region << "', metadata={";
-          for (const auto &m : r.metadata) {
-              os << m.first << "=" << m.second << ", ";
-          }
-          os << '\b' << '\b' << "}}";
-          return os;
-      }
+      friend std::ostream &operator<<(std::ostream &os, const PutObjectRequest &r);
 
     };
 

@@ -9,6 +9,7 @@
 #include <string>
 #include <chrono>
 #include <sstream>
+#include <map>
 
 // Poco includes
 #include <Poco/DateTime.h>
@@ -27,101 +28,136 @@
 
 namespace AwsMock::Database::Entity::S3 {
 
-    using bsoncxx::view_or_value;
-    using bsoncxx::document::view;
-    using bsoncxx::document::value;
+  using bsoncxx::view_or_value;
+  using bsoncxx::document::view;
+  using bsoncxx::document::value;
 
-    struct Bucket {
+  enum BucketVersionStatus {
+    ENABLED,
+    SUSPENDED,
+    DISABLED
+  };
 
-      /**
-       * ID
-       */
-      std::string oid;
+  static std::map<BucketVersionStatus, std::string> BucketVersionStatusNames{
+    {BucketVersionStatus::ENABLED, "enabled"},
+    {BucketVersionStatus::SUSPENDED, "suspended"},
+    {BucketVersionStatus::DISABLED, "disabled"},
+  };
 
-      /**
-       * Bucket region
-       */
-      std::string region;
+  [[maybe_unused]] static std::string BucketVersionStatusToString(BucketVersionStatus bucketVersionStatus) {
+    return BucketVersionStatusNames[bucketVersionStatus];
+  }
 
-      /**
-       * Bucket name
-       */
-      std::string name;
+  [[maybe_unused]] static BucketVersionStatus BucketVersionStatusFromString(const std::string &bucketVersionStatus) {
+    for (auto &it : BucketVersionStatusNames) {
+      if (it.second == bucketVersionStatus) {
+        return it.first;
+      }
+    }
+    return BucketVersionStatus::DISABLED;
+  }
 
-      /**
-       * Bucket owner
-       */
-      std::string owner;
+  struct Bucket {
 
-      /**
-       * Bucket notifications
-       */
-      std::vector<BucketNotification> notifications;
+    /**
+     * ID
+     */
+    std::string oid;
 
-      /**
-       * Creation date
-       */
-      Poco::DateTime created;
+    /**
+     * Bucket region
+     */
+    std::string region;
 
-      /**
-       * Last modification date
-       */
-      Poco::DateTime modified;
+    /**
+     * Bucket name
+     */
+    std::string name;
 
-      /**
-       * Checks whether a notification with the given event name exists.
-       *
-       * @param eventName name of the event
-       * @return true if notification with the given event name exists.
-       */
-      bool HasNotification(const std::string &eventName);
+    /**
+     * Bucket owner
+     */
+    std::string owner;
 
-      /**
-       * Returns a given notification by name
-       *
-       * @param eventName name of the event
-       * @return found notification or notifications.end().
-       */
-      BucketNotification GetNotification(const std::string &eventName);
+    /**
+     * Bucket notifications
+     */
+    std::vector<BucketNotification> notifications;
 
-      /**
-       * Converts the entity to a MongoDB document
-       *
-       * @return entity as MongoDB document.
-       */
-      [[nodiscard]] view_or_value <view, value> ToDocument() const;
+    /**
+     * Bucket versioning status
+     */
+    BucketVersionStatus versionStatus = DISABLED;
 
-      /**
-       * Converts the MongoDB document to an entity
-       *
-       * @return entity.
-       */
-      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult);
+    /**
+     * Creation date
+     */
+    Poco::DateTime created;
 
-      /**
-       * Converts the MongoDB document to an entity
-       *
-       * @return entity.
-       */
-      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+    /**
+     * Last modification date
+     */
+    Poco::DateTime modified;
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Checks whether a notification with the given event name exists.
+     *
+     * @param eventName name of the event
+     * @return true if notification with the given event name exists.
+     */
+    bool HasNotification(const std::string &eventName);
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const Bucket &q);
-    };
+    /**
+     * Returns a given notification by name
+     *
+     * @param eventName name of the event
+     * @return found notification or notifications.end().
+     */
+    BucketNotification GetNotification(const std::string &eventName);
 
-    typedef struct Bucket Bucket;
-    typedef std::vector<Bucket> BucketList;
+    /**
+     * Returns a boolean indicating the versioinig status
+     */
+    bool IsVersioned() const;
+
+    /**
+     * Converts the entity to a MongoDB document
+     *
+     * @return entity as MongoDB document.
+     */
+    [[nodiscard]] view_or_value<view, value> ToDocument() const;
+
+    /**
+     * Converts the MongoDB document to an entity
+     *
+     * @return entity.
+     */
+    [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult);
+
+    /**
+     * Converts the MongoDB document to an entity
+     *
+     * @return entity.
+     */
+    [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
+
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const Bucket &q);
+  };
+
+  typedef struct Bucket Bucket;
+  typedef std::vector<Bucket> BucketList;
 
 } // namespace AwsMock::Database::S3::Entity
 

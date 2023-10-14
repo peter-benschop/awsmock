@@ -63,4 +63,4 @@ docs/docs
 **/*.ninja
 
 # database
-samples/database-data
+dist/samples/database-data

@@ -2,12 +2,13 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_CORE_DTO_GETOBJECTRESPONSE_H
-#define AWSMOCK_CORE_DTO_GETOBJECTRESPONSE_H
+#ifndef AWSMOCK_DTO_S3_GETOBJECTRESPONSE_H
+#define AWSMOCK_DTO_S3_GETOBJECTRESPONSE_H
 
 // C++ standard includes
 #include <string>
 #include <sstream>
+#include <map>
 
 // Poco includes
 #include "Poco/DateTime.h"
@@ -63,30 +64,17 @@ namespace AwsMock::Dto::S3 {
        *
        * @return DTO as string for logging.
        */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
+      [[nodiscard]] std::string ToString() const;
 
       /**
        * Stream provider.
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const GetObjectResponse &r) {
-          os << "GetObjectResponse={bucket='" << r.bucket << "', key='" << r.key << "', size='" << r.size << "', filename='" << r.filename << "', contentType='"
-             << r.contentType << "', metadata={";
-          for (const auto &m : r.metadata) {
-              os << m.first << "=" << m.second << ", ";
-          }
-          os << '\b' << '\b' << "' created='" << Poco::DateTimeFormatter().format(r.created, Poco::DateTimeFormat::HTTP_FORMAT) <<
-             "', modified='" << Poco::DateTimeFormatter().format(r.modified, Poco::DateTimeFormat::HTTP_FORMAT) << "'}";
-          return os;
-      }
+      friend std::ostream &operator<<(std::ostream &os, const GetObjectResponse &r);
 
     };
 
 } // namespace AwsMock::Dto::S3
 
-#endif //AWSMOCK_CORE_DTO_GETOBJECTRESPONSE_H
+#endif //AWSMOCK_DTO_S3_GETOBJECTRESPONSE_H

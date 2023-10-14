@@ -146,8 +146,7 @@ namespace AwsMock::Service {
     return codeDir;
   }
 
-  std::vector<std::string> LambdaServiceHelper::GetEnvironment(const Database::Entity::Lambda::Environment &lambdaEnvironment,
-                                                               Core::LogStream &logger) {
+  std::vector<std::string> LambdaServiceHelper::GetEnvironment(const Database::Entity::Lambda::Environment &lambdaEnvironment, Core::LogStream &logger) {
 
     std::vector<std::string> environment;
     environment.reserve(lambdaEnvironment.variables.size());
