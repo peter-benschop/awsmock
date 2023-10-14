@@ -7,10 +7,13 @@ namespace AwsMock::Core {
   //
   // LogStreamBuf
   //
-  LogStreamBuf::LogStreamBuf(Poco::Logger &logger, Poco::Message::Priority priority, std::size_t bufferCapacity) :
-    _logger(logger),
-    _priority(priority) {
+  LogStreamBuf::LogStreamBuf(Poco::Logger &logger, Poco::Message::Priority priority, std::size_t bufferCapacity) : _logger(logger), _priority(priority) {
     _message.reserve(bufferCapacity);
+    Poco::AutoPtr<Poco::ConsoleChannel> pCons(new Poco::ConsoleChannel());
+    Poco::AutoPtr<Poco::PatternFormatter> pPF(new Poco::PatternFormatter("%d-%m-%Y %H:%M:%S.%i [%q] %I %s:%u - %t"));
+    Poco::AutoPtr<Poco::FormattingChannel> pFC(new Poco::FormattingChannel(pPF, pCons));
+    //Poco::Logger::root().setChannel(pFC);
+    _logger.setChannel(pFC);
   }
 
   LogStreamBuf::~LogStreamBuf() = default;
