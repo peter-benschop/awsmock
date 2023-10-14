@@ -47,6 +47,9 @@
 .idea
 **/*.iml
 
+# Doxygeb
+**/CMakeDoxyfile.in
+**/Version.h
 
 # Tests
 Testing/*
