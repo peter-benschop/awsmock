@@ -281,10 +281,11 @@ namespace AwsMock::Service {
     /**
      * Deletes an object
      *
-     * @param bucket S3 bucket name
+     * @param bucket S3 bucket
      * @param key S3 object key
+     * @param internalName S3 internal name
      */
-    void DeleteObject(const std::string &bucket, const std::string &key);
+    void DeleteObject(const std::string &bucket,const std::string &key,const std::string &internalName);
 
     /**
      * Deletes an bucket

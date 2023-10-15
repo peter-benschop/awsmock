@@ -6,8 +6,8 @@
 
 namespace AwsMock::Service {
 
-  LambdaService::LambdaService(const Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationCenter &notificationCenter) :
-      _logger(Poco::Logger::get("LambdaService")), _configuration(configuration), LambdaServiceHelper(configuration), _metricService(metricService), _notificationCenter(notificationCenter) {
+  LambdaService::LambdaService(const Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue, Poco::NotificationQueue &invokeQueue) :
+    _logger(Poco::Logger::get("LambdaService")), _configuration(configuration), _metricService(metricService), _createQueue(createQueue), _invokeQueue(invokeQueue) {
 
     // Initialize environment
     _accountId = _configuration.getString("awsmock.account.id", "000000000000");
@@ -65,7 +65,11 @@ namespace AwsMock::Service {
     lambdaEntity = _lambdaDatabase->CreateOrUpdateLambda(lambdaEntity);
 
     // Create lambda function asynchronously
-    CreateLambdaFunction(std::make_pair(request.code.zipFile, lambdaEntity.oid));
+    // Send create notification
+    _createQueue.enqueueNotification(new Dto::Lambda::CreateNotification(request.code.zipFile, lambdaEntity.oid));
+    log_debug_stream(_logger) << "Lambda create notification send, function: " + lambdaEntity.function << std::endl;
+
+    //CreateLambdaFunction(std::make_pair(request.code.zipFile, lambdaEntity.oid));
 
     // Create response
     Dto::Lambda::CreateFunctionResponse response{
@@ -118,7 +122,7 @@ namespace AwsMock::Service {
         log_debug_stream(_logger) << "Got lambda entity eventNotification: " + lambda.ToString() << std::endl;
 
         // Send invocation request
-        _notificationCenter.postNotification(new Dto::Lambda::InvocationNotification(lambda.function, eventNotification.ToJson(), region, user, "localhost", lambda.hostPort));
+        _invokeQueue.enqueueNotification(new Dto::Lambda::InvocationNotification(lambda.function, eventNotification.ToJson(), region, user, "localhost", lambda.hostPort));
         log_debug_stream(_logger) << "Lambda executor notification send, name: " + lambda.function << std::endl;
       }
     }
@@ -134,7 +138,7 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Got lambda entity, name: " + lambda.function << std::endl;
 
     // Send invocation request
-    _notificationCenter.postNotification(new Dto::Lambda::InvocationNotification(functionName, payload, region, user, "localhost", lambda.hostPort));
+    _invokeQueue.enqueueNotification(new Dto::Lambda::InvocationNotification(functionName, payload, region, user, "localhost", lambda.hostPort));
     log_debug_stream(_logger) << "Lambda executor notification send, name: " + lambda.function << std::endl;
 
     // Update database

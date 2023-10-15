@@ -80,14 +80,14 @@ namespace AwsMock::Service {
       Database::Entity::S3::Object object = _database->GetObject(request.region, request.bucket, request.key);
 
       Dto::S3::GetMetadataResponse response = {
-          .bucket = object.bucket,
-          .key = object.key,
-          .md5Sum = object.md5sum,
-          .contentType = object.contentType,
-          .size = object.size,
-          .metadata = object.metadata,
-          .created = object.created,
-          .modified = object.modified
+        .bucket = object.bucket,
+        .key = object.key,
+        .md5Sum = object.md5sum,
+        .contentType = object.contentType,
+        .size = object.size,
+        .metadata = object.metadata,
+        .created = object.created,
+        .modified = object.modified
       };
 
       log_trace_stream(_logger) << "S3 get object metadata response: " + response.ToString() << std::endl;
@@ -122,7 +122,7 @@ namespace AwsMock::Service {
       Database::Entity::S3::Object object;
       if (!request.versionId.empty()) {
         object = _database->GetObjectVersion(request.region, request.bucket, request.key, request.versionId);
-        if(object.oid.empty()) {
+        if (object.oid.empty()) {
           log_error_stream(_logger) << "Object " << request.key << " does not exist" << std::endl;
           throw Core::ServiceException("Object does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
         }
@@ -132,13 +132,13 @@ namespace AwsMock::Service {
 
       std::string filename = _dataS3Dir + Poco::Path::separator() + object.internalName;
       Dto::S3::GetObjectResponse response = {
-          .bucket = object.bucket,
-          .key = object.key,
-          .size = object.size,
-          .filename = filename,
-          .contentType = object.contentType,
-          .metadata = object.metadata,
-          .modified = object.modified,
+        .bucket = object.bucket,
+        .key = object.key,
+        .size = object.size,
+        .filename = filename,
+        .contentType = object.contentType,
+        .metadata = object.metadata,
+        .modified = object.modified,
       };
       log_trace_stream(_logger) << "S3 get object response: " << response.ToString() << std::endl;
       log_info_stream(_logger) << "Object returned, bucket: " << request.bucket << " key: " << request.key << std::endl;
@@ -233,19 +233,20 @@ namespace AwsMock::Service {
     return Core::StringUtils::GenerateRandomString(40);
   }
 
-  Dto::S3::CompleteMultipartUploadResult S3Service::CompleteMultipartUpload(const std::string &uploadId, const std::string &bucket, const std::string &key, const std::string &region, const std::string &user) {
-    log_trace_stream(_logger) << "CompleteMultipartUpload request, uploadId: " << uploadId << " bucket: " << bucket << " key: " << key << " region: " << region << " user: " << user;
+  Dto::S3::CompleteMultipartUploadResult S3Service::CompleteMultipartUpload(const std::string &uploadId,
+                                                                            const std::string &bucket,
+                                                                            const std::string &key,
+                                                                            const std::string &region,
+                                                                            const std::string &user) {
+    log_trace_stream(_logger) << "CompleteMultipartUpload request, uploadId: " << uploadId << " bucket: " << bucket << " key: " << key << " region: " << region
+                              << " user: " << user;
 
     // Get all file parts
     std::string uploadDir = GetMultipartUploadDirectory(uploadId);
     std::vector<std::string> files = Core::DirUtils::ListFilesByPrefix(uploadDir, uploadId);
 
-    // Create bucket directory, if not existing
-    std::string fileDir = _dataS3Dir + Poco::Path::separator() + bucket + Poco::Path::separator() + GetDirFromKey(key);
-    Core::DirUtils::EnsureDirectory(fileDir);
-
     // Output file
-    std::string outFile = _dataS3Dir + Poco::Path::separator() + Core::StringUtils::GenerateRandomHexString(32);
+    std::string outFile = _dataS3Dir + Poco::Path::separator() + Core::AwsUtils::GenerateS3FileName();
     log_trace_stream(_logger) << "Output file, outFile: " << outFile << std::endl;
 
     // Append all parts to the output file
@@ -261,15 +262,15 @@ namespace AwsMock::Service {
 
     // Create database object
     Database::Entity::S3::Object object = _database->CreateOrUpdateObject(
-        {
-            .region=region,
-            .bucket=bucket,
-            .key=key,
-            .owner=user,
-            .size=fileSize,
-          .md5sum=md5sum,
-          .internalName=outFile,
-        });
+      {
+        .region=region,
+        .bucket=bucket,
+        .key=key,
+        .owner=user,
+        .size=fileSize,
+        .md5sum=md5sum,
+        .internalName=outFile,
+      });
 
     // Cleanup
     Core::DirUtils::DeleteDirectory(uploadDir);
@@ -339,26 +340,39 @@ namespace AwsMock::Service {
         throw Core::ServiceException("Target bucket does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
       }
 
+      // Get the source object from the database
+      Database::Entity::S3::Bucket targetBucket = _database->GetBucketByRegionName(request.region, request.targetBucket);
       sourceObject = _database->GetObject(request.region, request.sourceBucket, request.sourceKey);
+
+      // Copy physical file
+      std::string targetFile = Core::AwsUtils::GenerateS3FileName();
+      std::string sourcePath = _dataS3Dir + Poco::Path::separator() + sourceObject.internalName;
+      std::string targetPath = _dataS3Dir + Poco::Path::separator() + targetFile;
+      Core::FileUtils::CopyTo(sourcePath, targetPath);
 
       // Update database
       targetObject = {
-          .region=request.region,
-          .bucket=request.targetBucket,
-          .key=request.targetKey,
-          .owner=sourceObject.owner,
-          .size=sourceObject.size,
-          .md5sum=sourceObject.md5sum,
-          .contentType=sourceObject.contentType,
-          .metadata=request.metadata
+        .region=request.region,
+        .bucket=request.targetBucket,
+        .key=request.targetKey,
+        .owner=sourceObject.owner,
+        .size=sourceObject.size,
+        .md5sum=sourceObject.md5sum,
+        .sha1sum=sourceObject.sha1sum,
+        .sha256sum=sourceObject.sha256sum,
+        .contentType=sourceObject.contentType,
+        .metadata=request.metadata,
+        .internalName=targetFile,
       };
+
+      // Create version ID
+      if (targetBucket.IsVersioned()) {
+        targetObject.versionId = Core::AwsUtils::GenerateS3VersionId();
+      }
+
+      // Create object
       targetObject = _database->CreateObject(targetObject);
       log_debug_stream(_logger) << "Database updated, bucket: " << targetObject.bucket << " key: " << targetObject.key << std::endl;
-
-      // Copy physical file
-      std::string sourcePath = GetFilename(request.sourceBucket, request.sourceKey);
-      std::string targetPath = GetFilename(request.targetBucket, request.targetKey);
-      Core::FileUtils::CopyTo(sourcePath, targetPath);
 
       // Check notification
       CheckNotifications(targetObject.region, targetObject.bucket, targetObject.key, targetObject.size, "s3:ObjectCreated:Put");
@@ -383,15 +397,18 @@ namespace AwsMock::Service {
     if (_database->ObjectExists({.region=request.region, .bucket=request.bucket, .key=request.key})) {
 
       try {
+
+        // Get object from database
+        Database::Entity::S3::Object object = _database->GetObject(request.region, request.bucket, request.key);
+
         // Delete from database
-        Database::Entity::S3::Object object = {.region=request.region, .bucket=request.bucket, .key=request.key};
         _database->DeleteObject(object);
         log_debug_stream(_logger) << "Database object deleted, bucket: " + request.bucket + " key: " << request.key << std::endl;
 
         // Delete file system object
-        DeleteObject(request.bucket, request.key);
+        DeleteObject(object.bucket, object.key, object.internalName);
 
-        // Check notification
+        // Check notifications
         CheckNotifications(request.region, request.bucket, request.key, 0, "s3:ObjectRemoved:Delete");
 
         log_info_stream(_logger) << "Object deleted, bucket: " << request.bucket << " key: " << request.key << std::endl;
@@ -413,6 +430,7 @@ namespace AwsMock::Service {
 
     Dto::S3::DeleteObjectsResponse response;
     try {
+
       // Delete from database
       _database->DeleteObjects(request.bucket, request.keys);
       log_debug_stream(_logger) << "Database object deleted, count: " << request.keys.size() << std::endl;
@@ -420,7 +438,11 @@ namespace AwsMock::Service {
       // Delete file system objects
       for (const auto &key : request.keys) {
 
-        DeleteObject(request.bucket, key);
+        // Delete from database
+        Database::Entity::S3::Object object = _database->GetObject(request.region, request.bucket, key);
+        log_debug_stream(_logger) << "Database object deleted, count: " << request.keys.size() << std::endl;
+
+        DeleteObject(object.bucket, object.key, object.internalName);
         log_debug_stream(_logger) << "File system object deleted: " << key << std::endl;
 
         // Check notifications
@@ -563,9 +585,9 @@ namespace AwsMock::Service {
     return _dataS3Dir + Poco::Path::separator() + bucket + Poco::Path::separator() + key;
   }
 
-  void S3Service::DeleteObject(const std::string &bucket, const std::string &key) {
+  void S3Service::DeleteObject(const std::string &bucket, const std::string &key, const std::string &internalName) {
 
-    std::string filename = _dataS3Dir + Poco::Path::separator() + bucket + Poco::Path::separator() + key;
+    std::string filename = _dataS3Dir + Poco::Path::separator() + internalName;
     Core::FileUtils::DeleteFile(filename);
     log_debug_stream(_logger) << "File system object deleted, filename: " << filename << std::endl;
 
@@ -603,7 +625,8 @@ namespace AwsMock::Service {
     Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, path, Poco::Net::HTTPMessage::HTTP_1_1);
     request.setContentLength((long) body.length());
     request.add("Content-Type", "application/json");
-    request.add("Authorization", "AWS4-HMAC-SHA256 Credential=none/20230618/eu-central-1/lambda/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840");
+    request.add("Authorization",
+                "AWS4-HMAC-SHA256 Credential=none/20230618/eu-central-1/lambda/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840");
     log_debug_stream(_logger) << "SQS message request created, body: " + body << std::endl;
 
     // Send request
@@ -657,16 +680,17 @@ namespace AwsMock::Service {
   Dto::S3::PutObjectResponse S3Service::SaveUnversionedObject(Dto::S3::PutObjectRequest &request, std::istream &stream) {
 
     // Write file
-    std::string fileName = _dataS3Dir + Poco::Path::separator() + Core::StringUtils::GenerateRandomHexString(32);
-    std::ofstream ofs(fileName);
+    std::string fileName = Core::AwsUtils::GenerateS3FileName();
+    std::string filePath = _dataS3Dir + Poco::Path::separator() + fileName;
+    std::ofstream ofs(filePath);
     long size = Poco::StreamCopier::copyStream(stream, ofs);
-    log_debug_stream(_logger) << "File received, fileName: " << fileName << " size: " << size << std::endl;
+    log_debug_stream(_logger) << "File received, fileName: " << filePath << " size: " << size << std::endl;
 
     // Meta data
-    std::string md5sum = Core::Crypto::GetMd5FromFile(fileName);
-    std::string sha1sum = Core::Crypto::GetSha1FromFile(fileName);
-    std::string sha256sum = Core::Crypto::GetSha256FromFile(fileName);
-    log_debug_stream(_logger) << "Metadata, bucket: " << request.bucket << " key: " << request.key << "md5: " << md5sum << " sha256: " << sha256sum << std::endl;
+    std::string md5sum = Core::Crypto::GetMd5FromFile(filePath);
+    std::string sha1sum = Core::Crypto::GetSha1FromFile(filePath);
+    std::string sha256sum = Core::Crypto::GetSha256FromFile(filePath);
+    log_debug_stream(_logger) << "Metadata, bucket: " << request.bucket << " key: " << request.key << " md5: " << md5sum << " sha256: " << sha256sum << std::endl;
 
     // Update database
     Database::Entity::S3::Object object = {

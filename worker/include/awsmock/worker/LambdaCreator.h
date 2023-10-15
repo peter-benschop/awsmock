@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_LAMBDASERVICEHELPER_H
-#define AWSMOCK_SERVICE_LAMBDASERVICEHELPER_H
+#ifndef AWSMOCK_WORKER_LAMBDACREATOR_H
+#define AWSMOCK_WORKER_LAMBDACREATOR_H
 
 // C++ standard includes
 #include <string>
@@ -13,20 +13,24 @@
 #include "Poco/ActiveMethod.h"
 #include "Poco/ActiveResult.h"
 #include <Poco/Base64Decoder.h>
+#include <Poco/NotificationQueue.h>
 #include <Poco/StreamCopier.h>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/Configuration.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/dto/lambda/CreateNotification.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/service/DockerService.h>
 
-namespace AwsMock::Service {
+namespace AwsMock::Worker {
 
-  class LambdaServiceHelper {
+  class LambdaCreator : public Poco::Runnable {
 
     public:
 
@@ -34,15 +38,37 @@ namespace AwsMock::Service {
      * Constructor
      *
      * @param configuration service configuration
+     * @param metricService monitoring service
+     * @param createQueue lambda create notification queue
      */
-    explicit LambdaServiceHelper(const Core::Configuration &configuration);
+    explicit LambdaCreator(const Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue);
 
     /**
-     * Create new lambda function
+     * Listens for invocation requests and send the invocation to the right port.
      */
-    Poco::ActiveMethod<void, std::pair<std::string, std::string>, LambdaServiceHelper> CreateLambdaFunction;
+    void run() override;
 
     private:
+
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
+
+    /**
+     * Configuration
+     */
+    const Core::Configuration &_configuration;
+
+    /**
+     * Metric service
+     */
+    Core::MetricService &_metricService;
+
+    /**
+     * Database connection
+     */
+    std::shared_ptr<Database::LambdaDatabase> _lambdaDatabase;
 
     /**
      * Data directory
@@ -55,21 +81,22 @@ namespace AwsMock::Service {
     std::string _tempDir;
 
     /**
-     * Configuration
-     */
-    const Core::Configuration &_configuration;
-
-    /**
      * Docker service
      */
     Service::DockerService _dockerService;
 
     /**
-     * Create a new lambda function.
-     *
-     * @param lambda pair of zip file and oid
+     * Lambda create notification queue
      */
-    void CreateLambdaFunctionImpl(const std::pair<std::string, std::string> &lambda);
+    Poco::NotificationQueue &_createQueue;
+
+    /**
+     * Create new lambda function
+     *
+     * @param functionCode zipped and BASE64 encoded function code
+     * @param functionId lambda function OID
+     */
+    void CreateLambdaFunction(const std::string &functionCode, const std::string &functionId);
 
     /**
      * Save the ZIP file and unpack it in a temporary folder
@@ -78,7 +105,7 @@ namespace AwsMock::Service {
      * @param lambdaEntity lambda entity
      * @param dockerTag docker tag to use
      */
-    void CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag, Core::LogStream &_logger);
+    void CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
 
     /**
      * Creates an new docker container, in case the container does not exists inside the docker daemon.
@@ -86,7 +113,7 @@ namespace AwsMock::Service {
      * @param entity lambda entity.
      * @param dockerTag docker tag.
      */
-    void CreateDockerContainer(Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag, Core::LogStream &_logger);
+    void CreateDockerContainer(Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
 
     /**
      * Converts the lambda environment to a vector of string, which is needed by the docker API
@@ -94,7 +121,7 @@ namespace AwsMock::Service {
      * @param lambdaEnvironment lambda environment
      * @return vector of strings containing the runtime environment
      */
-    std::vector<std::string> GetEnvironment(const Database::Entity::Lambda::Environment &lambdaEnvironment, Core::LogStream &_logger);
+    std::vector<std::string> GetEnvironment(const Database::Entity::Lambda::Environment &lambdaEnvironment);
 
     /**
      * Unpack the provided ZIP file.
@@ -106,7 +133,7 @@ namespace AwsMock::Service {
      * @param fileName filename of the Base64 encoded and zipped code file
      * @return code directory
      */
-    std::string UnpackZipFile(const std::string &zipFile, const std::string &runtime, const std::string &fileName, Core::LogStream &_logger);
+    std::string UnpackZipFile(const std::string &zipFile, const std::string &runtime, const std::string &fileName);
 
     /**
      * Returns a random host port in the range 32768 - 65536 for the host port of the docker container which is running the lambda function.
@@ -117,6 +144,6 @@ namespace AwsMock::Service {
 
   };
 
-} //namespace AwsMock::Service
+} //namespace AwsMock::Worker
 
-#endif // AWSMOCK_SERVICE_LAMBDASERVICE_H
+#endif // AWSMOCK_WORKER_LAMBDACREATOR_H

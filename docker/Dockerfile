@@ -10,7 +10,7 @@ RUN cd /usr/src && \
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr . && \
     cmake --build . --config Release && \
     cmake --install . --prefix /usr &&\
-    cp etc/aws-mock.properties /etc
+    cp dist/etc/aws-mock.properties /etc
 
 # Supervisord
 RUN apt-get update && apt-get install -y supervisor
