@@ -19,6 +19,7 @@
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/s3/UserIdentity.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -69,50 +70,6 @@ namespace AwsMock::Dto::S3 {
      *   ]
      * }
      */
-    struct UserIdentity {
-
-      /**
-       * AWS principal ID
-       */
-      std::string principalId;
-
-      /**
-       * Converts the DTO to a JSON representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] Poco::JSON::Object ToJsonObject() const {
-          try {
-              Poco::JSON::Object rootJson;
-              rootJson.set("principalId", principalId);
-              return rootJson;
-          } catch (Poco::Exception &exc) {
-              throw Core::ServiceException(exc.message(), 500);
-          }
-      }
-
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
-
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const UserIdentity &r) {
-          os << "UserIdentity={principalId='" + r.principalId + "'}";
-          return os;
-      }
-
-    };
 
     struct RequestParameter {
 
@@ -707,4 +664,4 @@ namespace AwsMock::Dto::S3 {
 
     };
 }
-#endif //AWSMOCK_DTO_S3_EVENTNOTIFICATION_H
+#endif // AWSMOCK_DTO_S3_EVENTNOTIFICATION_H

@@ -35,45 +35,21 @@ namespace AwsMock::Dto::S3 {
        *
        * @return XML string
        */
-      [[nodiscard]] std::string ToXml() const {
-          Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-          Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("CreateBucketConfiguration");
-          pDoc->appendChild(pRoot);
-
-          Poco::XML::AutoPtr<Poco::XML::Element> pLocation = pDoc->createElement("LocationConstraint");
-          pRoot->appendChild(pLocation);
-          Poco::XML::AutoPtr<Poco::XML::Text> pLocationText = pDoc->createTextNode(location);
-          pLocation->appendChild(pLocationText);
-
-          std::stringstream output;
-          Poco::XML::DOMWriter writer;
-          writer.setNewLine("\n");
-          writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
-          writer.writeNode(output, pDoc);
-
-          return output.str();
-      }
+      [[nodiscard]] std::string ToXml() const;
 
       /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.
        */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
+      [[nodiscard]] std::string ToString() const;
 
       /**
        * Stream provider.
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const CreateBucketConstraint &r) {
-          os << "CreateBucketConstraint={location='" + r.location + "'}";
-          return os;
-      }
+      friend std::ostream &operator<<(std::ostream &os, const CreateBucketConstraint &r);
 
     };
 
