@@ -13,7 +13,7 @@ RUN mkdir -p /usr/src && \
     cmake -DBUILD_SHARED_LIBS=ON . &&\
     make install
 
-# Install Poco libraries
+# Install Poco framework
 RUN cd /usr/src && \
     git clone -b master https://github.com/pocoproject/poco.git && \
     cd poco && \
