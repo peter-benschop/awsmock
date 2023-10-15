@@ -1,6 +1,6 @@
 FROM jensvogt/aws-mock-base:latest
 
-RUN apt-get update && apt-get upgrade && apt-get -y install gh
+RUN apt-get update && apt-get -y upgrade && apt-get -y install gh
 
 # Install basics
 RUN mkdir -p /usr/src
