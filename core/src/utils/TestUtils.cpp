@@ -25,7 +25,7 @@ namespace AwsMock::Core {
     ofs << "awsmock.mongodb.password=admin" << std::endl;
     // S3 configuration
     ofs << "awsmock.service.s3.data.dir=/tmp/test/data/s3" << std::endl;
-    ofs << "awsmock.service.s3.port=9500" << std::endl;
+    ofs << "awsmock.service.s3.port=19500" << std::endl;
     ofs << "awsmock.service.s3.host=localhost" << std::endl;
     // Thread pool configuration
     ofs << "awsmock.threadpool.name=srv-worker" << std::endl;
