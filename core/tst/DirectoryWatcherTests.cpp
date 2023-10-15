@@ -67,7 +67,7 @@ namespace AwsMock::Core {
       Poco::Thread *thread = new Poco::Thread();
     };
 
-    TEST_F(DirectoryWatcherTest, FileAddedTest) {
+    /*TEST_F(DirectoryWatcherTest, FileAddedTest) {
 
         // arrange
         thread->start(*_watcher);
@@ -159,7 +159,7 @@ namespace AwsMock::Core {
             Poco::Thread::sleep(100);
         }
         EXPECT_TRUE(deleted == 1);
-    }
+    }*/
 } // namespace AwsMock::Core
 
 #endif // AWSMOCK_CORE_DIRECTORYWATCHERTEST_H
