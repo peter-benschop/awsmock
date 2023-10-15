@@ -1,7 +1,5 @@
 FROM jensvogt/aws-mock-base:latest
 
-ENV GH_TOKEN ${{ github.token }}
-
 RUN apt-get update && apt-get -y upgrade && apt-get -y install gh
 
 # Install basics
