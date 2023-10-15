@@ -32,19 +32,22 @@
 # Author: Nuno Fachada
 
 # Check if git is found...
+find_package(Git QUIET)
+
+# Check if git is found...
 if (GIT_FOUND AND VERSION_UPDATE_FROM_GIT)
 
     # Get last tag from git
-    execute_process(COMMAND ${GIT_EXECUTABLE} describe --abbrev=0 --tags
+    execute_process(COMMAND bash "-c" "gh release list -L1 | awk '{print $1}'"
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             OUTPUT_VARIABLE ${PROJECT_NAME}_VERSION_STRING
             OUTPUT_STRIP_TRAILING_WHITESPACE)
 
     #How many commits since last tag
-    execute_process(COMMAND ${GIT_EXECUTABLE} rev-list master ${${PROJECT_NAME}_VERSION_STRING}^..HEAD --count
-            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-            OUTPUT_VARIABLE ${PROJECT_NAME}_VERSION_AHEAD
-            OUTPUT_STRIP_TRAILING_WHITESPACE)
+#    execute_process(COMMAND ${GIT_EXECUTABLE} rev-list main ${${PROJECT_NAME}_VERSION_STRING}^..HEAD --count
+#            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+#            OUTPUT_VARIABLE ${PROJECT_NAME}_VERSION_AHEAD
+#            OUTPUT_STRIP_TRAILING_WHITESPACE)
 
     # Get current commit SHA from git
     execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
