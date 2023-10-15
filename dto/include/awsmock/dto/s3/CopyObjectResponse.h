@@ -20,73 +20,40 @@
 
 namespace AwsMock::Dto::S3 {
 
-    struct CopyObjectResponse {
+  struct CopyObjectResponse {
 
-      /**
-       * Etag
-       */
-      std::string eTag;
+    /**
+     * Etag
+     */
+    std::string eTag;
 
-      /**
-       * Last modified
-       */
-      std::string lastModified;
+    /**
+     * Last modified
+     */
+    std::string lastModified;
 
-      /**
-       * Convert to XML representation
-       *
-       * @return XML string
-       */
-      [[nodiscard]] std::string ToXml() const {
+    /**
+     * Convert to XML representation
+     *
+     * @return XML string
+     */
+    std::string ToXml() const;
 
-          // Root
-          Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-          Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("CopyObjectResult");
-          pDoc->appendChild(pRoot);
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    std::string ToString() const;
 
-          // ETag
-          Poco::XML::AutoPtr<Poco::XML::Element> pETag = pDoc->createElement("ETag");
-          pRoot->appendChild(pETag);
-          Poco::XML::AutoPtr<Poco::XML::Text> pETagText = pDoc->createTextNode(eTag);
-          pETag->appendChild(pETagText);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const CopyObjectResponse &r);
 
-          // LastModified
-          Poco::XML::AutoPtr<Poco::XML::Element> pLastModified = pDoc->createElement("LastModified");
-          pRoot->appendChild(pLastModified);
-          Poco::XML::AutoPtr<Poco::XML::Text> pLastModifiedTest = pDoc->createTextNode(lastModified);
-          pLastModified->appendChild(pLastModifiedTest);
-
-          std::stringstream output;
-          Poco::XML::DOMWriter writer;
-          writer.setNewLine("\n");
-          writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
-          writer.writeNode(output, pDoc);
-
-          return output.str();
-      }
-
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
-
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const CopyObjectResponse &r) {
-          os << "CopyObjectResponse={eTag:'" + r.eTag + "'}";
-          return os;
-      }
-
-    };
+  };
 
 } // namespace AwsMock::Dto
 

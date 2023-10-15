@@ -9,7 +9,7 @@
 #include <curl/curl.h>
 
 // GTest includes
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 // Test includes
 #include <awsmock/core/TestUtils.h>

@@ -67,6 +67,18 @@ namespace AwsMock::Database {
     return result;
   }
 
+  Entity::SNS::TopicList SNSDatabase::GetTopicsBySubscriptionArn(const std::string &subscriptionArn) {
+
+    Entity::SNS::TopicList topicList;
+    auto queueCursor = _topicCollection.find(make_document(kvp("subscriptions.subscriptionArn", subscriptionArn)));
+    for (auto topic : queueCursor) {
+      Entity::SNS::Topic result;
+      result.FromDocument(topic);
+      topicList.push_back(result);
+    }
+    return topicList;
+  }
+
   Entity::SNS::TopicList SNSDatabase::ListTopics(const std::string &region) {
 
     bsoncxx::builder::basic::document builder;

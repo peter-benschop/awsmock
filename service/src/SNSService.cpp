@@ -93,11 +93,11 @@ namespace AwsMock::Service {
       // Update database
       std::string messageId = Core::StringUtils::GenerateRandomString(100);
       message = _snsDatabase->CreateMessage({
-                                                .region=request.region,
-                                                .topicArn=request.topicArn,
-                                                .targetArn=request.targetArn,
-                                                .message=request.message,
-                                                .messageId=messageId
+                                              .region=request.region,
+                                              .topicArn=request.topicArn,
+                                              .targetArn=request.targetArn,
+                                              .message=request.message,
+                                              .messageId=messageId
                                             });
 
       // Check subscriptions
@@ -134,8 +134,9 @@ namespace AwsMock::Service {
 
         // Add subscription
         topic.subscriptions.push_back({
-                                          .protocol=request.protocol,
-                                          .endpoint=request.endpoint
+                                        .protocol=request.protocol,
+                                        .endpoint=request.endpoint,
+                                        .subscriptionArn=subscriptionArn
                                       });
 
         // Save to database
@@ -144,6 +145,38 @@ namespace AwsMock::Service {
       }
 
       return {.subscriptionArn=subscriptionArn};
+
+    } catch (Poco::Exception &ex) {
+      log_error_stream(_logger) << "SNS subscription failed, message: " << ex.message() << std::endl;
+      throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  Dto::SNS::UnsubscribeResponse SNSService::Unsubscribe(const Dto::SNS::UnsubscribeRequest &request) {
+
+    try {
+
+      // Check topic/target ARN
+      if (request.subscriptionArn.empty()) {
+        throw Core::ServiceException("Subscription ARN missing", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+      }
+
+      // Create new subscription
+      Database::Entity::SNS::TopicList topics = _snsDatabase->GetTopicsBySubscriptionArn(request.subscriptionArn);
+
+      for (auto &topic : topics) {
+
+        // Add subscription
+        topic.subscriptions.erase(std::remove_if(topic.subscriptions.begin(), topic.subscriptions.end(), [&request](const auto &item) {
+          return item.subscriptionArn == request.subscriptionArn;
+        }), end(topic.subscriptions));
+
+        // Save to database
+        topic = _snsDatabase->UpdateTopic(topic);
+        _logger.debug() << "Subscription added, topic: " << topic.ToString() << std::endl;
+      }
+
+      return {.subscriptionArn=request.subscriptionArn};
 
     } catch (Poco::Exception &ex) {
       log_error_stream(_logger) << "SNS subscription failed, message: " << ex.message() << std::endl;
@@ -175,20 +208,20 @@ namespace AwsMock::Service {
 
     // Create a SQS notification request
     AwsMock::Dto::SNS::SqsNotificationRequest sqsNotificationRequest = {
-        .type="Notification",
-        .messageId=Poco::UUIDGenerator().createRandom().toString(),
-        .topicArn=request.topicArn,
-        .message=request.message,
-        .timestamp=Poco::Timestamp().epochMicroseconds()/1000
+      .type="Notification",
+      .messageId=Poco::UUIDGenerator().createRandom().toString(),
+      .topicArn=request.topicArn,
+      .message=request.message,
+      .timestamp=Poco::Timestamp().epochMicroseconds() / 1000
     };
 
     // Wrap it in a SQS message request
     Dto::SQS::SendMessageRequest sendMessageRequest = {
-        .region=request.region,
-        .queueUrl=sqsQueue.queueUrl,
-        .queueArn=sqsQueue.queueArn,
-        .body=sqsNotificationRequest.ToJson(),
-        .requestId=sqsNotificationRequest.messageId
+      .region=request.region,
+      .queueUrl=sqsQueue.queueUrl,
+      .queueArn=sqsQueue.queueArn,
+      .body=sqsNotificationRequest.ToJson(),
+      .requestId=sqsNotificationRequest.messageId
     };
 
     _sqsService->SendMessage(sendMessageRequest);

@@ -20,7 +20,7 @@ namespace AwsMock::Service {
   bool DockerService::ImageExists(const std::string &name, const std::string &tag) {
 
     std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + ":" + tag + "\"]}");
-    Core::CurlResponse curlResponse = _curlUtils.SendRequest("GET", "http://localhost/images/json?all=true&filters=" + filters);
+    Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketRequest("GET", "http://localhost/images/json?all=true&filters=" + filters);
     log_trace_stream(_logger) << "List images request send to docker daemon, output: " << curlResponse.ToString() << std::endl;
 
     if (curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
@@ -35,7 +35,8 @@ namespace AwsMock::Service {
   void DockerService::CreateImage(const std::string &name, const std::string &tag, const std::string &fromImage) {
 
     std::string queryString = Core::StringUtils::UrlEncode("name=" + name + "&tag=" + tag + "&fromImage=" + fromImage);
-    Core::CurlResponse curlResponse = _curlUtils.SendRequest("POST", "http://localhost/images/create?name=" + name + "&tag=" + tag + "&fromImage=" + fromImage);
+    Core::CurlResponse curlResponse =
+      _curlUtils.SendUnixSocketRequest("POST", "http://localhost/images/create?name=" + name + "&tag=" + tag + "&fromImage=" + fromImage);
     log_trace_stream(_logger) << "Create image request send to docker daemon, output: " << curlResponse.ToString() << std::endl;
 
     if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
@@ -48,7 +49,7 @@ namespace AwsMock::Service {
   Dto::Docker::Image DockerService::GetImageByName(const std::string &name, const std::string &tag) {
 
     std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + "\"]}");
-    Core::CurlResponse curlResponse = _curlUtils.SendRequest("GET", "http://localhost/images/json?all=true&filters=" + filters);
+    Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketRequest("GET", "http://localhost/images/json?all=true&filters=" + filters);
     log_debug_stream(_logger) << "List container request send to docker daemon, name: " << name << " tags: " << tag << std::endl;
     log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
@@ -75,7 +76,7 @@ namespace AwsMock::Service {
     std::string dockerFile = WriteDockerFile(codeDir, handler, runtime, environment);
     std::string imageFile = BuildImageFile(codeDir, name);
 
-    Core::CurlResponse curlResponse = _curlUtils.SendFileRequest("POST", "http://localhost/build?t=" + name + ":" + tag + "&q=true", {}, imageFile);
+    Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketFileRequest("POST", "http://localhost/build?t=" + name + ":" + tag + "&q=true", {}, imageFile);
     log_debug_stream(_logger) << "Docker image build, image: " << name << ":" << tag << std::endl;
     log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
@@ -86,7 +87,7 @@ namespace AwsMock::Service {
   }
 
   void DockerService::DeleteImage(const std::string &id) {
-    Core::CurlResponse curlResponse = _curlUtils.SendRequest("DELETE", "http://localhost/images/" + id + "?force=true");
+    Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketRequest("DELETE", "http://localhost/images/" + id + "?force=true");
     if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
       log_error_stream(_logger) << "Delete image failed, status: " << curlResponse.statusCode << std::endl;
     }
@@ -95,7 +96,7 @@ namespace AwsMock::Service {
   bool DockerService::ContainerExists(const std::string &name, const std::string &tag) {
 
     std::string filters = Core::StringUtils::UrlEncode(R"({"name":[")" + name + "\"]}");
-    Core::CurlResponse curlResponse = _curlUtils.SendRequest("GET", "http://localhost/containers/json?all=true&filters=" + filters);
+    Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketRequest("GET", "http://localhost/containers/json?all=true&filters=" + filters);
     log_debug_stream(_logger) << "List container request send to docker daemon" << std::endl;
     log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
@@ -112,7 +113,7 @@ namespace AwsMock::Service {
   Dto::Docker::Container DockerService::GetContainerByName(const std::string &name, const std::string &tag) {
 
     std::string filters = Core::StringUtils::UrlEncode(R"({"name":[")" + std::string("/") + name + "\"]}");
-    Core::CurlResponse curlResponse = _curlUtils.SendRequest("GET", "http://localhost/containers/json?all=true&filters=" + filters);
+    Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketRequest("GET", "http://localhost/containers/json?all=true&filters=" + filters);
     log_debug_stream(_logger) << "List container request send to docker daemon" << std::endl;
     log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
@@ -139,7 +140,7 @@ namespace AwsMock::Service {
   Dto::Docker::Container DockerService::GetContainerById(const std::string &id) {
 
     std::string filters = Core::StringUtils::UrlEncode(R"({"id":[")" + id + "\"]}");
-    Core::CurlResponse curlResponse = _curlUtils.SendRequest("GET", "http://localhost/containers/json?filters=" + filters);
+    Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketRequest("GET", "http://localhost/containers/json?filters=" + filters);
     log_debug_stream(_logger) << "List container request send to docker daemon" << std::endl;
     log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
@@ -174,7 +175,7 @@ namespace AwsMock::Service {
     };
 
     std::string jsonBody = request.ToJson();
-    Core::CurlResponse curlResponse = _curlUtils.SendRequest("POST", "http://localhost/containers/create?name=" + name, jsonBody);
+    Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketRequest("POST", "http://localhost/containers/create?name=" + name, jsonBody);
     log_debug_stream(_logger) << "Create container request send to docker daemon" << std::endl;
     log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
@@ -191,7 +192,7 @@ namespace AwsMock::Service {
 
   void DockerService::StartDockerContainer(const std::string &id) {
 
-    Core::CurlResponse curlResponse = _curlUtils.SendRequest("POST", "http://localhost/containers/" + id + "/start");
+    Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketRequest("POST", "http://localhost/containers/" + id + "/start");
     log_debug_stream(_logger) << "Sending start container request" << std::endl;
     log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
@@ -206,7 +207,7 @@ namespace AwsMock::Service {
 
   void DockerService::RestartDockerContainer(const std::string &id) {
 
-    Core::CurlResponse curlResponse = _curlUtils.SendRequest("POST", "http://localhost/containers/" + id + "/restart");
+    Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketRequest("POST", "http://localhost/containers/" + id + "/restart");
     log_debug_stream(_logger) << "Sending restart container request" << std::endl;
     log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
@@ -221,7 +222,7 @@ namespace AwsMock::Service {
 
   void DockerService::StopContainer(const Dto::Docker::Container &container) {
 
-    Core::CurlResponse curlResponse = _curlUtils.SendRequest("POST", "http://localhost/containers/" + container.id + "/stop");
+    Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketRequest("POST", "http://localhost/containers/" + container.id + "/stop");
     log_debug_stream(_logger) << "Sending stop container request" << std::endl;
     log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
@@ -232,7 +233,7 @@ namespace AwsMock::Service {
 
   void DockerService::DeleteContainer(const Dto::Docker::Container &container) {
 
-    Core::CurlResponse curlResponse = _curlUtils.SendRequest("DELETE", "http://localhost/containers/" + container.id + "?force=true");
+    Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketRequest("DELETE", "http://localhost/containers/" + container.id + "?force=true");
     log_debug_stream(_logger) << "Sending delete container request" << std::endl;
     log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
@@ -243,7 +244,7 @@ namespace AwsMock::Service {
 
   void DockerService::PruneContainers() {
 
-    Core::CurlResponse curlResponse = _curlUtils.SendRequest("POST", "http://localhost/containers/prune");
+    Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketRequest("POST", "http://localhost/containers/prune");
 
     if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
       log_warning_stream(_logger) << "Prune containers failed, status: " << curlResponse.statusCode << std::endl;

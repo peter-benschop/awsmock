@@ -15,78 +15,78 @@
 
 namespace AwsMock::Core {
 
-    class ConfigurationTest : public ::testing::Test {
+  class ConfigurationTest : public ::testing::Test {
 
     protected:
 
-      void SetUp() override {
-      }
-
-      void TearDown() override {
-      }
-
-      Configuration _configuration = Configuration(TMP_PROPERTIES_FILE);
-    };
-
-    TEST_F(ConfigurationTest, EmptyFilenameTest) {
-
-        // arrange
-
-        // act
-        EXPECT_THROW({
-                         try {
-                             Configuration configuration = Configuration("");
-                         }
-                         catch (const CoreException &e) {
-                             EXPECT_STREQ("Empty filename", e.message().c_str());
-                             EXPECT_STREQ("CoreException: ", e.name());
-                             throw;
-                         }
-                     }, CoreException);
-
-        // assert
+    void SetUp() override {
     }
 
-    TEST_F(ConfigurationTest, ConstructorTest) {
-
-        // arrange
-        Configuration *configuration = nullptr;
-
-        // act
-        EXPECT_NO_THROW({ configuration = new Configuration(TMP_PROPERTIES_FILE); });
-
-        // assert
-        EXPECT_STREQ(configuration->GetFilename().c_str(), TMP_PROPERTIES_FILE);
-        EXPECT_STREQ(configuration->GetLogLevel().c_str(), "error");
+    void TearDown() override {
     }
 
-    TEST_F(ConfigurationTest, SetValueTest) {
+    Configuration _configuration = Configuration(TMP_PROPERTIES_FILE);
+  };
 
-        // arrange
-        Configuration *configuration = nullptr;
-        EXPECT_NO_THROW({ configuration = new Configuration(TMP_PROPERTIES_FILE); });
+  TEST_F(ConfigurationTest, EmptyFilenameTest) {
 
-        // act
-        if (configuration != nullptr) {
-            configuration->SetValue("awsmock.log.level", "error");
-        }
+    // arrange
 
-        // assert
-        EXPECT_STREQ(configuration->getString("awsmock.log.level").c_str(), "error");
+    // act
+    EXPECT_THROW({
+                   try {
+                     Configuration configuration = Configuration("");
+                   }
+                   catch (const CoreException &e) {
+                     EXPECT_STREQ("Empty filename", e.message().c_str());
+                     EXPECT_STREQ("CoreException: ", e.name());
+                     throw;
+                   }
+                 }, CoreException);
+
+    // assert
+  }
+
+  TEST_F(ConfigurationTest, ConstructorTest) {
+
+    // arrange
+    Configuration *configuration = nullptr;
+
+    // act
+    EXPECT_NO_THROW({ configuration = new Configuration(TMP_PROPERTIES_FILE); });
+
+    // assert
+    EXPECT_STREQ(configuration->GetFilename().c_str(), TMP_PROPERTIES_FILE);
+    EXPECT_STREQ(configuration->GetLogLevel().c_str(), "debug");
+  }
+
+  TEST_F(ConfigurationTest, SetValueTest) {
+
+    // arrange
+    Configuration *configuration = nullptr;
+    EXPECT_NO_THROW({ configuration = new Configuration(TMP_PROPERTIES_FILE); });
+
+    // act
+    if (configuration != nullptr) {
+      configuration->SetValue("awsmock.log.level", "error");
     }
 
-    TEST_F(ConfigurationTest, EnvironmentTest) {
+    // assert
+    EXPECT_STREQ(configuration->getString("awsmock.log.level").c_str(), "error");
+  }
 
-        // arrange
-        setenv("AWSMOCK_CORE_LOG_LEVEL", "error", true);
-        Configuration *configuration = nullptr;
-        EXPECT_NO_THROW({ configuration = new Configuration(TMP_PROPERTIES_FILE); });
+  TEST_F(ConfigurationTest, EnvironmentTest) {
 
-        // act
+    // arrange
+    setenv("AWSMOCK_CORE_LOG_LEVEL", "error", true);
+    Configuration *configuration = nullptr;
 
-        // assert
-        EXPECT_STREQ(configuration->getString("awsmock.log.level").c_str(), "error");
-    }
+    // act
+    EXPECT_NO_THROW({configuration = new Configuration(TMP_PROPERTIES_FILE);});
+
+    // assert
+    EXPECT_STREQ(configuration->getString("awsmock.log.level").c_str(), "error");
+  }
 
 } // namespace AwsMock::Core
 

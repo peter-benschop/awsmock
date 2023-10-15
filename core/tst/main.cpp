@@ -10,35 +10,35 @@
 #include "gtest/gtest.h"
 
 class TestEnvironment : public ::testing::Environment {
-public:
+  public:
 
-    // Initialise a test configuration.
-    void SetUp() override {
-        std::ofstream ofs("/tmp/aws-mock.properties");
-        ofs << "awsmock.region=eu-central-1" << std::endl;
-        ofs << "awsmock.account.id=000000000000" << std::endl;
-        ofs << "awsmock.rest.host=localhost" << std::endl;
-        ofs << "awsmock.rest.port=4567" << std::endl;
-        ofs << "awsmock.mongodb.name=test" << std::endl;
-        ofs << "awsmock.mongodb.host=192.168.178.34" << std::endl;
-        ofs << "awsmock.mongodb.port=27017" << std::endl;
-        ofs << "awsmock.mongodb.user=admin" << std::endl;
-        ofs << "awsmock.mongodb.password=admin" << std::endl;
-        ofs << "awsmock.threadpool.name=srv-worker" << std::endl;
-        ofs << "awsmock.threadpool.min=8" << std::endl;
-        ofs << "awsmock.threadpool.max=32" << std::endl;
-        ofs << "awsmock.threadpool.idletime=60" << std::endl;
-        ofs << "awsmock.monitoring.port=8081" << std::endl;
-        ofs << "awsmock.monitoring.timeout=60000" << std::endl;
-        ofs << "awsmock.log.level=debug" << std::endl;
-        ofs.close();
-    }
+  // Initialise a test configuration.
+  void SetUp() override {
+    std::ofstream ofs("/tmp/aws-mock.properties", std::ofstream::out | std::ofstream::trunc);
+    ofs << "awsmock.region=eu-central-1" << std::endl;
+    ofs << "awsmock.account.id=000000000000" << std::endl;
+    ofs << "awsmock.rest.host=localhost" << std::endl;
+    ofs << "awsmock.rest.port=4567" << std::endl;
+    ofs << "awsmock.mongodb.name=test" << std::endl;
+    ofs << "awsmock.mongodb.host=192.168.178.34" << std::endl;
+    ofs << "awsmock.mongodb.port=27017" << std::endl;
+    ofs << "awsmock.mongodb.user=admin" << std::endl;
+    ofs << "awsmock.mongodb.password=admin" << std::endl;
+    ofs << "awsmock.threadpool.name=srv-worker" << std::endl;
+    ofs << "awsmock.threadpool.min=8" << std::endl;
+    ofs << "awsmock.threadpool.max=32" << std::endl;
+    ofs << "awsmock.threadpool.idletime=60" << std::endl;
+    ofs << "awsmock.monitoring.port=8081" << std::endl;
+    ofs << "awsmock.monitoring.timeout=60000" << std::endl;
+    ofs << "awsmock.log.level=debug" << std::endl;
+    ofs.close();
+  }
 };
 
 int main(int argc, char **argv) {
 
-    // Run tests
-    ::testing::InitGoogleTest(&argc, argv);
-    ::testing::AddGlobalTestEnvironment(new TestEnvironment);
-    return RUN_ALL_TESTS();
+  // Run tests
+  ::testing::InitGoogleTest(&argc, argv);
+  ::testing::AddGlobalTestEnvironment(new TestEnvironment);
+  return RUN_ALL_TESTS();
 }

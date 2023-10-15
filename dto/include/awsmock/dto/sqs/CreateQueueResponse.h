@@ -47,6 +47,11 @@ namespace AwsMock::Dto::SQS {
       std::string queueUrl;
 
       /**
+       * Queue ARN
+       */
+      std::string queueArn;
+
+      /**
        * Convert to XML representation
        *
        * @return XML string
@@ -102,7 +107,8 @@ namespace AwsMock::Dto::SQS {
        * @return output stream
        */
       friend std::ostream &operator<<(std::ostream &os, const CreateQueueResponse &r) {
-          os << "CreateQueueResponse={region='" + r.region + "' name='" + r.name + "' owner='" + r.owner + "' url='" + r.queueUrl + "'}";
+        os << "CreateQueueResponse={region='" << r.region << "' name='" << r.name << "' owner='" << r.owner << "' url='" << r.queueUrl << "', arn='" << r.queueArn
+           << "'}";
           return os;
       }
 

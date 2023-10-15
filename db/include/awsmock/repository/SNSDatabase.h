@@ -94,6 +94,14 @@ namespace AwsMock::Database {
       Entity::SNS::Topic GetTopicByArn(const std::string &topicArn);
 
       /**
+       * Return a list of topics with the given subscription ARN
+       *
+       * @param subscriptionArn subscription ARN
+       * @return topic with given topic ARN
+       */
+      Entity::SNS::TopicList GetTopicsBySubscriptionArn(const std::string &subscriptionArn);
+
+      /**
        * Updates an existing topic in the SNS topic table
        *
        * @param topic topic entity
