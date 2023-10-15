@@ -37,7 +37,7 @@
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/DockerService.h>
-#include <awsmock/service/LambdaServiceHelper.h>
+#include "awsmock/worker/LambdaCreator.h"
 
 namespace AwsMock::Service {
 
