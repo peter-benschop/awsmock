@@ -36,6 +36,8 @@ jobs:
     name: Tag
     runs-on: self-hosted
     needs: [ build ]
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
       - name: Check out code
         uses: actions/checkout@v3
