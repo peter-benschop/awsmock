@@ -10,7 +10,7 @@
 #include "Poco/DateTime.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTimeFormatter.h"
-#include <Poco/NotificationCenter.h>
+#include <Poco/NotificationQueue.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
@@ -38,9 +38,10 @@ namespace AwsMock::Service {
      *
      * @param configuration application configuration
      * @param metricService monitoring service
-     * @param notificationCenter Poco notification center
+     * @param createQueue create notification queue
+     * @param invokeQueue invoke notification queue
      */
-    LambdaHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationCenter &notificationCenter);
+    LambdaHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue, Poco::NotificationQueue &invokeQueue);
 
     protected:
 

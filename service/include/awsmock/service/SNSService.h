@@ -27,6 +27,8 @@
 #include <awsmock/dto/sns/SqsNotificationRequest.h>
 #include <awsmock/dto/sns/SubscribeRequest.h>
 #include <awsmock/dto/sns/SubscribeResponse.h>
+#include <awsmock/dto/sns/UnsubscribeRequest.h>
+#include <awsmock/dto/sns/UnsubscribeResponse.h>
 #include <awsmock/dto/sqs/SendMessageRequest.h>
 #include <awsmock/dto/sqs/SendMessageResponse.h>
 #include <awsmock/repository/SNSDatabase.h>
@@ -73,12 +75,20 @@ namespace AwsMock::Service {
       Dto::SNS::PublishResponse Publish(const Dto::SNS::PublishRequest &request);
 
       /**
-       * Publish a message to a SNS topic
+       * Subscribe to a topic
        *
-       * @param request AWS region
-       * @return PublishResponse
+       * @param request subscribe request DTO
+       * @return SubscribeResponse DTO
        */
       Dto::SNS::SubscribeResponse Subscribe(const Dto::SNS::SubscribeRequest &request);
+
+      /**
+       * Unsubscribe from a topic
+       *
+       * @param request unsubscribe request DTO
+       * @return UnsubscribeResponse DTO
+       */
+      Dto::SNS::UnsubscribeResponse Unsubscribe(const Dto::SNS::UnsubscribeRequest &request);
 
       /**
        * Delete a queue

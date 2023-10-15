@@ -44,13 +44,24 @@ namespace AwsMock::Core {
       CurlUtils();
 
       /**
+       * Send request to a HTTP URL
+       *
+       * @param method HTTP method
+       * @param path request path
+       * @param extraHeaders header map
+       * @param body request body
+       * @return Dto::Curl::CurlResponse
+       */
+      CurlResponse SendHttpRequest(const std::string &method, const std::string &path, const std::map<std::string,std::string>&extraHeaders, const std::string &body={});
+
+      /**
        * Send request
        *
        * @param method HTTP method
        * @param path request path
        * @return Dto::Curl::CurlResponse
        */
-      CurlResponse SendRequest(const std::string &method, const std::string &path);
+      CurlResponse SendUnixSocketRequest(const std::string &method, const std::string &path);
 
       /**
        * Send request
@@ -60,10 +71,10 @@ namespace AwsMock::Core {
        * @param body request body
        * @return Dto::Curl::CurlResponse
        */
-      CurlResponse SendRequest(const std::string &method, const std::string &path, const std::string &body);
+      CurlResponse SendUnixSocketRequest(const std::string &method, const std::string &path, const std::string &body);
 
       /**
-       * Send request
+       * Send a file request using unix sockets
        *
        * @param method HTTP method
        * @param path request path
@@ -71,7 +82,7 @@ namespace AwsMock::Core {
        * @param fileName filename to send as request body
        * @return Dto::Curl::CurlResponse
        */
-      CurlResponse SendFileRequest(const std::string &method, const std::string &path, const std::string &header, const std::string &fileName);
+      CurlResponse SendUnixSocketFileRequest(const std::string &method, const std::string &path, const std::string &header, const std::string &fileName);
 
     private:
 

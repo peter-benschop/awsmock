@@ -10,7 +10,7 @@
 #include <sstream>
 
 // Poco includes
-#include <Poco/NotificationCenter.h>
+#include <Poco/NotificationQueue.h>
 #include <Poco/RecursiveDirectoryIterator.h>
 #include <Poco/StreamCopier.h>
 #include <Poco/Net/HTTPClientSession.h>
@@ -28,6 +28,7 @@
 #include <awsmock/dto/s3/EventNotification.h>
 #include <awsmock/dto/lambda/CreateFunctionRequest.h>
 #include <awsmock/dto/lambda/CreateFunctionResponse.h>
+#include <awsmock/dto/lambda/CreateNotification.h>
 #include <awsmock/dto/lambda/CreateTagRequest.h>
 #include <awsmock/dto/lambda/InvocationNotification.h>
 #include <awsmock/dto/lambda/ListFunctionResponse.h>
@@ -37,7 +38,6 @@
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/DockerService.h>
-#include "awsmock/worker/LambdaCreator.h"
 
 namespace AwsMock::Service {
 
@@ -60,7 +60,7 @@ namespace AwsMock::Service {
    *
    * @author jens.vogt@opitz-consulting.com
    */
-  class LambdaService : public LambdaServiceHelper {
+  class LambdaService {
 
     public:
 
@@ -71,7 +71,10 @@ namespace AwsMock::Service {
      * @param metricService aws-mock monitoring service
      * @param notificationCenter Poco notification center
      */
-    explicit LambdaService(const Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationCenter &notificationCenter);
+    explicit LambdaService(const Core::Configuration &configuration,
+                           Core::MetricService &metricService,
+                           Poco::NotificationQueue &createQueue,
+                           Poco::NotificationQueue &invokeQueue);
 
     /**
      * Create lambda function
@@ -184,9 +187,14 @@ namespace AwsMock::Service {
     Core::MetricService &_metricService;
 
     /**
-     * Notification center
+     * Create notification center
      */
-    Poco::NotificationCenter &_notificationCenter;
+    Poco::NotificationQueue &_createQueue;
+
+    /**
+     * Invoke notification center
+     */
+    Poco::NotificationQueue &_invokeQueue;
 
     /**
      * Lambda database connection

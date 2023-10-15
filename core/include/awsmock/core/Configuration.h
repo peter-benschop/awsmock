@@ -7,6 +7,7 @@
 
 // Standard C++ includes
 #include <string>
+#include <fstream>
 #include <sstream>
 #include <utility>
 
@@ -57,6 +58,9 @@ namespace AwsMock::Core {
 
       /**
        * Define a new configuration property.
+       *
+       * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
+       * key, the key is preserved, otherwise the default value is taken. </p>
        *
        * @param key configuration key
        * @param envProperty  environment variable name
@@ -127,6 +131,13 @@ namespace AwsMock::Core {
        * @return library version
        */
       static std::string GetVersion();
+
+      /**
+       * Writes the current configuration the given file
+       *
+       * @param filename name of the configuration file
+       */
+      void WriteFile(const std::string &filename);
 
       /**
        * Converts the DTO to a string representation.

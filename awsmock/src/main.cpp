@@ -278,6 +278,16 @@ namespace AwsMock {
     Controller::Router _router = Controller::Router(_configuration, _metricService);
 
     /**
+     * Create notification queue
+     */
+    Poco::NotificationQueue _createQueue;
+
+    /**
+     * Invoke notification queue
+     */
+    Poco::NotificationQueue _invokeQueue;
+
+    /**
      * Gateway controller
      */
     RestService _restService = RestService(_configuration);
@@ -300,7 +310,7 @@ namespace AwsMock {
     /**
      * Lambda worker
      */
-    Worker::LambdaWorker _lambdaWorker = Worker::LambdaWorker(_configuration, _metricService, _notificationCenter);
+    Worker::LambdaWorker _lambdaWorker = Worker::LambdaWorker(_configuration, _metricService, _createQueue, _invokeQueue);
 
     /**
      * Transfer worker
@@ -325,7 +335,7 @@ namespace AwsMock {
     /**
      * Lambda server
      */
-    Service::LambdaServer _lambdaServer = Service::LambdaServer(_configuration, _metricService, _notificationCenter);
+    Service::LambdaServer _lambdaServer = Service::LambdaServer(_configuration, _metricService, _createQueue, _invokeQueue);
 
     /**
      * Transfer server
@@ -341,11 +351,6 @@ namespace AwsMock {
      * Database
      */
     Database::Database _database = Database::Database(_configuration);
-
-    /**
-     * Notification center
-     */
-    Poco::NotificationCenter _notificationCenter;
   };
 
 } // namespace AwsMock

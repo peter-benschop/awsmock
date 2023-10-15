@@ -2,13 +2,16 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include "awsmock/worker/LambdaWorker.h"
-#include "awsmock/worker/LambdaExecutor.h"
+#include <awsmock/worker/LambdaWorker.h>
 
 namespace AwsMock::Worker {
 
-  LambdaWorker::LambdaWorker(const Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationCenter &notificationCenter)
-      : AbstractWorker(configuration), _logger(Poco::Logger::get("LambdaWorker")), _configuration(configuration), _metricService(metricService), _notificationCenter(notificationCenter), _running(false) {
+  LambdaWorker::LambdaWorker(const Core::Configuration &configuration,
+                             Core::MetricService &metricService,
+                             Poco::NotificationQueue &createQueue,
+                             Poco::NotificationQueue &invokeQueue)
+    : AbstractWorker(configuration), _logger(Poco::Logger::get("LambdaWorker")), _configuration(configuration), _metricService(metricService),
+      _createQueue(createQueue), _invokeQueue(invokeQueue), _running(false) {
 
     _dataDir = _configuration.getString("awsmock.data.dir") + Poco::Path::separator() + "lambda";
     _logger.debug() << "Lambda directory: " << _dataDir << std::endl;
@@ -90,11 +93,12 @@ namespace AwsMock::Worker {
     // Cleanup
     CleanupContainers();
 
+    // Start creator/executor
+    Poco::ThreadPool::defaultPool().start(_lambdaCreator);
+    Poco::ThreadPool::defaultPool().start(_lambdaExecutor);
+
     // Start all lambda functions
     StartLambdaFunctions();
-
-    // Subscribe to lambda invocation notifications
-    _notificationCenter.addObserver(Poco::Observer<LambdaExecutor, Dto::Lambda::InvocationNotification>(_lambdaExecutor, &LambdaExecutor::HandleInvocationNotifications));
 
     // Start monitoring thread
     _threadPool.StartThread(_configuration, _metricService);

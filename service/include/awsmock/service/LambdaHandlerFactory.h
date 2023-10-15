@@ -9,7 +9,7 @@
 #include "Poco/Logger.h"
 #include "Poco/Mutex.h"
 #include "Poco/ScopedLock.h"
-#include "Poco/NotificationCenter.h"
+#include "Poco/NotificationQueue.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 
 // AwsMock includes
@@ -31,8 +31,14 @@ namespace AwsMock::Service {
      *
      * @param configuration application configuration
      * @param metricService  monitoring
+     * @param createQueue create notification queue
+     * @param invokeQueue invoke notification queue
      */
-    LambdaRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationCenter &notificationCenter) : _configuration(configuration), _metricService(metricService), _notificationCenter(notificationCenter) {}
+    LambdaRequestHandlerFactory(Core::Configuration &configuration,
+                                Core::MetricService &metricService,
+                                Poco::NotificationQueue &createQueue,
+                                Poco::NotificationQueue &invokeQueue)
+      : _configuration(configuration), _metricService(metricService), _createQueue(createQueue), _invokeQueue(invokeQueue) {}
 
     /**
      * Create new lambda request handler
@@ -40,7 +46,7 @@ namespace AwsMock::Service {
      * @return lambda request handler
      */
     Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &) override {
-      return new LambdaHandler(_configuration, _metricService, _notificationCenter);
+      return new LambdaHandler(_configuration, _metricService, _createQueue, _invokeQueue);
     }
 
     private:
@@ -56,9 +62,14 @@ namespace AwsMock::Service {
     Core::MetricService &_metricService;
 
     /**
-     * Notification center
+     * Create notification center
      */
-    Poco::NotificationCenter &_notificationCenter;
+    Poco::NotificationQueue &_createQueue;
+
+    /**
+     * Invoke notification center
+     */
+    Poco::NotificationQueue &_invokeQueue;
   };
 
 } // namespace AwsMock::Service

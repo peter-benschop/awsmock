@@ -2,37 +2,41 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_S3_DELETEOBJECTSRESPONSE_H
-#define AWSMOCK_DTO_S3_DELETEOBJECTSRESPONSE_H
+#ifndef AWSMOCK_DTO_SNS_UNSUBSCRIBERESPONSE_H
+#define AWSMOCK_DTO_SNS_UNSUBSCRIBERESPONSE_H
 
 // C++ standard includes
 #include <string>
 #include <sstream>
 
 // Poco includes
+#include "Poco/DateTime.h"
+#include "Poco/DateTimeFormat.h"
+#include "Poco/DateTimeFormatter.h"
+#include "Poco/UUID.h"
+#include "Poco/UUIDGenerator.h"
 #include "Poco/DOM/AutoPtr.h"
 #include "Poco/DOM/Document.h"
 #include "Poco/DOM/Element.h"
-#include "Poco/DOM/NodeList.h"
 #include "Poco/DOM/Text.h"
 #include "Poco/DOM/DOMWriter.h"
 #include "Poco/XML/XMLWriter.h"
 
-namespace AwsMock::Dto::S3 {
+namespace AwsMock::Dto::SNS {
 
-    struct DeleteObjectsResponse {
+    struct UnsubscribeResponse {
 
       /**
-       * Keys
+       * Subscription ARN
        */
-      std::vector<std::string> keys;
+      std::string subscriptionArn;
 
       /**
        * Convert to XML representation
        *
        * @return XML string
        */
-      [[nodiscard]] std::string ToXml() const;
+      [[nodiscard]] static std::string ToXml() ;
 
       /**
        * Converts the DTO to a string representation.
@@ -46,10 +50,10 @@ namespace AwsMock::Dto::S3 {
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const DeleteObjectsResponse &r);
+      friend std::ostream &operator<<(std::ostream &os, const UnsubscribeResponse &r);
 
     };
 
-} // namespace AwsMock::Dto
+} // namespace AwsMock::Dto::SNS
 
-#endif // AWSMOCK_DTO_S3_DELETEOBJECTSRESPONSE_H
+#endif // AWSMOCK_DTO_SNS_UNSUBSCRIBERESPONSE_H

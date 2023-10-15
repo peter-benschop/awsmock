@@ -6,6 +6,7 @@
 #define AWSMOCK_CORE_DTO_COPYOBJECTREQUEST_H
 
 // C++ standard includes
+#include <map>
 #include <string>
 #include <sstream>
 
@@ -53,26 +54,14 @@ namespace AwsMock::Dto::S3 {
        *
        * @return DTO as string for logging.
        */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
+      std::string ToString() const;
 
       /**
        * Stream provider.
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const CopyObjectRequest &r) {
-          os << "CopyObjectRequest={region='" << r.region << "' user='" << r.user << "' sourceBucket='" << r.sourceBucket << "' sourceKey='" << r.sourceKey
-              << "' targetBucket='" << r.targetBucket << "' targetKey='" << r.targetKey << "' metadata={";
-          for (const auto &m : r.metadata) {
-              os << m.first << "=" << m.second << ", ";
-          }
-          os << '\b' << '\b' << "}}";
-          return os;
-      }
+      friend std::ostream &operator<<(std::ostream &os, const CopyObjectRequest &r);
 
     };
 

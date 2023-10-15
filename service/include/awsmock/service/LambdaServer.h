@@ -6,9 +6,10 @@
 #define AWSMOCK_SERVICE_LAMBDASERVER_H
 
 // Poco includes
-#include "Poco/Logger.h"
-#include "Poco/Net/HTTPRequestHandlerFactory.h"
-#include "Poco/Net/HTTPServer.h"
+#include <Poco/Logger.h>
+#include <Poco/NotificationQueue.h>
+#include <Poco/Net/HTTPRequestHandlerFactory.h>
+#include <Poco/Net/HTTPServer.h>
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
@@ -21,77 +22,87 @@
 
 namespace AwsMock::Service {
 
-    /**
-     * Lambda REST service
-     */
-    class LambdaServer {
+  /**
+   * Lambda REST service
+   */
+  class LambdaServer {
 
     public:
-      /**
-       * Constructor
-       *
-       * @param configuration application configuration
-       * @param metricService monitoring service
-       */
-      explicit LambdaServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationCenter &notificationCenter);
+    /**
+     * Constructor
+     *
+     * @param configuration application configuration
+     * @param metricService monitoring service
+     * @param createQueue create notification queue
+     * @param invokeQueue invoke notification queue
+     */
+    explicit LambdaServer(Core::Configuration &configuration,
+                          Core::MetricService &metricService,
+                          Poco::NotificationQueue &createQueue,
+                          Poco::NotificationQueue &invokeQueue);
 
-      /**
-       * Destructor
-       */
-      ~LambdaServer();
+    /**
+     * Destructor
+     */
+    ~LambdaServer();
 
-      /**
-       * Start the restfull service.
-       */
-      void start();
+    /**
+     * Start the restfull service.
+     */
+    void start();
 
     private:
 
-      /**
-       * Rest port
-       */
-      int _port;
+    /**
+     * Rest port
+     */
+    int _port;
 
-      /**
-       * Rest host
-       */
-      std::string _host;
+    /**
+     * Rest host
+     */
+    std::string _host;
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
 
-      /**
-      * Application configuration
-      */
-      Core::Configuration &_configuration;
+    /**
+    * Application configuration
+    */
+    Core::Configuration &_configuration;
 
-      /**
-       * Metric service
-       */
-      Core::MetricService &_metricService;
+    /**
+     * Metric service
+     */
+    Core::MetricService &_metricService;
 
-      /**
-       * Notification center
-       */
-      Poco::NotificationCenter &_notificationCenter;
+    /**
+     * Create notification queue
+     */
+    Poco::NotificationQueue &_createQueue;
 
-      /**
-       * HTTP server instance
-       */
-      Poco::Net::HTTPServer *_httpServer;
+    /**
+     * Invoke notification queue
+     */
+    Poco::NotificationQueue &_invokeQueue;
 
-      /**
-       * HTTP max message queue length
-       */
-      int _maxQueueLength;
+    /**
+     * HTTP server instance
+     */
+    Poco::Net::HTTPServer *_httpServer;
 
-      /**
-       * HTTP max concurrent connection
-       */
-      int _maxThreads;
-    };
+    /**
+     * HTTP max message queue length
+     */
+    int _maxQueueLength;
+
+    /**
+     * HTTP max concurrent connection
+     */
+    int _maxThreads;
+  };
 
 } // namespace AwsMock::Service
 

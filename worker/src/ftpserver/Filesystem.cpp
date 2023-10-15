@@ -199,7 +199,7 @@ namespace AwsMock::FtpServer {
     std::map<std::string, FileStatus> dirContent(const std::string &path) {
         std::map<std::string, FileStatus> content;
         DIR *dp = opendir(path.c_str());
-        struct dirent *dirp = nullptr;
+        struct dirent *dirp;
         if (dp == nullptr) {
             std::cerr << "Error opening directory: " << strerror(errno) << std::endl;
             return content;

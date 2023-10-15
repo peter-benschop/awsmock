@@ -6,14 +6,20 @@
 
 namespace AwsMock::Worker {
 
-  LambdaExecutor::LambdaExecutor(const Core::Configuration &configuration, Core::MetricService &metricService)
-      : _logger(Poco::Logger::get("LambdaExecutor")), _configuration(configuration), _metricService(metricService) {
+  LambdaExecutor::LambdaExecutor(const Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &invokeQueue)
+    : _logger(Poco::Logger::get("LambdaExecutor")), _configuration(configuration), _metricService(metricService), _invokeQueue(invokeQueue) {
   }
 
-  void LambdaExecutor::HandleInvocationNotifications(Dto::Lambda::InvocationNotification *invocationNotification) {
-    log_debug_stream(_logger) << "Lambda invocation notification received, name:" << invocationNotification->functionName << std::endl;
-    SendInvocationRequest(invocationNotification->hostName, invocationNotification->port, invocationNotification->payload);
-    invocationNotification->release();
+  void LambdaExecutor::run() {
+    log_debug_stream(_logger) << "Lambda invocation notification received, queueSize:" << _invokeQueue.size() << std::endl;
+    Poco::AutoPtr<Poco::Notification> pNf(_invokeQueue.waitDequeueNotification());
+    while (pNf) {
+      auto *pWorkNf = dynamic_cast<Dto::Lambda::InvocationNotification *>(pNf.get());
+      if (pWorkNf) {
+        SendInvocationRequest(pWorkNf->hostName, pWorkNf->port, pWorkNf->payload);
+      }
+      pNf = _invokeQueue.waitDequeueNotification();
+    }
   }
 
   void LambdaExecutor::SendInvocationRequest(const std::string &hostName, int port, const std::string &body) {

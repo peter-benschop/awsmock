@@ -21,8 +21,6 @@
 #include <awsmock/core/MetricServiceTimer.h>
 #include <awsmock/dto/lambda/InvocationNotification.h>
 
-#define LAMBDA_NOTIFICATION_TIMEOUT 60000
-
 namespace AwsMock::Worker {
 
   /**
@@ -35,7 +33,7 @@ namespace AwsMock::Worker {
    *
    * @author jens.vogt@opitz-consulting.com
    */
-  class LambdaExecutor {
+  class LambdaExecutor : public Poco::Runnable {
 
     public:
 
@@ -44,16 +42,14 @@ namespace AwsMock::Worker {
      *
      * @param configuration application configuration
      * @param metricService monitoring service
-     * @param notificationQueue input notification queue
+     * @param invokeQueue invoke notification queue
      */
-    LambdaExecutor(const Core::Configuration &configuration, Core::MetricService &metricService);
+    LambdaExecutor(const Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &invokeQueue);
 
     /**
      * Listens for invocation requests and send the invocation to the right port.
-     *
-     * @param invocationNotification lambda invocation notification
      */
-    void HandleInvocationNotifications(Dto::Lambda::InvocationNotification *invocationNotification);
+    void run();
 
     private:
 
@@ -89,6 +85,11 @@ namespace AwsMock::Worker {
      * Metric service
      */
     Core::MetricService &_metricService;
+
+    /**
+     * Lambda invocation notification queue
+     */
+    Poco::NotificationQueue &_invokeQueue;
   };
 
 } // namespace AwsMock

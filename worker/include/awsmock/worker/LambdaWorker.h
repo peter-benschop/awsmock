@@ -11,17 +11,20 @@
 // Poco includes
 #include <Poco/Logger.h>
 #include <Poco/Runnable.h>
-#include <Poco/Observer.h>
+#include <Poco/NotificationQueue.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/MetricService.h>
+#include <awsmock/dto/lambda/InvocationNotification.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/ServiceDatabase.h>
 #include <awsmock/service/S3Service.h>
 #include <awsmock/worker/AbstractWorker.h>
 #include <awsmock/worker/LambdaExecutor.h>
+#include <awsmock/worker/LambdaCreator.h>
+#include "awsmock/worker/LambdaExecutor.h"
 #include <awsmock/worker/LambdaMonitoring.h>
 
 namespace AwsMock::Worker {
@@ -36,7 +39,10 @@ namespace AwsMock::Worker {
      * @param configuration aws-mock configuration
      * @param metricService aws-mock monitoring
      */
-    explicit LambdaWorker(const Core::Configuration &configuration, Core::MetricService & metricService, Poco::NotificationCenter &notificationCenter);
+    explicit LambdaWorker(const Core::Configuration &configuration,
+                          Core::MetricService &metricService,
+                          Poco::NotificationQueue &createQueue,
+                          Poco::NotificationQueue &invokeQueue);
 
     /**
      * Main method
@@ -64,13 +70,6 @@ namespace AwsMock::Worker {
     void SendCreateFunctionRequest(Dto::Lambda::CreateFunctionRequest &request, const std::string &contentType);
 
     /**
-     * Handle lambda invocation notifications.
-     *
-     * @param invocationNotification invocation notification DTO
-     */
-    void HandleInvocationNotifications(Dto::Lambda::InvocationNotification* invocationNotification);
-
-    /**
      * Returns the code from a local file.
      *
      * <p>The code will provided as a Base64 encoded zip file.</p>
@@ -96,9 +95,14 @@ namespace AwsMock::Worker {
     Core::MetricService &_metricService;
 
     /**
-     * Poco notification center
+     * Create notification queue
      */
-    Poco::NotificationCenter &_notificationCenter;
+    Poco::NotificationQueue &_createQueue;
+
+    /**
+     * Invoke notification queue
+     */
+    Poco::NotificationQueue &_invokeQueue;
 
     /**
      * Thread pool
@@ -126,9 +130,14 @@ namespace AwsMock::Worker {
     std::unique_ptr<Service::DockerService> _dockerService;
 
     /**
+     * Lambda creator
+     */
+    LambdaCreator _lambdaCreator = LambdaCreator(_configuration, _metricService, _createQueue);
+
+    /**
      * Lambda executor
      */
-    LambdaExecutor _lambdaExecutor = LambdaExecutor(_configuration, _metricService);
+    LambdaExecutor _lambdaExecutor = LambdaExecutor(_configuration, _metricService, _invokeQueue);
 
     /**
      * Data dir
