@@ -2,7 +2,7 @@ FROM debian:bookworm-slim
 
 # Install basics
 RUN apt-get update && apt-get -y install build-essential cmake git openssl libssl-dev supervisor libarchive-dev \
-    zlib1g-dev wget libarchive13 libz1 libcurl4-openssl-dev libtbb-dev libasio-dev gnupg curl
+    zlib1g-dev wget libarchive13 libz1 libcurl4-openssl-dev libtbb-dev libasio-dev gnupg curl gh
 RUN mkdir -p /usr/src
 
 # Install google test
