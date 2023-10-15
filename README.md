@@ -25,6 +25,18 @@ has two collections: Buckets and Objects. Buckets contain the bucket metadata an
 
 See [AwsMock S3 supported commands](docs/S3/S3Functions.md) for a list of supported commands.
 
+## SNS
+
+Amazon Simple Notification Service (Amazon SNS) is a managed service that provides message delivery from publishers to 
+subscribers (also known as producers and consumers). Publishers communicate asynchronously with subscribers by sending 
+messages to a topic, which is a logical access point and communication channel. Clients can subscribe to the SNS topic 
+and receive published messages using a supported endpoint type, such as Amazon Kinesis Data Firehose, Amazon SQS, 
+AWS Lambda, HTTP, email, mobile push notifications, and mobile text messages (SMS).
+
+Currently only SQS is supported as endpoint type.
+
+See [AwsMock SNS supported commands](docs/SNS/SNSFunctions.md) for a list of supported commands.
+
 ## Getting started
 
 ### Building AwsMock
