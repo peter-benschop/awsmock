@@ -21,6 +21,10 @@ namespace AwsMock::Service {
 
     log_info_stream(_logger) << "SQS monitoring started" << std::endl;
 
+    if(_period <= 0) {
+      return;
+    }
+
     _running = true;
     while (_running) {
       _logger.debug() << "SQS monitoring processing started" << std::endl;

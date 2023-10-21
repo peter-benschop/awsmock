@@ -41,7 +41,7 @@ namespace AwsMock::Service {
   }
 
   S3Server::~S3Server() {
-    StopHttpServer();
+    StopServer();
   }
 
   void S3Server::run() {

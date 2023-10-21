@@ -50,12 +50,32 @@ namespace AwsMock::Service {
        */
       void run() override;
 
+      /**
+       * Returns the running flag
+       */
+      bool IsRunning() const { return _running; }
+
+      /**
+       * Stop server
+       */
+      void StopServer();
+
     private:
+
+      /**
+       * Start the monitoring service.
+       */
+      void StartMonitoringServer();
 
       /**
        * Start the restfull service.
        */
       void StartHttpServer();
+
+      /**
+       * Stops the restfull service.
+       */
+      void StopHttpServer();
 
       /**
        * Reset messages
@@ -133,7 +153,7 @@ namespace AwsMock::Service {
       /**
        * HTTP server instance
        */
-      Poco::Net::HTTPServer *_httpServer;
+      std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
 
   };
 

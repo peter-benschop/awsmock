@@ -55,7 +55,7 @@ namespace AwsMock::Service {
       _s3Server.StopServer();
       _database.DeleteAllBuckets();
       Core::FileUtils::DeleteFile(_testFile);
-      Poco::ThreadPool::defaultPool().stopAll();
+      //Poco::ThreadPool::defaultPool().stopAll();
     }
 
     Core::CurlUtils _curlUtils;
