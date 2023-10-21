@@ -7,6 +7,7 @@
 
 // C++ standard includes
 #include <string>
+#include <sstream>
 
 namespace AwsMock::Dto::SQS {
 
@@ -31,6 +32,21 @@ namespace AwsMock::Dto::SQS {
        * Owner
        */
       std::string owner;
+
+      /**
+       * Converts the DTO to a string representation.
+       *
+       * @return DTO as string for logging.
+       */
+      [[nodiscard]] std::string ToString() const;
+
+      /**
+       * Stream provider.
+       *
+       * @return output stream
+       */
+      friend std::ostream &operator<<(std::ostream &os, const CreateQueueRequest &r);
+
     };
 
 } // namespace AwsMock::Dto::SQS
