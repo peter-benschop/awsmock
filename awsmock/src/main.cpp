@@ -45,8 +45,6 @@
 #include <awsmock/service/SQSServer.h>
 #include <awsmock/service/SNSServer.h>
 #include <awsmock/service/TransferServer.h>
-#include <awsmock/service/LambdaServer.h>
-#include <awsmock/service/TransferServer.h>
 
 namespace AwsMock {
 
@@ -60,7 +58,8 @@ namespace AwsMock {
     // print out all the frames to stderr
     fprintf(stderr, "Error: signal %d:\n", sig);
     backtrace_symbols_fd(array, size, STDERR_FILENO);
-    exit(1);
+    throw Poco::Exception("Signal arrived");
+    //exit(1);
   }
 
   /**
@@ -70,239 +69,246 @@ namespace AwsMock {
 
     protected:
 
-    /**
-     * Initialization callback from Poco Application class.
-     *
-     * @param self application reference.
-     */
-    [[maybe_unused]] void initialize(Application &self) override {
+      /**
+       * Initialization callback from Poco Application class.
+       *
+       * @param self application reference.
+       */
+      [[maybe_unused]] void initialize(Application &self) override {
 
-      InitializeMonitoring();
-      InitializeErrorHandler();
-      InitializeIndexes();
-      InitializeCurl();
-      log_info_stream(_logger) << "Starting " << Configuration::GetAppName() << " v" << Configuration::GetVersion() << " pid: " << getpid() << " loglevel: "
-                               << _configuration.GetLogLevel() << std::endl;
-      Poco::Util::ServerApplication::initialize(self);
-    }
-
-    /**
-     * Shutdown the application. Gets called when the application is about to stop.
-     */
-    [[maybe_unused]] void uninitialize() override {
-
-      log_debug_stream(_logger) << "Starting system shutdown" << std::endl;
-
-      // Shutdown monitoring
-      _metricService.ShutdownServer();
-      log_debug_stream(_logger) << "Metric server stopped" << std::endl;
-
-      Poco::Util::Application::uninitialize();
-      log_debug_stream(_logger) << "Bye, bye, and thanks for all the fish" << std::endl;
-    }
-
-    /**
-     * Define the command line options.
-     *
-     * @param options Poco options class.
-     */
-    [[maybe_unused]] void defineOptions(Poco::Util::OptionSet &options) override {
-
-      Poco::Util::ServerApplication::defineOptions(options);
-      options.addOption(Poco::Util::Option("config", "", "set the configuration file").required(false).repeatable(false).argument("value").callback(
-          Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
-      options.addOption(Poco::Util::Option("level", "", "set the log level").required(false).repeatable(false).argument("value").callback(
-          Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
-      options.addOption(Poco::Util::Option("version", "", "display version information").required(false).repeatable(false).callback(
-          Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
-      options.addOption(Poco::Util::Option("help", "", "display help information").required(false).repeatable(false).callback(
-          Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
-    }
-
-    /**
-     * Handles the command line options. Uses Poco command line optios handling.
-     *
-     * @param name command line option name.
-     * @param value command line option value.
-     */
-    void handleOption(const std::string &name, const std::string &value) override {
-
-      if (name == "help") {
-
-        Poco::Util::HelpFormatter helpFormatter(options());
-        helpFormatter.setCommand(commandName());
-        helpFormatter.setUsage("OPTIONS");
-        helpFormatter.setHeader("AwsMock - AWS simulation written in C++ v" + Configuration::GetVersion());
-        helpFormatter.format(std::cout);
-        stopOptionsProcessing();
-        exit(0);
-
-      } else if (name == "config") {
-
-        _configuration.SetFilename(value);
-
-      } else if (name == "version") {
-
-        std::cout << Configuration::GetAppName() << " v" << Configuration::GetVersion() << std::endl;
-        exit(0);
-
-      } else if (name == "level") {
-
-        _configuration.SetLogLevel(value);
-        Poco::Logger::get("").setLevel(value);
+        InitializeMonitoring();
+        InitializeErrorHandler();
+        InitializeIndexes();
+        InitializeCurl();
+        log_info_stream(_logger) << "Starting " << Configuration::GetAppName() << " " << Configuration::GetVersion() << " pid: " << getpid() << " loglevel: "
+                                 << _configuration.GetLogLevel() << std::endl;
+        log_info_stream(_logger) << "Configuration file: " << _configuration.GetFilename() << std::endl;
+        Poco::Util::ServerApplication::initialize(self);
       }
-    }
 
-    /**
-     * Initialize the Prometheus monitoring counters and start the prometheus server.
-     */
-    void InitializeMonitoring() {
+      /**
+       * Shutdown the application. Gets called when the application is about to stop.
+       */
+      [[maybe_unused]] void uninitialize() override {
 
-      _metricService.Initialize();
-      _metricService.StartServer();
-    }
+        // Shutdown all services
+        _condition.broadcast();
 
-    /**
-     * Initialize error handler
-     */
-    void InitializeErrorHandler() {
+        // Shutdown monitoring
+        _metricService.ShutdownServer();
+        log_debug_stream(_logger) << "Metric server stopped" << std::endl;
 
-      // Install error handler
-      Poco::ErrorHandler::set(&_threadErrorHandler);
-      log_debug_stream(_logger) << "Error handler initialized" << std::endl;
-    }
+        Poco::Util::Application::uninitialize();
+        log_debug_stream(_logger) << "Bye, bye, and thanks for all the fish" << std::endl;
+      }
 
-    /**
-     * Initialize database indexes
-     */
-    void InitializeIndexes() {
+      /**
+       * Define the command line options.
+       *
+       * @param options Poco options class.
+       */
+      [[maybe_unused]] void defineOptions(Poco::Util::OptionSet &options) override {
 
-      // Install error handler
-      _database.CreateIndexes();
-      log_debug_stream(_logger) << "Database indexes created" << std::endl;
-    }
+        Poco::Util::ServerApplication::defineOptions(options);
+        options.addOption(Poco::Util::Option("config", "", "set the configuration file").required(false).repeatable(false).argument("value").callback(
+            Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
+        options.addOption(Poco::Util::Option("level", "", "set the log level").required(false).repeatable(false).argument("value").callback(
+            Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
+        options.addOption(Poco::Util::Option("version", "", "display version information").required(false).repeatable(false).callback(
+            Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
+        options.addOption(Poco::Util::Option("help", "", "display help information").required(false).repeatable(false).callback(
+            Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
+      }
 
-    /**
-     * Initialize CURL library
-     */
-    void InitializeCurl() {
-      curl_global_init(CURL_GLOBAL_ALL);
-      log_debug_stream(_logger) << "Curl library initialized" << std::endl;
+      /**
+       * Handles the command line options. Uses Poco command line optios handling.
+       *
+       * @param name command line option name.
+       * @param value command line option value.
+       */
+      void handleOption(const std::string &name, const std::string &value) override {
 
-    }
+        if (name == "help") {
 
-    void StartServices() {
+          Poco::Util::HelpFormatter helpFormatter(options());
+          helpFormatter.setCommand(commandName());
+          helpFormatter.setUsage("OPTIONS");
+          helpFormatter.setHeader("AwsMock - AWS simulation written in C++ v" + Configuration::GetVersion());
+          helpFormatter.format(std::cout);
+          stopOptionsProcessing();
+          exit(0);
 
-      // Start the S3 server
-      Poco::ThreadPool::defaultPool().start(_s3Server);
+        } else if (name == "config") {
 
-      // Start the SQS server
-      Poco::ThreadPool::defaultPool().start(_sqsServer);
+          _configuration.SetFilename(value);
 
-      // Start the SNS server
-      Poco::ThreadPool::defaultPool().start(_snsServer);
+        } else if (name == "version") {
 
-      // Start the lambda server
-      Poco::ThreadPool::defaultPool().start(_lambdaServer);
+          std::cout << Configuration::GetAppName() << " v" << Configuration::GetVersion() << std::endl;
+          exit(0);
 
-      // Start the transfer server
-      Poco::ThreadPool::defaultPool().start(_transferServer);
-    }
+        } else if (name == "level") {
 
-    /**
-     * Main routine.
-     *
-     * @param args command line arguments.
-     * @return system exit code.
-     */
-    int main([[maybe_unused]]const ArgVec &args) override {
+          _configuration.SetLogLevel(value);
+          Poco::Logger::get("").setLevel(value);
+        }
+      }
 
-      signal(SIGSEGV, handler);
+      /**
+       * Initialize the Prometheus monitoring counters and start the prometheus server.
+       */
+      void InitializeMonitoring() {
 
-      log_debug_stream(_logger) << "Entering main routine" << std::endl;
+        _metricService.Initialize();
+        _metricService.StartServer();
+      }
 
-      // Start service and worker. Services needed to start first, as the worker could possibly use the services.
-      StartServices();
+      /**
+       * Initialize error handler
+       */
+      void InitializeErrorHandler() {
 
-      // Start HTTP server
-      _restService.setRouter(&_router);
-      _restService.start();
+        // Install error handler
+        Poco::ErrorHandler::set(&_threadErrorHandler);
+        log_debug_stream(_logger) << "Error handler initialized" << std::endl;
+      }
 
-      // Wait for termination
-      this->waitForTerminationRequest();
-      return Application::EXIT_OK;
-    }
+      /**
+       * Initialize database indexes
+       */
+      void InitializeIndexes() {
+
+        // Install error handler
+        _database.CreateIndexes();
+        log_debug_stream(_logger) << "Database indexes created" << std::endl;
+      }
+
+      /**
+       * Initialize CURL library
+       */
+      void InitializeCurl() {
+        curl_global_init(CURL_GLOBAL_ALL);
+        log_debug_stream(_logger) << "Curl library initialized" << std::endl;
+
+      }
+
+      void StartServices() {
+
+        // Start the S3 server
+        Poco::ThreadPool::defaultPool().start(_s3Server);
+
+        // Start the SQS server
+        Poco::ThreadPool::defaultPool().start(_sqsServer);
+
+        // Start the SNS server
+        Poco::ThreadPool::defaultPool().start(_snsServer);
+
+        // Start the lambda server
+        Poco::ThreadPool::defaultPool().start(_lambdaServer);
+
+        // Start the transfer server
+        Poco::ThreadPool::defaultPool().start(_transferServer);
+      }
+
+      /**
+       * Main routine.
+       *
+       * @param args command line arguments.
+       * @return system exit code.
+       */
+      int main([[maybe_unused]]const ArgVec &args) override {
+
+        log_debug_stream(_logger) << "Entering main routine" << std::endl;
+
+        // Start service and worker. Services needed to start first, as the worker could possibly use the services.
+        StartServices();
+
+        // Start HTTP server
+        _restService.setRouter(_router);
+        _restService.start();
+
+        // Wait for termination
+        this->waitForTerminationRequest();
+        return Application::EXIT_OK;
+
+      }
 
     private:
-    /**
-     * Logger
-     */
-    Core::LogStream _logger = Core::LogStream(Poco::Logger::get("Gateway"));
 
-    /**
-     * Application configuration
-     */
-    Configuration _configuration = Configuration(CONFIGURATION_BASE_PATH);
+      /**
+       * Logger
+       */
+      Core::LogStream _logger = Core::LogStream(Poco::Logger::get("Gateway"));
 
-    /**
-     * Monitoring service
-     */
-    Core::MetricService _metricService = Core::MetricService(_configuration);
+      /**
+       * Application configuration
+       */
+      Configuration _configuration = Configuration(CONFIGURATION_BASE_PATH);
 
-    /**
-     * Gateway router
-     */
-    Controller::Router _router = Controller::Router(_configuration, _metricService);
+      /**
+       * Monitoring service
+       */
+      Core::MetricService _metricService = Core::MetricService(_configuration);
 
-    /**
-     * Create notification queue
-     */
-    Poco::NotificationQueue _createQueue;
+      /**
+       * Gateway router
+       */
+      std::shared_ptr<Controller::Router> _router = std::make_shared<Controller::Router>(_configuration, _metricService);
 
-    /**
-     * Invoke notification queue
-     */
-    Poco::NotificationQueue _invokeQueue;
+      /**
+       * Create notification queue
+       */
+      Poco::NotificationQueue _createQueue;
 
-    /**
-     * Gateway controller
-     */
-    RestService _restService = RestService(_configuration);
+      /**
+       * Invoke notification queue
+       */
+      Poco::NotificationQueue _invokeQueue;
 
-    /**
-     * S3 server
-     */
-    Service::S3Server _s3Server = Service::S3Server(_configuration, _metricService);
+      /**
+       * Gateway controller
+       */
+      RestService _restService = RestService(_configuration);
 
-    /**
-     * SQS server
-     */
-    Service::SQSServer _sqsServer = Service::SQSServer(_configuration, _metricService);
+      /**
+       * Stop condition
+       */
+      Poco::Condition _condition;
 
-    /**
-     * SNS server
-     */
-    Service::SNSServer _snsServer = Service::SNSServer(_configuration, _metricService);
+      /**
+       * S3 server
+       */
+      Service::S3Server _s3Server = Service::S3Server(_configuration, _metricService, _condition);
 
-    /**
-     * Lambda server
-     */
-    Service::LambdaServer _lambdaServer = Service::LambdaServer(_configuration, _metricService, _createQueue, _invokeQueue);
+      /**
+       * SQS server
+       */
+      Service::SQSServer _sqsServer = Service::SQSServer(_configuration, _metricService, _condition);
 
-    /**
-     * Transfer server
-     */
-    Service::TransferServer _transferServer = Service::TransferServer(_configuration, _metricService);
+      /**
+       * SNS server
+       */
+      Service::SNSServer _snsServer = Service::SNSServer(_configuration, _metricService, _condition);
 
-    /**
-     * Thread error handler
-     */
-    Core::ThreadErrorHandler _threadErrorHandler;
+      /**
+       * Lambda server
+       */
+      Service::LambdaServer _lambdaServer = Service::LambdaServer(_configuration, _metricService, _createQueue, _invokeQueue, _condition);
 
-    /**
-     * Database
-     */
-    Database::Database _database = Database::Database(_configuration);
+      /**
+       * Transfer server
+       */
+      Service::TransferServer _transferServer = Service::TransferServer(_configuration, _metricService, _condition);
+
+      /**
+       * Thread error handler
+       */
+      Core::ThreadErrorHandler _threadErrorHandler;
+
+      /**
+       * Database
+       */
+      Database::Database _database = Database::Database(_configuration);
   };
 
 } // namespace AwsMock

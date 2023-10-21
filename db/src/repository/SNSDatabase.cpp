@@ -19,39 +19,58 @@ namespace AwsMock::Database {
   }
 
   bool SNSDatabase::TopicExists(const std::string &topicArn) {
+    try {
+      int64_t count = _topicCollection.count_documents(make_document(kvp("topicArn", topicArn)));
+      log_trace_stream(_logger) << "Topic exists: " << (count > 0 ? "true" : "false") << std::endl;
 
-    int64_t count = _topicCollection.count_documents(make_document(kvp("topicArn", topicArn)));
-    log_trace_stream(_logger) << "Topic exists: " << (count > 0 ? "true" : "false") << std::endl;
-
-    return count > 0;
+      return count > 0;
+    } catch (const mongocxx::exception &exc) {
+      _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+      throw Core::DatabaseException(exc.what(), 500);
+    }
   }
 
   bool SNSDatabase::TopicExists(const std::string &region, const std::string &topicName) {
+    try {
+      int64_t count = _topicCollection.count_documents(make_document(kvp("region", region), kvp("topicName", topicName)));
+      log_trace_stream(_logger) << "Topic exists: " << (count > 0 ? "true" : "false") << std::endl;
+      return count > 0;
+    } catch (const mongocxx::exception &exc) {
+      _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+      throw Core::DatabaseException(exc.what(), 500);
+    }
 
-    int64_t count = _topicCollection.count_documents(make_document(kvp("region", region), kvp("topicName", topicName)));
-    log_trace_stream(_logger) << "Topic exists: " << (count > 0 ? "true" : "false") << std::endl;
-    return count > 0;
   }
 
   Entity::SNS::Topic SNSDatabase::CreateTopic(const Entity::SNS::Topic &topic) {
 
-    auto result = _topicCollection.insert_one(topic.ToDocument());
-    log_trace_stream(_logger) << "Topic created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
-
-    return GetTopicById(result->inserted_id().get_oid().value);
+    try {
+      auto result = _topicCollection.insert_one(topic.ToDocument());
+      log_trace_stream(_logger) << "Topic created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
+      return GetTopicById(result->inserted_id().get_oid().value);
+    } catch (const mongocxx::exception &exc) {
+      _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+      throw Core::DatabaseException(exc.what(), 500);
+    }
   }
 
   Entity::SNS::Topic SNSDatabase::GetTopicById(bsoncxx::oid oid) {
 
-    mongocxx::stdx::optional<bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("_id", oid)));
+    try {
+      mongocxx::stdx::optional<bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("_id", oid)));
 
-    if (mResult->empty()) {
-      return {};
+      if (!mResult) {
+        return {};
+      }
+
+      Entity::SNS::Topic result;
+      result.FromDocument(mResult);
+      return result;
+
+    } catch (const mongocxx::exception &exc) {
+      _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+      throw Core::DatabaseException(exc.what(), 500);
     }
-
-    Entity::SNS::Topic result;
-    result.FromDocument(mResult);
-    return result;
   }
 
   Entity::SNS::Topic SNSDatabase::GetTopicById(const std::string &oid) {
@@ -59,78 +78,95 @@ namespace AwsMock::Database {
   }
 
   Entity::SNS::Topic SNSDatabase::GetTopicByArn(const std::string &topicArn) {
-
-    mongocxx::stdx::optional<bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("topicArn", topicArn)));
-    Entity::SNS::Topic result;
-    result.FromDocument(mResult);
-
-    return result;
+    try {
+      mongocxx::stdx::optional<bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("topicArn", topicArn)));
+      Entity::SNS::Topic result;
+      result.FromDocument(mResult);
+      return result;
+    } catch (const mongocxx::exception &exc) {
+      _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+      throw Core::DatabaseException(exc.what(), 500);
+    }
   }
 
   Entity::SNS::TopicList SNSDatabase::GetTopicsBySubscriptionArn(const std::string &subscriptionArn) {
 
     Entity::SNS::TopicList topicList;
-    auto queueCursor = _topicCollection.find(make_document(kvp("subscriptions.subscriptionArn", subscriptionArn)));
-    for (auto topic : queueCursor) {
-      Entity::SNS::Topic result;
-      result.FromDocument(topic);
-      topicList.push_back(result);
+    try {
+      auto queueCursor = _topicCollection.find(make_document(kvp("subscriptions.subscriptionArn", subscriptionArn)));
+      for (auto topic : queueCursor) {
+        Entity::SNS::Topic result;
+        result.FromDocument(topic);
+        topicList.push_back(result);
+      }
+    } catch (const mongocxx::exception &exc) {
+      _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+      throw Core::DatabaseException(exc.what(), 500);
     }
     return topicList;
   }
 
   Entity::SNS::TopicList SNSDatabase::ListTopics(const std::string &region) {
 
-    bsoncxx::builder::basic::document builder;
-    if (!region.empty()) {
-      builder.append(bsoncxx::builder::basic::kvp("region", region));
-    }
-    bsoncxx::document::value filter = builder.extract();
-
     Entity::SNS::TopicList topicList;
-    auto queueCursor = _topicCollection.find({filter});
-    for (auto topic : queueCursor) {
-      Entity::SNS::Topic result;
-      result.FromDocument(topic);
-      topicList.push_back(result);
+    try {
+      auto queueCursor = _topicCollection.find(make_document(kvp("region", region)));
+      for (auto topic : queueCursor) {
+        Entity::SNS::Topic result;
+        result.FromDocument(topic);
+        topicList.push_back(result);
+      }
+    } catch (const mongocxx::exception &exc) {
+      _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+      throw Core::DatabaseException(exc.what(), 500);
     }
-
     log_trace_stream(_logger) << "Got topic list, size:" << topicList.size() << std::endl;
     return topicList;
   }
 
   Entity::SNS::Topic SNSDatabase::UpdateTopic(const Entity::SNS::Topic &topic) {
 
-    auto result = _topicCollection.replace_one(make_document(kvp("region", topic.region), kvp("topicArn", topic.topicArn)), topic.ToDocument());
-
-    log_trace_stream(_logger) << "Topic updated: " << topic.ToString() << std::endl;
-
+    try {
+      auto result = _topicCollection.replace_one(make_document(kvp("region", topic.region), kvp("topicArn", topic.topicArn)), topic.ToDocument());
+      log_trace_stream(_logger) << "Topic updated: " << topic.ToString() << std::endl;
+    } catch (const mongocxx::exception &exc) {
+      _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+      throw Core::DatabaseException(exc.what(), 500);
+    }
     return GetTopicByArn(topic.topicArn);
   }
 
   long SNSDatabase::CountTopics(const std::string &region) {
 
-    bsoncxx::builder::basic::document builder;
-    if (!region.empty()) {
-      builder.append(bsoncxx::builder::basic::kvp("region", region));
-    }
-    bsoncxx::document::value filter = builder.extract();
+    try {
+      long count = _topicCollection.count_documents(make_document(kvp("region", region)));
+      log_trace_stream(_logger) << "Count topics, result: " << count << std::endl;
 
-    long count = _topicCollection.count_documents({filter});
-    log_trace_stream(_logger) << "Count topics, result: " << count << std::endl;
-    return count;
+      return count;
+    } catch (const mongocxx::exception &exc) {
+      _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+      throw Core::DatabaseException(exc.what(), 500);
+    }
   }
 
   void SNSDatabase::DeleteTopic(const Entity::SNS::Topic &topic) {
-
-    auto result = _topicCollection.delete_many(make_document(kvp("topicArn", topic.topicArn)));
-    log_debug_stream(_logger) << "Topic deleted, count: " << result->deleted_count() << std::endl;
+    try {
+      auto result = _topicCollection.delete_many(make_document(kvp("topicArn", topic.topicArn)));
+      log_debug_stream(_logger) << "Topic deleted, count: " << result->deleted_count() << std::endl;
+    } catch (const mongocxx::exception &exc) {
+      _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+      throw Core::DatabaseException(exc.what(), 500);
+    }
   }
 
   void SNSDatabase::DeleteAllTopics() {
-
-    auto result = _topicCollection.delete_many({});
-    log_debug_stream(_logger) << "All topics deleted, count: " << result->deleted_count() << std::endl;
+    try {
+      auto result = _topicCollection.delete_many({});
+      log_debug_stream(_logger) << "All topics deleted, count: " << result->deleted_count() << std::endl;
+    } catch (const mongocxx::exception &exc) {
+      _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+      throw Core::DatabaseException(exc.what(), 500);
+    }
   }
 
   Entity::SNS::Message SNSDatabase::CreateMessage(const Entity::SNS::Message &message) {
@@ -143,7 +179,7 @@ namespace AwsMock::Database {
       return GetMessageById(result->inserted_id().get_oid().value);
 
     } catch (const mongocxx::exception &exc) {
-      _logger.error() << "Database exception " << exc.what() << std::endl;
+      _logger.error() << "SNS Database exception " << exc.what() << std::endl;
       throw Core::DatabaseException(exc.what(), 500);
     }
   }
@@ -156,7 +192,7 @@ namespace AwsMock::Database {
 
       return result;
     } catch (const mongocxx::exception &exc) {
-      _logger.error() << "Database exception " << exc.what() << std::endl;
+      _logger.error() << "SNS Database exception " << exc.what() << std::endl;
       throw Core::DatabaseException(exc.what(), 500);
     }
   }
@@ -167,25 +203,24 @@ namespace AwsMock::Database {
 
   long SNSDatabase::CountMessages(const std::string &region, const std::string &topicArn) {
 
-    bsoncxx::builder::basic::document builder;
-    if (!region.empty()) {
-      builder.append(bsoncxx::builder::basic::kvp("region", region));
+    try {
+      long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("topicArn", topicArn)));
+      log_trace_stream(_logger) << "Count messages, region: " << region << " arn: " << topicArn << " result: " << count << std::endl;
+      return count;
+    } catch (const mongocxx::exception &exc) {
+      _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+      throw Core::DatabaseException(exc.what(), 500);
     }
-    if (!topicArn.empty()) {
-      builder.append(bsoncxx::builder::basic::kvp("topicArn", topicArn));
-    }
-    bsoncxx::document::value filter = builder.extract();
-
-    long count = _messageCollection.count_documents({filter});
-    log_trace_stream(_logger) << "Count messages, region: " << region << " arn: " << topicArn << " result: " << count << std::endl;
-
-    return count;
   }
 
   void SNSDatabase::DeleteMessage(const Entity::SNS::Message &message) {
-
-    auto result = _messageCollection.delete_one(make_document(kvp("messageId", message.messageId)));
-    log_debug_stream(_logger) << "Messages deleted, messageId: " << message.messageId << " count: " << result->deleted_count() << std::endl;
+    try {
+      auto result = _messageCollection.delete_one(make_document(kvp("messageId", message.messageId)));
+      log_debug_stream(_logger) << "Messages deleted, messageId: " << message.messageId << " count: " << result->deleted_count() << std::endl;
+    } catch (const mongocxx::exception &exc) {
+      _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+      throw Core::DatabaseException(exc.what(), 500);
+    }
   }
 
   void SNSDatabase::DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &receipts) {
@@ -194,14 +229,23 @@ namespace AwsMock::Database {
     for (const auto &receipt : receipts) {
       array.append(receipt);
     }
-
-    auto result = _messageCollection.delete_many(make_document(kvp("region", region), kvp("topicArn", topicArn), kvp("messageId", make_document(kvp("$in", array)))));
-    log_debug_stream(_logger) << "Messages deleted, count: " << result->result().deleted_count() << std::endl;
+    try {
+      auto result = _messageCollection.delete_many(make_document(kvp("region", region), kvp("topicArn", topicArn), kvp("messageId", make_document(kvp("$in", array)))));
+      log_debug_stream(_logger) << "Messages deleted, count: " << result->result().deleted_count() << std::endl;
+    } catch (const mongocxx::exception &exc) {
+      _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+      throw Core::DatabaseException(exc.what(), 500);
+    }
   }
 
   void SNSDatabase::DeleteAllMessages() {
-    auto result = _messageCollection.delete_many({});
-    log_debug_stream(_logger) << "All messages deleted, count: " << result->deleted_count() << std::endl;
+    try {
+      auto result = _messageCollection.delete_many({});
+      log_debug_stream(_logger) << "All messages deleted, count: " << result->deleted_count() << std::endl;
+    } catch (const mongocxx::exception &exc) {
+      _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+      throw Core::DatabaseException(exc.what(), 500);
+    }
   }
 
 } // namespace AwsMock::Database

@@ -12,9 +12,10 @@
 #include <algorithm>
 
 // Poco includes
-#include "Poco/TextConverter.h"
-#include "Poco/Latin1Encoding.h"
-#include "Poco/UTF8Encoding.h"
+#include <Poco/Condition.h>
+#include <Poco/TextConverter.h>
+#include <Poco/Latin1Encoding.h>
+#include <Poco/UTF8Encoding.h>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
@@ -51,7 +52,7 @@
 
 namespace AwsMock::Service {
 
-    class SQSService {
+  class SQSService {
 
     public:
 
@@ -59,8 +60,9 @@ namespace AwsMock::Service {
        * Constructor
        *
        * @param configuration service configuration
+       * @param condition stop condition
        */
-      explicit SQSService(const Core::Configuration &configuration);
+      explicit SQSService(const Core::Configuration &configuration, Poco::Condition &condition);
 
       /**
        * Creates a new queue
@@ -68,7 +70,7 @@ namespace AwsMock::Service {
        * @param request create queue request
        * @return CreateQueueResponse
        */
-      Dto::SQS::CreateQueueResponse CreateQueue(const Dto::SQS::CreateQueueRequest & request);
+      Dto::SQS::CreateQueueResponse CreateQueue(const Dto::SQS::CreateQueueRequest &request);
 
       /**
        * Returns a list of all available queues
@@ -132,7 +134,6 @@ namespace AwsMock::Service {
        */
       Dto::SQS::SendMessageResponse SendMessage(const Dto::SQS::SendMessageRequest &request);
 
-
       /**
        * Receive a list of messages
        *
@@ -175,7 +176,7 @@ namespace AwsMock::Service {
        * @param bytes output byte array
        * @param offset offset of the output byte array
        */
-      static void GetIntAsByteArray(int n, unsigned char* bytes, int offset);
+      static void GetIntAsByteArray(int n, unsigned char *bytes, int offset);
 
       /**
        * Logger
@@ -196,7 +197,17 @@ namespace AwsMock::Service {
        * Database connection
        */
       std::unique_ptr<Database::SQSDatabase> _database;
-    };
+
+      /**
+       * Shutdown condition
+       */
+      Poco::Condition &_condition;
+
+      /**
+       * Shutdown mutex
+       */
+      Poco::Mutex _mutex;
+  };
 
 } // namespace AwsMock::Service
 

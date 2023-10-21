@@ -6,6 +6,7 @@
 #define AWSMOCK_SERVICE_SQSHANDLERFACTORY_H
 
 // Poco includes
+#include "Poco/Condition.h"
 #include "Poco/Logger.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 
@@ -16,10 +17,10 @@
 
 namespace AwsMock::Service {
 
-    /**
-     * S3 request handler factory
-     */
-    class SQSRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
+  /**
+   * S3 request handler factory
+   */
+  class SQSRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 
     public:
 
@@ -28,8 +29,9 @@ namespace AwsMock::Service {
        *
        * @param configuration application configuration
        * @param metricService  monitoring
+       * @param condition stop condition
        */
-      SQSRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService) {}
+      SQSRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition) : _configuration(configuration), _metricService(metricService), _condition(condition) {}
 
       /**
        * Create a new request handler
@@ -37,7 +39,7 @@ namespace AwsMock::Service {
        * @return new request handler
        */
       Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &) override {
-          return new SQSHandler(_configuration, _metricService);
+        return new SQSHandler(_configuration, _metricService, _condition);
       }
 
     private:
@@ -52,7 +54,11 @@ namespace AwsMock::Service {
        */
       Core::MetricService &_metricService;
 
-    };
+      /**
+       * Shutdown condition
+       */
+      Poco::Condition &_condition;
+  };
 
 } // namespace AwsMock::Service
 

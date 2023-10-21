@@ -61,10 +61,11 @@ namespace AwsMock::Service {
     Core::CurlUtils _curlUtils;
     std::string _testFile, _endpoint;
     std::map <std::string, std::string> _extraHeaders;
+    Poco::Condition _condition;
     Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
     Core::MetricService _metricService = Core::MetricService(_configuration);
     Database::S3Database _database = Database::S3Database(_configuration);
-    S3Server _s3Server = S3Server(_configuration, _metricService);
+    S3Server _s3Server = S3Server(_configuration, _metricService, _condition);
   };
 
   TEST_F(S3ServerTest, BucketCreateTest) {

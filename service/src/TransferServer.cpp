@@ -6,8 +6,8 @@
 
 namespace AwsMock::Service {
 
-  TransferServer::TransferServer(Core::Configuration &configuration, Core::MetricService &metricService)
-      : AbstractWorker(configuration), _logger(Poco::Logger::get("TransferWorker")), _configuration(configuration), _metricService(metricService), _running(false) {
+  TransferServer::TransferServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition)
+      : AbstractWorker(configuration), _logger(Poco::Logger::get("TransferServer")), _configuration(configuration), _metricService(metricService), _condition(condition), _running(false) {
 
     // REST server configuration
     _port = _configuration.getInt("awsmock.service.transfer.port", TRANSFER_DEFAULT_PORT);
@@ -41,11 +41,12 @@ namespace AwsMock::Service {
   }
 
   TransferServer::~TransferServer() {
-    if (_httpServer) {
-      _httpServer->stopAll(true);
-      delete _httpServer;
-      log_info_stream(_logger) << "Transfer rest service stopped" << std::endl;
-    }
+    StopServer();
+  }
+
+  void TransferServer::StopServer() {
+    _running = false;
+    StopHttpServer();
   }
 
   void TransferServer::StartHttpServer() {
@@ -56,11 +57,18 @@ namespace AwsMock::Service {
     httpServerParams->setMaxThreads(_maxThreads);
     log_debug_stream(_logger) << "HTTP server parameter set, maxQueue: " << _maxQueueLength << " maxThreads: " << _maxThreads << std::endl;
 
-    _httpServer =
-        new Poco::Net::HTTPServer(new TransferRequestHandlerFactory(_configuration, _metricService), Poco::Net::ServerSocket(Poco::UInt16(_port)), httpServerParams);
-
+    _httpServer = std::make_shared<Poco::Net::HTTPServer>(new TransferRequestHandlerFactory(_configuration, _metricService), Poco::Net::ServerSocket(Poco::UInt16(_port)), httpServerParams);
     _httpServer->start();
+
     log_info_stream(_logger) << "Transfer rest service started, endpoint: http://" << _host << ":" << _port << std::endl;
+  }
+
+  void TransferServer::StopHttpServer() {
+    if (_httpServer) {
+      _httpServer->stop();
+      _httpServer.reset();
+      log_info_stream(_logger) << "Transfer rest service stopped" << std::endl;
+    }
   }
 
   void TransferServer::StartTransferServer(Database::Entity::Transfer::Transfer &server) {
@@ -164,9 +172,16 @@ namespace AwsMock::Service {
     _running = true;
     while (_running) {
       log_debug_stream(_logger) << "TransferWorker processing started" << std::endl;
-      Poco::Thread::sleep(_period);
       CheckTransferServers();
+
+      // Wait for timeout or condition
+      _mutex.lock();
+      if (_condition.tryWait(_mutex, _period)) {
+        break;
+      }
+      _mutex.unlock();
     }
+    StopServer();
   }
 
   void TransferServer::SendCreateBucketRequest(const std::string &bucket) {

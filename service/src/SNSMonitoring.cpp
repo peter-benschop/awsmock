@@ -6,8 +6,8 @@
 
 namespace AwsMock::Service {
 
-  SNSMonitoring::SNSMonitoring(const Core::Configuration &configuration, Core::MetricService &metricService)
-      : _logger(Poco::Logger::get("SNSMonitoring")), _configuration(configuration), _metricService(metricService), _running(false) {
+  SNSMonitoring::SNSMonitoring(const Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition)
+      : _logger(Poco::Logger::get("SNSMonitoring")), _configuration(configuration), _metricService(metricService), _condition(condition),  _running(false) {
 
     // Update period
     _period = _configuration.getInt("awsmock.monitoring.sns.period", SNS_MONITORING_DEFAULT_PERIOD);
@@ -23,9 +23,18 @@ namespace AwsMock::Service {
 
     _running = true;
     while (_running) {
+
       _logger.debug() << "SNS monitoring processing started" << std::endl;
+
+      // Update counter
       UpdateCounters();
-      Poco::Thread::sleep(_period);
+
+      // Wait for timeout or condition
+      _mutex.lock();
+      if (_condition.tryWait(_mutex, _period)) {
+        break;
+      }
+      _mutex.unlock();
     }
   }
 

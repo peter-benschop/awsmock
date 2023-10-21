@@ -6,17 +6,18 @@
 #define AWSMOCK_SERVICE_S3SERVER_H
 
 // Poco includes
-#include "Poco/Logger.h"
-#include "Poco/Net/HTTPRequestHandlerFactory.h"
-#include "Poco/Net/HTTPServer.h"
+#include <Poco/Logger.h>
+#include <Poco/Condition.h>
+#include <Poco/Net/HTTPRequestHandlerFactory.h>
+#include <Poco/Net/HTTPServer.h>
 
 // AwsMock includes
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/MetricService.h"
-#include "awsmock/core/ThreadPool.h"
-#include "awsmock/service/S3HandlerFactory.h"
-#include "awsmock/service/S3Monitoring.h"
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/core/ThreadPool.h>
+#include <awsmock/service/S3HandlerFactory.h>
+#include <awsmock/service/S3Monitoring.h>
 
 #define S3_DEFAULT_PORT 9500
 #define S3_DEFAULT_HOST "localhost"
@@ -34,8 +35,9 @@ namespace AwsMock::Service {
        *
        * @param configuration application configuration
        * @param metricService monitoring service
+       * @param condition stop condition
        */
-      explicit S3Server(Core::Configuration &configuration, Core::MetricService &metricService);
+      explicit S3Server(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
 
       /**
        * Destructor
@@ -300,6 +302,17 @@ namespace AwsMock::Service {
        * S3 service port
        */
       int _s3ServicePort;
+
+      /**
+       * Shutdown condition
+       */
+      Poco::Condition &_condition;
+
+      /**
+       * Shutdown mutex
+       */
+      Poco::Mutex _mutex;
+
   };
 
 } // namespace AwsMock::Service

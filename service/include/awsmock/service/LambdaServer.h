@@ -9,6 +9,7 @@
 #include <string>
 
 // Poco includes
+#include <Poco/Condition.h>
 #include <Poco/Logger.h>
 #include <Poco/Runnable.h>
 #include <Poco/NotificationQueue.h>
@@ -28,6 +29,9 @@
 #include <awsmock/service/LambdaMonitoring.h>
 #include <awsmock/service/LambdaHandlerFactory.h>
 
+#define LAMBDA_DEFAULT_PORT 9503
+#define LAMBDA_DEFAULT_HOST "localhost"
+
 namespace AwsMock::Service {
 
   class LambdaServer : public Poco::Runnable, public AbstractWorker {
@@ -39,8 +43,9 @@ namespace AwsMock::Service {
        *
        * @param configuration aws-mock configuration
        * @param metricService aws-mock monitoring
+       * @param condition stop condition
        */
-      explicit LambdaServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue, Poco::NotificationQueue &invokeQueue);
+      explicit LambdaServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue, Poco::NotificationQueue &invokeQueue, Poco::Condition &condition);
 
       /**
        * Destructor
@@ -52,12 +57,34 @@ namespace AwsMock::Service {
        */
       void run() override;
 
+      /**
+       * Stop server
+       */
+      void StopServer();
+
+      /**
+       * Return running flag
+       *
+       * @return running flag
+       */
+      bool IsRunning() const { return _running; }
+
     private:
+
+      /**
+       * Start monitoring
+       */
+      void StartMonitoring();
 
       /**
        * Start the restfull service.
        */
       void StartHttpServer();
+
+      /**
+       * Stop the restfull service.
+       */
+      void StopHttpServer();
 
       /**
        * Delete dangling, stopped containers
@@ -170,7 +197,7 @@ namespace AwsMock::Service {
       /**
        * HTTP server instance
        */
-      Poco::Net::HTTPServer *_httpServer;
+      std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
 
       /**
        * Rest port
@@ -202,6 +229,15 @@ namespace AwsMock::Service {
        */
       int _lambdaServicePort;
 
+      /**
+       * Shutdown condition
+       */
+      Poco::Condition &_condition;
+
+      /**
+       * Shutdown mutex
+       */
+      Poco::Mutex _mutex;
   };
 
 } // namespace AwsMock::Service

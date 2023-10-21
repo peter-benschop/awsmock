@@ -9,6 +9,7 @@ namespace AwsMock::Service {
   TransferService::TransferService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("TransferService")), _configuration(configuration) {
 
     // Initialize environment
+    _ftpPort = _configuration.getInt("awsmock.service.transfer.ftp.port", TRANSFER_DEFAULT_FTP_PORT);
     _accountId = _configuration.getString("awsmock.account.id", "000000000000");
     _transferDatabase = std::make_unique<Database::TransferDatabase>(_configuration);
     log_debug_stream(_logger) << "Transfer service initialized" << std::endl;
@@ -30,7 +31,7 @@ namespace AwsMock::Service {
     std::string transferArn = Core::AwsUtils::CreateTransferArn(request.region, _accountId, serverId);
 
     // Create entity
-    transferEntity = {.region=request.region, .serverId=serverId, .arn=transferArn, .protocols=request.protocols};
+    transferEntity = {.region=request.region, .serverId=serverId, .arn=transferArn, .protocols=request.protocols, .port=_ftpPort};
 
     // Add anonymous user
     Database::Entity::Transfer::User anonymousUser = {.userName="anonymous", .password="123", .homeDirectory="/"};

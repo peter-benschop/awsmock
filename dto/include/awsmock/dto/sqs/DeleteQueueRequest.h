@@ -7,6 +7,10 @@
 
 // C++ standard includes
 #include <string>
+#include <sstream>
+
+// Poco includes
+#include <Poco/UUIDGenerator.h>
 
 namespace AwsMock::Dto::SQS {
 
@@ -37,21 +41,14 @@ namespace AwsMock::Dto::SQS {
        *
        * @return DTO as string for logging.
        */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
+      [[nodiscard]] std::string ToString() const;
 
       /**
        * Stream provider.
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const DeleteQueueRequest &r) {
-          os << "DeleteQueueRequest={queueUrl='" + r.queueUrl + "' resource='" + r.resource + "' requestId='" + r.requestId + "'}";
-          return os;
-      }
+      friend std::ostream &operator<<(std::ostream &os, const DeleteQueueRequest &r);
 
     };
 

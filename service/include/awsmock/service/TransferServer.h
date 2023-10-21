@@ -11,6 +11,7 @@
 #include <memory>
 
 // Poco includes
+#include <Poco/Condition.h>
 #include <Poco/Logger.h>
 #include <Poco/Runnable.h>
 
@@ -43,8 +44,9 @@ namespace AwsMock::Service {
        *
        * @param configuration aws-mock configuration
        * @param metricService aws-mock monitoring service
+       * @param condition stop condition
        */
-      explicit TransferServer(Core::Configuration &configuration, Core::MetricService &metricService);
+      explicit TransferServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
 
       /**
        * Destructor
@@ -56,12 +58,29 @@ namespace AwsMock::Service {
        */
       void run() override;
 
+      /**
+       * Stop server
+       */
+      void StopServer();
+
+      /**
+       * Return running flag
+       *
+       * @return running flag
+       */
+      bool IsRunning() const { return _running; }
+
     private:
 
       /**
        * Start the restfull service.
        */
       void StartHttpServer();
+
+      /**
+       * Stop the restfull service.
+       */
+      void StopHttpServer();
 
       /**
        * Starts a single transfer server
@@ -161,7 +180,7 @@ namespace AwsMock::Service {
       /**
        * HTTP server instance
        */
-      Poco::Net::HTTPServer *_httpServer;
+      std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
 
       /**
        * AWS region
@@ -209,11 +228,6 @@ namespace AwsMock::Service {
       std::shared_ptr<FtpServer::FtpServer> _ftpServer;
 
       /**
-       * Directory _watcher
-       */
-      std::shared_ptr<Core::DirectoryWatcher> _watcher;
-
-      /**
        * S3 service host
        */
       std::string _s3ServiceHost;
@@ -222,6 +236,16 @@ namespace AwsMock::Service {
        * S3 service port
        */
       int _s3ServicePort;
+
+      /**
+       * Shutdown condition
+       */
+      Poco::Condition &_condition;
+
+      /**
+       * Shutdown mutex
+       */
+      Poco::Mutex _mutex;
   };
 
 } // namespace AwsMock::Service

@@ -6,9 +6,10 @@
 #define AWSMOCK_SERVICE_SQSHANDLER_H
 
 // Poco includes
-#include "Poco/DateTime.h"
-#include "Poco/DateTimeFormat.h"
-#include "Poco/DateTimeFormatter.h"
+#include <Poco/Condition.h>
+#include <Poco/DateTime.h>
+#include <Poco/DateTimeFormat.h>
+#include <Poco/DateTimeFormatter.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
@@ -46,8 +47,9 @@ namespace AwsMock::Service {
        *
        * @param configuration application configuration
        * @param metricService monitoring service
+       * @param condition stop condition
        */
-      SQSHandler(Core::Configuration &configuration,Core::MetricService &metricService);
+      SQSHandler(Core::Configuration &configuration,Core::MetricService &metricService, Poco::Condition &condition);
 
     protected:
 

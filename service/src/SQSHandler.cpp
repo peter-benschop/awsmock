@@ -3,8 +3,8 @@
 
 namespace AwsMock::Service {
 
-  SQSHandler::SQSHandler(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractHandler(), _logger(Poco::Logger::get("SQSServiceHandler")), _configuration(configuration),
-                                                                                                   _metricService(metricService), _sqsService(configuration) {
+  SQSHandler::SQSHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition) : AbstractHandler(), _logger(Poco::Logger::get("SQSServiceHandler")), _configuration(configuration),
+                                                                                                   _metricService(metricService), _sqsService(configuration, condition) {
 
     _accountId = _configuration.getString("awsmock.account.id", DEFAULT_SQS_ACCOUNT_ID);
     _endpoint = _configuration.getString("awsmock.service.sqs.endpoint", DEFAULT_SQS_ENDPOINT);

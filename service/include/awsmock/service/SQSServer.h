@@ -7,10 +7,14 @@
 
 // C++ standard includes
 #include <string>
+#include <chrono>
+#include <condition_variable>
 
 // Poco includes
 #include <Poco/Logger.h>
 #include <Poco/Runnable.h>
+#include <Poco/SignalHandler.h>
+#include <Poco/Condition.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
@@ -37,8 +41,9 @@ namespace AwsMock::Service {
        *
        * @param configuration aws-mock configuration
        * @param metricService aws-mock monitoring service
+       * @param condition stop condition
        */
-      explicit SQSServer(Core::Configuration &configuration, Core::MetricService &metricService);
+      explicit SQSServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
 
       /**
        * Destructor
@@ -155,6 +160,15 @@ namespace AwsMock::Service {
        */
       std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
 
+      /**
+       * Shutdown condition
+       */
+      Poco::Condition &_condition;
+
+      /**
+       * Shutdown mutex
+       */
+      Poco::Mutex _mutex;
   };
 
 } // namespace AwsMock::Service

@@ -41,11 +41,12 @@ namespace AwsMock::Service {
       _sqsDatabase.DeleteAllMessages();
     }
 
+    Poco::Condition _condition;
     Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
     Database::SNSDatabase _snsDatabase = Database::SNSDatabase(_configuration);
     Database::SQSDatabase _sqsDatabase = Database::SQSDatabase(_configuration);
-    SNSService _snsService = SNSService(_configuration);
-    SQSService _sqsService = SQSService(_configuration);
+    SNSService _snsService = SNSService(_configuration,_condition);
+    SQSService _sqsService = SQSService(_configuration,_condition);
   };
 
   TEST_F(SNSServiceTest, TopicCreateTest) {

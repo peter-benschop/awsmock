@@ -9,6 +9,7 @@
 #include <string>
 
 // Poco includes
+#include <Poco/Condition.h>
 #include <Poco/Logger.h>
 #include <Poco/Runnable.h>
 
@@ -38,8 +39,9 @@ namespace AwsMock::Service {
        *
        * @param configuration aws-mock configuration
        * @param metricService aws-mock monitoring service
+       * @param condition stop condition
        */
-      explicit SNSServer(Core::Configuration &configuration, Core::MetricService &metricService);
+      explicit SNSServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
 
       /**
        * Destructor
@@ -51,12 +53,34 @@ namespace AwsMock::Service {
        */
       void run() override;
 
+      /**
+       * Stop server
+       */
+      void StopServer();
+
+      /**
+       * Return running flag
+       *
+       * @return running flag
+       */
+      bool IsRunning() const { return _running; }
+
     private:
+
+      /**
+       * Start monitoring
+       */
+      void StartMonitoring();
 
       /**
        * Start the restfull service.
        */
       void StartHttpServer();
+
+      /**
+       * Stop the restfull service
+       */
+      void StopHttpServer();
 
       /**
        * Reset messages
@@ -134,7 +158,17 @@ namespace AwsMock::Service {
       /**
        * HTTP server instance
        */
-      Poco::Net::HTTPServer *_httpServer;
+      std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
+
+      /**
+       * Shutdown condition
+       */
+      Poco::Condition &_condition;
+
+      /**
+       * Shutdown mutex
+       */
+      Poco::Mutex _mutex;
   };
 
 } // namespace AwsMock::Service

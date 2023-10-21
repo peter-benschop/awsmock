@@ -6,7 +6,8 @@
 
 namespace AwsMock::Service {
 
-  S3Server::S3Server(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractWorker(configuration), _logger(Poco::Logger::get("S3Server")), _configuration(configuration), _metricService(metricService), _running(false) {
+  S3Server::S3Server(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition)
+      : AbstractWorker(configuration), _logger(Poco::Logger::get("S3Server")), _configuration(configuration), _metricService(metricService), _condition(condition), _running(false) {
 
     // Get HTTP configuration values
     _port = _configuration.getInt("awsmock.service.s3.port", S3_DEFAULT_PORT);
@@ -54,12 +55,22 @@ namespace AwsMock::Service {
 
     _running = true;
     while (_running) {
+
       _logger.debug() << "S3 processing started" << std::endl;
-      Poco::Thread::sleep(_period);
+
+      // Wait for timeout or condition
+      _mutex.lock();
+      if (_condition.tryWait(_mutex, _period)) {
+        break;
+      }
+      _mutex.unlock();
     }
+    StopServer();
   }
 
   void S3Server::StopServer() {
+    _running = false;
+    //Poco::Thread::current()->join();
     StopHttpServer();
     _threadPool.stopAll();
   }
@@ -88,7 +99,7 @@ namespace AwsMock::Service {
   }
 
   void S3Server::StartMonitoringServer() {
-    _threadPool.StartThread(_configuration, _metricService);
+    _threadPool.StartThread(_configuration, _metricService, _condition);
   }
 
   void S3Server::UpdateCounters() {

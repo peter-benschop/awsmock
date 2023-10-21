@@ -6,8 +6,8 @@
 
 namespace AwsMock::Service {
 
-  SQSService::SQSService(const Core::Configuration &configuration)
-      : _logger(Poco::Logger::get("SQSService")), _configuration(configuration) {
+  SQSService::SQSService(const Core::Configuration &configuration, Poco::Condition &condition)
+      : _logger(Poco::Logger::get("SQSService")), _configuration(configuration), _condition(condition) {
 
     // Initialize environment
     _accountId = _configuration.getString("awsmock.account.id", DEFAULT_ACCOUNT_ID);
@@ -228,7 +228,7 @@ namespace AwsMock::Service {
       // Set attributes
       Database::Entity::SQS::MessageAttributeList attributes;
       attributes.push_back({.attributeName="SentTimestamp", .attributeValue=std::to_string(Poco::Timestamp().epochMicroseconds() / 1000), .attributeType=Database::Entity::SQS::MessageAttributeType::NUMBER});
-      attributes.push_back({.attributeName="ApproximateFirstReceivedTimestamp", .attributeValue=std::to_string(Poco::Timestamp().epochMicroseconds()-100 / 1000), .attributeType=Database::Entity::SQS::MessageAttributeType::NUMBER});
+      attributes.push_back({.attributeName="ApproximateFirstReceivedTimestamp", .attributeValue=std::to_string(Poco::Timestamp().epochMicroseconds() - 100 / 1000), .attributeType=Database::Entity::SQS::MessageAttributeType::NUMBER});
       attributes.push_back({.attributeName="ApproximateReceivedCount", .attributeValue=std::to_string(0), .attributeType=Database::Entity::SQS::MessageAttributeType::NUMBER});
       attributes.push_back({.attributeName="SenderId", .attributeValue=request.region, .attributeType=Database::Entity::SQS::MessageAttributeType::STRING});
       for (const auto &attribute : request.messageAttributes) {
@@ -288,7 +288,13 @@ namespace AwsMock::Service {
 
         auto end = std::chrono::high_resolution_clock::now();
         elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-        Poco::Thread::sleep(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+
+        // Wait for timeout or condition
+        _mutex.lock();
+        if (_condition.tryWait(_mutex, 500)) {
+          return {};
+        }
+        _mutex.unlock();
       }
 
       Dto::SQS::ReceiveMessageResponse response;
@@ -296,8 +302,7 @@ namespace AwsMock::Service {
         response.messageList = messageList;
         response.requestId = request.requestId;
       }
-      log_info_stream(_logger) << "Message received, count: " << messageList.size() << " requestId: "
-                               << request.requestId << std::endl;
+      log_info_stream(_logger) << "Message received, count: " << messageList.size() << " requestId: " << request.requestId << std::endl;
 
       return response;
 

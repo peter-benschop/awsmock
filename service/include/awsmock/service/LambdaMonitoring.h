@@ -11,8 +11,7 @@
 #include <sys/inotify.h>
 
 // Poco includes
-#include "Poco/Delegate.h"
-#include <Poco/DirectoryWatcher.h>
+#include <Poco/Condition.h>
 #include <Poco/Logger.h>
 #include <Poco/Path.h>
 #include <Poco/Runnable.h>
@@ -44,62 +43,73 @@ namespace AwsMock::Service {
 
     public:
 
-    /**
-     * Constructor
-     *
-     * @param configuration aws-mock configuration
-     * @param metricService aws-mock monitoring
-     */
-    explicit LambdaMonitoring(const Core::Configuration &configuration, Core::MetricService &metricService);
+      /**
+       * Constructor
+       *
+       * @param configuration aws-mock configuration
+       * @param metricService aws-mock monitoring
+       * @param condition stop condition
+       */
+      explicit LambdaMonitoring(const Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
 
-    /**
-     * Main method
-     */
-    void run() override;
+      /**
+       * Main method
+       */
+      void run() override;
 
-    /**
-     * Return running flag
-     *
-     * @return true if thread is running
-     */
-    bool GetRunning() const { return _running; }
+      /**
+       * Return running flag
+       *
+       * @return true if thread is running
+       */
+      bool GetRunning() const { return _running; }
 
     private:
 
-    /**
-     * Update metric counters
-     */
-    void UpdateCounters();
+      /**
+       * Update metric counters
+       */
+      void UpdateCounters();
 
-    /**
-     * Logger
-     */
-    Core::LogStream _logger;
+      /**
+       * Logger
+       */
+      Core::LogStream _logger;
 
-    /**
-     * Configuration
-     */
-    const Core::Configuration &_configuration;
+      /**
+       * Configuration
+       */
+      const Core::Configuration &_configuration;
 
-    /**
-     * Metric service
-     */
-    Core::MetricService &_metricService;
+      /**
+       * Metric service
+       */
+      Core::MetricService &_metricService;
 
-    /**
-     * S3 database
-     */
-    std::unique_ptr<Database::LambdaDatabase> _lambdaDatabase;
+      /**
+       * S3 database
+       */
+      std::unique_ptr<Database::LambdaDatabase> _lambdaDatabase;
 
-    /**
-     * S3 monitoring period in seconds
-     */
-    int _period;
+      /**
+       * S3 monitoring period in seconds
+       */
+      int _period;
 
-    /**
-     * Running flag
-     */
-    bool _running;
+      /**
+       * Running flag
+       */
+      bool _running;
+
+      /**
+       * Shutdown condition
+       */
+      Poco::Condition &_condition;
+
+      /**
+       * Shutdown mutex
+       */
+      Poco::Mutex _mutex;
   };
 
 } // namespace AwsMock::Service

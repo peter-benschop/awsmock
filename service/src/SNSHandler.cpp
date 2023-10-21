@@ -3,8 +3,8 @@
 
 namespace AwsMock::Service {
 
-  SNSHandler::SNSHandler(Core::Configuration &configuration, Core::MetricService &metricService)
-      : AbstractHandler(), _logger(Poco::Logger::get("SNSServiceHandler")), _configuration(configuration), _metricService(metricService), _snsService(configuration) {
+  SNSHandler::SNSHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition)
+      : AbstractHandler(), _logger(Poco::Logger::get("SNSServiceHandler")), _configuration(configuration), _metricService(metricService), _snsService(configuration, condition) {
   }
 
   void SNSHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {

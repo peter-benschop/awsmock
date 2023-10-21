@@ -6,7 +6,8 @@
 
 namespace AwsMock::Service {
 
-  SQSServer::SQSServer(Core::Configuration &configuration, Core::MetricService &metricService) : _logger(Poco::Logger::get("SQSServer")), _configuration(configuration), _metricService(metricService), _running(false) {
+  SQSServer::SQSServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition)
+      : _logger(Poco::Logger::get("SQSServer")), _configuration(configuration), _metricService(metricService), _condition(condition), _running(false) {
 
     // HTTP server configuration
     _port = _configuration.getInt("awsmock.service.sqs.port", SQS_DEFAULT_PORT);
@@ -22,12 +23,12 @@ namespace AwsMock::Service {
     _region = _configuration.getString("awsmock.region");
     _sqsDatabase = std::make_unique<Database::SQSDatabase>(_configuration);
     _serviceDatabase = std::make_unique<Database::ServiceDatabase>(_configuration);
-
     log_debug_stream(_logger) << "SQSServer initialized" << std::endl;
   }
 
   SQSServer::~SQSServer() {
     StopServer();
+    _condition.signal();
   }
 
   void SQSServer::run() {
@@ -38,6 +39,7 @@ namespace AwsMock::Service {
 //        if (!_serviceDatabase->IsActive("SQS")) {
 //            return;
 //        }
+
     // Start monitoring thread
     StartMonitoringServer();
 
@@ -46,19 +48,30 @@ namespace AwsMock::Service {
 
     _running = true;
     while (_running) {
+
       log_debug_stream(_logger) << "SQSServer processing started" << std::endl;
+
+      // Reset messages
       ResetMessages();
-      Poco::Thread::sleep(_period);
+
+      // Wait for timeout or condition
+      _mutex.lock();
+      if (_condition.tryWait(_mutex, _period)) {
+        break;
+      }
+      _mutex.unlock();
     }
+    StopServer();
   }
 
   void SQSServer::StopServer() {
+    _running = false;
     StopHttpServer();
     _threadPool.stopAll();
   }
 
   void SQSServer::StartMonitoringServer() {
-    _threadPool.StartThread(_configuration, _metricService);
+    _threadPool.StartThread(_configuration, _metricService, _condition);
   }
 
   void SQSServer::StartHttpServer() {
@@ -69,14 +82,14 @@ namespace AwsMock::Service {
     httpServerParams->setMaxThreads(_maxThreads);
     log_debug_stream(_logger) << "HTTP server parameter set, maxQueue: " << _maxQueueLength << " maxThreads: " << _maxThreads << std::endl;
 
-    _httpServer = std::make_shared<Poco::Net::HTTPServer>(new SQSRequestHandlerFactory(_configuration, _metricService), Poco::Net::ServerSocket(Poco::UInt16(_port)), httpServerParams);
+    _httpServer = std::make_shared<Poco::Net::HTTPServer>(new SQSRequestHandlerFactory(_configuration, _metricService, _condition), Poco::Net::ServerSocket(Poco::UInt16(_port)), httpServerParams);
 
     _httpServer->start();
     log_info_stream(_logger) << "SQS rest service started, endpoint: http://" << _host << ":" << _port << std::endl;
   }
 
   void SQSServer::StopHttpServer() {
-    if(_httpServer) {
+    if (_httpServer) {
       _httpServer->stop();
       _httpServer.reset();
       log_info_stream(_logger) << "SQS rest service stopped" << std::endl;

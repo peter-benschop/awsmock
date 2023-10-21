@@ -35,37 +35,38 @@ namespace AwsMock::Service {
 
     protected:
 
-    void SetUp() override {
-      // Create some test objects
-      _extraHeaders["Authorization"] =
-        "AWS4-HMAC-SHA256 Credential=none/20230618/eu-central-1/sqs/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840";
+      void SetUp() override {
+        // Create some test objects
+        _extraHeaders["Authorization"] =
+            "AWS4-HMAC-SHA256 Credential=none/20230618/eu-central-1/sqs/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840";
 
-      // Define endpoint
-      std::string _port = _configuration.getString("awsmock.service.sqs.port", std::to_string(SQS_DEFAULT_PORT));
-      std::string _host = _configuration.getString("awsmock.service.sqs.host", SQS_DEFAULT_HOST);
-      _endpoint = "http://" + _host + ":" + _port;
+        // Define endpoint
+        std::string _port = _configuration.getString("awsmock.service.sqs.port", std::to_string(SQS_DEFAULT_PORT));
+        std::string _host = _configuration.getString("awsmock.service.sqs.host", SQS_DEFAULT_HOST);
+        _endpoint = "http://" + _host + ":" + _port;
 
-      // Start HTTP server
-      Poco::ThreadPool::defaultPool().start(_sqsServer);
-      while(!_sqsServer.IsRunning()) {
-        Poco::Thread::sleep(1000);
+        // Start HTTP server
+        Poco::ThreadPool::defaultPool().start(_sqsServer);
+        while (!_sqsServer.IsRunning()) {
+          Poco::Thread::sleep(1000);
+        }
       }
-    }
 
-    void TearDown() override {
-      _sqsServer.StopServer();
-      _database.DeleteAllQueues();
-      Core::FileUtils::DeleteFile(_testFile);
-      //Poco::ThreadPool::defaultPool().stopAll();
-    }
+      void TearDown() override {
+        _sqsServer.StopServer();
+        _database.DeleteAllQueues();
+        Core::FileUtils::DeleteFile(_testFile);
+        //Poco::ThreadPool::defaultPool().stopAll();
+      }
 
-    Core::CurlUtils _curlUtils;
-    std::string _testFile, _endpoint;
-    std::map <std::string, std::string> _extraHeaders;
-    Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
-    Core::MetricService _metricService = Core::MetricService(_configuration);
-    Database::SQSDatabase _database = Database::SQSDatabase(_configuration);
-    SQSServer _sqsServer = SQSServer(_configuration, _metricService);
+      Core::CurlUtils _curlUtils;
+      std::string _testFile, _endpoint;
+      std::map<std::string, std::string> _extraHeaders;
+      Poco::Condition _condition;
+      Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+      Core::MetricService _metricService = Core::MetricService(_configuration);
+      Database::SQSDatabase _database = Database::SQSDatabase(_configuration);
+      SQSServer _sqsServer = SQSServer(_configuration, _metricService, _condition);
   };
 
   TEST_F(SQSServerTest, QueueCreateTest) {

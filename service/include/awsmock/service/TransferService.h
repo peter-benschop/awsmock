@@ -34,9 +34,11 @@
 #include <awsmock/dto/transfer/StopServerRequest.h>
 #include <awsmock/repository/TransferDatabase.h>
 
+#define TRANSFER_DEFAULT_FTP_PORT 2121
+
 namespace AwsMock::Service {
 
-    class TransferService {
+  class TransferService {
 
     public:
 
@@ -118,7 +120,12 @@ namespace AwsMock::Service {
        * Transfer database connection
        */
       std::unique_ptr<Database::TransferDatabase> _transferDatabase;
-    };
+
+      /**
+       * FTP port
+       */
+      int _ftpPort;
+  };
 
 } //namespace AwsMock::Service
 

@@ -50,14 +50,14 @@ namespace AwsMock {
        *
        * @return REST URL router
        */
-      Poco::Net::HTTPRequestHandlerFactory *getRouter();
+      std::shared_ptr<Poco::Net::HTTPRequestHandlerFactory> getRouter();
 
       /**
        * Sets the REST URL router
        *
        * @param router HTTP request router.
        */
-      void setRouter(Poco::Net::HTTPRequestHandlerFactory *router);
+      void setRouter(std::shared_ptr<Poco::Net::HTTPRequestHandlerFactory> router);
 
       /**
        * Start the restfull service.
@@ -72,7 +72,7 @@ namespace AwsMock {
        * @param router router to use
        * @param port port to use (default: 9100)
        */
-      void start(Poco::Net::HTTPRequestHandlerFactory *router, int port = GATEWAY_DEFAULT_PORT);
+      void start(std::shared_ptr<Poco::Net::HTTPRequestHandlerFactory> router, int port = GATEWAY_DEFAULT_PORT);
 
     private:
 
@@ -99,12 +99,12 @@ namespace AwsMock {
       /**
        * REST router
        */
-      Poco::Net::HTTPRequestHandlerFactory *_router = nullptr;
+      std::shared_ptr<Poco::Net::HTTPRequestHandlerFactory> _router = nullptr;
 
       /**
        * HTTP server instance
        */
-      Poco::Net::HTTPServer *_httpServer = nullptr;
+      std::shared_ptr<Poco::Net::HTTPServer> _httpServer = nullptr;
 
       /**
        * HTTP max message queue length

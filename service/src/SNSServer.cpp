@@ -6,8 +6,8 @@
 
 namespace AwsMock::Service {
 
-  SNSServer::SNSServer(Core::Configuration &configuration, Core::MetricService &metricService)
-      : _logger(Poco::Logger::get("SQSWorker")), _configuration(configuration), _metricService(metricService), _running(false) {
+  SNSServer::SNSServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition)
+      : _logger(Poco::Logger::get("SNSServer")), _configuration(configuration), _metricService(metricService), _condition(condition), _running(false) {
 
     // HTTP server configuration
     _port = _configuration.getInt("awsmock.service.sns.port", SNS_DEFAULT_PORT);
@@ -28,11 +28,7 @@ namespace AwsMock::Service {
   }
 
   SNSServer::~SNSServer() {
-    if (_httpServer) {
-      _httpServer->stopAll(true);
-      delete _httpServer;
-      log_info_stream(_logger) << "SNS rest service stopped" << std::endl;
-    }
+    StopServer();
   }
 
   void SNSServer::run() {
@@ -44,14 +40,34 @@ namespace AwsMock::Service {
 //            return;
 //        }
     // Start monitoring thread
-    _threadPool.StartThread(_configuration, _metricService);
+    StartMonitoring();
+
+    // Start REST service
+    StartHttpServer();
 
     _running = true;
     while (_running) {
       log_debug_stream(_logger) << "SNSServer processing started" << std::endl;
       ResetMessages();
-      Poco::Thread::sleep(_period);
+
+      // Wait for timeout or condition
+      _mutex.lock();
+      if (_condition.tryWait(_mutex, _period)) {
+        break;
+      }
+      _mutex.unlock();
     }
+    StopServer();
+  }
+
+  void SNSServer::StartMonitoring() {
+    _threadPool.StartThread(_configuration, _metricService, _condition);
+  }
+
+  void SNSServer::StopServer() {
+    _threadPool.stopAll();
+    _running = false;
+    StopHttpServer();
   }
 
   void SNSServer::StartHttpServer() {
@@ -62,11 +78,18 @@ namespace AwsMock::Service {
     httpServerParams->setMaxThreads(_maxThreads);
     log_debug_stream(_logger) << "HTTP server parameter set, maxQueue: " << _maxQueueLength << " maxThreads: " << _maxThreads << std::endl;
 
-    _httpServer =
-        new Poco::Net::HTTPServer(new SNSRequestHandlerFactory(_configuration, _metricService), Poco::Net::ServerSocket(Poco::UInt16(_port)), httpServerParams);
-
+    _httpServer = std::make_shared<Poco::Net::HTTPServer>(new SNSRequestHandlerFactory(_configuration, _metricService, _condition), Poco::Net::ServerSocket(Poco::UInt16(_port)), httpServerParams);
     _httpServer->start();
+
     log_info_stream(_logger) << "SNS rest service started, endpoint: http://" << _host << ":" << _port << std::endl;
+  }
+
+  void SNSServer::StopHttpServer() {
+    if (_httpServer) {
+      _httpServer->stopAll(true);
+      _httpServer.reset();
+      log_info_stream(_logger) << "SNS rest service stopped" << std::endl;
+    }
   }
 
   void SNSServer::ResetMessages() {

@@ -11,8 +11,7 @@
 #include <sys/inotify.h>
 
 // Poco includes
-#include "Poco/Delegate.h"
-#include <Poco/DirectoryWatcher.h>
+#include <Poco/Condition.h>
 #include <Poco/Logger.h>
 #include <Poco/Path.h>
 #include <Poco/Runnable.h>
@@ -48,8 +47,9 @@ namespace AwsMock::Service {
        *
        * @param configuration aws-mock configuration
        * @param metricService aws-mock monitoring
+       * @param condition stop condition
        */
-      explicit SNSMonitoring(const Core::Configuration &configuration, Core::MetricService &metricService);
+      explicit SNSMonitoring(const Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
 
       /**
        * Main method
@@ -99,6 +99,16 @@ namespace AwsMock::Service {
        * Running flag
        */
       bool _running;
+
+      /**
+       * Shutdown condition
+       */
+      Poco::Condition &_condition;
+
+      /**
+       * Shutdown mutex
+       */
+      Poco::Mutex _mutex;
   };
 
 } // namespace AwsMock::Service

@@ -6,16 +6,23 @@
 
 namespace AwsMock::Service {
 
-  LambdaServer::LambdaServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue, Poco::NotificationQueue &invokeQueue)
-      : AbstractWorker(configuration), _logger(Poco::Logger::get("LambdaWorker")), _configuration(configuration), _metricService(metricService),
-        _createQueue(createQueue), _invokeQueue(invokeQueue), _running(false) {
+  LambdaServer::LambdaServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue, Poco::NotificationQueue &invokeQueue, Poco::Condition &condition)
+      : AbstractWorker(configuration), _logger(Poco::Logger::get("LambdaServer")), _configuration(configuration), _metricService(metricService),
+        _createQueue(createQueue), _invokeQueue(invokeQueue), _condition(condition), _running(false) {
 
+    // Get HTTP configuration values
+    _port = _configuration.getInt("awsmock.service.lambda.port", LAMBDA_DEFAULT_PORT);
+    _host = _configuration.getString("awsmock.service.lambda.host", LAMBDA_DEFAULT_HOST);
+    _maxQueueLength = _configuration.getInt("awsmock.service.s3.max.queue", 250);
+    _maxThreads = _configuration.getInt("awsmock.service.s3.max.threads", 50);
+
+    // Directories
     _dataDir = _configuration.getString("awsmock.data.dir") + Poco::Path::separator() + "lambda";
     _logger.debug() << "Lambda directory: " << _dataDir << std::endl;
 
     // Sleeping period
     _period = _configuration.getInt("awsmock.worker.lambda.period", 10000);
-    log_debug_stream(_logger) << "Lambda worker period: " << _period << std::endl;
+    log_debug_stream(_logger) << "Lambda server period: " << _period << std::endl;
 
     // Create environment
     _region = _configuration.getString("awsmock.region");
@@ -35,11 +42,51 @@ namespace AwsMock::Service {
   }
 
   LambdaServer::~LambdaServer() {
-    if (_httpServer) {
-      _httpServer->stopAll(true);
-      delete _httpServer;
-      log_info_stream(_logger) << "Lambda rest service stopped" << std::endl;
+    StopServer();
+  }
+
+  void LambdaServer::run() {
+
+    log_info_stream(_logger) << "Lambda worker started" << std::endl;
+
+    // Start monitoring thread
+    StartMonitoring();
+
+    // Start HTTP server
+    StartHttpServer();
+
+    // Check service active
+    /*if (!_serviceDatabase->IsActive("Lambda")) {
+        return;
+    }*/
+
+    // Cleanup
+    CleanupContainers();
+
+    // Start creator/executor
+    Poco::ThreadPool::defaultPool().start(_lambdaCreator);
+    Poco::ThreadPool::defaultPool().start(_lambdaExecutor);
+
+    // Start all lambda functions
+    StartLambdaFunctions();
+
+    _running = true;
+    while (_running) {
+
+      log_debug_stream(_logger) << "LambdaWorker processing started" << std::endl;
+
+      // Wait for timeout or condition
+      _mutex.lock();
+      if (_condition.tryWait(_mutex, _period)) {
+        break;
+      }
+      _mutex.unlock();
     }
+    StopServer();
+  }
+
+  void LambdaServer::StartMonitoring() {
+    _threadPool.StartThread(_configuration, _metricService, _condition);
   }
 
   void LambdaServer::StartHttpServer() {
@@ -50,12 +97,24 @@ namespace AwsMock::Service {
     httpServerParams->setMaxThreads(_maxThreads);
     log_debug_stream(_logger) << "HTTP server parameter set, maxQueue: " << _maxQueueLength << " maxThreads: " << _maxThreads << std::endl;
 
-    _httpServer =
-        new Poco::Net::HTTPServer(new LambdaRequestHandlerFactory(_configuration, _metricService, _createQueue, _invokeQueue),
-                                  Poco::Net::ServerSocket(Poco::UInt16(_port)), httpServerParams);
-
+    _httpServer = std::make_shared<Poco::Net::HTTPServer>(new LambdaRequestHandlerFactory(_configuration, _metricService, _createQueue, _invokeQueue), Poco::Net::ServerSocket(Poco::UInt16(_port)), httpServerParams);
     _httpServer->start();
+
     log_info_stream(_logger) << "Lambda rest service started, endpoint: http://" << _host << ":" << _port << std::endl;
+  }
+
+  void LambdaServer::StopHttpServer() {
+    if (_httpServer) {
+      _httpServer->stop();
+      _httpServer.reset();
+      log_info_stream(_logger) << "Lambda rest service stopped" << std::endl;
+    }
+  }
+
+  void LambdaServer::StopServer() {
+    _running = false;
+    StopHttpServer();
+    _threadPool.stopAll();
   }
 
   void LambdaServer::CleanupContainers() {
@@ -100,35 +159,6 @@ namespace AwsMock::Service {
       log_debug_stream(_logger) << "Loaded lambda from file:" << lambda.fileName << " size: " << Core::FileUtils::FileSize(lambda.fileName) << std::endl;
     }
     return code;
-  }
-
-  void LambdaServer::run() {
-
-    log_info_stream(_logger) << "Lambda worker started" << std::endl;
-
-    // Check service active
-    /*if (!_serviceDatabase->IsActive("Lambda")) {
-        return;
-    }*/
-
-    // Cleanup
-    CleanupContainers();
-
-    // Start creator/executor
-    Poco::ThreadPool::defaultPool().start(_lambdaCreator);
-    Poco::ThreadPool::defaultPool().start(_lambdaExecutor);
-
-    // Start all lambda functions
-    StartLambdaFunctions();
-
-    // Start monitoring thread
-    _threadPool.StartThread(_configuration, _metricService);
-
-    _running = true;
-    while (_running) {
-      log_debug_stream(_logger) << "LambdaWorker processing started" << std::endl;
-      Poco::Thread::sleep(_period);
-    }
   }
 
   void LambdaServer::SendCreateFunctionRequest(Dto::Lambda::CreateFunctionRequest &lambdaRequest, const std::string &contentType) {

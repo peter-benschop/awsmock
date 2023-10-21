@@ -12,7 +12,6 @@ namespace AwsMock::Core {
     Poco::AutoPtr<Poco::ConsoleChannel> pCons(new Poco::ConsoleChannel());
     Poco::AutoPtr<Poco::PatternFormatter> pPF(new Poco::PatternFormatter("%d-%m-%Y %H:%M:%S.%i [%q] %I %s:%u - %t"));
     Poco::AutoPtr<Poco::FormattingChannel> pFC(new Poco::FormattingChannel(pPF, pCons));
-    //Poco::Logger::root().setChannel(pFC);
     _logger.setChannel(pFC);
   }
 
@@ -39,7 +38,7 @@ namespace AwsMock::Core {
   }
 
   int LogStreamBuf::writeToDevice(char c) {
-    //Poco::Mutex::ScopedLock lock(_mutex);
+    Poco::Mutex::ScopedLock lock(_mutex);
     if (c == '\n' || c == '\r') {
       if (_message.length() > 0) {
         Poco::Message msg(_logger.name(), _message, _priority, _file, _line);

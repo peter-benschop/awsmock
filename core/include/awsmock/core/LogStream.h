@@ -257,4 +257,4 @@ namespace AwsMock::Core {
 #define log_trace_stream(logger) \
 	if ((logger).trace()) (logger).trace( __FILE__, __LINE__)
 
-#endif //AWS_MOCK_CORE_INCLUDE_AWSMOCK_CORE_LOGSTREAM_H
+#endif // AWSMOCK_CORE_LOGSTREAM_H

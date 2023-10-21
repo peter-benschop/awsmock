@@ -6,8 +6,8 @@
 
 namespace AwsMock::Service {
 
-  SQSMonitoring::SQSMonitoring(const Core::Configuration &configuration, Core::MetricService &metricService)
-      : _logger(Poco::Logger::get("SQSMonitoring")), _configuration(configuration), _metricService(metricService), _running(false) {
+  SQSMonitoring::SQSMonitoring(const Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition)
+      : _logger(Poco::Logger::get("SQSMonitoring")), _configuration(configuration), _metricService(metricService), _condition(condition), _running(false) {
 
     // Update period
     _period = _configuration.getInt("awsmock.monitoring.sqs.period", SQS_MONITORING_DEFAULT_PERIOD);
@@ -21,15 +21,24 @@ namespace AwsMock::Service {
 
     log_info_stream(_logger) << "SQS monitoring started" << std::endl;
 
-    if(_period <= 0) {
+    if (_period <= 0) {
       return;
     }
 
     _running = true;
     while (_running) {
+
       _logger.debug() << "SQS monitoring processing started" << std::endl;
+
+      // Update counter
       UpdateCounters();
-      Poco::Thread::sleep(_period);
+
+      // Wait for timeout or condition
+      _mutex.lock();
+      if (_condition.tryWait(_mutex, _period)) {
+        break;
+      }
+      _mutex.unlock();
     }
   }
 
@@ -42,7 +51,7 @@ namespace AwsMock::Service {
     _metricService.SetGauge("sqs_message_count_total", messages);
 
     // Count messages per queue
-    for(const auto &queue : _sqsDatabase->ListQueues()) {
+    for (const auto &queue : _sqsDatabase->ListQueues()) {
       std::string labelValue = Poco::replace(queue.name, "-", "_");
       long messagesPerQueue = _sqsDatabase->CountMessages(queue.region, queue.queueUrl);
       _metricService.SetGauge("sqs_message_count", "queue", labelValue, messagesPerQueue);
