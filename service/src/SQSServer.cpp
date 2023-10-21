@@ -61,6 +61,8 @@ namespace AwsMock::Service {
       }
       _mutex.unlock();
     }
+
+    // Stop serer
     StopServer();
   }
 
