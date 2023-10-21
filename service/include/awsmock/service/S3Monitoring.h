@@ -46,62 +46,67 @@ namespace AwsMock::Service {
 
     public:
 
-    /**
-     * Constructor
-     *
-     * @param configuration aws-mock configuration
-     * @param metricService aws-mock monitoring
-     */
-    explicit S3Monitoring(const Core::Configuration &configuration, Core::MetricService &metricService);
+      /**
+       * Constructor
+       *
+       * @param configuration aws-mock configuration
+       * @param metricService aws-mock monitoring
+       */
+      explicit S3Monitoring(const Core::Configuration &configuration, Core::MetricService &metricService);
 
-    /**
-     * Main method
-     */
-    void run() override;
+      /**
+       * Main method
+       */
+      void run() override;
 
-    /**
-     * Return running flag
-     *
-     * @return true if thread is running
-     */
-    bool GetRunning() { return _running; }
+      /**
+       * Stop
+       */
+      void Stop();
+
+      /**
+       * Return running flag
+       *
+       * @return true if thread is running
+       */
+      bool GetRunning() const { return _running; }
 
     private:
 
-    /**
-     * Update metric counters
-     */
-    void UpdateCounters();
+      /**
+       * Update metric counters
+       */
+      void UpdateCounters();
 
-    /**
-     * Logger
-     */
-    Core::LogStream _logger;
+      /**
+       * Logger
+       */
+      Core::LogStream _logger;
 
-    /**
-     * Configuration
-     */
-    const Core::Configuration &_configuration;
+      /**
+       * Configuration
+       */
+      const Core::Configuration &_configuration;
 
-    /**
-     * Metric service
-     */
-    Core::MetricService &_metricService;
+      /**
+       * Metric service
+       */
+      Core::MetricService &_metricService;
 
-    /**
-     * S3 database
-     */
-    std::unique_ptr<Database::S3Database> _s3Database;
+      /**
+       * S3 database
+       */
+      std::unique_ptr<Database::S3Database> _s3Database;
 
-    /**
-     * S3 monitoring period in seconds
-     */
-    int _period;
+      /**
+       * S3 monitoring period in seconds
+       */
+      int _period;
 
-    /**
-     * Running flag
-     */
-    bool _running;
+      /**
+       * Running flag
+       */
+      bool _running;
   };
 
 } // namespace AwsMock::Worker

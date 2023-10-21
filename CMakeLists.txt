@@ -30,7 +30,7 @@ add_subdirectory(core)
 add_subdirectory(dto)
 add_subdirectory(db)
 add_subdirectory(service)
-add_subdirectory(worker)
+#add_subdirectory(worker)
 add_subdirectory(awsmock)
 
 if (BUILD_DOCUMENTATION)

@@ -21,12 +21,20 @@ namespace AwsMock::Service {
 
     log_info_stream(_logger) << "S3 monitoring started" << std::endl;
 
+    if(_period <= 0) {
+      return;
+    }
+
     _running = true;
     while (_running) {
       _logger.debug() << "S3 monitoring processing started" << std::endl;
       UpdateCounters();
       Poco::Thread::sleep(_period);
     }
+  }
+
+  void S3Monitoring::Stop() {
+    _running = false;
   }
 
   void S3Monitoring::UpdateCounters() {

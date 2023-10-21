@@ -7,7 +7,7 @@
 namespace AwsMock::Core {
 
   void TestUtils::CreateTestConfigurationFile() {
-    std::ofstream ofs(TMP_PROPERTIES_FILE);
+    std::ofstream ofs(TMP_PROPERTIES_FILE, std::ofstream::out | std::ofstream::trunc);
     // AWS configuration
     ofs << "awsmock.region=eu-central-1" << std::endl;
     ofs << "awsmock.account.id=000000000000" << std::endl;
@@ -27,6 +27,11 @@ namespace AwsMock::Core {
     ofs << "awsmock.service.s3.data.dir=/tmp/test/data/s3" << std::endl;
     ofs << "awsmock.service.s3.port=19500" << std::endl;
     ofs << "awsmock.service.s3.host=localhost" << std::endl;
+    ofs << "awsmock.monitoring.s3.period=-1" << std::endl;
+    // SQS configuration
+    ofs << "awsmock.service.sqs.port=19501" << std::endl;
+    ofs << "awsmock.service.sqs.host=localhost" << std::endl;
+    ofs << "awsmock.monitoring.sqs.period=-1" << std::endl;
     // Thread pool configuration
     ofs << "awsmock.threadpool.name=srv-worker" << std::endl;
     ofs << "awsmock.threadpool.min=8" << std::endl;
@@ -34,7 +39,7 @@ namespace AwsMock::Core {
     ofs << "awsmock.threadpool.idletime=60" << std::endl;
     // Monitoring configuration
     ofs << "awsmock.monitoring.port=8081" << std::endl;
-    ofs << "awsmock.monitoring.timeout=60000" << std::endl;
+    // Logging
     ofs << "awsmock.log.level=error" << std::endl;
     // Docker
     ofs << "awsmock.docker.network.mode=bridge" << std::endl;
@@ -42,6 +47,6 @@ namespace AwsMock::Core {
     ofs << "awsmock.docker.default.memory.size=512" << std::endl;
     ofs << "awsmock.docker.default.temp.size=10240" << std::endl;
     ofs << "awsmock.docker.container.port=8080" << std::endl;
-
+    ofs.close();
   }
 }

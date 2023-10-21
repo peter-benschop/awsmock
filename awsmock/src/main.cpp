@@ -45,8 +45,8 @@
 #include <awsmock/service/SQSServer.h>
 #include <awsmock/service/SNSServer.h>
 #include <awsmock/service/TransferServer.h>
-#include <awsmock/worker/LambdaWorker.h>
-#include <awsmock/worker/TransferWorker.h>
+#include <awsmock/service/LambdaServer.h>
+#include <awsmock/service/TransferServer.h>
 
 namespace AwsMock {
 
@@ -191,12 +191,6 @@ namespace AwsMock {
 
     }
 
-    void StartWorker() {
-
-      // Start the Transfer worker
-      Poco::ThreadPool::defaultPool().start(_transferWorker);
-    }
-
     void StartServices() {
 
       // Start the S3 server
@@ -212,7 +206,7 @@ namespace AwsMock {
       Poco::ThreadPool::defaultPool().start(_lambdaServer);
 
       // Start the transfer server
-      _transferServer.start();
+      Poco::ThreadPool::defaultPool().start(_transferServer);
     }
 
     /**
@@ -227,10 +221,8 @@ namespace AwsMock {
 
       log_debug_stream(_logger) << "Entering main routine" << std::endl;
 
-      // Start service and worker. Services needed to start first, as the worker could possibly use the
-      // services.
+      // Start service and worker. Services needed to start first, as the worker could possibly use the services.
       StartServices();
-      StartWorker();
 
       // Start HTTP server
       _restService.setRouter(&_router);
@@ -276,11 +268,6 @@ namespace AwsMock {
      * Gateway controller
      */
     RestService _restService = RestService(_configuration);
-
-    /**
-     * Transfer worker
-     */
-    Worker::TransferWorker _transferWorker = Worker::TransferWorker(_configuration);
 
     /**
      * S3 server

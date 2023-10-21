@@ -61,7 +61,7 @@ namespace AwsMock::Service {
        *
        * @return true if thread is running
        */
-      bool GetRunning() { return _running; }
+      bool GetRunning() const { return _running; }
 
     private:
 

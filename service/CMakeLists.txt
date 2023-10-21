@@ -8,10 +8,12 @@ set(SNS_SOURCES src/SNSServer.cpp src/SNSHandler.cpp src/SNSService.cpp src/SNSM
 set(LAMBDA_SOURCES src/LambdaServer.cpp src/LambdaHandler.cpp src/LambdaService.cpp src/LambdaMonitoring.cpp
         src/LambdaCreator.cpp src/LambdaExecutor.cpp)
 set(TRANSFER_SOURCES src/TransferServer.cpp src/TransferHandler.cpp src/TransferService.cpp)
+set(FTP_SOURCES src/ftpserver/Filesystem.cpp src/ftpserver/FtpSession.cpp src/ftpserver/FtpServer.cpp
+        src/ftpserver/FtpServerImpl.cpp src/ftpserver/UserDatabase.cpp)
 set(DOCKER_SOURCES src/DockerService.cpp)
 
 set(SOURCES src/AbstractHandler.cpp src/AbstractWorker.cpp ${S3_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${TRANSFER_SOURCES}
-        ${LAMBDA_SOURCES} ${DOCKER_SOURCES})
+        ${FTP_SOURCES} ${LAMBDA_SOURCES} ${DOCKER_SOURCES})
 
 # Test directory
 add_subdirectory(tst)

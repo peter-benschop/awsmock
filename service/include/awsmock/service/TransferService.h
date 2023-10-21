@@ -33,7 +33,6 @@
 #include <awsmock/dto/transfer/StartServerRequest.h>
 #include <awsmock/dto/transfer/StopServerRequest.h>
 #include <awsmock/repository/TransferDatabase.h>
-#include <awsmock/service/FtpServer.h>
 
 namespace AwsMock::Service {
 

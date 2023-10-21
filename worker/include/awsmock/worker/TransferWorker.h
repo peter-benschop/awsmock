@@ -2,8 +2,8 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#ifndef AWSMOCK_WORKER_TRANSFERWORKER_H
-#define AWSMOCK_WORKER_TRANSFERWORKER_H
+#ifndef AWSMOCK_SERVICE_TRANSFERSERVER_H
+#define AWSMOCK_SERVICE_TRANSFERSERVER_H
 
 // C++ standard includes
 #include <string>
@@ -25,16 +25,23 @@
 #define DEFAULT_BASE_DIR "transfer"
 #define CONTENT_TYPE_JSON "application/json"
 
-namespace AwsMock::Worker {
+namespace AwsMock::Service {
 
-    class TransferWorker : public Poco::Runnable, public AbstractWorker {
+    class TransferServer : public Poco::Runnable, public AbstractWorker {
 
     public:
 
       /**
        * Constructor
+       *
+       * @param AwsMock configuration
        */
-      [[maybe_unused]] explicit TransferWorker(const Core::Configuration &configuration);
+      explicit TransferServer(Core::Configuration &configuration);
+
+      /**
+       * Destructor
+       */
+      ~TransferServer() override;
 
       /**
        * Main method
@@ -42,6 +49,11 @@ namespace AwsMock::Worker {
       void run() override;
 
     private:
+
+      /**
+       * Start the restfull service.
+       */
+      void StartHttpServer();
 
       /**
        * Starts a single transfer server
@@ -91,7 +103,7 @@ namespace AwsMock::Worker {
       /**
        * Configuration
        */
-      const Core::Configuration &_configuration;
+      Core::Configuration &_configuration;
 
       /**
        * Service database
@@ -179,6 +191,6 @@ namespace AwsMock::Worker {
       int _s3ServicePort;
     };
 
-} // namespace AwsMock::Worker
+} // namespace AwsMock::Service
 
-#endif // AWSMOCK_WORKER_TRANSFERWORKER_H
+#endif // AWSMOCK_SERVICE_TRANSFERSERVER_H

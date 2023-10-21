@@ -85,10 +85,7 @@ namespace AwsMock::Core {
     return response;
   }
 
-  CurlResponse CurlUtils::SendHttpRequest(const std::string &method,
-                                          const std::string &path,
-                                          const std::map<std::string, std::string> &extraHeaders,
-                                          const std::string &body) {
+  CurlResponse CurlUtils::SendHttpRequest(const std::string &method, const std::string &path, const std::map<std::string, std::string> &extraHeaders, const std::string &body) {
 
     _readBuffer.clear();
     curl = curl_easy_init();
@@ -112,7 +109,7 @@ namespace AwsMock::Core {
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &_readBuffer);
-    if(!body.empty()) {
+    if (!body.empty()) {
       curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body.c_str());
     }
 

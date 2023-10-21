@@ -43,8 +43,8 @@ namespace AwsMock::Service {
     Dto::S3::CreateBucketResponse createBucketResponse;
     try {
       // Create directory
-      std::string bucketDir = _dataS3Dir + Poco::Path::separator() + name;
-      Core::DirUtils::EnsureDirectory(bucketDir);
+      //std::string bucketDir = _dataS3Dir + Poco::Path::separator() + name;
+      //Core::DirUtils::EnsureDirectory(bucketDir);
 
       // Update database
       _database->CreateBucket({.region=region, .name=name, .owner=owner});
@@ -507,7 +507,7 @@ namespace AwsMock::Service {
 
       // Delete bucket from database
       _database->DeleteBucket(bucket);
-      log_info_stream(_logger) << "Bucket deleted, bucket: " << bucket << std::endl;
+      log_info_stream(_logger) << "Bucket deleted, bucket: " << bucket.name << std::endl;
 
     } catch (Poco::Exception &ex) {
       log_error_stream(_logger) << "S3 Delete Bucket failed, message: " << ex.message() << std::endl;

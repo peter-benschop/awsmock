@@ -2,12 +2,18 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include <awsmock/worker/TransferWorker.h>
+#include <awsmock/service/TransferServer.h>
 
-namespace AwsMock::Worker {
+namespace AwsMock::Service {
 
-  [[maybe_unused]] TransferWorker::TransferWorker(const Core::Configuration &configuration)
+  TransferServer::TransferServer(Core::Configuration &configuration)
       : AbstractWorker(configuration), _logger(Poco::Logger::get("TransferWorker")), _configuration(configuration), _running(false) {
+
+    // REST server configuration
+    _port = _configuration.getInt("awsmock.service.transfer.port", TRANSFER_DEFAULT_PORT);
+    _host = _configuration.getString("awsmock.service.transfer.host", TRANSFER_DEFAULT_HOST);
+    _maxQueueLength = _configuration.getInt("awsmock.service.transfer.max.queue", 250);
+    _maxThreads = _configuration.getInt("awsmock.service.transfer.max.threads", 50);
 
     // Sleeping period
     _period = _configuration.getInt("awsmock.worker.transfer.period", 10000);
@@ -34,7 +40,30 @@ namespace AwsMock::Worker {
     log_info_stream(_logger) << "TransferWorker initialized" << std::endl;
   }
 
-  void TransferWorker::StartTransferServer(Database::Entity::Transfer::Transfer &server) {
+  TransferServer::~TransferServer() {
+    if(_httpServer) {
+      _httpServer->stopAll(true);
+      delete _httpServer;
+      log_info_stream(_logger) << "Transfer rest service stopped" << std::endl;
+    }
+  }
+
+  void TransferServer::StartHttpServer() {
+
+    // Set HTTP server parameter
+    auto *httpServerParams = new Poco::Net::HTTPServerParams();
+    httpServerParams->setMaxQueued(_maxQueueLength);
+    httpServerParams->setMaxThreads(_maxThreads);
+    log_debug_stream(_logger) << "HTTP server parameter set, maxQueue: " << _maxQueueLength << " maxThreads: " << _maxThreads << std::endl;
+
+    _httpServer =
+        new Poco::Net::HTTPServer(new TransferRequestHandlerFactory(_configuration, _metricService), Poco::Net::ServerSocket(Poco::UInt16(_port)), httpServerParams);
+
+    _httpServer->start();
+    log_info_stream(_logger) << "Transfer rest service started, endpoint: http://" << _host << ":" << _port << std::endl;
+  }
+
+  void TransferServer::StartTransferServer(Database::Entity::Transfer::Transfer &server) {
 
     // Create transfer server thread
     _ftpServer = std::make_shared<FtpServer::FtpServer>(_configuration, server.serverId, server.port, server.listenAddress);
@@ -60,7 +89,7 @@ namespace AwsMock::Worker {
     log_info_stream(_logger) << "Transfer server " << server.serverId << " started " << std::endl;
   }
 
-  void TransferWorker::StopTransferServer(Database::Entity::Transfer::Transfer &server) {
+  void TransferServer::StopTransferServer(Database::Entity::Transfer::Transfer &server) {
 
     // Create transfer server thread
     std::shared_ptr<FtpServer::FtpServer> ftpserver = _transferServerList[server.serverId];
@@ -72,7 +101,7 @@ namespace AwsMock::Worker {
     log_debug_stream(_logger) << "Transfer server " << server.serverId << " stopped " << std::endl;
   }
 
-  void TransferWorker::StartTransferServers() {
+  void TransferServer::StartTransferServers() {
 
     log_debug_stream(_logger) << "Starting transfer servers" << std::endl;
     std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase->ListServers(_region);
@@ -84,7 +113,7 @@ namespace AwsMock::Worker {
     }
   }
 
-  void TransferWorker::CheckTransferServers() {
+  void TransferServer::CheckTransferServers() {
 
     log_debug_stream(_logger) << "Checking transfer servers" << std::endl;
     std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase->ListServers(_region);
@@ -111,7 +140,7 @@ namespace AwsMock::Worker {
     }
   }
 
-  void TransferWorker::run() {
+  void TransferServer::run() {
 
     log_info_stream(_logger) << "Transfer worker started" << std::endl;
 
@@ -119,6 +148,9 @@ namespace AwsMock::Worker {
     /*if (!_serviceDatabase->IsActive("Lambda")) {
         return;
     }*/
+
+    // Start REST server
+    StartHttpServer();
 
     // Send create bucket request
     if (!SendExistsBucketRequest(_bucket)) {
@@ -137,7 +169,7 @@ namespace AwsMock::Worker {
     }
   }
 
-  void TransferWorker::SendCreateBucketRequest(const std::string &bucket) {
+  void TransferServer::SendCreateBucketRequest(const std::string &bucket) {
 
     std::string url = _baseUrl + "/" + bucket;
     Dto::S3::CreateBucketConstraint location = {.location=_region};
@@ -146,11 +178,11 @@ namespace AwsMock::Worker {
     log_debug_stream(_logger) << "Create bucket message request send" << std::endl;
   }
 
-  bool TransferWorker::SendExistsBucketRequest(const std::string &bucket) {
+  bool TransferServer::SendExistsBucketRequest(const std::string &bucket) {
 
     std::string url = _baseUrl + "/" + bucket;
     bool result = SendHeadRequest(url, CONTENT_TYPE_JSON);
     log_debug_stream(_logger) << "Bucket exists message request send, result: " << result << std::endl;
     return result;
   }
-} // namespace AwsMock::Worker
+} // namespace AwsMock::Service

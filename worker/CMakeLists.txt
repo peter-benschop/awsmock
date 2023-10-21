@@ -4,7 +4,7 @@ set(LIBRARY_STATIC awsmockwrk_static)
 
 #src/worker/S3Worker.cpp src/worker/S3Monitoring.cpp
 
-set(WORKER_SOURCES src/worker/AbstractWorker.cpp  src/worker/TransferWorker.cpp)
+set(WORKER_SOURCES )
 set(FTP_SOURCES src/ftpserver/Filesystem.cpp src/ftpserver/FtpSession.cpp src/ftpserver/FtpServer.cpp
         src/ftpserver/FtpServerImpl.cpp src/ftpserver/UserDatabase.cpp)
 
