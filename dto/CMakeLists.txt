@@ -2,8 +2,9 @@
 set(LIBRARY awsmockdto)
 set(LIBRARY_STATIC awsmockdto_static)
 
-set(SQS_SOURCES src/sqs/MessageAttribute.cpp src/sqs/SendMessageRequest.cpp src/sqs/SendMessageResponse.cpp
-        src/sqs/ListQueueResponse.cpp src/sqs/GetQueueAttributesRequest.cpp src/sqs/GetQueueAttributesResponse.cpp
+set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp src/sqs/MessageAttribute.cpp
+        src/sqs/SendMessageRequest.cpp src/sqs/SendMessageResponse.cpp src/sqs/ListQueueResponse.cpp
+        src/sqs/GetQueueAttributesRequest.cpp src/sqs/GetQueueAttributesResponse.cpp
         src/sqs/SetQueueAttributesRequest.cpp src/sqs/SetQueueAttributesResponse.cpp src/sqs/ReceiveMessageRequest.cpp
         src/sqs/ReceiveMessageResponse.cpp src/sqs/PurgeQueueRequest.cpp src/sqs/PurgeQueueResponse.cpp
         src/sqs/DeleteQueueRequest.cpp src/sqs/DeleteQueueResponse.cpp)
