@@ -2,9 +2,9 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include <awsmock/worker/LambdaMonitoring.h>
+#include <awsmock/service/LambdaMonitoring.h>
 
-namespace AwsMock::Worker {
+namespace AwsMock::Service {
 
   LambdaMonitoring::LambdaMonitoring(const Core::Configuration &configuration, Core::MetricService &metricService)
       : _logger(Poco::Logger::get("LambdaMonitoring")), _configuration(configuration), _metricService(metricService), _running(false) {
@@ -34,4 +34,4 @@ namespace AwsMock::Worker {
     _metricService.SetGauge("lambda_count_total", lambdas);
   }
 
-} // namespace AwsMock::Worker
+} // namespace AwsMock::Service

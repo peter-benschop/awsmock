@@ -2,8 +2,8 @@
 // Created by vogje01 on 06/10/2023.
 //
 
-#ifndef AWSMOCK_WORKER_S3MONITORING_H
-#define AWSMOCK_WORKER_S3MONITORING_H
+#ifndef AWSMOCK_SERVICE_S3MONITORING_H
+#define AWSMOCK_SERVICE_S3MONITORING_H
 
 // C++ standard includes
 #include <string>
@@ -32,15 +32,15 @@
 #include <awsmock/core/LogStream.h>
 #include "awsmock/core/MetricService.h"
 #include "awsmock/core/ResourceNotFoundException.h"
-#include <awsmock/repository/ServiceDatabase.h>
-#include <awsmock/repository/S3Database.h>
 #include <awsmock/dto/s3/CreateBucketConstraint.h>
 #include <awsmock/dto/s3/PutObjectRequest.h>
-#include <awsmock/worker/AbstractWorker.h>
+#include <awsmock/repository/ServiceDatabase.h>
+#include <awsmock/repository/S3Database.h>
+#include <awsmock/service/AbstractWorker.h>
 
 #define S3_MONITORING_DEFAULT_PERIOD 60000
 
-namespace AwsMock::Worker {
+namespace AwsMock::Service {
 
   class S3Monitoring : public Poco::Runnable {
 
@@ -106,4 +106,4 @@ namespace AwsMock::Worker {
 
 } // namespace AwsMock::Worker
 
-#endif //AWSMOCK_WORKER_S3MONITORING_H
+#endif // AWSMOCK_SERVICE_S3MONITORING_H

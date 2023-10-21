@@ -2,9 +2,9 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include "awsmock/worker/S3Monitoring.h"
+#include "awsmock/service/S3Monitoring.h"
 
-namespace AwsMock::Worker {
+namespace AwsMock::Service {
 
   S3Monitoring::S3Monitoring(const Core::Configuration &configuration, Core::MetricService &metricService)
       : _logger(Poco::Logger::get("S3Monitoring")), _configuration(configuration), _metricService(metricService), _running(false) {

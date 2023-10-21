@@ -46,25 +46,6 @@ namespace AwsMock::Core {
     EXPECT_EQ(result, MD5_SUM);
   }
 
-  TEST_F(CryptoTest, Md5StringOpensslTest) {
-
-    // arrange
-    unsigned char output[16];
-    auto *bytes = new unsigned char[4092];
-    memcpy(bytes, TEST_STRING, std::strlen(TEST_STRING));
-
-    // act
-    // OpenSSL (3.0.x version)
-    std::string result1 = Crypto::GetMd5FromString(std::string(reinterpret_cast<const char *>(bytes), std::strlen(TEST_STRING)));
-
-    // Old MD5 (OpenSSL 1.0.x)
-    MD5(bytes, std::strlen(TEST_STRING), output);
-    std::string result2 = Core::Crypto::HexEncode(output, 16);
-
-    // assert
-    EXPECT_STREQ(result1.c_str(), result2.c_str());
-  }
-
   TEST_F(CryptoTest, Md5FileTest) {
     // arrange
     std::string file = FileUtils::CreateTempFile("txt", TEST_STRING);

@@ -1,51 +1,114 @@
 //
-// Created by vogje01 on 04/01/2023.
+// Created by vogje01 on 03/06/2023.
 //
 
 #ifndef AWSMOCK_SERVICE_SQSSERVER_H
 #define AWSMOCK_SERVICE_SQSSERVER_H
 
+// C++ standard includes
+#include <string>
+
 // Poco includes
-#include "Poco/Logger.h"
-#include "Poco/Net/HTTPRequestHandlerFactory.h"
-#include "Poco/Net/HTTPServer.h"
+#include <Poco/Logger.h>
+#include <Poco/Runnable.h>
 
 // AwsMock includes
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/MetricService.h"
-#include "awsmock/service/SQSHandlerFactory.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/ThreadPool.h>
+#include <awsmock/repository/ServiceDatabase.h>
+#include <awsmock/repository/SQSDatabase.h>
+#include <awsmock/service/SQSMonitoring.h>
+#include <awsmock/service/SQSHandlerFactory.h>
 
 #define SQS_DEFAULT_PORT 9501
 #define SQS_DEFAULT_HOST "localhost"
+#define SQS_DEFAULT_QUEUE_LENGTH  250
+#define SQS_DEFAULT_THREADS 50
 
 namespace AwsMock::Service {
 
-    /**
-     * S3 REST service
-     */
-    class SQSServer {
+  class SQSServer : public Poco::Runnable {
 
     public:
+
       /**
        * Constructor
        *
-       * @param configuration application configuration
-       * @param metricService monitoring service
+       * @param configuration aws-mock configuration
+       * @param metricService aws-mock monitoring service
        */
       explicit SQSServer(Core::Configuration &configuration, Core::MetricService &metricService);
 
       /**
        * Destructor
        */
-      ~SQSServer();
+      ~SQSServer() override;
+
+      /**
+       * Main method
+       */
+      void run() override;
+
+    private:
 
       /**
        * Start the restfull service.
        */
-      void start();
+      void StartHttpServer();
 
-    private:
+      /**
+       * Reset messages
+       *
+       * <p>Loops over all SQS queues and sets the status to INITIAL in case the visibility timeout has been reached. Also the retry count in increased by one.</p>
+       * <p>Checks also the expiration date and removed the messages, which are older than the max retention period.</>
+       */
+      void ResetMessages();
+
+      /**
+       * Logger
+       */
+      Core::LogStream _logger;
+
+      /**
+       * Configuration
+       */
+      Core::Configuration &_configuration;
+
+      /**
+       * Metric service
+       */
+      Core::MetricService &_metricService;
+
+      /**
+       * Service database
+       */
+      std::unique_ptr<Database::ServiceDatabase> _serviceDatabase;
+
+      /**
+       * S3 service
+       */
+      std::unique_ptr<Database::SQSDatabase> _sqsDatabase;
+
+      /**
+       * Thread pool
+       */
+      AwsMock::Core::ThreadPool<SQSMonitoring> _threadPool;
+
+      /**
+       * AWS region
+       */
+      std::string _region;
+
+      /**
+       * Running flag
+       */
+      bool _running;
+
+      /**
+       * Sleeping period in ms
+       */
+      int _period;
 
       /**
        * Rest port
@@ -58,26 +121,6 @@ namespace AwsMock::Service {
       std::string _host;
 
       /**
-       * Logger
-       */
-      Core::LogStream _logger;
-
-      /**
-      * Application configuration
-      */
-      Core::Configuration &_configuration;
-
-      /**
-       * Metric service
-       */
-      Core::MetricService &_metricService;
-
-      /**
-       * HTTP server instance
-       */
-      Poco::Net::HTTPServer *_httpServer;
-
-      /**
        * HTTP max message queue length
        */
       int _maxQueueLength;
@@ -87,8 +130,13 @@ namespace AwsMock::Service {
        */
       int _maxThreads;
 
-    };
+      /**
+       * HTTP server instance
+       */
+      Poco::Net::HTTPServer *_httpServer;
+
+  };
 
 } // namespace AwsMock::Service
 
-#endif //AWSMOCK_SERVICE_SQSSERVER_H
+#endif // AWSMOCK_SERVICE_SQSSERVER_H

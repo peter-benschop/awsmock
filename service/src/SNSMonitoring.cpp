@@ -2,9 +2,9 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include <awsmock/worker/SNSMonitoring.h>
+#include <awsmock/service/SNSMonitoring.h>
 
-namespace AwsMock::Worker {
+namespace AwsMock::Service {
 
   SNSMonitoring::SNSMonitoring(const Core::Configuration &configuration, Core::MetricService &metricService)
       : _logger(Poco::Logger::get("SNSMonitoring")), _configuration(configuration), _metricService(metricService), _running(false) {

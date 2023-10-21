@@ -45,9 +45,6 @@
 #include <awsmock/service/SQSServer.h>
 #include <awsmock/service/SNSServer.h>
 #include <awsmock/service/TransferServer.h>
-#include <awsmock/worker/SNSWorker.h>
-#include <awsmock/worker/SQSWorker.h>
-#include <awsmock/worker/S3Worker.h>
 #include <awsmock/worker/LambdaWorker.h>
 #include <awsmock/worker/TransferWorker.h>
 
@@ -196,18 +193,6 @@ namespace AwsMock {
 
     void StartWorker() {
 
-      // Start the S3 worker
-      Poco::ThreadPool::defaultPool().start(_s3Worker);
-
-      // Start the SQS worker
-      Poco::ThreadPool::defaultPool().start(_sqsWorker);
-
-      // Start the SNS worker
-      Poco::ThreadPool::defaultPool().start(_snsWorker);
-
-      // Start the Lambda worker
-      Poco::ThreadPool::defaultPool().start(_lambdaWorker);
-
       // Start the Transfer worker
       Poco::ThreadPool::defaultPool().start(_transferWorker);
     }
@@ -215,16 +200,16 @@ namespace AwsMock {
     void StartServices() {
 
       // Start the S3 server
-      _s3Server.start();
+      Poco::ThreadPool::defaultPool().start(_s3Server);
 
       // Start the SQS server
-      _sqsServer.start();
+      Poco::ThreadPool::defaultPool().start(_sqsServer);
 
       // Start the SNS server
-      _snsServer.start();
+      Poco::ThreadPool::defaultPool().start(_snsServer);
 
       // Start the lambda server
-      _lambdaServer.start();
+      Poco::ThreadPool::defaultPool().start(_lambdaServer);
 
       // Start the transfer server
       _transferServer.start();
@@ -291,26 +276,6 @@ namespace AwsMock {
      * Gateway controller
      */
     RestService _restService = RestService(_configuration);
-
-    /**
-     * S3 worker
-     */
-    Worker::S3Worker _s3Worker = Worker::S3Worker(_configuration, _metricService);
-
-    /**
-     * SQS worker
-     */
-    Worker::SQSWorker _sqsWorker = Worker::SQSWorker(_configuration, _metricService);
-
-    /**
-     * SNS worker
-     */
-    Worker::SNSWorker _snsWorker = Worker::SNSWorker(_configuration, _metricService);
-
-    /**
-     * Lambda worker
-     */
-    Worker::LambdaWorker _lambdaWorker = Worker::LambdaWorker(_configuration, _metricService, _createQueue, _invokeQueue);
 
     /**
      * Transfer worker

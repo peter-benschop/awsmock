@@ -2,11 +2,11 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include <awsmock/worker/LambdaWorker.h>
+#include <awsmock/service/LambdaServer.h>
 
-namespace AwsMock::Worker {
+namespace AwsMock::Service {
 
-  LambdaWorker::LambdaWorker(const Core::Configuration &configuration,
+  LambdaServer::LambdaServer(Core::Configuration &configuration,
                              Core::MetricService &metricService,
                              Poco::NotificationQueue &createQueue,
                              Poco::NotificationQueue &invokeQueue)
@@ -37,12 +37,37 @@ namespace AwsMock::Worker {
     log_debug_stream(_logger) << "LambdaWorker initialized" << std::endl;
   }
 
-  void LambdaWorker::CleanupContainers() {
+
+  LambdaServer::~LambdaServer() {
+    if (_httpServer) {
+      _httpServer->stopAll(true);
+      delete _httpServer;
+      log_info_stream(_logger) << "Lambda rest service stopped" << std::endl;
+    }
+  }
+
+  void LambdaServer::StartHttpServer() {
+
+    // Set HTTP server parameter
+    auto *httpServerParams = new Poco::Net::HTTPServerParams();
+    httpServerParams->setMaxQueued(_maxQueueLength);
+    httpServerParams->setMaxThreads(_maxThreads);
+    log_debug_stream(_logger) << "HTTP server parameter set, maxQueue: " << _maxQueueLength << " maxThreads: " << _maxThreads << std::endl;
+
+    _httpServer =
+        new Poco::Net::HTTPServer(new LambdaRequestHandlerFactory(_configuration, _metricService, _createQueue, _invokeQueue),
+                                  Poco::Net::ServerSocket(Poco::UInt16(_port)), httpServerParams);
+
+    _httpServer->start();
+    log_info_stream(_logger) << "Lambda rest service started, endpoint: http://" << _host << ":" << _port << std::endl;
+  }
+
+  void LambdaServer::CleanupContainers() {
     _dockerService->PruneContainers();
     log_debug_stream(_logger) << "Docker containers cleaned up" << std::endl;
   }
 
-  void LambdaWorker::StartLambdaFunctions() {
+  void LambdaServer::StartLambdaFunctions() {
 
     log_debug_stream(_logger) << "Starting lambdas" << std::endl;
     std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase->ListLambdas(_region);
@@ -64,7 +89,7 @@ namespace AwsMock::Worker {
     }
   }
 
-  Dto::Lambda::Code LambdaWorker::GetCode(const Database::Entity::Lambda::Lambda &lambda) {
+  Dto::Lambda::Code LambdaServer::GetCode(const Database::Entity::Lambda::Lambda &lambda) {
 
     Dto::Lambda::Code code;
     if (Core::FileUtils::FileExists(lambda.fileName)) {
@@ -81,7 +106,7 @@ namespace AwsMock::Worker {
     return code;
   }
 
-  void LambdaWorker::run() {
+  void LambdaServer::run() {
 
     log_info_stream(_logger) << "Lambda worker started" << std::endl;
 
@@ -110,7 +135,7 @@ namespace AwsMock::Worker {
     }
   }
 
-  void LambdaWorker::SendCreateFunctionRequest(Dto::Lambda::CreateFunctionRequest &lambdaRequest, const std::string &contentType) {
+  void LambdaServer::SendCreateFunctionRequest(Dto::Lambda::CreateFunctionRequest &lambdaRequest, const std::string &contentType) {
 
     std::string url = "http://" + _lambdaServiceHost + ":" + std::to_string(_lambdaServicePort) + "/2015-03-31/functions";
     std::string body = lambdaRequest.ToJson();

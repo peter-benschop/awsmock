@@ -2,8 +2,8 @@
 // Created by vogje01 on 06/10/2023.
 //
 
-#ifndef AWSMOCK_WORKER_SNSMONITORING_H
-#define AWSMOCK_WORKER_SNSMONITORING_H
+#ifndef AWSMOCK_SERVICE_LAMBDAMONITORING_H
+#define AWSMOCK_SERVICE_LAMBDAMONITORING_H
 
 // C++ standard includes
 #include <string>
@@ -30,16 +30,17 @@
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
-#include "awsmock/core/MetricService.h"
-#include "awsmock/core/ResourceNotFoundException.h"
+#include <awsmock/core/MetricService.h>
+#include <awsmock/core/ResourceNotFoundException.h>
+#include <awsmock/core/ThreadPool.h>
 #include <awsmock/repository/ServiceDatabase.h>
-#include <awsmock/repository/SNSDatabase.h>
+#include <awsmock/repository/LambdaDatabase.h>
 
-#define SNS_MONITORING_DEFAULT_PERIOD 60000
+#define LAMBDA_MONITORING_DEFAULT_PERIOD 60000
 
-namespace AwsMock::Worker {
+namespace AwsMock::Service {
 
-  class SNSMonitoring : public Poco::Runnable {
+  class LambdaMonitoring : public Poco::Runnable {
 
     public:
 
@@ -49,7 +50,7 @@ namespace AwsMock::Worker {
      * @param configuration aws-mock configuration
      * @param metricService aws-mock monitoring
      */
-    explicit SNSMonitoring(const Core::Configuration &configuration, Core::MetricService &metricService);
+    explicit LambdaMonitoring(const Core::Configuration &configuration, Core::MetricService &metricService);
 
     /**
      * Main method
@@ -61,7 +62,7 @@ namespace AwsMock::Worker {
      *
      * @return true if thread is running
      */
-    bool GetRunning() { return _running; }
+    bool GetRunning() const { return _running; }
 
     private:
 
@@ -88,7 +89,7 @@ namespace AwsMock::Worker {
     /**
      * S3 database
      */
-    std::unique_ptr<Database::SNSDatabase> _snsDatabase;
+    std::unique_ptr<Database::LambdaDatabase> _lambdaDatabase;
 
     /**
      * S3 monitoring period in seconds
@@ -101,6 +102,6 @@ namespace AwsMock::Worker {
     bool _running;
   };
 
-} // namespace AwsMock::Worker
+} // namespace AwsMock::Service
 
-#endif // AWSMOCK_WORKER_SNSMONITORING_H
+#endif // AWSMOCK_SERVICE_LAMBDAMONITORING_H

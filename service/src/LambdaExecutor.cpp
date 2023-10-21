@@ -2,11 +2,11 @@
 // Created by root on 10/9/23.
 //
 
-#include <awsmock/worker/LambdaExecutor.h>
+#include <awsmock/service/LambdaExecutor.h>
 
-namespace AwsMock::Worker {
+namespace AwsMock::Service {
 
-  LambdaExecutor::LambdaExecutor(const Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &invokeQueue)
+  LambdaExecutor::LambdaExecutor(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &invokeQueue)
     : _logger(Poco::Logger::get("LambdaExecutor")), _configuration(configuration), _metricService(metricService), _invokeQueue(invokeQueue) {
   }
 

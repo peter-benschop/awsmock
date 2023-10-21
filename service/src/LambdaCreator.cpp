@@ -2,12 +2,11 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-//#include <awsmock/worker/LambdaCreator.h>
-#include "../../include/awsmock/worker/LambdaCreator.h"
+#include <awsmock/service/LambdaCreator.h>
 
-namespace AwsMock::Worker {
+namespace AwsMock::Service {
 
-  LambdaCreator::LambdaCreator(const Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue)
+  LambdaCreator::LambdaCreator(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue)
     : _logger(Poco::Logger::get("LambdaCreator")), _configuration(configuration), _metricService(metricService), _dockerService(configuration),
       _createQueue(createQueue) {
     _lambdaDatabase = std::make_shared<Database::LambdaDatabase>(_configuration);

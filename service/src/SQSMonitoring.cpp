@@ -2,9 +2,9 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include <awsmock/worker/SQSMonitoring.h>
+#include <awsmock/service/SQSMonitoring.h>
 
-namespace AwsMock::Worker {
+namespace AwsMock::Service {
 
   SQSMonitoring::SQSMonitoring(const Core::Configuration &configuration, Core::MetricService &metricService)
       : _logger(Poco::Logger::get("SQSMonitoring")), _configuration(configuration), _metricService(metricService), _running(false) {

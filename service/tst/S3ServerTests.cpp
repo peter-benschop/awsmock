@@ -45,7 +45,7 @@ namespace AwsMock::Service {
       _endpoint = "http://" + _host + ":" + _port;
 
       // Start HTTP server
-      _server.start();
+      Poco::ThreadPool::defaultPool().start(_server);
     }
 
     void TearDown() override {

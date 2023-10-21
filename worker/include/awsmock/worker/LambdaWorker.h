@@ -2,8 +2,8 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#ifndef AWSMOCK_WORKER_LAMBDAWORKER_H
-#define AWSMOCK_WORKER_LAMBDAWORKER_H
+#ifndef AWSMOCK_SERVER_LAMBDASERVER_H
+#define AWSMOCK_SERVER_LAMBDASERVER_H
 
 // C++ standard includes
 #include <string>
@@ -21,160 +21,188 @@
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/ServiceDatabase.h>
 #include <awsmock/service/S3Service.h>
-#include <awsmock/worker/AbstractWorker.h>
-#include <awsmock/worker/LambdaExecutor.h>
-#include <awsmock/worker/LambdaCreator.h>
-#include "awsmock/worker/LambdaExecutor.h"
-#include <awsmock/worker/LambdaMonitoring.h>
+#include <awsmock/service/AbstractWorker.h>
+#include <awsmock/service/LambdaExecutor.h>
+#include <awsmock/service/LambdaCreator.h>
+#include "awsmock/service/LambdaExecutor.h"
+#include <awsmock/service/LambdaMonitoring.h>
 
-namespace AwsMock::Worker {
+namespace AwsMock::Service {
 
-  class LambdaWorker : public Poco::Runnable, public AbstractWorker {
+  class LambdaServer : public Poco::Runnable, public AbstractWorker {
 
     public:
 
-    /**
-     * Constructor
-     *
-     * @param configuration aws-mock configuration
-     * @param metricService aws-mock monitoring
-     */
-    explicit LambdaWorker(const Core::Configuration &configuration,
-                          Core::MetricService &metricService,
-                          Poco::NotificationQueue &createQueue,
-                          Poco::NotificationQueue &invokeQueue);
+      /**
+       * Constructor
+       *
+       * @param configuration aws-mock configuration
+       * @param metricService aws-mock monitoring
+       */
+      explicit LambdaServer(const Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue, Poco::NotificationQueue &invokeQueue);
 
-    /**
-     * Main method
-     */
-    void run() override;
+      /**
+       * Destructor
+       */
+      ~LambdaServer();
+
+      /**
+       * Main method
+       */
+      void run() override;
 
     private:
 
-    /**
-     * Delete dangling, stopped containers
-     */
-    void CleanupContainers();
+      /**
+       * Start the restfull service.
+       */
+      void StartHttpServer();
 
-    /**
-     * Start all lambdas if they are not existing
-     */
-    void StartLambdaFunctions();
+      /**
+       * Delete dangling, stopped containers
+       */
+      void CleanupContainers();
 
-    /**
-     * Send a lambda create function request.
-     *
-     * @param request HTTP request
-     * @param contentType HTTP content type
-     */
-    void SendCreateFunctionRequest(Dto::Lambda::CreateFunctionRequest &request, const std::string &contentType);
+      /**
+       * Start all lambdas if they are not existing
+       */
+      void StartLambdaFunctions();
 
-    /**
-     * Returns the code from a local file.
-     *
-     * <p>The code will provided as a Base64 encoded zip file.</p>
-     *
-     * @param lambda lambda to get the code from.
-     * @return Dto::Lambda::Code
-     */
-    Dto::Lambda::Code GetCode(const Database::Entity::Lambda::Lambda &lambda);
+      /**
+       * Send a lambda create function request.
+       *
+       * @param request HTTP request
+       * @param contentType HTTP content type
+       */
+      void SendCreateFunctionRequest(Dto::Lambda::CreateFunctionRequest &request, const std::string &contentType);
 
-    /**
-     * Logger
-     */
-    Core::LogStream _logger;
+      /**
+       * Returns the code from a local file.
+       *
+       * <p>The code will provided as a Base64 encoded zip file.</p>
+       *
+       * @param lambda lambda to get the code from.
+       * @return Dto::Lambda::Code
+       */
+      Dto::Lambda::Code GetCode(const Database::Entity::Lambda::Lambda &lambda);
 
-    /**
-     * Configuration
-     */
-    const Core::Configuration &_configuration;
+      /**
+       * Logger
+       */
+      Core::LogStream _logger;
 
-    /**
-     * Metric service
-     */
-    Core::MetricService &_metricService;
+      /**
+       * Configuration
+       */
+      const Core::Configuration &_configuration;
 
-    /**
-     * Create notification queue
-     */
-    Poco::NotificationQueue &_createQueue;
+      /**
+       * Metric service
+       */
+      Core::MetricService &_metricService;
 
-    /**
-     * Invoke notification queue
-     */
-    Poco::NotificationQueue &_invokeQueue;
+      /**
+       * Create notification queue
+       */
+      Poco::NotificationQueue &_createQueue;
 
-    /**
-     * Thread pool
-     */
-    AwsMock::Core::ThreadPool<LambdaMonitoring> _threadPool;
+      /**
+       * Invoke notification queue
+       */
+      Poco::NotificationQueue &_invokeQueue;
 
-    /**
-     * Service database
-     */
-    std::unique_ptr<Database::ServiceDatabase> _serviceDatabase;
+      /**
+       * Thread pool
+       */
+      AwsMock::Core::ThreadPool<LambdaMonitoring> _threadPool;
 
-    /**
-     * Lambda database
-     */
-    std::unique_ptr<Database::LambdaDatabase> _lambdaDatabase;
+      /**
+       * Service database
+       */
+      std::unique_ptr<Database::ServiceDatabase> _serviceDatabase;
 
-    /**
-     * Lambda service
-     */
-    std::unique_ptr<Service::LambdaService> _lambdaService;
+      /**
+       * Lambda database
+       */
+      std::unique_ptr<Database::LambdaDatabase> _lambdaDatabase;
 
-    /**
-     * Docker service
-     */
-    std::unique_ptr<Service::DockerService> _dockerService;
+      /**
+       * Lambda service
+       */
+      std::unique_ptr<Service::LambdaService> _lambdaService;
 
-    /**
-     * Lambda creator
-     */
-    LambdaCreator _lambdaCreator = LambdaCreator(_configuration, _metricService, _createQueue);
+      /**
+       * Docker service
+       */
+      std::unique_ptr<Service::DockerService> _dockerService;
 
-    /**
-     * Lambda executor
-     */
-    LambdaExecutor _lambdaExecutor = LambdaExecutor(_configuration, _metricService, _invokeQueue);
+      /**
+       * Lambda creator
+       */
+      LambdaCreator _lambdaCreator = LambdaCreator(_configuration, _metricService, _createQueue);
 
-    /**
-     * Data dir
-     */
-    std::string _dataDir;
+      /**
+       * Lambda executor
+       */
+      LambdaExecutor _lambdaExecutor = LambdaExecutor(_configuration, _metricService, _invokeQueue);
 
-    /**
-     * AWS region
-     */
-    std::string _region;
+      /**
+       * Data dir
+       */
+      std::string _dataDir;
 
-    /**
-     * Running flag
-     */
-    bool _running;
+      /**
+       * AWS region
+       */
+      std::string _region;
 
-    /**
-     * Sleeping period in ms
-     */
-    int _period;
+      /**
+       * Running flag
+       */
+      bool _running;
 
-    /**
-     * Docker swarm ID
-     */
-    std::string _swarmId;
+      /**
+       * Sleeping period in ms
+       */
+      int _period;
 
-    /**
-     * Lambda service host
-     */
-    std::string _lambdaServiceHost;
+      /**
+       * HTTP server instance
+       */
+      Poco::Net::HTTPServer *_httpServer;
 
-    /**
-     * Lambda service port
-     */
-    int _lambdaServicePort;
+      /**
+       * Rest port
+       */
+      int _port;
+
+      /**
+       * Rest host
+       */
+      std::string _host;
+
+      /**
+       * HTTP max message queue length
+       */
+      int _maxQueueLength;
+
+      /**
+       * HTTP max concurrent connection
+       */
+      int _maxThreads;
+
+      /**
+       * Lambda service host
+       */
+      std::string _lambdaServiceHost;
+
+      /**
+       * Lambda service port
+       */
+      int _lambdaServicePort;
+
   };
 
-} // namespace AwsMock::Worker
+} // namespace AwsMock::Service
 
-#endif // AWSMOCK_WORKER_LAMBDAWORKER_H
+#endif // AWSMOCK_SERVER_LAMBDASERVER_H
