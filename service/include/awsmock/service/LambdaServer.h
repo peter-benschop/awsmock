@@ -23,9 +23,10 @@
 #include <awsmock/repository/ServiceDatabase.h>
 #include <awsmock/service/S3Service.h>
 #include <awsmock/service/AbstractWorker.h>
+#include <awsmock/service/AbstractServer.h>
 #include <awsmock/service/LambdaExecutor.h>
 #include <awsmock/service/LambdaCreator.h>
-#include "awsmock/service/LambdaExecutor.h"
+#include <awsmock/service/LambdaExecutor.h>
 #include <awsmock/service/LambdaMonitoring.h>
 #include <awsmock/service/LambdaHandlerFactory.h>
 
@@ -34,7 +35,7 @@
 
 namespace AwsMock::Service {
 
-  class LambdaServer : public Poco::Runnable, public AbstractWorker {
+  class LambdaServer : public AbstractServer, public AbstractWorker {
 
     public:
 
@@ -55,7 +56,7 @@ namespace AwsMock::Service {
       /**
        * Main method
        */
-      void run() override;
+      void MainLoop() override;
 
       /**
        * Stop server
@@ -228,16 +229,6 @@ namespace AwsMock::Service {
        * Lambda service port
        */
       int _lambdaServicePort;
-
-      /**
-       * Shutdown condition
-       */
-      Poco::Condition &_condition;
-
-      /**
-       * Shutdown mutex
-       */
-      Poco::Mutex _mutex;
   };
 
 } // namespace AwsMock::Service

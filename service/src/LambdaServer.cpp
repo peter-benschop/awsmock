@@ -7,8 +7,8 @@
 namespace AwsMock::Service {
 
   LambdaServer::LambdaServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue, Poco::NotificationQueue &invokeQueue, Poco::Condition &condition)
-      : AbstractWorker(configuration), _logger(Poco::Logger::get("LambdaServer")), _configuration(configuration), _metricService(metricService),
-        _createQueue(createQueue), _invokeQueue(invokeQueue), _condition(condition), _running(false) {
+      : AbstractWorker(configuration), AbstractServer(configuration, condition), _logger(Poco::Logger::get("LambdaServer")), _configuration(configuration), _metricService(metricService),
+        _createQueue(createQueue), _invokeQueue(invokeQueue), _running(false) {
 
     // Get HTTP configuration values
     _port = _configuration.getInt("awsmock.service.lambda.port", LAMBDA_DEFAULT_PORT);
@@ -43,11 +43,21 @@ namespace AwsMock::Service {
 
   LambdaServer::~LambdaServer() {
     StopServer();
+    _condition.signal();
   }
 
-  void LambdaServer::run() {
+  void LambdaServer::MainLoop() {
 
+    // Check service active
+    if (!IsActive("lambda")) {
+      log_info_stream(_logger) << "Lambda service inactive" << std::endl;
+      return;
+    }
     log_info_stream(_logger) << "Lambda worker started" << std::endl;
+
+    // Start creator/executor
+    Poco::ThreadPool::defaultPool().start(_lambdaCreator);
+    Poco::ThreadPool::defaultPool().start(_lambdaExecutor);
 
     // Start monitoring thread
     StartMonitoring();
@@ -55,17 +65,8 @@ namespace AwsMock::Service {
     // Start HTTP server
     StartHttpServer();
 
-    // Check service active
-    /*if (!_serviceDatabase->IsActive("Lambda")) {
-        return;
-    }*/
-
     // Cleanup
     CleanupContainers();
-
-    // Start creator/executor
-    Poco::ThreadPool::defaultPool().start(_lambdaCreator);
-    Poco::ThreadPool::defaultPool().start(_lambdaExecutor);
 
     // Start all lambda functions
     StartLambdaFunctions();
@@ -76,12 +77,12 @@ namespace AwsMock::Service {
       log_debug_stream(_logger) << "LambdaWorker processing started" << std::endl;
 
       // Wait for timeout or condition
-      _mutex.lock();
-      if (_condition.tryWait(_mutex, _period)) {
+      if(InterruptableSleep(_period)) {
         break;
       }
-      _mutex.unlock();
     }
+
+    // Shutdown
     StopServer();
   }
 

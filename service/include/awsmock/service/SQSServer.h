@@ -22,6 +22,7 @@
 #include <awsmock/core/ThreadPool.h>
 #include <awsmock/repository/ServiceDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
+#include <awsmock/service/AbstractServer.h>
 #include <awsmock/service/SQSMonitoring.h>
 #include <awsmock/service/SQSHandlerFactory.h>
 
@@ -32,7 +33,7 @@
 
 namespace AwsMock::Service {
 
-  class SQSServer : public Poco::Runnable {
+  class SQSServer : public AbstractServer {
 
     public:
 
@@ -53,7 +54,7 @@ namespace AwsMock::Service {
       /**
        * Main method
        */
-      void run() override;
+      void MainLoop() override;
 
       /**
        * Returns the running flag
@@ -159,16 +160,6 @@ namespace AwsMock::Service {
        * HTTP server instance
        */
       std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
-
-      /**
-       * Shutdown condition
-       */
-      Poco::Condition &_condition;
-
-      /**
-       * Shutdown mutex
-       */
-      Poco::Mutex _mutex;
   };
 
 } // namespace AwsMock::Service

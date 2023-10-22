@@ -6,7 +6,7 @@ include_directories(../include ../../core/include /usr/include /usr/include/bson
 link_directories(/usr/lib /usr/lib/x86_64-linux-gnu /usr/local/lib ../ ../../core)
 
 add_executable(${BINARY} DatabaseTests.cpp S3DatabaseTests.cpp SQSDatabaseTests.cpp SNSDatabaseTests.cpp
-        LambdaDatabaseTests.cpp TransferDatabaseTest.cpp main.cpp)
+        LambdaDatabaseTests.cpp TransferDatabaseTest.cpp ServiceDatabaseTests.cpp main.cpp)
 target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore mongocxx bsoncxx PocoUtil PocoFoundation PocoNetSSL
         PocoNet PocoJSON PocoZip PocoPrometheus gtest ${CMAKE_DL_LIBS} pthread ssl crypto z archive curl tbb)
 

@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
 
   SQSServer::SQSServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition)
-      : _logger(Poco::Logger::get("SQSServer")), _configuration(configuration), _metricService(metricService), _condition(condition), _running(false) {
+      : AbstractServer(configuration, condition), _logger(Poco::Logger::get("SQSServer")), _configuration(configuration), _metricService(metricService), _running(false) {
 
     // HTTP server configuration
     _port = _configuration.getInt("awsmock.service.sqs.port", SQS_DEFAULT_PORT);
@@ -31,14 +31,14 @@ namespace AwsMock::Service {
     _condition.signal();
   }
 
-  void SQSServer::run() {
-
-    log_info_stream(_logger) << "SQS worker started" << std::endl;
+  void SQSServer::MainLoop() {
 
     // Check service active
-//        if (!_serviceDatabase->IsActive("SQS")) {
-//            return;
-//        }
+    if (!IsActive("sqs")) {
+      log_info_stream(_logger) << "SQS service inactive" << std::endl;
+      return;
+    }
+    log_info_stream(_logger) << "SQS worker starting" << std::endl;
 
     // Start monitoring thread
     StartMonitoringServer();
@@ -55,14 +55,12 @@ namespace AwsMock::Service {
       ResetMessages();
 
       // Wait for timeout or condition
-      _mutex.lock();
-      if (_condition.tryWait(_mutex, _period)) {
+      if (InterruptableSleep(_period)) {
         break;
       }
-      _mutex.unlock();
     }
 
-    // Stop serer
+    // Shutdown
     StopServer();
   }
 
@@ -92,7 +90,7 @@ namespace AwsMock::Service {
 
   void SQSServer::StopHttpServer() {
     if (_httpServer) {
-      _httpServer->stop();
+      _httpServer->stopAll(true);
       _httpServer.reset();
       log_info_stream(_logger) << "SQS rest service stopped" << std::endl;
     }

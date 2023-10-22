@@ -38,7 +38,7 @@ namespace AwsMock::Database {
 
         // arrange
         int count = 0;
-        Poco::Data::Session session = _s3database.GetSession();
+        Poco::Data::Session session = _servicedatabase.GetSession();
 
         // act
         Poco::Data::Statement stmt(session);

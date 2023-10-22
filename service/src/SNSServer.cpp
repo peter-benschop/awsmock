@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
 
   SNSServer::SNSServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition)
-      : _logger(Poco::Logger::get("SNSServer")), _configuration(configuration), _metricService(metricService), _condition(condition), _running(false) {
+      : AbstractServer(configuration, condition), _logger(Poco::Logger::get("SNSServer")), _configuration(configuration), _metricService(metricService), _running(false) {
 
     // HTTP server configuration
     _port = _configuration.getInt("awsmock.service.sns.port", SNS_DEFAULT_PORT);
@@ -29,16 +29,19 @@ namespace AwsMock::Service {
 
   SNSServer::~SNSServer() {
     StopServer();
+    _condition.signal();
   }
 
-  void SNSServer::run() {
+  void SNSServer::MainLoop() {
+
+    // Check service active
+    if (!IsActive("sqs")) {
+      log_info_stream(_logger) << "SNS service inactive" << std::endl;
+      return;
+    }
 
     log_info_stream(_logger) << "SNS service starting" << std::endl;
 
-    // Check service active
-//        if (!_serviceDatabase->IsActive("SQS")) {
-//            return;
-//        }
     // Start monitoring thread
     StartMonitoring();
 
@@ -51,12 +54,12 @@ namespace AwsMock::Service {
       ResetMessages();
 
       // Wait for timeout or condition
-      _mutex.lock();
-      if (_condition.tryWait(_mutex, _period)) {
+      if (InterruptableSleep(_period)) {
         break;
       }
-      _mutex.unlock();
     }
+
+    // Shutdown
     StopServer();
   }
 

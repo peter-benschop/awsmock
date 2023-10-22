@@ -20,6 +20,7 @@
 #include <awsmock/core/MetricService.h>
 #include <awsmock/repository/ServiceDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
+#include <awsmock/service/AbstractServer.h>
 #include <awsmock/service/SNSMonitoring.h>
 #include <awsmock/service/SNSHandlerFactory.h>
 
@@ -30,7 +31,7 @@
 
 namespace AwsMock::Service {
 
-  class SNSServer : public Poco::Runnable {
+  class SNSServer : public AbstractServer {
 
     public:
 
@@ -51,7 +52,7 @@ namespace AwsMock::Service {
       /**
        * Main method
        */
-      void run() override;
+      void MainLoop() override;
 
       /**
        * Stop server
@@ -159,16 +160,6 @@ namespace AwsMock::Service {
        * HTTP server instance
        */
       std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
-
-      /**
-       * Shutdown condition
-       */
-      Poco::Condition &_condition;
-
-      /**
-       * Shutdown mutex
-       */
-      Poco::Mutex _mutex;
   };
 
 } // namespace AwsMock::Service

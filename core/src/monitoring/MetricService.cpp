@@ -52,12 +52,12 @@ namespace AwsMock::Core {
   }
 
   void MetricService::ShutdownServer() {
-    log_debug_stream(_logger) << "Starting MetricService shutdown" << std::endl;
-    if (_server != nullptr) {
-      _server->stop();
-    }
+    log_info_stream(_logger) << "Starting MetricService shutdown" << std::endl;
     if (_metricSystemTimer != nullptr) {
       _metricSystemTimer->stop();
+    }
+    if (_server != nullptr) {
+      _server->stop();
     }
   }
 

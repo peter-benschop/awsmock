@@ -7,7 +7,6 @@
 
 // Poco includes
 #include <Poco/Logger.h>
-#include <Poco/Condition.h>
 #include <Poco/Net/HTTPRequestHandlerFactory.h>
 #include <Poco/Net/HTTPServer.h>
 
@@ -16,8 +15,10 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/MetricService.h>
 #include <awsmock/core/ThreadPool.h>
-#include <awsmock/service/S3HandlerFactory.h>
+#include <awsmock/service/AbstractServer.h>
+#include <awsmock/service/AbstractWorker.h>
 #include <awsmock/service/S3Monitoring.h>
+#include <awsmock/service/S3HandlerFactory.h>
 
 #define S3_DEFAULT_PORT 9500
 #define S3_DEFAULT_HOST "localhost"
@@ -27,7 +28,7 @@ namespace AwsMock::Service {
   /**
    * S3 service
    */
-  class S3Server : public Poco::Runnable, public AbstractWorker {
+  class S3Server : public AbstractServer, public AbstractWorker {
 
     public:
       /**
@@ -47,7 +48,7 @@ namespace AwsMock::Service {
       /**
        * Thread main method
        */
-      void run() override;
+      void MainLoop() override;
 
       /**
        * Stop server
@@ -304,15 +305,9 @@ namespace AwsMock::Service {
       int _s3ServicePort;
 
       /**
-       * Shutdown condition
+       * Stop condition
        */
       Poco::Condition &_condition;
-
-      /**
-       * Shutdown mutex
-       */
-      Poco::Mutex _mutex;
-
   };
 
 } // namespace AwsMock::Service
