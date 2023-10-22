@@ -13,7 +13,7 @@
 
 namespace AwsMock::Core {
 
-    class TestUtils {
+  class TestUtils {
 
     public:
 
@@ -22,6 +22,6 @@ namespace AwsMock::Core {
        */
       static void CreateTestConfigurationFile();
 
-    };
+  };
 }
 #endif //AWSMOCK_CORE_TESTUTILS_H

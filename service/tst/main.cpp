@@ -13,25 +13,27 @@
 
 // Test includes
 #include <awsmock/core/TestUtils.h>
+#include <awsmock/utils/TestUtils.h>
 
 class TestEnvironment : public ::testing::Environment {
-public:
+  public:
 
-  // Initialise a test configuration.
-  void SetUp() override {
+    // Initialise a test configuration.
+    void SetUp() override {
       AwsMock::Core::TestUtils::CreateTestConfigurationFile();
-  }
+      AwsMock::Database::TestUtils::CreateServices();
+    }
 };
 
 int main(int argc, char **argv) {
 
-    // Initialize CURL
-    curl_global_init(CURL_GLOBAL_ALL);
+  // Initialize CURL
+  curl_global_init(CURL_GLOBAL_ALL);
 
-    // Run tests
-    ::testing::InitGoogleTest(&argc, argv);
-    ::testing::AddGlobalTestEnvironment(new TestEnvironment);
-    int ret = RUN_ALL_TESTS();
+  // Run tests
+  ::testing::InitGoogleTest(&argc, argv);
+  ::testing::AddGlobalTestEnvironment(new TestEnvironment);
+  int ret = RUN_ALL_TESTS();
 
-    return ret;
+  return ret;
 }

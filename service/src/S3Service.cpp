@@ -65,13 +65,13 @@ namespace AwsMock::Service {
 
     // Check existence
     if (!_database->BucketExists({.region=request.region, .name=request.bucket})) {
-      log_error_stream(_logger) << "Bucket " << request.bucket << " does not exist" << std::endl;
+      log_info_stream(_logger) << "Bucket " << request.bucket << " does not exist" << std::endl;
       throw Core::ServiceException("Bucket does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
     if (!request.key.empty()) {
       if (!_database->ObjectExists({.region=request.region, .bucket=request.bucket, .key=request.key})) {
-        log_error_stream(_logger) << "Object " << request.key << " does not exist" << std::endl;
+        log_info_stream(_logger) << "Object " << request.key << " does not exist" << std::endl;
         throw Core::ServiceException("Object does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
       }
     }

@@ -118,7 +118,7 @@ namespace AwsMock::Database::Entity::S3 {
     /**
      * Returns a boolean indicating the versioinig status
      */
-    bool IsVersioned() const;
+    [[nodiscard]] bool IsVersioned() const;
 
     /**
      * Converts the entity to a MongoDB document

@@ -11,11 +11,12 @@
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
+#include "awsmock/entity/service/Service.h"
 #include <awsmock/repository/Database.h>
 
 namespace AwsMock::Database {
 
-    class ServiceDatabase : public Database {
+  class ServiceDatabase : public Database {
 
     public:
 
@@ -34,6 +35,75 @@ namespace AwsMock::Database {
        */
       bool IsActive(const std::string &name);
 
+      /**
+       * Check existence of service
+       *
+       * @param name service name
+       * @return created service
+       */
+      bool ServiceExists(const std::string &service);
+
+      /**
+       * Returns the service by id
+       *
+       * @param oid service oid
+       * @return service, if existing
+       * @throws DatabaseException
+       */
+      Entity::Service::Service GetServiceById(const bsoncxx::oid &oid);
+
+      /**
+       * Returns the service by id
+       *
+       * @param name service name
+       * @return service, if existing
+       * @throws DatabaseException
+       */
+      Entity::Service::Service GetServiceByName(const std::string &name);
+
+      /**
+       * Creates a service
+       *
+       * @param service service entity
+       * @return created service
+       */
+      Entity::Service::Service CreateService(const Entity::Service::Service &service);
+
+      /**
+       * Uupdates a service
+       *
+       * @param service service entity
+       * @return updated service
+       */
+      Entity::Service::Service UpdateService(const Entity::Service::Service &service);
+
+      /**
+       * Creates or updates a service
+       *
+       * @param service service entity
+       * @return updated service
+       */
+      Entity::Service::Service CreateOrUpdateService(const Entity::Service::Service &service);
+
+      /**
+       * Counts the number of services
+       *
+       * @return total number of services
+       */
+      int ServiceCount();
+
+      /**
+       * Deletes service
+       *
+       * @param service service entity
+       */
+      void DeleteService(const Entity::Service::Service &service);
+
+      /**
+       * Deletes all service
+       */
+      void DeleteAllServices();
+
     private:
 
       /**
@@ -46,7 +116,7 @@ namespace AwsMock::Database {
        */
       mongocxx::collection _serviceCollection{};
 
-    };
+  };
 
 } // namespace AwsMock::Database
 

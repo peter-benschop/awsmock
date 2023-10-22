@@ -80,6 +80,7 @@ namespace AwsMock {
         InitializeErrorHandler();
         InitializeIndexes();
         InitializeCurl();
+        InitializeServices();
         log_info_stream(_logger) << "Starting " << Configuration::GetAppName() << " " << Configuration::GetVersion() << " pid: " << getpid() << " loglevel: "
                                  << _configuration.GetLogLevel() << std::endl;
         log_info_stream(_logger) << "Configuration file: " << _configuration.GetFilename() << std::endl;
@@ -190,6 +191,13 @@ namespace AwsMock {
         curl_global_init(CURL_GLOBAL_ALL);
         log_debug_stream(_logger) << "Curl library initialized" << std::endl;
 
+      }
+
+      void InitializeServices() {
+        for (const auto &it : _services) {
+          bool status = _configuration.getBool("awsmock.service." + it + ".active", false);
+          _serviceDatabase.CreateOrUpdateService({.oid={}, .name=it, .status=(status ? Database::Entity::Service::ServiceStatus::RUNNING : Database::Entity::Service::ServiceStatus::STOPPED)});
+        }
       }
 
       void StartServices() {
@@ -309,6 +317,16 @@ namespace AwsMock {
        * Database
        */
       Database::Database _database = Database::Database(_configuration);
+
+      /**
+       * Service database
+       */
+      Database::ServiceDatabase _serviceDatabase = Database::ServiceDatabase(_configuration);
+
+      /**
+       * Service names
+       */
+       std::vector<std::string> _services = {"s3", "sqs", "sns", "lambda", "transfer"};
   };
 
 } // namespace AwsMock

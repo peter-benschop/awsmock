@@ -16,7 +16,7 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif ()
 set(CMAKE_INSTALL_PREFIX "/usr" CACHE STRING " " FORCE)
-message("Building ${PROJECT_NAME} v${${PROJECT_NAME}_VERSION_STRING} type: ${CMAKE_BUILD_TYPE}, install prefix: ${CMAKE_INSTALL_PREFIX}")
+message("Building ${PROJECT_NAME} ${${PROJECT_NAME}_VERSION_STRING} type: ${CMAKE_BUILD_TYPE}, install prefix: ${CMAKE_INSTALL_PREFIX}")
 
 # Doxygen
 set(doxyfile ${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile)

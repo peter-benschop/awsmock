@@ -12,7 +12,7 @@ set(FTP_SOURCES src/ftpserver/Filesystem.cpp src/ftpserver/FtpSession.cpp src/ft
         src/ftpserver/FtpServerImpl.cpp src/ftpserver/UserDatabase.cpp)
 set(DOCKER_SOURCES src/DockerService.cpp)
 
-set(SOURCES src/AbstractHandler.cpp src/AbstractWorker.cpp ${S3_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${TRANSFER_SOURCES}
+set(SOURCES src/AbstractHandler.cpp src/AbstractWorker.cpp src/AbstractServer.cpp ${S3_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${TRANSFER_SOURCES}
         ${FTP_SOURCES} ${LAMBDA_SOURCES} ${DOCKER_SOURCES})
 
 # Test directory
