@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# Lambda function
+# lambda function
 #
 function lambda_exists {
   awsmock lambda list-functions | grep arn | grep $1 | wc -l

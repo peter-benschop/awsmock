@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/dist/etc/")
 set(VERSION_UPDATE_FROM_GIT TRUE)
 include(GetVersionFromGitTag)
-configure_file (core/include/awsmock/core/Version.h.in core/include/awsmock/core/Version.h)
+configure_file (src/core/include/awsmock/core/Version.h.in src/core/include/awsmock/core/Version.h)
 
 # Set root install directory
 if (NOT CMAKE_BUILD_TYPE)
@@ -26,12 +26,12 @@ option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation 
 # Testing
 enable_testing()
 
-add_subdirectory(core)
-add_subdirectory(dto)
-add_subdirectory(db)
-add_subdirectory(service)
-#add_subdirectory(worker)
-add_subdirectory(awsmock)
+add_subdirectory(src/core)
+add_subdirectory(src/dto)
+add_subdirectory(src/db)
+add_subdirectory(src/service)
+add_subdirectory(src/gateway)
+add_subdirectory(src/controller)
 
 if (BUILD_DOCUMENTATION)
     if (NOT DOXYGEN_FOUND)
