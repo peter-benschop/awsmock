@@ -24,7 +24,8 @@ services:
     networks:
       - "local"
     ports:
-      - "80:80"
+      - "4566:4566"
+      - "4567:4567"
       - "8081:8081"
       - "27017:27017"
 #    environment:
