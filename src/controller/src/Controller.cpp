@@ -10,8 +10,8 @@ namespace AwsMock::Controller {
 
     // Initialize database
     _serviceDatabase = std::make_unique<Database::ModuleDatabase>(_configuration);
-    _host= configuration.getString("awsmock.manager.host", AWSMOCKCTL_DEFAULT_HOST);
-    _port= configuration.getInt("awsmock.manager.port", AWSMOCKCTL_DEFAULT_PORT);
+    _host = configuration.getString("awsmock.manager.host", AWSMOCKCTL_DEFAULT_HOST);
+    _port = configuration.getInt("awsmock.manager.port", AWSMOCKCTL_DEFAULT_PORT);
     _baseUrl = "http://" + _host + ":" + std::to_string(_port);
   }
 
@@ -36,11 +36,17 @@ namespace AwsMock::Controller {
     AddAuthorization(headers);
     Core::CurlResponse response = _curlUtils.SendHttpRequest("PUT", _baseUrl + "/" + name + "/start", headers);
 
-    Dto::Module::Module module = Dto::Module::Module::FromJson(response.output);
-    if (response.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
-      std::cout << "Module " << module.name << "(" << module.port << ")" << " started" << std::endl;
+    if (name == "all") {
+
+      std::cout << "All modules started" << std::endl;
+
     } else {
-      std::cout << "Module " << name << " could not be started: " << response.output << std::endl;
+      Dto::Module::Module module = Dto::Module::Module::FromJson(response.output);
+      if (response.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
+        std::cout << "Module " << module.name << "(" << module.port << ")" << " started" << std::endl;
+      } else {
+        std::cout << "Module " << name << " could not be started: " << response.output << std::endl;
+      }
     }
   }
 
@@ -50,11 +56,17 @@ namespace AwsMock::Controller {
     AddAuthorization(headers);
     Core::CurlResponse response = _curlUtils.SendHttpRequest("PUT", _baseUrl + "/" + name + "/stop", headers);
 
-    Dto::Module::Module module = Dto::Module::Module::FromJson(response.output);
-    if (response.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
-      std::cout << "Module " << module.name << "(" << module.port << ")" << " stopped" << std::endl;
+    if (name == "all") {
+
+      std::cout << "All modules stopped" << std::endl;
+
     } else {
-      std::cout << "Module " << name << " could not be stopped: " << response.output << std::endl;
+      Dto::Module::Module module = Dto::Module::Module::FromJson(response.output);
+      if (response.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
+        std::cout << "Module " << module.name << "(" << module.port << ")" << " stopped" << std::endl;
+      } else {
+        std::cout << "Module " << name << " could not be stopped: " << response.output << std::endl;
+      }
     }
   }
 

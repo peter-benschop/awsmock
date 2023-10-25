@@ -213,6 +213,7 @@ namespace AwsMock {
             Poco::ThreadPool::defaultPool().start(*_gatewayServer);
             _serverMap[module.name] = _gatewayServer;
           }
+          log_debug_stream(_logger) << "Module " << module.name << " started" << std::endl;
         }
       }
 
@@ -250,6 +251,7 @@ namespace AwsMock {
               auto* gatewayServer = (Service::GatewayServer*)_serverMap[module.name];
               gatewayServer->StopServer();
             }
+            log_debug_stream(_logger) << "Module " << module.name << " stopped" << std::endl;
           }
         }
       }

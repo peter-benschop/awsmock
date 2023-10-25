@@ -9,13 +9,16 @@ namespace AwsMock::Dto::Lambda {
   std::string ListFunctionResponse::ToJson() {
 
     for (auto &lambda : lambdaList) {
-      functions.push_back({
-                              .codeSha256=lambda.codeSha256,
-                              .codeSize=lambda.memorySize,
-                              .functionArn=lambda.arn,
-                              .functionName=lambda.function,
-                              .handler=lambda.handler,
-                              .lastModified=lambda.modified});
+      Function function ={
+          .codeSha256=lambda.codeSha256,
+          .codeSize=lambda.memorySize,
+          .functionArn=lambda.arn,
+          .functionName=lambda.function,
+          .handler=lambda.handler,
+          .lastModified=lambda.modified
+      };
+      function.environment.variables=lambda.environment.variables;
+      functions.push_back(function);
     }
 
     try {

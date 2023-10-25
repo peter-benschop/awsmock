@@ -6,13 +6,13 @@
 
 namespace AwsMock::Database::Entity::Lambda {
 
-    void Environment::FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult) {
+  void Environment::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
-        auto varDoc = mResult.value()["variables"].get_array();
-        for (auto &v : varDoc.value) {
-            for (auto &it : v.get_document().value) {
-                variables.emplace_back(it.key(), it.get_string().value);
-            }
-        }
+    auto varDoc = mResult.value()["variables"].get_array();
+    for (auto &v : varDoc.value) {
+      for (auto &it : v.get_document().value) {
+        variables[std::string{it.key()}] = it.get_string().value;
+      }
     }
+  }
 }

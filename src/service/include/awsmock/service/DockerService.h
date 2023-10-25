@@ -43,12 +43,12 @@
 
 namespace AwsMock::Service {
 
-    /**
-     * The DockerService controls the connection to the docker daemon.
-     *
-     * <p>All docker related commands will be executed by the different methods.</p>
-     */
-    class DockerService {
+  /**
+   * The DockerService controls the connection to the docker daemon.
+   *
+   * <p>All docker related commands will be executed by the different methods.</p>
+   */
+  class DockerService {
 
     public:
 
@@ -102,7 +102,7 @@ namespace AwsMock::Service {
                              const std::string &tag,
                              const std::string &handler,
                              const std::string &runtime,
-                             const std::vector<std::pair<std::string, std::string>> &environment);
+                             const std::map<std::string, std::string> &environment);
 
       /**
        * Delete an image by name/tags.
@@ -213,8 +213,7 @@ namespace AwsMock::Service {
        * @param environment runtime environment
        * @return return docker file path
        */
-      std::string WriteDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime,
-                                  const std::vector<std::pair<std::string, std::string>> &environment);
+      std::string WriteDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment);
 
       /**
        * Write the compressed docker imagefile.
@@ -259,7 +258,7 @@ namespace AwsMock::Service {
        * Docker internal network name
        */
       std::string _containerPort;
-    };
+  };
 
 } //namespace AwsMock::Service
 

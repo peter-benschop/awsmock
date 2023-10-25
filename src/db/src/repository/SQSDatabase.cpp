@@ -17,8 +17,7 @@ namespace AwsMock::Database {
     _messageCollection = GetConnection()["sqs_message"];
 
     // Get end point
-    _endpoint = configuration.getString("awsmock.rest.host", "localhost") + ":" +
-        configuration.getString("awsmock.rest.port", "4567");
+    _endpoint = configuration.getString("awsmock.rest.host", "localhost") + ":" + configuration.getString("awsmock.rest.port", "4567");
   }
 
   bool SQSDatabase::QueueUrlExists(const std::string &region, const std::string &queueUrl) {
@@ -231,8 +230,7 @@ namespace AwsMock::Database {
                                                                                 result.receiptHandle))),
                                                   kvp("$inc", make_document(kvp("retries", 1)))));
     }
-    log_debug_stream(_logger) << "Messages received, region: " << region << " queue: " << queueUrl + " count: "
-                              << messageList.size() << std::endl;
+    log_debug_stream(_logger) << "Messages received, region: " << region << " queue: " << queueUrl + " count: " << messageList.size() << std::endl;
   }
 
   void SQSDatabase::ResetMessages(const std::string &queueUrl, long visibility) {
@@ -245,8 +243,7 @@ namespace AwsMock::Database {
                                                  make_document(kvp("$set", make_document(
                                                      kvp("status", Entity::SQS::INITIAL),
                                                      kvp("receiptHandle", "")))));
-    log_debug_stream(_logger) << "Message reset, visibility: " << visibility << " updated: "
-                              << result->upserted_count() << std::endl;
+    log_debug_stream(_logger) << "Message reset, visibility: " << visibility << " updated: " << result->upserted_count() << " queue: " << queueUrl << std::endl;
   }
 
   void SQSDatabase::RedriveMessages(const std::string &queueUrl, const Entity::SQS::RedrivePolicy &redrivePolicy) {
@@ -261,8 +258,7 @@ namespace AwsMock::Database {
                                                                                              redrivePolicy.deadLetterTargetArn),
                                                                                          kvp("queueUrl",
                                                                                              dlqQueueUrl)))));
-    log_debug_stream(_logger) << "Message redrive, arn: " << redrivePolicy.deadLetterTargetArn << " updated: "
-                              << result->modified_count() << std::endl;
+    log_debug_stream(_logger) << "Message redrive, arn: " << redrivePolicy.deadLetterTargetArn << " updated: " << result->modified_count() << " queue: " << queueUrl << std::endl;
   }
 
   long SQSDatabase::CountMessages(const std::string &region, const std::string &queueUrl) {

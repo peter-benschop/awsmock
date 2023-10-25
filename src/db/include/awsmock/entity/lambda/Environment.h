@@ -7,8 +7,8 @@
 
 // C++ includes
 #include <string>
-#include <vector>
 #include <sstream>
+#include <map>
 
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
@@ -22,7 +22,7 @@ namespace AwsMock::Database::Entity::Lambda {
       /**
        * Variables
        */
-      std::vector <std::pair<std::string, std::string>> variables;
+      std::map<std::string, std::string> variables;
 
       /**
        * Converts the MongoDB document to an entity

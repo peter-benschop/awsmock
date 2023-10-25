@@ -19,7 +19,7 @@ namespace AwsMock::FtpServer {
 
     // Bucket
     _bucket = _configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
-    _baseDir = _configuration.getString("awsmock.worker.transfer.base.dir", DEFAULT_BASE_DIR);
+    _baseDir = _configuration.getString("awsmock.service.transfer.base.dir", DEFAULT_BASE_DIR);
   }
 
   FtpSession::~FtpSession() {
@@ -44,6 +44,7 @@ namespace AwsMock::FtpServer {
   void FtpSession::sendFtpMessage(const FtpMessage &message) {
     sendRawFtpMessage(message.str());
   }
+
   void FtpSession::sendFtpMessage(FtpReplyCode code, const std::string &message) {
     sendFtpMessage(FtpMessage(code, message));
   }

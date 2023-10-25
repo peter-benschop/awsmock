@@ -10,10 +10,13 @@ namespace AwsMock::Service {
     : _logger(Poco::Logger::get("LambdaCreator")), _configuration(configuration), _metricService(metricService), _dockerService(configuration),
       _createQueue(createQueue) {
     _lambdaDatabase = std::make_shared<Database::LambdaDatabase>(_configuration);
+
+    _dataDir = _configuration.getString("awsmock.data.dir", "/tmp/awsmock/data");
+    _tempDir = _dataDir + Poco::Path::separator() + "tmp";
   }
 
   void LambdaCreator::run() {
-    log_debug_stream(_logger) << "lambda create notification received, queueSize:" << _createQueue.size() << std::endl;
+    log_debug_stream(_logger) << "Lambda create notification received, queueSize:" << _createQueue.size() << std::endl;
     Poco::AutoPtr<Poco::Notification> pNf(_createQueue.waitDequeueNotification());
     while (pNf) {
       auto *pWorkNf = dynamic_cast<Dto::Lambda::CreateNotification *>(pNf.get());
@@ -64,7 +67,7 @@ namespace AwsMock::Service {
     lambdaEntity.stateReason = "Activated";
     _lambdaDatabase->UpdateLambda(lambdaEntity);
 
-    log_debug_stream(logger) << "lambda function started: " << lambdaEntity.function << ":" << dockerTag << std::endl;
+    log_debug_stream(logger) << "Lambda function started: " << lambdaEntity.function << ":" << dockerTag << std::endl;
   }
 
   void LambdaCreator::CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {
@@ -76,7 +79,7 @@ namespace AwsMock::Service {
 
     // Unzip provided zip-file into a temporary directory
     std::string codeDir = UnpackZipFile(zipFile, lambdaEntity.runtime, lambdaEntity.fileName);
-    log_debug_stream(_logger) << "lambda file unzipped, codeDir: " << codeDir << std::endl;
+    log_debug_stream(_logger) << "Lambda file unzipped, codeDir: " << codeDir << std::endl;
 
     // Build the docker image using the docker service
     std::string imageFile =
@@ -101,7 +104,7 @@ namespace AwsMock::Service {
       std::vector<std::string> environment = GetEnvironment(lambdaEntity.environment);
       Dto::Docker::CreateContainerResponse
           containerCreateResponse = _dockerService.CreateContainer(lambdaEntity.function, dockerTag, environment, lambdaEntity.hostPort);
-      log_debug_stream(_logger) << "lambda container created, hostPort: " << lambdaEntity.hostPort << std::endl;
+      log_debug_stream(_logger) << "Lambda container created, hostPort: " << lambdaEntity.hostPort << std::endl;
     } catch (std::exception &exc) {
       log_error_stream(_logger) << exc.what() << std::endl;
     }
@@ -118,9 +121,6 @@ namespace AwsMock::Service {
     }
 
     std::string decodedZipFile = Core::Crypto::Base64Decode(zipFile);
-
-    _dataDir = _configuration.getString("awsmock.data.dir", "/home/awsmock/data");
-    _tempDir = _dataDir + Poco::Path::separator() + "tmp";
 
     // Create directory
     std::string codeDir = Core::DirUtils::CreateTempDir(_tempDir);

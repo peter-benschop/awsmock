@@ -7,6 +7,7 @@ namespace AwsMock {
       : AbstractResource(), _logger(Poco::Logger::get("TransferHandler")), _configuration(configuration), _metricService(metricService), _serverMap(serverMap) {
 
     _serviceDatabase = std::make_shared<Database::ModuleDatabase>(_configuration);
+    _moduleService = std::make_shared<Service::ModuleService>(_configuration, _serverMap);
   }
 
   void ModuleHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]] const std::string &region, [[maybe_unused]] const std::string &user) {
@@ -32,34 +33,15 @@ namespace AwsMock {
       log_info_stream(_logger) << "Module: " << name << " action: " << action << std::endl;
 
       if (action == "start") {
+        if(name == "all") {
 
-        // Set status
-        Database::Entity::Module::Module module = _serviceDatabase->GetModuleByName(name);
-        if (module.status == Database::Entity::Module::ModuleStatus::RUNNING) {
+          _moduleService->StartAllServices();
 
-          throw Core::ServiceException("Module " + name + " already running", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+          // Send response
+          SendOkResponse(response, {});
 
         } else {
-
-          // Set status
-          _serviceDatabase->SetStatus(name, Database::Entity::Module::ModuleStatus::RUNNING);
-
-          if (module.name == "s3") {
-            Service::S3Server* s3server = (Service::S3Server*)_serverMap[module.name];
-            Poco::ThreadPool::defaultPool().start(*s3server);
-          } else if (module.name == "sqs") {
-            Service::SQSServer* sqsServer = (Service::SQSServer*)_serverMap[module.name];
-            Poco::ThreadPool::defaultPool().start(*sqsServer);
-          } else if (module.name == "sns") {
-            Service::SNSServer* snsServer = (Service::SNSServer*)_serverMap[module.name];
-            Poco::ThreadPool::defaultPool().start(*snsServer);
-          } else if (module.name == "lambda") {
-            Service::LambdaServer* lambdaServer = (Service::LambdaServer*)_serverMap[module.name];
-            Poco::ThreadPool::defaultPool().start(*lambdaServer);
-          } else if (module.name == "transfer") {
-            Service::TransferServer* transferServer = (Service::TransferServer*)_serverMap[module.name];
-            Poco::ThreadPool::defaultPool().start(*transferServer);
-          }
+          Database::Entity::Module::Module module = _moduleService->StartService(name);
 
           // Send response
           std::string body = Dto::Module::Module::ToJson(module);
@@ -68,24 +50,17 @@ namespace AwsMock {
 
       } else if (action == "stop") {
 
-        // Set status
-        Database::Entity::Module::Module module = _serviceDatabase->GetModuleByName(name);
-        if (module.status != Database::Entity::Module::ModuleStatus::RUNNING) {
+        if(name == "all") {
 
-          throw Core::ServiceException("Module " + name + " not running", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+          _moduleService->StopAllServices();
+
+          // Send response
+          SendOkResponse(response, {});
 
         } else {
 
-          // Set status
-          _serviceDatabase->SetStatus(name, Database::Entity::Module::ModuleStatus::STOPPED);
-
-          // Stop service
-          for (const auto &server : _serverMap) {
-            if (name == server.first) {
-              server.second->StopServer();
-              log_info_stream(_logger) << "Module " << name << " stopped" << std::endl;
-            }
-          }
+          // Stop single module
+          Database::Entity::Module::Module module = _moduleService->StopService(name);
 
           // Send response
           std::string body = Dto::Module::Module::ToJson(module);

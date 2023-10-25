@@ -16,8 +16,8 @@ namespace AwsMock::Service {
     _maxThreads = _configuration.getInt("awsmock.service.transfer.max.threads", TRANSFER_DEFAULT_THREADS);
 
     // Sleeping period
-    _period = _configuration.getInt("awsmock.worker.transfer.period", 10000);
-    log_debug_stream(_logger) << "Transfer manager worker period: " << _period << std::endl;
+    _period = _configuration.getInt("awsmock.service.transfer.period", 10000);
+    log_debug_stream(_logger) << "Transfer manager service period: " << _period << std::endl;
 
     // Create environment
     _region = _configuration.getString("awsmock.region");
@@ -25,7 +25,7 @@ namespace AwsMock::Service {
 
     // Bucket
     _bucket = _configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
-    _baseDir = _configuration.getString("awsmock.worker.transfer.base.dir", DEFAULT_BASE_DIR);
+    _baseDir = _configuration.getString("awsmock.service.transfer.base.dir", DEFAULT_BASE_DIR);
 
     // S3 service connection
     _s3ServiceHost = _configuration.getString("awsmock.service.s3.host", "localhost");

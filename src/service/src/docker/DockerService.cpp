@@ -26,7 +26,7 @@ namespace AwsMock::Service {
     if (curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
 
       Dto::Docker::ListImageResponse response(curlResponse.output);
-      log_debug_stream(_logger) << "Docker image found, name: " << name << ":" << tag << (response.imageList.empty() ? "true" : "false") << std::endl;
+      log_debug_stream(_logger) << "Docker image found, name: " << name << ":" << tag << " exists: " << (response.imageList.empty() ? "false" : "true") << std::endl;
       return !response.imageList.empty();
     }
     return false;
@@ -70,7 +70,7 @@ namespace AwsMock::Service {
     return {};
   }
 
-  std::string DockerService::BuildImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler, const std::string &runtime, const std::vector<std::pair<std::string, std::string>> &environment) {
+  std::string DockerService::BuildImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) {
     log_debug_stream(_logger) << "Build image request, name: " << name << " tags: " << tag << " runtime: " << runtime << std::endl;
 
     std::string dockerFile = WriteDockerFile(codeDir, handler, runtime, environment);
@@ -192,7 +192,7 @@ namespace AwsMock::Service {
 
   void DockerService::StartDockerContainer(const std::string &id) {
 
-    Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketRequest("POST", "http://localhost/containers/" + id + "/StartServer");
+    Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketRequest("POST", "http://localhost/containers/" + id + "/start");
     log_debug_stream(_logger) << "Sending StartServer container request" << std::endl;
     log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
@@ -257,7 +257,7 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Prune containers, count: " << response.containersDeleted.size() << " spaceReclaimed: " << response.spaceReclaimed << std::endl;
   }
 
-  std::string DockerService::WriteDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::vector<std::pair<std::string, std::string>> &environment) {
+  std::string DockerService::WriteDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) {
 
     std::string dockerFilename = codeDir + Poco::Path::separator() + "Dockerfile";
 

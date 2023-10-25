@@ -21,7 +21,7 @@ namespace AwsMock::Core {
   }
 
   std::string DirUtils::CreateTempDir(const std::string &parent) {
-    Poco::File tempDir = Poco::File(parent + GetTempDir());
+    Poco::File tempDir = Poco::File(parent + Poco::Path::separator() + Poco::replace(Poco::toLower(Poco::UUIDGenerator().createRandom().toString()), "-", ""));
     tempDir.createDirectories();
     return tempDir.path();
   }

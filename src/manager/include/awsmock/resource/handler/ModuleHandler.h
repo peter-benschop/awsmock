@@ -21,6 +21,7 @@
 #include <awsmock/core/MetricDefinition.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/module/Module.h>
+#include <awsmock/service/ModuleService.h>
 #include <awsmock/service/S3Server.h>
 #include <awsmock/service/SQSServer.h>
 #include <awsmock/service/SNSServer.h>
@@ -142,6 +143,11 @@ namespace AwsMock {
        * Module database
        */
       std::shared_ptr<Database::ModuleDatabase> _serviceDatabase;
+
+      /**
+       * Module service
+       */
+      std::shared_ptr<Service::ModuleService> _moduleService;
   };
 
 } // namespace AwsMock
