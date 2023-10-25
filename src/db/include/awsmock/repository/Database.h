@@ -41,7 +41,7 @@ namespace AwsMock::Database {
       /**
        * Check all indexes.
        *
-       * <p>Normally done during server start.</p>
+       * <p>Normally done during manager StartServer.</p>
        */
       void CreateIndexes();
 

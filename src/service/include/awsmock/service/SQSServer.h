@@ -20,7 +20,7 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/ThreadPool.h>
-#include <awsmock/repository/ServiceDatabase.h>
+#include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/AbstractServer.h>
 #include <awsmock/service/SQSMonitoring.h>
@@ -42,9 +42,8 @@ namespace AwsMock::Service {
        *
        * @param configuration aws-mock configuration
        * @param metricService aws-mock monitoring service
-       * @param condition stop condition
        */
-      explicit SQSServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
+      explicit SQSServer(Core::Configuration &configuration, Core::MetricService &metricService);
 
       /**
        * Destructor
@@ -57,14 +56,9 @@ namespace AwsMock::Service {
       void MainLoop() override;
 
       /**
-       * Returns the running flag
+       * Stop the monitoring service.
        */
-      bool IsRunning() const { return _running; }
-
-      /**
-       * Stop server
-       */
-      void StopServer();
+      void StopMonitoringServer();
 
     private:
 
@@ -72,16 +66,6 @@ namespace AwsMock::Service {
        * Start the monitoring service.
        */
       void StartMonitoringServer();
-
-      /**
-       * Start the restfull service.
-       */
-      void StartHttpServer();
-
-      /**
-       * Stops the restfull service.
-       */
-      void StopHttpServer();
 
       /**
        * Reset messages
@@ -109,7 +93,7 @@ namespace AwsMock::Service {
       /**
        * Service database
        */
-      std::unique_ptr<Database::ServiceDatabase> _serviceDatabase;
+      std::unique_ptr<Database::ModuleDatabase> _serviceDatabase;
 
       /**
        * S3 service
@@ -155,11 +139,6 @@ namespace AwsMock::Service {
        * HTTP max concurrent connections
        */
       int _maxThreads;
-
-      /**
-       * HTTP server instance
-       */
-      std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
   };
 
 } // namespace AwsMock::Service

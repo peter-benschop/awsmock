@@ -19,10 +19,13 @@
 #include <Poco/DateTime.h>
 #include <Poco/DateTimeFormat.h>
 #include <Poco/DateTimeFormatter.h>
+#include <Poco/FileChannel.h>
+
+#define LOG_PATTERN "%d-%m-%Y %H:%M:%S.%i [%q] %I %s:%u - %t"
 
 namespace AwsMock::Core {
 
-    class LogStreamBuf : public Poco::UnbufferedStreamBuf
+  class LogStreamBuf : public Poco::UnbufferedStreamBuf
       /// This class implements a streambuf interface
       /// to a Logger.
       ///
@@ -30,7 +33,7 @@ namespace AwsMock::Core {
       /// to a string. As soon as a CR or LF (std::endl) is written,
       /// the string is sent to the Logger, with the set
       /// priority.
-    {
+  {
     public:
       LogStreamBuf(Poco::Logger &logger, Poco::Message::Priority priority, std::size_t bufferCapacity = 0);
       /// Creates the LogStream.
@@ -47,7 +50,7 @@ namespace AwsMock::Core {
       void setChannel(const Poco::Channel::Ptr &channel);
       /// Sets the log channel
 
-      void setFile(const char* file);
+      void setFile(const char *file);
       /// Sets the file for log messages.
 
       void setLine(int line);
@@ -76,16 +79,16 @@ namespace AwsMock::Core {
       Poco::Logger &_logger;
       Poco::Message::Priority _priority;
       std::string _message;
-      const char* _file;
+      const char *_file;
       int _line = 0;
-    };
+  };
 
-    class Foundation_API LogIOS : public virtual std::ios
+  class Foundation_API LogIOS : public virtual std::ios
       /// The base class for LogStream.
       ///
       /// This class is needed to ensure the correct initialization
       /// order of the stream buffer and base classes.
-    {
+  {
     public:
       LogIOS(Poco::Logger &logger, Poco::Message::Priority priority, std::size_t bufferCapacity = 0);
       ~LogIOS() override;
@@ -93,9 +96,9 @@ namespace AwsMock::Core {
 
     protected:
       LogStreamBuf _buf;
-    };
+  };
 
-    class Foundation_API LogStream : public LogIOS, public std::ostream
+  class Foundation_API LogStream : public LogIOS, public std::ostream
       /// This class implements an ostream interface
       /// to a Logger.
       ///
@@ -108,7 +111,7 @@ namespace AwsMock::Core {
       ///     LogStream ls(someLogger);
       ///     ls << "Some informational message" << std::endl;
       ///     ls.error() << "Some error message" << std::endl;
-    {
+  {
     public:
       static const std::size_t DEFAULT_BUFFER_CAPACITY = 9092;
 
@@ -121,10 +124,16 @@ namespace AwsMock::Core {
       /**
        * Priority strings
        */
-      static const std::string priorities [] ;
+      static const std::string priorities[];
 
       void setChannel(Poco::Channel::Ptr channel);
       /// Sets the log channel
+
+      static void setFileChannel(const std::string &filename);
+      /// Sets the file channel for the root logger
+
+      static void setConsoleChannel();
+      /// Sets the standard console log channel for root logger
 
       LogStream &level(const std::string &level);
       /// Sets the logging level
@@ -132,7 +141,7 @@ namespace AwsMock::Core {
       LogStream &fatal();
       /// Sets the priority for log messages to Message::PRIO_FATAL.
 
-      LogStream &fatal(const char* file, int line);
+      LogStream &fatal(const char *file, int line);
       /// Sets the priority for log messages to Message::PRIO_FATAL and file and line attributes.
 
       LogStream &fatal(const std::string &message);
@@ -142,7 +151,7 @@ namespace AwsMock::Core {
       LogStream &critical();
       /// Sets the priority for log messages to Message::PRIO_CRITICAL.
 
-      LogStream &critical(const char* file, int line);
+      LogStream &critical(const char *file, int line);
       /// Sets the priority for log messages to Message::PRIO_CRITICAL and file and line attributes.
 
       LogStream &critical(const std::string &message);
@@ -152,7 +161,7 @@ namespace AwsMock::Core {
       LogStream &error();
       /// Sets the priority for log messages to Message::PRIO_ERROR.
 
-      LogStream &error(const char* file, int line);
+      LogStream &error(const char *file, int line);
       /// Sets the priority for log messages to Message::PRIO_ERROR and file and line attributes.
 
       LogStream &error(const std::string &message);
@@ -162,7 +171,7 @@ namespace AwsMock::Core {
       LogStream &warning();
       /// Sets the priority for log messages to Message::PRIO_WARNING.
 
-      LogStream &warning(const char* file, int line);
+      LogStream &warning(const char *file, int line);
       /// Sets the priority for log messages to Message::PRIO_WARNING and file and line attributes.
 
       LogStream &warning(const std::string &message);
@@ -172,7 +181,7 @@ namespace AwsMock::Core {
       LogStream &notice();
       /// Sets the priority for log messages to Message::PRIO_NOTICE.
 
-      LogStream &notice(const char* file, int line);
+      LogStream &notice(const char *file, int line);
       /// Sets the priority for log messages to Message::PRIO_NOTICE and file and line attributes.
 
       LogStream &notice(const std::string &message);
@@ -182,7 +191,7 @@ namespace AwsMock::Core {
       LogStream &information();
       /// Sets the priority for log messages to Message::PRIO_INFORMATION.
 
-      LogStream &information(const char* file, int line);
+      LogStream &information(const char *file, int line);
       /// Sets the priority for log messages to Message::PRIO_INFORMATION and file and line attributes.
 
       LogStream &information(const std::string &message);
@@ -192,7 +201,7 @@ namespace AwsMock::Core {
       LogStream &debug();
       /// Sets the priority for log messages to Message::PRIO_DEBUG.
 
-      LogStream &debug(const char* file, int line);
+      LogStream &debug(const char *file, int line);
       /// Sets the priority for log messages to Message::PRIO_DEBUG and file and line attributes.
 
       LogStream &debug(const std::string &message);
@@ -202,7 +211,7 @@ namespace AwsMock::Core {
       LogStream &trace();
       /// Sets the priority for log messages to Message::PRIO_TRACE.
 
-      LogStream &trace(const char* file, int line);
+      LogStream &trace(const char *file, int line);
       /// Sets the priority for log messages to Message::PRIO_TRACE and file and line attributes.
 
       LogStream &trace(const std::string &message);
@@ -212,49 +221,44 @@ namespace AwsMock::Core {
       LogStream &priority(Poco::Message::Priority priority);
       /// Sets the priority for log messages.
 
-      /**
-       * Default log pattern
-       */
-      //Poco::AutoPtr<Poco::FormattingChannel> formattingChannel() const;
-    };
+      static Poco::AutoPtr<Poco::ConsoleChannel> _pConsoleChannel;
+      static Poco::AutoPtr<Poco::FileChannel> _pFileChannel;
+      static Poco::AutoPtr<Poco::PatternFormatter> _pFormatter;
+      static Poco::AutoPtr<Poco::FormattingChannel> _pFormattingChannel;
+  };
 
-/*    inline Poco::AutoPtr<Poco::FormattingChannel> LogStream::formattingChannel() const {
+  //
+  // inlines
+  //
+  inline std::size_t LogStreamBuf::capacity() const {
+    return _message.capacity();
+  }
 
-        return pFC;
-    }*/
+  inline Poco::Message::Priority LogStreamBuf::getPriority() const {
+    return _priority;
+  }
 
-    //
-    // inlines
-    //
-    inline std::size_t LogStreamBuf::capacity() const {
-        return _message.capacity();
-    }
-
-    inline Poco::Message::Priority LogStreamBuf::getPriority() const {
-        return _priority;
-    }
-
-    inline Poco::Logger &LogStreamBuf::logger() const {
-        return _logger;
-    }
+  inline Poco::Logger &LogStreamBuf::logger() const {
+    return _logger;
+  }
 
 } // namespace Poco
 
 #define log_fatal_stream(logger) \
-	if ((logger).fatal()) (logger).fatal( __FILE__, __LINE__)
+    if ((logger).fatal()) (logger).fatal( __FILE__, __LINE__)
 #define log_critical_stream(logger) \
-	if ((logger).critical()) (logger).critical( __FILE__, __LINE__)
+    if ((logger).critical()) (logger).critical( __FILE__, __LINE__)
 #define log_error_stream(logger) \
-	if ((logger).error()) (logger).error( __FILE__, __LINE__)
+    if ((logger).error()) (logger).error( __FILE__, __LINE__)
 #define log_warning_stream(logger) \
-	if ((logger).warning()) (logger).warning( __FILE__, __LINE__)
+    if ((logger).warning()) (logger).warning( __FILE__, __LINE__)
 #define log_notice_stream(logger) \
-	if ((logger).notice()) (logger).notice( __FILE__, __LINE__)
+    if ((logger).notice()) (logger).notice( __FILE__, __LINE__)
 #define log_info_stream(logger) \
-	if ((logger).information()) (logger).information( __FILE__, __LINE__)
+    if ((logger).information()) (logger).information( __FILE__, __LINE__)
 #define log_debug_stream(logger) \
-	if ((logger).debug()) (logger).debug( __FILE__, __LINE__)
+    if ((logger).debug()) (logger).debug( __FILE__, __LINE__)
 #define log_trace_stream(logger) \
-	if ((logger).trace()) (logger).trace( __FILE__, __LINE__)
+    if ((logger).trace()) (logger).trace( __FILE__, __LINE__)
 
 #endif // AWSMOCK_CORE_LOGSTREAM_H

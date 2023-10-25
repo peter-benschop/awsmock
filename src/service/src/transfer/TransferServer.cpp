@@ -6,10 +6,10 @@
 
 namespace AwsMock::Service {
 
-  TransferServer::TransferServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition)
-      : AbstractWorker(configuration), _logger(Poco::Logger::get("TransferServer")), _configuration(configuration), _metricService(metricService), _condition(condition), _running(false) {
+  TransferServer::TransferServer(Core::Configuration &configuration, Core::MetricService &metricService)
+      : AbstractServer(configuration, "transfer"), AbstractWorker(configuration), _logger(Poco::Logger::get("TransferServer")), _configuration(configuration), _metricService(metricService), _running(false) {
 
-    // REST server configuration
+    // REST manager configuration
     _port = _configuration.getInt("awsmock.service.transfer.port", TRANSFER_DEFAULT_PORT);
     _host = _configuration.getString("awsmock.service.transfer.host", TRANSFER_DEFAULT_HOST);
     _maxQueueLength = _configuration.getInt("awsmock.service.transfer.max.queue", TRANSFER_DEFAULT_QUEUE_LENGTH);
@@ -17,7 +17,7 @@ namespace AwsMock::Service {
 
     // Sleeping period
     _period = _configuration.getInt("awsmock.worker.transfer.period", 10000);
-    log_debug_stream(_logger) << "Transfer server worker period: " << _period << std::endl;
+    log_debug_stream(_logger) << "Transfer manager worker period: " << _period << std::endl;
 
     // Create environment
     _region = _configuration.getString("awsmock.region");
@@ -37,43 +37,16 @@ namespace AwsMock::Service {
     Core::DirUtils::EnsureDirectory(_baseDir);
     log_debug_stream(_logger) << "Using baseDir: " << _baseDir << std::endl;
 
-    log_info_stream(_logger) << "TransferWorker initialized" << std::endl;
+    log_info_stream(_logger) << "Transfer manager initialized" << std::endl;
   }
 
   TransferServer::~TransferServer() {
     StopServer();
   }
 
-  void TransferServer::StopServer() {
-    _running = false;
-    StopHttpServer();
-  }
-
-  void TransferServer::StartHttpServer() {
-
-    // Set HTTP server parameter
-    auto *httpServerParams = new Poco::Net::HTTPServerParams();
-    httpServerParams->setMaxQueued(_maxQueueLength);
-    httpServerParams->setMaxThreads(_maxThreads);
-    log_debug_stream(_logger) << "HTTP server parameter set, maxQueue: " << _maxQueueLength << " maxThreads: " << _maxThreads << std::endl;
-
-    _httpServer = std::make_shared<Poco::Net::HTTPServer>(new TransferRequestHandlerFactory(_configuration, _metricService), Poco::Net::ServerSocket(Poco::UInt16(_port)), httpServerParams);
-    _httpServer->start();
-
-    log_info_stream(_logger) << "Transfer rest service started, endpoint: http://" << _host << ":" << _port << std::endl;
-  }
-
-  void TransferServer::StopHttpServer() {
-    if (_httpServer) {
-      _httpServer->stop();
-      _httpServer.reset();
-      log_info_stream(_logger) << "Transfer rest service stopped" << std::endl;
-    }
-  }
-
   void TransferServer::StartTransferServer(Database::Entity::Transfer::Transfer &server) {
 
-    // Create transfer server thread
+    // Create transfer manager thread
     _ftpServer = std::make_shared<FtpServer::FtpServer>(_configuration, server.serverId, server.port, server.listenAddress);
     _transferServerList[server.serverId] = _ftpServer;
 
@@ -86,7 +59,7 @@ namespace AwsMock::Service {
       Core::DirUtils::EnsureDirectory(homeDir);
       log_debug_stream(_logger) << "Using homeDir: " << homeDir << std::endl;
 
-      // Add to FTP server
+      // Add to FTP manager
       _ftpServer->addUser(user.userName, user.password, homeDir, FtpServer::Permission::All);
     }
     _ftpServer->start(server.concurrency);
@@ -94,19 +67,19 @@ namespace AwsMock::Service {
     // Update database
     server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::ONLINE);
 
-    log_info_stream(_logger) << "Transfer server " << server.serverId << " started " << std::endl;
+    log_info_stream(_logger) << "Transfer manager " << server.serverId << " started " << std::endl;
   }
 
   void TransferServer::StopTransferServer(Database::Entity::Transfer::Transfer &server) {
 
-    // Create transfer server thread
+    // Create transfer manager thread
     std::shared_ptr<FtpServer::FtpServer> ftpserver = _transferServerList[server.serverId];
     ftpserver->stop();
 
     // Update database
     server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::OFFLINE);
 
-    log_debug_stream(_logger) << "Transfer server " << server.serverId << " stopped " << std::endl;
+    log_debug_stream(_logger) << "Transfer manager " << server.serverId << " stopped " << std::endl;
   }
 
   void TransferServer::StartTransferServers() {
@@ -148,48 +121,47 @@ namespace AwsMock::Service {
     }
   }
 
-  void TransferServer::run() {
-
-    log_info_stream(_logger) << "Transfer worker started" << std::endl;
+  void TransferServer::MainLoop() {
 
     // Check service active
-    /*if (!_serviceDatabase->IsActive("lambda")) {
-        return;
-    }*/
+    if (!IsActive("transfer")) {
+      log_info_stream(_logger) << "Transfer service inactive" << std::endl;
+      return;
+    }
+    log_info_stream(_logger) << "Transfer service starting" << std::endl;
 
-    // Start REST server
-    StartHttpServer();
+    // Start REST manager
+    StartHttpServer(_maxQueueLength, _maxThreads, _host, _port, new TransferRequestHandlerFactory(_configuration, _metricService));
 
     // Send create bucket request
-    if (!SendExistsBucketRequest(_bucket)) {
+    /*if (!SendExistsBucketRequest(_bucket)) {
       SendCreateBucketRequest(_bucket);
       log_debug_stream(_logger) << "Sending S3 create bucket: " << _bucket << std::endl;
-    }
+    }*/
 
-    // Start all lambda functions
+    // Start all transfer servers
     StartTransferServers();
 
     _running = true;
     while (_running) {
+
       log_debug_stream(_logger) << "TransferWorker processing started" << std::endl;
+
+      // Check transfer servers
       CheckTransferServers();
 
-      // Wait for timeout or condition
-      _mutex.lock();
-      if (_condition.tryWait(_mutex, _period)) {
+      /// Wait for timeout or condition
+      if(InterruptableSleep(_period)) {
         break;
       }
-      _mutex.unlock();
     }
-    StopServer();
   }
 
   void TransferServer::SendCreateBucketRequest(const std::string &bucket) {
 
     std::string url = _baseUrl + "/" + bucket;
     Dto::S3::CreateBucketConstraint location = {.location=_region};
-    std::string body = location.ToXml();
-    SendPutRequest(url, body, CONTENT_TYPE_JSON);
+    SendPutRequest(url, location.ToXml(), CONTENT_TYPE_JSON);
     log_debug_stream(_logger) << "Create bucket message request send" << std::endl;
   }
 

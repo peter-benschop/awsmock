@@ -51,7 +51,7 @@ namespace AwsMock::Service {
       void MainLoop() override;
 
       /**
-       * Stop server
+       * Stop manager
        */
       void StopServer();
 
@@ -70,7 +70,7 @@ namespace AwsMock::Service {
       void StartHttpServer();
 
       /**
-       * Stop http server
+       * Stop http manager
        */
       void StopHttpServer();
 
@@ -230,7 +230,7 @@ namespace AwsMock::Service {
       Core::MetricService &_metricService;
 
       /**
-       * HTTP server instance
+       * HTTP manager instance
        */
       std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
 

@@ -38,7 +38,7 @@ namespace AwsMock::Service {
        * @param metricService monitoring service
        * @param condition stop condition
        */
-      explicit S3Server(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
+      explicit S3Server(Core::Configuration &configuration, Core::MetricService &metricService);
 
       /**
        * Destructor
@@ -51,28 +51,11 @@ namespace AwsMock::Service {
       void MainLoop() override;
 
       /**
-       * Stop server
+       * Stops the monitoring service.
        */
-      void StopServer();
-
-      /**
-       * Return running flag
-       *
-       * @return running flag
-       */
-      bool IsRunning() const { return _running; }
+      void StopMonitoringServer();
 
     private:
-
-      /**
-       * Start the restfull service.
-       */
-      void StartHttpServer();
-
-      /**
-       * Stop http server
-       */
-      void StopHttpServer();
 
       /**
        * Start the monitoring service.
@@ -230,14 +213,14 @@ namespace AwsMock::Service {
       Core::MetricService &_metricService;
 
       /**
-       * HTTP server instance
+       * HTTP manager instance
        */
       std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
 
       /**
        * Service database
        */
-      std::unique_ptr<Database::ServiceDatabase> _serviceDatabase;
+      std::unique_ptr<Database::ModuleDatabase> _serviceDatabase;
 
       /**
        * S3 database
@@ -303,11 +286,6 @@ namespace AwsMock::Service {
        * S3 service port
        */
       int _s3ServicePort;
-
-      /**
-       * Stop condition
-       */
-      Poco::Condition &_condition;
   };
 
 } // namespace AwsMock::Service

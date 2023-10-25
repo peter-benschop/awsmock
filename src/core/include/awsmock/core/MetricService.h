@@ -40,7 +40,7 @@ namespace AwsMock::Core {
 
     /**
      * Maintains a list of counter and gauges for monitoring via Prometheus. The data is made available via a HTTP
-     * server listening on port 8081. The port ist configurable.
+     * manager listening on port 8081. The port ist configurable.
      *
      * @author jens.vogt@opitz-consulting.com
      */
@@ -51,7 +51,7 @@ namespace AwsMock::Core {
       /**
        * Default constructor
        */
-      MetricService() : _logger(Poco::Logger::get("root")), _port(8081), _timeout(60000) {}
+      MetricService() : _logger(Poco::Logger::get("MetricService")), _port(8081), _timeout(60000) {}
 
       /**
        * Constructor
@@ -69,11 +69,6 @@ namespace AwsMock::Core {
       explicit MetricService(int port, long timeout);
 
       /**
-       * Destructor
-       */
-      virtual ~MetricService();
-
-      /**
        * Initialization
        */
       [[maybe_unused]] virtual void Initialize();
@@ -85,7 +80,7 @@ namespace AwsMock::Core {
       void ShutdownServer();
 
       /**
-       * Starts the HTTP server
+       * Starts the HTTP manager
        */
       [[maybe_unused]]
       void StartServer();
@@ -377,19 +372,19 @@ namespace AwsMock::Core {
       Core::LogStream _logger;
 
       /**
-       * Metric server for Prometheus
+       * Metric manager for Prometheus
        */
-      Poco::Prometheus::MetricsServer *_server{};
+      std::shared_ptr<Poco::Prometheus::MetricsServer> _server;
 
       /**
        * System monitoring thread
        */
-      MetricSystemCollector* _metricSystemCollector{};
+      std::shared_ptr<MetricSystemCollector> _metricSystemCollector{};
 
       /**
        * System monitoring thread
        */
-      Poco::Timer *_metricSystemTimer{};
+      std::shared_ptr<Poco::Timer> _metricSystemTimer{};
 
       /**
        * Counter map
@@ -407,12 +402,12 @@ namespace AwsMock::Core {
       TimerMap _timerMap;
 
       /**
-       * Timer start map
+       * Timer StartServer map
        */
       TimerStartMap _timerStartMap;
 
       /**
-       * Port for the monitoring server
+       * Port for the monitoring manager
        */
       long _port;
 

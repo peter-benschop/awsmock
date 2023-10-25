@@ -31,12 +31,12 @@
 
 namespace AwsMock::Service {
 
-    typedef std::map<std::string, std::string> HeaderMap;
+  typedef std::map<std::string, std::string> HeaderMap;
 
-    /**
-     * Abstract HTTP request handler
-     */
-    class AbstractHandler : public Poco::Net::HTTPRequestHandler {
+  /**
+   * Abstract HTTP request handler
+   */
+  class AbstractHandler : public Poco::Net::HTTPRequestHandler {
 
     public:
       /**
@@ -132,7 +132,7 @@ namespace AwsMock::Service {
        * @param statusCode HTTP Status Code.
        * @param reason status reason.
        */
-      void handleHttpStatusCode(Poco::Net::HTTPServerResponse &response, int statusCode, const char* reason = nullptr);
+      void handleHttpStatusCode(Poco::Net::HTTPServerResponse &response, int statusCode, const char *reason = nullptr);
 
       /**
        * CHecks whether a query parameter exists
@@ -176,7 +176,6 @@ namespace AwsMock::Service {
        * @return payload as a string,
        */
       std::string GetPayload(Poco::Net::HTTPServerRequest &request);
-
 
       /**
        * Get the action from the request body
@@ -278,13 +277,13 @@ namespace AwsMock::Service {
        */
       static std::string GetBodyAsString(Poco::Net::HTTPServerRequest &request);
 
-        /**
-         * Send a OK response (HTTP status code 200).
-         *
-         * @param response HTTP response object
-         * @param payload HTTP body payload
-         * @param extraHeader HTTP header map values, added to the default headers
-         */
+      /**
+       * Send a OK response (HTTP status code 200).
+       *
+       * @param response HTTP response object
+       * @param payload HTTP body payload
+       * @param extraHeader HTTP header map values, added to the default headers
+       */
       void SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &payload = {}, const HeaderMap &extraHeader = {});
 
       /**
@@ -329,7 +328,16 @@ namespace AwsMock::Service {
        * @param response HTTP response object
        * @param exc service exception object
        */
-      void SendErrorResponse(const std::string &service,Poco::Net::HTTPServerResponse &response, Core::ServiceException &exc);
+      void SendErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Core::ServiceException &exc);
+
+      /**
+       * Send an error response (HTTP status code 200).
+       *
+       * @param service service name
+       * @param response HTTP response object
+       * @param payload response body
+       */
+      void SendErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, const std::string &payload);
 
       /**
        * Send a no content response, status: 204.
@@ -364,7 +372,7 @@ namespace AwsMock::Service {
        * @param request HTTP request
        * @return string map of metadata
        */
-      std::map<std::string,std::string> GetMetadata(Poco::Net::HTTPServerRequest &request);
+      std::map<std::string, std::string> GetMetadata(Poco::Net::HTTPServerRequest &request);
 
       /**
        * Check for the existence of given header key
@@ -463,7 +471,7 @@ namespace AwsMock::Service {
        */
       HeaderMap _headerMap;
 
-    };
+  };
 
 } // namespace AwsMock::Service
 

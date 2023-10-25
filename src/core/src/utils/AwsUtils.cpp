@@ -45,6 +45,6 @@ namespace AwsMock::Core {
   }
 
   std::string AwsUtils::CreateTransferArn(const std::string &region, const std::string &accountId, const std::string &serverId) {
-    return CreateArn("transfer", region, accountId, "server/" + serverId);
+    return CreateArn("transfer", region, accountId, "manager/" + serverId);
   }
 }

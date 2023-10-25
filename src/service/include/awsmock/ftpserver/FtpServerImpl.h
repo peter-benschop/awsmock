@@ -24,7 +24,7 @@ namespace AwsMock::FtpServer {
       /**
        * Constructor
        *
-       * @param serverName name of the server
+       * @param serverName name of the manager
        * @param address listen address
        * @param port listen port
        * @param configuration AwsMock configuration
@@ -44,14 +44,14 @@ namespace AwsMock::FtpServer {
       /**
        * Assigment constructor (disabled, as we are storing the this pointer in lambda captures)
        *
-       * @return FTP server implementation
+       * @return FTP manager implementation
        */
       FtpServerImpl &operator=(FtpServerImpl &&) = delete;
 
       /**
        * Assigment constructor (disabled, as we are storing the this pointer in lambda captures)
        *
-       * @return FTP server implementation
+       * @return FTP manager implementation
        */
       FtpServerImpl(FtpServerImpl &&) = delete;
 
@@ -81,7 +81,7 @@ namespace AwsMock::FtpServer {
       bool addUserAnonymous(const std::string &local_root_path, Permission permissions);
 
       /**
-       * Start the server
+       * Start the manager
        *
        * @param thread_count thread count
        * @return true if successful
@@ -89,7 +89,7 @@ namespace AwsMock::FtpServer {
       bool start(size_t thread_count = 1);
 
       /**
-       * Stop the server
+       * Stop the manager
        */
       void stop();
 
@@ -160,7 +160,7 @@ namespace AwsMock::FtpServer {
       std::atomic<int> _openConnectionCount;
 
       /**
-       * Name of the server
+       * Name of the manager
        */
       std::string _serverName;
 

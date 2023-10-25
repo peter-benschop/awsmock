@@ -10,10 +10,6 @@ namespace AwsMock::Core {
   //
   LogStreamBuf::LogStreamBuf(Poco::Logger &logger, Poco::Message::Priority priority, std::size_t bufferCapacity) : _logger(logger), _priority(priority) {
     _message.reserve(bufferCapacity);
-    Poco::AutoPtr<Poco::ConsoleChannel> pCons(new Poco::ConsoleChannel());
-    Poco::AutoPtr<Poco::PatternFormatter> pPF(new Poco::PatternFormatter("%d-%m-%Y %H:%M:%S.%i [%q] %I %s:%u - %t"));
-    Poco::AutoPtr<Poco::FormattingChannel> pFC(new Poco::FormattingChannel(pPF, pCons));
-    _logger.setChannel(pFC);
   }
 
   LogStreamBuf::~LogStreamBuf() = default;
@@ -54,8 +50,7 @@ namespace AwsMock::Core {
   //
   // LogIOS
   //
-  LogIOS::LogIOS(Poco::Logger &logger, Poco::Message::Priority priority, std::size_t bufferCapacity) :
-    _buf(logger, priority, bufferCapacity) {
+  LogIOS::LogIOS(Poco::Logger &logger, Poco::Message::Priority priority, std::size_t bufferCapacity) : _buf(logger, priority, bufferCapacity) {
     init(&_buf);
   }
 
@@ -65,18 +60,42 @@ namespace AwsMock::Core {
     return &_buf;
   }
 
+  Poco::AutoPtr<Poco::ConsoleChannel> LogStream::_pConsoleChannel = new Poco::ConsoleChannel();
+  Poco::AutoPtr<Poco::FileChannel> LogStream::_pFileChannel = new Poco::FileChannel();
+  Poco::AutoPtr<Poco::PatternFormatter> LogStream::_pFormatter = new Poco::PatternFormatter(LOG_PATTERN);
+  Poco::AutoPtr<Poco::FormattingChannel> LogStream::_pFormattingChannel = new Poco::FormattingChannel(_pFormatter, _pConsoleChannel);
+
   //
   // LogStream
   //
-  LogStream::LogStream(Poco::Logger &logger, Poco::Message::Priority priority, std::size_t bufferCapacity) :
-    LogIOS(logger, priority, bufferCapacity),
-    std::ostream(&_buf) {
+  LogStream::LogStream(Poco::Logger &logger, Poco::Message::Priority priority, std::size_t bufferCapacity) : LogIOS(logger, priority, bufferCapacity), std::ostream(&_buf) {
+    logger.setChannel(_pFormattingChannel);
   }
 
   LogStream::~LogStream() = default;
 
   void LogStream::setChannel(Poco::Channel::Ptr channel) {
     _buf.setChannel(channel);
+  }
+
+  void LogStream::setConsoleChannel() {
+    Poco::AutoPtr<Poco::ConsoleChannel>channel = new Poco::ConsoleChannel();
+    Poco::AutoPtr<Poco::PatternFormatter>formatter(new Poco::PatternFormatter(LOG_PATTERN));
+    Poco::Logger::root().setChannel(new Poco::FormattingChannel(formatter, channel));
+  }
+
+  void LogStream::setFileChannel(const std::string &filename) {
+    Poco::Logger::root().getChannel()->close();
+    _pFileChannel = new Poco::FileChannel(filename);
+    _pFileChannel->setProperty("rotation", "10 M");
+    _pFileChannel->setProperty("archive", "timestamp");
+    _pFormattingChannel = new Poco::FormattingChannel(_pFormatter, _pFileChannel);
+    Poco::Logger::root().setChannel(_pFormattingChannel);
+    /*std::vector<std::string> loggers;
+    Poco::Logger::names(loggers);
+    for(const auto &it:loggers) {
+      Poco::Logger::get(it).setChannel(_pFormattingChannel);
+    }*/
   }
 
   LogStream &LogStream::fatal() {

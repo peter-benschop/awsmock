@@ -7,22 +7,27 @@
 
 // Poco includes
 #include "Poco/Logger.h"
+#include "Poco/Task.h"
+#include "Poco/TaskManager.h"
 #include "Poco/JSON/JSON.h"
 #include <Poco/JSON/Array.h>
 #include <Poco/JSON/Object.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
+#include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/MetricService.h>
 #include <awsmock/core/MetricServiceTimer.h>
 #include <awsmock/core/MetricDefinition.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/repository/ServiceDatabase.h>
+#include <awsmock/dto/module/Module.h>
+#include <awsmock/service/S3Server.h>
+#include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/resource/HandlerException.h>
 #include <awsmock/resource/AbstractResource.h>
 
-#define TRANSFER_DEFAULT_HOST "localhost"
-#define TRANSFER_DEFAULT_PORT 9600
+#define MODULE_DEFAULT_HOST "localhost"
+#define MODULE_DEFAULT_PORT 9600
 
 namespace AwsMock {
 
@@ -109,22 +114,6 @@ namespace AwsMock {
     private:
 
       /**
-       * Convert to JSON
-       *
-       * @param serviceList list of service entities
-       * @return JSON representation
-       */
-      static std::string ToJson(const Database::Entity::Service::ServiceList &serviceList);
-
-      /**
-       * Convert to JSON
-       *
-       * @param service service entity
-       * @return JSON representation
-       */
-      static std::string ToJson(const Database::Entity::Service::Service &service);
-
-      /**
        * Logger
        */
       Core::LogStream _logger;
@@ -142,7 +131,7 @@ namespace AwsMock {
       /**
        * Module database
        */
-      std::shared_ptr<Database::ServiceDatabase> _serviceDatabase;
+      std::shared_ptr<Database::ModuleDatabase> _serviceDatabase;
   };
 
 } // namespace AwsMock

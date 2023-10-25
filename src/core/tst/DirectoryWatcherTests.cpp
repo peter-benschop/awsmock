@@ -133,7 +133,7 @@ namespace AwsMock::Core {
     TEST_F(DirectoryWatcherTest, DirectoryAddedTest) {
 
         // arrange
-        thread->start(*_watcher);
+        thread->StartServer(*_watcher);
 
         // act
         Core::DirUtils::MakeDirectory(tempDir + "/tmptest");
@@ -148,7 +148,7 @@ namespace AwsMock::Core {
     TEST_F(DirectoryWatcherTest, DirectoryDeleteTest) {
 
         // arrange
-        thread->start(*_watcher);
+        thread->StartServer(*_watcher);
         Core::DirUtils::MakeDirectory(tempDir + "/tmptest");
 
         // act

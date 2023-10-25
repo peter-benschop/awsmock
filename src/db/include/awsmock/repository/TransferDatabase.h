@@ -37,7 +37,7 @@ namespace AwsMock::Database {
        *
        * @param region AWS region name
        * @param transferName AWS transfer name
-       * @return true if transfer server already exists
+       * @return true if transfer manager already exists
        * @throws DatabaseException
        */
       bool TransferExists(const std::string &region, const std::string &transferName);
@@ -46,7 +46,7 @@ namespace AwsMock::Database {
        * Check existence of lambda
        *
        * @param transferName AWS transfer name
-       * @return true if transfer server already exists
+       * @return true if transfer manager already exists
        * @throws DatabaseException
        */
       bool TransferExists(const Entity::Transfer::Transfer &transferName);
@@ -55,7 +55,7 @@ namespace AwsMock::Database {
        * Check existence of lambda
        *
        * @param transferName AWS transfer name
-       * @return true if transfer server already exists
+       * @return true if transfer manager already exists
        * @throws DatabaseException
        */
       bool TransferExists(const std::string &transferName);
@@ -65,7 +65,7 @@ namespace AwsMock::Database {
        *
        * @param region AWS region name
        * @param protocols list of protocols
-       * @return true if transfer server already exists
+       * @return true if transfer manager already exists
        * @throws DatabaseException
        */
       bool TransferExists(const std::string &region, std::vector<std::string> protocols);
@@ -80,7 +80,7 @@ namespace AwsMock::Database {
 
 
       /**
-       * Updates an existing transfer server
+       * Updates an existing transfer manager
        *
        * @param lambda lambda entity
        * @return updated lambda entity.
@@ -89,7 +89,7 @@ namespace AwsMock::Database {
 
 
       /**
-       * Created or updates an existing transfer server
+       * Created or updates an existing transfer manager
        *
        * @param lambda lambda entity
        * @return created or updated lambda entity.
@@ -97,59 +97,59 @@ namespace AwsMock::Database {
       Entity::Transfer::Transfer CreateOrUpdateTransfer(const Entity::Transfer::Transfer &lambda);
 
       /**
-       * Returns a transfer server entity by primary key
+       * Returns a transfer manager entity by primary key
        *
-       * @param oid transfer server primary key
-       * @return transfer server entity
+       * @param oid transfer manager primary key
+       * @return transfer manager entity
        * @throws DatabaseException
        */
       Entity::Transfer::Transfer GetTransferById(bsoncxx::oid oid);
 
       /**
-       * Returns a transfer server entity by primary key
+       * Returns a transfer manager entity by primary key
        *
-       * @param oid transfer server primary key
-       * @return transfer server entity
+       * @param oid transfer manager primary key
+       * @return transfer manager entity
        * @throws DatabaseException
        */
       Entity::Transfer::Transfer GetTransferById(const std::string &oid);
 
       /**
-       * Returns a transfer server entity by server ID
+       * Returns a transfer manager entity by manager ID
        *
-       * @param serverId transfer server ID
-       * @return transfer server entity
+       * @param serverId transfer manager ID
+       * @return transfer manager entity
        * @throws DatabaseException
        */
       Entity::Transfer::Transfer GetTransferByServerId(const std::string &serverId);
 
       /**
-       * Returns a transfer server entity by ARN
+       * Returns a transfer manager entity by ARN
        *
-       * @param arn transfer server ARN
-       * @return transfer server entity
+       * @param arn transfer manager ARN
+       * @return transfer manager entity
        * @throws DatabaseException
        */
       Entity::Transfer::Transfer GetTransferByArn(const std::string &arn);
 
       /**
-       * Returns a list of transfer server.
+       * Returns a list of transfer manager.
        *
        * @param region AWS region name
-       * @return list of transfer server
+       * @return list of transfer manager
        */
       std::vector<Entity::Transfer::Transfer> ListServers(const std::string &region);
 
       /**
-       * Deletes an existing transfer server
+       * Deletes an existing transfer manager
        *
-       * @param transferName transfer server name
+       * @param transferName transfer manager name
        * @throws DatabaseException
        */
       void DeleteTransfer(const std::string &transferName);
 
       /**
-       * Deletes all existing transfer server
+       * Deletes all existing transfer manager
        *
        * @throws DatabaseException
        */

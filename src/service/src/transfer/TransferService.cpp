@@ -18,11 +18,11 @@ namespace AwsMock::Service {
   Dto::Transfer::CreateTransferResponse
   TransferService::CreateTransferServer(Dto::Transfer::CreateTransferRequest &request) {
 
-    log_debug_stream(_logger) << "Create transfer server" << std::endl;
+    log_debug_stream(_logger) << "Create transfer manager" << std::endl;
 
     // Check existence
     if (_transferDatabase->TransferExists(request.region, request.protocols)) {
-      throw Core::ServiceException("Transfer server exists already", 403);
+      throw Core::ServiceException("Transfer manager exists already", 403);
     }
 
     std::string serverId = "s-" + Poco::toLower(Core::StringUtils::GenerateRandomHexString(20));
@@ -54,7 +54,7 @@ namespace AwsMock::Service {
 
     if (!_transferDatabase->TransferExists(request.region, request.serverId)) {
 
-      throw Core::ServiceException("Transfer server with ID '" + request.serverId + "  does not exist", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+      throw Core::ServiceException("Transfer manager with ID '" + request.serverId + "  does not exist", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
 
     } else {
 
@@ -62,7 +62,7 @@ namespace AwsMock::Service {
 
       // Check user
       if (transferEntity.HasUser(request.userName)) {
-        throw Core::ServiceException("Transfer server has already a user with name '" + request.userName + "'", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+        throw Core::ServiceException("Transfer manager has already a user with name '" + request.userName + "'", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
       // Get home directory
@@ -82,7 +82,7 @@ namespace AwsMock::Service {
 
       // Update database
       transferEntity = _transferDatabase->UpdateTransfer(transferEntity);
-      log_debug_stream(_logger) << "Updated transfer server, serverId: " << transferEntity.serverId << std::endl;
+      log_debug_stream(_logger) << "Updated transfer manager, serverId: " << transferEntity.serverId << std::endl;
     }
 
     // Create response
@@ -124,13 +124,13 @@ namespace AwsMock::Service {
         throw Core::ServiceException("Server with ID '" + request.serverId + "' does not exist", 500);
       }
 
-      // Get the server
+      // Get the manager
       server = _transferDatabase->GetTransferByServerId(request.serverId);
 
       // Update state, rest will be done by transfer worker
       server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::ONLINE);
       server = _transferDatabase->UpdateTransfer(server);
-      log_info_stream(_logger) << "Transfer server started, serverId: " << server.serverId << std::endl;
+      log_info_stream(_logger) << "Transfer manager started, serverId: " << server.serverId << std::endl;
 
     } catch (Poco::Exception &ex) {
 
@@ -138,7 +138,7 @@ namespace AwsMock::Service {
       server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::START_FAILED);
       server = _transferDatabase->UpdateTransfer(server);
 
-      log_error_stream(_logger) << "Start server request failed, serverId: " << server.serverId << " message: " << ex.message() << std::endl;
+      log_error_stream(_logger) << "Start manager request failed, serverId: " << server.serverId << " message: " << ex.message() << std::endl;
       throw Core::ServiceException(ex.message(), 500);
     }
   }
@@ -151,13 +151,13 @@ namespace AwsMock::Service {
         throw Core::ServiceException("Server with ID '" + request.serverId + "' does not exist", 500);
       }
 
-      // Get the server
+      // Get the manager
       server = _transferDatabase->GetTransferByServerId(request.serverId);
 
       // Update state, rest will be done by transfer worker
       server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::OFFLINE);
       server = _transferDatabase->UpdateTransfer(server);
-      log_info_stream(_logger) << "Transfer server stopped, serverId: " << server.serverId << std::endl;
+      log_info_stream(_logger) << "Transfer manager stopped, serverId: " << server.serverId << std::endl;
 
     } catch (Poco::Exception &ex) {
 
@@ -165,7 +165,7 @@ namespace AwsMock::Service {
       server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::STOP_FAILED);
       server = _transferDatabase->UpdateTransfer(server);
 
-      log_error_stream(_logger) << "Stop server request failed, serverId: " << server.serverId << " message: " << ex.message() << std::endl;
+      log_error_stream(_logger) << "Stop manager request failed, serverId: " << server.serverId << " message: " << ex.message() << std::endl;
       throw Core::ServiceException(ex.message(), 500);
     }
   }
@@ -178,16 +178,16 @@ namespace AwsMock::Service {
         throw Core::ServiceException("Server with ID '" + request.serverId + "' does not exist", 500);
       }
 
-      // Get the server
+      // Get the manager
       server = _transferDatabase->GetTransferByServerId(request.serverId);
 
       // Update state, rest will be done by transfer worker
       server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::OFFLINE);
       server = _transferDatabase->UpdateTransfer(server);
-      log_info_stream(_logger) << "Transfer server stopped, serverId: " << server.serverId << std::endl;
+      log_info_stream(_logger) << "Transfer manager stopped, serverId: " << server.serverId << std::endl;
 
       _transferDatabase->DeleteTransfer(request.serverId);
-      log_info_stream(_logger) << "Transfer server deleted, serverId: " << server.serverId << std::endl;
+      log_info_stream(_logger) << "Transfer manager deleted, serverId: " << server.serverId << std::endl;
 
     } catch (Poco::Exception &ex) {
 
@@ -195,7 +195,7 @@ namespace AwsMock::Service {
       server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::STOP_FAILED);
       server = _transferDatabase->UpdateTransfer(server);
 
-      log_error_stream(_logger) << "Start server request failed, serverId: " << server.serverId << " message: " << ex.message() << std::endl;
+      log_error_stream(_logger) << "Start manager request failed, serverId: " << server.serverId << " message: " << ex.message() << std::endl;
       throw Core::ServiceException(ex.message(), 500);
     }
   }

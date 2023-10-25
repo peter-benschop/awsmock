@@ -45,7 +45,7 @@ namespace AwsMock::Service {
         std::string _host = _configuration.getString("awsmock.service.sqs.host", SQS_DEFAULT_HOST);
         _endpoint = "http://" + _host + ":" + _port;
 
-        // Start HTTP server
+        // Start HTTP manager
         Poco::ThreadPool::defaultPool().start(_sqsServer);
         while (!_sqsServer.IsRunning()) {
           Poco::Thread::sleep(1000);
@@ -62,11 +62,10 @@ namespace AwsMock::Service {
       Core::CurlUtils _curlUtils;
       std::string _testFile, _endpoint;
       std::map<std::string, std::string> _extraHeaders;
-      Poco::Condition _condition;
       Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
       Core::MetricService _metricService = Core::MetricService(_configuration);
       Database::SQSDatabase _database = Database::SQSDatabase(_configuration);
-      SQSServer _sqsServer = SQSServer(_configuration, _metricService, _condition);
+      SQSServer _sqsServer = SQSServer(_configuration, _metricService);
   };
 
   TEST_F(SQSServerTest, QueueCreateTest) {

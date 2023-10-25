@@ -10,9 +10,9 @@ namespace AwsMock::Database {
 
   void TestUtils::CreateServices() {
     Core::Configuration configuration = Core::Configuration(TMP_PROPERTIES_FILE);
-    auto _serviceDatabase = ServiceDatabase(configuration);
+    auto _serviceDatabase = ModuleDatabase(configuration);
     for(const auto &it:_services) {
-      _serviceDatabase.CreateOrUpdateService({.oid={}, .name=it, .status=Entity::Service::ServiceStatus::RUNNING});
+      _serviceDatabase.CreateOrUpdateModule({.oid={}, .name=it, .status=Entity::Module::ModuleStatus::RUNNING});
     }
   }
 }

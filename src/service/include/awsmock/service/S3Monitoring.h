@@ -33,7 +33,7 @@
 #include "awsmock/core/ResourceNotFoundException.h"
 #include <awsmock/dto/s3/CreateBucketConstraint.h>
 #include <awsmock/dto/s3/PutObjectRequest.h>
-#include <awsmock/repository/ServiceDatabase.h>
+#include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/AbstractWorker.h>
 
@@ -54,6 +54,8 @@ namespace AwsMock::Service {
        */
       explicit S3Monitoring(const Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
 
+      ~S3Monitoring() override;
+
       /**
        * Main method
        */
@@ -65,6 +67,8 @@ namespace AwsMock::Service {
        * @return true if thread is running
        */
       bool GetRunning() const { return _running; }
+
+      void Stop();
 
     private:
 

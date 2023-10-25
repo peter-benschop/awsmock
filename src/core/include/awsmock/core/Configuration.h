@@ -29,7 +29,7 @@ namespace AwsMock::Core {
      * <ul>
      * <li>AWSMOCK_COM_BASENAME: the base name of the configuration file</li>
      * <li>AWSMOCK_COM_PROFILE: the profile of the configuration file</li>
-     * <li>AWSMOCK_COM_METRIC_PORT: the port for the prometheus server (default: 8081)</li>
+     * <li>AWSMOCK_COM_METRIC_PORT: the port for the prometheus manager (default: 8081)</li>
      * <li>AWSMOCK_COM_METRIC_TIMEOUT: the timeout for the prometheus system monitoring (default: 60000)</li>
      * <li>AWSMOCK_COM_LOGLEVEL: the logging level (default: information, possible values: debug, information, warning, error, fatal)</li>
      * </ul>
@@ -83,7 +83,7 @@ namespace AwsMock::Core {
      void SetFilename(const std::string &filename);
 
       /**
-       * Returns the current port for the prometheus server.
+       * Returns the current port for the prometheus manager.
        *
        * @return prometheus port
        */

@@ -16,7 +16,7 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/repository/LambdaDatabase.h>
-#include <awsmock/repository/ServiceDatabase.h>
+#include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/service/S3Service.h>
 
 namespace AwsMock::Service {
@@ -98,7 +98,7 @@ namespace AwsMock::Service {
       /**
        * Service database
        */
-      std::unique_ptr <Database::ServiceDatabase> _serviceDatabase;
+      std::unique_ptr <Database::ModuleDatabase> _serviceDatabase;
       
       /**
        * lambda database

@@ -591,7 +591,7 @@ namespace AwsMock::Service {
     Core::FileUtils::DeleteFile(filename);
     log_debug_stream(_logger) << "File system object deleted, filename: " << filename << std::endl;
 
-    if (bucket == "transfer-server") {
+    if (bucket == "transfer-manager") {
       filename = _transferDir + Poco::Path::separator() + key;
       Core::FileUtils::DeleteFile(filename);
       log_debug_stream(_logger) << "Transfer file system object deleted, filename: " << filename << std::endl;

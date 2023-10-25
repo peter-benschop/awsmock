@@ -13,7 +13,7 @@ namespace AwsMock::Service {
         && request.getMethod() != Poco::Net::HTTPRequest::HTTP_POST && request.getMethod() != Poco::Net::HTTPRequest::HTTP_DELETE
         && request.getMethod() != Poco::Net::HTTPRequest::HTTP_OPTIONS && request.getMethod() != Poco::Net::HTTPRequest::HTTP_HEAD) {
       log_error_stream(_logger) << "Invalid request method, method: " << request.getMethod() << std::endl;
-      throw Core::ServiceException("The request method is not supported by the server and cannot be handled.", Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
+      throw Core::ServiceException("The request method is not supported by the manager and cannot be handled.", Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
     }
 
     if (request.has("Accept")) {
@@ -477,6 +477,17 @@ namespace AwsMock::Service {
     SetHeaders(response, payload.length());
 
     handleHttpStatusCode(response, exc.code(), exc.message().c_str());
+    std::ostream &outputStream = response.send();
+    outputStream << payload;
+    outputStream.flush();
+  }
+
+  void AbstractHandler::SendErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, const std::string &payload) {
+
+    SetHeaders(response, payload.length());
+
+    log_error_stream(_logger) << "Exception, code: " << response.getStatus() << " message: " << payload << std::endl;
+    handleHttpStatusCode(response, response.getStatus());
     std::ostream &outputStream = response.send();
     outputStream << payload;
     outputStream.flush();

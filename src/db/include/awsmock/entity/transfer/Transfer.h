@@ -105,7 +105,7 @@ namespace AwsMock::Database::Entity::Transfer {
       std::string state = ServerStateToString(ServerState::OFFLINE);
 
       /**
-       * Concurrency, nuber of FTP server threads
+       * Concurrency, nuber of FTP manager threads
        */
       int concurrency = 8;
 
@@ -120,7 +120,7 @@ namespace AwsMock::Database::Entity::Transfer {
       std::string listenAddress = "0.0.0.0";
 
       /**
-       * Last transfer server start
+       * Last transfer manager StartServer
        */
       Poco::DateTime lastStarted;
 
@@ -138,7 +138,7 @@ namespace AwsMock::Database::Entity::Transfer {
        * Checks whether a user exists already.
        *
        * @param userName name of the user
-       * @return true if transfer server with the given user exists.
+       * @return true if transfer manager with the given user exists.
        */
       bool HasUser(const std::string &userName);
 
@@ -146,7 +146,7 @@ namespace AwsMock::Database::Entity::Transfer {
        * Checks whether a protocol exists already.
        *
        * @param userName name of the user
-       * @return true if transfer server with the given user exists.
+       * @return true if transfer manager with the given user exists.
        */
       bool HasProtocol(const std::string &p);
 

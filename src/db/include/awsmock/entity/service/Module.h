@@ -2,8 +2,8 @@
 // Created by vogje01 on 10/22/23.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_SERVICE_SERVICE_H
-#define AWSMOCK_DB_ENTITY_SERVICE_SERVICE_H
+#ifndef AWSMOCK_DB_ENTITY_MODULE_MODULE_H
+#define AWSMOCK_DB_ENTITY_MODULE_MODULE_H
 
 // C++ includes
 #include <string>
@@ -23,9 +23,9 @@
 #include <mongocxx/exception/exception.hpp>
 
 // AwsMock includes
-#include <awsmock/entity/service/ServiceStatus.h>
+#include <awsmock/entity/service/ModuleStatus.h>
 
-namespace AwsMock::Database::Entity::Service {
+namespace AwsMock::Database::Entity::Module {
 
   using bsoncxx::view_or_value;
   using bsoncxx::document::view;
@@ -34,7 +34,7 @@ namespace AwsMock::Database::Entity::Service {
   using bsoncxx::builder::basic::make_array;
   using bsoncxx::builder::basic::make_document;
 
-  struct Service {
+  struct Module {
 
     /**
      * ID
@@ -49,7 +49,7 @@ namespace AwsMock::Database::Entity::Service {
     /**
      * Status
      */
-    ServiceStatus status;
+    ModuleStatus status;
 
     /**
      * Executable
@@ -69,7 +69,7 @@ namespace AwsMock::Database::Entity::Service {
     /**
      * Last modification date
      */
-    Poco::DateTime modified = Poco::DateTime();;
+    Poco::DateTime modified = Poco::DateTime();
 
     /**
      * Converts the entity to a MongoDB document
@@ -93,11 +93,6 @@ namespace AwsMock::Database::Entity::Service {
     [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
     /**
-     * Convert to JSON
-     */
-    static std::string ToJson();
-
-    /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
@@ -107,14 +102,16 @@ namespace AwsMock::Database::Entity::Service {
     /**
      * Stream provider.
      *
+     * @param os output stream
+     * @param m module struct
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const Service &o);
+    friend std::ostream &operator<<(std::ostream &os, const Module &m);
 
   };
 
-  typedef std::vector<Service> ServiceList;
+  typedef std::vector<Module> ModuleList;
 
 } // AwsMock::Database::Entity::Service
 
-#endif // AWSMOCK_DB_ENTITY_SERVICE_SERVICE_H
+#endif // AWSMOCK_DB_ENTITY_MODULE_MODULE_H

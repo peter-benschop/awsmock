@@ -6,8 +6,8 @@
 
 namespace AwsMock::Service {
 
-  S3Server::S3Server(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition)
-      : AbstractWorker(configuration), AbstractServer(configuration, condition), _logger(Poco::Logger::get("S3Server")), _configuration(configuration), _metricService(metricService), _condition(condition), _running(false) {
+  S3Server::S3Server(Core::Configuration &configuration, Core::MetricService &metricService)
+      : AbstractWorker(configuration), AbstractServer(configuration, "s3"), _logger(Poco::Logger::get("S3Server")), _configuration(configuration), _metricService(metricService), _running(false) {
 
     // Get HTTP configuration values
     _port = _configuration.getInt("awsmock.service.s3.port", S3_DEFAULT_PORT);
@@ -36,14 +36,14 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "S3 service endpoint: http://" << _s3ServiceHost << ":" << _s3ServicePort << std::endl;
 
     // Database connections
-    _serviceDatabase = std::make_unique<Database::ServiceDatabase>(_configuration);
+    _serviceDatabase = std::make_unique<Database::ModuleDatabase>(_configuration);
     _s3Database = std::make_unique<Database::S3Database>(_configuration);
     log_debug_stream(_logger) << "S3 service initialized, endpoint: " << _host << ":" << _port << std::endl;
   }
 
   S3Server::~S3Server() {
     StopServer();
-    _condition.signal();
+    _threadPool.stopAll();
   }
 
   void S3Server::MainLoop() {
@@ -59,7 +59,7 @@ namespace AwsMock::Service {
     StartMonitoringServer();
 
     // Start REST service
-    StartHttpServer();
+    StartHttpServer(_maxQueueLength, _maxThreads, _host, _port, new S3RequestHandlerFactory(_configuration, _metricService));
 
     _running = true;
     while (_running) {
@@ -71,42 +71,14 @@ namespace AwsMock::Service {
         break;
       }
     }
-
-    // Shutdown
-    StopServer();
-  }
-
-  void S3Server::StopServer() {
-    _running = false;
-    StopHttpServer();
-    _threadPool.stopAll();
-  }
-
-  void S3Server::StartHttpServer() {
-
-    // Set HTTP server parameter
-    auto *httpServerParams = new Poco::Net::HTTPServerParams();
-    httpServerParams->setMaxQueued(_maxQueueLength);
-    httpServerParams->setMaxThreads(_maxThreads);
-    log_debug_stream(_logger) << "HTTP server parameter set, maxQueue: " << _maxQueueLength << " maxThreads: " << _maxThreads << std::endl;
-
-    _httpServer = std::make_shared<Poco::Net::HTTPServer>(new S3RequestHandlerFactory(_configuration, _metricService), Poco::Net::ServerSocket(Poco::UInt16(_port)), httpServerParams);
-
-    _httpServer->start();
-    log_info_stream(_logger) << "S3 rest service started, endpoint: http://" << _host << ":" << _port << std::endl;
-  }
-
-  void S3Server::StopHttpServer() {
-    _running = false;
-    if (_httpServer) {
-      _httpServer->stop();
-      _httpServer.reset();
-      log_info_stream(_logger) << "S3 rest service stopped" << std::endl;
-    }
   }
 
   void S3Server::StartMonitoringServer() {
     _threadPool.StartThread(_configuration, _metricService, _condition);
+  }
+
+  void S3Server::StopMonitoringServer() {
+    _threadPool.stopAll();
   }
 
   void S3Server::UpdateCounters() {

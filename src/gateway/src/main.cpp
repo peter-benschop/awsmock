@@ -49,24 +49,13 @@
 
 namespace AwsMock {
 
-  void handler(int sig) {
-    void *array[10];
-    size_t size;
-
-    // get void*'s for all entries on the stack
-    size = backtrace(array, 10);
-
-    // print out all the frames to stderr
-    fprintf(stderr, "Error: signal %d:\n", sig);
-    backtrace_symbols_fd(array, size, STDERR_FILENO);
-    throw Poco::Exception("Signal arrived");
-    //exit(1);
-  }
-
   /**
    * Main application class.
    */
   class AwsMock : public Poco::Util::ServerApplication {
+
+    public:
+      AwsMock() : _logger(Core::LogStream(Poco::Logger::get("Gateway"))) {}
 
     protected:
 
@@ -77,11 +66,7 @@ namespace AwsMock {
        */
       [[maybe_unused]] void initialize(Application &self) override {
 
-        InitializeMonitoring();
-        InitializeErrorHandler();
-        InitializeIndexes();
-        InitializeCurl();
-        InitializeServices();
+        Core::LogStream::setConsoleChannel();
         log_info_stream(_logger) << "Starting " << Configuration::GetAppName() << " " << Configuration::GetVersion() << " pid: " << getpid() << " loglevel: "
                                  << _configuration.GetLogLevel() << std::endl;
         log_info_stream(_logger) << "Configuration file: " << _configuration.GetFilename() << std::endl;
@@ -94,14 +79,17 @@ namespace AwsMock {
       [[maybe_unused]] void uninitialize() override {
 
         // Shutdown all services
-        _condition.broadcast();
+        _restService.StopServer();
+        //_transferServer.StopMonitoringServer();
 
         // Shutdown monitoring
         _metricService.ShutdownServer();
-        log_debug_stream(_logger) << "Metric server stopped" << std::endl;
+        log_debug_stream(_logger) << "Metric manager stopped" << std::endl;
 
-        Poco::Util::Application::uninitialize();
-        log_debug_stream(_logger) << "Bye, bye, and thanks for all the fish" << std::endl;
+        //Poco::Util::Application::uninitialize();
+        log_debug_stream(_logger) << "Bye, bye and thanks for all the fish" << std::endl;
+
+        //Poco::Util::ServerApplication::terminate();
       }
 
       /**
@@ -114,9 +102,9 @@ namespace AwsMock {
         Poco::Util::ServerApplication::defineOptions(options);
         options.addOption(Poco::Util::Option("config", "", "set the configuration file").required(false).repeatable(false).argument("value").callback(
             Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
-        options.addOption(Poco::Util::Option("level", "", "set the log level").required(false).repeatable(false).argument("value").callback(
+        options.addOption(Poco::Util::Option("loglevel", "", "set the log level").required(false).repeatable(false).argument("value").callback(
             Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
-        options.addOption(Poco::Util::Option("file", "", "set the log file").required(false).repeatable(false).argument("value").callback(
+        options.addOption(Poco::Util::Option("logfile", "", "set the log file").required(false).repeatable(false).argument("value").callback(
             Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
         options.addOption(Poco::Util::Option("version", "", "display version information").required(false).repeatable(false).callback(
             Poco::Util::OptionCallback<AwsMock>(this, &AwsMock::handleOption)));
@@ -151,83 +139,15 @@ namespace AwsMock {
           std::cout << Configuration::GetAppName() << " v" << Configuration::GetVersion() << std::endl;
           exit(0);
 
-        } else if (name == "level") {
+        } else if (name == "loglevel") {
 
           _configuration.SetLogLevel(value);
-          Poco::Logger::get("").setLevel(value);
+          Poco::Logger::root().setLevel(value);
 
-        } else if (name == "file") {
+        } else if (name == "logfile") {
 
-          Poco::AutoPtr<Poco::FileChannel> pChannel(new Poco::FileChannel);
-          pChannel->setProperty("path", value);
-          pChannel->setProperty("rotation", "10 M");
-          pChannel->setProperty("archive", "timestamp");
-
-          Poco::Logger::root().setChannel(pChannel);
+          Core::LogStream::setFileChannel(value);
         }
-      }
-
-      /**
-       * Initialize the Prometheus monitoring counters and start the prometheus server.
-       */
-      void InitializeMonitoring() {
-
-        _metricService.Initialize();
-        _metricService.StartServer();
-      }
-
-      /**
-       * Initialize error handler
-       */
-      void InitializeErrorHandler() {
-
-        // Install error handler
-        Poco::ErrorHandler::set(&_threadErrorHandler);
-        log_debug_stream(_logger) << "Error handler initialized" << std::endl;
-      }
-
-      /**
-       * Initialize database indexes
-       */
-      void InitializeIndexes() {
-
-        // Install error handler
-        _database.CreateIndexes();
-        log_debug_stream(_logger) << "Database indexes created" << std::endl;
-      }
-
-      /**
-       * Initialize CURL library
-       */
-      void InitializeCurl() {
-        curl_global_init(CURL_GLOBAL_ALL);
-        log_debug_stream(_logger) << "Curl library initialized" << std::endl;
-
-      }
-
-      void InitializeServices() {
-        for (const auto &it : _services) {
-          bool status = _configuration.getBool("awsmock.service." + it + ".active", false);
-          _serviceDatabase.CreateOrUpdateService({.oid={}, .name=it, .status=(status ? Database::Entity::Service::ServiceStatus::RUNNING : Database::Entity::Service::ServiceStatus::STOPPED)});
-        }
-      }
-
-      void StartServices() {
-
-        // Start the S3 server
-        Poco::ThreadPool::defaultPool().start(_s3Server);
-
-        // Start the SQS server
-        Poco::ThreadPool::defaultPool().start(_sqsServer);
-
-        // Start the SNS server
-        Poco::ThreadPool::defaultPool().start(_snsServer);
-
-        // Start the lambda server
-        Poco::ThreadPool::defaultPool().start(_lambdaServer);
-
-        // Start the transfer server
-        Poco::ThreadPool::defaultPool().start(_transferServer);
       }
 
       /**
@@ -240,17 +160,13 @@ namespace AwsMock {
 
         log_debug_stream(_logger) << "Entering main routine" << std::endl;
 
-        // Start service and worker. Services needed to start first, as the worker could possibly use the services.
-        StartServices();
-
-        // Start HTTP server
+        // Start HTTP manager
         _restService.setRouter(_router);
-        _restService.start();
+        _restService.StartServer();
 
         // Wait for termination
         this->waitForTerminationRequest();
         return Application::EXIT_OK;
-
       }
 
     private:
@@ -258,7 +174,7 @@ namespace AwsMock {
       /**
        * Logger
        */
-      Core::LogStream _logger = Core::LogStream(Poco::Logger::get("Gateway"));
+      Core::LogStream _logger;
 
       /**
        * Application configuration
@@ -276,69 +192,9 @@ namespace AwsMock {
       std::shared_ptr<Controller::Router> _router = std::make_shared<Controller::Router>(_configuration, _metricService);
 
       /**
-       * Create notification queue
-       */
-      Poco::NotificationQueue _createQueue;
-
-      /**
-       * Invoke notification queue
-       */
-      Poco::NotificationQueue _invokeQueue;
-
-      /**
        * Gateway controller
        */
       RestService _restService = RestService(_configuration);
-
-      /**
-       * Stop condition
-       */
-      Poco::Condition _condition;
-
-      /**
-       * S3 server
-       */
-      Service::S3Server _s3Server = Service::S3Server(_configuration, _metricService, _condition);
-
-      /**
-       * SQS server
-       */
-      Service::SQSServer _sqsServer = Service::SQSServer(_configuration, _metricService, _condition);
-
-      /**
-       * SNS server
-       */
-      Service::SNSServer _snsServer = Service::SNSServer(_configuration, _metricService, _condition);
-
-      /**
-       * lambda server
-       */
-      Service::LambdaServer _lambdaServer = Service::LambdaServer(_configuration, _metricService, _createQueue, _invokeQueue, _condition);
-
-      /**
-       * Transfer server
-       */
-      Service::TransferServer _transferServer = Service::TransferServer(_configuration, _metricService, _condition);
-
-      /**
-       * Thread error handler
-       */
-      Core::ThreadErrorHandler _threadErrorHandler;
-
-      /**
-       * Database
-       */
-      Database::Database _database = Database::Database(_configuration);
-
-      /**
-       * Service database
-       */
-      Database::ServiceDatabase _serviceDatabase = Database::ServiceDatabase(_configuration);
-
-      /**
-       * Service names
-       */
-       std::vector<std::string> _services = {"s3", "sqs", "sns", "lambda", "transfer"};
   };
 
 } // namespace AwsMock

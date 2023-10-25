@@ -17,6 +17,10 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "S3 monitoring initialized" << std::endl;
   }
 
+  S3Monitoring::~S3Monitoring() {
+    _condition.signal();
+  }
+
   void S3Monitoring::run() {
 
     log_info_stream(_logger) << "S3 monitoring started" << std::endl;
@@ -41,6 +45,8 @@ namespace AwsMock::Service {
       _mutex.unlock();
     }
   }
+
+  void S3Monitoring::Stop() {_condition.signal();}
 
   void S3Monitoring::UpdateCounters() {
     long buckets = _s3Database->BucketCount();

@@ -9,7 +9,7 @@
 #define FTP_DEFAULT_HOST "localhost"
 #define FTP_DEFAULT_ADDRESS "0.0.0.0"
 #define FTP_BASE_DIR "/tmp/awsmock/data/transfer"
-#define FTP_BUCKET "transfer-server"
+#define FTP_BUCKET "transfer-manager"
 
 // C++ includes
 #include <awsmock/core/Configuration.h>
@@ -21,20 +21,20 @@ namespace AwsMock::FtpServer {
   class FtpServerImpl;
 
   /**
-   * @brief The fineftp::TransferFtpServer is a simple FTP server library.
+   * @brief The fineftp::TransferFtpServer is a simple FTP manager library.
    *
    * Using the TransferFtpServer class is simple:
    *   1. Create an instance
    *   2. Add a user
-   *   3. Start the server
+   *   3. Start the manager
    *
-   * Then your server is up and running. In code it will look like this:
+   * Then your manager is up and running. In code it will look like this:
    *
    * @code{.cpp}
    *
-   *   fineftp::TransferFtpServer server(2121);
-   *   server.addUserAnonymous("C:\\", fineftp::Permission::All);
-   *   server.start();
+   *   fineftp::TransferFtpServer manager(2121);
+   *   manager.addUserAnonymous("C:\\", fineftp::Permission::All);
+   *   manager.StartServer();
    *
    * @endcode
    *
@@ -52,7 +52,7 @@ namespace AwsMock::FtpServer {
        * free port port. Use port=0, if that behaviour is desired. The chosen port
        * can be determined by with getPort().
        *
-       * @param port: The port to start the FTP server on. Defaults to 21.
+       * @param port: The port to StartServer the FTP manager on. Defaults to 21.
        * @param host: The host to accept incoming connections from.
        */
       // TransferFtpServer(const std::string &address, uint16_t port = 21);
@@ -72,7 +72,7 @@ namespace AwsMock::FtpServer {
        * For security reasons it might be desirable to bind to a specific IP
        * address. Use TransferFtpServer(const std::string&, uint16_t) for that purpose.
        *
-       * @param port: The port to start the FTP server on. Defaults to 21.
+       * @param port: The port to StartServer the FTP manager on. Defaults to 21.
        */
       // TransferFtpServer(uint16_t port = 21);
 
@@ -132,12 +132,12 @@ namespace AwsMock::FtpServer {
       void stop();
 
       /**
-       * @brief Sets the name of the server
+       * @brief Sets the name of the manager
        */
       void setName(const std::string &name) { _name = name; }
 
       /**
-       * @brief Returns the name of the server
+       * @brief Returns the name of the manager
        */
       std::string getName() { return _name; }
 
@@ -149,21 +149,21 @@ namespace AwsMock::FtpServer {
       int getOpenConnectionCount() const;
 
       /**
-       * @brief Get the control port that the FTP server is listening on
+       * @brief Get the control port that the FTP manager is listening on
        *
-       * When the server was created with a specific port (not 0), this port will
+       * When the manager was created with a specific port (not 0), this port will
        * be returned.
-       * If the server however was created with port 0, the operating system will
+       * If the manager however was created with port 0, the operating system will
        * choose a free port. This method will return that port.
        *
-       * @return The control port the server is listening on
+       * @return The control port the manager is listening on
        */
       [[nodiscard]] int getPort() const;
 
       /**
-       * @brief Get the ip address that the FTP server is listening for.
+       * @brief Get the ip address that the FTP manager is listening for.
        *
-       * @return The ip address the FTP server is listening for.
+       * @return The ip address the FTP manager is listening for.
        */
       [[nodiscard]] std::string getAddress() const;
 
@@ -185,27 +185,27 @@ namespace AwsMock::FtpServer {
       std::unique_ptr<FtpServerImpl> _ftp_server;
 
       /**
-       * Name of the server
+       * Name of the manager
        */
       std::string _serverName;
 
       /**
-       * Hostname for the server
+       * Hostname for the manager
        */
       std::string _host;
 
       /**
-       * IP address for the server
+       * IP address for the manager
        */
       std::string _address;
 
       /**
-       * Hostname for the server
+       * Hostname for the manager
        */
       int _port;
 
       /**
-       * Name of the server
+       * Name of the manager
        */
       std::string _name;
 

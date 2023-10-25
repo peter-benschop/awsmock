@@ -6,7 +6,8 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 set(SOURCES src/Configuration.cpp src/Controller.cpp src/main.cpp)
 
-include_directories(include /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi ../core/include ../db/include)
+include_directories(include /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi ../core/include ../dto/include
+        ../db/include)
 link_directories(/usr/lib /usr/lib/x86_64-linux-gnu /usr/local/lib ../core)
 
 add_executable(${BINARY} ${SOURCES})

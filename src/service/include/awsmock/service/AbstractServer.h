@@ -7,16 +7,18 @@
 
 // C++ standard includes
 #include <string>
+#include <map>
 
 // Poco includes
 #include <Poco/Condition.h>
 #include <Poco/Logger.h>
-#include <Poco/Runnable.h>
+#include <Poco/Task.h>
+#include <Poco/Net/HTTPServer.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/repository/ServiceDatabase.h>
+#include <awsmock/repository/ModuleDatabase.h>
 
 namespace AwsMock::Service {
 
@@ -29,22 +31,47 @@ namespace AwsMock::Service {
        *
        * @param configuration AwsMock configuration
        * @param condition stop condition
+       * @param name manager name
        */
-      explicit AbstractServer(const Core::Configuration &configuration, Poco::Condition &condition);
+      explicit AbstractServer(const Core::Configuration &configuration, std::string name);
 
       /**
        * Checks whether the service is active
        *
-       * @param url HTTP URL
-       * @param body HTTP message body
-       * @param contentType HTTP content type
+       * @param name module name
        */
       bool IsActive(const std::string &name);
+
+      /**
+       * Returns the running flag
+       */
+      bool IsRunning();
 
       /**
        * Main thread methods
        */
       void run() override;
+
+      /**
+       * Stop the manager
+       */
+      void StopServer();
+
+      /**
+       * Start the HTTP manager
+       *
+       * @param maxQueueLength maximal request queue length
+       * @param maxThreads maximal number of worker threads
+       * @param host HTTP host name
+       * @param port HTTP port
+       * @param requestFactory HTTP request factory
+       */
+      void StartHttpServer(int maxQueueLength, int maxThreads, const std::string &host, int port, Poco::Net::HTTPRequestHandlerFactory *requestFactory);
+
+      /**
+       * Stops the HTTP manager
+       */
+      void StopHttpServer();
 
     protected:
 
@@ -61,7 +88,7 @@ namespace AwsMock::Service {
       /**
        * Shutdown condition
        */
-      Poco::Condition &_condition;
+      Poco::Condition _condition;
 
     private:
 
@@ -76,9 +103,14 @@ namespace AwsMock::Service {
       const Core::Configuration &_configuration;
 
       /**
+       * Service name
+       */
+      std::string _name;
+
+      /**
        * Service database
        */
-      std::unique_ptr<Database::ServiceDatabase> _serviceDatabase;
+      std::unique_ptr<Database::ModuleDatabase> _serviceDatabase;
 
       /**
        * Shutdown mutex
@@ -89,7 +121,17 @@ namespace AwsMock::Service {
        * Running flag
        */
       bool _running;
+
+      /**
+       * HTTP manager instance
+       */
+      std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
   };
+
+  /**
+   * Server map
+   */
+  typedef std::map<std::string, Service::AbstractServer*> ServerMap;
 
 } // namespace AwsMock::Service
 

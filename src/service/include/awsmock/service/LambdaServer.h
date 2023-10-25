@@ -20,7 +20,7 @@
 #include <awsmock/core/MetricService.h>
 #include <awsmock/dto/lambda/InvocationNotification.h>
 #include <awsmock/repository/LambdaDatabase.h>
-#include <awsmock/repository/ServiceDatabase.h>
+#include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/service/S3Service.h>
 #include <awsmock/service/AbstractWorker.h>
 #include <awsmock/service/AbstractServer.h>
@@ -44,9 +44,10 @@ namespace AwsMock::Service {
        *
        * @param configuration aws-mock configuration
        * @param metricService aws-mock monitoring
-       * @param condition stop condition
+       * @param createQueue create lambda notification queue
+       * @param invokeQueue invoke lambda notification queue
        */
-      explicit LambdaServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue, Poco::NotificationQueue &invokeQueue, Poco::Condition &condition);
+      explicit LambdaServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue, Poco::NotificationQueue &invokeQueue);
 
       /**
        * Destructor
@@ -59,33 +60,16 @@ namespace AwsMock::Service {
       void MainLoop() override;
 
       /**
-       * Stop server
+       * Stop monitoring manager
        */
-      void StopServer();
-
-      /**
-       * Return running flag
-       *
-       * @return running flag
-       */
-      bool IsRunning() const { return _running; }
+      void StopMonitoringServer();
 
     private:
 
       /**
-       * Start monitoring
+       * Start monitoring manager
        */
-      void StartMonitoring();
-
-      /**
-       * Start the restfull service.
-       */
-      void StartHttpServer();
-
-      /**
-       * Stop the restfull service.
-       */
-      void StopHttpServer();
+      void StartMonitoringServer();
 
       /**
        * Delete dangling, stopped containers
@@ -148,7 +132,7 @@ namespace AwsMock::Service {
       /**
        * Service database
        */
-      std::unique_ptr<Database::ServiceDatabase> _serviceDatabase;
+      std::unique_ptr<Database::ModuleDatabase> _serviceDatabase;
 
       /**
        * lambda database
@@ -194,11 +178,6 @@ namespace AwsMock::Service {
        * Sleeping period in ms
        */
       int _period;
-
-      /**
-       * HTTP server instance
-       */
-      std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
 
       /**
        * Rest port

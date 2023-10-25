@@ -92,13 +92,13 @@ namespace AwsMock::Core {
       static std::string CreateSNSSubscriptionArn(const std::string &region, const std::string &accountId, const std::string &topicName);
 
       /**
-       * Create transfer server ARN
+       * Create transfer manager ARN
        *
        * <p>Syntax arn:aws:sns:us-west-2:123456789012:serverId</p>
        *
        * @param region AWS region
        * @param accountId AWS account ID
-       * @param serverId ID of the transfer server
+       * @param serverId ID of the transfer manager
        */
       static std::string CreateTransferArn(const std::string &region, const std::string &accountId, const std::string &serverId);
 

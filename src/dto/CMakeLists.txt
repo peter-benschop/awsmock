@@ -19,15 +19,18 @@ set(DOCKER_SOURCES src/docker/Port.cpp src/docker/Container.cpp src/docker/ListC
         src/docker/CreateContainerRequest.cpp)
 set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionResponse.cpp src/lambda/DeadLetterConfig.cpp
         src/lambda/Function.cpp src/lambda/InvocationNotification.cpp src/lambda/CreateNotification.cpp)
+set(MODULE_SOURCES src/module/Module.cpp)
 
-set(SOURCES ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES})
+set(SOURCES ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES} ${MODULE_SOURCES})
 
 # Includes
 include_directories(include ../core/include ../db/include /usr/include /usr/include/mongo /usr/include/bsoncxx/v_noabi
         /usr/include/mongocxx/v_noabi tbb)
 
 add_library(${LIBRARY} SHARED ${SOURCES}
-        include/awsmock/dto/lambda/InvocationNotification.h)
+        include/awsmock/dto/lambda/InvocationNotification.h
+        include/awsmock/dto/module/Module.h
+        src/Module.cpp)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 

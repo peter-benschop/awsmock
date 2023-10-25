@@ -10,37 +10,11 @@ namespace AwsMock::Core {
 
   MetricService::MetricService(int port, long timeout) : _logger(Poco::Logger::get("MetricService")), _port(port), _timeout(timeout) {}
 
-  MetricService::~MetricService() {
-    // Delete counters
-    for (auto &it : _counterMap) {
-      delete it.second;
-    }
-    // Delete gauges
-    for (auto &it : _gaugeMap) {
-      delete it.second;
-    }
-    for (auto &it : _timerMap) {
-      delete it.second;
-    }
-    if (_server != nullptr) {
-      _server->stop();
-    }
-    if (_metricSystemTimer != nullptr) {
-      _metricSystemTimer->stop();
-    }
-    _timerStartMap.clear();
-    delete _server;
-    delete _metricSystemTimer;
-    delete _metricSystemCollector;
-    log_debug_stream(_logger) << "MetricService cleaned up" << std::endl;
-  }
-
-  [[maybe_unused]]
   void MetricService::Initialize() {
-    _server = new Poco::Prometheus::MetricsServer(_port);
-    _metricSystemTimer = new Poco::Timer(0, _timeout);
-    _metricSystemCollector = new MetricSystemCollector();
-    log_debug_stream(_logger) << "Prometheus server initialized, port: " << _port << std::endl;
+    _server = std::make_shared<Poco::Prometheus::MetricsServer>(_port);
+    _metricSystemTimer = std::make_shared<Poco::Timer>(0, _timeout);
+    _metricSystemCollector = std::make_shared<MetricSystemCollector>();
+    log_debug_stream(_logger) << "Prometheus manager initialized, port: " << _port << std::endl;
   }
 
   [[maybe_unused]] void MetricService::StartServer() {
@@ -48,17 +22,18 @@ namespace AwsMock::Core {
     if (_server != nullptr) {
       _server->start();
     }
-    log_info_stream(_logger) << "Monitoring server started, port: " << _port << std::endl;;
+    log_info_stream(_logger) << "Monitoring manager started, port: " << _port << std::endl;;
   }
 
   void MetricService::ShutdownServer() {
-    log_info_stream(_logger) << "Starting MetricService shutdown" << std::endl;
-    if (_metricSystemTimer != nullptr) {
+    /*if (_metricSystemTimer != nullptr) {
       _metricSystemTimer->stop();
-    }
+    }*/
     if (_server != nullptr) {
       _server->stop();
+      _server.reset();
     }
+    log_info_stream(_logger) << "Metric service has been shutdown" << std::endl;
   }
 
   void MetricService::AddCounter(const std::string &name) {

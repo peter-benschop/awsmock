@@ -20,8 +20,9 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/s3/CreateBucketConstraint.h>
 #include <awsmock/ftpserver/FtpServer.h>
-#include <awsmock/repository/ServiceDatabase.h>
+#include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/repository/TransferDatabase.h>
+#include <awsmock/service/AbstractServer.h>
 #include <awsmock/service/AbstractWorker.h>
 #include <awsmock/service/TransferHandlerFactory.h>
 
@@ -29,13 +30,13 @@
 #define TRANSFER_DEFAULT_HOST "localhost"
 #define TRANSFER_DEFAULT_QUEUE_LENGTH  250
 #define TRANSFER_DEFAULT_THREADS 50
-#define DEFAULT_TRANSFER_BUCKET "transfer-server"
+#define DEFAULT_TRANSFER_BUCKET "transfer-manager"
 #define DEFAULT_BASE_DIR "transfer"
 #define CONTENT_TYPE_JSON "application/json"
 
 namespace AwsMock::Service {
 
-  class TransferServer : public Poco::Runnable, public AbstractWorker {
+  class TransferServer : public AbstractServer, public AbstractWorker {
 
     public:
 
@@ -44,9 +45,8 @@ namespace AwsMock::Service {
        *
        * @param configuration aws-mock configuration
        * @param metricService aws-mock monitoring service
-       * @param condition stop condition
        */
-      explicit TransferServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
+      explicit TransferServer(Core::Configuration &configuration, Core::MetricService &metricService);
 
       /**
        * Destructor
@@ -56,43 +56,21 @@ namespace AwsMock::Service {
       /**
        * Main method
        */
-      void run() override;
-
-      /**
-       * Stop server
-       */
-      void StopServer();
-
-      /**
-       * Return running flag
-       *
-       * @return running flag
-       */
-      bool IsRunning() const { return _running; }
+      void MainLoop() override;
 
     private:
 
       /**
-       * Start the restfull service.
-       */
-      void StartHttpServer();
-
-      /**
-       * Stop the restfull service.
-       */
-      void StopHttpServer();
-
-      /**
-       * Starts a single transfer server
+       * Starts a single transfer manager
        *
-       * @param server transfer server entity
+       * @param server transfer manager entity
        */
       void StartTransferServer(Database::Entity::Transfer::Transfer &server);
 
       /**
-       * Stops a single transfer server
+       * Stops a single transfer manager
        *
-       * @param server transfer server entity
+       * @param server transfer manager entity
        */
       void StopTransferServer(Database::Entity::Transfer::Transfer &server);
 
@@ -140,7 +118,7 @@ namespace AwsMock::Service {
       /**
        * Service database
        */
-      std::unique_ptr<Database::ServiceDatabase> _serviceDatabase;
+      std::unique_ptr<Database::ModuleDatabase> _serviceDatabase;
 
       /**
        * lambda database
@@ -176,11 +154,6 @@ namespace AwsMock::Service {
        * HTTP max concurrent connection
        */
       int _maxThreads;
-
-      /**
-       * HTTP server instance
-       */
-      std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
 
       /**
        * AWS region
@@ -223,7 +196,7 @@ namespace AwsMock::Service {
       std::map<std::string, std::shared_ptr<FtpServer::FtpServer>> _transferServerList;
 
       /**
-       * Actual FTP server
+       * Actual FTP manager
        */
       std::shared_ptr<FtpServer::FtpServer> _ftpServer;
 
@@ -236,16 +209,6 @@ namespace AwsMock::Service {
        * S3 service port
        */
       int _s3ServicePort;
-
-      /**
-       * Shutdown condition
-       */
-      Poco::Condition &_condition;
-
-      /**
-       * Shutdown mutex
-       */
-      Poco::Mutex _mutex;
   };
 
 } // namespace AwsMock::Service

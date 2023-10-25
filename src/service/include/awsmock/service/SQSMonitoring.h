@@ -31,7 +31,7 @@
 #include <awsmock/core/LogStream.h>
 #include "awsmock/core/MetricService.h"
 #include "awsmock/core/ResourceNotFoundException.h"
-#include <awsmock/repository/ServiceDatabase.h>
+#include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/AbstractWorker.h>
 

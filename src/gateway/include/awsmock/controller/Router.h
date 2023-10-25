@@ -27,7 +27,7 @@
 
 namespace AwsMock::Controller {
 
-    class Router : public Poco::Net::HTTPRequestHandlerFactory {
+  class Router : public Poco::Net::HTTPRequestHandlerFactory {
 
     public:
 
@@ -38,6 +38,7 @@ namespace AwsMock::Controller {
        * @param metricService common monitoring service
        */
       Router(Configuration &configuration, Core::MetricService &metricService);
+      ~Router();
 
       /**
        * Add a route
@@ -93,7 +94,7 @@ namespace AwsMock::Controller {
        * Routing table
        */
       std::map<std::string, std::string> _routingTable;
-    };
+  };
 
 } // namespace AwsMock::Controller
 

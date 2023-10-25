@@ -192,8 +192,8 @@ namespace AwsMock::Service {
 
   void DockerService::StartDockerContainer(const std::string &id) {
 
-    Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketRequest("POST", "http://localhost/containers/" + id + "/start");
-    log_debug_stream(_logger) << "Sending start container request" << std::endl;
+    Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketRequest("POST", "http://localhost/containers/" + id + "/StartServer");
+    log_debug_stream(_logger) << "Sending StartServer container request" << std::endl;
     log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
     if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_NO_CONTENT && curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_NOT_MODIFIED) {

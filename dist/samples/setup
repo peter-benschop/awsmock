@@ -125,7 +125,7 @@ function transfer_exists() {
 
 function create_transfer_server {
   if [ "$(transfer_exists)" -eq 0 ]; then
-    SERVERID=$(awsmock transfer create-server --protocols ftp | jq -r '.ServerId') > /dev/null 2>&1
+    SERVERID=$(awsmock transfer create-manager --protocols ftp | jq -r '.ServerId') > /dev/null 2>&1
     echo "Transfer server $SERVERID created"
   else
     SERVERID=$(awsmock transfer list-servers | jq -r '.Servers[].ServerId')
@@ -135,18 +135,18 @@ function create_transfer_server {
 
 function create_transfer_user {
   role="arn:aws:iam::000000000000:role/$2"
-  awsmock transfer create-user --server-id $1 --role $role --user-name $3 --home-directory $4 > /dev/null 2>&1
+  awsmock transfer create-user --manager-id $1 --role $role --user-name $3 --home-directory $4 > /dev/null 2>&1
   echo "Transfer server user $3 created"
 }
 
 function start_transfer_server {
-  awsmock transfer start-server --server-id $1
+  awsmock transfer start-manager --manager-id $1
 }
 
 #
 # Create S3 buckets
 #
-create_s3_bucket transfer-server
+create_s3_bucket transfer-manager
 create_s3_bucket file-delivery
 create_s3_bucket json-parsing-results
 create_s3_bucket onix3-produktmeldungen
@@ -206,7 +206,7 @@ create_sns_topic datenlieferant-updates
 create_sns_subscription protokollierung
 
 #
-# Create FTP server, creates also the transfer-server S3 bucket
+# Create FTP manager, creates also the transfer-manager S3 bucket
 #
 create_transfer_server
 create_transfer_user $SERVERID transfer_role ftpuser1 ftpuser1
@@ -218,5 +218,5 @@ start_transfer_server $SERVERID
 #
 # Setup S3 bucket notification events
 #
-create_bucket_notification transfer-server file-copy-hook.json
+create_bucket_notification transfer-manager file-copy-hook.json
 create_bucket_notification file-delivery file-delivery-hook.json

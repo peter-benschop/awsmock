@@ -12,8 +12,8 @@
 
 // AwsMock includes
 #include <awsmock/core/TestUtils.h>
-#include <awsmock/repository/ServiceDatabase.h>
-#include <awsmock/entity/service/ServiceStatus.h>
+#include <awsmock/repository/ModuleDatabase.h>
+#include <awsmock/entity/service/ModuleStatus.h>
 
 namespace AwsMock::Database {
 

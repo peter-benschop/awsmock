@@ -32,7 +32,7 @@
 #include <awsmock/core/MetricService.h>
 #include <awsmock/core/ResourceNotFoundException.h>
 #include <awsmock/core/ThreadPool.h>
-#include <awsmock/repository/ServiceDatabase.h>
+#include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/repository/LambdaDatabase.h>
 
 #define LAMBDA_MONITORING_DEFAULT_PERIOD 60000

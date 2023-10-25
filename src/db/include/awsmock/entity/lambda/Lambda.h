@@ -289,7 +289,7 @@ namespace AwsMock::Database::Entity::Lambda {
       std::string fileName;
 
       /**
-       * Last function start
+       * Last function StartServer
        */
       Poco::DateTime lastStarted;
 

@@ -10,10 +10,12 @@ set(LAMBDA_SOURCES src/lambda/LambdaServer.cpp src/lambda/LambdaHandler.cpp src/
 set(TRANSFER_SOURCES src/transfer/TransferServer.cpp src/transfer/TransferHandler.cpp src/transfer/TransferService.cpp)
 set(FTP_SOURCES src/ftpserver/Filesystem.cpp src/ftpserver/FtpSession.cpp src/ftpserver/FtpServer.cpp
         src/ftpserver/FtpServerImpl.cpp src/ftpserver/UserDatabase.cpp)
+set(GATEWAY_SOURCES src/gateway/GatewayServer.cpp src/gateway/GatewayRouter.cpp src/gateway/GatewayHandler.cpp)
 set(DOCKER_SOURCES src/docker/DockerService.cpp)
 
-set(SOURCES src/common/AbstractHandler.cpp src/common/AbstractWorker.cpp src/common/AbstractServer.cpp ${S3_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${TRANSFER_SOURCES}
-        ${FTP_SOURCES} ${LAMBDA_SOURCES} ${DOCKER_SOURCES})
+set(SOURCES src/common/AbstractHandler.cpp src/common/AbstractWorker.cpp src/common/AbstractServer.cpp ${S3_SOURCES}
+        ${SQS_SOURCES} ${SNS_SOURCES} ${TRANSFER_SOURCES} ${FTP_SOURCES} ${LAMBDA_SOURCES} ${DOCKER_SOURCES}
+        ${GATEWAY_SOURCES})
 
 # Test directory
 add_subdirectory(tst)
@@ -22,7 +24,8 @@ add_subdirectory(tst)
 include_directories(include ../core/include ../db/include ../dto/include /usr/include /usr/include/bsoncxx/v_noabi
         /usr/include/mongocxx/v_noabi tbb)
 
-add_library(${LIBRARY} SHARED ${SOURCES})
+add_library(${LIBRARY} SHARED ${SOURCES}
+        src/gateway/GatewayRouter.cpp)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 
 install(TARGETS ${LIBRARY} DESTINATION lib)

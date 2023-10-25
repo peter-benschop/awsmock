@@ -44,7 +44,7 @@ namespace AwsMock::Service {
       std::string _host = _configuration.getString("awsmock.service.s3.host", S3_DEFAULT_HOST);
       _endpoint = "http://" + _host + ":" + _port;
 
-      // Start HTTP server
+      // Start HTTP manager
       Poco::ThreadPool::defaultPool().start(_s3Server);
       while(!_s3Server.IsRunning()) {
         Poco::Thread::sleep(1000);
@@ -61,11 +61,10 @@ namespace AwsMock::Service {
     Core::CurlUtils _curlUtils;
     std::string _testFile, _endpoint;
     std::map <std::string, std::string> _extraHeaders;
-    Poco::Condition _condition;
     Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
     Core::MetricService _metricService = Core::MetricService(_configuration);
     Database::S3Database _database = Database::S3Database(_configuration);
-    S3Server _s3Server = S3Server(_configuration, _metricService, _condition);
+    S3Server _s3Server = S3Server(_configuration, _metricService);
   };
 
   TEST_F(S3ServerTest, BucketCreateTest) {

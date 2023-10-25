@@ -6,8 +6,7 @@
 
 namespace AwsMock::Controller {
 
-  Router::Router(Configuration &configuration, Core::MetricService &metricService)
-      : _logger(Poco::Logger::get("Router")), _configuration(configuration), _metricService(metricService) {
+  Router::Router(Configuration &configuration, Core::MetricService &metricService): _logger(Poco::Logger::get("Router")), _configuration(configuration), _metricService(metricService) {
 
     // Add routes
     AddRoute("s3", "AwsMock::Resource::Factory::S3Factory");
@@ -19,7 +18,9 @@ namespace AwsMock::Controller {
     AddRoute("module", "AwsMock::Resource::Factory::ModuleFactory");
     log_debug_stream(_logger) << "Router initialized" << std::endl;
   }
-
+  Router::~Router(){
+    serverStopped.enable();
+  }
   Poco::Net::HTTPRequestHandler *Router::createRequestHandler(const Poco::Net::HTTPServerRequest &request) {
 
     // Get the authorization header

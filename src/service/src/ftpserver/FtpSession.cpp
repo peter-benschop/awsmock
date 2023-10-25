@@ -280,7 +280,7 @@ namespace AwsMock::FtpServer {
   // Transfer parameter commands
 
   void FtpSession::handleFtpCommandPORT(const std::string & /*param*/) {
-    sendFtpMessage(FtpReplyCode::SYNTAX_ERROR_UNRECOGNIZED_COMMAND, "FTP active mode is not supported by this server");
+    sendFtpMessage(FtpReplyCode::SYNTAX_ERROR_UNRECOGNIZED_COMMAND, "FTP active mode is not supported by this manager");
   }
 
   void FtpSession::handleFtpCommandPASV(const std::string & /*param*/) {
@@ -451,7 +451,7 @@ namespace AwsMock::FtpServer {
 
     // TODO: the ACTION_NOT_TAKEN reply is not RCF 959 conform. Apparently in
     // 1985 nobody anticipated that you might not want anybody uploading files
-    // to your server. We use the return code anyways, as the popular FileZilla
+    // to your manager. We use the return code anyways, as the popular FileZilla
     // Server also returns that code as "Permission denied"
     if (static_cast<int>(_logged_in_user->permissions_ & Permission::FileWrite) == 0) {
       sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Permission denied");
@@ -749,7 +749,7 @@ namespace AwsMock::FtpServer {
           return;
         }
       } else {
-        // TODO: RFC959: If the pathname specifies a file then the server should send current information on the file.
+        // TODO: RFC959: If the pathname specifies a file then the manager should send current information on the file.
         sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Path is not a directory");
         return;
       }
@@ -785,7 +785,7 @@ namespace AwsMock::FtpServer {
           return;
         }
       } else {
-        // TODO: RFC959: If the pathname specifies a file then the server should send current information on the file.
+        // TODO: RFC959: If the pathname specifies a file then the manager should send current information on the file.
         sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Path is not a directory");
         return;
       }

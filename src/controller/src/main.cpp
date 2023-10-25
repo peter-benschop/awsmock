@@ -35,7 +35,6 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/ThreadErrorHandler.h>
 #include <awsmock/controller/Configuration.h>
 #include <awsmock/repository/Database.h>
 #include "awsmock/controller/Controller.h"
@@ -56,9 +55,9 @@ namespace AwsMock::Controller {
        */
       [[maybe_unused]] void initialize(Application &self) override {
 
-        log_info_stream(_logger) << "Starting " << Configuration::GetAppName() << " " << Configuration::GetVersion() << " pid: " << getpid() << " loglevel: "
-                                 << _configuration.GetLogLevel() << std::endl;
-        log_info_stream(_logger) << "Configuration file: " << _configuration.GetFilename() << std::endl;
+        //log_info_stream(_logger) << "Starting " << Configuration::GetAppName() << " " << Configuration::GetVersion() << " pid: " << getpid() << " loglevel: "
+//                                 << _configuration.GetLogLevel() << std::endl;
+        //      log_info_stream(_logger) << "Configuration file: " << _configuration.GetFilename() << std::endl;
         Poco::Util::Application::initialize(self);
       }
 
@@ -87,9 +86,9 @@ namespace AwsMock::Controller {
             Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
         options.addOption(Poco::Util::Option("list", "", "list all services").required(false).repeatable(false).callback(
             Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
-        options.addOption(Poco::Util::Option("start", "", "start a service").required(false).repeatable(false).argument("value").callback(
+        options.addOption(Poco::Util::Option("start", "", "starts a service").required(false).repeatable(false).argument("value").callback(
             Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
-        options.addOption(Poco::Util::Option("stop", "", "stop a service").required(false).repeatable(false).callback(
+        options.addOption(Poco::Util::Option("stop", "", "stops a service").required(false).repeatable(false).argument("value").callback(
             Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
         options.addOption(Poco::Util::Option("help", "", "display help information").required(false).repeatable(false).callback(
             Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
@@ -119,7 +118,7 @@ namespace AwsMock::Controller {
 
         } else if (name == "version") {
 
-          std::cout << Configuration::GetAppName() << " v" << Configuration::GetVersion() << std::endl;
+          std::cout << "awsmockctl" << " " << Configuration::GetVersion() << std::endl;
           exit(0);
 
         } else if (name == "level") {
@@ -134,16 +133,13 @@ namespace AwsMock::Controller {
         } else if (name == "start") {
 
           _controller.StartService(value);
+
+        } else if (name == "stop") {
+
+          _controller.StopService(value);
         }
 
       }
-
-/*      void InitializeServices() {
-        for (const auto &it : _services) {
-          bool status = _configuration.getBool("awsmock.service." + it + ".active", false);
-          _serviceDatabase.CreateOrUpdateService({.oid={}, .name=it, .status=(status ? Database::Entity::Service::ServiceStatus::RUNNING : Database::Entity::Service::ServiceStatus::STOPPED)});
-        }
-      }*/
 
       /**
        * Main routine.
@@ -152,8 +148,6 @@ namespace AwsMock::Controller {
        * @return system exit code.
        */
       int main([[maybe_unused]]const ArgVec &args) override {
-
-        log_debug_stream(_logger) << "Entering main routine" << std::endl;
         return 0;
       }
 

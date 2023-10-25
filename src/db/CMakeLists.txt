@@ -9,10 +9,10 @@ set(S3_SOURCES src/entity/s3/Bucket.cpp src/entity/s3/BucketNotification.cpp src
 set(LAMBDA_SOURCES src/entity/lambda/Tags.cpp src/entity/lambda/Environment.cpp
         src/entity/lambda/EphemeralStorage.cpp src/entity/lambda/Lambda.cpp src/repository/LambdaDatabase.cpp)
 set(TRANSFER_SOURCES src/repository/TransferDatabase.cpp src/entity/transfer/User.cpp src/entity/transfer/Transfer.cpp)
-set(SERVICE_SOURCES src/entity/service/Service.cpp src/repository/ServiceDatabase.cpp)
+set(SERVICE_SOURCES src/entity/service/Module.cpp src/repository/ModuleDatabase.cpp)
 
-set(SOURCES src/repository/Database.cpp src/utils/TestUtils.cpp ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${LAMBDA_SOURCES}
-        ${TRANSFER_SOURCES} ${SERVICE_SOURCES})
+set(SOURCES src/repository/Database.cpp src/repository/ModuleDatabase.cpp src/utils/TestUtils.cpp
+        ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${LAMBDA_SOURCES} ${TRANSFER_SOURCES} ${SERVICE_SOURCES})
 
 # Test directory
 add_subdirectory(tst)

@@ -9,22 +9,17 @@
 namespace AwsMock {
 
   RestService::RestService(Core::Configuration &configuration)
-      : _port(GATEWAY_DEFAULT_PORT), _host(GATEWAY_DEFAULT_HOST), _logger(Poco::Logger::get("RestService")), _configuration(configuration) {
+      : _port(MANAGER_DEFAULT_PORT), _host(MANAGER_DEFAULT_HOST), _logger(Poco::Logger::get("RestService")), _configuration(configuration) {
 
-    _port = _configuration.getInt("awsmock.gateway.port", GATEWAY_DEFAULT_PORT);
-    _host = _configuration.getString("awsmock.gateway.host", GATEWAY_DEFAULT_HOST);
-    _maxQueueLength = _configuration.getInt("awsmock.gateway.max.queue", GATEWAY_MAX_CONNECTIONS);
-    _maxThreads = _configuration.getInt("awsmock.gateway.max.threads", GATEWAY_MAX_THREADS);
+    _port = _configuration.getInt("awsmock.gateway.port", MANAGER_DEFAULT_PORT);
+    _host = _configuration.getString("awsmock.gateway.host", MANAGER_DEFAULT_HOST);
+    _maxQueueLength = _configuration.getInt("awsmock.gateway.max.queue", MANAGER_MAX_CONNECTIONS);
+    _maxThreads = _configuration.getInt("awsmock.gateway.max.threads", MANAGER_MAX_THREADS);
     log_debug_stream(_logger) << "Rest service initialized, endpoint: " << _host << ":" << _port << std::endl;
   }
 
   RestService::~RestService() {
-
-    _router.reset();
-    if (_httpServer) {
-      _httpServer->stopAll(true);
-      _httpServer.reset();
-    }
+    StopServer();
   }
 
   void RestService::setPort(int port) {
@@ -39,9 +34,9 @@ namespace AwsMock {
     return _router;
   }
 
-  void RestService::start() {
+  void RestService::StartServer() {
 
-    // Configure server
+    // Configure manager
     auto *httpServerParams = new Poco::Net::HTTPServerParams();
 
     httpServerParams->setMaxQueued(_maxQueueLength);
@@ -56,9 +51,17 @@ namespace AwsMock {
     }
   }
 
-  void RestService::start(std::shared_ptr<Poco::Net::HTTPRequestHandlerFactory> router, int port) {
+  void RestService::StartServer(std::shared_ptr<Poco::Net::HTTPRequestHandlerFactory> router, int port) {
     setPort(port);
     setRouter(std::move(router));
-    start();
+    StartServer();
+  }
+
+  void RestService::StopServer() {
+    //_router.reset();
+    if (_httpServer) {
+      _httpServer->stopAll(true);
+      _httpServer.reset();
+    }
   }
 }

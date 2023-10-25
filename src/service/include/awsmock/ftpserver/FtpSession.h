@@ -31,7 +31,7 @@
 #include <awsmock/service/AbstractWorker.h>
 
 #define DEFAULT_BASE_DIR "transfer"
-#define DEFAULT_TRANSFER_BUCKET "transfer-server"
+#define DEFAULT_TRANSFER_BUCKET "transfer-manager"
 
 namespace AwsMock::FtpServer {
     class FtpSession : public std::enable_shared_from_this<FtpSession>, public Service::AbstractWorker {
@@ -294,7 +294,7 @@ namespace AwsMock::FtpServer {
       int _s3ServicePort;
 
       /**
-       * Transfer server base dir
+       * Transfer manager base dir
        */
       std::string _baseDir;
 

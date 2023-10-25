@@ -61,7 +61,7 @@ namespace AwsMock::Core
     TEST_F(StringUtilsTest, JoinTest)
     {
         // arrange
-        std::vector<std::string> values = {"transfer-server", "ftpuser1", "incoming", "mix"};
+        std::vector<std::string> values = {"transfer-manager", "ftpuser1", "incoming", "mix"};
 
         // act
         std::string result = StringUtils::Join(values, '/', 1);

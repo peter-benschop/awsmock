@@ -13,17 +13,17 @@
 #include "awsmock/core/LogStream.h"
 #include "awsmock/core/Configuration.h"
 
-#define GATEWAY_DEFAULT_PORT 4567
+#define MANAGER_DEFAULT_PORT 4567
 #define GATEWAY_DEFAULT_HOST "localhost"
-#define GATEWAY_MAX_CONNECTIONS 250
+#define MANAGER_MAX_CONNECTIONS 250
 #define GATEWAY_MAX_THREADS 50
 
 namespace AwsMock {
 
-    /**
-     * General REST service
-     */
-    class RestService {
+  /**
+   * General REST service
+   */
+  class RestService {
 
     public:
       /**
@@ -62,9 +62,9 @@ namespace AwsMock {
       /**
        * Start the restfull service.
        *
-       * The router has to be defined before the HTTP server is started.
+       * The router has to be defined before the HTTP manager is started.
        */
-      void start();
+      void StartServer();
 
       /**
        * Start with port and router.
@@ -72,7 +72,12 @@ namespace AwsMock {
        * @param router router to use
        * @param port port to use (default: 9100)
        */
-      void start(std::shared_ptr<Poco::Net::HTTPRequestHandlerFactory> router, int port = GATEWAY_DEFAULT_PORT);
+      void StartServer(std::shared_ptr<Poco::Net::HTTPRequestHandlerFactory> router, int port = MANAGER_DEFAULT_PORT);
+
+      /**
+       * Stop the manager
+       */
+      void StopServer();
 
     private:
 
@@ -102,7 +107,7 @@ namespace AwsMock {
       std::shared_ptr<Poco::Net::HTTPRequestHandlerFactory> _router = nullptr;
 
       /**
-       * HTTP server instance
+       * HTTP manager instance
        */
       std::shared_ptr<Poco::Net::HTTPServer> _httpServer = nullptr;
 
@@ -115,7 +120,7 @@ namespace AwsMock {
        * HTTP max concurrent connection
        */
       int _maxThreads;
-    };
+  };
 } // namespace AwsMock
 
 #endif //AWSMOCK_CONTROLLER_RESTSERVICE_H

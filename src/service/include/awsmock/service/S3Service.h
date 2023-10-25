@@ -207,7 +207,7 @@ namespace AwsMock::Service {
     /**
      * Send lambda function invocation request to lambda service.
      *
-     * <p>This will send a lambda invocation requst to the lambda service. The lambda service will start the corresponding lambda function and will send the S3
+     * <p>This will send a lambda invocation requst to the lambda service. The lambda service will StartServer the corresponding lambda function and will send the S3
      * notification request to the lambda function.</p>
      *
      * @param eventNotification S3 event notification
@@ -333,7 +333,7 @@ namespace AwsMock::Service {
     std::string _dataS3Dir;
 
     /**
-     * Transfer server base directory
+     * Transfer manager base directory
      */
     std::string _transferDir;
 
