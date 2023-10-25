@@ -53,7 +53,7 @@ function delete_sns_topic(){
 }
 
 #
-# Lambda function
+# lambda function
 #
 function lambda_exists() {
   awsmock lambda list-functions | grep arn | grep $1 | wc -l
@@ -69,7 +69,7 @@ function delete_lambda_function(){
 }
 
 #
- # Transfer server
+ # Transfer manager
  #
  function transfer_exists() {
    awsmock transfer list-servers | grep "Arn" | wc -l
@@ -78,7 +78,7 @@ function delete_lambda_function(){
  function delete_transfer_server {
    if [ "$(transfer_exists)" -gt 0 ]; then
      SERVERID=$(awsmock transfer list-servers | jq -r '.Servers[].ServerId')
-     awsmock transfer delete-server --server-id "$SERVERID" > /dev/null 2>&1
+     awsmock transfer delete-manager --manager-id "$SERVERID" > /dev/null 2>&1
      echo "Transfer server $SERVERID deleted"
    else
      echo "Transfer server does not exist"
@@ -92,7 +92,7 @@ function delete_lambda_function(){
 #
 # Delete S3 objects
 #
-delete_s3_bucket transfer-server
+delete_s3_bucket transfer-manager
 delete_s3_bucket file-delivery
 delete_s3_bucket json-parsing-results
 delete_s3_bucket onix3-produktmeldungen
@@ -146,6 +146,6 @@ delete_sns_topic protokollierung-topic
 delete_sns_topic datenlieferant-updates
 
 #
-# Delete transfer server
+# Delete transfer manager
 #
 delete_transfer_server

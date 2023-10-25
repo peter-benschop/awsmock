@@ -1,0 +1,160 @@
+//
+// Created by vogje01 on 02/06/2023.
+//
+
+#ifndef AWMOCK_CORE_SERVICEDATABASETEST_H
+#define AWMOCK_CORE_SERVICEDATABASETEST_H
+
+// C++ standard includes
+#include <iostream>
+#include <vector>
+
+// GTest includes
+#include <gtest/gtest.h>
+
+// Local includes
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/TestUtils.h>
+#include <awsmock/repository/ModuleDatabase.h>
+
+// MongoDB includes
+#include <bsoncxx/builder/basic/document.hpp>
+#include <mongocxx/client.hpp>
+
+#define SERVICE "test-service"
+
+namespace AwsMock::Database {
+
+  using bsoncxx::builder::basic::kvp;
+  using bsoncxx::builder::basic::make_array;
+  using bsoncxx::builder::basic::make_document;
+
+  class ServiceDatabaseTest : public ::testing::Test {
+
+    protected:
+
+      void SetUp() override {
+        _region = _configuration.getString("awsmock.region");
+      }
+
+      void TearDown() override {
+        _moduleDatabase.DeleteAllModules();
+      }
+
+      std::string _region;
+      Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+      ModuleDatabase _moduleDatabase = ModuleDatabase(_configuration);
+  };
+
+  TEST_F(ServiceDatabaseTest, ServiceCreateTest) {
+
+    // arrange
+    Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
+
+    // act
+    Entity::Module::Module result = _moduleDatabase.CreateModule(module);
+
+    // assert
+    EXPECT_TRUE(result.name == SERVICE);
+    EXPECT_TRUE(result.status == Entity::Module::ModuleStatus::RUNNING);
+  }
+
+  TEST_F(ServiceDatabaseTest, ServiceExistsTest) {
+
+    // arrange
+    Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
+    module = _moduleDatabase.CreateModule(module);
+
+    // act
+    bool result1 = _moduleDatabase.ModuleExists(module.name);
+    bool result2 = _moduleDatabase.ModuleExists("blabla");
+
+    // assert
+    EXPECT_TRUE(result1);
+    EXPECT_FALSE(result2);
+  }
+
+  TEST_F(ServiceDatabaseTest, ServiceActiveTest) {
+
+    // arrange
+    Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
+    module = _moduleDatabase.CreateModule(module);
+
+    // act
+    bool result = _moduleDatabase.IsActive(module.name);
+
+    // assert
+    EXPECT_TRUE(result);
+  }
+
+  TEST_F(ServiceDatabaseTest, ServiceGetByNameTest) {
+
+    // arrange
+    Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
+    module = _moduleDatabase.CreateModule(module);
+
+    // act
+    Entity::Module::Module result = _moduleDatabase.GetModuleByName(module.name);
+
+    // assert
+    EXPECT_TRUE(result.name == SERVICE);
+  }
+
+  TEST_F(ServiceDatabaseTest, ServiceGetByIdTest) {
+
+    // arrange
+    Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
+    module = _moduleDatabase.CreateModule(module);
+    bsoncxx::oid oid(module.oid);
+
+    // act
+    Entity::Module::Module result = _moduleDatabase.GetModuleById(oid);
+
+    // assert
+    EXPECT_TRUE(result.name == SERVICE);
+  }
+
+  TEST_F(ServiceDatabaseTest, ServiceUpdateTest) {
+
+    // arrange
+    Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
+    module = _moduleDatabase.CreateModule(module);
+    module.status = Entity::Module::ModuleStatus::STOPPED;
+
+    // act
+    Entity::Module::Module result = _moduleDatabase.UpdateModule(module);
+
+    // assert
+    EXPECT_TRUE(result.status == Entity::Module::ModuleStatus::STOPPED);
+  }
+
+  TEST_F(ServiceDatabaseTest, ServiceListTest) {
+
+    // arrange
+    Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
+    _moduleDatabase.CreateModule(module);
+
+    // act
+    Entity::Module::ModuleList result = _moduleDatabase.ListModules();
+
+    // assert
+    EXPECT_EQ(1, result.size());
+  }
+
+  TEST_F(ServiceDatabaseTest, ServiceDeleteTest) {
+
+    // arrange
+    Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
+    module = _moduleDatabase.CreateModule(module);
+
+    // act
+    _moduleDatabase.DeleteModule(module);
+    int count = _moduleDatabase.ModuleCount();
+
+    // assert
+    EXPECT_EQ(0, count);
+  }
+
+} // namespace AwsMock::Database
+
+#endif // AWMOCK_CORE_SERVICEDATABASETEST_H
