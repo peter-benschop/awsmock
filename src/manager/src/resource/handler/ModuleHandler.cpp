@@ -16,7 +16,7 @@ namespace AwsMock {
     _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "GET");
     log_debug_stream(_logger) << "Module GET request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
 
-    Database::Entity::Module::ModuleList modules = _serviceDatabase->ListModules();
+    Database::Entity::Module::ModuleList modules = _moduleService->ListModules();
     std::string body = Dto::Module::Module::ToJson(modules);
 
     SendOkResponse(response, body);
@@ -33,6 +33,7 @@ namespace AwsMock {
       log_info_stream(_logger) << "Module: " << name << " action: " << action << std::endl;
 
       if (action == "start") {
+
         if(name == "all") {
 
           _moduleService->StartAllServices();
@@ -48,6 +49,24 @@ namespace AwsMock {
           SendOkResponse(response, body);
         }
 
+      } else if (action == "restart") {
+
+        if(name == "all") {
+
+          _moduleService->RestartAllServices();
+
+          // Send response
+          SendOkResponse(response, {});
+
+        } else {
+
+          // Stop single module
+          Database::Entity::Module::Module module = _moduleService->RestartService(name);
+
+          // Send response
+          std::string body = Dto::Module::Module::ToJson(module);
+          SendOkResponse(response, body);
+        }
       } else if (action == "stop") {
 
         if(name == "all") {

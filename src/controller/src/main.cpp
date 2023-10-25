@@ -88,6 +88,8 @@ namespace AwsMock::Controller {
             Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
         options.addOption(Poco::Util::Option("start", "", "starts a service").required(false).repeatable(false).argument("value").callback(
             Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
+        options.addOption(Poco::Util::Option("restart", "", "restarts a service").required(false).repeatable(false).argument("value").callback(
+            Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
         options.addOption(Poco::Util::Option("stop", "", "stops a service").required(false).repeatable(false).argument("value").callback(
             Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
         options.addOption(Poco::Util::Option("help", "", "display help information").required(false).repeatable(false).callback(
@@ -133,6 +135,10 @@ namespace AwsMock::Controller {
         } else if (name == "start") {
 
           _controller.StartService(value);
+
+        } else if (name == "restart") {
+
+          _controller.RestartService(value);
 
         } else if (name == "stop") {
 
