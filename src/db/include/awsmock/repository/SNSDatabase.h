@@ -170,8 +170,8 @@ namespace AwsMock::Database {
       /**
        * Count the number of message by status
        *
+       * @param region AWS region
        * @param topicUrl URL of the topic
-       * @param visibility visibility period in seconds
        */
       long CountMessages(const std::string &region = {}, const std::string& topicUrl = {});
 
@@ -181,7 +181,7 @@ namespace AwsMock::Database {
        * @param topicUrl URL of the topic
        * @param visibility visibility period in seconds
        */
-      //[[maybe_unused]] long CountMessagesByStatus(const std::string &region, const std::string& topicUrl, int status);
+      //long CountMessagesByStatus(const std::string &region, const std::string& topicUrl, int status);
 
       /**
        * Deletes a message.

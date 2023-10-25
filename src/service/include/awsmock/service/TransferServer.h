@@ -95,7 +95,6 @@ namespace AwsMock::Service {
        * Sends a exists bucket request to the S3 service
        *
        * @param bucket S3 bucket name
-       * @param contentType content type
        * @return true when bucket exists
        */
       bool SendExistsBucketRequest(const std::string &bucket);

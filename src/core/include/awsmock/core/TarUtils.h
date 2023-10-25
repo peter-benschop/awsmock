@@ -47,12 +47,12 @@ namespace AwsMock::Core {
        * @param fileName name of the file to write
        * @param removeDir remove name of the directory from filename
        * @param isDir directory flag
-       * @param isDir link flag, needed to preserve links
+       * @param isLink link flag, needed to preserve links
        */
       static void WriteFile(struct archive *archive, const std::string &fileName, const std::string &removeDir, bool isDir, bool isLink);
 
       /**
-       * Read a symbolik link.
+       * Read a symbolic link.
        *
        * @param path path to link.
        * @return target path.

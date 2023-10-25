@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <deque>
 #include <fstream>
 #include <iostream>
@@ -34,13 +33,16 @@
 #define DEFAULT_TRANSFER_BUCKET "transfer-manager"
 
 namespace AwsMock::FtpServer {
-    class FtpSession : public std::enable_shared_from_this<FtpSession>, public Service::AbstractWorker {
+
+  class FtpSession : public std::enable_shared_from_this<FtpSession>, public Service::AbstractWorker {
+
     private:
+
       struct IoFile {
         IoFile(const std::string &filename, std::string user, std::ios::openmode mode) : file_stream_(filename, mode), stream_buffer_(1024 * 1024),
                                                                                          _fileName(filename), _user(std::move(user)) {
 
-            file_stream_.rdbuf()->pubsetbuf(stream_buffer_.data(), static_cast<std::streamsize>(stream_buffer_.size()));
+          file_stream_.rdbuf()->pubsetbuf(stream_buffer_.data(), static_cast<std::streamsize>(stream_buffer_.size()));
         }
 
         // Copy
@@ -52,8 +54,8 @@ namespace AwsMock::FtpServer {
         IoFile(IoFile &&) = delete;
 
         ~IoFile() {
-            file_stream_.flush();
-            file_stream_.close();
+          file_stream_.flush();
+          file_stream_.close();
         }
 
         std::fstream file_stream_;
@@ -203,8 +205,6 @@ namespace AwsMock::FtpServer {
       /**
        * Send file to AWS s3
        *
-       * @param bucket S3 bucket
-       * @param key S3 key
        * @param user user name
        * @param fileName filename
        */
@@ -307,5 +307,5 @@ namespace AwsMock::FtpServer {
        * S3 bucket name
        */
       std::string _bucket;
-    };
+  };
 }

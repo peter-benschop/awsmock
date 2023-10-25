@@ -48,7 +48,7 @@ namespace AwsMock {
        *
        * @param configuration application configuration
        * @param metricService monitoring service
-       * @param taskManager task manager
+       * @param serverMap map of services
        */
       ModuleHandler(Core::Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap);
 

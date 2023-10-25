@@ -117,7 +117,7 @@ namespace AwsMock::Database {
     /**
      * Returns a queue by URL
      *
-     * @param queueArn queue URL
+     * @param queueUrl queue URL
      * @return queue entity
      * @throws DatabaseException
      */
@@ -151,7 +151,7 @@ namespace AwsMock::Database {
     /**
      * Count the number of queues for a given region.
      *
-     * @param queueUrl URL of the queue
+     * @param region AWS region
      * @return number of queues in the given region.
      */
     long CountQueues(const std::string &region = {});
@@ -221,10 +221,8 @@ namespace AwsMock::Database {
      * @param queueUrl queue URL
      * @param visibility in seconds
      * @param messageList message list
-     * @return MessageList
      */
-    void ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility,
-                         Entity::SQS::MessageList &messageList);
+    void ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, Entity::SQS::MessageList &messageList);
 
     /**
      * Reset expired messages
@@ -238,23 +236,24 @@ namespace AwsMock::Database {
      * Redrive expired messages.
      *
      * @param queueUrl URL of the queue
-     * @param visibility visibility period in seconds
+     * @param redrivePolicy redrive policy
      */
     void RedriveMessages(const std::string &queueUrl, const Entity::SQS::RedrivePolicy &redrivePolicy);
 
     /**
      * Count the number of message by status
      *
+     * @param region AWS region
      * @param queueUrl URL of the queue
-     * @param visibility visibility period in seconds
      */
     long CountMessages(const std::string &region = {}, const std::string &queueUrl = {});
 
     /**
      * Count the number of message by status
      *
+     * @param region AWS region
      * @param queueUrl URL of the queue
-     * @param visibility visibility period in seconds
+     * @param status message status
      */
     long CountMessagesByStatus(const std::string &region, const std::string &queueUrl, int status);
 

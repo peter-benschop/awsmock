@@ -157,7 +157,7 @@ namespace AwsMock::Core {
       /**
        * Convert to hex string
        *
-       * @param input input char array
+       * @param hash input char array
        * @param size input char length
        * @return hex encoded string
        */

@@ -37,7 +37,7 @@ namespace AwsMock::Controller {
        *
        * @param configuration application configuration
        * @param metricService common monitoring service
-       * @param taskManager task manager
+       * @param serverMap map of services
        */
       Router(Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap);
 

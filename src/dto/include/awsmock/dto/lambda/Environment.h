@@ -161,8 +161,8 @@ namespace AwsMock::Dto::Lambda {
     /**
      * Returns a given tags value by key
      *
-     * @param eventName name of the event
-     * @return found notification or notifications.end().
+     * @param key key of the tags
+     * @return tag value
      */
     std::string GetTagValue(const std::string &key) {
       auto it = find_if(tags.begin(), tags.end(), [key](const std::pair<std::string, std::string> &t) {
@@ -174,7 +174,7 @@ namespace AwsMock::Dto::Lambda {
     /**
      * Convert to a JSON string
      *
-     * @return JSON string
+     * @param object JSON object
      */
     void FromJson(Poco::JSON::Object::Ptr object) {
 

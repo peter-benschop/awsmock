@@ -144,7 +144,7 @@ namespace AwsMock::Service {
        *
        * @param bucket bucket name
        * @param key object key
-       * @retunr local file path
+       * @return local file path
        */
       std::string GetFileFromBucketKey(const std::string &bucket, const std::string &key);
 

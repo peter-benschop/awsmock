@@ -32,28 +32,34 @@ namespace AwsMock::FtpServer {
       FtpServerImpl(std::string serverName, std::string address, uint16_t port, const Core::Configuration &configuration);
 
       /**
-       *  Copy (constrcutor disabled)
+       * Copy (constrcutor disabled)
+       *
+       * @param ftpServerImpl server implementation
        */
-      FtpServerImpl(const FtpServerImpl &) = delete;
+      FtpServerImpl(const FtpServerImpl &ftpServerImpl) = delete;
 
       /**
-       *  Copy (constrcutor disabled)
+       * Copy (constrcutor disabled)
+       *
+       * @param ftpServerImpl server implementation
+       * @return FTP server implementation
        */
-      FtpServerImpl &operator=(const FtpServerImpl &) = delete;
+      FtpServerImpl &operator=(const FtpServerImpl &ftpServerImpl) = delete;
 
       /**
        * Assigment constructor (disabled, as we are storing the this pointer in lambda captures)
        *
+       * @param ftpServerImpl server implementation
        * @return FTP manager implementation
        */
-      FtpServerImpl &operator=(FtpServerImpl &&) = delete;
+      FtpServerImpl &operator=(FtpServerImpl &&ftpServerImpl) = delete;
 
       /**
        * Assigment constructor (disabled, as we are storing the this pointer in lambda captures)
        *
-       * @return FTP manager implementation
+       * @param ftpServerImpl server implementation
        */
-      FtpServerImpl(FtpServerImpl &&) = delete;
+      FtpServerImpl(FtpServerImpl &&ftpServerImpl) = delete;
 
       /**
        * Destructor

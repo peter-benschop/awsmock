@@ -27,6 +27,7 @@ namespace AwsMock::Resource::Factory {
        *
        * @param configuration configuration
        * @param metricService monitoring
+       * @param serverMap service map
        * @return HTTP request handler
        */
       virtual Poco::Net::HTTPRequestHandler *createResource(Core::Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap) = 0;

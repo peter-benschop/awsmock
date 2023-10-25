@@ -37,7 +37,7 @@ namespace AwsMock::Service {
        * @param request HTTP request
        * @return request HTTP request handler
        */
-      Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &) override {
+      Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
           return new S3Handler(_configuration, _metricService);
       }
 

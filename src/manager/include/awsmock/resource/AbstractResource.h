@@ -35,14 +35,14 @@
 
 namespace AwsMock::Resource {
 
-    typedef std::vector<std::pair<std::string, std::string>> HeaderMap;
+  typedef std::vector<std::pair<std::string, std::string>> HeaderMap;
 
-    /**
-     * Abstract HTTP request handler
-     */
-    class AbstractResource : public Poco::Net::HTTPRequestHandler {
+  /**
+   * Abstract HTTP request handler
+   */
+  class AbstractResource : public Poco::Net::HTTPRequestHandler {
 
-     public:
+    public:
       /**
        * Default User-defined Constructor
        */
@@ -62,7 +62,7 @@ namespace AwsMock::Resource {
        */
       void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
 
-     protected:
+    protected:
 
       /**
        * Handles the HTTP method GET.
@@ -150,9 +150,7 @@ namespace AwsMock::Resource {
        * @param statusCode HTTP Status Code.
        * @param reason status reason.
        */
-      static void handleHttpStatusCode(Poco::Net::HTTPServerResponse &response,
-                                       int statusCode,
-                                       const char *reason = nullptr);
+      static void handleHttpStatusCode(Poco::Net::HTTPServerResponse &response,int statusCode,const char *reason = nullptr);
 
       /**
        * Returns the region and the user
@@ -160,7 +158,6 @@ namespace AwsMock::Resource {
        * @param authorization HTTP authorization string
        * @param region AWS region
        * @param user AWS user
-       * @return body string
        */
       void GetRegionUser(const std::string &authorization, std::string &region, std::string &user);
 
@@ -262,7 +259,7 @@ namespace AwsMock::Resource {
        */
       void SetHeaders(Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user);
 
-     private:
+    private:
 
       /**
        * Set the header values
@@ -309,7 +306,7 @@ namespace AwsMock::Resource {
        * Header map
        */
       HeaderMap _headerMap;
-    };
+  };
 
 } // namespace AwsMock::Resource
 

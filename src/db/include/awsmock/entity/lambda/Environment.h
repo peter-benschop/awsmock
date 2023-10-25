@@ -27,7 +27,7 @@ namespace AwsMock::Database::Entity::Lambda {
       /**
        * Converts the MongoDB document to an entity
        *
-       * @return entity.
+       * @param mResult database view.
        */
       void FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult);
 

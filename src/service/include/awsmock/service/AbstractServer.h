@@ -30,7 +30,6 @@ namespace AwsMock::Service {
        * Constructor
        *
        * @param configuration AwsMock configuration
-       * @param condition stop condition
        * @param name manager name
        */
       explicit AbstractServer(const Core::Configuration &configuration, std::string name);

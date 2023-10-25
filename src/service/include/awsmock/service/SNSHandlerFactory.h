@@ -29,10 +29,15 @@ namespace AwsMock::Service {
        * @param configuration application configuration
        * @param metricService  monitoring
        */
-      SNSRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition) : _configuration(configuration), _metricService(metricService), _condition(condition) {}
+      SNSRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService) {}
 
+      /**
+       * Create request handler
+       *
+       * @return pointer to request handler
+       */
       virtual Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &) override {
-        return new SNSHandler(_configuration, _metricService, _condition);
+        return new SNSHandler(_configuration, _metricService);
       }
 
     private:
@@ -46,11 +51,6 @@ namespace AwsMock::Service {
        * Metric service
        */
       Core::MetricService &_metricService;
-
-      /**
-       * Shutdown condition
-       */
-      Poco::Condition &_condition;
   };
 
 } // namespace AwsMock::Service

@@ -34,9 +34,8 @@ namespace AwsMock::Service {
        *
        * @param configuration application configuration
        * @param metricService monitoring service
-       * @param condition stop condition
        */
-      SNSHandler(Core::Configuration &configuration,Core::MetricService &metricService, Poco::Condition &condition);
+      SNSHandler(Core::Configuration &configuration,Core::MetricService &metricService);
 
     protected:
 
@@ -87,7 +86,6 @@ namespace AwsMock::Service {
       /**
        * Options request.
        *
-       * @param request HTTP request
        * @param response HTTP response
        * @see AbstractResource::handleOption(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
        */
