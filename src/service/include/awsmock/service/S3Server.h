@@ -242,11 +242,6 @@ namespace AwsMock::Service {
       int _period;
 
       /**
-       * Running flag
-       */
-      bool _running;
-
-      /**
        * Data directory
        */
       std::string _dataDir;

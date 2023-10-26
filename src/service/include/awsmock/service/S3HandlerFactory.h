@@ -16,10 +16,10 @@
 
 namespace AwsMock::Service {
 
-    /**
-     * S3 request handler factory
-     */
-    class S3RequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
+  /**
+   * S3 request handler factory
+   */
+  class S3RequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 
     public:
 
@@ -37,8 +37,8 @@ namespace AwsMock::Service {
        * @param request HTTP request
        * @return request HTTP request handler
        */
-      Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
-          return new S3Handler(_configuration, _metricService);
+      Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &) override {
+        return new S3Handler(_configuration, _metricService);
       }
 
     private:
@@ -53,7 +53,7 @@ namespace AwsMock::Service {
        */
       Core::MetricService &_metricService;
 
-    };
+  };
 
 } // namespace AwsMock::Service
 

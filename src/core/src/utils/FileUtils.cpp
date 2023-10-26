@@ -27,7 +27,7 @@ namespace AwsMock::Core {
 
   std::string FileUtils::GetTempFile(const std::string &dir, const std::string &extension) {
     return dir + Poco::Path::separator()
-      + Poco::replace(Poco::toLower(Poco::Path::temp() + Poco::UUIDGenerator().createRandom().toString() + "." + extension), "-", "");
+        + Poco::replace(Poco::toLower(Poco::Path::temp() + Poco::UUIDGenerator().createRandom().toString() + "." + extension), "-", "");
   }
 
   std::string FileUtils::GetParentPath(const std::string &fileName) {

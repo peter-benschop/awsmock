@@ -20,7 +20,7 @@
 
 namespace AwsMock::Database {
 
-    class DatabaseTest : public ::testing::Test {
+  class DatabaseTest : public ::testing::Test {
 
     protected:
 
@@ -32,21 +32,21 @@ namespace AwsMock::Database {
 
       Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
       Database _database = Database(_configuration);
-    };
+  };
 
-    /*TEST_F(DatabaseTest, ConstructorTest) {
+  /*TEST_F(DatabaseTest, ConstructorTest) {
 
-        // arrange
-        int count = 0;
-        Poco::Data::Session session = _servicedatabase.GetSession();
+      // arrange
+      int count = 0;
+      Poco::Data::Session session = _servicedatabase.GetSession();
 
-        // act
-        Poco::Data::Statement stmt(session);
-        stmt << "SELECT COUNT(*) FROM service", into(count), now;
+      // act
+      Poco::Data::Statement stmt(session);
+      stmt << "SELECT COUNT(*) FROM service", into(count), now;
 
-        // assert
-        EXPECT_EQ(count, 4);
-    }*/
+      // assert
+      EXPECT_EQ(count, 4);
+  }*/
 
 } // namespace AwsMock::Core
 

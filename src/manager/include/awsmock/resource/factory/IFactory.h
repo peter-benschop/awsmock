@@ -15,10 +15,10 @@
 
 namespace AwsMock::Resource::Factory {
 
-    /**
-     * Factory interface
-     */
-    class IFactory {
+  /**
+   * Factory interface
+   */
+  class IFactory {
 
     public:
 
@@ -31,7 +31,7 @@ namespace AwsMock::Resource::Factory {
        * @return HTTP request handler
        */
       virtual Poco::Net::HTTPRequestHandler *createResource(Core::Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap) = 0;
-    };
+  };
 
 } // namespace AwsMock
 

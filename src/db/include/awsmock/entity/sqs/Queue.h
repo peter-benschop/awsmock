@@ -25,425 +25,429 @@
 
 namespace AwsMock::Database::Entity::SQS {
 
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::view_or_value;
-    using bsoncxx::document::view;
-    using bsoncxx::document::value;
+  using bsoncxx::builder::basic::kvp;
+  using bsoncxx::builder::basic::make_array;
+  using bsoncxx::builder::basic::make_document;
+  using bsoncxx::view_or_value;
+  using bsoncxx::document::view;
+  using bsoncxx::document::value;
 
-    struct RedrivePolicy {
+  struct RedrivePolicy {
 
-      /**
-       * Dead letter queue target ARN
-       */
-      std::string deadLetterTargetArn;
+    /**
+     * Dead letter queue target ARN
+     */
+    std::string deadLetterTargetArn;
 
-      /**
-       * Maximal number of retries, before the message will be send to the DQL
-       */
-      int maxReceiveCount;
+    /**
+     * Maximal number of retries, before the message will be send to the DQL
+     */
+    int maxReceiveCount;
 
-      /**
-       * Parse values from a JSON stream
-       *
-       * @param body json input stream
-       */
-      void FromJson(const std::string &body) {
+    /**
+     * Parse values from a JSON stream
+     *
+     * @param body json input stream
+     */
+    void FromJson(const std::string &body) {
 
-          if (body.empty()) {
-              return;
-          }
-
-          Poco::JSON::Parser parser;
-          Poco::Dynamic::Var result = parser.parse(body);
-          Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
-          try {
-              if (rootObject->has("deadLetterTargetArn") && rootObject->get("deadLetterTargetArn").isString()) {
-                  deadLetterTargetArn = rootObject->get("deadLetterTargetArn").convert<std::string>();
-                  maxReceiveCount = rootObject->get("maxReceiveCount").convert<int>();
-              }
-
-              // Cleanup
-              rootObject->clear();
-              parser.reset();
-
-          } catch (Poco::Exception &exc) {
-              throw Core::ServiceException(exc.message(), 500);
-          }
+      if (body.empty()) {
+        return;
       }
 
-      /**
-       * Converts the DTO to a JSON representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToJson() const {
+      Poco::JSON::Parser parser;
+      Poco::Dynamic::Var result = parser.parse(body);
+      Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
-          if (deadLetterTargetArn.empty()) {
-              return {};
-          }
+      try {
+        if (rootObject->has("deadLetterTargetArn") && rootObject->get("deadLetterTargetArn").isString()) {
+          deadLetterTargetArn = rootObject->get("deadLetterTargetArn").convert<std::string>();
+          maxReceiveCount = rootObject->get("maxReceiveCount").convert<int>();
+        }
 
-          try {
-              Poco::JSON::Object rootJson;
-              rootJson.set("deadLetterTargetArn", deadLetterTargetArn);
-              rootJson.set("maxReceiveCount", maxReceiveCount);
+        // Cleanup
+        rootObject->clear();
+        parser.reset();
 
-              std::ostringstream os;
-              rootJson.stringify(os);
-              return os.str();
+      } catch (Poco::Exception &exc) {
+        throw Core::ServiceException(exc.message(), 500);
+      }
+    }
 
-          } catch (Poco::Exception &exc) {
-              throw Core::ServiceException(exc.message(), 500);
-          }
+    /**
+     * Converts the DTO to a JSON representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToJson() const {
+
+      if (deadLetterTargetArn.empty()) {
+        return {};
       }
 
-      /**
-       * Converts the entity to a MongoDB document
-       *
-       * @return entity as MongoDB document.
-       */
-      [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
+      try {
+        Poco::JSON::Object rootJson;
+        rootJson.set("deadLetterTargetArn", deadLetterTargetArn);
+        rootJson.set("maxReceiveCount", maxReceiveCount);
 
-          view_or_value<view, value> redrivePolicyDoc = make_document(
-              kvp("deadLetterTargetArn", deadLetterTargetArn),
-              kvp("maxReceiveCount", maxReceiveCount));
+        std::ostringstream os;
+        rootJson.stringify(os);
+        return os.str();
 
-          return redrivePolicyDoc;
+      } catch (Poco::Exception &exc) {
+        throw Core::ServiceException(exc.message(), 500);
       }
+    }
 
-      /**
-       * Converts the MongoDB document to an entity
-       *
-       * @return entity.
-       */
-      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
+    /**
+     * Converts the entity to a MongoDB document
+     *
+     * @return entity as MongoDB document.
+     */
+    [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
-          deadLetterTargetArn = bsoncxx::string::to_string(mResult.value()["deadLetterTargetArn"].get_string().value);
-          maxReceiveCount = mResult.value()["maxReceiveCount"].get_int32().value;
-      }
+      view_or_value<view, value> redrivePolicyDoc = make_document(
+          kvp("deadLetterTargetArn", deadLetterTargetArn),
+          kvp("maxReceiveCount", maxReceiveCount));
 
-      /**
-       * Converts the MongoDB document to an entity
-       *
-       * @return entity.
-       */
-      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+      return redrivePolicyDoc;
+    }
 
-          deadLetterTargetArn = bsoncxx::string::to_string(mResult.value()["deadLetterTargetArn"].get_string().value);
-          maxReceiveCount = mResult.value()["maxReceiveCount"].get_int32().value;
-      }
+    /**
+     * Converts the MongoDB document to an entity
+     *
+     * @param mResult MongoDB document.
+     */
+    [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
+      deadLetterTargetArn = bsoncxx::string::to_string(mResult.value()["deadLetterTargetArn"].get_string().value);
+      maxReceiveCount = mResult.value()["maxReceiveCount"].get_int32().value;
+    }
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const RedrivePolicy &r) {
-          os << "RedrivePolicy={deadLetterTargetArn='" << r.deadLetterTargetArn << "' maxReceiveCount='" << r.maxReceiveCount << "'}";
-          return os;
-      }
+    /**
+     * Converts the MongoDB document to an entity
+     *
+     * @param mResult MongoDB document.
+     */
+    [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
-    };
+      deadLetterTargetArn = bsoncxx::string::to_string(mResult.value()["deadLetterTargetArn"].get_string().value);
+      maxReceiveCount = mResult.value()["maxReceiveCount"].get_int32().value;
+    }
 
-    struct QueueAttribute {
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const {
+      std::stringstream ss;
+      ss << (*this);
+      return ss.str();
+    }
 
-      /**
-       * Delay seconds
-       */
-      int delaySeconds = 0;
+    /**
+     * Stream provider.
+     *
+     * @param os output stream
+     * @param r redrive policy
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const RedrivePolicy &r) {
+      os << "RedrivePolicy={deadLetterTargetArn='" << r.deadLetterTargetArn << "' maxReceiveCount='" << r.maxReceiveCount << "'}";
+      return os;
+    }
 
-      /**
-       * Max message size (256kB)
-       */
-      int maxMessageSize = 262144;
+  };
 
-      /**
-       * Max retention period (4d)
-       */
-      int messageRetentionPeriod = 345600;
+  struct QueueAttribute {
 
-      /**
-       * Receive message timeout
-       */
-      int receiveMessageWaitTime = 20;
+    /**
+     * Delay seconds
+     */
+    int delaySeconds = 0;
 
-      /**
-       * Visibility timeout
-       */
-      int visibilityTimeout = 30;
+    /**
+     * Max message size (256kB)
+     */
+    int maxMessageSize = 262144;
 
-      /**
-       * Policy
-       *
-       * <p>The queue's policy. A valid AWS policy.</p>
-       */
-      std::string policy;
+    /**
+     * Max retention period (4d)
+     */
+    int messageRetentionPeriod = 345600;
 
-      /**
-       * Redrive policy
-       *
-       * <p>JSON string</p>
-       */
-      RedrivePolicy redrivePolicy;
+    /**
+     * Receive message timeout
+     */
+    int receiveMessageWaitTime = 20;
 
-      /**
-       * Redrive allow policy
-       *
-       * <p>JSON string</p>
-       */
-      std::string redriveAllowPolicy;
+    /**
+     * Visibility timeout
+     */
+    int visibilityTimeout = 30;
 
-      /**
-       * Number of message counter
-       */
-      long approximateNumberOfMessages = 0;
+    /**
+     * Policy
+     *
+     * <p>The queue's policy. A valid AWS policy.</p>
+     */
+    std::string policy;
 
-      /**
-       * Delay counter
-       */
-      long approximateNumberOfMessagesDelayed = 0;
+    /**
+     * Redrive policy
+     *
+     * <p>JSON string</p>
+     */
+    RedrivePolicy redrivePolicy;
 
-      /**
-       * Not visible counter
-       */
-      long approximateNumberOfMessagesNotVisible = 0;
+    /**
+     * Redrive allow policy
+     *
+     * <p>JSON string</p>
+     */
+    std::string redriveAllowPolicy;
 
-      /**
-       * Converts the entity to a MongoDB document
-       *
-       * @return entity as MongoDB document.
-       */
-      [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
+    /**
+     * Number of message counter
+     */
+    long approximateNumberOfMessages = 0;
 
-          view_or_value<view, value> queueAttributetDoc = make_document(
-              kvp("delaySeconds", delaySeconds),
-              kvp("maxMessageSize", maxMessageSize),
-              kvp("messageRetentionPeriod", messageRetentionPeriod),
-              kvp("policy", policy),
-              kvp("receiveMessageWaitTime", receiveMessageWaitTime),
-              kvp("visibilityTimeout", visibilityTimeout),
-              kvp("redrivePolicy", redrivePolicy.ToDocument()),
-              kvp("redriveAllowPolicy", redriveAllowPolicy),
-              kvp("approximateNumberOfMessages", approximateNumberOfMessages),
-              kvp("approximateNumberOfMessagesDelayed", approximateNumberOfMessagesDelayed),
-              kvp("approximateNumberOfMessagesNotVisible", approximateNumberOfMessagesNotVisible));
+    /**
+     * Delay counter
+     */
+    long approximateNumberOfMessagesDelayed = 0;
 
-          return queueAttributetDoc;
-      }
+    /**
+     * Not visible counter
+     */
+    long approximateNumberOfMessagesNotVisible = 0;
 
-      /**
-       * Converts the MongoDB document to an entity
-       *
-       * @return entity.
-       */
-      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
+    /**
+     * Converts the entity to a MongoDB document
+     *
+     * @return entity as MongoDB document.
+     */
+    [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
-          delaySeconds = mResult.value()["delaySeconds"].get_int32().value;
-          maxMessageSize = mResult.value()["maxMessageSize"].get_int32().value;
-          messageRetentionPeriod = mResult.value()["messageRetentionPeriod"].get_int32().value;
-          policy = bsoncxx::string::to_string(mResult.value()["policy"].get_string().value);
-          receiveMessageWaitTime = mResult.value()["receiveMessageWaitTime"].get_int32().value;
-          visibilityTimeout = mResult.value()["visibilityTimeout"].get_int32().value;
-          redrivePolicy.FromDocument(mResult.value()["redrivePolicy"].get_document().value);
-          redriveAllowPolicy = bsoncxx::string::to_string(mResult.value()["redriveAllowPolicy"].get_string().value);
-          approximateNumberOfMessages = mResult.value()["approximateNumberOfMessages"].get_int64().value;
-          approximateNumberOfMessagesDelayed = mResult.value()["approximateNumberOfMessagesDelayed"].get_int64().value;
-          approximateNumberOfMessagesNotVisible = mResult.value()["approximateNumberOfMessagesNotVisible"].get_int64().value;
+      view_or_value<view, value> queueAttributetDoc = make_document(
+          kvp("delaySeconds", delaySeconds),
+          kvp("maxMessageSize", maxMessageSize),
+          kvp("messageRetentionPeriod", messageRetentionPeriod),
+          kvp("policy", policy),
+          kvp("receiveMessageWaitTime", receiveMessageWaitTime),
+          kvp("visibilityTimeout", visibilityTimeout),
+          kvp("redrivePolicy", redrivePolicy.ToDocument()),
+          kvp("redriveAllowPolicy", redriveAllowPolicy),
+          kvp("approximateNumberOfMessages", approximateNumberOfMessages),
+          kvp("approximateNumberOfMessagesDelayed", approximateNumberOfMessagesDelayed),
+          kvp("approximateNumberOfMessagesNotVisible", approximateNumberOfMessagesNotVisible));
 
-      }
+      return queueAttributetDoc;
+    }
 
-      /**
-       * Converts the MongoDB document to an entity
-       *
-       * @return entity.
-       */
-      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+    /**
+     * Converts the MongoDB document to an entity
+     *
+     * @param mResult MongoDB document view.
+     */
+    [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
 
-          delaySeconds = mResult.value()["delaySeconds"].get_int32().value;
-          maxMessageSize = mResult.value()["maxMessageSize"].get_int32().value;
-          messageRetentionPeriod = mResult.value()["messageRetentionPeriod"].get_int32().value;
-          policy = bsoncxx::string::to_string(mResult.value()["policy"].get_string().value);
-          receiveMessageWaitTime = mResult.value()["receiveMessageWaitTime"].get_int32().value;
-          visibilityTimeout = mResult.value()["visibilityTimeout"].get_int32().value;
-          redrivePolicy.FromDocument(mResult.value()["redrivePolicy"].get_document().value);
-          redriveAllowPolicy = bsoncxx::string::to_string(mResult.value()["redriveAllowPolicy"].get_string().value);
-          approximateNumberOfMessages = mResult.value()["approximateNumberOfMessages"].get_int64().value;
-          approximateNumberOfMessagesDelayed = mResult.value()["approximateNumberOfMessagesDelayed"].get_int64().value;
-          approximateNumberOfMessagesNotVisible = mResult.value()["approximateNumberOfMessagesNotVisible"].get_int64().value;
-      }
+      delaySeconds = mResult.value()["delaySeconds"].get_int32().value;
+      maxMessageSize = mResult.value()["maxMessageSize"].get_int32().value;
+      messageRetentionPeriod = mResult.value()["messageRetentionPeriod"].get_int32().value;
+      policy = bsoncxx::string::to_string(mResult.value()["policy"].get_string().value);
+      receiveMessageWaitTime = mResult.value()["receiveMessageWaitTime"].get_int32().value;
+      visibilityTimeout = mResult.value()["visibilityTimeout"].get_int32().value;
+      redrivePolicy.FromDocument(mResult.value()["redrivePolicy"].get_document().value);
+      redriveAllowPolicy = bsoncxx::string::to_string(mResult.value()["redriveAllowPolicy"].get_string().value);
+      approximateNumberOfMessages = mResult.value()["approximateNumberOfMessages"].get_int64().value;
+      approximateNumberOfMessagesDelayed = mResult.value()["approximateNumberOfMessagesDelayed"].get_int64().value;
+      approximateNumberOfMessagesNotVisible = mResult.value()["approximateNumberOfMessagesNotVisible"].get_int64().value;
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
+    }
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const QueueAttribute &r) {
-          os << "QueueAttribute={delaySeconds='" << r.delaySeconds << "' maxMessageSize='" << r.maxMessageSize << "' messageRetentionPeriod='"
-             << r.messageRetentionPeriod << "' policy='" << r.policy << "' receiveMessageWaitTime='" << r.receiveMessageWaitTime <<
-             "' visibilityTimeout='" << r.visibilityTimeout << "' redrivePolicy=" << r.redrivePolicy.ToString() << " redriveAllowPolicy='" << r.redriveAllowPolicy <<
-             "' approximateNumberOfMessages='" << r.approximateNumberOfMessages << "' approximateNumberOfMessagesDelayed='" << r.approximateNumberOfMessagesDelayed <<
-             "' approximateNumberOfMessagesNotVisible='" << r.approximateNumberOfMessagesNotVisible << "'}";
-          return os;
-      }
+    /**
+     * Converts the MongoDB document to an entity
+     *
+     * @param mResult MongoDB document view.
+     */
+    [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
-    };
+      delaySeconds = mResult.value()["delaySeconds"].get_int32().value;
+      maxMessageSize = mResult.value()["maxMessageSize"].get_int32().value;
+      messageRetentionPeriod = mResult.value()["messageRetentionPeriod"].get_int32().value;
+      policy = bsoncxx::string::to_string(mResult.value()["policy"].get_string().value);
+      receiveMessageWaitTime = mResult.value()["receiveMessageWaitTime"].get_int32().value;
+      visibilityTimeout = mResult.value()["visibilityTimeout"].get_int32().value;
+      redrivePolicy.FromDocument(mResult.value()["redrivePolicy"].get_document().value);
+      redriveAllowPolicy = bsoncxx::string::to_string(mResult.value()["redriveAllowPolicy"].get_string().value);
+      approximateNumberOfMessages = mResult.value()["approximateNumberOfMessages"].get_int64().value;
+      approximateNumberOfMessagesDelayed = mResult.value()["approximateNumberOfMessagesDelayed"].get_int64().value;
+      approximateNumberOfMessagesNotVisible = mResult.value()["approximateNumberOfMessagesNotVisible"].get_int64().value;
+    }
 
-    typedef struct QueueAttribute QueueAttribute;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const {
+      std::stringstream ss;
+      ss << (*this);
+      return ss.str();
+    }
 
-    struct Queue {
+    /**
+     * Stream provider.
+     *
+     * @param os output stream
+     * @param r queue attribute
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const QueueAttribute &r) {
+      os << "QueueAttribute={delaySeconds='" << r.delaySeconds << "' maxMessageSize='" << r.maxMessageSize << "' messageRetentionPeriod='"
+         << r.messageRetentionPeriod << "' policy='" << r.policy << "' receiveMessageWaitTime='" << r.receiveMessageWaitTime <<
+         "' visibilityTimeout='" << r.visibilityTimeout << "' redrivePolicy=" << r.redrivePolicy.ToString() << " redriveAllowPolicy='" << r.redriveAllowPolicy <<
+         "' approximateNumberOfMessages='" << r.approximateNumberOfMessages << "' approximateNumberOfMessagesDelayed='" << r.approximateNumberOfMessagesDelayed <<
+         "' approximateNumberOfMessagesNotVisible='" << r.approximateNumberOfMessagesNotVisible << "'}";
+      return os;
+    }
 
-      /**
-       * ID
-       */
-      std::string oid;
+  };
 
-      /**
-       * AWS region
-       */
-      std::string region;
+  typedef struct QueueAttribute QueueAttribute;
 
-      /**
-       * Queue name
-       */
-      std::string name;
+  struct Queue {
 
-      /**
-       * Owner
-       */
-      std::string owner;
+    /**
+     * ID
+     */
+    std::string oid;
 
-      /**
-       * Queue URL
-       */
-      std::string queueUrl;
+    /**
+     * AWS region
+     */
+    std::string region;
 
-      /**
-       * Queue ARN
-       */
-      std::string queueArn;
+    /**
+     * Queue name
+     */
+    std::string name;
 
-      /**
-       * Queue attributes
-       */
-      QueueAttribute attributes;
+    /**
+     * Owner
+     */
+    std::string owner;
 
-      /**
-       * Creation date
-       */
-      Poco::DateTime created = Poco::DateTime();
+    /**
+     * Queue URL
+     */
+    std::string queueUrl;
 
-      /**
-       * Last modification date
-       */
-      Poco::DateTime modified = Poco::DateTime();
+    /**
+     * Queue ARN
+     */
+    std::string queueArn;
 
-      /**
-       * Converts the entity to a MongoDB document
-       *
-       * @return entity as MongoDB document.
-       */
-      [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
+    /**
+     * Queue attributes
+     */
+    QueueAttribute attributes;
 
-          view_or_value<view, value> queueDoc = make_document(
-              kvp("region", region),
-              kvp("name", name),
-              kvp("owner", owner),
-              kvp("queueUrl", queueUrl),
-              kvp("queueArn", queueArn),
-              kvp("attributes", attributes.ToDocument()),
-              kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds()/1000))),
-              kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds()/1000))));
+    /**
+     * Creation date
+     */
+    Poco::DateTime created = Poco::DateTime();
 
-          return queueDoc;
-      }
+    /**
+     * Last modification date
+     */
+    Poco::DateTime modified = Poco::DateTime();
 
-      /**
-       * Converts the MongoDB document to an entity
-       *
-       * @return entity.
-       */
-      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
+    /**
+     * Converts the entity to a MongoDB document
+     *
+     * @return entity as MongoDB document.
+     */
+    [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
-          oid = mResult.value()["_id"].get_oid().value.to_string();
-          region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
-          name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
-          owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
-          queueUrl = bsoncxx::string::to_string(mResult.value()["queueUrl"].get_string().value);
-          queueArn = bsoncxx::string::to_string(mResult.value()["queueArn"].get_string().value);
-          attributes.FromDocument(mResult.value()["attributes"].get_document().value);
-          created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-          modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
-      }
+      view_or_value<view, value> queueDoc = make_document(
+          kvp("region", region),
+          kvp("name", name),
+          kvp("owner", owner),
+          kvp("queueUrl", queueUrl),
+          kvp("queueArn", queueArn),
+          kvp("attributes", attributes.ToDocument()),
+          kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
+          kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
 
-      /**
-       * Converts the MongoDB document to an entity
-       *
-       * @return entity.
-       */
-      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+      return queueDoc;
+    }
 
-          oid = mResult.value()["_id"].get_oid().value.to_string();
-          region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
-          name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
-          owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
-          queueUrl = bsoncxx::string::to_string(mResult.value()["queueUrl"].get_string().value);
-          queueArn = bsoncxx::string::to_string(mResult.value()["queueArn"].get_string().value);
-          attributes.FromDocument(mResult.value()["attributes"].get_document().value);
-          created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-          modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
-      }
+    /**
+     * Converts the MongoDB document to an entity
+     *
+     * @param mResult MongoDB document.
+     */
+    [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
+      oid = mResult.value()["_id"].get_oid().value.to_string();
+      region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
+      name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
+      owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
+      queueUrl = bsoncxx::string::to_string(mResult.value()["queueUrl"].get_string().value);
+      queueArn = bsoncxx::string::to_string(mResult.value()["queueArn"].get_string().value);
+      attributes.FromDocument(mResult.value()["attributes"].get_document().value);
+      created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
+      modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+    }
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const Queue &q) {
-          os << "Queue={id='" << q.oid << "' region='" << q.region << "' name='" << q.name << "' owner='" << q.owner << "' queueUrl='" << q.queueUrl <<
-             "' queueArn='" << q.queueArn << "' created='" << Poco::DateTimeFormatter().format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) <<
-             "' modified='" << Poco::DateTimeFormatter().format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) << "'}";
-          return os;
-      }
+    /**
+     * Converts the MongoDB document to an entity
+     *
+     * @param mResult MongoDB document.
+     */
+    [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
-    };
+      oid = mResult.value()["_id"].get_oid().value.to_string();
+      region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
+      name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
+      owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
+      queueUrl = bsoncxx::string::to_string(mResult.value()["queueUrl"].get_string().value);
+      queueArn = bsoncxx::string::to_string(mResult.value()["queueArn"].get_string().value);
+      attributes.FromDocument(mResult.value()["attributes"].get_document().value);
+      created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
+      modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+    }
 
-    typedef struct Queue Queue;
-    typedef std::vector<Queue> QueueList;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const {
+      std::stringstream ss;
+      ss << (*this);
+      return ss.str();
+    }
+
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const Queue &q) {
+      os << "Queue={id='" << q.oid << "' region='" << q.region << "' name='" << q.name << "' owner='" << q.owner << "' queueUrl='" << q.queueUrl <<
+         "' queueArn='" << q.queueArn << "' created='" << Poco::DateTimeFormatter().format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) <<
+         "' modified='" << Poco::DateTimeFormatter().format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) << "'}";
+      return os;
+    }
+
+  };
+
+  typedef struct Queue Queue;
+  typedef std::vector<Queue> QueueList;
 
 } // namespace AwsMock::Database::Entity::S3
 #endif // AWSMOCK_DB_ENTITY_SQS_QUEUE_H

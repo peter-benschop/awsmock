@@ -27,7 +27,7 @@
 
 namespace AwsMock::Database {
 
-    class S3Database : public Database {
+  class S3Database : public Database {
 
     public:
 
@@ -99,7 +99,7 @@ namespace AwsMock::Database {
        * @return created bucket entity
        * @throws DatabaseException
        */
-      Entity::S3::Bucket CreateBucket(const Entity::S3::Bucket& bucket);
+      Entity::S3::Bucket CreateBucket(const Entity::S3::Bucket &bucket);
 
       /**
        * List all buckets
@@ -124,7 +124,7 @@ namespace AwsMock::Database {
        * @return created bucket entity
        * @throws DatabaseException
        */
-      Entity::S3::Bucket UpdateBucket(const Entity::S3::Bucket& bucket);
+      Entity::S3::Bucket UpdateBucket(const Entity::S3::Bucket &bucket);
 
       /**
        * Create a new S3 object in the S3 object table
@@ -133,7 +133,7 @@ namespace AwsMock::Database {
        * @return created object entity
        * @throws DatabaseException
        */
-      Entity::S3::Object CreateObject(const Entity::S3::Object& object);
+      Entity::S3::Object CreateObject(const Entity::S3::Object &object);
 
       /**
        * Create a new S3 object in the S3 object table, if it does not exist, otherwise update the exiting object.
@@ -142,7 +142,7 @@ namespace AwsMock::Database {
        * @return created or updated object entity
        * @throws DatabaseException
        */
-      Entity::S3::Object CreateOrUpdateObject(const Entity::S3::Object& object);
+      Entity::S3::Object CreateOrUpdateObject(const Entity::S3::Object &object);
 
       /**
        * Updates an existing object in the S3 object table
@@ -151,7 +151,7 @@ namespace AwsMock::Database {
        * @return updated object entity
        * @throws DatabaseException
        */
-      Entity::S3::Object UpdateObject(const Entity::S3::Object& object);
+      Entity::S3::Object UpdateObject(const Entity::S3::Object &object);
 
       /**
        * Check the existence of an object
@@ -160,7 +160,7 @@ namespace AwsMock::Database {
        * @return true if existing otherwise false
        * @throws DatabaseException
        */
-      bool ObjectExists(const Entity::S3::Object& object);
+      bool ObjectExists(const Entity::S3::Object &object);
 
       /**
        * Gets an object from an bucket
@@ -268,7 +268,7 @@ namespace AwsMock::Database {
        * @param bucket bucket entity
        * @throws DatabaseException
        */
-      void DeleteBucket(const Entity::S3::Bucket& bucket);
+      void DeleteBucket(const Entity::S3::Bucket &bucket);
 
       /**
        * Deletes all buckets
@@ -319,7 +319,7 @@ namespace AwsMock::Database {
        */
       static std::map<std::string, std::vector<std::string>> allowedEventTypes;
 
-    };
+  };
 
 } // namespace AwsMock::Database
 

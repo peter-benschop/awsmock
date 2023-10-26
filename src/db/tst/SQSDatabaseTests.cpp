@@ -31,20 +31,20 @@ namespace AwsMock::Database {
 
     protected:
 
-    void SetUp() override {
-      _region = _configuration.getString("awsmock.region");
-      _accountId = _configuration.getString("awsmock.account.id", DEFAULT_SQS_ACCOUNT_ID);
-      _queueArn = Core::AwsUtils::CreateSQSQueueArn(_region, _accountId, QUEUE_NAME);
-    }
+      void SetUp() override {
+        _region = _configuration.getString("awsmock.region");
+        _accountId = _configuration.getString("awsmock.account.id", DEFAULT_SQS_ACCOUNT_ID);
+        _queueArn = Core::AwsUtils::CreateSQSQueueArn(_region, _accountId, QUEUE_NAME);
+      }
 
-    void TearDown() override {
-      _sqsDatabase.DeleteAllQueues();
-      _sqsDatabase.DeleteAllMessages();
-    }
+      void TearDown() override {
+        _sqsDatabase.DeleteAllQueues();
+        _sqsDatabase.DeleteAllMessages();
+      }
 
-    std::string _region, _queueArn, _accountId;
-    Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
-    SQSDatabase _sqsDatabase = SQSDatabase(_configuration);
+      std::string _region, _queueArn, _accountId;
+      Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+      SQSDatabase _sqsDatabase = SQSDatabase(_configuration);
   };
 
   TEST_F(SQSDatabaseTest, QueueCreateTest) {

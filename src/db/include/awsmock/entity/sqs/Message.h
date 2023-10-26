@@ -26,124 +26,126 @@
 
 namespace AwsMock::Database::Entity::SQS {
 
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::view_or_value;
-    using bsoncxx::document::view;
-    using bsoncxx::document::value;
+  using bsoncxx::builder::basic::kvp;
+  using bsoncxx::builder::basic::make_array;
+  using bsoncxx::builder::basic::make_document;
+  using bsoncxx::view_or_value;
+  using bsoncxx::document::view;
+  using bsoncxx::document::value;
 
-    struct Message {
+  struct Message {
 
-      /**
-       * ID
-       */
-      std::string oid;
+    /**
+     * ID
+     */
+    std::string oid;
 
-      /**
-       * Aws region name
-       */
-      std::string region;
+    /**
+     * Aws region name
+     */
+    std::string region;
 
-      /**
-       * Queue URL
-       */
-      std::string queueUrl;
+    /**
+     * Queue URL
+     */
+    std::string queueUrl;
 
-      /**
-       * Message body
-       */
-      std::string body;
+    /**
+     * Message body
+     */
+    std::string body;
 
-      /**
-       * Status
-       */
-      int status = INITIAL;
+    /**
+     * Status
+     */
+    int status = INITIAL;
 
-      /**
-       * Last send datetime
-       */
-      Poco::DateTime reset;
+    /**
+     * Last send datetime
+     */
+    Poco::DateTime reset;
 
-      /**
-       * Send retries
-       */
-      int retries = 0;
+    /**
+     * Send retries
+     */
+    int retries = 0;
 
-      /**
-       * Message ID
-       */
-      std::string messageId;
+    /**
+     * Message ID
+     */
+    std::string messageId;
 
-      /**
-       * Receipt handle
-       */
-      std::string receiptHandle;
+    /**
+     * Receipt handle
+     */
+    std::string receiptHandle;
 
-      /**
-       * MD5 sum body
-       */
-      std::string md5Body;
+    /**
+     * MD5 sum body
+     */
+    std::string md5Body;
 
-      /**
-       * MD5 sum sqs
-       */
-      std::string md5Attr;
+    /**
+     * MD5 sum sqs
+     */
+    std::string md5Attr;
 
-      /**
-       * List of sqs
-       */
-      MessageAttributeList attributes;
+    /**
+     * List of sqs
+     */
+    MessageAttributeList attributes;
 
-      /**
-       * Creation date
-       */
-      Poco::DateTime created = Poco::DateTime();
+    /**
+     * Creation date
+     */
+    Poco::DateTime created = Poco::DateTime();
 
-      /**
-       * Last modification date
-       */
-      Poco::DateTime modified = Poco::DateTime();
+    /**
+     * Last modification date
+     */
+    Poco::DateTime modified = Poco::DateTime();
 
-      /**
-       * Converts the entity to a MongoDB document
-       *
-       * @return entity as MongoDB document.
-       */
-      [[nodiscard]] view_or_value<view, value> ToDocument() const;
+    /**
+     * Converts the entity to a MongoDB document
+     *
+     * @return entity as MongoDB document.
+     */
+    [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
-      /**
-       * Converts the MongoDB document to an entity
-       *
-       * @return entity.
-       */
-      void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult);
+    /**
+     * Converts the MongoDB document to an entity
+     *
+     * @param mResult MongoDB document.
+     */
+    void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult);
 
-      /**
-       * Converts the MongoDB document to an entity
-       *
-       * @return entity.
-       */
-      void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+    /**
+     * Converts the MongoDB document to an entity
+     *
+     * @param mResult MongoDB document.
+     */
+    void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const Message &m);
+    /**
+     * Stream provider.
+     *
+     * @param os output stream
+     * @param m message
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const Message &m);
 
-    };
+  };
 
-    typedef struct Message Message;
-    typedef std::vector<Message> MessageList;
+  typedef struct Message Message;
+  typedef std::vector<Message> MessageList;
 
 } // namespace AwsMock::Database::Entity::S3
 

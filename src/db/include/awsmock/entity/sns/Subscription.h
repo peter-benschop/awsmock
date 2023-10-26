@@ -1,0 +1,108 @@
+//
+// Created by vogje01 on 01/06/2023.
+//
+
+#ifndef AWSMOCK_DB_ENTITY_SNS_SUBSCRIPTION_H
+#define AWSMOCK_DB_ENTITY_SNS_SUBSCRIPTION_H
+
+// C++ includes
+#include <string>
+#include <vector>
+
+// Poco includes
+#include <Poco/DateTime.h>
+#include <Poco/DateTimeFormat.h>
+#include <Poco/DateTimeFormatter.h>
+
+// MongoDB includes
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/string/to_string.hpp>
+#include <bsoncxx/builder/basic/array.hpp>
+#include <bsoncxx/builder/basic/document.hpp>
+#include <mongocxx/stdx.hpp>
+
+// AwsMock includes
+#include <awsmock/core/ServiceException.h>
+
+namespace AwsMock::Database::Entity::SNS {
+
+  using bsoncxx::builder::basic::kvp;
+  using bsoncxx::builder::basic::make_array;
+  using bsoncxx::builder::basic::make_document;
+  using bsoncxx::view_or_value;
+  using bsoncxx::document::view;
+  using bsoncxx::document::value;
+
+  struct Subscription {
+
+    /**
+     * Protocol
+     */
+    std::string protocol;
+
+    /**
+     * Endpoint
+     */
+    std::string endpoint;
+
+    /**
+     * Subscription ARN
+     */
+    std::string subscriptionArn;
+
+    /**
+     * Converts the entity to a MongoDB document
+     *
+     * @return entity as MongoDB document.
+     */
+    [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
+
+      view_or_value<view, value> subscriptionDoc = make_document(
+          kvp("protocol", protocol),
+          kvp("endpoint", endpoint),
+          kvp("subscriptionArn", subscriptionArn));
+
+      return subscriptionDoc;
+    }
+
+    /**
+     * Converts the MongoDB document to an entity
+     *
+     * @param mResult MongoDB document.
+     */
+    [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view_or_value> mResult) {
+
+      protocol = bsoncxx::string::to_string(mResult.value().view()["protocol"].get_string().value);
+      endpoint = bsoncxx::string::to_string(mResult.value().view()["endpoint"].get_string().value);
+      subscriptionArn = bsoncxx::string::to_string(mResult.value().view()["subscriptionArn"].get_string().value);
+    }
+
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const {
+      std::stringstream ss;
+      ss << (*this);
+      return ss.str();
+    }
+
+    /**
+     * Stream provider.
+     *
+     * @param os output stream
+     * @param m subscription entity
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const Subscription &m) {
+      os << "Subscription={protocol='" << m.protocol << "' endpoint='" << m.endpoint << "'}";
+      return os;
+    }
+
+  };
+
+  typedef std::vector<Subscription> SubscriptionList;
+
+} // namespace AwsMock::Database::Entity::SNS
+#endif // AWSMOCK_DB_ENTITY_SNS_SUBSCRIPTION_H

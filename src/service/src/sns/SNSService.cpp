@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-  SNSService::SNSService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("SNSService")), _configuration(configuration) {
+  SNSService::SNSService(const Core::Configuration &configuration, Poco::Condition &condition) : _logger(Poco::Logger::get("SNSService")), _configuration(configuration), _condition(condition) {
 
     // Initialize environment
     _snsDatabase = std::make_unique<Database::SNSDatabase>(_configuration);
@@ -93,11 +93,11 @@ namespace AwsMock::Service {
       // Update database
       std::string messageId = Core::StringUtils::GenerateRandomString(100);
       message = _snsDatabase->CreateMessage({
-                                                .region=request.region,
-                                                .topicArn=request.topicArn,
-                                                .targetArn=request.targetArn,
-                                                .message=request.message,
-                                                .messageId=messageId
+                                              .region=request.region,
+                                              .topicArn=request.topicArn,
+                                              .targetArn=request.targetArn,
+                                              .message=request.message,
+                                              .messageId=messageId
                                             });
 
       // Check subscriptions
@@ -134,9 +134,9 @@ namespace AwsMock::Service {
 
         // Add subscription
         topic.subscriptions.push_back({
-                                          .protocol=request.protocol,
-                                          .endpoint=request.endpoint,
-                                          .subscriptionArn=subscriptionArn
+                                        .protocol=request.protocol,
+                                        .endpoint=request.endpoint,
+                                        .subscriptionArn=subscriptionArn
                                       });
 
         // Save to database
@@ -208,20 +208,20 @@ namespace AwsMock::Service {
 
     // Create a SQS notification request
     AwsMock::Dto::SNS::SqsNotificationRequest sqsNotificationRequest = {
-        .type="Notification",
-        .messageId=Poco::UUIDGenerator().createRandom().toString(),
-        .topicArn=request.topicArn,
-        .message=request.message,
-        .timestamp=Poco::Timestamp().epochMicroseconds() / 1000
+      .type="Notification",
+      .messageId=Poco::UUIDGenerator().createRandom().toString(),
+      .topicArn=request.topicArn,
+      .message=request.message,
+      .timestamp=Poco::Timestamp().epochMicroseconds() / 1000
     };
 
     // Wrap it in a SQS message request
     Dto::SQS::SendMessageRequest sendMessageRequest = {
-        .region=request.region,
-        .queueUrl=sqsQueue.queueUrl,
-        .queueArn=sqsQueue.queueArn,
-        .body=sqsNotificationRequest.ToJson(),
-        .requestId=sqsNotificationRequest.messageId
+      .region=request.region,
+      .queueUrl=sqsQueue.queueUrl,
+      .queueArn=sqsQueue.queueArn,
+      .body=sqsNotificationRequest.ToJson(),
+      .requestId=sqsNotificationRequest.messageId
     };
 
     _sqsService->SendMessage(sendMessageRequest);

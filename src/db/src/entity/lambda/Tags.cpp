@@ -6,41 +6,41 @@
 
 namespace AwsMock::Database::Entity::Lambda {
 
-    bool Tags::HasTag(const std::string &key) {
-        return find_if(tags.begin(), tags.end(), [key](const std::pair <std::string, std::string> &t) {
-          return t.first == key;
-        }) != tags.end();
+  bool Tags::HasTag(const std::string &key) {
+    return find_if(tags.begin(), tags.end(), [key](const std::pair<std::string, std::string> &t) {
+      return t.first == key;
+    }) != tags.end();
+  }
+
+  std::string Tags::GetTagValue(const std::string &key) {
+    auto it = find_if(tags.begin(), tags.end(), [key](const std::pair<std::string, std::string> &t) {
+      return t.first == key;
+    });
+    return it->second;
+  }
+
+  void Tags::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+
+    std::vector<std::string> keys;
+    std::transform(mResult->begin(), mResult->end(), std::back_inserter(keys), [](bsoncxx::document::element ele) {
+      return bsoncxx::string::to_string(ele.key());
+    });
+
+    for (auto &it : keys) {
+      tags.emplace_back(it, bsoncxx::string::to_string(mResult.value()[it].get_string().value));
     }
+  }
 
-    std::string Tags::GetTagValue(const std::string &key) {
-        auto it = find_if(tags.begin(), tags.end(), [key](const std::pair <std::string, std::string> &t) {
-          return t.first == key;
-        });
-        return it->second;
+  [[nodiscard]] std::string Tags::ToString() const {
+    std::stringstream ss;
+    ss << (*this);
+    return ss.str();
+  }
+
+  std::ostream &operator<<(std::ostream &os, const Tags &t) {
+    for (const auto &i : t.tags) {
+      os << "Tags={key='" << i.first << "' value='" << i.second << "'}";
     }
-
-    void Tags::FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult) {
-
-        std::vector <std::string> keys;
-        std::transform(mResult->begin(), mResult->end(), std::back_inserter(keys), [](bsoncxx::document::element ele) {
-          return bsoncxx::string::to_string(ele.key());
-        });
-
-        for (auto &it : keys) {
-            tags.emplace_back(it, bsoncxx::string::to_string(mResult.value()[it].get_string().value));
-        }
-    }
-
-    [[nodiscard]] std::string Tags::ToString() const {
-        std::stringstream ss;
-        ss << (*this);
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const Tags &t) {
-        for (const auto &i : t.tags) {
-            os << "Tags={key='" << i.first << "' value='" << i.second << "'}";
-        }
-        return os;
-    }
+    return os;
+  }
 }

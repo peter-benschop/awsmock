@@ -17,35 +17,35 @@
 
 namespace AwsMock::Database::Entity::Lambda {
 
-    struct EphemeralStorage {
+  struct EphemeralStorage {
 
-      /**
-       * Temporary disk space in MB. Default: 512 MB, Range: 512 - 10240 MB
-       */
-      long size = 512;
+    /**
+     * Temporary disk space in MB. Default: 512 MB, Range: 512 - 10240 MB
+     */
+    long size = 512;
 
-      /**
-       * Converts the MongoDB document to an entity
-       *
-       * @param mResult database document.
-       */
-      [[maybe_unused]] void FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult);
+    /**
+     * Converts the MongoDB document to an entity
+     *
+     * @param mResult database document.
+     */
+    [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const EphemeralStorage &m);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const EphemeralStorage &m);
 
-    };
+  };
 
 } // namespace AwsMock::Database::Entity::lambda
 

@@ -6,19 +6,19 @@
 
 namespace AwsMock::Database::Entity::Lambda {
 
-    void EphemeralStorage::FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult) {
+  void EphemeralStorage::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
-        size = mResult.value()["size"].get_int64();
-    }
+    size = mResult.value()["size"].get_int64();
+  }
 
-    std::string EphemeralStorage::ToString() const {
-        std::stringstream ss;
-        ss << (*this);
-        return ss.str();
-    }
+  std::string EphemeralStorage::ToString() const {
+    std::stringstream ss;
+    ss << (*this);
+    return ss.str();
+  }
 
-    std::ostream &operator<<(std::ostream &os, const EphemeralStorage &m) {
-        os << "EphemeralStorage={size='" << m.size << "'}";
-        return os;
-    }
+  std::ostream &operator<<(std::ostream &os, const EphemeralStorage &m) {
+    os << "EphemeralStorage={size='" << m.size << "'}";
+    return os;
+  }
 }

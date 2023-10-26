@@ -18,7 +18,7 @@ namespace AwsMock::Database::Entity::Module {
     UNKNOWN
   };
 
-  static std::map <ModuleStatus, std::string> ModuleStatusNames{
+  static std::map<ModuleStatus, std::string> ModuleStatusNames{
       {ModuleStatus::STOPPED, "STOPPED"},
       {ModuleStatus::RUNNING, "RUNNING"},
       {ModuleStatus::SUSPENDED, "SUSPENDED"},

@@ -125,11 +125,6 @@ namespace AwsMock::Service {
       std::unique_ptr<Database::TransferDatabase> _transferDatabase;
 
       /**
-       * Running flag
-       */
-      bool _running;
-
-      /**
        * Sleeping period in ms
        */
       int _period;

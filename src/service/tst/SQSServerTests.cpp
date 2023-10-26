@@ -84,7 +84,7 @@ namespace AwsMock::Service {
   TEST_F(SQSServerTest, QueueDeleteTest) {
 
     // arrange
-    _curlUtils.SendHttpRequest("POST", _endpoint, _extraHeaders, CREATE_QUEUE_REQUEST);
+    Core::CurlResponse createResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
 
     // act
     Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", _endpoint, _extraHeaders, DELETE_QUEUE_REQUEST);
@@ -97,4 +97,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Core
 
-#endif // AWMOCK_CORE_S3SERVERTEST_H
+#endif // AWMOCK_CORE_SQSSERVERTEST_H

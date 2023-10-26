@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
 
   SNSServer::SNSServer(Core::Configuration &configuration, Core::MetricService &metricService)
-      : AbstractServer(configuration, "sns"), _logger(Poco::Logger::get("SNSServer")), _configuration(configuration), _metricService(metricService), _running(false) {
+      : AbstractServer(configuration, "sns"), _logger(Poco::Logger::get("SNSServer")), _configuration(configuration), _metricService(metricService) {
 
     // HTTP manager configuration
     _port = _configuration.getInt("awsmock.service.sns.port", SNS_DEFAULT_PORT);
@@ -47,9 +47,11 @@ namespace AwsMock::Service {
     // Start REST service
     StartHttpServer(_maxQueueLength, _maxThreads,_host,_port,new SNSRequestHandlerFactory(_configuration, _metricService, _condition));
 
-    _running = true;
-    while (_running) {
+    while (IsRunning()) {
+
       log_debug_stream(_logger) << "SNSServer processing started" << std::endl;
+
+      // Reset messages
       ResetMessages();
 
       // Wait for timeout or condition

@@ -21,7 +21,7 @@
 
 namespace AwsMock::Database {
 
-    class LambdaDatabase : public Database {
+  class LambdaDatabase : public Database {
 
     public:
 
@@ -94,7 +94,6 @@ namespace AwsMock::Database {
        */
       Entity::Lambda::Lambda UpdateLambda(const Entity::Lambda::Lambda &lambda);
 
-
       /**
        * Created or updates an existing lambda function
        *
@@ -165,7 +164,7 @@ namespace AwsMock::Database {
        */
       mongocxx::collection _lambdaCollection{};
 
-    };
+  };
 
 } // namespace AwsMock::Database
 
