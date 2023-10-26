@@ -67,3 +67,7 @@ docs/docs
 
 # database
 dist/samples/database-data
+
+# executables
+src/controller/awsmockctl
+src/manager/awsmockmgr

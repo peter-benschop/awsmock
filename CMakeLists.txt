@@ -5,7 +5,6 @@ project(aws-mock)
 set(CMAKE_CXX_STANDARD 20)
 
 # Semantic versioning (sv4git)
-#execute_process (COMMAND bash -c "git sv cv | tr -d '\n'" OUTPUT_VARIABLE GIT_VERSION)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/dist/etc/")
 set(VERSION_UPDATE_FROM_GIT TRUE)
 include(GetVersionFromGitTag)
@@ -16,7 +15,7 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif ()
 set(CMAKE_INSTALL_PREFIX "/usr" CACHE STRING " " FORCE)
-message("Building ${PROJECT_NAME} ${${PROJECT_NAME}_VERSION_STRING} type: ${CMAKE_BUILD_TYPE}, install prefix: ${CMAKE_INSTALL_PREFIX}")
+message("-- Building ${PROJECT_NAME} ${${PROJECT_NAME}_VERSION_STRING} type: ${CMAKE_BUILD_TYPE}, install prefix: ${CMAKE_INSTALL_PREFIX}")
 
 # Doxygen
 set(doxyfile ${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile)
