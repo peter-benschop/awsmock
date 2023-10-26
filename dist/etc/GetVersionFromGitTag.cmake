@@ -35,7 +35,7 @@
 find_package(Git QUIET)
 
 # Check if git is found...
-if (GIT_FOUND AND VERSION_UPDATE_FROM_GIT)
+if (GIT_FOUND)
 
     # Get last tag from git
     execute_process(COMMAND bash "-c" "gh release list -L1 | awk '{print $1}'"
