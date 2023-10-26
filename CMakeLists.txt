@@ -31,7 +31,6 @@ add_subdirectory(src/dto)
 add_subdirectory(src/db)
 add_subdirectory(src/manager)
 add_subdirectory(src/service)
-#add_subdirectory(src/gateway)
 add_subdirectory(src/controller)
 
 if (BUILD_DOCUMENTATION)

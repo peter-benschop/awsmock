@@ -6,7 +6,7 @@
 #define AWSMOCK_CONTROLLER_CONTROLLER_H
 
 // C includes
-#include <stdlib.h>
+#include <cstdlib>
 
 // C++ includes
 #include <string>
@@ -24,6 +24,9 @@
 
 #define AWSMOCKCTL_DEFAULT_HOST "localhost"
 #define AWSMOCKCTL_DEFAULT_PORT 4567
+#define AWSMOCKCTL_DEFAULT_USER "none"
+#define AWSMOCKCTL_DEFAULT_CLIENT "00000000"
+#define AWSMOCKCTL_DEFAULT_REGION "eu-central-1"
 
 namespace AwsMock::Controller {
 
@@ -44,14 +47,21 @@ namespace AwsMock::Controller {
       /**
        * Start a service
        *
-       * @param name service name
+       * @param name service name, or 'all'
        */
       void StartService(const std::string &name);
 
       /**
+       * Restart a service
+       *
+       * @param name service name, or 'all'
+       */
+      void RestartService(const std::string &name);
+
+      /**
        * Stops a service
        *
-       * @param name service name
+       * @param name service name, or 'all'
        */
       void StopService(const std::string &name);
 
@@ -61,7 +71,7 @@ namespace AwsMock::Controller {
        *
        * @param headers headers
        */
-      static void AddAuthorization(std::map<std::string, std::string> &headers);
+      void AddAuthorization(std::map<std::string, std::string> &headers);
 
       /**
        * Logger
@@ -72,11 +82,6 @@ namespace AwsMock::Controller {
        * Application configuration
        */
       const Configuration &_configuration;
-
-      /**
-       * Service database
-       */
-      std::shared_ptr<Database::ModuleDatabase> _serviceDatabase;
 
       /**
        * Curl utils
@@ -97,6 +102,21 @@ namespace AwsMock::Controller {
        * Base URL
        */
       std::string _baseUrl;
+
+      /**
+       * User
+       */
+      std::string _user;
+
+      /**
+       * Client ID
+       */
+      std::string _clientId;
+
+      /**
+       * AWS region
+       */
+      std::string _region;
   };
 
 } // namespace AwsMock::Controller

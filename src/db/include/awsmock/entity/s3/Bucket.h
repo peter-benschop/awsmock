@@ -39,9 +39,9 @@ namespace AwsMock::Database::Entity::S3 {
   };
 
   static std::map<BucketVersionStatus, std::string> BucketVersionStatusNames{
-    {BucketVersionStatus::ENABLED, "enabled"},
-    {BucketVersionStatus::SUSPENDED, "suspended"},
-    {BucketVersionStatus::DISABLED, "disabled"},
+      {BucketVersionStatus::ENABLED, "enabled"},
+      {BucketVersionStatus::SUSPENDED, "suspended"},
+      {BucketVersionStatus::DISABLED, "disabled"},
   };
 
   [[maybe_unused]] static std::string BucketVersionStatusToString(BucketVersionStatus bucketVersionStatus) {
@@ -130,14 +130,14 @@ namespace AwsMock::Database::Entity::S3 {
     /**
      * Converts the MongoDB document to an entity
      *
-     * @return entity.
+     * @param mResult MongoDB document.
      */
     [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult);
 
     /**
      * Converts the MongoDB document to an entity
      *
-     * @return entity.
+     * @param mResult MongoDB document.
      */
     [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
@@ -151,9 +151,11 @@ namespace AwsMock::Database::Entity::S3 {
     /**
      * Stream provider.
      *
+     * @param os output stream
+     * @param bucket bucket entity
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const Bucket &q);
+    friend std::ostream &operator<<(std::ostream &os, const Bucket &bucket);
   };
 
   typedef struct Bucket Bucket;

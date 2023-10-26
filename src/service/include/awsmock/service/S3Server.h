@@ -36,7 +36,6 @@ namespace AwsMock::Service {
        *
        * @param configuration application configuration
        * @param metricService monitoring service
-       * @param condition stop condition
        */
       explicit S3Server(Core::Configuration &configuration, Core::MetricService &metricService);
 
@@ -127,7 +126,7 @@ namespace AwsMock::Service {
        *
        * @param bucket bucket name
        * @param key object key
-       * @retunr local file path
+       * @return local file path
        */
       std::string GetFileFromBucketKey(const std::string &bucket, const std::string &key);
 
@@ -241,11 +240,6 @@ namespace AwsMock::Service {
        * Sleeping period in ms
        */
       int _period;
-
-      /**
-       * Running flag
-       */
-      bool _running;
 
       /**
        * Data directory

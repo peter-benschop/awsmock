@@ -42,6 +42,13 @@ namespace AwsMock::Service {
       explicit ModuleService(const Core::Configuration &configuration, Service::ServerMap &serverMap);
 
       /**
+       * Return all list of all modules
+       *
+       * @param list of all modules
+       */
+      Database::Entity::Module::ModuleList ListModules();
+
+      /**
        * Starts a service
        *
        * @param name service name
@@ -49,9 +56,21 @@ namespace AwsMock::Service {
       Database::Entity::Module::Module StartService(const std::string &name);
 
       /**
-       * Starts all service
+       * Starts all services
        */
       void StartAllServices();
+
+      /**
+       * Restarts a service
+       *
+       * @param name service name
+       */
+      Database::Entity::Module::Module RestartService(const std::string &name);
+
+      /**
+       * Restarts all services
+       */
+      void RestartAllServices();
 
       /**
        * Stops a service

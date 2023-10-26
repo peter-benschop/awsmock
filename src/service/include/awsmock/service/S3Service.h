@@ -167,7 +167,6 @@ namespace AwsMock::Service {
      * Delete object
      *
      * @param request delete object request
-     * @return DeleteObjectResponse
      */
     void DeleteObject(const Dto::S3::DeleteObjectRequest &request);
 

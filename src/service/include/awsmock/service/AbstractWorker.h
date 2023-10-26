@@ -61,7 +61,6 @@ namespace AwsMock::Service {
        * Send a HEAD request
        *
        * @param url HTTP URL
-       * @param body HTTP message body
        * @param contentType HTTP content type
        * @return true, if status = 200
        */

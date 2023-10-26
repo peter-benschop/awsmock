@@ -165,7 +165,6 @@ namespace AwsMock::Service {
        * @param authorization HTTP authorization string
        * @param region AWS region
        * @param user AWS user
-       * @return body string
        */
       void GetRegionUser(const std::string &authorization, std::string &region, std::string &user);
 
@@ -399,7 +398,7 @@ namespace AwsMock::Service {
       /**
        * Dump the request to std::cerr
        *
-       * @param request HTTP request
+       * @param response HTTP response
        */
       void DumpResponseHeaders(Poco::Net::HTTPServerResponse &response);
 

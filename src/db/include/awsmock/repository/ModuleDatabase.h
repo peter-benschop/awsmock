@@ -41,7 +41,7 @@ namespace AwsMock::Database {
        * @param name module name
        * @return created module
        */
-      bool ModuleExists(const std::string &service);
+      bool ModuleExists(const std::string &name);
 
       /**
        * Returns the module by id
@@ -72,7 +72,7 @@ namespace AwsMock::Database {
       /**
        * Updates a module
        *
-       * @param service module entity
+       * @param module module entity
        * @return updated module
        */
       Entity::Module::Module UpdateModule(const Entity::Module::Module &module);
@@ -96,7 +96,7 @@ namespace AwsMock::Database {
       /**
        * Creates or updates a module
        *
-       * @param service module entity
+       * @param module module entity
        * @return updated module
        */
       Entity::Module::Module CreateOrUpdateModule(const Entity::Module::Module &module);

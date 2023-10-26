@@ -21,7 +21,7 @@
 
 namespace AwsMock::Database {
 
-    class TransferDatabase : public Database {
+  class TransferDatabase : public Database {
 
     public:
 
@@ -78,7 +78,6 @@ namespace AwsMock::Database {
        */
       Entity::Transfer::Transfer CreateTransfer(const Entity::Transfer::Transfer &lambda);
 
-
       /**
        * Updates an existing transfer manager
        *
@@ -86,7 +85,6 @@ namespace AwsMock::Database {
        * @return updated lambda entity.
        */
       Entity::Transfer::Transfer UpdateTransfer(const Entity::Transfer::Transfer &lambda);
-
 
       /**
        * Created or updates an existing transfer manager
@@ -167,7 +165,7 @@ namespace AwsMock::Database {
        */
       mongocxx::collection _transferCollection{};
 
-    };
+  };
 
 } // namespace AwsMock::Database
 

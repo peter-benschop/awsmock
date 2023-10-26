@@ -95,7 +95,6 @@ namespace AwsMock::Service {
        * Sends a exists bucket request to the S3 service
        *
        * @param bucket S3 bucket name
-       * @param contentType content type
        * @return true when bucket exists
        */
       bool SendExistsBucketRequest(const std::string &bucket);
@@ -124,11 +123,6 @@ namespace AwsMock::Service {
        * lambda database
        */
       std::unique_ptr<Database::TransferDatabase> _transferDatabase;
-
-      /**
-       * Running flag
-       */
-      bool _running;
 
       /**
        * Sleeping period in ms

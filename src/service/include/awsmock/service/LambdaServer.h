@@ -170,11 +170,6 @@ namespace AwsMock::Service {
       std::string _region;
 
       /**
-       * Running flag
-       */
-      bool _running;
-
-      /**
        * Sleeping period in ms
        */
       int _period;

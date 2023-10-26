@@ -19,12 +19,16 @@ namespace AwsMock::Service {
     return _serviceDatabase->IsActive(_name);
   }
 
-  bool AbstractServer::IsRunning() {
+  bool AbstractServer::IsRunning() const {
     return _running;
   }
 
   void AbstractServer::run() {
-      MainLoop();
+    MainLoop();
+    StopHttpServer();
+    _running = false;
+    _serviceDatabase->SetStatus(_name, Database::Entity::Module::ModuleStatus::STOPPED);
+    log_info_stream(_logger) << "Module " << _name << " has been shutdown" << std::endl;
   }
 
   bool AbstractServer::InterruptableSleep(int period) {
@@ -37,29 +41,29 @@ namespace AwsMock::Service {
   }
 
   void AbstractServer::StopServer() {
-    StopHttpServer();
-    _condition.broadcast();
-    _serviceDatabase->SetStatus(_name, Database::Entity::Module::ModuleStatus::STOPPED);
-    log_info_stream(_logger) << "Module " << _name << " has been shutdown" << std::endl;
+    _condition.signal();
   }
 
-  void AbstractServer::StartHttpServer(int maxQueueLength, int maxThreads, const std::string &host, int port, Poco::Net::HTTPRequestHandlerFactory* requestFactory) {
+  void AbstractServer::StartHttpServer(int maxQueueLength, int maxThreads, const std::string &host, int port, Poco::Net::HTTPRequestHandlerFactory *requestFactory) {
 
-    // Set HTTP manager parameter
+    // Set HTTP server parameter
     auto *httpServerParams = new Poco::Net::HTTPServerParams();
     httpServerParams->setMaxQueued(maxQueueLength);
     httpServerParams->setMaxThreads(maxThreads);
-    log_debug_stream(_logger) << "HTTP manager parameter set, maxQueue: " << maxQueueLength << " maxThreads: " << maxThreads << std::endl;
+    log_debug_stream(_logger) << "HTTP server parameter set, maxQueue: " << maxQueueLength << " maxThreads: " << maxThreads << std::endl;
 
     _serviceDatabase->SetPort(_name, port);
     _httpServer = std::make_shared<Poco::Net::HTTPServer>(requestFactory, Poco::Net::ServerSocket(Poco::UInt16(port)), httpServerParams);
     _httpServer->start();
 
+    // Set running, now that the HTTP server is running
+    _running = true;
+
     log_info_stream(_logger) << "HTTP server " << _name << " started, endpoint: http://" << host << ":" << port << std::endl;
   }
 
   void AbstractServer::StopHttpServer() {
-    if(_httpServer) {
+    if (_httpServer) {
       _httpServer->stopAll(true);
       _httpServer.reset();
     }

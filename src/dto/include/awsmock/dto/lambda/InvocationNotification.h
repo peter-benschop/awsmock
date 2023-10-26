@@ -53,7 +53,7 @@ namespace AwsMock::Dto::Lambda {
      * @param payload event payload
      * @param region AWS region
      * @param user AWS user
-     * @param hostname hostname of the lambda function
+     * @param hostName hostname of the lambda function
      * @param port lambda function port
      */
     InvocationNotification(const std::string &functionName, const std::string &payload, const std::string &region, const std::string &user, const std::string &hostName, int port);

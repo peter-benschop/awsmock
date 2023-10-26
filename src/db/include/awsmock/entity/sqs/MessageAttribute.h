@@ -96,6 +96,8 @@ namespace AwsMock::Database::Entity::SQS {
     /**
      * Stream provider.
      *
+     * @param os output stream
+     * @param m message attribute
      * @return output stream
      */
     friend std::ostream &operator<<(std::ostream &os, const MessageAttribute &m);

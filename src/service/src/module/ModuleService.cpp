@@ -11,12 +11,20 @@ namespace AwsMock::Service {
     _moduleDatabase = std::make_shared<Database::ModuleDatabase>(_configuration);
   }
 
+  Database::Entity::Module::ModuleList ModuleService::ListModules() {
+
+    Database::Entity::Module::ModuleList modules = _moduleDatabase->ListModules();
+    log_debug_stream(_logger) << &"Module list, count: "[modules.size()] << std::endl;
+    return modules;
+  }
+
   Database::Entity::Module::Module ModuleService::StartService(const std::string &name) {
 
     // Set status
     Database::Entity::Module::Module module = _moduleDatabase->GetModuleByName(name);
     if (module.status == Database::Entity::Module::ModuleStatus::RUNNING) {
 
+      log_info_stream(_logger) << "Module " + name + " already running" << std::endl;
       throw Core::ServiceException("Module " + name + " already running", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
 
     } else {
@@ -40,6 +48,7 @@ namespace AwsMock::Service {
         auto *transferServer = (Service::TransferServer *) _serverMap[module.name];
         Poco::ThreadPool::defaultPool().start(*transferServer);
       }
+      log_info_stream(_logger) << "Module " + name + " started" << std::endl;
     }
     return module;
   }
@@ -49,6 +58,30 @@ namespace AwsMock::Service {
     Database::Entity::Module::ModuleList modules = _moduleDatabase->ListModules();
     for (const auto &module : modules) {
       StartService(module.name);
+    }
+  }
+
+  Database::Entity::Module::Module ModuleService::RestartService(const std::string &name) {
+
+    // Set status
+    Database::Entity::Module::Module module = _moduleDatabase->GetModuleByName(name);
+    if (module.status == Database::Entity::Module::ModuleStatus::RUNNING) {
+
+      StopService(name);
+      log_info_stream(_logger) << "Module " + name + " already running" << std::endl;
+      throw Core::ServiceException("Module " + name + " already running", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+
+    }
+
+    log_info_stream(_logger) << "Module " + name + " restarted" << std::endl;
+    return StartService(name);
+  }
+
+  void ModuleService::RestartAllServices() {
+
+    Database::Entity::Module::ModuleList modules = _moduleDatabase->ListModules();
+    for (const auto &module : modules) {
+      RestartService(module.name);
     }
   }
 

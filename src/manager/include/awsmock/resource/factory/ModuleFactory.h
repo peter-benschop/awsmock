@@ -12,7 +12,7 @@
 
 namespace AwsMock::Resource::Factory {
 
-    class ModuleFactory : public IFactory {
+  class ModuleFactory : public IFactory {
 
     public:
 
@@ -21,10 +21,11 @@ namespace AwsMock::Resource::Factory {
        *
        * @param configuration application configuration
        * @param metricService monitoring service
+       * @param serverMap server map
        * @return resource handler
        */
       Poco::Net::HTTPRequestHandler *createResource(Core::Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap) override;
-    };
+  };
 
 }// namespace AwsMock::Resource::Factory
 

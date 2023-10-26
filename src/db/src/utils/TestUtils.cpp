@@ -11,7 +11,7 @@ namespace AwsMock::Database {
   void TestUtils::CreateServices() {
     Core::Configuration configuration = Core::Configuration(TMP_PROPERTIES_FILE);
     auto _serviceDatabase = ModuleDatabase(configuration);
-    for(const auto &it:_services) {
+    for (const auto &it : _services) {
       _serviceDatabase.CreateOrUpdateModule({.oid={}, .name=it, .status=Entity::Module::ModuleStatus::RUNNING});
     }
   }

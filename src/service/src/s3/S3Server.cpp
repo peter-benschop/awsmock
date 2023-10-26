@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
 
   S3Server::S3Server(Core::Configuration &configuration, Core::MetricService &metricService)
-      : AbstractWorker(configuration), AbstractServer(configuration, "s3"), _logger(Poco::Logger::get("S3Server")), _configuration(configuration), _metricService(metricService), _running(false) {
+      : AbstractWorker(configuration), AbstractServer(configuration, "s3"), _logger(Poco::Logger::get("S3Server")), _configuration(configuration), _metricService(metricService) {
 
     // Get HTTP configuration values
     _port = _configuration.getInt("awsmock.service.s3.port", S3_DEFAULT_PORT);
@@ -61,8 +61,7 @@ namespace AwsMock::Service {
     // Start REST service
     StartHttpServer(_maxQueueLength, _maxThreads, _host, _port, new S3RequestHandlerFactory(_configuration, _metricService));
 
-    _running = true;
-    while (_running) {
+    while (IsRunning()) {
 
       log_debug_stream(_logger) << "S3 processing started" << std::endl;
 

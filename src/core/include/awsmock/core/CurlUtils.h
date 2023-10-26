@@ -78,7 +78,7 @@ namespace AwsMock::Core {
        *
        * @param method HTTP method
        * @param path request path
-       * @param headers request extra headers
+       * @param header request extra headers
        * @param fileName filename to send as request body
        * @return Dto::Curl::CurlResponse
        */

@@ -22,229 +22,136 @@
 #include <bsoncxx/builder/basic/document.hpp>
 #include <mongocxx/stdx.hpp>
 
+// AwsMock includes
+#include <awsmock/entity/sns/MessageAttribute.h>
+
 namespace AwsMock::Database::Entity::SNS {
 
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::view_or_value;
-    using bsoncxx::document::view;
-    using bsoncxx::document::value;
+  using bsoncxx::builder::basic::kvp;
+  using bsoncxx::builder::basic::make_array;
+  using bsoncxx::builder::basic::make_document;
+  using bsoncxx::view_or_value;
+  using bsoncxx::document::view;
+  using bsoncxx::document::value;
 
-    enum STATUS { INITIAL, SEND, RESEND };
+  enum MessageStatus { INITIAL, SEND, RESEND };
+  static std::map<MessageStatus, std::string> MessageStatusNames{
+      {MessageStatus::INITIAL, "INITIAL"},
+      {MessageStatus::SEND, "SEND"},
+      {MessageStatus::RESEND, "RESEND"},
+  };
 
-    struct MessageAttribute {
+  [[maybe_unused]] static std::string MessageStatusToString(MessageStatus messageStatus) {
+    return MessageStatusNames[messageStatus];
+  }
 
-      /**
-       * MessageAttribute name
-       */
-      std::string attributeName;
-
-      /**
-       * MessageAttribute value
-       */
-      std::string attributeValue;
-
-      /**
-       * Converts the entity to a MongoDB document
-       *
-       * @return entity as MongoDB document.
-       */
-      [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
-
-          view_or_value<view, value> messageAttributeDoc = make_document(
-              kvp("name", attributeName),
-              kvp("value", attributeValue));
-
-          return messageAttributeDoc;
+  [[maybe_unused]] static MessageStatus MessageStatusFromString(const std::string &messageStatusString) {
+    for (auto &it : MessageStatusNames) {
+      if (it.second == messageStatusString) {
+        return it.first;
       }
+    }
+    return MessageStatus::INITIAL;
+  }
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
+  struct Message {
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const MessageAttribute &m) {
-          os << "MessageAttribute={name='" + m.attributeValue + "'value='" + m.attributeValue + "'}";
-          return os;
-      }
+    /**
+     * ID
+     */
+    std::string oid;
 
-    };
+    /**
+     * Aws region name
+     */
+    std::string region;
 
-    typedef struct MessageAttribute MessageAttribute;
-    typedef std::vector<MessageAttribute> MessageAttributeList;
+    /**
+     * Topic ARN
+     */
+    std::string topicArn;
 
-    struct Message {
+    /**
+     * Target ARN
+     */
+    std::string targetArn;
 
-      /**
-       * ID
-       */
-      std::string oid;
+    /**
+     * Message body
+     */
+    std::string message;
 
-      /**
-       * Aws region name
-       */
-      std::string region;
+    /**
+     * Message ID
+     */
+    std::string messageId;
 
-      /**
-       * Topic ARN
-       */
-      std::string topicArn;
+    /**
+     * Message ID
+     */
+    MessageStatus status;
 
-      /**
-       * Target ARN
-       */
-      std::string targetArn;
+    /**
+     * List of sqs
+     */
+    MessageAttributeList attributes;
 
-      /**
-       * Message body
-       */
-      std::string message;
+    /**
+     * Last send datetime
+     */
+    Poco::DateTime lastSend;
 
-      /**
-       * Message ID
-       */
-      std::string messageId;
+    /**
+     * Creation datetime
+     */
+    Poco::DateTime created = Poco::DateTime();
 
-      /**
-       * List of sqs
-       */
-      MessageAttributeList attributes;
+    /**
+     * Last modified datetime
+     */
+    Poco::DateTime modified = Poco::DateTime();
 
-      /**
-       * Last send datetime
-       */
-      Poco::DateTime lastSend;
+    /**
+     * Converts the entity to a MongoDB document
+     *
+     * @return entity as MongoDB document.
+     */
+    [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
-      /**
-       * Creation datetime
-       */
-      Poco::DateTime created = Poco::DateTime();
+    /**
+     * Converts the MongoDB document to an entity
+     *
+     * @param mResult MongoDB document.
+     */
+    void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult);
 
-      /**
-       * Last modified datetime
-       */
-      Poco::DateTime modified = Poco::DateTime();
+    /**
+     * Converts the MongoDB document to an entity
+     *
+     * @param mResult MongoDB document.
+     */
+    void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
-      /**
-       * Converts the entity to a MongoDB document
-       *
-       * @return entity as MongoDB document.
-       */
-      [[nodiscard]] view_or_value<view, value> ToDocument() const {
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-          auto messageAttributesDoc = bsoncxx::builder::basic::array{};
-          for (const auto &attribute : attributes) {
-              messageAttributesDoc.append(attribute.ToDocument());
-          }
+    /**
+     * Stream provider.
+     *
+     * @param os output stream
+     * @param message message entity
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const Message &message);
 
-          view_or_value<view, value> messageDoc = make_document(
-              kvp("region", region),
-              kvp("topicArn", topicArn),
-              kvp("targetArn", targetArn),
-              kvp("message", message),
-              kvp("messageId", messageId),
-              kvp("attributes", messageAttributesDoc),
-              kvp("reset", bsoncxx::types::b_date(std::chrono::milliseconds(0))),
-              kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-              kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+  };
 
-          return messageDoc;
-      }
-
-      /**
-       * Converts the MongoDB document to an entity
-       *
-       * @return entity.
-       */
-      void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
-
-          oid = mResult.value()["_id"].get_oid().value.to_string();
-          region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
-          topicArn = bsoncxx::string::to_string(mResult.value()["topicArn"].get_string().value);
-          targetArn = bsoncxx::string::to_string(mResult.value()["targetArn"].get_string().value);
-          message = bsoncxx::string::to_string(mResult.value()["message"].get_string().value);
-          messageId = bsoncxx::string::to_string(mResult.value()["messageId"].get_string().value);
-          lastSend = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["reset"].get_date().value) / 1000));
-          created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-          modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
-
-          bsoncxx::array::view attributesView{mResult.value()["attributes"].get_array().value};
-          for (bsoncxx::array::element attributeElement : attributesView) {
-              MessageAttribute attribute{
-                  .attributeName=bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
-                  .attributeValue=bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value)
-              };
-              attributes.push_back(attribute);
-          }
-      }
-
-      /**
-       * Converts the MongoDB document to an entity
-       *
-       * @return entity.
-       */
-     void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
-
-          oid = mResult.value()["_id"].get_oid().value.to_string();
-          region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
-          topicArn = bsoncxx::string::to_string(mResult.value()["topicArn"].get_string().value);
-          targetArn = bsoncxx::string::to_string(mResult.value()["targetArn"].get_string().value);
-          message = bsoncxx::string::to_string(mResult.value()["message"].get_string().value);
-          messageId = bsoncxx::string::to_string(mResult.value()["messageId"].get_string().value);
-          lastSend = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["reset"].get_date().value) / 1000));
-          created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-          modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
-
-          bsoncxx::array::view attributesView{mResult.value()["attributes"].get_array().value};
-          for (bsoncxx::array::element attributeElement : attributesView) {
-              MessageAttribute attribute{
-                  .attributeName=bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
-                  .attributeValue=bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value)
-              };
-              attributes.push_back(attribute);
-          }
-      }
-
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
-
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const Message &m) {
-          os << "Message={oid='" + m.oid + "' topicArn: " + m.topicArn + "' targetArn='" + m.targetArn + "'message='" + m.message + "'messageId='" + m.messageId
-              + "' reset='" + Poco::DateTimeFormatter().format(m.lastSend, Poco::DateTimeFormat::HTTP_FORMAT) + "' created='" +
-              Poco::DateTimeFormatter().format(m.created, Poco::DateTimeFormat::HTTP_FORMAT) + "' modified='" +
-              Poco::DateTimeFormatter().format(m.modified, Poco::DateTimeFormat::HTTP_FORMAT) + "'}";
-          return os;
-      }
-
-    };
-
-    typedef struct Message Message;
-    typedef std::vector<Message> MessageList;
+  typedef struct Message Message;
+  typedef std::vector<Message> MessageList;
 
 } // namespace AwsMock::Database::Entity::SNS
 

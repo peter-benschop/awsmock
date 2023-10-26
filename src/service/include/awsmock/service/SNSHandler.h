@@ -87,7 +87,6 @@ namespace AwsMock::Service {
       /**
        * Options request.
        *
-       * @param request HTTP request
        * @param response HTTP response
        * @see AbstractResource::handleOption(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
        */

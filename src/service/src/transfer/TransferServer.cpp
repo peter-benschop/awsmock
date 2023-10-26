@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
 
   TransferServer::TransferServer(Core::Configuration &configuration, Core::MetricService &metricService)
-      : AbstractServer(configuration, "transfer"), AbstractWorker(configuration), _logger(Poco::Logger::get("TransferServer")), _configuration(configuration), _metricService(metricService), _running(false) {
+      : AbstractServer(configuration, "transfer"), AbstractWorker(configuration), _logger(Poco::Logger::get("TransferServer")), _configuration(configuration), _metricService(metricService) {
 
     // REST manager configuration
     _port = _configuration.getInt("awsmock.service.transfer.port", TRANSFER_DEFAULT_PORT);
@@ -142,8 +142,7 @@ namespace AwsMock::Service {
     // Start all transfer servers
     StartTransferServers();
 
-    _running = true;
-    while (_running) {
+    while (IsRunning()) {
 
       log_debug_stream(_logger) << "TransferWorker processing started" << std::endl;
 

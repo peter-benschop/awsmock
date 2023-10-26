@@ -20,7 +20,7 @@
 
 namespace AwsMock::Database {
 
-    class Database {
+  class Database {
 
     public:
 
@@ -92,7 +92,7 @@ namespace AwsMock::Database {
        */
       mongocxx::client _client;
 
-    };
+  };
 
 } // namespace AwsMock::Database
 

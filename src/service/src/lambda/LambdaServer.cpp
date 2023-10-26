@@ -8,7 +8,7 @@ namespace AwsMock::Service {
 
   LambdaServer::LambdaServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue, Poco::NotificationQueue &invokeQueue)
       : AbstractWorker(configuration), AbstractServer(configuration, "lambda"), _logger(Poco::Logger::get("LambdaServer")), _configuration(configuration), _metricService(metricService),
-        _createQueue(createQueue), _invokeQueue(invokeQueue), _running(false) {
+        _createQueue(createQueue), _invokeQueue(invokeQueue) {
 
     // Get HTTP configuration values
     _port = _configuration.getInt("awsmock.service.lambda.port", LAMBDA_DEFAULT_PORT);
@@ -70,8 +70,7 @@ namespace AwsMock::Service {
     // Start all lambda functions
     StartLambdaFunctions();
 
-    _running = true;
-    while (_running) {
+    while (IsRunning()) {
 
       log_debug_stream(_logger) << "LambdaWorker processing started" << std::endl;
 

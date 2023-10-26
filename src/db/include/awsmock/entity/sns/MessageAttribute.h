@@ -1,14 +1,15 @@
 //
-// Created by vogje01 on 07/06/2023.
+// Created by vogje01 on 01/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_USER_H
-#define AWSMOCK_DB_ENTITY_USER_H
+#ifndef AWSMOCK_DB_ENTITY_SNS_MESSAGEATTRIBUTE_H
+#define AWSMOCK_DB_ENTITY_SNS_MESSAGEATTRIBUTE_H
 
 // C++ includes
 #include <string>
+#include <sstream>
 #include <vector>
-#include <iostream>
+#include <map>
 
 // Poco includes
 #include <Poco/DateTime.h>
@@ -22,7 +23,7 @@
 #include <bsoncxx/builder/basic/document.hpp>
 #include <mongocxx/stdx.hpp>
 
-namespace AwsMock::Database::Entity::Transfer {
+namespace AwsMock::Database::Entity::SNS {
 
   using bsoncxx::builder::basic::kvp;
   using bsoncxx::builder::basic::make_array;
@@ -31,29 +32,24 @@ namespace AwsMock::Database::Entity::Transfer {
   using bsoncxx::document::view;
   using bsoncxx::document::value;
 
-  struct User {
+  struct MessageAttribute {
 
     /**
-     * User name
+     * MessageAttribute name
      */
-    std::string userName;
+    std::string attributeName;
 
     /**
-     * Password
+     * MessageAttribute value
      */
-    std::string password;
+    std::string attributeValue;
 
     /**
-     * Home directory
-     */
-    std::string homeDirectory;
-
-    /**
-     * Converts the MongoDB document to an entity
+     * Converts the entity to a MongoDB document
      *
-     * @param mResult MongoDB document.
+     * @return entity as MongoDB document.
      */
-    [[maybe_unused]] void FromDocument(bsoncxx::document::view mResult);
+    [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
     /**
      * Converts the DTO to a string representation.
@@ -66,12 +62,16 @@ namespace AwsMock::Database::Entity::Transfer {
      * Stream provider.
      *
      * @param os output stream
-     * @param m user
+     * @param m message attribute entity
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const User &m);
+    friend std::ostream &operator<<(std::ostream &os, const MessageAttribute &m);
 
   };
 
-}
-#endif // AWSMOCK_DB_ENTITY_USER_H
+  typedef struct MessageAttribute MessageAttribute;
+  typedef std::vector<MessageAttribute> MessageAttributeList;
+
+} // namespace AwsMock::Database::Entity::SNS
+
+#endif // AWSMOCK_DB_ENTITY_SNS_MESSAGEATTRIBUTE_H

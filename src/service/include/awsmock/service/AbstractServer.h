@@ -14,9 +14,11 @@
 #include <Poco/Logger.h>
 #include <Poco/Task.h>
 #include <Poco/Net/HTTPServer.h>
+#include <Poco/Net/HTTPServerResponse.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
+#include <awsmock/core/CurlUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/repository/ModuleDatabase.h>
 
@@ -30,7 +32,6 @@ namespace AwsMock::Service {
        * Constructor
        *
        * @param configuration AwsMock configuration
-       * @param condition stop condition
        * @param name manager name
        */
       explicit AbstractServer(const Core::Configuration &configuration, std::string name);
@@ -45,7 +46,7 @@ namespace AwsMock::Service {
       /**
        * Returns the running flag
        */
-      bool IsRunning();
+      bool IsRunning() const;
 
       /**
        * Main thread methods

@@ -27,7 +27,7 @@
 
 namespace AwsMock::Database {
 
-    class SNSDatabase : public Database {
+  class SNSDatabase : public Database {
 
     public:
 
@@ -64,7 +64,7 @@ namespace AwsMock::Database {
        * @return created SNS topic entity
        * @throws DatabaseException
        */
-      Entity::SNS::Topic CreateTopic(const Entity::SNS::Topic& topic);
+      Entity::SNS::Topic CreateTopic(const Entity::SNS::Topic &topic);
 
       /**
        * Returns a topic by primary key
@@ -108,7 +108,7 @@ namespace AwsMock::Database {
        * @return updated SNS topic entity
        * @throws DatabaseException
        */
-      Entity::SNS::Topic UpdateTopic(const Entity::SNS::Topic& topic);
+      Entity::SNS::Topic UpdateTopic(const Entity::SNS::Topic &topic);
 
       /**
        * List all available topics
@@ -165,23 +165,24 @@ namespace AwsMock::Database {
        * @return message entity
        * @throws Core::DatabaseException
        */
-      [[maybe_unused]] Entity::SNS::Message GetMessageById(const std::string & oid);
+      [[maybe_unused]] Entity::SNS::Message GetMessageById(const std::string &oid);
 
       /**
        * Count the number of message by status
        *
+       * @param region AWS region
        * @param topicUrl URL of the topic
-       * @param visibility visibility period in seconds
        */
-      long CountMessages(const std::string &region = {}, const std::string& topicUrl = {});
+      long CountMessages(const std::string &region = {}, const std::string &topicUrl = {});
 
       /**
        * Count the number of message by status
        *
-       * @param topicUrl URL of the topic
-       * @param visibility visibility period in seconds
+       * @param region AWS region
+       * @param topicArn ARN of the topic
+       * @param status message status
        */
-      //[[maybe_unused]] long CountMessagesByStatus(const std::string &region, const std::string& topicUrl, int status);
+      long CountMessagesByStatus(const std::string &region, const std::string &topicArn, int status);
 
       /**
        * Deletes a message.
@@ -224,7 +225,7 @@ namespace AwsMock::Database {
        * SNS message collection
        */
       mongocxx::collection _messageCollection{};
-    };
+  };
 
 } // namespace AwsMock::Database
 

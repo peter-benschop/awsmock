@@ -113,7 +113,7 @@ namespace AwsMock::Database {
   Entity::SQS::QueueList SQSDatabase::ListQueues(const std::string &region) {
 
     bsoncxx::builder::basic::document filter;
-    if(!region.empty()) {
+    if (!region.empty()) {
       filter.append(kvp("region", region));
     }
 

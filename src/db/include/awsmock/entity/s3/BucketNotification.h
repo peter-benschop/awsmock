@@ -17,54 +17,54 @@
 
 namespace AwsMock::Database::Entity::S3 {
 
-    using bsoncxx::view_or_value;
-    using bsoncxx::document::view;
-    using bsoncxx::document::value;
+  using bsoncxx::view_or_value;
+  using bsoncxx::document::view;
+  using bsoncxx::document::value;
 
-    struct BucketNotification {
+  struct BucketNotification {
 
-      /**
-       * Event
-       */
-      std::string event;
+    /**
+     * Event
+     */
+    std::string event;
 
-      /**
-       * Notification ID
-       */
-      std::string notificationId;
+    /**
+     * Notification ID
+     */
+    std::string notificationId;
 
-      /**
-       * Queue ARN
-       */
-      std::string queueArn;
+    /**
+     * Queue ARN
+     */
+    std::string queueArn;
 
-      /**
-       * lambda ARN
-       */
-      std::string lambdaArn;
+    /**
+     * lambda ARN
+     */
+    std::string lambdaArn;
 
-      /**
-       * Converts the entity to a MongoDB document
-       *
-       * @return entity as MongoDB document.
-       */
-      [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
+    /**
+     * Converts the entity to a MongoDB document
+     *
+     * @return entity as MongoDB document.
+     */
+    [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const BucketNotification &q);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const BucketNotification &q);
 
-    };
+  };
 
 } // namespace AwsMock::Database::Entity::S3
 

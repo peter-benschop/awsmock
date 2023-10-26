@@ -42,20 +42,6 @@ namespace AwsMock::FtpServer {
   class FtpServer {
 
     public:
-      /**
-       * @brief Creates an FTP Server instance that will listen on the the given control port and accept connections from the given network interface.
-       *
-       * If no port is provided, the default FTP Port 21 is used. If you want to
-       * use that port, make sure that your application runs as root.
-       *
-       * Instead of using a predefined port, the operating system can choose a
-       * free port port. Use port=0, if that behaviour is desired. The chosen port
-       * can be determined by with getPort().
-       *
-       * @param port: The port to StartServer the FTP manager on. Defaults to 21.
-       * @param host: The host to accept incoming connections from.
-       */
-      // TransferFtpServer(const std::string &address, uint16_t port = 21);
 
       /**
        * @brief Creates an FTP Server instance that will listen on the the given control port.
@@ -72,13 +58,16 @@ namespace AwsMock::FtpServer {
        * For security reasons it might be desirable to bind to a specific IP
        * address. Use TransferFtpServer(const std::string&, uint16_t) for that purpose.
        *
+       * @param configuration: AwsMock configuration
+       * @param serverName: server name
        * @param port: The port to StartServer the FTP manager on. Defaults to 21.
+       * @param address: listen address
        */
-      // TransferFtpServer(uint16_t port = 21);
-
       explicit FtpServer(const Core::Configuration &configuration, std::string serverName, int port, std::string address);
 
-      // Destructor
+      /**
+       * Destructor
+       */
       ~FtpServer();
 
       /**

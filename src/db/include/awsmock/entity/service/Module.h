@@ -81,14 +81,14 @@ namespace AwsMock::Database::Entity::Module {
     /**
      * Converts the MongoDB document to an entity
      *
-     * @return entity.
+     * @param mResult MongoDB document.
      */
     void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult);
 
     /**
      * Converts the MongoDB document to an entity
      *
-     * @return entity.
+     * @param mResult MongoDB document.
      */
     [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
@@ -103,10 +103,10 @@ namespace AwsMock::Database::Entity::Module {
      * Stream provider.
      *
      * @param os output stream
-     * @param m module struct
+     * @param module module entity
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const Module &m);
+    friend std::ostream &operator<<(std::ostream &os, const Module &module);
 
   };
 

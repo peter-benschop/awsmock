@@ -13,12 +13,13 @@
 
 namespace AwsMock::Resource::Factory {
 
-    class IFactory;
+  class IFactory;
 
-    /**
-     * HTTP resource factory
-     */
-    class Factory {
+  /**
+   * HTTP resource factory
+   */
+  class Factory {
+
     public:
 
       /**
@@ -30,11 +31,13 @@ namespace AwsMock::Resource::Factory {
       static IFactory *createResourceFactory(std::string &name);
 
     private:
+
       /**
        * Default constructor
        */
-      Factory() = default;;
-    };
-} // namespace AwsMock::RESOuRCE::factory
+      Factory() = default;
+  };
+
+} // namespace AwsMock::Resource::Factory
 
 #endif // AWSMOCK_RESOURCE_FACTORY_H

@@ -12,7 +12,7 @@
 
 namespace AwsMock::FtpServer {
 
-    class UserDatabase {
+  class UserDatabase {
 
     public:
       /**
@@ -23,7 +23,7 @@ namespace AwsMock::FtpServer {
       /**
        * Add a new user to the database.
        *
-       * <p><cursive><bold>TODO:</bold> Should be replaced by Aws User database</cursive></p>
+       * <p>TODO:Should be replaced by Aws User database</p>
        *
        * @param username name of the user
        * @param password user password
@@ -71,5 +71,5 @@ namespace AwsMock::FtpServer {
        * Logger
        */
       Core::LogStream _logger;
-    };
+  };
 }
