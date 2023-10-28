@@ -26,8 +26,10 @@
                                 "&Attribute.1.Value=40" \
                                 "&Tag.Key=QueueType" \
                                 "&Tag.Value=Production"
+#define LIST_QUEUE_REQUEST "Action=ListQueues"
+#define LIST_QUEUE_RESPONSE "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<ListQueuesResponse>\n\t<ListQueuesResult>\n\t\t<QueueUrl>http://localhost:4566/000000000000/TestQueue</QueueUrl>\n\t</ListQueuesResult>\n\t<ResponseMetadata>\n\t\t<RequestId>b3f94441-5353-406e-85b7-566a12218fdb</RequestId>\n\t</ResponseMetadata>\n</ListQueuesResponse>\n"
 #define DELETE_QUEUE_REQUEST "Action=DeleteQueue" \
-                               "&QueueUrl=http://localhost:4566/000000000000/TestQueue"
+                             "&QueueUrl=http://localhost:4566/000000000000/TestQueue"
 
 namespace AwsMock::Service {
 
@@ -79,6 +81,21 @@ namespace AwsMock::Service {
     // assert
     EXPECT_TRUE(response.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
     EXPECT_EQ(1, queueList.size());
+  }
+
+  TEST_F(SQSServerTest, QueueListTest) {
+
+    // arrange
+    Core::CurlResponse createResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
+    EXPECT_TRUE(createResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
+
+    // act
+    Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, LIST_QUEUE_REQUEST);
+    EXPECT_TRUE(createResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
+
+    // assert
+    EXPECT_TRUE(response.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
+    EXPECT_TRUE(Core::StringUtils::Contains(response.output, "TestQueue"));
   }
 
   TEST_F(SQSServerTest, QueueDeleteTest) {

@@ -279,7 +279,7 @@ namespace AwsMock::Database {
     _sqsDatabase.CreateMessage(message);
 
     // act
-    long result = _sqsDatabase.CountMessagesByStatus(_region, QUEUE_NAME, Entity::SQS::INITIAL);
+    long result = _sqsDatabase.CountMessagesByStatus(_region, QUEUE_NAME, Entity::SQS::MessageStatus::INITIAL);
 
     // assert
     EXPECT_EQ(1, result);
@@ -299,7 +299,7 @@ namespace AwsMock::Database {
 
     // act
     _sqsDatabase.ResetMessages(QUEUE_NAME, 1);
-    long result = _sqsDatabase.CountMessagesByStatus(_region, QUEUE_NAME, Entity::SQS::INITIAL);
+    long result = _sqsDatabase.CountMessagesByStatus(_region, QUEUE_NAME, Entity::SQS::MessageStatus::INITIAL);
 
     // assert
     EXPECT_EQ(1, result);

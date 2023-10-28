@@ -27,6 +27,7 @@
 #include <awsmock/dto/sqs/GetQueueAttributesRequest.h>
 #include <awsmock/dto/sqs/GetQueueAttributesResponse.h>
 #include <awsmock/dto/sqs/DeleteMessageRequest.h>
+#include <awsmock/dto/sqs/DeleteMessageBatchRequest.h>
 #include <awsmock/dto/sqs/DeleteMessageResponse.h>
 #include <awsmock/dto/sqs/DeleteQueueRequest.h>
 #include <awsmock/dto/sqs/DeleteQueueResponse.h>
@@ -150,6 +151,14 @@ namespace AwsMock::Service {
        * @throws ServiceException
        */
       void DeleteMessage(const Dto::SQS::DeleteMessageRequest &request);
+
+      /**
+       * Deletes a message in a batch
+       *
+       * @param request delete message batch request DTO
+       * @throws ServiceException
+       */
+      void DeleteMessageBatch(const Dto::SQS::DeleteMessageBatchRequest &request);
 
       /**
        * Returns the MD5 sum of all attributes.

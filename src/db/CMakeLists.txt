@@ -3,7 +3,8 @@ set(LIBRARY awsmockdb)
 set(LIBRARY_STATIC awsmockdb_static)
 
 set(SQS_SOURCES src/entity/sqs/MessageAttribute.cpp src/entity/sqs/Message.cpp src/repository/SQSDatabase.cpp)
-set(SNS_SOURCES src/entity/sns/MessageAttribute.cpp src/entity/sns/Message.cpp src/repository/SNSDatabase.cpp)
+set(SNS_SOURCES src/entity/sns/MessageAttribute.cpp src/entity/sns/Message.cpp src/entity/sns/Topic.cpp
+        src/entity/sns/Subscription.cpp src/repository/SNSDatabase.cpp)
 set(S3_SOURCES src/entity/s3/Bucket.cpp src/entity/s3/BucketNotification.cpp src/entity/s3/Object.cpp
         src/repository/S3Database.cpp)
 set(LAMBDA_SOURCES src/entity/lambda/Tags.cpp src/entity/lambda/Environment.cpp

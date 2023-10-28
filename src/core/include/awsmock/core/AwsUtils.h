@@ -20,7 +20,7 @@
 
 namespace AwsMock::Core {
 
-    class AwsUtils {
+  class AwsUtils {
 
     public:
 
@@ -107,8 +107,17 @@ namespace AwsMock::Core {
        *
        * @return request ID
        */
-      static std::string GetRequestId() {
-          return Poco::UUIDGenerator().createRandom().toString();
+      static std::string CreateRequestId() {
+        return Poco::UUIDGenerator().createRandom().toString();
+      }
+
+      /**
+       * Returns a receipt handle.
+       *
+       * @return receipt handle
+       */
+      static std::string CreateReceiptHandler() {
+        return StringUtils::GenerateRandomString(512);
       }
 
       /**
@@ -129,6 +138,6 @@ namespace AwsMock::Core {
         return StringUtils::GenerateRandomVersion(S3_VERSION_ID_LENGTH);
       }
 
-    };
+  };
 }
 #endif //AWSMOCK_CORE_AWSUTILS_H

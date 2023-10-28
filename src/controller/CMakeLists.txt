@@ -13,7 +13,7 @@ link_directories(/usr/lib /usr/lib/x86_64-linux-gnu /usr/local/lib ../core)
 add_executable(${BINARY} ${SOURCES})
 
 target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdb awsmockdto mongocxx bsoncxx PocoPrometheus PocoNet PocoJSON
-        PocoXML PocoZip PocoFoundation PocoUtil pthread crypto ssl z archive curl tbb)
+        PocoXML PocoZip PocoFoundation PocoUtil pthread crypto ssl z archive curl tbb systemd)
 add_library(${BINARY}_lib STATIC ${SOURCES})
 
 install(TARGETS ${BINARY} DESTINATION bin)

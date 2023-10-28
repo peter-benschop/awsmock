@@ -31,10 +31,12 @@
 #include <Poco/Util/HelpFormatter.h>
 #include <Poco/Util/Option.h>
 #include <Poco/Util/OptionSet.h>
+#include <Poco/Util/OptionProcessor.h>
 #include <Poco/Util/ServerApplication.h>
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/StringUtils.h>
 #include <awsmock/controller/Configuration.h>
 #include <awsmock/repository/Database.h>
 #include "awsmock/controller/Controller.h"
@@ -78,19 +80,9 @@ namespace AwsMock::Controller {
       [[maybe_unused]] void defineOptions(Poco::Util::OptionSet &options) override {
 
         Poco::Util::Application::defineOptions(options);
-        options.addOption(Poco::Util::Option("config", "", "set the configuration file").required(false).repeatable(false).argument("value").callback(
-            Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
-        options.addOption(Poco::Util::Option("level", "", "set the log level").required(false).repeatable(false).argument("value").callback(
+        options.addOption(Poco::Util::Option("config", "", "set the configuration file").required(false).repeatable(false).argument("file").callback(
             Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
         options.addOption(Poco::Util::Option("version", "", "display version information").required(false).repeatable(false).callback(
-            Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
-        options.addOption(Poco::Util::Option("list", "", "list all services").required(false).repeatable(false).callback(
-            Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
-        options.addOption(Poco::Util::Option("start", "", "starts a service").required(false).repeatable(false).argument("value").callback(
-            Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
-        options.addOption(Poco::Util::Option("restart", "", "restarts a service").required(false).repeatable(false).argument("value").callback(
-            Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
-        options.addOption(Poco::Util::Option("stop", "", "stops a service").required(false).repeatable(false).argument("value").callback(
             Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
         options.addOption(Poco::Util::Option("help", "", "display help information").required(false).repeatable(false).callback(
             Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
@@ -106,15 +98,23 @@ namespace AwsMock::Controller {
 
         if (name == "help") {
 
+          std::cout << std::endl;
           Poco::Util::HelpFormatter helpFormatter(options());
+          helpFormatter.setHeader("\nAwsMock - AWS simulation written in C++ " + Configuration::GetVersion() + "\n\nOptions:");
           helpFormatter.setCommand(commandName());
-          helpFormatter.setUsage("OPTIONS");
-          helpFormatter.setHeader("AwsMock - AWS simulation written in C++ v" + Configuration::GetVersion());
+          helpFormatter.setUsage("<options> <command>");
           helpFormatter.format(std::cout);
+          std::cout << "\nCommands:\n" << std::endl;
+          std::cout << "list\t\t\t: lists all available services" << std::endl;
+          std::cout << "start [<service>]\t: starts the given service. If no argument is given, starts all services." << std::endl;
+          std::cout << "stop [<service>]\t: stops the given service. If no argument is given, stops all services" << std::endl;
+          std::cout << "restart [<service>]\t: restarts the given service. If no argument is given, restarts all services" << std::endl;
+          std::cout << "logs\t\t\t: shows the manager logs" << std::endl;
+          std::cout << "loglevel <level>\t: sets the manager log to level" << std::endl;
           stopOptionsProcessing();
           exit(0);
 
-        } else if (name == "config") {
+        } else if (name == "file") {
 
           _configuration.SetFilename(value);
 
@@ -128,23 +128,36 @@ namespace AwsMock::Controller {
           _configuration.SetLogLevel(value);
           Poco::Logger::get("").setLevel(value);
 
-        } else if (name == "list") {
+        }
+      }
+
+      void ProcessCommand(const ArgVec &args) {
+
+        const std::string &name = args[0];
+        if (name == "list") {
 
           _controller.ListServices();
 
         } else if (name == "start") {
 
-          _controller.StartService(value);
+          _controller.StartService(args[1]);
 
         } else if (name == "restart") {
 
-          _controller.RestartService(value);
+          _controller.RestartService(args[1]);
 
         } else if (name == "stop") {
 
-          _controller.StopService(value);
-        }
+          _controller.StopService(args[1]);
 
+        } else if (name == "logs") {
+
+          _controller.ShowServiceLogs();
+
+        } else if (name == "loglevel") {
+
+          _controller.SetLogLevel(args[1]);
+        }
       }
 
       /**
@@ -154,6 +167,9 @@ namespace AwsMock::Controller {
        * @return system exit code.
        */
       int main([[maybe_unused]]const ArgVec &args) override {
+
+        ProcessCommand(args);
+
         return 0;
       }
 

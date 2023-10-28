@@ -32,7 +32,7 @@ namespace AwsMock::Core {
   }
 
   void DirUtils::EnsureDirectory(const std::string &dirName) {
-    if(!DirectoryExists(dirName)) {
+    if (!DirectoryExists(dirName)) {
       MakeDirectory((dirName));
     }
   }

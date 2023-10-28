@@ -20,47 +20,54 @@
 #include "Poco/DOM/DOMWriter.h"
 #include "Poco/XML/XMLWriter.h"
 
+// AwsMock includes
+#include <awsmock/core/LogStream.h>
+
 namespace AwsMock::Dto::SQS {
 
-    struct GetQueueAttributesResponse {
+  struct GetQueueAttributesResponse {
 
-      /**
-       * Attributes
-       */
-      std::vector<std::pair<std::string, std::string>> attributes;
+    /**
+     * Attributes
+     */
+    std::vector<std::pair<std::string, std::string>> attributes;
 
-      /**
-       * Resource
-       */
-      std::string resource = "SQS";
+    /**
+     * Resource
+     */
+    std::string resource = "SQS";
 
-      /**
-       * Resource
-       */
-      std::string requestId = Poco::UUIDGenerator().createRandom().toString();
+    /**
+     * Resource
+     */
+    std::string requestId = Poco::UUIDGenerator().createRandom().toString();
 
-      /**
-       * Convert to XML representation
-       *
-       * @return XML string
-       */
-      [[nodiscard]] std::string ToXml() const;
+    /**
+     * Convert to XML representation
+     *
+     * @return XML string
+     */
+    [[nodiscard]] std::string ToXml() const;
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const GetQueueAttributesResponse &r);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const GetQueueAttributesResponse &r);
 
-    };
+    /**
+     * Static logger
+     */
+    static Core::LogStream _logger;
+  };
 
 } // namespace AwsMock::Dto::SQS
 

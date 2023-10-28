@@ -6,12 +6,14 @@
 #define AWSMOCK_CONTROLLER_CONTROLLER_H
 
 // C includes
-#include <cstdlib>
+#include <systemd/sd-journal.h>
+#include <systemd/sd-daemon.h>
 
 // C++ includes
 #include <string>
 #include <iostream>
 #include <iomanip>
+#include <cstdlib>
 
 // Poco includes
 #include <Poco/Logger.h>
@@ -64,6 +66,18 @@ namespace AwsMock::Controller {
        * @param name service name, or 'all'
        */
       void StopService(const std::string &name);
+
+      /**
+       * Show the logs
+       */
+      void ShowServiceLogs();
+
+      /**
+       * Sets the managers log level
+       *
+       * @param level log level
+       */
+      void SetLogLevel(const std::string &level);
 
     private:
       /**

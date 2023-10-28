@@ -4,7 +4,7 @@
 namespace AwsMock {
 
   ModuleHandler::ModuleHandler(Core::Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap)
-      : AbstractResource(), _logger(Poco::Logger::get("TransferHandler")), _configuration(configuration), _metricService(metricService), _serverMap(serverMap) {
+      : AbstractResource(), _logger(Poco::Logger::get("ModuleHandler")), _configuration(configuration), _metricService(metricService), _serverMap(serverMap) {
 
     _serviceDatabase = std::make_shared<Database::ModuleDatabase>(_configuration);
     _moduleService = std::make_shared<Service::ModuleService>(_configuration, _serverMap);
@@ -34,7 +34,7 @@ namespace AwsMock {
 
       if (action == "start") {
 
-        if(name == "all") {
+        if (name == "all") {
 
           _moduleService->StartAllServices();
 
@@ -51,7 +51,7 @@ namespace AwsMock {
 
       } else if (action == "restart") {
 
-        if(name == "all") {
+        if (name == "all") {
 
           _moduleService->RestartAllServices();
 
@@ -67,9 +67,10 @@ namespace AwsMock {
           std::string body = Dto::Module::Module::ToJson(module);
           SendOkResponse(response, body);
         }
+
       } else if (action == "stop") {
 
-        if(name == "all") {
+        if (name == "all") {
 
           _moduleService->StopAllServices();
 
@@ -85,6 +86,20 @@ namespace AwsMock {
           std::string body = Dto::Module::Module::ToJson(module);
           SendOkResponse(response, body);
         }
+
+      } else if (action == "loglevel") {
+
+        std::string level = Core::HttpUtils::GetPathParameter(request.getURI(), 2);
+        Poco::Logger::root().setLevel(level);
+
+        std::vector<std::string>names;
+        Poco::Logger::names(names);
+        for(const auto &n  : names) {
+          Poco::Logger::get(n).setLevel(level);
+        }
+
+        // Send response
+        SendOkResponse(response, {});
       }
 
     } catch (Core::ServiceException &exc) {

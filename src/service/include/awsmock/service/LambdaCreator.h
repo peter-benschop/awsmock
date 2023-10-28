@@ -49,48 +49,7 @@ namespace AwsMock::Service {
       void run() override;
 
     private:
-
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
-
-      /**
-       * Configuration
-       */
-      Core::Configuration &_configuration;
-
-      /**
-       * Metric service
-       */
-      Core::MetricService &_metricService;
-
-      /**
-       * Database connection
-       */
-      std::shared_ptr<Database::LambdaDatabase> _lambdaDatabase;
-
-      /**
-       * Data directory
-       */
-      std::string _dataDir;
-
-      /**
-       * Temp directory
-       */
-      std::string _tempDir;
-
-      /**
-       * Docker service
-       */
-      Service::DockerService _dockerService;
-
-      /**
-       * lambda create notification queue
-       */
-      Poco::NotificationQueue &_createQueue;
-
-      /**
+/**
        * Create new lambda function
        *
        * @param functionCode zipped and BASE64 encoded function code
@@ -141,6 +100,63 @@ namespace AwsMock::Service {
        * @return random port between 32768 and 65536
        */
       static int GetHostPort();
+
+      /**
+       * Returns the docker tag.
+       *
+       * <p>The method returns the docker tags in that order:
+       * <ul>
+       * <li>version: if the lambda entity has a version tag, the version tag is used.</li>
+       * <li>dockerTag: if the lambda entity has a dockerTag, the dockerTag is used.</li>
+       * <li>tag: if the lambda entity has a tag named tag, this tag is used.</li>
+       * <li>latest: default return value.</li>
+       * </ul>
+       * </p>
+       *
+       * @param lambda lambda database entity
+       * @return random port between 32768 and 65536
+       */
+      static std::string GetDockerTag(const Database::Entity::Lambda::Lambda &lambda);
+
+      /**
+       * Logger
+       */
+      Core::LogStream _logger;
+
+      /**
+       * Configuration
+       */
+      Core::Configuration &_configuration;
+
+      /**
+       * Metric service
+       */
+      Core::MetricService &_metricService;
+
+      /**
+       * Database connection
+       */
+      std::shared_ptr<Database::LambdaDatabase> _lambdaDatabase;
+
+      /**
+       * Data directory
+       */
+      std::string _dataDir;
+
+      /**
+       * Temp directory
+       */
+      std::string _tempDir;
+
+      /**
+       * Docker service
+       */
+      Service::DockerService _dockerService;
+
+      /**
+       * lambda create notification queue
+       */
+      Poco::NotificationQueue &_createQueue;
 
   };
 

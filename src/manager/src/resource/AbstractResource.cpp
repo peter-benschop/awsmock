@@ -330,7 +330,7 @@ namespace AwsMock::Resource {
         // Default headers
         request.set("Region", region);
         request.set("User", user);
-        request.set("RequestId", Core::AwsUtils::GetRequestId());
+        request.set("RequestId", Core::AwsUtils::CreateRequestId());
     }
 
     void AbstractResource::DumpRequest(Poco::Net::HTTPServerRequest &request) {

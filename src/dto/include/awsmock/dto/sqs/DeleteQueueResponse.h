@@ -71,6 +71,9 @@ namespace AwsMock::Dto::SQS {
        */
       friend std::ostream &operator<<(std::ostream &os, const DeleteQueueResponse &r);
 
+      /**
+       * Static logger
+       */
       static Core::LogStream _logger;
   };
 

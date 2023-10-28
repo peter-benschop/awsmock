@@ -241,6 +241,13 @@ namespace AwsMock::Database {
       void RedriveMessages(const std::string &queueUrl, const Entity::SQS::RedrivePolicy &redrivePolicy);
 
       /**
+       * Any message, which has a message status is DELAYED is reset when the delay period is over.
+       *
+       * @param queueUrl queue URL.
+       */
+      void ResetDelayedMessages(const std::string &queueUrl);
+
+      /**
        * Count the number of message by status
        *
        * @param region AWS region
@@ -255,7 +262,7 @@ namespace AwsMock::Database {
        * @param queueUrl URL of the queue
        * @param status message status
        */
-      long CountMessagesByStatus(const std::string &region, const std::string &queueUrl, int status);
+      long CountMessagesByStatus(const std::string &region, const std::string &queueUrl, Entity::SQS::MessageStatus status);
 
       /**
        * Deletes all messages of a queue

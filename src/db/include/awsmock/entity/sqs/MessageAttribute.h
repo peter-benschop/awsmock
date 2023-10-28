@@ -32,8 +32,6 @@ namespace AwsMock::Database::Entity::SQS {
   using bsoncxx::document::view;
   using bsoncxx::document::value;
 
-  enum STATUS { INITIAL, SEND, RESEND, DELAYED };
-
   enum MessageAttributeType { STRING, NUMBER };
   static std::map<MessageAttributeType, std::string> MessageAttributeTypeNames{
       {MessageAttributeType::STRING, "String"},

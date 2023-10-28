@@ -20,6 +20,8 @@
 #include <awsmock/core/MetricDefinition.h>
 #include <awsmock/dto/sqs/GetQueueUrlRequest.h>
 #include <awsmock/dto/sqs/GetQueueUrlResponse.h>
+#include <awsmock/dto/sqs/DeleteMessageBatchEntry.h>
+#include <awsmock/dto/sqs/DeleteMessageBatchRequest.h>
 #include <awsmock/service/AbstractHandler.h>
 #include <awsmock/service/SQSService.h>
 
