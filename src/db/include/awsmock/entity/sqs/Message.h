@@ -23,6 +23,7 @@
 
 // AwsMock includes
 #include <awsmock/entity/sqs/MessageAttribute.h>
+#include <awsmock/entity/sqs/MessageStatus.h>
 
 namespace AwsMock::Database::Entity::SQS {
 
@@ -58,7 +59,7 @@ namespace AwsMock::Database::Entity::SQS {
     /**
      * Status
      */
-    int status = INITIAL;
+    MessageStatus status = MessageStatus::INITIAL;
 
     /**
      * Last send datetime
