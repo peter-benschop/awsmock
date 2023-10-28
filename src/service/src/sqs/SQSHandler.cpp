@@ -4,7 +4,7 @@
 namespace AwsMock::Service {
 
   SQSHandler::SQSHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition) : AbstractHandler(), _logger(Poco::Logger::get("SQSServiceHandler")), _configuration(configuration),
-                                                                                                   _metricService(metricService), _sqsService(configuration, condition) {
+                                                                                                                               _metricService(metricService), _sqsService(configuration, condition) {
 
     _accountId = _configuration.getString("awsmock.account.id", DEFAULT_SQS_ACCOUNT_ID);
     _endpoint = _configuration.getString("awsmock.service.sqs.endpoint", DEFAULT_SQS_ENDPOINT);
@@ -189,6 +189,25 @@ namespace AwsMock::Service {
             .receiptHandle=receiptHandle
         };
         _sqsService.DeleteMessage(sqsRequest);
+
+        SendOkResponse(response);
+
+      } else if (action == "DeleteMessageBatch") {
+
+        Dto::SQS::DeleteMessageBatchRequest sqsRequest;
+        sqsRequest.queueUrl = GetStringParameter(payload, "QueueUrl");
+
+        // Get message count
+        int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "DeleteMessageBatchRequestEntry") / 2;
+        log_trace_stream(_logger) << "Got entry count, count: " << count << std::endl;
+
+        for (int i = 1; i <= count; i++) {
+          std::string id = Core::HttpUtils::GetQueryParameterValueByName(payload, "DeleteMessageBatchRequestEntry." + std::to_string(i) + ".Id");
+          std::string receiptHandle = Core::HttpUtils::GetQueryParameterValueByName(payload, "DeleteMessageBatchRequestEntry." + std::to_string(i) + ".ReceiptHandle");
+          Dto::SQS::DeleteMessageBatchEntry entry = {.id=id, .receiptHandle=receiptHandle};
+          sqsRequest.deleteMessageBatchEntries.emplace_back(entry);
+        }
+        _sqsService.DeleteMessageBatch(sqsRequest);
 
         SendOkResponse(response);
       }

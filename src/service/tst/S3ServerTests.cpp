@@ -95,6 +95,38 @@ namespace AwsMock::Service {
     EXPECT_EQ(0, bucketList.size());
   }
 
+  TEST_F(S3ServerTest, ObjectCreateTest) {
+
+    // arrange
+    Core::CurlResponse bucketCreateResponse = _curlUtils.SendHttpRequest("PUT", _endpoint + "/" + BUCKET, _extraHeaders, LOCATION_CONSTRAINT);
+    EXPECT_TRUE(bucketCreateResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
+
+    // act
+    Core::CurlResponse objectCreateResponse = _curlUtils.SendHttpRequest("PUT", _endpoint + "/" + BUCKET + "/" + KEY, _extraHeaders, R"({"test":"test"})");
+    Database::Entity::S3::ObjectList objectList = _database.ListBucket(BUCKET);
+
+    // assert
+    EXPECT_TRUE(objectCreateResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
+    EXPECT_EQ(1, objectList.size());
+  }
+
+  TEST_F(S3ServerTest, ObjectDeleteTest) {
+
+    // arrange
+    Core::CurlResponse bucketCreateResponse = _curlUtils.SendHttpRequest("PUT", _endpoint + "/" + BUCKET, _extraHeaders, LOCATION_CONSTRAINT);
+    EXPECT_TRUE(bucketCreateResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
+    Core::CurlResponse objectCreateResponse = _curlUtils.SendHttpRequest("PUT", _endpoint + "/" + BUCKET + "/" + KEY, _extraHeaders, R"({"test":"test"})");
+    EXPECT_TRUE(objectCreateResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
+
+    // act
+    Core::CurlResponse objectDeleteResponse = _curlUtils.SendHttpRequest("DELETE", _endpoint + "/" + BUCKET + "/" + KEY, _extraHeaders);
+    Database::Entity::S3::ObjectList objectList = _database.ListBucket(BUCKET);
+
+    // assert
+    EXPECT_TRUE(objectDeleteResponse.statusCode == Poco::Net::HTTPResponse::HTTP_NO_CONTENT);
+    EXPECT_EQ(0, objectList.size());
+  }
+
 } // namespace AwsMock::Core
 
 #endif // AWMOCK_CORE_S3SERVERTEST_H

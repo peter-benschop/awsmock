@@ -28,6 +28,10 @@ namespace AwsMock::Database {
     return _client[_name];
   }
 
+  mongocxx::client_session Database::GetSession() {
+    return _client.start_session();
+  }
+
   void Database::CreateIndexes() {
 
     // SQS indexes

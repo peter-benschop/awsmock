@@ -26,8 +26,8 @@ namespace AwsMock::Service {
   void AbstractServer::run() {
     MainLoop();
     StopHttpServer();
-    _running = false;
     _serviceDatabase->SetStatus(_name, Database::Entity::Module::ModuleStatus::STOPPED);
+    _running = false;
     log_info_stream(_logger) << "Module " << _name << " has been shutdown" << std::endl;
   }
 
@@ -64,7 +64,7 @@ namespace AwsMock::Service {
 
   void AbstractServer::StopHttpServer() {
     if (_httpServer) {
-      _httpServer->stopAll(true);
+      _httpServer->stop();
       _httpServer.reset();
     }
   }

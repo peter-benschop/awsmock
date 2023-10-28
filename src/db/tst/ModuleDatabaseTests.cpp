@@ -29,7 +29,7 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_array;
   using bsoncxx::builder::basic::make_document;
 
-  class ServiceDatabaseTest : public ::testing::Test {
+  class ModuleDatabaseTest : public ::testing::Test {
 
     protected:
 
@@ -46,7 +46,7 @@ namespace AwsMock::Database {
       ModuleDatabase _moduleDatabase = ModuleDatabase(_configuration);
   };
 
-  TEST_F(ServiceDatabaseTest, ServiceCreateTest) {
+  TEST_F(ModuleDatabaseTest, ModuleCreateTest) {
 
     // arrange
     Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
@@ -59,7 +59,7 @@ namespace AwsMock::Database {
     EXPECT_TRUE(result.status == Entity::Module::ModuleStatus::RUNNING);
   }
 
-  TEST_F(ServiceDatabaseTest, ServiceExistsTest) {
+  TEST_F(ModuleDatabaseTest, ModuleExistsTest) {
 
     // arrange
     Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
@@ -74,7 +74,7 @@ namespace AwsMock::Database {
     EXPECT_FALSE(result2);
   }
 
-  TEST_F(ServiceDatabaseTest, ServiceActiveTest) {
+  TEST_F(ModuleDatabaseTest, ModuleActiveTest) {
 
     // arrange
     Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
@@ -87,7 +87,7 @@ namespace AwsMock::Database {
     EXPECT_TRUE(result);
   }
 
-  TEST_F(ServiceDatabaseTest, ServiceGetByNameTest) {
+  TEST_F(ModuleDatabaseTest, ModuleGetByNameTest) {
 
     // arrange
     Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
@@ -100,7 +100,7 @@ namespace AwsMock::Database {
     EXPECT_TRUE(result.name == SERVICE);
   }
 
-  TEST_F(ServiceDatabaseTest, ServiceGetByIdTest) {
+  TEST_F(ModuleDatabaseTest, ModuleGetByIdTest) {
 
     // arrange
     Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
@@ -114,7 +114,7 @@ namespace AwsMock::Database {
     EXPECT_TRUE(result.name == SERVICE);
   }
 
-  TEST_F(ServiceDatabaseTest, ServiceUpdateTest) {
+  TEST_F(ModuleDatabaseTest, ModuleUpdateTest) {
 
     // arrange
     Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
@@ -128,7 +128,7 @@ namespace AwsMock::Database {
     EXPECT_TRUE(result.status == Entity::Module::ModuleStatus::STOPPED);
   }
 
-  TEST_F(ServiceDatabaseTest, ServiceListTest) {
+  TEST_F(ModuleDatabaseTest, ModuleListTest) {
 
     // arrange
     Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
@@ -141,7 +141,7 @@ namespace AwsMock::Database {
     EXPECT_EQ(1, result.size());
   }
 
-  TEST_F(ServiceDatabaseTest, ServiceDeleteTest) {
+  TEST_F(ModuleDatabaseTest, ModuleDeleteTest) {
 
     // arrange
     Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
@@ -153,6 +153,34 @@ namespace AwsMock::Database {
 
     // assert
     EXPECT_EQ(0, count);
+  }
+
+  TEST_F(ModuleDatabaseTest, ModuleSetStatusTest) {
+
+    // arrange
+    Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
+    module = _moduleDatabase.CreateModule(module);
+
+    // act
+    _moduleDatabase.SetStatus(SERVICE, Entity::Module::ModuleStatus::STOPPED);
+    Entity::Module::Module updatedModule = _moduleDatabase.GetModuleByName(SERVICE);
+
+    // assert
+    EXPECT_EQ(updatedModule.status, Entity::Module::ModuleStatus::STOPPED);
+  }
+
+  TEST_F(ModuleDatabaseTest, ModuleSetPortTest) {
+
+    // arrange
+    Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
+    module = _moduleDatabase.CreateModule(module);
+
+    // act
+    _moduleDatabase.SetPort(SERVICE, 9999);
+    Entity::Module::Module updatedModule = _moduleDatabase.GetModuleByName(SERVICE);
+
+    // assert
+    EXPECT_EQ(updatedModule.port, 9999);
   }
 
 } // namespace AwsMock::Database

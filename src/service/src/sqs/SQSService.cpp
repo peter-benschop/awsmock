@@ -126,7 +126,7 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Got queue: " << queue.ToString() << std::endl;
 
     Dto::SQS::GetQueueAttributesResponse response;
-    if (request.attributeNames.size() == 1 && request.attributeNames[0] == "All") {
+    if (request.attributeNames.size() == 1 || Poco::toLower(request.attributeNames[0]) == "all") {
       response.attributes.emplace_back("ApproximateNumberOfMessages", std::to_string(queue.attributes.approximateNumberOfMessages));
       response.attributes.emplace_back("ApproximateNumberOfMessagesDelayed", std::to_string(queue.attributes.approximateNumberOfMessagesDelayed));
       response.attributes.emplace_back("ApproximateNumberOfMessagesNotVisible", std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible));
@@ -236,8 +236,8 @@ namespace AwsMock::Service {
       }
 
       // Set parameters
-      std::string messageId = Poco::UUIDGenerator().createRandom().toString();
-      std::string receiptHandle = Core::StringUtils::GenerateRandomString(512);
+      std::string messageId = Core::AwsUtils::CreateRequestId();
+      std::string receiptHandle = Core::AwsUtils::CreateReceiptHandler();
       std::string md5Body = GetMd5Body(request.body);
       std::string md5Attr = GetMd5Attributes(request.messageAttributes);
 
@@ -253,7 +253,7 @@ namespace AwsMock::Service {
               .md5Attr=md5Attr,
               .attributes=attributes
           });
-      log_info_stream(_logger) << "Message send, messageId: " << messageId << "requestId: " << request.requestId << std::endl;
+      log_info_stream(_logger) << "Message send, messageId: " << messageId << " requestId: " << request.requestId << std::endl;
 
       return {
           .queueUrl=message.queueUrl,
@@ -301,8 +301,8 @@ namespace AwsMock::Service {
       if (!messageList.empty()) {
         response.messageList = messageList;
         response.requestId = request.requestId;
+        log_info_stream(_logger) << "Messages received, count: " << messageList.size() << " requestId: " << request.requestId << std::endl;
       }
-      log_info_stream(_logger) << "Message received, count: " << messageList.size() << " requestId: " << request.requestId << std::endl;
 
       return response;
 
@@ -323,6 +323,28 @@ namespace AwsMock::Service {
 
       // Delete from database
       _database->DeleteMessage({.queueUrl=request.queueUrl, .receiptHandle=request.receiptHandle});
+
+    } catch (Poco::Exception &ex) {
+      log_error_stream(_logger) << "SQS delete message failed, message: " << ex.message() << std::endl;
+      throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  void SQSService::DeleteMessageBatch(const Dto::SQS::DeleteMessageBatchRequest &request) {
+    log_trace_stream(_logger) << "Delete message batch request, size: " << request.deleteMessageBatchEntries.size() << std::endl;
+
+    try {
+
+      for (const auto &entry : request.deleteMessageBatchEntries) {
+
+        // TODO: Check existence
+        if (!_database->MessageExists(entry.receiptHandle)) {
+          throw Core::ServiceException("Queue does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+        }
+
+        // Delete from database
+        _database->DeleteMessage({.queueUrl=request.queueUrl, .receiptHandle=entry.receiptHandle});
+      }
 
     } catch (Poco::Exception &ex) {
       log_error_stream(_logger) << "SQS delete message failed, message: " << ex.message() << std::endl;

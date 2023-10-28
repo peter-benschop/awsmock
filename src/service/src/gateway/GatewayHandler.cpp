@@ -8,33 +8,33 @@ namespace AwsMock::Service {
   }
 
   void GatewayHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    log_debug_stream(_logger) << "Gateway GET request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
+    log_trace_stream(_logger) << "Gateway GET request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
 
     Core::MetricServiceTimer measure(_metricService, GATEWAY_GET_TIMER);
     _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "GET");
-    log_debug_stream(_logger) << "Gateway GET request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
+    log_trace_stream(_logger) << "Gateway GET request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
 
     SetHeaders(request, region, user);
     ForwardRequest(request, response, _host, _port);
   }
 
   void GatewayHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    log_debug_stream(_logger) << "Gateway PUT request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+    log_trace_stream(_logger) << "Gateway PUT request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
     Core::MetricServiceTimer measure(_metricService, GATEWAY_PUT_TIMER);
     _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "PUT");
-    log_debug_stream(_logger) << "Gateway PUT request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
+    log_trace_stream(_logger) << "Gateway PUT request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
 
     SetHeaders(request, region, user);
     ForwardRequest(request, response, _host, _port);
   }
 
   void GatewayHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    log_debug_stream(_logger) << "Gateway POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+    log_trace_stream(_logger) << "Gateway POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
     Core::MetricServiceTimer measure(_metricService, GATEWAY_POST_TIMER);
     _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "POST");
-    log_debug_stream(_logger) << "Gateway POST request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
+    log_trace_stream(_logger) << "Gateway POST request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
 
     SetHeaders(request, region, user);
     ForwardRequest(request, response, _host, _port);
@@ -45,7 +45,7 @@ namespace AwsMock::Service {
 
     Core::MetricServiceTimer measure(_metricService, GATEWAY_DELETE_TIMER);
     _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "DELETE");
-    log_debug_stream(_logger) << "Gateway DELETE request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
+    log_trace_stream(_logger) << "Gateway DELETE request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
 
     SetHeaders(request, region, user);
     ForwardRequest(request, response, _host, _port);
@@ -56,7 +56,7 @@ namespace AwsMock::Service {
 
     Core::MetricServiceTimer measure(_metricService, GATEWAY_HEAD_TIMER);
     _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "HEAD");
-    log_debug_stream(_logger) << "Gateway HEAD request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
+    log_trace_stream(_logger) << "Gateway HEAD request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
 
     SetHeaders(request, region, user);
     ForwardRequest(request, response, _host, _port);
@@ -89,10 +89,8 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "Got response from backend service" << std::endl;
 
     HeaderMap headerMap;
-    auto i = response.begin();
-    while (i != response.end()) {
-      headerMap[i->first] = i->second;
-      ++i;
+    for (const auto & i : response) {
+      headerMap[i.first] = i.second;
     }
 
     if (response.getStatus() == Poco::Net::HTTPResponse::HTTP_OK || response.getStatus() == Poco::Net::HTTPResponse::HTTP_NO_CONTENT) {
@@ -110,6 +108,6 @@ namespace AwsMock::Service {
     // Default headers
     request.set("Region", region);
     request.set("User", user);
-    request.set("RequestId", Core::AwsUtils::GetRequestId());
+    request.set("RequestId", Core::AwsUtils::CreateRequestId());
   }
 }

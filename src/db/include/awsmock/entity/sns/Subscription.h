@@ -55,38 +55,21 @@ namespace AwsMock::Database::Entity::SNS {
      *
      * @return entity as MongoDB document.
      */
-    [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
-
-      view_or_value<view, value> subscriptionDoc = make_document(
-          kvp("protocol", protocol),
-          kvp("endpoint", endpoint),
-          kvp("subscriptionArn", subscriptionArn));
-
-      return subscriptionDoc;
-    }
+    [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
     /**
      * Converts the MongoDB document to an entity
      *
      * @param mResult MongoDB document.
      */
-    [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view_or_value> mResult) {
-
-      protocol = bsoncxx::string::to_string(mResult.value().view()["protocol"].get_string().value);
-      endpoint = bsoncxx::string::to_string(mResult.value().view()["endpoint"].get_string().value);
-      subscriptionArn = bsoncxx::string::to_string(mResult.value().view()["subscriptionArn"].get_string().value);
-    }
+    [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view_or_value> mResult);
 
     /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const {
-      std::stringstream ss;
-      ss << (*this);
-      return ss.str();
-    }
+    [[nodiscard]] std::string ToString() const;
 
     /**
      * Stream provider.
@@ -95,10 +78,7 @@ namespace AwsMock::Database::Entity::SNS {
      * @param m subscription entity
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const Subscription &m) {
-      os << "Subscription={protocol='" << m.protocol << "' endpoint='" << m.endpoint << "'}";
-      return os;
-    }
+    friend std::ostream &operator<<(std::ostream &os, const Subscription &m);
 
   };
 

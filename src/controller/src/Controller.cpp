@@ -114,6 +114,72 @@ namespace AwsMock::Controller {
     }
   }
 
+  void Controller::ShowServiceLogs() {
+    sd_journal *jd;
+    int r = sd_journal_open(&jd, SD_JOURNAL_LOCAL_ONLY);
+    if (r != 0) {
+      std::cerr << "Failed to open journal:" << strerror(r) << std::endl;
+      return;
+    }
+
+    r = sd_journal_add_match(jd, "_SYSTEMD_UNIT=aws-mock.service", 0);
+    if (r != 0) {
+      std::cerr << "Failed to set matching entries: " << strerror(r) << std::endl;
+      return;
+    }
+
+    r = sd_journal_seek_tail(jd);
+    if (r != 0) {
+      std::cerr << "Failed to got to end of journal:" << strerror(r) << std::endl;
+      return;
+    }
+
+    for (;;) {
+      const void *d;
+      size_t l;
+      r = sd_journal_next(jd);
+      if (r < 0) {
+        std::cerr << "Failed to iterate to next entry: " << strerror(-r) << std::endl;
+        break;
+      }
+      if (r == 0) {
+        // Reached the end, let's wait for changes, and try again
+        r = sd_journal_wait(jd, (uint64_t) -1);
+        if (r < 0) {
+          std::cerr << "Failed to wait for changes: " << strerror(-r) << std::endl;
+          break;
+        }
+        continue;
+      }
+      r = sd_journal_get_data(jd, "MESSAGE", &d, &l);
+      if (r < 0) {
+        std::cerr << "Failed to read message field: " << strerror(-r) << std::endl;
+        continue;
+      }
+      printf("%.*s\n", (int) l, (const char *) d + 8);
+    }
+    sd_journal_close(jd);
+  }
+
+  void Controller::SetLogLevel(const std::string &level) {
+
+    std::map<std::string, std::string> headers;
+    AddAuthorization(headers);
+    Core::CurlResponse response = _curlUtils.SendHttpRequest("PUT", _baseUrl + "/manager/loglevel/" + level, headers);
+
+    if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
+      std::cerr << "Error: " << response.statusReason << std::endl;
+      return;
+    }
+
+    Dto::Module::Module module = Dto::Module::Module::FromJson(response.output);
+    if (response.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
+      std::cout << "Log level set to " << level << std::endl;
+    } else {
+      std::cout << "Could not set log level: " << response.output << std::endl;
+    }
+  }
+
   void Controller::AddAuthorization(std::map<std::string, std::string> &headers) {
     headers["Authorization"] =
         "AWS4-HMAC-SHA256 Credential=" + _user + "/" + _clientId + "/" + _region + "/module/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840";

@@ -7,8 +7,8 @@
 namespace AwsMock::Service {
 
   LambdaCreator::LambdaCreator(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue)
-    : _logger(Poco::Logger::get("LambdaCreator")), _configuration(configuration), _metricService(metricService), _dockerService(configuration),
-      _createQueue(createQueue) {
+      : _logger(Poco::Logger::get("LambdaCreator")), _configuration(configuration), _metricService(metricService), _dockerService(configuration),
+        _createQueue(createQueue) {
     _lambdaDatabase = std::make_shared<Database::LambdaDatabase>(_configuration);
 
     _dataDir = _configuration.getString("awsmock.data.dir", "/tmp/awsmock/data");
@@ -30,8 +30,6 @@ namespace AwsMock::Service {
   void LambdaCreator::CreateLambdaFunction(const std::string &functionCode, const std::string &functionId) {
     Core::LogStream logger(Poco::Logger::get("LambdaCreator"));
     log_debug_stream(logger) << "Start creating lambda function, oid: " << functionId << std::endl;
-
-    // Configuration
 
     // Make local copy
     Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase->GetLambdaById(functionId);
@@ -82,8 +80,7 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Lambda file unzipped, codeDir: " << codeDir << std::endl;
 
     // Build the docker image using the docker service
-    std::string imageFile =
-        _dockerService.BuildImage(codeDir, lambdaEntity.function, dockerTag, lambdaEntity.handler, lambdaEntity.runtime, lambdaEntity.environment.variables);
+    std::string imageFile = _dockerService.BuildImage(codeDir, lambdaEntity.function, dockerTag, lambdaEntity.handler, lambdaEntity.runtime, lambdaEntity.environment.variables);
 
     // Get the image struct
     Dto::Docker::Image image = _dockerService.GetImageByName(lambdaEntity.function, dockerTag);
@@ -123,43 +120,48 @@ namespace AwsMock::Service {
     std::string decodedZipFile = Core::Crypto::Base64Decode(zipFile);
 
     // Create directory
-    std::string codeDir = Core::DirUtils::CreateTempDir(_tempDir);
-    if (Core::StringUtils::ContainsIgnoreCase(runtime, "java")) {
+    try {
+      std::string codeDir = Core::DirUtils::CreateTempDir("/tmp");
+      if (Core::StringUtils::ContainsIgnoreCase(runtime, "java")) {
 
-      // Create classes directory
-      std::string classesDir = codeDir + Poco::Path::separator() + "classes";
-      Core::DirUtils::EnsureDirectory(classesDir);
+        // Create classes directory
+        std::string classesDir = codeDir + Poco::Path::separator() + "classes";
+        Core::DirUtils::EnsureDirectory(classesDir);
 
-      // Decompress
-      std::stringstream input(decodedZipFile);
-      Poco::Zip::Decompress dec(input, Poco::Path(classesDir));
-      dec.decompressAllFiles();
-      input.clear();
-      log_debug_stream(_logger) << "ZIP file unpacked, dir: " << codeDir << std::endl;
+        // Decompress
+        std::stringstream input(decodedZipFile);
+        Poco::Zip::Decompress dec(input, Poco::Path(classesDir));
+        dec.decompressAllFiles();
+        input.clear();
+        log_debug_stream(_logger) << "ZIP file unpacked, dir: " << codeDir << std::endl;
 
-    } else {
+      } else {
 
-      // Create directory
-      Core::DirUtils::EnsureDirectory(codeDir);
+        // Create directory
+        Core::DirUtils::EnsureDirectory(codeDir);
 
-      // Write to temp file
-      std::ofstream ofs(_tempDir + "/zipfile.zip");
-      ofs << decodedZipFile;
-      ofs.close();
+        // Write to temp file
+        std::ofstream ofs(_tempDir + "/zipfile.zip");
+        ofs << decodedZipFile;
+        ofs.close();
 
-      // Decompress
-      Core::ExecResult result = Core::SystemUtils::Exec("unzip -o -d " + codeDir + " " + _tempDir + "/zipfile.zip");
-      log_debug_stream(_logger) << "ZIP file unpacked, dir: " << codeDir << " result: " << result.status << std::endl;
+        // Decompress
+        Core::ExecResult result = Core::SystemUtils::Exec("unzip -o -d " + codeDir + " " + _tempDir + "/zipfile.zip");
+        log_debug_stream(_logger) << "ZIP file unpacked, dir: " << codeDir << " result: " << result.status << std::endl;
+      }
+      return codeDir;
+
+    } catch (Poco::Exception &exc) {
+      log_error_stream(_logger) << "Could not unzip lambda code, error: " << exc.message() << std::endl;
     }
-
-    return codeDir;
+    return {};
   }
 
   std::vector<std::string> LambdaCreator::GetEnvironment(const Database::Entity::Lambda::Environment &lambdaEnvironment) {
 
     std::vector<std::string> environment;
     environment.reserve(lambdaEnvironment.variables.size());
-    for (const std::pair<std::string, std::string> &variable : lambdaEnvironment.variables) {
+    for (const auto &variable : lambdaEnvironment.variables) {
       environment.emplace_back(variable.first + "=" + variable.second);
     }
     log_debug_stream(_logger) << "lambda runtime environment converted, size: " << environment.size() << std::endl;
@@ -168,5 +170,18 @@ namespace AwsMock::Service {
 
   int LambdaCreator::GetHostPort() {
     return Core::RandomUtils::NextInt(HOST_PORT_MIN, HOST_PORT_MAX);
+  }
+
+  std::string LambdaCreator::GetDockerTag(const Database::Entity::Lambda::Lambda &lambda) {
+    if (lambda.HasTag("version")) {
+      return lambda.GetTagValue("version");
+    }
+    if (lambda.HasTag("dockerTag")) {
+      return lambda.GetTagValue("dockerTag");
+    }
+    if (lambda.HasTag("tag")) {
+      return lambda.GetTagValue("tag");
+    }
+    return "latest";
   }
 } // namespace AwsMock::Service
