@@ -236,9 +236,11 @@ namespace AwsMock::Service {
       }
 
       // Set delay
+      Poco::DateTime reset;
       Database::Entity::SQS::MessageStatus messageStatus = Database::Entity::SQS::MessageStatus::INITIAL;
       if (queue.attributes.delaySeconds > 0) {
-        Database::Entity::SQS::MessageStatus messageStatus = Database::Entity::SQS::MessageStatus::DELAYED;
+        messageStatus = Database::Entity::SQS::MessageStatus::DELAYED;
+        reset += Poco::Timespan(queue.attributes.delaySeconds, 0);
       }
 
       // Set parameters
@@ -254,6 +256,7 @@ namespace AwsMock::Service {
               .queueUrl=queue.queueUrl,
               .body=request.body,
               .status=messageStatus,
+              .reset=reset,
               .messageId=messageId,
               .receiptHandle=receiptHandle,
               .md5Body=md5Body,

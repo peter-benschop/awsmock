@@ -87,6 +87,11 @@ namespace AwsMock::Service {
         _sqsDatabase->RedriveMessages(queue.queueUrl, queue.attributes.redrivePolicy);
       }
 
+      // Check delays
+      if (queue.attributes.delaySeconds > 0) {
+        _sqsDatabase->ResetDelayedMessages(queue.queueUrl, queue.attributes.delaySeconds);
+      }
+
       _sqsDatabase->UpdateQueue(queue);
       log_trace_stream(_logger) << "Queue updated, name" << queue.name << std::endl;
     }

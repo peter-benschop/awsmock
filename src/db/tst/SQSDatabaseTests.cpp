@@ -290,16 +290,42 @@ namespace AwsMock::Database {
     // arrange
     Entity::SQS::Queue queue = {.region=_region, .name=QUEUE_NAME, .owner=OWNER, .queueUrl=QUEUE_URL};
     queue = _sqsDatabase.CreateQueue(queue);
-    Entity::SQS::Message message = {.region=_region, .queueUrl=queue.name, .body=BODY};
+    Entity::SQS::Message message = {.region=_region, .queueUrl=queue.queueUrl, .body=BODY};
     _sqsDatabase.CreateMessage(message);
     Entity::SQS::MessageList messageList;
-    _sqsDatabase.ReceiveMessages(_region, QUEUE_NAME, 1, messageList);
+    _sqsDatabase.ReceiveMessages(_region, QUEUE_URL, 1, messageList);
     Poco::Thread().sleep(2000);
     _sqsDatabase.ResetMessages(QUEUE_URL, 1);
 
     // act
-    _sqsDatabase.ResetMessages(QUEUE_NAME, 1);
-    long result = _sqsDatabase.CountMessagesByStatus(_region, QUEUE_NAME, Entity::SQS::MessageStatus::INITIAL);
+    _sqsDatabase.ResetMessages(QUEUE_URL, 1);
+    long result = _sqsDatabase.CountMessagesByStatus(_region, QUEUE_URL, Entity::SQS::MessageStatus::INITIAL);
+
+    // assert
+    EXPECT_EQ(1, result);
+  }
+
+  TEST_F(SQSDatabaseTest, MessageDelayTest) {
+
+    // arrange
+    Entity::SQS::QueueAttribute queueAttribute;
+    queueAttribute.delaySeconds = 1;
+    Entity::SQS::Queue queue = {.region=_region, .name=QUEUE_NAME, .owner=OWNER, .queueUrl=QUEUE_URL, .attributes=queueAttribute};
+    queue = _sqsDatabase.CreateQueue(queue);
+
+    Poco::DateTime reset;
+    reset += Poco::Timespan(queueAttribute.delaySeconds, 0);
+    Entity::SQS::Message message = {.region=_region, .queueUrl=QUEUE_URL, .body=BODY, .status=Entity::SQS::MessageStatus::DELAYED, .reset=reset};
+    _sqsDatabase.CreateMessage(message);
+
+    Entity::SQS::MessageList messageList;
+    _sqsDatabase.ReceiveMessages(_region, QUEUE_NAME, 1, messageList);
+    EXPECT_EQ(0, messageList.size());
+    Poco::Thread().sleep(2000);
+
+    // act
+    _sqsDatabase.ResetDelayedMessages(QUEUE_URL, queueAttribute.delaySeconds);
+    long result = _sqsDatabase.CountMessagesByStatus(_region, QUEUE_URL, Entity::SQS::MessageStatus::INITIAL);
 
     // assert
     EXPECT_EQ(1, result);

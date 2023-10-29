@@ -30,7 +30,6 @@
 #define TRANSFER_DEFAULT_HOST "localhost"
 #define TRANSFER_DEFAULT_QUEUE_LENGTH  250
 #define TRANSFER_DEFAULT_THREADS 50
-#define DEFAULT_TRANSFER_BUCKET "transfer-manager"
 #define DEFAULT_BASE_DIR "transfer"
 #define CONTENT_TYPE_JSON "application/json"
 

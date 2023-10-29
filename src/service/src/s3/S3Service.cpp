@@ -12,6 +12,7 @@ namespace AwsMock::Service {
     _dataDir = _configuration.getString("awsmock.data.dir", DEFAULT_DATA_DIR);
     _dataS3Dir = _configuration.getString("awsmock.service.s3.data.dir", DEFAULT_S3_DATA_DIR);
     _transferDir = _configuration.getString("awsmock.service.ftp.base.dir", DEFAULT_TRANSFER_DATA_DIR);
+    _transferBucket = _configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
     _tempDir = _dataDir + Poco::Path::separator() + "tmp";
 
     // Initialize database
@@ -591,7 +592,7 @@ namespace AwsMock::Service {
     Core::FileUtils::DeleteFile(filename);
     log_debug_stream(_logger) << "File system object deleted, filename: " << filename << std::endl;
 
-    if (bucket == "transfer-manager") {
+    if (bucket == _transferBucket) {
       filename = _transferDir + Poco::Path::separator() + key;
       Core::FileUtils::DeleteFile(filename);
       log_debug_stream(_logger) << "Transfer file system object deleted, filename: " << filename << std::endl;

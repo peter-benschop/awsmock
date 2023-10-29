@@ -211,6 +211,14 @@ namespace AwsMock::FtpServer {
       void SendCreateObjectRequest(const std::string &user, const std::string &fileName);
 
       /**
+       * Delete file in AWS s3
+       *
+       * @param user user name
+       * @param fileName filename
+       */
+      void SendDeleteObjectRequest(const std::string &user, const std::string &fileName);
+
+      /**
        * Extract the S3 key from the file path.
        *
        * @param path file system path

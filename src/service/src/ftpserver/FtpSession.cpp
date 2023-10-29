@@ -624,6 +624,7 @@ namespace AwsMock::FtpServer {
         return;
       } else {
         if (unlink(local_path.c_str()) == 0) {
+          SendDeleteObjectRequest(_logged_in_user->_username, local_path);
           sendFtpMessage(FtpReplyCode::FILE_ACTION_COMPLETED, "Successfully deleted file");
           return;
         } else {
@@ -878,6 +879,8 @@ namespace AwsMock::FtpServer {
         stream << filename;
         stream << "\r\n";
       }
+
+      std::string tmp = stream.str();
 
       // Copy the file list into a raw char vector
       const std::string dir_listing_string = stream.str();
@@ -1183,6 +1186,14 @@ namespace AwsMock::FtpServer {
     headers["x-amz-meta-user-agent"] = "AWSTransfer";
     headers["x-amz-meta-user-agent-id"] = user + "@" + _serverName;
     SendFile(url, fileName, headers);
+    log_debug_stream(_logger) << "Create object message request send, url: " << url << std::endl;
+  }
+
+  void FtpSession::SendDeleteObjectRequest(const std::string &user, const std::string &fileName) {
+
+    std::string key = GetKey(fileName);
+    std::string url = _baseUrl + "/" + _bucket + "/" + key;
+    SendDeleteRequest(url, {}, "application/json");
     log_debug_stream(_logger) << "Create object message request send, url: " << url << std::endl;
   }
 
