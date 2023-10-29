@@ -81,14 +81,14 @@ namespace AwsMock::Service {
       Database::Entity::S3::Object object = _database->GetObject(request.region, request.bucket, request.key);
 
       Dto::S3::GetMetadataResponse response = {
-        .bucket = object.bucket,
-        .key = object.key,
-        .md5Sum = object.md5sum,
-        .contentType = object.contentType,
-        .size = object.size,
-        .metadata = object.metadata,
-        .created = object.created,
-        .modified = object.modified
+          .bucket = object.bucket,
+          .key = object.key,
+          .md5Sum = object.md5sum,
+          .contentType = object.contentType,
+          .size = object.size,
+          .metadata = object.metadata,
+          .created = object.created,
+          .modified = object.modified
       };
 
       log_trace_stream(_logger) << "S3 get object metadata response: " + response.ToString() << std::endl;
@@ -133,13 +133,13 @@ namespace AwsMock::Service {
 
       std::string filename = _dataS3Dir + Poco::Path::separator() + object.internalName;
       Dto::S3::GetObjectResponse response = {
-        .bucket = object.bucket,
-        .key = object.key,
-        .size = object.size,
-        .filename = filename,
-        .contentType = object.contentType,
-        .metadata = object.metadata,
-        .modified = object.modified,
+          .bucket = object.bucket,
+          .key = object.key,
+          .size = object.size,
+          .filename = filename,
+          .contentType = object.contentType,
+          .metadata = object.metadata,
+          .modified = object.modified,
       };
       log_trace_stream(_logger) << "S3 get object response: " << response.ToString() << std::endl;
       log_info_stream(_logger) << "Object returned, bucket: " << request.bucket << " key: " << request.key << std::endl;
@@ -263,15 +263,15 @@ namespace AwsMock::Service {
 
     // Create database object
     Database::Entity::S3::Object object = _database->CreateOrUpdateObject(
-      {
-        .region=region,
-        .bucket=bucket,
-        .key=key,
-        .owner=user,
-        .size=fileSize,
-        .md5sum=md5sum,
-        .internalName=outFile,
-      });
+        {
+            .region=region,
+            .bucket=bucket,
+            .key=key,
+            .owner=user,
+            .size=fileSize,
+            .md5sum=md5sum,
+            .internalName=outFile,
+        });
 
     // Cleanup
     Core::DirUtils::DeleteDirectory(uploadDir);
@@ -281,13 +281,13 @@ namespace AwsMock::Service {
 
     log_info_stream(_logger) << "Multipart upload finished, bucket: " << bucket << " key: " << key << std::endl;
     return {
-      .location=region,
-      .bucket=bucket,
-      .key=key,
-      .etag=md5sum,
-      .md5sum=md5sum,
-      .checksumSha1=sha1sum,
-      .checksumSha256=sha256sum
+        .location=region,
+        .bucket=bucket,
+        .key=key,
+        .etag=md5sum,
+        .md5sum=md5sum,
+        .checksumSha1=sha1sum,
+        .checksumSha256=sha256sum
     };
   }
 
@@ -353,17 +353,17 @@ namespace AwsMock::Service {
 
       // Update database
       targetObject = {
-        .region=request.region,
-        .bucket=request.targetBucket,
-        .key=request.targetKey,
-        .owner=sourceObject.owner,
-        .size=sourceObject.size,
-        .md5sum=sourceObject.md5sum,
-        .sha1sum=sourceObject.sha1sum,
-        .sha256sum=sourceObject.sha256sum,
-        .contentType=sourceObject.contentType,
-        .metadata=request.metadata,
-        .internalName=targetFile,
+          .region=request.region,
+          .bucket=request.targetBucket,
+          .key=request.targetKey,
+          .owner=sourceObject.owner,
+          .size=sourceObject.size,
+          .md5sum=sourceObject.md5sum,
+          .sha1sum=sourceObject.sha1sum,
+          .sha256sum=sourceObject.sha256sum,
+          .contentType=sourceObject.contentType,
+          .metadata=request.metadata,
+          .internalName=targetFile,
       };
 
       // Create version ID
@@ -502,7 +502,13 @@ namespace AwsMock::Service {
       throw Core::ServiceException("Bucket is not empty", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
+    // Check transfer bucket
+    if (name == _transferBucket) {
+      throw Core::ServiceException("Transfer bucket cannot be deleted", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+    }
+
     try {
+
       // Delete directory
       DeleteBucket(name);
 
@@ -695,17 +701,17 @@ namespace AwsMock::Service {
 
     // Update database
     Database::Entity::S3::Object object = {
-      .region=request.region,
-      .bucket=request.bucket,
-      .key=request.key,
-      .owner=request.owner,
-      .size=size,
-      .md5sum=md5sum,
-      .sha1sum=sha1sum,
-      .sha256sum=sha256sum,
-      .contentType=request.contentType,
-      .metadata=request.metadata,
-      .internalName=fileName
+        .region=request.region,
+        .bucket=request.bucket,
+        .key=request.key,
+        .owner=request.owner,
+        .size=size,
+        .md5sum=md5sum,
+        .sha1sum=sha1sum,
+        .sha256sum=sha256sum,
+        .contentType=request.contentType,
+        .metadata=request.metadata,
+        .internalName=fileName
     };
 
     // Update database
@@ -717,14 +723,14 @@ namespace AwsMock::Service {
     log_info_stream(_logger) << "Put object succeeded, bucket: " << request.bucket << " key: " << request.key << std::endl;
 
     return {
-      .bucket=request.bucket,
-      .key=request.key,
-      .etag=md5sum,
-      .md5Sum=md5sum,
-      .contentLength=size,
-      .checksumAlgorithm="SHA256",
-      .checksumSha256=sha256sum,
-      .metadata=request.metadata
+        .bucket=request.bucket,
+        .key=request.key,
+        .etag=md5sum,
+        .md5Sum=md5sum,
+        .contentLength=size,
+        .checksumAlgorithm="SHA256",
+        .checksumSha256=sha256sum,
+        .metadata=request.metadata
     };
   }
 
@@ -755,18 +761,18 @@ namespace AwsMock::Service {
 
       // Create new version of new object
       object = {
-        .region=request.region,
-        .bucket=request.bucket,
-        .key=request.key,
-        .owner=request.owner,
-        .size=size,
-        .md5sum=md5sum,
-        .sha1sum=sha1sum,
-        .sha256sum=sha256sum,
-        .contentType=request.contentType,
-        .metadata=request.metadata,
-        .internalName=fileName,
-        .versionId=versionId,
+          .region=request.region,
+          .bucket=request.bucket,
+          .key=request.key,
+          .owner=request.owner,
+          .size=size,
+          .md5sum=md5sum,
+          .sha1sum=sha1sum,
+          .sha256sum=sha256sum,
+          .contentType=request.contentType,
+          .metadata=request.metadata,
+          .internalName=fileName,
+          .versionId=versionId,
       };
 
       // Create new version in database
@@ -784,15 +790,15 @@ namespace AwsMock::Service {
     }
 
     return {
-      .bucket=request.bucket,
-      .key=request.key,
-      .etag=md5sum,
-      .md5Sum=md5sum,
-      .contentLength=size,
-      .checksumAlgorithm="SHA256",
-      .checksumSha256=sha256sum,
-      .metadata=request.metadata,
-      .versionId=object.versionId
+        .bucket=request.bucket,
+        .key=request.key,
+        .etag=md5sum,
+        .md5Sum=md5sum,
+        .contentLength=size,
+        .checksumAlgorithm="SHA256",
+        .checksumSha256=sha256sum,
+        .metadata=request.metadata,
+        .versionId=object.versionId
     };
   }
 } // namespace AwsMock::Service
