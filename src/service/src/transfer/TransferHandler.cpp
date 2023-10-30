@@ -134,7 +134,7 @@ namespace AwsMock::Service {
       GetVersionActionFromUri(request.getURI(), version, action);
 
       HeaderMap headerMap;
-      headerMap["Connection"] = "closed";
+      headerMap["Connection"] = "Keep-alive: 300";
       headerMap["Server"] = "AmazonS3";
 
       SendOkResponse(response, {}, headerMap);

@@ -119,9 +119,10 @@ namespace AwsMock::Service {
     }
 
     try {
+      Database::Entity::S3::Bucket bucketEntity = _database->GetBucketByRegionName(request.region, request.bucket);
 
       Database::Entity::S3::Object object;
-      if (!request.versionId.empty()) {
+      if (bucketEntity.IsVersioned() && !request.versionId.empty()) {
         object = _database->GetObjectVersion(request.region, request.bucket, request.key, request.versionId);
         if (object.oid.empty()) {
           log_error_stream(_logger) << "Object " << request.key << " does not exist" << std::endl;
@@ -139,6 +140,7 @@ namespace AwsMock::Service {
           .filename = filename,
           .contentType = object.contentType,
           .metadata = object.metadata,
+          .md5sum=object.md5sum,
           .modified = object.modified,
       };
       log_trace_stream(_logger) << "S3 get object response: " << response.ToString() << std::endl;
@@ -213,10 +215,9 @@ namespace AwsMock::Service {
 
     // Create upload directory, if not existing
     std::string uploadDir = GetMultipartUploadDirectory(uploadId);
-    if (!Core::DirUtils::DirectoryExists(uploadDir)) {
-      Core::DirUtils::MakeDirectory(uploadDir);
-    }
-    log_info_stream(_logger) << "Multipart upload started, bucket: " << bucket << " key: " << key << std::endl;
+    Core::DirUtils::EnsureDirectory(uploadDir);
+
+    log_info_stream(_logger) << "Multipart upload started, bucket: " << bucket << " key: " << key << " uploadId: " << uploadId << std::endl;
     return {.bucket=bucket, .key=key, .uploadId=uploadId};
   }
 
@@ -227,31 +228,28 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "Using uploadDir: " << uploadDir << std::endl;
 
     std::ofstream ofs(uploadDir + Poco::Path::separator() + uploadId + "-" + std::to_string(part));
-    ofs << stream.rdbuf();
+    Poco::StreamCopier::copyStream(stream, ofs);
+    ofs.close();
     log_trace_stream(_logger) << "Part uploaded, part: " << part << " dir: " << uploadDir << std::endl;
 
     log_info_stream(_logger) << "Upload part succeeded, part: " << part << std::endl;
     return Core::StringUtils::GenerateRandomString(40);
   }
 
-  Dto::S3::CompleteMultipartUploadResult S3Service::CompleteMultipartUpload(const std::string &uploadId,
-                                                                            const std::string &bucket,
-                                                                            const std::string &key,
-                                                                            const std::string &region,
-                                                                            const std::string &user) {
-    log_trace_stream(_logger) << "CompleteMultipartUpload request, uploadId: " << uploadId << " bucket: " << bucket << " key: " << key << " region: " << region
-                              << " user: " << user;
+  Dto::S3::CompleteMultipartUploadResult S3Service::CompleteMultipartUpload(const std::string &uploadId, const std::string &bucket, const std::string &key, const std::string &region, const std::string &user) {
+    log_trace_stream(_logger) << "CompleteMultipartUpload request, uploadId: " << uploadId << " bucket: " << bucket << " key: " << key << " region: " << region << " user: " << user;
 
     // Get all file parts
     std::string uploadDir = GetMultipartUploadDirectory(uploadId);
     std::vector<std::string> files = Core::DirUtils::ListFilesByPrefix(uploadDir, uploadId);
 
     // Output file
-    std::string outFile = _dataS3Dir + Poco::Path::separator() + Core::AwsUtils::GenerateS3FileName();
+    std::string filename = Core::AwsUtils::GenerateS3FileName();
+    std::string outFile = _dataS3Dir + Poco::Path::separator() + filename;
     log_trace_stream(_logger) << "Output file, outFile: " << outFile << std::endl;
 
     // Append all parts to the output file
-    Core::FileUtils::AppendBinaryFiles(outFile, _tempDir, files);
+    Core::FileUtils::AppendBinaryFiles(outFile, uploadDir, files);
     log_trace_stream(_logger) << "Input files appended to outfile, outFile: " << outFile << std::endl;
 
     // Get file size, MD5 sum
@@ -259,7 +257,7 @@ namespace AwsMock::Service {
     std::string md5sum = Core::Crypto::GetMd5FromFile(outFile);
     std::string sha1sum = Core::Crypto::GetSha1FromFile(outFile);
     std::string sha256sum = Core::Crypto::GetSha256FromFile(outFile);
-    log_debug_stream(_logger) << "Metadata, bucket: " << bucket << " key: " << key << "md5: " << md5sum << " sha256: " << sha256sum << std::endl;
+    log_debug_stream(_logger) << "Metadata, bucket: " << bucket << " key: " << key << " md5: " << md5sum << " sha256: " << sha256sum << std::endl;
 
     // Create database object
     Database::Entity::S3::Object object = _database->CreateOrUpdateObject(
@@ -270,7 +268,9 @@ namespace AwsMock::Service {
             .owner=user,
             .size=fileSize,
             .md5sum=md5sum,
-            .internalName=outFile,
+            .sha1sum=sha1sum,
+            .sha256sum=sha256sum,
+            .internalName=filename,
         });
 
     // Cleanup

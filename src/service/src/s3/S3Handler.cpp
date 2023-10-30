@@ -5,15 +5,25 @@ namespace AwsMock::Service {
 
   S3Handler::S3Handler(Core::Configuration &configuration, Core::MetricService &metricService)
       : AbstractHandler(), _logger(Poco::Logger::get("S3ServiceHandler")), _configuration(configuration), _metricService(metricService), _s3Service(configuration) {
+    std::string host = _configuration.getString("awsmock.gateway.host", "localhost");
+    std::string port = _configuration.getString("awsmock.gateway.port", "4566");
+    _endpoint = "http://" + host + ":" + port;
   }
 
   void S3Handler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
     log_debug_stream(_logger) << "S3 GET request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
 
     try {
-      //std::string tmp = request.getURI();
-      std::string bucket = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
-      std::string key = Core::HttpUtils::GetPathParametersFromIndex(request.getURI(), 1);
+
+      // Strange behaviour of the S§CRT client
+      std::string uri = request.getURI();
+      if (Core::StringUtils::Contains(request.getURI(), _endpoint)) {
+        uri = uri.substr(_endpoint.length());
+      }
+      std::string bucket = Core::HttpUtils::GetPathParameter(uri, 0);
+      std::string key = Core::HttpUtils::GetPathParametersFromIndex(uri, 1);
+
+      //DumpRequestHeaders(request);
 
       if (bucket.empty()) {
 
@@ -30,19 +40,27 @@ namespace AwsMock::Service {
             .bucket=bucket,
             .key=key
         };
+
         // Get version ID
         std::string versionId = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "versionId");
-        if(!versionId.empty()) {
+        if (!versionId.empty()) {
           s3Request.versionId = versionId;
+        }
+
+        // Get range
+        if (request.has("Range")) {
+          std::string rangeStr = request.get("Range");
+          std::string parts = Core::StringUtils::Split(rangeStr, '=')[1];
+          s3Request.min = std::stol(Core::StringUtils::Split(parts, '-')[0]);
+          s3Request.max = std::stol(Core::StringUtils::Split(parts, '-')[1]);
         }
 
         // Get object
         Dto::S3::GetObjectResponse s3Response = _s3Service.GetObject(s3Request);
 
         HeaderMap headerMap;
-        headerMap["ETag"] = Core::StringUtils::GenerateRandomString(32);
+        headerMap["ETag"] = "\"" + s3Response.md5sum + "\"";
         headerMap["Content-Type"] = s3Response.contentType;
-        headerMap["Content-Length"] = std::to_string(s3Response.size);
         headerMap["Last-Modified"] = Poco::DateTimeFormatter().format(s3Response.modified, Poco::DateTimeFormat::HTTP_FORMAT);
 
         // Set user headers
@@ -50,7 +68,25 @@ namespace AwsMock::Service {
           headerMap["x-amz-meta-" + m.first] = m.second;
         }
 
-        SendOkResponse(response, s3Response.filename, s3Response.size, headerMap);
+        if (request.has("Range")) {
+          long range = s3Request.max - s3Request.min;
+          long min = s3Request.max;
+          long max = s3Request.max + range - 1;
+          if (max > s3Response.size) {
+            max = s3Response.size - 1;
+          }
+          headerMap["Accept-Ranges"] = "bytes";
+          headerMap["Content-Range"] = "bytes " + std::to_string(min) + "-" + std::to_string(max) + "/" + std::to_string(s3Response.size);
+          headerMap["Content-Length"] = std::to_string(max - min);
+          log_info_stream(_logger) << "Progress: " << std::to_string(min) << "-" << std::to_string(max) << "/" << std::to_string(s3Response.size) << std::endl;
+
+          SendOkResponse(response, s3Response.filename, s3Request.min, s3Request.max, headerMap);
+
+        } else {
+
+          SendOkResponse(response, s3Response.filename, s3Response.size, headerMap);
+
+        }
 
       } else if (Core::HttpUtils::HasQueryParameter(request.getURI(), "list-type")) {
 
@@ -116,7 +152,7 @@ namespace AwsMock::Service {
         // S3 initial multipart upload
         std::string partNumber = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "partNumber");
         std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "uploadId");
-        log_debug_stream(_logger) << "Initial S3 multipart upload part: " << partNumber << std::endl;
+        log_debug_stream(_logger) << "S3 multipart upload part: " << partNumber << std::endl;
 
         std::string eTag = _s3Service.UploadPart(request.stream(), std::stoi(partNumber), uploadId);
 
@@ -208,11 +244,11 @@ namespace AwsMock::Service {
 
         HeaderMap headerMap;
         headerMap["Content-MD5"] = putObjectResponse.md5Sum;
-        headerMap["Content-Length"] = std::to_string(putObjectResponse.contentLength);
+        //headerMap["Content-Length"] = std::to_string(putObjectResponse.contentLength);
         headerMap["ETag"] = "\"" + putObjectResponse.etag + "\"";
         headerMap["x-amz-sdk-checksum-algorithm"] = putObjectResponse.checksumAlgorithm;
         headerMap["x-amz-checksum-sha256"] = putObjectResponse.checksumSha256;
-        if(!putObjectResponse.versionId.empty()) {
+        if (!putObjectResponse.versionId.empty()) {
           headerMap["x-amz-version-id"] = putObjectResponse.versionId;
         }
         log_debug_stream(_logger) << " size: " << putObjectResponse.contentLength << std::endl;

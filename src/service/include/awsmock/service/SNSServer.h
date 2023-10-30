@@ -28,110 +28,116 @@
 #define SNS_DEFAULT_HOST "localhost"
 #define SNS_DEFAULT_QUEUE_LENGTH  250
 #define SNS_DEFAULT_THREADS 50
+#define SNS_DEFAULT_TIMEOUT 120
 
 namespace AwsMock::Service {
 
   class SNSServer : public AbstractServer {
 
-    public:
+  public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration aws-mock configuration
-       * @param metricService aws-mock monitoring service
-       */
-      explicit SNSServer(Core::Configuration &configuration, Core::MetricService &metricService);
+    /**
+     * Constructor
+     *
+     * @param configuration aws-mock configuration
+     * @param metricService aws-mock monitoring service
+     */
+    explicit SNSServer(Core::Configuration &configuration, Core::MetricService &metricService);
 
-      /**
-       * Destructor
-       */
-      ~SNSServer() override;
+    /**
+     * Destructor
+     */
+    ~SNSServer() override;
 
-      /**
-       * Main method
-       */
-      void MainLoop() override;
+    /**
+     * Main method
+     */
+    void MainLoop() override;
 
-      /**
-       * Stop monitoring
-       */
-      void StopMonitoringServer();
+    /**
+     * Stop monitoring
+     */
+    void StopMonitoringServer();
 
-    private:
+  private:
 
-      /**
-       * Start monitoring
-       */
-      void StartMonitoringServer();
+    /**
+     * Start monitoring
+     */
+    void StartMonitoringServer();
 
-      /**
-       * Reset messages
-       *
-       * <p>Loops over all SQS queues and sets the status to INITIAL in case the visibility timeout has been reached. Also the retry count in increased by one.</p>
-       * <p>Checks also the expiration date and removed the messages, which are older than the max retention period.</>
-       */
-      void ResetMessages();
+    /**
+     * Reset messages
+     *
+     * <p>Loops over all SQS queues and sets the status to INITIAL in case the visibility timeout has been reached. Also the retry count in increased by one.</p>
+     * <p>Checks also the expiration date and removed the messages, which are older than the max retention period.</>
+     */
+    void ResetMessages();
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
 
-      /**
-       * Configuration
-       */
-      Core::Configuration &_configuration;
+    /**
+     * Configuration
+     */
+    Core::Configuration &_configuration;
 
-      /**
-       * Metric service
-       */
-      Core::MetricService &_metricService;
+    /**
+     * Metric service
+     */
+    Core::MetricService &_metricService;
 
-      /**
-       * Service database
-       */
-      std::unique_ptr<Database::ModuleDatabase> _serviceDatabase;
+    /**
+     * Service database
+     */
+    std::unique_ptr<Database::ModuleDatabase> _serviceDatabase;
 
-      /**
-       * S3 service
-       */
-      std::unique_ptr<Database::SQSDatabase> _sqsDatabase;
+    /**
+     * S3 service
+     */
+    std::unique_ptr<Database::SQSDatabase> _sqsDatabase;
 
-      /**
-       * Thread pool
-       */
-      AwsMock::Core::ThreadPool<SNSMonitoring> _threadPool;
+    /**
+     * Thread pool
+     */
+    AwsMock::Core::ThreadPool<SNSMonitoring> _threadPool;
 
-      /**
-       * AWS region
-       */
-      std::string _region;
+    /**
+     * AWS region
+     */
+    std::string _region;
 
-      /**
-       * Sleeping period in ms
-       */
-      int _period;
+    /**
+     * Sleeping period in ms
+     */
+    int _period;
 
-      /**
-       * Rest port
-       */
-      int _port;
+    /**
+     * Rest port
+     */
+    int _port;
 
-      /**
-       * Rest host
-       */
-      std::string _host;
+    /**
+     * Rest host
+     */
+    std::string _host;
 
-      /**
-       * HTTP max message queue length
-       */
-      int _maxQueueLength;
+    /**
+     * HTTP max message queue length
+     */
+    int _maxQueueLength;
 
-      /**
-       * HTTP max concurrent connections
-       */
-      int _maxThreads;
+    /**
+     * HTTP max concurrent connections
+     */
+    int _maxThreads;
+
+    /**
+     * HTTP request timeout in seconds
+     */
+    int _requestTimeout;
   };
 
 } // namespace AwsMock::Service

@@ -13,8 +13,9 @@ namespace AwsMock::Service {
     // Get HTTP configuration values
     _port = _configuration.getInt("awsmock.service.lambda.port", LAMBDA_DEFAULT_PORT);
     _host = _configuration.getString("awsmock.service.lambda.host", LAMBDA_DEFAULT_HOST);
-    _maxQueueLength = _configuration.getInt("awsmock.service.s3.max.queue", 250);
-    _maxThreads = _configuration.getInt("awsmock.service.s3.max.threads", 50);
+    _maxQueueLength = _configuration.getInt("awsmock.service.lambda.max.queue", LAMBDA_DEFAULT_QUEUE);
+    _maxThreads = _configuration.getInt("awsmock.service.lambda.max.threads", LAMBDA_DEFAULT_THREADS);
+    _requestTimeout = _configuration.getInt("awsmock.service.lambda.timeout", LAMBDA_DEFAULT_TIMEOUT);
 
     // Directories
     _dataDir = _configuration.getString("awsmock.data.dir") + Poco::Path::separator() + "lambda";
@@ -62,7 +63,7 @@ namespace AwsMock::Service {
     StartMonitoringServer();
 
     // Start HTTP manager
-    StartHttpServer(_maxQueueLength, _maxThreads, _host, _port, new LambdaRequestHandlerFactory(_configuration, _metricService, _createQueue, _invokeQueue));
+    StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new LambdaRequestHandlerFactory(_configuration, _metricService, _createQueue, _invokeQueue));
 
     // Cleanup
     CleanupContainers();

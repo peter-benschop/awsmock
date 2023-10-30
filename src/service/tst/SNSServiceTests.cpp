@@ -32,6 +32,8 @@ namespace AwsMock::Service {
     protected:
 
     void SetUp() override {
+      // Set log level
+      Core::LogStream::SetGlobalLevel("error");
     }
 
     void TearDown() override {

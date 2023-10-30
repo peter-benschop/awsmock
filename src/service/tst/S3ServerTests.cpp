@@ -34,6 +34,9 @@ namespace AwsMock::Service {
     protected:
 
     void SetUp() override {
+      // Set log level
+      Core::LogStream::SetGlobalLevel("error");
+
       // Create some test objects
       _testFile = Core::FileUtils::CreateTempFile("/tmp", "json", 10);
       _extraHeaders["Authorization"] =
@@ -55,7 +58,6 @@ namespace AwsMock::Service {
       _s3Server.StopServer();
       _database.DeleteAllBuckets();
       Core::FileUtils::DeleteFile(_testFile);
-      //Poco::ThreadPool::defaultPool().stopAll();
     }
 
     Core::CurlUtils _curlUtils;

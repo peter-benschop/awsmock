@@ -312,7 +312,7 @@ namespace AwsMock::Resource {
         response.set("Date", Poco::DateTimeFormatter::format(Poco::DateTime(), Poco::DateTimeFormat::HTTP_FORMAT));
         response.set("Content-Length", std::to_string(contentLength));
         response.set("Content-Type", "text/html; charset=utf-8");
-        response.set("Connection", "close");
+        response.set("Connection", "Keep-alive: 300");
         response.set("Server", "AmazonS3");
 
         // Extra headers

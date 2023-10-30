@@ -77,6 +77,7 @@ namespace AwsMock::Service {
 
     // Create HTTP request and set headers
     Poco::Net::HTTPClientSession session(host, port);
+    session.setReceiveTimeout(Poco::Timespan(120, 0));
     log_trace_stream(_logger) << "Forward session, host: " << host << " port: " << port << std::endl;
 
     // Send request with body
@@ -84,21 +85,16 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "Forward request send" << std::endl;
 
     // Get the response
-    std::stringstream body;
-    Poco::StreamCopier::copyStream(session.receiveResponse(response), body);
-    log_trace_stream(_logger) << "Got response from backend service" << std::endl;
+    Poco::Net::HTTPResponse clientResponse;
+    std::istream &is = session.receiveResponse(clientResponse);
 
-    HeaderMap headerMap;
-    for (const auto & i : response) {
-      headerMap[i.first] = i.second;
+    // Copy headers
+    for (const auto &i : clientResponse) {
+      response.set(i.first, i.second);
     }
+    long send = Poco::StreamCopier::copyStream(is, response.send(), 1024 * 1024);
+    log_debug_stream(_logger) << "Bytes send: " << send << std::endl;
 
-    if (response.getStatus() == Poco::Net::HTTPResponse::HTTP_OK || response.getStatus() == Poco::Net::HTTPResponse::HTTP_NO_CONTENT) {
-      SendOkResponse(response, body.str(), headerMap);
-    } else {
-      // TODO: use name of service
-      SendErrorResponse("gateway", response, body.str());
-    }
     log_trace_stream(_logger) << "Backend service response send back to client" << std::endl;
   }
 

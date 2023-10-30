@@ -405,7 +405,39 @@ namespace AwsMock::Service {
 
       // Send body
       std::ifstream ifs(fileName);
-      Poco::StreamCopier::copyStream(ifs, os);
+      long send = Poco::StreamCopier::copyStream(ifs, os);
+      os.flush();
+      ifs.close();
+      log_info_stream(_logger) << "Bytes send: " << send << std::endl;
+
+    } catch (Poco::Exception &exc) {
+      log_error_stream(_logger) << "Exception: " << exc.message() << std::endl;
+    }
+  }
+
+  void AbstractHandler::SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long min, long max, const HeaderMap &extraHeader) {
+    log_trace_stream(_logger) << "Sending OK response, status: 200, filename: " << fileName << " min: " << min << " max: " << max << std::endl;
+    try {
+
+      // Set headers
+      SetHeaders(response, max - min, extraHeader);
+
+      //DumpResponseHeaders(response);
+
+      // Set status
+      handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_PARTIAL_CONTENT);
+
+      // Send response
+      std::ostream &os = response.send();
+
+      // Send body
+        long range = max - min;
+        char buffer[range];
+        std::ifstream ifs(fileName, std::ios::binary | std::ios::in);
+        ifs.seekg(min, std::ios::beg);
+        ifs.readsome(buffer, range);
+        os.write(buffer, range);
+        ifs.close();
 
     } catch (Poco::Exception &exc) {
       log_error_stream(_logger) << "Exception: " << exc.message() << std::endl;
@@ -493,14 +525,14 @@ namespace AwsMock::Service {
     outputStream.flush();
   }
 
-  void AbstractHandler::SetHeaders(Poco::Net::HTTPServerResponse &response, unsigned long contentLength, HeaderMap extraHeader) {
+  void AbstractHandler::SetHeaders(Poco::Net::HTTPServerResponse &response, unsigned long contentLength, const HeaderMap &extraHeader) {
     log_trace_stream(_logger) << "Setting header values, contentLength: " << contentLength << std::endl;
 
     // Default headers
     response.set("Date", Poco::DateTimeFormatter::format(Poco::DateTime(), Poco::DateTimeFormat::HTTP_FORMAT));
     response.set("Content-Length", std::to_string(contentLength));
     response.set("Content-Type", "application/xml");
-    response.set("Connection", "close");
+    response.set("Connection", "Keep-alive: 300");
     response.set("Server", "awsmock");
 
     // Extra headers

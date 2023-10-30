@@ -14,6 +14,7 @@ namespace AwsMock::Service {
     _host = _configuration.getString("awsmock.service.gateway.host", GATEWAY_DEFAULT_HOST);
     _maxQueueLength = _configuration.getInt("awsmock.service.gateway.max.queue", GATEWAY_MAX_QUEUE);
     _maxThreads = _configuration.getInt("awsmock.service.gateway.max.threads", GATEWAY_MAX_THREADS);
+    _requestTimeout = _configuration.getInt("awsmock.service.gateway.timeout", GATEWAY_TIMEOUT);
 
     // Sleeping period
     _period = _configuration.getInt("awsmock.worker.lambda.period", 10000);
@@ -41,7 +42,7 @@ namespace AwsMock::Service {
     StartMonitoringServer();
 
     // Start HTTP manager
-    StartHttpServer(_maxQueueLength, _maxThreads, _host, _port, new GatewayRouter(_configuration, _metricService));
+    StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new GatewayRouter(_configuration, _metricService));
 
     _running = true;
     while (_running) {

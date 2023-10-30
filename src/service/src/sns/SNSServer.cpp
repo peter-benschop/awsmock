@@ -14,6 +14,7 @@ namespace AwsMock::Service {
     _host = _configuration.getString("awsmock.service.sns.host", SNS_DEFAULT_HOST);
     _maxQueueLength = _configuration.getInt("awsmock.service.sns.max.queue", SNS_DEFAULT_QUEUE_LENGTH);
     _maxThreads = _configuration.getInt("awsmock.service.sns.max.threads", SNS_DEFAULT_THREADS);
+    _requestTimeout = _configuration.getInt("awsmock.service.sns.timeout", SNS_DEFAULT_TIMEOUT);
     log_debug_stream(_logger) << "SNS rest service initialized, endpoint: " << _host << ":" << _port << std::endl;
 
     // Sleeping period
@@ -45,7 +46,7 @@ namespace AwsMock::Service {
     StartMonitoringServer();
 
     // Start REST service
-    StartHttpServer(_maxQueueLength, _maxThreads,_host,_port,new SNSRequestHandlerFactory(_configuration, _metricService, _condition));
+    StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new SNSRequestHandlerFactory(_configuration, _metricService, _condition));
 
     while (IsRunning()) {
 

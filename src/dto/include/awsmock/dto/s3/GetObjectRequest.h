@@ -34,6 +34,16 @@ namespace AwsMock::Dto::S3 {
       std::string versionId;
 
       /**
+       * Range minimum
+       */
+      long min;
+
+      /**
+       * Range maximum
+       */
+      long max;
+
+      /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.

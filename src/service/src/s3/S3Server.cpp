@@ -12,8 +12,9 @@ namespace AwsMock::Service {
     // Get HTTP configuration values
     _port = _configuration.getInt("awsmock.service.s3.port", S3_DEFAULT_PORT);
     _host = _configuration.getString("awsmock.service.s3.host", S3_DEFAULT_HOST);
-    _maxQueueLength = _configuration.getInt("awsmock.service.s3.max.queue", 250);
-    _maxThreads = _configuration.getInt("awsmock.service.s3.max.threads", 50);
+    _maxQueueLength = _configuration.getInt("awsmock.service.s3.max.queue", S3_DEFAULT_QUEUE_SIZE);
+    _maxThreads = _configuration.getInt("awsmock.service.s3.max.threads", S3_DEFAULT_MAX_THREADS);
+    _requestTimeout = _configuration.getInt("awsmock.service.s3.timeout", S3_DEFAULT_TIMEOUT);
 
     // Directories
     _dataDir = _configuration.getString("awsmock.service.s3.data.dir");
@@ -59,7 +60,7 @@ namespace AwsMock::Service {
     StartMonitoringServer();
 
     // Start REST service
-    StartHttpServer(_maxQueueLength, _maxThreads, _host, _port, new S3RequestHandlerFactory(_configuration, _metricService));
+    StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new S3RequestHandlerFactory(_configuration, _metricService));
 
     while (IsRunning()) {
 

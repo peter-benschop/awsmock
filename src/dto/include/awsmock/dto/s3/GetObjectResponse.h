@@ -50,6 +50,11 @@ namespace AwsMock::Dto::S3 {
       std::map<std::string, std::string> metadata;
 
       /**
+       * MD5 sum
+       */
+      std::string md5sum;
+
+      /**
        * Created
        */
       Poco::DateTime created;

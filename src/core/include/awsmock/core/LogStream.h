@@ -221,6 +221,8 @@ namespace AwsMock::Core {
       LogStream &priority(Poco::Message::Priority priority);
       /// Sets the priority for log messages.
 
+      static void SetGlobalLevel(const std::string &level);
+
       static Poco::AutoPtr<Poco::ConsoleChannel> _pConsoleChannel;
       static Poco::AutoPtr<Poco::FileChannel> _pFileChannel;
       static Poco::AutoPtr<Poco::PatternFormatter> _pFormatter;
