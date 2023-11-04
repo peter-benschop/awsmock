@@ -19,7 +19,7 @@ namespace AwsMock::Service {
             if(action == "functions/") {
 
                 Dto::lambda::ListFunctionResponse lambdaResponse = _lambdaService.ListFunctions(region);
-                SendOkResponse(response, lambdaResponse.ToJson());
+                SendRangeResponse(response, lambdaResponse.ToJson());
             }*/
 
     } catch (Core::ServiceException &exc) {
@@ -134,7 +134,7 @@ namespace AwsMock::Service {
       GetVersionActionFromUri(request.getURI(), version, action);
 
       HeaderMap headerMap;
-      headerMap["Connection"] = "closed";
+      headerMap["Connection"] = "keep-alive";
       headerMap["Server"] = "AmazonS3";
 
       SendOkResponse(response, {}, headerMap);

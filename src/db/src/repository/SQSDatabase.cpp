@@ -84,11 +84,7 @@ namespace AwsMock::Database {
 
   Entity::SQS::Queue SQSDatabase::GetQueueByUrl(const std::string &queueUrl) {
 
-    bsoncxx::builder::stream::document filter{};
-    filter << "queueUrl" << queueUrl << bsoncxx::builder::stream::finalize;
-
     mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("queueUrl", make_document(kvp("$regex", queueUrl)))));
-
     if (!mResult) {
       return {};
     }
@@ -146,13 +142,12 @@ namespace AwsMock::Database {
 
   long SQSDatabase::CountQueues(const std::string &region) {
 
-    bsoncxx::builder::basic::document builder;
-    if (!region.empty()) {
-      builder.append(bsoncxx::builder::basic::kvp("region", region));
+    long count=0;
+    if(region.empty()) {
+      count = _queueCollection.count_documents({});
+    } else {
+      count = _queueCollection.count_documents(make_document(kvp("region", region)));
     }
-    bsoncxx::document::value filter = builder.extract();
-
-    long count = _queueCollection.count_documents({filter});
     log_trace_stream(_logger) << "Count queues, result: " << count << std::endl;
 
     return count;
@@ -300,21 +295,28 @@ namespace AwsMock::Database {
     }
   }
 
-  void SQSDatabase::ResetDelayedMessages(const std::string &queueUrl) {
+  void SQSDatabase::ResetDelayedMessages(const std::string &queueUrl, long delay) {
 
     auto session = GetSession();
     session.start_transaction();
-
     try {
 
-      auto result = _messageCollection.update_many(make_document(kvp("queueUrl", queueUrl),
-                                                                 kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::DELAYED))),
-                                                   make_document(kvp("$set", make_document(
-                                                       kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))))));
+      auto now = std::chrono::high_resolution_clock::now();
+      auto result = _messageCollection.update_many(
+          make_document(
+              kvp("queueUrl", queueUrl),
+              kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)),
+              kvp("reset", make_document(
+                  kvp("$lt", bsoncxx::types::b_date(now))))),
+          make_document(
+              kvp("$set",
+                  make_document(
+                      kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))))));
       // Commit
       session.commit_transaction();
 
-      log_trace_stream(_logger) << "Message delay, updated: " << result->modified_count() << " queue: " << queueUrl << std::endl;
+      int i = result->upserted_count();
+      log_trace_stream(_logger) << "Delayed message reset, updated: " << result->upserted_count() << " queue: " << queueUrl << std::endl;
 
     } catch (mongocxx::exception &e) {
       log_error_stream(_logger) << "Collection transaction exception: " << e.what() << std::endl;

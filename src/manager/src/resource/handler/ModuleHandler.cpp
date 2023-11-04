@@ -90,13 +90,7 @@ namespace AwsMock {
       } else if (action == "loglevel") {
 
         std::string level = Core::HttpUtils::GetPathParameter(request.getURI(), 2);
-        Poco::Logger::root().setLevel(level);
-
-        std::vector<std::string>names;
-        Poco::Logger::names(names);
-        for(const auto &n  : names) {
-          Poco::Logger::get(n).setLevel(level);
-        }
+        Core::LogStream::SetGlobalLevel(level);
 
         // Send response
         SendOkResponse(response, {});

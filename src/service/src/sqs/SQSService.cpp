@@ -123,7 +123,7 @@ namespace AwsMock::Service {
     }
 
     Database::Entity::SQS::Queue queue = _database->GetQueueByUrl(request.queueUrl);
-    log_debug_stream(_logger) << "Got queue: " << queue.ToString() << std::endl;
+    log_debug_stream(_logger) << "Got queue: " << queue.queueUrl << std::endl;
 
     Dto::SQS::GetQueueAttributesResponse response;
     if (request.attributeNames.size() == 1 || Poco::toLower(request.attributeNames[0]) == "all") {
@@ -140,6 +140,7 @@ namespace AwsMock::Service {
       response.attributes.emplace_back("ReceiveMessageWaitTimeSeconds", std::to_string(queue.attributes.receiveMessageWaitTime));
       response.attributes.emplace_back("VisibilityTimeout", std::to_string(queue.attributes.visibilityTimeout));
     }
+    log_debug_stream(_logger) << response.ToString() << std::endl;
     return response;
   }
 
@@ -236,9 +237,11 @@ namespace AwsMock::Service {
       }
 
       // Set delay
+      Poco::DateTime reset;
       Database::Entity::SQS::MessageStatus messageStatus = Database::Entity::SQS::MessageStatus::INITIAL;
       if (queue.attributes.delaySeconds > 0) {
-        Database::Entity::SQS::MessageStatus messageStatus = Database::Entity::SQS::MessageStatus::DELAYED;
+        messageStatus = Database::Entity::SQS::MessageStatus::DELAYED;
+        reset += Poco::Timespan(queue.attributes.delaySeconds, 0);
       }
 
       // Set parameters
@@ -254,6 +257,7 @@ namespace AwsMock::Service {
               .queueUrl=queue.queueUrl,
               .body=request.body,
               .status=messageStatus,
+              .reset=reset,
               .messageId=messageId,
               .receiptHandle=receiptHandle,
               .md5Body=md5Body,

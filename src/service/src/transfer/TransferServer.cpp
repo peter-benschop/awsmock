@@ -14,6 +14,7 @@ namespace AwsMock::Service {
     _host = _configuration.getString("awsmock.service.transfer.host", TRANSFER_DEFAULT_HOST);
     _maxQueueLength = _configuration.getInt("awsmock.service.transfer.max.queue", TRANSFER_DEFAULT_QUEUE_LENGTH);
     _maxThreads = _configuration.getInt("awsmock.service.transfer.max.threads", TRANSFER_DEFAULT_THREADS);
+    _requestTimeout = _configuration.getInt("awsmock.service.transfer.timeout", TRANSFER_DEFAULT_TIMEOUT);
 
     // Sleeping period
     _period = _configuration.getInt("awsmock.service.transfer.period", 10000);
@@ -131,7 +132,7 @@ namespace AwsMock::Service {
     log_info_stream(_logger) << "Transfer service starting" << std::endl;
 
     // Start REST manager
-    StartHttpServer(_maxQueueLength, _maxThreads, _host, _port, new TransferRequestHandlerFactory(_configuration, _metricService));
+    StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new TransferRequestHandlerFactory(_configuration, _metricService));
 
     // Send create bucket request
     /*if (!SendExistsBucketRequest(_bucket)) {

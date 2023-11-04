@@ -64,12 +64,32 @@ namespace AwsMock::Core {
   }
 
   void FileUtils::AppendBinaryFiles(const std::string &outFile, const std::string &inDir, const std::vector<std::string> &files) {
-    std::ofstream ofs(outFile, std::ios::out | std::ios::trunc | std::ios::binary);
+    std::ofstream ofs(outFile, std::ios::out | std::ios::trunc | std::ios::binary | std::ios::app);
     for (auto &it : files) {
       std::string inFile = inDir;
       inFile.append(Poco::Path::separator() + it);
-      std::ifstream ifs(inFile, std::ios::in | std::ios::binary);
-      ofs << ifs.rdbuf();
+      std::ifstream ifs(inFile, std::ios::in);
+      long copied = Poco::StreamCopier::copyStream(ifs, ofs);
+      if (copied != Core::FileUtils::FileSize(inFile)) {
+        throw Poco::Exception("Invalid input file");
+      }
+      ofs.flush();
+      ifs.close();
+    }
+    ofs.close();
+  }
+
+  void FileUtils::AppendTextFiles(const std::string &outFile, const std::string &inDir, const std::vector<std::string> &files) {
+    std::ofstream ofs(outFile, std::ios::out | std::ios::app);
+    for (auto &it : files) {
+      std::string inFile = inDir;
+      inFile.append(Poco::Path::separator() + it);
+      std::ifstream ifs(inFile, std::ios::in);
+      long copied = Poco::StreamCopier::copyStream(ifs, ofs);
+      if (copied != Core::FileUtils::FileSize(inFile)) {
+        throw Poco::Exception("Invalid input file");
+      }
+      ofs.flush();
       ifs.close();
     }
     ofs.close();

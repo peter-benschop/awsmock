@@ -244,8 +244,9 @@ namespace AwsMock::Database {
        * Any message, which has a message status is DELAYED is reset when the delay period is over.
        *
        * @param queueUrl queue URL.
+       * @param delay delay in seconds.
        */
-      void ResetDelayedMessages(const std::string &queueUrl);
+      void ResetDelayedMessages(const std::string &queueUrl, long delay);
 
       /**
        * Count the number of message by status

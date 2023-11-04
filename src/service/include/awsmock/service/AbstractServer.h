@@ -63,11 +63,12 @@ namespace AwsMock::Service {
        *
        * @param maxQueueLength maximal request queue length
        * @param maxThreads maximal number of worker threads
+       * @param requestTimeout request timeout in seconds
        * @param host HTTP host name
        * @param port HTTP port
        * @param requestFactory HTTP request factory
        */
-      void StartHttpServer(int maxQueueLength, int maxThreads, const std::string &host, int port, Poco::Net::HTTPRequestHandlerFactory *requestFactory);
+      void StartHttpServer(int maxQueueLength, int maxThreads, int requestTimeout, const std::string &host, int port, Poco::Net::HTTPRequestHandlerFactory *requestFactory);
 
       /**
        * Stops the HTTP manager

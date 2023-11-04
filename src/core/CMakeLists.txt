@@ -5,7 +5,8 @@ set(LIBRARY_STATIC awsmockcore_static)
 set(UTILS_SOURCES src/utils/StringUtils.cpp src/utils/FileUtils.cpp src/utils/DirUtils.cpp src/utils/DateTimeUtils.cpp
         src/utils/CryptoUtils.cpp src/utils/DirectoryWatcher.cpp src/utils/AwsUtils.cpp src/utils/SystemUtils.cpp
         src/utils/CurlUtils.cpp src/utils/TarUtils.cpp src/utils/RandomUtils.cpp src/utils/JsonUtils.cpp
-        src/config/Configuration.cpp src/utils/TestUtils.cpp src/utils/HttpUtils.cpp)
+        src/config/Configuration.cpp src/utils/TestUtils.cpp src/utils/HttpUtils.cpp src/utils/NumberUtils.cpp
+        src/utils/MemoryMappedFile.cpp)
 
 set(EXCEPTION_SOURCES src/exception/CoreException.cpp src/exception/DatabaseException.cpp
         src/exception/ServiceException.cpp src/exception/ResourceNotFoundException.cpp)
@@ -20,7 +21,8 @@ add_subdirectory(tst)
 # Includes
 include_directories(./include /usr/include /usr/local/include)
 
-add_library(${LIBRARY} SHARED ${SOURCES})
+add_library(${LIBRARY} SHARED ${SOURCES}
+        include/awsmock/core/MemoryMappedFile.h)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 

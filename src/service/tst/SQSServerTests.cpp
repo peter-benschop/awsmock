@@ -38,6 +38,10 @@ namespace AwsMock::Service {
     protected:
 
       void SetUp() override {
+
+        // Set log level
+        Core::LogStream::SetGlobalLevel("error");
+
         // Create some test objects
         _extraHeaders["Authorization"] =
             "AWS4-HMAC-SHA256 Credential=none/20230618/eu-central-1/sqs/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840";

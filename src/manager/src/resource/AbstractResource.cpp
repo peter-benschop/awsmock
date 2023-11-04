@@ -275,36 +275,6 @@ namespace AwsMock::Resource {
         outputStream.flush();
     }
 
-    void AbstractResource::ForwardRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &host, int port) {
-
-        // Create HTTP request and set headers
-        Poco::Net::HTTPClientSession session(host, port);
-        log_trace_stream(_logger) << "Forward session, host: " << host << " port: " << port << std::endl;
-
-        // Send request with body
-        Poco::StreamCopier::copyStream(request.stream(), session.sendRequest(request));
-        log_trace_stream(_logger) << "Forward request send" << std::endl;
-
-        // Get the response
-        std::stringstream body;
-        Poco::StreamCopier::copyStream(session.receiveResponse(response), body);
-        log_trace_stream(_logger) << "Got response from backend service" << std::endl;
-
-        Resource::HeaderMap headerMap;
-        auto i = response.begin();
-        while (i != response.end()) {
-            headerMap.emplace_back(std::make_pair(i->first, i->second));
-            ++i;
-        }
-
-        if (response.getStatus() == Poco::Net::HTTPResponse::HTTP_OK || response.getStatus() == Poco::Net::HTTPResponse::HTTP_NO_CONTENT) {
-            SendOkResponse(response, body.str(), &headerMap);
-        } else {
-            SendErrorResponse(response, body.str());
-        }
-        log_trace_stream(_logger) << "Backend service response send back to client" << std::endl;
-    }
-
     void AbstractResource::SetHeaders(Poco::Net::HTTPServerResponse &response, unsigned long contentLength, HeaderMap *extraHeader) {
         log_trace_stream(_logger) << "Setting header values, contentLength: " << contentLength << std::endl;
 
@@ -312,7 +282,7 @@ namespace AwsMock::Resource {
         response.set("Date", Poco::DateTimeFormatter::format(Poco::DateTime(), Poco::DateTimeFormat::HTTP_FORMAT));
         response.set("Content-Length", std::to_string(contentLength));
         response.set("Content-Type", "text/html; charset=utf-8");
-        response.set("Connection", "close");
+        response.set("Connection", "keep-alive");
         response.set("Server", "AmazonS3");
 
         // Extra headers

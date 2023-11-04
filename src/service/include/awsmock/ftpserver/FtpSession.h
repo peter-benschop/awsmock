@@ -29,8 +29,7 @@
 #include <awsmock/ftpserver/FtpUser.h>
 #include <awsmock/service/AbstractWorker.h>
 
-#define DEFAULT_BASE_DIR "transfer"
-#define DEFAULT_TRANSFER_BUCKET "transfer-manager"
+#define DEFAULT_BASE_DIR "/home/awsmock/data/transfer"
 
 namespace AwsMock::FtpServer {
 
@@ -209,6 +208,14 @@ namespace AwsMock::FtpServer {
        * @param fileName filename
        */
       void SendCreateObjectRequest(const std::string &user, const std::string &fileName);
+
+      /**
+       * Delete file in AWS s3
+       *
+       * @param user user name
+       * @param fileName filename
+       */
+      void SendDeleteObjectRequest(const std::string &user, const std::string &fileName);
 
       /**
        * Extract the S3 key from the file path.

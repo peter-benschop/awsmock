@@ -30,7 +30,8 @@
 #define TRANSFER_DEFAULT_HOST "localhost"
 #define TRANSFER_DEFAULT_QUEUE_LENGTH  250
 #define TRANSFER_DEFAULT_THREADS 50
-#define DEFAULT_TRANSFER_BUCKET "transfer-manager"
+#define TRANSFER_DEFAULT_TIMEOUT 120
+
 #define DEFAULT_BASE_DIR "transfer"
 #define CONTENT_TYPE_JSON "application/json"
 
@@ -38,171 +39,176 @@ namespace AwsMock::Service {
 
   class TransferServer : public AbstractServer, public AbstractWorker {
 
-    public:
+  public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration aws-mock configuration
-       * @param metricService aws-mock monitoring service
-       */
-      explicit TransferServer(Core::Configuration &configuration, Core::MetricService &metricService);
+    /**
+     * Constructor
+     *
+     * @param configuration aws-mock configuration
+     * @param metricService aws-mock monitoring service
+     */
+    explicit TransferServer(Core::Configuration &configuration, Core::MetricService &metricService);
 
-      /**
-       * Destructor
-       */
-      ~TransferServer() override;
+    /**
+     * Destructor
+     */
+    ~TransferServer() override;
 
-      /**
-       * Main method
-       */
-      void MainLoop() override;
+    /**
+     * Main method
+     */
+    void MainLoop() override;
 
-    private:
+  private:
 
-      /**
-       * Starts a single transfer manager
-       *
-       * @param server transfer manager entity
-       */
-      void StartTransferServer(Database::Entity::Transfer::Transfer &server);
+    /**
+     * Starts a single transfer manager
+     *
+     * @param server transfer manager entity
+     */
+    void StartTransferServer(Database::Entity::Transfer::Transfer &server);
 
-      /**
-       * Stops a single transfer manager
-       *
-       * @param server transfer manager entity
-       */
-      void StopTransferServer(Database::Entity::Transfer::Transfer &server);
+    /**
+     * Stops a single transfer manager
+     *
+     * @param server transfer manager entity
+     */
+    void StopTransferServer(Database::Entity::Transfer::Transfer &server);
 
-      /**
-       * Start all transfer servers, if they are not existing
-       */
-      void StartTransferServers();
+    /**
+     * Start all transfer servers, if they are not existing
+     */
+    void StartTransferServers();
 
-      /**
-       * Check transfer servers
-       */
-      void CheckTransferServers();
+    /**
+     * Check transfer servers
+     */
+    void CheckTransferServers();
 
-      /**
-       * Sends a create bucket request to the S3 service
-       *
-       * @param bucket S3 bucket name
-       */
-      void SendCreateBucketRequest(const std::string &bucket);
+    /**
+     * Sends a create bucket request to the S3 service
+     *
+     * @param bucket S3 bucket name
+     */
+    void SendCreateBucketRequest(const std::string &bucket);
 
-      /**
-       * Sends a exists bucket request to the S3 service
-       *
-       * @param bucket S3 bucket name
-       * @return true when bucket exists
-       */
-      bool SendExistsBucketRequest(const std::string &bucket);
+    /**
+     * Sends a exists bucket request to the S3 service
+     *
+     * @param bucket S3 bucket name
+     * @return true when bucket exists
+     */
+    bool SendExistsBucketRequest(const std::string &bucket);
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
 
-      /**
-       * Configuration
-       */
-      Core::Configuration &_configuration;
+    /**
+     * Configuration
+     */
+    Core::Configuration &_configuration;
 
-      /**
-       * Metric service
-       */
-      Core::MetricService &_metricService;
+    /**
+     * Metric service
+     */
+    Core::MetricService &_metricService;
 
-      /**
-       * Service database
-       */
-      std::unique_ptr<Database::ModuleDatabase> _serviceDatabase;
+    /**
+     * Service database
+     */
+    std::unique_ptr<Database::ModuleDatabase> _serviceDatabase;
 
-      /**
-       * lambda database
-       */
-      std::unique_ptr<Database::TransferDatabase> _transferDatabase;
+    /**
+     * lambda database
+     */
+    std::unique_ptr<Database::TransferDatabase> _transferDatabase;
 
-      /**
-       * Sleeping period in ms
-       */
-      int _period;
+    /**
+     * Sleeping period in ms
+     */
+    int _period;
 
-      /**
-       * Rest port
-       */
-      int _port;
+    /**
+     * Rest port
+     */
+    int _port;
 
-      /**
-       * Rest host
-       */
-      std::string _host;
+    /**
+     * Rest host
+     */
+    std::string _host;
 
-      /**
-       * HTTP max message queue length
-       */
-      int _maxQueueLength;
+    /**
+     * HTTP max message queue length
+     */
+    int _maxQueueLength;
 
-      /**
-       * HTTP max concurrent connection
-       */
-      int _maxThreads;
+    /**
+     * HTTP max concurrent connection
+     */
+    int _maxThreads;
 
-      /**
-       * AWS region
-       */
-      std::string _region;
+    /**
+     * HTTP request timeout in seconds
+     */
+    int _requestTimeout;
 
-      /**
-       * AWS client ID
-       */
-      std::string _clientId;
+    /**
+     * AWS region
+     */
+    std::string _region;
 
-      /**
-       * AWS user
-       */
-      std::string _user;
+    /**
+     * AWS client ID
+     */
+    std::string _clientId;
 
-      /**
-       * AWS S3 bucket
-       */
-      std::string _bucket;
+    /**
+     * AWS user
+     */
+    std::string _user;
 
-      /**
-       * Base dir for all FTP users
-       */
-      std::string _baseDir;
+    /**
+     * AWS S3 bucket
+     */
+    std::string _bucket;
 
-      /**
-       * Base URL for all S3 request
-       */
-      std::string _baseUrl;
+    /**
+     * Base dir for all FTP users
+     */
+    std::string _baseDir;
 
-      /**
-       * Server id
-       */
-      std::string _serverId;
+    /**
+     * Base URL for all S3 request
+     */
+    std::string _baseUrl;
 
-      /**
-       * List of transfer servers
-       */
-      std::map<std::string, std::shared_ptr<FtpServer::FtpServer>> _transferServerList;
+    /**
+     * Server id
+     */
+    std::string _serverId;
 
-      /**
-       * Actual FTP manager
-       */
-      std::shared_ptr<FtpServer::FtpServer> _ftpServer;
+    /**
+     * List of transfer servers
+     */
+    std::map<std::string, std::shared_ptr<FtpServer::FtpServer>> _transferServerList;
 
-      /**
-       * S3 service host
-       */
-      std::string _s3ServiceHost;
+    /**
+     * Actual FTP manager
+     */
+    std::shared_ptr<FtpServer::FtpServer> _ftpServer;
 
-      /**
-       * S3 service port
-       */
-      int _s3ServicePort;
+    /**
+     * S3 service host
+     */
+    std::string _s3ServiceHost;
+
+    /**
+     * S3 service port
+     */
+    int _s3ServicePort;
   };
 
 } // namespace AwsMock::Service

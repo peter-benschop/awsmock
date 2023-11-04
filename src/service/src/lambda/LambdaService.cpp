@@ -69,8 +69,6 @@ namespace AwsMock::Service {
     _createQueue.enqueueNotification(new Dto::Lambda::CreateNotification(request.code.zipFile, lambdaEntity.oid));
     log_debug_stream(_logger) << "lambda create notification send, function: " + lambdaEntity.function << std::endl;
 
-    //CreateLambdaFunction(std::make_pair(request.code.zipFile, lambdaEntity.oid));
-
     // Create response
     Dto::Lambda::CreateFunctionResponse response{
         .functionArn=lambdaEntity.arn,

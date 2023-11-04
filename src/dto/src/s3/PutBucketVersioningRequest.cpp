@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/dto/s3/PutBucketVersioningRequest.h>
+#include <iostream>
 
 namespace AwsMock::Dto::S3 {
 
@@ -12,11 +13,20 @@ namespace AwsMock::Dto::S3 {
 
   void PutBucketVersioningRequest::FromXml(const std::string &xmlString) {
 
-    Poco::XML::DOMParser parser;
-    Poco::AutoPtr<Poco::XML::Document> pDoc = parser.parseString(xmlString);
+    try {
+      Poco::XML::DOMParser parser;
+      Poco::AutoPtr<Poco::XML::Document> pDoc = parser.parseString(xmlString);
 
-    Poco::XML::Node *node = pDoc->getNodeByPath("/VersioningConfiguration/Status");
-    status = node->innerText();
+      Poco::XML::Node *node = pDoc->getNodeByPath("/VersioningConfiguration/Status");
+      if(node) {
+        status = node->innerText();
+      } else {
+        std::cerr << "Exception: Wrong versioning status" << std::endl;
+      }
+
+    } catch(Poco::Exception &exc){
+      std::cerr << "Exception: " << exc.message() << std::endl;
+    }
   }
 
   std::string PutBucketVersioningRequest::ToString() const {

@@ -44,12 +44,14 @@ namespace AwsMock::Service {
     _condition.signal();
   }
 
-  void AbstractServer::StartHttpServer(int maxQueueLength, int maxThreads, const std::string &host, int port, Poco::Net::HTTPRequestHandlerFactory *requestFactory) {
+  void AbstractServer::StartHttpServer(int maxQueueLength, int maxThreads, int requestTimeout, const std::string &host, int port, Poco::Net::HTTPRequestHandlerFactory *requestFactory) {
 
     // Set HTTP server parameter
     auto *httpServerParams = new Poco::Net::HTTPServerParams();
     httpServerParams->setMaxQueued(maxQueueLength);
     httpServerParams->setMaxThreads(maxThreads);
+    httpServerParams->setTimeout(Poco::Timespan(requestTimeout,0));
+    httpServerParams->setKeepAlive(true);
     log_debug_stream(_logger) << "HTTP server parameter set, maxQueue: " << maxQueueLength << " maxThreads: " << maxThreads << std::endl;
 
     _serviceDatabase->SetPort(_name, port);

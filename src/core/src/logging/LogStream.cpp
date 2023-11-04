@@ -79,8 +79,8 @@ namespace AwsMock::Core {
   }
 
   void LogStream::setConsoleChannel() {
-    Poco::AutoPtr<Poco::ConsoleChannel>channel = new Poco::ConsoleChannel();
-    Poco::AutoPtr<Poco::PatternFormatter>formatter(new Poco::PatternFormatter(LOG_PATTERN));
+    Poco::AutoPtr<Poco::ConsoleChannel> channel = new Poco::ConsoleChannel();
+    Poco::AutoPtr<Poco::PatternFormatter> formatter(new Poco::PatternFormatter(LOG_PATTERN));
     Poco::Logger::root().setChannel(new Poco::FormattingChannel(formatter, channel));
   }
 
@@ -91,11 +91,6 @@ namespace AwsMock::Core {
     _pFileChannel->setProperty("archive", "timestamp");
     _pFormattingChannel = new Poco::FormattingChannel(_pFormatter, _pFileChannel);
     Poco::Logger::root().setChannel(_pFormattingChannel);
-    /*std::vector<std::string> loggers;
-    Poco::Logger::names(loggers);
-    for(const auto &it:loggers) {
-      Poco::Logger::get(it).setChannel(_pFormattingChannel);
-    }*/
   }
 
   LogStream &LogStream::fatal() {
@@ -228,4 +223,14 @@ namespace AwsMock::Core {
     return *this;
   }
 
+  void LogStream::SetGlobalLevel(const std::string &level) {
+    Poco::Logger::root().setLevel(level);
+
+    std::vector<std::string> names;
+    Poco::Logger::names(names);
+    for (const auto &n : names) {
+      Poco::Logger::get(n).setLevel(level);
+    }
+
+  }
 } // namespace Poco

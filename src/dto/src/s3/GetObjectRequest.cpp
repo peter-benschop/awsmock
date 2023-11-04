@@ -13,7 +13,7 @@ namespace AwsMock::Dto::S3 {
   }
 
   std::ostream &operator<<(std::ostream &os, const GetObjectRequest &r) {
-    os << "GetObjectRequest={region='" << r.region << ", bucket='" << r.bucket << "' key='" << r.key << "', versionId='" << r.versionId << "'}";
+    os << "GetObjectRequest={region='" << r.region << ", bucket='" << r.bucket << "' key='" << r.key << "', versionId='" << r.versionId << ", min=" << r.min << ", max=" << r.max << "}";
     return os;
   }
 

@@ -238,19 +238,6 @@ namespace AwsMock::Resource {
       [[maybe_unused]] void DumpBodyToFile(Poco::Net::HTTPServerRequest &request, const std::string &filename);
 
       /**
-       * Forward request to service port
-       *
-       * @param request HTTP request
-       * @param response HTTP response
-       * @param host forward host
-       * @param port forward port
-       */
-      void ForwardRequest(Poco::Net::HTTPServerRequest &request,
-                          Poco::Net::HTTPServerResponse &response,
-                          const std::string &host,
-                          int port);
-
-      /**
        * Set default request header values
        *
        * @param request HTTP request object
