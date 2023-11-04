@@ -51,6 +51,7 @@ namespace AwsMock::Service {
     httpServerParams->setMaxQueued(maxQueueLength);
     httpServerParams->setMaxThreads(maxThreads);
     httpServerParams->setTimeout(Poco::Timespan(requestTimeout,0));
+    httpServerParams->setKeepAlive(true);
     log_debug_stream(_logger) << "HTTP server parameter set, maxQueue: " << maxQueueLength << " maxThreads: " << maxThreads << std::endl;
 
     _serviceDatabase->SetPort(_name, port);

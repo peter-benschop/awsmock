@@ -12,8 +12,9 @@ namespace AwsMock::Service {
 
     Core::MetricServiceTimer measure(_metricService, GATEWAY_GET_TIMER);
     _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "GET");
-    log_trace_stream(_logger) << "Gateway GET request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
+    log_info_stream(_logger) << "Gateway GET request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
 
+    //DumpRequestHeaders(request);
     SetHeaders(request, region, user);
     ForwardRequest(request, response, _host, _port);
   }
@@ -93,7 +94,7 @@ namespace AwsMock::Service {
       response.set(i.first, i.second);
     }
     long send = Poco::StreamCopier::copyStream(is, response.send(), 1024 * 1024);
-    log_debug_stream(_logger) << "Bytes send: " << send << std::endl;
+    log_trace_stream(_logger) << "Bytes send: " << send << std::endl;
 
     log_trace_stream(_logger) << "Backend service response send back to client" << std::endl;
   }

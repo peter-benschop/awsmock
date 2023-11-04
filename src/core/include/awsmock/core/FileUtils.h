@@ -33,6 +33,7 @@
 #include "Poco/String.h"
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
+#include "Poco/StreamCopier.h"
 #include "Poco/UUIDGenerator.h"
 #include "Poco/Zip/Decompress.h"
 #include "Poco/Zip/Compress.h"
@@ -45,22 +46,6 @@
 #include "awsmock/core/StringUtils.h"
 
 namespace AwsMock::Core {
-
-  /*struct [[maybe_unused]] rangebuf : std::streambuf {
-
-    rangebuf(std::streampos start, size_t size, std::streambuf *sbuf) : size_(size), sbuf_(sbuf) {
-      sbuf->seekpos(start, std::ios_base::in);
-    }
-
-    int underflow() override {
-      size_t r(this->sbuf_->sgetn(this->buf_, std::min<size_t>(sizeof(this->buf_), this->size_));
-      this->size -= r;
-      this->setg(this->buf_, this->buf_, this->buf_ + r);
-      return this->gptr() == this->egptr() ? traits_type::eof() : traits_type::to_int_type(*this->gptr());
-    }
-    size_t size_;
-    std::streambuf *sbuf_;
-  };*/
 
   /**
    * File utilities.
@@ -199,6 +184,17 @@ namespace AwsMock::Core {
     static void AppendBinaryFiles(const std::string &outFile, const std::string &inDir, const std::vector<std::string> &files);
 
     /**
+     * Append several text files to a single output file.
+     *
+     * <p>The out file will be truncated, before its used </p>
+     *
+     * @param outFile output file name
+     * @param inDir input directory
+     * @param files string vector of text files to append to output file
+     */
+    static void AppendTextFiles(const std::string &outFile, const std::string &inDir, const std::vector<std::string> &files);
+
+    /**
      * Strips the path from the filename
      *
      * @param fileName name of the file
@@ -243,7 +239,14 @@ namespace AwsMock::Core {
      */
     static bool Touch(const std::string &fileName);
 
+    /**
+     * Logger
+     */
     static Core::LogStream logger;
+
+    /**
+     *
+     */
   };
 } // namespace AwsMock::Core
 #endif // AWSMOCK_CORE_FILEUTILS_H

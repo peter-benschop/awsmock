@@ -29,107 +29,107 @@ typedef enum {
 
 namespace AwsMock::Core {
 
+  /**
+   * CURL utilities.
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
+  class CurlUtils {
+
+  public:
+
     /**
-     * CURL utilities.
-     *
-     * @author jens.vogt@opitz-consulting.com
+     * Constructor
      */
-    class CurlUtils {
+    CurlUtils();
 
-    public:
+    /**
+     * Send request to a HTTP URL
+     *
+     * @param method HTTP method
+     * @param path request path
+     * @param extraHeaders header map
+     * @param body request body
+     * @return Dto::Curl::CurlResponse
+     */
+    CurlResponse SendHttpRequest(const std::string &method, const std::string &path, const std::map<std::string, std::string> &extraHeaders = {}, const std::string &body = {});
 
-      /**
-       * Constructor
-       */
-      CurlUtils();
+    /**
+     * Send request
+     *
+     * @param method HTTP method
+     * @param path request path
+     * @return Dto::Curl::CurlResponse
+     */
+    CurlResponse SendUnixSocketRequest(const std::string &method, const std::string &path);
 
-      /**
-       * Send request to a HTTP URL
-       *
-       * @param method HTTP method
-       * @param path request path
-       * @param extraHeaders header map
-       * @param body request body
-       * @return Dto::Curl::CurlResponse
-       */
-      CurlResponse SendHttpRequest(const std::string &method, const std::string &path, const std::map<std::string,std::string>&extraHeaders, const std::string &body={});
+    /**
+     * Send request
+     *
+     * @param method HTTP method
+     * @param path request path
+     * @param body request body
+     * @return Dto::Curl::CurlResponse
+     */
+    CurlResponse SendUnixSocketRequest(const std::string &method, const std::string &path, const std::string &body);
 
-      /**
-       * Send request
-       *
-       * @param method HTTP method
-       * @param path request path
-       * @return Dto::Curl::CurlResponse
-       */
-      CurlResponse SendUnixSocketRequest(const std::string &method, const std::string &path);
+    /**
+     * Send a file request using unix sockets
+     *
+     * @param method HTTP method
+     * @param path request path
+     * @param header request extra headers
+     * @param fileName filename to send as request body
+     * @return Dto::Curl::CurlResponse
+     */
+    CurlResponse SendUnixSocketFileRequest(const std::string &method, const std::string &path, const std::string &header, const std::string &fileName);
 
-      /**
-       * Send request
-       *
-       * @param method HTTP method
-       * @param path request path
-       * @param body request body
-       * @return Dto::Curl::CurlResponse
-       */
-      CurlResponse SendUnixSocketRequest(const std::string &method, const std::string &path, const std::string &body);
+  private:
 
-      /**
-       * Send a file request using unix sockets
-       *
-       * @param method HTTP method
-       * @param path request path
-       * @param header request extra headers
-       * @param fileName filename to send as request body
-       * @return Dto::Curl::CurlResponse
-       */
-      CurlResponse SendUnixSocketFileRequest(const std::string &method, const std::string &path, const std::string &header, const std::string &fileName);
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
 
-    private:
+    /**
+     * Curl
+     */
+    CURL *curl{};
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+    /**
+     * Curl response codes
+     */
+    CURLcode res{};
 
-      /**
-       * Curl
-       */
-      CURL *curl{};
+    /**
+     * Host URI
+     */
+    std::string _apiVersion;
 
-      /**
-       * Curl response codes
-       */
-      CURLcode res{};
+    /**
+     * Curl headers
+     */
+    struct curl_slist *headers = nullptr;
 
-      /**
-       * Host URI
-       */
-      std::string _apiVersion;
+    /**
+     * Read buffer
+     */
+    std::string _readBuffer;
 
-      /**
-       * Curl headers
-       */
-      struct curl_slist *headers = nullptr;
-
-      /**
-       * Read buffer
-       */
-      std::string _readBuffer;
-
-      /**
-       * Write callback
-       *
-       * @param contents
-       * @param size
-       * @param nmemb
-       * @param userp
-       * @return
-       */
-      [[maybe_unused]] static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp){
-          ((std::string*)userp)->append((char*)contents, size * nmemb);
-          return size * nmemb;
-      }
-    };
+    /**
+     * Write callback
+     *
+     * @param contents
+     * @param size
+     * @param nmemb
+     * @param userp
+     * @return
+     */
+    [[maybe_unused]] static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp) {
+      ((std::string *) userp)->append((char *) contents, size * nmemb);
+      return size * nmemb;
+    }
+  };
 }
 
 #endif //AWSMOCK_CORE_CURLUTILS_H

@@ -415,12 +415,17 @@ namespace AwsMock::Service {
     }
   }
 
-  void AbstractHandler::SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long min, long max, const HeaderMap &extraHeader) {
+  void AbstractHandler::SendRangeResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long min, long max, long size, const HeaderMap &extraHeader) {
     log_trace_stream(_logger) << "Sending OK response, status: 200, filename: " << fileName << " min: " << min << " max: " << max << std::endl;
     try {
 
+      if (!Core::MemoryMappedFile::instance().IsMapped()) {
+        Core::MemoryMappedFile::instance().OpenFile(fileName);
+      }
+
       // Set headers
-      SetHeaders(response, max - min, extraHeader);
+      long range = max - min + 1;
+      SetHeaders(response, range, extraHeader);
 
       //DumpResponseHeaders(response);
 
@@ -431,13 +436,19 @@ namespace AwsMock::Service {
       std::ostream &os = response.send();
 
       // Send body
-        long range = max - min;
-        char buffer[range];
-        std::ifstream ifs(fileName, std::ios::binary | std::ios::in);
-        ifs.seekg(min, std::ios::beg);
-        ifs.readsome(buffer, range);
+      if (range > 0) {
+        char *buffer = new char[range + 1];
+        Core::MemoryMappedFile::instance().ReadChunk(min, range, (char *) buffer);
         os.write(buffer, range);
-        ifs.close();
+        os.flush();
+        os.clear();
+        delete[] buffer;
+      }
+
+      // Close file
+      if (min + range >= size) {
+        Core::MemoryMappedFile::instance().CloseFile();
+      }
 
     } catch (Poco::Exception &exc) {
       log_error_stream(_logger) << "Exception: " << exc.message() << std::endl;
@@ -532,7 +543,7 @@ namespace AwsMock::Service {
     response.set("Date", Poco::DateTimeFormatter::format(Poco::DateTime(), Poco::DateTimeFormat::HTTP_FORMAT));
     response.set("Content-Length", std::to_string(contentLength));
     response.set("Content-Type", "application/xml");
-    response.set("Connection", "Keep-alive: 300");
+    response.set("Connection", "keep-alive");
     response.set("Server", "awsmock");
 
     // Extra headers

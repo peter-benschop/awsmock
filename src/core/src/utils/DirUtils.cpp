@@ -97,7 +97,8 @@ namespace AwsMock::Core {
       }
       ++it;
     }
-    std::sort(fileNames.begin(), fileNames.end());
+    // start at position 6, comparing 6 characters
+    std::sort(fileNames.begin(), fileNames.end(), SubstringCompare('-'));
     return fileNames;
   }
 

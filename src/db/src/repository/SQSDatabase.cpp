@@ -84,11 +84,7 @@ namespace AwsMock::Database {
 
   Entity::SQS::Queue SQSDatabase::GetQueueByUrl(const std::string &queueUrl) {
 
-    bsoncxx::builder::stream::document filter{};
-    filter << "queueUrl" << queueUrl << bsoncxx::builder::stream::finalize;
-
     mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("queueUrl", make_document(kvp("$regex", queueUrl)))));
-
     if (!mResult) {
       return {};
     }

@@ -98,8 +98,10 @@ namespace AwsMock::Core {
     // Set headers
     headers = curl_slist_append(nullptr, "Accept: application/json");
     headers = curl_slist_append(headers, "Content-Type: application/json");
-    for (const auto &it : extraHeaders) {
-      headers = curl_slist_append(headers, (it.first + ": " + it.second).c_str());
+    if(!extraHeaders.empty()) {
+      for (const auto &it : extraHeaders) {
+        headers = curl_slist_append(headers, (it.first + ": " + it.second).c_str());
+      }
     }
 
     // Set options
@@ -109,6 +111,7 @@ namespace AwsMock::Core {
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &_readBuffer);
+    //curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
     if (!body.empty()) {
       curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body.c_str());
     }

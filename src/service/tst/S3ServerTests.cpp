@@ -26,6 +26,10 @@
                                 <LocationConstraint>eu-central-1</LocationConstraint> \
                              </CreateBucketConfiguration>"
 #define CREATE_BUCKET_RESPONSE "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<CreateBucketResult>\n\t<BuckerArn>arn</BuckerArn>\n</CreateBucketResult>\n"
+#define TEST_CONTENT R"({"test":"test"})"
+#define VERSIONING_BODY "<VersioningConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">" \
+                        "  <Status>Enabled</Status>" \
+                        "</VersioningConfiguration>"
 
 namespace AwsMock::Service {
 
@@ -83,6 +87,21 @@ namespace AwsMock::Service {
     EXPECT_EQ(1, bucketList.size());
   }
 
+  TEST_F(S3ServerTest, BucketCreateVersionedTest) {
+
+    // arrange
+    Core::CurlResponse response = _curlUtils.SendHttpRequest("PUT", _endpoint + "/" + BUCKET, _extraHeaders, LOCATION_CONSTRAINT);
+    Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
+    EXPECT_EQ(1, bucketList.size());
+
+    // act
+    Core::CurlResponse versioningResponse = _curlUtils.SendHttpRequest("PUT", _endpoint + "/" + BUCKET + "?versioning", _extraHeaders, VERSIONING_BODY);
+
+    // assert
+    EXPECT_TRUE(versioningResponse.statusCode == Poco::Net::HTTPResponse::HTTP_NO_CONTENT);
+    EXPECT_EQ(1, bucketList.size());
+  }
+
   TEST_F(S3ServerTest, BucketDeleteTest) {
 
     // arrange
@@ -104,7 +123,7 @@ namespace AwsMock::Service {
     EXPECT_TRUE(bucketCreateResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
 
     // act
-    Core::CurlResponse objectCreateResponse = _curlUtils.SendHttpRequest("PUT", _endpoint + "/" + BUCKET + "/" + KEY, _extraHeaders, R"({"test":"test"})");
+    Core::CurlResponse objectCreateResponse = _curlUtils.SendHttpRequest("PUT", _endpoint + "/" + BUCKET + "/" + KEY, _extraHeaders, TEST_CONTENT);
     Database::Entity::S3::ObjectList objectList = _database.ListBucket(BUCKET);
 
     // assert
@@ -112,12 +131,28 @@ namespace AwsMock::Service {
     EXPECT_EQ(1, objectList.size());
   }
 
+  TEST_F(S3ServerTest, ObjectGetTest) {
+
+    // arrange
+    Core::CurlResponse bucketCreateResponse = _curlUtils.SendHttpRequest("PUT", _endpoint + "/" + BUCKET, _extraHeaders, LOCATION_CONSTRAINT);
+    EXPECT_TRUE(bucketCreateResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
+    Core::CurlResponse objectCreateResponse = _curlUtils.SendHttpRequest("PUT", _endpoint + "/" + BUCKET + "/" + KEY, _extraHeaders, TEST_CONTENT);
+    EXPECT_TRUE(objectCreateResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
+
+    // act
+    Core::CurlResponse objectGetResponse = _curlUtils.SendHttpRequest("GET", _endpoint + "/" + BUCKET + "/" + KEY,_extraHeaders);
+
+    // assert
+    EXPECT_TRUE(objectGetResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
+    EXPECT_FALSE(objectGetResponse.output.empty());
+  }
+
   TEST_F(S3ServerTest, ObjectDeleteTest) {
 
     // arrange
     Core::CurlResponse bucketCreateResponse = _curlUtils.SendHttpRequest("PUT", _endpoint + "/" + BUCKET, _extraHeaders, LOCATION_CONSTRAINT);
     EXPECT_TRUE(bucketCreateResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
-    Core::CurlResponse objectCreateResponse = _curlUtils.SendHttpRequest("PUT", _endpoint + "/" + BUCKET + "/" + KEY, _extraHeaders, R"({"test":"test"})");
+    Core::CurlResponse objectCreateResponse = _curlUtils.SendHttpRequest("PUT", _endpoint + "/" + BUCKET + "/" + KEY, _extraHeaders, TEST_CONTENT);
     EXPECT_TRUE(objectCreateResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
 
     // act

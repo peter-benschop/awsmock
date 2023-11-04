@@ -15,7 +15,7 @@ namespace AwsMock::Service {
 
     try {
 
-      // Strange behaviour of the S§CRT client
+      // Strange behaviour of the S3CRT client
       std::string uri = request.getURI();
       if (Core::StringUtils::Contains(request.getURI(), _endpoint)) {
         uri = uri.substr(_endpoint.length());
@@ -54,6 +54,7 @@ namespace AwsMock::Service {
           s3Request.min = std::stol(Core::StringUtils::Split(parts, '-')[0]);
           s3Request.max = std::stol(Core::StringUtils::Split(parts, '-')[1]);
         }
+        log_info_stream(_logger) << "Requested multipart download range: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << std::endl;
 
         // Get object
         Dto::S3::GetObjectResponse s3Response = _s3Service.GetObject(s3Request);
@@ -69,18 +70,13 @@ namespace AwsMock::Service {
         }
 
         if (request.has("Range")) {
-          long range = s3Request.max - s3Request.min;
-          long min = s3Request.max;
-          long max = s3Request.max + range - 1;
-          if (max > s3Response.size) {
-            max = s3Response.size - 1;
-          }
+          long range = s3Request.max - s3Request.min + 1;
           headerMap["Accept-Ranges"] = "bytes";
-          headerMap["Content-Range"] = "bytes " + std::to_string(min) + "-" + std::to_string(max) + "/" + std::to_string(s3Response.size);
-          headerMap["Content-Length"] = std::to_string(max - min);
-          log_info_stream(_logger) << "Progress: " << std::to_string(min) << "-" << std::to_string(max) << "/" << std::to_string(s3Response.size) << std::endl;
+          headerMap["Content-Range"] = "bytes " + std::to_string(s3Request.min) + "-" + std::to_string(s3Request.max) + "/" + std::to_string(s3Response.size);
+          headerMap["Content-Length"] = std::to_string(range);
+          log_info_stream(_logger) << "Progress: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << "/" << std::to_string(s3Response.size) << std::endl;
 
-          SendOkResponse(response, s3Response.filename, s3Request.min, s3Request.max, headerMap);
+          SendRangeResponse(response, s3Response.filename, s3Request.min, s3Request.max, s3Response.size, headerMap);
 
         } else {
 
@@ -135,7 +131,6 @@ namespace AwsMock::Service {
 
     try {
 
-      //std::string tmp = request.getURI();
       std::string bucket = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
       std::string key = Core::HttpUtils::GetPathParametersFromIndex(request.getURI(), 1);
       log_debug_stream(_logger) << "Found bucket/key, bucket: " << bucket << " key: " << key << std::endl;
@@ -145,7 +140,8 @@ namespace AwsMock::Service {
       bool isVersioning = Core::HttpUtils::HasQueryParameter(request.getURI(), "versioning");
       bool isCopyRequest = HeaderExists(request, "x-amz-copy-source");
 
-      //DumpBody(request);
+      //DumpRequestHeaders(request);
+      //std::cerr << request.getURI();
 
       if (isMultipartUpload) {
 
@@ -289,6 +285,7 @@ namespace AwsMock::Service {
         log_debug_stream(_logger) << "Starting multipart upload" << std::endl;
 
         Dto::S3::InitiateMultipartUploadResult result = _s3Service.CreateMultipartUpload(bucket, key, region, user);
+
         SendOkResponse(response, result.ToXml());
 
       } else if (isDeleteObjects) {

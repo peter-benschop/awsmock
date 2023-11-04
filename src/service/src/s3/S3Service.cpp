@@ -227,13 +227,17 @@ namespace AwsMock::Service {
     std::string uploadDir = GetMultipartUploadDirectory(uploadId);
     log_trace_stream(_logger) << "Using uploadDir: " << uploadDir << std::endl;
 
-    std::ofstream ofs(uploadDir + Poco::Path::separator() + uploadId + "-" + std::to_string(part));
+    std::string fileName = uploadDir + Poco::Path::separator() + uploadId + "-" + std::to_string(part);
+    std::ofstream ofs(fileName);
     Poco::StreamCopier::copyStream(stream, ofs);
     ofs.close();
     log_trace_stream(_logger) << "Part uploaded, part: " << part << " dir: " << uploadDir << std::endl;
 
+    // Get md5sum a ETag
+    std::string eTag = Core::Crypto::Base64Encode(Core::Crypto::GetMd5FromFile(fileName));
+
     log_info_stream(_logger) << "Upload part succeeded, part: " << part << std::endl;
-    return Core::StringUtils::GenerateRandomString(40);
+    return eTag;
   }
 
   Dto::S3::CompleteMultipartUploadResult S3Service::CompleteMultipartUpload(const std::string &uploadId, const std::string &bucket, const std::string &key, const std::string &region, const std::string &user) {
@@ -249,9 +253,13 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "Output file, outFile: " << outFile << std::endl;
 
     // Append all parts to the output file
-    Core::FileUtils::AppendBinaryFiles(outFile, uploadDir, files);
-    log_trace_stream(_logger) << "Input files appended to outfile, outFile: " << outFile << std::endl;
+    try {
+      Core::FileUtils::AppendTextFiles(outFile, uploadDir, files);
+      log_trace_stream(_logger) << "Input files appended to outfile, outFile: " << outFile << std::endl;
 
+    } catch(Poco::Exception &exc){
+      log_error_stream(_logger) << "Append to binary file failes, error: " << exc.message() << std::endl;
+    }
     // Get file size, MD5 sum
     long fileSize = (long) Core::FileUtils::FileSize(outFile);
     std::string md5sum = Core::Crypto::GetMd5FromFile(outFile);

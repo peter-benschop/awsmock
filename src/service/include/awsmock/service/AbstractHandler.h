@@ -24,6 +24,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/MemoryMappedFile.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/core/ResourceNotFoundException.h>
@@ -303,9 +304,10 @@ namespace AwsMock::Service {
      * @param fileName file to send
      * @param min minimum position
      * @param max minimum position
+     * @param size total size of the file
      * @param extraHeader HTTP header map values, added to the default headers
      */
-    void SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long min, long max, const HeaderMap &extraHeader = {});
+    void SendRangeResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long min, long max, long size, const HeaderMap &extraHeader = {});
 
     /**
      * Send a HEAD response (HTTP status code 200)
@@ -482,6 +484,10 @@ namespace AwsMock::Service {
      */
     HeaderMap _headerMap;
 
+    /**
+     * POco mutex
+     */
+    Poco::Mutex _mutex;
   };
 
 } // namespace AwsMock::Service

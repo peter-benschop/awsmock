@@ -34,7 +34,7 @@ RUN mkdir -p /tmp/awsmock/data/s3 && \
     mkdir -p /tmp/awsmock/init
 
 # Expose ports
-EXPOSE 80 80
+EXPOSE 4566 4566
 EXPOSE 8081 8081
 EXPOSE 27017 27017
 
