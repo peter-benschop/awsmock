@@ -46,3 +46,4 @@ endif ()
 
 # Installation
 install(FILES dist/etc/aws-mock.properties DESTINATION /etc)
+install(FILES dist/bin/awslocal DESTINATION /usr/bin)

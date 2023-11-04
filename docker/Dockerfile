@@ -9,8 +9,8 @@ RUN apt-get update && apt-get -y upgrade && apt-get -y install gh
 RUN mkdir -p /usr/src
 
 # Install aws-mock
-RUN cd /usr/src && \
-    git clone https://github.com/jensvogt/aws-mock.git && \
+WORKDIR /usr/src
+RUN git clone https://github.com/jensvogt/aws-mock.git && \
     cd /usr/src/aws-mock && \
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr . && \
     cmake --build . --config Release && \
@@ -23,6 +23,12 @@ RUN mkdir -p /var/log/supervisor
 RUN mkdir -p /etc/supervisor/conf.d/
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
+# AWS CLI v2
+WORKDIR /usr/src
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    sudo ./aws/install --bin-dir /usr/bin --install-dir /usr
+
 # Cleanup
 RUN rm -rf /usr/src
 
@@ -30,12 +36,13 @@ RUN rm -rf /usr/src
 RUN mkdir -p /tmp/awsmock/data/s3 && \
     mkdir -p /tmp/awsmock/data/lambda && \
     mkdir -p /tmp/awsmock/data/transfer && \
-    mkdir -p /tmp/awsmock/data/tmp && \
-    mkdir -p /tmp/awsmock/init
+    mkdir -p /tmp/awsmock/data/tmp
 
 # Expose ports
 EXPOSE 4566 4566
 EXPOSE 8081 8081
 EXPOSE 27017 27017
+
+VOLUME /var/run/docker.sock /var/run/docker.sock
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
