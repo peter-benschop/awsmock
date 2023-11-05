@@ -1,6 +1,6 @@
 FROM jensvogt/aws-mock-base:latest
 
-RUN apt-get update && apt-get -y upgrade
+RUN apt-get update && apt-get -y upgrade && apt-get install zip
 
 # Install basics
 ARG GH_TOKEN=${GH_TOKEN}
@@ -46,8 +46,8 @@ RUN aws configure set aws_access_key_id none && \
     aws configure set profile.awsmock.region eu-central-1 && \
     aws configure set profile.awsmock.aws_access_key_id none && \
     aws configure set profile.awsmock.aws_secret_access_key none
- \
-    # Expose ports
+
+# Expose ports
 EXPOSE 4566 4566
 EXPOSE 8081 8081
 EXPOSE 27017 27017
