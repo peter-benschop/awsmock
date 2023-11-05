@@ -2,7 +2,7 @@ FROM debian:bookworm-slim
 
 # Install basics
 RUN apt-get update && apt-get -y install build-essential cmake git openssl libssl-dev supervisor libarchive-dev \
-    zlib1g-dev wget libarchive13 libz1 libcurl4-openssl-dev libtbb-dev libasio-dev gnupg curl gh libsystemd.dev
+    zlib1g-dev wget libarchive13 libz1 libcurl4-openssl-dev libtbb-dev libasio-dev gnupg curl gh libsystemd.dev zip
 RUN mkdir -p /usr/src
 
 # Install google test
@@ -42,7 +42,7 @@ RUN wget http://security.debian.org/debian-security/pool/updates/main/o/openssl/
     rm libssl1.1_1.1.1n-0+deb11u5_amd64.deb
 
 # Install MongoDB
-RUN apt-get install gnupg2 wget -y && \
+RUN apt-get install gnupg2 -y && \
     curl -fsSL https://pgp.mongodb.com/server-7.0.asc | gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor && \
     echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] http://repo.mongodb.org/apt/debian bullseye/mongodb-org/7.0 main" | tee /etc/apt/sources.list.d/mongodb-org-7.0.list && \
     apt-get update && \

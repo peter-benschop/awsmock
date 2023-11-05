@@ -33,56 +33,62 @@ namespace AwsMock::Service {
       /**
        * Send a lambda create function request.
        *
+       * @param module AwsMock module name
        * @param url HTTP URL
        * @param body HTTP message body
        * @param contentType HTTP content type
        */
-      void SendPostRequest(const std::string &url, const std::string &body, const std::string &contentType);
+      void SendPostRequest(const std::string &module, const std::string &url, const std::string &body, const std::string &contentType);
       
       /**
        * Send a PUT request.
        *
+       * @param module AwsMock module name
        * @param url HTTP URL
        * @param body HTTP message body
        * @param contentType HTTP content type
        */
-      void SendPutRequest(const std::string &url, const std::string &body, const std::string &contentType);
+      void SendPutRequest(const std::string &module, const std::string &url, const std::string &body, const std::string &contentType);
       
       /**
        * Send a DELETE request
        *
+       * @param module AwsMock module name
        * @param url HTTP URL
        * @param body HTTP message body
        * @param contentType HTTP content type
        */
-      void SendDeleteRequest(const std::string &url, const std::string &body, const std::string &contentType);
+      void SendDeleteRequest(const std::string &module, const std::string &url, const std::string &body, const std::string &contentType);
       
       /**
        * Send a HEAD request
        *
+       * @param module AwsMock module name
        * @param url HTTP URL
        * @param contentType HTTP content type
        * @return true, if status = 200
        */
-      bool SendHeadRequest(const std::string &url, const std::string &contentType);
+      bool SendHeadRequest(const std::string &module, const std::string &url, const std::string &contentType);
       
       /**
        * Send a lambda create function request.
        *
+       * @param module AwsMock module name
        * @param url HTTP URL
        * @param fileName name of the file to send
        * @param headers HTTP header map
        */
-      void SendFile(const std::string &url, const std::string &fileName, const std::map <std::string, std::string> &headers);
+      void SendFile(const std::string &module, const std::string &url, const std::string &fileName, const std::map <std::string, std::string> &headers);
     
     private:
       
       /**
        * Adds the authorization header.
        *
+       * @param module AwsMock module name
        * @param request HTTP request
        */
-      void AddAuthorization(Poco::Net::HTTPRequest &request);
+      void AddAuthorization(const std::string &module, Poco::Net::HTTPRequest &request);
       
       /**
        * Logger

@@ -1,11 +1,13 @@
 FROM jensvogt/aws-mock-base:latest
 
-ARG GH_TOKEN=${GH_TOKEN}
-ENV GH_TOKEN=${GH_TOKEN}
-
-RUN apt-get update && apt-get -y upgrade && apt-get -y install gh unzip
+RUN apt-get update && apt-get -y upgrade
 
 # Install basics
+ARG GH_TOKEN=${GH_TOKEN}
+ENV GH_TOKEN=${GH_TOKEN}
+RUN gh auth login
+
+# Create build environment
 RUN mkdir -p /usr/src
 
 # Install aws-mock
@@ -27,7 +29,7 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 WORKDIR /usr/src
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
-    sudo ./aws/install --bin-dir /usr/bin --install-dir /usr
+    ./aws/install --bin-dir /usr/bin --install-dir /usr
 
 # Cleanup
 RUN rm -rf /usr/src
@@ -38,7 +40,14 @@ RUN mkdir -p /tmp/awsmock/data/s3 && \
     mkdir -p /tmp/awsmock/data/transfer && \
     mkdir -p /tmp/awsmock/data/tmp
 
-# Expose ports
+RUN aws configure set aws_access_key_id none && \
+    aws configure set aws_secret_access_key none && \
+    aws configure set default.region eu-central-1 && \
+    aws configure set profile.awsmock.region eu-central-1 && \
+    aws configure set profile.awsmock.aws_access_key_id none && \
+    aws configure set profile.awsmock.aws_secret_access_key none
+ \
+    # Expose ports
 EXPOSE 4566 4566
 EXPOSE 8081 8081
 EXPOSE 27017 27017

@@ -180,35 +180,50 @@ namespace AwsMock {
 
       void StartServices() {
 
+        // Handle environment variables
+        if(_configuration.has("awsmock.service.sqs.active") && _configuration.getBool("awsmock.service.sqs.active")) {
+          _serviceDatabase.SetStatus("sqs", Database::Entity::Module::ModuleStatus::RUNNING);
+        }
+        if(_configuration.has("awsmock.service.s3.active") && _configuration.getBool("awsmock.service.s3.active")) {
+          _serviceDatabase.SetStatus("s3", Database::Entity::Module::ModuleStatus::RUNNING);
+        }
+        if(_configuration.has("awsmock.service.sns.active") && _configuration.getBool("awsmock.service.sns.active")) {
+          _serviceDatabase.SetStatus("sns", Database::Entity::Module::ModuleStatus::RUNNING);
+        }
+        if(_configuration.has("awsmock.service.lambda.active") && _configuration.getBool("awsmock.service.lambda.active")) {
+          _serviceDatabase.SetStatus("lambda", Database::Entity::Module::ModuleStatus::RUNNING);
+        }
+        if(_configuration.has("awsmock.service.transfer.active") && _configuration.getBool("awsmock.service.transfer.active")) {
+          _serviceDatabase.SetStatus("transfer", Database::Entity::Module::ModuleStatus::RUNNING);
+        }
+        if(_configuration.has("awsmock.gateway.active") && _configuration.getBool("awsmock.gateway.active")) {
+          _serviceDatabase.SetStatus("gateway", Database::Entity::Module::ModuleStatus::RUNNING);
+        }
+
+        // Get last module configuration
         Database::Entity::Module::ModuleList modules = _serviceDatabase.ListModules();
         for (const auto &module : modules) {
-          if (module.name == "s3") {
-            _serviceDatabase.SetStatus(module.name, Database::Entity::Module::ModuleStatus::RUNNING);
+          if (module.name == "s3" && module.status == Database::Entity::Module::ModuleStatus::RUNNING) {
             _s3Server = new Service::S3Server(_configuration, _metricService);
             Poco::ThreadPool::defaultPool().start(*_s3Server);
             _serverMap[module.name] = _s3Server;
-          } else if (module.name == "sqs") {
-            _serviceDatabase.SetStatus(module.name, Database::Entity::Module::ModuleStatus::RUNNING);
+          } else if (module.name == "sqs" && module.status == Database::Entity::Module::ModuleStatus::RUNNING) {
             _sqsServer = new Service::SQSServer(_configuration, _metricService);
             Poco::ThreadPool::defaultPool().start(*_sqsServer);
             _serverMap[module.name] = _sqsServer;
-          } else if (module.name == "sns") {
-            _serviceDatabase.SetStatus(module.name, Database::Entity::Module::ModuleStatus::RUNNING);
+          } else if (module.name == "sns" && module.status == Database::Entity::Module::ModuleStatus::RUNNING) {
             _snsServer = new Service::SNSServer(_configuration, _metricService);
             Poco::ThreadPool::defaultPool().start(*_snsServer);
             _serverMap[module.name] = _snsServer;
-          } else if (module.name == "lambda") {
-            _serviceDatabase.SetStatus(module.name, Database::Entity::Module::ModuleStatus::RUNNING);
+          } else if (module.name == "lambda" && module.status == Database::Entity::Module::ModuleStatus::RUNNING) {
             _lambdaServer = new Service::LambdaServer(_configuration, _metricService, _createQueue, _invokeQueue);
             Poco::ThreadPool::defaultPool().start(*_lambdaServer);
             _serverMap[module.name] = _lambdaServer;
-          } else if (module.name == "transfer") {
-            _serviceDatabase.SetStatus(module.name, Database::Entity::Module::ModuleStatus::RUNNING);
+          } else if (module.name == "transfer" && module.status == Database::Entity::Module::ModuleStatus::RUNNING) {
             _transferServer = new Service::TransferServer(_configuration, _metricService);
             Poco::ThreadPool::defaultPool().start(*_transferServer);
             _serverMap[module.name] = _transferServer;
-          } else if (module.name == "gateway") {
-            _serviceDatabase.SetStatus(module.name, Database::Entity::Module::ModuleStatus::RUNNING);
+          } else if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::RUNNING) {
             _gatewayServer = new Service::GatewayServer(_configuration, _metricService);
             Poco::ThreadPool::defaultPool().start(*_gatewayServer);
             _serverMap[module.name] = _gatewayServer;

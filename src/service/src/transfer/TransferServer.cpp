@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
 
   TransferServer::TransferServer(Core::Configuration &configuration, Core::MetricService &metricService)
-      : AbstractServer(configuration, "transfer"), AbstractWorker(configuration), _logger(Poco::Logger::get("TransferServer")), _configuration(configuration), _metricService(metricService) {
+      : AbstractServer(configuration, "transfer"), AbstractWorker(configuration), _logger(Poco::Logger::get("TransferServer")), _configuration(configuration), _metricService(metricService), _module("transfer") {
 
     // REST manager configuration
     _port = _configuration.getInt("awsmock.service.transfer.port", TRANSFER_DEFAULT_PORT);
@@ -157,18 +157,18 @@ namespace AwsMock::Service {
     }
   }
 
-  void TransferServer::SendCreateBucketRequest(const std::string &bucket) {
+  void TransferServer::SendCreateBucketRequest(const std::string &module, const std::string &bucket) {
 
     std::string url = _baseUrl + "/" + bucket;
     Dto::S3::CreateBucketConstraint location = {.location=_region};
-    SendPutRequest(url, location.ToXml(), CONTENT_TYPE_JSON);
+    SendPutRequest(module, url, location.ToXml(), CONTENT_TYPE_JSON);
     log_debug_stream(_logger) << "Create bucket message request send" << std::endl;
   }
 
-  bool TransferServer::SendExistsBucketRequest(const std::string &bucket) {
+  bool TransferServer::SendExistsBucketRequest(const std::string &module, const std::string &bucket) {
 
     std::string url = _baseUrl + "/" + bucket;
-    bool result = SendHeadRequest(url, CONTENT_TYPE_JSON);
+    bool result = SendHeadRequest(module, url, CONTENT_TYPE_JSON);
     log_debug_stream(_logger) << "Bucket exists message request send, result: " << result << std::endl;
     return result;
   }

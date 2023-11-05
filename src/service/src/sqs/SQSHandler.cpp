@@ -6,8 +6,7 @@ namespace AwsMock::Service {
   SQSHandler::SQSHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition) : AbstractHandler(), _logger(Poco::Logger::get("SQSServiceHandler")), _configuration(configuration),
                                                                                                                                _metricService(metricService), _sqsService(configuration, condition) {
 
-    _accountId = _configuration.getString("awsmock.account.id", DEFAULT_SQS_ACCOUNT_ID);
-    _endpoint = _configuration.getString("awsmock.service.sqs.endpoint", DEFAULT_SQS_ENDPOINT);
+    _endpoint = Core::AwsUtils::GetEndpoint(configuration);
   }
 
   void SQSHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
@@ -42,7 +41,7 @@ namespace AwsMock::Service {
       if (action == "CreateQueue") {
 
         std::string queueName = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueName");
-        std::string queueUrl = "http://" + _endpoint + "/" + _accountId + "/" + queueName;
+        std::string queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, queueName);
 
         Dto::SQS::CreateQueueRequest sqsRequest = {
             .region=region,
@@ -101,7 +100,7 @@ namespace AwsMock::Service {
 
       } else if (action == "ReceiveMessage") {
 
-        std::string queueUrl = GetQueueUrl(request, payload, _endpoint);
+        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
 
         int maxMessages = GetIntParameter(payload, "MaxNumberOfMessages", 1, 10, 3);
         int waitTimeSeconds = GetIntParameter(payload, "WaitTimeSeconds", 1, 900, 5);
@@ -133,15 +132,14 @@ namespace AwsMock::Service {
 
       } else if (action == "GetQueueAttributes") {
 
-        std::string queueUrl = GetQueueUrl(request, payload, _endpoint);
+        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
 
         int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "Attribute");
         log_trace_stream(_logger) << "Got attribute names count: " << count << std::endl;
 
         std::vector<std::string> attributeNames;
         for (int i = 1; i <= count; i++) {
-          attributeNames.emplace_back(Core::HttpUtils::GetQueryParameterValueByName(payload,
-                                                                                    "Attribute." + std::to_string(i)));
+          attributeNames.emplace_back(Core::HttpUtils::GetQueryParameterValueByName(payload, "Attribute." + std::to_string(i)));
         }
 
         Dto::SQS::GetQueueAttributesRequest sqsRequest = {
@@ -155,17 +153,15 @@ namespace AwsMock::Service {
 
       } else if (action == "SetQueueAttributes") {
 
-        std::string queueUrl = GetQueueUrl(request, payload, _endpoint);
+        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
 
         int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "Attribute");
         log_trace_stream(_logger) << "Got attribute count, count: " << count << std::endl;
 
         AttributeList attributes;
         for (int i = 1; i <= count; i++) {
-          std::string attributeName =
-              Core::HttpUtils::GetQueryParameterValueByName(payload, "Attribute." + std::to_string(i) + ".Name");
-          std::string attributeValue =
-              Core::HttpUtils::GetQueryParameterValueByName(payload, "Attribute." + std::to_string(i) + ".Value");
+          std::string attributeName = Core::HttpUtils::GetQueryParameterValueByName(payload, "Attribute." + std::to_string(i) + ".Name");
+          std::string attributeValue = Core::HttpUtils::GetQueryParameterValueByName(payload, "Attribute." + std::to_string(i) + ".Value");
           attributes[attributeName] = attributeValue;
         }
 
@@ -264,14 +260,5 @@ namespace AwsMock::Service {
       messageAttributes.emplace_back(messageAttribute);
     }
     return messageAttributes;
-  }
-
-  std::string SQSHandler::GetQueueUrl(Poco::Net::HTTPServerRequest &request, const std::string &payload, const std::string &endpoint) {
-
-    std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
-    if (queueUrl.empty()) {
-      queueUrl = "http://" + endpoint + request.getURI();
-    }
-    return queueUrl;
   }
 }

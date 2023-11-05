@@ -203,14 +203,19 @@ namespace AwsMock::Service {
     int _requestTimeout;
 
     /**
-     * lambda service host
+     * Lambda service host
      */
     std::string _lambdaServiceHost;
 
     /**
-     * lambda service port
+     * Lambda service port
      */
     int _lambdaServicePort;
+
+    /**
+     * Module name
+     */
+    std::string _module;
   };
 
 } // namespace AwsMock::Service

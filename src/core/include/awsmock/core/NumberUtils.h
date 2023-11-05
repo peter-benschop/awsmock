@@ -53,6 +53,15 @@ namespace AwsMock::Core {
        * @return value in kilobytes
        */
       static long ToMegabytes(long value);
+
+      /**
+       * Returns a byte array from an integer
+       *
+       * @param n integer value
+       * @param bytes output bytes
+       * @param offset offset
+       */
+      static void GetIntAsByteArray(int n, unsigned char *bytes, int offset);
     };
 
 } // namespace AwsMock::Core

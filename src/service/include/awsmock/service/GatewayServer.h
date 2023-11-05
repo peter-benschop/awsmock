@@ -30,7 +30,6 @@
 #include <awsmock/service/LambdaMonitoring.h>
 #include <awsmock/service/LambdaHandlerFactory.h>
 
-#define GATEWAY_DEFAULT_PORT 4566
 #define GATEWAY_DEFAULT_HOST "localhost"
 #define GATEWAY_MAX_QUEUE 250
 #define GATEWAY_MAX_THREADS 50
