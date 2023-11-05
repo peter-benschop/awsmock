@@ -10,7 +10,7 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_array;
   using bsoncxx::builder::basic::make_document;
 
-  SQSDatabase::SQSDatabase(const Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("SQSDatabase")) {
+  SQSDatabase::SQSDatabase(const Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("SQSDatabase")), _configuration(configuration) {
 
     // Get collections
     _queueCollection = GetConnection()["sqs_queue"];
@@ -219,7 +219,7 @@ namespace AwsMock::Database {
         result.FromDocument(message);
 
         result.retries++;
-        result.receiptHandle = Core::AwsUtils::CreateReceiptHandler();
+        result.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
         messageList.push_back(result);
 
         // Update values
@@ -259,6 +259,7 @@ namespace AwsMock::Database {
                             make_document(
                                 kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)),
                                 kvp("receiptHandle", "")))));
+
       // Commit
       session.commit_transaction();
 
@@ -274,7 +275,7 @@ namespace AwsMock::Database {
     auto session = GetSession();
     session.start_transaction();
     try {
-      std::string dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(redrivePolicy.deadLetterTargetArn, _endpoint);
+      std::string dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(_configuration, redrivePolicy.deadLetterTargetArn);
       auto result = _messageCollection.update_many(make_document(kvp("queueUrl", queueUrl),
                                                                  kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)),
                                                                  kvp("retries", make_document(

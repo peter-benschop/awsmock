@@ -181,7 +181,6 @@ namespace AwsMock::Controller {
   }
 
   void Controller::AddAuthorization(std::map<std::string, std::string> &headers) {
-    headers["Authorization"] =
-        "AWS4-HMAC-SHA256 Credential=" + _user + "/" + _clientId + "/" + _region + "/module/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840";
+    headers["Authorization"] = Core::AwsUtils::GetAuthorizationHeader(_configuration, "module");
   }
 } // namespace AwsMock::Controller

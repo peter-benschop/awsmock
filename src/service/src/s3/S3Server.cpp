@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
 
   S3Server::S3Server(Core::Configuration &configuration, Core::MetricService &metricService)
-      : AbstractWorker(configuration), AbstractServer(configuration, "s3"), _logger(Poco::Logger::get("S3Server")), _configuration(configuration), _metricService(metricService) {
+      : AbstractWorker(configuration), AbstractServer(configuration, "s3"), _logger(Poco::Logger::get("S3Server")), _configuration(configuration), _metricService(metricService), _module("s3") {
 
     // Get HTTP configuration values
     _port = _configuration.getInt("awsmock.service.s3.port", S3_DEFAULT_PORT);
@@ -165,14 +165,14 @@ namespace AwsMock::Service {
     std::string url = "http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket;
     std::string body = constraint.ToXml();
 
-    SendPutRequest(url, body, contentType);
+    SendPutRequest(_module, url, body, contentType);
     log_debug_stream(_logger) << "S3 create bucket request send" << std::endl;
   }
 
   void S3Server::SendDeleteBucketRequest(const std::string &bucket, const std::string &contentType) {
 
     std::string url = "http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket;
-    SendDeleteRequest(url, {}, contentType);
+    SendDeleteRequest(_module, url, {}, contentType);
     log_debug_stream(_logger) << "S3 delete bucket request send" << std::endl;
   }
 
@@ -187,26 +187,26 @@ namespace AwsMock::Service {
     headers["Content-Type"] = contentType;
     headers["Content-Intern"] = "true";
 
-    SendFile(url, fileName, headers);
+    SendFile(_module, url, fileName, headers);
     log_debug_stream(_logger) << "S3 put object request send" << std::endl;
   }
 
   bool S3Server::SendHeadObjectRequest(const std::string &bucket, const std::string &contentType) {
 
     std::string url = "http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket;
-    return SendHeadRequest(url, contentType);
+    return SendHeadRequest(_module, url, contentType);
   }
 
   bool S3Server::SendHeadObjectRequest(const std::string &bucket, const std::string &key, const std::string &contentType) {
 
     std::string url = "http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket + "/" + key;
-    return SendHeadRequest(url, contentType);
+    return SendHeadRequest(_module, url, contentType);
   }
 
   void S3Server::SendDeleteObjectRequest(const std::string &bucket, const std::string &key, const std::string &contentType) {
 
     std::string url = "http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort) + "/" + bucket + "/" + key;
-    SendDeleteRequest(url, {}, contentType);
+    SendDeleteRequest(_module, url, {}, contentType);
     log_debug_stream(_logger) << "S3 delete object request send" << std::endl;
   }
 }

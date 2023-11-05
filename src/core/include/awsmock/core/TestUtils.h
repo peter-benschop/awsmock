@@ -9,6 +9,9 @@
 #include <string>
 #include <fstream>
 
+// AwsMock includes
+#include <awsmock/core/SystemUtils.h>
+
 #define TMP_PROPERTIES_FILE "/tmp/aws-mock.properties"
 
 namespace AwsMock::Core {

@@ -27,9 +27,6 @@
                                 "&Tag.Key=QueueType" \
                                 "&Tag.Value=Production"
 #define LIST_QUEUE_REQUEST "Action=ListQueues"
-#define LIST_QUEUE_RESPONSE "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<ListQueuesResponse>\n\t<ListQueuesResult>\n\t\t<QueueUrl>http://localhost:4566/000000000000/TestQueue</QueueUrl>\n\t</ListQueuesResult>\n\t<ResponseMetadata>\n\t\t<RequestId>b3f94441-5353-406e-85b7-566a12218fdb</RequestId>\n\t</ResponseMetadata>\n</ListQueuesResponse>\n"
-#define DELETE_QUEUE_REQUEST "Action=DeleteQueue" \
-                             "&QueueUrl=http://localhost:4566/000000000000/TestQueue"
 
 namespace AwsMock::Service {
 
@@ -46,7 +43,7 @@ namespace AwsMock::Service {
         _extraHeaders["Authorization"] =
             "AWS4-HMAC-SHA256 Credential=none/20230618/eu-central-1/sqs/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840";
 
-        // Define endpoint
+        // Define endpoint. This is the endpoint of the SQS server, not the gateway
         std::string _port = _configuration.getString("awsmock.service.sqs.port", std::to_string(SQS_DEFAULT_PORT));
         std::string _host = _configuration.getString("awsmock.service.sqs.host", SQS_DEFAULT_HOST);
         _endpoint = "http://" + _host + ":" + _port;
@@ -62,7 +59,6 @@ namespace AwsMock::Service {
         _sqsServer.StopServer();
         _database.DeleteAllQueues();
         Core::FileUtils::DeleteFile(_testFile);
-        //Poco::ThreadPool::defaultPool().stopAll();
       }
 
       Core::CurlUtils _curlUtils;
@@ -105,10 +101,13 @@ namespace AwsMock::Service {
   TEST_F(SQSServerTest, QueueDeleteTest) {
 
     // arrange
-    Core::CurlResponse createResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
+    Core::CurlResponse curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
+    Dto::SQS::CreateQueueResponse createResponse;
+    createResponse.FromXml(curlResponse.output);
 
     // act
-    Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", _endpoint, _extraHeaders, DELETE_QUEUE_REQUEST);
+    std::string deleteQueueRequest = "Action=DeleteQueue&QueueUrl="+createResponse.queueUrl;
+    Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", _endpoint, _extraHeaders, deleteQueueRequest);
     Database::Entity::SQS::QueueList queueList = _database.ListQueues();
 
     // assert

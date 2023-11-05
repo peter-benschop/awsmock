@@ -25,7 +25,7 @@ namespace AwsMock::Service {
 
     try {
       // Get queue ARN
-      std::string queueArn = Core::AwsUtils::CreateSQSQueueArn(request.region, _accountId, request.name);
+      std::string queueArn = Core::AwsUtils::CreateSqsQueueArn(_configuration, request.name);
 
       // Update database
       Database::Entity::SQS::Queue queue = _database->CreateQueue({
@@ -246,7 +246,7 @@ namespace AwsMock::Service {
 
       // Set parameters
       std::string messageId = Core::AwsUtils::CreateRequestId();
-      std::string receiptHandle = Core::AwsUtils::CreateReceiptHandler();
+      std::string receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
       std::string md5Body = GetMd5Body(request.body);
       std::string md5Attr = GetMd5Attributes(request.messageAttributes);
 

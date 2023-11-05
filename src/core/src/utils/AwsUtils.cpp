@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/core/AwsUtils.h>
+#include "awsmock/core/CryptoUtils.h"
 
 namespace AwsMock::Core {
 
@@ -18,12 +19,21 @@ namespace AwsMock::Core {
     return CreateArn("lambda", region, accountId, "function:" + function);
   }
 
-  std::string AwsUtils::CreateSQSQueueArn(const std::string &region, const std::string &accountId, const std::string &queueName) {
+  std::string AwsUtils::CreateSqsQueueUrl(const Configuration &configuration, const std::string &queueName) {
+    std::string endpoint = GetEndpoint(configuration);
+    std::string accountId = configuration.getString("awsmock.account.id", SQS_DEFAULT_ACCOUNT_ID);
+    return endpoint + "/" + accountId + "/" + queueName;
+  }
+
+  std::string AwsUtils::CreateSqsQueueArn(const Configuration &configuration, const std::string &queueName) {
+    std::string region = configuration.getString("awsmock.region", GATEWAY_DEFAULT_REGION);
+    std::string accountId = configuration.getString("awsmock.account.id", SQS_DEFAULT_ACCOUNT_ID);
     return CreateArn("sqs", region, accountId, queueName);
   }
 
-  std::string AwsUtils::ConvertSQSQueueArnToUrl(const std::string &queueArn, const std::string &endpoint) {
+  std::string AwsUtils::ConvertSQSQueueArnToUrl(const Configuration &configuration, const std::string &queueArn) {
 
+    std::string endpoint = GetEndpoint(configuration);
     std::vector <std::string> parts = StringUtils::Split(queueArn, ':');
     if (parts.size() < 6) {
       return {};
@@ -33,7 +43,7 @@ namespace AwsMock::Core {
     std::string queueName = parts[5];
     parts.clear();
 
-    return "http://" + endpoint + "/" + accountId + "/" + queueName;
+    return endpoint + "/" + accountId + "/" + queueName;
   }
 
   std::string AwsUtils::CreateSNSTopicArn(const std::string &region, const std::string &accountId, const std::string &topicName) {
@@ -46,5 +56,12 @@ namespace AwsMock::Core {
 
   std::string AwsUtils::CreateTransferArn(const std::string &region, const std::string &accountId, const std::string &serverId) {
     return CreateArn("transfer", region, accountId, "manager/" + serverId);
+  }
+
+  std::string AwsUtils::GetAuthorizationHeader(const Configuration &configuration, const std::string &module) {
+    std::string accountId = configuration.getString("awsmock.account.id");
+    std::string clientId = configuration.getString("awsmock.client.id");
+    std::string region = configuration.getString("awsmock.region");
+    return "AWS4-HMAC-SHA256 Credential=" + accountId + "/" + clientId + "/" + region + "/" + module + "/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840";
   }
 }

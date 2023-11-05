@@ -19,6 +19,7 @@
 #include <Poco/Logger.h>
 
 // AwsMock includes
+#include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CurlUtils.h>
 #include <awsmock/dto/module/Module.h>
 #include <awsmock/controller/Configuration.h>

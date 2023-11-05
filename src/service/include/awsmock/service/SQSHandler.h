@@ -129,16 +129,6 @@ namespace AwsMock::Service {
       static std::vector<Dto::SQS::MessageAttribute> GetMessageAttributes(const std::string &payload);
 
       /**
-       * Get the queue URL, either as part of the URL as as parameter in the message body.
-       *
-       * @param request HTTP request
-       * @param payload HTTP body
-       * @param endpoint HTTP endpoint
-       * @return list of message attributes
-       */
-      static std::string GetQueueUrl(Poco::Net::HTTPServerRequest &request, const std::string &payload, const std::string &endpoint);
-
-      /**
        * Logger
        */
       Core::LogStream _logger;

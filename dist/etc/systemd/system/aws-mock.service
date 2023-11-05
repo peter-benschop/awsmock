@@ -1,0 +1,14 @@
+[Unit]
+Description=AWS Simulation Service Manager
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=awsmock
+ExecStart=/usr/bin/awsmockmgr --loglevel information --config /etc/aws-mock.properties
+
+[Install]
+WantedBy=multi-user.target

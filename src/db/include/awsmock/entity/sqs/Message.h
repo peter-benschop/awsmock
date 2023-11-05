@@ -8,6 +8,7 @@
 // C++ includes
 #include <string>
 #include <vector>
+#include <algorithm>
 
 // Poco includes
 #include "Poco/DateTime.h"
@@ -22,6 +23,8 @@
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
+#include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/NumberUtils.h>
 #include <awsmock/entity/sqs/MessageAttribute.h>
 #include <awsmock/entity/sqs/MessageStatus.h>
 

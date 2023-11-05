@@ -248,7 +248,7 @@ namespace AwsMock::Service {
     std::vector<std::string> files = Core::DirUtils::ListFilesByPrefix(uploadDir, uploadId);
 
     // Output file
-    std::string filename = Core::AwsUtils::GenerateS3FileName();
+    std::string filename = Core::AwsUtils::CreateS3FileName();
     std::string outFile = _dataS3Dir + Poco::Path::separator() + filename;
     log_trace_stream(_logger) << "Output file, outFile: " << outFile << std::endl;
 
@@ -354,7 +354,7 @@ namespace AwsMock::Service {
       sourceObject = _database->GetObject(request.region, request.sourceBucket, request.sourceKey);
 
       // Copy physical file
-      std::string targetFile = Core::AwsUtils::GenerateS3FileName();
+      std::string targetFile = Core::AwsUtils::CreateS3FileName();
       std::string sourcePath = _dataS3Dir + Poco::Path::separator() + sourceObject.internalName;
       std::string targetPath = _dataS3Dir + Poco::Path::separator() + targetFile;
       Core::FileUtils::CopyTo(sourcePath, targetPath);
@@ -376,7 +376,7 @@ namespace AwsMock::Service {
 
       // Create version ID
       if (targetBucket.IsVersioned()) {
-        targetObject.versionId = Core::AwsUtils::GenerateS3VersionId();
+        targetObject.versionId = Core::AwsUtils::CreateS3VersionId();
       }
 
       // Create object
@@ -695,7 +695,7 @@ namespace AwsMock::Service {
   Dto::S3::PutObjectResponse S3Service::SaveUnversionedObject(Dto::S3::PutObjectRequest &request, std::istream &stream) {
 
     // Write file
-    std::string fileName = Core::AwsUtils::GenerateS3FileName();
+    std::string fileName = Core::AwsUtils::CreateS3FileName();
     std::string filePath = _dataS3Dir + Poco::Path::separator() + fileName;
     std::ofstream ofs(filePath);
     long size = Poco::StreamCopier::copyStream(stream, ofs);
@@ -745,7 +745,7 @@ namespace AwsMock::Service {
   Dto::S3::PutObjectResponse S3Service::SaveVersionedObject(Dto::S3::PutObjectRequest &request, std::istream &stream, Database::Entity::S3::Bucket &bucket) {
 
     // Write file
-    std::string fileName = Core::AwsUtils::GenerateS3FileName();
+    std::string fileName = Core::AwsUtils::CreateS3FileName();
     std::string filePath = _dataS3Dir + Poco::Path::separator() + fileName;
     std::ofstream ofs(filePath);
     long size = Poco::StreamCopier::copyStream(stream, ofs);
@@ -765,7 +765,7 @@ namespace AwsMock::Service {
     if (existingObject.oid.empty()) {
 
       // Version ID
-      std::string versionId = Core::AwsUtils::GenerateS3VersionId();
+      std::string versionId = Core::AwsUtils::CreateS3VersionId();
 
       // Create new version of new object
       object = {

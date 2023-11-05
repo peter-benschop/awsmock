@@ -8,7 +8,7 @@ namespace AwsMock::Service {
 
   LambdaServer::LambdaServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue, Poco::NotificationQueue &invokeQueue)
       : AbstractWorker(configuration), AbstractServer(configuration, "lambda"), _logger(Poco::Logger::get("LambdaServer")), _configuration(configuration), _metricService(metricService),
-        _createQueue(createQueue), _invokeQueue(invokeQueue) {
+        _createQueue(createQueue), _invokeQueue(invokeQueue), _module("lambda") {
 
     // Get HTTP configuration values
     _port = _configuration.getInt("awsmock.service.lambda.port", LAMBDA_DEFAULT_PORT);
@@ -138,7 +138,7 @@ namespace AwsMock::Service {
 
     std::string url = "http://" + _lambdaServiceHost + ":" + std::to_string(_lambdaServicePort) + "/2015-03-31/functions";
     std::string body = lambdaRequest.ToJson();
-    SendPostRequest(url, body, contentType);
+    SendPostRequest(_module, url, body, contentType);
     log_debug_stream(_logger) << "lambda create function request send" << std::endl;
   }
 

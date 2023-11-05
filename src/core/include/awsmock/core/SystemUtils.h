@@ -8,6 +8,7 @@
 // C includes
 #include <fcntl.h>
 #include <pwd.h>
+#include <unistd.h>
 
 // C++ includes
 #include <cstdio>
@@ -26,12 +27,17 @@
 // Poco includes
 #include <Poco/String.h>
 #include <Poco/RegularExpression.h>
+#include <Poco/Environment.h>
 
 // AwsMock includes
 #include "awsmock/core/CoreException.h"
 #include "awsmock/core/LogStream.h"
+#include "awsmock/core/RandomUtils.h"
 #include "awsmock/core/StreamFilter.h"
 #include "awsmock/core/FileUtils.h"
+
+#define RANDOM_PORT_MIN 32768
+#define RANDOM_PORT_MAX 65536
 
 namespace AwsMock::Core {
 
@@ -71,6 +77,29 @@ namespace AwsMock::Core {
        * @return absolute path of the home directory.
        */
       static std::string GetHomeDir();
+
+      /**
+       * Returns the node name (uname -n) of the server
+       *
+       * @return node name of the server
+       */
+      static std::string GetNodeName();
+
+      /**
+       * Returns the DNS host name of the server
+       *
+       * @return host name of the server
+       */
+      static std::string GetHostName();
+
+      /**
+       * Returns a random poprt number between 32768 and 65536
+       *
+       * @return random port
+       */
+      static int GetRandomPort();
+
+    private:
 
       /**
        * Logger

@@ -43,7 +43,7 @@ namespace AwsMock::Dto::S3 {
        *
        * @return DTO as string for logging.
        */
-      std::string ToString() const;
+      [[nodiscard]] std::string ToString() const;
 
       /**
        * Stream provider.

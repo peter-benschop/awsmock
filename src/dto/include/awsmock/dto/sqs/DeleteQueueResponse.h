@@ -55,7 +55,7 @@ namespace AwsMock::Dto::SQS {
        *
        * @return XML string
        */
-      static std::string ToXml();
+      std::string ToXml();
 
       /**
        * Converts the DTO to a string representation.

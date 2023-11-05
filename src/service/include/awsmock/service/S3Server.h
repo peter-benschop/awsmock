@@ -288,6 +288,11 @@ namespace AwsMock::Service {
      * S3 service port
      */
     int _s3ServicePort;
+
+    /**
+     * S3 module name
+     */
+    std::string _module;
   };
 
 } // namespace AwsMock::Service

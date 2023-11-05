@@ -6,6 +6,19 @@
 
 namespace AwsMock::Dto::SQS {
 
+  void CreateQueueResponse::FromXml(const std::string &xmlString) {
+
+    Poco::XML::DOMParser parser;
+    Poco::AutoPtr<Poco::XML::Document> pDoc = parser.parseString(xmlString);
+
+    Poco::XML::Node *node = pDoc->getNodeByPath("/CreateQueueResponse/CreateQueueResult/QueueUrl");
+    if(node) {
+      queueUrl = node->innerText();
+    } else {
+      std::cerr << "Exception: Wrong create queue payload" << std::endl;
+    }
+  }
+
   std::string CreateQueueResponse::ToXml() const {
 
     // Root

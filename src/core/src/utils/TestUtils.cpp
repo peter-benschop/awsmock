@@ -7,6 +7,8 @@
 namespace AwsMock::Core {
 
   void TestUtils::CreateTestConfigurationFile() {
+    int port = SystemUtils::GetRandomPort();
+    std::string hostName = SystemUtils::GetNodeName();
     std::ofstream ofs(TMP_PROPERTIES_FILE, std::ofstream::out | std::ofstream::trunc);
     // AWS configuration
     ofs << "awsmock.region=eu-central-1" << std::endl;
@@ -14,12 +16,11 @@ namespace AwsMock::Core {
     ofs << "awsmock.client.id=00000000" << std::endl;
     ofs << "awsmock.user=none" << std::endl;
     // Rest configuration
-    ofs << "awsmock.rest.host=localhost" << std::endl;
-    ofs << "awsmock.rest.port=4566" << std::endl;
-    ofs << "awsmock.data.dir=/tmp/test/data" << std::endl;
+    ofs << "awsmock.gateway.host=" << hostName << std::endl;
+    ofs << "awsmock.gateway.port=" << port << std::endl;
     // Database configuration
     ofs << "awsmock.mongodb.name=test" << std::endl;
-    ofs << "awsmock.mongodb.host=192.168.178.34" << std::endl;
+    ofs << "awsmock.mongodb.host=" << hostName << std::endl;
     ofs << "awsmock.mongodb.port=27017" << std::endl;
     ofs << "awsmock.mongodb.user=admin" << std::endl;
     ofs << "awsmock.mongodb.password=admin" << std::endl;
@@ -30,7 +31,7 @@ namespace AwsMock::Core {
     ofs << "awsmock.monitoring.s3.period=-1" << std::endl;
     // SQS configuration
     ofs << "awsmock.service.sqs.port=19501" << std::endl;
-    ofs << "awsmock.service.sqs.host=localhost" << std::endl;
+    ofs << "awsmock.service.sqs.host=" << hostName << std::endl;
     ofs << "awsmock.monitoring.sqs.period=-1" << std::endl;
     // Thread pool configuration
     ofs << "awsmock.threadpool.name=srv-worker" << std::endl;
