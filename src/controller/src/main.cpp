@@ -111,6 +111,7 @@ namespace AwsMock::Controller {
           std::cout << "restart [<service>]\t: restarts the given service. If no argument is given, restarts all services" << std::endl;
           std::cout << "logs\t\t\t: shows the manager logs" << std::endl;
           std::cout << "loglevel <level>\t: sets the manager log to level" << std::endl;
+          std::cout << "config\t: shows the gateway configuration" << std::endl;
           stopOptionsProcessing();
           exit(0);
 
@@ -157,6 +158,10 @@ namespace AwsMock::Controller {
         } else if (name == "loglevel") {
 
           _controller.SetLogLevel(args[1]);
+
+        } else if (name == "config") {
+
+          _controller.GetDefaults();
         }
       }
 

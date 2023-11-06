@@ -20,7 +20,7 @@ set(DOCKER_SOURCES src/docker/Port.cpp src/docker/Container.cpp src/docker/ListC
         src/docker/CreateContainerRequest.cpp)
 set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionResponse.cpp src/lambda/DeadLetterConfig.cpp
         src/lambda/Function.cpp src/lambda/InvocationNotification.cpp src/lambda/CreateNotification.cpp)
-set(MODULE_SOURCES src/module/Module.cpp)
+set(MODULE_SOURCES src/module/Module.cpp src/module/GatewayConfig.cpp)
 
 set(SOURCES ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES} ${MODULE_SOURCES})
 
