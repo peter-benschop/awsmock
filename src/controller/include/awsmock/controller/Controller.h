@@ -21,6 +21,7 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CurlUtils.h>
+#include <awsmock/dto/module/GatewayConfig.h>
 #include <awsmock/dto/module/Module.h>
 #include <awsmock/controller/Configuration.h>
 #include <awsmock/repository/ModuleDatabase.h>
@@ -35,103 +36,110 @@ namespace AwsMock::Controller {
 
   class Controller {
 
-    public:
+  public:
 
-      /**
-       * Constructor
-       */
-      explicit Controller(const Configuration &configuration);
+    /**
+     * Constructor
+     */
+    explicit Controller(const Configuration &configuration);
 
-      /**
-       * List all available services
-       */
-      void ListServices();
+    /**
+     * List all available services
+     */
+    void ListServices();
 
-      /**
-       * Start a service
-       *
-       * @param name service name, or 'all'
-       */
-      void StartService(const std::string &name);
+    /**
+     * Start a service
+     *
+     * @param name service name, or 'all'
+     */
+    void StartService(const std::string &name);
 
-      /**
-       * Restart a service
-       *
-       * @param name service name, or 'all'
-       */
-      void RestartService(const std::string &name);
+    /**
+     * Restart a service
+     *
+     * @param name service name, or 'all'
+     */
+    void RestartService(const std::string &name);
 
-      /**
-       * Stops a service
-       *
-       * @param name service name, or 'all'
-       */
-      void StopService(const std::string &name);
+    /**
+     * Stops a service
+     *
+     * @param name service name, or 'all'
+     */
+    void StopService(const std::string &name);
 
-      /**
-       * Show the logs
-       */
-      void ShowServiceLogs();
+    /**
+     * Show the logs
+     */
+    void ShowServiceLogs();
 
-      /**
-       * Sets the managers log level
-       *
-       * @param level log level
-       */
-      void SetLogLevel(const std::string &level);
+    /**
+     * Sets the managers log level
+     *
+     * @param level log level
+     */
+    void SetLogLevel(const std::string &level);
 
-    private:
-      /**
-       * Add authorization header.
-       *
-       * @param headers headers
-       */
-      void AddAuthorization(std::map<std::string, std::string> &headers);
+    /**
+     * Returns the current AwsMock configuration
+     *
+     * @return current configuration
+     */
+    void GetDefaults();
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+  private:
+    /**
+     * Add authorization header.
+     *
+     * @param headers headers
+     */
+    void AddAuthorization(std::map<std::string, std::string> &headers);
 
-      /**
-       * Application configuration
-       */
-      const Configuration &_configuration;
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
 
-      /**
-       * Curl utils
-       */
-       Core::CurlUtils _curlUtils;
+    /**
+     * Application configuration
+     */
+    const Configuration &_configuration;
 
-      /**
-       * Host
-       */
-      std::string _host;
+    /**
+     * Curl utils
+     */
+    Core::CurlUtils _curlUtils;
 
-      /**
-       * Port
-       */
-      int _port;
+    /**
+     * Host
+     */
+    std::string _host;
 
-      /**
-       * Base URL
-       */
-      std::string _baseUrl;
+    /**
+     * Port
+     */
+    int _port;
 
-      /**
-       * User
-       */
-      std::string _user;
+    /**
+     * Base URL
+     */
+    std::string _baseUrl;
 
-      /**
-       * Client ID
-       */
-      std::string _clientId;
+    /**
+     * User
+     */
+    std::string _user;
 
-      /**
-       * AWS region
-       */
-      std::string _region;
+    /**
+     * Client ID
+     */
+    std::string _clientId;
+
+    /**
+     * AWS region
+     */
+    std::string _region;
   };
 
 } // namespace AwsMock::Controller

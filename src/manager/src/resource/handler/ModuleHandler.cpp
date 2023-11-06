@@ -16,10 +16,31 @@ namespace AwsMock {
     _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "GET");
     log_debug_stream(_logger) << "Module GET request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
 
-    Database::Entity::Module::ModuleList modules = _moduleService->ListModules();
-    std::string body = Dto::Module::Module::ToJson(modules);
+    std::string action = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
 
-    SendOkResponse(response, body);
+    if (action == "config") {
+
+      std::string host = _configuration.getString("awsmock.gateway.host", "localhost");
+      int port = _configuration.getInt("awsmock.gateway.port", 4566);
+      Dto::Module::GatewayConfig config = {
+          .region=_configuration.getString("awsmock.region", "eu-central-1"),
+          .endpoint="http://" + host + "/" + std::to_string(port),
+          .protocol="http",
+          .host=host,
+          .port=port,
+          .user=_configuration.getString("awsmock.user", "none"),
+          .accessId=_configuration.getString("awsmock.account.id", "000000000000"),
+          .clientId=_configuration.getString("awsmock.client.id", "00000000"),
+          .dataDir=_configuration.getString("awsmock.data.dir", "/tmp/awsmock/data"),
+      };
+      SendOkResponse(response, Dto::Module::GatewayConfig::ToJson(config));
+
+    } else {
+
+      Database::Entity::Module::ModuleList modules = _moduleService->ListModules();
+      std::string body = Dto::Module::Module::ToJson(modules);
+      SendOkResponse(response, body);
+    }
   }
 
   void ModuleHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]] const std::string &region, [[maybe_unused]] const std::string &user) {

@@ -1,6 +1,6 @@
 FROM jensvogt/aws-mock-base:latest
 
-RUN apt-get update && apt-get -y upgrade && apt-get -y install zip
+RUN apt-get update && apt-get -y upgrade
 
 # Install basics
 ARG GH_TOKEN=${GH_TOKEN}

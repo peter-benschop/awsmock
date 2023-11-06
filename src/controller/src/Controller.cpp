@@ -180,6 +180,32 @@ namespace AwsMock::Controller {
     }
   }
 
+  void Controller::GetDefaults() {
+
+    std::map<std::string, std::string> headers;
+    AddAuthorization(headers);
+    Core::CurlResponse response = _curlUtils.SendHttpRequest("GET", _baseUrl + "/config/", headers);
+
+    if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
+      std::cerr << "Error: " << response.statusReason << std::endl;
+      return;
+    }
+
+    Dto::Module::GatewayConfig gatewayConfig = Dto::Module::GatewayConfig::FromJson(response.output);
+    if (response.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
+      std::cout << "Config: " << std::endl;
+      std::cout << "  " << std::setw(16) << std::left << "Endpoint: " << std::setw(32) << gatewayConfig.endpoint << std::endl;
+      std::cout << "  " << std::setw(16) << std::left << "Host: " << std::setw(32) << gatewayConfig.host << std::endl;
+      std::cout << "  " << std::setw(16) << std::left << "Port: " << std::setw(32) << gatewayConfig.port << std::endl;
+      std::cout << "  " << std::setw(16) << std::left << "User: " << std::setw(32) << gatewayConfig.user << std::endl;
+      std::cout << "  " << std::setw(16) << std::left << "AccessId: " << std::setw(32) << gatewayConfig.accessId << std::endl;
+      std::cout << "  " << std::setw(16) << std::left << "ClientId: " << std::setw(32) << gatewayConfig.clientId << std::endl;
+      std::cout << "  " << std::setw(16) << std::left << "DataDir: " << std::setw(32) << gatewayConfig.dataDir << std::endl;
+    } else {
+      std::cout << "Could not set log level: " << response.output << std::endl;
+    }
+  }
+
   void Controller::AddAuthorization(std::map<std::string, std::string> &headers) {
     headers["Authorization"] = Core::AwsUtils::GetAuthorizationHeader(_configuration, "module");
   }
