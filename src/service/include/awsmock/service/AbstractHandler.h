@@ -431,6 +431,13 @@ namespace AwsMock::Service {
     [[maybe_unused]] void DumpBody(Poco::Net::HTTPServerRequest &request);
 
     /**
+     * Dump the request body to std::cerr
+     *
+     * @param payload HTTP request body
+     */
+    [[maybe_unused]] void DumpPayload(const std::string &payload);
+
+    /**
      * Dump the request body to a file
      *
      * @param request HTTP request

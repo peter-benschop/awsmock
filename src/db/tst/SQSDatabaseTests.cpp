@@ -234,6 +234,21 @@ namespace AwsMock::Database {
     EXPECT_TRUE(result);
   }
 
+  TEST_F(SQSDatabaseTest, MessageGetByIdTest) {
+
+    // arrange
+    Entity::SQS::Queue queue = {.region=_region, .name=QUEUE_NAME, .owner=OWNER, .queueUrl=_queueUrl};
+    queue = _sqsDatabase.CreateQueue(queue);
+    Entity::SQS::Message message = {.region=_region, .queueUrl=queue.queueUrl, .body=BODY};
+    message = _sqsDatabase.CreateMessage(message);
+
+    // act
+    Entity::SQS::Message result = _sqsDatabase.GetMessageById(message.oid);
+
+    // assert
+    EXPECT_TRUE(message.oid== result.oid);
+  }
+
   TEST_F(SQSDatabaseTest, MessageReceiveTest) {
 
     // arrange
@@ -342,6 +357,23 @@ namespace AwsMock::Database {
 
     // assert
     EXPECT_EQ(result.receiptHandle, messageList[0].receiptHandle);
+  }
+
+  TEST_F(SQSDatabaseTest, MessageUpdateTest) {
+
+    // arrange
+    Entity::SQS::Queue queue = {.region=_region, .name=QUEUE_NAME, .owner=OWNER, .queueUrl=_queueUrl};
+    queue = _sqsDatabase.CreateQueue(queue);
+    Entity::SQS::Message message = {.region=_region, .queueUrl=queue.queueUrl, .body=BODY, .receiptHandle=Core::AwsUtils::CreateSqsReceiptHandler()};
+    message = _sqsDatabase.CreateMessage(message);
+
+    // act
+    message.status = Entity::SQS::MessageStatus::DELAYED;
+    Entity::SQS::Message result = _sqsDatabase.UpdateMessage(message);
+
+    // assert
+    EXPECT_TRUE(result.oid == message.oid);
+    EXPECT_TRUE(result.status == Entity::SQS::MessageStatus::DELAYED);
   }
 
   TEST_F(SQSDatabaseTest, MessageDeleteTest) {

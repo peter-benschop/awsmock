@@ -48,3 +48,13 @@ endif ()
 install(FILES dist/etc/aws-mock.properties DESTINATION /etc)
 install(FILES dist/etc/systemd/system/aws-mock.service DESTINATION etc/systemd/system)
 install(FILES dist/bin/awslocal DESTINATION /usr/bin)
+
+# Install gzipped man pages
+add_custom_target(man-awsmockctl ALL DEPENDS docs/man/awsmockctl.1)
+
+# compress man page
+add_custom_command(OUTPUT docs/man/awsmockctl.1.gz COMMAND gzip -9 --no-name --to-stdout docs/man/awsmockctl.1 >"${CMAKE_CURRENT_BINARY_DIR}/docs/man/awsmockctl.1.gz"
+        MAIN_DEPENDENCY docs/man/awsmockctl.1 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/docs/man)
+
+# install compressed man page
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/docs/man/awsmockctl.1.gz DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)

@@ -31,6 +31,11 @@ namespace AwsMock::Dto::SQS {
       std::string queueArn;
 
       /**
+       * Queue name
+       */
+      std::string queueName;
+
+      /**
        * Message body
        */
       std::string body;

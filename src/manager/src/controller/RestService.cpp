@@ -46,7 +46,7 @@ namespace AwsMock {
 
     if (_httpServer) {
       _httpServer->start();
-      log_info_stream(_logger) << "AwsMock gateway started, endpoint: http://" << _host << ":" << _port << std::endl;
+      log_info_stream(_logger) << "AwsMock manager started, endpoint: http://" << _host << ":" << _port << std::endl;
     }
   }
 

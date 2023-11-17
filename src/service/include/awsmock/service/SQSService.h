@@ -42,6 +42,7 @@
 #include <awsmock/dto/sqs/SendMessageResponse.h>
 #include <awsmock/dto/sqs/SetQueueAttributesRequest.h>
 #include <awsmock/dto/sqs/SetQueueAttributesResponse.h>
+#include <awsmock/dto/sqs/SetVisibilityTimeoutRequest.h>
 #include <awsmock/repository/SQSDatabase.h>
 
 #define DEFAULT_ACCOUNT_ID "000000000000"
@@ -55,167 +56,175 @@ namespace AwsMock::Service {
 
   class SQSService {
 
-    public:
+  public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration service configuration
-       * @param condition stop condition
-       */
-      explicit SQSService(const Core::Configuration &configuration, Poco::Condition &condition);
+    /**
+     * Constructor
+     *
+     * @param configuration service configuration
+     * @param condition stop condition
+     */
+    explicit SQSService(const Core::Configuration &configuration, Poco::Condition &condition);
 
-      /**
-       * Creates a new queue
-       *
-       * @param request create queue request
-       * @return CreateQueueResponse
-       */
-      Dto::SQS::CreateQueueResponse CreateQueue(const Dto::SQS::CreateQueueRequest &request);
+    /**
+     * Creates a new queue
+     *
+     * @param request create queue request
+     * @return CreateQueueResponse
+     */
+    Dto::SQS::CreateQueueResponse CreateQueue(const Dto::SQS::CreateQueueRequest &request);
 
-      /**
-       * Returns a list of all available queues
-       *
-       * @param region AWS region
-       * @return ListQueuesResponse
-       */
-      Dto::SQS::ListQueueResponse ListQueues(const std::string &region);
+    /**
+     * Returns a list of all available queues
+     *
+     * @param region AWS region
+     * @return ListQueuesResponse
+     */
+    Dto::SQS::ListQueueResponse ListQueues(const std::string &region);
 
-      /**
-       * Purge a queue.
-       *
-       * @param request purge queue request
-       * @return PurgeQueueResponse
-       * @throws ServiceException
-       */
-      Dto::SQS::PurgeQueueResponse PurgeQueue(const Dto::SQS::PurgeQueueRequest &request);
+    /**
+     * Purge a queue.
+     *
+     * @param request purge queue request
+     * @return PurgeQueueResponse
+     * @throws ServiceException
+     */
+    Dto::SQS::PurgeQueueResponse PurgeQueue(const Dto::SQS::PurgeQueueRequest &request);
 
-      /**
-       * Return the queue attributes
-       *
-       * @param request get queue sqs request
-       * @return GetQueueAttributesResponse
-       * @throws ServiceException
-       */
-      Dto::SQS::GetQueueUrlResponse GetQueueUrl(const Dto::SQS::GetQueueUrlRequest &request);
+    /**
+     * Return the queue attributes
+     *
+     * @param request get queue sqs request
+     * @return GetQueueAttributesResponse
+     * @throws ServiceException
+     */
+    Dto::SQS::GetQueueUrlResponse GetQueueUrl(const Dto::SQS::GetQueueUrlRequest &request);
 
-      /**
-       * Return the queue attributes
-       *
-       * @param request get queue sqs request
-       * @return GetQueueAttributesResponse
-       * @throws ServiceException
-       */
-      Dto::SQS::GetQueueAttributesResponse GetQueueAttributes(const Dto::SQS::GetQueueAttributesRequest &request);
+    /**
+     * Return the queue attributes
+     *
+     * @param request get queue sqs request
+     * @return GetQueueAttributesResponse
+     * @throws ServiceException
+     */
+    Dto::SQS::GetQueueAttributesResponse GetQueueAttributes(const Dto::SQS::GetQueueAttributesRequest &request);
 
-      /**
-       * Put queue attributes
-       *
-       * @param request put queue sqs request
-       * @return SetQueueAttributesResponse
-       * @throws ServiceException
-       */
-      Dto::SQS::SetQueueAttributesResponse SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request);
+    /**
+     * Put queue attributes
+     *
+     * @param request put queue sqs request
+     * @return SetQueueAttributesResponse
+     * @throws ServiceException
+     */
+    Dto::SQS::SetQueueAttributesResponse SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request);
 
-      /**
-       * Delete a queue
-       *
-       * @param request delete request DTO
-       * @return DeleteQueueResponse
-       * @throws ServiceException
-       */
-      Dto::SQS::DeleteQueueResponse DeleteQueue(const Dto::SQS::DeleteQueueRequest &request);
+    /**
+     * Sets the message visibility timeout.
+     *
+     * @param request set visibility timeout request
+     * @throws ServiceException
+     */
+    void SetVisibilityTimeout(Dto::SQS::SetVisibilityTimeoutRequest &request);
 
-      /**
-       * Creates a new queue
-       *
-       * @param request create message request
-       * @return SendMessageResponse
-       * @throws ServiceException
-       */
-      Dto::SQS::SendMessageResponse SendMessage(const Dto::SQS::SendMessageRequest &request);
+    /**
+     * Delete a queue
+     *
+     * @param request delete request DTO
+     * @return DeleteQueueResponse
+     * @throws ServiceException
+     */
+    Dto::SQS::DeleteQueueResponse DeleteQueue(const Dto::SQS::DeleteQueueRequest &request);
 
-      /**
-       * Receive a list of messages
-       *
-       * @param request receive message request
-       * @return ReceiveMessageResponse
-       * @throws ServiceException
-       */
-      Dto::SQS::ReceiveMessageResponse ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request);
+    /**
+     * Creates a new queue
+     *
+     * @param request create message request
+     * @return SendMessageResponse
+     * @throws ServiceException
+     */
+    Dto::SQS::SendMessageResponse SendMessage(const Dto::SQS::SendMessageRequest &request);
 
-      /**
-       * Deletes a message
-       *
-       * @param request delete message request DTO
-       * @throws ServiceException
-       */
-      void DeleteMessage(const Dto::SQS::DeleteMessageRequest &request);
+    /**
+     * Receive a list of messages
+     *
+     * @param request receive message request
+     * @return ReceiveMessageResponse
+     * @throws ServiceException
+     */
+    Dto::SQS::ReceiveMessageResponse ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request);
 
-      /**
-       * Deletes a message in a batch
-       *
-       * @param request delete message batch request DTO
-       * @throws ServiceException
-       */
-      void DeleteMessageBatch(const Dto::SQS::DeleteMessageBatchRequest &request);
+    /**
+     * Deletes a message
+     *
+     * @param request delete message request DTO
+     * @throws ServiceException
+     */
+    void DeleteMessage(const Dto::SQS::DeleteMessageRequest &request);
 
-      /**
-       * Returns the MD5 sum of all attributes.
-       *
-       * @param attributes vector of attributes
-       * @return MD5 sum of attributes string
-       */
-      static std::string GetMd5Attributes(const Dto::SQS::MessageAttributeList &attributes);
+    /**
+     * Deletes a message in a batch
+     *
+     * @param request delete message batch request DTO
+     * @throws ServiceException
+     */
+    void DeleteMessageBatch(const Dto::SQS::DeleteMessageBatchRequest &request);
 
-    private:
+    /**
+     * Returns the MD5 sum of all attributes.
+     *
+     * @param attributes vector of attributes
+     * @return MD5 sum of attributes string
+     */
+    static std::string GetMd5Attributes(const Dto::SQS::MessageAttributeList &attributes);
 
-      /**
-       * Returns the MD5 sum of the message body.
-       *
-       * @param body message body
-       * @return MD5 sum of message body
-       */
-      std::string GetMd5Body(const std::string &body);
+  private:
 
-      /**
-       * Returns a integer as byte array and fill it in the given byte array at position offset.
-       *
-       * @param n integer value
-       * @param bytes output byte array
-       * @param offset offset of the output byte array
-       */
-      static void GetIntAsByteArray(int n, unsigned char *bytes, int offset);
+    /**
+     * Returns the MD5 sum of the message body.
+     *
+     * @param body message body
+     * @return MD5 sum of message body
+     */
+    std::string GetMd5Body(const std::string &body);
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+    /**
+     * Returns a integer as byte array and fill it in the given byte array at position offset.
+     *
+     * @param n integer value
+     * @param bytes output byte array
+     * @param offset offset of the output byte array
+     */
+    static void GetIntAsByteArray(int n, unsigned char *bytes, int offset);
 
-      /**
-       * Account ID
-       */
-      std::string _accountId;
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
 
-      /**
-       * Configuration
-       */
-      const Core::Configuration &_configuration;
+    /**
+     * Account ID
+     */
+    std::string _accountId;
 
-      /**
-       * Database connection
-       */
-      std::unique_ptr<Database::SQSDatabase> _database;
+    /**
+     * Configuration
+     */
+    const Core::Configuration &_configuration;
 
-      /**
-       * Shutdown condition
-       */
-      Poco::Condition &_condition;
+    /**
+     * Database connection
+     */
+    std::unique_ptr<Database::SQSDatabase> _database;
 
-      /**
-       * Shutdown mutex
-       */
-      Poco::Mutex _mutex;
+    /**
+     * Shutdown condition
+     */
+    Poco::Condition &_condition;
+
+    /**
+     * Shutdown mutex
+     */
+    Poco::Mutex _mutex;
   };
 
 } // namespace AwsMock::Service

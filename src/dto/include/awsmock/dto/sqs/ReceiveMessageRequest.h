@@ -37,6 +37,11 @@ namespace AwsMock::Dto::SQS {
       std::string queueUrl;
 
       /**
+       * Queue name
+       */
+      std::string queueName;
+
+      /**
        * Maximal number of messages
        */
       int maxMessages = 10;

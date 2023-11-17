@@ -14,6 +14,7 @@
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
+#include <mongocxx/options/find_one_and_update.hpp>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
@@ -146,7 +147,7 @@ namespace AwsMock::Database {
      * @param queue AWS region
      * @return updated queue
      */
-    Entity::SQS::Queue UpdateQueue(const Entity::SQS::Queue &queue);
+    Entity::SQS::Queue UpdateQueue(Entity::SQS::Queue &queue);
 
     /**
      * Count the number of queues for a given region.
@@ -155,6 +156,15 @@ namespace AwsMock::Database {
      * @return number of queues in the given region.
      */
     long CountQueues(const std::string &region = {});
+
+    /**
+     * Converts a queue object to a JSON string
+     *
+     * @param queue queue entity
+     * @return queue converted to JSON string
+     * @throws Core::DatabaseException
+     */
+    //static std::string ConvertQueueToJson(const Entity::SQS::Queue &queue);
 
     /**
      * Deletes a queue.
@@ -215,6 +225,14 @@ namespace AwsMock::Database {
     Entity::SQS::Message GetMessageByReceiptHandle(const std::string &receiptHandle);
 
     /**
+     * Updates a given message.
+     *
+     * @param message SQS message
+     * @return updated message
+     */
+    Entity::SQS::Message UpdateMessage(Entity::SQS::Message &message);
+
+    /**
      * Receive messages from an queue.
      *
      * @param region AWS region
@@ -266,6 +284,15 @@ namespace AwsMock::Database {
     long CountMessagesByStatus(const std::string &region, const std::string &queueUrl, Entity::SQS::MessageStatus status);
 
     /**
+     * Converts a message object to a JSON string
+     *
+     * @param document message document
+     * @return message converted to JSON string
+     * @throws Core::DatabaseException
+     */
+    static std::string ConvertMessageToJson(mongocxx::stdx::optional<bsoncxx::document::value> document);
+
+    /**
      * Deletes all messages of a queue
      *
      * @param queue message queue to delete messages from
@@ -289,11 +316,6 @@ namespace AwsMock::Database {
     void DeleteAllMessages();
 
   private:
-
-    /**
-     * REST endpoint
-     */
-    std::string _endpoint;
 
     /**
      * Logger

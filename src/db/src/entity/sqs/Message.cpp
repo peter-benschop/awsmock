@@ -38,7 +38,7 @@ namespace AwsMock::Database::Entity::SQS {
     return messageDoc;
   }
 
-  void Message::FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
+  /*void Message::FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
 
     oid = mResult.value()["_id"].get_oid().value.to_string();
     region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
@@ -63,7 +63,7 @@ namespace AwsMock::Database::Entity::SQS {
       };
       attributes.push_back(attribute);
     }
-  }
+  }*/
 
   void Message::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
