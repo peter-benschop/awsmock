@@ -112,7 +112,7 @@ namespace AwsMock::Service {
         Dto::SQS::SendMessageResponse msgResponse = _service.SendMessage(msgRequest);
 
         // act
-        Dto::SQS::ReceiveMessageRequest receiveRequest = {.queueUrl=QUEUE_URL, .maxMessages=10, .waitTimeSeconds=1};
+        Dto::SQS::ReceiveMessageRequest receiveRequest = {.region=REGION, .queueUrl=QUEUE_URL, .queueName=QUEUE, .maxMessages=10, .waitTimeSeconds=1};
         Dto::SQS::ReceiveMessageResponse receiveResponse = _service.ReceiveMessages(receiveRequest);
 
         // assert

@@ -27,13 +27,22 @@ namespace AwsMock::Service {
       // Get queue ARN
       std::string queueArn = Core::AwsUtils::CreateSqsQueueArn(_configuration, request.name);
 
+      Database::Entity::SQS::QueueAttribute attributes;
+      for (auto &a : request.attributes) {
+        if (a.attributeName == "VisibilityTimeout") {
+          attributes.visibilityTimeout = std::stoi(a.attributeValue);
+        }
+      }
+
       // Update database
       Database::Entity::SQS::Queue queue = _database->CreateQueue({
                                                                       .region=request.region,
                                                                       .name=request.name,
                                                                       .owner=request.owner,
                                                                       .queueUrl=request.queueUrl,
-                                                                      .queueArn=queueArn
+                                                                      .queueArn=queueArn,
+                                                                      .attributes=attributes,
+                                                                      .tags=request.tags
                                                                   });
       log_trace_stream(_logger) << "SQS queue created: " << queue.ToString() << std::endl;
 
@@ -126,7 +135,7 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Got queue: " << queue.queueUrl << std::endl;
 
     Dto::SQS::GetQueueAttributesResponse response;
-    if (request.attributeNames.size() == 1 || Poco::toLower(request.attributeNames[0]) == "all") {
+    if (std::find(request.attributeNames.begin(), request.attributeNames.end(), "All") != request.attributeNames.end()) {
       response.attributes.emplace_back("ApproximateNumberOfMessages", std::to_string(queue.attributes.approximateNumberOfMessages));
       response.attributes.emplace_back("ApproximateNumberOfMessagesDelayed", std::to_string(queue.attributes.approximateNumberOfMessagesDelayed));
       response.attributes.emplace_back("ApproximateNumberOfMessagesNotVisible", std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible));
@@ -139,6 +148,43 @@ namespace AwsMock::Service {
       response.attributes.emplace_back("QueueArn", queue.queueArn);
       response.attributes.emplace_back("ReceiveMessageWaitTimeSeconds", std::to_string(queue.attributes.receiveMessageWaitTime));
       response.attributes.emplace_back("VisibilityTimeout", std::to_string(queue.attributes.visibilityTimeout));
+    } else {
+      if (std::find(request.attributeNames.begin(), request.attributeNames.end(), "VisibilityTimeout") != request.attributeNames.end()) {
+        response.attributes.emplace_back("Policy", queue.attributes.policy);
+      }
+      if (std::find(request.attributeNames.begin(), request.attributeNames.end(), "VisibilityTimeout") != request.attributeNames.end()) {
+        response.attributes.emplace_back("VisibilityTimeout", std::to_string(queue.attributes.visibilityTimeout));
+      }
+      if (std::find(request.attributeNames.begin(), request.attributeNames.end(), "MaximumMessageSize") != request.attributeNames.end()) {
+        response.attributes.emplace_back("MaximumMessageSize", std::to_string(queue.attributes.maxMessageSize));
+      }
+      if (std::find(request.attributeNames.begin(), request.attributeNames.end(), "MessageRetentionPeriod") != request.attributeNames.end()) {
+        response.attributes.emplace_back("MessageRetentionPeriod", std::to_string(queue.attributes.messageRetentionPeriod));
+      }
+      if (std::find(request.attributeNames.begin(), request.attributeNames.end(), "ApproximateNumberOfMessages") != request.attributeNames.end()) {
+        response.attributes.emplace_back("ApproximateNumberOfMessages", std::to_string(queue.attributes.approximateNumberOfMessages));
+      }
+      if (std::find(request.attributeNames.begin(), request.attributeNames.end(), "ApproximateNumberOfMessagesNotVisible") != request.attributeNames.end()) {
+        response.attributes.emplace_back("ApproximateNumberOfMessagesNotVisible", std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible));
+      }
+      if (std::find(request.attributeNames.begin(), request.attributeNames.end(), "CreatedTimestamp") != request.attributeNames.end()) {
+        response.attributes.emplace_back("CreatedTimestamp", Poco::DateTimeFormatter::format(queue.created, Poco::DateTimeFormat::HTTP_FORMAT));
+      }
+      if (std::find(request.attributeNames.begin(), request.attributeNames.end(), "LastModifiedTimestamp") != request.attributeNames.end()) {
+        response.attributes.emplace_back("LastModifiedTimestamp", Poco::DateTimeFormatter::format(queue.modified, Poco::DateTimeFormat::HTTP_FORMAT));
+      }
+      if (std::find(request.attributeNames.begin(), request.attributeNames.end(), "ApproximateNumberOfMessagesDelayed") != request.attributeNames.end()) {
+        response.attributes.emplace_back("ApproximateNumberOfMessagesNotVisible", std::to_string(queue.attributes.approximateNumberOfMessagesDelayed));
+      }
+      if (std::find(request.attributeNames.begin(), request.attributeNames.end(), "DelaySeconds") != request.attributeNames.end()) {
+        response.attributes.emplace_back("DelaySeconds", std::to_string(queue.attributes.delaySeconds));
+      }
+      if (std::find(request.attributeNames.begin(), request.attributeNames.end(), "ReceiveMessageWaitTimeSeconds") != request.attributeNames.end()) {
+        response.attributes.emplace_back("ReceiveMessageWaitTimeSeconds", std::to_string(queue.attributes.receiveMessageWaitTime));
+      }
+      if (std::find(request.attributeNames.begin(), request.attributeNames.end(), "RedrivePolicy") != request.attributeNames.end()) {
+        response.attributes.emplace_back("RedrivePolicy", queue.attributes.redrivePolicy.ToJson());
+      }
     }
     log_debug_stream(_logger) << response.ToString() << std::endl;
     return response;
@@ -178,13 +224,13 @@ namespace AwsMock::Service {
     }
   }
 
-  void SQSService::SetVisibilityTimeout(Dto::SQS::SetVisibilityTimeoutRequest &request) {
-    log_trace_stream(_logger) << "Put queue sqs request, queue: " << request.queueUrl << std::endl;
+  void SQSService::SetVisibilityTimeout(Dto::SQS::ChangeMessageVisibilityRequest &request) {
+    log_trace_stream(_logger) << "Change message visibility request, queue: " << request.queueUrl << std::endl;
 
     // Check existence
-    if (!_database->QueueUrlExists(request.region, request.queueUrl)) {
-      log_warning_stream(_logger)<< "SQS queue does not exist, queueUrl: " << request.queueUrl << std::endl;
-      throw Core::ServiceException("SQS queue '" + request.queueUrl + "' does not exists", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+    if (!_database->MessageExists(request.receiptHandle)) {
+      log_warning_stream(_logger) << "SQS message does not exist, receiptHandle: " << request.receiptHandle << std::endl;
+      throw Core::ServiceException("SQS message with receipt handle '" + request.receiptHandle + "' does not exists", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
     try {
@@ -194,18 +240,15 @@ namespace AwsMock::Service {
       log_trace_stream(_logger) << "Got message: " << message.ToString() << std::endl;
 
       // Reset all attributes
-      Database::Entity::SQS::MessageAttribute attribute = {.attributeName="VisibilityTimeout", .attributeValue=std::to_string(request.visibilityTimeout), .type="Number"};
+      Database::Entity::SQS::MessageAttribute attribute = {.attributeName="VisibilityTimeout", .attributeValue=std::to_string(request.visibilityTimeout), .attributeType=Database::Entity::SQS::MessageAttributeType::NUMBER};
       message.attributes.push_back(attribute);
 
       // Update database
       message = _database->UpdateMessage(message);
-      log_trace_stream(_logger) << "Queue updated: " << queue.ToString() << std::endl;
-
-      Dto::SQS::SetQueueAttributesResponse response = {.region=queue.region, .requestId=request.requestId};
-      return response;
+      log_trace_stream(_logger) << "Message updated: " << message.ToString() << std::endl;
 
     } catch (Poco::Exception &ex) {
-      log_error_stream(_logger) << "SQS delete queue failed, message: " << ex.message() << std::endl;
+      log_error_stream(_logger) << "SQS change message visibility timeout request failed, message: " << ex.message() << std::endl;
       throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
   }

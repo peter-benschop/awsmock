@@ -14,7 +14,7 @@
 
 namespace AwsMock::Dto::SQS {
 
-    struct SetVisibilityTimeoutRequest {
+    struct ChangeMessageVisibilityRequest {
 
       /**
        * AWS region
@@ -53,7 +53,7 @@ namespace AwsMock::Dto::SQS {
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const SetVisibilityTimeoutRequest &r);
+      friend std::ostream &operator<<(std::ostream &os, const ChangeMessageVisibilityRequest &r);
 
     };
 

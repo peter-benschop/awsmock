@@ -34,6 +34,9 @@ namespace AwsMock::Service {
       std::string payload = GetPayload(request);
       std::string requestId = GetHeaderValue(request, "RequestId", Poco::UUIDGenerator().createRandom().toString());
 
+      DumpRequest(request);
+      DumpPayload(payload);
+
       std::string action = Core::HttpUtils::GetQueryParameterValueByName(payload, "Action");
       std::string version = Core::HttpUtils::GetQueryParameterValueByName(payload, "Version");
       log_debug_stream(_logger) << "SQS POST request, action: " << action << " version: " << version << std::endl;
@@ -41,13 +44,18 @@ namespace AwsMock::Service {
       if (action == "CreateQueue") {
 
         std::string queueName = GetQueueName(request, payload);
-        std::string queueUrl = GetQueueUrl(request, payload);
+        std::string queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, queueName);
+
+        std::vector<Dto::SQS::QueueAttribute> attributes = GetQueueAttributes(payload);
+        std::map<std::string,std::string> tags = GetQueueTags(payload);
 
         Dto::SQS::CreateQueueRequest sqsRequest = {
             .region=region,
             .name=queueName,
             .queueUrl=queueUrl,
-            .owner=user
+            .owner=user,
+            .attributes=attributes,
+            .tags=tags
         };
         Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
         SendOkResponse(response, sqsResponse.ToXml());
@@ -138,14 +146,8 @@ namespace AwsMock::Service {
       } else if (action == "GetQueueAttributes") {
 
         std::string queueUrl = GetQueueUrl(request, payload);
+        std::vector<std::string> attributeNames = GetQueueAttributeNames(payload);
 
-        int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "Attribute");
-        log_trace_stream(_logger) << "Got attribute names count: " << count << std::endl;
-
-        std::vector<std::string> attributeNames;
-        for (int i = 1; i <= count; i++) {
-          attributeNames.emplace_back(Core::HttpUtils::GetQueryParameterValueByName(payload, "AttributeName." + std::to_string(i)));
-        }
 
         Dto::SQS::GetQueueAttributesRequest sqsRequest = {
             .region=region,
@@ -195,7 +197,6 @@ namespace AwsMock::Service {
             .receiptHandle=receiptHandle,
             .visibilityTimeout=visibilityTimeout
         };
-        //_sqsService.DeleteMessage(sqsRequest);
 
         SendOkResponse(response);
 
@@ -289,10 +290,7 @@ namespace AwsMock::Service {
     switch (GetUserAgent(request)) {
     case UserAgentType::AWS_CLI:
     case UserAgentType::AWS_SDK_CPP:return Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
-    case UserAgentType::AWS_SDK_JAVA: {
-      std::string host = request["Host"];
-      return "http://" + host + "/" + request.getURI();
-    }
+    case UserAgentType::AWS_SDK_JAVA:return Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
     case UserAgentType::AWS_SDK_UNKNOWN:break;
     }
     return std::string{};
@@ -311,6 +309,50 @@ namespace AwsMock::Service {
       }
     }
     throw Poco::Exception("Unknown user agent");
+  }
+
+  std::vector<Dto::SQS::QueueAttribute> SQSHandler::GetQueueAttributes(const std::string &payload) {
+
+    std::vector<Dto::SQS::QueueAttribute> queueAttributes;
+
+    int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "Attribute") / 2;
+    log_trace_stream(_logger) << "Got attribute count, count: " << count << std::endl;
+
+    for (int i = 1; i <= count; i++) {
+      Dto::SQS::QueueAttribute attribute = {
+          .attributeName=Core::HttpUtils::GetQueryParameterValueByName(payload, "Attribute." + std::to_string(i) + ".Name"),
+          .attributeValue=Core::HttpUtils::GetQueryParameterValueByName(payload, "Attribute." + std::to_string(i) + ".Value")
+      };
+      queueAttributes.emplace_back(attribute);
+    }
+    return queueAttributes;
+  }
+
+  std::map<std::string, std::string> SQSHandler::GetQueueTags(const std::string &payload) {
+
+    std::map<std::string, std::string> queueTags;
+
+    int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "Tag") / 2;
+    log_trace_stream(_logger) << "Got tags count, count: " << count << std::endl;
+
+    for (int i = 1; i <= count; i++) {
+      std::string key = Core::HttpUtils::GetQueryParameterValueByName(payload, "Tag." + std::to_string(i) + ".Key");
+      std::string value = Core::HttpUtils::GetQueryParameterValueByName(payload, "Tag." + std::to_string(i) + ".Value");
+      queueTags[key] = value;
+    }
+    return queueTags;
+  }
+
+  std::vector<std::string> SQSHandler::GetQueueAttributeNames(const std::string &payload){
+
+    int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "Attribute");
+    log_trace_stream(_logger) << "Got attribute names count: " << count << std::endl;
+
+    std::vector<std::string> attributeNames;
+    for (int i = 1; i <= count; i++) {
+      attributeNames.emplace_back(Core::HttpUtils::GetQueryParameterValueByName(payload, "AttributeName." + std::to_string(i)));
+    }
+    return attributeNames;
   }
 
   std::vector<Dto::SQS::MessageAttribute> SQSHandler::GetMessageAttributes(const std::string &payload) {

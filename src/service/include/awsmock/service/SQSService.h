@@ -42,7 +42,7 @@
 #include <awsmock/dto/sqs/SendMessageResponse.h>
 #include <awsmock/dto/sqs/SetQueueAttributesRequest.h>
 #include <awsmock/dto/sqs/SetQueueAttributesResponse.h>
-#include <awsmock/dto/sqs/SetVisibilityTimeoutRequest.h>
+#include <awsmock/dto/sqs/ChangeMessageVisibilityRequest.h>
 #include <awsmock/repository/SQSDatabase.h>
 
 #define DEFAULT_ACCOUNT_ID "000000000000"
@@ -124,7 +124,7 @@ namespace AwsMock::Service {
      * @param request set visibility timeout request
      * @throws ServiceException
      */
-    void SetVisibilityTimeout(Dto::SQS::SetVisibilityTimeoutRequest &request);
+    void SetVisibilityTimeout(Dto::SQS::ChangeMessageVisibilityRequest &request);
 
     /**
      * Delete a queue

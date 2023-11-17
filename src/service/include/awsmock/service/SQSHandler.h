@@ -131,6 +131,30 @@ namespace AwsMock::Service {
   private:
 
     /**
+     * Get the queue attributes.
+     *
+     * @param payload HTTP body
+     * @return list of queue attributes
+     */
+    std::vector<Dto::SQS::QueueAttribute> GetQueueAttributes(const std::string &payload);
+
+    /**
+     * Get the queue tags.
+     *
+     * @param payload HTTP body
+     * @return list of queue tags
+     */
+    std::map<std::string,std::string> GetQueueTags(const std::string &payload);
+
+    /**
+     * Get the queue attribute names.
+     *
+     * @param payload HTTP body
+     * @return list of queue attribute names
+     */
+    std::vector<std::string> GetQueueAttributeNames(const std::string &payload);
+
+    /**
      * Get the message attributes.
      *
      * @param payload HTTP body

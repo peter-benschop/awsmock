@@ -356,6 +356,11 @@ namespace AwsMock::Database::Entity::SQS {
     QueueAttribute attributes;
 
     /**
+     * Queue tags
+     */
+    std::map<std::string, std::string> tags;
+
+    /**
      * Creation date
      */
     Poco::DateTime created = Poco::DateTime();
@@ -372,6 +377,11 @@ namespace AwsMock::Database::Entity::SQS {
      */
     [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
+      auto tagsDoc = bsoncxx::builder::basic::document{};
+      for (const auto &t : tags) {
+        tagsDoc.append(kvp(t.first, t.second));
+      }
+
       view_or_value<view, value> queueDoc = make_document(
           kvp("region", region),
           kvp("name", name),
@@ -379,6 +389,7 @@ namespace AwsMock::Database::Entity::SQS {
           kvp("queueUrl", queueUrl),
           kvp("queueArn", queueArn),
           kvp("attributes", attributes.ToDocument()),
+          kvp("tags", tagsDoc),
           kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
           kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
 
@@ -390,7 +401,7 @@ namespace AwsMock::Database::Entity::SQS {
      *
      * @param mResult MongoDB document.
      */
-    [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
+    /*[[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
 
       oid = mResult.value()["_id"].get_oid().value.to_string();
       region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
@@ -401,7 +412,7 @@ namespace AwsMock::Database::Entity::SQS {
       attributes.FromDocument(mResult.value()["attributes"].get_document().value);
       created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
       modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
-    }
+    }*/
 
     /**
      * Converts the MongoDB document to an entity
@@ -419,6 +430,14 @@ namespace AwsMock::Database::Entity::SQS {
       attributes.FromDocument(mResult.value()["attributes"].get_document().value);
       created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
       modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+
+      // Get tags
+      bsoncxx::document::view tagsView = mResult.value()["tags"].get_document().value;
+      for (bsoncxx::document::element tagElement : tagsView) {
+        std::string key = bsoncxx::string::to_string(tagElement.key());
+        std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
+        tags.emplace(key, value);
+      }
     }
 
     /**

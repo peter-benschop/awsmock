@@ -2,8 +2,8 @@
 // Created by vogje01 on 21/10/2023.
 //
 
-#ifndef AWMOCK_CORE_SQSSERVERTEST_H
-#define AWMOCK_CORE_SQSSERVERTEST_H
+#ifndef AWMOCK_SQS_CPP_SERVERTEST_H
+#define AWMOCK_SQS_CPP_SERVERTEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
@@ -42,6 +42,8 @@ namespace AwsMock::Service {
         // Create some test objects
         _extraHeaders["Authorization"] =
             "AWS4-HMAC-SHA256 Credential=none/20230618/eu-central-1/sqs/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840";
+        _extraHeaders["User-Agent"] =
+            "aws-sdk-cpp";
 
         // Define endpoint. This is the endpoint of the SQS server, not the gateway
         std::string _port = _configuration.getString("awsmock.service.sqs.port", std::to_string(SQS_DEFAULT_PORT));
