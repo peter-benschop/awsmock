@@ -113,7 +113,7 @@ namespace AwsMock::Service {
     Core::Configuration &_configuration;
 
     /**
-     * Metric service
+     * Metric module
      */
     Core::MetricService &_metricService;
 
@@ -143,12 +143,12 @@ namespace AwsMock::Service {
     std::unique_ptr<Database::LambdaDatabase> _lambdaDatabase;
 
     /**
-     * lambda service
+     * lambda module
      */
     std::unique_ptr<Service::LambdaService> _lambdaService;
 
     /**
-     * Docker service
+     * Docker module
      */
     std::unique_ptr<Service::DockerService> _dockerService;
 
@@ -203,12 +203,12 @@ namespace AwsMock::Service {
     int _requestTimeout;
 
     /**
-     * Lambda service host
+     * Lambda module host
      */
     std::string _lambdaServiceHost;
 
     /**
-     * Lambda service port
+     * Lambda module port
      */
     int _lambdaServicePort;
 

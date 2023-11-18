@@ -25,8 +25,8 @@ namespace AwsMock::Service {
   /**
    * AWS S3 mock handler
    *
-   * <p>AWS S3 HTTP request handler. All S3 related REST call are ending here. Depending on the request header the S3 service will be selected in case the
-   * authorization header contains the S3 service.<p>
+   * <p>AWS S3 HTTP request handler. All S3 related REST call are ending here. Depending on the request header the S3 module will be selected in case the
+   * authorization header contains the S3 module.<p>
    *
    * <p><h3>GET Requests</h3>
    * <ul>
@@ -50,7 +50,7 @@ namespace AwsMock::Service {
      * Constructor
      *
      * @param configuration application configuration
-     * @param metricService monitoring service
+     * @param metricService monitoring module
      */
     S3Handler(Core::Configuration &configuration, Core::MetricService &metricService);
 
@@ -132,12 +132,12 @@ namespace AwsMock::Service {
     Core::Configuration &_configuration;
 
     /**
-     * Metric service
+     * Metric module
      */
     Core::MetricService &_metricService;
 
     /**
-     * S3 service
+     * S3 module
      */
     Service::S3Service _s3Service;
 

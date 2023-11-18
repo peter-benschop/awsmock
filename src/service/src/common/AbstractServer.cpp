@@ -4,19 +4,17 @@
 
 #include <awsmock/service/AbstractServer.h>
 
-#include <utility>
-
 namespace AwsMock::Service {
 
   AbstractServer::AbstractServer(const Core::Configuration &configuration, std::string name) : _logger(Poco::Logger::get("AbstractServer")), _configuration(configuration), _name(std::move(name)), _running(false) {
 
     // Create environment
-    _serviceDatabase = std::make_unique<Database::ModuleDatabase>(_configuration);
+    _moduleDatabase = std::make_unique<Database::ModuleDatabase>(_configuration);
     log_debug_stream(_logger) << "AbstractServer initialized" << std::endl;
   }
 
   bool AbstractServer::IsActive(const std::string &name) {
-    return _serviceDatabase->IsActive(_name);
+    return _moduleDatabase->IsActive(_name);
   }
 
   bool AbstractServer::IsRunning() const {
@@ -26,7 +24,7 @@ namespace AwsMock::Service {
   void AbstractServer::run() {
     MainLoop();
     StopHttpServer();
-    _serviceDatabase->SetStatus(_name, Database::Entity::Module::ModuleStatus::STOPPED);
+    _moduleDatabase->SetStatus(_name, Database::Entity::Module::ModuleStatus::STOPPED);
     _running = false;
     log_info_stream(_logger) << "Module " << _name << " has been shutdown" << std::endl;
   }
@@ -54,13 +52,14 @@ namespace AwsMock::Service {
     httpServerParams->setKeepAlive(true);
     log_debug_stream(_logger) << "HTTP server parameter set, maxQueue: " << maxQueueLength << " maxThreads: " << maxThreads << std::endl;
 
-    _serviceDatabase->SetPort(_name, port);
+    _moduleDatabase->SetPort(_name, port);
     _httpServer = std::make_shared<Poco::Net::HTTPServer>(requestFactory, Poco::Net::ServerSocket(Poco::UInt16(port)), httpServerParams);
     _httpServer->start();
 
     // Set running, now that the HTTP server is running
     _running = true;
-
+    _moduleDatabase->SetStatus(_name, Database::Entity::Module::ModuleStatus::RUNNING);
+    
     log_info_stream(_logger) << "HTTP server " << _name << " started, endpoint: http://" << host << ":" << port << std::endl;
   }
 

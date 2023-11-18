@@ -111,12 +111,12 @@ namespace AwsMock::Service {
       std::unique_ptr <Database::LambdaDatabase> _lambdaDatabase;
       
       /**
-       * S3 service
+       * S3 module
        */
       std::unique_ptr <Service::S3Service> _s3Service;
       
       /**
-       * lambda service
+       * lambda module
        */
       std::unique_ptr <Service::LambdaService> _lambdaService;
       
@@ -151,12 +151,12 @@ namespace AwsMock::Service {
       std::string _user;
       
       /**
-       * lambda service host
+       * lambda module host
        */
       std::string _lambdaServiceHost;
       
       /**
-       * lambda service port
+       * lambda module port
        */
       int _lambdaServicePort;
   };

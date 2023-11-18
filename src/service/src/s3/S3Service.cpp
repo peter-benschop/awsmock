@@ -10,21 +10,21 @@ namespace AwsMock::Service {
 
     // Initialize directories
     _dataDir = _configuration.getString("awsmock.data.dir", DEFAULT_DATA_DIR);
-    _dataS3Dir = _configuration.getString("awsmock.service.s3.data.dir", DEFAULT_S3_DATA_DIR);
-    _transferDir = _configuration.getString("awsmock.service.ftp.base.dir", DEFAULT_TRANSFER_DATA_DIR);
-    _transferBucket = _configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
+    _dataS3Dir = _configuration.getString("awsmock.module.s3.data.dir", DEFAULT_S3_DATA_DIR);
+    _transferDir = _configuration.getString("awsmock.module.ftp.base.dir", DEFAULT_TRANSFER_DATA_DIR);
+    _transferBucket = _configuration.getString("awsmock.module.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
     _tempDir = _dataDir + Poco::Path::separator() + "tmp";
 
     // Initialize database
     _database = std::make_unique<Database::S3Database>(_configuration);
 
-    // SQS service connection
-    _sqsServiceHost = _configuration.getString("awsmock.service.sqs.host", "localhost");
-    _sqsServicePort = _configuration.getInt("awsmock.service.sqs.port", 9501);
+    // SQS module connection
+    _sqsServiceHost = _configuration.getString("awsmock.module.sqs.host", "localhost");
+    _sqsServicePort = _configuration.getInt("awsmock.module.sqs.port", 9501);
 
-    // lambda service connection
-    _lambdaServiceHost = _configuration.getString("awsmock.service.lambda.host", "localhost");
-    _lambdaServicePort = _configuration.getInt("awsmock.service.lambda.port", 9503);
+    // lambda module connection
+    _lambdaServiceHost = _configuration.getString("awsmock.module.lambda.host", "localhost");
+    _lambdaServicePort = _configuration.getInt("awsmock.module.lambda.port", 9503);
 
     // Create temp directory
     Core::DirUtils::EnsureDirectory(_tempDir);

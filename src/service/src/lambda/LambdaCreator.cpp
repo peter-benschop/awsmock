@@ -83,7 +83,7 @@ namespace AwsMock::Service {
     std::string codeDir = UnpackZipFile(zipFile, lambdaEntity.runtime, lambdaEntity.fileName);
     log_debug_stream(_logger) << "Lambda file unzipped, codeDir: " << codeDir << std::endl;
 
-    // Build the docker image using the docker service
+    // Build the docker image using the docker module
     std::string imageFile = _dockerService.BuildImage(codeDir, lambdaEntity.function, dockerTag, lambdaEntity.handler, lambdaEntity.runtime, lambdaEntity.environment.variables);
 
     // Get the image struct

@@ -36,7 +36,7 @@ namespace AwsMock::Core {
     /**
      * Create Amazon Resource Names (ARNs)
      *
-     * @param service AWS service name
+     * @param service AWS module name
      * @param region AWS region
      * @param accountId AWS accountId
      * @param resourceId AWS resourceId

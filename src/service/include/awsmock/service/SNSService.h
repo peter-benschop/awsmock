@@ -46,7 +46,7 @@ namespace AwsMock::Service {
       /**
        * Constructor
        *
-       * @param configuration service configuration
+       * @param configuration module configuration
        * @param condition stop condition
        */
       explicit SNSService(const Core::Configuration &configuration, Poco::Condition &condition);
@@ -144,7 +144,7 @@ namespace AwsMock::Service {
       std::unique_ptr<Database::SQSDatabase> _sqsDatabase;
 
       /**
-       * SQS service
+       * SQS module
        */
       std::unique_ptr<SQSService> _sqsService;
 

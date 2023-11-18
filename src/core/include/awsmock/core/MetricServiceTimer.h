@@ -21,7 +21,7 @@ namespace AwsMock::Core {
        *
        * <p>Measure a methods execution time.</p>
        *
-       * @param metricService metric service
+       * @param metricService metric module
        * @param name name of the underlying timer
        */
       explicit MetricServiceTimer(M &metricService, std::string name) : _metricService(metricService), _name(std::move(name)) {
@@ -56,7 +56,7 @@ namespace AwsMock::Core {
     private:
 
       /**
-       * Metric service
+       * Metric module
        */
       M &_metricService;
 

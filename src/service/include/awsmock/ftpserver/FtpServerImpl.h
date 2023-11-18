@@ -151,7 +151,7 @@ namespace AwsMock::FtpServer {
       std::vector<std::thread> _threadPool;
 
       /**
-       * Asio IO service
+       * Asio IO module
        */
       asio::io_service _ioService;
 

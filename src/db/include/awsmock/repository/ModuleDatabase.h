@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
-#include <awsmock/entity/service/Module.h>
+#include <awsmock/entity/module/Module.h>
 #include <awsmock/repository/Database.h>
 
 namespace AwsMock::Database {
@@ -116,7 +116,7 @@ namespace AwsMock::Database {
     Entity::Module::ModuleList ListModules();
 
     /**
-     * Deletes service
+     * Deletes module
      *
      * @param module module entity
      */

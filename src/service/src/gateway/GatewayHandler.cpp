@@ -96,7 +96,7 @@ namespace AwsMock::Service {
     long send = Poco::StreamCopier::copyStream(is, response.send(), 1024 * 1024);
     log_trace_stream(_logger) << "Bytes send: " << send << std::endl;
 
-    log_trace_stream(_logger) << "Backend service response send back to client" << std::endl;
+    log_trace_stream(_logger) << "Backend module response send back to client" << std::endl;
   }
 
   void GatewayHandler::SetHeaders(Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user) {

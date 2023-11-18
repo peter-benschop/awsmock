@@ -53,7 +53,7 @@ namespace AwsMock::Service {
        * Constructor
        *
        * @param configuration application configuration
-       * @param metricService common monitoring service
+       * @param metricService common monitoring module
        */
       GatewayRouter(Core::Configuration &configuration, Core::MetricService &metricService);
 
@@ -83,17 +83,17 @@ namespace AwsMock::Service {
       /**
        * Return HTTP restful resource.
        *
-       * @param service AWS service name
+       * @param service AWS module name
        * @param uri request URI
        * @return restfull resource
        */
       Poco::Net::HTTPRequestHandler *GetResource(const std::string &service, const std::string &uri);
 
       /**
-       * Returns the AWS service, region and user from the authorization string.
+       * Returns the AWS module, region and user from the authorization string.
        *
        * @param authInfo authorization string
-       * @return service name
+       * @return module name
        */
       std::string GetService(const std::string &authInfo);
 
@@ -108,7 +108,7 @@ namespace AwsMock::Service {
       Core::Configuration &_configuration;
 
       /**
-       * Metric service
+       * Metric module
        */
       Core::MetricService &_metricService;
 

@@ -30,7 +30,7 @@ namespace AwsMock::Service {
     request.getCredentials(scheme, authInfo);
     log_debug_stream(_logger) << "Schema: " << scheme << " Authorization: " << authInfo << "URI: " << request.getURI() << " Method: " + request.getMethod() << std::endl;
 
-    // Get the service from the request authorization header. Currently, no credentials checks are made.
+    // Get the module from the request authorization header. Currently, no credentials checks are made.
     std::string service = GetService(authInfo);
 
     return GetResource(service, request.getURI());
@@ -40,14 +40,14 @@ namespace AwsMock::Service {
 
     Poco::URI uri = Poco::URI(route);
 
-    // Get the resource factory index for the service
+    // Get the resource factory index for the module
     auto factoryIndex = _routingTable.find(service);
     if (factoryIndex == _routingTable.end()) {
-      log_error_stream(_logger) << "No routing found, service: " + service << std::endl;
+      log_error_stream(_logger) << "No routing found, module: " + service << std::endl;
       //return new AwsMock::ResourceNotFound();
     }
 
-    // Get the resource factory for the service
+    // Get the resource factory for the module
     std::string host = _routingTable[service].host;
     int port = _routingTable[service].port;
     log_debug_stream(_logger) << "Found request handler for route: " << route << " endpoint: " << host << ":" << port << std::endl;
@@ -59,12 +59,12 @@ namespace AwsMock::Service {
     Poco::RegularExpression::MatchVec posVec;
     Poco::RegularExpression pattern(R"(Credential=[a-zA-Z0-9]+\/[0-9]{8}\/[a-zA-Z0-9\-]+\/([a-zA-Z0-9]+)\/aws4_request,.*$)");
     if (!pattern.match(authorization, 0, posVec)) {
-      log_error_stream(_logger) << "Could not extract service, authorization: " << authorization << std::endl;
-      throw Core::ResourceNotFoundException("Could not extract service", Poco::Net::HTTPServerResponse::HTTP_NOT_FOUND);
+      log_error_stream(_logger) << "Could not extract module, authorization: " << authorization << std::endl;
+      throw Core::ResourceNotFoundException("Could not extract module", Poco::Net::HTTPServerResponse::HTTP_NOT_FOUND);
     }
 
     std::string service = authorization.substr(posVec[1].offset, posVec[1].length);
-    log_debug_stream(_logger) << "Found service: " << service << std::endl;
+    log_debug_stream(_logger) << "Found module: " << service << std::endl;
 
     return service;
   }

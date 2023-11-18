@@ -10,12 +10,12 @@ namespace AwsMock::Service {
       : AbstractServer(configuration, "sqs"), _logger(Poco::Logger::get("SQSServer")), _configuration(configuration), _metricService(metricService) {
 
     // HTTP manager configuration
-    _port = _configuration.getInt("awsmock.service.sqs.port", SQS_DEFAULT_PORT);
-    _host = _configuration.getString("awsmock.service.sqs.host", SQS_DEFAULT_HOST);
-    _maxQueueLength = _configuration.getInt("awsmock.service.sqs.max.queue", SQS_DEFAULT_QUEUE_LENGTH);
-    _maxThreads = _configuration.getInt("awsmock.service.sqs.max.threads", SQS_DEFAULT_THREADS);
-    _requestTimeout = _configuration.getInt("awsmock.service.sqs.timeout", SQS_DEFAULT_TIMEOUT);
-    log_debug_stream(_logger) << "SQS rest service initialized, endpoint: " << _host << ":" << _port << std::endl;
+    _port = _configuration.getInt("awsmock.module.sqs.port", SQS_DEFAULT_PORT);
+    _host = _configuration.getString("awsmock.module.sqs.host", SQS_DEFAULT_HOST);
+    _maxQueueLength = _configuration.getInt("awsmock.module.sqs.max.queue", SQS_DEFAULT_QUEUE_LENGTH);
+    _maxThreads = _configuration.getInt("awsmock.module.sqs.max.threads", SQS_DEFAULT_THREADS);
+    _requestTimeout = _configuration.getInt("awsmock.module.sqs.timeout", SQS_DEFAULT_TIMEOUT);
+    log_debug_stream(_logger) << "SQS rest module initialized, endpoint: " << _host << ":" << _port << std::endl;
 
     // Sleeping period
     _period = _configuration.getInt("awsmock.worker.sqs.period", 10000);
@@ -33,9 +33,9 @@ namespace AwsMock::Service {
 
   void SQSServer::MainLoop() {
 
-    // Check service active
+    // Check module active
     if (!IsActive("sqs")) {
-      log_info_stream(_logger) << "SQS service inactive" << std::endl;
+      log_info_stream(_logger) << "SQS module inactive" << std::endl;
       return;
     }
     log_info_stream(_logger) << "SQS server starting, port: " << _port << std::endl;
@@ -43,7 +43,7 @@ namespace AwsMock::Service {
     // Start monitoring thread
     StartMonitoringServer();
 
-    // Start REST service
+    // Start REST module
     StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new SQSRequestHandlerFactory(_configuration, _metricService, _condition));
 
     while (IsRunning()) {

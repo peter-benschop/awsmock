@@ -47,8 +47,8 @@ namespace AwsMock::Service {
         "AWS4-HMAC-SHA256 Credential=none/20230618/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840";
 
       // Define endpoint
-      std::string _port = _configuration.getString("awsmock.service.s3.port", std::to_string(S3_DEFAULT_PORT));
-      std::string _host = _configuration.getString("awsmock.service.s3.host", S3_DEFAULT_HOST);
+      std::string _port = _configuration.getString("awsmock.module.s3.port", std::to_string(S3_DEFAULT_PORT));
+      std::string _host = _configuration.getString("awsmock.module.s3.host", S3_DEFAULT_HOST);
       _endpoint = "http://" + _host + ":" + _port;
 
       // Start HTTP manager

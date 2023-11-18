@@ -191,7 +191,7 @@ namespace AwsMock::Resource {
       /**
        * Send an error response (HTTP status code 200).
        *
-       * @param service service name
+       * @param service module name
        * @param response HTTP response object
        * @param exc exception object
        */
@@ -200,9 +200,9 @@ namespace AwsMock::Resource {
       /**
        * Send an error response (HTTP status code 200).
        *
-       * @param service service name
+       * @param service module name
        * @param response HTTP response object
-       * @param exc service exception object
+       * @param exc module exception object
        */
       void SendErrorResponse(const std::string &service,
                              Poco::Net::HTTPServerResponse &response,

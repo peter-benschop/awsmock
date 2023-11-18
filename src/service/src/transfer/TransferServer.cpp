@@ -10,29 +10,29 @@ namespace AwsMock::Service {
       : AbstractServer(configuration, "transfer"), AbstractWorker(configuration), _logger(Poco::Logger::get("TransferServer")), _configuration(configuration), _metricService(metricService), _module("transfer") {
 
     // REST manager configuration
-    _port = _configuration.getInt("awsmock.service.transfer.port", TRANSFER_DEFAULT_PORT);
-    _host = _configuration.getString("awsmock.service.transfer.host", TRANSFER_DEFAULT_HOST);
-    _maxQueueLength = _configuration.getInt("awsmock.service.transfer.max.queue", TRANSFER_DEFAULT_QUEUE_LENGTH);
-    _maxThreads = _configuration.getInt("awsmock.service.transfer.max.threads", TRANSFER_DEFAULT_THREADS);
-    _requestTimeout = _configuration.getInt("awsmock.service.transfer.timeout", TRANSFER_DEFAULT_TIMEOUT);
+    _port = _configuration.getInt("awsmock.module.transfer.port", TRANSFER_DEFAULT_PORT);
+    _host = _configuration.getString("awsmock.module.transfer.host", TRANSFER_DEFAULT_HOST);
+    _maxQueueLength = _configuration.getInt("awsmock.module.transfer.max.queue", TRANSFER_DEFAULT_QUEUE_LENGTH);
+    _maxThreads = _configuration.getInt("awsmock.module.transfer.max.threads", TRANSFER_DEFAULT_THREADS);
+    _requestTimeout = _configuration.getInt("awsmock.module.transfer.timeout", TRANSFER_DEFAULT_TIMEOUT);
 
     // Sleeping period
-    _period = _configuration.getInt("awsmock.service.transfer.period", 10000);
-    log_debug_stream(_logger) << "Transfer manager service period: " << _period << std::endl;
+    _period = _configuration.getInt("awsmock.module.transfer.period", 10000);
+    log_debug_stream(_logger) << "Transfer manager module period: " << _period << std::endl;
 
     // Create environment
     _region = _configuration.getString("awsmock.region");
     _transferDatabase = std::make_unique<Database::TransferDatabase>(_configuration);
 
     // Bucket
-    _bucket = _configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
-    _baseDir = _configuration.getString("awsmock.service.transfer.base.dir", DEFAULT_BASE_DIR);
+    _bucket = _configuration.getString("awsmock.module.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
+    _baseDir = _configuration.getString("awsmock.module.transfer.base.dir", DEFAULT_BASE_DIR);
 
-    // S3 service connection
-    _s3ServiceHost = _configuration.getString("awsmock.service.s3.host", "localhost");
-    _s3ServicePort = _configuration.getInt("awsmock.service.s3.port", 9501);
+    // S3 module connection
+    _s3ServiceHost = _configuration.getString("awsmock.module.s3.host", "localhost");
+    _s3ServicePort = _configuration.getInt("awsmock.module.s3.port", 9501);
     _baseUrl = "http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort);
-    log_debug_stream(_logger) << "S3 service endpoint: http://" << _s3ServiceHost << ":" << _s3ServicePort << std::endl;
+    log_debug_stream(_logger) << "S3 module endpoint: http://" << _s3ServiceHost << ":" << _s3ServicePort << std::endl;
 
     // Ensure base directory exists
     Core::DirUtils::EnsureDirectory(_baseDir);
@@ -124,12 +124,12 @@ namespace AwsMock::Service {
 
   void TransferServer::MainLoop() {
 
-    // Check service active
+    // Check module active
     if (!IsActive("transfer")) {
-      log_info_stream(_logger) << "Transfer service inactive" << std::endl;
+      log_info_stream(_logger) << "Transfer module inactive" << std::endl;
       return;
     }
-    log_info_stream(_logger) << "Transfer service starting" << std::endl;
+    log_info_stream(_logger) << "Transfer module starting" << std::endl;
 
     // Start REST manager
     StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new TransferRequestHandlerFactory(_configuration, _metricService));

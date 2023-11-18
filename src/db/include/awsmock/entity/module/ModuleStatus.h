@@ -13,6 +13,7 @@ namespace AwsMock::Database::Entity::Module {
 
   enum class ModuleStatus {
     STOPPED,
+    STARTING,
     RUNNING,
     SUSPENDED,
     UNKNOWN
@@ -20,6 +21,7 @@ namespace AwsMock::Database::Entity::Module {
 
   static std::map<ModuleStatus, std::string> ModuleStatusNames{
       {ModuleStatus::STOPPED, "STOPPED"},
+      {ModuleStatus::STARTING, "STARTING"},
       {ModuleStatus::RUNNING, "RUNNING"},
       {ModuleStatus::SUSPENDED, "SUSPENDED"},
       {ModuleStatus::UNKNOWN, "UNKNOWN"},

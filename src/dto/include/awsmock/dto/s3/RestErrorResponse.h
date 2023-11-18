@@ -28,7 +28,7 @@ namespace AwsMock::Dto::S3 {
       /**
        * Constructor.
        *
-       * @param exc service exception
+       * @param exc module exception
        */
       explicit RestErrorResponse(const Core::ServiceException &exc) {
           message = exc.message();

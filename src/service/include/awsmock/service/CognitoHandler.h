@@ -32,7 +32,7 @@ namespace AwsMock::Service {
        * Constructor
        *
        * @param configuration application configuration
-       * @param metricService monitoring service
+       * @param metricService monitoring module
        */
       CognitoHandler(Core::Configuration &configuration, Core::MetricService &metricService);
 
@@ -114,12 +114,12 @@ namespace AwsMock::Service {
       Core::Configuration &_configuration;
 
       /**
-       * Metric service
+       * Metric module
        */
       Core::MetricService &_metricService;
 
       /**
-       * Cognito service
+       * Cognito module
        */
       Service::CognitoService _cognitoService;
 

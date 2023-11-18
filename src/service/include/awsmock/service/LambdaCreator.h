@@ -37,8 +37,8 @@ namespace AwsMock::Service {
       /**
        * Constructor
        *
-       * @param configuration service configuration
-       * @param metricService monitoring service
+       * @param configuration module configuration
+       * @param metricService monitoring module
        * @param createQueue lambda create notification queue
        */
       explicit LambdaCreator(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue);
@@ -129,7 +129,7 @@ namespace AwsMock::Service {
       Core::Configuration &_configuration;
 
       /**
-       * Metric service
+       * Metric module
        */
       Core::MetricService &_metricService;
 
@@ -149,7 +149,7 @@ namespace AwsMock::Service {
       std::string _tempDir;
 
       /**
-       * Docker service
+       * Docker module
        */
       Service::DockerService _dockerService;
 

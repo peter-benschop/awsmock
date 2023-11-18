@@ -9,10 +9,10 @@ namespace AwsMock::Service {
   TransferService::TransferService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("TransferService")), _configuration(configuration) {
 
     // Initialize environment
-    _ftpPort = _configuration.getInt("awsmock.service.transfer.ftp.port", TRANSFER_DEFAULT_FTP_PORT);
+    _ftpPort = _configuration.getInt("awsmock.module.transfer.ftp.port", TRANSFER_DEFAULT_FTP_PORT);
     _accountId = _configuration.getString("awsmock.account.id", "000000000000");
     _transferDatabase = std::make_unique<Database::TransferDatabase>(_configuration);
-    log_debug_stream(_logger) << "Transfer service initialized" << std::endl;
+    log_debug_stream(_logger) << "Transfer module initialized" << std::endl;
   }
 
   Dto::Transfer::CreateTransferResponse

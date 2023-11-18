@@ -21,8 +21,8 @@
 // AwsMock includes
 #include "awsmock/core/JsonUtils.h"
 #include <awsmock/core/ServiceException.h>
-#include <awsmock/entity/service/Module.h>
-#include <awsmock/entity/service/ModuleStatus.h>
+#include <awsmock/entity/module/Module.h>
+#include <awsmock/entity/module/ModuleStatus.h>
 
 namespace AwsMock::Dto::Module {
 

@@ -23,7 +23,7 @@
 #include <mongocxx/exception/exception.hpp>
 
 // AwsMock includes
-#include <awsmock/entity/service/ModuleStatus.h>
+#include <awsmock/entity/module/ModuleStatus.h>
 
 namespace AwsMock::Database::Entity::Module {
 

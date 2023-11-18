@@ -13,7 +13,7 @@
 // AwsMock includes
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/ModuleDatabase.h>
-#include <awsmock/entity/service/ModuleStatus.h>
+#include <awsmock/entity/module/ModuleStatus.h>
 
 namespace AwsMock::Database {
 
@@ -22,7 +22,7 @@ namespace AwsMock::Database {
     public:
 
       /**
-       * Creates all services in the service database
+       * Creates all services in the module database
        */
       static void CreateServices();
 

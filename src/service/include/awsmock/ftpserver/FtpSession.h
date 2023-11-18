@@ -119,7 +119,7 @@ namespace AwsMock::FtpServer {
       void handleFtpCommandSTRU(const std::string &param);
       void handleFtpCommandMODE(const std::string &param);
 
-      // Ftp service commands
+      // Ftp module commands
       void handleFtpCommandRETR(const std::string &param);
       void handleFtpCommandSIZE(const std::string &param);
       void handleFtpCommandSTOR(const std::string &param);
@@ -256,7 +256,7 @@ namespace AwsMock::FtpServer {
       std::shared_ptr<FtpUser> _logged_in_user;
 
       /**
-       * Global IO service
+       * Global IO module
        */
       asio::io_service &_io_service;
 
@@ -291,12 +291,12 @@ namespace AwsMock::FtpServer {
       std::string _serverName;
 
       /**
-       * S3 service host
+       * S3 module host
        */
       std::string _s3ServiceHost;
 
       /**
-       * S3 service port
+       * S3 module port
        */
       int _s3ServicePort;
 
@@ -306,7 +306,7 @@ namespace AwsMock::FtpServer {
       std::string _baseDir;
 
       /**
-       * S3 service base URL
+       * S3 module base URL
        */
       std::string _baseUrl;
 

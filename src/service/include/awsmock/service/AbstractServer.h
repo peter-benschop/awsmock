@@ -8,6 +8,7 @@
 // C++ standard includes
 #include <string>
 #include <map>
+#include <utility>
 
 // Poco includes
 #include <Poco/Condition.h>
@@ -21,6 +22,7 @@
 #include <awsmock/core/CurlUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/repository/ModuleDatabase.h>
+#include <awsmock/entity/module/ModuleStatus.h>
 
 namespace AwsMock::Service {
 
@@ -37,7 +39,7 @@ namespace AwsMock::Service {
     explicit AbstractServer(const Core::Configuration &configuration, std::string name);
 
     /**
-     * Checks whether the service is active
+     * Checks whether the module is active
      *
      * @param name module name
      */
@@ -112,7 +114,7 @@ namespace AwsMock::Service {
     /**
      * Service database
      */
-    std::unique_ptr<Database::ModuleDatabase> _serviceDatabase;
+    std::unique_ptr<Database::ModuleDatabase> _moduleDatabase;
 
     /**
      * Shutdown mutex

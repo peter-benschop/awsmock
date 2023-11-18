@@ -182,7 +182,7 @@ create_queue_with_dead_letter_queue artikel-transformations-service-artikel-ausg
 create_queue_with_dead_letter_queue textannotation-result
 create_queue_with_dead_letter_queue bilderlink
 create_queue_with_dead_letter_queue katalogdaten
-#create_queue_with_dead_letter_queue daten-lieferanten-service-daten-eingang
+#create_queue_with_dead_letter_queue daten-lieferanten-module-daten-eingang
 #create_queue_with_dead_letter_queue daten-datenlieferanten-notification
 #create_queue_with_dead_letter_queue inventory-feed-parsing-result
 
