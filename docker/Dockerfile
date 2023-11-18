@@ -5,7 +5,7 @@ RUN apt-get update && apt-get -y upgrade
 # Install basics
 ARG GH_TOKEN=${GH_TOKEN}
 ENV GH_TOKEN=${GH_TOKEN}
-#RUN gh auth login
+RUN gh auth login
 
 # Create build environment
 RUN mkdir -p /usr/src
