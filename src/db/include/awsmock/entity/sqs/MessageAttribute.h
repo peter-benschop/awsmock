@@ -54,15 +54,6 @@ namespace AwsMock::Database::Entity::SQS {
   struct MessageAttribute {
 
     /**
-     * Constructor.
-     *
-     * @param name attribute name
-     * @param value attribute value
-     * @param type attribute type
-     */
-    //MessageAttribute(std::string name, std::string value, const MessageAttributeType &type);
-
-    /**
      * Message attribute name
      */
     std::string attributeName;

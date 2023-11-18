@@ -15,9 +15,6 @@ namespace AwsMock::Database {
     // Get collections
     _queueCollection = GetConnection()["sqs_queue"];
     _messageCollection = GetConnection()["sqs_message"];
-
-    // Get end point
-    _endpoint = configuration.getString("awsmock.rest.host", "localhost") + ":" + configuration.getString("awsmock.rest.port", "4567");
   }
 
   bool SQSDatabase::QueueUrlExists(const std::string &region, const std::string &queueUrl) {
@@ -46,10 +43,23 @@ namespace AwsMock::Database {
 
   Entity::SQS::Queue SQSDatabase::CreateQueue(const Entity::SQS::Queue &queue) {
 
-    auto result = _queueCollection.insert_one(queue.ToDocument());
-    log_trace_stream(_logger) << "Queue created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
+    auto session = GetSession();
+    session.start_transaction();
 
-    return GetQueueById(result->inserted_id().get_oid().value);
+    try {
+      auto result = _queueCollection.insert_one(queue.ToDocument());
+      log_trace_stream(_logger) << "Queue created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
+
+      // Commit
+      session.commit_transaction();
+
+      return GetQueueById(result->inserted_id().get_oid().value);
+
+    } catch (mongocxx::exception &e) {
+      session.abort_transaction();
+      log_error_stream(_logger) << "Collection transaction exception: " << e.what() << std::endl;
+      throw Core::DatabaseException("Insert queue failed, region: " + queue.region + " queueUrl: " + queue.queueUrl + " message: " + e.what());
+    }
   }
 
   Entity::SQS::Queue SQSDatabase::GetQueueById(bsoncxx::oid oid) {
@@ -98,6 +108,7 @@ namespace AwsMock::Database {
 
     mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
     if (!mResult) {
+      log_warning_stream(_logger) << "GetQueueByName failed, name: " << name << std::endl;
       return {};
     }
 
@@ -132,18 +143,26 @@ namespace AwsMock::Database {
     log_debug_stream(_logger) << "Purged queue, count: " << result->deleted_count() << std::endl;
   }
 
-  Entity::SQS::Queue SQSDatabase::UpdateQueue(const Entity::SQS::Queue &queue) {
+  Entity::SQS::Queue SQSDatabase::UpdateQueue(Entity::SQS::Queue &queue) {
 
-    auto result = _queueCollection.replace_one(make_document(kvp("region", queue.region), kvp("name", queue.name)), queue.ToDocument());
+    mongocxx::options::find_one_and_update opts{};
+    opts.return_document(mongocxx::options::return_document::k_after);
+
+    auto mResult = _queueCollection.find_one_and_update(make_document(kvp("region", queue.region), kvp("name", queue.name)), queue.ToDocument(), opts);
     log_trace_stream(_logger) << "Queue updated: " << queue.ToString() << std::endl;
 
-    return GetQueueById(queue.oid);
+    if (!mResult) {
+      throw Core::DatabaseException("Update queue failed, region: " + queue.region + " queueUrl: " + queue.queueUrl);
+    }
+
+    queue.FromDocument(mResult->view());
+    return queue;
   }
 
   long SQSDatabase::CountQueues(const std::string &region) {
 
-    long count=0;
-    if(region.empty()) {
+    long count = 0;
+    if (region.empty()) {
       count = _queueCollection.count_documents({});
     } else {
       count = _queueCollection.count_documents(make_document(kvp("region", region)));
@@ -200,6 +219,22 @@ namespace AwsMock::Database {
 
   Entity::SQS::Message SQSDatabase::GetMessageById(const std::string &oid) {
     return GetMessageById(bsoncxx::oid(oid));
+  }
+
+  Entity::SQS::Message SQSDatabase::UpdateMessage(Entity::SQS::Message &message) {
+
+    mongocxx::options::find_one_and_update opts{};
+    opts.return_document(mongocxx::options::return_document::k_after);
+
+    auto mResult = _messageCollection.find_one_and_update(make_document(kvp("_id", bsoncxx::oid{message.oid})), message.ToDocument(), opts);
+    log_trace_stream(_logger) << "Message updated, count: " << ConvertMessageToJson(mResult.value()) << std::endl;
+
+    if (!mResult) {
+      throw Core::DatabaseException("Update message failed, oid: " + message.oid);
+    }
+
+    message.FromDocument(mResult->view());
+    return message;
   }
 
   void SQSDatabase::ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, Entity::SQS::MessageList &messageList) {
@@ -360,4 +395,11 @@ namespace AwsMock::Database {
     log_debug_stream(_logger) << "All messages deleted, count: " << result->deleted_count() << std::endl;
   }
 
+  /*std::string SQSDatabase::ConvertQueueToJson(const Entity::SQS::Message &message) {
+  return bsoncxx::to_json(message);
+  }*/
+
+  std::string SQSDatabase::ConvertMessageToJson(mongocxx::stdx::optional<bsoncxx::document::value> document) {
+    return bsoncxx::to_json(document->view());
+  }
 } // namespace AwsMock::Database

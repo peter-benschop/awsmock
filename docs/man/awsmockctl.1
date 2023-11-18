@@ -1,0 +1,55 @@
+.TH awsmockctl 1 "14 Nov 2023" "version 0.5.90"
+.SH [NAME]
+awsmockctl AwsMock controller
+.SH SYNOPSIS
+.B awsmockctl [OPTIONS] [COMMAND]
+.SH DESCRIPTION
+.P
+awsmockctl controls and show some insides of the AwsMock AWS cloud simulation. Supported AWS modules are: SQS, SNS
+S3, Cognito, TransferServer, Lambda. AwsMock is written in C++ and has a module structure, using different modules for
+each AWS service plus a API gateway, which routes the requests to the different modules.
+.P
+Per default the gateway runs on port 4566, but can be chaged in the configuration file. The default configuration file
+is
+.I /etc/aws-mock.properties
+.SH OPTIONS
+.TP
+.B \-\-config\~ <configuration-file-path>
+starts the controller with a given configuration file. Per default the configuration file
+.I /etc/aws-mock.properties
+will be used.
+.TP
+.B \-\-help
+shows the usage screen and exists
+.TP
+.B \-\-version
+shows the current version and exists.
+.SH COMMANDS
+.TP
+.BI list
+lists the currently running AwsMock modules like S3, SQS, SNS etc. Each line has the format:
+.IP
+SQS         RUNNING
+.IP
+SNS         STOPPED
+.TP
+.BI stop\~ <module>
+stops the given module. Modules are S3, SQS, SNS, Transfer, Cognito. Modules names can be given case-insensitive.
+.TP
+.BI start\~ <module>
+starts the given module.
+.TP
+.BI restart\~ <module>
+restarts the given module.
+.TP
+.BI logs
+shows the console logs of the AwsMock manager application
+.I awsmockmgr.
+.TP
+.BI logLevel\~ <level>
+sets the log level of the AwsMock manager
+.I awsmockmgr. loglevel
+can be one of: trace, debug, information, warning, error, critical or fatal.
+.TP
+.BI config
+shows the configuration of the AwsMock API gateway.

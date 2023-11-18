@@ -270,6 +270,8 @@ namespace AwsMock::Service {
     std::string payload;
     Poco::StreamCopier::copyToString(request.stream(), payload);
     log_trace_stream(_logger) << "Request payload: " << payload << std::endl;
+    request.stream().clear();
+    request.stream().seekg(0);
     return payload;
   }
 
@@ -599,11 +601,18 @@ namespace AwsMock::Service {
 
   [[maybe_unused]] void AbstractHandler::DumpBody(Poco::Net::HTTPServerRequest &request) {
     log_trace_stream(_logger) << "Dump request body" << std::endl;
-    std::basic_streambuf<char> *cinbuf = request.stream().rdbuf();
     std::cerr << "================== Request Body ==================" << std::endl;
     std::cerr << request.stream().rdbuf() << std::endl;
     std::cerr << "==================================================" << std::endl;
-    request.stream().rdbuf(cinbuf);
+    request.stream().clear();
+    request.stream().seekg(0, std::ios::beg);
+  }
+
+  [[maybe_unused]] void AbstractHandler::DumpPayload(const std::string &payload) {
+    log_trace_stream(_logger) << "Dump request body" << std::endl;
+    std::cerr << "================== Request Body ==================" << std::endl;
+    std::cerr << payload<< std::endl;
+    std::cerr << "==================================================" << std::endl;
   }
 
   void AbstractHandler::DumpBodyToFile(Poco::Net::HTTPServerRequest &request, const std::string &filename) {

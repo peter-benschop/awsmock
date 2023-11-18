@@ -121,7 +121,7 @@ namespace AwsMock::Database::Entity::SQS {
      *
      * @param mResult MongoDB document.
      */
-    void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult);
+    //void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult);
 
     /**
      * Converts the MongoDB document to an entity
