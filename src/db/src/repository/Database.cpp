@@ -32,6 +32,18 @@ namespace AwsMock::Database {
     return _client.start_session();
   }
 
+  void Database::WaitForStartup() {
+    while (true) {
+      try {
+        const auto ping_cmd = bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("ping", 1));
+        _client["awsmock"].run_command(ping_cmd.view());
+        break;
+      } catch (const std::exception &e) {
+      }
+      Poco::Thread::sleep(500);
+    }
+  }
+
   void Database::CreateIndexes() {
 
     // SQS indexes
