@@ -22,82 +22,87 @@ namespace AwsMock::Database {
 
   class Database {
 
-    public:
+  public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration configuration properties
-       */
-      explicit Database(const Core::Configuration &configuration);
+    /**
+     * Constructor
+     *
+     * @param configuration configuration properties
+     */
+    explicit Database(const Core::Configuration &configuration);
 
-      /**
-       * Returns a MongoDB connection from the pool
-       *
-       * @return MongoDB database client
-       */
-      mongocxx::database GetConnection();
+    /**
+     * Returns a MongoDB connection from the pool
+     *
+     * @return MongoDB database client
+     */
+    mongocxx::database GetConnection();
 
-      /**
-       * Check all indexes.
-       *
-       * <p>Normally done during manager StartServer.</p>
-       */
-      void CreateIndexes();
+    /**
+     * Check all indexes.
+     *
+     * <p>Normally done during manager StartServer.</p>
+     */
+    void CreateIndexes();
 
-      /**
-       * Returns a client session
-       *
-       * @return client session
-       */
-      mongocxx::client_session GetSession();
+    /**
+     * Returns a client session
+     *
+     * @return client session
+     */
+    mongocxx::client_session GetSession();
 
-    private:
+    /**
+     * Wait for the mongodb client session to be ready
+     */
+    void WaitForStartup();
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+  private:
 
-      /**
-       * Application configuration
-       */
-      const Core::Configuration &_configuration;
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
 
-      /**
-       * Database name
-       */
-      std::string _name;
+    /**
+     * Application configuration
+     */
+    const Core::Configuration &_configuration;
 
-      /**
-       * Database host
-       */
-      std::string _host;
+    /**
+     * Database name
+     */
+    std::string _name;
 
-      /**
-       * Database port
-       */
-      int _port;
+    /**
+     * Database host
+     */
+    std::string _host;
 
-      /**
-       * Database user
-       */
-      std::string _user;
+    /**
+     * Database port
+     */
+    int _port;
 
-      /**
-       * Database password
-       */
-      std::string _password;
+    /**
+     * Database user
+     */
+    std::string _user;
 
-      /**
-       * MongoDB URI
-       */
-      mongocxx::uri _uri;
+    /**
+     * Database password
+     */
+    std::string _password;
 
-      /**
-       * Database client
-       */
-      mongocxx::client _client;
+    /**
+     * MongoDB URI
+     */
+    mongocxx::uri _uri;
+
+    /**
+     * Database client
+     */
+    mongocxx::client _client;
 
   };
 

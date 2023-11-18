@@ -276,6 +276,10 @@ namespace AwsMock {
 
       log_debug_stream(_logger) << "Entering main routine" << std::endl;
 
+      // Wait for the mongodb to be ready, this is only needed for the awsmock-container, as  the supervisor is starting
+      // the server process and the mongodb daemon the same time.
+      _database.WaitForStartup();
+
       // Start module and worker. Services needed to StartServer first, as the worker could possibly use the services.
       StartServices();
 
