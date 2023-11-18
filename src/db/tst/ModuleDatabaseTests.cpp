@@ -31,19 +31,19 @@ namespace AwsMock::Database {
 
   class ModuleDatabaseTest : public ::testing::Test {
 
-    protected:
+  protected:
 
-      void SetUp() override {
-        _region = _configuration.getString("awsmock.region");
-      }
+    void SetUp() override {
+      _region = _configuration.getString("awsmock.region");
+    }
 
-      void TearDown() override {
-        _moduleDatabase.DeleteAllModules();
-      }
+    void TearDown() override {
+      _moduleDatabase.DeleteAllModules();
+    }
 
-      std::string _region;
-      Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
-      ModuleDatabase _moduleDatabase = ModuleDatabase(_configuration);
+    std::string _region;
+    Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+    ModuleDatabase _moduleDatabase = ModuleDatabase(_configuration);
   };
 
   TEST_F(ModuleDatabaseTest, ModuleCreateTest) {
@@ -138,7 +138,7 @@ namespace AwsMock::Database {
     Entity::Module::ModuleList result = _moduleDatabase.ListModules();
 
     // assert
-    EXPECT_EQ(1, result.size());
+    EXPECT_EQ(8, result.size());
   }
 
   TEST_F(ModuleDatabaseTest, ModuleDeleteTest) {
@@ -152,7 +152,7 @@ namespace AwsMock::Database {
     int count = _moduleDatabase.ModuleCount();
 
     // assert
-    EXPECT_EQ(0, count);
+    EXPECT_EQ(7, count);
   }
 
   TEST_F(ModuleDatabaseTest, ModuleSetStatusTest) {
