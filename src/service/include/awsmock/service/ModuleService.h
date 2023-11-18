@@ -15,14 +15,14 @@
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
-#include "awsmock/core/ServiceException.h"
-#include <awsmock/entity/service/Module.h>
+#include <awsmock/core/ServiceException.h>
+#include <awsmock/entity/module/Module.h>
 #include <awsmock/repository/ModuleDatabase.h>
-#include "awsmock/service/S3Server.h"
-#include "awsmock/service/SQSServer.h"
-#include "awsmock/service/SNSServer.h"
-#include "awsmock/service/LambdaServer.h"
-#include "awsmock/service/TransferServer.h"
+#include <awsmock/service/S3Server.h>
+#include <awsmock/service/SQSServer.h>
+#include <awsmock/service/SNSServer.h>
+#include <awsmock/service/LambdaServer.h>
+#include <awsmock/service/TransferServer.h>
 
 namespace AwsMock::Service {
 
@@ -31,80 +31,88 @@ namespace AwsMock::Service {
    */
   class ModuleService {
 
-    public:
+  public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration service configuration
-       * @param serverMap service map
-       */
-      explicit ModuleService(const Core::Configuration &configuration, Service::ServerMap &serverMap);
+    /**
+     * Constructor
+     *
+     * @param configuration module configuration
+     * @param serverMap module map
+     */
+    explicit ModuleService(const Core::Configuration &configuration, Service::ServerMap &serverMap);
 
-      /**
-       * Return all list of all modules
-       *
-       * @param list of all modules
-       */
-      Database::Entity::Module::ModuleList ListModules();
+    /**
+     * Return all list of all modules
+     *
+     * @param list of all modules
+     */
+    Database::Entity::Module::ModuleList ListModules();
 
-      /**
-       * Starts a service
-       *
-       * @param name service name
-       */
-      Database::Entity::Module::Module StartService(const std::string &name);
+    /**
+     * Returns the running state
+     *
+     * @param module module name
+     * @return module state
+     */
+    bool IsRunning(const std::string &module);
 
-      /**
-       * Starts all services
-       */
-      void StartAllServices();
+    /**
+     * Starts a module
+     *
+     * @param name module name
+     */
+    Database::Entity::Module::Module StartService(const std::string &name);
 
-      /**
-       * Restarts a service
-       *
-       * @param name service name
-       */
-      Database::Entity::Module::Module RestartService(const std::string &name);
+    /**
+     * Starts all services
+     */
+    void StartAllServices();
 
-      /**
-       * Restarts all services
-       */
-      void RestartAllServices();
+    /**
+     * Restarts a module
+     *
+     * @param name module name
+     */
+    Database::Entity::Module::Module RestartService(const std::string &name);
 
-      /**
-       * Stops a service
-       *
-       * @param name service name
-       */
-      Database::Entity::Module::Module StopService(const std::string &name);
+    /**
+     * Restarts all services
+     */
+    void RestartAllServices();
 
-      /**
-       * Stops all services
-       */
-      void StopAllServices();
+    /**
+     * Stops a module
+     *
+     * @param name module name
+     */
+    Database::Entity::Module::Module StopService(const std::string &name);
 
-    private:
+    /**
+     * Stops all services
+     */
+    void StopAllServices();
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+  private:
 
-      /**
-       * Configuration
-       */
-      const Core::Configuration &_configuration;
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
 
-      /**
-       * Server map
-       */
-      Service::ServerMap &_serverMap;
+    /**
+     * Configuration
+     */
+    const Core::Configuration &_configuration;
 
-      /**
-       * Module database
-       */
-      std::shared_ptr<Database::ModuleDatabase>_moduleDatabase;
+    /**
+     * Server map
+     */
+    Service::ServerMap &_serverMap;
+
+    /**
+     * Module database
+     */
+    std::shared_ptr<Database::ModuleDatabase> _moduleDatabase;
   };
 
 } // namespace AwsMock::Service

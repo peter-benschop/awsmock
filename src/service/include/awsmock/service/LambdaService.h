@@ -42,7 +42,7 @@
 namespace AwsMock::Service {
 
   /**
-   * AWS lambda service. Handles all lambda related requests:
+   * AWS lambda module. Handles all lambda related requests:
    *
    * <ul>
    * <li>Create lambda function.</li>
@@ -67,8 +67,8 @@ namespace AwsMock::Service {
       /**
        * Constructor
        *
-       * @param configuration service configuration
-       * @param metricService aws-mock monitoring service
+       * @param configuration module configuration
+       * @param metricService aws-mock monitoring module
        * @param createQueue create notification queue
        * @param invokeQueue invoke notification queue
        */
@@ -205,7 +205,7 @@ namespace AwsMock::Service {
       std::shared_ptr<Database::S3Database> _s3Database;
 
       /**
-       * Docker service
+       * Docker module
        */
       std::shared_ptr<Service::DockerService> _dockerService;
   };

@@ -44,8 +44,8 @@ namespace AwsMock::Service {
       _extraHeaders["User-Agent"] = "aws-sdk-cpp";
 
       // Define endpoint. This is the endpoint of the SQS server, not the gateway
-      std::string _port = _configuration.getString("awsmock.service.sqs.port", std::to_string(SQS_DEFAULT_PORT));
-      std::string _host = _configuration.getString("awsmock.service.sqs.host", SQS_DEFAULT_HOST);
+      std::string _port = _configuration.getString("awsmock.module.sqs.port", std::to_string(SQS_DEFAULT_PORT));
+      std::string _host = _configuration.getString("awsmock.module.sqs.host", SQS_DEFAULT_HOST);
       _endpoint = "http://" + _host + ":" + _port;
 
       // Start HTTP manager

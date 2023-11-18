@@ -97,9 +97,9 @@ namespace AwsMock::Controller {
         helpFormatter.format(std::cout);
         std::cout << "\nCommands:\n" << std::endl;
         std::cout << "list\t\t\t: lists all available services" << std::endl;
-        std::cout << "start [<service>]\t: starts the given service. If no argument is given, starts all services." << std::endl;
-        std::cout << "stop [<service>]\t: stops the given service. If no argument is given, stops all services" << std::endl;
-        std::cout << "restart [<service>]\t: restarts the given service. If no argument is given, restarts all services" << std::endl;
+        std::cout << "start [<module>]\t: starts the given module. If no argument is given, starts all services." << std::endl;
+        std::cout << "stop [<module>]\t: stops the given module. If no argument is given, stops all services" << std::endl;
+        std::cout << "restart [<module>]\t: restarts the given module. If no argument is given, restarts all services" << std::endl;
         std::cout << "logs\t\t\t: shows the manager logs" << std::endl;
         std::cout << "loglevel <level>\t: sets the manager log to level" << std::endl;
         std::cout << "config\t: shows the gateway configuration" << std::endl;

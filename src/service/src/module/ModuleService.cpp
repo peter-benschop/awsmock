@@ -14,8 +14,15 @@ namespace AwsMock::Service {
   Database::Entity::Module::ModuleList ModuleService::ListModules() {
 
     Database::Entity::Module::ModuleList modules = _moduleDatabase->ListModules();
-    log_debug_stream(_logger) << &"Module list, count: "[modules.size()] << std::endl;
+    log_debug_stream(_logger) << "Module list, count: "[modules.size()] << std::endl;
     return modules;
+  }
+
+  bool ModuleService::IsRunning(const std::string &moduleName) {
+
+    Database::Entity::Module::Module module = _moduleDatabase->GetModuleByName(moduleName);
+    log_debug_stream(_logger) << "Module status, status: "<< Database::Entity::Module::ModuleStatusToString(module.status) << std::endl;
+    return module.status == Database::Entity::Module::ModuleStatus::RUNNING;
   }
 
   Database::Entity::Module::Module ModuleService::StartService(const std::string &name) {
@@ -98,7 +105,7 @@ namespace AwsMock::Service {
       // Set status
       _moduleDatabase->SetStatus(name, Database::Entity::Module::ModuleStatus::STOPPED);
 
-      // Stop service
+      // Stop module
       for (const auto &server : _serverMap) {
         if (name == server.first) {
           server.second->StopServer();

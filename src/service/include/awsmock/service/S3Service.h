@@ -58,7 +58,7 @@ namespace AwsMock::Service {
       /**
        * Constructor
        *
-       * @param configuration service configuration
+       * @param configuration module configuration
        */
       explicit S3Service(const Core::Configuration &configuration);
 
@@ -205,9 +205,9 @@ namespace AwsMock::Service {
       void SendQueueNotificationRequest(const Dto::S3::EventNotification &eventNotification, const std::string &queueArn);
 
       /**
-       * Send lambda function invocation request to lambda service.
+       * Send lambda function invocation request to lambda module.
        *
-       * <p>This will send a lambda invocation requst to the lambda service. The lambda service will StartServer the corresponding lambda function and will send the S3
+       * <p>This will send a lambda invocation requst to the lambda module. The lambda module will StartServer the corresponding lambda function and will send the S3
        * notification request to the lambda function.</p>
        *
        * @param eventNotification S3 event notification
@@ -363,22 +363,22 @@ namespace AwsMock::Service {
       MultiPartUploads _uploads;
 
       /**
-       * SQS service port
+       * SQS module port
        */
       int _sqsServicePort;
 
       /**
-       * SQS service host
+       * SQS module host
        */
       std::string _sqsServiceHost;
 
       /**
-       * lambda service port
+       * lambda module port
        */
       int _lambdaServicePort;
 
       /**
-       * lambda service host
+       * lambda module host
        */
       std::string _lambdaServiceHost;
   };

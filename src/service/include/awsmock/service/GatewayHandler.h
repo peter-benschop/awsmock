@@ -29,8 +29,8 @@ namespace AwsMock::Service {
   /**
    * AWS S3 mock handler
    *
-   * <p>AWS S3 HTTP request handler. All S3 related REST call are ending here. Depending on the request header the S3 service will be selected in case the
-   * authorization header contains the S3 service.<p>
+   * <p>AWS S3 HTTP request handler. All S3 related REST call are ending here. Depending on the request header the S3 module will be selected in case the
+   * authorization header contains the S3 module.<p>
    *
    * <p><h3>GET Requests</h3>
    * <ul>
@@ -54,9 +54,9 @@ namespace AwsMock::Service {
        * Constructor
        *
        * @param configuration application configuration
-       * @param metricService monitoring service
-       * @param host service host
-       * @param port service port
+       * @param metricService monitoring module
+       * @param host module host
+       * @param port module port
        */
       GatewayHandler(Core::Configuration &configuration, Core::MetricService &metricService, std::string host, int port);
 
@@ -128,12 +128,12 @@ namespace AwsMock::Service {
     private:
 
       /**
-       * Forward request to the corresponding service
+       * Forward request to the corresponding module
        *
        * @param request HTTP request
        * @param response HTTP response
-       * @param host service host
-       * @param port service port
+       * @param host module host
+       * @param port module port
        */
       void ForwardRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &host, int port);
 
@@ -157,7 +157,7 @@ namespace AwsMock::Service {
       Core::Configuration &_configuration;
 
       /**
-       * Metric service
+       * Metric module
        */
       Core::MetricService &_metricService;
 

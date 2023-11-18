@@ -55,7 +55,7 @@ namespace AwsMock::Service {
       /**
        * Constructor
        *
-       * @param configuration service configuration
+       * @param configuration module configuration
        */
       explicit DockerService(const Core::Configuration &configuration);
 

@@ -40,7 +40,7 @@ namespace AwsMock::Service {
      * Constructor
      *
      * @param configuration aws-mock configuration
-     * @param metricService aws-mock monitoring service
+     * @param metricService aws-mock monitoring module
      */
     explicit SNSServer(Core::Configuration &configuration, Core::MetricService &metricService);
 
@@ -85,7 +85,7 @@ namespace AwsMock::Service {
     Core::Configuration &_configuration;
 
     /**
-     * Metric service
+     * Metric module
      */
     Core::MetricService &_metricService;
 
@@ -95,7 +95,7 @@ namespace AwsMock::Service {
     std::unique_ptr<Database::ModuleDatabase> _serviceDatabase;
 
     /**
-     * S3 service
+     * S3 module
      */
     std::unique_ptr<Database::SQSDatabase> _sqsDatabase;
 

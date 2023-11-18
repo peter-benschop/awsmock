@@ -35,7 +35,7 @@ namespace AwsMock::Service {
        * Constructor
        *
        * @param configuration application configuration
-       * @param metricService monitoring service
+       * @param metricService monitoring module
        */
       TransferHandler(Core::Configuration &configuration, Core::MetricService &metricService);
 
@@ -133,12 +133,12 @@ namespace AwsMock::Service {
       Core::Configuration &_configuration;
 
       /**
-       * Metric service
+       * Metric module
        */
       Core::MetricService &_metricService;
 
       /**
-       * Transfer service
+       * Transfer module
        */
       Service::TransferService _transferService;
 

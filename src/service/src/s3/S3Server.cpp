@@ -10,14 +10,14 @@ namespace AwsMock::Service {
       : AbstractWorker(configuration), AbstractServer(configuration, "s3"), _logger(Poco::Logger::get("S3Server")), _configuration(configuration), _metricService(metricService), _module("s3") {
 
     // Get HTTP configuration values
-    _port = _configuration.getInt("awsmock.service.s3.port", S3_DEFAULT_PORT);
-    _host = _configuration.getString("awsmock.service.s3.host", S3_DEFAULT_HOST);
-    _maxQueueLength = _configuration.getInt("awsmock.service.s3.max.queue", S3_DEFAULT_QUEUE_SIZE);
-    _maxThreads = _configuration.getInt("awsmock.service.s3.max.threads", S3_DEFAULT_MAX_THREADS);
-    _requestTimeout = _configuration.getInt("awsmock.service.s3.timeout", S3_DEFAULT_TIMEOUT);
+    _port = _configuration.getInt("awsmock.module.s3.port", S3_DEFAULT_PORT);
+    _host = _configuration.getString("awsmock.module.s3.host", S3_DEFAULT_HOST);
+    _maxQueueLength = _configuration.getInt("awsmock.module.s3.max.queue", S3_DEFAULT_QUEUE_SIZE);
+    _maxThreads = _configuration.getInt("awsmock.module.s3.max.threads", S3_DEFAULT_MAX_THREADS);
+    _requestTimeout = _configuration.getInt("awsmock.module.s3.timeout", S3_DEFAULT_TIMEOUT);
 
     // Directories
-    _dataDir = _configuration.getString("awsmock.service.s3.data.dir");
+    _dataDir = _configuration.getString("awsmock.module.s3.data.dir");
     Core::DirUtils::EnsureDirectory(_dataDir);
     log_debug_stream(_logger) << "Data directory path: " << _dataDir << std::endl;
 
@@ -31,15 +31,15 @@ namespace AwsMock::Service {
     _clientId = _configuration.getString("awsmock.client.id", "00000000");
     _user = _configuration.getString("awsmock.user", "none");
 
-    // S3 service connection
-    _s3ServiceHost = _configuration.getString("awsmock.service.s3.host", "localhost");
-    _s3ServicePort = _configuration.getInt("awsmock.service.s3.port", 9501);
-    log_debug_stream(_logger) << "S3 service endpoint: http://" << _s3ServiceHost << ":" << _s3ServicePort << std::endl;
+    // S3 module connection
+    _s3ServiceHost = _configuration.getString("awsmock.module.s3.host", "localhost");
+    _s3ServicePort = _configuration.getInt("awsmock.module.s3.port", 9501);
+    log_debug_stream(_logger) << "S3 module endpoint: http://" << _s3ServiceHost << ":" << _s3ServicePort << std::endl;
 
     // Database connections
     _serviceDatabase = std::make_unique<Database::ModuleDatabase>(_configuration);
     _s3Database = std::make_unique<Database::S3Database>(_configuration);
-    log_debug_stream(_logger) << "S3 service initialized, endpoint: " << _host << ":" << _port << std::endl;
+    log_debug_stream(_logger) << "S3 module initialized, endpoint: " << _host << ":" << _port << std::endl;
   }
 
   S3Server::~S3Server() {
@@ -49,17 +49,17 @@ namespace AwsMock::Service {
 
   void S3Server::MainLoop() {
 
-    // Check service active
+    // Check module active
     if (!IsActive("s3")) {
-      log_info_stream(_logger) << "S3 service inactive" << std::endl;
+      log_info_stream(_logger) << "S3 module inactive" << std::endl;
       return;
     }
-    log_info_stream(_logger) << "S3 service starting" << std::endl;
+    log_info_stream(_logger) << "S3 module starting" << std::endl;
 
     // Start monitoring thread
     StartMonitoringServer();
 
-    // Start REST service
+    // Start REST module
     StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new S3RequestHandlerFactory(_configuration, _metricService));
 
     while (IsRunning()) {
@@ -143,19 +143,19 @@ namespace AwsMock::Service {
 
   bool S3Server::ExistsObject(const std::string &bucket, const std::string &key) {
 
-    // Send object metadata request to S3 service, if the object is not existing return false
+    // Send object metadata request to S3 module, if the object is not existing return false
     return SendHeadObjectRequest(bucket, key, "application/octet-stream");
   }
 
   bool S3Server::ExistsBucket(const std::string &bucket) {
 
-    // Send object metadata request to S3 service, if the object is not existing return false
+    // Send object metadata request to S3 module, if the object is not existing return false
     return SendHeadObjectRequest(bucket, "application/octet-stream");
   }
 
   void S3Server::DeleteObject(const std::string &bucket, const std::string &key) {
 
-    // Send delete object request to S3 service
+    // Send delete object request to S3 module
     SendDeleteObjectRequest(bucket, key, "application/octet-stream");
   }
 

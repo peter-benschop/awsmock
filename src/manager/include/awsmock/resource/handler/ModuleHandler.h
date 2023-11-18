@@ -22,6 +22,7 @@
 #include <awsmock/core/LogStream.h>
 #include "awsmock/dto/module/GatewayConfig.h"
 #include <awsmock/dto/module/Module.h>
+#include <awsmock/entity/module/Module.h>
 #include <awsmock/service/ModuleService.h>
 #include <awsmock/service/S3Server.h>
 #include <awsmock/service/SQSServer.h>
@@ -48,7 +49,7 @@ namespace AwsMock {
        * Constructor
        *
        * @param configuration application configuration
-       * @param metricService monitoring service
+       * @param metricService monitoring module
        * @param serverMap map of services
        */
       ModuleHandler(Core::Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap);
@@ -131,7 +132,7 @@ namespace AwsMock {
       Core::Configuration &_configuration;
 
       /**
-       * Metric service
+       * Metric module
        */
       Core::MetricService &_metricService;
 
@@ -146,7 +147,7 @@ namespace AwsMock {
       std::shared_ptr<Database::ModuleDatabase> _serviceDatabase;
 
       /**
-       * Module service
+       * Module module
        */
       std::shared_ptr<Service::ModuleService> _moduleService;
   };

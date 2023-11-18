@@ -19,9 +19,9 @@
 namespace AwsMock {
 
     /**
-     * Onix splitting service configuration handler. Configurations are read from the /etc/ directory. By default the class will read a configuration file called
-     * /etc/onix-splitting-service-&lt;profile&gt;.properties. The configuration files can be chosen using the profile, running with profile 'dev' will read
-     * /etc/onix-splitting-service-dev.properties.
+     * Onix splitting module configuration handler. Configurations are read from the /etc/ directory. By default the class will read a configuration file called
+     * /etc/onix-splitting-module-&lt;profile&gt;.properties. The configuration files can be chosen using the profile, running with profile 'dev' will read
+     * /etc/onix-splitting-module-dev.properties.
      * <p>
      * Supported profile are:
      * <pre>

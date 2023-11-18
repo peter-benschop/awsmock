@@ -35,6 +35,13 @@ namespace AwsMock {
       };
       SendOkResponse(response, Dto::Module::GatewayConfig::ToJson(config));
 
+    } else if (action == "running") {
+
+      std::string module = Core::HttpUtils::GetPathParameter(request.getURI(), 1);
+      bool result = _moduleService->IsRunning(module);
+
+      SendOkResponse(response, result ? "true" : "false");
+
     } else {
 
       Database::Entity::Module::ModuleList modules = _moduleService->ListModules();

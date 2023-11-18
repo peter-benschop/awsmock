@@ -57,7 +57,7 @@ namespace AwsMock::Service {
     Core::Configuration &_configuration;
 
     /**
-     * Metric service
+     * Metric module
      */
     Core::MetricService &_metricService;
 

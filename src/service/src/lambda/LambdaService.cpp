@@ -20,7 +20,7 @@ namespace AwsMock::Service {
 
     // Create temp directory
     Core::DirUtils::EnsureDirectory(_tempDir);
-    log_trace_stream(_logger) << "lambda service initialized" << std::endl;
+    log_trace_stream(_logger) << "lambda module initialized" << std::endl;
   }
 
   Dto::Lambda::CreateFunctionResponse LambdaService::CreateFunction(Dto::Lambda::CreateFunctionRequest &request) {

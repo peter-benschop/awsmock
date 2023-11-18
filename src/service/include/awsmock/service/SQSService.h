@@ -61,7 +61,7 @@ namespace AwsMock::Service {
     /**
      * Constructor
      *
-     * @param configuration service configuration
+     * @param configuration module configuration
      * @param condition stop condition
      */
     explicit SQSService(const Core::Configuration &configuration, Poco::Condition &condition);

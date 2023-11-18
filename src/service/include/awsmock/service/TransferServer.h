@@ -45,7 +45,7 @@ namespace AwsMock::Service {
      * Constructor
      *
      * @param configuration aws-mock configuration
-     * @param metricService aws-mock monitoring service
+     * @param metricService aws-mock monitoring module
      */
     explicit TransferServer(Core::Configuration &configuration, Core::MetricService &metricService);
 
@@ -86,7 +86,7 @@ namespace AwsMock::Service {
     void CheckTransferServers();
 
     /**
-     * Sends a create bucket request to the S3 service
+     * Sends a create bucket request to the S3 module
      *
      * @param module AwsMock module name
      * @param bucket S3 bucket name
@@ -94,7 +94,7 @@ namespace AwsMock::Service {
     void SendCreateBucketRequest(const std::string &module, const std::string &bucket);
 
     /**
-     * Sends a exists bucket request to the S3 service
+     * Sends a exists bucket request to the S3 module
      *
      * @param module AwsMock module name
      * @param bucket S3 bucket name
@@ -113,7 +113,7 @@ namespace AwsMock::Service {
     Core::Configuration &_configuration;
 
     /**
-     * Metric service
+     * Metric module
      */
     Core::MetricService &_metricService;
 
@@ -203,12 +203,12 @@ namespace AwsMock::Service {
     std::shared_ptr<FtpServer::FtpServer> _ftpServer;
 
     /**
-     * S3 service host
+     * S3 module host
      */
     std::string _s3ServiceHost;
 
     /**
-     * S3 service port
+     * S3 module port
      */
     int _s3ServicePort;
 

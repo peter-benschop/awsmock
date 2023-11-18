@@ -167,7 +167,7 @@ namespace AwsMock::Database {
       modulesList.push_back(result);
     }
 
-    log_trace_stream(_logger) << "Got service list, size:" << modulesList.size() << std::endl;
+    log_trace_stream(_logger) << "Got module list, size:" << modulesList.size() << std::endl;
     return modulesList;
   }
 
@@ -177,17 +177,17 @@ namespace AwsMock::Database {
       log_debug_stream(_logger) << "Service deleted, count: " << result->deleted_count() << std::endl;
 
     } catch (mongocxx::exception::system_error &e) {
-      log_error_stream(_logger) << "Delete service failed, error: " << e.what() << std::endl;
+      log_error_stream(_logger) << "Delete module failed, error: " << e.what() << std::endl;
     }
   }
 
   void ModuleDatabase::DeleteAllModules() {
     try {
       auto result = _moduleCollection.delete_many(make_document());
-      log_debug_stream(_logger) << "All service deleted, count: " << result->deleted_count() << std::endl;
+      log_debug_stream(_logger) << "All module deleted, count: " << result->deleted_count() << std::endl;
 
     } catch (mongocxx::exception::system_error &e) {
-      log_error_stream(_logger) << "Delete all service failed, error: " << e.what() << std::endl;
+      log_error_stream(_logger) << "Delete all module failed, error: " << e.what() << std::endl;
     }
   }
 

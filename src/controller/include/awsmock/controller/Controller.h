@@ -49,23 +49,23 @@ namespace AwsMock::Controller {
     void ListServices();
 
     /**
-     * Start a service
+     * Start a module
      *
-     * @param name service name, or 'all'
+     * @param name module name, or 'all'
      */
     void StartService(const std::string &name);
 
     /**
-     * Restart a service
+     * Restart a module
      *
-     * @param name service name, or 'all'
+     * @param name module name, or 'all'
      */
     void RestartService(const std::string &name);
 
     /**
-     * Stops a service
+     * Stops a module
      *
-     * @param name service name, or 'all'
+     * @param name module name, or 'all'
      */
     void StopService(const std::string &name);
 

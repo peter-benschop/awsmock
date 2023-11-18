@@ -42,7 +42,7 @@ namespace AwsMock::Database {
 
       // act
       Poco::Data::Statement stmt(session);
-      stmt << "SELECT COUNT(*) FROM service", into(count), now;
+      stmt << "SELECT COUNT(*) FROM module", into(count), now;
 
       // assert
       EXPECT_EQ(count, 4);

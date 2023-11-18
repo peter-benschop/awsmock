@@ -21,7 +21,7 @@
 namespace AwsMock {
 
   /**
-   * General REST service
+   * General REST module
    */
   class RestService {
 
@@ -60,7 +60,7 @@ namespace AwsMock {
       void setRouter(std::shared_ptr<Poco::Net::HTTPRequestHandlerFactory> router);
 
       /**
-       * Start the restfull service.
+       * Start the restfull module.
        *
        * The router has to be defined before the HTTP manager is started.
        */

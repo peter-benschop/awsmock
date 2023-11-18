@@ -234,7 +234,7 @@ namespace AwsMock::Service {
       }
 
     } catch (Core::ServiceException &exc) {
-      _logger.error() << "SQS service exception: " << exc.message() << std::endl;
+      _logger.error() << "SQS module exception: " << exc.message() << std::endl;
       SendErrorResponse("SQS", response, exc);
     }
   }

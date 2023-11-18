@@ -20,7 +20,7 @@ namespace AwsMock::Resource::Factory {
        * Create a new resource handler.
        *
        * @param configuration application configuration
-       * @param metricService monitoring service
+       * @param metricService monitoring module
        * @param serverMap server map
        * @return resource handler
        */

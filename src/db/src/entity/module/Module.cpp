@@ -2,7 +2,7 @@
 // Created by vogje01 on 03/09/2023.
 //
 
-#include <awsmock/entity/service/Module.h>
+#include <awsmock/entity/module/Module.h>
 
 namespace AwsMock::Database::Entity::Module {
 

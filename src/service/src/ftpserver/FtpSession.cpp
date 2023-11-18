@@ -12,14 +12,14 @@ namespace AwsMock::FtpServer {
       command_write_strand_(io_service), data_type_binary_(false), data_acceptor_(io_service), data_buffer_strand_(io_service), file_rw_strand_(io_service),
       _ftpWorkingDirectory("/"), _logger(Poco::Logger::get("FtpSession")), _configuration(configuration), _serverName(serverName) {
 
-    // S3 service connection
-    _s3ServiceHost = _configuration.getString("awsmock.service.s3.host", "localhost");
-    _s3ServicePort = _configuration.getInt("awsmock.service.s3.port", 9501);
+    // S3 module connection
+    _s3ServiceHost = _configuration.getString("awsmock.module.s3.host", "localhost");
+    _s3ServicePort = _configuration.getInt("awsmock.module.s3.port", 9501);
     _baseUrl = "http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort);
 
     // Bucket
-    _bucket = _configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
-    _baseDir = _configuration.getString("awsmock.service.transfer.base.dir", DEFAULT_BASE_DIR);
+    _bucket = _configuration.getString("awsmock.module.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
+    _baseDir = _configuration.getString("awsmock.module.transfer.base.dir", DEFAULT_BASE_DIR);
   }
 
   FtpSession::~FtpSession() {
@@ -151,7 +151,7 @@ namespace AwsMock::FtpServer {
       {"STRU", std::bind(&FtpSession::handleFtpCommandSTRU, this, std::placeholders::_1)},
       {"MODE", std::bind(&FtpSession::handleFtpCommandMODE, this, std::placeholders::_1)},
 
-      // Ftp service commands
+      // Ftp module commands
       {"RETR", std::bind(&FtpSession::handleFtpCommandRETR, this, std::placeholders::_1)},
       {"STOR", std::bind(&FtpSession::handleFtpCommandSTOR, this, std::placeholders::_1)},
       {"STOU", std::bind(&FtpSession::handleFtpCommandSTOU, this, std::placeholders::_1)},
@@ -374,7 +374,7 @@ namespace AwsMock::FtpServer {
     sendFtpMessage(FtpReplyCode::SYNTAX_ERROR_UNRECOGNIZED_COMMAND, "Unsupported command");
   }
 
-  // Ftp service commands
+  // Ftp module commands
   void FtpSession::handleFtpCommandRETR(const std::string &param) {
     if (!_logged_in_user) {
       sendFtpMessage(FtpReplyCode::NOT_LOGGED_IN, "Not logged in");

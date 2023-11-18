@@ -26,7 +26,7 @@
 namespace AwsMock::Service {
 
   /**
-   * Cognito service
+   * Cognito module
    */
   class CognitoServer : public AbstractServer, public AbstractWorker {
 
@@ -35,7 +35,7 @@ namespace AwsMock::Service {
        * Constructor
        *
        * @param configuration application configuration
-       * @param metricService monitoring service
+       * @param metricService monitoring module
        * @param condition stop condition
        */
       explicit CognitoServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
@@ -65,7 +65,7 @@ namespace AwsMock::Service {
     private:
 
       /**
-       * Start the restfull service.
+       * Start the restfull module.
        */
       void StartHttpServer();
 
@@ -75,7 +75,7 @@ namespace AwsMock::Service {
       void StopHttpServer();
 
       /**
-       * Start the monitoring service.
+       * Start the monitoring module.
        */
       void StartMonitoringServer();
 
@@ -85,28 +85,28 @@ namespace AwsMock::Service {
       void UpdateCounters();
 
       /**
-       * Create a new bucket, by sending the corresponding CreateBucket request to the S3 service.
+       * Create a new bucket, by sending the corresponding CreateBucket request to the S3 module.
        *
        * @param dirPath absolute path of the directory
        */
       void CreateBucket(const std::string &dirPath);
 
       /**
-       * Deletes an existing bucket, by sending the corresponding DeleteBucket request to the S3 service.
+       * Deletes an existing bucket, by sending the corresponding DeleteBucket request to the S3 module.
        *
        * @param dirPath absolute path of the directory
        */
       void DeleteBucket(const std::string &dirPath);
 
       /**
-       * Create a new object, by sending the corresponding PutObject request to the S3 service.
+       * Create a new object, by sending the corresponding PutObject request to the S3 module.
        *
        * @param filePath absolute path of the file
        */
       void CreateObject(const std::string &filePath);
 
       /**
-       * Checks the existence of a bucket in the database, by sending the corresponding HeadObject request to the S3 service.
+       * Checks the existence of a bucket in the database, by sending the corresponding HeadObject request to the S3 module.
        *
        * @param bucket S3 bucket name
        * @return true if object exists
@@ -114,7 +114,7 @@ namespace AwsMock::Service {
       bool ExistsBucket(const std::string &bucket);
 
       /**
-       * Checks the existence of an object in database, by sending the corresponding HeadObject request to the S3 service.
+       * Checks the existence of an object in database, by sending the corresponding HeadObject request to the S3 module.
        *
        * @param bucket S3 bucket name
        * @param key S3 object key
@@ -123,7 +123,7 @@ namespace AwsMock::Service {
       bool ExistsObject(const std::string &bucket, const std::string &key);
 
       /**
-       * Deletes an existing object, by sending the corresponding DeleteObject request to the S3 service.
+       * Deletes an existing object, by sending the corresponding DeleteObject request to the S3 module.
        *
        * @param bucket S3 bucket name
        * @param key S3 object key
@@ -149,7 +149,7 @@ namespace AwsMock::Service {
       std::string GetFileFromBucketKey(const std::string &bucket, const std::string &key);
 
       /**
-       * Sends a create object request to the S3 service
+       * Sends a create object request to the S3 module
        *
        * @param bucket S3 bucket name
        * @param contentType content type
@@ -157,7 +157,7 @@ namespace AwsMock::Service {
       void SendCreateBucketRequest(const std::string &bucket, const std::string &contentType);
 
       /**
-       * Sends a delete bucket request to the S3 service
+       * Sends a delete bucket request to the S3 module
        *
        * @param bucket S3 bucket name
        * @param contentType content type
@@ -165,7 +165,7 @@ namespace AwsMock::Service {
       void SendDeleteBucketRequest(const std::string &bucket, const std::string &contentType);
 
       /**
-       * Sends a put object request to the S3 service
+       * Sends a put object request to the S3 module
        *
        * @param fileName name of the file
        * @param bucket S3 bucket name
@@ -177,7 +177,7 @@ namespace AwsMock::Service {
       void SendPutObjectRequest(const std::string &fileName, const std::string &bucket, const std::string &key, const std::string &md5Sum, const std::string &contentType, unsigned long fileSize);
 
       /**
-       * Sends a head object request to the S3 service
+       * Sends a head object request to the S3 module
        *
        * @param bucket S3 bucket name
        * @param contentType content type
@@ -186,7 +186,7 @@ namespace AwsMock::Service {
       bool SendHeadObjectRequest(const std::string &bucket, const std::string &contentType);
 
       /**
-       * Sends a head object request to the S3 service
+       * Sends a head object request to the S3 module
        *
        * @param bucket S3 bucket name
        * @param key S3 object key
@@ -196,7 +196,7 @@ namespace AwsMock::Service {
       bool SendHeadObjectRequest(const std::string &bucket, const std::string &key, const std::string &contentType);
 
       /**
-       * Sends a delete object request to the S3 service
+       * Sends a delete object request to the S3 module
        *
        * @param bucket S3 bucket name
        * @param key S3 object key
@@ -225,7 +225,7 @@ namespace AwsMock::Service {
       Core::Configuration &_configuration;
 
       /**
-       * Metric service
+       * Metric module
        */
       Core::MetricService &_metricService;
 

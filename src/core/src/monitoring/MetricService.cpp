@@ -33,7 +33,7 @@ namespace AwsMock::Core {
       _server->stop();
       _server.reset();
     }
-    log_info_stream(_logger) << "Metric service has been shutdown" << std::endl;
+    log_info_stream(_logger) << "Metric module has been shutdown" << std::endl;
   }
 
   void MetricService::AddCounter(const std::string &name) {

@@ -35,8 +35,8 @@ namespace AwsMock::Service {
        * Creates a new request handler
        *
        * @param request HTTP request
-       * @param host service host
-       * @param port service port
+       * @param host module host
+       * @param port module port
        * @return request HTTP request handler
        */
       virtual Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request, const std::string &host, int port) {
@@ -51,7 +51,7 @@ namespace AwsMock::Service {
       Core::Configuration &_configuration;
 
       /**
-       * Metric service
+       * Metric module
        */
       Core::MetricService &_metricService;
 

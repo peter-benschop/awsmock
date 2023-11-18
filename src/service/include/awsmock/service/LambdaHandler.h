@@ -37,7 +37,7 @@ namespace AwsMock::Service {
      * Constructor
      *
      * @param configuration application configuration
-     * @param metricService monitoring service
+     * @param metricService monitoring module
      * @param createQueue create notification queue
      * @param invokeQueue invoke notification queue
      */
@@ -121,12 +121,12 @@ namespace AwsMock::Service {
     Core::Configuration &_configuration;
 
     /**
-     * Metric service
+     * Metric module
      */
     Core::MetricService &_metricService;
 
     /**
-     * lambda service
+     * lambda module
      */
     Service::LambdaService _lambdaService;
   };

@@ -11,11 +11,11 @@ namespace AwsMock::Service {
         _createQueue(createQueue), _invokeQueue(invokeQueue), _module("lambda") {
 
     // Get HTTP configuration values
-    _port = _configuration.getInt("awsmock.service.lambda.port", LAMBDA_DEFAULT_PORT);
-    _host = _configuration.getString("awsmock.service.lambda.host", LAMBDA_DEFAULT_HOST);
-    _maxQueueLength = _configuration.getInt("awsmock.service.lambda.max.queue", LAMBDA_DEFAULT_QUEUE);
-    _maxThreads = _configuration.getInt("awsmock.service.lambda.max.threads", LAMBDA_DEFAULT_THREADS);
-    _requestTimeout = _configuration.getInt("awsmock.service.lambda.timeout", LAMBDA_DEFAULT_TIMEOUT);
+    _port = _configuration.getInt("awsmock.module.lambda.port", LAMBDA_DEFAULT_PORT);
+    _host = _configuration.getString("awsmock.module.lambda.host", LAMBDA_DEFAULT_HOST);
+    _maxQueueLength = _configuration.getInt("awsmock.module.lambda.max.queue", LAMBDA_DEFAULT_QUEUE);
+    _maxThreads = _configuration.getInt("awsmock.module.lambda.max.threads", LAMBDA_DEFAULT_THREADS);
+    _requestTimeout = _configuration.getInt("awsmock.module.lambda.timeout", LAMBDA_DEFAULT_TIMEOUT);
 
     // Directories
     _dataDir = _configuration.getString("awsmock.data.dir") + Poco::Path::separator() + "lambda";
@@ -29,12 +29,12 @@ namespace AwsMock::Service {
     _region = _configuration.getString("awsmock.region");
     _lambdaDatabase = std::make_unique<Database::LambdaDatabase>(_configuration);
 
-    // lambda service connection
-    _lambdaServiceHost = _configuration.getString("awsmock.service.lambda.host", "localhost");
-    _lambdaServicePort = _configuration.getInt("awsmock.service.lambda.port", 9503);
-    log_debug_stream(_logger) << "lambda service endpoint: http://" << _lambdaServiceHost << ":" << _lambdaServicePort << std::endl;
+    // lambda module connection
+    _lambdaServiceHost = _configuration.getString("awsmock.module.lambda.host", "localhost");
+    _lambdaServicePort = _configuration.getInt("awsmock.module.lambda.port", 9503);
+    log_debug_stream(_logger) << "lambda module endpoint: http://" << _lambdaServiceHost << ":" << _lambdaServicePort << std::endl;
 
-    // Docker service
+    // Docker module
     _dockerService = std::make_unique<Service::DockerService>(_configuration);
 
     // Create lambda directory
@@ -48,9 +48,9 @@ namespace AwsMock::Service {
 
   void LambdaServer::MainLoop() {
 
-    // Check service active
+    // Check module active
     if (!IsActive("lambda")) {
-      log_info_stream(_logger) << "lambda service inactive" << std::endl;
+      log_info_stream(_logger) << "lambda module inactive" << std::endl;
       return;
     }
     log_info_stream(_logger) << "lambda worker started" << std::endl;

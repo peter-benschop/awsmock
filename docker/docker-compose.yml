@@ -38,7 +38,7 @@ services:
       retries: 15
 
 #  onix3-parser:
-#    container_name: import-metadaten-onix3-service
+#    container_name: import-metadaten-onix3-module
 #    depends_on:
 #      postgres:
 #        condition: service_started
@@ -64,8 +64,8 @@ services:
 #    networks:
 #      - local
 
-# image-service:
-#   container_name: pim-import-image-service
+# image-module:
+#   container_name: pim-import-image-module
 #   depends_on:
 #     postgres:
 #       condition: service_started
@@ -100,7 +100,7 @@ services:
 #    environment:
 #      - produkt-form-detailliert-table=pim-product-form-detailiert
 #      - artikel-input-queue=parsing-result-queue
-#      - artikel-output-queue=artikel-transformations-service-artikel-ausgang
+#      - artikel-output-queue=artikel-transformations-module-artikel-ausgang
 #      - AWS_REGION=eu-central-1
 #      - AWS_ACCESS_KEY_ID=localAccessKey
 #      - AWS_SECRET_KEY=secretAccessKey
@@ -116,7 +116,7 @@ services:
 #      context: ../
 #      dockerfile: pim-local-dev/docker/ExportL2000/Dockerfile
 #    environment:
-#      - artikel-input-queue=artikel-transformations-service-artikel-ausgang
+#      - artikel-input-queue=artikel-transformations-module-artikel-ausgang
 #      - sns-logging-topic=file-logging-queue
 #      - AWS_REGION=eu-central-1
 #      - AWS_ACCESS_KEY_ID=localAccessKey
@@ -166,7 +166,7 @@ services:
 #      - "local"
 
 #  protocolizing:
-#    container_name: pim-protokollierung-service
+#    container_name: pim-protokollierung-module
 #    depends_on:
 #      postgres:
 #        condition: service_started
@@ -188,7 +188,7 @@ services:
 #      - local
 
 #  datenlieferant:
-#    container_name: pim-datenlieferant-service
+#    container_name: pim-datenlieferant-module
 #    depends_on:
 #      postgres:
 #        condition: service_started
@@ -218,7 +218,7 @@ services:
 #      context: ../
 #      dockerfile: pim-local-dev/docker/SQSEater/Dockerfile
 #    environment:
-#      - QUEUES=file-logging-queue image-result-queue artikel-transformations-service-artikel-ausgang textannotation-result-queue bilderlink-output-queue
+#      - QUEUES=file-logging-queue image-result-queue artikel-transformations-module-artikel-ausgang textannotation-result-queue bilderlink-output-queue
 #      - AWS_REGION=eu-central-1
 #      - AWS_SECRET_ACCESS_KEY=localAccessKey
 #      - AWS_ACCESS_KEY_ID=localAccessKey
