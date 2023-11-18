@@ -5,7 +5,7 @@ RUN apt-get update && apt-get -y upgrade
 # Install basics
 ARG GH_TOKEN=${GH_TOKEN}
 ENV GH_TOKEN=${GH_TOKEN}
-RUN gh auth login
+#RUN gh auth login
 
 # Create build environment
 RUN mkdir -p /usr/src
@@ -16,11 +16,10 @@ RUN git clone https://github.com/jensvogt/aws-mock.git && \
     cd /usr/src/aws-mock && \
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr . && \
     cmake --build . --config Release && \
-    cmake --install . --prefix /usr &&\
-    cp dist/etc/aws-mock.properties /etc
+    cmake --install . --prefix /usr
 
 # Supervisord
-RUN apt-get update && apt-get install -y supervisor
+RUN apt-get install -y supervisor
 RUN mkdir -p /var/log/supervisor
 RUN mkdir -p /etc/supervisor/conf.d/
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf

@@ -9,9 +9,11 @@ awsmockctl controls and show some insides of the AwsMock AWS cloud simulation. S
 S3, Cognito, TransferServer, Lambda. AwsMock is written in C++ and has a module structure, using different modules for
 each AWS service plus a API gateway, which routes the requests to the different modules.
 .P
-Per default the gateway runs on port 4566, but can be chaged in the configuration file. The default configuration file
+Per default the gateway runs on port 4566, but can be changed in the configuration file. The default configuration file
 is
 .I /etc/aws-mock.properties
+awsmockctl provides a series of commands, which control the different modules. It allows to start/stop different modules
+as well as to show the current configuration.
 .SH OPTIONS
 .TP
 .B \-\-config\~ <configuration-file-path>
@@ -30,7 +32,6 @@ shows the current version and exists.
 lists the currently running AwsMock modules like S3, SQS, SNS etc. Each line has the format:
 .IP
 SQS         RUNNING
-.IP
 SNS         STOPPED
 .TP
 .BI stop\~ <module>
@@ -53,3 +54,25 @@ can be one of: trace, debug, information, warning, error, critical or fatal.
 .TP
 .BI config
 shows the configuration of the AwsMock API gateway.
+.SH EXAMPLES
+.PP
+.in +4n
+.EX
+/usr/bin/awsmockctl list
+SQS         RUNNING
+SQS         RUNNING
+S3          STOPPED
+.EE
+.in
+.PP
+.PP
+.in +4n
+.EX
+/usr/bin/awsmockctl stop sqs
+SQS         STOPPED
+.EE
+.in
+.PP
+.SH SEE ALSO
+.TP
+.BI awsmockmgr(1)
