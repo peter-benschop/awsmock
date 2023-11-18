@@ -39,7 +39,7 @@ namespace AwsMock::Database {
     GetConnection()["sqs_message"].create_index(make_document(kvp("queueUrl", 1), kvp("status", 1), kvp("retries", 1)), make_document(kvp("name", "queueurl_status_retries_idx2")));
     GetConnection()["sqs_queue"].create_index(make_document(kvp("region", 1), kvp("name", 1)), make_document(kvp("name", "region_name_idx1")));
     GetConnection()["sqs_queue"].create_index(make_document(kvp("region", 1), kvp("url", 1)), make_document(kvp("name", "region_url_idx2")));
-    GetConnection()["service"].create_index(make_document(kvp("name", 1), kvp("status", 1)), make_document(kvp("name", "name_status_idx1")));
+    GetConnection()["module"].create_index(make_document(kvp("name", 1), kvp("status", 1)), make_document(kvp("name", "name_status_idx1")));
     log_debug_stream(_logger) << "SQS indexes created" << std::endl;
   }
 
