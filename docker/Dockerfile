@@ -5,7 +5,7 @@ RUN apt-get update && apt-get -y upgrade
 # Install basics
 ARG GH_TOKEN=${GH_TOKEN}
 ENV GH_TOKEN=${GH_TOKEN}
-#RUN gh auth login
+RUN gh auth login
 
 # Create build environment
 RUN mkdir -p /usr/src
@@ -48,6 +48,7 @@ RUN aws configure set aws_access_key_id none && \
 
 # Expose ports
 EXPOSE 4566 4566
+EXPOSE 4567 4567
 EXPOSE 8081 8081
 EXPOSE 27017 27017
 
