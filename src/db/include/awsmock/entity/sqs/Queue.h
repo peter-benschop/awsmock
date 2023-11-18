@@ -378,8 +378,10 @@ namespace AwsMock::Database::Entity::SQS {
     [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
       auto tagsDoc = bsoncxx::builder::basic::document{};
-      for (const auto &t : tags) {
-        tagsDoc.append(kvp(t.first, t.second));
+      if(!tags.empty()) {
+        for (const auto &t : tags) {
+          tagsDoc.append(kvp(t.first, t.second));
+        }
       }
 
       view_or_value<view, value> queueDoc = make_document(
@@ -395,24 +397,6 @@ namespace AwsMock::Database::Entity::SQS {
 
       return queueDoc;
     }
-
-    /**
-     * Converts the MongoDB document to an entity
-     *
-     * @param mResult MongoDB document.
-     */
-    /*[[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
-
-      oid = mResult.value()["_id"].get_oid().value.to_string();
-      region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
-      name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
-      owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
-      queueUrl = bsoncxx::string::to_string(mResult.value()["queueUrl"].get_string().value);
-      queueArn = bsoncxx::string::to_string(mResult.value()["queueArn"].get_string().value);
-      attributes.FromDocument(mResult.value()["attributes"].get_document().value);
-      created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-      modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
-    }*/
 
     /**
      * Converts the MongoDB document to an entity

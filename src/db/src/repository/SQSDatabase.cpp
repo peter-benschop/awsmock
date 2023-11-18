@@ -43,10 +43,23 @@ namespace AwsMock::Database {
 
   Entity::SQS::Queue SQSDatabase::CreateQueue(const Entity::SQS::Queue &queue) {
 
-    auto result = _queueCollection.insert_one(queue.ToDocument());
-    log_trace_stream(_logger) << "Queue created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
+    auto session = GetSession();
+    session.start_transaction();
 
-    return GetQueueById(result->inserted_id().get_oid().value);
+    try {
+      auto result = _queueCollection.insert_one(queue.ToDocument());
+      log_trace_stream(_logger) << "Queue created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
+
+      // Commit
+      session.commit_transaction();
+
+      return GetQueueById(result->inserted_id().get_oid().value);
+
+    } catch (mongocxx::exception &e) {
+      session.abort_transaction();
+      log_error_stream(_logger) << "Collection transaction exception: " << e.what() << std::endl;
+      throw Core::DatabaseException("Insert queue failed, region: " + queue.region + " queueUrl: " + queue.queueUrl + " message: " + e.what());
+    }
   }
 
   Entity::SQS::Queue SQSDatabase::GetQueueById(bsoncxx::oid oid) {
@@ -216,7 +229,7 @@ namespace AwsMock::Database {
     auto mResult = _messageCollection.find_one_and_update(make_document(kvp("_id", bsoncxx::oid{message.oid})), message.ToDocument(), opts);
     log_trace_stream(_logger) << "Message updated, count: " << ConvertMessageToJson(mResult.value()) << std::endl;
 
-    if(!mResult){
+    if (!mResult) {
       throw Core::DatabaseException("Update message failed, oid: " + message.oid);
     }
 

@@ -34,8 +34,8 @@ namespace AwsMock::Service {
       std::string payload = GetPayload(request);
       std::string requestId = GetHeaderValue(request, "RequestId", Poco::UUIDGenerator().createRandom().toString());
 
-      DumpRequest(request);
-      DumpPayload(payload);
+      //DumpRequest(request);
+      //DumpPayload(payload);
 
       std::string action = Core::HttpUtils::GetQueryParameterValueByName(payload, "Action");
       std::string version = Core::HttpUtils::GetQueryParameterValueByName(payload, "Version");
@@ -47,7 +47,7 @@ namespace AwsMock::Service {
         std::string queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, queueName);
 
         std::vector<Dto::SQS::QueueAttribute> attributes = GetQueueAttributes(payload);
-        std::map<std::string,std::string> tags = GetQueueTags(payload);
+        std::map<std::string, std::string> tags = GetQueueTags(payload);
 
         Dto::SQS::CreateQueueRequest sqsRequest = {
             .region=region,
@@ -147,7 +147,6 @@ namespace AwsMock::Service {
 
         std::string queueUrl = GetQueueUrl(request, payload);
         std::vector<std::string> attributeNames = GetQueueAttributeNames(payload);
-
 
         Dto::SQS::GetQueueAttributesRequest sqsRequest = {
             .region=region,
@@ -338,12 +337,14 @@ namespace AwsMock::Service {
     for (int i = 1; i <= count; i++) {
       std::string key = Core::HttpUtils::GetQueryParameterValueByName(payload, "Tag." + std::to_string(i) + ".Key");
       std::string value = Core::HttpUtils::GetQueryParameterValueByName(payload, "Tag." + std::to_string(i) + ".Value");
-      queueTags[key] = value;
+      if (!key.empty() && !value.empty()) {
+        queueTags[key] = value;
+      }
     }
     return queueTags;
   }
 
-  std::vector<std::string> SQSHandler::GetQueueAttributeNames(const std::string &payload){
+  std::vector<std::string> SQSHandler::GetQueueAttributeNames(const std::string &payload) {
 
     int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "Attribute");
     log_trace_stream(_logger) << "Got attribute names count: " << count << std::endl;
