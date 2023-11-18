@@ -46,15 +46,21 @@ endif ()
 
 # Installation
 install(FILES dist/etc/aws-mock.properties DESTINATION /etc)
-install(FILES dist/etc/systemd/system/aws-mock.service DESTINATION etc/systemd/system)
-install(FILES dist/bin/awslocal DESTINATION /usr/bin)
+install(FILES dist/etc/systemd/system/aws-mock.service DESTINATION /etc/systemd/system)
+install(FILES dist/bin/awslocal DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+install(FILES docs/man/awsmockctl.1.gz DESTINATION /usr/share/man/man1)
+
+#include(GNUInstallDirs)
+#file(ARCHIVE_CREATE OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/awsmockctl.1.gz PATHS ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/awsmockctl.1 FORMAT raw COMPRESSION GZip)
+#install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/awsmockctl.1.gz DESTINATION "${CMAKE_INSTALL_MANDIR}")
 
 # Install gzipped man pages
-add_custom_target(man-awsmockctl ALL DEPENDS docs/man/awsmockctl.1)
+#add_custom_target(man ALL DEPENDS docs/man/awsmockctl.1)
 
 # compress man page
-add_custom_command(OUTPUT docs/man/awsmockctl.1.gz COMMAND gzip -9 --no-name --to-stdout docs/man/awsmockctl.1 >"${CMAKE_CURRENT_BINARY_DIR}/docs/man/awsmockctl.1.gz"
-        MAIN_DEPENDENCY docs/man/awsmockctl.1 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/docs/man)
+#add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/awsmockctl.1.gz
+#        COMMAND gzip -9 --no-name --to-stdout ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/awsmockctl.1 > ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/awsmockctl.1.gz
+#        MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/awsmockctl.1 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 # install compressed man page
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/docs/man/awsmockctl.1.gz DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+#install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/awsmockctl.1.gz DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
