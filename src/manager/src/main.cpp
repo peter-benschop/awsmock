@@ -38,7 +38,7 @@
 #include <awsmock/controller/Router.h>
 #include <awsmock/controller/RestService.h>
 #include "awsmock/service/GatewayServer.h"
-#include "awsmock/entity/module/ModuleStatus.h"
+#include "awsmock/entity/module/ModuleState.h"
 #include "awsmock/entity/module/Module.h"
 
 namespace AwsMock {
@@ -176,49 +176,53 @@ namespace AwsMock {
     void StartServices() {
 
       // Handle environment variables
-      if (_configuration.has("awsmock.module.sqs.active") && _configuration.getBool("awsmock.module.sqs.active")) {
-        _serviceDatabase.SetStatus("sqs", Database::Entity::Module::ModuleStatus::RUNNING);
+      if (_configuration.has("awsmock.mongodb.active") && _configuration.getBool("awsmock.mongodb.active")) {
+        _moduleDatabase.SetStatus("database", Database::Entity::Module::ModuleStatus::ACTIVE);
+        _database.StartDatabase();
       }
-      if (_configuration.has("awsmock.module.s3.active") && _configuration.getBool("awsmock.module.s3.active")) {
-        _serviceDatabase.SetStatus("s3", Database::Entity::Module::ModuleStatus::RUNNING);
+      if (_configuration.has("awsmock.service.sqs.active") && _configuration.getBool("awsmock.service.sqs.active")) {
+        _moduleDatabase.SetStatus("sqs", Database::Entity::Module::ModuleStatus::ACTIVE);
       }
-      if (_configuration.has("awsmock.module.sns.active") && _configuration.getBool("awsmock.module.sns.active")) {
-        _serviceDatabase.SetStatus("sns", Database::Entity::Module::ModuleStatus::RUNNING);
+      if (_configuration.has("awsmock.service.s3.active") && _configuration.getBool("awsmock.service.s3.active")) {
+        _moduleDatabase.SetStatus("s3", Database::Entity::Module::ModuleStatus::ACTIVE);
       }
-      if (_configuration.has("awsmock.module.lambda.active") && _configuration.getBool("awsmock.module.lambda.active")) {
-        _serviceDatabase.SetStatus("lambda", Database::Entity::Module::ModuleStatus::RUNNING);
+      if (_configuration.has("awsmock.service.sns.active") && _configuration.getBool("awsmock.service.sns.active")) {
+        _moduleDatabase.SetStatus("sns", Database::Entity::Module::ModuleStatus::ACTIVE);
       }
-      if (_configuration.has("awsmock.module.transfer.active") && _configuration.getBool("awsmock.module.transfer.active")) {
-        _serviceDatabase.SetStatus("transfer", Database::Entity::Module::ModuleStatus::RUNNING);
+      if (_configuration.has("awsmock.service.lambda.active") && _configuration.getBool("awsmock.service.lambda.active")) {
+        _moduleDatabase.SetStatus("lambda", Database::Entity::Module::ModuleStatus::ACTIVE);
       }
-      if (_configuration.has("awsmock.gateway.active") && _configuration.getBool("awsmock.gateway.active")) {
-        _serviceDatabase.SetStatus("gateway", Database::Entity::Module::ModuleStatus::RUNNING);
+      if (_configuration.has("awsmock.service.transfer.active") && _configuration.getBool("awsmock.service.transfer.active")) {
+        _moduleDatabase.SetStatus("transfer", Database::Entity::Module::ModuleStatus::ACTIVE);
+      }
+      if (_configuration.has("awsmock.service.gateway.active") && _configuration.getBool("awsmock.service.gateway.active")) {
+        _moduleDatabase.SetStatus("gateway", Database::Entity::Module::ModuleStatus::ACTIVE);
       }
 
       // Get last module configuration
-      Database::Entity::Module::ModuleList modules = _serviceDatabase.ListModules();
+      Database::Entity::Module::ModuleList modules = _moduleDatabase.ListModules();
       for (const auto &module : modules) {
-        if (module.name == "s3" && module.status == Database::Entity::Module::ModuleStatus::STARTING) {
+        if (module.name == "s3" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
           _s3Server = new Service::S3Server(_configuration, _metricService);
           Poco::ThreadPool::defaultPool().start(*_s3Server);
           _serverMap[module.name] = _s3Server;
-        } else if (module.name == "sqs" && module.status == Database::Entity::Module::ModuleStatus::STARTING) {
+        } else if (module.name == "sqs" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
           _sqsServer = new Service::SQSServer(_configuration, _metricService);
           Poco::ThreadPool::defaultPool().start(*_sqsServer);
           _serverMap[module.name] = _sqsServer;
-        } else if (module.name == "sns" && module.status == Database::Entity::Module::ModuleStatus::STARTING) {
+        } else if (module.name == "sns" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
           _snsServer = new Service::SNSServer(_configuration, _metricService);
           Poco::ThreadPool::defaultPool().start(*_snsServer);
           _serverMap[module.name] = _snsServer;
-        } else if (module.name == "lambda" && module.status == Database::Entity::Module::ModuleStatus::STARTING) {
+        } else if (module.name == "lambda" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
           _lambdaServer = new Service::LambdaServer(_configuration, _metricService, _createQueue, _invokeQueue);
           Poco::ThreadPool::defaultPool().start(*_lambdaServer);
           _serverMap[module.name] = _lambdaServer;
-        } else if (module.name == "transfer" && module.status == Database::Entity::Module::ModuleStatus::STARTING) {
+        } else if (module.name == "transfer" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
           _transferServer = new Service::TransferServer(_configuration, _metricService);
           Poco::ThreadPool::defaultPool().start(*_transferServer);
           _serverMap[module.name] = _transferServer;
-        } else if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::STARTING) {
+        } else if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
           _gatewayServer = new Service::GatewayServer(_configuration, _metricService);
           Poco::ThreadPool::defaultPool().start(*_gatewayServer);
           _serverMap[module.name] = _gatewayServer;
@@ -229,35 +233,35 @@ namespace AwsMock {
 
     void StopServices() {
 
-      Database::Entity::Module::ModuleList modules = _serviceDatabase.ListModules();
+      Database::Entity::Module::ModuleList modules = _moduleDatabase.ListModules();
       for (const auto &module : modules) {
-        if (module.status == Database::Entity::Module::ModuleStatus::RUNNING) {
+        if (module.state == Database::Entity::Module::ModuleState::RUNNING) {
           if (module.name == "s3") {
-            _serviceDatabase.SetStatus(module.name, Database::Entity::Module::ModuleStatus::STOPPED);
+            _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
             auto *s3Server = (Service::S3Server *) _serverMap[module.name];
             s3Server->StopMonitoringServer();
             s3Server->StopServer();
           } else if (module.name == "sqs") {
-            _serviceDatabase.SetStatus(module.name, Database::Entity::Module::ModuleStatus::STOPPED);
+            _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
             auto *sqsServer = (Service::SQSServer *) _serverMap[module.name];
             sqsServer->StopMonitoringServer();
             sqsServer->StopServer();
           } else if (module.name == "sns") {
-            _serviceDatabase.SetStatus(module.name, Database::Entity::Module::ModuleStatus::STOPPED);
+            _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
             auto *snsServer = (Service::SNSServer *) _serverMap[module.name];
             snsServer->StopMonitoringServer();
             snsServer->StopServer();
           } else if (module.name == "lambda") {
-            _serviceDatabase.SetStatus(module.name, Database::Entity::Module::ModuleStatus::STOPPED);
+            _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
             auto *lambdaServer = (Service::LambdaServer *) _serverMap[module.name];
             lambdaServer->StopMonitoringServer();
             lambdaServer->StopServer();
           } else if (module.name == "transfer") {
-            _serviceDatabase.SetStatus(module.name, Database::Entity::Module::ModuleStatus::STOPPED);
+            _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
             auto *transferServer = (Service::LambdaServer *) _serverMap[module.name];
             transferServer->StopServer();
           } else if (module.name == "gateway") {
-            _serviceDatabase.SetStatus(module.name, Database::Entity::Module::ModuleStatus::STOPPED);
+            _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
             auto *gatewayServer = (Service::GatewayServer *) _serverMap[module.name];
             gatewayServer->StopServer();
           }
@@ -275,10 +279,6 @@ namespace AwsMock {
     int main([[maybe_unused]]const ArgVec &args) override {
 
       log_debug_stream(_logger) << "Entering main routine" << std::endl;
-
-      // Wait for the mongodb to be ready, this is only needed for the awsmock-container, as  the supervisor is starting
-      // the server process and the mongodb daemon the same time.
-      _database.WaitForStartup();
 
       // Start module and worker. Services needed to StartServer first, as the worker could possibly use the services.
       StartServices();
@@ -367,7 +367,7 @@ namespace AwsMock {
     /**
      * Service database
      */
-    Database::ModuleDatabase _serviceDatabase = Database::ModuleDatabase(_configuration);
+    Database::ModuleDatabase _moduleDatabase = Database::ModuleDatabase(_configuration);
 
     /**
      * Server map

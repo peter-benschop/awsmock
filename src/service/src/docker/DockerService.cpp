@@ -40,7 +40,7 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "Create image request send to docker daemon, output: " << curlResponse.ToString() << std::endl;
 
     if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
-      log_error_stream(_logger) << "Docker image create failed, status: " << curlResponse.statusCode << std::endl;
+      log_error_stream(_logger) << "Docker image create failed, state: " << curlResponse.statusCode << std::endl;
     } else {
       log_debug_stream(_logger) << "Docker image created, name: " << name << ":" << tag << std::endl;
     }
@@ -81,7 +81,7 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
     if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
-      log_error_stream(_logger) << "Build image failed, status: " << curlResponse.statusCode << std::endl;
+      log_error_stream(_logger) << "Build image failed, state: " << curlResponse.statusCode << std::endl;
     }
     return imageFile;
   }
@@ -89,7 +89,7 @@ namespace AwsMock::Service {
   void DockerService::DeleteImage(const std::string &id) {
     Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketRequest("DELETE", "http://localhost/images/" + id + "?force=true");
     if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
-      log_error_stream(_logger) << "Delete image failed, status: " << curlResponse.statusCode << std::endl;
+      log_error_stream(_logger) << "Delete image failed, state: " << curlResponse.statusCode << std::endl;
     }
   }
 
@@ -101,7 +101,7 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
     if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
-      log_warning_stream(_logger) << "Docker container exists failed, status: " << curlResponse.statusCode << std::endl;
+      log_warning_stream(_logger) << "Docker container exists failed, state: " << curlResponse.statusCode << std::endl;
       return false;
     }
 
@@ -118,7 +118,7 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
     if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
-      log_warning_stream(_logger) << "Get docker container by name failed, status: " << curlResponse.statusCode << std::endl;
+      log_warning_stream(_logger) << "Get docker container by name failed, state: " << curlResponse.statusCode << std::endl;
       return {};
     }
 
@@ -145,7 +145,7 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
     if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
-      log_warning_stream(_logger) << "Get docker container by ID failed, status: " << curlResponse.statusCode << std::endl;
+      log_warning_stream(_logger) << "Get docker container by ID failed, state: " << curlResponse.statusCode << std::endl;
       return {};
     }
 
@@ -180,7 +180,7 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
     if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_CREATED) {
-      log_warning_stream(_logger) << "Create container failed, status: " << curlResponse.statusCode << std::endl;
+      log_warning_stream(_logger) << "Create container failed, state: " << curlResponse.statusCode << std::endl;
       return {};
     }
 
@@ -197,7 +197,7 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
     if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_NO_CONTENT && curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_NOT_MODIFIED) {
-      log_warning_stream(_logger) << "Start container failed, status: " << curlResponse.statusCode << std::endl;
+      log_warning_stream(_logger) << "Start container failed, state: " << curlResponse.statusCode << std::endl;
     }
   }
 
@@ -212,7 +212,7 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
     if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_NO_CONTENT) {
-      log_warning_stream(_logger) << "Restart container failed, status: " << curlResponse.statusCode << std::endl;
+      log_warning_stream(_logger) << "Restart container failed, state: " << curlResponse.statusCode << std::endl;
     }
   }
 
@@ -227,7 +227,7 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
     if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_NO_CONTENT) {
-      log_warning_stream(_logger) << "Stop container failed, status: " << curlResponse.statusCode << std::endl;
+      log_warning_stream(_logger) << "Stop container failed, state: " << curlResponse.statusCode << std::endl;
     }
   }
 
@@ -238,7 +238,7 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
     if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_NO_CONTENT) {
-      log_warning_stream(_logger) << "Delete container failed, status: " << curlResponse.statusCode << std::endl;
+      log_warning_stream(_logger) << "Delete container failed, state: " << curlResponse.statusCode << std::endl;
     }
   }
 
@@ -247,7 +247,7 @@ namespace AwsMock::Service {
     Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketRequest("POST", "http://localhost/containers/prune");
 
     if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
-      log_warning_stream(_logger) << "Prune containers failed, status: " << curlResponse.statusCode << std::endl;
+      log_warning_stream(_logger) << "Prune containers failed, state: " << curlResponse.statusCode << std::endl;
       return;
     }
 

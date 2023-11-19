@@ -378,7 +378,7 @@ namespace AwsMock::Database::Entity::SQS {
     [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
       auto tagsDoc = bsoncxx::builder::basic::document{};
-      if(!tags.empty()) {
+      if (!tags.empty()) {
         for (const auto &t : tags) {
           tagsDoc.append(kvp(t.first, t.second));
         }
@@ -416,11 +416,13 @@ namespace AwsMock::Database::Entity::SQS {
       modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
 
       // Get tags
-      bsoncxx::document::view tagsView = mResult.value()["tags"].get_document().value;
-      for (bsoncxx::document::element tagElement : tagsView) {
-        std::string key = bsoncxx::string::to_string(tagElement.key());
-        std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
-        tags.emplace(key, value);
+      if (mResult.value().find("tags") != mResult.value().end()) {
+        bsoncxx::document::view tagsView = mResult.value()["tags"].get_document().value;
+        for (bsoncxx::document::element tagElement : tagsView) {
+          std::string key = bsoncxx::string::to_string(tagElement.key());
+          std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
+          tags.emplace(key, value);
+        }
       }
     }
 

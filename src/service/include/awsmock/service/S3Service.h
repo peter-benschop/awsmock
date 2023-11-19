@@ -60,7 +60,7 @@ namespace AwsMock::Service {
        *
        * @param configuration module configuration
        */
-      explicit S3Service(const Core::Configuration &configuration);
+      explicit S3Service(Core::Configuration &configuration);
 
       /**
        * Returns the meta data of an S3 object
@@ -350,7 +350,7 @@ namespace AwsMock::Service {
       /**
        * Configuration
        */
-      const Core::Configuration &_configuration;
+      Core::Configuration &_configuration;
 
       /**
        * Database connection

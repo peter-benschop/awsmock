@@ -49,20 +49,20 @@ namespace AwsMock::Database {
   TEST_F(ModuleDatabaseTest, ModuleCreateTest) {
 
     // arrange
-    Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
+    Entity::Module::Module module = {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING};
 
     // act
     Entity::Module::Module result = _moduleDatabase.CreateModule(module);
 
     // assert
     EXPECT_TRUE(result.name == SERVICE);
-    EXPECT_TRUE(result.status == Entity::Module::ModuleStatus::RUNNING);
+    EXPECT_TRUE(result.state == Entity::Module::ModuleState::RUNNING);
   }
 
   TEST_F(ModuleDatabaseTest, ModuleExistsTest) {
 
     // arrange
-    Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
+    Entity::Module::Module module = {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING};
     module = _moduleDatabase.CreateModule(module);
 
     // act
@@ -77,7 +77,7 @@ namespace AwsMock::Database {
   TEST_F(ModuleDatabaseTest, ModuleActiveTest) {
 
     // arrange
-    Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
+    Entity::Module::Module module = {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING};
     module = _moduleDatabase.CreateModule(module);
 
     // act
@@ -90,7 +90,7 @@ namespace AwsMock::Database {
   TEST_F(ModuleDatabaseTest, ModuleGetByNameTest) {
 
     // arrange
-    Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
+    Entity::Module::Module module = {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING};
     module = _moduleDatabase.CreateModule(module);
 
     // act
@@ -103,7 +103,7 @@ namespace AwsMock::Database {
   TEST_F(ModuleDatabaseTest, ModuleGetByIdTest) {
 
     // arrange
-    Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
+    Entity::Module::Module module = {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING};
     module = _moduleDatabase.CreateModule(module);
     bsoncxx::oid oid(module.oid);
 
@@ -117,21 +117,21 @@ namespace AwsMock::Database {
   TEST_F(ModuleDatabaseTest, ModuleUpdateTest) {
 
     // arrange
-    Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
+    Entity::Module::Module module = {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING};
     module = _moduleDatabase.CreateModule(module);
-    module.status = Entity::Module::ModuleStatus::STOPPED;
+    module.state = Entity::Module::ModuleState::STOPPED;
 
     // act
     Entity::Module::Module result = _moduleDatabase.UpdateModule(module);
 
     // assert
-    EXPECT_TRUE(result.status == Entity::Module::ModuleStatus::STOPPED);
+    EXPECT_TRUE(result.state == Entity::Module::ModuleState::STOPPED);
   }
 
   TEST_F(ModuleDatabaseTest, ModuleListTest) {
 
     // arrange
-    Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
+    Entity::Module::Module module = {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING};
     _moduleDatabase.CreateModule(module);
 
     // act
@@ -144,7 +144,7 @@ namespace AwsMock::Database {
   TEST_F(ModuleDatabaseTest, ModuleDeleteTest) {
 
     // arrange
-    Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
+    Entity::Module::Module module = {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING};
     module = _moduleDatabase.CreateModule(module);
 
     // act
@@ -158,21 +158,21 @@ namespace AwsMock::Database {
   TEST_F(ModuleDatabaseTest, ModuleSetStatusTest) {
 
     // arrange
-    Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
+    Entity::Module::Module module = {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING};
     module = _moduleDatabase.CreateModule(module);
 
     // act
-    _moduleDatabase.SetStatus(SERVICE, Entity::Module::ModuleStatus::STOPPED);
+    _moduleDatabase.SetState(SERVICE, Entity::Module::ModuleState::STOPPED);
     Entity::Module::Module updatedModule = _moduleDatabase.GetModuleByName(SERVICE);
 
     // assert
-    EXPECT_EQ(updatedModule.status, Entity::Module::ModuleStatus::STOPPED);
+    EXPECT_EQ(updatedModule.state, Entity::Module::ModuleState::STOPPED);
   }
 
   TEST_F(ModuleDatabaseTest, ModuleSetPortTest) {
 
     // arrange
-    Entity::Module::Module module = {.name=SERVICE, .status=Entity::Module::ModuleStatus::RUNNING};
+    Entity::Module::Module module = {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING};
     module = _moduleDatabase.CreateModule(module);
 
     // act

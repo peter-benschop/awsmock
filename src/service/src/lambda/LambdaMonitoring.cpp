@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-  LambdaMonitoring::LambdaMonitoring(const Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition)
+  LambdaMonitoring::LambdaMonitoring(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition)
       : _logger(Poco::Logger::get("LambdaMonitoring")), _configuration(configuration), _metricService(metricService), _condition(condition), _running(false) {
 
     // Update period

@@ -148,7 +148,7 @@ namespace AwsMock::Resource {
        *
        * @param response response to be handled.
        * @param statusCode HTTP Status Code.
-       * @param reason status reason.
+       * @param reason state reason.
        */
       static void handleHttpStatusCode(Poco::Net::HTTPServerResponse &response,int statusCode,const char *reason = nullptr);
 
@@ -170,7 +170,7 @@ namespace AwsMock::Resource {
       std::string GetPayload(Poco::Net::HTTPServerRequest &request);
 
       /**
-       * Send a OK response (HTTP status code 200).
+       * Send a OK response (HTTP state code 200).
        *
        * @param response HTTP response object
        * @param payload HTTP body payload
@@ -189,7 +189,7 @@ namespace AwsMock::Resource {
       void SendErrorResponse(Poco::Net::HTTPServerResponse &response, const std::string &payload);
 
       /**
-       * Send an error response (HTTP status code 200).
+       * Send an error response (HTTP state code 200).
        *
        * @param service module name
        * @param response HTTP response object
@@ -198,7 +198,7 @@ namespace AwsMock::Resource {
       void SendErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Poco::Exception &exc);
 
       /**
-       * Send an error response (HTTP status code 200).
+       * Send an error response (HTTP state code 200).
        *
        * @param service module name
        * @param response HTTP response object

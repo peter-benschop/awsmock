@@ -221,7 +221,7 @@ namespace AwsMock::Resource {
     }
 
     void AbstractResource::SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &payload, HeaderMap *extraHeader) {
-        log_trace_stream(_logger) << "Sending OK response, status: 200 payload: " << payload << std::endl;
+        log_trace_stream(_logger) << "Sending OK response, state: 200 payload: " << payload << std::endl;
 
         // Get content length
         unsigned long contentLength = 0;

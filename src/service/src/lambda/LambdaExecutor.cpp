@@ -43,13 +43,13 @@ namespace AwsMock::Service {
     os << body;
     os.flush();
 
-    // Get the response status
+    // Get the response state
     Poco::Net::HTTPResponse response;
     session.receiveResponse(response);
     if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
-      log_error_stream(_logger) << "HTTP error, status: " << response.getStatus() << " reason: " + response.getReason() << std::endl;
+      log_error_stream(_logger) << "HTTP error, state: " << response.getStatus() << " reason: " + response.getReason() << std::endl;
     }
-    log_debug_stream(_logger) << "lambda invocation request send, status: " << response.getStatus() << std::endl;
+    log_debug_stream(_logger) << "lambda invocation request send, state: " << response.getStatus() << std::endl;
   }
 
   Poco::URI LambdaExecutor::GetRequestUri(const std::string &hostName, int port) {

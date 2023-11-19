@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-  SQSMonitoring::SQSMonitoring(const Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition)
+  SQSMonitoring::SQSMonitoring(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition)
       : _logger(Poco::Logger::get("SQSMonitoring")), _configuration(configuration), _metricService(metricService), _condition(condition), _running(false) {
 
     // Update period

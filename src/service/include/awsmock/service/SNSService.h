@@ -49,7 +49,7 @@ namespace AwsMock::Service {
        * @param configuration module configuration
        * @param condition stop condition
        */
-      explicit SNSService(const Core::Configuration &configuration, Poco::Condition &condition);
+      explicit SNSService(Core::Configuration &configuration, Poco::Condition &condition);
 
       /**
        * Creates a new queue
@@ -131,7 +131,7 @@ namespace AwsMock::Service {
       /**
        * Configuration
        */
-      const Core::Configuration &_configuration;
+      Core::Configuration &_configuration;
 
       /**
        * SNS database connection

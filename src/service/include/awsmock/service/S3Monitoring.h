@@ -52,8 +52,11 @@ namespace AwsMock::Service {
        * @param metricService aws-mock monitoring
        * @param condition stop condition
        */
-      explicit S3Monitoring(const Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
+      explicit S3Monitoring(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
 
+      /**
+       * Destructor
+       */
       ~S3Monitoring() override;
 
       /**
@@ -85,7 +88,7 @@ namespace AwsMock::Service {
       /**
        * Configuration
        */
-      const Core::Configuration &_configuration;
+      Core::Configuration &_configuration;
 
       /**
        * Metric module

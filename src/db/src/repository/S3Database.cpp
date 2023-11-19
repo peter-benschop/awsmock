@@ -16,11 +16,13 @@ namespace AwsMock::Database {
       {"Deleted", {"s3:ObjectRemoved:Delete", "s3:ObjectRemoved:DeleteMarkerCreated"}}
   };
 
-  S3Database::S3Database(const Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("S3Database")) {
+  S3Database::S3Database(Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("S3Database")) {
 
-    // Get collections
-    _bucketCollection = GetConnection()["s3_bucket"];
-    _objectCollection = GetConnection()["s3_object"];
+    if(HasDatabase()) {
+      // Get collections
+      _bucketCollection = GetConnection()["s3_bucket"];
+      _objectCollection = GetConnection()["s3_object"];
+    }
   }
 
   bool S3Database::BucketExists(const std::string &region, const std::string &name) {

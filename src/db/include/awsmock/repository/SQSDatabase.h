@@ -23,6 +23,7 @@
 #include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
+#include <awsmock/memorydb/SQSMemoryDb.h>
 #include <awsmock/repository/Database.h>
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/entity/sqs/Queue.h>
@@ -38,7 +39,7 @@ namespace AwsMock::Database {
      *
      * @param configuration configuration properties
      */
-    explicit SQSDatabase(const Core::Configuration &configuration);
+    explicit SQSDatabase(Core::Configuration &configuration);
 
     /**
      * Check existence of queue
@@ -259,7 +260,7 @@ namespace AwsMock::Database {
     void RedriveMessages(const std::string &queueUrl, const Entity::SQS::RedrivePolicy &redrivePolicy);
 
     /**
-     * Any message, which has a message status is DELAYED is reset when the delay period is over.
+     * Any message, which has a message state is DELAYED is reset when the delay period is over.
      *
      * @param queueUrl queue URL.
      * @param delay delay in seconds.
@@ -267,7 +268,7 @@ namespace AwsMock::Database {
     void ResetDelayedMessages(const std::string &queueUrl, long delay);
 
     /**
-     * Count the number of message by status
+     * Count the number of message by state
      *
      * @param region AWS region
      * @param queueUrl URL of the queue
@@ -275,11 +276,11 @@ namespace AwsMock::Database {
     long CountMessages(const std::string &region = {}, const std::string &queueUrl = {});
 
     /**
-     * Count the number of message by status
+     * Count the number of message by state
      *
      * @param region AWS region
      * @param queueUrl URL of the queue
-     * @param status message status
+     * @param status message state
      */
     long CountMessagesByStatus(const std::string &region, const std::string &queueUrl, Entity::SQS::MessageStatus status);
 
@@ -325,7 +326,7 @@ namespace AwsMock::Database {
     /**
      * AwsMock configuration
      */
-    const Core::Configuration &_configuration;
+    Core::Configuration &_configuration;
 
     /**
      * SQS queue collection
@@ -336,6 +337,16 @@ namespace AwsMock::Database {
      * SQS message collection
      */
     mongocxx::collection _messageCollection{};
+
+    /**
+     * SQS queue vector, when running without database
+     */
+     std::map<std::string, Entity::SQS::Queue> _queues;
+
+    /**
+     * SQS message vector, when running without database
+     */
+    std::map<std::string, Entity::SQS::Message> _messages;
   };
 
 } // namespace AwsMock::Database

@@ -10,7 +10,7 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_array;
   using bsoncxx::builder::basic::make_document;
 
-  TransferDatabase::TransferDatabase(const Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("TransferDatabase")) {
+  TransferDatabase::TransferDatabase(Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("TransferDatabase")) {
 
     // Get collection
     _transferCollection = GetConnection()["transfer"];

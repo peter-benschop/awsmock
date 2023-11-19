@@ -23,7 +23,7 @@
 #include <mongocxx/exception/exception.hpp>
 
 // AwsMock includes
-#include <awsmock/entity/module/ModuleStatus.h>
+#include <awsmock/entity/module/ModuleState.h>
 
 namespace AwsMock::Database::Entity::Module {
 
@@ -45,6 +45,11 @@ namespace AwsMock::Database::Entity::Module {
      * Name
      */
     std::string name;
+
+    /**
+     * State
+     */
+    ModuleState state;
 
     /**
      * Status
@@ -83,7 +88,7 @@ namespace AwsMock::Database::Entity::Module {
      *
      * @param mResult MongoDB document.
      */
-    void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult);
+    //void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult);
 
     /**
      * Converts the MongoDB document to an entity

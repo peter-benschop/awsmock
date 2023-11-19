@@ -30,7 +30,7 @@ namespace AwsMock::Database {
        *
        * @param configuration configuration properties
        */
-      explicit LambdaDatabase(const Core::Configuration &configuration);
+      explicit LambdaDatabase(Core::Configuration &configuration);
 
       /**
        * Check existence of lambda

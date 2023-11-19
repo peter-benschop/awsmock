@@ -10,14 +10,14 @@ namespace AwsMock::Service {
       : AbstractWorker(configuration), AbstractServer(configuration, "s3"), _logger(Poco::Logger::get("S3Server")), _configuration(configuration), _metricService(metricService), _module("s3") {
 
     // Get HTTP configuration values
-    _port = _configuration.getInt("awsmock.module.s3.port", S3_DEFAULT_PORT);
-    _host = _configuration.getString("awsmock.module.s3.host", S3_DEFAULT_HOST);
-    _maxQueueLength = _configuration.getInt("awsmock.module.s3.max.queue", S3_DEFAULT_QUEUE_SIZE);
-    _maxThreads = _configuration.getInt("awsmock.module.s3.max.threads", S3_DEFAULT_MAX_THREADS);
-    _requestTimeout = _configuration.getInt("awsmock.module.s3.timeout", S3_DEFAULT_TIMEOUT);
+    _port = _configuration.getInt("awsmock.service.s3.port", S3_DEFAULT_PORT);
+    _host = _configuration.getString("awsmock.service.s3.host", S3_DEFAULT_HOST);
+    _maxQueueLength = _configuration.getInt("awsmock.service.s3.max.queue", S3_DEFAULT_QUEUE_SIZE);
+    _maxThreads = _configuration.getInt("awsmock.service.s3.max.threads", S3_DEFAULT_MAX_THREADS);
+    _requestTimeout = _configuration.getInt("awsmock.service.s3.timeout", S3_DEFAULT_TIMEOUT);
 
     // Directories
-    _dataDir = _configuration.getString("awsmock.module.s3.data.dir");
+    _dataDir = _configuration.getString("awsmock.service.s3.data.dir");
     Core::DirUtils::EnsureDirectory(_dataDir);
     log_debug_stream(_logger) << "Data directory path: " << _dataDir << std::endl;
 
@@ -70,6 +70,7 @@ namespace AwsMock::Service {
       if(InterruptableSleep(_period)) {
         break;
       }
+      UpdateCounters();
     }
   }
 

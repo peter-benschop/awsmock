@@ -56,7 +56,7 @@ namespace AwsMock::Core {
         log_trace_stream(_logger) << "System collector starting" << std::endl;
 
         std::string line;
-        std::ifstream ifs("/proc/self/status");
+        std::ifstream ifs("/proc/self/state");
         while (ifs) {
             std::getline(ifs, line);
 

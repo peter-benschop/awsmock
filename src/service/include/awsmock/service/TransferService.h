@@ -47,7 +47,7 @@ namespace AwsMock::Service {
        *
        * @param configuration module configuration
        */
-      explicit TransferService(const Core::Configuration &configuration);
+      explicit TransferService(Core::Configuration &configuration);
 
       /**
        * Create transfer manager request
@@ -114,7 +114,7 @@ namespace AwsMock::Service {
       /**
        * Configuration
        */
-      const Core::Configuration &_configuration;
+      Core::Configuration &_configuration;
 
       /**
        * Transfer database connection

@@ -157,19 +157,19 @@ namespace AwsMock::Service {
       break;
 
     case 400:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, reason != nullptr ? reason : Poco::Net::HTTPResponse::HTTP_REASON_BAD_REQUEST);
-      log_error_stream(_logger) << "HTTP status code: 401 message: " << Poco::Net::HTTPResponse::HTTP_REASON_BAD_REQUEST << std::endl;
+      log_error_stream(_logger) << "HTTP state code: 401 message: " << Poco::Net::HTTPResponse::HTTP_REASON_BAD_REQUEST << std::endl;
       break;
 
     case 401:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED, reason != nullptr ? reason : Poco::Net::HTTPResponse::HTTP_REASON_UNAUTHORIZED);
-      log_error_stream(_logger) << "HTTP status code: 401 message: " << Poco::Net::HTTPResponse::HTTP_REASON_UNAUTHORIZED << std::endl;
+      log_error_stream(_logger) << "HTTP state code: 401 message: " << Poco::Net::HTTPResponse::HTTP_REASON_UNAUTHORIZED << std::endl;
       break;
 
     case 403:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_FORBIDDEN, reason != nullptr ? reason : Poco::Net::HTTPResponse::HTTP_REASON_FORBIDDEN);
-      log_warning_stream(_logger) << "HTTP status code: 403 message: " << Poco::Net::HTTPResponse::HTTP_REASON_FORBIDDEN << std::endl;
+      log_warning_stream(_logger) << "HTTP state code: 403 message: " << Poco::Net::HTTPResponse::HTTP_REASON_FORBIDDEN << std::endl;
       break;
 
     case 404:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_FOUND, reason != nullptr ? reason : Poco::Net::HTTPResponse::HTTP_REASON_NOT_FOUND);
-      log_warning_stream(_logger) << "HTTP status code: 404 message: " << Poco::Net::HTTPResponse::HTTP_REASON_NOT_FOUND << std::endl;
+      log_warning_stream(_logger) << "HTTP state code: 404 message: " << Poco::Net::HTTPResponse::HTTP_REASON_NOT_FOUND << std::endl;
       break;
 
     case 405:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_METHOD_NOT_ALLOWED);
@@ -370,7 +370,7 @@ namespace AwsMock::Service {
   }
 
   void AbstractHandler::SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &payload, const HeaderMap &extraHeader) {
-    log_trace_stream(_logger) << "Sending OK response, status: 200 payload: " << payload << std::endl;
+    log_trace_stream(_logger) << "Sending OK response, state: 200 payload: " << payload << std::endl;
 
     // Get content length
     unsigned long contentLength = 0;
@@ -393,13 +393,13 @@ namespace AwsMock::Service {
   }
 
   void AbstractHandler::SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long contentLength, const HeaderMap &extraHeader) {
-    log_trace_stream(_logger) << "Sending OK response, status: 200, filename: " << fileName << " contentLength: " << contentLength << std::endl;
+    log_trace_stream(_logger) << "Sending OK response, state: 200, filename: " << fileName << " contentLength: " << contentLength << std::endl;
     try {
 
       // Set headers
       SetHeaders(response, contentLength, extraHeader);
 
-      // Set status
+      // Set state
       handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_OK);
 
       // Send response
@@ -418,7 +418,7 @@ namespace AwsMock::Service {
   }
 
   void AbstractHandler::SendRangeResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long min, long max, long size, const HeaderMap &extraHeader) {
-    log_trace_stream(_logger) << "Sending OK response, status: 200, filename: " << fileName << " min: " << min << " max: " << max << std::endl;
+    log_trace_stream(_logger) << "Sending OK response, state: 200, filename: " << fileName << " min: " << min << " max: " << max << std::endl;
     try {
 
       if (!Core::MemoryMappedFile::instance().IsMapped()) {
@@ -431,7 +431,7 @@ namespace AwsMock::Service {
 
       //DumpResponseHeaders(response);
 
-      // Set status
+      // Set state
       handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_PARTIAL_CONTENT);
 
       // Send response
@@ -458,7 +458,7 @@ namespace AwsMock::Service {
   }
 
   void AbstractHandler::SendHeadResponse(Poco::Net::HTTPServerResponse &response, const HeaderMap &extraHeader) {
-    log_trace_stream(_logger) << "Sending Head response, status: 200" << std::endl;
+    log_trace_stream(_logger) << "Sending Head response, state: 200" << std::endl;
     try {
 
       // Set headers
@@ -475,7 +475,7 @@ namespace AwsMock::Service {
   }
 
   void AbstractHandler::SendNoContentResponse(Poco::Net::HTTPServerResponse &response, const HeaderMap &extraHeader) {
-    log_trace_stream(_logger) << "Sending NO_CONTENT response, status: 204" << std::endl;
+    log_trace_stream(_logger) << "Sending NO_CONTENT response, state: 204" << std::endl;
     try {
 
       // Set headers
@@ -491,7 +491,7 @@ namespace AwsMock::Service {
   }
 
   void AbstractHandler::SendDeleteResponse(Poco::Net::HTTPServerResponse &response, const HeaderMap &extraHeader) {
-    log_trace_stream(_logger) << "Sending DELETE response, status: 204" << std::endl;
+    log_trace_stream(_logger) << "Sending DELETE response, state: 204" << std::endl;
 
     // Get content length
     unsigned long contentLength = 0;

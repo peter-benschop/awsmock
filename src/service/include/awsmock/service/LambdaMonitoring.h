@@ -50,7 +50,7 @@ namespace AwsMock::Service {
        * @param metricService aws-mock monitoring
        * @param condition stop condition
        */
-      explicit LambdaMonitoring(const Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
+      explicit LambdaMonitoring(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
 
       /**
        * Main method
@@ -79,7 +79,7 @@ namespace AwsMock::Service {
       /**
        * Configuration
        */
-      const Core::Configuration &_configuration;
+      Core::Configuration &_configuration;
 
       /**
        * Metric module

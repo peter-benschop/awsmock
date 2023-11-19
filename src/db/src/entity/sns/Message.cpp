@@ -19,7 +19,7 @@ namespace AwsMock::Database::Entity::SNS {
         kvp("targetArn", targetArn),
         kvp("message", message),
         kvp("messageId", messageId),
-        kvp("status", MessageStatusToString(status)),
+        kvp("state", MessageStatusToString(status)),
         kvp("attributes", messageAttributesDoc),
         kvp("reset", bsoncxx::types::b_date(std::chrono::milliseconds(0))),
         kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
@@ -35,7 +35,7 @@ namespace AwsMock::Database::Entity::SNS {
     topicArn = bsoncxx::string::to_string(mResult.value()["topicArn"].get_string().value);
     targetArn = bsoncxx::string::to_string(mResult.value()["targetArn"].get_string().value);
     message = bsoncxx::string::to_string(mResult.value()["message"].get_string().value);
-    status = MessageStatusFromString(bsoncxx::string::to_string(mResult.value()["status"].get_string().value));
+    status = MessageStatusFromString(bsoncxx::string::to_string(mResult.value()["state"].get_string().value));
     messageId = bsoncxx::string::to_string(mResult.value()["messageId"].get_string().value);
     lastSend = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["reset"].get_date().value) / 1000));
     created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
@@ -58,7 +58,7 @@ namespace AwsMock::Database::Entity::SNS {
     topicArn = bsoncxx::string::to_string(mResult.value()["topicArn"].get_string().value);
     targetArn = bsoncxx::string::to_string(mResult.value()["targetArn"].get_string().value);
     message = bsoncxx::string::to_string(mResult.value()["message"].get_string().value);
-    status = MessageStatusFromString(bsoncxx::string::to_string(mResult.value()["status"].get_string().value));
+    status = MessageStatusFromString(bsoncxx::string::to_string(mResult.value()["state"].get_string().value));
     messageId = bsoncxx::string::to_string(mResult.value()["messageId"].get_string().value);
     lastSend = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["reset"].get_date().value) / 1000));
     created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));

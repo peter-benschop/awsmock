@@ -66,17 +66,17 @@ namespace AwsMock::Dto::Lambda {
       Poco::DateTime lastModified = {};
 
       /**
-       * Last update status
+       * Last update state
        */
       std::string lastUpdateStatus = {};
 
       /**
-       * Last update status reason
+       * Last update state reason
        */
       std::string lastUpdateStatusReason = {};
 
       /**
-       * Last update status reason
+       * Last update state reason
        */
       std::string lastUpdateStatusReasonCode = {};
 

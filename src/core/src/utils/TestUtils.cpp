@@ -16,8 +16,8 @@ namespace AwsMock::Core {
     ofs << "awsmock.client.id=00000000" << std::endl;
     ofs << "awsmock.user=none" << std::endl;
     // Rest configuration
-    ofs << "awsmock.gateway.host=" << hostName << std::endl;
-    ofs << "awsmock.gateway.port=" << port << std::endl;
+    ofs << "awsmock.service.gateway.host=" << hostName << std::endl;
+    ofs << "awsmock.service.gateway.port=" << port << std::endl;
     // Database configuration
     ofs << "awsmock.mongodb.name=test" << std::endl;
     ofs << "awsmock.mongodb.host=" << hostName << std::endl;

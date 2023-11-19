@@ -11,57 +11,89 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_document;
 
   std::map<std::string, Entity::Module::Module> ModuleDatabase::_existingModules = {
-      {"s3", {.name="s3", .status=Entity::Module::ModuleStatus::STOPPED}},
-      {"sqs", {.name="sqs", .status=Entity::Module::ModuleStatus::STOPPED}},
-      {"sns", {.name="sns", .status=Entity::Module::ModuleStatus::STOPPED}},
-      {"lambda", {.name="lambda", .status=Entity::Module::ModuleStatus::STOPPED}},
-      {"transfer", {.name="transfer", .status=Entity::Module::ModuleStatus::STOPPED}},
-      {"cognito", {.name="cognito", .status=Entity::Module::ModuleStatus::STOPPED}},
-      {"gateway", {.name="gateway", .status=Entity::Module::ModuleStatus::STOPPED}},
+      {"s3", {.name="s3", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+      {"sqs", {.name="sqs", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+      {"sns", {.name="sns", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+      {"lambda", {.name="lambda", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+      {"transfer", {.name="transfer", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+      {"cognito", {.name="cognito", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+      {"gateway", {.name="gateway", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+      {"database", {.name="database", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}}
   };
 
-  ModuleDatabase::ModuleDatabase(const Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("ModuleDatabase")) {
+  ModuleDatabase::ModuleDatabase(Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("ModuleDatabase")), _configuration(configuration) {
 
-    // Get collections
-    _moduleCollection = GetConnection()["module"];
+    if (HasDatabase()) {
 
-    // Create default modules
-    for (auto const &module : _existingModules) {
-      if (!ModuleExists(module.first)) {
-        CreateModule(module.second);
+      // Get collections
+      _moduleCollection = GetConnection()["module"];
+
+      // Create default modules
+      for (auto const &module : _existingModules) {
+        if (!ModuleExists(module.first)) {
+          CreateModule(module.second);
+        }
       }
+
+    } else {
+
+      for (auto &module : _existingModules) {
+        module.second.status = _configuration.getBool("awsmock.service." + module.first + ".active", false) ? Entity::Module::ModuleStatus::ACTIVE : Entity::Module::ModuleStatus::INACTIVE;
+        module.second.state = _configuration.getBool("awsmock.service." + module.first + ".active", false) ? Entity::Module::ModuleState::RUNNING : Entity::Module::ModuleState::STOPPED;
+        _modules[Poco::UUIDGenerator().createRandom().toString()] = module.second;
+      }
+
     }
   }
 
   bool ModuleDatabase::IsActive(const std::string &name) {
 
-    try {
-      auto result = _moduleCollection.find_one(make_document(kvp("name", name)));
-      if (result) {
-        Entity::Module::Module service;
-        service.FromDocument(result);
-        log_trace_stream(_logger) << "Module status: " << Entity::Module::ModuleStatusToString(service.status) << std::endl;
-        return service.status == Entity::Module::ModuleStatus::RUNNING;
+    if (HasDatabase()) {
+
+      try {
+        auto result = _moduleCollection.find_one(make_document(kvp("name", name)));
+        if (result) {
+          Entity::Module::Module module;
+          module.FromDocument(result);
+          log_trace_stream(_logger) << "Module state: " << Entity::Module::ModuleStateToString(module.state) << std::endl;
+          return module.status == Entity::Module::ModuleStatus::ACTIVE;
+        }
+      } catch (mongocxx::exception::system_error &e) {
+        log_error_stream(_logger) << "IsActive failed, error: " << e.what() << std::endl;
       }
-    } catch (mongocxx::exception::system_error &e) {
-      log_error_stream(_logger) << "IsActive failed, error: " << e.what() << std::endl;
+
+    } else {
+
+      auto module = find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &queue) {
+        return queue.second.name == name;
+      });
+      return module->second.status == Entity::Module::ModuleStatus::ACTIVE;
+
     }
     return false;
   }
 
-  bool ModuleDatabase::ModuleExists(const std::string &module) {
-    try {
-      int64_t count = _moduleCollection.count_documents(make_document(kvp("name", module)));
-      log_trace_stream(_logger) << "Module exists: " << (count > 0 ? "true" : "false") << std::endl;
-      return count > 0;
-    } catch (mongocxx::exception::system_error &e) {
-      log_error_stream(_logger) << "Module exists failed, error: " << e.what() << std::endl;
+  bool ModuleDatabase::ModuleExists(const std::string &name) {
+
+    if (HasDatabase()) {
+
+      try {
+        int64_t count = _moduleCollection.count_documents(make_document(kvp("name", name)));
+        log_trace_stream(_logger) << "Module exists: " << (count > 0 ? "true" : "false") << std::endl;
+        return count > 0;
+      } catch (mongocxx::exception::system_error &e) {
+        log_error_stream(_logger) << "Module exists failed, error: " << e.what() << std::endl;
+      }
+
+    } else {
+      return find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &queue) {
+        return queue.second.name == name;
+      }) != _modules.end();
     }
     return false;
   }
 
   Entity::Module::Module ModuleDatabase::GetModuleById(const bsoncxx::oid &oid) {
-
     try {
 
       mongocxx::stdx::optional<bsoncxx::document::value> mResult = _moduleCollection.find_one(make_document(kvp("_id", oid)));
@@ -79,62 +111,151 @@ namespace AwsMock::Database {
 
   Entity::Module::Module ModuleDatabase::GetModuleByName(const std::string &name) {
 
-    try {
+    if (HasDatabase()) {
 
-      mongocxx::stdx::optional<bsoncxx::document::value> mResult = _moduleCollection.find_one(make_document(kvp("name", name)));
-      if (mResult) {
-        Entity::Module::Module modules;
-        modules.FromDocument(mResult);
-        return modules;
+      try {
+
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _moduleCollection.find_one(make_document(kvp("name", name)));
+        if (mResult) {
+          Entity::Module::Module modules;
+          modules.FromDocument(mResult);
+          return modules;
+        }
+
+      } catch (mongocxx::exception::system_error &e) {
+        log_error_stream(_logger) << "Get module by name failed, error: " << e.what() << std::endl;
       }
 
-    } catch (mongocxx::exception::system_error &e) {
-      log_error_stream(_logger) << "Get module by name failed, error: " << e.what() << std::endl;
+    } else {
+
+      auto module = find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &queue) {
+        return queue.second.name == name;
+      });
+
+      if (module != _modules.end()) {
+        module->second.oid = module->first;
+        return module->second;
+      }
+
     }
     return {};
   }
 
   Entity::Module::Module ModuleDatabase::CreateModule(const Entity::Module::Module &module) {
 
-    try {
+    if (HasDatabase()) {
 
-      auto result = _moduleCollection.insert_one(module.ToDocument().view());
-      log_trace_stream(_logger) << "Module created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
-      return GetModuleById(result->inserted_id().get_oid().value);
+      try {
 
-    } catch (mongocxx::exception::system_error &e) {
-      log_error_stream(_logger) << "Get module by ID failed, error: " << e.what() << std::endl;
+        auto result = _moduleCollection.insert_one(module.ToDocument().view());
+        log_trace_stream(_logger) << "Module created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
+        return GetModuleById(result->inserted_id().get_oid().value);
+
+      } catch (mongocxx::exception::system_error &e) {
+        log_error_stream(_logger) << "Get module by ID failed, error: " << e.what() << std::endl;
+      }
+
+    } else {
+
+      _modules[Poco::UUIDGenerator().createRandom().toString()] = module;
+
     }
     return {};
   }
 
   Entity::Module::Module ModuleDatabase::UpdateModule(const Entity::Module::Module &module) {
-    try {
-      auto mResult = _moduleCollection.replace_one(make_document(kvp("name", module.name)), module.ToDocument());
-      log_trace_stream(_logger) << "Module updated: " << module.ToString() << std::endl;
-      return GetModuleByName(module.name);
 
-    } catch (mongocxx::exception::system_error &e) {
-      log_error_stream(_logger) << "Update module failed, error: " << e.what() << std::endl;
+    if (HasDatabase()) {
+
+      try {
+        auto mResult = _moduleCollection.replace_one(make_document(kvp("name", module.name)), module.ToDocument());
+        log_trace_stream(_logger) << "Module updated: " << module.ToString() << std::endl;
+        return GetModuleByName(module.name);
+
+      } catch (mongocxx::exception::system_error &e) {
+        log_error_stream(_logger) << "Update module failed, error: " << e.what() << std::endl;
+      }
+
+    } else {
+
+      std::string name = module.name;
+      auto it = find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &queue) {
+        return queue.second.name == name;
+      });
+
+      if (it != _modules.end()) {
+        _modules[it->first] = module;
+      }
     }
     return {};
   }
 
+  void ModuleDatabase::SetState(const std::string &name, const Entity::Module::ModuleState &state) {
+
+    if (HasDatabase()) {
+
+      try {
+        auto mResult = _moduleCollection.update_one(make_document(kvp("name", name)), make_document(kvp("$set", make_document(kvp("state", Entity::Module::ModuleStateToString(state))))));
+        log_trace_stream(_logger) << "Module state updated, name: " << name << " state: " << Entity::Module::ModuleStateToString(state) << std::endl;
+      } catch (mongocxx::exception::system_error &e) {
+        log_error_stream(_logger) << "Set module state failed, error: " << e.what() << std::endl;
+      }
+
+    } else {
+
+      auto it = find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &queue) {
+        return queue.second.name == name;
+      });
+
+      if (it != _modules.end()) {
+        it->second.state = state;
+      }
+    }
+  }
+
   void ModuleDatabase::SetStatus(const std::string &name, const Entity::Module::ModuleStatus &status) {
-    try {
-      auto mResult = _moduleCollection.update_one(make_document(kvp("name", name)), make_document(kvp("$set", make_document(kvp("status", Entity::Module::ModuleStatusToString(status))))));
-      log_trace_stream(_logger) << "Module status updated, name: " << name << " status: " << Entity::Module::ModuleStatusToString(status) << std::endl;
-    } catch (mongocxx::exception::system_error &e) {
-      log_error_stream(_logger) << "Set module status failed, error: " << e.what() << std::endl;
+
+    if (HasDatabase()) {
+
+      try {
+        auto mResult = _moduleCollection.update_one(make_document(kvp("name", name)), make_document(kvp("$set", make_document(kvp("status", Entity::Module::ModuleStatusToString(status))))));
+        log_trace_stream(_logger) << "Module status updated, name: " << name << " state: " << Entity::Module::ModuleStatusToString(status) << std::endl;
+      } catch (mongocxx::exception::system_error &e) {
+        log_error_stream(_logger) << "Set module status failed, error: " << e.what() << std::endl;
+      }
+
+    } else {
+
+      auto it = find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &queue) {
+        return queue.second.name == name;
+      });
+
+      if (it != _modules.end()) {
+        it->second.status = status;
+      }
     }
   }
 
   void ModuleDatabase::SetPort(const std::string &name, int port) {
-    try {
-      auto mResult = _moduleCollection.update_one(make_document(kvp("name", name)), make_document(kvp("$set", make_document(kvp("port", port)))));
-      log_trace_stream(_logger) << "Module port updated, name: " << name << " port: " << port << std::endl;
-    } catch (mongocxx::exception::system_error &e) {
-      log_error_stream(_logger) << "Set module port failed, error: " << e.what() << std::endl;
+
+    if (HasDatabase()) {
+
+      try {
+        auto mResult = _moduleCollection.update_one(make_document(kvp("name", name)), make_document(kvp("$set", make_document(kvp("port", port)))));
+        log_trace_stream(_logger) << "Module port updated, name: " << name << " port: " << port << std::endl;
+      } catch (mongocxx::exception::system_error &e) {
+        log_error_stream(_logger) << "Set module port failed, error: " << e.what() << std::endl;
+      }
+
+    } else {
+
+      auto it = find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &queue) {
+        return queue.second.name == name;
+      });
+
+      if (it != _modules.end()) {
+        it->second.port = port;
+      }
     }
   }
 
@@ -147,12 +268,23 @@ namespace AwsMock::Database {
   }
 
   int ModuleDatabase::ModuleCount() {
-    try {
-      int64_t count = _moduleCollection.count_documents(make_document());
-      log_trace_stream(_logger) << "Service status: " << (count > 0 ? "true" : "false") << std::endl;
-      return (int) count;
-    } catch (mongocxx::exception::system_error &e) {
-      log_error_stream(_logger) << "Service exists failed, error: " << e.what() << std::endl;
+
+    if (HasDatabase()) {
+
+      try {
+
+        int64_t count = _moduleCollection.count_documents(make_document());
+        log_trace_stream(_logger) << "Service state: " << (count > 0 ? "true" : "false") << std::endl;
+        return static_cast<int>(count);
+
+      } catch (mongocxx::exception::system_error &e) {
+        log_error_stream(_logger) << "Service exists failed, error: " << e.what() << std::endl;
+      }
+
+    } else {
+
+      return static_cast<int>(_modules.size());
+
     }
     return -1;
   }
@@ -160,11 +292,21 @@ namespace AwsMock::Database {
   Entity::Module::ModuleList ModuleDatabase::ListModules() {
 
     Entity::Module::ModuleList modulesList;
-    auto serviceCursor = _moduleCollection.find({});
-    for (auto service : serviceCursor) {
-      Entity::Module::Module result;
-      result.FromDocument(service);
-      modulesList.push_back(result);
+    if (HasDatabase()) {
+
+      auto serviceCursor = _moduleCollection.find({});
+      for (auto service : serviceCursor) {
+        Entity::Module::Module result;
+        result.FromDocument(service);
+        modulesList.push_back(result);
+      }
+
+    } else {
+
+      for (const auto &it : _modules) {
+        modulesList.emplace_back(it.second);
+      }
+
     }
 
     log_trace_stream(_logger) << "Got module list, size:" << modulesList.size() << std::endl;
@@ -172,22 +314,48 @@ namespace AwsMock::Database {
   }
 
   void ModuleDatabase::DeleteModule(const Entity::Module::Module &module) {
-    try {
-      auto result = _moduleCollection.delete_many(make_document(kvp("name", module.name)));
-      log_debug_stream(_logger) << "Service deleted, count: " << result->deleted_count() << std::endl;
 
-    } catch (mongocxx::exception::system_error &e) {
-      log_error_stream(_logger) << "Delete module failed, error: " << e.what() << std::endl;
+    if (HasDatabase()) {
+
+      try {
+
+        auto result = _moduleCollection.delete_many(make_document(kvp("name", module.name)));
+        log_debug_stream(_logger) << "Service deleted, count: " << result->deleted_count() << std::endl;
+
+      } catch (mongocxx::exception::system_error &e) {
+        log_error_stream(_logger) << "Delete module failed, error: " << e.what() << std::endl;
+      }
+
+    } else {
+
+      std::string name = module.name;
+      auto it = find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &queue) {
+        return queue.second.name == name;
+      });
+
+      if (it != _modules.end()) {
+        _modules.erase(it->first);
+      }
     }
   }
 
   void ModuleDatabase::DeleteAllModules() {
-    try {
-      auto result = _moduleCollection.delete_many(make_document());
-      log_debug_stream(_logger) << "All module deleted, count: " << result->deleted_count() << std::endl;
 
-    } catch (mongocxx::exception::system_error &e) {
-      log_error_stream(_logger) << "Delete all module failed, error: " << e.what() << std::endl;
+    if (HasDatabase()) {
+
+      try {
+
+        auto result = _moduleCollection.delete_many(make_document());
+        log_debug_stream(_logger) << "All module deleted, count: " << result->deleted_count() << std::endl;
+
+      } catch (mongocxx::exception::system_error &e) {
+        log_error_stream(_logger) << "Delete all module failed, error: " << e.what() << std::endl;
+      }
+
+    } else {
+
+      _modules.clear();
+
     }
   }
 

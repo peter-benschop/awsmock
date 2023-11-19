@@ -14,6 +14,9 @@
 #include <mongocxx/uri.hpp>
 #include <mongocxx/exception/exception.hpp>
 
+// Poco includes
+#include <Poco/Util/AbstractConfiguration.h>
+
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
@@ -29,7 +32,13 @@ namespace AwsMock::Database {
      *
      * @param configuration configuration properties
      */
-    explicit Database(const Core::Configuration &configuration);
+    explicit Database(Core::Configuration &configuration);
+    Database();
+
+    /**
+     * Initialize mongodb
+     */
+    void Initialize();
 
     /**
      * Returns a MongoDB connection from the pool
@@ -57,6 +66,21 @@ namespace AwsMock::Database {
      */
     void WaitForStartup();
 
+    /**
+     * Check whether we are running without database
+     */
+     bool HasDatabase() const;
+
+    /**
+     * Start the database
+     */
+    void StartDatabase();
+
+    /**
+     * Stops the database
+     */
+    void StopDatabase();
+
   private:
 
     /**
@@ -67,7 +91,7 @@ namespace AwsMock::Database {
     /**
      * Application configuration
      */
-    const Core::Configuration &_configuration;
+    Core::Configuration &_configuration;
 
     /**
      * Database name
@@ -104,6 +128,10 @@ namespace AwsMock::Database {
      */
     mongocxx::client _client;
 
+    /**
+     * Database flag
+     */
+    bool _useDatabase;
   };
 
 } // namespace AwsMock::Database

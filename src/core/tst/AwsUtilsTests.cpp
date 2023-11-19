@@ -24,7 +24,7 @@ namespace AwsMock::Core {
     void SetUp() override {
       _region = _configuration.getString("awsmock.region");
       _accountId = _configuration.getString("awsmock.account.id");
-      _endpoint = SystemUtils::GetHostName() + ":" + _configuration.getString("awsmock.gateway.port");
+      _endpoint = SystemUtils::GetHostName() + ":" + _configuration.getString("awsmock.service.gateway.port");
     }
 
   protected:

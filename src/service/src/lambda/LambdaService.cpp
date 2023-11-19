@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-  LambdaService::LambdaService(const Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue, Poco::NotificationQueue &invokeQueue) :
+  LambdaService::LambdaService(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue, Poco::NotificationQueue &invokeQueue) :
     _logger(Poco::Logger::get("LambdaService")), _configuration(configuration), _metricService(metricService), _createQueue(createQueue), _invokeQueue(invokeQueue) {
 
     // Initialize environment

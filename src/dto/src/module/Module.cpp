@@ -12,7 +12,7 @@ namespace AwsMock::Dto::Module {
       moduleJson.set("name", module.name);
       moduleJson.set("executable", module.executable);
       moduleJson.set("port", module.port);
-      moduleJson.set("status", Database::Entity::Module::ModuleStatusToString(module.status));
+      moduleJson.set("state", Database::Entity::Module::ModuleStateToString(module.state));
       moduleJson.set("created", Poco::DateTimeFormatter().format(module.created, Poco::DateTimeFormat::HTTP_FORMAT));
       moduleJson.set("modified", Poco::DateTimeFormatter().format(module.modified, Poco::DateTimeFormat::HTTP_FORMAT));
 
@@ -33,7 +33,7 @@ namespace AwsMock::Dto::Module {
         serviceJson.set("name", service.name);
         serviceJson.set("executable", service.executable);
         serviceJson.set("port", service.port);
-        serviceJson.set("status", Database::Entity::Module::ModuleStatusToString(service.status));
+        serviceJson.set("state", Database::Entity::Module::ModuleStateToString(service.state));
         serviceJson.set("created", Poco::DateTimeFormatter().format(service.created, Poco::DateTimeFormat::HTTP_FORMAT));
         serviceJson.set("modified", Poco::DateTimeFormatter().format(service.modified, Poco::DateTimeFormat::HTTP_FORMAT));
         moduleJsonArray.add(serviceJson);
@@ -62,8 +62,8 @@ namespace AwsMock::Dto::Module {
       Core::JsonUtils::GetJsonValueString("name", rootObject, module.name);
       Core::JsonUtils::GetJsonValueString("executable", rootObject, module.executable);
       Core::JsonUtils::GetJsonValueInt("port", rootObject, module.port);
-      if (rootObject->has("status")) {
-        module.status = Database::Entity::Module::ModuleStatusFromString(rootObject->get("status").convert<std::string>());
+      if (rootObject->has("state")) {
+        module.status = Database::Entity::Module::ModuleStateFromString(rootObject->get("state").convert<std::string>());
       }
 
       // Cleanup
@@ -91,8 +91,8 @@ namespace AwsMock::Dto::Module {
         Core::JsonUtils::GetJsonValueString("name", jsonModule.extract<Poco::JSON::Object::Ptr>(), module.name);
         Core::JsonUtils::GetJsonValueString("executable", jsonModule.extract<Poco::JSON::Object::Ptr>(), module.executable);
         Core::JsonUtils::GetJsonValueInt("port", jsonModule.extract<Poco::JSON::Object::Ptr>(), module.port);
-        if (jsonModule.extract<Poco::JSON::Object::Ptr>()->has("status")) {
-          module.status = Database::Entity::Module::ModuleStatusFromString(jsonModule.extract<Poco::JSON::Object::Ptr>()->get("status").convert<std::string>());
+        if (jsonModule.extract<Poco::JSON::Object::Ptr>()->has("state")) {
+          module.status = Database::Entity::Module::ModuleStateFromString(jsonModule.extract<Poco::JSON::Object::Ptr>()->get("state").convert<std::string>());
         }
         modules.emplace_back(module);
       }
