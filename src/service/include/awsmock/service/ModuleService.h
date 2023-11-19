@@ -18,6 +18,7 @@
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/entity/module/Module.h>
 #include <awsmock/repository/ModuleDatabase.h>
+#include <awsmock/service/GatewayServer.h>
 #include <awsmock/service/S3Server.h>
 #include <awsmock/service/SQSServer.h>
 #include <awsmock/service/SNSServer.h>
@@ -39,7 +40,7 @@ namespace AwsMock::Service {
      * @param configuration module configuration
      * @param serverMap module map
      */
-    explicit ModuleService(const Core::Configuration &configuration, Service::ServerMap &serverMap);
+    explicit ModuleService(Core::Configuration &configuration, Service::ServerMap &serverMap);
 
     /**
      * Return all list of all modules
@@ -102,7 +103,7 @@ namespace AwsMock::Service {
     /**
      * Configuration
      */
-    const Core::Configuration &_configuration;
+    Core::Configuration &_configuration;
 
     /**
      * Server map

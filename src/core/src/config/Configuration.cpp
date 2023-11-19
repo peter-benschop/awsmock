@@ -82,6 +82,22 @@ namespace AwsMock::Core {
     log_trace_stream(_logger) << "Value set, key: " << key << std::endl;
   }
 
+  void Configuration::SetValue(const std::string &key, bool value) {
+    if (!hasProperty(key)) {
+      throw CoreException("Property not found, key: " + key);
+    }
+    setBool(key, value);
+    log_trace_stream(_logger) << "Value set, key: " << key << std::endl;
+  }
+
+  void Configuration::SetValue(const std::string &key, int value) {
+    if (!hasProperty(key)) {
+      throw CoreException("Property not found, key: " + key);
+    }
+    setInt(key, value);
+    log_trace_stream(_logger) << "Value set, key: " << key << std::endl;
+  }
+
   std::string Configuration::GetAppName() {
     return PROJECT_NAME;
   }

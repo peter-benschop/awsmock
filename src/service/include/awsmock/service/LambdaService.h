@@ -72,7 +72,7 @@ namespace AwsMock::Service {
        * @param createQueue create notification queue
        * @param invokeQueue invoke notification queue
        */
-      explicit LambdaService(const Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue, Poco::NotificationQueue &invokeQueue);
+      explicit LambdaService(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue, Poco::NotificationQueue &invokeQueue);
 
       /**
        * Create lambda function
@@ -177,7 +177,7 @@ namespace AwsMock::Service {
       /**
        * Configuration
        */
-      const Core::Configuration &_configuration;
+      Core::Configuration &_configuration;
 
       /**
        * Monitoring

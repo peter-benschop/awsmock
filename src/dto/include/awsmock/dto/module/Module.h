@@ -22,7 +22,7 @@
 #include "awsmock/core/JsonUtils.h"
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/entity/module/Module.h>
-#include <awsmock/entity/module/ModuleStatus.h>
+#include <awsmock/entity/module/ModuleState.h>
 
 namespace AwsMock::Dto::Module {
 
@@ -36,7 +36,7 @@ namespace AwsMock::Dto::Module {
     /**
      * Status
      */
-    Database::Entity::Module::ModuleStatus status;
+    Database::Entity::Module::ModuleState status;
 
     /**
      * Executable

@@ -22,7 +22,7 @@
 #include <awsmock/core/CurlUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/repository/ModuleDatabase.h>
-#include <awsmock/entity/module/ModuleStatus.h>
+#include <awsmock/entity/module/ModuleState.h>
 
 namespace AwsMock::Service {
 
@@ -36,7 +36,7 @@ namespace AwsMock::Service {
      * @param configuration AwsMock configuration
      * @param name manager name
      */
-    explicit AbstractServer(const Core::Configuration &configuration, std::string name);
+    explicit AbstractServer(Core::Configuration &configuration, std::string name);
 
     /**
      * Checks whether the module is active
@@ -104,7 +104,7 @@ namespace AwsMock::Service {
     /**
      * Configuration
      */
-    const Core::Configuration &_configuration;
+    Core::Configuration &_configuration;
 
     /**
      * Service name

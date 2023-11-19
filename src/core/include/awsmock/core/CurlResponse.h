@@ -14,12 +14,12 @@ namespace AwsMock::Core {
     struct CurlResponse {
 
       /**
-       * HTTP status code
+       * HTTP state code
        */
       int statusCode;
 
       /**
-       * HTTP status reason
+       * HTTP state reason
        */
       std::string statusReason;
 

@@ -21,7 +21,7 @@ namespace AwsMock::Dto::S3 {
       if(node) {
         status = node->innerText();
       } else {
-        std::cerr << "Exception: Wrong versioning status" << std::endl;
+        std::cerr << "Exception: Wrong versioning state" << std::endl;
       }
 
     } catch(Poco::Exception &exc){
@@ -36,7 +36,7 @@ namespace AwsMock::Dto::S3 {
   }
 
   std::ostream &operator<<(std::ostream &os, const PutBucketVersioningRequest &r) {
-    os << "PutBucketVersioningRequest={region='" << r.region << "', user='" << r.user << "', bucket='" << r.bucket << "', status='" << r.status << "'}";
+    os << "PutBucketVersioningRequest={region='" << r.region << "', user='" << r.user << "', bucket='" << r.bucket << "', state='" << r.status << "'}";
     return os;
   }
 

@@ -8,6 +8,9 @@
 // C++ standard includes
 #include <string>
 
+// Poco includes
+#include <Poco/UUIDGenerator.h>
+
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
@@ -25,7 +28,7 @@ namespace AwsMock::Database {
      *
      * @param configuration configuration properties
      */
-    explicit ModuleDatabase(const Core::Configuration &configuration);
+    explicit ModuleDatabase(Core::Configuration &configuration);
 
     /**
      * Checks the active flag.
@@ -36,12 +39,12 @@ namespace AwsMock::Database {
     bool IsActive(const std::string &name);
 
     /**
-     * Check existence of module
+     * Check existence of name
      *
-     * @param module module module
-     * @return created module
+     * @param name name name
+     * @return created name
      */
-    bool ModuleExists(const std::string &module);
+    bool ModuleExists(const std::string &name);
 
     /**
      * Returns the module by id
@@ -78,10 +81,24 @@ namespace AwsMock::Database {
     Entity::Module::Module UpdateModule(const Entity::Module::Module &module);
 
     /**
+     * Sets the state of module.
+     *
+     * <p>State can be one of STARTING, RUNNING, STOPPED, UNKNOWN.</p>
+     *
+     * @param name module name
+     * @param state module state
+     * @see AwsMock::Database::Entity::Module::ModuleState()
+     */
+    void SetState(const std::string &name, const Entity::Module::ModuleState &state);
+
+    /**
      * Sets the status of module.
+     *
+     * <p>Status can be one of UNKNOWN, ACTIVE, INACTIVE.</p>
      *
      * @param name module name
      * @param status module status
+     * @see AwsMock::Database::Entity::Module::ModuleStatus()
      */
     void SetStatus(const std::string &name, const Entity::Module::ModuleStatus &status);
 
@@ -135,15 +152,24 @@ namespace AwsMock::Database {
     Core::LogStream _logger;
 
     /**
+     * Configuration
+     */
+    Core::Configuration &_configuration;
+
+    /**
      * Service collection
      */
     mongocxx::collection _moduleCollection{};
 
     /**
+     * Modules map
+     */
+    std::map<std::string, Entity::Module::Module> _modules;
+
+    /**
      * Existing modules
      */
     static std::map<std::string, Entity::Module::Module> _existingModules;
-
   };
 
 } // namespace AwsMock::Database

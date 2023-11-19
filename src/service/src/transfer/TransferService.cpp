@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-  TransferService::TransferService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("TransferService")), _configuration(configuration) {
+  TransferService::TransferService(Core::Configuration &configuration) : _logger(Poco::Logger::get("TransferService")), _configuration(configuration) {
 
     // Initialize environment
     _ftpPort = _configuration.getInt("awsmock.module.transfer.ftp.port", TRANSFER_DEFAULT_FTP_PORT);

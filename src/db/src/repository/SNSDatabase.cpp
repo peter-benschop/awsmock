@@ -11,7 +11,7 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_document;
   using bsoncxx::builder::stream::document;
 
-  SNSDatabase::SNSDatabase(const Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("SNSDatabase")) {
+  SNSDatabase::SNSDatabase(Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("SNSDatabase")) {
 
     // Get collections
     _topicCollection = GetConnection()["sns_topic"];
@@ -216,8 +216,8 @@ namespace AwsMock::Database {
   long SNSDatabase::CountMessagesByStatus(const std::string &region, const std::string &topicArn, int status) {
 
     try {
-      long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("topicArn", topicArn), kvp("status", status)));
-      log_trace_stream(_logger) << "Count messages by status, region: " << region << " arn: " << topicArn << " result: " << count << std::endl;
+      long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("topicArn", topicArn), kvp("state", status)));
+      log_trace_stream(_logger) << "Count messages by state, region: " << region << " arn: " << topicArn << " result: " << count << std::endl;
       return count;
     } catch (const mongocxx::exception &exc) {
       _logger.error() << "SNS Database exception " << exc.what() << std::endl;

@@ -36,7 +36,7 @@ namespace AwsMock::Database {
      *
      * @param configuration configuration properties
      */
-    explicit S3Database(const Core::Configuration &configuration);
+    explicit S3Database(Core::Configuration &configuration);
 
     /**
      * Bucket exists

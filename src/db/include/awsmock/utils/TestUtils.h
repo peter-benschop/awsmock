@@ -13,7 +13,7 @@
 // AwsMock includes
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/ModuleDatabase.h>
-#include <awsmock/entity/module/ModuleStatus.h>
+#include <awsmock/entity/module/ModuleState.h>
 
 namespace AwsMock::Database {
 
@@ -29,7 +29,7 @@ namespace AwsMock::Database {
       /**
       * Service names
       */
-      static std::vector<std::string> _services;
+      static std::vector<std::string> _modules;
   };
 
 } //namespace AwsMock::Database

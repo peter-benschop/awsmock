@@ -6,13 +6,13 @@
 
 namespace AwsMock::Database {
 
-  std::vector<std::string> TestUtils::_services = {"s3", "sqs", "sns", "lambda", "transfer"};
+  std::vector<std::string> TestUtils::_modules = {"s3", "sqs", "sns", "lambda", "transfer", "gateway", "database"};
 
   void TestUtils::CreateServices() {
     Core::Configuration configuration = Core::Configuration(TMP_PROPERTIES_FILE);
     auto _serviceDatabase = ModuleDatabase(configuration);
-    for (const auto &it : _services) {
-      _serviceDatabase.CreateOrUpdateModule({.oid={}, .name=it, .status=Entity::Module::ModuleStatus::RUNNING});
+    for (const auto &it : _modules) {
+      _serviceDatabase.CreateOrUpdateModule({.oid={}, .name=it, .state=Entity::Module::ModuleState::RUNNING, .status=Entity::Module::ModuleStatus::ACTIVE});
     }
   }
 }

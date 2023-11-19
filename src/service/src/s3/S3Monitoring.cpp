@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-  S3Monitoring::S3Monitoring(const Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition)
+  S3Monitoring::S3Monitoring(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition)
       : _logger(Poco::Logger::get("S3Monitoring")), _configuration(configuration), _metricService(metricService), _condition(condition), _running(false) {
 
     // Update period

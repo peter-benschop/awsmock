@@ -6,7 +6,6 @@ namespace AwsMock {
   ModuleHandler::ModuleHandler(Core::Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap)
       : AbstractResource(), _logger(Poco::Logger::get("ModuleHandler")), _configuration(configuration), _metricService(metricService), _serverMap(serverMap) {
 
-    _serviceDatabase = std::make_shared<Database::ModuleDatabase>(_configuration);
     _moduleService = std::make_shared<Service::ModuleService>(_configuration, _serverMap);
   }
 
@@ -20,8 +19,8 @@ namespace AwsMock {
 
     if (action == "config") {
 
-      std::string host = _configuration.getString("awsmock.gateway.host", "localhost");
-      int port = _configuration.getInt("awsmock.gateway.port", 4566);
+      std::string host = _configuration.getString("awsmock.service.gateway.host", "localhost");
+      int port = _configuration.getInt("awsmock.service.gateway.port", 4566);
       Dto::Module::GatewayConfig config = {
           .region=_configuration.getString("awsmock.region", "eu-central-1"),
           .endpoint="http://" + host + "/" + std::to_string(port),

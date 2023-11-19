@@ -11,6 +11,7 @@
 
 // C++ includes
 #include <string>
+#include <sstream>
 #include <iostream>
 #include <iomanip>
 #include <cstdlib>

@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-  SNSService::SNSService(const Core::Configuration &configuration, Poco::Condition &condition) : _logger(Poco::Logger::get("SNSService")), _configuration(configuration), _condition(condition) {
+  SNSService::SNSService(Core::Configuration &configuration, Poco::Condition &condition) : _logger(Poco::Logger::get("SNSService")), _configuration(configuration), _condition(condition) {
 
     // Initialize environment
     _snsDatabase = std::make_unique<Database::SNSDatabase>(_configuration);

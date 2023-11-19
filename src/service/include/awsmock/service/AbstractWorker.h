@@ -66,7 +66,7 @@ namespace AwsMock::Service {
        * @param module AwsMock module name
        * @param url HTTP URL
        * @param contentType HTTP content type
-       * @return true, if status = 200
+       * @return true, if state = 200
        */
       bool SendHeadRequest(const std::string &module, const std::string &url, const std::string &contentType);
       

@@ -39,12 +39,12 @@ namespace AwsMock::Service {
       os.clear();
     }
 
-    // Get the response status
+    // Get the response state
     Poco::Net::HTTPResponse response;
     if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
-      log_error_stream(_logger) << "HTTP error, status: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
+      log_error_stream(_logger) << "HTTP error, state: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
     }
-    log_debug_stream(_logger) << "POST request send, status: " << response.getStatus() << std::endl;
+    log_debug_stream(_logger) << "POST request send, state: " << response.getStatus() << std::endl;
 
   }
 
@@ -70,12 +70,12 @@ namespace AwsMock::Service {
       os.clear();
     }
 
-    // Get the response status
+    // Get the response state
     Poco::Net::HTTPResponse response;
     if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
-      log_error_stream(_logger) << "HTTP error, status: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
+      log_error_stream(_logger) << "HTTP error, state: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
     }
-    log_debug_stream(_logger) << "PUT request send, status: " << response.getStatus() << std::endl;
+    log_debug_stream(_logger) << "PUT request send, state: " << response.getStatus() << std::endl;
 
   }
 
@@ -101,12 +101,12 @@ namespace AwsMock::Service {
       os.clear();
     }
 
-    // Get the response status
+    // Get the response state
     Poco::Net::HTTPResponse response;
     if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
-      log_error_stream(_logger) << "HTTP error, status: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
+      log_error_stream(_logger) << "HTTP error, state: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
     }
-    log_debug_stream(_logger) << "DELETE request send, status: " << response.getStatus() << std::endl;
+    log_debug_stream(_logger) << "DELETE request send, state: " << response.getStatus() << std::endl;
   }
 
   bool AbstractWorker::SendHeadRequest(const std::string &module, const std::string &url, const std::string &contentType) {
@@ -124,9 +124,9 @@ namespace AwsMock::Service {
     // Send request
     session.sendRequest(request);
 
-    // Get the response status
+    // Get the response state
     Poco::Net::HTTPResponse response;
-    log_debug_stream(_logger) << "HEAD head request send, status: " << response.getStatus() << std::endl;
+    log_debug_stream(_logger) << "HEAD head request send, state: " << response.getStatus() << std::endl;
     return response.getStatus() == Poco::Net::HTTPResponse::HTTP_OK;
   }
 
@@ -150,13 +150,13 @@ namespace AwsMock::Service {
     long copied = Poco::StreamCopier::copyStream(ifs, os);
     log_debug_stream(_logger) << "Body send, file: " << fileName << " size: " << copied << std::endl;
 
-    // Get the response status
+    // Get the response state
     Poco::Net::HTTPResponse response;
     session.receiveResponse(response);
     if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
-      log_error_stream(_logger) << "HTTP error, status: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
+      log_error_stream(_logger) << "HTTP error, state: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
     }
-    log_debug_stream(_logger) << "Send file request send, status: " << response.getStatus() << std::endl;
+    log_debug_stream(_logger) << "Send file request send, state: " << response.getStatus() << std::endl;
   }
 
   void AbstractWorker::AddAuthorization(const std::string &module, Poco::Net::HTTPRequest &request) {

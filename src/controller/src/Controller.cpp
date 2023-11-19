@@ -34,8 +34,9 @@ namespace AwsMock::Controller {
 
     std::cout << "Modules:" << std::endl;
     for (auto const &module : modules) {
-      std::cout << "  " << std::setw(16) << std::left << module.name << std::setw(9) << Database::Entity::Module::ModuleStatusToString(module.status)
-                << std::setw(9) << " " << std::setw(10) << std::left << module.port << std::endl;
+      std::string sport = module.port > 0 ? std::to_string(module.port) : "";
+      std::cout << "  " << std::setw(16) << std::left << module.name << std::setw(9) << Database::Entity::Module::ModuleStateToString(module.status)
+                << std::setw(9) << " " << std::setw(10) << std::left << sport << std::endl;
     }
   }
 
@@ -57,7 +58,11 @@ namespace AwsMock::Controller {
     } else {
       Dto::Module::Module module = Dto::Module::Module::FromJson(response.output);
       if (response.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
-        std::cout << "Module " << module.name << " (" << module.port << ")" << " started" << std::endl;
+        if (module.port > 0) {
+          std::cout << "Module " << module.name << "(" << module.port << ") started" << std::endl;
+        } else {
+          std::cout << "Module " << module.name << " started" << std::endl;
+        }
       } else {
         std::cout << "Module " << name << " could not be started: " << response.output << std::endl;
       }
@@ -82,7 +87,11 @@ namespace AwsMock::Controller {
     } else {
       Dto::Module::Module module = Dto::Module::Module::FromJson(response.output);
       if (response.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
-        std::cout << "Module " << module.name << " (" << module.port << ")" << " restarted" << std::endl;
+        if (module.port > 0) {
+          std::cout << "Module " << module.name << "(" << module.port << ") restarted" << std::endl;
+        } else {
+          std::cout << "Module " << module.name << " restarted" << std::endl;
+        }
       } else {
         std::cout << "Module " << name << " could not be restarted: " << response.output << std::endl;
       }
@@ -107,7 +116,11 @@ namespace AwsMock::Controller {
     } else {
       Dto::Module::Module module = Dto::Module::Module::FromJson(response.output);
       if (response.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
-        std::cout << "Module " << module.name << "(" << module.port << ")" << " stopped" << std::endl;
+        if (module.port > 0) {
+          std::cout << "Module " << module.name << "(" << module.port << ") stopped" << std::endl;
+        } else {
+          std::cout << "Module " << module.name << " stopped" << std::endl;
+        }
       } else {
         std::cout << "Module " << name << " could not be stopped: " << response.output << std::endl;
       }

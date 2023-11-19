@@ -5,8 +5,8 @@ namespace AwsMock::Service {
 
   S3Handler::S3Handler(Core::Configuration &configuration, Core::MetricService &metricService)
       : AbstractHandler(), _logger(Poco::Logger::get("S3ServiceHandler")), _configuration(configuration), _metricService(metricService), _s3Service(configuration) {
-    std::string host = _configuration.getString("awsmock.gateway.host", "localhost");
-    std::string port = _configuration.getString("awsmock.gateway.port", "4566");
+    std::string host = _configuration.getString("awsmock.service.gateway.host", "localhost");
+    std::string port = _configuration.getString("awsmock.service.gateway.port", "4566");
     _endpoint = "http://" + host + ":" + port;
   }
 

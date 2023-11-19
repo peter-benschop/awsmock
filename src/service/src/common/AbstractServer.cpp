@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-  AbstractServer::AbstractServer(const Core::Configuration &configuration, std::string name) : _logger(Poco::Logger::get("AbstractServer")), _configuration(configuration), _name(std::move(name)), _running(false) {
+  AbstractServer::AbstractServer(Core::Configuration &configuration, std::string name) : _logger(Poco::Logger::get("AbstractServer")), _configuration(configuration), _name(std::move(name)), _running(false) {
 
     // Create environment
     _moduleDatabase = std::make_unique<Database::ModuleDatabase>(_configuration);
@@ -24,7 +24,7 @@ namespace AwsMock::Service {
   void AbstractServer::run() {
     MainLoop();
     StopHttpServer();
-    _moduleDatabase->SetStatus(_name, Database::Entity::Module::ModuleStatus::STOPPED);
+    _moduleDatabase->SetState(_name, Database::Entity::Module::ModuleState::STOPPED);
     _running = false;
     log_info_stream(_logger) << "Module " << _name << " has been shutdown" << std::endl;
   }
@@ -58,7 +58,7 @@ namespace AwsMock::Service {
 
     // Set running, now that the HTTP server is running
     _running = true;
-    _moduleDatabase->SetStatus(_name, Database::Entity::Module::ModuleStatus::RUNNING);
+    _moduleDatabase->SetState(_name, Database::Entity::Module::ModuleState::RUNNING);
     
     log_info_stream(_logger) << "HTTP server " << _name << " started, endpoint: http://" << host << ":" << port << std::endl;
   }

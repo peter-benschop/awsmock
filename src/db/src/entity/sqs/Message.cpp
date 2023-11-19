@@ -24,7 +24,7 @@ namespace AwsMock::Database::Entity::SQS {
         kvp("region", region),
         kvp("queueUrl", queueUrl),
         kvp("body", body),
-        kvp("status", MessageStatusToString(status)),
+        kvp("state", MessageStatusToString(status)),
         kvp("retries", retries),
         kvp("messageId", messageId),
         kvp("receiptHandle", receiptHandle),
@@ -44,7 +44,7 @@ namespace AwsMock::Database::Entity::SQS {
     region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
     queueUrl = bsoncxx::string::to_string(mResult.value()["queueUrl"].get_string().value);
     body = bsoncxx::string::to_string(mResult.value()["body"].get_string().value);
-    status = MessageStatusFromString(bsoncxx::string::to_string(mResult.value()["status"].get_string().value));
+    state = MessageStatusFromString(bsoncxx::string::to_string(mResult.value()["state"].get_string().value));
     retries = mResult.value()["retries"].get_int32().value;
     messageId = bsoncxx::string::to_string(mResult.value()["messageId"].get_string().value);
     receiptHandle = bsoncxx::string::to_string(mResult.value()["receiptHandle"].get_string().value);
@@ -71,7 +71,7 @@ namespace AwsMock::Database::Entity::SQS {
     region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
     queueUrl = bsoncxx::string::to_string(mResult.value()["queueUrl"].get_string().value);
     body = bsoncxx::string::to_string(mResult.value()["body"].get_string().value);
-    status = MessageStatusFromString(bsoncxx::string::to_string(mResult.value()["status"].get_string().value));
+    status = MessageStatusFromString(bsoncxx::string::to_string(mResult.value()["state"].get_string().value));
     retries = mResult.value()["retries"].get_int32().value;
     messageId = bsoncxx::string::to_string(mResult.value()["messageId"].get_string().value);
     receiptHandle = bsoncxx::string::to_string(mResult.value()["receiptHandle"].get_string().value);
@@ -99,7 +99,7 @@ namespace AwsMock::Database::Entity::SQS {
   }
 
   std::ostream &operator<<(std::ostream &os, const Message &m) {
-    os << "Message={oid='" << m.oid << "', queueUrl='" << m.queueUrl << "', body='" << m.body << "', status='" << MessageStatusToString(m.status) << "' ,reset='" << Poco::DateTimeFormatter().format(m.reset, Poco::DateTimeFormat::HTTP_FORMAT)
+    os << "Message={oid='" << m.oid << "', queueUrl='" << m.queueUrl << "', body='" << m.body << "', state='" << MessageStatusToString(m.status) << "' ,reset='" << Poco::DateTimeFormatter().format(m.reset, Poco::DateTimeFormat::HTTP_FORMAT)
        << "', retries=" << m.retries << ", messageId='" << m.messageId << "', receiptHandle='" << m.receiptHandle << "', md5body='" << m.md5Body << "', md5Attr='" << m.md5Attr << "'}";
     return os;
   }

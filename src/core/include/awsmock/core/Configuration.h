@@ -111,12 +111,28 @@ namespace AwsMock::Core {
       void SetLogLevel(const std::string &level);
 
       /**
-       * Sets an configuration value
+       * Sets a string configuration value
        *
        * @param key property key
        * @param value configuration value
        */
       void SetValue(const std::string &key, const std::string &value);
+
+      /**
+       * Sets a bool configuration value
+       *
+       * @param key property key
+       * @param value configuration value
+       */
+      void SetValue(const std::string &key, bool value);
+
+      /**
+       * Sets an integer configuration value
+       *
+       * @param key property key
+       * @param value configuration value
+       */
+      void SetValue(const std::string &key, int value);
 
       /**
        * Returns the application name

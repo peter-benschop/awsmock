@@ -36,7 +36,7 @@ namespace AwsMock::Database {
        *
        * @param configuration configuration properties
        */
-      explicit SNSDatabase(const Core::Configuration &configuration);
+      explicit SNSDatabase(Core::Configuration &configuration);
 
       /**
        * Check existence of topic
@@ -168,7 +168,7 @@ namespace AwsMock::Database {
       [[maybe_unused]] Entity::SNS::Message GetMessageById(const std::string &oid);
 
       /**
-       * Count the number of message by status
+       * Count the number of message by state
        *
        * @param region AWS region
        * @param topicUrl URL of the topic
@@ -176,11 +176,11 @@ namespace AwsMock::Database {
       long CountMessages(const std::string &region = {}, const std::string &topicUrl = {});
 
       /**
-       * Count the number of message by status
+       * Count the number of message by state
        *
        * @param region AWS region
        * @param topicArn ARN of the topic
-       * @param status message status
+       * @param status message state
        */
       long CountMessagesByStatus(const std::string &region, const std::string &topicArn, int status);
 

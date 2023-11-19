@@ -85,7 +85,7 @@ namespace AwsMock::Database::Entity::S3 {
     std::vector<BucketNotification> notifications;
 
     /**
-     * Bucket versioning status
+     * Bucket versioning state
      */
     BucketVersionStatus versionStatus = DISABLED;
 
@@ -116,7 +116,7 @@ namespace AwsMock::Database::Entity::S3 {
     BucketNotification GetNotification(const std::string &eventName);
 
     /**
-     * Returns a boolean indicating the versioinig status
+     * Returns a boolean indicating the versioinig state
      */
     [[nodiscard]] bool IsVersioned() const;
 

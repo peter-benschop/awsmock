@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-  S3Service::S3Service(const Core::Configuration &configuration) : _logger(Poco::Logger::get("S3Service")), _configuration(configuration) {
+  S3Service::S3Service(Core::Configuration &configuration) : _logger(Poco::Logger::get("S3Service")), _configuration(configuration) {
 
     // Initialize directories
     _dataDir = _configuration.getString("awsmock.data.dir", DEFAULT_DATA_DIR);
@@ -200,7 +200,7 @@ namespace AwsMock::Service {
     bucket.versionStatus = Database::Entity::S3::BucketVersionStatusFromString(Poco::toLower(request.status));
 
     _database->UpdateBucket(bucket);
-    log_info_stream(_logger) << "Put bucket versioning, bucket: " << request.bucket << " status: " << request.status << std::endl;
+    log_info_stream(_logger) << "Put bucket versioning, bucket: " << request.bucket << " state: " << request.status << std::endl;
   }
 
   Dto::S3::InitiateMultipartUploadResult S3Service::CreateMultipartUpload(std::string &bucket, std::string &key, const std::string &region, const std::string &user) {
@@ -648,13 +648,13 @@ namespace AwsMock::Service {
     std::ostream &os = session.sendRequest(request);
     os << body;
 
-    // Get the response status
+    // Get the response state
     Poco::Net::HTTPResponse response;
     session.receiveResponse(response);
     if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
-      log_error_stream(_logger) << "HTTP error, status: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
+      log_error_stream(_logger) << "HTTP error, state: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
     }
-    log_debug_stream(_logger) << "SQS message request send, status: " << response.getStatus() << std::endl;
+    log_debug_stream(_logger) << "SQS message request send, state: " << response.getStatus() << std::endl;
   }
 
   void S3Service::SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::BucketNotification &bucketNotification) {
@@ -683,13 +683,13 @@ namespace AwsMock::Service {
     std::ostream &os = session.sendRequest(request);
     os << body;
 
-    // Get the response status
+    // Get the response state
     Poco::Net::HTTPResponse response;
     session.receiveResponse(response);
     if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
-      log_error_stream(_logger) << "HTTP error, status: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
+      log_error_stream(_logger) << "HTTP error, state: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
     }
-    log_debug_stream(_logger) << "Invocation request send, status: " << response.getStatus() << std::endl;
+    log_debug_stream(_logger) << "Invocation request send, state: " << response.getStatus() << std::endl;
   }
 
   Dto::S3::PutObjectResponse S3Service::SaveUnversionedObject(Dto::S3::PutObjectRequest &request, std::istream &stream) {

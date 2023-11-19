@@ -64,7 +64,7 @@ namespace AwsMock::Service {
      * @param configuration module configuration
      * @param condition stop condition
      */
-    explicit SQSService(const Core::Configuration &configuration, Poco::Condition &condition);
+    explicit SQSService(Core::Configuration &configuration, Poco::Condition &condition);
 
     /**
      * Creates a new queue
@@ -209,7 +209,7 @@ namespace AwsMock::Service {
     /**
      * Configuration
      */
-    const Core::Configuration &_configuration;
+    Core::Configuration &_configuration;
 
     /**
      * Database connection

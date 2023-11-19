@@ -29,6 +29,7 @@
 #include <awsmock/service/SNSServer.h>
 #include <awsmock/service/LambdaServer.h>
 #include <awsmock/service/TransferServer.h>
+#include <awsmock/service/GatewayServer.h>
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/resource/HandlerException.h>
 #include <awsmock/resource/AbstractResource.h>
