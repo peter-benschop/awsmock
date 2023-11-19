@@ -132,7 +132,7 @@ namespace AwsMock::Service {
     // arrange
     Dto::SQS::CreateQueueRequest queueRequest = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
     Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
-    Dto::SQS::SendMessageRequest msgRequest = {.region=REGION, .queueUrl=QUEUE_URL, .body=BODY};
+    Dto::SQS::SendMessageRequest msgRequest = {.region=REGION, .queueUrl=QUEUE_URL, .queueName=QUEUE, .body=BODY};
     Dto::SQS::SendMessageResponse msgResponse = _service.SendMessage(msgRequest);
 
     // act

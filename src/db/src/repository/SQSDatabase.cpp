@@ -405,12 +405,12 @@ namespace AwsMock::Database {
       auto result = _messageCollection.update_many(
           make_document(
               kvp("queueUrl", queueUrl),
-              kvp("state", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)),
+              kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)),
               kvp("reset", make_document(
                   kvp("$lt", bsoncxx::types::b_date(now))))),
           make_document(kvp("$set",
                             make_document(
-                                kvp("state", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)),
+                                kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)),
                                 kvp("receiptHandle", "")))));
 
       // Commit
@@ -430,7 +430,7 @@ namespace AwsMock::Database {
     try {
       std::string dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(_configuration, redrivePolicy.deadLetterTargetArn);
       auto result = _messageCollection.update_many(make_document(kvp("queueUrl", queueUrl),
-                                                                 kvp("state", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)),
+                                                                 kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)),
                                                                  kvp("retries", make_document(
                                                                      kvp("$gt", redrivePolicy.maxReceiveCount)))),
                                                    make_document(kvp("$set", make_document(kvp("retries", 0),
@@ -459,17 +459,16 @@ namespace AwsMock::Database {
       auto result = _messageCollection.update_many(
           make_document(
               kvp("queueUrl", queueUrl),
-              kvp("state", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)),
+              kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)),
               kvp("reset", make_document(
                   kvp("$lt", bsoncxx::types::b_date(now))))),
           make_document(
               kvp("$set",
                   make_document(
-                      kvp("state", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))))));
+                      kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))))));
       // Commit
       session.commit_transaction();
 
-      int i = result->upserted_count();
       log_trace_stream(_logger) << "Delayed message reset, updated: " << result->upserted_count() << " queue: " << queueUrl << std::endl;
 
     } catch (mongocxx::exception &e) {
@@ -488,8 +487,8 @@ namespace AwsMock::Database {
 
   long SQSDatabase::CountMessagesByStatus(const std::string &region, const std::string &queueUrl, Entity::SQS::MessageStatus status) {
 
-    long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl), kvp("state", Entity::SQS::MessageStatusToString(status))));
-    log_trace_stream(_logger) << "Count messages by state, state: " << Entity::SQS::MessageStatusToString(status) << " result: " << count << std::endl;
+    long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl), kvp("status", Entity::SQS::MessageStatusToString(status))));
+    log_trace_stream(_logger) << "Count messages by status, status: " << Entity::SQS::MessageStatusToString(status) << " result: " << count << std::endl;
 
     return count;
   }

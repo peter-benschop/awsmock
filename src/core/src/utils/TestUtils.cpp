@@ -19,19 +19,20 @@ namespace AwsMock::Core {
     ofs << "awsmock.service.gateway.host=" << hostName << std::endl;
     ofs << "awsmock.service.gateway.port=" << port << std::endl;
     // Database configuration
+    ofs << "awsmock.mongodb.active=true" << std::endl;
     ofs << "awsmock.mongodb.name=test" << std::endl;
     ofs << "awsmock.mongodb.host=" << hostName << std::endl;
     ofs << "awsmock.mongodb.port=27017" << std::endl;
     ofs << "awsmock.mongodb.user=admin" << std::endl;
     ofs << "awsmock.mongodb.password=admin" << std::endl;
     // S3 configuration
-    ofs << "awsmock.module.s3.data.dir=/tmp/test/data/s3" << std::endl;
-    ofs << "awsmock.module.s3.port=19500" << std::endl;
-    ofs << "awsmock.module.s3.host=localhost" << std::endl;
+    ofs << "awsmock.service.s3.data.dir=/tmp/test/data/s3" << std::endl;
+    ofs << "awsmock.service.s3.port=19500" << std::endl;
+    ofs << "awsmock.service.s3.host=localhost" << std::endl;
     ofs << "awsmock.monitoring.s3.period=-1" << std::endl;
     // SQS configuration
-    ofs << "awsmock.module.sqs.port=19501" << std::endl;
-    ofs << "awsmock.module.sqs.host=" << hostName << std::endl;
+    ofs << "awsmock.service.sqs.port=19501" << std::endl;
+    ofs << "awsmock.service.sqs.host=" << hostName << std::endl;
     ofs << "awsmock.monitoring.sqs.period=-1" << std::endl;
     // Thread pool configuration
     ofs << "awsmock.threadpool.name=srv-worker" << std::endl;
