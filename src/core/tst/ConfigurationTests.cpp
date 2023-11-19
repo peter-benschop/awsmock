@@ -68,7 +68,7 @@ namespace AwsMock::Core {
 
     // act
     if (configuration != nullptr) {
-      configuration->SetValue("awsmock.log.level", "error");
+      configuration->SetValue("awsmock.log.level", std::string("error"));
     }
 
     // assert

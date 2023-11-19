@@ -88,4 +88,4 @@ namespace AwsMock::Core {
 
 } // namespace AwsMock::Core
 
-#endif // AWMOCK_CORE_DIRUTILSTEST_H
+#endif // AWMOCK_CORE_AWSUTILSTEST_H

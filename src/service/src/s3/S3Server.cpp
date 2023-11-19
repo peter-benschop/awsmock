@@ -32,8 +32,8 @@ namespace AwsMock::Service {
     _user = _configuration.getString("awsmock.user", "none");
 
     // S3 module connection
-    _s3ServiceHost = _configuration.getString("awsmock.module.s3.host", "localhost");
-    _s3ServicePort = _configuration.getInt("awsmock.module.s3.port", 9501);
+    _s3ServiceHost = _configuration.getString("awsmock.service.s3.host", "localhost");
+    _s3ServicePort = _configuration.getInt("awsmock.service.s3.port", 9501);
     log_debug_stream(_logger) << "S3 module endpoint: http://" << _s3ServiceHost << ":" << _s3ServicePort << std::endl;
 
     // Database connections

@@ -77,7 +77,7 @@ namespace AwsMock::Database {
   TEST_F(ModuleDatabaseTest, ModuleActiveTest) {
 
     // arrange
-    Entity::Module::Module module = {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING};
+    Entity::Module::Module module = {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING, .status=Entity::Module::ModuleStatus::ACTIVE};
     module = _moduleDatabase.CreateModule(module);
 
     // act
@@ -138,7 +138,7 @@ namespace AwsMock::Database {
     Entity::Module::ModuleList result = _moduleDatabase.ListModules();
 
     // assert
-    EXPECT_EQ(8, result.size());
+    EXPECT_EQ(9, result.size());
   }
 
   TEST_F(ModuleDatabaseTest, ModuleDeleteTest) {
@@ -152,7 +152,7 @@ namespace AwsMock::Database {
     int count = _moduleDatabase.ModuleCount();
 
     // assert
-    EXPECT_EQ(7, count);
+    EXPECT_EQ(8, count);
   }
 
   TEST_F(ModuleDatabaseTest, ModuleSetStatusTest) {
