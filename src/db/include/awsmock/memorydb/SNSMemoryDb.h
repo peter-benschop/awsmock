@@ -39,6 +39,43 @@ namespace AwsMock::Database {
     }
 
     /**
+     * Check existence of topic
+     *
+     * @param region AWS region
+     * @param name topic name
+     * @return true if topic already exists
+     * @throws DatabaseException
+     */
+    bool TopicExists(const std::string &region, const std::string &name);
+
+    /**
+     * Check existence of topic
+     *
+     * @param topicName topic ARN
+     * @return true if topic already exists
+     * @throws DatabaseException
+     */
+    bool TopicExists(const std::string &topicName);
+
+    /**
+     * Create a new topic in the SNS topic table
+     *
+     * @param topic topic entity
+     * @return created SNS topic entity
+     * @throws DatabaseException
+     */
+    Entity::SNS::Topic CreateTopic(const Entity::SNS::Topic &topic);
+
+    /**
+     * Returns a topic by primary key
+     *
+     * @param oid topic primary key
+     * @return topic entity
+     * @throws DatabaseException
+     */
+    Entity::SNS::Topic GetTopicById(const std::string &oid);
+
+    /**
      * Counts the number of topics
      *
      * @param region AWS region
