@@ -347,6 +347,11 @@ namespace AwsMock::Database {
      * SQS message vector, when running without database
      */
     std::map<std::string, Entity::SQS::Message> _messages;
+
+    /**
+     * SQS in-memory database
+     */
+    SQSMemoryDb &_memoryDb;
   };
 
 } // namespace AwsMock::Database

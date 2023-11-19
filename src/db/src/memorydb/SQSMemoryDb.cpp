@@ -6,9 +6,7 @@
 
 namespace AwsMock::Database {
 
-  SQSMemoryDb::SQSMemoryDb() : _logger(Poco::Logger::get("SQSMemoryDb")) {
-
-  }
+  SQSMemoryDb::SQSMemoryDb() : _logger(Poco::Logger::get("SQSMemoryDb")) {}
 
   bool SQSMemoryDb::QueueExists(const std::string &region, const std::string &name) {
 
@@ -61,24 +59,23 @@ namespace AwsMock::Database {
 
     if (it != _queues.end()) {
       it->second.oid = it->first;
-      result = it->second;
+      return it->second;
     }
-    return result;
+    return {};
   }
 
   Entity::SQS::Queue SQSMemoryDb::GetQueueByUrl(const std::string &queueUrl) {
 
     Entity::SQS::Queue result;
-
     auto it = find_if(_queues.begin(), _queues.end(), [queueUrl](const std::pair<std::string, Entity::SQS::Queue> &queue) {
       return queue.second.queueUrl == queueUrl;
     });
 
     if (it != _queues.end()) {
       it->second.oid = it->first;
-      result = it->second;
+      return it->second;
     }
-    return result;
+    return {};
   }
 
   Entity::SQS::Queue SQSMemoryDb::GetQueueByName(const std::string &region, const std::string &name) {
@@ -90,9 +87,9 @@ namespace AwsMock::Database {
 
     if (it != _queues.end()) {
       it->second.oid = it->first;
-      result = it->second;
+      return it->second;
     }
-    return result;
+    return {};
   }
 
   Entity::SQS::QueueList SQSMemoryDb::ListQueues(const std::string &region) {
@@ -160,5 +157,136 @@ namespace AwsMock::Database {
 
     log_debug_stream(_logger) << "All queues deleted, count: " << _queues.size() << std::endl;
     _queues.clear();
+  }
+
+  Entity::SQS::Message SQSMemoryDb::CreateMessage(const Entity::SQS::Message &message) {
+
+    std::string oid = Poco::UUIDGenerator().createRandom().toString();
+    _messages[oid] = message;
+    log_trace_stream(_logger) << "Message created, oid: " << oid << std::endl;
+
+    return GetMessageById(oid);
+  }
+
+  bool SQSMemoryDb::MessageExists(const std::string &receiptHandle) {
+
+    return find_if(_messages.begin(), _messages.end(), [receiptHandle](const std::pair<std::string, Entity::SQS::Message> &message) {
+      return message.second.receiptHandle == receiptHandle;
+    }) != _messages.end();
+  }
+
+  Entity::SQS::Message SQSMemoryDb::GetMessageById(const std::string &oid) {
+
+    auto it = find_if(_messages.begin(), _messages.end(), [oid](const std::pair<std::string, Entity::SQS::Message> &message) {
+      return message.first == oid;
+    });
+
+    if (it != _messages.end()) {
+      it->second.oid = it->first;
+      return it->second;
+    }
+    return {};
+  }
+
+  Entity::SQS::Message SQSMemoryDb::GetMessageByReceiptHandle(const std::string &receiptHandle) {
+
+    Entity::SQS::Message result;
+    auto it = find_if(_messages.begin(), _messages.end(), [receiptHandle](const std::pair<std::string, Entity::SQS::Message> &message) {
+      return message.second.receiptHandle == receiptHandle;
+    });
+
+    if (it != _messages.end()) {
+      it->second.oid = it->first;
+      result = it->second;
+    }
+    return result;
+  }
+
+  Entity::SQS::Message SQSMemoryDb::UpdateMessage(Entity::SQS::Message &message) {
+
+    std::string oid = message.oid;
+    auto it = find_if(_messages.begin(), _messages.end(), [oid](const std::pair<std::string, Entity::SQS::Message> &message) {
+      return message.second.oid == oid;
+    });
+    _messages[it->first] = message;
+    return _messages[it->first];
+  }
+
+  void SQSMemoryDb::ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, Entity::SQS::MessageList &messageList) {
+
+    auto reset = std::chrono::high_resolution_clock::now() + std::chrono::seconds{visibility};
+
+    // Get the cursor
+    for (auto message : _messages) {
+
+      if (message.second.region == region && message.second.queueUrl == queueUrl && message.second.status == Entity::SQS::MessageStatus::INITIAL) {
+
+        message.second.retries++;
+        message.second.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
+        messageList.push_back(message.second);
+
+        // Update values
+        message.second.status = Entity::SQS::MessageStatus::INVISIBLE;
+        message.second.reset = Poco::Timestamp(reset.time_since_epoch().count() / 1000);
+      }
+    }
+
+    log_trace_stream(_logger) << "Messages received, region: " << region << " queue: " << queueUrl + " count: " << messageList.size() << std::endl;
+  }
+
+  void SQSMemoryDb::ResetMessages(const std::string &queueUrl, long visibility) {
+
+    long count = 0;
+    auto now = std::chrono::high_resolution_clock::now();
+    for (auto message : _messages) {
+
+      if (message.second.queueUrl == queueUrl && message.second.status == Entity::SQS::MessageStatus::INVISIBLE && message.second.reset < Poco::Timestamp(now.time_since_epoch().count() / 1000)) {
+        message.second.status = Entity::SQS::MessageStatus::INITIAL;
+        message.second.receiptHandle = "";
+        count++;
+      }
+      log_trace_stream(_logger) << "Message reset, visibility: " << visibility << " updated: " << count << " queue: " << queueUrl << std::endl;
+    }
+  }
+
+  void SQSMemoryDb::RedriveMessages(const std::string &queueUrl, const Entity::SQS::RedrivePolicy &redrivePolicy, const Core::Configuration &configuration) {
+
+    long count = 0;
+    std::string dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(configuration, redrivePolicy.deadLetterTargetArn);
+    for (auto message : _messages) {
+
+      if (message.second.queueUrl == queueUrl && message.second.status == Entity::SQS::MessageStatus::INITIAL && message.second.retries > redrivePolicy.maxReceiveCount) {
+        message.second.retries = 0;
+        message.second.queueUrl = dlqQueueUrl;
+        count++;
+      }
+    }
+    log_trace_stream(_logger) << "Message redrive, arn: " << redrivePolicy.deadLetterTargetArn << " updated: " << count << " queue: " << queueUrl << std::endl;
+  }
+
+  void SQSMemoryDb::DeleteMessages(const std::string &queueUrl) {
+
+    const auto count = std::erase_if(_messages, [queueUrl](const auto &item) {
+      auto const &[key, value] = item;
+      return value.queueUrl == queueUrl;
+    });
+
+    log_debug_stream(_logger) << "Messages deleted, queue: " << queueUrl << " count: " << count << std::endl;
+  }
+
+  void SQSMemoryDb::DeleteMessage(const Entity::SQS::Message &message) {
+
+    std::string receiptHandle = message.receiptHandle;
+    const auto count = std::erase_if(_messages, [receiptHandle](const auto &item) {
+      auto const &[key, value] = item;
+      return value.receiptHandle == receiptHandle;
+    });
+    log_debug_stream(_logger) << "Messages deleted, receiptHandle: " << message.receiptHandle << " count: " << count << std::endl;
+  }
+
+  void SQSMemoryDb::DeleteAllMessages() {
+
+    log_debug_stream(_logger) << "All messages deleted, count: " << _messages.size() << std::endl;
+    _messages.clear();
   }
 }

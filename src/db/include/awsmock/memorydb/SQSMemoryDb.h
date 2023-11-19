@@ -13,6 +13,7 @@
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
+#include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/entity/sqs/Queue.h>
 #include <awsmock/entity/sqs/Message.h>
@@ -32,7 +33,7 @@ namespace AwsMock::Database {
     /**
      * Singleton instance
      */
-    static SQSMemoryDb &instance(void) {
+    static SQSMemoryDb &instance() {
       static Poco::SingletonHolder<SQSMemoryDb> sh;
       return *sh.get();
     }
@@ -157,6 +158,100 @@ namespace AwsMock::Database {
      * Deletes all queues
      */
     void DeleteAllQueues();
+
+    /**
+     * Creates a new message in the SQS message table
+     *
+     * @param message SQS message entity
+     * @return saved message entity
+     * @throws Core::DatabaseException
+     */
+    Entity::SQS::Message CreateMessage(const Entity::SQS::Message &message);
+
+    /**
+     * Checks whether the message exists by receipt handle.
+     *
+     * @param messageId message ID
+     * @return true if message exists, otherwise false
+     * @throws Core::DatabaseException
+     */
+    bool MessageExists(const std::string &receiptHandle);
+
+    /**
+     * Returns a message by ID.
+     *
+     * @param oid message objectId
+     * @return message entity
+     * @throws Core::DatabaseException
+     */
+    Entity::SQS::Message GetMessageById(const std::string &oid);
+
+    /**
+     * Updates a given message.
+     *
+     * @param message SQS message
+     * @return updated message
+     */
+    Entity::SQS::Message UpdateMessage(Entity::SQS::Message &message);
+
+    /**
+     * Receive messages from an queue.
+     *
+     * @param region AWS region
+     * @param queueUrl queue URL
+     * @param visibility in seconds
+     * @param messageList message list
+     */
+    void ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, Entity::SQS::MessageList &messageList);
+
+    /**
+     * Reset expired messages
+     *
+     * @param queueUrl URL of the queue
+     * @param visibility visibility period in seconds
+     */
+    [[maybe_unused]] void ResetMessages(const std::string &queueUrl, long visibility);
+
+    /**
+     * Redrive expired messages.
+     *
+     * @param queueUrl URL of the queue
+     * @param redrivePolicy redrive policy
+     * @param configuration AwsMock configuration
+     */
+    void RedriveMessages(const std::string &queueUrl, const Entity::SQS::RedrivePolicy &redrivePolicy, const Core::Configuration &configuration);
+
+    /**
+      * Returns a message by receipt handle.
+      *
+      * @param receiptHandle message receipt handle
+      * @return message entity
+      * @throws Core::DatabaseException
+      */
+    Entity::SQS::Message GetMessageByReceiptHandle(const std::string &receiptHandle);
+
+    /**
+     * Deletes all messages of a queue
+     *
+     * @param queue message queue to delete messages from
+     * @throws Core::DatabaseException
+     */
+    void DeleteMessages(const std::string &queue);
+
+    /**
+     * Deletes a message.
+     *
+     * @param message message to delete
+     * @throws Core::DatabaseException
+     */
+    void DeleteMessage(const Entity::SQS::Message &message);
+
+    /**
+     * Deletes a messages.
+     *
+     * @throws Core::DatabaseException
+     */
+    void DeleteAllMessages();
 
   private:
 
