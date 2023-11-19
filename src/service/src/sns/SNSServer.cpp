@@ -53,7 +53,7 @@ namespace AwsMock::Service {
       log_debug_stream(_logger) << "SNSServer processing started" << std::endl;
 
       // Reset messages
-      ResetMessages();
+      //ResetMessages();
 
       // Wait for timeout or condition
       if (InterruptableSleep(_period)) {
