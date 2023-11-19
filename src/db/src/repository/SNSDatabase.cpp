@@ -11,11 +11,15 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_document;
   using bsoncxx::builder::stream::document;
 
-  SNSDatabase::SNSDatabase(Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("SNSDatabase")) {
+  SNSDatabase::SNSDatabase(Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("SNSDatabase")), _memoryDb(SNSMemoryDb::instance()) {
 
-    // Get collections
-    _topicCollection = GetConnection()["sns_topic"];
-    _messageCollection = GetConnection()["sns_message"];
+    if (HasDatabase()) {
+
+      // Get collections
+      _topicCollection = GetConnection()["sns_topic"];
+      _messageCollection = GetConnection()["sns_message"];
+
+    }
   }
 
   bool SNSDatabase::TopicExists(const std::string &topicArn) {
@@ -138,14 +142,22 @@ namespace AwsMock::Database {
 
   long SNSDatabase::CountTopics(const std::string &region) {
 
-    try {
-      long count = _topicCollection.count_documents(make_document(kvp("region", region)));
-      log_trace_stream(_logger) << "Count topics, result: " << count << std::endl;
+    if (HasDatabase()) {
 
-      return count;
-    } catch (const mongocxx::exception &exc) {
-      _logger.error() << "SNS Database exception " << exc.what() << std::endl;
-      throw Core::DatabaseException(exc.what(), 500);
+      try {
+        long count = _topicCollection.count_documents(make_document(kvp("region", region)));
+        log_trace_stream(_logger) << "Count topics, result: " << count << std::endl;
+
+        return count;
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), 500);
+      }
+
+    } else {
+
+      return _memoryDb.CountTopics();
+
     }
   }
 
@@ -203,13 +215,20 @@ namespace AwsMock::Database {
 
   long SNSDatabase::CountMessages(const std::string &region, const std::string &topicArn) {
 
-    try {
-      long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("topicArn", topicArn)));
-      log_trace_stream(_logger) << "Count messages, region: " << region << " arn: " << topicArn << " result: " << count << std::endl;
-      return count;
-    } catch (const mongocxx::exception &exc) {
-      _logger.error() << "SNS Database exception " << exc.what() << std::endl;
-      throw Core::DatabaseException(exc.what(), 500);
+    if(HasDatabase()) {
+
+      try {
+        long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("topicArn", topicArn)));
+        log_trace_stream(_logger) << "Count messages, region: " << region << " arn: " << topicArn << " result: " << count << std::endl;
+        return count;
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), 500);
+      }
+    } else {
+
+      return _memoryDb.CountMessages(region, topicArn);
+
     }
   }
 

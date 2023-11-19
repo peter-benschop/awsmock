@@ -16,12 +16,14 @@ namespace AwsMock::Database {
       {"Deleted", {"s3:ObjectRemoved:Delete", "s3:ObjectRemoved:DeleteMarkerCreated"}}
   };
 
-  S3Database::S3Database(Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("S3Database")) {
+  S3Database::S3Database(Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("S3Database")), _memoryDb(S3MemoryDb::instance()) {
 
-    if(HasDatabase()) {
+    if (HasDatabase()) {
+
       // Get collections
       _bucketCollection = GetConnection()["s3_bucket"];
       _objectCollection = GetConnection()["s3_object"];
+
     }
   }
 
@@ -51,13 +53,21 @@ namespace AwsMock::Database {
 
   long S3Database::BucketCount() {
 
-    try {
-      long count = _bucketCollection.count_documents(make_document());
-      log_trace_stream(_logger) << "Bucket count: " << count << std::endl;
-      return count;
+    if(HasDatabase()) {
 
-    } catch (mongocxx::exception::system_error &e) {
-      log_error_stream(_logger) << "Bucket count failed, error: " << e.what() << std::endl;
+      try {
+        long count = _bucketCollection.count_documents(make_document());
+        log_trace_stream(_logger) << "Bucket count: " << count << std::endl;
+        return count;
+
+      } catch (mongocxx::exception::system_error &e) {
+        log_error_stream(_logger) << "Bucket count failed, error: " << e.what() << std::endl;
+      }
+
+    } else {
+
+      return _memoryDb.BucketCount();
+
     }
     return -1;
   }
@@ -92,13 +102,20 @@ namespace AwsMock::Database {
   Entity::S3::BucketList S3Database::ListBuckets() {
 
     Entity::S3::BucketList bucketList;
-    auto bucketCursor = _bucketCollection.find({});
-    for (auto bucket : bucketCursor) {
-      Entity::S3::Bucket result;
-      result.FromDocument(bucket);
-      bucketList.push_back(result);
-    }
+    if (HasDatabase()) {
 
+      auto bucketCursor = _bucketCollection.find({});
+      for (auto bucket : bucketCursor) {
+        Entity::S3::Bucket result;
+        result.FromDocument(bucket);
+        bucketList.push_back(result);
+      }
+
+    } else {
+
+      bucketList = _memoryDb.ListBuckets();
+
+    }
     log_trace_stream(_logger) << "Got bucket list, size:" << bucketList.size() << std::endl;
     return bucketList;
   }
@@ -119,23 +136,32 @@ namespace AwsMock::Database {
     return GetBucketByRegionName(bucket.region, bucket.name);
   }
 
+  // TODO: Combine with Listobject
   Entity::S3::ObjectList S3Database::ListBucket(const std::string &bucket, const std::string &prefix) {
 
     Entity::S3::ObjectList objectList;
-    if (prefix.empty()) {
-      auto objectCursor = _objectCollection.find(make_document(kvp("bucket", bucket)));
-      for (auto object : objectCursor) {
-        Entity::S3::Object result;
-        result.FromDocument(object);
-        objectList.push_back(result);
+    if (HasDatabase()) {
+
+      if (prefix.empty()) {
+        auto objectCursor = _objectCollection.find(make_document(kvp("bucket", bucket)));
+        for (auto object : objectCursor) {
+          Entity::S3::Object result;
+          result.FromDocument(object);
+          objectList.push_back(result);
+        }
+      } else {
+        auto objectCursor = _objectCollection.find(make_document(kvp("bucket", bucket), kvp("key", bsoncxx::types::b_regex{"^" + prefix + ".*"})));
+        for (auto object : objectCursor) {
+          Entity::S3::Object result;
+          result.FromDocument(object);
+          objectList.push_back(result);
+        }
       }
+
     } else {
-      auto objectCursor = _objectCollection.find(make_document(kvp("bucket", bucket), kvp("key", bsoncxx::types::b_regex{"^" + prefix + ".*"})));
-      for (auto object : objectCursor) {
-        Entity::S3::Object result;
-        result.FromDocument(object);
-        objectList.push_back(result);
-      }
+
+      objectList = _memoryDb.ListBucket(bucket, prefix);
+
     }
 
     log_trace_stream(_logger) << "Got object list, size:" << objectList.size() << std::endl;
@@ -146,24 +172,31 @@ namespace AwsMock::Database {
   Entity::S3::ObjectList S3Database::ListObjects(const std::string &prefix) {
 
     Entity::S3::ObjectList objectList;
-    if (prefix.empty()) {
-      auto objectCursor = _objectCollection.find({});
-      for (auto object : objectCursor) {
-        Entity::S3::Object result;
-        result.FromDocument(object);
-        objectList.push_back(result);
+    if (HasDatabase()) {
+
+      if (prefix.empty()) {
+        auto objectCursor = _objectCollection.find({});
+        for (auto object : objectCursor) {
+          Entity::S3::Object result;
+          result.FromDocument(object);
+          objectList.push_back(result);
+        }
+      } else {
+        auto objectCursor = _objectCollection.find(make_document(kvp("key", bsoncxx::types::b_regex{"^" + prefix + ".*"})));
+        for (auto object : objectCursor) {
+          Entity::S3::Object result;
+          result.FromDocument(object);
+          objectList.push_back(result);
+        }
       }
+
     } else {
-      auto objectCursor = _objectCollection.find(make_document(kvp("key", bsoncxx::types::b_regex{"^" + prefix + ".*"})));
-      for (auto object : objectCursor) {
-        Entity::S3::Object result;
-        result.FromDocument(object);
-        objectList.push_back(result);
-      }
+
+      objectList = _memoryDb.ListObjects(prefix);
+
     }
 
     log_trace_stream(_logger) << "Got object list in all buckets, size:" << objectList.size() << std::endl;
-
     return objectList;
   }
 
@@ -307,22 +340,30 @@ namespace AwsMock::Database {
 
   long S3Database::ObjectCount(const std::string &region, const std::string &bucket) {
 
-    bsoncxx::builder::basic::document builder;
-    if (!region.empty()) {
-      builder.append(bsoncxx::builder::basic::kvp("region", region));
-    }
-    if (!bucket.empty()) {
-      builder.append(bsoncxx::builder::basic::kvp("bucket", bucket));
-    }
-    bsoncxx::document::value filter = builder.extract();
+    if(HasDatabase()) {
 
-    try {
-      long count = _objectCollection.count_documents({filter});
-      log_trace_stream(_logger) << "Object count: " << count << std::endl;
-      return count;
+      bsoncxx::builder::basic::document builder;
+      if (!region.empty()) {
+        builder.append(bsoncxx::builder::basic::kvp("region", region));
+      }
+      if (!bucket.empty()) {
+        builder.append(bsoncxx::builder::basic::kvp("bucket", bucket));
+      }
+      bsoncxx::document::value filter = builder.extract();
 
-    } catch (mongocxx::exception::system_error &e) {
-      log_error_stream(_logger) << "Object count failed, error: " << e.what() << std::endl;
+      try {
+        long count = _objectCollection.count_documents({filter});
+        log_trace_stream(_logger) << "Object count: " << count << std::endl;
+        return count;
+
+      } catch (mongocxx::exception::system_error &e) {
+        log_error_stream(_logger) << "Object count failed, error: " << e.what() << std::endl;
+      }
+
+    } else {
+
+      return _memoryDb.ObjectCount(region, bucket);
+
     }
     return -1;
   }

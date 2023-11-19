@@ -10,10 +10,14 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_array;
   using bsoncxx::builder::basic::make_document;
 
-  TransferDatabase::TransferDatabase(Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("TransferDatabase")) {
+  TransferDatabase::TransferDatabase(Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("TransferDatabase")), _memoryDb(TransferMemoryDb::instance()) {
 
-    // Get collection
-    _transferCollection = GetConnection()["transfer"];
+    if (HasDatabase()) {
+
+      // Get collection
+      _transferCollection = GetConnection()["transfer"];
+
+    }
   }
 
   bool TransferDatabase::TransferExists(const std::string &region, const std::string &serverId) {
@@ -106,18 +110,26 @@ namespace AwsMock::Database {
   std::vector<Entity::Transfer::Transfer> TransferDatabase::ListServers(const std::string &region) {
 
     std::vector<Entity::Transfer::Transfer> transfers;
-    try {
 
-      auto transferCursor = _transferCollection.find(make_document(kvp("region", region)));
-      for (auto transfer : transferCursor) {
-        Entity::Transfer::Transfer result;
-        result.FromDocument(transfer);
-        transfers.push_back(result);
+    if (HasDatabase()) {
+
+      try {
+
+        auto transferCursor = _transferCollection.find(make_document(kvp("region", region)));
+        for (auto transfer : transferCursor) {
+          Entity::Transfer::Transfer result;
+          result.FromDocument(transfer);
+          transfers.push_back(result);
+        }
+        log_trace_stream(_logger) << "Got transfer list, size:" << transfers.size() << std::endl;
+
+      } catch (mongocxx::exception::system_error &e) {
+        log_error_stream(_logger) << "List servers failed, error: " << e.what() << std::endl;
       }
-      log_trace_stream(_logger) << "Got transfer list, size:" << transfers.size() << std::endl;
 
-    } catch (mongocxx::exception::system_error &e) {
-      log_error_stream(_logger) << "List servers failed, error: " << e.what() << std::endl;
+    } else {
+
+      return _memoryDb.ListServers(region);
     }
     return transfers;
   }

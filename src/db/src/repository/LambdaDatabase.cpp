@@ -10,10 +10,14 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_array;
   using bsoncxx::builder::basic::make_document;
 
-  LambdaDatabase::LambdaDatabase(Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("LambdaDatabase")) {
+  LambdaDatabase::LambdaDatabase(Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("LambdaDatabase")), _memoryDb(LambdaMemoryDb::instance()) {
 
-    // Get collection
-    _lambdaCollection = GetConnection()["lambda"];
+    if (HasDatabase()) {
+
+      // Get collection
+      _lambdaCollection = GetConnection()["lambda"];
+
+    }
   }
 
   bool LambdaDatabase::LambdaExists(const std::string &region, const std::string &function, const std::string &runtime) {
@@ -56,19 +60,27 @@ namespace AwsMock::Database {
 
   long LambdaDatabase::LambdaCount(const std::string &region) {
 
-    bsoncxx::builder::basic::document builder;
-    if (!region.empty()) {
-      builder.append(bsoncxx::builder::basic::kvp("region", region));
-    }
-    bsoncxx::document::value filter = builder.extract();
+    if(HasDatabase()) {
 
-    try {
-      long count = _lambdaCollection.count_documents({filter});
-      log_trace_stream(_logger) << "lambda count: " << count << std::endl;
-      return count;
+      bsoncxx::builder::basic::document builder;
+      if (!region.empty()) {
+        builder.append(bsoncxx::builder::basic::kvp("region", region));
+      }
+      bsoncxx::document::value filter = builder.extract();
 
-    } catch (mongocxx::exception::system_error &e) {
-      log_error_stream(_logger) << "lambda count failed, error: " << e.what() << std::endl;
+      try {
+        long count = _lambdaCollection.count_documents({filter});
+        log_trace_stream(_logger) << "lambda count: " << count << std::endl;
+        return count;
+
+      } catch (mongocxx::exception::system_error &e) {
+        log_error_stream(_logger) << "lambda count failed, error: " << e.what() << std::endl;
+      }
+
+    } else {
+
+      return _memoryDb.LambdaCount(region);
+
     }
     return -1;
   }
@@ -146,21 +158,30 @@ namespace AwsMock::Database {
   }
 
   std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdas(const std::string &region) {
-    try {
-      std::vector<Entity::Lambda::Lambda> lambdas;
-      auto lamdaCursor = _lambdaCollection.find(make_document(kvp("region", region)));
-      for (auto lambda : lamdaCursor) {
-        Entity::Lambda::Lambda result;
-        result.FromDocument(lambda);
-        lambdas.push_back(result);
-      }
-      log_trace_stream(_logger) << "Got lamda list, size:" << lambdas.size() << std::endl;
 
-      return lambdas;
-    } catch (const mongocxx::exception &exc) {
-      _logger.error() << "Database exception " << exc.what() << std::endl;
-      throw Core::DatabaseException(exc.what(), 500);
+    std::vector<Entity::Lambda::Lambda> lambdas;
+    if (HasDatabase()) {
+
+      try {
+        auto lambdaCursor = _lambdaCollection.find(make_document(kvp("region", region)));
+        for (auto lambda : lambdaCursor) {
+          Entity::Lambda::Lambda result;
+          result.FromDocument(lambda);
+          lambdas.push_back(result);
+        }
+
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), 500);
+      }
+
+    } else {
+
+      lambdas = _memoryDb.ListLambdas(region);
     }
+
+    log_trace_stream(_logger) << "Got lamda list, size:" << lambdas.size() << std::endl;
+    return lambdas;
   }
 
   void LambdaDatabase::DeleteLambda(const std::string &functionName) {

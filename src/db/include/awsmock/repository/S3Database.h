@@ -21,6 +21,7 @@
 #include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
+#include <awsmock/memorydb/S3MemoryDb.h>
 #include <awsmock/repository/Database.h>
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/Object.h>
@@ -319,6 +320,10 @@ namespace AwsMock::Database {
      */
     static std::map<std::string, std::vector<std::string>> allowedEventTypes;
 
+    /**
+     * S3 in-memory database
+     */
+    S3MemoryDb &_memoryDb;
   };
 
 } // namespace AwsMock::Database
