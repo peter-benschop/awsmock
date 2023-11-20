@@ -12,58 +12,58 @@
 
 namespace AwsMock::Dto::S3 {
 
-    struct CopyObjectRequest {
+  struct CopyObjectRequest {
 
-      /**
-       * Region
-       */
-      std::string region;
+    /**
+     * Region
+     */
+    std::string region;
 
-      /**
-       * Region
-       */
-      std::string user;
+    /**
+     * Region
+     */
+    std::string user;
 
-      /**
-       * Source bucket
-       */
-      std::string sourceBucket;
+    /**
+     * Source bucket
+     */
+    std::string sourceBucket;
 
-      /**
-       * Source key
-       */
-      std::string sourceKey;
+    /**
+     * Source key
+     */
+    std::string sourceKey;
 
-      /**
-       * Target bucket
-       */
-      std::string targetBucket;
+    /**
+     * Target bucket
+     */
+    std::string targetBucket;
 
-      /**
-       * Target key
-       */
-      std::string targetKey;
+    /**
+     * Target key
+     */
+    std::string targetKey;
 
-      /**
-       * Metadata
-       */
-      std::map<std::string, std::string> metadata;
-      
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      std::string ToString() const;
+    /**
+     * Metadata
+     */
+    std::map<std::string, std::string> metadata;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const CopyObjectRequest &r);
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    std::string ToString() const;
 
-    };
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const CopyObjectRequest &r);
+
+  };
 
 } // namespace AwsMock::Dto::S3
 

@@ -11,6 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/FileUtils.h>
+#include <awsmock/dto/sqs/CreateQueueResponse.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/SQSServer.h>
 #include <awsmock/service/SQSService.h>
@@ -44,6 +45,8 @@
                                 "&Tag.Key=QueueType" \
                                 "&Tag.Value=Production"
 #define LIST_QUEUE_REQUEST "Action=ListQueues"
+#define GET_QUEUE_URL_REQUEST "Action=GetQueueUrl&QueueName=TestQueue"
+#define SEND_MESSAGE_REQUEST "Action=SendMessage&QueueUrl=TestQueue&MessageBody=%7B%22testattribute%22%3A%22testvalue%22%7D"
 
 namespace AwsMock::Service {
 
@@ -132,6 +135,45 @@ namespace AwsMock::Service {
     // assert
     EXPECT_TRUE(response.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
     EXPECT_EQ(0, queueList.size());
+  }
+
+  TEST_F(SQSServerJavaTest, QueueGetUrlTest) {
+
+    // arrange
+    Core::CurlResponse curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
+    Dto::SQS::CreateQueueResponse createResponse;
+    createResponse.FromXml(curlResponse.output);
+
+    // act
+    curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, GET_QUEUE_URL_REQUEST);
+    Dto::SQS::GetQueueUrlResponse getQueueUrlResponse;
+    getQueueUrlResponse.FromXml(curlResponse.output);
+
+    // assert
+    EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
+    EXPECT_TRUE(Core::StringUtils::Contains(getQueueUrlResponse.queueUrl, "TestQueue"));
+  }
+
+  TEST_F(SQSServerJavaTest, MessageSendTest) {
+
+    // arrange
+    Core::CurlResponse curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
+    Dto::SQS::CreateQueueResponse createResponse;
+    createResponse.FromXml(curlResponse.output);
+    curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, GET_QUEUE_URL_REQUEST);
+    Dto::SQS::GetQueueUrlResponse getQueueUrlResponse;
+    getQueueUrlResponse.FromXml(curlResponse.output);
+    std::string queueUrl = getQueueUrlResponse.queueUrl;
+
+    // act
+    curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, SEND_MESSAGE_REQUEST);
+    Dto::SQS::SendMessageResponse sendMessageResponse;
+    sendMessageResponse.FromXml(curlResponse.output);
+    long messageCount = _database.CountMessages(REGION, queueUrl);
+
+    // assert
+    EXPECT_FALSE(sendMessageResponse.messageId.empty());
+    EXPECT_EQ(1, messageCount);
   }
 
 } // namespace AwsMock::Core

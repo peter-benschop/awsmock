@@ -36,7 +36,7 @@ namespace AwsMock::Service {
 
     std::string queryString = Core::StringUtils::UrlEncode("name=" + name + "&tag=" + tag + "&fromImage=" + fromImage);
     Core::CurlResponse curlResponse =
-      _curlUtils.SendUnixSocketRequest("POST", "http://localhost/images/create?name=" + name + "&tag=" + tag + "&fromImage=" + fromImage);
+        _curlUtils.SendUnixSocketRequest("POST", "http://localhost/images/create?name=" + name + "&tag=" + tag + "&fromImage=" + fromImage);
     log_trace_stream(_logger) << "Create image request send to docker daemon, output: " << curlResponse.ToString() << std::endl;
 
     if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {

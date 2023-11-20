@@ -17,68 +17,68 @@
 
 namespace AwsMock::Dto::S3 {
 
-    struct GetObjectResponse {
+  struct GetObjectResponse {
 
-      /**
-       * Bucket
-       */
-      std::string bucket;
+    /**
+     * Bucket
+     */
+    std::string bucket;
 
-      /**
-       * Key
-       */
-      std::string key;
+    /**
+     * Key
+     */
+    std::string key;
 
-      /**
-       * Content length
-       */
-      long size;
+    /**
+     * Content length
+     */
+    long size;
 
-      /**
-       * File name
-       */
-      std::string filename;
+    /**
+     * File name
+     */
+    std::string filename;
 
-      /**
-       * Content type
-       */
-      std::string contentType;
+    /**
+     * Content type
+     */
+    std::string contentType;
 
-      /**
-       * Metadata
-       */
-      std::map<std::string, std::string> metadata;
+    /**
+     * Metadata
+     */
+    std::map<std::string, std::string> metadata;
 
-      /**
-       * MD5 sum
-       */
-      std::string md5sum;
+    /**
+     * MD5 sum
+     */
+    std::string md5sum;
 
-      /**
-       * Created
-       */
-      Poco::DateTime created;
+    /**
+     * Created
+     */
+    Poco::DateTime created;
 
-      /**
-       * Modified
-       */
-      Poco::DateTime modified;
+    /**
+     * Modified
+     */
+    Poco::DateTime modified;
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const GetObjectResponse &r);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const GetObjectResponse &r);
 
-    };
+  };
 
 } // namespace AwsMock::Dto::S3
 

@@ -53,8 +53,8 @@ namespace AwsMock::Database {
   Entity::SNS::TopicList SNSMemoryDb::GetTopicsBySubscriptionArn(const std::string &subscriptionArn) {
 
     Entity::SNS::TopicList topics;
-    for(const auto &topic:_topics){
-      if(topic.second.subscriptions.size()>0) {
+    for (const auto &topic : _topics) {
+      if (topic.second.subscriptions.size() > 0) {
         auto it = find_if(topic.second.subscriptions.begin(), topic.second.subscriptions.end(), [subscriptionArn](const Entity::SNS::Subscription &subcription) {
           return subcription.subscriptionArn == subscriptionArn;
         });
@@ -91,7 +91,7 @@ namespace AwsMock::Database {
 
     Entity::SNS::TopicList topicList;
     for (const auto &topic : _topics) {
-      if(topic.second.region == region) {
+      if (topic.second.region == region) {
         topicList.emplace_back(topic.second);
       }
     }
@@ -134,7 +134,7 @@ namespace AwsMock::Database {
     log_debug_stream(_logger) << "All topics deleted, count: " << _topics.size() << std::endl;
     _topics.clear();
   }
-  
+
   long SNSMemoryDb::CountMessages(const std::string &region, const std::string &topicArn) {
 
     long count = 0;

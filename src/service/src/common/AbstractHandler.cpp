@@ -611,7 +611,7 @@ namespace AwsMock::Service {
   [[maybe_unused]] void AbstractHandler::DumpPayload(const std::string &payload) {
     log_trace_stream(_logger) << "Dump request body" << std::endl;
     std::cerr << "================== Request Body ==================" << std::endl;
-    std::cerr << payload<< std::endl;
+    std::cerr << payload << std::endl;
     std::cerr << "==================================================" << std::endl;
   }
 

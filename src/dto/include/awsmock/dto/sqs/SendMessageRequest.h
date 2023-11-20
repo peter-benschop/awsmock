@@ -13,58 +13,58 @@
 
 namespace AwsMock::Dto::SQS {
 
-    struct SendMessageRequest {
+  struct SendMessageRequest {
 
-      /**
-       * Region
-       */
-      std::string region;
+    /**
+     * Region
+     */
+    std::string region;
 
-      /**
-       * Queue URL
-       */
-      std::string queueUrl;
+    /**
+     * Queue URL
+     */
+    std::string queueUrl;
 
-      /**
-       * Queue ARN
-       */
-      std::string queueArn;
+    /**
+     * Queue ARN
+     */
+    std::string queueArn;
 
-      /**
-       * Queue name
-       */
-      std::string queueName;
+    /**
+     * Queue name
+     */
+    std::string queueName;
 
-      /**
-       * Message body
-       */
-      std::string body;
+    /**
+     * Message body
+     */
+    std::string body;
 
-      /**
-       * Message attributes
-       */
-      MessageAttributeList messageAttributes;
+    /**
+     * Message attributes
+     */
+    MessageAttributeList messageAttributes;
 
-      /**
-       * Request ID
-       */
-      std::string requestId;
+    /**
+     * Request ID
+     */
+    std::string requestId;
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const SendMessageRequest &r);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const SendMessageRequest &r);
 
-    };
+  };
 
 } // namespace AwsMock::Dto::SQS
 

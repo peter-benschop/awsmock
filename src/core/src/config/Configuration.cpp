@@ -116,7 +116,7 @@ namespace AwsMock::Core {
     std::vector<std::string> pKeys;
     this->keys(pKeys);
     std::ofstream ofs(filename, std::ofstream::trunc);
-    for (const auto & key : *this) {
+    for (const auto &key : *this) {
       ofs << key.first << "=" << key.second << std::endl;
     }
   }

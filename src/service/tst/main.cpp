@@ -16,13 +16,13 @@
 #include <awsmock/utils/TestUtils.h>
 
 class TestEnvironment : public ::testing::Environment {
-  public:
+public:
 
-    // Initialise a test configuration.
-    void SetUp() override {
-      AwsMock::Core::TestUtils::CreateTestConfigurationFile();
-      AwsMock::Database::TestUtils::CreateServices();
-    }
+  // Initialise a test configuration.
+  void SetUp() override {
+    AwsMock::Core::TestUtils::CreateTestConfigurationFile();
+    AwsMock::Database::TestUtils::CreateServices();
+  }
 };
 
 int main(int argc, char **argv) {

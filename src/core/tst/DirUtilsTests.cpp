@@ -20,125 +20,123 @@
 
 namespace AwsMock::Core {
 
-    class DirUtilsTest : public ::testing::Test {
+  class DirUtilsTest : public ::testing::Test {
 
-    protected:
+  protected:
 
-      void SetUp() override {
-          tempDir = Core::DirUtils::CreateTempDir();
-      }
-
-      void TearDown() override {
-          Core::DirUtils::DeleteDirectory(tempDir);
-      }
-
-      std::string tempDir;
-    };
-
-    TEST_F(DirUtilsTest, DeleteDirTest) {
-
-        // arrange
-        std::string dirName = DirUtils::CreateTempDir(tempDir);
-
-        // act
-        EXPECT_NO_THROW({ DirUtils::DeleteDirectory(dirName); });
-
-        // assert
-        EXPECT_FALSE(DirUtils::DirectoryExists(dirName));
+    void SetUp() override {
+      tempDir = Core::DirUtils::CreateTempDir();
     }
 
-    TEST_F(DirUtilsTest, IsDirectoryTest) {
-
-        // arrange
-        std::string dirName = DirUtils::CreateTempDir(tempDir);
-
-        // act
-        bool result = DirUtils::IsDirectory(dirName);
-
-        // assert
-        EXPECT_TRUE(result);
+    void TearDown() override {
+      Core::DirUtils::DeleteDirectory(tempDir);
     }
 
-    TEST_F(DirUtilsTest, DeleteDirRecursiveTest) {
+    std::string tempDir;
+  };
 
-        // arrange
-        std::string dirName = DirUtils::CreateTempDir(tempDir);
-        for (int i = 0; i < 3; i++) {
-            FileUtils::CreateTempFile(dirName, "json", 100);
-        }
+  TEST_F(DirUtilsTest, DeleteDirTest) {
 
-        // act
-        EXPECT_NO_THROW({ DirUtils::DeleteDirectory(dirName, true); });
+    // arrange
+    std::string dirName = DirUtils::CreateTempDir(tempDir);
 
-        // assert
-        EXPECT_FALSE(DirUtils::DirectoryExists(dirName));
+    // act
+    EXPECT_NO_THROW({ DirUtils::DeleteDirectory(dirName); });
+
+    // assert
+    EXPECT_FALSE(DirUtils::DirectoryExists(dirName));
+  }
+
+  TEST_F(DirUtilsTest, IsDirectoryTest) {
+
+    // arrange
+    std::string dirName = DirUtils::CreateTempDir(tempDir);
+
+    // act
+    bool result = DirUtils::IsDirectory(dirName);
+
+    // assert
+    EXPECT_TRUE(result);
+  }
+
+  TEST_F(DirUtilsTest, DeleteDirRecursiveTest) {
+
+    // arrange
+    std::string dirName = DirUtils::CreateTempDir(tempDir);
+    for (int i = 0; i < 3; i++) {
+      FileUtils::CreateTempFile(dirName, "json", 100);
     }
 
-    TEST_F(DirUtilsTest, DirectoryFileCountTest) {
+    // act
+    EXPECT_NO_THROW({ DirUtils::DeleteDirectory(dirName, true); });
 
-        // arrange
-        std::string dirName = DirUtils::CreateTempDir(tempDir);
-        for (int i = 0; i < 3; i++) {
-            FileUtils::CreateTempFile(dirName, "json", 100);
-        }
+    // assert
+    EXPECT_FALSE(DirUtils::DirectoryExists(dirName));
+  }
 
-        // act
-        long result = 0;
-        EXPECT_NO_THROW({ result = DirUtils::DirectoryCountFiles(dirName); });
+  TEST_F(DirUtilsTest, DirectoryFileCountTest) {
 
-        // assert
-        EXPECT_EQ(result, 3);
+    // arrange
+    std::string dirName = DirUtils::CreateTempDir(tempDir);
+    for (int i = 0; i < 3; i++) {
+      FileUtils::CreateTempFile(dirName, "json", 100);
     }
 
-    TEST_F(DirUtilsTest, DirectoryEmptyTest) {
+    // act
+    long result = 0;
+    EXPECT_NO_THROW({ result = DirUtils::DirectoryCountFiles(dirName); });
 
-        // arrange
-        std::string dirName = DirUtils::CreateTempDir(tempDir);
+    // assert
+    EXPECT_EQ(result, 3);
+  }
 
-        // act
-        bool result = false;
-        EXPECT_NO_THROW({ result = DirUtils::DirectoryEmpty(dirName); });
+  TEST_F(DirUtilsTest, DirectoryEmptyTest) {
 
-        // assert
-        EXPECT_EQ(result, true);
-    }
+    // arrange
+    std::string dirName = DirUtils::CreateTempDir(tempDir);
 
-    TEST_F(DirUtilsTest, ListFilesTest)
-    {
-        // arrange
-        std::string dirName = DirUtils::CreateTempDir(tempDir);
-        std::string fileName1 = FileUtils::CreateTempFile(dirName, "json", 100);
-        std::string fileName2 = FileUtils::CreateTempFile(dirName, "txt", 100);
-        std::string fileName3 = FileUtils::CreateTempFile(dirName, "xml", 100);
+    // act
+    bool result = false;
+    EXPECT_NO_THROW({ result = DirUtils::DirectoryEmpty(dirName); });
 
-        // act
-        std::vector<std::string> result;
-        EXPECT_NO_THROW({ result = DirUtils::ListFiles(dirName); });
+    // assert
+    EXPECT_EQ(result, true);
+  }
 
-        // assert
-        EXPECT_FALSE(result.empty());
-        EXPECT_THAT(result, ::testing::Contains(::testing::Eq(::std::string(fileName1))));
-        EXPECT_THAT(result, ::testing::Contains(::testing::Eq(::std::string(fileName2))));
-        EXPECT_THAT(result, ::testing::Contains(::testing::Eq(::std::string(fileName3))));
-    }
+  TEST_F(DirUtilsTest, ListFilesTest) {
+    // arrange
+    std::string dirName = DirUtils::CreateTempDir(tempDir);
+    std::string fileName1 = FileUtils::CreateTempFile(dirName, "json", 100);
+    std::string fileName2 = FileUtils::CreateTempFile(dirName, "txt", 100);
+    std::string fileName3 = FileUtils::CreateTempFile(dirName, "xml", 100);
 
-    TEST_F(DirUtilsTest, ListFilesPatternTest)
-    {
-        // arrange
-        std::string dirName = DirUtils::CreateTempDir(tempDir);
-        std::string fileName1 = FileUtils::CreateTempFile(dirName, "json", 100);
-        std::string fileName2 = FileUtils::CreateTempFile(dirName, "txt", 100);
-        std::string fileName3 = FileUtils::CreateTempFile(dirName, "xml", 100);
+    // act
+    std::vector<std::string> result;
+    EXPECT_NO_THROW({ result = DirUtils::ListFiles(dirName); });
 
-        // act
-        std::vector<std::string> result;
-        EXPECT_NO_THROW({ result = DirUtils::ListFilesByPattern(dirName, "^\\/tmp.*\\.xml$"); });
+    // assert
+    EXPECT_FALSE(result.empty());
+    EXPECT_THAT(result, ::testing::Contains(::testing::Eq(::std::string(fileName1))));
+    EXPECT_THAT(result, ::testing::Contains(::testing::Eq(::std::string(fileName2))));
+    EXPECT_THAT(result, ::testing::Contains(::testing::Eq(::std::string(fileName3))));
+  }
 
-        // assert
-        EXPECT_FALSE(result.empty());
-        EXPECT_EQ(result.size(), 1);
-        EXPECT_THAT(result, ::testing::Contains(::testing::Eq(::std::string(fileName3))));
-    }
+  TEST_F(DirUtilsTest, ListFilesPatternTest) {
+    // arrange
+    std::string dirName = DirUtils::CreateTempDir(tempDir);
+    std::string fileName1 = FileUtils::CreateTempFile(dirName, "json", 100);
+    std::string fileName2 = FileUtils::CreateTempFile(dirName, "txt", 100);
+    std::string fileName3 = FileUtils::CreateTempFile(dirName, "xml", 100);
+
+    // act
+    std::vector<std::string> result;
+    EXPECT_NO_THROW({ result = DirUtils::ListFilesByPattern(dirName, "^\\/tmp.*\\.xml$"); });
+
+    // assert
+    EXPECT_FALSE(result.empty());
+    EXPECT_EQ(result.size(), 1);
+    EXPECT_THAT(result, ::testing::Contains(::testing::Eq(::std::string(fileName3))));
+  }
 
 } // namespace AwsMock::Core
 

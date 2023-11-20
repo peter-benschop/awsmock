@@ -11,60 +11,60 @@
 
 namespace AwsMock::Core {
 
-    template<class M>
-    class MetricServiceTimer {
+  template<class M>
+  class MetricServiceTimer {
 
-    public:
+  public:
 
-      /**
-       * Constructor
-       *
-       * <p>Measure a methods execution time.</p>
-       *
-       * @param metricService metric module
-       * @param name name of the underlying timer
-       */
-      explicit MetricServiceTimer(M &metricService, std::string name) : _metricService(metricService), _name(std::move(name)) {
-          if (!_metricService.TimerExists(_name)) {
-              _metricService.AddTimer(_name);
-          }
-          _metricService.StartTimer(_name);
+    /**
+     * Constructor
+     *
+     * <p>Measure a methods execution time.</p>
+     *
+     * @param metricService metric module
+     * @param name name of the underlying timer
+     */
+    explicit MetricServiceTimer(M &metricService, std::string name) : _metricService(metricService), _name(std::move(name)) {
+      if (!_metricService.TimerExists(_name)) {
+        _metricService.AddTimer(_name);
       }
+      _metricService.StartTimer(_name);
+    }
 
-      /**
-       * Destructor
-       */
-      ~MetricServiceTimer() {
-          _metricService.StopTimer(_name);
-      }
+    /**
+     * Destructor
+     */
+    ~MetricServiceTimer() {
+      _metricService.StopTimer(_name);
+    }
 
-      /**
-       * Default constructor
-       */
-      MetricServiceTimer() = delete;
+    /**
+     * Default constructor
+     */
+    MetricServiceTimer() = delete;
 
-      /**
-       * Copy constructor
-       */
-      MetricServiceTimer(const MetricServiceTimer &) = delete;
+    /**
+     * Copy constructor
+     */
+    MetricServiceTimer(const MetricServiceTimer &) = delete;
 
-      /**
-       * Equals operator
-       */
-      MetricServiceTimer &operator=(const MetricServiceTimer &) = delete;
+    /**
+     * Equals operator
+     */
+    MetricServiceTimer &operator=(const MetricServiceTimer &) = delete;
 
-    private:
+  private:
 
-      /**
-       * Metric module
-       */
-      M &_metricService;
+    /**
+     * Metric module
+     */
+    M &_metricService;
 
-      /**
-       * Name of the timer
-       */
-      const std::string _name;
-    };
+    /**
+     * Name of the timer
+     */
+    const std::string _name;
+  };
 
 } // namespace AwsMock::Core
 

@@ -14,43 +14,43 @@
 
 namespace AwsMock::Dto::SQS {
 
-    struct DeleteQueueRequest {
+  struct DeleteQueueRequest {
 
-      /**
-       * AWS region
-       */
-      std::string region;
+    /**
+     * AWS region
+     */
+    std::string region;
 
-      /**
-       * Queue URL
-       */
-      std::string queueUrl;
+    /**
+     * Queue URL
+     */
+    std::string queueUrl;
 
-      /**
-       * Resource
-       */
-      std::string resource = "Unknown resource";
+    /**
+     * Resource
+     */
+    std::string resource = "Unknown resource";
 
-      /**
-       * Request ID
-       */
-      std::string requestId = Poco::UUIDGenerator().createRandom().toString();
+    /**
+     * Request ID
+     */
+    std::string requestId = Poco::UUIDGenerator().createRandom().toString();
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const DeleteQueueRequest &r);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const DeleteQueueRequest &r);
 
-    };
+  };
 
 } // namespace AwsMock::Dto::SQS
 

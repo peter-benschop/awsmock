@@ -470,8 +470,8 @@ namespace AwsMock::Database {
 
     if (HasDatabase()) {
 
-    auto result = _objectCollection.delete_many({});
-    log_debug_stream(_logger) << "All objects deleted, count: " << result->deleted_count() << std::endl;
+      auto result = _objectCollection.delete_many({});
+      log_debug_stream(_logger) << "All objects deleted, count: " << result->deleted_count() << std::endl;
 
     } else {
 

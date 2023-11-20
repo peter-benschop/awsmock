@@ -12,63 +12,63 @@
 
 namespace AwsMock::Dto::S3 {
 
-    struct PutObjectRequest {
+  struct PutObjectRequest {
 
-      /**
-       * Region
-       */
-      std::string region;
+    /**
+     * Region
+     */
+    std::string region;
 
-      /**
-       * Bucket
-       */
-      std::string bucket;
+    /**
+     * Bucket
+     */
+    std::string bucket;
 
-      /**
-       * Key
-       */
-      std::string key;
+    /**
+     * Key
+     */
+    std::string key;
 
-      /**
-       * Owner
-       */
-      std::string owner;
+    /**
+     * Owner
+     */
+    std::string owner;
 
-      /**
-       * MD5 sum
-       */
-      std::string md5Sum;
+    /**
+     * MD5 sum
+     */
+    std::string md5Sum;
 
-      /**
-       * Content type
-       */
-      std::string contentType;
+    /**
+     * Content type
+     */
+    std::string contentType;
 
-      /**
-       * Content type
-       */
-      long contentLength;
+    /**
+     * Content type
+     */
+    long contentLength;
 
-      /**
-       * Metadata
-       */
-      std::map<std::string, std::string> metadata;
+    /**
+     * Metadata
+     */
+    std::map<std::string, std::string> metadata;
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const PutObjectRequest &r);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const PutObjectRequest &r);
 
-    };
+  };
 
 } // namespace AwsMock::Dto::s3
 

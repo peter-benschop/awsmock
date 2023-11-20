@@ -19,52 +19,52 @@
 
 namespace AwsMock::Dto::S3 {
 
-    struct DeleteObjectsRequest {
+  struct DeleteObjectsRequest {
 
-      /**
-       * Constructor.
-       *
-       * @param xmlString XML request structure
-       */
-      explicit DeleteObjectsRequest(const std::string &xmlString);
+    /**
+     * Constructor.
+     *
+     * @param xmlString XML request structure
+     */
+    explicit DeleteObjectsRequest(const std::string &xmlString);
 
-      /**
-       * Region
-       */
-      std::string region;
+    /**
+     * Region
+     */
+    std::string region;
 
-      /**
-       * Bucket
-       */
-      std::string bucket;
+    /**
+     * Bucket
+     */
+    std::string bucket;
 
-      /**
-       * Key
-       */
-      std::vector<std::string> keys;
+    /**
+     * Key
+     */
+    std::vector<std::string> keys;
 
-      /**
-       * Parse the delete objects request XML.
-       *
-       * @param xmlString notification XML string
-       */
-      void FromXml(const std::string &xmlString);
+    /**
+     * Parse the delete objects request XML.
+     *
+     * @param xmlString notification XML string
+     */
+    void FromXml(const std::string &xmlString);
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const DeleteObjectsRequest &r);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const DeleteObjectsRequest &r);
 
-    };
+  };
 
 } // namespace AwsMock::Dto::S3
 

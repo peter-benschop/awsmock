@@ -21,108 +21,108 @@
 
 namespace AwsMock::Dto::Transfer {
 
-    struct CreateUserRequest {
+  struct CreateUserRequest {
 
-      /**
-       * Region
-       */
-      std::string region;
+    /**
+     * Region
+     */
+    std::string region;
 
-      /**
-       * Server ID
-       */
-      std::string serverId;
+    /**
+     * Server ID
+     */
+    std::string serverId;
 
-      /**
-       * User name
-       */
-      std::string userName;
+    /**
+     * User name
+     */
+    std::string userName;
 
-      /**
-       * Password
-       */
-      std::string password;
+    /**
+     * Password
+     */
+    std::string password;
 
-      /**
-       * Home directory
-       */
-      std::string homeDirectory;
+    /**
+     * Home directory
+     */
+    std::string homeDirectory;
 
-      /**
-       * Creates a JSON string from the object.
-       *
-       * @return JSON string
-       */
-      [[nodiscard]] std::string ToJson() const {
+    /**
+     * Creates a JSON string from the object.
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const {
 
-          try {
-              Poco::JSON::Object rootJson;
-              rootJson.set("Region", region);
-              rootJson.set("ServerId", serverId);
-              rootJson.set("UserName", userName);
-              rootJson.set("Password", password);
-              rootJson.set("HomeDirectory", homeDirectory);
+      try {
+        Poco::JSON::Object rootJson;
+        rootJson.set("Region", region);
+        rootJson.set("ServerId", serverId);
+        rootJson.set("UserName", userName);
+        rootJson.set("Password", password);
+        rootJson.set("HomeDirectory", homeDirectory);
 
-              std::ostringstream os;
-              rootJson.stringify(os);
-              return os.str();
+        std::ostringstream os;
+        rootJson.stringify(os);
+        return os.str();
 
-          } catch (Poco::Exception &exc) {
-              throw Core::ServiceException(exc.message(), 500);
-          }
+      } catch (Poco::Exception &exc) {
+        throw Core::ServiceException(exc.message(), 500);
       }
+    }
 
-      /**
-       * Parse a JSON stream
-       *
-       * @param body json input stream
-       */
-      void FromJson(const std::string &body) {
+    /**
+     * Parse a JSON stream
+     *
+     * @param body json input stream
+     */
+    void FromJson(const std::string &body) {
 
-          Poco::JSON::Parser parser;
-          Poco::Dynamic::Var result = parser.parse(body);
-          Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+      Poco::JSON::Parser parser;
+      Poco::Dynamic::Var result = parser.parse(body);
+      Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
-          try {
+      try {
 
-              // Set attributes
-              Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-              Core::JsonUtils::GetJsonValueString("ServerId", rootObject, serverId);
-              Core::JsonUtils::GetJsonValueString("UserName", rootObject, userName);
-              Core::JsonUtils::GetJsonValueString("Password", rootObject, password);
-              Core::JsonUtils::GetJsonValueString("HomeDirectory", rootObject, homeDirectory);
+        // Set attributes
+        Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
+        Core::JsonUtils::GetJsonValueString("ServerId", rootObject, serverId);
+        Core::JsonUtils::GetJsonValueString("UserName", rootObject, userName);
+        Core::JsonUtils::GetJsonValueString("Password", rootObject, password);
+        Core::JsonUtils::GetJsonValueString("HomeDirectory", rootObject, homeDirectory);
 
-              // Cleanup
-              rootObject->clear();
-              parser.reset();
+        // Cleanup
+        rootObject->clear();
+        parser.reset();
 
-          } catch (Poco::Exception &exc) {
-              throw Core::ServiceException(exc.message(), 500);
-          }
+      } catch (Poco::Exception &exc) {
+        throw Core::ServiceException(exc.message(), 500);
       }
+    }
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const {
+      std::stringstream ss;
+      ss << (*this);
+      return ss.str();
+    }
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const CreateUserRequest &r) {
-          os << "CreateUserRequest={region='" << r.region << "' serverId='" << r.serverId << "' userName='" << r.userName << "' password:='" << r.password
-             << "' homeDirectory='" << r.homeDirectory << "}";
-          return os;
-      }
-    };
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const CreateUserRequest &r) {
+      os << "CreateUserRequest={region='" << r.region << "' serverId='" << r.serverId << "' userName='" << r.userName << "' password:='" << r.password
+         << "' homeDirectory='" << r.homeDirectory << "}";
+      return os;
+    }
+  };
 
 } // namespace AwsMock::Dto::lambda
 

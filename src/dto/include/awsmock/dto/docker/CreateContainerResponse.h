@@ -24,63 +24,63 @@
 
 namespace AwsMock::Dto::Docker {
 
-    struct CreateContainerResponse {
+  struct CreateContainerResponse {
 
-      /**
-       * ID
-       */
-      std::string id;
+    /**
+     * ID
+     */
+    std::string id;
 
-      /**
-       * Warnings
-       */
-      std::vector<std::string> warnings;
+    /**
+     * Warnings
+     */
+    std::vector<std::string> warnings;
 
-      /**
-       * Assigned random port
-       */
-      int hostPort;
+    /**
+     * Assigned random port
+     */
+    int hostPort;
 
-      /**
-       * Convert to a JSON string
-       *
-       * @param body JSON string
-       */
-      void FromJson(const std::string &body) {
+    /**
+     * Convert to a JSON string
+     *
+     * @param body JSON string
+     */
+    void FromJson(const std::string &body) {
 
-          Poco::JSON::Parser parser;
-          Poco::Dynamic::Var result = parser.parse(body);
-          Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+      Poco::JSON::Parser parser;
+      Poco::Dynamic::Var result = parser.parse(body);
+      Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
-          try {
-              Core::JsonUtils::GetJsonValueString("Id", rootObject, id);
-          } catch (Poco::Exception &exc) {
-              throw Core::ServiceException(exc.message(), 500);
-          }
+      try {
+        Core::JsonUtils::GetJsonValueString("Id", rootObject, id);
+      } catch (Poco::Exception &exc) {
+        throw Core::ServiceException(exc.message(), 500);
       }
+    }
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const {
+      std::stringstream ss;
+      ss << (*this);
+      return ss.str();
+    }
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const CreateContainerResponse &r) {
-          os << "CreateContainerResponse={id='" + r.id + "' hostPort='" + std::to_string(r.hostPort) + "'}";
-          return os;
-      }
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const CreateContainerResponse &r) {
+      os << "CreateContainerResponse={id='" + r.id + "' hostPort='" + std::to_string(r.hostPort) + "'}";
+      return os;
+    }
 
-    };
+  };
 
 } // namespace AwsMock::Dto::Docker
 

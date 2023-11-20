@@ -14,50 +14,50 @@
 
 namespace AwsMock::Core {
 
+  /**
+   * Handles unmatched exception.
+   *
+   * <p>They will be only logged, for investigation.</p>
+   */
+  class ThreadErrorHandler : public Poco::ErrorHandler {
+
+  public:
+
+    ThreadErrorHandler() : _logger(Poco::Logger::get("root")) {}
+
     /**
-     * Handles unmatched exception.
+     * Poco exceptions.
      *
-     * <p>They will be only logged, for investigation.</p>
+     * @param exc poco exception
      */
-    class ThreadErrorHandler : public Poco::ErrorHandler {
+    void exception(const Poco::Exception &exc) override {
+      log_error_stream(_logger) << "Unhandled POCO exception: " + exc.displayText() + " in class: " + exc.className() << std::endl;
+    }
 
-    public:
+    /**
+     * C++ standard exception.
+     *
+     * @param exc standard exception
+     */
+    void exception(const std::exception &exc) override {
+      log_error_stream(_logger) << "Unhandled STD exception: " << std::string(exc.what()) << std::endl;
+    }
 
-      ThreadErrorHandler() : _logger(Poco::Logger::get("root")) {}
+    /**
+     * All other exceptions
+     */
+    void exception() override {
+      log_error_stream(_logger) << "Unknown exception" << std::endl;
+    }
 
-      /**
-       * Poco exceptions.
-       *
-       * @param exc poco exception
-       */
-      void exception(const Poco::Exception &exc) override {
-          log_error_stream(_logger) << "Unhandled POCO exception: " + exc.displayText() + " in class: " + exc.className() << std::endl;
-      }
+  private:
 
-      /**
-       * C++ standard exception.
-       *
-       * @param exc standard exception
-       */
-      void exception(const std::exception &exc) override {
-          log_error_stream(_logger) << "Unhandled STD exception: " << std::string(exc.what()) << std::endl;
-      }
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
 
-      /**
-       * All other exceptions
-       */
-      void exception() override {
-          log_error_stream(_logger) << "Unknown exception" << std::endl;
-      }
-
-    private:
-
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
-
-    };
+  };
 
 } // namespace AwsMock::Core
 

@@ -20,35 +20,35 @@
 
 namespace AwsMock::Dto::S3 {
 
-    struct DeleteObjectsResponse {
+  struct DeleteObjectsResponse {
 
-      /**
-       * Keys
-       */
-      std::vector<std::string> keys;
+    /**
+     * Keys
+     */
+    std::vector<std::string> keys;
 
-      /**
-       * Convert to XML representation
-       *
-       * @return XML string
-       */
-      [[nodiscard]] std::string ToXml() const;
+    /**
+     * Convert to XML representation
+     *
+     * @return XML string
+     */
+    [[nodiscard]] std::string ToXml() const;
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const DeleteObjectsResponse &r);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const DeleteObjectsResponse &r);
 
-    };
+  };
 
 } // namespace AwsMock::Dto
 

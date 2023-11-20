@@ -48,7 +48,7 @@ namespace AwsMock::Service {
     auto *httpServerParams = new Poco::Net::HTTPServerParams();
     httpServerParams->setMaxQueued(maxQueueLength);
     httpServerParams->setMaxThreads(maxThreads);
-    httpServerParams->setTimeout(Poco::Timespan(requestTimeout,0));
+    httpServerParams->setTimeout(Poco::Timespan(requestTimeout, 0));
     httpServerParams->setKeepAlive(true);
     log_debug_stream(_logger) << "HTTP server parameter set, maxQueue: " << maxQueueLength << " maxThreads: " << maxThreads << std::endl;
 
@@ -59,7 +59,7 @@ namespace AwsMock::Service {
     // Set running, now that the HTTP server is running
     _running = true;
     _moduleDatabase->SetState(_name, Database::Entity::Module::ModuleState::RUNNING);
-    
+
     log_info_stream(_logger) << "HTTP server " << _name << " started, endpoint: http://" << host << ":" << port << std::endl;
   }
 

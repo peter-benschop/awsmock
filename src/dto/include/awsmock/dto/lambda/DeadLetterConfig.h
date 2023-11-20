@@ -20,21 +20,21 @@
 
 namespace AwsMock::Dto::Lambda {
 
-    struct DeadLetterConfig {
+  struct DeadLetterConfig {
 
-      /**
-       * Target ARN
-       */
-      std::string targetArn = {};
+    /**
+     * Target ARN
+     */
+    std::string targetArn = {};
 
-      /**
-       * Converts the DTO to a JSON representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+    /**
+     * Converts the DTO to a JSON representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
-    };
+  };
 
 } // namespace AwsMock::Dto::lambda
 

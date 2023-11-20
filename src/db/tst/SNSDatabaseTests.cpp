@@ -28,20 +28,20 @@ namespace AwsMock::Database {
 
   class SNSDatabaseTest : public ::testing::Test {
 
-    protected:
+  protected:
 
-      void SetUp() override {
-        _region = _configuration.getString("awsmock.region");
-      }
+    void SetUp() override {
+      _region = _configuration.getString("awsmock.region");
+    }
 
-      void TearDown() override {
-        _snsDatabase.DeleteAllTopics();
-        _snsDatabase.DeleteAllMessages();
-      }
+    void TearDown() override {
+      _snsDatabase.DeleteAllTopics();
+      _snsDatabase.DeleteAllMessages();
+    }
 
-      std::string _region;
-      Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
-      SNSDatabase _snsDatabase = SNSDatabase(_configuration);
+    std::string _region;
+    Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+    SNSDatabase _snsDatabase = SNSDatabase(_configuration);
   };
 
   TEST_F(SNSDatabaseTest, TopicCreateTest) {

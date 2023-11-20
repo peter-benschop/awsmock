@@ -23,25 +23,25 @@
 
 namespace AwsMock::Dto::Docker {
 
-    struct ListContainerResponse {
+  struct ListContainerResponse {
 
-      /**
-       * Container list
-       */
-      std::vector<Container> containerList;
+    /**
+     * Container list
+     */
+    std::vector<Container> containerList;
 
-      /**
-       * Constructor
-       */
-      explicit ListContainerResponse(const std::string &body);
+    /**
+     * Constructor
+     */
+    explicit ListContainerResponse(const std::string &body);
 
-      /**
-       * Convert to a JSON string
-       *
-       * @return JSON string
-       */
-      void FromJson(const std::string &body);
-    };
+    /**
+     * Convert to a JSON string
+     *
+     * @return JSON string
+     */
+    void FromJson(const std::string &body);
+  };
 
 } // namespace AwsMock::Dto::Docker
 

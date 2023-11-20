@@ -17,42 +17,42 @@
 
 namespace AwsMock::Dto::S3 {
 
-    struct CreateBucketRequest {
+  struct CreateBucketRequest {
 
-      /**
-       * Bucket location
-       */
-      std::string _locationConstraint;
+    /**
+     * Bucket location
+     */
+    std::string _locationConstraint;
 
-      /**
-       * Constructor
-       *
-       * @param xmlString XML string
-       */
-      explicit CreateBucketRequest(const std::string &xmlString);
+    /**
+     * Constructor
+     *
+     * @param xmlString XML string
+     */
+    explicit CreateBucketRequest(const std::string &xmlString);
 
-      /**
-       * Convert from XML representation
-       *
-       * @param xmlString XML string
-       */
-      void FromXml(const std::string &xmlString);
+    /**
+     * Convert from XML representation
+     *
+     * @param xmlString XML string
+     */
+    void FromXml(const std::string &xmlString);
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const CreateBucketRequest &r);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const CreateBucketRequest &r);
 
-    };
+  };
 
 } // namespace AwsMock::Dto::s3
 

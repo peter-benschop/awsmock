@@ -24,49 +24,49 @@
 
 namespace AwsMock::Dto::Lambda {
 
-    struct DeleteTagsRequest {
+  struct DeleteTagsRequest {
 
-      /**
-       * ARN
-       */
-      std::string arn;
+    /**
+     * ARN
+     */
+    std::string arn;
 
-      /**
-       * Tags
-       */
-      std::vector<std::string> tags;
+    /**
+     * Tags
+     */
+    std::vector<std::string> tags;
 
-      /**
-       * Constructor
-       */
-      DeleteTagsRequest(std::string arn, std::vector<std::string> tags) : arn(std::move(arn)), tags(tags) {}
+    /**
+     * Constructor
+     */
+    DeleteTagsRequest(std::string arn, std::vector<std::string> tags) : arn(std::move(arn)), tags(tags) {}
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const {
+      std::stringstream ss;
+      ss << (*this);
+      return ss.str();
+    }
+
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const DeleteTagsRequest &r) {
+      os << "DeleteTagsRequest={tags='[";
+      for (const auto &it : r.tags) {
+        os << " tagKey='" << it << "'";
       }
+      os << "]}";
+      return os;
+    }
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const DeleteTagsRequest &r) {
-          os << "DeleteTagsRequest={tags='[";
-          for (const auto &it : r.tags) {
-              os << " tagKey='" << it << "'";
-          }
-          os << "]}";
-          return os;
-      }
-
-    };
+  };
 
 } // namespace AwsMock::Dto::lambda
 

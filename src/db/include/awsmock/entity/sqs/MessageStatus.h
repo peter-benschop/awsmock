@@ -12,10 +12,10 @@
 namespace AwsMock::Database::Entity::SQS {
 
   enum class MessageStatus {
-      INITIAL,
-      DELAYED,
-      INVISIBLE,
-      UNKNOWN
+    INITIAL,
+    DELAYED,
+    INVISIBLE,
+    UNKNOWN
   };
 
   static std::map<MessageStatus, std::string> MessageStatusNames{

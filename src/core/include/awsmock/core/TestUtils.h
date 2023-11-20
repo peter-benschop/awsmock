@@ -18,12 +18,12 @@ namespace AwsMock::Core {
 
   class TestUtils {
 
-    public:
+  public:
 
-      /**
-       * Creates a test configuration file
-       */
-      static void CreateTestConfigurationFile();
+    /**
+     * Creates a test configuration file
+     */
+    static void CreateTestConfigurationFile();
 
   };
 }

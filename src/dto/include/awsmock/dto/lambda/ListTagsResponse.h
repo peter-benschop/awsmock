@@ -20,35 +20,35 @@
 
 namespace AwsMock::Dto::Lambda {
 
-    struct ListTagsResponse {
+  struct ListTagsResponse {
 
-      /**
-       * Tags
-       */
-      std::map<std::string, std::string> tags;
+    /**
+     * Tags
+     */
+    std::map<std::string, std::string> tags;
 
-      /**
-       * Convert to a JSON string
-       *
-       * @return JSON string
-       */
-      [[nodiscard]] std::string ToJson();
+    /**
+     * Convert to a JSON string
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson();
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const ListTagsResponse &r);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const ListTagsResponse &r);
 
-    };
+  };
 
 } // namespace AwsMock::Dto::lambda
 

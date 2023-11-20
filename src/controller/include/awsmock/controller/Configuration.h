@@ -18,35 +18,35 @@
 
 namespace AwsMock::Controller {
 
+  /**
+   * AwsMock controller configuration
+   */
+  class Configuration : public Core::Configuration {
+  public:
+
     /**
-     * AwsMock controller configuration
+     * Constructor
      */
-    class Configuration : public Core::Configuration {
-    public:
+    Configuration();
 
-      /**
-       * Constructor
-       */
-      Configuration();
+    /**
+     * Constructor.
+     *
+     * @param basename base name of the configuration file.
+     */
+    explicit Configuration(const std::string &basename);
 
-      /**
-       * Constructor.
-       *
-       * @param basename base name of the configuration file.
-       */
-      explicit Configuration(const std::string &basename);
+    /**
+     * Initialize the configuration and add the default configuration options.
+     */
+    void InitializeConfig();
 
-      /**
-       * Initialize the configuration and add the default configuration options.
-       */
-      void InitializeConfig();
-
-    private:
-      /**
-       * Logger
-       */
-      Poco::Logger &_logger = Poco::Logger::get("Configuration");
-    };
+  private:
+    /**
+     * Logger
+     */
+    Poco::Logger &_logger = Poco::Logger::get("Configuration");
+  };
 
 } // namespace AwsMock::Controller
 

@@ -24,68 +24,68 @@
 
 namespace AwsMock::Dto::SQS {
 
-    struct ReceiveMessageRequest {
+  struct ReceiveMessageRequest {
 
-      /**
-       * AWS region
-       */
-      std::string region;
+    /**
+     * AWS region
+     */
+    std::string region;
 
-      /**
-       * Queue URL
-       */
-      std::string queueUrl;
+    /**
+     * Queue URL
+     */
+    std::string queueUrl;
 
-      /**
-       * Queue name
-       */
-      std::string queueName;
+    /**
+     * Queue name
+     */
+    std::string queueName;
 
-      /**
-       * Maximal number of messages
-       */
-      int maxMessages = 10;
+    /**
+     * Maximal number of messages
+     */
+    int maxMessages = 10;
 
-      /**
-       * Visibility
-       */
-      int visibility = 15;
+    /**
+     * Visibility
+     */
+    int visibility = 15;
 
-      /**
-       * Wait time in seconds
-       */
-      int waitTimeSeconds = 1;
+    /**
+     * Wait time in seconds
+     */
+    int waitTimeSeconds = 1;
 
-      /**
-       * MessageAttribute names
-       */
-      std::vector<std::string> AttributeName = {"All"};
+    /**
+     * MessageAttribute names
+     */
+    std::vector<std::string> AttributeName = {"All"};
 
-      /**
-       * Resource
-       */
-      std::string resource = "SQS";
+    /**
+     * Resource
+     */
+    std::string resource = "SQS";
 
-      /**
-       * Resource
-       */
-      std::string requestId;
+    /**
+     * Resource
+     */
+    std::string requestId;
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const ReceiveMessageRequest &r);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const ReceiveMessageRequest &r);
 
-    };
+  };
 
 } // namespace AwsMock::Dto::SQS
 

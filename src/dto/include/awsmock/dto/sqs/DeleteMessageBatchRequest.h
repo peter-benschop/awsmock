@@ -18,48 +18,48 @@
 
 namespace AwsMock::Dto::SQS {
 
-    struct DeleteMessageBatchRequest {
+  struct DeleteMessageBatchRequest {
 
-      /**
-       * AWS region
-       */
-      std::string region;
+    /**
+     * AWS region
+     */
+    std::string region;
 
-      /**
-       * Queue URL
-       */
-      std::string queueUrl;
+    /**
+     * Queue URL
+     */
+    std::string queueUrl;
 
-      /**
-       * Entries
-       */
-      DeleteMessageBatchEntries deleteMessageBatchEntries;
+    /**
+     * Entries
+     */
+    DeleteMessageBatchEntries deleteMessageBatchEntries;
 
-      /**
-       * Resource
-       */
-      std::string resource = "SQS";
+    /**
+     * Resource
+     */
+    std::string resource = "SQS";
 
-      /**
-       * Resource
-       */
-      std::string requestId = Poco::UUIDGenerator().createRandom().toString();
+    /**
+     * Resource
+     */
+    std::string requestId = Poco::UUIDGenerator().createRandom().toString();
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const DeleteMessageBatchRequest &r);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const DeleteMessageBatchRequest &r);
 
-    };
+  };
 
 } // namespace AwsMock::Dto::SQS
 

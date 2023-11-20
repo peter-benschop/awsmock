@@ -35,61 +35,61 @@ namespace AwsMock::Service {
    */
   class LambdaExecutor : public Poco::Runnable {
 
-    public:
+  public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration application configuration
-       * @param metricService monitoring module
-       * @param invokeQueue invoke notification queue
-       */
-      LambdaExecutor(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &invokeQueue);
+    /**
+     * Constructor
+     *
+     * @param configuration application configuration
+     * @param metricService monitoring module
+     * @param invokeQueue invoke notification queue
+     */
+    LambdaExecutor(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &invokeQueue);
 
-      /**
-       * Listens for invocation requests and send the invocation to the right port.
-       */
-      void run();
+    /**
+     * Listens for invocation requests and send the invocation to the right port.
+     */
+    void run();
 
-    private:
+  private:
 
-      /**
-       * Send the invocation request to the corresponding port
-       *
-       * @param hostName host name of the docker instance
-       * @param port lambda docker external port
-       * @param body event payload
-       */
-      void SendInvocationRequest(const std::string &hostName, int port, const std::string &body);
+    /**
+     * Send the invocation request to the corresponding port
+     *
+     * @param hostName host name of the docker instance
+     * @param port lambda docker external port
+     * @param body event payload
+     */
+    void SendInvocationRequest(const std::string &hostName, int port, const std::string &body);
 
-      /**
-       * Returns the URI for the invocation request.
-       *
-       * @param hostName host name of the docker instance
-       * @param port lambda docker external port
-       * @return URI of the invocation request
-       */
-      static Poco::URI GetRequestUri(const std::string &hostName, int port);
+    /**
+     * Returns the URI for the invocation request.
+     *
+     * @param hostName host name of the docker instance
+     * @param port lambda docker external port
+     * @return URI of the invocation request
+     */
+    static Poco::URI GetRequestUri(const std::string &hostName, int port);
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
 
-      /**
-       * S3 handler configuration
-       */
-      Core::Configuration &_configuration;
+    /**
+     * S3 handler configuration
+     */
+    Core::Configuration &_configuration;
 
-      /**
-       * Metric module
-       */
-      Core::MetricService &_metricService;
+    /**
+     * Metric module
+     */
+    Core::MetricService &_metricService;
 
-      /**
-       * lambda invocation notification queue
-       */
-      Poco::NotificationQueue &_invokeQueue;
+    /**
+     * lambda invocation notification queue
+     */
+    Poco::NotificationQueue &_invokeQueue;
   };
 
 } // namespace AwsMock::Service

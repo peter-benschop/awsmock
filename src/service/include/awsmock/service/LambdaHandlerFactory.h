@@ -24,7 +24,7 @@ namespace AwsMock::Service {
    */
   class LambdaRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 
-    public:
+  public:
 
     /**
      * Constructor
@@ -38,7 +38,7 @@ namespace AwsMock::Service {
                                 Core::MetricService &metricService,
                                 Poco::NotificationQueue &createQueue,
                                 Poco::NotificationQueue &invokeQueue)
-      : _configuration(configuration), _metricService(metricService), _createQueue(createQueue), _invokeQueue(invokeQueue) {}
+        : _configuration(configuration), _metricService(metricService), _createQueue(createQueue), _invokeQueue(invokeQueue) {}
 
     /**
      * Create new lambda request handler
@@ -49,7 +49,7 @@ namespace AwsMock::Service {
       return new LambdaHandler(_configuration, _metricService, _createQueue, _invokeQueue);
     }
 
-    private:
+  private:
 
     /**
      * S3 handler configuration

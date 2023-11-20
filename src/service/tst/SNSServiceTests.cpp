@@ -29,7 +29,7 @@ namespace AwsMock::Service {
 
   class SNSServiceTest : public ::testing::Test {
 
-    protected:
+  protected:
 
     void SetUp() override {
       // Set log level
@@ -47,11 +47,12 @@ namespace AwsMock::Service {
     Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
     Database::SNSDatabase _snsDatabase = Database::SNSDatabase(_configuration);
     Database::SQSDatabase _sqsDatabase = Database::SQSDatabase(_configuration);
-    SNSService _snsService = SNSService(_configuration,_condition);
-    SQSService _sqsService = SQSService(_configuration,_condition);
+    SNSService _snsService = SNSService(_configuration, _condition);
+    SQSService _sqsService = SQSService(_configuration, _condition);
   };
 
-  TEST_F(SNSServiceTest, TopicCreateTest) {
+  TEST_F(SNSServiceTest, TopicCreateTest
+  ) {
 
     // arrange
     Dto::SNS::CreateTopicRequest request = {.region=REGION, .topicName=TOPIC, .owner=OWNER};
@@ -60,44 +61,60 @@ namespace AwsMock::Service {
     Dto::SNS::CreateTopicResponse response = _snsService.CreateTopic(request);
 
     // assert
-    EXPECT_TRUE(response.region == REGION);
-    EXPECT_TRUE(response.name == TOPIC);
+    EXPECT_TRUE(response
+                    .region == REGION);
+    EXPECT_TRUE(response
+                    .name == TOPIC);
   }
 
-  TEST_F(SNSServiceTest, TopicDeleteTest) {
+  TEST_F(SNSServiceTest, TopicDeleteTest
+  ) {
 
-    // arrange
+// arrange
     Dto::SNS::CreateTopicRequest topicRequest = {.region=REGION, .topicName=TOPIC, .owner=OWNER};
     Dto::SNS::CreateTopicResponse topicResponse = _snsService.CreateTopic(topicRequest);
 
-    // act
-    EXPECT_NO_THROW({ _snsService.DeleteTopic(topicResponse.region, topicResponse.topicArn); });
+// act
+    EXPECT_NO_THROW({
+                      _snsService.
+                          DeleteTopic(topicResponse
+                                          .region, topicResponse.topicArn);
+                    });
 
-    // assert
-    EXPECT_EQ(0, _snsDatabase.ListTopics(REGION).size());
+// assert
+    EXPECT_EQ(0, _snsDatabase.ListTopics(REGION).
+        size()
+    );
   }
 
-  TEST_F(SNSServiceTest, SubscribeTest) {
+  TEST_F(SNSServiceTest, SubscribeTest
+  ) {
 
-    // arrange
+// arrange
     Dto::SNS::CreateTopicRequest topicRequest = {.region=REGION, .topicName=TOPIC, .owner=OWNER};
     Dto::SNS::CreateTopicResponse topicResponse = _snsService.CreateTopic(topicRequest);
     Dto::SQS::CreateQueueRequest queueRequest = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
     Dto::SQS::CreateQueueResponse queueResponse = _sqsService.CreateQueue(queueRequest);
 
-    // act
+// act
     Dto::SNS::SubscribeRequest subscribeRequest = {.region=REGION, .topicArn=topicResponse.topicArn, .protocol="sqs", .endpoint=queueResponse.queueArn, .owner=OWNER};
     Dto::SNS::SubscribeResponse subscribeResponse = _snsService.Subscribe(subscribeRequest);
     Dto::SNS::ListTopicsResponse response = _snsService.ListTopics(REGION);
 
-    // assert
-    EXPECT_TRUE(subscribeResponse.subscriptionArn.length() > 0);
-    EXPECT_EQ(1, response.topicList[0].subscriptions.size());
+// assert
+    EXPECT_TRUE(subscribeResponse
+                    .subscriptionArn.
+        length()
+                    > 0);
+    EXPECT_EQ(1, response.topicList[0].subscriptions.
+        size()
+    );
   }
 
-  TEST_F(SNSServiceTest, UnsubscribeTest) {
+  TEST_F(SNSServiceTest, UnsubscribeTest
+  ) {
 
-    // arrange
+// arrange
     Dto::SNS::CreateTopicRequest topicRequest = {.region=REGION, .topicName=TOPIC, .owner=OWNER};
     Dto::SNS::CreateTopicResponse topicResponse = _snsService.CreateTopic(topicRequest);
     Dto::SQS::CreateQueueRequest queueRequest = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
@@ -105,34 +122,49 @@ namespace AwsMock::Service {
     Dto::SNS::SubscribeRequest subscribeRequest = {.region=REGION, .topicArn=topicResponse.topicArn, .protocol="sqs", .endpoint=queueResponse.queueArn, .owner=OWNER};
     Dto::SNS::SubscribeResponse subscribeResponse = _snsService.Subscribe(subscribeRequest);
 
-    // act
+// act
     Dto::SNS::UnsubscribeRequest unsubscribeRequest = {.region=REGION, .subscriptionArn=subscribeResponse.subscriptionArn};
     Dto::SNS::UnsubscribeResponse unsubscribeResponse = _snsService.Unsubscribe(unsubscribeRequest);
     Dto::SNS::ListTopicsResponse response = _snsService.ListTopics(REGION);
 
-    // assert
-    EXPECT_TRUE(subscribeResponse.subscriptionArn.length() > 0);
-    EXPECT_EQ(0, response.topicList[0].subscriptions.size());
+// assert
+    EXPECT_TRUE(subscribeResponse
+                    .subscriptionArn.
+        length()
+                    > 0);
+    EXPECT_EQ(0, response.topicList[0].subscriptions.
+        size()
+    );
   }
 
-  TEST_F(SNSServiceTest, PublishMessageTest) {
+  TEST_F(SNSServiceTest, PublishMessageTest
+  ) {
 
-    // arrange
+// arrange
     Dto::SNS::CreateTopicRequest topicRequest = {.region=REGION, .topicName=TOPIC, .owner=OWNER};
     Dto::SNS::CreateTopicResponse topicResponse = _snsService.CreateTopic(topicRequest);
     Dto::SNS::PublishRequest request = {.region=REGION, .topicArn=topicResponse.topicArn, .message=BODY};
 
-    // act
+// act
     Dto::SNS::PublishResponse response = _snsService.Publish(request);
 
-    // assert
-    EXPECT_TRUE(response.messageId.length() > 0);
-    EXPECT_TRUE(response.ToXml().length() > 0);
+// assert
+    EXPECT_TRUE(response
+                    .messageId.
+        length()
+                    > 0);
+    EXPECT_TRUE(response
+                    .
+                        ToXml()
+                    .
+                        length()
+                    > 0);
   }
 
-  TEST_F(SNSServiceTest, MessageReceiveTest) {
+  TEST_F(SNSServiceTest, MessageReceiveTest
+  ) {
 
-    // arrange
+// arrange
     Dto::SNS::CreateTopicRequest topicRequest = {.region=REGION, .topicName=TOPIC, .owner=OWNER};
     Dto::SNS::CreateTopicResponse topicResponse = _snsService.CreateTopic(topicRequest);
     Dto::SQS::CreateQueueRequest queueRequest = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
@@ -142,12 +174,15 @@ namespace AwsMock::Service {
     Dto::SNS::PublishRequest request = {.region=REGION, .topicArn=topicResponse.topicArn, .message=BODY};
     Dto::SNS::PublishResponse response = _snsService.Publish(request);
 
-    // act
+// act
     Dto::SQS::ReceiveMessageRequest receiveRequest = {.region=REGION, .queueUrl=QUEUE_URL, .queueName=QUEUE, .maxMessages=10, .waitTimeSeconds=5};
     Dto::SQS::ReceiveMessageResponse receiveResponse = _sqsService.ReceiveMessages(receiveRequest);
 
-    // assert
-    EXPECT_EQ(receiveResponse.messageList.size(), 1);
+// assert
+    EXPECT_EQ(receiveResponse
+                  .messageList.
+        size(),
+              1);
   }
 } // namespace AwsMock::Core
 

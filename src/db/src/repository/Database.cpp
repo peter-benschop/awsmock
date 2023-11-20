@@ -89,7 +89,7 @@ namespace AwsMock::Database {
 
   void Database::CreateIndexes() {
 
-    if(_useDatabase) {
+    if (_useDatabase) {
 
       GetConnection()["sqs_message"].create_index(make_document(kvp("queueUrl", 1), kvp("state", 1), kvp("reset", 1)), make_document(kvp("name", "sqs_queueurl_status_reset_idx1")));
       GetConnection()["sqs_message"].create_index(make_document(kvp("queueUrl", 1), kvp("state", 1), kvp("retries", 1)), make_document(kvp("name", "sqs_queueurl_status_retries_idx2")));

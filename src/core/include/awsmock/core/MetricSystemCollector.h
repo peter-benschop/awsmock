@@ -32,98 +32,98 @@
 
 namespace AwsMock::Core {
 
+  /**
+   * Collect system information like CPU and Memory. Runs as background thread with a given timeout in ms.
+   *
+   * @author jens.vogt@opitz-consulting.com
+  */
+  class MetricSystemCollector {
+
+  public:
+
     /**
-     * Collect system information like CPU and Memory. Runs as background thread with a given timeout in ms.
+     * Constructor.
+     */
+    explicit MetricSystemCollector();
+
+    /**
+     * Destructor.
+     */
+    ~MetricSystemCollector();
+
+    /**
+     * Runnable method
      *
-     * @author jens.vogt@opitz-consulting.com
-    */
-    class MetricSystemCollector {
+     * @param timer Poco timer implementation
+     */
+    void onTimer(Poco::Timer &timer);
 
-    public:
+  private:
+    /**
+     * Initialization
+     */
+    void InitializeSystemCounter();
 
-      /**
-       * Constructor.
-       */
-      explicit MetricSystemCollector();
+    /**
+     * Updates the system counter
+     */
+    void CollectSystemCounter();
 
-      /**
-       * Destructor.
-       */
-      ~MetricSystemCollector();
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
 
-      /**
-       * Runnable method
-       *
-       * @param timer Poco timer implementation
-       */
-      void onTimer(Poco::Timer& timer);
+    /**
+     * Virtual memory gauge
+     */
+    Poco::Prometheus::Gauge *_virtualMemory;
 
-    private:
-      /**
-       * Initialization
-       */
-      void InitializeSystemCounter();
+    /**
+     * Real memory gauge
+     */
+    Poco::Prometheus::Gauge *_realMemory;
 
-      /**
-       * Updates the system counter
-       */
-      void CollectSystemCounter();
+    /**
+     * Total thread gauge
+     */
+    Poco::Prometheus::Gauge *_totalThreads;
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+    /**
+     * Total CPU gauge
+     */
+    Poco::Prometheus::Gauge *_totalCpu;
 
-      /**
-       * Virtual memory gauge
-       */
-      Poco::Prometheus::Gauge* _virtualMemory;
+    /**
+     * User CPU gauge
+     */
+    Poco::Prometheus::Gauge *_userCpu;
 
-      /**
-       * Real memory gauge
-       */
-      Poco::Prometheus::Gauge* _realMemory;
+    /**
+     * System CPU gauge
+     */
+    Poco::Prometheus::Gauge *_systemCpu;
 
-      /**
-       * Total thread gauge
-       */
-      Poco::Prometheus::Gauge *_totalThreads;
+    /**
+     * Number of processors
+     */
+    int numProcessors{};
 
-      /**
-       * Total CPU gauge
-       */
-      Poco::Prometheus::Gauge *_totalCpu;
+    /**
+     * Last CPU
+     */
+    clock_t lastCPU{};
 
-      /**
-       * User CPU gauge
-       */
-      Poco::Prometheus::Gauge *_userCpu;
+    /**
+     * Last system CPU
+     */
+    clock_t lastSysCPU{};
 
-      /**
-       * System CPU gauge
-       */
-      Poco::Prometheus::Gauge *_systemCpu;
-
-      /**
-       * Number of processors
-       */
-      int numProcessors{};
-
-      /**
-       * Last CPU
-       */
-      clock_t lastCPU{};
-
-      /**
-       * Last system CPU
-       */
-      clock_t lastSysCPU{};
-
-      /**
-       * Last user CPU
-       */
-      clock_t lastUserCPU{};
-    };
+    /**
+     * Last user CPU
+     */
+    clock_t lastUserCPU{};
+  };
 } // namespace AwsMock::Core
 
 #endif //AWSMOCK_CORE_METRICSYSTEMCOLLECTOR_H

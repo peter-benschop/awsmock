@@ -14,48 +14,48 @@
 
 namespace AwsMock::Dto::SQS {
 
-    struct ChangeMessageVisibilityRequest {
+  struct ChangeMessageVisibilityRequest {
 
-      /**
-       * AWS region
-       */
-      std::string region;
+    /**
+     * AWS region
+     */
+    std::string region;
 
-      /**
-       * Queue URL
-       */
-      std::string queueUrl;
+    /**
+     * Queue URL
+     */
+    std::string queueUrl;
 
-      /**
-       * Request handle
-       */
-      std::string receiptHandle;
+    /**
+     * Request handle
+     */
+    std::string receiptHandle;
 
-      /**
-       * Visibility timeout
-       */
-      int visibilityTimeout;
+    /**
+     * Visibility timeout
+     */
+    int visibilityTimeout;
 
-      /**
-       * Request ID
-       */
-      std::string requestId = Poco::UUIDGenerator().createRandom().toString();
+    /**
+     * Request ID
+     */
+    std::string requestId = Poco::UUIDGenerator().createRandom().toString();
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const ChangeMessageVisibilityRequest &r);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const ChangeMessageVisibilityRequest &r);
 
-    };
+  };
 
 } // namespace AwsMock::Dto::SQS
 

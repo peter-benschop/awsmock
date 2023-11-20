@@ -21,37 +21,37 @@ namespace AwsMock::Service {
    */
   class S3RequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 
-    public:
+  public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration application configuration
-       * @param metricService  monitoring
-       */
-      S3RequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService) {}
+    /**
+     * Constructor
+     *
+     * @param configuration application configuration
+     * @param metricService  monitoring
+     */
+    S3RequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService) {}
 
-      /**
-       * Creates a new request handler
-       *
-       * @param request HTTP request
-       * @return request HTTP request handler
-       */
-      Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &) override {
-        return new S3Handler(_configuration, _metricService);
-      }
+    /**
+     * Creates a new request handler
+     *
+     * @param request HTTP request
+     * @return request HTTP request handler
+     */
+    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &) override {
+      return new S3Handler(_configuration, _metricService);
+    }
 
-    private:
+  private:
 
-      /**
-       * S3 handler configuration
-       */
-      Core::Configuration &_configuration;
+    /**
+     * S3 handler configuration
+     */
+    Core::Configuration &_configuration;
 
-      /**
-       * Metric module
-       */
-      Core::MetricService &_metricService;
+    /**
+     * Metric module
+     */
+    Core::MetricService &_metricService;
 
   };
 

@@ -60,7 +60,7 @@ namespace AwsMock::Database {
 
   long LambdaDatabase::LambdaCount(const std::string &region) {
 
-    if(HasDatabase()) {
+    if (HasDatabase()) {
 
       bsoncxx::builder::basic::document builder;
       if (!region.empty()) {

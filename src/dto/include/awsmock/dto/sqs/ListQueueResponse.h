@@ -28,35 +28,35 @@
 
 namespace AwsMock::Dto::SQS {
 
-    struct ListQueueResponse {
+  struct ListQueueResponse {
 
-      /**
-       * List of queues
-       */
-      Database::Entity::SQS::QueueList queueList;
+    /**
+     * List of queues
+     */
+    Database::Entity::SQS::QueueList queueList;
 
-      /**
-       * Convert to XML representation
-       *
-       * @return XML string
-       */
-      [[nodiscard]] std::string ToXml() const;
+    /**
+     * Convert to XML representation
+     *
+     * @return XML string
+     */
+    [[nodiscard]] std::string ToXml() const;
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const ListQueueResponse &r);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const ListQueueResponse &r);
 
-    };
+  };
 
 } // namespace AwsMock::Dto::SQS
 

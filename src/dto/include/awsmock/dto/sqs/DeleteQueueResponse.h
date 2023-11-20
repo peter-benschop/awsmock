@@ -31,50 +31,50 @@ namespace AwsMock::Dto::SQS {
 
   class DeleteQueueResponse {
 
-    public:
+  public:
 
-      /**
-       * Queue entity
-       */
-      Database::Entity::SQS::Queue _queue;
+    /**
+     * Queue entity
+     */
+    Database::Entity::SQS::Queue _queue;
 
-      /**
-       * Constructor
-       */
-      explicit DeleteQueueResponse() = default;
+    /**
+     * Constructor
+     */
+    explicit DeleteQueueResponse() = default;
 
-      /**
-       * Constructor
-       *
-       * @param queue queue entity.
-       */
-      explicit DeleteQueueResponse(Database::Entity::SQS::Queue queue);
+    /**
+     * Constructor
+     *
+     * @param queue queue entity.
+     */
+    explicit DeleteQueueResponse(Database::Entity::SQS::Queue queue);
 
-      /**
-       * Convert to XML representation
-       *
-       * @return XML string
-       */
-      std::string ToXml();
+    /**
+     * Convert to XML representation
+     *
+     * @return XML string
+     */
+    std::string ToXml();
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const DeleteQueueResponse &r);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const DeleteQueueResponse &r);
 
-      /**
-       * Static logger
-       */
-      static Core::LogStream _logger;
+    /**
+     * Static logger
+     */
+    static Core::LogStream _logger;
   };
 
 } // namespace AwsMock::Dto::SQS

@@ -16,46 +16,46 @@
 
 namespace AwsMock::Service {
 
+  /**
+   * S3 request handler factory
+   */
+  class GatewayRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
+
+  public:
+
     /**
-     * S3 request handler factory
+     * Constructor
+     *
+     * @param configuration application configuration
+     * @param metricService  monitoring
      */
-    class GatewayRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
+    GatewayRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService) {}
 
-    public:
+    /**
+     * Creates a new request handler
+     *
+     * @param request HTTP request
+     * @param host module host
+     * @param port module port
+     * @return request HTTP request handler
+     */
+    virtual Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request, const std::string &host, int port) {
+      return new GatewayHandler(_configuration, _metricService, host, port);
+    }
 
-      /**
-       * Constructor
-       *
-       * @param configuration application configuration
-       * @param metricService  monitoring
-       */
-      GatewayRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService) {}
+  private:
 
-      /**
-       * Creates a new request handler
-       *
-       * @param request HTTP request
-       * @param host module host
-       * @param port module port
-       * @return request HTTP request handler
-       */
-      virtual Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request, const std::string &host, int port) {
-          return new GatewayHandler(_configuration, _metricService, host, port);
-      }
+    /**
+     * S3 handler configuration
+     */
+    Core::Configuration &_configuration;
 
-    private:
+    /**
+     * Metric module
+     */
+    Core::MetricService &_metricService;
 
-      /**
-       * S3 handler configuration
-       */
-      Core::Configuration &_configuration;
-
-      /**
-       * Metric module
-       */
-      Core::MetricService &_metricService;
-
-    };
+  };
 
 } // namespace AwsMock::Service
 

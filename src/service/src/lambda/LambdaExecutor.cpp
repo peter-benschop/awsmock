@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
 
   LambdaExecutor::LambdaExecutor(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &invokeQueue)
-    : _logger(Poco::Logger::get("LambdaExecutor")), _configuration(configuration), _metricService(metricService), _invokeQueue(invokeQueue) {
+      : _logger(Poco::Logger::get("LambdaExecutor")), _configuration(configuration), _metricService(metricService), _invokeQueue(invokeQueue) {
   }
 
   void LambdaExecutor::run() {

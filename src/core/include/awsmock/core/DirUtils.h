@@ -26,7 +26,7 @@ namespace AwsMock::Core {
   struct SubstringCompare {
     char _delimiter;
 
-    SubstringCompare(char delimiter): _delimiter(delimiter) {}
+    SubstringCompare(char delimiter) : _delimiter(delimiter) {}
 
     bool operator()(std::string const &a, std::string const &b) const {
 

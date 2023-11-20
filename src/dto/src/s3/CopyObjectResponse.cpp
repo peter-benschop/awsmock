@@ -9,20 +9,20 @@ namespace AwsMock::Dto::S3 {
   std::string CopyObjectResponse::ToXml() const {
 
     // Root
-    Poco::XML::AutoPtr <Poco::XML::Document> pDoc = new Poco::XML::Document;
-    Poco::XML::AutoPtr <Poco::XML::Element> pRoot = pDoc->createElement("CopyObjectResult");
+    Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
+    Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("CopyObjectResult");
     pDoc->appendChild(pRoot);
 
     // ETag
-    Poco::XML::AutoPtr <Poco::XML::Element> pETag = pDoc->createElement("ETag");
+    Poco::XML::AutoPtr<Poco::XML::Element> pETag = pDoc->createElement("ETag");
     pRoot->appendChild(pETag);
-    Poco::XML::AutoPtr <Poco::XML::Text> pETagText = pDoc->createTextNode(eTag);
+    Poco::XML::AutoPtr<Poco::XML::Text> pETagText = pDoc->createTextNode(eTag);
     pETag->appendChild(pETagText);
 
     // LastModified
-    Poco::XML::AutoPtr <Poco::XML::Element> pLastModified = pDoc->createElement("LastModified");
+    Poco::XML::AutoPtr<Poco::XML::Element> pLastModified = pDoc->createElement("LastModified");
     pRoot->appendChild(pLastModified);
-    Poco::XML::AutoPtr <Poco::XML::Text> pLastModifiedTest = pDoc->createTextNode(lastModified);
+    Poco::XML::AutoPtr<Poco::XML::Text> pLastModifiedTest = pDoc->createTextNode(lastModified);
     pLastModified->appendChild(pLastModifiedTest);
 
     std::stringstream output;

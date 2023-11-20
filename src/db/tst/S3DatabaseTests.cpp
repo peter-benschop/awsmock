@@ -33,20 +33,20 @@ namespace AwsMock::Database {
 
   class S3DatabaseTest : public ::testing::Test {
 
-    protected:
+  protected:
 
-      void SetUp() override {
-        _region = _configuration.getString("awsmock.region");
-      }
+    void SetUp() override {
+      _region = _configuration.getString("awsmock.region");
+    }
 
-      void TearDown() override {
-        _servicedatabase.DeleteAllBuckets();
-        _servicedatabase.DeleteAllObjects();
-      }
+    void TearDown() override {
+      _servicedatabase.DeleteAllBuckets();
+      _servicedatabase.DeleteAllObjects();
+    }
 
-      std::string _region;
-      Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
-      S3Database _servicedatabase = S3Database(_configuration);
+    std::string _region;
+    Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+    S3Database _servicedatabase = S3Database(_configuration);
   };
 
   TEST_F(S3DatabaseTest, BucketCreateTest) {

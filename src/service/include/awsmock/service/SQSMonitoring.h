@@ -41,75 +41,75 @@ namespace AwsMock::Service {
 
   class SQSMonitoring : public Poco::Runnable {
 
-    public:
+  public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration aws-mock configuration
-       * @param metricService aws-mock monitoring
-       * @param condition stop condition
-       */
-      explicit SQSMonitoring(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
+    /**
+     * Constructor
+     *
+     * @param configuration aws-mock configuration
+     * @param metricService aws-mock monitoring
+     * @param condition stop condition
+     */
+    explicit SQSMonitoring(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
 
-      /**
-       * Main method
-       */
-      void run() override;
+    /**
+     * Main method
+     */
+    void run() override;
 
-      /**
-       * Return running flag
-       *
-       * @return true if thread is running
-       */
-      bool GetRunning() { return _running; }
+    /**
+     * Return running flag
+     *
+     * @return true if thread is running
+     */
+    bool GetRunning() { return _running; }
 
-    private:
+  private:
 
-      /**
-       * Update metric counters
-       */
-      void UpdateCounters();
+    /**
+     * Update metric counters
+     */
+    void UpdateCounters();
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
 
-      /**
-       * Configuration
-       */
-      Core::Configuration &_configuration;
+    /**
+     * Configuration
+     */
+    Core::Configuration &_configuration;
 
-      /**
-       * Metric module
-       */
-      Core::MetricService &_metricService;
+    /**
+     * Metric module
+     */
+    Core::MetricService &_metricService;
 
-      /**
-       * S3 database
-       */
-      std::unique_ptr<Database::SQSDatabase> _sqsDatabase;
+    /**
+     * S3 database
+     */
+    std::unique_ptr<Database::SQSDatabase> _sqsDatabase;
 
-      /**
-       * S3 monitoring period in seconds
-       */
-      int _period;
+    /**
+     * S3 monitoring period in seconds
+     */
+    int _period;
 
-      /**
-       * Running flag
-       */
-      bool _running;
+    /**
+     * Running flag
+     */
+    bool _running;
 
-      /**
-       * Shutdown condition
-       */
-      Poco::Condition &_condition;
+    /**
+     * Shutdown condition
+     */
+    Poco::Condition &_condition;
 
-      /**
-       * Shutdown mutex
-       */
-      Poco::Mutex _mutex;
+    /**
+     * Shutdown mutex
+     */
+    Poco::Mutex _mutex;
   };
 
 } // namespace AwsMock::Service

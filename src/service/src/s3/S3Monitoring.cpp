@@ -46,7 +46,7 @@ namespace AwsMock::Service {
     }
   }
 
-  void S3Monitoring::Stop() {_condition.signal();}
+  void S3Monitoring::Stop() { _condition.signal(); }
 
   void S3Monitoring::UpdateCounters() {
     long buckets = _s3Database->BucketCount();

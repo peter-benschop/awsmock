@@ -20,63 +20,63 @@
 
 namespace AwsMock::Dto::S3 {
 
-    struct GetMetadataResponse {
+  struct GetMetadataResponse {
 
-      /**
-       * Bucket
-       */
-      std::string bucket;
+    /**
+     * Bucket
+     */
+    std::string bucket;
 
-      /**
-       * Key
-       */
-      std::string key;
+    /**
+     * Key
+     */
+    std::string key;
 
-      /**
-       * MD5 sum
-       */
-      std::string md5Sum;
+    /**
+     * MD5 sum
+     */
+    std::string md5Sum;
 
-      /**
-       * Content type
-       */
-      std::string contentType;
+    /**
+     * Content type
+     */
+    std::string contentType;
 
-      /**
-       * Size
-       */
-      long size;
+    /**
+     * Size
+     */
+    long size;
 
-      /**
-       * Metadata
-       */
-      std::map<std::string, std::string> metadata;
+    /**
+     * Metadata
+     */
+    std::map<std::string, std::string> metadata;
 
-      /**
-       * Created
-       */
-      Poco::DateTime created;
+    /**
+     * Created
+     */
+    Poco::DateTime created;
 
-      /**
-       * Last modified
-       */
-      Poco::DateTime modified;
+    /**
+     * Last modified
+     */
+    Poco::DateTime modified;
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const GetMetadataResponse &r);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const GetMetadataResponse &r);
 
-    };
+  };
 
 } // namespace AwsMock::Dto::S3
 

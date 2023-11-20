@@ -69,7 +69,7 @@ namespace AwsMock::Database {
     /**
      * Check whether we are running without database
      */
-     bool HasDatabase() const;
+    bool HasDatabase() const;
 
     /**
      * Start the database

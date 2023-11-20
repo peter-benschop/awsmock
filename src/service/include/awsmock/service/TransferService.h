@@ -40,91 +40,91 @@ namespace AwsMock::Service {
 
   class TransferService {
 
-    public:
+  public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration module configuration
-       */
-      explicit TransferService(Core::Configuration &configuration);
+    /**
+     * Constructor
+     *
+     * @param configuration module configuration
+     */
+    explicit TransferService(Core::Configuration &configuration);
 
-      /**
-       * Create transfer manager request
-       *
-       * @param request create transfer request
-       * @return CreateTransferResponse
-       */
-      Dto::Transfer::CreateTransferResponse CreateTransferServer(Dto::Transfer::CreateTransferRequest &request);
+    /**
+     * Create transfer manager request
+     *
+     * @param request create transfer request
+     * @return CreateTransferResponse
+     */
+    Dto::Transfer::CreateTransferResponse CreateTransferServer(Dto::Transfer::CreateTransferRequest &request);
 
-      /**
-       * Create a user for the transfer manager.
-       *
-       * @param request create user request
-       * @return CreateUserResponse
-       */
-      Dto::Transfer::CreateUserResponse CreateUser(Dto::Transfer::CreateUserRequest &request);
+    /**
+     * Create a user for the transfer manager.
+     *
+     * @param request create user request
+     * @return CreateUserResponse
+     */
+    Dto::Transfer::CreateUserResponse CreateUser(Dto::Transfer::CreateUserRequest &request);
 
-      /**
-       * Returns a list of available servers
-       *
-       * @param request list manager request
-       * @return ListServerResponse
-       */
-      Dto::Transfer::ListServerResponse ListServers(const Dto::Transfer::ListServerRequest &request);
+    /**
+     * Returns a list of available servers
+     *
+     * @param request list manager request
+     * @return ListServerResponse
+     */
+    Dto::Transfer::ListServerResponse ListServers(const Dto::Transfer::ListServerRequest &request);
 
-      /**
-       * Starts an manager.
-       *
-       * @param request StartServer manager request
-       */
-      void StartServer(const Dto::Transfer::StartServerRequest &request);
+    /**
+     * Starts an manager.
+     *
+     * @param request StartServer manager request
+     */
+    void StartServer(const Dto::Transfer::StartServerRequest &request);
 
-      /**
-       * Stops an manager.
-       *
-       * @param request stop manager request
-       */
-      void StopServer(const Dto::Transfer::StopServerRequest &request);
+    /**
+     * Stops an manager.
+     *
+     * @param request stop manager request
+     */
+    void StopServer(const Dto::Transfer::StopServerRequest &request);
 
-      /**
-       * Deleted an manager.
-       *
-       * @param request delete manager request
-       */
-      void DeleteServer(const Dto::Transfer::DeleteServerRequest &request);
+    /**
+     * Deleted an manager.
+     *
+     * @param request delete manager request
+     */
+    void DeleteServer(const Dto::Transfer::DeleteServerRequest &request);
 
-    private:
+  private:
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
 
-      /**
-       * AWS region
-       */
-      std::string _region;
+    /**
+     * AWS region
+     */
+    std::string _region;
 
-      /**
-       * AWS account ID
-       */
-      std::string _accountId;
+    /**
+     * AWS account ID
+     */
+    std::string _accountId;
 
-      /**
-       * Configuration
-       */
-      Core::Configuration &_configuration;
+    /**
+     * Configuration
+     */
+    Core::Configuration &_configuration;
 
-      /**
-       * Transfer database connection
-       */
-      std::unique_ptr<Database::TransferDatabase> _transferDatabase;
+    /**
+     * Transfer database connection
+     */
+    std::unique_ptr<Database::TransferDatabase> _transferDatabase;
 
-      /**
-       * FTP port
-       */
-      int _ftpPort;
+    /**
+     * FTP port
+     */
+    int _ftpPort;
   };
 
 } //namespace AwsMock::Service

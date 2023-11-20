@@ -16,48 +16,48 @@
 
 namespace AwsMock::Dto::SQS {
 
-    struct SetQueueAttributesRequest {
+  struct SetQueueAttributesRequest {
 
-      /**
-       * AWS region
-       */
-      std::string region;
+    /**
+     * AWS region
+     */
+    std::string region;
 
-      /**
-       * Queue URL
-       */
-      std::string queueUrl;
+    /**
+     * Queue URL
+     */
+    std::string queueUrl;
 
-      /**
-       * Attributes
-       */
-      std::map<std::string,std::string> attributes;
+    /**
+     * Attributes
+     */
+    std::map<std::string, std::string> attributes;
 
-      /**
-       * Resource
-       */
-      std::string resource = "SQS";
+    /**
+     * Resource
+     */
+    std::string resource = "SQS";
 
-      /**
-       * Resource
-       */
-      std::string requestId = Poco::UUIDGenerator().createRandom().toString();
+    /**
+     * Resource
+     */
+    std::string requestId = Poco::UUIDGenerator().createRandom().toString();
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const SetQueueAttributesRequest &r);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const SetQueueAttributesRequest &r);
 
-    };
+  };
 
 } // namespace AwsMock::Dto::SQS
 
