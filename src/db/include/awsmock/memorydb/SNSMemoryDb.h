@@ -119,6 +119,19 @@ namespace AwsMock::Database {
     long CountTopics(const std::string &region = {});
 
     /**
+     * Deletes a topic.
+     *
+     * @param topic topic entity
+     * @throws DatabaseException
+     */
+    void DeleteTopic(const Entity::SNS::Topic &topic);
+
+    /**
+     * Deletes all topics
+     */
+    void DeleteAllTopics();
+
+    /**
      * Count the number of message by state
      *
      * @param region AWS region

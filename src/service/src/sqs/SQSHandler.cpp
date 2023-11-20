@@ -79,10 +79,8 @@ namespace AwsMock::Service {
       } else if (action == "SendMessage") {
 
         std::string queueUrl = GetQueueUrl(request, payload);
-
         std::string queueArn = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueArn");
         std::string body = Core::HttpUtils::GetQueryParameterValueByName(payload, "MessageBody");
-
         std::vector<Dto::SQS::MessageAttribute> attributes = GetMessageAttributes(payload);
 
         Dto::SQS::SendMessageRequest sqsRequest = {
