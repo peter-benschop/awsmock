@@ -14,36 +14,14 @@
 #include <awsmock/dto/sqs/CreateQueueResponse.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/SQSServer.h>
-#include <awsmock/service/SQSService.h>
 
 // Test includes
 #include <awsmock/core/TestUtils.h>
 
 #define REGION "eu-central-1"
 #define OWNER "test-owner"
-// =============================================== Body ===============================================================
-// Action=CreateQueue&Version=2012-11-05&QueueName=test-queue&Attribute.1.Name=VisibilityTimeout&Attribute.1.Value=99
-// ====================================================================================================================
-// ============================================== Headers =============================================================
-// Host: 192.168.178.34:4566
-// amz-sdk-invocation-id: f3f02263-3145-09b3-7421-915c0582fe4a
-// amz-sdk-request: attempt=1; max=3
-// Authorization: AWS4-HMAC-SHA256 Credential=ASIATJV5PDKHUCV346GW/20231117/eu-central-1/sqs/aws4_request, SignedHeaders=amz-sdk-invocation-id;amz-sdk-request;content-length;content-type;host;x-amz-date;x-amz-security-token, Signature=940ebc3db38c6706d5655dd73c1f5af71d63441a662430113bc6a8fcb0442f7c
-// Content-Type: application/x-www-form-urlencoded; charset=utf-8
-// User-Agent: aws-sdk-java/2.20.63 Linux/6.1.0-13-amd64 OpenJDK_64-Bit_Server_VM/17.0.9+9-Debian-1deb12u1 Java/17.0.9 vendor/Debian io/sync http/Apache cfg/retry-mode/standard
-// X-Amz-Date: 20231117T174451Z
-// X-Amz-Security-Token: FwoGZXIvYXdzEOb//////////wEaDBrHO9QRxjhhmtT9GiL3AZn4fzXmTL66XeZzOFPhM3CXiZj9pmqPpXepFkJvz7rRzkmSU5wB1+oxedTfVojjUIKlXK8wiWcIOd1yTeW4bFR0gMoRT/UDAvoIPc8VYfPwVhuAjTLdflfRc4aviLPPtUnPGue86yAdvYIZJna9FBB4Ltb/eTGsxCYsd7LH2qaobGJHq0UfQ+haSLSHLaWJeUY6f0xMHA3ZVgStrh9dNi0DXmSSu1bVwtmor+Io//GKb06/RjcejLbjHp2ZMrHChiSQPAyPjoRPGO71df5SKGgQtzAtAxf/9OsiFkD8U0+gPegL7iwDDb0HycXwBEs4kLeN9ApUITcosr+/qgYyMqFaJTF649WUQwy398cjXdC3wKR6YGkobD9ffasNMsqBC8JLiLrn8yIDAf/BAlyzJO7o
-// Content-Length: 114
-// Connection: Close
-// Region: eu-central-1
-// User: ASIATJV5PDKHUCV346GW
-// RequestId: 08155120-3145-40f2-8100-34e7e8f33004
-#define CREATE_QUEUE_REQUEST "Action=CreateQueue" \
-                                "&QueueName=TestQueue" \
-                                "&Attribute.1.Name=VisibilityTimeout" \
-                                "&Attribute.1.Value=40" \
-                                "&Tag.Key=QueueType" \
-                                "&Tag.Value=Production"
+#define VERSION std::string("2012-11-05")
+#define CREATE_QUEUE_REQUEST "Action=CreateQueue&QueueName=TestQueue&Attribute.1.Name=VisibilityTimeout&Attribute.1.Value=40&Tag.Key=QueueType&Tag.Value=Production"
 #define LIST_QUEUE_REQUEST "Action=ListQueues"
 #define GET_QUEUE_URL_REQUEST "Action=GetQueueUrl&QueueName=TestQueue"
 #define SEND_MESSAGE_REQUEST "Action=SendMessage&QueueUrl=TestQueue&MessageBody=%7B%22testattribute%22%3A%22testvalue%22%7D"
@@ -95,9 +73,10 @@ namespace AwsMock::Service {
   TEST_F(SQSServerJavaTest, QueueCreateTest) {
 
     // arrange
+    std::string body = "Action=CreateQueue&Version=" + VERSION + "&QueueName=TestQueue&Attribute.1.Name=VisibilityTimeout&Attribute.1.Value=40&Tag.Key=QueueType&Tag.Value=Production";
 
     // act
-    Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
+    Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, body);
     Database::Entity::SQS::QueueList queueList = _database.ListQueues();
 
     // assert
@@ -108,7 +87,8 @@ namespace AwsMock::Service {
   TEST_F(SQSServerJavaTest, QueueListTest) {
 
     // arrange
-    Core::CurlResponse createResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
+    std::string body = "Action=CreateQueue&Version=" + VERSION + "&QueueName=TestQueue&Attribute.1.Name=VisibilityTimeout&Attribute.1.Value=40&Tag.Key=QueueType&Tag.Value=Production";
+    Core::CurlResponse createResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, body);
     EXPECT_TRUE(createResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
 
     // act
@@ -123,50 +103,59 @@ namespace AwsMock::Service {
   TEST_F(SQSServerJavaTest, QueueDeleteTest) {
 
     // arrange
-    Core::CurlResponse curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
+    std::string body = "Action=CreateQueue&Version=" + VERSION + "&QueueName=TestQueue&Attribute.1.Name=VisibilityTimeout&Attribute.1.Value=40&Tag.Key=QueueType&Tag.Value=Production";
+    Core::CurlResponse curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, body);
+    EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
     Dto::SQS::CreateQueueResponse createResponse;
     createResponse.FromXml(curlResponse.output);
 
     // act
     std::string deleteQueueRequest = "Action=DeleteQueue&QueueUrl=" + createResponse.queueUrl;
-    Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", _endpoint, _extraHeaders, deleteQueueRequest);
+    curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint, _extraHeaders, deleteQueueRequest);
+    EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
     Database::Entity::SQS::QueueList queueList = _database.ListQueues();
 
     // assert
-    EXPECT_TRUE(response.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
     EXPECT_EQ(0, queueList.size());
   }
 
   TEST_F(SQSServerJavaTest, QueueGetUrlTest) {
 
     // arrange
-    Core::CurlResponse curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
+    std::string body = "Action=CreateQueue&Version=" + VERSION + "&QueueName=TestQueue&Attribute.1.Name=VisibilityTimeout&Attribute.1.Value=40&Tag.Key=QueueType&Tag.Value=Production";
+    Core::CurlResponse curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, body);
+    EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
     Dto::SQS::CreateQueueResponse createResponse;
     createResponse.FromXml(curlResponse.output);
 
     // act
     curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, GET_QUEUE_URL_REQUEST);
+    EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
     Dto::SQS::GetQueueUrlResponse getQueueUrlResponse;
     getQueueUrlResponse.FromXml(curlResponse.output);
 
     // assert
-    EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
     EXPECT_TRUE(Core::StringUtils::Contains(getQueueUrlResponse.queueUrl, "TestQueue"));
   }
 
   TEST_F(SQSServerJavaTest, MessageSendTest) {
 
     // arrange
-    Core::CurlResponse curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
+    std::string body = "Action=CreateQueue&Version=" + VERSION + "&QueueName=TestQueue&Attribute.1.Name=VisibilityTimeout&Attribute.1.Value=40&Tag.Key=QueueType&Tag.Value=Production";
+    Core::CurlResponse curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, body);
+    EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
     Dto::SQS::CreateQueueResponse createResponse;
     createResponse.FromXml(curlResponse.output);
+
     curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, GET_QUEUE_URL_REQUEST);
+    EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
     Dto::SQS::GetQueueUrlResponse getQueueUrlResponse;
     getQueueUrlResponse.FromXml(curlResponse.output);
     std::string queueUrl = getQueueUrlResponse.queueUrl;
 
     // act
     curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, SEND_MESSAGE_REQUEST);
+    EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
     Dto::SQS::SendMessageResponse sendMessageResponse;
     sendMessageResponse.FromXml(curlResponse.output);
     long messageCount = _database.CountMessages(REGION, queueUrl);
@@ -174,6 +163,35 @@ namespace AwsMock::Service {
     // assert
     EXPECT_FALSE(sendMessageResponse.messageId.empty());
     EXPECT_EQ(1, messageCount);
+  }
+
+  TEST_F(SQSServerJavaTest, QueuePurgeTest) {
+
+    // arrange
+    std::string body = "Action=CreateQueue&Version=" + VERSION + "&QueueName=TestQueue&Attribute.1.Name=VisibilityTimeout&Attribute.1.Value=40&Tag.Key=QueueType&Tag.Value=Production";
+    Core::CurlResponse curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, body);
+    EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
+    Dto::SQS::CreateQueueResponse createResponse;
+    createResponse.FromXml(curlResponse.output);
+
+    curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, GET_QUEUE_URL_REQUEST);
+    EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
+    Dto::SQS::GetQueueUrlResponse getQueueUrlResponse;
+    getQueueUrlResponse.FromXml(curlResponse.output);
+    std::string queueUrl = getQueueUrlResponse.queueUrl;
+
+    curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, SEND_MESSAGE_REQUEST);
+    EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
+    Dto::SQS::SendMessageResponse sendMessageResponse;
+    sendMessageResponse.FromXml(curlResponse.output);
+
+    // act
+    body = "Action=PurgeQueue&QueueUrl=" + queueUrl;
+    _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, body);
+    long messageCount = _database.CountMessages(REGION, queueUrl);
+
+    // assert
+    EXPECT_EQ(0, messageCount);
   }
 
 } // namespace AwsMock::Core
