@@ -181,9 +181,9 @@ namespace AwsMock::Database {
      *
      * @param region AWS region
      * @param topicArn ARN of the topic
-     * @param status message state
+     * @param status message status
      */
-    long CountMessagesByStatus(const std::string &region, const std::string &topicArn, int status);
+    long CountMessagesByStatus(const std::string &region, const std::string &topicArn, Entity::SNS::MessageStatus status);
 
     /**
      * Deletes a message.

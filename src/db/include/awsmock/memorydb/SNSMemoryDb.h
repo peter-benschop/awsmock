@@ -76,6 +76,41 @@ namespace AwsMock::Database {
     Entity::SNS::Topic GetTopicById(const std::string &oid);
 
     /**
+     * Returns a topic by is ARN
+     *
+     * @param topicArn topic ARN
+     * @return topic entity
+     * @throws DatabaseException
+     */
+    Entity::SNS::Topic GetTopicByArn(const std::string &topicArn);
+
+    /**
+     * Return a list of topics with the given subscription ARN
+     *
+     * @param subscriptionArn subscription ARN
+     * @return topic with given topic ARN
+     */
+    Entity::SNS::TopicList GetTopicsBySubscriptionArn(const std::string &subscriptionArn);
+
+    /**
+     * Updates an existing topic in the SNS topic table
+     *
+     * @param topic topic entity
+     * @return updated SNS topic entity
+     * @throws DatabaseException
+     */
+    Entity::SNS::Topic UpdateTopic(const Entity::SNS::Topic &topic);
+
+    /**
+     * List all available topics
+     *
+     * @param region AWS region
+     * @return list of SNS topics
+     * @throws DatabaseException
+     */
+    Entity::SNS::TopicList ListTopics(const std::string &region = {});
+
+    /**
      * Counts the number of topics
      *
      * @param region AWS region
@@ -90,6 +125,40 @@ namespace AwsMock::Database {
      * @param topicArn ARN of the topic
      */
     long CountMessages(const std::string &region = {}, const std::string &topicArn = {});
+
+    /**
+     * Count the number of message by state
+     *
+     * @param region AWS region
+     * @param topicArn ARN of the topic
+     * @param status message status
+     */
+    long CountMessagesByStatus(const std::string &region, const std::string &topicArn, Entity::SNS::MessageStatus status);
+
+    /**
+     * Deletes a message.
+     *
+     * @param message message to delete
+     * @throws Core::DatabaseException
+     */
+    void DeleteMessage(const Entity::SNS::Message &message);
+
+    /**
+     * Bulk delete of messages.
+     *
+     * @param region AWS region
+     * @param topicArn topic ARN
+     * @param receipts vector of receipts
+     * @throws Core::DatabaseException
+     */
+    void DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &receipts);
+
+    /**
+     * Deletes a messages.
+     *
+     * @throws Core::DatabaseException
+     */
+    void DeleteAllMessages();
 
   private:
 
