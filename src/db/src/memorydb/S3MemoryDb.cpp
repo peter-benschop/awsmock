@@ -134,6 +134,62 @@ namespace AwsMock::Database {
     _buckets.clear();
   }
 
+  bool S3MemoryDb::ObjectExists(const Entity::S3::Object &object) {
+
+    std::string region = object.region;
+    std::string bucket = object.bucket;
+    std::string key = object.key;
+    return find_if(_objects.begin(), _objects.end(), [region, bucket, key](const std::pair<std::string, Entity::S3::Object> &object) {
+      return object.second.region == region && object.second.bucket == bucket && object.second.key == key;
+    }) != _objects.end();
+  }
+
+  Entity::S3::Object S3MemoryDb::CreateObject(const Entity::S3::Object &object) {
+
+    std::string oid = Poco::UUIDGenerator().createRandom().toString();
+    _objects[oid] = object;
+    log_trace_stream(_logger) << "Object created, oid: " << oid << std::endl;
+    return GetObjectById(oid);
+
+  }
+
+  Entity::S3::Object S3MemoryDb::UpdateObject(const Entity::S3::Object &object) {
+
+    std::string bucket = object.bucket;
+    std::string key = object.key;
+    auto it = find_if(_objects.begin(), _objects.end(), [bucket, key](const std::pair<std::string, Entity::S3::Object> &object) {
+      return object.second.bucket == bucket && object.second.key == key;
+    });
+    _objects[it->first] = object;
+    return _objects[it->first];
+  }
+
+  Entity::S3::Object S3MemoryDb::GetObjectById(const std::string &oid) {
+
+    auto it = find_if(_objects.begin(), _objects.end(), [oid](const std::pair<std::string, Entity::S3::Object> &object) {
+      return object.first == oid;
+    });
+
+    if (it != _objects.end()) {
+      it->second.oid = oid;
+      return it->second;
+    }
+    return {};
+  }
+
+  Entity::S3::Object S3MemoryDb::GetObject(const std::string &region, const std::string &bucket, const std::string &key) {
+
+    auto it = find_if(_objects.begin(), _objects.end(), [region, bucket, key](const std::pair<std::string, Entity::S3::Object> &object) {
+      return object.second.region == region && object.second.bucket == bucket && object.second.key == key;
+    });
+
+    if (it != _objects.end()) {
+      it->second.oid = it->first;
+      return it->second;
+    }
+    return {};
+  }
+
   long S3MemoryDb::ObjectCount(const std::string &region, const std::string &bucket) {
 
     long count = 0;

@@ -148,6 +148,53 @@ namespace AwsMock::Database {
     void DeleteAllBuckets();
 
     /**
+     * Check the existence of an object
+     *
+     * @param object object entity
+     * @return true if existing otherwise false
+     * @throws DatabaseException
+     */
+    bool ObjectExists(const Entity::S3::Object &object);
+
+    /**
+     * Create a new S3 object in the S3 object table
+     *
+     * @param object object entity
+     * @return created object entity
+     * @throws DatabaseException
+     */
+    Entity::S3::Object CreateObject(const Entity::S3::Object &object);
+
+    /**
+     * Updates an existing object in the S3 object table
+     *
+     * @param object object entity
+     * @return updated object entity
+     * @throws DatabaseException
+     */
+    Entity::S3::Object UpdateObject(const Entity::S3::Object &object);
+
+    /**
+     * Gets an object from an bucket
+     *
+     * @param oid object ID
+     * @return S3 object
+     * @throws DatabaseException
+     */
+    Entity::S3::Object GetObjectById(const std::string &oid);
+
+    /**
+     * Gets an object from an bucket
+     *
+     * @param region AWS S3 region name
+     * @param bucket object bucket
+     * @param key object key
+     * @return S3 object
+     * @throws DatabaseException
+     */
+    Entity::S3::Object GetObject(const std::string &region, const std::string &bucket, const std::string &key);
+
+    /**
      * Counts the number of keys in a bucket
      *
      * @param region AWS region
