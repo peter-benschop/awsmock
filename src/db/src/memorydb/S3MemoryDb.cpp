@@ -117,6 +117,23 @@ namespace AwsMock::Database {
     return _buckets[it->first];
   }
 
+  void S3MemoryDb::DeleteBucket(const Entity::S3::Bucket &bucket) {
+
+    std::string region = bucket.region;
+    std::string name = bucket.name;
+    const auto count = std::erase_if(_buckets, [region, name](const auto &item) {
+      auto const &[key, value] = item;
+      return value.region == region && value.name == name;
+    });
+    log_debug_stream(_logger) << "Bucket deleted, count: " << count << std::endl;
+  }
+
+  void S3MemoryDb::DeleteAllBuckets() {
+
+    log_debug_stream(_logger) << "All buckets deleted, count: " << _buckets.size() << std::endl;
+    _buckets.clear();
+  }
+
   long S3MemoryDb::ObjectCount(const std::string &region, const std::string &bucket) {
 
     long count = 0;
@@ -149,5 +166,32 @@ namespace AwsMock::Database {
 
     log_trace_stream(_logger) << "Got object list, size: " << objectList.size() << std::endl;
     return objectList;
+  }
+
+  void S3MemoryDb::DeleteObject(const Entity::S3::Object &object) {
+
+    std::string bucket = object.bucket;
+    std::string key = object.key;
+    const auto count = std::erase_if(_objects, [bucket, key](const auto &item) {
+      auto const &[k, v] = item;
+      return v.bucket == bucket && v.key == key;
+    });
+    log_debug_stream(_logger) << "Object deleted, count: " << count << std::endl;
+  }
+
+  void S3MemoryDb::DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys) {
+
+    auto count = 0;
+    for (const auto &key : keys) {
+      count += std::erase_if(_objects, [bucket, key](const auto &item) {
+        auto const &[k, v] = item;
+        return v.bucket == bucket && v.key == key;
+      });
+    }
+    log_debug_stream(_logger) << "Objects deleted, count: " << count << std::endl;
+  }
+
+  void S3MemoryDb::DeleteAllObjects() {
+    _objects.clear();
   }
 }

@@ -246,15 +246,32 @@ namespace AwsMock::Database {
 
   void S3Database::DeleteBucket(const Entity::S3::Bucket &bucket) {
 
-    auto delete_many_result =
-        _bucketCollection.delete_one(make_document(kvp("name", bucket.name)));
-    log_debug_stream(_logger) << "Bucket deleted, count: " << delete_many_result->deleted_count() << std::endl;
+    if (HasDatabase()) {
+
+      auto delete_many_result =
+          _bucketCollection.delete_one(make_document(kvp("name", bucket.name)));
+      log_debug_stream(_logger) << "Bucket deleted, count: " << delete_many_result->deleted_count() << std::endl;
+
+    } else {
+
+      _memoryDb.DeleteBucket(bucket);
+
+    }
   }
 
   void S3Database::DeleteAllBuckets() {
-    auto delete_many_result =
-        _bucketCollection.delete_many({});
-    log_debug_stream(_logger) << "All buckets deleted, count: " << delete_many_result->deleted_count() << std::endl;
+
+    if (HasDatabase()) {
+
+      auto delete_many_result =
+          _bucketCollection.delete_many({});
+      log_debug_stream(_logger) << "All buckets deleted, count: " << delete_many_result->deleted_count() << std::endl;
+
+    } else {
+
+      _memoryDb.DeleteAllBuckets();
+
+    }
   }
 
   bool S3Database::ObjectExists(const Entity::S3::Object &object) {
@@ -414,28 +431,53 @@ namespace AwsMock::Database {
 
   void S3Database::DeleteObject(const Entity::S3::Object &object) {
 
-    try {
-      auto result = _objectCollection.delete_many(make_document(kvp("region", object.region), kvp("bucket", object.bucket), kvp("key", object.key)));
-      log_debug_stream(_logger) << "Objects deleted, count: " << result->deleted_count() << std::endl;
+    if (HasDatabase()) {
 
-    } catch (mongocxx::exception::system_error &e) {
-      log_error_stream(_logger) << "Delete object failed, error: " << e.what() << std::endl;
+      try {
+        auto result = _objectCollection.delete_many(make_document(kvp("region", object.region), kvp("bucket", object.bucket), kvp("key", object.key)));
+        log_debug_stream(_logger) << "Objects deleted, count: " << result->deleted_count() << std::endl;
+
+      } catch (mongocxx::exception::system_error &e) {
+        log_error_stream(_logger) << "Delete object failed, error: " << e.what() << std::endl;
+      }
+
+    } else {
+
+      _memoryDb.DeleteObject(object);
+
     }
   }
 
   void S3Database::DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys) {
 
-    bsoncxx::builder::basic::array array{};
-    for (const auto &key : keys) {
-      array.append(key);
+    if (HasDatabase()) {
+
+      bsoncxx::builder::basic::array array{};
+      for (const auto &key : keys) {
+        array.append(key);
+      }
+      auto result = _objectCollection.delete_many(make_document(kvp("bucket", bucket), kvp("key", make_document(kvp("$in", array)))));
+      log_debug_stream(_logger) << "Objects deleted, count: " << result->result().deleted_count() << std::endl;
+
+    } else {
+
+      _memoryDb.DeleteObjects(bucket, keys);
+
     }
-    auto result = _objectCollection.delete_many(make_document(kvp("bucket", bucket), kvp("key", make_document(kvp("$in", array)))));
-    log_debug_stream(_logger) << "Objects deleted, count: " << result->result().deleted_count() << std::endl;
   }
 
   void S3Database::DeleteAllObjects() {
+
+    if (HasDatabase()) {
+
     auto result = _objectCollection.delete_many({});
     log_debug_stream(_logger) << "All objects deleted, count: " << result->deleted_count() << std::endl;
+
+    } else {
+
+      _memoryDb.DeleteAllObjects();
+
+    }
   }
 
   Entity::S3::Bucket S3Database::CreateBucketNotification(const Entity::S3::Bucket &bucket, const Entity::S3::BucketNotification &bucketNotification) {
