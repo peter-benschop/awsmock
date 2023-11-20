@@ -135,6 +135,19 @@ namespace AwsMock::Database {
     Entity::S3::ObjectList ListObjects(const std::string &prefix = {});
 
     /**
+     * Delete a bucket.
+     *
+     * @param bucket bucket entity
+     * @throws DatabaseException
+     */
+    void DeleteBucket(const Entity::S3::Bucket &bucket);
+
+    /**
+     * Deletes all buckets
+     */
+    void DeleteAllBuckets();
+
+    /**
      * Counts the number of keys in a bucket
      *
      * @param region AWS region
@@ -143,6 +156,28 @@ namespace AwsMock::Database {
      * @throws DatabaseException
      */
     long ObjectCount(const std::string &region = {}, const std::string &bucket = {});
+
+    /**
+     * Delete an object.
+     *
+     * @param object object entity
+     * @throws DatabaseException
+     */
+    void DeleteObject(const Entity::S3::Object &object);
+
+    /**
+     * Updates an existing object in the S3 object table
+     *
+     * @param bucket bucket to delete from
+     * @param keys vector of object keys
+     * @throws DatabaseException
+     */
+    void DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys);
+
+    /**
+     * Deletes all objects
+     */
+    void DeleteAllObjects();
 
   private:
 

@@ -50,8 +50,7 @@ RUN aws configure set aws_access_key_id none && \
 EXPOSE 4566 4566
 EXPOSE 4567 4567
 EXPOSE 8081 8081
-EXPOSE 27017 27017
 
 VOLUME /var/run/docker.sock /var/run/docker.sock
 
-CMD ["/usr/bin/aws-mock"]
+CMD ["/usr/bin/awsmockmgr"]
