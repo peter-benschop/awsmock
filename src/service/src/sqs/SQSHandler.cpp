@@ -359,8 +359,10 @@ namespace AwsMock::Service {
 
     std::vector<Dto::SQS::MessageAttribute> messageAttributes;
 
-    int attributeCount = Core::HttpUtils::CountQueryParametersByPrefix(payload, "MessageAttribute") / 3;
-    for (int i = 1; i <= attributeCount; i++) {
+    int attributeCount = Core::HttpUtils::CountQueryParametersByPrefix(payload, "MessageAttribute");
+    log_debug_stream(_logger) << "Got message attribute count: " << attributeCount << std::endl;
+
+    for (int i = 1; i <= attributeCount/3; i++) {
 
       std::string attributeName = Core::HttpUtils::GetQueryParameterValueByName(payload, "MessageAttribute." + std::to_string(i) + ".Name");
       std::string attributeType = Core::HttpUtils::GetQueryParameterValueByName(payload, "MessageAttribute." + std::to_string(i) + ".Value.DataType");
@@ -372,6 +374,7 @@ namespace AwsMock::Service {
       Dto::SQS::MessageAttribute messageAttribute = {.attributeName=attributeName, .attributeValue=attributeValue, .type=attributeType};
       messageAttributes.emplace_back(messageAttribute);
     }
+    log_debug_stream(_logger) << "Extracted message attribute count: " << messageAttributes.size() << std::endl;
     return messageAttributes;
   }
 }
