@@ -146,10 +146,10 @@ namespace AwsMock::Database {
   void SQSMemoryDb::DeleteQueue(const Entity::SQS::Queue &queue) {
 
     std::string region = queue.region;
-    std::string name = queue.name;
-    const auto count = std::erase_if(_queues, [region, name](const auto &item) {
+    std::string queueUrl = queue.queueUrl;
+    const auto count = std::erase_if(_queues, [region, queueUrl](const auto &item) {
       auto const &[key, value] = item;
-      return value.region == region && value.name == name;
+      return value.region == region && value.queueUrl == queueUrl;
     });
     log_debug_stream(_logger) << "Queue deleted, count: " << count << std::endl;
   }

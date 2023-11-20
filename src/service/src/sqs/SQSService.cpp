@@ -258,10 +258,7 @@ namespace AwsMock::Service {
 
     // Check existence
     if (!_database->QueueUrlExists(request.region, request.queueUrl)) {
-      throw Core::ServiceException("SQS queue '" + request.queueUrl + "' does not exists",
-                                   Poco::Net::HTTPResponse::HTTP_NOT_FOUND,
-                                   request.resource.c_str(),
-                                   request.requestId.c_str());
+      throw Core::ServiceException("SQS queue '" + request.queueUrl + "' does not exists", Poco::Net::HTTPResponse::HTTP_NOT_FOUND, request.resource.c_str(), request.requestId.c_str());
     }
 
     Dto::SQS::DeleteQueueResponse response;

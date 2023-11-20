@@ -233,22 +233,40 @@ namespace AwsMock::Database {
   }
 
   void SNSDatabase::DeleteTopic(const Entity::SNS::Topic &topic) {
-    try {
-      auto result = _topicCollection.delete_many(make_document(kvp("topicArn", topic.topicArn)));
-      log_debug_stream(_logger) << "Topic deleted, count: " << result->deleted_count() << std::endl;
-    } catch (const mongocxx::exception &exc) {
-      _logger.error() << "SNS Database exception " << exc.what() << std::endl;
-      throw Core::DatabaseException(exc.what(), 500);
+
+    if (HasDatabase()) {
+
+      try {
+        auto result = _topicCollection.delete_many(make_document(kvp("topicArn", topic.topicArn)));
+        log_debug_stream(_logger) << "Topic deleted, count: " << result->deleted_count() << std::endl;
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), 500);
+      }
+
+    } else {
+
+      _memoryDb.DeleteTopic(topic);
+
     }
   }
 
   void SNSDatabase::DeleteAllTopics() {
-    try {
-      auto result = _topicCollection.delete_many({});
-      log_debug_stream(_logger) << "All topics deleted, count: " << result->deleted_count() << std::endl;
-    } catch (const mongocxx::exception &exc) {
-      _logger.error() << "SNS Database exception " << exc.what() << std::endl;
-      throw Core::DatabaseException(exc.what(), 500);
+
+    if (HasDatabase()) {
+
+      try {
+        auto result = _topicCollection.delete_many({});
+        log_debug_stream(_logger) << "All topics deleted, count: " << result->deleted_count() << std::endl;
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), 500);
+      }
+
+    } else {
+
+      _memoryDb.DeleteAllTopics();
+
     }
   }
 

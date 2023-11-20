@@ -118,6 +118,23 @@ namespace AwsMock::Database {
     return count;
   }
 
+  void SNSMemoryDb::DeleteTopic(const Entity::SNS::Topic &topic) {
+
+    std::string region = topic.region;
+    std::string name = topic.topicName;
+    const auto count = std::erase_if(_topics, [region, name](const auto &item) {
+      auto const &[key, value] = item;
+      return value.region == region && value.topicName == name;
+    });
+    log_debug_stream(_logger) << "Topic deleted, count: " << count << std::endl;
+  }
+
+  void SNSMemoryDb::DeleteAllTopics() {
+
+    log_debug_stream(_logger) << "All topics deleted, count: " << _topics.size() << std::endl;
+    _topics.clear();
+  }
+  
   long SNSMemoryDb::CountMessages(const std::string &region, const std::string &topicArn) {
 
     long count = 0;
