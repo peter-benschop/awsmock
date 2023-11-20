@@ -16,43 +16,43 @@
 
 namespace AwsMock::Service {
 
+  /**
+   * Transfer request handler factory
+   */
+  class TransferRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
+
+  public:
+
     /**
-     * Transfer request handler factory
+     * Constructor
+     *
+     * @param configuration application configuration
+     * @param metricService  monitoring
      */
-    class TransferRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
+    TransferRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService) {}
 
-    public:
+    /**
+     * Create new request handler instance
+     *
+     * @return request handler instance
+     */
+    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &) override {
+      return new TransferHandler(_configuration, _metricService);
+    }
 
-      /**
-       * Constructor
-       *
-       * @param configuration application configuration
-       * @param metricService  monitoring
-       */
-      TransferRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService) {}
+  private:
 
-      /**
-       * Create new request handler instance
-       *
-       * @return request handler instance
-       */
-      Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &) override {
-          return new TransferHandler(_configuration, _metricService);
-      }
+    /**
+     * S3 handler configuration
+     */
+    Core::Configuration &_configuration;
 
-    private:
+    /**
+     * Metric module
+     */
+    Core::MetricService &_metricService;
 
-      /**
-       * S3 handler configuration
-       */
-      Core::Configuration &_configuration;
-
-      /**
-       * Metric module
-       */
-      Core::MetricService &_metricService;
-
-    };
+  };
 
 } // namespace AwsMock::Service
 

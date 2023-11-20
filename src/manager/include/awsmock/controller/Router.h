@@ -30,81 +30,81 @@ namespace AwsMock::Controller {
 
   class Router : public Poco::Net::HTTPRequestHandlerFactory {
 
-    public:
+  public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration application configuration
-       * @param metricService common monitoring module
-       * @param serverMap map of services
-       */
-      Router(Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap);
+    /**
+     * Constructor
+     *
+     * @param configuration application configuration
+     * @param metricService common monitoring module
+     * @param serverMap map of services
+     */
+    Router(Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap);
 
-      /**
-       * Destructor
-       */
-      ~Router();
+    /**
+     * Destructor
+     */
+    ~Router();
 
-      /**
-       * Add a route
-       *
-       * @param route request route
-       * @param factory resource factory
-       */
-      void AddRoute(const std::string &route, const std::string &factory);
+    /**
+     * Add a route
+     *
+     * @param route request route
+     * @param factory resource factory
+     */
+    void AddRoute(const std::string &route, const std::string &factory);
 
-      /**
-       * HTTP request handler
-       *
-       * @param request HTTP request
-       * @return request handler or null in case of failure
-       */
-      Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override;
+    /**
+     * HTTP request handler
+     *
+     * @param request HTTP request
+     * @return request handler or null in case of failure
+     */
+    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override;
 
-    private:
+  private:
 
-      /**
-       * Return HTTP restful resource.
-       *
-       * @param service AWS module name
-       * @param uri request URI
-       * @return restfull resource
-       */
-      Poco::Net::HTTPRequestHandler *GetResource(const std::string &service, const std::string &uri);
+    /**
+     * Return HTTP restful resource.
+     *
+     * @param service AWS module name
+     * @param uri request URI
+     * @return restfull resource
+     */
+    Poco::Net::HTTPRequestHandler *GetResource(const std::string &service, const std::string &uri);
 
-      /**
-       * Returns the AWS module, region and user from the authorization string.
-       *
-       * @param authInfo authorization string
-       * @return module name
-       */
-      std::string GetService(const std::string &authInfo);
+    /**
+     * Returns the AWS module, region and user from the authorization string.
+     *
+     * @param authInfo authorization string
+     * @return module name
+     */
+    std::string GetService(const std::string &authInfo);
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
 
-      /**
-       * Configuration
-       */
-      Configuration &_configuration;
+    /**
+     * Configuration
+     */
+    Configuration &_configuration;
 
-      /**
-       * Metric module
-       */
-      Core::MetricService &_metricService;
+    /**
+     * Metric module
+     */
+    Core::MetricService &_metricService;
 
-      /**
-       * Server map
-       */
-      Service::ServerMap &_serverMap;
+    /**
+     * Server map
+     */
+    Service::ServerMap &_serverMap;
 
-      /**
-       * Routing table
-       */
-      std::map<std::string, std::string> _routingTable;
+    /**
+     * Routing table
+     */
+    std::map<std::string, std::string> _routingTable;
   };
 
 } // namespace AwsMock::Controller

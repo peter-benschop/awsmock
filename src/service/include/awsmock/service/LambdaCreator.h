@@ -32,131 +32,131 @@ namespace AwsMock::Service {
 
   class LambdaCreator : public Poco::Runnable {
 
-    public:
+  public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration module configuration
-       * @param metricService monitoring module
-       * @param createQueue lambda create notification queue
-       */
-      explicit LambdaCreator(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue);
+    /**
+     * Constructor
+     *
+     * @param configuration module configuration
+     * @param metricService monitoring module
+     * @param createQueue lambda create notification queue
+     */
+    explicit LambdaCreator(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue);
 
-      /**
-       * Listens for invocation requests and send the invocation to the right port.
-       */
-      void run() override;
+    /**
+     * Listens for invocation requests and send the invocation to the right port.
+     */
+    void run() override;
 
-    private:
+  private:
 /**
        * Create new lambda function
        *
        * @param functionCode zipped and BASE64 encoded function code
        * @param functionId lambda function OID
        */
-      void CreateLambdaFunction(const std::string &functionCode, const std::string &functionId);
+    void CreateLambdaFunction(const std::string &functionCode, const std::string &functionId);
 
-      /**
-       * Save the ZIP file and unpack it in a temporary folder
-       *
-       * @param zipFile Base64 encoded ZIP file
-       * @param lambdaEntity lambda entity
-       * @param dockerTag docker tag to use
-       */
-      void CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
+    /**
+     * Save the ZIP file and unpack it in a temporary folder
+     *
+     * @param zipFile Base64 encoded ZIP file
+     * @param lambdaEntity lambda entity
+     * @param dockerTag docker tag to use
+     */
+    void CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
 
-      /**
-       * Creates an new docker container, in case the container does not exists inside the docker daemon.
-       *
-       * @param lambdaEntity lambda entity.
-       * @param dockerTag docker tag.
-       */
-      void CreateDockerContainer(Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
+    /**
+     * Creates an new docker container, in case the container does not exists inside the docker daemon.
+     *
+     * @param lambdaEntity lambda entity.
+     * @param dockerTag docker tag.
+     */
+    void CreateDockerContainer(Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
 
-      /**
-       * Converts the lambda environment to a vector of string, which is needed by the docker API
-       *
-       * @param lambdaEnvironment lambda environment
-       * @return vector of strings containing the runtime environment
-       */
-      std::vector<std::string> GetEnvironment(const Database::Entity::Lambda::Environment &lambdaEnvironment);
+    /**
+     * Converts the lambda environment to a vector of string, which is needed by the docker API
+     *
+     * @param lambdaEnvironment lambda environment
+     * @return vector of strings containing the runtime environment
+     */
+    std::vector<std::string> GetEnvironment(const Database::Entity::Lambda::Environment &lambdaEnvironment);
 
-      /**
-       * Unpack the provided ZIP file.
-       *
-       * <p>Needed only when the lambda function is provided as zipped request body.</p>
-       *
-       * @param zipFile Base64 encoded zip file.
-       * @param runtime AWS lambda runtime name
-       * @param fileName filename of the Base64 encoded and zipped code file
-       * @return code directory
-       */
-      std::string UnpackZipFile(const std::string &zipFile, const std::string &runtime, const std::string &fileName);
+    /**
+     * Unpack the provided ZIP file.
+     *
+     * <p>Needed only when the lambda function is provided as zipped request body.</p>
+     *
+     * @param zipFile Base64 encoded zip file.
+     * @param runtime AWS lambda runtime name
+     * @param fileName filename of the Base64 encoded and zipped code file
+     * @return code directory
+     */
+    std::string UnpackZipFile(const std::string &zipFile, const std::string &runtime, const std::string &fileName);
 
-      /**
-       * Returns a random host port in the range 32768 - 65536 for the host port of the docker container which is running the lambda function.
-       *
-       * @return random port between 32768 and 65536
-       */
-      static int GetHostPort();
+    /**
+     * Returns a random host port in the range 32768 - 65536 for the host port of the docker container which is running the lambda function.
+     *
+     * @return random port between 32768 and 65536
+     */
+    static int GetHostPort();
 
-      /**
-       * Returns the docker tag.
-       *
-       * <p>The method returns the docker tags in that order:
-       * <ul>
-       * <li>version: if the lambda entity has a version tag, the version tag is used.</li>
-       * <li>dockerTag: if the lambda entity has a dockerTag, the dockerTag is used.</li>
-       * <li>tag: if the lambda entity has a tag named tag, this tag is used.</li>
-       * <li>latest: default return value.</li>
-       * </ul>
-       * </p>
-       *
-       * @param lambda lambda database entity
-       * @return random port between 32768 and 65536
-       */
-      static std::string GetDockerTag(const Database::Entity::Lambda::Lambda &lambda);
+    /**
+     * Returns the docker tag.
+     *
+     * <p>The method returns the docker tags in that order:
+     * <ul>
+     * <li>version: if the lambda entity has a version tag, the version tag is used.</li>
+     * <li>dockerTag: if the lambda entity has a dockerTag, the dockerTag is used.</li>
+     * <li>tag: if the lambda entity has a tag named tag, this tag is used.</li>
+     * <li>latest: default return value.</li>
+     * </ul>
+     * </p>
+     *
+     * @param lambda lambda database entity
+     * @return random port between 32768 and 65536
+     */
+    static std::string GetDockerTag(const Database::Entity::Lambda::Lambda &lambda);
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
 
-      /**
-       * Configuration
-       */
-      Core::Configuration &_configuration;
+    /**
+     * Configuration
+     */
+    Core::Configuration &_configuration;
 
-      /**
-       * Metric module
-       */
-      Core::MetricService &_metricService;
+    /**
+     * Metric module
+     */
+    Core::MetricService &_metricService;
 
-      /**
-       * Database connection
-       */
-      std::shared_ptr<Database::LambdaDatabase> _lambdaDatabase;
+    /**
+     * Database connection
+     */
+    std::shared_ptr<Database::LambdaDatabase> _lambdaDatabase;
 
-      /**
-       * Data directory
-       */
-      std::string _dataDir;
+    /**
+     * Data directory
+     */
+    std::string _dataDir;
 
-      /**
-       * Temp directory
-       */
-      std::string _tempDir;
+    /**
+     * Temp directory
+     */
+    std::string _tempDir;
 
-      /**
-       * Docker module
-       */
-      Service::DockerService _dockerService;
+    /**
+     * Docker module
+     */
+    Service::DockerService _dockerService;
 
-      /**
-       * lambda create notification queue
-       */
-      Poco::NotificationQueue &_createQueue;
+    /**
+     * lambda create notification queue
+     */
+    Poco::NotificationQueue &_createQueue;
 
   };
 

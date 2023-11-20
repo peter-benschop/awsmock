@@ -41,72 +41,72 @@
 
 namespace AwsMock::Core {
 
-    struct ExecResult {
-      int status = -1;
-      std::string output;
-    };
-    typedef struct ExecResult ExecResult;
+  struct ExecResult {
+    int status = -1;
+    std::string output;
+  };
+  typedef struct ExecResult ExecResult;
+
+  /**
+   * System utils for command line execution and other system routines.
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
+  class SystemUtils {
+
+  public:
 
     /**
-     * System utils for command line execution and other system routines.
+     * Execute system command and capture the stdout output result.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @param command command string
+     * @return command output.
      */
-    class SystemUtils {
+    static ExecResult Exec(const std::string &command);
 
-    public:
+    /**
+     * Returns the current working directory.
+     *
+     * @return absolute path of the current work directory.
+     */
+    static std::string GetCurrentWorkingDir();
 
-      /**
-       * Execute system command and capture the stdout output result.
-       *
-       * @param command command string
-       * @return command output.
-       */
-      static ExecResult Exec(const std::string &command);
+    /**
+     * Returns the home directory of the user
+     *
+     * @return absolute path of the home directory.
+     */
+    static std::string GetHomeDir();
 
-      /**
-       * Returns the current working directory.
-       *
-       * @return absolute path of the current work directory.
-       */
-      static std::string GetCurrentWorkingDir();
+    /**
+     * Returns the node name (uname -n) of the server
+     *
+     * @return node name of the server
+     */
+    static std::string GetNodeName();
 
-      /**
-       * Returns the home directory of the user
-       *
-       * @return absolute path of the home directory.
-       */
-      static std::string GetHomeDir();
+    /**
+     * Returns the DNS host name of the server
+     *
+     * @return host name of the server
+     */
+    static std::string GetHostName();
 
-      /**
-       * Returns the node name (uname -n) of the server
-       *
-       * @return node name of the server
-       */
-      static std::string GetNodeName();
+    /**
+     * Returns a random poprt number between 32768 and 65536
+     *
+     * @return random port
+     */
+    static int GetRandomPort();
 
-      /**
-       * Returns the DNS host name of the server
-       *
-       * @return host name of the server
-       */
-      static std::string GetHostName();
+  private:
 
-      /**
-       * Returns a random poprt number between 32768 and 65536
-       *
-       * @return random port
-       */
-      static int GetRandomPort();
+    /**
+     * Logger
+     */
+    static Core::LogStream _logger;
 
-    private:
-
-      /**
-       * Logger
-       */
-      static Core::LogStream _logger;
-
-    };
+  };
 
 } // namespace AwsMock::Core
 

@@ -15,13 +15,13 @@
 
 namespace AwsMock::Core {
 
-    class DateTimeUtils {
-    public:
+  class DateTimeUtils {
+  public:
 
-      static std::string AwsDatetime(const Poco::DateTime& dateTime);
+    static std::string AwsDatetime(const Poco::DateTime &dateTime);
 
-      static std::string AwsDatetimeNow();
+    static std::string AwsDatetimeNow();
 
-    };
+  };
 } // namespace AwsMock::Core
 #endif //AWSMOCK_CORE_DATETIMEUTILS_H

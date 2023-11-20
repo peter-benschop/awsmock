@@ -144,7 +144,7 @@ namespace AwsMock::Service {
      * @param payload HTTP body
      * @return list of queue tags
      */
-    std::map<std::string,std::string> GetQueueTags(const std::string &payload);
+    std::map<std::string, std::string> GetQueueTags(const std::string &payload);
 
     /**
      * Get the queue attribute names.

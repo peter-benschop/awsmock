@@ -31,7 +31,7 @@ namespace AwsMock::Service {
    */
   class LambdaHandler : public AbstractHandler {
 
-    public:
+  public:
 
     /**
      * Constructor
@@ -43,7 +43,7 @@ namespace AwsMock::Service {
      */
     LambdaHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue, Poco::NotificationQueue &invokeQueue);
 
-    protected:
+  protected:
 
     /**
      * HTTP GET request.
@@ -108,7 +108,7 @@ namespace AwsMock::Service {
      */
     void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
-    private:
+  private:
 
     /**
      * Logger

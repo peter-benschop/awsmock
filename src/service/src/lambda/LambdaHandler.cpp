@@ -7,8 +7,8 @@ namespace AwsMock::Service {
                                Core::MetricService &metricService,
                                Poco::NotificationQueue &createQueue,
                                Poco::NotificationQueue &invokeQueue)
-    : AbstractHandler(), _logger(Poco::Logger::get("LambdaServiceHandler")), _configuration(configuration), _metricService(metricService),
-      _lambdaService(configuration, metricService, createQueue, invokeQueue) {
+      : AbstractHandler(), _logger(Poco::Logger::get("LambdaServiceHandler")), _configuration(configuration), _metricService(metricService),
+        _lambdaService(configuration, metricService, createQueue, invokeQueue) {
   }
 
   void LambdaHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, [[maybe_unused]]const std::string &user) {

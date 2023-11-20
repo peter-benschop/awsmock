@@ -11,40 +11,33 @@
 
 namespace AwsMock::Dto::SQS {
 
-    struct GetQueueUrlRequest {
+  struct GetQueueUrlRequest {
 
-      /**
-       * AWS region name
-       */
-      std::string region;
+    /**
+     * AWS region name
+     */
+    std::string region;
 
-      /**
-       * Name of the queue
-       */
-      std::string queueName;
+    /**
+     * Name of the queue
+     */
+    std::string queueName;
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const GetQueueUrlRequest &r) {
-          os << "GetQueueUrlRequest={region='" << r.region << "' queueName='" << r.queueName << "'}";
-          return os;
-      }
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const GetQueueUrlRequest &r);
 
-    };
+  };
 
 } // namespace AwsMock::Dto::SQS
 

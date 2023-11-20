@@ -11,53 +11,53 @@
 
 namespace AwsMock::Dto::S3 {
 
-    struct GetObjectRequest {
+  struct GetObjectRequest {
 
-      /**
-       * AWS region name
-       */
-      std::string region;
+    /**
+     * AWS region name
+     */
+    std::string region;
 
-      /**
-       * Bucket
-       */
-      std::string bucket;
+    /**
+     * Bucket
+     */
+    std::string bucket;
 
-      /**
-       * Key
-       */
-      std::string key;
+    /**
+     * Key
+     */
+    std::string key;
 
-      /**
-       * Version ID
-       */
-      std::string versionId;
+    /**
+     * Version ID
+     */
+    std::string versionId;
 
-      /**
-       * Range minimum
-       */
-      long min;
+    /**
+     * Range minimum
+     */
+    long min;
 
-      /**
-       * Range maximum
-       */
-      long max;
+    /**
+     * Range maximum
+     */
+    long max;
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const GetObjectRequest &r);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const GetObjectRequest &r);
 
-    };
+  };
 
 } // namespace AwsMock::Dto::S3
 

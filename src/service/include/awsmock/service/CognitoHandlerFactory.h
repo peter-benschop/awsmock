@@ -16,44 +16,44 @@
 
 namespace AwsMock::Service {
 
+  /**
+   * S3 request handler factory
+   */
+  class CognitoRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
+
+  public:
+
     /**
-     * S3 request handler factory
+     * Constructor
+     *
+     * @param configuration application configuration
+     * @param metricService  monitoring
      */
-    class CognitoRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
+    CognitoRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService) {}
 
-    public:
+    /**
+     * Create a new request handler instance.
+     *
+     * @param request HTTP request
+     * @return HTTP request handler
+     */
+    virtual Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) {
+      return new S3Handler(_configuration, _metricService);
+    }
 
-      /**
-       * Constructor
-       *
-       * @param configuration application configuration
-       * @param metricService  monitoring
-       */
-      CognitoRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService) {}
+  private:
 
-      /**
-       * Create a new request handler instance.
-       *
-       * @param request HTTP request
-       * @return HTTP request handler
-       */
-      virtual Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) {
-          return new S3Handler(_configuration, _metricService);
-      }
+    /**
+     * S3 handler configuration
+     */
+    Core::Configuration &_configuration;
 
-    private:
+    /**
+     * Metric module
+     */
+    Core::MetricService &_metricService;
 
-      /**
-       * S3 handler configuration
-       */
-      Core::Configuration &_configuration;
-
-      /**
-       * Metric module
-       */
-      Core::MetricService &_metricService;
-
-    };
+  };
 
 } // namespace AwsMock::Service
 

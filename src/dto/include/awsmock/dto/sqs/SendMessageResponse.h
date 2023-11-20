@@ -20,6 +20,7 @@
 #include "Poco/DOM/AutoPtr.h"
 #include "Poco/DOM/Document.h"
 #include "Poco/DOM/Element.h"
+#include "Poco/DOM/DOMParser.h"
 #include "Poco/DOM/Text.h"
 #include "Poco/DOM/DOMWriter.h"
 #include "Poco/XML/XMLWriter.h"
@@ -29,65 +30,72 @@
 
 namespace AwsMock::Dto::SQS {
 
-    struct SendMessageResponse {
+  struct SendMessageResponse {
 
-      /**
-       * ID
-       */
-      long id;
+    /**
+     * ID
+     */
+    long id;
 
-      /**
-       * Queue URL
-       */
-      std::string queueUrl;
+    /**
+     * Queue URL
+     */
+    std::string queueUrl;
 
-      /**
-       * Message ID
-       */
-      std::string messageId;
+    /**
+     * Message ID
+     */
+    std::string messageId;
 
-      /**
-       * Receipt handle
-       */
-      std::string receiptHandle;
+    /**
+     * Receipt handle
+     */
+    std::string receiptHandle;
 
-      /**
-       * MD5 sum of body
-       */
-      std::string md5Body;
+    /**
+     * MD5 sum of body
+     */
+    std::string md5Body;
 
-      /**
-       * MD5 sum of sqs
-       */
-      std::string md5Attr;
+    /**
+     * MD5 sum of sqs
+     */
+    std::string md5Attr;
 
-      /**
-       * Request ID
-       */
-      std::string requestId;
+    /**
+     * Request ID
+     */
+    std::string requestId;
 
-      /**
-       * Convert to XML representation
-       *
-       * @return XML string
-       */
-      [[nodiscard]] std::string ToXml() const;
+    /**
+     * Convert to XML representation
+     *
+     * @return XML string
+     */
+    [[nodiscard]] std::string ToXml() const;
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Convert from XML representation
+     *
+     * @param xmlString  XML string
+     */
+    void FromXml(const std::string &xmlString);
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const SendMessageResponse &r);
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-    };
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const SendMessageResponse &r);
+
+  };
 
 } // namespace AwsMock::Dto::SQS
 

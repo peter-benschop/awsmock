@@ -13,56 +13,56 @@
 
 namespace AwsMock::Core {
 
+  /**
+   * Number utilities.
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
+  class NumberUtils {
+
+  public:
+
     /**
-     * Number utilities.
+     * Return a string with the value in kilobytes.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @param value value to print
+     * @return value string
      */
-    class NumberUtils {
+    static std::string ToKilobytesStr(long value);
 
-    public:
+    /**
+     * Converts the given number to kilobytes.
+     *
+     * @param value value to convert
+     * @return value in kilobytes
+     */
+    static long ToKilobytes(long value);
 
-      /**
-       * Return a string with the value in kilobytes.
-       *
-       * @param value value to print
-       * @return value string
-       */
-      static std::string ToKilobytesStr(long value);
+    /**
+     * Return a string with the value in megabytes.
+     *
+     * @param value value to print
+     * @return value string
+     */
+    static std::string ToMegabytesStr(long value);
 
-      /**
-       * Converts the given number to kilobytes.
-       *
-       * @param value value to convert
-       * @return value in kilobytes
-       */
-      static long ToKilobytes(long value);
+    /**
+     * Converts the given number to megabytes.
+     *
+     * @param value value to convert
+     * @return value in kilobytes
+     */
+    static long ToMegabytes(long value);
 
-      /**
-       * Return a string with the value in megabytes.
-       *
-       * @param value value to print
-       * @return value string
-       */
-      static std::string ToMegabytesStr(long value);
-
-      /**
-       * Converts the given number to megabytes.
-       *
-       * @param value value to convert
-       * @return value in kilobytes
-       */
-      static long ToMegabytes(long value);
-
-      /**
-       * Returns a byte array from an integer
-       *
-       * @param n integer value
-       * @param bytes output bytes
-       * @param offset offset
-       */
-      static void GetIntAsByteArray(int n, unsigned char *bytes, int offset);
-    };
+    /**
+     * Returns a byte array from an integer
+     *
+     * @param n integer value
+     * @param bytes output bytes
+     * @param offset offset
+     */
+    static void GetIntAsByteArray(int n, unsigned char *bytes, int offset);
+  };
 
 } // namespace AwsMock::Core
 

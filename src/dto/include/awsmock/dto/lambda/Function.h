@@ -15,126 +15,126 @@
 
 namespace AwsMock::Dto::Lambda {
 
-    struct Function {
+  struct Function {
 
-      /**
-       * Architectures
-       */
-      std::vector<std::string> architectures = {};
+    /**
+     * Architectures
+     */
+    std::vector<std::string> architectures = {};
 
-      /**
-       * SHA256 checksum
-       */
-      std::string codeSha256 = {};
+    /**
+     * SHA256 checksum
+     */
+    std::string codeSha256 = {};
 
-      /**
-       * Code size
-       */
-      long codeSize = 0;
+    /**
+     * Code size
+     */
+    long codeSize = 0;
 
-      /**
-       * Dead letter config
-       */
-      DeadLetterConfig deadLetterConfig = {};
+    /**
+     * Dead letter config
+     */
+    DeadLetterConfig deadLetterConfig = {};
 
-      /**
-       * Description
-       */
-      std::string description = {};
-      // TODO: Environment, EpheremalStorage, FileSystemConfig
+    /**
+     * Description
+     */
+    std::string description = {};
+    // TODO: Environment, EpheremalStorage, FileSystemConfig
 
-      /**
-       * Function ARN
-       */
-      std::string functionArn = {};
+    /**
+     * Function ARN
+     */
+    std::string functionArn = {};
 
-      /**
-       * Function name
-       */
-      std::string functionName = {};
+    /**
+     * Function name
+     */
+    std::string functionName = {};
 
-      /**
-       * Function handler
-       */
-      std::string handler = {};
+    /**
+     * Function handler
+     */
+    std::string handler = {};
 
-      // TODO: ImageConfigResponse
+    // TODO: ImageConfigResponse
 
-      /**
-       * Last modification datetime
-       */
-      Poco::DateTime lastModified = {};
+    /**
+     * Last modification datetime
+     */
+    Poco::DateTime lastModified = {};
 
-      /**
-       * Last update state
-       */
-      std::string lastUpdateStatus = {};
+    /**
+     * Last update state
+     */
+    std::string lastUpdateStatus = {};
 
-      /**
-       * Last update state reason
-       */
-      std::string lastUpdateStatusReason = {};
+    /**
+     * Last update state reason
+     */
+    std::string lastUpdateStatusReason = {};
 
-      /**
-       * Last update state reason
-       */
-      std::string lastUpdateStatusReasonCode = {};
+    /**
+     * Last update state reason
+     */
+    std::string lastUpdateStatusReasonCode = {};
 
-      // TODO: Layers
+    // TODO: Layers
 
-      /**
-       * State
-       */
-      std::string state = {};
+    /**
+     * State
+     */
+    std::string state = {};
 
-      /**
-       * State reason
-       */
-      std::string stateReason = {};
+    /**
+     * State reason
+     */
+    std::string stateReason = {};
 
-      /**
-       * State reason code
-       */
-      std::string stateReasonCode = {};
+    /**
+     * State reason code
+     */
+    std::string stateReasonCode = {};
 
-      /**
-       * Timeout
-       */
-      int timeout = 15;
+    /**
+     * Timeout
+     */
+    int timeout = 15;
 
-      /**
-       * Version
-       */
-      std::string version = {};
+    /**
+     * Version
+     */
+    std::string version = {};
 
-      /**
-       * Environment
-       */
-      EnvironmentVariables environment = {};
+    /**
+     * Environment
+     */
+    EnvironmentVariables environment = {};
 
-      /**
-       * Converts the DTO to a JSON representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+    /**
+     * Converts the DTO to a JSON representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const Function &f);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const Function &f);
 
-    };
+  };
 
-    typedef std::vector<Function> FunctionList;
+  typedef std::vector<Function> FunctionList;
 }
 #endif // AWSMOCK_DTO_LAMBDA_FUNCTION_H

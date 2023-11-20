@@ -22,15 +22,15 @@
 namespace AwsMock::Core {
   class FileUtilsTest : public ::testing::Test {
 
-    protected:
-      void SetUp() override {
-        tempDir = Core::DirUtils::CreateTempDir();
-      }
+  protected:
+    void SetUp() override {
+      tempDir = Core::DirUtils::CreateTempDir();
+    }
 
-      void TearDown() override {
-        Core::DirUtils::DeleteDirectory(tempDir);
-      }
-      std::string tempDir;
+    void TearDown() override {
+      Core::DirUtils::DeleteDirectory(tempDir);
+    }
+    std::string tempDir;
   };
 
   TEST_F(FileUtilsTest, BasenameTest) {

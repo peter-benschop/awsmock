@@ -12,47 +12,47 @@
 
 namespace AwsMock::Dto::SQS {
 
-    struct MessageAttribute {
+  struct MessageAttribute {
 
-      /**
-       * MessageAttribute name
-       */
-      std::string attributeName;
+    /**
+     * MessageAttribute name
+     */
+    std::string attributeName;
 
-      /**
-       * MessageAttribute value
-       */
-      std::string attributeValue;
+    /**
+     * MessageAttribute value
+     */
+    std::string attributeValue;
 
-      /**
-       * Logical data type
-       */
-      std::string type;
+    /**
+     * Logical data type
+     */
+    std::string type;
 
-      /**
-       * Transport data type
-       */
-      std::string transportType;
+    /**
+     * Transport data type
+     */
+    std::string transportType;
 
-      bool operator< (const MessageAttribute &other) const;
+    bool operator<(const MessageAttribute &other) const;
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const MessageAttribute &r);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const MessageAttribute &r);
 
-    };
+  };
 
-    typedef std::vector<MessageAttribute> MessageAttributeList;
+  typedef std::vector<MessageAttribute> MessageAttributeList;
 
 } // namespace AwsMock::Dto::SQS
 

@@ -20,22 +20,22 @@ namespace AwsMock::Resource::Factory {
    */
   class Factory {
 
-    public:
+  public:
 
-      /**
-       * Creates a new resource factory.
-       *
-       * @param name resource factory name.
-       * @return resource factory
-       */
-      static IFactory *createResourceFactory(std::string &name);
+    /**
+     * Creates a new resource factory.
+     *
+     * @param name resource factory name.
+     * @return resource factory
+     */
+    static IFactory *createResourceFactory(std::string &name);
 
-    private:
+  private:
 
-      /**
-       * Default constructor
-       */
-      Factory() = default;
+    /**
+     * Default constructor
+     */
+    Factory() = default;
   };
 
 } // namespace AwsMock::Resource::Factory

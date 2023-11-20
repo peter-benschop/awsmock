@@ -56,7 +56,7 @@ namespace AwsMock::Service {
     Dto::Docker::Container container = _dockerService.GetContainerByName(lambdaEntity.function, dockerTag);
 
     // Start docker container, in case it is not already running. If already running get current public port.
-    if(container.state != "running") {
+    if (container.state != "running") {
       _dockerService.StartDockerContainer(container.id);
     } else {
       lambdaEntity.hostPort = container.GetLambdaPort();

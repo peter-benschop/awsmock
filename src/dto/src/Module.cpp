@@ -6,5 +6,4 @@
 
 namespace AwsMock::Dto::Module {
 
-
 } // namespace AwsMock::Dto::Module

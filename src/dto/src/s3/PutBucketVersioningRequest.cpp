@@ -18,13 +18,13 @@ namespace AwsMock::Dto::S3 {
       Poco::AutoPtr<Poco::XML::Document> pDoc = parser.parseString(xmlString);
 
       Poco::XML::Node *node = pDoc->getNodeByPath("/VersioningConfiguration/Status");
-      if(node) {
+      if (node) {
         status = node->innerText();
       } else {
         std::cerr << "Exception: Wrong versioning state" << std::endl;
       }
 
-    } catch(Poco::Exception &exc){
+    } catch (Poco::Exception &exc) {
       std::cerr << "Exception: " << exc.message() << std::endl;
     }
   }

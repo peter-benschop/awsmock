@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
 
   GatewayServer::GatewayServer(Core::Configuration &configuration, Core::MetricService &metricService)
-      : AbstractServer(configuration, "gateway"), _logger(Poco::Logger::get("GatewayServer")), _configuration(configuration), _metricService(metricService),_running(false) {
+      : AbstractServer(configuration, "gateway"), _logger(Poco::Logger::get("GatewayServer")), _configuration(configuration), _metricService(metricService), _running(false) {
 
     // Get HTTP configuration values
     _port = _configuration.getInt("awsmock.module.gateway.port", GATEWAY_DEFAULT_PORT);

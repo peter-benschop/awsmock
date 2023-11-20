@@ -27,7 +27,7 @@
 namespace AwsMock::Core {
   class CryptoTest : public ::testing::Test {
 
-    protected:
+  protected:
     void SetUp() override {
     }
 

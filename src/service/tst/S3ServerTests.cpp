@@ -35,7 +35,7 @@ namespace AwsMock::Service {
 
   class S3ServerTest : public ::testing::Test {
 
-    protected:
+  protected:
 
     void SetUp() override {
       // Set log level
@@ -44,7 +44,7 @@ namespace AwsMock::Service {
       // Create some test objects
       _testFile = Core::FileUtils::CreateTempFile("/tmp", "json", 10);
       _extraHeaders["Authorization"] =
-        "AWS4-HMAC-SHA256 Credential=none/20230618/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840";
+          "AWS4-HMAC-SHA256 Credential=none/20230618/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840";
 
       // Define endpoint
       std::string _port = _configuration.getString("awsmock.service.s3.port", std::to_string(S3_DEFAULT_PORT));
@@ -53,7 +53,7 @@ namespace AwsMock::Service {
 
       // Start HTTP manager
       Poco::ThreadPool::defaultPool().start(_s3Server);
-      while(!_s3Server.IsRunning()) {
+      while (!_s3Server.IsRunning()) {
         Poco::Thread::sleep(1000);
       }
     }
@@ -66,7 +66,7 @@ namespace AwsMock::Service {
 
     Core::CurlUtils _curlUtils;
     std::string _testFile, _endpoint;
-    std::map <std::string, std::string> _extraHeaders;
+    std::map<std::string, std::string> _extraHeaders;
     Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
     Core::MetricService _metricService = Core::MetricService(_configuration);
     Database::S3Database _database = Database::S3Database(_configuration);
@@ -140,7 +140,7 @@ namespace AwsMock::Service {
     EXPECT_TRUE(objectCreateResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
 
     // act
-    Core::CurlResponse objectGetResponse = _curlUtils.SendHttpRequest("GET", _endpoint + "/" + BUCKET + "/" + KEY,_extraHeaders);
+    Core::CurlResponse objectGetResponse = _curlUtils.SendHttpRequest("GET", _endpoint + "/" + BUCKET + "/" + KEY, _extraHeaders);
 
     // assert
     EXPECT_TRUE(objectGetResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);

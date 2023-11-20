@@ -257,7 +257,7 @@ namespace AwsMock::Service {
       Core::FileUtils::AppendTextFiles(outFile, uploadDir, files);
       log_trace_stream(_logger) << "Input files appended to outfile, outFile: " << outFile << std::endl;
 
-    } catch(Poco::Exception &exc){
+    } catch (Poco::Exception &exc) {
       log_error_stream(_logger) << "Append to binary file failes, error: " << exc.message() << std::endl;
     }
     // Get file size, MD5 sum

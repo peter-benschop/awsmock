@@ -454,7 +454,7 @@ namespace AwsMock::Service {
      * @param contentLength payload content length
      * @param headerMap vector of header key/values pairs
      */
-    void SetHeaders(Poco::Net::HTTPServerResponse &response, unsigned long contentLength, const HeaderMap& headerMap = {});
+    void SetHeaders(Poco::Net::HTTPServerResponse &response, unsigned long contentLength, const HeaderMap &headerMap = {});
 
     /**
      * Logger

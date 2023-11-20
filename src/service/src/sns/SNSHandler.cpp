@@ -64,7 +64,7 @@ namespace AwsMock::Service {
         std::string subscriptionArn = GetStringParameter(payload, "SubscriptionArn");
 
         Dto::SNS::UnsubscribeResponse
-          snsResponse = _snsService.Unsubscribe({.region=region, .subscriptionArn=subscriptionArn});
+            snsResponse = _snsService.Unsubscribe({.region=region, .subscriptionArn=subscriptionArn});
         SendOkResponse(response, snsResponse.ToXml());
 
       } else if (action == "DeleteTopic") {

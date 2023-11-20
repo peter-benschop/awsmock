@@ -17,38 +17,38 @@
 
 namespace AwsMock::Dto::S3 {
 
-    struct GetMetadataRequest {
+  struct GetMetadataRequest {
 
-      /**
-       * AWS region
-       */
-      std::string region;
+    /**
+     * AWS region
+     */
+    std::string region;
 
-      /**
-       * Bucket
-       */
-      std::string bucket;
+    /**
+     * Bucket
+     */
+    std::string bucket;
 
-      /**
-       * Key
-       */
-      std::string key;
+    /**
+     * Key
+     */
+    std::string key;
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const GetMetadataRequest &r);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const GetMetadataRequest &r);
 
-    };
+  };
 
 } // namespace AwsMock::Dto::S3
 

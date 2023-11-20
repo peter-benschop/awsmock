@@ -34,7 +34,7 @@ namespace AwsMock::Core {
   std::string AwsUtils::ConvertSQSQueueArnToUrl(const Configuration &configuration, const std::string &queueArn) {
 
     std::string endpoint = GetEndpoint(configuration);
-    std::vector <std::string> parts = StringUtils::Split(queueArn, ':');
+    std::vector<std::string> parts = StringUtils::Split(queueArn, ':');
     if (parts.size() < 6) {
       return {};
     }

@@ -151,7 +151,7 @@ namespace AwsMock::Service {
       CheckTransferServers();
 
       /// Wait for timeout or condition
-      if(InterruptableSleep(_period)) {
+      if (InterruptableSleep(_period)) {
         break;
       }
     }

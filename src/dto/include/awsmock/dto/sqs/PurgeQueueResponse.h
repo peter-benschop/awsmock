@@ -21,40 +21,40 @@
 
 namespace AwsMock::Dto::SQS {
 
-    struct PurgeQueueResponse {
+  struct PurgeQueueResponse {
 
-      /**
-       * Resource
-       */
-      std::string resource = "Unknown resource";
+    /**
+     * Resource
+     */
+    std::string resource = "Unknown resource";
 
-      /**
-       * Resource
-       */
-      std::string requestId = Poco::UUIDGenerator().createRandom().toString();
+    /**
+     * Resource
+     */
+    std::string requestId = Poco::UUIDGenerator().createRandom().toString();
 
-      /**
-       * Convert to XML representation
-       *
-       * @return XML string
-       */
-      [[nodiscard]] std::string ToXml() const;
+    /**
+     * Convert to XML representation
+     *
+     * @return XML string
+     */
+    [[nodiscard]] std::string ToXml() const;
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const PurgeQueueResponse &r);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const PurgeQueueResponse &r);
 
-    };
+  };
 
 } // namespace AwsMock::Dto::SQS
 

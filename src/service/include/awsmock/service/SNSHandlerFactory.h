@@ -21,42 +21,42 @@ namespace AwsMock::Service {
    */
   class SNSRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 
-    public:
+  public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration application configuration
-       * @param metricService  monitoring
-       * @param condition stop condition
-       */
-      SNSRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition) : _configuration(configuration), _metricService(metricService), _condition(condition) {}
+    /**
+     * Constructor
+     *
+     * @param configuration application configuration
+     * @param metricService  monitoring
+     * @param condition stop condition
+     */
+    SNSRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition) : _configuration(configuration), _metricService(metricService), _condition(condition) {}
 
-      /**
-       * Create request handler
-       *
-       * @return pointer to request handler
-       */
-      Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &) override {
-        return new SNSHandler(_configuration, _metricService, _condition);
-      }
+    /**
+     * Create request handler
+     *
+     * @return pointer to request handler
+     */
+    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &) override {
+      return new SNSHandler(_configuration, _metricService, _condition);
+    }
 
-    private:
+  private:
 
-      /**
-       * S3 handler configuration
-       */
-      Core::Configuration &_configuration;
+    /**
+     * S3 handler configuration
+     */
+    Core::Configuration &_configuration;
 
-      /**
-       * Metric module
-       */
-      Core::MetricService &_metricService;
+    /**
+     * Metric module
+     */
+    Core::MetricService &_metricService;
 
-      /**
-       * Shutdown condition
-       */
-      Poco::Condition &_condition;
+    /**
+     * Shutdown condition
+     */
+    Poco::Condition &_condition;
   };
 
 } // namespace AwsMock::Service

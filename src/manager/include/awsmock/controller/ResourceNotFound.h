@@ -15,21 +15,21 @@
 
 namespace AwsMock {
 
+  /**
+   * AwsMock resource not found response.
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
+  class [[maybe_unused]] ResourceNotFound : public Poco::Net::HTTPRequestHandler {
+  public:
     /**
-     * AwsMock resource not found response.
+     * Constructor
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @param request HTTP restfull request
+     * @param response HTTP restfull response
      */
-    class [[maybe_unused]] ResourceNotFound : public Poco::Net::HTTPRequestHandler {
-    public:
-        /**
-         * Constructor
-         *
-         * @param request HTTP restfull request
-         * @param response HTTP restfull response
-         */
-        void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
-    };
+    void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
+  };
 } // namespace AwsMock
 
 #endif // AWSMOCK_CONTROLLER_RESOURCENOTFOUND_H

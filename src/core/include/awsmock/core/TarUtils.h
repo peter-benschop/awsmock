@@ -21,49 +21,49 @@
 
 namespace AwsMock::Core {
 
-    class TarUtils {
+  class TarUtils {
 
-    public:
+  public:
 
-      /**
-       * Constructor
-       */
-      TarUtils() : _logger(Poco::Logger::get("TarUtils")) {}
+    /**
+     * Constructor
+     */
+    TarUtils() : _logger(Poco::Logger::get("TarUtils")) {}
 
-      /**
-       * Archive a whole directory tree to a tar file.
-       *
-       * @param tarFile name of the tar file
-       * @param directory directory name
-       */
-      static void TarDirectory(const std::string &tarFile, const std::string &directory);
+    /**
+     * Archive a whole directory tree to a tar file.
+     *
+     * @param tarFile name of the tar file
+     * @param directory directory name
+     */
+    static void TarDirectory(const std::string &tarFile, const std::string &directory);
 
-    private:
+  private:
 
-      /**
-       * Writes archive single file to the Tar archive.
-       *
-       * @param archive tar archive.
-       * @param fileName name of the file to write
-       * @param removeDir remove name of the directory from filename
-       * @param isDir directory flag
-       * @param isLink link flag, needed to preserve links
-       */
-      static void WriteFile(struct archive *archive, const std::string &fileName, const std::string &removeDir, bool isDir, bool isLink);
+    /**
+     * Writes archive single file to the Tar archive.
+     *
+     * @param archive tar archive.
+     * @param fileName name of the file to write
+     * @param removeDir remove name of the directory from filename
+     * @param isDir directory flag
+     * @param isLink link flag, needed to preserve links
+     */
+    static void WriteFile(struct archive *archive, const std::string &fileName, const std::string &removeDir, bool isDir, bool isLink);
 
-      /**
-       * Read a symbolic link.
-       *
-       * @param path path to link.
-       * @return target path.
-       */
-      static std::string Readsymlink(const std::string &path);
+    /**
+     * Read a symbolic link.
+     *
+     * @param path path to link.
+     * @return target path.
+     */
+    static std::string Readsymlink(const std::string &path);
 
-      /**
-       * Logger
-       */
-      Poco::Logger &_logger;
-    };
+    /**
+     * Logger
+     */
+    Poco::Logger &_logger;
+  };
 
 } // namespace AwsMock::Core
 

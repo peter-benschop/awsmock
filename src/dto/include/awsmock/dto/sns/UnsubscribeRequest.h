@@ -11,33 +11,33 @@
 
 namespace AwsMock::Dto::SNS {
 
-    struct UnsubscribeRequest {
+  struct UnsubscribeRequest {
 
-      /**
-       * AWS region
-       */
-      std::string region;
+    /**
+     * AWS region
+     */
+    std::string region;
 
-      /**
-       * Subscription ARN
-       */
-      std::string subscriptionArn;
+    /**
+     * Subscription ARN
+     */
+    std::string subscriptionArn;
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const ;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const UnsubscribeRequest &r);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const UnsubscribeRequest &r);
 
-    };
+  };
 
 } // namespace AwsMock::Dto::SNS
 

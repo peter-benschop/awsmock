@@ -22,24 +22,24 @@ namespace AwsMock::Database {
 
   class SQSDatabaseTest : public ::testing::Test {
 
-    protected:
+  protected:
 
-      void SetUp() override {
-        _queueArn = Core::AwsUtils::CreateSqsQueueArn(_configuration, QUEUE_NAME);
-        _queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, QUEUE_NAME);
-        _dlqueueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, DLQ_NAME);
-        _dlqueueArn = Core::AwsUtils::CreateSqsQueueArn(_configuration, DLQ_NAME);
-        _region = _configuration.getString("awsmock.region");
-      }
+    void SetUp() override {
+      _queueArn = Core::AwsUtils::CreateSqsQueueArn(_configuration, QUEUE_NAME);
+      _queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, QUEUE_NAME);
+      _dlqueueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, DLQ_NAME);
+      _dlqueueArn = Core::AwsUtils::CreateSqsQueueArn(_configuration, DLQ_NAME);
+      _region = _configuration.getString("awsmock.region");
+    }
 
-      void TearDown() override {
-        _sqsDatabase.DeleteAllQueues();
-        _sqsDatabase.DeleteAllMessages();
-      }
+    void TearDown() override {
+      _sqsDatabase.DeleteAllQueues();
+      _sqsDatabase.DeleteAllMessages();
+    }
 
-      std::string _region, _queueUrl, _queueArn, _dlqueueUrl, _dlqueueArn;
-      Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
-      SQSDatabase _sqsDatabase = SQSDatabase(_configuration);
+    std::string _region, _queueUrl, _queueArn, _dlqueueUrl, _dlqueueArn;
+    Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+    SQSDatabase _sqsDatabase = SQSDatabase(_configuration);
   };
 
   TEST_F(SQSDatabaseTest, QueueCreateTest) {
@@ -246,7 +246,7 @@ namespace AwsMock::Database {
     Entity::SQS::Message result = _sqsDatabase.GetMessageById(message.oid);
 
     // assert
-    EXPECT_TRUE(message.oid== result.oid);
+    EXPECT_TRUE(message.oid == result.oid);
   }
 
   TEST_F(SQSDatabaseTest, MessageReceiveTest) {

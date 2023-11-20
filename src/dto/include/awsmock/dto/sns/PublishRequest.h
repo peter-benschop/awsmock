@@ -11,49 +11,49 @@
 
 namespace AwsMock::Dto::SNS {
 
-    struct PublishRequest {
+  struct PublishRequest {
 
-      /**
-       * Region
-       */
-      std::string region;
+    /**
+     * Region
+     */
+    std::string region;
 
-      /**
-       * Topic ARN
-       */
-      std::string topicArn;
+    /**
+     * Topic ARN
+     */
+    std::string topicArn;
 
-      /**
-       * Target ARN
-       */
-      std::string targetArn;
+    /**
+     * Target ARN
+     */
+    std::string targetArn;
 
-      /**
-       * Message body
-       */
-      std::string message;
+    /**
+     * Message body
+     */
+    std::string message;
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const {
+      std::stringstream ss;
+      ss << (*this);
+      return ss.str();
+    }
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const PublishRequest &r) {
-          os << "PublishRequest={region='" + r.region + "' topicArn='" + r.topicArn + "' targetArn: '" + r.targetArn + "' message='" + r.message + "'}";
-          return os;
-      }
-    };
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const PublishRequest &r) {
+      os << "PublishRequest={region='" + r.region + "' topicArn='" + r.topicArn + "' targetArn: '" + r.targetArn + "' message='" + r.message + "'}";
+      return os;
+    }
+  };
 
 } // namespace AwsMock::Dto::SNS
 

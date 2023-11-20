@@ -21,66 +21,66 @@
 
 namespace AwsMock::Dto::Transfer {
 
-    struct CreateUserResponse {
+  struct CreateUserResponse {
 
-      /**
-       * Region
-       */
-      std::string region;
+    /**
+     * Region
+     */
+    std::string region;
 
-      /**
-       * Server ID
-       */
-      std::string serverId;
+    /**
+     * Server ID
+     */
+    std::string serverId;
 
-      /**
-       * User name
-       */
-      std::string userName;
+    /**
+     * User name
+     */
+    std::string userName;
 
-      /**
-       * Creates a JSON string from the object.
-       *
-       * @return JSON string
-       */
-      std::string ToJson() {
+    /**
+     * Creates a JSON string from the object.
+     *
+     * @return JSON string
+     */
+    std::string ToJson() {
 
-          try {
-              Poco::JSON::Object rootJson;
-              rootJson.set("Region", region);
-              rootJson.set("ServerId", serverId);
-              rootJson.set("UserName", userName);
+      try {
+        Poco::JSON::Object rootJson;
+        rootJson.set("Region", region);
+        rootJson.set("ServerId", serverId);
+        rootJson.set("UserName", userName);
 
-              std::ostringstream os;
-              rootJson.stringify(os);
-              return os.str();
+        std::ostringstream os;
+        rootJson.stringify(os);
+        return os.str();
 
-          } catch (Poco::Exception &exc) {
-              throw Core::ServiceException(exc.message(), 500);
-          }
+      } catch (Poco::Exception &exc) {
+        throw Core::ServiceException(exc.message(), 500);
       }
+    }
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const {
+      std::stringstream ss;
+      ss << (*this);
+      return ss.str();
+    }
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const CreateUserResponse &r) {
-          os << "CreateUserResponse={region='" << r.region << "' serverId='" << r.serverId << "' userName='" << r.userName << "'}";
-          return os;
-      }
-    };
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const CreateUserResponse &r) {
+      os << "CreateUserResponse={region='" << r.region << "' serverId='" << r.serverId << "' userName='" << r.userName << "'}";
+      return os;
+    }
+  };
 
 } // namespace AwsMock::Dto::Transfer
 

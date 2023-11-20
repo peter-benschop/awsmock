@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-  GatewayRouter::GatewayRouter(Core::Configuration &configuration, Core::MetricService &metricService): _logger(Poco::Logger::get("Router")), _configuration(configuration), _metricService(metricService) {
+  GatewayRouter::GatewayRouter(Core::Configuration &configuration, Core::MetricService &metricService) : _logger(Poco::Logger::get("Router")), _configuration(configuration), _metricService(metricService) {
 
     // Add routes
     _routingTable["s3"] = {.name="s3", .host="localhost", .port=9500};
@@ -19,7 +19,7 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Gateway router initialized" << std::endl;
   }
 
-  GatewayRouter::~GatewayRouter(){
+  GatewayRouter::~GatewayRouter() {
     serverStopped.enable();
   }
 

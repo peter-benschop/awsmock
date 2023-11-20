@@ -15,54 +15,54 @@
 
 namespace AwsMock::Core {
 
+  /**
+   * Random utilities.
+   *
+   * <p>Using the Mersenne Twister random generator with a uniform distribution.</p>
+   */
+  class RandomUtils {
+
+  public:
+
     /**
-     * Random utilities.
+     * Generates a random integer between min and max
      *
-     * <p>Using the Mersenne Twister random generator with a uniform distribution.</p>
+     * @param min minimum integer
+     * @param max minimum integer
+     * @return random number between min and max
      */
-    class RandomUtils {
+    static int NextInt(int min, int max);
 
-    public:
+    /**
+     * Generates a random integer array, with random numbers between min and max with the given size
+     *
+     * @param size number of random numbers to generate
+     * @param min minimum integer
+     * @param max minimum integer
+     * @return random number between min and max
+     */
+    static std::vector<int> IntArray(int size, int min, int max);
 
-      /**
-       * Generates a random integer between min and max
-       *
-       * @param min minimum integer
-       * @param max minimum integer
-       * @return random number between min and max
-       */
-      static int NextInt(int min, int max);
+    /**
+     * Generates a double between min and max
+     *
+     * @param min minimum integer
+     * @param max minimum integer
+     * @return double random number between min and max
+     */
+    static double NextDouble(double min, double max);
 
-      /**
-       * Generates a random integer array, with random numbers between min and max with the given size
-       *
-       * @param size number of random numbers to generate
-       * @param min minimum integer
-       * @param max minimum integer
-       * @return random number between min and max
-       */
-      static std::vector<int> IntArray(int size, int min, int max);
+    /**
+     * Generates a random double array, with random numbers between min and max with the given size
+     *
+     * @param size number of random numbers to generate
+     * @param min minimum integer
+     * @param max minimum integer
+     * @return double random number between min and max
+     */
+    static std::vector<double> DoubleArray(int size, double min, double max);
 
-      /**
-       * Generates a double between min and max
-       *
-       * @param min minimum integer
-       * @param max minimum integer
-       * @return double random number between min and max
-       */
-      static double NextDouble(double min, double max);
-
-      /**
-       * Generates a random double array, with random numbers between min and max with the given size
-       *
-       * @param size number of random numbers to generate
-       * @param min minimum integer
-       * @param max minimum integer
-       * @return double random number between min and max
-       */
-      static std::vector<double> DoubleArray(int size, double min, double max);
-
-    };
+  };
 
 }
 

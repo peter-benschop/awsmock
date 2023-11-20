@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
 
   SNSMonitoring::SNSMonitoring(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition)
-      : _logger(Poco::Logger::get("SNSMonitoring")), _configuration(configuration), _metricService(metricService), _condition(condition),  _running(false) {
+      : _logger(Poco::Logger::get("SNSMonitoring")), _configuration(configuration), _metricService(metricService), _condition(condition), _running(false) {
 
     // Update period
     _period = _configuration.getInt("awsmock.monitoring.sns.period", SNS_MONITORING_DEFAULT_PERIOD);
@@ -47,7 +47,7 @@ namespace AwsMock::Service {
     _metricService.SetGauge("sns_message_count_total", messages);
 
     // Count messages per topic
-    for(const auto &topic : _snsDatabase->ListTopics()) {
+    for (const auto &topic : _snsDatabase->ListTopics()) {
       std::string labelValue = Poco::replace(topic.topicName, "-", "_");
       long messagesPerQueue = _snsDatabase->CountMessages(topic.region, topic.topicArn);
       _metricService.SetGauge("sns_message_count", "topic", labelValue, messagesPerQueue);

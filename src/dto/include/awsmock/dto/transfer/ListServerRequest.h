@@ -20,89 +20,89 @@
 
 namespace AwsMock::Dto::Transfer {
 
-    struct ListServerRequest {
+  struct ListServerRequest {
 
-      /**
-       * Region
-       */
-      std::string region;
+    /**
+     * Region
+     */
+    std::string region;
 
-      /**
-       * Maximal number of results
-       */
-      int maxResults;
+    /**
+     * Maximal number of results
+     */
+    int maxResults;
 
-      /**
-       * Token
-       */
-      std::string nextToken;
+    /**
+     * Token
+     */
+    std::string nextToken;
 
-      /**
-       * Creates a JSON string from the object.
-       *
-       * @return JSON string
-       */
-      [[nodiscard]] std::string ToJson() const {
+    /**
+     * Creates a JSON string from the object.
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const {
 
-          try {
-              Poco::JSON::Object rootJson;
-              rootJson.set("Region", region);
-              rootJson.set("MaxResults", maxResults);
-              rootJson.set("NextToken", nextToken);
+      try {
+        Poco::JSON::Object rootJson;
+        rootJson.set("Region", region);
+        rootJson.set("MaxResults", maxResults);
+        rootJson.set("NextToken", nextToken);
 
-              std::ostringstream os;
-              rootJson.stringify(os);
-              return os.str();
+        std::ostringstream os;
+        rootJson.stringify(os);
+        return os.str();
 
-          } catch (Poco::Exception &exc) {
-              throw Core::ServiceException(exc.message(), 500);
-          }
+      } catch (Poco::Exception &exc) {
+        throw Core::ServiceException(exc.message(), 500);
       }
+    }
 
-      /**
-       * Parse a JSON stream
-       *
-       * @param body json input stream
-       */
-      void FromJson(const std::string &body) {
+    /**
+     * Parse a JSON stream
+     *
+     * @param body json input stream
+     */
+    void FromJson(const std::string &body) {
 
-          Poco::JSON::Parser parser;
-          Poco::Dynamic::Var result = parser.parse(body);
-          Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+      Poco::JSON::Parser parser;
+      Poco::Dynamic::Var result = parser.parse(body);
+      Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
-          try {
+      try {
 
-              // Get root values
-              Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-              Core::JsonUtils::GetJsonValueInt("MaxResults", rootObject, maxResults);
-              Core::JsonUtils::GetJsonValueString("NextToken", rootObject, nextToken);
+        // Get root values
+        Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
+        Core::JsonUtils::GetJsonValueInt("MaxResults", rootObject, maxResults);
+        Core::JsonUtils::GetJsonValueString("NextToken", rootObject, nextToken);
 
-          } catch (Poco::Exception &exc) {
-              throw Core::ServiceException(exc.message(), 500);
-          }
+      } catch (Poco::Exception &exc) {
+        throw Core::ServiceException(exc.message(), 500);
       }
+    }
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const {
-          std::stringstream ss;
-          ss << (*this);
-          return ss.str();
-      }
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const {
+      std::stringstream ss;
+      ss << (*this);
+      return ss.str();
+    }
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const ListServerRequest &r) {
-          os << "ListServerRequest={region='" << r.region << "' maxResults='" << r.maxResults << "' nextToken='" << r.nextToken << "'}";
-          return os;
-      }
-    };
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const ListServerRequest &r) {
+      os << "ListServerRequest={region='" << r.region << "' maxResults='" << r.maxResults << "' nextToken='" << r.nextToken << "'}";
+      return os;
+    }
+  };
 
 } // namespace AwsMock::Dto::lambda
 

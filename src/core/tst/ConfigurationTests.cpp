@@ -17,15 +17,15 @@ namespace AwsMock::Core {
 
   class ConfigurationTest : public ::testing::Test {
 
-    protected:
+  protected:
 
-      void SetUp() override {
-      }
+    void SetUp() override {
+    }
 
-      void TearDown() override {
-      }
+    void TearDown() override {
+    }
 
-      Configuration _configuration = Configuration(TMP_PROPERTIES_FILE);
+    Configuration _configuration = Configuration(TMP_PROPERTIES_FILE);
   };
 
   TEST_F(ConfigurationTest, EmptyFilenameTest) {

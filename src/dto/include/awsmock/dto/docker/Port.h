@@ -24,50 +24,50 @@
 
 namespace AwsMock::Dto::Docker {
 
-    struct Port {
+  struct Port {
 
-      /**
-       * Constructor
-       */
-      Port(const Poco::JSON::Object::Ptr &object);
+    /**
+     * Constructor
+     */
+    Port(const Poco::JSON::Object::Ptr &object);
 
-      /**
-       * Private port, means port inside the container
-       */
-      int privatePort;
+    /**
+     * Private port, means port inside the container
+     */
+    int privatePort;
 
-      /**
-       * Public port, means port visible from docker host
-       */
-      int publicPort;
+    /**
+     * Public port, means port visible from docker host
+     */
+    int publicPort;
 
-      /**
-       * Port type (tcp,udp, etc.)
-       */
-      std::string type;
+    /**
+     * Port type (tcp,udp, etc.)
+     */
+    std::string type;
 
-      /**
-       * Convert to a JSON string
-       *
-       * @return JSON string
-       */
-      void FromJson(Poco::JSON::Object::Ptr object);
+    /**
+     * Convert to a JSON string
+     *
+     * @return JSON string
+     */
+    void FromJson(Poco::JSON::Object::Ptr object);
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const Port &c);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const Port &c);
 
-    };
+  };
 
 } // namespace AwsMock::Dto::Docker
 

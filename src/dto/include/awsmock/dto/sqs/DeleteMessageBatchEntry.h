@@ -12,35 +12,35 @@
 
 namespace AwsMock::Dto::SQS {
 
-    struct DeleteMessageBatchEntry {
+  struct DeleteMessageBatchEntry {
 
-      /**
-       * Entry ID
-       */
-      std::string id;
+    /**
+     * Entry ID
+     */
+    std::string id;
 
-      /**
-       * Receipt handle
-       */
-      std::string receiptHandle;
+    /**
+     * Receipt handle
+     */
+    std::string receiptHandle;
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &os, const DeleteMessageBatchEntry &d);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const DeleteMessageBatchEntry &d);
 
-    };
+  };
 
-    typedef std::vector<DeleteMessageBatchEntry> DeleteMessageBatchEntries;
+  typedef std::vector<DeleteMessageBatchEntry> DeleteMessageBatchEntries;
 
 } // namespace AwsMock::Dto::SQS
 

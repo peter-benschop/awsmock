@@ -50,214 +50,214 @@ namespace AwsMock::Service {
    */
   class DockerService {
 
-    public:
+  public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration module configuration
-       */
-      explicit DockerService(const Core::Configuration &configuration);
+    /**
+     * Constructor
+     *
+     * @param configuration module configuration
+     */
+    explicit DockerService(const Core::Configuration &configuration);
 
-      /**
-       * Creates a simple image
-       *
-       * @param name image name
-       * @param tag image tags
-       * @param imageCode code of the image
-       */
-      void CreateImage(const std::string &name, const std::string &tag, const std::string &imageCode);
+    /**
+     * Creates a simple image
+     *
+     * @param name image name
+     * @param tag image tags
+     * @param imageCode code of the image
+     */
+    void CreateImage(const std::string &name, const std::string &tag, const std::string &imageCode);
 
-      /**
-       * Checks whether a image exists.
-       *
-       * @param name image name
-       * @param tag image tags
-       * @return true if image exists, otherwise false
-       */
-      bool ImageExists(const std::string &name, const std::string &tag);
+    /**
+     * Checks whether a image exists.
+     *
+     * @param name image name
+     * @param tag image tags
+     * @return true if image exists, otherwise false
+     */
+    bool ImageExists(const std::string &name, const std::string &tag);
 
-      /**
-       * Returns a image by name/tags.
-       *
-       * @param name container name
-       * @param tag container tags
-       * @return Image
-       */
-      Dto::Docker::Image GetImageByName(const std::string &name, const std::string &tag);
+    /**
+     * Returns a image by name/tags.
+     *
+     * @param name container name
+     * @param tag container tags
+     * @return Image
+     */
+    Dto::Docker::Image GetImageByName(const std::string &name, const std::string &tag);
 
-      /**
-       * Build a docker image for a lambda
-       *
-       * @param codeDir code directory
-       * @param name lambda function name, used as image name
-       * @param tag image tags
-       * @param handler lambda function handler
-       * @param runtime lambda AWS runtime
-       * @param environment runtime environment
-       * @return file size in bytes
-       */
-      std::string BuildImage(const std::string &codeDir,
-                             const std::string &name,
-                             const std::string &tag,
-                             const std::string &handler,
-                             const std::string &runtime,
-                             const std::map<std::string, std::string> &environment);
+    /**
+     * Build a docker image for a lambda
+     *
+     * @param codeDir code directory
+     * @param name lambda function name, used as image name
+     * @param tag image tags
+     * @param handler lambda function handler
+     * @param runtime lambda AWS runtime
+     * @param environment runtime environment
+     * @return file size in bytes
+     */
+    std::string BuildImage(const std::string &codeDir,
+                           const std::string &name,
+                           const std::string &tag,
+                           const std::string &handler,
+                           const std::string &runtime,
+                           const std::map<std::string, std::string> &environment);
 
-      /**
-       * Delete an image by name/tags.
-       *
-       * @param id image ID
-       */
-      void DeleteImage(const std::string &id);
+    /**
+     * Delete an image by name/tags.
+     *
+     * @param id image ID
+     */
+    void DeleteImage(const std::string &id);
 
-      /**
-       * Checks whether a container exists.
-       *
-       * @param name container name
-       * @param tag container tags
-       * @return true if container exists, otherwise false
-       */
-      bool ContainerExists(const std::string &name, const std::string &tag);
+    /**
+     * Checks whether a container exists.
+     *
+     * @param name container name
+     * @param tag container tags
+     * @return true if container exists, otherwise false
+     */
+    bool ContainerExists(const std::string &name, const std::string &tag);
 
-      /**
-       * List all docker images
-       *
-       * @return CreateFunctionResponse
-       */
-      // Dto::Docker::ListImageResponse ListImages();
+    /**
+     * List all docker images
+     *
+     * @return CreateFunctionResponse
+     */
+    // Dto::Docker::ListImageResponse ListImages();
 
-      /**
-       * Creates a container
-       *
-       * @param name image name
-       * @param tag image tags
-       * @param environment runtime environment variables
-       * @param hostPort external port of the lambda
-       * @return CreateContainerResponse
-       */
-      Dto::Docker::CreateContainerResponse CreateContainer(const std::string &name, const std::string &tag, const std::vector<std::string> &environment, int hostPort);
+    /**
+     * Creates a container
+     *
+     * @param name image name
+     * @param tag image tags
+     * @param environment runtime environment variables
+     * @param hostPort external port of the lambda
+     * @return CreateContainerResponse
+     */
+    Dto::Docker::CreateContainerResponse CreateContainer(const std::string &name, const std::string &tag, const std::vector<std::string> &environment, int hostPort);
 
-      /**
-       * Returns a container by name/tags.
-       *
-       * @param name container name
-       * @param tag container tags
-       * @return Container
-       */
-      Dto::Docker::Container GetContainerByName(const std::string &name, const std::string &tag);
+    /**
+     * Returns a container by name/tags.
+     *
+     * @param name container name
+     * @param tag container tags
+     * @return Container
+     */
+    Dto::Docker::Container GetContainerByName(const std::string &name, const std::string &tag);
 
-      /**
-       * Returns a container by name/tags.
-       *
-       * @param id container ID
-       * @return Container
-       */
-      Dto::Docker::Container GetContainerById(const std::string &id);
+    /**
+     * Returns a container by name/tags.
+     *
+     * @param id container ID
+     * @return Container
+     */
+    Dto::Docker::Container GetContainerById(const std::string &id);
 
-      /**
-       * Start the container
-       *
-       * @param id container ID
-       */
-      void StartDockerContainer(const std::string &id);
+    /**
+     * Start the container
+     *
+     * @param id container ID
+     */
+    void StartDockerContainer(const std::string &id);
 
-      /**
-       * Start the container
-       *
-       * @param container container
-       */
-      void StartContainer(const Dto::Docker::Container &container);
+    /**
+     * Start the container
+     *
+     * @param container container
+     */
+    void StartContainer(const Dto::Docker::Container &container);
 
-      /**
-       * Restart the container
-       *
-       * @param id container ID
-       */
-      void RestartDockerContainer(const std::string &id);
+    /**
+     * Restart the container
+     *
+     * @param id container ID
+     */
+    void RestartDockerContainer(const std::string &id);
 
-      /**
-       * Restart the container
-       *
-       * @param container container
-       */
-      void RestartContainer(const Dto::Docker::Container &container);
+    /**
+     * Restart the container
+     *
+     * @param container container
+     */
+    void RestartContainer(const Dto::Docker::Container &container);
 
-      /**
-       * Stops the container
-       *
-       * @param container container
-       */
-      void StopContainer(const Dto::Docker::Container &container);
+    /**
+     * Stops the container
+     *
+     * @param container container
+     */
+    void StopContainer(const Dto::Docker::Container &container);
 
-      /**
-       * Deletes the container
-       *
-       * @param container container DTO
-       */
-      void DeleteContainer(const Dto::Docker::Container &container);
+    /**
+     * Deletes the container
+     *
+     * @param container container DTO
+     */
+    void DeleteContainer(const Dto::Docker::Container &container);
 
-      /**
-       * Deletes all stopped containers.
-       */
-      void PruneContainers();
+    /**
+     * Deletes all stopped containers.
+     */
+    void PruneContainers();
 
-    private:
+  private:
 
-      /**
-       * Write the docker file.
-       *
-       * @param codeDir code directory
-       * @param handler handler function
-       * @param runtime docker image runtime
-       * @param environment runtime environment
-       * @return return docker file path
-       */
-      std::string WriteDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment);
+    /**
+     * Write the docker file.
+     *
+     * @param codeDir code directory
+     * @param handler handler function
+     * @param runtime docker image runtime
+     * @param environment runtime environment
+     * @return return docker file path
+     */
+    std::string WriteDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment);
 
-      /**
-       * Write the compressed docker imagefile.
-       *
-       * @param codeDir code directory
-       * @param name function name
-       * @return return docker file path
-       */
-      std::string BuildImageFile(const std::string &codeDir, const std::string &name);
+    /**
+     * Write the compressed docker imagefile.
+     *
+     * @param codeDir code directory
+     * @param name function name
+     * @return return docker file path
+     */
+    std::string BuildImageFile(const std::string &codeDir, const std::string &name);
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
 
-      /**
-       * Configuration
-       */
-      const Core::Configuration &_configuration;
+    /**
+     * Configuration
+     */
+    const Core::Configuration &_configuration;
 
-      /**
-       * Curl utilities
-       */
-      Core::CurlUtils _curlUtils;
+    /**
+     * Curl utilities
+     */
+    Core::CurlUtils _curlUtils;
 
-      /**
-       * Docker version
-       */
-      std::string _dockerVersion;
+    /**
+     * Docker version
+     */
+    std::string _dockerVersion;
 
-      /**
-       * Docker network mode, bridge or host
-       */
-      std::string _networkMode;
+    /**
+     * Docker network mode, bridge or host
+     */
+    std::string _networkMode;
 
-      /**
-       * Docker internal network name
-       */
-      std::string _networkName;
+    /**
+     * Docker internal network name
+     */
+    std::string _networkName;
 
-      /**
-       * Docker internal network name
-       */
-      std::string _containerPort;
+    /**
+     * Docker internal network name
+     */
+    std::string _containerPort;
   };
 
 } //namespace AwsMock::Service
