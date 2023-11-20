@@ -121,6 +121,7 @@ namespace AwsMock::Database {
     });
     _queues[it->first] = queue;
     return _queues[it->first];
+
   }
 
   long SQSMemoryDb::CountQueues(const std::string &region) {
