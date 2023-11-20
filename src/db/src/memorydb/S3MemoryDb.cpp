@@ -8,6 +8,55 @@ namespace AwsMock::Database {
 
   S3MemoryDb::S3MemoryDb() : _logger(Poco::Logger::get("SQSMemoryDb")) {}
 
+  bool S3MemoryDb::BucketExists(const std::string &region, const std::string &name) {
+
+    return find_if(_buckets.begin(), _buckets.end(), [region, name](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
+      return bucket.second.region == region && bucket.second.name == name;
+    }) != _buckets.end();
+  }
+
+  bool S3MemoryDb::BucketExists(const Entity::S3::Bucket &bucket) {
+
+    return BucketExists(bucket.region, bucket.name);
+  }
+
+  Entity::S3::Bucket S3MemoryDb::GetBucketById(const std::string &oid) {
+
+    auto it = find_if(_buckets.begin(), _buckets.end(), [oid](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
+      return bucket.first == oid;
+    });
+
+    if (it != _buckets.end()) {
+      it->second.oid = oid;
+      return it->second;
+    }
+    return {};
+  }
+
+  Entity::S3::Bucket S3MemoryDb::GetBucketByRegionName(const std::string &region, const std::string &name) {
+
+    Entity::S3::Bucket result;
+
+    auto it = find_if(_buckets.begin(), _buckets.end(), [region, name](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
+      return bucket.second.region == region && bucket.second.name == name;
+    });
+
+    if (it != _buckets.end()) {
+      it->second.oid = it->first;
+      return it->second;
+    }
+    return {};
+  }
+
+  Entity::S3::Bucket S3MemoryDb::CreateBucket(const Entity::S3::Bucket &bucket) {
+
+    std::string oid = Poco::UUIDGenerator().createRandom().toString();
+    _buckets[oid] = bucket;
+    log_trace_stream(_logger) << "Bucket created, oid: " << oid << std::endl;
+    return GetBucketById(oid);
+
+  }
+
   Entity::S3::BucketList S3MemoryDb::ListBuckets() {
 
     Entity::S3::BucketList bucketList;
@@ -17,6 +66,17 @@ namespace AwsMock::Database {
 
     log_trace_stream(_logger) << "Got bucket list, size: " << bucketList.size() << std::endl;
     return bucketList;
+  }
+
+  bool S3MemoryDb::HasObjects(const Entity::S3::Bucket &bucket) {
+
+    long count = 0;
+    for (const auto &object : _objects) {
+      if (object.second.region == bucket.region && object.second.bucket == bucket.name) {
+        count++;
+      }
+    }
+    return count > 0;
   }
 
   long S3MemoryDb::BucketCount() {
@@ -46,15 +106,26 @@ namespace AwsMock::Database {
     return objectList;
   }
 
+  Entity::S3::Bucket S3MemoryDb::UpdateBucket(const Entity::S3::Bucket &bucket) {
+
+    std::string region = bucket.region;
+    std::string name = bucket.name;
+    auto it = find_if(_buckets.begin(), _buckets.end(), [region, name](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
+      return bucket.second.region == region && bucket.second.name == name;
+    });
+    _buckets[it->first] = bucket;
+    return _buckets[it->first];
+  }
+
   long S3MemoryDb::ObjectCount(const std::string &region, const std::string &bucket) {
 
     long count = 0;
     for (const auto &object : _objects) {
       if (!region.empty() && object.second.region == region && !bucket.empty() && object.second.bucket == bucket) {
         count++;
-      } else if(!region.empty() && object.second.region == region) {
+      } else if (!region.empty() && object.second.region == region) {
         count++;
-      } else if(!bucket.empty() && object.second.bucket == bucket) {
+      } else if (!bucket.empty() && object.second.bucket == bucket) {
         count++;
       }
     }

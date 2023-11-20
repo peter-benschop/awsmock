@@ -110,7 +110,7 @@ namespace AwsMock::Database {
     Entity::S3::BucketList ListBuckets();
 
     /**
-     * CHeck whether the bucket has still objects
+     * Check whether the bucket has still objects
      *
      * @param bucket bucket entity
      * @return true if bucket exists
