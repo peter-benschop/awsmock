@@ -19,10 +19,10 @@ RUN git clone https://github.com/jensvogt/aws-mock.git && \
     cmake --install . --prefix /usr
 
 # Supervisord
-RUN apt-get install -y supervisor
-RUN mkdir -p /var/log/supervisor
-RUN mkdir -p /etc/supervisor/conf.d/
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+#RUN apt-get install -y supervisor
+#RUN mkdir -p /var/log/supervisor
+#RUN mkdir -p /etc/supervisor/conf.d/
+#COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # AWS CLI v2
 WORKDIR /usr/src
@@ -54,4 +54,4 @@ EXPOSE 27017 27017
 
 VOLUME /var/run/docker.sock /var/run/docker.sock
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+CMD ["/usr/bin/aws-mock"]
