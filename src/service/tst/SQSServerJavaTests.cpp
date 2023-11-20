@@ -20,6 +20,7 @@
 
 #define REGION "eu-central-1"
 #define OWNER "test-owner"
+#define MESSAGE "{\"test-attribute\":\"test-value\"}"
 #define VERSION std::string("2012-11-05")
 #define CREATE_QUEUE_REQUEST "Action=CreateQueue&QueueName=TestQueue&Attribute.1.Name=VisibilityTimeout&Attribute.1.Value=40&Tag.Key=QueueType&Tag.Value=Production"
 #define LIST_QUEUE_REQUEST "Action=ListQueues"
@@ -154,7 +155,8 @@ namespace AwsMock::Service {
     std::string queueUrl = getQueueUrlResponse.queueUrl;
 
     // act
-    curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, SEND_MESSAGE_REQUEST);
+    body = "Action=SendMessage&Version=2003-11-05&QueueUrl=" + Core::StringUtils::UrlEncode(queueUrl) + "&MessageBody=" + Core::StringUtils::UrlEncode(MESSAGE);
+    curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, body);
     EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
     Dto::SQS::SendMessageResponse sendMessageResponse;
     sendMessageResponse.FromXml(curlResponse.output);
