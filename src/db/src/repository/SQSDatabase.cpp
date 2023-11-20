@@ -297,7 +297,7 @@ namespace AwsMock::Database {
 
   Entity::SQS::Message SQSDatabase::CreateMessage(const Entity::SQS::Message &message) {
 
-    if(HasDatabase()) {
+    if (HasDatabase()) {
 
       auto result = _messageCollection.insert_one(message.ToDocument());
       log_trace_stream(_logger) << "Message created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
@@ -312,9 +312,17 @@ namespace AwsMock::Database {
 
   bool SQSDatabase::MessageExists(const std::string &receiptHandle) {
 
-    int64_t count = _messageCollection.count_documents(make_document(kvp("receiptHandle", receiptHandle)));
-    log_trace_stream(_logger) << "Message exists: " << (count > 0 ? "true" : "false") << std::endl;
-    return count > 0;
+    if (HasDatabase()) {
+
+      int64_t count = _messageCollection.count_documents(make_document(kvp("receiptHandle", receiptHandle)));
+      log_trace_stream(_logger) << "Message exists: " << (count > 0 ? "true" : "false") << std::endl;
+      return count > 0;
+
+    } else {
+
+      return _memoryDb.MessageExists(receiptHandle);
+
+    }
   }
 
   Entity::SQS::Message SQSDatabase::GetMessageById(bsoncxx::oid oid) {
@@ -328,169 +336,241 @@ namespace AwsMock::Database {
 
   Entity::SQS::Message SQSDatabase::GetMessageByReceiptHandle(const std::string &receiptHandle) {
 
-    mongocxx::stdx::optional<bsoncxx::document::value> mResult = _messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle)));
-    Entity::SQS::Message result;
-    result.FromDocument(mResult);
+    if (HasDatabase()) {
 
-    return result;
+      mongocxx::stdx::optional<bsoncxx::document::value> mResult = _messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle)));
+      Entity::SQS::Message result;
+      result.FromDocument(mResult);
+      return result;
+
+    } else {
+
+      return _memoryDb.GetMessageByReceiptHandle(receiptHandle);
+
+    }
   }
 
   Entity::SQS::Message SQSDatabase::GetMessageById(const std::string &oid) {
-    return GetMessageById(bsoncxx::oid(oid));
+
+    if (HasDatabase()) {
+
+      return GetMessageById(bsoncxx::oid(oid));
+
+    } else {
+
+      return _memoryDb.GetMessageById(oid);
+
+    }
   }
 
   Entity::SQS::Message SQSDatabase::UpdateMessage(Entity::SQS::Message &message) {
 
-    mongocxx::options::find_one_and_update opts{};
-    opts.return_document(mongocxx::options::return_document::k_after);
+    if (HasDatabase()) {
 
-    auto mResult = _messageCollection.find_one_and_update(make_document(kvp("_id", bsoncxx::oid{message.oid})), message.ToDocument(), opts);
-    log_trace_stream(_logger) << "Message updated, count: " << ConvertMessageToJson(mResult.value()) << std::endl;
+      mongocxx::options::find_one_and_update opts{};
+      opts.return_document(mongocxx::options::return_document::k_after);
 
-    if (!mResult) {
-      throw Core::DatabaseException("Update message failed, oid: " + message.oid);
+      auto mResult = _messageCollection.find_one_and_update(make_document(kvp("_id", bsoncxx::oid{message.oid})), message.ToDocument(), opts);
+      log_trace_stream(_logger) << "Message updated, count: " << ConvertMessageToJson(mResult.value()) << std::endl;
+
+      if (!mResult) {
+        throw Core::DatabaseException("Update message failed, oid: " + message.oid);
+      }
+
+      message.FromDocument(mResult->view());
+      return message;
+
+    } else {
+
+      return _memoryDb.UpdateMessage(message);
+
     }
-
-    message.FromDocument(mResult->view());
-    return message;
   }
 
   void SQSDatabase::ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, Entity::SQS::MessageList &messageList) {
 
     auto reset = std::chrono::high_resolution_clock::now() + std::chrono::seconds{visibility};
 
-    auto session = GetSession();
-    session.start_transaction();
+    if (HasDatabase()) {
 
-    try {
+      auto session = GetSession();
+      session.start_transaction();
 
-      // Get the cursor
-      auto messageCursor = _messageCollection.find(make_document(kvp("queueUrl", queueUrl), kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))));
-      for (auto message : messageCursor) {
+      try {
 
-        Entity::SQS::Message result;
-        result.FromDocument(message);
+        // Get the cursor
+        auto messageCursor = _messageCollection.find(make_document(kvp("queueUrl", queueUrl), kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))));
+        for (auto message : messageCursor) {
 
-        result.retries++;
-        result.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
-        messageList.push_back(result);
+          Entity::SQS::Message result;
+          result.FromDocument(message);
 
-        // Update values
-        _messageCollection.update_one(make_document(kvp("_id", message["_id"].get_oid())),
-                                      make_document(kvp("$set", make_document(kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)),
-                                                                              kvp("reset",
-                                                                                  bsoncxx::types::b_date(reset)),
-                                                                              kvp("receiptHandle",
-                                                                                  result.receiptHandle))),
-                                                    kvp("$inc", make_document(kvp("retries", 1)))));
+          result.retries++;
+          result.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
+          messageList.push_back(result);
+
+          // Update values
+          _messageCollection.update_one(make_document(kvp("_id", message["_id"].get_oid())),
+                                        make_document(kvp("$set", make_document(kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)),
+                                                                                kvp("reset",
+                                                                                    bsoncxx::types::b_date(reset)),
+                                                                                kvp("receiptHandle",
+                                                                                    result.receiptHandle))),
+                                                      kvp("$inc", make_document(kvp("retries", 1)))));
+        }
+
+        // Commit
+        session.commit_transaction();
+
+      } catch (mongocxx::exception &e) {
+        log_error_stream(_logger) << "Collection transaction exception: " << e.what() << std::endl;
+        session.abort_transaction();
       }
 
-      // Commit
-      session.commit_transaction();
+    } else {
 
-    } catch (mongocxx::exception &e) {
-      log_error_stream(_logger) << "Collection transaction exception: " << e.what() << std::endl;
-      session.abort_transaction();
+      _memoryDb.ReceiveMessages(region, queueUrl, visibility, messageList);
+
     }
     log_trace_stream(_logger) << "Messages received, region: " << region << " queue: " << queueUrl + " count: " << messageList.size() << std::endl;
   }
 
   void SQSDatabase::ResetMessages(const std::string &queueUrl, long visibility) {
 
-    auto session = GetSession();
-    session.start_transaction();
-    try {
+    if (HasDatabase()) {
 
-      auto now = std::chrono::high_resolution_clock::now();
-      auto result = _messageCollection.update_many(
-          make_document(
-              kvp("queueUrl", queueUrl),
-              kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)),
-              kvp("reset", make_document(
-                  kvp("$lt", bsoncxx::types::b_date(now))))),
-          make_document(kvp("$set",
-                            make_document(
-                                kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)),
-                                kvp("receiptHandle", "")))));
+      auto session = GetSession();
+      session.start_transaction();
+      try {
 
-      // Commit
-      session.commit_transaction();
+        auto now = std::chrono::high_resolution_clock::now();
+        auto result = _messageCollection.update_many(
+            make_document(
+                kvp("queueUrl", queueUrl),
+                kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)),
+                kvp("reset", make_document(
+                    kvp("$lt", bsoncxx::types::b_date(now))))),
+            make_document(kvp("$set",
+                              make_document(
+                                  kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)),
+                                  kvp("receiptHandle", "")))));
 
-      log_trace_stream(_logger) << "Message reset, visibility: " << visibility << " updated: " << result->upserted_count() << " queue: " << queueUrl << std::endl;
+        // Commit
+        session.commit_transaction();
 
-    } catch (mongocxx::exception &e) {
-      log_error_stream(_logger) << "Collection transaction exception: " << e.what() << std::endl;
-      session.abort_transaction();
+        log_trace_stream(_logger) << "Message reset, visibility: " << visibility << " updated: " << result->upserted_count() << " queue: " << queueUrl << std::endl;
+
+      } catch (mongocxx::exception &e) {
+        log_error_stream(_logger) << "Collection transaction exception: " << e.what() << std::endl;
+        session.abort_transaction();
+      }
+
+    } else {
+
+      _memoryDb.ResetMessages(queueUrl, visibility);
+
     }
   }
 
   void SQSDatabase::RedriveMessages(const std::string &queueUrl, const Entity::SQS::RedrivePolicy &redrivePolicy) {
-    auto session = GetSession();
-    session.start_transaction();
-    try {
-      std::string dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(_configuration, redrivePolicy.deadLetterTargetArn);
-      auto result = _messageCollection.update_many(make_document(kvp("queueUrl", queueUrl),
-                                                                 kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)),
-                                                                 kvp("retries", make_document(
-                                                                     kvp("$gt", redrivePolicy.maxReceiveCount)))),
-                                                   make_document(kvp("$set", make_document(kvp("retries", 0),
-                                                                                           kvp("queueArn",
-                                                                                               redrivePolicy.deadLetterTargetArn),
-                                                                                           kvp("queueUrl",
-                                                                                               dlqQueueUrl)))));
-      // Commit
-      session.commit_transaction();
 
-      log_trace_stream(_logger) << "Message redrive, arn: " << redrivePolicy.deadLetterTargetArn << " updated: " << result->modified_count() << " queue: " << queueUrl << std::endl;
+    if (HasDatabase()) {
 
-    } catch (mongocxx::exception &e) {
-      log_error_stream(_logger) << "Collection transaction exception: " << e.what() << std::endl;
-      session.abort_transaction();
+      auto session = GetSession();
+      session.start_transaction();
+
+      try {
+
+        std::string dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(_configuration, redrivePolicy.deadLetterTargetArn);
+        auto result = _messageCollection.update_many(make_document(kvp("queueUrl", queueUrl),
+                                                                   kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)),
+                                                                   kvp("retries", make_document(
+                                                                       kvp("$gt", redrivePolicy.maxReceiveCount)))),
+                                                     make_document(kvp("$set", make_document(kvp("retries", 0),
+                                                                                             kvp("queueArn",
+                                                                                                 redrivePolicy.deadLetterTargetArn),
+                                                                                             kvp("queueUrl",
+                                                                                                 dlqQueueUrl)))));
+        // Commit
+        session.commit_transaction();
+        log_trace_stream(_logger) << "Message redrive, arn: " << redrivePolicy.deadLetterTargetArn << " updated: " << result->modified_count() << " queue: " << queueUrl << std::endl;
+
+      } catch (mongocxx::exception &e) {
+        log_error_stream(_logger) << "Collection transaction exception: " << e.what() << std::endl;
+        session.abort_transaction();
+      }
+
+    } else {
+
+      _memoryDb.RedriveMessages(queueUrl, redrivePolicy, _configuration);
+
     }
   }
 
   void SQSDatabase::ResetDelayedMessages(const std::string &queueUrl, long delay) {
 
-    auto session = GetSession();
-    session.start_transaction();
-    try {
+    if (HasDatabase()) {
 
-      auto now = std::chrono::high_resolution_clock::now();
-      auto result = _messageCollection.update_many(
-          make_document(
-              kvp("queueUrl", queueUrl),
-              kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)),
-              kvp("reset", make_document(
-                  kvp("$lt", bsoncxx::types::b_date(now))))),
-          make_document(
-              kvp("$set",
-                  make_document(
-                      kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))))));
-      // Commit
-      session.commit_transaction();
+      auto session = GetSession();
+      session.start_transaction();
+      try {
 
-      log_trace_stream(_logger) << "Delayed message reset, updated: " << result->upserted_count() << " queue: " << queueUrl << std::endl;
+        auto now = std::chrono::high_resolution_clock::now();
+        auto result = _messageCollection.update_many(
+            make_document(
+                kvp("queueUrl", queueUrl),
+                kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)),
+                kvp("reset", make_document(
+                    kvp("$lt", bsoncxx::types::b_date(now))))),
+            make_document(
+                kvp("$set",
+                    make_document(
+                        kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))))));
+        // Commit
+        session.commit_transaction();
 
-    } catch (mongocxx::exception &e) {
-      log_error_stream(_logger) << "Collection transaction exception: " << e.what() << std::endl;
-      session.abort_transaction();
+        log_trace_stream(_logger) << "Delayed message reset, updated: " << result->upserted_count() << " queue: " << queueUrl << std::endl;
+
+      } catch (mongocxx::exception &e) {
+        log_error_stream(_logger) << "Collection transaction exception: " << e.what() << std::endl;
+        session.abort_transaction();
+      }
+
+    } else {
+
+      _memoryDb.ResetDelayedMessages(queueUrl, delay);
+
     }
   }
 
   long SQSDatabase::CountMessages(const std::string &region, const std::string &queueUrl) {
 
-    long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
-    log_trace_stream(_logger) << "Count messages, region: " << region << " url: " << queueUrl << " result: " << count << std::endl;
+    if (HasDatabase()) {
 
-    return count;
+      long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
+      log_trace_stream(_logger) << "Count messages, region: " << region << " url: " << queueUrl << " result: " << count << std::endl;
+      return count;
+
+    } else {
+
+      return _memoryDb.CountMessages(region, queueUrl);
+
+    }
   }
 
   long SQSDatabase::CountMessagesByStatus(const std::string &region, const std::string &queueUrl, Entity::SQS::MessageStatus status) {
 
-    long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl), kvp("status", Entity::SQS::MessageStatusToString(status))));
-    log_trace_stream(_logger) << "Count messages by status, status: " << Entity::SQS::MessageStatusToString(status) << " result: " << count << std::endl;
+    if (HasDatabase()) {
 
-    return count;
+      long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl), kvp("status", Entity::SQS::MessageStatusToString(status))));
+      log_trace_stream(_logger) << "Count messages by status, status: " << Entity::SQS::MessageStatusToString(status) << " result: " << count << std::endl;
+      return count;
+
+    } else {
+
+      return _memoryDb.CountMessagesByStatus(region, queueUrl, status);
+
+    }
   }
 
   void SQSDatabase::DeleteMessages(const std::string &queueUrl) {
