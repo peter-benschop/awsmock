@@ -29,13 +29,21 @@ namespace AwsMock::Database {
 
   bool S3Database::BucketExists(const std::string &region, const std::string &name) {
 
-    try {
-      int64_t count = _bucketCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
-      log_trace_stream(_logger) << "Bucket exists: " << (count > 0 ? "true" : "false") << std::endl;
-      return count > 0;
-    } catch (const mongocxx::exception &exc) {
-      _logger.error() << "Database exception " << exc.what() << std::endl;
-      throw Core::DatabaseException(exc.what(), 500);
+    if (HasDatabase()) {
+
+      try {
+        int64_t count = _bucketCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
+        log_trace_stream(_logger) << "Bucket exists: " << (count > 0 ? "true" : "false") << std::endl;
+        return count > 0;
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), 500);
+      }
+
+    } else {
+
+      return _memoryDb.BucketExists(region, name);
+
     }
   }
 
@@ -45,15 +53,22 @@ namespace AwsMock::Database {
 
   Entity::S3::Bucket S3Database::CreateBucket(const Entity::S3::Bucket &bucket) {
 
-    auto insert_one_result = _bucketCollection.insert_one(bucket.ToDocument());
-    log_trace_stream(_logger) << "Bucket created, oid: " << insert_one_result->inserted_id().get_oid().value.to_string() << std::endl;
+    if (HasDatabase()) {
 
-    return GetBucketById(insert_one_result->inserted_id().get_oid().value);
+      auto insert_one_result = _bucketCollection.insert_one(bucket.ToDocument());
+      log_trace_stream(_logger) << "Bucket created, oid: " << insert_one_result->inserted_id().get_oid().value.to_string() << std::endl;
+      return GetBucketById(insert_one_result->inserted_id().get_oid().value);
+
+    } else {
+
+      return _memoryDb.CreateBucket(bucket);
+
+    }
   }
 
   long S3Database::BucketCount() {
 
-    if(HasDatabase()) {
+    if (HasDatabase()) {
 
       try {
         long count = _bucketCollection.count_documents(make_document());
@@ -82,21 +97,37 @@ namespace AwsMock::Database {
   }
 
   Entity::S3::Bucket S3Database::GetBucketById(const std::string &oid) {
-    return GetBucketById(bsoncxx::oid(oid));
+
+    if (HasDatabase()) {
+
+      return GetBucketById(bsoncxx::oid(oid));
+
+    } else {
+
+      return _memoryDb.GetBucketById(oid);
+
+    }
   }
 
   Entity::S3::Bucket S3Database::GetBucketByRegionName(const std::string &region, const std::string &name) {
 
-    mongocxx::stdx::optional<bsoncxx::document::value> mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
+    if (HasDatabase()) {
 
-    if (mResult->empty()) {
-      return {};
+      mongocxx::stdx::optional<bsoncxx::document::value> mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
+      if (mResult->empty()) {
+        return {};
+      }
+
+      Entity::S3::Bucket result;
+      result.FromDocument(mResult);
+      log_trace_stream(_logger) << "Got bucket: " << result.ToString() << std::endl;
+      return result;
+
+    } else {
+
+      return _memoryDb.GetBucketByRegionName(region, name);
+
     }
-
-    Entity::S3::Bucket result;
-    result.FromDocument(mResult);
-    log_trace_stream(_logger) << "Got bucket: " << result.ToString() << std::endl;
-    return result;
   }
 
   Entity::S3::BucketList S3Database::ListBuckets() {
@@ -122,18 +153,31 @@ namespace AwsMock::Database {
 
   bool S3Database::HasObjects(const Entity::S3::Bucket &bucket) {
 
-    int64_t count = _objectCollection.count_documents(make_document(kvp("region", bucket.region), kvp("bucket", bucket.name)));
-    log_trace_stream(_logger) << "Objects exists: " << (count > 0 ? "true" : "false") << std::endl;
+    if (HasDatabase()) {
 
-    return count > 0;
+      int64_t count = _objectCollection.count_documents(make_document(kvp("region", bucket.region), kvp("bucket", bucket.name)));
+      log_trace_stream(_logger) << "Objects exists: " << (count > 0 ? "true" : "false") << std::endl;
+      return count > 0;
+
+    } else {
+
+      return _memoryDb.HasObjects(bucket);
+
+    }
   }
 
   Entity::S3::Bucket S3Database::UpdateBucket(const Entity::S3::Bucket &bucket) {
 
-    auto result = _bucketCollection.replace_one(make_document(kvp("region", bucket.region), kvp("name", bucket.name)), bucket.ToDocument());
-    log_trace_stream(_logger) << "Bucket updated: " << bucket.ToString() << std::endl;
+    if (HasDatabase()) {
 
-    return GetBucketByRegionName(bucket.region, bucket.name);
+      auto result = _bucketCollection.replace_one(make_document(kvp("region", bucket.region), kvp("name", bucket.name)), bucket.ToDocument());
+      log_trace_stream(_logger) << "Bucket updated: " << bucket.ToString() << std::endl;
+      return GetBucketByRegionName(bucket.region, bucket.name);
+
+    } else {
+
+      return _memoryDb.UpdateBucket(bucket);
+    }
   }
 
   // TODO: Combine with Listobject
@@ -340,7 +384,7 @@ namespace AwsMock::Database {
 
   long S3Database::ObjectCount(const std::string &region, const std::string &bucket) {
 
-    if(HasDatabase()) {
+    if (HasDatabase()) {
 
       bsoncxx::builder::basic::document builder;
       if (!region.empty()) {

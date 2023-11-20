@@ -39,11 +39,66 @@ namespace AwsMock::Database {
     }
 
     /**
+     * Bucket exists
+     *
+     * @param region AWS region
+     * @param name bucket name
+     * @return true if bucket exists
+     * @throws DatabaseException
+     */
+    bool BucketExists(const std::string &region, const std::string &name);
+
+    /**
+     * Bucket exists
+     *
+     * @param bucket bucket entity
+     * @return true if bucket exists
+     * @throws DatabaseException
+     */
+    bool BucketExists(const Entity::S3::Bucket &bucket);
+
+    /**
+     * Returns the bucket by id
+     *
+     * @param oid bucket oid
+     * @return bucket, if existing
+     * @throws DatabaseException
+     */
+    Entity::S3::Bucket GetBucketById(const std::string &oid);
+
+    /**
+     * Returns the bucket by region and name.
+     *
+     * @param region AWS region
+     * @param name bucket name
+     * @return bucket entity
+     */
+    Entity::S3::Bucket GetBucketByRegionName(const std::string &region, const std::string &name);
+
+    /**
+     * Create a new bucket in the S3 bucket table
+     *
+     * @param bucket bucket entity
+     * @return created bucket entity
+     * @throws DatabaseException
+     */
+    Entity::S3::Bucket CreateBucket(const Entity::S3::Bucket &bucket);
+
+    /**
      * List all buckets
      *
      * @return BucketList
      */
     Entity::S3::BucketList ListBuckets();
+
+    /**
+     * Check whether the bucket has still objects
+     *
+     * @param bucket bucket entity
+     * @return true if bucket exists
+     * @throws DatabaseException
+     */
+    bool HasObjects(const Entity::S3::Bucket &bucket);
 
     /**
      * List all objects of a bucket
@@ -61,6 +116,15 @@ namespace AwsMock::Database {
      * @throws DatabaseException
      */
     long BucketCount();
+
+    /**
+     * Updates a bucket
+     *
+     * @param bucket bucket entity
+     * @return created bucket entity
+     * @throws DatabaseException
+     */
+    Entity::S3::Bucket UpdateBucket(const Entity::S3::Bucket &bucket);
 
     /**
      * List all objects.
