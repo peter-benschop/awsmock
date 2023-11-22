@@ -18,12 +18,6 @@ RUN git clone https://github.com/jensvogt/aws-mock.git && \
     cmake --build . --config Release && \
     cmake --install . --prefix /usr
 
-# Supervisord
-#RUN apt-get install -y supervisor
-#RUN mkdir -p /var/log/supervisor
-#RUN mkdir -p /etc/supervisor/conf.d/
-#COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-
 # AWS CLI v2
 WORKDIR /usr/src
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \

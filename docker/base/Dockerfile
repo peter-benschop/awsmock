@@ -41,26 +41,5 @@ RUN wget http://security.debian.org/debian-security/pool/updates/main/o/openssl/
     dpkg -i libssl1.1_1.1.1n-0+deb11u5_amd64.deb && \
     rm libssl1.1_1.1.1n-0+deb11u5_amd64.deb
 
-# Install MongoDB
-#RUN apt-get install gnupg2 -y && \
-#    curl -fsSL https://pgp.mongodb.com/server-7.0.asc | gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor && \
-#    echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] http://repo.mongodb.org/apt/debian bullseye/mongodb-org/7.0 main" | tee /etc/apt/sources.list.d/mongodb-org-7.0.list && \
-#    apt-get update && \
-#    apt-get install -y mongodb-org
-#RUN mkdir -p /data/db && \
-#    mkdir -p /var/log/mongodb && \
-#    mkdir -p /var/lib/mongodb && \
-#    mkdir -p /usr/src/mongo
-
-#COPY mongod.conf /etc/mongod.conf
-#COPY init.js /usr/src/mongo
-
-# Install admin user
-#WORKDIR /usr/src/mongo
-#RUN nohup bash -c "mongod &" && \
-#    sleep 4 && \
-#    mongosh < /usr/src/mongo/init.js
-#RUN sed -i 's/#security:/security/g' /etc/mongod.conf
-#RUN sed -i 's/#  authorization: enabled/  authorization: enabled/g' /etc/mongod.conf
-#
+# Cleanup
 RUN rm -rf /usr/src

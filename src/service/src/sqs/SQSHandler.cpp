@@ -181,8 +181,8 @@ namespace AwsMock::Service {
 
       } else if (action == "ChangeMessageVisibility") {
 
-        DumpRequestHeaders(request);
-        DumpPayload(payload);
+        //DumpRequestHeaders(request);
+        //DumpPayload(payload);
 
         int visibilityTimeout = GetIntParameter(payload, "VisibilityTimeout", 30, 12 * 3600, 60);
         std::string receiptHandle = GetStringParameter(payload, "ReceiptHandle");
@@ -285,6 +285,7 @@ namespace AwsMock::Service {
 
   std::string SQSHandler::GetQueueUrl(const Poco::Net::HTTPServerRequest &request, const std::string &payload) {
 
+    const std::string &uri = request.getURI();
     switch (GetUserAgent(request)) {
     case UserAgentType::AWS_CLI:
     case UserAgentType::AWS_SDK_CPP:return Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
