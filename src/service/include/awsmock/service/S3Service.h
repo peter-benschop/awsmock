@@ -42,9 +42,9 @@
 #include "awsmock/dto/s3/PutObjectResponse.h"
 #include "awsmock/service/LambdaService.h"
 
-#define DEFAULT_DATA_DIR  "/home/awsmock/data"
-#define DEFAULT_S3_DATA_DIR  "/home/awsmock/data/s3"
-#define DEFAULT_TRANSFER_DATA_DIR  "/home/awsmock/data/transfer"
+#define DEFAULT_DATA_DIR  "/tmp/awsmock/data"
+#define DEFAULT_S3_DATA_DIR  "/tmp/awsmock/data/s3"
+#define DEFAULT_TRANSFER_DATA_DIR  "/tmp/awsmock/data/transfer"
 #define DEFAULT_TRANSFER_BUCKET  "transfer-server"
 
 namespace AwsMock::Service {
