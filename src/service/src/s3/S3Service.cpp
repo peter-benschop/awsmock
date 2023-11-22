@@ -10,9 +10,9 @@ namespace AwsMock::Service {
 
     // Initialize directories
     _dataDir = _configuration.getString("awsmock.data.dir", DEFAULT_DATA_DIR);
-    _dataS3Dir = _configuration.getString("awsmock.module.s3.data.dir", DEFAULT_S3_DATA_DIR);
-    _transferDir = _configuration.getString("awsmock.module.ftp.base.dir", DEFAULT_TRANSFER_DATA_DIR);
-    _transferBucket = _configuration.getString("awsmock.module.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
+    _dataS3Dir = _configuration.getString("awsmock.service.s3.data.dir", DEFAULT_S3_DATA_DIR);
+    _transferDir = _configuration.getString("awsmock.service.ftp.base.dir", DEFAULT_TRANSFER_DATA_DIR);
+    _transferBucket = _configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
     _tempDir = _dataDir + Poco::Path::separator() + "tmp";
 
     // Initialize database
@@ -26,8 +26,10 @@ namespace AwsMock::Service {
     _lambdaServiceHost = _configuration.getString("awsmock.module.lambda.host", "localhost");
     _lambdaServicePort = _configuration.getInt("awsmock.module.lambda.port", 9503);
 
-    // Create temp directory
+    // Create directories
     Core::DirUtils::EnsureDirectory(_tempDir);
+    Core::DirUtils::EnsureDirectory(_dataDir);
+    Core::DirUtils::EnsureDirectory(_dataS3Dir);
   }
 
   Dto::S3::CreateBucketResponse S3Service::CreateBucket(const std::string &name, const std::string &owner, const Dto::S3::CreateBucketRequest &s3Request) {
