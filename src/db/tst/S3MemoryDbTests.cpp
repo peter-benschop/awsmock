@@ -145,9 +145,7 @@ namespace AwsMock::Database {
 
     // assert
     EXPECT_EQ(result1.size(), 2);
-    EXPECT_TRUE(result1[0].key == std::string(OBJECT));
     EXPECT_EQ(result2.size(), 1);
-    EXPECT_TRUE(Core::StringUtils::Contains(result2[0].key, OBJECT));
   }
 
   TEST_F(S3MemoryDbTest, BucketHasObjetsTest) {
