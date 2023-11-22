@@ -53,8 +53,8 @@ namespace AwsMock::Service {
           std::string parts = Core::StringUtils::Split(rangeStr, '=')[1];
           s3Request.min = std::stol(Core::StringUtils::Split(parts, '-')[0]);
           s3Request.max = std::stol(Core::StringUtils::Split(parts, '-')[1]);
+          log_info_stream(_logger) << "Requested multipart download range: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << std::endl;
         }
-        log_info_stream(_logger) << "Requested multipart download range: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << std::endl;
 
         // Get object
         Dto::S3::GetObjectResponse s3Response = _s3Service.GetObject(s3Request);

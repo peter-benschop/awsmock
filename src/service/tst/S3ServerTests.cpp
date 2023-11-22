@@ -25,7 +25,7 @@
 #define LOCATION_CONSTRAINT "<CreateBucketConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\"> \
                                 <LocationConstraint>eu-central-1</LocationConstraint> \
                              </CreateBucketConfiguration>"
-#define CREATE_BUCKET_RESPONSE "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<CreateBucketResult>\n\t<BuckerArn>arn</BuckerArn>\n</CreateBucketResult>\n"
+#define CREATE_BUCKET_RESPONSE "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<CreateBucketResult>\n\t<BucketArn>arn</BucketArn>\n</CreateBucketResult>\n"
 #define TEST_CONTENT R"({"test":"test"})"
 #define VERSIONING_BODY "<VersioningConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">" \
                         "  <Status>Enabled</Status>" \
