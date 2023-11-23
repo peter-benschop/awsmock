@@ -29,8 +29,8 @@ jobs:
       - name: Run tests
         run: cd build && ctest -V
 
-      - name: Create docs
-        run: cd build && make docs
+#      - name: Create docs
+#        run: cd build && make docs
 
   tag:
     name: Tag

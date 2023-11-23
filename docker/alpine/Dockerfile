@@ -6,7 +6,7 @@ RUN apk update && apk add groff g++ make cmake ccache openssl-dev git gdb curl w
 # Install basics
 ARG GH_TOKEN=${GH_TOKEN}
 ENV GH_TOKEN=${GH_TOKEN}
-RUN gh auth login
+#RUN gh auth login
 
 # Create build environment
 RUN mkdir -p /usr/src
