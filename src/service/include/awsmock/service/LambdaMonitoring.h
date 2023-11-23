@@ -25,7 +25,6 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/DirUtils.h>
-#include <awsmock/core/DirectoryWatcher.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>

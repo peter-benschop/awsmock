@@ -18,7 +18,7 @@ namespace AwsMock::Database {
 
   bool TransferMemoryDb::TransferExists(const Entity::Transfer::Transfer &transfer) {
 
-    TransferExists(transfer.region, transfer.serverId);
+    return TransferExists(transfer.region, transfer.serverId);
 
   }
 
