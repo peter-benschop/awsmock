@@ -26,6 +26,7 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
 
 # Cleanup
 RUN rm -rf /usr/src
+RUN apt-get purge -y --auto-remove build-essential cmake git libssl-dev libarchive-dev
 
 # Make dirctories
 RUN mkdir -p /tmp/awsmock/data/s3 && \
