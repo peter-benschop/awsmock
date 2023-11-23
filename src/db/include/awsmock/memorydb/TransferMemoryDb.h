@@ -51,12 +51,88 @@ namespace AwsMock::Database {
     bool TransferExists(const std::string &region, const std::string &serverId);
 
     /**
+     * Check existence of lambda
+     *
+     * @param transfer AWS transfer
+     * @return true if transfer manager already exists
+     * @throws DatabaseException
+     */
+    bool TransferExists(const Entity::Transfer::Transfer &transfer);
+
+    /**
+     * Check existence of lambda
+     *
+     * @param serverId AWS server ID
+     * @return true if transfer manager already exists
+     * @throws DatabaseException
+     */
+    bool TransferExists(const std::string &serverId);
+
+    /**
      * Returns a list of transfer manager.
      *
      * @param region AWS region name
      * @return list of transfer manager
      */
     std::vector<Entity::Transfer::Transfer> ListServers(const std::string &region);
+
+    /**
+     * Create a new lambda function
+     *
+     * @param transfer transfer entity
+     * @return created transfer entity.
+     */
+    Entity::Transfer::Transfer CreateTransfer(const Entity::Transfer::Transfer &transfer);
+
+    /**
+     * Updates an existing transfer manager
+     *
+     * @param transfer transfer entity
+     * @return updated transfer entity.
+     */
+    Entity::Transfer::Transfer UpdateTransfer(const Entity::Transfer::Transfer &transfer);
+
+    /**
+     * Returns a transfer manager entity by primary key
+     *
+     * @param oid transfer manager primary key
+     * @return transfer manager entity
+     * @throws DatabaseException
+     */
+    Entity::Transfer::Transfer GetTransferById(const std::string &oid);
+
+    /**
+     * Returns a transfer manager entity by manager ID
+     *
+     * @param serverId transfer manager ID
+     * @return transfer manager entity
+     * @throws DatabaseException
+     */
+    Entity::Transfer::Transfer GetTransferByServerId(const std::string &serverId);
+
+    /**
+     * Returns a transfer manager entity by ARN
+     *
+     * @param arn transfer manager ARN
+     * @return transfer manager entity
+     * @throws DatabaseException
+     */
+    Entity::Transfer::Transfer GetTransferByArn(const std::string &arn);
+
+    /**
+     * Deletes an existing transfer manager
+     *
+     * @param serverId transfer server ID
+     * @throws DatabaseException
+     */
+    void DeleteTransfer(const std::string &serverId);
+
+    /**
+     * Deletes all existing transfer server
+     *
+     * @throws DatabaseException
+     */
+    void DeleteAllTransfers();
 
   private:
 

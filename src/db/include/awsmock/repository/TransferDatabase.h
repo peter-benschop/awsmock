@@ -46,11 +46,11 @@ namespace AwsMock::Database {
     /**
      * Check existence of lambda
      *
-     * @param transferName AWS transfer name
+     * @param transfer AWS transfer
      * @return true if transfer manager already exists
      * @throws DatabaseException
      */
-    bool TransferExists(const Entity::Transfer::Transfer &transferName);
+    bool TransferExists(const Entity::Transfer::Transfer &transfer);
 
     /**
      * Check existence of lambda
@@ -142,13 +142,13 @@ namespace AwsMock::Database {
     /**
      * Deletes an existing transfer manager
      *
-     * @param transferName transfer manager name
+     * @param serverId transfer serverID
      * @throws DatabaseException
      */
-    void DeleteTransfer(const std::string &transferName);
+    void DeleteTransfer(const std::string &serverId);
 
     /**
-     * Deletes all existing transfer manager
+     * Deletes all existing transfer server
      *
      * @throws DatabaseException
      */
