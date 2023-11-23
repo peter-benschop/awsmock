@@ -60,7 +60,7 @@ jobs:
   release:
     name: Release
     runs-on: self-hosted
-    needs: [ build ]
+    needs: [ tag ]
     env:
       GH_TOKEN: '${{ github.token }}'
     steps:
