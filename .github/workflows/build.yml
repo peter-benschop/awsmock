@@ -17,7 +17,6 @@ jobs:
       - name: Create tag
         id: create-tag
         run: |
-          git sv tag
           VERSION=$(git sv cv)
           gh release create v$VERSION --latest --target=main --notes ""
 
