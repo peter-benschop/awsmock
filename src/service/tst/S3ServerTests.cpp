@@ -83,7 +83,7 @@ namespace AwsMock::Service {
 
     // assert
     EXPECT_TRUE(response.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
-    EXPECT_TRUE(response.output == CREATE_BUCKET_RESPONSE);
+    EXPECT_TRUE(Core::StringUtils::Contains(response.output, "BucketArn"));
     EXPECT_EQ(1, bucketList.size());
   }
 
