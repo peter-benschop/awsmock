@@ -67,6 +67,7 @@ namespace AwsMock::Database {
   }
 
   Entity::SNS::Topic SNSMemoryDb::CreateTopic(const Entity::SNS::Topic &topic) {
+    Poco::ScopedLock loc(_topicMutex);
 
     std::string oid = Poco::UUIDGenerator().createRandom().toString();
     _topics[oid] = topic;
@@ -76,6 +77,7 @@ namespace AwsMock::Database {
   }
 
   Entity::SNS::Topic SNSMemoryDb::UpdateTopic(const Entity::SNS::Topic &topic) {
+    Poco::ScopedLock loc(_topicMutex);
 
     std::string region = topic.region;
     std::string name = topic.topicName;
@@ -119,6 +121,7 @@ namespace AwsMock::Database {
   }
 
   void SNSMemoryDb::DeleteTopic(const Entity::SNS::Topic &topic) {
+    Poco::ScopedLock loc(_topicMutex);
 
     std::string region = topic.region;
     std::string name = topic.topicName;
@@ -130,9 +133,33 @@ namespace AwsMock::Database {
   }
 
   void SNSMemoryDb::DeleteAllTopics() {
+    Poco::ScopedLock loc(_topicMutex);
 
     log_debug_stream(_logger) << "All topics deleted, count: " << _topics.size() << std::endl;
     _topics.clear();
+  }
+
+  Entity::SNS::Message SNSMemoryDb::CreateMessage(const Entity::SNS::Message &message) {
+    Poco::ScopedLock loc(_messageMutex);
+
+    std::string oid = Poco::UUIDGenerator().createRandom().toString();
+    _messages[oid] = message;
+    log_trace_stream(_logger) << "Message created, oid: " << oid << std::endl;
+    return GetMessageById(oid);
+
+  }
+
+  Entity::SNS::Message SNSMemoryDb::GetMessageById(const std::string &oid) {
+
+    auto it = find_if(_messages.begin(), _messages.end(), [oid](const std::pair<std::string, Entity::SNS::Message> &message) {
+      return message.first == oid;
+    });
+
+    if (it != _messages.end()) {
+      it->second.oid = oid;
+      return it->second;
+    }
+    return {};
   }
 
   long SNSMemoryDb::CountMessages(const std::string &region, const std::string &topicArn) {
@@ -162,6 +189,7 @@ namespace AwsMock::Database {
   }
 
   void SNSMemoryDb::DeleteMessage(const Entity::SNS::Message &message) {
+    Poco::ScopedLock loc(_messageMutex);
 
     std::string messageId = message.messageId;
     const auto count = std::erase_if(_messages, [messageId](const auto &item) {
@@ -172,6 +200,7 @@ namespace AwsMock::Database {
   }
 
   void SNSMemoryDb::DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &messageIds) {
+    Poco::ScopedLock loc(_messageMutex);
 
     auto count = 0;
     for (auto &messageId : messageIds) {
@@ -184,6 +213,7 @@ namespace AwsMock::Database {
   }
 
   void SNSMemoryDb::DeleteAllMessages() {
+    Poco::ScopedLock loc(_messageMutex);
 
     log_debug_stream(_logger) << "All messages deleted, count: " << _messages.size() << std::endl;
     _messages.clear();

@@ -37,11 +37,11 @@ namespace AwsMock::Database {
      * Check existence of lambda
      *
      * @param region AWS region name
-     * @param transferName AWS transfer name
+     * @param serverId AWS server ID
      * @return true if transfer manager already exists
      * @throws DatabaseException
      */
-    bool TransferExists(const std::string &region, const std::string &transferName);
+    bool TransferExists(const std::string &region, const std::string &serverId);
 
     /**
      * Check existence of lambda

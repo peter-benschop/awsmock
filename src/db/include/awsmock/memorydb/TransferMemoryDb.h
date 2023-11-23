@@ -9,6 +9,8 @@
 #include <string>
 
 // Poco includes
+#include <Poco/Mutex.h>
+#include <Poco/ScopedLock.h>
 #include <Poco/SingletonHolder.h>
 #include <Poco/UUIDGenerator.h>
 
@@ -39,6 +41,16 @@ namespace AwsMock::Database {
     }
 
     /**
+     * Check existence of lambda
+     *
+     * @param region AWS region name
+     * @param serverId AWS server ID
+     * @return true if transfer manager already exists
+     * @throws DatabaseException
+     */
+    bool TransferExists(const std::string &region, const std::string &serverId);
+
+    /**
      * Returns a list of transfer manager.
      *
      * @param region AWS region name
@@ -63,8 +75,17 @@ namespace AwsMock::Database {
      */
     std::map<std::string, Entity::Transfer::User> _users;
 
+    /**
+     * Transfer mutex
+     */
+    Poco::Mutex _transferMutex;
+
+    /**
+     * User mutex
+     */
+    Poco::Mutex _userMutex;
   };
 
 } // namespace AwsMock::Database
 
-#endif // AWSMOCK_REPOSITORY_SQSMEMORYDB_H
+#endif // AWSMOCK_REPOSITORY_TRANSFERMEMORYDB_H
