@@ -8,6 +8,36 @@ namespace AwsMock::Database {
 
   LambdaMemoryDb::LambdaMemoryDb() : _logger(Poco::Logger::get("SQSMemoryDb")) {}
 
+  bool LambdaMemoryDb::LambdaExists(const std::string &function) {
+
+    return find_if(_lambdas.begin(), _lambdas.end(), [function](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
+      return lambda.second.function == function;
+    }) != _lambdas.end();
+  }
+
+  bool LambdaMemoryDb::LambdaExists(const Entity::Lambda::Lambda &lambda) {
+
+    std::string region = lambda.region;
+    std::string function = lambda.function;
+    return find_if(_lambdas.begin(), _lambdas.end(), [region, function](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
+      return lambda.second.region == region && lambda.second.function == function;
+    }) != _lambdas.end();
+  }
+
+  bool LambdaMemoryDb::LambdaExists(const std::string &region, const std::string &function, const std::string &runtime) {
+
+    return find_if(_lambdas.begin(), _lambdas.end(), [region, function, runtime](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
+      return lambda.second.region == region && lambda.second.function == function && lambda.second.runtime == runtime;
+    }) != _lambdas.end();
+  }
+
+  bool LambdaMemoryDb::LambdaExistsByArn(const std::string &arn) {
+
+    return find_if(_lambdas.begin(), _lambdas.end(), [arn](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
+      return lambda.second.arn == arn;
+    }) != _lambdas.end();
+  }
+
   Entity::Lambda::LambdaList LambdaMemoryDb::ListLambdas(const std::string &region) {
 
     Entity::Lambda::LambdaList lambdaList;
@@ -27,6 +57,41 @@ namespace AwsMock::Database {
     return lambdaList;
   }
 
+  Entity::Lambda::Lambda LambdaMemoryDb::CreateLambda(const Entity::Lambda::Lambda &lambda) {
+    Poco::ScopedLock lock(_lambdaMutex);
+
+    std::string oid = Poco::UUIDGenerator().createRandom().toString();
+    _lambdas[oid] = lambda;
+    log_trace_stream(_logger) << "Lambda created, oid: " << oid << std::endl;
+    return GetLambdaById(oid);
+  }
+
+  Entity::Lambda::Lambda LambdaMemoryDb::GetLambdaById(const std::string &oid) {
+
+    auto it = find_if(_lambdas.begin(), _lambdas.end(), [oid](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
+      return lambda.first == oid;
+    });
+
+    if (it != _lambdas.end()) {
+      it->second.oid = oid;
+      return it->second;
+    }
+    return {};
+  }
+
+  Entity::Lambda::Lambda LambdaMemoryDb::GetLambdaByArn(const std::string &arn) {
+
+    auto it = find_if(_lambdas.begin(), _lambdas.end(), [arn](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
+      return lambda.first == arn;
+    });
+
+    if (it != _lambdas.end()) {
+      it->second.oid = arn;
+      return it->second;
+    }
+    return {};
+  }
+
   long LambdaMemoryDb::LambdaCount(const std::string &region) {
 
     long count = 0;
@@ -40,5 +105,36 @@ namespace AwsMock::Database {
       }
     }
     return count;
+  }
+
+  Entity::Lambda::Lambda LambdaMemoryDb::UpdateLambda(const Entity::Lambda::Lambda &lambda) {
+
+    Poco::ScopedLock lock(_lambdaMutex);
+
+    std::string region = lambda.region;
+    std::string function = lambda.function;
+    auto it = find_if(_lambdas.begin(), _lambdas.end(), [region, function](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
+      return lambda.second.region == region && lambda.second.function == function;
+    });
+    _lambdas[it->first] = lambda;
+    return _lambdas[it->first];
+
+  }
+
+  void LambdaMemoryDb::DeleteLambda(const std::string &functionName) {
+    Poco::ScopedLock lock(_lambdaMutex);
+
+    const auto count = std::erase_if(_lambdas, [functionName](const auto &item) {
+      auto const &[key, value] = item;
+      return value.function == functionName;
+    });
+    log_debug_stream(_logger) << "Bucket deleted, count: " << count << std::endl;
+  }
+
+  void LambdaMemoryDb::DeleteAllLambdas() {
+    Poco::ScopedLock lock(_lambdaMutex);
+
+    log_debug_stream(_logger) << "All lambdas deleted, count: " << _lambdas.size() << std::endl;
+    _lambdas.clear();
   }
 }

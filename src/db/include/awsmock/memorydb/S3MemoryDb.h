@@ -9,6 +9,8 @@
 #include <string>
 
 // Poco includes
+#include <Poco/Mutex.h>
+#include <Poco/ScopedLock.h>
 #include <Poco/SingletonHolder.h>
 #include <Poco/UUIDGenerator.h>
 
@@ -243,6 +245,15 @@ namespace AwsMock::Database {
      */
     std::map<std::string, Entity::S3::Object> _objects;
 
+    /**
+     * Bucket mutex
+     */
+     Poco::Mutex _bucketMutex;
+
+    /**
+     * Object mutex
+     */
+    Poco::Mutex _objectMutex;
   };
 
 } // namespace AwsMock::Database

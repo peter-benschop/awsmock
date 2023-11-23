@@ -381,6 +381,11 @@ namespace AwsMock::Service {
      * lambda module host
      */
     std::string _lambdaServiceHost;
+
+    /**
+     * S3 account id
+     */
+    std::string _accountId;
   };
 
 } // namespace AwsMock::Service

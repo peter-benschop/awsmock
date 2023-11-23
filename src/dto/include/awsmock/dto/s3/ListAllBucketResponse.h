@@ -77,8 +77,7 @@ namespace AwsMock::Dto::S3 {
 
       std::stringstream output;
       Poco::XML::DOMWriter writer;
-      writer.setNewLine("\n");
-      writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
+      writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION);
       writer.writeNode(output, pDoc);
 
       return output.str();

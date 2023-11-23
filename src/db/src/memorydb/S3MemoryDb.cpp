@@ -16,7 +16,6 @@ namespace AwsMock::Database {
   }
 
   bool S3MemoryDb::BucketExists(const Entity::S3::Bucket &bucket) {
-
     return BucketExists(bucket.region, bucket.name);
   }
 
@@ -49,6 +48,7 @@ namespace AwsMock::Database {
   }
 
   Entity::S3::Bucket S3MemoryDb::CreateBucket(const Entity::S3::Bucket &bucket) {
+    Poco::ScopedLock lock(_bucketMutex);
 
     std::string oid = Poco::UUIDGenerator().createRandom().toString();
     _buckets[oid] = bucket;
@@ -108,6 +108,8 @@ namespace AwsMock::Database {
 
   Entity::S3::Bucket S3MemoryDb::UpdateBucket(const Entity::S3::Bucket &bucket) {
 
+    Poco::ScopedLock lock(_bucketMutex);
+
     std::string region = bucket.region;
     std::string name = bucket.name;
     auto it = find_if(_buckets.begin(), _buckets.end(), [region, name](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
@@ -118,6 +120,7 @@ namespace AwsMock::Database {
   }
 
   void S3MemoryDb::DeleteBucket(const Entity::S3::Bucket &bucket) {
+    Poco::ScopedLock lock(_bucketMutex);
 
     std::string region = bucket.region;
     std::string name = bucket.name;
@@ -129,6 +132,7 @@ namespace AwsMock::Database {
   }
 
   void S3MemoryDb::DeleteAllBuckets() {
+    Poco::ScopedLock lock(_bucketMutex);
 
     log_debug_stream(_logger) << "All buckets deleted, count: " << _buckets.size() << std::endl;
     _buckets.clear();
@@ -145,6 +149,7 @@ namespace AwsMock::Database {
   }
 
   Entity::S3::Object S3MemoryDb::CreateObject(const Entity::S3::Object &object) {
+    Poco::ScopedLock lock(_objectMutex);
 
     std::string oid = Poco::UUIDGenerator().createRandom().toString();
     _objects[oid] = object;
@@ -154,6 +159,7 @@ namespace AwsMock::Database {
   }
 
   Entity::S3::Object S3MemoryDb::UpdateObject(const Entity::S3::Object &object) {
+    Poco::ScopedLock lock(_objectMutex);
 
     std::string bucket = object.bucket;
     std::string key = object.key;
@@ -225,6 +231,7 @@ namespace AwsMock::Database {
   }
 
   void S3MemoryDb::DeleteObject(const Entity::S3::Object &object) {
+    Poco::ScopedLock lock(_objectMutex);
 
     std::string bucket = object.bucket;
     std::string key = object.key;
@@ -236,6 +243,7 @@ namespace AwsMock::Database {
   }
 
   void S3MemoryDb::DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys) {
+    Poco::ScopedLock lock(_objectMutex);
 
     auto count = 0;
     for (const auto &key : keys) {
@@ -248,6 +256,8 @@ namespace AwsMock::Database {
   }
 
   void S3MemoryDb::DeleteAllObjects() {
+    Poco::ScopedLock lock(_objectMutex);
+
     _objects.clear();
   }
 }

@@ -9,6 +9,8 @@
 #include <string>
 
 // Poco includes
+#include <Poco/Mutex.h>
+#include <Poco/ScopedLock.h>
 #include <Poco/SingletonHolder.h>
 #include <Poco/UUIDGenerator.h>
 
@@ -295,6 +297,15 @@ namespace AwsMock::Database {
      */
     std::map<std::string, Entity::SQS::Message> _messages;
 
+    /**
+     * Queue mutex
+     */
+    Poco::Mutex _queueMutex;
+
+    /**
+     * Message mutex
+     */
+    Poco::Mutex _messageMutex;
   };
 
 } // namespace AwsMock::Database

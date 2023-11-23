@@ -9,6 +9,8 @@
 #include <string>
 
 // Poco includes
+#include <Poco/Mutex.h>
+#include <Poco/ScopedLock.h>
 #include <Poco/SingletonHolder.h>
 #include <Poco/UUIDGenerator.h>
 
@@ -132,6 +134,24 @@ namespace AwsMock::Database {
     void DeleteAllTopics();
 
     /**
+     * Creates a new message in the SQS message table
+     *
+     * @param message SQS message entity
+     * @return saved message entity
+     * @throws Core::DatabaseException
+     */
+    Entity::SNS::Message CreateMessage(const Entity::SNS::Message &message);
+
+    /**
+     * Returns a message by ID.
+     *
+     * @param oid message objectId
+     * @return message entity
+     * @throws Core::DatabaseException
+     */
+    [[maybe_unused]] Entity::SNS::Message GetMessageById(const std::string &oid);
+
+    /**
      * Count the number of message by state
      *
      * @param region AWS region
@@ -190,6 +210,15 @@ namespace AwsMock::Database {
      */
     std::map<std::string, Entity::SNS::Message> _messages;
 
+    /**
+     * Topic mutex
+     */
+    Poco::Mutex _topicMutex;
+
+    /**
+     * Message mutex
+     */
+    Poco::Mutex _messageMutex;
   };
 
 } // namespace AwsMock::Database

@@ -18,9 +18,7 @@ set(CMAKE_INSTALL_PREFIX "/usr" CACHE STRING " " FORCE)
 message("-- Building ${PROJECT_NAME} ${${PROJECT_NAME}_VERSION_STRING} type: ${CMAKE_BUILD_TYPE}, install prefix: ${CMAKE_INSTALL_PREFIX}")
 
 # Doxygen
-set(doxyfile ${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile)
-find_package(Doxygen)
-option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation (requires Doxygen)" ${DOXYGEN_FOUND})
+option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation (requires Doxygen)" OFF)
 
 # Testing
 enable_testing()
@@ -33,6 +31,8 @@ add_subdirectory(src/service)
 add_subdirectory(src/controller)
 
 if (BUILD_DOCUMENTATION)
+    set(doxyfile ${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile)
+    find_package(Doxygen)
     if (NOT DOXYGEN_FOUND)
         message(FATAL_ERROR "Doxygen is needed to build the documentation.")
     endif ()

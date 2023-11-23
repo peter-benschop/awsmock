@@ -8,6 +8,8 @@ namespace AwsMock::Service {
 
   S3Service::S3Service(Core::Configuration &configuration) : _logger(Poco::Logger::get("S3Service")), _configuration(configuration) {
 
+    _accountId = _configuration.getString("awsmock.account.id");
+
     // Initialize directories
     _dataDir = _configuration.getString("awsmock.data.dir", DEFAULT_DATA_DIR);
     _dataS3Dir = _configuration.getString("awsmock.service.s3.data.dir", DEFAULT_S3_DATA_DIR);
@@ -40,6 +42,7 @@ namespace AwsMock::Service {
 
     // Check existence
     if (_database->BucketExists({.region=region, .name=name})) {
+      log_warning_stream(_logger) << "Bucket exists already, region: " << region << " name: " << name << std::endl;
       throw Core::ServiceException("Bucket exists already", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
@@ -52,7 +55,7 @@ namespace AwsMock::Service {
       // Update database
       _database->CreateBucket({.region=region, .name=name, .owner=owner});
 
-      createBucketResponse = Dto::S3::CreateBucketResponse(region, "arn");
+      createBucketResponse = Dto::S3::CreateBucketResponse(region, Core::AwsUtils::CreateArn("s3", region, _accountId, name));
       log_trace_stream(_logger) << "S3 create bucket response: " << createBucketResponse.ToXml() << std::endl;
       log_info_stream(_logger) << "Bucket created, bucket: " << name << std::endl;
 

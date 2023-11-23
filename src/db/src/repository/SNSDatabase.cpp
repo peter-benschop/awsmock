@@ -272,16 +272,23 @@ namespace AwsMock::Database {
 
   Entity::SNS::Message SNSDatabase::CreateMessage(const Entity::SNS::Message &message) {
 
-    try {
+    if (HasDatabase()) {
 
-      auto result = _messageCollection.insert_one(message.ToDocument());
-      log_trace_stream(_logger) << "Message created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
+      try {
 
-      return GetMessageById(result->inserted_id().get_oid().value);
+        auto result = _messageCollection.insert_one(message.ToDocument());
+        log_trace_stream(_logger) << "Message created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
+        return GetMessageById(result->inserted_id().get_oid().value);
 
-    } catch (const mongocxx::exception &exc) {
-      _logger.error() << "SNS Database exception " << exc.what() << std::endl;
-      throw Core::DatabaseException(exc.what(), 500);
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), 500);
+      }
+
+    } else {
+
+      return _memoryDb.CreateMessage();
+
     }
   }
 

@@ -21,13 +21,24 @@ namespace AwsMock::Database {
   }
 
   bool LambdaDatabase::LambdaExists(const std::string &region, const std::string &function, const std::string &runtime) {
-    try {
-      int64_t count = _lambdaCollection.count_documents(make_document(kvp("region", region), kvp("function", function), kvp("runtime", runtime)));
-      log_trace_stream(_logger) << "lambda function exists: " << (count > 0 ? "true" : "false") << std::endl;
-      return count > 0;
-    } catch (const mongocxx::exception &exc) {
-      _logger.error() << "Database exception " << exc.what() << std::endl;
-      throw Core::DatabaseException(exc.what(), 500);
+
+    if (HasDatabase()) {
+
+      try {
+
+        int64_t count = _lambdaCollection.count_documents(make_document(kvp("region", region), kvp("function", function), kvp("runtime", runtime)));
+        log_trace_stream(_logger) << "lambda function exists: " << (count > 0 ? "true" : "false") << std::endl;
+        return count > 0;
+
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), 500);
+      }
+
+    } else {
+
+      return _memoryDb.LambdaExists(region, function, runtime);
+
     }
   }
 
@@ -37,24 +48,46 @@ namespace AwsMock::Database {
   }
 
   bool LambdaDatabase::LambdaExists(const std::string &functionName) {
-    try {
-      int64_t count = _lambdaCollection.count_documents(make_document(kvp("function", functionName)));
-      log_trace_stream(_logger) << "lambda function exists: " << (count > 0 ? "true" : "false") << std::endl;
-      return count > 0;
-    } catch (const mongocxx::exception &exc) {
-      _logger.error() << "Database exception " << exc.what() << std::endl;
-      throw Core::DatabaseException(exc.what(), 500);
+
+    if (HasDatabase()) {
+
+      try {
+
+        int64_t count = _lambdaCollection.count_documents(make_document(kvp("function", functionName)));
+        log_trace_stream(_logger) << "lambda function exists: " << (count > 0 ? "true" : "false") << std::endl;
+        return count > 0;
+
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), 500);
+      }
+
+    } else {
+
+      return _memoryDb.LambdaExists(functionName);
+
     }
   }
 
   bool LambdaDatabase::LambdaExistsByArn(const std::string &arn) {
-    try {
-      int64_t count = _lambdaCollection.count_documents(make_document(kvp("arn", arn)));
-      log_trace_stream(_logger) << "lambda function exists: " << (count > 0 ? "true" : "false") << std::endl;
-      return count > 0;
-    } catch (const mongocxx::exception &exc) {
-      _logger.error() << "Database exception " << exc.what() << std::endl;
-      throw Core::DatabaseException(exc.what(), 500);
+
+    if (HasDatabase()) {
+
+      try {
+
+        int64_t count = _lambdaCollection.count_documents(make_document(kvp("arn", arn)));
+        log_trace_stream(_logger) << "lambda function exists: " << (count > 0 ? "true" : "false") << std::endl;
+        return count > 0;
+
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), 500);
+      }
+
+    } else {
+
+      return _memoryDb.LambdaExistsByArn(arn);
+
     }
   }
 
@@ -86,32 +119,79 @@ namespace AwsMock::Database {
   }
 
   Entity::Lambda::Lambda LambdaDatabase::CreateLambda(const Entity::Lambda::Lambda &lambda) {
-    try {
-      auto result = _lambdaCollection.insert_one(lambda.ToDocument());
-      log_trace_stream(_logger) << "Bucket created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
 
-      return GetLambdaById(result->inserted_id().get_oid().value);
-    } catch (const mongocxx::exception &exc) {
-      _logger.error() << "Database exception " << exc.what() << std::endl;
-      throw Core::DatabaseException(exc.what(), 500);
+    if (HasDatabase()) {
+
+      try {
+        auto result = _lambdaCollection.insert_one(lambda.ToDocument());
+        log_trace_stream(_logger) << "Bucket created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
+        return GetLambdaById(result->inserted_id().get_oid().value);
+
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), 500);
+      }
+
+    } else {
+
+      return _memoryDb.CreateLambda(lambda);
+
     }
   }
 
   Entity::Lambda::Lambda LambdaDatabase::GetLambdaById(bsoncxx::oid oid) {
+
     try {
+
       mongocxx::stdx::optional<bsoncxx::document::value> mResult = _lambdaCollection.find_one(make_document(kvp("_id", oid)));
       Entity::Lambda::Lambda result;
       result.FromDocument(mResult);
-
       return result;
+
     } catch (const mongocxx::exception &exc) {
       _logger.error() << "Database exception " << exc.what() << std::endl;
       throw Core::DatabaseException(exc.what(), 500);
     }
+
   }
 
   Entity::Lambda::Lambda LambdaDatabase::GetLambdaById(const std::string &oid) {
-    return GetLambdaById(bsoncxx::oid(oid));
+
+    if (HasDatabase()) {
+
+      return GetLambdaById(bsoncxx::oid(oid));
+
+    } else {
+
+      return _memoryDb.GetLambdaById(oid);
+    }
+  }
+
+  Entity::Lambda::Lambda LambdaDatabase::GetLambdaByArn(const std::string &arn) {
+
+    if (HasDatabase()) {
+
+      try {
+
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _lambdaCollection.find_one(make_document(kvp("arn", arn)));
+        if (!mResult) {
+          log_error_stream(_logger) << "GetLambdaByArn failed, arn " << arn << std::endl;
+          return {};
+        }
+
+        Entity::Lambda::Lambda result;
+        result.FromDocument(mResult);
+        return result;
+
+      } catch (mongocxx::exception::system_error &e) {
+        log_error_stream(_logger) << "Get lambda by ARN failed, error: " << e.what() << std::endl;
+      }
+
+    } else {
+
+      return _memoryDb.GetLambdaByArn(arn);
+    }
+    return {};
   }
 
   Entity::Lambda::Lambda LambdaDatabase::CreateOrUpdateLambda(const Entity::Lambda::Lambda &lambda) {
@@ -124,37 +204,26 @@ namespace AwsMock::Database {
   }
 
   Entity::Lambda::Lambda LambdaDatabase::UpdateLambda(const Entity::Lambda::Lambda &lambda) {
-    try {
-      auto result = _lambdaCollection.replace_one(make_document(kvp("region", lambda.region), kvp("function", lambda.function), kvp("runtime", lambda.runtime)),
-                                                  lambda.ToDocument());
 
-      log_trace_stream(_logger) << "lambda updated: " << lambda.ToString() << std::endl;
+    if (HasDatabase()) {
 
-      return GetLambdaByArn(lambda.arn);
+      try {
+        auto result = _lambdaCollection.replace_one(make_document(kvp("region", lambda.region), kvp("function", lambda.function), kvp("runtime", lambda.runtime)), lambda.ToDocument());
 
-    } catch (const mongocxx::exception &exc) {
-      _logger.error() << "Database exception " << exc.what() << std::endl;
-      throw Core::DatabaseException(exc.what(), 500);
-    }
-  }
+        log_trace_stream(_logger) << "lambda updated: " << lambda.ToString() << std::endl;
 
-  Entity::Lambda::Lambda LambdaDatabase::GetLambdaByArn(const std::string &arn) {
+        return GetLambdaByArn(lambda.arn);
 
-    try {
-      mongocxx::stdx::optional<bsoncxx::document::value> mResult = _lambdaCollection.find_one(make_document(kvp("arn", arn)));
-      if (!mResult) {
-        log_error_stream(_logger) << "GetLambdaByArn failed, arn " << arn << std::endl;
-        return {};
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), 500);
       }
 
-      Entity::Lambda::Lambda result;
-      result.FromDocument(mResult);
-      return result;
+    } else {
 
-    } catch (mongocxx::exception::system_error &e) {
-      log_error_stream(_logger) << "Get lambda by ARN failed, error: " << e.what() << std::endl;
+      return _memoryDb.UpdateLambda(lambda);
+
     }
-    return {};
   }
 
   std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdas(const std::string &region) {
