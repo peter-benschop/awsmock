@@ -287,7 +287,7 @@ namespace AwsMock::Database {
 
     } else {
 
-      return _memoryDb.CreateMessage();
+      return _memoryDb.CreateMessage(message);
 
     }
   }
