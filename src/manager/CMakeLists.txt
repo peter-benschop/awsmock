@@ -18,8 +18,7 @@ include_directories(/usr/include /usr/local/include)
 add_executable(${BINARY} ${SOURCES})
 
 target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdb awsmocksrv awsmockdto mongocxx bsoncxx
-        PocoPrometheus PocoNet PocoJSON PocoXML PocoZip PocoFoundation PocoUtil pthread crypto ssl z archive
-        curl tbb)
+        PocoPrometheus PocoNet PocoJSON PocoXML PocoZip PocoFoundation PocoUtil pthread crypto ssl z archive curl )
 add_library(${BINARY}_lib STATIC ${SOURCES})
 
 install(TARGETS ${BINARY} DESTINATION bin)
