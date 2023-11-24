@@ -7,6 +7,10 @@
 namespace AwsMock::Core {
 
   void TestUtils::CreateTestConfigurationFile() {
+    CreateTestConfigurationFile(true);
+  }
+
+  void TestUtils::CreateTestConfigurationFile(bool withDatabase) {
     int port = SystemUtils::GetRandomPort();
     std::string hostName = SystemUtils::GetNodeName();
     std::ofstream ofs(TMP_PROPERTIES_FILE, std::ofstream::out | std::ofstream::trunc);
@@ -19,7 +23,7 @@ namespace AwsMock::Core {
     ofs << "awsmock.service.gateway.host=" << hostName << std::endl;
     ofs << "awsmock.service.gateway.port=" << port << std::endl;
     // Database configuration
-    ofs << "awsmock.mongodb.active=true" << std::endl;
+    ofs << "awsmock.mongodb.active=" << (withDatabase ? "true" : "false") << std::endl;
     ofs << "awsmock.mongodb.name=test" << std::endl;
     ofs << "awsmock.mongodb.host=" << hostName << std::endl;
     ofs << "awsmock.mongodb.port=27017" << std::endl;

@@ -6,40 +6,43 @@
 
 namespace AwsMock::Service {
 
-  LambdaCreator::LambdaCreator(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue)
-      : _logger(Poco::Logger::get("LambdaCreator")), _configuration(configuration), _metricService(metricService), _dockerService(configuration),
-        _createQueue(createQueue) {
+  LambdaCreator::LambdaCreator(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue) : _logger(Poco::Logger::get("LambdaCreator")), _configuration(configuration),
+                                                                                                                                               _metricService(metricService), _dockerService(configuration), _createQueue(createQueue) {
+
+    // Database connection
     _lambdaDatabase = std::make_shared<Database::LambdaDatabase>(_configuration);
 
+    // Configuration
     _dataDir = _configuration.getString("awsmock.data.dir", "/tmp/awsmock/data");
     _tempDir = _dataDir + Poco::Path::separator() + "tmp";
   }
 
   void LambdaCreator::run() {
+
     log_debug_stream(_logger) << "Lambda create notification received, queueSize:" << _createQueue.size() << std::endl;
+
     Poco::AutoPtr<Poco::Notification> pNf(_createQueue.waitDequeueNotification());
     while (pNf) {
+
       auto *pWorkNf = dynamic_cast<Dto::Lambda::CreateNotification *>(pNf.get());
       if (pWorkNf) {
         CreateLambdaFunction(pWorkNf->zipFileContent, pWorkNf->functionId);
       }
       pNf = _createQueue.waitDequeueNotification();
+
     }
   }
 
   void LambdaCreator::CreateLambdaFunction(const std::string &functionCode, const std::string &functionId) {
-    Core::LogStream logger(Poco::Logger::get("LambdaCreator"));
-    log_debug_stream(logger) << "Start creating lambda function, oid: " << functionId << std::endl;
+
+    log_debug_stream(_logger) << "Start creating lambda function, oid: " << functionId << std::endl;
 
     // Make local copy
     Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase->GetLambdaById(functionId);
 
     // Docker tag
-    std::string dockerTag = "latest";
-    if (lambdaEntity.HasTag("tag")) {
-      dockerTag = lambdaEntity.GetTagValue("tag");
-    }
-    log_debug_stream(logger) << "Using docker tag: " << dockerTag << std::endl;
+    std::string dockerTag = GetDockerTag(lambdaEntity);
+    log_debug_stream(_logger) << "Using docker tag: " << dockerTag << std::endl;
 
     // Build the docker image, if not existing
     if (!_dockerService.ImageExists(lambdaEntity.function, dockerTag)) {
@@ -55,7 +58,7 @@ namespace AwsMock::Service {
     // Get docker container
     Dto::Docker::Container container = _dockerService.GetContainerByName(lambdaEntity.function, dockerTag);
 
-    // Start docker container, in case it is not already running. If already running get current public port.
+    // Start docker container, in case it is not already running.
     if (container.state != "running") {
       _dockerService.StartDockerContainer(container.id);
     } else {
@@ -69,7 +72,7 @@ namespace AwsMock::Service {
     lambdaEntity.stateReason = "Activated";
     _lambdaDatabase->UpdateLambda(lambdaEntity);
 
-    log_debug_stream(logger) << "Lambda function started: " << lambdaEntity.function << ":" << dockerTag << std::endl;
+    log_debug_stream(_logger) << "Lambda function started: " << lambdaEntity.function << ":" << dockerTag << std::endl;
   }
 
   void LambdaCreator::CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {

@@ -21,9 +21,18 @@ namespace AwsMock::Core {
   public:
 
     /**
-     * Creates a test configuration file
+     * Creates a test configuration file.
+     *
+     * <p>Database will be switched off.</p>
      */
     static void CreateTestConfigurationFile();
+
+    /**
+     * Creates a test configuration file.
+     *
+     * @param withDatabase set to true when the configuration should be for a database
+     */
+    static void CreateTestConfigurationFile(bool withDatabase);
 
   };
 }
