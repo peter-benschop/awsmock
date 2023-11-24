@@ -72,24 +72,28 @@ namespace AwsMock::Database {
       return lambda.first == oid;
     });
 
-    if (it != _lambdas.end()) {
-      it->second.oid = oid;
-      return it->second;
+    if (it == _lambdas.end()) {
+      log_error_stream(_logger) << "Get lambda by ID failed, arn: " << oid << std::endl;
+      throw Core::DatabaseException("Get lambda by ID failed, arn: "+oid);
     }
-    return {};
+
+    it->second.oid = oid;
+    return it->second;
   }
 
   Entity::Lambda::Lambda LambdaMemoryDb::GetLambdaByArn(const std::string &arn) {
 
     auto it = find_if(_lambdas.begin(), _lambdas.end(), [arn](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
-      return lambda.first == arn;
+      return lambda.second.arn == arn;
     });
 
-    if (it != _lambdas.end()) {
-      it->second.oid = arn;
-      return it->second;
+    if (it == _lambdas.end()) {
+      log_error_stream(_logger) << "Get lambda by ARN failed, arn: " << arn << std::endl;
+      throw Core::DatabaseException("Get lambda by ARN failed, arn: "+arn);
     }
-    return {};
+
+    it->second.oid = arn;
+    return it->second;
   }
 
   long LambdaMemoryDb::LambdaCount(const std::string &region) {
@@ -116,9 +120,13 @@ namespace AwsMock::Database {
     auto it = find_if(_lambdas.begin(), _lambdas.end(), [region, function](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
       return lambda.second.region == region && lambda.second.function == function;
     });
+
+    if(it == _lambdas.end()) {
+      log_error_stream(_logger) << "Update lambda failed, region: " << lambda.region << " function: " << lambda.function << std::endl;
+      throw Core::DatabaseException("Update lambda failed, region: " + lambda.region + " function: " + lambda.function);
+    }
     _lambdas[it->first] = lambda;
     return _lambdas[it->first];
-
   }
 
   void LambdaMemoryDb::DeleteLambda(const std::string &functionName) {

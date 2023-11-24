@@ -1,0 +1,68 @@
+.TH awsmockmgr 1 "24 Nov 2023" "version 0.5.112"
+.SH [NAME]
+awsmockmgr AwsMock manager
+.SH SYNOPSIS
+.B awsmockmgr [OPTIONS]
+.SH DESCRIPTION
+.P
+awsmockmgr is the mein AwsMock module manager. Each AwsMock service has its own module. The manager
+starts/stops/restarts this modules. Supported modules are:
+.TP
+.B S3
+AWS file store mock
+.TP
+.B SQS
+AWS Simple Queueing System mock
+.TP
+.B SNS
+AWS Simple Notification System mock
+.TP
+.B Lambda
+AWS lambda function mock
+.TP
+.B Transfer
+AWS Transfer Manager
+.TP
+.B Cognito
+AWS Cognito mock
+.TP
+.B Gateway
+AwsMock API gateway
+.P
+Per default the gateway runs on port 4566, but can be changed in the configuration file. The default configuration file
+is
+.I /etc/aws-mock.properties
+.SH OPTIONS
+.TP
+.B \-\-daemon
+Run AwsMock manager as a daemon.
+.TP
+.B \-\-umask
+Set the daemon's umask (octal, e.g. 027).
+.TP
+.B \-\-pidfile\~ <path>
+Write the process ID of the application to given file.
+.TP
+.B \-\-config\~ <configuration-file-path>
+Starts the controller with a given configuration file. Per default the configuration file is
+.I /etc/aws-mock.properties
+.TP
+.B \-\-loglevel\~ <level>
+Starts the manager with the given logging level. Valid values are: trace, debug, information, warning, error, critical,
+fatal
+.TP
+.B \-\-logfile\~ <path>
+Writes the logging message to the given file.
+.TP
+.B \-\-version
+Shows the current version and exists.
+.TP
+.B \-\-help
+shows the usage screen and exists
+.SH EXAMPLES
+.TP
+.BI awsmockmgr\~ \-\-daemon\~ \-\-loglevel\~ debug
+Start the AwsMOck manager as background daemon process with the 'debug' log level.
+.SH SEE ALSO
+.TP
+.BI awsmockctl(1)
