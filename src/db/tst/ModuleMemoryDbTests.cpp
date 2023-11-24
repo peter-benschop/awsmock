@@ -106,10 +106,9 @@ namespace AwsMock::Database {
     // arrange
     Entity::Module::Module module = {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING};
     module = _moduleDatabase.CreateModule(module);
-    bsoncxx::oid oid(module.oid);
 
     // act
-    Entity::Module::Module result = _moduleDatabase.GetModuleById(oid);
+    Entity::Module::Module result = _moduleDatabase.GetModuleById(module.oid);
 
     // assert
     EXPECT_TRUE(result.name == SERVICE);
@@ -139,7 +138,7 @@ namespace AwsMock::Database {
     Entity::Module::ModuleList result = _moduleDatabase.ListModules();
 
     // assert
-    EXPECT_EQ(9, result.size());
+    EXPECT_EQ(1, result.size());
   }
 
   TEST_F(ModuleMemoryDbTest, ModuleDeleteTest) {
@@ -153,7 +152,7 @@ namespace AwsMock::Database {
     int count = _moduleDatabase.ModuleCount();
 
     // assert
-    EXPECT_EQ(8, count);
+    EXPECT_EQ(0, count);
   }
 
   TEST_F(ModuleMemoryDbTest, ModuleSetStatusTest) {

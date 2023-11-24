@@ -300,7 +300,7 @@ namespace AwsMock::Database {
 
     } else {
 
-      return _memoryDb.ListModules();
+      modulesList = _memoryDb.ListModules();
 
     }
 
@@ -323,7 +323,7 @@ namespace AwsMock::Database {
 
     } else {
 
-      return _memoryDb.DeleteModule(module);
+      _memoryDb.DeleteModule(module);
 
     }
   }
