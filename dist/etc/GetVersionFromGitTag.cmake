@@ -38,7 +38,7 @@ find_package(Git QUIET)
 if (GIT_FOUND)
 
     # Get last tag from git
-    execute_process(COMMAND bash "-c" "gh release list -L1 | awk '{print $1}'"
+    execute_process(COMMAND ${GIT_EXECUTABLE} sv cv
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             OUTPUT_VARIABLE ${PROJECT_NAME}_VERSION_STRING
             OUTPUT_STRIP_TRAILING_WHITESPACE)
