@@ -15,6 +15,7 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
 #include "awsmock/core/DatabaseException.h"
+#include "awsmock/memorydb/ModuleMemoryDb.h"
 #include <awsmock/entity/module/Module.h>
 #include <awsmock/repository/Database.h>
 
@@ -55,6 +56,15 @@ namespace AwsMock::Database {
      * @throws DatabaseException
      */
     Entity::Module::Module GetModuleById(const bsoncxx::oid &oid);
+
+    /**
+     * Returns the module by id
+     *
+     * @param oid module oid
+     * @return module, if existing
+     * @throws DatabaseException
+     */
+    Entity::Module::Module GetModuleById(const std::string &oid);
 
     /**
      * Returns the module by id
@@ -163,9 +173,9 @@ namespace AwsMock::Database {
     mongocxx::collection _moduleCollection{};
 
     /**
-     * Modules map
+     * Modules in-memory database
      */
-    std::map<std::string, Entity::Module::Module> _modules;
+    ModuleMemoryDb _memoryDb;
 
     /**
      * Existing modules
