@@ -2,8 +2,8 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_CORE_SERVICEDATABASETEST_H
-#define AWMOCK_CORE_SERVICEDATABASETEST_H
+#ifndef AWMOCK_CORE_MODULEMEMORYDBTEST_H
+#define AWMOCK_CORE_MODULEMEMORYDBTEST_H
 
 // C++ standard includes
 #include <iostream>
@@ -12,14 +12,14 @@
 // GTest includes
 #include <gtest/gtest.h>
 
+// MongoDB includes
+#include <bsoncxx/builder/basic/document.hpp>
+#include <mongocxx/client.hpp>
+
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/ModuleDatabase.h>
-
-// MongoDB includes
-#include <bsoncxx/builder/basic/document.hpp>
-#include <mongocxx/client.hpp>
 
 #define SERVICE "test-module"
 
@@ -29,12 +29,13 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_array;
   using bsoncxx::builder::basic::make_document;
 
-  class ModuleDatabaseTest : public ::testing::Test {
+  class ModuleMemoryDbTest : public ::testing::Test {
 
   protected:
 
     void SetUp() override {
       _region = _configuration.getString("awsmock.region");
+      _configuration.setBool("awsmock.mongodb.active", false);
     }
 
     void TearDown() override {
@@ -46,7 +47,7 @@ namespace AwsMock::Database {
     ModuleDatabase _moduleDatabase = ModuleDatabase(_configuration);
   };
 
-  TEST_F(ModuleDatabaseTest, ModuleCreateTest) {
+  TEST_F(ModuleMemoryDbTest, ModuleCreateTest) {
 
     // arrange
     Entity::Module::Module module = {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING};
@@ -59,7 +60,7 @@ namespace AwsMock::Database {
     EXPECT_TRUE(result.state == Entity::Module::ModuleState::RUNNING);
   }
 
-  TEST_F(ModuleDatabaseTest, ModuleExistsTest) {
+  TEST_F(ModuleMemoryDbTest, ModuleExistsTest) {
 
     // arrange
     Entity::Module::Module module = {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING};
@@ -74,7 +75,7 @@ namespace AwsMock::Database {
     EXPECT_FALSE(result2);
   }
 
-  TEST_F(ModuleDatabaseTest, ModuleActiveTest) {
+  TEST_F(ModuleMemoryDbTest, ModuleActiveTest) {
 
     // arrange
     Entity::Module::Module module = {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING, .status=Entity::Module::ModuleStatus::ACTIVE};
@@ -87,7 +88,7 @@ namespace AwsMock::Database {
     EXPECT_TRUE(result);
   }
 
-  TEST_F(ModuleDatabaseTest, ModuleGetByNameTest) {
+  TEST_F(ModuleMemoryDbTest, ModuleGetByNameTest) {
 
     // arrange
     Entity::Module::Module module = {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING};
@@ -100,7 +101,7 @@ namespace AwsMock::Database {
     EXPECT_TRUE(result.name == SERVICE);
   }
 
-  TEST_F(ModuleDatabaseTest, ModuleGetByIdTest) {
+  TEST_F(ModuleMemoryDbTest, ModuleGetByIdTest) {
 
     // arrange
     Entity::Module::Module module = {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING};
@@ -114,7 +115,7 @@ namespace AwsMock::Database {
     EXPECT_TRUE(result.name == SERVICE);
   }
 
-  TEST_F(ModuleDatabaseTest, ModuleUpdateTest) {
+  TEST_F(ModuleMemoryDbTest, ModuleUpdateTest) {
 
     // arrange
     Entity::Module::Module module = {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING};
@@ -128,7 +129,7 @@ namespace AwsMock::Database {
     EXPECT_TRUE(result.state == Entity::Module::ModuleState::STOPPED);
   }
 
-  TEST_F(ModuleDatabaseTest, ModuleListTest) {
+  TEST_F(ModuleMemoryDbTest, ModuleListTest) {
 
     // arrange
     Entity::Module::Module module = {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING};
@@ -141,7 +142,7 @@ namespace AwsMock::Database {
     EXPECT_EQ(9, result.size());
   }
 
-  TEST_F(ModuleDatabaseTest, ModuleDeleteTest) {
+  TEST_F(ModuleMemoryDbTest, ModuleDeleteTest) {
 
     // arrange
     Entity::Module::Module module = {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING};
@@ -155,7 +156,7 @@ namespace AwsMock::Database {
     EXPECT_EQ(8, count);
   }
 
-  TEST_F(ModuleDatabaseTest, ModuleSetStatusTest) {
+  TEST_F(ModuleMemoryDbTest, ModuleSetStatusTest) {
 
     // arrange
     Entity::Module::Module module = {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING};
@@ -169,7 +170,7 @@ namespace AwsMock::Database {
     EXPECT_EQ(updatedModule.state, Entity::Module::ModuleState::STOPPED);
   }
 
-  TEST_F(ModuleDatabaseTest, ModuleSetPortTest) {
+  TEST_F(ModuleMemoryDbTest, ModuleSetPortTest) {
 
     // arrange
     Entity::Module::Module module = {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING};
@@ -185,4 +186,4 @@ namespace AwsMock::Database {
 
 } // namespace AwsMock::Database
 
-#endif // AWMOCK_CORE_SERVICEDATABASETEST_H
+#endif // AWMOCK_CORE_MODULEMEMORYDBTEST_H

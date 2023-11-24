@@ -153,14 +153,14 @@ namespace AwsMock::Database {
 
       } catch (mongocxx::exception::system_error &e) {
         log_error_stream(_logger) << "Get module by ID failed, error: " << e.what() << std::endl;
+        throw Core::DatabaseException("Get module by ID failed, error: " + std::string(e.what()));
       }
 
     } else {
 
-      _modules[Poco::UUIDGenerator().createRandom().toString()] = module;
+      return _modules[Poco::UUIDGenerator().createRandom().toString()] = module;
 
     }
-    return {};
   }
 
   Entity::Module::Module ModuleDatabase::UpdateModule(const Entity::Module::Module &module) {
@@ -174,6 +174,7 @@ namespace AwsMock::Database {
 
       } catch (mongocxx::exception::system_error &e) {
         log_error_stream(_logger) << "Update module failed, error: " << e.what() << std::endl;
+        throw Core::DatabaseException("Update module failed, error: " + std::string(e.what()));
       }
 
     } else {
