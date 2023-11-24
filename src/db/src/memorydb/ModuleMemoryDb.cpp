@@ -80,6 +80,46 @@ namespace AwsMock::Database {
     return _modules[it->first];
   }
 
+  void ModuleMemoryDb::SetState(const std::string &name, const Entity::Module::ModuleState &state) {
+    Poco::ScopedLock lock(_moduleMutex);
+
+    auto it = find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &module) {
+      return module.second.name == name;
+    });
+    if(it != _modules.end()) {
+      it->second.state = state;
+      _modules[it->first] = it->second;
+    }
+  }
+
+  void ModuleMemoryDb::SetStatus(const std::string &name, const Entity::Module::ModuleStatus &status) {
+    Poco::ScopedLock lock(_moduleMutex);
+
+    auto it = find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &module) {
+      return module.second.name == name;
+    });
+    if(it != _modules.end()) {
+      it->second.status = status;
+      _modules[it->first] = it->second;
+    }
+  }
+
+  void ModuleMemoryDb::SetPort(const std::string &name, int port) {
+    Poco::ScopedLock lock(_moduleMutex);
+
+    auto it = find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &module) {
+      return module.second.name == name;
+    });
+    if(it != _modules.end()) {
+      it->second.port = port;
+      _modules[it->first] = it->second;
+    }
+  }
+
+  int ModuleMemoryDb::ModuleCount() {
+    return _modules.size();
+  }
+
   void ModuleMemoryDb::DeleteModule(const Entity::Module::Module &module) {
     Poco::ScopedLock lock(_moduleMutex);
 

@@ -40,7 +40,7 @@ namespace AwsMock::Database {
       for (auto &module : _existingModules) {
         module.second.status = _configuration.getBool("awsmock.service." + module.first + ".active", false) ? Entity::Module::ModuleStatus::ACTIVE : Entity::Module::ModuleStatus::INACTIVE;
         module.second.state = _configuration.getBool("awsmock.service." + module.first + ".active", false) ? Entity::Module::ModuleState::RUNNING : Entity::Module::ModuleState::STOPPED;
-        _modules[Poco::UUIDGenerator().createRandom().toString()] = module.second;
+        _memoryDb.CreateModule(module.second);
       }
 
     }
@@ -64,10 +64,7 @@ namespace AwsMock::Database {
 
     } else {
 
-      auto module = find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &queue) {
-        return queue.second.name == name;
-      });
-      return module->second.status == Entity::Module::ModuleStatus::ACTIVE;
+      return _memoryDb.IsActive(name);
 
     }
     return false;
@@ -86,14 +83,15 @@ namespace AwsMock::Database {
       }
 
     } else {
-      return find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &queue) {
-        return queue.second.name == name;
-      }) != _modules.end();
+
+      return _memoryDb.ModuleExists(name);
+
     }
     return false;
   }
 
   Entity::Module::Module ModuleDatabase::GetModuleById(const bsoncxx::oid &oid) {
+
     try {
 
       mongocxx::stdx::optional<bsoncxx::document::value> mResult = _moduleCollection.find_one(make_document(kvp("_id", oid)));
@@ -107,6 +105,32 @@ namespace AwsMock::Database {
       log_error_stream(_logger) << "Get module by ID failed, error: " << e.what() << std::endl;
     }
     return {};
+
+  }
+
+  Entity::Module::Module ModuleDatabase::GetModuleById(const std::string &oid) {
+
+    if (HasDatabase()) {
+
+      try {
+
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _moduleCollection.find_one(make_document(kvp("_id", oid)));
+        if (mResult) {
+          Entity::Module::Module modules;
+          modules.FromDocument(mResult);
+          return modules;
+        }
+
+      } catch (mongocxx::exception::system_error &e) {
+        log_error_stream(_logger) << "Get module by ID failed, error: " << e.what() << std::endl;
+      }
+      return {};
+
+    } else {
+
+      return _memoryDb.GetModuleById(oid);
+
+    }
   }
 
   Entity::Module::Module ModuleDatabase::GetModuleByName(const std::string &name) {
@@ -128,14 +152,7 @@ namespace AwsMock::Database {
 
     } else {
 
-      auto module = find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &queue) {
-        return queue.second.name == name;
-      });
-
-      if (module != _modules.end()) {
-        module->second.oid = module->first;
-        return module->second;
-      }
+      return _memoryDb.GetModuleByName(name);
 
     }
     return {};
@@ -158,7 +175,7 @@ namespace AwsMock::Database {
 
     } else {
 
-      return _modules[Poco::UUIDGenerator().createRandom().toString()] = module;
+      return _memoryDb.CreateModule(module);
 
     }
   }
@@ -179,14 +196,8 @@ namespace AwsMock::Database {
 
     } else {
 
-      std::string name = module.name;
-      auto it = find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &queue) {
-        return queue.second.name == name;
-      });
+      return _memoryDb.UpdateModule(module);
 
-      if (it != _modules.end()) {
-        _modules[it->first] = module;
-      }
     }
     return {};
   }
@@ -204,13 +215,8 @@ namespace AwsMock::Database {
 
     } else {
 
-      auto it = find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &queue) {
-        return queue.second.name == name;
-      });
+      return _memoryDb.SetState(name, state);
 
-      if (it != _modules.end()) {
-        it->second.state = state;
-      }
     }
   }
 
@@ -227,13 +233,8 @@ namespace AwsMock::Database {
 
     } else {
 
-      auto it = find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &queue) {
-        return queue.second.name == name;
-      });
+      return _memoryDb.SetStatus(name, status);
 
-      if (it != _modules.end()) {
-        it->second.status = status;
-      }
     }
   }
 
@@ -250,13 +251,8 @@ namespace AwsMock::Database {
 
     } else {
 
-      auto it = find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &queue) {
-        return queue.second.name == name;
-      });
+      return _memoryDb.SetPort(name, port);
 
-      if (it != _modules.end()) {
-        it->second.port = port;
-      }
     }
   }
 
@@ -284,7 +280,7 @@ namespace AwsMock::Database {
 
     } else {
 
-      return static_cast<int>(_modules.size());
+      return _memoryDb.ModuleCount();
 
     }
     return -1;
@@ -304,9 +300,7 @@ namespace AwsMock::Database {
 
     } else {
 
-      for (const auto &it : _modules) {
-        modulesList.emplace_back(it.second);
-      }
+      return _memoryDb.ListModules();
 
     }
 
@@ -329,14 +323,8 @@ namespace AwsMock::Database {
 
     } else {
 
-      std::string name = module.name;
-      auto it = find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &queue) {
-        return queue.second.name == name;
-      });
+      return _memoryDb.DeleteModule(module);
 
-      if (it != _modules.end()) {
-        _modules.erase(it->first);
-      }
     }
   }
 
@@ -355,7 +343,7 @@ namespace AwsMock::Database {
 
     } else {
 
-      _modules.clear();
+      return _memoryDb.DeleteAllModules();
 
     }
   }
