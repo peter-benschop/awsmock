@@ -100,7 +100,7 @@ namespace AwsMock::Database {
 
     long count = 0;
     if (region.empty()) {
-      return _lambdas.size();
+      return static_cast<long>(_lambdas.size());
     } else {
       for (const auto &lambda : _lambdas) {
         if (lambda.second.region == region) {
@@ -136,7 +136,7 @@ namespace AwsMock::Database {
       auto const &[key, value] = item;
       return value.function == functionName;
     });
-    log_debug_stream(_logger) << "Bucket deleted, count: " << count << std::endl;
+    log_debug_stream(_logger) << "Lambda deleted, count: " << count << std::endl;
   }
 
   void LambdaMemoryDb::DeleteAllLambdas() {

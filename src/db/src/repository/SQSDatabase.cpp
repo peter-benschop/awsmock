@@ -543,6 +543,39 @@ namespace AwsMock::Database {
     }
   }
 
+  void SQSDatabase::MessageRetention(const std::string &queueUrl, long retentionPeriod) {
+
+    auto reset = std::chrono::high_resolution_clock::now() - std::chrono::seconds{retentionPeriod};
+
+    if (HasDatabase()) {
+      auto session = GetSession();
+      session.start_transaction();
+      try {
+
+        auto now = std::chrono::high_resolution_clock::now();
+        auto result = _messageCollection.delete_many(
+            make_document(
+                kvp("queueUrl", queueUrl),
+                kvp("created", make_document(
+                    kvp("$lt", bsoncxx::types::b_date(reset))))));
+
+        // Commit
+        session.commit_transaction();
+
+        log_trace_stream(_logger) << "Message retention reset, deleted: " << result->deleted_count() << " queue: " << queueUrl << std::endl;
+
+      } catch (mongocxx::exception &e) {
+        log_error_stream(_logger) << "Collection transaction exception: " << e.what() << std::endl;
+        session.abort_transaction();
+      }
+
+    } else {
+
+      _memoryDb.MessageRetention(queueUrl, retentionPeriod);
+
+    }
+  }
+
   long SQSDatabase::CountMessages(const std::string &region, const std::string &queueUrl) {
 
     if (HasDatabase()) {

@@ -307,6 +307,23 @@ namespace AwsMock::Database {
     log_trace_stream(_logger) << "Delayed message reset, updated: " << count << " queue: " << queueUrl << std::endl;
   }
 
+  void SQSMemoryDb::MessageRetention(const std::string &queueUrl, long retentionPeriod) {
+    Poco::ScopedLock lock(_messageMutex);
+
+    long count = 0;
+    auto reset = std::chrono::high_resolution_clock::now() - std::chrono::seconds{retentionPeriod};
+
+    for (auto &message : _messages) {
+
+      if (message.second.queueUrl == queueUrl && message.second.status == Entity::SQS::MessageStatus::DELAYED && message.second.reset < Poco::Timestamp(reset.time_since_epoch().count() / 1000)) {
+
+        DeleteMessage(message.second);
+        count++;
+      }
+    }
+    log_trace_stream(_logger) << "Nessage retention reset, deleted: " << count << " queue: " << queueUrl << std::endl;
+  }
+
   long SQSMemoryDb::CountMessages(const std::string &region, const std::string &queueUrl) {
 
     long count = 0;

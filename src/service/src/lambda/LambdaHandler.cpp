@@ -46,6 +46,7 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "lambda PUT request, URI: " << request.getURI() << " region: " << region << " user: " + user << std::endl;
 
     try {
+
       std::string version, action;
       Core::HttpUtils::GetVersionAction(request.getURI(), version, action);
 
