@@ -28,11 +28,12 @@ namespace AwsMock::Database {
       return module.first == oid;
     });
 
-    if (it != _modules.end()) {
-      it->second.oid = oid;
-      return it->second;
+    if (it == _modules.end()) {
+      log_error_stream(_logger) << "Get module by ID failed, oid: " << oid << std::endl;
+      throw Core::DatabaseException("Get module by ID failed, oid: " + oid);
     }
-    return {};
+    it->second.oid = oid;
+    return it->second;
   }
 
   Entity::Module::Module ModuleMemoryDb::GetModuleByName(const std::string &name) {
@@ -41,11 +42,12 @@ namespace AwsMock::Database {
       return module.second.name == name;
     });
 
-    if (it != _modules.end()) {
-      it->second.oid = it->first;
-      return it->second;
+    if (it == _modules.end()) {
+      log_error_stream(_logger) << "Get module by name failed, oid: " << name << std::endl;
+      throw Core::DatabaseException("Get module by name failed, oid: " + name);
     }
-    return {};
+    it->second.oid = it->first;
+    return it->second;
   }
 
   Entity::Module::Module ModuleMemoryDb::CreateModule(const Entity::Module::Module &module) {
@@ -76,6 +78,12 @@ namespace AwsMock::Database {
     auto it = find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &module) {
       return module.second.name == name;
     });
+
+    if (it == _modules.end()) {
+      log_error_stream(_logger) << "Update module failed, module: " << name << std::endl;
+      throw Core::DatabaseException("Update module failed, module: " + name);
+    }
+
     _modules[it->first] = module;
     return _modules[it->first];
   }
@@ -86,10 +94,14 @@ namespace AwsMock::Database {
     auto it = find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &module) {
       return module.second.name == name;
     });
-    if(it != _modules.end()) {
-      it->second.state = state;
-      _modules[it->first] = it->second;
+
+    if (it == _modules.end()) {
+      log_error_stream(_logger) << "Set state failed, module: " << name << std::endl;
+      throw Core::DatabaseException("Set state failed, module: " + name);
     }
+
+    it->second.state = state;
+    _modules[it->first] = it->second;
   }
 
   void ModuleMemoryDb::SetStatus(const std::string &name, const Entity::Module::ModuleStatus &status) {
@@ -98,10 +110,14 @@ namespace AwsMock::Database {
     auto it = find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &module) {
       return module.second.name == name;
     });
-    if(it != _modules.end()) {
-      it->second.status = status;
-      _modules[it->first] = it->second;
+
+    if (it == _modules.end()) {
+      log_error_stream(_logger) << "Set status failed, module: " << name << std::endl;
+      throw Core::DatabaseException("Set status failed, module: " + name);
     }
+
+    it->second.status = status;
+    _modules[it->first] = it->second;
   }
 
   void ModuleMemoryDb::SetPort(const std::string &name, int port) {
@@ -110,14 +126,18 @@ namespace AwsMock::Database {
     auto it = find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &module) {
       return module.second.name == name;
     });
-    if(it != _modules.end()) {
-      it->second.port = port;
-      _modules[it->first] = it->second;
+
+    if (it == _modules.end()) {
+      log_error_stream(_logger) << "Set port failed, module: " << name << std::endl;
+      throw Core::DatabaseException("Set port failed, module: " + name);
     }
+
+    it->second.port = port;
+    _modules[it->first] = it->second;
   }
 
   int ModuleMemoryDb::ModuleCount() {
-    return _modules.size();
+    return static_cast<int>(_modules.size());
   }
 
   void ModuleMemoryDb::DeleteModule(const Entity::Module::Module &module) {

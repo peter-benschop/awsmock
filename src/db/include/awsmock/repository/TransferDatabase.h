@@ -69,7 +69,7 @@ namespace AwsMock::Database {
      * @return true if transfer manager already exists
      * @throws DatabaseException
      */
-    bool TransferExists(const std::string &region, std::vector<std::string> protocols);
+    bool TransferExists(const std::string &region, const std::vector<std::string>& protocols);
 
     /**
      * Create a new lambda function

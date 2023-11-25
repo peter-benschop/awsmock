@@ -29,7 +29,6 @@ namespace AwsMock::Database {
     void SetUp() override {
       _region = _configuration.getString("awsmock.region");
       _accountId = _configuration.getString("awsmock.account.id");
-      _configuration.setBool("awsmock.mongodb.active", false);
     }
 
     void TearDown() override {
@@ -38,7 +37,7 @@ namespace AwsMock::Database {
 
     std::string _region;
     std::string _accountId;
-    Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
     LambdaDatabase _lambdaDatabase = LambdaDatabase(_configuration);
   };
 

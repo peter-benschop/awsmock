@@ -38,7 +38,7 @@ namespace AwsMock::Database {
     }
 
     std::string _region, _queueUrl, _queueArn, _dlqueueUrl, _dlqueueArn;
-    Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration();
     SQSDatabase _sqsDatabase = SQSDatabase(_configuration);
   };
 

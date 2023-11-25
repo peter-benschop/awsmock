@@ -45,7 +45,7 @@ namespace AwsMock::Database {
     }
 
     std::string _region;
-    Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration();
     S3Database _servicedatabase = S3Database(_configuration);
   };
 

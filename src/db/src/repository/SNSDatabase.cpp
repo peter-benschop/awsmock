@@ -169,12 +169,14 @@ namespace AwsMock::Database {
     if (HasDatabase()) {
 
       try {
+
         auto queueCursor = _topicCollection.find(make_document(kvp("region", region)));
         for (auto topic : queueCursor) {
           Entity::SNS::Topic result;
           result.FromDocument(topic);
           topicList.push_back(result);
         }
+
       } catch (const mongocxx::exception &exc) {
         _logger.error() << "SNS Database exception " << exc.what() << std::endl;
         throw Core::DatabaseException(exc.what(), 500);
@@ -182,7 +184,7 @@ namespace AwsMock::Database {
 
     } else {
 
-      topicList = _memoryDb.ListTopics();
+      topicList = _memoryDb.ListTopics(region);
 
     }
     log_trace_stream(_logger) << "Got topic list, size:" << topicList.size() << std::endl;

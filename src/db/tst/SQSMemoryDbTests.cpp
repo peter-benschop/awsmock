@@ -25,7 +25,6 @@ namespace AwsMock::Database {
   protected:
 
     void SetUp() override {
-      _configuration.SetValue("awsmock.mongodb.active", false);
       _queueArn = Core::AwsUtils::CreateSqsQueueArn(_configuration, QUEUE_NAME);
       _queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, QUEUE_NAME);
       _dlqueueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, DLQ_NAME);
@@ -39,7 +38,7 @@ namespace AwsMock::Database {
     }
 
     std::string _region, _queueUrl, _queueArn, _dlqueueUrl, _dlqueueArn;
-    Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
     SQSDatabase _sqsDatabase = SQSDatabase(_configuration);
   };
 

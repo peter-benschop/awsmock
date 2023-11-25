@@ -35,7 +35,6 @@ namespace AwsMock::Database {
 
     void SetUp() override {
       _region = _configuration.getString("awsmock.region");
-      _configuration.setBool("awsmock.mongodb.active", false);
     }
 
     void TearDown() override {
@@ -43,7 +42,7 @@ namespace AwsMock::Database {
     }
 
     std::string _region;
-    Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
     ModuleDatabase _moduleDatabase = ModuleDatabase(_configuration);
   };
 
@@ -138,7 +137,7 @@ namespace AwsMock::Database {
     Entity::Module::ModuleList result = _moduleDatabase.ListModules();
 
     // assert
-    EXPECT_EQ(1, result.size());
+    EXPECT_EQ(9, result.size());
   }
 
   TEST_F(ModuleMemoryDbTest, ModuleDeleteTest) {
@@ -152,7 +151,7 @@ namespace AwsMock::Database {
     int count = _moduleDatabase.ModuleCount();
 
     // assert
-    EXPECT_EQ(0, count);
+    EXPECT_EQ(8, count);
   }
 
   TEST_F(ModuleMemoryDbTest, ModuleSetStatusTest) {
