@@ -1,12 +1,11 @@
 FROM alpine:latest
 
-RUN apk update && apk add groff g++ make cmake ccache openssl-dev git gdb curl curl-dev wget python3 aws-cli  \
-    linux-headers libarchive-dev github-cli gtest-dev libtbb libtbb-dev asio-dev elogind-dev
+RUN apk update && apk add groff g++ make cmake ccache openssl-dev git curl curl-dev python3 aws-cli linux-headers  \
+    libarchive-dev github-cli libtbb libtbb-dev asio-dev gtest-dev
 
 # Install basics
 ARG GH_TOKEN=${GH_TOKEN}
 ENV GH_TOKEN=${GH_TOKEN}
-#RUN gh auth login
 
 # Create build environment
 RUN mkdir -p /usr/src
@@ -44,8 +43,8 @@ RUN git clone https://github.com/jensvogt/aws-mock.git && \
 
 # Cleanup
 RUN rm -rf /usr/src
-RUN apk del gcc g++ cmake make linux_headers curl-dev openssl-dev libarchive-dev gtest-dev libtbb-dev asio-dev \
-    elogind-dev
+RUN apk del gcc g++ cmake ccache make linux-headers curl-dev openssl-dev libarchive-dev gtest-dev libtbb-dev asio-dev \
+    gtest-dev
 
 # Make dirctories
 RUN mkdir -p /tmp/awsmock/data/s3 && \

@@ -75,6 +75,11 @@ namespace AwsMock::Service {
 
     for (auto &queue : queueList) {
 
+      // Check retention period
+      if(queue.attributes.messageRetentionPeriod>0) {
+        _sqsDatabase->MessageRetention(queue.queueUrl, queue.attributes.messageRetentionPeriod);
+      }
+
       // Reset messages which have expired
       _sqsDatabase->ResetMessages(queue.queueUrl, queue.attributes.visibilityTimeout);
 

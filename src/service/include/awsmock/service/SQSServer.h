@@ -77,6 +77,13 @@ namespace AwsMock::Service {
     void ResetMessages();
 
     /**
+     * Check the retention period of messages.
+     *
+     * <p>Deletes all message which are older than the retention period. Rge default retention period is 14 days, but can ve change on a per queue level.</p>
+     */
+    void MessageRetention();
+
+    /**
      * Logger
      */
     Core::LogStream _logger;

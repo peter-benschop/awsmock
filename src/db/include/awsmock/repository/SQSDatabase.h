@@ -268,6 +268,14 @@ namespace AwsMock::Database {
     void ResetDelayedMessages(const std::string &queueUrl, long delay);
 
     /**
+     * Any message, which has is older than the retention period is deleted.
+     *
+     * @param queueUrl queue URL.
+     * @param retentionPeriod retention period in seconds.
+     */
+    void MessageRetention(const std::string &queueUrl, long retentionPeriod);
+
+    /**
      * Count the number of message by state
      *
      * @param region AWS region
