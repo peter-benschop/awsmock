@@ -144,10 +144,11 @@ namespace AwsMock::Controller {
 
         _controller.StopService(args[1]);
 
+#ifdef HAS_SYSTEMD
       } else if (name == "logs") {
 
         _controller.ShowServiceLogs();
-
+#endif
       } else if (name == "loglevel") {
 
         _controller.SetLogLevel(args[1]);
