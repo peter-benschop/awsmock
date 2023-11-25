@@ -1,17 +1,10 @@
-FROM debian:bookworm-slim
+FROM alpine:latest
 
-# Install basics
-RUN apt-get update && apt-get -y install build-essential cmake git openssl libssl-dev libarchive-dev \
-    zlib1g-dev wget libarchive13 libz1 libcurl4-openssl-dev libtbb-dev libasio-dev gnupg curl gh libsystemd.dev zip
+RUN apk update && apk add groff g++ make cmake ccache openssl-dev git curl curl-dev python3 aws-cli linux-headers  \
+    libarchive-dev github-cli libtbb libtbb-dev asio-dev gtest-dev
+
+# Create build environment
 RUN mkdir -p /usr/src
-
-# Install google test
-RUN mkdir -p /usr/src && \
-    cd /usr/src && \
-    git clone https://github.com/google/googletest.git && \
-    cd googletest && \
-    cmake -DBUILD_SHARED_LIBS=ON . &&\
-    make install
 
 # Install Poco framework
 RUN cd /usr/src && \
@@ -35,11 +28,6 @@ RUN cd /usr/src && \
     cd mongo-cxx-driver && \
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_CXX_STANDARD=17 . && \
     make install
-
-# Install libssl 1.1
-RUN wget http://security.debian.org/debian-security/pool/updates/main/o/openssl/libssl1.1_1.1.1n-0+deb11u5_amd64.deb && \
-    dpkg -i libssl1.1_1.1.1n-0+deb11u5_amd64.deb && \
-    rm libssl1.1_1.1.1n-0+deb11u5_amd64.deb
 
 # Cleanup
 RUN rm -rf /usr/src
