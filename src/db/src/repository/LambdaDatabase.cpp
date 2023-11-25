@@ -254,22 +254,44 @@ namespace AwsMock::Database {
   }
 
   void LambdaDatabase::DeleteLambda(const std::string &functionName) {
-    try {
-      auto result = _lambdaCollection.delete_many(make_document(kvp("function", functionName)));
-      log_debug_stream(_logger) << "lambda deleted, function: " << functionName << " count: " << result->deleted_count() << std::endl;
-    } catch (const mongocxx::exception &exc) {
-      _logger.error() << "Database exception " << exc.what() << std::endl;
-      throw Core::DatabaseException(exc.what(), 500);
+
+    if (HasDatabase()) {
+
+      try {
+
+        auto result = _lambdaCollection.delete_many(make_document(kvp("function", functionName)));
+        log_debug_stream(_logger) << "lambda deleted, function: " << functionName << " count: " << result->deleted_count() << std::endl;
+
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), 500);
+      }
+
+    } else {
+
+      _memoryDb.DeleteLambda(functionName);
+
     }
   }
 
   void LambdaDatabase::DeleteAllLambdas() {
-    try {
-      auto result = _lambdaCollection.delete_many({});
-      log_debug_stream(_logger) << "All lambdas deleted, count: " << result->deleted_count() << std::endl;
-    } catch (const mongocxx::exception &exc) {
-      _logger.error() << "Database exception " << exc.what() << std::endl;
-      throw Core::DatabaseException(exc.what(), 500);
+
+    if (HasDatabase()) {
+
+      try {
+
+        auto result = _lambdaCollection.delete_many({});
+        log_debug_stream(_logger) << "All lambdas deleted, count: " << result->deleted_count() << std::endl;
+
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), 500);
+      }
+
+    } else {
+
+      _memoryDb.DeleteAllLambdas();
+
     }
   }
 
