@@ -127,6 +127,7 @@ namespace AwsMock::Controller {
     }
   }
 
+#ifdef HAS_SYSTEMD
   void Controller::ShowServiceLogs() {
     sd_journal *jd;
     int r = sd_journal_open(&jd, SD_JOURNAL_LOCAL_ONLY);
@@ -173,6 +174,7 @@ namespace AwsMock::Controller {
     }
     sd_journal_close(jd);
   }
+#endif
 
   void Controller::SetLogLevel(const std::string &level) {
 
