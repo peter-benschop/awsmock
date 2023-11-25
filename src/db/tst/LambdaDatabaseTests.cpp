@@ -37,7 +37,7 @@ namespace AwsMock::Database {
 
     std::string _region;
     std::string _accountId;
-    Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration();
     LambdaDatabase _lambdaDatabase = LambdaDatabase(_configuration);
   };
 

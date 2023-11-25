@@ -55,4 +55,13 @@ namespace AwsMock::Core {
     ofs << "awsmock.docker.container.port=8080" << std::endl;
     ofs.close();
   }
+
+  std::string TestUtils::GetTestConfigurationFilename() {
+    return TMP_PROPERTIES_FILE;
+  }
+
+  Core::Configuration TestUtils::GetTestConfiguration(bool withDatabase){
+    CreateTestConfigurationFile(withDatabase);
+    return Core::Configuration(GetTestConfigurationFilename());
+  }
 }

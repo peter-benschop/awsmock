@@ -2,8 +2,8 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_CORE_TRANSFERDATABASETEST_H
-#define AWMOCK_CORE_TRANSFERDATABASETEST_H
+#ifndef AWMOCK_CORE_TRANSFERMEMORYDBTEST_H
+#define AWMOCK_CORE_TRANSFERMEMORYDBTEST_H
 
 // C++ standard includes
 #include <iostream>
@@ -30,7 +30,7 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_array;
   using bsoncxx::builder::basic::make_document;
 
-  class TransferDatabaseTest : public ::testing::Test {
+  class TransferMemoryDbTest : public ::testing::Test {
 
   protected:
 
@@ -43,11 +43,11 @@ namespace AwsMock::Database {
     }
 
     std::string _region;
-    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration();
+    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
     TransferDatabase _transferDatabase = TransferDatabase(_configuration);
   };
 
-  TEST_F(TransferDatabaseTest, TransferCreateTest) {
+  TEST_F(TransferMemoryDbTest, TransferCreateTest) {
 
     // arrange
     Entity::Transfer::Transfer transfer = {.region=_region, .protocols={"tcp", "ftp"}};
@@ -60,7 +60,7 @@ namespace AwsMock::Database {
     EXPECT_TRUE(result.region == _region);
   }
 
-  TEST_F(TransferDatabaseTest, TransferExistsUniqueTest) {
+  TEST_F(TransferMemoryDbTest, TransferExistsUniqueTest) {
 
     // arrange
     Entity::Transfer::Transfer transfer1 = {.region=_region, .protocols={"tcp", "ftp"}};
@@ -76,7 +76,7 @@ namespace AwsMock::Database {
     EXPECT_FALSE(result2);
   }
 
-  TEST_F(TransferDatabaseTest, TransferExistsByServerIdTest) {
+  TEST_F(TransferMemoryDbTest, TransferExistsByServerIdTest) {
 
     // arrange
     Entity::Transfer::Transfer transfer = {.region=_region, .protocols={"tcp", "ftp"}};
@@ -91,10 +91,10 @@ namespace AwsMock::Database {
     EXPECT_TRUE(result2);
   }
 
-  TEST_F(TransferDatabaseTest, TransferGetByServerIdTest) {
+  TEST_F(TransferMemoryDbTest, TransferGetByServerIdTest) {
 
     // arrange
-    Entity::Transfer::Transfer transfer = {.region=_region, .protocols={"tcp", "ftp"}};
+    Entity::Transfer::Transfer transfer = {.region=_region, .serverId="test", .protocols={"tcp", "ftp"}};
     transfer = _transferDatabase.CreateTransfer(transfer);
 
     // act
@@ -104,20 +104,20 @@ namespace AwsMock::Database {
     EXPECT_TRUE(result.serverId == transfer.serverId);
   }
 
-  TEST_F(TransferDatabaseTest, TransferGetByServerArnTest) {
+  TEST_F(TransferMemoryDbTest, TransferGetByServerArnTest) {
 
     // arrange
-    Entity::Transfer::Transfer transfer = {.region=_region, .protocols={"tcp", "ftp"}};
+    Entity::Transfer::Transfer transfer = {.region=_region, .arn="aws:transfer", .protocols={"tcp", "ftp"}};
     transfer = _transferDatabase.CreateTransfer(transfer);
 
     // act
     Entity::Transfer::Transfer result = _transferDatabase.GetTransferByArn(transfer.arn);
 
     // assert
-    EXPECT_TRUE(result.serverId == transfer.serverId);
+    EXPECT_TRUE(result.arn == transfer.arn);
   }
 
-  TEST_F(TransferDatabaseTest, TransferUpdateTest) {
+  TEST_F(TransferMemoryDbTest, TransferUpdateTest) {
 
     // arrange
     Entity::Transfer::Transfer transfer = {.region=_region, .protocols={"tcp", "ftp"}};
@@ -131,7 +131,7 @@ namespace AwsMock::Database {
     EXPECT_TRUE(result.users[0].userName == "test");
   }
 
-  TEST_F(TransferDatabaseTest, TransferDeleteTest) {
+  TEST_F(TransferMemoryDbTest, TransferDeleteTest) {
 
     // arrange
     Entity::Transfer::Transfer transfer = {.region=_region, .protocols={"tcp", "ftp"}};
@@ -145,7 +145,7 @@ namespace AwsMock::Database {
     EXPECT_FALSE(result);
   }
 
-  TEST_F(TransferDatabaseTest, TransferDeleteAllTest) {
+  TEST_F(TransferMemoryDbTest, TransferDeleteAllTest) {
 
     // arrange
     Entity::Transfer::Transfer transfer1 = {.region=_region, .protocols={"tcp", "ftp"}};
@@ -165,4 +165,4 @@ namespace AwsMock::Database {
 
 } // namespace AwsMock::Core
 
-#endif // AWMOCK_CORE_TRANSFERDATABASETEST_H
+#endif // AWMOCK_CORE_TRANSFERMEMORYDBTEST_H

@@ -40,7 +40,7 @@ namespace AwsMock::Database {
     }
 
     std::string _region;
-    Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration();
     SNSDatabase _snsDatabase = SNSDatabase(_configuration);
   };
 

@@ -17,6 +17,7 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/DatabaseException.h>
 #include <awsmock/entity/transfer/Transfer.h>
 #include <awsmock/entity/transfer/User.h>
 #include <awsmock/repository/Database.h>
@@ -41,7 +42,7 @@ namespace AwsMock::Database {
     }
 
     /**
-     * Check existence of lambda
+     * Check existence of transfer servers
      *
      * @param region AWS region name
      * @param serverId AWS server ID
@@ -51,7 +52,7 @@ namespace AwsMock::Database {
     bool TransferExists(const std::string &region, const std::string &serverId);
 
     /**
-     * Check existence of lambda
+     * Check existence of transfer servers
      *
      * @param transfer AWS transfer
      * @return true if transfer manager already exists
@@ -60,13 +61,23 @@ namespace AwsMock::Database {
     bool TransferExists(const Entity::Transfer::Transfer &transfer);
 
     /**
-     * Check existence of lambda
+     * Check existence of transfer servers
      *
      * @param serverId AWS server ID
      * @return true if transfer manager already exists
      * @throws DatabaseException
      */
     bool TransferExists(const std::string &serverId);
+
+    /**
+     * Check existence of transfer servers by protocol
+     *
+     * @param region AWS region name
+     * @param protocols list of protocols
+     * @return true if transfer manager already exists
+     * @throws DatabaseException
+     */
+    bool TransferExists(const std::string &region, const std::vector<std::string> &protocols);
 
     /**
      * Returns a list of transfer manager.
@@ -77,7 +88,7 @@ namespace AwsMock::Database {
     std::vector<Entity::Transfer::Transfer> ListServers(const std::string &region);
 
     /**
-     * Create a new lambda function
+     * Create a new transfer servers
      *
      * @param transfer transfer entity
      * @return created transfer entity.

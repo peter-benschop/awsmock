@@ -6,7 +6,7 @@ set(SNS_SOURCES SNSDatabaseTests.cpp SNSMemoryDbTests.cpp)
 set(S3_SOURCES S3DatabaseTests.cpp S3MemoryDbTests.cpp)
 set(MODULE_SOURCES ModuleDatabaseTests.cpp ModuleMemoryDbTests.cpp)
 set(LAMBDA_SOURCES LambdaDatabaseTests.cpp LambdaMemoryDbTests.cpp)
-set(TRANSFER_SOURCES TransferDatabaseTest.cpp)
+set(TRANSFER_SOURCES TransferDatabaseTest.cpp TransferMemoryDbTest.cpp)
 
 # Includes
 include_directories(../include ../../core/include /usr/include /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)

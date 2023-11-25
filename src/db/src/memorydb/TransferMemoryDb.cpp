@@ -30,6 +30,14 @@ namespace AwsMock::Database {
 
   }
 
+  bool TransferMemoryDb::TransferExists(const std::string &region, const std::vector<std::string> &protocols) {
+
+    return find_if(_transfers.begin(), _transfers.end(), [region, protocols](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
+      return transfer.second.region == region && transfer.second.protocols == protocols;
+    }) != _transfers.end();
+
+  }
+
   std::vector<Entity::Transfer::Transfer> TransferMemoryDb::ListServers(const std::string &region) {
 
     Entity::Transfer::TransferList transferList;
@@ -59,6 +67,12 @@ namespace AwsMock::Database {
     auto it = find_if(_transfers.begin(), _transfers.end(), [region, serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
       return transfer.second.region == region && transfer.second.serverId == serverId;
     });
+
+    if (it == _transfers.end()) {
+      log_error_stream(_logger) << "Update transfer failed, serverId: " << serverId << std::endl;
+      throw Core::DatabaseException("Update transfer failed, serverId: " + serverId);
+    }
+
     _transfers[it->first] = transfer;
     return _transfers[it->first];
 
@@ -70,11 +84,13 @@ namespace AwsMock::Database {
       return transfer.first == oid;
     });
 
-    if (it != _transfers.end()) {
-      it->second.oid = oid;
-      return it->second;
+    if (it == _transfers.end()) {
+      log_error_stream(_logger) << "Get transfer by ID failed, oid: " << oid << std::endl;
+      throw Core::DatabaseException("Get transfer by ID failed, oid: " + oid);
     }
-    return {};
+
+    it->second.oid = oid;
+    return it->second;
   }
 
   Entity::Transfer::Transfer TransferMemoryDb::GetTransferByServerId(const std::string &serverId) {
@@ -83,24 +99,28 @@ namespace AwsMock::Database {
       return transfer.second.serverId == serverId;
     });
 
-    if (it != _transfers.end()) {
-      it->second.oid = it->first;
-      return it->second;
+    if (it == _transfers.end()) {
+      log_error_stream(_logger) << "Get transfer by serverId failed, serverId: " << serverId << std::endl;
+      throw Core::DatabaseException("Get transfer by serverId failed, serverId: " + serverId);
     }
-    return {};
+
+    it->second.oid = it->first;
+    return it->second;
   }
 
   Entity::Transfer::Transfer TransferMemoryDb::GetTransferByArn(const std::string &arn) {
 
     auto it = find_if(_transfers.begin(), _transfers.end(), [arn](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
-      return transfer.second.serverId == arn;
+      return transfer.second.arn == arn;
     });
 
-    if (it != _transfers.end()) {
-      it->second.oid = it->first;
-      return it->second;
+    if (it == _transfers.end()) {
+      log_error_stream(_logger) << "Get transfer by arn failed, arn: " << arn << std::endl;
+      throw Core::DatabaseException("Get transfer by arn failed, arn: " + arn);
     }
-    return {};
+
+    it->second.oid = it->first;
+    return it->second;
   }
 
   void TransferMemoryDb::DeleteTransfer(const std::string &serverId) {

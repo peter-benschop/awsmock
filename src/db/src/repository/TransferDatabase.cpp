@@ -22,9 +22,17 @@ namespace AwsMock::Database {
 
   bool TransferDatabase::TransferExists(const std::string &region, const std::string &serverId) {
 
-    int64_t count = _transferCollection.count_documents(make_document(kvp("region", region), kvp("serverId", serverId)));
-    log_trace_stream(_logger) << "Transfer manager exists: " << (count > 0 ? "true" : "false") << std::endl;
-    return count > 0;
+    if (HasDatabase()) {
+
+      int64_t count = _transferCollection.count_documents(make_document(kvp("region", region), kvp("serverId", serverId)));
+      log_trace_stream(_logger) << "Transfer manager exists: " << (count > 0 ? "true" : "false") << std::endl;
+      return count > 0;
+
+    } else {
+
+      return _memoryDb.TransferExists(region, serverId);
+
+    }
   }
 
   bool TransferDatabase::TransferExists(const Entity::Transfer::Transfer &transfer) {
@@ -34,28 +42,52 @@ namespace AwsMock::Database {
 
   bool TransferDatabase::TransferExists(const std::string &serverId) {
 
-    int64_t count = _transferCollection.count_documents(make_document(kvp("serverId", serverId)));
-    log_trace_stream(_logger) << "Transfer manager exists: " << (count > 0 ? "true" : "false") << std::endl;
-    return count > 0;
+    if (HasDatabase()) {
+
+      int64_t count = _transferCollection.count_documents(make_document(kvp("serverId", serverId)));
+      log_trace_stream(_logger) << "Transfer manager exists: " << (count > 0 ? "true" : "false") << std::endl;
+      return count > 0;
+
+    } else {
+
+      return _memoryDb.TransferExists(serverId);
+
+    }
   }
 
-  bool TransferDatabase::TransferExists(const std::string &region, std::vector<std::string> protocols) {
+  bool TransferDatabase::TransferExists(const std::string &region, const std::vector<std::string> &protocols) {
 
-    bsoncxx::builder::basic::array mProtocol{};
-    for (const auto &p : protocols) {
-      mProtocol.append(p);
+    if (HasDatabase()) {
+
+      bsoncxx::builder::basic::array mProtocol{};
+      for (const auto &p : protocols) {
+        mProtocol.append(p);
+      }
+      int64_t count = _transferCollection.count_documents(make_document(kvp("region", region), kvp("protocols", make_document(kvp("$all", mProtocol)))));
+      log_trace_stream(_logger) << "Transfer manager exists: " << (count > 0 ? "true" : "false") << std::endl;
+      return count > 0;
+
+    } else {
+
+      return _memoryDb.TransferExists(region, protocols);
+
     }
-    int64_t count = _transferCollection.count_documents(make_document(kvp("region", region), kvp("protocols", make_document(kvp("$all", mProtocol)))));
-    log_trace_stream(_logger) << "Transfer manager exists: " << (count > 0 ? "true" : "false") << std::endl;
-    return count > 0;
   }
 
   Entity::Transfer::Transfer TransferDatabase::CreateTransfer(const Entity::Transfer::Transfer &transfer) {
 
-    auto result = _transferCollection.insert_one(transfer.ToDocument());
-    log_trace_stream(_logger) << "Bucket created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
+    if (HasDatabase()) {
 
-    return GetTransferById(result->inserted_id().get_oid().value);
+      auto result = _transferCollection.insert_one(transfer.ToDocument());
+      log_trace_stream(_logger) << "Bucket created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
+
+      return GetTransferById(result->inserted_id().get_oid().value);
+
+    } else {
+
+      return _memoryDb.CreateTransfer(transfer);
+
+    }
   }
 
   Entity::Transfer::Transfer TransferDatabase::GetTransferById(bsoncxx::oid oid) {
@@ -63,21 +95,37 @@ namespace AwsMock::Database {
     mongocxx::stdx::optional<bsoncxx::document::value> mResult = _transferCollection.find_one(make_document(kvp("_id", oid)));
     Entity::Transfer::Transfer result;
     result.FromDocument(mResult);
-
     return result;
+
   }
 
   Entity::Transfer::Transfer TransferDatabase::GetTransferById(const std::string &oid) {
-    return GetTransferById(bsoncxx::oid(oid));
+
+    if (HasDatabase()) {
+
+      return GetTransferById(bsoncxx::oid(oid));
+
+    } else {
+
+      return _memoryDb.GetTransferById(oid);
+
+    }
   }
 
   Entity::Transfer::Transfer TransferDatabase::GetTransferByServerId(const std::string &serverId) {
 
-    mongocxx::stdx::optional<bsoncxx::document::value> mResult = _transferCollection.find_one(make_document(kvp("serverId", serverId)));
-    Entity::Transfer::Transfer result;
-    result.FromDocument(mResult);
+    if (HasDatabase()) {
 
-    return result;
+      mongocxx::stdx::optional<bsoncxx::document::value> mResult = _transferCollection.find_one(make_document(kvp("serverId", serverId)));
+      Entity::Transfer::Transfer result;
+      result.FromDocument(mResult);
+      return result;
+
+    } else {
+
+      return _memoryDb.GetTransferByServerId(serverId);
+
+    }
   }
 
   Entity::Transfer::Transfer TransferDatabase::CreateOrUpdateTransfer(const Entity::Transfer::Transfer &lambda) {
@@ -91,20 +139,33 @@ namespace AwsMock::Database {
 
   Entity::Transfer::Transfer TransferDatabase::UpdateTransfer(const Entity::Transfer::Transfer &transfer) {
 
-    auto result = _transferCollection.replace_one(make_document(kvp("region", transfer.region), kvp("serverId", transfer.serverId)), transfer.ToDocument());
+    if (HasDatabase()) {
 
-    log_trace_stream(_logger) << "Transfer updated: " << transfer.ToString() << std::endl;
+      auto result = _transferCollection.replace_one(make_document(kvp("region", transfer.region), kvp("serverId", transfer.serverId)), transfer.ToDocument());
+      log_trace_stream(_logger) << "Transfer updated: " << transfer.ToString() << std::endl;
+      return GetTransferByServerId(transfer.serverId);
 
-    return GetTransferByServerId(transfer.serverId);
+    } else {
+
+      return _memoryDb.UpdateTransfer(transfer);
+
+    }
   }
 
   Entity::Transfer::Transfer TransferDatabase::GetTransferByArn(const std::string &arn) {
 
-    mongocxx::stdx::optional<bsoncxx::document::value> mResult = _transferCollection.find_one(make_document(kvp("arn", arn)));
-    Entity::Transfer::Transfer result;
-    result.FromDocument(mResult);
+    if (HasDatabase()) {
 
-    return result;
+      mongocxx::stdx::optional<bsoncxx::document::value> mResult = _transferCollection.find_one(make_document(kvp("arn", arn)));
+      Entity::Transfer::Transfer result;
+      result.FromDocument(mResult);
+      return result;
+
+    } else {
+
+      return _memoryDb.GetTransferByArn(arn);
+
+    }
   }
 
   std::vector<Entity::Transfer::Transfer> TransferDatabase::ListServers(const std::string &region) {
@@ -130,19 +191,37 @@ namespace AwsMock::Database {
     } else {
 
       return _memoryDb.ListServers(region);
+
     }
     return transfers;
   }
 
   void TransferDatabase::DeleteTransfer(const std::string &serverId) {
 
-    auto result = _transferCollection.delete_many(make_document(kvp("serverId", serverId)));
-    log_debug_stream(_logger) << "Transfer deleted, serverId: " << serverId << " count: " << result->deleted_count() << std::endl;
+    if (HasDatabase()) {
+
+      auto result = _transferCollection.delete_many(make_document(kvp("serverId", serverId)));
+      log_debug_stream(_logger) << "Transfer deleted, serverId: " << serverId << " count: " << result->deleted_count() << std::endl;
+
+    } else {
+
+      _memoryDb.DeleteTransfer(serverId);
+
+    }
   }
 
   void TransferDatabase::DeleteAllTransfers() {
-    auto result = _transferCollection.delete_many({});
-    log_debug_stream(_logger) << "All transfers deleted, count: " << result->deleted_count() << std::endl;
+
+    if (HasDatabase()) {
+
+      auto result = _transferCollection.delete_many({});
+      log_debug_stream(_logger) << "All transfers deleted, count: " << result->deleted_count() << std::endl;
+
+    } else {
+
+      _memoryDb.DeleteAllTransfers();
+
+    }
   }
 
 } // namespace AwsMock::Database

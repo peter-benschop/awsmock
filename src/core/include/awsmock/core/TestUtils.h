@@ -11,6 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/core/SystemUtils.h>
+#include <awsmock/core/Configuration.h>
 
 #define TMP_PROPERTIES_FILE "/tmp/aws-mock.properties"
 
@@ -34,6 +35,20 @@ namespace AwsMock::Core {
      */
     static void CreateTestConfigurationFile(bool withDatabase);
 
+    /**
+     * Returns the name of the generated test configuration properties file.
+     *
+     * @return name of the generated test configuration file
+     */
+    static std::string GetTestConfigurationFilename();
+
+    /**
+     * Returns the name of the generated test configuration properties file.
+     *
+     * @param withDatabase run with MongoDB database
+     * @return name of the generated test configuration file
+     */
+    static Core::Configuration GetTestConfiguration(bool withDatabase = true);
   };
 }
 #endif //AWSMOCK_CORE_TESTUTILS_H
