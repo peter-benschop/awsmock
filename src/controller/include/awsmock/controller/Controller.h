@@ -6,8 +6,10 @@
 #define AWSMOCK_CONTROLLER_CONTROLLER_H
 
 // C includes
+#ifdef HAS_SYSTEMD
 #include <systemd/sd-journal.h>
 #include <systemd/sd-daemon.h>
+#endif
 
 // C++ includes
 #include <string>
@@ -70,10 +72,12 @@ namespace AwsMock::Controller {
      */
     void StopService(const std::string &name);
 
+#ifdef HAS_SYSTEMD
     /**
      * Show the logs
      */
     void ShowServiceLogs();
+#endif
 
     /**
      * Sets the managers log level

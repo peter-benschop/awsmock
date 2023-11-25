@@ -31,7 +31,12 @@ AwsMock API gateway
 .P
 Per default the gateway runs on port 4566, but can be changed in the configuration file. The default configuration file
 is
-.I /etc/aws-mock.properties
+.I /etc/aws-mock.properties.
+The manager can run as a docker daemon (see http://docker.io/jensvogt/awsmock for more information), or as a standalone
+application.
+.P
+AwsMock also supports the persistence of the current configuration in a MongoDB instance. In order to run
+AwsMock as a host application with a a database, switch the database support on in the properties file.
 .SH OPTIONS
 .TP
 .B \-\-daemon
