@@ -33,7 +33,6 @@ namespace AwsMock::Database {
      * @param configuration configuration properties
      */
     explicit Database(Core::Configuration &configuration);
-    Database();
 
     /**
      * Initialize mongodb
@@ -60,11 +59,6 @@ namespace AwsMock::Database {
      * @return client session
      */
     mongocxx::client_session GetSession();
-
-    /**
-     * Wait for the mongodb client session to be ready
-     */
-    void WaitForStartup();
 
     /**
      * Check whether we are running without database

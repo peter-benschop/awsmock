@@ -216,7 +216,7 @@ namespace AwsMock::Service {
   }
 
   void SQSService::SetVisibilityTimeout(Dto::SQS::ChangeMessageVisibilityRequest &request) {
-    log_trace_stream(_logger) << "Change message visibility request, queue: " << request.queueUrl << std::endl;
+    log_trace_stream(_logger) << "Change message visibilityTimeout request, queue: " << request.queueUrl << std::endl;
 
     // Check existence
     if (!_database->MessageExists(request.receiptHandle)) {
@@ -239,7 +239,7 @@ namespace AwsMock::Service {
       log_trace_stream(_logger) << "Message updated: " << message.ToString() << std::endl;
 
     } catch (Poco::Exception &ex) {
-      log_error_stream(_logger) << "SQS change message visibility timeout request failed, message: " << ex.message() << std::endl;
+      log_error_stream(_logger) << "SQS change message visibilityTimeout timeout request failed, message: " << ex.message() << std::endl;
       throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
   }

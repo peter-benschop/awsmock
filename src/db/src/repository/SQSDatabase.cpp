@@ -461,7 +461,7 @@ namespace AwsMock::Database {
         // Commit
         session.commit_transaction();
 
-        log_trace_stream(_logger) << "Message reset, visibility: " << visibility << " updated: " << result->upserted_count() << " queue: " << queueUrl << std::endl;
+        log_trace_stream(_logger) << "Message reset, visibilityTimeout: " << visibility << " updated: " << result->upserted_count() << " queue: " << queueUrl << std::endl;
 
       } catch (mongocxx::exception &e) {
         log_error_stream(_logger) << "Collection transaction exception: " << e.what() << std::endl;

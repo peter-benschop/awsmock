@@ -70,6 +70,21 @@ namespace AwsMock::Dto::SQS {
     }
   }
 
+  void GetQueueUrlResponse::FromJson(const std::string &jsonString) {
+
+    try {
+      Poco::JSON::Parser parser;
+      Poco::Dynamic::Var result = parser.parse(jsonString);
+
+      Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+      Core::JsonUtils::GetJsonValueString("QueueUrl", rootObject, queueUrl);
+
+    } catch (Poco::Exception &exc) {
+      std::cerr << exc.message() << std::endl;
+      throw Core::ServiceException(exc.message(), 500);
+    }
+  }
+
   std::string GetQueueUrlResponse::ToString() const {
     std::stringstream ss;
     ss << (*this);

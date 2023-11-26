@@ -265,7 +265,7 @@ namespace AwsMock::Database {
         _messages[message.first] = message.second;
         count++;
       }
-      log_trace_stream(_logger) << "Message reset, visibility: " << visibility << " updated: " << count << " queue: " << queueUrl << std::endl;
+      log_trace_stream(_logger) << "Message reset, visibilityTimeout: " << visibility << " updated: " << count << " queue: " << queueUrl << std::endl;
     }
   }
 

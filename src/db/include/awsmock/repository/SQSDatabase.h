@@ -247,7 +247,7 @@ namespace AwsMock::Database {
      * Reset expired messages
      *
      * @param queueUrl URL of the queue
-     * @param visibility visibility period in seconds
+     * @param visibility visibilityTimeout period in seconds
      */
     [[maybe_unused]] void ResetMessages(const std::string &queueUrl, long visibility);
 

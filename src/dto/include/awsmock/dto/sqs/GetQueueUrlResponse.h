@@ -23,6 +23,7 @@
 
 // AwsMock includes
 #include <awsmock/core/ServiceException.h>
+#include <awsmock/core/JsonUtils.h>
 
 /**
  * <?xml version="1.0"?>
@@ -64,6 +65,13 @@ namespace AwsMock::Dto::SQS {
      * @return JSON string
      */
     std::string ToJson();
+
+    /**
+     * Convert from JSON representation
+     *
+     * @param jsonString JSON string
+     */
+    void FromJson(const std::string &jsonString);
 
     /**
      * Converts the DTO to a string representation.

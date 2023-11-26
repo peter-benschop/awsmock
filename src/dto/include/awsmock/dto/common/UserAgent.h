@@ -15,6 +15,7 @@
 
 // AwsMock includes
 #include <awsmock/core/ServiceException.h>
+#include <awsmock/core/StringUtils.h>
 
 namespace AwsMock::Dto::Common {
 

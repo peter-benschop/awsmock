@@ -6,14 +6,6 @@
 
 namespace AwsMock::Dto::SQS {
 
-/*{
-  "MD5OfMessageAttributes": "string",
-  "MD5OfMessageBody": "string",
-  "MD5OfMessageSystemAttributes": "string",
-  "MessageId": "string",
-  "SequenceNumber": "string"
-}*/
-
   std::string SendMessageResponse::ToJson() {
 
     try {
@@ -29,6 +21,23 @@ namespace AwsMock::Dto::SQS {
       return os.str();
 
     } catch (Poco::Exception &exc) {
+      throw Core::ServiceException(exc.message(), 500);
+    }
+  }
+
+  void SendMessageResponse::FromJson(const std::string &jsonString) {
+
+    try {
+      Poco::JSON::Parser parser;
+      Poco::Dynamic::Var result = parser.parse(jsonString);
+
+      Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+      Core::JsonUtils::GetJsonValueString("MD5OfMessageBody", rootObject, md5Body);
+      Core::JsonUtils::GetJsonValueString("MD5OfMessageSystemAttributes", rootObject, md5Attr);
+      Core::JsonUtils::GetJsonValueString("MessageId", rootObject, messageId);
+
+    } catch (Poco::Exception &exc) {
+      std::cerr << exc.message() << std::endl;
       throw Core::ServiceException(exc.message(), 500);
     }
   }

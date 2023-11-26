@@ -30,7 +30,7 @@
 
 namespace AwsMock::Service {
 
-  class SQSServerCppTest : public ::testing::Test {
+  class SQSServerXmlTest : public ::testing::Test {
 
   protected:
 
@@ -41,7 +41,7 @@ namespace AwsMock::Service {
 
       // Create some test objects
       _extraHeaders["Authorization"] = Core::AwsUtils::GetAuthorizationHeader(_configuration, "sqs");
-      _extraHeaders["User-Agent"] = "aws-sdk-cpp";
+      _extraHeaders["Content-Type"] = Core::AwsUtils::GetContentTypeHeader("xml");
 
       // Define endpoint. This is the endpoint of the SQS server, not the gateway
       std::string _port = _configuration.getString("awsmock.module.sqs.port", std::to_string(SQS_DEFAULT_PORT));
@@ -69,11 +69,12 @@ namespace AwsMock::Service {
     SQSServer _sqsServer = SQSServer(_configuration, _metricService);
   };
 
-  TEST_F(SQSServerCppTest, QueueCreateTest) {
+  TEST_F(SQSServerXmlTest, QueueCreateTest) {
 
     // arrange
 
     // act
+    _extraHeaders["User-Agent"] = Core::AwsUtils::GetUserAgentHeader("sqs", "create-queue");
     Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
     Database::Entity::SQS::QueueList queueList = _database.ListQueues();
 
@@ -82,13 +83,15 @@ namespace AwsMock::Service {
     EXPECT_EQ(1, queueList.size());
   }
 
-  TEST_F(SQSServerCppTest, QueueListTest) {
+  TEST_F(SQSServerXmlTest, QueueListTest) {
 
     // arrange
+    _extraHeaders["User-Agent"] = Core::AwsUtils::GetUserAgentHeader("sqs", "create-queue");
     Core::CurlResponse createResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
     EXPECT_TRUE(createResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
 
     // act
+    _extraHeaders["User-Agent"] = Core::AwsUtils::GetUserAgentHeader("sqs", "list-queues");
     Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, LIST_QUEUE_REQUEST);
     EXPECT_TRUE(createResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
 
@@ -97,14 +100,16 @@ namespace AwsMock::Service {
     EXPECT_TRUE(Core::StringUtils::Contains(response.output, "TestQueue"));
   }
 
-  TEST_F(SQSServerCppTest, QueueDeleteTest) {
+  TEST_F(SQSServerXmlTest, QueueDeleteTest) {
 
     // arrange
+    _extraHeaders["User-Agent"] = Core::AwsUtils::GetUserAgentHeader("sqs", "create-queue");
     Core::CurlResponse curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
     Dto::SQS::CreateQueueResponse createResponse;
     createResponse.FromXml(curlResponse.output);
 
     // act
+    _extraHeaders["User-Agent"] = Core::AwsUtils::GetUserAgentHeader("sqs", "delete-queue");
     std::string deleteQueueRequest = "Action=DeleteQueue&QueueUrl=" + createResponse.queueUrl;
     Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", _endpoint, _extraHeaders, deleteQueueRequest);
     Database::Entity::SQS::QueueList queueList = _database.ListQueues();

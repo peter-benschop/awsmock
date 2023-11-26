@@ -3,6 +3,8 @@
 //
 
 #include <awsmock/dto/sqs/CreateQueueResponse.h>
+#include <Poco/JSON/Parser.h>
+#include "awsmock/core/JsonUtils.h"
 
 namespace AwsMock::Dto::SQS {
 
@@ -11,12 +13,28 @@ namespace AwsMock::Dto::SQS {
     try {
       Poco::JSON::Object rootJson;
       rootJson.set("QueueName", name);
+      rootJson.set("QueueUrl", queueUrl);
 
       std::ostringstream os;
       rootJson.stringify(os);
       return os.str();
 
     } catch (Poco::Exception &exc) {
+      throw Core::ServiceException(exc.message(), 500);
+    }
+  }
+
+  void CreateQueueResponse::FromJson(const std::string &jsonString) {
+
+    try {
+      Poco::JSON::Parser parser;
+      Poco::Dynamic::Var result = parser.parse(jsonString);
+
+      Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+      Core::JsonUtils::GetJsonValueString("QueueUrl", rootObject, queueUrl);
+
+    } catch (Poco::Exception &exc) {
+      std::cerr << exc.message() << std::endl;
       throw Core::ServiceException(exc.message(), 500);
     }
   }

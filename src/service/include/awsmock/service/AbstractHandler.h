@@ -191,20 +191,6 @@ namespace AwsMock::Service {
     void GetActionVersion(const std::string &body, std::string &action, std::string &version);
 
     /**
-     * Get the command from the user agent header
-     *
-     * <p>Returns the command from the user agent HTTP header. Example:
-     * <pre>
-     * User-Agent: aws-cli/2.13.38 Python/3.11.6 Linux/6.1.0-13-amd64 exe/x86_64.debian.12 prompt/off command/sqs.list-queues
-     * </pre>
-     * </p>
-     *
-     * @param request HTTP request
-     * @return UserAgent DTO
-     */
-    Dto::Common::UserAgent GetCommand(const Poco::Net::HTTPServerRequest &request);
-
-    /**
      * Get the action from the request path
      *
      * <p>Returns a string parameter from the message path. This is mainly used by SQS.</p>
@@ -214,25 +200,6 @@ namespace AwsMock::Service {
      * @return parameter value
      */
     std::string GetStringParameter(const std::string &path, const std::string &name);
-
-    /**
-     * Get a path parameter by index
-     *
-     * @param path HTTP request path
-     * @param index path index
-     * @return parameter value
-     */
-    std::string GetStringPathParameter(const std::string &path, int index);
-
-    /**
-     * Gets a string parameter at position index
-     *
-     * @param path HTTP request path
-     * @param name name of the parameter
-     * @param index index of tke key
-     * @return parameter value at index
-     */
-    std::string GetStringParameter(const std::string &path, const std::string &name, int index);
 
     /**
      * Return an integer name.

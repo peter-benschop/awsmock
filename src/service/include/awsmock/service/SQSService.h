@@ -114,9 +114,9 @@ namespace AwsMock::Service {
     void SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request);
 
     /**
-     * Sets the message visibility timeout.
+     * Sets the message visibilityTimeout timeout.
      *
-     * @param request set visibility timeout request
+     * @param request set visibilityTimeout timeout request
      * @throws ServiceException
      */
     void SetVisibilityTimeout(Dto::SQS::ChangeMessageVisibilityRequest &request);
