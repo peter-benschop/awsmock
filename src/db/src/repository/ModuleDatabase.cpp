@@ -164,7 +164,7 @@ namespace AwsMock::Database {
 
       try {
 
-        auto result = _moduleCollection.insert_one(module.ToDocument().view());
+        auto result = _moduleCollection.insert_one(module.ToDocument());
         log_trace_stream(_logger) << "Module created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
         return GetModuleById(result->inserted_id().get_oid().value);
 
