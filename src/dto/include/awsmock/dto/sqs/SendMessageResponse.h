@@ -24,9 +24,11 @@
 #include "Poco/DOM/Text.h"
 #include "Poco/DOM/DOMWriter.h"
 #include "Poco/XML/XMLWriter.h"
+#include <Poco/JSON/Object.h>
 
 // AwsMock includes
 #include <awsmock/dto/sqs/MessageAttribute.h>
+#include <awsmock/core/ServiceException.h>
 
 namespace AwsMock::Dto::SQS {
 
@@ -66,6 +68,13 @@ namespace AwsMock::Dto::SQS {
      * Request ID
      */
     std::string requestId;
+
+    /**
+     * Convert to JSON representation
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson();
 
     /**
      * Convert to XML representation

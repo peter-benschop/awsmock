@@ -6,6 +6,21 @@
 
 namespace AwsMock::Dto::SQS {
 
+  std::string CreateQueueResponse::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("QueueName", name);
+
+      std::ostringstream os;
+      rootJson.stringify(os);
+      return os.str();
+
+    } catch (Poco::Exception &exc) {
+      throw Core::ServiceException(exc.message(), 500);
+    }
+  }
+
   void CreateQueueResponse::FromXml(const std::string &xmlString) {
 
     Poco::XML::DOMParser parser;
@@ -46,8 +61,7 @@ namespace AwsMock::Dto::SQS {
 
     std::stringstream output;
     Poco::XML::DOMWriter writer;
-    writer.setNewLine("\n");
-    writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
+    writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION);
     writer.writeNode(output, pDoc);
 
     return output.str();

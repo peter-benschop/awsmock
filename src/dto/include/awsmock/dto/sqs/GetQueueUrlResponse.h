@@ -10,18 +10,15 @@
 #include <sstream>
 
 // Poco includes
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-#include "Poco/DOM/AutoPtr.h"
-#include "Poco/DOM/Document.h"
+#include "Poco/UUIDGenerator.h"
 #include "Poco/DOM/AutoPtr.h"
 #include "Poco/DOM/Document.h"
 #include "Poco/DOM/Element.h"
 #include "Poco/DOM/Text.h"
 #include "Poco/DOM/DOMParser.h"
 #include "Poco/DOM/DOMWriter.h"
-#include "Poco/UUID.h"
-#include "Poco/UUIDGenerator.h"
+#include <Poco/JSON/JSON.h>
+#include <Poco/JSON/Parser.h>
 #include "Poco/XML/XMLWriter.h"
 
 // AwsMock includes
@@ -59,7 +56,7 @@ namespace AwsMock::Dto::SQS {
      *
      * @return XML string
      */
-    std::string ToXml();
+    std::string ToXml() const;
 
     /**
      * Convert to a JSON string
@@ -73,7 +70,7 @@ namespace AwsMock::Dto::SQS {
      *
      * @return DTO as string for logging.
      */
-    std::string ToString() const;
+    [[nodiscard]] std::string ToString() const;
 
     /**
      * Stream provider.

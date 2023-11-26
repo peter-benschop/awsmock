@@ -6,6 +6,33 @@
 
 namespace AwsMock::Dto::SQS {
 
+/*{
+  "MD5OfMessageAttributes": "string",
+  "MD5OfMessageBody": "string",
+  "MD5OfMessageSystemAttributes": "string",
+  "MessageId": "string",
+  "SequenceNumber": "string"
+}*/
+
+  std::string SendMessageResponse::ToJson() {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("MessageId", messageId);
+      rootJson.set("MD5OfMessageBody", md5Body);
+      rootJson.set("MD5OfMessageSystemAttributes", md5Attr);
+      //rootJson.set("SequenceNumber", s);
+      //rootJson.set("MD5OfMessageAttributes", );
+
+      std::ostringstream os;
+      rootJson.stringify(os);
+      return os.str();
+
+    } catch (Poco::Exception &exc) {
+      throw Core::ServiceException(exc.message(), 500);
+    }
+  }
+
   void SendMessageResponse::FromXml(const std::string &xmlString) {
 
     Poco::XML::DOMParser parser;

@@ -22,11 +22,13 @@ namespace AwsMock::Dto::Common {
     clientPrompt = userAgent.substr(posVec[5].offset, posVec[5].length) == "ON";
     clientModule = userAgent.substr(posVec[6].offset, posVec[6].length);
     clientCommand = userAgent.substr(posVec[7].offset, posVec[7].length);
+
+    contentType = request["Content-Type"] == "application/x-amz-json-1.0" ? "json" : "xml";
   }
 
   void UserAgent::FromRequest(const Poco::Net::HTTPServerRequest &request, const std::string &service) {
     FromRequest(request);
-    if(clientModule != service) {
+    if (clientModule != service) {
       throw Core::ServiceException("Request was send to the wrong service!");
     }
   }
@@ -39,7 +41,7 @@ namespace AwsMock::Dto::Common {
 
   std::ostream &operator<<(std::ostream &os, const UserAgent &r) {
     os << "UserAgent={clientApplication='" << r.clientApplication << ", clientLanguage='" << r.clientLanguage << "', clientOs='" << r.clientOs << "', clientExecutableType='" << r.clientExecutableType << "', clientPrompt=" << r.clientPrompt
-       << ", clientModule='" << r.clientModule << "', clientCommand='" << r.clientCommand << "'}";
+       << ", clientModule='" << r.clientModule << "', clientCommand='" << r.clientCommand << "' contentType='" << r.contentType << "'}";
     return os;
   }
 }

@@ -40,7 +40,7 @@ namespace AwsMock::Database {
 
     if (HasDatabase()) {
 
-      int64_t count = _queueCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", make_document(kvp("$regex", queueUrl)))));
+      int64_t count = _queueCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
       log_trace_stream(_logger) << "Queue exists: " << (count > 0 ? "true" : "false") << std::endl;
       return count > 0;
 

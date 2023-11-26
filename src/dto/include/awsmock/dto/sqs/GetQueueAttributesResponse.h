@@ -18,10 +18,12 @@
 #include "Poco/DOM/Element.h"
 #include "Poco/DOM/Text.h"
 #include "Poco/DOM/DOMWriter.h"
+#include <Poco/JSON/Object.h>
 #include "Poco/XML/XMLWriter.h"
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/ServiceException.h>
 
 namespace AwsMock::Dto::SQS {
 
@@ -41,6 +43,13 @@ namespace AwsMock::Dto::SQS {
      * Resource
      */
     std::string requestId = Poco::UUIDGenerator().createRandom().toString();
+
+    /**
+     * Convert to a JSON string
+     *
+     * @return JSON string
+     */
+    std::string ToJson() const;
 
     /**
      * Convert to XML representation

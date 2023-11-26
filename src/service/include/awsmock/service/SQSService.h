@@ -30,18 +30,15 @@
 #include <awsmock/dto/sqs/DeleteMessageBatchRequest.h>
 #include <awsmock/dto/sqs/DeleteMessageResponse.h>
 #include <awsmock/dto/sqs/DeleteQueueRequest.h>
-#include <awsmock/dto/sqs/DeleteQueueResponse.h>
 #include <awsmock/dto/sqs/GetQueueUrlRequest.h>
 #include <awsmock/dto/sqs/GetQueueUrlResponse.h>
 #include <awsmock/dto/sqs/ListQueueResponse.h>
 #include <awsmock/dto/sqs/PurgeQueueRequest.h>
-#include <awsmock/dto/sqs/PurgeQueueResponse.h>
 #include <awsmock/dto/sqs/ReceiveMessageRequest.h>
 #include <awsmock/dto/sqs/ReceiveMessageResponse.h>
 #include <awsmock/dto/sqs/SendMessageRequest.h>
 #include <awsmock/dto/sqs/SendMessageResponse.h>
 #include <awsmock/dto/sqs/SetQueueAttributesRequest.h>
-#include <awsmock/dto/sqs/SetQueueAttributesResponse.h>
 #include <awsmock/dto/sqs/ChangeMessageVisibilityRequest.h>
 #include <awsmock/repository/SQSDatabase.h>
 
@@ -86,10 +83,9 @@ namespace AwsMock::Service {
      * Purge a queue.
      *
      * @param request purge queue request
-     * @return PurgeQueueResponse
      * @throws ServiceException
      */
-    Dto::SQS::PurgeQueueResponse PurgeQueue(const Dto::SQS::PurgeQueueRequest &request);
+    void PurgeQueue(const Dto::SQS::PurgeQueueRequest &request);
 
     /**
      * Return the queue attributes
@@ -110,13 +106,12 @@ namespace AwsMock::Service {
     Dto::SQS::GetQueueAttributesResponse GetQueueAttributes(const Dto::SQS::GetQueueAttributesRequest &request);
 
     /**
-     * Put queue attributes
+     * Set queue attributes
      *
      * @param request put queue sqs request
-     * @return SetQueueAttributesResponse
      * @throws ServiceException
      */
-    Dto::SQS::SetQueueAttributesResponse SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request);
+    void SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request);
 
     /**
      * Sets the message visibility timeout.
@@ -130,10 +125,9 @@ namespace AwsMock::Service {
      * Delete a queue
      *
      * @param request delete request DTO
-     * @return DeleteQueueResponse
      * @throws ServiceException
      */
-    Dto::SQS::DeleteQueueResponse DeleteQueue(const Dto::SQS::DeleteQueueRequest &request);
+    void DeleteQueue(const Dto::SQS::DeleteQueueRequest &request);
 
     /**
      * Creates a new queue

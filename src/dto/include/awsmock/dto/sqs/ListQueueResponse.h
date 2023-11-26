@@ -43,6 +43,13 @@ namespace AwsMock::Dto::SQS {
     [[nodiscard]] std::string ToXml() const;
 
     /**
+     * Convert to JSON representation
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const;
+
+    /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.

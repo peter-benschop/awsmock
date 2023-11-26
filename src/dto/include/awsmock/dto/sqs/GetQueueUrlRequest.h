@@ -9,6 +9,15 @@
 #include <string>
 #include <sstream>
 
+// Poco includes
+#include <Poco/JSON/JSON.h>
+#include <Poco/JSON/Parser.h>
+#include <Poco/Dynamic/Var.h>
+
+// AwsMock includes
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/ServiceException.h>
+
 namespace AwsMock::Dto::SQS {
 
   struct GetQueueUrlRequest {
@@ -22,6 +31,13 @@ namespace AwsMock::Dto::SQS {
      * Name of the queue
      */
     std::string queueName;
+
+    /**
+     * Converts the JSON string to a DTO
+     *
+     * @param jsonString JSON string
+     */
+    void FromJson(const std::string &jsonString);
 
     /**
      * Converts the DTO to a string representation.

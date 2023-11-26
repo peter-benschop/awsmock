@@ -21,7 +21,7 @@ namespace AwsMock::Dto::SQS {
 
   }
 
-  std::string GetQueueUrlResponse::ToXml() {
+  std::string GetQueueUrlResponse::ToXml() const {
 
     // Root
     Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;

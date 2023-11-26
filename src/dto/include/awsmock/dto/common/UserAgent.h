@@ -56,6 +56,11 @@ namespace AwsMock::Dto::Common {
     std::string clientCommand;
 
     /**
+     * Client content type
+     */
+    std::string contentType;
+
+    /**
      * Getś the value from the user-agent string
      *
      * @param request HTTP server request

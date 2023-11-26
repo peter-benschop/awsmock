@@ -10,7 +10,14 @@
 #include <sstream>
 #include <map>
 
+// Poco includes
+#include <Poco/JSON/JSON.h>
+#include <Poco/JSON/Parser.h>
+#include <Poco/Dynamic/Var.h>
+
 // AwsMock includes
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/ServiceException.h>
 #include <awsmock/dto/sqs/QueueAttribute.h>
 
 namespace AwsMock::Dto::SQS {
@@ -46,6 +53,13 @@ namespace AwsMock::Dto::SQS {
      * Tags
      */
     std::map<std::string, std::string> tags;
+
+    /**
+     * Converts the JSON string to DTO.
+     *
+     * @param JSON string
+     */
+    void FromJson(const std::string &jsonString);
 
     /**
      * Converts the DTO to a string representation.

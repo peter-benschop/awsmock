@@ -6,6 +6,22 @@
 
 namespace AwsMock::Dto::SQS {
 
+  void DeleteQueueRequest::FromJson(const std::string &jsonString) {
+
+    Poco::JSON::Parser parser;
+    Poco::Dynamic::Var result = parser.parse(jsonString);
+    Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+
+    try {
+
+      // Attributes
+      Core::JsonUtils::GetJsonValueString("QueueUrl", rootObject, queueUrl);
+
+    } catch (Poco::Exception &exc) {
+      throw Core::ServiceException(exc.message(), 500);
+    }
+  }
+
   std::string DeleteQueueRequest::ToString() const {
     std::stringstream ss;
     ss << (*this);
