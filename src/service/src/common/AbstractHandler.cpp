@@ -604,8 +604,6 @@ namespace AwsMock::Service {
     std::cerr << "================== Request Body ==================" << std::endl;
     std::cerr << request.stream().rdbuf() << std::endl;
     std::cerr << "==================================================" << std::endl;
-    request.stream().clear();
-    request.stream().seekg(0, std::ios::beg);
   }
 
   [[maybe_unused]] void AbstractHandler::DumpPayload(const std::string &payload) {

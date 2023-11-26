@@ -34,7 +34,7 @@ namespace AwsMock::Service {
       std::string payload = GetPayload(request);
       std::string requestId = GetHeaderValue(request, "RequestId", Poco::UUIDGenerator().createRandom().toString());
 
-      //DumpRequest(request);
+      DumpRequest(request);
       //DumpPayload(payload);
 
       std::string action = Core::HttpUtils::GetQueryParameterValueByName(payload, "Action");

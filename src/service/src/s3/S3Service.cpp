@@ -398,6 +398,78 @@ namespace AwsMock::Service {
     return {.eTag=targetObject.md5sum, .lastModified=Poco::DateTimeFormatter::format(Poco::DateTime(), Poco::DateTimeFormat::ISO8601_FRAC_FORMAT)};
   }
 
+  Dto::S3::MoveObjectResponse S3Service::MoveObject(Dto::S3::MoveObjectRequest &request) {
+    log_trace_stream(_logger) << "Move object request: " << request.ToString() << std::endl;
+
+    // Check existence of source bucket
+    if (!_database->BucketExists({.region=request.region, .name=request.sourceBucket})) {
+      log_error_stream(_logger) << "Source bucket does not exist, region: " << request.region + " bucket: " << request.sourceBucket << std::endl;
+      throw Core::ServiceException("Source bucket does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+    }
+
+    // Check existence of source key
+    if (!_database->ObjectExists({.region=request.region, .bucket=request.sourceBucket, .key=request.sourceKey})) {
+      log_error_stream(_logger) << "Source object does not exist, region: " << request.region + " bucket: " << request.sourceBucket << " key: "
+                                << request.sourceKey << std::endl;
+      throw Core::ServiceException("Source object does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+    }
+
+    Dto::S3::CopyObjectResponse response;
+    Database::Entity::S3::Object sourceObject, targetObject;
+    try {
+
+      // Check existence of target bucket
+      if (!_database->BucketExists({.region=request.region, .name=request.targetBucket})) {
+        log_error_stream(_logger) << "Target bucket does not exist, region: " << request.region + " bucket: " << request.targetBucket << std::endl;
+        throw Core::ServiceException("Target bucket does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+      }
+
+      // Get the source object from the database
+      Database::Entity::S3::Bucket targetBucket = _database->GetBucketByRegionName(request.region, request.targetBucket);
+      sourceObject = _database->GetObject(request.region, request.sourceBucket, request.sourceKey);
+
+      // Copy physical file
+      std::string targetFile = Core::AwsUtils::CreateS3FileName();
+      std::string sourcePath = _dataS3Dir + Poco::Path::separator() + sourceObject.internalName;
+      std::string targetPath = _dataS3Dir + Poco::Path::separator() + targetFile;
+      Core::FileUtils::CopyTo(sourcePath, targetPath);
+
+      // Update database
+      targetObject = {
+          .region=request.region,
+          .bucket=request.targetBucket,
+          .key=request.targetKey,
+          .owner=sourceObject.owner,
+          .size=sourceObject.size,
+          .md5sum=sourceObject.md5sum,
+          .sha1sum=sourceObject.sha1sum,
+          .sha256sum=sourceObject.sha256sum,
+          .contentType=sourceObject.contentType,
+          .metadata=request.metadata,
+          .internalName=targetFile,
+      };
+
+      // Create version ID
+      if (targetBucket.IsVersioned()) {
+        targetObject.versionId = Core::AwsUtils::CreateS3VersionId();
+      }
+
+      // Create object
+      targetObject = _database->CreateObject(targetObject);
+      log_debug_stream(_logger) << "Database updated, bucket: " << targetObject.bucket << " key: " << targetObject.key << std::endl;
+
+      // Check notification
+      CheckNotifications(targetObject.region, targetObject.bucket, targetObject.key, targetObject.size, "s3:ObjectCreated:Put");
+      log_info_stream(_logger) << "Move object succeeded, sourceBucket: " << request.sourceBucket << " sourceKey: " << request.sourceKey << " targetBucket: "
+                               << request.targetBucket << " targetKey: " << request.targetKey << std::endl;
+
+    } catch (Poco::Exception &ex) {
+      log_error_stream(_logger) << "S3 copy object request failed, message: " << ex.message() << std::endl;
+      throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+    }
+    return {.eTag=targetObject.md5sum, .lastModified=Poco::DateTimeFormatter::format(Poco::DateTime(), Poco::DateTimeFormat::ISO8601_FRAC_FORMAT)};
+  }
+
   void S3Service::DeleteObject(const Dto::S3::DeleteObjectRequest &request) {
     log_trace_stream(_logger) << "Delete object request: " << request.ToString() << std::endl;
 

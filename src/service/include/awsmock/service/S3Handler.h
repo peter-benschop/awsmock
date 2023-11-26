@@ -17,6 +17,7 @@
 #include <awsmock/core/MetricServiceTimer.h>
 #include <awsmock/core/MetricDefinition.h>
 #include <awsmock/core/NumberUtils.h>
+#include "awsmock/dto/common/UserAgent.h"
 #include <awsmock/service/AbstractHandler.h>
 #include <awsmock/service/S3Service.h>
 
@@ -141,11 +142,8 @@ namespace AwsMock::Service {
      */
     Service::S3Service _s3Service;
 
-    /**
-     * Endpoint
-     */
-    std::string _endpoint;
   };
+
 } // namespace AwsMock::Service
 
 #endif // AWSMOCK_SERVICE_S3HANDLER_H

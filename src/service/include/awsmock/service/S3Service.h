@@ -35,6 +35,8 @@
 #include "awsmock/dto/s3/ListBucketRequest.h"
 #include "awsmock/dto/s3/ListBucketResult.h"
 #include "awsmock/dto/s3/ListAllBucketResponse.h"
+#include "awsmock/dto/s3/MoveObjectRequest.h"
+#include "awsmock/dto/s3/MoveObjectResponse.h"
 #include "awsmock/dto/s3/PutBucketNotificationRequest.h"
 #include "awsmock/dto/s3/PutBucketVersioningRequest.h"
 #include "awsmock/dto/s3/PutObjectRequest.h"
@@ -132,11 +134,7 @@ namespace AwsMock::Service {
      * @param user AWS user
      * @return Dto::S3::InitiateMultipartUploadResult
      */
-    Dto::S3::CompleteMultipartUploadResult CompleteMultipartUpload(const std::string &uploadId,
-                                                                   const std::string &bucket,
-                                                                   const std::string &key,
-                                                                   const std::string &region,
-                                                                   const std::string &user);
+    Dto::S3::CompleteMultipartUploadResult CompleteMultipartUpload(const std::string &uploadId, const std::string &bucket, const std::string &key, const std::string &region, const std::string &user);
 
     /**
      * Get object
@@ -158,10 +156,18 @@ namespace AwsMock::Service {
     /**
      * Copy object
      *
-     * @param request put object request
+     * @param request copy object request
      * @return PutObjectResponse
      */
     Dto::S3::CopyObjectResponse CopyObject(Dto::S3::CopyObjectRequest &request);
+
+    /**
+     * Move object
+     *
+     * @param request move object request
+     * @return PutObjectResponse
+     */
+    Dto::S3::MoveObjectResponse MoveObject(Dto::S3::MoveObjectRequest &request);
 
     /**
      * Delete object
