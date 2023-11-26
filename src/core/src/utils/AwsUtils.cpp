@@ -64,4 +64,12 @@ namespace AwsMock::Core {
     std::string region = configuration.getString("awsmock.region");
     return "AWS4-HMAC-SHA256 Credential=" + accountId + "/" + clientId + "/" + region + "/" + module + "/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840";
   }
+
+  std::string AwsUtils::GetUserAgentHeader(const std::string &service, const std::string &command) {
+    return "aws-cli/2.13.38 Python/3.11.6 Linux/6.1.0-13-amd64 exe/x86_64.debian.12 prompt/off command/" + service + "." + command;
+  }
+
+  std::string AwsUtils::GetContentTypeHeader(const std::string &contentType) {
+    return "application/x-amz-" + contentType + "-1.0";
+  }
 }

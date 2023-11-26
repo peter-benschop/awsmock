@@ -25,13 +25,29 @@
 #include "Poco/DOM/DOMWriter.h"
 #include "Poco/XML/XMLWriter.h"
 #include <Poco/JSON/Object.h>
+#include <Poco/JSON/Parser.h>
 
 // AwsMock includes
 #include <awsmock/dto/sqs/MessageAttribute.h>
 #include <awsmock/core/ServiceException.h>
+#include <awsmock/core/JsonUtils.h>
 
 namespace AwsMock::Dto::SQS {
 
+  /**
+   * Send message response
+   * <p>
+   * Example:
+   * <pre>
+   * {
+   *   "MD5OfMessageAttributes": "string",
+   *   "MD5OfMessageBody": "string",
+   *   "MD5OfMessageSystemAttributes": "string",
+   *   "MessageId": "string",
+   *   "SequenceNumber": "string"
+   *}
+   * </pre>
+   */
   struct SendMessageResponse {
 
     /**
@@ -75,6 +91,13 @@ namespace AwsMock::Dto::SQS {
      * @return JSON string
      */
     [[nodiscard]] std::string ToJson();
+
+    /**
+     * Convert from JSON representation
+     *
+     * @param jsonString JSON string
+     */
+    void FromJson(const std::string &jsonString);
 
     /**
      * Convert to XML representation

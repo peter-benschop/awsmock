@@ -97,7 +97,7 @@ namespace AwsMock::Core {
 
     // Set headers
     headers = curl_slist_append(nullptr, "Accept: application/json");
-    headers = curl_slist_append(headers, "Content-Type: application/json");
+    //headers = curl_slist_append(headers, "Content-Type: application/json");
     if (!extraHeaders.empty()) {
       for (const auto &it : extraHeaders) {
         headers = curl_slist_append(headers, (it.first + ": " + it.second).c_str());

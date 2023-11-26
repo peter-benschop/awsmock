@@ -117,9 +117,7 @@ namespace AwsMock::Service {
           SendOkResponse(response, s3Response.filename, s3Response.size, headerMap);
 
         }
-
       }
-
     } catch (Core::ServiceException &exc) {
       SendErrorResponse("S3", response, exc);
     }

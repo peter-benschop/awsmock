@@ -6,6 +6,30 @@
 
 namespace AwsMock::Dto::SQS {
 
+  std::string ReceiveMessageResponse::ToJson() {
+
+    try {
+      Poco::JSON::Object rootJson;
+
+      Poco::JSON::Array messageArray;
+      for(const auto &message:messageList) {
+        Poco::JSON::Object messageObject;
+        messageObject.set("Body", message.body);
+        messageObject.set("ReceiptHandle", message.receiptHandle);
+        messageObject.set("MD5OfBody", message.md5Body);
+        messageObject.set("MD5OfMessageAttributes", message.md5Attr);
+        messageObject.set("MessageId", message.messageId);
+      }
+
+      std::ostringstream os;
+      rootJson.stringify(os);
+      return os.str();
+
+    } catch (Poco::Exception &exc) {
+      throw Core::ServiceException(exc.message(), 500);
+    }
+  }
+
   std::string ReceiveMessageResponse::ToXml() const {
 
     // Root

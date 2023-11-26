@@ -71,7 +71,7 @@ namespace AwsMock::Service {
     /**
      * Reset messages
      *
-     * <p>Loops over all SQS queues and sets the state to INITIAL in case the visibility timeout has been reached. Also the retry count in increased by one.</p>
+     * <p>Loops over all SQS queues and sets the state to INITIAL in case the visibilityTimeout timeout has been reached. Also the retry count in increased by one.</p>
      * <p>Checks also the expiration date and removed the messages, which are older than the max retention period.</>
      */
     void ResetMessages();

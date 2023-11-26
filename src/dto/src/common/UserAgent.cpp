@@ -23,7 +23,7 @@ namespace AwsMock::Dto::Common {
     clientModule = userAgent.substr(posVec[6].offset, posVec[6].length);
     clientCommand = userAgent.substr(posVec[7].offset, posVec[7].length);
 
-    contentType = request["Content-Type"] == "application/x-amz-json-1.0" ? "json" : "xml";
+    contentType = Core::StringUtils::Contains(request["Content-Type"], "json") ? "json" : "xml";
   }
 
   void UserAgent::FromRequest(const Poco::Net::HTTPServerRequest &request, const std::string &service) {

@@ -76,8 +76,6 @@ namespace AwsMock::Service {
 
       } else if (userAgent.clientCommand == "delete-queue") {
 
-        DumpRequest(request);
-
         Dto::SQS::DeleteQueueRequest sqsRequest;
         if (userAgent.contentType == "json") {
           sqsRequest.FromJson(payload);
@@ -129,29 +127,27 @@ namespace AwsMock::Service {
         Dto::SQS::GetQueueUrlResponse sqsResponse = _sqsService.GetQueueUrl(sqsRequest);
         SendOkResponse(response, userAgent.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
 
-      } else if (userAgent.clientCommand == "ReceiveMessage") {
+      } else if (userAgent.clientCommand == "receive-message") {
 
-        std::string queueName = GetQueueName(request, payload);
+        Dto::SQS::ReceiveMessageRequest sqsRequest;
+        if (userAgent.contentType == "json") {
 
-        int maxMessages = GetIntParameter(payload, "MaxNumberOfMessages", 1, 10, 3);
-        int waitTimeSeconds = GetIntParameter(payload, "WaitTimeSeconds", 1, 900, 5);
-        int visibility = GetIntParameter(payload, "VisibilityTimeout", 1, 900, 30);
+          sqsRequest.FromJson(payload);
+          sqsRequest.region = region;
 
-        Dto::SQS::ReceiveMessageRequest sqsRequest = {
-            .region=region,
-            .queueName=queueName,
-            .maxMessages=maxMessages,
-            .visibility=visibility,
-            .waitTimeSeconds=waitTimeSeconds,
-            .requestId=requestId
-        };
+        } else {
+
+          std::string queueName = GetQueueName(request, payload);
+          int maxMessages = GetIntParameter(payload, "MaxNumberOfMessages", 1, 10, 3);
+          int waitTimeSeconds = GetIntParameter(payload, "WaitTimeSeconds", 1, 900, 5);
+          int visibility = GetIntParameter(payload, "VisibilityTimeout", 1, 900, 30);
+          sqsRequest = {.region=region, .queueName=queueName, .maxMessages=maxMessages, .visibilityTimeout=visibility, .waitTimeSeconds=waitTimeSeconds, .requestId=requestId};
+
+        }
         Dto::SQS::ReceiveMessageResponse sqsResponse = _sqsService.ReceiveMessages(sqsRequest);
 
         // Set the message attributes
-        std::map<std::string, std::string> extraHeader = {{
-                                                              "contentType", "application/json"
-                                                          }};
-        SendOkResponse(response, sqsResponse.ToXml(), extraHeader);
+        SendOkResponse(response, userAgent.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
 
       } else if (userAgent.clientCommand == "purge-queue") {
 
@@ -218,7 +214,7 @@ namespace AwsMock::Service {
 
         SendOkResponse(response);
 
-      } else if (userAgent.clientCommand == "change-visibility-timeout") {
+      } else if (userAgent.clientCommand == "change-visibilityTimeout-timeout") {
 
         Dto::SQS::ChangeMessageVisibilityRequest sqsRequest;
         if (userAgent.contentType == "json") {

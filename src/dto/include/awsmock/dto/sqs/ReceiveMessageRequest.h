@@ -10,20 +10,42 @@
 #include <sstream>
 
 // Poco includes
-#include "Poco/UUID.h"
-#include "Poco/UUIDGenerator.h"
-#include "Poco/DOM/AutoPtr.h"
-#include "Poco/DOM/Document.h"
-#include "Poco/DOM/Element.h"
-#include "Poco/DOM/Text.h"
-#include "Poco/DOM/DOMWriter.h"
-#include "Poco/XML/XMLWriter.h"
+#include <Poco/UUID.h>
+#include <Poco/UUIDGenerator.h>
+#include <Poco/DOM/AutoPtr.h>
+#include <Poco/DOM/Document.h>
+#include <Poco/DOM/Element.h>
+#include <Poco/DOM/Text.h>
+#include <Poco/DOM/DOMWriter.h>
+#include <Poco/XML/XMLWriter.h>
+#include <Poco/JSON/JSON.h>
+#include <Poco/JSON/Parser.h>
+#include <Poco/Dynamic/Var.h>
 
 // AwsMock includes
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/ServiceException.h>
 #include <awsmock/entity/sqs/Message.h>
 
 namespace AwsMock::Dto::SQS {
 
+  /**
+   * Receive message request.
+   * <p>
+   * Example:
+   * <pre>
+   * {
+   *   "AttributeNames": [ "string" ],
+   *   "MaxNumberOfMessages": number,
+   *   "MessageAttributeNames": [ "string" ],
+   *   "MessageSystemAttributeNames": [ "string" ],
+   *   "QueueUrl": "string",
+   *   "ReceiveRequestAttemptId": "string",
+   *   "VisibilityTimeout": number,
+   *   "WaitTimeSeconds": number
+   * }
+   * </pre>
+   */
   struct ReceiveMessageRequest {
 
     /**
@@ -49,7 +71,7 @@ namespace AwsMock::Dto::SQS {
     /**
      * Visibility
      */
-    int visibility = 15;
+    int visibilityTimeout = 15;
 
     /**
      * Wait time in seconds
@@ -70,6 +92,13 @@ namespace AwsMock::Dto::SQS {
      * Resource
      */
     std::string requestId;
+
+    /**
+     * Converts the JSON string to DTO.
+     *
+     * @param JSON string
+     */
+    void FromJson(const std::string &jsonString);
 
     /**
      * Converts the DTO to a string representation.

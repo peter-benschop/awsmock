@@ -10,22 +10,57 @@
 #include <sstream>
 
 // Poco includes
-#include "Poco/UUID.h"
-#include "Poco/UUIDGenerator.h"
-#include "Poco/DOM/AutoPtr.h"
-#include "Poco/DOM/Document.h"
-#include "Poco/DOM/Element.h"
-#include "Poco/DOM/Text.h"
-#include "Poco/DOM/DOMWriter.h"
-#include "Poco/XML/XMLWriter.h"
+#include <Poco/UUID.h>
+#include <Poco/UUIDGenerator.h>
+#include <Poco/DOM/AutoPtr.h>
+#include <Poco/DOM/Document.h>
+#include <Poco/DOM/Element.h>
+#include <Poco/DOM/Text.h>
+#include <Poco/DOM/DOMWriter.h>
+#include <Poco/JSON/Object.h>
+#include <Poco/XML/XMLWriter.h>
 
 // AwsMock includes
 #include <awsmock/entity/sqs/Message.h>
+#include <awsmock/core/ServiceException.h>
 
 namespace AwsMock::Dto::SQS {
 
+  /**
+   * Receive message response.
+   * <p>
+   * Example:
+   * <pre>
+   * {
+   *   "messages": [
+   *      {
+   *         "Attributes": {
+   *            "string" : "string"
+   *         },
+   *         "Body": "string",
+   *         "MD5OfBody": "string",
+   *         "MD5OfMessageAttributes": "string",
+   *         "MessageAttributes": {
+   *            "string" : {
+   *               "BinaryListValues": [ blob ],
+   *               "BinaryValue": blob,
+   *               "DataType": "string",
+   *               "StringListValues": [ "string" ],
+   *               "StringValue": "string"
+   *            }
+   *         },
+   *         "MessageId": "string",
+   *         "ReceiptHandle": "string"
+   *      }
+   *   ]
+   *   }
+   * <pre>
+   */
   struct ReceiveMessageResponse {
 
+    /**
+     * Message list
+     */
     Database::Entity::SQS::MessageList messageList;
 
     /**
@@ -37,6 +72,13 @@ namespace AwsMock::Dto::SQS {
      * Resource
      */
     std::string requestId;
+
+    /**
+     * Convert to a JSON string
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson();
 
     /**
      * Convert to XML representation

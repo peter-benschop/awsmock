@@ -22,14 +22,14 @@
 #define OWNER "test-owner"
 #define MESSAGE "{\"test-attribute\":\"test-value\"}"
 #define VERSION std::string("2012-11-05")
-#define CREATE_QUEUE_REQUEST "Action=CreateQueue&QueueName=TestQueue&Attribute.1.Name=VisibilityTimeout&Attribute.1.Value=40&Tag.Key=QueueType&Tag.Value=Production"
+#define CREATE_QUEUE_REQUEST "{\"QueueName\":\"TestQueue\"}"
 #define LIST_QUEUE_REQUEST "Action=ListQueues"
-#define GET_QUEUE_URL_REQUEST "Action=GetQueueUrl&QueueName=TestQueue"
-#define SEND_MESSAGE_REQUEST "Action=SendMessage&QueueUrl=TestQueue&MessageBody=%7B%22testattribute%22%3A%22testvalue%22%7D"
+#define GET_QUEUE_URL_REQUEST "{\"QueueName\":\"TestQueue\"}"
+#define SEND_MESSAGE_REQUEST "{\"QueueName\":\"TestQueue\", \"MessageBody\":\"testattribute\"}"
 
 namespace AwsMock::Service {
 
-  class SQSServerJavaTest : public ::testing::Test {
+  class SQSServerJsonTest : public ::testing::Test {
 
   protected:
 
@@ -39,10 +39,8 @@ namespace AwsMock::Service {
       Core::LogStream::SetGlobalLevel("error");
 
       // Create some test objects
-      _extraHeaders["Authorization"] =
-          "AWS4-HMAC-SHA256 Credential=none/20230618/eu-central-1/sqs/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840";
-      _extraHeaders["User-Agent"] =
-          "aws-sdk-cpp";
+      _extraHeaders["Authorization"] = Core::AwsUtils::GetAuthorizationHeader(_configuration, "sqs");
+      _extraHeaders["Content-Type"] = Core::AwsUtils::GetContentTypeHeader("json");
 
       // Define endpoint. This is the endpoint of the SQS server, not the gateway
       std::string _port = _configuration.getString("awsmock.module.sqs.port", std::to_string(SQS_DEFAULT_PORT));
@@ -65,19 +63,19 @@ namespace AwsMock::Service {
     Core::CurlUtils _curlUtils;
     std::string _testFile, _endpoint;
     std::map<std::string, std::string> _extraHeaders;
-    Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration();
     Core::MetricService _metricService = Core::MetricService(_configuration);
     Database::SQSDatabase _database = Database::SQSDatabase(_configuration);
     SQSServer _sqsServer = SQSServer(_configuration, _metricService);
   };
 
-  TEST_F(SQSServerJavaTest, QueueCreateTest) {
+  TEST_F(SQSServerJsonTest, QueueCreateTest) {
 
     // arrange
-    std::string body = "Action=CreateQueue&Version=" + VERSION + "&QueueName=TestQueue&Attribute.1.Name=VisibilityTimeout&Attribute.1.Value=40&Tag.Key=QueueType&Tag.Value=Production";
 
     // act
-    Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, body);
+    _extraHeaders["User-Agent"] = Core::AwsUtils::GetUserAgentHeader("sqs", "create-queue");
+    Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
     Database::Entity::SQS::QueueList queueList = _database.ListQueues();
 
     // assert
@@ -85,14 +83,15 @@ namespace AwsMock::Service {
     EXPECT_EQ(1, queueList.size());
   }
 
-  TEST_F(SQSServerJavaTest, QueueListTest) {
+  TEST_F(SQSServerJsonTest, QueueListTest) {
 
     // arrange
-    std::string body = "Action=CreateQueue&Version=" + VERSION + "&QueueName=TestQueue&Attribute.1.Name=VisibilityTimeout&Attribute.1.Value=40&Tag.Key=QueueType&Tag.Value=Production";
-    Core::CurlResponse createResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, body);
+    _extraHeaders["User-Agent"] = Core::AwsUtils::GetUserAgentHeader("sqs", "create-queue");
+    Core::CurlResponse createResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
     EXPECT_TRUE(createResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
 
     // act
+    _extraHeaders["User-Agent"] = Core::AwsUtils::GetUserAgentHeader("sqs", "list-queues");
     Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, LIST_QUEUE_REQUEST);
     EXPECT_TRUE(createResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
 
@@ -101,17 +100,18 @@ namespace AwsMock::Service {
     EXPECT_TRUE(Core::StringUtils::Contains(response.output, "TestQueue"));
   }
 
-  TEST_F(SQSServerJavaTest, QueueDeleteTest) {
+  TEST_F(SQSServerJsonTest, QueueDeleteTest) {
 
     // arrange
-    std::string body = "Action=CreateQueue&Version=" + VERSION + "&QueueName=TestQueue&Attribute.1.Name=VisibilityTimeout&Attribute.1.Value=40&Tag.Key=QueueType&Tag.Value=Production";
-    Core::CurlResponse curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, body);
+    _extraHeaders["User-Agent"] = Core::AwsUtils::GetUserAgentHeader("sqs", "create-queue");
+    Core::CurlResponse curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
     EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
     Dto::SQS::CreateQueueResponse createResponse;
-    createResponse.FromXml(curlResponse.output);
+    createResponse.FromJson(curlResponse.output);
 
     // act
-    std::string deleteQueueRequest = "Action=DeleteQueue&QueueUrl=" + createResponse.queueUrl;
+    _extraHeaders["User-Agent"] = Core::AwsUtils::GetUserAgentHeader("sqs", "delete-queue");
+    std::string deleteQueueRequest = "{\"QueueUrl\":\"" + createResponse.queueUrl + "\"}";
     curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint, _extraHeaders, deleteQueueRequest);
     EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
     Database::Entity::SQS::QueueList queueList = _database.ListQueues();
@@ -120,46 +120,49 @@ namespace AwsMock::Service {
     EXPECT_EQ(0, queueList.size());
   }
 
-  TEST_F(SQSServerJavaTest, QueueGetUrlTest) {
+  TEST_F(SQSServerJsonTest, QueueGetUrlTest) {
 
     // arrange
-    std::string body = "Action=CreateQueue&Version=" + VERSION + "&QueueName=TestQueue&Attribute.1.Name=VisibilityTimeout&Attribute.1.Value=40&Tag.Key=QueueType&Tag.Value=Production";
-    Core::CurlResponse curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, body);
+    _extraHeaders["User-Agent"] = Core::AwsUtils::GetUserAgentHeader("sqs", "create-queue");
+    Core::CurlResponse curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
     EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
     Dto::SQS::CreateQueueResponse createResponse;
-    createResponse.FromXml(curlResponse.output);
+    createResponse.FromJson(curlResponse.output);
 
     // act
+    _extraHeaders["User-Agent"] = Core::AwsUtils::GetUserAgentHeader("sqs", "get-queue-url");
     curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, GET_QUEUE_URL_REQUEST);
     EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
     Dto::SQS::GetQueueUrlResponse getQueueUrlResponse;
-    getQueueUrlResponse.FromXml(curlResponse.output);
+    getQueueUrlResponse.FromJson(curlResponse.output);
 
     // assert
     EXPECT_TRUE(Core::StringUtils::Contains(getQueueUrlResponse.queueUrl, "TestQueue"));
   }
 
-  TEST_F(SQSServerJavaTest, MessageSendTest) {
+  TEST_F(SQSServerJsonTest, MessageSendTest) {
 
     // arrange
-    std::string body = "Action=CreateQueue&Version=" + VERSION + "&QueueName=TestQueue&Attribute.1.Name=VisibilityTimeout&Attribute.1.Value=40&Tag.Key=QueueType&Tag.Value=Production";
-    Core::CurlResponse curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, body);
+    _extraHeaders["User-Agent"] = Core::AwsUtils::GetUserAgentHeader("sqs", "create-queue");
+    Core::CurlResponse curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
     EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
     Dto::SQS::CreateQueueResponse createResponse;
-    createResponse.FromXml(curlResponse.output);
+    createResponse.FromJson(curlResponse.output);
 
+    _extraHeaders["User-Agent"] = Core::AwsUtils::GetUserAgentHeader("sqs", "get-queue-url");
     curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, GET_QUEUE_URL_REQUEST);
     EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
     Dto::SQS::GetQueueUrlResponse getQueueUrlResponse;
-    getQueueUrlResponse.FromXml(curlResponse.output);
+    getQueueUrlResponse.FromJson(curlResponse.output);
     std::string queueUrl = getQueueUrlResponse.queueUrl;
 
     // act
-    body = "Action=SendMessage&Version=2003-11-05&QueueUrl=" + Core::StringUtils::UrlEncode(queueUrl) + "&MessageBody=" + Core::StringUtils::UrlEncode(MESSAGE);
+    std::string body = "{\"QueueUrl\":\"" + queueUrl + "\", \"MessageBody\":\"test\"}";
+    _extraHeaders["User-Agent"] = Core::AwsUtils::GetUserAgentHeader("sqs", "send-message");
     curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, body);
     EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
     Dto::SQS::SendMessageResponse sendMessageResponse;
-    sendMessageResponse.FromXml(curlResponse.output);
+    sendMessageResponse.FromJson(curlResponse.output);
     long messageCount = _database.CountMessages(REGION, queueUrl);
 
     // assert
@@ -167,28 +170,32 @@ namespace AwsMock::Service {
     EXPECT_EQ(1, messageCount);
   }
 
-  TEST_F(SQSServerJavaTest, QueuePurgeTest) {
+  TEST_F(SQSServerJsonTest, QueuePurgeTest) {
 
     // arrange
-    std::string body = "Action=CreateQueue&Version=" + VERSION + "&QueueName=TestQueue&Attribute.1.Name=VisibilityTimeout&Attribute.1.Value=40&Tag.Key=QueueType&Tag.Value=Production";
-    Core::CurlResponse curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, body);
+    _extraHeaders["User-Agent"] = Core::AwsUtils::GetUserAgentHeader("sqs", "create-queue");
+    Core::CurlResponse curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
     EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
     Dto::SQS::CreateQueueResponse createResponse;
-    createResponse.FromXml(curlResponse.output);
+    createResponse.FromJson(curlResponse.output);
 
+    _extraHeaders["User-Agent"] = Core::AwsUtils::GetUserAgentHeader("sqs", "get-queue-url");
     curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, GET_QUEUE_URL_REQUEST);
     EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
     Dto::SQS::GetQueueUrlResponse getQueueUrlResponse;
-    getQueueUrlResponse.FromXml(curlResponse.output);
+    getQueueUrlResponse.FromJson(curlResponse.output);
     std::string queueUrl = getQueueUrlResponse.queueUrl;
 
-    curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, SEND_MESSAGE_REQUEST);
+    std::string body = "{\"QueueUrl\":\"" + queueUrl + "\", \"MessageBody\":\"test\"}";
+    _extraHeaders["User-Agent"] = Core::AwsUtils::GetUserAgentHeader("sqs", "send-message");
+    curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, body);
     EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
     Dto::SQS::SendMessageResponse sendMessageResponse;
-    sendMessageResponse.FromXml(curlResponse.output);
+    sendMessageResponse.FromJson(curlResponse.output);
 
     // act
-    body = "Action=PurgeQueue&QueueUrl=" + queueUrl;
+    body = "{\"QueueUrl\":\"" + queueUrl + "\"}";
+    _extraHeaders["User-Agent"] = Core::AwsUtils::GetUserAgentHeader("sqs", "purge-queue");
     _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, body);
     long messageCount = _database.CountMessages(REGION, queueUrl);
 

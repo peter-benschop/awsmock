@@ -65,6 +65,13 @@ namespace AwsMock::Dto::SQS {
     [[nodiscard]] std::string ToJson() const;
 
     /**
+     * Convert from JSON representation
+     *
+     * @param jsonString JSON string
+     */
+    void FromJson(const std::string &jsonString);
+
+    /**
      * Convert to XML representation
      *
      * @return XML string
@@ -74,7 +81,7 @@ namespace AwsMock::Dto::SQS {
     /**
      * Convert from XML representation
      *
-     * @param xmlString  XML string
+     * @param xmlString XML string
      */
     void FromXml(const std::string &xmlString);
 
