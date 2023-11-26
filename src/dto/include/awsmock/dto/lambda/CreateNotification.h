@@ -47,6 +47,9 @@ namespace AwsMock::Dto::Lambda {
      * @return output stream
      */
     friend std::ostream &operator<<(std::ostream &os, const CreateNotification &i);
+
   };
-}
+
+} // namespace AwsMock::Dto::Lambda
+
 #endif // AWSMOCK_DTO_LAMBDA_CREATENOTIFICATION_H

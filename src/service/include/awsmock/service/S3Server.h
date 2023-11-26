@@ -297,4 +297,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Service
 
-#endif //AWSMOCK_SERVICE_S3SERVER_H
+#endif // AWSMOCK_SERVICE_S3SERVER_H

@@ -47,10 +47,8 @@ namespace AwsMock::Service {
     }
 
     Dto::S3::CreateBucketResponse createBucketResponse;
+
     try {
-      // Create directory
-      //std::string bucketDir = _dataS3Dir + Poco::Path::separator() + name;
-      //Core::DirUtils::EnsureDirectory(bucketDir);
 
       // Update database
       _database->CreateBucket({.region=region, .name=name, .owner=owner});

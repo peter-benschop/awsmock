@@ -134,12 +134,6 @@ namespace AwsMock::Service {
     // Start REST manager
     StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new TransferRequestHandlerFactory(_configuration, _metricService));
 
-    // Send create bucket request
-    /*if (!SendExistsBucketRequest(_bucket)) {
-      SendCreateBucketRequest(_bucket);
-      log_debug_stream(_logger) << "Sending S3 create bucket: " << _bucket << std::endl;
-    }*/
-
     // Start all transfer servers
     StartTransferServers();
 
@@ -150,26 +144,10 @@ namespace AwsMock::Service {
       // Check transfer servers
       CheckTransferServers();
 
-      /// Wait for timeout or condition
+      // Wait for timeout or condition
       if (InterruptableSleep(_period)) {
         break;
       }
     }
-  }
-
-  void TransferServer::SendCreateBucketRequest(const std::string &module, const std::string &bucket) {
-
-    std::string url = _baseUrl + "/" + bucket;
-    Dto::S3::CreateBucketConstraint location = {.location=_region};
-    SendPutRequest(module, url, location.ToXml(), CONTENT_TYPE_JSON);
-    log_debug_stream(_logger) << "Create bucket message request send" << std::endl;
-  }
-
-  bool TransferServer::SendExistsBucketRequest(const std::string &module, const std::string &bucket) {
-
-    std::string url = _baseUrl + "/" + bucket;
-    bool result = SendHeadRequest(module, url, CONTENT_TYPE_JSON);
-    log_debug_stream(_logger) << "Bucket exists message request send, result: " << result << std::endl;
-    return result;
   }
 } // namespace AwsMock::Service

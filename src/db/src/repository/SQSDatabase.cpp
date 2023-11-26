@@ -186,17 +186,20 @@ namespace AwsMock::Database {
     Entity::SQS::QueueList queueList;
     if (HasDatabase()) {
 
-      bsoncxx::builder::basic::document filter;
-      if (!region.empty()) {
-        filter.append(kvp("region", region));
-      }
-
-      auto queueCursor = _queueCollection.find({filter});
-
-      for (auto queue : queueCursor) {
-        Entity::SQS::Queue result;
-        result.FromDocument(queue);
-        queueList.push_back(result);
+      if (region.empty()) {
+        auto queueCursor  = _queueCollection.find({});
+        for (auto queue : queueCursor) {
+          Entity::SQS::Queue result;
+          result.FromDocument(queue);
+          queueList.push_back(result);
+        }
+      } else {
+        auto queueCursor = _queueCollection.find(make_document(kvp("region", region)));
+        for (auto queue : queueCursor) {
+          Entity::SQS::Queue result;
+          result.FromDocument(queue);
+          queueList.push_back(result);
+        }
       }
 
     } else {
