@@ -130,6 +130,7 @@ namespace AwsMock::Service {
      */
     std::string _accountId;
   };
+
 } // namespace AwsMock::Service
 
 #endif // AWSMOCK_SERVICE_SNSHANDLER_H
