@@ -2,11 +2,12 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_COGNITO_USERPOOL_H
-#define AWSMOCK_DB_ENTITY_COGNITO_USERPOOL_H
+#ifndef AWSMOCK_DB_ENTITY_COGNITO_USER_H
+#define AWSMOCK_DB_ENTITY_COGNITO_USER_H
 
 // C++ includes
 #include <string>
+#include <map>
 
 // Poco includes
 #include <Poco/DateTime.h>
@@ -20,6 +21,10 @@
 #include <bsoncxx/builder/basic/document.hpp>
 #include <mongocxx/stdx.hpp>
 
+// AwsMock includes
+#include <awsmock/entity/cognito/UserStatus.h>
+#include <awsmock/entity/cognito/UserAttribute.h>
+
 namespace AwsMock::Database::Entity::Cognito {
 
   using bsoncxx::builder::basic::kvp;
@@ -30,7 +35,7 @@ namespace AwsMock::Database::Entity::Cognito {
   using bsoncxx::document::value;
   using bsoncxx::to_json;
 
-  struct UserPool {
+  struct User {
 
     /**
      * MongoDB POD
@@ -38,19 +43,24 @@ namespace AwsMock::Database::Entity::Cognito {
     std::string oid;
 
     /**
-     * AWS region
+     * User name
      */
-    std::string region;
+    std::string userName;
 
     /**
-     * User pool ID
+     * Enabled
      */
-    std::string id;
+    bool enabled;
 
     /**
-     * Name
+     * Attributes
      */
-    std::string name;
+    AttributeList attributes;
+
+    /**
+     * Status
+     */
+    UserStatus userStatus;
 
     /**
      * Creation date
@@ -87,14 +97,11 @@ namespace AwsMock::Database::Entity::Cognito {
      * Stream provider.
      *
      * @param os output stream
-     * @param userPool userPool entity
+     * @param user user entity
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const UserPool &userPool);
+    friend std::ostream &operator<<(std::ostream &os, const User &user);
 
   };
-
-  typedef std::vector<Entity::Cognito::UserPool> UserPoolList;
-
 }
-#endif //AWSMOCK_DB_ENTITY_COGNITO_USERPOOL_H
+#endif // AWSMOCK_DB_ENTITY_COGNITO_USER_H

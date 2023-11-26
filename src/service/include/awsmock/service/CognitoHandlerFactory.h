@@ -6,11 +6,11 @@
 #define AWSMOCK_SERVICE_COGNITOHANDLERFACTORY_H
 
 // Poco includes
-#include "Poco/Logger.h"
-#include "Poco/Net/HTTPRequestHandlerFactory.h"
+#include <Poco/Net/HTTPRequestHandlerFactory.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/MetricService.h>
 #include <awsmock/service/CognitoHandler.h>
 
@@ -19,7 +19,7 @@ namespace AwsMock::Service {
   /**
    * S3 request handler factory
    */
-  class CognitoRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
+  class CognitoHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 
   public:
 
@@ -29,7 +29,7 @@ namespace AwsMock::Service {
      * @param configuration application configuration
      * @param metricService  monitoring
      */
-    CognitoRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService) {}
+    CognitoHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _logger(Poco::Logger::get("CognitoHandlerFactory")), _configuration(configuration), _metricService(metricService) {}
 
     /**
      * Create a new request handler instance.
@@ -37,11 +37,17 @@ namespace AwsMock::Service {
      * @param request HTTP request
      * @return HTTP request handler
      */
-    virtual Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) {
-      return new S3Handler(_configuration, _metricService);
+    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
+      log_trace_stream(_logger) << "Factory for request: " << request.getURI() << std::endl;
+      return new CognitoHandler(_configuration, _metricService);
     }
 
   private:
+
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
 
     /**
      * S3 handler configuration

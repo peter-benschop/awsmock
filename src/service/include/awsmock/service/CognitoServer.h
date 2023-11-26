@@ -15,13 +15,18 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/MetricService.h>
 #include <awsmock/core/ThreadPool.h>
+#include <awsmock/repository/CognitoDatabase.h>
+#include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/service/AbstractServer.h>
 #include <awsmock/service/AbstractWorker.h>
-#include <awsmock/service/S3Monitoring.h>
-#include <awsmock/service/S3HandlerFactory.h>
+#include <awsmock/service/CognitoMonitoring.h>
+#include <awsmock/service/CognitoHandlerFactory.h>
 
 #define COGNITO_DEFAULT_PORT 9500
 #define COGNITO_DEFAULT_HOST "localhost"
+#define COGNITO_DEFAULT_QUEUE_SIZE 250
+#define COGNITO_DEFAULT_MAX_THREADS 50
+#define COGNITO_DEFAULT_TIMEOUT 900
 
 namespace AwsMock::Service {
 
@@ -36,9 +41,8 @@ namespace AwsMock::Service {
      *
      * @param configuration application configuration
      * @param metricService monitoring module
-     * @param condition stop condition
      */
-    explicit CognitoServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
+    explicit CognitoServer(Core::Configuration &configuration, Core::MetricService &metricService);
 
     /**
      * Destructor
@@ -50,29 +54,7 @@ namespace AwsMock::Service {
      */
     void MainLoop() override;
 
-    /**
-     * Stop manager
-     */
-    void StopServer();
-
-    /**
-     * Return running flag
-     *
-     * @return running flag
-     */
-    bool IsRunning() const { return _running; }
-
   private:
-
-    /**
-     * Start the restfull module.
-     */
-    void StartHttpServer();
-
-    /**
-     * Stop http manager
-     */
-    void StopHttpServer();
 
     /**
      * Start the monitoring module.
@@ -80,129 +62,14 @@ namespace AwsMock::Service {
     void StartMonitoringServer();
 
     /**
+     * Stop the monitoring module.
+     */
+    void StopMonitoringServer();
+
+    /**
      * Update metric counters
      */
     void UpdateCounters();
-
-    /**
-     * Create a new bucket, by sending the corresponding CreateBucket request to the S3 module.
-     *
-     * @param dirPath absolute path of the directory
-     */
-    void CreateBucket(const std::string &dirPath);
-
-    /**
-     * Deletes an existing bucket, by sending the corresponding DeleteBucket request to the S3 module.
-     *
-     * @param dirPath absolute path of the directory
-     */
-    void DeleteBucket(const std::string &dirPath);
-
-    /**
-     * Create a new object, by sending the corresponding PutObject request to the S3 module.
-     *
-     * @param filePath absolute path of the file
-     */
-    void CreateObject(const std::string &filePath);
-
-    /**
-     * Checks the existence of a bucket in the database, by sending the corresponding HeadObject request to the S3 module.
-     *
-     * @param bucket S3 bucket name
-     * @return true if object exists
-     */
-    bool ExistsBucket(const std::string &bucket);
-
-    /**
-     * Checks the existence of an object in database, by sending the corresponding HeadObject request to the S3 module.
-     *
-     * @param bucket S3 bucket name
-     * @param key S3 object key
-     * @return true if object exists
-     */
-    bool ExistsObject(const std::string &bucket, const std::string &key);
-
-    /**
-     * Deletes an existing object, by sending the corresponding DeleteObject request to the S3 module.
-     *
-     * @param bucket S3 bucket name
-     * @param key S3 object key
-     */
-    void DeleteObject(const std::string &bucket, const std::string &key);
-
-    /**
-     * Gets the bucket and object key from the file name.
-     *
-     * @param fileName absolute file file name
-     * @param bucket bucket name
-     * @param key object key
-     */
-    void GetBucketKeyFromFile(const std::string &fileName, std::string &bucket, std::string &key);
-
-    /**
-     * Gets the absolute file path from bucket and object key.
-     *
-     * @param bucket bucket name
-     * @param key object key
-     * @return local file path
-     */
-    std::string GetFileFromBucketKey(const std::string &bucket, const std::string &key);
-
-    /**
-     * Sends a create object request to the S3 module
-     *
-     * @param bucket S3 bucket name
-     * @param contentType content type
-     */
-    void SendCreateBucketRequest(const std::string &bucket, const std::string &contentType);
-
-    /**
-     * Sends a delete bucket request to the S3 module
-     *
-     * @param bucket S3 bucket name
-     * @param contentType content type
-     */
-    void SendDeleteBucketRequest(const std::string &bucket, const std::string &contentType);
-
-    /**
-     * Sends a put object request to the S3 module
-     *
-     * @param fileName name of the file
-     * @param bucket S3 bucket name
-     * @param key S3 object key
-     * @param md5Sum MD5 hash
-     * @param contentType content type
-     * @param fileSize size of the file
-     */
-    void SendPutObjectRequest(const std::string &fileName, const std::string &bucket, const std::string &key, const std::string &md5Sum, const std::string &contentType, unsigned long fileSize);
-
-    /**
-     * Sends a head object request to the S3 module
-     *
-     * @param bucket S3 bucket name
-     * @param contentType content type
-     * @return true if object exists
-     */
-    bool SendHeadObjectRequest(const std::string &bucket, const std::string &contentType);
-
-    /**
-     * Sends a head object request to the S3 module
-     *
-     * @param bucket S3 bucket name
-     * @param key S3 object key
-     * @param contentType content type
-     * @return true if object exists
-     */
-    bool SendHeadObjectRequest(const std::string &bucket, const std::string &key, const std::string &contentType);
-
-    /**
-     * Sends a delete object request to the S3 module
-     *
-     * @param bucket S3 bucket name
-     * @param key S3 object key
-     * @param contentType content type
-     */
-    void SendDeleteObjectRequest(const std::string &bucket, const std::string &key, const std::string &contentType);
 
     /**
      * Rest port
@@ -237,12 +104,12 @@ namespace AwsMock::Service {
     /**
      * Service database
      */
-    std::unique_ptr<Database::ServiceDatabase> _serviceDatabase;
+    std::unique_ptr<Database::ModuleDatabase> _moduleDatabase;
 
     /**
      * S3 database
      */
-    std::unique_ptr<Database::S3Database> _s3Database;
+    std::unique_ptr<Database::CognitoDatabase> _cognitoDatabase;
 
     /**
      * HTTP max message queue length
@@ -253,6 +120,11 @@ namespace AwsMock::Service {
      * HTTP max concurrent connection
      */
     int _maxThreads;
+
+    /**
+     * HTTP request timeout in seconds
+     */
+    int _requestTimeout;
 
     /**
      * Sleeping period in ms
@@ -290,14 +162,15 @@ namespace AwsMock::Service {
     std::string _user;
 
     /**
-     * Thread pool
+     * S3 module name
      */
-    AwsMock::Core::ThreadPool<S3Monitoring> _threadPool;
+    std::string _module;
 
     /**
-     * Stop condition
+     * Thread pool
      */
-    Poco::Condition &_condition;
+    AwsMock::Core::ThreadPool<CognitoMonitoring> _threadPool;
+
   };
 
 } // namespace AwsMock::Service

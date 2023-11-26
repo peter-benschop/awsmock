@@ -35,19 +35,19 @@ namespace AwsMock::Database {
      *
      * @param region AWS region name
      * @param name AWS function
-     * @return true if cognito user pool already exists
+     * @return true if cognito user pool exists
      * @throws DatabaseException
      */
     bool UserPoolExists(const std::string &region, const std::string &name);
 
     /**
-     * Check existence of cognito
+     * Check existence of cognito user pool
      *
-     * @param cognito AWS function
-     * @return true if cognito already exists
+     * @param id user pool id
+     * @return true if cognito user pool exists
      * @throws DatabaseException
      */
-    //bool CognitoExists(const Entity::Cognito::Cognito &cognito);
+    bool UserPoolExists(const std::string &id);
 
     /**
      * Check existence of cognito
@@ -127,27 +127,27 @@ namespace AwsMock::Database {
     //Entity::Cognito::Cognito GetCognitoByArn(const std::string &arn);
 
     /**
-     * Returns a list of cognito functions.
+     * Returns a list of cognito user pools.
      *
      * @param region AWS region name
-     * @return list of cognito functions
+     * @return list of cognito user pools
      */
-    //std::vector<Entity::Cognito::Cognito> ListCognitos(const std::string &region);
+    std::vector<Entity::Cognito::UserPool> ListUserPools(const std::string &region);
 
     /**
-     * Deletes an existing cognito function
+     * Deletes an existing cognito user pool
      *
-     * @param functionName cognito function name
+     * @param id cognito user pool ID
      * @throws DatabaseException
      */
-    //void DeleteCognito(const std::string &functionName);
+    void DeleteUserPool(const std::string &id);
 
     /**
-     * Deletes all existing cognito functions
+     * Deletes all existing cognito user pools
      *
      * @throws DatabaseException
      */
-    //void DeleteAllCognitos();
+    void DeleteAllUserPools();
 
   private:
 
@@ -159,7 +159,7 @@ namespace AwsMock::Database {
     /**
      * Cognito user pool collection
      */
-    mongocxx::collection _cognitoUserPoolCollection{};
+    mongocxx::collection _userPoolCollection{};
 
     /**
      * S3 in-memory database

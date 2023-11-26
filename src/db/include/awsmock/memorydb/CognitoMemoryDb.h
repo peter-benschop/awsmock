@@ -53,31 +53,13 @@ namespace AwsMock::Database {
     bool UserPoolExists(const std::string &region, const std::string &name);
 
     /**
-     * Check existence of cognito
+     * Check existence of cognito user pool
      *
-     * @param cognito AWS function
-     * @return true if cognito already exists
+     * @param id user pool id
+     * @return true if cognito user pool exists
      * @throws DatabaseException
      */
-    //bool CognitoExists(const Entity::Cognito::Cognito &cognito);
-
-    /**
-     * Check existence of cognito
-     *
-     * @param function AWS function
-     * @return true if cognito already exists
-     * @throws DatabaseException
-     */
-    //bool CognitoExists(const std::string &function);
-
-    /**
-     * Check existence of cognito
-     *
-     * @param arn AWS ARN
-     * @return true if cognito exists
-     * @throws DatabaseException
-     */
-    //bool CognitoExistsByArn(const std::string &arn);
+    bool UserPoolExists(const std::string &id);
 
     /**
      * Create a new cognito user pool
@@ -106,20 +88,20 @@ namespace AwsMock::Database {
     //Entity::Cognito::Cognito GetCognitoByArn(const std::string &arn);
 
     /**
-     * Count all cognitos
+     * Count all user pools
      *
      * @param region aws-mock region.
-     * @return total number of cognitos.
+     * @return total number of user pools.
      */
-    long CognitoCount(const std::string &region = {});
+    //long CognitoCount(const std::string &region = {});
 
     /**
-     * Returns a list of cognito functions.
+     * Returns a list of cognito user pools.
      *
      * @param region AWS region name
-     * @return list of cognito functions
+     * @return list of cognito user pools
      */
-    //std::vector<Entity::Cognito::Cognito> ListCognitos(const std::string &region);
+    std::vector<Entity::Cognito::UserPool> ListUserPools(const std::string &region);
 
     /**
      * Updates an existing cognito cognito function
@@ -130,19 +112,19 @@ namespace AwsMock::Database {
     //Entity::Cognito::Cognito UpdateCognito(const Entity::Cognito::Cognito &cognito);
 
     /**
-     * Deletes an existing cognito function
+     * Deletes an existing cognito user pool
      *
-     * @param functionName cognito function name
+     * @param id cognito user pool ID
      * @throws DatabaseException
      */
-    //void DeleteCognito(const std::string &functionName);
+    void DeleteUserPool(const std::string &id);
 
     /**
-     * Deletes all existing cognito functions
+     * Deletes all existing cognito user pools
      *
      * @throws DatabaseException
      */
-    //void DeleteAllCognitos();
+     void DeleteAllUserPools();
 
   private:
 
@@ -154,12 +136,12 @@ namespace AwsMock::Database {
     /**
      * Cognito user pool map
      */
-    std::map<std::string, Entity::Cognito::UserPool> _cognitoUserPools{};
+    std::map<std::string, Entity::Cognito::UserPool> _userPools{};
 
     /**
-     * Cognito mutex
+     * Cognito user pool mutex
      */
-    Poco::Mutex _cognitoMutex;
+    Poco::Mutex _userPoolMutex;
   };
 
 } // namespace AwsMock::Database

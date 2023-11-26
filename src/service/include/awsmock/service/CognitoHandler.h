@@ -104,6 +104,19 @@ namespace AwsMock::Service {
   private:
 
     /**
+     * Get the action from the request.
+     *
+     * <p>For cognito the action is part of the User-Agent header.
+     * <pre>
+     * User-Agent: aws-cli/2.13.38 Python/3.11.6 Linux/6.1.0-13-amd64 exe/x86_64.debian.12 prompt/off command/cognito-idp.list-user-pools
+     * </pre>
+     * </p>
+     *
+     * @param request HTTP request
+     */
+    std::string GetAction(const Poco::Net::HTTPServerRequest &request);
+
+    /**
      * Logger
      */
     Core::LogStream _logger;
@@ -119,11 +132,12 @@ namespace AwsMock::Service {
     Core::MetricService &_metricService;
 
     /**
-     * Cognito module
+     * Cognito service
      */
     Service::CognitoService _cognitoService;
 
   };
+
 } // namespace AwsMock::Service
 
 #endif // AWSMOCK_SERVICE_COGNITOHANDLER_H

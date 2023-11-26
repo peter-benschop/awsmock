@@ -27,7 +27,7 @@ namespace AwsMock::Database {
     }
 
     void TearDown() override {
-      //_cognitoDatabase.DeleteAllUserPools();
+      _cognitoDatabase.DeleteAllUserPools();
     }
 
     std::string _region;
@@ -36,7 +36,7 @@ namespace AwsMock::Database {
     CognitoDatabase _cognitoDatabase = CognitoDatabase(_configuration);
   };
 
-  TEST_F(CognitoDatabaseTest, CognitoUserPoolExistsTest) {
+  TEST_F(CognitoDatabaseTest, UserPoolExistsTest) {
 
     // arrange
     Entity::Cognito::UserPool userPool = {.region=_region, .name=USER_POOL};
@@ -60,80 +60,37 @@ namespace AwsMock::Database {
 
     // assert
     EXPECT_EQ(1, result);
-  }
+  }*/
 
-  TEST_F(CognitoDatabaseTest, CognitoExistsTest) {
+  TEST_F(CognitoDatabaseTest, UserPoolIdExistsTest) {
 
     // arrange
-    Entity::Cognito::Cognito cognito = {.region=_region, .function=FUNCTION, .runtime=RUNTIME, .role=ROLE, .handler=HANDLER, .codeSize=1000};
-    _cognitoDatabase.CreateCognito(cognito);
+    Entity::Cognito::UserPool userPool = {.region=_region, .name=USER_POOL};
+    userPool = _cognitoDatabase.CreateUserPool(userPool);
 
     // act
-    bool result = _cognitoDatabase.CognitoExists(_region, FUNCTION, RUNTIME);
+    bool result = _cognitoDatabase.UserPoolExists(userPool.id);
 
     // assert
     EXPECT_TRUE(result);
   }
 
-  TEST_F(CognitoDatabaseTest, CognitoGetByIdTest) {
+  TEST_F(CognitoDatabaseTest, UserPoolListTest) {
 
     // arrange
-    Entity::Cognito::Cognito cognito = {.region=_region, .function=FUNCTION, .runtime=RUNTIME, .role=ROLE, .handler=HANDLER, .codeSize=1000};
-    cognito = _cognitoDatabase.CreateCognito(cognito);
+    Entity::Cognito::UserPool userPool = {.region=_region, .name=USER_POOL};
+    userPool = _cognitoDatabase.CreateUserPool(userPool);
 
     // act
-    Entity::Cognito::Cognito result = _cognitoDatabase.GetCognitoById(cognito.oid);
-
-    // assert
-    EXPECT_EQ(result.oid, cognito.oid);
-  }
-
-  TEST_F(CognitoDatabaseTest, CognitoGetByArnTest) {
-
-    // arrange
-    std::string arn = Core::AwsUtils::CreateCognitoArn(_region, _accountId, FUNCTION);
-    Entity::Cognito::Cognito cognito = {.region=_region, .function=FUNCTION, .runtime=RUNTIME, .role=ROLE, .handler=HANDLER, .arn=arn};
-    cognito = _cognitoDatabase.CreateCognito(cognito);
-
-    // act
-    Entity::Cognito::Cognito result = _cognitoDatabase.GetCognitoByArn(arn);
-
-    // assert
-    EXPECT_EQ(result.arn, cognito.arn);
-  }
-
-  TEST_F(CognitoDatabaseTest, CognitoUpdateTest) {
-
-    // arrange
-    std::string arn = Core::AwsUtils::CreateCognitoArn(_region, _accountId, FUNCTION);
-    Entity::Cognito::Cognito cognito = {.region=_region, .function=FUNCTION, .runtime=RUNTIME, .role=ROLE, .handler=HANDLER, .arn=arn};
-    cognito = _cognitoDatabase.CreateCognito(cognito);
-
-    // act
-    cognito.role = "new_role";
-    Entity::Cognito::Cognito result = _cognitoDatabase.UpdateCognito(cognito);
-
-    // assert
-    EXPECT_EQ(result.role, cognito.role);
-  }
-
-  TEST_F(CognitoDatabaseTest, CognitoListTest) {
-
-    // arrange
-    Entity::Cognito::Cognito cognito = {.region=_region, .function=FUNCTION, .runtime=RUNTIME, .role=ROLE, .handler=HANDLER, .codeSize=1000};
-    cognito = _cognitoDatabase.CreateCognito(cognito);
-
-    // act
-    std::vector<Entity::Cognito::Cognito> result = _cognitoDatabase.ListCognitos(cognito.region);
+    std::vector<Entity::Cognito::UserPool> result = _cognitoDatabase.ListUserPools(_region);
 
     // assert
     EXPECT_EQ(1, result.size());
-    EXPECT_TRUE(result[0].runtime == RUNTIME);
-    EXPECT_TRUE(result[0].role == ROLE);
-    EXPECT_TRUE(result[0].handler == HANDLER);
+    EXPECT_TRUE(result[0].name == USER_POOL);
+    EXPECT_TRUE(result[0].region == _region);
   }
 
-  TEST_F(CognitoDatabaseTest, CognitoDeleteTest) {
+/*  TEST_F(CognitoDatabaseTest, CognitoDeleteTest) {
 
     // arrange
     std::string arn = Core::AwsUtils::CreateCognitoArn(_region, _accountId, FUNCTION);
@@ -146,7 +103,8 @@ namespace AwsMock::Database {
 
     // assert
     EXPECT_FALSE(result);
-  }*/
+  }
+  */
 
 } // namespace AwsMock::Core
 

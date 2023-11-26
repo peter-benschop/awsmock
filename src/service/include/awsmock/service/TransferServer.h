@@ -86,23 +86,6 @@ namespace AwsMock::Service {
     void CheckTransferServers();
 
     /**
-     * Sends a create bucket request to the S3 module
-     *
-     * @param module AwsMock module name
-     * @param bucket S3 bucket name
-     */
-    void SendCreateBucketRequest(const std::string &module, const std::string &bucket);
-
-    /**
-     * Sends a exists bucket request to the S3 module
-     *
-     * @param module AwsMock module name
-     * @param bucket S3 bucket name
-     * @return true when bucket exists
-     */
-    bool SendExistsBucketRequest(const std::string &module, const std::string &bucket);
-
-    /**
      * Logger
      */
     Core::LogStream _logger;

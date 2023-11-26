@@ -12,7 +12,8 @@ set(LAMBDA_SOURCES src/entity/lambda/Tags.cpp src/entity/lambda/Environment.cpp 
         src/entity/lambda/EphemeralStorage.cpp src/repository/LambdaDatabase.cpp src/memorydb/LambdaMemoryDb.cpp)
 set(TRANSFER_SOURCES src/repository/TransferDatabase.cpp src/entity/transfer/User.cpp src/entity/transfer/Transfer.cpp
         src/memorydb/TransferMemoryDb.cpp)
-set(COGNITO_SOURCES src/entity/cognito/UserPool.cpp src/memorydb/CognitoMemoryDb.cpp src/repository/CognitoDatabase.cpp)
+set(COGNITO_SOURCES src/entity/cognito/UserPool.cpp src/entity/cognito/User.cpp src/memorydb/CognitoMemoryDb.cpp
+        src/repository/CognitoDatabase.cpp)
 set(MODULE_SOURCES src/entity/module/Module.cpp src/repository/ModuleDatabase.cpp src/memorydb/ModuleMemoryDb.cpp)
 
 set(SOURCES src/repository/Database.cpp src/utils/TestUtils.cpp ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES}
@@ -27,7 +28,9 @@ include_directories(include ../core/include /usr/include /usr/include/mongo /usr
 
 add_library(${LIBRARY} SHARED ${SOURCES}
         include/awsmock/memorydb/SQSMemoryDb.h
-        include/awsmock/entity/cognito/UserPool.h)
+        include/awsmock/entity/cognito/UserPool.h
+        include/awsmock/entity/cognito/UserStatus.h
+        include/awsmock/entity/cognito/UserAttribute.h)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 

@@ -18,11 +18,11 @@ add_executable(${BINARY} ${SOURCES})
 if(SYSTEMD)
     # systemd available
     add_definitions(-DHAS_SYSTEMD)
-    target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdb awsmockdto mongocxx bsoncxx PocoPrometheus PocoNet
+    target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb mongocxx bsoncxx PocoPrometheus PocoNet
             PocoJSON PocoXML PocoZip PocoFoundation PocoUtil pthread crypto ssl z archive curl tbb systemd)
 else()
     # systemd not available
-    target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdb awsmockdto mongocxx bsoncxx PocoPrometheus PocoNet
+    target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb mongocxx bsoncxx PocoPrometheus PocoNet
             PocoJSON PocoXML PocoZip PocoFoundation PocoUtil pthread crypto ssl z archive curl tbb)
 endif()
 

@@ -37,9 +37,7 @@
 #include <awsmock/config/Configuration.h>
 #include <awsmock/controller/Router.h>
 #include <awsmock/controller/RestService.h>
-#include "awsmock/service/GatewayServer.h"
-#include "awsmock/entity/module/ModuleState.h"
-#include "awsmock/entity/module/Module.h"
+#include <awsmock/service/CognitoServer.h>
 
 namespace AwsMock {
 
@@ -195,6 +193,9 @@ namespace AwsMock {
       if (_configuration.has("awsmock.service.transfer.active") && _configuration.getBool("awsmock.service.transfer.active")) {
         _moduleDatabase.SetStatus("transfer", Database::Entity::Module::ModuleStatus::ACTIVE);
       }
+      if (_configuration.has("awsmock.service.cognito.active") && _configuration.getBool("awsmock.service.cognito.active")) {
+        _moduleDatabase.SetStatus("cognito", Database::Entity::Module::ModuleStatus::ACTIVE);
+      }
       if (_configuration.has("awsmock.service.gateway.active") && _configuration.getBool("awsmock.service.gateway.active")) {
         _moduleDatabase.SetStatus("gateway", Database::Entity::Module::ModuleStatus::ACTIVE);
       }
@@ -222,6 +223,10 @@ namespace AwsMock {
           _transferServer = new Service::TransferServer(_configuration, _metricService);
           Poco::ThreadPool::defaultPool().start(*_transferServer);
           _serverMap[module.name] = _transferServer;
+        } else if (module.name == "cognito" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+          _cognitoServer = new Service::CognitoServer(_configuration, _metricService);
+          Poco::ThreadPool::defaultPool().start(*_cognitoServer);
+          _serverMap[module.name] = _cognitoServer;
         } else if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
           _gatewayServer = new Service::GatewayServer(_configuration, _metricService);
           Poco::ThreadPool::defaultPool().start(*_gatewayServer);
@@ -260,6 +265,10 @@ namespace AwsMock {
             _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
             auto *transferServer = (Service::LambdaServer *) _serverMap[module.name];
             transferServer->StopServer();
+          } else if (module.name == "cognito") {
+            _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
+            auto *cognitoServer = (Service::CognitoServer *) _serverMap[module.name];
+            cognitoServer->StopServer();
           } else if (module.name == "gateway") {
             _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
             auto *gatewayServer = (Service::GatewayServer *) _serverMap[module.name];
@@ -338,6 +347,11 @@ namespace AwsMock {
      * Transfer module
      */
     Service::TransferServer *_transferServer{};
+
+    /**
+     * Cognito module
+     */
+    Service::CognitoServer *_cognitoServer{};
 
     /**
      * Request gateway module

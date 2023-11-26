@@ -51,20 +51,19 @@ namespace AwsMock::Service {
       // Start HTTP manager
       Poco::ThreadPool::defaultPool().start(_sqsServer);
       while (!_sqsServer.IsRunning()) {
-        Poco::Thread::sleep(1000);
+        Poco::Thread::sleep(500);
       }
     }
 
     void TearDown() override {
       _sqsServer.StopServer();
       _database.DeleteAllQueues();
-      Core::FileUtils::DeleteFile(_testFile);
     }
 
     Core::CurlUtils _curlUtils;
-    std::string _testFile, _endpoint;
+    std::string _endpoint;
     std::map<std::string, std::string> _extraHeaders;
-    Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration();
     Core::MetricService _metricService = Core::MetricService(_configuration);
     Database::SQSDatabase _database = Database::SQSDatabase(_configuration);
     SQSServer _sqsServer = SQSServer(_configuration, _metricService);

@@ -11,11 +11,11 @@ namespace AwsMock::Service {
     // Add routes
     _routingTable["s3"] = {.name="s3", .host="localhost", .port=9500};
     _routingTable["s3api"] = {.name="s3", .host="localhost", .port=9500};
-    _routingTable["sqs"] = {.name="s3", .host="localhost", .port=9501};
-    _routingTable["sns"] = {.name="s3", .host="localhost", .port=9502};
-    _routingTable["lambda"] = {.name="s3", .host="localhost", .port=9503};
-    _routingTable["transfer"] = {.name="s3", .host="localhost", .port=9504};
-    _routingTable["cognito"] = {.name="s3", .host="localhost", .port=9505};
+    _routingTable["sqs"] = {.name="sqs", .host="localhost", .port=9501};
+    _routingTable["sns"] = {.name="sns", .host="localhost", .port=9502};
+    _routingTable["lambda"] = {.name="lambda", .host="localhost", .port=9503};
+    _routingTable["transfer"] = {.name="transfer", .host="localhost", .port=9504};
+    _routingTable["cognito-idp"] = {.name="cognito", .host="localhost", .port=9505};
     log_debug_stream(_logger) << "Gateway router initialized" << std::endl;
   }
 
@@ -57,7 +57,7 @@ namespace AwsMock::Service {
   std::string GatewayRouter::GetService(const std::string &authorization) {
 
     Poco::RegularExpression::MatchVec posVec;
-    Poco::RegularExpression pattern(R"(Credential=[a-zA-Z0-9]+\/[0-9]{8}\/[a-zA-Z0-9\-]+\/([a-zA-Z0-9]+)\/aws4_request,.*$)");
+    Poco::RegularExpression pattern(R"(Credential=[a-zA-Z0-9]+\/[0-9]{8}\/[a-zA-Z0-9\-]+\/([a-zA-Z0-9\-]+)\/aws4_request,.*$)");
     if (!pattern.match(authorization, 0, posVec)) {
       log_error_stream(_logger) << "Could not extract module, authorization: " << authorization << std::endl;
       throw Core::ResourceNotFoundException("Could not extract module", Poco::Net::HTTPServerResponse::HTTP_NOT_FOUND);
