@@ -69,40 +69,28 @@ namespace AwsMock::Service {
     }
   }
 
-  void AbstractHandler::handleGet([[maybe_unused]]Poco::Net::HTTPServerRequest &request,
-                                  Poco::Net::HTTPServerResponse &response,
-                                  [[maybe_unused]]const std::string &region,
-                                  [[maybe_unused]]const std::string &user) {
+  void AbstractHandler::handleGet([[maybe_unused]]Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
     log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user << std::endl;
     handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
     std::ostream &errorStream = response.send();
     errorStream.flush();
   }
 
-  void AbstractHandler::handlePut([[maybe_unused]]Poco::Net::HTTPServerRequest &request,
-                                  Poco::Net::HTTPServerResponse &response,
-                                  [[maybe_unused]]const std::string &region,
-                                  [[maybe_unused]]const std::string &user) {
+  void AbstractHandler::handlePut([[maybe_unused]]Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
     log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user << std::endl;
     handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
     std::ostream &errorStream = response.send();
     errorStream.flush();
   }
 
-  void AbstractHandler::handlePost([[maybe_unused]]Poco::Net::HTTPServerRequest &request,
-                                   Poco::Net::HTTPServerResponse &response,
-                                   [[maybe_unused]]const std::string &region,
-                                   [[maybe_unused]]const std::string &user) {
+  void AbstractHandler::handlePost([[maybe_unused]]Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
     log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user << std::endl;
     handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
     std::ostream &errorStream = response.send();
     errorStream.flush();
   }
 
-  void AbstractHandler::handleDelete([[maybe_unused]]Poco::Net::HTTPServerRequest &request,
-                                     Poco::Net::HTTPServerResponse &response,
-                                     [[maybe_unused]]const std::string &region,
-                                     [[maybe_unused]]const std::string &user) {
+  void AbstractHandler::handleDelete([[maybe_unused]]Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
     log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user << std::endl;
     handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
     std::ostream &errorStream = response.send();
@@ -120,10 +108,7 @@ namespace AwsMock::Service {
     errorStream.flush();
   }
 
-  void AbstractHandler::handleHead([[maybe_unused]]Poco::Net::HTTPServerRequest &request,
-                                   Poco::Net::HTTPServerResponse &response,
-                                   [[maybe_unused]]const std::string &region,
-                                   [[maybe_unused]]const std::string &user) {
+  void AbstractHandler::handleHead([[maybe_unused]]Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
     log_trace_stream(_logger) << "Request, method: " << request.getMethod() << std::endl;
     response.setStatusAndReason(
         Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED,
