@@ -96,13 +96,14 @@ namespace AwsMock::Database {
 
       mongocxx::stdx::optional<bsoncxx::document::value> mResult = _moduleCollection.find_one(make_document(kvp("_id", oid)));
       if (mResult) {
-        Entity::Module::Module modules;
-        modules.FromDocument(mResult);
-        return modules;
+        Entity::Module::Module module;
+        module.FromDocument(mResult);
+        return module;
       }
 
     } catch (mongocxx::exception::system_error &e) {
       log_error_stream(_logger) << "Get module by ID failed, error: " << e.what() << std::endl;
+      throw Core::DatabaseException("Module not found, oid: " + oid.to_string());
     }
     return {};
 
@@ -112,19 +113,7 @@ namespace AwsMock::Database {
 
     if (HasDatabase()) {
 
-      try {
-
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _moduleCollection.find_one(make_document(kvp("_id", oid)));
-        if (mResult) {
-          Entity::Module::Module modules;
-          modules.FromDocument(mResult);
-          return modules;
-        }
-
-      } catch (mongocxx::exception::system_error &e) {
-        log_error_stream(_logger) << "Get module by ID failed, error: " << e.what() << std::endl;
-      }
-      return {};
+      return GetModuleById(bsoncxx::oid(oid));
 
     } else {
 
