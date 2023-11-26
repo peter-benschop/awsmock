@@ -35,12 +35,30 @@ namespace AwsMock::Dto::SQS {
 
     std::stringstream output;
     Poco::XML::DOMWriter writer;
-    writer.setNewLine("\n");
-    writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
+    writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION);
     writer.writeNode(output, pDoc);
-    std::string tmp = output.str();
 
     return output.str();
+  }
+
+  std::string ListQueueResponse::ToJson() const {
+
+    try {
+      Poco::JSON::Array queuesArrayJson;
+      for(const auto &queue:queueList) {
+        queuesArrayJson.add(queue.queueUrl);
+      }
+
+      Poco::JSON::Object rootJson;
+      rootJson.set("QueueUrls", queuesArrayJson);
+
+      std::ostringstream os;
+      rootJson.stringify(os);
+      return os.str();
+
+    } catch (Poco::Exception &exc) {
+      throw Core::ServiceException(exc.message(), 500);
+    }
   }
 
   std::string ListQueueResponse::ToString() const {

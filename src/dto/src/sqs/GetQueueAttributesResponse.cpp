@@ -8,6 +8,27 @@ namespace AwsMock::Dto::SQS {
 
   Core::LogStream GetQueueAttributesResponse::_logger = Core::LogStream(Poco::Logger::get("GetQueueAttributesResponse"));
 
+  std::string GetQueueAttributesResponse::ToJson() const {
+
+    try {
+
+      Poco::JSON::Object attributeObject;
+      for (const auto &attribute : attributes) {
+        attributeObject.set(attribute.first, attribute.second);
+      }
+
+      Poco::JSON::Object rootJson;
+      rootJson.set("Attributes", attributeObject);
+
+      std::ostringstream os;
+      rootJson.stringify(os);
+      return os.str();
+
+    } catch (Poco::Exception &exc) {
+      throw Core::ServiceException(exc.message(), 500);
+    }
+  }
+
   std::string GetQueueAttributesResponse::ToXml() const {
 
     try {

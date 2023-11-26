@@ -8,7 +8,16 @@
 // C++ standard includes
 #include <string>
 
+// Poco includes
+#include "Poco/UUID.h"
+#include "Poco/UUIDGenerator.h"
+#include <Poco/JSON/JSON.h>
+#include <Poco/JSON/Parser.h>
+#include <Poco/Dynamic/Var.h>
+
 // AwsMock includes
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/ServiceException.h>
 #include <awsmock/dto/sqs/MessageAttribute.h>
 
 namespace AwsMock::Dto::SQS {
@@ -49,6 +58,13 @@ namespace AwsMock::Dto::SQS {
      * Request ID
      */
     std::string requestId;
+
+    /**
+     * Converts the JSON string to a DTO
+     *
+     * @param jsonString JSON string
+     */
+    void FromJson(const std::string &jsonString);
 
     /**
      * Converts the DTO to a string representation.

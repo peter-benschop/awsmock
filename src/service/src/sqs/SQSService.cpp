@@ -77,16 +77,14 @@ namespace AwsMock::Service {
     }
   }
 
-  Dto::SQS::PurgeQueueResponse SQSService::PurgeQueue(const Dto::SQS::PurgeQueueRequest &request) {
-    log_trace_stream(_logger) << "Purge queue request, region: " << request.region << " queueUrl: " << request.queueUrl
-                              << std::endl;
+  void SQSService::PurgeQueue(const Dto::SQS::PurgeQueueRequest &request) {
+    log_trace_stream(_logger) << "Purge queue request, region: " << request.region << " queueUrl: " << request.queueUrl<< std::endl;
 
     // Check existence
     if (!_database->QueueUrlExists(request.region, request.queueUrl)) {
       throw Core::ServiceException("SQS queue '" + request.queueUrl + "' does not exists",Poco::Net::HTTPResponse::HTTP_NOT_FOUND,request.resource.c_str(),request.requestId.c_str());
     }
 
-    Dto::SQS::PurgeQueueResponse response = {.resource=request.resource, .requestId=request.requestId};
     try {
 
       _database->PurgeQueue(request.region, request.queueUrl);
@@ -96,7 +94,6 @@ namespace AwsMock::Service {
       log_error_stream(_logger) << "SQS purge queue failed, message: " << ex.message() << std::endl;
       throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, request.resource.c_str(), request.requestId.c_str());
     }
-    return response;
   }
 
   Dto::SQS::GetQueueUrlResponse SQSService::GetQueueUrl(const Dto::SQS::GetQueueUrlRequest &request) {
@@ -112,7 +109,7 @@ namespace AwsMock::Service {
       return response;
 
     } catch (Poco::Exception &ex) {
-      log_error_stream(_logger) << "SQS purge queue failed, message: " << ex.message() << std::endl;
+      log_error_stream(_logger) << "SQS get queue failed, message: " << ex.message() << std::endl;
       throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_NOT_FOUND, request.region.c_str(), request.queueName.c_str());
     }
   }
@@ -187,7 +184,7 @@ namespace AwsMock::Service {
     return response;
   }
 
-  Dto::SQS::SetQueueAttributesResponse SQSService::SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request) {
+  void SQSService::SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request) {
     log_trace_stream(_logger) << "Put queue sqs request, queue: " << request.queueUrl << std::endl;
 
     // Check existence
@@ -211,9 +208,6 @@ namespace AwsMock::Service {
       // Update database
       queue = _database->UpdateQueue(queue);
       log_trace_stream(_logger) << "Queue updated: " << queue.ToString() << std::endl;
-
-      Dto::SQS::SetQueueAttributesResponse response = {.region=queue.region, .requestId=request.requestId};
-      return response;
 
     } catch (Poco::Exception &ex) {
       log_error_stream(_logger) << "SQS delete queue failed, message: " << ex.message() << std::endl;
@@ -250,7 +244,7 @@ namespace AwsMock::Service {
     }
   }
 
-  Dto::SQS::DeleteQueueResponse SQSService::DeleteQueue(const Dto::SQS::DeleteQueueRequest &request) {
+  void  SQSService::DeleteQueue(const Dto::SQS::DeleteQueueRequest &request) {
     log_trace_stream(_logger) << "Delete queue request, request: " << request.ToString() << std::endl;
 
     // Check existence
@@ -258,7 +252,6 @@ namespace AwsMock::Service {
       throw Core::ServiceException("SQS queue '" + request.queueUrl + "' does not exists", Poco::Net::HTTPResponse::HTTP_NOT_FOUND, request.resource.c_str(), request.requestId.c_str());
     }
 
-    Dto::SQS::DeleteQueueResponse response;
     try {
 
       // Delete all messages in queue
@@ -271,17 +264,12 @@ namespace AwsMock::Service {
       log_error_stream(_logger) << "SQS delete queue failed, message: " << ex.message() << std::endl;
       throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
-    return response;
   }
 
   Dto::SQS::SendMessageResponse SQSService::SendMessage(const Dto::SQS::SendMessageRequest &request) {
 
     if (!request.queueUrl.empty() && !_database->QueueUrlExists(request.region, request.queueUrl)) {
       throw Core::ServiceException("SQS queue '" + request.queueUrl + "' does not exists", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
-    } else if (!request.queueArn.empty() && !_database->QueueArnExists(request.queueArn)) {
-      throw Core::ServiceException("SQS queue '" + request.queueArn + "' does not exists", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
-    } else if (!request.queueName.empty() && !_database->QueueExists(request.region, request.queueName)) {
-      throw Core::ServiceException("SQS queue '" + request.queueName + "' does not exists", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
     try {
@@ -290,10 +278,6 @@ namespace AwsMock::Service {
       Database::Entity::SQS::Queue queue;
       if (!request.queueUrl.empty()) {
         queue = _database->GetQueueByUrl(request.queueUrl);
-      } else if (!request.queueArn.empty()) {
-        queue = _database->GetQueueByArn(request.queueArn);
-      } else if (!request.queueName.empty()) {
-        queue = _database->GetQueueByName(request.region, request.queueName);
       }
 
       // Set attributes

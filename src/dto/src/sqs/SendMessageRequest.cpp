@@ -6,6 +6,30 @@
 
 namespace AwsMock::Dto::SQS {
 
+  void SendMessageRequest::FromJson(const std::string &jsonString) {
+
+    Poco::JSON::Parser parser;
+    Poco::Dynamic::Var result = parser.parse(jsonString);
+    const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+
+    try {
+
+      // Attributes
+      Core::JsonUtils::GetJsonValueString("QueueUrl", rootObject, queueUrl);
+      Core::JsonUtils::GetJsonValueString("MessageBody", rootObject, body);
+      Poco::JSON::Array::Ptr attributesArray = rootObject->getArray("MessageAttributes");
+
+      if (attributesArray != nullptr) {
+        for (const auto &it : *attributesArray) {
+          //attributeNames.emplace_back(it.extract<std::string>());
+        }
+      }
+
+    } catch (Poco::Exception &exc) {
+      throw Core::ServiceException(exc.message(), 500);
+    }
+  }
+
   std::string SendMessageRequest::ToString() const {
     std::stringstream ss;
     ss << (*this);

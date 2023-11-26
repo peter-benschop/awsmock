@@ -28,6 +28,7 @@
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/core/ResourceNotFoundException.h>
+#include <awsmock/dto/common/UserAgent.h>
 #include <awsmock/dto/s3/RestErrorResponse.h>
 #include <awsmock/dto/sqs/RestErrorResponse.h>
 
@@ -188,6 +189,20 @@ namespace AwsMock::Service {
      * @param version SQS version (out)
      */
     void GetActionVersion(const std::string &body, std::string &action, std::string &version);
+
+    /**
+     * Get the command from the user agent header
+     *
+     * <p>Returns the command from the user agent HTTP header. Example:
+     * <pre>
+     * User-Agent: aws-cli/2.13.38 Python/3.11.6 Linux/6.1.0-13-amd64 exe/x86_64.debian.12 prompt/off command/sqs.list-queues
+     * </pre>
+     * </p>
+     *
+     * @param request HTTP request
+     * @return UserAgent DTO
+     */
+    Dto::Common::UserAgent GetCommand(const Poco::Net::HTTPServerRequest &request);
 
     /**
      * Get the action from the request path

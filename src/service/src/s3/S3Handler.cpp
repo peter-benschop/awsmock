@@ -1,13 +1,9 @@
 
-#include "awsmock/service/S3Handler.h"
+#include <awsmock/service/S3Handler.h>
 
 namespace AwsMock::Service {
 
-  S3Handler::S3Handler(Core::Configuration &configuration, Core::MetricService &metricService)
-      : AbstractHandler(), _logger(Poco::Logger::get("S3ServiceHandler")), _configuration(configuration), _metricService(metricService), _s3Service(configuration) {
-    std::string host = _configuration.getString("awsmock.service.gateway.host", "localhost");
-    std::string port = _configuration.getString("awsmock.service.gateway.port", "4566");
-    _endpoint = "http://" + host + ":" + port;
+  S3Handler::S3Handler(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractHandler(), _logger(Poco::Logger::get("S3ServiceHandler")), _configuration(configuration), _metricService(metricService), _s3Service(configuration) {
   }
 
   void S3Handler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
@@ -15,23 +11,61 @@ namespace AwsMock::Service {
 
     try {
 
-      // Strange behaviour of the S3CRT client
-      std::string uri = request.getURI();
-      if (Core::StringUtils::Contains(request.getURI(), _endpoint)) {
-        uri = uri.substr(_endpoint.length());
-      }
-      std::string bucket = Core::HttpUtils::GetPathParameter(uri, 0);
-      std::string key = Core::HttpUtils::GetPathParametersFromIndex(uri, 1);
+      Dto::Common::UserAgent userAgent;
+      userAgent.FromRequest(request, "s3");
 
-      //DumpRequestHeaders(request);
+      // Get bucket key
+      std::string bucket = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
+      std::string key = Core::HttpUtils::GetPathParametersFromIndex(request.getURI(), 1);
 
-      if (bucket.empty()) {
+      if (userAgent.clientCommand == "ls") {
 
-        // Return bucket list
-        Dto::S3::ListAllBucketResponse s3Response = _s3Service.ListAllBuckets();
-        SendOkResponse(response, s3Response.ToXml());
+        if (bucket.empty() && key.empty()) {
 
-      } else if (!bucket.empty() && !key.empty()) {
+          // Return bucket list
+          Dto::S3::ListAllBucketResponse s3Response = _s3Service.ListAllBuckets();
+          SendOkResponse(response, s3Response.ToXml());
+
+        } else if (key.empty()) {
+
+          if (Core::HttpUtils::HasQueryParameter(request.getURI(), "list-type")) {
+
+            int listType = 1;
+            if (Core::HttpUtils::HasQueryParameter(request.getURI(), "list-type")) {
+              listType = std::stoi(Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "list-type"));
+            }
+
+            std::string delimiter;
+            if (Core::HttpUtils::HasQueryParameter(request.getURI(), "delimiter")) {
+              delimiter = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "delimiter");
+            }
+
+            std::string prefix;
+            if (Core::HttpUtils::HasQueryParameter(request.getURI(), "prefix")) {
+              prefix = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "prefix");
+            }
+
+            std::string encodingType = "url";
+            if (Core::HttpUtils::HasQueryParameter(request.getURI(), "encoding_type")) {
+              encodingType = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "encoding_type");
+            }
+
+            // Return object list
+            Dto::S3::ListBucketRequest s3Request = {
+                .region=region,
+                .name=bucket,
+                .listType=listType,
+                .prefix=prefix,
+                .delimiter=delimiter,
+                .encodingType=encodingType
+            };
+            Dto::S3::ListBucketResult result = _s3Service.ListBucket(s3Request);
+            SendOkResponse(response, result.ToXml());
+          }
+        }
+
+      } else if (userAgent.clientCommand == "cp") {
+
 
         // Get object request
         log_debug_stream(_logger) << "S3 get object request, bucket: " << bucket << " key: " << key << std::endl;
@@ -84,44 +118,9 @@ namespace AwsMock::Service {
 
         }
 
-      } else if (Core::HttpUtils::HasQueryParameter(request.getURI(), "list-type")) {
-
-        int listType = 1;
-        if (Core::HttpUtils::HasQueryParameter(request.getURI(), "list-type")) {
-          listType = std::stoi(Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "list-type"));
-        }
-
-        std::string delimiter;
-        if (Core::HttpUtils::HasQueryParameter(request.getURI(), "delimiter")) {
-          delimiter = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "delimiter");
-        }
-
-        std::string prefix;
-        if (Core::HttpUtils::HasQueryParameter(request.getURI(), "prefix")) {
-          prefix = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "prefix");
-        }
-
-        std::string encodingType = "url";
-        if (Core::HttpUtils::HasQueryParameter(request.getURI(), "encoding_type")) {
-          encodingType = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "encoding_type");
-        }
-
-        // Return object list
-        Dto::S3::ListBucketRequest s3Request = {
-            .region=region,
-            .name=bucket,
-            .listType=listType,
-            .prefix=prefix,
-            .delimiter=delimiter,
-            .encodingType=encodingType
-        };
-        Dto::S3::ListBucketResult result = _s3Service.ListBucket(s3Request);
-        SendOkResponse(response, result.ToXml());
       }
 
     } catch (Core::ServiceException &exc) {
-      SendErrorResponse("S3", response, exc);
-    } catch (Core::ResourceNotFoundException &exc) {
       SendErrorResponse("S3", response, exc);
     }
   }
@@ -131,77 +130,17 @@ namespace AwsMock::Service {
 
     try {
 
+      Dto::Common::UserAgent userAgent;
+      userAgent.FromRequest(request, "s3");
+
       std::string bucket = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
       std::string key = Core::HttpUtils::GetPathParametersFromIndex(request.getURI(), 1);
       log_debug_stream(_logger) << "Found bucket/key, bucket: " << bucket << " key: " << key << std::endl;
 
-      bool isMultipartUpload = Core::HttpUtils::HasQueryParameter(request.getURI(), "uploadId");
       bool isNotification = Core::HttpUtils::HasQueryParameter(request.getURI(), "notification");
       bool isVersioning = Core::HttpUtils::HasQueryParameter(request.getURI(), "versioning");
-      bool isCopyRequest = HeaderExists(request, "x-amz-copy-source");
 
-      //DumpRequestHeaders(request);
-      //std::cerr << request.getURI();
-
-      if (isMultipartUpload) {
-
-        // S3 initial multipart upload
-        std::string partNumber = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "partNumber");
-        std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "uploadId");
-        log_debug_stream(_logger) << "S3 multipart upload part: " << partNumber << std::endl;
-
-        std::string eTag = _s3Service.UploadPart(request.stream(), std::stoi(partNumber), uploadId);
-
-        HeaderMap headerMap;
-        headerMap["ETag"] = eTag;
-
-        SendNoContentResponse(response, headerMap);
-        log_debug_stream(_logger) << "Finished S3 multipart upload part: " << partNumber << std::endl;
-
-      } else if (isNotification) {
-
-        log_debug_stream(_logger) << "Bucket notification request, bucket: " << bucket << std::endl;
-
-        // S3 notification setup
-        std::string body = Core::HttpUtils::GetBodyAsString(request);
-        Dto::S3::PutBucketNotificationRequest s3Request = Dto::S3::PutBucketNotificationRequest(body, region, bucket);
-
-        _s3Service.PutBucketNotification(s3Request);
-
-        SendOkResponse(response);
-
-      } else if (isCopyRequest) {
-
-        log_debug_stream(_logger) << "Object copy request, bucket: " << bucket << " key: " << key << std::endl;
-
-        // Get the user metadata
-        std::map<std::string, std::string> metadata = GetMetadata(request);
-
-        //DumpRequestHeaders(request);
-
-        // Get S3 source bucket/key
-        std::string sourceHeader = GetHeaderValue(request, "x-amz-copy-source", "empty");
-        std::string sourceBucket = Core::HttpUtils::GetPathParameter(sourceHeader, 0);
-        std::string sourceKey = Core::HttpUtils::GetPathParametersFromIndex(sourceHeader, 1);
-
-        Dto::S3::CopyObjectRequest s3Request = {
-            .region=region,
-            .user=user,
-            .sourceBucket=sourceBucket,
-            .sourceKey= sourceKey,
-            .targetBucket=bucket,
-            .targetKey=key,
-            .metadata=metadata
-        };
-
-        Dto::S3::CopyObjectResponse s3Response = _s3Service.CopyObject(s3Request);
-
-        HeaderMap headerMap;
-        headerMap["ETag"] = s3Response.eTag;
-
-        SendOkResponse(response, s3Response.ToXml(), headerMap);
-
-      } else if (isVersioning) {
+      if (isVersioning) {
 
         log_debug_stream(_logger) << "Bucket versioning request, region: " << region << " bucket: " << bucket << std::endl;
 
@@ -216,42 +155,131 @@ namespace AwsMock::Service {
 
         SendNoContentResponse(response);
 
-      } else if (!key.empty()) {
+      } else if (isNotification) {
 
-        //DumpRequestHeaders(request);
+        log_debug_stream(_logger) << "Bucket notification request, bucket: " << bucket << std::endl;
+
+        // S3 notification setup
+        std::string body = Core::HttpUtils::GetBodyAsString(request);
+        Dto::S3::PutBucketNotificationRequest s3Request = Dto::S3::PutBucketNotificationRequest(body, region, bucket);
+
+        _s3Service.PutBucketNotification(s3Request);
+
+        SendOkResponse(response);
+
+      } else if (userAgent.clientCommand == "cp") {
+
+        bool isMultipartUpload = Core::HttpUtils::HasQueryParameter(request.getURI(), "uploadId");
+
+        if (isMultipartUpload) {
+
+          // S3 initial multipart upload
+          std::string partNumber = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "partNumber");
+          std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "uploadId");
+          log_debug_stream(_logger) << "S3 multipart upload part: " << partNumber << std::endl;
+
+          std::string eTag = _s3Service.UploadPart(request.stream(), std::stoi(partNumber), uploadId);
+
+          HeaderMap headerMap;
+          headerMap["ETag"] = eTag;
+
+          SendNoContentResponse(response, headerMap);
+          log_debug_stream(_logger) << "Finished S3 multipart upload part: " << partNumber << std::endl;
+
+        } else {
+
+          // Get the user metadata
+          std::map<std::string, std::string> metadata = GetMetadata(request);
+
+          bool isCopyRequest = HeaderExists(request, "x-amz-copy-source");
+
+          if (isCopyRequest) {
+
+            log_debug_stream(_logger) << "Object copy request, bucket: " << bucket << " key: " << key << std::endl;
+
+            // Get S3 source bucket/key
+            std::string sourceHeader = GetHeaderValue(request, "x-amz-copy-source", "empty");
+            std::string sourceBucket = Core::HttpUtils::GetPathParameter(sourceHeader, 0);
+            std::string sourceKey = Core::HttpUtils::GetPathParametersFromIndex(sourceHeader, 1);
+
+            Dto::S3::CopyObjectRequest s3Request = {
+                .region=region,
+                .user=user,
+                .sourceBucket=sourceBucket,
+                .sourceKey= sourceKey,
+                .targetBucket=bucket,
+                .targetKey=key,
+                .metadata=metadata
+            };
+
+            Dto::S3::CopyObjectResponse s3Response = _s3Service.CopyObject(s3Request);
+
+            HeaderMap headerMap;
+            headerMap["ETag"] = s3Response.eTag;
+
+            SendOkResponse(response, s3Response.ToXml(), headerMap);
+
+          } else {
+
+            // S3 put object request
+            Dto::S3::PutObjectRequest putObjectRequest = {
+                .region=region,
+                .bucket=bucket,
+                .key=key,
+                .owner=user,
+                .md5Sum=GetHeaderValue(request, "Content-MD5", ""),
+                .contentType=GetHeaderValue(request, "Content-Type", "application/octet-stream"),
+                .contentLength=std::stol(GetHeaderValue(request, "Content-Length", "0")),
+                .metadata=metadata
+            };
+            log_debug_stream(_logger) << "ContentLength: " << putObjectRequest.contentLength << " contentType: " << putObjectRequest.contentType << std::endl;
+
+            Dto::S3::PutObjectResponse putObjectResponse = _s3Service.PutObject(putObjectRequest, request.stream());
+
+            HeaderMap headerMap;
+            headerMap["Content-MD5"] = putObjectResponse.md5Sum;
+            headerMap["ETag"] = "\"" + putObjectResponse.etag + "\"";
+            headerMap["x-amz-sdk-checksum-algorithm"] = putObjectResponse.checksumAlgorithm;
+            headerMap["x-amz-checksum-sha256"] = putObjectResponse.checksumSha256;
+            if (!putObjectResponse.versionId.empty()) {
+              headerMap["x-amz-version-id"] = putObjectResponse.versionId;
+            }
+            log_debug_stream(_logger) << " size: " << putObjectResponse.contentLength << std::endl;
+
+            SendOkResponse(response, {}, headerMap);
+          }
+
+        }
+      } else if (userAgent.clientCommand == "mv") {
+
+        log_debug_stream(_logger) << "Object move request, bucket: " << bucket << " key: " << key << std::endl;
+
+        // Get S3 source bucket/key
+        std::string sourceHeader = GetHeaderValue(request, "x-amz-copy-source", "empty");
+        std::string sourceBucket = Core::HttpUtils::GetPathParameter(sourceHeader, 0);
+        std::string sourceKey = Core::HttpUtils::GetPathParametersFromIndex(sourceHeader, 1);
 
         // Get the user metadata
         std::map<std::string, std::string> metadata = GetMetadata(request);
 
-        // S3 put object request
-        Dto::S3::PutObjectRequest putObjectRequest = {
+        Dto::S3::MoveObjectRequest s3Request = {
             .region=region,
-            .bucket=bucket,
-            .key=key,
-            .owner=user,
-            .md5Sum=GetHeaderValue(request, "Content-MD5", ""),
-            .contentType=GetHeaderValue(request, "Content-Type", "application/octet-stream"),
-            .contentLength=std::stol(GetHeaderValue(request, "Content-Length", "0")),
+            .user=user,
+            .sourceBucket=sourceBucket,
+            .sourceKey= sourceKey,
+            .targetBucket=bucket,
+            .targetKey=key,
             .metadata=metadata
         };
-        log_debug_stream(_logger) << "ContentLength: " << putObjectRequest.contentLength << " contentType: " << putObjectRequest.contentType << std::endl;
 
-        Dto::S3::PutObjectResponse putObjectResponse = _s3Service.PutObject(putObjectRequest, request.stream());
+        Dto::S3::MoveObjectResponse s3Response = _s3Service.MoveObject(s3Request);
 
         HeaderMap headerMap;
-        headerMap["Content-MD5"] = putObjectResponse.md5Sum;
-        //headerMap["Content-Length"] = std::to_string(putObjectResponse.contentLength);
-        headerMap["ETag"] = "\"" + putObjectResponse.etag + "\"";
-        headerMap["x-amz-sdk-checksum-algorithm"] = putObjectResponse.checksumAlgorithm;
-        headerMap["x-amz-checksum-sha256"] = putObjectResponse.checksumSha256;
-        if (!putObjectResponse.versionId.empty()) {
-          headerMap["x-amz-version-id"] = putObjectResponse.versionId;
-        }
-        log_debug_stream(_logger) << " size: " << putObjectResponse.contentLength << std::endl;
+        headerMap["ETag"] = s3Response.eTag;
 
-        SendOkResponse(response, {}, headerMap);
+        SendOkResponse(response, s3Response.ToXml(), headerMap);
 
-      } else if (!bucket.empty()) {
+      } else if (userAgent.clientCommand == "mb") {
 
         // S3 create bucket request
         std::string name = Core::DirUtils::RelativePath(request.getURI());
@@ -273,39 +301,44 @@ namespace AwsMock::Service {
 
     try {
 
-      //DumpRequest(request);
+      Dto::Common::UserAgent userAgent;
+      userAgent.FromRequest(request, "s3");
+
       std::string bucket = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
       std::string key = Core::HttpUtils::GetPathParametersFromIndex(request.getURI(), 1);
 
-      bool isMultipartUpload = Core::HttpUtils::HasQueryParameter(request.getURI(), "uploads");
-      bool isDeleteObjects = Core::HttpUtils::HasQueryParameter(request.getURI(), "delete");
+      if (userAgent.clientCommand == "cp") {
 
-      if (isMultipartUpload) {
+        bool isMultipartUpload = Core::HttpUtils::HasQueryParameter(request.getURI(), "uploads");
+        bool isDeleteObjects = Core::HttpUtils::HasQueryParameter(request.getURI(), "delete");
 
-        log_debug_stream(_logger) << "Starting multipart upload" << std::endl;
+        if (isMultipartUpload) {
 
-        Dto::S3::InitiateMultipartUploadResult result = _s3Service.CreateMultipartUpload(bucket, key, region, user);
+          log_debug_stream(_logger) << "Starting multipart upload" << std::endl;
 
-        SendOkResponse(response, result.ToXml());
+          Dto::S3::InitiateMultipartUploadResult result = _s3Service.CreateMultipartUpload(bucket, key, region, user);
 
-      } else if (isDeleteObjects) {
+          SendOkResponse(response, result.ToXml());
 
-        log_debug_stream(_logger) << "Starting delete objects request" << std::endl;
+        } else if (isDeleteObjects) {
 
-        std::string payload = Core::HttpUtils::GetBodyAsString(request);
+          log_debug_stream(_logger) << "Starting delete objects request" << std::endl;
 
-        auto s3Request = Dto::S3::DeleteObjectsRequest(payload);
-        Dto::S3::DeleteObjectsResponse s3Response = _s3Service.DeleteObjects(s3Request);
-        SendOkResponse(response, s3Response.ToXml());
+          std::string payload = Core::HttpUtils::GetBodyAsString(request);
 
-      } else {
+          auto s3Request = Dto::S3::DeleteObjectsRequest(payload);
+          Dto::S3::DeleteObjectsResponse s3Response = _s3Service.DeleteObjects(s3Request);
+          SendOkResponse(response, s3Response.ToXml());
 
-        std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "uploadId");
-        log_debug_stream(_logger) << "Finish multipart upload request, uploadId: " << uploadId << std::endl;
+        } else {
 
-        Dto::S3::CompleteMultipartUploadResult result = _s3Service.CompleteMultipartUpload(uploadId, bucket, key, region, user);
-        SendOkResponse(response, result.ToXml());
+          std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "uploadId");
+          log_debug_stream(_logger) << "Finish multipart upload request, uploadId: " << uploadId << std::endl;
 
+          Dto::S3::CompleteMultipartUploadResult result = _s3Service.CompleteMultipartUpload(uploadId, bucket, key, region, user);
+          SendOkResponse(response, result.ToXml());
+
+        }
       }
 
     } catch (Poco::Exception &exc) {
@@ -317,15 +350,37 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "S3 DELETE request, URI: " + request.getURI() << " region: " << region << " user: " << user << std::endl;
 
     try {
-      std::string bucket = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
-      std::string key = Core::HttpUtils::GetPathParametersFromIndex(request.getURI(), 1);
 
-      if (!bucket.empty() && !key.empty()) {
+      // Get user agent
+      Dto::Common::UserAgent userAgent;
+      userAgent.FromRequest(request, "s3");
+
+      if (userAgent.clientCommand == "rm") {
+
+        // Get bucket / key
+        std::string bucket = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
+        std::string key = Core::HttpUtils::GetPathParametersFromIndex(request.getURI(), 1);
+
         _s3Service.DeleteObject({.region=region, .user=user, .bucket=bucket, .key=key});
         SendDeleteResponse(response);
-      } else if (!bucket.empty()) {
+
+      } else if (userAgent.clientCommand == "rb") {
+
+        // Get bucket / key
+        std::string bucket = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
+
         _s3Service.DeleteBucket(region, bucket);
         SendDeleteResponse(response);
+
+      } else if (userAgent.clientCommand == "mv") {
+
+        // Get bucket / key
+        std::string bucket = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
+        std::string key = Core::HttpUtils::GetPathParametersFromIndex(request.getURI(), 1);
+
+        _s3Service.DeleteObject({.region=region, .user=user, .bucket=bucket, .key=key});
+        SendDeleteResponse(response);
+
       }
 
     } catch (Core::ServiceException &exc) {

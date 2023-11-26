@@ -6,6 +6,22 @@
 
 namespace AwsMock::Dto::SQS {
 
+  void CreateQueueRequest::FromJson(const std::string &jsonString) {
+
+    Poco::JSON::Parser parser;
+    Poco::Dynamic::Var result = parser.parse(jsonString);
+    auto rootObject = result.extract<Poco::JSON::Object::Ptr>();
+
+    try {
+
+      // Attributes
+      Core::JsonUtils::GetJsonValueString("QueueName", rootObject, name);
+
+    } catch (Poco::Exception &exc) {
+      throw Core::ServiceException(exc.message(), 500);
+    }
+  }
+
   std::string CreateQueueRequest::ToString() const {
     std::stringstream ss;
     ss << (*this);

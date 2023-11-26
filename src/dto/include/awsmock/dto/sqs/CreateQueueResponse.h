@@ -23,6 +23,10 @@
 #include "Poco/DOM/DOMParser.h"
 #include "Poco/DOM/DOMWriter.h"
 #include "Poco/XML/XMLWriter.h"
+#include <Poco/JSON/Object.h>
+
+// AwsMock includes
+#include <awsmock/core/ServiceException.h>
 
 namespace AwsMock::Dto::SQS {
 
@@ -52,6 +56,13 @@ namespace AwsMock::Dto::SQS {
      * Queue ARN
      */
     std::string queueArn;
+
+    /**
+     * Convert to a JSON string
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Convert to XML representation
