@@ -26,12 +26,14 @@ namespace AwsMock::Service {
     StopHttpServer();
     _moduleDatabase->SetState(_name, Database::Entity::Module::ModuleState::STOPPED);
     _running = false;
+    std::cerr << "Module: " << _name << " shutdown" << std::endl;
     log_info_stream(_logger) << "Module " << _name << " has been shutdown" << std::endl;
   }
 
   bool AbstractServer::InterruptableSleep(int period) {
     _mutex.lock();
     if (_condition.tryWait(_mutex, period)) {
+      _mutex.unlock();
       return true;
     }
     _mutex.unlock();
@@ -39,7 +41,7 @@ namespace AwsMock::Service {
   }
 
   void AbstractServer::StopServer() {
-    _condition.signal();
+    _condition.broadcast();
   }
 
   void AbstractServer::StartHttpServer(int maxQueueLength, int maxThreads, int requestTimeout, const std::string &host, int port, Poco::Net::HTTPRequestHandlerFactory *requestFactory) {

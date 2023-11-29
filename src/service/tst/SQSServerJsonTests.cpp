@@ -35,10 +35,7 @@ namespace AwsMock::Service {
 
     void SetUp() override {
 
-      // Set log level
-      Core::LogStream::SetGlobalLevel("error");
-
-      // Create some test objects
+      // Set HTTP headers
       _extraHeaders["Authorization"] = Core::AwsUtils::GetAuthorizationHeader(_configuration, "sqs");
       _extraHeaders["Content-Type"] = Core::AwsUtils::GetContentTypeHeader("json");
 
@@ -57,11 +54,10 @@ namespace AwsMock::Service {
     void TearDown() override {
       _sqsServer.StopServer();
       _database.DeleteAllQueues();
-      Core::FileUtils::DeleteFile(_testFile);
     }
 
     Core::CurlUtils _curlUtils;
-    std::string _testFile, _endpoint;
+    std::string _endpoint;
     std::map<std::string, std::string> _extraHeaders;
     Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration();
     Core::MetricService _metricService = Core::MetricService(_configuration);

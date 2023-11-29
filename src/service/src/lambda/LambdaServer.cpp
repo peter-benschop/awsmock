@@ -78,6 +78,7 @@ namespace AwsMock::Service {
       // Wait for timeout or condition
       if (InterruptableSleep(_period)) {
         StopMonitoringServer();
+        StopExecutors();
         break;
       }
     }
@@ -89,6 +90,10 @@ namespace AwsMock::Service {
 
   void LambdaServer::StopMonitoringServer() {
     _threadPool.stopAll();
+  }
+
+  void LambdaServer::StopExecutors() {
+    Poco::ThreadPool::defaultPool().stopAll();
   }
 
   void LambdaServer::CleanupContainers() {

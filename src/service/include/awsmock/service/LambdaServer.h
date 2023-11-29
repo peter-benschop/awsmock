@@ -67,6 +67,11 @@ namespace AwsMock::Service {
      */
     void StopMonitoringServer();
 
+    /**
+     * Stop executors
+     */
+    void StopExecutors();
+
   private:
 
     /**

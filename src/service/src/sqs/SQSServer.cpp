@@ -41,7 +41,7 @@ namespace AwsMock::Service {
     log_info_stream(_logger) << "SQS server starting, port: " << _port << std::endl;
 
     // Start monitoring thread
-    StartMonitoringServer();
+    //StartMonitoringServer();
 
     // Start REST module
     StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new SQSRequestHandlerFactory(_configuration, _metricService, _condition));
@@ -55,7 +55,7 @@ namespace AwsMock::Service {
 
       // Wait for timeout or condition
       if (InterruptableSleep(_period)) {
-        StopMonitoringServer();
+        //StopMonitoringServer();
         break;
       }
     }

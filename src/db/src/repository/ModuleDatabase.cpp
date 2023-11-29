@@ -188,7 +188,6 @@ namespace AwsMock::Database {
       return _memoryDb.UpdateModule(module);
 
     }
-    return {};
   }
 
   void ModuleDatabase::SetState(const std::string &name, const Entity::Module::ModuleState &state) {
@@ -204,7 +203,7 @@ namespace AwsMock::Database {
 
     } else {
 
-      return _memoryDb.SetState(name, state);
+      _memoryDb.SetState(name, state);
 
     }
   }
@@ -222,7 +221,7 @@ namespace AwsMock::Database {
 
     } else {
 
-      return _memoryDb.SetStatus(name, status);
+      _memoryDb.SetStatus(name, status);
 
     }
   }
@@ -240,7 +239,7 @@ namespace AwsMock::Database {
 
     } else {
 
-      return _memoryDb.SetPort(name, port);
+      _memoryDb.SetPort(name, port);
 
     }
   }
