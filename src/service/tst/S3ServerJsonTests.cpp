@@ -38,11 +38,8 @@ namespace AwsMock::Service {
   protected:
 
     void SetUp() override {
-      // Set log level
-      Core::LogStream::SetGlobalLevel("error");
 
-      // Create some test objects
-      _testFile = Core::FileUtils::CreateTempFile("/tmp", "json", 10);
+      // Set HTTP headers
       _extraHeaders["Authorization"] = Core::AwsUtils::GetAuthorizationHeader(_configuration, "s3");
       _extraHeaders["Content-Type"] = Core::AwsUtils::GetContentTypeHeader("json");
 
@@ -54,18 +51,17 @@ namespace AwsMock::Service {
       // Start HTTP manager
       Poco::ThreadPool::defaultPool().start(_s3Server);
       while (!_s3Server.IsRunning()) {
-        Poco::Thread::sleep(1000);
+        Poco::Thread::sleep(500);
       }
     }
 
     void TearDown() override {
       _s3Server.StopServer();
       _database.DeleteAllBuckets();
-      Core::FileUtils::DeleteFile(_testFile);
     }
 
     Core::CurlUtils _curlUtils;
-    std::string _testFile, _endpoint;
+    std::string _endpoint;
     std::map<std::string, std::string> _extraHeaders;
     Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration();
     Core::MetricService _metricService = Core::MetricService(_configuration);

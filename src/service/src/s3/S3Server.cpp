@@ -44,7 +44,6 @@ namespace AwsMock::Service {
 
   S3Server::~S3Server() {
     StopServer();
-    _threadPool.stopAll();
   }
 
   void S3Server::MainLoop() {
@@ -57,7 +56,7 @@ namespace AwsMock::Service {
     log_info_stream(_logger) << "S3 module starting" << std::endl;
 
     // Start monitoring thread
-    StartMonitoringServer();
+    //StartMonitoringServer();
 
     // Start REST module
     StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new S3RequestHandlerFactory(_configuration, _metricService));
@@ -68,7 +67,7 @@ namespace AwsMock::Service {
 
       // Wait for timeout or condition
       if (InterruptableSleep(_period)) {
-        StopMonitoringServer();
+        //StopMonitoringServer();
         break;
       }
       UpdateCounters();

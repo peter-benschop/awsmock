@@ -36,10 +36,7 @@ namespace AwsMock::Service {
 
     void SetUp() override {
 
-      // Set log level
-      Core::LogStream::SetGlobalLevel("error");
-
-      // Create some test objects
+      // Set HTTP headers
       _extraHeaders["Authorization"] = Core::AwsUtils::GetAuthorizationHeader(_configuration, "sqs");
       _extraHeaders["Content-Type"] = Core::AwsUtils::GetContentTypeHeader("xml");
 

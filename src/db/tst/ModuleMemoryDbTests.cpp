@@ -34,14 +34,12 @@ namespace AwsMock::Database {
   protected:
 
     void SetUp() override {
-      _region = _configuration.getString("awsmock.region");
     }
 
     void TearDown() override {
       _moduleDatabase.DeleteAllModules();
     }
 
-    std::string _region;
     Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
     ModuleDatabase _moduleDatabase = ModuleDatabase(_configuration);
   };
