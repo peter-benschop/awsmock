@@ -113,7 +113,7 @@ namespace AwsMock::Database {
     Entity::SQS::Queue queue = _sqsDatabase.CreateQueue({.region=_region, .name=QUEUE_NAME, .owner=OWNER, .queueUrl=_queueUrl, .queueArn=_queueArn});
 
     // act
-    Entity::SQS::Queue result = _sqsDatabase.GetQueueByUrl(_queueUrl);
+    Entity::SQS::Queue result = _sqsDatabase.GetQueueByUrl(_region, _queueUrl);
 
     // assert
     EXPECT_TRUE(result.name == QUEUE_NAME);

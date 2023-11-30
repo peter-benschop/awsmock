@@ -13,7 +13,8 @@
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/CognitoDatabase.h>
 
-#define USER_POOL "test-user-pool"
+#define USER_POOL_ID "test-user-pool_sdjhdjft"
+#define USER_POOL_NAME "test-user-pool"
 
 namespace AwsMock::Database {
 
@@ -36,75 +37,73 @@ namespace AwsMock::Database {
     CognitoDatabase _cognitoDatabase = CognitoDatabase(_configuration);
   };
 
+  TEST_F(CognitoDatabaseTest, UserPoolCreateTest) {
+
+    // arrange
+    Entity::Cognito::UserPool userPool = {.region=_region, .id=USER_POOL_ID, .name=USER_POOL_NAME};
+
+    // act
+    Entity::Cognito::UserPool result = _cognitoDatabase.CreateUserPool(userPool);
+
+    // assert
+    EXPECT_TRUE(result.name == USER_POOL_NAME);
+    EXPECT_TRUE(result.id.length() > 0);
+  }
+
+  TEST_F(CognitoDatabaseTest, ListUserPoolsTest) {
+
+    // arrange
+    Entity::Cognito::UserPool userPool = {.region=_region, .id=USER_POOL_ID, .name=USER_POOL_NAME};
+    Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
+
+    // act
+    Entity::Cognito::UserPoolList result = _cognitoDatabase.ListUserPools(_region);
+
+    // assert
+    EXPECT_FALSE(result.empty());
+    EXPECT_EQ(1, result.size());
+  }
+
   TEST_F(CognitoDatabaseTest, UserPoolExistsTest) {
 
     // arrange
-    Entity::Cognito::UserPool userPool = {.region=_region, .name=USER_POOL};
-    _cognitoDatabase.CreateUserPool(userPool);
+    Entity::Cognito::UserPool userPool = {.region=_region, .id=USER_POOL_ID, .name=USER_POOL_NAME};
+    Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
 
     // act
-    bool result = _cognitoDatabase.UserPoolExists(_region, USER_POOL);
+    bool result = _cognitoDatabase.UserPoolExists(_region, USER_POOL_NAME);
 
     // assert
     EXPECT_TRUE(result);
   }
 
-  /*TEST_F(CognitoDatabaseTest, CognitoCountTest) {
+  TEST_F(CognitoDatabaseTest, UserPoolUpdateTest) {
 
     // arrange
-    Entity::Cognito::Cognito cognito = {.region=_region, .function=FUNCTION, .runtime=RUNTIME, .role=ROLE, .handler=HANDLER, .codeSize=1000};
-    _cognitoDatabase.CreateCognito(cognito);
+    Entity::Cognito::UserPool userPool = {.region=_region, .id=USER_POOL_ID, .name=USER_POOL_NAME};
+    Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
 
     // act
-    long result = _cognitoDatabase.CognitoCount(cognito.region);
+    createUserPoolResult.id = std::string(USER_POOL_NAME) + "2";
+    Entity::Cognito::UserPool updateUserPoolResult = _cognitoDatabase.UpdateUserPool(createUserPoolResult);
 
     // assert
-    EXPECT_EQ(1, result);
-  }*/
-
-  TEST_F(CognitoDatabaseTest, UserPoolIdExistsTest) {
-
-    // arrange
-    Entity::Cognito::UserPool userPool = {.region=_region, .name=USER_POOL};
-    userPool = _cognitoDatabase.CreateUserPool(userPool);
-
-    // act
-    bool result = _cognitoDatabase.UserPoolExists(userPool.id);
-
-    // assert
-    EXPECT_TRUE(result);
+    EXPECT_TRUE(updateUserPoolResult.id == std::string(USER_POOL_NAME) + "2");
   }
 
-  TEST_F(CognitoDatabaseTest, UserPoolListTest) {
+  TEST_F(CognitoDatabaseTest, DeleteUserPoolTest) {
 
     // arrange
-    Entity::Cognito::UserPool userPool = {.region=_region, .name=USER_POOL};
-    userPool = _cognitoDatabase.CreateUserPool(userPool);
+    Entity::Cognito::UserPool userPool = {.region=_region, .id=USER_POOL_ID, .name=USER_POOL_NAME};
+    Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
 
     // act
-    std::vector<Entity::Cognito::UserPool> result = _cognitoDatabase.ListUserPools(_region);
-
-    // assert
-    EXPECT_EQ(1, result.size());
-    EXPECT_TRUE(result[0].name == USER_POOL);
-    EXPECT_TRUE(result[0].region == _region);
-  }
-
-/*  TEST_F(CognitoDatabaseTest, CognitoDeleteTest) {
-
-    // arrange
-    std::string arn = Core::AwsUtils::CreateCognitoArn(_region, _accountId, FUNCTION);
-    Entity::Cognito::Cognito cognito = {.region=_region, .function=FUNCTION, .runtime=RUNTIME, .role=ROLE, .handler=HANDLER, .arn=arn};
-    cognito = _cognitoDatabase.CreateCognito(cognito);
-
-    // act
-    _cognitoDatabase.DeleteCognito(cognito.function);
-    bool result = _cognitoDatabase.CognitoExists(_region, FUNCTION, RUNTIME);
+    _cognitoDatabase.DeleteUserPool(createUserPoolResult.id);
+    bool result = _cognitoDatabase.UserPoolExists(_region, USER_POOL_NAME);
 
     // assert
     EXPECT_FALSE(result);
   }
-  */
 
 } // namespace AwsMock::Core
 

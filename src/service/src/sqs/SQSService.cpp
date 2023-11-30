@@ -125,7 +125,7 @@ namespace AwsMock::Service {
                                    request.requestId.c_str());
     }
 
-    Database::Entity::SQS::Queue queue = _database->GetQueueByUrl(request.queueUrl);
+    Database::Entity::SQS::Queue queue = _database->GetQueueByUrl(request.region, request.queueUrl);
     log_debug_stream(_logger) << "Got queue: " << queue.queueUrl << std::endl;
 
     Dto::SQS::GetQueueAttributesResponse response;
@@ -195,7 +195,7 @@ namespace AwsMock::Service {
     try {
 
       // Get the queue
-      Database::Entity::SQS::Queue queue = _database->GetQueueByUrl(request.queueUrl);
+      Database::Entity::SQS::Queue queue = _database->GetQueueByUrl(request.region, request.queueUrl);
       log_trace_stream(_logger) << "Got queue: " << queue.ToString() << std::endl;
 
       // Reset all attributes
@@ -277,7 +277,7 @@ namespace AwsMock::Service {
       // Get queue in case of ARN
       Database::Entity::SQS::Queue queue;
       if (!request.queueUrl.empty()) {
-        queue = _database->GetQueueByUrl(request.queueUrl);
+        queue = _database->GetQueueByUrl(request.region, request.queueUrl);
       }
 
       // Set attributes
@@ -340,7 +340,7 @@ namespace AwsMock::Service {
 
     try {
       Database::Entity::SQS::MessageList messageList;
-      Database::Entity::SQS::Queue queue = _database->GetQueueByName(request.region, request.queueName);
+      Database::Entity::SQS::Queue queue = _database->GetQueueByUrl(request.region, request.queueUrl);
 
       long elapsed = 0;
       auto begin = std::chrono::high_resolution_clock::now();

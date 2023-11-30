@@ -30,7 +30,7 @@
 
 namespace AwsMock::Service {
 
-  class SQSServerXmlTest : public ::testing::Test {
+  class SQSServerJavaTest : public ::testing::Test {
 
   protected:
 
@@ -66,12 +66,12 @@ namespace AwsMock::Service {
     SQSServer _sqsServer = SQSServer(_configuration, _metricService);
   };
 
-  TEST_F(SQSServerXmlTest, QueueCreateTest) {
+  TEST_F(SQSServerJavaTest, QueueCreateTest) {
 
     // arrange
 
     // act
-    _extraHeaders["User-Agent"] = Core::AwsUtils::GetUserAgentHeader("sqs", "create-queue");
+    _extraHeaders["User-Agent"] = Core::AwsUtils::GetJava2UserAgentHeader("sqs", "create-queue");
     Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
     Database::Entity::SQS::QueueList queueList = _database.ListQueues();
 
@@ -80,15 +80,15 @@ namespace AwsMock::Service {
     EXPECT_EQ(1, queueList.size());
   }
 
-  TEST_F(SQSServerXmlTest, QueueListTest) {
+  TEST_F(SQSServerJavaTest, QueueListTest) {
 
     // arrange
-    _extraHeaders["User-Agent"] = Core::AwsUtils::GetUserAgentHeader("sqs", "create-queue");
+    _extraHeaders["User-Agent"] = Core::AwsUtils::GetJava2UserAgentHeader("sqs", "create-queue");
     Core::CurlResponse createResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
     EXPECT_TRUE(createResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
 
     // act
-    _extraHeaders["User-Agent"] = Core::AwsUtils::GetUserAgentHeader("sqs", "list-queues");
+    _extraHeaders["User-Agent"] = Core::AwsUtils::GetJava2UserAgentHeader("sqs", "list-queues");
     Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, LIST_QUEUE_REQUEST);
     EXPECT_TRUE(createResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
 
@@ -97,16 +97,16 @@ namespace AwsMock::Service {
     EXPECT_TRUE(Core::StringUtils::Contains(response.output, "TestQueue"));
   }
 
-  TEST_F(SQSServerXmlTest, QueueDeleteTest) {
+  TEST_F(SQSServerJavaTest, QueueDeleteTest) {
 
     // arrange
-    _extraHeaders["User-Agent"] = Core::AwsUtils::GetUserAgentHeader("sqs", "create-queue");
+    _extraHeaders["User-Agent"] = Core::AwsUtils::GetJava2UserAgentHeader("sqs", "create-queue");
     Core::CurlResponse curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
     Dto::SQS::CreateQueueResponse createResponse;
     createResponse.FromXml(curlResponse.output);
 
     // act
-    _extraHeaders["User-Agent"] = Core::AwsUtils::GetUserAgentHeader("sqs", "delete-queue");
+    _extraHeaders["User-Agent"] = Core::AwsUtils::GetJava2UserAgentHeader("sqs", "delete-queue");
     std::string deleteQueueRequest = "Action=DeleteQueue&QueueUrl=" + createResponse.queueUrl;
     Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", _endpoint, _extraHeaders, deleteQueueRequest);
     Database::Entity::SQS::QueueList queueList = _database.ListQueues();

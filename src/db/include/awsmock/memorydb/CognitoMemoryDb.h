@@ -79,21 +79,12 @@ namespace AwsMock::Database {
     Entity::Cognito::UserPool GetUserPoolByOid(const std::string &oid);
 
     /**
-      * Returns a cognito entity by ARN
-      *
-      * @param arn cognito ARN
-      * @return cognito entity
-      * @throws DatabaseException
-      */
-    //Entity::Cognito::Cognito GetCognitoByArn(const std::string &arn);
-
-    /**
      * Count all user pools
      *
      * @param region aws-mock region.
      * @return total number of user pools.
      */
-    //long CognitoCount(const std::string &region = {});
+    long UserPoolCount(const std::string &region = {});
 
     /**
      * Returns a list of cognito user pools.
@@ -104,12 +95,12 @@ namespace AwsMock::Database {
     std::vector<Entity::Cognito::UserPool> ListUserPools(const std::string &region);
 
     /**
-     * Updates an existing cognito cognito function
+     * Updates an existing cognito user pool
      *
-     * @param cognito cognito entity
-     * @return updated cognito entity.
+     * @param cognito cognito user pool
+     * @return updated cognito user pool entity.
      */
-    //Entity::Cognito::Cognito UpdateCognito(const Entity::Cognito::Cognito &cognito);
+    Entity::Cognito::UserPool UpdateUserPool(const Entity::Cognito::UserPool &userPool);
 
     /**
      * Deletes an existing cognito user pool

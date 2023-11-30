@@ -50,24 +50,6 @@ namespace AwsMock::Database {
     bool UserPoolExists(const std::string &id);
 
     /**
-     * Check existence of cognito
-     *
-     * @param function AWS function
-     * @return true if cognito already exists
-     * @throws DatabaseException
-     */
-    //bool CognitoExists(const std::string &function);
-
-    /**
-     * Check existence of cognito
-     *
-     * @param arn AWS ARN
-     * @return true if cognito exists
-     * @throws DatabaseException
-     */
-    //bool CognitoExistsByArn(const std::string &arn);
-
-    /**
      * Create a new cognito function
      *
      * @param userPool cognito user pool entity to create
@@ -76,20 +58,20 @@ namespace AwsMock::Database {
     Entity::Cognito::UserPool CreateUserPool(const Entity::Cognito::UserPool &userPool);
 
     /**
-     * Count all cognitos
+     * Count all user pools
      *
      * @param region aws-mock region.
-     * @return total number of cognitos.
+     * @return total number of user pools.
      */
-    //long CognitoCount(const std::string &region = {});
+    long CognitoCount(const std::string &region = {});
 
     /**
-     * Updates an existing cognito cognito function
+     * Updates an existing cognito user pool
      *
-     * @param cognito cognito entity
-     * @return updated cognito entity.
+     * @param userPool user pool entity
+     * @return updated cognito user pool entity.
      */
-    //Entity::Cognito::Cognito UpdateCognito(const Entity::Cognito::Cognito &cognito);
+    Entity::Cognito::UserPool UpdateUserPool(const Entity::Cognito::UserPool &userPool);
 
     /**
      * Created or updates an existing cognito function
@@ -109,22 +91,14 @@ namespace AwsMock::Database {
     Entity::Cognito::UserPool GetUserPoolById(bsoncxx::oid oid);
 
     /**
-     * Returns a cognito entity by primary key
+     * Returns a cognito user pool entity by region and name
      *
-     * @param oid cognito primary key
+     * @param region AWS region
+     * @param name cognito user pool name
      * @return cognito entity
      * @throws DatabaseException
      */
-    //Entity::Cognito::Cognito GetCognitoById(const std::string &oid);
-
-    /**
-     * Returns a cognito entity by ARN
-     *
-     * @param arn cognito ARN
-     * @return cognito entity
-     * @throws DatabaseException
-     */
-    //Entity::Cognito::Cognito GetCognitoByArn(const std::string &arn);
+    Entity::Cognito::UserPool GetUserPoolByRegionName(const std::string &region, const std::string &name);
 
     /**
      * Returns a list of cognito user pools.

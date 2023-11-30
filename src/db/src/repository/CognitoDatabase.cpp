@@ -104,26 +104,47 @@ namespace AwsMock::Database {
     }
 
   }
-/*
-  Entity::Cognito::Cognito CognitoDatabase::CreateOrUpdateCognito(const Entity::Cognito::Cognito &cognito) {
+
+  Entity::Cognito::UserPool CognitoDatabase::GetUserPoolByRegionName(const std::string &region, const std::string &name) {
+
+    try {
+
+      mongocxx::stdx::optional<bsoncxx::document::value> mResult = _userPoolCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
+      if (!mResult) {
+        _logger.error() << "Database exception: Cognito not found " << std::endl;
+        throw Core::DatabaseException("Database exception, Cognito not found ", 500);
+      }
+
+      Entity::Cognito::UserPool result;
+      result.FromDocument(mResult);
+      return result;
+
+    } catch (const mongocxx::exception &exc) {
+      _logger.error() << "Database exception " << exc.what() << std::endl;
+      throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+    }
+
+  }
+
+  /*  Entity::Cognito::Cognito CognitoDatabase::CreateOrUpdateCognito(const Entity::Cognito::Cognito &cognito) {
 
     if (CognitoExists(cognito)) {
       return UpdateCognito(cognito);
     } else {
       return CreateCognito(cognito);
     }
-  }
+  }*/
 
-  Entity::Cognito::Cognito CognitoDatabase::UpdateCognito(const Entity::Cognito::Cognito &cognito) {
+  Entity::Cognito::UserPool CognitoDatabase::UpdateUserPool(const Entity::Cognito::UserPool &userPool) {
 
     if (HasDatabase()) {
 
       try {
-        auto result = _cognitoCollection.replace_one(make_document(kvp("region", cognito.region), kvp("function", cognito.function), kvp("runtime", cognito.runtime)), cognito.ToDocument());
+        auto result = _userPoolCollection.replace_one(make_document(kvp("region", userPool.region), kvp("name", userPool.name)), userPool.ToDocument());
 
-        log_trace_stream(_logger) << "cognito updated: " << cognito.ToString() << std::endl;
+        log_trace_stream(_logger) << "Cognito user pool updated: " << userPool.ToString() << std::endl;
 
-        return GetCognitoByArn(cognito.arn);
+        return GetUserPoolByRegionName(userPool.region, userPool.name);
 
       } catch (const mongocxx::exception &exc) {
         _logger.error() << "Database exception " << exc.what() << std::endl;
@@ -132,10 +153,10 @@ namespace AwsMock::Database {
 
     } else {
 
-      return _memoryDb.UpdateCognito(cognito);
+      return _memoryDb.UpdateUserPool(userPool);
 
     }
-  }*/
+  }
 
   std::vector<Entity::Cognito::UserPool> CognitoDatabase::ListUserPools(const std::string &region) {
 
