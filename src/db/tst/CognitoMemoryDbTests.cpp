@@ -2,8 +2,8 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_CORE_COGNITODATABASETEST_H
-#define AWMOCK_CORE_COGNITODATABASETEST_H
+#ifndef AWMOCK_CORE_COGNITOMEMORYDBTEST_H
+#define AWMOCK_CORE_COGNITOMEMORYDBTEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
@@ -18,7 +18,7 @@
 
 namespace AwsMock::Database {
 
-  class CognitoDatabaseDbTest : public ::testing::Test {
+  class CognitoMemoryDbTest : public ::testing::Test {
 
   protected:
 
@@ -33,11 +33,11 @@ namespace AwsMock::Database {
 
     std::string _region;
     std::string _accountId;
-    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration();
+    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
     CognitoDatabase _cognitoDatabase = CognitoDatabase(_configuration);
   };
 
-  TEST_F(CognitoDatabaseDbTest, UserPoolCreateTest) {
+  TEST_F(CognitoMemoryDbTest, UserPoolCreateTest) {
 
     // arrange
     Entity::Cognito::UserPool userPool = {.region=_region, .id=USER_POOL_ID, .name=USER_POOL_NAME};
@@ -50,7 +50,7 @@ namespace AwsMock::Database {
     EXPECT_TRUE(result.id.length() > 0);
   }
 
-  TEST_F(CognitoDatabaseDbTest, ListUserPoolsTest) {
+  TEST_F(CognitoMemoryDbTest, ListUserPoolsTest) {
 
     // arrange
     Entity::Cognito::UserPool userPool = {.region=_region, .id=USER_POOL_ID, .name=USER_POOL_NAME};
@@ -64,7 +64,7 @@ namespace AwsMock::Database {
     EXPECT_EQ(1, result.size());
   }
 
-  TEST_F(CognitoDatabaseDbTest, UserPoolExistsTest) {
+  TEST_F(CognitoMemoryDbTest, UserPoolExistsTest) {
 
     // arrange
     Entity::Cognito::UserPool userPool = {.region=_region, .id=USER_POOL_ID, .name=USER_POOL_NAME};
@@ -77,7 +77,7 @@ namespace AwsMock::Database {
     EXPECT_TRUE(result);
   }
 
-  TEST_F(CognitoDatabaseDbTest, UserPoolUpdateTest) {
+  TEST_F(CognitoMemoryDbTest, UserPoolUpdateTest) {
 
     // arrange
     Entity::Cognito::UserPool userPool = {.region=_region, .id=USER_POOL_ID, .name=USER_POOL_NAME};
@@ -91,7 +91,7 @@ namespace AwsMock::Database {
     EXPECT_TRUE(updateUserPoolResult.id == std::string(USER_POOL_NAME) + "2");
   }
 
-  TEST_F(CognitoDatabaseDbTest, DeleteUserPoolTest) {
+  TEST_F(CognitoMemoryDbTest, DeleteUserPoolTest) {
 
     // arrange
     Entity::Cognito::UserPool userPool = {.region=_region, .id=USER_POOL_ID, .name=USER_POOL_NAME};
@@ -107,4 +107,4 @@ namespace AwsMock::Database {
 
 } // namespace AwsMock::Core
 
-#endif // AWMOCK_CORE_COGNITODATABASETEST_H
+#endif // AWMOCK_CORE_COGNITOMEMORYDBTEST_H
