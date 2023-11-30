@@ -8,8 +8,10 @@ RUN git clone https://github.com/jensvogt/aws-mock.git && \
     cmake --build . --config Release && \
     cmake --install . --prefix /usr
 
+# Cleanup
 RUN apk del gcc g++ cmake ccache make linux-headers curl-dev openssl-dev libarchive-dev gtest-dev libtbb-dev asio-dev \
     gtest-dev
+RUN rm -rf /usr/src
 
 # Make dirctories
 RUN mkdir -p /tmp/awsmock/data/s3 && \
