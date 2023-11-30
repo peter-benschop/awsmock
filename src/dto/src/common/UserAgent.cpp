@@ -6,31 +6,33 @@
 
 namespace AwsMock::Dto::Common {
 
-  void UserAgent::FromRequest(const Poco::Net::HTTPServerRequest &request) {
+  void UserAgent::FromRequest(Poco::Net::HTTPServerRequest &request) {
 
-    std::string userAgent = request["User-Agent"];
-    Poco::RegularExpression::MatchVec posVec;
-    Poco::RegularExpression pattern(R"(^([A-Za-z0-9_\-\/\.]+)\ ([A-Za-z0-9_\-\/\.]+)\ ([A-Za-z0-9_\-\/\.]+)\ ([A-Za-z0-9_\-\/\.]+)+\ ([A-Za-z0-9_\-\/\.]+)\ command\/(.*)\.(.*)$)");
-    if (!pattern.match(userAgent, 0, posVec)) {
-      throw Core::ServiceException("Could not extract user agent DTO");
+    std::vector<std::string> parts = Core::StringUtils::Split(request["User-Agent"], ' ');
+    if (parts.empty() || parts.size() < 6) {
+      throw Core::ServiceException("User parts not readable!");
+    } else {
+
+      type = UserAgentTypFromString(parts[0]);
+      if (type == UserAgentType::AWS_CLI) {
+
+        clientApplication = parts[0];
+        clientLanguage = parts[1];
+        clientOs = parts[2];
+        clientExecutableType = parts[3];
+        clientPrompt = parts[4] == "ON";
+        clientModule = Core::StringUtils::Split(parts[5], '.')[0];
+        clientCommand = Core::StringUtils::Split(parts[5], '.')[1];
+
+        if (request.has("Content-Type")) {
+          contentType = Core::StringUtils::Contains(request["Content-Type"], "json") ? "json" : "xml";
+        }
+      }
     }
-
-    clientApplication = userAgent.substr(posVec[1].offset, posVec[1].length);
-    clientLanguage = userAgent.substr(posVec[2].offset, posVec[2].length);
-    clientOs = userAgent.substr(posVec[3].offset, posVec[3].length);
-    clientExecutableType = userAgent.substr(posVec[4].offset, posVec[4].length);
-    clientPrompt = userAgent.substr(posVec[5].offset, posVec[5].length) == "ON";
-    clientModule = userAgent.substr(posVec[6].offset, posVec[6].length);
-    clientCommand = userAgent.substr(posVec[7].offset, posVec[7].length);
-
-    contentType = Core::StringUtils::Contains(request["Content-Type"], "json") ? "json" : "xml";
   }
 
-  void UserAgent::FromRequest(const Poco::Net::HTTPServerRequest &request, const std::string &service) {
+  void UserAgent::FromRequest(Poco::Net::HTTPServerRequest &request, const std::string &service) {
     FromRequest(request);
-    if (clientModule != service) {
-      throw Core::ServiceException("Request was send to the wrong service!");
-    }
   }
 
   std::string UserAgent::ToString() const {

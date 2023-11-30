@@ -1,7 +1,7 @@
 set(BINARY srv_tst)
 set(STATIC_LIB awsmocksrv)
 
-set(SOURCES SQSServiceTests.cpp SQSServerXmlTests.cpp SQSServerJsonTests.cpp SNSServiceTests.cpp S3ServiceTests.cpp
+set(SOURCES SQSServiceTests.cpp SQSServerJavaTests.cpp SQSServerCliTest.cpp SNSServiceTests.cpp S3ServiceTests.cpp
         S3ServerXmlTests.cpp S3ServerJsonTests.cpp DockerServiceTests.cpp main.cpp)
 
 # Includes

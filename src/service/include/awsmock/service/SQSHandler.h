@@ -30,13 +30,6 @@
 
 namespace AwsMock::Service {
 
-  enum class UserAgentType {
-    AWS_SDK_JAVA,
-    AWS_SDK_CPP,
-    AWS_CLI,
-    AWS_SDK_UNKNOWN
-  };
-
   /**
    * Attribute  list
    */
@@ -97,6 +90,29 @@ namespace AwsMock::Service {
      * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
      */
     void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+
+    /**
+     * HTTP Cli POST request.
+     *
+     * @param request HTTP request
+     * @param response HTTP response
+     * @param userAgent user agent string
+     * @param region AWS region
+     * @param user AWS user
+     * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+     */
+    void handlePostCli(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::UserAgent userAgent, const std::string &region, const std::string &user);
+
+    /**
+     * HTTP Java POST request.
+     *
+     * @param request HTTP request
+     * @param response HTTP response
+     * @param region AWS region
+     * @param user AWS user
+     * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+     */
+    void handlePostJava(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user);
 
     /**
      * Delete DELETE request.
@@ -161,42 +177,6 @@ namespace AwsMock::Service {
      * @return list of message attributes
      */
     std::vector<Dto::SQS::MessageAttribute> GetMessageAttributes(const std::string &payload);
-
-    /**
-     * User agent dependent extraction of the queue name.
-     *
-     * <p>Depending on the user-agent (aws-sdk-java, aws-sdk-cpp, aws-cli, etc.) the request looks totally different. AWS has no common policy how the HTTP request should look like. Therefore the request parameter must be extracted differently fpr the
-     * different user-agents.</p>.
-     *
-     * @param request HTTP request
-     * @param payload HTTP message body
-     * @return queue name
-     */
-    static std::string GetQueueName(const Poco::Net::HTTPServerRequest &request, const std::string &payload);
-
-    /**
-     * User agent dependent extraction of the queue URL
-     *
-     * <p>Depending on the user-agent (aws-sdk-java, aws-sdk-cpp, aws-cli, etc.) the request looks totally different. AWS has no common policy how the HTTP request should look like. Therefore the request parameter must be extracted differently fpr the
-     * different user-agents.</p>.
-     *
-     * @param request HTTP request
-     * @param payload HTTP message body
-     * @return queue URL
-     */
-    static std::string GetQueueUrl(const Poco::Net::HTTPServerRequest &request, const std::string &payload);
-
-    /**
-     * Extracts the user agent from the HTTP header.
-     *
-     * <p>Depending on the user-agent (aws-sdk-java, aws-sdk-cpp, aws-cli, etc.) the request looks totally different. AWS has no common policy how the HTTP request should look like. Therefore the request parameter must be extracted differently fpr the
-     * different user-agents.</p>.
-     *
-     * @param request HTTP request
-     * @param payload HTTP message body
-     * @return user agent (@see UserAgentType)
-     */
-    static UserAgentType GetUserAgent(const Poco::Net::HTTPServerRequest &request);
 
     /**
      * Logger

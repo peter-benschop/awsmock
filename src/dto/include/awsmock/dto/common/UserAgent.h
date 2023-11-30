@@ -19,6 +19,35 @@
 
 namespace AwsMock::Dto::Common {
 
+  enum class UserAgentType {
+    AWS_SDK_JAVA1,
+    AWS_SDK_JAVA2,
+    AWS_SDK_CPP,
+    AWS_CLI,
+    AWS_SDK_UNKNOWN
+  };
+
+  static std::map<UserAgentType, std::string> UserAgentTypeNames{
+      {UserAgentType::AWS_SDK_JAVA1, "aws-sdk-java/1"},
+      {UserAgentType::AWS_SDK_JAVA2, "aws-sdk-java/2"},
+      {UserAgentType::AWS_SDK_CPP, "aws-sdk-cpp/2"},
+      {UserAgentType::AWS_CLI, "aws-cli/2"},
+      {UserAgentType::AWS_SDK_UNKNOWN, ""},
+  };
+
+  [[maybe_unused]]static std::string UserAgentTypToString(UserAgentType userAgentType) {
+    return UserAgentTypeNames[userAgentType];
+  }
+
+  [[maybe_unused]]static UserAgentType UserAgentTypFromString(const std::string &userAgentType) {
+    for (auto &it : UserAgentTypeNames) {
+      if (Core::StringUtils::StartsWith(userAgentType, it.second)) {
+        return it.first;
+      }
+    }
+    return UserAgentType::AWS_SDK_UNKNOWN;
+  }
+
   struct UserAgent {
 
     /**
@@ -59,7 +88,12 @@ namespace AwsMock::Dto::Common {
     /**
      * Client content type
      */
-    std::string contentType;
+    std::string contentType = "application/xml";
+
+    /**
+     * User agent type
+     */
+    UserAgentType type;
 
     /**
      * Getś the value from the user-agent string
@@ -67,7 +101,7 @@ namespace AwsMock::Dto::Common {
      * @param request HTTP server request
      * @return UserAgent DTO
      */
-     void FromRequest(const Poco::Net::HTTPServerRequest &request);
+     void FromRequest(Poco::Net::HTTPServerRequest &request);
 
     /**
      * Getś the value from the user-agent string
@@ -76,7 +110,7 @@ namespace AwsMock::Dto::Common {
      * @param service AWS service name
      * @return UserAgent DTO
      */
-    void FromRequest(const Poco::Net::HTTPServerRequest &request, const std::string &service);
+    void FromRequest(Poco::Net::HTTPServerRequest &request, const std::string &service);
 
     /**
      * Converts the DTO to a string representation.

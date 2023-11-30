@@ -13,12 +13,13 @@ namespace AwsMock::Service {
 
       Dto::Common::UserAgent userAgent;
       userAgent.FromRequest(request, "s3");
+      //DumpRequest(request);
 
       // Get bucket key
       std::string bucket = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
       std::string key = Core::HttpUtils::GetPathParametersFromIndex(request.getURI(), 1);
 
-      if (userAgent.clientCommand == "ls") {
+      if (userAgent.clientCommand == "ls" || userAgent.clientCommand == "rm") {
 
         if (bucket.empty() && key.empty()) {
 
@@ -65,7 +66,6 @@ namespace AwsMock::Service {
         }
 
       } else if (userAgent.clientCommand == "cp") {
-
 
         // Get object request
         log_debug_stream(_logger) << "S3 get object request, bucket: " << bucket << " key: " << key << std::endl;

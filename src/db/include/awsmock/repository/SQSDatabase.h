@@ -123,7 +123,7 @@ namespace AwsMock::Database {
      * @return queue entity
      * @throws DatabaseException
      */
-    Entity::SQS::Queue GetQueueByUrl(const std::string &queueUrl);
+    Entity::SQS::Queue GetQueueByUrl(const std::string &region, const std::string &queueUrl);
 
     /**
      * List all available queues

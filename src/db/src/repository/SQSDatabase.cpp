@@ -140,12 +140,12 @@ namespace AwsMock::Database {
     return result;
   }
 
-  Entity::SQS::Queue SQSDatabase::GetQueueByUrl(const std::string &queueUrl) {
+  Entity::SQS::Queue SQSDatabase::GetQueueByUrl(const std::string &region, const std::string &queueUrl) {
 
     Entity::SQS::Queue result;
     if (HasDatabase()) {
 
-      mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("queueUrl", make_document(kvp("$regex", queueUrl)))));
+      mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
       if (!mResult) {
         return {};
       }
@@ -187,7 +187,7 @@ namespace AwsMock::Database {
     if (HasDatabase()) {
 
       if (region.empty()) {
-        auto queueCursor  = _queueCollection.find({});
+        auto queueCursor = _queueCollection.find({});
         for (auto queue : queueCursor) {
           Entity::SQS::Queue result;
           result.FromDocument(queue);

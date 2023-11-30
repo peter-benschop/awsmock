@@ -65,26 +65,40 @@ namespace AwsMock::Database {
     return it->second;
   }
 
-  /*
+  long CognitoMemoryDb::UserPoolCount(const std::string &region) {
+    long count = 0;
+    if (region.empty()) {
+      count = static_cast<long>(_userPools.size());
+    } else {
+      for (const auto &userPool : _userPools) {
+        if (userPool.second.region == region) {
+          count++;
+        }
+      }
+    }
 
-  Entity::Cognito::Cognito CognitoMemoryDb::UpdateCognito(const Entity::Cognito::Cognito &cognito) {
+    log_trace_stream(_logger) << "Count user pools, size: " << count << std::endl;
+    return count;
+  }
+
+  Entity::Cognito::UserPool CognitoMemoryDb::UpdateUserPool(const Entity::Cognito::UserPool &userPool) {
 
     Poco::ScopedLock lock(_userPoolMutex);
 
-    std::string region = cognito.region;
-    std::string function = cognito.function;
-    auto it = find_if(_cognitos.begin(), _cognitos.end(), [region, function](const std::pair<std::string, Entity::Cognito::Cognito> &cognito) {
-      return cognito.second.region == region && cognito.second.function == function;
+    std::string region = userPool.region;
+    std::string name = userPool.name;
+    auto it = find_if(_userPools.begin(), _userPools.end(), [region, name](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
+      return userPool.second.region == region && userPool.second.name == name;
     });
 
-    if(it == _cognitos.end()) {
-      log_error_stream(_logger) << "Update cognito failed, region: " << cognito.region << " function: " << cognito.function << std::endl;
-      throw Core::DatabaseException("Update cognito failed, region: " + cognito.region + " function: " + cognito.function);
+    if (it == _userPools.end()) {
+      log_error_stream(_logger) << "Update user pool failed, region: " << userPool.region << " name: " << userPool.name << std::endl;
+      throw Core::DatabaseException("Update cognito user pool failed, region: " + userPool.region + " name: " + userPool.name);
     }
-    _cognitos[it->first] = cognito;
-    return _cognitos[it->first];
+    _userPools[it->first] = userPool;
+    return _userPools[it->first];
   }
-*/
+
   void CognitoMemoryDb::DeleteUserPool(const std::string &id) {
     Poco::ScopedLock lock(_userPoolMutex);
 
