@@ -12,7 +12,7 @@ namespace AwsMock::Dto::SQS {
       Poco::JSON::Object rootJson;
       rootJson.set("MessageId", messageId);
       rootJson.set("MD5OfMessageBody", md5Body);
-      rootJson.set("MD5OfMessageSystemAttributes", md5Attr);
+      rootJson.set("MD5OfMessageAttributes", md5Attr);
       //rootJson.set("SequenceNumber", s);
       //rootJson.set("MD5OfMessageAttributes", );
 

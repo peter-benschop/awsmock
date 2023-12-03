@@ -9,7 +9,6 @@
 #include <string>
 #include <chrono>
 #include <ctime>
-#include <algorithm>
 
 // Poco includes
 #include <Poco/Condition.h>
@@ -163,14 +162,6 @@ namespace AwsMock::Service {
      */
     void DeleteMessageBatch(const Dto::SQS::DeleteMessageBatchRequest &request);
 
-    /**
-     * Returns the MD5 sum of all attributes.
-     *
-     * @param attributes vector of attributes
-     * @return MD5 sum of attributes string
-     */
-    static std::string GetMd5Attributes(const Dto::SQS::MessageAttributeList &attributes);
-
   private:
 
     /**
@@ -180,15 +171,6 @@ namespace AwsMock::Service {
      * @return MD5 sum of message body
      */
     std::string GetMd5Body(const std::string &body);
-
-    /**
-     * Returns a integer as byte array and fill it in the given byte array at position offset.
-     *
-     * @param n integer value
-     * @param bytes output byte array
-     * @param offset offset of the output byte array
-     */
-    static void GetIntAsByteArray(int n, unsigned char *bytes, int offset);
 
     /**
      * Logger

@@ -117,7 +117,7 @@ namespace AwsMock::Service {
     // arrange
     Dto::SQS::CreateQueueRequest queueRequest = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
     Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
-    Dto::SQS::SendMessageRequest request = {.region=REGION, .queueUrl=QUEUE_URL, .body=BODY};
+    Dto::SQS::SendMessageRequest request = {.region=REGION, .queueUrl=QUEUE_URL, .body=BODY, .messageId=Poco::UUIDGenerator().createRandom().toString()};
 
     // act
     Dto::SQS::SendMessageResponse response = _service.SendMessage(request);
@@ -168,12 +168,12 @@ namespace AwsMock::Service {
     // MessageAttribute.1.Value.StringValue=application/json
     // MessageAttribute.1.Value.DataType=String
     //
-    Dto::SQS::MessageAttribute messageAttribute = {.attributeName="contentType", .attributeValue="application/json", .type="String"};
+    Dto::SQS::MessageAttribute messageAttribute = {.name="contentType", .stringValue="application/json", .type=Dto::SQS::MessageAttributeDataType::STRING};
     std::vector<Dto::SQS::MessageAttribute> messageAttributes;
     messageAttributes.push_back(messageAttribute);
 
     // act
-    std::string md5sum = _service.GetMd5Attributes(messageAttributes);
+    std::string md5sum = Dto::SQS::MessageAttribute::GetMd5Attributes(messageAttributes);
 
     // assert
     EXPECT_TRUE("6ed5f16969b625c8d900cbd5da557e9e" == md5sum);
@@ -190,14 +190,14 @@ namespace AwsMock::Service {
     // MessageAttribute.2.Value.StringValue=42
     // MessageAttribute.2.Value.DataType=Number
     //
-    Dto::SQS::MessageAttribute messageAttribute1 = {.attributeName="contentType", .attributeValue="application/json", .type="String"};
-    Dto::SQS::MessageAttribute messageAttribute2 = {.attributeName="contentLength", .attributeValue="42", .type="Number"};
+    Dto::SQS::MessageAttribute messageAttribute1 = {.name="contentType", .stringValue="application/json", .type=Dto::SQS::MessageAttributeDataType::STRING};
+    Dto::SQS::MessageAttribute messageAttribute2 = {.name="contentLength", .stringValue="42", .type=Dto::SQS::MessageAttributeDataType::NUMBER};
     std::vector<Dto::SQS::MessageAttribute> messageAttributes;
     messageAttributes.push_back(messageAttribute1);
     messageAttributes.push_back(messageAttribute2);
 
     // act
-    std::string md5sum = _service.GetMd5Attributes(messageAttributes);
+    std::string md5sum = Dto::SQS::MessageAttribute::GetMd5Attributes(messageAttributes);
 
     // assert
     EXPECT_TRUE("ebade6c58059dfd4bbf8cee9da7465fe" == md5sum);

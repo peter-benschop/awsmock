@@ -32,10 +32,11 @@ namespace AwsMock::Database::Entity::SQS {
   using bsoncxx::document::view;
   using bsoncxx::document::value;
 
-  enum MessageAttributeType { STRING, NUMBER };
+  enum MessageAttributeType { STRING, NUMBER, BINARY };
   static std::map<MessageAttributeType, std::string> MessageAttributeTypeNames{
       {MessageAttributeType::STRING, "String"},
       {MessageAttributeType::NUMBER, "Number"},
+      {MessageAttributeType::BINARY, "Binary"},
   };
 
   [[maybe_unused]] static std::string MessageAttributeTypeToString(MessageAttributeType messageAttributeType) {
@@ -73,7 +74,7 @@ namespace AwsMock::Database::Entity::SQS {
      *
      * @return entity as MongoDB document.
      */
-    view_or_value<view, value> ToDocument() const;
+    [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
     /**
      * Converts the DTO to a string representation.

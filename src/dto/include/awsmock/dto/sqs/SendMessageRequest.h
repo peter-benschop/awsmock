@@ -60,6 +60,11 @@ namespace AwsMock::Dto::SQS {
     std::string requestId;
 
     /**
+     * Message ID
+     */
+    std::string messageId;
+
+    /**
      * Converts the JSON string to a DTO
      *
      * @param jsonString JSON string

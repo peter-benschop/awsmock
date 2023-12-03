@@ -39,7 +39,8 @@ add_library(${LIBRARY} SHARED ${SOURCES}
         include/awsmock/dto/module/Module.h
         src/Module.cpp
         include/awsmock/dto/cognito/ListUserPoolRequest.h
-        include/awsmock/dto/common/UserAgent.h)
+        include/awsmock/dto/common/UserAgent.h
+        include/awsmock/dto/sqs/MessageAttributeDataType.h)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 

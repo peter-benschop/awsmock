@@ -273,8 +273,10 @@ namespace AwsMock::Service {
     }
 
     try {
+      // Sanitize body message
+      std::string messageBody = Core::StringUtils::SanitizeUtf8(request.body);
 
-      // Get queue in case of ARN
+      // Get queue by URL
       Database::Entity::SQS::Queue queue;
       if (!request.queueUrl.empty()) {
         queue = _database->GetQueueByUrl(request.region, request.queueUrl);
@@ -287,7 +289,7 @@ namespace AwsMock::Service {
       attributes.push_back({.attributeName="ApproximateReceivedCount", .attributeValue=std::to_string(0), .attributeType=Database::Entity::SQS::MessageAttributeType::NUMBER});
       attributes.push_back({.attributeName="SenderId", .attributeValue=request.region, .attributeType=Database::Entity::SQS::MessageAttributeType::STRING});
       for (const auto &attribute : request.messageAttributes) {
-        attributes.push_back({.attributeName=attribute.attributeName, .attributeValue=attribute.attributeValue, .attributeType=Database::Entity::SQS::MessageAttributeTypeFromString(attribute.type)});
+        attributes.push_back({.attributeName=attribute.name, .attributeValue=attribute.stringValue, .attributeType=Database::Entity::SQS::MessageAttributeTypeFromString(Dto::SQS::MessageAttributeDataTypeToString(attribute.type))});
       }
 
       // Set delay
@@ -299,33 +301,32 @@ namespace AwsMock::Service {
       }
 
       // Set parameters
-      std::string messageId = Core::AwsUtils::CreateRequestId();
       std::string receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
-      std::string md5Body = GetMd5Body(request.body);
-      std::string md5Attr = GetMd5Attributes(request.messageAttributes);
+      std::string md5Body = Core::Crypto::GetMd5FromString(messageBody);
+      std::string md5Attr = Dto::SQS::MessageAttribute::GetMd5Attributes(request.messageAttributes);
 
       // Update database
       Database::Entity::SQS::Message message = _database->CreateMessage(
           {
               .region= request.region,
               .queueUrl=queue.queueUrl,
-              .body=request.body,
+              .body=messageBody,
               .status=messageStatus,
               .reset=reset,
-              .messageId=messageId,
+              .messageId=request.messageId,
               .receiptHandle=receiptHandle,
               .md5Body=md5Body,
               .md5Attr=md5Attr,
               .attributes=attributes,
           });
-      log_info_stream(_logger) << "Message send, messageId: " << messageId << " requestId: " << request.requestId << std::endl;
+      log_info_stream(_logger) << "Message send, messageId: " << request.messageId << " md5Body: " << md5Body << std::endl;
 
       return {
           .queueUrl=message.queueUrl,
           .messageId=message.messageId,
           .receiptHandle=message.receiptHandle,
-          .md5Body=message.md5Body,
-          .md5Attr=message.md5Attr,
+          .md5Body=md5Body,
+          .md5Attr=md5Attr,
           .requestId=request.requestId
       };
 
@@ -346,7 +347,7 @@ namespace AwsMock::Service {
       auto begin = std::chrono::high_resolution_clock::now();
       while (elapsed < request.waitTimeSeconds * 1000) {
 
-        _database->ReceiveMessages(queue.region, queue.queueUrl, queue.attributes.visibilityTimeout, messageList);
+        _database->ReceiveMessages(queue.region, queue.queueUrl, queue.attributes.visibilityTimeout, request.maxMessages, messageList);
         log_trace_stream(_logger) << "Messages in database, url: " << queue.queueUrl << " count: " << messageList.size() << std::endl;
 
         if (!messageList.empty()) {
@@ -420,52 +421,4 @@ namespace AwsMock::Service {
     }
   }
 
-  std::string SQSService::GetMd5Body(const std::string &body) {
-    std::string md5sum = Core::Crypto::GetMd5FromString(body);
-    log_trace_stream(_logger) << "MD5 of body: " << md5sum << std::endl;
-    return md5sum;
-  }
-
-  std::string SQSService::GetMd5Attributes(const Dto::SQS::MessageAttributeList &attributes) {
-
-    int length = 0;
-    auto *bytes = new unsigned char[4092];
-
-    // Sort the attributes by name
-    std::vector<Dto::SQS::MessageAttribute> sortedAttributes = attributes;
-    std::sort(sortedAttributes.begin(), sortedAttributes.end());
-
-    for (const auto &a : sortedAttributes) {
-
-      GetIntAsByteArray(a.attributeName.length(), bytes, length);
-      length += 4;
-      memcpy(bytes + length, a.attributeName.c_str(), a.attributeName.length());
-      length += a.attributeName.length();
-
-      GetIntAsByteArray(a.type.length(), bytes, length);
-      length += 4;
-      memcpy(bytes + length, a.type.c_str(), a.type.length());
-      length += a.type.length();
-
-      bytes[length] = (1 & 0x000000ff);
-      length += 1;
-
-      GetIntAsByteArray(a.attributeValue.length(), bytes, length);
-      length += 4;
-      memcpy(bytes + length, a.attributeValue.c_str(), a.attributeValue.length());
-      length += a.attributeValue.length();
-    }
-
-    // Calculate MD5 of byte array
-    std::string output = Core::Crypto::GetMd5FromString(std::string(reinterpret_cast<const char *>(bytes), length));
-
-    return output;
-  }
-
-  void SQSService::GetIntAsByteArray(int n, unsigned char *bytes, int offset) {
-    bytes[offset + 3] = n & 0x000000ff;
-    bytes[offset + 2] = (n & 0x0000ff00) >> 8;
-    bytes[offset + 1] = (n & 0x00ff0000) >> 16;
-    bytes[offset] = (n & 0xff000000) >> 24;
-  }
 } // namespace AwsMock::Service

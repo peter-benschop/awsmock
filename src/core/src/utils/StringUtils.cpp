@@ -178,6 +178,25 @@ namespace AwsMock::Core {
     return Poco::replace(decoded, '+', ' ');
   }
 
+  std::string StringUtils::SanitizeUtf8(const std::string &input) {
+    size_t inbytes_len = input.length();
+    char *inbuf = const_cast<char *>(input.c_str());
+
+    size_t outbytes_len = input.length();
+    char *result = static_cast<char *>(calloc(outbytes_len + 1, sizeof(char)));
+    char *outbuf = result;
+
+    iconv_t cd = iconv_open("UTF-8//IGNORE", "UTF-8");
+    if(cd == (iconv_t)-1) {
+      perror("iconv_open");
+    }
+    if(iconv(cd, &inbuf, &inbytes_len, &outbuf, &outbytes_len)) {
+      perror("iconv");
+    }
+    iconv_close(cd);
+    return {result};
+  }
+
   std::string StringUtils::ToHexString(unsigned char *input, size_t length) {
     std::stringstream ss;
     for (size_t i = 0; i < length; i++) {
