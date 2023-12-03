@@ -239,9 +239,10 @@ namespace AwsMock::Database {
      * @param region AWS region
      * @param queueUrl queue URL
      * @param visibility in seconds
+     * @param count message count to receive
      * @param messageList message list
      */
-    void ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, Entity::SQS::MessageList &messageList);
+    void ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, int count, Entity::SQS::MessageList &messageList);
 
     /**
      * Reset expired messages

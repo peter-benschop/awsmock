@@ -16,6 +16,9 @@
 #include <regex>
 #include <iomanip>
 
+// Iconv includes
+#include <iconv.h>
+
 // Poco includes
 #include <Poco/String.h>
 #include <Poco/URI.h>
@@ -269,6 +272,14 @@ namespace AwsMock::Core {
      */
     static std::string ToHexString(unsigned char *input, size_t length);
 
+    /**
+     * Sanitizes the string and removes Convert the given string to a hex encoded string.
+     *
+     * @param input input byte array
+     * @param length length of the byte array
+     * @return hex encoded string
+     */
+    static std::string SanitizeUtf8(const std::string &input);
   };
 
 } // namespace AwsMock::Core

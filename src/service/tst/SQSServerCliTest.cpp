@@ -107,7 +107,7 @@ namespace AwsMock::Service {
 
     // act
     _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("sqs", "delete-queue");
-    std::string deleteQueueRequest = "{\"QueueUrl\":\"" + createResponse.queueUrl + "\"}";
+    std::string deleteQueueRequest = R"({"QueueUrl":")" + createResponse.queueUrl + "\"}";
     curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint, _extraHeaders, deleteQueueRequest);
     EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
     Database::Entity::SQS::QueueList queueList = _database.ListQueues();
@@ -153,7 +153,7 @@ namespace AwsMock::Service {
     std::string queueUrl = getQueueUrlResponse.queueUrl;
 
     // act
-    std::string body = "{\"QueueUrl\":\"" + queueUrl + "\", \"MessageBody\":\"test\"}";
+    std::string body = R"({"QueueUrl":")" + queueUrl + R"(", "MessageBody":"test"})";
     _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("sqs", "send-message");
     curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, body);
     EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
@@ -182,7 +182,7 @@ namespace AwsMock::Service {
     getQueueUrlResponse.FromJson(curlResponse.output);
     std::string queueUrl = getQueueUrlResponse.queueUrl;
 
-    std::string body = "{\"QueueUrl\":\"" + queueUrl + "\", \"MessageBody\":\"test\"}";
+    std::string body = R"({"QueueUrl":")" + queueUrl + R"(", "MessageBody":"test"})";
     _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("sqs", "send-message");
     curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, body);
     EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
@@ -190,7 +190,7 @@ namespace AwsMock::Service {
     sendMessageResponse.FromJson(curlResponse.output);
 
     // act
-    body = "{\"QueueUrl\":\"" + queueUrl + "\"}";
+    body = R"({"QueueUrl":")" + queueUrl + "\"}";
     _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("sqs", "purge-queue");
     _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, body);
     long messageCount = _database.CountMessages(REGION, queueUrl);

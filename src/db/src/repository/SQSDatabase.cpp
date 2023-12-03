@@ -390,7 +390,7 @@ namespace AwsMock::Database {
     }
   }
 
-  void SQSDatabase::ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, Entity::SQS::MessageList &messageList) {
+  void SQSDatabase::ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, int count, Entity::SQS::MessageList &messageList) {
 
     auto reset = std::chrono::high_resolution_clock::now() + std::chrono::seconds{visibility};
 
@@ -400,9 +400,12 @@ namespace AwsMock::Database {
       session.start_transaction();
 
       try {
+        mongocxx::options::find opts;
+        opts.limit(count);
 
         // Get the cursor
-        auto messageCursor = _messageCollection.find(make_document(kvp("queueUrl", queueUrl), kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))));
+        auto messageCursor = _messageCollection.find(make_document(kvp("queueUrl", queueUrl), kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))), opts);
+
         for (auto message : messageCursor) {
 
           Entity::SQS::Message result;
@@ -628,7 +631,7 @@ namespace AwsMock::Database {
     if (HasDatabase()) {
 
       auto result = _messageCollection.delete_one(make_document(kvp("receiptHandle", message.receiptHandle)));
-      log_debug_stream(_logger) << "Messages deleted, receiptHandle: " << message.receiptHandle << " count: " << result->deleted_count() << std::endl;
+      log_debug_stream(_logger) << "Messages deleted, receiptHandle: " << Core::StringUtils::SubString(message.receiptHandle, 0, 40) << "... count: " << result->deleted_count() << std::endl;
 
     } else {
 

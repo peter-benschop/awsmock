@@ -7,33 +7,67 @@
 
 // C++ standard includes
 #include <string>
+#include <cstring>
 #include <sstream>
 #include <vector>
+#include <algorithm>
+
+// AwsMock includes
+#include <awsmock/core/CryptoUtils.h>
+#include <awsmock/dto/sqs/MessageAttributeDataType.h>
 
 namespace AwsMock::Dto::SQS {
 
   struct MessageAttribute {
 
     /**
-     * MessageAttribute name
+     * Message attribute name
      */
-    std::string attributeName;
+    std::string name;
 
     /**
-     * MessageAttribute value
+     * Message attribute string value
      */
-    std::string attributeValue;
+    std::string stringValue;
+
+    /**
+     * Message attribute binary value
+     */
+    unsigned char* binaryValue;
 
     /**
      * Logical data type
      */
-    std::string type;
+    MessageAttributeDataType type;
 
     /**
      * Transport data type
      */
     std::string transportType;
 
+    /**
+     * Returns the MD5 sum of all attributes.
+     *
+     * @param attributes vector of attributes
+     * @return MD5 sum of attributes string
+     */
+    static std::string GetMd5Attributes(const std::vector<MessageAttribute> &attributes);
+
+    /**
+     * Returns a integer as byte array and fill it in the given byte array at position offset.
+     *
+     * @param n integer value
+     * @param bytes output byte array
+     * @param offset offset of the output byte array
+     */
+    static void GetIntAsByteArray(int n, unsigned char *bytes, int offset);
+
+    /**
+     * Name comparator
+     *
+     * @param other
+     * @return
+     */
     bool operator<(const MessageAttribute &other) const;
 
     /**
