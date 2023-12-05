@@ -20,7 +20,7 @@ namespace AwsMock::Service {
 
     // Check existence
     if (_database->QueueExists(request.region, request.name)) {
-      throw Core::ServiceException("SQS queue '" + request.queueUrl + "' exists already", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+      throw Core::ServiceException("SQS queue '" + request.queueUrl + "' exists already", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
 
     try {
@@ -78,11 +78,11 @@ namespace AwsMock::Service {
   }
 
   void SQSService::PurgeQueue(const Dto::SQS::PurgeQueueRequest &request) {
-    log_trace_stream(_logger) << "Purge queue request, region: " << request.region << " queueUrl: " << request.queueUrl<< std::endl;
+    log_trace_stream(_logger) << "Purge queue request, region: " << request.region << " queueUrl: " << request.queueUrl << std::endl;
 
     // Check existence
     if (!_database->QueueUrlExists(request.region, request.queueUrl)) {
-      throw Core::ServiceException("SQS queue '" + request.queueUrl + "' does not exists",Poco::Net::HTTPResponse::HTTP_NOT_FOUND,request.resource.c_str(),request.requestId.c_str());
+      throw Core::ServiceException("SQS queue '" + request.queueUrl + "' does not exists", Poco::Net::HTTPResponse::HTTP_NOT_FOUND, request.resource.c_str(), request.requestId.c_str());
     }
 
     try {
@@ -199,11 +199,24 @@ namespace AwsMock::Service {
       log_trace_stream(_logger) << "Got queue: " << queue.ToString() << std::endl;
 
       // Reset all attributes
-      queue.attributes.policy = request.attributes["Policy"];
-      queue.attributes.redrivePolicy.FromJson(request.attributes["RedrivePolicy"]);
-      queue.attributes.redriveAllowPolicy = request.attributes["RedriveAllowPolicy"];
-      queue.attributes.messageRetentionPeriod = std::stoi(request.attributes["MessageRetentionPeriod"]);
-      queue.attributes.visibilityTimeout = std::stoi(request.attributes["VisibilityTimeout"]);
+      if (!request.attributes["Policy"].empty()) {
+        queue.attributes.policy = request.attributes["Policy"];
+      }
+      if (!request.attributes["RedrivePolicy"].empty()) {
+        queue.attributes.redrivePolicy.FromJson(request.attributes["RedrivePolicy"]);
+      }
+      if (!request.attributes["RedriveAllowPolicy"].empty()) {
+        queue.attributes.redriveAllowPolicy = request.attributes["RedriveAllowPolicy"];
+      }
+      if (!request.attributes["MessageRetentionPeriod"].empty()) {
+        queue.attributes.messageRetentionPeriod = std::stoi(request.attributes["MessageRetentionPeriod"]);
+      }
+      if (!request.attributes["VisibilityTimeout"].empty()) {
+        queue.attributes.visibilityTimeout = std::stoi(request.attributes["VisibilityTimeout"]);
+      }
+      if (!request.attributes["QueueArn"].empty()) {
+        queue.attributes.queueArn = request.attributes["QueueArn"];
+      }
 
       // Update database
       queue = _database->UpdateQueue(queue);
@@ -244,7 +257,7 @@ namespace AwsMock::Service {
     }
   }
 
-  void  SQSService::DeleteQueue(const Dto::SQS::DeleteQueueRequest &request) {
+  void SQSService::DeleteQueue(const Dto::SQS::DeleteQueueRequest &request) {
     log_trace_stream(_logger) << "Delete queue request, request: " << request.ToString() << std::endl;
 
     // Check existence
@@ -273,7 +286,7 @@ namespace AwsMock::Service {
     }
 
     try {
-      // Sanitize body message
+      // Sanitize message body
       std::string messageBody = Core::StringUtils::SanitizeUtf8(request.body);
 
       // Get queue by URL
@@ -301,6 +314,7 @@ namespace AwsMock::Service {
       }
 
       // Set parameters
+      std::string messageId = Core::AwsUtils::CreateMessageId();
       std::string receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
       std::string md5Body = Core::Crypto::GetMd5FromString(messageBody);
       std::string md5Attr = Dto::SQS::MessageAttribute::GetMd5Attributes(request.messageAttributes);
@@ -313,7 +327,7 @@ namespace AwsMock::Service {
               .body=messageBody,
               .status=messageStatus,
               .reset=reset,
-              .messageId=request.messageId,
+              .messageId=messageId,
               .receiptHandle=receiptHandle,
               .md5Body=md5Body,
               .md5Attr=md5Attr,

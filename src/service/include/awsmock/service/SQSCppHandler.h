@@ -2,8 +2,8 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_SQSHANDLER_H
-#define AWSMOCK_SERVICE_SQSHANDLER_H
+#ifndef AWSMOCK_SERVICE_SQSCPPHANDLER_H
+#define AWSMOCK_SERVICE_SQSCPPHANDLER_H
 
 // Poco includes
 #include <Poco/Condition.h>
@@ -24,9 +24,6 @@
 #include <awsmock/dto/sqs/DeleteMessageBatchRequest.h>
 #include <awsmock/service/AbstractHandler.h>
 #include <awsmock/service/SQSService.h>
-#include <awsmock/service/SQSCliHandler.h>
-#include <awsmock/service/SQSCppHandler.h>
-#include <awsmock/service/SQSJava2Handler.h>
 
 #define DEFAULT_SQS_ENDPOINT "localhost:4566"
 #define DEFAULT_SQS_ACCOUNT_ID "000000000000"
@@ -46,7 +43,7 @@ namespace AwsMock::Service {
    *
    * @author jens.vogt@opitz-consulting.com
    */
-  class SQSHandler : public SQSCliHandler, public SQSCppHandler, public SQSJava2Handler {
+  class SQSCppHandler : public virtual AbstractHandler {
 
   public:
 
@@ -57,7 +54,7 @@ namespace AwsMock::Service {
      * @param metricService monitoring module
      * @param condition stop condition
      */
-    SQSHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
+    SQSCppHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
 
   protected:
 
@@ -95,6 +92,29 @@ namespace AwsMock::Service {
     void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
     /**
+     * HTTP Cli POST request.
+     *
+     * @param request HTTP request
+     * @param response HTTP response
+     * @param userAgent user agent string
+     * @param region AWS region
+     * @param user AWS user
+     * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+     */
+    void handlePostCli(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::UserAgent userAgent, const std::string &region, const std::string &user);
+
+    /**
+     * HTTP Java POST request.
+     *
+     * @param request HTTP request
+     * @param response HTTP response
+     * @param region AWS region
+     * @param user AWS user
+     * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+     */
+    void handlePostJava(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user);
+
+    /**
      * Delete DELETE request.
      *
      * @param request HTTP request
@@ -127,11 +147,68 @@ namespace AwsMock::Service {
   private:
 
     /**
+     * Get the queue attributes.
+     *
+     * @param payload HTTP body
+     * @return list of queue attributes
+     */
+    std::vector<Dto::SQS::QueueAttribute> GetQueueAttributes(const std::string &payload);
+
+    /**
+     * Get the queue tags.
+     *
+     * @param payload HTTP body
+     * @return list of queue tags
+     */
+    std::map<std::string, std::string> GetQueueTags(const std::string &payload);
+
+    /**
+     * Get the queue attribute names.
+     *
+     * @param payload HTTP body
+     * @return list of queue attribute names
+     */
+    std::vector<std::string> GetQueueAttributeNames(const std::string &payload);
+
+    /**
+     * Get the message attributes.
+     *
+     * @param payload HTTP body
+     * @return list of message attributes
+     */
+    std::vector<Dto::SQS::MessageAttribute> GetMessageAttributes(const std::string &payload);
+
+    /**
      * Logger
      */
     Core::LogStream _logger;
+
+    /**
+     * ImageHandler import configuration
+     */
+    Core::Configuration &_configuration;
+
+    /**
+     * Metric module
+     */
+    Core::MetricService &_metricService;
+
+    /**
+     * SQS module
+     */
+    Service::SQSService _sqsService;
+
+    /**
+     * Default account ID
+     */
+    std::string _accountId;
+
+    /**
+     * Default endpoint
+     */
+    std::string _endpoint;
   };
 
 } // namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_SQSHANDLER_H
+#endif // AWSMOCK_SERVICE_SQSCPPHANDLER_H

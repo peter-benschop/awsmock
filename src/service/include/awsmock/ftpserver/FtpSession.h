@@ -29,7 +29,7 @@
 #include <awsmock/ftpserver/FtpUser.h>
 #include <awsmock/service/AbstractWorker.h>
 
-#define DEFAULT_BASE_DIR "/home/awsmock/data/transfer"
+#define DEFAULT_BASE_DIR "/tmp/awsmock/data/transfer"
 
 namespace AwsMock::FtpServer {
 

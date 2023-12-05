@@ -62,7 +62,7 @@ namespace AwsMock::Service {
       }
 
     } catch (Poco::Exception &exc) {
-      SendErrorResponse("Cognito", response, exc);
+      SendXmlErrorResponse("Cognito", response, exc);
     }
   }
 

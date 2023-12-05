@@ -6,6 +6,7 @@
 
 namespace AwsMock::Dto::SQS {
 
+  // NOLINTNEXTLINE(cppcoreguidelines-interfaces-global-init)
   Core::LogStream GetQueueAttributesResponse::_logger = Core::LogStream(Poco::Logger::get("GetQueueAttributesResponse"));
 
   std::string GetQueueAttributesResponse::ToJson() const {
@@ -25,7 +26,8 @@ namespace AwsMock::Dto::SQS {
       return os.str();
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      log_error_stream(_logger) << "SQS JSON serialization exception: " << exc.message() << std::endl;
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -78,9 +80,9 @@ namespace AwsMock::Dto::SQS {
 
       return output.str();
     } catch (Poco::Exception &exc) {
-      log_error_stream(_logger) << "SQS XML conversion error: " << exc.message() << std::endl;
+      log_error_stream(_logger) << "SQS XML serialization exception: " << exc.message() << std::endl;
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
-    return {};
   }
 
   std::string GetQueueAttributesResponse::ToString() const {

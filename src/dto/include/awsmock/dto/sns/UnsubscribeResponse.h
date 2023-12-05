@@ -36,7 +36,7 @@ namespace AwsMock::Dto::SNS {
      *
      * @return XML string
      */
-    [[nodiscard]] static std::string ToXml();
+    [[nodiscard]] std::string ToXml();
 
     /**
      * Converts the DTO to a string representation.

@@ -2,8 +2,8 @@
 // Created by vogje01 on 21/10/2023.
 //
 
-#ifndef AWMOCK_SQS_JAVA_SERVERTEST_H
-#define AWMOCK_SQS_JAVA_SERVERTEST_H
+#ifndef AWMOCK_SQS_CLI_INTEGRATIONTEST_H
+#define AWMOCK_SQS_CLI_INTEGRATIONTEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
@@ -20,180 +20,185 @@
 
 #define REGION "eu-central-1"
 #define OWNER "test-owner"
-#define MESSAGE "{\"test-attribute\":\"test-value\"}"
-#define VERSION std::string("2012-11-05")
-#define CREATE_QUEUE_REQUEST "{\"QueueName\":\"TestQueue\"}"
-#define LIST_QUEUE_REQUEST "Action=ListQueues"
-#define GET_QUEUE_URL_REQUEST "{\"QueueName\":\"TestQueue\"}"
-#define SEND_MESSAGE_REQUEST "{\"QueueName\":\"TestQueue\", \"MessageBody\":\"testattribute\"}"
+#define SQS_ACCOUNT_ID "000000000000"
+#define TEST_QUEUE std::string("test-queue")
 
 namespace AwsMock::Service {
 
-  class SQSServerCliTest : public ::testing::Test {
+  class SQSServerCliIntegrationTest : public ::testing::Test {
 
   protected:
 
     void SetUp() override {
 
-      // Set HTTP headers
-      _extraHeaders["Authorization"] = Core::AwsUtils::GetAuthorizationHeader(_configuration, "sqs");
-      _extraHeaders["Content-Type"] = Core::AwsUtils::GetContentTypeHeader("json");
-
       // Define endpoint. This is the endpoint of the SQS server, not the gateway
-      std::string _port = _configuration.getString("awsmock.module.sqs.port", std::to_string(SQS_DEFAULT_PORT));
-      std::string _host = _configuration.getString("awsmock.module.sqs.host", SQS_DEFAULT_HOST);
+      std::string _port = _configuration.getString("awsmock.service.sqs.port", std::to_string(SQS_DEFAULT_PORT));
+      std::string _host = _configuration.getString("awsmock.service.sqs.host", SQS_DEFAULT_HOST);
+      _configuration.setString("awsmock.service.gateway.port", _port);
+      _accountId = _configuration.getString("awsmock.account.id", SQS_ACCOUNT_ID);
       _endpoint = "http://" + _host + ":" + _port;
+      _queueUrl = "http://" + _host + ":" + _port + "/" + _accountId + "/" + TEST_QUEUE;
 
       // Start HTTP manager
       Poco::ThreadPool::defaultPool().start(_sqsServer);
-      while (!_sqsServer.IsRunning()) {
-        Poco::Thread::sleep(1000);
-      }
     }
 
     void TearDown() override {
-      _sqsServer.StopServer();
+      _database.DeleteAllMessages();
       _database.DeleteAllQueues();
+      _sqsServer.StopServer();
     }
 
-    Core::CurlUtils _curlUtils;
-    std::string _endpoint;
-    std::map<std::string, std::string> _extraHeaders;
+    std::string GetReceiptHandle(const std::string &jsonString) {
+
+      std::string receiptHandle;
+      Poco::JSON::Parser parser;
+      Poco::Dynamic::Var result = parser.parse(jsonString);
+      const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+
+      try {
+        Poco::JSON::Array::Ptr messageArray = rootObject->getArray("Messages");
+
+        if (messageArray != nullptr) {
+          for (const auto &it : *messageArray) {
+            Poco::JSON::Object::Ptr object =  it.extract<Poco::JSON::Object::Ptr>();
+            Core::JsonUtils::GetJsonValueString("ReceiptHandle", object, receiptHandle);
+          }
+        }
+      } catch (Poco::Exception &exc) {
+        throw Core::ServiceException(exc.message(), 500);
+      }
+      return receiptHandle;
+    }
+
+    std::string _endpoint, _queueUrl, _accountId;
     Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration();
     Core::MetricService _metricService = Core::MetricService(_configuration);
     Database::SQSDatabase _database = Database::SQSDatabase(_configuration);
     SQSServer _sqsServer = SQSServer(_configuration, _metricService);
   };
 
-  TEST_F(SQSServerCliTest, QueueCreateTest) {
+  TEST_F(SQSServerCliIntegrationTest, QueueCreateTest) {
 
     // arrange
 
     // act
-    _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("sqs", "create-queue");
-    Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
+    Core::ExecResult result = Core::TestUtils::SendCliCommand("sqs", "aws sqs create-queue --queue-name " + TEST_QUEUE + " --endpoint " + _endpoint);
     Database::Entity::SQS::QueueList queueList = _database.ListQueues();
 
     // assert
-    EXPECT_TRUE(response.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
+    EXPECT_EQ(0, result.status);
     EXPECT_EQ(1, queueList.size());
+    EXPECT_TRUE(Core::StringUtils::Contains(result.output, TEST_QUEUE));
   }
 
-  TEST_F(SQSServerCliTest, QueueListTest) {
+  TEST_F(SQSServerCliIntegrationTest, QueueListTest) {
 
     // arrange
-    _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("sqs", "create-queue");
-    Core::CurlResponse createResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
-    EXPECT_TRUE(createResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
+    Core::ExecResult createResult = Core::TestUtils::SendCliCommand("sqs", "aws sqs create-queue --queue-name " + TEST_QUEUE + " --endpoint " + _endpoint);
+    EXPECT_EQ(0, createResult.status);
 
     // act
-    _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("sqs", "list-queues");
-    Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, LIST_QUEUE_REQUEST);
-    EXPECT_TRUE(createResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
+    Core::ExecResult result = Core::TestUtils::SendCliCommand("sqs", "aws sqs list-queues --endpoint " + _endpoint);
 
     // assert
-    EXPECT_TRUE(response.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
-    EXPECT_TRUE(Core::StringUtils::Contains(response.output, "TestQueue"));
+    EXPECT_EQ(0, result.status);
+    EXPECT_TRUE(Core::StringUtils::Contains(result.output, TEST_QUEUE));
   }
 
-  TEST_F(SQSServerCliTest, QueueDeleteTest) {
+  TEST_F(SQSServerCliIntegrationTest, QueueGetUrlTest) {
 
     // arrange
-    _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("sqs", "create-queue");
-    Core::CurlResponse curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
-    EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
-    Dto::SQS::CreateQueueResponse createResponse;
-    createResponse.FromJson(curlResponse.output);
+    Core::ExecResult createResult = Core::TestUtils::SendCliCommand("sqs", "aws sqs create-queue --queue-name " + TEST_QUEUE + " --endpoint " + _endpoint);
+    EXPECT_EQ(0, createResult.status);
 
     // act
-    _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("sqs", "delete-queue");
-    std::string deleteQueueRequest = R"({"QueueUrl":")" + createResponse.queueUrl + "\"}";
-    curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint, _extraHeaders, deleteQueueRequest);
-    EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
+    Core::ExecResult result = Core::TestUtils::SendCliCommand("sqs", "aws sqs get-queue-url --queue-name " + TEST_QUEUE + " --endpoint " + _endpoint);
+
+    // assert
+    EXPECT_EQ(0, result.status);
+    EXPECT_TRUE(Core::StringUtils::Contains(result.output, _queueUrl));
+  }
+
+  TEST_F(SQSServerCliIntegrationTest, QueuePurgeTest) {
+
+    // arrange
+    Core::ExecResult createResult = Core::TestUtils::SendCliCommand("sqs", "aws sqs create-queue --queue-name " + TEST_QUEUE + " --endpoint " + _endpoint);
+    EXPECT_EQ(0, createResult.status);
+
+    Core::ExecResult sendResult = Core::TestUtils::SendCliCommand("sqs", "aws sqs send-message --queue-url " + _queueUrl + " --message-body TEST-BODY --endpoint " + _endpoint);
+    EXPECT_EQ(0, createResult.status);
+
+    // act
+    Core::ExecResult result = Core::TestUtils::SendCliCommand("sqs", "aws sqs purge-queue --queue-url " + _queueUrl + " --endpoint " + _endpoint);
+    long messageCount = _database.CountMessages(REGION, _queueUrl);
+
+    // assert
+    EXPECT_EQ(0, messageCount);
+  }
+
+  TEST_F(SQSServerCliIntegrationTest, QueueDeleteTest) {
+
+    // arrange
+    Core::ExecResult createResult = Core::TestUtils::SendCliCommand("sqs", "aws sqs create-queue --queue-name " + TEST_QUEUE + " --endpoint " + _endpoint);
+    EXPECT_EQ(0, createResult.status);
+
+    // act
+    Core::ExecResult result = Core::TestUtils::SendCliCommand("sqs", "aws sqs delete-queue --queue-url " + _queueUrl + " --endpoint " + _endpoint);
     Database::Entity::SQS::QueueList queueList = _database.ListQueues();
 
     // assert
+    EXPECT_EQ(0, result.status);
     EXPECT_EQ(0, queueList.size());
   }
 
-  TEST_F(SQSServerCliTest, QueueGetUrlTest) {
+  TEST_F(SQSServerCliIntegrationTest, MessageSendTest) {
 
     // arrange
-    _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("sqs", "create-queue");
-    Core::CurlResponse curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
-    EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
-    Dto::SQS::CreateQueueResponse createResponse;
-    createResponse.FromJson(curlResponse.output);
+    Core::ExecResult createResult = Core::TestUtils::SendCliCommand("sqs", "aws sqs create-queue --queue-name " + TEST_QUEUE + " --endpoint " + _endpoint);
+    EXPECT_EQ(0, createResult.status);
 
     // act
-    _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("sqs", "get-queue-url");
-    curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, GET_QUEUE_URL_REQUEST);
-    EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
-    Dto::SQS::GetQueueUrlResponse getQueueUrlResponse;
-    getQueueUrlResponse.FromJson(curlResponse.output);
+    Core::ExecResult result = Core::TestUtils::SendCliCommand("sqs", "aws sqs send-message --queue-url " + _queueUrl + " --message-body TEST-BODY --endpoint " + _endpoint);
+    long messageCount = _database.CountMessages(REGION, _queueUrl);
 
     // assert
-    EXPECT_TRUE(Core::StringUtils::Contains(getQueueUrlResponse.queueUrl, "TestQueue"));
-  }
-
-  TEST_F(SQSServerCliTest, MessageSendTest) {
-
-    // arrange
-    _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("sqs", "create-queue");
-    Core::CurlResponse curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
-    EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
-    Dto::SQS::CreateQueueResponse createResponse;
-    createResponse.FromJson(curlResponse.output);
-
-    _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("sqs", "get-queue-url");
-    curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, GET_QUEUE_URL_REQUEST);
-    EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
-    Dto::SQS::GetQueueUrlResponse getQueueUrlResponse;
-    getQueueUrlResponse.FromJson(curlResponse.output);
-    std::string queueUrl = getQueueUrlResponse.queueUrl;
-
-    // act
-    std::string body = R"({"QueueUrl":")" + queueUrl + R"(", "MessageBody":"test"})";
-    _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("sqs", "send-message");
-    curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, body);
-    EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
-    Dto::SQS::SendMessageResponse sendMessageResponse;
-    sendMessageResponse.FromJson(curlResponse.output);
-    long messageCount = _database.CountMessages(REGION, queueUrl);
-
-    // assert
-    EXPECT_FALSE(sendMessageResponse.messageId.empty());
+    EXPECT_EQ(0, result.status);
     EXPECT_EQ(1, messageCount);
   }
 
-  TEST_F(SQSServerCliTest, QueuePurgeTest) {
+  TEST_F(SQSServerCliIntegrationTest, MessageReceiveTest) {
 
     // arrange
-    _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("sqs", "create-queue");
-    Core::CurlResponse curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, CREATE_QUEUE_REQUEST);
-    EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
-    Dto::SQS::CreateQueueResponse createResponse;
-    createResponse.FromJson(curlResponse.output);
-
-    _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("sqs", "get-queue-url");
-    curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, GET_QUEUE_URL_REQUEST);
-    EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
-    Dto::SQS::GetQueueUrlResponse getQueueUrlResponse;
-    getQueueUrlResponse.FromJson(curlResponse.output);
-    std::string queueUrl = getQueueUrlResponse.queueUrl;
-
-    std::string body = R"({"QueueUrl":")" + queueUrl + R"(", "MessageBody":"test"})";
-    _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("sqs", "send-message");
-    curlResponse = _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, body);
-    EXPECT_TRUE(curlResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
-    Dto::SQS::SendMessageResponse sendMessageResponse;
-    sendMessageResponse.FromJson(curlResponse.output);
+    Core::ExecResult createResult = Core::TestUtils::SendCliCommand("sqs", "aws sqs create-queue --queue-name " + TEST_QUEUE + " --endpoint " + _endpoint);
+    EXPECT_EQ(0, createResult.status);
+    Core::ExecResult sendResult = Core::TestUtils::SendCliCommand("sqs", "aws sqs send-message --queue-url " + _queueUrl + " --message-body TEST-BODY --endpoint " + _endpoint);
+    EXPECT_EQ(0, sendResult.status);
 
     // act
-    body = R"({"QueueUrl":")" + queueUrl + "\"}";
-    _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("sqs", "purge-queue");
-    _curlUtils.SendHttpRequest("POST", _endpoint + "/", _extraHeaders, body);
-    long messageCount = _database.CountMessages(REGION, queueUrl);
+    Core::ExecResult result = Core::TestUtils::SendCliCommand("sqs", "aws sqs receive-message --queue-url " + _queueUrl + " --endpoint " + _endpoint);
+
+    // assert
+    EXPECT_EQ(0, result.status);
+    EXPECT_TRUE(result.output.length() > 0);
+    EXPECT_TRUE(Core::StringUtils::Contains(result.output, "Messages"));
+  }
+
+  TEST_F(SQSServerCliIntegrationTest, MessageDeleteTest) {
+
+    // arrange
+    Core::ExecResult createResult = Core::TestUtils::SendCliCommand("sqs", "aws sqs create-queue --queue-name " + TEST_QUEUE + " --endpoint " + _endpoint);
+    EXPECT_EQ(0, createResult.status);
+    Core::ExecResult sendResult = Core::TestUtils::SendCliCommand("sqs", "aws sqs send-message --queue-url " + _queueUrl + " --message-body TEST-BODY --endpoint " + _endpoint);
+    EXPECT_EQ(0, createResult.status);
+    Core::ExecResult receiveResult = Core::TestUtils::SendCliCommand("sqs", "aws sqs receive-message --queue-url " + _queueUrl + " --endpoint " + _endpoint);
+    EXPECT_EQ(0, receiveResult.status);
+    std::string receiptHandle = GetReceiptHandle(receiveResult.output);
+
+    // act
+    Core::ExecResult result = Core::TestUtils::SendCliCommand("sqs", "aws sqs delete-message --queue-url " + _queueUrl + " --receipt-handle " + receiptHandle + " --endpoint " + _endpoint);
+    EXPECT_EQ(0, receiveResult.status);
+    long messageCount = _database.CountMessages(REGION, _queueUrl);
 
     // assert
     EXPECT_EQ(0, messageCount);
@@ -201,4 +206,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Core
 
-#endif // AWMOCK_SQS_JAVA_SERVERTEST_H
+#endif // AWMOCK_SQS_CLI_INTEGRATIONTEST_H

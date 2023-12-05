@@ -32,7 +32,7 @@ namespace AwsMock::Core {
 
     std::string basePath = GetBasePath(uri);
     std::vector<std::string> parameters = StringUtils::Split(basePath, '/');
-    return Core::StringUtils::Join(parameters, '/', 1);
+    return Core::StringUtils::Join(parameters, '/', index);
   }
 
   std::vector<std::string> HttpUtils::GetPathParameters(const std::string &uri) {

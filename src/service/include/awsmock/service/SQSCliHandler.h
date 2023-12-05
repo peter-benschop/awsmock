@@ -2,51 +2,48 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_S3HANDLER_H
-#define AWSMOCK_SERVICE_S3HANDLER_H
+#ifndef AWSMOCK_SERVICE_SQSCLIHANDLER_H
+#define AWSMOCK_SERVICE_SQSCLIHANDLER_H
 
 // Poco includes
-#include "Poco/DateTime.h"
-#include "Poco/DateTimeFormat.h"
-#include "Poco/DateTimeFormatter.h"
+#include <Poco/Condition.h>
+#include <Poco/DateTime.h>
+#include <Poco/DateTimeFormat.h>
+#include <Poco/DateTimeFormatter.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/HttpUtils.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/MetricService.h>
 #include <awsmock/core/MetricServiceTimer.h>
 #include <awsmock/core/MetricDefinition.h>
-#include <awsmock/core/NumberUtils.h>
-#include "awsmock/dto/common/UserAgent.h"
+#include <awsmock/dto/sqs/GetQueueUrlRequest.h>
+#include <awsmock/dto/sqs/GetQueueUrlResponse.h>
+#include <awsmock/dto/sqs/DeleteMessageBatchEntry.h>
+#include <awsmock/dto/sqs/DeleteMessageBatchRequest.h>
 #include <awsmock/service/AbstractHandler.h>
-#include <awsmock/service/S3Service.h>
-#include <awsmock/service/S3CliHandler.h>
-#include <awsmock/service/S3CppHandler.h>
-#include <awsmock/service/S3Java2Handler.h>
+#include <awsmock/service/SQSService.h>
+
+#define DEFAULT_SQS_ENDPOINT "localhost:4566"
+#define DEFAULT_SQS_ACCOUNT_ID "000000000000"
 
 namespace AwsMock::Service {
 
   /**
-   * AWS S3 mock handler
-   *
-   * <p>AWS S3 HTTP request handler. All S3 related REST call are ending here. Depending on the request header the S3 module will be selected in case the
-   * authorization header contains the S3 module.<p>
-   *
-   * <p><h3>GET Requests</h3>
-   * <ul>
-   * <li>S3 bucket list command: <pre>aws s3 ls --endpoint http://localhost:4567</pre></li>
-   * <li>S3 object list command: <pre>aws s3 ls s3://example-bucket --recursive --endpoint http://localhost:4567</pre></li>
-   * </ul>
-   * </p>
-   * <p><h3>POST Requests</h3>
-   * <ul>
-   * <li>Bigfile (>4MB) Initial Multipart upload: <pre>aws cp example.txt s3://example-bucket/test/example.txt --endpoint http://localhost:4567</pre></li>
-   * <li>Upload part</li>
-   * <li>Complete Multipart upload</li>
-   * </ul>
-   * <p>
+   * Attribute  list
    */
-  class S3Handler : public S3CliHandler, public S3CppHandler, public S3Java2Handler {
+  typedef std::map<std::string, std::string> AttributeList;
+
+  /**
+   * AWS S3 mock handler.
+   *
+   * <p>The SQS request are coming in two different flavours. Using the AWS CLI the queue URL is part of the HTTP parameters in the body of the message. Both are
+   * using POST request, whereas the Java SDK is providing the queue-url as part of the HTTP URL in the header of the request.</p>
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
+  class SQSCliHandler : public virtual AbstractHandler {
 
   public:
 
@@ -55,8 +52,9 @@ namespace AwsMock::Service {
      *
      * @param configuration application configuration
      * @param metricService monitoring module
+     * @param condition stop condition
      */
-    S3Handler(Core::Configuration &configuration, Core::MetricService &metricService);
+    SQSCliHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
 
   protected:
 
@@ -65,7 +63,7 @@ namespace AwsMock::Service {
      *
      * @param request HTTP request
      * @param response HTTP response
-     * @param region AWS region name
+     * @param region AWS region
      * @param user AWS user
      * @see AbstractResource::handleGet(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
      */
@@ -76,7 +74,7 @@ namespace AwsMock::Service {
      *
      * @param request HTTP request
      * @param response HTTP response
-     * @param region AWS region name
+     * @param region AWS region
      * @param user AWS user
      * @see AbstractResource::handlePut(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
      */
@@ -87,7 +85,7 @@ namespace AwsMock::Service {
      *
      * @param request HTTP request
      * @param response HTTP response
-     * @param region AWS region name
+     * @param region AWS region
      * @param user AWS user
      * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
      */
@@ -98,7 +96,7 @@ namespace AwsMock::Service {
      *
      * @param request HTTP request
      * @param response HTTP response
-     * @param region AWS region name
+     * @param region AWS region
      * @param user AWS user
      * @see AbstractResource::handleDelete(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
      */
@@ -117,13 +115,45 @@ namespace AwsMock::Service {
      *
      * @param request HTTP request
      * @param response HTTP response
-     * @param region AWS region name
+     * @param region AWS region
      * @param user AWS user
-     * @see AbstractResource::handleHead(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+     * @see AbstractResource::handleOption(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
      */
     void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
   private:
+
+    /**
+     * Get the queue attributes.
+     *
+     * @param payload HTTP body
+     * @return list of queue attributes
+     */
+    std::vector<Dto::SQS::QueueAttribute> GetQueueAttributes(const std::string &payload);
+
+    /**
+     * Get the queue tags.
+     *
+     * @param payload HTTP body
+     * @return list of queue tags
+     */
+    std::map<std::string, std::string> GetQueueTags(const std::string &payload);
+
+    /**
+     * Get the queue attribute names.
+     *
+     * @param payload HTTP body
+     * @return list of queue attribute names
+     */
+    std::vector<std::string> GetQueueAttributeNames(const std::string &payload);
+
+    /**
+     * Get the message attributes.
+     *
+     * @param payload HTTP body
+     * @return list of message attributes
+     */
+    std::vector<Dto::SQS::MessageAttribute> GetMessageAttributes(const std::string &payload);
 
     /**
      * Logger
@@ -131,7 +161,7 @@ namespace AwsMock::Service {
     Core::LogStream _logger;
 
     /**
-     * S3 handler configuration
+     * ImageHandler import configuration
      */
     Core::Configuration &_configuration;
 
@@ -141,12 +171,21 @@ namespace AwsMock::Service {
     Core::MetricService &_metricService;
 
     /**
-     * S3 module
+     * SQS module
      */
-    Service::S3Service _s3Service;
+    Service::SQSService _sqsService;
 
+    /**
+     * Default account ID
+     */
+    std::string _accountId;
+
+    /**
+     * Default endpoint
+     */
+    std::string _endpoint;
   };
 
 } // namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_S3HANDLER_H
+#endif // AWSMOCK_SERVICE_SQSCLIHANDLER_H

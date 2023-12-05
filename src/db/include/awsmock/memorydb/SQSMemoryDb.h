@@ -197,14 +197,15 @@ namespace AwsMock::Database {
     Entity::SQS::Message UpdateMessage(Entity::SQS::Message &message);
 
     /**
-     * Receive messages from an queue.
+     * Receive messages from a queue.
      *
      * @param region AWS region
      * @param queueUrl queue URL
      * @param visibility in seconds
+     * @param maxMessages maximal number of messages
      * @param messageList message list
      */
-    void ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, Entity::SQS::MessageList &messageList);
+    void ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, int maxMessages, Entity::SQS::MessageList &messageList);
 
     /**
      * Reset expired messages

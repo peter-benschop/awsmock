@@ -11,6 +11,7 @@
 
 // Poco includes
 #include <Poco/UUIDGenerator.h>
+#include <Poco/Net/HTTPServerResponse.h>
 
 // AwsMock includes
 #include <awsmock/core/StringUtils.h>
@@ -127,9 +128,16 @@ namespace AwsMock::Core {
      *
      * @return request ID
      */
-    static std::string CreateRequestId() {
-      return Poco::UUIDGenerator().createRandom().toString();
-    }
+    static std::string CreateRequestId();
+
+    /**
+     * Returns a message ID.
+     *
+     * <p>Used for SQS and SNS to generate a message ID, which is basically a UUID.</p>
+     *
+     * @return message ID
+     */
+    static std::string CreateMessageId();
 
     /**
      * Returns a receipt handle.
@@ -209,6 +217,22 @@ namespace AwsMock::Core {
      * @return user agent header
      */
     static std::string GetJava2UserAgentHeader(const std::string &service, const std::string &command);
+
+    /**
+     * Returns the HTTP user agent header
+     *
+     * <p>
+     * Example:
+     * <pre>
+     * aws-sdk-cpp/2.20.38 Python/3.11.6 Linux/6.1.0-13-amd64 exe/x86_64.debian.12 prompt/off command/s3.ls
+     * </pre>
+     * </p>
+     *
+     * @param service AwsMock service
+     * @param command AWS command
+     * @return user agent header
+     */
+    static std::string GetCppUserAgentHeader(const std::string &service, const std::string &command);
 
     /**
      * Returns the HTTP content type header

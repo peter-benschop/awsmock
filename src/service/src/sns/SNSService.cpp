@@ -91,7 +91,7 @@ namespace AwsMock::Service {
       }
 
       // Update database
-      std::string messageId = Core::StringUtils::GenerateRandomString(100);
+      std::string messageId = Core::AwsUtils::CreateMessageId();
       message = _snsDatabase->CreateMessage({
                                                 .region=request.region,
                                                 .topicArn=request.topicArn,
@@ -209,7 +209,7 @@ namespace AwsMock::Service {
     // Create a SQS notification request
     AwsMock::Dto::SNS::SqsNotificationRequest sqsNotificationRequest = {
         .type="Notification",
-        .messageId=Poco::UUIDGenerator().createRandom().toString(),
+        .messageId=Core::AwsUtils::CreateMessageId(),
         .topicArn=request.topicArn,
         .message=request.message,
         .timestamp=Poco::Timestamp().epochMicroseconds() / 1000
@@ -221,7 +221,7 @@ namespace AwsMock::Service {
         .queueUrl=sqsQueue.queueUrl,
         .queueArn=sqsQueue.queueArn,
         .body=sqsNotificationRequest.ToJson(),
-        .requestId=sqsNotificationRequest.messageId
+        .requestId=Core::AwsUtils::CreateRequestId()
     };
 
     _sqsService->SendMessage(sendMessageRequest);

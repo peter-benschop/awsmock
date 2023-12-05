@@ -390,7 +390,7 @@ namespace AwsMock::Database {
     }
   }
 
-  void SQSDatabase::ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, int count, Entity::SQS::MessageList &messageList) {
+  void SQSDatabase::ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, int maxMessages, Entity::SQS::MessageList &messageList) {
 
     auto reset = std::chrono::high_resolution_clock::now() + std::chrono::seconds{visibility};
 
@@ -401,7 +401,7 @@ namespace AwsMock::Database {
 
       try {
         mongocxx::options::find opts;
-        opts.limit(count);
+        opts.limit(maxMessages);
 
         // Get the cursor
         auto messageCursor = _messageCollection.find(make_document(kvp("queueUrl", queueUrl), kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))), opts);
@@ -435,7 +435,7 @@ namespace AwsMock::Database {
 
     } else {
 
-      _memoryDb.ReceiveMessages(region, queueUrl, visibility, messageList);
+      _memoryDb.ReceiveMessages(region, queueUrl, visibility, maxMessages, messageList);
 
     }
     log_trace_stream(_logger) << "Messages received, region: " << region << " queue: " << queueUrl + " count: " << messageList.size() << std::endl;
@@ -586,8 +586,17 @@ namespace AwsMock::Database {
 
     if (HasDatabase()) {
 
-      long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
-      log_trace_stream(_logger) << "Count messages, region: " << region << " url: " << queueUrl << " result: " << count << std::endl;
+      long count = 0;
+      if(!region.empty() && !queueUrl.empty()) {
+        count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
+        log_trace_stream(_logger) << "Count messages, region: " << region << " url: " << queueUrl << " result: " << count << std::endl;
+      } else if(!region.empty()) {
+        count = _messageCollection.count_documents(make_document(kvp("region", region)));
+        log_trace_stream(_logger) << "Count messages, region: " << region << " result: " << count << std::endl;
+      } else {
+        count = _messageCollection.count_documents({});
+        log_trace_stream(_logger) << "Count messages, result: " << count << std::endl;
+      }
       return count;
 
     } else {
