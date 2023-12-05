@@ -80,6 +80,7 @@ namespace AwsMock::Service {
 
     // arrange
     Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " sqs create-queue test-queue");
+    EXPECT_EQ(0, createResult.status);
 
     // act
     Core::ExecResult listResult = Core::SystemUtils::Exec(_baseCommand + " sqs list-queues");
@@ -87,6 +88,82 @@ namespace AwsMock::Service {
     // assert
     EXPECT_EQ(0, listResult.status);
     EXPECT_TRUE(Core::StringUtils::Contains(listResult.output, "test-queue"));
+  }
+
+  TEST_F(SQSServerJavaTest, QueuePurgeTest) {
+
+    // arrange
+    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " sqs create-queue test-queue");
+    EXPECT_EQ(0, createResult.status);
+    Core::ExecResult sendResult = Core::SystemUtils::Exec(_baseCommand + " sqs send-message test-queue test-message");
+    EXPECT_EQ(0, sendResult.status);
+    Core::ExecResult getQueueUrlResult = Core::SystemUtils::Exec(_baseCommand + " sqs get-queue-url test-queue");
+    EXPECT_EQ(0, getQueueUrlResult.status);
+    std::string queueUrl = getQueueUrlResult.output;
+
+    // act
+    Core::ExecResult listResult = Core::SystemUtils::Exec(_baseCommand + " sqs purge-queue " + queueUrl);
+    long messageCount = _database.CountMessages();
+
+    // assert
+    EXPECT_EQ(0, listResult.status);
+    EXPECT_EQ(0, messageCount);
+  }
+
+  TEST_F(SQSServerJavaTest, GetQueueAttributeAllTest) {
+
+    // arrange
+    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " sqs create-queue test-queue");
+    EXPECT_EQ(0, createResult.status);
+    Core::ExecResult sendResult = Core::SystemUtils::Exec(_baseCommand + " sqs send-message test-queue test-message");
+    EXPECT_EQ(0, sendResult.status);
+    Core::ExecResult getQueueUrlResult = Core::SystemUtils::Exec(_baseCommand + " sqs get-queue-url test-queue");
+    EXPECT_EQ(0, getQueueUrlResult.status);
+    std::string queueUrl = getQueueUrlResult.output;
+
+    // act
+    Core::ExecResult getQueueAttributeResult = Core::SystemUtils::Exec(_baseCommand + " sqs get-queue-attributes " + queueUrl + " All");
+
+    // assert
+    EXPECT_EQ(0, getQueueAttributeResult.status);
+    EXPECT_TRUE(Core::StringUtils::Contains(getQueueAttributeResult.output, "CreatedTimestamp"));
+  }
+
+  TEST_F(SQSServerJavaTest, GetQueueAttributeSomeTest) {
+
+    // arrange
+    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " sqs create-queue test-queue");
+    EXPECT_EQ(0, createResult.status);
+    Core::ExecResult sendResult = Core::SystemUtils::Exec(_baseCommand + " sqs send-message test-queue test-message");
+    EXPECT_EQ(0, sendResult.status);
+    Core::ExecResult getQueueUrlResult = Core::SystemUtils::Exec(_baseCommand + " sqs get-queue-url test-queue");
+    EXPECT_EQ(0, getQueueUrlResult.status);
+    std::string queueUrl = getQueueUrlResult.output;
+
+    // act
+    Core::ExecResult getQueueAttributeResult = Core::SystemUtils::Exec(_baseCommand + " sqs get-queue-attributes " + queueUrl + " ReceiveMessageWaitTimeSeconds");
+
+    // assert
+    EXPECT_EQ(0, getQueueAttributeResult.status);
+    EXPECT_TRUE(Core::StringUtils::Contains(getQueueAttributeResult.output, "ReceiveMessageWaitTimeSeconds"));
+  }
+
+  TEST_F(SQSServerJavaTest, SetQueueAttributeTest) {
+
+    // arrange
+    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " sqs create-queue test-queue");
+    EXPECT_EQ(0, createResult.status);
+    Core::ExecResult sendResult = Core::SystemUtils::Exec(_baseCommand + " sqs send-message test-queue test-message");
+    EXPECT_EQ(0, sendResult.status);
+    Core::ExecResult getQueueUrlResult = Core::SystemUtils::Exec(_baseCommand + " sqs get-queue-url test-queue");
+    EXPECT_EQ(0, getQueueUrlResult.status);
+    std::string queueUrl = getQueueUrlResult.output;
+
+    // act
+    Core::ExecResult setQueueAttributeResult = Core::SystemUtils::Exec(_baseCommand + " sqs set-queue-attributes " + queueUrl + " VisibilityTimeout=42");
+
+    // assert
+    EXPECT_EQ(0, setQueueAttributeResult.status);
   }
 
   TEST_F(SQSServerJavaTest, QueueDeleteTest) {
@@ -137,6 +214,29 @@ namespace AwsMock::Service {
     // assert
     EXPECT_EQ(0, receiveResult.status);
     EXPECT_EQ(1, messageCount);
+  }
+
+  TEST_F(SQSServerJavaTest, MessageDeleteTest) {
+
+    // arrange
+    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " sqs create-queue test-queue");
+    EXPECT_EQ(0, createResult.status);
+    Core::ExecResult getQueueUrlResult = Core::SystemUtils::Exec(_baseCommand + " sqs get-queue-url test-queue");
+    EXPECT_EQ(0, getQueueUrlResult.status);
+    std::string queueUrl = getQueueUrlResult.output;
+    Core::ExecResult sendResult = Core::SystemUtils::Exec(_baseCommand + " sqs send-message " + queueUrl + " \"test-message\"");
+    EXPECT_EQ(0, sendResult.status);
+    Core::ExecResult receiveResult = Core::SystemUtils::Exec(_baseCommand + " sqs receive-message test-queue 5 5");
+    EXPECT_EQ(0, receiveResult.status);
+    std::string receiptHandle = receiveResult.output;
+
+    // act
+    Core::ExecResult deleteResult = Core::SystemUtils::Exec(_baseCommand + " sqs delete-message " + queueUrl + " " + receiptHandle);
+    long messageCount = _database.CountMessages();
+
+    // assert
+    EXPECT_EQ(0, receiveResult.status);
+    EXPECT_EQ(0, messageCount);
   }
 
 } // namespace AwsMock::Core
