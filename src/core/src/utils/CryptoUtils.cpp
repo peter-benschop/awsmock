@@ -37,13 +37,12 @@ namespace AwsMock::Core {
 
     EVP_DigestInit_ex(context, md, nullptr);
 
-    std::ifstream is;
-    is.open(fileName.c_str(), std::ios::binary);
-    while (is.good()) {
-      is.read(buffer, AWSMOCK_BUFFER_SIZE);
-      EVP_DigestUpdate(context, buffer, is.gcount());
+    std::ifstream ifs(fileName, std::ios::binary);
+    while (ifs.good()) {
+      ifs.read(buffer, AWSMOCK_BUFFER_SIZE);
+      EVP_DigestUpdate(context, buffer, ifs.gcount());
     }
-    is.close();
+    ifs.close();
 
     EVP_DigestFinal_ex(context, md_value, &md_len);
     EVP_MD_CTX_free(context);

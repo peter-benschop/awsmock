@@ -5,6 +5,14 @@
 #ifndef AWSMOCK_CORE_CRYPTOUTILS_H
 #define AWSMOCK_CORE_CRYPTOUTILS_H
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 // Standard C++ includes
 #include <string>
 #include <string_view>
@@ -25,7 +33,7 @@
 #include <awsmock/core/StringUtils.h>
 
 // 64kB buffer
-#define AWSMOCK_BUFFER_SIZE 64000
+#define AWSMOCK_BUFFER_SIZE 4096
 
 namespace AwsMock::Core {
 

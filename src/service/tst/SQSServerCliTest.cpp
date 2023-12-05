@@ -25,7 +25,7 @@
 
 namespace AwsMock::Service {
 
-  class SQSServerCliIntegrationTest : public ::testing::Test {
+  class SQSServerCliTest : public ::testing::Test {
 
   protected:
 
@@ -49,7 +49,7 @@ namespace AwsMock::Service {
       _sqsServer.StopServer();
     }
 
-    std::string GetReceiptHandle(const std::string &jsonString) {
+    static std::string GetReceiptHandle(const std::string &jsonString) {
 
       std::string receiptHandle;
       Poco::JSON::Parser parser;
@@ -61,7 +61,7 @@ namespace AwsMock::Service {
 
         if (messageArray != nullptr) {
           for (const auto &it : *messageArray) {
-            Poco::JSON::Object::Ptr object =  it.extract<Poco::JSON::Object::Ptr>();
+            const auto& object =  it.extract<Poco::JSON::Object::Ptr>();
             Core::JsonUtils::GetJsonValueString("ReceiptHandle", object, receiptHandle);
           }
         }
@@ -78,7 +78,7 @@ namespace AwsMock::Service {
     SQSServer _sqsServer = SQSServer(_configuration, _metricService);
   };
 
-  TEST_F(SQSServerCliIntegrationTest, QueueCreateTest) {
+  TEST_F(SQSServerCliTest, QueueCreateTest) {
 
     // arrange
 
@@ -92,7 +92,7 @@ namespace AwsMock::Service {
     EXPECT_TRUE(Core::StringUtils::Contains(result.output, TEST_QUEUE));
   }
 
-  TEST_F(SQSServerCliIntegrationTest, QueueListTest) {
+  TEST_F(SQSServerCliTest, QueueListTest) {
 
     // arrange
     Core::ExecResult createResult = Core::TestUtils::SendCliCommand("sqs", "aws sqs create-queue --queue-name " + TEST_QUEUE + " --endpoint " + _endpoint);
@@ -106,7 +106,7 @@ namespace AwsMock::Service {
     EXPECT_TRUE(Core::StringUtils::Contains(result.output, TEST_QUEUE));
   }
 
-  TEST_F(SQSServerCliIntegrationTest, QueueGetUrlTest) {
+  TEST_F(SQSServerCliTest, QueueGetUrlTest) {
 
     // arrange
     Core::ExecResult createResult = Core::TestUtils::SendCliCommand("sqs", "aws sqs create-queue --queue-name " + TEST_QUEUE + " --endpoint " + _endpoint);
@@ -120,7 +120,7 @@ namespace AwsMock::Service {
     EXPECT_TRUE(Core::StringUtils::Contains(result.output, _queueUrl));
   }
 
-  TEST_F(SQSServerCliIntegrationTest, QueuePurgeTest) {
+  TEST_F(SQSServerCliTest, QueuePurgeTest) {
 
     // arrange
     Core::ExecResult createResult = Core::TestUtils::SendCliCommand("sqs", "aws sqs create-queue --queue-name " + TEST_QUEUE + " --endpoint " + _endpoint);
@@ -137,7 +137,7 @@ namespace AwsMock::Service {
     EXPECT_EQ(0, messageCount);
   }
 
-  TEST_F(SQSServerCliIntegrationTest, QueueDeleteTest) {
+  TEST_F(SQSServerCliTest, QueueDeleteTest) {
 
     // arrange
     Core::ExecResult createResult = Core::TestUtils::SendCliCommand("sqs", "aws sqs create-queue --queue-name " + TEST_QUEUE + " --endpoint " + _endpoint);
@@ -152,7 +152,7 @@ namespace AwsMock::Service {
     EXPECT_EQ(0, queueList.size());
   }
 
-  TEST_F(SQSServerCliIntegrationTest, MessageSendTest) {
+  TEST_F(SQSServerCliTest, MessageSendTest) {
 
     // arrange
     Core::ExecResult createResult = Core::TestUtils::SendCliCommand("sqs", "aws sqs create-queue --queue-name " + TEST_QUEUE + " --endpoint " + _endpoint);
@@ -167,7 +167,7 @@ namespace AwsMock::Service {
     EXPECT_EQ(1, messageCount);
   }
 
-  TEST_F(SQSServerCliIntegrationTest, MessageReceiveTest) {
+  TEST_F(SQSServerCliTest, MessageReceiveTest) {
 
     // arrange
     Core::ExecResult createResult = Core::TestUtils::SendCliCommand("sqs", "aws sqs create-queue --queue-name " + TEST_QUEUE + " --endpoint " + _endpoint);
@@ -184,7 +184,7 @@ namespace AwsMock::Service {
     EXPECT_TRUE(Core::StringUtils::Contains(result.output, "Messages"));
   }
 
-  TEST_F(SQSServerCliIntegrationTest, MessageDeleteTest) {
+  TEST_F(SQSServerCliTest, MessageDeleteTest) {
 
     // arrange
     Core::ExecResult createResult = Core::TestUtils::SendCliCommand("sqs", "aws sqs create-queue --queue-name " + TEST_QUEUE + " --endpoint " + _endpoint);
