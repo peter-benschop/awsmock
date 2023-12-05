@@ -38,6 +38,10 @@ namespace AwsMock::Core {
     ofs << "awsmock.service.sqs.port=19501" << std::endl;
     ofs << "awsmock.service.sqs.host=" << hostName << std::endl;
     ofs << "awsmock.monitoring.sqs.period=-1" << std::endl;
+    // SQS configuration
+    ofs << "awsmock.service.sns.port=19502" << std::endl;
+    ofs << "awsmock.service.sns.host=" << hostName << std::endl;
+    ofs << "awsmock.monitoring.sns.period=-1" << std::endl;
     // Thread pool configuration
     ofs << "awsmock.threadpool.name=srv-worker" << std::endl;
     ofs << "awsmock.threadpool.min=8" << std::endl;

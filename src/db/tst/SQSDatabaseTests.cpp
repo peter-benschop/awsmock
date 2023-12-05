@@ -303,7 +303,7 @@ namespace AwsMock::Database {
     Entity::SQS::Message message = {.region=_region, .queueUrl=queue.queueUrl, .body=BODY};
     _sqsDatabase.CreateMessage(message);
     Entity::SQS::MessageList messageList;
-    _sqsDatabase.ReceiveMessages(_region, _queueUrl, 1, 3, messageList);
+    _sqsDatabase.ReceiveMessages(_region, _queueUrl, 1, 1, messageList);
     Poco::Thread().sleep(2000);
     _sqsDatabase.ResetMessages(_queueUrl, 1);
 
@@ -429,10 +429,10 @@ namespace AwsMock::Database {
     // act
     Entity::SQS::MessageList messageList;
     _sqsDatabase.ReceiveMessages(_region, _queueUrl, 1, 1, messageList);
-    Poco::Thread().sleep(1000);
+    Poco::Thread().sleep(2000);
     _sqsDatabase.ResetMessages(_queueUrl, 1);
     _sqsDatabase.ReceiveMessages(_region, _queueUrl, 1, 1, messageList);
-    Poco::Thread().sleep(1000);
+    Poco::Thread().sleep(2000);
     _sqsDatabase.ResetMessages(_queueUrl, 1);
 
     _sqsDatabase.RedriveMessages(_queueUrl, redrivePolicy);
