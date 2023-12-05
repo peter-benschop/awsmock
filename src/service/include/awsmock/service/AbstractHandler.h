@@ -314,7 +314,7 @@ namespace AwsMock::Service {
      * @param response HTTP response object
      * @param exc exception object
      */
-    void SendErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Poco::Exception &exc);
+    void SendXmlErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Poco::Exception &exc);
 
     /**
      * Send an error response (HTTP state code 200).
@@ -323,7 +323,7 @@ namespace AwsMock::Service {
      * @param response HTTP response object
      * @param exc module exception object
      */
-    void SendErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Core::ServiceException &exc);
+    void SendXmlErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Core::ServiceException &exc);
 
     /**
      * Send an error response (HTTP state code 200).
@@ -332,7 +332,25 @@ namespace AwsMock::Service {
      * @param response HTTP response object
      * @param payload response body
      */
-    void SendErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, const std::string &payload);
+    void SendXmlErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, const std::string &payload);
+
+    /**
+     * Send an error response (HTTP state code 200).
+     *
+     * @param service module name
+     * @param response HTTP response object
+     * @param exc exception object
+     */
+    void SendJsonErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Poco::Exception &exc);
+
+    /**
+     * Send an error response (HTTP state code 200).
+     *
+     * @param service module name
+     * @param response HTTP response object
+     * @param exc module exception object
+     */
+    void SendJsonErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Core::ServiceException &exc);
 
     /**
      * Send a no content response, state: 204.
@@ -435,8 +453,9 @@ namespace AwsMock::Service {
      * @param response HTTP response object
      * @param contentLength payload content length
      * @param headerMap vector of header key/values pairs
+     * @param contentType content type
      */
-    void SetHeaders(Poco::Net::HTTPServerResponse &response, unsigned long contentLength, const HeaderMap &headerMap = {});
+    void SetHeaders(Poco::Net::HTTPServerResponse &response, unsigned long contentLength, const HeaderMap &headerMap = {}, const std::string &contentType = "application/xml");
 
     /**
      * Logger

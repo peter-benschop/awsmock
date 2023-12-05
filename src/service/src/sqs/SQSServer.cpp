@@ -10,11 +10,11 @@ namespace AwsMock::Service {
       : AbstractServer(configuration, "sqs"), _logger(Poco::Logger::get("SQSServer")), _configuration(configuration), _metricService(metricService) {
 
     // HTTP manager configuration
-    _port = _configuration.getInt("awsmock.module.sqs.port", SQS_DEFAULT_PORT);
-    _host = _configuration.getString("awsmock.module.sqs.host", SQS_DEFAULT_HOST);
-    _maxQueueLength = _configuration.getInt("awsmock.module.sqs.max.queue", SQS_DEFAULT_QUEUE_LENGTH);
-    _maxThreads = _configuration.getInt("awsmock.module.sqs.max.threads", SQS_DEFAULT_THREADS);
-    _requestTimeout = _configuration.getInt("awsmock.module.sqs.timeout", SQS_DEFAULT_TIMEOUT);
+    _port = _configuration.getInt("awsmock.service.sqs.port", SQS_DEFAULT_PORT);
+    _host = _configuration.getString("awsmock.service.sqs.host", SQS_DEFAULT_HOST);
+    _maxQueueLength = _configuration.getInt("awsmock.service.sqs.max.queue", SQS_DEFAULT_QUEUE_LENGTH);
+    _maxThreads = _configuration.getInt("awsmock.service.sqs.max.threads", SQS_DEFAULT_THREADS);
+    _requestTimeout = _configuration.getInt("awsmock.service.sqs.timeout", SQS_DEFAULT_TIMEOUT);
     log_debug_stream(_logger) << "SQS rest module initialized, endpoint: " << _host << ":" << _port << std::endl;
 
     // Sleeping period

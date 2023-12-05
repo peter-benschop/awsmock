@@ -26,7 +26,6 @@ namespace AwsMock::Service {
     StopHttpServer();
     _moduleDatabase->SetState(_name, Database::Entity::Module::ModuleState::STOPPED);
     _running = false;
-    std::cerr << "Module: " << _name << " shutdown" << std::endl;
     log_info_stream(_logger) << "Module " << _name << " has been shutdown" << std::endl;
   }
 

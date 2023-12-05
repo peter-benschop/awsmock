@@ -222,7 +222,7 @@ namespace AwsMock::Database {
     return _messages[it->first];
   }
 
-  void SQSMemoryDb::ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, Entity::SQS::MessageList &messageList) {
+  void SQSMemoryDb::ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, int maxMessages, Entity::SQS::MessageList &messageList) {
     Poco::ScopedLock lock(_messageMutex);
 
     auto reset = std::chrono::high_resolution_clock::now() + std::chrono::seconds{visibility};
@@ -242,6 +242,11 @@ namespace AwsMock::Database {
 
         // Update store
         _messages[message.first] = message.second;
+
+        // Check max messages
+        if(messageList.size() >= maxMessages) {
+          break;
+        }
       }
     }
 

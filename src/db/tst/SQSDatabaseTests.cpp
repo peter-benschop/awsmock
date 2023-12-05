@@ -325,13 +325,13 @@ namespace AwsMock::Database {
 
     Poco::DateTime reset;
     reset += Poco::Timespan(queueAttribute.delaySeconds, 0);
-    Entity::SQS::Message message = {.region=_region, .queueUrl=_queueUrl, .body=BODY, .status=Entity::SQS::MessageStatus::DELAYED, .reset=reset};
+    Entity::SQS::Message message = {.region=_region, .queueUrl=queue.queueUrl, .body=BODY, .status=Entity::SQS::MessageStatus::DELAYED, .reset=reset};
     _sqsDatabase.CreateMessage(message);
 
     Entity::SQS::MessageList messageList;
-    _sqsDatabase.ReceiveMessages(_region, QUEUE_NAME, 1, 3, messageList);
+    _sqsDatabase.ReceiveMessages(_region, QUEUE_NAME, 1, 1, messageList);
     EXPECT_EQ(0, messageList.size());
-    Poco::Thread().sleep(2000);
+    Poco::Thread().sleep(1000);
 
     // act
     _sqsDatabase.ResetDelayedMessages(_queueUrl, queueAttribute.delaySeconds);
@@ -428,11 +428,11 @@ namespace AwsMock::Database {
 
     // act
     Entity::SQS::MessageList messageList;
-    _sqsDatabase.ReceiveMessages(_region, _queueUrl, 1, 3, messageList);
-    Poco::Thread().sleep(2000);
+    _sqsDatabase.ReceiveMessages(_region, _queueUrl, 1, 1, messageList);
+    Poco::Thread().sleep(1000);
     _sqsDatabase.ResetMessages(_queueUrl, 1);
-    _sqsDatabase.ReceiveMessages(_region, _queueUrl, 1, 3, messageList);
-    Poco::Thread().sleep(2000);
+    _sqsDatabase.ReceiveMessages(_region, _queueUrl, 1, 1, messageList);
+    Poco::Thread().sleep(1000);
     _sqsDatabase.ResetMessages(_queueUrl, 1);
 
     _sqsDatabase.RedriveMessages(_queueUrl, redrivePolicy);

@@ -21,9 +21,10 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "SNS POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << " length: " << response.getContentLength() << std::endl;
 
     try {
+
+      //DumpRequestHeaders(request);
       std::string payload = GetPayload(request);
       std::string action, version;
-
       GetActionVersion(payload, action, version);
 
       if (action == "CreateTopic") {
@@ -78,7 +79,7 @@ namespace AwsMock::Service {
 
     } catch (Core::ServiceException &exc) {
       log_error_stream(_logger) << "Service exception: " << exc.message() << std::endl;
-      SendErrorResponse("SNS", response, exc);
+      SendXmlErrorResponse("SNS", response, exc);
     }
   }
 

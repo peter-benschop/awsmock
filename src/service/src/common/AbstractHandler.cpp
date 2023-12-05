@@ -490,13 +490,13 @@ namespace AwsMock::Service {
     outputStream.flush();
   }
 
-  void AbstractHandler::SendErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Poco::Exception &exc) {
+  void AbstractHandler::SendXmlErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Poco::Exception &exc) {
 
     Core::ServiceException serviceException = Core::ServiceException(exc.message(), exc.code());
-    SendErrorResponse(service, response, serviceException);
+    SendXmlErrorResponse(service, response, serviceException);
   }
 
-  void AbstractHandler::SendErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Core::ServiceException &exc) {
+  void AbstractHandler::SendXmlErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Core::ServiceException &exc) {
 
     std::string payload;
     if (service == "SQS") {
@@ -512,7 +512,7 @@ namespace AwsMock::Service {
     outputStream.flush();
   }
 
-  void AbstractHandler::SendErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, const std::string &payload) {
+  void AbstractHandler::SendXmlErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, const std::string &payload) {
 
     SetHeaders(response, payload.length());
 
@@ -523,13 +523,36 @@ namespace AwsMock::Service {
     outputStream.flush();
   }
 
-  void AbstractHandler::SetHeaders(Poco::Net::HTTPServerResponse &response, unsigned long contentLength, const HeaderMap &extraHeader) {
+  void AbstractHandler::SendJsonErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Poco::Exception &exc) {
+
+    Core::ServiceException serviceException = Core::ServiceException(exc.message(), exc.code());
+    SendJsonErrorResponse(service, response, serviceException);
+  }
+
+  void AbstractHandler::SendJsonErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Core::ServiceException &exc) {
+
+    std::string payload;
+    if (service == "SQS") {
+      payload = Dto::SQS::RestErrorResponse(exc).ToJson();
+    } else if (service == "S3") {
+      //payload = Dto::S3::RestErrorResponse(exc).ToJson();
+    }
+    SetHeaders(response, payload.length(), {}, "application/json");
+
+    handleHttpStatusCode(response, exc.code(), exc.message().c_str());
+    std::ostream &outputStream = response.send();
+    outputStream << payload;
+    outputStream.flush();
+    //DumpResponse(response);
+  }
+
+  void AbstractHandler::SetHeaders(Poco::Net::HTTPServerResponse &response, unsigned long contentLength, const HeaderMap &extraHeader, const std::string &contentType) {
     log_trace_stream(_logger) << "Setting header values, contentLength: " << contentLength << std::endl;
 
     // Default headers
     response.set("Date", Poco::DateTimeFormatter::format(Poco::DateTime(), Poco::DateTimeFormat::HTTP_FORMAT));
     response.set("Content-Length", std::to_string(contentLength));
-    response.set("Content-Type", "application/xml");
+    response.set("Content-Type", contentType);
     response.set("Connection", "keep-alive");
     response.set("Server", "awsmock");
 

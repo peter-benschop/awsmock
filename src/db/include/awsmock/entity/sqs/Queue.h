@@ -224,11 +224,16 @@ namespace AwsMock::Database::Entity::SQS {
     long approximateNumberOfMessagesNotVisible = 0;
 
     /**
+     * AWS ARN
+     */
+    std::string queueArn;
+
+    /**
      * Converts the entity to a MongoDB document
      *
      * @return entity as MongoDB document.
      */
-    [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const {
+    [[maybe_unused]] [[nodiscard]] view_or_value <view, value> ToDocument() const {
 
       view_or_value<view, value> queueAttributetDoc = make_document(
           kvp("delaySeconds", delaySeconds),
@@ -241,30 +246,10 @@ namespace AwsMock::Database::Entity::SQS {
           kvp("redriveAllowPolicy", redriveAllowPolicy),
           kvp("approximateNumberOfMessages", approximateNumberOfMessages),
           kvp("approximateNumberOfMessagesDelayed", approximateNumberOfMessagesDelayed),
-          kvp("approximateNumberOfMessagesNotVisible", approximateNumberOfMessagesNotVisible));
+          kvp("approximateNumberOfMessagesNotVisible", approximateNumberOfMessagesNotVisible),
+          kvp("queueArn", queueArn));
 
       return queueAttributetDoc;
-    }
-
-    /**
-     * Converts the MongoDB document to an entity
-     *
-     * @param mResult MongoDB document view.
-     */
-    [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
-
-      delaySeconds = mResult.value()["delaySeconds"].get_int32().value;
-      maxMessageSize = mResult.value()["maxMessageSize"].get_int32().value;
-      messageRetentionPeriod = mResult.value()["messageRetentionPeriod"].get_int32().value;
-      policy = bsoncxx::string::to_string(mResult.value()["policy"].get_string().value);
-      receiveMessageWaitTime = mResult.value()["receiveMessageWaitTime"].get_int32().value;
-      visibilityTimeout = mResult.value()["visibilityTimeout"].get_int32().value;
-      redrivePolicy.FromDocument(mResult.value()["redrivePolicy"].get_document().value);
-      redriveAllowPolicy = bsoncxx::string::to_string(mResult.value()["redriveAllowPolicy"].get_string().value);
-      approximateNumberOfMessages = mResult.value()["approximateNumberOfMessages"].get_int64().value;
-      approximateNumberOfMessagesDelayed = mResult.value()["approximateNumberOfMessagesDelayed"].get_int64().value;
-      approximateNumberOfMessagesNotVisible = mResult.value()["approximateNumberOfMessagesNotVisible"].get_int64().value;
-
     }
 
     /**
@@ -285,6 +270,7 @@ namespace AwsMock::Database::Entity::SQS {
       approximateNumberOfMessages = mResult.value()["approximateNumberOfMessages"].get_int64().value;
       approximateNumberOfMessagesDelayed = mResult.value()["approximateNumberOfMessagesDelayed"].get_int64().value;
       approximateNumberOfMessagesNotVisible = mResult.value()["approximateNumberOfMessagesNotVisible"].get_int64().value;
+      //queueArn = bsoncxx::string::to_string(mResult.value()["queueArn"].get_string().value);
     }
 
     /**
@@ -306,11 +292,9 @@ namespace AwsMock::Database::Entity::SQS {
      * @return output stream
      */
     friend std::ostream &operator<<(std::ostream &os, const QueueAttribute &r) {
-      os << "QueueAttribute={delaySeconds='" << r.delaySeconds << "' maxMessageSize='" << r.maxMessageSize << "' messageRetentionPeriod='"
-         << r.messageRetentionPeriod << "' policy='" << r.policy << "' receiveMessageWaitTime='" << r.receiveMessageWaitTime <<
-         "' visibilityTimeout='" << r.visibilityTimeout << "' redrivePolicy=" << r.redrivePolicy.ToString() << " redriveAllowPolicy='" << r.redriveAllowPolicy <<
-         "' approximateNumberOfMessages='" << r.approximateNumberOfMessages << "' approximateNumberOfMessagesDelayed='" << r.approximateNumberOfMessagesDelayed <<
-         "' approximateNumberOfMessagesNotVisible='" << r.approximateNumberOfMessagesNotVisible << "'}";
+      os << "QueueAttribute={delaySeconds='" << r.delaySeconds << "' maxMessageSize='" << r.maxMessageSize << "' messageRetentionPeriod='" << r.messageRetentionPeriod << "' policy='" << r.policy << "' receiveMessageWaitTime='" << r.receiveMessageWaitTime
+         << "' visibilityTimeout='" << r.visibilityTimeout << "' redrivePolicy=" << r.redrivePolicy.ToString() << " redriveAllowPolicy='" << r.redriveAllowPolicy << "' approximateNumberOfMessages='" << r.approximateNumberOfMessages
+         << "' approximateNumberOfMessagesDelayed='" << r.approximateNumberOfMessagesDelayed << "' approximateNumberOfMessagesNotVisible='" << r.approximateNumberOfMessagesNotVisible << "', queueArn='" << r.queueArn << "'}";
       return os;
     }
 

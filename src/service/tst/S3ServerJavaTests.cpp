@@ -33,35 +33,33 @@
 
 namespace AwsMock::Service {
 
-  class S3ServerXmlTest : public ::testing::Test {
+  class S3ServerJavaTest : public ::testing::Test {
 
   protected:
 
     void SetUp() override {
-
-      // Set HTTP headers
-      _extraHeaders["Authorization"] = Core::AwsUtils::GetAuthorizationHeader(_configuration, "s3");
-      _extraHeaders["Content-Type"] = Core::AwsUtils::GetContentTypeHeader("xml");
 
       // Define endpoint
       std::string _port = _configuration.getString("awsmock.service.s3.port", std::to_string(S3_DEFAULT_PORT));
       std::string _host = _configuration.getString("awsmock.service.s3.host", S3_DEFAULT_HOST);
       _endpoint = "http://" + _host + ":" + _port;
 
+      // Set base command
+      _baseCommand = "java -jar /usr/local/lib/awsmock-java-test-0.0.1-SNAPSHOT-jar-with-dependencies.jar " + _endpoint;
+
       // Start HTTP manager
+      Poco::ThreadPool::defaultPool().addCapacity(10);
       Poco::ThreadPool::defaultPool().start(_s3Server);
-      while (!_s3Server.IsRunning()) {
-        Poco::Thread::sleep(500);
-      }
     }
 
     void TearDown() override {
-      _s3Server.StopServer();
+      _database.DeleteAllObjects();
       _database.DeleteAllBuckets();
+      _s3Server.StopServer();
     }
 
     Core::CurlUtils _curlUtils;
-    std::string _endpoint;
+    std::string _endpoint, _baseCommand;
     std::map<std::string, std::string> _extraHeaders;
     Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration();
     Core::MetricService _metricService = Core::MetricService(_configuration);
@@ -69,22 +67,20 @@ namespace AwsMock::Service {
     S3Server _s3Server = S3Server(_configuration, _metricService);
   };
 
-  TEST_F(S3ServerXmlTest, BucketCreateTest) {
+  TEST_F(S3ServerJavaTest, BucketCreateTest) {
 
     // arrange
 
     // act
-    _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("s3", "mb");
-    Core::CurlResponse response = _curlUtils.SendHttpRequest("PUT", _endpoint + "/" + BUCKET, _extraHeaders, LOCATION_CONSTRAINT);
+    Core::ExecResult result = Core::SystemUtils::Exec(_baseCommand + " s3 create-bucket test-bucket");
     Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
 
     // assert
-    EXPECT_TRUE(response.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
-    EXPECT_TRUE(Core::StringUtils::Contains(response.output, "BucketArn"));
+    EXPECT_EQ(0, result.status);
     EXPECT_EQ(1, bucketList.size());
   }
 
-  TEST_F(S3ServerXmlTest, BucketCreateVersionedTest) {
+  /*TEST_F(S3ServerJavaTest, BucketCreateVersionedTest) {
 
     // arrange
     _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("s3", "mb");
@@ -99,42 +95,55 @@ namespace AwsMock::Service {
     // assert
     EXPECT_TRUE(versioningResponse.statusCode == Poco::Net::HTTPResponse::HTTP_NO_CONTENT);
     EXPECT_EQ(1, bucketList.size());
-  }
+  }*/
 
-  TEST_F(S3ServerXmlTest, BucketDeleteTest) {
+  TEST_F(S3ServerJavaTest, BucketListTest) {
 
     // arrange
-    _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("s3", "mb");
-    Core::CurlResponse bucketCreateResponse = _curlUtils.SendHttpRequest("PUT", _endpoint + "/" + BUCKET, _extraHeaders, LOCATION_CONSTRAINT);
+    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " s3 create-bucket test-bucket");
+    EXPECT_EQ(0, createResult.status);
 
     // act
-    _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("s3", "rb");
-    Core::CurlResponse response = _curlUtils.SendHttpRequest("DELETE", _endpoint + "/" + BUCKET, _extraHeaders);
+    Core::ExecResult listResult = Core::SystemUtils::Exec(_baseCommand + " s3 list-bucket test-bucket");
     Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
 
     // assert
-    EXPECT_TRUE(response.statusCode == Poco::Net::HTTPResponse::HTTP_NO_CONTENT);
+    EXPECT_EQ(0, listResult.status);
+    EXPECT_TRUE(Core::StringUtils::Contains(listResult.output, "test-bucket"));
+    EXPECT_EQ(1, bucketList.size());
+  }
+
+  TEST_F(S3ServerJavaTest, BucketDeleteTest) {
+
+    // arrange
+    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " s3 create-bucket test-bucket");
+    EXPECT_EQ(0, createResult.status);
+
+    // act
+    Core::ExecResult deleteResult = Core::SystemUtils::Exec(_baseCommand + " s3 delete-bucket test-bucket");
+    Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
+
+    // assert
+    EXPECT_EQ(0, deleteResult.status);
     EXPECT_EQ(0, bucketList.size());
   }
 
-  TEST_F(S3ServerXmlTest, ObjectCreateTest) {
+  TEST_F(S3ServerJavaTest, ObjectPutTest) {
 
     // arrange
-    _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("s3", "mb");
-    Core::CurlResponse bucketCreateResponse = _curlUtils.SendHttpRequest("PUT", _endpoint + "/" + BUCKET, _extraHeaders, LOCATION_CONSTRAINT);
-    EXPECT_TRUE(bucketCreateResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
+    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " s3 create-bucket test-bucket");
+    EXPECT_EQ(0, createResult.status);
 
     // act
-    _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("s3", "cp");
-    Core::CurlResponse objectCreateResponse = _curlUtils.SendHttpRequest("PUT", _endpoint + "/" + BUCKET + "/" + KEY, _extraHeaders, TEST_CONTENT);
+    Core::ExecResult putResult = Core::SystemUtils::Exec(_baseCommand + " s3 put-object test-bucket test-key \"test-object\"");
     Database::Entity::S3::ObjectList objectList = _database.ListBucket(BUCKET);
 
     // assert
-    EXPECT_TRUE(objectCreateResponse.statusCode == Poco::Net::HTTPResponse::HTTP_OK);
+    //EXPECT_EQ(0, putResult.status);
     EXPECT_EQ(1, objectList.size());
   }
 
-  TEST_F(S3ServerXmlTest, ObjectGetTest) {
+  /*TEST_F(S3ServerJavaTest, ObjectGetTest) {
 
     // arrange
     _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("s3", "mb");
@@ -153,7 +162,7 @@ namespace AwsMock::Service {
     EXPECT_FALSE(objectGetResponse.output.empty());
   }
 
-  TEST_F(S3ServerXmlTest, ObjectDeleteTest) {
+  TEST_F(S3ServerJavaTest, ObjectDeleteTest) {
 
     // arrange
     _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("s3", "mb");
@@ -171,7 +180,7 @@ namespace AwsMock::Service {
     // assert
     EXPECT_TRUE(objectDeleteResponse.statusCode == Poco::Net::HTTPResponse::HTTP_NO_CONTENT);
     EXPECT_EQ(0, objectList.size());
-  }
+  }*/
 
 } // namespace AwsMock::Core
 

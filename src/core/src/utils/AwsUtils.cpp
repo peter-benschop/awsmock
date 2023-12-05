@@ -73,7 +73,19 @@ namespace AwsMock::Core {
     return "aws-sdk-java/2.13.38 Python/3.11.6 Linux/6.1.0-13-amd64 exe/x86_64.debian.12 prompt/off command/" + service + "." + command;
   }
 
+  std::string AwsUtils::GetCppUserAgentHeader(const std::string &service, const std::string &command) {
+    return "aws-sdk-cpp/2.13.38 Python/3.11.6 Linux/6.1.0-13-amd64 exe/x86_64.debian.12 prompt/off command/" + service + "." + command;
+  }
+
   std::string AwsUtils::GetContentTypeHeader(const std::string &contentType) {
     return "application/x-amz-" + contentType + "-1.0";
+  }
+
+  std::string AwsUtils::CreateRequestId()  {
+    return Poco::UUIDGenerator().createRandom().toString();
+  }
+
+  std::string AwsUtils::CreateMessageId() {
+    return Poco::UUIDGenerator().createRandom().toString();
   }
 }

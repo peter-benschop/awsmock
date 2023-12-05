@@ -12,6 +12,13 @@
 // Poco includes
 #include "Poco/UUID.h"
 #include "Poco/UUIDGenerator.h"
+#include <Poco/JSON/JSON.h>
+#include <Poco/JSON/Parser.h>
+#include <Poco/Dynamic/Var.h>
+
+// AwsMock includes
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/ServiceException.h>
 
 namespace AwsMock::Dto::SQS {
 
@@ -43,26 +50,25 @@ namespace AwsMock::Dto::SQS {
     std::string requestId = Poco::UUIDGenerator().createRandom().toString();
 
     /**
+     * Converts the JSON string to DTO.
+     *
+     * @param JSON string
+     */
+    void FromJson(const std::string &jsonString);
+
+    /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const {
-      std::stringstream ss;
-      ss << (*this);
-      return ss.str();
-    }
+    [[nodiscard]] std::string ToString();
 
     /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const DeleteMessageRequest &r) {
-      os << "DeleteMessageRequest={region='" << r.region
-         << "' queueUrl='" + r.queueUrl + "' receiptHandle='" + r.receiptHandle + "' resource='" + r.resource + "' requestId='" + r.requestId + "'}";
-      return os;
-    }
+    friend std::ostream &operator<<(std::ostream &os, const DeleteMessageRequest &r);
 
   };
 

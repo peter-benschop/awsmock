@@ -12,14 +12,18 @@ namespace AwsMock::Dto::SQS {
       Poco::JSON::Object rootJson;
 
       Poco::JSON::Array messageArray;
-      for(const auto &message:messageList) {
+      for (const auto &message : messageList) {
         Poco::JSON::Object messageObject;
         messageObject.set("Body", message.body);
         messageObject.set("ReceiptHandle", message.receiptHandle);
         messageObject.set("MD5OfBody", message.md5Body);
         messageObject.set("MD5OfMessageAttributes", message.md5Attr);
         messageObject.set("MessageId", message.messageId);
+        messageArray.add(messageObject);
       }
+
+      // Add message array
+      rootJson.set("Messages", messageArray);
 
       std::ostringstream os;
       rootJson.stringify(os);
@@ -102,10 +106,7 @@ namespace AwsMock::Dto::SQS {
 
     std::stringstream output;
     Poco::XML::DOMWriter writer;
-    //writer.setNewLine("\n");
-    //writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
     writer.writeNode(output, pDoc);
-    //std::cout << output.str() << std::endl;
 
     return output.str();
   }

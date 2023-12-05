@@ -49,6 +49,15 @@ namespace AwsMock::Core {
      * @return name of the generated test configuration file
      */
     static Core::Configuration GetTestConfiguration(bool withDatabase = true);
+
+    /**
+     * Send a CLI command
+     *
+     * @param service service name
+     * @param command command name
+     * @return exec result
+     */
+    static Core::ExecResult SendCliCommand(const std::string &service, const std::string &command);
   };
 }
 #endif //AWSMOCK_CORE_TESTUTILS_H

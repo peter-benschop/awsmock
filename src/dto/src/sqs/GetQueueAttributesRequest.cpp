@@ -20,7 +20,9 @@ namespace AwsMock::Dto::SQS {
 
       if (attributesArray != nullptr) {
         for (const auto &it : *attributesArray) {
-          attributeNames.emplace_back(it.extract<std::string>());
+          if(!it.isEmpty()) {
+            attributeNames.emplace_back(it.extract<std::string>());
+          }
         }
       }
 

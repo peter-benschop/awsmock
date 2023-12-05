@@ -13,13 +13,13 @@ namespace AwsMock::FtpServer {
         _ftpWorkingDirectory("/"), _logger(Poco::Logger::get("FtpSession")), _configuration(configuration), _serverName(serverName) {
 
     // S3 module connection
-    _s3ServiceHost = _configuration.getString("awsmock.module.s3.host", "localhost");
-    _s3ServicePort = _configuration.getInt("awsmock.module.s3.port", 9501);
+    _s3ServiceHost = _configuration.getString("awsmock.service.s3.host", "localhost");
+    _s3ServicePort = _configuration.getInt("awsmock.service.s3.port", 9500);
     _baseUrl = "http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort);
 
     // Bucket
-    _bucket = _configuration.getString("awsmock.module.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
-    _baseDir = _configuration.getString("awsmock.module.transfer.base.dir", DEFAULT_BASE_DIR);
+    _bucket = _configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
+    _baseDir = _configuration.getString("awsmock.service.transfer.base.dir", DEFAULT_BASE_DIR);
   }
 
   FtpSession::~FtpSession() {
@@ -1198,7 +1198,7 @@ namespace AwsMock::FtpServer {
   }
 
   std::string FtpSession::GetKey(const std::string &path) {
-    std::string key = Core::StringUtils::StripBeginning(path, _baseDir);
+    std::string key = Core::StringUtils::StripBeginning(path, "transfer/");
     if (!key.empty() && key[0] == '/') {
       return key.substr(1);
     }

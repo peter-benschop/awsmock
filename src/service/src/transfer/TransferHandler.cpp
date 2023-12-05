@@ -23,9 +23,9 @@ namespace AwsMock::Service {
             }*/
 
     } catch (Core::ServiceException &exc) {
-      SendErrorResponse("S3", response, exc);
+      SendXmlErrorResponse("S3", response, exc);
     } catch (Core::ResourceNotFoundException &exc) {
-      SendErrorResponse("lambda", response, exc);
+      SendXmlErrorResponse("lambda", response, exc);
     }
   }
 
@@ -37,7 +37,7 @@ namespace AwsMock::Service {
       GetVersionActionFromUri(request.getURI(), version, action);
 
     } catch (Poco::Exception &exc) {
-      SendErrorResponse("lambda", response, exc);
+      SendXmlErrorResponse("lambda", response, exc);
     }
   }
 
@@ -98,7 +98,7 @@ namespace AwsMock::Service {
       }
 
     } catch (Poco::Exception &exc) {
-      SendErrorResponse("Transfer", response, exc);
+      SendXmlErrorResponse("Transfer", response, exc);
     }
   }
 
@@ -110,7 +110,7 @@ namespace AwsMock::Service {
       GetVersionActionFromUri(request.getURI(), version, action);
 
     } catch (Core::ServiceException &exc) {
-      SendErrorResponse("lambda", response, exc);
+      SendXmlErrorResponse("lambda", response, exc);
     }
   }
 
@@ -140,7 +140,7 @@ namespace AwsMock::Service {
       SendOkResponse(response, {}, headerMap);
 
     } catch (Poco::Exception &exc) {
-      SendErrorResponse("lambda", response, exc);
+      SendXmlErrorResponse("lambda", response, exc);
     }
   }
 

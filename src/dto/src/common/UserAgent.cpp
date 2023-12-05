@@ -8,9 +8,18 @@ namespace AwsMock::Dto::Common {
 
   void UserAgent::FromRequest(Poco::Net::HTTPServerRequest &request) {
 
+    if(!request.has("User-Agent")) {
+
+      // C++ does not send a user agent
+      type = UserAgentType::AWS_SDK_CPP;
+      contentType = "xml";
+      return;
+    }
+
+    // We have a user agent, so use it
     std::vector<std::string> parts = Core::StringUtils::Split(request["User-Agent"], ' ');
     if (parts.empty() || parts.size() < 6) {
-      throw Core::ServiceException("User parts not readable!");
+      throw Core::ServiceException("Could not extract user agent DTO");
     } else {
 
       type = UserAgentTypFromString(parts[0]);
@@ -24,10 +33,10 @@ namespace AwsMock::Dto::Common {
         clientModule = Core::StringUtils::Split(parts[5], '.')[0];
         clientCommand = Core::StringUtils::Split(parts[5], '.')[1];
 
-        if (request.has("Content-Type")) {
-          contentType = Core::StringUtils::Contains(request["Content-Type"], "json") ? "json" : "xml";
-        }
       }
+    }
+    if (request.has("Content-Type")) {
+      contentType = Core::StringUtils::Contains(request["Content-Type"], "json") ? "json" : "xml";
     }
   }
 
