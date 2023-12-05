@@ -43,7 +43,7 @@ namespace AwsMock::Core {
     std::string result = Crypto::GetMd5FromString(TEST_STRING);
 
     // assert
-    EXPECT_EQ(result, MD5_SUM);
+    EXPECT_TRUE(result == MD5_SUM);
   }
 
   TEST_F(CryptoTest, Md5FileTest) {
@@ -54,7 +54,20 @@ namespace AwsMock::Core {
     std::string result = Crypto::GetMd5FromFile(file);
 
     // assert
-    EXPECT_EQ(result, MD5_SUM);
+    EXPECT_TRUE(result== MD5_SUM);
+  }
+
+  TEST_F(CryptoTest, Md5DoubleFileTest) {
+    // arrange
+    std::string file1 = FileUtils::CreateTempFile("txt", TEST_STRING);
+    std::string file2 = FileUtils::CreateTempFile("txt", TEST_STRING);
+
+    // act
+    std::string result1 = Crypto::GetMd5FromFile(file1);
+    std::string result2 = Crypto::GetMd5FromFile(file2);
+
+    // assert
+    EXPECT_TRUE(result1 == result2);
   }
 
   TEST_F(CryptoTest, Sha1StringTest) {

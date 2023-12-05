@@ -27,7 +27,7 @@
 
 namespace AwsMock::Service {
 
-  class S3ServerCliIntegrationTest : public ::testing::Test {
+  class S3ServerCliTest : public ::testing::Test {
 
   protected:
 
@@ -58,7 +58,7 @@ namespace AwsMock::Service {
     S3Server _s3Server = S3Server(_configuration, _metricService);
   };
 
-  TEST_F(S3ServerCliIntegrationTest, BucketCreateTest) {
+  TEST_F(S3ServerCliTest, BucketCreateTest) {
 
     // arrange
 
@@ -72,7 +72,7 @@ namespace AwsMock::Service {
     EXPECT_EQ(1, bucketList.size());
   }
 
-  TEST_F(S3ServerCliIntegrationTest, BucketListTest) {
+  TEST_F(S3ServerCliTest, BucketListTest) {
 
     // arrange
     std::string filename = Core::FileUtils::CreateTempFile("json", 10);
@@ -88,7 +88,7 @@ namespace AwsMock::Service {
     EXPECT_TRUE(Core::StringUtils::Contains(result.output, TEST_BUCKET_NAME));
   }
 
-  TEST_F(S3ServerCliIntegrationTest, BucketDeleteTest) {
+  TEST_F(S3ServerCliTest, BucketDeleteTest) {
 
     // arrange
     Core::ExecResult createResult = Core::TestUtils::SendCliCommand("sqs", "aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
@@ -103,7 +103,7 @@ namespace AwsMock::Service {
     EXPECT_EQ(0, bucketList.size());
   }
 
-  TEST_F(S3ServerCliIntegrationTest, ObjectCreateTest) {
+  TEST_F(S3ServerCliTest, ObjectCreateTest) {
 
     // arrange
     std::string filename = Core::FileUtils::CreateTempFile("json", 10);
@@ -119,7 +119,7 @@ namespace AwsMock::Service {
     EXPECT_EQ(1, objectList.size());
   }
 
-  TEST_F(S3ServerCliIntegrationTest, ObjectGetTest) {
+  TEST_F(S3ServerCliTest, ObjectGetTest) {
 
     // arrange
     std::string filename = Core::FileUtils::CreateTempFile("json", 10);
@@ -137,7 +137,7 @@ namespace AwsMock::Service {
     EXPECT_TRUE(Core::FileUtils::FileExists(filename));
   }
 
-  TEST_F(S3ServerCliIntegrationTest, ObjectCopyTest) {
+  TEST_F(S3ServerCliTest, ObjectCopyTest) {
 
     // arrange
     std::string filename = Core::FileUtils::CreateTempFile("json", 10);
@@ -157,7 +157,7 @@ namespace AwsMock::Service {
     EXPECT_TRUE(objectList[1].key == "test/" + filename);
   }
 
-  TEST_F(S3ServerCliIntegrationTest, ObjectMoveTest) {
+  TEST_F(S3ServerCliTest, ObjectMoveTest) {
 
     // arrange
     std::string filename = Core::FileUtils::CreateTempFile("json", 10);
@@ -176,7 +176,7 @@ namespace AwsMock::Service {
     EXPECT_TRUE(objectList[0].key == "test/" + filename);
   }
 
-  TEST_F(S3ServerCliIntegrationTest, ObjectDeleteTest) {
+  TEST_F(S3ServerCliTest, ObjectDeleteTest) {
 
     // arrange
     std::string filename = Core::FileUtils::CreateTempFile("json", 10);

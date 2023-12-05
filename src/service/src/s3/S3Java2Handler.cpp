@@ -228,11 +228,6 @@ namespace AwsMock::Service {
 
         HeaderMap headerMap;
         headerMap["Content-MD5"] = putObjectResponse.md5Sum;
-        //headerMap["Content-Length"] = std::to_string(putObjectResponse.contentLength);
-        headerMap["ETag"] = "\"" + putObjectResponse.etag + "\"";
-        headerMap["x-amz-sdk-checksum-algorithm"] = putObjectResponse.checksumAlgorithm;
-        headerMap["x-amz-checksum-sha256"] = putObjectResponse.checksumSha256;
-        headerMap["x-amz-checksum"] = putObjectResponse.etag;
         if (!putObjectResponse.versionId.empty()) {
           headerMap["x-amz-version-id"] = putObjectResponse.versionId;
         }
@@ -369,6 +364,5 @@ namespace AwsMock::Service {
     std::ostream &outputStream = response.send();
     outputStream.flush();
   }
-
 
 }
