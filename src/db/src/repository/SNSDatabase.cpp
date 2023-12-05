@@ -182,11 +182,23 @@ namespace AwsMock::Database {
 
       try {
 
-        auto queueCursor = _topicCollection.find(make_document(kvp("region", region)));
-        for (auto topic : queueCursor) {
-          Entity::SNS::Topic result;
-          result.FromDocument(topic);
-          topicList.push_back(result);
+        if(region.empty()) {
+
+          auto queueCursor = _topicCollection.find({});
+          for (auto topic : queueCursor) {
+            Entity::SNS::Topic result;
+            result.FromDocument(topic);
+            topicList.push_back(result);
+          }
+
+        } else {
+
+          auto queueCursor = _topicCollection.find(make_document(kvp("region", region)));
+          for (auto topic : queueCursor) {
+            Entity::SNS::Topic result;
+            result.FromDocument(topic);
+            topicList.push_back(result);
+          }
         }
 
       } catch (const mongocxx::exception &exc) {
@@ -362,13 +374,23 @@ namespace AwsMock::Database {
     if (HasDatabase()) {
 
       try {
-        long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("topicArn", topicArn)));
+
+        long count = 0;
+        if(!region.empty() && !topicArn.empty()) {
+          count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("topicArn", topicArn)));
+        } else if(!region.empty()) {
+          count = _messageCollection.count_documents(make_document(kvp("region", region)));
+        } else {
+          count = _messageCollection.count_documents({});
+        }
         log_trace_stream(_logger) << "Count messages, region: " << region << " arn: " << topicArn << " result: " << count << std::endl;
         return count;
+
       } catch (const mongocxx::exception &exc) {
         _logger.error() << "SNS Database exception " << exc.what() << std::endl;
         throw Core::DatabaseException(exc.what(), 500);
       }
+
     } else {
 
       return _memoryDb.CountMessages(region, topicArn);

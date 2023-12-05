@@ -21,7 +21,6 @@
 #define REGION "eu-central-1"
 #define TEST_BUCKET_NAME std::string("test-bucket")
 #define TEST_BUCKET std::string("s3://test-bucket")
-#define TEST_KEY "testfile.json"
 #define OWNER "test-owner"
 #define S3_ACCOUNT_ID "000000000000"
 

@@ -190,7 +190,7 @@ namespace AwsMock::Service {
     Core::ExecResult createResult = Core::TestUtils::SendCliCommand("sqs", "aws sqs create-queue --queue-name " + TEST_QUEUE + " --endpoint " + _endpoint);
     EXPECT_EQ(0, createResult.status);
     Core::ExecResult sendResult = Core::TestUtils::SendCliCommand("sqs", "aws sqs send-message --queue-url " + _queueUrl + " --message-body TEST-BODY --endpoint " + _endpoint);
-    EXPECT_EQ(0, createResult.status);
+    EXPECT_EQ(0, sendResult.status);
     Core::ExecResult receiveResult = Core::TestUtils::SendCliCommand("sqs", "aws sqs receive-message --queue-url " + _queueUrl + " --endpoint " + _endpoint);
     EXPECT_EQ(0, receiveResult.status);
     std::string receiptHandle = GetReceiptHandle(receiveResult.output);
