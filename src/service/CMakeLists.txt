@@ -6,7 +6,8 @@ set(S3_SOURCES src/s3/S3Server.cpp src/s3/S3Handler.cpp src/s3/S3CliHandler.cpp 
         src/s3/S3Java2Handler.cpp src/s3/S3Service.cpp src/s3/S3Monitoring.cpp)
 set(SQS_SOURCES src/sqs/SQSServer.cpp src/sqs/SQSHandler.cpp src/sqs/SQSCliHandler.cpp src/sqs/SQSCppHandler.cpp
         src/sqs/SQSJava2Handler.cpp src/sqs/SQSService.cpp src/sqs/SQSMonitoring.cpp)
-set(SNS_SOURCES src/sns/SNSServer.cpp src/sns/SNSHandler.cpp src/sns/SNSService.cpp src/sns/SNSMonitoring.cpp)
+set(SNS_SOURCES src/sns/SNSServer.cpp src/sns/SNSHandler.cpp src/sns/SNSCliHandler.cpp src/sns/SNSJava2Handler.cpp
+        src/sns/SNSCppHandler.cpp src/sns/SNSService.cpp src/sns/SNSMonitoring.cpp)
 set(LAMBDA_SOURCES src/lambda/LambdaServer.cpp src/lambda/LambdaHandler.cpp src/lambda/LambdaService.cpp
         src/lambda/LambdaMonitoring.cpp src/lambda/LambdaCreator.cpp src/lambda/LambdaExecutor.cpp)
 set(COGNITO_SOURCES src/cognito/CognitoHandler.cpp src/cognito/CognitoHandler.cpp src/cognito/CognitoService.cpp

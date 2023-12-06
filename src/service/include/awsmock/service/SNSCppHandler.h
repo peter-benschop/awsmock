@@ -2,8 +2,8 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_SNSHANDLER_H
-#define AWSMOCK_SERVICE_SNSHANDLER_H
+#ifndef AWSMOCK_SERVICE_SNSCPPHANDLER_H
+#define AWSMOCK_SERVICE_SNSCPPHANDLER_H
 
 // Poco includes
 #include <Poco/DateTime.h>
@@ -17,18 +17,15 @@
 #include <awsmock/core/MetricDefinition.h>
 #include <awsmock/service/AbstractHandler.h>
 #include <awsmock/service/SNSService.h>
-#include <awsmock/service/SNSCliHandler.h>
-#include <awsmock/service/SNSJava2Handler.h>
-#include <awsmock/service/SNSCppHandler.h>
 
 namespace AwsMock::Service {
 
   typedef std::map<std::string, std::string> AttributeList;
 
   /**
-   * AWS SNS mock handler
+   * AWS SNS mock handler for Java
    */
-  class SNSHandler : public SNSCliHandler, public SNSJava2Handler, public SNSCppHandler {
+  class SNSCppHandler : public virtual AbstractHandler {
 
   public:
 
@@ -39,7 +36,7 @@ namespace AwsMock::Service {
      * @param metricService monitoring module
      * @param condition stop condition
      */
-    SNSHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
+    SNSCppHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
 
   protected:
 
@@ -136,4 +133,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_SNSHANDLER_H
+#endif // AWSMOCK_SERVICE_SNSCPPHANDLER_H

@@ -40,7 +40,6 @@ namespace AwsMock::Service {
       _endpoint = "http://" + _host + ":" + _port;
 
       // Start HTTP manager
-      Poco::ThreadPool::defaultPool().addCapacity(100);
       Poco::ThreadPool::defaultPool().start(_s3Server);
     }
 
