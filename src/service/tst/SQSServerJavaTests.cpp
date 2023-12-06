@@ -13,7 +13,6 @@
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/SQSServer.h>
-#include <awsmock/service/SQSService.h>
 
 // Test includes
 #include <awsmock/core/TestUtils.h>

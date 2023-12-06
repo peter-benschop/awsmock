@@ -2,24 +2,21 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_SNSHANDLER_H
-#define AWSMOCK_SERVICE_SNSHANDLER_H
+#ifndef AWSMOCK_SERVICE_SNSCLIHANDLER_H
+#define AWSMOCK_SERVICE_SNSCLIHANDLER_H
 
 // Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
+#include "Poco/DateTime.h"
+#include "Poco/DateTimeFormat.h"
+#include "Poco/DateTimeFormatter.h"
 
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
-#include <awsmock/core/MetricService.h>
-#include <awsmock/core/MetricServiceTimer.h>
-#include <awsmock/core/MetricDefinition.h>
-#include <awsmock/service/AbstractHandler.h>
-#include <awsmock/service/SNSService.h>
-#include <awsmock/service/SNSCliHandler.h>
-#include <awsmock/service/SNSJava2Handler.h>
-#include <awsmock/service/SNSCppHandler.h>
+#include "awsmock/core/Configuration.h"
+#include "awsmock/core/MetricService.h"
+#include "awsmock/core/MetricServiceTimer.h"
+#include "awsmock/core/MetricDefinition.h"
+#include "awsmock/service/AbstractHandler.h"
+#include "awsmock/service/SNSService.h"
 
 namespace AwsMock::Service {
 
@@ -28,7 +25,7 @@ namespace AwsMock::Service {
   /**
    * AWS SNS mock handler
    */
-  class SNSHandler : public SNSCliHandler, public SNSJava2Handler, public SNSCppHandler {
+  class SNSCliHandler : public virtual AbstractHandler {
 
   public:
 
@@ -39,7 +36,7 @@ namespace AwsMock::Service {
      * @param metricService monitoring module
      * @param condition stop condition
      */
-    SNSHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
+    SNSCliHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
 
   protected:
 
@@ -136,4 +133,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_SNSHANDLER_H
+#endif // AWSMOCK_SERVICE_SNSCLIHANDLER_H

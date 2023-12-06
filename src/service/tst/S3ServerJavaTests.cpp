@@ -13,7 +13,6 @@
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/S3Server.h>
-#include <awsmock/service/S3Service.h>
 
 // Test includes
 #include <awsmock/core/TestUtils.h>
@@ -22,14 +21,6 @@
 #define BUCKET "test-bucket"
 #define KEY "testfile.json"
 #define OWNER "test-owner"
-#define LOCATION_CONSTRAINT "<CreateBucketConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\"> \
-                                <LocationConstraint>eu-central-1</LocationConstraint> \
-                             </CreateBucketConfiguration>"
-#define CREATE_BUCKET_RESPONSE "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<CreateBucketResult>\n\t<BucketArn>arn</BucketArn>\n</CreateBucketResult>\n"
-#define TEST_CONTENT R"({"test":"test"})"
-#define VERSIONING_BODY "<VersioningConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">" \
-                        "  <Status>Enabled</Status>" \
-                        "</VersioningConfiguration>"
 
 namespace AwsMock::Service {
 
@@ -51,7 +42,6 @@ namespace AwsMock::Service {
       _tempFile = Core::FileUtils::CreateTempFile("txt");
 
       // Start HTTP manager
-      Poco::ThreadPool::defaultPool().addCapacity(10);
       Poco::ThreadPool::defaultPool().start(_s3Server);
     }
 
@@ -83,23 +73,6 @@ namespace AwsMock::Service {
     EXPECT_EQ(0, result.status);
     EXPECT_EQ(1, bucketList.size());
   }
-
-  /*TEST_F(S3ServerJavaTest, BucketCreateVersionedTest) {
-
-    // arrange
-    _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("s3", "mb");
-    Core::CurlResponse response = _curlUtils.SendHttpRequest("PUT", _endpoint + "/" + BUCKET, _extraHeaders, LOCATION_CONSTRAINT);
-    Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
-    EXPECT_EQ(1, bucketList.size());
-
-    // act
-    _extraHeaders["User-Agent"] = Core::AwsUtils::GetCliUserAgentHeader("s3", "cp");
-    Core::CurlResponse versioningResponse = _curlUtils.SendHttpRequest("PUT", _endpoint + "/" + BUCKET + "?versioning", _extraHeaders, VERSIONING_BODY);
-
-    // assert
-    EXPECT_TRUE(versioningResponse.statusCode == Poco::Net::HTTPResponse::HTTP_NO_CONTENT);
-    EXPECT_EQ(1, bucketList.size());
-  }*/
 
   TEST_F(S3ServerJavaTest, BucketListTest) {
 
