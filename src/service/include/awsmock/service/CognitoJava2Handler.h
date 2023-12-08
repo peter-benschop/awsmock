@@ -2,8 +2,8 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_COGNITOHANDLER_H
-#define AWSMOCK_SERVICE_COGNITOHANDLER_H
+#ifndef AWSMOCK_SERVICE_COGNITO_JAVA_HANDLER_H
+#define AWSMOCK_SERVICE_COGNITO_JAVA_HANDLER_H
 
 // Poco includes
 #include "Poco/DateTime.h"
@@ -17,16 +17,14 @@
 #include <awsmock/core/MetricServiceTimer.h>
 #include <awsmock/core/MetricDefinition.h>
 #include <awsmock/service/AbstractHandler.h>
-#include <awsmock/service/CognitoCliHandler.h>
-#include <awsmock/service/CognitoJava2Handler.h>
 #include <awsmock/service/CognitoService.h>
 
 namespace AwsMock::Service {
 
   /**
-   * AWS Cognito mock handler
+   * AWS Cognito mock HTTP handler
    */
-  class CognitoHandler : public CognitoCliHandler, public CognitoJava2Handler {
+  class CognitoJava2Handler : public virtual AbstractHandler {
 
   public:
 
@@ -36,7 +34,7 @@ namespace AwsMock::Service {
      * @param configuration application configuration
      * @param metricService monitoring module
      */
-    CognitoHandler(Core::Configuration &configuration, Core::MetricService &metricService);
+    CognitoJava2Handler(Core::Configuration &configuration, Core::MetricService &metricService);
 
   protected:
 
@@ -106,6 +104,14 @@ namespace AwsMock::Service {
   private:
 
     /**
+     * Return the command from the header.
+     *
+     * @param request HTTP request
+     * @return SQS action
+     */
+    std::string GetActionFromHeader(Poco::Net::HTTPServerRequest &request);
+
+    /**
      * Logger
      */
     Core::LogStream _logger;
@@ -129,4 +135,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_COGNITOHANDLER_H
+#endif // AWSMOCK_SERVICE_COGNITO_JAVA_HANDLER_H

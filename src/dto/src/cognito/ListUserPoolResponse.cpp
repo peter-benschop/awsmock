@@ -16,14 +16,15 @@ namespace AwsMock::Dto::Cognito {
         Poco::JSON::Object userPoolJson;
         userPoolJson.set("Id", userPool.id);
         userPoolJson.set("Name", userPool.name);
-        userPoolJson.set("LastModifiedDate", Poco::DateTimeFormatter().format(userPool.modified, Poco::DateTimeFormat::ISO8601_FRAC_FORMAT));
-        userPoolJson.set("CreationDate", Poco::DateTimeFormatter().format(userPool.created, Poco::DateTimeFormat::ISO8601_FRAC_FORMAT));
+        userPoolJson.set("LastModifiedDate", std::to_string(userPool.modified.timestamp().epochTime()));
+        userPoolJson.set("CreationDate", std::to_string(userPool.modified.timestamp().epochTime()));
         userPoolArray.add(userPoolJson);
       }
 
       rootObject.set("UserPools", userPoolArray);
       std::ostringstream os;
       rootObject.stringify(os);
+      std::string tmp = os.str();
       return os.str();
 
     } catch (Poco::Exception &exc) {
