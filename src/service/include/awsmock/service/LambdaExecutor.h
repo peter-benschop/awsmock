@@ -6,16 +6,15 @@
 #define AWSMOCK_SERVICE_LAMBDAEXECUTOR_H
 
 // Poco includes
-#include "Poco/Logger.h"
-#include "Poco/Runnable.h"
-#include "Poco/Notification.h"
-#include "Poco/NotificationQueue.h"
+#include <Poco/Logger.h>
+#include <Poco/Runnable.h>
+#include <Poco/Notification.h>
+#include <Poco/NotificationQueue.h>
 #include <Poco/Net/HTTPClientSession.h>
 #include <Poco/Net/HTTPRequest.h>
 #include <Poco/Net/HTTPResponse.h>
 
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/MetricService.h>
 #include <awsmock/core/MetricServiceTimer.h>
@@ -40,16 +39,15 @@ namespace AwsMock::Service {
     /**
      * Constructor
      *
-     * @param configuration application configuration
      * @param metricService monitoring module
      * @param invokeQueue invoke notification queue
      */
-    LambdaExecutor(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &invokeQueue);
+    LambdaExecutor(Core::MetricService &metricService, Poco::NotificationQueue &invokeQueue);
 
     /**
      * Listens for invocation requests and send the invocation to the right port.
      */
-    void run();
+    void run() override;
 
   private:
 
@@ -75,11 +73,6 @@ namespace AwsMock::Service {
      * Logger
      */
     Core::LogStream _logger;
-
-    /**
-     * S3 handler configuration
-     */
-    Core::Configuration &_configuration;
 
     /**
      * Metric module

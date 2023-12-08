@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database {
 
-  std::vector<std::string> TestUtils::_modules = {"s3", "sqs", "sns", "lambda", "transfer", "gateway", "database"};
+  std::vector<std::string> TestUtils::_modules = {"s3", "sqs", "sns", "lambda", "transfer", "cognito", "gateway", "database"};
 
   void TestUtils::CreateServices() {
     Core::Configuration configuration = Core::Configuration(TMP_PROPERTIES_FILE);

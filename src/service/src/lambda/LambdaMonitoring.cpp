@@ -19,6 +19,9 @@ namespace AwsMock::Service {
 
   void LambdaMonitoring::run() {
 
+    if (_period <= 0) {
+      return;
+    }
     log_info_stream(_logger) << "lambda monitoring started" << std::endl;
 
     _running = true;

@@ -6,9 +6,7 @@
 
 namespace AwsMock::Service {
 
-  LambdaExecutor::LambdaExecutor(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &invokeQueue)
-      : _logger(Poco::Logger::get("LambdaExecutor")), _configuration(configuration), _metricService(metricService), _invokeQueue(invokeQueue) {
-  }
+  LambdaExecutor::LambdaExecutor(Core::MetricService &metricService, Poco::NotificationQueue &invokeQueue) : _logger(Poco::Logger::get("LambdaExecutor")), _metricService(metricService), _invokeQueue(invokeQueue) {}
 
   void LambdaExecutor::run() {
     log_debug_stream(_logger) << "lambda invocation notification received, queueSize:" << _invokeQueue.size() << std::endl;

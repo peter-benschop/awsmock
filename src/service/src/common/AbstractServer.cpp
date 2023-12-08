@@ -66,8 +66,9 @@ namespace AwsMock::Service {
 
   void AbstractServer::StopHttpServer() {
     if (_httpServer) {
-      _httpServer->stop();
+      _httpServer->stopAll(true);
       _httpServer.reset();
+      log_debug_stream(_logger) << "HTTP server stopped: " << _name << std::endl;
     }
   }
 

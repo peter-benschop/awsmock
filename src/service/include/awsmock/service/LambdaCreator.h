@@ -10,8 +10,6 @@
 #include <sstream>
 
 // Poco includes
-#include "Poco/ActiveMethod.h"
-#include "Poco/ActiveResult.h"
 #include <Poco/Base64Decoder.h>
 #include <Poco/NotificationQueue.h>
 #include <Poco/StreamCopier.h>
@@ -38,10 +36,9 @@ namespace AwsMock::Service {
      * Constructor
      *
      * @param configuration module configuration
-     * @param metricService monitoring module
      * @param createQueue lambda create notification queue
      */
-    explicit LambdaCreator(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue);
+    explicit LambdaCreator(Core::Configuration &configuration, Poco::NotificationQueue &createQueue);
 
     /**
      * Listens for invocation requests and send the invocation to the right port.
@@ -49,12 +46,13 @@ namespace AwsMock::Service {
     void run() override;
 
   private:
-/**
-       * Create new lambda function
-       *
-       * @param functionCode zipped and BASE64 encoded function code
-       * @param functionId lambda function OID
-       */
+
+    /**
+     * Create new lambda function
+     *
+     * @param functionCode zipped and BASE64 encoded function code
+     * @param functionId lambda function OID
+     */
     void CreateLambdaFunction(const std::string &functionCode, const std::string &functionId);
 
     /**
@@ -127,11 +125,6 @@ namespace AwsMock::Service {
      * Configuration
      */
     Core::Configuration &_configuration;
-
-    /**
-     * Metric module
-     */
-    Core::MetricService &_metricService;
 
     /**
      * Database connection

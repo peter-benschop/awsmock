@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
 
   CognitoServer::CognitoServer(Core::Configuration &configuration, Core::MetricService &metricService)
-      : AbstractWorker(configuration), AbstractServer(configuration, "cognito"), _logger(Poco::Logger::get("CognitoServer")), _configuration(configuration), _metricService(metricService), _module("cognito") {
+      : AbstractWorker(configuration), AbstractServer(configuration, "cognito"), _logger(Poco::Logger::get("CognitoServer")), _configuration(configuration), _metricService(metricService), _module("cognito"), _running(false) {
 
     // Get HTTP configuration values
     _port = _configuration.getInt("awsmock.service.cognito.port", COGNITO_DEFAULT_PORT);
@@ -39,7 +39,7 @@ namespace AwsMock::Service {
   void CognitoServer::MainLoop() {
 
     // Check module active
-    if (!IsActive("s3")) {
+    if (!IsActive("cognito")) {
       log_info_stream(_logger) << "Cognito module inactive" << std::endl;
       return;
     }

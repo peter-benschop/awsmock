@@ -65,7 +65,7 @@ namespace AwsMock::Database {
     return it->second;
   }
 
-  long CognitoMemoryDb::UserPoolCount(const std::string &region) {
+  long CognitoMemoryDb::CountUserPools(const std::string &region) {
     long count = 0;
     if (region.empty()) {
       count = static_cast<long>(_userPools.size());

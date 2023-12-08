@@ -19,6 +19,7 @@ namespace AwsMock::Core {
     ofs << "awsmock.account.id=000000000000" << std::endl;
     ofs << "awsmock.client.id=00000000" << std::endl;
     ofs << "awsmock.user=none" << std::endl;
+    ofs << "awsmock.data.dir=/tmp/awsmock/data" << std::endl;
     // Rest configuration
     ofs << "awsmock.service.gateway.host=" << hostName << std::endl;
     ofs << "awsmock.service.gateway.port=" << port << std::endl;
@@ -42,6 +43,21 @@ namespace AwsMock::Core {
     ofs << "awsmock.service.sns.port=19502" << std::endl;
     ofs << "awsmock.service.sns.host=" << hostName << std::endl;
     ofs << "awsmock.monitoring.sns.period=-1" << std::endl;
+    // Lambda configuration
+    ofs << "awsmock.service.lambda.active=true" << std::endl;
+    ofs << "awsmock.service.lambda.port=19503" << std::endl;
+    ofs << "awsmock.service.lambda.host=localhost" << std::endl;
+    ofs << "awsmock.monitoring.lambda.period=-1" << std::endl;
+    // Transfer configuration
+    ofs << "awsmock.service.transfer.active=true" << std::endl;
+    ofs << "awsmock.service.transfer.port=19504" << std::endl;
+    ofs << "awsmock.service.transfer.host=localhost" << std::endl;
+    ofs << "awsmock.monitoring.transfer.period=-1" << std::endl;
+    // Cognito configuration
+    ofs << "awsmock.service.cognito.active=true" << std::endl;
+    ofs << "awsmock.service.cognito.port=19505" << std::endl;
+    ofs << "awsmock.service.cognito.host=localhost" << std::endl;
+    ofs << "awsmock.monitoring.cognito.period=-1" << std::endl;
     // Thread pool configuration
     ofs << "awsmock.threadpool.name=srv-worker" << std::endl;
     ofs << "awsmock.threadpool.min=8" << std::endl;
@@ -50,7 +66,7 @@ namespace AwsMock::Core {
     // Monitoring configuration
     ofs << "awsmock.monitoring.port=8081" << std::endl;
     // Logging
-    ofs << "awsmock.log.level=error" << std::endl;
+    ofs << "awsmock.log.level=debug" << std::endl;
     // Docker
     ofs << "awsmock.docker.network.mode=bridge" << std::endl;
     ofs << "awsmock.docker.network.name=.dockerhost.net" << std::endl;

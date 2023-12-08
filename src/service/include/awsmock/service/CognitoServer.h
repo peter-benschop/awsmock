@@ -22,7 +22,7 @@
 #include <awsmock/service/CognitoMonitoring.h>
 #include <awsmock/service/CognitoHandlerFactory.h>
 
-#define COGNITO_DEFAULT_PORT 9500
+#define COGNITO_DEFAULT_PORT 9505
 #define COGNITO_DEFAULT_HOST "localhost"
 #define COGNITO_DEFAULT_QUEUE_SIZE 250
 #define COGNITO_DEFAULT_MAX_THREADS 50

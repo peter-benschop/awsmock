@@ -19,6 +19,9 @@ namespace AwsMock::Service {
 
   void SNSMonitoring::run() {
 
+    if (_period <= 0) {
+      return;
+    }
     log_info_stream(_logger) << "SNS monitoring started" << std::endl;
 
     _running = true;

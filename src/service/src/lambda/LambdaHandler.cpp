@@ -94,7 +94,8 @@ namespace AwsMock::Service {
         log_debug_stream(_logger) << "Found lambda arn, arn: " << arn << std::endl;
 
         std::string body = Core::HttpUtils::GetBodyAsString(request);
-        Dto::Lambda::CreateTagRequest lambdaRequest(arn, body);
+        Dto::Lambda::CreateTagRequest lambdaRequest;
+        lambdaRequest.FromJson(body);
 
         _lambdaService.CreateTag(lambdaRequest);
         SendOkResponse(response, {}, Poco::Net::HTTPResponse::HTTP_NO_CONTENT);

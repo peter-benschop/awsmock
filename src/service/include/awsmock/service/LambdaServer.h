@@ -160,12 +160,12 @@ namespace AwsMock::Service {
     /**
      * lambda creator
      */
-    LambdaCreator _lambdaCreator = LambdaCreator(_configuration, _metricService, _createQueue);
+    LambdaCreator _lambdaCreator = LambdaCreator(_configuration, _createQueue);
 
     /**
      * lambda executor
      */
-    LambdaExecutor _lambdaExecutor = LambdaExecutor(_configuration, _metricService, _invokeQueue);
+    LambdaExecutor _lambdaExecutor = LambdaExecutor( _metricService, _invokeQueue);
 
     /**
      * Data dir
