@@ -175,12 +175,14 @@ namespace AwsMock::Database {
           }
 
         } else {
+
           auto userPoolCursor = _userPoolCollection.find(make_document(kvp("region", region)));
           for (auto userPool : userPoolCursor) {
             Entity::Cognito::UserPool result;
             result.FromDocument(userPool);
             userPools.push_back(result);
           }
+
         }
       } catch (const mongocxx::exception &exc) {
         _logger.error() << "Database exception " << exc.what() << std::endl;

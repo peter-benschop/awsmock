@@ -52,7 +52,6 @@ namespace AwsMock::Service {
       _s3Server.StopServer();
     }
 
-    Core::CurlUtils _curlUtils;
     std::string _endpoint, _baseCommand, _tempFile;
     std::map<std::string, std::string> _extraHeaders;
     Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration();

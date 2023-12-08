@@ -3,9 +3,8 @@
 
 namespace AwsMock::Service {
 
-  CognitoHandler::CognitoHandler(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractHandler(), _logger(Poco::Logger::get("CognitoHandler")), _configuration(configuration), _metricService(metricService),
-                                                                                                           _cognitoService(configuration) {
-  }
+  CognitoHandler::CognitoHandler(Core::Configuration &configuration, Core::MetricService &metricService) : CognitoCliHandler(configuration, metricService), CognitoJava2Handler(configuration, metricService), _logger(Poco::Logger::get("CognitoHandler")),
+                                                                                                           _configuration(configuration), _metricService(metricService), _cognitoService(configuration) {}
 
   void CognitoHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
     log_debug_stream(_logger) << "Cognito GET request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
@@ -20,49 +19,21 @@ namespace AwsMock::Service {
 
     try {
 
-      //DumpRequest(request);
-      //DumpBody(request);
-
       Dto::Common::UserAgent userAgent;
-      userAgent.FromRequest(request, "cognito-idp");
+      userAgent.FromRequest(request, "cognito");
 
-      if (userAgent.clientCommand == "create-user-pool") {
-
-        std::string payload = GetPayload(request);
-        Dto::Cognito::CreateUserPoolRequest cognitoRequest{};
-        cognitoRequest.FromJson(payload);
-        cognitoRequest.region = region;
-
-        log_debug_stream(_logger) << "Got list user pool request, json: " << cognitoRequest.ToString() << std::endl;
-
-        Dto::Cognito::CreateUserPoolResponse serviceResponse = _cognitoService.CreateUserPool(cognitoRequest);
-        SendOkResponse(response, serviceResponse.ToJson());
-
-      } else if (userAgent.clientCommand == "list-user-pools") {
-
-        std::string payload = GetPayload(request);
-        Dto::Cognito::ListUserPoolRequest cognitoRequest{};
-        cognitoRequest.FromJson(payload);
-        cognitoRequest.region = region;
-        log_debug_stream(_logger) << "Got list user pool request, json: " << cognitoRequest.ToString() << std::endl;
-
-        Dto::Cognito::ListUserPoolResponse serviceResponse = _cognitoService.ListUserPools(cognitoRequest);
-        SendOkResponse(response, serviceResponse.ToJson());
-
-      } else if (userAgent.clientCommand == "delete-user-pool") {
-
-        std::string payload = GetPayload(request);
-        Dto::Cognito::DeleteUserPoolRequest cognitoRequest{};
-        cognitoRequest.FromJson(payload);
-        log_debug_stream(_logger) << "Got delete user pool request, json: " << cognitoRequest.ToString() << std::endl;
-
-        _cognitoService.DeleteUserPool(cognitoRequest);
-        SendOkResponse(response);
+      switch (userAgent.type) {
+      case Dto::Common::UserAgentType::AWS_SDK_UNKNOWN:
+      case Dto::Common::UserAgentType::AWS_CLI: return CognitoCliHandler::handlePost(request, response, region, user);
+      case Dto::Common::UserAgentType::AWS_SDK_JAVA1: break;
+      case Dto::Common::UserAgentType::AWS_SDK_JAVA2: return CognitoJava2Handler::handlePost(request, response, region, user);
+      case Dto::Common::UserAgentType::AWS_SDK_CPP: return CognitoJava2Handler::handlePost(request, response, region, user);
 
       }
 
-    } catch (Poco::Exception &exc) {
-      SendXmlErrorResponse("Cognito", response, exc);
+    } catch (Core::ServiceException &exc) {
+      _logger.error() << "SQS module exception: " << exc.message() << std::endl;
+      SendXmlErrorResponse("SQS", response, exc);
     }
   }
 
