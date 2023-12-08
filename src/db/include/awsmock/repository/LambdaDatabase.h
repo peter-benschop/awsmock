@@ -136,7 +136,7 @@ namespace AwsMock::Database {
      * @param region AWS region name
      * @return list of lambda functions
      */
-    std::vector<Entity::Lambda::Lambda> ListLambdas(const std::string &region);
+    std::vector<Entity::Lambda::Lambda> ListLambdas(const std::string &region = {});
 
     /**
      * Deletes an existing lambda function

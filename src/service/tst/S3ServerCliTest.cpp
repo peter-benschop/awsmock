@@ -2,8 +2,8 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_S3_S3SERVERINTEGRATIONTEST_H
-#define AWMOCK_S3_S3SERVERINTEGRATIONTEST_H
+#ifndef AWMOCK_S3_S3SERVERCLITEST_H
+#define AWMOCK_S3_S3SERVERCLITEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
@@ -19,9 +19,9 @@
 #include <awsmock/core/TestUtils.h>
 
 #define REGION "eu-central-1"
+#define OWNER "test-owner"
 #define TEST_BUCKET_NAME std::string("test-bucket")
 #define TEST_BUCKET std::string("s3://test-bucket")
-#define OWNER "test-owner"
 #define S3_ACCOUNT_ID "000000000000"
 
 namespace AwsMock::Service {
@@ -192,6 +192,6 @@ namespace AwsMock::Service {
     EXPECT_EQ(0, objectList.size());
   }
 
-} // namespace AwsMock::Core
+} // namespace AwsMock::Service
 
-#endif // AWMOCK_S3_S3SERVERINTEGRATIONTEST_H
+#endif // AWMOCK_S3_S3SERVERCLITEST_H

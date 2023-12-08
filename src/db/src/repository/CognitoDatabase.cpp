@@ -164,13 +164,24 @@ namespace AwsMock::Database {
     if (HasDatabase()) {
 
       try {
-        auto userPoolCursor = _userPoolCollection.find(make_document(kvp("region", region)));
-        for (auto userPool : userPoolCursor) {
-          Entity::Cognito::UserPool result;
-          result.FromDocument(userPool);
-          userPools.push_back(result);
-        }
 
+        if(region.empty()) {
+
+          auto userPoolCursor = _userPoolCollection.find(make_document());
+          for (auto userPool : userPoolCursor) {
+            Entity::Cognito::UserPool result;
+            result.FromDocument(userPool);
+            userPools.push_back(result);
+          }
+
+        } else {
+          auto userPoolCursor = _userPoolCollection.find(make_document(kvp("region", region)));
+          for (auto userPool : userPoolCursor) {
+            Entity::Cognito::UserPool result;
+            result.FromDocument(userPool);
+            userPools.push_back(result);
+          }
+        }
       } catch (const mongocxx::exception &exc) {
         _logger.error() << "Database exception " << exc.what() << std::endl;
         throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
@@ -183,6 +194,32 @@ namespace AwsMock::Database {
 
     log_trace_stream(_logger) << "Got user pool list, size:" << userPools.size() << std::endl;
     return userPools;
+  }
+
+  long CognitoDatabase::CountUserPools(const std::string &region) {
+
+    if (HasDatabase()) {
+
+      try {
+        long count = 0;
+        if (region.empty()) {
+          count = _userPoolCollection.count_documents(make_document());
+        } else {
+          count = _userPoolCollection.count_documents(make_document(kvp("region", region)));
+        }
+        log_trace_stream(_logger) << "lambda count: " << count << std::endl;
+        return count;
+
+      } catch (mongocxx::exception::system_error &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+      }
+
+    } else {
+
+      return _memoryDb.CountUserPools(region);
+
+    }
   }
 
   void CognitoDatabase::DeleteUserPool(const std::string &id) {

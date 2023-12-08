@@ -59,5 +59,7 @@ namespace AwsMock::Core {
      */
     static Core::ExecResult SendCliCommand(const std::string &service, const std::string &command);
   };
-}
+
+} // namespace AwsMock::Core
+
 #endif //AWSMOCK_CORE_TESTUTILS_H

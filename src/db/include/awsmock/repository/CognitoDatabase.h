@@ -63,7 +63,7 @@ namespace AwsMock::Database {
      * @param region aws-mock region.
      * @return total number of user pools.
      */
-    long CognitoCount(const std::string &region = {});
+    long CountUserPools(const std::string &region = {});
 
     /**
      * Updates an existing cognito user pool
@@ -106,7 +106,7 @@ namespace AwsMock::Database {
      * @param region AWS region name
      * @return list of cognito user pools
      */
-    std::vector<Entity::Cognito::UserPool> ListUserPools(const std::string &region);
+    std::vector<Entity::Cognito::UserPool> ListUserPools(const std::string &region = {});
 
     /**
      * Deletes an existing cognito user pool

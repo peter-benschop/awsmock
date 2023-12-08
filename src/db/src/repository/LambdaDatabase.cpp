@@ -238,11 +238,23 @@ namespace AwsMock::Database {
     if (HasDatabase()) {
 
       try {
-        auto lambdaCursor = _lambdaCollection.find(make_document(kvp("region", region)));
-        for (auto lambda : lambdaCursor) {
-          Entity::Lambda::Lambda result;
-          result.FromDocument(lambda);
-          lambdas.push_back(result);
+
+        if(region.empty()) {
+
+          auto lambdaCursor = _lambdaCollection.find({});
+          for (auto lambda : lambdaCursor) {
+            Entity::Lambda::Lambda result;
+            result.FromDocument(lambda);
+            lambdas.push_back(result);
+          }
+        } else{
+          auto lambdaCursor = _lambdaCollection.find(make_document(kvp("region", region)));
+          for (auto lambda : lambdaCursor) {
+            Entity::Lambda::Lambda result;
+            result.FromDocument(lambda);
+            lambdas.push_back(result);
+          }
+
         }
 
       } catch (const mongocxx::exception &exc) {

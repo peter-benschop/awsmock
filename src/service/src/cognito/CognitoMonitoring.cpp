@@ -14,7 +14,7 @@ namespace AwsMock::Service {
 
     // Database connections
     _cognitoDatabase = std::make_unique<Database::CognitoDatabase>(_configuration);
-    log_debug_stream(_logger) << "S3 monitoring initialized" << std::endl;
+    log_debug_stream(_logger) << "Cognito monitoring initialized" << std::endl;
   }
 
   CognitoMonitoring::~CognitoMonitoring() {
@@ -23,7 +23,7 @@ namespace AwsMock::Service {
 
   void CognitoMonitoring::run() {
 
-    log_info_stream(_logger) << "S3 monitoring started" << std::endl;
+    log_info_stream(_logger) << "Cognito monitoring started" << std::endl;
 
     if (_period <= 0) {
       return;
@@ -32,7 +32,7 @@ namespace AwsMock::Service {
     _running = true;
     while (_running) {
 
-      _logger.debug() << "S3 monitoring processing started" << std::endl;
+      _logger.debug() << "Cognito monitoring processing started" << std::endl;
 
       // Update counter
       UpdateCounters();
@@ -49,16 +49,8 @@ namespace AwsMock::Service {
   void CognitoMonitoring::Stop() { _condition.signal(); }
 
   void CognitoMonitoring::UpdateCounters() {
-    /*long buckets = _cognitoDatabase->BucketCount();
-    long objects = _cognitoDatabase->ObjectCount();
-    _metricService.SetGauge("s3_bucket_count_total", buckets);
-    _metricService.SetGauge("s3_object_count_total", objects);
-    for (const auto &bucket : _cognitoDatabase->ListBuckets()) {
-      std::string labelValue = Poco::replace(bucket.name, "-", "_");
-      long objectsPerBucket = _cognitoDatabase->ObjectCount(bucket.region, bucket.name);
-      _metricService.SetGauge("s3_bucket_count", "bucket", labelValue, objectsPerBucket);
-    }*/
-
+    long userPools = _cognitoDatabase->CountUserPools();
+    _metricService.SetGauge("cognito_userpool_count_total", userPools);
   }
 
 } // namespace AwsMock::Worker
