@@ -113,5 +113,27 @@ namespace AwsMock::Service {
     }
 
   }
+  void CognitoService::AdminDeleteUser(const Dto::Cognito::AdminDeleteUserRequest &request) {
+    log_debug_stream(_logger) << "Admin delete user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId << std::endl;
 
+    if (!_database->UserPoolExists(request.userPoolId)) {
+      throw Core::ServiceException("User pool does not exists, id: " + request.userPoolId);
+    }
+
+    if (!_database->UserExists(request.region, request.userPoolId, request.userName)) {
+      throw Core::ServiceException("User does not exists, userPoolId: " + request.userPoolId + " userName: " + request.userName);
+    }
+
+    try {
+      Database::Entity::Cognito::User user = _database->GetUserByUserName(request.region, request.userPoolId, request.userName);
+
+      _database->DeleteUser(user);
+      log_trace_stream(_logger) << "User deleted, userName:  " << request.userName << " userPoolId: " << request.userPoolId << std::endl;
+
+    } catch (Poco::Exception &ex) {
+      log_error_stream(_logger) << "Delete user request failed, message: " << ex.message() << std::endl;
+      throw Core::ServiceException(ex.message(), 500);
+    }
+
+  }
 } // namespace AwsMock::Service

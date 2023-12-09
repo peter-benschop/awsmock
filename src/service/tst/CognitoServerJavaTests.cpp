@@ -24,32 +24,33 @@ namespace AwsMock::Service {
 
   class CognitoServerJavaTest : public ::testing::Test {
 
-  protected:
+    protected:
 
-    void SetUp() override {
+      void SetUp() override {
 
-      // Define endpoint
-      std::string _port = _configuration.getString("awsmock.service.cognito.port", std::to_string(COGNITO_DEFAULT_PORT));
-      std::string _host = _configuration.getString("awsmock.service.cognito.host", COGNITO_DEFAULT_HOST);
-      _endpoint = "http://" + _host + ":" + _port;
+        // Define endpoint
+        std::string _port = _configuration.getString("awsmock.service.cognito.port", std::to_string(COGNITO_DEFAULT_PORT));
+        std::string _host = _configuration.getString("awsmock.service.cognito.host", COGNITO_DEFAULT_HOST);
+        _endpoint = "http://" + _host + ":" + _port;
 
-      // Set base command
-      _baseCommand = "java -jar /usr/local/lib/awsmock-java-test-0.0.1-SNAPSHOT-jar-with-dependencies.jar " + _endpoint + " cognito ";
+        // Set base command
+        _baseCommand = "java -jar /usr/local/lib/awsmock-java-test-0.0.1-SNAPSHOT-jar-with-dependencies.jar " + _endpoint + " cognito ";
 
-      // Start HTTP manager
-      Poco::ThreadPool::defaultPool().start(_cognitoServer);
-    }
+        // Start HTTP manager
+        Poco::ThreadPool::defaultPool().start(_cognitoServer);
+      }
 
-    void TearDown() override {
-      _database.DeleteAllUserPools();
-      _cognitoServer.StopServer();
-    }
+      void TearDown() override {
+        _database.DeleteAllUsers();
+        _database.DeleteAllUserPools();
+        _cognitoServer.StopServer();
+      }
 
-    std::string _endpoint, _baseCommand;
-    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration();
-    Core::MetricService _metricService = Core::MetricService(_configuration);
-    Database::CognitoDatabase _database = Database::CognitoDatabase(_configuration);
-    CognitoServer _cognitoServer = CognitoServer(_configuration, _metricService);
+      std::string _endpoint, _baseCommand;
+      Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration();
+      Core::MetricService _metricService = Core::MetricService(_configuration);
+      Database::CognitoDatabase _database = Database::CognitoDatabase(_configuration);
+      CognitoServer _cognitoServer = CognitoServer(_configuration, _metricService);
   };
 
   TEST_F(CognitoServerJavaTest, UserPoolCreateTest) {
@@ -101,18 +102,36 @@ namespace AwsMock::Service {
   TEST_F(CognitoServerJavaTest, UserCreateTest) {
 
     // arrange
-  Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + "create-user-pool test-user-pool");
-  EXPECT_EQ(0, createResult.status);
-  Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
-  std::string userPoolId = userPoolList.front().id;
+    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + "create-user-pool test-user-pool");
+    EXPECT_EQ(0, createResult.status);
+    Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
+    std::string userPoolId = userPoolList.front().id;
 
     // act
-    Core::ExecResult result = Core::SystemUtils::Exec(_baseCommand + "create-user "+userPoolId+" test-user");
+    Core::ExecResult result = Core::SystemUtils::Exec(_baseCommand + "admin-create-user " + userPoolId + " test-user");
     Database::Entity::Cognito::UserList userList = _database.ListUsers();
 
     // assert
     EXPECT_EQ(0, result.status);
-    EXPECT_EQ(1, userPoolList.size());
+    EXPECT_EQ(1, userList.size());
+  }
+
+  TEST_F(CognitoServerJavaTest, UserDeleteTest) {
+
+    // arrange
+    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + "create-user-pool test-user-pool");
+    EXPECT_EQ(0, createResult.status);
+    Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
+    std::string userPoolId = userPoolList.front().id;
+    Core::ExecResult createdUser = Core::SystemUtils::Exec(_baseCommand + "admin-create-user " + userPoolId + " test-user");
+
+    // act
+    Core::ExecResult result = Core::SystemUtils::Exec(_baseCommand + "admin-delete-user " + userPoolId + " test-user");
+    Database::Entity::Cognito::UserList userList = _database.ListUsers();
+
+    // assert
+    EXPECT_EQ(0, result.status);
+    EXPECT_EQ(0, userList.size());
   }
 
 } // namespace AwsMock::Service

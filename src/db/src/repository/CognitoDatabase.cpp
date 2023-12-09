@@ -332,6 +332,27 @@ namespace AwsMock::Database {
 
   }
 
+  Entity::Cognito::User CognitoDatabase::GetUserByUserName(const std::string &region, const std::string &userPoolId, const std::string &userName) {
+
+    try {
+
+      auto mResult = _userCollection.find_one(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("userName", userName)));
+      if (!mResult) {
+        _logger.error() << "Database exception: user not found " << std::endl;
+        throw Core::DatabaseException("Database exception, user not found ", 500);
+      }
+
+      Entity::Cognito::User result;
+      result.FromDocument(mResult);
+      return result;
+
+    } catch (const mongocxx::exception &exc) {
+      _logger.error() << "Database exception " << exc.what() << std::endl;
+      throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+    }
+
+  }
+
   Entity::Cognito::User CognitoDatabase::GetUserById(const std::string &oid) {
 
     if (HasDatabase()) {
@@ -424,14 +445,14 @@ namespace AwsMock::Database {
     return users;
   }
 
-  void CognitoDatabase::DeleteUser(const std::string &id) {
+  void CognitoDatabase::DeleteUser(const Entity::Cognito::User &user) {
 
     if (HasDatabase()) {
 
       try {
 
-        auto result = _userCollection.delete_many(make_document(kvp("_id", id)));
-        log_debug_stream(_logger) << "User deleted, id: " << id << " count: " << result->deleted_count() << std::endl;
+        auto result = _userCollection.delete_many(make_document(kvp("region", user.region),kvp("userPoolId", user.userPoolId),kvp("userName", user.userName)));
+        log_debug_stream(_logger) << "User deleted, userName: " << user.userName << " count: " << result->deleted_count() << std::endl;
 
       } catch (const mongocxx::exception &exc) {
         _logger.error() << "Database exception " << exc.what() << std::endl;
@@ -440,7 +461,7 @@ namespace AwsMock::Database {
 
     } else {
 
-      _memoryDb.DeleteUser(id);
+      _memoryDb.DeleteUser(user);
 
     }
   }
