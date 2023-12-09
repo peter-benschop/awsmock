@@ -123,6 +123,21 @@ namespace AwsMock::Database {
     EXPECT_TRUE(result.userPoolId == USER_POOL_ID);
   }
 
+  TEST_F(CognitoMemoryDbTest, UserExistsTest) {
+
+    // arrange
+    Entity::Cognito::UserPool userPool = {.region=_region, .id=USER_POOL_ID, .name=USER_POOL_NAME};
+    Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
+    Entity::Cognito::User user = {.region=_region, .userPoolId=USER_POOL_ID, .userName=USER_NAME};
+    Entity::Cognito::User createdUser = _cognitoDatabase.CreateUser(user);
+
+    // act
+    bool result = _cognitoDatabase.UserExists(createdUser.region, createdUser.userPoolId, createdUser.userName);
+
+    // assert
+    EXPECT_TRUE(result);
+  }
+
   TEST_F(CognitoMemoryDbTest, UserCountTest) {
 
     // arrange
