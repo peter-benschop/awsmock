@@ -31,7 +31,7 @@ namespace AwsMock::Dto::SQS {
       Poco::JSON::Parser parser;
       Poco::Dynamic::Var result = parser.parse(jsonString);
 
-      Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+      const auto& rootObject = result.extract<Poco::JSON::Object::Ptr>();
       Core::JsonUtils::GetJsonValueString("MD5OfMessageBody", rootObject, md5Body);
       Core::JsonUtils::GetJsonValueString("MD5OfMessageSystemAttributes", rootObject, md5Attr);
       Core::JsonUtils::GetJsonValueString("MessageId", rootObject, messageId);

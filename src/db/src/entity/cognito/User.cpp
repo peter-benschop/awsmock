@@ -15,6 +15,7 @@ namespace AwsMock::Database::Entity::Cognito {
 
     view_or_value<view, value> userDocument = make_document(
         kvp("userName", userName),
+        kvp("userPoolId", userPoolId),
         kvp("enabled", enabled),
         kvp("userStatus", Entity::Cognito::UserStatusToString(userStatus)),
         kvp("attributes", userAttributesDoc),
@@ -28,6 +29,7 @@ namespace AwsMock::Database::Entity::Cognito {
 
     oid = mResult.value()["_id"].get_oid().value.to_string();
     userName = bsoncxx::string::to_string(mResult.value()["userName"].get_string().value);
+    userPoolId = bsoncxx::string::to_string(mResult.value()["userPoolId"].get_string().value);
     enabled = mResult.value()["enabled"].get_bool().value;
     userStatus = Entity::Cognito::UserStatusFromString(bsoncxx::string::to_string(mResult.value()["userStatus"].get_string().value));
     created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));

@@ -15,26 +15,28 @@
 
 #define USER_POOL_ID "test-user-pool_sdjhdjft"
 #define USER_POOL_NAME "test-user-pool"
+#define USER_NAME "test-user"
 
 namespace AwsMock::Database {
 
   class CognitoMemoryDbTest : public ::testing::Test {
 
-  protected:
+    protected:
 
-    void SetUp() override {
-      _region = _configuration.getString("awsmock.region");
-      _accountId = _configuration.getString("awsmock.account.id");
-    }
+      void SetUp() override {
+        _region = _configuration.getString("awsmock.region");
+        _accountId = _configuration.getString("awsmock.account.id");
+      }
 
-    void TearDown() override {
-      _cognitoDatabase.DeleteAllUserPools();
-    }
+      void TearDown() override {
+        _cognitoDatabase.DeleteAllUsers();
+        _cognitoDatabase.DeleteAllUserPools();
+      }
 
-    std::string _region;
-    std::string _accountId;
-    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
-    CognitoDatabase _cognitoDatabase = CognitoDatabase(_configuration);
+      std::string _region;
+      std::string _accountId;
+      Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
+      CognitoDatabase _cognitoDatabase = CognitoDatabase(_configuration);
   };
 
   TEST_F(CognitoMemoryDbTest, UserPoolCreateTest) {
@@ -103,6 +105,69 @@ namespace AwsMock::Database {
 
     // assert
     EXPECT_FALSE(result);
+  }
+
+  TEST_F(CognitoMemoryDbTest, UserCreateTest) {
+
+    // arrange
+    Entity::Cognito::UserPool userPool = {.region=_region, .id=USER_POOL_ID, .name=USER_POOL_NAME};
+    Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
+    Entity::Cognito::User user = {.region=_region, .userPoolId=USER_POOL_ID, .userName=USER_NAME};
+
+    // act
+    Entity::Cognito::User result = _cognitoDatabase.CreateUser(user);
+
+    // assert
+    EXPECT_TRUE(result.userName == USER_NAME);
+    EXPECT_FALSE(result.userPoolId.empty());
+    EXPECT_TRUE(result.userPoolId == USER_POOL_ID);
+  }
+
+  TEST_F(CognitoMemoryDbTest, UserCountTest) {
+
+    // arrange
+    Entity::Cognito::UserPool userPool = {.region=_region, .id=USER_POOL_ID, .name=USER_POOL_NAME};
+    Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
+    Entity::Cognito::User user = {.region=_region, .userPoolId=USER_POOL_ID, .userName=USER_NAME};
+    Entity::Cognito::User createdUser = _cognitoDatabase.CreateUser(user);
+
+    // act
+    long count = _cognitoDatabase.CountUsers();
+
+    // assert
+    EXPECT_EQ(1, count);
+  }
+
+  TEST_F(CognitoMemoryDbTest, UserListTest) {
+
+    // arrange
+    Entity::Cognito::UserPool userPool = {.region=_region, .id=USER_POOL_ID, .name=USER_POOL_NAME};
+    Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
+    Entity::Cognito::User user = {.region=_region, .userPoolId=USER_POOL_ID, .userName=USER_NAME};
+    Entity::Cognito::User createdUser = _cognitoDatabase.CreateUser(user);
+
+    // act
+    Entity::Cognito::UserList userList = _cognitoDatabase.ListUsers();
+
+    // assert
+    EXPECT_EQ(1, userList.size());
+    EXPECT_TRUE(userList.front().userName == USER_NAME);
+  }
+
+  TEST_F(CognitoMemoryDbTest, UserDeleteTest) {
+
+    // arrange
+    Entity::Cognito::UserPool userPool = {.region=_region, .id=USER_POOL_ID, .name=USER_POOL_NAME};
+    Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
+    Entity::Cognito::User user = {.region=_region, .userPoolId=USER_POOL_ID, .userName=USER_NAME};
+    Entity::Cognito::User createdUser = _cognitoDatabase.CreateUser(user);
+
+    // act
+    _cognitoDatabase.DeleteUser(createdUser.oid);
+    long count = _cognitoDatabase.CountUsers();
+
+    // assert
+    EXPECT_EQ(0, count);
   }
 
 } // namespace AwsMock::Core

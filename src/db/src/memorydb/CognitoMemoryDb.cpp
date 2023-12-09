@@ -57,8 +57,8 @@ namespace AwsMock::Database {
     });
 
     if (it == _userPools.end()) {
-      log_error_stream(_logger) << "Get cognito user pool by oid failed, arn: " << oid << std::endl;
-      throw Core::DatabaseException("Get cognito user pool by oid failed, arn: " + oid);
+      log_error_stream(_logger) << "Get cognito user pool by oid failed, oid: " << oid << std::endl;
+      throw Core::DatabaseException("Get cognito user pool by oid failed, oid: " + oid);
     }
 
     it->second.oid = oid;
@@ -114,6 +114,113 @@ namespace AwsMock::Database {
 
     log_debug_stream(_logger) << "All cognito user pools deleted, count: " << _userPools.size() << std::endl;
     _userPools.clear();
+  }
+
+  bool CognitoMemoryDb::UserExists(const std::string &region, const std::string &userPoolId, const std::string &userName) {
+
+    return find_if(_users.begin(), _users.end(), [region, userPoolId, userName](const std::pair<std::string, Entity::Cognito::User> &user) {
+      return user.second.region == region && user.second.userPoolId == userPoolId && user.second.userName == userName;
+    }) != _users.end();
+  }
+
+  Entity::Cognito::User CognitoMemoryDb::CreateUser(const Entity::Cognito::User &user) {
+    Poco::ScopedLock lock(_userMutex);
+
+    std::string oid = Poco::UUIDGenerator().createRandom().toString();
+    _users[oid] = user;
+    log_trace_stream(_logger) << "Cognito user created, oid: " << oid << std::endl;
+    return GetUserByOid(oid);
+  }
+
+  Entity::Cognito::User CognitoMemoryDb::GetUserByOid(const std::string &oid) {
+
+    auto it = find_if(_users.begin(), _users.end(), [oid](const std::pair<std::string, Entity::Cognito::User> &user) {
+      return user.first == oid;
+    });
+
+    if (it == _users.end()) {
+      log_error_stream(_logger) << "Get cognito user by oid failed, oid: " << oid << std::endl;
+      throw Core::DatabaseException("Get cognito user by oid failed, oid: " + oid);
+    }
+
+    it->second.oid = oid;
+    return it->second;
+  }
+
+  long CognitoMemoryDb::CountUsers(const std::string &region, const std::string &userPoolId) {
+
+    long count = 0;
+    if (!region.empty() && !userPoolId.empty()) {
+
+      for (const auto &user : _users) {
+        if (user.second.region == region && user.second.userPoolId == userPoolId) {
+          count++;
+        }
+      }
+
+    } else if (!region.empty()) {
+
+      for (const auto &user : _users) {
+        if (user.second.region == region) {
+          count++;
+        }
+      }
+
+    } else {
+
+      count = static_cast<long>(_users.size());
+    }
+
+    log_trace_stream(_logger) << "Count user pools, size: " << count << std::endl;
+    return count;
+  }
+
+  std::vector<Entity::Cognito::User> CognitoMemoryDb::ListUsers(const std::string &region, const std::string &userPoolId) {
+
+    Entity::Cognito::UserList userList;
+    if (!region.empty() && !userPoolId.empty()) {
+
+      for (const auto &user : _users) {
+        if (user.second.region == region && user.second.userPoolId == userPoolId) {
+          userList.emplace_back(user.second);
+        }
+      }
+
+    } else if (!region.empty()) {
+
+      for (const auto &user : _users) {
+        if (user.second.region == region) {
+          userList.emplace_back(user.second);
+        }
+      }
+
+    } else {
+
+      for (const auto &user : _users) {
+        userList.emplace_back(user.second);
+      }
+
+    }
+
+    log_trace_stream(_logger) << "Got user list, size: " << userList.size() << std::endl;
+    return userList;
+  }
+
+  void CognitoMemoryDb::DeleteUser(const std::string &id) {
+    Poco::ScopedLock lock(_userMutex);
+
+    const auto count = std::erase_if(_users, [id](const auto &item) {
+      auto const &[key, value] = item;
+      return key == id;
+    });
+    log_debug_stream(_logger) << "Cognito user deleted, count: " << count << std::endl;
+  }
+
+  void CognitoMemoryDb::DeleteAllUsers() {
+    Poco::ScopedLock lock(_userMutex);
+
+    log_debug_stream(_logger) << "All cognito user deleted, count: " << _userPools.size() << std::endl;
+    _users.clear();
   }
 
 }
