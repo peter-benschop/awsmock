@@ -10,7 +10,7 @@ namespace AwsMock::Dto::Cognito {
 
     Poco::JSON::Parser parser;
     Poco::Dynamic::Var result = parser.parse(payload);
-    const auto& rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
     try {
 
@@ -28,7 +28,7 @@ namespace AwsMock::Dto::Cognito {
   }
 
   std::ostream &operator<<(std::ostream &os, const DeleteUserPoolRequest &r) {
-    os << "DeleteUserPoolRequest={id='" << r.id << "}";
+    os << "DeleteUserPoolRequest={region='" + r.region + "', id='" << r.id << "}";
     return os;
   }
 }

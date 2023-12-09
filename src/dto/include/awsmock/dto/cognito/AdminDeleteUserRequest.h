@@ -2,8 +2,8 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_COGNITO_DELETEUSERPOOLREQUEST_H
-#define AWSMOCK_DTO_COGNITO_DELETEUSERPOOLREQUEST_H
+#ifndef AWSMOCK_DTO_COGNITO_ADMIN_DELETE_USER_REQUEST_H
+#define AWSMOCK_DTO_COGNITO_ADMIN_DELETE_USER_REQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -17,10 +17,12 @@
 // AwsMOck includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/ServiceException.h>
+#include <awsmock/dto/cognito/MessageAction.h>
+#include <awsmock/dto/cognito/UserAttribute.h>
 
 namespace AwsMock::Dto::Cognito {
 
-  struct DeleteUserPoolRequest {
+  struct AdminDeleteUserRequest {
 
     /**
      * AWS region
@@ -28,9 +30,14 @@ namespace AwsMock::Dto::Cognito {
     std::string region;
 
     /**
-     * User pool id
+     * ID of the user pool
      */
-    std::string id;
+    std::string userPoolId;
+
+    /**
+     * Name of the user
+     */
+    std::string userName;
 
     /**
      * Convert from a JSON object.
@@ -51,10 +58,10 @@ namespace AwsMock::Dto::Cognito {
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const DeleteUserPoolRequest &i);
+    friend std::ostream &operator<<(std::ostream &os, const AdminDeleteUserRequest &i);
 
   };
 
 } // namespace AwsMock::Dto::Cognito
 
-#endif // AWSMOCK_DTO_COGNITO_DELETEUSERPOOLREQUEST_H
+#endif // AWSMOCK_DTO_COGNITO_ADMIN_DELETE_USER_REQUEST_H

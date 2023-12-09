@@ -14,13 +14,14 @@ namespace AwsMock::Database::Entity::Cognito {
     }
 
     view_or_value<view, value> userDocument = make_document(
-        kvp("userName", userName),
-        kvp("userPoolId", userPoolId),
-        kvp("enabled", enabled),
-        kvp("userStatus", Entity::Cognito::UserStatusToString(userStatus)),
-        kvp("attributes", userAttributesDoc),
-        kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-        kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+      kvp("region", region),
+      kvp("userName", userName),
+      kvp("userPoolId", userPoolId),
+      kvp("enabled", enabled),
+      kvp("userStatus", Entity::Cognito::UserStatusToString(userStatus)),
+      kvp("attributes", userAttributesDoc),
+      kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
+      kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
     return userDocument;
 
   }
@@ -28,6 +29,7 @@ namespace AwsMock::Database::Entity::Cognito {
   void User::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
     oid = mResult.value()["_id"].get_oid().value.to_string();
+    region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
     userName = bsoncxx::string::to_string(mResult.value()["userName"].get_string().value);
     userPoolId = bsoncxx::string::to_string(mResult.value()["userPoolId"].get_string().value);
     enabled = mResult.value()["enabled"].get_bool().value;
@@ -38,8 +40,8 @@ namespace AwsMock::Database::Entity::Cognito {
     bsoncxx::array::view attributesView{mResult.value()["attributes"].get_array().value};
     for (bsoncxx::array::element attributeElement : attributesView) {
       Attribute attribute{
-          .name=bsoncxx::string::to_string(attributeElement["name"].get_string().value),
-          .value=bsoncxx::string::to_string(attributeElement["value"].get_string().value)
+        .name=bsoncxx::string::to_string(attributeElement["name"].get_string().value),
+        .value=bsoncxx::string::to_string(attributeElement["value"].get_string().value)
       };
       attributes.push_back(attribute);
     }
@@ -52,8 +54,8 @@ namespace AwsMock::Database::Entity::Cognito {
   }
 
   std::ostream &operator<<(std::ostream &os, const User &u) {
-    os << "User={oid='" << u.oid << "', userName='" << u.userName << "', enabled='" << u.enabled << "', userStatus='" << Entity::Cognito::UserStatusToString(u.userStatus) << "', attributes={";
-    for(const auto &attribute:u.attributes) {
+    os << "User={oid='" << u.oid << "', region='" + u.region + "', userName='" << u.userName << "', enabled='" << u.enabled << "', userStatus='" << Entity::Cognito::UserStatusToString(u.userStatus) << "', attributes={";
+    for (const auto &attribute : u.attributes) {
       os << attribute.name << "'" << attribute.value << "', ";
     }
     os << "\b\b" << "}";

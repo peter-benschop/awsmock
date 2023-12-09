@@ -50,9 +50,30 @@ namespace AwsMock::Service {
 
         Dto::Cognito::DeleteUserPoolRequest cognitoRequest{};
         cognitoRequest.FromJson(payload);
+        cognitoRequest.region = region;
         log_debug_stream(_logger) << "Got delete user pool request, json: " << cognitoRequest.ToString() << std::endl;
 
         _cognitoService.DeleteUserPool(cognitoRequest);
+        SendOkResponse(response);
+
+      } else if (action == "AdminCreateUser") {
+
+        Dto::Cognito::AdminCreateUserRequest cognitoRequest{};
+        cognitoRequest.FromJson(payload);
+        cognitoRequest.region = region;
+        log_debug_stream(_logger) << "Got admin create user request, json: " << cognitoRequest.ToString() << std::endl;
+
+        Dto::Cognito::AdminCreateUserResponse cognitoResponse = _cognitoService.AdminCreateUser(cognitoRequest);
+        SendOkResponse(response, cognitoResponse.ToJson());
+
+      } else if (action == "AdminDeleteUser") {
+
+        Dto::Cognito::AdminDeleteUserRequest cognitoRequest{};
+        cognitoRequest.FromJson(payload);
+        cognitoRequest.region = region;
+        log_debug_stream(_logger) << "Got admin delete user request, json: " << cognitoRequest.ToString() << std::endl;
+
+        _cognitoService.AdminDeleteUser(cognitoRequest);
         SendOkResponse(response);
 
       }

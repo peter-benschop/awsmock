@@ -147,6 +147,17 @@ namespace AwsMock::Database {
       Entity::Cognito::User GetUserByOid(const std::string &oid);
 
       /**
+       * Returns a cognito user entity by region, userId and name.
+       *
+       * @param region aws-mock region.
+       * @param userPoolId user pool ID
+       * @param userName user name
+       * @return cognito user entity
+       * @throws DatabaseException
+       */
+      Entity::Cognito::User GetUserByUserName(const std::string &region, const std::string &userPoolId, const std::string &userName);
+
+      /**
        * Count all user pools
        *
        * @param region aws-mock region.
@@ -167,10 +178,10 @@ namespace AwsMock::Database {
       /**
        * Deletes an existing cognito users
        *
-       * @param id cognito user ID
+       * @param user cognito user to delete
        * @throws DatabaseException
        */
-      void DeleteUser(const std::string &id);
+      void DeleteUser(const Entity::Cognito::User &user);
 
       /**
        * Deletes all existing cognito users

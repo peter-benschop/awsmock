@@ -147,6 +147,21 @@ namespace AwsMock::Database {
     return it->second;
   }
 
+  Entity::Cognito::User CognitoMemoryDb::GetUserByUserName(const std::string &region, const std::string &userPoolId, const std::string &userName) {
+
+    auto it = find_if(_users.begin(), _users.end(), [region, userPoolId, userName](const std::pair<std::string, Entity::Cognito::User> &user) {
+      return user.second.region == region && user.second.userPoolId == userPoolId && user.second.userName == userName;
+    });
+
+    if (it == _users.end()) {
+      log_error_stream(_logger) << "Get cognito user by user name failed, userName: " << userName << std::endl;
+      throw Core::DatabaseException("Get cognito user by user name failed, userName: " + userName);
+    }
+
+    it->second.oid = it->first;
+    return it->second;
+  }
+
   long CognitoMemoryDb::CountUsers(const std::string &region, const std::string &userPoolId) {
 
     long count = 0;
@@ -206,12 +221,11 @@ namespace AwsMock::Database {
     return userList;
   }
 
-  void CognitoMemoryDb::DeleteUser(const std::string &id) {
+  void CognitoMemoryDb::DeleteUser(const Entity::Cognito::User &user) {
     Poco::ScopedLock lock(_userMutex);
 
-    const auto count = std::erase_if(_users, [id](const auto &item) {
-      auto const &[key, value] = item;
-      return key == id;
+    const auto count = std::erase_if(_users, [user](const std::pair<std::string, Entity::Cognito::User> &u) {
+      return u.second.region == user.region && u.second.userPoolId == user.userPoolId && u.second.userName == user.userName;
     });
     log_debug_stream(_logger) << "Cognito user deleted, count: " << count << std::endl;
   }

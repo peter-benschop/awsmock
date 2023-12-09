@@ -163,7 +163,7 @@ namespace AwsMock::Database {
     Entity::Cognito::User createdUser = _cognitoDatabase.CreateUser(user);
 
     // act
-    _cognitoDatabase.DeleteUser(createdUser.oid);
+    _cognitoDatabase.DeleteUser(createdUser);
     long count = _cognitoDatabase.CountUsers();
 
     // assert
