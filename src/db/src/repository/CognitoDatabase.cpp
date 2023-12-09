@@ -16,6 +16,7 @@ namespace AwsMock::Database {
 
       // Get collections
       _userPoolCollection = GetConnection()["cognito_userpool"];
+      _userCollection = GetConnection()["cognito_user"];
 
     }
   }
@@ -41,6 +42,7 @@ namespace AwsMock::Database {
 
     }
   }
+
   bool CognitoDatabase::UserPoolExists(const std::string &id) {
 
     if (HasDatabase()) {
@@ -126,14 +128,14 @@ namespace AwsMock::Database {
 
   }
 
-  /*  Entity::Cognito::Cognito CognitoDatabase::CreateOrUpdateCognito(const Entity::Cognito::Cognito &cognito) {
+/*  Entity::Cognito::Cognito CognitoDatabase::CreateOrUpdateCognito(const Entity::Cognito::Cognito &cognito) {
 
-    if (CognitoExists(cognito)) {
-      return UpdateCognito(cognito);
-    } else {
-      return CreateCognito(cognito);
-    }
-  }*/
+  if (CognitoExists(cognito)) {
+    return UpdateCognito(cognito);
+  } else {
+    return CreateCognito(cognito);
+  }
+}*/
 
   Entity::Cognito::UserPool CognitoDatabase::UpdateUserPool(const Entity::Cognito::UserPool &userPool) {
 
@@ -165,7 +167,7 @@ namespace AwsMock::Database {
 
       try {
 
-        if(region.empty()) {
+        if (region.empty()) {
 
           auto userPoolCursor = _userPoolCollection.find(make_document());
           for (auto userPool : userPoolCursor) {
@@ -209,7 +211,7 @@ namespace AwsMock::Database {
         } else {
           count = _userPoolCollection.count_documents(make_document(kvp("region", region)));
         }
-        log_trace_stream(_logger) << "lambda count: " << count << std::endl;
+        log_trace_stream(_logger) << "User pool count: " << count << std::endl;
         return count;
 
       } catch (mongocxx::exception::system_error &exc) {
@@ -266,4 +268,201 @@ namespace AwsMock::Database {
     }
   }
 
+  bool CognitoDatabase::UserExists(const std::string &region, const std::string &userPoolId, const std::string &userName) {
+
+    if (HasDatabase()) {
+
+      try {
+
+        int64_t count = _userCollection.count_documents(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("userName", userName)));
+        log_trace_stream(_logger) << "Cognito user exists: " << (count > 0 ? "true" : "false") << std::endl;
+        return count > 0;
+
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+      }
+
+    } else {
+
+      return _memoryDb.UserExists(region, userPoolId, userName);
+
+    }
+  }
+
+  Entity::Cognito::User CognitoDatabase::CreateUser(const Entity::Cognito::User &user) {
+
+    if (HasDatabase()) {
+
+      try {
+        auto result = _userCollection.insert_one(user.ToDocument());
+        log_trace_stream(_logger) << "User created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
+        return GetUserById(result->inserted_id().get_oid().value);
+
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+      }
+
+    } else {
+
+      return _memoryDb.CreateUser(user);
+
+    }
+  }
+
+  Entity::Cognito::User CognitoDatabase::GetUserById(bsoncxx::oid oid) {
+
+    try {
+
+      mongocxx::stdx::optional<bsoncxx::document::value> mResult = _userCollection.find_one(make_document(kvp("_id", oid)));
+      if (!mResult) {
+        _logger.error() << "Database exception: user not found " << std::endl;
+        throw Core::DatabaseException("Database exception, user not found ", 500);
+      }
+
+      Entity::Cognito::User result;
+      result.FromDocument(mResult);
+      return result;
+
+    } catch (const mongocxx::exception &exc) {
+      _logger.error() << "Database exception " << exc.what() << std::endl;
+      throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+    }
+
+  }
+
+  Entity::Cognito::User CognitoDatabase::GetUserById(const std::string &oid) {
+
+    if (HasDatabase()) {
+
+      return GetUserById(bsoncxx::oid(oid));
+
+    } else {
+
+      return _memoryDb.GetUserByOid(oid);
+
+    }
+
+  }
+
+  long CognitoDatabase::CountUsers(const std::string &region, const std::string &userPoolId) {
+
+    if (HasDatabase()) {
+
+      try {
+
+        long count = 0;
+        if (!region.empty() && !userPoolId.empty()) {
+          count = _userCollection.count_documents(make_document(kvp("region", region), kvp("userPoolId", userPoolId)));
+        } else if (!region.empty()) {
+          count = _userCollection.count_documents(make_document(kvp("region", region)));
+        } else {
+          count = _userCollection.count_documents(make_document());
+        }
+        log_trace_stream(_logger) << "User count: " << count << std::endl;
+        return count;
+
+      } catch (mongocxx::exception::system_error &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+      }
+
+    } else {
+
+      return _memoryDb.CountUsers(region);
+
+    }
+  }
+
+  std::vector<Entity::Cognito::User> CognitoDatabase::ListUsers(const std::string &region, const std::string &userPoolId) {
+
+    std::vector<Entity::Cognito::User> users;
+    if (HasDatabase()) {
+
+      try {
+
+        if (!region.empty() && !userPoolId.empty()) {
+
+          auto userCursor = _userCollection.find(make_document(kvp("region", region), kvp("userPoolId", userPoolId)));
+          for (auto user : userCursor) {
+            Entity::Cognito::User result;
+            result.FromDocument(user);
+            users.push_back(result);
+          }
+
+        } else if (!region.empty()) {
+
+          auto userCursor = _userCollection.find(make_document(kvp("region", region)));
+          for (auto user : userCursor) {
+            Entity::Cognito::User result;
+            result.FromDocument(user);
+            users.push_back(result);
+          }
+
+        } else {
+
+          auto userCursor = _userCollection.find(make_document());
+          for (auto user : userCursor) {
+            Entity::Cognito::User result;
+            result.FromDocument(user);
+            users.push_back(result);
+          }
+        }
+
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+      }
+
+    } else {
+
+      users = _memoryDb.ListUsers(region, userPoolId);
+    }
+
+    log_trace_stream(_logger) << "Got user list, size:" << users.size() << std::endl;
+    return users;
+  }
+
+  void CognitoDatabase::DeleteUser(const std::string &id) {
+
+    if (HasDatabase()) {
+
+      try {
+
+        auto result = _userCollection.delete_many(make_document(kvp("_id", id)));
+        log_debug_stream(_logger) << "User deleted, id: " << id << " count: " << result->deleted_count() << std::endl;
+
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+      }
+
+    } else {
+
+      _memoryDb.DeleteUser(id);
+
+    }
+  }
+
+  void CognitoDatabase::DeleteAllUsers() {
+
+    if (HasDatabase()) {
+
+      try {
+
+        auto result = _userCollection.delete_many({});
+        log_debug_stream(_logger) << "All cognito users deleted, count: " << result->deleted_count() << std::endl;
+
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+      }
+
+    } else {
+
+      _memoryDb.DeleteAllUsers();
+
+    }
+  }
 } // namespace AwsMock::Database

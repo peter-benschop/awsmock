@@ -98,6 +98,23 @@ namespace AwsMock::Service {
     EXPECT_EQ(0, count);
   }
 
+  TEST_F(CognitoServerJavaTest, UserCreateTest) {
+
+    // arrange
+  Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + "create-user-pool test-user-pool");
+  EXPECT_EQ(0, createResult.status);
+  Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
+  std::string userPoolId = userPoolList.front().id;
+
+    // act
+    Core::ExecResult result = Core::SystemUtils::Exec(_baseCommand + "create-user "+userPoolId+" test-user");
+    Database::Entity::Cognito::UserList userList = _database.ListUsers();
+
+    // assert
+    EXPECT_EQ(0, result.status);
+    EXPECT_EQ(1, userPoolList.size());
+  }
+
 } // namespace AwsMock::Service
 
 #endif // AWMOCK_COGNITO_SERVERJAVATEST_H

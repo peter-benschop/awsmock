@@ -10,7 +10,7 @@ namespace AwsMock::Dto::SQS {
 
     Poco::JSON::Parser parser;
     Poco::Dynamic::Var result = parser.parse(jsonString);
-    auto rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    const auto& rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
     try {
 

@@ -43,6 +43,16 @@ namespace AwsMock::Database::Entity::Cognito {
     std::string oid;
 
     /**
+     * Aws region
+     */
+    std::string region;
+
+    /**
+     * User pool ID
+     */
+    std::string userPoolId;
+
+    /**
      * User name
      */
     std::string userName;
@@ -103,5 +113,7 @@ namespace AwsMock::Database::Entity::Cognito {
     friend std::ostream &operator<<(std::ostream &os, const User &user);
 
   };
+
+  typedef std::vector<User> UserList;
 }
 #endif // AWSMOCK_DB_ENTITY_COGNITO_USER_H

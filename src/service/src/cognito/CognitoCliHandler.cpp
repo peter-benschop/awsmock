@@ -59,6 +59,26 @@ namespace AwsMock::Service {
         _cognitoService.DeleteUserPool(cognitoRequest);
         SendOkResponse(response);
 
+      } else if (userAgent.clientCommand == "list-user-pools") {
+
+        std::string payload = GetPayload(request);
+        Dto::Cognito::ListUserPoolRequest cognitoRequest{};
+        cognitoRequest.FromJson(payload);
+        cognitoRequest.region = region;
+        log_debug_stream(_logger) << "Got list user pool request, json: " << cognitoRequest.ToString() << std::endl;
+
+        Dto::Cognito::ListUserPoolResponse serviceResponse = _cognitoService.ListUserPools(cognitoRequest);
+        SendOkResponse(response, serviceResponse.ToJson());
+
+      } else if (userAgent.clientCommand == "admin-create-user") {
+
+        std::string payload = GetPayload(request);
+        Dto::Cognito::AdminCreateUserRequest cognitoRequest{};
+        cognitoRequest.FromJson(payload);
+        log_debug_stream(_logger) << "Got admin create user request, json: " << cognitoRequest.ToString() << std::endl;
+
+        Dto::Cognito::AdminCreateUserResponse cognitoResponse = _cognitoService.AdminCreateUser(cognitoRequest);
+        SendOkResponse(response, cognitoResponse.ToJson());
       }
 
     } catch (Poco::Exception &exc) {

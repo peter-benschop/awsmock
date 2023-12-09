@@ -2,24 +2,26 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_COGNITOSERVICE_H
-#define AWSMOCK_SERVICE_COGNITOSERVICE_H
+#ifndef AWSMOCK_SERVICE_COGNITO_SERVICE_H
+#define AWSMOCK_SERVICE_COGNITO_SERVICE_H
 
 // C++ standard includes
 #include <string>
 
 // Poco includes
-#include "Poco/DateTime.h"
-#include "Poco/DateTimeFormat.h"
-#include "Poco/DateTimeFormatter.h"
+#include <Poco/DateTime.h>
+#include <Poco/DateTimeFormat.h>
+#include <Poco/DateTimeFormatter.h>
 
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/ServiceException.h>
-#include "awsmock/dto/cognito/CreateUserPoolRequest.h"
-#include "awsmock/dto/cognito/CreateUserPoolResponse.h"
-#include "awsmock/dto/cognito/DeleteUserPoolRequest.h"
+#include <awsmock/dto/cognito/AdminCreateUserRequest.h>
+#include <awsmock/dto/cognito/AdminCreateUserResponse.h>
+#include <awsmock/dto/cognito/CreateUserPoolRequest.h>
+#include <awsmock/dto/cognito/CreateUserPoolResponse.h>
+#include <awsmock/dto/cognito/DeleteUserPoolRequest.h>
 #include <awsmock/dto/cognito/ListUserPoolRequest.h>
 #include <awsmock/dto/cognito/ListUserPoolResponse.h>
 #include <awsmock/repository/CognitoDatabase.h>
@@ -63,6 +65,14 @@ namespace AwsMock::Service {
      */
     void DeleteUserPool(const Dto::Cognito::DeleteUserPoolRequest &request);
 
+    /**
+     * Create a new cognito user
+     *
+     * @param request create user request
+     * @return AdminCreateUserResponse DTO
+     */
+    Dto::Cognito::AdminCreateUserResponse AdminCreateUser(const Dto::Cognito::AdminCreateUserRequest &request);
+
   private:
 
     /**
@@ -88,4 +98,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_COGNITOSERVICE_H
+#endif // AWSMOCK_SERVICE_COGNITO_SERVICE_H

@@ -8,12 +8,6 @@ namespace AwsMock::Service {
 
   CognitoService::CognitoService(Core::Configuration &configuration) : _logger(Poco::Logger::get("CognitoService")), _configuration(configuration) {
 
-    _accountId = _configuration.getString("awsmock.account.id");
-
-    // Initialize directories
-//    _dataDir = _configuration.getString("awsmock.data.dir", DEFAULT_DATA_DIR);
-//    _dataS3Dir = _configuration.getString("awsmock.service.s3.data.dir", DEFAULT_S3_DATA_DIR);
-
     // Initialize database
     _database = std::make_unique<Database::CognitoDatabase>(_configuration);
   }
@@ -81,6 +75,43 @@ namespace AwsMock::Service {
       log_error_stream(_logger) << "Create user pool request failed, message: " << ex.message() << std::endl;
       throw Core::ServiceException(ex.message(), 500);
     }
+  }
+
+  Dto::Cognito::AdminCreateUserResponse CognitoService::AdminCreateUser(const Dto::Cognito::AdminCreateUserRequest &request) {
+    log_debug_stream(_logger) << "Admin create user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId << std::endl;
+
+    if (!_database->UserPoolExists(request.userPoolId)) {
+      throw Core::ServiceException("User pool does not exists, id: " + request.userPoolId);
+    }
+
+    if (_database->UserExists(request.region, request.userPoolId, request.userName)) {
+      throw Core::ServiceException("User exists exists already, userPoolId: " + request.userPoolId + " userName: " + request.userName);
+    }
+
+    try {
+      Database::Entity::Cognito::User user = {
+          .region=request.region,
+          .userPoolId=request.userPoolId,
+          .userName=request.userName,
+          .enabled=true,
+          .created=Poco::DateTime(),
+          .modified=Poco::DateTime(),
+      };
+
+      user = _database->CreateUser(user);
+      Dto::Cognito::AdminCreateUserResponse response = {
+          .region=user.region,
+          .userName=user.userName,
+          .enabled=user.enabled
+      };
+      log_trace_stream(_logger) << "Create user response: " + response.ToJson() << std::endl;
+      return response;
+
+    } catch (Poco::Exception &ex) {
+      log_error_stream(_logger) << "Create user request failed, message: " << ex.message() << std::endl;
+      throw Core::ServiceException(ex.message(), 500);
+    }
+
   }
 
 } // namespace AwsMock::Service
