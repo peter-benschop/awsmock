@@ -12,8 +12,8 @@ namespace AwsMock::Database {
   using bsoncxx::builder::stream::document;
 
   std::map<std::string, std::vector<std::string>> S3Database::allowedEventTypes = {
-      {"Created", {"s3:ObjectCreated:Put", "s3:ObjectCreated:Post", "s3:ObjectCreated:Copy", "s3:ObjectCreated:CompleteMultipartUpload"}},
-      {"Deleted", {"s3:ObjectRemoved:Delete", "s3:ObjectRemoved:DeleteMarkerCreated"}}
+    {"Created", {"s3:ObjectCreated:Put", "s3:ObjectCreated:Post", "s3:ObjectCreated:Copy", "s3:ObjectCreated:CompleteMultipartUpload"}},
+    {"Deleted", {"s3:ObjectRemoved:Delete", "s3:ObjectRemoved:DeleteMarkerCreated"}}
   };
 
   S3Database::S3Database(Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("S3Database")), _memoryDb(S3MemoryDb::instance()) {
@@ -244,12 +244,28 @@ namespace AwsMock::Database {
     return objectList;
   }
 
+  void S3Database::DumpBuckets(std::string &input) {
+
+    if(!input.empty()) {
+      input += ",";
+    }
+    input += "{\"s3-buckets\":[";
+    auto bucketCursor = _bucketCollection.find({});
+    for (auto bucket : bucketCursor) {
+
+      input += bsoncxx::to_json(bucket) + ",";
+    }
+    if (!input.empty())
+      input.pop_back();
+    input += "]}";
+  }
+
   void S3Database::DeleteBucket(const Entity::S3::Bucket &bucket) {
 
     if (HasDatabase()) {
 
       auto delete_many_result =
-          _bucketCollection.delete_one(make_document(kvp("name", bucket.name)));
+        _bucketCollection.delete_one(make_document(kvp("name", bucket.name)));
       log_debug_stream(_logger) << "Bucket deleted, count: " << delete_many_result->deleted_count() << std::endl;
 
     } else {
@@ -264,7 +280,7 @@ namespace AwsMock::Database {
     if (HasDatabase()) {
 
       auto delete_many_result =
-          _bucketCollection.delete_many({});
+        _bucketCollection.delete_many({});
       log_debug_stream(_logger) << "All buckets deleted, count: " << delete_many_result->deleted_count() << std::endl;
 
     } else {
@@ -359,7 +375,7 @@ namespace AwsMock::Database {
       try {
 
         auto update_one_result =
-            _objectCollection.replace_one(make_document(kvp("region", object.region), kvp("bucket", object.bucket), kvp("key", object.key)), object.ToDocument());
+          _objectCollection.replace_one(make_document(kvp("region", object.region), kvp("bucket", object.bucket), kvp("key", object.key)), object.ToDocument());
         log_trace_stream(_logger) << "Object updated: " << object.ToString() << std::endl;
         return GetObject(object.region, object.bucket, object.key);
 
@@ -406,7 +422,7 @@ namespace AwsMock::Database {
 
     try {
       mongocxx::stdx::optional<bsoncxx::document::value>
-          mResult = _objectCollection.find_one(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key), kvp("md5sum", md5sum)));
+        mResult = _objectCollection.find_one(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key), kvp("md5sum", md5sum)));
       if (mResult.has_value()) {
         Entity::S3::Object result;
         result.FromDocument(mResult);
@@ -536,10 +552,10 @@ namespace AwsMock::Database {
       for (const auto &it : allowedEvents) {
 
         Entity::S3::BucketNotification notification = {
-            .event=it,
-            .notificationId=bucketNotification.notificationId,
-            .queueArn=bucketNotification.queueArn,
-            .lambdaArn=bucketNotification.lambdaArn
+          .event=it,
+          .notificationId=bucketNotification.notificationId,
+          .queueArn=bucketNotification.queueArn,
+          .lambdaArn=bucketNotification.lambdaArn
         };
         internBucket.notifications.emplace_back(notification);
       }
@@ -585,6 +601,22 @@ namespace AwsMock::Database {
     log_trace_stream(_logger) << "Bucket notification deleted, notification: " << bucketNotification.ToString() << std::endl;
 
     return UpdateBucket(internBucket);
+  }
+
+  void S3Database::DumpObjects(std::string &input) {
+
+    if(!input.empty()) {
+      input += ",";
+    }
+    input += "{\"s3-objects\":[";
+    auto objectCursor = _objectCollection.find({});
+    for (auto object : objectCursor) {
+
+      input += bsoncxx::to_json(object) + ",";
+    }
+    if (!input.empty())
+      input.pop_back();
+    input += "]}";
   }
 
 } // namespace AwsMock::Database

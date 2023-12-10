@@ -1,13 +1,13 @@
 //
-// Created by vogje01 on 01/06/2023.
+// Created by vogje01 on 12/10/23.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_SQS_QUEUE_H
-#define AWSMOCK_DB_ENTITY_SQS_QUEUE_H
+#ifndef AWSMOCK_DB_ENTITY_SQS_REDRIVE_POLICY_H
+#define AWSMOCK_DB_ENTITY_SQS_REDRIVE_POLICY_H
 
 // C++ includes
 #include <string>
-#include <vector>
+#include <sstream>
 
 // Poco includes
 #include <Poco/DateTime.h>
@@ -22,7 +22,6 @@
 
 // AwsMock includes
 #include <awsmock/core/ServiceException.h>
-#include <awsmock/entity/sqs/QueueAttribute.h>
 
 namespace AwsMock::Database::Entity::SQS {
 
@@ -33,64 +32,38 @@ namespace AwsMock::Database::Entity::SQS {
   using bsoncxx::document::view;
   using bsoncxx::document::value;
 
-  struct Queue {
+  struct RedrivePolicy {
 
     /**
-     * ID
+     * Dead letter queue target ARN
      */
-    std::string oid;
+    std::string deadLetterTargetArn;
 
     /**
-     * AWS region
+     * Maximal number of retries, before the message will be send to the DQL
      */
-    std::string region;
+    int maxReceiveCount;
 
     /**
-     * Queue name
+     * Parse values from a JSON stream
+     *
+     * @param body json input stream
      */
-    std::string name;
+    void FromJson(const std::string &body);
 
     /**
-     * Owner
+     * Converts the DTO to a JSON representation.
+     *
+     * @return DTO as string for logging.
      */
-    std::string owner;
-
-    /**
-     * Queue URL
-     */
-    std::string queueUrl;
-
-    /**
-     * Queue ARN
-     */
-    std::string queueArn;
-
-    /**
-     * Queue attributes
-     */
-    QueueAttribute attributes;
-
-    /**
-     * Queue tags
-     */
-    std::map<std::string, std::string> tags;
-
-    /**
-     * Creation date
-     */
-    Poco::DateTime created = Poco::DateTime();
-
-    /**
-     * Last modification date
-     */
-    Poco::DateTime modified = Poco::DateTime();
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Converts the entity to a MongoDB document
      *
      * @return entity as MongoDB document.
      */
-    [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
+    [[maybe_unused]] [[nodiscard]] view_or_value <view, value> ToDocument() const;
 
     /**
      * Converts the MongoDB document to an entity
@@ -116,14 +89,14 @@ namespace AwsMock::Database::Entity::SQS {
     /**
      * Stream provider.
      *
+     * @param os output stream
+     * @param r redrive policy
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const Queue &q);
+    friend std::ostream &operator<<(std::ostream &os, const RedrivePolicy &r);
 
   };
 
-  typedef std::vector<Queue> QueueList;
+} // namespace AwsMock::Database::Entity::SQS
 
-} // namespace AwsMock::Database::Entity::S3
-
-#endif // AWSMOCK_DB_ENTITY_SQS_QUEUE_H
+#endif // AWSMOCK_DB_ENTITY_SQS_REDRIVE_POLICY_H

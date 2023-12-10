@@ -136,7 +136,7 @@ namespace AwsMock::Controller {
       return;
     }
 
-    r = sd_journal_add_match(jd, "_SYSTEMD_UNIT=aws-mock.module", 0);
+    r = sd_journal_add_match(jd, "_SYSTEMD_UNIT=aws-mock.service", 0);
     if (r != 0) {
       std::cerr << "Failed to set matching entries: " << strerror(r) << std::endl;
       return;
@@ -219,6 +219,18 @@ namespace AwsMock::Controller {
     } else {
       std::cout << "Could not set log level: " << response.output << std::endl;
     }
+  }
+
+  void Controller::ExportInfrastructure() {
+    std::map<std::string, std::string> headers;
+    AddAuthorization(headers);
+    Core::CurlResponse response = _curlUtils.SendHttpRequest("GET", _baseUrl + "/export/", headers);
+
+    if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
+      std::cerr << "Error: " << response.statusReason << std::endl;
+      return;
+    }
+    std::cout << response.output;
   }
 
   void Controller::AddAuthorization(std::map<std::string, std::string> &headers) {

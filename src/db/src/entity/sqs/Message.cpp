@@ -65,6 +65,21 @@ namespace AwsMock::Database::Entity::SQS {
     }
   }
 
+  Poco::JSON::Object Message::ToJsonObject() const{
+    Poco::JSON::Object jsonObject;
+    jsonObject.set("region", region);
+    jsonObject.set("queueUrl", queueUrl);
+    jsonObject.set("body", body);
+    jsonObject.set("status", MessageStatusToString(status));
+    jsonObject.set("messageId", messageId);
+    jsonObject.set("receiptHandle", receiptHandle);
+    jsonObject.set("md5Body", md5Body);
+    jsonObject.set("md5Attr", md5Attr);
+    jsonObject.set("reset", Poco::DateTimeFormatter::format(reset, Poco::DateTimeFormat::ISO8601_FORMAT));
+    //jsonObject.set("attributes", attributes);
+    return jsonObject;
+  }
+
   std::string Message::ToString() const {
     std::stringstream ss;
     ss << (*this);

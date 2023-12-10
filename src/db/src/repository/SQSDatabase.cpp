@@ -390,6 +390,39 @@ namespace AwsMock::Database {
     }
   }
 
+  Entity::SQS::MessageList SQSDatabase::ListMessages(const std::string &region) {
+
+    Entity::SQS::MessageList messageList;
+    if (HasDatabase()) {
+
+      if (region.empty()) {
+
+        auto messageCursor = _messageCollection.find({});
+        for (auto message : messageCursor) {
+          Entity::SQS::Message result;
+          result.FromDocument(message);
+          messageList.push_back(result);
+        }
+
+      } else {
+
+        auto messageCursor = _messageCollection.find(make_document(kvp("region", region)));
+        for (auto message : messageCursor) {
+          Entity::SQS::Message result;
+          result.FromDocument(message);
+          messageList.push_back(result);
+        }
+      }
+
+    } else {
+
+      messageList = _memoryDb.ListMessages(region);
+
+    }
+    log_trace_stream(_logger) << "Got message list, size: " << messageList.size() << std::endl;
+    return messageList;
+  }
+
   void SQSDatabase::ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, int maxMessages, Entity::SQS::MessageList &messageList) {
 
     auto reset = std::chrono::high_resolution_clock::now() + std::chrono::seconds{visibility};

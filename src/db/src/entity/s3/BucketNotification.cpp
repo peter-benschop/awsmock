@@ -21,6 +21,15 @@ namespace AwsMock::Database::Entity::S3 {
     return notificationDoc;
   }
 
+  Poco::JSON::Object BucketNotification::ToJsonObject() const {
+    Poco::JSON::Object jsonObject;
+    jsonObject.set("notificationId", notificationId);
+    jsonObject.set("event", event);
+    jsonObject.set("queueArn", queueArn);
+    jsonObject.set("lambdaArn", lambdaArn);
+    return jsonObject;
+  }
+
   std::string BucketNotification::ToString() const {
     std::stringstream ss;
     ss << (*this);

@@ -98,13 +98,14 @@ namespace AwsMock::Controller {
         std::cout << "\nCommands:\n" << std::endl;
         std::cout << "list\t\t\t: lists all available services" << std::endl;
         std::cout << "start [<module>]\t: starts the given module. If no argument is given, starts all services." << std::endl;
-        std::cout << "stop [<module>]\t: stops the given module. If no argument is given, stops all services" << std::endl;
+        std::cout << "stop [<module>]\t\t: stops the given module. If no argument is given, stops all services" << std::endl;
         std::cout << "restart [<module>]\t: restarts the given module. If no argument is given, restarts all services" << std::endl;
 #ifdef HAS_SYSTEMD
         std::cout << "logs\t\t\t: shows the manager logs" << std::endl;
 #endif
         std::cout << "loglevel <level>\t: sets the manager log to level" << std::endl;
-        std::cout << "config\t: shows the gateway configuration" << std::endl;
+        std::cout << "config\t\t\t: shows the gateway configuration" << std::endl;
+        std::cout << "export\t\t\t: dumps the current infrastructure to stdout" << std::endl;
         stopOptionsProcessing();
         exit(0);
 
@@ -157,9 +158,15 @@ namespace AwsMock::Controller {
 
         _controller.GetDefaults();
 
+      } else if (name == "export") {
+
+        _controller.ExportInfrastructure();
+
       } else {
+
         std::cerr << "Unknown command: " << name << std::endl;
         return -1;
+
       }
       return 0;
     }

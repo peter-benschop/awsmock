@@ -132,4 +132,27 @@ namespace AwsMock::Service {
       StopService(module.name);
     }
   }
+
+  std::string ModuleService::ExportInfrastructure() {
+
+    Dto::Common::Infrastructure infrastructure;
+    Database::Entity::Module::ModuleList modules = _moduleDatabase->ListModules();
+    log_info_stream(_logger) << "Found modules, count: " << modules.size() << std::endl;
+
+    std::string jsonBuckets;
+    for (const auto &module : modules) {
+      if (Core::StringUtils::EqualsIgnoreCase(module.name, "s3")) {
+        std::shared_ptr<Database::S3Database> _s3Database = std::make_shared<Database::S3Database>(_configuration);
+        infrastructure.s3Buckets = _s3Database->ListBuckets();
+        infrastructure.s3Objects = _s3Database->ListObjects();
+      }
+      if (Core::StringUtils::EqualsIgnoreCase(module.name, "sqs")) {
+        std::shared_ptr<Database::SQSDatabase> _sqsDatabase = std::make_shared<Database::SQSDatabase>(_configuration);
+        infrastructure.sqsQueues = _sqsDatabase->ListQueues();
+        infrastructure.sqsMessages = _sqsDatabase->ListMessages();
+      }
+    }
+    return infrastructure.ToJson();
+  }
+
 }

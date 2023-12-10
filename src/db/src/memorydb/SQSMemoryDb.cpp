@@ -222,6 +222,30 @@ namespace AwsMock::Database {
     return _messages[it->first];
   }
 
+  Entity::SQS::MessageList SQSMemoryDb::ListMessages(const std::string &region) {
+
+    Entity::SQS::MessageList messageList;
+    if(region.empty()) {
+
+      for (const auto &message : _messages) {
+        messageList.emplace_back(message.second);
+      }
+
+    } else {
+
+      for (const auto &message : _messages) {
+        if (message.second.region == region) {
+          messageList.emplace_back(message.second);
+        }
+
+      }
+
+    }
+
+    log_trace_stream(_logger) << "Got message list, size: " << messageList.size() << std::endl;
+    return messageList;
+  }
+
   void SQSMemoryDb::ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, int maxMessages, Entity::SQS::MessageList &messageList) {
     Poco::ScopedLock lock(_messageMutex);
 

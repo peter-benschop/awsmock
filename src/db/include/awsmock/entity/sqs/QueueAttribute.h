@@ -1,9 +1,9 @@
 //
-// Created by vogje01 on 01/06/2023.
+// Created by vogje01 on 12/10/23.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_SQS_QUEUE_H
-#define AWSMOCK_DB_ENTITY_SQS_QUEUE_H
+#ifndef AWSMOCK_DB_ENTITY_SQS_QUEUE_ATTRIBUTE_H
+#define AWSMOCK_DB_ENTITY_SQS_QUEUE_ATTRIBUTE_H
 
 // C++ includes
 #include <string>
@@ -22,7 +22,7 @@
 
 // AwsMock includes
 #include <awsmock/core/ServiceException.h>
-#include <awsmock/entity/sqs/QueueAttribute.h>
+#include <awsmock/entity/sqs/RedrivePolicy.h>
 
 namespace AwsMock::Database::Entity::SQS {
 
@@ -33,57 +33,73 @@ namespace AwsMock::Database::Entity::SQS {
   using bsoncxx::document::view;
   using bsoncxx::document::value;
 
-  struct Queue {
+  struct QueueAttribute {
 
     /**
-     * ID
+     * Delay seconds
      */
-    std::string oid;
+    int delaySeconds = 0;
 
     /**
-     * AWS region
+     * Max message size (256kB)
      */
-    std::string region;
+    int maxMessageSize = 262144;
 
     /**
-     * Queue name
+     * Max retention period (4d)
      */
-    std::string name;
+    int messageRetentionPeriod = 345600;
 
     /**
-     * Owner
+     * Receive message timeout
      */
-    std::string owner;
+    int receiveMessageWaitTime = 20;
 
     /**
-     * Queue URL
+     * Visibility timeout
      */
-    std::string queueUrl;
+    int visibilityTimeout = 30;
 
     /**
-     * Queue ARN
+     * Policy
+     *
+     * <p>The queue's policy. A valid AWS policy.</p>
+     */
+    std::string policy;
+
+    /**
+     * Redrive policy
+     *
+     * <p>JSON string</p>
+     */
+    RedrivePolicy redrivePolicy;
+
+    /**
+     * Redrive allow policy
+     *
+     * <p>JSON string</p>
+     */
+    std::string redriveAllowPolicy;
+
+    /**
+     * Number of message counter
+     */
+    long approximateNumberOfMessages = 0;
+
+    /**
+     * Delay counter
+     */
+    long approximateNumberOfMessagesDelayed = 0;
+
+    /**
+     * Not visible counter
+     */
+    long approximateNumberOfMessagesNotVisible = 0;
+
+    /**
+     * AWS ARN
      */
     std::string queueArn;
-
-    /**
-     * Queue attributes
-     */
-    QueueAttribute attributes;
-
-    /**
-     * Queue tags
-     */
-    std::map<std::string, std::string> tags;
-
-    /**
-     * Creation date
-     */
-    Poco::DateTime created = Poco::DateTime();
-
-    /**
-     * Last modification date
-     */
-    Poco::DateTime modified = Poco::DateTime();
 
     /**
      * Converts the entity to a MongoDB document
@@ -95,7 +111,7 @@ namespace AwsMock::Database::Entity::SQS {
     /**
      * Converts the MongoDB document to an entity
      *
-     * @param mResult MongoDB document.
+     * @param mResult MongoDB document view.
      */
     [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
@@ -116,14 +132,14 @@ namespace AwsMock::Database::Entity::SQS {
     /**
      * Stream provider.
      *
+     * @param os output stream
+     * @param r queue attribute
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const Queue &q);
+    friend std::ostream &operator<<(std::ostream &os, const QueueAttribute &r);
 
   };
 
-  typedef std::vector<Queue> QueueList;
+} // namespace AwsMock::Database::Entity::SQS
 
-} // namespace AwsMock::Database::Entity::S3
-
-#endif // AWSMOCK_DB_ENTITY_SQS_QUEUE_H
+#endif // AWSMOCK_DB_ENTITY_SQS_QUEUE_ATTRIBUTE_H
