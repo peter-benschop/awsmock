@@ -9,11 +9,11 @@ namespace AwsMock::Database::Entity::Cognito {
   view_or_value<view, value> UserPool::ToDocument() const {
 
     view_or_value<view, value> userPoolDocument = make_document(
-        kvp("region", region),
-        kvp("id", id),
-        kvp("name", name),
-        kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-        kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+      kvp("region", region),
+      kvp("id", id),
+      kvp("name", name),
+      kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
+      kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
     return userPoolDocument;
 
   }
@@ -29,6 +29,13 @@ namespace AwsMock::Database::Entity::Cognito {
 
   }
 
+  Poco::JSON::Object UserPool::ToJsonObject() const {
+    Poco::JSON::Object jsonObject;
+    jsonObject.set("region", region);
+    jsonObject.set("name", name);
+    return jsonObject;
+  }
+
   std::string UserPool::ToString() const {
     std::stringstream ss;
     ss << (*this);
@@ -36,8 +43,8 @@ namespace AwsMock::Database::Entity::Cognito {
   }
 
   std::ostream &operator<<(std::ostream &os, const UserPool &u) {
-    os << "UserPool={oid='" << u.oid << "' region='" << u.region << "' id='" << u.id << "'name='" << u.name << "' created='" << Poco::DateTimeFormatter().format(u.created, Poco::DateTimeFormat::HTTP_FORMAT)
-       << "' modified='" << Poco::DateTimeFormatter().format(u.modified, Poco::DateTimeFormat::HTTP_FORMAT) << "'}";
+    os << "UserPool={oid='" << u.oid << "' region='" << u.region << "' id='" << u.id << "'name='" << u.name << "' created='" << Poco::DateTimeFormatter::format(u.created, Poco::DateTimeFormat::HTTP_FORMAT)
+       << "' modified='" << Poco::DateTimeFormatter::format(u.modified, Poco::DateTimeFormat::HTTP_FORMAT) << "'}";
     return os;
   }
 }

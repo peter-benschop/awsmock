@@ -107,7 +107,7 @@ namespace AwsMock::Database {
     long count = 0;
     if (region.empty()) {
 
-      count = _topics.size();
+      count = static_cast<long>(_topics.size());
 
     } else {
 
@@ -188,6 +188,28 @@ namespace AwsMock::Database {
     return count;
   }
 
+  Entity::SNS::MessageList SNSMemoryDb::ListMessages(const std::string &region) {
+
+    Entity::SNS::MessageList messageList;
+    if(region.empty()) {
+
+      for (const auto &message : _messages) {
+        messageList.emplace_back(message.second);
+      }
+
+    } else {
+
+      for (const auto &message : _messages) {
+        if (message.second.region == region) {
+          messageList.emplace_back(message.second);
+        }
+      }
+    }
+
+    log_trace_stream(_logger) << "Got message list, size: " << messageList.size() << std::endl;
+    return messageList;
+  }
+
   void SNSMemoryDb::DeleteMessage(const Entity::SNS::Message &message) {
     Poco::ScopedLock loc(_messageMutex);
 
@@ -202,12 +224,12 @@ namespace AwsMock::Database {
   void SNSMemoryDb::DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &messageIds) {
     Poco::ScopedLock loc(_messageMutex);
 
-    auto count = 0;
+    long count = 0;
     for (auto &messageId : messageIds) {
-      count += std::erase_if(_messages, [region, topicArn, messageId](const auto &item) {
+      count += static_cast<long>(std::erase_if(_messages, [region, topicArn, messageId](const auto &item) {
         auto const &[key, value] = item;
         return value.region == region && value.topicArn == topicArn && value.messageId == messageId;
-      });
+      }));
     }
     log_debug_stream(_logger) << "Messages deleted, count: " << count << " count: " << count << std::endl;
   }

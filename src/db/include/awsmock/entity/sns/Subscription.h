@@ -13,6 +13,7 @@
 #include <Poco/DateTime.h>
 #include <Poco/DateTimeFormat.h>
 #include <Poco/DateTimeFormatter.h>
+#include <Poco/JSON/Object.h>
 
 // MongoDB includes
 #include <bsoncxx/json.hpp>
@@ -63,6 +64,13 @@ namespace AwsMock::Database::Entity::SNS {
      * @param mResult MongoDB document.
      */
     [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view_or_value> mResult);
+
+    /**
+     * Converts the entity to a JSON object
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
     /**
      * Converts the DTO to a string representation.

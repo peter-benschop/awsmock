@@ -416,6 +416,39 @@ namespace AwsMock::Database {
     }
   }
 
+  Entity::SNS::MessageList SNSDatabase::ListMessages(const std::string &region) {
+
+    Entity::SNS::MessageList messageList;
+    if (HasDatabase()) {
+
+      if (region.empty()) {
+
+        auto messageCursor = _messageCollection.find(make_document());
+        for (auto message : messageCursor) {
+          Entity::SNS::Message result;
+          result.FromDocument(message);
+          messageList.push_back(result);
+        }
+
+      } else {
+
+        auto messageCursor = _messageCollection.find(make_document(kvp("region", region)));
+        for (auto message : messageCursor) {
+          Entity::SNS::Message result;
+          result.FromDocument(message);
+          messageList.push_back(result);
+        }
+      }
+
+    } else {
+
+      messageList = _memoryDb.ListMessages(region);
+
+    }
+    log_trace_stream(_logger) << "Got message list, size: " << messageList.size() << std::endl;
+    return messageList;
+  }
+
   void SNSDatabase::DeleteMessage(const Entity::SNS::Message &message) {
 
     if (HasDatabase()) {

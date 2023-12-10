@@ -21,6 +21,17 @@ namespace AwsMock::Database::Entity::SNS {
     protocol = bsoncxx::string::to_string(mResult.value().view()["protocol"].get_string().value);
     endpoint = bsoncxx::string::to_string(mResult.value().view()["endpoint"].get_string().value);
     subscriptionArn = bsoncxx::string::to_string(mResult.value().view()["subscriptionArn"].get_string().value);
+
+  }
+
+  Poco::JSON::Object Subscription::ToJsonObject() const {
+
+    Poco::JSON::Object jsonObject;
+    jsonObject.set("protocol", protocol);
+    jsonObject.set("endpoint", endpoint);
+    jsonObject.set("subscriptionArn", subscriptionArn);
+    return jsonObject;
+
   }
 
   std::string Subscription::ToString() const {

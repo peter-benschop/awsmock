@@ -32,7 +32,7 @@ namespace AwsMock::Database::Entity::SNS {
     return topicDoc;
   }
 
-  void Topic::FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
+  void Topic::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
     oid = mResult.value()["_id"].get_oid().value.to_string();
     region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
@@ -54,26 +54,21 @@ namespace AwsMock::Database::Entity::SNS {
     }
   }
 
-  void Topic::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+  Poco::JSON::Object Topic::ToJsonObject() const {
+    Poco::JSON::Object jsonObject;
+    jsonObject.set("region", region);
+    jsonObject.set("topicName", topicName);
+    jsonObject.set("owner", owner);
+    jsonObject.set("topicUrl", topicUrl);
+    jsonObject.set("topicArn", topicArn);
 
-    oid = mResult.value()["_id"].get_oid().value.to_string();
-    region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
-    topicName = bsoncxx::string::to_string(mResult.value()["topicName"].get_string().value);
-    owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
-    topicUrl = bsoncxx::string::to_string(mResult.value()["topicUrl"].get_string().value);
-    topicArn = bsoncxx::string::to_string(mResult.value()["topicArn"].get_string().value);
-    created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-    modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
-
-    bsoncxx::array::view subscriptionsView{mResult.value()["subscriptions"].get_array().value};
-    for (bsoncxx::array::element subscriptionElement : subscriptionsView) {
-      Subscription subscription{
-          .protocol=bsoncxx::string::to_string(subscriptionElement["protocol"].get_string().value),
-          .endpoint=bsoncxx::string::to_string(subscriptionElement["endpoint"].get_string().value),
-          .subscriptionArn=bsoncxx::string::to_string(subscriptionElement["subscriptionArn"].get_string().value)
-      };
-      subscriptions.push_back(subscription);
+    Poco::JSON::Array jsonSubscriptionArray;
+    for (const auto &subscription : subscriptions) {
+      jsonSubscriptionArray.add(subscription.ToJsonObject());
     }
+    jsonObject.set("subscriptions", jsonSubscriptionArray);
+
+    return jsonObject;
   }
 
   std::string Topic::ToString() const {

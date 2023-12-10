@@ -18,6 +18,10 @@
 
 // AwsMock includes
 #include <awsmock/core/ServiceException.h>
+#include <awsmock/entity/cognito/User.h>
+#include <awsmock/entity/cognito/UserPool.h>
+#include <awsmock/entity/sns/Topic.h>
+#include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sqs/Queue.h>
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/entity/s3/Bucket.h>
@@ -46,6 +50,26 @@ namespace AwsMock::Dto::Common {
      * SQS messages
      */
     Database::Entity::SQS::MessageList sqsMessages;
+
+    /**
+     * SNS topics
+     */
+    Database::Entity::SNS::TopicList snsTopics;
+
+    /**
+     * SQS messages
+     */
+    Database::Entity::SNS::MessageList snsMessages;
+
+    /**
+     * Cognito user pools
+     */
+    Database::Entity::Cognito::UserPoolList cognitoUserPools;
+
+    /**
+     * Cognito users
+     */
+    Database::Entity::Cognito::UserList cognitoUsers;
 
     /**
      * JSON representation
