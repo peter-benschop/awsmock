@@ -26,6 +26,7 @@
 #include <mongocxx/stdx.hpp>
 
 // AwsMock include
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/entity/s3/BucketNotification.h>
 
 namespace AwsMock::Database::Entity::S3 {
@@ -142,6 +143,13 @@ namespace AwsMock::Database::Entity::S3 {
      * @return DTO as string for logging.
      */
     [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+
+    /**
+     * Converts the entity to a JSON object
+     *
+     * @return DTO as string for logging.
+     */
+    void FromJsonObject(Poco::JSON::Object::Ptr jsonObject);
 
     /**
      * Converts the DTO to a string representation.

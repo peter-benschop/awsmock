@@ -10,6 +10,9 @@
 #include <sstream>
 #include <map>
 
+// Poco includes
+#include <Poco/JSON/Object.h>
+
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
@@ -31,6 +34,12 @@ namespace AwsMock::Database::Entity::Lambda {
      */
     void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
+    /**
+     * Converts the entity to a JSON object
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
   };
 
 } // namespace AwsMock::Database::Entity::lambda {

@@ -17,6 +17,7 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/dto/common/Infrastructure.h>
+#include <awsmock/dto/common/Services.h>
 #include <awsmock/entity/module/Module.h>
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/service/GatewayServer.h>
@@ -97,9 +98,17 @@ namespace AwsMock::Service {
       /**
        * Exports the current infrastructure
        *
+       * @param services service name list
        * @return JSON string
        */
-      std::string ExportInfrastructure();
+      std::string ExportInfrastructure(const Dto::Common::Services &services);
+
+      /**
+       * Import the infrastructure
+       *
+       * @param jsonString infrastructure JSON string
+       */
+      void ImportInfrastructure(const std::string &jsonString);
 
     private:
 

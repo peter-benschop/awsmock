@@ -128,11 +128,13 @@ namespace AwsMock::Database {
       Entity::S3::Bucket UpdateBucket(const Entity::S3::Bucket &bucket);
 
       /**
-       * Dumps the bucket list as JSON string
+       * Create a new bucket or updated a existing bucket
        *
-       * @param input input string to append to
+       * @param bucket bucket entity
+       * @return created bucket entity
+       * @throws DatabaseException
        */
-      void DumpBuckets(std::string &input);
+      Entity::S3::Bucket CreateOrUpdateBucket(const Entity::S3::Bucket &bucket);
 
       /**
        * Dumps the S3 object list as JSON string

@@ -46,6 +46,18 @@ namespace AwsMock::Dto::Common {
         jsonSnsMessageArray.add(message.ToJsonObject());
       }
 
+      // Lambda functions
+      Poco::JSON::Array jsonLambdaArray;
+      for (const auto &lambda : lambdas) {
+        jsonLambdaArray.add(lambda.ToJsonObject());
+      }
+
+      // Transfer server
+      Poco::JSON::Array jsonTransferArray;
+      for (const auto &transfer : transferServers) {
+        jsonTransferArray.add(transfer.ToJsonObject());
+      }
+
       // Cognito user pools
       Poco::JSON::Array jsonCognitoUserPoolArray;
       for (const auto &userPool : cognitoUserPools) {
@@ -59,14 +71,36 @@ namespace AwsMock::Dto::Common {
       }
 
       Poco::JSON::Object infrastructureJson;
-      infrastructureJson.set("s3-buckets", jsonBucketArray);
-      infrastructureJson.set("s3-objects", jsonObjectArray);
-      infrastructureJson.set("sqs-queues", jsonQueueArray);
-      infrastructureJson.set("sqs-messages", jsonSqsMessageArray);
-      infrastructureJson.set("sns-topics", jsonTopicArray);
-      infrastructureJson.set("sns-messages", jsonSnsMessageArray);
-      infrastructureJson.set("cognito-user-pools", jsonCognitoUserPoolArray);
-      infrastructureJson.set("cognito-users", jsonCognitoUserArray);
+      if (!jsonBucketArray.empty()) {
+        infrastructureJson.set("s3-buckets", jsonBucketArray);
+      }
+      if (!jsonObjectArray.empty()) {
+        infrastructureJson.set("s3-objects", jsonObjectArray);
+      }
+      if (!jsonQueueArray.empty()) {
+        infrastructureJson.set("sqs-queues", jsonQueueArray);
+      }
+      if (!jsonSqsMessageArray.empty()) {
+        infrastructureJson.set("sqs-messages", jsonSqsMessageArray);
+      }
+      if (!jsonTopicArray.empty()) {
+        infrastructureJson.set("sns-topics", jsonTopicArray);
+      }
+      if (!jsonSnsMessageArray.empty()) {
+        infrastructureJson.set("sns-messages", jsonSnsMessageArray);
+      }
+      if (!jsonLambdaArray.empty()) {
+        infrastructureJson.set("lambda-functions", jsonLambdaArray);
+      }
+      if (!jsonTransferArray.empty()) {
+        infrastructureJson.set("transfer-servers", jsonTransferArray);
+      }
+      if (!jsonCognitoUserPoolArray.empty()) {
+        infrastructureJson.set("cognito-user-pools", jsonCognitoUserPoolArray);
+      }
+      if (!jsonCognitoUserArray.empty()) {
+        infrastructureJson.set("cognito-users", jsonCognitoUserArray);
+      }
 
       Poco::JSON::Object rootJson;
       rootJson.set("infrastructure", infrastructureJson);
@@ -78,5 +112,34 @@ namespace AwsMock::Dto::Common {
     } catch (Poco::Exception &exc) {
       throw Core::ServiceException(exc.message(), 500);
     }
+  }
+
+  void Infrastructure::FromJson(const std::string &jsonString) {
+
+    Poco::JSON::Parser parser;
+    Poco::Dynamic::Var result = parser.parse(jsonString);
+    const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    const auto &infrastructureObject = rootObject->getObject("infrastructure");
+
+    try {
+
+      Poco::JSON::Array::Ptr s3BucketArray = infrastructureObject->getArray("s3-buckets");
+      for (int i = 0; i < s3BucketArray->size(); i++) {
+        Database::Entity::S3::Bucket bucket;
+        bucket.FromJsonObject(s3BucketArray->getObject(i));
+        s3Buckets.emplace_back(bucket);
+      }
+
+      Poco::JSON::Array::Ptr s3ObjectArray = infrastructureObject->getArray("s3-objects");
+      for (int i = 0; i < s3ObjectArray->size(); i++) {
+        Database::Entity::S3::Object s3Object;
+        s3Object.FromJsonObject(s3ObjectArray->getObject(i));
+        s3Objects.emplace_back(s3Object);
+      }
+
+    } catch (Poco::Exception &exc) {
+      throw Core::ServiceException(exc.message(), 500);
+    }
+
   }
 }

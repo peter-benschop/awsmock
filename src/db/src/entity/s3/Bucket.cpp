@@ -37,13 +37,13 @@ namespace AwsMock::Database::Entity::S3 {
     }
 
     view_or_value<view, value> bucketDoc = make_document(
-        kvp("region", region),
-        kvp("name", name),
-        kvp("owner", owner),
-        kvp("notifications", notificationsDoc),
-        kvp("versionStatus", BucketVersionStatusToString(versionStatus)),
-        kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-        kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+      kvp("region", region),
+      kvp("name", name),
+      kvp("owner", owner),
+      kvp("notifications", notificationsDoc),
+      kvp("versionStatus", BucketVersionStatusToString(versionStatus)),
+      kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
+      kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
 
     return bucketDoc;
   }
@@ -61,10 +61,10 @@ namespace AwsMock::Database::Entity::S3 {
     bsoncxx::array::view notificationView{mResult.value()["notifications"].get_array().value};
     for (bsoncxx::array::element notificationElement : notificationView) {
       BucketNotification notification{
-          .event=bsoncxx::string::to_string(notificationElement["event"].get_string().value),
-          .notificationId=bsoncxx::string::to_string(notificationElement["notificationId"].get_string().value),
-          .queueArn=bsoncxx::string::to_string(notificationElement["queueArn"].get_string().value),
-          .lambdaArn=bsoncxx::string::to_string(notificationElement["lambdaArn"].get_string().value)
+        .event=bsoncxx::string::to_string(notificationElement["event"].get_string().value),
+        .notificationId=bsoncxx::string::to_string(notificationElement["notificationId"].get_string().value),
+        .queueArn=bsoncxx::string::to_string(notificationElement["queueArn"].get_string().value),
+        .lambdaArn=bsoncxx::string::to_string(notificationElement["lambdaArn"].get_string().value)
       };
       notifications.push_back(notification);
     }
@@ -78,11 +78,28 @@ namespace AwsMock::Database::Entity::S3 {
     jsonObject.set("versionStatus", BucketVersionStatusToString(versionStatus));
 
     Poco::JSON::Array jsonArray;
-    for(const auto &notification:notifications) {
+    for (const auto &notification : notifications) {
       jsonArray.add(notification.ToJsonObject());
     }
     jsonObject.set("notifications", jsonArray);
     return jsonObject;
+  }
+
+  void Bucket::FromJsonObject(Poco::JSON::Object::Ptr jsonObject) {
+
+    Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
+    Core::JsonUtils::GetJsonValueString("name", jsonObject, name);
+    Core::JsonUtils::GetJsonValueString("owner", jsonObject, owner);
+    std::string versionStatusStr;
+    Core::JsonUtils::GetJsonValueString("versionStatus", jsonObject, versionStatusStr);
+    versionStatus = BucketVersionStatusFromString(versionStatusStr);
+
+    Poco::JSON::Array::Ptr jsonNotificationArray = jsonObject->getArray("notifications");
+    for (int i = 0; i < jsonNotificationArray->size(); i++) {
+      BucketNotification nofication;
+      nofication.FromJsonObject(jsonNotificationArray->getObject(i));
+      notifications.emplace_back(nofication);
+    }
   }
 
   std::string Bucket::ToString() const {

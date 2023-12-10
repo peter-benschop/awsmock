@@ -21,6 +21,7 @@
 #include <awsmock/core/MetricDefinition.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/common/Infrastructure.h>
+#include <awsmock/dto/common/Services.h>
 #include "awsmock/dto/module/GatewayConfig.h"
 #include <awsmock/dto/module/Module.h>
 #include <awsmock/entity/module/Module.h>

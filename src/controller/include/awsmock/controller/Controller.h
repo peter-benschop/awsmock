@@ -24,8 +24,9 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CurlUtils.h>
-#include <awsmock/dto/module/GatewayConfig.h>
+#include <awsmock/dto/common/Services.h>
 #include <awsmock/dto/module/Module.h>
+#include <awsmock/dto/module/GatewayConfig.h>
 #include <awsmock/controller/Configuration.h>
 #include <awsmock/repository/ModuleDatabase.h>
 
@@ -94,9 +95,16 @@ namespace AwsMock::Controller {
       void GetDefaults();
 
       /**
-       * Dumps the current infrastructure as JSON file to stdout
+       * Dumps the current infrastructure as JSON file to stdout.
+       *
+       * @param services list of services
        */
-      void ExportInfrastructure();
+      void ExportInfrastructure(const std::vector<std::string> &services);
+
+      /**
+       * Imports the current infrastructure from stdin
+       */
+      void ImportInfrastructure();
 
     private:
       /**

@@ -23,10 +23,12 @@
 #include <Poco/DateTime.h>
 #include <Poco/DateTimeFormat.h>
 #include <Poco/DateTimeFormatter.h>
+#include <Poco/JSON/Object.h>
 
 // AwsMock includes
 #include <awsmock/entity/lambda/Tags.h>
 #include <awsmock/entity/lambda/Environment.h>
+#include <awsmock/entity/lambda/EphemeralStorage.h>
 
 namespace AwsMock::Database::Entity::Lambda {
 
@@ -131,45 +133,6 @@ namespace AwsMock::Database::Entity::Lambda {
     }
     return LambdaStateReasonCode::Idle;
   }
-
-  struct EphemeralStorage {
-
-    /**
-     * Temporary disk space in MB. Default: 512 MB, Range: 512 - 10240 MB
-     */
-    long size = 512;
-
-    /**
-     * Converts the MongoDB document to an entity
-     *
-     * @param mResult database document.
-     */
-    [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
-
-      size = mResult.value()["size"].get_int64();
-    }
-
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const {
-      std::stringstream ss;
-      ss << (*this);
-      return ss.str();
-    }
-
-    /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const EphemeralStorage &m) {
-      os << "EphemeralStorage={size='" << m.size << "'}";
-      return os;
-    }
-  };
 
   struct Lambda {
 
@@ -336,14 +299,14 @@ namespace AwsMock::Database::Entity::Lambda {
      *
      * @param mResult query result.
      */
-    void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult);
+    void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
     /**
-     * Converts the MongoDB document to an entity
+     * Converts the entity to a JSON object
      *
-     * @param mResult query result.
+     * @return DTO as string for logging.
      */
-    void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
     /**
      * Converts the DTO to a string representation.
@@ -362,7 +325,6 @@ namespace AwsMock::Database::Entity::Lambda {
     friend std::ostream &operator<<(std::ostream &os, const Lambda &lambda);
   };
 
-  typedef struct Lambda Lambda;
   typedef std::vector<Lambda> LambdaList;
 }
 #endif //AWSMOCK_DB_ENTITY_LAMBDA_H

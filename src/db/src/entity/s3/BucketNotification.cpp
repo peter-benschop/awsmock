@@ -30,6 +30,14 @@ namespace AwsMock::Database::Entity::S3 {
     return jsonObject;
   }
 
+  void BucketNotification::FromJsonObject(const Poco::JSON::Object::Ptr& jsonObject) {
+
+    Core::JsonUtils::GetJsonValueString("notificationId", jsonObject, notificationId);
+    Core::JsonUtils::GetJsonValueString("event", jsonObject, event);
+    Core::JsonUtils::GetJsonValueString("queueArn", jsonObject, queueArn);
+    Core::JsonUtils::GetJsonValueString("lambdaArn", jsonObject, lambdaArn);
+  }
+
   std::string BucketNotification::ToString() const {
     std::stringstream ss;
     ss << (*this);

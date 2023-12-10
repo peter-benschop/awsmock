@@ -17,9 +17,12 @@
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/entity/cognito/User.h>
 #include <awsmock/entity/cognito/UserPool.h>
+#include <awsmock/entity/lambda/Lambda.h>
+#include <awsmock/entity/transfer/Transfer.h>
 #include <awsmock/entity/sns/Topic.h>
 #include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sqs/Queue.h>
@@ -62,6 +65,16 @@ namespace AwsMock::Dto::Common {
     Database::Entity::SNS::MessageList snsMessages;
 
     /**
+     * Lambda functions
+     */
+    Database::Entity::Lambda::LambdaList lambdas;
+
+    /**
+     * Transfer servers
+     */
+    Database::Entity::Transfer::TransferList transferServers;
+
+    /**
      * Cognito user pools
      */
     Database::Entity::Cognito::UserPoolList cognitoUserPools;
@@ -77,6 +90,13 @@ namespace AwsMock::Dto::Common {
      * @return Infrastructure as JSON string
      */
     std::string ToJson();
+
+    /**
+     * From JSON representation
+     *
+     * @param Infrastructure as JSON string
+     */
+    void FromJson(const std::string &jsonString);
   };
 
 } // namespace AwsMock::Dto

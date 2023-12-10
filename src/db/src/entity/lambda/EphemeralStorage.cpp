@@ -11,6 +11,13 @@ namespace AwsMock::Database::Entity::Lambda {
     size = mResult.value()["size"].get_int64();
   }
 
+  Poco::JSON::Object EphemeralStorage::ToJsonObject() const {
+
+    Poco::JSON::Object jsonObject;
+    jsonObject.set("size", size);
+    return jsonObject;
+  }
+
   std::string EphemeralStorage::ToString() const {
     std::stringstream ss;
     ss << (*this);
