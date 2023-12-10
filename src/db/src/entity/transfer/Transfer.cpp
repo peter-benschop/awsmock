@@ -47,7 +47,7 @@ namespace AwsMock::Database::Entity::Transfer {
     return transferDoc;
   }
 
-  void Transfer::FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult) {
+  void Transfer::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
     oid = mResult.value()["_id"].get_oid().value.to_string();
     region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
@@ -77,34 +77,25 @@ namespace AwsMock::Database::Entity::Transfer {
     }
   }
 
-  void Transfer::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+  Poco::JSON::Object Transfer::ToJsonObject() const {
 
-    oid = mResult.value()["_id"].get_oid().value.to_string();
-    region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
-    serverId = bsoncxx::string::to_string(mResult.value()["serverId"].get_string().value);
-    arn = bsoncxx::string::to_string(mResult.value()["arn"].get_string().value);
-    state = bsoncxx::string::to_string(mResult.value()["state"].get_string().value);
-    concurrency = mResult.value()["concurrency"].get_int32().value;
-    port = mResult.value()["port"].get_int32().value;
-    listenAddress = bsoncxx::string::to_string(mResult.value()["listenAddress"].get_string().value);
-    lastStarted = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date().value) / 1000));
-    created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-    modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+    Poco::JSON::Object jsonObject;
+    jsonObject.set("region", region);
+    jsonObject.set("serverId", serverId);
+    jsonObject.set("arn", arn);
+    jsonObject.set("state", state);
+    jsonObject.set("concurrency", concurrency);
+    jsonObject.set("port", port);
+    jsonObject.set("listenAddress", listenAddress);
+    jsonObject.set("lastStarted", Poco::DateTimeFormatter::format(lastStarted, Poco::DateTimeFormat::ISO8601_FORMAT));
 
-    auto protocolsDoc = mResult.value()["protocols"].get_array();
-    for (auto &p : protocolsDoc.value) {
-      protocols.emplace_back(bsoncxx::string::to_string(p.get_string().value));
+    Poco::JSON::Array jsonProtocolsArray;
+    for(const auto &protocol: protocols) {
+      jsonProtocolsArray.add(protocol);
     }
+    jsonObject.set("protocols", jsonProtocolsArray);
 
-    bsoncxx::array::view usersView{mResult.value()["users"].get_array().value};
-    for (bsoncxx::array::element userElement : usersView) {
-      User user{
-          .userName=bsoncxx::string::to_string(userElement["userName"].get_string().value),
-          .password=bsoncxx::string::to_string(userElement["password"].get_string().value),
-          .homeDirectory=bsoncxx::string::to_string(userElement["homeDirectory"].get_string().value)
-      };
-      users.push_back(user);
-    }
+    return jsonObject;
   }
 
   std::string Transfer::ToString() const {

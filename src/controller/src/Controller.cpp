@@ -221,10 +221,35 @@ namespace AwsMock::Controller {
     }
   }
 
-  void Controller::ExportInfrastructure() {
+  void Controller::ExportInfrastructure(const std::vector<std::string> &services) {
+
+    Dto::Common::Services exportServices;
+    for (const auto &service : services) {
+      exportServices.serviceNames.emplace_back(service);
+    }
+
     std::map<std::string, std::string> headers;
     AddAuthorization(headers);
-    Core::CurlResponse response = _curlUtils.SendHttpRequest("GET", _baseUrl + "/export/", headers);
+    Core::CurlResponse response = _curlUtils.SendHttpRequest("GET", _baseUrl + "/export", headers, exportServices.ToJson());
+
+    if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
+      std::cerr << "Error: " << response.statusReason << std::endl;
+      return;
+    }
+    std::cout << response.output;
+  }
+
+  void Controller::ImportInfrastructure() {
+
+    std::string line;
+    std::stringstream jsonString;
+    while (std::getline(std::cin, line)) {
+      jsonString << line;
+    }
+
+    std::map<std::string, std::string> headers;
+    AddAuthorization(headers);
+    Core::CurlResponse response = _curlUtils.SendHttpRequest("GET", _baseUrl + "/import", headers, jsonString.str());
 
     if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
       std::cerr << "Error: " << response.statusReason << std::endl;

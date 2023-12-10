@@ -43,161 +43,169 @@ namespace AwsMock::Controller {
    */
   class AwsMockCtl : public Poco::Util::Application {
 
-  protected:
+    protected:
 
-    /**
-     * Initialization callback from Poco Application class.
-     *
-     * @param self application reference.
-     */
-    [[maybe_unused]] void initialize(Application &self) override {
-      Poco::Util::Application::initialize(self);
-    }
-
-    /**
-     * Shutdown the application. Gets called when the application is about to stop.
-     */
-    [[maybe_unused]] void uninitialize() override {
-
-      Poco::Util::Application::uninitialize();
-      log_debug_stream(_logger) << "Bye, bye, and thanks for all the fish" << std::endl;
-    }
-
-    /**
-     * Define the command line options.
-     *
-     * @param options Poco options class.
-     */
-    [[maybe_unused]] void defineOptions(Poco::Util::OptionSet &options) override {
-
-      Poco::Util::Application::defineOptions(options);
-      options.addOption(Poco::Util::Option("config", "", "set the configuration file").required(false).repeatable(false).argument("file").callback(
-          Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
-      options.addOption(Poco::Util::Option("version", "", "display version information").required(false).repeatable(false).callback(
-          Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
-      options.addOption(Poco::Util::Option("help", "", "display help information").required(false).repeatable(false).callback(
-          Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
-    }
-
-    /**
-     * Handles the command line options. Uses Poco command line optios handling.
-     *
-     * @param name command line option name.
-     * @param value command line option value.
-     */
-    void handleOption(const std::string &name, const std::string &value) override {
-
-      if (name == "help") {
-
-        std::cout << std::endl;
-        Poco::Util::HelpFormatter helpFormatter(options());
-        helpFormatter.setHeader("\nAwsMock - AWS simulation written in C++ " + Configuration::GetVersion() + "\n\nOptions:");
-        helpFormatter.setCommand(commandName());
-        helpFormatter.setUsage("<options> <command>");
-        helpFormatter.format(std::cout);
-        std::cout << "\nCommands:\n" << std::endl;
-        std::cout << "list\t\t\t: lists all available services" << std::endl;
-        std::cout << "start [<module>]\t: starts the given module. If no argument is given, starts all services." << std::endl;
-        std::cout << "stop [<module>]\t\t: stops the given module. If no argument is given, stops all services" << std::endl;
-        std::cout << "restart [<module>]\t: restarts the given module. If no argument is given, restarts all services" << std::endl;
-#ifdef HAS_SYSTEMD
-        std::cout << "logs\t\t\t: shows the manager logs" << std::endl;
-#endif
-        std::cout << "loglevel <level>\t: sets the manager log to level" << std::endl;
-        std::cout << "config\t\t\t: shows the gateway configuration" << std::endl;
-        std::cout << "export\t\t\t: dumps the current infrastructure to stdout" << std::endl;
-        stopOptionsProcessing();
-        exit(0);
-
-      } else if (name == "file") {
-
-        _configuration.SetFilename(value);
-
-      } else if (name == "version") {
-
-        std::cout << "awsmockctl" << " " << Configuration::GetVersion() << std::endl;
-        exit(0);
-
-      } else if (name == "level") {
-
-        _configuration.SetLogLevel(value);
-        Poco::Logger::get("").setLevel(value);
-
+      /**
+       * Initialization callback from Poco Application class.
+       *
+       * @param self application reference.
+       */
+      [[maybe_unused]] void initialize(Application &self) override {
+        Poco::Util::Application::initialize(self);
       }
-    }
 
-    int ProcessCommand(const ArgVec &args) {
+      /**
+       * Shutdown the application. Gets called when the application is about to stop.
+       */
+      [[maybe_unused]] void uninitialize() override {
 
-      const std::string &name = args[0];
-      if (name == "list") {
+        Poco::Util::Application::uninitialize();
+        log_debug_stream(_logger) << "Bye, bye, and thanks for all the fish" << std::endl;
+      }
 
-        _controller.ListServices();
+      /**
+       * Define the command line options.
+       *
+       * @param options Poco options class.
+       */
+      [[maybe_unused]] void defineOptions(Poco::Util::OptionSet &options) override {
 
-      } else if (name == "start") {
+        Poco::Util::Application::defineOptions(options);
+        options.addOption(Poco::Util::Option("config", "", "set the configuration file").required(false).repeatable(false).argument("file").callback(
+          Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
+        options.addOption(Poco::Util::Option("version", "", "display version information").required(false).repeatable(false).callback(
+          Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
+        options.addOption(Poco::Util::Option("help", "", "display help information").required(false).repeatable(false).callback(
+          Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
+      }
 
-        _controller.StartService(args[1]);
+      /**
+       * Handles the command line options. Uses Poco command line optios handling.
+       *
+       * @param name command line option name.
+       * @param value command line option value.
+       */
+      void handleOption(const std::string &name, const std::string &value) override {
 
-      } else if (name == "restart") {
+        if (name == "help") {
 
-        _controller.RestartService(args[1]);
+          std::cout << std::endl;
+          Poco::Util::HelpFormatter helpFormatter(options());
+          helpFormatter.setHeader("\nAwsMock - AWS simulation written in C++ " + Configuration::GetVersion() + "\n\nOptions:");
+          helpFormatter.setCommand(commandName());
+          helpFormatter.setUsage("<options> <command>");
+          helpFormatter.format(std::cout);
+          std::cout << "\nCommands:\n" << std::endl;
+          std::cout << "list\t\t\t: lists all available services" << std::endl;
+          std::cout << "start [<module>]\t: starts the given module. If no argument is given, starts all services." << std::endl;
+          std::cout << "stop [<module>]\t\t: stops the given module. If no argument is given, stops all services" << std::endl;
+          std::cout << "restart [<module>]\t: restarts the given module. If no argument is given, restarts all services" << std::endl;
+#ifdef HAS_SYSTEMD
+          std::cout << "logs\t\t\t: shows the manager logs" << std::endl;
+#endif
+          std::cout << "loglevel <level>\t: sets the manager log to level" << std::endl;
+          std::cout << "config\t\t\t: shows the gateway configuration" << std::endl;
+          std::cout << "export [services]\t: dumps the current infrastructure to stdout. Services is a space separated list of service names." << std::endl;
+          std::cout << "\t\t\t  Valid services are: s3, sqs, sns, lambda, transfer, cognito" << std::endl;
+          std::cout << "import\t\t\t: imports the infrastructure from stdin." << std::endl;
 
-      } else if (name == "stop") {
+          stopOptionsProcessing();
+          exit(0);
 
-        _controller.StopService(args[1]);
+        } else if (name == "file") {
+
+          _configuration.SetFilename(value);
+
+        } else if (name == "version") {
+
+          std::cout << "awsmockctl" << " " << Configuration::GetVersion() << std::endl;
+          exit(0);
+
+        } else if (name == "level") {
+
+          _configuration.SetLogLevel(value);
+          Poco::Logger::get("").setLevel(value);
+
+        }
+      }
+
+      int ProcessCommand(const ArgVec &args) {
+
+        const std::string &name = args[0];
+        if (name == "list") {
+
+          _controller.ListServices();
+
+        } else if (name == "start") {
+
+          _controller.StartService(args[1]);
+
+        } else if (name == "restart") {
+
+          _controller.RestartService(args[1]);
+
+        } else if (name == "stop") {
+
+          _controller.StopService(args[1]);
 
 #ifdef HAS_SYSTEMD
-      } else if (name == "logs") {
+        } else if (name == "logs") {
 
-        _controller.ShowServiceLogs();
+          _controller.ShowServiceLogs();
 #endif
-      } else if (name == "loglevel") {
+        } else if (name == "loglevel") {
 
-        _controller.SetLogLevel(args[1]);
+          _controller.SetLogLevel(args[1]);
 
-      } else if (name == "config") {
+        } else if (name == "config") {
 
-        _controller.GetDefaults();
+          _controller.GetDefaults();
 
-      } else if (name == "export") {
+        } else if (name == "export") {
 
-        _controller.ExportInfrastructure();
+          std::vector<std::string> services = {args.begin() + 1, args.end()};
+          _controller.ExportInfrastructure(services);
 
-      } else {
+        } else if (name == "import") {
 
-        std::cerr << "Unknown command: " << name << std::endl;
-        return -1;
+          _controller.ImportInfrastructure();
 
+        } else {
+
+          std::cerr << "Unknown command: " << name << std::endl;
+          return -1;
+
+        }
+        return 0;
       }
-      return 0;
-    }
 
-    /**
-     * Main routine.
-     *
-     * @param args command line arguments.
-     * @return system exit code.
-     */
-    int main([[maybe_unused]]const ArgVec &args) override {
+      /**
+       * Main routine.
+       *
+       * @param args command line arguments.
+       * @return system exit code.
+       */
+      int main([[maybe_unused]]const ArgVec &args) override {
 
-      return ProcessCommand(args);
-    }
+        return ProcessCommand(args);
+      }
 
-  private:
+    private:
 
-    /**
-     * Logger
-     */
-    Core::LogStream _logger = Core::LogStream(Poco::Logger::get("Gateway"));
+      /**
+       * Logger
+       */
+      Core::LogStream _logger = Core::LogStream(Poco::Logger::get("Gateway"));
 
-    /**
-     * Application configuration
-     */
-    Configuration _configuration = Configuration(CONFIGURATION_BASE_PATH);
+      /**
+       * Application configuration
+       */
+      Configuration _configuration = Configuration(CONFIGURATION_BASE_PATH);
 
-    /**
-     * Controller
-     */
-    Controller _controller = Controller(_configuration);
+      /**
+       * Controller
+       */
+      Controller _controller = Controller(_configuration);
   };
 
 } // namespace AwsMock

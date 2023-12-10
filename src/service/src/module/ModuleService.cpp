@@ -134,36 +134,64 @@ namespace AwsMock::Service {
     }
   }
 
-  std::string ModuleService::ExportInfrastructure() {
+  std::string ModuleService::ExportInfrastructure(const Dto::Common::Services &services) {
 
     Dto::Common::Infrastructure infrastructure;
     Database::Entity::Module::ModuleList modules = _moduleDatabase->ListModules();
     log_info_stream(_logger) << "Found modules, count: " << modules.size() << std::endl;
 
     std::string jsonBuckets;
-    for (const auto &module : modules) {
-      if (Core::StringUtils::EqualsIgnoreCase(module.name, "s3")) {
+    for (const auto &service : services.serviceNames) {
+
+      if (Core::StringUtils::EqualsIgnoreCase(service, "all") || Core::StringUtils::EqualsIgnoreCase(service, "s3")) {
         std::shared_ptr<Database::S3Database> _s3Database = std::make_shared<Database::S3Database>(_configuration);
         infrastructure.s3Buckets = _s3Database->ListBuckets();
         infrastructure.s3Objects = _s3Database->ListObjects();
       }
-      if (Core::StringUtils::EqualsIgnoreCase(module.name, "sqs")) {
+      if (Core::StringUtils::EqualsIgnoreCase(service, "all") || Core::StringUtils::EqualsIgnoreCase(service, "sqs")) {
         std::shared_ptr<Database::SQSDatabase> _sqsDatabase = std::make_shared<Database::SQSDatabase>(_configuration);
         infrastructure.sqsQueues = _sqsDatabase->ListQueues();
         infrastructure.sqsMessages = _sqsDatabase->ListMessages();
       }
-      if (Core::StringUtils::EqualsIgnoreCase(module.name, "sns")) {
+      if (Core::StringUtils::EqualsIgnoreCase(service, "all") || Core::StringUtils::EqualsIgnoreCase(service, "sns")) {
         std::shared_ptr<Database::SNSDatabase> _snsDatabase = std::make_shared<Database::SNSDatabase>(_configuration);
         infrastructure.snsTopics = _snsDatabase->ListTopics();
         infrastructure.snsMessages = _snsDatabase->ListMessages();
       }
-      if (Core::StringUtils::EqualsIgnoreCase(module.name, "cognito")) {
+      if (Core::StringUtils::EqualsIgnoreCase(service, "all") || Core::StringUtils::EqualsIgnoreCase(service, "lambda")) {
+        std::shared_ptr<Database::LambdaDatabase> _lambdaDatabase = std::make_shared<Database::LambdaDatabase>(_configuration);
+        infrastructure.lambdas = _lambdaDatabase->ListLambdas();
+      }
+      if (Core::StringUtils::EqualsIgnoreCase(service, "all") || Core::StringUtils::EqualsIgnoreCase(service, "cognito")) {
         std::shared_ptr<Database::CognitoDatabase> _cognitoDatabase = std::make_shared<Database::CognitoDatabase>(_configuration);
         infrastructure.cognitoUserPools = _cognitoDatabase->ListUserPools();
         infrastructure.cognitoUsers = _cognitoDatabase->ListUsers();
       }
     }
     return infrastructure.ToJson();
+  }
+
+  void ModuleService::ImportInfrastructure(const std::string &jsonString) {
+    log_info_stream(_logger) << "Importing services, length: " << jsonString.length() << std::endl;
+
+    Dto::Common::Infrastructure infrastructure;
+    infrastructure.FromJson(jsonString);
+
+    if (!infrastructure.s3Buckets.empty() || !infrastructure.s3Objects.empty()) {
+      std::shared_ptr<Database::S3Database> _s3Database = std::make_shared<Database::S3Database>(_configuration);
+      if (!infrastructure.s3Buckets.empty()) {
+        for (const auto &bucket : infrastructure.s3Buckets) {
+          _s3Database->CreateOrUpdateBucket(bucket);
+        }
+        log_info_stream(_logger) << "S3 buckets imported, count: " << infrastructure.s3Buckets.size() << std::endl;
+      }
+      if (!infrastructure.s3Objects.empty()) {
+        for (const auto &object : infrastructure.s3Objects) {
+          _s3Database->CreateOrUpdateObject(object);
+        }
+        log_info_stream(_logger) << "S3 objects imported, count: " << infrastructure.s3Objects.size() << std::endl;
+      }
+    }
   }
 
 }

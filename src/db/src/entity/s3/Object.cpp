@@ -87,6 +87,29 @@ namespace AwsMock::Database::Entity::S3 {
     return jsonObject;
   }
 
+  void Object::FromJsonObject(Poco::JSON::Object::Ptr jsonObject) {
+
+    Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
+    Core::JsonUtils::GetJsonValueString("bucket", jsonObject, bucket);
+    Core::JsonUtils::GetJsonValueString("key", jsonObject, key);
+    Core::JsonUtils::GetJsonValueString("owner", jsonObject, owner);
+    Core::JsonUtils::GetJsonValueLong("size", jsonObject, size);
+    Core::JsonUtils::GetJsonValueString("md5sum", jsonObject, md5sum);
+    Core::JsonUtils::GetJsonValueString("sha1sum", jsonObject, sha1sum);
+    Core::JsonUtils::GetJsonValueString("sha256sum", jsonObject, sha256sum);
+    Core::JsonUtils::GetJsonValueString("contentType", jsonObject, contentType);
+    Core::JsonUtils::GetJsonValueString("internalName", jsonObject, internalName);
+    Core::JsonUtils::GetJsonValueString("versionId", jsonObject, versionId);
+
+    Poco::JSON::Array::Ptr jsonMetadataArray = jsonObject->getArray("metadata");
+    for (int i = 0; i < jsonMetadataArray->size(); i++) {
+      Poco::JSON::Object::Ptr jsonMetadataObject = jsonMetadataArray->getObject(i);
+      std::string keyString = jsonMetadataObject->get("name");
+      std::string valueString = jsonMetadataObject->get("value");
+      metadata[keyString] = valueString;
+    }
+  }
+
   std::string Object::ToString() const {
     std::stringstream ss;
     ss << (*this);

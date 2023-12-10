@@ -16,6 +16,7 @@ namespace AwsMock {
     log_debug_stream(_logger) << "Module GET request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
 
     std::string action = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
+    std::string payload = Core::HttpUtils::GetBodyAsString(request);
     log_debug_stream(_logger) << "Action: " + action << std::endl;
 
     if (action == "config") {
@@ -44,8 +45,15 @@ namespace AwsMock {
 
     } else if (action == "export") {
 
-      std::string infrastructure = _moduleService->ExportInfrastructure();
+      Dto::Common::Services services;
+      services.FromJson(payload);
+      std::string infrastructure = _moduleService->ExportInfrastructure(services);
       SendOkResponse(response, infrastructure);
+
+    } else if (action == "import") {
+
+      _moduleService->ImportInfrastructure(payload);
+      SendOkResponse(response);
 
     } else {
 

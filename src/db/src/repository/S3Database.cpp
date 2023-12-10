@@ -180,6 +180,16 @@ namespace AwsMock::Database {
     }
   }
 
+  Entity::S3::Bucket S3Database::CreateOrUpdateBucket(const Entity::S3::Bucket &bucket) {
+
+    if (BucketExists(bucket)) {
+      return UpdateBucket(bucket);
+    } else {
+      return CreateBucket(bucket);
+    }
+
+  }
+
   // TODO: Combine with Listobject
   Entity::S3::ObjectList S3Database::ListBucket(const std::string &bucket, const std::string &prefix) {
 
@@ -242,22 +252,6 @@ namespace AwsMock::Database {
 
     log_trace_stream(_logger) << "Got object list in all buckets, size:" << objectList.size() << std::endl;
     return objectList;
-  }
-
-  void S3Database::DumpBuckets(std::string &input) {
-
-    if(!input.empty()) {
-      input += ",";
-    }
-    input += "{\"s3-buckets\":[";
-    auto bucketCursor = _bucketCollection.find({});
-    for (auto bucket : bucketCursor) {
-
-      input += bsoncxx::to_json(bucket) + ",";
-    }
-    if (!input.empty())
-      input.pop_back();
-    input += "]}";
   }
 
   void S3Database::DeleteBucket(const Entity::S3::Bucket &bucket) {
