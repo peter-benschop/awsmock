@@ -3,7 +3,8 @@ set(LIBRARY awsmockdb)
 set(LIBRARY_STATIC awsmockdb_static)
 
 set(SQS_SOURCES src/entity/sqs/MessageAttribute.cpp src/entity/sqs/Message.cpp src/repository/SQSDatabase.cpp
-        src/memorydb/SQSMemoryDb.cpp)
+        src/memorydb/SQSMemoryDb.cpp src/entity/sqs/Queue.cpp src/entity/sqs/QueueAttribute.cpp
+        src/entity/sqs/RedrivePolicy.cpp)
 set(SNS_SOURCES src/entity/sns/MessageAttribute.cpp src/entity/sns/Message.cpp src/entity/sns/Topic.cpp
         src/entity/sns/Subscription.cpp src/repository/SNSDatabase.cpp src/memorydb/SNSMemoryDb.cpp)
 set(S3_SOURCES src/entity/s3/Bucket.cpp src/entity/s3/BucketNotification.cpp src/entity/s3/Object.cpp
@@ -30,7 +31,9 @@ add_library(${LIBRARY} SHARED ${SOURCES}
         include/awsmock/memorydb/SQSMemoryDb.h
         include/awsmock/entity/cognito/UserPool.h
         include/awsmock/entity/cognito/UserStatus.h
-        include/awsmock/entity/cognito/UserAttribute.h)
+        include/awsmock/entity/cognito/UserAttribute.h
+        include/awsmock/entity/sqs/QueueAttribute.h
+        include/awsmock/entity/sqs/RedrivePolicy.h)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 

@@ -16,6 +16,7 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/ServiceException.h>
+#include <awsmock/dto/common/Infrastructure.h>
 #include <awsmock/entity/module/Module.h>
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/service/GatewayServer.h>
@@ -32,88 +33,95 @@ namespace AwsMock::Service {
    */
   class ModuleService {
 
-  public:
+    public:
 
-    /**
-     * Constructor
-     *
-     * @param configuration module configuration
-     * @param serverMap module map
-     */
-    explicit ModuleService(Core::Configuration &configuration, Service::ServerMap &serverMap);
+      /**
+       * Constructor
+       *
+       * @param configuration module configuration
+       * @param serverMap module map
+       */
+      explicit ModuleService(Core::Configuration &configuration, Service::ServerMap &serverMap);
 
-    /**
-     * Return all list of all modules
-     *
-     * @param list of all modules
-     */
-    Database::Entity::Module::ModuleList ListModules();
+      /**
+       * Return all list of all modules
+       *
+       * @param list of all modules
+       */
+      Database::Entity::Module::ModuleList ListModules();
 
-    /**
-     * Returns the running state
-     *
-     * @param module module name
-     * @return module state
-     */
-    bool IsRunning(const std::string &module);
+      /**
+       * Returns the running state
+       *
+       * @param module module name
+       * @return module state
+       */
+      bool IsRunning(const std::string &module);
 
-    /**
-     * Starts a module
-     *
-     * @param name module name
-     */
-    Database::Entity::Module::Module StartService(const std::string &name);
+      /**
+       * Starts a module
+       *
+       * @param name module name
+       */
+      Database::Entity::Module::Module StartService(const std::string &name);
 
-    /**
-     * Starts all services
-     */
-    void StartAllServices();
+      /**
+       * Starts all services
+       */
+      void StartAllServices();
 
-    /**
-     * Restarts a module
-     *
-     * @param name module name
-     */
-    Database::Entity::Module::Module RestartService(const std::string &name);
+      /**
+       * Restarts a module
+       *
+       * @param name module name
+       */
+      Database::Entity::Module::Module RestartService(const std::string &name);
 
-    /**
-     * Restarts all services
-     */
-    void RestartAllServices();
+      /**
+       * Restarts all services
+       */
+      void RestartAllServices();
 
-    /**
-     * Stops a module
-     *
-     * @param name module name
-     */
-    Database::Entity::Module::Module StopService(const std::string &name);
+      /**
+       * Stops a module
+       *
+       * @param name module name
+       */
+      Database::Entity::Module::Module StopService(const std::string &name);
 
-    /**
-     * Stops all services
-     */
-    void StopAllServices();
+      /**
+       * Stops all services
+       */
+      void StopAllServices();
 
-  private:
+      /**
+       * Exports the current infrastructure
+       *
+       * @return JSON string
+       */
+      std::string ExportInfrastructure();
 
-    /**
-     * Logger
-     */
-    Core::LogStream _logger;
+    private:
 
-    /**
-     * Configuration
-     */
-    Core::Configuration &_configuration;
+      /**
+       * Logger
+       */
+      Core::LogStream _logger;
 
-    /**
-     * Server map
-     */
-    Service::ServerMap &_serverMap;
+      /**
+       * Configuration
+       */
+      Core::Configuration &_configuration;
 
-    /**
-     * Module database
-     */
-    std::shared_ptr<Database::ModuleDatabase> _moduleDatabase;
+      /**
+       * Server map
+       */
+      Service::ServerMap &_serverMap;
+
+      /**
+       * Module database
+       */
+      std::shared_ptr<Database::ModuleDatabase> _moduleDatabase;
   };
 
 } // namespace AwsMock::Service
