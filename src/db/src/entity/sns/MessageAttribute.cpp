@@ -15,6 +15,15 @@ namespace AwsMock::Database::Entity::SNS {
     return messageAttributeDoc;
   }
 
+  Poco::JSON::Object MessageAttribute::ToJsonObject() const {
+
+    Poco::JSON::Object jsonObject;
+    jsonObject.set("name", attributeName);
+    jsonObject.set("value", attributeValue);
+    return jsonObject;
+
+  }
+
   std::string MessageAttribute::ToString() const {
     std::stringstream ss;
     ss << (*this);

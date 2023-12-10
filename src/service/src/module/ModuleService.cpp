@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/service/ModuleService.h>
+#include "awsmock/repository/CognitoDatabase.h"
 
 namespace AwsMock::Service {
 
@@ -150,6 +151,16 @@ namespace AwsMock::Service {
         std::shared_ptr<Database::SQSDatabase> _sqsDatabase = std::make_shared<Database::SQSDatabase>(_configuration);
         infrastructure.sqsQueues = _sqsDatabase->ListQueues();
         infrastructure.sqsMessages = _sqsDatabase->ListMessages();
+      }
+      if (Core::StringUtils::EqualsIgnoreCase(module.name, "sns")) {
+        std::shared_ptr<Database::SNSDatabase> _snsDatabase = std::make_shared<Database::SNSDatabase>(_configuration);
+        infrastructure.snsTopics = _snsDatabase->ListTopics();
+        infrastructure.snsMessages = _snsDatabase->ListMessages();
+      }
+      if (Core::StringUtils::EqualsIgnoreCase(module.name, "cognito")) {
+        std::shared_ptr<Database::CognitoDatabase> _cognitoDatabase = std::make_shared<Database::CognitoDatabase>(_configuration);
+        infrastructure.cognitoUserPools = _cognitoDatabase->ListUserPools();
+        infrastructure.cognitoUsers = _cognitoDatabase->ListUsers();
       }
     }
     return infrastructure.ToJson();

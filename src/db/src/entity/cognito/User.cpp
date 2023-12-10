@@ -47,6 +47,23 @@ namespace AwsMock::Database::Entity::Cognito {
     }
   }
 
+  Poco::JSON::Object User::ToJsonObject() const {
+    Poco::JSON::Object jsonObject;
+    jsonObject.set("region", region);
+    jsonObject.set("userName", userName);
+    jsonObject.set("userPoolId", userPoolId);
+    jsonObject.set("enabled", enabled);
+    jsonObject.set("userStatus", Entity::Cognito::UserStatusToString(userStatus));
+    Poco::JSON::Array jsonAttributeArray;
+    for (const auto &attribute : attributes) {
+      Poco::JSON::Object jsonAttribute;
+      jsonAttribute.set("name", attribute.name);
+      jsonAttribute.set("value", attribute.value);
+      jsonAttributeArray.add(jsonAttribute);
+    }
+    return jsonObject;
+  }
+
   std::string User::ToString() const {
     std::stringstream ss;
     ss << (*this);

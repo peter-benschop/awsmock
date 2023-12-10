@@ -29,23 +29,50 @@ namespace AwsMock::Dto::Common {
       }
 
       // SQS message array
-      Poco::JSON::Array jsonMessageArray;
+      Poco::JSON::Array jsonSqsMessageArray;
       for (const auto &message : sqsMessages) {
-        jsonMessageArray.add(message.ToJsonObject());
+        jsonSqsMessageArray.add(message.ToJsonObject());
+      }
+
+      // SNS topic array
+      Poco::JSON::Array jsonTopicArray;
+      for (const auto &topic : snsTopics) {
+        jsonTopicArray.add(topic.ToJsonObject());
+      }
+
+      // SNS message array
+      Poco::JSON::Array jsonSnsMessageArray;
+      for (const auto &message : snsMessages) {
+        jsonSnsMessageArray.add(message.ToJsonObject());
+      }
+
+      // Cognito user pools
+      Poco::JSON::Array jsonCognitoUserPoolArray;
+      for (const auto &userPool : cognitoUserPools) {
+        jsonCognitoUserPoolArray.add(userPool.ToJsonObject());
+      }
+
+      // Cognito users
+      Poco::JSON::Array jsonCognitoUserArray;
+      for (const auto &user : cognitoUsers) {
+        jsonCognitoUserArray.add(user.ToJsonObject());
       }
 
       Poco::JSON::Object infrastructureJson;
       infrastructureJson.set("s3-buckets", jsonBucketArray);
       infrastructureJson.set("s3-objects", jsonObjectArray);
       infrastructureJson.set("sqs-queues", jsonQueueArray);
-      infrastructureJson.set("sqs-messages", jsonMessageArray);
+      infrastructureJson.set("sqs-messages", jsonSqsMessageArray);
+      infrastructureJson.set("sns-topics", jsonTopicArray);
+      infrastructureJson.set("sns-messages", jsonSnsMessageArray);
+      infrastructureJson.set("cognito-user-pools", jsonCognitoUserPoolArray);
+      infrastructureJson.set("cognito-users", jsonCognitoUserArray);
 
       Poco::JSON::Object rootJson;
       rootJson.set("infrastructure", infrastructureJson);
 
       std::ostringstream os;
       rootJson.stringify(os);
-      std::string tmp = os.str();
       return os.str();
 
     } catch (Poco::Exception &exc) {

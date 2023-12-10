@@ -12,6 +12,7 @@
 #include <Poco/DateTime.h>
 #include <Poco/DateTimeFormat.h>
 #include <Poco/DateTimeFormatter.h>
+#include <Poco/JSON/Object.h>
 
 // MongoDB includes
 #include <bsoncxx/json.hpp>
@@ -77,6 +78,13 @@ namespace AwsMock::Database::Entity::Cognito {
     void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
     /**
+     * Converts the entity to a JSON object
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+
+    /**
      * Converts the entity to a string representation.
      *
      * @return entity as string for logging.
@@ -96,5 +104,6 @@ namespace AwsMock::Database::Entity::Cognito {
 
   typedef std::vector<Entity::Cognito::UserPool> UserPoolList;
 
-}
-#endif //AWSMOCK_DB_ENTITY_COGNITO_USERPOOL_H
+} // namespace AwsMock::Database::Entity::Cognito
+
+#endif // AWSMOCK_DB_ENTITY_COGNITO_USERPOOL_H
