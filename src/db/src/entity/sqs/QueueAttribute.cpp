@@ -57,6 +57,22 @@ namespace AwsMock::Database::Entity::SQS {
     return jsonObject;
   }
 
+  void QueueAttribute::FromJsonObject(const Poco::JSON::Object::Ptr& jsonObject) {
+
+    Core::JsonUtils::GetJsonValueInt("delaySeconds", jsonObject, delaySeconds);
+    Core::JsonUtils::GetJsonValueInt("maxMessageSize", jsonObject, maxMessageSize);
+    Core::JsonUtils::GetJsonValueInt("messageRetentionPeriod", jsonObject, messageRetentionPeriod);
+    Core::JsonUtils::GetJsonValueString("policy", jsonObject, policy);
+    Core::JsonUtils::GetJsonValueInt("receiveMessageWaitTime", jsonObject, receiveMessageWaitTime);
+    Core::JsonUtils::GetJsonValueInt("visibilityTimeout", jsonObject, visibilityTimeout);
+    Core::JsonUtils::GetJsonValueString("redriveAllowPolicy", jsonObject, redriveAllowPolicy);
+    Core::JsonUtils::GetJsonValueLong("approximateNumberOfMessages", jsonObject, approximateNumberOfMessages);
+    Core::JsonUtils::GetJsonValueLong("approximateNumberOfMessagesDelayed", jsonObject, approximateNumberOfMessagesDelayed);
+    Core::JsonUtils::GetJsonValueLong("approximateNumberOfMessagesNotVisible", jsonObject, approximateNumberOfMessagesNotVisible);
+
+    redrivePolicy.FromJsonObject(jsonObject->getObject("redrivePolicy"));
+  }
+
   std::string QueueAttribute::ToString() const {
     std::stringstream ss;
     ss << (*this);

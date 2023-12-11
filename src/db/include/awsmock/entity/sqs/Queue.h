@@ -21,6 +21,7 @@
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/entity/sqs/QueueAttribute.h>
 
@@ -105,6 +106,13 @@ namespace AwsMock::Database::Entity::SQS {
      * @return DTO as string for logging.
      */
     [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+
+    /**
+     * Converts the entity to a JSON object
+     *
+     * @return DTO as string for logging.
+     */
+    void FromJsonObject(Poco::JSON::Object::Ptr jsonObject);
 
     /**
      * Converts the DTO to a string representation.

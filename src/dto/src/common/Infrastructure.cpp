@@ -137,6 +137,13 @@ namespace AwsMock::Dto::Common {
         s3Objects.emplace_back(s3Object);
       }
 
+      Poco::JSON::Array::Ptr sqsQueueArray = infrastructureObject->getArray("sqs-queues");
+      for (int i = 0; i < sqsQueueArray->size(); i++) {
+        Database::Entity::SQS::Queue sqsQueueObject;
+        sqsQueueObject.FromJsonObject(sqsQueueArray->getObject(i));
+        sqsQueues.emplace_back(sqsQueueObject);
+      }
+
     } catch (Poco::Exception &exc) {
       throw Core::ServiceException(exc.message(), 500);
     }
