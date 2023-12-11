@@ -139,6 +139,14 @@ namespace AwsMock::Database {
     _topics.clear();
   }
 
+  bool SNSMemoryDb::MessageExists(const std::string &id) {
+
+    return find_if(_messages.begin(), _messages.end(), [id](const std::pair<std::string, Entity::SNS::Message> &message) {
+      return message.first == id;
+    }) != _messages.end();
+
+  }
+
   Entity::SNS::Message SNSMemoryDb::CreateMessage(const Entity::SNS::Message &message) {
     Poco::ScopedLock loc(_messageMutex);
 
@@ -208,6 +216,17 @@ namespace AwsMock::Database {
 
     log_trace_stream(_logger) << "Got message list, size: " << messageList.size() << std::endl;
     return messageList;
+  }
+
+  Entity::SNS::Message SNSMemoryDb::UpdateMessage(Entity::SNS::Message &message) {
+    Poco::ScopedLock lock(_messageMutex);
+
+    std::string oid = message.oid;
+    auto it = find_if(_messages.begin(), _messages.end(), [oid](const std::pair<std::string, Entity::SNS::Message> &message) {
+      return message.second.oid == oid;
+    });
+    _messages[it->first] = message;
+    return _messages[it->first];
   }
 
   void SNSMemoryDb::DeleteMessage(const Entity::SNS::Message &message) {

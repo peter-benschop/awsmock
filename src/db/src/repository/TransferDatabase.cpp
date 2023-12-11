@@ -176,11 +176,23 @@ namespace AwsMock::Database {
 
       try {
 
-        auto transferCursor = _transferCollection.find(make_document(kvp("region", region)));
-        for (auto transfer : transferCursor) {
-          Entity::Transfer::Transfer result;
-          result.FromDocument(transfer);
-          transfers.push_back(result);
+        if (region.empty()) {
+
+          auto transferCursor = _transferCollection.find(make_document());
+          for (auto transfer : transferCursor) {
+            Entity::Transfer::Transfer result;
+            result.FromDocument(transfer);
+            transfers.push_back(result);
+          }
+
+        } else {
+
+          auto transferCursor = _transferCollection.find(make_document(kvp("region", region)));
+          for (auto transfer : transferCursor) {
+            Entity::Transfer::Transfer result;
+            result.FromDocument(transfer);
+            transfers.push_back(result);
+          }
         }
         log_trace_stream(_logger) << "Got transfer list, size:" << transfers.size() << std::endl;
 

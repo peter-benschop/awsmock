@@ -112,6 +112,15 @@ namespace AwsMock::Database {
       Entity::SNS::Topic UpdateTopic(const Entity::SNS::Topic &topic);
 
       /**
+       * Create a new topic or updates an existing topic
+       *
+       * @param topic topic entity
+       * @return created or updated SNS topic entity
+       * @throws DatabaseException
+       */
+      Entity::SNS::Topic CreateOrUpdateTopic(Entity::SNS::Topic &topic);
+
+      /**
        * List all available topics
        *
        * @param region AWS region
@@ -140,6 +149,15 @@ namespace AwsMock::Database {
        * Deletes all topics
        */
       void DeleteAllTopics();
+
+      /**
+       * Check existence of message
+       *
+       * @param id message ID
+       * @return true if message already exists
+       * @throws DatabaseException
+       */
+      bool MessageExists(const std::string &id);
 
       /**
        * Creates a new message in the SQS message table
@@ -193,6 +211,24 @@ namespace AwsMock::Database {
        * @throws DatabaseException
        */
       Entity::SNS::MessageList ListMessages(const std::string &region = {});
+
+      /**
+       * Updates an existing message
+       *
+       * @param message message entity
+       * @return created or updated SNS message entity
+       * @throws DatabaseException
+       */
+      Entity::SNS::Message UpdateMessage(Entity::SNS::Message &message);
+
+      /**
+       * Create a new queue or updates an existing message
+       *
+       * @param message message entity
+       * @return created or updated SNS message entity
+       * @throws DatabaseException
+       */
+      Entity::SNS::Message CreateOrUpdateMessage(Entity::SNS::Message &message);
 
       /**
        * Deletes a message.

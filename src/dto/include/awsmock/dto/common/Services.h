@@ -40,7 +40,13 @@ namespace AwsMock::Dto::Common {
      */
     std::vector<std::string>serviceNames;
 
-    bool HasService(const std::string &service);
+    /**
+     * Check existence of given service name
+     *
+     * @param service name of the service
+     * @return true in case the service exists
+     */
+    bool HasService(const std::string &service)const;
 
     /**
      * JSON representation

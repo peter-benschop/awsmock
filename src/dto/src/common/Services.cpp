@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::Common {
 
-  bool Services::HasService(const std::string &service) {
+  bool Services::HasService(const std::string &service) const {
 
     if (Core::StringUtils::EqualsIgnoreCase(service, "all")) {
       return true;
