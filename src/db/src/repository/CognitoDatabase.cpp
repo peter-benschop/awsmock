@@ -128,14 +128,18 @@ namespace AwsMock::Database {
 
   }
 
-/*  Entity::Cognito::Cognito CognitoDatabase::CreateOrUpdateCognito(const Entity::Cognito::Cognito &cognito) {
+  Entity::Cognito::UserPool CognitoDatabase::CreateOrUpdateUserPool(Entity::Cognito::UserPool &userPool) {
 
-  if (CognitoExists(cognito)) {
-    return UpdateCognito(cognito);
-  } else {
-    return CreateCognito(cognito);
+    if (UserPoolExists(userPool.region, userPool.name)) {
+
+      return UpdateUserPool(userPool);
+
+    } else {
+
+      return CreateUserPool(userPool);
+
+    }
   }
-}*/
 
   Entity::Cognito::UserPool CognitoDatabase::UpdateUserPool(const Entity::Cognito::UserPool &userPool) {
 
@@ -445,13 +449,49 @@ namespace AwsMock::Database {
     return users;
   }
 
+  Entity::Cognito::User CognitoDatabase::UpdateUser(const Entity::Cognito::User &user) {
+
+    if (HasDatabase()) {
+
+      try {
+        auto result = _userCollection.replace_one(make_document(kvp("region", user.region), kvp("userPoolId", user.userPoolId), kvp("userName", user.userName)), user.ToDocument());
+
+        log_trace_stream(_logger) << "Cognito user updated: " << user.ToString() << std::endl;
+
+        return GetUserByUserName(user.region, user.userPoolId, user.userName);
+
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+      }
+
+    } else {
+
+      return _memoryDb.UpdateUser(user);
+
+    }
+  }
+
+  Entity::Cognito::User CognitoDatabase::CreateOrUpdateUser(Entity::Cognito::User &user) {
+
+    if (UserExists(user.region, user.userPoolId, user.userName)) {
+
+      return UpdateUser(user);
+
+    } else {
+
+      return CreateUser(user);
+
+    }
+  }
+
   void CognitoDatabase::DeleteUser(const Entity::Cognito::User &user) {
 
     if (HasDatabase()) {
 
       try {
 
-        auto result = _userCollection.delete_many(make_document(kvp("region", user.region),kvp("userPoolId", user.userPoolId),kvp("userName", user.userName)));
+        auto result = _userCollection.delete_many(make_document(kvp("region", user.region), kvp("userPoolId", user.userPoolId), kvp("userName", user.userName)));
         log_debug_stream(_logger) << "User deleted, userName: " << user.userName << " count: " << result->deleted_count() << std::endl;
 
       } catch (const mongocxx::exception &exc) {

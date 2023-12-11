@@ -221,6 +221,25 @@ namespace AwsMock::Database {
     return userList;
   }
 
+  Entity::Cognito::User CognitoMemoryDb::UpdateUser(const Entity::Cognito::User &user) {
+
+    Poco::ScopedLock lock(_userMutex);
+
+    std::string region = user.region;
+    std::string userPoolId = user.userPoolId;
+    std::string userName = user.userName;
+    auto it = find_if(_users.begin(), _users.end(), [region, userPoolId, userName](const std::pair<std::string, Entity::Cognito::User> &user) {
+      return user.second.region == region && user.second.userPoolId == userPoolId && user.second.userName==userName;
+    });
+
+    if (it == _users.end()) {
+      log_error_stream(_logger) << "Update user failed, region: " << user.region << " name: " << user.userName << std::endl;
+      throw Core::DatabaseException("Update cognito user failed, region: " + user.region + " name: " + user.userName);
+    }
+    _users[it->first] = user;
+    return _users[it->first];
+  }
+
   void CognitoMemoryDb::DeleteUser(const Entity::Cognito::User &user) {
     Poco::ScopedLock lock(_userMutex);
 
@@ -233,7 +252,7 @@ namespace AwsMock::Database {
   void CognitoMemoryDb::DeleteAllUsers() {
     Poco::ScopedLock lock(_userMutex);
 
-    log_debug_stream(_logger) << "All cognito user deleted, count: " << _userPools.size() << std::endl;
+    log_debug_stream(_logger) << "All cognito users deleted, count: " << _userPools.size() << std::endl;
     _users.clear();
   }
 

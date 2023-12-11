@@ -220,6 +220,35 @@ namespace AwsMock::Service {
         log_info_stream(_logger) << "SNS messages imported, count: " << infrastructure.snsMessages.size() << std::endl;
       }
     }
+    if (!infrastructure.lambdas.empty()) {
+      std::shared_ptr<Database::LambdaDatabase> _lambdaDatabase = std::make_shared<Database::LambdaDatabase>(_configuration);
+      for (auto &lambda : infrastructure.lambdas) {
+        _lambdaDatabase->CreateOrUpdateLambda(lambda);
+      }
+      log_info_stream(_logger) << "Lambda functions imported, count: " << infrastructure.lambdas.size() << std::endl;
+    }
+    if (!infrastructure.transferServers.empty()) {
+      std::shared_ptr<Database::TransferDatabase> _transferDatabase = std::make_shared<Database::TransferDatabase>(_configuration);
+      for (auto &transfer : infrastructure.transferServers) {
+        _transferDatabase->CreateOrUpdateTransfer(transfer);
+      }
+      log_info_stream(_logger) << "Transfer servers imported, count: " << infrastructure.transferServers.size() << std::endl;
+    }
+    if (!infrastructure.cognitoUserPools.empty() || !infrastructure.cognitoUsers.empty()) {
+      std::shared_ptr<Database::CognitoDatabase> _cognitoDatabase = std::make_shared<Database::CognitoDatabase>(_configuration);
+      if (!infrastructure.cognitoUserPools.empty()) {
+        for (auto &userPool : infrastructure.cognitoUserPools) {
+          _cognitoDatabase->CreateOrUpdateUserPool(userPool);
+        }
+        log_info_stream(_logger) << "SNS topics imported, count: " << infrastructure.snsTopics.size() << std::endl;
+      }
+      if (!infrastructure.cognitoUsers.empty()) {
+        for (auto &user : infrastructure.cognitoUsers) {
+          _cognitoDatabase->CreateOrUpdateUser(user);
+        }
+        log_info_stream(_logger) << "SNS messages imported, count: " << infrastructure.snsMessages.size() << std::endl;
+      }
+    }
   }
 
   void ModuleService::CleanInfrastructure(const Dto::Common::Services &services) {
