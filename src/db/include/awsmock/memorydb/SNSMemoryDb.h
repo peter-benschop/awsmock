@@ -134,6 +134,15 @@ namespace AwsMock::Database {
       void DeleteAllTopics();
 
       /**
+       * Check existence of message
+       *
+       * @param id message ID
+       * @return true if message already exists
+       * @throws DatabaseException
+       */
+      bool MessageExists(const std::string &id);
+
+      /**
        * Creates a new message in the SQS message table
        *
        * @param message SQS message entity
@@ -167,6 +176,14 @@ namespace AwsMock::Database {
        * @throws DatabaseException
        */
       Entity::SNS::MessageList ListMessages(const std::string &region = {});
+
+      /**
+       * Updates a given message.
+       *
+       * @param message SNS message
+       * @return updated message
+       */
+      Entity::SNS::Message UpdateMessage(Entity::SNS::Message &message);
 
       /**
        * Count the number of message by state

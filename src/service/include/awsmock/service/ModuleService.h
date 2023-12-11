@@ -110,6 +110,13 @@ namespace AwsMock::Service {
        */
       void ImportInfrastructure(const std::string &jsonString);
 
+      /**
+       * Cleans the current infrastructure
+       *
+       * @param services service name list
+       */
+      void CleanInfrastructure(const Dto::Common::Services &services);
+
     private:
 
       /**

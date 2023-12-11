@@ -41,13 +41,23 @@ namespace AwsMock::Database {
   std::vector<Entity::Transfer::Transfer> TransferMemoryDb::ListServers(const std::string &region) {
 
     Entity::Transfer::TransferList transferList;
-    for (const auto &transfer : _transfers) {
-      transferList.emplace_back(transfer.second);
+    if (region.empty()) {
+
+      for (const auto &transfer : _transfers) {
+        transferList.emplace_back(transfer.second);
+      }
+
+    } else {
+
+      for (const auto &transfer : _transfers) {
+        if (transfer.second.region == region) {
+          transferList.emplace_back(transfer.second);
+        }
+      }
     }
 
     log_trace_stream(_logger) << "Got transfer list, size: " << transferList.size() << std::endl;
     return transferList;
-
   }
 
   Entity::Transfer::Transfer TransferMemoryDb::CreateTransfer(const Entity::Transfer::Transfer &transfer) {

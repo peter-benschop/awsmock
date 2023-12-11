@@ -43,7 +43,7 @@ namespace AwsMock::Database::Entity::SQS {
     /**
      * Maximal number of retries, before the message will be send to the DQL
      */
-    int maxReceiveCount;
+    int maxReceiveCount = 0;
 
     /**
      * Parse values from a JSON stream

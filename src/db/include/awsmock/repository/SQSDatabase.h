@@ -151,6 +151,15 @@ namespace AwsMock::Database {
       Entity::SQS::Queue UpdateQueue(Entity::SQS::Queue &queue);
 
       /**
+       * Create a new queue or updates an existing queue
+       *
+       * @param queue queue entity
+       * @return created SQS queue entity
+       * @throws DatabaseException
+       */
+      Entity::SQS::Queue CreateOrUpdateQueue(Entity::SQS::Queue &queue);
+
+      /**
        * Count the number of queues for a given region.
        *
        * @param region AWS region
@@ -232,6 +241,15 @@ namespace AwsMock::Database {
        * @return updated message
        */
       Entity::SQS::Message UpdateMessage(Entity::SQS::Message &message);
+
+      /**
+       * Create a new queue or updates an existing message
+       *
+       * @param message message entity
+       * @return created or updated SQS message entity
+       * @throws DatabaseException
+       */
+      Entity::SQS::Message CreateOrUpdateMessage(Entity::SQS::Message &message);
 
       /**
        * List all available messages

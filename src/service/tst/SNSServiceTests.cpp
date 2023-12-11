@@ -91,7 +91,7 @@ namespace AwsMock::Service {
     Dto::SNS::ListTopicsResponse response = _snsService.ListTopics(REGION);
 
     // assert
-    EXPECT_TRUE(subscribeResponse.subscriptionArn.length()> 0);
+    EXPECT_FALSE(subscribeResponse.subscriptionArn.empty());
     EXPECT_EQ(1, response.topicList[0].subscriptions.size());
   }
 
@@ -111,7 +111,7 @@ namespace AwsMock::Service {
     Dto::SNS::ListTopicsResponse response = _snsService.ListTopics(REGION);
 
     // assert
-    EXPECT_TRUE(subscribeResponse.subscriptionArn.length() > 0);
+    EXPECT_FALSE(subscribeResponse.subscriptionArn.empty());
     EXPECT_EQ(0, response.topicList[0].subscriptions.size());
   }
 
@@ -126,8 +126,8 @@ namespace AwsMock::Service {
     Dto::SNS::PublishResponse response = _snsService.Publish(request);
 
     // assert
-    EXPECT_TRUE(response.messageId.length() > 0);
-    EXPECT_TRUE(response.ToXml().length() > 0);
+    EXPECT_FALSE(response.messageId.empty());
+    EXPECT_FALSE(response.ToXml().empty());
   }
 
   TEST_F(SNSServiceTest, MessageReceiveTest) {

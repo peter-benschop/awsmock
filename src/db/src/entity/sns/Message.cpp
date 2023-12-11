@@ -20,7 +20,7 @@ namespace AwsMock::Database::Entity::SNS {
       kvp("targetArn", targetArn),
       kvp("message", message),
       kvp("messageId", messageId),
-      kvp("state", MessageStatusToString(status)),
+      kvp("status", MessageStatusToString(status)),
       kvp("attributes", messageAttributesDoc),
       kvp("reset", bsoncxx::types::b_date(std::chrono::milliseconds(0))),
       kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
@@ -44,12 +44,14 @@ namespace AwsMock::Database::Entity::SNS {
       modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
 
       bsoncxx::array::view attributesView{mResult.value()["attributes"].get_array().value};
-      for (bsoncxx::array::element attributeElement : attributesView) {
-        MessageAttribute attribute{
-          .attributeName=bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
-          .attributeValue=bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value)
-        };
-        attributes.push_back(attribute);
+      if(!attributesView.empty()) {
+        for (bsoncxx::array::element attributeElement : attributesView) {
+          MessageAttribute attribute{
+            .attributeName=bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
+            .attributeValue=bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value)
+          };
+          attributes.push_back(attribute);
+        }
       }
     } catch (std::exception &exc) {
       Poco::Logger::get("SNSMessage").error("SNS message exception: " + std::string(exc.what()));

@@ -55,6 +55,13 @@ namespace AwsMock {
       _moduleService->ImportInfrastructure(payload);
       SendOkResponse(response);
 
+    } else if (action == "clean") {
+
+      Dto::Common::Services services;
+      services.FromJson(payload);
+      _moduleService->CleanInfrastructure(services);
+      SendOkResponse(response);
+
     } else {
 
       Database::Entity::Module::ModuleList modules = _moduleService->ListModules();

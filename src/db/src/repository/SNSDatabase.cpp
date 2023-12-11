@@ -245,6 +245,19 @@ namespace AwsMock::Database {
     }
   }
 
+  Entity::SNS::Topic SNSDatabase::CreateOrUpdateTopic(Entity::SNS::Topic &topic) {
+
+    if(TopicExists(topic.region, topic.topicName)) {
+
+      return UpdateTopic(topic);
+
+    } else {
+
+      return CreateTopic(topic);
+
+    }
+  }
+
   long SNSDatabase::CountTopics(const std::string &region) {
 
     if (HasDatabase()) {
@@ -318,6 +331,27 @@ namespace AwsMock::Database {
     } else {
 
       _memoryDb.DeleteAllTopics();
+
+    }
+  }
+
+  bool SNSDatabase::MessageExists(const std::string &id) {
+
+    if (HasDatabase()) {
+
+      try {
+        int64_t count = _messageCollection.count_documents(make_document(kvp("_id", id)));
+        log_trace_stream(_logger) << "Message exists: " << (count > 0 ? "true" : "false") << std::endl;
+
+        return count > 0;
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), 500);
+      }
+
+    } else {
+
+      return _memoryDb.MessageExists(id);
 
     }
   }
@@ -447,6 +481,43 @@ namespace AwsMock::Database {
     }
     log_trace_stream(_logger) << "Got message list, size: " << messageList.size() << std::endl;
     return messageList;
+  }
+
+  Entity::SNS::Message SNSDatabase::UpdateMessage(Entity::SNS::Message &message) {
+
+    if (HasDatabase()) {
+
+      mongocxx::options::find_one_and_update opts{};
+      opts.return_document(mongocxx::options::return_document::k_after);
+
+      auto mResult = _messageCollection.find_one_and_update(make_document(kvp("_id", bsoncxx::oid{message.oid})), message.ToDocument(), opts);
+      log_trace_stream(_logger) << "Message updated, count: " << bsoncxx::to_json(mResult->view()) << std::endl;
+
+      if (!mResult) {
+        throw Core::DatabaseException("Update message failed, oid: " + message.oid);
+      }
+
+      message.FromDocument(mResult->view());
+      return message;
+
+    } else {
+
+      return _memoryDb.UpdateMessage(message);
+
+    }
+  }
+
+  Entity::SNS::Message SNSDatabase::CreateOrUpdateMessage(Entity::SNS::Message &message) {
+
+    if(MessageExists(message.messageId)) {
+
+      return UpdateMessage(message);
+
+    } else {
+
+      return CreateMessage(message);
+
+    }
   }
 
   void SNSDatabase::DeleteMessage(const Entity::SNS::Message &message) {

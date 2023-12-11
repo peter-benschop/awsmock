@@ -137,7 +137,7 @@ namespace AwsMock::Database {
      * @param region AWS region name
      * @return list of transfer manager
      */
-    std::vector<Entity::Transfer::Transfer> ListServers(const std::string &region);
+    std::vector<Entity::Transfer::Transfer> ListServers(const std::string &region = {});
 
     /**
      * Deletes an existing transfer manager

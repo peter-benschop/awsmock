@@ -250,6 +250,19 @@ namespace AwsMock::Database {
     }
   }
 
+  Entity::SQS::Queue SQSDatabase::CreateOrUpdateQueue(Entity::SQS::Queue &queue) {
+
+    if(QueueExists(queue.region, queue.queueUrl)) {
+
+      return UpdateQueue(queue);
+
+    } else {
+
+      return CreateQueue(queue);
+
+    }
+  }
+
   long SQSDatabase::CountQueues(const std::string &region) {
 
     long count = 0;
@@ -374,7 +387,7 @@ namespace AwsMock::Database {
       opts.return_document(mongocxx::options::return_document::k_after);
 
       auto mResult = _messageCollection.find_one_and_update(make_document(kvp("_id", bsoncxx::oid{message.oid})), message.ToDocument(), opts);
-      log_trace_stream(_logger) << "Message updated, count: " << ConvertMessageToJson(mResult.value()) << std::endl;
+      log_trace_stream(_logger) << "Message updated: " << ConvertMessageToJson(mResult.value()) << std::endl;
 
       if (!mResult) {
         throw Core::DatabaseException("Update message failed, oid: " + message.oid);
@@ -386,6 +399,19 @@ namespace AwsMock::Database {
     } else {
 
       return _memoryDb.UpdateMessage(message);
+
+    }
+  }
+
+  Entity::SQS::Message SQSDatabase::CreateOrUpdateMessage(Entity::SQS::Message &message) {
+
+    if(MessageExists(message.receiptHandle)) {
+
+      return UpdateMessage(message);
+
+    } else {
+
+      return CreateMessage(message);
 
     }
   }

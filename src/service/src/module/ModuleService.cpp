@@ -137,36 +137,34 @@ namespace AwsMock::Service {
   std::string ModuleService::ExportInfrastructure(const Dto::Common::Services &services) {
 
     Dto::Common::Infrastructure infrastructure;
-    Database::Entity::Module::ModuleList modules = _moduleDatabase->ListModules();
-    log_info_stream(_logger) << "Found modules, count: " << modules.size() << std::endl;
 
-    std::string jsonBuckets;
-    for (const auto &service : services.serviceNames) {
-
-      if (Core::StringUtils::EqualsIgnoreCase(service, "all") || Core::StringUtils::EqualsIgnoreCase(service, "s3")) {
-        std::shared_ptr<Database::S3Database> _s3Database = std::make_shared<Database::S3Database>(_configuration);
-        infrastructure.s3Buckets = _s3Database->ListBuckets();
-        infrastructure.s3Objects = _s3Database->ListObjects();
-      }
-      if (Core::StringUtils::EqualsIgnoreCase(service, "all") || Core::StringUtils::EqualsIgnoreCase(service, "sqs")) {
-        std::shared_ptr<Database::SQSDatabase> _sqsDatabase = std::make_shared<Database::SQSDatabase>(_configuration);
-        infrastructure.sqsQueues = _sqsDatabase->ListQueues();
-        infrastructure.sqsMessages = _sqsDatabase->ListMessages();
-      }
-      if (Core::StringUtils::EqualsIgnoreCase(service, "all") || Core::StringUtils::EqualsIgnoreCase(service, "sns")) {
-        std::shared_ptr<Database::SNSDatabase> _snsDatabase = std::make_shared<Database::SNSDatabase>(_configuration);
-        infrastructure.snsTopics = _snsDatabase->ListTopics();
-        infrastructure.snsMessages = _snsDatabase->ListMessages();
-      }
-      if (Core::StringUtils::EqualsIgnoreCase(service, "all") || Core::StringUtils::EqualsIgnoreCase(service, "lambda")) {
-        std::shared_ptr<Database::LambdaDatabase> _lambdaDatabase = std::make_shared<Database::LambdaDatabase>(_configuration);
-        infrastructure.lambdas = _lambdaDatabase->ListLambdas();
-      }
-      if (Core::StringUtils::EqualsIgnoreCase(service, "all") || Core::StringUtils::EqualsIgnoreCase(service, "cognito")) {
-        std::shared_ptr<Database::CognitoDatabase> _cognitoDatabase = std::make_shared<Database::CognitoDatabase>(_configuration);
-        infrastructure.cognitoUserPools = _cognitoDatabase->ListUserPools();
-        infrastructure.cognitoUsers = _cognitoDatabase->ListUsers();
-      }
+    if (services.HasService("all") || services.HasService("s3")) {
+      std::shared_ptr<Database::S3Database> _s3Database = std::make_shared<Database::S3Database>(_configuration);
+      infrastructure.s3Buckets = _s3Database->ListBuckets();
+      infrastructure.s3Objects = _s3Database->ListObjects();
+    }
+    if (services.HasService("all") || services.HasService("sqs")) {
+      std::shared_ptr<Database::SQSDatabase> _sqsDatabase = std::make_shared<Database::SQSDatabase>(_configuration);
+      infrastructure.sqsQueues = _sqsDatabase->ListQueues();
+      infrastructure.sqsMessages = _sqsDatabase->ListMessages();
+    }
+    if (services.HasService("all") || services.HasService("sns")) {
+      std::shared_ptr<Database::SNSDatabase> _snsDatabase = std::make_shared<Database::SNSDatabase>(_configuration);
+      infrastructure.snsTopics = _snsDatabase->ListTopics();
+      infrastructure.snsMessages = _snsDatabase->ListMessages();
+    }
+    if (services.HasService("all") || services.HasService("lambda")) {
+      std::shared_ptr<Database::LambdaDatabase> _lambdaDatabase = std::make_shared<Database::LambdaDatabase>(_configuration);
+      infrastructure.lambdas = _lambdaDatabase->ListLambdas();
+    }
+    if (services.HasService("all") || services.HasService("cognito")) {
+      std::shared_ptr<Database::CognitoDatabase> _cognitoDatabase = std::make_shared<Database::CognitoDatabase>(_configuration);
+      infrastructure.cognitoUserPools = _cognitoDatabase->ListUserPools();
+      infrastructure.cognitoUsers = _cognitoDatabase->ListUsers();
+    }
+    if (services.HasService("all") || services.HasService("transfer")) {
+      std::shared_ptr<Database::TransferDatabase> _transferDatabase = std::make_shared<Database::TransferDatabase>(_configuration);
+      infrastructure.transferServers = _transferDatabase->ListServers();
     }
     return infrastructure.ToJson();
   }
@@ -192,6 +190,68 @@ namespace AwsMock::Service {
         log_info_stream(_logger) << "S3 objects imported, count: " << infrastructure.s3Objects.size() << std::endl;
       }
     }
+    if (!infrastructure.sqsQueues.empty() || !infrastructure.sqsMessages.empty()) {
+      std::shared_ptr<Database::SQSDatabase> _sqsDatabase = std::make_shared<Database::SQSDatabase>(_configuration);
+      if (!infrastructure.sqsQueues.empty()) {
+        for (auto &queue : infrastructure.sqsQueues) {
+          _sqsDatabase->CreateOrUpdateQueue(queue);
+        }
+        log_info_stream(_logger) << "SQS queues imported, count: " << infrastructure.sqsQueues.size() << std::endl;
+      }
+      if (!infrastructure.sqsMessages.empty()) {
+        for (auto &message : infrastructure.sqsMessages) {
+          _sqsDatabase->CreateOrUpdateMessage(message);
+        }
+        log_info_stream(_logger) << "SQS messages imported, count: " << infrastructure.sqsMessages.size() << std::endl;
+      }
+    }
+    if (!infrastructure.snsTopics.empty() || !infrastructure.snsMessages.empty()) {
+      std::shared_ptr<Database::SNSDatabase> _snsDatabase = std::make_shared<Database::SNSDatabase>(_configuration);
+      if (!infrastructure.snsTopics.empty()) {
+        for (auto &topic : infrastructure.snsTopics) {
+          _snsDatabase->CreateOrUpdateTopic(topic);
+        }
+        log_info_stream(_logger) << "SNS topics imported, count: " << infrastructure.snsTopics.size() << std::endl;
+      }
+      if (!infrastructure.snsMessages.empty()) {
+        for (auto &message : infrastructure.snsMessages) {
+          _snsDatabase->CreateOrUpdateMessage(message);
+        }
+        log_info_stream(_logger) << "SNS messages imported, count: " << infrastructure.snsMessages.size() << std::endl;
+      }
+    }
   }
 
+  void ModuleService::CleanInfrastructure(const Dto::Common::Services &services) {
+    log_info_stream(_logger) << "Cleaning services, length: " << services.serviceNames.size() << std::endl;
+
+    if (services.HasService("all") || services.HasService("s3")) {
+      std::shared_ptr<Database::S3Database> _s3Database = std::make_shared<Database::S3Database>(_configuration);
+      _s3Database->DeleteAllObjects();
+      _s3Database->DeleteAllBuckets();
+    }
+    if (services.HasService("all") || services.HasService("sqs")) {
+      std::shared_ptr<Database::SQSDatabase> _sqsDatabase = std::make_shared<Database::SQSDatabase>(_configuration);
+      _sqsDatabase->DeleteAllMessages();
+      _sqsDatabase->DeleteAllQueues();
+    }
+    if (services.HasService("all") || services.HasService("sns")) {
+      std::shared_ptr<Database::SNSDatabase> _snsDatabase = std::make_shared<Database::SNSDatabase>(_configuration);
+      _snsDatabase->DeleteAllMessages();
+      _snsDatabase->DeleteAllTopics();
+    }
+    if (services.HasService("all") || services.HasService("lambda")) {
+      std::shared_ptr<Database::LambdaDatabase> _lambdaDatabase = std::make_shared<Database::LambdaDatabase>(_configuration);
+      _lambdaDatabase->DeleteAllLambdas();
+    }
+    if (services.HasService("all") || services.HasService("cognito")) {
+      std::shared_ptr<Database::CognitoDatabase> _cognitoDatabase = std::make_shared<Database::CognitoDatabase>(_configuration);
+      _cognitoDatabase->DeleteAllUsers();
+      _cognitoDatabase->DeleteAllUserPools();
+    }
+    if (services.HasService("all") || services.HasService("trabsfer")) {
+      std::shared_ptr<Database::TransferDatabase> _transferDatabase = std::make_shared<Database::TransferDatabase>(_configuration);
+      _transferDatabase->DeleteAllTransfers();
+    }
+  }
 }

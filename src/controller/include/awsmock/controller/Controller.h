@@ -106,6 +106,13 @@ namespace AwsMock::Controller {
        */
       void ImportInfrastructure();
 
+      /**
+       * Cleans the current infrastructure.
+       *
+       * @param services list of services
+       */
+      void CleanInfrastructure(const std::vector<std::string> &services);
+
     private:
       /**
        * Add authorization header.

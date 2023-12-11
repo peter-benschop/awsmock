@@ -105,9 +105,11 @@ namespace AwsMock::Controller {
 #endif
           std::cout << "loglevel <level>\t: sets the manager log to level" << std::endl;
           std::cout << "config\t\t\t: shows the gateway configuration" << std::endl;
-          std::cout << "export [services]\t: dumps the current infrastructure to stdout. Services is a space separated list of service names." << std::endl;
-          std::cout << "\t\t\t  Valid services are: s3, sqs, sns, lambda, transfer, cognito" << std::endl;
+          std::cout << "export [modules]\t: dumps the current infrastructure to stdout. Modules is a space separated list of module names." << std::endl;
           std::cout << "import\t\t\t: imports the infrastructure from stdin." << std::endl;
+          std::cout << "clean [modules]\t\t: cleans the current infrastructure. Modules is a space separated list of module names." << std::endl;
+          std::cout << "\nModules:\n" << std::endl;
+          std::cout << "Valid modules are: all, s3, sqs, sns, lambda, transfer, cognito." << std::endl;
 
           stopOptionsProcessing();
           exit(0);
@@ -164,11 +166,22 @@ namespace AwsMock::Controller {
         } else if (name == "export") {
 
           std::vector<std::string> services = {args.begin() + 1, args.end()};
+          if(services.empty())  {
+            services.emplace_back("all");
+          }
           _controller.ExportInfrastructure(services);
 
         } else if (name == "import") {
 
           _controller.ImportInfrastructure();
+
+        } else if (name == "clean") {
+
+          std::vector<std::string> services = {args.begin() + 1, args.end()};
+          if(services.empty())  {
+            services.emplace_back("all");
+          }
+          _controller.CleanInfrastructure(services);
 
         } else {
 
