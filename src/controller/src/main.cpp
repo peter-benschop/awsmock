@@ -73,6 +73,8 @@ namespace AwsMock::Controller {
         Poco::Util::Application::defineOptions(options);
         options.addOption(Poco::Util::Option("config", "", "set the configuration file").required(false).repeatable(false).argument("file").callback(
           Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
+        options.addOption(Poco::Util::Option("pretty", "", "set the export pretty print flag").required(false).repeatable(false).argument("pretty").callback(
+          Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
         options.addOption(Poco::Util::Option("version", "", "display version information").required(false).repeatable(false).callback(
           Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
         options.addOption(Poco::Util::Option("help", "", "display help information").required(false).repeatable(false).callback(
@@ -109,7 +111,7 @@ namespace AwsMock::Controller {
           std::cout << "import\t\t\t: imports the infrastructure from stdin." << std::endl;
           std::cout << "clean [modules]\t\t: cleans the current infrastructure. Modules is a space separated list of module names." << std::endl;
           std::cout << "\nModules:\n" << std::endl;
-          std::cout << "Valid modules are: all, s3, sqs, sns, lambda, transfer, cognito." << std::endl;
+          std::cout << "Valid modules are: all, s3, sqs, sns, lambda, transfer, cognito, dynamodb." << std::endl;
 
           stopOptionsProcessing();
           exit(0);
@@ -127,6 +129,10 @@ namespace AwsMock::Controller {
 
           _configuration.SetLogLevel(value);
           Poco::Logger::get("").setLevel(value);
+
+        } else if (name == "pretty") {
+
+          _configuration.setBool("awsmock.pretty", value == "true");
 
         }
       }
@@ -165,11 +171,12 @@ namespace AwsMock::Controller {
 
         } else if (name == "export") {
 
+          bool pretty = _configuration.getBool("awsmock.pretty");
           std::vector<std::string> services = {args.begin() + 1, args.end()};
-          if(services.empty())  {
+          if (services.empty()) {
             services.emplace_back("all");
           }
-          _controller.ExportInfrastructure(services);
+          _controller.ExportInfrastructure(services, pretty);
 
         } else if (name == "import") {
 
@@ -178,7 +185,7 @@ namespace AwsMock::Controller {
         } else if (name == "clean") {
 
           std::vector<std::string> services = {args.begin() + 1, args.end()};
-          if(services.empty())  {
+          if (services.empty()) {
             services.emplace_back("all");
           }
           _controller.CleanInfrastructure(services);
@@ -219,6 +226,7 @@ namespace AwsMock::Controller {
        * Controller
        */
       Controller _controller = Controller(_configuration);
+
   };
 
 } // namespace AwsMock

@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::Common {
 
-  std::string Infrastructure::ToJson() {
+  std::string Infrastructure::ToJson(bool prettyPrint) {
 
     try {
 
@@ -105,8 +105,12 @@ namespace AwsMock::Dto::Common {
       Poco::JSON::Object rootJson;
       rootJson.set("infrastructure", infrastructureJson);
 
+      int indent = 0;
       std::ostringstream os;
-      rootJson.stringify(os);
+      if(prettyPrint) {
+        indent = JSON_DEFAULT_INDENT;
+      }
+      rootJson.stringify(os, indent);
       return os.str();
 
     } catch (Poco::Exception &exc) {
@@ -142,6 +146,13 @@ namespace AwsMock::Dto::Common {
         Database::Entity::SQS::Queue sqsQueueObject;
         sqsQueueObject.FromJsonObject(sqsQueueArray->getObject(i));
         sqsQueues.emplace_back(sqsQueueObject);
+      }
+
+      Poco::JSON::Array::Ptr sqsMessageArray = infrastructureObject->getArray("sqs-messages");
+      for (int i = 0; i < sqsMessageArray->size(); i++) {
+        Database::Entity::SQS::Message sqsMessageObject;
+        sqsMessageObject.FromJsonObject(sqsMessageArray->getObject(i));
+        sqsMessages.emplace_back(sqsMessageObject);
       }
 
     } catch (Poco::Exception &exc) {

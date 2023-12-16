@@ -50,7 +50,7 @@ namespace AwsMock::Dto::Cognito {
     std::string temporaryPassword;
 
     /**
-     * User attributes list
+     * User userAttributes list
      */
     UserAttributeList userAttributes;
 

@@ -87,9 +87,10 @@ namespace AwsMock::Dto::Common {
     /**
      * JSON representation
      *
+     * @param prettyPrint pretty print, if true JSON indent=4
      * @return Infrastructure as JSON string
      */
-    std::string ToJson();
+    std::string ToJson(bool prettyPrint = false);
 
     /**
      * From JSON representation

@@ -46,8 +46,8 @@ namespace AwsMock::Dto::SQS {
 
       for (const auto &attribute : attributes) {
 
-        // Attribute
-        Poco::XML::AutoPtr<Poco::XML::Element> pAttribute = pDoc->createElement("Attribute");
+        // UserAttribute
+        Poco::XML::AutoPtr<Poco::XML::Element> pAttribute = pDoc->createElement("UserAttribute");
         pAttributeResult->appendChild(pAttribute);
 
         // Name
@@ -92,7 +92,7 @@ namespace AwsMock::Dto::SQS {
   }
 
   std::ostream &operator<<(std::ostream &os, const GetQueueAttributesResponse &r) {
-    os << "GetQueueAttributesResponse={resource='" << r.resource << "', requestId: '" << r.requestId << "', attributes={";
+    os << "GetQueueAttributesResponse={resource='" << r.resource << "', requestId: '" << r.requestId << "', userAttributes={";
     for (const auto &attribute : r.attributes) {
       os << attribute.first << "='" << attribute.second << "', ";
     }

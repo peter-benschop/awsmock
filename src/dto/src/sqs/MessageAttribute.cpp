@@ -15,7 +15,7 @@ namespace AwsMock::Dto::SQS {
     int length = 0;
     auto *bytes = new unsigned char[4092];
 
-    // Sort the attributes by name
+    // Sort the userAttributes by name
     std::vector <Dto::SQS::MessageAttribute> sortedAttributes = attributes;
     std::sort(sortedAttributes.begin(), sortedAttributes.end());
 

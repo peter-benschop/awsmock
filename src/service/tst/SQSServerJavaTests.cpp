@@ -27,39 +27,39 @@ namespace AwsMock::Service {
    */
   class SQSServerJavaTest : public ::testing::Test {
 
-  protected:
+    protected:
 
-    void SetUp() override {
+      void SetUp() override {
 
-      // General configuration
-      _region = _configuration.getString("awsmock.region", "eu-central-1");
+        // General configuration
+        _region = _configuration.getString("awsmock.region", "eu-central-1");
 
-      // Define endpoint. This is the endpoint of the SQS server, not the gateway
-      std::string _port = _configuration.getString("awsmock.service.sqs.port", std::to_string(SQS_DEFAULT_PORT));
-      std::string _host = _configuration.getString("awsmock.service.sqs.host", SQS_DEFAULT_HOST);
-      _configuration.setString("awsmock.service.gateway.port", _port);
-      _endpoint = "http://" + _host + ":" + _port;
+        // Define endpoint. This is the endpoint of the SQS server, not the gateway
+        std::string _port = _configuration.getString("awsmock.service.sqs.port", std::to_string(SQS_DEFAULT_PORT));
+        std::string _host = _configuration.getString("awsmock.service.sqs.host", SQS_DEFAULT_HOST);
+        _configuration.setString("awsmock.service.gateway.port", _port);
+        _endpoint = "http://" + _host + ":" + _port;
 
-      // Set base command
-      _baseCommand = "java -jar /usr/local/lib/awsmock-java-test-0.0.1-SNAPSHOT-jar-with-dependencies.jar " + _endpoint;
+        // Set base command
+        _baseCommand = "java -jar /usr/local/lib/awsmock-java-test-0.0.1-SNAPSHOT-jar-with-dependencies.jar " + _endpoint;
 
-      // Start HTTP manager
-      Poco::ThreadPool::defaultPool().start(_sqsServer);
-    }
+        // Start HTTP manager
+        Poco::ThreadPool::defaultPool().start(_sqsServer);
+      }
 
-    void TearDown() override {
-      _sqsServer.StopServer();
-      _database.DeleteAllMessages();
-      _database.DeleteAllQueues();
-    }
+      void TearDown() override {
+        _sqsServer.StopServer();
+        _database.DeleteAllMessages();
+        _database.DeleteAllQueues();
+      }
 
-    Core::CurlUtils _curlUtils;
-    std::string _endpoint, _baseCommand, _region;
-    std::map<std::string, std::string> _extraHeaders;
-    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration();
-    Core::MetricService _metricService = Core::MetricService(_configuration);
-    Database::SQSDatabase _database = Database::SQSDatabase(_configuration);
-    SQSServer _sqsServer = SQSServer(_configuration, _metricService);
+      Core::CurlUtils _curlUtils;
+      std::string _endpoint, _baseCommand, _region;
+      std::map<std::string, std::string> _extraHeaders;
+      Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration();
+      Core::MetricService _metricService = Core::MetricService(_configuration);
+      Database::SQSDatabase _database = Database::SQSDatabase(_configuration);
+      SQSServer _sqsServer = SQSServer(_configuration, _metricService);
   };
 
   TEST_F(SQSServerJavaTest, QueueCreateTest) {
@@ -147,7 +147,7 @@ namespace AwsMock::Service {
     EXPECT_TRUE(Core::StringUtils::Contains(getQueueAttributeResult.output, "ReceiveMessageWaitTimeSeconds"));
   }
 
-  TEST_F(SQSServerJavaTest, SetQueueAttributeTest) {
+  TEST_F(SQSServerJavaTest, QueueSetAttributeTest) {
 
     // arrange
     Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " sqs create-queue test-queue");
@@ -159,10 +159,26 @@ namespace AwsMock::Service {
     EXPECT_EQ(0, sendResult.status);
 
     // act
-    Core::ExecResult setQueueAttributeResult = Core::SystemUtils::Exec(_baseCommand + " sqs set-queue-attributes " + queueUrl + " VisibilityTimeout=42");
+    Core::ExecResult setQueueAttributeResult = Core::SystemUtils::Exec(_baseCommand + " sqs set-queue-userAttributes " + queueUrl + " VisibilityTimeout=42");
 
     // assert
     EXPECT_EQ(0, setQueueAttributeResult.status);
+  }
+
+  TEST_F(SQSServerJavaTest, QueueGetUrlTest) {
+
+    // arrange
+    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " sqs create-queue test-queue");
+    EXPECT_EQ(0, createResult.status);
+
+    // act
+    Core::ExecResult getQueueUrlResult = Core::SystemUtils::Exec(_baseCommand + " sqs get-queue-url test-queue");
+    EXPECT_EQ(0, getQueueUrlResult.status);
+    std::string queueUrl = getQueueUrlResult.output;
+
+    // assert
+    EXPECT_EQ(0, getQueueUrlResult.status);
+    EXPECT_TRUE(queueUrl == _endpoint + "/000000000000/test-queue");
   }
 
   TEST_F(SQSServerJavaTest, QueueDeleteTest) {

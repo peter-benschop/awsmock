@@ -13,6 +13,8 @@
 #include <Poco/JSON/Parser.h>
 #include <Poco/Dynamic/Var.h>
 
+#define JSON_DEFAULT_INDENT 4
+
 namespace AwsMock::Core {
 
   /**

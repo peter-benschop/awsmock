@@ -50,7 +50,7 @@ namespace AwsMock::Dto::SQS {
     std::string body;
 
     /**
-     * Message attributes
+     * Message userAttributes
      */
     MessageAttributeList messageAttributes;
 

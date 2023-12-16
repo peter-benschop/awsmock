@@ -89,13 +89,13 @@ namespace AwsMock::Service {
 
       // act
       Dto::SQS::CreateQueueResponse response = _service.CreateQueue(request);
-      Database::Entity::SQS::QueueAttribute attributes = _database.GetQueueAttributesByQueueUrl(response.queueUrl);
+      Database::Entity::SQS::QueueAttribute userAttributes = _database.GetQueueAttributesByQueueUrl(response.queueUrl);
 
       // assert
       EXPECT_TRUE(response.name == QUEUE);
       EXPECT_TRUE(response.region == REGION);
-      EXPECT_EQ(attributes.maxMessageSize, 262144);
-      EXPECT_EQ(attributes.visibilityTimeout, 30);
+      EXPECT_EQ(userAttributes.maxMessageSize, 262144);
+      EXPECT_EQ(userAttributes.visibilityTimeout, 30);
   }*/
 
   TEST_F(SQSServiceTest, QueueDeleteTest) {

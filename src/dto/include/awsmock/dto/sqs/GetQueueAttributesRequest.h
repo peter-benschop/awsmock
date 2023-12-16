@@ -36,7 +36,7 @@ namespace AwsMock::Dto::SQS {
     std::string queueUrl;
 
     /**
-     * Attribute names list
+     * UserAttribute names list
      */
     std::vector<std::string> attributeNames;
 

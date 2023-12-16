@@ -46,10 +46,10 @@ namespace AwsMock::Dto::SQS {
     std::string transportType;
 
     /**
-     * Returns the MD5 sum of all attributes.
+     * Returns the MD5 sum of all userAttributes.
      *
-     * @param attributes vector of attributes
-     * @return MD5 sum of attributes string
+     * @param attributes vector of userAttributes
+     * @return MD5 sum of userAttributes string
      */
     static std::string GetMd5Attributes(const std::vector<MessageAttribute> &attributes);
 

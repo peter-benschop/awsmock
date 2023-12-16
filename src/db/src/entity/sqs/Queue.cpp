@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/entity/sqs/Queue.h>
+#include <Poco/Logger.h>
 
 namespace AwsMock::Database::Entity::SQS {
 
@@ -31,24 +32,29 @@ namespace AwsMock::Database::Entity::SQS {
 
   void Queue::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
-    oid = mResult.value()["_id"].get_oid().value.to_string();
-    region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
-    name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
-    owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
-    queueUrl = bsoncxx::string::to_string(mResult.value()["queueUrl"].get_string().value);
-    queueArn = bsoncxx::string::to_string(mResult.value()["queueArn"].get_string().value);
-    attributes.FromDocument(mResult.value()["attributes"].get_document().value);
-    created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-    modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+    try {
 
-    // Get tags
-    if (mResult.value().find("tags") != mResult.value().end()) {
-      bsoncxx::document::view tagsView = mResult.value()["tags"].get_document().value;
-      for (bsoncxx::document::element tagElement : tagsView) {
-        std::string key = bsoncxx::string::to_string(tagElement.key());
-        std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
-        tags.emplace(key, value);
+      oid = mResult.value()["_id"].get_oid().value.to_string();
+      region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
+      name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
+      owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
+      queueUrl = bsoncxx::string::to_string(mResult.value()["queueUrl"].get_string().value);
+      queueArn = bsoncxx::string::to_string(mResult.value()["queueArn"].get_string().value);
+      attributes.FromDocument(mResult.value()["attributes"].get_document().value);
+      created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
+      modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+
+      // Get tags
+      if (mResult.value().find("tags") != mResult.value().end()) {
+        bsoncxx::document::view tagsView = mResult.value()["tags"].get_document().value;
+        for (bsoncxx::document::element tagElement : tagsView) {
+          std::string key = bsoncxx::string::to_string(tagElement.key());
+          std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
+          tags.emplace(key, value);
+        }
       }
+    } catch (std::exception &exc) {
+      Poco::Logger::get("Queue").error("Exception: oid: " + oid + " error: " + exc.what());
     }
   }
 
@@ -59,7 +65,7 @@ namespace AwsMock::Database::Entity::SQS {
     jsonObject.set("owner", owner);
     jsonObject.set("queueUrl", queueUrl);
     jsonObject.set("queueArn", queueArn);
-    jsonObject.set("attributes", attributes.ToJsonObject());
+    jsonObject.set("userAttributes", attributes.ToJsonObject());
     return jsonObject;
   }
 
@@ -71,7 +77,7 @@ namespace AwsMock::Database::Entity::SQS {
     Core::JsonUtils::GetJsonValueString("queueUrl", jsonObject, queueUrl);
     Core::JsonUtils::GetJsonValueString("queueArn", jsonObject, queueArn);
     Core::JsonUtils::GetJsonValueString("owner", jsonObject, owner);
-    attributes.FromJsonObject(jsonObject->getObject("attributes"));
+    attributes.FromJsonObject(jsonObject->getObject("userAttributes"));
   }
 
   std::string Queue::ToString() const {

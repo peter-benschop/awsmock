@@ -115,7 +115,7 @@ namespace AwsMock::Service {
   }
 
   Dto::SQS::GetQueueAttributesResponse SQSService::GetQueueAttributes(const Dto::SQS::GetQueueAttributesRequest &request) {
-    log_trace_stream(_logger) << "Get queue attributes request, request: " << request.ToString() << std::endl;
+    log_trace_stream(_logger) << "Get queue userAttributes request, request: " << request.ToString() << std::endl;
 
     // Check existence
     if (!_database->QueueUrlExists(request.region, request.queueUrl)) {
@@ -198,7 +198,7 @@ namespace AwsMock::Service {
       Database::Entity::SQS::Queue queue = _database->GetQueueByUrl(request.region, request.queueUrl);
       log_trace_stream(_logger) << "Got queue: " << queue.ToString() << std::endl;
 
-      // Reset all attributes
+      // Reset all userAttributes
       if (!request.attributes["Policy"].empty()) {
         queue.attributes.policy = request.attributes["Policy"];
       }
@@ -243,7 +243,7 @@ namespace AwsMock::Service {
       Database::Entity::SQS::Message message = _database->GetMessageByReceiptHandle(request.receiptHandle);
       log_trace_stream(_logger) << "Got message: " << message.ToString() << std::endl;
 
-      // Reset all attributes
+      // Reset all userAttributes
       Database::Entity::SQS::MessageAttribute attribute = {.attributeName="VisibilityTimeout", .attributeValue=std::to_string(request.visibilityTimeout), .attributeType=Database::Entity::SQS::MessageAttributeType::NUMBER};
       message.attributes.push_back(attribute);
 
@@ -295,7 +295,7 @@ namespace AwsMock::Service {
         queue = _database->GetQueueByUrl(request.region, request.queueUrl);
       }
 
-      // Set attributes
+      // Set userAttributes
       Database::Entity::SQS::MessageAttributeList attributes;
       attributes.push_back({.attributeName="SentTimestamp", .attributeValue=std::to_string(Poco::Timestamp().epochMicroseconds() / 1000), .attributeType=Database::Entity::SQS::MessageAttributeType::NUMBER});
       attributes.push_back({.attributeName="ApproximateFirstReceivedTimestamp", .attributeValue=std::to_string(Poco::Timestamp().epochMicroseconds() / 1000), .attributeType=Database::Entity::SQS::MessageAttributeType::NUMBER});

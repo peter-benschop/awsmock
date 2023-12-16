@@ -81,7 +81,7 @@ namespace AwsMock::Service {
       // Reset messages which have expired
       _sqsDatabase->ResetMessages(queue.queueUrl, queue.attributes.visibilityTimeout);
 
-      // Set counter default attributes
+      // Set counter default userAttributes
       queue.attributes.approximateNumberOfMessages = _sqsDatabase->CountMessages(queue.region, queue.queueUrl);
       queue.attributes.approximateNumberOfMessagesDelayed = _sqsDatabase->CountMessagesByStatus(queue.region, queue.queueUrl, Database::Entity::SQS::MessageStatus::DELAYED);
       queue.attributes.approximateNumberOfMessagesNotVisible = _sqsDatabase->CountMessagesByStatus(queue.region, queue.queueUrl, Database::Entity::SQS::MessageStatus::INVISIBLE);

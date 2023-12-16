@@ -49,7 +49,6 @@ namespace AwsMock::Dto::Module {
     /**
      * Port
      */
-
     int port = 4566;
 
     /**
@@ -71,6 +70,11 @@ namespace AwsMock::Dto::Module {
      * Data directory
      */
     std::string dataDir = "/tmp/awsmock/data";
+
+    /**
+     * Pretty print
+     */
+    bool prettyPrint = false;
 
     /**
      * Convert to JSON representation
@@ -103,6 +107,7 @@ namespace AwsMock::Dto::Module {
      * @return output stream
      */
     friend std::ostream &operator<<(std::ostream &os, const GatewayConfig &m);
+
   };
 
 } // namespace AwsMock::Dto

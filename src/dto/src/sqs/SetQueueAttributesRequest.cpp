@@ -39,7 +39,7 @@ namespace AwsMock::Dto::SQS {
   }
 
   std::ostream &operator<<(std::ostream &os, const SetQueueAttributesRequest &r) {
-    os << "SetQueueAttributesRequest={queueUrl='" << r.queueUrl + "', resource='" << r.resource + "', requestId='" << r.requestId << "', attributes={";
+    os << "SetQueueAttributesRequest={queueUrl='" << r.queueUrl + "', resource='" << r.resource + "', requestId='" << r.requestId << "', userAttributes={";
     for (auto &attribute : r.attributes) {
       os << attribute.first << "='" << attribute.second << "', ";
     }

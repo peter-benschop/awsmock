@@ -74,8 +74,8 @@ Supported commands are:
 | SendMessage        | Send a message to a queue     | aws sqs send-message --queue-url &lt;url&gt; --endpoint http://localhost:4566                                        |
 | ReceiveMessage     | Receive messages from a queue | aws sqs receive-message --queue-url &lt;url&gt; --endpoint http://localhost:4566                                     |
 | PurgeQueue         | Purge a queue                 | aws sqs purge-queue --queue-url &lt;url&gt; --endpoint http://localhost:4566                                         |
-| GetQueueAttributes | Get queue attributes          | aws sqs get-queue-attributes --queue-url &lt;url&gt; --attribute-names All --endpoint http://localhost:4566          |
-| SetQueueAttributes | Sets a queue attribute        | aws sqs set-queue-attributes --queue-url &lt;url&gt; --attributes &lt;value&gt; --endpoint http://localhost:4566     |
+| GetQueueAttributes | Get queue userAttributes          | aws sqs get-queue-userAttributes --queue-url &lt;url&gt; --attribute-names All --endpoint http://localhost:4566          |
+| SetQueueAttributes | Sets a queue attribute        | aws sqs set-queue-userAttributes --queue-url &lt;url&gt; --userAttributes &lt;value&gt; --endpoint http://localhost:4566     |
 | DeleteMessage      | Deletes a message             | aws sqs delete-message --queue-url &lt;url&gt; --receipt-handle &lt;handle&gt; --endpoint http://localhost:4566      |
 | DeleteQueue        | Deletes a queue               | aws sqs delete-queue --queue-url &lt;url&gt; --receipt-handle &lt;handle&gt; --endpoint http://localhost:4566 |
 
