@@ -60,6 +60,7 @@ core/tst/*.txt
 docs/html
 docs/xml
 docs/docs
+docs/man/**.1
 
 # Ninja
 **/.ninja*

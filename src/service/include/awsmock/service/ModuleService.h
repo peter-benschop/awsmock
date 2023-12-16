@@ -99,9 +99,10 @@ namespace AwsMock::Service {
        * Exports the current infrastructure
        *
        * @param services service name list
+       * @param prettyPrint JSON pretty print, if true JSON indent = 4
        * @return JSON string
        */
-      std::string ExportInfrastructure(const Dto::Common::Services &services);
+      std::string ExportInfrastructure(const Dto::Common::Services &services, bool prettyPrint = false);
 
       /**
        * Import the infrastructure
@@ -138,6 +139,11 @@ namespace AwsMock::Service {
        * Module database
        */
       std::shared_ptr<Database::ModuleDatabase> _moduleDatabase;
+
+      /**
+       * JSON pretty print
+       */
+      bool _prettyPrint;
   };
 
 } // namespace AwsMock::Service

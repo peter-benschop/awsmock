@@ -87,7 +87,7 @@ namespace AwsMock::Service {
     void PurgeQueue(const Dto::SQS::PurgeQueueRequest &request);
 
     /**
-     * Return the queue attributes
+     * Return the queue userAttributes
      *
      * @param request get queue sqs request
      * @return GetQueueAttributesResponse
@@ -96,7 +96,7 @@ namespace AwsMock::Service {
     Dto::SQS::GetQueueUrlResponse GetQueueUrl(const Dto::SQS::GetQueueUrlRequest &request);
 
     /**
-     * Return the queue attributes
+     * Return the queue userAttributes
      *
      * @param request get queue sqs request
      * @return GetQueueAttributesResponse
@@ -105,7 +105,7 @@ namespace AwsMock::Service {
     Dto::SQS::GetQueueAttributesResponse GetQueueAttributes(const Dto::SQS::GetQueueAttributesRequest &request);
 
     /**
-     * Set queue attributes
+     * Set queue userAttributes
      *
      * @param request put queue sqs request
      * @throws ServiceException

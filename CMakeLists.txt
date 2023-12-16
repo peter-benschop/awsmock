@@ -3,6 +3,7 @@ project(aws-mock)
 
 # required modules for our task
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dist/modules/modules)
 
 # Doxygen
 option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation (requires Doxygen)" OFF)
@@ -30,6 +31,7 @@ add_subdirectory(src/db)
 add_subdirectory(src/manager)
 add_subdirectory(src/service)
 add_subdirectory(src/controller)
+add_subdirectory(docs)
 
 if (BUILD_DOCUMENTATION)
     set(doxyfile ${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile)
@@ -50,7 +52,7 @@ install(FILES dist/etc/aws-mock.properties DESTINATION /etc)
 install(FILES dist/etc/systemd/system/aws-mock.service DESTINATION /etc/systemd/system)
 install(FILES dist/bin/awslocal DESTINATION ${CMAKE_INSTALL_PREFIX}/bin PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
         GROUP_EXECUTE GROUP_READ WORLD_EXECUTE)
-install(FILES docs/man/awsmockctl.1.gz DESTINATION /usr/share/man/man1 PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ
-        WORLD_READ)
-install(FILES docs/man/awsmockmgr.1.gz DESTINATION /usr/share/man/man1 PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ
-        WORLD_READ)
+install(FILES docs/man/awsmockctl.1 DESTINATION /usr/share/man/man1 PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
+install(FILES docs/man/awsmockmgr.1 DESTINATION /usr/share/man/man1 PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
+install(FILES docs/man/awsmocksqs.1 DESTINATION /usr/share/man/man1 PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
+install(FILES docs/man/awslocal.1 DESTINATION /usr/share/man/man1 PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)

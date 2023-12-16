@@ -85,7 +85,7 @@ namespace AwsMock::Dto::Transfer {
 
       try {
 
-        // Set attributes
+        // Set userAttributes
         Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
         Core::JsonUtils::GetJsonValueString("ServerId", rootObject, serverId);
         Core::JsonUtils::GetJsonValueString("UserName", rootObject, userName);

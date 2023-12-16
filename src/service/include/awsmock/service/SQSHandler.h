@@ -34,7 +34,7 @@
 namespace AwsMock::Service {
 
   /**
-   * Attribute  list
+   * UserAttribute  list
    */
   typedef std::map<std::string, std::string> AttributeList;
 

@@ -7,8 +7,9 @@
 
 namespace AwsMock::Service {
 
-  ModuleService::ModuleService(Core::Configuration &configuration, Service::ServerMap &serverMap) : _logger(Poco::Logger::get("ModuleService")), _configuration(configuration), _serverMap(serverMap) {
+  ModuleService::ModuleService(Core::Configuration &configuration, Service::ServerMap &serverMap) : _logger(Poco::Logger::get("ModuleService")), _configuration(configuration), _serverMap(serverMap), _prettyPrint(false) {
 
+    _prettyPrint = _configuration.getBool("awsmock.pretty");
     _moduleDatabase = std::make_shared<Database::ModuleDatabase>(_configuration);
   }
 
@@ -134,7 +135,7 @@ namespace AwsMock::Service {
     }
   }
 
-  std::string ModuleService::ExportInfrastructure(const Dto::Common::Services &services) {
+  std::string ModuleService::ExportInfrastructure(const Dto::Common::Services &services, bool prettyPrint) {
 
     Dto::Common::Infrastructure infrastructure;
 
@@ -166,7 +167,7 @@ namespace AwsMock::Service {
       std::shared_ptr<Database::TransferDatabase> _transferDatabase = std::make_shared<Database::TransferDatabase>(_configuration);
       infrastructure.transferServers = _transferDatabase->ListServers();
     }
-    return infrastructure.ToJson();
+    return infrastructure.ToJson(prettyPrint);
   }
 
   void ModuleService::ImportInfrastructure(const std::string &jsonString) {
@@ -220,6 +221,37 @@ namespace AwsMock::Service {
         log_info_stream(_logger) << "SNS messages imported, count: " << infrastructure.snsMessages.size() << std::endl;
       }
     }
+    if (!infrastructure.lambdas.empty()) {
+      std::shared_ptr<Database::LambdaDatabase> _lambdaDatabase = std::make_shared<Database::LambdaDatabase>(_configuration);
+      for (auto &lambda : infrastructure.lambdas) {
+        _lambdaDatabase->CreateOrUpdateLambda(lambda);
+      }
+      log_info_stream(_logger) << "Lambda functions imported, count: " << infrastructure.lambdas.size() << std::endl;
+    }
+    if (!infrastructure.transferServers.empty()) {
+      std::shared_ptr<Database::TransferDatabase> _transferDatabase = std::make_shared<Database::TransferDatabase>(_configuration);
+      for (auto &transfer : infrastructure.transferServers) {
+        _transferDatabase->CreateOrUpdateTransfer(transfer);
+      }
+      log_info_stream(_logger) << "Transfer servers imported, count: " << infrastructure.transferServers.size() << std::endl;
+    }
+
+    // Cognito
+    if (!infrastructure.cognitoUserPools.empty() || !infrastructure.cognitoUsers.empty()) {
+      std::shared_ptr<Database::CognitoDatabase> _cognitoDatabase = std::make_shared<Database::CognitoDatabase>(_configuration);
+      if (!infrastructure.cognitoUserPools.empty()) {
+        for (auto &userPool : infrastructure.cognitoUserPools) {
+          _cognitoDatabase->CreateOrUpdateUserPool(userPool);
+        }
+        log_info_stream(_logger) << "Cognito user pools imported, count: " << infrastructure.cognitoUserPools.size() << std::endl;
+      }
+      if (!infrastructure.cognitoUsers.empty()) {
+        for (auto &user : infrastructure.cognitoUsers) {
+          _cognitoDatabase->CreateOrUpdateUser(user);
+        }
+        log_info_stream(_logger) << "Cognito users imported, count: " << infrastructure.cognitoUsers.size() << std::endl;
+      }
+    }
   }
 
   void ModuleService::CleanInfrastructure(const Dto::Common::Services &services) {
@@ -249,7 +281,7 @@ namespace AwsMock::Service {
       _cognitoDatabase->DeleteAllUsers();
       _cognitoDatabase->DeleteAllUserPools();
     }
-    if (services.HasService("all") || services.HasService("trabsfer")) {
+    if (services.HasService("all") || services.HasService("transfer")) {
       std::shared_ptr<Database::TransferDatabase> _transferDatabase = std::make_shared<Database::TransferDatabase>(_configuration);
       _transferDatabase->DeleteAllTransfers();
     }

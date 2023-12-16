@@ -78,7 +78,7 @@ namespace AwsMock::Dto::SQS {
       for (auto &at : it.attributes) {
 
         // MessageAttribute
-        Poco::XML::AutoPtr<Poco::XML::Element> pAttribute = pDoc->createElement("Attribute");
+        Poco::XML::AutoPtr<Poco::XML::Element> pAttribute = pDoc->createElement("UserAttribute");
         pMessage->appendChild(pAttribute);
 
         // Name

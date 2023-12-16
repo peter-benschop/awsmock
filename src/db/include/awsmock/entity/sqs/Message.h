@@ -132,6 +132,13 @@ namespace AwsMock::Database::Entity::SQS {
     [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
     /**
+     * Converts the entity to a JSON object
+     *
+     * @return DTO as string for logging.
+     */
+    void FromJsonObject(Poco::JSON::Object::Ptr jsonObject);
+
+    /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.

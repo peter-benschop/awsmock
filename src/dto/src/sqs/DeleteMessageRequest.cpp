@@ -10,7 +10,7 @@ namespace AwsMock::Dto::SQS {
 
     Poco::JSON::Parser parser;
     Poco::Dynamic::Var result = parser.parse(jsonString);
-    auto rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    const auto& rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
     try {
 
@@ -24,15 +24,14 @@ namespace AwsMock::Dto::SQS {
     }
   }
 
-  std::string DeleteMessageRequest::ToString() {
+  std::string DeleteMessageRequest::ToString() const {
     std::stringstream ss;
     ss << (*this);
     return ss.str();
   }
 
   std::ostream &operator<<(std::ostream &os, const DeleteMessageRequest &r) {
-    os << "DeleteMessageRequest={region='" << r.region
-       << "' queueUrl='" + r.queueUrl + "' receiptHandle='" + r.receiptHandle + "' resource='" + r.resource + "' requestId='" + r.requestId + "'}";
+    os << "DeleteMessageRequest={region='" << r.region << "', queueUrl='" << r.queueUrl << "', receiptHandle='" << r.receiptHandle << "', resource='" << r.resource << "', requestId='" << r.requestId << "'}";
     return os;
   }
 

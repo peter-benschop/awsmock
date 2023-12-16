@@ -31,7 +31,7 @@
 namespace AwsMock::Service {
 
   /**
-   * Attribute  list
+   * UserAttribute  list
    */
   typedef std::map<std::string, std::string> AttributeList;
 
@@ -147,10 +147,10 @@ namespace AwsMock::Service {
   private:
 
     /**
-     * Get the queue attributes.
+     * Get the queue userAttributes.
      *
      * @param payload HTTP body
-     * @return list of queue attributes
+     * @return list of queue userAttributes
      */
     std::vector<Dto::SQS::QueueAttribute> GetQueueAttributes(const std::string &payload);
 
@@ -171,10 +171,10 @@ namespace AwsMock::Service {
     std::vector<std::string> GetQueueAttributeNames(const std::string &payload);
 
     /**
-     * Get the message attributes.
+     * Get the message userAttributes.
      *
      * @param payload HTTP body
-     * @return list of message attributes
+     * @return list of message userAttributes
      */
     std::vector<Dto::SQS::MessageAttribute> GetMessageAttributes(const std::string &payload);
 

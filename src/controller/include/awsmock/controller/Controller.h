@@ -98,8 +98,9 @@ namespace AwsMock::Controller {
        * Dumps the current infrastructure as JSON file to stdout.
        *
        * @param services list of services
+       * @param pretty JSON pretty print (indent=4)
        */
-      void ExportInfrastructure(const std::vector<std::string> &services);
+      void ExportInfrastructure(const std::vector<std::string> &services, bool pretty = true);
 
       /**
        * Imports the current infrastructure from stdin

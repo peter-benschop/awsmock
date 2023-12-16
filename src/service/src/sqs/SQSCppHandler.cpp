@@ -116,7 +116,7 @@ namespace AwsMock::Service {
         };
         Dto::SQS::ReceiveMessageResponse sqsResponse = _sqsService.ReceiveMessages(sqsRequest);
 
-        // Set the message attributes
+        // Set the message userAttributes
         std::map<std::string, std::string> extraHeader = {{"contentType", "application/xml"}};
         log_debug_stream(_logger) << "ReceiveMessage, queueUrl " << queueUrl << " count: " << sqsResponse.messageList.size() << std::endl;
         SendOkResponse(response, sqsResponse.ToXml(), extraHeader);
@@ -151,13 +151,13 @@ namespace AwsMock::Service {
 
         std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
 
-        int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "Attribute");
+        int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "UserAttribute");
         log_trace_stream(_logger) << "Got attribute count, count: " << count << std::endl;
 
         AttributeList attributes;
         for (int i = 1; i <= count; i++) {
-          std::string attributeName = Core::HttpUtils::GetQueryParameterValueByName(payload, "Attribute." + std::to_string(i) + ".Name");
-          std::string attributeValue = Core::HttpUtils::GetQueryParameterValueByName(payload, "Attribute." + std::to_string(i) + ".Value");
+          std::string attributeName = Core::HttpUtils::GetQueryParameterValueByName(payload, "UserAttribute." + std::to_string(i) + ".Name");
+          std::string attributeValue = Core::HttpUtils::GetQueryParameterValueByName(payload, "UserAttribute." + std::to_string(i) + ".Value");
           attributes[attributeName] = attributeValue;
         }
 
@@ -261,13 +261,13 @@ namespace AwsMock::Service {
 
     std::vector<Dto::SQS::QueueAttribute> queueAttributes;
 
-    int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "Attribute") / 2;
+    int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "UserAttribute") / 2;
     log_trace_stream(_logger) << "Got attribute count, count: " << count << std::endl;
 
     for (int i = 1; i <= count; i++) {
       Dto::SQS::QueueAttribute attribute = {
-          .attributeName=Core::HttpUtils::GetQueryParameterValueByName(payload, "Attribute." + std::to_string(i) + ".Name"),
-          .attributeValue=Core::HttpUtils::GetQueryParameterValueByName(payload, "Attribute." + std::to_string(i) + ".Value")
+          .attributeName=Core::HttpUtils::GetQueryParameterValueByName(payload, "UserAttribute." + std::to_string(i) + ".Name"),
+          .attributeValue=Core::HttpUtils::GetQueryParameterValueByName(payload, "UserAttribute." + std::to_string(i) + ".Value")
       };
       queueAttributes.emplace_back(attribute);
     }
@@ -293,7 +293,7 @@ namespace AwsMock::Service {
 
   std::vector<std::string> SQSCppHandler::GetQueueAttributeNames(const std::string &payload) {
 
-    int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "Attribute");
+    int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "UserAttribute");
     log_trace_stream(_logger) << "Got attribute names count: " << count << std::endl;
 
     std::vector<std::string> attributeNames;

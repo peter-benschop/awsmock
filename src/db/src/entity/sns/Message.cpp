@@ -21,7 +21,7 @@ namespace AwsMock::Database::Entity::SNS {
       kvp("message", message),
       kvp("messageId", messageId),
       kvp("status", MessageStatusToString(status)),
-      kvp("attributes", messageAttributesDoc),
+      kvp("userAttributes", messageAttributesDoc),
       kvp("reset", bsoncxx::types::b_date(std::chrono::milliseconds(0))),
       kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
       kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
@@ -43,7 +43,7 @@ namespace AwsMock::Database::Entity::SNS {
       created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
       modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
 
-      bsoncxx::array::view attributesView{mResult.value()["attributes"].get_array().value};
+      bsoncxx::array::view attributesView{mResult.value()["userAttributes"].get_array().value};
       if(!attributesView.empty()) {
         for (bsoncxx::array::element attributeElement : attributesView) {
           MessageAttribute attribute{

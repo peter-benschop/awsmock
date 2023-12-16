@@ -21,6 +21,9 @@
 #include <bsoncxx/builder/basic/document.hpp>
 #include <mongocxx/stdx.hpp>
 
+// AwsMock includes
+#include <awsmock/core/JsonUtils.h>
+
 namespace AwsMock::Database::Entity::Cognito {
 
   using bsoncxx::builder::basic::kvp;
@@ -54,6 +57,11 @@ namespace AwsMock::Database::Entity::Cognito {
     std::string name;
 
     /**
+     * Client ID
+     */
+    std::string clientId;
+
+    /**
      * Creation date
      */
     Poco::DateTime created = Poco::DateTime();
@@ -83,6 +91,13 @@ namespace AwsMock::Database::Entity::Cognito {
      * @return DTO as string for logging.
      */
     [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+
+    /**
+     * Converts the entity to a JSON object
+     *
+     * @return DTO as string for logging.
+     */
+    void FromJsonObject(Poco::JSON::Object::Ptr jsonObject);
 
     /**
      * Converts the entity to a string representation.

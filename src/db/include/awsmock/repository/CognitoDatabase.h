@@ -74,6 +74,15 @@ public:
     Entity::Cognito::UserPool UpdateUserPool(const Entity::Cognito::UserPool &userPool);
 
     /**
+     * Creates a new user pool or updates an existing user pool
+     *
+     * @param userPool user pool entity
+     * @return created or updated Cognito user pool entity
+     * @throws DatabaseException
+     */
+    Entity::Cognito::UserPool CreateOrUpdateUserPool(Entity::Cognito::UserPool &userPool);
+
+    /**
      * Created or updates an existing cognito user pool
      *
      * @param cognito cognito entity
@@ -188,6 +197,23 @@ public:
      * @return list of cognito users
      */
     std::vector<Entity::Cognito::User> ListUsers(const std::string &region = {}, const std::string &userPoolId = {});
+
+    /**
+     * Updates an existing cognito user
+     *
+     * @param user user entity
+     * @return updated cognito user entity.
+     */
+    Entity::Cognito::User UpdateUser(const Entity::Cognito::User &user);
+
+    /**
+     * Creates a new user or updates an existing user
+     *
+     * @param user user entity
+     * @return created or updated Cognito user entity
+     * @throws DatabaseException
+     */
+    Entity::Cognito::User CreateOrUpdateUser(Entity::Cognito::User &user);
 
     /**
      * Deletes an existing cognito users

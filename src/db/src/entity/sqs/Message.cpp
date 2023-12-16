@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/entity/sqs/Message.h>
+#include "awsmock/core/JsonUtils.h"
 
 namespace AwsMock::Database::Entity::SQS {
 
@@ -30,7 +31,7 @@ namespace AwsMock::Database::Entity::SQS {
         kvp("receiptHandle", receiptHandle),
         kvp("md5Body", md5Body),
         kvp("md5Attr", md5Attr),
-        kvp("attributes", messageAttributesDoc),
+        kvp("userAttributes", messageAttributesDoc),
         kvp("reset", bsoncxx::types::b_date(std::chrono::milliseconds(reset.timestamp().epochMicroseconds() / 1000))),
         kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
         kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
@@ -54,7 +55,7 @@ namespace AwsMock::Database::Entity::SQS {
     created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
     modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
 
-    bsoncxx::array::view attributesView{mResult.value()["attributes"].get_array().value};
+    bsoncxx::array::view attributesView{mResult.value()["userAttributes"].get_array().value};
     for (bsoncxx::array::element attributeElement : attributesView) {
       MessageAttribute attribute{
           .attributeName=bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
@@ -76,8 +77,43 @@ namespace AwsMock::Database::Entity::SQS {
     jsonObject.set("md5Body", md5Body);
     jsonObject.set("md5Attr", md5Attr);
     jsonObject.set("reset", Poco::DateTimeFormatter::format(reset, Poco::DateTimeFormat::ISO8601_FORMAT));
-    //jsonObject.set("attributes", attributes);
+
+    // Attributes
+    Poco::JSON::Array jsonAttributeArray;
+    for(const auto &attribute:attributes) {
+      Poco::JSON::Object jsonAttributeObject;
+      jsonAttributeObject.set("name", attribute.attributeName);
+      jsonAttributeObject.set("value", attribute.attributeValue);
+      jsonAttributeArray.add(jsonAttributeObject);
+    }
+    jsonObject.set("userAttributes", jsonAttributeArray);
+
     return jsonObject;
+  }
+
+  void Message::FromJsonObject(Poco::JSON::Object::Ptr jsonObject) {
+
+    Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
+    Core::JsonUtils::GetJsonValueString("queueUrl", jsonObject, queueUrl);
+    Core::JsonUtils::GetJsonValueString("body", jsonObject, body);
+    Core::JsonUtils::GetJsonValueString("messageId", jsonObject, messageId);
+    Core::JsonUtils::GetJsonValueString("receiptHandle", jsonObject, receiptHandle);
+    Core::JsonUtils::GetJsonValueString("md5Body", jsonObject, md5Body);
+    Core::JsonUtils::GetJsonValueString("md5Attr", jsonObject, md5Attr);
+    Core::JsonUtils::GetJsonValueDate("reset", jsonObject, reset);
+    std::string statusStr;
+    Core::JsonUtils::GetJsonValueString("status", jsonObject, statusStr);
+    status = MessageStatusFromString(statusStr);
+
+    // Attributes
+    Poco::JSON::Array::Ptr jsonAttributeArray = jsonObject->getArray("userAttributes");
+    for(int i = 0; i < jsonAttributeArray->size(); i++) {
+      MessageAttribute messageAttribute;
+      Poco::JSON::Object::Ptr jsonAttributeObject = jsonAttributeArray->getObject(i);
+      Core::JsonUtils::GetJsonValueString("name", jsonAttributeObject, messageAttribute.attributeName);
+      Core::JsonUtils::GetJsonValueString("value", jsonAttributeObject, messageAttribute.attributeValue);
+      attributes.emplace_back(messageAttribute);
+    }
   }
 
   std::string Message::ToString() const {

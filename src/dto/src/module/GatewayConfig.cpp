@@ -18,6 +18,7 @@ namespace AwsMock::Dto::Module {
       gatewayConfigJson.set("clientId", gatewayConfig.clientId);
       gatewayConfigJson.set("user", gatewayConfig.user);
       gatewayConfigJson.set("dataDir", gatewayConfig.dataDir);
+      gatewayConfigJson.set("prettyPrint", gatewayConfig.prettyPrint);
 
       std::ostringstream os;
       gatewayConfigJson.stringify(os);
@@ -48,6 +49,7 @@ namespace AwsMock::Dto::Module {
       Core::JsonUtils::GetJsonValueString("clientId", rootObject, gatewayConfig.clientId);
       Core::JsonUtils::GetJsonValueString("user", rootObject, gatewayConfig.user);
       Core::JsonUtils::GetJsonValueString("dataDir", rootObject, gatewayConfig.dataDir);
+      Core::JsonUtils::GetJsonValueBool("prettyPrint", rootObject, gatewayConfig.prettyPrint);
 
       // Cleanup
       parser.reset();

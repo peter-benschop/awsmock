@@ -31,7 +31,7 @@
 namespace AwsMock::Service {
 
   /**
-   * Attribute  list
+   * UserAttribute  list
    */
   typedef std::map<std::string, std::string> AttributeList;
 
@@ -45,144 +45,146 @@ namespace AwsMock::Service {
    */
   class SQSJava2Handler : public virtual AbstractHandler {
 
-  public:
+    public:
 
-    /**
-     * Constructor
-     *
-     * @param configuration application configuration
-     * @param metricService monitoring module
-     * @param condition stop condition
-     */
-    SQSJava2Handler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
+      /**
+       * Constructor
+       *
+       * @param configuration application configuration
+       * @param metricService monitoring module
+       * @param condition stop condition
+       */
+      SQSJava2Handler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
 
-  protected:
+    protected:
 
-    /**
-     * HTTP GET request.
-     *
-     * @param request HTTP request
-     * @param response HTTP response
-     * @param region AWS region
-     * @param user AWS user
-     * @see AbstractResource::handleGet(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-     */
-    void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+      /**
+       * HTTP GET request.
+       *
+       * @param request HTTP request
+       * @param response HTTP response
+       * @param region AWS region
+       * @param user AWS user
+       * @see AbstractResource::handleGet(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+       */
+      void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
-    /**
-     * HTTP PUT request.
-     *
-     * @param request HTTP request
-     * @param response HTTP response
-     * @param region AWS region
-     * @param user AWS user
-     * @see AbstractResource::handlePut(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-     */
-    void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+      /**
+       * HTTP PUT request.
+       *
+       * @param request HTTP request
+       * @param response HTTP response
+       * @param region AWS region
+       * @param user AWS user
+       * @see AbstractResource::handlePut(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+       */
+      void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
-    /**
-     * HTTP POST request.
-     *
-     * @param request HTTP request
-     * @param response HTTP response
-     * @param region AWS region
-     * @param user AWS user
-     * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-     */
-    void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+      /**
+       * HTTP POST request.
+       *
+       * @param request HTTP request
+       * @param response HTTP response
+       * @param region AWS region
+       * @param user AWS user
+       * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+       */
+      void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
-    /**
-     * HTTP Cli POST request.
-     *
-     * @param request HTTP request
-     * @param response HTTP response
-     * @param userAgent user agent string
-     * @param region AWS region
-     * @param user AWS user
-     * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-     */
-    void handlePostCli(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::UserAgent userAgent, const std::string &region, const std::string &user);
+      /**
+       * Delete DELETE request.
+       *
+       * @param request HTTP request
+       * @param response HTTP response
+       * @param region AWS region
+       * @param user AWS user
+       * @see AbstractResource::handleDelete(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+       */
+      void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
-    /**
-     * HTTP Java POST request.
-     *
-     * @param request HTTP request
-     * @param response HTTP response
-     * @param region AWS region
-     * @param user AWS user
-     * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-     */
-    void handlePostJava(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user);
+      /**
+       * Options request.
+       *
+       * @param response HTTP response
+       * @see AbstractResource::handleOption(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+       */
+      void handleOptions(Poco::Net::HTTPServerResponse &response) override;
 
-    /**
-     * Delete DELETE request.
-     *
-     * @param request HTTP request
-     * @param response HTTP response
-     * @param region AWS region
-     * @param user AWS user
-     * @see AbstractResource::handleDelete(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-     */
-    void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+      /**
+       * Head request.
+       *
+       * @param request HTTP request
+       * @param response HTTP response
+       * @param region AWS region
+       * @param user AWS user
+       * @see AbstractResource::handleOption(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+       */
+      void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
-    /**
-     * Options request.
-     *
-     * @param response HTTP response
-     * @see AbstractResource::handleOption(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-     */
-    void handleOptions(Poco::Net::HTTPServerResponse &response) override;
+    private:
 
-    /**
-     * Head request.
-     *
-     * @param request HTTP request
-     * @param response HTTP response
-     * @param region AWS region
-     * @param user AWS user
-     * @see AbstractResource::handleOption(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-     */
-    void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+      /**
+       * Return the command from the header or from the payload.
+       *
+       * @param request HTTP request
+       * @param payload HTTP payload
+       * @return SQS action
+       */
+      static std::string GetActionFromHeader(Poco::Net::HTTPServerRequest &request, const std::string &payload);
 
-  private:
+      /**
+       * Get the message userAttributes.
+       *
+       * @param payload HTTP body
+       * @return list of message userAttributes
+       */
+      std::vector<Dto::SQS::MessageAttribute> GetMessageAttributes(const std::string &payload);
 
-    /**
-     * Return the command from the header.
-     *
-     * @param request HTTP request
-     * @return SQS action
-     */
-    std::string GetActionFromHeader(Poco::Net::HTTPServerRequest &request);
+      /**
+       * Get the queue userAttributes.
+       *
+       * @param payload HTTP body
+       * @return list of queue userAttributes
+       */
+      std::vector<Dto::SQS::QueueAttribute> GetQueueAttributes(const std::string &payload);
 
-    /**
-     * Logger
-     */
-    Core::LogStream _logger;
+      /**
+       * Get the queue tags.
+       *
+       * @param payload HTTP body
+       * @return list of queue tags
+       */
+      std::map<std::string, std::string> GetQueueTags(const std::string &payload);
 
-    /**
-     * ImageHandler import configuration
-     */
-    Core::Configuration &_configuration;
+      /**
+       * Logger
+       */
+      Core::LogStream _logger;
 
-    /**
-     * Metric module
-     */
-    Core::MetricService &_metricService;
+      /**
+       * ImageHandler import configuration
+       */
+      Core::Configuration &_configuration;
 
-    /**
-     * SQS module
-     */
-    Service::SQSService _sqsService;
+      /**
+       * Metric module
+       */
+      Core::MetricService &_metricService;
 
-    /**
-     * Default account ID
-     */
-    std::string _accountId;
+      /**
+       * SQS module
+       */
+      Service::SQSService _sqsService;
 
-    /**
-     * Default endpoint
-     */
-    std::string _endpoint;
+      /**
+       * Default account ID
+       */
+      std::string _accountId;
+
+      /**
+       * Default endpoint
+       */
+      std::string _endpoint;
   };
 
 } // namespace AwsMock::Service

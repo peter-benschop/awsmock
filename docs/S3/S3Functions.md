@@ -1,7 +1,7 @@
 
 # Supported S3 commands 
 
-For compatibility reasons the JSON attributes are always stored in files and the ```file://<filename>``` is used to add the attribute value to the command, for instance
+For compatibility reasons the JSON userAttributes are always stored in files and the ```file://<filename>``` is used to add the attribute value to the command, for instance
 ```
 aws put-bucket-notification-configuration --bucket <bucket> --notification-configuration file://<hook-file> --endpoint http://localhost:4566|
 ```

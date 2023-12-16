@@ -23,6 +23,7 @@
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/entity/cognito/UserStatus.h>
 #include <awsmock/entity/cognito/UserAttribute.h>
 
@@ -66,12 +67,17 @@ namespace AwsMock::Database::Entity::Cognito {
     /**
      * Attributes
      */
-    AttributeList attributes;
+    UserAttributeList userAttributes;
 
     /**
      * Status
      */
     UserStatus userStatus;
+
+    /**
+     * Password
+     */
+    std::string password;
 
     /**
      * Creation date
@@ -103,6 +109,13 @@ namespace AwsMock::Database::Entity::Cognito {
      * @return DTO as string for logging.
      */
     [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+
+    /**
+     * Converts the entity to a JSON object
+     *
+     * @return DTO as string for logging.
+     */
+    void FromJsonObject(const Poco::JSON::Object::Ptr& jsonObject);
 
     /**
      * Converts the entity to a string representation.

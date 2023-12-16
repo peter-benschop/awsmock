@@ -137,7 +137,7 @@ namespace AwsMock::Service {
       }
       Dto::SQS::ReceiveMessageResponse sqsResponse = _sqsService.ReceiveMessages(sqsRequest);
 
-      // Set the message attributes
+      // Set the message userAttributes
       SendOkResponse(response, userAgent.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
 
     } else if (userAgent.clientCommand == "purge-queue") {
@@ -176,7 +176,7 @@ namespace AwsMock::Service {
       Dto::SQS::GetQueueAttributesResponse sqsResponse = _sqsService.GetQueueAttributes(sqsRequest);
       SendOkResponse(response, userAgent.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
 
-    } else if (userAgent.clientCommand == "set-queue-attributes") {
+    } else if (userAgent.clientCommand == "set-queue-attribute") {
 
       Dto::SQS::SetQueueAttributesRequest sqsRequest;
 
@@ -189,7 +189,7 @@ namespace AwsMock::Service {
 
         std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
 
-        int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "Attribute");
+        int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "UserAttribute");
         log_trace_stream(_logger) << "Got attribute count, count: " << count << std::endl;
 
         AttributeList attributes;
@@ -205,7 +205,7 @@ namespace AwsMock::Service {
 
       SendOkResponse(response);
 
-    } else if (userAgent.clientCommand == "change-visibilityTimeout-timeout") {
+    } else if (userAgent.clientCommand == "change-visibility-timeout") {
 
       Dto::SQS::ChangeMessageVisibilityRequest sqsRequest;
       if (userAgent.contentType == "json") {
@@ -302,13 +302,13 @@ namespace AwsMock::Service {
 
     std::vector<Dto::SQS::QueueAttribute> queueAttributes;
 
-    int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "Attribute") / 2;
+    int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "UserAttribute") / 2;
     log_trace_stream(_logger) << "Got attribute count, count: " << count << std::endl;
 
     for (int i = 1; i <= count; i++) {
       Dto::SQS::QueueAttribute attribute = {
-          .attributeName=Core::HttpUtils::GetQueryParameterValueByName(payload, "Attribute." + std::to_string(i) + ".Name"),
-          .attributeValue=Core::HttpUtils::GetQueryParameterValueByName(payload, "Attribute." + std::to_string(i) + ".Value")
+          .attributeName=Core::HttpUtils::GetQueryParameterValueByName(payload, "UserAttribute." + std::to_string(i) + ".Name"),
+          .attributeValue=Core::HttpUtils::GetQueryParameterValueByName(payload, "UserAttribute." + std::to_string(i) + ".Value")
       };
       queueAttributes.emplace_back(attribute);
     }
@@ -334,7 +334,7 @@ namespace AwsMock::Service {
 
   std::vector<std::string> SQSCliHandler::GetQueueAttributeNames(const std::string &payload) {
 
-    int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "Attribute");
+    int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "UserAttribute");
     log_trace_stream(_logger) << "Got attribute names count: " << count << std::endl;
 
     std::vector<std::string> attributeNames;

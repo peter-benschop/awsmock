@@ -40,7 +40,7 @@ namespace AwsMock::Dto::Cognito {
     bool enabled = false;
 
     /**
-     * User attributes list
+     * User userAttributes list
      */
     UserAttributeList userAttributes;
 

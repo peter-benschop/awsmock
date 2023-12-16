@@ -61,7 +61,7 @@ namespace AwsMock::Dto::SQS {
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString();
+    [[nodiscard]] std::string ToString() const;
 
     /**
      * Stream provider.

@@ -67,7 +67,7 @@ namespace AwsMock::Database::Entity::SQS {
     std::string queueArn;
 
     /**
-     * Queue attributes
+     * Queue userAttributes
      */
     QueueAttribute attributes;
 

@@ -176,6 +176,14 @@ namespace AwsMock::Database {
       std::vector<Entity::Cognito::User> ListUsers(const std::string &region = {}, const std::string &userPoolId = {});
 
       /**
+       * Updates an existing cognito user
+       *
+       * @param user user entity
+       * @return updated cognito user entity.
+       */
+      Entity::Cognito::User UpdateUser(const Entity::Cognito::User &user);
+
+      /**
        * Deletes an existing cognito users
        *
        * @param user cognito user to delete
