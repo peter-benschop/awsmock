@@ -1,19 +1,4 @@
 
-# Set modules path
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../dist/modules)
-
-# Include pandoc
-include(PandocMan)
-
-#set(MAN_SOURCES awsmockctl.1)
-
-#foreach(file ${MAN_SOURCES})
-#    add_pandoc_man(${CMAKE_CURRENT_SOURCE_DIR}/man/${file}.md)
-#    file(ARCHIVE_CREATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/man/${file}.gz PATHS ${CMAKE_CURRENT_SOURCE_DIR}/man/${file} FORMAT raw COMPRESSION GZip)
-#endforeach()
-
-#add_pandoc_man(${CMAKE_CURRENT_SOURCE_DIR}/man/awsmockctl.1.md)
-
 find_program(PANDOC_EXECUTABLE NAMES pandoc)
 
 set(MAN_NAMES awsmockmgr.1 awsmockctl.1 awsmocksqs.1  awslocal.1)
