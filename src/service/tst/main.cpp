@@ -11,6 +11,9 @@
 // GTest includes
 #include <gtest/gtest.h>
 
+// GTest includes
+#include <Poco/ThreadPool.h>
+
 // Test includes
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/utils/TestUtils.h>
