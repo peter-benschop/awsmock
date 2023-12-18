@@ -28,10 +28,14 @@ set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPool
         src/cognito/DeleteUserPoolRequest.cpp src/cognito/AdminCreateUserRequest.cpp
         src/cognito/AdminCreateUserResponse.cpp src/cognito/AdminDeleteUserRequest.cpp src/cognito/ListUsersRequest.cpp
         src/cognito/ListUsersResponse.cpp)
+set(TRANSFER_SOURCES src/transfer/Tag.cpp src/transfer/CreateServerRequest.cpp src/transfer/CreateServerResponse.cpp
+        src/transfer/CreateUserRequest.cpp src/transfer/CreateUserResponse.cpp src/transfer/DeleteServerRequest.cpp
+        src/transfer/IdentityProviderDetails.cpp src/transfer/ListServerRequest.cpp src/transfer/ListServerResponse.cpp
+        src/transfer/Server.cpp)
 set(MODULE_SOURCES src/module/Module.cpp src/module/GatewayConfig.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
-        ${COGNITO_SOURCES} ${MODULE_SOURCES})
+        ${COGNITO_SOURCES} ${TRANSFER_SOURCES} ${MODULE_SOURCES})
 
 # Includes
 include_directories(include ../core/include ../db/include /usr/include /usr/include/mongo /usr/include/bsoncxx/v_noabi
@@ -43,7 +47,8 @@ add_library(${LIBRARY} SHARED ${SOURCES}
         src/common/Module.cpp
         include/awsmock/dto/cognito/ListUserPoolRequest.h
         include/awsmock/dto/common/UserAgent.h
-        include/awsmock/dto/sqs/MessageAttributeDataType.h)
+        include/awsmock/dto/sqs/MessageAttributeDataType.h
+        include/awsmock/dto/transfer/Server.h)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 

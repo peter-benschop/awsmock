@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_TRANSFER_DELETE_SERVER_REQUEST_H
-#define AWSMOCK_DTO_TRANSFER_DELETE_SERVER_REQUEST_H
+#ifndef AWSMOCK_DTO_TRANSFER_CREATE_TRANSFER_REQUEST_H
+#define AWSMOCK_DTO_TRANSFER_CREATE_TRANSFER_REQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -17,10 +17,11 @@
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/ServiceException.h>
+#include <awsmock/dto/transfer/Tag.h>
 
 namespace AwsMock::Dto::Transfer {
 
-  struct DeleteServerRequest {
+  struct CreateServerRequest {
 
     /**
      * Region
@@ -28,9 +29,21 @@ namespace AwsMock::Dto::Transfer {
     std::string region;
 
     /**
-     * Maximal number of results
+     * Protocols
      */
-    std::string serverId;
+    std::vector<std::string> protocols = {"ftp"};
+
+    /**
+     * Tags
+     */
+    TagList tags;
+
+    /**
+     * Creates a JSON string from the object.
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Parse a JSON stream
@@ -51,10 +64,10 @@ namespace AwsMock::Dto::Transfer {
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const DeleteServerRequest &r);
+    friend std::ostream &operator<<(std::ostream &os, const CreateServerRequest &r);
 
   };
 
 } // namespace AwsMock::Dto::lambda
 
-#endif // AWSMOCK_DTO_TRANSFER_DELETE_SERVER_REQUEST_H
+#endif // AWSMOCK_DTO_TRANSFER_CREATE_TRANSFER_REQUEST_H

@@ -53,9 +53,9 @@ namespace AwsMock::Service {
 
       if (target == "TransferService.CreateServer") {
 
-        Dto::Transfer::CreateTransferRequest transferRequest = {.region=region};
+        Dto::Transfer::CreateServerRequest transferRequest = {.region=region};
         transferRequest.FromJson(body);
-        Dto::Transfer::CreateTransferResponse transferResponse = _transferService.CreateTransferServer(transferRequest);
+        Dto::Transfer::CreateServerResponse transferResponse = _transferService.CreateTransferServer(transferRequest);
         SendOkResponse(response, transferResponse.ToJson());
 
       } else if (target == "TransferService.CreateUser") {

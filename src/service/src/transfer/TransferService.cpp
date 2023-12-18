@@ -15,8 +15,8 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Transfer module initialized" << std::endl;
   }
 
-  Dto::Transfer::CreateTransferResponse
-  TransferService::CreateTransferServer(Dto::Transfer::CreateTransferRequest &request) {
+  Dto::Transfer::CreateServerResponse
+  TransferService::CreateTransferServer(Dto::Transfer::CreateServerRequest &request) {
 
     log_debug_stream(_logger) << "Create transfer manager" << std::endl;
 
@@ -40,7 +40,7 @@ namespace AwsMock::Service {
     transferEntity = _transferDatabase->CreateTransfer(transferEntity);
 
     // Create response
-    Dto::Transfer::CreateTransferResponse
+    Dto::Transfer::CreateServerResponse
         response{.region=transferEntity.region, .serverId=serverId, .arn=transferArn};
 
     return response;
