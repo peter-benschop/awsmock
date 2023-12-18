@@ -25,9 +25,9 @@ aws --endpoint-url http://localhost:4566 --profile awsmock $*
 
 ## EXAMPLES
 
-To get a list of all currently available quques:
+To get a list of all currently available queues:
 ```
-awslocal sqs list-queues"
+awslocal sqs list-queues
 {
     "QueueUrls": [
         "http://localhost:4566/000000000000/test-dlqueue",

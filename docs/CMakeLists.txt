@@ -10,7 +10,6 @@ foreach(m IN LISTS MAN_NAMES)
     add_custom_command(OUTPUT ${mf}
             COMMAND ${PANDOC_EXECUTABLE} ${PANDOC_OPTS} ${ms}
             DEPENDS ${ms}
-#            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             COMMENT "Building manpage ${mf}"
             VERBATIM)
     list(APPEND MAN_FILES ${mf})

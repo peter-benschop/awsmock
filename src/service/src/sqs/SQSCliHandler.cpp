@@ -205,7 +205,7 @@ namespace AwsMock::Service {
 
       SendOkResponse(response);
 
-    } else if (userAgent.clientCommand == "change-visibility-timeout") {
+    } else if (userAgent.clientCommand == "change-message-visibility") {
 
       Dto::SQS::ChangeMessageVisibilityRequest sqsRequest;
       if (userAgent.contentType == "json") {
