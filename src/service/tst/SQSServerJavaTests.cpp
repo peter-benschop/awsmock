@@ -48,9 +48,9 @@ namespace AwsMock::Service {
       }
 
       void TearDown() override {
-        _sqsServer.StopServer();
         _database.DeleteAllMessages();
         _database.DeleteAllQueues();
+        _sqsServer.StopServer();
       }
 
       Core::CurlUtils _curlUtils;
@@ -101,11 +101,11 @@ namespace AwsMock::Service {
     EXPECT_EQ(0, sendResult.status);
 
     // act
-    Core::ExecResult listResult = Core::SystemUtils::Exec(_baseCommand + " sqs purge-queue " + queueUrl);
+    Core::ExecResult purgeResult = Core::SystemUtils::Exec(_baseCommand + " sqs purge-queue " + queueUrl);
     long messageCount = _database.CountMessages();
 
     // assert
-    EXPECT_EQ(0, listResult.status);
+    EXPECT_EQ(0, purgeResult.status);
     EXPECT_EQ(0, messageCount);
   }
 

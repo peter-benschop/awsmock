@@ -56,8 +56,8 @@ namespace AwsMock::Dto::Transfer {
   }
 
   std::ostream &operator<<(std::ostream &os, const CreateUserRequest &r) {
-    os << "CreateUserRequest={region='" << r.region << "' serverId='" << r.serverId << "' userName='" << r.userName << "' password:='" << r.password
-       << "' homeDirectory='" << r.homeDirectory << "}";
+    os << "CreateUserRequest={region='" << r.region << "', serverId='" << r.serverId << "', userName='" << r.userName << "', password:='" << r.password
+       << "', homeDirectory='" << r.homeDirectory << "}";
     return os;
   }
 
