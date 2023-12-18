@@ -19,6 +19,7 @@
 #include <awsmock/utils/TestUtils.h>
 
 class TestEnvironment : public ::testing::Environment {
+
 public:
 
   // Initialise a test configuration.
