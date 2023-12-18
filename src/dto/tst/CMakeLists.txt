@@ -7,7 +7,8 @@ set(STATIC_LIB awsmockdto)
 #set(LAMBDA_SOURCES LambdaServiceTests.cpp LambdaServerCliTest.cpp)
 #set(DOCKER_SOURCES DockerServiceTests.cpp)
 #set(COGNITO_SOURCES CognitoServiceTests.cpp CognitoServerCliTest.cpp CognitoServerJavaTests.cpp)
-set(TRANSFER_SOURCES CreateServerRequestTest.cpp CreateServerResponseTest.cpp)
+set(TRANSFER_SOURCES transfer/CreateServerRequestTest.cpp transfer/CreateServerResponseTest.cpp
+        transfer/CreateUserRequestTest.cpp transfer/CreateServerResponseTest.cpp)
 set(MAIN_SOURCES main.cpp)
 
 # Includes
