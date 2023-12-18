@@ -66,6 +66,16 @@ namespace AwsMock::Service {
         Dto::Cognito::AdminCreateUserResponse cognitoResponse = _cognitoService.AdminCreateUser(cognitoRequest);
         SendOkResponse(response, cognitoResponse.ToJson());
 
+      } else if (action == "ListUsers") {
+
+        Dto::Cognito::ListUsersRequest cognitoRequest{};
+        cognitoRequest.FromJson(payload);
+        cognitoRequest.region = region;
+        log_debug_stream(_logger) << "Got list users request: " << cognitoRequest.ToString() << std::endl;
+
+        Dto::Cognito::ListUsersResponse cognitoResponse = _cognitoService.ListUsers(cognitoRequest);
+        SendOkResponse(response, cognitoResponse.ToJson());
+
       } else if (action == "AdminDeleteUser") {
 
         Dto::Cognito::AdminDeleteUserRequest cognitoRequest{};

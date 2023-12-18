@@ -18,28 +18,30 @@
 
 #define REGION "eu-central-1"
 #define OWNER "test-owner"
+#define USER_NAME "test-user"
 #define USER_POOL_NAME "test-user-pool"
 
 namespace AwsMock::Service {
 
   class CognitoServiceTest : public ::testing::Test {
 
-  protected:
+    protected:
 
-    void SetUp() override {
-      // General configuration
-      _region = _configuration.getString("awsmock.region", "eu-central-1");
-    }
+      void SetUp() override {
+        // General configuration
+        _region = _configuration.getString("awsmock.region", "eu-central-1");
+      }
 
-    void TearDown() override {
-      _database.DeleteAllUserPools();
-    }
+      void TearDown() override {
+        _database.DeleteAllUsers();
+        _database.DeleteAllUserPools();
+      }
 
-    std::string _region;
-    Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
-    Database::CognitoDatabase _database = Database::CognitoDatabase(_configuration);
-    CognitoService _service = CognitoService(_configuration);
-    std::string testFile;
+      std::string _region;
+      Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+      Database::CognitoDatabase _database = Database::CognitoDatabase(_configuration);
+      CognitoService _service = CognitoService(_configuration);
+      std::string testFile;
   };
 
   TEST_F(CognitoServiceTest, UserPoolCreateTest) {
@@ -86,6 +88,58 @@ namespace AwsMock::Service {
 
     // assert
     EXPECT_EQ(0, userPoolCount);
+  }
+
+  TEST_F(CognitoServiceTest, UserCreateTest) {
+
+    // arrange
+    Dto::Cognito::CreateUserPoolRequest createUserPoolRequest = {.region=_region, .name=USER_POOL_NAME};
+    Dto::Cognito::CreateUserPoolResponse createUserPoolResponse = _service.CreateUserPool(createUserPoolRequest);
+    Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByRegionName(_region, USER_POOL_NAME);
+    Dto::Cognito::AdminCreateUserRequest createUserRequest = {.region=_region, .userPoolId=userPool.id, .userName=USER_NAME};
+
+    // act
+    Dto::Cognito::AdminCreateUserResponse createUserResponse = _service.AdminCreateUser(createUserRequest);
+    long userCount = _database.CountUsers();
+
+    // assert
+    EXPECT_EQ(1, userCount);
+  }
+
+  TEST_F(CognitoServiceTest, UserListTest) {
+
+    // arrange
+    Dto::Cognito::CreateUserPoolRequest createUserPoolRequest = {.region=_region, .name=USER_POOL_NAME};
+    Dto::Cognito::CreateUserPoolResponse createUserPoolResponse = _service.CreateUserPool(createUserPoolRequest);
+    Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByRegionName(_region, USER_POOL_NAME);
+    Dto::Cognito::AdminCreateUserRequest createUserRequest = {.region=_region, .userPoolId=userPool.id, .userName=USER_NAME};
+    Dto::Cognito::AdminCreateUserResponse createUserResponse = _service.AdminCreateUser(createUserRequest);
+
+    // act
+    Dto::Cognito::ListUsersRequest listRequest = {.region=_region, .userPoolId=userPool.id};
+    Dto::Cognito::ListUsersResponse listResponse = _service.ListUsers(listRequest);
+
+    // assert
+    EXPECT_FALSE(listResponse.users.empty());
+    EXPECT_TRUE(listResponse.users.front().userName == USER_NAME);
+  }
+
+  TEST_F(CognitoServiceTest, UserDeleteTest) {
+
+    // arrange
+    Dto::Cognito::CreateUserPoolRequest createUserPoolRequest = {.region=_region, .name=USER_POOL_NAME};
+    Dto::Cognito::CreateUserPoolResponse createUserPoolResponse = _service.CreateUserPool(createUserPoolRequest);
+    Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByRegionName(_region, USER_POOL_NAME);
+    Dto::Cognito::AdminCreateUserRequest createUserRequest = {.region=_region, .userPoolId=userPool.id, .userName=USER_NAME};
+    Dto::Cognito::AdminCreateUserResponse createUserResponse = _service.AdminCreateUser(createUserRequest);
+
+    // act
+    Dto::Cognito::AdminDeleteUserRequest deleteUserRequest = {.region=_region, .userPoolId = userPool.id, .userName=USER_NAME};
+    _service.AdminDeleteUser(deleteUserRequest);
+    long userCount = _database.CountUsers();
+
+    // assert
+    EXPECT_EQ(0, userCount);
   }
 
 } // namespace AwsMock::Service

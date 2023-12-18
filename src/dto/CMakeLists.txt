@@ -26,7 +26,8 @@ set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionRespon
 set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPoolResponse.cpp
         src/cognito/CreateUserPoolRequest.cpp src/cognito/CreateUserPoolResponse.cpp src/cognito/UserAttribute.cpp
         src/cognito/DeleteUserPoolRequest.cpp src/cognito/AdminCreateUserRequest.cpp
-        src/cognito/AdminCreateUserResponse.cpp src/cognito/AdminDeleteUserRequest.cpp)
+        src/cognito/AdminCreateUserResponse.cpp src/cognito/AdminDeleteUserRequest.cpp src/cognito/ListUsersRequest.cpp
+        src/cognito/ListUsersResponse.cpp)
 set(MODULE_SOURCES src/module/Module.cpp src/module/GatewayConfig.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}

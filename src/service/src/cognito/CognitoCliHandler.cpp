@@ -3,7 +3,7 @@
 
 namespace AwsMock::Service {
 
-  CognitoCliHandler::CognitoCliHandler(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractHandler(), _logger(Poco::Logger::get("CognitoJava2Handler")), _configuration(configuration), _metricService(metricService),
+  CognitoCliHandler::CognitoCliHandler(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractHandler(), _logger(Poco::Logger::get("CognitoCli2Handler")), _configuration(configuration), _metricService(metricService),
                                                                                                                  _cognitoService(configuration) {
   }
 
@@ -19,9 +19,6 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Cognito POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
     try {
-
-      //DumpRequest(request);
-      //DumpBody(request);
 
       Dto::Common::UserAgent userAgent;
       userAgent.FromRequest(request, "cognito-idp");
@@ -54,31 +51,44 @@ namespace AwsMock::Service {
         std::string payload = GetPayload(request);
         Dto::Cognito::DeleteUserPoolRequest cognitoRequest{};
         cognitoRequest.FromJson(payload);
+        cognitoRequest.region = region;
         log_debug_stream(_logger) << "Got delete user pool request, json: " << cognitoRequest.ToString() << std::endl;
 
         _cognitoService.DeleteUserPool(cognitoRequest);
         SendOkResponse(response);
-
-      } else if (userAgent.clientCommand == "list-user-pools") {
-
-        std::string payload = GetPayload(request);
-        Dto::Cognito::ListUserPoolRequest cognitoRequest{};
-        cognitoRequest.FromJson(payload);
-        cognitoRequest.region = region;
-        log_debug_stream(_logger) << "Got list user pool request, json: " << cognitoRequest.ToString() << std::endl;
-
-        Dto::Cognito::ListUserPoolResponse serviceResponse = _cognitoService.ListUserPools(cognitoRequest);
-        SendOkResponse(response, serviceResponse.ToJson());
 
       } else if (userAgent.clientCommand == "admin-create-user") {
 
         std::string payload = GetPayload(request);
         Dto::Cognito::AdminCreateUserRequest cognitoRequest{};
         cognitoRequest.FromJson(payload);
+        cognitoRequest.region = region;
         log_debug_stream(_logger) << "Got admin create user request, json: " << cognitoRequest.ToString() << std::endl;
 
         Dto::Cognito::AdminCreateUserResponse cognitoResponse = _cognitoService.AdminCreateUser(cognitoRequest);
         SendOkResponse(response, cognitoResponse.ToJson());
+
+      } else if (userAgent.clientCommand == "list-users") {
+
+        std::string payload = GetPayload(request);
+        Dto::Cognito::ListUsersRequest cognitoRequest{};
+        cognitoRequest.FromJson(payload);
+        cognitoRequest.region = region;
+        log_debug_stream(_logger) << "Got list users request, json: " << cognitoRequest.ToString() << std::endl;
+
+        Dto::Cognito::ListUsersResponse cognitoResponse = _cognitoService.ListUsers(cognitoRequest);
+        SendOkResponse(response, cognitoResponse.ToJson());
+
+      } else if (userAgent.clientCommand == "admin-delete-user") {
+
+        std::string payload = GetPayload(request);
+        Dto::Cognito::AdminDeleteUserRequest cognitoRequest{};
+        cognitoRequest.FromJson(payload);
+        cognitoRequest.region = region;
+        log_debug_stream(_logger) << "Got admin delete user request, json: " << cognitoRequest.ToString() << std::endl;
+
+        _cognitoService.AdminDeleteUser(cognitoRequest);
+        SendOkResponse(response);
       }
 
     } catch (Poco::Exception &exc) {

@@ -85,9 +85,8 @@ namespace AwsMock::Core {
     return Core::Configuration(GetTestConfigurationFilename());
   }
 
-  Core::ExecResult TestUtils::SendCliCommand(const std::string &service, const std::string &command) {
-    Core::ExecResult result = Core::SystemUtils::Exec(command);
-    return result;
+  Core::ExecResult TestUtils::SendCliCommand(const std::string &command) {
+    return Core::SystemUtils::Exec(command);
   }
 
 }

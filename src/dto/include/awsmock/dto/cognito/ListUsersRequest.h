@@ -2,15 +2,14 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_COGNITO_ADMIN_CREATE_USER_RESPONSE_H
-#define AWSMOCK_DTO_COGNITO_ADMIN_CREATE_USER_RESPONSE_H
+#ifndef AWSMOCK_DTO_COGNITO_LIST_USERS_REQUEST_H
+#define AWSMOCK_DTO_COGNITO_LIST_USERS_REQUEST_H
 
 // C++ standard includes
 #include <string>
 #include <sstream>
 
 // Poco includes
-#include <Poco/Logger.h>
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
 #include <Poco/Dynamic/Var.h>
@@ -18,12 +17,10 @@
 // AwsMOck includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/ServiceException.h>
-#include <awsmock/dto/cognito/MessageAction.h>
-#include <awsmock/dto/cognito/UserAttribute.h>
 
 namespace AwsMock::Dto::Cognito {
 
-  struct AdminCreateUserResponse {
+  struct ListUsersRequest {
 
     /**
      * AWS region
@@ -31,19 +28,9 @@ namespace AwsMock::Dto::Cognito {
     std::string region;
 
     /**
-     * Name of the user
+     * User pool ID
      */
-    std::string userName;
-
-    /**
-     * Enabled flag
-     */
-    bool enabled = false;
-
-    /**
-     * User userAttributes list
-     */
-    UserAttributeList userAttributes;
+    std::string userPoolId;
 
     /**
      * Convert from a JSON object.
@@ -51,13 +38,6 @@ namespace AwsMock::Dto::Cognito {
      * @param payload json string object
      */
     void FromJson(const std::string &payload);
-
-    /**
-     * Convert from a JSON object.
-     *
-     * @return JSON representation of the object
-     */
-    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Converts the DTO to a string representation.
@@ -71,10 +51,10 @@ namespace AwsMock::Dto::Cognito {
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const AdminCreateUserResponse &i);
+    friend std::ostream &operator<<(std::ostream &os, const ListUsersRequest &i);
 
   };
 
 } // namespace AwsMock::Dto::Cognito
 
-#endif // AWSMOCK_DTO_COGNITO_ADMIN_CREATE_USER_RESPONSE_H
+#endif // AWSMOCK_DTO_COGNITO_LIST_USERS_REQUEST_H

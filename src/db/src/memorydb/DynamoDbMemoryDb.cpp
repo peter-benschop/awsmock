@@ -2,20 +2,20 @@
 // Created by vogje01 on 11/19/23.
 //
 
-#include <awsmock/memorydb/LambdaMemoryDb.h>
+#include <awsmock/memorydb/DynamoDbMemoryDb.h>
 
 namespace AwsMock::Database {
 
-  LambdaMemoryDb::LambdaMemoryDb() : _logger(Poco::Logger::get("LambdaMemoryDb")) {}
+  DynamoDbMemoryDb::DynamoDbMemoryDb() : _logger(Poco::Logger::get("DynamoDbMemoryDb")) {}
 
-  bool LambdaMemoryDb::LambdaExists(const std::string &function) {
+  bool DynamoDbMemoryDb::DatabaseExists(const std::string &region, const std::string &name) {
 
-    return find_if(_lambdas.begin(), _lambdas.end(), [function](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
-      return lambda.second.function == function;
-    }) != _lambdas.end();
+    return find_if(_dynamoDbs.begin(), _dynamoDbs.end(), [region, name](const std::pair<std::string, Entity::DynamoDb::DynamoDb> &dynamoDb) {
+      return dynamoDb.second.region == region && dynamoDb.second.name == name;
+    }) != _dynamoDbs.end();
   }
 
-  bool LambdaMemoryDb::LambdaExists(const Entity::Lambda::Lambda &lambda) {
+  /*bool LambdaMemoryDb::LambdaExists(const Entity::Lambda::Lambda &lambda) {
 
     std::string region = lambda.region;
     std::string function = lambda.function;
@@ -79,24 +79,24 @@ namespace AwsMock::Database {
 
     it->second.oid = oid;
     return it->second;
-  }
+  }*/
 
-  Entity::Lambda::Lambda LambdaMemoryDb::GetLambdaByArn(const std::string &arn) {
+  Entity::DynamoDb::DynamoDb DynamoDbMemoryDb::GetDatabaseByName(const std::string &region, const std::string &name) {
 
-    auto it = find_if(_lambdas.begin(), _lambdas.end(), [arn](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
-      return lambda.second.arn == arn;
+    auto it = find_if(_dynamoDbs.begin(), _dynamoDbs.end(), [region, name](const std::pair<std::string, Entity::DynamoDb::DynamoDb> &dynamoDb) {
+      return dynamoDb.second.region == region && dynamoDb.second.name == name;
     });
 
-    if (it == _lambdas.end()) {
-      log_error_stream(_logger) << "Get lambda by ARN failed, arn: " << arn << std::endl;
-      throw Core::DatabaseException("Get lambda by ARN failed, arn: "+arn);
+    if (it == _dynamoDbs.end()) {
+      log_error_stream(_logger) << "Get DynamoDb by name failed, region: " << region << " name: " << name << std::endl;
+      throw Core::DatabaseException("Get DynamoDb by name failed, region: " + region + " name: " + name);
     }
 
-    it->second.oid = arn;
+    it->second.oid = it->first;
     return it->second;
   }
 
-  long LambdaMemoryDb::LambdaCount(const std::string &region) {
+  /*long LambdaMemoryDb::LambdaCount(const std::string &region) {
 
     long count = 0;
     if (region.empty()) {
@@ -144,5 +144,5 @@ namespace AwsMock::Database {
 
     log_debug_stream(_logger) << "All lambdas deleted, count: " << _lambdas.size() << std::endl;
     _lambdas.clear();
-  }
+  }*/
 }

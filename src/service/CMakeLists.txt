@@ -14,6 +14,7 @@ set(COGNITO_SOURCES src/cognito/CognitoHandler.cpp src/cognito/CognitoHandler.cp
         src/cognito/CognitoJava2Handler.cpp src/cognito/CognitoService.cpp src/cognito/CognitoServer.cpp
         src/cognito/CognitoMonitoring.cpp)
 set(TRANSFER_SOURCES src/transfer/TransferServer.cpp src/transfer/TransferHandler.cpp src/transfer/TransferService.cpp)
+set(DYNAMODB_SOURCES src/dynamodb/DynamoDbService.cpp)
 set(FTP_SOURCES src/ftpserver/Filesystem.cpp src/ftpserver/FtpSession.cpp src/ftpserver/FtpServer.cpp
         src/ftpserver/FtpServerImpl.cpp src/ftpserver/UserDatabase.cpp)
 set(GATEWAY_SOURCES src/gateway/GatewayServer.cpp src/gateway/GatewayRouter.cpp src/gateway/GatewayHandler.cpp)
@@ -22,7 +23,7 @@ set(MODULE_SOURCES src/module/ModuleService.cpp)
 
 set(SOURCES src/common/AbstractHandler.cpp src/common/AbstractWorker.cpp src/common/AbstractServer.cpp ${S3_SOURCES}
         ${SQS_SOURCES} ${SNS_SOURCES} ${TRANSFER_SOURCES} ${FTP_SOURCES} ${LAMBDA_SOURCES} ${COGNITO_SOURCES}
-        ${DOCKER_SOURCES} ${GATEWAY_SOURCES} ${MODULE_SOURCES})
+        ${DYNAMODB_SOURCES} ${DOCKER_SOURCES} ${GATEWAY_SOURCES} ${MODULE_SOURCES})
 
 # Test directory
 add_subdirectory(tst)

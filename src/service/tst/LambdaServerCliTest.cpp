@@ -78,7 +78,7 @@ namespace AwsMock::Service {
     // arrange
 
     // act
-    Core::ExecResult createResult = Core::TestUtils::SendCliCommand("lambda", "aws lambda create-function --function-name " + FUNCTION_NAME + " --role " + ROLE + " --code " + CODE + " --runtime " + RUNTIME + " --endpoint " + _endpoint);
+    Core::ExecResult createResult = Core::TestUtils::SendCliCommand("aws lambda create-function --function-name " + FUNCTION_NAME + " --role " + ROLE + " --code " + CODE + " --runtime " + RUNTIME + " --endpoint " + _endpoint);
     EXPECT_EQ(0, createResult.status);
     Database::Entity::Lambda::LambdaList lambdaList = _database.ListLambdas();
 
@@ -97,11 +97,11 @@ namespace AwsMock::Service {
     }
 
     // arrange
-    Core::ExecResult createResult = Core::TestUtils::SendCliCommand("lambda", "aws lambda create-function --function-name " + FUNCTION_NAME + " --role " + ROLE + " --code " + CODE + " --runtime " + RUNTIME + " --endpoint " + _endpoint);
+    Core::ExecResult createResult = Core::TestUtils::SendCliCommand("aws lambda create-function --function-name " + FUNCTION_NAME + " --role " + ROLE + " --code " + CODE + " --runtime " + RUNTIME + " --endpoint " + _endpoint);
     EXPECT_EQ(0, createResult.status);
 
     // act
-    Core::ExecResult listResult = Core::TestUtils::SendCliCommand("lambda", "aws lambda list-functions --endpoint " + _endpoint);
+    Core::ExecResult listResult = Core::TestUtils::SendCliCommand("aws lambda list-functions --endpoint " + _endpoint);
 
     // assert
     EXPECT_EQ(0, listResult.status);

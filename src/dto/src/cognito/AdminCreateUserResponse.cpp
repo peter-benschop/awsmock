@@ -31,22 +31,28 @@ namespace AwsMock::Dto::Cognito {
       }
 
     } catch (Poco::Exception &exc) {
+      Poco::Logger::get("AdminCreateUserResponse").error("JSON exception: " + exc.message());
       throw Core::ServiceException(exc.message(), 500);
     }
   }
 
-  std::string AdminCreateUserResponse::ToJson() {
+  std::string AdminCreateUserResponse::ToJson() const {
 
     try {
       Poco::JSON::Object rootJson;
-      rootJson.set("User", enabled);
-      rootJson.set("Enabled", enabled);
+
+      Poco::JSON::Object userJson;
+      userJson.set("Username", userName);
+      userJson.set("Enabled", enabled);
+
+      rootJson.set("User", userJson);
 
       std::ostringstream os;
       rootJson.stringify(os);
       return os.str();
 
     } catch (Poco::Exception &exc) {
+      Poco::Logger::get("AdminCreateUserResponse").error("JSON exception: " + exc.message());
       throw Core::ServiceException(exc.message(), 500);
     }
   }
