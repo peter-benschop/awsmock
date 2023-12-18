@@ -58,21 +58,16 @@ namespace AwsMock::Core {
     ofs << "awsmock.service.cognito.port=19505" << std::endl;
     ofs << "awsmock.service.cognito.host=localhost" << std::endl;
     ofs << "awsmock.monitoring.cognito.period=-1" << std::endl;
-    // Thread pool configuration
-    ofs << "awsmock.threadpool.name=srv-worker" << std::endl;
-    ofs << "awsmock.threadpool.min=8" << std::endl;
-    ofs << "awsmock.threadpool.max=32" << std::endl;
-    ofs << "awsmock.threadpool.idletime=60" << std::endl;
-    // Monitoring configuration
-    ofs << "awsmock.monitoring.port=8081" << std::endl;
-    // Logging
-    ofs << "awsmock.log.level=debug" << std::endl;
     // Docker
     ofs << "awsmock.docker.network.mode=bridge" << std::endl;
     ofs << "awsmock.docker.network.name=.dockerhost.net" << std::endl;
     ofs << "awsmock.docker.default.memory.size=512" << std::endl;
     ofs << "awsmock.docker.default.temp.size=10240" << std::endl;
     ofs << "awsmock.docker.container.port=8080" << std::endl;
+    // Monitoring configuration
+    ofs << "awsmock.monitoring.port=8081" << std::endl;
+    // Logging
+    ofs << "awsmock.log.level=debug" << std::endl;
     ofs.close();
   }
 

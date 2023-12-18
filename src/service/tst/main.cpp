@@ -33,7 +33,7 @@ public:
 int main(int argc, char **argv) {
 
   // Initialize CURL
-  curl_global_init(CURL_GLOBAL_ALL);
+  //curl_global_init(CURL_GLOBAL_ALL);
 
   // Run tests
   ::testing::InitGoogleTest(&argc, argv);
