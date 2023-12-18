@@ -23,6 +23,8 @@
 #include <awsmock/dto/cognito/CreateUserPoolRequest.h>
 #include <awsmock/dto/cognito/CreateUserPoolResponse.h>
 #include <awsmock/dto/cognito/DeleteUserPoolRequest.h>
+#include <awsmock/dto/cognito/ListUsersRequest.h>
+#include <awsmock/dto/cognito/ListUsersResponse.h>
 #include <awsmock/dto/cognito/ListUserPoolRequest.h>
 #include <awsmock/dto/cognito/ListUserPoolResponse.h>
 #include <awsmock/repository/CognitoDatabase.h>
@@ -73,6 +75,14 @@ namespace AwsMock::Service {
        * @return AdminCreateUserResponse DTO
        */
       Dto::Cognito::AdminCreateUserResponse AdminCreateUser(const Dto::Cognito::AdminCreateUserRequest &request);
+
+      /**
+       * List cognito users
+       *
+       * @param request list user request
+       * @return ListUsersResponse DTO
+       */
+      Dto::Cognito::ListUsersResponse ListUsers(const Dto::Cognito::ListUsersRequest &request);
 
       /**
        * Deletes a cognito user

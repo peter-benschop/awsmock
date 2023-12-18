@@ -61,7 +61,7 @@ namespace AwsMock::Service {
     // arrange
 
     // act
-    Core::ExecResult result = Core::TestUtils::SendCliCommand("sqs", "aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
+    Core::ExecResult result = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
     EXPECT_EQ(0, result.status);
     Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
 
@@ -74,11 +74,11 @@ namespace AwsMock::Service {
 
     // arrange
     std::string filename = Core::FileUtils::CreateTempFile("json", 10);
-    Core::ExecResult createResult = Core::TestUtils::SendCliCommand("sqs", "aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
+    Core::ExecResult createResult = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
     EXPECT_EQ(0, createResult.status);
 
     // act
-    Core::ExecResult result = Core::TestUtils::SendCliCommand("sqs", "aws s3 ls --endpoint " + _endpoint);
+    Core::ExecResult result = Core::TestUtils::SendCliCommand("aws s3 ls --endpoint " + _endpoint);
 
     // assert
     EXPECT_EQ(0, result.status);
@@ -89,11 +89,11 @@ namespace AwsMock::Service {
   TEST_F(S3ServerCliTest, BucketDeleteTest) {
 
     // arrange
-    Core::ExecResult createResult = Core::TestUtils::SendCliCommand("sqs", "aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
+    Core::ExecResult createResult = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
     EXPECT_EQ(0, createResult.status);
 
     // act
-    Core::ExecResult result = Core::TestUtils::SendCliCommand("sqs", "aws s3 rb " + TEST_BUCKET + " --endpoint " + _endpoint);
+    Core::ExecResult result = Core::TestUtils::SendCliCommand("aws s3 rb " + TEST_BUCKET + " --endpoint " + _endpoint);
     Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
 
     // assert
@@ -105,11 +105,11 @@ namespace AwsMock::Service {
 
     // arrange
     std::string filename = Core::FileUtils::CreateTempFile("json", 10);
-    Core::ExecResult createResult = Core::TestUtils::SendCliCommand("sqs", "aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
+    Core::ExecResult createResult = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
     EXPECT_EQ(0, createResult.status);
 
     // act
-    Core::ExecResult result = Core::TestUtils::SendCliCommand("sqs", "aws s3 cp " + filename + " " + TEST_BUCKET + "/" + filename + " --endpoint " + _endpoint);
+    Core::ExecResult result = Core::TestUtils::SendCliCommand("aws s3 cp " + filename + " " + TEST_BUCKET + "/" + filename + " --endpoint " + _endpoint);
     Database::Entity::S3::ObjectList objectList = _database.ListBucket("test-bucket");
 
     // assert
@@ -121,13 +121,13 @@ namespace AwsMock::Service {
 
     // arrange
     std::string filename = Core::FileUtils::CreateTempFile("json", 10);
-    Core::ExecResult createBucketResult = Core::TestUtils::SendCliCommand("sqs", "aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
+    Core::ExecResult createBucketResult = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
     EXPECT_EQ(0, createBucketResult.status);
-    Core::ExecResult createObjectResult = Core::TestUtils::SendCliCommand("sqs", "aws s3 cp " + filename + " " + TEST_BUCKET + "/" + filename + " --endpoint " + _endpoint);
+    Core::ExecResult createObjectResult = Core::TestUtils::SendCliCommand("aws s3 cp " + filename + " " + TEST_BUCKET + "/" + filename + " --endpoint " + _endpoint);
     EXPECT_EQ(0, createObjectResult.status);
 
     // act
-    Core::ExecResult result = Core::TestUtils::SendCliCommand("sqs", "aws s3 cp " + TEST_BUCKET + "/" + filename + " " + filename + " --endpoint " + _endpoint);
+    Core::ExecResult result = Core::TestUtils::SendCliCommand("aws s3 cp " + TEST_BUCKET + "/" + filename + " " + filename + " --endpoint " + _endpoint);
 
     // assert
     EXPECT_EQ(0, result.status);
@@ -139,13 +139,13 @@ namespace AwsMock::Service {
 
     // arrange
     std::string filename = Core::FileUtils::CreateTempFile("json", 10);
-    Core::ExecResult createBucketResult = Core::TestUtils::SendCliCommand("sqs", "aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
+    Core::ExecResult createBucketResult = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
     EXPECT_EQ(0, createBucketResult.status);
-    Core::ExecResult createObjectResult = Core::TestUtils::SendCliCommand("sqs", "aws s3 cp " + filename + " " + TEST_BUCKET + "/" + filename + " --endpoint " + _endpoint);
+    Core::ExecResult createObjectResult = Core::TestUtils::SendCliCommand("aws s3 cp " + filename + " " + TEST_BUCKET + "/" + filename + " --endpoint " + _endpoint);
     EXPECT_EQ(0, createObjectResult.status);
 
     // act
-    Core::ExecResult copyResult = Core::TestUtils::SendCliCommand("sqs", "aws s3 cp " + TEST_BUCKET + "/" + filename + " " + TEST_BUCKET + "/test/" + filename + " --endpoint " + _endpoint);
+    Core::ExecResult copyResult = Core::TestUtils::SendCliCommand("aws s3 cp " + TEST_BUCKET + "/" + filename + " " + TEST_BUCKET + "/test/" + filename + " --endpoint " + _endpoint);
     EXPECT_EQ(0, createObjectResult.status);
     Database::Entity::S3::ObjectList objectList = _database.ListBucket(TEST_BUCKET_NAME);
 
@@ -159,13 +159,13 @@ namespace AwsMock::Service {
 
     // arrange
     std::string filename = Core::FileUtils::CreateTempFile("json", 10);
-    Core::ExecResult createBucketResult = Core::TestUtils::SendCliCommand("sqs", "aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
+    Core::ExecResult createBucketResult = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
     EXPECT_EQ(0, createBucketResult.status);
-    Core::ExecResult createObjectResult = Core::TestUtils::SendCliCommand("sqs", "aws s3 cp " + filename + " " + TEST_BUCKET + "/" + filename + " --endpoint " + _endpoint);
+    Core::ExecResult createObjectResult = Core::TestUtils::SendCliCommand("aws s3 cp " + filename + " " + TEST_BUCKET + "/" + filename + " --endpoint " + _endpoint);
     EXPECT_EQ(0, createObjectResult.status);
 
     // act
-    Core::ExecResult copyResult = Core::TestUtils::SendCliCommand("sqs", "aws s3 mv " + TEST_BUCKET + "/" + filename + " " + TEST_BUCKET + "/test/" + filename + " --endpoint " + _endpoint);
+    Core::ExecResult copyResult = Core::TestUtils::SendCliCommand("aws s3 mv " + TEST_BUCKET + "/" + filename + " " + TEST_BUCKET + "/test/" + filename + " --endpoint " + _endpoint);
     EXPECT_EQ(0, createObjectResult.status);
     Database::Entity::S3::ObjectList objectList = _database.ListBucket(TEST_BUCKET_NAME);
 
@@ -178,13 +178,13 @@ namespace AwsMock::Service {
 
     // arrange
     std::string filename = Core::FileUtils::CreateTempFile("json", 10);
-    Core::ExecResult createBucketResult = Core::TestUtils::SendCliCommand("sqs", "aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
+    Core::ExecResult createBucketResult = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
     EXPECT_EQ(0, createBucketResult.status);
-    Core::ExecResult createObjectResult = Core::TestUtils::SendCliCommand("sqs", "aws s3 cp " + filename + " " + TEST_BUCKET + "/" + filename + " --endpoint " + _endpoint);
+    Core::ExecResult createObjectResult = Core::TestUtils::SendCliCommand("aws s3 cp " + filename + " " + TEST_BUCKET + "/" + filename + " --endpoint " + _endpoint);
     EXPECT_EQ(0, createObjectResult.status);
 
     // act
-    Core::ExecResult result = Core::TestUtils::SendCliCommand("sqs", "aws s3 rm " + TEST_BUCKET + "/" + filename + " --endpoint " + _endpoint);
+    Core::ExecResult result = Core::TestUtils::SendCliCommand("aws s3 rm " + TEST_BUCKET + "/" + filename + " --endpoint " + _endpoint);
     Database::Entity::S3::ObjectList objectList = _database.ListBucket("test-bucket");
 
     // assert

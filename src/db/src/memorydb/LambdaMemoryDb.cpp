@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database {
 
-  LambdaMemoryDb::LambdaMemoryDb() : _logger(Poco::Logger::get("SQSMemoryDb")) {}
+  LambdaMemoryDb::LambdaMemoryDb() : _logger(Poco::Logger::get("LambdaMemoryDb")) {}
 
   bool LambdaMemoryDb::LambdaExists(const std::string &function) {
 

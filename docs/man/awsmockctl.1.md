@@ -2,7 +2,7 @@
 title: awsmockctl(1)
 section: 1
 header: awsmockctl AwsMock Controller
-footer: awsmockctl VERSION_STRING
+footer: awsmockctl 0.5.154
 date: December 18, 2023
 ---
 
@@ -65,6 +65,18 @@ trace, debug, information, warning, error, critical or fatal.
 ```config```  
 &nbsp;&nbsp;&nbsp;&nbsp;shows the configuration of the AwsMock API gateway.
 
+```export [modules]```  
+&nbsp;&nbsp;&nbsp;&nbsp;export the current infrastructure to stdout in JSON format. ```modules``` can be space separated
+list of AwsMock modules. If no modules are given or the module list contains ```all```, all modules will be exported.
+
+```import```  
+&nbsp;&nbsp;&nbsp;&nbsp;import the infrastructure from stdin in JSON format.
+
+```clean```  
+&nbsp;&nbsp;&nbsp;&nbsp;cleans the infrastructure. This means all SQS queues plus messages, SNS topics plus messages, S3 
+buckets with all objects, transfer servers, and lambda functions will be deleted. ALl modules will be still running, but
+all AwsMock objects will be emptied
+
 ## EXAMPLES
 
 In oder to show the current running modules:
@@ -104,12 +116,35 @@ Show the manager logs
 10-11-2023 16:56:51.429 [T] 17 SNSServer:94 - Queue updated, nametextannotation-result-queue
 ```
 
+Export the S3 infrastructure:
+```
+/usr/bin/awsmockctl export s3 sqs
+{
+    "infrastructure": {
+     "s3-buckets": [
+            {
+                "name": "transfer-server",
+                "notifications": [
+                    {
+                        "event": "s3:ObjectCreated:Put",
+                        "lambdaArn": "arn:aws:lambda:eu-central-1:000000000000:function:ftp-file-copy",
+                        "notificationId": "1234567890123",
+                        "queueArn": ""
+                    },
+                    ....
+```
+
+Export the S3 infrastructure to a file ```infrastrcture.json```:
+```
+/usr/bin/awsmockctl export s3 sqs > infrastrcture.json
+```
+
 ## AUTHOR
 
 Jens Vogt <jens.vogt@opitz-consulting.com>
 
 ## VERSION
-&nbsp;&nbsp;&nbsp;&nbsp; VERSION_STRING
+&nbsp;&nbsp;&nbsp;&nbsp; 0.5.154
 
 ## BUGS
 
@@ -117,4 +152,4 @@ Bugs and enhancement requests can be reported and filed at https://github.com/je
 
 ## SEE ALSO
 
-```awsmockmgr(1)```, ```awsmocksql(1)```
+```awsmockmgr(1)```, ```awsmocksqs(1)```, ```awsmocks3(1)```, ```awslocal(1)```

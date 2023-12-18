@@ -15,10 +15,12 @@ set(TRANSFER_SOURCES src/repository/TransferDatabase.cpp src/entity/transfer/Use
         src/memorydb/TransferMemoryDb.cpp)
 set(COGNITO_SOURCES src/entity/cognito/UserPool.cpp src/entity/cognito/User.cpp src/memorydb/CognitoMemoryDb.cpp
         src/repository/CognitoDatabase.cpp)
+set(DYNAMODB_SOURCES src/entity/dynamodb/DynamoDb.cpp src/repository/DynamoDbDatabase.cpp
+        src/memorydb/DynamoDbMemoryDb.cpp)
 set(MODULE_SOURCES src/entity/module/Module.cpp src/repository/ModuleDatabase.cpp src/memorydb/ModuleMemoryDb.cpp)
 
 set(SOURCES src/repository/Database.cpp src/utils/TestUtils.cpp ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES}
-        ${LAMBDA_SOURCES} ${TRANSFER_SOURCES} ${COGNITO_SOURCES} ${MODULE_SOURCES})
+        ${LAMBDA_SOURCES} ${TRANSFER_SOURCES} ${COGNITO_SOURCES} ${DYNAMODB_SOURCES} ${MODULE_SOURCES})
 
 # Test directory
 add_subdirectory(tst)
@@ -33,7 +35,8 @@ add_library(${LIBRARY} SHARED ${SOURCES}
         include/awsmock/entity/cognito/UserStatus.h
         include/awsmock/entity/cognito/UserAttribute.h
         include/awsmock/entity/sqs/QueueAttribute.h
-        include/awsmock/entity/sqs/RedrivePolicy.h)
+        include/awsmock/entity/sqs/RedrivePolicy.h
+        ../dto/include/awsmock/dto/transfer/IdentityProviderDetails.h)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 

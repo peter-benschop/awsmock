@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_LAMBDASERVICE_H
-#define AWSMOCK_SERVICE_LAMBDASERVICE_H
+#ifndef AWSMOCK_SERVICE_LAMBDA_SERVICE_H
+#define AWSMOCK_SERVICE_LAMBDA_SERVICE_H
 
 // C++ standard includes
 #include <string>
@@ -210,6 +210,6 @@ namespace AwsMock::Service {
     std::shared_ptr<Service::DockerService> _dockerService;
   };
 
-} //namespace AwsMock::Service
+} // namespace AwsMock::Service
 
-#endif //AWSMOCK_SERVICE_LAMBDASERVICE_H
+#endif // AWSMOCK_SERVICE_LAMBDA_SERVICE_H

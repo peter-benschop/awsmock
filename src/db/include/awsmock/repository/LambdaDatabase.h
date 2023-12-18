@@ -161,12 +161,12 @@ namespace AwsMock::Database {
     Core::LogStream _logger;
 
     /**
-     * lambda collection
+     * Lambda collection
      */
     mongocxx::collection _lambdaCollection{};
 
     /**
-     * S3 in-memory database
+     * Lambda in-memory database
      */
     LambdaMemoryDb &_memoryDb;
 

@@ -49,7 +49,7 @@ namespace AwsMock::Database {
 
     // assert
     EXPECT_TRUE(result.name == USER_POOL_NAME);
-    EXPECT_TRUE(result.id.length() > 0);
+    EXPECT_FALSE(result.id.empty());
   }
 
   TEST_F(CognitoMemoryDbTest, ListUserPoolsTest) {

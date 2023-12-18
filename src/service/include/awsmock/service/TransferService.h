@@ -23,8 +23,8 @@
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
-#include <awsmock/dto/transfer/CreateTransferRequest.h>
-#include <awsmock/dto/transfer/CreateTransferResponse.h>
+#include <awsmock/dto/transfer/CreateServerRequest.h>
+#include <awsmock/dto/transfer/CreateServerResponse.h>
 #include <awsmock/dto/transfer/CreateUserRequest.h>
 #include <awsmock/dto/transfer/CreateUserResponse.h>
 #include <awsmock/dto/transfer/DeleteServerRequest.h>
@@ -50,12 +50,12 @@ namespace AwsMock::Service {
     explicit TransferService(Core::Configuration &configuration);
 
     /**
-     * Create transfer manager request
+     * Create transfer server request
      *
-     * @param request create transfer request
-     * @return CreateTransferResponse
+     * @param request create server request
+     * @return CreateServerResponse
      */
-    Dto::Transfer::CreateTransferResponse CreateTransferServer(Dto::Transfer::CreateTransferRequest &request);
+    Dto::Transfer::CreateServerResponse CreateTransferServer(Dto::Transfer::CreateServerRequest &request);
 
     /**
      * Create a user for the transfer manager.

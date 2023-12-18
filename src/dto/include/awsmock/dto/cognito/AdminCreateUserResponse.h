@@ -10,6 +10,7 @@
 #include <sstream>
 
 // Poco includes
+#include <Poco/Logger.h>
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
 #include <Poco/Dynamic/Var.h>
@@ -56,7 +57,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @return JSON representation of the object
      */
-    std::string ToJson();
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Converts the DTO to a string representation.

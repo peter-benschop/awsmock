@@ -53,11 +53,10 @@ namespace AwsMock::Core {
     /**
      * Send a CLI command
      *
-     * @param service service name
      * @param command command name
      * @return exec result
      */
-    static Core::ExecResult SendCliCommand(const std::string &service, const std::string &command);
+    static Core::ExecResult SendCliCommand(const std::string &command);
   };
 
 } // namespace AwsMock::Core

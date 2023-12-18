@@ -2,8 +2,8 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_CORE_COGNITODATABASETEST_H
-#define AWMOCK_CORE_COGNITODATABASETEST_H
+#ifndef AWMOCK_DATABASE_COGNITO_DATABASE_TEST_H
+#define AWMOCK_DATABASE_COGNITO_DATABASE_TEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
@@ -49,7 +49,7 @@ namespace AwsMock::Database {
 
     // assert
     EXPECT_TRUE(result.name == USER_POOL_NAME);
-    EXPECT_TRUE(result.id.length() > 0);
+    EXPECT_FALSE(result.id.empty());
   }
 
   TEST_F(CognitoDatabaseDbTest, UserPoolListTest) {
@@ -187,4 +187,4 @@ namespace AwsMock::Database {
 
 } // namespace AwsMock::Core
 
-#endif // AWMOCK_CORE_COGNITODATABASETEST_H
+#endif // AWMOCK_DATABASE_COGNITO_DATABASE_TEST_H

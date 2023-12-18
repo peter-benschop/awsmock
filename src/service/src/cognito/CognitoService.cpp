@@ -113,6 +113,25 @@ namespace AwsMock::Service {
     }
 
   }
+
+  Dto::Cognito::ListUsersResponse CognitoService::ListUsers(const Dto::Cognito::ListUsersRequest &request) {
+    log_debug_stream(_logger) << "List users request, region: " << request.region << " userPoolId: " << request.userPoolId << std::endl;
+
+    Dto::Cognito::ListUsersResponse response{};
+
+    try {
+
+      Database::Entity::Cognito::UserList users = _database->ListUsers(request.region, request.userPoolId);
+      response.users = users;
+      log_trace_stream(_logger) << "Users list outcome: " + response.ToJson() << std::endl;
+      return response;
+
+    } catch (Poco::Exception &ex) {
+      log_error_stream(_logger) << "User list request failed, message: " << ex.message() << std::endl;
+      throw Core::ServiceException(ex.message(), 500);
+    }
+  }
+
   void CognitoService::AdminDeleteUser(const Dto::Cognito::AdminDeleteUserRequest &request) {
     log_debug_stream(_logger) << "Admin delete user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId << std::endl;
 

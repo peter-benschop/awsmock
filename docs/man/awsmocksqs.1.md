@@ -2,7 +2,7 @@
 title: awsmocksqs(1)
 section: 1
 header: awsmocksqs AwsMock SQS module
-footer: awsmocksqs VERSION_STRING
+footer: awsmocksqs 0.5.154
 date: December 18, 2023
 ---
 
@@ -23,14 +23,31 @@ corresponding man page ```awslocal(1)```.
 
 ## COMMANDS
 
-```"awslocal sqs create-queue --queue-name <queue-name>```
+```awslocal sqs create-queue --queue-name <queue-name>```  
 &nbsp;&nbsp;&nbsp;&nbsp;creates a new queue
+
+```awslocal sqs list-queues```  
+&nbsp;&nbsp;&nbsp;&nbsp;lists all available queues
+
+```awslocal sqs get-queue-attributes --queue-url <queue-url>```  
+&nbsp;&nbsp;&nbsp;&nbsp;lists all attributes of a given queue
+
+```awslocal sqs send-message --queue-url <queue-url> --message-body <message-body>```  
+&nbsp;&nbsp;&nbsp;&nbsp;sends a message to a queue
 
 ## EXAMPLES
 
-To get a list of all currently available quques:
+To create a new queue:
 ```
-/usr/bin/awslocal sqs list-queues"
+awslocal sqs create-queue --queue-name test-queue"
+{
+    "QueueUrl": "http://localhost:4566/000000000000/test-queue"
+}
+```
+
+To get a list of all currently available queues:
+```
+awslocal sqs list-queues"
 {
     "QueueUrls": [
         "http://localhost:4566/000000000000/test-dlqueue",
@@ -43,7 +60,7 @@ To get a list of all currently available quques:
 
 To get a list of all SQS queue attributes:
 ```
-/usr/bin/awslocal sqs get-queue-attributes --queue-url http://localhost:4566/000000000000/test-queue --attribute-name All
+awslocal sqs get-queue-attributes --queue-url http://localhost:4566/000000000000/test-queue --attribute-name All
 {
     "Attributes": {
         "ApproximateNumberOfMessages": "0",
@@ -62,12 +79,17 @@ To get a list of all SQS queue attributes:
 }
 ```
 
+To delete a queue:
+```
+awslocal sqs delete-queue --queue-url test-queue"
+```
+
 ## AUTHOR
 
 Jens Vogt <jens.vogt@opitz-consulting.com>
 
 ## VERSION
-&nbsp;&nbsp;&nbsp;&nbsp; VERSION_STRING
+&nbsp;&nbsp;&nbsp;&nbsp; 0.5.154
 
 ## BUGS
 
