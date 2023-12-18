@@ -37,7 +37,7 @@ namespace AwsMock::Core {
   int LogStreamBuf::writeToDevice(char c) {
     Poco::Mutex::ScopedLock lock(_mutex);
     if (c == '\n' || c == '\r') {
-      if (_message.length() > 0) {
+      if (!_message.empty()) {
         Poco::Message msg(_logger.name(), _message, _priority, _file, _line);
         _logger.log(msg);
         _message.clear();
@@ -74,7 +74,7 @@ namespace AwsMock::Core {
 
   LogStream::~LogStream() = default;
 
-  void LogStream::setChannel(Poco::Channel::Ptr channel) {
+  void LogStream::setChannel(const Poco::Channel::Ptr& channel) {
     _buf.setChannel(channel);
   }
 

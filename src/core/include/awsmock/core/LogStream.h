@@ -126,7 +126,7 @@ namespace AwsMock::Core {
      */
     static const std::string priorities[];
 
-    void setChannel(Poco::Channel::Ptr channel);
+    void setChannel(const Poco::Channel::Ptr& channel);
     /// Sets the log channel
 
     static void setFileChannel(const std::string &filename);

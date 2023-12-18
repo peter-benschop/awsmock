@@ -12,9 +12,9 @@
 #include <utility>
 
 // Poco includes
-#include "Poco/String.h"
-#include "Poco/Util/LayeredConfiguration.h"
-#include "Poco/Util/PropertyFileConfiguration.h"
+#include <Poco/String.h>
+#include <Poco/Util/LayeredConfiguration.h>
+#include <Poco/Util/PropertyFileConfiguration.h>
 
 // AwsMock includes
 #include <awsmock/core/CoreException.h>
@@ -43,152 +43,153 @@ namespace AwsMock::Core {
    */
   class Configuration : public Poco::Util::PropertyFileConfiguration {
 
-  public:
-    /**
-     * Constructor
-     */
-    Configuration();
+    public:
+      /**
+       * Constructor
+       */
+      Configuration();
 
-    /**
-     * Constructor
-     *
-     * @param basename basename of the configuration file.
-     */
-    explicit Configuration(const std::string &basename);
+      /**
+       * Constructor
+       *
+       * @param basename basename of the configuration file.
+       */
+      explicit Configuration(const std::string &basename);
 
-    /**
-     * Define a new configuration property.
-     *
-     * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
-     * key, the key is preserved, otherwise the default value is taken. </p>
-     *
-     * @param key configuration key
-     * @param envProperty  environment variable name
-     * @param defaultValue  default value
-     */
-    void DefineProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue);
+      /**
+       * Define a new configuration property.
+       *
+       * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
+       * key, the key is preserved, otherwise the default value is taken. </p>
+       *
+       * @param key configuration key
+       * @param envProperty  environment variable name
+       * @param defaultValue  default value
+       */
+      void DefineProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue);
 
-    /**
-     * Returns the file name of the configuration file.
-     *
-     * @return file name of the configuration file.
-     */
-    std::string GetFilename() const;
+      /**
+       * Returns the file name of the configuration file.
+       *
+       * @return file name of the configuration file.
+       */
+      std::string GetFilename() const;
 
-    /**
-     * Sets the file name of the configuration file.
-     *
-     * @param filename file name of the configuration file.
-     */
-    void SetFilename(const std::string &filename);
+      /**
+       * Sets the file name of the configuration file.
+       *
+       * @param filename file name of the configuration file.
+       */
+      void SetFilename(const std::string &filename);
 
-    /**
-     * Returns the current port for the prometheus manager.
-     *
-     * @return prometheus port
-     */
-    int GetMetricPort() const;
+      /**
+       * Returns the current port for the prometheus manager.
+       *
+       * @return prometheus port
+       */
+      int GetMetricPort() const;
 
-    /**
-     * Returns the current timeout for the prometheus system monitoring.
-     *
-     * @return prometheus port
-     */
-    long GetMetricTimeout() const;
+      /**
+       * Returns the current timeout for the prometheus system monitoring.
+       *
+       * @return prometheus port
+       */
+      long GetMetricTimeout() const;
 
-    /**
-     * Return the current log level.
-     *
-     * @return current logging level
-     */
-    std::string GetLogLevel() const;
+      /**
+       * Return the current log level.
+       *
+       * @return current logging level
+       */
+      std::string GetLogLevel() const;
 
-    /**
-     * Sets the log level.
-     *
-     * @param level logging level to set
-     */
-    void SetLogLevel(const std::string &level);
+      /**
+       * Sets the log level.
+       *
+       * @param level logging level to set
+       */
+      void SetLogLevel(const std::string &level);
 
-    /**
-     * Sets a string configuration value
-     *
-     * @param key property key
-     * @param value configuration value
-     */
-    void SetValue(const std::string &key, const std::string &value);
+      /**
+       * Sets a string configuration value
+       *
+       * @param key property key
+       * @param value configuration value
+       */
+      void SetValue(const std::string &key, const std::string &value);
 
-    /**
-     * Sets a bool configuration value
-     *
-     * @param key property key
-     * @param value configuration value
-     */
-    void SetValue(const std::string &key, bool value);
+      /**
+       * Sets a bool configuration value
+       *
+       * @param key property key
+       * @param value configuration value
+       */
+      void SetValue(const std::string &key, bool value);
 
-    /**
-     * Sets an integer configuration value
-     *
-     * @param key property key
-     * @param value configuration value
-     */
-    void SetValue(const std::string &key, int value);
+      /**
+       * Sets an integer configuration value
+       *
+       * @param key property key
+       * @param value configuration value
+       */
+      void SetValue(const std::string &key, int value);
 
-    /**
-     * Returns the application name
-     *
-     * @return application name
-     */
-    static std::string GetAppName();
+      /**
+       * Returns the application name
+       *
+       * @return application name
+       */
+      static std::string GetAppName();
 
-    /**
-     * Returns the version of the library.
-     *
-     * @return library version
-     */
-    static std::string GetVersion();
+      /**
+       * Returns the version of the library.
+       *
+       * @return library version
+       */
+      static std::string GetVersion();
 
-    /**
-     * Writes the current configuration the given file
-     *
-     * @param filename name of the configuration file
-     */
-    void WriteFile(const std::string &filename);
+      /**
+       * Writes the current configuration the given file
+       *
+       * @param filename name of the configuration file
+       */
+      void WriteFile(const std::string &filename);
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+      /**
+       * Converts the DTO to a string representation.
+       *
+       * @return DTO as string for logging.
+       */
+      [[nodiscard]] std::string ToString() const;
 
-  private:
-    /**
-     * Initialize the base properties
-     */
-    void Initialize();
+    private:
 
-    /**
-     * Logger
-     */
-    Core::LogStream _logger;
+      /**
+       * Initialize the base properties
+       */
+      void Initialize();
 
-    /**
-     * Name of the configuration file
-     */
-    std::string _filename;
+      /**
+       * Logger
+       */
+      Core::LogStream _logger;
 
-    /**
-     * Profile configuration file
-     */
-    std::string _profile;
+      /**
+       * Name of the configuration file
+       */
+      std::string _filename;
 
-    /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &, const Configuration &);
+      /**
+       * Profile configuration file
+       */
+      std::string _profile;
+
+      /**
+       * Stream provider.
+       *
+       * @return output stream
+       */
+      friend std::ostream &operator<<(std::ostream &, const Configuration &);
   };
 
 } // namespace AwsMock::Core

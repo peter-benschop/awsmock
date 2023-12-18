@@ -2,8 +2,8 @@
 // Created by vogje01 on 31/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_S3_LISTBUCKETRESULT_H
-#define AWSMOCK_DTO_S3_LISTBUCKETRESULT_H
+#ifndef AWSMOCK_DTO_S3_LIST_BUCKET_RESPONSE_H
+#define AWSMOCK_DTO_S3_LIST_BUCKET_RESPONSE_H
 
 // C++ Standard includes
 #include <string>
@@ -11,72 +11,22 @@
 #include <vector>
 
 // Poco includes
-#include "Poco/DateTime.h"
-#include "Poco/DateTimeFormat.h"
-#include "Poco/DateTimeFormatter.h"
-#include "Poco/DOM/AutoPtr.h"
-#include "Poco/DOM/Document.h"
-#include "Poco/DOM/Element.h"
-#include "Poco/DOM/Text.h"
-#include "Poco/DOM/DOMWriter.h"
-#include "Poco/XML/XMLWriter.h"
+#include <Poco/DateTime.h>
+#include <Poco/DateTimeFormat.h>
+#include <Poco/DateTimeFormatter.h>
+#include <Poco/DOM/AutoPtr.h>
+#include <Poco/DOM/Document.h>
+#include <Poco/DOM/Element.h>
+#include <Poco/DOM/Text.h>
+#include <Poco/DOM/DOMWriter.h>
+#include <Poco/XML/XMLWriter.h>
 
 // AwsMock includes
+#include <awsmock/dto/s3/Content.h>
+#include <awsmock/dto/s3/Owner.h>
 #include <awsmock/entity/s3/Object.h>
 
 namespace AwsMock::Dto::S3 {
-
-  struct Owner {
-
-    /**
-     * ID
-     */
-    std::string id;
-
-    /**
-     * Display name
-     */
-    std::string displayName;
-
-  };
-
-  struct Content {
-
-    /**
-     * Checksum algorithms
-     */
-    std::vector<std::string> checksumAlgorithms;
-
-    /**
-     * ETag
-     */
-    std::string etag;
-
-    /**
-     * Key
-     */
-    std::string key;
-
-    /**
-     * Last modified
-     */
-    std::string lastModified;
-
-    /**
-     * Owner
-     */
-    Owner owner;
-
-    /**
-     * Size
-     */
-    long size = 0;
-
-    /**
-     * Storage class
-     */
-    std::string storageClass;
-  };
 
   struct CommonPrefix {
 
@@ -86,7 +36,7 @@ namespace AwsMock::Dto::S3 {
     std::string _prefix;
   };
 
-  struct ListBucketResult {
+  struct ListBucketResponse {
 
     /**
      * Truncation flag
@@ -149,7 +99,7 @@ namespace AwsMock::Dto::S3 {
      * @param bucket bucket
      * @param objectList object list
      */
-    ListBucketResult(const std::string &bucket, const Database::Entity::S3::ObjectList &objectList) {
+    ListBucketResponse(const std::string &bucket, const Database::Entity::S3::ObjectList &objectList) {
 
       maxKeys = 1000;
       name = bucket;
@@ -334,7 +284,7 @@ namespace AwsMock::Dto::S3 {
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const ListBucketResult &r) {
+    friend std::ostream &operator<<(std::ostream &os, const ListBucketResponse &r) {
       os << "ListBucketResult={name='" + r.name + "' prefix='" + r.prefix + "'}";
       return os;
     }
@@ -343,4 +293,4 @@ namespace AwsMock::Dto::S3 {
 
 } // namespace AwsMock::Dto::S3
 
-#endif //AWSMOCK_DTO_S3_LISTBUCKETRESULT_H
+#endif // AWSMOCK_DTO_S3_LIST_BUCKET_RESPONSE_H
