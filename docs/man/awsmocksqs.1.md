@@ -79,9 +79,30 @@ awslocal sqs get-queue-attributes --queue-url http://localhost:4566/000000000000
 }
 ```
 
+To send a message to a queue:
+```
+awslocal sqs send-message --queue-url http://localhost:4566/000000000000/test-queue --message-body file://message.json
+```
+
+To receive a message from a queue:
+```
+awslocal sqs receive-message --queue-url http://localhost:4566/000000000000/test-queue
+{
+    "Messages": [
+        {
+            "MessageId": "2ef14ec8-aec3-42b9-af71-b9861c431f81",
+            "ReceiptHandle": "wXJklVJTXrT0ulgVHLN8baHrE1yGBClZbpee6Wg1T.....
+            "MD5OfBody": "beaa0032306f083e847cbf86a09ba9b2",
+            "Body": "test-message",
+            "MD5OfMessageAttributes": "d41d8cd98f00b204e9800998ecf8427e"
+        }
+    ]
+}
+```
+
 To change the visibility of a message:
 ```
-awslocal sqs change-message-visibility --queue-url "http://localhost:4566/000000000000/test-queue-queue --receipt-handle file://receipt-handle --visibility-timeout 120
+awslocal sqs change-message-visibility --queue-url http://localhost:4566/000000000000/test-queue-queue --receipt-handle file://receipt-handle --visibility-timeout 120
 ```
 
 To delete a queue:
@@ -102,4 +123,4 @@ Bugs and enhancement requests can be reported and filed at https://github.com/je
 
 ## SEE ALSO
 
-```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```
+```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocks3(1)```
