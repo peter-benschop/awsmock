@@ -173,16 +173,16 @@ namespace AwsMock::Service {
     }
   }
 
-  Dto::S3::ListBucketResult S3Service::ListBucket(const Dto::S3::ListBucketRequest &request) {
+  Dto::S3::ListBucketResponse S3Service::ListBucket(const Dto::S3::ListBucketRequest &request) {
     log_trace_stream(_logger) << "List bucket request: " + request.ToString() << std::endl;
 
     try {
 
       Database::Entity::S3::ObjectList objectList = _database->ListBucket(request.name, request.prefix);
-      Dto::S3::ListBucketResult listBucketResult = Dto::S3::ListBucketResult(request.name, objectList);
+      Dto::S3::ListBucketResponse listBucketResponse = Dto::S3::ListBucketResponse(request.name, objectList);
       log_info_stream(_logger) << "Bucket list returned, count: " << objectList.size() << std::endl;
 
-      return listBucketResult;
+      return listBucketResponse;
 
     } catch (Poco::Exception &ex) {
       log_error_stream(_logger) << "S3 list bucket failed, message: " << ex.message() << std::endl;

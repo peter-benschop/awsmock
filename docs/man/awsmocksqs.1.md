@@ -79,9 +79,14 @@ awslocal sqs get-queue-attributes --queue-url http://localhost:4566/000000000000
 }
 ```
 
+To change the visibility of a message:
+```
+awslocal sqs change-message-visibility --queue-url "http://localhost:4566/000000000000/test-queue-queue --receipt-handle file://receipt-handle --visibility-timeout 120
+```
+
 To delete a queue:
 ```
-awslocal sqs delete-queue --queue-url test-queue"
+awslocal sqs delete-queue --queue-url "http://localhost:4566/000000000000/test-queue-queue
 ```
 
 ## AUTHOR

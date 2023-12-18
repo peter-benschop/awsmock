@@ -60,8 +60,8 @@ namespace AwsMock::Service {
                 .delimiter=delimiter,
                 .encodingType=encodingType
             };
-            Dto::S3::ListBucketResult result = _s3Service.ListBucket(s3Request);
-            SendOkResponse(response, result.ToXml());
+            Dto::S3::ListBucketResponse s3Response = _s3Service.ListBucket(s3Request);
+            SendOkResponse(response, s3Response.ToXml());
           }
         }
 

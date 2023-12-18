@@ -11,13 +11,17 @@ set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp s
         src/sqs/PurgeQueueRequest.cpp src/sqs/DeleteQueueRequest.cpp src/sqs/ChangeMessageVisibilityRequest.cpp
         src/sqs/DeleteMessageRequest.cpp src/sqs/DeleteMessageBatchEntry.cpp src/sqs/DeleteMessageBatchRequest.cpp)
 set(SNS_SOURCES src/sns/SqsNotificationRequest.cpp src/sns/SubscribeRequest.cpp src/sns/SubscribeResponse.cpp
-        src/sns/UnsubscribeRequest.cpp src/sns/UnsubscribeResponse.cpp)
+        src/sns/UnsubscribeRequest.cpp src/sns/UnsubscribeResponse.cpp src/sns/CreateTopicRequest.cpp
+        src/sns/CreateTopicResponse.cpp src/sns/DeleteTopicResponse.cpp src/sns/ListTopicsResponse.cpp
+        src/sns/PublishRequest.cpp src/sns/PublishResponse.cpp)
 set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp src/s3/PutBucketVersioningRequest.cpp
         src/s3/PutObjectRequest.cpp src/s3/GetObjectRequest.cpp src/s3/GetObjectResponse.cpp
         src/s3/DeleteObjectRequest.cpp src/s3/DeleteObjectsRequest.cpp src/s3/DeleteObjectsResponse.cpp
         src/s3/CompleteMultipartUploadResult.cpp src/s3/CopyObjectRequest.cpp src/s3/CopyObjectResponse.cpp
         src/s3/MoveObjectRequest.cpp src/s3/MoveObjectResponse.cpp src/s3/CreateBucketConstraint.cpp
-        src/s3/UserIdentity.cpp src/s3/GetMetadataRequest.cpp src/s3/GetMetadataResponse.cpp)
+        src/s3/UserIdentity.cpp src/s3/GetMetadataRequest.cpp src/s3/GetMetadataResponse.cpp
+        src/s3/ListAllBucketResponse.cpp src/s3/ListBucketRequest.cpp src/s3/ListAllBucketResponse.cpp
+        src/s3/Owner.cpp src/s3/Content.cpp)
 set(DOCKER_SOURCES src/docker/Port.cpp src/docker/Container.cpp src/docker/ListContainerResponse.cpp
         src/docker/CreateContainerRequest.cpp)
 set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionResponse.cpp src/lambda/DeadLetterConfig.cpp
@@ -44,7 +48,8 @@ add_subdirectory(tst)
 include_directories(include ../core/include ../db/include /usr/include/mongo /usr/include/bsoncxx/v_noabi
         /usr/include/mongocxx/v_noabi)
 
-add_library(${LIBRARY} SHARED ${SOURCES})
+add_library(${LIBRARY} SHARED ${SOURCES}
+        include/awsmock/dto/s3/Content.h)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 

@@ -2,11 +2,12 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SNS_CREATETOPICREQUEST_H
-#define AWSMOCK_DTO_SNS_CREATETOPICREQUEST_H
+#ifndef AWSMOCK_DTO_SNS_CREATE_TOPIC_REQUEST_H
+#define AWSMOCK_DTO_SNS_CREATE_TOPIC_REQUEST_H
 
 // C++ standard includes
 #include <string>
+#include <sstream>
 
 namespace AwsMock::Dto::SNS {
 
@@ -32,24 +33,17 @@ namespace AwsMock::Dto::SNS {
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const {
-      std::stringstream ss;
-      ss << (*this);
-      return ss.str();
-    }
+    [[nodiscard]] std::string ToString() const;
 
     /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const CreateTopicRequest &r) {
-      os << "CreateTopicRequest={region='" << r.region << "' topicName='" << r.topicName << "' owner='" << r.owner << "'}";
-      return os;
-    }
+    friend std::ostream &operator<<(std::ostream &os, const CreateTopicRequest &r);
 
   };
 
 } // namespace AwsMock::Dto::SNS
 
-#endif // AWSMOCK_DTO_SNS_CREATETOPICREQUEST_H
+#endif // AWSMOCK_DTO_SNS_CREATE_TOPIC_REQUEST_H
