@@ -1,11 +1,13 @@
 # aws-mock
 
-aws-mock is a high performance, persistent AWS simulation. Currently the following services are supported: 
+aws-mock is a high performance, persistent AWS simulation. Currently, the following services are supported: 
 
 - S3: Amazon Simple Storage Service
 - SQS: Amazon Simple Queue Service
 - SNS: Amazon Simple Notification Service
-- Lambda: Amazon Lambda Service
+- Lambda: Amazon Lambda service
+- Cognito: Amazon Cognito identity service
+- DynamoDB: Amazon Dynamo database service
 - Transfer: Amazon transfer server, supporting an FTP server
 
 aws-mock is written in C++ with a MongoDB persistence layer. All objects are stored in the database. The simulation 
@@ -47,47 +49,48 @@ See [AwsMock SNS supported commands](docs/SNS/SNSFunctions.md) for a list of sup
  - OR Clang 3.3 or later
  - Aws SDK C++ installed (see [AWS SDK for C++](https://pocoproject.org/))
  - Poco installed (see [Simplify C++ development](https://pocoproject.org/))
- - MongoDB client C and CXX (see [MongoDB C++ driver](https://www.mongodb.com/docs/drivers/cxx/))
- - libcurl, libz, libssl, libcrypto, libarchive
+ - MongoDB C and CXX clients (see [MongoDB C++ driver](https://www.mongodb.com/docs/drivers/cxx/))
+ - libcurl, libz, libssl, libcrypto, libarchive, libtbb
  - 4GB of RAM.
 
 #### Building from Source:
+
+Building AwsMock from scratch is a rather time-consuming procedure. For a first glance at AwsMock, better use the provided
+docker image. Nevertheless, if you need to compile it by your own, here are the instructions.
+
 To create an out-of-source build:
 
  1. Install CMake and the relevant build tools for your platform. Ensure these are available in your executable path.
- 2. Create your build directory. Replace <BUILD_DIR> with your build directory name:
+ 2. Download the source tree
+    ```
+    git clone https://github.com/jensvogt/aws-mock.git
+    cd aws-mock
+    ```
  3. Build the project:
     ```
-    cd <BUILD_DIR>
-    cmake <path-to-root-of-this-source-code> -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH=<path-to-install>
+    cmake . -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH=<path-to-install>
     cmake --build . --config=Debug
+    ```
+ 4. Install the executables, libraries and man pages:
+    ```
     cmake --install . --config=Debug
     ```
+ 5. Start the manager:
+    ```
+    awsmockmgr --deamon --loglevel debug
+    ```
     
-## SQS
+As already said, this can be a time-consuming procedure, depending on your machine and the environment.
 
-Supported commands are:
+### Using the docker image
 
-| REST Api           | Description                   | Example                                                                                                              |
-|--------------------|-------------------------------|----------------------------------------------------------------------------------------------------------------------|
-| CreateQueue        | Create a new queue            | aws sqs create-queue --queue-name &lt;name&gt; --endpoint http://localhost:4566                                      |
-| SendMessage        | Send a message to a queue     | aws sqs send-message --queue-url &lt;url&gt; --endpoint http://localhost:4566                                        |
-| ReceiveMessage     | Receive messages from a queue | aws sqs receive-message --queue-url &lt;url&gt; --endpoint http://localhost:4566                                     |
-| PurgeQueue         | Purge a queue                 | aws sqs purge-queue --queue-url &lt;url&gt; --endpoint http://localhost:4566                                         |
-| GetQueueAttributes | Get queue userAttributes          | aws sqs get-queue-userAttributes --queue-url &lt;url&gt; --attribute-names All --endpoint http://localhost:4566          |
-| SetQueueAttributes | Sets a queue attribute        | aws sqs set-queue-userAttributes --queue-url &lt;url&gt; --userAttributes &lt;value&gt; --endpoint http://localhost:4566     |
-| DeleteMessage      | Deletes a message             | aws sqs delete-message --queue-url &lt;url&gt; --receipt-handle &lt;handle&gt; --endpoint http://localhost:4566      |
-| DeleteQueue        | Deletes a queue               | aws sqs delete-queue --queue-url &lt;url&gt; --receipt-handle &lt;handle&gt; --endpoint http://localhost:4566 |
+Using the provided docker image is much simpler (assuming Docker is already installed).
 
-## SNS
-
-Supported commands are:
-
-| REST Api    | Description                       | Example                                                                                                     |
-|-------------|-----------------------------------|-------------------------------------------------------------------------------------------------------------|
-| CreateTopic | Creates a new SNS topic           | aws sns create-topic --name &lt;name&gt; --endpoint http://localhost:4566                                   |
-| ListTopic   | Lists all topics                  | aws sns list-topic --endpoint http://localhost:4566                                                         | 
-| Publish     | Publish a message to a topic      | aws sns publish --topic-arn&lt;arn&gt; --message &lt;message&gt; --endpoint http://localhost:4566           |
-| Subscribe   | Subscribes an endpoint to a topic | aws sns subscribe --topic-arn&lt;arn&gt; --protocol &lt;protocol&gt; --endpoint http://localhost:4566       |
-| Unsubscribe | Unsubscribe from a topic          | aws sns unsubscribe --subscription-arn&lt;arn&gt; --endpoint http://localhost:4566                          |
-| Delete      | Deletes a topic                   | aws sns delete --topic-arn&lt;arn&gt; --endpoint http://localhost:4566 |
+To start the docker image:
+  1. Pull the docker image:
+  ```
+  docker pull jensvogt/aws-mock:latest
+  ```
+  2. Start the container
+  ```
+  ```

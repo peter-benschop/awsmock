@@ -13,7 +13,7 @@ namespace AwsMock::Dto::Transfer {
   }
 
   std::ostream &operator<<(std::ostream &os, const Tag &r) {
-    os << "Tag={key='" << r.key << "' value='" << r.value << "}";
+    os << "Tag={key='" << r.key << "', value='" << r.value << "'}";
     return os;
   }
 

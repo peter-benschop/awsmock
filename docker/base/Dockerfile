@@ -1,7 +1,7 @@
 FROM alpine:latest
 
 RUN apk update && apk add groff g++ make cmake ccache openssl-dev git curl curl-dev python3 aws-cli linux-headers  \
-    libarchive-dev github-cli libtbb libtbb-dev asio-dev gtest-dev
+    libarchive libarchive-dev github-cli libtbb libtbb-dev asio-dev gtest-dev pandoc icu-libs
 
 # Create build environment
 RUN mkdir -p /usr/src

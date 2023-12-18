@@ -27,7 +27,7 @@ namespace AwsMock::Dto::Transfer {
   }
 
   std::ostream &operator<<(std::ostream &os, const CreateServerResponse &r) {
-    os << "CreateServerResponse={region='" << r.region << "' serverId='" << r.serverId << "' arn='" << r.arn;
+    os << "CreateServerResponse={region='" << r.region << "', serverId='" << r.serverId << "', arn='" << r.arn << "'}";
     return os;
   }
 

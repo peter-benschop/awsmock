@@ -10,7 +10,9 @@ namespace AwsMock::Dto::Transfer {
 
     try {
       Poco::JSON::Object rootJson;
-      rootJson.set("region", region);
+      rootJson.set("Region", region);
+      rootJson.set("Domain", domain);
+
 
       std::ostringstream os;
       rootJson.stringify(os);
@@ -29,10 +31,26 @@ namespace AwsMock::Dto::Transfer {
 
     try {
       Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-      Poco::JSON::Array::Ptr protocolsArray = rootObject->getArray("Protocols");
-      if (protocolsArray != nullptr) {
-        for (const auto &protocol : *protocolsArray) {
-          protocols.push_back(protocol.convert<std::string>());
+      Core::JsonUtils::GetJsonValueString("Domain", rootObject, domain);
+
+      // Protocols
+      if (rootObject->has("Protocols")) {
+        Poco::JSON::Array::Ptr protocolsArray = rootObject->getArray("Protocols");
+        if (protocolsArray != nullptr) {
+          for (const auto &protocol : *protocolsArray) {
+            protocols.push_back(protocol.convert<std::string>());
+          }
+        }
+      }
+
+      // Tags
+      if (rootObject->has("Tags")) {
+        Poco::JSON::Object::Ptr tagsObject = rootObject->getObject("Tags");
+        for (const auto &tagName : tagsObject->getNames()) {
+          std::string value;
+          Core::JsonUtils::GetJsonValueString(tagName, tagsObject, value);
+          Tag tag = {.key=tagName, .value=value};
+          tags.emplace_back(tag);
         }
       }
 
@@ -52,11 +70,17 @@ namespace AwsMock::Dto::Transfer {
   }
 
   std::ostream &operator<<(std::ostream &os, const CreateServerRequest &r) {
-    os << "CreateServerRequest={region='" << r.region << "' {";
+    os << "CreateServerRequest={region='" << r.region << "', tags=[";
     for (const auto &tag : r.tags) {
-      os << tag.ToString();
+      os << tag.ToString() << ", ";
     }
-    os << "}";
+    os.seekp(-2,std::ostream::cur);
+    os << "], protocols=[";
+    for (const auto &protocol : r.protocols) {
+      os << "'" << protocol << "', ";
+    }
+    os.seekp(-2,std::ostream::cur);
+    os << "]}";
     return os;
   }
 

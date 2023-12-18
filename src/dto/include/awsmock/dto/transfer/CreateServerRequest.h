@@ -18,6 +18,7 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/dto/transfer/Tag.h>
+#include <awsmock/dto/transfer/IdentityProviderDetails.h>
 
 namespace AwsMock::Dto::Transfer {
 
@@ -29,14 +30,24 @@ namespace AwsMock::Dto::Transfer {
     std::string region;
 
     /**
+     * Domain
+     */
+    std::string domain;
+
+    /**
      * Protocols
      */
-    std::vector<std::string> protocols = {"ftp"};
+    std::vector<std::string> protocols;
 
     /**
      * Tags
      */
     TagList tags;
+
+    /**
+     * Identity provider details
+     */
+    IdentityProviderDetails identityProviderDetails;
 
     /**
      * Creates a JSON string from the object.
