@@ -35,4 +35,4 @@ VOLUME /var/run/docker.sock /var/run/docker.sock
 
 ENV AWSMOCK_DATABASE_ACTIVE=false
 
-CMD ["/usr/bin/sh"]
+CMD ["/usr/bin/awsmockmgr"]

@@ -2,8 +2,8 @@
 // Created by vogje01 on 12/11/2022.
 //
 
-#ifndef AWSMOCK_CORE_SYSTEMUTILS_H_
-#define AWSMOCK_CORE_SYSTEMUTILS_H_
+#ifndef AWSMOCK_CORE_SYSTEM_UTILS_H_
+#define AWSMOCK_CORE_SYSTEM_UTILS_H_
 
 // C includes
 #include <fcntl.h>
@@ -30,11 +30,11 @@
 #include <Poco/Environment.h>
 
 // AwsMock includes
-#include "awsmock/core/CoreException.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/RandomUtils.h"
-#include "awsmock/core/StreamFilter.h"
-#include "awsmock/core/FileUtils.h"
+#include <awsmock/core/CoreException.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/RandomUtils.h>
+#include <awsmock/core/StreamFilter.h>
+#include <awsmock/core/FileUtils.h>
 
 #define RANDOM_PORT_MIN 32768
 #define RANDOM_PORT_MAX 65536
@@ -93,21 +93,14 @@ namespace AwsMock::Core {
     static std::string GetHostName();
 
     /**
-     * Returns a random poprt number between 32768 and 65536
+     * Returns a random port number between 32768 and 65536
      *
      * @return random port
      */
     static int GetRandomPort();
 
-  private:
-
-    /**
-     * Logger
-     */
-    static Core::LogStream _logger;
-
   };
 
 } // namespace AwsMock::Core
 
-#endif // AWSMOCK_CORE_SYSTEMUTILS_H_
+#endif // AWSMOCK_CORE_SYSTEM_UTILS_H_
