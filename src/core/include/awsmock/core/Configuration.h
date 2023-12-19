@@ -107,34 +107,6 @@ namespace AwsMock::Core {
       void SetFilename(const std::string &filename);
 
       /**
-       * Returns the current port for the prometheus manager.
-       *
-       * @return prometheus port
-       */
-      int GetMetricPort() const;
-
-      /**
-       * Returns the current timeout for the prometheus system monitoring.
-       *
-       * @return prometheus port
-       */
-      long GetMetricTimeout() const;
-
-      /**
-       * Return the current log level.
-       *
-       * @return current logging level
-       */
-      std::string GetLogLevel() const;
-
-      /**
-       * Sets the log level.
-       *
-       * @param level logging level to set
-       */
-      void SetLogLevel(const std::string &level);
-
-      /**
        * Sets a string configuration value
        *
        * @param key property key

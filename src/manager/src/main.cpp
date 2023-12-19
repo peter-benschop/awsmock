@@ -62,7 +62,7 @@ namespace AwsMock {
       InitializeIndexes();
       InitializeCurl();
       log_info_stream(_logger) << "Starting " << Configuration::GetAppName() << " " << Configuration::GetVersion() << " pid: " << getpid() << " loglevel: "
-                               << _configuration.GetLogLevel() << std::endl;
+                               << _configuration.getString("awsmock.log.level") << std::endl;
       log_info_stream(_logger) << "Configuration file: " << _configuration.GetFilename() << std::endl;
       Poco::Util::ServerApplication::initialize(self);
     }
@@ -133,7 +133,7 @@ namespace AwsMock {
 
       } else if (name == "loglevel") {
 
-        _configuration.SetLogLevel(value);
+        _configuration.setString("awsmock.log.level", value);
         Poco::Logger::root().setLevel(value);
 
       } else if (name == "logfile") {

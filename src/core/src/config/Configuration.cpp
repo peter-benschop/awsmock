@@ -87,6 +87,40 @@ namespace AwsMock::Core {
     DefineProperty("awsmock.service.transfer.base.dir", "AWSMOCK_SERVICE_TRANSFER_BASE_DIR", "/tmp/awsmock/data/transfer");
     DefineProperty("awsmock.service.transfer.period", "AWSMOCK_SERVICE_TRANSFER_PERIOD", 60000);
 
+    // Cognito
+    DefineProperty("awsmock.service.cognito.active", "AWSMOCK_SERVICE_COGNITO_ACTIVE", true);
+    DefineProperty("awsmock.service.cognito.host", "AWSMOCK_SERVICE_COGNITO_HOST", "localhost");
+    DefineProperty("awsmock.service.cognito.port", "AWSMOCK_SERVICE_COGNITO_PORT", 9505);
+    DefineProperty("awsmock.service.cognito.max.queue", "AWSMOCK_SERVICE_COGNITO_MAX_QUEUE", 250);
+    DefineProperty("awsmock.service.cognito.max.threads", "AWSMOCK_SERVICE_COGNITO_MAX_THREADS", 50);
+    DefineProperty("awsmock.service.cognito.timeout", "AWSMOCK_SERVICE_COGNITO_TIMEOUT", 120);
+    DefineProperty("awsmock.service.cognito.period", "AWSMOCK_SERVICE_COGNITO_PERIOD", 10000);
+
+    // DynamoDB
+    DefineProperty("awsmock.service.dynamodb.active", "AWSMOCK_SERVICE_COGNITO_ACTIVE", true);
+    DefineProperty("awsmock.service.dynamodb.host", "AWSMOCK_SERVICE_COGNITO_HOST", "localhost");
+    DefineProperty("awsmock.service.dynamodb.port", "AWSMOCK_SERVICE_COGNITO_PORT", 9506);
+    DefineProperty("awsmock.service.dynamodb.max.queue", "AWSMOCK_SERVICE_COGNITO_MAX_QUEUE", 250);
+    DefineProperty("awsmock.service.dynamodb.max.threads", "AWSMOCK_SERVICE_COGNITO_MAX_THREADS", 50);
+    DefineProperty("awsmock.service.dynamodb.timeout", "AWSMOCK_SERVICE_COGNITO_TIMEOUT", 120);
+    DefineProperty("awsmock.service.dynamodb.period", "AWSMOCK_SERVICE_COGNITO_PERIOD", 10000);
+
+    // DynamoDB
+    DefineProperty("awsmock.service.dynamodb.active", "AWSMOCK_SERVICE_DYNAMODB_ACTIVE", true);
+    DefineProperty("awsmock.service.dynamodb.host", "AWSMOCK_SERVICE_DYNAMODB_HOST", "localhost");
+    DefineProperty("awsmock.service.dynamodb.port", "AWSMOCK_SERVICE_DYNAMODB_PORT", 9506);
+    DefineProperty("awsmock.service.dynamodb.max.queue", "AWSMOCK_SERVICE_DYNAMODB_MAX_QUEUE", 250);
+    DefineProperty("awsmock.service.dynamodb.max.threads", "AWSMOCK_SERVICE_DYNAMODB_MAX_THREADS", 50);
+    DefineProperty("awsmock.service.dynamodb.timeout", "AWSMOCK_SERVICE_DYNAMODB_TIMEOUT", 120);
+    DefineProperty("awsmock.service.dynamodb.period", "AWSMOCK_SERVICE_DYNAMODB_PERIOD", 10000);
+
+    // Docker
+    DefineProperty("awsmock.docker.network.mode", "AWSMOCK_DOCKER_NETWORK_MODE", "bridge");
+    DefineProperty("awsmock.docker.network.name", "AWSMOCK_DOCKER_NETWORK_NAME", ".dockerhost.net");
+    DefineProperty("awsmock.docker.default.memory.size", "AWSMOCK_DOCKER_DEFAULT_MEMORY_SIZE", 512);
+    DefineProperty("awsmock.docker.default.temp.size", "AWSMOCK_DOCKER_DEFAULT_TEMP_SIZE", 10240);
+    DefineProperty("awsmock.docker.container.port", "AWSMOCK_DOCKER_CONTAINER_PORT", 8080);
+
     // Monitoring
     DefineProperty("awsmock.monitoring.port", "AWSMOCK_CORE_METRIC_PORT", "8081");
     DefineProperty("awsmock.monitoring.timeout", "AWSMOCK_CORE_METRIC_TIMEOUT", "60000");
@@ -95,7 +129,12 @@ namespace AwsMock::Core {
     DefineProperty("awsmock.log.level", "AWSMOCK_CORE_LOG_LEVEL", "information");
 
     // Database
-    DefineProperty("awsmock.mongodb.active", "AWSMOCK_DATABASE_ACTIVE", true);
+    DefineProperty("awsmock.mongodb.active", "AWSMOCK_MONGODB_ACTIVE", true);
+    DefineProperty("awsmock.mongodb.name", "AWSMOCK_MONGODB_NAME", "awsmock");
+    DefineProperty("awsmock.mongodb.host", "AWSMOCK_MONGODB_HOST", "localhost");
+    DefineProperty("awsmock.mongodb.port", "AWSMOCK_MONGODB_PORT", 27017);
+    DefineProperty("awsmock.mongodb.user", "AWSMOCK_MONGODB_USER", "admin");
+    DefineProperty("awsmock.mongodb.password", "AWSMOCK_MONGODB_PASSWORD", "admin");
   }
 
   void Configuration::DefineProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue) {
@@ -138,31 +177,6 @@ namespace AwsMock::Core {
     }
     _filename = filename;
     load(_filename);
-  }
-
-  int Configuration::GetMetricPort() const {
-    if (!hasProperty("awsmock.monitoring.port")) {
-      throw CoreException("Property not found, key: awsmock.prometheus.port");
-    }
-    return getInt("awsmock.monitoring.port");
-  }
-
-  long Configuration::GetMetricTimeout() const {
-    if (!hasProperty("awsmock.monitoring.timeout")) {
-      throw CoreException("Property not found, key: awsmock.monitoring.timeout");
-    }
-    return getInt("awsmock.monitoring.timeout");
-  }
-
-  std::string Configuration::GetLogLevel() const {
-    if (!hasProperty("awsmock.log.level")) {
-      throw CoreException("Property not found, key: awsmock.log.level");
-    }
-    return getString("awsmock.log.level");
-  }
-
-  void Configuration::SetLogLevel(const std::string &logLevel) {
-    setString("awsmock.log.level", logLevel);
   }
 
   void Configuration::SetValue(const std::string &key, const std::string &value) {
