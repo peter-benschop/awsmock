@@ -47,7 +47,7 @@ namespace AwsMock {
   class AwsMockServer : public Poco::Util::ServerApplication {
 
   public:
-    AwsMockServer() : _logger(Core::LogStream(Poco::Logger::get("AwsMockServer"))) {}
+    AwsMockServer() : _logger(Core::LogStream(Poco::Logger::get("AwsMockManager"))) {}
 
   protected:
 
@@ -58,7 +58,6 @@ namespace AwsMock {
      */
     [[maybe_unused]] void initialize(Application &self) override {
 
-      Core::LogStream::setConsoleChannel();
       InitializeMonitoring();
       InitializeIndexes();
       InitializeCurl();
@@ -139,7 +138,7 @@ namespace AwsMock {
 
       } else if (name == "logfile") {
 
-        Core::LogStream::setFileChannel(value);
+        _logger.setFileChannel(value);
       }
     }
 

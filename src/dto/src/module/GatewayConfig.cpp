@@ -19,6 +19,7 @@ namespace AwsMock::Dto::Module {
       gatewayConfigJson.set("user", gatewayConfig.user);
       gatewayConfigJson.set("dataDir", gatewayConfig.dataDir);
       gatewayConfigJson.set("prettyPrint", gatewayConfig.prettyPrint);
+      gatewayConfigJson.set("databaseActive", gatewayConfig.databaseActive);
 
       std::ostringstream os;
       gatewayConfigJson.stringify(os);
@@ -50,6 +51,7 @@ namespace AwsMock::Dto::Module {
       Core::JsonUtils::GetJsonValueString("user", rootObject, gatewayConfig.user);
       Core::JsonUtils::GetJsonValueString("dataDir", rootObject, gatewayConfig.dataDir);
       Core::JsonUtils::GetJsonValueBool("prettyPrint", rootObject, gatewayConfig.prettyPrint);
+      Core::JsonUtils::GetJsonValueBool("databaseActive", rootObject, gatewayConfig.databaseActive);
 
       // Cleanup
       parser.reset();
@@ -68,7 +70,7 @@ namespace AwsMock::Dto::Module {
 
   std::ostream &operator<<(std::ostream &os, const GatewayConfig &g) {
     os << "GatewayConfig={region='" << g.region << "', protocol='" << g.protocol << "', endpoint=" << g.endpoint << "', host='" << g.host << "', port=" << g.port << ", accessId='" << g.accessId << "', clientId='" << g.clientId << "', user='" << g.user
-       << "', dataDir='" << g.dataDir << "'}";
+       << "', dataDir='" << g.dataDir << "', databaseActive=" << (g.databaseActive ? "true" : "false") << "}";
     return os;
   }
 

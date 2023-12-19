@@ -60,15 +60,14 @@ namespace AwsMock::Core {
     return &_buf;
   }
 
-  Poco::AutoPtr<Poco::ConsoleChannel> LogStream::_pConsoleChannel = new Poco::ConsoleChannel();
-  Poco::AutoPtr<Poco::FileChannel> LogStream::_pFileChannel = new Poco::FileChannel();
-  Poco::AutoPtr<Poco::PatternFormatter> LogStream::_pFormatter = new Poco::PatternFormatter(LOG_PATTERN);
-  Poco::AutoPtr<Poco::FormattingChannel> LogStream::_pFormattingChannel = new Poco::FormattingChannel(_pFormatter, _pConsoleChannel);
-
   //
   // LogStream
   //
   LogStream::LogStream(Poco::Logger &logger, Poco::Message::Priority priority, std::size_t bufferCapacity) : LogIOS(logger, priority, bufferCapacity), std::ostream(&_buf) {
+    _pConsoleChannel = new Poco::ConsoleChannel();
+    _pFileChannel = new Poco::FileChannel();
+    _pFormatter = new Poco::PatternFormatter(LOG_PATTERN);
+    _pFormattingChannel = new Poco::FormattingChannel(_pFormatter, _pConsoleChannel);
     logger.setChannel(_pFormattingChannel);
   }
 

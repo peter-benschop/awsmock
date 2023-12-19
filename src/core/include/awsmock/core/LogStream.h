@@ -129,10 +129,10 @@ namespace AwsMock::Core {
     void setChannel(const Poco::Channel::Ptr& channel);
     /// Sets the log channel
 
-    static void setFileChannel(const std::string &filename);
+    void setFileChannel(const std::string &filename);
     /// Sets the file channel for the root logger
 
-    static void setConsoleChannel();
+    void setConsoleChannel();
     /// Sets the standard console log channel for root logger
 
     LogStream &level(const std::string &level);
@@ -223,10 +223,10 @@ namespace AwsMock::Core {
 
     static void SetGlobalLevel(const std::string &level);
 
-    static Poco::AutoPtr<Poco::ConsoleChannel> _pConsoleChannel;
-    static Poco::AutoPtr<Poco::FileChannel> _pFileChannel;
-    static Poco::AutoPtr<Poco::PatternFormatter> _pFormatter;
-    static Poco::AutoPtr<Poco::FormattingChannel> _pFormattingChannel;
+    Poco::AutoPtr<Poco::ConsoleChannel> _pConsoleChannel;
+    Poco::AutoPtr<Poco::FileChannel> _pFileChannel;
+    Poco::AutoPtr<Poco::PatternFormatter> _pFormatter;
+    Poco::AutoPtr<Poco::FormattingChannel> _pFormattingChannel;
   };
 
   //
