@@ -33,6 +33,6 @@ EXPOSE 8081 8081
 
 VOLUME /var/run/docker.sock /var/run/docker.sock
 
-ENV AWSMOCK_DATABASE_ACTIVE=false
+ENV AWSMOCK_MONGODB_ACTIVE=false
 
 CMD ["/usr/bin/awsmockmgr"]
