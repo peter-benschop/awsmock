@@ -88,18 +88,23 @@ namespace AwsMock::Database {
   Entity::S3::ObjectList S3MemoryDb::ListBucket(const std::string &bucket, const std::string &prefix) {
 
     Entity::S3::ObjectList objectList;
+
     if (prefix.empty()) {
+
       for (const auto &object : _objects) {
         if (object.second.bucket == bucket) {
           objectList.emplace_back(object.second);
         }
       }
+
     } else {
+
       for (const auto &object : _objects) {
         if (object.second.bucket == bucket && Core::StringUtils::StartsWith(object.second.key, prefix)) {
           objectList.emplace_back(object.second);
         }
       }
+
     }
 
     log_trace_stream(_logger) << "Got object list, size: " << objectList.size() << std::endl;

@@ -109,23 +109,30 @@ namespace AwsMock::Database {
 
   Entity::Cognito::UserPool CognitoDatabase::GetUserPoolByRegionName(const std::string &region, const std::string &name) {
 
-    try {
+    if (HasDatabase()) {
 
-      mongocxx::stdx::optional<bsoncxx::document::value> mResult = _userPoolCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
-      if (!mResult) {
-        _logger.error() << "Database exception: Cognito not found " << std::endl;
-        throw Core::DatabaseException("Database exception, Cognito not found ", 500);
+      try {
+
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _userPoolCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
+        if (!mResult) {
+          _logger.error() << "Database exception: Cognito not found " << std::endl;
+          throw Core::DatabaseException("Database exception, Cognito not found ", 500);
+        }
+
+        Entity::Cognito::UserPool result;
+        result.FromDocument(mResult);
+        return result;
+
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
       }
 
-      Entity::Cognito::UserPool result;
-      result.FromDocument(mResult);
-      return result;
+    } else {
 
-    } catch (const mongocxx::exception &exc) {
-      _logger.error() << "Database exception " << exc.what() << std::endl;
-      throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+      return _memoryDb.GetUserPoolByRegionName(region,name);
+
     }
-
   }
 
   Entity::Cognito::UserPool CognitoDatabase::CreateOrUpdateUserPool(Entity::Cognito::UserPool &userPool) {
@@ -338,23 +345,30 @@ namespace AwsMock::Database {
 
   Entity::Cognito::User CognitoDatabase::GetUserByUserName(const std::string &region, const std::string &userPoolId, const std::string &userName) {
 
-    try {
+    if (HasDatabase()) {
 
-      auto mResult = _userCollection.find_one(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("userName", userName)));
-      if (!mResult) {
-        _logger.error() << "Database exception: user not found " << std::endl;
-        throw Core::DatabaseException("Database exception, user not found ", 500);
+      try {
+
+        auto mResult = _userCollection.find_one(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("userName", userName)));
+        if (!mResult) {
+          _logger.error() << "Database exception: user not found " << std::endl;
+          throw Core::DatabaseException("Database exception, user not found ", 500);
+        }
+
+        Entity::Cognito::User result;
+        result.FromDocument(mResult);
+        return result;
+
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
       }
 
-      Entity::Cognito::User result;
-      result.FromDocument(mResult);
-      return result;
+    } else {
 
-    } catch (const mongocxx::exception &exc) {
-      _logger.error() << "Database exception " << exc.what() << std::endl;
-      throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+      return _memoryDb.GetUserByUserName(region, userPoolId, userName);
+
     }
-
   }
 
   Entity::Cognito::User CognitoDatabase::GetUserById(const std::string &oid) {

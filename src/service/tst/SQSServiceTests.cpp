@@ -2,8 +2,8 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_CORE_SQSSERVICETEST_H
-#define AWMOCK_CORE_SQSSERVICETEST_H
+#ifndef AWMOCK_SERVICE_SQS_SERVICE_TEST_H
+#define AWMOCK_SERVICE_SQS_SERVICE_TEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
@@ -27,22 +27,22 @@ namespace AwsMock::Service {
 
   class SQSServiceTest : public ::testing::Test {
 
-  protected:
+    protected:
 
-    void SetUp() override {
-      // Set log level
-      Core::LogStream::SetGlobalLevel("error");
-    }
+      void SetUp() override {
+        // Set log level
+        Core::LogStream::SetGlobalLevel("error");
+      }
 
-    void TearDown() override {
-      _database.DeleteAllQueues();
-      _database.DeleteAllMessages();
-    }
+      void TearDown() override {
+        _database.DeleteAllQueues();
+        _database.DeleteAllMessages();
+      }
 
-    Poco::Condition _condition;
-    Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
-    Database::SQSDatabase _database = Database::SQSDatabase(_configuration);
-    SQSService _service = SQSService(_configuration, _condition);
+      Poco::Condition _condition;
+      Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
+      Database::SQSDatabase _database = Database::SQSDatabase(_configuration);
+      SQSService _service = SQSService(_configuration, _condition);
   };
 
   TEST_F(SQSServiceTest, QueueCreateTest) {
@@ -205,4 +205,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Core
 
-#endif // AWMOCK_CORE_SQSSERVICETEST_H
+#endif // AWMOCK_SERVICE_SQS_SERVICE_TEST_H

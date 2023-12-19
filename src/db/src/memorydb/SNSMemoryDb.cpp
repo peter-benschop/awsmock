@@ -16,10 +16,10 @@ namespace AwsMock::Database {
 
   }
 
-  bool SNSMemoryDb::TopicExists(const std::string &name) {
+  bool SNSMemoryDb::TopicExists(const std::string &arn) {
 
-    return find_if(_topics.begin(), _topics.end(), [name](const std::pair<std::string, Entity::SNS::Topic> &topic) {
-      return topic.second.topicName == name;
+    return find_if(_topics.begin(), _topics.end(), [arn](const std::pair<std::string, Entity::SNS::Topic> &topic) {
+      return topic.second.topicArn == arn;
     }) != _topics.end();
 
   }
@@ -92,10 +92,20 @@ namespace AwsMock::Database {
   Entity::SNS::TopicList SNSMemoryDb::ListTopics(const std::string &region) {
 
     Entity::SNS::TopicList topicList;
-    for (const auto &topic : _topics) {
-      if (topic.second.region == region) {
+    if (region.empty()) {
+
+      for (const auto &topic : _topics) {
         topicList.emplace_back(topic.second);
       }
+
+    } else {
+
+      for (const auto &topic : _topics) {
+        if (topic.second.region == region) {
+          topicList.emplace_back(topic.second);
+        }
+      }
+
     }
 
     log_trace_stream(_logger) << "Got topic list, size: " << topicList.size() << std::endl;
@@ -124,10 +134,10 @@ namespace AwsMock::Database {
     Poco::ScopedLock loc(_topicMutex);
 
     std::string region = topic.region;
-    std::string name = topic.topicName;
-    const auto count = std::erase_if(_topics, [region, name](const auto &item) {
+    std::string arn = topic.topicArn;
+    const auto count = std::erase_if(_topics, [region, arn](const auto &item) {
       auto const &[key, value] = item;
-      return value.region == region && value.topicName == name;
+      return value.region == region && value.topicArn == arn;
     });
     log_debug_stream(_logger) << "Topic deleted, count: " << count << std::endl;
   }
@@ -180,6 +190,8 @@ namespace AwsMock::Database {
         count++;
       } else if (!topicArn.empty() && message.second.topicArn == topicArn) {
         count++;
+      } else {
+        count++;
       }
     }
     return count;
@@ -199,7 +211,7 @@ namespace AwsMock::Database {
   Entity::SNS::MessageList SNSMemoryDb::ListMessages(const std::string &region) {
 
     Entity::SNS::MessageList messageList;
-    if(region.empty()) {
+    if (region.empty()) {
 
       for (const auto &message : _messages) {
         messageList.emplace_back(message.second);

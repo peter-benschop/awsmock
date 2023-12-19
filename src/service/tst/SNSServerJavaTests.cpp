@@ -2,8 +2,8 @@
 // Created by vogje01 on 21/10/2023.
 //
 
-#ifndef AWMOCK_SNS_JAVA_SERVERTEST_H
-#define AWMOCK_SNS_JAVA_SERVERTEST_H
+#ifndef AWMOCK_SERVICE_SNS_JAVA_SERVER_TEST_H
+#define AWMOCK_SERVICE_SNS_JAVA_SERVER_TEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
@@ -62,7 +62,7 @@ namespace AwsMock::Service {
 
     Core::CurlUtils _curlUtils;
     std::string _snsEndpoint, _sqsEndpoint, _snsBaseCommand, _sqsBaseCommand, _region;
-    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration();
+    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
     Core::MetricService _metricService = Core::MetricService(_configuration);
     Database::SNSDatabase _snsDatabase = Database::SNSDatabase(_configuration);
     Database::SQSDatabase _sqsDatabase = Database::SQSDatabase(_configuration);
@@ -158,4 +158,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Core
 
-#endif // AWMOCK_SNS_JAVA_SERVERTEST_H
+#endif // AWMOCK_SERVICE_SNS_JAVA_SERVER_TEST_H

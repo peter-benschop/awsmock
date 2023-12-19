@@ -2,8 +2,8 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_CORE_S3SERVICETEST_H
-#define AWMOCK_CORE_S3SERVICETEST_H
+#ifndef AWMOCK_CORE_S3SERVICE_TEST_H
+#define AWMOCK_CORE_S3SERVICE_TEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
@@ -29,21 +29,21 @@ namespace AwsMock::Service {
 
   class S3ServiceTest : public ::testing::Test {
 
-  protected:
+    protected:
 
-    void SetUp() override {
-      testFile = Core::FileUtils::CreateTempFile("/tmp", "json", 10);
-    }
+      void SetUp() override {
+        testFile = Core::FileUtils::CreateTempFile("/tmp", "json", 10);
+      }
 
-    void TearDown() override {
-      _database.DeleteAllBuckets();
-      Core::FileUtils::DeleteFile(testFile);
-    }
+      void TearDown() override {
+        _database.DeleteAllBuckets();
+        Core::FileUtils::DeleteFile(testFile);
+      }
 
-    Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
-    Database::S3Database _database = Database::S3Database(_configuration);
-    S3Service _service = S3Service(_configuration);
-    std::string testFile;
+      Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
+      Database::S3Database _database = Database::S3Database(_configuration);
+      S3Service _service = S3Service(_configuration);
+      std::string testFile;
   };
 
   TEST_F(S3ServiceTest, BucketCreateTest) {
@@ -106,4 +106,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Core
 
-#endif // AWMOCK_CORE_S3SERVICETEST_H
+#endif // AWMOCK_CORE_S3SERVICE_TEST_H

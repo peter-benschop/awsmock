@@ -66,7 +66,7 @@ namespace AwsMock::Core {
        * @param envProperty environment variable name
        * @param defaultValue string default value
        */
-      void DefineProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue);
+      void DefineStringProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue);
 
       /**
        * Define a new configuration property.
@@ -78,7 +78,7 @@ namespace AwsMock::Core {
        * @param envProperty environment variable name
        * @param defaultValue boolean default value
        */
-      void DefineProperty(const std::string &key, const std::string &envProperty, bool defaultValue);
+      void DefineBoolProperty(const std::string &key, const std::string &envProperty, bool defaultValue);
 
       /**
        * Define a new configuration property.
@@ -90,7 +90,7 @@ namespace AwsMock::Core {
        * @param envProperty environment variable name
        * @param defaultValue integer default value
        */
-      void DefineProperty(const std::string &key, const std::string &envProperty, int defaultValue);
+      void DefineIntProperty(const std::string &key, const std::string &envProperty, int defaultValue);
 
       /**
        * Returns the file name of the configuration file.
