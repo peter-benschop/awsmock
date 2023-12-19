@@ -25,7 +25,7 @@ AwsMock S3 mock simulates a real AWS S3 bucket and its object. They can be copie
 functions. S3 object are stored on disk and their metadata is part of AwsMock Mongo DB collection. Therefore the MongoDB 
 has two collections: Buckets and Objects. Buckets contain the bucket metadata and teh object collection the object data.
 
-See [AwsMock S3 supported commands](docs/S3/S3Functions.md) for a list of supported commands.
+See [AwsMock S3 supported commands](docs/man/awsmocks3.md) in the supplied man page.
 
 ## SNS
 
@@ -95,5 +95,10 @@ To start the docker image:
   ```
   docker run -p 4566:4566 -p 4567:4567 jensvogt/aws-mock:latest
   ```
-This invocation will run with the in-memory database, as the alpine image does not have a own MongoDb instance. To connect
-a MongoDB instance use the provided docker-compose file.
+This invocation will run with the in-memory database, as the alpine image does not have a own MongoDb instance. 
+
+To connect a MongoDB instance use the provided docker-compose file:
+  ```
+  cd docker
+  docker-compose up
+  ```
