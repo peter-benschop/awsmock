@@ -97,15 +97,6 @@ namespace AwsMock::Core {
     DefineIntProperty("awsmock.service.cognito.period", "AWSMOCK_SERVICE_COGNITO_PERIOD", 10000);
 
     // DynamoDB
-    DefineBoolProperty("awsmock.service.dynamodb.active", "AWSMOCK_SERVICE_COGNITO_ACTIVE", true);
-    DefineStringProperty("awsmock.service.dynamodb.host", "AWSMOCK_SERVICE_COGNITO_HOST", "localhost");
-    DefineIntProperty("awsmock.service.dynamodb.port", "AWSMOCK_SERVICE_COGNITO_PORT", 9506);
-    DefineIntProperty("awsmock.service.dynamodb.max.queue", "AWSMOCK_SERVICE_COGNITO_MAX_QUEUE", 250);
-    DefineIntProperty("awsmock.service.dynamodb.max.threads", "AWSMOCK_SERVICE_COGNITO_MAX_THREADS", 50);
-    DefineIntProperty("awsmock.service.dynamodb.timeout", "AWSMOCK_SERVICE_COGNITO_TIMEOUT", 120);
-    DefineIntProperty("awsmock.service.dynamodb.period", "AWSMOCK_SERVICE_COGNITO_PERIOD", 10000);
-
-    // DynamoDB
     DefineBoolProperty("awsmock.service.dynamodb.active", "AWSMOCK_SERVICE_DYNAMODB_ACTIVE", true);
     DefineStringProperty("awsmock.service.dynamodb.host", "AWSMOCK_SERVICE_DYNAMODB_HOST", "localhost");
     DefineIntProperty("awsmock.service.dynamodb.port", "AWSMOCK_SERVICE_DYNAMODB_PORT", 9506);
