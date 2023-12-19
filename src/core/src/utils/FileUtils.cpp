@@ -4,8 +4,6 @@
 
 namespace AwsMock::Core {
 
-  Core::LogStream FileUtils::logger(Poco::Logger::get("FileUtils"));
-
   std::string FileUtils::GetBasename(const std::string &fileName) {
     Poco::Path path(fileName);
     return path.getBaseName();
@@ -147,7 +145,6 @@ namespace AwsMock::Core {
     struct stat info{};
     stat(fileName.c_str(), &info);  // Error check omitted
     struct passwd *pw = getpwuid(info.st_uid);
-    //struct group  *gr = getgrgid(info.st_gid);
     if (pw) {
       return pw->pw_name;
     }
@@ -167,7 +164,6 @@ namespace AwsMock::Core {
   void FileUtils::UnzipFiles(const std::string &zipFile, const std::string &dirName) {
     Poco::File tempDir = Poco::File(dirName);
     tempDir.createDirectories();
-    log_debug_stream(logger) << "Using output directory: " << dirName << std::endl;
 
     std::ifstream inp(zipFile, std::ios::binary);
     poco_assert(inp);
@@ -177,17 +173,14 @@ namespace AwsMock::Core {
 
     // Decompress to directory
     dec.decompressAllFiles();
-    log_debug_stream(logger) << "File uncompressed, zipFile: " << zipFile << " directory:" << dirName << std::endl;
   }
 
   void FileUtils::ZipFiles(const std::string &zipFile, const std::string &dirName) {
-    log_debug_stream(logger) << "Using directory: " << dirName << std::endl;
 
     std::ofstream out(zipFile, std::ios::binary);
     Poco::Zip::Compress com(out, true);
     com.addRecursive(Poco::Path(dirName));
     com.close();
-    log_debug_stream(logger) << "Files compressed, zipFile: " << zipFile << " directory:" << dirName << std::endl;
   }
 
   bool FileUtils::Touch(const std::string &fileName) {

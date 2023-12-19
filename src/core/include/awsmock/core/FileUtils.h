@@ -2,8 +2,8 @@
 // Created by vogje01 on 22/08/2022.
 //
 
-#ifndef AWSMOCK_CORE_FILEUTILS_H
-#define AWSMOCK_CORE_FILEUTILS_H
+#ifndef AWSMOCK_CORE_FILE_UTILS_H
+#define AWSMOCK_CORE_FILE_UTILS_H
 
 // Standard C includes
 #include <pwd.h>
@@ -239,14 +239,6 @@ namespace AwsMock::Core {
      */
     static bool Touch(const std::string &fileName);
 
-    /**
-     * Logger
-     */
-    static Core::LogStream logger;
-
-    /**
-     *
-     */
   };
 } // namespace AwsMock::Core
 #endif // AWSMOCK_CORE_FILEUTILS_H
