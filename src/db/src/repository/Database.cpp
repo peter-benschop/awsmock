@@ -34,6 +34,8 @@ namespace AwsMock::Database {
 
     // MongoDB URI
     _uri = mongocxx::uri("mongodb://" + _user + ":" + _password + "@" + _host + ":" + std::to_string(_port) + "/?maxPoolSize=32");
+    log_info_stream(_logger) << "Database URI: " << _uri.to_string() << std::endl;
+
     _client = mongocxx::client{_uri};
 
     // Update module database
