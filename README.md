@@ -93,4 +93,7 @@ To start the docker image:
   ```
   2. Start the container
   ```
+  docker run -p 4566:4566 -p 4567:4567 jensvogt/aws-mock:latest
   ```
+This invocation will run with the in-memory database, as the alpine image does not have a own MongoDb instance. To connect
+a MongoDB instance use the provided docker-compose file.

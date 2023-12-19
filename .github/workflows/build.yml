@@ -33,8 +33,8 @@ jobs:
       - name: Build
         run: cmake --build ./build --config Release
 
-#      - name: Run tests
-#        run: cd build && ctest -V
+      - name: Run tests
+        run: cd build && ctest -V
 
 #      - name: Create docs
 #        run: cd build && make docs

@@ -69,6 +69,18 @@ namespace AwsMock::Core {
       void DefineProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue);
 
       /**
+       * Define a new configuration property.
+       *
+       * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
+       * key, the key is preserved, otherwise the default value is taken. </p>
+       *
+       * @param key configuration key
+       * @param envProperty  environment variable name
+       * @param defaultValue  default value
+       */
+      void DefineProperty(const std::string &key, const std::string &envProperty, bool defaultValue);
+
+      /**
        * Returns the file name of the configuration file.
        *
        * @return file name of the configuration file.

@@ -23,6 +23,9 @@ namespace AwsMock::Core {
 
     // Logging
     DefineProperty("awsmock.log.level", "AWSMOCK_CORE_LOG_LEVEL", "information");
+
+    // Database
+    DefineProperty("awsmock.mongodb.active", "AWSMOCK_DATABASE_ACTIVE", true);
   }
 
   void Configuration::DefineProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue) {
@@ -30,6 +33,15 @@ namespace AwsMock::Core {
       setString(key, getenv(envProperty.c_str()));
     } else if (!has(key)) {
       setString(key, defaultValue);
+    }
+    log_trace_stream(_logger) << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue << std::endl;
+  }
+
+  void Configuration::DefineProperty(const std::string &key, const std::string &envProperty, bool defaultValue) {
+    if (getenv(envProperty.c_str()) != nullptr) {
+      setBool(key, std::string(getenv(envProperty.c_str())) == "true");
+    } else if (!has(key)) {
+      setBool(key, defaultValue);
     }
     log_trace_stream(_logger) << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue << std::endl;
   }

@@ -77,6 +77,11 @@ namespace AwsMock::Dto::Module {
     bool prettyPrint = false;
 
     /**
+     * Database active
+     */
+    bool databaseActive = false;
+
+    /**
      * Convert to JSON representation
      *
      * @param moduleEntity module entity

@@ -22,10 +22,12 @@ namespace AwsMock {
     if (action == "config") {
 
       std::string host = _configuration.getString("awsmock.service.gateway.host", "localhost");
+      std::string regionCfg = _configuration.getString("awsmock.region", "eu-central-1");
       int port = _configuration.getInt("awsmock.service.gateway.port", 4566);
+      std::string endpoint = "http://" + host + "/" + std::to_string(port);
       Dto::Module::GatewayConfig config = {
-          .region=_configuration.getString("awsmock.region", "eu-central-1"),
-          .endpoint="http://" + host + "/" + std::to_string(port),
+          .region=regionCfg,
+          .endpoint=endpoint,
           .protocol="http",
           .host=host,
           .port=port,
@@ -33,6 +35,7 @@ namespace AwsMock {
           .accessId=_configuration.getString("awsmock.account.id", "000000000000"),
           .clientId=_configuration.getString("awsmock.client.id", "00000000"),
           .dataDir=_configuration.getString("awsmock.data.dir", "/tmp/awsmock/data"),
+          .databaseActive=_configuration.getBool("awsmock.mongodb.active", false)
       };
       SendOkResponse(response, Dto::Module::GatewayConfig::ToJson(config));
 

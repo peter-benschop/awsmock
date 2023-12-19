@@ -8,7 +8,7 @@ RUN mkdir -p /usr/src
 
 # Install Poco framework
 RUN cd /usr/src && \
-    git clone -b devel https://github.com/pocoproject/poco.git && \
+    git clone -b master https://github.com/pocoproject/poco.git && \
     cd poco && \
     cmake -DENABLE_PAGECOMPILER=OFF -DENABLE_DATA_SQLITE=OFF -DENABLE_REDIS=OFF -DENABLE_DATA_POSTGRESQL=OFF  \
     -DENABLE_DATA_MYSQL=OFF -DENABLE_NETSSL=ON -DENABLE_MONGODB=OFF -DENABLE_JWT=OFF -DENABLE_DATA=OFF  \

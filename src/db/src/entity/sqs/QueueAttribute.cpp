@@ -30,11 +30,11 @@ namespace AwsMock::Database::Entity::SQS {
     delaySeconds = mResult.value()["delaySeconds"].get_int32().value;
     maxMessageSize = mResult.value()["maxMessageSize"].get_int32().value;
     messageRetentionPeriod = mResult.value()["messageRetentionPeriod"].get_int32().value;
-    policy = bsoncxx::string::to_string(mResult.value()["policy"].get_string().value);
+    policy = mResult.value()["policy"].get_string().value;
     receiveMessageWaitTime = mResult.value()["receiveMessageWaitTime"].get_int32().value;
     visibilityTimeout = mResult.value()["visibilityTimeout"].get_int32().value;
     redrivePolicy.FromDocument(mResult.value()["redrivePolicy"].get_document().value);
-    redriveAllowPolicy = bsoncxx::string::to_string(mResult.value()["redriveAllowPolicy"].get_string().value);
+    redriveAllowPolicy = mResult.value()["redriveAllowPolicy"].get_string().value;
     approximateNumberOfMessages = mResult.value()["approximateNumberOfMessages"].get_int64().value;
     approximateNumberOfMessagesDelayed = mResult.value()["approximateNumberOfMessagesDelayed"].get_int64().value;
     approximateNumberOfMessagesNotVisible = mResult.value()["approximateNumberOfMessagesNotVisible"].get_int64().value;
