@@ -6,8 +6,6 @@
 
 namespace AwsMock::Core {
 
-  Core::LogStream SystemUtils::_logger = Core::LogStream(Poco::Logger::get("SystemUtils"));
-
   ExecResult SystemUtils::Exec(const std::string &cmd) {
     // set up file redirection
     std::filesystem::path redirection = std::filesystem::absolute(".output.temp");
