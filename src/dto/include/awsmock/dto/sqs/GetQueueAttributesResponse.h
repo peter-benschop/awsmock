@@ -72,11 +72,6 @@ namespace AwsMock::Dto::SQS {
      * @return output stream
      */
     friend std::ostream &operator<<(std::ostream &os, const GetQueueAttributesResponse &r);
-
-    /**
-     * Static logger
-     */
-    static Core::LogStream _logger;
   };
 
 } // namespace AwsMock::Dto::SQS
