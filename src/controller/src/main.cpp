@@ -127,7 +127,7 @@ namespace AwsMock::Controller {
 
         } else if (name == "level") {
 
-          _configuration.SetLogLevel(value);
+          _configuration.setString("awsmock.log.level", value);
           Poco::Logger::get("").setLevel(value);
 
         } else if (name == "pretty") {

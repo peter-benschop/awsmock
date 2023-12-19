@@ -2,8 +2,8 @@
 // Created by vogje01 on 21/10/2023.
 //
 
-#ifndef AWMOCK_SNS_CLI_INTEGRATIONTEST_H
-#define AWMOCK_SNS_CLI_INTEGRATIONTEST_H
+#ifndef AWMOCK_SERVICE_SNS_CLI_INTEGRATIONTEST_H
+#define AWMOCK_SERVICE_SNS_CLI_INTEGRATIONTEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
@@ -128,7 +128,7 @@ namespace AwsMock::Service {
     }
 
     std::string _snsEndpoint, _sqsEndpoint;
-    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration();
+    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
     Core::MetricService _metricService = Core::MetricService(_configuration);
     Database::SNSDatabase _snsDatabase = Database::SNSDatabase(_configuration);
     Database::SQSDatabase _sqsDatabase = Database::SQSDatabase(_configuration);
@@ -276,4 +276,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Core
 
-#endif // AWMOCK_SNS_CLI_INTEGRATIONTEST_H
+#endif // AWMOCK_SERVICE_SNS_CLI_INTEGRATIONTEST_H

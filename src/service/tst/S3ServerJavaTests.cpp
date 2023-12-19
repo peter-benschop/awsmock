@@ -2,8 +2,8 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_CORE_S3SERVERTEST_H
-#define AWMOCK_CORE_S3SERVERTEST_H
+#ifndef AWMOCK_SERVICE_S3_SERVER_JAVA_TEST_H
+#define AWMOCK_SERVICE_S3_SERVER_JAVA_TEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
@@ -54,7 +54,7 @@ namespace AwsMock::Service {
 
     std::string _endpoint, _baseCommand, _tempFile;
     std::map<std::string, std::string> _extraHeaders;
-    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration();
+    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
     Core::MetricService _metricService = Core::MetricService(_configuration);
     Database::S3Database _database = Database::S3Database(_configuration);
     S3Server _s3Server = S3Server(_configuration, _metricService);
@@ -154,4 +154,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Core
 
-#endif // AWMOCK_CORE_S3SERVERTEST_H
+#endif // AWMOCK_SERVICE_S3_SERVER_JAVA_TEST_H

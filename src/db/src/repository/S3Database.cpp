@@ -203,7 +203,9 @@ namespace AwsMock::Database {
           result.FromDocument(object);
           objectList.push_back(result);
         }
+
       } else {
+
         auto objectCursor = _objectCollection.find(make_document(kvp("bucket", bucket), kvp("key", bsoncxx::types::b_regex{"^" + prefix + ".*"})));
         for (auto object : objectCursor) {
           Entity::S3::Object result;

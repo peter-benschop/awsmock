@@ -80,6 +80,16 @@ namespace AwsMock::Database {
       Entity::Cognito::UserPool GetUserPoolByOid(const std::string &oid);
 
       /**
+       * Returns a cognito user pool entity by region and name
+       *
+       * @param region AWS region
+       * @param name cognito user pool name
+       * @return cognito entity
+       * @throws DatabaseException
+       */
+      Entity::Cognito::UserPool GetUserPoolByRegionName(const std::string &region, const std::string &name);
+
+      /**
        * Count all user pools
        *
        * @param region aws-mock region.

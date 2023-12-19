@@ -2,15 +2,14 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWSMOCK_CORE_CONFIGURATIONTEST_H
-#define AWSMOCK_CORE_CONFIGURATIONTEST_H
+#ifndef AWSMOCK_CORE_CONFIGURATION_TEST_H
+#define AWSMOCK_CORE_CONFIGURATION_TEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
 
 // Local includes
 #include <awsmock/core/Configuration.h>
-#include <awsmock/core/CoreException.h>
 #include <awsmock/core/TestUtils.h>
 
 namespace AwsMock::Core {
@@ -57,7 +56,7 @@ namespace AwsMock::Core {
 
     // assert
     EXPECT_STREQ(configuration->GetFilename().c_str(), TMP_PROPERTIES_FILE);
-    EXPECT_TRUE(configuration->GetLogLevel().length() > 0);
+    EXPECT_FALSE(configuration->getString("awsmock.log.level").empty());
   }
 
   TEST_F(ConfigurationTest, SetValueTest) {
@@ -78,16 +77,17 @@ namespace AwsMock::Core {
   TEST_F(ConfigurationTest, EnvironmentTest) {
 
     // arrange
-    setenv("AWSMOCK_CORE_LOG_LEVEL", "error", true);
+    setenv("AWSMOCK_LOG_LEVEL", "error", true);
     Configuration *configuration = nullptr;
 
     // act
     EXPECT_NO_THROW({ configuration = new Configuration(TMP_PROPERTIES_FILE); });
 
     // assert
+    std::string tmp = configuration->getString("awsmock.log.level");
     EXPECT_STREQ(configuration->getString("awsmock.log.level").c_str(), "error");
   }
 
 } // namespace AwsMock::Core
 
-#endif // AWSMOCK_CORE_CONFIGURATIONTEST_H
+#endif // AWSMOCK_CORE_CONFIGURATION_TEST_H

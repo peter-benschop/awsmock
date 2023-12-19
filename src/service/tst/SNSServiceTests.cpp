@@ -2,8 +2,8 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_CORE_SQSSERVICETEST_H
-#define AWMOCK_CORE_SQSSERVICETEST_H
+#ifndef AWMOCK_SERVICE_SNS_SERVICE_TEST_H
+#define AWMOCK_SERVICE_SNS_SERVICE_TEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
@@ -29,26 +29,26 @@ namespace AwsMock::Service {
 
   class SNSServiceTest : public ::testing::Test {
 
-  protected:
+    protected:
 
-    void SetUp() override {
-      // Set log level
-      Core::LogStream::SetGlobalLevel("error");
-    }
+      void SetUp() override {
+        // Set log level
+        Core::LogStream::SetGlobalLevel("error");
+      }
 
-    void TearDown() override {
-      _snsDatabase.DeleteAllTopics();
-      _snsDatabase.DeleteAllMessages();
-      _sqsDatabase.DeleteAllQueues();
-      _sqsDatabase.DeleteAllMessages();
-    }
+      void TearDown() override {
+        _snsDatabase.DeleteAllTopics();
+        _snsDatabase.DeleteAllMessages();
+        _sqsDatabase.DeleteAllQueues();
+        _sqsDatabase.DeleteAllMessages();
+      }
 
-    Poco::Condition _condition;
-    Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
-    Database::SNSDatabase _snsDatabase = Database::SNSDatabase(_configuration);
-    Database::SQSDatabase _sqsDatabase = Database::SQSDatabase(_configuration);
-    SNSService _snsService = SNSService(_configuration, _condition);
-    SQSService _sqsService = SQSService(_configuration, _condition);
+      Poco::Condition _condition;
+      Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
+      Database::SNSDatabase _snsDatabase = Database::SNSDatabase(_configuration);
+      Database::SQSDatabase _sqsDatabase = Database::SQSDatabase(_configuration);
+      SNSService _snsService = SNSService(_configuration, _condition);
+      SQSService _sqsService = SQSService(_configuration, _condition);
   };
 
   TEST_F(SNSServiceTest, TopicCreateTest) {
@@ -71,7 +71,7 @@ namespace AwsMock::Service {
     Dto::SNS::CreateTopicResponse topicResponse = _snsService.CreateTopic(topicRequest);
 
     // act
-    EXPECT_NO_THROW({_snsService.DeleteTopic(topicResponse.region, topicResponse.topicArn);});
+    EXPECT_NO_THROW({ _snsService.DeleteTopic(topicResponse.region, topicResponse.topicArn); });
 
     // assert
     EXPECT_EQ(0, _snsDatabase.ListTopics(REGION).size());
@@ -147,9 +147,9 @@ namespace AwsMock::Service {
     Dto::SQS::ReceiveMessageResponse receiveResponse = _sqsService.ReceiveMessages(receiveRequest);
 
     // assert
-    EXPECT_EQ(receiveResponse.messageList.size(),1);
+    EXPECT_EQ(receiveResponse.messageList.size(), 1);
   }
 
 } // namespace AwsMock::Core
 
-#endif // AWMOCK_CORE_SQSSERVICETEST_H
+#endif // AWMOCK_SERVICE_SNS_SERVICE_TEST_H

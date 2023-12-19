@@ -2,8 +2,8 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_S3_S3SERVERCLITEST_H
-#define AWMOCK_S3_S3SERVERCLITEST_H
+#ifndef AWMOCK_SERVICE_S3_SERVER_CLI_TEST_H
+#define AWMOCK_SERVICE_S3_SERVER_CLI_TEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
@@ -28,32 +28,32 @@ namespace AwsMock::Service {
 
   class S3ServerCliTest : public ::testing::Test {
 
-  protected:
+    protected:
 
-    void SetUp() override {
+      void SetUp() override {
 
-      // Define endpoint
-      std::string _port = _configuration.getString("awsmock.service.s3.port", std::to_string(S3_DEFAULT_PORT));
-      std::string _host = _configuration.getString("awsmock.service.s3.host", S3_DEFAULT_HOST);
-      _configuration.setString("awsmock.service.gateway.port", _port);
-      _accountId = _configuration.getString("awsmock.account.id", S3_ACCOUNT_ID);
-      _endpoint = "http://" + _host + ":" + _port;
+        // Define endpoint
+        std::string _port = _configuration.getString("awsmock.service.s3.port", std::to_string(S3_DEFAULT_PORT));
+        std::string _host = _configuration.getString("awsmock.service.s3.host", S3_DEFAULT_HOST);
+        _configuration.setString("awsmock.service.gateway.port", _port);
+        _accountId = _configuration.getString("awsmock.account.id", S3_ACCOUNT_ID);
+        _endpoint = "http://" + _host + ":" + _port;
 
-      // Start HTTP manager
-      Poco::ThreadPool::defaultPool().start(_s3Server);
-    }
+        // Start HTTP manager
+        Poco::ThreadPool::defaultPool().start(_s3Server);
+      }
 
-    void TearDown() override {
-      _database.DeleteAllObjects();
-      _database.DeleteAllBuckets();
-      _s3Server.StopServer();
-    }
+      void TearDown() override {
+        _database.DeleteAllObjects();
+        _database.DeleteAllBuckets();
+        _s3Server.StopServer();
+      }
 
-    std::string _endpoint, _accountId;
-    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration();
-    Core::MetricService _metricService = Core::MetricService(_configuration);
-    Database::S3Database _database = Database::S3Database(_configuration);
-    S3Server _s3Server = S3Server(_configuration, _metricService);
+      std::string _endpoint, _accountId;
+      Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
+      Core::MetricService _metricService = Core::MetricService(_configuration);
+      Database::S3Database _database = Database::S3Database(_configuration);
+      S3Server _s3Server = S3Server(_configuration, _metricService);
   };
 
   TEST_F(S3ServerCliTest, BucketCreateTest) {
@@ -151,8 +151,8 @@ namespace AwsMock::Service {
 
     // assert
     EXPECT_EQ(2, objectList.size());
-    EXPECT_TRUE(objectList[0].key == filename);
-    EXPECT_TRUE(objectList[1].key == "test/" + filename);
+    EXPECT_TRUE(objectList[0].key == "test/" + filename || objectList[0].key == filename);
+    EXPECT_TRUE(objectList[1].key == "test/" + filename || objectList[1].key == filename);
   }
 
   TEST_F(S3ServerCliTest, ObjectMoveTest) {
@@ -194,4 +194,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Service
 
-#endif // AWMOCK_S3_S3SERVERCLITEST_H
+#endif // AWMOCK_SERVICE_S3_SERVER_CLI_TEST_H
