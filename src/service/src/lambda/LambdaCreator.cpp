@@ -27,8 +27,7 @@ namespace AwsMock::Service {
       if (pWorkNf) {
         CreateLambdaFunction(pWorkNf->zipFileContent, pWorkNf->functionId);
       }
-      pNf = _createQueue.waitDequeueNotification();
-
+      pNf = _createQueue.waitDequeueNotification(1000);
     }
   }
 

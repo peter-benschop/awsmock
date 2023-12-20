@@ -58,6 +58,12 @@ namespace AwsMock::Service {
       } else if (module.name == "transfer") {
         auto *transferServer = (Service::TransferServer *) _serverMap[module.name];
         Poco::ThreadPool::defaultPool().start(*transferServer);
+      } else if (module.name == "cognito") {
+        auto *cognitoServer = (Service::CognitoServer *) _serverMap[module.name];
+        Poco::ThreadPool::defaultPool().start(*cognitoServer);
+      } else if (module.name == "dynamodb") {
+        auto *dynamoDbServer = (Service::DynamoDbServer *) _serverMap[module.name];
+        Poco::ThreadPool::defaultPool().start(*dynamoDbServer);
       } else if (module.name == "gateway") {
         auto *gatewayServer = (Service::GatewayServer *) _serverMap[module.name];
         Poco::ThreadPool::defaultPool().start(*gatewayServer);
@@ -163,6 +169,11 @@ namespace AwsMock::Service {
       infrastructure.cognitoUserPools = _cognitoDatabase->ListUserPools();
       infrastructure.cognitoUsers = _cognitoDatabase->ListUsers();
     }
+    if (services.HasService("all") || services.HasService("dynamodb")) {
+      std::shared_ptr<Database::DynamoDbDatabase> _dynamoDbDatabase = std::make_shared<Database::DynamoDbDatabase>(_configuration);
+      //infrastructure.cognitoUserPools = _dynamoDbDatabase->ListUserPools();
+      //infrastructure.cognitoUsers = _dynamoDbDatabase->ListUsers();
+    }
     if (services.HasService("all") || services.HasService("transfer")) {
       std::shared_ptr<Database::TransferDatabase> _transferDatabase = std::make_shared<Database::TransferDatabase>(_configuration);
       infrastructure.transferServers = _transferDatabase->ListServers();
@@ -252,6 +263,23 @@ namespace AwsMock::Service {
         log_info_stream(_logger) << "Cognito users imported, count: " << infrastructure.cognitoUsers.size() << std::endl;
       }
     }
+
+    // DynamoDB
+    if (!infrastructure.cognitoUserPools.empty() || !infrastructure.cognitoUsers.empty()) {
+      std::shared_ptr<Database::DynamoDbDatabase> _dynamoDatabase = std::make_shared<Database::DynamoDbDatabase>(_configuration);
+      if (!infrastructure.cognitoUserPools.empty()) {
+        for (auto &userPool : infrastructure.cognitoUserPools) {
+          //_dynamoDatabase->CreateOrUpdateUserPool(userPool);
+        }
+        log_info_stream(_logger) << "DynamoDb tables imported, count: " << infrastructure.cognitoUserPools.size() << std::endl;
+      }
+      if (!infrastructure.cognitoUsers.empty()) {
+        for (auto &user : infrastructure.cognitoUsers) {
+          //_cognitoDatabase->CreateOrUpdateUser(user);
+        }
+        log_info_stream(_logger) << "Cognito users imported, count: " << infrastructure.cognitoUsers.size() << std::endl;
+      }
+    }
   }
 
   void ModuleService::CleanInfrastructure(const Dto::Common::Services &services) {
@@ -280,6 +308,11 @@ namespace AwsMock::Service {
       std::shared_ptr<Database::CognitoDatabase> _cognitoDatabase = std::make_shared<Database::CognitoDatabase>(_configuration);
       _cognitoDatabase->DeleteAllUsers();
       _cognitoDatabase->DeleteAllUserPools();
+    }
+    if (services.HasService("all") || services.HasService("dynamodb")) {
+      std::shared_ptr<Database::DynamoDbDatabase> _dynamoDbDatabase = std::make_shared<Database::DynamoDbDatabase>(_configuration);
+      //_cognitoDatabase->DeleteAllUsers();
+      //_cognitoDatabase->DeleteAllUserPools();
     }
     if (services.HasService("all") || services.HasService("transfer")) {
       std::shared_ptr<Database::TransferDatabase> _transferDatabase = std::make_shared<Database::TransferDatabase>(_configuration);

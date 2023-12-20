@@ -2,7 +2,7 @@
 title: awsmockctl(1)
 section: 1
 header: awsmockctl AwsMock Controller
-footer: awsmockctl 0.5.154
+footer: awsmockctl 0.5.167
 date: December 18, 2023
 ---
 
@@ -144,7 +144,7 @@ Export the S3 infrastructure to a file ```infrastrcture.json```:
 Jens Vogt <jens.vogt@opitz-consulting.com>
 
 ## VERSION
-&nbsp;&nbsp;&nbsp;&nbsp; 0.5.154
+&nbsp;&nbsp;&nbsp;&nbsp; 0.5.167
 
 ## BUGS
 

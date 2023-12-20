@@ -258,7 +258,7 @@ namespace AwsMock::Service {
      * @param request HTTP request
      * @return request body as string
      */
-    static std::string GetBodyAsString(Poco::Net::HTTPServerRequest &request);
+    std::string GetBodyAsString(Poco::Net::HTTPServerRequest &request);
 
     /**
      * Send a OK response (HTTP state code 200).

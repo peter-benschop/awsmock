@@ -93,7 +93,9 @@ namespace AwsMock::Service {
   }
 
   void LambdaServer::StopExecutors() {
-    Poco::ThreadPool::defaultPool().stopAll();
+    _createQueue.wakeUpAll();
+    _invokeQueue.wakeUpAll();
+    Poco::ThreadPool::defaultPool().joinAll();
   }
 
   void LambdaServer::CleanupContainers() {

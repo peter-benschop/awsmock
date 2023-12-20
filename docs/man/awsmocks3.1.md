@@ -2,7 +2,7 @@
 title: awsmocks3(1)
 section: 1
 header: awsmocks3 AwsMock S3 module
-footer: awsmocks3 0.5.154
+footer: awsmocks3 0.5.167
 date: December 18, 2023
 ---
 
@@ -69,7 +69,7 @@ awslocal s3 cp s3://test-bucket-1/test/README.md test.md
 Jens Vogt <jens.vogt@opitz-consulting.com>
 
 ## VERSION
-&nbsp;&nbsp;&nbsp;&nbsp; 0.5.154
+&nbsp;&nbsp;&nbsp;&nbsp; 0.5.167
 
 ## BUGS
 

@@ -2,51 +2,37 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_RESOURCE_MODULE_HANDLER_H
-#define AWSMOCK_RESOURCE_MODULE_HANDLER_H
+#ifndef AWSMOCK_SERVICE_DYNAMODB_HANDLER_H
+#define AWSMOCK_SERVICE_DYNAMODB_HANDLER_H
 
 // Poco includes
-#include "Poco/Logger.h"
-#include "Poco/Task.h"
-#include "Poco/TaskManager.h"
-#include "Poco/JSON/JSON.h"
-#include <Poco/JSON/Array.h>
-#include <Poco/JSON/Object.h>
+#include <Poco/Logger.h>
+#include <Poco/DateTime.h>
+#include <Poco/DateTimeFormat.h>
+#include <Poco/DateTimeFormatter.h>
+#include <Poco/Net/HTTPServerRequestImpl.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/HttpUtils.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/MetricService.h>
 #include <awsmock/core/MetricServiceTimer.h>
 #include <awsmock/core/MetricDefinition.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/Infrastructure.h>
-#include <awsmock/dto/common/Services.h>
-#include "awsmock/dto/module/GatewayConfig.h"
-#include <awsmock/dto/module/Module.h>
-#include <awsmock/entity/module/Module.h>
-#include <awsmock/service/ModuleService.h>
-#include <awsmock/service/S3Server.h>
-#include <awsmock/service/SQSServer.h>
-#include <awsmock/service/SNSServer.h>
-#include <awsmock/service/LambdaServer.h>
-#include <awsmock/service/TransferServer.h>
-#include <awsmock/service/CognitoServer.h>
-#include <awsmock/service/DynamoDbServer.h>
-#include <awsmock/service/GatewayServer.h>
-#include <awsmock/repository/ModuleDatabase.h>
-#include <awsmock/resource/HandlerException.h>
-#include <awsmock/resource/AbstractResource.h>
+#include <awsmock/service/AbstractHandler.h>
+#include <awsmock/service/DynamoDbCliHandler.h>
+#include <awsmock/service/DynamoDbJava2Handler.h>
+#include <awsmock/service/DynamoDbCppHandler.h>
+#include <awsmock/service/DynamoDbService.h>
 
-#define MODULE_DEFAULT_HOST "localhost"
-#define MODULE_DEFAULT_PORT 9600
-
-namespace AwsMock {
+namespace AwsMock::Service {
 
   /**
-   * AwsMock module handler
+   * AWS DynamoDB mock handler
+   *
+   * <p>AWS DynamoDB HTTP request handler. All DynamoDB related REST call are ending here.<p>
    */
-  class ModuleHandler : public AwsMock::Resource::AbstractResource {
+  class DynamoDbHandler : public DynamoDbCliHandler, public DynamoDbCppHandler, public DynamoDbJava2Handler {
 
     public:
 
@@ -55,9 +41,8 @@ namespace AwsMock {
        *
        * @param configuration application configuration
        * @param metricService monitoring module
-       * @param serverMap map of services
        */
-      ModuleHandler(Core::Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap);
+      DynamoDbHandler(Core::Configuration &configuration, Core::MetricService &metricService);
 
     protected:
 
@@ -127,6 +112,16 @@ namespace AwsMock {
     private:
 
       /**
+       * Forward request to DynamoDB docker image.
+       *
+       * @param request incoming HTTP request
+       * @param response HTTP response
+       * @param host name of the host
+       * @param port container port
+       */
+      void ForwardRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &host, int port);
+
+      /**
        * Logger
        */
       Core::LogStream _logger;
@@ -142,21 +137,21 @@ namespace AwsMock {
       Core::MetricService &_metricService;
 
       /**
-       * Task manager
+       * DynamoDB module
        */
-      Service::ServerMap &_serverMap;
+      Service::DynamoDbService _dynamoDbService;
 
       /**
-       * Module database
+       * DynamoDB docker image host
        */
-      std::shared_ptr<Database::ModuleDatabase> _serviceDatabase;
+      std::string _dynamoDbHost;
 
       /**
-       * Module module
+       * DynamoDB docker image port
        */
-      std::shared_ptr<Service::ModuleService> _moduleService;
+      int _dynamoDbPort;
   };
 
 } // namespace AwsMock
 
-#endif // AWSMOCK_RESOURCE_MODULE_HANDLER_H
+#endif // AWSMOCK_SERVICE_DYNAMODB_HANDLER_H

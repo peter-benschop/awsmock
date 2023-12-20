@@ -2,7 +2,7 @@
 title: awsmockmgr(1)
 section: 1
 header: awsmockmgr AwsMock Manager
-footer: awsmockmgr 0.5.154
+footer: awsmockmgr 0.5.167
 date: December 18, 2023
 ---
 
@@ -81,7 +81,7 @@ Start the AwsMock manager as background daemon process with the 'debug' log leve
 Jens Vogt <jens.vogt@opitz-consulting.com>
 
 ## VERSION
-&nbsp;&nbsp;&nbsp;&nbsp; 0.5.154
+&nbsp;&nbsp;&nbsp;&nbsp; 0.5.167
 
 ## BUGS
 
@@ -89,4 +89,4 @@ Bugs and enhancement requests can be reported and filed at https://github.com/je
 
 ## SEE ALSO
 
-```awsmockctl(1)```, ```awsmocksqs(1)```, ```awsmocks3(1)```, ```awslocal(1)```
+```awsmockctl(1)```, ```awsmocksqs(1)```, ```awslocal(1)```, ```awsmocks3(1)```, ```awsmocksqs(1)```, ```awsmocksns(1)```

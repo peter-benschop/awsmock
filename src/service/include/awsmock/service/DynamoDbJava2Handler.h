@@ -2,16 +2,13 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_RESOURCE_MODULE_HANDLER_H
-#define AWSMOCK_RESOURCE_MODULE_HANDLER_H
+#ifndef AWSMOCK_SERVICE_DYNAMODB_JAVA2_HANDLER_H
+#define AWSMOCK_SERVICE_DYNAMODB_JAVA2_HANDLER_H
 
 // Poco includes
-#include "Poco/Logger.h"
-#include "Poco/Task.h"
-#include "Poco/TaskManager.h"
-#include "Poco/JSON/JSON.h"
-#include <Poco/JSON/Array.h>
-#include <Poco/JSON/Object.h>
+#include <Poco/DateTime.h>
+#include <Poco/DateTimeFormat.h>
+#include <Poco/DateTimeFormatter.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
@@ -19,34 +16,17 @@
 #include <awsmock/core/MetricService.h>
 #include <awsmock/core/MetricServiceTimer.h>
 #include <awsmock/core/MetricDefinition.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/Infrastructure.h>
-#include <awsmock/dto/common/Services.h>
-#include "awsmock/dto/module/GatewayConfig.h"
-#include <awsmock/dto/module/Module.h>
-#include <awsmock/entity/module/Module.h>
-#include <awsmock/service/ModuleService.h>
-#include <awsmock/service/S3Server.h>
-#include <awsmock/service/SQSServer.h>
-#include <awsmock/service/SNSServer.h>
-#include <awsmock/service/LambdaServer.h>
-#include <awsmock/service/TransferServer.h>
-#include <awsmock/service/CognitoServer.h>
-#include <awsmock/service/DynamoDbServer.h>
-#include <awsmock/service/GatewayServer.h>
-#include <awsmock/repository/ModuleDatabase.h>
-#include <awsmock/resource/HandlerException.h>
-#include <awsmock/resource/AbstractResource.h>
+#include <awsmock/core/NumberUtils.h>
+#include "awsmock/dto/common/UserAgent.h"
+#include <awsmock/service/AbstractHandler.h>
+#include <awsmock/service/DynamoDbService.h>
 
-#define MODULE_DEFAULT_HOST "localhost"
-#define MODULE_DEFAULT_PORT 9600
-
-namespace AwsMock {
+namespace AwsMock::Service {
 
   /**
-   * AwsMock module handler
+   * AWS DynamoDB Java2 mock handler
    */
-  class ModuleHandler : public AwsMock::Resource::AbstractResource {
+  class DynamoDbJava2Handler : public virtual AbstractHandler {
 
     public:
 
@@ -55,9 +35,8 @@ namespace AwsMock {
        *
        * @param configuration application configuration
        * @param metricService monitoring module
-       * @param serverMap map of services
        */
-      ModuleHandler(Core::Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap);
+      DynamoDbJava2Handler(Core::Configuration &configuration, Core::MetricService &metricService);
 
     protected:
 
@@ -92,7 +71,7 @@ namespace AwsMock {
        * @param user AWS user
        * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
        */
-      void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+      void handlePost(Poco::Net::HTTPRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) ;
 
       /**
        * Delete DELETE request.
@@ -127,6 +106,15 @@ namespace AwsMock {
     private:
 
       /**
+       * Return the command from the header or from the payload.
+       *
+       * @param request HTTP request
+       * @param payload HTTP payload
+       * @return SQS action
+       */
+      static std::string GetActionFromHeader(Poco::Net::HTTPServerRequest &request, const std::string &payload);
+
+      /**
        * Logger
        */
       Core::LogStream _logger;
@@ -142,21 +130,12 @@ namespace AwsMock {
       Core::MetricService &_metricService;
 
       /**
-       * Task manager
+       * DynamoDB module
        */
-      Service::ServerMap &_serverMap;
+      Service::DynamoDbService _dynamoDbService;
 
-      /**
-       * Module database
-       */
-      std::shared_ptr<Database::ModuleDatabase> _serviceDatabase;
-
-      /**
-       * Module module
-       */
-      std::shared_ptr<Service::ModuleService> _moduleService;
   };
 
-} // namespace AwsMock
+} // namespace AwsMock::Service
 
-#endif // AWSMOCK_RESOURCE_MODULE_HANDLER_H
+#endif // AWSMOCK_SERVICE_DYNAMODB_JAVA2_HANDLER_H
