@@ -16,21 +16,36 @@ namespace AwsMock::Service {
 
   }
 
-  void DynamoDbService::StartInstance(const std::string &region, const std::string &name) {
+  Dto::DynamoDb::CreateTableResponse DynamoDbService::CreateTable(const Dto::DynamoDb::CreateTableRequest &request) {
+    log_debug_stream(_logger) << "Start creating a new DynamoDb table, region: " << request.region << " name: " << request.tableName << std::endl;
 
-    log_debug_stream(_logger) << "Start creating a new DynamoDb instance, region: " << region << " name: " << name << std::endl;
+    if (_dynamoDbDatabase->TableExists(request.region, request.tableName)) {
+      log_warning_stream(_logger) << "DynamoDb table exists already, region: " << request.region << " name: " << request.tableName << std::endl;
+      throw Core::ServiceException("DynamoDb table exists already", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+    }
 
-    // Make local copy
-    Database::Entity::DynamoDb::DynamoDb dynamoDBEntity = _dynamoDbDatabase->GetDatabaseByName(region, name);
+    Dto::DynamoDb::CreateTableResponse createTableResponse;
+    try {
 
-    // Docker tag
-    //std::string dockerTag = GetDockerTag(lambdaEntity);
-    //log_debug_stream(_logger) << "Using docker tag: " << dockerTag << std::endl;
+      Database::Entity::DynamoDb::Table table = {
+        .region=request.region,
+        .name=request.tableName,
+        .attributes=request.attributes,
+        .tags=request.tags
+      };
 
-    // Build the docker image, if not existing
-    //if (!_dockerService.ImageExists(lambdaEntity.function, dockerTag)) {
-    //CreateDockerImage(functionCode, lambdaEntity, dockerTag);
-    //}
+      // Update database
+      table = _dynamoDbDatabase->CreateTable(table);
+
+      createTableResponse = {.region=table.region, .tableName=table.name, .tags=table.tags, .attributes=table.attributes};
+      log_info_stream(_logger) << "DynamoDb table created, name: " << table.name << std::endl;
+
+    } catch (Poco::Exception &exc) {
+      log_error_stream(_logger) << "DynamoDbd create table failed, message: " << exc.message() << std::endl;
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+    }
+
+    return createTableResponse;
+
   }
-
 } // namespace AwsMock::Service

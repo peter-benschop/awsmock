@@ -2,18 +2,17 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_COGNITO_SERVERJAVATEST_H
-#define AWMOCK_COGNITO_SERVERJAVATEST_H
+#ifndef AWMOCK_DYNAMODB_SERVER_JAVA_TEST_H
+#define AWMOCK_DYNAMODB_SERVER_JAVA_TEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
-#include <awsmock/core/FileUtils.h>
 #include <awsmock/core/TestUtils.h>
-#include <awsmock/repository/CognitoDatabase.h>
-#include <awsmock/service/CognitoServer.h>
+#include <awsmock/repository/DynamoDbDatabase.h>
+#include <awsmock/service/DynamoDbServer.h>
 
 #define REGION "eu-central-1"
 #define BUCKET "test-bucket"
@@ -22,51 +21,51 @@
 
 namespace AwsMock::Service {
 
-  class CognitoServerJavaTest : public ::testing::Test {
+  class DynamoDbServerJavaTest : public ::testing::Test {
 
     protected:
 
       void SetUp() override {
 
         // Define endpoint
-        std::string _port = _configuration.getString("awsmock.service.cognito.port", std::to_string(COGNITO_DEFAULT_PORT));
-        std::string _host = _configuration.getString("awsmock.service.cognito.host", COGNITO_DEFAULT_HOST);
+        std::string _port = _configuration.getString("awsmock.service.dynamodb.port", std::to_string(DYNAMODB_DEFAULT_PORT));
+        std::string _host = _configuration.getString("awsmock.service.dynamodb.host", DYNAMODB_DEFAULT_HOST);
         _endpoint = "http://" + _host + ":" + _port;
 
         // Set base command
-        _baseCommand = "java -jar /usr/local/lib/awsmock-java-test-0.0.1-SNAPSHOT-jar-with-dependencies.jar " + _endpoint + " cognito ";
+        _baseCommand = "java -jar /usr/local/lib/awsmock-java-test-0.0.1-SNAPSHOT-jar-with-dependencies.jar " + _endpoint + " dynamodb ";
 
         // Start HTTP manager
-        Poco::ThreadPool::defaultPool().start(_dynamoDbServer);
+        Poco::ThreadPool::defaultPool().start(_cognitoServer);
       }
 
       void TearDown() override {
-        _database.DeleteAllUsers();
-        _database.DeleteAllUserPools();
-        _dynamoDbServer.StopServer();
+        //_database.DeleteAllUsers();
+        _database.DeleteAllTables();
+        _cognitoServer.StopServer();
       }
 
       std::string _endpoint, _baseCommand;
       Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
       Core::MetricService _metricService = Core::MetricService(_configuration);
-      Database::CognitoDatabase _database = Database::CognitoDatabase(_configuration);
-      CognitoServer _dynamoDbServer = CognitoServer(_configuration, _metricService);
+      Database::DynamoDbDatabase _database = Database::DynamoDbDatabase(_configuration);
+      DynamoDbServer _cognitoServer = DynamoDbServer(_configuration, _metricService);
   };
 
-  TEST_F(CognitoServerJavaTest, UserPoolCreateTest) {
+  TEST_F(DynamoDbServerJavaTest, TableCreateTest) {
 
     // arrange
 
     // act
-    Core::ExecResult result = Core::SystemUtils::Exec(_baseCommand + "create-user-pool test-user-pool");
-    Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
+    Core::ExecResult result = Core::SystemUtils::Exec(_baseCommand + "create-table test-table");
+    Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
 
     // assert
     EXPECT_EQ(0, result.status);
-    EXPECT_EQ(1, userPoolList.size());
+    EXPECT_EQ(1, tableList.size());
   }
 
-  TEST_F(CognitoServerJavaTest, UserPoolListTest) {
+  /*TEST_F(CognitoServerJavaTest, UserPoolListTest) {
 
     // arrange
     Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + "create-user-pool test-user-pool");
@@ -132,8 +131,8 @@ namespace AwsMock::Service {
     // assert
     EXPECT_EQ(0, result.status);
     EXPECT_EQ(0, userList.size());
-  }
+  }*/
 
 } // namespace AwsMock::Service
 
-#endif // AWMOCK_COGNITO_SERVERJAVATEST_H
+#endif // AWMOCK_DYNAMODB_SERVER_JAVA_TEST_H

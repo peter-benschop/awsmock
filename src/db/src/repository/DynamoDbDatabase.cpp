@@ -15,7 +15,8 @@ namespace AwsMock::Database {
     if (HasDatabase()) {
 
       // Get collection
-      _dynamodbCollection = GetConnection()["dynamo_db"];
+      _dynamodbCollection = GetConnection()["dynamodb"];
+      _tableCollection = GetConnection()["dynamodb_table"];
 
     }
   }
@@ -144,16 +145,16 @@ namespace AwsMock::Database {
 
     }
     return -1;
-  }
+  }*/
 
-  Entity::Lambda::Lambda LambdaDatabase::CreateLambda(const Entity::Lambda::Lambda &lambda) {
+  Entity::DynamoDb::Table DynamoDbDatabase::CreateTable(const Entity::DynamoDb::Table &table) {
 
     if (HasDatabase()) {
 
       try {
-        auto result = _lambdaCollection.insert_one(lambda.ToDocument());
-        log_trace_stream(_logger) << "Bucket created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
-        return GetLambdaById(result->inserted_id().get_oid().value);
+        auto result = _tableCollection.insert_one(table.ToDocument());
+        log_trace_stream(_logger) << "DynamoDb table created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
+        return GetTableById(result->inserted_id().get_oid().value);
 
       } catch (const mongocxx::exception &exc) {
         _logger.error() << "Database exception " << exc.what() << std::endl;
@@ -162,22 +163,22 @@ namespace AwsMock::Database {
 
     } else {
 
-      return _memoryDb.CreateLambda(lambda);
+      return _memoryDb.CreateTable(table);
 
     }
   }
 
-  Entity::Lambda::Lambda LambdaDatabase::GetLambdaById(bsoncxx::oid oid) {
+  Entity::DynamoDb::Table DynamoDbDatabase::GetTableById(bsoncxx::oid oid) {
 
     try {
 
-      mongocxx::stdx::optional<bsoncxx::document::value> mResult = _lambdaCollection.find_one(make_document(kvp("_id", oid)));
+      mongocxx::stdx::optional<bsoncxx::document::value> mResult = _tableCollection.find_one(make_document(kvp("_id", oid)));
       if (!mResult) {
-        _logger.error() << "Database exception: Lambda not found " << std::endl;
-        throw Core::DatabaseException("Database exception, Lambda not found ", 500);
+        _logger.error() << "Database exception: Table not found " << std::endl;
+        throw Core::DatabaseException("Database exception, Table not found ", 500);
       }
 
-      Entity::Lambda::Lambda result;
+      Entity::DynamoDb::Table result;
       result.FromDocument(mResult);
       return result;
 
@@ -188,19 +189,19 @@ namespace AwsMock::Database {
 
   }
 
-  Entity::Lambda::Lambda LambdaDatabase::GetLambdaById(const std::string &oid) {
+  Entity::DynamoDb::Table DynamoDbDatabase::GetTableById(const std::string &oid) {
 
     if (HasDatabase()) {
 
-      return GetLambdaById(bsoncxx::oid(oid));
+      return GetTableById(bsoncxx::oid(oid));
 
     } else {
 
-      return _memoryDb.GetLambdaById(oid);
+      return _memoryDb.GetTableById(oid);
     }
   }
 
-  Entity::Lambda::Lambda LambdaDatabase::GetLambdaByArn(const std::string &arn) {
+/*  Entity::Lambda::Lambda LambdaDatabase::GetLambdaByArn(const std::string &arn) {
 
     if (HasDatabase()) {
 
@@ -257,29 +258,51 @@ namespace AwsMock::Database {
       return _memoryDb.UpdateLambda(lambda);
 
     }
+  }*/
+
+  bool DynamoDbDatabase::TableExists(const std::string &region, const std::string &tableName) {
+
+    if (HasDatabase()) {
+
+      try {
+
+        int64_t count = _tableCollection.count_documents(make_document(kvp("region", region), kvp("tableName", tableName)));
+        log_trace_stream(_logger) << "DynamoDb table exists: " << (count > 0 ? "true" : "false") << std::endl;
+        return count > 0;
+
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+      }
+
+    } else {
+
+      return _memoryDb.TableExists(region, tableName);
+
+    }
   }
 
-  std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdas(const std::string &region) {
+  std::vector<Entity::DynamoDb::Table> DynamoDbDatabase::ListTables(const std::string &region) {
 
-    std::vector<Entity::Lambda::Lambda> lambdas;
+    std::vector<Entity::DynamoDb::Table> tables;
     if (HasDatabase()) {
 
       try {
 
         if(region.empty()) {
 
-          auto lambdaCursor = _lambdaCollection.find({});
+          auto lambdaCursor = _tableCollection.find({});
           for (auto lambda : lambdaCursor) {
-            Entity::Lambda::Lambda result;
+            Entity::DynamoDb::Table result;
             result.FromDocument(lambda);
-            lambdas.push_back(result);
+            tables.push_back(result);
           }
         } else{
-          auto lambdaCursor = _lambdaCollection.find(make_document(kvp("region", region)));
+          auto lambdaCursor = _tableCollection.find(make_document(kvp("region", region)));
           for (auto lambda : lambdaCursor) {
-            Entity::Lambda::Lambda result;
+            Entity::DynamoDb::Table result;
             result.FromDocument(lambda);
-            lambdas.push_back(result);
+            tables.push_back(result);
           }
 
         }
@@ -291,21 +314,21 @@ namespace AwsMock::Database {
 
     } else {
 
-      lambdas = _memoryDb.ListLambdas(region);
+      tables = _memoryDb.ListTables(region);
     }
 
-    log_trace_stream(_logger) << "Got lamda list, size:" << lambdas.size() << std::endl;
-    return lambdas;
+    log_trace_stream(_logger) << "Got DynamoDb table list, size:" << tables.size() << std::endl;
+    return tables;
   }
 
-  void LambdaDatabase::DeleteLambda(const std::string &functionName) {
+  void DynamoDbDatabase::DeleteTable(const std::string &tableName) {
 
     if (HasDatabase()) {
 
       try {
 
-        auto result = _lambdaCollection.delete_many(make_document(kvp("function", functionName)));
-        log_debug_stream(_logger) << "lambda deleted, function: " << functionName << " count: " << result->deleted_count() << std::endl;
+        auto result = _tableCollection.delete_many(make_document(kvp("tableName", tableName)));
+        log_debug_stream(_logger) << "DynamoDB table deleted, tableName: " << tableName << " count: " << result->deleted_count() << std::endl;
 
       } catch (const mongocxx::exception &exc) {
         _logger.error() << "Database exception " << exc.what() << std::endl;
@@ -314,19 +337,19 @@ namespace AwsMock::Database {
 
     } else {
 
-      _memoryDb.DeleteLambda(functionName);
+      _memoryDb.DeleteTable(tableName);
 
     }
   }
 
-  void LambdaDatabase::DeleteAllLambdas() {
+  void DynamoDbDatabase::DeleteAllTables() {
 
     if (HasDatabase()) {
 
       try {
 
-        auto result = _lambdaCollection.delete_many({});
-        log_debug_stream(_logger) << "All lambdas deleted, count: " << result->deleted_count() << std::endl;
+        auto result = _tableCollection.delete_many({});
+        log_debug_stream(_logger) << "All DynamoDb tables deleted, count: " << result->deleted_count() << std::endl;
 
       } catch (const mongocxx::exception &exc) {
         _logger.error() << "Database exception " << exc.what() << std::endl;
@@ -335,9 +358,9 @@ namespace AwsMock::Database {
 
     } else {
 
-      _memoryDb.DeleteAllLambdas();
+      _memoryDb.DeleteAllTables();
 
     }
-  }*/
+  }
 
 } // namespace AwsMock::Database

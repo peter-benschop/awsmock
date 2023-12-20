@@ -42,6 +42,11 @@
 
 namespace AwsMock::Service {
 
+  /**
+   * AwsMock DynamoDB server
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   class DynamoDbServer : public AbstractServer, public AbstractWorker {
 
     public:
@@ -68,11 +73,6 @@ namespace AwsMock::Service {
        * Stop monitoring manager
        */
       void StopMonitoringServer();
-
-      /**
-       * Stop executors
-       */
-      void StopExecutors();
 
     private:
 

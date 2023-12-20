@@ -23,21 +23,24 @@ namespace AwsMock::Service {
     DumpResponse(response);
   }
 
-  void DynamoDbJava2Handler::handlePost(Poco::Net::HTTPRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
+  void DynamoDbJava2Handler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
 
     try {
-      log_trace_stream(_logger) << "Dump request" << std::endl;
-      std::cerr << "==================== Request =====================" << std::endl;
-      request.write(std::cerr);
-      std::cerr << "==================================================" << std::endl;
-      Dto::Common::UserAgent userAgent;
-      //userAgent.FromRequest(request, "dynamodb");
 
-      /*std::string requestId = GetHeaderValue(request, "RequestId", Poco::UUIDGenerator().createRandom().toString());
+      std::string requestId = GetHeaderValue(request, "RequestId", Poco::UUIDGenerator().createRandom().toString());
       std::string payload = GetBodyAsString(request);
-      std::string action = GetActionFromHeader(request, payload);*/
+      std::string action = GetActionFromHeader(request, payload);
 
-      SendOkResponse(response);
+      if(action == "CreateTable") {
+
+        Dto::DynamoDb::CreateTableRequest tableRequest;
+        tableRequest.FromJson(payload);
+
+        Dto::DynamoDb::CreateTableResponse tableResponse = _dynamoDbService.CreateTable(tableRequest);
+        SendOkResponse(response,tableResponse.ToJson());
+
+      }
+
     } catch (Core::ServiceException &exc) {
       _logger.error() << "DynamoDb module exception: " << exc.message() << std::endl;
       SendJsonErrorResponse("DynamoDb", response, exc);
