@@ -57,7 +57,7 @@ namespace AwsMock::Dto::SQS {
      *
      * @return XML string
      */
-    std::string ToXml() const;
+    [[nodiscard]] std::string ToXml() const;
 
     /**
      * Convert to a JSON string

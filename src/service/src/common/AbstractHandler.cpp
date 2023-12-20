@@ -347,6 +347,7 @@ namespace AwsMock::Service {
   std::string AbstractHandler::GetBodyAsString(Poco::Net::HTTPServerRequest &request) {
     std::stringstream sstream;
     sstream << request.stream().rdbuf();
+    request.stream().seekg(0, request.stream().beg);
     return sstream.str();
   }
 

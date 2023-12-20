@@ -2,37 +2,31 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_DYNAMODB_HANDLER_H
-#define AWSMOCK_SERVICE_DYNAMODB_HANDLER_H
+#ifndef AWSMOCK_SERVICE_DYNAMODB_CLI_HANDLER_H
+#define AWSMOCK_SERVICE_DYNAMODB_CLI_HANDLER_H
 
 // Poco includes
-#include <Poco/Logger.h>
 #include <Poco/DateTime.h>
 #include <Poco/DateTimeFormat.h>
 #include <Poco/DateTimeFormatter.h>
-#include <Poco/Net/HTTPServerRequestImpl.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/MetricService.h>
 #include <awsmock/core/MetricServiceTimer.h>
 #include <awsmock/core/MetricDefinition.h>
+#include <awsmock/core/NumberUtils.h>
+#include "awsmock/dto/common/UserAgent.h"
 #include <awsmock/service/AbstractHandler.h>
-#include <awsmock/service/DynamoDbCliHandler.h>
-#include <awsmock/service/DynamoDbJava2Handler.h>
-#include <awsmock/service/DynamoDbCppHandler.h>
-#include <awsmock/service/DynamoDbService.h>
+#include <awsmock/service/S3Service.h>
 
 namespace AwsMock::Service {
 
   /**
-   * AWS DynamoDB mock handler
-   *
-   * <p>AWS DynamoDB HTTP request handler. All DynamoDB related REST call are ending here.<p>
+   * AWS DynamoDB CLI mock handler
    */
-  class DynamoDbHandler : public DynamoDbCliHandler, public DynamoDbCppHandler, public DynamoDbJava2Handler {
+  class DynamoDbCliHandler : public virtual AbstractHandler {
 
     public:
 
@@ -42,7 +36,7 @@ namespace AwsMock::Service {
        * @param configuration application configuration
        * @param metricService monitoring module
        */
-      DynamoDbHandler(Core::Configuration &configuration, Core::MetricService &metricService);
+      DynamoDbCliHandler(Core::Configuration &configuration, Core::MetricService &metricService);
 
     protected:
 
@@ -112,16 +106,6 @@ namespace AwsMock::Service {
     private:
 
       /**
-       * Forward request to DynamoDB docker image.
-       *
-       * @param request incoming HTTP request
-       * @param response HTTP response
-       * @param host name of the host
-       * @param port container port
-       */
-      void ForwardRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &host, int port);
-
-      /**
        * Logger
        */
       Core::LogStream _logger;
@@ -137,21 +121,12 @@ namespace AwsMock::Service {
       Core::MetricService &_metricService;
 
       /**
-       * DynamoDB module
+       * S3 module
        */
-      Service::DynamoDbService _dynamoDbService;
+      Service::S3Service _s3Service;
 
-      /**
-       * DynamoDB docker image host
-       */
-      std::string _dynamoDbHost;
-
-      /**
-       * DynamoDB docker image port
-       */
-      int _dynamoDbPort;
   };
 
-} // namespace AwsMock
+} // namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_DYNAMODB_HANDLER_H
+#endif // AWSMOCK_SERVICE_DYNAMODB_CLI_HANDLER_H

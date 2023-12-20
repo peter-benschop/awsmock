@@ -104,7 +104,7 @@ namespace AwsMock::Service {
           sqsRequest = {.region=region, .queueUrl=queueUrl, .body=body, .messageAttributes=attributes, .requestId=requestId, .messageId=requestId};
 
           Dto::SQS::SendMessageResponse sqsResponse = _sqsService.SendMessage(sqsRequest);
-          SendOkResponse(response, sqsResponse.ToJson());
+          SendOkResponse(response, sqsResponse.ToXml());
         }
 
       } else if (action == "GetQueueUrl") {

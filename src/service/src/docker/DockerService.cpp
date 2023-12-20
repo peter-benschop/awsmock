@@ -13,7 +13,7 @@ namespace AwsMock::Service {
     _networkName = _configuration.getString("awsmock.docker.network.name", NETWORK_NAME);
     _containerPort = _configuration.getString("awsmock.docker.container.port", CONTAINER_PORT);
 
-    log_debug_stream(_logger) << "Network mode: " << _networkMode << std::endl;
+    log_trace_stream(_logger) << "Network mode: " << _networkMode << std::endl;
   }
 
   bool DockerService::ImageExists(const std::string &name, const std::string &tag) {

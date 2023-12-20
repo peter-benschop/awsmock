@@ -3,8 +3,9 @@
 
 namespace AwsMock::Service {
 
-  DynamoDbHandler::DynamoDbHandler(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractHandler(), _logger(Poco::Logger::get("DynamoDbHandler")), _configuration(configuration), _metricService(metricService),
-                                                                                                             _dynamoDbService(configuration, metricService) {
+  DynamoDbHandler::DynamoDbHandler(Core::Configuration &configuration, Core::MetricService &metricService) : DynamoDbCliHandler(configuration, metricService), DynamoDbCppHandler(configuration, metricService),
+                                                                                                             DynamoDbJava2Handler(configuration, metricService), _logger(Poco::Logger::get("DynamoDbHandler")), _configuration(configuration),
+                                                                                                             _metricService(metricService), _dynamoDbService(configuration, metricService) {
 
     // Get environment
     _dynamoDbHost = _configuration.getString("awsmock.service.dynamodb.host", "localhost");
@@ -48,15 +49,8 @@ namespace AwsMock::Service {
 
     try {
 
-      // Get the action
-      Dto::Common::UserAgent userAgent;
-      userAgent.FromRequest(request, "dynamodb");
-
       // Forward request to docker image
       ForwardRequest(request, response, _dynamoDbHost, _dynamoDbPort);
-
-      if(userAgent.clientCommand == "list-tables") {
-      }
 
     } catch (Poco::Exception &exc) {
       SendXmlErrorResponse("lambda", response, exc);

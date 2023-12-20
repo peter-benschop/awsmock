@@ -29,11 +29,11 @@ namespace AwsMock::Dto::SQS {
     pDoc->appendChild(pRoot);
 
     // CreateQueueResult
-    Poco::XML::AutoPtr<Poco::XML::Element> pQueueUelResult = pDoc->createElement("GetQueueUrlResult");
-    pRoot->appendChild(pQueueUelResult);
+    Poco::XML::AutoPtr<Poco::XML::Element> pQueueUrlResult = pDoc->createElement("GetQueueUrlResult");
+    pRoot->appendChild(pQueueUrlResult);
 
     Poco::XML::AutoPtr<Poco::XML::Element> pQueueUrl = pDoc->createElement("QueueUrl");
-    pQueueUelResult->appendChild(pQueueUrl);
+    pQueueUrlResult->appendChild(pQueueUrl);
     Poco::XML::AutoPtr<Poco::XML::Text> pQueueUrlText = pDoc->createTextNode(queueUrl);
     pQueueUrl->appendChild(pQueueUrlText);
 
@@ -48,10 +48,9 @@ namespace AwsMock::Dto::SQS {
 
     std::stringstream output;
     Poco::XML::DOMWriter writer;
-    writer.setNewLine("\n");
-    writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
+    writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION);
     writer.writeNode(output, pDoc);
-
+    std::string tmp = output.str();
     return output.str();
   }
 
