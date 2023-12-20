@@ -17,6 +17,7 @@ namespace AwsMock::Database {
       {"lambda", {.name="lambda", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
       {"transfer", {.name="transfer", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
       {"cognito", {.name="cognito", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+      {"dynamodb", {.name="dynamodb", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
       {"gateway", {.name="gateway", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
       {"database", {.name="database", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}}
   };
@@ -158,8 +159,8 @@ namespace AwsMock::Database {
         return GetModuleById(result->inserted_id().get_oid().value);
 
       } catch (mongocxx::exception::system_error &e) {
-        log_error_stream(_logger) << "Get module by ID failed, error: " << e.what() << std::endl;
-        throw Core::DatabaseException("Get module by ID failed, error: " + std::string(e.what()));
+        log_error_stream(_logger) << "Create module failed, error: " << e.what() << std::endl;
+        throw Core::DatabaseException("Create module failed, error: " + std::string(e.what()));
       }
 
     } else {

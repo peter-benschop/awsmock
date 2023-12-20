@@ -1,7 +1,7 @@
 
 find_program(PANDOC_EXECUTABLE NAMES pandoc)
 
-set(MAN_NAMES awsmockmgr.1 awsmockctl.1 awsmocksqs.1 awsmocks3.1 awslocal.1 awsmockcfg.1)
+set(MAN_NAMES awsmockmgr.1 awsmockctl.1  awsmockcfg.1 awslocal.1 awsmocksqs.1 awsmocks3.1 awsmocksns.1  awsmocklambda.1)
 set(MAN_FILES)
 foreach(m IN LISTS MAN_NAMES)
     set(mf ${CMAKE_CURRENT_SOURCE_DIR}/man/${m})

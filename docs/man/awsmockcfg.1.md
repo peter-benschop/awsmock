@@ -2,7 +2,7 @@
 title: awsmockcfg(1)
 section: 1
 header: awsmockcfg AwsMock configuration
-footer: awsmockcfg 0.5.154
+footer: awsmockcfg 0.5.167
 date: December 18, 2023
 ---
 
@@ -152,7 +152,7 @@ variable. Finally, the log level will be set to ```debug```.
 Jens Vogt <jens.vogt@opitz-consulting.com>
 
 ## VERSION
-&nbsp;&nbsp;&nbsp;&nbsp; 0.5.154
+&nbsp;&nbsp;&nbsp;&nbsp; 0.5.167
 
 ## BUGS
 

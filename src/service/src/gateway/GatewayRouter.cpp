@@ -8,14 +8,19 @@ namespace AwsMock::Service {
 
   GatewayRouter::GatewayRouter(Core::Configuration &configuration, Core::MetricService &metricService) : _logger(Poco::Logger::get("Router")), _configuration(configuration), _metricService(metricService) {
 
+    // Get the ports
+    int s3Port = _configuration.getInt("awsmock.service.s3.port", 9500);
+    int dynamodbPort = _configuration.getInt("awsmock.service.dynamodb.port", 9500);
+
     // Add routes
-    _routingTable["s3"] = {.name="s3", .host="localhost", .port=9500};
+    _routingTable["s3"] = {.name="s3", .host="localhost", .port=s3Port};
     _routingTable["s3api"] = {.name="s3", .host="localhost", .port=9500};
     _routingTable["sqs"] = {.name="sqs", .host="localhost", .port=9501};
     _routingTable["sns"] = {.name="sns", .host="localhost", .port=9502};
     _routingTable["lambda"] = {.name="lambda", .host="localhost", .port=9503};
     _routingTable["transfer"] = {.name="transfer", .host="localhost", .port=9504};
     _routingTable["cognito-idp"] = {.name="cognito", .host="localhost", .port=9505};
+    _routingTable["dynamodb"] = {.name="dynamodb", .host="localhost", .port=dynamodbPort};
     log_debug_stream(_logger) << "Gateway router initialized" << std::endl;
   }
 

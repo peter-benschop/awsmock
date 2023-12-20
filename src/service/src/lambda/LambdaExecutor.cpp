@@ -16,7 +16,7 @@ namespace AwsMock::Service {
       if (pWorkNf) {
         SendInvocationRequest(pWorkNf->hostName, pWorkNf->port, pWorkNf->payload);
       }
-      pNf = _invokeQueue.waitDequeueNotification();
+      pNf = _invokeQueue.waitDequeueNotification(1000);
     }
   }
 

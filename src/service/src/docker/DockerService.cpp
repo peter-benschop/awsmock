@@ -35,7 +35,7 @@ namespace AwsMock::Service {
 
     std::string queryString = Core::StringUtils::UrlEncode("name=" + name + "&tag=" + tag + "&fromImage=" + fromImage);
     Core::CurlResponse curlResponse =
-        _curlUtils.SendUnixSocketRequest("POST", "http://localhost/images/create?name=" + name + "&tag=" + tag + "&fromImage=" + fromImage);
+      _curlUtils.SendUnixSocketRequest("POST", "http://localhost/images/create?name=" + name + "&tag=" + tag + "&fromImage=" + fromImage);
     log_trace_stream(_logger) << "Create image request send to docker daemon, output: " << curlResponse.ToString() << std::endl;
 
     if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
@@ -83,6 +83,25 @@ namespace AwsMock::Service {
       log_error_stream(_logger) << "Build image failed, state: " << curlResponse.statusCode << std::endl;
     }
     return imageFile;
+  }
+
+  std::string DockerService::BuildImage(const std::string &name, const std::string &tag, const std::string &dockerFile) {
+    log_debug_stream(_logger) << "Build image request, name: " << name << " tags: " << tag << std::endl;
+
+    // Write docker file
+    std::string codeDir = Core::DirUtils::CreateTempDir();
+    std::ofstream ofs(codeDir + Poco::Path::separator() + "Dockerfile");
+    ofs << dockerFile;
+    ofs.close();
+
+    Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketFileRequest("POST", "http://localhost/build?t=" + name + ":" + tag + "&q=true", {}, dockerFile);
+    log_debug_stream(_logger) << "Docker image build, image: " << name << ":" << tag << std::endl;
+    log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
+
+    if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
+      log_error_stream(_logger) << "Build image failed, state: " << curlResponse.statusCode << std::endl;
+    }
+    return dockerFile;
   }
 
   void DockerService::DeleteImage(const std::string &id) {
@@ -163,14 +182,43 @@ namespace AwsMock::Service {
 
     // Create the request
     Dto::Docker::CreateContainerRequest request = {
-        .hostName=name,
-        .domainName=name + _networkName,
-        .user="root",
-        .image=name + ":" + tag,
-        .networkMode=_networkMode,
-        .environment=environment,
-        .containerPort=_containerPort,
-        .hostPort=std::to_string(hostPort)
+      .hostName=name,
+      .domainName=name + _networkName,
+      .user="root",
+      .image=name + ":" + tag,
+      .networkMode=_networkMode,
+      .environment=environment,
+      .containerPort=_containerPort,
+      .hostPort=std::to_string(hostPort)
+    };
+
+    std::string jsonBody = request.ToJson();
+    Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketRequest("POST", "http://localhost/containers/create?name=" + name, jsonBody);
+    log_debug_stream(_logger) << "Create container request send to docker daemon" << std::endl;
+    log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
+
+    if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_CREATED) {
+      log_warning_stream(_logger) << "Create container failed, state: " << curlResponse.statusCode << std::endl;
+      return {};
+    }
+
+    Dto::Docker::CreateContainerResponse response = {.hostPort=hostPort};
+    response.FromJson(curlResponse.output);
+
+    return response;
+  }
+
+  Dto::Docker::CreateContainerResponse DockerService::CreateContainer(const std::string &name, const std::string &tag, int hostPort, int containerPort) {
+
+    // Create the request
+    Dto::Docker::CreateContainerRequest request = {
+      .hostName=name,
+      .domainName=name + _networkName,
+      .user="root",
+      .image=name + ":" + tag,
+      .networkMode=_networkMode,
+      .containerPort=std::to_string(containerPort),
+      .hostPort=std::to_string(hostPort)
     };
 
     std::string jsonBody = request.ToJson();

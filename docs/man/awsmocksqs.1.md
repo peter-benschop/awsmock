@@ -2,7 +2,7 @@
 title: awsmocksqs(1)
 section: 1
 header: awsmocksqs AwsMock SQS module
-footer: awsmocksqs 0.5.154
+footer: awsmocksqs 0.5.167
 date: December 18, 2023
 ---
 
@@ -23,8 +23,8 @@ corresponding man page ```awslocal(1)```.
 
 ## COMMANDS
 
-```awslocal sqs create-queue --queue-name <queue-name>```  
-&nbsp;&nbsp;&nbsp;&nbsp;creates a new queue
+```awslocal lambda create-function --function-name <function-name>```  
+&nbsp;&nbsp;&nbsp;&nbsp;creates a new lambda function
 
 ```awslocal sqs list-queues```  
 &nbsp;&nbsp;&nbsp;&nbsp;lists all available queues
@@ -39,7 +39,7 @@ corresponding man page ```awslocal(1)```.
 
 To create a new queue:
 ```
-awslocal sqs create-queue --queue-name test-queue"
+awslocal sqs create-queue --queue-name test-queue
 {
     "QueueUrl": "http://localhost:4566/000000000000/test-queue"
 }
@@ -47,7 +47,7 @@ awslocal sqs create-queue --queue-name test-queue"
 
 To get a list of all currently available queues:
 ```
-awslocal sqs list-queues"
+awslocal sqs list-queues
 {
     "QueueUrls": [
         "http://localhost:4566/000000000000/test-dlqueue",
@@ -115,7 +115,7 @@ awslocal sqs delete-queue --queue-url "http://localhost:4566/000000000000/test-q
 Jens Vogt <jens.vogt@opitz-consulting.com>
 
 ## VERSION
-&nbsp;&nbsp;&nbsp;&nbsp; 0.5.154
+&nbsp;&nbsp;&nbsp;&nbsp; 0.5.167
 
 ## BUGS
 
@@ -123,4 +123,4 @@ Bugs and enhancement requests can be reported and filed at https://github.com/je
 
 ## SEE ALSO
 
-```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocks3(1)```
+```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocks3(1)```, ```awsmocksns(1)```, ```awsmocklambda(1)```

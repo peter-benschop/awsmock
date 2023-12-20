@@ -25,6 +25,8 @@
 #include <awsmock/service/SQSServer.h>
 #include <awsmock/service/SNSServer.h>
 #include <awsmock/service/LambdaServer.h>
+#include <awsmock/service/CognitoServer.h>
+#include <awsmock/service/DynamoDbServer.h>
 #include <awsmock/service/TransferServer.h>
 
 namespace AwsMock::Service {

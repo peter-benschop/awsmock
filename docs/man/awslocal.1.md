@@ -2,7 +2,7 @@
 title: awslocal(1)
 section: 1
 header: awslocal AwsMock local command
-footer: awslocal 0.5.154
+footer: awslocal 0.5.167
 date: December 18, 2023
 ---
 
@@ -64,7 +64,7 @@ awslocal sqs get-queue-attributes --queue-url http://localhost:4566/000000000000
 Jens Vogt <jens.vogt@opitz-consulting.com>
 
 ## VERSION
-&nbsp;&nbsp;&nbsp;&nbsp; 0.5.154
+&nbsp;&nbsp;&nbsp;&nbsp; 0.5.167
 
 ## BUGS
 
