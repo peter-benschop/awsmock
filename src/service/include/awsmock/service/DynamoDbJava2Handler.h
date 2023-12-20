@@ -17,7 +17,9 @@
 #include <awsmock/core/MetricServiceTimer.h>
 #include <awsmock/core/MetricDefinition.h>
 #include <awsmock/core/NumberUtils.h>
-#include "awsmock/dto/common/UserAgent.h"
+#include <awsmock/dto/common/UserAgent.h>
+#include <awsmock/dto/dynamodb/CreateTableRequest.h>
+#include <awsmock/dto/dynamodb/CreateTableResponse.h>
 #include <awsmock/service/AbstractHandler.h>
 #include <awsmock/service/DynamoDbService.h>
 
@@ -65,13 +67,13 @@ namespace AwsMock::Service {
       /**
        * HTTP POST request.
        *
-       * @param request HTTP request
-       * @param response HTTP response
+       * @param request HTTP server request
+       * @param response HTTP server response
        * @param region AWS region name
        * @param user AWS user
        * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
        */
-      void handlePost(Poco::Net::HTTPRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) ;
+      void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) ;
 
       /**
        * Delete DELETE request.

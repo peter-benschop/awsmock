@@ -2,11 +2,11 @@
 // Created by vogje01 on 20/12/2023.
 //
 
-#include <awsmock/dto/dynamodb/CreateTableRequest.h>
+#include <awsmock/dto/dynamodb/CreateTableResponse.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
-  std::string CreateTableRequest::ToJson() {
+  std::string CreateTableResponse::ToJson() {
 
     try {
       Poco::JSON::Object rootJson;
@@ -41,7 +41,7 @@ namespace AwsMock::Dto::DynamoDb {
     }
   }
 
-  void CreateTableRequest::FromJson(const std::string &body) {
+  void CreateTableResponse::FromJson(const std::string &body) {
 
     Poco::JSON::Parser parser;
     Poco::Dynamic::Var result = parser.parse(body);
@@ -54,26 +54,22 @@ namespace AwsMock::Dto::DynamoDb {
 
       // Tags
       Poco::JSON::Array::Ptr jsonTagsArray = rootObject->getArray("Tags");
-      if(!jsonTagsArray.isNull()) {
-        for (size_t i = 0; i < jsonTagsArray->size(); i++) {
-          std::string key, value;
-          Poco::JSON::Object::Ptr jsonTagsObject = jsonTagsArray->getObject(i);
-          Core::JsonUtils::GetJsonValueString("Key", jsonTagsObject, key);
-          Core::JsonUtils::GetJsonValueString("Value", jsonTagsObject, value);
-          tags[key] = value;
-        }
+      for(size_t i = 0; i < jsonTagsArray->size(); i++) {
+        std::string key, value;
+        Poco::JSON::Object::Ptr jsonTagsObject = jsonTagsArray->getObject(i);
+        Core::JsonUtils::GetJsonValueString("Key", jsonTagsObject, key);
+        Core::JsonUtils::GetJsonValueString("Value", jsonTagsObject, value);
+        tags[key] = value;
       }
 
       // Attributes
       Poco::JSON::Array::Ptr jsonAttributeArray = rootObject->getArray("AttributeDefinitions");
-      if(!jsonAttributeArray.isNull()) {
-        for (size_t i = 0; i < jsonAttributeArray->size(); i++) {
-          std::string name, type;
-          Poco::JSON::Object::Ptr jsonAttributeObject = jsonAttributeArray->getObject(i);
-          Core::JsonUtils::GetJsonValueString("AttributeName", jsonAttributeObject, name);
-          Core::JsonUtils::GetJsonValueString("AttributeType", jsonAttributeObject, type);
-          tags[name] = type;
-        }
+      for(size_t i = 0; i < jsonAttributeArray->size(); i++) {
+        std::string name, type;
+        Poco::JSON::Object::Ptr jsonAttributeObject = jsonAttributeArray->getObject(i);
+        Core::JsonUtils::GetJsonValueString("Name", jsonAttributeObject, name);
+        Core::JsonUtils::GetJsonValueString("Type", jsonAttributeObject, type);
+        tags[name] = type;
       }
 
     } catch (Poco::Exception &exc) {
@@ -81,14 +77,14 @@ namespace AwsMock::Dto::DynamoDb {
     }
   }
 
-  std::string CreateTableRequest::ToString() const {
+  std::string CreateTableResponse::ToString() const {
     std::stringstream ss;
     ss << (*this);
     return ss.str();
   }
 
-  std::ostream &operator<<(std::ostream &os, const CreateTableRequest &r) {
-    os << "CreateTableRequest={region='" << r.region << "', tableClass='" << r.tableClass << "', tableName='" << r.tableName
+  std::ostream &operator<<(std::ostream &os, const CreateTableResponse &r) {
+    os << "CreateTableResponse={region='" << r.region << "', tableClass='" << r.tableClass << "', tableName='" << r.tableName
     << "' tags=[";
     for (const auto &tag : r.tags) {
       os << "key='" << tag.first << "' value='" << tag.second << "', ";

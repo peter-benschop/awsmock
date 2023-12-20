@@ -24,6 +24,8 @@
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
+#include <awsmock/dto/dynamodb/CreateTableRequest.h>
+#include <awsmock/dto/dynamodb/CreateTableResponse.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
 #include <awsmock/service/DockerService.h>
 
@@ -36,60 +38,60 @@ namespace AwsMock::Service {
    */
   class DynamoDbService {
 
-  public:
+    public:
 
-    /**
-     * Constructor
-     *
-     * @param configuration module configuration
-     * @param metricService aws-mock monitoring module
-     */
-    explicit DynamoDbService(Core::Configuration &configuration, Core::MetricService &metricService);
+      /**
+       * Constructor
+       *
+       * @param configuration module configuration
+       * @param metricService aws-mock monitoring module
+       */
+      explicit DynamoDbService(Core::Configuration &configuration, Core::MetricService &metricService);
 
-    /**
-     * Starts a new DynamoDB instance with the given name.
-     *
-     * @param region AWS region.
-     * @param name DynamoDb instance name.
-     */
-    [[maybe_unused]] void StartInstance(const std::string &region, const std::string &name);
+      /**
+       * Creates a new table
+       *
+       * @param request create table request DTO
+       * @return CreateTableResponse
+       */
+      Dto::DynamoDb::CreateTableResponse CreateTable(const Dto::DynamoDb::CreateTableRequest &request);
 
-  private:
+    private:
 
-    /**
-     * Logger
-     */
-    Core::LogStream _logger;
+      /**
+       * Logger
+       */
+      Core::LogStream _logger;
 
-    /**
-     * AWS region
-     */
-    std::string _region;
+      /**
+       * AWS region
+       */
+      std::string _region;
 
-    /**
-     * AWS account ID
-     */
-    std::string _accountId;
+      /**
+       * AWS account ID
+       */
+      std::string _accountId;
 
-    /**
-     * Configuration
-     */
-    Core::Configuration &_configuration;
+      /**
+       * Configuration
+       */
+      Core::Configuration &_configuration;
 
-    /**
-     * Monitoring
-     */
-    Core::MetricService &_metricService;
+      /**
+       * Monitoring
+       */
+      Core::MetricService &_metricService;
 
-    /**
-     * Docker module
-     */
-    std::shared_ptr<Service::DockerService> _dockerService;
+      /**
+       * Docker module
+       */
+      std::shared_ptr<Service::DockerService> _dockerService;
 
-    /**
-     * Database connection
-     */
-    std::shared_ptr<Database::DynamoDbDatabase> _dynamoDbDatabase;
+      /**
+       * Database connection
+       */
+      std::shared_ptr<Database::DynamoDbDatabase> _dynamoDbDatabase;
 
   };
 
