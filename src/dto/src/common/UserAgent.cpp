@@ -22,7 +22,7 @@ namespace AwsMock::Dto::Common {
       throw Core::ServiceException("Could not extract user agent DTO");
     } else {
 
-      type = UserAgentTypFromString(parts[0]);
+      type = UserAgentTypeFromString(parts[0]);
       if (type == UserAgentType::AWS_CLI) {
 
         clientApplication = parts[0];

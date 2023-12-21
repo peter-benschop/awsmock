@@ -103,6 +103,56 @@ namespace AwsMock::Service {
 
   }
 
+  Dto::DynamoDb::GetItemResponse DynamoDbService::GetItem(const Dto::DynamoDb::GetItemRequest &request) {
+    log_debug_stream(_logger) << "Start get item, region: " << request.region << " name: " << request.tableName << std::endl;
+
+    if (!_dynamoDbDatabase->TableExists(request.region, request.tableName)) {
+      log_warning_stream(_logger) << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName << std::endl;
+      throw Core::ServiceException("DynamoDb table exists already", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+    }
+
+    Dto::DynamoDb::GetItemResponse getItemResponse;
+    try {
+
+      // Send request to docker container
+      std::string body = SendDynamoDbRequest(request.body, request.headers);
+      getItemResponse.FromJson(body);
+      log_info_stream(_logger) << "DynamoDb get item, name: " << request.tableName << std::endl;
+
+    } catch (Poco::Exception &exc) {
+      log_error_stream(_logger) << "DynamoDbd get item failed, message: " << exc.message() << std::endl;
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+    }
+
+    return getItemResponse;
+
+  }
+
+  Dto::DynamoDb::PutItemResponse DynamoDbService::PutItem(const Dto::DynamoDb::PutItemRequest &request) {
+    log_debug_stream(_logger) << "Start put item, region: " << request.region << " name: " << request.tableName << std::endl;
+
+    if (!_dynamoDbDatabase->TableExists(request.region, request.tableName)) {
+      log_warning_stream(_logger) << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName << std::endl;
+      throw Core::ServiceException("DynamoDb table exists already", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+    }
+
+    Dto::DynamoDb::PutItemResponse putItemResponse;
+    try {
+
+      // Send request to docker container
+      std::string body = SendDynamoDbRequest(request.body, request.headers);
+      putItemResponse.FromJson(body);
+      log_info_stream(_logger) << "DynamoDb put item, name: " << request.tableName << std::endl;
+
+    } catch (Poco::Exception &exc) {
+      log_error_stream(_logger) << "DynamoDbd put item failed, message: " << exc.message() << std::endl;
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+    }
+
+    return putItemResponse;
+
+  }
+
   std::string DynamoDbService::SendDynamoDbRequest(const std::string &body, const std::map<std::string, std::string> &headers) {
     log_debug_stream(_logger) << "Sending DynamoDB request, endpoint: " << _dockerHost << ":" << _dockerPort << std::endl;
 

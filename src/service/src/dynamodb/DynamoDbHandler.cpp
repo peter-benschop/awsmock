@@ -52,7 +52,7 @@ namespace AwsMock::Service {
       // Get the action
       Dto::Common::UserAgent userAgent;
       userAgent.FromRequest(request, "dynamodb");
-      log_debug_stream(_logger) << "Command: " << userAgent.clientCommand << std::endl;
+      log_debug_stream(_logger) << "Command: " << Dto::Common::UserAgentTypeToString(userAgent.type) << std::endl;
 
       switch (userAgent.type) {
       case Dto::Common::UserAgentType::AWS_SDK_UNKNOWN:

@@ -38,7 +38,9 @@ set(TRANSFER_SOURCES src/transfer/Tag.cpp src/transfer/CreateServerRequest.cpp s
         src/transfer/Server.cpp src/transfer/StartServerRequest.cpp src/transfer/StopServerRequest.cpp)
 set(DYNAMODB_SOURCES src/dynamodb/CreateTableRequest.cpp src/dynamodb/CreateTableResponse.cpp
         src/dynamodb/DeleteTableRequest.cpp src/dynamodb/DeleteTableResponse.cpp src/dynamodb/ProvisionedThroughput.cpp
-        src/dynamodb/ListTableRequest.cpp src/dynamodb/ListTableRequest.cpp src/dynamodb/ListTableResponse.cpp)
+        src/dynamodb/ListTableRequest.cpp src/dynamodb/ListTableRequest.cpp src/dynamodb/ListTableResponse.cpp
+        src/dynamodb/GetItemRequest.cpp src/dynamodb/GetItemResponse.cpp src/dynamodb/PutItemRequest.cpp
+        src/dynamodb/PutItemResponse.cpp)
 set(MODULE_SOURCES src/module/Module.cpp src/module/GatewayConfig.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}

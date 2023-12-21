@@ -15,7 +15,8 @@ set(COGNITO_SOURCES src/cognito/CognitoHandler.cpp src/cognito/CognitoHandler.cp
         src/cognito/CognitoMonitoring.cpp)
 set(TRANSFER_SOURCES src/transfer/TransferServer.cpp src/transfer/TransferHandler.cpp src/transfer/TransferService.cpp)
 set(DYNAMODB_SOURCES src/dynamodb/DynamoDbServer.cpp src/dynamodb/DynamoDbHandler.cpp src/dynamodb/DynamoDbCliHandler.cpp
-        src/dynamodb/DynamoDbJava2Handler.cpp src/dynamodb/DynamoDbCppHandler.cpp src/dynamodb/DynamoDbService.cpp)
+        src/dynamodb/DynamoDbJava2Handler.cpp src/dynamodb/DynamoDbCppHandler.cpp src/dynamodb/DynamoDbService.cpp
+        src/dynamodb/DynamoDbMonitoring.cpp)
 set(FTP_SOURCES src/ftpserver/Filesystem.cpp src/ftpserver/FtpSession.cpp src/ftpserver/FtpServer.cpp
         src/ftpserver/FtpServerImpl.cpp src/ftpserver/UserDatabase.cpp)
 set(GATEWAY_SOURCES src/gateway/GatewayServer.cpp src/gateway/GatewayRouter.cpp src/gateway/GatewayHandler.cpp)

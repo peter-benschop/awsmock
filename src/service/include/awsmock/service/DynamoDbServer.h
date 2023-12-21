@@ -22,7 +22,7 @@
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/service/AbstractWorker.h>
 #include <awsmock/service/AbstractServer.h>
-#include <awsmock/service/LambdaMonitoring.h>
+#include <awsmock/service/DynamoDbMonitoring.h>
 #include <awsmock/service/DynamoDbHandlerFactory.h>
 
 #define DYNAMODB_DEFAULT_PORT 9506
@@ -109,7 +109,7 @@ namespace AwsMock::Service {
       /**
        * Thread pool
        */
-      AwsMock::Core::ThreadPool<LambdaMonitoring> _threadPool;
+      AwsMock::Core::ThreadPool<DynamoDbMonitoring> _threadPool;
 
       /**
        * Service database

@@ -28,8 +28,12 @@
 #include <awsmock/dto/dynamodb/CreateTableResponse.h>
 #include <awsmock/dto/dynamodb/DeleteTableRequest.h>
 #include <awsmock/dto/dynamodb/DeleteTableResponse.h>
+#include <awsmock/dto/dynamodb/GetItemRequest.h>
+#include <awsmock/dto/dynamodb/GetItemResponse.h>
 #include <awsmock/dto/dynamodb/ListTableRequest.h>
 #include <awsmock/dto/dynamodb/ListTableResponse.h>
+#include <awsmock/dto/dynamodb/PutItemRequest.h>
+#include <awsmock/dto/dynamodb/PutItemResponse.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
 #include <awsmock/service/DockerService.h>
 
@@ -67,6 +71,22 @@ namespace AwsMock::Service {
        * @return ListTableResponse
        */
       Dto::DynamoDb::ListTableResponse ListTables(const Dto::DynamoDb::ListTableRequest &request);
+
+      /**
+       * Gets an item
+       *
+       * @param request get item request DTO
+       * @return GetItemResponse
+       */
+      Dto::DynamoDb::GetItemResponse GetItem(const Dto::DynamoDb::GetItemRequest &request);
+
+      /**
+       * Puts an item
+       *
+       * @param request put item request DTO
+       * @return GetItemResponse
+       */
+      Dto::DynamoDb::PutItemResponse PutItem(const Dto::DynamoDb::PutItemRequest &request);
 
       /**
        * Deletes a table

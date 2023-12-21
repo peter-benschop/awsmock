@@ -37,19 +37,19 @@ namespace AwsMock::Service {
         _baseCommand = "java -jar /usr/local/lib/awsmock-java-test-0.0.1-SNAPSHOT-jar-with-dependencies.jar " + _endpoint + " dynamodb ";
 
         // Start HTTP manager
-        Poco::ThreadPool::defaultPool().start(_cognitoServer);
+        Poco::ThreadPool::defaultPool().start(_dynamoDbServer);
       }
 
       void TearDown() override {
         Core::SystemUtils::Exec(_baseCommand + "delete-table test-table");
-        _cognitoServer.StopServer();
+        _dynamoDbServer.StopServer();
       }
 
       std::string _endpoint, _baseCommand;
       Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
       Core::MetricService _metricService = Core::MetricService(_configuration);
       Database::DynamoDbDatabase _database = Database::DynamoDbDatabase(_configuration);
-      DynamoDbServer _cognitoServer = DynamoDbServer(_configuration, _metricService);
+      DynamoDbServer _dynamoDbServer = DynamoDbServer(_configuration, _metricService);
   };
 
   TEST_F(DynamoDbServerJavaTest, TableCreateTest) {

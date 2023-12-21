@@ -35,11 +35,11 @@ namespace AwsMock::Dto::Common {
       {UserAgentType::AWS_SDK_UNKNOWN, ""},
   };
 
-  [[maybe_unused]]static std::string UserAgentTypToString(UserAgentType userAgentType) {
+  [[maybe_unused]]static std::string UserAgentTypeToString(UserAgentType userAgentType) {
     return UserAgentTypeNames[userAgentType];
   }
 
-  [[maybe_unused]]static UserAgentType UserAgentTypFromString(const std::string &userAgentType) {
+  [[maybe_unused]]static UserAgentType UserAgentTypeFromString(const std::string &userAgentType) {
     for (auto &it : UserAgentTypeNames) {
       if (Core::StringUtils::StartsWith(userAgentType, it.second)) {
         return it.first;
