@@ -30,7 +30,16 @@ namespace AwsMock::Dto::DynamoDb {
         object.set("AttributeType", tag.second);
         jsonAttributeArray.add(object);
       }
-      rootJson.set("Tags", jsonAttributeArray);
+      rootJson.set("AttributeDefinitions", jsonAttributeArray);
+
+      Poco::JSON::Array jsonKeySchemaArray;
+      for(const auto &key: keySchemas) {
+        Poco::JSON::Object object;
+        object.set("AttributeName", key.first);
+        object.set("KeyType", key.second);
+        jsonKeySchemaArray.add(object);
+      }
+      rootJson.set("KeySchema", jsonKeySchemaArray);
 
       std::ostringstream os;
       rootJson.stringify(os);
@@ -41,38 +50,53 @@ namespace AwsMock::Dto::DynamoDb {
     }
   }
 
-  void CreateTableResponse::FromJson(const std::string &body) {
+  void CreateTableResponse::FromJson(const std::string &jsonString) {
+
+    body = jsonString;
 
     Poco::JSON::Parser parser;
-    Poco::Dynamic::Var result = parser.parse(body);
+    Poco::Dynamic::Var result = parser.parse(jsonString);
     Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
     try {
-      Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-      Core::JsonUtils::GetJsonValueString("TableClass", rootObject, tableClass);
-      Core::JsonUtils::GetJsonValueString("TableName", rootObject, tableName);
 
-      // Tags
-      Poco::JSON::Array::Ptr jsonTagsArray = rootObject->getArray("Tags");
-      for(size_t i = 0; i < jsonTagsArray->size(); i++) {
-        std::string key, value;
-        Poco::JSON::Object::Ptr jsonTagsObject = jsonTagsArray->getObject(i);
-        Core::JsonUtils::GetJsonValueString("Key", jsonTagsObject, key);
-        Core::JsonUtils::GetJsonValueString("Value", jsonTagsObject, value);
-        tags[key] = value;
+      Poco::JSON::Object::Ptr jsonTableDescription = rootObject->getObject("TableDescription");
+
+      Core::JsonUtils::GetJsonValueString("TableName", jsonTableDescription, tableName);
+      Core::JsonUtils::GetJsonValueString("TableArn", jsonTableDescription, tableArn);
+      Core::JsonUtils::GetJsonValueLong("TableSizeBytes", jsonTableDescription, tableSizeBytes);
+      Core::JsonUtils::GetJsonValueLong("ItemCount", jsonTableDescription, tableSizeBytes);
+      Core::JsonUtils::GetJsonValueBool("DeletionProtectionEnabled", jsonTableDescription, deleteProtectionEnabled);
+      std::string tableStatusStr;
+      Core::JsonUtils::GetJsonValueString("TableStatus", jsonTableDescription, tableStatusStr);
+      tableStatus = TableStatusFromString(tableStatusStr);
+
+      // Key schema
+      Poco::JSON::Array::Ptr jsonKeySchemaArray = jsonTableDescription->getArray("KeySchema");
+      if(!jsonKeySchemaArray.isNull()) {
+        for (size_t i = 0; i < jsonKeySchemaArray->size(); i++) {
+          std::string key, value;
+          Poco::JSON::Object::Ptr jsonKeySchemaObject = jsonKeySchemaArray->getObject(i);
+          Core::JsonUtils::GetJsonValueString("AttributeName", jsonKeySchemaObject, key);
+          Core::JsonUtils::GetJsonValueString("KeyType", jsonKeySchemaObject, value);
+          keySchemas[key] = value;
+        }
       }
 
       // Attributes
-      Poco::JSON::Array::Ptr jsonAttributeArray = rootObject->getArray("AttributeDefinitions");
-      for(size_t i = 0; i < jsonAttributeArray->size(); i++) {
-        std::string name, type;
-        Poco::JSON::Object::Ptr jsonAttributeObject = jsonAttributeArray->getObject(i);
-        Core::JsonUtils::GetJsonValueString("Name", jsonAttributeObject, name);
-        Core::JsonUtils::GetJsonValueString("Type", jsonAttributeObject, type);
-        tags[name] = type;
+      Poco::JSON::Array::Ptr jsonAttributeArray = jsonTableDescription->getArray("AttributeDefinitions");
+      if(!jsonAttributeArray.isNull()) {
+        for (size_t i = 0; i < jsonAttributeArray->size(); i++) {
+          std::string name, type;
+          Poco::JSON::Object::Ptr jsonAttributeObject = jsonAttributeArray->getObject(i);
+          Core::JsonUtils::GetJsonValueString("AttributeName", jsonAttributeObject, name);
+          Core::JsonUtils::GetJsonValueString("AttributeType", jsonAttributeObject, type);
+          attributes[name] = type;
+        }
       }
 
     } catch (Poco::Exception &exc) {
+      std::cerr << exc.message()  <<std::endl;
       throw Core::ServiceException(exc.message(), 500);
     }
   }

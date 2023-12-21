@@ -64,6 +64,11 @@ namespace AwsMock::Database::Entity::DynamoDb {
     std::map<std::string, std::string> tags;
 
     /**
+     * Key schemas
+     */
+    std::map<std::string, std::string> keySchemas;
+
+    /**
      * Creation date
      */
     Poco::DateTime created = Poco::DateTime();

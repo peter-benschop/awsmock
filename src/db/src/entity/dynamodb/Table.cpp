@@ -24,11 +24,20 @@ namespace AwsMock::Database::Entity::DynamoDb {
       }
     }
 
+    // Key schemas
+    auto keySchemaDoc = bsoncxx::builder::basic::document{};
+    if (!keySchemas.empty()) {
+      for (const auto &t : keySchemas) {
+        keySchemaDoc.append(kvp(t.first, t.second));
+      }
+    }
+
     view_or_value<view, value> lambdaDoc = make_document(
       kvp("region", region),
       kvp("name", name),
       kvp("tags", tagsDoc),
       kvp("attributes", attributesDoc),
+      kvp("keySchemas", keySchemaDoc),
       kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
       kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
 
@@ -62,12 +71,41 @@ namespace AwsMock::Database::Entity::DynamoDb {
         attributes.emplace(key, value);
       }
     }
+
+    // Key schemas
+    if (mResult.value().find("keySchemas") != mResult.value().end()) {
+      bsoncxx::document::view keySchemaView = mResult.value()["keySchemas"].get_document().value;
+      for (bsoncxx::document::element keySchemaElement : keySchemaView) {
+        std::string key = bsoncxx::string::to_string(keySchemaElement.key());
+        std::string value = bsoncxx::string::to_string(keySchemaView[key].get_string().value);
+        keySchemas.emplace(key, value);
+      }
+    }
   }
 
   Poco::JSON::Object Table::ToJsonObject() const {
     Poco::JSON::Object jsonObject;
     jsonObject.set("region", region);
     jsonObject.set("name", name);
+
+    Poco::JSON::Array jsonTagsArray;
+    for(const auto &tag: tags) {
+      Poco::JSON::Object object;
+      object.set("Key", tag.first);
+      object.set("Value", tag.second);
+      jsonTagsArray.add(object);
+    }
+    jsonObject.set("Tags", jsonTagsArray);
+
+    Poco::JSON::Array jsonAttributeArray;
+    for(const auto &tag: attributes) {
+      Poco::JSON::Object object;
+      object.set("AttributeName", tag.first);
+      object.set("AttributeType", tag.second);
+      jsonAttributeArray.add(object);
+    }
+    jsonObject.set("Attributes", jsonAttributeArray);
+
     jsonObject.set("created", Poco::DateTimeFormatter::format(created, Poco::DateTimeFormat::ISO8601_FORMAT));
     jsonObject.set("modified", Poco::DateTimeFormatter::format(modified, Poco::DateTimeFormat::ISO8601_FORMAT));
 

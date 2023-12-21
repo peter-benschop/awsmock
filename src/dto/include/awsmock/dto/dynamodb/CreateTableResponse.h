@@ -19,9 +19,47 @@
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/ServiceException.h>
+#include <awsmock/dto/dynamodb/TableStatus.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
+  /**
+   * Example:
+   * <pre>
+   * {
+   *   "TableDescription":
+   *     {
+   *       "AttributeDefinitions": [
+   *           {
+   *             "AttributeName":"orgaNr",
+   *             "AttributeType":"N"
+   *           }
+   *       ],
+   *       "TableName":"test-table",
+   *       "KeySchema":[
+   *         {
+   *           "AttributeName":"orgaNr",
+   *           "KeyType":"HASH"
+   *         }
+   *       ],
+   *       "TableStatus":"ACTIVE",
+   *       "CreationDateTime":1703158038.811,
+   *       "ProvisionedThroughput":
+   *         {
+   *           "LastIncreaseDateTime":0.000,
+   *           "LastDecreaseDateTime":0.000,
+   *           "NumberOfDecreasesToday":0,
+   *           "ReadCapacityUnits":1,
+   *           "WriteCapacityUnits":1
+   *         },
+   *       "TableSizeBytes":0,
+   *       "ItemCount":0,
+   *       "TableArn":"arn:aws:dynamodb:ddblocal:000000000000:table/test-table",
+   *       "DeletionProtectionEnabled":false
+   *    }
+   * }
+   * </pre>
+   */
   struct CreateTableResponse {
 
     /**
@@ -40,6 +78,31 @@ namespace AwsMock::Dto::DynamoDb {
     std::string tableName;
 
     /**
+     * Table ARN
+     */
+    std::string tableArn;
+
+    /**
+     * Table size
+     */
+    long tableSizeBytes;
+
+    /**
+     * Item count
+     */
+    long itemCount;
+
+    /**
+     * Delete protection enabled
+     */
+    bool deleteProtectionEnabled;
+
+    /**
+     * Key schema
+     */
+    std::map<std::string, std::string> keySchemas;
+
+    /**
      * Tags
      */
     std::map<std::string, std::string> tags;
@@ -48,6 +111,16 @@ namespace AwsMock::Dto::DynamoDb {
      * Attribute definitions
      */
     std::map<std::string, std::string> attributes;
+
+    /**
+     * Table status
+     */
+    TableStatus tableStatus;
+
+    /**
+     * Original HTTP response body
+     */
+    std::string body;
 
     /**
      * Creates a JSON string from the object.

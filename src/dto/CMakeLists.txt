@@ -36,7 +36,11 @@ set(TRANSFER_SOURCES src/transfer/Tag.cpp src/transfer/CreateServerRequest.cpp s
         src/transfer/CreateUserRequest.cpp src/transfer/CreateUserResponse.cpp src/transfer/DeleteServerRequest.cpp
         src/transfer/IdentityProviderDetails.cpp src/transfer/ListServerRequest.cpp src/transfer/ListServerResponse.cpp
         src/transfer/Server.cpp src/transfer/StartServerRequest.cpp src/transfer/StopServerRequest.cpp)
-set(DYNAMODB_SOURCES src/dynamodb/CreateTableRequest.cpp src/dynamodb/CreateTableResponse.cpp)
+set(DYNAMODB_SOURCES src/dynamodb/CreateTableRequest.cpp src/dynamodb/CreateTableResponse.cpp
+        src/dynamodb/DeleteTableRequest.cpp src/dynamodb/DeleteTableResponse.cpp src/dynamodb/ProvisionedThroughput.cpp
+        src/dynamodb/ListTableRequest.cpp src/dynamodb/ListTableRequest.cpp src/dynamodb/ListTableResponse.cpp
+        src/dynamodb/GetItemRequest.cpp src/dynamodb/GetItemResponse.cpp src/dynamodb/PutItemRequest.cpp
+        src/dynamodb/PutItemResponse.cpp)
 set(MODULE_SOURCES src/module/Module.cpp src/module/GatewayConfig.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
@@ -50,7 +54,8 @@ include_directories(include ../core/include ../db/include /usr/include/mongo /us
         /usr/include/mongocxx/v_noabi)
 
 add_library(${LIBRARY} SHARED ${SOURCES}
-        include/awsmock/dto/s3/Content.h)
+        include/awsmock/dto/s3/Content.h
+        include/awsmock/dto/dynamodb/TableStatus.h)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 

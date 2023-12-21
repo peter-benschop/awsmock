@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_DYNAMODB_CREATE_TABLE_REQUEST_H
-#define AWSMOCK_DTO_DYNAMODB_CREATE_TABLE_REQUEST_H
+#ifndef AWSMOCK_DTO_DYNAMODB_LIST_TABLE_REQUEST_H
+#define AWSMOCK_DTO_DYNAMODB_LIST_TABLE_REQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -23,42 +23,23 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
-  struct CreateTableRequest {
+  struct ListTableRequest {
 
     /**
-     * Region
+     * AWS region
      */
     std::string region;
 
     /**
-     * Table class
+     * The first table name that this operation will evaluate. Use the value that was returned for LastEvaluatedTableName
+     * in a previous operation, so that you can obtain the next page of results.
      */
-    std::string tableClass;
+    std::string exclusiveStartTableName;
 
     /**
-     * Table name
+     * Limit
      */
-    std::string tableName;
-
-    /**
-     * Tags
-     */
-    std::map<std::string, std::string> tags;
-
-    /**
-     * Attribute definitions
-     */
-    std::map<std::string, std::string> attributes;
-
-    /**
-     * Key schemas
-     */
-    std::map<std::string, std::string> keySchemas;
-
-    /**
-     * Provisioned throughput
-     */
-    ProvisionedThroughput provisionedThroughput;
+    int limit;
 
     /**
      * Original HTTP request body
@@ -96,10 +77,10 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const CreateTableRequest &r);
+    friend std::ostream &operator<<(std::ostream &os, const ListTableRequest &r);
 
   };
 
 } // namespace AwsMock::Dto::lambda
 
-#endif // AWSMOCK_DTO_DYNAMODB_CREATE_TABLE_REQUEST_H
+#endif // AWSMOCK_DTO_DYNAMODB_LIST_TABLE_REQUEST_H

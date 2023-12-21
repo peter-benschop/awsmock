@@ -17,9 +17,15 @@ namespace AwsMock::Database {
 
   bool DynamoDbMemoryDb::TableExists(const std::string &region, const std::string &tableName) {
 
-    return find_if(_tables.begin(), _tables.end(), [region, tableName](const std::pair<std::string, Entity::DynamoDb::Table> &table) {
-      return table.second.region == region && table.second.name == tableName;
-    }) != _tables.end();
+    if (!region.empty()) {
+      return find_if(_tables.begin(), _tables.end(), [region, tableName](const std::pair<std::string, Entity::DynamoDb::Table> &table) {
+        return table.second.region == region && table.second.name == tableName;
+      }) != _tables.end();
+    } else {
+      return find_if(_tables.begin(), _tables.end(), [tableName](const std::pair<std::string, Entity::DynamoDb::Table> &table) {
+        return table.second.name == tableName;
+      }) != _tables.end();
+    }
   }
 
   Entity::DynamoDb::TableList DynamoDbMemoryDb::ListTables(const std::string &region) {
@@ -120,7 +126,7 @@ namespace AwsMock::Database {
       auto const &[key, value] = item;
       return value.name == tableName;
     });
-    log_debug_stream(_logger) << "Lambda deleted, count: " << count << std::endl;
+    log_debug_stream(_logger) << "DynamoDB table deleted, count: " << count << std::endl;
   }
 
   void DynamoDbMemoryDb::DeleteAllTables() {

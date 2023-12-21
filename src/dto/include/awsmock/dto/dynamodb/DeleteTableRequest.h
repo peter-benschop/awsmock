@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_DYNAMODB_CREATE_TABLE_REQUEST_H
-#define AWSMOCK_DTO_DYNAMODB_CREATE_TABLE_REQUEST_H
+#ifndef AWSMOCK_DTO_DYNAMODB_DELETE_TABLE_REQUEST_H
+#define AWSMOCK_DTO_DYNAMODB_DELETE_TABLE_REQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -19,11 +19,11 @@
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/ServiceException.h>
-#include "ProvisionedThroughput.h"
+#include <awsmock/dto/dynamodb/ProvisionedThroughput.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
-  struct CreateTableRequest {
+  struct DeleteTableRequest {
 
     /**
      * Region
@@ -31,34 +31,9 @@ namespace AwsMock::Dto::DynamoDb {
     std::string region;
 
     /**
-     * Table class
-     */
-    std::string tableClass;
-
-    /**
      * Table name
      */
     std::string tableName;
-
-    /**
-     * Tags
-     */
-    std::map<std::string, std::string> tags;
-
-    /**
-     * Attribute definitions
-     */
-    std::map<std::string, std::string> attributes;
-
-    /**
-     * Key schemas
-     */
-    std::map<std::string, std::string> keySchemas;
-
-    /**
-     * Provisioned throughput
-     */
-    ProvisionedThroughput provisionedThroughput;
 
     /**
      * Original HTTP request body
@@ -96,10 +71,10 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const CreateTableRequest &r);
+    friend std::ostream &operator<<(std::ostream &os, const DeleteTableRequest &r);
 
   };
 
 } // namespace AwsMock::Dto::lambda
 
-#endif // AWSMOCK_DTO_DYNAMODB_CREATE_TABLE_REQUEST_H
+#endif // AWSMOCK_DTO_DYNAMODB_DELETE_TABLE_REQUEST_H

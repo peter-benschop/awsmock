@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_DYNAMODB_CREATE_TABLE_REQUEST_H
-#define AWSMOCK_DTO_DYNAMODB_CREATE_TABLE_REQUEST_H
+#ifndef AWSMOCK_DTO_DYNAMODB_PUT_ITEM_REQUEST_H
+#define AWSMOCK_DTO_DYNAMODB_PUT_ITEM_REQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -19,11 +19,11 @@
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/ServiceException.h>
-#include "ProvisionedThroughput.h"
+#include <awsmock/dto/dynamodb/GetItemKey.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
-  struct CreateTableRequest {
+  struct PutItemRequest {
 
     /**
      * Region
@@ -31,34 +31,29 @@ namespace AwsMock::Dto::DynamoDb {
     std::string region;
 
     /**
-     * Table class
-     */
-    std::string tableClass;
-
-    /**
      * Table name
      */
     std::string tableName;
 
     /**
-     * Tags
+     * Keys
      */
-    std::map<std::string, std::string> tags;
+    std::map<std::string, GetItemKey> item;
 
     /**
-     * Attribute definitions
+     * Projection exception
      */
-    std::map<std::string, std::string> attributes;
+    std::string projectionExpression;
 
     /**
-     * Key schemas
+     * Consistent read
      */
-    std::map<std::string, std::string> keySchemas;
+    bool consistentRead;
 
     /**
-     * Provisioned throughput
+     * Return consumed capacity
      */
-    ProvisionedThroughput provisionedThroughput;
+    bool returnConsumedCapacity;
 
     /**
      * Original HTTP request body
@@ -96,10 +91,10 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const CreateTableRequest &r);
+    friend std::ostream &operator<<(std::ostream &os, const PutItemRequest &r);
 
   };
 
 } // namespace AwsMock::Dto::lambda
 
-#endif // AWSMOCK_DTO_DYNAMODB_CREATE_TABLE_REQUEST_H
+#endif // AWSMOCK_DTO_DYNAMODB_PUT_ITEM_REQUEST_H

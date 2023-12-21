@@ -26,6 +26,14 @@
 #include <awsmock/core/TarUtils.h>
 #include <awsmock/dto/dynamodb/CreateTableRequest.h>
 #include <awsmock/dto/dynamodb/CreateTableResponse.h>
+#include <awsmock/dto/dynamodb/DeleteTableRequest.h>
+#include <awsmock/dto/dynamodb/DeleteTableResponse.h>
+#include <awsmock/dto/dynamodb/GetItemRequest.h>
+#include <awsmock/dto/dynamodb/GetItemResponse.h>
+#include <awsmock/dto/dynamodb/ListTableRequest.h>
+#include <awsmock/dto/dynamodb/ListTableResponse.h>
+#include <awsmock/dto/dynamodb/PutItemRequest.h>
+#include <awsmock/dto/dynamodb/PutItemResponse.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
 #include <awsmock/service/DockerService.h>
 
@@ -56,7 +64,48 @@ namespace AwsMock::Service {
        */
       Dto::DynamoDb::CreateTableResponse CreateTable(const Dto::DynamoDb::CreateTableRequest &request);
 
+      /**
+       * Lists all available tables
+       *
+       * @param request list table request DTO
+       * @return ListTableResponse
+       */
+      Dto::DynamoDb::ListTableResponse ListTables(const Dto::DynamoDb::ListTableRequest &request);
+
+      /**
+       * Gets an item
+       *
+       * @param request get item request DTO
+       * @return GetItemResponse
+       */
+      Dto::DynamoDb::GetItemResponse GetItem(const Dto::DynamoDb::GetItemRequest &request);
+
+      /**
+       * Puts an item
+       *
+       * @param request put item request DTO
+       * @return GetItemResponse
+       */
+      Dto::DynamoDb::PutItemResponse PutItem(const Dto::DynamoDb::PutItemRequest &request);
+
+      /**
+       * Deletes a table
+       *
+       * @param request delete table request DTO
+       * @return DeleteTableResponse
+       */
+      Dto::DynamoDb::DeleteTableResponse DeleteTable(const Dto::DynamoDb::DeleteTableRequest &request);
+
     private:
+
+      /**
+       * Send the request to the DynamoDB container
+       *
+       * @param body original HTTP request body
+       * @param headers original HTTP request headers
+       * @return response body
+       */
+      std::string SendDynamoDbRequest(const std::string &body, const std::map<std::string, std::string>& headers);
 
       /**
        * Logger
@@ -92,6 +141,16 @@ namespace AwsMock::Service {
        * Database connection
        */
       std::shared_ptr<Database::DynamoDbDatabase> _dynamoDbDatabase;
+
+      /**
+       * DynamoDb docker host
+       */
+      std::string _dockerHost;
+
+      /**
+       * DynamoDb docker port
+       */
+      int _dockerPort;
 
   };
 

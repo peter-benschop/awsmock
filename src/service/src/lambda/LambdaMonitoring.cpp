@@ -14,7 +14,7 @@ namespace AwsMock::Service {
 
     // Database connections
     _lambdaDatabase = std::make_unique<Database::LambdaDatabase>(_configuration);
-    log_debug_stream(_logger) << "lambda monitoring initialized" << std::endl;
+    log_debug_stream(_logger) << "Lambda monitoring initialized" << std::endl;
   }
 
   void LambdaMonitoring::run() {
@@ -22,12 +22,12 @@ namespace AwsMock::Service {
     if (_period <= 0) {
       return;
     }
-    log_info_stream(_logger) << "lambda monitoring started" << std::endl;
+    log_info_stream(_logger) << "Lambda monitoring started" << std::endl;
 
     _running = true;
-    while (_running) {
+    while (true) {
 
-      _logger.debug() << "lambda monitoring processing started" << std::endl;
+      _logger.debug() << "Lambda monitoring processing started" << std::endl;
 
       // Update counters
       UpdateCounters();
