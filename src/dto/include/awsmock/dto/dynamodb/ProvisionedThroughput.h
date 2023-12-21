@@ -2,19 +2,16 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_DYNAMODB_CREATE_TABLE_RESPONSE_H
-#define AWSMOCK_DTO_DYNAMODB_CREATE_TABLE_RESPONSE_H
+#ifndef AWSMOCK_DTO_DYNAMODB_PROVISIONED_THROUGHPUT_H
+#define AWSMOCK_DTO_DYNAMODB_PROVISIONED_THROUGHPUT_H
 
 // C++ standard includes
 #include <string>
 #include <sstream>
-#include <vector>
-#include <utility>
 
 // Poco includes
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
-#include <Poco/Dynamic/Var.h>
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
@@ -22,37 +19,17 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
-  struct CreateTableResponse {
+  struct ProvisionedThroughput {
 
     /**
-     * Region
+     * Read capacity units
      */
-    std::string region;
+    int readCapacityUnits;
 
     /**
-     * Table class
+     * Write capacity units
      */
-    std::string tableClass;
-
-    /**
-     * Table name
-     */
-    std::string tableName;
-
-    /**
-     * Tags
-     */
-    std::map<std::string, std::string> tags;
-
-    /**
-     * Attribute definitions
-     */
-    std::map<std::string, std::string> attributes;
-
-    /**
-     * Original HTTP response body
-     */
-    std::string body;
+    int writeCapacityUnits;
 
     /**
      * Creates a JSON string from the object.
@@ -64,9 +41,9 @@ namespace AwsMock::Dto::DynamoDb {
     /**
      * Parse a JSON stream
      *
-     * @param jsonString JSON string
+     * @param jsonBody JSON string
      */
-    void FromJson(const std::string &jsonString);
+    void FromJson(const std::string &jsonBody);
 
     /**
      * Converts the DTO to a string representation.
@@ -80,10 +57,10 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const CreateTableResponse &r);
+    friend std::ostream &operator<<(std::ostream &os, const ProvisionedThroughput &r);
 
   };
 
 } // namespace AwsMock::Dto::lambda
 
-#endif // AWSMOCK_DTO_DYNAMODB_CREATE_TABLE_RESPONSE_H
+#endif // AWSMOCK_DTO_DYNAMODB_PROVISIONED_THROUGHPUT_H

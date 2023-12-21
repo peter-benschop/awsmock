@@ -31,15 +31,34 @@ namespace AwsMock::Service {
       std::string payload = GetBodyAsString(request);
       std::string action = GetActionFromHeader(request, payload);
 
-      if(action == "CreateTable") {
+      if (action == "CreateTable") {
 
         Dto::DynamoDb::CreateTableRequest tableRequest;
         tableRequest.FromJson(payload);
 
+        // Copy headers
+        for (const auto &header : request) {
+          tableRequest.headers[header.first] = header.second;
+        }
+
         Dto::DynamoDb::CreateTableResponse tableResponse = _dynamoDbService.CreateTable(tableRequest);
-        SendOkResponse(response,tableResponse.ToJson());
+        SendOkResponse(response, tableResponse.body);
+
+      } else if (action == "DeleteTable") {
+
+        Dto::DynamoDb::DeleteTableRequest tableRequest;
+        tableRequest.FromJson(payload);
+
+        // Copy headers
+        for (const auto &header : request) {
+          tableRequest.headers[header.first] = header.second;
+        }
+
+        Dto::DynamoDb::DeleteTableResponse tableResponse = _dynamoDbService.DeleteTable(tableRequest);
+        SendOkResponse(response, tableResponse.body);
 
       }
+
 
     } catch (Core::ServiceException &exc) {
       _logger.error() << "DynamoDb module exception: " << exc.message() << std::endl;

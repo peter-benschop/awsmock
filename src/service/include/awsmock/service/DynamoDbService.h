@@ -26,6 +26,8 @@
 #include <awsmock/core/TarUtils.h>
 #include <awsmock/dto/dynamodb/CreateTableRequest.h>
 #include <awsmock/dto/dynamodb/CreateTableResponse.h>
+#include <awsmock/dto/dynamodb/DeleteTableRequest.h>
+#include <awsmock/dto/dynamodb/DeleteTableResponse.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
 #include <awsmock/service/DockerService.h>
 
@@ -56,7 +58,24 @@ namespace AwsMock::Service {
        */
       Dto::DynamoDb::CreateTableResponse CreateTable(const Dto::DynamoDb::CreateTableRequest &request);
 
+      /**
+       * Deletes a table
+       *
+       * @param request delete table request DTO
+       * @return DeleteTableResponse
+       */
+      Dto::DynamoDb::DeleteTableResponse DeleteTable(const Dto::DynamoDb::DeleteTableRequest &request);
+
     private:
+
+      /**
+       * Send the request to the DynamoDB container
+       *
+       * @param body original HTTP request body
+       * @param headers original HTTP request headers
+       * @return response body
+       */
+      std::string SendDynamoDbRequest(const std::string &body, const std::map<std::string, std::string>& headers);
 
       /**
        * Logger
@@ -92,6 +111,16 @@ namespace AwsMock::Service {
        * Database connection
        */
       std::shared_ptr<Database::DynamoDbDatabase> _dynamoDbDatabase;
+
+      /**
+       * DynamoDb docker host
+       */
+      std::string _dockerHost;
+
+      /**
+       * DynamoDb docker port
+       */
+      int _dockerPort;
 
   };
 
