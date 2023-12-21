@@ -19,6 +19,8 @@
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/ServiceException.h>
+#include <awsmock/dto/dynamodb/ProvisionedThroughput.h>
+#include <awsmock/dto/dynamodb/TableStatus.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -33,6 +35,41 @@ namespace AwsMock::Dto::DynamoDb {
      * Table name
      */
     std::string tableName;
+
+    /**
+     * Table ID
+     */
+    std::string tableId;
+
+    /**
+     * Table ARN
+     */
+    std::string tableArn;
+
+    /**
+     * Key schema
+     */
+    std::map<std::string, std::string> keySchemas;
+
+    /**
+     * Tags
+     */
+    std::map<std::string, std::string> tags;
+
+    /**
+     * Attribute definitions
+     */
+    std::map<std::string, std::string> attributes;
+
+    /**
+     * Provisioned throughput
+     */
+    ProvisionedThroughput provisionedThroughput;
+
+    /**
+     * Table status
+     */
+    TableStatus tableStatus;
 
     /**
      * HTTP response body

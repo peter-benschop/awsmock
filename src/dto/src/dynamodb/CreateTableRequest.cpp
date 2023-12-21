@@ -84,7 +84,7 @@ namespace AwsMock::Dto::DynamoDb {
           Poco::JSON::Object::Ptr jsonAttributeObject = jsonAttributeArray->getObject(i);
           Core::JsonUtils::GetJsonValueString("AttributeName", jsonAttributeObject, name);
           Core::JsonUtils::GetJsonValueString("AttributeType", jsonAttributeObject, type);
-          tags[name] = type;
+          attributes[name] = type;
         }
       }
 
@@ -101,6 +101,7 @@ namespace AwsMock::Dto::DynamoDb {
       }
 
     } catch (Poco::Exception &exc) {
+      std::cerr << exc.message() << std::endl;
       throw Core::ServiceException(exc.message(), 500);
     }
   }

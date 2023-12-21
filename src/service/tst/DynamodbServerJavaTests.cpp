@@ -31,6 +31,7 @@ namespace AwsMock::Service {
         std::string _port = _configuration.getString("awsmock.service.dynamodb.port", std::to_string(DYNAMODB_DEFAULT_PORT));
         std::string _host = _configuration.getString("awsmock.service.dynamodb.host", DYNAMODB_DEFAULT_HOST);
         _endpoint = "http://" + _host + ":" + _port;
+        Poco::Logger::root().setLevel("debug");
 
         // Set base command
         _baseCommand = "java -jar /usr/local/lib/awsmock-java-test-0.0.1-SNAPSHOT-jar-with-dependencies.jar " + _endpoint + " dynamodb ";
@@ -40,8 +41,7 @@ namespace AwsMock::Service {
       }
 
       void TearDown() override {
-        //_database.DeleteAllUsers();
-        _database.DeleteAllTables();
+        Core::SystemUtils::Exec(_baseCommand + "delete-table test-table");
         _cognitoServer.StopServer();
       }
 
@@ -65,73 +65,38 @@ namespace AwsMock::Service {
     EXPECT_EQ(1, tableList.size());
   }
 
-  /*TEST_F(CognitoServerJavaTest, UserPoolListTest) {
+  TEST_F(DynamoDbServerJavaTest, TableListTest) {
 
     // arrange
-    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + "create-user-pool test-user-pool");
-    EXPECT_EQ(0, createResult.status);
+    Core::ExecResult result = Core::SystemUtils::Exec(_baseCommand + "create-table test-table");
+    EXPECT_EQ(0, result.status);
+    Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
+    EXPECT_EQ(1, tableList.size());
 
     // act
-    Core::ExecResult listResult = Core::SystemUtils::Exec(_baseCommand + "list-user-pools 10");
-    Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
+    Core::ExecResult listResult = Core::SystemUtils::Exec(_baseCommand + "list-tables 10");
 
     // assert
     EXPECT_EQ(0, listResult.status);
-    EXPECT_TRUE(Core::StringUtils::Contains(listResult.output, "test-user-pool"));
-    EXPECT_EQ(1, userPoolList.size());
+    EXPECT_TRUE(Core::StringUtils::Contains(listResult.output, "test-table"));
   }
 
-  TEST_F(CognitoServerJavaTest, UserPoolDeleteTest) {
+  TEST_F(DynamoDbServerJavaTest, TableDeleteTest) {
 
     // arrange
-    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + "create-user-pool test-user-pool");
-    EXPECT_EQ(0, createResult.status);
-    Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
-    std::string userPoolId = userPoolList.front().id;
+    Core::ExecResult result = Core::SystemUtils::Exec(_baseCommand + "create-table test-table");
+    EXPECT_EQ(0, result.status);
+    Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
+    EXPECT_EQ(1, tableList.size());
 
     // act
-    Core::ExecResult deleteResult = Core::SystemUtils::Exec(_baseCommand + "delete-user-pool " + userPoolId);
-    long count = _database.CountUserPools();
+    Core::ExecResult deleteResult = Core::SystemUtils::Exec(_baseCommand + "delete-table test-table");
+    tableList = _database.ListTables();
 
     // assert
     EXPECT_EQ(0, deleteResult.status);
-    EXPECT_EQ(0, count);
+    EXPECT_EQ(0, tableList.size());
   }
-
-  TEST_F(CognitoServerJavaTest, UserCreateTest) {
-
-    // arrange
-    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + "create-user-pool test-user-pool");
-    EXPECT_EQ(0, createResult.status);
-    Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
-    std::string userPoolId = userPoolList.front().id;
-
-    // act
-    Core::ExecResult result = Core::SystemUtils::Exec(_baseCommand + "admin-create-user " + userPoolId + " test-user");
-    Database::Entity::Cognito::UserList userList = _database.ListUsers();
-
-    // assert
-    EXPECT_EQ(0, result.status);
-    EXPECT_EQ(1, userList.size());
-  }
-
-  TEST_F(CognitoServerJavaTest, UserDeleteTest) {
-
-    // arrange
-    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + "create-user-pool test-user-pool");
-    EXPECT_EQ(0, createResult.status);
-    Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
-    std::string userPoolId = userPoolList.front().id;
-    Core::ExecResult createdUser = Core::SystemUtils::Exec(_baseCommand + "admin-create-user " + userPoolId + " test-user");
-
-    // act
-    Core::ExecResult result = Core::SystemUtils::Exec(_baseCommand + "admin-delete-user " + userPoolId + " test-user");
-    Database::Entity::Cognito::UserList userList = _database.ListUsers();
-
-    // assert
-    EXPECT_EQ(0, result.status);
-    EXPECT_EQ(0, userList.size());
-  }*/
 
 } // namespace AwsMock::Service
 

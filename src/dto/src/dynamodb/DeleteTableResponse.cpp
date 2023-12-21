@@ -12,6 +12,18 @@ namespace AwsMock::Dto::DynamoDb {
       Poco::JSON::Object rootJson;
       rootJson.set("Region", region);
       rootJson.set("TableName", tableName);
+      rootJson.set("TableId", tableId);
+      rootJson.set("TableArn", tableArn);
+
+      Poco::JSON::Array jsonKeySchemasArray;
+      for (const auto &keySchema : keySchemas) {
+        Poco::JSON::Object object;
+        object.set("AttributeName", keySchema.first);
+        object.set("KeyType", keySchema.second);
+        jsonKeySchemasArray.add(object);
+      }
+      rootJson.set("KeySchema", jsonKeySchemasArray);
+      rootJson.set("ProvisionedThroughput", provisionedThroughput.ToJsonObject());
 
       std::ostringstream os;
       rootJson.stringify(os);
@@ -22,16 +34,47 @@ namespace AwsMock::Dto::DynamoDb {
     }
   }
 
-  void DeleteTableResponse::FromJson(const std::string &body) {
+  void DeleteTableResponse::FromJson(const std::string &jsonString) {
+
+    body = jsonString;
 
     Poco::JSON::Parser parser;
-    Poco::Dynamic::Var result = parser.parse(body);
-    Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    Poco::Dynamic::Var result = parser.parse(jsonString);
+    const auto& rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
     try {
-      Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-      Core::JsonUtils::GetJsonValueString("TableName", rootObject, tableName);
 
+      Poco::JSON::Object::Ptr jsonTableDescription = rootObject->getObject("TableDescription");
+
+      Core::JsonUtils::GetJsonValueString("Region", jsonTableDescription, region);
+      Core::JsonUtils::GetJsonValueString("TableName", jsonTableDescription, tableName);
+      std::string tableStatusStr;
+      Core::JsonUtils::GetJsonValueString("TableStatus", jsonTableDescription, tableStatusStr);
+      tableStatus = TableStatusFromString(tableStatusStr);
+
+      // Key schema
+      Poco::JSON::Array::Ptr jsonKeySchemaArray = jsonTableDescription->getArray("KeySchema");
+      if(!jsonKeySchemaArray.isNull()) {
+        for (size_t i = 0; i < jsonKeySchemaArray->size(); i++) {
+          std::string key, value;
+          Poco::JSON::Object::Ptr jsonKeySchemaObject = jsonKeySchemaArray->getObject(i);
+          Core::JsonUtils::GetJsonValueString("AttributeName", jsonKeySchemaObject, key);
+          Core::JsonUtils::GetJsonValueString("KeyType", jsonKeySchemaObject, value);
+          keySchemas[key] = value;
+        }
+      }
+
+      // Attributes
+      Poco::JSON::Array::Ptr jsonAttributeArray = jsonTableDescription->getArray("AttributeDefinitions");
+      if(!jsonAttributeArray.isNull()) {
+        for (size_t i = 0; i < jsonAttributeArray->size(); i++) {
+          std::string name, type;
+          Poco::JSON::Object::Ptr jsonAttributeObject = jsonAttributeArray->getObject(i);
+          Core::JsonUtils::GetJsonValueString("AttributeName", jsonAttributeObject, name);
+          Core::JsonUtils::GetJsonValueString("AttributeType", jsonAttributeObject, type);
+          attributes[name] = type;
+        }
+      }
     } catch (Poco::Exception &exc) {
       throw Core::ServiceException(exc.message(), 500);
     }

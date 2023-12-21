@@ -1,17 +1,18 @@
 //
-// Created by vogje01 on 21/12/2023.
+// Created by vogje01 on 20/12/2023.
 //
 
-#include <awsmock/dto/dynamodb/DeleteTableRequest.h>
+#include <awsmock/dto/dynamodb/ListTableRequest.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
-  std::string DeleteTableRequest::ToJson() {
+  std::string ListTableRequest::ToJson() {
 
     try {
       Poco::JSON::Object rootJson;
       rootJson.set("Region", region);
-      rootJson.set("TableName", tableName);
+      rootJson.set("ExclusiveStartTableName", exclusiveStartTableName);
+      rootJson.set("Limit", limit);
 
       std::ostringstream os;
       rootJson.stringify(os);
@@ -22,8 +23,9 @@ namespace AwsMock::Dto::DynamoDb {
     }
   }
 
-  void DeleteTableRequest::FromJson(const std::string &jsonBody) {
+  void ListTableRequest::FromJson(const std::string &jsonBody) {
 
+    // Save original body
     body = jsonBody;
 
     Poco::JSON::Parser parser;
@@ -31,23 +33,23 @@ namespace AwsMock::Dto::DynamoDb {
     const auto& rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
     try {
-
       Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-      Core::JsonUtils::GetJsonValueString("TableName", rootObject, tableName);
+      Core::JsonUtils::GetJsonValueString("ExclusiveStartTableName", rootObject, exclusiveStartTableName);
+      Core::JsonUtils::GetJsonValueInt("Limit", rootObject, limit);
 
     } catch (Poco::Exception &exc) {
       throw Core::ServiceException(exc.message(), 500);
     }
   }
 
-  std::string DeleteTableRequest::ToString() const {
+  std::string ListTableRequest::ToString() const {
     std::stringstream ss;
     ss << (*this);
     return ss.str();
   }
 
-  std::ostream &operator<<(std::ostream &os, const DeleteTableRequest &r) {
-    os << "DeleteTableRequest={region='" << r.region << "', tableName='" << r.tableName << "'}";
+  std::ostream &operator<<(std::ostream &os, const ListTableRequest &r) {
+    os << "ListTableRequest={region='" << r.region << "', exclusiveStartTableName='" << r.exclusiveStartTableName << "', limit='" << r.limit << "}";
     return os;
   }
 

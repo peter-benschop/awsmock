@@ -32,11 +32,26 @@ namespace AwsMock::Dto::DynamoDb {
     int writeCapacityUnits;
 
     /**
-     * Creates a JSON string from the object.
-     *
-     * @return JSON string
+     * Last decrease time
      */
-    [[nodiscard]] std::string ToJson();
+    long lastDecreaseDateTime;
+
+    /**
+     * Last increase time
+     */
+    long lastIncreaseDateTime;
+
+    /**
+     * NUmber of decreases
+     */
+    long numberOfDecreasesToday;
+
+    /**
+     * Converts the entity to a JSON object
+     *
+     * @return JSON object
+     */
+    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
     /**
      * Parse a JSON stream

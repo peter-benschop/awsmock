@@ -180,6 +180,7 @@ namespace AwsMock::Database {
 
       Entity::DynamoDb::Table result;
       result.FromDocument(mResult);
+      _logger.debug() << "Got table by ID, table: " << result.ToString() << std::endl;
       return result;
 
     } catch (const mongocxx::exception &exc) {
@@ -266,7 +267,12 @@ namespace AwsMock::Database {
 
       try {
 
-        int64_t count = _tableCollection.count_documents(make_document(kvp("region", region), kvp("tableName", tableName)));
+        int64_t count;
+        if(!region.empty()) {
+          count = _tableCollection.count_documents(make_document(kvp("region", region), kvp("name", tableName)));
+        } else {
+          count = _tableCollection.count_documents(make_document(kvp("name", tableName)));
+        }
         log_trace_stream(_logger) << "DynamoDb table exists: " << (count > 0 ? "true" : "false") << std::endl;
         return count > 0;
 
@@ -327,7 +333,7 @@ namespace AwsMock::Database {
 
       try {
 
-        auto result = _tableCollection.delete_many(make_document(kvp("tableName", tableName)));
+        auto result = _tableCollection.delete_many(make_document(kvp("name", tableName)));
         log_debug_stream(_logger) << "DynamoDB table deleted, tableName: " << tableName << " count: " << result->deleted_count() << std::endl;
 
       } catch (const mongocxx::exception &exc) {

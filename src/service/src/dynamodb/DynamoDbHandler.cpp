@@ -49,14 +49,9 @@ namespace AwsMock::Service {
 
     try {
 
-      //DumpRequest(request);
       // Get the action
       Dto::Common::UserAgent userAgent;
       userAgent.FromRequest(request, "dynamodb");
-
-//      Poco::Net::HTTPServerRequestImpl copy = Poco::Net::HTTPServerRequestImpl(request);
-      // Forward request to docker image
-      //ForwardRequest(request, response, _dynamoDbHost, _dynamoDbPort);
       log_debug_stream(_logger) << "Command: " << userAgent.clientCommand << std::endl;
 
       switch (userAgent.type) {

@@ -56,6 +56,11 @@ namespace AwsMock::Dto::DynamoDb {
     std::map<std::string, std::string> keySchemas;
 
     /**
+     * Provisioned throughput
+     */
+    ProvisionedThroughput provisionedThroughput;
+
+    /**
      * Original HTTP request body
      */
     std::string body;
@@ -64,11 +69,6 @@ namespace AwsMock::Dto::DynamoDb {
      * Original HTTP request headers
      */
     std::map<std::string, std::string> headers;
-
-    /**
-     * Provisioned throughput
-     */
-    ProvisionedThroughput provisionedThroughput;
 
     /**
      * Creates a JSON string from the object.

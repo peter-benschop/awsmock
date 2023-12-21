@@ -19,7 +19,7 @@
 #include <awsmock/core/NumberUtils.h>
 #include "awsmock/dto/common/UserAgent.h"
 #include <awsmock/service/AbstractHandler.h>
-#include <awsmock/service/S3Service.h>
+#include <awsmock/service/DynamoDbService.h>
 
 namespace AwsMock::Service {
 
@@ -106,6 +106,15 @@ namespace AwsMock::Service {
     private:
 
       /**
+       * Return the command from the header or from the payload.
+       *
+       * @param request HTTP request
+       * @param payload HTTP payload
+       * @return SQS action
+       */
+      static std::string GetActionFromHeader(Poco::Net::HTTPServerRequest &request, const std::string &payload);
+
+      /**
        * Logger
        */
       Core::LogStream _logger;
@@ -121,9 +130,9 @@ namespace AwsMock::Service {
       Core::MetricService &_metricService;
 
       /**
-       * S3 module
+       * DynamoDB module
        */
-      Service::S3Service _s3Service;
+      Service::DynamoDbService _dynamoDbService;
 
   };
 

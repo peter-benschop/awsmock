@@ -34,16 +34,17 @@ namespace AwsMock::Service {
         .region=request.region,
         .name=request.tableName,
         .attributes=request.attributes,
-        .tags=request.tags
+        .tags=request.tags,
+        .keySchemas=request.keySchemas
       };
 
       // Update database
       table = _dynamoDbDatabase->CreateTable(table);
 
-      createTableResponse = {.region=table.region, .tableName=table.name, .tags=table.tags, .attributes=table.attributes};
+      // Send request to docker container
+      std::string body = SendDynamoDbRequest(request.body, request.headers);
+      createTableResponse.FromJson(body);
       log_info_stream(_logger) << "DynamoDb table created, name: " << table.name << std::endl;
-
-      createTableResponse.body = SendDynamoDbRequest(request.body, request.headers);
 
     } catch (Poco::Exception &exc) {
       log_error_stream(_logger) << "DynamoDbd create table failed, message: " << exc.message() << std::endl;
@@ -54,12 +55,32 @@ namespace AwsMock::Service {
 
   }
 
+  Dto::DynamoDb::ListTableResponse DynamoDbService::ListTables(const Dto::DynamoDb::ListTableRequest &request) {
+    log_debug_stream(_logger) << "Starting list table request, region: " << request.region << std::endl;
+
+    Dto::DynamoDb::ListTableResponse listTableResponse;
+    try {
+
+      // Send request to docker container
+      std::string body = SendDynamoDbRequest(request.body, request.headers);
+      listTableResponse.FromJson(body);
+      log_info_stream(_logger) << "DynamoDb list tables, region: " << request.region << std::endl;
+
+    } catch (Poco::Exception &exc) {
+      log_error_stream(_logger) << "DynamoDbd create table failed, message: " << exc.message() << std::endl;
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+    }
+
+    return listTableResponse;
+
+  }
+
   Dto::DynamoDb::DeleteTableResponse DynamoDbService::DeleteTable(const Dto::DynamoDb::DeleteTableRequest &request) {
     log_debug_stream(_logger) << "Start creating a new DynamoDb table, region: " << request.region << " name: " << request.tableName << std::endl;
 
     if (!_dynamoDbDatabase->TableExists(request.region, request.tableName)) {
       log_warning_stream(_logger) << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName << std::endl;
-      throw Core::ServiceException("DynamoDb table exists already", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+      throw Core::ServiceException("DynamoDb table exists already", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
     }
 
     Dto::DynamoDb::DeleteTableResponse deleteTableResponse;
@@ -68,13 +89,13 @@ namespace AwsMock::Service {
       // Delete table in database
       _dynamoDbDatabase->DeleteTable(request.tableName);
 
-      //deleteTableResponse = {.region=table.region, .tableName=table.name};
-      log_info_stream(_logger) << "DynamoDb table created, name: " << request.tableName << std::endl;
-
+      // Send request to docker container
       std::string body = SendDynamoDbRequest(request.body, request.headers);
+      deleteTableResponse.FromJson(body);
+      log_info_stream(_logger) << "DynamoDb table deleted, name: " << request.tableName << std::endl;
 
     } catch (Poco::Exception &exc) {
-      log_error_stream(_logger) << "DynamoDbd create table failed, message: " << exc.message() << std::endl;
+      log_error_stream(_logger) << "DynamoDbd delete table failed, message: " << exc.message() << std::endl;
       throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
 
@@ -82,7 +103,7 @@ namespace AwsMock::Service {
 
   }
 
-  std::string DynamoDbService::SendDynamoDbRequest(const std::string &body, const std::map<std::string, std::string>& headers) {
+  std::string DynamoDbService::SendDynamoDbRequest(const std::string &body, const std::map<std::string, std::string> &headers) {
     log_debug_stream(_logger) << "Sending DynamoDB request, endpoint: " << _dockerHost << ":" << _dockerPort << std::endl;
 
     Poco::URI uri = Poco::URI("http://" + _dockerHost + ":" + std::to_string(_dockerPort) + "/");
@@ -114,7 +135,7 @@ namespace AwsMock::Service {
 
     std::stringstream bodyStream;
     Poco::StreamCopier::copyStream(istream, bodyStream);
-    log_debug_stream(_logger) << "DynamoDB request request send, state: " << response.getStatus() << std::endl;
+    log_debug_stream(_logger) << "DynamoDB request request send, status: " << response.getStatus() << std::endl;
 
     return bodyStream.str();
   }
