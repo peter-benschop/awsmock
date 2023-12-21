@@ -10,9 +10,15 @@ namespace AwsMock::Dto::DynamoDb {
 
     try {
       Poco::JSON::Object rootJson;
-      rootJson.set("Region", region);
-      rootJson.set("ExclusiveStartTableName", exclusiveStartTableName);
-      rootJson.set("Limit", limit);
+      if (!region.empty()) {
+        rootJson.set("Region", region);
+      }
+      if (!exclusiveStartTableName.empty()) {
+        rootJson.set("ExclusiveStartTableName", exclusiveStartTableName);
+      }
+      if (limit > 0) {
+        rootJson.set("Limit", limit);
+      }
 
       std::ostringstream os;
       rootJson.stringify(os);
@@ -30,7 +36,7 @@ namespace AwsMock::Dto::DynamoDb {
 
     Poco::JSON::Parser parser;
     Poco::Dynamic::Var result = parser.parse(jsonBody);
-    const auto& rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
     try {
       Core::JsonUtils::GetJsonValueString("Region", rootObject, region);

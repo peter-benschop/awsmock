@@ -15,7 +15,7 @@ set(TRANSFER_SOURCES src/repository/TransferDatabase.cpp src/entity/transfer/Use
         src/memorydb/TransferMemoryDb.cpp)
 set(COGNITO_SOURCES src/entity/cognito/UserPool.cpp src/entity/cognito/User.cpp src/memorydb/CognitoMemoryDb.cpp
         src/repository/CognitoDatabase.cpp)
-set(DYNAMODB_SOURCES src/entity/dynamodb/DynamoDb.cpp src/entity/dynamodb/Table.cpp src/repository/DynamoDbDatabase.cpp
+set(DYNAMODB_SOURCES src/entity/dynamodb/Item.cpp src/entity/dynamodb/Table.cpp src/repository/DynamoDbDatabase.cpp
         src/memorydb/DynamoDbMemoryDb.cpp)
 set(MODULE_SOURCES src/entity/module/Module.cpp src/repository/ModuleDatabase.cpp src/memorydb/ModuleMemoryDb.cpp)
 

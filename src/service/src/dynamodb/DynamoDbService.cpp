@@ -103,6 +103,20 @@ namespace AwsMock::Service {
 
   }
 
+  void DynamoDbService::DeleteAllTables() {
+    log_debug_stream(_logger) << "Deleting all tables" << std::endl;
+
+    try {
+      // Delete table in database
+      _dynamoDbDatabase->DeleteAllTables();
+      log_info_stream(_logger) << "DynamoDb tables deleted" << std::endl;
+
+    } catch (Poco::Exception &exc) {
+      log_error_stream(_logger) << "DynamoDbd delete table failed, message: " << exc.message() << std::endl;
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+    }
+  }
+
   Dto::DynamoDb::GetItemResponse DynamoDbService::GetItem(const Dto::DynamoDb::GetItemRequest &request) {
     log_debug_stream(_logger) << "Start get item, region: " << request.region << " name: " << request.tableName << std::endl;
 
@@ -145,7 +159,7 @@ namespace AwsMock::Service {
       log_info_stream(_logger) << "DynamoDb put item, name: " << request.tableName << std::endl;
 
     } catch (Poco::Exception &exc) {
-      log_error_stream(_logger) << "DynamoDbd put item failed, message: " << exc.message() << std::endl;
+      log_error_stream(_logger) << "DynamoDb put item failed, message: " << exc.message() << std::endl;
       throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
 
@@ -153,8 +167,61 @@ namespace AwsMock::Service {
 
   }
 
+  Dto::DynamoDb::QueryResponse DynamoDbService::Query(const Dto::DynamoDb::QueryRequest &request) {
+    log_debug_stream(_logger) << "Start query, region: " << request.region << " name: " << request.tableName << std::endl;
+
+    if (!_dynamoDbDatabase->TableExists(request.region, request.tableName)) {
+      log_warning_stream(_logger) << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName << std::endl;
+      throw Core::ServiceException("DynamoDb table exists already", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+    }
+
+    Dto::DynamoDb::QueryResponse queryResponse;
+    try {
+
+      // Send request to docker container
+      std::string body = SendDynamoDbRequest(request.body, request.headers);
+      queryResponse.FromJson(body);
+      log_info_stream(_logger) << "DynamoDb query item, name: " << request.tableName << std::endl;
+
+    } catch (Poco::Exception &exc) {
+      log_error_stream(_logger) << "DynamoDb query failed, message: " << exc.message() << std::endl;
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+    }
+
+    return queryResponse;
+
+  }
+
+  Dto::DynamoDb::DeleteItemResponse DynamoDbService::DeleteItem(const Dto::DynamoDb::DeleteItemRequest &request) {
+    log_debug_stream(_logger) << "Start creating a new DynamoDb item, region: " << request.region << " table: " << request.tableName << std::endl;
+
+    /*if (!_dynamoDbDatabase->ItemExists(request.region, request.tableName)) {
+      log_warning_stream(_logger) << "DynamoDb item does not exist, region: " << request.region << " name: " << request.tableName << std::endl;
+      throw Core::ServiceException("DynamoDb item exists already", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+    }*/
+
+    Dto::DynamoDb::DeleteItemResponse deleteItemResponse;
+    try {
+
+      // Delete item in database
+      _dynamoDbDatabase->DeleteItem(request.region, request.tableName, "");
+
+      // Send request to docker container
+      std::string body = SendDynamoDbRequest(request.body, request.headers);
+      deleteItemResponse.FromJson(body);
+      log_info_stream(_logger) << "DynamoDb item deleted, table: " << request.tableName << std::endl;
+
+    } catch (Poco::Exception &exc) {
+      log_error_stream(_logger) << "DynamoDbd delete item failed, message: " << exc.message() << std::endl;
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+    }
+
+    return deleteItemResponse;
+
+  }
+
   std::string DynamoDbService::SendDynamoDbRequest(const std::string &body, const std::map<std::string, std::string> &headers) {
-    log_debug_stream(_logger) << "Sending DynamoDB request, endpoint: " << _dockerHost << ":" << _dockerPort << std::endl;
+    log_debug_stream(_logger) << "Sending DynamoDB container request, endpoint: " << _dockerHost << ":" << _dockerPort << std::endl;
 
     Poco::URI uri = Poco::URI("http://" + _dockerHost + ":" + std::to_string(_dockerPort) + "/");
     std::string path(uri.getPathAndQuery());

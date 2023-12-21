@@ -2,8 +2,8 @@
 // Created by vogje01 on 07/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_DYNAMODB_H
-#define AWSMOCK_DB_ENTITY_DYNAMODB_H
+#ifndef AWSMOCK_DB_ENTITY_DYNAMO_ITEM_H
+#define AWSMOCK_DB_ENTITY_DYNAMO_ITEM_H
 
 // C++ includes
 #include <string>
@@ -36,7 +36,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
   using bsoncxx::document::value;
   using bsoncxx::to_json;
 
-  struct DynamoDb {
+  struct Item {
 
     /**
      * ID
@@ -98,11 +98,11 @@ namespace AwsMock::Database::Entity::DynamoDb {
      * @param d DynamoDB  entity
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const DynamoDb &d);
+    friend std::ostream &operator<<(std::ostream &os, const Item &d);
   };
 
-  typedef std::vector<DynamoDb> DynamoDbList;
+  typedef std::vector<Item> ItemList;
 
 } // namespace AwsMock::Database::Entity::DynamoDb
 
-#endif // AWSMOCK_DB_ENTITY_DYNAMODB_H
+#endif // AWSMOCK_DB_ENTITY_DYNAMO_ITEM_H

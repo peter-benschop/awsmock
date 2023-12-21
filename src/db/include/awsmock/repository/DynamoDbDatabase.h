@@ -17,7 +17,6 @@
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/memorydb/DynamoDbMemoryDb.h>
 #include <awsmock/repository/Database.h>
-#include <awsmock/entity/dynamodb/DynamoDb.h>
 
 namespace AwsMock::Database {
 
@@ -33,15 +32,6 @@ namespace AwsMock::Database {
       explicit DynamoDbDatabase(Core::Configuration &configuration);
 
       /**
-       * Checks the existence of a DynamoDb instance.
-       *
-       * @param region AWS region.
-       * @param name name of the database instance.
-       * @return true if database exists, otherwise false
-       */
-      bool DatabaseExists(const std::string &region, const std::string &name);
-
-      /**
        * Check existence of DynamoDb table
        *
        * @param region AWS region name
@@ -50,14 +40,6 @@ namespace AwsMock::Database {
        * @throws DatabaseException
        */
       bool TableExists(const std::string &region, const std::string &tableName);
-
-      /**
-       * Returns the database entity by name.
-       *
-       * @param region AWS region.
-       * @param name name of the database instance.
-       */
-      Entity::DynamoDb::DynamoDb GetDatabaseByName(const std::string &region, const std::string &name);
 
       /**
        * Create a new DynamoDb table
@@ -108,6 +90,26 @@ namespace AwsMock::Database {
        */
       void DeleteAllTables();
 
+      /**
+       * Checks the existence of an item.
+       *
+       * @param region AWS region.
+       * @param tableName name of the table
+       * @param key primary key of the item
+       * @return true if database exists, otherwise false
+       */
+      bool ItemExists(const std::string &region, const std::string &tableName, const std::string & key);
+
+      /**
+       * Deletes an item
+       *
+       * @param region AWS region.
+       * @param tableName name of the table
+       * @param key primary key of the item
+       * @return true if database exists, otherwise false
+       */
+      void DeleteItem(const std::string &region, const std::string &tableName, const std::string & key);
+
     private:
 
       /**
@@ -116,14 +118,14 @@ namespace AwsMock::Database {
       Core::LogStream _logger;
 
       /**
-       * DynamoDb collection
-       */
-      mongocxx::collection _dynamodbCollection{};
-
-      /**
        * DynamoDb table collection
        */
       mongocxx::collection _tableCollection{};
+
+      /**
+       * DynamoDb item collection
+       */
+      mongocxx::collection _itemCollection{};
 
       /**
        * DynamoDB in-memory database

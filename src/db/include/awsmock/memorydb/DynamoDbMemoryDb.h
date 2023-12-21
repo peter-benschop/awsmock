@@ -22,7 +22,7 @@
 #include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/entity/dynamodb/DynamoDb.h>
+#include <awsmock/entity/dynamodb/Item.h>
 #include "awsmock/entity/dynamodb/Table.h"
 #include <awsmock/repository/Database.h>
 
@@ -44,25 +44,6 @@ namespace AwsMock::Database {
         static Poco::SingletonHolder<DynamoDbMemoryDb> sh;
         return *sh.get();
       }
-
-      /**
-       * Check existence of lambda
-       *
-       * @param region AWS region name
-       * @param name name of the database
-       * @return true if lambda already exists
-       * @throws DatabaseException
-       */
-      bool DatabaseExists(const std::string &region, const std::string &name);
-
-      /**
-       * Returns the database entity by name.
-       *
-       * @param region AWS region.
-       * @param name name of the database instance.
-       * @return DynamoDb database entity
-       */
-      Entity::DynamoDb::DynamoDb GetDatabaseByName(const std::string &region, const std::string &name);
 
       /**
        * Check existence of DynamoDb table
@@ -115,96 +96,24 @@ namespace AwsMock::Database {
       void DeleteAllTables();
 
       /**
-       * Check existence of lambda
+       * Checks the existence of an item.
        *
-       * @param lambda AWS function
-       * @return true if lambda already exists
-       * @throws DatabaseException
+       * @param region AWS region.
+       * @param tableName name of the table
+       * @param key primary key of the item
+       * @return true if database exists, otherwise false
        */
-      //bool LambdaExists(const Entity::Lambda::Lambda &lambda);
+      bool ItemExists(const std::string &region, const std::string &tableName, const std::string & key);
 
       /**
-       * Check existence of lambda
+       * Deletes an item
        *
-       * @param function AWS function
-       * @return true if lambda already exists
-       * @throws DatabaseException
+       * @param region AWS region.
+       * @param tableName name of the table
+       * @param key primary key of the item
+       * @return true if database exists, otherwise false
        */
-      //bool LambdaExists(const std::string &function);
-
-      /**
-       * Check existence of lambda
-       *
-       * @param arn AWS ARN
-       * @return true if lambda exists
-       * @throws DatabaseException
-       */
-      //bool LambdaExistsByArn(const std::string &arn);
-
-      /**
-       * Create a new lambda function
-       *
-       * @param lambda lambda entity
-       * @return created lambda entity.
-       */
-      //Entity::Lambda::Lambda CreateLambda(const Entity::Lambda::Lambda &lambda);
-
-      /**
-       * Returns a lambda entity by primary key
-       *
-       * @param oid lambda primary key
-       * @return lambda entity
-       * @throws DatabaseException
-       */
-      //Entity::Lambda::Lambda GetLambdaById(const std::string &oid);
-
-      /**
-        * Returns a lambda entity by ARN
-        *
-        * @param arn lambda ARN
-        * @return lambda entity
-        * @throws DatabaseException
-        */
-      //Entity::Lambda::Lambda GetLambdaByArn(const std::string &arn);
-
-      /**
-       * Count all lambdas
-       *
-       * @param region aws-mock region.
-       * @return total number of lambdas.
-       */
-      //long LambdaCount(const std::string &region = {});
-
-      /**
-       * Returns a list of lambda functions.
-       *
-       * @param region AWS region name
-       * @return list of lambda functions
-       */
-      //std::vector<Entity::Lambda::Lambda> ListLambdas(const std::string &region);
-
-      /**
-       * Updates an existing lambda lambda function
-       *
-       * @param lambda lambda entity
-       * @return updated lambda entity.
-       */
-      //Entity::Lambda::Lambda UpdateLambda(const Entity::Lambda::Lambda &lambda);
-
-      /**
-       * Deletes an existing lambda function
-       *
-       * @param functionName lambda function name
-       * @throws DatabaseException
-       */
-      //void DeleteLambda(const std::string &functionName);
-
-      /**
-       * Deletes all existing lambda functions
-       *
-       * @throws DatabaseException
-       */
-      //void DeleteAllLambdas();
+      void DeleteItem(const std::string &region, const std::string &tableName, const std::string & key);
 
     private:
 
@@ -214,19 +123,24 @@ namespace AwsMock::Database {
       Core::LogStream _logger;
 
       /**
-       * Lambda map
-       */
-      std::map<std::string, Entity::DynamoDb::DynamoDb> _dynamoDbs{};
-
-      /**
-       * Lambda map
+       * Table map
        */
       std::map<std::string, Entity::DynamoDb::Table> _tables{};
+
+      /**
+       * Item map
+       */
+      std::map<std::string, Entity::DynamoDb::Item> _items{};
 
       /**
        * Table mutex
        */
       Poco::Mutex _tableMutex;
+
+      /**
+       * Item mutex
+       */
+      Poco::Mutex _itemMutex;
   };
 
 } // namespace AwsMock::Database

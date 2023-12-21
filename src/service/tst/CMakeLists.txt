@@ -7,7 +7,7 @@ set(S3_SOURCES S3ServiceTests.cpp S3ServerJavaTests.cpp S3ServerCliTest.cpp)
 set(LAMBDA_SOURCES LambdaServiceTests.cpp LambdaServerCliTest.cpp)
 set(DOCKER_SOURCES DockerServiceTests.cpp)
 set(COGNITO_SOURCES CognitoServiceTests.cpp CognitoServerCliTest.cpp CognitoServerJavaTests.cpp)
-set(DYNAMODB_SOURCES DynamodbServerJavaTests.cpp)
+set(DYNAMODB_SOURCES DynamodbServerJavaTests.cpp DynamoDbServerCliTest.cpp)
 set(MAIN_SOURCES main.cpp)
 
 # Includes

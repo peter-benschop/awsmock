@@ -2,11 +2,11 @@
 // Created by vogje01 on 20/12/2023.
 //
 
-#include <awsmock/dto/dynamodb/PutItemResponse.h>
+#include <awsmock/dto/dynamodb/QueryResponse.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
-  std::string PutItemResponse::ToJson() {
+  std::string QueryResponse::ToJson() {
 
     try {
       Poco::JSON::Object rootJson;
@@ -22,7 +22,7 @@ namespace AwsMock::Dto::DynamoDb {
     }
   }
 
-  void PutItemResponse::FromJson(const std::string &jsonString) {
+  void QueryResponse::FromJson(const std::string &jsonString) {
 
     body = jsonString;
 
@@ -42,14 +42,14 @@ namespace AwsMock::Dto::DynamoDb {
     }
   }
 
-  std::string PutItemResponse::ToString() const {
+  std::string QueryResponse::ToString() const {
     std::stringstream ss;
     ss << (*this);
     return ss.str();
   }
 
-  std::ostream &operator<<(std::ostream &os, const PutItemResponse &r) {
-    os << "PutItemResponse={region='" << r.region << "', tableName='" << r.tableName << "}";
+  std::ostream &operator<<(std::ostream &os, const QueryResponse &r) {
+    os << "QueryResponse={region='" << r.region << "', tableName='" << r.tableName << "}";
     return os;
   }
 
