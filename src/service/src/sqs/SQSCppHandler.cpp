@@ -42,12 +42,12 @@ namespace AwsMock::Service {
         std::map<std::string, std::string> tags = GetQueueTags(payload);
 
         Dto::SQS::CreateQueueRequest sqsRequest = {
-            .region=region,
-            .name=queueName,
-            .queueUrl=queueUrl,
-            .owner=user,
-            .attributes=attributes,
-            .tags=tags
+          .region=region,
+          .name=queueName,
+          .queueUrl=queueUrl,
+          .owner=user,
+          .attributes=attributes,
+          .tags=tags
         };
         Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
         SendOkResponse(response, sqsResponse.ToXml());
@@ -62,8 +62,8 @@ namespace AwsMock::Service {
         std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
 
         Dto::SQS::DeleteQueueRequest sqsRequest = {
-            .region=region,
-            .queueUrl=queueUrl
+          .region=region,
+          .queueUrl=queueUrl
         };
         _sqsService.DeleteQueue(sqsRequest);
         SendOkResponse(response);
@@ -77,12 +77,12 @@ namespace AwsMock::Service {
         log_debug_stream(_logger) << "SendMessage, queueUrl " << queueUrl << std::endl;
 
         Dto::SQS::SendMessageRequest sqsRequest = {
-            .region=region,
-            .queueUrl=queueUrl,
-            .body=body,
-            .messageAttributes=attributes,
-            .requestId=requestId,
-            .messageId=messageId
+          .region=region,
+          .queueUrl=queueUrl,
+          .body=body,
+          .messageAttributes=attributes,
+          .requestId=requestId,
+          .messageId=messageId
         };
         Dto::SQS::SendMessageResponse sqsResponse = _sqsService.SendMessage(sqsRequest);
         SendOkResponse(response, sqsResponse.ToXml());
@@ -92,8 +92,8 @@ namespace AwsMock::Service {
         std::string queueName = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueName");
 
         Dto::SQS::GetQueueUrlRequest sqsRequest = {
-            .region=region,
-            .queueName=queueName
+          .region=region,
+          .queueName=queueName
         };
         Dto::SQS::GetQueueUrlResponse sqsResponse = _sqsService.GetQueueUrl(sqsRequest);
         SendOkResponse(response, sqsResponse.ToXml());
@@ -107,12 +107,12 @@ namespace AwsMock::Service {
         int visibility = GetIntParameter(payload, "VisibilityTimeout", 1, 900, 30);
 
         Dto::SQS::ReceiveMessageRequest sqsRequest = {
-            .region=region,
-            .queueUrl=queueUrl,
-            .maxMessages=maxMessages,
-            .visibilityTimeout=visibility,
-            .waitTimeSeconds=waitTimeSeconds,
-            .requestId=requestId
+          .region=region,
+          .queueUrl=queueUrl,
+          .maxMessages=maxMessages,
+          .visibilityTimeout=visibility,
+          .waitTimeSeconds=waitTimeSeconds,
+          .requestId=requestId
         };
         Dto::SQS::ReceiveMessageResponse sqsResponse = _sqsService.ReceiveMessages(sqsRequest);
 
@@ -126,8 +126,8 @@ namespace AwsMock::Service {
         std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
 
         Dto::SQS::PurgeQueueRequest sqsRequest = {
-            .queueUrl=queueUrl,
-            .region=region
+          .region=region,
+          .queueUrl=queueUrl
         };
         _sqsService.PurgeQueue(sqsRequest);
 
@@ -139,9 +139,9 @@ namespace AwsMock::Service {
         std::vector<std::string> attributeNames = GetQueueAttributeNames(payload);
 
         Dto::SQS::GetQueueAttributesRequest sqsRequest = {
-            .region=region,
-            .queueUrl=queueUrl,
-            .attributeNames=attributeNames
+          .region=region,
+          .queueUrl=queueUrl,
+          .attributeNames=attributeNames
         };
         Dto::SQS::GetQueueAttributesResponse sqsResponse = _sqsService.GetQueueAttributes(sqsRequest);
 
@@ -162,9 +162,9 @@ namespace AwsMock::Service {
         }
 
         Dto::SQS::SetQueueAttributesRequest sqsRequest = {
-            .region=region,
-            .queueUrl=queueUrl,
-            .attributes=attributes
+          .region=region,
+          .queueUrl=queueUrl,
+          .attributes=attributes
         };
         _sqsService.SetQueueAttributes(sqsRequest);
 
@@ -181,10 +181,10 @@ namespace AwsMock::Service {
         std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
 
         Dto::SQS::ChangeMessageVisibilityRequest sqsRequest = {
-            .region=region,
-            .queueUrl=queueUrl,
-            .receiptHandle=receiptHandle,
-            .visibilityTimeout=visibilityTimeout
+          .region=region,
+          .queueUrl=queueUrl,
+          .receiptHandle=receiptHandle,
+          .visibilityTimeout=visibilityTimeout
         };
 
         SendOkResponse(response);
@@ -195,9 +195,9 @@ namespace AwsMock::Service {
         std::string receiptHandle = GetStringParameter(payload, "ReceiptHandle");
 
         Dto::SQS::DeleteMessageRequest sqsRequest = {
-            .region=region,
-            .queueUrl=queueUrl,
-            .receiptHandle=receiptHandle
+          .region=region,
+          .queueUrl=queueUrl,
+          .receiptHandle=receiptHandle
         };
         _sqsService.DeleteMessage(sqsRequest);
 
@@ -266,8 +266,8 @@ namespace AwsMock::Service {
 
     for (int i = 1; i <= count; i++) {
       Dto::SQS::QueueAttribute attribute = {
-          .attributeName=Core::HttpUtils::GetQueryParameterValueByName(payload, "UserAttribute." + std::to_string(i) + ".Name"),
-          .attributeValue=Core::HttpUtils::GetQueryParameterValueByName(payload, "UserAttribute." + std::to_string(i) + ".Value")
+        .attributeName=Core::HttpUtils::GetQueryParameterValueByName(payload, "UserAttribute." + std::to_string(i) + ".Name"),
+        .attributeValue=Core::HttpUtils::GetQueryParameterValueByName(payload, "UserAttribute." + std::to_string(i) + ".Value")
       };
       queueAttributes.emplace_back(attribute);
     }

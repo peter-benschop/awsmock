@@ -238,11 +238,10 @@ namespace AwsMock::Database {
       opts.return_document(mongocxx::options::return_document::k_after);
 
       auto mResult = _queueCollection.find_one_and_update(make_document(kvp("region", queue.region), kvp("name", queue.name)), queue.ToDocument(), opts);
-      log_trace_stream(_logger) << "Queue updated: " << queue.ToString() << std::endl;
-
       if (!mResult) {
         throw Core::DatabaseException("Update queue failed, region: " + queue.region + " queueUrl: " + queue.queueUrl);
       }
+      log_trace_stream(_logger) << "Queue updated: " << queue.ToString() << std::endl;
 
       queue.FromDocument(mResult->view());
       return queue;

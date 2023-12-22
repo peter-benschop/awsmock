@@ -255,6 +255,33 @@ namespace AwsMock::Service {
     }
   }
 
+  void SQSService::TagQueue(const Dto::SQS::TagQueueRequest &request) {
+
+    try {
+
+      // Check existence
+      if (!_database->QueueUrlExists(request.region, request.queueUrl)) {
+        throw Core::ServiceException("SQS queue topic does not exists", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+      }
+
+      // Get the topic
+      Database::Entity::SQS::Queue queue = _database->GetQueueByUrl(request.region, request.queueUrl);
+
+      // Set tags and update database
+      for(const auto &tag:request.tags) {
+        queue.tags[tag.first] = tag.second;
+      }
+
+      queue = _database->UpdateQueue(queue);
+      log_info_stream(_logger) << "SQS queue tags updated, count: " << request.tags.size() << std::endl;
+
+    } catch (Poco::Exception &ex) {
+      log_error_stream(_logger) << "SQS set queue tags failed, message: " << ex.message() << std::endl;
+      throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+    }
+  }
+
+
   void SQSService::DeleteQueue(const Dto::SQS::DeleteQueueRequest &request) {
     log_trace_stream(_logger) << "Delete queue request, request: " << request.ToString() << std::endl;
 

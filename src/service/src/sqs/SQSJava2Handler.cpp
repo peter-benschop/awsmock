@@ -162,10 +162,33 @@ namespace AwsMock::Service {
         } else {
 
           std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
-          sqsRequest = {.queueUrl=queueUrl, .region=region};
+          sqsRequest = {.region=region, .queueUrl=queueUrl};
 
         }
         _sqsService.PurgeQueue(sqsRequest);
+        SendOkResponse(response);
+
+      } else if (action == "TagQueue") {
+
+        Dto::SQS::TagQueueRequest sqsRequest;
+        if (userAgent.contentType == "json") {
+
+          sqsRequest.FromJson(payload);
+          sqsRequest.region = region;
+
+        } else {
+
+          std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
+          std::string tagKey = Core::HttpUtils::GetQueryParameterValueByName(payload, "Tag.Key");
+          std::string tagValue = Core::HttpUtils::GetQueryParameterValueByName(payload, "Tag.Key");
+
+          std::map<std::string, std::string> tags;
+          tags[tagKey] = tagValue;
+
+          sqsRequest = {.region=region, .queueUrl=queueUrl, .tags=tags};
+
+        }
+        _sqsService.TagQueue(sqsRequest);
         SendOkResponse(response);
 
       } else if (action == "GetQueueAttributes") {
