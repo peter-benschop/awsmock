@@ -144,7 +144,7 @@ Export the S3 infrastructure to a file ```infrastrcture.json```:
 Jens Vogt <jens.vogt@opitz-consulting.com>
 
 ## VERSION
-&nbsp;&nbsp;&nbsp;&nbsp; 0.5.167
+0.5.167
 
 ## BUGS
 
@@ -153,4 +153,4 @@ Bugs and enhancement requests can be reported and filed at https://github.com/je
 ## SEE ALSO
 
 ```awsmockmgr(1)```, ```awsmocksqs(1)```, ```awslocal(1)```, ```awsmocksqs(1)```, ```awsmocksns(1)```, ```awsmocklambda(1)```,
-```awsmockdynamodb(1)```
+```awsmockdynamodb(1)```, ```awsmockcognito(1)```
