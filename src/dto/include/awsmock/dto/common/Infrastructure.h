@@ -19,6 +19,8 @@
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/ServiceException.h>
+#include <awsmock/entity/dynamodb/Table.h>
+#include <awsmock/entity/dynamodb/Item.h>
 #include <awsmock/entity/cognito/User.h>
 #include <awsmock/entity/cognito/UserPool.h>
 #include <awsmock/entity/lambda/Lambda.h>
@@ -85,6 +87,16 @@ namespace AwsMock::Dto::Common {
     Database::Entity::Cognito::UserList cognitoUsers;
 
     /**
+     * DynamoDb tables
+     */
+    Database::Entity::DynamoDb::TableList dynamoDbTables;
+
+    /**
+     * DynamoDb items
+     */
+    Database::Entity::DynamoDb::ItemList  dynamoDbItems;
+
+    /**
      * JSON representation
      *
      * @param prettyPrint pretty print, if true JSON indent=4
@@ -98,6 +110,7 @@ namespace AwsMock::Dto::Common {
      * @param Infrastructure as JSON string
      */
     void FromJson(const std::string &jsonString);
+
   };
 
 } // namespace AwsMock::Dto

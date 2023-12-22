@@ -25,7 +25,7 @@ namespace AwsMock::Dto::DynamoDb {
       return os.str();
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -44,7 +44,7 @@ namespace AwsMock::Dto::DynamoDb {
       Core::JsonUtils::GetJsonValueInt("Limit", rootObject, limit);
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
   }
 

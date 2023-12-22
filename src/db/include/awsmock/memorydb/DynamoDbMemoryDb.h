@@ -103,7 +103,16 @@ namespace AwsMock::Database {
        * @param key primary key of the item
        * @return true if database exists, otherwise false
        */
-      bool ItemExists(const std::string &region, const std::string &tableName, const std::string & key);
+      bool ItemExists(const std::string &region, const std::string &tableName, const std::string &key);
+
+      /**
+       * Returns a list of DynamoDB items
+       *
+       * @param region AWS region.
+       * @param tableName table name
+       * @return list of DynamoDB tables
+       */
+      Entity::DynamoDb::ItemList ListItems(const std::string &region = {}, const std::string &tableName = {});
 
       /**
        * Deletes an item
@@ -113,7 +122,7 @@ namespace AwsMock::Database {
        * @param key primary key of the item
        * @return true if database exists, otherwise false
        */
-      void DeleteItem(const std::string &region, const std::string &tableName, const std::string & key);
+      void DeleteItem(const std::string &region, const std::string &tableName, const std::string &key);
 
     private:
 

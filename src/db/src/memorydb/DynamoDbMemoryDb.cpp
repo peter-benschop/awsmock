@@ -94,6 +94,36 @@ namespace AwsMock::Database {
     }
   }
 
+  Entity::DynamoDb::ItemList DynamoDbMemoryDb::ListItems(const std::string &region, const std::string &tableName) {
+
+    Entity::DynamoDb::ItemList items;
+    if (region.empty() && tableName.empty()) {
+
+      for (const auto &item : _items) {
+        items.emplace_back(item.second);
+      }
+
+    } else if (tableName.empty()) {
+
+      for (const auto &item : _items) {
+        if (item.second.region == region) {
+          items.emplace_back(item.second);
+        }
+      }
+
+    } else {
+
+      for (const auto &item : _items) {
+        if (item.second.region == region && item.second.name == tableName) {
+          items.emplace_back(item.second);
+        }
+      }
+    }
+
+    log_trace_stream(_logger) << "Got DynamoDB items, size: " << items.size() << std::endl;
+    return items;
+  }
+
   void DynamoDbMemoryDb::DeleteItem(const std::string &region, const std::string &tableName, const std::string &key) {
     Poco::ScopedLock lock(_itemMutex);
 

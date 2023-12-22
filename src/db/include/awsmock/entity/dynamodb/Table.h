@@ -2,8 +2,8 @@
 // Created by vogje01 on 07/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_DYNAMO_TABLE_H
-#define AWSMOCK_DB_ENTITY_DYNAMO_TABLE_H
+#ifndef AWSMOCK_DB_ENTITY_DYNAMODB_TABLE_H
+#define AWSMOCK_DB_ENTITY_DYNAMODB_TABLE_H
 
 // C++ includes
 #include <string>
@@ -25,6 +25,7 @@
 #include <Poco/JSON/Object.h>
 
 // AwsMock includes
+#include <awsmock/core/JsonUtils.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
 
@@ -97,7 +98,14 @@ namespace AwsMock::Database::Entity::DynamoDb {
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+    Poco::JSON::Object ToJsonObject() const;
+
+    /**
+     * Converts an JSON object to an entity
+     *
+     * @param jsonObject JSON object.
+     */
+    void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 
     /**
      * Converts the DTO to a string representation.
@@ -120,4 +128,4 @@ namespace AwsMock::Database::Entity::DynamoDb {
 
 } // namespace AwsMock::Database::Entity::DynamoDb
 
-#endif // AWSMOCK_DB_ENTITY_DYNAMO_TABLE_H
+#endif // AWSMOCK_DB_ENTITY_DYNAMODB_TABLE_H

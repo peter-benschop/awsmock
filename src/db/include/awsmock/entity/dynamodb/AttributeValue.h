@@ -1,15 +1,17 @@
 //
-// Created by vogje01 on 07/06/2023.
+// Created by vogje01 on 12/21/23.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_DYNAMODB_ITEM_H
-#define AWSMOCK_DB_ENTITY_DYNAMODB_ITEM_H
+#ifndef AWSMOCK_ENTITY_DYNAMODB_ATTRIBUTE_VALUE_H
+#define AWSMOCK_ENTITY_DYNAMODB_ATTRIBUTE_VALUE_H
 
 // C++ includes
 #include <string>
-#include <vector>
-#include <iostream>
-#include <sstream>
+#include <map>
+
+// Poco includes
+#include <Poco/JSON/Parser.h>
+#include <Poco/JSON/Object.h>
 
 // MongoDB includes
 #include <bsoncxx/json.hpp>
@@ -18,14 +20,9 @@
 #include <bsoncxx/builder/basic/document.hpp>
 #include <mongocxx/stdx.hpp>
 
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-#include <Poco/JSON/Object.h>
-
-// AwsMock includes
-#include <awsmock/entity/dynamodb/AttributeValue.h>
+// AwsMock include
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/ServiceException.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
 
@@ -37,27 +34,37 @@ namespace AwsMock::Database::Entity::DynamoDb {
   using bsoncxx::document::value;
   using bsoncxx::to_json;
 
-  struct Item {
+  struct AttributeValue {
 
     /**
-     * ID
+     * String value
      */
-    std::string oid;
+    std::string stringValue;
 
     /**
-     * AWS region name
+     * String set value
      */
-    std::string region;
+    std::vector<std::string> stringSetValue;
 
     /**
-     * Name
+     * Number value
      */
-    std::string name;
+    std::string numberValue;
 
     /**
-     * Item
+     * Number set value
      */
-    std::map<std::string, Entity::DynamoDb::AttributeValue> attributes;
+    std::vector<std::string> numberSetValue;
+
+    /**
+     * Boolean value
+     */
+    bool boolValue;
+
+    /**
+     * Null value
+     */
+    bool nullValue;
 
     /**
      * Creation date
@@ -68,6 +75,20 @@ namespace AwsMock::Database::Entity::DynamoDb {
      * Last modification date
      */
     Poco::DateTime modified = Poco::DateTime();
+
+    /**
+     * Convert to JSON value
+     *
+     * @return JSON object
+     */
+    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+
+    /**
+     * Convert from JSON object.
+     *
+     * @param jsonObject JSON object
+     */
+    void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 
     /**
      * Converts the entity to a MongoDB document
@@ -84,13 +105,6 @@ namespace AwsMock::Database::Entity::DynamoDb {
     void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
     /**
-     * Converts the entity to a JSON object
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
-
-    /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
@@ -100,16 +114,11 @@ namespace AwsMock::Database::Entity::DynamoDb {
     /**
      * Stream provider.
      *
-     * @param os output stream
-     * @param d DynamoDB  entity
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const Item &d);
+    friend std::ostream &operator<<(std::ostream &os, const AttributeValue &r);
 
   };
+} // namespace AwsMock::Dto::DynampDb
 
-  typedef std::vector<Item> ItemList;
-
-} // namespace AwsMock::Database::Entity::DynamoDb
-
-#endif // AWSMOCK_DB_ENTITY_DYNAMODB_ITEM_H
+#endif // AWSMOCK_ENTITY_DYNAMODB_ATTRIBUTE_VALUE_H

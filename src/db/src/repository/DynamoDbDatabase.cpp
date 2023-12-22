@@ -32,7 +32,7 @@ namespace AwsMock::Database {
 
       } catch (const mongocxx::exception &exc) {
         _logger.error() << "Database exception " << exc.what() << std::endl;
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
     } else {
@@ -49,7 +49,7 @@ namespace AwsMock::Database {
       mongocxx::stdx::optional<bsoncxx::document::value> mResult = _tableCollection.find_one(make_document(kvp("_id", oid)));
       if (!mResult) {
         _logger.error() << "Database exception: Table not found " << std::endl;
-        throw Core::DatabaseException("Database exception, Table not found ", 500);
+        throw Core::DatabaseException("Database exception, Table not found ", Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
       Entity::DynamoDb::Table result;
@@ -59,7 +59,7 @@ namespace AwsMock::Database {
 
     } catch (const mongocxx::exception &exc) {
       _logger.error() << "Database exception " << exc.what() << std::endl;
-      throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+      throw Core::DatabaseException("Database exception " + std::string(exc.what()), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
 
   }
@@ -83,7 +83,7 @@ namespace AwsMock::Database {
       try {
 
         int64_t count;
-        if(!region.empty()) {
+        if (!region.empty()) {
           count = _tableCollection.count_documents(make_document(kvp("region", region), kvp("name", tableName)));
         } else {
           count = _tableCollection.count_documents(make_document(kvp("name", tableName)));
@@ -93,7 +93,7 @@ namespace AwsMock::Database {
 
       } catch (const mongocxx::exception &exc) {
         _logger.error() << "Database exception " << exc.what() << std::endl;
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
     } else {
@@ -105,24 +105,26 @@ namespace AwsMock::Database {
 
   std::vector<Entity::DynamoDb::Table> DynamoDbDatabase::ListTables(const std::string &region) {
 
-    std::vector<Entity::DynamoDb::Table> tables;
+    Entity::DynamoDb::TableList tables;
     if (HasDatabase()) {
 
       try {
 
-        if(region.empty()) {
+        if (region.empty()) {
 
-          auto lambdaCursor = _tableCollection.find({});
-          for (auto lambda : lambdaCursor) {
+          auto tableCursor = _tableCollection.find({});
+          for (auto table : tableCursor) {
             Entity::DynamoDb::Table result;
-            result.FromDocument(lambda);
+            result.FromDocument(table);
             tables.push_back(result);
           }
-        } else{
-          auto lambdaCursor = _tableCollection.find(make_document(kvp("region", region)));
-          for (auto lambda : lambdaCursor) {
+
+        } else {
+
+          auto tableCursor = _tableCollection.find(make_document(kvp("region", region)));
+          for (auto table : tableCursor) {
             Entity::DynamoDb::Table result;
-            result.FromDocument(lambda);
+            result.FromDocument(table);
             tables.push_back(result);
           }
 
@@ -130,7 +132,7 @@ namespace AwsMock::Database {
 
       } catch (const mongocxx::exception &exc) {
         _logger.error() << "Database exception " << exc.what() << std::endl;
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
     } else {
@@ -153,7 +155,7 @@ namespace AwsMock::Database {
 
       } catch (const mongocxx::exception &exc) {
         _logger.error() << "Database exception " << exc.what() << std::endl;
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
     } else {
@@ -174,7 +176,7 @@ namespace AwsMock::Database {
 
       } catch (const mongocxx::exception &exc) {
         _logger.error() << "Database exception " << exc.what() << std::endl;
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
     } else {
@@ -191,7 +193,7 @@ namespace AwsMock::Database {
       try {
 
         int64_t count;
-        if(!region.empty()) {
+        if (!region.empty()) {
           count = _tableCollection.count_documents(make_document(kvp("region", region), kvp("name", tableName)));
         } else {
           count = _tableCollection.count_documents(make_document(kvp("name", tableName)));
@@ -201,7 +203,7 @@ namespace AwsMock::Database {
 
       } catch (const mongocxx::exception &exc) {
         _logger.error() << "Database exception " << exc.what() << std::endl;
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
     } else {
@@ -209,6 +211,56 @@ namespace AwsMock::Database {
       return _memoryDb.ItemExists(region, tableName, key);
 
     }
+  }
+
+  Entity::DynamoDb::ItemList DynamoDbDatabase::ListItems(const std::string &region, const std::string &tableName) {
+
+    Entity::DynamoDb::ItemList items;
+    if (HasDatabase()) {
+
+      try {
+
+        if (region.empty() && tableName.empty()) {
+
+          auto itemCursor = _itemCollection.find({});
+          for (auto item : itemCursor) {
+            Entity::DynamoDb::Item result;
+            result.FromDocument(item);
+            items.push_back(result);
+          }
+
+        } else if (tableName.empty()) {
+
+          auto itemCursor = _itemCollection.find(make_document(kvp("region", region)));
+          for (auto item : itemCursor) {
+            Entity::DynamoDb::Item result;
+            result.FromDocument(item);
+            items.push_back(result);
+          }
+
+        } else {
+
+          auto itemCursor = _itemCollection.find(make_document(kvp("region", region), kvp("name", tableName)));
+          for (auto item : itemCursor) {
+            Entity::DynamoDb::Item result;
+            result.FromDocument(item);
+            items.push_back(result);
+          }
+
+        }
+
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+      }
+
+    } else {
+
+      items = _memoryDb.ListItems(region, tableName);
+    }
+
+    log_trace_stream(_logger) << "Got DynamoDb item list, size:" << items.size() << std::endl;
+    return items;
   }
 
   void DynamoDbDatabase::DeleteItem(const std::string &region, const std::string &tableName, const std::string &key) {
@@ -222,7 +274,7 @@ namespace AwsMock::Database {
 
       } catch (const mongocxx::exception &exc) {
         _logger.error() << "Database exception " << exc.what() << std::endl;
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
     } else {

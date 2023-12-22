@@ -25,6 +25,7 @@
 // AwsMock includes
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/entity/sns/Subscription.h>
+#include <awsmock/entity/sns/TopicAttribute.h>
 
 namespace AwsMock::Database::Entity::SNS {
 
@@ -35,6 +36,11 @@ namespace AwsMock::Database::Entity::SNS {
   using bsoncxx::document::view;
   using bsoncxx::document::value;
 
+  /**
+   * SNS topic entity
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   struct Topic {
 
     /**
@@ -73,6 +79,16 @@ namespace AwsMock::Database::Entity::SNS {
     SubscriptionList subscriptions;
 
     /**
+     * Attributes
+     */
+    TopicAttribute topicAttribute;
+
+    /**
+     * Topic tags
+     */
+    std::map<std::string, std::string> tags;
+
+    /**
      * Creation date
      */
     Poco::DateTime created = Poco::DateTime();
@@ -95,14 +111,14 @@ namespace AwsMock::Database::Entity::SNS {
      *
      * @return entity as MongoDB document.
      */
-    [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
+    [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
     /**
      * Converts the MongoDB document to an entity
      *
      * @param mResult MongoDB document view.
      */
-    [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+    void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
     /**
      * Converts the entity to a JSON object
@@ -127,8 +143,8 @@ namespace AwsMock::Database::Entity::SNS {
 
   };
 
-  typedef struct Topic Topic;
   typedef std::vector<Topic> TopicList;
 
 } // namespace AwsMock::Database::Entity::SNS
+
 #endif // AWSMOCK_DB_ENTITY_SNS_TOPIC_H

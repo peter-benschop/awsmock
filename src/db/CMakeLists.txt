@@ -6,7 +6,8 @@ set(SQS_SOURCES src/entity/sqs/MessageAttribute.cpp src/entity/sqs/Message.cpp s
         src/memorydb/SQSMemoryDb.cpp src/entity/sqs/Queue.cpp src/entity/sqs/QueueAttribute.cpp
         src/entity/sqs/RedrivePolicy.cpp)
 set(SNS_SOURCES src/entity/sns/MessageAttribute.cpp src/entity/sns/Message.cpp src/entity/sns/Topic.cpp
-        src/entity/sns/Subscription.cpp src/repository/SNSDatabase.cpp src/memorydb/SNSMemoryDb.cpp)
+        src/entity/sns/TopicAttribute.cpp src/entity/sns/Subscription.cpp src/repository/SNSDatabase.cpp
+        src/memorydb/SNSMemoryDb.cpp)
 set(S3_SOURCES src/entity/s3/Bucket.cpp src/entity/s3/BucketNotification.cpp src/entity/s3/Object.cpp
         src/repository/S3Database.cpp src/memorydb/S3MemoryDb.cpp)
 set(LAMBDA_SOURCES src/entity/lambda/Tags.cpp src/entity/lambda/Environment.cpp src/entity/lambda/Lambda.cpp
@@ -15,8 +16,8 @@ set(TRANSFER_SOURCES src/repository/TransferDatabase.cpp src/entity/transfer/Use
         src/memorydb/TransferMemoryDb.cpp)
 set(COGNITO_SOURCES src/entity/cognito/UserPool.cpp src/entity/cognito/User.cpp src/memorydb/CognitoMemoryDb.cpp
         src/repository/CognitoDatabase.cpp)
-set(DYNAMODB_SOURCES src/entity/dynamodb/Item.cpp src/entity/dynamodb/Table.cpp src/repository/DynamoDbDatabase.cpp
-        src/memorydb/DynamoDbMemoryDb.cpp)
+set(DYNAMODB_SOURCES src/entity/dynamodb/Item.cpp src/entity/dynamodb/Table.cpp src/entity/dynamodb/AttributeValue.cpp
+        src/repository/DynamoDbDatabase.cpp src/memorydb/DynamoDbMemoryDb.cpp)
 set(MODULE_SOURCES src/entity/module/Module.cpp src/repository/ModuleDatabase.cpp src/memorydb/ModuleMemoryDb.cpp)
 
 set(SOURCES src/repository/Database.cpp src/utils/TestUtils.cpp ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES}

@@ -41,7 +41,7 @@ set(DYNAMODB_SOURCES src/dynamodb/CreateTableRequest.cpp src/dynamodb/CreateTabl
         src/dynamodb/ListTableRequest.cpp src/dynamodb/ListTableRequest.cpp src/dynamodb/ListTableResponse.cpp
         src/dynamodb/GetItemRequest.cpp src/dynamodb/GetItemResponse.cpp src/dynamodb/PutItemRequest.cpp
         src/dynamodb/PutItemResponse.cpp src/dynamodb/QueryRequest.cpp src/dynamodb/QueryResponse.cpp
-        src/dynamodb/DeleteItemRequest.cpp src/dynamodb/DeleteItemResponse.cpp)
+        src/dynamodb/DeleteItemRequest.cpp src/dynamodb/DeleteItemResponse.cpp src/dynamodb/AttributeValue.cpp)
 set(MODULE_SOURCES src/module/Module.cpp src/module/GatewayConfig.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
@@ -56,7 +56,8 @@ include_directories(include ../core/include ../db/include /usr/include/mongo /us
 
 add_library(${LIBRARY} SHARED ${SOURCES}
         include/awsmock/dto/s3/Content.h
-        include/awsmock/dto/dynamodb/TableStatus.h)
+        include/awsmock/dto/dynamodb/TableStatus.h
+        include/awsmock/dto/dynamodb/AttributeValue.h)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 
