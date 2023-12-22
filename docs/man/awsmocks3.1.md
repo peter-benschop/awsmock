@@ -69,7 +69,7 @@ awslocal s3 cp s3://test-bucket-1/test/README.md test.md
 Jens Vogt <jens.vogt@opitz-consulting.com>
 
 ## VERSION
-&nbsp;&nbsp;&nbsp;&nbsp; 0.5.167
+0.5.167
 
 ## BUGS
 
@@ -78,4 +78,4 @@ Bugs and enhancement requests can be reported and filed at https://github.com/je
 ## SEE ALSO
 
 ```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocksqs(1)```, ```awsmocksns(1)```, ```awsmocklambda(1)```,
-```awsmockdynamodb(1)```
+```awsmockdynamodb(1)```, ```awsmockcognito(1)```

@@ -96,7 +96,7 @@ namespace AwsMock::Service {
         HeaderMap headerMap;
         headerMap["ETag"] = "\"" + s3Response.md5sum + "\"";
         headerMap["Content-Type"] = s3Response.contentType;
-        headerMap["Last-Modified"] = Poco::DateTimeFormatter().format(s3Response.modified, Poco::DateTimeFormat::HTTP_FORMAT);
+        headerMap["Last-Modified"] = Poco::DateTimeFormatter::format(s3Response.modified, Poco::DateTimeFormat::HTTP_FORMAT);
 
         // Set user headers
         for (const auto &m : s3Response.metadata) {

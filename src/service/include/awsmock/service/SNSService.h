@@ -27,6 +27,8 @@
 #include <awsmock/dto/sns/SqsNotificationRequest.h>
 #include <awsmock/dto/sns/SubscribeRequest.h>
 #include <awsmock/dto/sns/SubscribeResponse.h>
+#include <awsmock/dto/sns/TagResourceRequest.h>
+#include <awsmock/dto/sns/TagResourceResponse.h>
 #include <awsmock/dto/sns/UnsubscribeRequest.h>
 #include <awsmock/dto/sns/UnsubscribeResponse.h>
 #include <awsmock/dto/sqs/SendMessageRequest.h>
@@ -41,117 +43,125 @@ namespace AwsMock::Service {
 
   class SNSService {
 
-  public:
+    public:
 
-    /**
-     * Constructor
-     *
-     * @param configuration module configuration
-     * @param condition stop condition
-     */
-    explicit SNSService(Core::Configuration &configuration, Poco::Condition &condition);
+      /**
+       * Constructor
+       *
+       * @param configuration module configuration
+       * @param condition stop condition
+       */
+      explicit SNSService(Core::Configuration &configuration, Poco::Condition &condition);
 
-    /**
-     * Creates a new queue
-     *
-     * @param request create queue request
-     * @return CreateQueueResponse
-     */
-    Dto::SNS::CreateTopicResponse CreateTopic(const Dto::SNS::CreateTopicRequest &request);
+      /**
+       * Creates a new queue
+       *
+       * @param request create queue request
+       * @return CreateQueueResponse
+       */
+      Dto::SNS::CreateTopicResponse CreateTopic(const Dto::SNS::CreateTopicRequest &request);
 
-    /**
-     * Returns a list of all available queues
-     *
-     * @param region AWS region
-     * @return ListQueuesResponse
-     */
-    Dto::SNS::ListTopicsResponse ListTopics(const std::string &region);
+      /**
+       * Returns a list of all available queues
+       *
+       * @param region AWS region
+       * @return ListQueuesResponse
+       */
+      Dto::SNS::ListTopicsResponse ListTopics(const std::string &region);
 
-    /**
-     * Publish a message to a SNS topic
-     *
-     * @param request AWS region
-     * @return PublishResponse
-     */
-    Dto::SNS::PublishResponse Publish(const Dto::SNS::PublishRequest &request);
+      /**
+       * Publish a message to a SNS topic
+       *
+       * @param request AWS region
+       * @return PublishResponse
+       */
+      Dto::SNS::PublishResponse Publish(const Dto::SNS::PublishRequest &request);
 
-    /**
-     * Subscribe to a topic
-     *
-     * @param request subscribe request DTO
-     * @return SubscribeResponse DTO
-     */
-    Dto::SNS::SubscribeResponse Subscribe(const Dto::SNS::SubscribeRequest &request);
+      /**
+       * Subscribe to a topic
+       *
+       * @param request subscribe request DTO
+       * @return SubscribeResponse DTO
+       */
+      Dto::SNS::SubscribeResponse Subscribe(const Dto::SNS::SubscribeRequest &request);
 
-    /**
-     * Unsubscribe from a topic
-     *
-     * @param request unsubscribe request DTO
-     * @return UnsubscribeResponse DTO
-     */
-    Dto::SNS::UnsubscribeResponse Unsubscribe(const Dto::SNS::UnsubscribeRequest &request);
+      /**
+       * Unsubscribe from a topic
+       *
+       * @param request unsubscribe request DTO
+       * @return UnsubscribeResponse DTO
+       */
+      Dto::SNS::UnsubscribeResponse Unsubscribe(const Dto::SNS::UnsubscribeRequest &request);
 
-    /**
-     * Delete a queue
-     *
-     * @param region AWS region name
-     * @param topicArn topic ARN
-     * @return DeleteQueueResponse
-     * @throws ServiceException
-     */
-    Dto::SNS::DeleteTopicResponse DeleteTopic(const std::string &region, const std::string &topicArn);
+      /**
+       * Sets tags for a topic
+       *
+       * @param request tag resource request DTO
+       * @return TagResourceResponse DTO
+       */
+      Dto::SNS::TagResourceResponse TagResource(const Dto::SNS::TagResourceRequest &request);
 
-  private:
+      /**
+       * Delete a queue
+       *
+       * @param region AWS region name
+       * @param topicArn topic ARN
+       * @return DeleteQueueResponse
+       * @throws ServiceException
+       */
+      Dto::SNS::DeleteTopicResponse DeleteTopic(const std::string &region, const std::string &topicArn);
 
-    /**
-     * Checks the subscriptions.
-     *
-     * <p>If a SQS queue subscription is found send the message to the SQS queue.</p>
-     */
-    void CheckSubscriptions(const Dto::SNS::PublishRequest &request);
+    private:
 
-    /**
-     * Send a SNS message to an SQS queue
-     *
-     * @param subscription SNS subscription
-     * @param request SNS publish request
-     */
-    void SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request);
+      /**
+       * Checks the subscriptions.
+       *
+       * <p>If a SQS queue subscription is found send the message to the SQS queue.</p>
+       */
+      void CheckSubscriptions(const Dto::SNS::PublishRequest &request);
 
-    /**
-     * Logger
-     */
-    Core::LogStream _logger;
+      /**
+       * Send a SNS message to an SQS queue
+       *
+       * @param subscription SNS subscription
+       * @param request SNS publish request
+       */
+      void SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request);
 
-    /**
-     * Account ID
-     */
-    std::string _accountId;
+      /**
+       * Logger
+       */
+      Core::LogStream _logger;
 
-    /**
-     * Configuration
-     */
-    Core::Configuration &_configuration;
+      /**
+       * Account ID
+       */
+      std::string _accountId;
 
-    /**
-     * SNS database connection
-     */
-    std::unique_ptr<Database::SNSDatabase> _snsDatabase;
+      /**
+       * Configuration
+       */
+      Core::Configuration &_configuration;
 
-    /**
-     * SQS database connection
-     */
-    std::unique_ptr<Database::SQSDatabase> _sqsDatabase;
+      /**
+       * SNS database connection
+       */
+      std::unique_ptr<Database::SNSDatabase> _snsDatabase;
 
-    /**
-     * SQS module
-     */
-    std::unique_ptr<SQSService> _sqsService;
+      /**
+       * SQS database connection
+       */
+      std::unique_ptr<Database::SQSDatabase> _sqsDatabase;
 
-    /**
-     * Shutdown condition
-     */
-    Poco::Condition &_condition;
+      /**
+       * SQS module
+       */
+      std::unique_ptr<SQSService> _sqsService;
+
+      /**
+       * Shutdown condition
+       */
+      Poco::Condition &_condition;
   };
 
 } // namespace AwsMock::Service

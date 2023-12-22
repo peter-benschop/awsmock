@@ -115,7 +115,7 @@ awslocal sqs delete-queue --queue-url "http://localhost:4566/000000000000/test-q
 Jens Vogt <jens.vogt@opitz-consulting.com>
 
 ## VERSION
-&nbsp;&nbsp;&nbsp;&nbsp; 0.5.167
+0.5.167
 
 ## BUGS
 
@@ -124,4 +124,4 @@ Bugs and enhancement requests can be reported and filed at https://github.com/je
 ## SEE ALSO
 
 ```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocks3(1)```, ```awsmocksns(1)```, ```awsmocklambda(1)```,
-```awsmockdynamodb(1)```
+```awsmockdynamodb(1)```, ```awsmockcognito(1)```

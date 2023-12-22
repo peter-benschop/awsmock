@@ -4,7 +4,7 @@
 namespace AwsMock::Service {
 
   SNSCliHandler::SNSCliHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition)
-      : AbstractHandler(), _logger(Poco::Logger::get("SNSServiceHandler")), _configuration(configuration), _metricService(metricService), _snsService(configuration, condition) {
+    : AbstractHandler(), _logger(Poco::Logger::get("SNSServiceHandler")), _configuration(configuration), _metricService(metricService), _snsService(configuration, condition) {
   }
 
   void SNSCliHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
@@ -56,16 +56,32 @@ namespace AwsMock::Service {
         std::string protocol = GetStringParameter(payload, "Protocol");
         std::string endpoint = GetStringParameter(payload, "Endpoint");
 
-        Dto::SNS::SubscribeResponse
-            snsResponse = _snsService.Subscribe({.region=region, .topicArn=topicArn, .protocol=protocol, .endpoint=endpoint, .owner=user});
+        Dto::SNS::SubscribeResponse snsResponse = _snsService.Subscribe({.region=region, .topicArn=topicArn, .protocol=protocol, .endpoint=endpoint, .owner=user});
         SendOkResponse(response, snsResponse.ToXml());
 
       } else if (action == "Unsubscribe") {
 
         std::string subscriptionArn = GetStringParameter(payload, "SubscriptionArn");
 
-        Dto::SNS::UnsubscribeResponse
-            snsResponse = _snsService.Unsubscribe({.region=region, .subscriptionArn=subscriptionArn});
+        Dto::SNS::UnsubscribeResponse snsResponse = _snsService.Unsubscribe({.region=region, .subscriptionArn=subscriptionArn});
+        SendOkResponse(response, snsResponse.ToXml());
+
+      } else if (action == "TagResource") {
+
+        std::string resourceArn = GetStringParameter(payload, "ResourceArn");
+        log_debug_stream(_logger) << "Resource ARN: " << resourceArn << std::endl;
+
+        int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "Tags.member")/2;
+        log_trace_stream(_logger) << "Got tags count, count: " << count << std::endl;
+
+        std::map<std::string, std::string> tags;
+        for (int i = 1; i <= count; i++) {
+          std::string tagKey = Core::HttpUtils::GetQueryParameterValueByName(payload, "Tags.member." + std::to_string(i) + ".Key");
+          std::string tagValue = Core::HttpUtils::GetQueryParameterValueByName(payload, "Tags.member." + std::to_string(i) + ".Value");
+          tags[tagKey] = tagValue;
+        }
+        Dto::SNS::TagResourceRequest snsRequest = {.region=region, .resourceArn= resourceArn, .tags=tags};
+        Dto::SNS::TagResourceResponse snsResponse = _snsService.TagResource(snsRequest);
         SendOkResponse(response, snsResponse.ToXml());
 
       } else if (action == "DeleteTopic") {

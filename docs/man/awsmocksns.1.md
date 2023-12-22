@@ -38,6 +38,9 @@ corresponding man page ```awslocal(1)```.
 ```awslocal sqs publish --topic-arn <topic-arn> --message <message-body>```  
 &nbsp;&nbsp;&nbsp;&nbsp;sends a message to a topic
 
+```awslocal sqs tag-resource --resource-arn <topic-arn> --tags Key=<tagKey>,Value=<tagValue>```  
+&nbsp;&nbsp;&nbsp;&nbsp;set resource tags to a topic
+
 ```awslocal sns delete-topic --topic-arn <topic-arn>```  
 &nbsp;&nbsp;&nbsp;&nbsp;subscripbe a queue to a topic
 
@@ -84,6 +87,11 @@ awslocal sns publish --topic-arn arn:aws:sns:eu-central-1:000000000000:test-topi
 }
 ```
 
+To tag a topic
+```
+awslocal sns tag-resource --resource-arn arn:aws:sns:eu-central-1:000000000000:test-topic --tags=Key=Team,Value=Alpha
+```
+
 To delete a topic:
 ```
 awslocal sns delete-topic --topic-arn arn:aws:sns:eu-central-1:000000000000:test-topic
@@ -94,7 +102,7 @@ awslocal sns delete-topic --topic-arn arn:aws:sns:eu-central-1:000000000000:test
 Jens Vogt <jens.vogt@opitz-consulting.com>
 
 ## VERSION
-&nbsp;&nbsp;&nbsp;&nbsp; 0.5.167
+0.5.167
 
 ## BUGS
 
@@ -103,4 +111,4 @@ Bugs and enhancement requests can be reported and filed at https://github.com/je
 ## SEE ALSO
 
 ```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocks3(1)```, ```awsmocksqs(1)```, ```awsmocklambda(1)```,
-```awsmockdynamodb(1)```
+```awsmockdynamodb(1)```, ```awsmockcognito(1)```

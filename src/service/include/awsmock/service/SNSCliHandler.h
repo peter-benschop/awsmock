@@ -2,21 +2,22 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_SNSCLIHANDLER_H
-#define AWSMOCK_SERVICE_SNSCLIHANDLER_H
+#ifndef AWSMOCK_SERVICE_SNS_CLI_HANDLER_H
+#define AWSMOCK_SERVICE_SNS_CLI_HANDLER_H
 
 // Poco includes
-#include "Poco/DateTime.h"
-#include "Poco/DateTimeFormat.h"
-#include "Poco/DateTimeFormatter.h"
+#include <Poco/DateTime.h>
+#include <Poco/DateTimeFormat.h>
+#include <Poco/DateTimeFormatter.h>
 
 // AwsMock includes
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/MetricService.h"
-#include "awsmock/core/MetricServiceTimer.h"
-#include "awsmock/core/MetricDefinition.h"
-#include "awsmock/service/AbstractHandler.h"
-#include "awsmock/service/SNSService.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/HttpUtils.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/core/MetricServiceTimer.h>
+#include <awsmock/core/MetricDefinition.h>
+#include <awsmock/service/AbstractHandler.h>
+#include <awsmock/service/SNSService.h>
 
 namespace AwsMock::Service {
 
@@ -133,4 +134,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_SNSCLIHANDLER_H
+#endif // AWSMOCK_SERVICE_SNS_CLI_HANDLER_H
