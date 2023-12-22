@@ -2,12 +2,13 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SNS_SUBSCRIBERESPONSE_H
-#define AWSMOCK_DTO_SNS_SUBSCRIBERESPONSE_H
+#ifndef AWSMOCK_DTO_SNS_TAG_RESOURCE_RESPONSE_H
+#define AWSMOCK_DTO_SNS_TAG_RESOURCE_RESPONSE_H
 
 // C++ standard includes
 #include <string>
 #include <sstream>
+#include <map>
 
 // Poco includes
 #include <Poco/DateTime.h>
@@ -24,12 +25,7 @@
 
 namespace AwsMock::Dto::SNS {
 
-  struct SubscribeResponse {
-
-    /**
-     * Subscription ARN
-     */
-    std::string subscriptionArn;
+  struct TagResourceResponse {
 
     /**
      * Convert to XML representation
@@ -50,10 +46,12 @@ namespace AwsMock::Dto::SNS {
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const SubscribeResponse &r);
+    friend std::ostream &operator<<(std::ostream &os, const TagResourceResponse &r);
 
   };
 
+  typedef std::map<std::string, std::string> TagList;
+
 } // namespace AwsMock::Dto::SNS
 
-#endif // AWSMOCK_DTO_SNS_SUBSCRIBERESPONSE_H
+#endif // AWSMOCK_DTO_SNS_TAG_RESOURCE_RESPONSE_H
