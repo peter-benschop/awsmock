@@ -10,104 +10,123 @@ namespace AwsMock::Dto::Common {
 
     try {
 
+      Poco::JSON::Object rootJson;
+      Poco::JSON::Object infrastructureJson;
+
       // S3 Bucket array
-      Poco::JSON::Array jsonBucketArray;
-      for (const auto &bucket : s3Buckets) {
-        jsonBucketArray.add(bucket.ToJsonObject());
+      if (!s3Buckets.empty()) {
+        Poco::JSON::Array jsonBucketArray;
+        for (const auto &bucket : s3Buckets) {
+          jsonBucketArray.add(bucket.ToJsonObject());
+        }
+        infrastructureJson.set("s3-buckets", jsonBucketArray);
       }
 
       // S3 object array
-      Poco::JSON::Array jsonObjectArray;
-      for (const auto &object : s3Objects) {
-        jsonObjectArray.add(object.ToJsonObject());
+      if (!s3Objects.empty()) {
+        Poco::JSON::Array jsonObjectArray;
+        for (const auto &object : s3Objects) {
+          jsonObjectArray.add(object.ToJsonObject());
+        }
+        infrastructureJson.set("s3-objects", jsonObjectArray);
       }
 
       // SQS queue array
-      Poco::JSON::Array jsonQueueArray;
-      for (const auto &queue : sqsQueues) {
-        jsonQueueArray.add(queue.ToJsonObject());
+      if (!sqsQueues.empty()) {
+        Poco::JSON::Array jsonQueueArray;
+        for (const auto &queue : sqsQueues) {
+          jsonQueueArray.add(queue.ToJsonObject());
+        }
+        infrastructureJson.set("sqs-queues", jsonQueueArray);
       }
 
       // SQS message array
-      Poco::JSON::Array jsonSqsMessageArray;
-      for (const auto &message : sqsMessages) {
-        jsonSqsMessageArray.add(message.ToJsonObject());
+      if (!sqsMessages.empty()) {
+        Poco::JSON::Array jsonSqsMessageArray;
+        for (const auto &message : sqsMessages) {
+          jsonSqsMessageArray.add(message.ToJsonObject());
+        }
+        infrastructureJson.set("sqs-messages", jsonSqsMessageArray);
       }
 
       // SNS topic array
-      Poco::JSON::Array jsonTopicArray;
-      for (const auto &topic : snsTopics) {
-        jsonTopicArray.add(topic.ToJsonObject());
+      if (!snsTopics.empty()) {
+        Poco::JSON::Array jsonTopicArray;
+        for (const auto &topic : snsTopics) {
+          jsonTopicArray.add(topic.ToJsonObject());
+        }
+        infrastructureJson.set("sns-topics", jsonTopicArray);
       }
 
       // SNS message array
-      Poco::JSON::Array jsonSnsMessageArray;
-      for (const auto &message : snsMessages) {
-        jsonSnsMessageArray.add(message.ToJsonObject());
+      if (!snsMessages.empty()) {
+        Poco::JSON::Array jsonSnsMessageArray;
+        for (const auto &message : snsMessages) {
+          jsonSnsMessageArray.add(message.ToJsonObject());
+        }
+        infrastructureJson.set("sns-messages", jsonSnsMessageArray);
       }
 
       // Lambda functions
-      Poco::JSON::Array jsonLambdaArray;
-      for (const auto &lambda : lambdas) {
-        jsonLambdaArray.add(lambda.ToJsonObject());
+      if (!lambdas.empty()) {
+        Poco::JSON::Array jsonLambdaArray;
+        for (const auto &lambda : lambdas) {
+          jsonLambdaArray.add(lambda.ToJsonObject());
+        }
+        infrastructureJson.set("lambda-functions", jsonLambdaArray);
       }
 
       // Transfer server
-      Poco::JSON::Array jsonTransferArray;
-      for (const auto &transfer : transferServers) {
-        jsonTransferArray.add(transfer.ToJsonObject());
+      if (!transferServers.empty()) {
+        Poco::JSON::Array jsonTransferArray;
+        for (const auto &transfer : transferServers) {
+          jsonTransferArray.add(transfer.ToJsonObject());
+        }
+        infrastructureJson.set("transfer-servers", jsonTransferArray);
       }
 
       // Cognito user pools
-      Poco::JSON::Array jsonCognitoUserPoolArray;
-      for (const auto &userPool : cognitoUserPools) {
-        jsonCognitoUserPoolArray.add(userPool.ToJsonObject());
+      if (!cognitoUserPools.empty()) {
+        Poco::JSON::Array jsonCognitoUserPoolArray;
+        for (const auto &userPool : cognitoUserPools) {
+          jsonCognitoUserPoolArray.add(userPool.ToJsonObject());
+        }
+        infrastructureJson.set("cognito-user-pools", jsonCognitoUserPoolArray);
       }
 
       // Cognito users
-      Poco::JSON::Array jsonCognitoUserArray;
-      for (const auto &user : cognitoUsers) {
-        jsonCognitoUserArray.add(user.ToJsonObject());
-      }
-
-      Poco::JSON::Object infrastructureJson;
-      if (!jsonBucketArray.empty()) {
-        infrastructureJson.set("s3-buckets", jsonBucketArray);
-      }
-      if (!jsonObjectArray.empty()) {
-        infrastructureJson.set("s3-objects", jsonObjectArray);
-      }
-      if (!jsonQueueArray.empty()) {
-        infrastructureJson.set("sqs-queues", jsonQueueArray);
-      }
-      if (!jsonSqsMessageArray.empty()) {
-        infrastructureJson.set("sqs-messages", jsonSqsMessageArray);
-      }
-      if (!jsonTopicArray.empty()) {
-        infrastructureJson.set("sns-topics", jsonTopicArray);
-      }
-      if (!jsonSnsMessageArray.empty()) {
-        infrastructureJson.set("sns-messages", jsonSnsMessageArray);
-      }
-      if (!jsonLambdaArray.empty()) {
-        infrastructureJson.set("lambda-functions", jsonLambdaArray);
-      }
-      if (!jsonTransferArray.empty()) {
-        infrastructureJson.set("transfer-servers", jsonTransferArray);
-      }
-      if (!jsonCognitoUserPoolArray.empty()) {
-        infrastructureJson.set("cognito-user-pools", jsonCognitoUserPoolArray);
-      }
-      if (!jsonCognitoUserArray.empty()) {
+      if (!cognitoUsers.empty()) {
+        Poco::JSON::Array jsonCognitoUserArray;
+        for (const auto &user : cognitoUsers) {
+          jsonCognitoUserArray.add(user.ToJsonObject());
+        }
         infrastructureJson.set("cognito-users", jsonCognitoUserArray);
       }
 
-      Poco::JSON::Object rootJson;
+      // DynamoDb tables
+      if (!dynamoDbTables.empty()) {
+        Poco::JSON::Array jsonDynamoDbTableArray;
+        for (const auto &table : dynamoDbTables) {
+          jsonDynamoDbTableArray.add(table.ToJsonObject());
+        }
+        infrastructureJson.set("dynamodb-tables", jsonDynamoDbTableArray);
+      }
+
+      // DynamoDb items
+      if (!dynamoDbItems.empty()) {
+        Poco::JSON::Array jsonDynamoDbItemArray;
+        for (const auto &item : dynamoDbItems) {
+          jsonDynamoDbItemArray.add(item.ToJsonObject());
+        }
+        infrastructureJson.set("dynamodb-items", jsonDynamoDbItemArray);
+      }
+
+      // Add infrastructure JSON to root JSON
       rootJson.set("infrastructure", infrastructureJson);
 
       int indent = 0;
       std::ostringstream os;
-      if(prettyPrint) {
+      if (prettyPrint) {
         indent = JSON_DEFAULT_INDENT;
       }
       rootJson.stringify(os, indent);
@@ -153,6 +172,27 @@ namespace AwsMock::Dto::Common {
         Database::Entity::SQS::Message sqsMessageObject;
         sqsMessageObject.FromJsonObject(sqsMessageArray->getObject(i));
         sqsMessages.emplace_back(sqsMessageObject);
+      }
+
+      Poco::JSON::Array::Ptr cognitoUserPoolArray = infrastructureObject->getArray("cognito-user-pools");
+      for (int i = 0; i < cognitoUserPoolArray->size(); i++) {
+        Database::Entity::Cognito::UserPool cognitoUserPoolObject;
+        cognitoUserPoolObject.FromJsonObject(cognitoUserPoolArray->getObject(i));
+        cognitoUserPools.emplace_back(cognitoUserPoolObject);
+      }
+
+      Poco::JSON::Array::Ptr cognitoUserArray = infrastructureObject->getArray("cognito-users");
+      for (int i = 0; i < cognitoUserArray->size(); i++) {
+        Database::Entity::Cognito::User cognitoUserObject;
+        cognitoUserObject.FromJsonObject(cognitoUserArray->getObject(i));
+        cognitoUsers.emplace_back(cognitoUserObject);
+      }
+
+      Poco::JSON::Array::Ptr dynamoDbTableArray = infrastructureObject->getArray("dynamodb-tables");
+      for (int i = 0; i < dynamoDbTableArray->size(); i++) {
+        Database::Entity::DynamoDb::Table dynamoDbTableObject;
+        dynamoDbTableObject.FromJsonObject(dynamoDbTableArray->getObject(i));
+        dynamoDbTables.emplace_back(dynamoDbTableObject);
       }
 
     } catch (Poco::Exception &exc) {

@@ -1,19 +1,15 @@
 //
-// Created by vogje01 on 01/06/2023.
+// Created by vogje01 on 07/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_SNS_TOPIC_H
-#define AWSMOCK_DB_ENTITY_SNS_TOPIC_H
+#ifndef AWSMOCK_DB_ENTITY_DYNAMODB_ITEM_H
+#define AWSMOCK_DB_ENTITY_DYNAMODB_ITEM_H
 
 // C++ includes
 #include <string>
 #include <vector>
-
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-#include <Poco/JSON/Object.h>
+#include <iostream>
+#include <sstream>
 
 // MongoDB includes
 #include <bsoncxx/json.hpp>
@@ -22,12 +18,16 @@
 #include <bsoncxx/builder/basic/document.hpp>
 #include <mongocxx/stdx.hpp>
 
-// AwsMock includes
-#include <awsmock/core/ServiceException.h>
-#include <awsmock/entity/sns/Subscription.h>
-#include <awsmock/entity/sns/TopicAttribute.h>
+// Poco includes
+#include <Poco/DateTime.h>
+#include <Poco/DateTimeFormat.h>
+#include <Poco/DateTimeFormatter.h>
+#include <Poco/JSON/Object.h>
 
-namespace AwsMock::Database::Entity::SNS {
+// AwsMock includes
+#include <awsmock/entity/dynamodb/AttributeValue.h>
+
+namespace AwsMock::Database::Entity::DynamoDb {
 
   using bsoncxx::builder::basic::kvp;
   using bsoncxx::builder::basic::make_array;
@@ -35,13 +35,9 @@ namespace AwsMock::Database::Entity::SNS {
   using bsoncxx::view_or_value;
   using bsoncxx::document::view;
   using bsoncxx::document::value;
+  using bsoncxx::to_json;
 
-  /**
-   * SNS topic entity
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  struct Topic {
+  struct Item {
 
     /**
      * ID
@@ -49,44 +45,19 @@ namespace AwsMock::Database::Entity::SNS {
     std::string oid;
 
     /**
-     * AWS region
+     * AWS region name
      */
     std::string region;
 
     /**
-     * Topic name
+     * Name
      */
-    std::string topicName;
+    std::string name;
 
     /**
-     * Owner
+     * Item
      */
-    std::string owner;
-
-    /**
-     * Topic URL
-     */
-    std::string topicUrl;
-
-    /**
-     * Topic ARN
-     */
-    std::string topicArn;
-
-    /**
-     * Subscriptions
-     */
-    SubscriptionList subscriptions;
-
-    /**
-     * Attributes
-     */
-    TopicAttribute topicAttribute;
-
-    /**
-     * Topic tags
-     */
-    std::map<std::string, std::string> tags;
+    std::map<std::string, Entity::DynamoDb::AttributeValue> attributes;
 
     /**
      * Creation date
@@ -99,14 +70,6 @@ namespace AwsMock::Database::Entity::SNS {
     Poco::DateTime modified = Poco::DateTime();
 
     /**
-     * Checks whether a subscription with the given protocol/endpoint exists already.
-     *
-     * @param subscription name of the event
-     * @return true if notification with the given event name exists.
-     */
-    bool HasSubscription(const Subscription &subscription);
-
-    /**
      * Converts the entity to a MongoDB document
      *
      * @return entity as MongoDB document.
@@ -116,7 +79,7 @@ namespace AwsMock::Database::Entity::SNS {
     /**
      * Converts the MongoDB document to an entity
      *
-     * @param mResult MongoDB document view.
+     * @param mResult query result.
      */
     void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
@@ -137,14 +100,16 @@ namespace AwsMock::Database::Entity::SNS {
     /**
      * Stream provider.
      *
+     * @param os output stream
+     * @param d DynamoDB  entity
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const Topic &q);
+    friend std::ostream &operator<<(std::ostream &os, const Item &d);
 
   };
 
-  typedef std::vector<Topic> TopicList;
+  typedef std::vector<Item> ItemList;
 
-} // namespace AwsMock::Database::Entity::SNS
+} // namespace AwsMock::Database::Entity::DynamoDb
 
-#endif // AWSMOCK_DB_ENTITY_SNS_TOPIC_H
+#endif // AWSMOCK_DB_ENTITY_DYNAMODB_ITEM_H

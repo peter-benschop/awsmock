@@ -2,11 +2,11 @@
 // Created by vogje01 on 20/12/2023.
 //
 
-#include <awsmock/dto/dynamodb/PutItemRequest.h>
+#include <awsmock/dto/dynamodb/DeleteItemRequest.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
-  std::string PutItemRequest::ToJson() {
+  std::string DeleteItemRequest::ToJson() {
 
     try {
       Poco::JSON::Object rootJson;
@@ -22,7 +22,7 @@ namespace AwsMock::Dto::DynamoDb {
     }
   }
 
-  void PutItemRequest::FromJson(const std::string &jsonBody) {
+  void DeleteItemRequest::FromJson(const std::string &jsonBody) {
 
     // Save original body
     body = jsonBody;
@@ -32,31 +32,24 @@ namespace AwsMock::Dto::DynamoDb {
     Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
     try {
+
       Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
       Core::JsonUtils::GetJsonValueString("TableName", rootObject, tableName);
 
-      // Tags
-      Poco::JSON::Object::Ptr jsonKeyObject = rootObject->getObject("Item");
-      if (!jsonKeyObject.isNull()) {
-        for (size_t i = 0; i < jsonKeyObject->getNames().size(); i++) {
-          AttributeValue attributeValue;
-          attributeValue.FromJsonObject(jsonKeyObject->getObject(jsonKeyObject->getNames()[i]));
-          item[jsonKeyObject->getNames()[i]] = attributeValue;
-        }
-      }
     } catch (Poco::Exception &exc) {
+      std::cerr << exc.message() << std::endl;
       throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
   }
 
-  std::string PutItemRequest::ToString() const {
+  std::string DeleteItemRequest::ToString() const {
     std::stringstream ss;
     ss << (*this);
     return ss.str();
   }
 
-  std::ostream &operator<<(std::ostream &os, const PutItemRequest &r) {
-    os << "PutItemRequest={region='" << r.region << "', tableName='" << r.tableName << "}";
+  std::ostream &operator<<(std::ostream &os, const DeleteItemRequest &r) {
+    os << "DeleteItemRequest={region='" << r.region << "', tableName='" << r.tableName << "}";
     return os;
   }
 

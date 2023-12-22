@@ -58,6 +58,11 @@ namespace AwsMock::Core {
     ofs << "awsmock.service.cognito.port=19505" << std::endl;
     ofs << "awsmock.service.cognito.host=localhost" << std::endl;
     ofs << "awsmock.monitoring.cognito.period=-1" << std::endl;
+    // Cognito configuration
+    ofs << "awsmock.service.dynamodb.active=true" << std::endl;
+    ofs << "awsmock.service.dynamodb.port=19506" << std::endl;
+    ofs << "awsmock.service.dynamodb.host=localhost" << std::endl;
+    ofs << "awsmock.monitoring.dynamodb.period=-1" << std::endl;
     // Docker
     ofs << "awsmock.docker.network.mode=bridge" << std::endl;
     ofs << "awsmock.docker.network.name=.dockerhost.net" << std::endl;

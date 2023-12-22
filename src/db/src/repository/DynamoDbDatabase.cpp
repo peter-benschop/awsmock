@@ -15,137 +15,11 @@ namespace AwsMock::Database {
     if (HasDatabase()) {
 
       // Get collection
-      _dynamodbCollection = GetConnection()["dynamodb"];
       _tableCollection = GetConnection()["dynamodb_table"];
+      _itemCollection = GetConnection()["dynamodb_item"];
 
     }
   }
-
-  bool DynamoDbDatabase::DatabaseExists(const std::string &region, const std::string &name) {
-
-    if (HasDatabase()) {
-
-      try {
-
-        int64_t count = _dynamodbCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
-        log_trace_stream(_logger) << "DynamoDb database exists: " << (count > 0 ? "true" : "false") << std::endl;
-        return count > 0;
-
-      } catch (const mongocxx::exception &exc) {
-        _logger.error() << "Database exception " << exc.what() << std::endl;
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
-      }
-
-    } else {
-
-      return _memoryDb.DatabaseExists(region, name);
-
-    }
-  }
-
-  Entity::DynamoDb::DynamoDb DynamoDbDatabase::GetDatabaseByName(const std::string &region, const std::string &name) {
-
-    if (HasDatabase()) {
-
-      try {
-
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _dynamodbCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
-        if (!mResult) {
-          _logger.error() << "Database exception: DynamoDb not found " << std::endl;
-          throw Core::DatabaseException("Database exception, DynamoDb not found ", 500);
-        }
-
-        Entity::DynamoDb::DynamoDb result;
-        result.FromDocument(mResult);
-        return result;
-
-      } catch (mongocxx::exception::system_error &e) {
-        log_error_stream(_logger) << "Get DynamoDb by name failed, error: " << e.what() << std::endl;
-      }
-
-    } else {
-
-      return _memoryDb.GetDatabaseByName(region, name);
-    }
-    return {};
-  }
-
-  /*bool LambdaDatabase::LambdaExists(const Entity::Lambda::Lambda &lambda) {
-
-    return LambdaExists(lambda.region, lambda.function, lambda.runtime);
-  }
-
-  bool LambdaDatabase::LambdaExists(const std::string &functionName) {
-
-    if (HasDatabase()) {
-
-      try {
-
-        int64_t count = _lambdaCollection.count_documents(make_document(kvp("function", functionName)));
-        log_trace_stream(_logger) << "lambda function exists: " << (count > 0 ? "true" : "false") << std::endl;
-        return count > 0;
-
-      } catch (const mongocxx::exception &exc) {
-        _logger.error() << "Database exception " << exc.what() << std::endl;
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
-      }
-
-    } else {
-
-      return _memoryDb.LambdaExists(functionName);
-
-    }
-  }
-
-  bool LambdaDatabase::LambdaExistsByArn(const std::string &arn) {
-
-    if (HasDatabase()) {
-
-      try {
-
-        int64_t count = _lambdaCollection.count_documents(make_document(kvp("arn", arn)));
-        log_trace_stream(_logger) << "lambda function exists: " << (count > 0 ? "true" : "false") << std::endl;
-        return count > 0;
-
-      } catch (const mongocxx::exception &exc) {
-        _logger.error() << "Database exception " << exc.what() << std::endl;
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
-      }
-
-    } else {
-
-      return _memoryDb.LambdaExistsByArn(arn);
-
-    }
-  }
-
-  long LambdaDatabase::LambdaCount(const std::string &region) {
-
-    if (HasDatabase()) {
-
-      bsoncxx::builder::basic::document builder;
-      if (!region.empty()) {
-        builder.append(bsoncxx::builder::basic::kvp("region", region));
-      }
-      bsoncxx::document::value filter = builder.extract();
-
-      try {
-        long count = _lambdaCollection.count_documents({filter});
-        log_trace_stream(_logger) << "lambda count: " << count << std::endl;
-        return count;
-
-      } catch (mongocxx::exception::system_error &exc) {
-        _logger.error() << "Database exception " << exc.what() << std::endl;
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
-      }
-
-    } else {
-
-      return _memoryDb.LambdaCount(region);
-
-    }
-    return -1;
-  }*/
 
   Entity::DynamoDb::Table DynamoDbDatabase::CreateTable(const Entity::DynamoDb::Table &table) {
 
@@ -158,7 +32,7 @@ namespace AwsMock::Database {
 
       } catch (const mongocxx::exception &exc) {
         _logger.error() << "Database exception " << exc.what() << std::endl;
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
     } else {
@@ -175,7 +49,7 @@ namespace AwsMock::Database {
       mongocxx::stdx::optional<bsoncxx::document::value> mResult = _tableCollection.find_one(make_document(kvp("_id", oid)));
       if (!mResult) {
         _logger.error() << "Database exception: Table not found " << std::endl;
-        throw Core::DatabaseException("Database exception, Table not found ", 500);
+        throw Core::DatabaseException("Database exception, Table not found ", Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
       Entity::DynamoDb::Table result;
@@ -185,7 +59,7 @@ namespace AwsMock::Database {
 
     } catch (const mongocxx::exception &exc) {
       _logger.error() << "Database exception " << exc.what() << std::endl;
-      throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+      throw Core::DatabaseException("Database exception " + std::string(exc.what()), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
 
   }
@@ -202,65 +76,6 @@ namespace AwsMock::Database {
     }
   }
 
-/*  Entity::Lambda::Lambda LambdaDatabase::GetLambdaByArn(const std::string &arn) {
-
-    if (HasDatabase()) {
-
-      try {
-
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _lambdaCollection.find_one(make_document(kvp("arn", arn)));
-        if (!mResult) {
-          _logger.error() << "Database exception: Lambda not found " << std::endl;
-          throw Core::DatabaseException("Database exception, Lambda not found ", 500);
-        }
-
-        Entity::Lambda::Lambda result;
-        result.FromDocument(mResult);
-        return result;
-
-      } catch (mongocxx::exception::system_error &e) {
-        log_error_stream(_logger) << "Get lambda by ARN failed, error: " << e.what() << std::endl;
-      }
-
-    } else {
-
-      return _memoryDb.GetLambdaByArn(arn);
-    }
-    return {};
-  }
-
-  Entity::Lambda::Lambda LambdaDatabase::CreateOrUpdateLambda(const Entity::Lambda::Lambda &lambda) {
-
-    if (LambdaExists(lambda)) {
-      return UpdateLambda(lambda);
-    } else {
-      return CreateLambda(lambda);
-    }
-  }
-
-  Entity::Lambda::Lambda LambdaDatabase::UpdateLambda(const Entity::Lambda::Lambda &lambda) {
-
-    if (HasDatabase()) {
-
-      try {
-        auto result = _lambdaCollection.replace_one(make_document(kvp("region", lambda.region), kvp("function", lambda.function), kvp("runtime", lambda.runtime)), lambda.ToDocument());
-
-        log_trace_stream(_logger) << "lambda updated: " << lambda.ToString() << std::endl;
-
-        return GetLambdaByArn(lambda.arn);
-
-      } catch (const mongocxx::exception &exc) {
-        _logger.error() << "Database exception " << exc.what() << std::endl;
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
-      }
-
-    } else {
-
-      return _memoryDb.UpdateLambda(lambda);
-
-    }
-  }*/
-
   bool DynamoDbDatabase::TableExists(const std::string &region, const std::string &tableName) {
 
     if (HasDatabase()) {
@@ -268,7 +83,7 @@ namespace AwsMock::Database {
       try {
 
         int64_t count;
-        if(!region.empty()) {
+        if (!region.empty()) {
           count = _tableCollection.count_documents(make_document(kvp("region", region), kvp("name", tableName)));
         } else {
           count = _tableCollection.count_documents(make_document(kvp("name", tableName)));
@@ -278,7 +93,7 @@ namespace AwsMock::Database {
 
       } catch (const mongocxx::exception &exc) {
         _logger.error() << "Database exception " << exc.what() << std::endl;
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
     } else {
@@ -290,24 +105,26 @@ namespace AwsMock::Database {
 
   std::vector<Entity::DynamoDb::Table> DynamoDbDatabase::ListTables(const std::string &region) {
 
-    std::vector<Entity::DynamoDb::Table> tables;
+    Entity::DynamoDb::TableList tables;
     if (HasDatabase()) {
 
       try {
 
-        if(region.empty()) {
+        if (region.empty()) {
 
-          auto lambdaCursor = _tableCollection.find({});
-          for (auto lambda : lambdaCursor) {
+          auto tableCursor = _tableCollection.find({});
+          for (auto table : tableCursor) {
             Entity::DynamoDb::Table result;
-            result.FromDocument(lambda);
+            result.FromDocument(table);
             tables.push_back(result);
           }
-        } else{
-          auto lambdaCursor = _tableCollection.find(make_document(kvp("region", region)));
-          for (auto lambda : lambdaCursor) {
+
+        } else {
+
+          auto tableCursor = _tableCollection.find(make_document(kvp("region", region)));
+          for (auto table : tableCursor) {
             Entity::DynamoDb::Table result;
-            result.FromDocument(lambda);
+            result.FromDocument(table);
             tables.push_back(result);
           }
 
@@ -315,7 +132,7 @@ namespace AwsMock::Database {
 
       } catch (const mongocxx::exception &exc) {
         _logger.error() << "Database exception " << exc.what() << std::endl;
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
     } else {
@@ -338,7 +155,7 @@ namespace AwsMock::Database {
 
       } catch (const mongocxx::exception &exc) {
         _logger.error() << "Database exception " << exc.what() << std::endl;
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
     } else {
@@ -359,12 +176,110 @@ namespace AwsMock::Database {
 
       } catch (const mongocxx::exception &exc) {
         _logger.error() << "Database exception " << exc.what() << std::endl;
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
     } else {
 
       _memoryDb.DeleteAllTables();
+
+    }
+  }
+
+  bool DynamoDbDatabase::ItemExists(const std::string &region, const std::string &tableName, const std::string &key) {
+
+    if (HasDatabase()) {
+
+      try {
+
+        int64_t count;
+        if (!region.empty()) {
+          count = _tableCollection.count_documents(make_document(kvp("region", region), kvp("name", tableName)));
+        } else {
+          count = _tableCollection.count_documents(make_document(kvp("name", tableName)));
+        }
+        log_trace_stream(_logger) << "DynamoDb table exists: " << (count > 0 ? "true" : "false") << std::endl;
+        return count > 0;
+
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+      }
+
+    } else {
+
+      return _memoryDb.ItemExists(region, tableName, key);
+
+    }
+  }
+
+  Entity::DynamoDb::ItemList DynamoDbDatabase::ListItems(const std::string &region, const std::string &tableName) {
+
+    Entity::DynamoDb::ItemList items;
+    if (HasDatabase()) {
+
+      try {
+
+        if (region.empty() && tableName.empty()) {
+
+          auto itemCursor = _itemCollection.find({});
+          for (auto item : itemCursor) {
+            Entity::DynamoDb::Item result;
+            result.FromDocument(item);
+            items.push_back(result);
+          }
+
+        } else if (tableName.empty()) {
+
+          auto itemCursor = _itemCollection.find(make_document(kvp("region", region)));
+          for (auto item : itemCursor) {
+            Entity::DynamoDb::Item result;
+            result.FromDocument(item);
+            items.push_back(result);
+          }
+
+        } else {
+
+          auto itemCursor = _itemCollection.find(make_document(kvp("region", region), kvp("name", tableName)));
+          for (auto item : itemCursor) {
+            Entity::DynamoDb::Item result;
+            result.FromDocument(item);
+            items.push_back(result);
+          }
+
+        }
+
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+      }
+
+    } else {
+
+      items = _memoryDb.ListItems(region, tableName);
+    }
+
+    log_trace_stream(_logger) << "Got DynamoDb item list, size:" << items.size() << std::endl;
+    return items;
+  }
+
+  void DynamoDbDatabase::DeleteItem(const std::string &region, const std::string &tableName, const std::string &key) {
+
+    if (HasDatabase()) {
+
+      try {
+
+        auto result = _itemCollection.delete_many(make_document(kvp("name", tableName)));
+        log_debug_stream(_logger) << "DynamoDB item deleted, tableName: " << tableName << " count: " << result->deleted_count() << std::endl;
+
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+      }
+
+    } else {
+
+      _memoryDb.DeleteItem(region, tableName, key);
 
     }
   }

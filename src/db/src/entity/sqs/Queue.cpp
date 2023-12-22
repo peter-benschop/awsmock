@@ -66,6 +66,16 @@ namespace AwsMock::Database::Entity::SQS {
     jsonObject.set("queueUrl", queueUrl);
     jsonObject.set("queueArn", queueArn);
     jsonObject.set("userAttributes", attributes.ToJsonObject());
+
+    // Tags array
+    Poco::JSON::Array jsonTagArray;
+    for (const auto &tag : tags) {
+      Poco::JSON::Object jsonTagObject;
+      jsonTagObject.set(tag.first, tag.second);
+      jsonTagArray.add(jsonTagObject);
+    }
+    jsonObject.set("tags", jsonTagArray);
+
     return jsonObject;
   }
 
@@ -88,8 +98,12 @@ namespace AwsMock::Database::Entity::SQS {
 
   std::ostream &operator<<(std::ostream &os, const Queue &q) {
     os << "Queue={id='" << q.oid << "' region='" << q.region << "' name='" << q.name << "' owner='" << q.owner << "' queueUrl='" << q.queueUrl <<
-       "' queueArn='" << q.queueArn << "' created='" << Poco::DateTimeFormatter::format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) <<
-       "' modified='" << Poco::DateTimeFormatter::format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) << "'}";
+       "' queueArn='" << q.queueArn << "' created='" << Poco::DateTimeFormatter::format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) << "', tags=[";
+    for (const auto &it : q.tags) {
+      os << "key='" << it.first << "' value='" << it.second << "', ";
+    }
+    os.seekp(-2, std::ostream::cur);
+    os << "] modified='" << Poco::DateTimeFormatter::format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) << "'}";
     return os;
   }
 

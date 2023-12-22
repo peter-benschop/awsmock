@@ -8,13 +8,6 @@ namespace AwsMock::Database {
 
   DynamoDbMemoryDb::DynamoDbMemoryDb() : _logger(Poco::Logger::get("DynamoDbMemoryDb")) {}
 
-  bool DynamoDbMemoryDb::DatabaseExists(const std::string &region, const std::string &name) {
-
-    return find_if(_dynamoDbs.begin(), _dynamoDbs.end(), [region, name](const std::pair<std::string, Entity::DynamoDb::DynamoDb> &dynamoDb) {
-      return dynamoDb.second.region == region && dynamoDb.second.name == name;
-    }) != _dynamoDbs.end();
-  }
-
   bool DynamoDbMemoryDb::TableExists(const std::string &region, const std::string &tableName) {
 
     if (!region.empty()) {
@@ -64,60 +57,12 @@ namespace AwsMock::Database {
 
     if (it == _tables.end()) {
       log_error_stream(_logger) << "Get table by ID failed, oid: " << oid << std::endl;
-      throw Core::DatabaseException("Get table by ID failed, oid: "+oid);
+      throw Core::DatabaseException("Get table by ID failed, oid: " + oid);
     }
 
     it->second.oid = oid;
     return it->second;
   }
-
-  Entity::DynamoDb::DynamoDb DynamoDbMemoryDb::GetDatabaseByName(const std::string &region, const std::string &name) {
-
-    auto it = find_if(_dynamoDbs.begin(), _dynamoDbs.end(), [region, name](const std::pair<std::string, Entity::DynamoDb::DynamoDb> &dynamoDb) {
-      return dynamoDb.second.region == region && dynamoDb.second.name == name;
-    });
-
-    if (it == _dynamoDbs.end()) {
-      log_error_stream(_logger) << "Get DynamoDb by name failed, region: " << region << " name: " << name << std::endl;
-      throw Core::DatabaseException("Get DynamoDb by name failed, region: " + region + " name: " + name);
-    }
-
-    it->second.oid = it->first;
-    return it->second;
-  }
-
-  /*long LambdaMemoryDb::LambdaCount(const std::string &region) {
-
-    long count = 0;
-    if (region.empty()) {
-      return static_cast<long>(_lambdas.size());
-    } else {
-      for (const auto &lambda : _lambdas) {
-        if (lambda.second.region == region) {
-          count++;
-        }
-      }
-    }
-    return count;
-  }
-
-  Entity::Lambda::Lambda LambdaMemoryDb::UpdateLambda(const Entity::Lambda::Lambda &lambda) {
-
-    Poco::ScopedLock lock(_lambdaMutex);
-
-    std::string region = lambda.region;
-    std::string function = lambda.function;
-    auto it = find_if(_lambdas.begin(), _lambdas.end(), [region, function](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
-      return lambda.second.region == region && lambda.second.function == function;
-    });
-
-    if(it == _lambdas.end()) {
-      log_error_stream(_logger) << "Update lambda failed, region: " << lambda.region << " function: " << lambda.function << std::endl;
-      throw Core::DatabaseException("Update lambda failed, region: " + lambda.region + " function: " + lambda.function);
-    }
-    _lambdas[it->first] = lambda;
-    return _lambdas[it->first];
-  }*/
 
   void DynamoDbMemoryDb::DeleteTable(const std::string &tableName) {
     Poco::ScopedLock lock(_tableMutex);
@@ -135,4 +80,58 @@ namespace AwsMock::Database {
     log_debug_stream(_logger) << "All DynamoDb tables deleted, count: " << _tables.size() << std::endl;
     _tables.clear();
   }
+
+  bool DynamoDbMemoryDb::ItemExists(const std::string &region, const std::string &tableName, const std::string &key) {
+
+    if (!region.empty()) {
+      return find_if(_items.begin(), _items.end(), [region, tableName](const std::pair<std::string, Entity::DynamoDb::Item> &item) {
+        return item.second.region == region && item.second.name == tableName;
+      }) != _items.end();
+    } else {
+      return find_if(_items.begin(), _items.end(), [tableName](const std::pair<std::string, Entity::DynamoDb::Item> &item) {
+        return item.second.name == tableName;
+      }) != _items.end();
+    }
+  }
+
+  Entity::DynamoDb::ItemList DynamoDbMemoryDb::ListItems(const std::string &region, const std::string &tableName) {
+
+    Entity::DynamoDb::ItemList items;
+    if (region.empty() && tableName.empty()) {
+
+      for (const auto &item : _items) {
+        items.emplace_back(item.second);
+      }
+
+    } else if (tableName.empty()) {
+
+      for (const auto &item : _items) {
+        if (item.second.region == region) {
+          items.emplace_back(item.second);
+        }
+      }
+
+    } else {
+
+      for (const auto &item : _items) {
+        if (item.second.region == region && item.second.name == tableName) {
+          items.emplace_back(item.second);
+        }
+      }
+    }
+
+    log_trace_stream(_logger) << "Got DynamoDB items, size: " << items.size() << std::endl;
+    return items;
+  }
+
+  void DynamoDbMemoryDb::DeleteItem(const std::string &region, const std::string &tableName, const std::string &key) {
+    Poco::ScopedLock lock(_itemMutex);
+
+    const auto count = std::erase_if(_items, [region, tableName, key](const auto &item) {
+      auto const &[key, value] = item;
+      return value.region == region && value.name == tableName;
+    });
+    log_debug_stream(_logger) << "DynamoDB items deleted, count: " << count << std::endl;
+  }
+
 }

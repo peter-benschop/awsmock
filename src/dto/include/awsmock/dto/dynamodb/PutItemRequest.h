@@ -20,6 +20,7 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/dto/dynamodb/GetItemKey.h>
+#include <awsmock/dto/dynamodb/AttributeValue.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -31,37 +32,71 @@ namespace AwsMock::Dto::DynamoDb {
     std::string region;
 
     /**
-     * Table name
+     * The name of the table to contain the item.
+     *
+     * <p>
+     * Pattern: [a-zA-Z0-9_.-]+
+     * </p>
      */
     std::string tableName;
 
     /**
-     * Keys
+     * Item
+     *
+     * <p>
+     * A map of attribute name/value pairs, one for each attribute. Only the primary key attributes are required; you
+     * can optionally provide other attribute name-value pairs for the item.
+     * </p>
+     * <p>
+     * You must provide all of the attributes for the primary key. For example, with a simple primary key, you only
+     * need to provide a value for the partition key. For a composite primary key, you must provide both values for
+     * both the partition key and the sort key.
      */
-    std::map<std::string, GetItemKey> item;
+    std::map<std::string, AttributeValue> item;
 
     /**
-     * Projection exception
+     * Conditional expression
+     *
+     * <p>
+     * A condition that must be satisfied in order for a conditional PutItem operation to succeed.
+     * </p>
      */
-    std::string projectionExpression;
+    std::string conditionalExpression;
 
     /**
-     * Consistent read
-     */
-    bool consistentRead;
-
-    /**
-     * Return consumed capacity
+     * Return consumed capacity.
+     *
+     * <p>
+     * Determines the level of detail about either provisioned or on-demand throughput consumption that is returned in
+     * the response: INDEXES | TOTAL | NONE
+     * </p>
      */
     bool returnConsumedCapacity;
 
     /**
-     * Original HTTP request body
+     * Return values
+     *
+     * <p>
+     * Use ReturnValues if you want to get the item attributes as they appeared before they were updated with the
+     * PutItem request. For PutItem, the valid values are: NONE | ALL_OLD.
+     */
+    std::string returnValues;
+
+    /**
+     * Original HTTP request body.
+     *
+     * <p>
+     * Needed for the request to the docker image.
+     * </p>
      */
     std::string body;
 
     /**
-     * Original HTTP request headers
+     * Original HTTP request headers.
+     *
+     * <p>
+     * Needed for the request to the docker image.
+     * </p>
      */
     std::map<std::string, std::string> headers;
 

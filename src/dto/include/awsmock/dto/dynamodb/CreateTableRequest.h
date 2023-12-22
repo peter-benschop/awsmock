@@ -19,7 +19,7 @@
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/ServiceException.h>
-#include "ProvisionedThroughput.h"
+#include <awsmock/dto/dynamodb/ProvisionedThroughput.h>
 
 namespace AwsMock::Dto::DynamoDb {
 

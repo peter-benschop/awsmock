@@ -95,6 +95,19 @@ namespace AwsMock::Service {
         Dto::DynamoDb::PutItemResponse itemResponse = _dynamoDbService.PutItem(itemRequest);
         SendOkResponse(response, itemResponse.body);
 
+      } else if (action == "Query") {
+
+        Dto::DynamoDb::QueryRequest queryRequest;
+        queryRequest.FromJson(payload);
+
+        // Copy headers
+        for (const auto &header : request) {
+          queryRequest.headers[header.first] = header.second;
+        }
+
+        Dto::DynamoDb::QueryResponse queryResponse = _dynamoDbService.Query(queryRequest);
+        SendOkResponse(response, queryResponse.body);
+
       } else if (action == "DeleteTable") {
 
         Dto::DynamoDb::DeleteTableRequest tableRequest;

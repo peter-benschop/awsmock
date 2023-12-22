@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_DYNAMODB_LIST_TABLE_REQUEST_H
-#define AWSMOCK_DTO_DYNAMODB_LIST_TABLE_REQUEST_H
+#ifndef AWSMOCK_DTO_DYNAMODB_DELETE_ITEM_RESPONSE_H
+#define AWSMOCK_DTO_DYNAMODB_DELETE_ITEM_RESPONSE_H
 
 // C++ standard includes
 #include <string>
@@ -19,37 +19,38 @@
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/ServiceException.h>
-#include "ProvisionedThroughput.h"
+#include <awsmock/dto/dynamodb/TableStatus.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
-  struct ListTableRequest {
+  /**
+   * Example:
+   * <pre>
+   * {
+   *   "ConsumedCapacity":
+   *     {
+   *       "TableName":"test-table",
+   *       "CapacityUnits":1.0
+   *     }
+   * }
+   * </pre>
+   */
+  struct DeleteItemResponse {
 
     /**
-     * AWS region
+     * Region
      */
     std::string region;
 
     /**
-     * The first table name that this operation will evaluate. Use the value that was returned for LastEvaluatedTableName
-     * in a previous operation, so that you can obtain the next page of results.
+     * Table name
      */
-    std::string exclusiveStartTableName;
+    std::string tableName;
 
     /**
-     * Limit
-     */
-    int limit = 0;
-
-    /**
-     * Original HTTP request body
+     * Original HTTP response body
      */
     std::string body;
-
-    /**
-     * Original HTTP request headers
-     */
-    std::map<std::string, std::string> headers;
 
     /**
      * Creates a JSON string from the object.
@@ -61,9 +62,9 @@ namespace AwsMock::Dto::DynamoDb {
     /**
      * Parse a JSON stream
      *
-     * @param jsonBody JSON string
+     * @param jsonString JSON string
      */
-    void FromJson(const std::string &jsonBody);
+    void FromJson(const std::string &jsonString);
 
     /**
      * Converts the DTO to a string representation.
@@ -77,10 +78,10 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const ListTableRequest &r);
+    friend std::ostream &operator<<(std::ostream &os, const DeleteItemResponse &r);
 
   };
 
 } // namespace AwsMock::Dto::lambda
 
-#endif // AWSMOCK_DTO_DYNAMODB_LIST_TABLE_REQUEST_H
+#endif // AWSMOCK_DTO_DYNAMODB_DELETE_ITEM_RESPONSE_H

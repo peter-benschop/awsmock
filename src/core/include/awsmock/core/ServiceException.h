@@ -5,8 +5,10 @@
 #ifndef AWSMOCK_CORE_SERVICEEXCEPTION_H
 #define AWSMOCK_CORE_SERVICEEXCEPTION_H
 
-#include "Poco/Exception.h"
-#include "Poco/Net/HTTPResponse.h"
+// Poco includes
+#include <Poco/Exception.h>
+#include <Poco/Net/HTTPResponse.h>
+#include <Poco/Net/HTTPServerResponse.h>
 
 namespace AwsMock::Core {
 

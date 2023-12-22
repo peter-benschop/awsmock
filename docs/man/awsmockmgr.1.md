@@ -89,4 +89,5 @@ Bugs and enhancement requests can be reported and filed at https://github.com/je
 
 ## SEE ALSO
 
-```awsmockctl(1)```, ```awsmocksqs(1)```, ```awslocal(1)```, ```awsmocks3(1)```, ```awsmocksqs(1)```, ```awsmocksns(1)```
+```awsmockctl(1)```, ```awsmocksqs(1)```, ```awslocal(1)```, ```awsmocks3(1)```, ```awsmocksqs(1)```, ```awsmocksns(1)```,
+```awsmockdynamodb(1)```
