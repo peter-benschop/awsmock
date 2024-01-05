@@ -32,14 +32,14 @@ namespace AwsMock::Dto::SQS {
   struct PurgeQueueRequest {
 
     /**
-     * Queue URL
-     */
-    std::string queueUrl;
-
-    /**
      * AWS region
      */
     std::string region;
+
+    /**
+     * Queue URL
+     */
+    std::string queueUrl;
 
     /**
      * Resource

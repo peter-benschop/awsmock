@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_RECEIVEMESSAGEREQUEST_H
-#define AWSMOCK_DTO_SQS_RECEIVEMESSAGEREQUEST_H
+#ifndef AWSMOCK_DTO_SQS_RECEIVE_MESSAGE_REQUEST_H
+#define AWSMOCK_DTO_SQS_RECEIVE_MESSAGE_REQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -96,14 +96,14 @@ namespace AwsMock::Dto::SQS {
     /**
      * Converts the JSON string to DTO.
      *
-     * @param JSON string
+     * @param jsonString JSON string
      */
     void FromJson(const std::string &jsonString);
 
     /**
      * Converts the DTO to a string representation.
      *
-     * @return DTO as string for logging.
+     * @return DTO as string
      */
     [[nodiscard]] std::string ToString() const;
 
@@ -118,4 +118,4 @@ namespace AwsMock::Dto::SQS {
 
 } // namespace AwsMock::Dto::SQS
 
-#endif // AWSMOCK_DTO_SQS_RECEIVEMESSAGEREQUEST_H
+#endif // AWSMOCK_DTO_SQS_RECEIVE_MESSAGE_REQUEST_H

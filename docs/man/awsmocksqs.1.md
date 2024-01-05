@@ -23,7 +23,7 @@ corresponding man page ```awslocal(1)```.
 
 ## COMMANDS
 
-```awslocal lambda create-function --function-name <function-name>```  
+```awslocal lambda create-function --function-name <function-name>```    
 &nbsp;&nbsp;&nbsp;&nbsp;creates a new lambda function
 
 ```awslocal sqs list-queues```  
@@ -34,6 +34,24 @@ corresponding man page ```awslocal(1)```.
 
 ```awslocal sqs send-message --queue-url <queue-url> --message-body <message-body>```  
 &nbsp;&nbsp;&nbsp;&nbsp;sends a message to a queue
+
+```awslocal sqs receive-message --queue-url <queue-url>```  
+&nbsp;&nbsp;&nbsp;&nbsp;receives a message from a queue
+
+```awslocal sqs purge-queue --queue-url <queue-url>```    
+&nbsp;&nbsp;&nbsp;&nbsp;purge a queue
+
+```awslocal sqs get-queue-attributes --queue-url <queue-url> --attribute-names <attribute-names>```    
+&nbsp;&nbsp;&nbsp;&nbsp;shows the named queue attributes
+
+```awslocal sqs set-queue-attributes --queue-url <queue-url> --attributes <attributes>```    
+&nbsp;&nbsp;&nbsp;&nbsp;sets the named queue attributes
+
+```awslocal sqs tag-queue --queue-url <queue-url> --tags <Key=Value>```    
+&nbsp;&nbsp;&nbsp;&nbsp;tags the queue
+
+```awslocal sqs delete-queue --queue-url <queue-url>```    
+&nbsp;&nbsp;&nbsp;&nbsp;deletes the queue
 
 ## EXAMPLES
 
@@ -105,6 +123,11 @@ To change the visibility of a message:
 awslocal sqs change-message-visibility --queue-url http://localhost:4566/000000000000/test-queue-queue --receipt-handle file://receipt-handle --visibility-timeout 120
 ```
 
+To tag a queue (Key=Key1, Value=Value1):
+```
+awslocal sqs tag-queue --queue-url http://localhost:4566/000000000000/test-queue-queue --tags Key1=Value1
+```
+
 To delete a queue:
 ```
 awslocal sqs delete-queue --queue-url "http://localhost:4566/000000000000/test-queue-queue
@@ -124,4 +147,4 @@ Bugs and enhancement requests can be reported and filed at https://github.com/je
 ## SEE ALSO
 
 ```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocks3(1)```, ```awsmocksns(1)```, ```awsmocklambda(1)```,
-```awsmockdynamodb(1)```, ```awsmockcognito(1)```
+```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```

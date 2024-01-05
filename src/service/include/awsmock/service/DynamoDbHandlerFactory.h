@@ -38,9 +38,13 @@ namespace AwsMock::Service {
     /**
      * Create new lambda request handler
      *
+     * @param request HTTP request
      * @return lambda request handler
      */
-    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &) override {
+    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
+      if(request.getURI().empty()) {
+        return nullptr;
+      }
       return new DynamoDbHandler(_configuration, _metricService);
     }
 

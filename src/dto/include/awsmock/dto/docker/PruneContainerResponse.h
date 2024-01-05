@@ -39,13 +39,13 @@ namespace AwsMock::Dto::Docker {
     /**
      * Convert to a JSON string
      *
-     * @return JSON string
+     * @param jsonString JSON string
      */
-    void FromJson(const std::string &body) {
+    void FromJson(const std::string &jsonString) {
 
       try {
         Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(body);
+        Poco::Dynamic::Var result = parser.parse(jsonString);
         Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
         Core::JsonUtils::GetJsonValueLong("SpaceReclaimed", rootObject, spaceReclaimed);

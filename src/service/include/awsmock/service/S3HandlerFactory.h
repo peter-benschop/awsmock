@@ -2,8 +2,8 @@
 // Created by vogje01 on 17/06/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_S3HANDLERFACTORY_H
-#define AWSMOCK_SERVICE_S3HANDLERFACTORY_H
+#ifndef AWSMOCK_SERVICE_S3_HANDLER_FACTORY_H
+#define AWSMOCK_SERVICE_S3_HANDLER_FACTORY_H
 
 // Poco includes
 #include "Poco/Logger.h"
@@ -37,7 +37,10 @@ namespace AwsMock::Service {
      * @param request HTTP request
      * @return request HTTP request handler
      */
-    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &) override {
+    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
+      if(request.getURI().empty()) {
+        return nullptr;
+      }
       return new S3Handler(_configuration, _metricService);
     }
 
@@ -57,4 +60,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Service
 
-#endif //AWSMOCK_SERVICE_S3HANDLERFACTORY_H
+#endif // AWSMOCK_SERVICE_S3_HANDLER_FACTORY_H

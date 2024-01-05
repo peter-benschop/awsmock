@@ -1,19 +1,20 @@
 //
-// Created by vogje01 on 30/05/2023.
+// Created by vogje01 on 22/012/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_DELETEQUEUEREQUEST_H
-#define AWSMOCK_DTO_SQS_DELETEQUEUEREQUEST_H
+#ifndef AWSMOCK_DTO_SQS_TAG_QUEUE_REQUEST_H
+#define AWSMOCK_DTO_SQS_TAG_QUEUE_REQUEST_H
 
 // C++ standard includes
 #include <string>
 #include <sstream>
+#include <map>
 
 // Poco includes
+#include <Poco/Dynamic/Var.h>
 #include <Poco/UUIDGenerator.h>
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
-#include <Poco/Dynamic/Var.h>
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
@@ -21,7 +22,7 @@
 
 namespace AwsMock::Dto::SQS {
 
-  struct DeleteQueueRequest {
+  struct TagQueueRequest {
 
     /**
      * AWS region
@@ -34,17 +35,12 @@ namespace AwsMock::Dto::SQS {
     std::string queueUrl;
 
     /**
-     * Resource
+     * Tags map
      */
-    std::string resource = "Unknown resource";
+    std::map<std::string, std::string> tags;
 
     /**
-     * Request ID
-     */
-    std::string requestId = Poco::UUIDGenerator().createRandom().toString();
-
-    /**
-     * Converts the JSON string to DTO.
+     * Converts the JSON string to a DTO
      *
      * @param jsonString JSON string
      */
@@ -62,10 +58,12 @@ namespace AwsMock::Dto::SQS {
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const DeleteQueueRequest &r);
+    friend std::ostream &operator<<(std::ostream &os, const TagQueueRequest &r);
 
   };
 
-} // namespace AwsMock::Dto::SQS
+  typedef std::map<std::string, std::string> TagList;
 
-#endif // AWSMOCK_DTO_SQS_DELETEQUEUEREQUEST_H
+} // namespace AwsMock::Dto::SNS
+
+#endif // AWSMOCK_DTO_SQS_TAG_QUEUE_REQUEST_H

@@ -37,11 +37,11 @@ namespace AwsMock::Dto::Lambda {
     std::map<std::string, std::string> tags;
 
     /**
-     * Convert from a JSON object.
+     * Convert from a JSON string.
      *
-     * @param jsonObject json object
+     * @param jsonString JSON string
      */
-    void FromJson(const std::string &body);
+    void FromJson(const std::string &jsonString);
 
     /**
      * Creates a JSON string from the object.

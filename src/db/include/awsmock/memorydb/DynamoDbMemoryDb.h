@@ -124,6 +124,11 @@ namespace AwsMock::Database {
        */
       void DeleteItem(const std::string &region, const std::string &tableName, const std::string &key);
 
+      /**
+       * Deletes all items
+       */
+      void DeleteAllItems();
+
     private:
 
       /**

@@ -107,7 +107,7 @@ namespace AwsMock::Dto::Common {
     /**
      * From JSON representation
      *
-     * @param Infrastructure as JSON string
+     * @param jsonString JSON string
      */
     void FromJson(const std::string &jsonString);
 

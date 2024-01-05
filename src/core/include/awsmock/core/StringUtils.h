@@ -276,7 +276,6 @@ namespace AwsMock::Core {
      * Sanitizes the string and removes Convert the given string to a hex encoded string.
      *
      * @param input input byte array
-     * @param length length of the byte array
      * @return hex encoded string
      */
     static std::string SanitizeUtf8(const std::string &input);

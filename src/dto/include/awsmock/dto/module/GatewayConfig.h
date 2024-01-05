@@ -84,7 +84,7 @@ namespace AwsMock::Dto::Module {
     /**
      * Convert to JSON representation
      *
-     * @param moduleEntity module entity
+     * @param gatewayConfig gateway config
      * @return JSON string
      */
     static std::string ToJson(const GatewayConfig &gatewayConfig);

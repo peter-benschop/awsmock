@@ -36,9 +36,9 @@ namespace AwsMock::Dto::Cognito {
     /**
      * Converts the JSON string to a DTO
      *
-     * @param jsonString JSON string
+     * @param jsonObject JSON object
      */
-    void FromJson(const Poco::JSON::Object::Ptr &object);
+    void FromJson(const Poco::JSON::Object::Ptr &jsonObject);
 
     /**
      * Converts the DTO to a string representation.

@@ -72,13 +72,13 @@ namespace AwsMock::Dto::Docker {
     /**
      * Convert to a JSON string
      *
-     * @return JSON string
+     * @param jsonString JSON string
      */
-    void FromJson(const std::string &body) {
+    void FromJson(const std::string &jsonString) {
 
       try {
         Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(body);
+        Poco::Dynamic::Var result = parser.parse(jsonString);
 
         this->FromJson(result.extract<Poco::JSON::Object::Ptr>());
 
@@ -90,19 +90,19 @@ namespace AwsMock::Dto::Docker {
     /**
      * Convert to a JSON string
      *
-     * @return JSON string
+     * @param jsonObject JSON object
      */
-    void FromJson(Poco::JSON::Object::Ptr object) {
+    void FromJson(Poco::JSON::Object::Ptr jsonObject) {
 
       try {
-        Core::JsonUtils::GetJsonValueString("Id", object, id);
-        Core::JsonUtils::GetJsonValueString("ParentId", object, parentId);
-        Core::JsonUtils::GetJsonValueLong("Size", object, size);
-        Core::JsonUtils::GetJsonValueLong("SharedSize", object, sharedSize);
-        Core::JsonUtils::GetJsonValueLong("VirtualSize", object, virtualSize);
-        Core::JsonUtils::GetJsonValueInt("Containers", object, containers);
+        Core::JsonUtils::GetJsonValueString("Id", jsonObject, id);
+        Core::JsonUtils::GetJsonValueString("ParentId", jsonObject, parentId);
+        Core::JsonUtils::GetJsonValueLong("Size", jsonObject, size);
+        Core::JsonUtils::GetJsonValueLong("SharedSize", jsonObject, sharedSize);
+        Core::JsonUtils::GetJsonValueLong("VirtualSize", jsonObject, virtualSize);
+        Core::JsonUtils::GetJsonValueInt("Containers", jsonObject, containers);
 
-        Poco::JSON::Array::Ptr reproTagsArray = object->getArray("RepoTags");
+        Poco::JSON::Array::Ptr reproTagsArray = jsonObject->getArray("RepoTags");
         if (reproTagsArray != nullptr) {
           for (Poco::JSON::Array::ConstIterator nt = reproTagsArray->begin(); nt != reproTagsArray->end(); ++nt) {
             repoTags.push_back(nt->convert<std::string>());
@@ -161,13 +161,13 @@ namespace AwsMock::Dto::Docker {
     /**
      * Convert to a JSON string
      *
-     * @return JSON string
+     * @param jsonString JSON string
      */
-    void FromJson(const std::string &body) {
+    void FromJson(const std::string &jsonString) {
 
       try {
         Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(body);
+        Poco::Dynamic::Var result = parser.parse(jsonString);
         Poco::JSON::Array::Ptr rootArray = result.extract<Poco::JSON::Array::Ptr>();
         if (rootArray != nullptr) {
           for (Poco::JSON::Array::ConstIterator it = rootArray->begin(); it != rootArray->end(); ++it) {

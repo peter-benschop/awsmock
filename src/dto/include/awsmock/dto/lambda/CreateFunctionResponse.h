@@ -25,7 +25,7 @@ namespace AwsMock::Dto::Lambda {
   /**
    * Create function response
    *
-   * <p>Example:
+   * Example:
    * <pre>
    * {
    *   "FunctionName": "ftp-file-copy",
@@ -67,6 +67,7 @@ namespace AwsMock::Dto::Lambda {
    *    "RuntimeVersionArn": "arn:aws:lambda:eu-central-1::runtime:8eeff65f6809a3ce81507fe733fe09b835899b99481ba22fd75b5a7338290ec1"
    *   }
    * }
+   * </pre>
    */
   struct CreateFunctionResponse {
 

@@ -204,15 +204,18 @@ namespace AwsMock::Dto::Lambda {
     }
 
     /**
-     * Parse a JSON stream
+     * Parse a JSON stream.
+     *
+     * @verbatim
      *"{\"JAVA_TOOL_OPTIONS\":\"-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localhost\"}"
-     * @param body jsoninput stream
-     * @return
+     * @endverbatim
+     *
+     * @param jsonString JSON string
      */
-    void FromJson(const std::string &body) {
+    void FromJson(const std::string &jsonString) {
 
       Poco::JSON::Parser parser;
-      Poco::Dynamic::Var result = parser.parse(body);
+      Poco::Dynamic::Var result = parser.parse(jsonString);
       Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
       try {

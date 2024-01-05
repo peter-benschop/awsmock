@@ -99,7 +99,6 @@ namespace AwsMock::Dto::Common {
      * Getś the value from the user-agent string
      *
      * @param request HTTP server request
-     * @return UserAgent DTO
      */
      void FromRequest(Poco::Net::HTTPServerRequest &request);
 
@@ -108,7 +107,6 @@ namespace AwsMock::Dto::Common {
      *
      * @param request HTTP server request
      * @param service AWS service name
-     * @return UserAgent DTO
      */
     void FromRequest(Poco::Net::HTTPServerRequest &request, const std::string &service);
 

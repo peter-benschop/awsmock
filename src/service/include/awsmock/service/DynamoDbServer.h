@@ -88,8 +88,22 @@ namespace AwsMock::Service {
 
       /**
        * Start the local DynamoDB container.
+       *
+       * <p>
+       * If the AWS DynamoDb docker image does not already exists, it will be downloaded. Otherwise the local docker
+       * image will be started as container.
+       * </p>
        */
       void StartLocalDynamoDb();
+
+      /**
+       * Stop the local DynamoDB container.
+       *
+       * <p>
+       * The AWS DynamoDb docker container will be stopped.
+       * </p>
+       */
+      void StopLocalDynamoDb();
 
       /**
        * Logger

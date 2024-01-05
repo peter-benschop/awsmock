@@ -89,8 +89,6 @@ namespace AwsMock::Controller {
 
       /**
        * Returns the current AwsMock configuration
-       *
-       * @return current configuration
        */
       void GetDefaults();
 
