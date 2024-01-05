@@ -108,7 +108,7 @@ namespace AwsMock::Database {
       /**
        * Updates an existing cognito user pool
        *
-       * @param cognito cognito user pool
+       * @param userPool cognito user pool entity
        * @return updated cognito user pool entity.
        */
       Entity::Cognito::UserPool UpdateUserPool(const Entity::Cognito::UserPool &userPool);
@@ -142,7 +142,7 @@ namespace AwsMock::Database {
       /**
        * Create a new cognito user
        *
-       * @param userPool cognito user entity to create
+       * @param user cognito user entity to create
        * @return created cognito user entity.
        */
       Entity::Cognito::User CreateUser(const Entity::Cognito::User &user);

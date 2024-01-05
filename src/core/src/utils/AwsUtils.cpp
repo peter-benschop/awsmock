@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/core/AwsUtils.h>
-#include "awsmock/core/CryptoUtils.h"
 
 namespace AwsMock::Core {
 

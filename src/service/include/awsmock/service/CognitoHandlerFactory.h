@@ -38,7 +38,9 @@ namespace AwsMock::Service {
      * @return HTTP request handler
      */
     Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
-      log_trace_stream(_logger) << "Factory for request: " << request.getURI() << std::endl;
+      if(request.getURI().empty()) {
+        return nullptr;
+      }
       return new CognitoHandler(_configuration, _metricService);
     }
 

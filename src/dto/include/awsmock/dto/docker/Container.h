@@ -79,9 +79,9 @@ namespace AwsMock::Dto::Docker {
     /**
      * Convert to a JSON string
      *
-     * @return JSON string
+     * @param jsonObject JSON object
      */
-    void FromJson(Poco::JSON::Object::Ptr object);
+    void FromJson(Poco::JSON::Object::Ptr jsonObject);
 
     /**
      * Converts the DTO to a string representation.

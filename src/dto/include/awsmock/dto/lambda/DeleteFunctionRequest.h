@@ -34,13 +34,12 @@ namespace AwsMock::Dto::Lambda {
     /**
      * Parse a JSON stream
      *
-     * @param body jsoninput stream
-     * @return
+     * @param jsonString JSON string
      */
-    void FromJson(std::istream &body) {
+    void FromJson(std::istream &jsonString) {
 
       Poco::JSON::Parser parser;
-      Poco::Dynamic::Var result = parser.parse(body);
+      Poco::Dynamic::Var result = parser.parse(jsonString);
       Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
       try {

@@ -95,7 +95,7 @@ namespace AwsMock::Dto::Lambda {
     /**
      * Convert to a JSON string
      *
-     * @return JSON string
+     * @param object JSON object
      */
     void FromJson(Poco::JSON::Object::Ptr object) {
 

@@ -17,6 +17,7 @@
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/Configuration.h>
+#include <awsmock/core/CryptoUtils.h>
 
 #define S3_FILE_NAME_LENGTH 64
 #define S3_VERSION_ID_LENGTH 64
@@ -66,7 +67,11 @@ namespace AwsMock::Core {
     /**
      * Generate a SQS queue URL.
      *
-     * <p>The queue name has the format 'http://<host>:<port>/<accountId>/<queueName>'</p>
+     * <p>
+     * @verbatim
+     * The queue name has the format 'http://<host>:<port>/<accountId>/<queueName>'
+     * @endverbatim
+     * </p>
      *
      * @param configuration current AwsMock configuration
      * @param queueName name of the queue
@@ -191,9 +196,9 @@ namespace AwsMock::Core {
      *
      * <p>
      * Example:
-     * <pre>
+     * @verbatim
      * aws-cli/2.13.38 Python/3.11.6 Linux/6.1.0-13-amd64 exe/x86_64.debian.12 prompt/off command/s3.ls
-     * </pre>
+     * @endverbatim
      * </p>
      *
      * @param service AwsMock service
@@ -239,9 +244,9 @@ namespace AwsMock::Core {
      *
      * <p>
      * Example:
-     * <pre>
+     * @verbatim
      * Content-Type: "application/x-amz-json-1.0"
-     * </pre>
+     * @endverbatim
      * </p>
      *
      * @param service AwsMock service

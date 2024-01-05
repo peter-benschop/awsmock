@@ -4,7 +4,7 @@
 namespace AwsMock {
 
   ModuleHandler::ModuleHandler(Core::Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap)
-      : AbstractResource(), _logger(Poco::Logger::get("ModuleHandler")), _configuration(configuration), _metricService(metricService), _serverMap(serverMap) {
+    : AbstractResource(), _logger(Poco::Logger::get("ModuleHandler")), _configuration(configuration), _metricService(metricService), _serverMap(serverMap) {
 
     _moduleService = std::make_shared<Service::ModuleService>(_configuration, _serverMap);
   }
@@ -26,16 +26,16 @@ namespace AwsMock {
       int port = _configuration.getInt("awsmock.service.gateway.port", 4566);
       std::string endpoint = "http://" + host + "/" + std::to_string(port);
       Dto::Module::GatewayConfig config = {
-          .region=regionCfg,
-          .endpoint=endpoint,
-          .protocol="http",
-          .host=host,
-          .port=port,
-          .user=_configuration.getString("awsmock.user", "none"),
-          .accessId=_configuration.getString("awsmock.account.id", "000000000000"),
-          .clientId=_configuration.getString("awsmock.client.id", "00000000"),
-          .dataDir=_configuration.getString("awsmock.data.dir", "/tmp/awsmock/data"),
-          .databaseActive=_configuration.getBool("awsmock.mongodb.active", false)
+        .region=regionCfg,
+        .endpoint=endpoint,
+        .protocol="http",
+        .host=host,
+        .port=port,
+        .user=_configuration.getString("awsmock.user", "none"),
+        .accessId=_configuration.getString("awsmock.account.id", "000000000000"),
+        .clientId=_configuration.getString("awsmock.client.id", "00000000"),
+        .dataDir=_configuration.getString("awsmock.data.dir", "/tmp/awsmock/data"),
+        .databaseActive=_configuration.getBool("awsmock.mongodb.active", false)
       };
       SendOkResponse(response, Dto::Module::GatewayConfig::ToJson(config));
 
@@ -87,7 +87,7 @@ namespace AwsMock {
 
       if (action == "start") {
 
-        if (name == "all") {
+        if (name.empty() || name == "all") {
 
           _moduleService->StartAllServices();
 
@@ -95,6 +95,7 @@ namespace AwsMock {
           SendOkResponse(response, {});
 
         } else {
+
           Database::Entity::Module::Module module = _moduleService->StartService(name);
 
           // Send response
@@ -104,7 +105,7 @@ namespace AwsMock {
 
       } else if (action == "restart") {
 
-        if (name == "all") {
+        if (name.empty() || name == "all") {
 
           _moduleService->RestartAllServices();
 
@@ -123,7 +124,7 @@ namespace AwsMock {
 
       } else if (action == "stop") {
 
-        if (name == "all") {
+        if (name.empty() || name == "all") {
 
           _moduleService->StopAllServices();
 

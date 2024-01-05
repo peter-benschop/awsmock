@@ -14,8 +14,9 @@ namespace AwsMock::Dto::S3 {
   /**
    * Process the S3 notification configuration:
    *
-   * <p>Notification for a lambda function:
-   * <pre>
+   * <p>
+   * Notification for a lambda function:
+   * @verbatim
    * <NotificationConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
    *   <CloudFunctionConfiguration>
    *     <Id>1234567890123</Id>
@@ -34,7 +35,7 @@ namespace AwsMock::Dto::S3 {
    *     <Event>s3:ObjectCreated:*</Event>
    *   </QueueConfiguration>
    * </NotificationConfiguration>
-   * </pre>
+   * @endverbatim
    * </p>
    */
   struct PutBucketNotificationRequest {

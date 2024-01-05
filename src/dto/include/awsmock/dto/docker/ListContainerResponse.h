@@ -38,9 +38,9 @@ namespace AwsMock::Dto::Docker {
     /**
      * Convert to a JSON string
      *
-     * @return JSON string
+     * @param jsonString JSON string
      */
-    void FromJson(const std::string &body);
+    void FromJson(const std::string &jsonString);
   };
 
 } // namespace AwsMock::Dto::Docker

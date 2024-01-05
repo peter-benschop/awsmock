@@ -118,9 +118,6 @@ namespace AwsMock::Service {
 
       /**
        * Deletes all tables with all items
-       *
-       * @param request delete table request DTO
-       * @return DeleteTableResponse
        */
       void DeleteAllTables();
 

@@ -61,6 +61,7 @@ namespace AwsMock::Service {
       // Wait for timeout or condition
       if (InterruptableSleep(_period)) {
         StopMonitoringServer();
+        StopLocalDynamoDb();
         break;
       }
     }
@@ -98,9 +99,37 @@ namespace AwsMock::Service {
     // Start docker container, in case it is not already running.
     if (container.state != "running") {
       _dockerService->StartDockerContainer(container.id);
+      log_info_stream(_logger) << "Docker containers for DynamoDB started" << std::endl;
+    } else {
+      log_warning_stream(_logger) << "Docker containers for DynamoDB already running" << std::endl;
     }
 
-    log_debug_stream(_logger) << "Docker containers for DynamoDB started" << std::endl;
+  }
+
+  void DynamoDbServer::StopLocalDynamoDb() {
+    log_debug_stream(_logger) << "Starting DynamoDB docker image" << std::endl;
+
+    // Check docker image
+    if(!_dockerService->ImageExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
+      throw Core::ServiceException("Image does not exist", Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+    }
+
+    // Check container image
+    if(!_dockerService->ContainerExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
+      throw Core::ServiceException("Container does not exist", Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+    }
+
+    // Get docker container
+    Dto::Docker::Container container = _dockerService->GetContainerByName(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG);
+
+    // Stop docker container, in case it is running.
+    if (container.state == "running") {
+      _dockerService->StopContainer(container);
+      log_info_stream(_logger) << "Docker containers for DynamoDB stopped" << std::endl;
+    } else {
+      log_warning_stream(_logger) << "Docker containers for DynamoDB not running" << std::endl;
+    }
+
   }
 
 } // namespace AwsMock::Worker

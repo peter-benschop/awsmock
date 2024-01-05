@@ -311,8 +311,8 @@ namespace AwsMock::Service {
     }
     if (services.HasService("all") || services.HasService("dynamodb")) {
       std::shared_ptr<Database::DynamoDbDatabase> _dynamoDbDatabase = std::make_shared<Database::DynamoDbDatabase>(_configuration);
-      //_cognitoDatabase->DeleteAllUsers();
-      //_cognitoDatabase->DeleteAllUserPools();
+      _dynamoDbDatabase->DeleteAllItems();
+      _dynamoDbDatabase->DeleteAllTables();
     }
     if (services.HasService("all") || services.HasService("transfer")) {
       std::shared_ptr<Database::TransferDatabase> _transferDatabase = std::make_shared<Database::TransferDatabase>(_configuration);

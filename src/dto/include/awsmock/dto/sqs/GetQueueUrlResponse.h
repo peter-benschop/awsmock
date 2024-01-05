@@ -26,6 +26,8 @@
 #include <awsmock/core/JsonUtils.h>
 
 /**
+ * Example:
+ * @verbatim
  * <?xml version="1.0"?>
  * <GetQueueUrlResponse xmlns="http://queue.amazonaws.com/doc/2012-11-05/">
  *     <GetQueueUrlResult>
@@ -35,6 +37,7 @@
  *         <RequestId>552d6f30-4c8e-5b32-aaed-33408c7d6c38</RequestId>
  *     </ResponseMetadata>
  * </GetQueueUrlResponse>
+ * @endverbatim
  */
 namespace AwsMock::Dto::SQS {
 

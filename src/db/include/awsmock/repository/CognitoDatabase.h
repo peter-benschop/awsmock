@@ -94,7 +94,7 @@ public:
      * Returns a cognito user pool entity by primary key
      *
      * @param oid cognito user pool primary key
-     * @return cognito entity
+     * @return cognito user pool entity
      * @throws DatabaseException
      */
     Entity::Cognito::UserPool GetUserPoolById(bsoncxx::oid oid);
@@ -146,7 +146,7 @@ public:
     /**
      * Create a new cognito user
      *
-     * @param userPool cognito user entity to create
+     * @param user cognito user entity to create
      * @return created cognito user entity.
      */
     Entity::Cognito::User CreateUser(const Entity::Cognito::User &user);

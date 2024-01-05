@@ -36,9 +36,13 @@ namespace AwsMock::Service {
     /**
      * Create a new request handler
      *
+     * @request request HTTP request
      * @return new request handler
      */
-    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &) override {
+    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
+      if(request.getURI().empty()) {
+        return nullptr;
+      }
       return new SQSHandler(_configuration, _metricService, _condition);
     }
 

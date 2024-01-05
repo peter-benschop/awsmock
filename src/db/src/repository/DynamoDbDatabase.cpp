@@ -284,4 +284,25 @@ namespace AwsMock::Database {
     }
   }
 
+  void DynamoDbDatabase::DeleteAllItems() {
+
+    if (HasDatabase()) {
+
+      try {
+
+        auto result = _itemCollection.delete_many({});
+        log_debug_stream(_logger) << "DynamoDB items deleted, count: " << result->deleted_count() << std::endl;
+
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+      }
+
+    } else {
+
+      _memoryDb.DeleteAllItems();
+
+    }
+  }
+
 } // namespace AwsMock::Database

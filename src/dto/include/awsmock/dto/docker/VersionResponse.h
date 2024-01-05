@@ -34,7 +34,7 @@ namespace AwsMock::Dto::Docker {
     /**
      * Deserialize from a JSON object
      *
-     * @param object JSON object
+     * @param jsonObject JSON object
      */
     void FromJson(Poco::JSON::Object::Ptr jsonObject) {
 
@@ -77,7 +77,7 @@ namespace AwsMock::Dto::Docker {
     /**
      * Deserialize from a JSON object
      *
-     * @param object JSON object
+     * @param jsonObject JSON object
      */
     void FromJson(Poco::JSON::Object::Ptr jsonObject) {
 
@@ -115,7 +115,7 @@ namespace AwsMock::Dto::Docker {
     /**
      * Deserialize from a JSON object
      *
-     * @param object JSON object
+     * @param jsonObject JSON object
      */
     void FromJson(Poco::JSON::Object::Ptr jsonObject) {
 
@@ -148,7 +148,7 @@ namespace AwsMock::Dto::Docker {
     /**
      * Deserialize from a JSON object
      *
-     * @param object JSON object
+     * @param jsonString JSON string
      */
     void FromJson(const std::string &jsonString) {
 
