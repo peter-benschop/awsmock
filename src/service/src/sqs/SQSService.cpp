@@ -314,6 +314,7 @@ namespace AwsMock::Service {
       // Sanitize message body
       // TODO: FIx iconv on alpine linux
       //std::string messageBody = Core::StringUtils::SanitizeUtf8(request.body);
+      std::string messageBody = request.body;
 
       // Get queue by URL
       Database::Entity::SQS::Queue queue;
