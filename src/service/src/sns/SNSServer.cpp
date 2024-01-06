@@ -43,7 +43,7 @@ namespace AwsMock::Service {
     log_info_stream(_logger) << "SNS module starting" << std::endl;
 
     // Start monitoring thread
-    //StartMonitoringServer();
+    StartMonitoringServer();
 
     // Start REST module
     StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new SNSRequestHandlerFactory(_configuration, _metricService, _condition));
@@ -53,7 +53,7 @@ namespace AwsMock::Service {
       log_debug_stream(_logger) << "SNSServer processing started" << std::endl;
 
       // Reset messages
-      //ResetMessages();
+      ResetMessages();
 
       // Wait for timeout or condition
       if (InterruptableSleep(_period)) {

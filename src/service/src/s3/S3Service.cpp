@@ -772,15 +772,15 @@ namespace AwsMock::Service {
     // Write file
     std::string fileName = Core::AwsUtils::CreateS3FileName();
     std::string filePath = _dataS3Dir + Poco::Path::separator() + fileName;
-    std::ofstream ofs(filePath, std::ios::out | std::ios::trunc);
+    std::ofstream ofs(filePath);
     long size = Poco::StreamCopier::copyStream(stream, ofs);
     ofs.close();
     log_debug_stream(_logger) << "File received, fileName: " << filePath << " size: " << size << std::endl;
 
     // Meta data
     std::string md5sum = Core::Crypto::GetMd5FromFile(filePath);
-//    std::string sha1sum = Core::Crypto::GetSha1FromFile(filePath);
-//    std::string sha256sum = Core::Crypto::GetSha256FromFile(filePath);
+    std::string sha1sum = Core::Crypto::GetSha1FromFile(filePath);
+    std::string sha256sum = Core::Crypto::GetSha256FromFile(filePath);
     log_info_stream(_logger) << "Checksum, bucket: " << request.bucket << " key: " << request.key << " md5: " << md5sum << std::endl;
 
     // Update database
@@ -791,8 +791,8 @@ namespace AwsMock::Service {
         .owner=request.owner,
         .size=size,
         .md5sum=md5sum,
-//        .sha1sum=sha1sum,
-//        .sha256sum=sha256sum,
+        .sha1sum=sha1sum,
+        .sha256sum=sha256sum,
         .contentType=request.contentType,
         .metadata=request.metadata,
         .internalName=fileName
@@ -813,7 +813,7 @@ namespace AwsMock::Service {
         .md5Sum=md5sum,
         .contentLength=size,
         .checksumAlgorithm="SHA256",
-//        .checksumSha256=sha256sum,
+        .checksumSha256=sha256sum,
         .metadata=request.metadata
     };
   }

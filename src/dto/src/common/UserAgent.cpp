@@ -18,7 +18,7 @@ namespace AwsMock::Dto::Common {
 
     // We have a user agent, so use it
     std::vector<std::string> parts = Core::StringUtils::Split(request["User-Agent"], ' ');
-    if (parts.empty() || parts.size() < 6) {
+    if (parts.empty() || parts.size() < 4) {
       throw Core::ServiceException("Could not extract user agent DTO");
     } else {
 
