@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
 
   SQSServer::SQSServer(Core::Configuration &configuration, Core::MetricService &metricService)
-      : AbstractServer(configuration, "sqs"), _logger(Poco::Logger::get("SQSServer")), _configuration(configuration), _metricService(metricService) {
+    : AbstractServer(configuration, "sqs"), _logger(Poco::Logger::get("SQSServer")), _configuration(configuration), _metricService(metricService) {
 
     // HTTP manager configuration
     _port = _configuration.getInt("awsmock.service.sqs.port", SQS_DEFAULT_PORT);
@@ -77,7 +77,7 @@ namespace AwsMock::Service {
     for (auto &queue : queueList) {
 
       // Check retention period
-      if(queue.attributes.messageRetentionPeriod>0) {
+      if (queue.attributes.messageRetentionPeriod > 0) {
         _sqsDatabase->MessageRetention(queue.queueUrl, queue.attributes.messageRetentionPeriod);
       }
 

@@ -13,12 +13,38 @@ namespace AwsMock::Dto::SQS {
 
       Poco::JSON::Array messageArray;
       for (const auto &message : messageList) {
+
         Poco::JSON::Object messageObject;
         messageObject.set("Body", message.body);
         messageObject.set("ReceiptHandle", message.receiptHandle);
         messageObject.set("MD5OfBody", message.md5Body);
-        messageObject.set("MD5OfMessageAttributes", message.md5Attr);
         messageObject.set("MessageId", message.messageId);
+
+        Dto::SQS::MessageAttributeList messageAttributeListDto;
+
+        Poco::JSON::Object attributeObject;
+        for (auto &at : message.attributes) {
+
+          Dto::SQS::MessageAttribute messageAttributeDto = {.name=at.attributeName, .stringValue=at.attributeValue};
+
+          Poco::JSON::Object attributeValueObject;
+          if(at.attributeType == Database::Entity::SQS::MessageAttributeType::STRING) {
+            attributeValueObject.set("DataType", "String");
+            attributeValueObject.set("StringValue", at.attributeValue);
+            messageAttributeDto.type = MessageAttributeDataType::STRING;
+          } else if(at.attributeType == Database::Entity::SQS::MessageAttributeType::NUMBER) {
+            attributeValueObject.set("DataType", "Number");
+            attributeValueObject.set("StringValue", at.attributeValue);
+            messageAttributeDto.type = MessageAttributeDataType::NUMBER;
+          }
+          messageAttributeListDto.emplace_back(messageAttributeDto);
+          attributeObject.set(at.attributeName, attributeValueObject);
+        }
+
+        // MD5 of message attributes
+        messageObject.set("MD5OfMessageAttributes", Dto::SQS::MessageAttribute::GetMd5Attributes(messageAttributeListDto));
+
+        messageObject.set("MessageAttributes", attributeObject);
         messageArray.add(messageObject);
       }
 
@@ -27,6 +53,7 @@ namespace AwsMock::Dto::SQS {
 
       std::ostringstream os;
       rootJson.stringify(os);
+      std::cerr << os.str() << std::endl;
       return os.str();
 
     } catch (Poco::Exception &exc) {
@@ -78,7 +105,7 @@ namespace AwsMock::Dto::SQS {
       for (auto &at : it.attributes) {
 
         // MessageAttribute
-        Poco::XML::AutoPtr<Poco::XML::Element> pAttribute = pDoc->createElement("UserAttribute");
+        Poco::XML::AutoPtr<Poco::XML::Element> pAttribute = pDoc->createElement("Attribute");
         pMessage->appendChild(pAttribute);
 
         // Name

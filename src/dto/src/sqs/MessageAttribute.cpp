@@ -10,13 +10,13 @@ namespace AwsMock::Dto::SQS {
     return name < other.name;
   }
 
-  std::string MessageAttribute::GetMd5Attributes(const std::vector <MessageAttribute> &attributes) {
+  std::string MessageAttribute::GetMd5Attributes(const std::vector<MessageAttribute> &attributes) {
 
     int length = 0;
     auto *bytes = new unsigned char[4092];
 
     // Sort the userAttributes by name
-    std::vector <Dto::SQS::MessageAttribute> sortedAttributes = attributes;
+    std::vector<Dto::SQS::MessageAttribute> sortedAttributes = attributes;
     std::sort(sortedAttributes.begin(), sortedAttributes.end());
 
     for (const auto &a : sortedAttributes) {
