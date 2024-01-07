@@ -22,6 +22,7 @@
 
 // AwsMock includes
 #include <awsmock/entity/sqs/Message.h>
+#include <awsmock/dto/sqs/MessageAttribute.h>
 #include <awsmock/core/ServiceException.h>
 
 namespace AwsMock::Dto::SQS {

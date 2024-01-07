@@ -244,6 +244,7 @@ namespace AwsMock::Service {
       // Reset all userAttributes
       Database::Entity::SQS::MessageAttribute attribute = {.attributeName="VisibilityTimeout", .attributeValue=std::to_string(request.visibilityTimeout), .attributeType=Database::Entity::SQS::MessageAttributeType::NUMBER};
       message.attributes.push_back(attribute);
+      message.reset = Poco::DateTime() + Poco::Timespan(request.visibilityTimeout, 0);
 
       // Update database
       message = _database->UpdateMessage(message);

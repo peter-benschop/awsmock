@@ -255,7 +255,7 @@ namespace AwsMock::Database {
 
   Entity::SQS::Queue SQSDatabase::CreateOrUpdateQueue(Entity::SQS::Queue &queue) {
 
-    if(QueueExists(queue.region, queue.queueUrl)) {
+    if (QueueExists(queue.region, queue.queueUrl)) {
 
       return UpdateQueue(queue);
 
@@ -408,7 +408,7 @@ namespace AwsMock::Database {
 
   Entity::SQS::Message SQSDatabase::CreateOrUpdateMessage(Entity::SQS::Message &message) {
 
-    if(MessageExists(message.receiptHandle)) {
+    if (MessageExists(message.receiptHandle)) {
 
       return UpdateMessage(message);
 
@@ -453,6 +453,9 @@ namespace AwsMock::Database {
   }
 
   void SQSDatabase::ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, int maxMessages, Entity::SQS::MessageList &messageList) {
+
+    // First rest messages
+    ResetMessages(queueUrl, visibility);
 
     auto reset = std::chrono::high_resolution_clock::now() + std::chrono::seconds{visibility};
 
@@ -513,15 +516,15 @@ namespace AwsMock::Database {
 
         auto now = std::chrono::high_resolution_clock::now();
         auto result = _messageCollection.update_many(
-            make_document(
-                kvp("queueUrl", queueUrl),
-                kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)),
-                kvp("reset", make_document(
-                    kvp("$lt", bsoncxx::types::b_date(now))))),
-            make_document(kvp("$set",
-                              make_document(
-                                  kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)),
-                                  kvp("receiptHandle", "")))));
+          make_document(
+            kvp("queueUrl", queueUrl),
+            kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)),
+            kvp("reset", make_document(
+              kvp("$lt", bsoncxx::types::b_date(now))))),
+          make_document(kvp("$set",
+                            make_document(
+                              kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)),
+                              kvp("receiptHandle", "")))));
 
         // Commit
         session.commit_transaction();
@@ -553,7 +556,7 @@ namespace AwsMock::Database {
         auto result = _messageCollection.update_many(make_document(kvp("queueUrl", queueUrl),
                                                                    kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)),
                                                                    kvp("retries", make_document(
-                                                                       kvp("$gt", redrivePolicy.maxReceiveCount)))),
+                                                                     kvp("$gt", redrivePolicy.maxReceiveCount)))),
                                                      make_document(kvp("$set", make_document(kvp("retries", 0),
                                                                                              kvp("queueArn",
                                                                                                  redrivePolicy.deadLetterTargetArn),
@@ -585,15 +588,15 @@ namespace AwsMock::Database {
 
         auto now = std::chrono::high_resolution_clock::now();
         auto result = _messageCollection.update_many(
-            make_document(
-                kvp("queueUrl", queueUrl),
-                kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)),
-                kvp("reset", make_document(
-                    kvp("$lt", bsoncxx::types::b_date(now))))),
-            make_document(
-                kvp("$set",
-                    make_document(
-                        kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))))));
+          make_document(
+            kvp("queueUrl", queueUrl),
+            kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)),
+            kvp("reset", make_document(
+              kvp("$lt", bsoncxx::types::b_date(now))))),
+          make_document(
+            kvp("$set",
+                make_document(
+                  kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))))));
         // Commit
         session.commit_transaction();
 
@@ -622,10 +625,10 @@ namespace AwsMock::Database {
 
         auto now = std::chrono::high_resolution_clock::now();
         auto result = _messageCollection.delete_many(
-            make_document(
-                kvp("queueUrl", queueUrl),
-                kvp("created", make_document(
-                    kvp("$lt", bsoncxx::types::b_date(reset))))));
+          make_document(
+            kvp("queueUrl", queueUrl),
+            kvp("created", make_document(
+              kvp("$lt", bsoncxx::types::b_date(reset))))));
 
         // Commit
         session.commit_transaction();
@@ -649,10 +652,10 @@ namespace AwsMock::Database {
     if (HasDatabase()) {
 
       long count = 0;
-      if(!region.empty() && !queueUrl.empty()) {
+      if (!region.empty() && !queueUrl.empty()) {
         count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
         log_trace_stream(_logger) << "Count messages, region: " << region << " url: " << queueUrl << " result: " << count << std::endl;
-      } else if(!region.empty()) {
+      } else if (!region.empty()) {
         count = _messageCollection.count_documents(make_document(kvp("region", region)));
         log_trace_stream(_logger) << "Count messages, region: " << region << " result: " << count << std::endl;
       } else {
