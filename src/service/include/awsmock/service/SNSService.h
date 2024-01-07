@@ -22,6 +22,8 @@
 #include <awsmock/dto/sns/CreateTopicResponse.h>
 #include <awsmock/dto/sns/ListTopicsResponse.h>
 #include <awsmock/dto/sns/DeleteTopicResponse.h>
+#include <awsmock/dto/sns/GetTopicAttributesRequest.h>
+#include <awsmock/dto/sns/GetTopicAttributesResponse.h>
 #include <awsmock/dto/sns/PublishRequest.h>
 #include <awsmock/dto/sns/PublishResponse.h>
 #include <awsmock/dto/sns/SqsNotificationRequest.h>
@@ -100,6 +102,14 @@ namespace AwsMock::Service {
        * @return TagResourceResponse DTO
        */
       Dto::SNS::TagResourceResponse TagResource(const Dto::SNS::TagResourceRequest &request);
+
+      /**
+       * Returns the topic attributes
+       *
+       * @param request get topic attributes request DTO
+       * @return GetTopicAttributesResponse DTO
+       */
+      Dto::SNS::GetTopicAttributesResponse GetTopicAttributes(const Dto::SNS::GetTopicAttributesRequest &request);
 
       /**
        * Delete a queue
