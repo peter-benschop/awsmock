@@ -21,6 +21,8 @@
 #include <awsmock/dto/sns/CreateTopicRequest.h>
 #include <awsmock/dto/sns/CreateTopicResponse.h>
 #include <awsmock/dto/sns/ListTopicsResponse.h>
+#include <awsmock/dto/sns/ListSubscriptionsByTopicRequest.h>
+#include <awsmock/dto/sns/ListSubscriptionsByTopicResponse.h>
 #include <awsmock/dto/sns/DeleteTopicResponse.h>
 #include <awsmock/dto/sns/GetTopicAttributesRequest.h>
 #include <awsmock/dto/sns/GetTopicAttributesResponse.h>
@@ -110,6 +112,14 @@ namespace AwsMock::Service {
        * @return GetTopicAttributesResponse DTO
        */
       Dto::SNS::GetTopicAttributesResponse GetTopicAttributes(const Dto::SNS::GetTopicAttributesRequest &request);
+
+      /**
+       * Returns a list of subscriptions for a topic
+       *
+       * @param request list subscriptions request DTO
+       * @return ListSubscriptionByTopicResponse DTO
+       */
+      Dto::SNS::ListSubscriptionsByTopicResponse ListSubscriptionsByTopic(const Dto::SNS::ListSubscriptionsByTopicRequest &request);
 
       /**
        * Delete a queue
