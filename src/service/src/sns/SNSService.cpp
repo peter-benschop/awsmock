@@ -184,6 +184,28 @@ namespace AwsMock::Service {
     }
   }
 
+  Dto::SNS::GetTopicAttributesResponse SNSService::GetTopicAttributes(const Dto::SNS::GetTopicAttributesRequest &request) {
+
+    try {
+
+      // Check existence
+      if (!_snsDatabase->TopicExists(request.topicArn)) {
+        throw Core::ServiceException("SNS topic does not exists", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+      }
+
+      Database::Entity::SNS::Topic topic = _snsDatabase->GetTopicByArn(request.topicArn);
+      return {
+        .region=topic.region,
+        .topicArn=topic.topicArn,
+        .owner=topic.owner
+      };
+
+    } catch (Poco::Exception &ex) {
+      log_error_stream(_logger) << "SNS get topic attributes failed, message: " << ex.message() << std::endl;
+      throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+    }
+  }
+
   Dto::SNS::TagResourceResponse SNSService::TagResource(const Dto::SNS::TagResourceRequest &request) {
 
     try {

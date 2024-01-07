@@ -4,7 +4,7 @@
 namespace AwsMock::Service {
 
   SNSJava2Handler::SNSJava2Handler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition)
-      : AbstractHandler(), _logger(Poco::Logger::get("SNSServiceHandler")), _configuration(configuration), _metricService(metricService), _snsService(configuration, condition) {
+    : AbstractHandler(), _logger(Poco::Logger::get("SNSServiceHandler")), _configuration(configuration), _metricService(metricService), _snsService(configuration, condition) {
   }
 
   void SNSJava2Handler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
@@ -56,16 +56,21 @@ namespace AwsMock::Service {
         std::string protocol = GetStringParameter(payload, "Protocol");
         std::string endpoint = GetStringParameter(payload, "Endpoint");
 
-        Dto::SNS::SubscribeResponse
-            snsResponse = _snsService.Subscribe({.region=region, .topicArn=topicArn, .protocol=protocol, .endpoint=endpoint, .owner=user});
+        Dto::SNS::SubscribeResponse snsResponse = _snsService.Subscribe({.region=region, .topicArn=topicArn, .protocol=protocol, .endpoint=endpoint, .owner=user});
         SendOkResponse(response, snsResponse.ToXml());
 
       } else if (action == "Unsubscribe") {
 
         std::string subscriptionArn = GetStringParameter(payload, "SubscriptionArn");
 
-        Dto::SNS::UnsubscribeResponse
-            snsResponse = _snsService.Unsubscribe({.region=region, .subscriptionArn=subscriptionArn});
+        Dto::SNS::UnsubscribeResponse snsResponse = _snsService.Unsubscribe({.region=region, .subscriptionArn=subscriptionArn});
+        SendOkResponse(response, snsResponse.ToXml());
+
+      } else if (action == "GetTopicAttributes") {
+
+        std::string topicArn = GetStringParameter(payload, "TopicArn");
+
+        Dto::SNS::GetTopicAttributesResponse snsResponse = _snsService.GetTopicAttributes({.region=region, .topicArn=topicArn});
         SendOkResponse(response, snsResponse.ToXml());
 
       } else if (action == "DeleteTopic") {
