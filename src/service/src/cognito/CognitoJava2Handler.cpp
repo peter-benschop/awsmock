@@ -115,6 +115,7 @@ namespace AwsMock::Service {
   std::string CognitoJava2Handler::GetActionFromHeader(Poco::Net::HTTPServerRequest &request) {
 
     if (!request.has("X-Amz-Target")) {
+      log_error_stream(_logger) << "Could not extract action" << std::endl;
       throw Core::ServiceException("Could not extract action");
     }
 

@@ -64,6 +64,35 @@ namespace AwsMock::Database {
 
   }
 
+  Entity::DynamoDb::Table DynamoDbDatabase::GetTableByRegionName(const std::string &region, const std::string &name) {
+
+    if (HasDatabase()) {
+
+      try {
+
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _tableCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
+        if (!mResult) {
+          _logger.error() << "Database exception: Table not found " << std::endl;
+          throw Core::DatabaseException("Database exception, Table not found ", Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        Entity::DynamoDb::Table result;
+        result.FromDocument(mResult);
+        _logger.debug() << "Got table by ID, table: " << result.ToString() << std::endl;
+        return result;
+
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+      }
+
+    } else {
+
+      return _memoryDb.GetTableByRegionName(region, name);
+    }
+
+  }
+
   Entity::DynamoDb::Table DynamoDbDatabase::GetTableById(const std::string &oid) {
 
     if (HasDatabase()) {
@@ -142,6 +171,42 @@ namespace AwsMock::Database {
 
     log_trace_stream(_logger) << "Got DynamoDb table list, size:" << tables.size() << std::endl;
     return tables;
+  }
+
+  Entity::DynamoDb::Table DynamoDbDatabase::CreateOrUpdateTable(const Entity::DynamoDb::Table &table) {
+
+    if (TableExists(table.region, table.name)) {
+
+      return UpdateTable(table);
+
+    } else {
+
+      return CreateTable(table);
+
+    }
+  }
+
+  Entity::DynamoDb::Table DynamoDbDatabase::UpdateTable(const Entity::DynamoDb::Table &table) {
+
+    if (HasDatabase()) {
+
+      try {
+        auto result = _tableCollection.replace_one(make_document(kvp("region", table.region), kvp("name", table.name)), table.ToDocument());
+
+        log_trace_stream(_logger) << "DynamoDB table updated: " << table.ToString() << std::endl;
+
+        return GetTableByRegionName(table.region, table.name);
+
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+      }
+
+    } else {
+
+      return _memoryDb.UpdateTable(table);
+
+    }
   }
 
   void DynamoDbDatabase::DeleteTable(const std::string &tableName) {

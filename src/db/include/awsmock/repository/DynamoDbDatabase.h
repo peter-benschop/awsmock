@@ -50,6 +50,22 @@ namespace AwsMock::Database {
       Entity::DynamoDb::Table CreateTable(const Entity::DynamoDb::Table &table);
 
       /**
+       * Updates a new DynamoDb table
+       *
+       * @param table DynamoDb table
+       * @return updated DynamoDb table.
+       */
+      Entity::DynamoDb::Table UpdateTable(const Entity::DynamoDb::Table &table);
+
+      /**
+       * Create a new DynamoDb table or update an existing one
+       *
+       * @param table DynamoDb table
+       * @return created or updated DynamoDb table.
+       */
+      Entity::DynamoDb::Table CreateOrUpdateTable(const Entity::DynamoDb::Table &table);
+
+      /**
        * Returns a table entity by primary key
        *
        * @param oid table primary key
@@ -66,6 +82,16 @@ namespace AwsMock::Database {
        * @throws DatabaseException
        */
       Entity::DynamoDb::Table GetTableById(const std::string &oid);
+
+      /**
+       * Returns a table entity by primary key
+       *
+       * @param region table region
+       * @param name table name
+       * @return table entity
+       * @throws DatabaseException
+       */
+      Entity::DynamoDb::Table GetTableByRegionName(const std::string &region, const std::string &name);
 
       /**
        * Returns a list of DynamoDB tables
