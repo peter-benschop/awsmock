@@ -146,53 +146,67 @@ namespace AwsMock::Dto::Common {
 
     try {
 
-      Poco::JSON::Array::Ptr s3BucketArray = infrastructureObject->getArray("s3-buckets");
-      for (int i = 0; i < s3BucketArray->size(); i++) {
-        Database::Entity::S3::Bucket bucket;
-        bucket.FromJsonObject(s3BucketArray->getObject(i));
-        s3Buckets.emplace_back(bucket);
+      if (infrastructureObject->has("s3-buckets")) {
+        Poco::JSON::Array::Ptr s3BucketArray = infrastructureObject->getArray("s3-buckets");
+        for (int i = 0; i < s3BucketArray->size(); i++) {
+          Database::Entity::S3::Bucket bucket;
+          bucket.FromJsonObject(s3BucketArray->getObject(i));
+          s3Buckets.emplace_back(bucket);
+        }
       }
 
-      Poco::JSON::Array::Ptr s3ObjectArray = infrastructureObject->getArray("s3-objects");
-      for (int i = 0; i < s3ObjectArray->size(); i++) {
-        Database::Entity::S3::Object s3Object;
-        s3Object.FromJsonObject(s3ObjectArray->getObject(i));
-        s3Objects.emplace_back(s3Object);
+      if (infrastructureObject->has("s3-objects")) {
+        Poco::JSON::Array::Ptr s3ObjectArray = infrastructureObject->getArray("s3-objects");
+        for (int i = 0; i < s3ObjectArray->size(); i++) {
+          Database::Entity::S3::Object s3Object;
+          s3Object.FromJsonObject(s3ObjectArray->getObject(i));
+          s3Objects.emplace_back(s3Object);
+        }
       }
 
-      Poco::JSON::Array::Ptr sqsQueueArray = infrastructureObject->getArray("sqs-queues");
-      for (int i = 0; i < sqsQueueArray->size(); i++) {
-        Database::Entity::SQS::Queue sqsQueueObject;
-        sqsQueueObject.FromJsonObject(sqsQueueArray->getObject(i));
-        sqsQueues.emplace_back(sqsQueueObject);
+      if (infrastructureObject->has("sqs-queues")) {
+        Poco::JSON::Array::Ptr sqsQueueArray = infrastructureObject->getArray("sqs-queues");
+        for (int i = 0; i < sqsQueueArray->size(); i++) {
+          Database::Entity::SQS::Queue sqsQueueObject;
+          sqsQueueObject.FromJsonObject(sqsQueueArray->getObject(i));
+          sqsQueues.emplace_back(sqsQueueObject);
+        }
       }
 
-      Poco::JSON::Array::Ptr sqsMessageArray = infrastructureObject->getArray("sqs-messages");
-      for (int i = 0; i < sqsMessageArray->size(); i++) {
-        Database::Entity::SQS::Message sqsMessageObject;
-        sqsMessageObject.FromJsonObject(sqsMessageArray->getObject(i));
-        sqsMessages.emplace_back(sqsMessageObject);
+      if (infrastructureObject->has("sqs-messages")) {
+        Poco::JSON::Array::Ptr sqsMessageArray = infrastructureObject->getArray("sqs-messages");
+        for (int i = 0; i < sqsMessageArray->size(); i++) {
+          Database::Entity::SQS::Message sqsMessageObject;
+          sqsMessageObject.FromJsonObject(sqsMessageArray->getObject(i));
+          sqsMessages.emplace_back(sqsMessageObject);
+        }
       }
 
-      Poco::JSON::Array::Ptr cognitoUserPoolArray = infrastructureObject->getArray("cognito-user-pools");
-      for (int i = 0; i < cognitoUserPoolArray->size(); i++) {
-        Database::Entity::Cognito::UserPool cognitoUserPoolObject;
-        cognitoUserPoolObject.FromJsonObject(cognitoUserPoolArray->getObject(i));
-        cognitoUserPools.emplace_back(cognitoUserPoolObject);
+      if (infrastructureObject->has("cognito-user-pools")) {
+        Poco::JSON::Array::Ptr cognitoUserPoolArray = infrastructureObject->getArray("cognito-user-pools");
+        for (int i = 0; i < cognitoUserPoolArray->size(); i++) {
+          Database::Entity::Cognito::UserPool cognitoUserPoolObject;
+          cognitoUserPoolObject.FromJsonObject(cognitoUserPoolArray->getObject(i));
+          cognitoUserPools.emplace_back(cognitoUserPoolObject);
+        }
       }
 
-      Poco::JSON::Array::Ptr cognitoUserArray = infrastructureObject->getArray("cognito-users");
-      for (int i = 0; i < cognitoUserArray->size(); i++) {
-        Database::Entity::Cognito::User cognitoUserObject;
-        cognitoUserObject.FromJsonObject(cognitoUserArray->getObject(i));
-        cognitoUsers.emplace_back(cognitoUserObject);
+      if (infrastructureObject->has("cognito-users")) {
+        Poco::JSON::Array::Ptr cognitoUserArray = infrastructureObject->getArray("cognito-users");
+        for (int i = 0; i < cognitoUserArray->size(); i++) {
+          Database::Entity::Cognito::User cognitoUserObject;
+          cognitoUserObject.FromJsonObject(cognitoUserArray->getObject(i));
+          cognitoUsers.emplace_back(cognitoUserObject);
+        }
       }
 
-      Poco::JSON::Array::Ptr dynamoDbTableArray = infrastructureObject->getArray("dynamodb-tables");
-      for (int i = 0; i < dynamoDbTableArray->size(); i++) {
-        Database::Entity::DynamoDb::Table dynamoDbTableObject;
-        dynamoDbTableObject.FromJsonObject(dynamoDbTableArray->getObject(i));
-        dynamoDbTables.emplace_back(dynamoDbTableObject);
+      if (infrastructureObject->has("dynamodb-tables")) {
+        Poco::JSON::Array::Ptr dynamoDbTableArray = infrastructureObject->getArray("dynamodb-tables");
+        for (int i = 0; i < dynamoDbTableArray->size(); i++) {
+          Database::Entity::DynamoDb::Table dynamoDbTableObject;
+          dynamoDbTableObject.FromJsonObject(dynamoDbTableArray->getObject(i));
+          dynamoDbTables.emplace_back(dynamoDbTableObject);
+        }
       }
 
     } catch (Poco::Exception &exc) {

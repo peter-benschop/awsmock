@@ -2,8 +2,8 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_ABSTRACTHANDLER_H
-#define AWSMOCK_SERVICE_ABSTRACTHANDLER_H
+#ifndef AWSMOCK_SERVICE_ABSTRACT_HANDLER_H
+#define AWSMOCK_SERVICE_ABSTRACT_HANDLER_H
 
 // C++ includes
 #include <string>
@@ -500,4 +500,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_ABSTRACTHANDLER_H
+#endif // AWSMOCK_SERVICE_ABSTRACT_HANDLER_H

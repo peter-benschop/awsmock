@@ -26,6 +26,7 @@
 #include <awsmock/service/SQSService.h>
 #include <awsmock/service/SQSCliHandler.h>
 #include <awsmock/service/SQSCppHandler.h>
+#include <awsmock/service/SQSJava1Handler.h>
 #include <awsmock/service/SQSJava2Handler.h>
 
 #define DEFAULT_SQS_ENDPOINT "localhost:4566"
@@ -46,7 +47,7 @@ namespace AwsMock::Service {
    *
    * @author jens.vogt@opitz-consulting.com
    */
-  class SQSHandler : public SQSCliHandler, public SQSCppHandler, public SQSJava2Handler {
+  class SQSHandler : public SQSCliHandler, public SQSCppHandler, public SQSJava1Handler, public SQSJava2Handler {
 
   public:
 

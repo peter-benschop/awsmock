@@ -4,7 +4,8 @@
 namespace AwsMock::Service {
 
   SQSHandler::SQSHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition) : SQSCliHandler(configuration, metricService, condition), SQSCppHandler(configuration, metricService, condition),
-                                                                                                                               SQSJava2Handler(configuration, metricService, condition), _logger(Poco::Logger::get("SQSHandler")) {
+                                                                                                                               SQSJava1Handler(configuration, metricService, condition), SQSJava2Handler(configuration, metricService, condition),
+                                                                                                                               _logger(Poco::Logger::get("SQSHandler")) {
   }
 
   void SQSHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
@@ -34,7 +35,7 @@ namespace AwsMock::Service {
       switch (userAgent.type) {
       case Dto::Common::UserAgentType::AWS_SDK_UNKNOWN:
       case Dto::Common::UserAgentType::AWS_CLI: return SQSCliHandler::handlePost(request, response, region, user);
-      case Dto::Common::UserAgentType::AWS_SDK_JAVA1: break;
+      case Dto::Common::UserAgentType::AWS_SDK_JAVA1: return SQSJava1Handler::handlePost(request, response, region, user);
       case Dto::Common::UserAgentType::AWS_SDK_JAVA2: return SQSJava2Handler::handlePost(request, response, region, user);
       case Dto::Common::UserAgentType::AWS_SDK_CPP: return SQSCppHandler::handlePost(request, response, region, user);
 
