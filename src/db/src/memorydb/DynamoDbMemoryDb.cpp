@@ -64,6 +64,33 @@ namespace AwsMock::Database {
     return it->second;
   }
 
+  Entity::DynamoDb::Table DynamoDbMemoryDb::GetTableByRegionName(const std::string &region, const std::string &name) {
+
+    auto it = find_if(_tables.begin(), _tables.end(), [region, name](const std::pair<std::string, Entity::DynamoDb::Table> &table) {
+      return table.second.region == region && table.second.name == name;
+    });
+
+    if (it == _tables.end()) {
+      log_error_stream(_logger) << "Get table by region and name failed, region: " << region << " name: " << name << std::endl;
+      throw Core::DatabaseException("Get table by region and name failed, region: " + region + " name: " + name);
+    }
+
+    it->second.oid = it->first;
+    return it->second;
+  }
+
+  Entity::DynamoDb::Table DynamoDbMemoryDb::UpdateTable(const Entity::DynamoDb::Table &table) {
+    Poco::ScopedLock lock(_tableMutex);
+
+    std::string region = table.region;
+    std::string name = table.name;
+    auto it = find_if(_tables.begin(), _tables.end(), [region, name](const std::pair<std::string, Entity::DynamoDb::Table> &table) {
+      return table.second.region == region && table.second.name == name;
+    });
+    _tables[it->first] = table;
+    return _tables[it->first];
+  }
+
   void DynamoDbMemoryDb::DeleteTable(const std::string &tableName) {
     Poco::ScopedLock lock(_tableMutex);
 

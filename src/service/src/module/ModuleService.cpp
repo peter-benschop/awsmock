@@ -265,19 +265,19 @@ namespace AwsMock::Service {
     }
 
     // DynamoDB
-    if (!infrastructure.cognitoUserPools.empty() || !infrastructure.cognitoUsers.empty()) {
+    if (!infrastructure.dynamoDbTables.empty() || !infrastructure.dynamoDbItems.empty()) {
       std::shared_ptr<Database::DynamoDbDatabase> _dynamoDatabase = std::make_shared<Database::DynamoDbDatabase>(_configuration);
-      if (!infrastructure.cognitoUserPools.empty()) {
-        for (auto &userPool : infrastructure.cognitoUserPools) {
-          //_dynamoDatabase->CreateOrUpdateUserPool(userPool);
+      if (!infrastructure.dynamoDbTables.empty()) {
+        for (auto &table : infrastructure.dynamoDbTables) {
+          _dynamoDatabase->CreateOrUpdateTable(table);
         }
-        log_info_stream(_logger) << "DynamoDb tables imported, count: " << infrastructure.cognitoUserPools.size() << std::endl;
+        log_info_stream(_logger) << "DynamoDb tables imported, count: " << infrastructure.dynamoDbTables.size() << std::endl;
       }
-      if (!infrastructure.cognitoUsers.empty()) {
-        for (auto &user : infrastructure.cognitoUsers) {
-          //_cognitoDatabase->CreateOrUpdateUser(user);
+      if (!infrastructure.dynamoDbItems.empty()) {
+        for (auto &item : infrastructure.dynamoDbItems) {
+          //_dynamoDatabase->CreateOrUpdateUser(user);
         }
-        log_info_stream(_logger) << "Cognito users imported, count: " << infrastructure.cognitoUsers.size() << std::endl;
+        log_info_stream(_logger) << "DynamoDb items imported, count: " << infrastructure.dynamoDbItems.size() << std::endl;
       }
     }
   }

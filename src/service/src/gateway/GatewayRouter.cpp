@@ -20,6 +20,7 @@ namespace AwsMock::Service {
     _routingTable["lambda"] = {.name="lambda", .host="localhost", .port=9503};
     _routingTable["transfer"] = {.name="transfer", .host="localhost", .port=9504};
     _routingTable["cognito-idp"] = {.name="cognito", .host="localhost", .port=9505};
+    _routingTable["cognito-identity"] = {.name="cognito", .host="localhost", .port=9505};
     _routingTable["dynamodb"] = {.name="dynamodb", .host="localhost", .port=dynamodbPort};
     log_debug_stream(_logger) << "Gateway router initialized" << std::endl;
   }
