@@ -55,11 +55,6 @@ namespace AwsMock {
       std::string infrastructure = _moduleService->ExportInfrastructure(services, prettyPrint);
       SendOkResponse(response, infrastructure);
 
-    } else if (action == "import") {
-
-      _moduleService->ImportInfrastructure(payload);
-      SendOkResponse(response);
-
     } else if (action == "clean") {
 
       Dto::Common::Services services;
@@ -83,6 +78,7 @@ namespace AwsMock {
     try {
       std::string name = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
       std::string action = Core::HttpUtils::GetPathParameter(request.getURI(), 1);
+      std::string payload = Core::HttpUtils::GetBodyAsString(request);
       log_info_stream(_logger) << "Module: " << name << " action: " << action << std::endl;
 
       if (action == "start") {
@@ -140,6 +136,11 @@ namespace AwsMock {
           std::string body = Dto::Module::Module::ToJson(module);
           SendOkResponse(response, body);
         }
+
+      } else if (action == "import") {
+
+        _moduleService->ImportInfrastructure(payload);
+        SendOkResponse(response);
 
       } else if (action == "loglevel") {
 

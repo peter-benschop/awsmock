@@ -22,18 +22,17 @@ namespace AwsMock::Service {
 
     try {
 
-      //DumpRequestHeaders(request);
       std::string payload = GetPayload(request);
       std::string action, version;
       GetActionVersion(payload, action, version);
+      log_debug_stream(_logger) << "Action: " << action << std::endl;
 
       if (action == "CreateTopic") {
 
         std::string name = GetStringParameter(payload, "Name");
         log_debug_stream(_logger) << "Topic name: " << name << std::endl;
 
-        Dto::SNS::CreateTopicRequest snsRequest = {.region=region, .topicName = name, .owner=user};
-        Dto::SNS::CreateTopicResponse snsResponse = _snsService.CreateTopic(snsRequest);
+        Dto::SNS::CreateTopicResponse snsResponse = _snsService.CreateTopic({.region=region, .topicName = name, .owner=user});
         SendOkResponse(response, snsResponse.ToXml());
 
       } else if (action == "ListTopics") {
@@ -46,6 +45,7 @@ namespace AwsMock::Service {
         std::string topicArn = GetStringParameter(payload, "TopicArn");
         std::string targetArn = GetStringParameter(payload, "TargetArn");
         std::string message = GetStringParameter(payload, "Message");
+        log_debug_stream(_logger) << "Topic ARN: " << topicArn << " targetArn:" << targetArn << " message: " << message << std::endl;
 
         Dto::SNS::PublishResponse snsResponse = _snsService.Publish({.region=region, .topicArn=topicArn, .targetArn=targetArn, .message=message});
         SendOkResponse(response, snsResponse.ToXml());
@@ -55,6 +55,7 @@ namespace AwsMock::Service {
         std::string topicArn = GetStringParameter(payload, "TopicArn");
         std::string protocol = GetStringParameter(payload, "Protocol");
         std::string endpoint = GetStringParameter(payload, "Endpoint");
+        log_debug_stream(_logger) << "Topic ARN: " << topicArn << " protocol:" << protocol << " endpoint: " << endpoint << std::endl;
 
         Dto::SNS::SubscribeResponse snsResponse = _snsService.Subscribe({.region=region, .topicArn=topicArn, .protocol=protocol, .endpoint=endpoint, .owner=user});
         SendOkResponse(response, snsResponse.ToXml());
@@ -62,6 +63,7 @@ namespace AwsMock::Service {
       } else if (action == "Unsubscribe") {
 
         std::string subscriptionArn = GetStringParameter(payload, "SubscriptionArn");
+        log_debug_stream(_logger) << "Subscription ARN: " << subscriptionArn << std::endl;
 
         Dto::SNS::UnsubscribeResponse snsResponse = _snsService.Unsubscribe({.region=region, .subscriptionArn=subscriptionArn});
         SendOkResponse(response, snsResponse.ToXml());
@@ -69,6 +71,7 @@ namespace AwsMock::Service {
       } else if (action == "GetTopicAttributes") {
 
         std::string topicArn = GetStringParameter(payload, "TopicArn");
+        log_debug_stream(_logger) << "Topic ARN: " << topicArn << std::endl;
 
         Dto::SNS::GetTopicAttributesResponse snsResponse = _snsService.GetTopicAttributes({.region=region, .topicArn=topicArn});
         SendOkResponse(response, snsResponse.ToXml());
@@ -76,6 +79,7 @@ namespace AwsMock::Service {
       } else if (action == "ListSubscriptionsByTopic") {
 
         std::string topicArn = GetStringParameter(payload, "TopicArn");
+        log_debug_stream(_logger) << "Topic ARN: " << topicArn << std::endl;
 
         Dto::SNS::ListSubscriptionsByTopicResponse snsResponse = _snsService.ListSubscriptionsByTopic({.region=region, .topicArn=topicArn});
         SendOkResponse(response, snsResponse.ToXml());
@@ -112,7 +116,7 @@ namespace AwsMock::Service {
   void SNSJava2Handler::handleOptions(Poco::Net::HTTPServerResponse &response) {
     log_debug_stream(_logger) << "SNS OPTIONS request" << std::endl;
 
-    response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
+    response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS, HEAD");
     response.setContentType("text/plain; charset=utf-8");
 
     handleHttpStatusCode(response, 200);

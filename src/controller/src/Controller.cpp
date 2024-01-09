@@ -255,7 +255,7 @@ namespace AwsMock::Controller {
 
     std::map<std::string, std::string> headers;
     AddAuthorization(headers);
-    Core::CurlResponse response = _curlUtils.SendHttpRequest("GET", _baseUrl + "/import", headers, jsonString.str());
+    Core::CurlResponse response = _curlUtils.SendHttpRequest("PUT", _baseUrl + "/import", headers, jsonString.str());
 
     if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
       std::cerr << "Error: " << response.statusReason << std::endl;
