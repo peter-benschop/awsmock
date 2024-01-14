@@ -49,11 +49,12 @@ namespace AwsMock::Service {
 
         } else {
 
-          std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
+          std::string queueName = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueName");
+          std::string queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, queueName);
           std::vector<Dto::SQS::QueueAttribute> attributes = GetQueueAttributes(payload);
           std::map<std::string, std::string> tags = GetQueueTags(payload);
 
-          Dto::SQS::CreateQueueRequest sqsRequest = {.region=region, .queueUrl=queueUrl, .owner=user, .attributes=attributes, .tags=tags};
+          Dto::SQS::CreateQueueRequest sqsRequest = {.region=region, .name=queueName, .queueUrl=queueUrl, .owner=user, .attributes=attributes, .tags=tags};
 
           Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
           SendOkResponse(response, sqsResponse.ToXml());
@@ -298,7 +299,7 @@ namespace AwsMock::Service {
         SendOkResponse(response);
       }
     } catch (Core::ServiceException &exc) {
-      _logger.error() << "SQS module exception: " << exc.message() << std::endl;
+      log_error_stream(_logger) << "SQS module exception: " << exc.message() << std::endl;
       SendJsonErrorResponse("SQS", response, exc);
     }
   }
