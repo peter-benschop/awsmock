@@ -142,7 +142,7 @@ namespace AwsMock::Core {
     /// Sets the priority for log messages to Message::PRIO_FATAL.
 
     LogStream &fatal(const char *file, int line);
-    /// Sets the priority for log messages to Message::PRIO_FATAL and file and line userAttributes.
+    /// Sets the priority for log messages to Message::PRIO_FATAL and file and line attributes.
 
     LogStream &fatal(const std::string &message);
     /// Sets the priority for log messages to Message::PRIO_FATAL
@@ -152,7 +152,7 @@ namespace AwsMock::Core {
     /// Sets the priority for log messages to Message::PRIO_CRITICAL.
 
     LogStream &critical(const char *file, int line);
-    /// Sets the priority for log messages to Message::PRIO_CRITICAL and file and line userAttributes.
+    /// Sets the priority for log messages to Message::PRIO_CRITICAL and file and line attributes.
 
     LogStream &critical(const std::string &message);
     /// Sets the priority for log messages to Message::PRIO_CRITICAL
@@ -172,7 +172,7 @@ namespace AwsMock::Core {
     /// Sets the priority for log messages to Message::PRIO_WARNING.
 
     LogStream &warning(const char *file, int line);
-    /// Sets the priority for log messages to Message::PRIO_WARNING and file and line userAttributes.
+    /// Sets the priority for log messages to Message::PRIO_WARNING and file and line attributes.
 
     LogStream &warning(const std::string &message);
     /// Sets the priority for log messages to Message::PRIO_WARNING
@@ -182,7 +182,7 @@ namespace AwsMock::Core {
     /// Sets the priority for log messages to Message::PRIO_NOTICE.
 
     LogStream &notice(const char *file, int line);
-    /// Sets the priority for log messages to Message::PRIO_NOTICE and file and line userAttributes.
+    /// Sets the priority for log messages to Message::PRIO_NOTICE and file and line attributes.
 
     LogStream &notice(const std::string &message);
     /// Sets the priority for log messages to Message::PRIO_NOTICE
@@ -192,7 +192,7 @@ namespace AwsMock::Core {
     /// Sets the priority for log messages to Message::PRIO_INFORMATION.
 
     LogStream &information(const char *file, int line);
-    /// Sets the priority for log messages to Message::PRIO_INFORMATION and file and line userAttributes.
+    /// Sets the priority for log messages to Message::PRIO_INFORMATION and file and line attributes.
 
     LogStream &information(const std::string &message);
     /// Sets the priority for log messages to Message::PRIO_INFORMATION
@@ -202,7 +202,7 @@ namespace AwsMock::Core {
     /// Sets the priority for log messages to Message::PRIO_DEBUG.
 
     LogStream &debug(const char *file, int line);
-    /// Sets the priority for log messages to Message::PRIO_DEBUG and file and line userAttributes.
+    /// Sets the priority for log messages to Message::PRIO_DEBUG and file and line attributes.
 
     LogStream &debug(const std::string &message);
     /// Sets the priority for log messages to Message::PRIO_DEBUG
@@ -212,7 +212,7 @@ namespace AwsMock::Core {
     /// Sets the priority for log messages to Message::PRIO_TRACE.
 
     LogStream &trace(const char *file, int line);
-    /// Sets the priority for log messages to Message::PRIO_TRACE and file and line userAttributes.
+    /// Sets the priority for log messages to Message::PRIO_TRACE and file and line attributes.
 
     LogStream &trace(const std::string &message);
     /// Sets the priority for log messages to Message::PRIO_TRACE

@@ -177,14 +177,6 @@ namespace AwsMock::Service {
     private:
 
       /**
-       * Returns the MD5 sum of the message body.
-       *
-       * @param body message body
-       * @return MD5 sum of message body
-       */
-      std::string GetMd5Body(const std::string &body);
-
-      /**
        * Logger
        */
       Core::LogStream _logger;

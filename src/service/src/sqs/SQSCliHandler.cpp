@@ -31,6 +31,7 @@ namespace AwsMock::Service {
 
     std::string requestId = GetHeaderValue(request, "RequestId", Poco::UUIDGenerator().createRandom().toString());
     std::string payload = GetBodyAsString(request);
+
     if (userAgent.clientCommand == "create-queue") {
 
       if (userAgent.contentType == "json") {
@@ -176,7 +177,7 @@ namespace AwsMock::Service {
       Dto::SQS::GetQueueAttributesResponse sqsResponse = _sqsService.GetQueueAttributes(sqsRequest);
       SendOkResponse(response, userAgent.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
 
-    } else if (userAgent.clientCommand == "set-queue-attribute") {
+    } else if (userAgent.clientCommand == "set-queue-attributes") {
 
       Dto::SQS::SetQueueAttributesRequest sqsRequest;
 

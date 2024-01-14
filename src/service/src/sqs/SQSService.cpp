@@ -29,10 +29,35 @@ namespace AwsMock::Service {
 
       Database::Entity::SQS::QueueAttribute attributes;
       for (auto &a : request.attributes) {
+        if (a.attributeName == "DelaySeconds") {
+          attributes.delaySeconds = std::stoi(a.attributeValue);
+        }
+        if (a.attributeName == "MaxMessageSize") {
+          attributes.maxMessageSize = std::stoi(a.attributeValue);
+        }
+        if (a.attributeName == "MessageRetentionPeriod") {
+          attributes.messageRetentionPeriod = std::stoi(a.attributeValue);
+        }
         if (a.attributeName == "VisibilityTimeout") {
           attributes.visibilityTimeout = std::stoi(a.attributeValue);
         }
+        if (a.attributeName == "Policy") {
+          attributes.policy = a.attributeValue;
+        }
+        if (a.attributeName == "RedrivePolicy") {
+          attributes.redrivePolicy.FromJson(a.attributeValue);
+        }
+        if (a.attributeName == "RedriveAllowPolicy") {
+          attributes.redriveAllowPolicy = a.attributeValue;
+        }
+        if (a.attributeName == "ReceiveMessageWaitTime") {
+          attributes.receiveMessageWaitTime = std::stoi(a.attributeValue);
+        }
+        if (a.attributeName == "QueueArn") {
+          attributes.queueArn = a.attributeValue;
+        }
       }
+      attributes.queueArn = Core::AwsUtils::CreateSqsQueueArn(_configuration, request.name);
 
       // Update database
       Database::Entity::SQS::Queue queue = _database->CreateQueue({
@@ -187,7 +212,8 @@ namespace AwsMock::Service {
 
     // Check existence
     if (!_database->QueueUrlExists(request.region, request.queueUrl)) {
-      throw Core::ServiceException("SQS queue '" + request.queueUrl + "' does not exists", Poco::Net::HTTPResponse::HTTP_NOT_FOUND, request.resource.c_str(), request.requestId.c_str());
+      log_error_stream(_logger) << "SQS queue '" << request.queueUrl << "' does not exist" << std::endl;
+      throw Core::ServiceException("SQS queue '" + request.queueUrl + "' does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
     try {
@@ -214,6 +240,8 @@ namespace AwsMock::Service {
       }
       if (!request.attributes["QueueArn"].empty()) {
         queue.attributes.queueArn = request.attributes["QueueArn"];
+      } else {
+        queue.attributes.queueArn = queue.queueArn;
       }
 
       // Update database
