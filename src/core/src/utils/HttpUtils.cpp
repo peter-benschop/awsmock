@@ -145,6 +145,7 @@ namespace AwsMock::Core {
     if(request.stream().gcount() > 0) {
       std::string body;
       Poco::StreamCopier::copyToString(request.stream(), body);
+      return body;
     }
     return {};
   }
