@@ -78,7 +78,6 @@ namespace AwsMock {
     try {
       std::string name = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
       std::string action = Core::HttpUtils::GetPathParameter(request.getURI(), 1);
-      std::string payload = Core::HttpUtils::GetBodyAsString(request);
       log_info_stream(_logger) << "Module: " << name << " action: " << action << std::endl;
 
       if (action == "start") {
@@ -138,6 +137,8 @@ namespace AwsMock {
         }
 
       } else if (action == "import") {
+
+        std::string payload = Core::HttpUtils::GetBodyAsString(request);
 
         _moduleService->ImportInfrastructure(payload);
         SendOkResponse(response);
