@@ -65,7 +65,7 @@ namespace AwsMock::Database::Entity::SQS {
     jsonObject.set("owner", owner);
     jsonObject.set("queueUrl", queueUrl);
     jsonObject.set("queueArn", queueArn);
-    jsonObject.set("userAttributes", attributes.ToJsonObject());
+    jsonObject.set("attributes", attributes.ToJsonObject());
 
     // Tags array
     Poco::JSON::Array jsonTagArray;
@@ -87,7 +87,7 @@ namespace AwsMock::Database::Entity::SQS {
     Core::JsonUtils::GetJsonValueString("queueUrl", jsonObject, queueUrl);
     Core::JsonUtils::GetJsonValueString("queueArn", jsonObject, queueArn);
     Core::JsonUtils::GetJsonValueString("owner", jsonObject, owner);
-    attributes.FromJsonObject(jsonObject->getObject("userAttributes"));
+    attributes.FromJsonObject(jsonObject->getObject("attributes"));
   }
 
   std::string Queue::ToString() const {

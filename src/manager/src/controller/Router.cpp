@@ -2,7 +2,7 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#include "awsmock/controller/Router.h"
+#include <awsmock/controller/Router.h>
 
 namespace AwsMock::Controller {
 
