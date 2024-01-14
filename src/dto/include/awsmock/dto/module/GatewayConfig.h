@@ -67,6 +67,16 @@ namespace AwsMock::Dto::Module {
     std::string clientId = "000000000000";
 
     /**
+     * Access key ID
+     */
+    std::string accessKeyId = "none";
+
+    /**
+     * Secret access key
+     */
+    std::string secretAccessKey = "none";
+
+    /**
      * Data directory
      */
     std::string dataDir = "/tmp/awsmock/data";
