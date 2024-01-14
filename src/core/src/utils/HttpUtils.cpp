@@ -142,11 +142,8 @@ namespace AwsMock::Core {
   }
 
   std::string HttpUtils::GetBodyAsString(Poco::Net::HTTPServerRequest &request) {
-    if(request.stream().gcount() > 0) {
       std::string body;
       Poco::StreamCopier::copyToString(request.stream(), body);
       return body;
-    }
-    return {};
   }
 }
