@@ -20,7 +20,16 @@ namespace AwsMock::Service {
 
     // Check existence
     if (_snsDatabase->TopicExists(request.region, request.topicName)) {
-      throw Core::ServiceException("SNS topic exists already", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+      log_warning_stream(_logger) << "SNS topic '" + request.topicName + "' exists already" << std::endl;
+      Database::Entity::SNS::Topic topic = _snsDatabase->GetTopicByArn(request.topicName);
+      log_debug_stream(_logger) << "Got topic: " << topic.topicArn << std::endl;
+      return {
+        .region=topic.region,
+        .name=topic.topicName,
+        .owner=topic.owner,
+        .topicArn=topic.topicArn
+      };
+      //throw Core::ServiceException("SNS topic exists already", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
 
     try {
