@@ -64,7 +64,9 @@ namespace AwsMock::Service {
       explicit SQSService(Core::Configuration &configuration, Poco::Condition &condition);
 
       /**
-       * Creates a new queue
+       * Creates a new queue.
+       *
+       * <p>In case the queue exists already, return the existing queue.</p>
        *
        * @param request create queue request
        * @return CreateQueueResponse
