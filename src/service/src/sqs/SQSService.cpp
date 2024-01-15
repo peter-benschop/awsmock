@@ -18,9 +18,19 @@ namespace AwsMock::Service {
 
   Dto::SQS::CreateQueueResponse SQSService::CreateQueue(const Dto::SQS::CreateQueueRequest &request) {
 
-    // Check existence
+    // Check existence. In case the queue exists already return the existing queue.
     if (_database->QueueExists(request.region, request.name)) {
-      throw Core::ServiceException("SQS queue '" + request.queueUrl + "' exists already", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+      log_warning_stream(_logger) << "SQS queue '" + request.name + "' exists already" << std::endl;
+      Database::Entity::SQS::Queue queue = _database->GetQueueByName(request.region, request.name);
+      log_debug_stream(_logger) << "Got queue: " << queue.queueUrl << std::endl;
+      return {
+        .region=queue.region,
+        .name=queue.name,
+        .owner=queue.owner,
+        .queueUrl=queue.queueUrl,
+        .queueArn=queue.queueArn
+      };
+      //throw Core::ServiceException("SQS queue '" + request.queueUrl + "' exists already", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
 
     try {
