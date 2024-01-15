@@ -60,6 +60,8 @@ namespace AwsMock::Service {
       /**
        * Creates a new queue
        *
+       * <p>In case the topic exists already, return the existing topic.</p>
+       *
        * @param request create queue request
        * @return CreateQueueResponse
        */
