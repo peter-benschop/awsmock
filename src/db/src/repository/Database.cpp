@@ -20,7 +20,7 @@ namespace AwsMock::Database {
 
     } else {
 
-      log_debug_stream(_logger) << "Running without database" << std::endl;
+      log_trace_stream(_logger) << "Running without database" << std::endl;
     }
   }
 

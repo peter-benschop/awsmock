@@ -31,6 +31,7 @@ namespace AwsMock::Service {
 
     std::string requestId = GetHeaderValue(request, "RequestId", Poco::UUIDGenerator().createRandom().toString());
     std::string payload = GetBodyAsString(request);
+    log_debug_stream(_logger) << "SQS POST request, action: " << userAgent.clientCommand << " content: " << userAgent.contentType << std::endl;
 
     if (userAgent.clientCommand == "create-queue") {
 
