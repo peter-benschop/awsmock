@@ -180,7 +180,7 @@ namespace AwsMock::Service {
 
     // assert
     EXPECT_EQ(0, result.status);
-    EXPECT_TRUE(result.output.length() > 0);
+    EXPECT_FALSE(result.output.empty());
     EXPECT_TRUE(Core::StringUtils::Contains(result.output, "Messages"));
   }
 

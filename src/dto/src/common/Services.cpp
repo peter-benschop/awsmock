@@ -38,6 +38,11 @@ namespace AwsMock::Dto::Common {
 
   void Services::FromJson(const std::string &jsonString) {
 
+    if(jsonString.empty()) {
+      serviceNames.emplace_back("all");
+      return;
+    }
+
     Poco::JSON::Parser parser;
     Poco::Dynamic::Var result = parser.parse(jsonString);
     auto rootObject = result.extract<Poco::JSON::Object::Ptr>();

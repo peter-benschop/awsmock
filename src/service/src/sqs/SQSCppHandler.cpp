@@ -33,7 +33,7 @@ namespace AwsMock::Service {
       std::string version = Core::HttpUtils::GetQueryParameterValueByName(payload, "Version");
       log_debug_stream(_logger) << "SQS POST request, action: " << action << " version: " << version << std::endl;
 
-      if (action == "CreateQueu") {
+      if (action == "CreateQueue") {
 
         std::string queueName = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueName");
         std::string queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, queueName);

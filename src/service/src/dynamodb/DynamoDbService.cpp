@@ -24,7 +24,15 @@ namespace AwsMock::Service {
 
     if (_dynamoDbDatabase->TableExists(request.region, request.tableName)) {
       log_warning_stream(_logger) << "DynamoDb table exists already, region: " << request.region << " name: " << request.tableName << std::endl;
-      throw Core::ServiceException("DynamoDb table exists already", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+      Database::Entity::DynamoDb::Table table = _dynamoDbDatabase->GetTableByRegionName(request.region, request.tableName);
+      log_debug_stream(_logger) << "DynamoDb got table, region: " << request.region << " name: " << request.tableName << std::endl;
+      return {
+        .region=table.region,
+        .tableName=table.name,
+        .tags=table.tags,
+        .attributes=table.attributes
+      };
+      //throw Core::ServiceException("DynamoDb table exists already", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
     Dto::DynamoDb::CreateTableResponse createTableResponse;

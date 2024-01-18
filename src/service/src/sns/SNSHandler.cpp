@@ -4,7 +4,7 @@
 namespace AwsMock::Service {
 
   SNSHandler::SNSHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition) : SNSCliHandler(configuration, metricService, condition), SNSJava2Handler(configuration, metricService, condition),
-                                                                                                                               SNSCppHandler(configuration, metricService, condition), _logger(Poco::Logger::get("SNSServiceHandler")),
+                                                                                                                               SNSCppHandler(configuration, metricService, condition), _logger(Poco::Logger::get("SNSHandler")),
                                                                                                                                _configuration(configuration), _metricService(metricService), _snsService(configuration, condition) {
   }
 
