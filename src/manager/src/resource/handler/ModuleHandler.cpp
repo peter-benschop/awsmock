@@ -53,11 +53,18 @@ namespace AwsMock {
       std::string infrastructure = _moduleService->ExportInfrastructure(services, prettyPrint);
       SendOkResponse(response, infrastructure);
 
-    } else if (action == "clean") {
+    } else if (action == "clean-infrastructure") {
 
       Dto::Common::Services services;
       services.FromJson(payload);
       _moduleService->CleanInfrastructure(services);
+      SendOkResponse(response);
+
+    } else if (action == "clean-objects") {
+
+      Dto::Common::Services services;
+      services.FromJson(payload);
+      _moduleService->CleanObjects(services);
       SendOkResponse(response);
 
     } else {

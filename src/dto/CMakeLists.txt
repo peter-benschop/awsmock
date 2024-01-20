@@ -26,7 +26,7 @@ set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp sr
         src/s3/ListAllBucketResponse.cpp src/s3/ListBucketRequest.cpp src/s3/ListAllBucketResponse.cpp
         src/s3/Owner.cpp src/s3/Content.cpp)
 set(DOCKER_SOURCES src/docker/Port.cpp src/docker/Container.cpp src/docker/ListContainerResponse.cpp
-        src/docker/CreateContainerRequest.cpp)
+        src/docker/CreateContainerRequest.cpp src/docker/Filters.cpp)
 set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionResponse.cpp src/lambda/DeadLetterConfig.cpp
         src/lambda/Function.cpp src/lambda/InvocationNotification.cpp src/lambda/CreateNotification.cpp
         src/lambda/CreateTagRequest.cpp)
@@ -60,7 +60,9 @@ include_directories(include ../core/include ../db/include /usr/include/mongo /us
 add_library(${LIBRARY} SHARED ${SOURCES}
         include/awsmock/dto/s3/Content.h
         include/awsmock/dto/dynamodb/TableStatus.h
-        include/awsmock/dto/dynamodb/AttributeValue.h)
+        include/awsmock/dto/dynamodb/AttributeValue.h
+        src/docker/Filters.cpp
+        include/awsmock/dto/docker/Filters.h)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 

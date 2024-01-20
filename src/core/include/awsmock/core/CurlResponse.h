@@ -2,8 +2,8 @@
 // Created by vogje01 on 05/09/2023.
 //
 
-#ifndef AWSMOCK_DTO_CURL_CURLRESPONSE_H
-#define AWSMOCK_DTO_CURL_CURLRESPONSE_H
+#ifndef AWSMOCK_DTO_CURL_CURL_RESPONSE_H
+#define AWSMOCK_DTO_CURL_CURL_RESPONSE_H
 
 // C++ includes
 #include <string>
@@ -45,10 +45,12 @@ namespace AwsMock::Core {
      * @return output stream
      */
     friend std::ostream &operator<<(std::ostream &os, const CurlResponse &r) {
-      os << "CurlResponse={statusCode='" << r.statusCode << "' statusReason='" << r.statusReason << "' output='" << r.output << "'}";
+      os << "CurlResponse={statusCode='" << r.statusCode << "', statusReason='" << r.statusReason << "', output='" << r.output << "'}";
       return os;
     }
+
   };
 
 } // namespace AwsMock::Dto::Curl
-#endif // AWSMOCK_DTO_CURL_CURLRESPONSE_H
+
+#endif // AWSMOCK_DTO_CURL_CURL_RESPONSE_H
