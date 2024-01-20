@@ -15,9 +15,6 @@
 // Test includes
 #include <awsmock/core/TestUtils.h>
 
-#define NAME "test-container"
-#define IMAGE "test-image:latest"
-
 namespace AwsMock::Service {
 
   class DockerServiceTest : public ::testing::Test {

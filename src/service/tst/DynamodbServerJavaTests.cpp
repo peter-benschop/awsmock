@@ -41,7 +41,6 @@ namespace AwsMock::Service {
       }
 
       void TearDown() override {
-        Core::ExecResult deleteResult = Core::SystemUtils::Exec(_baseCommand + "delete-table test-table");
         _dynamoDbService.DeleteAllTables();
         _dynamoDbServer.StopServer();
       }

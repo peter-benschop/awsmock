@@ -114,11 +114,22 @@ namespace AwsMock::Service {
       void ImportInfrastructure(const std::string &jsonString);
 
       /**
-       * Cleans the current infrastructure
+       * Cleans the current infrastructure.
+       *
+       * <p>All SQS queues, SNS topics, S3 buckets etc. will be deleted, as well as all objects.</p>
        *
        * @param services service name list
        */
       void CleanInfrastructure(const Dto::Common::Services &services);
+
+      /**
+       * Cleans the objects from the infrastructure.
+       *
+       * <p>Cleans all objects from the infrastructure. This means all SQS messages, SNS messages, S3 object keys, etc. will be deleted.</p>
+       *
+       * @param services service name list
+       */
+      void CleanObjects(const Dto::Common::Services &services);
 
     private:
 

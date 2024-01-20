@@ -114,19 +114,21 @@ namespace AwsMock::Core {
     /**
      * Read buffer
      */
-    std::string _readBuffer;
+    std::string _readBuffer = {};
 
     /**
      * Write callback
      *
-     * @param contents
-     * @param size
-     * @param nmemb
-     * @param userp
-     * @return
+     * @param contents curl response string
+     * @param size size of a single byte
+     * @param nmemb number of bytes
+     * @param userp user pointer
+     * @return string containing message body
      */
     [[maybe_unused]] static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp) {
-      ((std::string *) userp)->append((char *) contents, size * nmemb);
+      if(nmemb > 0) {
+        static_cast<std::string *>(userp)->append((char *) contents, size * nmemb);
+      }
       return size * nmemb;
     }
   };

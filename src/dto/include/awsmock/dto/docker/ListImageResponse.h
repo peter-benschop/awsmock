@@ -170,9 +170,9 @@ namespace AwsMock::Dto::Docker {
         Poco::Dynamic::Var result = parser.parse(jsonString);
         Poco::JSON::Array::Ptr rootArray = result.extract<Poco::JSON::Array::Ptr>();
         if (rootArray != nullptr) {
-          for (Poco::JSON::Array::ConstIterator it = rootArray->begin(); it != rootArray->end(); ++it) {
+          for (const auto &it : *rootArray) {
             Image image;
-            image.FromJson(it->extract<Poco::JSON::Object::Ptr>());
+            image.FromJson(it.extract<Poco::JSON::Object::Ptr>());
             imageList.push_back(image);
           }
         }

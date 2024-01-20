@@ -96,9 +96,10 @@ namespace AwsMock::Database {
      *
      * @param name module name
      * @param state module state
+     * @return updated module
      * @see AwsMock::Database::Entity::Module::ModuleState()
      */
-    void SetState(const std::string &name, const Entity::Module::ModuleState &state);
+    Entity::Module::Module SetState(const std::string &name, const Entity::Module::ModuleState &state);
 
     /**
      * Sets the status of module.

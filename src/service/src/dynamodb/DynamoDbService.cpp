@@ -228,6 +228,20 @@ namespace AwsMock::Service {
 
   }
 
+  /*void DynamoDbService::DeleteItems(const std::string &tableName) {
+    log_debug_stream(_logger) << "Deleting all items, table: " << tableName << std::endl;
+
+    try {
+      // Delete table in database
+      _dynamoDbDatabase->DeleteAllTables();
+      log_info_stream(_logger) << "DynamoDb tables deleted" << std::endl;
+
+    } catch (Poco::Exception &exc) {
+      log_error_stream(_logger) << "DynamoDbd delete table failed, message: " << exc.message() << std::endl;
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+    }
+  }*/
+
   std::string DynamoDbService::SendDynamoDbRequest(const std::string &body, const std::map<std::string, std::string> &headers) {
     log_debug_stream(_logger) << "Sending DynamoDB container request, endpoint: " << _dockerHost << ":" << _dockerPort << std::endl;
 

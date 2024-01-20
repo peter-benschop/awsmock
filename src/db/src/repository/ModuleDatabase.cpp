@@ -191,7 +191,7 @@ namespace AwsMock::Database {
     }
   }
 
-  void ModuleDatabase::SetState(const std::string &name, const Entity::Module::ModuleState &state) {
+  Entity::Module::Module ModuleDatabase::SetState(const std::string &name, const Entity::Module::ModuleState &state) {
 
     if (HasDatabase()) {
 
@@ -201,10 +201,11 @@ namespace AwsMock::Database {
       } catch (mongocxx::exception::system_error &e) {
         log_error_stream(_logger) << "Set module state failed, error: " << e.what() << std::endl;
       }
+      return GetModuleByName(name);
 
     } else {
 
-      _memoryDb.SetState(name, state);
+      return _memoryDb.SetState(name, state);
 
     }
   }

@@ -88,7 +88,7 @@ namespace AwsMock::Database {
     return _modules[it->first];
   }
 
-  void ModuleMemoryDb::SetState(const std::string &name, const Entity::Module::ModuleState &state) {
+  Entity::Module::Module ModuleMemoryDb::SetState(const std::string &name, const Entity::Module::ModuleState &state) {
     Poco::ScopedLock lock(_moduleMutex);
 
     auto it = find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &module) {
@@ -102,6 +102,7 @@ namespace AwsMock::Database {
 
     it->second.state = state;
     _modules[it->first] = it->second;
+    return it->second;
   }
 
   void ModuleMemoryDb::SetStatus(const std::string &name, const Entity::Module::ModuleStatus &status) {

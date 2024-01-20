@@ -8,7 +8,7 @@ set(LAMBDA_SOURCES LambdaServiceTests.cpp LambdaServerCliTest.cpp)
 set(DOCKER_SOURCES DockerServiceTests.cpp)
 set(COGNITO_SOURCES CognitoServiceTests.cpp CognitoServerCliTest.cpp CognitoServerJavaTests.cpp)
 set(DYNAMODB_SOURCES DynamodbServerJavaTests.cpp DynamoDbServerCliTest.cpp)
-set(MAIN_SOURCES main.cpp)
+set(MAIN_SOURCES main.cpp ModuleServiceTests.cpp)
 
 # Includes
 include_directories(../include ../../core/include ../../db/include ../../dto/include /usr/include

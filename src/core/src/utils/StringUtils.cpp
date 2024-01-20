@@ -178,6 +178,12 @@ namespace AwsMock::Core {
     return Poco::replace(decoded, '+', ' ');
   }
 
+  std::string StringUtils::Quoted(const std::string &input) {
+    std::stringstream escaped;
+    escaped << std::quoted(input);
+    return escaped.str();
+  }
+
   std::string StringUtils::SanitizeUtf8(const std::string &input) {
     size_t inbytes_len = input.length();
     char *inbuf = const_cast<char *>(input.c_str());

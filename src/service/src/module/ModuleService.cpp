@@ -39,7 +39,7 @@ namespace AwsMock::Service {
     } else {
 
       // Set state
-      _moduleDatabase->SetState(name, Database::Entity::Module::ModuleState::RUNNING);
+      module = _moduleDatabase->SetState(name, Database::Entity::Module::ModuleState::RUNNING);
 
       if (module.name == "database") {
         _moduleDatabase->StartDatabase();
@@ -116,7 +116,7 @@ namespace AwsMock::Service {
     } else {
 
       // Set state
-      _moduleDatabase->SetState(name, Database::Entity::Module::ModuleState::STOPPED);
+      module = _moduleDatabase->SetState(name, Database::Entity::Module::ModuleState::STOPPED);
 
       // Stop module
       if (name == "database") {
@@ -125,11 +125,11 @@ namespace AwsMock::Service {
         for (const auto &server : _serverMap) {
           if (name == server.first) {
             server.second->StopServer();
-            log_info_stream(_logger) << "Module " << name << " stopped" << std::endl;
           }
         }
       }
     }
+    log_info_stream(_logger) << "Module " + name + " stopped" << std::endl;
     return module;
   }
 
@@ -317,6 +317,31 @@ namespace AwsMock::Service {
     if (services.HasService("all") || services.HasService("transfer")) {
       std::shared_ptr<Database::TransferDatabase> _transferDatabase = std::make_shared<Database::TransferDatabase>(_configuration);
       _transferDatabase->DeleteAllTransfers();
+    }
+  }
+
+  void ModuleService::CleanObjects(const Dto::Common::Services &services) {
+    log_info_stream(_logger) << "Cleaning objects, length: " << services.serviceNames.size() << std::endl;
+
+    if (services.HasService("all") || services.HasService("s3")) {
+      std::shared_ptr<Database::S3Database> _s3Database = std::make_shared<Database::S3Database>(_configuration);
+      _s3Database->DeleteAllObjects();
+    }
+    if (services.HasService("all") || services.HasService("sqs")) {
+      std::shared_ptr<Database::SQSDatabase> _sqsDatabase = std::make_shared<Database::SQSDatabase>(_configuration);
+      _sqsDatabase->DeleteAllMessages();
+    }
+    if (services.HasService("all") || services.HasService("sns")) {
+      std::shared_ptr<Database::SNSDatabase> _snsDatabase = std::make_shared<Database::SNSDatabase>(_configuration);
+      _snsDatabase->DeleteAllMessages();
+    }
+    if (services.HasService("all") || services.HasService("cognito")) {
+      std::shared_ptr<Database::CognitoDatabase> _cognitoDatabase = std::make_shared<Database::CognitoDatabase>(_configuration);
+      _cognitoDatabase->DeleteAllUsers();
+    }
+    if (services.HasService("all") || services.HasService("dynamodb")) {
+      std::shared_ptr<Database::DynamoDbDatabase> _dynamoDbDatabase = std::make_shared<Database::DynamoDbDatabase>(_configuration);
+      _dynamoDbDatabase->DeleteAllItems();
     }
   }
 }

@@ -54,6 +54,9 @@ namespace AwsMock::Dto::SQS {
     // Calculate MD5 of byte array
     std::string output = Core::Crypto::GetMd5FromString(std::string(reinterpret_cast<const char *>(bytes), length));
 
+    // Cleanup
+    delete[] bytes;
+
     return output;
   }
 
