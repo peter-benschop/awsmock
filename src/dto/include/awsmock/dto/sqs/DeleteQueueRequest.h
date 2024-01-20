@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_DELETEQUEUEREQUEST_H
-#define AWSMOCK_DTO_SQS_DELETEQUEUEREQUEST_H
+#ifndef AWSMOCK_DTO_SQS_DELETE_QUEUE_REQUEST_H
+#define AWSMOCK_DTO_SQS_DELETE_QUEUE_REQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -18,15 +18,11 @@
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/ServiceException.h>
+#include <awsmock/dto/sqs/SqsCommonRequest.h>
 
 namespace AwsMock::Dto::SQS {
 
-  struct DeleteQueueRequest {
-
-    /**
-     * AWS region
-     */
-    std::string region;
+  struct DeleteQueueRequest : public SqsCommonRequest {
 
     /**
      * Queue URL
@@ -37,11 +33,6 @@ namespace AwsMock::Dto::SQS {
      * Resource
      */
     std::string resource = "Unknown resource";
-
-    /**
-     * Request ID
-     */
-    std::string requestId = Poco::UUIDGenerator().createRandom().toString();
 
     /**
      * Converts the JSON string to DTO.
@@ -68,4 +59,4 @@ namespace AwsMock::Dto::SQS {
 
 } // namespace AwsMock::Dto::SQS
 
-#endif // AWSMOCK_DTO_SQS_DELETEQUEUEREQUEST_H
+#endif // AWSMOCK_DTO_SQS_DELETE_QUEUE_REQUEST_H

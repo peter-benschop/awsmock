@@ -10,46 +10,44 @@ namespace AwsMock::Dto::SQS {
     return name < other.name;
   }
 
-  std::string MessageAttribute::GetMd5Attributes(const std::vector<MessageAttribute> &attributes) {
+  std::string MessageAttribute::GetMd5Attributes(const std::map<std::string, MessageAttribute> &attributes, bool systemAttribute) {
 
     int length = 0;
     auto *bytes = new unsigned char[4092];
 
-    // Sort the userAttributes by name
-    std::vector<Dto::SQS::MessageAttribute> sortedAttributes = attributes;
-    std::sort(sortedAttributes.begin(), sortedAttributes.end());
+    for (const auto &a : attributes) {
 
-    for (const auto &a : sortedAttributes) {
-
-      GetIntAsByteArray(a.name.length(), bytes, length);
-      length += 4;
-      memcpy(bytes + length, a.name.c_str(), a.name.length());
-      length += a.name.length();
-
-      std::string type = Dto::SQS::MessageAttributeDataTypeToString(a.type);
-      GetIntAsByteArray(type.length(), bytes, length);
-      length += 4;
-      memcpy(bytes + length, type.c_str(), type.length());
-      length += type.length();
-
-      if (a.type == Dto::SQS::MessageAttributeDataType::BINARY) {
-        bytes[length] = (2 & 0x000000ff);
-      } else {
-        bytes[length] = (1 & 0x000000ff);
-      }
-      length += 1;
-
-      if (a.type == Dto::SQS::MessageAttributeDataType::BINARY) {
-        int len = sizeof(a.binaryValue) / sizeof(char);
-        GetIntAsByteArray(len, bytes, len);
+      if (a.second.systemAttribute == systemAttribute) {
+        GetIntAsByteArray(a.first.length(), bytes, length);
         length += 4;
-        memcpy(bytes + len, a.binaryValue, len);
-        length += len;
-      } else {
-        GetIntAsByteArray(a.stringValue.length(), bytes, length);
+        memcpy(bytes + length, a.first.c_str(), a.first.length());
+        length += a.first.length();
+
+        std::string type = Dto::SQS::MessageAttributeDataTypeToString(a.second.type);
+        GetIntAsByteArray(type.length(), bytes, length);
         length += 4;
-        memcpy(bytes + length, a.stringValue.c_str(), a.stringValue.length());
-        length += a.stringValue.length();
+        memcpy(bytes + length, type.c_str(), type.length());
+        length += type.length();
+
+        if (a.second.type == Dto::SQS::MessageAttributeDataType::BINARY) {
+          bytes[length] = (2 & 0x000000ff);
+        } else {
+          bytes[length] = (1 & 0x000000ff);
+        }
+        length += 1;
+
+        if (a.second.type == Dto::SQS::MessageAttributeDataType::BINARY) {
+          int len = sizeof(a.second.binaryValue) / sizeof(char);
+          GetIntAsByteArray(len, bytes, len);
+          length += 4;
+          memcpy(bytes + len, a.second.binaryValue, len);
+          length += len;
+        } else {
+          GetIntAsByteArray(a.second.stringValue.length(), bytes, length);
+          length += 4;
+          memcpy(bytes + length, a.second.stringValue.c_str(), a.second.stringValue.length());
+          length += a.second.stringValue.length();
+        }
       }
     }
 
@@ -66,6 +64,20 @@ namespace AwsMock::Dto::SQS {
     bytes[offset] = (n & 0xff000000) >> 24;
   }
 
+  void MessageAttribute::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
+
+
+    Core::JsonUtils::GetJsonValueString("Name", jsonObject, name);
+    Core::JsonUtils::GetJsonValueString("StringValue", jsonObject, stringValue);
+    if(!stringValue.empty()) {
+      type = MessageAttributeDataType::STRING;
+    }
+    Core::JsonUtils::GetJsonValueLong("NumberValue", jsonObject, numberValue);
+    if(numberValue > 0) {
+      type = MessageAttributeDataType::NUMBER;
+    }
+  }
+
   std::string MessageAttribute::ToString() const {
     std::stringstream ss;
     ss << (*this);
@@ -73,7 +85,11 @@ namespace AwsMock::Dto::SQS {
   }
 
   std::ostream &operator<<(std::ostream &os, const MessageAttribute &r) {
-    os << "MessageAttribute={name='" << r.name << "', stringValue='" << r.stringValue << "', binaryValue='" << r.binaryValue << "', type='" << MessageAttributeDataTypeToString(r.type) << "', transportType='" << r.transportType << "'}";
+    os << "MessageAttribute={name='" << r.name << "', type='" << MessageAttributeDataTypeToString(r.type) << "', transportType='" << r.transportType << "', stringValue='" << r.stringValue << "', numberValue=" << r.numberValue;
+    if(r.binaryValue != nullptr) {
+      os << " binaryValue='" << r.binaryValue;
+    }
+    os << "'}";
     return os;
   }
 }

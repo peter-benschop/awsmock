@@ -38,11 +38,13 @@ namespace AwsMock::Service {
       if (action == "CreateQueue") {
 
         Dto::SQS::CreateQueueRequest sqsRequest;
+        sqsRequest.region = region;
+        sqsRequest.requestId = requestId;
+
         if (userAgent.contentType == "json") {
 
           sqsRequest.FromJson(payload);
           sqsRequest.queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, sqsRequest.name);
-          sqsRequest.region = region;
           sqsRequest.owner = user;
           log_debug_stream(_logger) << "SQS create queue request: " << sqsRequest.ToString() << std::endl;
 
@@ -55,7 +57,7 @@ namespace AwsMock::Service {
           std::string queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, queueName);
           std::vector<Dto::SQS::QueueAttribute> attributes = GetQueueAttributes(payload);
           std::map<std::string, std::string> tags = GetQueueTags(payload);
-          sqsRequest = {.region=region, .name=queueName, .queueUrl=queueUrl, .owner=user, .attributes=attributes, .tags=tags};
+          sqsRequest = {.name=queueName, .queueUrl=queueUrl, .owner=user, .attributes=attributes, .tags=tags};
           log_debug_stream(_logger) << "SQS create queue request: " << sqsRequest.ToString() << std::endl;
 
           Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
@@ -80,15 +82,17 @@ namespace AwsMock::Service {
       } else if (action == "DeleteQueue") {
 
         Dto::SQS::DeleteQueueRequest sqsRequest;
+        sqsRequest.region = region;
+        sqsRequest.requestId = requestId;
+
         if (userAgent.contentType == "json") {
 
           sqsRequest.FromJson(payload);
-          sqsRequest.region = region;
 
         } else {
 
           std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
-          sqsRequest = {.region=region, .queueUrl=queueUrl};
+          sqsRequest = {.queueUrl=queueUrl};
         }
         log_debug_stream(_logger) << "SQS delete queue request: " << sqsRequest.ToString() << std::endl;
 
@@ -98,6 +102,9 @@ namespace AwsMock::Service {
       } else if (action == "SendMessage") {
 
         Dto::SQS::SendMessageRequest sqsRequest;
+        sqsRequest.region = region;
+        sqsRequest.requestId = requestId;
+
         if (userAgent.contentType == "json") {
 
           sqsRequest.FromJson(payload);
@@ -112,10 +119,12 @@ namespace AwsMock::Service {
 
           std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
           std::string body = Core::HttpUtils::GetQueryParameterValueByName(payload, "MessageBody");
-          std::vector<Dto::SQS::MessageAttribute> attributes = GetMessageAttributes(payload);
+          std::map<std::string, Dto::SQS::MessageAttribute> attributes = GetMessageAttributes(payload);
           log_debug_stream(_logger) << "SendMessage, queueUrl " << queueUrl << std::endl;
 
-          sqsRequest = {.region=region, .queueUrl=queueUrl, .body=body, .messageAttributes=attributes, .requestId=requestId, .messageId=requestId};
+          sqsRequest = {.queueUrl=queueUrl, .body=body, .attributes=attributes, .messageId=requestId};
+          sqsRequest.region=region;
+          sqsRequest.requestId = requestId;
           log_debug_stream(_logger) << "SQS send message request: " << sqsRequest.ToString() << std::endl;
 
           Dto::SQS::SendMessageResponse sqsResponse = _sqsService.SendMessage(sqsRequest);
@@ -367,9 +376,9 @@ namespace AwsMock::Service {
     return action;
   }
 
-  std::vector<Dto::SQS::MessageAttribute> SQSJava2Handler::GetMessageAttributes(const std::string &payload) {
+  std::map<std::string, Dto::SQS::MessageAttribute> SQSJava2Handler::GetMessageAttributes(const std::string &payload) {
 
-    std::vector<Dto::SQS::MessageAttribute> messageAttributes;
+    std::map<std::string, Dto::SQS::MessageAttribute> messageAttributes;
 
     int attributeCount = Core::HttpUtils::CountQueryParametersByPrefix(payload, "MessageAttribute");
     log_debug_stream(_logger) << "Got message attribute count: " << attributeCount << std::endl;
@@ -384,7 +393,7 @@ namespace AwsMock::Service {
         attributeValue = Core::HttpUtils::GetQueryParameterValueByName(payload, "MessageAttribute." + std::to_string(i) + ".Value.StringValue");
       }
       Dto::SQS::MessageAttribute messageAttribute = {.name=attributeName, .stringValue=attributeValue, .type=Dto::SQS::MessageAttributeDataTypeFromString(attributeType)};
-      messageAttributes.emplace_back(messageAttribute);
+      messageAttributes[attributeName] = messageAttribute;
     }
     log_debug_stream(_logger) << "Extracted message attribute count: " << messageAttributes.size() << std::endl;
     return messageAttributes;

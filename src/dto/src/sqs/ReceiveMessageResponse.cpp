@@ -28,21 +28,22 @@ namespace AwsMock::Dto::SQS {
           Dto::SQS::MessageAttribute messageAttributeDto = {.name=at.attributeName, .stringValue=at.attributeValue};
 
           Poco::JSON::Object attributeValueObject;
-          if(at.attributeType == Database::Entity::SQS::MessageAttributeType::STRING) {
+          if (at.attributeType == Database::Entity::SQS::MessageAttributeType::STRING) {
             attributeValueObject.set("DataType", "String");
             attributeValueObject.set("StringValue", at.attributeValue);
             messageAttributeDto.type = MessageAttributeDataType::STRING;
-          } else if(at.attributeType == Database::Entity::SQS::MessageAttributeType::NUMBER) {
+          } else if (at.attributeType == Database::Entity::SQS::MessageAttributeType::NUMBER) {
             attributeValueObject.set("DataType", "Number");
             attributeValueObject.set("StringValue", at.attributeValue);
             messageAttributeDto.type = MessageAttributeDataType::NUMBER;
           }
-          messageAttributeListDto.emplace_back(messageAttributeDto);
+          messageAttributeListDto[at.attributeName] = messageAttributeDto;
           attributeObject.set(at.attributeName, attributeValueObject);
         }
 
         // MD5 of message attributes
-        messageObject.set("MD5OfMessageAttributes", Dto::SQS::MessageAttribute::GetMd5Attributes(messageAttributeListDto));
+        messageObject.set("MD5OfMessageAttributes", Dto::SQS::MessageAttribute::GetMd5Attributes(messageAttributeListDto, false));
+        messageObject.set("MD5OfMessageSystemAttributes", Dto::SQS::MessageAttribute::GetMd5Attributes(messageAttributeListDto, true));
 
         messageObject.set("MessageAttributes", attributeObject);
         messageArray.add(messageObject);
@@ -53,7 +54,6 @@ namespace AwsMock::Dto::SQS {
 
       std::ostringstream os;
       rootJson.stringify(os);
-      std::cerr << os.str() << std::endl;
       return os.str();
 
     } catch (Poco::Exception &exc) {

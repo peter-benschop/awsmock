@@ -37,10 +37,10 @@ namespace AwsMock::Service {
       }
 
       void TearDown() override {
-        _snsDatabase.DeleteAllTopics();
         _snsDatabase.DeleteAllMessages();
-        _sqsDatabase.DeleteAllQueues();
+        _snsDatabase.DeleteAllTopics();
         _sqsDatabase.DeleteAllMessages();
+        _sqsDatabase.DeleteAllQueues();
       }
 
       Poco::Condition _condition;
@@ -82,7 +82,9 @@ namespace AwsMock::Service {
     // arrange
     Dto::SNS::CreateTopicRequest topicRequest = {.region=REGION, .topicName=TOPIC, .owner=OWNER};
     Dto::SNS::CreateTopicResponse topicResponse = _snsService.CreateTopic(topicRequest);
-    Dto::SQS::CreateQueueRequest queueRequest = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    Dto::SQS::CreateQueueRequest queueRequest = {.name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    queueRequest.region = REGION;
+    queueRequest.requestId = Poco::UUIDGenerator().createRandom().toString();
     Dto::SQS::CreateQueueResponse queueResponse = _sqsService.CreateQueue(queueRequest);
 
     // act
@@ -100,7 +102,10 @@ namespace AwsMock::Service {
     // arrange
     Dto::SNS::CreateTopicRequest topicRequest = {.region=REGION, .topicName=TOPIC, .owner=OWNER};
     Dto::SNS::CreateTopicResponse topicResponse = _snsService.CreateTopic(topicRequest);
-    Dto::SQS::CreateQueueRequest queueRequest = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    Dto::SQS::CreateQueueRequest queueRequest = {.name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    queueRequest.region = REGION;
+    queueRequest.requestId = Poco::UUIDGenerator().createRandom().toString();
+
     Dto::SQS::CreateQueueResponse queueResponse = _sqsService.CreateQueue(queueRequest);
     Dto::SNS::SubscribeRequest subscribeRequest = {.region=REGION, .topicArn=topicResponse.topicArn, .protocol="sqs", .endpoint=queueResponse.queueArn, .owner=OWNER};
     Dto::SNS::SubscribeResponse subscribeResponse = _snsService.Subscribe(subscribeRequest);
@@ -135,7 +140,9 @@ namespace AwsMock::Service {
     // arrange
     Dto::SNS::CreateTopicRequest topicRequest = {.region=REGION, .topicName=TOPIC, .owner=OWNER};
     Dto::SNS::CreateTopicResponse topicResponse = _snsService.CreateTopic(topicRequest);
-    Dto::SQS::CreateQueueRequest queueRequest = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    Dto::SQS::CreateQueueRequest queueRequest = {.name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    queueRequest.region = REGION;
+    queueRequest.requestId = Poco::UUIDGenerator().createRandom().toString();
     Dto::SQS::CreateQueueResponse queueResponse = _sqsService.CreateQueue(queueRequest);
     Dto::SNS::SubscribeRequest subscribeRequest = {.region=REGION, .topicArn=topicResponse.topicArn, .protocol="sqs", .endpoint=queueResponse.queueArn, .owner=OWNER};
     Dto::SNS::SubscribeResponse subscribeResponse = _snsService.Subscribe(subscribeRequest);

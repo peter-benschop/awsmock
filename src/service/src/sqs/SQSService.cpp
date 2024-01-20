@@ -363,12 +363,12 @@ namespace AwsMock::Service {
 
       // Set userAttributes
       Database::Entity::SQS::MessageAttributeList attributes;
-      attributes.push_back({.attributeName="SentTimestamp", .attributeValue=std::to_string(Poco::Timestamp().epochMicroseconds() / 1000), .attributeType=Database::Entity::SQS::MessageAttributeType::NUMBER});
-      attributes.push_back({.attributeName="ApproximateFirstReceivedTimestamp", .attributeValue=std::to_string(Poco::Timestamp().epochMicroseconds() / 1000), .attributeType=Database::Entity::SQS::MessageAttributeType::NUMBER});
-      attributes.push_back({.attributeName="ApproximateReceivedCount", .attributeValue=std::to_string(0), .attributeType=Database::Entity::SQS::MessageAttributeType::NUMBER});
-      attributes.push_back({.attributeName="SenderId", .attributeValue=request.region, .attributeType=Database::Entity::SQS::MessageAttributeType::STRING});
-      for (const auto &attribute : request.messageAttributes) {
-        attributes.push_back({.attributeName=attribute.name, .attributeValue=attribute.stringValue, .attributeType=Database::Entity::SQS::MessageAttributeTypeFromString(Dto::SQS::MessageAttributeDataTypeToString(attribute.type))});
+      attributes.push_back({.attributeName="SentTimestamp", .attributeValue=std::to_string(Poco::Timestamp().epochMicroseconds() / 1000), .attributeType=Database::Entity::SQS::MessageAttributeType::NUMBER, .systemAttribute=true});
+      attributes.push_back({.attributeName="ApproximateFirstReceivedTimestamp", .attributeValue=std::to_string(Poco::Timestamp().epochMicroseconds() / 1000), .attributeType=Database::Entity::SQS::MessageAttributeType::NUMBER, .systemAttribute=true});
+      attributes.push_back({.attributeName="ApproximateReceivedCount", .attributeValue=std::to_string(0), .attributeType=Database::Entity::SQS::MessageAttributeType::NUMBER, .systemAttribute=true});
+      attributes.push_back({.attributeName="SenderId", .attributeValue=request.region, .attributeType=Database::Entity::SQS::MessageAttributeType::STRING, .systemAttribute=true});
+      for (const auto &attribute : request.attributes) {
+        attributes.push_back({.attributeName=attribute.first, .attributeValue=attribute.second.stringValue, .attributeType=Database::Entity::SQS::MessageAttributeTypeFromString(Dto::SQS::MessageAttributeDataTypeToString(attribute.second.type)), .systemAttribute=false});
       }
 
       // Set delay
@@ -383,7 +383,8 @@ namespace AwsMock::Service {
       std::string messageId = Core::AwsUtils::CreateMessageId();
       std::string receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
       std::string md5Body = Core::Crypto::GetMd5FromString(messageBody);
-      std::string md5Attr = Dto::SQS::MessageAttribute::GetMd5Attributes(request.messageAttributes);
+      std::string md5Attr = Dto::SQS::MessageAttribute::GetMd5Attributes(request.attributes, false);
+      std::string md5SystemAttr = Dto::SQS::MessageAttribute::GetMd5Attributes(request.attributes, true);
 
       // Update database
       Database::Entity::SQS::Message message = _database->CreateMessage(
@@ -397,6 +398,7 @@ namespace AwsMock::Service {
           .receiptHandle=receiptHandle,
           .md5Body=md5Body,
           .md5Attr=md5Attr,
+          .md5SystemAttr=md5SystemAttr,
           .attributes=attributes,
         });
       log_info_stream(_logger) << "Message send, messageId: " << request.messageId << " md5Body: " << md5Body << std::endl;

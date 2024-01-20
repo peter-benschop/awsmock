@@ -148,12 +148,12 @@ namespace AwsMock::Service {
     std::vector<std::string> GetQueueAttributeNames(const std::string &payload);
 
     /**
-     * Get the message userAttributes.
+     * Get the message attributes.
      *
      * @param payload HTTP body
      * @return list of message userAttributes
      */
-    std::vector<Dto::SQS::MessageAttribute> GetMessageAttributes(const std::string &payload);
+    std::map<std::string, Dto::SQS::MessageAttribute> GetMessageAttributes(const std::string &payload);
 
     /**
      * Logger

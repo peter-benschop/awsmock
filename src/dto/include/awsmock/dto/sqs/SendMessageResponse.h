@@ -76,9 +76,14 @@ namespace AwsMock::Dto::SQS {
     std::string md5Body;
 
     /**
-     * MD5 sum of sqs
+     * MD5 sum of sqs of user attributes
      */
     std::string md5Attr;
+
+    /**
+     * MD5 sum of sqs system attributes
+     */
+    std::string md5SystemAttr;
 
     /**
      * Request ID

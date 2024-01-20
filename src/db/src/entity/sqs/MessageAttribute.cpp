@@ -13,9 +13,10 @@ namespace AwsMock::Database::Entity::SQS {
   view_or_value<view, value> MessageAttribute::ToDocument() const {
 
     view_or_value<view, value> messageAttributeDoc = make_document(
-        kvp("attributeName", attributeName),
-        kvp("attributeValue", attributeValue),
-        kvp("attributeType", Database::Entity::SQS::MessageAttributeTypeToString(attributeType)));
+      kvp("attributeName", attributeName),
+      kvp("attributeValue", attributeValue),
+      kvp("systemAttribute", systemAttribute),
+      kvp("attributeType", Database::Entity::SQS::MessageAttributeTypeToString(attributeType)));
 
     return messageAttributeDoc;
   }
@@ -27,7 +28,8 @@ namespace AwsMock::Database::Entity::SQS {
   }
 
   std::ostream &operator<<(std::ostream &os, const MessageAttribute &m) {
-    os << "MessageAttribute={attributeName='" << m.attributeValue << "', attributeValue='" << m.attributeValue + "', attributeType='" << Database::Entity::SQS::MessageAttributeTypeToString(m.attributeType) << "'}";
+    os << "MessageAttribute={attributeName='" << m.attributeValue << "', attributeValue='" << m.attributeValue + "', attributeType='" << Database::Entity::SQS::MessageAttributeTypeToString(m.attributeType) << "', systemAttribute="
+       << (m.systemAttribute ? "true" : "false") << "}";
     return os;
   }
 
