@@ -29,7 +29,7 @@ namespace AwsMock::Dto::SQS {
   }
 
   std::ostream &operator<<(std::ostream &os, const DeleteQueueRequest &r) {
-    os << "DeleteQueueRequest={queueUrl='" + r.queueUrl + "' resource='" + r.resource + "' requestId='" + r.requestId + "'}";
+    os << "DeleteQueueRequest={queueUrl='" + r.queueUrl + "', resource='" + r.resource + "', requestId='" + r.requestId + "'}";
     return os;
   }
 

@@ -204,6 +204,7 @@ namespace AwsMock::Service {
     // arrange
     Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " sqs create-queue test-queue");
     EXPECT_EQ(0, createResult.status);
+
     Core::ExecResult getQueueUrlResult = Core::SystemUtils::Exec(_baseCommand + " sqs get-queue-url test-queue");
     EXPECT_EQ(0, getQueueUrlResult.status);
     std::string queueUrl = getQueueUrlResult.output;
@@ -215,6 +216,26 @@ namespace AwsMock::Service {
     // assert
     EXPECT_EQ(0, sendResult.status);
     EXPECT_EQ(1, messageCount);
+  }
+
+  TEST_F(SQSServerJavaTest, MessageSendAttributesTest) {
+
+    // arrange
+    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " sqs create-queue test-queue");
+    EXPECT_EQ(0, createResult.status);
+    Core::ExecResult getQueueUrlResult = Core::SystemUtils::Exec(_baseCommand + " sqs get-queue-url test-queue");
+    EXPECT_EQ(0, getQueueUrlResult.status);
+    std::string queueUrl = getQueueUrlResult.output;
+
+    // act
+    Core::ExecResult sendResult = Core::SystemUtils::Exec(_baseCommand + " sqs send-message-with-attributes " + queueUrl + " test-message");
+    Core::ExecResult receiveResult = Core::SystemUtils::Exec(_baseCommand + " sqs receive-message " + queueUrl + " 1 5 5");
+    std::string receiptHandle = receiveResult.output;
+    Database::Entity::SQS::Message message = _database.GetMessageByReceiptHandle(receiveResult.output);
+
+    // assert
+    EXPECT_EQ(0, sendResult.status);
+    EXPECT_EQ(6, message.attributes.size());
   }
 
   TEST_F(SQSServerJavaTest, MessageReceiveTest) {

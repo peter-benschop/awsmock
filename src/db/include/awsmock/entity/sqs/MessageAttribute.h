@@ -70,6 +70,11 @@ namespace AwsMock::Database::Entity::SQS {
     MessageAttributeType attributeType;
 
     /**
+     * System attribute flag
+     */
+    bool systemAttribute = true;
+
+    /**
      * Converts the entity to a MongoDB document
      *
      * @return entity as MongoDB document.

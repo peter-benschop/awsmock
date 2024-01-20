@@ -138,7 +138,7 @@ namespace AwsMock::Service {
        * @param payload HTTP body
        * @return list of message userAttributes
        */
-      std::vector<Dto::SQS::MessageAttribute> GetMessageAttributes(const std::string &payload);
+      std::map<std::string, Dto::SQS::MessageAttribute> GetMessageAttributes(const std::string &payload);
 
       /**
        * Get the queue userAttributes.

@@ -13,11 +13,11 @@ namespace AwsMock::Dto::SQS {
       rootJson.set("MessageId", messageId);
       rootJson.set("MD5OfMessageBody", md5Body);
       rootJson.set("MD5OfMessageAttributes", md5Attr);
-      //rootJson.set("SequenceNumber", s);
-      //rootJson.set("MD5OfMessageAttributes", );
+      rootJson.set("MD5OfMessageSystemAttributes", md5SystemAttr);
 
       std::ostringstream os;
       rootJson.stringify(os);
+      std::string tmp = os.str();
       return os.str();
 
     } catch (Poco::Exception &exc) {
@@ -110,6 +110,7 @@ namespace AwsMock::Dto::SQS {
     writer.setNewLine("\n");
     writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
     writer.writeNode(output, pDoc);
+    std::string tmp = output.str();
     return output.str();
   }
 

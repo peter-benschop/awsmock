@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_MESSAGEATTRIBUTE_H
-#define AWSMOCK_DTO_SQS_MESSAGEATTRIBUTE_H
+#ifndef AWSMOCK_DTO_SQS_MESSAGE_ATTRIBUTE_H
+#define AWSMOCK_DTO_SQS_MESSAGE_ATTRIBUTE_H
 
 // C++ standard includes
 #include <string>
@@ -14,6 +14,7 @@
 
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/sqs/MessageAttributeDataType.h>
 
 namespace AwsMock::Dto::SQS {
@@ -28,12 +29,17 @@ namespace AwsMock::Dto::SQS {
     /**
      * Message attribute string value
      */
-    std::string stringValue;
+    std::string stringValue = {};
+
+    /**
+     * Message attribute number value
+     */
+    long numberValue = -1;
 
     /**
      * Message attribute binary value
      */
-    unsigned char* binaryValue;
+    unsigned char* binaryValue = nullptr;
 
     /**
      * Logical data type
@@ -46,12 +52,18 @@ namespace AwsMock::Dto::SQS {
     std::string transportType;
 
     /**
+     * System attribute flag
+     */
+    bool systemAttribute = true;
+
+    /**
      * Returns the MD5 sum of all userAttributes.
      *
      * @param attributes vector of userAttributes
+     * @param systemAttribute system attribute flag, if true only system attributes are taken into account
      * @return MD5 sum of userAttributes string
      */
-    static std::string GetMd5Attributes(const std::vector<MessageAttribute> &attributes);
+    static std::string GetMd5Attributes(const std::map<std::string, MessageAttribute> &attributes, bool systemAttribute);
 
     /**
      * Returns a integer as byte array and fill it in the given byte array at position offset.
@@ -61,6 +73,13 @@ namespace AwsMock::Dto::SQS {
      * @param offset offset of the output byte array
      */
     static void GetIntAsByteArray(int n, unsigned char *bytes, int offset);
+
+    /**
+     * Convert from JSON string
+     *
+     * @param attributeObject attribute object
+     */
+    void FromJsonObject(const Poco::JSON::Object::Ptr &attributeObject);
 
     /**
      * Name comparator
@@ -86,8 +105,8 @@ namespace AwsMock::Dto::SQS {
 
   };
 
-  typedef std::vector<MessageAttribute> MessageAttributeList;
+  typedef std::map<std::string, MessageAttribute> MessageAttributeList;
 
 } // namespace AwsMock::Dto::SQS
 
-#endif // AWSMOCK_DTO_SQS_MESSAGEATTRIBUTE_H
+#endif // AWSMOCK_DTO_SQS_MESSAGE_ATTRIBUTE_H

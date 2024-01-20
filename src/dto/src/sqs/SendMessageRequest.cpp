@@ -14,14 +14,23 @@ namespace AwsMock::Dto::SQS {
 
     try {
 
-      // Attributes
+      // General
       Core::JsonUtils::GetJsonValueString("QueueUrl", rootObject, queueUrl);
       Core::JsonUtils::GetJsonValueString("MessageBody", rootObject, body);
-      Poco::JSON::Array::Ptr attributesArray = rootObject->getArray("MessageAttributes");
 
-      if (attributesArray != nullptr) {
-        for (const auto &it : *attributesArray) {
-          //attributeNames.emplace_back(it.extract<std::string>());
+      // Attributes
+      if (rootObject->has("MessageAttributes")) {
+
+        Poco::JSON::Object::Ptr attributesObject = rootObject->getObject("MessageAttributes");
+
+        if (!attributesObject.isNull()) {
+          for (size_t i = 0; i < attributesObject->getNames().size(); i++) {
+            std::string attributeName = attributesObject->getNames()[i];
+            MessageAttribute attributeValue;
+            attributeValue.FromJsonObject(attributesObject->getObject(attributeName));
+            attributeValue.systemAttribute=false;
+            attributes[attributeName] = attributeValue;
+          }
         }
       }
 
@@ -38,8 +47,8 @@ namespace AwsMock::Dto::SQS {
 
   std::ostream &operator<<(std::ostream &os, const SendMessageRequest &r) {
     os << "SendMessageRequest={region='" << r.region << "', queueUrl='" << r.queueUrl << "', queueName='" << r.queueName << "', queueArn='" << r.queueArn << "', body: '" << r.body << "', requestId: " << r.requestId << "', userAttributes=[";
-    for (const auto &a : r.messageAttributes) {
-      os << a.ToString() << ", ";
+    for (const auto &a : r.attributes) {
+      os << a.first << "=" << a.second.ToString() << ", ";
     }
     os << "\b" << "\b" << "]}";
     return os;

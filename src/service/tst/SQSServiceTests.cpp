@@ -48,9 +48,11 @@ namespace AwsMock::Service {
   TEST_F(SQSServiceTest, QueueCreateTest) {
 
     // arrange
-    Dto::SQS::CreateQueueRequest request = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    Dto::SQS::CreateQueueRequest request = {.name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    request.region=REGION;
+    request.requestId=Poco::UUIDGenerator().createRandom().toString();
 
-    // act
+      // act
     Dto::SQS::CreateQueueResponse response = _service.CreateQueue(request);
 
     // assert
@@ -61,7 +63,9 @@ namespace AwsMock::Service {
   TEST_F(SQSServiceTest, QueueListTest) {
 
     // arrange
-    Dto::SQS::CreateQueueRequest request = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    Dto::SQS::CreateQueueRequest request = {.name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    request.region=REGION;
+    request.requestId=Poco::UUIDGenerator().createRandom().toString();
     Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(request);
 
     // act
@@ -101,9 +105,13 @@ namespace AwsMock::Service {
   TEST_F(SQSServiceTest, QueueDeleteTest) {
 
     // arrange
-    Dto::SQS::CreateQueueRequest queueRequest = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    Dto::SQS::CreateQueueRequest queueRequest = {.name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    queueRequest.region=REGION;
+    queueRequest.requestId=Poco::UUIDGenerator().createRandom().toString();
     Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
-    Dto::SQS::DeleteQueueRequest deleteRequest = {.region=REGION, .queueUrl=QUEUE_URL};
+    Dto::SQS::DeleteQueueRequest deleteRequest = {.queueUrl=QUEUE_URL};
+    deleteRequest.region=REGION;
+    deleteRequest.requestId=Poco::UUIDGenerator().createRandom().toString();
 
     // act
     EXPECT_NO_THROW({ _service.DeleteQueue(deleteRequest); });
@@ -115,9 +123,14 @@ namespace AwsMock::Service {
   TEST_F(SQSServiceTest, MessageCreateTest) {
 
     // arrange
-    Dto::SQS::CreateQueueRequest queueRequest = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    Dto::SQS::CreateQueueRequest queueRequest = {.name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    queueRequest.region=REGION;
+    queueRequest.requestId=Poco::UUIDGenerator().createRandom().toString();
+
     Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
-    Dto::SQS::SendMessageRequest request = {.region=REGION, .queueUrl=QUEUE_URL, .body=BODY, .messageId=Poco::UUIDGenerator().createRandom().toString()};
+    Dto::SQS::SendMessageRequest request = {.queueUrl=QUEUE_URL, .body=BODY, .messageId=Poco::UUIDGenerator().createRandom().toString()};
+    request.region=REGION;
+    request.requestId=Poco::UUIDGenerator().createRandom().toString();
 
     // act
     Dto::SQS::SendMessageResponse response = _service.SendMessage(request);
@@ -130,9 +143,13 @@ namespace AwsMock::Service {
   TEST_F(SQSServiceTest, MessageReceiveTest) {
 
     // arrange
-    Dto::SQS::CreateQueueRequest queueRequest = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    Dto::SQS::CreateQueueRequest queueRequest = {.name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    queueRequest.region=REGION;
+    queueRequest.requestId=Poco::UUIDGenerator().createRandom().toString();
     Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
-    Dto::SQS::SendMessageRequest msgRequest = {.region=REGION, .queueUrl=QUEUE_URL, .queueName=QUEUE, .body=BODY};
+    Dto::SQS::SendMessageRequest msgRequest = {.queueUrl=QUEUE_URL, .queueName=QUEUE, .body=BODY};
+    msgRequest.region=REGION;
+    msgRequest.requestId=Poco::UUIDGenerator().createRandom().toString();
     Dto::SQS::SendMessageResponse msgResponse = _service.SendMessage(msgRequest);
 
     // act
@@ -146,9 +163,13 @@ namespace AwsMock::Service {
   TEST_F(SQSServiceTest, MessageDeleteTest) {
 
     // arrange
-    Dto::SQS::CreateQueueRequest queueRequest = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    Dto::SQS::CreateQueueRequest queueRequest = {.name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    queueRequest.region=REGION;
+    queueRequest.requestId=Poco::UUIDGenerator().createRandom().toString();
     Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
-    Dto::SQS::SendMessageRequest msgRequest = {.region=REGION, .queueUrl=QUEUE_URL, .body=BODY};
+    Dto::SQS::SendMessageRequest msgRequest = {.queueUrl=QUEUE_URL, .body=BODY};
+    msgRequest.region=REGION;
+    msgRequest.requestId=Poco::UUIDGenerator().createRandom().toString();
     Dto::SQS::SendMessageResponse msgResponse = _service.SendMessage(msgRequest);
 
     // act
@@ -168,12 +189,12 @@ namespace AwsMock::Service {
     // MessageAttribute.1.Value.StringValue=application/json
     // MessageAttribute.1.Value.DataType=String
     //
-    Dto::SQS::MessageAttribute messageAttribute = {.name="contentType", .stringValue="application/json", .type=Dto::SQS::MessageAttributeDataType::STRING};
-    std::vector<Dto::SQS::MessageAttribute> messageAttributes;
-    messageAttributes.push_back(messageAttribute);
+    Dto::SQS::MessageAttribute messageAttribute = {.name="contentType", .stringValue="application/json", .type=Dto::SQS::MessageAttributeDataType::STRING, .systemAttribute=false};
+    std::map<std::string, Dto::SQS::MessageAttribute> messageAttributes;
+    messageAttributes[messageAttribute.name] = messageAttribute;
 
     // act
-    std::string md5sum = Dto::SQS::MessageAttribute::GetMd5Attributes(messageAttributes);
+    std::string md5sum = Dto::SQS::MessageAttribute::GetMd5Attributes(messageAttributes, false);
 
     // assert
     EXPECT_TRUE("6ed5f16969b625c8d900cbd5da557e9e" == md5sum);
@@ -190,14 +211,14 @@ namespace AwsMock::Service {
     // MessageAttribute.2.Value.StringValue=42
     // MessageAttribute.2.Value.DataType=Number
     //
-    Dto::SQS::MessageAttribute messageAttribute1 = {.name="contentType", .stringValue="application/json", .type=Dto::SQS::MessageAttributeDataType::STRING};
-    Dto::SQS::MessageAttribute messageAttribute2 = {.name="contentLength", .stringValue="42", .type=Dto::SQS::MessageAttributeDataType::NUMBER};
-    std::vector<Dto::SQS::MessageAttribute> messageAttributes;
-    messageAttributes.push_back(messageAttribute1);
-    messageAttributes.push_back(messageAttribute2);
+    Dto::SQS::MessageAttribute messageAttribute1 = {.name="contentType", .stringValue="application/json", .type=Dto::SQS::MessageAttributeDataType::STRING, .systemAttribute=false};
+    Dto::SQS::MessageAttribute messageAttribute2 = {.name="contentLength", .stringValue="42", .type=Dto::SQS::MessageAttributeDataType::NUMBER, .systemAttribute=false};
+    std::map<std::string, Dto::SQS::MessageAttribute> messageAttributes;
+    messageAttributes[messageAttribute1.name]=messageAttribute1;
+    messageAttributes[messageAttribute2.name]=messageAttribute2;
 
     // act
-    std::string md5sum = Dto::SQS::MessageAttribute::GetMd5Attributes(messageAttributes);
+    std::string md5sum = Dto::SQS::MessageAttribute::GetMd5Attributes(messageAttributes, false);
 
     // assert
     EXPECT_TRUE("ebade6c58059dfd4bbf8cee9da7465fe" == md5sum);
