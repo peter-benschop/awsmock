@@ -47,11 +47,6 @@ namespace AwsMock::Dto::SQS {
     MessageAttributeDataType type;
 
     /**
-     * Transport data type
-     */
-    std::string transportType;
-
-    /**
      * System attribute flag
      */
     bool systemAttribute = true;
@@ -87,9 +82,8 @@ namespace AwsMock::Dto::SQS {
      *
      * @param n integer value
      * @param bytes output byte array
-     * @param offset offset of the output byte array
      */
-    static void GetIntAsByteArray(size_t n, unsigned char *bytes, int offset);
+    static void GetIntAsByteArray(size_t n, unsigned char *bytes);
 
     /**
      * Convert from JSON string

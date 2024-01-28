@@ -85,7 +85,7 @@ namespace AwsMock::Dto::SQS {
     return output;
   }
 
-  void MessageAttribute::GetIntAsByteArray(size_t n, unsigned char *bytes, int offset) {
+  void MessageAttribute::GetIntAsByteArray(size_t n, unsigned char *bytes) {
     bytes[3] = n & 0x000000ff;
     bytes[2] = (n & 0x0000ff00) >> 8;
     bytes[1] = (n & 0x00ff0000) >> 16;
@@ -94,7 +94,7 @@ namespace AwsMock::Dto::SQS {
 
   void MessageAttribute::updateLengthAndBytes(EVP_MD_CTX *context, const std::string &str) {
     auto* bytes = static_cast<unsigned char *>(malloc(4));
-    GetIntAsByteArray(str.length(), bytes, 0);
+    GetIntAsByteArray(str.length(), bytes);
     EVP_DigestUpdate(context, bytes, 4);
     EVP_DigestUpdate(context, str.c_str(), str.length());
     free(bytes);
@@ -120,12 +120,11 @@ namespace AwsMock::Dto::SQS {
   }
 
   std::ostream &operator<<(std::ostream &os, const MessageAttribute &r) {
-    os << "MessageAttribute={name='" << r.name << "', type='" << MessageAttributeDataTypeToString(r.type) << "', transportType='" << r.transportType << "', stringValue='" << r.stringValue << "', numberValue=" << r.numberValue;
+    os << "MessageAttribute={name='" << r.name << "', type='" << MessageAttributeDataTypeToString(r.type) << "', stringValue='" << r.stringValue << "', numberValue=" << r.numberValue;
     if (r.binaryValue != nullptr) {
-      os << " binaryValue='" << r.binaryValue << ", ";
+      os << ", binaryValue='" << r.binaryValue << "'";
     }
-    os.seekp(-2, std::ostream::cur);
-    os << "'}";
+    os << "}";
     return os;
   }
 }
