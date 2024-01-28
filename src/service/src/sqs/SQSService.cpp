@@ -383,8 +383,8 @@ namespace AwsMock::Service {
       std::string messageId = Core::AwsUtils::CreateMessageId();
       std::string receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
       std::string md5Body = Core::Crypto::GetMd5FromString(messageBody);
-      std::string md5Attr = Dto::SQS::MessageAttribute::GetMd5Attributes(request.attributes, false);
-      std::string md5SystemAttr = Dto::SQS::MessageAttribute::GetMd5Attributes(request.attributes, true);
+      std::string md5UserAttr = Dto::SQS::MessageAttribute::GetMd5UserAttributes(request.attributes);
+      std::string md5SystemAttr = Dto::SQS::MessageAttribute::GetMd5SystemAttributes(request.attributes);
 
       // Update database
       Database::Entity::SQS::Message message = _database->CreateMessage(
@@ -397,7 +397,7 @@ namespace AwsMock::Service {
           .messageId=messageId,
           .receiptHandle=receiptHandle,
           .md5Body=md5Body,
-          .md5Attr=md5Attr,
+          .md5UserAttr=md5UserAttr,
           .md5SystemAttr=md5SystemAttr,
           .attributes=attributes,
         });
@@ -408,7 +408,7 @@ namespace AwsMock::Service {
         .messageId=message.messageId,
         .receiptHandle=message.receiptHandle,
         .md5Body=md5Body,
-        .md5Attr=md5Attr,
+        .md5Attr=md5UserAttr,
         .requestId=request.requestId
       };
 
@@ -469,11 +469,12 @@ namespace AwsMock::Service {
     try {
       // TODO: Check existence
       if (!_database->MessageExists(request.receiptHandle)) {
-        throw Core::ServiceException("Queue does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+        throw Core::ServiceException("Message does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
       }
 
       // Delete from database
       _database->DeleteMessage({.queueUrl=request.queueUrl, .receiptHandle=request.receiptHandle});
+      log_debug_stream(_logger) << "Message deleted, receiptHandle: " << request.receiptHandle << std::endl;
 
     } catch (Poco::Exception &ex) {
       log_error_stream(_logger) << "SQS delete message failed, message: " << ex.message() << std::endl;
@@ -490,15 +491,16 @@ namespace AwsMock::Service {
 
         // TODO: Check existence
         if (!_database->MessageExists(entry.receiptHandle)) {
-          throw Core::ServiceException("Queue does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+          throw Core::ServiceException("Message does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
         }
 
         // Delete from database
         _database->DeleteMessage({.queueUrl=request.queueUrl, .receiptHandle=entry.receiptHandle});
       }
+      log_debug_stream(_logger) << "Message batch deleted, count: " << request.deleteMessageBatchEntries.size() << std::endl;
 
     } catch (Poco::Exception &ex) {
-      log_error_stream(_logger) << "SQS delete message failed, message: " << ex.message() << std::endl;
+      log_error_stream(_logger) << "SQS delete batch messages failed, message: " << ex.message() << std::endl;
       throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
   }

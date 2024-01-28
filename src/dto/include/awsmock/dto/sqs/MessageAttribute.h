@@ -66,13 +66,26 @@ namespace AwsMock::Dto::SQS {
     static std::string GetMd5Attributes(const std::map<std::string, MessageAttribute> &attributes, bool systemAttribute);
 
     /**
+     * Returns the MD5 sum of all userAttributes.
+     *
+     * @param attributes vector of userAttributes
+     * @param systemAttribute system attribute flag, if true only system attributes are taken into account
+     * @return MD5 sum of userAttributes string
+     */
+    static std::string GetMd5UserAttributes(const std::map<std::string, MessageAttribute> &attributes);
+
+    static std::string GetMd5SystemAttributes(const std::map<std::string, MessageAttribute> &attributes);
+
+    static void updateLengthAndBytes(EVP_MD_CTX *context, const std::string &str);
+
+    /**
      * Returns a integer as byte array and fill it in the given byte array at position offset.
      *
      * @param n integer value
      * @param bytes output byte array
      * @param offset offset of the output byte array
      */
-    static void GetIntAsByteArray(int n, unsigned char *bytes, int offset);
+    static void GetIntAsByteArray(size_t n, unsigned char *bytes, int offset);
 
     /**
      * Convert from JSON string

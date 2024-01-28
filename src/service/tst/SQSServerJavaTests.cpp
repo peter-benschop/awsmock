@@ -302,6 +302,34 @@ namespace AwsMock::Service {
     EXPECT_EQ(0, messageCount);
   }
 
+  TEST_F(SQSServerJavaTest, MessageDeleteBatchTest) {
+
+    // arrange
+    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " sqs create-queue test-queue");
+    EXPECT_EQ(0, createResult.status);
+    Core::ExecResult getQueueUrlResult = Core::SystemUtils::Exec(_baseCommand + " sqs get-queue-url test-queue");
+    EXPECT_EQ(0, getQueueUrlResult.status);
+    std::string queueUrl = getQueueUrlResult.output;
+    Core::ExecResult sendResult1 = Core::SystemUtils::Exec(_baseCommand + " sqs send-message " + queueUrl + " \"test-message1\"");
+    EXPECT_EQ(0, sendResult1.status);
+    Core::ExecResult sendResult2 = Core::SystemUtils::Exec(_baseCommand + " sqs send-message " + queueUrl + " \"test-message2\"");
+    EXPECT_EQ(0, sendResult2.status);
+    Core::ExecResult receiveResult1 = Core::SystemUtils::Exec(_baseCommand + " sqs receive-message " + queueUrl + " 1 5 5");
+    EXPECT_EQ(0, receiveResult1.status);
+    std::string receiptHandle1 = receiveResult1.output;
+    Core::ExecResult receiveResult2 = Core::SystemUtils::Exec(_baseCommand + " sqs receive-message " + queueUrl + " 1 5 5");
+    EXPECT_EQ(0, receiveResult2.status);
+    std::string receiptHandle2 = receiveResult2.output;
+
+    // act
+    Core::ExecResult deleteResult = Core::SystemUtils::Exec(_baseCommand + " sqs delete-message-batch " + queueUrl + " " + receiptHandle1 + " " + receiptHandle2);
+    long messageCount = _database.CountMessages();
+
+    // assert
+    EXPECT_EQ(0, deleteResult.status);
+    EXPECT_EQ(0, messageCount);
+  }
+
 } // namespace AwsMock::Core
 
 #endif // AWMOCK_SQS_CPP_SERVERTEST_H
