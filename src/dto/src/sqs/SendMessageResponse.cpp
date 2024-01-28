@@ -13,7 +13,7 @@ namespace AwsMock::Dto::SQS {
       rootJson.set("MessageId", messageId);
       rootJson.set("MD5OfMessageBody", md5Body);
       rootJson.set("MD5OfMessageAttributes", md5Attr);
-      rootJson.set("MD5OfMessageSystemAttributes", md5SystemAttr);
+      //rootJson.set("MD5OfMessageSystemAttributes", md5SystemAttr);
 
       std::ostringstream os;
       rootJson.stringify(os);
@@ -33,7 +33,8 @@ namespace AwsMock::Dto::SQS {
 
       const auto& rootObject = result.extract<Poco::JSON::Object::Ptr>();
       Core::JsonUtils::GetJsonValueString("MD5OfMessageBody", rootObject, md5Body);
-      Core::JsonUtils::GetJsonValueString("MD5OfMessageSystemAttributes", rootObject, md5Attr);
+      Core::JsonUtils::GetJsonValueString("MD5OfMessageAttributes", rootObject, md5Attr);
+      Core::JsonUtils::GetJsonValueString("MD5OfMessageSystemAttributes", rootObject, md5SystemAttr);
       Core::JsonUtils::GetJsonValueString("MessageId", rootObject, messageId);
 
     } catch (Poco::Exception &exc) {

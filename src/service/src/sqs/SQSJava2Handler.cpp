@@ -306,21 +306,9 @@ namespace AwsMock::Service {
       } else if (action == "DeleteMessageBatch") {
 
         Dto::SQS::DeleteMessageBatchRequest sqsRequest;
-//        sqsRequest.FromJson(payload);
+        sqsRequest.FromJson(payload);
         sqsRequest.region = region;
 
-        sqsRequest.queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
-
-        // Get message count
-        int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "DeleteMessageBatchRequestEntry") / 2;
-        log_trace_stream(_logger) << "Got entry count, count: " << count << std::endl;
-
-        for (int i = 1; i <= count; i++) {
-          std::string id = Core::HttpUtils::GetQueryParameterValueByName(payload, "DeleteMessageBatchRequestEntry." + std::to_string(i) + ".Id");
-          std::string receiptHandle = Core::HttpUtils::GetQueryParameterValueByName(payload, "DeleteMessageBatchRequestEntry." + std::to_string(i) + ".ReceiptHandle");
-          Dto::SQS::DeleteMessageBatchEntry entry = {.id=id, .receiptHandle=receiptHandle};
-          sqsRequest.deleteMessageBatchEntries.emplace_back(entry);
-        }
         _sqsService.DeleteMessageBatch(sqsRequest);
 
         SendOkResponse(response);
