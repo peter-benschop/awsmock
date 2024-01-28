@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_CREATEMESSAGEREQUEST_H
-#define AWSMOCK_DTO_SQS_CREATEMESSAGEREQUEST_H
+#ifndef AWSMOCK_DTO_SQS_SEND_MESSAGE_REQUEST_H
+#define AWSMOCK_DTO_SQS_SEND_MESSAGE_REQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -13,7 +13,6 @@
 #include "Poco/UUIDGenerator.h"
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
-#include <Poco/Dynamic/Var.h>
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
@@ -23,7 +22,12 @@
 
 namespace AwsMock::Dto::SQS {
 
-  struct SendMessageRequest : public SqsCommonRequest {
+  struct SendMessageRequest {
+
+    /**
+     * AWS region
+     */
+    std::string region;
 
     /**
      * Queue URL
@@ -56,6 +60,11 @@ namespace AwsMock::Dto::SQS {
     std::string messageId;
 
     /**
+     * Request ID
+     */
+    std::string requestId;
+
+    /**
      * Converts the JSON string to a DTO
      *
      * @param jsonString JSON string
@@ -80,4 +89,4 @@ namespace AwsMock::Dto::SQS {
 
 } // namespace AwsMock::Dto::SQS
 
-#endif // AWSMOCK_DTO_SQS_CREATEMESSAGEREQUEST_H
+#endif // AWSMOCK_DTO_SQS_SEND_MESSAGE_REQUEST_H

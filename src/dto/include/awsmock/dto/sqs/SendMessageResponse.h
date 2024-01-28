@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_CREATEMESSAGERESPONSE_H
-#define AWSMOCK_DTO_SQS_CREATEMESSAGERESPONSE_H
+#ifndef AWSMOCK_DTO_SQS_SEND_MESSAGE_RESPONSE_H
+#define AWSMOCK_DTO_SQS_SEND_MESSAGE_RESPONSE_H
 
 // C++ standard includes
 #include <string>
@@ -86,6 +86,11 @@ namespace AwsMock::Dto::SQS {
     std::string md5SystemAttr;
 
     /**
+     * Message sequence number
+     */
+    std::string sequenceNumber = Poco::UUIDGenerator().createRandom().toString();
+
+    /**
      * Request ID
      */
     std::string requestId;
@@ -95,7 +100,7 @@ namespace AwsMock::Dto::SQS {
      *
      * @return JSON string
      */
-    [[nodiscard]] std::string ToJson();
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Convert from JSON representation
@@ -136,4 +141,4 @@ namespace AwsMock::Dto::SQS {
 
 } // namespace AwsMock::Dto::SQS
 
-#endif // AWSMOCK_DTO_SQS_CREATEMESSAGERESPONSE_H
+#endif // AWSMOCK_DTO_SQS_SEND_MESSAGE_RESPONSE_H

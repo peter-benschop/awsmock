@@ -18,7 +18,7 @@ namespace AwsMock::Dto::SQS {
       Core::JsonUtils::GetJsonValueString("QueueUrl", rootObject, queueUrl);
       Core::JsonUtils::GetJsonValueString("MessageBody", rootObject, body);
 
-      // Attributes
+      // User attributes
       if (rootObject->has("MessageAttributes")) {
 
         Poco::JSON::Object::Ptr attributesObject = rootObject->getObject("MessageAttributes");
@@ -28,12 +28,27 @@ namespace AwsMock::Dto::SQS {
             std::string attributeName = attributesObject->getNames()[i];
             MessageAttribute attributeValue;
             attributeValue.FromJsonObject(attributesObject->getObject(attributeName));
-            attributeValue.systemAttribute=false;
+            attributeValue.systemAttribute = false;
             attributes[attributeName] = attributeValue;
           }
         }
       }
 
+      // System attributes
+      if (rootObject->has("MessageSystemAttributes")) {
+
+        Poco::JSON::Object::Ptr attributesObject = rootObject->getObject("MessageSystemAttributes");
+
+        if (!attributesObject.isNull()) {
+          for (size_t i = 0; i < attributesObject->getNames().size(); i++) {
+            std::string attributeName = attributesObject->getNames()[i];
+            MessageAttribute attributeValue;
+            attributeValue.FromJsonObject(attributesObject->getObject(attributeName));
+            attributeValue.systemAttribute = true;
+            attributes[attributeName] = attributeValue;
+          }
+        }
+      }
     } catch (Poco::Exception &exc) {
       throw Core::ServiceException(exc.message(), 500);
     }
@@ -50,7 +65,8 @@ namespace AwsMock::Dto::SQS {
     for (const auto &a : r.attributes) {
       os << a.first << "=" << a.second.ToString() << ", ";
     }
-    os << "\b" << "\b" << "]}";
+    os.seekp(-2, std::ostream::cur);
+    os << "]}";
     return os;
   }
 

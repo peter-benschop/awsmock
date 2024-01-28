@@ -29,15 +29,17 @@ namespace AwsMock::Dto::SQS {
   }
 
   std::ostream &operator<<(std::ostream &os, const CreateQueueRequest &r) {
-    os << "CreateQueueRequest={region='" << r.region << "' queueUrl='" << r.queueUrl << "' name='" << r.name << "' owner='" << r.owner << "', userAttributes={";
+    os << "CreateQueueRequest={region='" << r.region << "', queueUrl='" << r.queueUrl << "', name='" << r.name << "', owner='" << r.owner << "', userAttributes=[";
     for (auto &attribute : r.attributes) {
       os << attribute.attributeName << "='" << attribute.attributeValue << "', ";
     }
-    os << "\b\b" << "}, tags={";
+    os.seekp(-2, std::ostream::cur);
+    os << "], tags=[";
     for (auto &tag : r.tags) {
       os << tag.first << "='" << tag.second << "', ";
     }
-    os << "\b\b" << "}}";
+    os.seekp(-2, std::ostream::cur);
+    os << "]}";
     return os;
   }
 

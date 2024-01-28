@@ -16,7 +16,7 @@
 // Test includes
 #include <awsmock/core/TestUtils.h>
 
-#define MD5_RESULT "421789f11a0f5cc6f29276b0f69eddb6"
+#define MD5_RESULT "c48838208d2b4e14e3ca0093a8443f09"
 
 namespace AwsMock::Dto::SQS {
 
@@ -34,8 +34,8 @@ namespace AwsMock::Dto::SQS {
 
     // arrange
     Dto::SQS::MessageAttributeList messageAttributes;
-    messageAttributes["attribute1"] = {.stringValue="value1", .type=Dto::SQS::MessageAttributeDataType::STRING, .systemAttribute=false};
-    messageAttributes["attribute2"] = {.stringValue="value2", .type=Dto::SQS::MessageAttributeDataType::STRING, .systemAttribute=false};
+    messageAttributes["my_attribute_name_1"] = {.stringValue="my_attribute_value_1", .type=Dto::SQS::MessageAttributeDataType::STRING, .systemAttribute=false};
+    messageAttributes["my_attribute_name_2"] = {.stringValue="my_attribute_value_2", .type=Dto::SQS::MessageAttributeDataType::STRING, .systemAttribute=false};
 
     // act
     std::string result = MessageAttribute::GetMd5UserAttributes(messageAttributes);

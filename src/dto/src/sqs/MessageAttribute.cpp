@@ -10,62 +10,13 @@ namespace AwsMock::Dto::SQS {
     return name < other.name;
   }
 
-  std::string MessageAttribute::GetMd5Attributes(const std::map<std::string, MessageAttribute> &attributes, bool systemAttribute) {
-
-    int length = 0;
-    auto *bytes = new unsigned char[4092];
-
-    for (const auto &a : attributes) {
-
-      //if (a.second.systemAttribute == systemAttribute) {
-        GetIntAsByteArray(a.first.length(), bytes, length);
-        length += 4;
-        memcpy(bytes + length, a.first.c_str(), a.first.length());
-        length += a.first.length();
-
-        std::string type = Dto::SQS::MessageAttributeDataTypeToString(a.second.type);
-        GetIntAsByteArray(type.length(), bytes, length);
-        length += 4;
-        memcpy(bytes + length, type.c_str(), type.length());
-        length += type.length();
-
-        if (a.second.type == Dto::SQS::MessageAttributeDataType::BINARY) {
-          bytes[length] = (2 & 0x000000ff);
-        } else {
-          bytes[length] = (1 & 0x000000ff);
-        }
-        length += 1;
-
-        if (a.second.type == Dto::SQS::MessageAttributeDataType::BINARY) {
-          int len = sizeof(a.second.binaryValue) / sizeof(char);
-          GetIntAsByteArray(len, bytes, len);
-          length += 4;
-          memcpy(bytes + len, a.second.binaryValue, len);
-          length += len;
-        } else {
-          GetIntAsByteArray(a.second.stringValue.length(), bytes, length);
-          length += 4;
-          memcpy(bytes + length, a.second.stringValue.c_str(), a.second.stringValue.length());
-          length += a.second.stringValue.length();
-        }
-      //}
-    }
-
-    // Calculate MD5 of byte array
-    std::string output = Core::Crypto::GetMd5FromString(std::string(reinterpret_cast<const char *>(bytes), length));
-
-    // Cleanup
-    delete[] bytes;
-
-    return output;
-  }
-
   std::string MessageAttribute::GetMd5UserAttributes(const std::map<std::string, MessageAttribute> &attributes) {
 
     EVP_MD_CTX *context = EVP_MD_CTX_new();
     const EVP_MD *md = EVP_md5();
     unsigned char md_value[EVP_MAX_MD_SIZE];
     unsigned int md_len;
+    auto *bytes = new unsigned char[1];
 
     EVP_DigestInit_ex(context, md, nullptr);
     for (const auto &a : attributes) {
@@ -80,7 +31,8 @@ namespace AwsMock::Dto::SQS {
 
         // Encoded value
         if (!a.second.stringValue.empty()) {
-          EVP_DigestUpdate(context, std::string("1").c_str(), 1);
+          bytes[0] = 1;
+          EVP_DigestUpdate(context, bytes, 1);
           updateLengthAndBytes(context, a.second.stringValue);
         }
       }
@@ -118,7 +70,7 @@ namespace AwsMock::Dto::SQS {
 
         // Encoded value
         if (!a.second.stringValue.empty()) {
-          EVP_DigestUpdate(context, std::string("1").c_str(), 1);
+          EVP_DigestUpdate(context, reinterpret_cast<const void *>(0x01), 1);
           updateLengthAndBytes(context, a.second.stringValue);
         }
       }
