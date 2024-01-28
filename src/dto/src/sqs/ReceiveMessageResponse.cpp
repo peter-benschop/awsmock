@@ -25,22 +25,20 @@ namespace AwsMock::Dto::SQS {
         Poco::JSON::Object attributeObject;
         for (auto &at : message.attributes) {
 
-          if (!at.systemAttribute) {
-            Dto::SQS::MessageAttribute messageAttributeDto = {.name=at.attributeName, .stringValue=at.attributeValue};
+          Dto::SQS::MessageAttribute messageAttributeDto = {.name=at.attributeName, .stringValue=at.attributeValue};
 
-            Poco::JSON::Object attributeValueObject;
-            if (at.attributeType == Database::Entity::SQS::MessageAttributeType::STRING) {
-              attributeValueObject.set("DataType", "String");
-              attributeValueObject.set("StringValue", at.attributeValue);
-              messageAttributeDto.type = MessageAttributeDataType::STRING;
-            } else if (at.attributeType == Database::Entity::SQS::MessageAttributeType::NUMBER) {
-              attributeValueObject.set("DataType", "Number");
-              attributeValueObject.set("StringValue", at.attributeValue);
-              messageAttributeDto.type = MessageAttributeDataType::NUMBER;
-            }
-            messageAttributeListDto[at.attributeName] = messageAttributeDto;
-            attributeObject.set(at.attributeName, attributeValueObject);
+          Poco::JSON::Object attributeValueObject;
+          if (at.attributeType == Database::Entity::SQS::MessageAttributeType::STRING) {
+            attributeValueObject.set("DataType", "String");
+            attributeValueObject.set("StringValue", at.attributeValue);
+            messageAttributeDto.type = MessageAttributeDataType::STRING;
+          } else if (at.attributeType == Database::Entity::SQS::MessageAttributeType::NUMBER) {
+            attributeValueObject.set("DataType", "Number");
+            attributeValueObject.set("StringValue", at.attributeValue);
+            messageAttributeDto.type = MessageAttributeDataType::NUMBER;
           }
+          messageAttributeListDto[at.attributeName] = messageAttributeDto;
+          attributeObject.set(at.attributeName, attributeValueObject);
         }
 
         // MD5 of message attributes
@@ -112,24 +110,21 @@ namespace AwsMock::Dto::SQS {
 
       for (auto &at : it.attributes) {
 
-        if(!at.systemAttribute) {
+        // MessageAttribute
+        Poco::XML::AutoPtr<Poco::XML::Element> pAttribute = pDoc->createElement("Attribute");
+        pMessage->appendChild(pAttribute);
 
-          // MessageAttribute
-          Poco::XML::AutoPtr<Poco::XML::Element> pAttribute = pDoc->createElement("Attribute");
-          pMessage->appendChild(pAttribute);
+        // Name
+        Poco::XML::AutoPtr<Poco::XML::Element> pAttrName = pDoc->createElement("Name");
+        pAttribute->appendChild(pAttrName);
+        Poco::XML::AutoPtr<Poco::XML::Text> pAttrNameText = pDoc->createTextNode(at.attributeName);
+        pAttrName->appendChild(pAttrNameText);
 
-          // Name
-          Poco::XML::AutoPtr<Poco::XML::Element> pAttrName = pDoc->createElement("Name");
-          pAttribute->appendChild(pAttrName);
-          Poco::XML::AutoPtr<Poco::XML::Text> pAttrNameText = pDoc->createTextNode(at.attributeName);
-          pAttrName->appendChild(pAttrNameText);
-
-          // Value
-          Poco::XML::AutoPtr<Poco::XML::Element> pAttrValue = pDoc->createElement("Value");
-          pAttribute->appendChild(pAttrValue);
-          Poco::XML::AutoPtr<Poco::XML::Text> pAttrValueText = pDoc->createTextNode(at.attributeValue);
-          pAttrValue->appendChild(pAttrValueText);
-        }
+        // Value
+        Poco::XML::AutoPtr<Poco::XML::Element> pAttrValue = pDoc->createElement("Value");
+        pAttribute->appendChild(pAttrValue);
+        Poco::XML::AutoPtr<Poco::XML::Text> pAttrValueText = pDoc->createTextNode(at.attributeValue);
+        pAttrValue->appendChild(pAttrValueText);
       }
     }
 
