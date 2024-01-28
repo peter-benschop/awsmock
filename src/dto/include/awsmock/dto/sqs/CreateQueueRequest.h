@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_CREATEQUEUEREQUEST_H
-#define AWSMOCK_DTO_SQS_CREATEQUEUEREQUEST_H
+#ifndef AWSMOCK_DTO_SQS_CREATE_QUEUE_REQUEST_H
+#define AWSMOCK_DTO_SQS_CREATE_QUEUE_REQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -23,7 +23,12 @@
 
 namespace AwsMock::Dto::SQS {
 
-  struct CreateQueueRequest : public SqsCommonRequest {
+  struct CreateQueueRequest {
+
+    /**
+     * AWS region
+     */
+    std::string region;
 
     /**
      * Name
@@ -51,6 +56,11 @@ namespace AwsMock::Dto::SQS {
     std::map<std::string, std::string> tags;
 
     /**
+     * AWS request ID
+     */
+    std::string requestId;
+
+    /**
      * Converts the JSON string to DTO.
      *
      * @param jsonString JSON string
@@ -75,4 +85,4 @@ namespace AwsMock::Dto::SQS {
 
 } // namespace AwsMock::Dto::SQS
 
-#endif // AWSMOCK_DTO_SQS_CREATEQUEUEREQUEST_H
+#endif // AWSMOCK_DTO_SQS_CREATE_QUEUE_REQUEST_H

@@ -228,7 +228,7 @@ namespace AwsMock::Service {
     std::string queueUrl = getQueueUrlResult.output;
 
     // act
-    Core::ExecResult sendResult = Core::SystemUtils::Exec(_baseCommand + " sqs send-message-with-attributes " + queueUrl + " test-message");
+    Core::ExecResult sendResult = Core::SystemUtils::Exec(_baseCommand + " sqs send-message-with-attributes " + queueUrl + " \"This is a test message\"");
     Core::ExecResult receiveResult = Core::SystemUtils::Exec(_baseCommand + " sqs receive-message " + queueUrl + " 1 5 5");
     std::string receiptHandle = receiveResult.output;
     Database::Entity::SQS::Message message = _database.GetMessageByReceiptHandle(receiveResult.output);

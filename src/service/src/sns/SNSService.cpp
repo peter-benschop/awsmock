@@ -297,12 +297,12 @@ namespace AwsMock::Service {
 
     // Wrap it in a SQS message request
     Dto::SQS::SendMessageRequest sendMessageRequest = {
+      .region=request.region,
       .queueUrl=sqsQueue.queueUrl,
       .queueArn=sqsQueue.queueArn,
-      .body=sqsNotificationRequest.ToJson()
+      .body=sqsNotificationRequest.ToJson(),
+      .requestId="ad",
     };
-    sendMessageRequest.region = request.region;
-    sendMessageRequest.requestId = Core::AwsUtils::CreateRequestId();
 
     _sqsService->SendMessage(sendMessageRequest);
   }

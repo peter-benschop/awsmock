@@ -9,6 +9,14 @@
 #include <string>
 #include <sstream>
 
+// Poco includes
+#include <Poco/JSON/Object.h>
+#include <Poco/JSON/Parser.h>
+
+// AwsMock includes
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/ServiceException.h>
+
 namespace AwsMock::Dto::SQS {
 
   struct SqsCommonRequest {
@@ -28,14 +36,14 @@ namespace AwsMock::Dto::SQS {
      *
      * @param jsonString JSON string
      */
-    void FromJson(const std::string &jsonString);
+    virtual void FromJson(const std::string &jsonString);
 
     /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+    virtual std::string ToString() const;
 
     /**
      * Stream provider.

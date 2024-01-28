@@ -22,7 +22,12 @@
 
 namespace AwsMock::Dto::SQS {
 
-  struct DeleteQueueRequest : public SqsCommonRequest {
+  struct DeleteQueueRequest {
+
+    /**
+     * AWS region
+     */
+    std::string region;
 
     /**
      * Queue URL
@@ -33,6 +38,11 @@ namespace AwsMock::Dto::SQS {
      * Resource
      */
     std::string resource = "Unknown resource";
+
+    /**
+     * AWS request ID
+     */
+    std::string requestId;
 
     /**
      * Converts the JSON string to DTO.

@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::SQS {
 
-  std::string SendMessageResponse::ToJson() {
+  std::string SendMessageResponse::ToJson() const {
 
     try {
       Poco::JSON::Object rootJson;
@@ -14,6 +14,7 @@ namespace AwsMock::Dto::SQS {
       rootJson.set("MD5OfMessageBody", md5Body);
       rootJson.set("MD5OfMessageAttributes", md5Attr);
       //rootJson.set("MD5OfMessageSystemAttributes", md5SystemAttr);
+      //rootJson.set("SequenceNumber", sequenceNumber);
 
       std::ostringstream os;
       rootJson.stringify(os);
@@ -32,13 +33,12 @@ namespace AwsMock::Dto::SQS {
       Poco::Dynamic::Var result = parser.parse(jsonString);
 
       const auto& rootObject = result.extract<Poco::JSON::Object::Ptr>();
+      Core::JsonUtils::GetJsonValueString("MessageId", rootObject, messageId);
       Core::JsonUtils::GetJsonValueString("MD5OfMessageBody", rootObject, md5Body);
       Core::JsonUtils::GetJsonValueString("MD5OfMessageAttributes", rootObject, md5Attr);
       Core::JsonUtils::GetJsonValueString("MD5OfMessageSystemAttributes", rootObject, md5SystemAttr);
-      Core::JsonUtils::GetJsonValueString("MessageId", rootObject, messageId);
 
     } catch (Poco::Exception &exc) {
-      std::cerr << exc.message() << std::endl;
       throw Core::ServiceException(exc.message(), 500);
     }
   }
@@ -91,11 +91,23 @@ namespace AwsMock::Dto::SQS {
     Poco::XML::AutoPtr<Poco::XML::Text> pMd5BodyText = pDoc->createTextNode(md5Body);
     pMd5Body->appendChild(pMd5BodyText);
 
-    // MD5 sqs
-    Poco::XML::AutoPtr<Poco::XML::Element> pMd5Attr = pDoc->createElement("MD5OfMessageAttributes");
-    pSendMessageResult->appendChild(pMd5Attr);
-    Poco::XML::AutoPtr<Poco::XML::Text> pMd5AttrText = pDoc->createTextNode(md5Attr);
-    pMd5Attr->appendChild(pMd5AttrText);
+    // MD5 user attributes
+    Poco::XML::AutoPtr<Poco::XML::Element> pMd5UserAttr = pDoc->createElement("MD5OfMessageAttributes");
+    pSendMessageResult->appendChild(pMd5UserAttr);
+    Poco::XML::AutoPtr<Poco::XML::Text> pMd5UserAttrText = pDoc->createTextNode(md5Attr);
+    pMd5UserAttr->appendChild(pMd5UserAttrText);
+
+    // MD5 system attributes
+    Poco::XML::AutoPtr<Poco::XML::Element> pMd5SystemAttr = pDoc->createElement("MD5OfMessageSystemAttributes");
+    pSendMessageResult->appendChild(pMd5SystemAttr);
+    Poco::XML::AutoPtr<Poco::XML::Text> pMd5SystemAttrText = pDoc->createTextNode(md5SystemAttr);
+    pMd5SystemAttr->appendChild(pMd5SystemAttrText);
+
+    // MD5 system attributes
+    Poco::XML::AutoPtr<Poco::XML::Element> pSequenceNr = pDoc->createElement("SequenceNumber");
+    pSendMessageResult->appendChild(pSequenceNr);
+    Poco::XML::AutoPtr<Poco::XML::Text> pSequenceNrText = pDoc->createTextNode(sequenceNumber);
+    pSequenceNr->appendChild(pSequenceNrText);
 
     // Metadata
     Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = pDoc->createElement("ResponseMetadata");
@@ -108,10 +120,7 @@ namespace AwsMock::Dto::SQS {
 
     std::stringstream output;
     Poco::XML::DOMWriter writer;
-    writer.setNewLine("\n");
-    writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
     writer.writeNode(output, pDoc);
-    std::string tmp = output.str();
     return output.str();
   }
 

@@ -409,6 +409,7 @@ namespace AwsMock::Service {
         .receiptHandle=message.receiptHandle,
         .md5Body=md5Body,
         .md5Attr=md5UserAttr,
+        .md5SystemAttr=md5SystemAttr,
         .requestId=request.requestId
       };
 
