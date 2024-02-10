@@ -1,6 +1,34 @@
-FROM jensvogt/aws-mock-base:latest
+FROM alpine:latest as build
 
-# Install aws-mock
+RUN apk update && apk add groff g++ make cmake ccache openssl-dev git curl curl-dev python3 aws-cli linux-headers  \
+    libarchive libarchive-dev github-cli libtbb libtbb-dev asio-dev gtest-dev pandoc icu-libs
+
+# Create build environment
+RUN mkdir -p /usr/src
+
+# Install Poco framework
+RUN cd /usr/src && \
+    git clone -b master https://github.com/pocoproject/poco.git && \
+    cd poco && \
+    cmake -DENABLE_PAGECOMPILER=OFF -DENABLE_DATA_SQLITE=OFF -DENABLE_REDIS=OFF -DENABLE_DATA_POSTGRESQL=OFF  \
+    -DENABLE_DATA_MYSQL=OFF -DENABLE_NETSSL=ON -DENABLE_MONGODB=OFF -DENABLE_JWT=OFF -DENABLE_DATA=OFF  \
+    -DENABLE_ACTIVERECORD=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr . && \
+    make install
+
+# Install mongo-c-driver
+RUN cd /usr/src && \
+    git clone -b r1.24 https://github.com/mongodb/mongo-c-driver.git && \
+    cd mongo-c-driver && \
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF . && \
+    make install
+
+# Install mongo-cxx-driver
+RUN cd /usr/src && \
+    git clone -b releases/v3.8 https://github.com/mongodb/mongo-cxx-driver.git && \
+    cd mongo-cxx-driver && \
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_CXX_STANDARD=17 . && \
+    make install
+
 WORKDIR /usr/src
 RUN git clone https://github.com/jensvogt/aws-mock.git && \
     cd /usr/src/aws-mock && \
@@ -9,9 +37,11 @@ RUN git clone https://github.com/jensvogt/aws-mock.git && \
     cmake --install . --prefix /usr
 
 # Cleanup
-RUN apk del gcc g++ cmake ccache make linux-headers curl-dev openssl-dev libarchive-dev gtest-dev libtbb-dev asio-dev \
-    gtest-dev
 RUN rm -rf /usr/src
+
+FROM alpine:latest
+
+RUN apk update && apk add aws-cli
 
 # Make dirctories
 RUN mkdir -p /tmp/awsmock/data/s3 && \
@@ -19,12 +49,72 @@ RUN mkdir -p /tmp/awsmock/data/s3 && \
     mkdir -p /tmp/awsmock/data/transfer && \
     mkdir -p /tmp/awsmock/data/tmp
 
-RUN /usr/bin/aws configure set aws_access_key_id none && \
-    /usr/bin/aws configure set aws_secret_access_key none && \
-    /usr/bin/aws configure set default.region eu-central-1 && \
-    /usr/bin/aws configure set profile.awsmock.region eu-central-1 && \
-    /usr/bin/aws configure set profile.awsmock.aws_access_key_id none && \
-    /usr/bin/aws configure set profile.awsmock.aws_secret_access_key none
+# Runtime
+
+COPY --from=build /usr/lib/libstdc++.so.6 /usr/lib/
+COPY --from=build /usr/lib/libgcc_s.so.1 /usr/lib/
+COPY --from=build /usr/lib/libicuuc.so.74 /usr/lib/
+COPY --from=build /usr/lib/libcurl.so.4 /usr/lib/
+COPY --from=build /usr/lib/libarchive.so.13 /usr/lib/
+COPY --from=build /usr/lib/libzstd.so.1 /usr/lib/
+COPY --from=build /usr/lib/libexpat.so.1 /usr/lib/
+COPY --from=build /usr/lib/liblzma.so.5 /usr/lib/
+COPY --from=build /usr/lib/liblz4.so.1 /usr/lib/
+COPY --from=build /usr/lib/libbz2.so.1 /usr/lib/
+COPY --from=build /usr/lib/libcares.so.2 /usr/lib/
+COPY --from=build /usr/lib/libnghttp2.so.14 /usr/lib/
+COPY --from=build /usr/lib/libidn2.so.0 /usr/lib/
+COPY --from=build /usr/lib/libbrotlidec.so.1 /usr/lib/
+COPY --from=build /usr/lib/libicudata.so.74 /usr/lib/
+COPY --from=build /usr/lib/libunistring.so.5 /usr/lib/
+COPY --from=build /usr/lib/libbrotlicommon.so.1 /usr/lib/
+COPY --from=build /lib/libacl.so.1.1.2301 /lib/
+RUN ln -s /lib/libacl.so.1.1.2301 /lib/libacl.so.1
+
+# Install poco
+COPY --from=build /usr/lib/libPocoPrometheus.so.101 /usr/lib/
+COPY --from=build /usr/lib/libPocoNet.so.101 /usr/lib/
+COPY --from=build /usr/lib/libPocoJSON.so.101 /usr/lib/
+COPY --from=build /usr/lib/libPocoXML.so.101 /usr/lib/
+COPY --from=build /usr/lib/libPocoZip.so.101 /usr/lib/
+COPY --from=build /usr/lib/libPocoUtil.so.101 /usr/lib/
+COPY --from=build /usr/lib/libPocoFoundation.so.101 /usr/lib/
+RUN ln -s /usr/lib/libPocoPrometheus.so.101 /usr/lib/libPocoPrometheus.so
+RUN ln -s /usr/lib/libPocoNet.so.101 /usr/lib/libPocoNet.so
+RUN ln -s /usr/lib/libPocoJSON.so.101 /usr/lib/libPocoJSON.so
+RUN ln -s /usr/lib/libPocoXML.so.101 /usr/lib/libPocoXML.so
+RUN ln -s /usr/lib/libPocoZip.so.101 /usr/lib/libPocoZip.so
+RUN ln -s /usr/lib/libPocoUtil.so.101 /usr/lib/libPocoUtil.so
+RUN ln -s /usr/lib/libPocoFoundation.so.101 /usr/lib/libPocoFoundation.so
+
+# Install Mongo C/C++ driver
+COPY --from=build /usr/lib/libbson-1.0.so.0.0.0 /usr/lib/
+RUN ln -s /usr/lib/libbson-1.0.so.0.0.0 /usr/lib/libbson-1.0.so.0
+RUN ln -s /usr/lib/libbson-1.0.so.0 /usr/lib/libbson-1.0.so
+COPY --from=build /usr/lib/libmongoc-1.0.so.0.0.0 /usr/lib/
+RUN ln -s /usr/lib/libmongoc-1.0.so.0.0.0 /usr/lib/libmongoc-1.0.so.0
+RUN ln -s /usr/lib/libmongoc-1.0.so.0 /usr/lib/libmongoc-1.0.so
+COPY --from=build /usr/lib/libmongocxx.so.3.8.2-pre /usr/lib/
+RUN ln -s /usr/lib/libmongocxx.so.3.8.2-pre /usr/lib/libmongocxx.so._noabi
+COPY --from=build /usr/lib/libbsoncxx.so.3.8.2-pre /usr/lib/
+RUN ln -s /usr/lib/libbsoncxx.so.3.8.2-pre /usr/lib/libbsoncxx.so._noabi
+RUN ln -s /usr/lib/libbsoncxx.so._noabi /usr/lib/libbsoncxx.so
+
+# Install aws-mock
+COPY --from=build /usr/bin/aws /usr/bin/
+COPY --from=build /usr/bin/awsmockmgr /usr/bin/
+COPY --from=build /usr/bin/awsmockctl /usr/bin/
+COPY --from=build /usr/lib/libawsmock* /usr/lib/
+COPY --from=build /etc/aws-mock.properties /etc/
+COPY --from=build /usr/bin/awslocal /usr/bin/
+
+# Configure awslocal
+RUN aws configure set aws_access_key_id none && \
+    aws configure set aws_secret_access_key none && \
+    aws configure set default.region eu-central-1 && \
+    aws configure set profile.awsmock.region eu-central-1 && \
+    aws configure set profile.awsmock.aws_access_key_id none && \
+    aws configure set profile.awsmock.aws_secret_access_key none
 
 # Expose ports
 EXPOSE 4566 4566
