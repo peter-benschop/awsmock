@@ -25,7 +25,7 @@ namespace AwsMock::Service {
 
   void SQSJava1Handler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
 
-    //DumpRequest(request);
+    DumpRequest(request);
     Dto::Common::UserAgent userAgent;
     userAgent.FromRequest(request, "sqs");
 

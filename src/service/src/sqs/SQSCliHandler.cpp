@@ -52,9 +52,7 @@ namespace AwsMock::Service {
         std::vector<Dto::SQS::QueueAttribute> attributes = GetQueueAttributes(payload);
         std::map<std::string, std::string> tags = GetQueueTags(payload);
 
-        Dto::SQS::CreateQueueRequest sqsRequest = {.queueUrl=queueUrl, .owner=user, .attributes=attributes, .tags=tags};
-        sqsRequest.region = region;
-        sqsRequest.requestId = requestId;
+        Dto::SQS::CreateQueueRequest sqsRequest = {.region=region, .queueUrl=queueUrl, .owner=user, .attributes=attributes, .tags=tags, .requestId=requestId};
 
         Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
         SendOkResponse(response, sqsResponse.ToXml());

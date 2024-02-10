@@ -21,6 +21,7 @@
 #define QUEUE_URL "http://localhost:4566/000000000000/test-queue"
 #define BODY "{\"TestObject\": \"TestValue\"}"
 #define BODY_MD5 "bf54bf4281dc11635fcdd2d7d6c9e126"
+#define EMPTY_MD5 "d41d8cd98f00b204e9800998ecf8427e"
 #define OWNER "test-owner"
 
 namespace AwsMock::Service {
@@ -136,8 +137,40 @@ namespace AwsMock::Service {
     Dto::SQS::SendMessageResponse response = _service.SendMessage(request);
 
     // assert
-    EXPECT_TRUE(response.messageId.length() > 0);
+    EXPECT_FALSE(response.messageId.empty());
     EXPECT_TRUE(response.md5Body == BODY_MD5);
+    EXPECT_TRUE(response.md5UserAttr == EMPTY_MD5);
+    EXPECT_TRUE(response.md5SystemAttr == EMPTY_MD5);
+  }
+
+  TEST_F(SQSServiceTest, MessagesCreateTest) {
+
+    // arrange
+    Dto::SQS::CreateQueueRequest queueRequest = {.name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    queueRequest.region=REGION;
+    queueRequest.requestId=Poco::UUIDGenerator().createRandom().toString();
+
+    Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
+    Dto::SQS::SendMessageRequest request1 = {.queueUrl=QUEUE_URL, .body=BODY, .messageId=Poco::UUIDGenerator().createRandom().toString()};
+    request1.region=REGION;
+    request1.requestId=Poco::UUIDGenerator().createRandom().toString();
+    Dto::SQS::SendMessageRequest request2 = {.queueUrl=QUEUE_URL, .body=BODY, .messageId=Poco::UUIDGenerator().createRandom().toString()};
+    request2.region=REGION;
+    request2.requestId=Poco::UUIDGenerator().createRandom().toString();
+
+    // act
+    Dto::SQS::SendMessageResponse response1 = _service.SendMessage(request1);
+    Dto::SQS::SendMessageResponse response2 = _service.SendMessage(request2);
+
+    // assert
+    EXPECT_FALSE(response1.messageId.empty());
+    EXPECT_TRUE(response1.md5Body == BODY_MD5);
+    EXPECT_TRUE(response1.md5UserAttr == EMPTY_MD5);
+    EXPECT_TRUE(response1.md5SystemAttr == EMPTY_MD5);
+    EXPECT_FALSE(response2.messageId.empty());
+    EXPECT_TRUE(response2.md5Body == BODY_MD5);
+    EXPECT_TRUE(response2.md5UserAttr == EMPTY_MD5);
+    EXPECT_TRUE(response2.md5SystemAttr == EMPTY_MD5);
   }
 
   TEST_F(SQSServiceTest, MessageReceiveTest) {
@@ -194,7 +227,7 @@ namespace AwsMock::Service {
     messageAttributes[messageAttribute.name] = messageAttribute;
 
     // act
-    std::string md5sum = Dto::SQS::MessageAttribute::GetMd5UserAttributes(messageAttributes);
+    std::string md5sum = Dto::SQS::MessageAttribute::GetMd5Attributes(messageAttributes, false);
 
     // assert
     EXPECT_TRUE("6ed5f16969b625c8d900cbd5da557e9e" == md5sum);
@@ -218,7 +251,7 @@ namespace AwsMock::Service {
     messageAttributes[messageAttribute2.name]=messageAttribute2;
 
     // act
-    std::string md5sum = Dto::SQS::MessageAttribute::GetMd5UserAttributes(messageAttributes);
+    std::string md5sum = Dto::SQS::MessageAttribute::GetMd5Attributes(messageAttributes, false);
 
     // assert
     EXPECT_TRUE("ebade6c58059dfd4bbf8cee9da7465fe" == md5sum);

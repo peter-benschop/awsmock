@@ -10,7 +10,7 @@ namespace AwsMock::Dto::SQS {
     return name < other.name;
   }
 
-  std::string MessageAttribute::GetMd5UserAttributes(const std::map<std::string, MessageAttribute> &attributes) {
+  std::string MessageAttribute::GetMd5Attributes(const std::map<std::string, MessageAttribute> &attributes, bool systemAttribute) {
 
     EVP_MD_CTX *context = EVP_MD_CTX_new();
     const EVP_MD *md = EVP_md5();
@@ -18,22 +18,22 @@ namespace AwsMock::Dto::SQS {
     unsigned int md_len;
     auto *bytes = new unsigned char[1];
 
-    EVP_DigestInit_ex(context, md, nullptr);
+    EVP_DigestInit(context, md);
     for (const auto &a : attributes) {
 
-      if (!a.second.systemAttribute) {
+      if (a.second.systemAttribute == systemAttribute) {
 
         // Encoded name
-        updateLengthAndBytes(context, a.first);
+        UpdateLengthAndBytes(context, a.first);
 
         // Encoded data type
-        updateLengthAndBytes(context, Dto::SQS::MessageAttributeDataTypeToString(a.second.type));
+        UpdateLengthAndBytes(context, Dto::SQS::MessageAttributeDataTypeToString(a.second.type));
 
         // Encoded value
         if (!a.second.stringValue.empty()) {
           bytes[0] = 1;
           EVP_DigestUpdate(context, bytes, 1);
-          updateLengthAndBytes(context, a.second.stringValue);
+          UpdateLengthAndBytes(context, a.second.stringValue);
         }
       }
     }
@@ -49,42 +49,6 @@ namespace AwsMock::Dto::SQS {
     return output;
   }
 
-  std::string MessageAttribute::GetMd5SystemAttributes(const std::map<std::string, MessageAttribute> &attributes) {
-
-    EVP_MD_CTX *context = EVP_MD_CTX_new();
-    const EVP_MD *md = EVP_md5();
-    unsigned char md_value[EVP_MAX_MD_SIZE];
-    unsigned int md_len;
-    std::string output;
-
-    EVP_DigestInit_ex(context, md, nullptr);
-    for (const auto &a : attributes) {
-
-      if (a.second.systemAttribute) {
-
-        // Encoded name
-        updateLengthAndBytes(context, a.first);
-
-        // Encoded data type
-        updateLengthAndBytes(context, Dto::SQS::MessageAttributeDataTypeToString(a.second.type));
-
-        // Encoded value
-        if (!a.second.stringValue.empty()) {
-          EVP_DigestUpdate(context, reinterpret_cast<const void *>(0x01), 1);
-          updateLengthAndBytes(context, a.second.stringValue);
-        }
-      }
-    }
-    EVP_DigestFinal_ex(context, md_value, &md_len);
-    EVP_MD_CTX_free(context);
-
-    output.resize(md_len * 2);
-    for (unsigned int i = 0; i < md_len; ++i) {
-      std::sprintf(&output[i * 2], "%02x", md_value[i]);
-    }
-    return output;
-  }
-
   void MessageAttribute::GetIntAsByteArray(size_t n, unsigned char *bytes) {
     bytes[3] = n & 0x000000ff;
     bytes[2] = (n & 0x0000ff00) >> 8;
@@ -92,7 +56,7 @@ namespace AwsMock::Dto::SQS {
     bytes[0] = (n & 0xff000000) >> 24;
   }
 
-  void MessageAttribute::updateLengthAndBytes(EVP_MD_CTX *context, const std::string &str) {
+  void MessageAttribute::UpdateLengthAndBytes(EVP_MD_CTX *context, const std::string &str) {
     auto* bytes = static_cast<unsigned char *>(malloc(4));
     GetIntAsByteArray(str.length(), bytes);
     EVP_DigestUpdate(context, bytes, 4);
