@@ -50,11 +50,10 @@ namespace AwsMock::Dto::SQS {
     Poco::XML::DOMWriter writer;
     writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION);
     writer.writeNode(output, pDoc);
-    std::string tmp = output.str();
     return output.str();
   }
 
-  std::string GetQueueUrlResponse::ToJson() {
+  std::string GetQueueUrlResponse::ToJson() const {
 
     try {
       Poco::JSON::Object rootJson;
@@ -75,7 +74,7 @@ namespace AwsMock::Dto::SQS {
       Poco::JSON::Parser parser;
       Poco::Dynamic::Var result = parser.parse(jsonString);
 
-      Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+      const auto& rootObject = result.extract<Poco::JSON::Object::Ptr>();
       Core::JsonUtils::GetJsonValueString("QueueUrl", rootObject, queueUrl);
 
     } catch (Poco::Exception &exc) {

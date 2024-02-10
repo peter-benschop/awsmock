@@ -81,8 +81,8 @@ namespace AwsMock::Database {
 
     if (_useDatabase) {
 
-      GetConnection()["sqs_message"].create_index(make_document(kvp("queueUrl", 1), kvp("state", 1), kvp("reset", 1)), make_document(kvp("name", "sqs_queueurl_status_reset_idx1")));
-      GetConnection()["sqs_message"].create_index(make_document(kvp("queueUrl", 1), kvp("state", 1), kvp("retries", 1)), make_document(kvp("name", "sqs_queueurl_status_retries_idx2")));
+      GetConnection()["sqs_message"].create_index(make_document(kvp("queueUrl", 1), kvp("status", 1), kvp("reset", 1)), make_document(kvp("name", "sqs_queueurl_status_reset_idx1")));
+      GetConnection()["sqs_message"].create_index(make_document(kvp("queueUrl", 1), kvp("status", 1), kvp("retries", 1)), make_document(kvp("name", "sqs_queueurl_status_retries_idx2")));
       GetConnection()["sqs_queue"].create_index(make_document(kvp("region", 1), kvp("name", 1)), make_document(kvp("name", "sqs_region_name_idx1")));
       GetConnection()["sqs_queue"].create_index(make_document(kvp("region", 1), kvp("url", 1)), make_document(kvp("name", "sqs_region_url_idx2")));
       GetConnection()["s3_bucket"].create_index(make_document(kvp("region", 1), kvp("name", 1)), make_document(kvp("name", "s3_region_name_idx1")));

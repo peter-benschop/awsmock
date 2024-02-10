@@ -12,9 +12,9 @@ namespace AwsMock::Dto::SQS {
       Poco::JSON::Object rootJson;
       rootJson.set("MessageId", messageId);
       rootJson.set("MD5OfMessageBody", md5Body);
-      rootJson.set("MD5OfMessageAttributes", md5Attr);
-      //rootJson.set("MD5OfMessageSystemAttributes", md5SystemAttr);
-      //rootJson.set("SequenceNumber", sequenceNumber);
+      rootJson.set("MD5OfMessageAttributes", md5UserAttr);
+      rootJson.set("MD5OfMessageSystemAttributes", md5SystemAttr);
+      rootJson.set("SequenceNumber", sequenceNumber);
 
       std::ostringstream os;
       rootJson.stringify(os);
@@ -32,10 +32,10 @@ namespace AwsMock::Dto::SQS {
       Poco::JSON::Parser parser;
       Poco::Dynamic::Var result = parser.parse(jsonString);
 
-      const auto& rootObject = result.extract<Poco::JSON::Object::Ptr>();
+      const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
       Core::JsonUtils::GetJsonValueString("MessageId", rootObject, messageId);
       Core::JsonUtils::GetJsonValueString("MD5OfMessageBody", rootObject, md5Body);
-      Core::JsonUtils::GetJsonValueString("MD5OfMessageAttributes", rootObject, md5Attr);
+      Core::JsonUtils::GetJsonValueString("MD5OfMessageAttributes", rootObject, md5UserAttr);
       Core::JsonUtils::GetJsonValueString("MD5OfMessageSystemAttributes", rootObject, md5SystemAttr);
 
     } catch (Poco::Exception &exc) {
@@ -62,7 +62,7 @@ namespace AwsMock::Dto::SQS {
     }
     node = pDoc->getNodeByPath("/SendMessageResponse/SendMessageResult/MD5OfMessageAttributes");
     if (node) {
-      md5Attr = node->innerText();
+      md5UserAttr = node->innerText();
     } else {
       std::cerr << "Exception: Wrong send message payload" << std::endl;
     }
@@ -94,7 +94,7 @@ namespace AwsMock::Dto::SQS {
     // MD5 user attributes
     Poco::XML::AutoPtr<Poco::XML::Element> pMd5UserAttr = pDoc->createElement("MD5OfMessageAttributes");
     pSendMessageResult->appendChild(pMd5UserAttr);
-    Poco::XML::AutoPtr<Poco::XML::Text> pMd5UserAttrText = pDoc->createTextNode(md5Attr);
+    Poco::XML::AutoPtr<Poco::XML::Text> pMd5UserAttrText = pDoc->createTextNode(md5UserAttr);
     pMd5UserAttr->appendChild(pMd5UserAttrText);
 
     // MD5 system attributes
@@ -132,7 +132,7 @@ namespace AwsMock::Dto::SQS {
 
   std::ostream &operator<<(std::ostream &os, const SendMessageResponse &r) {
     os << "SendMessageResponse={id='" << r.id << "', url='" << r.queueUrl << "', messageId='" << r.messageId << "', receiptHandle='" << r.receiptHandle
-       << "', md5body='" << r.md5Body << "', md5attr='" << r.md5Attr << "', requestId: '" << r.requestId << "'}";
+       << "', md5body='" << r.md5Body << "', md5UserAttr='" << r.md5UserAttr << "', md5SystemAttr='" << r.md5SystemAttr << "', requestId: '" << r.requestId << "'}";
     return os;
   }
 

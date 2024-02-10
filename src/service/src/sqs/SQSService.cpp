@@ -30,7 +30,6 @@ namespace AwsMock::Service {
         .queueUrl=queue.queueUrl,
         .queueArn=queue.queueArn
       };
-      //throw Core::ServiceException("SQS queue '" + request.queueUrl + "' exists already", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
 
     try {
@@ -383,8 +382,8 @@ namespace AwsMock::Service {
       std::string messageId = Core::AwsUtils::CreateMessageId();
       std::string receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
       std::string md5Body = Core::Crypto::GetMd5FromString(messageBody);
-      std::string md5UserAttr = Dto::SQS::MessageAttribute::GetMd5UserAttributes(request.attributes);
-      std::string md5SystemAttr = Dto::SQS::MessageAttribute::GetMd5SystemAttributes(request.attributes);
+      std::string md5UserAttr = Dto::SQS::MessageAttribute::GetMd5Attributes(request.attributes, false);
+      std::string md5SystemAttr = Dto::SQS::MessageAttribute::GetMd5Attributes(request.attributes, true);
 
       // Update database
       Database::Entity::SQS::Message message = _database->CreateMessage(
@@ -408,7 +407,7 @@ namespace AwsMock::Service {
         .messageId=message.messageId,
         .receiptHandle=message.receiptHandle,
         .md5Body=md5Body,
-        .md5Attr=md5UserAttr,
+        .md5UserAttr=md5UserAttr,
         .md5SystemAttr=md5SystemAttr,
         .requestId=request.requestId
       };
@@ -427,8 +426,8 @@ namespace AwsMock::Service {
       Database::Entity::SQS::Queue queue = _database->GetQueueByUrl(request.region, request.queueUrl);
 
       long elapsed = 0;
-      auto begin = std::chrono::high_resolution_clock::now();
-      while (elapsed < request.waitTimeSeconds * 1000) {
+      auto begin = std::chrono::system_clock::now();
+      while (elapsed < request.waitTimeSeconds) {
 
         _database->ReceiveMessages(queue.region, queue.queueUrl, queue.attributes.visibilityTimeout, request.maxMessages, messageList);
         log_trace_stream(_logger) << "Messages in database, url: " << queue.queueUrl << " count: " << messageList.size() << std::endl;
@@ -437,15 +436,10 @@ namespace AwsMock::Service {
           break;
         }
 
-        auto end = std::chrono::high_resolution_clock::now();
-        elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+        auto end = std::chrono::system_clock::now();
+        elapsed = std::chrono::duration_cast<std::chrono::seconds>(end - begin).count();
 
-        // Wait for timeout or condition
-        _mutex.lock();
-        if (_condition.tryWait(_mutex, 500)) {
-          return {};
-        }
-        _mutex.unlock();
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
       }
 
       Dto::SQS::ReceiveMessageResponse response;
