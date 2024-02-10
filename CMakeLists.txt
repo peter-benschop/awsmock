@@ -3,6 +3,7 @@ project(aws-mock)
 
 # required modules for our task
 set(CMAKE_CXX_STANDARD 20)
+set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dist/modules/modules)
 
 # Doxygen
@@ -28,8 +29,8 @@ enable_testing()
 add_subdirectory(src/core)
 add_subdirectory(src/dto)
 add_subdirectory(src/db)
-add_subdirectory(src/manager)
 add_subdirectory(src/service)
+add_subdirectory(src/manager)
 add_subdirectory(src/controller)
 add_subdirectory(docs)
 
