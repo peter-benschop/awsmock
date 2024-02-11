@@ -38,7 +38,7 @@ namespace AwsMock::Dto::SQS {
     messageAttributes["my_attribute_name_2"] = {.stringValue="my_attribute_value_2", .type=Dto::SQS::MessageAttributeDataType::STRING, .systemAttribute=false};
 
     // act
-    std::string result = MessageAttribute::GetMd5Attributes(messageAttributes, false);
+    std::string result = MessageAttribute::GetMd5Attributes(messageAttributes);
 
     // assert
     EXPECT_FALSE(result.empty());

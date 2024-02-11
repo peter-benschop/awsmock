@@ -42,8 +42,8 @@ namespace AwsMock::Dto::SQS {
         }
 
         // MD5 of message attributes
-        messageObject.set("MD5OfMessageAttributes", message.md5UserAttr);
-        messageObject.set("MD5OfMessageSystemAttributes", message.md5SystemAttr);
+        messageObject.set("MD5OfMessageAttributes", Dto::SQS::MessageAttribute::GetMd5Attributes(messageAttributeListDto));
+        //messageObject.set("MD5OfMessageSystemAttributes", message.md5SystemAttr);
 
         messageObject.set("MessageAttributes", attributeObject);
         messageArray.add(messageObject);

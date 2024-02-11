@@ -65,7 +65,7 @@ namespace AwsMock::Service {
 
     // act
     Core::ExecResult createResult = Core::TestUtils::SendCliCommand(
-      "aws dynamodb create-table --table-name test-table1 --attribute-definitions AttributeName=orgaNr,AttributeType=N --key-schema AttributeName=orgaNr,KeyType=HASH --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 --endpoint "
+      "aws dynamodb create-table --table-name test-table1 --attribute-definitions attributeName=orgaNr,AttributeType=N --key-schema attributeName=orgaNr,KeyType=HASH --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 --endpoint "
         + _endpoint);
     Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
 
@@ -78,7 +78,7 @@ namespace AwsMock::Service {
 
     // arrange
     Core::ExecResult createResult = Core::TestUtils::SendCliCommand(
-      "aws dynamodb create-table --table-name test-table2 --attribute-definitions AttributeName=orgaNr,AttributeType=N --key-schema AttributeName=orgaNr,KeyType=HASH --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 --endpoint "
+      "aws dynamodb create-table --table-name test-table2 --attribute-definitions attributeName=orgaNr,AttributeType=N --key-schema attributeName=orgaNr,KeyType=HASH --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 --endpoint "
         + _endpoint);
     Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
 

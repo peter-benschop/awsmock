@@ -81,7 +81,7 @@ namespace AwsMock::Dto::SQS {
     /**
      * MessageAttribute names
      */
-    std::vector<std::string> AttributeName = {"All"};
+    std::vector<std::string> attributeName = {"All"};
 
     /**
      * Resource

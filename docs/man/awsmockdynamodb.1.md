@@ -53,21 +53,21 @@ the corresponding man page ```awslocal(1)```.
 
 To create a new table:
 ```
-awslocal dynamodb create-table --table-name test-table --attribute-definitions AttributeName=orgaNr,AttributeType=N \
-                               --key-schema AttributeName=orgaNr,KeyType=HASH \
+awslocal dynamodb create-table --table-name test-table --attribute-definitions attributeName=orgaNr,AttributeType=N \
+                               --key-schema attributeName=orgaNr,KeyType=HASH \
                                --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1
 {
     "TableDescription": {
         "AttributeDefinitions": [
             {
-                "AttributeName": "orgaNr",
+                "attributeName": "orgaNr",
                 "AttributeType": "N"
             }
         ],
         "TableName": "test-table",
         "KeySchema": [
             {
-                "AttributeName": "orgaNr",
+                "attributeName": "orgaNr",
                 "KeyType": "HASH"
             }
         ],

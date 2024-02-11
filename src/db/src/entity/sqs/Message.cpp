@@ -53,7 +53,9 @@ namespace AwsMock::Database::Entity::SQS {
     md5Body = bsoncxx::string::to_string(mResult.value()["md5Body"].get_string().value);
     md5UserAttr = bsoncxx::string::to_string(mResult.value()["md5UserAttr"].get_string().value);
     md5SystemAttr = bsoncxx::string::to_string(mResult.value()["md5SystemAttr"].get_string().value);
-    reset = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["reset"].get_date().value) / 1000));
+    if(mResult.value()["reset"].type() != bsoncxx::type::k_null) {
+      reset = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["reset"].get_date().value) / 1000));
+    }
     created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
     modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
 
