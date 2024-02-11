@@ -6,7 +6,8 @@
 
 namespace AwsMock::Service {
 
-  DockerService::DockerService(const Core::Configuration &configuration) : _logger(Poco::Logger::get("DockerService")), _configuration(configuration), _networkMode(NETWORK_DEFAULT_MODE) {
+  DockerService::DockerService(const Core::Configuration &configuration)
+      : _logger(Poco::Logger::get("DockerService")), _configuration(configuration), _networkMode(NETWORK_DEFAULT_MODE) {
 
     // Get network mode
     _networkMode = _configuration.getString("awsmock.docker.network.mode", NETWORK_DEFAULT_MODE);
@@ -33,7 +34,8 @@ namespace AwsMock::Service {
 
   void DockerService::CreateImage(const std::string &name, const std::string &tag, const std::string &fromImage) {
 
-    Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketRequest("POST", "http://localhost/images/create?name=" + name + "&tag=" + tag + "&fromImage=" + fromImage);
+    Core::CurlResponse
+        curlResponse = _curlUtils.SendUnixSocketRequest("POST", "http://localhost/images/create?name=" + name + "&tag=" + tag + "&fromImage=" + fromImage);
     log_trace_stream(_logger) << "Create image request send to docker daemon, output: " << curlResponse.ToString() << std::endl;
 
     if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
@@ -42,7 +44,7 @@ namespace AwsMock::Service {
       log_debug_stream(_logger) << "Docker image created, name: " << name << ":" << tag << std::endl;
     }
     Dto::Docker::Image image = GetImageByName(name, tag);
-    while(GetImageByName(name, tag).size == 0) {
+    while (GetImageByName(name, tag).size == 0) {
       Poco::Thread::sleep(500);
     }
   }
@@ -71,7 +73,12 @@ namespace AwsMock::Service {
     return {};
   }
 
-  std::string DockerService::BuildImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) {
+  std::string DockerService::BuildImage(const std::string &codeDir,
+                                        const std::string &name,
+                                        const std::string &tag,
+                                        const std::string &handler,
+                                        const std::string &runtime,
+                                        const std::map<std::string, std::string> &environment) {
     log_debug_stream(_logger) << "Build image request, name: " << name << " tags: " << tag << " runtime: " << runtime << std::endl;
 
     std::string dockerFile = WriteDockerFile(codeDir, handler, runtime, environment);
@@ -89,15 +96,15 @@ namespace AwsMock::Service {
 
   std::string DockerService::BuildImage(const std::string &name, const std::string &tag, const std::string &dockerFile) {
     log_debug_stream(_logger) << "Build image request, name: " << name << " tags: " << tag << std::endl;
+//
+//    // Write docker file
+//    std::string codeDir = Core::DirUtils::CreateTempDir();
+//    std::string fileName = codeDir + Poco::Path::separator() + "Dockerfile";
+//    std::ofstream ofs(fileName);
+//    ofs << dockerFile;
+//    ofs.close();
 
-    // Write docker file
-    std::string codeDir = Core::DirUtils::CreateTempDir();
-    std::string fileName =codeDir + Poco::Path::separator() + "Dockerfile";
-    std::ofstream ofs(fileName);
-    ofs << dockerFile;
-    ofs.close();
-
-    Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketFileRequest("POST", "http://localhost/build?t=" + name + ":" + tag + "&q=true", {}, fileName);
+    Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketRequest("POST", "http://localhost/build?t=" + name + ":" + tag + "&q=true", dockerFile);
     log_debug_stream(_logger) << "Docker image build, image: " << name << ":" << tag << std::endl;
     log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 
@@ -181,18 +188,21 @@ namespace AwsMock::Service {
     return response.containerList[0];
   }
 
-  Dto::Docker::CreateContainerResponse DockerService::CreateContainer(const std::string &name, const std::string &tag, const std::vector<std::string> &environment, int hostPort) {
+  Dto::Docker::CreateContainerResponse DockerService::CreateContainer(const std::string &name,
+                                                                      const std::string &tag,
+                                                                      const std::vector<std::string> &environment,
+                                                                      int hostPort) {
 
     // Create the request
     Dto::Docker::CreateContainerRequest request = {
-      .hostName=name,
-      .domainName=name + _networkName,
-      .user="root",
-      .image=name + ":" + tag,
-      .networkMode=_networkMode,
-      .environment=environment,
-      .containerPort=_containerPort,
-      .hostPort=std::to_string(hostPort)
+        .hostName=name,
+        .domainName=name + _networkName,
+        .user="root",
+        .image=name + ":" + tag,
+        .networkMode=_networkMode,
+        .environment=environment,
+        .containerPort=_containerPort,
+        .hostPort=std::to_string(hostPort)
     };
 
     std::string jsonBody = request.ToJson();
@@ -215,13 +225,13 @@ namespace AwsMock::Service {
 
     // Create the request
     Dto::Docker::CreateContainerRequest request = {
-      .hostName=name,
-      .domainName=name + _networkName,
-      .user="root",
-      .image=name + ":" + tag,
-      .networkMode=_networkMode,
-      .containerPort=std::to_string(containerPort),
-      .hostPort=std::to_string(hostPort)
+        .hostName=name,
+        .domainName=name + _networkName,
+        .user="root",
+        .image=name + ":" + tag,
+        .networkMode=_networkMode,
+        .containerPort=std::to_string(containerPort),
+        .hostPort=std::to_string(hostPort)
     };
 
     std::string jsonBody = request.ToJson();
@@ -307,7 +317,10 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Prune containers, count: " << response.containersDeleted.size() << " spaceReclaimed: " << response.spaceReclaimed << std::endl;
   }
 
-  std::string DockerService::WriteDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) {
+  std::string DockerService::WriteDockerFile(const std::string &codeDir,
+                                             const std::string &handler,
+                                             const std::string &runtime,
+                                             const std::map<std::string, std::string> &environment) {
 
     std::string dockerFilename = codeDir + Poco::Path::separator() + "Dockerfile";
 

@@ -38,7 +38,7 @@
                              "VOLUME /tmp/dynamodbdata /home/dynamodblocal/data\n" \
                              "WORKDIR /home/dynamodblocal\n" \
                              "EXPOSE 8000 8000\n" \
-                             "ENTRYPOINT [\"java\", \"-Djava.library.path=./DynamoDBLocal_lib\", \"-jar\", \"DynamoDBLocal.jar\", \"-sharedDb\"]"
+                             "ENTRYPOINT [\"java\", \"-Djava.library.path=./DynamoDBLocal_lib\", \"-jar\", \"DynamoDBLocal.jar\", \"-sharedDb\"]\n"
 
 namespace AwsMock::Service {
 
