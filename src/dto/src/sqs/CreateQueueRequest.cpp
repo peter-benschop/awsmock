@@ -15,7 +15,7 @@ namespace AwsMock::Dto::SQS {
     try {
 
       // Attributes
-      Core::JsonUtils::GetJsonValueString("QueueName", rootObject, name);
+      Core::JsonUtils::GetJsonValueString("QueueName", rootObject, queueName);
 
     } catch (Poco::Exception &exc) {
       throw Core::ServiceException(exc.message(), 500);
@@ -29,7 +29,7 @@ namespace AwsMock::Dto::SQS {
   }
 
   std::ostream &operator<<(std::ostream &os, const CreateQueueRequest &r) {
-    os << "CreateQueueRequest={region='" << r.region << "', queueUrl='" << r.queueUrl << "', name='" << r.name << "', owner='" << r.owner << "', userAttributes=[";
+    os << "CreateQueueRequest={region='" << r.region << "', queueUrl='" << r.queueUrl << "', queueName='" << r.queueName << "', owner='" << r.owner << "', userAttributes=[";
     for (auto &attribute : r.attributes) {
       os << attribute.attributeName << "='" << attribute.attributeValue << "', ";
     }

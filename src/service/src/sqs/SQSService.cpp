@@ -19,9 +19,9 @@ namespace AwsMock::Service {
   Dto::SQS::CreateQueueResponse SQSService::CreateQueue(const Dto::SQS::CreateQueueRequest &request) {
 
     // Check existence. In case the queue exists already return the existing queue.
-    if (_database->QueueExists(request.region, request.name)) {
-      log_warning_stream(_logger) << "SQS queue '" + request.name + "' exists already" << std::endl;
-      Database::Entity::SQS::Queue queue = _database->GetQueueByName(request.region, request.name);
+    if (_database->QueueExists(request.region, request.queueName)) {
+      log_warning_stream(_logger) << "SQS queue '" + request.queueName + "' exists already" << std::endl;
+      Database::Entity::SQS::Queue queue = _database->GetQueueByName(request.region, request.queueName);
       log_debug_stream(_logger) << "Got queue: " << queue.queueUrl << std::endl;
       return {
           .region=queue.region,
@@ -34,7 +34,7 @@ namespace AwsMock::Service {
 
     try {
       // Get queue ARN
-      std::string queueArn = Core::AwsUtils::CreateSqsQueueArn(_configuration, request.name);
+      std::string queueArn = Core::AwsUtils::CreateSqsQueueArn(_configuration, request.queueName);
 
       Database::Entity::SQS::QueueAttribute attributes;
       for (auto &a : request.attributes) {
@@ -66,12 +66,12 @@ namespace AwsMock::Service {
           attributes.queueArn = a.attributeValue;
         }
       }
-      attributes.queueArn = Core::AwsUtils::CreateSqsQueueArn(_configuration, request.name);
+      attributes.queueArn = Core::AwsUtils::CreateSqsQueueArn(_configuration, request.queueName);
 
       // Update database
       Database::Entity::SQS::Queue queue = _database->CreateQueue({
                                                                       .region=request.region,
-                                                                      .name=request.name,
+                                                                      .name=request.queueName,
                                                                       .owner=request.owner,
                                                                       .queueUrl=request.queueUrl,
                                                                       .queueArn=queueArn,
@@ -134,13 +134,13 @@ namespace AwsMock::Service {
   }
 
   Dto::SQS::GetQueueUrlResponse SQSService::GetQueueUrl(const Dto::SQS::GetQueueUrlRequest &request) {
-    log_trace_stream(_logger) << "Get queue URL request, region: " << request.region << " name: " << request.queueName << std::endl;
+    log_trace_stream(_logger) << "Get queue URL request, region: " << request.region << " queueName: " << request.queueName << std::endl;
 
     try {
 
       // Get queue
       Database::Entity::SQS::Queue queue = _database->GetQueueByName(request.region, request.queueName);
-      log_info_stream(_logger) << "SQS get queue URL, region: " << request.region << " name: " << queue.queueUrl << std::endl;
+      log_info_stream(_logger) << "SQS get queue URL, region: " << request.region << " queueName: " << queue.queueUrl << std::endl;
       return {.queueUrl=queue.queueUrl};
 
     } catch (Poco::Exception &ex) {

@@ -375,7 +375,6 @@ namespace AwsMock::Service {
       os << payload;
     }
     os.flush();
-    os.clear();
   }
 
   void AbstractHandler::SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long contentLength, const HeaderMap &extraHeader) {

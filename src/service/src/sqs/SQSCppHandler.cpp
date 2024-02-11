@@ -42,7 +42,7 @@ namespace AwsMock::Service {
         std::map<std::string, std::string> tags = GetQueueTags(payload);
 
         Dto::SQS::CreateQueueRequest sqsRequest = {
-          .name=queueName,
+          .queueName=queueName,
           .queueUrl=queueUrl,
           .owner=user,
           .attributes=attributes,

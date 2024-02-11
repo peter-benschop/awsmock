@@ -39,7 +39,7 @@ namespace AwsMock::Service {
 
         Dto::SQS::CreateQueueRequest sqsRequest;
         sqsRequest.FromJson(payload);
-        sqsRequest.queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, sqsRequest.name);
+        sqsRequest.queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, sqsRequest.queueName);
         sqsRequest.region = region;
         sqsRequest.owner = user;
 
@@ -48,11 +48,12 @@ namespace AwsMock::Service {
 
       } else {
 
-        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
+        std::string queueName = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueName");
+        std::string queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, queueName);
         std::vector<Dto::SQS::QueueAttribute> attributes = GetQueueAttributes(payload);
         std::map<std::string, std::string> tags = GetQueueTags(payload);
 
-        Dto::SQS::CreateQueueRequest sqsRequest = {.region=region, .queueUrl=queueUrl, .owner=user, .attributes=attributes, .tags=tags, .requestId=requestId};
+        Dto::SQS::CreateQueueRequest sqsRequest = {.region=region, .queueName=queueName, .queueUrl=queueUrl, .owner=user, .attributes=attributes, .tags=tags, .requestId=requestId};
 
         Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
         SendOkResponse(response, sqsResponse.ToXml());
@@ -71,9 +72,12 @@ namespace AwsMock::Service {
 
       Dto::SQS::DeleteQueueRequest sqsRequest;
       if (userAgent.contentType == "json") {
+
         sqsRequest.FromJson(payload);
         sqsRequest.region = region;
+
       } else {
+
         std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
         sqsRequest = {.queueUrl=queueUrl};
         sqsRequest.region = region;
