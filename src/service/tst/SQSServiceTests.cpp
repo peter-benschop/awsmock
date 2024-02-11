@@ -49,7 +49,7 @@ namespace AwsMock::Service {
   TEST_F(SQSServiceTest, QueueCreateTest) {
 
     // arrange
-    Dto::SQS::CreateQueueRequest request = {.name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    Dto::SQS::CreateQueueRequest request = {.queueName=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
     request.region=REGION;
     request.requestId=Poco::UUIDGenerator().createRandom().toString();
 
@@ -64,7 +64,7 @@ namespace AwsMock::Service {
   TEST_F(SQSServiceTest, QueueListTest) {
 
     // arrange
-    Dto::SQS::CreateQueueRequest request = {.name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    Dto::SQS::CreateQueueRequest request = {.queueName=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
     request.region=REGION;
     request.requestId=Poco::UUIDGenerator().createRandom().toString();
     Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(request);
@@ -106,7 +106,7 @@ namespace AwsMock::Service {
   TEST_F(SQSServiceTest, QueueDeleteTest) {
 
     // arrange
-    Dto::SQS::CreateQueueRequest queueRequest = {.name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    Dto::SQS::CreateQueueRequest queueRequest = {.queueName=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
     queueRequest.region=REGION;
     queueRequest.requestId=Poco::UUIDGenerator().createRandom().toString();
     Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
@@ -124,7 +124,7 @@ namespace AwsMock::Service {
   TEST_F(SQSServiceTest, MessageCreateTest) {
 
     // arrange
-    Dto::SQS::CreateQueueRequest queueRequest = {.name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    Dto::SQS::CreateQueueRequest queueRequest = {.queueName=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
     queueRequest.region=REGION;
     queueRequest.requestId=Poco::UUIDGenerator().createRandom().toString();
 
@@ -146,7 +146,7 @@ namespace AwsMock::Service {
   TEST_F(SQSServiceTest, MessagesCreateTest) {
 
     // arrange
-    Dto::SQS::CreateQueueRequest queueRequest = {.name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    Dto::SQS::CreateQueueRequest queueRequest = {.queueName=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
     queueRequest.region=REGION;
     queueRequest.requestId=Poco::UUIDGenerator().createRandom().toString();
 
@@ -176,7 +176,7 @@ namespace AwsMock::Service {
   TEST_F(SQSServiceTest, MessageReceiveTest) {
 
     // arrange
-    Dto::SQS::CreateQueueRequest queueRequest = {.name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    Dto::SQS::CreateQueueRequest queueRequest = {.queueName=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
     queueRequest.region=REGION;
     queueRequest.requestId=Poco::UUIDGenerator().createRandom().toString();
     Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
@@ -196,7 +196,7 @@ namespace AwsMock::Service {
   TEST_F(SQSServiceTest, MessageDeleteTest) {
 
     // arrange
-    Dto::SQS::CreateQueueRequest queueRequest = {.name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    Dto::SQS::CreateQueueRequest queueRequest = {.queueName=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
     queueRequest.region=REGION;
     queueRequest.requestId=Poco::UUIDGenerator().createRandom().toString();
     Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);

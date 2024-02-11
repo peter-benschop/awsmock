@@ -41,7 +41,7 @@ namespace AwsMock::Service {
 
           Dto::SQS::CreateQueueRequest sqsRequest;
           sqsRequest.FromJson(payload);
-          sqsRequest.queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, sqsRequest.name);
+          sqsRequest.queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, sqsRequest.queueName);
           sqsRequest.region = region;
           sqsRequest.owner = user;
 

@@ -82,7 +82,7 @@ namespace AwsMock::Service {
     // arrange
     Dto::SNS::CreateTopicRequest topicRequest = {.region=REGION, .topicName=TOPIC, .owner=OWNER};
     Dto::SNS::CreateTopicResponse topicResponse = _snsService.CreateTopic(topicRequest);
-    Dto::SQS::CreateQueueRequest queueRequest = {.name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    Dto::SQS::CreateQueueRequest queueRequest = {.queueName=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
     queueRequest.region = REGION;
     queueRequest.requestId = Poco::UUIDGenerator().createRandom().toString();
     Dto::SQS::CreateQueueResponse queueResponse = _sqsService.CreateQueue(queueRequest);
@@ -102,7 +102,7 @@ namespace AwsMock::Service {
     // arrange
     Dto::SNS::CreateTopicRequest topicRequest = {.region=REGION, .topicName=TOPIC, .owner=OWNER};
     Dto::SNS::CreateTopicResponse topicResponse = _snsService.CreateTopic(topicRequest);
-    Dto::SQS::CreateQueueRequest queueRequest = {.name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    Dto::SQS::CreateQueueRequest queueRequest = {.queueName=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
     queueRequest.region = REGION;
     queueRequest.requestId = Poco::UUIDGenerator().createRandom().toString();
 
@@ -140,7 +140,7 @@ namespace AwsMock::Service {
     // arrange
     Dto::SNS::CreateTopicRequest topicRequest = {.region=REGION, .topicName=TOPIC, .owner=OWNER};
     Dto::SNS::CreateTopicResponse topicResponse = _snsService.CreateTopic(topicRequest);
-    Dto::SQS::CreateQueueRequest queueRequest = {.name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
+    Dto::SQS::CreateQueueRequest queueRequest = {.queueName=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
     queueRequest.region = REGION;
     queueRequest.requestId = Poco::UUIDGenerator().createRandom().toString();
     Dto::SQS::CreateQueueResponse queueResponse = _sqsService.CreateQueue(queueRequest);

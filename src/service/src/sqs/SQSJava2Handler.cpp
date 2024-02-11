@@ -44,7 +44,7 @@ namespace AwsMock::Service {
         if (userAgent.contentType == "json") {
 
           sqsRequest.FromJson(payload);
-          sqsRequest.queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, sqsRequest.name);
+          sqsRequest.queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, sqsRequest.queueName);
           sqsRequest.owner = user;
           log_debug_stream(_logger) << "SQS create queue request: " << sqsRequest.ToString() << std::endl;
 
@@ -57,7 +57,7 @@ namespace AwsMock::Service {
           std::string queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, queueName);
           std::vector<Dto::SQS::QueueAttribute> attributes = GetQueueAttributes(payload);
           std::map<std::string, std::string> tags = GetQueueTags(payload);
-          sqsRequest = {.region=region, .name=queueName, .queueUrl=queueUrl, .owner=user, .attributes=attributes, .tags=tags, .requestId=requestId};
+          sqsRequest = {.region=region, .queueName=queueName, .queueUrl=queueUrl, .owner=user, .attributes=attributes, .tags=tags, .requestId=requestId};
           log_debug_stream(_logger) << "SQS create queue request: " << sqsRequest.ToString() << std::endl;
 
           Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);

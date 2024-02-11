@@ -31,9 +31,9 @@ namespace AwsMock::Dto::SQS {
     std::string region;
 
     /**
-     * Name
+     * Queue name
      */
-    std::string name;
+    std::string queueName;
 
     /**
      * Queue URL

@@ -100,7 +100,7 @@ namespace AwsMock::Service {
       }
 
       _sqsDatabase->UpdateQueue(queue);
-      log_trace_stream(_logger) << "Queue updated, name" << queue.name << std::endl;
+      log_trace_stream(_logger) << "Queue updated, queueName" << queue.name << std::endl;
     }
   }
 } // namespace AwsMock::Worker

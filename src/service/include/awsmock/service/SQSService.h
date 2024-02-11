@@ -9,6 +9,7 @@
 #include <string>
 #include <chrono>
 #include <ctime>
+#include <thread>
 
 // Poco includes
 #include <Poco/Condition.h>
@@ -43,11 +44,6 @@
 #include <awsmock/repository/SQSDatabase.h>
 
 #define DEFAULT_ACCOUNT_ID "000000000000"
-#define INTEGER_SIZE_IN_BYTES 4
-#define STRING_TYPE_FIELD_INDEX '1'
-#define BINARY_TYPE_FIELD_INDEX '2'
-#define STRING_LIST_TYPE_FIELD_INDEX '3'
-#define BINARY_LIST_TYPE_FIELD_INDEX '4'
 
 namespace AwsMock::Service {
 
