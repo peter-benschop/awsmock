@@ -31,14 +31,14 @@ namespace AwsMock::Dto::DynamoDb {
    *     {
    *       "AttributeDefinitions": [
    *           {
-   *             "AttributeName":"orgaNr",
+   *             "attributeName":"orgaNr",
    *             "AttributeType":"N"
    *           }
    *       ],
    *       "TableName":"test-table",
    *       "KeySchema":[
    *         {
-   *           "AttributeName":"orgaNr",
+   *           "attributeName":"orgaNr",
    *           "KeyType":"HASH"
    *         }
    *       ],

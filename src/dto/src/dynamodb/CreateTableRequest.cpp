@@ -26,7 +26,7 @@ namespace AwsMock::Dto::DynamoDb {
       Poco::JSON::Array jsonAttributeArray;
       for (const auto &tag : attributes) {
         Poco::JSON::Object object;
-        object.set("AttributeName", tag.first);
+        object.set("attributeName", tag.first);
         object.set("AttributeType", tag.second);
         jsonAttributeArray.add(object);
       }
@@ -35,7 +35,7 @@ namespace AwsMock::Dto::DynamoDb {
       Poco::JSON::Array jsonKeySchemasArray;
       for (const auto &keySchema : keySchemas) {
         Poco::JSON::Object object;
-        object.set("AttributeName", keySchema.first);
+        object.set("attributeName", keySchema.first);
         object.set("KeyType", keySchema.second);
         jsonKeySchemasArray.add(object);
       }
@@ -82,7 +82,7 @@ namespace AwsMock::Dto::DynamoDb {
         for (size_t i = 0; i < jsonAttributeArray->size(); i++) {
           std::string name, type;
           Poco::JSON::Object::Ptr jsonAttributeObject = jsonAttributeArray->getObject(i);
-          Core::JsonUtils::GetJsonValueString("AttributeName", jsonAttributeObject, name);
+          Core::JsonUtils::GetJsonValueString("attributeName", jsonAttributeObject, name);
           Core::JsonUtils::GetJsonValueString("AttributeType", jsonAttributeObject, type);
           attributes[name] = type;
         }
@@ -94,7 +94,7 @@ namespace AwsMock::Dto::DynamoDb {
         for (size_t i = 0; i < jsonKeySchemasArray->size(); i++) {
           std::string attributeName, keyType;
           Poco::JSON::Object::Ptr jsonKeySchemaObject = jsonKeySchemasArray->getObject(i);
-          Core::JsonUtils::GetJsonValueString("AttributeName", jsonKeySchemaObject, attributeName);
+          Core::JsonUtils::GetJsonValueString("attributeName", jsonKeySchemaObject, attributeName);
           Core::JsonUtils::GetJsonValueString("KeyType", jsonKeySchemaObject, keyType);
           keySchemas[keyType] = attributeName;
         }

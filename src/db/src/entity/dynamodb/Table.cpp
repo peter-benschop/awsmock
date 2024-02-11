@@ -100,7 +100,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
     Poco::JSON::Array jsonAttributeArray;
     for (const auto &attribute : attributes) {
       Poco::JSON::Object object;
-      object.set("AttributeName", attribute.first);
+      object.set("attributeName", attribute.first);
       object.set("AttributeType", attribute.second);
       jsonAttributeArray.add(object);
     }

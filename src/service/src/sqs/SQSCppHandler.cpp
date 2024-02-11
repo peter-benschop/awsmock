@@ -303,7 +303,7 @@ namespace AwsMock::Service {
 
     std::vector<std::string> attributeNames;
     for (int i = 1; i <= count; i++) {
-      attributeNames.emplace_back(Core::HttpUtils::GetQueryParameterValueByName(payload, "AttributeName." + std::to_string(i)));
+      attributeNames.emplace_back(Core::HttpUtils::GetQueryParameterValueByName(payload, "attributeName." + std::to_string(i)));
     }
     return attributeNames;
   }

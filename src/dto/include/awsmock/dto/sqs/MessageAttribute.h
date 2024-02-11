@@ -58,7 +58,16 @@ namespace AwsMock::Dto::SQS {
      * @param systemAttribute system attribute flag, if true only system attributes are taken into account
      * @return MD5 sum of userAttributes string
      */
-    static std::string GetMd5Attributes(const std::map<std::string, MessageAttribute> &attributes, bool systemAttribute);
+    static std::string GetMd5SystemAttributes(const std::map<std::string, MessageAttribute> &attributes);
+
+    /**
+     * Returns the MD5 sum of all user attributes.
+     *
+     * @param attributes vector of user attributes
+     * @param systemAttribute system attribute flag, if true only system attributes are taken into account
+     * @return MD5 sum of userAttributes string
+     */
+    static std::string GetMd5Attributes(const std::map<std::string, MessageAttribute> &attributes);
 
     /**
      * Update the MD5 hash with a given value
