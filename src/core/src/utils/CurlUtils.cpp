@@ -54,7 +54,9 @@ namespace AwsMock::Core {
 
   CurlResponse CurlUtils::SendUnixSocketRequest(const std::string &method, const std::string &path, const std::string &body) {
 
-    _readBuffer = {};
+    if(!_readBuffer.empty()) {
+      _readBuffer = {};
+    }
     curl = curl_easy_init();
     if (!curl) {
       log_error_stream(_logger) << "Error while initiating curl" << std::endl;
@@ -81,11 +83,11 @@ namespace AwsMock::Core {
       log_error_stream(_logger) << "Request send failed, path: " << path << " error: " << curl_easy_strerror(res) << std::endl;
     }
 
-    int status = 0;
-    curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &status);
+    //int status = 0;
+    //curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &status);
 
-    CurlResponse response = {.statusCode=status, .statusReason=curl_easy_strerror(res)};
-    if (status == 200 && !_readBuffer.empty()) {
+    CurlResponse response = {.statusCode=res, .statusReason=curl_easy_strerror(res)};
+    if (res == CURLE_OK && !_readBuffer.empty()) {
       response.output = _readBuffer;
     }
     curl_easy_cleanup(curl);
@@ -145,7 +147,9 @@ namespace AwsMock::Core {
 
   CurlResponse CurlUtils::SendUnixSocketFileRequest(const std::string &method, const std::string &path, const std::string &header, const std::string &fileName) {
 
-    _readBuffer = {};
+    if(!_readBuffer.empty()) {
+      _readBuffer = {};
+    }
     curl = curl_easy_init();
     if (!curl) {
       log_error_stream(_logger) << "Error while initiating curl" << std::endl;
