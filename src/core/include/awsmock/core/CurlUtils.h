@@ -2,8 +2,8 @@
 // Created by vogje01 on 23/07/2023.
 //
 
-#ifndef AWSMOCK_CORE_CURLUTILS_H
-#define AWSMOCK_CORE_CURLUTILS_H
+#ifndef AWS_MOCK_CORE_CURLUTILS_H
+#define AWS_MOCK_CORE_CURLUTILS_H
 
 // C++ standard includes
 #include <string>

@@ -2,16 +2,14 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_CORE_JSONUTILSTEST_H
-#define AWMOCK_CORE_JSONUTILSTEST_H
+#ifndef AWMOCK_CORE_JSON_UTILS_TEST_H
+#define AWMOCK_CORE_JSON_UTILS_TEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
 
 // Poco includes
 #include "Poco/Path.h"
-#include "Poco/File.h"
 
 // Local includes
 #include <awsmock/core/JsonUtils.h>
@@ -20,15 +18,7 @@
 
 namespace AwsMock::Core {
 
-  class JsonUtilsTest : public ::testing::Test {
-
-  protected:
-    void SetUp() override {
-    }
-
-    void TearDown() override {
-    }
-  };
+  class JsonUtilsTest : public ::testing::Test {};
 
   TEST_F(JsonUtilsTest, BoolTest) {
 
@@ -139,4 +129,4 @@ namespace AwsMock::Core {
 
 } // namespace AwsMock::Core
 
-#endif // AWMOCK_CORE_JSONUTILSTEST_H
+#endif // AWMOCK_CORE_JSON_UTILS_TEST_H

@@ -69,29 +69,65 @@ namespace AwsMock::Service {
     }
   }
 
-  void AbstractHandler::handleGet([[maybe_unused]]Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
+  void AbstractHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
     log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user << std::endl;
+    DumpRequest(request);
+        handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
+    std::ostream &errorStream = response.send();
+    errorStream.flush();
+  }
+
+  void AbstractHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3ClientCommand) {
+    log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << s3ClientCommand.region << " user: " << s3ClientCommand.user << std::endl;
+    DumpRequest(request);
     handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
     std::ostream &errorStream = response.send();
     errorStream.flush();
   }
 
-  void AbstractHandler::handlePut([[maybe_unused]]Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
+  void AbstractHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
     log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user << std::endl;
+    DumpRequest(request);
     handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
     std::ostream &errorStream = response.send();
     errorStream.flush();
   }
 
-  void AbstractHandler::handlePost([[maybe_unused]]Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
-    log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user << std::endl;
+  void AbstractHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3ClientCommand) {
+    log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << s3ClientCommand.region << " user: " << s3ClientCommand.user << std::endl;
+    DumpRequest(request);
     handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
     std::ostream &errorStream = response.send();
     errorStream.flush();
   }
 
-  void AbstractHandler::handleDelete([[maybe_unused]]Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
+  void AbstractHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
     log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user << std::endl;
+    DumpRequest(request);
+    handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
+    std::ostream &errorStream = response.send();
+    errorStream.flush();
+  }
+
+  void AbstractHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3ClientCommand) {
+    log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << s3ClientCommand.region << " user: " << s3ClientCommand.user << std::endl;
+    DumpRequest(request);
+    handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
+    std::ostream &errorStream = response.send();
+    errorStream.flush();
+  }
+
+  void AbstractHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
+    log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user << std::endl;
+    DumpRequest(request);
+    handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
+    std::ostream &errorStream = response.send();
+    errorStream.flush();
+  }
+
+  void AbstractHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3ClientCommand) {
+    log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << s3ClientCommand.region << " user: " << s3ClientCommand.user << std::endl;
+    DumpRequest(request);
     handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
     std::ostream &errorStream = response.send();
     errorStream.flush();
@@ -188,35 +224,6 @@ namespace AwsMock::Service {
     default:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
       break;
     }
-  }
-
-  std::string AbstractHandler::GetQueryParameter(const std::string &parameterKey, bool optional) {
-
-    auto iterator = std::find_if(_queryStringParameters.begin(), _queryStringParameters.end(),
-                                 [&parameterKey](const std::pair<std::string, std::string> &item) {
-                                   return item.first == parameterKey;
-                                 }
-    );
-
-    if (iterator == _queryStringParameters.end()) {
-      if (optional) {
-        return {};
-      } else {
-        throw Core::ServiceException("MessageAttribute '" + parameterKey + "' is missing in URL.", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
-      }
-    }
-    return iterator->second;
-  }
-
-  bool AbstractHandler::QueryParameterExists(const std::string &parameterKey) {
-
-    auto iterator = std::find_if(_queryStringParameters.begin(), _queryStringParameters.end(),
-                                 [&parameterKey](const std::pair<std::string, std::string> &item) {
-                                   return item.first == parameterKey;
-                                 }
-    );
-
-    return iterator != _queryStringParameters.end();
   }
 
   std::string AbstractHandler::GetPathParameter(int pos) {

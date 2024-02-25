@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_CORE_DTO_S3_CREATE_BUCKET_REQUEST_H
-#define AWSMOCK_CORE_DTO_S3_CREATE_BUCKET_REQUEST_H
+#ifndef AWSMOCK_CORE_DTO_S3_COMPLETE_MULTIPART_UPLOAD_REQUEST_H
+#define AWSMOCK_CORE_DTO_S3_COMPLETE_MULTIPART_UPLOAD_REQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -17,7 +17,7 @@
 
 namespace AwsMock::Dto::S3 {
 
-  struct CreateBucketRequest {
+  struct CompleteMultipartUploadRequest {
 
     /**
      * Bucket location
@@ -27,12 +27,22 @@ namespace AwsMock::Dto::S3 {
     /**
      * Bucket name
      */
-    std::string bucketName;
+    std::string bucket;
 
     /**
      * Bucket owner
      */
-    std::string bucketOwner;
+    std::string key;
+
+    /**
+     * AWS user
+     */
+    std::string user;
+
+    /**
+     * AWS upload ID
+     */
+    std::string uploadId;
 
     /**
      * Convert from XML representation
@@ -53,10 +63,10 @@ namespace AwsMock::Dto::S3 {
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const CreateBucketRequest &r);
+    friend std::ostream &operator<<(std::ostream &os, const CompleteMultipartUploadRequest &r);
 
   };
 
 } // namespace AwsMock::Dto::s3
 
-#endif // AWSMOCK_CORE_DTO_S3_CREATE_BUCKET_REQUEST_H
+#endif // AWSMOCK_CORE_DTO_S3_COMPLETE_MULTIPART_UPLOAD_REQUEST_H

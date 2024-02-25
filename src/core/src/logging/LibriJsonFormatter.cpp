@@ -61,7 +61,7 @@ namespace AwsMock::Core {
   std::string JsonLogFormatter::priorityToString(Poco::Message::Priority p) {
     switch (p) {
     case Poco::Message::Priority::PRIO_FATAL:return PRIORITY_STR_FATAL;
-    case Poco::Message::Priority::PRIO_CRITICAL:return PRIORITY_STR_CRITIAL;
+    case Poco::Message::Priority::PRIO_CRITICAL:return PRIORITY_STR_CRITICAL;
     case Poco::Message::Priority::PRIO_ERROR:return PRIORITY_STR_ERROR;
     case Poco::Message::Priority::PRIO_WARNING:return PRIORITY_STR_WARNING;
     case Poco::Message::Priority::PRIO_NOTICE:return PRIORITY_STR_NOTICE;

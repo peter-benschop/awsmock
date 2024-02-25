@@ -210,4 +210,8 @@ namespace AwsMock::Core {
     }
     return ss.str();
   }
+
+  std::string StringUtils::ToString(bool value) {
+    return value ? "true" : "false";
+  }
 }

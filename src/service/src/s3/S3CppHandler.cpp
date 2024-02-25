@@ -245,7 +245,7 @@ namespace AwsMock::Service {
         std::string name = Core::DirUtils::RelativePath(request.getURI());
         std::string payload = Core::HttpUtils::GetBodyAsString(request);
         Dto::S3::CreateBucketRequest s3Request(payload);
-        Dto::S3::CreateBucketResponse s3Response = _s3Service.CreateBucket(name, user, s3Request);
+        Dto::S3::CreateBucketResponse s3Response = _s3Service.CreateBucket(s3Request);
 
         SendOkResponse(response, s3Response.ToXml());
 
@@ -272,7 +272,8 @@ namespace AwsMock::Service {
 
         log_debug_stream(_logger) << "Starting multipart upload" << std::endl;
 
-        Dto::S3::InitiateMultipartUploadResult result = _s3Service.CreateMultipartUpload(bucket, key, region, user);
+        Dto::S3::CreateMultipartUploadRequest s3Request = {.region=region, .bucket=bucket, .key=key, .user=user};
+        Dto::S3::CreateMultipartUploadResult result = _s3Service.CreateMultipartUpload(s3Request);
 
         SendOkResponse(response, result.ToXml());
 
@@ -291,7 +292,8 @@ namespace AwsMock::Service {
         std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "uploadId");
         log_debug_stream(_logger) << "Finish multipart upload request, uploadId: " << uploadId << std::endl;
 
-        Dto::S3::CompleteMultipartUploadResult result = _s3Service.CompleteMultipartUpload(uploadId, bucket, key, region, user);
+        Dto::S3::CompleteMultipartUploadRequest s3Request = {.region=region, .bucket=bucket, .key=key, .user=user};
+        Dto::S3::CompleteMultipartUploadResult result = _s3Service.CompleteMultipartUpload(s3Request);
         SendOkResponse(response, result.ToXml());
 
       }
@@ -312,7 +314,8 @@ namespace AwsMock::Service {
         _s3Service.DeleteObject({.region=region, .user=user, .bucket=bucket, .key=key});
         SendDeleteResponse(response);
       } else if (!bucket.empty()) {
-        _s3Service.DeleteBucket(region, bucket);
+        Dto::S3::DeleteBucketRequest s3Request =  {.region=region, .bucket=bucket};
+        _s3Service.DeleteBucket(s3Request);
         SendDeleteResponse(response);
       }
 

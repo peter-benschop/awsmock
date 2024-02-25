@@ -2,8 +2,8 @@
 // Created by vogje01 on 11/2/23.
 //
 
-#ifndef AWSMOCK_CORE_MEMORYMAPPEDFILE_H
-#define AWSMOCK_CORE_MEMORYMAPPEDFILE_H
+#ifndef AWS_MOCK_CORE_MEMORY_MAPPED_FILE_H
+#define AWS_MOCK_CORE_MEMORY_MAPPED_FILE_H
 
 // C includes
 #include <fcntl.h>
@@ -26,6 +26,11 @@
 
 namespace AwsMock::Core {
 
+  /**
+   * Memory mapped file utility.
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   class MemoryMappedFile {
 
   public:
@@ -66,7 +71,13 @@ namespace AwsMock::Core {
      */
     void ReadChunk(long start, long end, char *buffer);
 
-    bool IsMapped() { return _mapped; }
+    /**
+     * Returns true in case the file is mapped already.
+     *
+     * @return true, in case file is already mapped.
+     */
+    bool IsMapped() const { return _mapped; }
+
   private:
 
     /**
@@ -94,4 +105,4 @@ namespace AwsMock::Core {
 
 } // namespace AwsMock::Core
 
-#endif // AWSMOCK_CORE_MEMORYMAPPEDFILE_H
+#endif // AWS_MOCK_CORE_MEMORY_MAPPED_FILE_H

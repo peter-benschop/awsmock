@@ -2,8 +2,8 @@
 // Created by vogje01 on 09/09/2023.
 //
 
-#ifndef AWSMOCK_CORE_HTTPUTILS_H
-#define AWSMOCK_CORE_HTTPUTILS_H
+#ifndef AWS_MOCK_CORE_HTTP_UTILS_H
+#define AWS_MOCK_CORE_HTTP_UTILS_H
 
 // Standard C++ includes
 #include <string>
@@ -12,17 +12,23 @@
 #include <iostream>
 
 // Poco includes
-#include "Poco/RegularExpression.h"
-#include "Poco/StreamCopier.h"
-#include "Poco/Net/HTTPServerRequest.h"
+#include <Poco/RegularExpression.h>
+#include <Poco/StreamCopier.h>
+#include <Poco/Net/HTTPServerRequest.h>
 
 // AwsMock includes
-#include "awsmock/core/StringUtils.h"
-#include "awsmock/core/ServiceException.h"
+#include <awsmock/core/StringUtils.h>
+#include <awsmock/core/ServiceException.h>
 
 namespace AwsMock::Core {
 
+  /**
+   * HTTP utilities.
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   class HttpUtils {
+
   public:
 
     /**
@@ -166,6 +172,9 @@ namespace AwsMock::Core {
      * @return true if value is URL encoded
      */
     static bool IsUrlEncoded(const std::string &value);
+
   };
+
 } // namespace AwsMock::Core
-#endif // AWSMOCK_CORE_HTTPUTILS_H
+
+#endif // AWS_MOCK_CORE_HTTP_UTILS_H

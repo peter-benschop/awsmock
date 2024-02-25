@@ -4,7 +4,6 @@
 
 // C++ standard includes
 #include <string>
-#include <fstream>
 
 // GTest includes
 #include "gtest/gtest.h"

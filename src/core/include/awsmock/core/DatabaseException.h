@@ -2,15 +2,17 @@
 // Created by vogje01 on 02/09/2022.
 //
 
-#ifndef AWSMOCK_CORE_DATABASEEXCEPTION_H
-#define AWSMOCK_CORE_DATABASEEXCEPTION_H
+#ifndef AWS_MOCK_CORE_DATABASE_EXCEPTION_H
+#define AWS_MOCK_CORE_DATABASE_EXCEPTION_H
 
 #include "Poco/Exception.h"
 
 namespace AwsMock::Core {
 
   /**
-   * Database exception class. In case of a COM request failure a COMException is thrown.
+   * Database exception class.
+   *
+   * @author jens.vogt@opitz-consulting.com
    */
   class DatabaseException : public Poco::Exception {
   public:
@@ -87,4 +89,4 @@ namespace AwsMock::Core {
 
 } // namespace AwsMock::Core
 
-#endif //AWSMOCK_CORE_DATABASEEXCEPTION_H
+#endif //AWS_MOCK_CORE_DATABASE_EXCEPTION_H

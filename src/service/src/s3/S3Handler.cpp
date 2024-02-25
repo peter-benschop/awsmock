@@ -3,72 +3,45 @@
 
 namespace AwsMock::Service {
 
-  S3Handler::S3Handler(Core::Configuration &configuration, Core::MetricService &metricService) : S3CliHandler(configuration, metricService), S3CppHandler(configuration, metricService), S3Java2Handler(configuration, metricService),
-                                                                                                 _logger(Poco::Logger::get("S3Handler")), _configuration(configuration), _metricService(metricService), _s3Service(configuration) {
+  S3Handler::S3Handler(Core::Configuration &configuration, Core::MetricService &metricService) : S3CmdHandler(configuration, metricService), S3CliHandler(configuration, metricService), S3CppHandler(configuration, metricService),
+                                                                                                 S3Java2Handler(configuration, metricService), _logger(Poco::Logger::get("S3Handler")), _configuration(configuration), _metricService(metricService),
+                                                                                                 _s3Service(configuration) {
   }
 
   void S3Handler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
     log_debug_stream(_logger) << "S3 GET request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
 
-      Dto::Common::UserAgent userAgent;
-      userAgent.FromRequest(request, "s3");
-      //DumpRequest(request);
+    Dto::Common::S3ClientCommand clientCommand;
+    clientCommand.FromRequest(Dto::Common::HttpMethod::GET, request, region, user);
 
-      switch (userAgent.type) {
-      case Dto::Common::UserAgentType::AWS_SDK_CPP:return S3CppHandler::handleGet(request, response, region, user);
-      case Dto::Common::UserAgentType::AWS_SDK_JAVA1:break;
-      case Dto::Common::UserAgentType::AWS_SDK_JAVA2: return S3Java2Handler::handleGet(request, response, region, user);
-      case Dto::Common::UserAgentType::AWS_CLI:return S3CppHandler::handleGet(request, response, region, user);
-      case Dto::Common::UserAgentType::AWS_SDK_UNKNOWN:break;
-      }
+    S3CmdHandler::handleGet(request, response, clientCommand);
   }
 
   void S3Handler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
     log_debug_stream(_logger) << "S3 PUT request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
-    //DumpRequest(request);
-    Dto::Common::UserAgent userAgent;
-    userAgent.FromRequest(request, "s3");
+    Dto::Common::S3ClientCommand clientCommand;
+    clientCommand.FromRequest(Dto::Common::HttpMethod::PUT, request, region, user);
 
-    switch (userAgent.type) {
-    case Dto::Common::UserAgentType::AWS_SDK_CPP:return S3CppHandler::handlePut(request, response, region, user);
-    case Dto::Common::UserAgentType::AWS_SDK_JAVA1:break;
-    case Dto::Common::UserAgentType::AWS_SDK_JAVA2: return S3Java2Handler::handlePut(request, response, region, user);
-    case Dto::Common::UserAgentType::AWS_CLI:return S3CppHandler::handlePut(request, response, region, user);
-    case Dto::Common::UserAgentType::AWS_SDK_UNKNOWN:break;
-    }
+    S3CmdHandler::handlePut(request, response, clientCommand);
   }
 
   void S3Handler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
     log_debug_stream(_logger) << "S3 POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
-    //DumpRequest(request);
-    Dto::Common::UserAgent userAgent;
-    userAgent.FromRequest(request, "s3");
+    Dto::Common::S3ClientCommand clientCommand;
+    clientCommand.FromRequest(Dto::Common::HttpMethod::POST, request, region, user);
 
-    switch (userAgent.type) {
-    case Dto::Common::UserAgentType::AWS_SDK_CPP:return S3CppHandler::handlePost(request, response, region, user);
-    case Dto::Common::UserAgentType::AWS_SDK_JAVA1:break;
-    case Dto::Common::UserAgentType::AWS_SDK_JAVA2: return S3Java2Handler::handlePost(request, response, region, user);
-    case Dto::Common::UserAgentType::AWS_CLI:return S3CppHandler::handlePost(request, response, region, user);
-    case Dto::Common::UserAgentType::AWS_SDK_UNKNOWN:break;
-    }
+    S3CmdHandler::handlePost(request, response, clientCommand);
   }
 
   void S3Handler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
     log_debug_stream(_logger) << "S3 DELETE request, URI: " + request.getURI() << " region: " << region << " user: " << user << std::endl;
 
-    //DumpRequest(request);
-    Dto::Common::UserAgent userAgent;
-    userAgent.FromRequest(request, "s3");
+    Dto::Common::S3ClientCommand clientCommand;
+    clientCommand.FromRequest(Dto::Common::HttpMethod::DELETE, request, region, user);
 
-    switch (userAgent.type) {
-    case Dto::Common::UserAgentType::AWS_SDK_CPP:return S3CppHandler::handleDelete(request, response, region, user);
-    case Dto::Common::UserAgentType::AWS_SDK_JAVA1:break;
-    case Dto::Common::UserAgentType::AWS_SDK_JAVA2: return S3Java2Handler::handleDelete(request, response, region, user);
-    case Dto::Common::UserAgentType::AWS_CLI:return S3CppHandler::handleDelete(request, response, region, user);
-    case Dto::Common::UserAgentType::AWS_SDK_UNKNOWN:break;
-    }
+    S3CmdHandler::handleDelete(request, response, clientCommand);
   }
 
   void S3Handler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {

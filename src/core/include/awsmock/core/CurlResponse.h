@@ -2,8 +2,8 @@
 // Created by vogje01 on 05/09/2023.
 //
 
-#ifndef AWSMOCK_DTO_CURL_CURL_RESPONSE_H
-#define AWSMOCK_DTO_CURL_CURL_RESPONSE_H
+#ifndef AWS_MOCK_DTO_CURL_CURL_RESPONSE_H
+#define AWS_MOCK_DTO_CURL_CURL_RESPONSE_H
 
 // C++ includes
 #include <string>
@@ -11,6 +11,11 @@
 
 namespace AwsMock::Core {
 
+  /**
+   * Curl library response structure
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   struct CurlResponse {
 
     /**
@@ -53,4 +58,4 @@ namespace AwsMock::Core {
 
 } // namespace AwsMock::Dto::Curl
 
-#endif // AWSMOCK_DTO_CURL_CURL_RESPONSE_H
+#endif // AWS_MOCK_DTO_CURL_CURL_RESPONSE_H

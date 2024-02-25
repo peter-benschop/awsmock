@@ -260,8 +260,7 @@ namespace AwsMock::Database {
 
     if (HasDatabase()) {
 
-      auto delete_many_result =
-        _bucketCollection.delete_one(make_document(kvp("name", bucket.name)));
+      auto delete_many_result = _bucketCollection.delete_one(make_document(kvp("name", bucket.name)));
       log_debug_stream(_logger) << "Bucket deleted, count: " << delete_many_result->deleted_count() << std::endl;
 
     } else {

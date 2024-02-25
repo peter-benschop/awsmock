@@ -2,7 +2,8 @@
 set(LIBRARY awsmockdto)
 set(LIBRARY_STATIC awsmockdto_static)
 
-set(COMMON_SOURCES src/common/UserAgent.cpp src/common/Infrastructure.cpp src/common/Services.cpp)
+set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/common/Infrastructure.cpp
+        src/common/Services.cpp)
 set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp src/sqs/MessageAttribute.cpp
         src/sqs/SendMessageRequest.cpp src/sqs/SendMessageResponse.cpp src/sqs/ListQueueResponse.cpp
         src/sqs/GetQueueAttributesRequest.cpp src/sqs/GetQueueAttributesResponse.cpp src/sqs/TagQueueRequest.cpp
@@ -24,7 +25,8 @@ set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp sr
         src/s3/MoveObjectRequest.cpp src/s3/MoveObjectResponse.cpp src/s3/CreateBucketConstraint.cpp
         src/s3/UserIdentity.cpp src/s3/GetMetadataRequest.cpp src/s3/GetMetadataResponse.cpp
         src/s3/ListAllBucketResponse.cpp src/s3/ListBucketRequest.cpp src/s3/ListAllBucketResponse.cpp
-        src/s3/Owner.cpp src/s3/Content.cpp)
+        src/s3/DeleteBucketRequest.cpp src/s3/CreateMultipartUploadRequest.cpp src/s3/Owner.cpp src/s3/Content.cpp
+        src/s3/CreateMultipartUploadResult.cpp)
 set(DOCKER_SOURCES src/docker/Port.cpp src/docker/Container.cpp src/docker/ListContainerResponse.cpp
         src/docker/CreateContainerRequest.cpp src/docker/Filters.cpp)
 set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionResponse.cpp src/lambda/DeadLetterConfig.cpp

@@ -2,8 +2,8 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWSMOCK_CORE_CRYPTOTEST_H
-#define AWSMOCK_CORE_CRYPTOTEST_H
+#ifndef AWSMOCK_CORE_CRYPTO_UTILS_TEST_H
+#define AWSMOCK_CORE_CRYPTO_UTILS_TEST_H
 
 // GTest includes
 #include "gtest/gtest.h"
@@ -25,15 +25,7 @@
 #define SHA256_HMAC_SUM  "62025e1d8825e24f50410f8e9b8c40c319f622244baab30265de1d5ee8bf6a19"
 
 namespace AwsMock::Core {
-  class CryptoTest : public ::testing::Test {
-
-  protected:
-    void SetUp() override {
-    }
-
-    void TearDown() override {
-    }
-  };
+  class CryptoTest : public ::testing::Test {};
 
   TEST_F(CryptoTest, Md5StringTest) {
 
@@ -154,4 +146,4 @@ namespace AwsMock::Core {
 
 } // namespace AwsMock::Core
 
-#endif // AWSMOCK_CORE_CRYPTOTEST_H
+#endif // AWSMOCK_CORE_CRYPTO_UTILS_TEST_H

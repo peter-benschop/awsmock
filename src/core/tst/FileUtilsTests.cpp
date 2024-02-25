@@ -2,16 +2,14 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_CORE_FILEUTILSTEST_H
-#define AWMOCK_CORE_FILEUTILSTEST_H
+#ifndef AWMOCK_CORE_FILE_UTILS_TEST_H
+#define AWMOCK_CORE_FILE_UTILS_TEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
 
 // Poco includes
 #include "Poco/Path.h"
-#include "Poco/File.h"
 
 // Local includes
 #include <awsmock/core/DirUtils.h>
@@ -20,6 +18,7 @@
 #define FILE_SIZE (100*1024)
 
 namespace AwsMock::Core {
+
   class FileUtilsTest : public ::testing::Test {
 
   protected:
@@ -172,4 +171,4 @@ namespace AwsMock::Core {
 
 } // namespace AwsMOck::Core
 
-#endif // AWMOCK_CORE_FILEUTILSTEST_H
+#endif // AWMOCK_CORE_FILE_UTILS_TEST_H

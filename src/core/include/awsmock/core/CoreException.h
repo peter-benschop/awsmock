@@ -2,8 +2,8 @@
 // Created by vogje01 on 02/09/2022.
 //
 
-#ifndef AWSMOCK_CORE_COREEXCEPTION_H
-#define AWSMOCK_CORE_COREEXCEPTION_H
+#ifndef AWS_MOCK_CORE_CORE_EXCEPTION_H
+#define AWS_MOCK_CORE_CORE_EXCEPTION_H
 
 #include "Poco/Exception.h"
 
@@ -87,4 +87,4 @@ namespace AwsMock::Core {
 
 } // namespace AwsMock::Core
 
-#endif //AWSMOCK_CORE_COREEXCEPTION_H
+#endif //AWS_MOCK_CORE_CORE_EXCEPTION_H

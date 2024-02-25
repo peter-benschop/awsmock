@@ -6,10 +6,6 @@
 
 namespace AwsMock::Dto::S3 {
 
-  DeleteObjectsRequest::DeleteObjectsRequest(const std::string &xmlString) {
-    FromXml(xmlString);
-  }
-
   void DeleteObjectsRequest::FromXml(const std::string &xmlString) {
 
     Poco::XML::DOMParser parser;

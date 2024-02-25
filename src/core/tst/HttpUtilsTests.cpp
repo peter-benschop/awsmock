@@ -2,28 +2,18 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_CORE_HTTPUTILSTEST_H
-#define AWMOCK_CORE_HTTPUTILSTEST_H
+#ifndef AWMOCK_CORE_HTTP_UTILS_TEST_H
+#define AWMOCK_CORE_HTTP_UTILS_TEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
 
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
 
 namespace AwsMock::Core {
 
-  class HttpUtilsTest : public ::testing::Test {
-
-  protected:
-
-    void SetUp() override {
-    }
-
-    void TearDown() override {
-    }
-  };
+  class HttpUtilsTest : public ::testing::Test {};
 
   TEST_F(HttpUtilsTest, BasePathTest) {
 
@@ -253,4 +243,4 @@ namespace AwsMock::Core {
 
 } // namespace AwsMock::Core
 
-#endif // AWMOCK_CORE_HTTPUTILSTEST_H
+#endif // AWMOCK_CORE_HTTP_UTILS_TEST_H

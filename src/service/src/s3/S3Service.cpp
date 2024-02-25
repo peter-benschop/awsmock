@@ -34,20 +34,20 @@ namespace AwsMock::Service {
     Core::DirUtils::EnsureDirectory(_dataS3Dir);
   }
 
-  Dto::S3::CreateBucketResponse S3Service::CreateBucket(const std::string &name, const std::string &owner, const Dto::S3::CreateBucketRequest &s3Request) {
+  Dto::S3::CreateBucketResponse S3Service::CreateBucket(const Dto::S3::CreateBucketRequest &s3Request) {
     log_trace_stream(_logger) << "Create bucket request, s3Request: " << s3Request.ToString() << std::endl;
 
     // Get region
-    std::string region = s3Request._locationConstraint;
+    std::string region = s3Request.region;
 
     // Check existence
-    if (_database->BucketExists({.region=region, .name=name})) {
-      log_warning_stream(_logger) << "Bucket exists already, region: " << region << " name: " << name << std::endl;
-      Database::Entity::S3::Bucket bucket = _database->GetBucketByRegionName(region, name);
-      log_debug_stream(_logger) << "Got bucket: " << name << std::endl;
+    if (_database->BucketExists({.region=region, .name=s3Request.bucketName})) {
+      log_warning_stream(_logger) << "Bucket exists already, region: " << region << " name: " << s3Request.bucketName << std::endl;
+      Database::Entity::S3::Bucket bucket = _database->GetBucketByRegionName(region, s3Request.bucketName);
+      log_debug_stream(_logger) << "Got bucket: " << s3Request.bucketName << std::endl;
       return {
         .location=bucket.region,
-        .arn=Core::AwsUtils::CreateArn("s3", region, _accountId, name)
+        .arn=Core::AwsUtils::CreateArn("s3", region, _accountId, s3Request.bucketName)
       };
 //      throw Core::ServiceException("Bucket exists already", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
@@ -57,11 +57,11 @@ namespace AwsMock::Service {
     try {
 
       // Update database
-      _database->CreateBucket({.region=region, .name=name, .owner=owner});
+      _database->CreateBucket({.region=region, .name=s3Request.bucketName, .owner=s3Request.bucketOwner});
 
-      createBucketResponse = Dto::S3::CreateBucketResponse(region, Core::AwsUtils::CreateArn("s3", region, _accountId, name));
+      createBucketResponse = Dto::S3::CreateBucketResponse(region, Core::AwsUtils::CreateArn("s3", region, _accountId, s3Request.bucketName));
       log_trace_stream(_logger) << "S3 create bucket response: " << createBucketResponse.ToXml() << std::endl;
-      log_info_stream(_logger) << "Bucket created, bucket: " << name << std::endl;
+      log_info_stream(_logger) << "Bucket created, bucket: " << s3Request.bucketName << std::endl;
 
     } catch (Poco::Exception &exc) {
       log_error_stream(_logger) << "S3 create bucket failed, message: " << exc.message() << std::endl;
@@ -212,11 +212,11 @@ namespace AwsMock::Service {
     log_info_stream(_logger) << "Put bucket versioning, bucket: " << request.bucket << " state: " << request.status << std::endl;
   }
 
-  Dto::S3::InitiateMultipartUploadResult S3Service::CreateMultipartUpload(std::string &bucket, std::string &key, const std::string &region, const std::string &user) {
-    log_trace_stream(_logger) << "CreateMultipartUpload request, bucket: " + bucket << " key: " << key << " region: " << region << " user: " << user << std::endl;
+  Dto::S3::CreateMultipartUploadResult S3Service::CreateMultipartUpload(const Dto::S3::CreateMultipartUploadRequest &request) {
+    log_trace_stream(_logger) << "CreateMultipartUpload request, bucket: " + request.bucket << " key: " << request.key << " region: " << request.region << " user: " << request.user << std::endl;
 
     // Check existence
-    if (!_database->BucketExists({.region=region, .name=bucket})) {
+    if (!_database->BucketExists({.region=request.region, .name=request.bucket})) {
       throw Core::ServiceException("Bucket does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
@@ -226,8 +226,8 @@ namespace AwsMock::Service {
     std::string uploadDir = GetMultipartUploadDirectory(uploadId);
     Core::DirUtils::EnsureDirectory(uploadDir);
 
-    log_info_stream(_logger) << "Multipart upload started, bucket: " << bucket << " key: " << key << " uploadId: " << uploadId << std::endl;
-    return {.bucket=bucket, .key=key, .uploadId=uploadId};
+    log_info_stream(_logger) << "Multipart upload started, bucket: " << request.bucket << " key: " << request.key << " uploadId: " << uploadId << std::endl;
+    return {.region=request.region, .bucket=request.bucket, .key=request.key, .uploadId=uploadId};
   }
 
   std::string S3Service::UploadPart(std::istream &stream, int part, const std::string &uploadId) {
@@ -249,12 +249,12 @@ namespace AwsMock::Service {
     return eTag;
   }
 
-  Dto::S3::CompleteMultipartUploadResult S3Service::CompleteMultipartUpload(const std::string &uploadId, const std::string &bucket, const std::string &key, const std::string &region, const std::string &user) {
-    log_trace_stream(_logger) << "CompleteMultipartUpload request, uploadId: " << uploadId << " bucket: " << bucket << " key: " << key << " region: " << region << " user: " << user;
+  Dto::S3::CompleteMultipartUploadResult S3Service::CompleteMultipartUpload(const Dto::S3::CompleteMultipartUploadRequest &request) {
+    log_trace_stream(_logger) << "CompleteMultipartUpload request, uploadId: " << request.uploadId << " bucket: " << request.bucket << " key: " << request.key << " region: " << request.region << " user: " << request.user << std::endl;
 
     // Get all file parts
-    std::string uploadDir = GetMultipartUploadDirectory(uploadId);
-    std::vector<std::string> files = Core::DirUtils::ListFilesByPrefix(uploadDir, uploadId);
+    std::string uploadDir = GetMultipartUploadDirectory(request.uploadId);
+    std::vector<std::string> files = Core::DirUtils::ListFilesByPrefix(uploadDir, request.uploadId);
 
     // Output file
     std::string filename = Core::AwsUtils::CreateS3FileName();
@@ -274,15 +274,15 @@ namespace AwsMock::Service {
     std::string md5sum = Core::Crypto::GetMd5FromFile(outFile);
     std::string sha1sum = Core::Crypto::GetSha1FromFile(outFile);
     std::string sha256sum = Core::Crypto::GetSha256FromFile(outFile);
-    log_debug_stream(_logger) << "Metadata, bucket: " << bucket << " key: " << key << " md5: " << md5sum << " sha256: " << sha256sum << std::endl;
+    log_debug_stream(_logger) << "Metadata, bucket: " << request.bucket << " key: " << request.key << " md5: " << md5sum << " sha256: " << sha256sum << std::endl;
 
     // Create database object
     Database::Entity::S3::Object object = _database->CreateOrUpdateObject(
       {
-        .region=region,
-        .bucket=bucket,
-        .key=key,
-        .owner=user,
+        .region=request.region,
+        .bucket=request.bucket,
+        .key=request.key,
+        .owner=request.user,
         .size=fileSize,
         .md5sum=md5sum,
         .sha1sum=sha1sum,
@@ -294,13 +294,13 @@ namespace AwsMock::Service {
     Core::DirUtils::DeleteDirectory(uploadDir);
 
     // Check notifications
-    CheckNotifications(region, bucket, key, object.size, "s3:ObjectCreated:Put");
+    CheckNotifications(request.region, request.bucket, request.key, object.size, "s3:ObjectCreated:Put");
 
-    log_info_stream(_logger) << "Multipart upload finished, bucket: " << bucket << " key: " << key << std::endl;
+    log_info_stream(_logger) << "Multipart upload finished, bucket: " << request.bucket << " key: " << request.key << std::endl;
     return {
-      .location=region,
-      .bucket=bucket,
-      .key=key,
+      .location=request.region,
+      .bucket=request.bucket,
+      .key=request.key,
       .etag=md5sum,
       .md5sum=md5sum,
       .checksumSha1=sha1sum,
@@ -576,10 +576,10 @@ namespace AwsMock::Service {
     }
   }
 
-  void S3Service::DeleteBucket(const std::string &region, const std::string &name) {
-    log_trace_stream(_logger) << "Delete bucket request, name: " << name << std::endl;
+  void S3Service::DeleteBucket(const Dto::S3::DeleteBucketRequest &request) {
+    log_trace_stream(_logger) << "Delete bucket request, name: " << request.bucket << std::endl;
 
-    Database::Entity::S3::Bucket bucket = {.region=region, .name=name};
+    Database::Entity::S3::Bucket bucket = {.region=request.region, .name=request.bucket};
 
     // Check existence
     if (!_database->BucketExists(bucket)) {
@@ -592,14 +592,14 @@ namespace AwsMock::Service {
     }
 
     // Check transfer bucket
-    if (name == _transferBucket) {
+    if (request.bucket == _transferBucket) {
       throw Core::ServiceException("Transfer bucket cannot be deleted", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
     }
 
     try {
 
       // Delete directory
-      DeleteBucket(name);
+      DeleteBucket(request.bucket);
 
       // Delete bucket from database
       _database->DeleteBucket(bucket);
@@ -694,9 +694,9 @@ namespace AwsMock::Service {
     }
   }
 
-  void S3Service::DeleteBucket(const std::string &bucket) {
+  void S3Service::DeleteBucket(const std::string &name) {
 
-    std::string bucketDir = _dataS3Dir + Poco::Path::separator() + bucket;
+    std::string bucketDir = _dataS3Dir + Poco::Path::separator() + name;
     if (Core::DirUtils::DirectoryExists(bucketDir)) {
       Core::DirUtils::DeleteDirectory(bucketDir, true);
       log_debug_stream(_logger) << "Bucket directory deleted, bucketDir: " + bucketDir << std::endl;

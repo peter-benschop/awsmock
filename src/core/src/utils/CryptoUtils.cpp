@@ -14,9 +14,9 @@ namespace AwsMock::Core {
     unsigned int md_len;
     std::string output;
 
-    EVP_DigestInit_ex(context, md, nullptr);
-    EVP_DigestUpdate(context, content.c_str(), content.length());
-    EVP_DigestFinal_ex(context, md_value, &md_len);
+    EVP_DigestInit(context, md);
+    EVP_DigestUpdate(context, reinterpret_cast<const unsigned char*>(content.c_str()), content.length());
+    EVP_DigestFinal(context, md_value, &md_len);
     EVP_MD_CTX_free(context);
 
     output.resize(md_len * 2);

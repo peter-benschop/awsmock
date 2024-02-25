@@ -2,8 +2,8 @@
 // Created by vogje01 on 06/06/2023.
 //
 
-#ifndef AWSMOCK_CORE_AWSUTILS_H
-#define AWSMOCK_CORE_AWSUTILS_H
+#ifndef AWS_MOCK_CORE_AWS_UTILS_H
+#define AWS_MOCK_CORE_AWS_UTILS_H
 
 // C++ standard includes
 #include <string>
@@ -258,4 +258,4 @@ namespace AwsMock::Core {
 
 } // namespace AwsMock::Core
 
-#endif // AWSMOCK_CORE_AWSUTILS_H
+#endif // AWS_MOCK_CORE_AWS_UTILS_H

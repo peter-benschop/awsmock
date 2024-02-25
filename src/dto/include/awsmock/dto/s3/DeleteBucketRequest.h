@@ -1,0 +1,49 @@
+//
+// Created by vogje01 on 30/05/2023.
+//
+
+#ifndef AWSMOCK_CORE_DTO_DELETE_BUCKET_REQUEST_H
+#define AWSMOCK_CORE_DTO_DELETE_BUCKET_REQUEST_H
+
+// C++ standard includes
+#include <string>
+#include <sstream>
+
+namespace AwsMock::Dto::S3 {
+
+  struct DeleteBucketRequest {
+
+    /**
+     * Region
+     */
+    std::string region;
+
+    /**
+     * Region
+     */
+    std::string user;
+
+    /**
+     * Bucket
+     */
+    std::string bucket;
+
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
+
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &os, const DeleteBucketRequest &r);
+
+  };
+
+} // namespace AwsMock::Dto::S3
+
+#endif // AWSMOCK_CORE_DTO_DELETE_BUCKET_REQUEST_H

@@ -2,8 +2,8 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_CORE_S3SERVICE_TEST_H
-#define AWMOCK_CORE_S3SERVICE_TEST_H
+#ifndef AWMOCK_CORE_S3_SERVICE_TEST_H
+#define AWMOCK_CORE_S3_SERVICE_TEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
@@ -49,10 +49,10 @@ namespace AwsMock::Service {
   TEST_F(S3ServiceTest, BucketCreateTest) {
 
     // arrange
-    Dto::S3::CreateBucketRequest request = Dto::S3::CreateBucketRequest(LOCATION_CONSTRAINT);
+    Dto::S3::CreateBucketRequest request = {.region=LOCATION_CONSTRAINT, .bucketName=BUCKET, .bucketOwner=OWNER};
 
     // act
-    Dto::S3::CreateBucketResponse response = _service.CreateBucket(BUCKET, OWNER, request);
+    Dto::S3::CreateBucketResponse response = _service.CreateBucket(request);
 
     // assert
     EXPECT_TRUE(response.location == "eu-central-1");
@@ -61,11 +61,12 @@ namespace AwsMock::Service {
   TEST_F(S3ServiceTest, BucketDeleteTest) {
 
     // arrange
-    Dto::S3::CreateBucketRequest request = Dto::S3::CreateBucketRequest(LOCATION_CONSTRAINT);
-    Dto::S3::CreateBucketResponse response = _service.CreateBucket(BUCKET, OWNER, request);
+    Dto::S3::CreateBucketRequest request = {.region=LOCATION_CONSTRAINT, .bucketName=BUCKET, .bucketOwner=OWNER};
+    Dto::S3::CreateBucketResponse response = _service.CreateBucket(request);
 
     // act
-    _service.DeleteBucket(REGION, BUCKET);
+    Dto::S3::DeleteBucketRequest s3Request =  {.region=REGION, .bucket=BUCKET};
+    _service.DeleteBucket(s3Request);
     Dto::S3::ListAllBucketResponse result = _service.ListAllBuckets();
 
     // assert
@@ -75,8 +76,8 @@ namespace AwsMock::Service {
   TEST_F(S3ServiceTest, ObjectPutTest) {
 
     // arrange
-    Dto::S3::CreateBucketRequest request = Dto::S3::CreateBucketRequest(LOCATION_CONSTRAINT);
-    Dto::S3::CreateBucketResponse response = _service.CreateBucket(BUCKET, OWNER, request);
+    Dto::S3::CreateBucketRequest request = {.region=LOCATION_CONSTRAINT, .bucketName=BUCKET, .bucketOwner=OWNER};
+    Dto::S3::CreateBucketResponse response = _service.CreateBucket(request);
     std::ifstream ifs(testFile);
 
     // act
@@ -91,8 +92,8 @@ namespace AwsMock::Service {
   TEST_F(S3ServiceTest, ObjectDeleteTest) {
 
     // arrange
-    Dto::S3::CreateBucketRequest request = Dto::S3::CreateBucketRequest(LOCATION_CONSTRAINT);
-    Dto::S3::CreateBucketResponse response = _service.CreateBucket(BUCKET, OWNER, request);
+    Dto::S3::CreateBucketRequest request = {.region=LOCATION_CONSTRAINT, .bucketName=BUCKET, .bucketOwner=OWNER};
+    Dto::S3::CreateBucketResponse response = _service.CreateBucket(request);
     std::ifstream ifs(testFile);
     Dto::S3::PutObjectRequest putRequest = {.region=REGION, .bucket=BUCKET, .key=KEY};
     Dto::S3::PutObjectResponse putResponse = _service.PutObject(putRequest, ifs);
@@ -106,4 +107,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Core
 
-#endif // AWMOCK_CORE_S3SERVICE_TEST_H
+#endif // AWMOCK_CORE_S3_SERVICE_TEST_H

@@ -29,6 +29,7 @@
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/core/ResourceNotFoundException.h>
 #include <awsmock/dto/common/UserAgent.h>
+#include <awsmock/dto/common/S3ClientCommand.h>
 #include <awsmock/dto/s3/RestErrorResponse.h>
 #include <awsmock/dto/sqs/RestErrorResponse.h>
 
@@ -74,6 +75,15 @@ namespace AwsMock::Service {
     virtual void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user);
 
     /**
+     * Handles the HTTP method GET.
+     *
+     * @param request HTTP request
+     * @param response HTTP response
+     * @param s3Command S3 client command
+     */
+    virtual void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3Command);
+
+    /**
      * Handles the HTTP method PUT.
      *
      * @param request HTTP request
@@ -82,6 +92,15 @@ namespace AwsMock::Service {
      * @param user current user
      */
     virtual void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user);
+
+    /**
+     * Handles the HTTP method PUT.
+     *
+     * @param request HTTP request
+     * @param response HTTP response
+     * @param s3Command S3 client command
+     */
+    virtual void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3Command);
 
     /**
      * Handles the HTTP method POST.
@@ -94,6 +113,15 @@ namespace AwsMock::Service {
     virtual void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user);
 
     /**
+     * Handles the HTTP method POST.
+     *
+     * @param request HTTP request
+     * @param response HTTP response
+     * @param s3Command S3 client command
+     */
+    virtual void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3Command);
+
+    /**
      * Handles the HTTP method DELETE.
      *
      * @param request HTTP request
@@ -102,6 +130,15 @@ namespace AwsMock::Service {
      * @param user current user
      */
     virtual void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user);
+
+    /**
+     * Handles the HTTP method DELETE.
+     *
+     * @param request HTTP request
+     * @param response HTTP response
+     * @param s3Command S3 client command
+     */
+    virtual void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3Command);
 
     /**
      * Handles the HTTP OPTIONS method.
@@ -136,23 +173,6 @@ namespace AwsMock::Service {
      * @param reason state reason.
      */
     void handleHttpStatusCode(Poco::Net::HTTPServerResponse &response, int statusCode, const char *reason = nullptr);
-
-    /**
-     * CHecks whether a query parameter exists
-     *
-     * @param parameterKey parameter name.
-     * @return true if parameter exists, otherwise false
-     */
-    bool QueryParameterExists(const std::string &parameterKey);
-
-    /**
-     * Returns a query parameter by name.
-     *
-     * @param name parameter name.
-     * @param optional parameter is optional.
-     * @return  arameter value.
-     */
-    std::string GetQueryParameter(const std::string &name, bool optional = true);
 
     /**
      * Returns a path parameter by position.
@@ -361,7 +381,7 @@ namespace AwsMock::Service {
     void SendNoContentResponse(Poco::Net::HTTPServerResponse &response, const HeaderMap &extraHeader = {});
 
     /**
-     * CHecks whether the request has a header with the given key
+     * Checks whether the request has a header with the given key
      *
      * @param request HTTP request
      * @param name header key

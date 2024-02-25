@@ -30,30 +30,31 @@ namespace AwsMock::Service {
 
     protected:
 
-      void SetUp() override {
+    void SetUp() override {
 
-        // Define endpoint
-        std::string _port = _configuration.getString("awsmock.service.s3.port", std::to_string(S3_DEFAULT_PORT));
-        std::string _host = _configuration.getString("awsmock.service.s3.host", S3_DEFAULT_HOST);
-        _configuration.setString("awsmock.service.gateway.port", _port);
-        _accountId = _configuration.getString("awsmock.account.id", S3_ACCOUNT_ID);
-        _endpoint = "http://" + _host + ":" + _port;
+      // Define endpoint
+      std::string _port = _configuration.getString("awsmock.service.s3.port", std::to_string(S3_DEFAULT_PORT));
+      std::string _host = _configuration.getString("awsmock.service.s3.host", S3_DEFAULT_HOST);
+      _configuration.setString("awsmock.service.gateway.port", _port);
+      _accountId = _configuration.getString("awsmock.account.id", S3_ACCOUNT_ID);
+      _endpoint = "http://" + _host + ":" + _port;
+      _output = "json";
 
-        // Start HTTP manager
-        Poco::ThreadPool::defaultPool().start(_s3Server);
-      }
+      // Start HTTP manager
+      Poco::ThreadPool::defaultPool().start(_s3Server);
+    }
 
-      void TearDown() override {
-        _database.DeleteAllObjects();
-        _database.DeleteAllBuckets();
-        _s3Server.StopServer();
-      }
+    void TearDown() override {
+      _database.DeleteAllObjects();
+      _database.DeleteAllBuckets();
+      _s3Server.StopServer();
+    }
 
-      std::string _endpoint, _accountId;
-      Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
-      Core::MetricService _metricService = Core::MetricService(_configuration);
-      Database::S3Database _database = Database::S3Database(_configuration);
-      S3Server _s3Server = S3Server(_configuration, _metricService);
+    std::string _endpoint, _accountId, _output;
+    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
+    Core::MetricService _metricService = Core::MetricService(_configuration);
+    Database::S3Database _database = Database::S3Database(_configuration);
+    S3Server _s3Server = S3Server(_configuration, _metricService);
   };
 
   TEST_F(S3ServerCliTest, BucketCreateTest) {
@@ -61,7 +62,7 @@ namespace AwsMock::Service {
     // arrange
 
     // act
-    Core::ExecResult result = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
+    Core::ExecResult result = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint + " --output " + _output);
     EXPECT_EQ(0, result.status);
     Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
 
@@ -159,19 +160,47 @@ namespace AwsMock::Service {
 
     // arrange
     std::string filename = Core::FileUtils::CreateTempFile("json", 10);
+    std::string objectName = Core::StringUtils::Split(filename, '/')[2];
     Core::ExecResult createBucketResult = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
     EXPECT_EQ(0, createBucketResult.status);
-    Core::ExecResult createObjectResult = Core::TestUtils::SendCliCommand("aws s3 cp " + filename + " " + TEST_BUCKET + "/" + filename + " --endpoint " + _endpoint);
+    Core::ExecResult createObjectResult = Core::TestUtils::SendCliCommand("aws s3 cp " + filename + " " + TEST_BUCKET + "/" + objectName + " --endpoint " + _endpoint);
     EXPECT_EQ(0, createObjectResult.status);
 
     // act
-    Core::ExecResult copyResult = Core::TestUtils::SendCliCommand("aws s3 mv " + TEST_BUCKET + "/" + filename + " " + TEST_BUCKET + "/test/" + filename + " --endpoint " + _endpoint);
-    EXPECT_EQ(0, createObjectResult.status);
+    Core::ExecResult moveResult = Core::TestUtils::SendCliCommand("aws s3 mv " + TEST_BUCKET + "/" + objectName + " " + TEST_BUCKET + "/test/" + objectName + " --endpoint " + _endpoint);
+    EXPECT_EQ(0, moveResult.status);
     Database::Entity::S3::ObjectList objectList = _database.ListBucket(TEST_BUCKET_NAME);
 
     // assert
     EXPECT_EQ(1, objectList.size());
-    EXPECT_TRUE(objectList[0].key == "test/" + filename);
+    EXPECT_TRUE(objectList[0].key == "test/" + objectName);
+  }
+
+  TEST_F(S3ServerCliTest, ObjectMultipartUploadTest) {
+
+    // arrange: Create bucket
+    Core::ExecResult createBucketResult = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
+    EXPECT_EQ(0, createBucketResult.status);
+    Core::ExecResult createMultipartResult = Core::TestUtils::SendCliCommand("aws s3api create-multipart-upload --bucket test-bucket --key multipart-upload.json --endpoint " + _endpoint);
+    EXPECT_EQ(0, createMultipartResult.status);
+
+    // arrange: CreateMultipartUpload
+    Dto::S3::CreateMultipartUploadResult s3Result;
+    s3Result.FromJson(createMultipartResult.output);
+
+    // act
+    std::string filename = Core::FileUtils::CreateTempFile("json", 10 * 1024 * 1024);
+    Core::ExecResult uploadPartResult = Core::TestUtils::SendCliCommand("aws s3api upload-part --bucket test-bucket --key multipart-upload.json --part-number 1 --body " + filename + " --upload-id " + s3Result.uploadId + " --endpoint " + _endpoint);
+    EXPECT_EQ(0, uploadPartResult.status);
+
+    //aws s3api complete-multipart-upload --multipart-upload file://fileparts.json --bucket DOC-EXAMPLE-BUCKET --key large_test_file --upload-id exampleTUVGeKAk3Ob7qMynRKqe3ROcavPRwg92eA6JPD4ybIGRxJx9R0VbgkrnOVphZFK59KCYJAO1PXlrBSW7vcH7ANHZwTTf0ovqe6XPYHwsSp7eTRnXB1qjx40Tk
+    Core::ExecResult finishPartResult = Core::TestUtils::SendCliCommand("aws s3api complete-multipart-upload --bucket test-bucket --key multipart-upload.json --upload-id " + s3Result.uploadId + " --endpoint " + _endpoint);
+    EXPECT_EQ(0, finishPartResult.status);
+    Database::Entity::S3::ObjectList objectList = _database.ListBucket(TEST_BUCKET_NAME);
+
+    // assert
+    EXPECT_EQ(1, objectList.size());
+    EXPECT_TRUE(objectList[0].key == "multipart-upload.json");
   }
 
   TEST_F(S3ServerCliTest, ObjectDeleteTest) {
@@ -191,7 +220,6 @@ namespace AwsMock::Service {
     EXPECT_EQ(0, result.status);
     EXPECT_EQ(0, objectList.size());
   }
-
 } // namespace AwsMock::Service
 
 #endif // AWMOCK_SERVICE_S3_SERVER_CLI_TEST_H

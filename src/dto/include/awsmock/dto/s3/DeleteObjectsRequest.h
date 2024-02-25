@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_CORE_DTO_DELETEOBJECTSREQUEST_H
-#define AWSMOCK_CORE_DTO_DELETEOBJECTSREQUEST_H
+#ifndef AWSMOCK_CORE_DTO_DELETE_OBJECTS_REQUEST_H
+#define AWSMOCK_CORE_DTO_DELETE_OBJECTS_REQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -20,13 +20,6 @@
 namespace AwsMock::Dto::S3 {
 
   struct DeleteObjectsRequest {
-
-    /**
-     * Constructor.
-     *
-     * @param xmlString XML request structure
-     */
-    explicit DeleteObjectsRequest(const std::string &xmlString);
 
     /**
      * Region
@@ -68,4 +61,4 @@ namespace AwsMock::Dto::S3 {
 
 } // namespace AwsMock::Dto::S3
 
-#endif //AWSMOCK_CORE_DTO_DELETEOBJECTSREQUEST_H
+#endif // AWSMOCK_CORE_DTO_DELETE_OBJECTS_REQUEST_H

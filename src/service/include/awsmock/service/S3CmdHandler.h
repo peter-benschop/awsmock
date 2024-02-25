@@ -2,8 +2,8 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_S3HANDLER_H
-#define AWSMOCK_SERVICE_S3HANDLER_H
+#ifndef AWSMOCK_SERVICE_S3_CMD_HANDLER_H
+#define AWSMOCK_SERVICE_S3_CMD_HANDLER_H
 
 // Poco includes
 #include "Poco/DateTime.h"
@@ -21,10 +21,6 @@
 #include "awsmock/dto/common/S3ClientCommand.h"
 #include <awsmock/service/AbstractHandler.h>
 #include <awsmock/service/S3Service.h>
-#include <awsmock/service/S3CliHandler.h>
-#include <awsmock/service/S3CppHandler.h>
-#include <awsmock/service/S3Java2Handler.h>
-#include <awsmock/service/S3CmdHandler.h>
 
 namespace AwsMock::Service {
 
@@ -48,7 +44,7 @@ namespace AwsMock::Service {
    * </ul>
    * <p>
    */
-  class S3Handler : public S3CliHandler, public S3CppHandler, public S3Java2Handler, public S3CmdHandler {
+  class S3CmdHandler : public virtual AbstractHandler {
 
   public:
 
@@ -58,7 +54,7 @@ namespace AwsMock::Service {
      * @param configuration application configuration
      * @param metricService monitoring module
      */
-    S3Handler(Core::Configuration &configuration, Core::MetricService &metricService);
+    S3CmdHandler(Core::Configuration &configuration, Core::MetricService &metricService);
 
   protected:
 
@@ -67,44 +63,40 @@ namespace AwsMock::Service {
      *
      * @param request HTTP request
      * @param response HTTP response
-     * @param region AWS region name
-     * @param user AWS user
+     * @param s3Command S3 client command
      * @see AbstractResource::handleGet(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
      */
-    void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+    void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3Command) override;
 
     /**
      * HTTP PUT request.
      *
      * @param request HTTP request
      * @param response HTTP response
-     * @param region AWS region name
-     * @param user AWS user
+     * @param s3Command S3 client command
      * @see AbstractResource::handlePut(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
      */
-    void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+    void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3Command) override;
 
     /**
      * HTTP POST request.
      *
      * @param request HTTP request
      * @param response HTTP response
-     * @param region AWS region name
-     * @param user AWS user
+     * @param s3Command S3 client command
      * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
      */
-    void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+    void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3Command) override;
 
     /**
      * Delete DELETE request.
      *
      * @param request HTTP request
      * @param response HTTP response
-     * @param region AWS region name
-     * @param user AWS user
+     * @param s3Command S3 client command
      * @see AbstractResource::handleDelete(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
      */
-    void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+    void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3Command) override;
 
     /**
      * Options request.
@@ -151,4 +143,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_S3HANDLER_H
+#endif // AWSMOCK_SERVICE_S3_CMD_HANDLER_H

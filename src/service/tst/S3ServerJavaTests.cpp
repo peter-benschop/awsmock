@@ -26,7 +26,7 @@ namespace AwsMock::Service {
 
   class S3ServerJavaTest : public ::testing::Test {
 
-  protected:
+    protected:
 
     void SetUp() override {
 
@@ -107,15 +107,15 @@ namespace AwsMock::Service {
   TEST_F(S3ServerJavaTest, ObjectPutTest) {
 
     // arrange
-    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " s3 create-bucket test-bucket");
+    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " s3 create-bucket " + BUCKET);
     EXPECT_EQ(0, createResult.status);
 
     // act
-    Core::ExecResult putResult = Core::SystemUtils::Exec(_baseCommand + " s3 put-object test-bucket test-key \"test-object\"");
+    Core::ExecResult putResult = Core::SystemUtils::Exec(_baseCommand + " s3 put-object " + BUCKET + " test-key \"test-object\"");
+    EXPECT_EQ(0, putResult.status);
     Database::Entity::S3::ObjectList objectList = _database.ListBucket(BUCKET);
 
     // assert
-    EXPECT_EQ(0, putResult.status);
     EXPECT_EQ(1, objectList.size());
   }
 

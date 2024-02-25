@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_S3SERVICE_H
-#define AWSMOCK_SERVICE_S3SERVICE_H
+#ifndef AWSMOCK_SERVICE_S3_SERVICE_H
+#define AWSMOCK_SERVICE_S3_SERVICE_H
 
 // C++ standard includes
 #include <string>
@@ -19,10 +19,13 @@
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/dto/s3/CompleteMultipartUploadResult.h>
-#include <awsmock/dto/s3/CreateBucketRequest.h>
-#include <awsmock/dto/s3/CreateBucketResponse.h>
 #include <awsmock/dto/s3/CopyObjectRequest.h>
 #include <awsmock/dto/s3/CopyObjectResponse.h>
+#include <awsmock/dto/s3/CompleteMultipartUploadRequest.h>
+#include <awsmock/dto/s3/CreateBucketRequest.h>
+#include <awsmock/dto/s3/CreateBucketResponse.h>
+#include <awsmock/dto/s3/CreateMultipartUploadRequest.h>
+#include <awsmock/dto/s3/DeleteBucketRequest.h>
 #include <awsmock/dto/s3/DeleteObjectRequest.h>
 #include <awsmock/dto/s3/DeleteObjectsRequest.h>
 #include <awsmock/dto/s3/DeleteObjectsResponse.h>
@@ -31,7 +34,7 @@
 #include <awsmock/dto/s3/GetMetadataResponse.h>
 #include <awsmock/dto/s3/GetObjectRequest.h>
 #include <awsmock/dto/s3/GetObjectResponse.h>
-#include <awsmock/dto/s3/InitiateMultipartUploadResult.h>
+#include <awsmock/dto/s3/CreateMultipartUploadResult.h>
 #include <awsmock/dto/s3/ListBucketRequest.h>
 #include <awsmock/dto/s3/ListBucketResponse.h>
 #include <awsmock/dto/s3/ListAllBucketResponse.h>
@@ -74,12 +77,10 @@ namespace AwsMock::Service {
     /**
      * Creates a new bucket
      *
-     * @param name name of the bucket
-     * @param owner owner of the bucket
      * @param s3Request S3 create request
      * @return CreateBucketResponse
      */
-    Dto::S3::CreateBucketResponse CreateBucket(const std::string &name, const std::string &owner, const Dto::S3::CreateBucketRequest &s3Request);
+    Dto::S3::CreateBucketResponse CreateBucket(const Dto::S3::CreateBucketRequest &s3Request);
 
     /**
      * Lists all buckets
@@ -110,9 +111,9 @@ namespace AwsMock::Service {
      * @param key object key
      * @param region AWS region
      * @param user AWS user
-     * @return Dto::S3::InitiateMultipartUploadResult
+     * @return Dto::S3::CreateMultipartUploadResult
      */
-    Dto::S3::InitiateMultipartUploadResult CreateMultipartUpload(std::string &bucket, std::string &key, const std::string &region, const std::string &user);
+    Dto::S3::CreateMultipartUploadResult CreateMultipartUpload(const Dto::S3::CreateMultipartUploadRequest &request);
 
     /**
      * Upload a partial file
@@ -127,14 +128,10 @@ namespace AwsMock::Service {
     /**
      * Completes a multipart upload.
      *
-     * @param uploadId upload ID
-     * @param bucket bucket name
-     * @param key object key
-     * @param region AWS region
-     * @param user AWS user
-     * @return Dto::S3::InitiateMultipartUploadResult
+     * @param request multipart upload request
+     * @return Dto::S3::CreateMultipartUploadResult
      */
-    Dto::S3::CompleteMultipartUploadResult CompleteMultipartUpload(const std::string &uploadId, const std::string &bucket, const std::string &key, const std::string &region, const std::string &user);
+    Dto::S3::CompleteMultipartUploadResult CompleteMultipartUpload(const Dto::S3::CompleteMultipartUploadRequest &request);
 
     /**
      * Get object
@@ -194,10 +191,9 @@ namespace AwsMock::Service {
     /**
      * Delete a bucket
      *
-     * @param region AWS region name
-     * @param name name of the bucket
+     * @param request bucket delete request.
      */
-    void DeleteBucket(const std::string &region, const std::string &name);
+    void DeleteBucket(const Dto::S3::DeleteBucketRequest &request);
 
   private:
 
@@ -395,4 +391,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_S3SERVICE_H
+#endif // AWSMOCK_SERVICE_S3_SERVICE_H

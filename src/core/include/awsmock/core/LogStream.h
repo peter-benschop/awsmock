@@ -2,8 +2,8 @@
 // Created by vogje01 on 20/06/2023.
 //
 
-#ifndef AWSMOCK_CORE_LOGSTREAM_H
-#define AWSMOCK_CORE_LOGSTREAM_H
+#ifndef AWS_MOCK_CORE_LOG_STREAM_H
+#define AWS_MOCK_CORE_LOG_STREAM_H
 
 // C++ standard includes
 #include <istream>
@@ -26,12 +26,9 @@
 namespace AwsMock::Core {
 
   class LogStreamBuf : public Poco::UnbufferedStreamBuf
-    /// This class implements a streambuf interface
-    /// to a Logger.
+    /// This class implements a streambuf interface to a Logger.
     ///
-    /// The streambuf appends all characters written to it
-    /// to a string. As soon as a CR or LF (std::endl) is written,
-    /// the string is sent to the Logger, with the set
+    /// The streambuf appends all characters written to it to a string. As soon as a CR or LF (std::endl) is written, the string is sent to the Logger, with the set
     /// priority.
   {
   public:
@@ -59,7 +56,7 @@ namespace AwsMock::Core {
     [[nodiscard]] Poco::Logger &logger() const;
     /// Returns a reference to the Logger.
 
-    [[nodiscard]] std::size_t capacity() const;
+    [[maybe_unused]] [[nodiscard]] std::size_t capacity() const;
     /// Returns the internal message buffer capacity.
 
     void reserve(std::size_t capacity);
@@ -232,7 +229,7 @@ namespace AwsMock::Core {
   //
   // inlines
   //
-  inline std::size_t LogStreamBuf::capacity() const {
+  [[maybe_unused]] inline std::size_t LogStreamBuf::capacity() const {
     return _message.capacity();
   }
 
@@ -263,4 +260,4 @@ namespace AwsMock::Core {
 #define log_trace_stream(logger) \
     if ((logger).trace()) (logger).trace( __FILE__, __LINE__)
 
-#endif // AWSMOCK_CORE_LOGSTREAM_H
+#endif // AWS_MOCK_CORE_LOG_STREAM_H

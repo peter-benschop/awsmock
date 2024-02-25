@@ -25,7 +25,7 @@ namespace AwsMock::Controller {
     log_debug_stream(_logger) << "Schema: " << scheme << " Authorization: " << authInfo << "URI: " << request.getURI() << " Method: " + request.getMethod() << std::endl;
 
     // Get the module from the request authorization header. Currently, no credentials checks are made.
-    std::string service = GetService(authInfo);
+    std::string service = GetModule(authInfo);
 
     return GetResource(service, request.getURI());
   }
@@ -57,7 +57,7 @@ namespace AwsMock::Controller {
     _routingTable[route] = factory;
   }
 
-  std::string Router::GetService(const std::string &authorization) {
+  std::string Router::GetModule(const std::string &authorization) {
 
     Poco::RegularExpression::MatchVec posVec;
     Poco::RegularExpression pattern(R"(Credential=[a-zA-Z0-9]+\/[0-9]{8}\/[a-zA-Z0-9\-]+\/([a-zA-Z0-9]+)\/aws4_request,.*$)");
@@ -66,9 +66,9 @@ namespace AwsMock::Controller {
       throw Core::ResourceNotFoundException("Could not extract module");
     }
 
-    std::string service = authorization.substr(posVec[1].offset, posVec[1].length);
-    log_debug_stream(_logger) << "Found module: " << service << std::endl;
+    std::string module = authorization.substr(posVec[1].offset, posVec[1].length);
+    log_debug_stream(_logger) << "Found module: " << module << std::endl;
 
-    return service;
+    return module;
   }
 } // namespace AwsMock::Controller
