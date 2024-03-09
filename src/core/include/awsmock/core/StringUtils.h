@@ -286,7 +286,7 @@ namespace AwsMock::Core {
      * @param input input byte array
      * @return hex encoded string
      */
-    static std::string SanitizeUtf8(const std::string &input);
+    static std::string SanitizeUtf8(std::string &input);
 
     /**
      * Converts a bool variable to a string.

@@ -33,14 +33,14 @@ namespace AwsMock::Database {
     _password = _configuration.getString("awsmock.mongodb.password", "admin");
 
     // MongoDB URI
-    _uri = mongocxx::uri("mongodb://" + _user + ":" + _password + "@" + _host + ":" + std::to_string(_port) + "/?maxPoolSize=32");
+    _uri = mongocxx::uri("mongodb://" + _user + ":" + _password + "@" + _host + ":" + std::to_string(_port) + "/?maxPoolSize=256");
     log_trace_stream(_logger) << "Database URI: " << _uri.to_string() << std::endl;
 
+    //mongocxx::pool pool{_uri};
     _client = mongocxx::client{_uri};
 
     // Update module database
-    _client[_name]["module"].update_one(make_document(kvp("name", "database")), make_document(kvp("$set", make_document(kvp("state", "RUNNING")))));
-
+    UpdateModuleStatus();
     log_debug_stream(_logger) << "MongoDB connection initialized" << std::endl;
   }
 
@@ -89,6 +89,13 @@ namespace AwsMock::Database {
       GetConnection()["module"].create_index(make_document(kvp("name", 1), kvp("state", 1)), make_document(kvp("name", "module_name_status_idx1")));
       log_debug_stream(_logger) << "SQS indexes created" << std::endl;
     }
+  }
+
+  void Database::UpdateModuleStatus() {
+    auto session = GetSession();
+    session.start_transaction();
+    _client[_name]["module"].update_one(make_document(kvp("name", "database")), make_document(kvp("$set", make_document(kvp("state", "RUNNING")))));
+    session.commit_transaction();
   }
 
 } // namespace AwsMock::Database

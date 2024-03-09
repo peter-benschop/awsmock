@@ -39,6 +39,7 @@ namespace AwsMock::Dto::SQS {
     }
     EVP_DigestFinal(context, md_value, &md_len);
     EVP_MD_CTX_free(context);
+    delete[] bytes;
 
     std::string output;
     output.resize(md_len * 2);
@@ -76,6 +77,7 @@ namespace AwsMock::Dto::SQS {
     }
     EVP_DigestFinal(context, md_value, &md_len);
     EVP_MD_CTX_free(context);
+    delete[] bytes;
 
     std::string output;
     output.resize(md_len * 2);

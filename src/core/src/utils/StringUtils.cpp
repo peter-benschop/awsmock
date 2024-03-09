@@ -184,7 +184,7 @@ namespace AwsMock::Core {
     return escaped.str();
   }
 
-  std::string StringUtils::SanitizeUtf8(const std::string &input) {
+  std::string StringUtils::SanitizeUtf8(std::string &input) {
     size_t inbytes_len = input.length();
     char *inbuf = const_cast<char *>(input.c_str());
 
@@ -200,7 +200,9 @@ namespace AwsMock::Core {
       perror("iconv");
     }
     iconv_close(cd);
-    return {result};
+    input.assign(result);
+    delete result;
+    return input;
   }
 
   std::string StringUtils::ToHexString(unsigned char *input, size_t length) {

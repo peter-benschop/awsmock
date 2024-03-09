@@ -185,6 +185,9 @@ namespace AwsMock::Service {
 
           } else {
 
+            //DumpRequest(request);
+            std::string checksumAlgorithm = GetHeaderValue(request, "x-amz-sdk-checksum-algorithm", "empty");
+
             // S3 put object request
             Dto::S3::PutObjectRequest putObjectRequest = {
               .region=s3ClientCommand.region,
@@ -194,6 +197,7 @@ namespace AwsMock::Service {
               .md5Sum=GetHeaderValue(request, "Content-MD5", ""),
               .contentType=GetHeaderValue(request, "Content-Type", "application/octet-stream"),
               .contentLength=std::stol(GetHeaderValue(request, "Content-Length", "0")),
+              .checksumAlgorithm=checksumAlgorithm,
               .metadata=metadata
             };
             log_debug_stream(_logger) << "ContentLength: " << putObjectRequest.contentLength << " contentType: " << putObjectRequest.contentType << std::endl;
@@ -203,13 +207,18 @@ namespace AwsMock::Service {
             HeaderMap headerMap;
             headerMap["Content-MD5"] = putObjectResponse.md5Sum;
             headerMap["ETag"] = "\"" + putObjectResponse.etag + "\"";
-            headerMap["x-amz-sdk-checksum-algorithm"] = putObjectResponse.checksumAlgorithm;
-            headerMap["x-amz-checksum-sha256"] = putObjectResponse.checksumSha256;
+            if (!putObjectResponse.checksumSha1.empty()) {
+              headerMap["x-amz-checksum-sha1"] = putObjectResponse.checksumSha1;
+            }
+            if (!putObjectResponse.checksumSha256.empty()) {
+              headerMap["x-amz-checksum-sha256"] = putObjectResponse.checksumSha256;
+            }
             if (!putObjectResponse.versionId.empty()) {
               headerMap["x-amz-version-id"] = putObjectResponse.versionId;
             }
             log_debug_stream(_logger) << " size: " << putObjectResponse.contentLength << std::endl;
 
+            //SendContinueResponse(response);
             SendOkResponse(response, {}, headerMap);
           }
           break;
@@ -413,7 +422,7 @@ namespace AwsMock::Service {
           break;
         }
 
-          // Should not happen
+        // Should not happen
         case Dto::Common::CommandType::CREATE_BUCKET:
         case Dto::Common::CommandType::PUT_OBJECT:
         case Dto::Common::CommandType::GET_OBJECT:
@@ -426,7 +435,7 @@ namespace AwsMock::Service {
         case Dto::Common::CommandType::COMPLETE_MULTIPART_UPLOAD:
         case Dto::Common::CommandType::UNKNOWN: {
           log_error_stream(_logger) << "Bad request, method: DELETE clientCommand: " << Dto::Common::CommandTypeToString(s3ClientCommand.command) << std::endl;
-          throw Core::ServiceException("Bad request, method: DELETE clientCommand: " + Dto::Common::CommandTypeToString(s3ClientCommand.command));
+        //  throw Core::ServiceException("Bad request, method: DELETE clientCommand: " + Dto::Common::CommandTypeToString(s3ClientCommand.command));
         }
       }
 

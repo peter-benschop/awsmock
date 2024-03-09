@@ -21,10 +21,12 @@ namespace AwsMock::Dto::Common {
     key = Core::HttpUtils::GetPathParametersFromIndex(request.getURI(), 1);
 
     // Qualifiers
-    multipartRequest = Core::HttpUtils::HasQueryParameter(request.getURI(), "uploadId");
+    std::string url = request.getURI();
+    multipartRequest = Core::HttpUtils::HasQueryParameter(request.getURI(), "uploads") || Core::HttpUtils::HasQueryParameter(request.getURI(), "uploadId");
     notificationRequest = Core::HttpUtils::HasQueryParameter(request.getURI(), "notification");
     versionRequest = Core::HttpUtils::HasQueryParameter(request.getURI(), "versioning");
     copyRequest = request.has("x-amz-copy-source");
+    uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "uploadId");
 
     if (!userAgent.clientCommand.empty()) {
 
@@ -38,6 +40,8 @@ namespace AwsMock::Dto::Common {
             command = CommandType::LIST_BUCKETS;
           } else if (!bucket.empty() && key.empty()) {
             command = CommandType::LIST_OBJECTS;
+          } else {
+            command = CommandType::GET_OBJECT;
           }
           break;
         case HttpMethod::PUT:
@@ -55,7 +59,7 @@ namespace AwsMock::Dto::Common {
           }
           break;
         case HttpMethod::POST:
-        case HttpMethod::UNKNOWN:{
+        case HttpMethod::UNKNOWN: {
           break;
         }
       }
@@ -73,9 +77,19 @@ namespace AwsMock::Dto::Common {
       }
     } else if (userAgent.clientCommand == "cp") {
       if (httpMethod == HttpMethod::PUT) {
-        command = CommandType::PUT_OBJECT;
+        if (multipartRequest) {
+          command = CommandType::UPLOAD_PART;
+        } else {
+          command = CommandType::PUT_OBJECT;
+        }
       } else if (httpMethod == HttpMethod::GET) {
         command = CommandType::GET_OBJECT;
+      } else if (httpMethod == HttpMethod::POST) {
+        if (multipartRequest && uploadId.empty()) {
+          command = CommandType::CREATE_MULTIPART_UPLOAD;
+        } else {
+          command = CommandType::COMPLETE_MULTIPART_UPLOAD;
+        }
       }
     } else if (userAgent.clientCommand == "mv") {
       command = CommandType::MOVE_OBJECT;

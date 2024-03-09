@@ -237,7 +237,6 @@ namespace AwsMock::Service {
             HeaderMap headerMap;
             headerMap["Content-MD5"] = putObjectResponse.md5Sum;
             headerMap["ETag"] = "\"" + putObjectResponse.etag + "\"";
-            headerMap["x-amz-sdk-checksum-algorithm"] = putObjectResponse.checksumAlgorithm;
             headerMap["x-amz-checksum-sha256"] = putObjectResponse.checksumSha256;
             if (!putObjectResponse.versionId.empty()) {
               headerMap["x-amz-version-id"] = putObjectResponse.versionId;

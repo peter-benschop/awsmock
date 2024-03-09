@@ -153,6 +153,11 @@ namespace AwsMock::Dto::Common {
     bool copyRequest;
 
     /**
+     * Multipart upload ID
+     */
+    std::string uploadId;
+
+    /**
      * Gets command type from the user agent
      *
      * @param httpMethod HTTP request method

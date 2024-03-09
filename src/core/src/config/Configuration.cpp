@@ -45,7 +45,7 @@ namespace AwsMock::Core {
     DefineIntProperty("awsmock.service.s3.max.queue", "AWSMOCK_SERVICE_S3_MAX_QUEUE", 250);
     DefineIntProperty("awsmock.service.s3.max.threads", "AWSMOCK_SERVICE_S3_MAX_THREADS", 50);
     DefineIntProperty("awsmock.service.s3.timeout", "AWSMOCK_SERVICE_S3_TIMEOUT", 900);
-    DefineBoolProperty("awsmock.service.s3.data.dir", "AWSMOCK_SERVICE_S3_DATA_DIR", "tmp/awsmock/data/s3");
+    DefineStringProperty("awsmock.service.s3.data.dir", "AWSMOCK_SERVICE_S3_DATA_DIR", "tmp/awsmock/data/s3");
     DefineIntProperty("awsmock.service.s3.period", "AWSMOCK_SERVICE_S3_PERIOD", 60000);
 
     // SQS

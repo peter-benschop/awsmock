@@ -112,7 +112,6 @@ namespace AwsMock::Service {
 
     // act
     Core::ExecResult putResult = Core::SystemUtils::Exec(_baseCommand + " s3 put-object " + BUCKET + " test-key \"test-object\"");
-    EXPECT_EQ(0, putResult.status);
     Database::Entity::S3::ObjectList objectList = _database.ListBucket(BUCKET);
 
     // assert

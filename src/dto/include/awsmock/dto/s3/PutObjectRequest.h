@@ -50,6 +50,11 @@ namespace AwsMock::Dto::S3 {
     long contentLength;
 
     /**
+     * Checksum algorithm
+     */
+    std::string checksumAlgorithm;
+
+    /**
      * Metadata
      */
     std::map<std::string, std::string> metadata;

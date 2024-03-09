@@ -300,6 +300,13 @@ namespace AwsMock::Service {
     void SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long contentLength, const HeaderMap &extraHeader = {});
 
     /**
+     * Send a CONTINUE response (HTTP state code 100).
+     *
+     * @param response HTTP response object
+     */
+    void SendContinueResponse(Poco::Net::HTTPServerResponse &response);
+
+    /**
      * Send a OK response (HTTP state code 200) with an part of an output.
      *
      * @param response HTTP response object

@@ -72,7 +72,7 @@ namespace AwsMock::Service {
   void AbstractHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
     log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user << std::endl;
     DumpRequest(request);
-        handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
+    handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
     std::ostream &errorStream = response.send();
     errorStream.flush();
   }
@@ -407,6 +407,15 @@ namespace AwsMock::Service {
     } catch (Poco::Exception &exc) {
       log_error_stream(_logger) << "Exception: " << exc.message() << std::endl;
     }
+  }
+
+  void AbstractHandler::SendContinueResponse(Poco::Net::HTTPServerResponse &response) {
+    log_trace_stream(_logger) << "Sending CONTINUE response, state: 100" << std::endl;
+
+    // Send response
+    handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_CONTINUE);
+    std::ostream &os = response.send();
+    os.flush();
   }
 
   void AbstractHandler::SendRangeResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long min, long max, long size, const HeaderMap &extraHeader) {

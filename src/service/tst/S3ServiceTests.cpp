@@ -29,27 +29,27 @@ namespace AwsMock::Service {
 
   class S3ServiceTest : public ::testing::Test {
 
-    protected:
+  protected:
 
-      void SetUp() override {
-        testFile = Core::FileUtils::CreateTempFile("/tmp", "json", 10);
-      }
+    void SetUp() override {
+      testFile = Core::FileUtils::CreateTempFile("/tmp", "json", 10);
+    }
 
-      void TearDown() override {
-        _database.DeleteAllBuckets();
-        Core::FileUtils::DeleteFile(testFile);
-      }
+    void TearDown() override {
+      _database.DeleteAllBuckets();
+      Core::FileUtils::DeleteFile(testFile);
+    }
 
-      Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
-      Database::S3Database _database = Database::S3Database(_configuration);
-      S3Service _service = S3Service(_configuration);
-      std::string testFile;
+    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
+    Database::S3Database _database = Database::S3Database(_configuration);
+    S3Service _service = S3Service(_configuration);
+    std::string testFile;
   };
 
   TEST_F(S3ServiceTest, BucketCreateTest) {
 
     // arrange
-    Dto::S3::CreateBucketRequest request = {.region=LOCATION_CONSTRAINT, .bucketName=BUCKET, .bucketOwner=OWNER};
+    Dto::S3::CreateBucketRequest request = {.region=REGION, .bucketName=BUCKET, .bucketOwner=OWNER};
 
     // act
     Dto::S3::CreateBucketResponse response = _service.CreateBucket(request);
@@ -61,11 +61,11 @@ namespace AwsMock::Service {
   TEST_F(S3ServiceTest, BucketDeleteTest) {
 
     // arrange
-    Dto::S3::CreateBucketRequest request = {.region=LOCATION_CONSTRAINT, .bucketName=BUCKET, .bucketOwner=OWNER};
+    Dto::S3::CreateBucketRequest request = {.region=REGION, .bucketName=BUCKET, .bucketOwner=OWNER};
     Dto::S3::CreateBucketResponse response = _service.CreateBucket(request);
 
     // act
-    Dto::S3::DeleteBucketRequest s3Request =  {.region=REGION, .bucket=BUCKET};
+    Dto::S3::DeleteBucketRequest s3Request = {.region=REGION, .bucket=BUCKET};
     _service.DeleteBucket(s3Request);
     Dto::S3::ListAllBucketResponse result = _service.ListAllBuckets();
 
@@ -76,7 +76,7 @@ namespace AwsMock::Service {
   TEST_F(S3ServiceTest, ObjectPutTest) {
 
     // arrange
-    Dto::S3::CreateBucketRequest request = {.region=LOCATION_CONSTRAINT, .bucketName=BUCKET, .bucketOwner=OWNER};
+    Dto::S3::CreateBucketRequest request = {.region=REGION, .bucketName=BUCKET, .bucketOwner=OWNER};
     Dto::S3::CreateBucketResponse response = _service.CreateBucket(request);
     std::ifstream ifs(testFile);
 
@@ -92,7 +92,7 @@ namespace AwsMock::Service {
   TEST_F(S3ServiceTest, ObjectDeleteTest) {
 
     // arrange
-    Dto::S3::CreateBucketRequest request = {.region=LOCATION_CONSTRAINT, .bucketName=BUCKET, .bucketOwner=OWNER};
+    Dto::S3::CreateBucketRequest request = {.region=REGION, .bucketName=BUCKET, .bucketOwner=OWNER};
     Dto::S3::CreateBucketResponse response = _service.CreateBucket(request);
     std::ifstream ifs(testFile);
     Dto::S3::PutObjectRequest putRequest = {.region=REGION, .bucket=BUCKET, .key=KEY};

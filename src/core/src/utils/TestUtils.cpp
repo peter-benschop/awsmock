@@ -31,36 +31,39 @@ namespace AwsMock::Core {
     ofs << "awsmock.mongodb.user=admin" << std::endl;
     ofs << "awsmock.mongodb.password=admin" << std::endl;
     // S3 configuration
-    ofs << "awsmock.service.s3.data.dir=/tmp/test/data/s3" << std::endl;
     ofs << "awsmock.service.s3.port=19500" << std::endl;
     ofs << "awsmock.service.s3.host=localhost" << std::endl;
     ofs << "awsmock.monitoring.s3.period=-1" << std::endl;
+    // S3 api configuration
+    ofs << "awsmock.service.s3api.port=19501" << std::endl;
+    ofs << "awsmock.service.s3api.host=localhost" << std::endl;
+    ofs << "awsmock.monitoring.s3api.period=-1" << std::endl;
     // SQS configuration
-    ofs << "awsmock.service.sqs.port=19501" << std::endl;
+    ofs << "awsmock.service.sqs.port=19502" << std::endl;
     ofs << "awsmock.service.sqs.host=" << hostName << std::endl;
     ofs << "awsmock.monitoring.sqs.period=-1" << std::endl;
     // SQS configuration
-    ofs << "awsmock.service.sns.port=19502" << std::endl;
+    ofs << "awsmock.service.sns.port=19503" << std::endl;
     ofs << "awsmock.service.sns.host=" << hostName << std::endl;
     ofs << "awsmock.monitoring.sns.period=-1" << std::endl;
     // Lambda configuration
     ofs << "awsmock.service.lambda.active=true" << std::endl;
-    ofs << "awsmock.service.lambda.port=19503" << std::endl;
+    ofs << "awsmock.service.lambda.port=19504" << std::endl;
     ofs << "awsmock.service.lambda.host=localhost" << std::endl;
     ofs << "awsmock.monitoring.lambda.period=-1" << std::endl;
     // Transfer configuration
     ofs << "awsmock.service.transfer.active=true" << std::endl;
-    ofs << "awsmock.service.transfer.port=19504" << std::endl;
+    ofs << "awsmock.service.transfer.port=19505" << std::endl;
     ofs << "awsmock.service.transfer.host=localhost" << std::endl;
     ofs << "awsmock.monitoring.transfer.period=-1" << std::endl;
     // Cognito configuration
     ofs << "awsmock.service.cognito.active=true" << std::endl;
-    ofs << "awsmock.service.cognito.port=19505" << std::endl;
+    ofs << "awsmock.service.cognito.port=19506" << std::endl;
     ofs << "awsmock.service.cognito.host=localhost" << std::endl;
     ofs << "awsmock.monitoring.cognito.period=-1" << std::endl;
     // Cognito configuration
     ofs << "awsmock.service.dynamodb.active=true" << std::endl;
-    ofs << "awsmock.service.dynamodb.port=19506" << std::endl;
+    ofs << "awsmock.service.dynamodb.port=19507" << std::endl;
     ofs << "awsmock.service.dynamodb.host=localhost" << std::endl;
     ofs << "awsmock.monitoring.dynamodb.period=-1" << std::endl;
     // Docker

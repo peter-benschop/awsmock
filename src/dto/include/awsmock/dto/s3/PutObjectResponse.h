@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_CORE_DTO_PUTOBJECTRESPONSE_H
-#define AWSMOCK_CORE_DTO_PUTOBJECTRESPONSE_H
+#ifndef AWSMOCK_CORE_DTO_PUT_OBJECT_RESPONSE_H
+#define AWSMOCK_CORE_DTO_PUT_OBJECT_RESPONSE_H
 
 // C++ standard includes
 #include <string>
@@ -32,12 +32,12 @@ namespace AwsMock::Dto::S3 {
     /**
      * ETag
      */
-    std::string etag;
+    std::string etag = {};
 
     /**
      * Base64 encoded MD5 sum
      */
-    std::string md5Sum;
+    std::string md5Sum = {};
 
     /**
      * Content length
@@ -45,14 +45,14 @@ namespace AwsMock::Dto::S3 {
     long contentLength;
 
     /**
-     * SHA256 checksum algorithm
+     * Base64 encoded SHA1 checksum
      */
-    std::string checksumAlgorithm = "SHA256";
+    std::string checksumSha1 = {};
 
     /**
      * Base64 encoded SHA256 checksum
      */
-    std::string checksumSha256;
+    std::string checksumSha256 = {};
 
     /**
      * Metadata
@@ -69,7 +69,7 @@ namespace AwsMock::Dto::S3 {
      *
      * @return DTO as string for logging.
      */
-    std::string ToString() const;
+    [[nodiscard]] std::string ToString() const;
 
     /**
      * Stream provider.
@@ -82,4 +82,4 @@ namespace AwsMock::Dto::S3 {
 
 } // namespace AwsMock::Dto::S3
 
-#endif //AWSMOCK_CORE_DTO_PUTOBJECTRESPONSE_H
+#endif // AWSMOCK_CORE_DTO_PUT_OBJECT_RESPONSE_H
