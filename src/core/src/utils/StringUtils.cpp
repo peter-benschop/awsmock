@@ -193,10 +193,10 @@ namespace AwsMock::Core {
     char *outbuf = result;
 
     iconv_t cd = iconv_open("UTF-8//IGNORE", "UTF-8");
-    if(cd == (iconv_t)-1) {
+    if (cd == (iconv_t) -1) {
       perror("iconv_open");
     }
-    if(iconv(cd, &inbuf, &inbytes_len, &outbuf, &outbytes_len)) {
+    if (iconv(cd, &inbuf, &inbytes_len, &outbuf, &outbytes_len)) {
       perror("iconv");
     }
     iconv_close(cd);
@@ -216,4 +216,10 @@ namespace AwsMock::Core {
   std::string StringUtils::ToString(bool value) {
     return value ? "true" : "false";
   }
+
+  std::string StringUtils::StripChunkSignature(std::string &input) {
+    std::regex regex("(^|\r\n)[0-9a-fA-F]+;chunk-signature=[0-9a-f]{64}(\r\n)(\r\n$)?", std::regex_constants::icase);
+    return std::regex_replace(input, regex, "");
+  }
+
 }

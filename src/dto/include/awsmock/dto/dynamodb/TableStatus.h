@@ -46,6 +46,6 @@ namespace AwsMock::Dto::DynamoDb {
     return TableStatus::UNKNOWN;
   }
 
-}
+} // namespace AwsMock::Dto::DynamoDb
 
 #endif // AWSMOCK_DTO_DYNAMODB_TABLE_STATUS_H

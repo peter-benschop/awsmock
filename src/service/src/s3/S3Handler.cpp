@@ -3,8 +3,7 @@
 
 namespace AwsMock::Service {
 
-  S3Handler::S3Handler(Core::Configuration &configuration, Core::MetricService &metricService) : S3CmdHandler(configuration, metricService), S3CliHandler(configuration, metricService), S3CppHandler(configuration, metricService),
-                                                                                                 S3Java2Handler(configuration, metricService), _logger(Poco::Logger::get("S3Handler")), _configuration(configuration), _metricService(metricService),
+  S3Handler::S3Handler(Core::Configuration &configuration, Core::MetricService &metricService) : S3CmdHandler(configuration, metricService), _logger(Poco::Logger::get("S3Handler")), _configuration(configuration), _metricService(metricService),
                                                                                                  _s3Service(configuration) {
   }
 

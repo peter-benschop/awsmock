@@ -59,6 +59,10 @@ namespace AwsMock::Dto::Common {
           }
           break;
         case HttpMethod::POST:
+          if (!bucket.empty()) {
+            command = CommandType::DELETE_OBJECTS;
+          }
+          break;
         case HttpMethod::UNKNOWN: {
           break;
         }

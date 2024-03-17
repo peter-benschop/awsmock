@@ -90,6 +90,6 @@ namespace AwsMock::Dto::DynamoDb {
     friend std::ostream &operator<<(std::ostream &os, const AttributeValue &r);
 
   };
-} // namespace AwsMock::Dto::DynampDb
+} // namespace AwsMock::Dto::DynamoDb
 
 #endif // AWSMOCK_DTO_DYNAMODB_ATTRIBUTEVALUE_H

@@ -59,4 +59,4 @@ namespace AwsMock::Dto::DynamoDb {
     return os;
   }
 
-} // namespace AwsMock::Dto::lambda
+} // namespace AwsMock::Dto::DynamoDb

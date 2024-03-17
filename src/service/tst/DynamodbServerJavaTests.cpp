@@ -58,11 +58,12 @@ namespace AwsMock::Service {
     // arrange
 
     // act
-    Core::ExecResult result = Core::SystemUtils::Exec(_baseCommand + "create-table test-table");
+    Core::ExecResult createTableResult = Core::SystemUtils::Exec(_baseCommand + "create-table test-table");
+    EXPECT_EQ(0, createTableResult.status);
     Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
 
     // assert
-    EXPECT_EQ(0, result.status);
+    EXPECT_EQ(0, createTableResult.status);
     EXPECT_EQ(1, tableList.size());
   }
 
@@ -85,13 +86,14 @@ namespace AwsMock::Service {
   TEST_F(DynamoDbServerJavaTest, TableDeleteTest) {
 
     // arrange
-    Core::ExecResult result = Core::SystemUtils::Exec(_baseCommand + "create-table test-table");
-    EXPECT_EQ(0, result.status);
+    Core::ExecResult createTableResult = Core::SystemUtils::Exec(_baseCommand + "create-table test-table");
+    EXPECT_EQ(0, createTableResult.status);
     Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
     EXPECT_EQ(1, tableList.size());
 
     // act
     Core::ExecResult deleteResult = Core::SystemUtils::Exec(_baseCommand + "delete-table test-table");
+    EXPECT_EQ(0, deleteResult.status);
     tableList = _database.ListTables();
 
     // assert

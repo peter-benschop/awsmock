@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_DYNAMODB_DELETE_ITEM_RESPONSE_H
-#define AWSMOCK_DTO_DYNAMODB_DELETE_ITEM_RESPONSE_H
+#ifndef AWSMOCK_DTO_DYNAMODB_DESCRIBE_TABLE_REQUEST_H
+#define AWSMOCK_DTO_DYNAMODB_DESCRIBE_TABLE_REQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -19,23 +19,11 @@
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/ServiceException.h>
-#include <awsmock/dto/dynamodb/TableStatus.h>
+#include <awsmock/dto/dynamodb/ProvisionedThroughput.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
-  /**
-   * Example:
-   * <pre>
-   * {
-   *   "ConsumedCapacity":
-   *     {
-   *       "TableName":"test-table",
-   *       "CapacityUnits":1.0
-   *     }
-   * }
-   * </pre>
-   */
-  struct DeleteItemResponse {
+  struct DescribeTableRequest {
 
     /**
      * Region
@@ -48,9 +36,14 @@ namespace AwsMock::Dto::DynamoDb {
     std::string tableName;
 
     /**
-     * Original HTTP response body
+     * Original HTTP request body
      */
     std::string body;
+
+    /**
+     * Original HTTP request headers
+     */
+    std::map<std::string, std::string> headers;
 
     /**
      * Creates a JSON string from the object.
@@ -62,9 +55,9 @@ namespace AwsMock::Dto::DynamoDb {
     /**
      * Parse a JSON stream
      *
-     * @param jsonString JSON string
+     * @param jsonBody JSON string
      */
-    void FromJson(const std::string &jsonString);
+    void FromJson(const std::string &jsonBody);
 
     /**
      * Converts the DTO to a string representation.
@@ -78,10 +71,10 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const DeleteItemResponse &r);
+    friend std::ostream &operator<<(std::ostream &os, const DescribeTableRequest &r);
 
   };
 
 } // namespace AwsMock::Dto::DynamoDb
 
-#endif // AWSMOCK_DTO_DYNAMODB_DELETE_ITEM_RESPONSE_H
+#endif // AWSMOCK_DTO_DYNAMODB_DESCRIBE_TABLE_REQUEST_H

@@ -81,6 +81,6 @@ namespace AwsMock::Dto::DynamoDb {
 
   };
 
-} // namespace AwsMock::Dto::lambda
+} // namespace AwsMock::Dto::DynamoDb
 
 #endif // AWSMOCK_DTO_DYNAMODB_LIST_TABLE_REQUEST_H

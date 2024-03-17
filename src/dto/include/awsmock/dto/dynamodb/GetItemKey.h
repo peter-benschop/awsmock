@@ -65,6 +65,6 @@ namespace AwsMock::Dto::DynamoDb {
 
   };
 
-} // namespace AwsMock::Dto::lambda
+} // namespace AwsMock::Dto::DynamoDb
 
 #endif // GetItemRequest.h

@@ -83,8 +83,8 @@ namespace AwsMock::Core {
       log_error_stream(_logger) << "Request send failed, path: " << path << " error: " << curl_easy_strerror(res) << std::endl;
     }
 
-    //int status = 0;
-    //curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &status);
+    int status = 0;
+    curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &status);
 
     CurlResponse response = {.statusCode=res, .statusReason=curl_easy_strerror(res)};
     if (res == CURLE_OK && !_readBuffer.empty()) {

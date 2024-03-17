@@ -54,7 +54,7 @@ namespace AwsMock::Core {
    */
   class FileUtils {
 
-  public:
+    public:
     /**
      * Extracts the base name (without extension) from the given file name.
      */
@@ -238,6 +238,13 @@ namespace AwsMock::Core {
      * @param fileName absolute file name of the file
      */
     static bool Touch(const std::string &fileName);
+
+    /**
+     * Strip chunk signatures from file
+     *
+     * @param fileName absolute file name of the file
+     */
+    static void StripChunkSignature(const std::string &path);
 
   };
 

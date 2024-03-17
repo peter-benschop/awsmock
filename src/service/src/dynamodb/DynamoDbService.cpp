@@ -16,7 +16,7 @@ namespace AwsMock::Service {
 
     // DynamoDB docker host, port
     _dockerHost = "localhost";
-    _dockerPort = 8000;
+    _dockerPort = _configuration.getInt("awsmock.dynamodb.port");
   }
 
   Dto::DynamoDb::CreateTableResponse DynamoDbService::CreateTable(const Dto::DynamoDb::CreateTableRequest &request) {
@@ -88,7 +88,7 @@ namespace AwsMock::Service {
 
     if (!_dynamoDbDatabase->TableExists(request.region, request.tableName)) {
       log_warning_stream(_logger) << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName << std::endl;
-      throw Core::ServiceException("DynamoDb table exists already", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+      throw Core::ServiceException("DynamoDb table does not exist", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
     }
 
     Dto::DynamoDb::DeleteTableResponse deleteTableResponse;
@@ -115,6 +115,13 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Deleting all tables" << std::endl;
 
     try {
+
+      // Delete all tables from DynamoDB
+      for (auto &table : _dynamoDbDatabase->ListTables()) {
+        std::string body = "{\"TableName\":\"" + table.name + "\"}";
+        DeleteTable({.region=table.region, .tableName=table.name, .body=body});
+      }
+
       // Delete table in database
       _dynamoDbDatabase->DeleteAllTables();
       log_info_stream(_logger) << "DynamoDb tables deleted" << std::endl;

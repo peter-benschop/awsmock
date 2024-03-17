@@ -323,7 +323,7 @@ namespace AwsMock::Service {
     }
   }
 
-  void SQSService::DeleteQueue(const Dto::SQS::DeleteQueueRequest &request) {
+  Dto::SQS::DeleteQueueResponse SQSService::DeleteQueue(const Dto::SQS::DeleteQueueRequest &request) {
     log_trace_stream(_logger) << "Delete queue request, request: " << request.ToString() << std::endl;
 
     // Check existence
@@ -342,6 +342,8 @@ namespace AwsMock::Service {
       // Update database
       _database->DeleteQueue({.region=request.region, .queueUrl=request.queueUrl});
 
+      return {.region=request.region, .queueUrl=request.queueUrl,.requestId=request.requestId};
+
     } catch (Poco::Exception &ex) {
       log_error_stream(_logger) << "SQS delete queue failed, message: " << ex.message() << std::endl;
       throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
@@ -356,8 +358,8 @@ namespace AwsMock::Service {
 
     try {
       // Sanitize message body
-      std::string messageBody = Core::StringUtils::SanitizeUtf8(request.body);
-//      std::string messageBody = request.body;
+      //std::string messageBody = Core::StringUtils::SanitizeUtf8(request.body);
+      std::string messageBody = request.body;
 
       // Get queue by URL
       Database::Entity::SQS::Queue queue;

@@ -169,6 +169,20 @@ namespace AwsMock::Core {
     EXPECT_FALSE(DirUtils::DirectoryEmpty(outputDirName));
   }
 
+  TEST_F(FileUtilsTest, StripChunkSignatureTest) {
+
+    // arrange
+    std::string tempFile = FileUtils::CreateTempFile("txt", "b;chunk-signature=654753fda\ntest\nb;chunk-signature=654753fda\n");
+
+    // act
+    FileUtils::StripChunkSignature(tempFile);
+
+    // assert
+    EXPECT_FALSE(tempFile.empty());
+    EXPECT_TRUE(FileUtils::FileExists(tempFile));
+    EXPECT_EQ(5, FileUtils::FileSize(tempFile));
+  }
+
 } // namespace AwsMOck::Core
 
 #endif // AWMOCK_CORE_FILE_UTILS_TEST_H

@@ -289,6 +289,14 @@ namespace AwsMock::Core {
     static std::string SanitizeUtf8(std::string &input);
 
     /**
+     * Strip any chunk signatures from the input string
+     *
+     * @param input input string
+     * @return stripped input string
+     */
+    static std::string StripChunkSignature(std::string &input);
+
+    /**
      * Converts a bool variable to a string.
      *
      * @param value bool value

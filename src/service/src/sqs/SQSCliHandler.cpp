@@ -76,16 +76,22 @@ namespace AwsMock::Service {
         sqsRequest.FromJson(payload);
         sqsRequest.region = region;
 
+        Dto::SQS::DeleteQueueResponse sqsResponse = _sqsService.DeleteQueue(sqsRequest);
+
+        // Empty response
+        SendOkResponse(response);
+
       } else {
 
         std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
         sqsRequest = {.queueUrl=queueUrl};
         sqsRequest.region = region;
         sqsRequest.requestId = requestId;
-      }
 
-      _sqsService.DeleteQueue(sqsRequest);
-      SendOkResponse(response);
+        Dto::SQS::DeleteQueueResponse sqsResponse = _sqsService.DeleteQueue(sqsRequest);
+        SendOkResponse(response, sqsResponse.ToXml());
+
+      }
 
     } else if (userAgent.clientCommand == "send-message") {
 

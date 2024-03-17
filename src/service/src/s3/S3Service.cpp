@@ -523,10 +523,6 @@ namespace AwsMock::Service {
     Dto::S3::DeleteObjectsResponse response;
     try {
 
-      // Delete from database
-      _database->DeleteObjects(request.bucket, request.keys);
-      log_debug_stream(_logger) << "Database object deleted, count: " << request.keys.size() << std::endl;
-
       // Delete file system objects
       for (const auto &key : request.keys) {
 
@@ -540,6 +536,11 @@ namespace AwsMock::Service {
         // Check notifications
         CheckNotifications(request.region, request.bucket, key, 0, "s3:ObjectRemoved:Delete");
       }
+
+      // Delete from database
+      _database->DeleteObjects(request.bucket, request.keys);
+      log_debug_stream(_logger) << "Database object deleted, count: " << request.keys.size() << std::endl;
+
       log_info_stream(_logger) << "Objects deleted, bucket: " << request.bucket << " count: " << request.keys.size() << std::endl;
 
     } catch (Poco::Exception &ex) {
@@ -783,6 +784,7 @@ namespace AwsMock::Service {
     std::ofstream ofs(filePath);
     long size = Poco::StreamCopier::copyStream(stream, ofs);
     ofs.close();
+    //Core::FileUtils::StripChunkSignature(filePath);
     log_debug_stream(_logger) << "File received, fileName: " << filePath << " size: " << size << std::endl;
 
     // Create entity

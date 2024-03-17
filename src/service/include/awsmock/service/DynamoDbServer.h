@@ -30,12 +30,12 @@
 #define DYNAMODB_DEFAULT_QUEUE 150
 #define DYNAMODB_DEFAULT_THREADS 50
 #define DYNAMODB_DEFAULT_TIMEOUT 120
-#define DYNAMODB_DOCKER_IMAGE std::string("dynamodblocal")
+#define DYNAMODB_DOCKER_IMAGE std::string("dynamodb-local")
 #define DYNAMODB_DOCKER_TAG std::string("latest")
 #define DYNAMODB_INTERNAL_PORT 8000
 #define DYNAMODB_EXTERNAL_PORT 8000
 #define DYNAMODB_DOCKER_FILE "FROM amazon/dynamodb-local:latest\n" \
-                             "VOLUME /tmp/dynamodbdata /home/dynamodblocal/data\n" \
+                             "VOLUME /home/awsmock/data/dynamodb /home/dynamodblocal/data\n" \
                              "WORKDIR /home/dynamodblocal\n" \
                              "EXPOSE 8000 8000\n" \
                              "ENTRYPOINT [\"java\", \"-Djava.library.path=./DynamoDBLocal_lib\", \"-jar\", \"DynamoDBLocal.jar\", \"-sharedDb\"]\n"

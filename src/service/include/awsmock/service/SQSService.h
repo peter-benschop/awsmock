@@ -31,6 +31,7 @@
 #include <awsmock/dto/sqs/DeleteMessageBatchRequest.h>
 #include <awsmock/dto/sqs/DeleteMessageResponse.h>
 #include <awsmock/dto/sqs/DeleteQueueRequest.h>
+#include <awsmock/dto/sqs/DeleteQueueResponse.h>
 #include <awsmock/dto/sqs/GetQueueUrlRequest.h>
 #include <awsmock/dto/sqs/GetQueueUrlResponse.h>
 #include <awsmock/dto/sqs/ListQueueResponse.h>
@@ -134,9 +135,10 @@ namespace AwsMock::Service {
        * Delete a queue
        *
        * @param request delete request DTO
+       * @return SQSQueueResponse
        * @throws ServiceException
        */
-      void DeleteQueue(const Dto::SQS::DeleteQueueRequest &request);
+      Dto::SQS::DeleteQueueResponse DeleteQueue(const Dto::SQS::DeleteQueueRequest &request);
 
       /**
        * Creates a new queue

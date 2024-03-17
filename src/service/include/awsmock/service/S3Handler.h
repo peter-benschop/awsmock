@@ -2,8 +2,8 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_S3HANDLER_H
-#define AWSMOCK_SERVICE_S3HANDLER_H
+#ifndef AWSMOCK_SERVICE_S3_HANDLER_H
+#define AWSMOCK_SERVICE_S3_HANDLER_H
 
 // Poco includes
 #include "Poco/DateTime.h"
@@ -21,9 +21,6 @@
 #include "awsmock/dto/common/S3ClientCommand.h"
 #include <awsmock/service/AbstractHandler.h>
 #include <awsmock/service/S3Service.h>
-#include <awsmock/service/S3CliHandler.h>
-#include <awsmock/service/S3CppHandler.h>
-#include <awsmock/service/S3Java2Handler.h>
 #include <awsmock/service/S3CmdHandler.h>
 
 namespace AwsMock::Service {
@@ -48,7 +45,7 @@ namespace AwsMock::Service {
    * </ul>
    * <p>
    */
-  class S3Handler : public S3CliHandler, public S3CppHandler, public S3Java2Handler, public S3CmdHandler {
+  class S3Handler : public S3CmdHandler {
 
   public:
 
@@ -151,4 +148,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_S3HANDLER_H
+#endif // AWSMOCK_SERVICE_S3_HANDLER_H

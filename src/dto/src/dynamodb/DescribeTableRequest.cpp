@@ -2,11 +2,11 @@
 // Created by vogje01 on 21/12/2023.
 //
 
-#include <awsmock/dto/dynamodb/DeleteTableRequest.h>
+#include <awsmock/dto/dynamodb/DescribeTableRequest.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
-  std::string DeleteTableRequest::ToJson() {
+  std::string DescribeTableRequest::ToJson() {
 
     try {
       Poco::JSON::Object rootJson;
@@ -22,7 +22,7 @@ namespace AwsMock::Dto::DynamoDb {
     }
   }
 
-  void DeleteTableRequest::FromJson(const std::string &jsonBody) {
+  void DescribeTableRequest::FromJson(const std::string &jsonBody) {
 
     body = jsonBody;
 
@@ -40,14 +40,14 @@ namespace AwsMock::Dto::DynamoDb {
     }
   }
 
-  std::string DeleteTableRequest::ToString() const {
+  std::string DescribeTableRequest::ToString() const {
     std::stringstream ss;
     ss << (*this);
     return ss.str();
   }
 
-  std::ostream &operator<<(std::ostream &os, const DeleteTableRequest &r) {
-    os << "DeleteTableRequest={region='" << r.region << "', tableName='" << r.tableName << "'}";
+  std::ostream &operator<<(std::ostream &os, const DescribeTableRequest &r) {
+    os << "DescribeTableRequest={region='" << r.region << "', tableName='" << r.tableName << "'}";
     return os;
   }
 

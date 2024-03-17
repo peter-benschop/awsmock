@@ -205,8 +205,8 @@ namespace AwsMock::Service {
             Dto::S3::PutObjectResponse putObjectResponse = _s3Service.PutObject(putObjectRequest, request.stream());
 
             HeaderMap headerMap;
-            headerMap["Content-MD5"] = putObjectResponse.md5Sum;
-            headerMap["ETag"] = "\"" + putObjectResponse.etag + "\"";
+            //headerMap["Content-MD5"] = putObjectResponse.md5Sum;
+            headerMap["ETag"] = Core::StringUtils::Quoted(putObjectResponse.md5Sum);
             if (!putObjectResponse.checksumSha1.empty()) {
               headerMap["x-amz-checksum-sha1"] = putObjectResponse.checksumSha1;
             }
@@ -217,8 +217,6 @@ namespace AwsMock::Service {
               headerMap["x-amz-version-id"] = putObjectResponse.versionId;
             }
             log_debug_stream(_logger) << " size: " << putObjectResponse.contentLength << std::endl;
-
-            //SendContinueResponse(response);
             SendOkResponse(response, {}, headerMap);
           }
           break;
@@ -352,6 +350,8 @@ namespace AwsMock::Service {
           std::string payload = Core::HttpUtils::GetBodyAsString(request);
           Dto::S3::DeleteObjectsRequest s3Request;
           s3Request.FromXml(payload);
+          s3Request.region = s3ClientCommand.region;
+          s3Request.bucket = s3ClientCommand.bucket;
 
           Dto::S3::DeleteObjectsResponse s3Response = _s3Service.DeleteObjects(s3Request);
           SendOkResponse(response, s3Response.ToXml());

@@ -9,7 +9,7 @@ namespace AwsMock::Service {
 
     // Get environment
     _dynamoDbHost = _configuration.getString("awsmock.service.dynamodb.host", "localhost");
-    _dynamoDbPort = 8000; //_configuration.getInt("awsmock.service.dynamodb.port", 8000);
+    _dynamoDbPort = _configuration.getInt("awsmock.dynamodb.port", 8000);
 
   }
 

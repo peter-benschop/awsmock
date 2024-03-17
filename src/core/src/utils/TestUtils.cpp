@@ -66,6 +66,7 @@ namespace AwsMock::Core {
     ofs << "awsmock.service.dynamodb.port=19507" << std::endl;
     ofs << "awsmock.service.dynamodb.host=localhost" << std::endl;
     ofs << "awsmock.monitoring.dynamodb.period=-1" << std::endl;
+    ofs << "awsmock.dynamodb.port=8000" << std::endl;
     // Docker
     ofs << "awsmock.docker.network.mode=bridge" << std::endl;
     ofs << "awsmock.docker.network.name=.dockerhost.net" << std::endl;
