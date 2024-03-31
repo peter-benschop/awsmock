@@ -247,7 +247,8 @@ namespace AwsMock {
 
         Database::Entity::Module::ModuleList modules = _moduleDatabase.ListModules();
         for (const auto &module : modules) {
-          if (module.state == Database::Entity::Module::ModuleState::RUNNING) {
+//          if (module.state == Database::Entity::Module::ModuleState::RUNNING) {
+            log_info_stream(_logger) << "Stopping module: " << module.name << std::endl;
             if (module.name == "s3") {
               _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
               auto *s3Server = (Service::S3Server *) _serverMap[module.name];
@@ -286,7 +287,7 @@ namespace AwsMock {
             }
             log_debug_stream(_logger) << "Module " << module.name << " stopped" << std::endl;
           }
-        }
+//        }
       }
 
       /**
@@ -308,6 +309,8 @@ namespace AwsMock {
 
         // Wait for termination
         this->waitForTerminationRequest();
+        log_debug_stream(_logger) << "Starting termination" << std::endl;
+
         return Application::EXIT_OK;
       }
 

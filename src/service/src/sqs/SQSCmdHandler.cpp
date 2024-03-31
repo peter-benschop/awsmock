@@ -10,287 +10,320 @@ namespace AwsMock::Service {
   void SQSCmdHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::SQSClientCommand &sqsClientCommand) {
     log_debug_stream(_logger) << "SQS POST request, URI: " << request.getURI() << " region: " << sqsClientCommand.region << " user: " << sqsClientCommand.user << " command: " << Dto::Common::SqsCommandTypeToString(sqsClientCommand.command) << std::endl;
 
-    Dto::Common::UserAgent userAgent;
-    userAgent.FromRequest(request, "sqs");
-
     std::string requestId = GetHeaderValue(request, "RequestId", Poco::UUIDGenerator().createRandom().toString());
-    std::string payload = GetBodyAsString(request);
-    log_debug_stream(_logger) << "SQS POST request, action: " << userAgent.clientCommand << " content: " << userAgent.contentType << std::endl;
 
-    if (userAgent.clientCommand == "create-queue") {
+    switch (sqsClientCommand.command) {
 
-      if (userAgent.contentType == "json") {
+      case Dto::Common::SqsCommandType::CREATE_QUEUE: {
 
-        Dto::SQS::CreateQueueRequest sqsRequest;
-        sqsRequest.FromJson(payload);
-        sqsRequest.queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, sqsRequest.queueName);
-        sqsRequest.region = sqsClientCommand.region;
-        sqsRequest.owner = sqsClientCommand.user;
+        if (sqsClientCommand.contentType == "json") {
 
-        Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
-        SendOkResponse(response, sqsResponse.ToJson());
+          Dto::SQS::CreateQueueRequest sqsRequest;
+          sqsRequest.FromJson(sqsClientCommand.payload);
+          sqsRequest.queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, sqsRequest.queueName);
+          sqsRequest.region = sqsClientCommand.region;
+          sqsRequest.owner = sqsClientCommand.user;
 
-      } else {
+          Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
+          SendOkResponse(response, sqsResponse.ToJson());
 
-        std::string queueName = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueName");
-        std::string queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, queueName);
-        std::vector<Dto::SQS::QueueAttribute> attributes = GetQueueAttributes(payload);
-        std::map<std::string, std::string> tags = GetQueueTags(payload);
+        } else {
 
-        Dto::SQS::CreateQueueRequest sqsRequest = {.region=sqsClientCommand.region, .queueName=queueName, .queueUrl=queueUrl, .owner=sqsClientCommand.user, .attributes=attributes, .tags=tags, .requestId=requestId};
+          std::string queueName = Core::HttpUtils::GetQueryParameterValueByName(sqsClientCommand.payload, "QueueName");
+          std::string queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, queueName);
+          std::vector<Dto::SQS::QueueAttribute> attributes = GetQueueAttributes(sqsClientCommand.payload);
+          std::map<std::string, std::string> tags = GetQueueTags(sqsClientCommand.payload);
 
-        Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
-        SendOkResponse(response, sqsResponse.ToXml());
+          Dto::SQS::CreateQueueRequest sqsRequest = {.region=sqsClientCommand.region, .queueName=queueName, .queueUrl=queueUrl, .owner=sqsClientCommand.user, .attributes=attributes, .tags=tags, .requestId=requestId};
+
+          Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
+          SendOkResponse(response, sqsResponse.ToXml());
+        }
+        break;
       }
+      case Dto::Common::SqsCommandType::PURGE_QUEUE: {
 
-    } else if (userAgent.clientCommand == "list-queues") {
+        Dto::SQS::PurgeQueueRequest sqsRequest;
+        if (sqsClientCommand.contentType == "json") {
 
-      Dto::SQS::ListQueueResponse sqsResponse = _sqsService.ListQueues(sqsClientCommand.region);
-      if (userAgent.contentType == "json") {
-        SendOkResponse(response, sqsResponse.ToJson());
-      } else {
-        SendOkResponse(response, sqsResponse.ToXml());
-      }
+          sqsRequest.FromJson(sqsClientCommand.payload);
+          sqsRequest.region = sqsClientCommand.region;
 
-    } else if (userAgent.clientCommand == "delete-queue") {
+        } else {
 
-      Dto::SQS::DeleteQueueRequest sqsRequest;
-      if (userAgent.contentType == "json") {
+          std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(sqsClientCommand.payload, "QueueUrl");
+          sqsRequest = {.region=sqsClientCommand.region, .queueUrl=queueUrl};
 
-        sqsRequest.FromJson(payload);
-        sqsRequest.region = sqsClientCommand.region;
-
-        Dto::SQS::DeleteQueueResponse sqsResponse = _sqsService.DeleteQueue(sqsRequest);
-
-        // Empty response
+        }
+        _sqsService.PurgeQueue(sqsRequest);
         SendOkResponse(response);
 
-      } else {
-
-        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
-        sqsRequest = {.queueUrl=queueUrl};
-        sqsRequest.region = sqsClientCommand.region;
-        sqsRequest.requestId = requestId;
-
-        Dto::SQS::DeleteQueueResponse sqsResponse = _sqsService.DeleteQueue(sqsRequest);
-        SendOkResponse(response, sqsResponse.ToXml());
-
+        break;
       }
 
-    } else if (userAgent.clientCommand == "send-message") {
+      case Dto::Common::SqsCommandType::GET_QUEUE_ATTRIBUTES: {
 
-      Dto::SQS::SendMessageRequest sqsRequest;
-      if (userAgent.contentType == "json") {
+        Dto::SQS::GetQueueAttributesRequest sqsRequest;
+        if (sqsClientCommand.contentType == "json") {
 
-        sqsRequest.FromJson(payload);
-        sqsRequest.region = sqsClientCommand.region;
-        sqsRequest.messageId = requestId;
+          sqsRequest.FromJson(sqsClientCommand.payload);
+          sqsRequest.region = sqsClientCommand.region;
 
-      } else {
+        } else {
 
-        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
-        std::string body = Core::HttpUtils::GetQueryParameterValueByName(payload, "MessageBody");
-        std::map<std::string, Dto::SQS::MessageAttribute> attributes = GetMessageAttributes(payload);
-        log_debug_stream(_logger) << "SendMessage, queueUrl " << queueUrl << std::endl;
+          std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(sqsClientCommand.payload, "QueueUrl");
+          std::vector<std::string> attributeNames = GetQueueAttributeNames(sqsClientCommand.payload);
+          sqsRequest = {.region=sqsClientCommand.region, .queueUrl=queueUrl, .attributeNames=attributeNames};
 
-        sqsRequest = {.queueUrl=queueUrl, .body=body, .attributes=attributes, .messageId=requestId};
-        sqsRequest.region = sqsClientCommand.region;
-        sqsRequest.requestId = requestId;
-      }
-
-      Dto::SQS::SendMessageResponse sqsResponse = _sqsService.SendMessage(sqsRequest);
-      SendOkResponse(response, userAgent.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
-
-    } else if (userAgent.clientCommand == "get-queue-url") {
-
-      Dto::SQS::GetQueueUrlRequest sqsRequest;
-      if (userAgent.contentType == "json") {
-
-        sqsRequest.FromJson(payload);
-        sqsRequest.region = sqsClientCommand.region;
-
-      } else {
-
-        std::string queueName = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueName");
-        sqsRequest = {.region=sqsClientCommand.region, .queueName=queueName};
-
-      }
-      Dto::SQS::GetQueueUrlResponse sqsResponse = _sqsService.GetQueueUrl(sqsRequest);
-      SendOkResponse(response, userAgent.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
-
-    } else if (userAgent.clientCommand == "receive-message") {
-
-      Dto::SQS::ReceiveMessageRequest sqsRequest;
-      if (userAgent.contentType == "json") {
-
-        sqsRequest.FromJson(payload);
-        sqsRequest.region = sqsClientCommand.region;
-
-      } else {
-
-        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
-        int maxMessages = GetIntParameter(payload, "MaxNumberOfMessages", 1, 10, 3);
-        int waitTimeSeconds = GetIntParameter(payload, "WaitTimeSeconds", 1, 900, 5);
-        int visibility = GetIntParameter(payload, "VisibilityTimeout", 1, 900, 30);
-        sqsRequest = {.region=sqsClientCommand.region, .queueUrl=queueUrl, .maxMessages=maxMessages, .visibilityTimeout=visibility, .waitTimeSeconds=waitTimeSeconds, .requestId=requestId};
-
-      }
-      Dto::SQS::ReceiveMessageResponse sqsResponse = _sqsService.ReceiveMessages(sqsRequest);
-
-      // Set the message userAttributes
-      SendOkResponse(response, userAgent.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
-
-    } else if (userAgent.clientCommand == "purge-queue") {
-
-      Dto::SQS::PurgeQueueRequest sqsRequest;
-      if (userAgent.contentType == "json") {
-
-        sqsRequest.FromJson(payload);
-        sqsRequest.region = sqsClientCommand.region;
-
-      } else {
-
-        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
-        sqsRequest = {.region=sqsClientCommand.region, .queueUrl=queueUrl};
-
-      }
-      _sqsService.PurgeQueue(sqsRequest);
-      SendOkResponse(response);
-
-    } else if (userAgent.clientCommand == "get-queue-attributes") {
-
-      Dto::SQS::GetQueueAttributesRequest sqsRequest;
-      if (userAgent.contentType == "json") {
-
-        sqsRequest.FromJson(payload);
-        sqsRequest.region = sqsClientCommand.region;
-
-      } else {
-
-        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
-        std::vector<std::string> attributeNames = GetQueueAttributeNames(payload);
-        sqsRequest = {.region=sqsClientCommand.region, .queueUrl=queueUrl, .attributeNames=attributeNames};
-
-      }
-
-      Dto::SQS::GetQueueAttributesResponse sqsResponse = _sqsService.GetQueueAttributes(sqsRequest);
-      SendOkResponse(response, userAgent.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
-
-    } else if (userAgent.clientCommand == "set-queue-attributes") {
-
-      Dto::SQS::SetQueueAttributesRequest sqsRequest;
-
-      if (userAgent.contentType == "json") {
-
-        sqsRequest.FromJson(payload);
-        sqsRequest.region = sqsClientCommand.region;
-
-      } else {
-
-        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
-
-        int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "UserAttribute");
-        log_trace_stream(_logger) << "Got attribute count, count: " << count << std::endl;
-
-        AttributeList attributes;
-        for (int i = 1; i <= count; i++) {
-          std::string attributeName = Core::HttpUtils::GetQueryParameterValueByName(payload, "Attribute." + std::to_string(i) + ".Name");
-          std::string attributeValue = Core::HttpUtils::GetQueryParameterValueByName(payload, "Attribute." + std::to_string(i) + ".Value");
-          attributes[attributeName] = attributeValue;
         }
 
-        sqsRequest = {.region=sqsClientCommand.region, .queueUrl=queueUrl, .attributes=attributes};
-      }
-      _sqsService.SetQueueAttributes(sqsRequest);
+        Dto::SQS::GetQueueAttributesResponse sqsResponse = _sqsService.GetQueueAttributes(sqsRequest);
+        SendOkResponse(response, sqsClientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
 
-      SendOkResponse(response);
-
-    } else if (userAgent.clientCommand == "tag-queue") {
-
-      Dto::SQS::TagQueueRequest sqsRequest;
-
-      if (userAgent.contentType == "json") {
-
-        sqsRequest.FromJson(payload);
-        sqsRequest.region = sqsClientCommand.region;
-
-      } else {
-
-        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
-        std::string tagKey = Core::HttpUtils::GetQueryParameterValueByName(payload, "Tag.Key");
-        std::string tagValue = Core::HttpUtils::GetQueryParameterValueByName(payload, "Tag.Key");
-
-        std::map<std::string, std::string> tags;
-        tags[tagKey] = tagValue;
-
-        sqsRequest = {.region=sqsClientCommand.region, .queueUrl=queueUrl, .tags=tags};
-      }
-      _sqsService.TagQueue(sqsRequest);
-
-      SendOkResponse(response);
-
-    } else if (userAgent.clientCommand == "change-message-visibility") {
-
-      Dto::SQS::ChangeMessageVisibilityRequest sqsRequest;
-      if (userAgent.contentType == "json") {
-
-        sqsRequest.FromJson(payload);
-        sqsRequest.region = sqsClientCommand.region;
-
-      } else {
-
-        int visibilityTimeout = GetIntParameter(payload, "VisibilityTimeout", 30, 12 * 3600, 60);
-        std::string receiptHandle = GetStringParameter(payload, "ReceiptHandle");
-
-        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
-        sqsRequest = {.region=sqsClientCommand.region, .queueUrl=queueUrl, .receiptHandle=receiptHandle, .visibilityTimeout=visibilityTimeout};
-
+        break;
       }
 
-      _sqsService.SetVisibilityTimeout(sqsRequest);
-      SendOkResponse(response);
+      case Dto::Common::SqsCommandType::SET_QUEUE_ATTRIBUTES: {
+        Dto::SQS::SetQueueAttributesRequest sqsRequest;
 
-    } else if (userAgent.clientCommand == "delete-message") {
+        if (sqsClientCommand.contentType == "json") {
 
-      Dto::SQS::DeleteMessageRequest sqsRequest;
-      if (userAgent.contentType == "json") {
+          sqsRequest.FromJson(sqsClientCommand.payload);
+          sqsRequest.region = sqsClientCommand.region;
 
-        sqsRequest.FromJson(payload);
-        sqsRequest.region = sqsClientCommand.region;
+        } else {
 
-      } else {
+          std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(sqsClientCommand.payload, "QueueUrl");
 
-        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
-        std::string receiptHandle = GetStringParameter(payload, "ReceiptHandle");
-        sqsRequest = {
-          .region=sqsClientCommand.region,
-          .queueUrl=queueUrl,
-          .receiptHandle=receiptHandle
-        };
+          int count = Core::HttpUtils::CountQueryParametersByPrefix(sqsClientCommand.payload, "UserAttribute");
+          log_trace_stream(_logger) << "Got attribute count, count: " << count << std::endl;
+
+          AttributeList attributes;
+          for (int i = 1; i <= count; i++) {
+            std::string attributeName = Core::HttpUtils::GetQueryParameterValueByName(sqsClientCommand.payload, "Attribute." + std::to_string(i) + ".Name");
+            std::string attributeValue = Core::HttpUtils::GetQueryParameterValueByName(sqsClientCommand.payload, "Attribute." + std::to_string(i) + ".Value");
+            attributes[attributeName] = attributeValue;
+          }
+
+          sqsRequest = {.region=sqsClientCommand.region, .queueUrl=queueUrl, .attributes=attributes};
+        }
+        _sqsService.SetQueueAttributes(sqsRequest);
+
+        SendOkResponse(response);
+        break;
+      }
+      case Dto::Common::SqsCommandType::GET_QUEUE_URL: {
+        Dto::SQS::GetQueueUrlRequest sqsRequest;
+        if (sqsClientCommand.contentType == "json") {
+
+          sqsRequest.FromJson(sqsClientCommand.payload);
+          sqsRequest.region = sqsClientCommand.region;
+
+        } else {
+
+          std::string queueName = Core::HttpUtils::GetQueryParameterValueByName(sqsClientCommand.payload, "QueueName");
+          sqsRequest = {.region=sqsClientCommand.region, .queueName=queueName};
+
+        }
+        Dto::SQS::GetQueueUrlResponse sqsResponse = _sqsService.GetQueueUrl(sqsRequest);
+        SendOkResponse(response, sqsClientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+
+        break;
       }
 
-      _sqsService.DeleteMessage(sqsRequest);
+      case Dto::Common::SqsCommandType::TAG_QUEUE: {
+        Dto::SQS::TagQueueRequest sqsRequest;
 
-      SendOkResponse(response);
+        if (sqsClientCommand.contentType == "json") {
 
-    } else if (userAgent.clientCommand == "delete-message-batch") {
+          sqsRequest.FromJson(sqsClientCommand.payload);
+          sqsRequest.region = sqsClientCommand.region;
 
-      Dto::SQS::DeleteMessageBatchRequest sqsRequest;
-      sqsRequest.queueUrl = Core::HttpUtils::GetQueryParameterValueByName(payload, "QueueUrl");
+        } else {
 
-      // Get message count
-      int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "DeleteMessageBatchRequestEntry") / 2;
-      log_trace_stream(_logger) << "Got entry count, count: " << count << std::endl;
+          std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(sqsClientCommand.payload, "QueueUrl");
+          std::string tagKey = Core::HttpUtils::GetQueryParameterValueByName(sqsClientCommand.payload, "Tag.Key");
+          std::string tagValue = Core::HttpUtils::GetQueryParameterValueByName(sqsClientCommand.payload, "Tag.Key");
 
-      for (int i = 1; i <= count; i++) {
-        std::string id = Core::HttpUtils::GetQueryParameterValueByName(payload, "DeleteMessageBatchRequestEntry." + std::to_string(i) + ".Id");
-        std::string receiptHandle = Core::HttpUtils::GetQueryParameterValueByName(payload, "DeleteMessageBatchRequestEntry." + std::to_string(i) + ".ReceiptHandle");
-        Dto::SQS::DeleteMessageBatchEntry entry = {.id=id, .receiptHandle=receiptHandle};
-        sqsRequest.deleteMessageBatchEntries.emplace_back(entry);
+          std::map<std::string, std::string> tags;
+          tags[tagKey] = tagValue;
+
+          sqsRequest = {.region=sqsClientCommand.region, .queueUrl=queueUrl, .tags=tags};
+        }
+        _sqsService.TagQueue(sqsRequest);
+
+        SendOkResponse(response);
+
+        break;
       }
-      _sqsService.DeleteMessageBatch(sqsRequest);
+      case Dto::Common::SqsCommandType::LIST_QUEUES: {
+        Dto::SQS::ListQueueResponse sqsResponse = _sqsService.ListQueues(sqsClientCommand.region);
+        if (sqsClientCommand.contentType == "json") {
+          SendOkResponse(response, sqsResponse.ToJson());
+        } else {
+          SendOkResponse(response, sqsResponse.ToXml());
+        }
+        break;
+      }
 
-      SendOkResponse(response);
+      case Dto::Common::SqsCommandType::DELETE_QUEUE: {
+        Dto::SQS::DeleteQueueRequest sqsRequest;
+        if (sqsClientCommand.contentType == "json") {
+
+          sqsRequest.FromJson(sqsClientCommand.payload);
+          sqsRequest.region = sqsClientCommand.region;
+
+          Dto::SQS::DeleteQueueResponse sqsResponse = _sqsService.DeleteQueue(sqsRequest);
+
+          // Empty response
+          SendOkResponse(response);
+
+        } else {
+
+          std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(sqsClientCommand.payload, "QueueUrl");
+          sqsRequest = {.queueUrl=queueUrl};
+          sqsRequest.region = sqsClientCommand.region;
+          sqsRequest.requestId = requestId;
+
+          Dto::SQS::DeleteQueueResponse sqsResponse = _sqsService.DeleteQueue(sqsRequest);
+          SendOkResponse(response, sqsResponse.ToXml());
+
+        }
+        break;
+      }
+
+      case Dto::Common::SqsCommandType::SEND_MESSAGE: {
+        Dto::SQS::SendMessageRequest sqsRequest;
+        if (sqsClientCommand.contentType == "json") {
+
+          sqsRequest.FromJson(sqsClientCommand.payload);
+          sqsRequest.region = sqsClientCommand.region;
+          sqsRequest.messageId = requestId;
+
+        } else {
+
+          std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(sqsClientCommand.payload, "QueueUrl");
+          std::string body = Core::HttpUtils::GetQueryParameterValueByName(sqsClientCommand.payload, "MessageBody");
+          std::map<std::string, Dto::SQS::MessageAttribute> attributes = GetMessageAttributes(sqsClientCommand.payload);
+          log_debug_stream(_logger) << "SendMessage, queueUrl " << queueUrl << std::endl;
+
+          sqsRequest = {.queueUrl=queueUrl, .body=body, .attributes=attributes, .messageId=requestId};
+          sqsRequest.region = sqsClientCommand.region;
+          sqsRequest.requestId = requestId;
+        }
+
+        Dto::SQS::SendMessageResponse sqsResponse = _sqsService.SendMessage(sqsRequest);
+        SendOkResponse(response, sqsClientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+        break;
+      }
+
+      case Dto::Common::SqsCommandType::RECEIVE_MESSAGE: {
+
+        Dto::SQS::ReceiveMessageRequest sqsRequest;
+        if (sqsClientCommand.contentType == "json") {
+
+          sqsRequest.FromJson(sqsClientCommand.payload);
+          sqsRequest.region = sqsClientCommand.region;
+
+        } else {
+
+          std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(sqsClientCommand.payload, "QueueUrl");
+          int maxMessages = GetIntParameter(sqsClientCommand.payload, "MaxNumberOfMessages", 1, 10, 3);
+          int waitTimeSeconds = GetIntParameter(sqsClientCommand.payload, "WaitTimeSeconds", 1, 900, 5);
+          int visibility = GetIntParameter(sqsClientCommand.payload, "VisibilityTimeout", 1, 900, 30);
+          sqsRequest = {.region=sqsClientCommand.region, .queueUrl=queueUrl, .maxMessages=maxMessages, .visibilityTimeout=visibility, .waitTimeSeconds=waitTimeSeconds, .requestId=requestId};
+
+        }
+        Dto::SQS::ReceiveMessageResponse sqsResponse = _sqsService.ReceiveMessages(sqsRequest);
+
+        // Set the message userAttributes
+        SendOkResponse(response, sqsClientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+
+        break;
+      }
+
+      case Dto::Common::SqsCommandType::CHANGE_MESSAGE_VISIBILITY: {
+
+        Dto::SQS::ChangeMessageVisibilityRequest sqsRequest;
+        if (sqsClientCommand.contentType == "json") {
+
+          sqsRequest.FromJson(sqsClientCommand.payload);
+          sqsRequest.region = sqsClientCommand.region;
+
+        } else {
+
+          int visibilityTimeout = GetIntParameter(sqsClientCommand.payload, "VisibilityTimeout", 30, 12 * 3600, 60);
+          std::string receiptHandle = GetStringParameter(sqsClientCommand.payload, "ReceiptHandle");
+
+          std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(sqsClientCommand.payload, "QueueUrl");
+          sqsRequest = {.region=sqsClientCommand.region, .queueUrl=queueUrl, .receiptHandle=receiptHandle, .visibilityTimeout=visibilityTimeout};
+
+        }
+
+        _sqsService.SetVisibilityTimeout(sqsRequest);
+        SendOkResponse(response);
+        break;
+      }
+
+      case Dto::Common::SqsCommandType::DELETE_MESSAGE: {
+
+        Dto::SQS::DeleteMessageRequest sqsRequest;
+        if (sqsClientCommand.contentType == "json") {
+
+          sqsRequest.FromJson(sqsClientCommand.payload);
+          sqsRequest.region = sqsClientCommand.region;
+
+        } else {
+
+          std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(sqsClientCommand.payload, "QueueUrl");
+          std::string receiptHandle = GetStringParameter(sqsClientCommand.payload, "ReceiptHandle");
+          sqsRequest = {
+            .region=sqsClientCommand.region,
+            .queueUrl=queueUrl,
+            .receiptHandle=receiptHandle
+          };
+        }
+
+        _sqsService.DeleteMessage(sqsRequest);
+
+        SendOkResponse(response);
+
+        break;
+      }
+
+      case Dto::Common::SqsCommandType::DELETE_MESSAGE_BATCH: {
+
+        Dto::SQS::DeleteMessageBatchRequest sqsRequest;
+        if (sqsClientCommand.contentType == "json") {
+
+          sqsRequest.FromJson(sqsClientCommand.payload);
+          sqsRequest.region = sqsClientCommand.region;
+
+        } else {
+
+          sqsRequest.queueUrl = Core::HttpUtils::GetQueryParameterValueByName(sqsClientCommand.payload, "QueueUrl");
+
+          // Get message count
+          int count = Core::HttpUtils::CountQueryParametersByPrefix(sqsClientCommand.payload, "Entries") / 2;
+          log_trace_stream(_logger) << "Got entry count, count: " << count << std::endl;
+
+          for (int i = 1; i <= count; i++) {
+            std::string id = Core::HttpUtils::GetQueryParameterValueByName(sqsClientCommand.payload, "DeleteMessageBatchRequestEntry." + std::to_string(i) + ".Id");
+            std::string receiptHandle = Core::HttpUtils::GetQueryParameterValueByName(sqsClientCommand.payload, "DeleteMessageBatchRequestEntry." + std::to_string(i) + ".ReceiptHandle");
+            Dto::SQS::DeleteMessageBatchEntry entry = {.id=id, .receiptHandle=receiptHandle};
+            sqsRequest.deleteMessageBatchEntries.emplace_back(entry);
+          }
+        }
+        _sqsService.DeleteMessageBatch(sqsRequest);
+
+        SendOkResponse(response);
+        break;
+      }
+
+      case Dto::Common::SqsCommandType::UNKNOWN: {
+        log_error_stream(_logger) << "Bad request, method: POST clientCommand: " << Dto::Common::SqsCommandTypeToString(sqsClientCommand.command) << std::endl;
+        throw Core::ServiceException("Bad request, method: POST clientCommand: " + Dto::Common::SqsCommandTypeToString(sqsClientCommand.command));
+      }
     }
   }
 

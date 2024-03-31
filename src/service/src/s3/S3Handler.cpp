@@ -79,15 +79,4 @@ namespace AwsMock::Service {
       log_error_stream(_logger) << exc.what() << std::endl;
     }
   }
-
-  void S3Handler::handleOptions(Poco::Net::HTTPServerResponse &response) {
-    log_debug_stream(_logger) << "S3 OPTIONS request" << std::endl;
-
-    response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
-    response.setContentType("text/plain; charset=utf-8");
-
-    handleHttpStatusCode(response, 200);
-    std::ostream &outputStream = response.send();
-    outputStream.flush();
-  }
 }

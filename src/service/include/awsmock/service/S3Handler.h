@@ -104,14 +104,6 @@ namespace AwsMock::Service {
     void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
     /**
-     * Options request.
-     *
-     * @param response HTTP response
-     * @see AbstractResource::handleOption(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-     */
-    void handleOptions(Poco::Net::HTTPServerResponse &response) override;
-
-    /**
      * Head request.
      *
      * @param request HTTP request

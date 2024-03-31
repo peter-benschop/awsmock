@@ -28,7 +28,7 @@ namespace AwsMock::Service {
 
   class AbstractServer : public Poco::Runnable {
 
-  public:
+    public:
 
     /**
      * Constructor
@@ -77,7 +77,7 @@ namespace AwsMock::Service {
      */
     void StopHttpServer();
 
-  protected:
+    protected:
 
     /**
      * Main loop
@@ -94,7 +94,7 @@ namespace AwsMock::Service {
      */
     Poco::Condition _condition;
 
-  private:
+    private:
 
     /**
      * Logger
@@ -130,6 +130,7 @@ namespace AwsMock::Service {
      * HTTP manager instance
      */
     std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
+
   };
 
   /**

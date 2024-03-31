@@ -63,6 +63,7 @@ namespace AwsMock::Service {
 
   void S3Server::StopMonitoringServer() {
     _threadPool.stopAll();
+    log_debug_stream(_logger) << "Monitoring stopped module: s3" << std::endl;
   }
 
   void S3Server::UpdateCounters() {

@@ -2,8 +2,8 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_SNSHANDLER_H
-#define AWSMOCK_SERVICE_SNSHANDLER_H
+#ifndef AWSMOCK_SERVICE_SNS_CMD_HANDLER_H
+#define AWSMOCK_SERVICE_SNS_CMD_HANDLER_H
 
 // Poco includes
 #include <Poco/DateTime.h>
@@ -12,22 +12,24 @@
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
+#include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/MetricService.h>
 #include <awsmock/core/MetricServiceTimer.h>
 #include <awsmock/core/MetricDefinition.h>
-#include <awsmock/dto/common/SNSClientCommand.h>
+#include "awsmock/dto/common/SNSClientCommand.h"
 #include <awsmock/service/AbstractHandler.h>
 #include <awsmock/service/SNSService.h>
-#include <awsmock/service/SNSCmdHandler.h>
 
 namespace AwsMock::Service {
 
   typedef std::map<std::string, std::string> AttributeList;
 
   /**
-   * AWS SNS mock handler
+   * AWS SNS command handler
+   *
+   * @author jens.vogt@opitz-consulting.com
    */
-  class SNSHandler : public SNSCmdHandler {
+  class SNSCmdHandler : public virtual AbstractHandler {
 
   public:
 
@@ -38,7 +40,7 @@ namespace AwsMock::Service {
      * @param metricService monitoring module
      * @param condition stop condition
      */
-    SNSHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
+    SNSCmdHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
 
   protected:
 
@@ -51,7 +53,7 @@ namespace AwsMock::Service {
      * @param user AWS user
      * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
      */
-    void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+    void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::SNSClientCommand &snsClientCommand);
 
   private:
 
@@ -83,4 +85,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_SNSHANDLER_H
+#endif // AWSMOCK_SERVICE_SNS_CMD_HANDLER_H

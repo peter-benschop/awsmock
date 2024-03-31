@@ -134,14 +134,14 @@ namespace AwsMock::Service {
   }
 
   void AbstractHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
-    log_trace_stream(_logger) << "Request, method: OPTIONS" << std::endl;
-    response.setStatusAndReason(
-        Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED,
-        Poco::Net::HTTPResponse::HTTP_REASON_NOT_IMPLEMENTED
-    );
+    log_debug_stream(_logger) << "S3 OPTIONS request" << std::endl;
 
-    std::ostream &errorStream = response.send();
-    errorStream.flush();
+    response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
+    response.setContentType("text/plain; charset=utf-8");
+
+    handleHttpStatusCode(response, 200);
+    std::ostream &outputStream = response.send();
+    outputStream.flush();
   }
 
   void AbstractHandler::handleHead([[maybe_unused]]Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {

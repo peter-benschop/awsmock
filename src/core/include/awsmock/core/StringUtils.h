@@ -303,6 +303,15 @@ namespace AwsMock::Core {
      * @return string representation
      */
     static std::string ToString(bool value);
+
+    /**
+     * Convert the string to snake case
+     *
+     * @param in in string
+     * @return string in snake case
+     */
+    static std::string ToSnakeCase(const std::string &in);
+
   };
 
 } // namespace AwsMock::Core

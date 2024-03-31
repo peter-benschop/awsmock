@@ -211,6 +211,18 @@ namespace AwsMock::Core {
     EXPECT_TRUE(result == "some invalid stuff");
   }
 
+  TEST_F(StringUtilsTest, SnakeCaseTest) {
+
+    // arrange
+    std::string input = "CreateQueue";
+
+    // act
+    std::string result = StringUtils::ToSnakeCase(input);
+
+    // assert
+    EXPECT_TRUE(result == "create-queue");
+  }
+
 } // namespace AwsMock::Core
 
 #endif // AWSMOCK_CORE_STRING_UTILS_TEST_H
