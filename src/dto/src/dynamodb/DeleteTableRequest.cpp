@@ -6,11 +6,11 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
-  std::string DeleteTableRequest::ToJson() {
+  std::string DeleteTableRequest::ToJson() const {
 
     try {
       Poco::JSON::Object rootJson;
-      rootJson.set("Region", region);
+      //rootJson.set("Region", region);
       rootJson.set("TableName", tableName);
 
       std::ostringstream os;
@@ -51,4 +51,4 @@ namespace AwsMock::Dto::DynamoDb {
     return os;
   }
 
-} // namespace AwsMock::Dto::lambda
+} // namespace AwsMock::Dto::DynamoDb

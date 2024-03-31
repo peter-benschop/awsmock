@@ -2,8 +2,8 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWSMOCK_CORE_SYSTEMUTILSTEST_H
-#define AWSMOCK_CORE_SYSTEMUTILSTEST_H
+#ifndef AWSMOCK_CORE_SYSTEM_UTILS_TEST_H
+#define AWSMOCK_CORE_SYSTEM_UTILS_TEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
@@ -13,15 +13,7 @@
 
 namespace AwsMock::Core {
 
-  class SystemUtilsTest : public ::testing::Test {
-
-  protected:
-    void SetUp() override {
-    }
-
-    void TearDown() override {
-    }
-  };
+  class SystemUtilsTest : public ::testing::Test {};
 
   TEST_F(SystemUtilsTest, GetNodeNameTest) {
 
@@ -31,7 +23,7 @@ namespace AwsMock::Core {
     std::string nodeName = SystemUtils::GetNodeName();
 
     // assert
-    EXPECT_TRUE(nodeName.length() > 0);
+    EXPECT_FALSE(nodeName.empty());
   }
 
   TEST_F(SystemUtilsTest, GetHostNameTest) {
@@ -42,9 +34,9 @@ namespace AwsMock::Core {
     std::string hostName = SystemUtils::GetHostName();
 
     // assert
-    EXPECT_TRUE(hostName.length() > 0);
+    EXPECT_FALSE(hostName.empty());
   }
 
 } // namespace AwsMock::Core
 
-#endif // AWSMOCK_CORE_SYSTEMUTILSTEST_H
+#endif // AWSMOCK_CORE_SYSTEM_UTILS_TEST_H

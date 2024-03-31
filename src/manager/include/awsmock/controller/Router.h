@@ -11,12 +11,12 @@
 #include <iostream>
 
 // Poco includes
-#include "Poco/URI.h"
-#include "Poco/Logger.h"
-#include "Poco/ClassLibrary.h"
-#include "Poco/DynamicFactory.h"
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPRequestHandlerFactory.h"
+#include <Poco/URI.h>
+#include <Poco/Logger.h>
+#include <Poco/ClassLibrary.h>
+#include <Poco/DynamicFactory.h>
+#include <Poco/Net/HTTPServerRequest.h>
+#include <Poco/Net/HTTPRequestHandlerFactory.h>
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
@@ -44,7 +44,7 @@ namespace AwsMock::Controller {
     /**
      * Destructor
      */
-    ~Router();
+    ~Router() override;
 
     /**
      * Add a route
@@ -76,10 +76,10 @@ namespace AwsMock::Controller {
     /**
      * Returns the AWS module, region and user from the authorization string.
      *
-     * @param authInfo authorization string
+     * @param authorization authorization string
      * @return module name
      */
-    std::string GetService(const std::string &authInfo);
+    std::string GetModule(const std::string &authorization);
 
     /**
      * Logger

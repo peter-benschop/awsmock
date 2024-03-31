@@ -50,7 +50,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @return JSON string
      */
-    [[nodiscard]] std::string ToJson();
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Parse a JSON stream
@@ -75,6 +75,6 @@ namespace AwsMock::Dto::DynamoDb {
 
   };
 
-} // namespace AwsMock::Dto::lambda
+} // namespace AwsMock::Dto::DynamoDb
 
 #endif // AWSMOCK_DTO_DYNAMODB_DELETE_TABLE_REQUEST_H

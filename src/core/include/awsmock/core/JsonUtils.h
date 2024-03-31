@@ -2,8 +2,8 @@
 // Created by vogje01 on 22/08/2022.
 //
 
-#ifndef AWSMOCK_CORE_JSONUTILS_H
-#define AWSMOCK_CORE_JSONUTILS_H
+#ifndef AWS_MOCK_CORE_JSON_UTILS_H
+#define AWS_MOCK_CORE_JSON_UTILS_H
 
 // Standard C++ includes
 #include <string>
@@ -90,4 +90,5 @@ namespace AwsMock::Core {
   };
 
 } // namespace AwsMock::Core
-#endif // AWSMOCK_CORE_FILEUTILS_H
+
+#endif // AWS_MOCK_CORE_JSON_UTILS_H

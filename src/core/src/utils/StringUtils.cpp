@@ -7,8 +7,10 @@ namespace AwsMock::Core {
 
   template<typename T = std::mt19937>
   auto RandomGenerator() -> T {
-    auto constexpr seed_bytes = sizeof(typename T::result_type) * T::state_size;
-    auto constexpr seed_len = seed_bytes / sizeof(std::seed_seq::result_type);
+    auto constexpr
+    seed_bytes = sizeof(typename T::result_type) * T::state_size;
+    auto constexpr
+    seed_len = seed_bytes / sizeof(std::seed_seq::result_type);
     auto seed = std::array<std::seed_seq::result_type, seed_len>();
     auto dev = std::random_device();
     std::generate_n(begin(seed), seed_len, std::ref(dev));
@@ -77,8 +79,8 @@ namespace AwsMock::Core {
     return std::regex_match(value, regex);
   }
 
-  std::vector<std::string> StringUtils::Split(const std::string &s, char delimiter) {
-    std::vector<std::string> tokens;
+  std::vector <std::string> StringUtils::Split(const std::string &s, char delimiter) {
+    std::vector <std::string> tokens;
     std::stringstream check1(s);
     std::string intermediate;
     while (getline(check1, intermediate, delimiter)) {
@@ -87,7 +89,7 @@ namespace AwsMock::Core {
     return tokens;
   }
 
-  std::string StringUtils::Join(const std::vector<std::string> &vec, char delimiter, int startIndex) {
+  std::string StringUtils::Join(const std::vector <std::string> &vec, char delimiter, int startIndex) {
     std::string result;
     for (int i = startIndex; i < vec.size(); i++) {
       result += vec[i];
@@ -184,7 +186,7 @@ namespace AwsMock::Core {
     return escaped.str();
   }
 
-  std::string StringUtils::SanitizeUtf8(const std::string &input) {
+  std::string StringUtils::SanitizeUtf8(std::string &input) {
     size_t inbytes_len = input.length();
     char *inbuf = const_cast<char *>(input.c_str());
 
@@ -193,14 +195,16 @@ namespace AwsMock::Core {
     char *outbuf = result;
 
     iconv_t cd = iconv_open("UTF-8//IGNORE", "UTF-8");
-    if(cd == (iconv_t)-1) {
+    if (cd == (iconv_t) - 1) {
       perror("iconv_open");
     }
-    if(iconv(cd, &inbuf, &inbytes_len, &outbuf, &outbytes_len)) {
+    if (iconv(cd, &inbuf, &inbytes_len, &outbuf, &outbytes_len)) {
       perror("iconv");
     }
     iconv_close(cd);
-    return {result};
+    input.assign(result);
+    delete result;
+    return input;
   }
 
   std::string StringUtils::ToHexString(unsigned char *input, size_t length) {
@@ -209,5 +213,44 @@ namespace AwsMock::Core {
       ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(input[i]);
     }
     return ss.str();
+  }
+
+  std::string StringUtils::ToString(bool value) {
+    return value ? "true" : "false";
+  }
+
+  std::string StringUtils::StripChunkSignature(std::string &input) {
+    std::regex regex("(^|\r\n)[0-9a-fA-F]+;chunk-signature=[0-9a-f]{64}(\r\n)(\r\n$)?", std::regex_constants::icase);
+    return std::regex_replace(input, regex, "");
+  }
+
+  std::string StringUtils::ToSnakeCase(const std::string &in) {
+
+    // Empty result string
+    std::string result;
+
+    // Append first character(in lower case) to result string
+    char c = (char)tolower(in[0]);
+    result += (char(c));
+
+    // Traverse the string from first index to last index
+    for (int i = 1; i < in.length(); i++) {
+
+      char ch = in[i];
+
+      // Check if the character is upper case then append '-' and such character (in lower case) to result string
+      if (isupper(ch)) {
+        result += '-';
+        result += char(tolower(ch));
+      }
+
+      else {
+        // If the character is lower case then add such character into result string
+        result += ch;
+      }
+    }
+
+    // Return the result
+    return result;
   }
 }

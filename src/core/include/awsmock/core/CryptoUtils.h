@@ -2,21 +2,21 @@
 // Created by vogje01 on 22/08/2022.
 //
 
-#ifndef AWSMOCK_CORE_CRYPTOUTILS_H
-#define AWSMOCK_CORE_CRYPTOUTILS_H
+#ifndef AWS_MOCK_CORE_CRYPTO_UTILS_H
+#define AWS_MOCK_CORE_CRYPTO_UTILS_H
 
+// Standard C includes
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 // Standard C++ includes
 #include <string>
 #include <string_view>
 #include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -178,4 +178,4 @@ namespace AwsMock::Core {
 
 } // namespace AwsMock::Core
 
-#endif // AWSMOCK_CORE_CRYPTOUTILS_H
+#endif // AWS_MOCK_CORE_CRYPTO_UTILS_H

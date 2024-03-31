@@ -409,7 +409,7 @@ namespace AwsMock::Database {
 
       try {
 
-        long count = 0;
+        long count;
         if(!region.empty() && !topicArn.empty()) {
           count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("topicArn", topicArn)));
         } else if(!region.empty()) {
@@ -446,7 +446,9 @@ namespace AwsMock::Database {
       }
 
     } else {
+
       return _memoryDb.CountMessagesByStatus(region, topicArn, status);
+
     }
   }
 

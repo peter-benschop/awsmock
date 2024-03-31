@@ -2,21 +2,21 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#ifndef AWSMOCK_CORE_DIRUTILS_H
-#define AWSMOCK_CORE_DIRUTILS_H
+#ifndef AWS_MOCK_CORE_DIRECTORY_UTILS_H
+#define AWS_MOCK_CORE_DIRECTORY_UTILS_H
 
 // C++ standard includes
 #include <string>
 
 // Poco includes
-#include "Poco/Path.h"
-#include "Poco/File.h"
-#include "Poco/String.h"
-#include "Poco/Logger.h"
-#include "Poco/UUIDGenerator.h"
-#include "Poco/RegularExpression.h"
-#include "Poco/DirectoryIterator.h"
-#include "Poco/RecursiveDirectoryIterator.h"
+#include <Poco/Path.h>
+#include <Poco/File.h>
+#include <Poco/String.h>
+#include <Poco/Logger.h>
+#include <Poco/UUIDGenerator.h>
+#include <Poco/RegularExpression.h>
+#include <Poco/DirectoryIterator.h>
+#include <Poco/RecursiveDirectoryIterator.h>
 
 // AwsMock includes
 #include <awsmock/core/StringUtils.h>
@@ -24,9 +24,10 @@
 namespace AwsMock::Core {
 
   struct SubstringCompare {
+
     char _delimiter;
 
-    SubstringCompare(char delimiter) : _delimiter(delimiter) {}
+    explicit SubstringCompare(char delimiter) : _delimiter(delimiter) {}
 
     bool operator()(std::string const &a, std::string const &b) const {
 
@@ -37,6 +38,11 @@ namespace AwsMock::Core {
     }
   };
 
+  /**
+   * Directory utilities.
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   class DirUtils {
 
   public:
@@ -166,4 +172,4 @@ namespace AwsMock::Core {
 
 } // namespace AwsMOck::Core
 
-#endif //AWSMOCK_CORE_DIRUTILS_H
+#endif // AWS_MOCK_CORE_DIRECTORY_UTILS_H

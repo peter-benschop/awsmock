@@ -2,8 +2,8 @@
 // Created by vogje01 on 22/08/2022.
 //
 
-#ifndef AWSMOCK_CORE_FILE_UTILS_H
-#define AWSMOCK_CORE_FILE_UTILS_H
+#ifndef AWS_MOCK_CORE_FILE_UTILS_H
+#define AWS_MOCK_CORE_FILE_UTILS_H
 
 // Standard C includes
 #include <pwd.h>
@@ -28,33 +28,33 @@
 #include <streambuf>
 
 // Poco includes
-#include "Poco/Path.h"
-#include "Poco/File.h"
-#include "Poco/String.h"
-#include "Poco/BinaryReader.h"
-#include "Poco/BinaryWriter.h"
-#include "Poco/StreamCopier.h"
-#include "Poco/UUIDGenerator.h"
-#include "Poco/Zip/Decompress.h"
-#include "Poco/Zip/Compress.h"
-#include "Poco/DirectoryIterator.h"
-#include "Poco/RegularExpression.h"
+#include <Poco/Path.h>
+#include <Poco/File.h>
+#include <Poco/String.h>
+#include <Poco/BinaryReader.h>
+#include <Poco/BinaryWriter.h>
+#include <Poco/StreamCopier.h>
+#include <Poco/UUIDGenerator.h>
+#include <Poco/Zip/Decompress.h>
+#include <Poco/Zip/Compress.h>
+#include <Poco/DirectoryIterator.h>
+#include <Poco/RegularExpression.h>
 
 // AwsMock includes
-#include "awsmock/core/DirUtils.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/StringUtils.h"
+#include <awsmock/core/DirUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/StringUtils.h>
 
 namespace AwsMock::Core {
 
   /**
-   * File utilities.
+   * Directory utilities.
    *
    * @author jens.vogt@opitz-consulting.com
    */
   class FileUtils {
 
-  public:
+    public:
     /**
      * Extracts the base name (without extension) from the given file name.
      */
@@ -239,6 +239,15 @@ namespace AwsMock::Core {
      */
     static bool Touch(const std::string &fileName);
 
+    /**
+     * Strip chunk signatures from file
+     *
+     * @param fileName absolute file name of the file
+     */
+    static void StripChunkSignature(const std::string &path);
+
   };
+
 } // namespace AwsMock::Core
-#endif // AWSMOCK_CORE_FILEUTILS_H
+
+#endif // AWS_MOCK_CORE_FILE_UTILS_H

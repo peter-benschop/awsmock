@@ -3,14 +3,8 @@
 
 namespace AwsMock::Service {
 
-  DynamoDbHandler::DynamoDbHandler(Core::Configuration &configuration, Core::MetricService &metricService) : DynamoDbCliHandler(configuration, metricService), DynamoDbCppHandler(configuration, metricService),
-                                                                                                             DynamoDbJava2Handler(configuration, metricService), _logger(Poco::Logger::get("DynamoDbHandler")), _configuration(configuration),
+  DynamoDbHandler::DynamoDbHandler(Core::Configuration &configuration, Core::MetricService &metricService) : DynamoDbCmdHandler(configuration, metricService), _logger(Poco::Logger::get("DynamoDbHandler")), _configuration(configuration),
                                                                                                              _metricService(metricService), _dynamoDbService(configuration, metricService) {
-
-    // Get environment
-    _dynamoDbHost = _configuration.getString("awsmock.service.dynamodb.host", "localhost");
-    _dynamoDbPort = 8000; //_configuration.getInt("awsmock.service.dynamodb.port", 8000);
-
   }
 
   void DynamoDbHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, [[maybe_unused]]const std::string &user) {
@@ -23,9 +17,9 @@ namespace AwsMock::Service {
       Core::HttpUtils::GetVersionAction(request.getURI(), version, action);
 
     } catch (Core::ServiceException &exc) {
-      SendXmlErrorResponse("DynamoDb", response, exc);
+      SendXmlErrorResponse("dynamodb", response, exc);
     } catch (Core::ResourceNotFoundException &exc) {
-      SendXmlErrorResponse("DynamoDb", response, exc);
+      SendXmlErrorResponse("dynamodb", response, exc);
     }
   }
 
@@ -39,7 +33,7 @@ namespace AwsMock::Service {
       Core::HttpUtils::GetVersionAction(request.getURI(), version, action);
 
     } catch (Poco::Exception &exc) {
-      SendXmlErrorResponse("lambda", response, exc);
+      SendXmlErrorResponse("dynamodb", response, exc);
     }
   }
 
@@ -47,25 +41,10 @@ namespace AwsMock::Service {
     _metricService.IncrementCounter("gateway_post_counter");
     log_trace_stream(_logger) << "DynamoDb POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
-    try {
+    Dto::Common::DynamoDbClientCommand clientCommand;
+    clientCommand.FromRequest(Dto::Common::HttpMethod::POST, request, region, user);
 
-      // Get the action
-      Dto::Common::UserAgent userAgent;
-      userAgent.FromRequest(request, "dynamodb");
-      log_debug_stream(_logger) << "Type: " << Dto::Common::UserAgentTypeToString(userAgent.type) << std::endl;
-
-      switch (userAgent.type) {
-      case Dto::Common::UserAgentType::AWS_SDK_UNKNOWN:
-      case Dto::Common::UserAgentType::AWS_CLI: return DynamoDbCliHandler::handlePost(request, response, region, user);
-      case Dto::Common::UserAgentType::AWS_SDK_JAVA1: break;
-      case Dto::Common::UserAgentType::AWS_SDK_JAVA2: return DynamoDbJava2Handler::handlePost(request, response, region, user);
-      case Dto::Common::UserAgentType::AWS_SDK_CPP: return DynamoDbCppHandler::handlePost(request, response, region, user);
-
-      }
-
-    } catch (Poco::Exception &exc) {
-      SendXmlErrorResponse("lambda", response, exc);
-    }
+    DynamoDbCmdHandler::handlePost(request, response, clientCommand);
   }
 
   void DynamoDbHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
@@ -78,7 +57,7 @@ namespace AwsMock::Service {
       std::string body = GetBodyAsString(request);
 
     } catch (Core::ServiceException &exc) {
-      SendXmlErrorResponse("lambda", response, exc);
+      SendXmlErrorResponse("dynamodb", response, exc);
     }
   }
 
@@ -112,30 +91,5 @@ namespace AwsMock::Service {
     } catch (Poco::Exception &exc) {
       SendXmlErrorResponse("dynamodb", response, exc);
     }
-  }
-
-  void DynamoDbHandler::ForwardRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &host, int port) {
-
-    // Create HTTP request and set headers
-    Poco::Net::HTTPClientSession session(host, port);
-    session.setReceiveTimeout(Poco::Timespan(120, 0));
-    log_trace_stream(_logger) << "Forward session, host: " << host << " port: " << port << std::endl;
-
-    // Send request with body
-    Poco::StreamCopier::copyStream(request.stream(), session.sendRequest(request));
-    log_trace_stream(_logger) << "Forward request send" << std::endl;
-
-    // Get the response
-    Poco::Net::HTTPResponse clientResponse;
-    std::istream &is = session.receiveResponse(clientResponse);
-
-    // Copy headers
-    for (const auto &i : clientResponse) {
-      response.set(i.first, i.second);
-    }
-    long send = Poco::StreamCopier::copyStream(is, response.send(), 1024 * 1024);
-    log_trace_stream(_logger) << "Bytes send: " << send << std::endl;
-
-    log_trace_stream(_logger) << "Backend module response send back to client" << std::endl;
   }
 }

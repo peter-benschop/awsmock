@@ -14,7 +14,7 @@ namespace AwsMock::Service {
   }
 
   bool AbstractServer::IsActive(const std::string &name) {
-    return _moduleDatabase->IsActive(_name);
+    return _moduleDatabase->IsActive(name);
   }
 
   bool AbstractServer::IsRunning() const {
@@ -31,16 +31,14 @@ namespace AwsMock::Service {
 
   bool AbstractServer::InterruptableSleep(int period) {
     _mutex.lock();
-    if (_condition.tryWait(_mutex, period)) {
-      _mutex.unlock();
-      return true;
-    }
+    bool signalled = _condition.tryWait(_mutex, period);
     _mutex.unlock();
-    return false;
+    return signalled;
   }
 
   void AbstractServer::StopServer() {
     _condition.broadcast();
+    log_debug_stream(_logger) << "Stop broadcast" << std::endl;
   }
 
   void AbstractServer::StartHttpServer(int maxQueueLength, int maxThreads, int requestTimeout, const std::string &host, int port, Poco::Net::HTTPRequestHandlerFactory *requestFactory) {
@@ -65,10 +63,10 @@ namespace AwsMock::Service {
   }
 
   void AbstractServer::StopHttpServer() {
-    /*if (_httpServer) {
+    if (_httpServer) {
       _httpServer->stopAll(true);
       log_debug_stream(_logger) << "HTTP server stopped: " << _name << std::endl;
-    }*/
+    }
   }
 
 } // namespace AwsMock::Worker

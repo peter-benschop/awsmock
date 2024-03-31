@@ -70,126 +70,6 @@ namespace AwsMock::Service {
     void UpdateCounters();
 
     /**
-     * Create a new bucket, by sending the corresponding CreateBucket request to the S3 module.
-     *
-     * @param dirPath absolute path of the directory
-     */
-    void CreateBucket(const std::string &dirPath);
-
-    /**
-     * Deletes an existing bucket, by sending the corresponding DeleteBucket request to the S3 module.
-     *
-     * @param dirPath absolute path of the directory
-     */
-    void DeleteBucket(const std::string &dirPath);
-
-    /**
-     * Create a new object, by sending the corresponding PutObject request to the S3 module.
-     *
-     * @param filePath absolute path of the file
-     */
-    void CreateObject(const std::string &filePath);
-
-    /**
-     * Checks the existence of a bucket in the database, by sending the corresponding HeadObject request to the S3 module.
-     *
-     * @param bucket S3 bucket name
-     * @return true if object exists
-     */
-    bool ExistsBucket(const std::string &bucket);
-
-    /**
-     * Checks the existence of an object in database, by sending the corresponding HeadObject request to the S3 module.
-     *
-     * @param bucket S3 bucket name
-     * @param key S3 object key
-     * @return true if object exists
-     */
-    bool ExistsObject(const std::string &bucket, const std::string &key);
-
-    /**
-     * Deletes an existing object, by sending the corresponding DeleteObject request to the S3 module.
-     *
-     * @param bucket S3 bucket name
-     * @param key S3 object key
-     */
-    void DeleteObject(const std::string &bucket, const std::string &key);
-
-    /**
-     * Gets the bucket and object key from the file name.
-     *
-     * @param fileName absolute file file name
-     * @param bucket bucket name
-     * @param key object key
-     */
-    void GetBucketKeyFromFile(const std::string &fileName, std::string &bucket, std::string &key);
-
-    /**
-     * Gets the absolute file path from bucket and object key.
-     *
-     * @param bucket bucket name
-     * @param key object key
-     * @return local file path
-     */
-    std::string GetFileFromBucketKey(const std::string &bucket, const std::string &key);
-
-    /**
-     * Sends a create object request to the S3 module
-     *
-     * @param bucket S3 bucket name
-     * @param contentType content type
-     */
-    void SendCreateBucketRequest(const std::string &bucket, const std::string &contentType);
-
-    /**
-     * Sends a delete bucket request to the S3 module
-     *
-     * @param bucket S3 bucket name
-     * @param contentType content type
-     */
-    void SendDeleteBucketRequest(const std::string &bucket, const std::string &contentType);
-
-    /**
-     * Sends a put object request to the S3 module
-     *
-     * @param fileName name of the file
-     * @param bucket S3 bucket name
-     * @param key S3 object key
-     * @param md5Sum MD5 hash
-     * @param contentType content type
-     * @param fileSize size of the file
-     */
-    void SendPutObjectRequest(const std::string &fileName, const std::string &bucket, const std::string &key, const std::string &md5Sum, const std::string &contentType, unsigned long fileSize);
-
-    /**
-     * Sends a head object request to the S3 module
-     *
-     * @param bucket S3 bucket name
-     * @param contentType content type
-     * @return true if object exists
-     */
-    bool SendHeadObjectRequest(const std::string &bucket, const std::string &contentType);
-
-    /**
-     * Sends a head object request to the S3 module
-     *
-     * @param bucket S3 bucket name
-     * @param key S3 object key
-     * @param contentType content type
-     * @return true if object exists
-     */
-    bool SendHeadObjectRequest(const std::string &bucket, const std::string &key, const std::string &contentType);
-
-    /**
-     * Sends a delete object request to the S3 module
-     *
-     * @param bucket S3 bucket name
-     * @param key S3 object key
-     * @param contentType content type
-     */
-    void SendDeleteObjectRequest(const std::string &bucket, const std::string &key, const std::string &contentType);
-
-    /**
      * Rest port
      */
     int _port;
@@ -218,11 +98,6 @@ namespace AwsMock::Service {
      * HTTP manager instance
      */
     std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
-
-    /**
-     * Service database
-     */
-    std::unique_ptr<Database::ModuleDatabase> _serviceDatabase;
 
     /**
      * S3 database
@@ -255,39 +130,9 @@ namespace AwsMock::Service {
     std::string _dataDir;
 
     /**
-     * AWS region
-     */
-    std::string _region;
-
-    /**
-     * AWS account ID
-     */
-    std::string _accountId;
-
-    /**
-     * AWS client ID
-     */
-    std::string _clientId;
-
-    /**
-     * AWS user
-     */
-    std::string _user;
-
-    /**
      * Thread pool
      */
     AwsMock::Core::ThreadPool<S3Monitoring> _threadPool;
-
-    /**
-     * S3 module host
-     */
-    std::string _s3ServiceHost;
-
-    /**
-     * S3 module port
-     */
-    int _s3ServicePort;
 
     /**
      * S3 module name

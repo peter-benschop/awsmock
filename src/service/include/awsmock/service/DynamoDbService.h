@@ -30,6 +30,9 @@
 #include <awsmock/dto/dynamodb/DeleteItemResponse.h>
 #include <awsmock/dto/dynamodb/DeleteTableRequest.h>
 #include <awsmock/dto/dynamodb/DeleteTableResponse.h>
+#include <awsmock/dto/dynamodb/DescribeTableRequest.h>
+#include <awsmock/dto/dynamodb/DescribeTableResponse.h>
+#include <awsmock/dto/dynamodb/DynamoDbResponse.h>
 #include <awsmock/dto/dynamodb/GetItemRequest.h>
 #include <awsmock/dto/dynamodb/GetItemResponse.h>
 #include <awsmock/dto/dynamodb/ListTableRequest.h>
@@ -52,130 +55,138 @@ namespace AwsMock::Service {
 
     public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration module configuration
-       * @param metricService aws-mock monitoring module
-       */
-      explicit DynamoDbService(Core::Configuration &configuration, Core::MetricService &metricService);
+    /**
+     * Constructor
+     *
+     * @param configuration module configuration
+     * @param metricService aws-mock monitoring module
+     */
+    explicit DynamoDbService(Core::Configuration &configuration, Core::MetricService &metricService);
 
-      /**
-       * Creates a new table
-       *
-       * @param request create table request DTO
-       * @return CreateTableResponse
-       */
-      Dto::DynamoDb::CreateTableResponse CreateTable(const Dto::DynamoDb::CreateTableRequest &request);
+    /**
+     * Creates a new table
+     *
+     * @param request create table request DTO
+     * @return CreateTableResponse
+     */
+    Dto::DynamoDb::CreateTableResponse CreateTable(const Dto::DynamoDb::CreateTableRequest &request);
 
-      /**
-       * Lists all available tables
-       *
-       * @param request list table request DTO
-       * @return ListTableResponse
-       */
-      Dto::DynamoDb::ListTableResponse ListTables(const Dto::DynamoDb::ListTableRequest &request);
+    /**
+     * Lists all available tables
+     *
+     * @param request list table request DTO
+     * @return ListTableResponse
+     */
+    Dto::DynamoDb::ListTableResponse ListTables(const Dto::DynamoDb::ListTableRequest &request);
 
-      /**
-       * Gets an item
-       *
-       * @param request get item request DTO
-       * @return GetItemResponse
-       */
-      Dto::DynamoDb::GetItemResponse GetItem(const Dto::DynamoDb::GetItemRequest &request);
+    /**
+     * Describes a table
+     *
+     * @param request describe table request DTO
+     * @return DescribeTableResponse
+     */
+    Dto::DynamoDb::DescribeTableResponse DescribeTable(const Dto::DynamoDb::DescribeTableRequest &request);
 
-      /**
-       * Puts an item
-       *
-       * @param request put item request DTO
-       * @return GetItemResponse
-       */
-      Dto::DynamoDb::PutItemResponse PutItem(const Dto::DynamoDb::PutItemRequest &request);
+    /**
+     * Deletes a table
+     *
+     * @param request delete table request DTO
+     * @return DeleteTableResponse
+     */
+    Dto::DynamoDb::DeleteTableResponse DeleteTable(const Dto::DynamoDb::DeleteTableRequest &request);
 
-      /**
-       * Query the database
-       *
-       * @param request query item request DTO
-       * @return QueryResponse
-       */
-      Dto::DynamoDb::QueryResponse Query(const Dto::DynamoDb::QueryRequest &request);
+    /**
+     * Deletes all tables with all items
+     */
+    void DeleteAllTables();
 
-      /**
-       * Deletes a item
-       *
-       * @param request delete item request DTO
-       * @return DeleteItemResponse
-       */
-      Dto::DynamoDb::DeleteItemResponse DeleteItem(const Dto::DynamoDb::DeleteItemRequest &request);
+    /**
+     * Gets an item
+     *
+     * @param request get item request DTO
+     * @return GetItemResponse
+     */
+    Dto::DynamoDb::GetItemResponse GetItem(const Dto::DynamoDb::GetItemRequest &request);
 
-      /**
-       * Deletes a table
-       *
-       * @param request delete table request DTO
-       * @return DeleteTableResponse
-       */
-      Dto::DynamoDb::DeleteTableResponse DeleteTable(const Dto::DynamoDb::DeleteTableRequest &request);
+    /**
+     * Puts an item
+     *
+     * @param request put item request DTO
+     * @return GetItemResponse
+     */
+    Dto::DynamoDb::PutItemResponse PutItem(const Dto::DynamoDb::PutItemRequest &request);
 
-      /**
-       * Deletes all tables with all items
-       */
-      void DeleteAllTables();
+    /**
+     * Query the database
+     *
+     * @param request query item request DTO
+     * @return QueryResponse
+     */
+    Dto::DynamoDb::QueryResponse Query(const Dto::DynamoDb::QueryRequest &request);
+
+    /**
+     * Deletes a item
+     *
+     * @param request delete item request DTO
+     * @return DeleteItemResponse
+     */
+    Dto::DynamoDb::DeleteItemResponse DeleteItem(const Dto::DynamoDb::DeleteItemRequest &request);
 
     private:
 
-      /**
-       * Send the request to the DynamoDB container
-       *
-       * @param body original HTTP request body
-       * @param headers original HTTP request headers
-       * @return response body
-       */
-      std::string SendDynamoDbRequest(const std::string &body, const std::map<std::string, std::string>& headers);
+    /**
+     * Send the request to the DynamoDB container
+     *
+     * @param body original HTTP request body
+     * @param headers original HTTP request headers
+     * @return response body
+     */
+    Dto::DynamoDb::DynamoDbResponse SendDynamoDbRequest(const std::string &body, const std::map<std::string, std::string> &headers);
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
 
-      /**
-       * AWS region
-       */
-      std::string _region;
+    /**
+     * AWS region
+     */
+    std::string _region;
 
-      /**
-       * AWS account ID
-       */
-      std::string _accountId;
+    /**
+     * AWS account ID
+     */
+    std::string _accountId;
 
-      /**
-       * Configuration
-       */
-      Core::Configuration &_configuration;
+    /**
+     * Configuration
+     */
+    Core::Configuration &_configuration;
 
-      /**
-       * Monitoring
-       */
-      Core::MetricService &_metricService;
+    /**
+     * Monitoring
+     */
+    Core::MetricService &_metricService;
 
-      /**
-       * Docker module
-       */
-      std::shared_ptr<Service::DockerService> _dockerService;
+    /**
+     * Docker module
+     */
+    std::shared_ptr<Service::DockerService> _dockerService;
 
-      /**
-       * Database connection
-       */
-      std::shared_ptr<Database::DynamoDbDatabase> _dynamoDbDatabase;
+    /**
+     * Database connection
+     */
+    std::shared_ptr<Database::DynamoDbDatabase> _dynamoDbDatabase;
 
-      /**
-       * DynamoDb docker host
-       */
-      std::string _dockerHost;
+    /**
+     * DynamoDb docker host
+     */
+    std::string _dockerHost;
 
-      /**
-       * DynamoDb docker port
-       */
-      int _dockerPort;
+    /**
+     * DynamoDb docker port
+     */
+    int _dockerPort;
 
   };
 

@@ -12,9 +12,9 @@ namespace AwsMock::Service {
 
     // Initialize directories
     _dataDir = _configuration.getString("awsmock.data.dir", DEFAULT_DATA_DIR);
-    _dataS3Dir = _configuration.getString("awsmock.service.s3.data.dir", DEFAULT_S3_DATA_DIR);
     _transferDir = _configuration.getString("awsmock.service.ftp.base.dir", DEFAULT_TRANSFER_DATA_DIR);
     _transferBucket = _configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
+    _dataS3Dir = _dataDir+ Poco::Path::separator() + "s3";
     _tempDir = _dataDir + Poco::Path::separator() + "tmp";
 
     // Initialize database
@@ -34,20 +34,20 @@ namespace AwsMock::Service {
     Core::DirUtils::EnsureDirectory(_dataS3Dir);
   }
 
-  Dto::S3::CreateBucketResponse S3Service::CreateBucket(const std::string &name, const std::string &owner, const Dto::S3::CreateBucketRequest &s3Request) {
+  Dto::S3::CreateBucketResponse S3Service::CreateBucket(const Dto::S3::CreateBucketRequest &s3Request) {
     log_trace_stream(_logger) << "Create bucket request, s3Request: " << s3Request.ToString() << std::endl;
 
     // Get region
-    std::string region = s3Request._locationConstraint;
+    std::string region = s3Request.region;
 
     // Check existence
-    if (_database->BucketExists({.region=region, .name=name})) {
-      log_warning_stream(_logger) << "Bucket exists already, region: " << region << " name: " << name << std::endl;
-      Database::Entity::S3::Bucket bucket = _database->GetBucketByRegionName(region, name);
-      log_debug_stream(_logger) << "Got bucket: " << name << std::endl;
+    if (_database->BucketExists({.region=region, .name=s3Request.bucketName})) {
+      log_warning_stream(_logger) << "Bucket exists already, region: " << region << " name: " << s3Request.bucketName << std::endl;
+      Database::Entity::S3::Bucket bucket = _database->GetBucketByRegionName(region, s3Request.bucketName);
+      log_debug_stream(_logger) << "Got bucket: " << s3Request.bucketName << std::endl;
       return {
-        .location=bucket.region,
-        .arn=Core::AwsUtils::CreateArn("s3", region, _accountId, name)
+          .location=bucket.region,
+          .arn=Core::AwsUtils::CreateArn("s3", region, _accountId, s3Request.bucketName)
       };
 //      throw Core::ServiceException("Bucket exists already", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
@@ -57,11 +57,11 @@ namespace AwsMock::Service {
     try {
 
       // Update database
-      _database->CreateBucket({.region=region, .name=name, .owner=owner});
+      _database->CreateBucket({.region=region, .name=s3Request.bucketName, .owner=s3Request.bucketOwner});
 
-      createBucketResponse = Dto::S3::CreateBucketResponse(region, Core::AwsUtils::CreateArn("s3", region, _accountId, name));
+      createBucketResponse = Dto::S3::CreateBucketResponse(region, Core::AwsUtils::CreateArn("s3", region, _accountId, s3Request.bucketName));
       log_trace_stream(_logger) << "S3 create bucket response: " << createBucketResponse.ToXml() << std::endl;
-      log_info_stream(_logger) << "Bucket created, bucket: " << name << std::endl;
+      log_info_stream(_logger) << "Bucket created, bucket: " << s3Request.bucketName << std::endl;
 
     } catch (Poco::Exception &exc) {
       log_error_stream(_logger) << "S3 create bucket failed, message: " << exc.message() << std::endl;
@@ -90,14 +90,14 @@ namespace AwsMock::Service {
       Database::Entity::S3::Object object = _database->GetObject(request.region, request.bucket, request.key);
 
       Dto::S3::GetMetadataResponse response = {
-        .bucket = object.bucket,
-        .key = object.key,
-        .md5Sum = object.md5sum,
-        .contentType = object.contentType,
-        .size = object.size,
-        .metadata = object.metadata,
-        .created = object.created,
-        .modified = object.modified
+          .bucket = object.bucket,
+          .key = object.key,
+          .md5Sum = object.md5sum,
+          .contentType = object.contentType,
+          .size = object.size,
+          .metadata = object.metadata,
+          .created = object.created,
+          .modified = object.modified
       };
 
       log_trace_stream(_logger) << "S3 get object metadata response: " + response.ToString() << std::endl;
@@ -143,14 +143,14 @@ namespace AwsMock::Service {
 
       std::string filename = _dataS3Dir + Poco::Path::separator() + object.internalName;
       Dto::S3::GetObjectResponse response = {
-        .bucket = object.bucket,
-        .key = object.key,
-        .size = object.size,
-        .filename = filename,
-        .contentType = object.contentType,
-        .metadata = object.metadata,
-        .md5sum=object.md5sum,
-        .modified = object.modified,
+          .bucket = object.bucket,
+          .key = object.key,
+          .size = object.size,
+          .filename = filename,
+          .contentType = object.contentType,
+          .metadata = object.metadata,
+          .md5sum=object.md5sum,
+          .modified = object.modified,
       };
       log_trace_stream(_logger) << "S3 get object response: " << response.ToString() << std::endl;
       log_info_stream(_logger) << "Object returned, bucket: " << request.bucket << " key: " << request.key << std::endl;
@@ -186,7 +186,7 @@ namespace AwsMock::Service {
 
       Database::Entity::S3::ObjectList objectList = _database->ListBucket(request.name, request.prefix);
       Dto::S3::ListBucketResponse listBucketResponse = Dto::S3::ListBucketResponse(request.name, objectList);
-      log_info_stream(_logger) << "Bucket list returned, count: " << objectList.size() << std::endl;
+      log_debug_stream(_logger) << "Bucket list returned, count: " << objectList.size() << std::endl;
 
       return listBucketResponse;
 
@@ -212,11 +212,11 @@ namespace AwsMock::Service {
     log_info_stream(_logger) << "Put bucket versioning, bucket: " << request.bucket << " state: " << request.status << std::endl;
   }
 
-  Dto::S3::InitiateMultipartUploadResult S3Service::CreateMultipartUpload(std::string &bucket, std::string &key, const std::string &region, const std::string &user) {
-    log_trace_stream(_logger) << "CreateMultipartUpload request, bucket: " + bucket << " key: " << key << " region: " << region << " user: " << user << std::endl;
+  Dto::S3::CreateMultipartUploadResult S3Service::CreateMultipartUpload(const Dto::S3::CreateMultipartUploadRequest &request) {
+    log_trace_stream(_logger) << "CreateMultipartUpload request, bucket: " + request.bucket << " key: " << request.key << " region: " << request.region << " user: " << request.user << std::endl;
 
     // Check existence
-    if (!_database->BucketExists({.region=region, .name=bucket})) {
+    if (!_database->BucketExists({.region=request.region, .name=request.bucket})) {
       throw Core::ServiceException("Bucket does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
@@ -226,8 +226,8 @@ namespace AwsMock::Service {
     std::string uploadDir = GetMultipartUploadDirectory(uploadId);
     Core::DirUtils::EnsureDirectory(uploadDir);
 
-    log_info_stream(_logger) << "Multipart upload started, bucket: " << bucket << " key: " << key << " uploadId: " << uploadId << std::endl;
-    return {.bucket=bucket, .key=key, .uploadId=uploadId};
+    log_info_stream(_logger) << "Multipart upload started, bucket: " << request.bucket << " key: " << request.key << " uploadId: " << uploadId << std::endl;
+    return {.region=request.region, .bucket=request.bucket, .key=request.key, .uploadId=uploadId};
   }
 
   std::string S3Service::UploadPart(std::istream &stream, int part, const std::string &uploadId) {
@@ -249,62 +249,64 @@ namespace AwsMock::Service {
     return eTag;
   }
 
-  Dto::S3::CompleteMultipartUploadResult S3Service::CompleteMultipartUpload(const std::string &uploadId, const std::string &bucket, const std::string &key, const std::string &region, const std::string &user) {
-    log_trace_stream(_logger) << "CompleteMultipartUpload request, uploadId: " << uploadId << " bucket: " << bucket << " key: " << key << " region: " << region << " user: " << user;
+  Dto::S3::CompleteMultipartUploadResult S3Service::CompleteMultipartUpload(const Dto::S3::CompleteMultipartUploadRequest &request) {
+    log_trace_stream(_logger) << "CompleteMultipartUpload request, uploadId: " << request.uploadId << " bucket: " << request.bucket << " key: " << request.key << " region: " << request.region << " user: " << request.user << std::endl;
 
     // Get all file parts
-    std::string uploadDir = GetMultipartUploadDirectory(uploadId);
-    std::vector<std::string> files = Core::DirUtils::ListFilesByPrefix(uploadDir, uploadId);
+    std::string uploadDir = GetMultipartUploadDirectory(request.uploadId);
+    std::vector<std::string> files = Core::DirUtils::ListFilesByPrefix(uploadDir, request.uploadId);
 
     // Output file
     std::string filename = Core::AwsUtils::CreateS3FileName();
     std::string outFile = _dataS3Dir + Poco::Path::separator() + filename;
-    log_trace_stream(_logger) << "Output file, outFile: " << outFile << std::endl;
+    log_debug_stream(_logger) << "Output file, outFile: " << outFile << std::endl;
 
     // Append all parts to the output file
     try {
+
       Core::FileUtils::AppendTextFiles(outFile, uploadDir, files);
-      log_trace_stream(_logger) << "Input files appended to outfile, outFile: " << outFile << std::endl;
+      log_debug_stream(_logger) << "Input files appended to outfile, outFile: " << outFile << std::endl;
 
     } catch (Poco::Exception &exc) {
       log_error_stream(_logger) << "Append to binary file failes, error: " << exc.message() << std::endl;
     }
+
     // Get file size, MD5 sum
     long fileSize = (long) Core::FileUtils::FileSize(outFile);
     std::string md5sum = Core::Crypto::GetMd5FromFile(outFile);
     std::string sha1sum = Core::Crypto::GetSha1FromFile(outFile);
     std::string sha256sum = Core::Crypto::GetSha256FromFile(outFile);
-    log_debug_stream(_logger) << "Metadata, bucket: " << bucket << " key: " << key << " md5: " << md5sum << " sha256: " << sha256sum << std::endl;
+    log_debug_stream(_logger) << "Metadata, bucket: " << request.bucket << " key: " << request.key << " md5: " << md5sum << " sha256: " << sha256sum << std::endl;
 
     // Create database object
     Database::Entity::S3::Object object = _database->CreateOrUpdateObject(
-      {
-        .region=region,
-        .bucket=bucket,
-        .key=key,
-        .owner=user,
-        .size=fileSize,
-        .md5sum=md5sum,
-        .sha1sum=sha1sum,
-        .sha256sum=sha256sum,
-        .internalName=filename,
-      });
+        {
+            .region=request.region,
+            .bucket=request.bucket,
+            .key=request.key,
+            .owner=request.user,
+            .size=fileSize,
+            .md5sum=md5sum,
+            .sha1sum=sha1sum,
+            .sha256sum=sha256sum,
+            .internalName=filename,
+        });
 
     // Cleanup
     Core::DirUtils::DeleteDirectory(uploadDir);
 
     // Check notifications
-    CheckNotifications(region, bucket, key, object.size, "s3:ObjectCreated:Put");
+    CheckNotifications(request.region, request.bucket, request.key, object.size, "s3:ObjectCreated:Put");
 
-    log_info_stream(_logger) << "Multipart upload finished, bucket: " << bucket << " key: " << key << std::endl;
+    log_info_stream(_logger) << "Multipart upload finished, bucket: " << request.bucket << " key: " << request.key << std::endl;
     return {
-      .location=region,
-      .bucket=bucket,
-      .key=key,
-      .etag=md5sum,
-      .md5sum=md5sum,
-      .checksumSha1=sha1sum,
-      .checksumSha256=sha256sum
+        .location=request.region,
+        .bucket=request.bucket,
+        .key=request.key,
+        .etag=md5sum,
+        .md5sum=md5sum,
+        .checksumSha1=sha1sum,
+        .checksumSha256=sha256sum
     };
   }
 
@@ -370,17 +372,17 @@ namespace AwsMock::Service {
 
       // Update database
       targetObject = {
-        .region=request.region,
-        .bucket=request.targetBucket,
-        .key=request.targetKey,
-        .owner=sourceObject.owner,
-        .size=sourceObject.size,
-        .md5sum=sourceObject.md5sum,
-        .sha1sum=sourceObject.sha1sum,
-        .sha256sum=sourceObject.sha256sum,
-        .contentType=sourceObject.contentType,
-        .metadata=request.metadata,
-        .internalName=targetFile,
+          .region=request.region,
+          .bucket=request.targetBucket,
+          .key=request.targetKey,
+          .owner=sourceObject.owner,
+          .size=sourceObject.size,
+          .md5sum=sourceObject.md5sum,
+          .sha1sum=sourceObject.sha1sum,
+          .sha256sum=sourceObject.sha256sum,
+          .contentType=sourceObject.contentType,
+          .metadata=request.metadata,
+          .internalName=targetFile,
       };
 
       // Create version ID
@@ -442,17 +444,17 @@ namespace AwsMock::Service {
 
       // Update database
       targetObject = {
-        .region=request.region,
-        .bucket=request.targetBucket,
-        .key=request.targetKey,
-        .owner=sourceObject.owner,
-        .size=sourceObject.size,
-        .md5sum=sourceObject.md5sum,
-        .sha1sum=sourceObject.sha1sum,
-        .sha256sum=sourceObject.sha256sum,
-        .contentType=sourceObject.contentType,
-        .metadata=request.metadata,
-        .internalName=targetFile,
+          .region=request.region,
+          .bucket=request.targetBucket,
+          .key=request.targetKey,
+          .owner=sourceObject.owner,
+          .size=sourceObject.size,
+          .md5sum=sourceObject.md5sum,
+          .sha1sum=sourceObject.sha1sum,
+          .sha256sum=sourceObject.sha256sum,
+          .contentType=sourceObject.contentType,
+          .metadata=request.metadata,
+          .internalName=targetFile,
       };
 
       // Create version ID
@@ -521,10 +523,6 @@ namespace AwsMock::Service {
     Dto::S3::DeleteObjectsResponse response;
     try {
 
-      // Delete from database
-      _database->DeleteObjects(request.bucket, request.keys);
-      log_debug_stream(_logger) << "Database object deleted, count: " << request.keys.size() << std::endl;
-
       // Delete file system objects
       for (const auto &key : request.keys) {
 
@@ -538,6 +536,11 @@ namespace AwsMock::Service {
         // Check notifications
         CheckNotifications(request.region, request.bucket, key, 0, "s3:ObjectRemoved:Delete");
       }
+
+      // Delete from database
+      _database->DeleteObjects(request.bucket, request.keys);
+      log_debug_stream(_logger) << "Database object deleted, count: " << request.keys.size() << std::endl;
+
       log_info_stream(_logger) << "Objects deleted, bucket: " << request.bucket << " count: " << request.keys.size() << std::endl;
 
     } catch (Poco::Exception &ex) {
@@ -576,10 +579,10 @@ namespace AwsMock::Service {
     }
   }
 
-  void S3Service::DeleteBucket(const std::string &region, const std::string &name) {
-    log_trace_stream(_logger) << "Delete bucket request, name: " << name << std::endl;
+  void S3Service::DeleteBucket(const Dto::S3::DeleteBucketRequest &request) {
+    log_trace_stream(_logger) << "Delete bucket request, name: " << request.bucket << std::endl;
 
-    Database::Entity::S3::Bucket bucket = {.region=region, .name=name};
+    Database::Entity::S3::Bucket bucket = {.region=request.region, .name=request.bucket};
 
     // Check existence
     if (!_database->BucketExists(bucket)) {
@@ -592,14 +595,14 @@ namespace AwsMock::Service {
     }
 
     // Check transfer bucket
-    if (name == _transferBucket) {
+    if (request.bucket == _transferBucket) {
       throw Core::ServiceException("Transfer bucket cannot be deleted", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
     }
 
     try {
 
       // Delete directory
-      DeleteBucket(name);
+      DeleteBucket(request.bucket);
 
       // Delete bucket from database
       _database->DeleteBucket(bucket);
@@ -694,9 +697,9 @@ namespace AwsMock::Service {
     }
   }
 
-  void S3Service::DeleteBucket(const std::string &bucket) {
+  void S3Service::DeleteBucket(const std::string &name) {
 
-    std::string bucketDir = _dataS3Dir + Poco::Path::separator() + bucket;
+    std::string bucketDir = _dataS3Dir + Poco::Path::separator() + name;
     if (Core::DirUtils::DirectoryExists(bucketDir)) {
       Core::DirUtils::DeleteDirectory(bucketDir, true);
       log_debug_stream(_logger) << "Bucket directory deleted, bucketDir: " + bucketDir << std::endl;
@@ -781,28 +784,32 @@ namespace AwsMock::Service {
     std::ofstream ofs(filePath);
     long size = Poco::StreamCopier::copyStream(stream, ofs);
     ofs.close();
+    //Core::FileUtils::StripChunkSignature(filePath);
     log_debug_stream(_logger) << "File received, fileName: " << filePath << " size: " << size << std::endl;
 
-    // Meta data
-    std::string md5sum = Core::Crypto::GetMd5FromFile(filePath);
-    std::string sha1sum = Core::Crypto::GetSha1FromFile(filePath);
-    std::string sha256sum = Core::Crypto::GetSha256FromFile(filePath);
-    log_info_stream(_logger) << "Checksum, bucket: " << request.bucket << " key: " << request.key << " md5: " << md5sum << std::endl;
-
-    // Update database
+    // Create entity
     Database::Entity::S3::Object object = {
-      .region=request.region,
-      .bucket=request.bucket,
-      .key=request.key,
-      .owner=request.owner,
-      .size=size,
-      .md5sum=md5sum,
-      .sha1sum=sha1sum,
-      .sha256sum=sha256sum,
-      .contentType=request.contentType,
-      .metadata=request.metadata,
-      .internalName=fileName
+        .region=request.region,
+        .bucket=request.bucket,
+        .key=request.key,
+        .owner=request.owner,
+        .size=size,
+        .contentType=request.contentType,
+        .metadata=request.metadata,
+        .internalName=fileName
     };
+
+    // Meta data
+    object.md5sum = Core::Crypto::GetMd5FromFile(filePath);
+    log_debug_stream(_logger) << "Checksum, bucket: " << request.bucket << " key: " << request.key << " md5: " << object.md5sum << std::endl;
+    if (request.checksumAlgorithm == "SHA1") {
+      object.sha1sum = Core::Crypto::GetSha1FromFile(filePath);
+      log_debug_stream(_logger) << "Checksum SHA1, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << std::endl;
+    }
+    if (request.checksumAlgorithm == "SHA256") {
+      object.sha256sum = Core::Crypto::GetSha256FromFile(filePath);
+      log_debug_stream(_logger) << "Checksum SHA256, bucket: " << request.bucket << " key: " << request.key << " sha256: " << object.sha256sum << std::endl;
+    }
 
     // Update database
     object = _database->CreateOrUpdateObject(object);
@@ -813,14 +820,14 @@ namespace AwsMock::Service {
     log_info_stream(_logger) << "Put object succeeded, bucket: " << request.bucket << " key: " << request.key << std::endl;
 
     return {
-      .bucket=request.bucket,
-      .key=request.key,
-      .etag=md5sum,
-      .md5Sum=md5sum,
-      .contentLength=size,
-      .checksumAlgorithm="SHA256",
-      .checksumSha256=sha256sum,
-      .metadata=request.metadata
+        .bucket=request.bucket,
+        .key=request.key,
+        .etag=object.md5sum,
+        .md5Sum=object.md5sum,
+        .contentLength=size,
+        .checksumSha1=object.sha1sum,
+        .checksumSha256=object.sha256sum,
+        .metadata=request.metadata
     };
   }
 
@@ -834,16 +841,10 @@ namespace AwsMock::Service {
     ofs.close();
     log_debug_stream(_logger) << "File received, filePath: " << filePath << " size: " << size << std::endl;
 
-    // Meta data
-    std::string md5sum = Core::Crypto::GetMd5FromFile(filePath);
-    //std::string sha1sum = Core::Crypto::GetSha1FromFile(filePath);
-    //std::string sha256sum = Core::Crypto::GetSha256FromFile(filePath);
-    log_info_stream(_logger) << "Checksum, bucket: " << request.bucket << " key: " << request.key << "md5: " << md5sum << std::endl;
-
     Database::Entity::S3::Object object;
 
     // Check existence by
-    Database::Entity::S3::Object existingObject = _database->GetObjectMd5(request.region, request.bucket, request.key, md5sum);
+    Database::Entity::S3::Object existingObject = _database->GetObjectMd5(request.region, request.bucket, request.key, request.md5Sum);
     if (existingObject.oid.empty()) {
 
       // Version ID
@@ -851,18 +852,15 @@ namespace AwsMock::Service {
 
       // Create new version of new object
       object = {
-        .region=request.region,
-        .bucket=request.bucket,
-        .key=request.key,
-        .owner=request.owner,
-        .size=size,
-        .md5sum=md5sum,
-//          .sha1sum=sha1sum,
-//          .sha256sum=sha256sum,
-        .contentType=request.contentType,
-        .metadata=request.metadata,
-        .internalName=fileName,
-        .versionId=versionId,
+          .region=request.region,
+          .bucket=request.bucket,
+          .key=request.key,
+          .owner=request.owner,
+          .size=size,
+          .contentType=request.contentType,
+          .metadata=request.metadata,
+          .internalName=fileName,
+          .versionId=versionId,
       };
 
       // Create new version in database
@@ -879,16 +877,28 @@ namespace AwsMock::Service {
       Core::FileUtils::DeleteFile(filePath);
     }
 
+    // Meta data
+    object.md5sum = Core::Crypto::GetMd5FromFile(filePath);
+    log_info_stream(_logger) << "Checksum, bucket: " << request.bucket << " key: " << request.key << "md5: " << object.md5sum << std::endl;
+    if (request.checksumAlgorithm == "SHA1") {
+      object.sha1sum = Core::Crypto::GetSha1FromFile(filePath);
+      log_debug_stream(_logger) << "Checksum SHA1, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << std::endl;
+    }
+    if (request.checksumAlgorithm == "SHA256") {
+      object.sha256sum = Core::Crypto::GetSha256FromFile(filePath);
+      log_debug_stream(_logger) << "Checksum SHA256, bucket: " << request.bucket << " key: " << request.key << " sha256: " << object.sha256sum << std::endl;
+    }
+
     return {
-      .bucket=request.bucket,
-      .key=request.key,
-      .etag=md5sum,
-      .md5Sum=md5sum,
-      .contentLength=size,
-      .checksumAlgorithm="SHA256",
-//        .checksumSha256=sha256sum,
-      .metadata=request.metadata,
-      .versionId=object.versionId
+        .bucket=request.bucket,
+        .key=request.key,
+        .etag=object.md5sum,
+        .md5Sum=object.md5sum,
+        .contentLength=size,
+        .checksumSha1=object.sha1sum,
+        .checksumSha256=object.sha256sum,
+        .metadata=request.metadata,
+        .versionId=object.versionId
     };
   }
 } // namespace AwsMock::Service

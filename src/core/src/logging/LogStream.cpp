@@ -5,6 +5,8 @@
 
 namespace AwsMock::Core {
 
+  Poco::Mutex LogStreamBuf::_mutex;
+
   //
   // LogStreamBuf
   //
@@ -12,7 +14,9 @@ namespace AwsMock::Core {
     _message.reserve(bufferCapacity);
   }
 
-  LogStreamBuf::~LogStreamBuf() = default;
+  LogStreamBuf::~LogStreamBuf() {
+    _message.clear();
+  };
 
   void LogStreamBuf::setPriority(Poco::Message::Priority priority) {
     _priority = priority;
@@ -35,9 +39,9 @@ namespace AwsMock::Core {
   }
 
   int LogStreamBuf::writeToDevice(char c) {
-    Poco::Mutex::ScopedLock lock(_mutex);
     if (c == '\n' || c == '\r') {
       if (!_message.empty()) {
+        //Poco::Mutex::ScopedLock lock(_mutex);
         Poco::Message msg(_logger.name(), _message, _priority, _file, _line);
         _logger.log(msg);
         _message.clear();

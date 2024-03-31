@@ -35,6 +35,7 @@ namespace AwsMock::Service {
 
         Dto::DynamoDb::CreateTableRequest tableRequest;
         tableRequest.FromJson(payload);
+        tableRequest.region = region;
 
         // Copy headers
         for (const auto &header : request) {
@@ -48,6 +49,7 @@ namespace AwsMock::Service {
 
         Dto::DynamoDb::ListTableRequest tableRequest;
         tableRequest.FromJson(payload);
+        tableRequest.region = region;
 
         // Copy headers
         for (const auto &header : request) {
@@ -57,10 +59,25 @@ namespace AwsMock::Service {
         Dto::DynamoDb::ListTableResponse tableResponse = _dynamoDbService.ListTables(tableRequest);
         SendOkResponse(response, tableResponse.body);
 
+      } else if (action == "DescribeTable") {
+
+        Dto::DynamoDb::DescribeTableRequest tableRequest;
+        tableRequest.FromJson(payload);
+        tableRequest.region = region;
+
+        // Copy headers
+        for (const auto &header : request) {
+          tableRequest.headers[header.first] = header.second;
+        }
+
+        Dto::DynamoDb::DescribeTableResponse tableResponse = _dynamoDbService.DescribeTable(tableRequest);
+        SendOkResponse(response, tableResponse.body);
+
       } else if (action == "DeleteTable") {
 
         Dto::DynamoDb::DeleteTableRequest tableRequest;
         tableRequest.FromJson(payload);
+        tableRequest.region = region;
 
         // Copy headers
         for (const auto &header : request) {

@@ -2,8 +2,8 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_S3HANDLER_H
-#define AWSMOCK_SERVICE_S3HANDLER_H
+#ifndef AWSMOCK_SERVICE_S3_HANDLER_H
+#define AWSMOCK_SERVICE_S3_HANDLER_H
 
 // Poco includes
 #include "Poco/DateTime.h"
@@ -18,11 +18,10 @@
 #include <awsmock/core/MetricDefinition.h>
 #include <awsmock/core/NumberUtils.h>
 #include "awsmock/dto/common/UserAgent.h"
+#include "awsmock/dto/common/S3ClientCommand.h"
 #include <awsmock/service/AbstractHandler.h>
 #include <awsmock/service/S3Service.h>
-#include <awsmock/service/S3CliHandler.h>
-#include <awsmock/service/S3CppHandler.h>
-#include <awsmock/service/S3Java2Handler.h>
+#include <awsmock/service/S3CmdHandler.h>
 
 namespace AwsMock::Service {
 
@@ -46,7 +45,7 @@ namespace AwsMock::Service {
    * </ul>
    * <p>
    */
-  class S3Handler : public S3CliHandler, public S3CppHandler, public S3Java2Handler {
+  class S3Handler : public S3CmdHandler {
 
   public:
 
@@ -105,14 +104,6 @@ namespace AwsMock::Service {
     void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
     /**
-     * Options request.
-     *
-     * @param response HTTP response
-     * @see AbstractResource::handleOption(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-     */
-    void handleOptions(Poco::Net::HTTPServerResponse &response) override;
-
-    /**
      * Head request.
      *
      * @param request HTTP request
@@ -149,4 +140,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_S3HANDLER_H
+#endif // AWSMOCK_SERVICE_S3_HANDLER_H

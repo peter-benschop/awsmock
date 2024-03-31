@@ -41,7 +41,8 @@ namespace AwsMock::Service {
       }
 
       void TearDown() override {
-        _dynamoDbService.DeleteAllTables();
+        Core::ExecResult deleteTableResult = Core::SystemUtils::Exec(_baseCommand + "delete-table test-table");
+        EXPECT_EQ(0, deleteTableResult.status);
         _dynamoDbServer.StopServer();
       }
 
@@ -58,11 +59,12 @@ namespace AwsMock::Service {
     // arrange
 
     // act
-    Core::ExecResult result = Core::SystemUtils::Exec(_baseCommand + "create-table test-table");
+    Core::ExecResult createTableResult = Core::SystemUtils::Exec(_baseCommand + "create-table test-table");
+    EXPECT_EQ(0, createTableResult.status);
     Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
 
     // assert
-    EXPECT_EQ(0, result.status);
+    EXPECT_EQ(0, createTableResult.status);
     EXPECT_EQ(1, tableList.size());
   }
 
@@ -82,7 +84,7 @@ namespace AwsMock::Service {
     EXPECT_TRUE(Core::StringUtils::Contains(listResult.output, "test-table"));
   }
 
-  TEST_F(DynamoDbServerJavaTest, TableDeleteTest) {
+  TEST_F(DynamoDbServerJavaTest, TableDescribeTest) {
 
     // arrange
     Core::ExecResult result = Core::SystemUtils::Exec(_baseCommand + "create-table test-table");
@@ -91,7 +93,24 @@ namespace AwsMock::Service {
     EXPECT_EQ(1, tableList.size());
 
     // act
+    Core::ExecResult describeResult = Core::SystemUtils::Exec(_baseCommand + "describe-table test-table");
+
+    // assert
+    EXPECT_EQ(0, describeResult.status);
+    EXPECT_TRUE(Core::StringUtils::Contains(describeResult.output, "test-table"));
+  }
+
+  TEST_F(DynamoDbServerJavaTest, TableDeleteTest) {
+
+    // arrange
+    Core::ExecResult createTableResult = Core::SystemUtils::Exec(_baseCommand + "create-table test-table");
+    EXPECT_EQ(0, createTableResult.status);
+    Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
+    EXPECT_EQ(1, tableList.size());
+
+    // act
     Core::ExecResult deleteResult = Core::SystemUtils::Exec(_baseCommand + "delete-table test-table");
+    EXPECT_EQ(0, deleteResult.status);
     tableList = _database.ListTables();
 
     // assert

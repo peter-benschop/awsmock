@@ -2,19 +2,19 @@
 // Created by vogje01 on 05/01/2023.
 //
 
-#ifndef AWSMOCK_CORE_JSONLOGFORMATTER_H
-#define AWSMOCK_CORE_JSONLOGFORMATTER_H
+#ifndef AWS_MOCK_CORE_JSON_LOG_FORMATTER_H
+#define AWS_MOCK_CORE_JSON_LOG_FORMATTER_H
 
 // Poco includes
-#include "Poco/Formatter.h"
-#include "Poco/Message.h"
+#include <Poco/Formatter.h>
+#include <Poco/Message.h>
 #include <Poco/JSON/Object.h>
-#include "Poco/Net/DNS.h"
+#include <Poco/Net/DNS.h>
 
 namespace AwsMock::Core {
 
   static const std::string PRIORITY_STR_FATAL = "FATAL";
-  static const std::string PRIORITY_STR_CRITIAL = "CRITICAL";
+  static const std::string PRIORITY_STR_CRITICAL = "CRITICAL";
   static const std::string PRIORITY_STR_ERROR = "ERROR";
   static const std::string PRIORITY_STR_WARNING = "WARNING";
   static const std::string PRIORITY_STR_NOTICE = "NOTICE";
@@ -24,6 +24,7 @@ namespace AwsMock::Core {
 
   /**
    * JSON log formatter.
+   *
    * <p>
    * This formatter s used to generate JSON output for all log messages, which is needed by the Kibana implementation.
    * </p>
@@ -89,4 +90,4 @@ namespace AwsMock::Core {
     std::string getFilename(const std::string &filename);
   };
 }
-#endif // AWSMOCK_CORE_JSONLOGFORMATTER_H
+#endif // AWS_MOCK_CORE_JSON_LOG_FORMATTER_H

@@ -2,12 +2,11 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_CORE_AWSUTILSTEST_H
-#define AWMOCK_CORE_AWSUTILSTEST_H
+#ifndef AWMOCK_CORE_AWS_UTILS_TEST_H
+#define AWMOCK_CORE_AWS_UTILS_TEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
 
 // Poco includes
 #include "Poco/Path.h"
@@ -88,4 +87,4 @@ namespace AwsMock::Core {
 
 } // namespace AwsMock::Core
 
-#endif // AWMOCK_CORE_AWSUTILSTEST_H
+#endif // AWMOCK_CORE_AWS_UTILS_TEST_H

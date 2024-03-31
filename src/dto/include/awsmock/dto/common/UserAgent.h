@@ -2,8 +2,8 @@
 // Created by vogje01 on 11/26/23.
 //
 
-#ifndef AWSMOCK_DTO_COMMON_USERAGENT_H
-#define AWSMOCK_DTO_COMMON_USERAGENT_H
+#ifndef AWSMOCK_DTO_COMMON_USER_AGENT_H
+#define AWSMOCK_DTO_COMMON_USER_AGENT_H
 
 // C++ includes
 #include <string>
@@ -86,7 +86,7 @@ namespace AwsMock::Dto::Common {
     std::string clientCommand;
 
     /**
-     * Client content type
+     * Client content type, default: application/xml
      */
     std::string contentType = "application/xml";
 
@@ -127,4 +127,4 @@ namespace AwsMock::Dto::Common {
   };
 
 }
-#endif //AWSMOCK_DTO_COMMON_USERAGENT_H
+#endif // AWSMOCK_DTO_COMMON_USER_AGENT_H

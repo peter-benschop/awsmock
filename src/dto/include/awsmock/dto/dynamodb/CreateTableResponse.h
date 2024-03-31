@@ -123,6 +123,11 @@ namespace AwsMock::Dto::DynamoDb {
     std::string body;
 
     /**
+     * Original HTTP response headers
+     */
+    std::map<std::string, std::string> headers;
+
+    /**
      * Creates a JSON string from the object.
      *
      * @return JSON string
@@ -132,9 +137,9 @@ namespace AwsMock::Dto::DynamoDb {
     /**
      * Parse a JSON stream
      *
-     * @param jsonString JSON string
+     * @param body JSON body
      */
-    void FromJson(const std::string &jsonString);
+    void FromJson(const std::string &body, const std::map<std::string, std::string> &headerMap);
 
     /**
      * Converts the DTO to a string representation.
@@ -152,6 +157,6 @@ namespace AwsMock::Dto::DynamoDb {
 
   };
 
-} // namespace AwsMock::Dto::lambda
+} // namespace AwsMock::Dto::DynamoDb
 
 #endif // AWSMOCK_DTO_DYNAMODB_CREATE_TABLE_RESPONSE_H

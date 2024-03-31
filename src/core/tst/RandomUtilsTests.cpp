@@ -2,8 +2,8 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWSMOCK_CORE_RANDOMUTILSTEST_H
-#define AWSMOCK_CORE_RANDOMUTILSTEST_H
+#ifndef AWSMOCK_CORE_RANDOM_UTILS_TEST_H
+#define AWSMOCK_CORE_RANDOM_UTILS_TEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
@@ -12,15 +12,8 @@
 #include <awsmock/core/RandomUtils.h>
 
 namespace AwsMock::Core {
-  class RandomUtilsTest : public ::testing::Test {
 
-  protected:
-    void SetUp() override {
-    }
-
-    void TearDown() override {
-    }
-  };
+  class RandomUtilsTest : public ::testing::Test {};
 
   TEST_F(RandomUtilsTest, MinMaxIntTest) {
 
@@ -98,4 +91,4 @@ namespace AwsMock::Core {
 
 } // namespace AwsMock::Core
 
-#endif // AWSMOCK_CORE_RANDOMUTILSTEST_H
+#endif // AWSMOCK_CORE_RANDOM_UTILS_TEST_H

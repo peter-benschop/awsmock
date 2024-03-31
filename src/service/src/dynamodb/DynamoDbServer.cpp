@@ -27,6 +27,9 @@ namespace AwsMock::Service {
     // Docker module
     _dockerService = std::make_unique<Service::DockerService>(_configuration);
     log_debug_stream(_logger) << "DynamoDbServer initialized" << std::endl;
+
+    // Start DynamoDb docker image
+    StartLocalDynamoDb();
   }
 
   DynamoDbServer::~DynamoDbServer() {
@@ -36,7 +39,7 @@ namespace AwsMock::Service {
   void DynamoDbServer::MainLoop() {
 
     // Check module active
-    if (!IsActive("lambda")) {
+    if (!IsActive("dynamodb")) {
       log_info_stream(_logger) << "DynamoDb module inactive" << std::endl;
       return;
     }
@@ -51,9 +54,6 @@ namespace AwsMock::Service {
     // Cleanup
     CleanupContainers();
 
-    // Start all lambda functions
-    StartLocalDynamoDb();
-
     while (IsRunning()) {
 
       log_debug_stream(_logger) << "DynamoDb processing started" << std::endl;
@@ -61,6 +61,7 @@ namespace AwsMock::Service {
       // Wait for timeout or condition
       if (InterruptableSleep(_period)) {
         StopMonitoringServer();
+        StopHttpServer();
         StopLocalDynamoDb();
         break;
       }

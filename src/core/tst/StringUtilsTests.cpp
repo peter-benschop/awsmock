@@ -2,8 +2,8 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWSMOCK_CORE_STRINGUTILSTEST_H
-#define AWSMOCK_CORE_STRINGUTILSTEST_H
+#ifndef AWSMOCK_CORE_STRING_UTILS_TEST_H
+#define AWSMOCK_CORE_STRING_UTILS_TEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
@@ -15,15 +15,8 @@
 #include <awsmock/core/StringUtils.h>
 
 namespace AwsMock::Core {
-  class StringUtilsTest : public ::testing::Test {
 
-  protected:
-    void SetUp() override {
-    }
-
-    void TearDown() override {
-    }
-  };
+  class StringUtilsTest : public ::testing::Test {};
 
   TEST_F(StringUtilsTest, IsNumericTest) {
     // arrange
@@ -218,6 +211,18 @@ namespace AwsMock::Core {
     EXPECT_TRUE(result == "some invalid stuff");
   }
 
+  TEST_F(StringUtilsTest, SnakeCaseTest) {
+
+    // arrange
+    std::string input = "CreateQueue";
+
+    // act
+    std::string result = StringUtils::ToSnakeCase(input);
+
+    // assert
+    EXPECT_TRUE(result == "create-queue");
+  }
+
 } // namespace AwsMock::Core
 
-#endif // AWSMOCK_CORE_STRINGUTILSTEST_H
+#endif // AWSMOCK_CORE_STRING_UTILS_TEST_H

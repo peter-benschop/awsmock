@@ -198,4 +198,29 @@ namespace AwsMock::Core {
     close(fd);
     return true;
   }
+
+  void FileUtils::StripChunkSignature(const std::string& path) {
+    std::string line;
+    std::ifstream fin;
+    std::string tempFile = GetTempFile("bin");
+
+    fin.open(path);
+
+    // Contents of path must be copied to a temp file then renamed back to the path file
+    std::ofstream temp;
+    temp.open(tempFile);
+
+    // Write all lines to temp other than the line marked for erasing
+    while (getline(fin, line)) {
+      if (!StringUtils::ContainsIgnoreCase(line, "chunk-signature"))
+        temp << line << std::endl;
+    }
+
+    temp.close();
+    fin.close();
+
+    // Required conversion for remove and rename functions
+    CopyTo(tempFile, path);
+    DeleteFile(tempFile);
+  }
 }

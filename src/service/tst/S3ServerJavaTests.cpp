@@ -26,7 +26,7 @@ namespace AwsMock::Service {
 
   class S3ServerJavaTest : public ::testing::Test {
 
-  protected:
+    protected:
 
     void SetUp() override {
 
@@ -107,15 +107,15 @@ namespace AwsMock::Service {
   TEST_F(S3ServerJavaTest, ObjectPutTest) {
 
     // arrange
-    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " s3 create-bucket test-bucket");
+    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " s3 create-bucket " + BUCKET);
     EXPECT_EQ(0, createResult.status);
 
     // act
-    Core::ExecResult putResult = Core::SystemUtils::Exec(_baseCommand + " s3 put-object test-bucket test-key \"test-object\"");
+    Core::ExecResult putResult = Core::SystemUtils::Exec(_baseCommand + " s3 put-object " + BUCKET + " test-key \"test-object\"");
+    EXPECT_EQ(0, putResult.status);
     Database::Entity::S3::ObjectList objectList = _database.ListBucket(BUCKET);
 
     // assert
-    EXPECT_EQ(0, putResult.status);
     EXPECT_EQ(1, objectList.size());
   }
 
@@ -124,11 +124,31 @@ namespace AwsMock::Service {
     // arrange
     Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " s3 create-bucket test-bucket");
     EXPECT_EQ(0, createResult.status);
-    Core::ExecResult putResult = Core::SystemUtils::Exec(_baseCommand + " s3 put-object test-bucket test-key \"test-object\"");
+    Core::ExecResult putResult = Core::SystemUtils::Exec(_baseCommand + " s3 put-object " + BUCKET + " test-key \"test-object\"");
     EXPECT_EQ(0, putResult.status);
 
     // act
-    Core::ExecResult getResult = Core::SystemUtils::Exec(_baseCommand + " s3 get-object test-bucket test-key " + _tempFile);
+    Core::ExecResult getResult = Core::SystemUtils::Exec(_baseCommand + " s3 get-object " + BUCKET + " test-key " + _tempFile);
+    EXPECT_EQ(0, getResult.status);
+
+    // assert
+    EXPECT_EQ(0, getResult.status);
+    EXPECT_TRUE(Core::FileUtils::FileSize(_tempFile) > 0);
+  }
+
+  TEST_F(S3ServerJavaTest, ObjectCopyTest) {
+
+    // arrange
+    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " s3 create-bucket test-bucket");
+    EXPECT_EQ(0, createResult.status);
+    Core::ExecResult putResult = Core::SystemUtils::Exec(_baseCommand + " s3 put-object " + BUCKET + " test-key \"test-object\"");
+    EXPECT_EQ(0, putResult.status);
+
+    // act
+    Core::ExecResult copyResult = Core::SystemUtils::Exec(_baseCommand + " s3 copy-object " + BUCKET + " test-key " + BUCKET + " test-key1");
+    EXPECT_EQ(0, copyResult.status);
+    Core::ExecResult getResult = Core::SystemUtils::Exec(_baseCommand + " s3 get-object " + BUCKET + " test-key1 " + _tempFile);
+    EXPECT_EQ(0, getResult.status);
 
     // assert
     EXPECT_EQ(0, getResult.status);
@@ -145,6 +165,26 @@ namespace AwsMock::Service {
 
     // act
     Core::ExecResult deleteResult = Core::SystemUtils::Exec(_baseCommand + " s3 delete-object test-bucket test-key");
+    long count = _database.ObjectCount();
+
+    // assert
+    EXPECT_EQ(0, deleteResult.status);
+    EXPECT_EQ(0, count);
+  }
+
+  TEST_F(S3ServerJavaTest, ObjectsDeleteTest) {
+
+    // arrange
+    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " s3 create-bucket test-bucket");
+    EXPECT_EQ(0, createResult.status);
+    Core::ExecResult putResult1 = Core::SystemUtils::Exec(_baseCommand + " s3 put-object test-bucket test-key1 \"test-object\"");
+    EXPECT_EQ(0, putResult1.status);
+    Core::ExecResult putResult2 = Core::SystemUtils::Exec(_baseCommand + " s3 put-object test-bucket test-key2 \"test-object\"");
+    EXPECT_EQ(0, putResult2.status);
+
+    // act
+    Core::ExecResult deleteResult = Core::SystemUtils::Exec(_baseCommand + " s3 delete-objects test-bucket test-key1 test-key2");
+    EXPECT_EQ(0, deleteResult.status);
     long count = _database.ObjectCount();
 
     // assert

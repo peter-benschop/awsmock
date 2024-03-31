@@ -43,13 +43,14 @@ namespace AwsMock::Dto::DynamoDb {
     }
   }
 
-  void DeleteTableResponse::FromJson(const std::string &jsonString) {
+  void DeleteTableResponse::FromJson(const std::string &jsonString, const std::map<std::string, std::string> &headerMap) {
 
     body = jsonString;
+    headers = headerMap;
 
-    Poco::JSON::Parser parser;
+    /*Poco::JSON::Parser parser;
     Poco::Dynamic::Var result = parser.parse(jsonString);
-    const auto& rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
     try {
 
@@ -63,7 +64,7 @@ namespace AwsMock::Dto::DynamoDb {
 
       // Key schema
       Poco::JSON::Array::Ptr jsonKeySchemaArray = jsonTableDescription->getArray("KeySchema");
-      if(!jsonKeySchemaArray.isNull()) {
+      if (!jsonKeySchemaArray.isNull()) {
         for (size_t i = 0; i < jsonKeySchemaArray->size(); i++) {
           std::string name, type;
           Poco::JSON::Object::Ptr jsonKeySchemaObject = jsonKeySchemaArray->getObject(i);
@@ -75,7 +76,7 @@ namespace AwsMock::Dto::DynamoDb {
 
       // Attributes
       Poco::JSON::Array::Ptr jsonAttributeArray = jsonTableDescription->getArray("AttributeDefinitions");
-      if(!jsonAttributeArray.isNull()) {
+      if (!jsonAttributeArray.isNull()) {
         for (size_t i = 0; i < jsonAttributeArray->size(); i++) {
           std::string name, type;
           Poco::JSON::Object::Ptr jsonAttributeObject = jsonAttributeArray->getObject(i);
@@ -86,7 +87,7 @@ namespace AwsMock::Dto::DynamoDb {
       }
     } catch (Poco::Exception &exc) {
       throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
-    }
+    }*/
   }
 
   std::string DeleteTableResponse::ToString() const {
@@ -100,4 +101,4 @@ namespace AwsMock::Dto::DynamoDb {
     return os;
   }
 
-} // namespace AwsMock::Dto::lambda
+} // namespace AwsMock::Dto::DynamoDb

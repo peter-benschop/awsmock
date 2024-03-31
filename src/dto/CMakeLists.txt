@@ -2,7 +2,9 @@
 set(LIBRARY awsmockdto)
 set(LIBRARY_STATIC awsmockdto_static)
 
-set(COMMON_SOURCES src/common/UserAgent.cpp src/common/Infrastructure.cpp src/common/Services.cpp)
+set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/common/SQSClientCommand.cpp
+        src/common/SNSClientCommand.cpp src/common/DynamoDbClientCommand.cpp src/common/Infrastructure.cpp
+        src/common/Services.cpp)
 set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp src/sqs/MessageAttribute.cpp
         src/sqs/SendMessageRequest.cpp src/sqs/SendMessageResponse.cpp src/sqs/ListQueueResponse.cpp
         src/sqs/GetQueueAttributesRequest.cpp src/sqs/GetQueueAttributesResponse.cpp src/sqs/TagQueueRequest.cpp
@@ -10,7 +12,7 @@ set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp s
         src/sqs/GetQueueUrlResponse.cpp src/sqs/ReceiveMessageRequest.cpp src/sqs/ReceiveMessageResponse.cpp
         src/sqs/PurgeQueueRequest.cpp src/sqs/DeleteQueueRequest.cpp src/sqs/ChangeMessageVisibilityRequest.cpp
         src/sqs/DeleteMessageRequest.cpp src/sqs/DeleteMessageBatchEntry.cpp src/sqs/DeleteMessageBatchRequest.cpp
-        src/sqs/SqsCommonRequest.cpp)
+        src/sqs/SqsCommonRequest.cpp src/sqs/DeleteQueueResponse.cpp)
 set(SNS_SOURCES src/sns/SqsNotificationRequest.cpp src/sns/SubscribeRequest.cpp src/sns/SubscribeResponse.cpp
         src/sns/UnsubscribeRequest.cpp src/sns/UnsubscribeResponse.cpp src/sns/CreateTopicRequest.cpp
         src/sns/CreateTopicResponse.cpp src/sns/DeleteTopicResponse.cpp src/sns/ListTopicsResponse.cpp
@@ -24,7 +26,8 @@ set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp sr
         src/s3/MoveObjectRequest.cpp src/s3/MoveObjectResponse.cpp src/s3/CreateBucketConstraint.cpp
         src/s3/UserIdentity.cpp src/s3/GetMetadataRequest.cpp src/s3/GetMetadataResponse.cpp
         src/s3/ListAllBucketResponse.cpp src/s3/ListBucketRequest.cpp src/s3/ListAllBucketResponse.cpp
-        src/s3/Owner.cpp src/s3/Content.cpp)
+        src/s3/DeleteBucketRequest.cpp src/s3/CreateMultipartUploadRequest.cpp src/s3/Owner.cpp src/s3/Content.cpp
+        src/s3/CreateMultipartUploadResult.cpp)
 set(DOCKER_SOURCES src/docker/Port.cpp src/docker/Container.cpp src/docker/ListContainerResponse.cpp
         src/docker/CreateContainerRequest.cpp src/docker/Filters.cpp)
 set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionResponse.cpp src/lambda/DeadLetterConfig.cpp
@@ -44,7 +47,8 @@ set(DYNAMODB_SOURCES src/dynamodb/CreateTableRequest.cpp src/dynamodb/CreateTabl
         src/dynamodb/ListTableRequest.cpp src/dynamodb/ListTableRequest.cpp src/dynamodb/ListTableResponse.cpp
         src/dynamodb/GetItemRequest.cpp src/dynamodb/GetItemResponse.cpp src/dynamodb/PutItemRequest.cpp
         src/dynamodb/PutItemResponse.cpp src/dynamodb/QueryRequest.cpp src/dynamodb/QueryResponse.cpp
-        src/dynamodb/DeleteItemRequest.cpp src/dynamodb/DeleteItemResponse.cpp src/dynamodb/AttributeValue.cpp)
+        src/dynamodb/DeleteItemRequest.cpp src/dynamodb/DeleteItemResponse.cpp src/dynamodb/AttributeValue.cpp
+        src/dynamodb/DescribeTableRequest.cpp src/dynamodb/DescribeTableResponse.cpp)
 set(MODULE_SOURCES src/module/Module.cpp src/module/GatewayConfig.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
@@ -62,7 +66,9 @@ add_library(${LIBRARY} SHARED ${SOURCES}
         include/awsmock/dto/dynamodb/TableStatus.h
         include/awsmock/dto/dynamodb/AttributeValue.h
         src/docker/Filters.cpp
-        include/awsmock/dto/docker/Filters.h)
+        include/awsmock/dto/docker/Filters.h
+        include/awsmock/dto/common/HttpMethod.h
+        include/awsmock/dto/dynamodb/DynamoDbResponse.h)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 

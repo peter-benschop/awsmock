@@ -2,18 +2,18 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_CORE_DTO_S3CREATEBUCKETREQUEST_H
-#define AWSMOCK_CORE_DTO_S3CREATEBUCKETREQUEST_H
+#ifndef AWSMOCK_CORE_DTO_S3_CREATE_BUCKET_REQUEST_H
+#define AWSMOCK_CORE_DTO_S3_CREATE_BUCKET_REQUEST_H
 
 // C++ standard includes
 #include <string>
 #include <sstream>
 
 // Poco includes
-#include "Poco/DOM/AutoPtr.h"
-#include "Poco/DOM/DOMParser.h"
-#include "Poco/DOM/Document.h"
-#include "Poco/DOM/Element.h"
+#include <Poco/DOM/AutoPtr.h>
+#include <Poco/DOM/DOMParser.h>
+#include <Poco/DOM/Document.h>
+#include <Poco/DOM/Element.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -22,14 +22,17 @@ namespace AwsMock::Dto::S3 {
     /**
      * Bucket location
      */
-    std::string _locationConstraint;
+    std::string region;
 
     /**
-     * Constructor
-     *
-     * @param xmlString XML string
+     * Bucket name
      */
-    explicit CreateBucketRequest(const std::string &xmlString);
+    std::string bucketName;
+
+    /**
+     * Bucket owner
+     */
+    std::string bucketOwner;
 
     /**
      * Convert from XML representation
@@ -56,4 +59,4 @@ namespace AwsMock::Dto::S3 {
 
 } // namespace AwsMock::Dto::s3
 
-#endif // AWSMOCK_CORE_DTO_S3CREATEBUCKETREQUEST_H
+#endif // AWSMOCK_CORE_DTO_S3_CREATE_BUCKET_REQUEST_H

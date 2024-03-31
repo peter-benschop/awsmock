@@ -25,7 +25,7 @@ namespace AwsMock::Database {
 
   class Database {
 
-  public:
+    public:
 
     /**
      * Constructor
@@ -75,7 +75,12 @@ namespace AwsMock::Database {
      */
     void StopDatabase();
 
-  private:
+    private:
+
+    /**
+     * Update module status
+     */
+    void UpdateModuleStatus();
 
     /**
      * Logger

@@ -69,43 +69,79 @@ namespace AwsMock::Service {
     }
   }
 
-  void AbstractHandler::handleGet([[maybe_unused]]Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
+  void AbstractHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
     log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user << std::endl;
+    DumpRequest(request);
     handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
     std::ostream &errorStream = response.send();
     errorStream.flush();
   }
 
-  void AbstractHandler::handlePut([[maybe_unused]]Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
-    log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user << std::endl;
+  void AbstractHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3ClientCommand) {
+    log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << s3ClientCommand.region << " user: " << s3ClientCommand.user << std::endl;
+    DumpRequest(request);
     handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
     std::ostream &errorStream = response.send();
     errorStream.flush();
   }
 
-  void AbstractHandler::handlePost([[maybe_unused]]Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
+  void AbstractHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
     log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user << std::endl;
+    DumpRequest(request);
     handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
     std::ostream &errorStream = response.send();
     errorStream.flush();
   }
 
-  void AbstractHandler::handleDelete([[maybe_unused]]Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
+  void AbstractHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3ClientCommand) {
+    log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << s3ClientCommand.region << " user: " << s3ClientCommand.user << std::endl;
+    DumpRequest(request);
+    handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
+    std::ostream &errorStream = response.send();
+    errorStream.flush();
+  }
+
+  void AbstractHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
     log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user << std::endl;
+    DumpRequest(request);
+    handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
+    std::ostream &errorStream = response.send();
+    errorStream.flush();
+  }
+
+  void AbstractHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3ClientCommand) {
+    log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << s3ClientCommand.region << " user: " << s3ClientCommand.user << std::endl;
+    DumpRequest(request);
+    handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
+    std::ostream &errorStream = response.send();
+    errorStream.flush();
+  }
+
+  void AbstractHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
+    log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user << std::endl;
+    DumpRequest(request);
+    handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
+    std::ostream &errorStream = response.send();
+    errorStream.flush();
+  }
+
+  void AbstractHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3ClientCommand) {
+    log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << s3ClientCommand.region << " user: " << s3ClientCommand.user << std::endl;
+    DumpRequest(request);
     handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
     std::ostream &errorStream = response.send();
     errorStream.flush();
   }
 
   void AbstractHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
-    log_trace_stream(_logger) << "Request, method: OPTIONS" << std::endl;
-    response.setStatusAndReason(
-        Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED,
-        Poco::Net::HTTPResponse::HTTP_REASON_NOT_IMPLEMENTED
-    );
+    log_debug_stream(_logger) << "S3 OPTIONS request" << std::endl;
 
-    std::ostream &errorStream = response.send();
-    errorStream.flush();
+    response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
+    response.setContentType("text/plain; charset=utf-8");
+
+    handleHttpStatusCode(response, 200);
+    std::ostream &outputStream = response.send();
+    outputStream.flush();
   }
 
   void AbstractHandler::handleHead([[maybe_unused]]Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
@@ -188,35 +224,6 @@ namespace AwsMock::Service {
     default:response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
       break;
     }
-  }
-
-  std::string AbstractHandler::GetQueryParameter(const std::string &parameterKey, bool optional) {
-
-    auto iterator = std::find_if(_queryStringParameters.begin(), _queryStringParameters.end(),
-                                 [&parameterKey](const std::pair<std::string, std::string> &item) {
-                                   return item.first == parameterKey;
-                                 }
-    );
-
-    if (iterator == _queryStringParameters.end()) {
-      if (optional) {
-        return {};
-      } else {
-        throw Core::ServiceException("MessageAttribute '" + parameterKey + "' is missing in URL.", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
-      }
-    }
-    return iterator->second;
-  }
-
-  bool AbstractHandler::QueryParameterExists(const std::string &parameterKey) {
-
-    auto iterator = std::find_if(_queryStringParameters.begin(), _queryStringParameters.end(),
-                                 [&parameterKey](const std::pair<std::string, std::string> &item) {
-                                   return item.first == parameterKey;
-                                 }
-    );
-
-    return iterator != _queryStringParameters.end();
   }
 
   std::string AbstractHandler::GetPathParameter(int pos) {
@@ -400,6 +407,15 @@ namespace AwsMock::Service {
     } catch (Poco::Exception &exc) {
       log_error_stream(_logger) << "Exception: " << exc.message() << std::endl;
     }
+  }
+
+  void AbstractHandler::SendContinueResponse(Poco::Net::HTTPServerResponse &response) {
+    log_trace_stream(_logger) << "Sending CONTINUE response, state: 100" << std::endl;
+
+    // Send response
+    handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_CONTINUE);
+    std::ostream &os = response.send();
+    os.flush();
   }
 
   void AbstractHandler::SendRangeResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long min, long max, long size, const HeaderMap &extraHeader) {
