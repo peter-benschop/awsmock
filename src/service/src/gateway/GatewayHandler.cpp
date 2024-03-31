@@ -12,9 +12,8 @@ namespace AwsMock::Service {
 
     Core::MetricServiceTimer measure(_metricService, GATEWAY_GET_TIMER);
     _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "GET");
-    log_info_stream(_logger) << "Gateway GET request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
+    log_debug_stream(_logger) << "Gateway GET request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
 
-    //DumpRequestHeaders(request);
     SetHeaders(request, region, user);
     ForwardRequest(request, response, _host, _port);
   }
@@ -24,7 +23,7 @@ namespace AwsMock::Service {
 
     Core::MetricServiceTimer measure(_metricService, GATEWAY_PUT_TIMER);
     _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "PUT");
-    log_trace_stream(_logger) << "Gateway PUT request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
+    log_debug_stream(_logger) << "Gateway PUT request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
 
     SetHeaders(request, region, user);
     ForwardRequest(request, response, _host, _port);
@@ -35,7 +34,7 @@ namespace AwsMock::Service {
 
     Core::MetricServiceTimer measure(_metricService, GATEWAY_POST_TIMER);
     _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "POST");
-    log_trace_stream(_logger) << "Gateway POST request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
+    log_debug_stream(_logger) << "Gateway POST request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
 
     SetHeaders(request, region, user);
     ForwardRequest(request, response, _host, _port);
@@ -46,7 +45,7 @@ namespace AwsMock::Service {
 
     Core::MetricServiceTimer measure(_metricService, GATEWAY_DELETE_TIMER);
     _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "DELETE");
-    log_trace_stream(_logger) << "Gateway DELETE request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
+    log_debug_stream(_logger) << "Gateway DELETE request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
 
     SetHeaders(request, region, user);
     ForwardRequest(request, response, _host, _port);
@@ -57,7 +56,7 @@ namespace AwsMock::Service {
 
     Core::MetricServiceTimer measure(_metricService, GATEWAY_HEAD_TIMER);
     _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "HEAD");
-    log_trace_stream(_logger) << "Gateway HEAD request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
+    log_debug_stream(_logger) << "Gateway HEAD request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
 
     SetHeaders(request, region, user);
     ForwardRequest(request, response, _host, _port);

@@ -186,7 +186,7 @@ namespace AwsMock::Service {
 
       Database::Entity::S3::ObjectList objectList = _database->ListBucket(request.name, request.prefix);
       Dto::S3::ListBucketResponse listBucketResponse = Dto::S3::ListBucketResponse(request.name, objectList);
-      log_info_stream(_logger) << "Bucket list returned, count: " << objectList.size() << std::endl;
+      log_debug_stream(_logger) << "Bucket list returned, count: " << objectList.size() << std::endl;
 
       return listBucketResponse;
 

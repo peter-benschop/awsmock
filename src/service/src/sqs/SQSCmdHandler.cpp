@@ -3,7 +3,7 @@
 
 namespace AwsMock::Service {
 
-  SQSCmdHandler::SQSCmdHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition) : AbstractHandler(), _logger(Poco::Logger::get("SQSCliHandler")), _configuration(configuration),
+  SQSCmdHandler::SQSCmdHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition) : AbstractHandler(), _logger(Poco::Logger::get("SQSCmdHandler")), _configuration(configuration),
                                                                                                                                      _metricService(metricService), _sqsService(configuration, condition) {
   }
 
@@ -26,6 +26,7 @@ namespace AwsMock::Service {
 
           Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
           SendOkResponse(response, sqsResponse.ToJson());
+          log_info_stream(_logger) << "Create queue, queueName: " << sqsRequest.queueName << std::endl;
 
         } else {
 
@@ -38,9 +39,11 @@ namespace AwsMock::Service {
 
           Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
           SendOkResponse(response, sqsResponse.ToXml());
+          log_info_stream(_logger) << "Create queue, queueName: " << queueName << std::endl;
         }
         break;
       }
+
       case Dto::Common::SqsCommandType::PURGE_QUEUE: {
 
         Dto::SQS::PurgeQueueRequest sqsRequest;
@@ -57,6 +60,7 @@ namespace AwsMock::Service {
         }
         _sqsService.PurgeQueue(sqsRequest);
         SendOkResponse(response);
+        log_info_stream(_logger) << "Purge queue, queueUrl: " << sqsRequest.queueUrl << std::endl;
 
         break;
       }
@@ -79,6 +83,7 @@ namespace AwsMock::Service {
 
         Dto::SQS::GetQueueAttributesResponse sqsResponse = _sqsService.GetQueueAttributes(sqsRequest);
         SendOkResponse(response, sqsClientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+        log_info_stream(_logger) << "Get queue attributes, queueUrl: " << sqsRequest.queueUrl << std::endl;
 
         break;
       }
@@ -110,8 +115,11 @@ namespace AwsMock::Service {
         _sqsService.SetQueueAttributes(sqsRequest);
 
         SendOkResponse(response);
+        log_info_stream(_logger) << "Set queue attributes, queueUrl: " << sqsRequest.queueUrl << std::endl;
+
         break;
       }
+
       case Dto::Common::SqsCommandType::GET_QUEUE_URL: {
         Dto::SQS::GetQueueUrlRequest sqsRequest;
         if (sqsClientCommand.contentType == "json") {
@@ -127,6 +135,7 @@ namespace AwsMock::Service {
         }
         Dto::SQS::GetQueueUrlResponse sqsResponse = _sqsService.GetQueueUrl(sqsRequest);
         SendOkResponse(response, sqsClientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+        log_info_stream(_logger) << "Get queue url, queueName: " << sqsRequest.queueName << std::endl;
 
         break;
       }
@@ -153,20 +162,30 @@ namespace AwsMock::Service {
         _sqsService.TagQueue(sqsRequest);
 
         SendOkResponse(response);
+        log_info_stream(_logger) << "Tag queue, queueUrl: " << sqsRequest.queueUrl << std::endl;
 
         break;
       }
+
       case Dto::Common::SqsCommandType::LIST_QUEUES: {
+
         Dto::SQS::ListQueueResponse sqsResponse = _sqsService.ListQueues(sqsClientCommand.region);
+
         if (sqsClientCommand.contentType == "json") {
+
           SendOkResponse(response, sqsResponse.ToJson());
+          log_info_stream(_logger) << "List queues" << std::endl;
+
         } else {
+
           SendOkResponse(response, sqsResponse.ToXml());
+          log_info_stream(_logger) << "List queues" << std::endl;
         }
         break;
       }
 
       case Dto::Common::SqsCommandType::DELETE_QUEUE: {
+
         Dto::SQS::DeleteQueueRequest sqsRequest;
         if (sqsClientCommand.contentType == "json") {
 
@@ -177,6 +196,7 @@ namespace AwsMock::Service {
 
           // Empty response
           SendOkResponse(response);
+          log_info_stream(_logger) << "Delete queue, queueUrl: " << sqsRequest.queueUrl << std::endl;
 
         } else {
 
@@ -187,12 +207,14 @@ namespace AwsMock::Service {
 
           Dto::SQS::DeleteQueueResponse sqsResponse = _sqsService.DeleteQueue(sqsRequest);
           SendOkResponse(response, sqsResponse.ToXml());
+          log_info_stream(_logger) << "Delete queue, queueUrl: " << sqsRequest.queueUrl << std::endl;
 
         }
         break;
       }
 
       case Dto::Common::SqsCommandType::SEND_MESSAGE: {
+
         Dto::SQS::SendMessageRequest sqsRequest;
         if (sqsClientCommand.contentType == "json") {
 
@@ -214,6 +236,8 @@ namespace AwsMock::Service {
 
         Dto::SQS::SendMessageResponse sqsResponse = _sqsService.SendMessage(sqsRequest);
         SendOkResponse(response, sqsClientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+        log_info_stream(_logger) << "Send message, queueUrl: " << sqsRequest.queueUrl << std::endl;
+
         break;
       }
 
@@ -238,6 +262,7 @@ namespace AwsMock::Service {
 
         // Set the message userAttributes
         SendOkResponse(response, sqsClientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+        log_info_stream(_logger) << "Receive message, queueUrl: " << sqsRequest.queueUrl << std::endl;
 
         break;
       }
@@ -262,6 +287,8 @@ namespace AwsMock::Service {
 
         _sqsService.SetVisibilityTimeout(sqsRequest);
         SendOkResponse(response);
+        log_info_stream(_logger) << "Change visibility, queueUrl: " << sqsRequest.queueUrl << std::endl;
+
         break;
       }
 
@@ -285,8 +312,8 @@ namespace AwsMock::Service {
         }
 
         _sqsService.DeleteMessage(sqsRequest);
-
         SendOkResponse(response);
+        log_info_stream(_logger) << "Delete message, queueUrl: " << sqsRequest.queueUrl << std::endl;
 
         break;
       }
@@ -315,8 +342,9 @@ namespace AwsMock::Service {
           }
         }
         _sqsService.DeleteMessageBatch(sqsRequest);
-
         SendOkResponse(response);
+        log_info_stream(_logger) << "Delete message batch, queueUrl: " << sqsRequest.queueUrl << std::endl;
+
         break;
       }
 

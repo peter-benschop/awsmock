@@ -3,7 +3,7 @@
 
 namespace AwsMock::Service {
 
-  S3CmdHandler::S3CmdHandler(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractHandler(), _logger(Poco::Logger::get("S3Handler")), _configuration(configuration), _metricService(metricService), _s3Service(configuration) {
+  S3CmdHandler::S3CmdHandler(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractHandler(), _logger(Poco::Logger::get("S3CmdHandler")), _configuration(configuration), _metricService(metricService), _s3Service(configuration) {
   }
 
   void S3CmdHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3ClientCommand) {
@@ -12,13 +12,16 @@ namespace AwsMock::Service {
     try {
 
       switch (s3ClientCommand.command) {
+
         case Dto::Common::S3CommandType::LIST_BUCKETS: {
 
           Dto::S3::ListAllBucketResponse s3Response = _s3Service.ListAllBuckets();
           SendOkResponse(response, s3Response.ToXml());
+          log_info_stream(_logger) << "List bucket, bucket: " << s3ClientCommand.bucket << std::endl;
 
           break;
         }
+
         case Dto::Common::S3CommandType::LIST_OBJECTS: {
           Dto::S3::ListBucketRequest s3Request;
 
@@ -62,8 +65,11 @@ namespace AwsMock::Service {
 
           Dto::S3::ListBucketResponse s3Response = _s3Service.ListBucket(s3Request);
           SendOkResponse(response, s3Response.ToXml());
+          log_info_stream(_logger) << "List objects, bucket: " << s3ClientCommand.bucket << std::endl;
+
           break;
         }
+
         case Dto::Common::S3CommandType::GET_OBJECT: {
 
           // Get object request
@@ -110,10 +116,12 @@ namespace AwsMock::Service {
             log_info_stream(_logger) << "Progress: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << "/" << std::to_string(s3Response.size) << std::endl;
 
             SendRangeResponse(response, s3Response.filename, s3Request.min, s3Request.max, s3Response.size, headerMap);
+            log_info_stream(_logger) << "Get object, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
 
           } else {
 
             SendOkResponse(response, s3Response.filename, s3Response.size, headerMap);
+            log_info_stream(_logger) << "Get object, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
 
           }
           break;
@@ -130,7 +138,6 @@ namespace AwsMock::Service {
         case Dto::Common::S3CommandType::UNKNOWN: {
           log_error_stream(_logger) << "Bad request, method: GET clientCommand: " << Dto::Common::S3CommandTypeToString(s3ClientCommand.command) << std::endl;
           throw Core::ServiceException("Bad request, method: GET clientCommand: " + Dto::Common::S3CommandTypeToString(s3ClientCommand.command));
-          break;
         }
       }
     } catch (Core::ServiceException &exc) {
@@ -144,14 +151,17 @@ namespace AwsMock::Service {
     try {
 
       switch (s3ClientCommand.command) {
+
         case Dto::Common::S3CommandType::CREATE_BUCKET: {
 
           Dto::S3::CreateBucketRequest s3Request = {.region=s3ClientCommand.region, .bucketName=s3ClientCommand.bucket, .bucketOwner=s3ClientCommand.user};
           Dto::S3::CreateBucketResponse s3Response = _s3Service.CreateBucket(s3Request);
           SendOkResponse(response, s3Response.ToXml());
+          log_info_stream(_logger) << "Create bucket, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
 
           break;
         }
+
         case Dto::Common::S3CommandType::PUT_OBJECT: {
 
           // Get the user metadata
@@ -182,6 +192,7 @@ namespace AwsMock::Service {
             headerMap["ETag"] = s3Response.eTag;
 
             SendOkResponse(response, s3Response.ToXml(), headerMap);
+            log_info_stream(_logger) << "Copy object, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
 
           } else {
 
@@ -218,9 +229,11 @@ namespace AwsMock::Service {
             }
             log_debug_stream(_logger) << " size: " << putObjectResponse.contentLength << std::endl;
             SendOkResponse(response, {}, headerMap);
+            log_info_stream(_logger) << "Put object, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
           }
           break;
         }
+
         case Dto::Common::S3CommandType::MOVE_OBJECT: {
           log_debug_stream(_logger) << "Object move request, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
 
@@ -248,8 +261,11 @@ namespace AwsMock::Service {
           headerMap["ETag"] = s3Response.eTag;
 
           SendOkResponse(response, s3Response.ToXml(), headerMap);
+          log_info_stream(_logger) << "Move object, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
+
           break;
         }
+
         case Dto::Common::S3CommandType::UPLOAD_PART: {
 
           std::string partNumber = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "partNumber");
@@ -263,6 +279,7 @@ namespace AwsMock::Service {
 
           SendNoContentResponse(response, headerMap);
           log_debug_stream(_logger) << "Finished S3 multipart upload part: " << partNumber << std::endl;
+
           break;
         }
 
@@ -321,7 +338,9 @@ namespace AwsMock::Service {
 
     try {
       switch (s3ClientCommand.command) {
+
         case Dto::Common::S3CommandType::COPY_OBJECT: {
+
           if (s3ClientCommand.multipartRequest) {
 
             log_debug_stream(_logger) << "Starting multipart upload" << std::endl;
@@ -330,6 +349,7 @@ namespace AwsMock::Service {
             Dto::S3::CreateMultipartUploadResult result = _s3Service.CreateMultipartUpload(s3Request);
 
             SendOkResponse(response, result.ToXml());
+            log_info_stream(_logger) << "Copy object, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
 
           } else {
 
@@ -339,10 +359,12 @@ namespace AwsMock::Service {
             Dto::S3::CompleteMultipartUploadRequest s3Request = {.region=s3ClientCommand.region, .bucket=s3ClientCommand.bucket, .key=s3ClientCommand.key, .user=s3ClientCommand.user, .uploadId=uploadId};
             Dto::S3::CompleteMultipartUploadResult result = _s3Service.CompleteMultipartUpload(s3Request);
             SendOkResponse(response, result.ToXml());
+            log_info_stream(_logger) << "Copy object, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
 
           }
           break;
         }
+
         case Dto::Common::S3CommandType::DELETE_OBJECTS: {
 
           log_debug_stream(_logger) << "Starting delete objects request" << std::endl;
@@ -355,9 +377,11 @@ namespace AwsMock::Service {
 
           Dto::S3::DeleteObjectsResponse s3Response = _s3Service.DeleteObjects(s3Request);
           SendOkResponse(response, s3Response.ToXml());
+          log_info_stream(_logger) << "Object deleted, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
 
           break;
         }
+
         case Dto::Common::S3CommandType::CREATE_MULTIPART_UPLOAD: {
 
           log_debug_stream(_logger) << "Starting multipart upload" << std::endl;
@@ -366,8 +390,11 @@ namespace AwsMock::Service {
           Dto::S3::CreateMultipartUploadResult result = _s3Service.CreateMultipartUpload(s3Request);
 
           SendOkResponse(response, result.ToXml());
+          log_info_stream(_logger) << "Create mutl-part upload, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
+
           break;
         }
+
         case Dto::Common::S3CommandType::COMPLETE_MULTIPART_UPLOAD: {
 
           log_debug_stream(_logger) << "Starting completing multipart upload" << std::endl;
@@ -377,6 +404,8 @@ namespace AwsMock::Service {
           Dto::S3::CompleteMultipartUploadResult result = _s3Service.CompleteMultipartUpload(s3Request);
 
           SendOkResponse(response, result.ToXml());
+          log_info_stream(_logger) << "Complete mutl-part upload, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
+
           break;
         }
 
@@ -407,22 +436,28 @@ namespace AwsMock::Service {
     try {
 
       switch (s3ClientCommand.command) {
+
         case Dto::Common::S3CommandType::DELETE_BUCKET: {
 
           Dto::S3::DeleteBucketRequest deleteBucketRequest = {.region=s3ClientCommand.region, .bucket=s3ClientCommand.bucket};
           _s3Service.DeleteBucket(deleteBucketRequest);
           SendDeleteResponse(response);
+          log_info_stream(_logger) << "Delete bucket, bucket: " << s3ClientCommand.bucket << std::endl;
+
           break;
         }
+
         case Dto::Common::S3CommandType::MOVE_OBJECT:
         case Dto::Common::S3CommandType::DELETE_OBJECT: {
 
           _s3Service.DeleteObject({.region=s3ClientCommand.region, .user=s3ClientCommand.user, .bucket=s3ClientCommand.bucket, .key=s3ClientCommand.key});
           SendDeleteResponse(response);
+          log_info_stream(_logger) << "Delete object, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
+
           break;
         }
 
-        // Should not happen
+          // Should not happen
         case Dto::Common::S3CommandType::CREATE_BUCKET:
         case Dto::Common::S3CommandType::PUT_OBJECT:
         case Dto::Common::S3CommandType::GET_OBJECT:
@@ -435,7 +470,7 @@ namespace AwsMock::Service {
         case Dto::Common::S3CommandType::COMPLETE_MULTIPART_UPLOAD:
         case Dto::Common::S3CommandType::UNKNOWN: {
           log_error_stream(_logger) << "Bad request, method: DELETE clientCommand: " << Dto::Common::S3CommandTypeToString(s3ClientCommand.command) << std::endl;
-        //  throw Core::ServiceException("Bad request, method: DELETE clientCommand: " + Dto::Common::S3CommandTypeToString(s3ClientCommand.command));
+          throw Core::ServiceException("Bad request, method: DELETE clientCommand: " + Dto::Common::S3CommandTypeToString(s3ClientCommand.command));
         }
       }
 

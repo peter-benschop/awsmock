@@ -22,6 +22,7 @@ namespace AwsMock::Service {
         Dto::SNS::CreateTopicRequest snsRequest = {.region=snsClientCommand.region, .topicName = name, .owner=snsClientCommand.user};
         Dto::SNS::CreateTopicResponse snsResponse = _snsService.CreateTopic(snsRequest);
         SendOkResponse(response, snsResponse.ToXml());
+        log_info_stream(_logger) << "Topic created, name: " << name << std::endl;
 
         break;
       }
@@ -30,6 +31,7 @@ namespace AwsMock::Service {
 
         Dto::SNS::ListTopicsResponse snsResponse = _snsService.ListTopics(snsClientCommand.region);
         SendOkResponse(response, snsResponse.ToXml());
+        log_info_stream(_logger) << "List topics" << std::endl;
 
         break;
       }
@@ -42,6 +44,7 @@ namespace AwsMock::Service {
 
         Dto::SNS::PublishResponse snsResponse = _snsService.Publish({.region=snsClientCommand.region, .topicArn=topicArn, .targetArn=targetArn, .message=message});
         SendOkResponse(response, snsResponse.ToXml());
+        log_info_stream(_logger) << "Message published, topic: " << topicArn <<std::endl;
 
         break;
       }
@@ -54,6 +57,8 @@ namespace AwsMock::Service {
 
         Dto::SNS::SubscribeResponse snsResponse = _snsService.Subscribe({.region=snsClientCommand.region, .topicArn=topicArn, .protocol=protocol, .endpoint=endpoint, .owner=snsClientCommand.user});
         SendOkResponse(response, snsResponse.ToXml());
+        log_info_stream(_logger) << "Subscribed to topic, topicArn: " << topicArn <<std::endl;
+
         break;
       }
 
@@ -63,6 +68,8 @@ namespace AwsMock::Service {
 
         Dto::SNS::UnsubscribeResponse snsResponse = _snsService.Unsubscribe({.region=snsClientCommand.region, .subscriptionArn=subscriptionArn});
         SendOkResponse(response, snsResponse.ToXml());
+        log_info_stream(_logger) << "Unsubscribed from topic, subscriptionArn: " << subscriptionArn <<std::endl;
+
         break;
       }
 
@@ -83,6 +90,7 @@ namespace AwsMock::Service {
         Dto::SNS::TagResourceRequest snsRequest = {.region=snsClientCommand.region, .resourceArn= resourceArn, .tags=tags};
         Dto::SNS::TagResourceResponse snsResponse = _snsService.TagResource(snsRequest);
         SendOkResponse(response, snsResponse.ToXml());
+        log_info_stream(_logger) << "Topic tagged, resourceArn: " << resourceArn <<std::endl;
 
         break;
       }
@@ -93,6 +101,8 @@ namespace AwsMock::Service {
 
         Dto::SNS::DeleteTopicResponse snsResponse = _snsService.DeleteTopic(snsClientCommand.region, topicArn);
         SendOkResponse(response, snsResponse.ToXml());
+        log_info_stream(_logger) << "Topic deleted, topicArn: " << topicArn <<std::endl;
+
         break;
       }
 
