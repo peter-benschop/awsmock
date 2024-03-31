@@ -103,8 +103,9 @@ namespace AwsMock::Service {
     std::ofstream ofs(fileName);
     ofs << dockerFile;
     ofs.close();
+    std::string imageFile = BuildImageFile(codeDir, name);
 
-    Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketFileRequest("POST", "http://localhost/build?t=" + name + ":" + tag + "&q=true", {}, fileName);
+    Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketFileRequest("POST", "http://localhost/build?t=" + name + ":" + tag /*+ "&q=true"*/, {}, imageFile);
     log_debug_stream(_logger) << "Docker image build, image: " << name << ":" << tag << std::endl;
     log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
 

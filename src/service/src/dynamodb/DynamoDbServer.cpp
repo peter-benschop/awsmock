@@ -61,6 +61,7 @@ namespace AwsMock::Service {
       // Wait for timeout or condition
       if (InterruptableSleep(_period)) {
         StopMonitoringServer();
+        StopHttpServer();
         StopLocalDynamoDb();
         break;
       }

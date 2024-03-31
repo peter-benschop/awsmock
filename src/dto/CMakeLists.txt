@@ -2,8 +2,8 @@
 set(LIBRARY awsmockdto)
 set(LIBRARY_STATIC awsmockdto_static)
 
-set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/common/Infrastructure.cpp
-        src/common/Services.cpp)
+set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/common/SQSClientCommand.cpp
+        src/common/DynamoDbClientCommand.cpp src/common/Infrastructure.cpp src/common/Services.cpp)
 set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp src/sqs/MessageAttribute.cpp
         src/sqs/SendMessageRequest.cpp src/sqs/SendMessageResponse.cpp src/sqs/ListQueueResponse.cpp
         src/sqs/GetQueueAttributesRequest.cpp src/sqs/GetQueueAttributesResponse.cpp src/sqs/TagQueueRequest.cpp
@@ -47,7 +47,7 @@ set(DYNAMODB_SOURCES src/dynamodb/CreateTableRequest.cpp src/dynamodb/CreateTabl
         src/dynamodb/GetItemRequest.cpp src/dynamodb/GetItemResponse.cpp src/dynamodb/PutItemRequest.cpp
         src/dynamodb/PutItemResponse.cpp src/dynamodb/QueryRequest.cpp src/dynamodb/QueryResponse.cpp
         src/dynamodb/DeleteItemRequest.cpp src/dynamodb/DeleteItemResponse.cpp src/dynamodb/AttributeValue.cpp
-        src/dynamodb/DescribeTableRequest.cpp)
+        src/dynamodb/DescribeTableRequest.cpp src/dynamodb/DescribeTableResponse.cpp)
 set(MODULE_SOURCES src/module/Module.cpp src/module/GatewayConfig.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
@@ -65,7 +65,9 @@ add_library(${LIBRARY} SHARED ${SOURCES}
         include/awsmock/dto/dynamodb/TableStatus.h
         include/awsmock/dto/dynamodb/AttributeValue.h
         src/docker/Filters.cpp
-        include/awsmock/dto/docker/Filters.h)
+        include/awsmock/dto/docker/Filters.h
+        include/awsmock/dto/common/HttpMethod.h
+        include/awsmock/dto/dynamodb/DynamoDbResponse.h)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 

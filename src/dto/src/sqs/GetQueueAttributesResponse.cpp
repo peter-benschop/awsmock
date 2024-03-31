@@ -43,7 +43,7 @@ namespace AwsMock::Dto::SQS {
       for (const auto &attribute : attributes) {
 
         // UserAttribute
-        Poco::XML::AutoPtr<Poco::XML::Element> pAttribute = pDoc->createElement("UserAttribute");
+        Poco::XML::AutoPtr<Poco::XML::Element> pAttribute = pDoc->createElement("Attribute");
         pAttributeResult->appendChild(pAttribute);
 
         // Name
@@ -70,11 +70,9 @@ namespace AwsMock::Dto::SQS {
 
       std::stringstream output;
       Poco::XML::DOMWriter writer;
-      writer.setNewLine("\n");
-      writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
       writer.writeNode(output, pDoc);
-
       return output.str();
+
     } catch (Poco::Exception &exc) {
       throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
     }

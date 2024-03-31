@@ -27,11 +27,12 @@ namespace AwsMock::Dto::DynamoDb {
     }
   }
 
-  void ListTableResponse::FromJson(const std::string &jsonString) {
+  void ListTableResponse::FromJson(const std::string &jsonString, const std::map<std::string, std::string> &headerMap) {
 
     body = jsonString;
+    headers = headerMap;
 
-    Poco::JSON::Parser parser;
+    /*Poco::JSON::Parser parser;
     Poco::Dynamic::Var result = parser.parse(jsonString);
     Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
@@ -41,7 +42,7 @@ namespace AwsMock::Dto::DynamoDb {
       Core::JsonUtils::GetJsonValueString("LastEvaluatedTableName", rootObject, lastEvaluatedTableName);
 
       Poco::JSON::Array::Ptr jsonTableArray = rootObject->getArray("TableNames");
-      if(!jsonTableArray.isNull()) {
+      if (!jsonTableArray.isNull()) {
         for (const auto &tableName : *jsonTableArray) {
           tableNames.emplace_back(tableName);
         }
@@ -49,7 +50,7 @@ namespace AwsMock::Dto::DynamoDb {
 
     } catch (Poco::Exception &exc) {
       throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
-    }
+    }*/
   }
 
   std::string ListTableResponse::ToString() const {

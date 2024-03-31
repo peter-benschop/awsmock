@@ -41,7 +41,8 @@ namespace AwsMock::Service {
       }
 
       void TearDown() override {
-        _dynamoDbService.DeleteAllTables();
+        Core::ExecResult deleteTableResult = Core::SystemUtils::Exec(_baseCommand + "delete-table test-table");
+        EXPECT_EQ(0, deleteTableResult.status);
         _dynamoDbServer.StopServer();
       }
 
@@ -81,6 +82,22 @@ namespace AwsMock::Service {
     // assert
     EXPECT_EQ(0, listResult.status);
     EXPECT_TRUE(Core::StringUtils::Contains(listResult.output, "test-table"));
+  }
+
+  TEST_F(DynamoDbServerJavaTest, TableDescribeTest) {
+
+    // arrange
+    Core::ExecResult result = Core::SystemUtils::Exec(_baseCommand + "create-table test-table");
+    EXPECT_EQ(0, result.status);
+    Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
+    EXPECT_EQ(1, tableList.size());
+
+    // act
+    Core::ExecResult describeResult = Core::SystemUtils::Exec(_baseCommand + "describe-table test-table");
+
+    // assert
+    EXPECT_EQ(0, describeResult.status);
+    EXPECT_TRUE(Core::StringUtils::Contains(describeResult.output, "test-table"));
   }
 
   TEST_F(DynamoDbServerJavaTest, TableDeleteTest) {

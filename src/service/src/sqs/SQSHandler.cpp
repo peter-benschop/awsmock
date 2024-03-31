@@ -3,9 +3,7 @@
 
 namespace AwsMock::Service {
 
-  SQSHandler::SQSHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition) : SQSCliHandler(configuration, metricService, condition), SQSCppHandler(configuration, metricService, condition),
-                                                                                                                               SQSJava1Handler(configuration, metricService, condition), SQSJava2Handler(configuration, metricService, condition),
-                                                                                                                               _logger(Poco::Logger::get("SQSHandler")) {
+  SQSHandler::SQSHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition) : SQSCmdHandler(configuration, metricService, condition), _logger(Poco::Logger::get("SQSHandler")) {
   }
 
   void SQSHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
@@ -27,7 +25,13 @@ namespace AwsMock::Service {
   void SQSHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
     log_debug_stream(_logger) << "SQS POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
-    try {
+
+    Dto::Common::SQSClientCommand clientCommand;
+    clientCommand.FromRequest(Dto::Common::HttpMethod::POST, request, region, user);
+
+    SQSCmdHandler::handlePost(request, response, clientCommand);
+
+    /*try {
 
       Dto::Common::UserAgent userAgent;
       userAgent.FromRequest(request, "sqs");
@@ -44,7 +48,7 @@ namespace AwsMock::Service {
     } catch (Core::ServiceException &exc) {
       log_error_stream(_logger) << "SQS module exception: " << exc.message() << std::endl;
       SendXmlErrorResponse("SQS", response, exc);
-    }
+    }*/
   }
 
   void SQSHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {

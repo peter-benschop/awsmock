@@ -164,7 +164,7 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Got queue: " << queue.queueUrl << std::endl;
 
     Dto::SQS::GetQueueAttributesResponse response;
-    if (std::find(request.attributeNames.begin(), request.attributeNames.end(), "All") != request.attributeNames.end()) {
+    if (CheckAttribute(request.attributeNames, "all")) {
       response.attributes.emplace_back("ApproximateNumberOfMessages", std::to_string(queue.attributes.approximateNumberOfMessages));
       response.attributes.emplace_back("ApproximateNumberOfMessagesDelayed", std::to_string(queue.attributes.approximateNumberOfMessagesDelayed));
       response.attributes.emplace_back("ApproximateNumberOfMessagesNotVisible", std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible));
@@ -178,40 +178,40 @@ namespace AwsMock::Service {
       response.attributes.emplace_back("ReceiveMessageWaitTimeSeconds", std::to_string(queue.attributes.receiveMessageWaitTime));
       response.attributes.emplace_back("VisibilityTimeout", std::to_string(queue.attributes.visibilityTimeout));
     } else {
-      if (std::find(request.attributeNames.begin(), request.attributeNames.end(), "VisibilityTimeout") != request.attributeNames.end()) {
+      if (CheckAttribute(request.attributeNames, "Policy")) {
         response.attributes.emplace_back("Policy", queue.attributes.policy);
       }
-      if (std::find(request.attributeNames.begin(), request.attributeNames.end(), "VisibilityTimeout") != request.attributeNames.end()) {
+      if (CheckAttribute(request.attributeNames, "VisibilityTimeout")) {
         response.attributes.emplace_back("VisibilityTimeout", std::to_string(queue.attributes.visibilityTimeout));
       }
-      if (std::find(request.attributeNames.begin(), request.attributeNames.end(), "MaximumMessageSize") != request.attributeNames.end()) {
+      if (CheckAttribute(request.attributeNames, "MaximumMessageSize")) {
         response.attributes.emplace_back("MaximumMessageSize", std::to_string(queue.attributes.maxMessageSize));
       }
-      if (std::find(request.attributeNames.begin(), request.attributeNames.end(), "MessageRetentionPeriod") != request.attributeNames.end()) {
+      if (CheckAttribute(request.attributeNames, "MessageRetentionPeriod")) {
         response.attributes.emplace_back("MessageRetentionPeriod", std::to_string(queue.attributes.messageRetentionPeriod));
       }
-      if (std::find(request.attributeNames.begin(), request.attributeNames.end(), "ApproximateNumberOfMessages") != request.attributeNames.end()) {
+      if (CheckAttribute(request.attributeNames, "ApproximateNumberOfMessages")) {
         response.attributes.emplace_back("ApproximateNumberOfMessages", std::to_string(queue.attributes.approximateNumberOfMessages));
       }
-      if (std::find(request.attributeNames.begin(), request.attributeNames.end(), "ApproximateNumberOfMessagesNotVisible") != request.attributeNames.end()) {
+      if (CheckAttribute(request.attributeNames, "ApproximateNumberOfMessagesNotVisible")) {
         response.attributes.emplace_back("ApproximateNumberOfMessagesNotVisible", std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible));
       }
-      if (std::find(request.attributeNames.begin(), request.attributeNames.end(), "CreatedTimestamp") != request.attributeNames.end()) {
+      if (CheckAttribute(request.attributeNames, "CreatedTimestamp")) {
         response.attributes.emplace_back("CreatedTimestamp", Poco::DateTimeFormatter::format(queue.created, Poco::DateTimeFormat::HTTP_FORMAT));
       }
-      if (std::find(request.attributeNames.begin(), request.attributeNames.end(), "LastModifiedTimestamp") != request.attributeNames.end()) {
+      if (CheckAttribute(request.attributeNames, "LastModifiedTimestamp")) {
         response.attributes.emplace_back("LastModifiedTimestamp", Poco::DateTimeFormatter::format(queue.modified, Poco::DateTimeFormat::HTTP_FORMAT));
       }
-      if (std::find(request.attributeNames.begin(), request.attributeNames.end(), "ApproximateNumberOfMessagesDelayed") != request.attributeNames.end()) {
+      if (CheckAttribute(request.attributeNames, "ApproximateNumberOfMessagesNotVisible")) {
         response.attributes.emplace_back("ApproximateNumberOfMessagesNotVisible", std::to_string(queue.attributes.approximateNumberOfMessagesDelayed));
       }
-      if (std::find(request.attributeNames.begin(), request.attributeNames.end(), "DelaySeconds") != request.attributeNames.end()) {
+      if (CheckAttribute(request.attributeNames, "DelaySeconds")) {
         response.attributes.emplace_back("DelaySeconds", std::to_string(queue.attributes.delaySeconds));
       }
-      if (std::find(request.attributeNames.begin(), request.attributeNames.end(), "ReceiveMessageWaitTimeSeconds") != request.attributeNames.end()) {
+      if (CheckAttribute(request.attributeNames, "ReceiveMessageWaitTimeSeconds")) {
         response.attributes.emplace_back("ReceiveMessageWaitTimeSeconds", std::to_string(queue.attributes.receiveMessageWaitTime));
       }
-      if (std::find(request.attributeNames.begin(), request.attributeNames.end(), "RedrivePolicy") != request.attributeNames.end()) {
+      if (CheckAttribute(request.attributeNames, "RedrivePolicy")) {
         response.attributes.emplace_back("RedrivePolicy", queue.attributes.redrivePolicy.ToJson());
       }
     }
@@ -521,4 +521,9 @@ namespace AwsMock::Service {
     }
   }
 
+  bool SQSService::CheckAttribute(const std::vector<std::string> &attributes, const std::string &value) {
+    return find_if(attributes.begin(), attributes.end(), [&value](const std::string &attribute) {
+      return Core::StringUtils::EqualsIgnoreCase(attribute, value);
+    }) != attributes.end();
+  }
 } // namespace AwsMock::Service

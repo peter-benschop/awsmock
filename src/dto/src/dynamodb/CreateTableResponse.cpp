@@ -50,9 +50,10 @@ namespace AwsMock::Dto::DynamoDb {
     }
   }
 
-  void CreateTableResponse::FromJson(const std::string &jsonString) {
+  void CreateTableResponse::FromJson(const std::string &jsonString, const std::map<std::string, std::string>&headerMap) {
 
-    body = jsonString;
+    this->body = jsonString;
+    this->headers = headerMap;
 
     Poco::JSON::Parser parser;
     Poco::Dynamic::Var result = parser.parse(jsonString);

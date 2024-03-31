@@ -50,7 +50,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @return JSON string
      */
-    [[nodiscard]] std::string ToJson();
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Parse a JSON stream

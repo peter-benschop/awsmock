@@ -12,14 +12,14 @@ namespace AwsMock::Service {
     try {
 
       switch (s3ClientCommand.command) {
-        case Dto::Common::CommandType::LIST_BUCKETS: {
+        case Dto::Common::S3CommandType::LIST_BUCKETS: {
 
           Dto::S3::ListAllBucketResponse s3Response = _s3Service.ListAllBuckets();
           SendOkResponse(response, s3Response.ToXml());
 
           break;
         }
-        case Dto::Common::CommandType::LIST_OBJECTS: {
+        case Dto::Common::S3CommandType::LIST_OBJECTS: {
           Dto::S3::ListBucketRequest s3Request;
 
           if (Core::HttpUtils::HasQueryParameter(request.getURI(), "list-type")) {
@@ -64,7 +64,7 @@ namespace AwsMock::Service {
           SendOkResponse(response, s3Response.ToXml());
           break;
         }
-        case Dto::Common::CommandType::GET_OBJECT: {
+        case Dto::Common::S3CommandType::GET_OBJECT: {
 
           // Get object request
           log_debug_stream(_logger) << "S3 get object request, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
@@ -120,16 +120,16 @@ namespace AwsMock::Service {
         }
 
           // Should not happen
-        case Dto::Common::CommandType::CREATE_BUCKET:
-        case Dto::Common::CommandType::PUT_OBJECT:
-        case Dto::Common::CommandType::COPY_OBJECT:
-        case Dto::Common::CommandType::MOVE_OBJECT:
-        case Dto::Common::CommandType::DELETE_BUCKET:
-        case Dto::Common::CommandType::DELETE_OBJECT:
-        case Dto::Common::CommandType::DELETE_OBJECTS:
-        case Dto::Common::CommandType::UNKNOWN: {
-          log_error_stream(_logger) << "Bad request, method: GET clientCommand: " << Dto::Common::CommandTypeToString(s3ClientCommand.command) << std::endl;
-          throw Core::ServiceException("Bad request, method: GET clientCommand: " + Dto::Common::CommandTypeToString(s3ClientCommand.command));
+        case Dto::Common::S3CommandType::CREATE_BUCKET:
+        case Dto::Common::S3CommandType::PUT_OBJECT:
+        case Dto::Common::S3CommandType::COPY_OBJECT:
+        case Dto::Common::S3CommandType::MOVE_OBJECT:
+        case Dto::Common::S3CommandType::DELETE_BUCKET:
+        case Dto::Common::S3CommandType::DELETE_OBJECT:
+        case Dto::Common::S3CommandType::DELETE_OBJECTS:
+        case Dto::Common::S3CommandType::UNKNOWN: {
+          log_error_stream(_logger) << "Bad request, method: GET clientCommand: " << Dto::Common::S3CommandTypeToString(s3ClientCommand.command) << std::endl;
+          throw Core::ServiceException("Bad request, method: GET clientCommand: " + Dto::Common::S3CommandTypeToString(s3ClientCommand.command));
           break;
         }
       }
@@ -144,7 +144,7 @@ namespace AwsMock::Service {
     try {
 
       switch (s3ClientCommand.command) {
-        case Dto::Common::CommandType::CREATE_BUCKET: {
+        case Dto::Common::S3CommandType::CREATE_BUCKET: {
 
           Dto::S3::CreateBucketRequest s3Request = {.region=s3ClientCommand.region, .bucketName=s3ClientCommand.bucket, .bucketOwner=s3ClientCommand.user};
           Dto::S3::CreateBucketResponse s3Response = _s3Service.CreateBucket(s3Request);
@@ -152,7 +152,7 @@ namespace AwsMock::Service {
 
           break;
         }
-        case Dto::Common::CommandType::PUT_OBJECT: {
+        case Dto::Common::S3CommandType::PUT_OBJECT: {
 
           // Get the user metadata
           std::map<std::string, std::string> metadata = GetMetadata(request);
@@ -221,7 +221,7 @@ namespace AwsMock::Service {
           }
           break;
         }
-        case Dto::Common::CommandType::MOVE_OBJECT: {
+        case Dto::Common::S3CommandType::MOVE_OBJECT: {
           log_debug_stream(_logger) << "Object move request, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
 
           // Get S3 source bucket/key
@@ -250,7 +250,7 @@ namespace AwsMock::Service {
           SendOkResponse(response, s3Response.ToXml(), headerMap);
           break;
         }
-        case Dto::Common::CommandType::UPLOAD_PART: {
+        case Dto::Common::S3CommandType::UPLOAD_PART: {
 
           std::string partNumber = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "partNumber");
           std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "uploadId");
@@ -267,18 +267,18 @@ namespace AwsMock::Service {
         }
 
           // Should not happen
-        case Dto::Common::CommandType::GET_OBJECT:
-        case Dto::Common::CommandType::COPY_OBJECT:
-        case Dto::Common::CommandType::LIST_BUCKETS:
-        case Dto::Common::CommandType::LIST_OBJECTS:
-        case Dto::Common::CommandType::DELETE_BUCKET:
-        case Dto::Common::CommandType::DELETE_OBJECT:
-        case Dto::Common::CommandType::DELETE_OBJECTS:
-        case Dto::Common::CommandType::CREATE_MULTIPART_UPLOAD:
-        case Dto::Common::CommandType::COMPLETE_MULTIPART_UPLOAD:
-        case Dto::Common::CommandType::UNKNOWN: {
-          log_error_stream(_logger) << "Bad request, method: PUT clientCommand: " << Dto::Common::CommandTypeToString(s3ClientCommand.command) << std::endl;
-          throw Core::ServiceException("Bad request, method: PUT clientCommand: " + Dto::Common::CommandTypeToString(s3ClientCommand.command));
+        case Dto::Common::S3CommandType::GET_OBJECT:
+        case Dto::Common::S3CommandType::COPY_OBJECT:
+        case Dto::Common::S3CommandType::LIST_BUCKETS:
+        case Dto::Common::S3CommandType::LIST_OBJECTS:
+        case Dto::Common::S3CommandType::DELETE_BUCKET:
+        case Dto::Common::S3CommandType::DELETE_OBJECT:
+        case Dto::Common::S3CommandType::DELETE_OBJECTS:
+        case Dto::Common::S3CommandType::CREATE_MULTIPART_UPLOAD:
+        case Dto::Common::S3CommandType::COMPLETE_MULTIPART_UPLOAD:
+        case Dto::Common::S3CommandType::UNKNOWN: {
+          log_error_stream(_logger) << "Bad request, method: PUT clientCommand: " << Dto::Common::S3CommandTypeToString(s3ClientCommand.command) << std::endl;
+          throw Core::ServiceException("Bad request, method: PUT clientCommand: " + Dto::Common::S3CommandTypeToString(s3ClientCommand.command));
         }
       }
 
@@ -321,7 +321,7 @@ namespace AwsMock::Service {
 
     try {
       switch (s3ClientCommand.command) {
-        case Dto::Common::CommandType::COPY_OBJECT: {
+        case Dto::Common::S3CommandType::COPY_OBJECT: {
           if (s3ClientCommand.multipartRequest) {
 
             log_debug_stream(_logger) << "Starting multipart upload" << std::endl;
@@ -343,7 +343,7 @@ namespace AwsMock::Service {
           }
           break;
         }
-        case Dto::Common::CommandType::DELETE_OBJECTS: {
+        case Dto::Common::S3CommandType::DELETE_OBJECTS: {
 
           log_debug_stream(_logger) << "Starting delete objects request" << std::endl;
 
@@ -358,7 +358,7 @@ namespace AwsMock::Service {
 
           break;
         }
-        case Dto::Common::CommandType::CREATE_MULTIPART_UPLOAD: {
+        case Dto::Common::S3CommandType::CREATE_MULTIPART_UPLOAD: {
 
           log_debug_stream(_logger) << "Starting multipart upload" << std::endl;
 
@@ -368,7 +368,7 @@ namespace AwsMock::Service {
           SendOkResponse(response, result.ToXml());
           break;
         }
-        case Dto::Common::CommandType::COMPLETE_MULTIPART_UPLOAD: {
+        case Dto::Common::S3CommandType::COMPLETE_MULTIPART_UPLOAD: {
 
           log_debug_stream(_logger) << "Starting completing multipart upload" << std::endl;
 
@@ -381,18 +381,18 @@ namespace AwsMock::Service {
         }
 
           // Should not happen
-        case Dto::Common::CommandType::CREATE_BUCKET:
-        case Dto::Common::CommandType::LIST_BUCKETS:
-        case Dto::Common::CommandType::DELETE_BUCKET:
-        case Dto::Common::CommandType::LIST_OBJECTS:
-        case Dto::Common::CommandType::PUT_OBJECT:
-        case Dto::Common::CommandType::GET_OBJECT:
-        case Dto::Common::CommandType::MOVE_OBJECT:
-        case Dto::Common::CommandType::DELETE_OBJECT:
-        case Dto::Common::CommandType::UPLOAD_PART:
-        case Dto::Common::CommandType::UNKNOWN: {
-          log_error_stream(_logger) << "Bad request, method: POST clientCommand: " << Dto::Common::CommandTypeToString(s3ClientCommand.command) << std::endl;
-          throw Core::ServiceException("Bad request, method: POST clientCommand: " + Dto::Common::CommandTypeToString(s3ClientCommand.command));
+        case Dto::Common::S3CommandType::CREATE_BUCKET:
+        case Dto::Common::S3CommandType::LIST_BUCKETS:
+        case Dto::Common::S3CommandType::DELETE_BUCKET:
+        case Dto::Common::S3CommandType::LIST_OBJECTS:
+        case Dto::Common::S3CommandType::PUT_OBJECT:
+        case Dto::Common::S3CommandType::GET_OBJECT:
+        case Dto::Common::S3CommandType::MOVE_OBJECT:
+        case Dto::Common::S3CommandType::DELETE_OBJECT:
+        case Dto::Common::S3CommandType::UPLOAD_PART:
+        case Dto::Common::S3CommandType::UNKNOWN: {
+          log_error_stream(_logger) << "Bad request, method: POST clientCommand: " << Dto::Common::S3CommandTypeToString(s3ClientCommand.command) << std::endl;
+          throw Core::ServiceException("Bad request, method: POST clientCommand: " + Dto::Common::S3CommandTypeToString(s3ClientCommand.command));
         }
       }
 
@@ -407,15 +407,15 @@ namespace AwsMock::Service {
     try {
 
       switch (s3ClientCommand.command) {
-        case Dto::Common::CommandType::DELETE_BUCKET: {
+        case Dto::Common::S3CommandType::DELETE_BUCKET: {
 
           Dto::S3::DeleteBucketRequest deleteBucketRequest = {.region=s3ClientCommand.region, .bucket=s3ClientCommand.bucket};
           _s3Service.DeleteBucket(deleteBucketRequest);
           SendDeleteResponse(response);
           break;
         }
-        case Dto::Common::CommandType::MOVE_OBJECT:
-        case Dto::Common::CommandType::DELETE_OBJECT: {
+        case Dto::Common::S3CommandType::MOVE_OBJECT:
+        case Dto::Common::S3CommandType::DELETE_OBJECT: {
 
           _s3Service.DeleteObject({.region=s3ClientCommand.region, .user=s3ClientCommand.user, .bucket=s3ClientCommand.bucket, .key=s3ClientCommand.key});
           SendDeleteResponse(response);
@@ -423,19 +423,19 @@ namespace AwsMock::Service {
         }
 
         // Should not happen
-        case Dto::Common::CommandType::CREATE_BUCKET:
-        case Dto::Common::CommandType::PUT_OBJECT:
-        case Dto::Common::CommandType::GET_OBJECT:
-        case Dto::Common::CommandType::COPY_OBJECT:
-        case Dto::Common::CommandType::LIST_BUCKETS:
-        case Dto::Common::CommandType::LIST_OBJECTS:
-        case Dto::Common::CommandType::DELETE_OBJECTS:
-        case Dto::Common::CommandType::CREATE_MULTIPART_UPLOAD:
-        case Dto::Common::CommandType::UPLOAD_PART:
-        case Dto::Common::CommandType::COMPLETE_MULTIPART_UPLOAD:
-        case Dto::Common::CommandType::UNKNOWN: {
-          log_error_stream(_logger) << "Bad request, method: DELETE clientCommand: " << Dto::Common::CommandTypeToString(s3ClientCommand.command) << std::endl;
-        //  throw Core::ServiceException("Bad request, method: DELETE clientCommand: " + Dto::Common::CommandTypeToString(s3ClientCommand.command));
+        case Dto::Common::S3CommandType::CREATE_BUCKET:
+        case Dto::Common::S3CommandType::PUT_OBJECT:
+        case Dto::Common::S3CommandType::GET_OBJECT:
+        case Dto::Common::S3CommandType::COPY_OBJECT:
+        case Dto::Common::S3CommandType::LIST_BUCKETS:
+        case Dto::Common::S3CommandType::LIST_OBJECTS:
+        case Dto::Common::S3CommandType::DELETE_OBJECTS:
+        case Dto::Common::S3CommandType::CREATE_MULTIPART_UPLOAD:
+        case Dto::Common::S3CommandType::UPLOAD_PART:
+        case Dto::Common::S3CommandType::COMPLETE_MULTIPART_UPLOAD:
+        case Dto::Common::S3CommandType::UNKNOWN: {
+          log_error_stream(_logger) << "Bad request, method: DELETE clientCommand: " << Dto::Common::S3CommandTypeToString(s3ClientCommand.command) << std::endl;
+        //  throw Core::ServiceException("Bad request, method: DELETE clientCommand: " + Dto::Common::S3CommandTypeToString(s3ClientCommand.command));
         }
       }
 

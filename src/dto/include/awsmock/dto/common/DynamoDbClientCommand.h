@@ -2,8 +2,8 @@
 // Created by vogje01 on 11/26/23.
 //
 
-#ifndef AWSMOCK_DTO_COMMON_S3_CLIENT_COMMAND_H
-#define AWSMOCK_DTO_COMMON_S3_CLIENT_COMMAND_H
+#ifndef AWSMOCK_DTO_COMMON_DYNAMODB_CLIENT_COMMAND_H
+#define AWSMOCK_DTO_COMMON_DYNAMODB_CLIENT_COMMAND_H
 
 // C++ includes
 #include <string>
@@ -18,62 +18,45 @@
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/dto/common/HttpMethod.h>
-#include <awsmock/dto/common/UserAgent.h>
+#include "awsmock/dto/common/UserAgent.h"
 
 namespace AwsMock::Dto::Common {
 
-  enum class S3CommandType {
-    CREATE_BUCKET,
-    LIST_BUCKETS,
-    DELETE_BUCKET,
-    LIST_OBJECTS,
-    PUT_OBJECT,
-    GET_OBJECT,
-    COPY_OBJECT,
-    MOVE_OBJECT,
-    DELETE_OBJECT,
-    DELETE_OBJECTS,
-    CREATE_MULTIPART_UPLOAD,
-    UPLOAD_PART,
-    COMPLETE_MULTIPART_UPLOAD,
+  enum class DynamoDbCommandType {
+    CREATE_TABLE,
+    LIST_TABLES,
+    DESCRIBE_TABLE,
+    DELETE_TABLE,
     UNKNOWN
   };
 
-  static std::map<S3CommandType, std::string> S3CommandTypeNames {
-    {S3CommandType::CREATE_BUCKET, "CreateBucket"},
-    {S3CommandType::LIST_BUCKETS, "ListBuckets"},
-    {S3CommandType::DELETE_BUCKET, "DeleteBucket"},
-    {S3CommandType::LIST_OBJECTS, "ListObjects"},
-    {S3CommandType::PUT_OBJECT, "PutObject"},
-    {S3CommandType::GET_OBJECT, "GetObject"},
-    {S3CommandType::COPY_OBJECT, "CopyObject"},
-    {S3CommandType::MOVE_OBJECT, "MoveObject"},
-    {S3CommandType::DELETE_OBJECT, "DeleteObject"},
-    {S3CommandType::DELETE_OBJECTS, "DeleteObjects"},
-    {S3CommandType::CREATE_MULTIPART_UPLOAD, "CreateMultipartUpload"},
-    {S3CommandType::UPLOAD_PART, "PartMultipartUpload"},
-    {S3CommandType::COMPLETE_MULTIPART_UPLOAD, "CompleteMultipartUpload"},
+  static std::map<DynamoDbCommandType, std::string> DynamoDbCommandTypeNames {
+    {DynamoDbCommandType::CREATE_TABLE, "CreateTable"},
+    {DynamoDbCommandType::LIST_TABLES, "ListTables"},
+    {DynamoDbCommandType::DESCRIBE_TABLE, "DescribeTable"},
+    {DynamoDbCommandType::DELETE_TABLE, "DeleteTable"},
+    {DynamoDbCommandType::UNKNOWN, "Unknown"},
   };
 
-  [[maybe_unused]]static std::string S3CommandTypeToString(S3CommandType commandType) {
-    return S3CommandTypeNames[commandType];
+  [[maybe_unused]]static std::string DynamoDbCommandTypeToString(DynamoDbCommandType commandType) {
+    return DynamoDbCommandTypeNames[commandType];
   }
 
-  [[maybe_unused]]static S3CommandType S3CommandTypeFromString(const std::string &commandType) {
-    for (auto &it : S3CommandTypeNames) {
+  [[maybe_unused]]static DynamoDbCommandType DynamoDbCommandTypeFromString(const std::string &commandType) {
+    for (auto &it : DynamoDbCommandTypeNames) {
       if (Core::StringUtils::StartsWith(commandType, it.second)) {
         return it.first;
       }
     }
-    return S3CommandType::UNKNOWN;
+    return DynamoDbCommandType::UNKNOWN;
   }
 
   /**
-   * The S3 client command is used as a standardized way of interpreting the different ways the clients are calling the REST services. Each client type is using a different way of calling the AWS REST services.
+   * The DynamoDB client command is used as a standardized way of interpreting the different ways the clients are calling the REST services. Each client type is using a different way of calling the AWS REST services.
    *
    * @author jens.vogt@opitz-consulting.com
    */
-  struct S3ClientCommand {
+  struct DynamoDbClientCommand {
 
     /**
      * HTTP request type
@@ -93,7 +76,7 @@ namespace AwsMock::Dto::Common {
     /**
      * Client command
      */
-    S3CommandType command;
+    DynamoDbCommandType command;
 
     /**
      * Bucket
@@ -136,7 +119,7 @@ namespace AwsMock::Dto::Common {
      * @param httpMethod HTTP request method
      * @param userAgent HTTP user agent
      */
-    void GetCommandFromUserAgent(const HttpMethod &httpMethod, const UserAgent &userAgent);
+    //void GetCommandFromUserAgent(const HttpMethod &httpMethod, const UserAgent &userAgent);
 
     /**
      * Getś the value from the user-agent string
@@ -159,10 +142,10 @@ namespace AwsMock::Dto::Common {
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const S3ClientCommand &i);
+    friend std::ostream &operator<<(std::ostream &os, const DynamoDbClientCommand &i);
 
   };
 
 } // namespace AwsMock::Dto::Common
 
-#endif // AWSMOCK_DTO_COMMON_S3_CLIENT_COMMAND_H
+#endif // AWSMOCK_DTO_COMMON_DYNAMODB_CLIENT_COMMAND_H
