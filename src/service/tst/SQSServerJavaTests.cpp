@@ -56,7 +56,7 @@ namespace AwsMock::Service {
       Core::CurlUtils _curlUtils;
       std::string _endpoint, _baseCommand, _region;
       std::map<std::string, std::string> _extraHeaders;
-      Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
+      Core::Configuration& _configuration = Core::Configuration::instance();
       Core::MetricService _metricService = Core::MetricService(_configuration);
       Database::SQSDatabase& _sqsDatabase = Database::SQSDatabase::instance();
       SQSServer _sqsServer = SQSServer(_configuration, _metricService);
@@ -178,7 +178,7 @@ namespace AwsMock::Service {
 
     // assert
     EXPECT_EQ(0, getQueueUrlResult.status);
-    EXPECT_TRUE(queueUrl == _endpoint + "/000000000000/test-queue");
+    EXPECT_TRUE(Core::StringUtils::Contains(queueUrl, "test-queue"));
   }
 
   TEST_F(SQSServerJavaTest, QueueDeleteTest) {

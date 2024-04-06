@@ -176,7 +176,7 @@ namespace AwsMock::Service {
     /**
      * Database connection
      */
-    std::shared_ptr<Database::DynamoDbDatabase> _dynamoDbDatabase;
+    Database::DynamoDbDatabase& _dynamoDbDatabase;
 
     /**
      * DynamoDb docker host

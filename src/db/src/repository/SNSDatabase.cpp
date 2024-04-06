@@ -65,17 +65,15 @@ namespace AwsMock::Database {
 
     if (HasDatabase()) {
 
-      auto session = GetSession();
-      session.start_transaction();
+      auto client = GetClient();
+      mongocxx::collection _topicCollection = (*client)["awsmock"]["sns_topic"];
+      auto session = client->start_session();
 
       try {
 
-        auto client = GetClient();
-        mongocxx::collection _topicCollection = (*client)["awsmock"]["sns_topic"];
+        session.start_transaction();
         auto result = _topicCollection.insert_one(topic.ToDocument());
         log_trace_stream(_logger) << "Topic created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
-
-        // Commit
         session.commit_transaction();
 
         return GetTopicById(result->inserted_id().get_oid().value);
@@ -228,17 +226,15 @@ namespace AwsMock::Database {
 
     if (HasDatabase()) {
 
-      auto session = GetSession();
-      session.start_transaction();
+      auto client = GetClient();
+      mongocxx::collection _topicCollection = (*client)["awsmock"]["sns_topic"];
+      auto session = client->start_session();
 
       try {
 
-        auto client = GetClient();
-        mongocxx::collection _topicCollection = (*client)["awsmock"]["sns_topic"];
+        session.start_transaction();
         auto result = _topicCollection.replace_one(make_document(kvp("region", topic.region), kvp("topicArn", topic.topicArn)), topic.ToDocument());
         log_trace_stream(_logger) << "Topic updated: " << topic.ToString() << std::endl;
-
-        // Commit
         session.commit_transaction();
 
         return GetTopicByArn(topic.topicArn);
@@ -297,17 +293,15 @@ namespace AwsMock::Database {
 
     if (HasDatabase()) {
 
-      auto session = GetSession();
-      session.start_transaction();
+      auto client = GetClient();
+      mongocxx::collection _topicCollection = (*client)["awsmock"]["sns_topic"];
+      auto session = client->start_session();
 
       try {
 
-        auto client = GetClient();
-        mongocxx::collection _topicCollection = (*client)["awsmock"]["sns_topic"];
+        session.start_transaction();
         auto result = _topicCollection.delete_many(make_document(kvp("topicArn", topic.topicArn)));
         log_debug_stream(_logger) << "Topic deleted, count: " << result->deleted_count() << std::endl;
-
-        // Commit
         session.commit_transaction();
 
       } catch (const mongocxx::exception &exc) {
@@ -327,18 +321,16 @@ namespace AwsMock::Database {
 
     if (HasDatabase()) {
 
-      auto session = GetSession();
-      session.start_transaction();
+      auto client = GetClient();
+      mongocxx::collection _topicCollection = (*client)["awsmock"]["sns_topic"];
+      auto session = client->start_session();
 
       try {
 
-        auto client = GetClient();
-        mongocxx::collection _topicCollection = (*client)["awsmock"]["sns_topic"];
+        session.start_transaction();
         auto result = _topicCollection.delete_many({});
-        log_debug_stream(_logger) << "All topics deleted, count: " << result->deleted_count() << std::endl;
-
-        // Commit
         session.commit_transaction();
+        log_debug_stream(_logger) << "All topics deleted, count: " << result->deleted_count() << std::endl;
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
@@ -381,18 +373,15 @@ namespace AwsMock::Database {
 
     if (HasDatabase()) {
 
-      auto session = GetSession();
-      session.start_transaction();
+      auto client = GetClient();
+      mongocxx::collection _messageCollection = (*client)["awsmock"]["sns_message"];
+      auto session = client->start_session();
 
       try {
 
-        auto client = GetClient();
-        mongocxx::collection _messageCollection = (*client)["awsmock"]["sns_message"];
-
+        session.start_transaction();
         auto result = _messageCollection.insert_one(message.ToDocument());
         log_trace_stream(_logger) << "Message created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
-
-        // Commit
         session.commit_transaction();
 
         return GetMessageById(result->inserted_id().get_oid().value);
@@ -564,17 +553,15 @@ namespace AwsMock::Database {
 
     if (HasDatabase()) {
 
-      auto session = GetSession();
-      session.start_transaction();
+      auto client = GetClient();
+      mongocxx::collection _messageCollection = (*client)["awsmock"]["sns_message"];
+      auto session = client->start_session();
 
       try {
 
-        auto client = GetClient();
-        mongocxx::collection _messageCollection = (*client)["awsmock"]["sns_message"];
+        session.start_transaction();
         auto result = _messageCollection.delete_one(make_document(kvp("messageId", message.messageId)));
         log_debug_stream(_logger) << "Messages deleted, messageId: " << message.messageId << " count: " << result->deleted_count() << std::endl;
-
-        // Commit
         session.commit_transaction();
 
       } catch (const mongocxx::exception &exc) {
@@ -594,8 +581,9 @@ namespace AwsMock::Database {
 
     if (HasDatabase()) {
 
-      auto session = GetSession();
-      session.start_transaction();
+      auto client = GetClient();
+      mongocxx::collection _messageCollection = (*client)["awsmock"]["sns_message"];
+      auto session = client->start_session();
 
       bsoncxx::builder::basic::array array{};
       for (const auto &receipt : receipts) {
@@ -604,12 +592,9 @@ namespace AwsMock::Database {
 
       try {
 
-        auto client = GetClient();
-        mongocxx::collection _messageCollection = (*client)["awsmock"]["sns_message"];
+        session.start_transaction();
         auto result = _messageCollection.delete_many(make_document(kvp("region", region), kvp("topicArn", topicArn), kvp("messageId", make_document(kvp("$in", array)))));
         log_debug_stream(_logger) << "Messages deleted, count: " << result->result().deleted_count() << std::endl;
-
-        // Commit
         session.commit_transaction();
 
       } catch (const mongocxx::exception &exc) {

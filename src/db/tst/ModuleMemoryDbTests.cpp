@@ -40,7 +40,7 @@ namespace AwsMock::Database {
       _moduleDatabase.DeleteAllModules();
     }
 
-    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
+    Core::Configuration& _configuration = Core::TestUtils::GetTestConfiguration(false);
     ModuleDatabase _moduleDatabase = ModuleDatabase();
   };
 
@@ -135,7 +135,7 @@ namespace AwsMock::Database {
     Entity::Module::ModuleList result = _moduleDatabase.ListModules();
 
     // assert
-    EXPECT_EQ(1, result.size());
+    EXPECT_EQ(10, result.size());
   }
 
   TEST_F(ModuleMemoryDbTest, ModuleDeleteTest) {
@@ -149,7 +149,7 @@ namespace AwsMock::Database {
     int count = _moduleDatabase.ModuleCount();
 
     // assert
-    EXPECT_EQ(0, count);
+    EXPECT_EQ(9, count);
   }
 
   TEST_F(ModuleMemoryDbTest, ModuleSetStatusTest) {

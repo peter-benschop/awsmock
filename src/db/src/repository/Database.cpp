@@ -31,17 +31,11 @@ namespace AwsMock::Database {
   }
 
   mongocxx::pool::entry Database::GetClient() {
-    mongocxx::pool::entry _client = _pool->acquire();
     return _pool->acquire();
   }
 
-  mongocxx::client_session Database::GetSession() {
-    mongocxx::pool::entry _client = _pool->acquire();
-    return (*_client).start_session();
-  }
-
   bool Database::HasDatabase() const {
-    return _configuration.getBool("awsmock.mongodb.active", false);
+    return _useDatabase;
   }
 
   void Database::StartDatabase() {
@@ -81,10 +75,10 @@ namespace AwsMock::Database {
   }
 
   void Database::UpdateModuleStatus() {
-    auto session = GetSession();
+/*    auto session = GetSession();
     session.start_transaction();
     session.client()[_name]["module"].update_one(make_document(kvp("name", "database")), make_document(kvp("$set", make_document(kvp("state", "RUNNING")))));
-    session.commit_transaction();
+    session.commit_transaction();*/
   }
 
 } // namespace AwsMock::Database

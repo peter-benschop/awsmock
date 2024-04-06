@@ -36,7 +36,7 @@ namespace AwsMock::Service {
       }
 
       std::string _region;
-      Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
+      Core::Configuration& _configuration = Core::Configuration::instance();
       Core::MetricService _metricService = Core::MetricService(_configuration);
       Database::ModuleDatabase _database = Database::ModuleDatabase();
 

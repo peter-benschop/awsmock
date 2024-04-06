@@ -45,7 +45,7 @@ namespace AwsMock::Database {
     }
 
     std::string _region;
-    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
+    Core::Configuration& _configuration = Core::TestUtils::GetTestConfiguration(false);
     S3Database _servicedatabase = S3Database();
   };
 

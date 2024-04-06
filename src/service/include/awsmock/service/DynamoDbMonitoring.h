@@ -88,7 +88,7 @@ namespace AwsMock::Service {
     /**
      * S3 database
      */
-    std::unique_ptr<Database::DynamoDbDatabase> _dynamoDbDatabase;
+    Database::DynamoDbDatabase& _dynamoDbDatabase;
 
     /**
      * S3 monitoring period in seconds

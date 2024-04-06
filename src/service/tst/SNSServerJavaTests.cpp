@@ -62,7 +62,7 @@ namespace AwsMock::Service {
 
     Core::CurlUtils _curlUtils;
     std::string _snsEndpoint, _sqsEndpoint, _snsBaseCommand, _sqsBaseCommand, _region;
-    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
+    Core::Configuration& _configuration = Core::Configuration::instance();
     Core::MetricService _metricService = Core::MetricService(_configuration);
     Database::SNSDatabase& _snsDatabase = Database::SNSDatabase::instance();
     Database::SQSDatabase& _sqsDatabase = Database::SQSDatabase::instance();

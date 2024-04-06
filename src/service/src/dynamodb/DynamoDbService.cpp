@@ -7,12 +7,11 @@
 namespace AwsMock::Service {
 
   DynamoDbService::DynamoDbService(Core::Configuration &configuration, Core::MetricService &metricService) :
-    _logger(Poco::Logger::get("DynamoDbService")), _configuration(configuration), _metricService(metricService) {
+    _logger(Poco::Logger::get("DynamoDbService")), _configuration(configuration), _metricService(metricService),_dynamoDbDatabase(Database::DynamoDbDatabase::instance()) {
 
     // Initialize environment
     _accountId = _configuration.getString("awsmock.account.id", "000000000000");
     _dockerService = std::make_shared<Service::DockerService>(_configuration);
-    _dynamoDbDatabase = std::make_shared<Database::DynamoDbDatabase>(_configuration);
 
     // DynamoDB docker host, port
     _dockerHost = "localhost";
@@ -22,9 +21,9 @@ namespace AwsMock::Service {
   Dto::DynamoDb::CreateTableResponse DynamoDbService::CreateTable(const Dto::DynamoDb::CreateTableRequest &request) {
     log_debug_stream(_logger) << "Start creating a new DynamoDb table, region: " << request.region << " name: " << request.tableName << std::endl;
 
-    if (_dynamoDbDatabase->TableExists(request.region, request.tableName)) {
+    if (_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
       log_warning_stream(_logger) << "DynamoDb table exists already, region: " << request.region << " name: " << request.tableName << std::endl;
-      Database::Entity::DynamoDb::Table table = _dynamoDbDatabase->GetTableByRegionName(request.region, request.tableName);
+      Database::Entity::DynamoDb::Table table = _dynamoDbDatabase.GetTableByRegionName(request.region, request.tableName);
       log_debug_stream(_logger) << "DynamoDb got table, region: " << request.region << " name: " << request.tableName << std::endl;
       return {
         .region=table.region,
@@ -47,7 +46,7 @@ namespace AwsMock::Service {
       };
 
       // Update database
-      table = _dynamoDbDatabase->CreateTable(table);
+      table = _dynamoDbDatabase.CreateTable(table);
 
       // Send request to docker container
       Dto::DynamoDb::DynamoDbResponse response = SendDynamoDbRequest(request.body, request.headers);
@@ -107,7 +106,7 @@ namespace AwsMock::Service {
   Dto::DynamoDb::DeleteTableResponse DynamoDbService::DeleteTable(const Dto::DynamoDb::DeleteTableRequest &request) {
     log_debug_stream(_logger) << "Start creating a new DynamoDb table, region: " << request.region << " name: " << request.tableName << std::endl;
 
-    if (!_dynamoDbDatabase->TableExists(request.region, request.tableName)) {
+    if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
       log_warning_stream(_logger) << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName << std::endl;
       throw Core::ServiceException("DynamoDb table does not exist", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
     }
@@ -116,7 +115,7 @@ namespace AwsMock::Service {
     try {
 
       // Delete table in database
-      _dynamoDbDatabase->DeleteTable(request.tableName);
+      _dynamoDbDatabase.DeleteTable(request.tableName);
 
       // Send request to docker container
       Dto::DynamoDb::DynamoDbResponse response = SendDynamoDbRequest(request.body, request.headers);
@@ -138,7 +137,7 @@ namespace AwsMock::Service {
     try {
 
       // Delete all tables from DynamoDB
-      for (auto &table : _dynamoDbDatabase->ListTables()) {
+      for (auto &table : _dynamoDbDatabase.ListTables()) {
         Dto::DynamoDb::DeleteTableRequest request;
         request.tableName = table.name;
         request.body = request.ToJson();
@@ -151,7 +150,7 @@ namespace AwsMock::Service {
       }
 
       // Delete table in database
-      _dynamoDbDatabase->DeleteAllTables();
+      _dynamoDbDatabase.DeleteAllTables();
       log_info_stream(_logger) << "DynamoDb tables deleted" << std::endl;
 
     } catch (Poco::Exception &exc) {
@@ -163,7 +162,7 @@ namespace AwsMock::Service {
   Dto::DynamoDb::GetItemResponse DynamoDbService::GetItem(const Dto::DynamoDb::GetItemRequest &request) {
     log_debug_stream(_logger) << "Start get item, region: " << request.region << " name: " << request.tableName << std::endl;
 
-    if (!_dynamoDbDatabase->TableExists(request.region, request.tableName)) {
+    if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
       log_warning_stream(_logger) << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName << std::endl;
       throw Core::ServiceException("DynamoDb table exists already", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
     }
@@ -188,7 +187,7 @@ namespace AwsMock::Service {
   Dto::DynamoDb::PutItemResponse DynamoDbService::PutItem(const Dto::DynamoDb::PutItemRequest &request) {
     log_debug_stream(_logger) << "Start put item, region: " << request.region << " name: " << request.tableName << std::endl;
 
-    if (!_dynamoDbDatabase->TableExists(request.region, request.tableName)) {
+    if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
       log_warning_stream(_logger) << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName << std::endl;
       throw Core::ServiceException("DynamoDb table exists already", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
     }
@@ -213,7 +212,7 @@ namespace AwsMock::Service {
   Dto::DynamoDb::QueryResponse DynamoDbService::Query(const Dto::DynamoDb::QueryRequest &request) {
     log_debug_stream(_logger) << "Start query, region: " << request.region << " name: " << request.tableName << std::endl;
 
-    if (!_dynamoDbDatabase->TableExists(request.region, request.tableName)) {
+    if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
       log_warning_stream(_logger) << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName << std::endl;
       throw Core::ServiceException("DynamoDb table exists already", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
     }
@@ -238,7 +237,7 @@ namespace AwsMock::Service {
   Dto::DynamoDb::DeleteItemResponse DynamoDbService::DeleteItem(const Dto::DynamoDb::DeleteItemRequest &request) {
     log_debug_stream(_logger) << "Start creating a new DynamoDb item, region: " << request.region << " table: " << request.tableName << std::endl;
 
-    /*if (!_dynamoDbDatabase->ItemExists(request.region, request.tableName)) {
+    /*if (!_dynamoDbDatabase.ItemExists(request.region, request.tableName)) {
       log_warning_stream(_logger) << "DynamoDb item does not exist, region: " << request.region << " name: " << request.tableName << std::endl;
       throw Core::ServiceException("DynamoDb item exists already", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
     }*/
@@ -247,7 +246,7 @@ namespace AwsMock::Service {
     try {
 
       // Delete item in database
-      _dynamoDbDatabase->DeleteItem(request.region, request.tableName, "");
+      _dynamoDbDatabase.DeleteItem(request.region, request.tableName, "");
 
       // Send request to docker container
       Dto::DynamoDb::DynamoDbResponse response = SendDynamoDbRequest(request.body, request.headers);
@@ -268,7 +267,7 @@ namespace AwsMock::Service {
 
     try {
       // Delete table in database
-      _dynamoDbDatabase->DeleteAllTables();
+      _dynamoDbDatabase.DeleteAllTables();
       log_info_stream(_logger) << "DynamoDb tables deleted" << std::endl;
 
     } catch (Poco::Exception &exc) {

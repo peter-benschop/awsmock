@@ -37,7 +37,7 @@ namespace AwsMock::Service {
       _configuration.setString("awsmock.service.gateway.port", _port);
       _accountId = _configuration.getString("awsmock.account.id", SQS_ACCOUNT_ID);
       _endpoint = "http://" + _host + ":" + _port;
-      _queueUrl = "http://" + _host + ":" + _port + "/" + _accountId + "/" + TEST_QUEUE;
+      _queueUrl = "http://" + Core::SystemUtils::GetHostName() + ":" + _port + "/" + _accountId + "/" + TEST_QUEUE;
 
       // Start HTTP manager
       Poco::ThreadPool::defaultPool().start(_sqsServer);
@@ -72,7 +72,7 @@ namespace AwsMock::Service {
     }
 
     std::string _endpoint, _queueUrl, _accountId;
-    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
+    Core::Configuration& _configuration = Core::Configuration::instance();
     Core::MetricService _metricService = Core::MetricService(_configuration);
     Database::SQSDatabase& _sqsDatabase = Database::SQSDatabase::instance();
     SQSServer _sqsServer = SQSServer(_configuration, _metricService);
@@ -117,7 +117,7 @@ namespace AwsMock::Service {
 
     // assert
     EXPECT_EQ(0, result.status);
-    EXPECT_TRUE(Core::StringUtils::Contains(result.output, _queueUrl));
+    EXPECT_TRUE(Core::StringUtils::Contains(result.output, TEST_QUEUE));
   }
 
   TEST_F(SQSServerCliTest, QueuePurgeTest) {

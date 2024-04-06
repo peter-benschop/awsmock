@@ -169,9 +169,9 @@ namespace AwsMock::Service {
       infrastructure.cognitoUsers = _cognitoDatabase.ListUsers();
     }
     if (services.HasService("all") || services.HasService("dynamodb")) {
-      std::shared_ptr<Database::DynamoDbDatabase> _dynamoDbDatabase = std::make_shared<Database::DynamoDbDatabase>(_configuration);
-      infrastructure.dynamoDbTables = _dynamoDbDatabase->ListTables();
-      infrastructure.dynamoDbItems = _dynamoDbDatabase->ListItems();
+      Database::DynamoDbDatabase& _dynamoDbDatabase = Database::DynamoDbDatabase::instance();
+      infrastructure.dynamoDbTables = _dynamoDbDatabase.ListTables();
+      infrastructure.dynamoDbItems = _dynamoDbDatabase.ListItems();
     }
     if (services.HasService("all") || services.HasService("transfer")) {
       Database::TransferDatabase& _transferDatabase = Database::TransferDatabase::instance();
@@ -265,10 +265,10 @@ namespace AwsMock::Service {
 
     // DynamoDB
     if (!infrastructure.dynamoDbTables.empty() || !infrastructure.dynamoDbItems.empty()) {
-      std::shared_ptr<Database::DynamoDbDatabase> _dynamoDatabase = std::make_shared<Database::DynamoDbDatabase>(_configuration);
+      Database::DynamoDbDatabase& _dynamoDatabase = Database::DynamoDbDatabase::instance();
       if (!infrastructure.dynamoDbTables.empty()) {
         for (auto &table : infrastructure.dynamoDbTables) {
-          _dynamoDatabase->CreateOrUpdateTable(table);
+          _dynamoDatabase.CreateOrUpdateTable(table);
         }
         log_info_stream(_logger) << "DynamoDb tables imported, count: " << infrastructure.dynamoDbTables.size() << std::endl;
       }
@@ -309,9 +309,9 @@ namespace AwsMock::Service {
       _cognitoDatabase.DeleteAllUserPools();
     }
     if (services.HasService("all") || services.HasService("dynamodb")) {
-      std::shared_ptr<Database::DynamoDbDatabase> _dynamoDbDatabase = std::make_shared<Database::DynamoDbDatabase>(_configuration);
-      _dynamoDbDatabase->DeleteAllItems();
-      _dynamoDbDatabase->DeleteAllTables();
+      Database::DynamoDbDatabase& _dynamoDbDatabase = Database::DynamoDbDatabase::instance();
+      _dynamoDbDatabase.DeleteAllItems();
+      _dynamoDbDatabase.DeleteAllTables();
     }
     if (services.HasService("all") || services.HasService("transfer")) {
       Database::TransferDatabase& _transferDatabase = Database::TransferDatabase::instance();
@@ -339,8 +339,8 @@ namespace AwsMock::Service {
       _cognitoDatabase.DeleteAllUsers();
     }
     if (services.HasService("all") || services.HasService("dynamodb")) {
-      std::shared_ptr<Database::DynamoDbDatabase> _dynamoDbDatabase = std::make_shared<Database::DynamoDbDatabase>(_configuration);
-      _dynamoDbDatabase->DeleteAllItems();
+      Database::DynamoDbDatabase& _dynamoDbDatabase = Database::DynamoDbDatabase::instance();
+      _dynamoDbDatabase.DeleteAllItems();
     }
   }
 }

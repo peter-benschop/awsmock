@@ -42,6 +42,7 @@
 #include <awsmock/dto/sqs/SendMessageRequest.h>
 #include <awsmock/dto/sqs/SendMessageResponse.h>
 #include <awsmock/dto/sqs/SetQueueAttributesRequest.h>
+#include <awsmock/dto/sqs/SetQueueAttributesResponse.h>
 #include <awsmock/dto/sqs/TagQueueRequest.h>
 #include <awsmock/repository/SQSDatabase.h>
 
@@ -109,9 +110,10 @@ namespace AwsMock::Service {
      * Set queue userAttributes
      *
      * @param request put queue sqs request
+     * @return SetQueueAttributesResponse
      * @throws ServiceException
      */
-    void SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request);
+    Dto::SQS::SetQueueAttributesResponse SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request);
 
     /**
      * Sets the message visibility timeout timeout.

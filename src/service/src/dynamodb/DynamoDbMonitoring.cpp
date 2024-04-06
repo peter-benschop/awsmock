@@ -7,13 +7,13 @@
 namespace AwsMock::Service {
 
   DynamoDbMonitoring::DynamoDbMonitoring(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition)
-      : _logger(Poco::Logger::get("DynamoDbMonitoring")), _configuration(configuration), _metricService(metricService), _condition(condition), _running(false) {
+      : _logger(Poco::Logger::get("DynamoDbMonitoring")), _configuration(configuration), _metricService(metricService), _dynamoDbDatabase(Database::DynamoDbDatabase::instance()), _condition(condition), _running(false) {
 
     // Update period
     _period = _configuration.getInt("awsmock.monitoring.dynamodb.period", DYNAMODB_MONITORING_DEFAULT_PERIOD);
 
     // Database connections
-    _dynamoDbDatabase = std::make_unique<Database::DynamoDbDatabase>(_configuration);
+
     log_debug_stream(_logger) << "DynamoDb monitoring initialized" << std::endl;
   }
 

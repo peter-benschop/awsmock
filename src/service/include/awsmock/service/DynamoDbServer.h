@@ -126,14 +126,9 @@ namespace AwsMock::Service {
       AwsMock::Core::ThreadPool<DynamoDbMonitoring> _threadPool;
 
       /**
-       * Service database
-       */
-      std::unique_ptr<Database::ModuleDatabase> _moduleDatabase;
-
-      /**
        * DynamoDb database
        */
-      std::unique_ptr<Database::DynamoDbDatabase> _dynamoDbDatabase;
+      Database::DynamoDbDatabase& _dynamoDbDatabase;
 
       /**
        * Docker module

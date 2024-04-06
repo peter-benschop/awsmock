@@ -65,13 +65,6 @@ namespace AwsMock::Database {
     void CreateIndexes();
 
     /**
-     * Returns a client session
-     *
-     * @return client session
-     */
-    mongocxx::client_session GetSession();
-
-    /**
      * Check whether we are running without database
      */
     bool HasDatabase() const;

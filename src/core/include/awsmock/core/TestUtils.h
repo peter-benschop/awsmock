@@ -48,7 +48,7 @@ namespace AwsMock::Core {
      * @param withDatabase run with MongoDB database
      * @return name of the generated test configuration file
      */
-    static Core::Configuration GetTestConfiguration(bool withDatabase = true);
+    static Core::Configuration& GetTestConfiguration(bool withDatabase = true);
 
     /**
      * Send a CLI command

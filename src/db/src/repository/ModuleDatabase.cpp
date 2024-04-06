@@ -22,6 +22,24 @@ namespace AwsMock::Database {
     {"database", {.name="database", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}}
   };
 
+  ModuleDatabase::ModuleDatabase() : _logger(Poco::Logger::get("ModuleDatabase")), _hasDatabase(HasDatabase()) {
+
+    for (const auto &module : _existingModules) {
+      if (_hasDatabase) {
+
+        if (!ModuleExists(module.first)) {
+          CreateModule(module.second);
+        }
+
+      } else {
+
+        if (!_memoryDb.ModuleExists(module.first)) {
+          _memoryDb.CreateModule(module.second);
+        }
+      }
+    }
+  }
+
   bool ModuleDatabase::IsActive(const std::string &name) {
 
     if (HasDatabase()) {
@@ -186,12 +204,13 @@ namespace AwsMock::Database {
 
     if (_hasDatabase) {
 
-      auto session = GetSession();
-      session.start_transaction();
+      auto client = GetClient();
+      mongocxx::collection _moduleCollection = (*client)["awsmock"]["module"];
+      auto session = client->start_session();
+
       try {
 
-        auto client = GetClient();
-        mongocxx::collection _moduleCollection = (*client)["awsmock"]["module"];
+        session.start_transaction();
         auto mResult = _moduleCollection.update_one(make_document(kvp("name", name)), make_document(kvp("$set", make_document(kvp("state", Entity::Module::ModuleStateToString(state))))));
         log_trace_stream(_logger) << "Module state updated, name: " << name << " state: " << Entity::Module::ModuleStateToString(state) << std::endl;
         session.commit_transaction();

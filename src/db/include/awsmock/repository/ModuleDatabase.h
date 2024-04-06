@@ -30,7 +30,7 @@ namespace AwsMock::Database {
      *
      * @param configuration configuration properties
      */
-    explicit ModuleDatabase() : _logger(Poco::Logger::get("ModuleDatabase")), _hasDatabase(HasDatabase()) {};
+    explicit ModuleDatabase();
 
     /**
      * Singleton instance

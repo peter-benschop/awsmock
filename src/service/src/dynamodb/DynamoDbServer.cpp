@@ -7,7 +7,8 @@
 namespace AwsMock::Service {
 
   DynamoDbServer::DynamoDbServer(Core::Configuration &configuration, Core::MetricService &metricService)
-      : AbstractWorker(configuration), AbstractServer(configuration, "dynamodb"), _logger(Poco::Logger::get("DynamoDbServer")), _configuration(configuration), _metricService(metricService), _module("dynamodb") {
+    : AbstractWorker(configuration), AbstractServer(configuration, "dynamodb"), _logger(Poco::Logger::get("DynamoDbServer")), _configuration(configuration), _metricService(metricService), _module("dynamodb"),
+      _dynamoDbDatabase(Database::DynamoDbDatabase::instance()) {
 
     // Get HTTP configuration values
     _region = _configuration.getString("awsmock.region");
@@ -20,9 +21,6 @@ namespace AwsMock::Service {
     // Sleeping period
     _period = _configuration.getInt("awsmock.worker.dynamodb.period", 10000);
     log_debug_stream(_logger) << "DynamoDB server period: " << _period << std::endl;
-
-    // Create environment
-    _dynamoDbDatabase = std::make_unique<Database::DynamoDbDatabase>(_configuration);
 
     // Docker module
     _dockerService = std::make_unique<Service::DockerService>(_configuration);
@@ -85,12 +83,12 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Starting DynamoDB docker image" << std::endl;
 
     // Check docker image
-    if(!_dockerService->ImageExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
+    if (!_dockerService->ImageExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
       _dockerService->BuildImage(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG, DYNAMODB_DOCKER_FILE);
     }
 
     // Check container image
-    if(!_dockerService->ContainerExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
+    if (!_dockerService->ContainerExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
       _dockerService->CreateContainer(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG, DYNAMODB_EXTERNAL_PORT, DYNAMODB_INTERNAL_PORT);
     }
 
@@ -111,12 +109,12 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Starting DynamoDB docker image" << std::endl;
 
     // Check docker image
-    if(!_dockerService->ImageExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
+    if (!_dockerService->ImageExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
       throw Core::ServiceException("Image does not exist", Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
 
     // Check container image
-    if(!_dockerService->ContainerExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
+    if (!_dockerService->ContainerExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
       throw Core::ServiceException("Container does not exist", Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
 

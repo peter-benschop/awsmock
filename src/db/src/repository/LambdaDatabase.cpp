@@ -122,6 +122,8 @@ namespace AwsMock::Database {
 
         auto client = GetClient();
         mongocxx::collection _lambdaCollection = (*client)["awsmock"]["lambda"];
+
+
         auto result = _lambdaCollection.insert_one(lambda.ToDocument());
         log_trace_stream(_logger) << "Bucket created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
         return GetLambdaById(result->inserted_id().get_oid().value);

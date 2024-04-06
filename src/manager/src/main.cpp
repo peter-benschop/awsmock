@@ -178,7 +178,7 @@ namespace AwsMock {
         _moduleDatabase.SetStatus("database", Database::Entity::Module::ModuleStatus::ACTIVE);
         //_database.StartDatabase();
       }
-      /*if (_configuration.has("awsmock.service.sqs.active") && _configuration.getBool("awsmock.service.sqs.active")) {
+      if (_configuration.has("awsmock.service.sqs.active") && _configuration.getBool("awsmock.service.sqs.active")) {
         _moduleDatabase.SetStatus("sqs", Database::Entity::Module::ModuleStatus::ACTIVE);
       }
       if (_configuration.has("awsmock.service.s3.active") && _configuration.getBool("awsmock.service.s3.active")) {
@@ -198,7 +198,7 @@ namespace AwsMock {
       }
       if (_configuration.has("awsmock.service.dynamodb.active") && _configuration.getBool("awsmock.service.dynamodb.active")) {
         _moduleDatabase.SetStatus("dynamodb", Database::Entity::Module::ModuleStatus::ACTIVE);
-      }*/
+      }
       if (_configuration.has("awsmock.service.gateway.active") && _configuration.getBool("awsmock.service.gateway.active")) {
         _moduleDatabase.SetStatus("gateway", Database::Entity::Module::ModuleStatus::ACTIVE);
       }
@@ -247,47 +247,47 @@ namespace AwsMock {
 
       Database::Entity::Module::ModuleList modules = _moduleDatabase.ListModules();
       for (const auto &module : modules) {
-//          if (module.state == Database::Entity::Module::ModuleState::RUNNING) {
-        log_info_stream(_logger) << "Stopping module: " << module.name << std::endl;
-        if (module.name == "s3") {
-          _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
-          auto *s3Server = (Service::S3Server *) _serverMap[module.name];
-          s3Server->StopMonitoringServer();
-          s3Server->StopServer();
-        } else if (module.name == "sqs") {
-          _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
-          auto *sqsServer = (Service::SQSServer *) _serverMap[module.name];
-          sqsServer->StopMonitoringServer();
-          sqsServer->StopServer();
-        } else if (module.name == "sns") {
-          _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
-          auto *snsServer = (Service::SNSServer *) _serverMap[module.name];
-          snsServer->StopMonitoringServer();
-          snsServer->StopServer();
-        } else if (module.name == "lambda") {
-          _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
-          auto *lambdaServer = (Service::LambdaServer *) _serverMap[module.name];
-          lambdaServer->StopMonitoringServer();
-          lambdaServer->StopServer();
-        } else if (module.name == "transfer") {
-          _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
-          auto *transferServer = (Service::LambdaServer *) _serverMap[module.name];
-          transferServer->StopServer();
-        } else if (module.name == "cognito") {
-          _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
-          auto *cognitoServer = (Service::CognitoServer *) _serverMap[module.name];
-          cognitoServer->StopServer();
-        } else if (module.name == "dynamodb") {
-          _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
-          _serverMap[module.name]->StopServer();
-        } else if (module.name == "gateway") {
-          _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
-          auto *gatewayServer = (Service::GatewayServer *) _serverMap[module.name];
-          gatewayServer->StopServer();
+        if (module.state == Database::Entity::Module::ModuleState::RUNNING) {
+          log_info_stream(_logger) << "Stopping module: " << module.name << std::endl;
+          if (module.name == "s3") {
+            _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
+            auto *s3Server = (Service::S3Server *) _serverMap[module.name];
+            s3Server->StopMonitoringServer();
+            s3Server->StopServer();
+          } else if (module.name == "sqs") {
+            _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
+            auto *sqsServer = (Service::SQSServer *) _serverMap[module.name];
+            sqsServer->StopMonitoringServer();
+            sqsServer->StopServer();
+          } else if (module.name == "sns") {
+            _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
+            auto *snsServer = (Service::SNSServer *) _serverMap[module.name];
+            snsServer->StopMonitoringServer();
+            snsServer->StopServer();
+          } else if (module.name == "lambda") {
+            _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
+            auto *lambdaServer = (Service::LambdaServer *) _serverMap[module.name];
+            lambdaServer->StopMonitoringServer();
+            lambdaServer->StopServer();
+          } else if (module.name == "transfer") {
+            _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
+            auto *transferServer = (Service::LambdaServer *) _serverMap[module.name];
+            transferServer->StopServer();
+          } else if (module.name == "cognito") {
+            _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
+            auto *cognitoServer = (Service::CognitoServer *) _serverMap[module.name];
+            cognitoServer->StopServer();
+          } else if (module.name == "dynamodb") {
+            _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
+            _serverMap[module.name]->StopServer();
+          } else if (module.name == "gateway") {
+            _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
+            auto *gatewayServer = (Service::GatewayServer *) _serverMap[module.name];
+            gatewayServer->StopServer();
+          }
+          log_debug_stream(_logger) << "Module " << module.name << " stopped" << std::endl;
         }
-        log_debug_stream(_logger) << "Module " << module.name << " stopped" << std::endl;
       }
-//        }
     }
 
     /**
