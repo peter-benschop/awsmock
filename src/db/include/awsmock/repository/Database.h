@@ -13,6 +13,7 @@
 #include <mongocxx/pool.hpp>
 #include <mongocxx/uri.hpp>
 #include <mongocxx/exception/exception.hpp>
+#include <mongocxx/exception/query_exception.hpp>
 
 // Poco includes
 #include <Poco/Util/AbstractConfiguration.h>
@@ -32,12 +33,15 @@ namespace AwsMock::Database {
      *
      * @param configuration configuration properties
      */
-    explicit Database(Core::Configuration &configuration);
+    explicit Database();
 
     /**
-     * Initialize mongodb
+     * Singleton instance
      */
-    void Initialize();
+    /*static Database &instance() {
+      static Poco::SingletonHolder<Database> sh;
+      return *sh.get();
+    }*/
 
     /**
      * Returns a MongoDB connection from the pool
@@ -45,6 +49,13 @@ namespace AwsMock::Database {
      * @return MongoDB database client
      */
     mongocxx::database GetConnection();
+
+    /**
+     * Returns a MongoDB client from the pool
+     *
+     * @return MongoDB database client
+     */
+    mongocxx::pool::entry GetClient();
 
     /**
      * Check all indexes.
@@ -125,12 +136,22 @@ namespace AwsMock::Database {
     /**
      * Database client
      */
-    mongocxx::client _client;
+    mongocxx::pool* _pool;
+
+    /**
+     * Database connection pool size
+     */
+    int _poolSize;
 
     /**
      * Database flag
      */
     bool _useDatabase;
+
+    /**
+     * Initialization flag
+     */
+    bool _initialized;
   };
 
 } // namespace AwsMock::Database

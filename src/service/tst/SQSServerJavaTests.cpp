@@ -48,8 +48,8 @@ namespace AwsMock::Service {
       }
 
       void TearDown() override {
-        _database.DeleteAllMessages();
-        _database.DeleteAllQueues();
+        _sqsDatabase.DeleteAllMessages();
+        _sqsDatabase.DeleteAllQueues();
         _sqsServer.StopServer();
       }
 
@@ -58,7 +58,7 @@ namespace AwsMock::Service {
       std::map<std::string, std::string> _extraHeaders;
       Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
       Core::MetricService _metricService = Core::MetricService(_configuration);
-      Database::SQSDatabase _database = Database::SQSDatabase(_configuration);
+      Database::SQSDatabase& _sqsDatabase = Database::SQSDatabase::instance();
       SQSServer _sqsServer = SQSServer(_configuration, _metricService);
   };
 
@@ -68,7 +68,7 @@ namespace AwsMock::Service {
 
     // act
     Core::ExecResult result = Core::SystemUtils::Exec(_baseCommand + " sqs create-queue test-queue");
-    Database::Entity::SQS::QueueList queueList = _database.ListQueues();
+    Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
 
     // assert
     EXPECT_TRUE(result.status == 0);
@@ -102,7 +102,7 @@ namespace AwsMock::Service {
 
     // act
     Core::ExecResult purgeResult = Core::SystemUtils::Exec(_baseCommand + " sqs purge-queue " + queueUrl);
-    long messageCount = _database.CountMessages();
+    long messageCount = _sqsDatabase.CountMessages();
 
     // assert
     EXPECT_EQ(0, purgeResult.status);
@@ -192,7 +192,7 @@ namespace AwsMock::Service {
 
     // act
     Core::ExecResult deleteResult = Core::SystemUtils::Exec(_baseCommand + " sqs delete-queue " + queueUrl);
-    Database::Entity::SQS::QueueList queueList = _database.ListQueues();
+    Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
 
     // assert
     EXPECT_EQ(0, deleteResult.status);
@@ -211,7 +211,7 @@ namespace AwsMock::Service {
 
     // act
     Core::ExecResult sendResult = Core::SystemUtils::Exec(_baseCommand + " sqs send-message " + queueUrl + " test-message");
-    long messageCount = _database.CountMessages();
+    long messageCount = _sqsDatabase.CountMessages();
 
     // assert
     EXPECT_EQ(0, sendResult.status);
@@ -231,7 +231,7 @@ namespace AwsMock::Service {
     Core::ExecResult sendResult = Core::SystemUtils::Exec(_baseCommand + " sqs send-message-with-attributes " + queueUrl + " \"This is a test message\"");
     Core::ExecResult receiveResult = Core::SystemUtils::Exec(_baseCommand + " sqs receive-message " + queueUrl + " 1 5 5");
     std::string receiptHandle = receiveResult.output;
-    Database::Entity::SQS::Message message = _database.GetMessageByReceiptHandle(receiveResult.output);
+    Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByReceiptHandle(receiveResult.output);
 
     // assert
     EXPECT_EQ(0, sendResult.status);
@@ -251,7 +251,7 @@ namespace AwsMock::Service {
 
     // act
     Core::ExecResult receiveResult = Core::SystemUtils::Exec(_baseCommand + " sqs receive-message " + queueUrl + " 1 5 5");
-    long messageCount = _database.CountMessages();
+    long messageCount = _sqsDatabase.CountMessages();
 
     // assert
     EXPECT_EQ(0, receiveResult.status);
@@ -295,7 +295,7 @@ namespace AwsMock::Service {
 
     // act
     Core::ExecResult deleteResult = Core::SystemUtils::Exec(_baseCommand + " sqs delete-message " + queueUrl + " " + receiptHandle);
-    long messageCount = _database.CountMessages();
+    long messageCount = _sqsDatabase.CountMessages();
 
     // assert
     EXPECT_EQ(0, receiveResult.status);
@@ -323,7 +323,7 @@ namespace AwsMock::Service {
 
     // act
     Core::ExecResult deleteResult = Core::SystemUtils::Exec(_baseCommand + " sqs delete-message-batch " + queueUrl + " " + receiptHandle1 + " " + receiptHandle2);
-    long messageCount = _database.CountMessages();
+    long messageCount = _sqsDatabase.CountMessages();
 
     // assert
     EXPECT_EQ(0, deleteResult.status);

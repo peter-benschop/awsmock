@@ -19,16 +19,22 @@
 
 namespace AwsMock::Database {
 
-class CognitoDatabase : public Database {
+  class CognitoDatabase : public Database {
 
-public:
+    public:
 
     /**
      * Constructor
-     *
-     * @param configuration configuration properties
      */
-    explicit CognitoDatabase(Core::Configuration &configuration);
+    explicit CognitoDatabase();
+
+    /**
+     * Singleton instance
+     */
+    static CognitoDatabase &instance() {
+      static Poco::SingletonHolder<CognitoDatabase> sh;
+      return *sh.get();
+    }
 
     /**
      * Check existence of cognito user pool
@@ -230,7 +236,7 @@ public:
      */
     void DeleteAllUsers();
 
-  private:
+    private:
 
     /**
      * Logger
@@ -238,21 +244,16 @@ public:
     Core::LogStream _logger;
 
     /**
-     * Cognito user pool collection
+     * Has Mongo
      */
-    mongocxx::collection _userPoolCollection{};
-
-    /**
-     * Cognito user collection
-     */
-    mongocxx::collection _userCollection{};
+    bool _hasDatabase;
 
     /**
      * S3 in-memory database
      */
     CognitoMemoryDb &_memoryDb;
 
-};
+  };
 
 } // namespace AwsMock::Database
 

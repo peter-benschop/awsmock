@@ -7,6 +7,7 @@
 
 // C includes
 #include <fcntl.h>
+#include <errno.h>
 #include <unistd.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -54,8 +55,9 @@ namespace AwsMock::Core {
      * Opens a file and prepares the memory map
      *
      * @param filename name of the file.
+     * @return true on success
      */
-    void OpenFile(const std::string &filename);
+    bool OpenFile(const std::string &filename);
 
     /**
      * Release all resources

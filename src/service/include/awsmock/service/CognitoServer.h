@@ -104,12 +104,12 @@ namespace AwsMock::Service {
     /**
      * Service database
      */
-    std::unique_ptr<Database::ModuleDatabase> _moduleDatabase;
+    Database::ModuleDatabase &_moduleDatabase;
 
     /**
      * S3 database
      */
-    std::unique_ptr<Database::CognitoDatabase> _cognitoDatabase;
+    Database::CognitoDatabase &_cognitoDatabase;
 
     /**
      * HTTP max message queue length

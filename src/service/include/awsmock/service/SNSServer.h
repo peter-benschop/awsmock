@@ -67,14 +67,6 @@ namespace AwsMock::Service {
     void StartMonitoringServer();
 
     /**
-     * Reset messages
-     *
-     * <p>Loops over all SQS queues and sets the state to INITIAL in case the visibilityTimeout timeout has been reached. Also the retry count in increased by one.</p>
-     * <p>Checks also the expiration date and removed the messages, which are older than the max retention period.</>
-     */
-    void ResetMessages();
-
-    /**
      * Logger
      */
     Core::LogStream _logger;
@@ -90,14 +82,9 @@ namespace AwsMock::Service {
     Core::MetricService &_metricService;
 
     /**
-     * Service database
-     */
-    std::unique_ptr<Database::ModuleDatabase> _serviceDatabase;
-
-    /**
      * S3 module
      */
-    std::unique_ptr<Database::SQSDatabase> _sqsDatabase;
+    Database::SNSDatabase& _snsDatabase;
 
     /**
      * Thread pool

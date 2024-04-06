@@ -41,7 +41,7 @@ namespace AwsMock::Database {
 
     std::string _region;
     Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
-    SNSDatabase _snsDatabase = SNSDatabase(_configuration);
+    SNSDatabase& _snsDatabase = SNSDatabase::instance();
   };
 
   TEST_F(SNSMemoryDbTest, TopicCreateTest) {

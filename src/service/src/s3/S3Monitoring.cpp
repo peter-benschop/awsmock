@@ -13,7 +13,7 @@ namespace AwsMock::Service {
     _period = _configuration.getInt("awsmock.monitoring.s3.period", S3_MONITORING_DEFAULT_PERIOD);
 
     // Database connections
-    _s3Database = std::make_unique<Database::S3Database>(_configuration);
+    _s3Database = std::make_unique<Database::S3Database>();
     log_debug_stream(_logger) << "S3 monitoring initialized" << std::endl;
   }
 

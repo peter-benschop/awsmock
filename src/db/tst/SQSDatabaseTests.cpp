@@ -39,7 +39,7 @@ namespace AwsMock::Database {
 
     std::string _region, _queueUrl, _queueArn, _dlqueueUrl, _dlqueueArn;
     Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration();
-    SQSDatabase _sqsDatabase = SQSDatabase(_configuration);
+    SQSDatabase& _sqsDatabase = SQSDatabase::instance();
   };
 
   TEST_F(SQSDatabaseTest, QueueCreateTest) {

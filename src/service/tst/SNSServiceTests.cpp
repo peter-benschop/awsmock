@@ -45,8 +45,8 @@ namespace AwsMock::Service {
 
       Poco::Condition _condition;
       Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
-      Database::SNSDatabase _snsDatabase = Database::SNSDatabase(_configuration);
-      Database::SQSDatabase _sqsDatabase = Database::SQSDatabase(_configuration);
+      Database::SNSDatabase& _snsDatabase = Database::SNSDatabase::instance();
+      Database::SQSDatabase& _sqsDatabase = Database::SQSDatabase::instance();
       SNSService _snsService = SNSService(_configuration, _condition);
       SQSService _sqsService = SQSService(_configuration, _condition);
   };

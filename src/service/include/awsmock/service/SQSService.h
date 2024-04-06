@@ -203,7 +203,7 @@ namespace AwsMock::Service {
     /**
      * Database connection
      */
-    std::unique_ptr<Database::SQSDatabase> _database;
+    Database::SQSDatabase& _database;
 
     /**
      * Shutdown condition

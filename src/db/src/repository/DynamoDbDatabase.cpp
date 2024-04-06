@@ -10,22 +10,16 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_array;
   using bsoncxx::builder::basic::make_document;
 
-  DynamoDbDatabase::DynamoDbDatabase(Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("DynamoDbDatabase")), _memoryDb(DynamoDbMemoryDb::instance()) {
-
-    if (HasDatabase()) {
-
-      // Get collection
-      _tableCollection = GetConnection()["dynamodb_table"];
-      _itemCollection = GetConnection()["dynamodb_item"];
-
-    }
-  }
+  DynamoDbDatabase::DynamoDbDatabase() : _logger(Poco::Logger::get("DynamoDbDatabase")), _memoryDb(DynamoDbMemoryDb::instance()) {}
 
   Entity::DynamoDb::Table DynamoDbDatabase::CreateTable(const Entity::DynamoDb::Table &table) {
 
     if (HasDatabase()) {
 
       try {
+
+        auto client = GetClient();
+        mongocxx::collection _tableCollection = (*client)["awsmock"]["dynamodb_table"];
         auto result = _tableCollection.insert_one(table.ToDocument());
         log_trace_stream(_logger) << "DynamoDb table created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
         return GetTableById(result->inserted_id().get_oid().value);
@@ -46,6 +40,8 @@ namespace AwsMock::Database {
 
     try {
 
+      auto client = GetClient();
+      mongocxx::collection _tableCollection = (*client)["awsmock"]["dynamodb_table"];
       mongocxx::stdx::optional<bsoncxx::document::value> mResult = _tableCollection.find_one(make_document(kvp("_id", oid)));
       if (!mResult) {
         _logger.error() << "Database exception: Table not found " << std::endl;
@@ -70,6 +66,8 @@ namespace AwsMock::Database {
 
       try {
 
+        auto client = GetClient();
+        mongocxx::collection _tableCollection = (*client)["awsmock"]["dynamodb_table"];
         mongocxx::stdx::optional<bsoncxx::document::value> mResult = _tableCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
         if (!mResult) {
           _logger.error() << "Database exception: Table not found " << std::endl;
@@ -112,6 +110,8 @@ namespace AwsMock::Database {
       try {
 
         int64_t count;
+        auto client = GetClient();
+        mongocxx::collection _tableCollection = (*client)["awsmock"]["dynamodb_table"];
         if (!region.empty()) {
           count = _tableCollection.count_documents(make_document(kvp("region", region), kvp("name", tableName)));
         } else {
@@ -139,6 +139,8 @@ namespace AwsMock::Database {
 
       try {
 
+        auto client = GetClient();
+        mongocxx::collection _tableCollection = (*client)["awsmock"]["dynamodb_table"];
         if (region.empty()) {
 
           auto tableCursor = _tableCollection.find({});
@@ -191,10 +193,11 @@ namespace AwsMock::Database {
     if (HasDatabase()) {
 
       try {
+
+        auto client = GetClient();
+        mongocxx::collection _tableCollection = (*client)["awsmock"]["dynamodb_table"];
         auto result = _tableCollection.replace_one(make_document(kvp("region", table.region), kvp("name", table.name)), table.ToDocument());
-
         log_trace_stream(_logger) << "DynamoDB table updated: " << table.ToString() << std::endl;
-
         return GetTableByRegionName(table.region, table.name);
 
       } catch (const mongocxx::exception &exc) {
@@ -215,6 +218,8 @@ namespace AwsMock::Database {
 
       try {
 
+        auto client = GetClient();
+        mongocxx::collection _tableCollection = (*client)["awsmock"]["dynamodb_table"];
         auto result = _tableCollection.delete_many(make_document(kvp("name", tableName)));
         log_debug_stream(_logger) << "DynamoDB table deleted, tableName: " << tableName << " count: " << result->deleted_count() << std::endl;
 
@@ -236,6 +241,8 @@ namespace AwsMock::Database {
 
       try {
 
+        auto client = GetClient();
+        mongocxx::collection _tableCollection = (*client)["awsmock"]["dynamodb_table"];
         auto result = _tableCollection.delete_many({});
         log_debug_stream(_logger) << "All DynamoDb tables deleted, count: " << result->deleted_count() << std::endl;
 
@@ -258,6 +265,8 @@ namespace AwsMock::Database {
       try {
 
         int64_t count;
+        auto client = GetClient();
+        mongocxx::collection _tableCollection = (*client)["awsmock"]["dynamodb_table"];
         if (!region.empty()) {
           count = _tableCollection.count_documents(make_document(kvp("region", region), kvp("name", tableName)));
         } else {
@@ -283,6 +292,8 @@ namespace AwsMock::Database {
     Entity::DynamoDb::ItemList items;
     if (HasDatabase()) {
 
+      auto client = GetClient();
+      mongocxx::collection _itemCollection = (*client)["awsmock"]["dynamodb_item"];
       try {
 
         if (region.empty() && tableName.empty()) {
@@ -334,6 +345,8 @@ namespace AwsMock::Database {
 
       try {
 
+        auto client = GetClient();
+        mongocxx::collection _itemCollection = (*client)["awsmock"]["dynamodb_item"];
         auto result = _itemCollection.delete_many(make_document(kvp("name", tableName)));
         log_debug_stream(_logger) << "DynamoDB item deleted, tableName: " << tableName << " count: " << result->deleted_count() << std::endl;
 
@@ -355,6 +368,8 @@ namespace AwsMock::Database {
 
       try {
 
+        auto client = GetClient();
+        mongocxx::collection _itemCollection = (*client)["awsmock"]["dynamodb_item"];
         auto result = _itemCollection.delete_many({});
         log_debug_stream(_logger) << "DynamoDB items deleted, count: " << result->deleted_count() << std::endl;
 

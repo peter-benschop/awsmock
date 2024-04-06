@@ -11,26 +11,20 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_document;
   using bsoncxx::builder::stream::document;
 
-  SNSDatabase::SNSDatabase(Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("SNSDatabase")), _memoryDb(SNSMemoryDb::instance()) {
-
-    if (HasDatabase()) {
-
-      // Get collections
-      _topicCollection = GetConnection()["sns_topic"];
-      _messageCollection = GetConnection()["sns_message"];
-
-    }
-  }
+  SNSDatabase::SNSDatabase() : _logger(Poco::Logger::get("SNSDatabase")), _memoryDb(SNSMemoryDb::instance()) {}
 
   bool SNSDatabase::TopicExists(const std::string &topicArn) {
 
     if (HasDatabase()) {
 
       try {
+
+        auto client = GetClient();
+        mongocxx::collection _topicCollection = (*client)["awsmock"]["sns_topic"];
         int64_t count = _topicCollection.count_documents(make_document(kvp("topicArn", topicArn)));
         log_trace_stream(_logger) << "Topic exists: " << (count > 0 ? "true" : "false") << std::endl;
-
         return count > 0;
+
       } catch (const mongocxx::exception &exc) {
         _logger.error() << "SNS Database exception " << exc.what() << std::endl;
         throw Core::DatabaseException(exc.what(), 500);
@@ -48,9 +42,13 @@ namespace AwsMock::Database {
     if (HasDatabase()) {
 
       try {
+
+        auto client = GetClient();
+        mongocxx::collection _topicCollection = (*client)["awsmock"]["sns_topic"];
         int64_t count = _topicCollection.count_documents(make_document(kvp("region", region), kvp("topicName", topicName)));
         log_trace_stream(_logger) << "Topic exists: " << (count > 0 ? "true" : "false") << std::endl;
         return count > 0;
+
       } catch (const mongocxx::exception &exc) {
         _logger.error() << "SNS Database exception " << exc.what() << std::endl;
         throw Core::DatabaseException(exc.what(), 500);
@@ -72,6 +70,8 @@ namespace AwsMock::Database {
 
       try {
 
+        auto client = GetClient();
+        mongocxx::collection _topicCollection = (*client)["awsmock"]["sns_topic"];
         auto result = _topicCollection.insert_one(topic.ToDocument());
         log_trace_stream(_logger) << "Topic created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
 
@@ -97,6 +97,8 @@ namespace AwsMock::Database {
 
     try {
 
+      auto client = GetClient();
+      mongocxx::collection _topicCollection = (*client)["awsmock"]["sns_topic"];
       mongocxx::stdx::optional<bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("_id", oid)));
       if (!mResult) {
         return {};
@@ -131,6 +133,8 @@ namespace AwsMock::Database {
 
       try {
 
+        auto client = GetClient();
+        mongocxx::collection _topicCollection = (*client)["awsmock"]["sns_topic"];
         mongocxx::stdx::optional<bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("topicArn", topicArn)));
         Entity::SNS::Topic result;
         result.FromDocument(mResult);
@@ -155,6 +159,8 @@ namespace AwsMock::Database {
 
       try {
 
+        auto client = GetClient();
+        mongocxx::collection _topicCollection = (*client)["awsmock"]["sns_topic"];
         auto queueCursor = _topicCollection.find(make_document(kvp("subscriptions.subscriptionArn", subscriptionArn)));
         for (auto topic : queueCursor) {
           Entity::SNS::Topic result;
@@ -181,6 +187,9 @@ namespace AwsMock::Database {
     if (HasDatabase()) {
 
       try {
+
+        auto client = GetClient();
+        mongocxx::collection _topicCollection = (*client)["awsmock"]["sns_topic"];
 
         if(region.empty()) {
 
@@ -224,6 +233,8 @@ namespace AwsMock::Database {
 
       try {
 
+        auto client = GetClient();
+        mongocxx::collection _topicCollection = (*client)["awsmock"]["sns_topic"];
         auto result = _topicCollection.replace_one(make_document(kvp("region", topic.region), kvp("topicArn", topic.topicArn)), topic.ToDocument());
         log_trace_stream(_logger) << "Topic updated: " << topic.ToString() << std::endl;
 
@@ -263,10 +274,13 @@ namespace AwsMock::Database {
     if (HasDatabase()) {
 
       try {
+
+        auto client = GetClient();
+        mongocxx::collection _topicCollection = (*client)["awsmock"]["sns_topic"];
         long count = _topicCollection.count_documents(make_document(kvp("region", region)));
         log_trace_stream(_logger) << "Count topics, result: " << count << std::endl;
-
         return count;
+
       } catch (const mongocxx::exception &exc) {
         _logger.error() << "SNS Database exception " << exc.what() << std::endl;
         throw Core::DatabaseException(exc.what(), 500);
@@ -288,6 +302,8 @@ namespace AwsMock::Database {
 
       try {
 
+        auto client = GetClient();
+        mongocxx::collection _topicCollection = (*client)["awsmock"]["sns_topic"];
         auto result = _topicCollection.delete_many(make_document(kvp("topicArn", topic.topicArn)));
         log_debug_stream(_logger) << "Topic deleted, count: " << result->deleted_count() << std::endl;
 
@@ -316,6 +332,8 @@ namespace AwsMock::Database {
 
       try {
 
+        auto client = GetClient();
+        mongocxx::collection _topicCollection = (*client)["awsmock"]["sns_topic"];
         auto result = _topicCollection.delete_many({});
         log_debug_stream(_logger) << "All topics deleted, count: " << result->deleted_count() << std::endl;
 
@@ -340,10 +358,13 @@ namespace AwsMock::Database {
     if (HasDatabase()) {
 
       try {
+
+        auto client = GetClient();
+        mongocxx::collection _messageCollection = (*client)["awsmock"]["sns_message"];
         int64_t count = _messageCollection.count_documents(make_document(kvp("_id", id)));
         log_trace_stream(_logger) << "Message exists: " << (count > 0 ? "true" : "false") << std::endl;
-
         return count > 0;
+
       } catch (const mongocxx::exception &exc) {
         _logger.error() << "SNS Database exception " << exc.what() << std::endl;
         throw Core::DatabaseException(exc.what(), 500);
@@ -364,6 +385,9 @@ namespace AwsMock::Database {
       session.start_transaction();
 
       try {
+
+        auto client = GetClient();
+        mongocxx::collection _messageCollection = (*client)["awsmock"]["sns_message"];
 
         auto result = _messageCollection.insert_one(message.ToDocument());
         log_trace_stream(_logger) << "Message created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
@@ -388,6 +412,9 @@ namespace AwsMock::Database {
 
   Entity::SNS::Message SNSDatabase::GetMessageById(bsoncxx::oid oid) {
     try {
+
+      auto client = GetClient();
+      mongocxx::collection _messageCollection = (*client)["awsmock"]["sns_message"];
       mongocxx::stdx::optional<bsoncxx::document::value> mResult = _messageCollection.find_one(make_document(kvp("_id", oid)));
       Entity::SNS::Message result;
       result.FromDocument(mResult);
@@ -410,6 +437,8 @@ namespace AwsMock::Database {
       try {
 
         long count;
+        auto client = GetClient();
+        mongocxx::collection _messageCollection = (*client)["awsmock"]["sns_message"];
         if(!region.empty() && !topicArn.empty()) {
           count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("topicArn", topicArn)));
         } else if(!region.empty()) {
@@ -437,9 +466,13 @@ namespace AwsMock::Database {
     if (HasDatabase()) {
 
       try {
+
+        auto client = GetClient();
+        mongocxx::collection _messageCollection = (*client)["awsmock"]["sns_message"];
         long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("topicArn", topicArn), kvp("status", Entity::SNS::MessageStatusToString(status))));
         log_trace_stream(_logger) << "Count messages by state, region: " << region << " arn: " << topicArn << " result: " << count << std::endl;
         return count;
+
       } catch (const mongocxx::exception &exc) {
         _logger.error() << "SNS Database exception " << exc.what() << std::endl;
         throw Core::DatabaseException(exc.what(), 500);
@@ -457,6 +490,8 @@ namespace AwsMock::Database {
     Entity::SNS::MessageList messageList;
     if (HasDatabase()) {
 
+      auto client = GetClient();
+      mongocxx::collection _messageCollection = (*client)["awsmock"]["sns_message"];
       if (region.empty()) {
 
         auto messageCursor = _messageCollection.find(make_document());
@@ -491,6 +526,9 @@ namespace AwsMock::Database {
 
       mongocxx::options::find_one_and_update opts{};
       opts.return_document(mongocxx::options::return_document::k_after);
+
+      auto client = GetClient();
+      mongocxx::collection _messageCollection = (*client)["awsmock"]["sns_message"];
 
       auto mResult = _messageCollection.find_one_and_update(make_document(kvp("_id", bsoncxx::oid{message.oid})), message.ToDocument(), opts);
       log_trace_stream(_logger) << "Message updated, count: " << bsoncxx::to_json(mResult->view()) << std::endl;
@@ -531,6 +569,8 @@ namespace AwsMock::Database {
 
       try {
 
+        auto client = GetClient();
+        mongocxx::collection _messageCollection = (*client)["awsmock"]["sns_message"];
         auto result = _messageCollection.delete_one(make_document(kvp("messageId", message.messageId)));
         log_debug_stream(_logger) << "Messages deleted, messageId: " << message.messageId << " count: " << result->deleted_count() << std::endl;
 
@@ -564,6 +604,8 @@ namespace AwsMock::Database {
 
       try {
 
+        auto client = GetClient();
+        mongocxx::collection _messageCollection = (*client)["awsmock"]["sns_message"];
         auto result = _messageCollection.delete_many(make_document(kvp("region", region), kvp("topicArn", topicArn), kvp("messageId", make_document(kvp("$in", array)))));
         log_debug_stream(_logger) << "Messages deleted, count: " << result->result().deleted_count() << std::endl;
 
@@ -589,6 +631,8 @@ namespace AwsMock::Database {
 
       try {
 
+        auto client = GetClient();
+        mongocxx::collection _messageCollection = (*client)["awsmock"]["sns_message"];
         auto result = _messageCollection.delete_many({});
         log_debug_stream(_logger) << "All messages deleted, count: " << result->deleted_count() << std::endl;
 

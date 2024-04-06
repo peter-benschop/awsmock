@@ -53,7 +53,7 @@ namespace AwsMock::Service {
     Poco::NotificationQueue createQueue, invokeQueue;
     Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
     Core::MetricService _metricService = Core::MetricService(_configuration);
-    Database::CognitoDatabase _database = Database::CognitoDatabase(_configuration);
+    Database::CognitoDatabase _database = Database::CognitoDatabase();
     CognitoServer _dynamodbServer = CognitoServer(_configuration, _metricService);
   };
 

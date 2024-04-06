@@ -101,14 +101,9 @@ namespace AwsMock::Service {
     Core::MetricService &_metricService;
 
     /**
-     * Service database
-     */
-    std::unique_ptr<Database::ModuleDatabase> _serviceDatabase;
-
-    /**
      * lambda database
      */
-    std::unique_ptr<Database::TransferDatabase> _transferDatabase;
+    Database::TransferDatabase& _transferDatabase;
 
     /**
      * Sleeping period in ms

@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
 
   SQSServer::SQSServer(Core::Configuration &configuration, Core::MetricService &metricService)
-    : AbstractServer(configuration, "sqs"), _logger(Poco::Logger::get("SQSServer")), _configuration(configuration), _metricService(metricService) {
+    : AbstractServer(configuration, "sqs"), _logger(Poco::Logger::get("SQSServer")), _configuration(configuration), _metricService(metricService),_serviceDatabase(Database::ModuleDatabase::instance()),_sqsDatabase(Database::SQSDatabase::instance()) {
 
     // HTTP manager configuration
     _port = _configuration.getInt("awsmock.service.sqs.port", SQS_DEFAULT_PORT);
@@ -22,8 +22,7 @@ namespace AwsMock::Service {
 
     // Create environment
     _region = _configuration.getString("awsmock.region");
-    _sqsDatabase = std::make_unique<Database::SQSDatabase>(_configuration);
-    _serviceDatabase = std::make_unique<Database::ModuleDatabase>(_configuration);
+    //_sqsDatabase = std::make_unique<Database::SQSDatabase>(_configuration);
     log_debug_stream(_logger) << "SQSServer initialized" << std::endl;
   }
 
@@ -71,35 +70,35 @@ namespace AwsMock::Service {
 
   void SQSServer::ResetMessages() {
 
-    Database::Entity::SQS::QueueList queueList = _sqsDatabase->ListQueues(_region);
+    Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(_region);
     log_trace_stream(_logger) << "Working on queue list, count" << queueList.size() << std::endl;
 
     for (auto &queue : queueList) {
 
       // Check retention period
       if (queue.attributes.messageRetentionPeriod > 0) {
-        _sqsDatabase->MessageRetention(queue.queueUrl, queue.attributes.messageRetentionPeriod);
+        _sqsDatabase.MessageRetention(queue.queueUrl, queue.attributes.messageRetentionPeriod);
       }
 
       // Reset messages which have expired
-      _sqsDatabase->ResetMessages(queue.queueUrl, queue.attributes.visibilityTimeout);
+      _sqsDatabase.ResetMessages(queue.queueUrl, queue.attributes.visibilityTimeout);
 
       // Set counter default userAttributes
-      queue.attributes.approximateNumberOfMessages = _sqsDatabase->CountMessages(queue.region, queue.queueUrl);
-      queue.attributes.approximateNumberOfMessagesDelayed = _sqsDatabase->CountMessagesByStatus(queue.region, queue.queueUrl, Database::Entity::SQS::MessageStatus::DELAYED);
-      queue.attributes.approximateNumberOfMessagesNotVisible = _sqsDatabase->CountMessagesByStatus(queue.region, queue.queueUrl, Database::Entity::SQS::MessageStatus::INVISIBLE);
+      queue.attributes.approximateNumberOfMessages = _sqsDatabase.CountMessages(queue.region, queue.queueUrl);
+      queue.attributes.approximateNumberOfMessagesDelayed = _sqsDatabase.CountMessagesByStatus(queue.region, queue.queueUrl, Database::Entity::SQS::MessageStatus::DELAYED);
+      queue.attributes.approximateNumberOfMessagesNotVisible = _sqsDatabase.CountMessagesByStatus(queue.region, queue.queueUrl, Database::Entity::SQS::MessageStatus::INVISIBLE);
 
       // Check retries
       if (!queue.attributes.redrivePolicy.deadLetterTargetArn.empty()) {
-        _sqsDatabase->RedriveMessages(queue.queueUrl, queue.attributes.redrivePolicy);
+        _sqsDatabase.RedriveMessages(queue.queueUrl, queue.attributes.redrivePolicy);
       }
 
       // Check delays
       if (queue.attributes.delaySeconds > 0) {
-        _sqsDatabase->ResetDelayedMessages(queue.queueUrl, queue.attributes.delaySeconds);
+        _sqsDatabase.ResetDelayedMessages(queue.queueUrl, queue.attributes.delaySeconds);
       }
 
-      _sqsDatabase->UpdateQueue(queue);
+      _sqsDatabase.UpdateQueue(queue);
       log_trace_stream(_logger) << "Queue updated, queueName" << queue.name << std::endl;
     }
   }

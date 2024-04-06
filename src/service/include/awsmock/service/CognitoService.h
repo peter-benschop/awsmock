@@ -106,7 +106,7 @@ namespace AwsMock::Service {
       /**
        * Database connection
        */
-      std::unique_ptr<Database::CognitoDatabase> _database;
+      Database::CognitoDatabase &_database;
 
       /**
        * S3 account id

@@ -356,7 +356,7 @@ namespace AwsMock::Service {
     /**
      * Database connection
      */
-    std::unique_ptr<Database::S3Database> _database;
+    Database::S3Database& _database;
 
     /**
      * Multipart uploads map

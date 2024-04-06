@@ -124,8 +124,8 @@ namespace AwsMock::Core {
     DefineStringProperty("awsmock.mongodb.name", "AWSMOCK_MONGODB_NAME", "awsmock");
     DefineStringProperty("awsmock.mongodb.host", "AWSMOCK_MONGODB_HOST", "localhost");
     DefineIntProperty("awsmock.mongodb.port", "AWSMOCK_MONGODB_PORT", 27017);
-    DefineStringProperty("awsmock.mongodb.user", "AWSMOCK_MONGODB_USER", "awsmock");
-    DefineStringProperty("awsmock.mongodb.password", "AWSMOCK_MONGODB_PASSWORD", "awsmock");
+    DefineStringProperty("awsmock.mongodb.user", "AWSMOCK_MONGODB_USER", "admin");
+    DefineStringProperty("awsmock.mongodb.password", "AWSMOCK_MONGODB_PASSWORD", "admin");
   }
 
   void Configuration::DefineStringProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue) {

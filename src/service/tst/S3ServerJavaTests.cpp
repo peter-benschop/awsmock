@@ -56,7 +56,7 @@ namespace AwsMock::Service {
     std::map<std::string, std::string> _extraHeaders;
     Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
     Core::MetricService _metricService = Core::MetricService(_configuration);
-    Database::S3Database _database = Database::S3Database(_configuration);
+    Database::S3Database _database = Database::S3Database();
     S3Server _s3Server = S3Server(_configuration, _metricService);
   };
 

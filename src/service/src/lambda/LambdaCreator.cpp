@@ -6,10 +6,8 @@
 
 namespace AwsMock::Service {
 
-  LambdaCreator::LambdaCreator(Core::Configuration &configuration, Poco::NotificationQueue &createQueue) : _logger(Poco::Logger::get("LambdaCreator")), _configuration(configuration), _dockerService(configuration), _createQueue(createQueue) {
-
-    // Database connection
-    _lambdaDatabase = std::make_shared<Database::LambdaDatabase>(_configuration);
+  LambdaCreator::LambdaCreator(Core::Configuration &configuration, Poco::NotificationQueue &createQueue)
+    : _logger(Poco::Logger::get("LambdaCreator")), _configuration(configuration), _lambdaDatabase(Database::LambdaDatabase::instance()), _dockerService(configuration), _createQueue(createQueue) {
 
     // Configuration
     _dataDir = _configuration.getString("awsmock.data.dir", "/tmp/awsmock/data");
@@ -36,7 +34,7 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Start creating lambda function, oid: " << functionId << std::endl;
 
     // Make local copy
-    Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase->GetLambdaById(functionId);
+    Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase.GetLambdaById(functionId);
 
     // Docker tag
     std::string dockerTag = GetDockerTag(lambdaEntity);
@@ -68,7 +66,7 @@ namespace AwsMock::Service {
     lambdaEntity.lastStarted = Poco::DateTime();
     lambdaEntity.state = Database::Entity::Lambda::LambdaState::Active;
     lambdaEntity.stateReason = "Activated";
-    _lambdaDatabase->UpdateLambda(lambdaEntity);
+    _lambdaDatabase.UpdateLambda(lambdaEntity);
 
     log_debug_stream(_logger) << "Lambda function started: " << lambdaEntity.function << ":" << dockerTag << std::endl;
   }
@@ -105,7 +103,7 @@ namespace AwsMock::Service {
     try {
       std::vector<std::string> environment = GetEnvironment(lambdaEntity.environment);
       Dto::Docker::CreateContainerResponse
-          containerCreateResponse = _dockerService.CreateContainer(lambdaEntity.function, dockerTag, environment, lambdaEntity.hostPort);
+        containerCreateResponse = _dockerService.CreateContainer(lambdaEntity.function, dockerTag, environment, lambdaEntity.hostPort);
       log_debug_stream(_logger) << "Lambda container created, hostPort: " << lambdaEntity.hostPort << std::endl;
     } catch (std::exception &exc) {
       log_error_stream(_logger) << exc.what() << std::endl;

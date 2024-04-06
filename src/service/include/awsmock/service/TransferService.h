@@ -119,7 +119,7 @@ namespace AwsMock::Service {
     /**
      * Transfer database connection
      */
-    std::unique_ptr<Database::TransferDatabase> _transferDatabase;
+    Database::TransferDatabase& _transferDatabase;
 
     /**
      * FTP port

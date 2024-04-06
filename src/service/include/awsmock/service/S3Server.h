@@ -102,7 +102,7 @@ namespace AwsMock::Service {
     /**
      * S3 database
      */
-    std::unique_ptr<Database::S3Database> _s3Database;
+    Database::S3Database& _s3Database;
 
     /**
      * HTTP max message queue length

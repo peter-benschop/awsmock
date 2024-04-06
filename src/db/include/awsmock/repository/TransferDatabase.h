@@ -31,7 +31,15 @@ namespace AwsMock::Database {
      *
      * @param configuration configuration properties
      */
-    explicit TransferDatabase(Core::Configuration &configuration);
+    explicit TransferDatabase();
+
+    /**
+     * Singleton instance
+     */
+    static TransferDatabase &instance() {
+      static Poco::SingletonHolder<TransferDatabase> sh;
+      return *sh.get();
+    }
 
     /**
      * Check existence of lambda
@@ -160,11 +168,6 @@ namespace AwsMock::Database {
      * Logger
      */
     Core::LogStream _logger;
-
-    /**
-     * Transfer collection
-     */
-    mongocxx::collection _transferCollection{};
 
     /**
      * Transfer in-memory database

@@ -101,12 +101,12 @@ namespace AwsMock::Service {
     /**
      * Service database
      */
-    std::unique_ptr<Database::ModuleDatabase> _serviceDatabase;
+    Database::ModuleDatabase &_serviceDatabase;
 
     /**
      * S3 module
      */
-    std::unique_ptr<Database::SQSDatabase> _sqsDatabase;
+    Database::SQSDatabase& _sqsDatabase;
 
     /**
      * Thread pool

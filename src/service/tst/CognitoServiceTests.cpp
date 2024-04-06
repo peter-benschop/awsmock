@@ -39,7 +39,7 @@ namespace AwsMock::Service {
 
       std::string _region;
       Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
-      Database::CognitoDatabase _database = Database::CognitoDatabase(_configuration);
+      Database::CognitoDatabase _database = Database::CognitoDatabase();
       CognitoService _service = CognitoService(_configuration);
       std::string testFile;
   };
