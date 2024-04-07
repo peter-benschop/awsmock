@@ -23,6 +23,10 @@ namespace AwsMock::Dto::DynamoDb {
      */
     std::map<std::string, std::string> headers;
 
+    /**
+     * Status from DynamoDb docker image
+     */
+    Poco::Net::HTTPResponse::HTTPStatus status;
   };
 
 } // namespace AwsMock::Dto::DynamoDb

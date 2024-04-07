@@ -172,9 +172,14 @@ namespace AwsMock::Database {
     Core::LogStream _logger;
 
     /**
-     * Has Mongo
+     * Use MongoDB
      */
-    bool _hasDatabase;
+    bool _useDatabase;
+
+    /**
+     * Database name
+     */
+    std::string _databaseName;
 
     /**
      * Modules in-memory database

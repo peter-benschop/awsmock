@@ -334,7 +334,7 @@ namespace AwsMock::Service {
           sqsRequest.queueUrl = Core::HttpUtils::GetQueryParameterValueByName(sqsClientCommand.payload, "QueueUrl");
 
           // Get message count
-          int count = Core::HttpUtils::CountQueryParametersByPrefix(sqsClientCommand.payload, "Entries") / 2;
+          int count = Core::HttpUtils::CountQueryParametersByPrefix(sqsClientCommand.payload, "DeleteMessageBatchRequestEntry") / 2;
           log_trace_stream(_logger) << "Got entry count, count: " << count << std::endl;
 
           for (int i = 1; i <= count; i++) {

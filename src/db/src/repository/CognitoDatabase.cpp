@@ -10,7 +10,7 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_array;
   using bsoncxx::builder::basic::make_document;
 
-  CognitoDatabase::CognitoDatabase() : _logger(Poco::Logger::get("CognitoDatabase")), _memoryDb(CognitoMemoryDb::instance()), _hasDatabase(Database::HasDatabase()) {}
+  CognitoDatabase::CognitoDatabase() : _logger(Poco::Logger::get("CognitoDatabase")), _memoryDb(CognitoMemoryDb::instance()), _hasDatabase(Database::HasDatabase()), _databaseName(GetDatabaseName()) {}
 
   bool CognitoDatabase::UserPoolExists(const std::string &region, const std::string &name) {
 
@@ -19,7 +19,7 @@ namespace AwsMock::Database {
       try {
 
         auto client = GetClient();
-        mongocxx::collection _userPoolCollection = (*client)["awsmock"]["cognito_userpool"];
+        mongocxx::collection _userPoolCollection = (*client)[_databaseName]["cognito_userpool"];
         int64_t count = _userPoolCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
         log_trace_stream(_logger) << "Cognito user pool exists: " << (count > 0 ? "true" : "false") << std::endl;
         return count > 0;
@@ -43,7 +43,7 @@ namespace AwsMock::Database {
       try {
 
         auto client = GetClient();
-        mongocxx::collection _userPoolCollection = (*client)["awsmock"]["cognito_userpool"];
+        mongocxx::collection _userPoolCollection = (*client)[_databaseName]["cognito_userpool"];
         int64_t count = _userPoolCollection.count_documents(make_document(kvp("id", id)));
         log_trace_stream(_logger) << "Cognito user pool exists: " << (count > 0 ? "true" : "false") << std::endl;
         return count > 0;
@@ -65,7 +65,7 @@ namespace AwsMock::Database {
     if (_hasDatabase) {
 
       auto client = GetClient();
-      mongocxx::collection _userPoolCollection = (*client)["awsmock"]["cognito_userpool"];
+      mongocxx::collection _userPoolCollection = (*client)[_databaseName]["cognito_userpool"];
       auto session = client->start_session();
 
       try {
@@ -94,7 +94,7 @@ namespace AwsMock::Database {
     try {
 
       auto client = GetClient();
-      mongocxx::collection _userPoolCollection = (*client)["awsmock"]["cognito_userpool"];
+      mongocxx::collection _userPoolCollection = (*client)[_databaseName]["cognito_userpool"];
       mongocxx::stdx::optional<bsoncxx::document::value> mResult = _userPoolCollection.find_one(make_document(kvp("_id", oid)));
       if (!mResult) {
         _logger.error() << "Database exception: Cognito not found " << std::endl;
@@ -119,7 +119,7 @@ namespace AwsMock::Database {
       try {
 
         auto client = GetClient();
-        mongocxx::collection _userPoolCollection = (*client)["awsmock"]["cognito_userpool"];
+        mongocxx::collection _userPoolCollection = (*client)[_databaseName]["cognito_userpool"];
         mongocxx::stdx::optional<bsoncxx::document::value> mResult = _userPoolCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
         if (!mResult) {
           _logger.error() << "Database exception: Cognito not found " << std::endl;
@@ -160,7 +160,7 @@ namespace AwsMock::Database {
     if (_hasDatabase) {
 
       auto client = GetClient();
-      mongocxx::collection _userPoolCollection = (*client)["awsmock"]["cognito_userpool"];
+      mongocxx::collection _userPoolCollection = (*client)[_databaseName]["cognito_userpool"];
       auto session = client->start_session();
 
       try {
@@ -192,7 +192,7 @@ namespace AwsMock::Database {
       try {
 
         auto client = GetClient();
-        mongocxx::collection _userPoolCollection = (*client)["awsmock"]["cognito_userpool"];
+        mongocxx::collection _userPoolCollection = (*client)[_databaseName]["cognito_userpool"];
         if (region.empty()) {
 
           auto userPoolCursor = _userPoolCollection.find(make_document());
@@ -233,7 +233,7 @@ namespace AwsMock::Database {
       try {
         long count = 0;
         auto client = GetClient();
-        mongocxx::collection _userPoolCollection = (*client)["awsmock"]["cognito_userpool"];
+        mongocxx::collection _userPoolCollection = (*client)[_databaseName]["cognito_userpool"];
         if (region.empty()) {
           count = _userPoolCollection.count_documents(make_document());
         } else {
@@ -259,7 +259,7 @@ namespace AwsMock::Database {
     if (_hasDatabase) {
 
       auto client = GetClient();
-      mongocxx::collection _userPoolCollection = (*client)["awsmock"]["cognito_userpool"];
+      mongocxx::collection _userPoolCollection = (*client)[_databaseName]["cognito_userpool"];
       auto session = client->start_session();
 
       try {
@@ -287,7 +287,7 @@ namespace AwsMock::Database {
     if (_hasDatabase) {
 
       auto client = GetClient();
-      mongocxx::collection _userPoolCollection = (*client)["awsmock"]["cognito_userpool"];
+      mongocxx::collection _userPoolCollection = (*client)[_databaseName]["cognito_userpool"];
       auto session = client->start_session();
 
       try {
@@ -317,7 +317,7 @@ namespace AwsMock::Database {
       try {
 
         auto client = GetClient();
-        mongocxx::collection _userCollection = (*client)["awsmock"]["cognito_user"];
+        mongocxx::collection _userCollection = (*client)[_databaseName]["cognito_user"];
         int64_t count = _userCollection.count_documents(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("userName", userName)));
         log_trace_stream(_logger) << "Cognito user exists: " << (count > 0 ? "true" : "false") << std::endl;
         return count > 0;
@@ -339,7 +339,7 @@ namespace AwsMock::Database {
     if (_hasDatabase) {
 
       auto client = GetClient();
-      mongocxx::collection _userCollection = (*client)["awsmock"]["cognito_user"];
+      mongocxx::collection _userCollection = (*client)[_databaseName]["cognito_user"];
       auto session = client->start_session();
 
       try {
@@ -368,7 +368,7 @@ namespace AwsMock::Database {
     try {
 
       auto client = GetClient();
-      mongocxx::collection _userCollection = (*client)["awsmock"]["cognito_user"];
+      mongocxx::collection _userCollection = (*client)[_databaseName]["cognito_user"];
       mongocxx::stdx::optional<bsoncxx::document::value> mResult = _userCollection.find_one(make_document(kvp("_id", oid)));
       if (!mResult) {
         _logger.error() << "Database exception: user not found " << std::endl;
@@ -393,7 +393,7 @@ namespace AwsMock::Database {
       try {
 
         auto client = GetClient();
-        mongocxx::collection _userCollection = (*client)["awsmock"]["cognito_user"];
+        mongocxx::collection _userCollection = (*client)[_databaseName]["cognito_user"];
         auto mResult = _userCollection.find_one(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("userName", userName)));
         if (!mResult) {
           _logger.error() << "Database exception: user not found " << std::endl;
@@ -438,7 +438,7 @@ namespace AwsMock::Database {
 
         long count = 0;
         auto client = GetClient();
-        mongocxx::collection _userCollection = (*client)["awsmock"]["cognito_user"];
+        mongocxx::collection _userCollection = (*client)[_databaseName]["cognito_user"];
         if (!region.empty() && !userPoolId.empty()) {
           count = _userCollection.count_documents(make_document(kvp("region", region), kvp("userPoolId", userPoolId)));
         } else if (!region.empty()) {
@@ -469,7 +469,7 @@ namespace AwsMock::Database {
       try {
 
         auto client = GetClient();
-        mongocxx::collection _userCollection = (*client)["awsmock"]["cognito_user"];
+        mongocxx::collection _userCollection = (*client)[_databaseName]["cognito_user"];
         if (!region.empty() && !userPoolId.empty()) {
 
           auto userCursor = _userCollection.find(make_document(kvp("region", region), kvp("userPoolId", userPoolId)));
@@ -517,7 +517,7 @@ namespace AwsMock::Database {
     if (_hasDatabase) {
 
       auto client = GetClient();
-      mongocxx::collection _userCollection = (*client)["awsmock"]["cognito_user"];
+      mongocxx::collection _userCollection = (*client)[_databaseName]["cognito_user"];
       auto session = client->start_session();
 
       try {
@@ -559,7 +559,7 @@ namespace AwsMock::Database {
     if (_hasDatabase) {
 
       auto client = GetClient();
-      mongocxx::collection _userCollection = (*client)["awsmock"]["cognito_user"];
+      mongocxx::collection _userCollection = (*client)[_databaseName]["cognito_user"];
       auto session = client->start_session();
 
       try {
@@ -587,7 +587,7 @@ namespace AwsMock::Database {
     if (_hasDatabase) {
 
       auto client = GetClient();
-      mongocxx::collection _userCollection = (*client)["awsmock"]["cognito_user"];
+      mongocxx::collection _userCollection = (*client)[_databaseName]["cognito_user"];
       auto session = client->start_session();
 
       try {

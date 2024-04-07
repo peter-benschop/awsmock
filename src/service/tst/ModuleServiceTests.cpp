@@ -38,7 +38,7 @@ namespace AwsMock::Service {
       std::string _region;
       Core::Configuration& _configuration = Core::Configuration::instance();
       Core::MetricService _metricService = Core::MetricService(_configuration);
-      Database::ModuleDatabase _database = Database::ModuleDatabase();
+      Database::ModuleDatabase& _database = Database::ModuleDatabase::instance();
 
       Service::ServerMap serverMap = {{"s3", new S3Server(_configuration, _metricService)}};
       ModuleService _service = ModuleService(_configuration, serverMap);

@@ -51,6 +51,11 @@ namespace AwsMock::Dto::DynamoDb {
     std::map<std::string, std::string> headers;
 
     /**
+     * HTTP status from docker image
+     */
+    Poco::Net::HTTPResponse::HTTPStatus status;
+
+    /**
      * Creates a JSON string from the object.
      *
      * @return JSON string

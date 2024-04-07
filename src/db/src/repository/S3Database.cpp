@@ -16,16 +16,16 @@ namespace AwsMock::Database {
     {"Deleted", {"s3:ObjectRemoved:Delete", "s3:ObjectRemoved:DeleteMarkerCreated"}}
   };
 
-  S3Database::S3Database() : _logger(Poco::Logger::get("S3Database")), _memoryDb(S3MemoryDb::instance()), _hasDatabase(HasDatabase()) {}
+  S3Database::S3Database() : _logger(Poco::Logger::get("S3Database")), _memoryDb(S3MemoryDb::instance()), _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()) {}
 
   bool S3Database::BucketExists(const std::string &region, const std::string &name) {
 
-    if (_hasDatabase) {
+    if (_useDatabase) {
 
       try {
 
         auto client = GetClient();
-        mongocxx::collection _bucketCollection = (*client)["awsmock"]["s3_bucket"];
+        mongocxx::collection _bucketCollection = (*client)[_databaseName]["s3_bucket"];
 
         int64_t count = _bucketCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
         log_trace_stream(_logger) << "Bucket exists: " << (count > 0 ? "true" : "false") << std::endl;
@@ -49,10 +49,10 @@ namespace AwsMock::Database {
 
   Entity::S3::Bucket S3Database::CreateBucket(const Entity::S3::Bucket &bucket) {
 
-    if (_hasDatabase) {
+    if (_useDatabase) {
 
       auto client = GetClient();
-      mongocxx::collection _bucketCollection = (*client)["awsmock"]["s3_bucket"];
+      mongocxx::collection _bucketCollection = (*client)[_databaseName]["s3_bucket"];
       auto session = client->start_session();
 
       try {
@@ -78,11 +78,11 @@ namespace AwsMock::Database {
 
   long S3Database::BucketCount() {
 
-    if (_hasDatabase) {
+    if (_useDatabase) {
 
       try {
         auto client = GetClient();
-        mongocxx::collection _bucketCollection = (*client)["awsmock"]["s3_bucket"];
+        mongocxx::collection _bucketCollection = (*client)[_databaseName]["s3_bucket"];
 
         long count = _bucketCollection.count_documents(make_document());
         log_trace_stream(_logger) << "Bucket count: " << count << std::endl;
@@ -103,7 +103,7 @@ namespace AwsMock::Database {
   Entity::S3::Bucket S3Database::GetBucketById(bsoncxx::oid oid) {
 
     auto client = GetClient();
-    mongocxx::collection _bucketCollection = (*client)["awsmock"]["s3_bucket"];
+    mongocxx::collection _bucketCollection = (*client)[_databaseName]["s3_bucket"];
 
     mongocxx::stdx::optional<bsoncxx::document::value> mResult = _bucketCollection.find_one(make_document(kvp("_id", oid)));
     Entity::S3::Bucket result;
@@ -114,7 +114,7 @@ namespace AwsMock::Database {
 
   Entity::S3::Bucket S3Database::GetBucketById(const std::string &oid) {
 
-    if (_hasDatabase) {
+    if (_useDatabase) {
 
       return GetBucketById(bsoncxx::oid(oid));
 
@@ -127,10 +127,10 @@ namespace AwsMock::Database {
 
   Entity::S3::Bucket S3Database::GetBucketByRegionName(const std::string &region, const std::string &name) {
 
-    if (_hasDatabase) {
+    if (_useDatabase) {
 
       auto client = GetClient();
-      mongocxx::collection _bucketCollection = (*client)["awsmock"]["s3_bucket"];
+      mongocxx::collection _bucketCollection = (*client)[_databaseName]["s3_bucket"];
       mongocxx::stdx::optional<bsoncxx::document::value> mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
       if (mResult->empty()) {
         return {};
@@ -151,10 +151,10 @@ namespace AwsMock::Database {
   Entity::S3::BucketList S3Database::ListBuckets() {
 
     Entity::S3::BucketList bucketList;
-    if (_hasDatabase) {
+    if (_useDatabase) {
 
       auto client = GetClient();
-      mongocxx::collection _bucketCollection = (*client)["awsmock"]["s3_bucket"];
+      mongocxx::collection _bucketCollection = (*client)[_databaseName]["s3_bucket"];
 
       auto bucketCursor = _bucketCollection.find({});
       for (auto bucket : bucketCursor) {
@@ -174,10 +174,10 @@ namespace AwsMock::Database {
 
   bool S3Database::HasObjects(const Entity::S3::Bucket &bucket) {
 
-    if (_hasDatabase) {
+    if (_useDatabase) {
 
       auto client = GetClient();
-      mongocxx::collection _objectCollection = (*client)["awsmock"]["s3_object"];
+      mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
       int64_t count = _objectCollection.count_documents(make_document(kvp("region", bucket.region), kvp("bucket", bucket.name)));
       log_trace_stream(_logger) << "Objects exists: " << (count > 0 ? "true" : "false") << std::endl;
       return count > 0;
@@ -191,10 +191,10 @@ namespace AwsMock::Database {
 
   Entity::S3::Bucket S3Database::UpdateBucket(const Entity::S3::Bucket &bucket) {
 
-    if (_hasDatabase) {
+    if (_useDatabase) {
 
       auto client = GetClient();
-      mongocxx::collection _bucketCollection = (*client)["awsmock"]["s3_bucket"];
+      mongocxx::collection _bucketCollection = (*client)[_databaseName]["s3_bucket"];
       auto session = client->start_session();
 
       try {
@@ -231,12 +231,12 @@ namespace AwsMock::Database {
   Entity::S3::ObjectList S3Database::ListBucket(const std::string &bucket, const std::string &prefix) {
 
     Entity::S3::ObjectList objectList;
-    if (_hasDatabase) {
+    if (_useDatabase) {
 
       if (prefix.empty()) {
 
         auto client = GetClient();
-        mongocxx::collection _objectCollection = (*client)["awsmock"]["s3_object"];
+        mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
         auto objectCursor = _objectCollection.find(make_document(kvp("bucket", bucket)));
         for (auto object : objectCursor) {
           Entity::S3::Object result;
@@ -247,7 +247,7 @@ namespace AwsMock::Database {
       } else {
 
         auto client = GetClient();
-        mongocxx::collection _objectCollection = (*client)["awsmock"]["s3_object"];
+        mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
         auto objectCursor = _objectCollection.find(make_document(kvp("bucket", bucket), kvp("key", bsoncxx::types::b_regex{"^" + prefix + ".*"})));
         for (auto object : objectCursor) {
           Entity::S3::Object result;
@@ -270,12 +270,12 @@ namespace AwsMock::Database {
   Entity::S3::ObjectList S3Database::ListObjects(const std::string &prefix) {
 
     Entity::S3::ObjectList objectList;
-    if (_hasDatabase) {
+    if (_useDatabase) {
 
       if (prefix.empty()) {
 
         auto client = GetClient();
-        mongocxx::collection _objectCollection = (*client)["awsmock"]["s3_object"];
+        mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
         auto objectCursor = _objectCollection.find({});
         for (auto object : objectCursor) {
           Entity::S3::Object result;
@@ -285,7 +285,7 @@ namespace AwsMock::Database {
       } else {
 
         auto client = GetClient();
-        mongocxx::collection _objectCollection = (*client)["awsmock"]["s3_object"];
+        mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
         auto objectCursor = _objectCollection.find(make_document(kvp("key", bsoncxx::types::b_regex{"^" + prefix + ".*"})));
         for (auto object : objectCursor) {
           Entity::S3::Object result;
@@ -306,10 +306,10 @@ namespace AwsMock::Database {
 
   void S3Database::DeleteBucket(const Entity::S3::Bucket &bucket) {
 
-    if (_hasDatabase) {
+    if (_useDatabase) {
 
       auto client = GetClient();
-      mongocxx::collection _bucketCollection = (*client)["awsmock"]["s3_bucket"];
+      mongocxx::collection _bucketCollection = (*client)[_databaseName]["s3_bucket"];
       auto session = client->start_session();
 
       try {
@@ -334,10 +334,10 @@ namespace AwsMock::Database {
 
   void S3Database::DeleteAllBuckets() {
 
-    if (_hasDatabase) {
+    if (_useDatabase) {
 
       auto client = GetClient();
-      mongocxx::collection _bucketCollection = (*client)["awsmock"]["s3_bucket"];
+      mongocxx::collection _bucketCollection = (*client)[_databaseName]["s3_bucket"];
       auto session = client->start_session();
 
       try {
@@ -362,10 +362,10 @@ namespace AwsMock::Database {
 
   bool S3Database::ObjectExists(const Entity::S3::Object &object) {
 
-    if (_hasDatabase) {
+    if (_useDatabase) {
 
       auto client = GetClient();
-      mongocxx::collection _objectCollection = (*client)["awsmock"]["s3_object"];
+      mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
       int64_t count = _objectCollection.count_documents(make_document(kvp("region", object.region), kvp("bucket", object.bucket), kvp("key", object.key)));
       log_trace_stream(_logger) << "Object exists: " << (count > 0 ? "true" : "false") << std::endl;
       return count > 0;
@@ -377,10 +377,10 @@ namespace AwsMock::Database {
 
   Entity::S3::Object S3Database::CreateObject(const Entity::S3::Object &object) {
 
-    if (_hasDatabase) {
+    if (_useDatabase) {
 
       auto client = GetClient();
-      mongocxx::collection _objectCollection = (*client)["awsmock"]["s3_object"];
+      mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
       auto session = client->start_session();
 
       try {
@@ -408,7 +408,7 @@ namespace AwsMock::Database {
 
     try {
       auto client = GetClient();
-      mongocxx::collection _objectCollection = (*client)["awsmock"]["s3_object"];
+      mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
       mongocxx::stdx::optional<bsoncxx::document::value> mResult = _objectCollection.find_one(make_document(kvp("_id", oid)));
 
       if (mResult->empty()) {
@@ -426,7 +426,7 @@ namespace AwsMock::Database {
 
   Entity::S3::Object S3Database::GetObjectById(const std::string &oid) {
 
-    if (_hasDatabase) {
+    if (_useDatabase) {
 
       return GetObjectById(bsoncxx::oid(oid));
 
@@ -448,10 +448,10 @@ namespace AwsMock::Database {
 
   Entity::S3::Object S3Database::UpdateObject(const Entity::S3::Object &object) {
 
-    if (_hasDatabase) {
+    if (_useDatabase) {
 
       auto client = GetClient();
-      mongocxx::collection _objectCollection = (*client)["awsmock"]["s3_object"];
+      mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
       auto session = client->start_session();
 
       try {
@@ -477,12 +477,12 @@ namespace AwsMock::Database {
 
   Entity::S3::Object S3Database::GetObject(const std::string &region, const std::string &bucket, const std::string &key) {
 
-    if (_hasDatabase) {
+    if (_useDatabase) {
 
       try {
 
         auto client = GetClient();
-        mongocxx::collection _objectCollection = (*client)["awsmock"]["s3_object"];
+        mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
         mongocxx::stdx::optional<bsoncxx::document::value> mResult = _objectCollection.find_one(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key)));
 
         if (mResult.has_value()) {
@@ -511,7 +511,7 @@ namespace AwsMock::Database {
     try {
 
       auto client = GetClient();
-      mongocxx::collection _objectCollection = (*client)["awsmock"]["s3_object"];
+      mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
       mongocxx::stdx::optional<bsoncxx::document::value>
         mResult = _objectCollection.find_one(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key), kvp("md5sum", md5sum)));
       if (mResult.has_value()) {
@@ -534,7 +534,7 @@ namespace AwsMock::Database {
     try {
 
       auto client = GetClient();
-      mongocxx::collection _objectCollection = (*client)["awsmock"]["s3_object"];
+      mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
       auto mResult = _objectCollection.find_one(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key), kvp("versionId", versionId)));
       if (mResult) {
         Entity::S3::Object result;
@@ -553,7 +553,7 @@ namespace AwsMock::Database {
 
   long S3Database::ObjectCount(const std::string &region, const std::string &bucket) {
 
-    if (_hasDatabase) {
+    if (_useDatabase) {
 
       bsoncxx::builder::basic::document builder;
       if (!region.empty()) {
@@ -567,7 +567,7 @@ namespace AwsMock::Database {
       try {
 
         auto client = GetClient();
-        mongocxx::collection _objectCollection = (*client)["awsmock"]["s3_object"];
+        mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
         long count = _objectCollection.count_documents({filter});
         log_trace_stream(_logger) << "Object count: " << count << std::endl;
         return count;
@@ -586,12 +586,12 @@ namespace AwsMock::Database {
 
   void S3Database::DeleteObject(const Entity::S3::Object &object) {
 
-    if (_hasDatabase) {
+    if (_useDatabase) {
 
       try {
 
         auto client = GetClient();
-        mongocxx::collection _objectCollection = (*client)["awsmock"]["s3_object"];
+        mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
         auto result = _objectCollection.delete_many(make_document(kvp("region", object.region), kvp("bucket", object.bucket), kvp("key", object.key)));
         log_debug_stream(_logger) << "Objects deleted, count: " << result->deleted_count() << std::endl;
 
@@ -609,7 +609,7 @@ namespace AwsMock::Database {
 
   void S3Database::DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys) {
 
-    if (_hasDatabase) {
+    if (_useDatabase) {
 
       bsoncxx::builder::basic::array array{};
       for (const auto &key : keys) {
@@ -617,7 +617,7 @@ namespace AwsMock::Database {
       }
 
       auto client = GetClient();
-      mongocxx::collection _objectCollection = (*client)["awsmock"]["s3_object"];
+      mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
       auto session = client->start_session();
 
       try {
@@ -642,10 +642,10 @@ namespace AwsMock::Database {
 
   void S3Database::DeleteAllObjects() {
 
-    if (_hasDatabase) {
+    if (_useDatabase) {
 
       auto client = GetClient();
-      mongocxx::collection _objectCollection = (*client)["awsmock"]["s3_object"];
+      mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
       auto session = client->start_session();
 
       try {

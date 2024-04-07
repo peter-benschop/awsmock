@@ -118,6 +118,24 @@ namespace AwsMock::Service {
     EXPECT_EQ(0, tableList.size());
   }
 
+  TEST_F(DynamoDbServerJavaTest, PutItemTest) {
+
+    // arrange
+    Core::ExecResult createTableResult = Core::SystemUtils::Exec(_baseCommand + "create-table test-table");
+    EXPECT_EQ(0, createTableResult.status);
+    Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
+    EXPECT_EQ(1, tableList.size());
+
+    // act
+    Core::ExecResult putItemResult = Core::SystemUtils::Exec(_baseCommand + "put-item test-table orgaNr 123");
+    EXPECT_EQ(0, putItemResult.status);
+    Database::Entity::DynamoDb::ItemList itemList = _database.ListItems();
+
+    // assert
+    EXPECT_EQ(0, putItemResult.status);
+    EXPECT_EQ(1, itemList.size());
+  }
+
 } // namespace AwsMock::Service
 
 #endif // AWMOCK_DYNAMODB_SERVER_JAVA_TEST_H

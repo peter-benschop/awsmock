@@ -7,9 +7,10 @@
 
 namespace AwsMock::Service {
 
-  ModuleService::ModuleService(Core::Configuration &configuration, Service::ServerMap &serverMap) : _logger(Poco::Logger::get("ModuleService")), _configuration(configuration), _serverMap(serverMap), _prettyPrint(false),_moduleDatabase(Database::ModuleDatabase::instance()) {
+  ModuleService::ModuleService(Core::Configuration &configuration, Service::ServerMap &serverMap)
+    : _logger(Poco::Logger::get("ModuleService")), _configuration(configuration), _serverMap(serverMap), _prettyPrint(false), _moduleDatabase(Database::ModuleDatabase::instance()) {
 
-    _prettyPrint = _configuration.getBool("awsmock.pretty");
+    _prettyPrint = _configuration.getBool("awsmock.pretty", false);
   }
 
   Database::Entity::Module::ModuleList ModuleService::ListModules() {
@@ -150,31 +151,31 @@ namespace AwsMock::Service {
       infrastructure.s3Objects = _s3Database->ListObjects();
     }
     if (services.HasService("all") || services.HasService("sqs")) {
-      Database::SQSDatabase& _sqsDatabase = Database::SQSDatabase::instance();
+      Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
       infrastructure.sqsQueues = _sqsDatabase.ListQueues();
       infrastructure.sqsMessages = _sqsDatabase.ListMessages();
     }
     if (services.HasService("all") || services.HasService("sns")) {
-      Database::SNSDatabase& _snsDatabase = Database::SNSDatabase::instance();
+      Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
       infrastructure.snsTopics = _snsDatabase.ListTopics();
       infrastructure.snsMessages = _snsDatabase.ListMessages();
     }
     if (services.HasService("all") || services.HasService("lambda")) {
-      Database::LambdaDatabase& _lambdaDatabase = Database::LambdaDatabase::instance();
+      Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
       infrastructure.lambdas = _lambdaDatabase.ListLambdas();
     }
     if (services.HasService("all") || services.HasService("cognito")) {
-      Database::CognitoDatabase& _cognitoDatabase = Database::CognitoDatabase::instance();
+      Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
       infrastructure.cognitoUserPools = _cognitoDatabase.ListUserPools();
       infrastructure.cognitoUsers = _cognitoDatabase.ListUsers();
     }
     if (services.HasService("all") || services.HasService("dynamodb")) {
-      Database::DynamoDbDatabase& _dynamoDbDatabase = Database::DynamoDbDatabase::instance();
+      Database::DynamoDbDatabase &_dynamoDbDatabase = Database::DynamoDbDatabase::instance();
       infrastructure.dynamoDbTables = _dynamoDbDatabase.ListTables();
       infrastructure.dynamoDbItems = _dynamoDbDatabase.ListItems();
     }
     if (services.HasService("all") || services.HasService("transfer")) {
-      Database::TransferDatabase& _transferDatabase = Database::TransferDatabase::instance();
+      Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
       infrastructure.transferServers = _transferDatabase.ListServers();
     }
     return infrastructure.ToJson(prettyPrint);
@@ -202,7 +203,7 @@ namespace AwsMock::Service {
       }
     }
     if (!infrastructure.sqsQueues.empty() || !infrastructure.sqsMessages.empty()) {
-      Database::SQSDatabase& _sqsDatabase = Database::SQSDatabase::instance();
+      Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
       if (!infrastructure.sqsQueues.empty()) {
         for (auto &queue : infrastructure.sqsQueues) {
           _sqsDatabase.CreateOrUpdateQueue(queue);
@@ -217,7 +218,7 @@ namespace AwsMock::Service {
       }
     }
     if (!infrastructure.snsTopics.empty() || !infrastructure.snsMessages.empty()) {
-      Database::SNSDatabase& _snsDatabase = Database::SNSDatabase::instance();
+      Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
       if (!infrastructure.snsTopics.empty()) {
         for (auto &topic : infrastructure.snsTopics) {
           _snsDatabase.CreateOrUpdateTopic(topic);
@@ -232,14 +233,14 @@ namespace AwsMock::Service {
       }
     }
     if (!infrastructure.lambdas.empty()) {
-      Database::LambdaDatabase& _lambdaDatabase = Database::LambdaDatabase::instance();
+      Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
       for (auto &lambda : infrastructure.lambdas) {
         _lambdaDatabase.CreateOrUpdateLambda(lambda);
       }
       log_info_stream(_logger) << "Lambda functions imported, count: " << infrastructure.lambdas.size() << std::endl;
     }
     if (!infrastructure.transferServers.empty()) {
-      Database::TransferDatabase& _transferDatabase = Database::TransferDatabase::instance();
+      Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
       for (auto &transfer : infrastructure.transferServers) {
         _transferDatabase.CreateOrUpdateTransfer(transfer);
       }
@@ -248,7 +249,7 @@ namespace AwsMock::Service {
 
     // Cognito
     if (!infrastructure.cognitoUserPools.empty() || !infrastructure.cognitoUsers.empty()) {
-      Database::CognitoDatabase& _cognitoDatabase = Database::CognitoDatabase::instance();
+      Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
       if (!infrastructure.cognitoUserPools.empty()) {
         for (auto &userPool : infrastructure.cognitoUserPools) {
           _cognitoDatabase.CreateOrUpdateUserPool(userPool);
@@ -265,7 +266,7 @@ namespace AwsMock::Service {
 
     // DynamoDB
     if (!infrastructure.dynamoDbTables.empty() || !infrastructure.dynamoDbItems.empty()) {
-      Database::DynamoDbDatabase& _dynamoDatabase = Database::DynamoDbDatabase::instance();
+      Database::DynamoDbDatabase &_dynamoDatabase = Database::DynamoDbDatabase::instance();
       if (!infrastructure.dynamoDbTables.empty()) {
         for (auto &table : infrastructure.dynamoDbTables) {
           _dynamoDatabase.CreateOrUpdateTable(table);
@@ -290,31 +291,31 @@ namespace AwsMock::Service {
       _s3Database->DeleteAllBuckets();
     }
     if (services.HasService("all") || services.HasService("sqs")) {
-      Database::SQSDatabase& _sqsDatabase = Database::SQSDatabase::instance();
+      Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
       _sqsDatabase.DeleteAllMessages();
       _sqsDatabase.DeleteAllQueues();
     }
     if (services.HasService("all") || services.HasService("sns")) {
-      Database::SNSDatabase& _snsDatabase = Database::SNSDatabase::instance();
+      Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
       _snsDatabase.DeleteAllMessages();
       _snsDatabase.DeleteAllTopics();
     }
     if (services.HasService("all") || services.HasService("lambda")) {
-      Database::LambdaDatabase& _lambdaDatabase = Database::LambdaDatabase::instance();
+      Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
       _lambdaDatabase.DeleteAllLambdas();
     }
     if (services.HasService("all") || services.HasService("cognito")) {
-      Database::CognitoDatabase& _cognitoDatabase = Database::CognitoDatabase::instance();
+      Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
       _cognitoDatabase.DeleteAllUsers();
       _cognitoDatabase.DeleteAllUserPools();
     }
     if (services.HasService("all") || services.HasService("dynamodb")) {
-      Database::DynamoDbDatabase& _dynamoDbDatabase = Database::DynamoDbDatabase::instance();
+      Database::DynamoDbDatabase &_dynamoDbDatabase = Database::DynamoDbDatabase::instance();
       _dynamoDbDatabase.DeleteAllItems();
       _dynamoDbDatabase.DeleteAllTables();
     }
     if (services.HasService("all") || services.HasService("transfer")) {
-      Database::TransferDatabase& _transferDatabase = Database::TransferDatabase::instance();
+      Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
       _transferDatabase.DeleteAllTransfers();
     }
   }
@@ -327,19 +328,19 @@ namespace AwsMock::Service {
       _s3Database->DeleteAllObjects();
     }
     if (services.HasService("all") || services.HasService("sqs")) {
-      Database::SQSDatabase& _sqsDatabase = Database::SQSDatabase::instance();
+      Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
       _sqsDatabase.DeleteAllMessages();
     }
     if (services.HasService("all") || services.HasService("sns")) {
-      Database::SNSDatabase& _snsDatabase = Database::SNSDatabase::instance();
+      Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
       _snsDatabase.DeleteAllMessages();
     }
     if (services.HasService("all") || services.HasService("cognito")) {
-      Database::CognitoDatabase& _cognitoDatabase = Database::CognitoDatabase::instance();
+      Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
       _cognitoDatabase.DeleteAllUsers();
     }
     if (services.HasService("all") || services.HasService("dynamodb")) {
-      Database::DynamoDbDatabase& _dynamoDbDatabase = Database::DynamoDbDatabase::instance();
+      Database::DynamoDbDatabase &_dynamoDbDatabase = Database::DynamoDbDatabase::instance();
       _dynamoDbDatabase.DeleteAllItems();
     }
   }

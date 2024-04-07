@@ -25,7 +25,7 @@
 #include <awsmock/service/DynamoDbMonitoring.h>
 #include <awsmock/service/DynamoDbHandlerFactory.h>
 
-#define DYNAMODB_DEFAULT_PORT 9506
+#define DYNAMODB_DEFAULT_PORT 9507
 #define DYNAMODB_DEFAULT_HOST "localhost"
 #define DYNAMODB_DEFAULT_QUEUE 150
 #define DYNAMODB_DEFAULT_THREADS 50

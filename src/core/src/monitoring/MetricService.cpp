@@ -6,7 +6,7 @@
 
 namespace AwsMock::Core {
 
-  MetricService::MetricService(const Configuration &configuration) : MetricService(configuration.getInt("awsmock.monitoring.port"), configuration.getInt("awsmock.monitoring.timeout")) {}
+  MetricService::MetricService(const Configuration &configuration) : MetricService(configuration.getInt("awsmock.monitoring.port", 8081), configuration.getInt("awsmock.monitoring.timeout", 10)) {}
 
   MetricService::MetricService(int port, long timeout) : _logger(Poco::Logger::get("MetricService")), _port(port), _timeout(timeout) {}
 

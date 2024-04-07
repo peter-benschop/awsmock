@@ -328,24 +328,19 @@ namespace AwsMock::Database {
     Core::LogStream _logger;
 
     /**
-     * S3 bucket collection
-     */
-    //mongocxx::collection _bucketCollection{};
-
-    /**
-     * S3 object collection
-     */
-    //mongocxx::collection _objectCollection{};
-
-    /**
      * Allowed event types
      */
     static std::map<std::string, std::vector<std::string>> allowedEventTypes;
 
     /**
-     * Has Mongo
+     * Use MongoDB
      */
-    bool _hasDatabase;
+    bool _useDatabase;
+
+    /**
+     * Database name
+     */
+    std::string _databaseName;
 
     /**
      * S3 in-memory database

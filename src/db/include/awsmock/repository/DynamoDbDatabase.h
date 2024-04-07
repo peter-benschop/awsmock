@@ -110,10 +110,11 @@ namespace AwsMock::Database {
     /**
      * Deletes an existing DynamoDB table
      *
+     * @param region AWS region
      * @param tableName name of the table
      * @throws DatabaseException
      */
-    void DeleteTable(const std::string &tableName);
+    void DeleteTable(const std::string &region, const std::string &tableName);
 
     /**
      * Deletes all existing DynamoDB tables
@@ -162,6 +163,16 @@ namespace AwsMock::Database {
      * Logger
      */
     Core::LogStream _logger;
+
+    /**
+     * Use MongoDB
+     */
+    bool _useDatabase;
+
+    /**
+     * Database name
+     */
+    std::string _databaseName;
 
     /**
      * DynamoDB in-memory database

@@ -70,6 +70,13 @@ namespace AwsMock::Database {
     bool HasDatabase() const;
 
     /**
+     * Returns the database name
+     *
+     * @return database name
+     */
+    std::string GetDatabaseName() const;
+
+    /**
      * Start the database
      */
     void StartDatabase();

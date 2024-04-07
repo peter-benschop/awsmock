@@ -503,8 +503,18 @@ namespace AwsMock::Service {
     SetHeaders(response, contentLength, extraHeader);
 
     // Send response
-    handleHttpStatusCode(response, 204);
+    handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTPStatus::HTTP_NO_CONTENT);
     std::ostream &outputStream = response.send();
+    outputStream.flush();
+  }
+
+  void AbstractHandler::SendErrorResponse(Poco::Net::HTTPServerResponse &response, const std::string& body, std::map<std::string, std::string> headers, const Poco::Net::HTTPResponse::HTTPStatus& status) {
+
+    SetHeaders(response, body.length(), headers);
+
+    handleHttpStatusCode(response, status);
+    std::ostream &outputStream = response.send();
+    outputStream << body;
     outputStream.flush();
   }
 
@@ -549,7 +559,7 @@ namespace AwsMock::Service {
 
   void AbstractHandler::SendJsonErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Core::ServiceException &exc) {
 
-    std::string payload;
+    std::string payload = exc.message();
     if (service == "SQS") {
       payload = Dto::SQS::RestErrorResponse(exc).ToJson();
     } else if (service == "S3") {

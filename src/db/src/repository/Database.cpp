@@ -38,6 +38,10 @@ namespace AwsMock::Database {
     return _useDatabase;
   }
 
+  std::string Database::GetDatabaseName() const {
+    return _name;
+  }
+
   void Database::StartDatabase() {
 
     _useDatabase = true;

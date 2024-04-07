@@ -8,6 +8,8 @@ namespace AwsMock::Core {
 
   void TestUtils::CreateTestConfigurationFile() {
     CreateTestConfigurationFile(true);
+    Core::Configuration& configuration = Core::Configuration::instance();
+    configuration.SetFilename(TMP_PROPERTIES_FILE);
   }
 
   void TestUtils::CreateTestConfigurationFile(bool withDatabase) {
