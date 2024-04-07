@@ -6,13 +6,13 @@
 
 namespace AwsMock::Core {
 
-  void MemoryMappedFile::OpenFile(const std::string &filename) {
+  bool MemoryMappedFile::OpenFile(const std::string &filename) {
 
-    int fd = open(filename.c_str(), O_RDONLY);
-
+    _mapped = false;
+    int fd = open(filename.c_str(), O_RDWR|O_CREAT, 0644);
     if (fd < 0) {
-      log_error_stream(_logger) << "Could not open file for memory mapping" << std::endl;
-      return;
+      log_error_stream(_logger) << "Could not open file for memory mapping, filename: " << filename << " errno: " << errno << std::endl;
+      return false;
     }
 
     long fileSize = FileUtils::FileSize(filename);
@@ -21,12 +21,15 @@ namespace AwsMock::Core {
     _membuffer = (char *) _start;
 
     if (_membuffer == MAP_FAILED) {
-      log_error_stream(_logger) << "Could not memory map file: " << filename << std::endl;
-      return;
+      log_error_stream(_logger) << "Memory map file failed, filename: " << filename << " errno: " << errno<< std::endl;
+      return false;
     }
     close(fd);
 
     _mapped = true;
+    log_info_stream(_logger) << "Memory map file opened, filename: " << filename << std::endl;
+
+    return _mapped;
   }
 
   void MemoryMappedFile::CloseFile() {

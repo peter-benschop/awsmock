@@ -10,20 +10,14 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_array;
   using bsoncxx::builder::basic::make_document;
 
-  TransferDatabase::TransferDatabase(Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("TransferDatabase")), _memoryDb(TransferMemoryDb::instance()) {
-
-    if (HasDatabase()) {
-
-      // Get collection
-      _transferCollection = GetConnection()["transfer"];
-
-    }
-  }
+  TransferDatabase::TransferDatabase() : _logger(Poco::Logger::get("TransferDatabase")), _memoryDb(TransferMemoryDb::instance()), _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()) {}
 
   bool TransferDatabase::TransferExists(const std::string &region, const std::string &serverId) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
+      auto client = GetClient();
+      mongocxx::collection _transferCollection = (*client)[_databaseName]["transfer"];
       int64_t count = _transferCollection.count_documents(make_document(kvp("region", region), kvp("serverId", serverId)));
       log_trace_stream(_logger) << "Transfer manager exists: " << (count > 0 ? "true" : "false") << std::endl;
       return count > 0;
@@ -42,8 +36,10 @@ namespace AwsMock::Database {
 
   bool TransferDatabase::TransferExists(const std::string &serverId) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
+      auto client = GetClient();
+      mongocxx::collection _transferCollection = (*client)[_databaseName]["transfer"];
       int64_t count = _transferCollection.count_documents(make_document(kvp("serverId", serverId)));
       log_trace_stream(_logger) << "Transfer manager exists: " << (count > 0 ? "true" : "false") << std::endl;
       return count > 0;
@@ -57,12 +53,15 @@ namespace AwsMock::Database {
 
   bool TransferDatabase::TransferExists(const std::string &region, const std::vector<std::string> &protocols) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
       bsoncxx::builder::basic::array mProtocol{};
       for (const auto &p : protocols) {
         mProtocol.append(p);
       }
+
+      auto client = GetClient();
+      mongocxx::collection _transferCollection = (*client)[_databaseName]["transfer"];
       int64_t count = _transferCollection.count_documents(make_document(kvp("region", region), kvp("protocols", make_document(kvp("$all", mProtocol)))));
       log_trace_stream(_logger) << "Transfer manager exists: " << (count > 0 ? "true" : "false") << std::endl;
       return count > 0;
@@ -76,8 +75,10 @@ namespace AwsMock::Database {
 
   Entity::Transfer::Transfer TransferDatabase::CreateTransfer(const Entity::Transfer::Transfer &transfer) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
+      auto client = GetClient();
+      mongocxx::collection _transferCollection = (*client)[_databaseName]["transfer"];
       auto result = _transferCollection.insert_one(transfer.ToDocument());
       log_trace_stream(_logger) << "Bucket created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
 
@@ -92,6 +93,8 @@ namespace AwsMock::Database {
 
   Entity::Transfer::Transfer TransferDatabase::GetTransferById(bsoncxx::oid oid) {
 
+    auto client = GetClient();
+    mongocxx::collection _transferCollection = (*client)[_databaseName]["transfer"];
     mongocxx::stdx::optional<bsoncxx::document::value> mResult = _transferCollection.find_one(make_document(kvp("_id", oid)));
     Entity::Transfer::Transfer result;
     result.FromDocument(mResult);
@@ -101,7 +104,7 @@ namespace AwsMock::Database {
 
   Entity::Transfer::Transfer TransferDatabase::GetTransferById(const std::string &oid) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
       return GetTransferById(bsoncxx::oid(oid));
 
@@ -114,8 +117,10 @@ namespace AwsMock::Database {
 
   Entity::Transfer::Transfer TransferDatabase::GetTransferByServerId(const std::string &serverId) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
+      auto client = GetClient();
+      mongocxx::collection _transferCollection = (*client)[_databaseName]["transfer"];
       mongocxx::stdx::optional<bsoncxx::document::value> mResult = _transferCollection.find_one(make_document(kvp("serverId", serverId)));
       Entity::Transfer::Transfer result;
       result.FromDocument(mResult);
@@ -139,8 +144,10 @@ namespace AwsMock::Database {
 
   Entity::Transfer::Transfer TransferDatabase::UpdateTransfer(const Entity::Transfer::Transfer &transfer) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
+      auto client = GetClient();
+      mongocxx::collection _transferCollection = (*client)[_databaseName]["transfer"];
       auto result = _transferCollection.replace_one(make_document(kvp("region", transfer.region), kvp("serverId", transfer.serverId)), transfer.ToDocument());
       log_trace_stream(_logger) << "Transfer updated: " << transfer.ToString() << std::endl;
       return GetTransferByServerId(transfer.serverId);
@@ -154,8 +161,10 @@ namespace AwsMock::Database {
 
   Entity::Transfer::Transfer TransferDatabase::GetTransferByArn(const std::string &arn) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
+      auto client = GetClient();
+      mongocxx::collection _transferCollection = (*client)[_databaseName]["transfer"];
       mongocxx::stdx::optional<bsoncxx::document::value> mResult = _transferCollection.find_one(make_document(kvp("arn", arn)));
       Entity::Transfer::Transfer result;
       result.FromDocument(mResult);
@@ -172,10 +181,12 @@ namespace AwsMock::Database {
 
     std::vector<Entity::Transfer::Transfer> transfers;
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
       try {
 
+        auto client = GetClient();
+        mongocxx::collection _transferCollection = (*client)[_databaseName]["transfer"];
         if (region.empty()) {
 
           auto transferCursor = _transferCollection.find(make_document());
@@ -210,8 +221,10 @@ namespace AwsMock::Database {
 
   void TransferDatabase::DeleteTransfer(const std::string &serverId) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
+      auto client = GetClient();
+      mongocxx::collection _transferCollection = (*client)[_databaseName]["transfer"];
       auto result = _transferCollection.delete_many(make_document(kvp("serverId", serverId)));
       log_debug_stream(_logger) << "Transfer deleted, serverId: " << serverId << " count: " << result->deleted_count() << std::endl;
 
@@ -224,8 +237,10 @@ namespace AwsMock::Database {
 
   void TransferDatabase::DeleteAllTransfers() {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
+      auto client = GetClient();
+      mongocxx::collection _transferCollection = (*client)[_databaseName]["transfer"];
       auto result = _transferCollection.delete_many({});
       log_debug_stream(_logger) << "All transfers deleted, count: " << result->deleted_count() << std::endl;
 

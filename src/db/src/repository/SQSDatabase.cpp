@@ -10,21 +10,15 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_array;
   using bsoncxx::builder::basic::make_document;
 
-  SQSDatabase::SQSDatabase(Core::Configuration &configuration)
-      : Database(configuration), _logger(Poco::Logger::get("SQSDatabase")), _configuration(configuration), _memoryDb(SQSMemoryDb::instance()) {
-
-    if (HasDatabase()) {
-
-      // Get collections
-      _queueCollection = GetConnection()["sqs_queue"];
-      _messageCollection = GetConnection()["sqs_message"];
-
-    }
+  SQSDatabase::SQSDatabase() : _logger(Poco::Logger::get("SQSDatabase")), _memoryDb(SQSMemoryDb::instance()), _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()) {
   }
 
   bool SQSDatabase::QueueExists(const std::string &region, const std::string &name) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
+
+      auto client = GetClient();
+      mongocxx::collection _queueCollection = (*client)[_databaseName]["sqs_queue"];
 
       int64_t count = _queueCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
       log_trace_stream(_logger) << "Queue exists: " << (count > 0 ? "true" : "false") << std::endl;
@@ -39,7 +33,10 @@ namespace AwsMock::Database {
 
   bool SQSDatabase::QueueUrlExists(const std::string &region, const std::string &queueUrl) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
+
+      auto client = GetClient();
+      mongocxx::collection _queueCollection = (*client)[_databaseName]["sqs_queue"];
 
       int64_t count = _queueCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
       log_trace_stream(_logger) << "Queue exists: " << (count > 0 ? "true" : "false") << std::endl;
@@ -54,7 +51,10 @@ namespace AwsMock::Database {
 
   bool SQSDatabase::QueueArnExists(const std::string &queueArn) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
+
+      auto client = GetClient();
+      mongocxx::collection _queueCollection = (*client)[_databaseName]["sqs_queue"];
 
       int64_t count = _queueCollection.count_documents(make_document(kvp("queueArn", queueArn)));
       log_trace_stream(_logger) << "Queue exists: " << (count > 0 ? "true" : "false") << std::endl;
@@ -69,16 +69,17 @@ namespace AwsMock::Database {
 
   Entity::SQS::Queue SQSDatabase::CreateQueue(const Entity::SQS::Queue &queue) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
-      auto session = GetSession();
-      session.start_transaction();
+      auto client = GetClient();
+      mongocxx::collection _queueCollection = (*client)[_databaseName]["sqs_queue"];
+      auto session = client->start_session();
 
       try {
+
+        session.start_transaction();
         auto result = _queueCollection.insert_one(queue.ToDocument());
         log_trace_stream(_logger) << "Queue created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
-
-        // Commit
         session.commit_transaction();
 
         return GetQueueById(result->inserted_id().get_oid().value);
@@ -98,6 +99,9 @@ namespace AwsMock::Database {
 
   Entity::SQS::Queue SQSDatabase::GetQueueById(bsoncxx::oid oid) {
 
+    auto client = GetClient();
+    mongocxx::collection _queueCollection = (*client)[_databaseName]["sqs_queue"];
+
     mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("_id", oid)));
     if (!mResult) {
       return {};
@@ -110,7 +114,7 @@ namespace AwsMock::Database {
 
   Entity::SQS::Queue SQSDatabase::GetQueueById(const std::string &oid) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
       return GetQueueById(bsoncxx::oid(oid));
 
@@ -124,7 +128,11 @@ namespace AwsMock::Database {
   Entity::SQS::Queue SQSDatabase::GetQueueByArn(const std::string &queueArn) {
 
     Entity::SQS::Queue result;
-    if (HasDatabase()) {
+    if (_useDatabase) {
+
+      auto client = GetClient();
+      mongocxx::collection _queueCollection = (*client)[_databaseName]["sqs_queue"];
+
       mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("queueArn", queueArn)));
 
       if (!mResult) {
@@ -144,7 +152,10 @@ namespace AwsMock::Database {
   Entity::SQS::Queue SQSDatabase::GetQueueByUrl(const std::string &region, const std::string &queueUrl) {
 
     Entity::SQS::Queue result;
-    if (HasDatabase()) {
+    if (_useDatabase) {
+
+      auto client = GetClient();
+      mongocxx::collection _queueCollection = (*client)[_databaseName]["sqs_queue"];
 
       mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
       if (!mResult) {
@@ -164,7 +175,10 @@ namespace AwsMock::Database {
   Entity::SQS::Queue SQSDatabase::GetQueueByName(const std::string &region, const std::string &name) {
 
     Entity::SQS::Queue result;
-    if (HasDatabase()) {
+    if (_useDatabase) {
+
+      auto client = GetClient();
+      mongocxx::collection _queueCollection = (*client)[_databaseName]["sqs_queue"];
 
       mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
       if (!mResult) {
@@ -185,7 +199,10 @@ namespace AwsMock::Database {
   Entity::SQS::QueueList SQSDatabase::ListQueues(const std::string &region) {
 
     Entity::SQS::QueueList queueList;
-    if (HasDatabase()) {
+    if (_useDatabase) {
+
+      auto client = GetClient();
+      mongocxx::collection _queueCollection = (*client)[_databaseName]["sqs_queue"];
 
       if (region.empty()) {
 
@@ -218,10 +235,24 @@ namespace AwsMock::Database {
 
   void SQSDatabase::PurgeQueue(const std::string &region, const std::string &queueUrl) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
-      auto result = _messageCollection.delete_many(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
-      log_debug_stream(_logger) << "Purged queue, count: " << result->deleted_count() << " url: " << queueUrl << std::endl;
+      auto client = GetClient();
+      auto messageCollection = (*client)[_databaseName]["sqs_message"];
+      auto session = client->start_session();
+
+      try {
+
+        session.start_transaction();
+        auto result = messageCollection.delete_many(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
+        session.commit_transaction();
+        log_debug_stream(_logger) << "Purged queue, count: " << result->deleted_count() << " url: " << queueUrl << std::endl;
+
+      } catch (const mongocxx::exception &exc) {
+        session.abort_transaction();
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+      }
 
     } else {
 
@@ -233,19 +264,30 @@ namespace AwsMock::Database {
 
   Entity::SQS::Queue SQSDatabase::UpdateQueue(Entity::SQS::Queue &queue) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
       mongocxx::options::find_one_and_update opts{};
       opts.return_document(mongocxx::options::return_document::k_after);
 
-      auto mResult = _queueCollection.find_one_and_update(make_document(kvp("region", queue.region), kvp("name", queue.name)), queue.ToDocument(), opts);
-      if (!mResult) {
-        throw Core::DatabaseException("Update queue failed, region: " + queue.region + " queueUrl: " + queue.queueUrl);
-      }
-      log_trace_stream(_logger) << "Queue updated: " << queue.ToString() << std::endl;
+      auto client = GetClient();
+      mongocxx::collection _queueCollection = (*client)[_databaseName]["sqs_queue"];
+      auto session = client->start_session();
 
-      queue.FromDocument(mResult->view());
-      return queue;
+      try {
+
+        session.start_transaction();
+        auto mResult = _queueCollection.find_one_and_update(make_document(kvp("region", queue.region), kvp("name", queue.name)), queue.ToDocument(), opts);
+        session.commit_transaction();
+        log_trace_stream(_logger) << "Queue updated: " << queue.ToString() << std::endl;
+
+        queue.FromDocument(mResult->view());
+        return queue;
+
+      } catch (const mongocxx::exception &exc) {
+        session.abort_transaction();
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+      }
 
     } else {
 
@@ -270,7 +312,10 @@ namespace AwsMock::Database {
   long SQSDatabase::CountQueues(const std::string &region) {
 
     long count = 0;
-    if (HasDatabase()) {
+    if (_useDatabase) {
+
+      auto client = GetClient();
+      mongocxx::collection _queueCollection = (*client)[_databaseName]["sqs_queue"];
 
       if (region.empty()) {
         count = _queueCollection.count_documents({});
@@ -289,10 +334,24 @@ namespace AwsMock::Database {
 
   void SQSDatabase::DeleteQueue(const Entity::SQS::Queue &queue) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
-      auto result = _queueCollection.delete_many(make_document(kvp("region", queue.region), kvp("queueUrl", queue.queueUrl)));
-      log_debug_stream(_logger) << "Queue deleted, count: " << result->deleted_count() << std::endl;
+      auto client = GetClient();
+      mongocxx::collection _queueCollection = (*client)[_databaseName]["sqs_queue"];
+      auto session = client->start_session();
+
+      try {
+
+        session.start_transaction();
+        auto result = _queueCollection.delete_many(make_document(kvp("region", queue.region), kvp("queueUrl", queue.queueUrl)));
+        session.commit_transaction();
+        log_debug_stream(_logger) << "Queue deleted, count: " << result->deleted_count() << std::endl;
+
+      } catch (const mongocxx::exception &exc) {
+        session.abort_transaction();
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+      }
 
     } else {
 
@@ -303,10 +362,24 @@ namespace AwsMock::Database {
 
   void SQSDatabase::DeleteAllQueues() {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
-      auto result = _queueCollection.delete_many({});
-      log_debug_stream(_logger) << "All queues deleted, count: " << result->deleted_count() << std::endl;
+      auto client = GetClient();
+      mongocxx::collection _queueCollection = (*client)[_databaseName]["sqs_queue"];
+      auto session = client->start_session();
+
+      try {
+
+        session.start_transaction();
+        auto result = _queueCollection.delete_many({});
+        session.commit_transaction();
+        log_debug_stream(_logger) << "All queues deleted, count: " << result->deleted_count() << std::endl;
+
+      } catch (const mongocxx::exception &exc) {
+        session.abort_transaction();
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+      }
 
     } else {
 
@@ -317,11 +390,25 @@ namespace AwsMock::Database {
 
   Entity::SQS::Message SQSDatabase::CreateMessage(const Entity::SQS::Message &message) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
-      auto result = _messageCollection.insert_one(message.ToDocument());
-      log_trace_stream(_logger) << "Message created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
-      return GetMessageById(result->inserted_id().get_oid().value);
+      auto client = GetClient();
+      auto messageCollection = (*client)[_databaseName]["sqs_message"];
+      auto session = client->start_session();
+
+      try {
+
+        session.start_transaction();
+        auto result = messageCollection.insert_one(message.ToDocument());
+        session.commit_transaction();
+        log_trace_stream(_logger) << "Message created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
+        return GetMessageById(result->inserted_id().get_oid().value);
+
+      } catch (const mongocxx::exception &exc) {
+        session.abort_transaction();
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+      }
 
     } else {
 
@@ -332,9 +419,12 @@ namespace AwsMock::Database {
 
   bool SQSDatabase::MessageExists(const std::string &receiptHandle) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
-      int64_t count = _messageCollection.count_documents(make_document(kvp("receiptHandle", receiptHandle)));
+      auto client = GetClient();
+      auto messageCollection = (*client)[_databaseName]["sqs_message"];
+
+      int64_t count = messageCollection.count_documents(make_document(kvp("receiptHandle", receiptHandle)));
       log_trace_stream(_logger) << "Message exists: " << (count > 0 ? "true" : "false") << std::endl;
       return count > 0;
 
@@ -347,7 +437,10 @@ namespace AwsMock::Database {
 
   Entity::SQS::Message SQSDatabase::GetMessageById(bsoncxx::oid oid) {
 
-    mongocxx::stdx::optional<bsoncxx::document::value> mResult = _messageCollection.find_one(make_document(kvp("_id", oid)));
+    auto client = GetClient();
+    auto messageCollection = (*client)[_databaseName]["sqs_message"];
+
+    mongocxx::stdx::optional<bsoncxx::document::value> mResult = messageCollection.find_one(make_document(kvp("_id", oid)));
     Entity::SQS::Message result;
     result.FromDocument(mResult);
 
@@ -356,9 +449,12 @@ namespace AwsMock::Database {
 
   Entity::SQS::Message SQSDatabase::GetMessageByReceiptHandle(const std::string &receiptHandle) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
-      mongocxx::stdx::optional<bsoncxx::document::value> mResult = _messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle)));
+      auto client = GetClient();
+      auto messageCollection = (*client)[_databaseName]["sqs_message"];
+
+      mongocxx::stdx::optional<bsoncxx::document::value> mResult = messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle)));
       Entity::SQS::Message result;
       result.FromDocument(mResult);
       return result;
@@ -372,7 +468,7 @@ namespace AwsMock::Database {
 
   Entity::SQS::Message SQSDatabase::GetMessageById(const std::string &oid) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
       return GetMessageById(bsoncxx::oid(oid));
 
@@ -385,26 +481,38 @@ namespace AwsMock::Database {
 
   Entity::SQS::Message SQSDatabase::UpdateMessage(Entity::SQS::Message &message) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
       mongocxx::options::find_one_and_update opts{};
       opts.return_document(mongocxx::options::return_document::k_after);
 
-      auto mResult = _messageCollection.find_one_and_update(make_document(kvp("_id", bsoncxx::oid{message.oid})), message.ToDocument(), opts);
-      log_trace_stream(_logger) << "Message updated: " << ConvertMessageToJson(mResult.value()) << std::endl;
+      auto client = GetClient();
+      auto messageCollection = (*client)[_databaseName]["sqs_message"];
+      auto session = client->start_session();
 
-      if (!mResult) {
-        throw Core::DatabaseException("Update message failed, oid: " + message.oid);
+      try {
+
+        session.start_transaction();
+        auto mResult = messageCollection.find_one_and_update(make_document(kvp("_id", bsoncxx::oid{message.oid})), message.ToDocument(), opts);
+        session.commit_transaction();
+        log_trace_stream(_logger) << "Message updated: " << ConvertMessageToJson(mResult.value()) << std::endl;
+        if (mResult) {
+          message.FromDocument(mResult->view());
+          return message;
+        }
+
+      } catch (const mongocxx::exception &exc) {
+        session.abort_transaction();
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
-
-      message.FromDocument(mResult->view());
-      return message;
 
     } else {
 
       return _memoryDb.UpdateMessage(message);
 
     }
+    return {};
   }
 
   Entity::SQS::Message SQSDatabase::CreateOrUpdateMessage(Entity::SQS::Message &message) {
@@ -423,11 +531,14 @@ namespace AwsMock::Database {
   Entity::SQS::MessageList SQSDatabase::ListMessages(const std::string &region) {
 
     Entity::SQS::MessageList messageList;
-    if (HasDatabase()) {
+    if (_useDatabase) {
+
+      auto client = GetClient();
+      auto messageCollection = (*client)[_databaseName]["sqs_message"];
 
       if (region.empty()) {
 
-        auto messageCursor = _messageCollection.find({});
+        auto messageCursor = messageCollection.find({});
         for (auto message : messageCursor) {
           Entity::SQS::Message result;
           result.FromDocument(message);
@@ -436,7 +547,7 @@ namespace AwsMock::Database {
 
       } else {
 
-        auto messageCursor = _messageCollection.find(make_document(kvp("region", region)));
+        auto messageCursor = messageCollection.find(make_document(kvp("region", region)));
         for (auto message : messageCursor) {
           Entity::SQS::Message result;
           result.FromDocument(message);
@@ -460,17 +571,21 @@ namespace AwsMock::Database {
 
     auto reset = std::chrono::high_resolution_clock::now() + std::chrono::seconds(visibility);
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
-      auto session = GetSession();
-      session.start_transaction();
+      auto client = GetClient();
+      auto messageCollection = (*client)[_databaseName]["sqs_message"];
+      auto session = client->start_session();
 
       try {
+
+        session.start_transaction();
+
         mongocxx::options::find opts;
         opts.limit(maxMessages);
 
         // Get the cursor
-        auto messageCursor = _messageCollection.find(make_document(kvp("queueUrl", queueUrl),
+        auto messageCursor = messageCollection.find(make_document(kvp("queueUrl", queueUrl),
                                                                    kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))),
                                                      opts);
 
@@ -484,7 +599,7 @@ namespace AwsMock::Database {
           messageList.push_back(result);
 
           // Update values
-          _messageCollection.update_one(make_document(kvp("_id", message["_id"].get_oid())),
+          messageCollection.update_one(make_document(kvp("_id", message["_id"].get_oid())),
                                         make_document(kvp("$set",
                                                           make_document(kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)),
                                                                         kvp("reset", bsoncxx::types::b_date(reset)),
@@ -510,25 +625,26 @@ namespace AwsMock::Database {
 
   void SQSDatabase::ResetMessages(const std::string &queueUrl, long visibility) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
-      auto session = GetSession();
-      session.start_transaction();
+      auto client = GetClient();
+      auto messageCollection = (*client)[_databaseName]["sqs_message"];
+      auto session = client->start_session();
+
       try {
 
-        auto result = _messageCollection.update_many(
-            make_document(
-                kvp("queueUrl", queueUrl),
-                kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)),
-                kvp("reset", make_document(
-                    kvp("$lt", bsoncxx::types::b_date(std::chrono::system_clock::now()))))),
-            make_document(kvp("$set",
-                              make_document(
-                                  kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)),
-                                  kvp("receiptHandle", ""),
-                                  kvp("reset", bsoncxx::types::b_null())))));
-
-        // Commit
+        session.start_transaction();
+        auto result = messageCollection.update_many(
+          make_document(
+            kvp("queueUrl", queueUrl),
+            kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)),
+            kvp("reset", make_document(
+              kvp("$lt", bsoncxx::types::b_date(std::chrono::system_clock::now()))))),
+          make_document(kvp("$set",
+                            make_document(
+                              kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)),
+                              kvp("receiptHandle", ""),
+                              kvp("reset", bsoncxx::types::b_null())))));
         session.commit_transaction();
 
         log_trace_stream(_logger) << "Message reset, updated: " << result->upserted_count() << " queue: " << queueUrl << std::endl;
@@ -547,24 +663,25 @@ namespace AwsMock::Database {
 
   void SQSDatabase::RedriveMessages(const std::string &queueUrl, const Entity::SQS::RedrivePolicy &redrivePolicy) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
-      auto session = GetSession();
-      session.start_transaction();
+      auto client = GetClient();
+      auto messageCollection = (*client)[_databaseName]["sqs_message"];
+      auto session = client->start_session();
 
       try {
 
-        std::string dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(_configuration, redrivePolicy.deadLetterTargetArn);
-        auto result = _messageCollection.update_many(make_document(kvp("queueUrl", queueUrl),
+        session.start_transaction();
+        std::string dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(Core::Configuration::instance(), redrivePolicy.deadLetterTargetArn);
+        auto result = messageCollection.update_many(make_document(kvp("queueUrl", queueUrl),
                                                                    kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)),
                                                                    kvp("retries", make_document(
-                                                                       kvp("$gt", redrivePolicy.maxReceiveCount)))),
+                                                                     kvp("$gt", redrivePolicy.maxReceiveCount)))),
                                                      make_document(kvp("$set", make_document(kvp("retries", 0),
                                                                                              kvp("queueArn",
                                                                                                  redrivePolicy.deadLetterTargetArn),
                                                                                              kvp("queueUrl",
                                                                                                  dlqQueueUrl)))));
-        // Commit
         session.commit_transaction();
         log_trace_stream(_logger) << "Message redrive, arn: " << redrivePolicy.deadLetterTargetArn << " updated: " << result->modified_count() << " queue: "
                                   << queueUrl << std::endl;
@@ -576,38 +693,41 @@ namespace AwsMock::Database {
 
     } else {
 
-      _memoryDb.RedriveMessages(queueUrl, redrivePolicy, _configuration);
+      _memoryDb.RedriveMessages(queueUrl, redrivePolicy, Core::Configuration::instance());
 
     }
   }
 
   void SQSDatabase::ResetDelayedMessages(const std::string &queueUrl, long delay) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
-      auto session = GetSession();
-      session.start_transaction();
+      auto client = GetClient();
+      auto messageCollection = (*client)[_databaseName]["sqs_message"];
+      auto session = client->start_session();
+
       try {
 
+        session.start_transaction();
         auto now = std::chrono::high_resolution_clock::now();
-        auto result = _messageCollection.update_many(
-            make_document(
-                kvp("queueUrl", queueUrl),
-                kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)),
-                kvp("reset", make_document(
-                    kvp("$lt", bsoncxx::types::b_date(now))))),
-            make_document(
-                kvp("$set",
-                    make_document(
-                        kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))))));
-        // Commit
+        auto result = messageCollection.update_many(
+          make_document(
+            kvp("queueUrl", queueUrl),
+            kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)),
+            kvp("reset", make_document(
+              kvp("$lt", bsoncxx::types::b_date(now))))),
+          make_document(
+            kvp("$set",
+                make_document(
+                  kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))))));
         session.commit_transaction();
 
         log_trace_stream(_logger) << "Delayed message reset, updated: " << result->upserted_count() << " queue: " << queueUrl << std::endl;
 
-      } catch (mongocxx::exception &e) {
-        log_error_stream(_logger) << "Collection transaction exception: " << e.what() << std::endl;
+      } catch (mongocxx::exception &exc) {
         session.abort_transaction();
+        log_error_stream(_logger) << "Collection transaction exception: " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
     } else {
@@ -621,26 +741,28 @@ namespace AwsMock::Database {
 
     auto reset = std::chrono::high_resolution_clock::now() - std::chrono::seconds{retentionPeriod};
 
-    if (HasDatabase()) {
-      auto session = GetSession();
-      session.start_transaction();
+    if (_useDatabase) {
+
+      auto client = GetClient();
+      auto messageCollection = (*client)[_databaseName]["sqs_message"];
+      auto session = client->start_session();
+
       try {
 
+        session.start_transaction();
         auto now = std::chrono::high_resolution_clock::now();
-        auto result = _messageCollection.delete_many(
-            make_document(
-                kvp("queueUrl", queueUrl),
-                kvp("created", make_document(
-                    kvp("$lt", bsoncxx::types::b_date(reset))))));
-
-        // Commit
+        auto result = messageCollection.delete_many(
+          make_document(
+            kvp("queueUrl", queueUrl),
+            kvp("created", make_document(
+              kvp("$lt", bsoncxx::types::b_date(reset))))));
         session.commit_transaction();
 
         log_trace_stream(_logger) << "Message retention reset, deleted: " << result->deleted_count() << " queue: " << queueUrl << std::endl;
 
-      } catch (mongocxx::exception &e) {
-        log_error_stream(_logger) << "Collection transaction exception: " << e.what() << std::endl;
-        session.abort_transaction();
+      } catch (const mongocxx::exception &exc) {
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
     } else {
@@ -652,17 +774,20 @@ namespace AwsMock::Database {
 
   long SQSDatabase::CountMessages(const std::string &region, const std::string &queueUrl) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
       long count = 0;
+      auto client = GetClient();
+      auto messageCollection = (*client)[_databaseName]["sqs_message"];
+
       if (!region.empty() && !queueUrl.empty()) {
-        count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
+        count = messageCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
         log_trace_stream(_logger) << "Count messages, region: " << region << " url: " << queueUrl << " result: " << count << std::endl;
       } else if (!region.empty()) {
-        count = _messageCollection.count_documents(make_document(kvp("region", region)));
+        count = messageCollection.count_documents(make_document(kvp("region", region)));
         log_trace_stream(_logger) << "Count messages, region: " << region << " result: " << count << std::endl;
       } else {
-        count = _messageCollection.count_documents({});
+        count = messageCollection.count_documents({});
         log_trace_stream(_logger) << "Count messages, result: " << count << std::endl;
       }
       return count;
@@ -676,9 +801,12 @@ namespace AwsMock::Database {
 
   long SQSDatabase::CountMessagesByStatus(const std::string &region, const std::string &queueUrl, Entity::SQS::MessageStatus status) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
-      long count = _messageCollection.count_documents(make_document(kvp("region", region),
+      auto client = GetClient();
+      auto messageCollection = (*client)[_databaseName]["sqs_message"];
+
+      long count = messageCollection.count_documents(make_document(kvp("region", region),
                                                                     kvp("queueUrl", queueUrl),
                                                                     kvp("status", Entity::SQS::MessageStatusToString(status))));
       log_trace_stream(_logger) << "Count messages by status, status: " << Entity::SQS::MessageStatusToString(status) << " result: " << count << std::endl;
@@ -693,10 +821,24 @@ namespace AwsMock::Database {
 
   void SQSDatabase::DeleteMessages(const std::string &queueUrl) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
-      auto result = _messageCollection.delete_many(make_document(kvp("queueUrl", queueUrl)));
-      log_debug_stream(_logger) << "Messages deleted, queue: " << queueUrl << " count: " << result->deleted_count() << std::endl;
+      auto client = GetClient();
+      auto messageCollection = (*client)[_databaseName]["sqs_message"];
+      auto session = client->start_session();
+
+      try {
+
+        session.start_transaction();
+        auto result = messageCollection.delete_many(make_document(kvp("queueUrl", queueUrl)));
+        session.commit_transaction();
+        log_debug_stream(_logger) << "Messages deleted, queue: " << queueUrl << " count: " << result->deleted_count() << std::endl;
+
+      } catch (const mongocxx::exception &exc) {
+        session.abort_transaction();
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+      }
 
     } else {
 
@@ -707,11 +849,24 @@ namespace AwsMock::Database {
 
   void SQSDatabase::DeleteMessage(const Entity::SQS::Message &message) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
-      auto result = _messageCollection.delete_one(make_document(kvp("receiptHandle", message.receiptHandle)));
-      log_debug_stream(_logger) << "Messages deleted, receiptHandle: " << Core::StringUtils::SubString(message.receiptHandle, 0, 40) << "... count: "
-                                << result->deleted_count() << std::endl;
+      auto client = GetClient();
+      auto messageCollection = (*client)[_databaseName]["sqs_message"];
+      auto session = client->start_session();
+
+      try {
+
+        session.start_transaction();
+        auto result = messageCollection.delete_one(make_document(kvp("receiptHandle", message.receiptHandle)));
+        session.commit_transaction();
+        log_debug_stream(_logger) << "Messages deleted, receiptHandle: " << Core::StringUtils::SubString(message.receiptHandle, 0, 40) << "... count: "
+                                  << result->deleted_count() << std::endl;
+      } catch (const mongocxx::exception &exc) {
+        session.abort_transaction();
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+      }
 
     } else {
 
@@ -722,10 +877,24 @@ namespace AwsMock::Database {
 
   void SQSDatabase::DeleteAllMessages() {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
-      auto result = _messageCollection.delete_many({});
-      log_debug_stream(_logger) << "All messages deleted, count: " << result->deleted_count() << std::endl;
+      auto client = GetClient();
+      auto messageCollection = (*client)[_databaseName]["sqs_message"];
+      auto session = client->start_session();
+
+      try {
+
+        session.start_transaction();
+        auto result = messageCollection.delete_many({});
+        session.commit_transaction();
+        log_debug_stream(_logger) << "All messages deleted, count: " << result->deleted_count() << std::endl;
+
+      } catch (const mongocxx::exception &exc) {
+        session.abort_transaction();
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+      }
 
     } else {
 
@@ -737,4 +906,5 @@ namespace AwsMock::Database {
   std::string SQSDatabase::ConvertMessageToJson(mongocxx::stdx::optional<bsoncxx::document::value> document) {
     return bsoncxx::to_json(document->view());
   }
+
 } // namespace AwsMock::Database

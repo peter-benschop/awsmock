@@ -47,9 +47,9 @@ namespace AwsMock::Service {
       }
 
       std::string _endpoint, _baseCommand;
-      Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
+      Core::Configuration& _configuration = Core::Configuration::instance();
       Core::MetricService _metricService = Core::MetricService(_configuration);
-      Database::DynamoDbDatabase _database = Database::DynamoDbDatabase(_configuration);
+      Database::DynamoDbDatabase& _database = Database::DynamoDbDatabase::instance();
       DynamoDbServer _dynamoDbServer = DynamoDbServer(_configuration, _metricService);
       DynamoDbService _dynamoDbService = DynamoDbService(_configuration, _metricService);
   };
@@ -116,6 +116,24 @@ namespace AwsMock::Service {
     // assert
     EXPECT_EQ(0, deleteResult.status);
     EXPECT_EQ(0, tableList.size());
+  }
+
+  TEST_F(DynamoDbServerJavaTest, PutItemTest) {
+
+    // arrange
+    Core::ExecResult createTableResult = Core::SystemUtils::Exec(_baseCommand + "create-table test-table");
+    EXPECT_EQ(0, createTableResult.status);
+    Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
+    EXPECT_EQ(1, tableList.size());
+
+    // act
+    Core::ExecResult putItemResult = Core::SystemUtils::Exec(_baseCommand + "put-item test-table orgaNr 123");
+    EXPECT_EQ(0, putItemResult.status);
+    Database::Entity::DynamoDb::ItemList itemList = _database.ListItems();
+
+    // assert
+    EXPECT_EQ(0, putItemResult.status);
+    EXPECT_EQ(1, itemList.size());
   }
 
 } // namespace AwsMock::Service

@@ -41,6 +41,8 @@
 #include <awsmock/dto/dynamodb/PutItemResponse.h>
 #include <awsmock/dto/dynamodb/QueryRequest.h>
 #include <awsmock/dto/dynamodb/QueryResponse.h>
+#include <awsmock/dto/dynamodb/ScanRequest.h>
+#include <awsmock/dto/dynamodb/ScanResponse.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
 #include <awsmock/service/DockerService.h>
 
@@ -125,6 +127,14 @@ namespace AwsMock::Service {
     Dto::DynamoDb::QueryResponse Query(const Dto::DynamoDb::QueryRequest &request);
 
     /**
+     * Scan the database
+     *
+     * @param request scan request DTO
+     * @return ScanResponse
+     */
+    Dto::DynamoDb::ScanResponse Scan(const Dto::DynamoDb::ScanRequest &request);
+
+    /**
      * Deletes a item
      *
      * @param request delete item request DTO
@@ -176,7 +186,7 @@ namespace AwsMock::Service {
     /**
      * Database connection
      */
-    std::shared_ptr<Database::DynamoDbDatabase> _dynamoDbDatabase;
+    Database::DynamoDbDatabase& _dynamoDbDatabase;
 
     /**
      * DynamoDb docker host

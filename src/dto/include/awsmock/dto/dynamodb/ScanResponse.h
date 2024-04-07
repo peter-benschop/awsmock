@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_DYNAMODB_DESCRIBE_TABLE_RESPONSE_H
-#define AWSMOCK_DTO_DYNAMODB_DESCRIBE_TABLE_RESPONSE_H
+#ifndef AWSMOCK_DTO_DYNAMODB_SCAN_RESPONSE_H
+#define AWSMOCK_DTO_DYNAMODB_SCAN_RESPONSE_H
 
 // C++ standard includes
 #include <string>
@@ -19,12 +19,23 @@
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/ServiceException.h>
-#include <awsmock/dto/dynamodb/ProvisionedThroughput.h>
 #include <awsmock/dto/dynamodb/TableStatus.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
-  struct DescribeTableResponse {
+  /**
+   * Example:
+   * <pre>
+   * {
+   *   "ConsumedCapacity":
+   *     {
+   *       "TableName":"test-table",
+   *       "CapacityUnits":1.0
+   *     }
+   * }
+   * </pre>
+   */
+  struct ScanResponse {
 
     /**
      * Region
@@ -37,47 +48,12 @@ namespace AwsMock::Dto::DynamoDb {
     std::string tableName;
 
     /**
-     * Table ID
-     */
-    std::string tableId;
-
-    /**
-     * Table ARN
-     */
-    std::string tableArn;
-
-    /**
-     * Key schema
-     */
-    std::map<std::string, std::string> keySchemas;
-
-    /**
-     * Tags
-     */
-    std::map<std::string, std::string> tags;
-
-    /**
-     * Attribute definitions
-     */
-    std::map<std::string, std::string> attributes;
-
-    /**
-     * Provisioned throughput
-     */
-    ProvisionedThroughput provisionedThroughput;
-
-    /**
-     * Table status
-     */
-    TableStatus tableStatus;
-
-    /**
-     * HTTP response body
+     * Original HTTP response body
      */
     std::string body;
 
     /**
-     * HTTP response headers
+     * Original HTTP response headers
      */
     std::map<std::string, std::string> headers;
 
@@ -96,10 +72,9 @@ namespace AwsMock::Dto::DynamoDb {
     /**
      * Parse a JSON stream
      *
-     * @param body JSON string
-     * @param headerMap map of headers
+     * @param jsonString JSON string
      */
-    void FromJson(const std::string &body, const std::map<std::string, std::string> &headers);
+    void FromJson(const std::string &jsonString);
 
     /**
      * Converts the DTO to a string representation.
@@ -113,10 +88,10 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const DescribeTableResponse &r);
+    friend std::ostream &operator<<(std::ostream &os, const ScanResponse &r);
 
   };
 
 } // namespace AwsMock::Dto::DynamoDb
 
-#endif // AWSMOCK_DTO_DYNAMODB_DESCRIBE_TABLE_RESPONSE_H
+#endif // AWSMOCK_DTO_DYNAMODB_SCAN_RESPONSE_H

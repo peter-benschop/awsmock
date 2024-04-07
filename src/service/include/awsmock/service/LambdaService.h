@@ -197,12 +197,12 @@ namespace AwsMock::Service {
     /**
      * lambda database connection
      */
-    std::shared_ptr<Database::LambdaDatabase> _lambdaDatabase;
+    Database::LambdaDatabase& _lambdaDatabase;
 
     /**
      * S3 database connection
      */
-    std::shared_ptr<Database::S3Database> _s3Database;
+    Database::S3Database& _s3Database;
 
     /**
      * Docker module

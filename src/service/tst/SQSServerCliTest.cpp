@@ -37,15 +37,15 @@ namespace AwsMock::Service {
       _configuration.setString("awsmock.service.gateway.port", _port);
       _accountId = _configuration.getString("awsmock.account.id", SQS_ACCOUNT_ID);
       _endpoint = "http://" + _host + ":" + _port;
-      _queueUrl = "http://" + _host + ":" + _port + "/" + _accountId + "/" + TEST_QUEUE;
+      _queueUrl = "http://" + Core::SystemUtils::GetHostName() + ":" + _port + "/" + _accountId + "/" + TEST_QUEUE;
 
       // Start HTTP manager
       Poco::ThreadPool::defaultPool().start(_sqsServer);
     }
 
     void TearDown() override {
-      _database.DeleteAllMessages();
-      _database.DeleteAllQueues();
+      _sqsDatabase.DeleteAllMessages();
+      _sqsDatabase.DeleteAllQueues();
       _sqsServer.StopServer();
     }
 
@@ -72,9 +72,9 @@ namespace AwsMock::Service {
     }
 
     std::string _endpoint, _queueUrl, _accountId;
-    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
+    Core::Configuration& _configuration = Core::Configuration::instance();
     Core::MetricService _metricService = Core::MetricService(_configuration);
-    Database::SQSDatabase _database = Database::SQSDatabase(_configuration);
+    Database::SQSDatabase& _sqsDatabase = Database::SQSDatabase::instance();
     SQSServer _sqsServer = SQSServer(_configuration, _metricService);
   };
 
@@ -84,7 +84,7 @@ namespace AwsMock::Service {
 
     // act
     Core::ExecResult result = Core::TestUtils::SendCliCommand("aws sqs create-queue --queue-name " + TEST_QUEUE + " --endpoint " + _endpoint);
-    Database::Entity::SQS::QueueList queueList = _database.ListQueues();
+    Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
 
     // assert
     EXPECT_EQ(0, result.status);
@@ -117,7 +117,7 @@ namespace AwsMock::Service {
 
     // assert
     EXPECT_EQ(0, result.status);
-    EXPECT_TRUE(Core::StringUtils::Contains(result.output, _queueUrl));
+    EXPECT_TRUE(Core::StringUtils::Contains(result.output, TEST_QUEUE));
   }
 
   TEST_F(SQSServerCliTest, QueuePurgeTest) {
@@ -131,7 +131,7 @@ namespace AwsMock::Service {
 
     // act
     Core::ExecResult result = Core::TestUtils::SendCliCommand("aws sqs purge-queue --queue-url " + _queueUrl + " --endpoint " + _endpoint);
-    long messageCount = _database.CountMessages(REGION, _queueUrl);
+    long messageCount = _sqsDatabase.CountMessages(REGION, _queueUrl);
 
     // assert
     EXPECT_EQ(0, messageCount);
@@ -145,7 +145,7 @@ namespace AwsMock::Service {
 
     // act
     Core::ExecResult result = Core::TestUtils::SendCliCommand("aws sqs delete-queue --queue-url " + _queueUrl + " --endpoint " + _endpoint);
-    Database::Entity::SQS::QueueList queueList = _database.ListQueues();
+    Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
 
     // assert
     EXPECT_EQ(0, result.status);
@@ -160,7 +160,7 @@ namespace AwsMock::Service {
 
     // act
     Core::ExecResult result = Core::TestUtils::SendCliCommand("aws sqs send-message --queue-url " + _queueUrl + " --message-body TEST-BODY --endpoint " + _endpoint);
-    long messageCount = _database.CountMessages(REGION, _queueUrl);
+    long messageCount = _sqsDatabase.CountMessages(REGION, _queueUrl);
 
     // assert
     EXPECT_EQ(0, result.status);
@@ -198,7 +198,7 @@ namespace AwsMock::Service {
     // act
     Core::ExecResult result = Core::TestUtils::SendCliCommand("aws sqs delete-message --queue-url " + _queueUrl + " --receipt-handle " + receiptHandle + " --endpoint " + _endpoint);
     EXPECT_EQ(0, receiveResult.status);
-    long messageCount = _database.CountMessages(REGION, _queueUrl);
+    long messageCount = _sqsDatabase.CountMessages(REGION, _queueUrl);
 
     // assert
     EXPECT_EQ(0, messageCount);

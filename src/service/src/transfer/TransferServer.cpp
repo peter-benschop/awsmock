@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
 
   TransferServer::TransferServer(Core::Configuration &configuration, Core::MetricService &metricService)
-      : AbstractServer(configuration, "transfer"), AbstractWorker(configuration), _logger(Poco::Logger::get("TransferServer")), _configuration(configuration), _metricService(metricService), _module("transfer") {
+      : AbstractServer(configuration, "transfer"), AbstractWorker(configuration), _logger(Poco::Logger::get("TransferServer")), _configuration(configuration), _metricService(metricService), _transferDatabase(Database::TransferDatabase::instance()), _module("transfer") {
 
     // REST manager configuration
     _port = _configuration.getInt("awsmock.module.transfer.port", TRANSFER_DEFAULT_PORT);
@@ -22,9 +22,6 @@ namespace AwsMock::Service {
 
     // Create environment
     _region = _configuration.getString("awsmock.region");
-    _transferDatabase = std::make_unique<Database::TransferDatabase>(_configuration);
-
-    // Bucket
     _bucket = _configuration.getString("awsmock.module.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
     _baseDir = _configuration.getString("awsmock.module.transfer.base.dir", DEFAULT_BASE_DIR);
 
@@ -86,7 +83,7 @@ namespace AwsMock::Service {
   void TransferServer::StartTransferServers() {
 
     log_debug_stream(_logger) << "Starting transfer servers" << std::endl;
-    std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase->ListServers(_region);
+    std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase.ListServers(_region);
 
     for (auto &transfer : transfers) {
       if (transfer.state == Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::ONLINE)) {
@@ -98,7 +95,7 @@ namespace AwsMock::Service {
   void TransferServer::CheckTransferServers() {
 
     log_debug_stream(_logger) << "Checking transfer servers" << std::endl;
-    std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase->ListServers(_region);
+    std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase.ListServers(_region);
 
     for (auto &transfer : transfers) {
       if (transfer.state == Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::ONLINE)) {
@@ -115,8 +112,8 @@ namespace AwsMock::Service {
     }
 
     for (auto &transfer : _transferServerList) {
-      if (!_transferDatabase->TransferExists(transfer.first)) {
-        Database::Entity::Transfer::Transfer server = _transferDatabase->GetTransferByServerId(transfer.first);
+      if (!_transferDatabase.TransferExists(transfer.first)) {
+        Database::Entity::Transfer::Transfer server = _transferDatabase.GetTransferByServerId(transfer.first);
         StopTransferServer(server);
       }
     }

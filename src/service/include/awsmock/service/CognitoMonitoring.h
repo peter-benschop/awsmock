@@ -94,7 +94,7 @@ namespace AwsMock::Service {
     /**
      * Cognito database
      */
-    std::unique_ptr<Database::CognitoDatabase> _cognitoDatabase;
+    Database::CognitoDatabase &_cognitoDatabase;
 
     /**
      * S3 monitoring period in seconds

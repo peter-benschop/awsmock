@@ -10,68 +10,55 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_array;
   using bsoncxx::builder::basic::make_document;
 
-  Database::Database(Core::Configuration &configuration) : _logger(Poco::Logger::get("Database")), _configuration(configuration), _useDatabase(false) {
+  Database::Database() : _configuration(Core::Configuration::instance()), _logger(Poco::Logger::get("Database")), _useDatabase(false), _initialized(false) {
 
     _useDatabase = _configuration.getBool("awsmock.mongodb.active", false);
-
-    if (_useDatabase) {
-
-      Initialize();
-
-    } else {
-
-      log_trace_stream(_logger) << "Running without database" << std::endl;
-    }
-  }
-
-  void Database::Initialize() {
-
     _name = _configuration.getString("awsmock.mongodb.name", "awsmock");
     _host = _configuration.getString("awsmock.mongodb.host", "localhost");
     _port = _configuration.getInt("awsmock.mongodb.port", 27017);
     _user = _configuration.getString("awsmock.mongodb.user", "admin");
     _password = _configuration.getString("awsmock.mongodb.password", "admin");
+    _poolSize = _configuration.getInt("awsmock.mongodb.pool.size", 256);
 
     // MongoDB URI
-    _uri = mongocxx::uri("mongodb://" + _user + ":" + _password + "@" + _host + ":" + std::to_string(_port) + "/?maxPoolSize=256");
-    log_trace_stream(_logger) << "Database URI: " << _uri.to_string() << std::endl;
-
-    //mongocxx::pool pool{_uri};
-    _client = mongocxx::client{_uri};
-
-    // Update module database
-    UpdateModuleStatus();
-    log_debug_stream(_logger) << "MongoDB connection initialized" << std::endl;
+    _uri = mongocxx::uri("mongodb://" + _user + ":" + _password + "@" + _host + ":" + std::to_string(_port) + "/?maxPoolSize=" + std::to_string(_poolSize));
+    _pool = new mongocxx::pool(_uri);
   }
 
   mongocxx::database Database::GetConnection() {
-    return _client[_name];
+    mongocxx::pool::entry _client = _pool->acquire();
+    return (*_client)[_name];
   }
 
-  mongocxx::client_session Database::GetSession() {
-    return _client.start_session();
+  mongocxx::pool::entry Database::GetClient() {
+    return _pool->acquire();
   }
 
   bool Database::HasDatabase() const {
-    return _configuration.getBool("awsmock.mongodb.active", false);
+    return _useDatabase;
+  }
+
+  std::string Database::GetDatabaseName() const {
+    return _name;
   }
 
   void Database::StartDatabase() {
 
     _useDatabase = true;
     _configuration.SetValue("awsmock.mongodb.active", true);
-    Initialize();
 
     // Update module database
-    _client[_name]["module"].update_one(make_document(kvp("name", "database")), make_document(kvp("$set", make_document(kvp("state", "RUNNING")))));
-    log_info_stream(_logger) << "Database module started" << std::endl;
+    mongocxx::pool::entry _client = _pool->acquire();
+    (*_client)[_name]["module"].update_one(make_document(kvp("name", "database")), make_document(kvp("$set", make_document(kvp("state", "RUNNING")))));
+    log_info_stream(_logger) << "Database module started, poolSize: " <<_poolSize << std::endl;
   }
 
   void Database::StopDatabase() {
 
     // Update module database
     _configuration.SetValue("awsmock.mongodb.active", false);
-    _client[_name]["module"].update_one(make_document(kvp("name", "database")), make_document(kvp("$set", make_document(kvp("state", "STOPPED")))));
+    mongocxx::pool::entry _client = _pool->acquire();
+    (*_client)[_name]["module"].update_one(make_document(kvp("name", "database")), make_document(kvp("$set", make_document(kvp("state", "STOPPED")))));
 
     _useDatabase = false;
     log_info_stream(_logger) << "Database module stopped" << std::endl;
@@ -92,10 +79,10 @@ namespace AwsMock::Database {
   }
 
   void Database::UpdateModuleStatus() {
-    auto session = GetSession();
+/*    auto session = GetSession();
     session.start_transaction();
-    _client[_name]["module"].update_one(make_document(kvp("name", "database")), make_document(kvp("$set", make_document(kvp("state", "RUNNING")))));
-    session.commit_transaction();
+    session.client()[_name]["module"].update_one(make_document(kvp("name", "database")), make_document(kvp("$set", make_document(kvp("state", "RUNNING")))));
+    session.commit_transaction();*/
   }
 
 } // namespace AwsMock::Database

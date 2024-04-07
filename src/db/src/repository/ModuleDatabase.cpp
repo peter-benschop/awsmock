@@ -11,39 +11,32 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_document;
 
   std::map<std::string, Entity::Module::Module> ModuleDatabase::_existingModules = {
-      {"s3", {.name="s3", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-      {"sqs", {.name="sqs", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-      {"sns", {.name="sns", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-      {"lambda", {.name="lambda", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-      {"transfer", {.name="transfer", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-      {"cognito", {.name="cognito", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-      {"dynamodb", {.name="dynamodb", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-      {"gateway", {.name="gateway", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-      {"database", {.name="database", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}}
+    {"s3", {.name="s3", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+    {"sqs", {.name="sqs", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+    {"sns", {.name="sns", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+    {"lambda", {.name="lambda", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+    {"transfer", {.name="transfer", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+    {"cognito", {.name="cognito", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+    {"dynamodb", {.name="dynamodb", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+    {"gateway", {.name="gateway", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+    {"database", {.name="database", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}}
   };
 
-  ModuleDatabase::ModuleDatabase(Core::Configuration &configuration) : Database(configuration), _logger(Poco::Logger::get("ModuleDatabase")), _configuration(configuration) {
+  ModuleDatabase::ModuleDatabase() : _logger(Poco::Logger::get("ModuleDatabase")), _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()) {
 
-    if (HasDatabase()) {
+    for (const auto &module : _existingModules) {
+      if (_useDatabase) {
 
-      // Get collections
-      _moduleCollection = GetConnection()["module"];
-
-      // Create default modules
-      for (auto const &module : _existingModules) {
         if (!ModuleExists(module.first)) {
           CreateModule(module.second);
         }
+
+      } else {
+
+        if (!_memoryDb.ModuleExists(module.first)) {
+          _memoryDb.CreateModule(module.second);
+        }
       }
-
-    } else {
-
-      for (auto &module : _existingModules) {
-        module.second.status = _configuration.getBool("awsmock.service." + module.first + ".active", false) ? Entity::Module::ModuleStatus::ACTIVE : Entity::Module::ModuleStatus::INACTIVE;
-        module.second.state = _configuration.getBool("awsmock.service." + module.first + ".active", false) ? Entity::Module::ModuleState::RUNNING : Entity::Module::ModuleState::STOPPED;
-        _memoryDb.CreateModule(module.second);
-      }
-
     }
   }
 
@@ -52,6 +45,9 @@ namespace AwsMock::Database {
     if (HasDatabase()) {
 
       try {
+
+        auto client = GetClient();
+        mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
         auto result = _moduleCollection.find_one(make_document(kvp("name", name)));
         if (result) {
           Entity::Module::Module module;
@@ -59,8 +55,9 @@ namespace AwsMock::Database {
           log_trace_stream(_logger) << "Module state: " << Entity::Module::ModuleStateToString(module.state) << std::endl;
           return module.status == Entity::Module::ModuleStatus::ACTIVE;
         }
+
       } catch (mongocxx::exception::system_error &e) {
-        log_error_stream(_logger) << "IsActive failed, error: " << e.what() << std::endl;
+        log_error_stream(_logger) << "IsActive failed, module: " << name << " error: " << e.what() << std::endl;
       }
 
     } else {
@@ -73,12 +70,16 @@ namespace AwsMock::Database {
 
   bool ModuleDatabase::ModuleExists(const std::string &name) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
       try {
+
+        auto client = GetClient();
+        mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
         int64_t count = _moduleCollection.count_documents(make_document(kvp("name", name)));
         log_trace_stream(_logger) << "Module exists: " << (count > 0 ? "true" : "false") << std::endl;
         return count > 0;
+
       } catch (mongocxx::exception::system_error &e) {
         log_error_stream(_logger) << "Module exists failed, error: " << e.what() << std::endl;
       }
@@ -94,6 +95,9 @@ namespace AwsMock::Database {
   Entity::Module::Module ModuleDatabase::GetModuleById(const bsoncxx::oid &oid) {
 
     try {
+
+      auto client = GetClient();
+      mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
 
       mongocxx::stdx::optional<bsoncxx::document::value> mResult = _moduleCollection.find_one(make_document(kvp("_id", oid)));
       if (mResult) {
@@ -112,7 +116,7 @@ namespace AwsMock::Database {
 
   Entity::Module::Module ModuleDatabase::GetModuleById(const std::string &oid) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
       return GetModuleById(bsoncxx::oid(oid));
 
@@ -125,11 +129,13 @@ namespace AwsMock::Database {
 
   Entity::Module::Module ModuleDatabase::GetModuleByName(const std::string &name) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
       try {
 
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _moduleCollection.find_one(make_document(kvp("name", name)));
+        auto client = GetClient();
+        mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
+        auto mResult = _moduleCollection.find_one(make_document(kvp("name", name)));
         if (mResult) {
           Entity::Module::Module modules;
           modules.FromDocument(mResult);
@@ -137,9 +143,8 @@ namespace AwsMock::Database {
         }
 
       } catch (mongocxx::exception::system_error &e) {
-        log_error_stream(_logger) << "Get module by name failed, error: " << e.what() << std::endl;
+        log_error_stream(_logger) << "Get module by name failed, name: " << name << " error: " << e.what() << std::endl;
       }
-
     } else {
 
       return _memoryDb.GetModuleByName(name);
@@ -150,10 +155,12 @@ namespace AwsMock::Database {
 
   Entity::Module::Module ModuleDatabase::CreateModule(const Entity::Module::Module &module) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
       try {
 
+        auto client = GetClient();
+        mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
         auto result = _moduleCollection.insert_one(module.ToDocument());
         log_trace_stream(_logger) << "Module created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
         return GetModuleById(result->inserted_id().get_oid().value);
@@ -172,9 +179,11 @@ namespace AwsMock::Database {
 
   Entity::Module::Module ModuleDatabase::UpdateModule(const Entity::Module::Module &module) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
       try {
+        auto client = GetClient();
+        mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
         auto mResult = _moduleCollection.replace_one(make_document(kvp("name", module.name)), module.ToDocument());
         log_trace_stream(_logger) << "Module updated: " << module.ToString() << std::endl;
         return GetModuleByName(module.name);
@@ -193,13 +202,22 @@ namespace AwsMock::Database {
 
   Entity::Module::Module ModuleDatabase::SetState(const std::string &name, const Entity::Module::ModuleState &state) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
+
+      auto client = GetClient();
+      mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
+      auto session = client->start_session();
 
       try {
+
+        session.start_transaction();
         auto mResult = _moduleCollection.update_one(make_document(kvp("name", name)), make_document(kvp("$set", make_document(kvp("state", Entity::Module::ModuleStateToString(state))))));
         log_trace_stream(_logger) << "Module state updated, name: " << name << " state: " << Entity::Module::ModuleStateToString(state) << std::endl;
+        session.commit_transaction();
+
       } catch (mongocxx::exception::system_error &e) {
         log_error_stream(_logger) << "Set module state failed, error: " << e.what() << std::endl;
+        session.abort_transaction();
       }
       return GetModuleByName(name);
 
@@ -212,11 +230,15 @@ namespace AwsMock::Database {
 
   void ModuleDatabase::SetStatus(const std::string &name, const Entity::Module::ModuleStatus &status) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
       try {
+
+        auto client = GetClient();
+        mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
         auto mResult = _moduleCollection.update_one(make_document(kvp("name", name)), make_document(kvp("$set", make_document(kvp("status", Entity::Module::ModuleStatusToString(status))))));
         log_trace_stream(_logger) << "Module status updated, name: " << name << " state: " << Entity::Module::ModuleStatusToString(status) << std::endl;
+
       } catch (mongocxx::exception::system_error &e) {
         log_error_stream(_logger) << "Set module status failed, error: " << e.what() << std::endl;
       }
@@ -230,11 +252,15 @@ namespace AwsMock::Database {
 
   void ModuleDatabase::SetPort(const std::string &name, int port) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
       try {
+
+        auto client = GetClient();
+        mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
         auto mResult = _moduleCollection.update_one(make_document(kvp("name", name)), make_document(kvp("$set", make_document(kvp("port", port)))));
         log_trace_stream(_logger) << "Module port updated, name: " << name << " port: " << port << std::endl;
+
       } catch (mongocxx::exception::system_error &e) {
         log_error_stream(_logger) << "Set module port failed, error: " << e.what() << std::endl;
       }
@@ -247,6 +273,7 @@ namespace AwsMock::Database {
   }
 
   Entity::Module::Module ModuleDatabase::CreateOrUpdateModule(const Entity::Module::Module &modules) {
+
     if (ModuleExists(modules.name)) {
       return UpdateModule((modules));
     } else {
@@ -256,10 +283,12 @@ namespace AwsMock::Database {
 
   int ModuleDatabase::ModuleCount() {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
       try {
 
+        auto client = GetClient();
+        mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
         int64_t count = _moduleCollection.count_documents(make_document());
         log_trace_stream(_logger) << "Service state: " << (count > 0 ? "true" : "false") << std::endl;
         return static_cast<int>(count);
@@ -279,8 +308,10 @@ namespace AwsMock::Database {
   Entity::Module::ModuleList ModuleDatabase::ListModules() {
 
     Entity::Module::ModuleList modulesList;
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
+      auto client = GetClient();
+      mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
       auto serviceCursor = _moduleCollection.find({});
       for (auto service : serviceCursor) {
         Entity::Module::Module result;
@@ -300,9 +331,11 @@ namespace AwsMock::Database {
 
   void ModuleDatabase::DeleteModule(const Entity::Module::Module &module) {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
       try {
+        auto client = GetClient();
+        mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
 
         auto result = _moduleCollection.delete_many(make_document(kvp("name", module.name)));
         log_debug_stream(_logger) << "Service deleted, count: " << result->deleted_count() << std::endl;
@@ -320,9 +353,11 @@ namespace AwsMock::Database {
 
   void ModuleDatabase::DeleteAllModules() {
 
-    if (HasDatabase()) {
+    if (_useDatabase) {
 
       try {
+        auto client = GetClient();
+        mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
 
         auto result = _moduleCollection.delete_many(make_document());
         log_debug_stream(_logger) << "All module deleted, count: " << result->deleted_count() << std::endl;

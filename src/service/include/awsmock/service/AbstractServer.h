@@ -114,7 +114,7 @@ namespace AwsMock::Service {
     /**
      * Service database
      */
-    std::unique_ptr<Database::ModuleDatabase> _moduleDatabase;
+    Database::ModuleDatabase &_moduleDatabase;
 
     /**
      * Shutdown mutex

@@ -168,12 +168,12 @@ namespace AwsMock::Service {
       /**
        * SNS database connection
        */
-      std::unique_ptr<Database::SNSDatabase> _snsDatabase;
+      Database::SNSDatabase& _snsDatabase;
 
       /**
        * SQS database connection
        */
-      std::unique_ptr<Database::SQSDatabase> _sqsDatabase;
+      Database::SQSDatabase& _sqsDatabase;
 
       /**
        * SQS module

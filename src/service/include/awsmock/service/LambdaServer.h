@@ -138,14 +138,9 @@ namespace AwsMock::Service {
     AwsMock::Core::ThreadPool<LambdaMonitoring> _threadPool;
 
     /**
-     * Service database
-     */
-    std::unique_ptr<Database::ModuleDatabase> _serviceDatabase;
-
-    /**
      * lambda database
      */
-    std::unique_ptr<Database::LambdaDatabase> _lambdaDatabase;
+    Database::LambdaDatabase& _lambdaDatabase;
 
     /**
      * lambda module

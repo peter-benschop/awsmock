@@ -96,11 +96,14 @@ namespace AwsMock::Service {
           sqsRequest.FromJson(sqsClientCommand.payload);
           sqsRequest.region = sqsClientCommand.region;
 
+          Dto::SQS::SetQueueAttributesResponse sqsResponse = _sqsService.SetQueueAttributes(sqsRequest);
+          SendOkResponse(response, sqsResponse.ToJson());
+
         } else {
 
           std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(sqsClientCommand.payload, "QueueUrl");
 
-          int count = Core::HttpUtils::CountQueryParametersByPrefix(sqsClientCommand.payload, "UserAttribute");
+          int count = Core::HttpUtils::CountQueryParametersByPrefix(sqsClientCommand.payload, "Attribute")/2;
           log_trace_stream(_logger) << "Got attribute count, count: " << count << std::endl;
 
           AttributeList attributes;
@@ -111,10 +114,10 @@ namespace AwsMock::Service {
           }
 
           sqsRequest = {.region=sqsClientCommand.region, .queueUrl=queueUrl, .attributes=attributes};
-        }
-        _sqsService.SetQueueAttributes(sqsRequest);
 
-        SendOkResponse(response);
+          Dto::SQS::SetQueueAttributesResponse sqsResponse = _sqsService.SetQueueAttributes(sqsRequest);
+          SendOkResponse(response, sqsResponse.ToXml());
+        }
         log_info_stream(_logger) << "Set queue attributes, queueUrl: " << sqsRequest.queueUrl << std::endl;
 
         break;
@@ -331,7 +334,7 @@ namespace AwsMock::Service {
           sqsRequest.queueUrl = Core::HttpUtils::GetQueryParameterValueByName(sqsClientCommand.payload, "QueueUrl");
 
           // Get message count
-          int count = Core::HttpUtils::CountQueryParametersByPrefix(sqsClientCommand.payload, "Entries") / 2;
+          int count = Core::HttpUtils::CountQueryParametersByPrefix(sqsClientCommand.payload, "DeleteMessageBatchRequestEntry") / 2;
           log_trace_stream(_logger) << "Got entry count, count: " << count << std::endl;
 
           for (int i = 1; i <= count; i++) {

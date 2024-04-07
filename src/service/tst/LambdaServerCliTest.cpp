@@ -60,9 +60,9 @@ namespace AwsMock::Service {
 
     std::string _endpoint, _accountId;
     Poco::NotificationQueue createQueue, invokeQueue;
-    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration();
+    Core::Configuration& _configuration = Core::Configuration().instance();
     Core::MetricService _metricService = Core::MetricService(_configuration);
-    Database::LambdaDatabase _database = Database::LambdaDatabase(_configuration);
+    Database::LambdaDatabase& _database = Database::LambdaDatabase::instance();
     LambdaServer _lambdaServer = LambdaServer(_configuration, _metricService, createQueue, invokeQueue);
   };
 

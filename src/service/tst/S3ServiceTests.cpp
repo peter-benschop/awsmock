@@ -40,8 +40,8 @@ namespace AwsMock::Service {
       Core::FileUtils::DeleteFile(testFile);
     }
 
-    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
-    Database::S3Database _database = Database::S3Database(_configuration);
+    Core::Configuration& _configuration = Core::TestUtils::GetTestConfiguration(false);
+    Database::S3Database _database = Database::S3Database();
     S3Service _service = S3Service(_configuration);
     std::string testFile;
   };

@@ -13,6 +13,7 @@
 
 // Poco includes
 #include <Poco/String.h>
+#include <Poco/SingletonHolder.h>
 #include <Poco/Util/LayeredConfiguration.h>
 #include <Poco/Util/PropertyFileConfiguration.h>
 
@@ -44,148 +45,156 @@ namespace AwsMock::Core {
   class Configuration : public Poco::Util::PropertyFileConfiguration {
 
     public:
-      /**
-       * Constructor
-       */
-      Configuration();
+    /**
+     * Constructor
+     */
+    Configuration();
 
-      /**
-       * Constructor
-       *
-       * @param basename basename of the configuration file.
-       */
-      explicit Configuration(const std::string &basename);
+    /**
+     * Singleton instance
+     */
+    static Configuration &instance() {
+      static Poco::SingletonHolder<Configuration> sh;
+      return *sh.get();
+    }
 
-      /**
-       * Define a new configuration property.
-       *
-       * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
-       * key, the key is preserved, otherwise the default value is taken. </p>
-       *
-       * @param key configuration key
-       * @param envProperty environment variable name
-       * @param defaultValue string default value
-       */
-      void DefineStringProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue);
+    /**
+     * Constructor
+     *
+     * @param basename basename of the configuration file.
+     */
+    explicit Configuration(const std::string &basename);
 
-      /**
-       * Define a new configuration property.
-       *
-       * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
-       * key, the key is preserved, otherwise the default value is taken. </p>
-       *
-       * @param key configuration key
-       * @param envProperty environment variable name
-       * @param defaultValue boolean default value
-       */
-      void DefineBoolProperty(const std::string &key, const std::string &envProperty, bool defaultValue);
+    /**
+     * Define a new configuration property.
+     *
+     * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
+     * key, the key is preserved, otherwise the default value is taken. </p>
+     *
+     * @param key configuration key
+     * @param envProperty environment variable name
+     * @param defaultValue string default value
+     */
+    void DefineStringProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue);
 
-      /**
-       * Define a new configuration property.
-       *
-       * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
-       * key, the key is preserved, otherwise the default value is taken. </p>
-       *
-       * @param key configuration key
-       * @param envProperty environment variable name
-       * @param defaultValue integer default value
-       */
-      void DefineIntProperty(const std::string &key, const std::string &envProperty, int defaultValue);
+    /**
+     * Define a new configuration property.
+     *
+     * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
+     * key, the key is preserved, otherwise the default value is taken. </p>
+     *
+     * @param key configuration key
+     * @param envProperty environment variable name
+     * @param defaultValue boolean default value
+     */
+    void DefineBoolProperty(const std::string &key, const std::string &envProperty, bool defaultValue);
 
-      /**
-       * Returns the file name of the configuration file.
-       *
-       * @return file name of the configuration file.
-       */
-      std::string GetFilename() const;
+    /**
+     * Define a new configuration property.
+     *
+     * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
+     * key, the key is preserved, otherwise the default value is taken. </p>
+     *
+     * @param key configuration key
+     * @param envProperty environment variable name
+     * @param defaultValue integer default value
+     */
+    void DefineIntProperty(const std::string &key, const std::string &envProperty, int defaultValue);
 
-      /**
-       * Sets the file name of the configuration file.
-       *
-       * @param filename file name of the configuration file.
-       */
-      void SetFilename(const std::string &filename);
+    /**
+     * Returns the file name of the configuration file.
+     *
+     * @return file name of the configuration file.
+     */
+    std::string GetFilename() const;
 
-      /**
-       * Sets a string configuration value
-       *
-       * @param key property key
-       * @param value configuration value
-       */
-      void SetValue(const std::string &key, const std::string &value);
+    /**
+     * Sets the file name of the configuration file.
+     *
+     * @param filename file name of the configuration file.
+     */
+    void SetFilename(const std::string &filename);
 
-      /**
-       * Sets a bool configuration value
-       *
-       * @param key property key
-       * @param value configuration value
-       */
-      void SetValue(const std::string &key, bool value);
+    /**
+     * Sets a string configuration value
+     *
+     * @param key property key
+     * @param value configuration value
+     */
+    void SetValue(const std::string &key, const std::string &value);
 
-      /**
-       * Sets an integer configuration value
-       *
-       * @param key property key
-       * @param value configuration value
-       */
-      void SetValue(const std::string &key, int value);
+    /**
+     * Sets a bool configuration value
+     *
+     * @param key property key
+     * @param value configuration value
+     */
+    void SetValue(const std::string &key, bool value);
 
-      /**
-       * Returns the application name
-       *
-       * @return application name
-       */
-      static std::string GetAppName();
+    /**
+     * Sets an integer configuration value
+     *
+     * @param key property key
+     * @param value configuration value
+     */
+    void SetValue(const std::string &key, int value);
 
-      /**
-       * Returns the version of the library.
-       *
-       * @return library version
-       */
-      static std::string GetVersion();
+    /**
+     * Returns the application name
+     *
+     * @return application name
+     */
+    static std::string GetAppName();
 
-      /**
-       * Writes the current configuration the given file
-       *
-       * @param filename name of the configuration file
-       */
-      void WriteFile(const std::string &filename);
+    /**
+     * Returns the version of the library.
+     *
+     * @return library version
+     */
+    static std::string GetVersion();
 
-      /**
-       * Converts the DTO to a string representation.
-       *
-       * @return DTO as string for logging.
-       */
-      [[nodiscard]] std::string ToString() const;
+    /**
+     * Writes the current configuration the given file
+     *
+     * @param filename name of the configuration file
+     */
+    void WriteFile(const std::string &filename);
+
+    /**
+     * Converts the DTO to a string representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToString() const;
 
     private:
 
-      /**
-       * Initialize the base properties
-       */
-      void Initialize();
+    /**
+     * Initialize the base properties
+     */
+    void Initialize();
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
 
-      /**
-       * Name of the configuration file
-       */
-      std::string _filename;
+    /**
+     * Name of the configuration file
+     */
+    std::string _filename;
 
-      /**
-       * Profile configuration file
-       */
-      std::string _profile;
+    /**
+     * Profile configuration file
+     */
+    std::string _profile;
 
-      /**
-       * Stream provider.
-       *
-       * @return output stream
-       */
-      friend std::ostream &operator<<(std::ostream &, const Configuration &);
+    /**
+     * Stream provider.
+     *
+     * @return output stream
+     */
+    friend std::ostream &operator<<(std::ostream &, const Configuration &);
   };
 
 } // namespace AwsMock::Core

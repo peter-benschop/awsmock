@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
 
   S3Server::S3Server(Core::Configuration &configuration, Core::MetricService &metricService)
-      : AbstractWorker(configuration), AbstractServer(configuration, "s3"), _logger(Poco::Logger::get("S3Server")), _configuration(configuration), _metricService(metricService), _module("s3") {
+      : AbstractWorker(configuration), AbstractServer(configuration, "s3"), _logger(Poco::Logger::get("S3Server")), _configuration(configuration), _metricService(metricService), _module("s3"), _s3Database(Database::S3Database::instance()) {
 
     // Get HTTP configuration values
     _port = _configuration.getInt("awsmock.service.s3.port", S3_DEFAULT_PORT);
@@ -19,9 +19,6 @@ namespace AwsMock::Service {
     // Sleeping period
     _period = _configuration.getInt("awsmock.worker.s3.period", 10000);
     log_debug_stream(_logger) << "Worker period: " << _period << std::endl;
-
-    // Database connections
-    _s3Database = std::make_unique<Database::S3Database>(_configuration);
     log_debug_stream(_logger) << "S3 module initialized, endpoint: " << _host << ":" << _port << std::endl;
   }
 
@@ -67,8 +64,8 @@ namespace AwsMock::Service {
   }
 
   void S3Server::UpdateCounters() {
-    long buckets = _s3Database->BucketCount();
-    long objects = _s3Database->ObjectCount();
+    long buckets = _s3Database.BucketCount();
+    long objects = _s3Database.ObjectCount();
     _metricService.SetGauge("s3_bucket_count", buckets);
     _metricService.SetGauge("s3_object_count", objects);
   }

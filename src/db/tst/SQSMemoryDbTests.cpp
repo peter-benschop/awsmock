@@ -38,8 +38,8 @@ namespace AwsMock::Database {
     }
 
     std::string _region, _queueUrl, _queueArn, _dlqueueUrl, _dlqueueArn;
-    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
-    SQSDatabase _sqsDatabase = SQSDatabase(_configuration);
+    Core::Configuration& _configuration = Core::TestUtils::GetTestConfiguration(false);
+    SQSDatabase& _sqsDatabase = SQSDatabase::instance();
   };
 
   TEST_F(SQSMemoryDbTest, QueueCreateTest) {
@@ -394,10 +394,10 @@ namespace AwsMock::Database {
     // act
     Entity::SQS::MessageList messageList;
     _sqsDatabase.ReceiveMessages(_region, _queueUrl, 1, 3, messageList);
-    Poco::Thread().sleep(2000);
+    Poco::Thread::sleep(2000);
     _sqsDatabase.ResetMessages(_queueUrl, 1);
     _sqsDatabase.ReceiveMessages(_region, _queueUrl, 1, 3, messageList);
-    Poco::Thread().sleep(2000);
+    Poco::Thread::sleep(2000);
     _sqsDatabase.ResetMessages(_queueUrl, 1);
 
     _sqsDatabase.RedriveMessages(_queueUrl, redrivePolicy);

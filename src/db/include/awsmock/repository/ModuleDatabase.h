@@ -23,14 +23,22 @@ namespace AwsMock::Database {
 
   class ModuleDatabase : public Database {
 
-  public:
+    public:
 
     /**
      * Constructor
      *
      * @param configuration configuration properties
      */
-    explicit ModuleDatabase(Core::Configuration &configuration);
+    explicit ModuleDatabase();
+
+    /**
+     * Singleton instance
+     */
+    static ModuleDatabase &instance() {
+      static Poco::SingletonHolder<ModuleDatabase> sh;
+      return *sh.get();
+    }
 
     /**
      * Checks the active flag.
@@ -156,7 +164,7 @@ namespace AwsMock::Database {
      */
     void DeleteAllModules();
 
-  private:
+    private:
 
     /**
      * Logger
@@ -164,14 +172,14 @@ namespace AwsMock::Database {
     Core::LogStream _logger;
 
     /**
-     * Configuration
+     * Use MongoDB
      */
-    Core::Configuration &_configuration;
+    bool _useDatabase;
 
     /**
-     * Service collection
+     * Database name
      */
-    mongocxx::collection _moduleCollection{};
+    std::string _databaseName;
 
     /**
      * Modules in-memory database

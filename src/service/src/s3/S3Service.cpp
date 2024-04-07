@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-  S3Service::S3Service(Core::Configuration &configuration) : _logger(Poco::Logger::get("S3Service")), _configuration(configuration) {
+  S3Service::S3Service(Core::Configuration &configuration) : _logger(Poco::Logger::get("S3Service")), _configuration(configuration), _database(Database::S3Database::instance()) {
 
     _accountId = _configuration.getString("awsmock.account.id");
 
@@ -14,11 +14,11 @@ namespace AwsMock::Service {
     _dataDir = _configuration.getString("awsmock.data.dir", DEFAULT_DATA_DIR);
     _transferDir = _configuration.getString("awsmock.service.ftp.base.dir", DEFAULT_TRANSFER_DATA_DIR);
     _transferBucket = _configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
-    _dataS3Dir = _dataDir+ Poco::Path::separator() + "s3";
+    _dataS3Dir = _dataDir + Poco::Path::separator() + "s3";
     _tempDir = _dataDir + Poco::Path::separator() + "tmp";
 
     // Initialize database
-    _database = std::make_unique<Database::S3Database>(_configuration);
+    //_database = std::make_unique<Database::S3Database>();
 
     // SQS module connection
     _sqsServiceHost = _configuration.getString("awsmock.module.sqs.host", "localhost");
@@ -41,13 +41,13 @@ namespace AwsMock::Service {
     std::string region = s3Request.region;
 
     // Check existence
-    if (_database->BucketExists({.region=region, .name=s3Request.bucketName})) {
+    if (_database.BucketExists({.region=region, .name=s3Request.bucketName})) {
       log_warning_stream(_logger) << "Bucket exists already, region: " << region << " name: " << s3Request.bucketName << std::endl;
-      Database::Entity::S3::Bucket bucket = _database->GetBucketByRegionName(region, s3Request.bucketName);
+      Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(region, s3Request.bucketName);
       log_debug_stream(_logger) << "Got bucket: " << s3Request.bucketName << std::endl;
       return {
-          .location=bucket.region,
-          .arn=Core::AwsUtils::CreateArn("s3", region, _accountId, s3Request.bucketName)
+        .location=bucket.region,
+        .arn=Core::AwsUtils::CreateArn("s3", region, _accountId, s3Request.bucketName)
       };
 //      throw Core::ServiceException("Bucket exists already", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
@@ -57,7 +57,7 @@ namespace AwsMock::Service {
     try {
 
       // Update database
-      _database->CreateBucket({.region=region, .name=s3Request.bucketName, .owner=s3Request.bucketOwner});
+      _database.CreateBucket({.region=region, .name=s3Request.bucketName, .owner=s3Request.bucketOwner});
 
       createBucketResponse = Dto::S3::CreateBucketResponse(region, Core::AwsUtils::CreateArn("s3", region, _accountId, s3Request.bucketName));
       log_trace_stream(_logger) << "S3 create bucket response: " << createBucketResponse.ToXml() << std::endl;
@@ -74,30 +74,30 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "Get metadata request, s3Request: " << request.ToString() << std::endl;
 
     // Check existence
-    if (!_database->BucketExists({.region=request.region, .name=request.bucket})) {
+    if (!_database.BucketExists({.region=request.region, .name=request.bucket})) {
       log_info_stream(_logger) << "Bucket " << request.bucket << " does not exist" << std::endl;
       throw Core::ServiceException("Bucket does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
     if (!request.key.empty()) {
-      if (!_database->ObjectExists({.region=request.region, .bucket=request.bucket, .key=request.key})) {
+      if (!_database.ObjectExists({.region=request.region, .bucket=request.bucket, .key=request.key})) {
         log_info_stream(_logger) << "Object " << request.key << " does not exist" << std::endl;
         throw Core::ServiceException("Object does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
       }
     }
 
     try {
-      Database::Entity::S3::Object object = _database->GetObject(request.region, request.bucket, request.key);
+      Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, request.key);
 
       Dto::S3::GetMetadataResponse response = {
-          .bucket = object.bucket,
-          .key = object.key,
-          .md5Sum = object.md5sum,
-          .contentType = object.contentType,
-          .size = object.size,
-          .metadata = object.metadata,
-          .created = object.created,
-          .modified = object.modified
+        .bucket = object.bucket,
+        .key = object.key,
+        .md5Sum = object.md5sum,
+        .contentType = object.contentType,
+        .size = object.size,
+        .metadata = object.metadata,
+        .created = object.created,
+        .modified = object.modified
       };
 
       log_trace_stream(_logger) << "S3 get object metadata response: " + response.ToString() << std::endl;
@@ -115,42 +115,42 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "Get object request, s3Request: " << request.ToString() << std::endl;
 
     // Check existence
-    if (!_database->BucketExists({.region=request.region, .name=request.bucket})) {
+    if (!_database.BucketExists({.region=request.region, .name=request.bucket})) {
       log_error_stream(_logger) << "Bucket " << request.bucket << " does not exist" << std::endl;
       throw Core::ServiceException("Bucket does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
     if (!request.key.empty()) {
-      if (!_database->ObjectExists({.region=request.region, .bucket=request.bucket, .key=request.key})) {
+      if (!_database.ObjectExists({.region=request.region, .bucket=request.bucket, .key=request.key})) {
         log_error_stream(_logger) << "Object " << request.key << " does not exist" << std::endl;
         throw Core::ServiceException("Object does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
       }
     }
 
     try {
-      Database::Entity::S3::Bucket bucketEntity = _database->GetBucketByRegionName(request.region, request.bucket);
+      Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(request.region, request.bucket);
 
       Database::Entity::S3::Object object;
       if (bucketEntity.IsVersioned() && !request.versionId.empty()) {
-        object = _database->GetObjectVersion(request.region, request.bucket, request.key, request.versionId);
+        object = _database.GetObjectVersion(request.region, request.bucket, request.key, request.versionId);
         if (object.oid.empty()) {
           log_error_stream(_logger) << "Object " << request.key << " does not exist" << std::endl;
           throw Core::ServiceException("Object does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
         }
       } else {
-        object = _database->GetObject(request.region, request.bucket, request.key);
+        object = _database.GetObject(request.region, request.bucket, request.key);
       }
 
       std::string filename = _dataS3Dir + Poco::Path::separator() + object.internalName;
       Dto::S3::GetObjectResponse response = {
-          .bucket = object.bucket,
-          .key = object.key,
-          .size = object.size,
-          .filename = filename,
-          .contentType = object.contentType,
-          .metadata = object.metadata,
-          .md5sum=object.md5sum,
-          .modified = object.modified,
+        .bucket = object.bucket,
+        .key = object.key,
+        .size = object.size,
+        .filename = filename,
+        .contentType = object.contentType,
+        .metadata = object.metadata,
+        .md5sum=object.md5sum,
+        .modified = object.modified,
       };
       log_trace_stream(_logger) << "S3 get object response: " << response.ToString() << std::endl;
       log_info_stream(_logger) << "Object returned, bucket: " << request.bucket << " key: " << request.key << std::endl;
@@ -167,7 +167,7 @@ namespace AwsMock::Service {
 
     try {
 
-      Database::Entity::S3::BucketList bucketList = _database->ListBuckets();
+      Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
       auto listAllBucketResponse = Dto::S3::ListAllBucketResponse(bucketList);
       log_debug_stream(_logger) << "Count all buckets, size: " << bucketList.size() << std::endl;
 
@@ -184,7 +184,7 @@ namespace AwsMock::Service {
 
     try {
 
-      Database::Entity::S3::ObjectList objectList = _database->ListBucket(request.name, request.prefix);
+      Database::Entity::S3::ObjectList objectList = _database.ListBucket(request.name, request.prefix);
       Dto::S3::ListBucketResponse listBucketResponse = Dto::S3::ListBucketResponse(request.name, objectList);
       log_debug_stream(_logger) << "Bucket list returned, count: " << objectList.size() << std::endl;
 
@@ -200,15 +200,15 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "Put bucket versioning request: " << request.ToString() << std::endl;
 
     // Check existence
-    if (!_database->BucketExists({.region=request.region, .name=request.bucket})) {
+    if (!_database.BucketExists({.region=request.region, .name=request.bucket})) {
       throw Core::ServiceException("Bucket does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
     // Update bucket
-    Database::Entity::S3::Bucket bucket = _database->GetBucketByRegionName(request.region, request.bucket);
+    Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
     bucket.versionStatus = Database::Entity::S3::BucketVersionStatusFromString(Poco::toLower(request.status));
 
-    _database->UpdateBucket(bucket);
+    _database.UpdateBucket(bucket);
     log_info_stream(_logger) << "Put bucket versioning, bucket: " << request.bucket << " state: " << request.status << std::endl;
   }
 
@@ -216,7 +216,7 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "CreateMultipartUpload request, bucket: " + request.bucket << " key: " << request.key << " region: " << request.region << " user: " << request.user << std::endl;
 
     // Check existence
-    if (!_database->BucketExists({.region=request.region, .name=request.bucket})) {
+    if (!_database.BucketExists({.region=request.region, .name=request.bucket})) {
       throw Core::ServiceException("Bucket does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
@@ -279,18 +279,18 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Metadata, bucket: " << request.bucket << " key: " << request.key << " md5: " << md5sum << " sha256: " << sha256sum << std::endl;
 
     // Create database object
-    Database::Entity::S3::Object object = _database->CreateOrUpdateObject(
-        {
-            .region=request.region,
-            .bucket=request.bucket,
-            .key=request.key,
-            .owner=request.user,
-            .size=fileSize,
-            .md5sum=md5sum,
-            .sha1sum=sha1sum,
-            .sha256sum=sha256sum,
-            .internalName=filename,
-        });
+    Database::Entity::S3::Object object = _database.CreateOrUpdateObject(
+      {
+        .region=request.region,
+        .bucket=request.bucket,
+        .key=request.key,
+        .owner=request.user,
+        .size=fileSize,
+        .md5sum=md5sum,
+        .sha1sum=sha1sum,
+        .sha256sum=sha256sum,
+        .internalName=filename,
+      });
 
     // Cleanup
     Core::DirUtils::DeleteDirectory(uploadDir);
@@ -300,13 +300,13 @@ namespace AwsMock::Service {
 
     log_info_stream(_logger) << "Multipart upload finished, bucket: " << request.bucket << " key: " << request.key << std::endl;
     return {
-        .location=request.region,
-        .bucket=request.bucket,
-        .key=request.key,
-        .etag=md5sum,
-        .md5sum=md5sum,
-        .checksumSha1=sha1sum,
-        .checksumSha256=sha256sum
+      .location=request.region,
+      .bucket=request.bucket,
+      .key=request.key,
+      .etag=md5sum,
+      .md5sum=md5sum,
+      .checksumSha1=sha1sum,
+      .checksumSha256=sha256sum
     };
   }
 
@@ -314,14 +314,14 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "Put object request: " << request.ToString() << std::endl;
 
     // Check existence
-    if (!_database->BucketExists({.region=request.region, .name=request.bucket})) {
+    if (!_database.BucketExists({.region=request.region, .name=request.bucket})) {
       log_error_stream(_logger) << "Bucket does not exist, region: " << request.region + " bucket: " << request.bucket << std::endl;
       throw Core::ServiceException("Bucket does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
     try {
       // Get bucket
-      Database::Entity::S3::Bucket bucket = _database->GetBucketByRegionName(request.region, request.bucket);
+      Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
 
       if (bucket.IsVersioned()) {
         return SaveVersionedObject(request, stream, bucket);
@@ -339,13 +339,13 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "Copy object request: " << request.ToString() << std::endl;
 
     // Check existence of source bucket
-    if (!_database->BucketExists({.region=request.region, .name=request.sourceBucket})) {
+    if (!_database.BucketExists({.region=request.region, .name=request.sourceBucket})) {
       log_error_stream(_logger) << "Source bucket does not exist, region: " << request.region + " bucket: " << request.sourceBucket << std::endl;
       throw Core::ServiceException("Source bucket does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
     // Check existence of source key
-    if (!_database->ObjectExists({.region=request.region, .bucket=request.sourceBucket, .key=request.sourceKey})) {
+    if (!_database.ObjectExists({.region=request.region, .bucket=request.sourceBucket, .key=request.sourceKey})) {
       log_error_stream(_logger) << "Source object does not exist, region: " << request.region + " bucket: " << request.sourceBucket << " key: "
                                 << request.sourceKey << std::endl;
       throw Core::ServiceException("Source object does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
@@ -355,14 +355,14 @@ namespace AwsMock::Service {
     Database::Entity::S3::Object sourceObject, targetObject;
     try {
       // Check existence of target bucket
-      if (!_database->BucketExists({.region=request.region, .name=request.targetBucket})) {
+      if (!_database.BucketExists({.region=request.region, .name=request.targetBucket})) {
         log_error_stream(_logger) << "Target bucket does not exist, region: " << request.region + " bucket: " << request.targetBucket << std::endl;
         throw Core::ServiceException("Target bucket does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
       }
 
       // Get the source object from the database
-      Database::Entity::S3::Bucket targetBucket = _database->GetBucketByRegionName(request.region, request.targetBucket);
-      sourceObject = _database->GetObject(request.region, request.sourceBucket, request.sourceKey);
+      Database::Entity::S3::Bucket targetBucket = _database.GetBucketByRegionName(request.region, request.targetBucket);
+      sourceObject = _database.GetObject(request.region, request.sourceBucket, request.sourceKey);
 
       // Copy physical file
       std::string targetFile = Core::AwsUtils::CreateS3FileName();
@@ -372,17 +372,17 @@ namespace AwsMock::Service {
 
       // Update database
       targetObject = {
-          .region=request.region,
-          .bucket=request.targetBucket,
-          .key=request.targetKey,
-          .owner=sourceObject.owner,
-          .size=sourceObject.size,
-          .md5sum=sourceObject.md5sum,
-          .sha1sum=sourceObject.sha1sum,
-          .sha256sum=sourceObject.sha256sum,
-          .contentType=sourceObject.contentType,
-          .metadata=request.metadata,
-          .internalName=targetFile,
+        .region=request.region,
+        .bucket=request.targetBucket,
+        .key=request.targetKey,
+        .owner=sourceObject.owner,
+        .size=sourceObject.size,
+        .md5sum=sourceObject.md5sum,
+        .sha1sum=sourceObject.sha1sum,
+        .sha256sum=sourceObject.sha256sum,
+        .contentType=sourceObject.contentType,
+        .metadata=request.metadata,
+        .internalName=targetFile,
       };
 
       // Create version ID
@@ -391,7 +391,7 @@ namespace AwsMock::Service {
       }
 
       // Create object
-      targetObject = _database->CreateObject(targetObject);
+      targetObject = _database.CreateObject(targetObject);
       log_debug_stream(_logger) << "Database updated, bucket: " << targetObject.bucket << " key: " << targetObject.key << std::endl;
 
       // Check notification
@@ -410,13 +410,13 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "Move object request: " << request.ToString() << std::endl;
 
     // Check existence of source bucket
-    if (!_database->BucketExists({.region=request.region, .name=request.sourceBucket})) {
+    if (!_database.BucketExists({.region=request.region, .name=request.sourceBucket})) {
       log_error_stream(_logger) << "Source bucket does not exist, region: " << request.region + " bucket: " << request.sourceBucket << std::endl;
       throw Core::ServiceException("Source bucket does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
     // Check existence of source key
-    if (!_database->ObjectExists({.region=request.region, .bucket=request.sourceBucket, .key=request.sourceKey})) {
+    if (!_database.ObjectExists({.region=request.region, .bucket=request.sourceBucket, .key=request.sourceKey})) {
       log_error_stream(_logger) << "Source object does not exist, region: " << request.region + " bucket: " << request.sourceBucket << " key: "
                                 << request.sourceKey << std::endl;
       throw Core::ServiceException("Source object does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
@@ -427,14 +427,14 @@ namespace AwsMock::Service {
     try {
 
       // Check existence of target bucket
-      if (!_database->BucketExists({.region=request.region, .name=request.targetBucket})) {
+      if (!_database.BucketExists({.region=request.region, .name=request.targetBucket})) {
         log_error_stream(_logger) << "Target bucket does not exist, region: " << request.region + " bucket: " << request.targetBucket << std::endl;
         throw Core::ServiceException("Target bucket does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
       }
 
       // Get the source object from the database
-      Database::Entity::S3::Bucket targetBucket = _database->GetBucketByRegionName(request.region, request.targetBucket);
-      sourceObject = _database->GetObject(request.region, request.sourceBucket, request.sourceKey);
+      Database::Entity::S3::Bucket targetBucket = _database.GetBucketByRegionName(request.region, request.targetBucket);
+      sourceObject = _database.GetObject(request.region, request.sourceBucket, request.sourceKey);
 
       // Copy physical file
       std::string targetFile = Core::AwsUtils::CreateS3FileName();
@@ -444,17 +444,17 @@ namespace AwsMock::Service {
 
       // Update database
       targetObject = {
-          .region=request.region,
-          .bucket=request.targetBucket,
-          .key=request.targetKey,
-          .owner=sourceObject.owner,
-          .size=sourceObject.size,
-          .md5sum=sourceObject.md5sum,
-          .sha1sum=sourceObject.sha1sum,
-          .sha256sum=sourceObject.sha256sum,
-          .contentType=sourceObject.contentType,
-          .metadata=request.metadata,
-          .internalName=targetFile,
+        .region=request.region,
+        .bucket=request.targetBucket,
+        .key=request.targetKey,
+        .owner=sourceObject.owner,
+        .size=sourceObject.size,
+        .md5sum=sourceObject.md5sum,
+        .sha1sum=sourceObject.sha1sum,
+        .sha256sum=sourceObject.sha256sum,
+        .contentType=sourceObject.contentType,
+        .metadata=request.metadata,
+        .internalName=targetFile,
       };
 
       // Create version ID
@@ -463,7 +463,7 @@ namespace AwsMock::Service {
       }
 
       // Create object
-      targetObject = _database->CreateObject(targetObject);
+      targetObject = _database.CreateObject(targetObject);
       log_debug_stream(_logger) << "Database updated, bucket: " << targetObject.bucket << " key: " << targetObject.key << std::endl;
 
       // Check notification
@@ -482,19 +482,19 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "Delete object request: " << request.ToString() << std::endl;
 
     // Check bucket existence
-    if (!_database->BucketExists({.region=request.region, .name=request.bucket})) {
+    if (!_database.BucketExists({.region=request.region, .name=request.bucket})) {
       throw Core::ServiceException("Bucket does not exist, bucket: " + request.bucket, Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
-    if (_database->ObjectExists({.region=request.region, .bucket=request.bucket, .key=request.key})) {
+    if (_database.ObjectExists({.region=request.region, .bucket=request.bucket, .key=request.key})) {
 
       try {
 
         // Get object from database
-        Database::Entity::S3::Object object = _database->GetObject(request.region, request.bucket, request.key);
+        Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, request.key);
 
         // Delete from database
-        _database->DeleteObject(object);
+        _database.DeleteObject(object);
         log_debug_stream(_logger) << "Database object deleted, bucket: " + request.bucket + " key: " << request.key << std::endl;
 
         // Delete file system object
@@ -516,7 +516,7 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "Delete objects request: " << request.ToString() << std::endl;
 
     // Check existence
-    if (!_database->BucketExists({.region=request.region, .name=request.bucket})) {
+    if (!_database.BucketExists({.region=request.region, .name=request.bucket})) {
       throw Core::ServiceException("Bucket does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
@@ -527,7 +527,7 @@ namespace AwsMock::Service {
       for (const auto &key : request.keys) {
 
         // Delete from database
-        Database::Entity::S3::Object object = _database->GetObject(request.region, request.bucket, key);
+        Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, key);
         log_debug_stream(_logger) << "Database object deleted, count: " << request.keys.size() << std::endl;
 
         DeleteObject(object.bucket, object.key, object.internalName);
@@ -538,7 +538,7 @@ namespace AwsMock::Service {
       }
 
       // Delete from database
-      _database->DeleteObjects(request.bucket, request.keys);
+      _database.DeleteObjects(request.bucket, request.keys);
       log_debug_stream(_logger) << "Database object deleted, count: " << request.keys.size() << std::endl;
 
       log_info_stream(_logger) << "Objects deleted, bucket: " << request.bucket << " count: " << request.keys.size() << std::endl;
@@ -555,12 +555,12 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "Put bucket notification request, id: " << request.notificationId << std::endl;
 
     // Check bucket existence
-    if (!_database->BucketExists({.region=request.region, .name=request.bucket})) {
+    if (!_database.BucketExists({.region=request.region, .name=request.bucket})) {
       throw Core::ServiceException("Bucket does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
     // Check notification existence
-    Database::Entity::S3::Bucket bucket = _database->GetBucketByRegionName(request.region, request.bucket);
+    Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
     if (bucket.HasNotification(request.event)) {
       throw Core::ServiceException("Bucket notification exists already", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
@@ -585,12 +585,12 @@ namespace AwsMock::Service {
     Database::Entity::S3::Bucket bucket = {.region=request.region, .name=request.bucket};
 
     // Check existence
-    if (!_database->BucketExists(bucket)) {
+    if (!_database.BucketExists(bucket)) {
       throw Core::ServiceException("Bucket does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
     // Check empty
-    if (_database->HasObjects(bucket)) {
+    if (_database.HasObjects(bucket)) {
       throw Core::ServiceException("Bucket is not empty", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
@@ -605,7 +605,7 @@ namespace AwsMock::Service {
       DeleteBucket(request.bucket);
 
       // Delete bucket from database
-      _database->DeleteBucket(bucket);
+      _database.DeleteBucket(bucket);
       log_info_stream(_logger) << "Bucket deleted, bucket: " << bucket.name << std::endl;
 
     } catch (Poco::Exception &ex) {
@@ -616,7 +616,7 @@ namespace AwsMock::Service {
 
   void S3Service::CheckNotifications(const std::string &region, const std::string &bucket, const std::string &key, long size, const std::string &event) {
 
-    Database::Entity::S3::Bucket bucketEntity = _database->GetBucketByRegionName(region, bucket);
+    Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(region, bucket);
 
     if (bucketEntity.HasNotification(event)) {
 
@@ -656,14 +656,14 @@ namespace AwsMock::Service {
   Database::Entity::S3::Bucket S3Service::CreateQueueConfiguration(const Database::Entity::S3::Bucket &bucket, const Dto::S3::PutBucketNotificationRequest &request) {
 
     Database::Entity::S3::BucketNotification bucketNotification = {.event=request.event, .notificationId=request.notificationId, .queueArn = request.queueArn};
-    return _database->CreateBucketNotification(bucket, bucketNotification);
+    return _database.CreateBucketNotification(bucket, bucketNotification);
   }
 
   Database::Entity::S3::Bucket S3Service::CreateLambdaConfiguration(const Database::Entity::S3::Bucket &bucket,
                                                                     const Dto::S3::PutBucketNotificationRequest &request) {
 
     Database::Entity::S3::BucketNotification bucketNotification = {.event=request.event, .notificationId=request.notificationId, .lambdaArn=request.lambdaArn};
-    return _database->CreateBucketNotification(bucket, bucketNotification);
+    return _database.CreateBucketNotification(bucket, bucketNotification);
   }
 
   std::string S3Service::GetDirFromKey(const std::string &key) {
@@ -789,14 +789,14 @@ namespace AwsMock::Service {
 
     // Create entity
     Database::Entity::S3::Object object = {
-        .region=request.region,
-        .bucket=request.bucket,
-        .key=request.key,
-        .owner=request.owner,
-        .size=size,
-        .contentType=request.contentType,
-        .metadata=request.metadata,
-        .internalName=fileName
+      .region=request.region,
+      .bucket=request.bucket,
+      .key=request.key,
+      .owner=request.owner,
+      .size=size,
+      .contentType=request.contentType,
+      .metadata=request.metadata,
+      .internalName=fileName
     };
 
     // Meta data
@@ -812,7 +812,7 @@ namespace AwsMock::Service {
     }
 
     // Update database
-    object = _database->CreateOrUpdateObject(object);
+    object = _database.CreateOrUpdateObject(object);
     log_debug_stream(_logger) << "Database updated, bucket: " << object.bucket << " key: " << object.key << std::endl;
 
     // Check notification
@@ -820,14 +820,14 @@ namespace AwsMock::Service {
     log_info_stream(_logger) << "Put object succeeded, bucket: " << request.bucket << " key: " << request.key << std::endl;
 
     return {
-        .bucket=request.bucket,
-        .key=request.key,
-        .etag=object.md5sum,
-        .md5Sum=object.md5sum,
-        .contentLength=size,
-        .checksumSha1=object.sha1sum,
-        .checksumSha256=object.sha256sum,
-        .metadata=request.metadata
+      .bucket=request.bucket,
+      .key=request.key,
+      .etag=object.md5sum,
+      .md5Sum=object.md5sum,
+      .contentLength=size,
+      .checksumSha1=object.sha1sum,
+      .checksumSha256=object.sha256sum,
+      .metadata=request.metadata
     };
   }
 
@@ -844,7 +844,7 @@ namespace AwsMock::Service {
     Database::Entity::S3::Object object;
 
     // Check existence by
-    Database::Entity::S3::Object existingObject = _database->GetObjectMd5(request.region, request.bucket, request.key, request.md5Sum);
+    Database::Entity::S3::Object existingObject = _database.GetObjectMd5(request.region, request.bucket, request.key, request.md5Sum);
     if (existingObject.oid.empty()) {
 
       // Version ID
@@ -852,19 +852,19 @@ namespace AwsMock::Service {
 
       // Create new version of new object
       object = {
-          .region=request.region,
-          .bucket=request.bucket,
-          .key=request.key,
-          .owner=request.owner,
-          .size=size,
-          .contentType=request.contentType,
-          .metadata=request.metadata,
-          .internalName=fileName,
-          .versionId=versionId,
+        .region=request.region,
+        .bucket=request.bucket,
+        .key=request.key,
+        .owner=request.owner,
+        .size=size,
+        .contentType=request.contentType,
+        .metadata=request.metadata,
+        .internalName=fileName,
+        .versionId=versionId,
       };
 
       // Create new version in database
-      object = _database->CreateObject(object);
+      object = _database.CreateObject(object);
       log_debug_stream(_logger) << "Database updated, bucket: " << object.bucket << " key: " << object.key << std::endl;
 
       // Check notification
@@ -890,15 +890,15 @@ namespace AwsMock::Service {
     }
 
     return {
-        .bucket=request.bucket,
-        .key=request.key,
-        .etag=object.md5sum,
-        .md5Sum=object.md5sum,
-        .contentLength=size,
-        .checksumSha1=object.sha1sum,
-        .checksumSha256=object.sha256sum,
-        .metadata=request.metadata,
-        .versionId=object.versionId
+      .bucket=request.bucket,
+      .key=request.key,
+      .etag=object.md5sum,
+      .md5Sum=object.md5sum,
+      .contentLength=size,
+      .checksumSha1=object.sha1sum,
+      .checksumSha256=object.sha256sum,
+      .metadata=request.metadata,
+      .versionId=object.versionId
     };
   }
 } // namespace AwsMock::Service

@@ -8,6 +8,8 @@ namespace AwsMock::Core {
 
   void TestUtils::CreateTestConfigurationFile() {
     CreateTestConfigurationFile(true);
+    Core::Configuration& configuration = Core::Configuration::instance();
+    configuration.SetFilename(TMP_PROPERTIES_FILE);
   }
 
   void TestUtils::CreateTestConfigurationFile(bool withDatabase) {
@@ -84,9 +86,11 @@ namespace AwsMock::Core {
     return TMP_PROPERTIES_FILE;
   }
 
-  Core::Configuration TestUtils::GetTestConfiguration(bool withDatabase){
+  Core::Configuration& TestUtils::GetTestConfiguration(bool withDatabase){
     CreateTestConfigurationFile(withDatabase);
-    return Core::Configuration(GetTestConfigurationFilename());
+    Core::Configuration& configuration = Core::Configuration::instance();
+    configuration.SetFilename(GetTestConfigurationFilename());
+    return configuration;
   }
 
   Core::ExecResult TestUtils::SendCliCommand(const std::string &command) {

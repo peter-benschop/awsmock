@@ -88,7 +88,7 @@ namespace AwsMock::Service {
     /**
      * S3 database
      */
-    std::unique_ptr<Database::LambdaDatabase> _lambdaDatabase;
+    Database::LambdaDatabase& _lambdaDatabase;
 
     /**
      * S3 monitoring period in seconds

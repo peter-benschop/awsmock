@@ -25,7 +25,7 @@
 #include <awsmock/service/DynamoDbMonitoring.h>
 #include <awsmock/service/DynamoDbHandlerFactory.h>
 
-#define DYNAMODB_DEFAULT_PORT 9506
+#define DYNAMODB_DEFAULT_PORT 9507
 #define DYNAMODB_DEFAULT_HOST "localhost"
 #define DYNAMODB_DEFAULT_QUEUE 150
 #define DYNAMODB_DEFAULT_THREADS 50
@@ -126,14 +126,9 @@ namespace AwsMock::Service {
       AwsMock::Core::ThreadPool<DynamoDbMonitoring> _threadPool;
 
       /**
-       * Service database
-       */
-      std::unique_ptr<Database::ModuleDatabase> _moduleDatabase;
-
-      /**
        * DynamoDb database
        */
-      std::unique_ptr<Database::DynamoDbDatabase> _dynamoDbDatabase;
+      Database::DynamoDbDatabase& _dynamoDbDatabase;
 
       /**
        * Docker module

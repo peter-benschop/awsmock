@@ -24,153 +24,160 @@ namespace AwsMock::Database {
 
     public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration configuration properties
-       */
-      explicit DynamoDbDatabase(Core::Configuration &configuration);
+    /**
+     * Constructor
+     */
+    explicit DynamoDbDatabase();
 
-      /**
-       * Check existence of DynamoDb table
-       *
-       * @param region AWS region name
-       * @param tableName table name
-       * @return true if DynamoDb table already exists
-       * @throws DatabaseException
-       */
-      bool TableExists(const std::string &region, const std::string &tableName);
+    /**
+     * Singleton instance
+     */
+    static DynamoDbDatabase &instance() {
+      static Poco::SingletonHolder<DynamoDbDatabase> sh;
+      return *sh.get();
+    }
 
-      /**
-       * Create a new DynamoDb table
-       *
-       * @param table DynamoDb table
-       * @return created DynamoDb table.
-       */
-      Entity::DynamoDb::Table CreateTable(const Entity::DynamoDb::Table &table);
+    /**
+     * Check existence of DynamoDb table
+     *
+     * @param region AWS region name
+     * @param tableName table name
+     * @return true if DynamoDb table already exists
+     * @throws DatabaseException
+     */
+    bool TableExists(const std::string &region, const std::string &tableName);
 
-      /**
-       * Updates a new DynamoDb table
-       *
-       * @param table DynamoDb table
-       * @return updated DynamoDb table.
-       */
-      Entity::DynamoDb::Table UpdateTable(const Entity::DynamoDb::Table &table);
+    /**
+     * Create a new DynamoDb table
+     *
+     * @param table DynamoDb table
+     * @return created DynamoDb table.
+     */
+    Entity::DynamoDb::Table CreateTable(const Entity::DynamoDb::Table &table);
 
-      /**
-       * Create a new DynamoDb table or update an existing one
-       *
-       * @param table DynamoDb table
-       * @return created or updated DynamoDb table.
-       */
-      Entity::DynamoDb::Table CreateOrUpdateTable(const Entity::DynamoDb::Table &table);
+    /**
+     * Updates a new DynamoDb table
+     *
+     * @param table DynamoDb table
+     * @return updated DynamoDb table.
+     */
+    Entity::DynamoDb::Table UpdateTable(const Entity::DynamoDb::Table &table);
 
-      /**
-       * Returns a table entity by primary key
-       *
-       * @param oid table primary key
-       * @return table entity
-       * @throws DatabaseException
-       */
-      Entity::DynamoDb::Table GetTableById(bsoncxx::oid oid);
+    /**
+     * Create a new DynamoDb table or update an existing one
+     *
+     * @param table DynamoDb table
+     * @return created or updated DynamoDb table.
+     */
+    Entity::DynamoDb::Table CreateOrUpdateTable(const Entity::DynamoDb::Table &table);
 
-      /**
-       * Returns a table entity by primary key
-       *
-       * @param oid table primary key
-       * @return table entity
-       * @throws DatabaseException
-       */
-      Entity::DynamoDb::Table GetTableById(const std::string &oid);
+    /**
+     * Returns a table entity by primary key
+     *
+     * @param oid table primary key
+     * @return table entity
+     * @throws DatabaseException
+     */
+    Entity::DynamoDb::Table GetTableById(bsoncxx::oid oid);
 
-      /**
-       * Returns a table entity by primary key
-       *
-       * @param region table region
-       * @param name table name
-       * @return table entity
-       * @throws DatabaseException
-       */
-      Entity::DynamoDb::Table GetTableByRegionName(const std::string &region, const std::string &name);
+    /**
+     * Returns a table entity by primary key
+     *
+     * @param oid table primary key
+     * @return table entity
+     * @throws DatabaseException
+     */
+    Entity::DynamoDb::Table GetTableById(const std::string &oid);
 
-      /**
-       * Returns a list of DynamoDB tables
-       *
-       * @param region AWS region name
-       * @return list of DynamoDB tables
-       */
-      Entity::DynamoDb::TableList ListTables(const std::string &region = {});
+    /**
+     * Returns a table entity by primary key
+     *
+     * @param region table region
+     * @param name table name
+     * @return table entity
+     * @throws DatabaseException
+     */
+    Entity::DynamoDb::Table GetTableByRegionName(const std::string &region, const std::string &name);
 
-      /**
-       * Deletes an existing DynamoDB table
-       *
-       * @param tableName name of the table
-       * @throws DatabaseException
-       */
-      void DeleteTable(const std::string &tableName);
+    /**
+     * Returns a list of DynamoDB tables
+     *
+     * @param region AWS region name
+     * @return list of DynamoDB tables
+     */
+    Entity::DynamoDb::TableList ListTables(const std::string &region = {});
 
-      /**
-       * Deletes all existing DynamoDB tables
-       *
-       * @throws DatabaseException
-       */
-      void DeleteAllTables();
+    /**
+     * Deletes an existing DynamoDB table
+     *
+     * @param region AWS region
+     * @param tableName name of the table
+     * @throws DatabaseException
+     */
+    void DeleteTable(const std::string &region, const std::string &tableName);
 
-      /**
-       * Checks the existence of an item.
-       *
-       * @param region AWS region.
-       * @param tableName name of the table
-       * @param key primary key of the item
-       * @return true if database exists, otherwise false
-       */
-      bool ItemExists(const std::string &region, const std::string &tableName, const std::string & key);
+    /**
+     * Deletes all existing DynamoDB tables
+     *
+     * @throws DatabaseException
+     */
+    void DeleteAllTables();
 
-      /**
-       * Returns a list of DynamoDB items
-       *
-       * @param region AWS region.
-       * @param tableName table name
-       * @return list of DynamoDB tables
-       */
-      Entity::DynamoDb::ItemList ListItems(const std::string &region = {}, const std::string &tableName = {});
+    /**
+     * Checks the existence of an item.
+     *
+     * @param region AWS region.
+     * @param tableName name of the table
+     * @param key primary key of the item
+     * @return true if database exists, otherwise false
+     */
+    bool ItemExists(const std::string &region, const std::string &tableName, const std::string &key);
 
-      /**
-       * Deletes an item
-       *
-       * @param region AWS region.
-       * @param tableName name of the table
-       * @param key primary key of the item
-       * @return true if database exists, otherwise false
-       */
-      void DeleteItem(const std::string &region, const std::string &tableName, const std::string &key);
+    /**
+     * Returns a list of DynamoDB items
+     *
+     * @param region AWS region.
+     * @param tableName table name
+     * @return list of DynamoDB tables
+     */
+    Entity::DynamoDb::ItemList ListItems(const std::string &region = {}, const std::string &tableName = {});
 
-      /**
-       * Deletes all items
-       */
-      void DeleteAllItems();
+    /**
+     * Deletes an item
+     *
+     * @param region AWS region.
+     * @param tableName name of the table
+     * @param key primary key of the item
+     * @return true if database exists, otherwise false
+     */
+    void DeleteItem(const std::string &region, const std::string &tableName, const std::string &key);
+
+    /**
+     * Deletes all items
+     */
+    void DeleteAllItems();
 
     private:
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
 
-      /**
-       * DynamoDb table collection
-       */
-      mongocxx::collection _tableCollection{};
+    /**
+     * Use MongoDB
+     */
+    bool _useDatabase;
 
-      /**
-       * DynamoDb item collection
-       */
-      mongocxx::collection _itemCollection{};
+    /**
+     * Database name
+     */
+    std::string _databaseName;
 
-      /**
-       * DynamoDB in-memory database
-       */
-      DynamoDbMemoryDb &_memoryDb;
+    /**
+     * DynamoDB in-memory database
+     */
+    DynamoDbMemoryDb &_memoryDb;
 
   };
 

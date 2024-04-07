@@ -30,7 +30,14 @@ namespace AwsMock::Service {
           }
 
           Dto::DynamoDb::CreateTableResponse tableResponse = _dynamoDbService.CreateTable(tableRequest);
-          SendOkResponse(response, tableResponse.body);
+
+          if(tableResponse.status == Poco::Net::HTTPResponse::HTTPStatus::HTTP_OK) {
+            SendOkResponse(response, tableResponse.body, tableResponse.headers);
+          } else {
+            SendErrorResponse(response, tableResponse.body, tableResponse.headers, tableResponse.status);
+          }
+          log_info_stream(_logger) << "Table created, name: " << tableRequest.tableName << std::endl;
+
           break;
         }
 
@@ -46,7 +53,13 @@ namespace AwsMock::Service {
           }
 
           Dto::DynamoDb::ListTableResponse tableResponse = _dynamoDbService.ListTables(tableRequest);
-          SendOkResponse(response, tableResponse.body, tableResponse.headers);
+          if(tableResponse.status == Poco::Net::HTTPResponse::HTTPStatus::HTTP_OK) {
+            SendOkResponse(response, tableResponse.body, tableResponse.headers);
+          } else {
+            SendErrorResponse(response, tableResponse.body, tableResponse.headers, tableResponse.status);
+          }
+          log_info_stream(_logger) << "Table listed, region: " << tableRequest.region << std::endl;
+
           break;
         }
 
@@ -62,7 +75,12 @@ namespace AwsMock::Service {
           }
 
           Dto::DynamoDb::DescribeTableResponse tableResponse = _dynamoDbService.DescribeTable(tableRequest);
-          SendOkResponse(response, tableResponse.body, tableResponse.headers);
+          if(tableResponse.status == Poco::Net::HTTPResponse::HTTPStatus::HTTP_OK) {
+            SendOkResponse(response, tableResponse.body, tableResponse.headers);
+          } else {
+            SendErrorResponse(response, tableResponse.body, tableResponse.headers, tableResponse.status);
+          }
+
           break;
         }
 
@@ -70,6 +88,7 @@ namespace AwsMock::Service {
 
           Dto::DynamoDb::DeleteTableRequest tableRequest;
           tableRequest.FromJson(payload);
+          tableRequest.region = clientCommand.region;
 
           // Copy headers
           for (const auto &header : request) {
@@ -77,7 +96,96 @@ namespace AwsMock::Service {
           }
 
           Dto::DynamoDb::DeleteTableResponse tableResponse = _dynamoDbService.DeleteTable(tableRequest);
-          SendOkResponse(response, tableResponse.body, tableResponse.headers);
+          if(tableResponse.status == Poco::Net::HTTPResponse::HTTPStatus::HTTP_OK) {
+            SendOkResponse(response, tableResponse.body, tableResponse.headers);
+          } else {
+            SendErrorResponse(response, tableResponse.body, tableResponse.headers, tableResponse.status);
+          }
+
+          break;
+        }
+
+        case Dto::Common::DynamoDbCommandType::GET_ITEM: {
+
+          Dto::DynamoDb::GetItemRequest itemRequest;
+          itemRequest.FromJson(payload);
+          itemRequest.region = clientCommand.region;
+
+          // Copy headers
+          for (const auto &header : request) {
+            itemRequest.headers[header.first] = header.second;
+          }
+
+          Dto::DynamoDb::GetItemResponse itemResponse = _dynamoDbService.GetItem(itemRequest);
+          if(itemResponse.status == Poco::Net::HTTPResponse::HTTPStatus::HTTP_OK) {
+            SendOkResponse(response, itemResponse.body, itemResponse.headers);
+          } else {
+            SendErrorResponse(response, itemResponse.body, itemResponse.headers, itemResponse.status);
+          }
+
+          break;
+        }
+
+        case Dto::Common::DynamoDbCommandType::PUT_ITEM: {
+
+          Dto::DynamoDb::PutItemRequest itemRequest;
+          itemRequest.FromJson(payload);
+          itemRequest.region = clientCommand.region;
+
+          // Copy headers
+          for (const auto &header : request) {
+            itemRequest.headers[header.first] = header.second;
+          }
+
+          Dto::DynamoDb::PutItemResponse itemResponse = _dynamoDbService.PutItem(itemRequest);
+          if(itemResponse.status == Poco::Net::HTTPResponse::HTTPStatus::HTTP_OK) {
+            SendOkResponse(response, itemResponse.body, itemResponse.headers);
+          } else {
+            SendErrorResponse(response, itemResponse.body, itemResponse.headers, itemResponse.status);
+          }
+
+          break;
+        }
+
+        case Dto::Common::DynamoDbCommandType::QUERY: {
+
+          Dto::DynamoDb::QueryRequest queryRequest;
+          queryRequest.FromJson(payload);
+          queryRequest.region = clientCommand.region;
+
+          // Copy headers
+          for (const auto &header : request) {
+            queryRequest.headers[header.first] = header.second;
+          }
+
+          Dto::DynamoDb::QueryResponse queryResponse = _dynamoDbService.Query(queryRequest);
+          if(queryResponse.status == Poco::Net::HTTPResponse::HTTPStatus::HTTP_OK) {
+            SendOkResponse(response, queryResponse.body, queryResponse.headers);
+          } else {
+            SendErrorResponse(response, queryResponse.body, queryResponse.headers, queryResponse.status);
+          }
+
+          break;
+        }
+
+        case Dto::Common::DynamoDbCommandType::SCAN: {
+
+          Dto::DynamoDb::ScanRequest scanRequest;
+          scanRequest.FromJson(payload);
+          scanRequest.region = clientCommand.region;
+
+          // Copy headers
+          for (const auto &header : request) {
+            scanRequest.headers[header.first] = header.second;
+          }
+
+          Dto::DynamoDb::ScanResponse scanResponse = _dynamoDbService.Scan(scanRequest);
+          if(scanResponse.status == Poco::Net::HTTPResponse::HTTPStatus::HTTP_OK) {
+            SendOkResponse(response, scanResponse.body, scanResponse.headers);
+          } else {
+            SendErrorResponse(response, scanResponse.body, scanResponse.headers, scanResponse.status);
+          }
+
           break;
         }
 
@@ -86,65 +194,14 @@ namespace AwsMock::Service {
           throw Core::ServiceException("Bad request, method: POST clientCommand: " + Dto::Common::DynamoDbCommandTypeToString(clientCommand.command));
         }
 
-        default:log_error_stream(_logger) << "Bad request, method: POST clientCommand: " << Dto::Common::DynamoDbCommandTypeToString(clientCommand.command) << std::endl;
+        default: {
+          log_error_stream(_logger) << "Bad request, method: POST clientCommand: " << Dto::Common::DynamoDbCommandTypeToString(clientCommand.command) << std::endl;
           SendOkResponse(response);
+        }
       }
-/*
-      if (action == "GetItem") {
-
-        Dto::DynamoDb::GetItemRequest itemRequest;
-        itemRequest.FromJson(payload);
-
-        // Copy headers
-        for (const auto &header : request) {
-          itemRequest.headers[header.first] = header.second;
-        }
-
-        Dto::DynamoDb::GetItemResponse itemResponse = _dynamoDbService.GetItem(itemRequest);
-        SendOkResponse(response, itemResponse.body);
-
-      } else if (action == "PutItem") {
-
-        Dto::DynamoDb::PutItemRequest itemRequest;
-        itemRequest.FromJson(payload);
-
-        // Copy headers
-        for (const auto &header : request) {
-          itemRequest.headers[header.first] = header.second;
-        }
-
-        Dto::DynamoDb::PutItemResponse itemResponse = _dynamoDbService.PutItem(itemRequest);
-        SendOkResponse(response, itemResponse.body);
-
-      } else if (action == "Query") {
-
-        Dto::DynamoDb::QueryRequest queryRequest;
-        queryRequest.FromJson(payload);
-
-        // Copy headers
-        for (const auto &header : request) {
-          queryRequest.headers[header.first] = header.second;
-        }
-
-        Dto::DynamoDb::QueryResponse queryResponse = _dynamoDbService.Query(queryRequest);
-        SendOkResponse(response, queryResponse.body);
-
-      } else if (action == "DeleteTable") {
-
-        Dto::DynamoDb::DeleteTableRequest tableRequest;
-        tableRequest.FromJson(payload);
-
-        // Copy headers
-        for (const auto &header : request) {
-          tableRequest.headers[header.first] = header.second;
-        }
-
-        Dto::DynamoDb::DeleteTableResponse tableResponse = _dynamoDbService.DeleteTable(tableRequest);
-        SendOkResponse(response, tableResponse.body);
-      }*/
 
     } catch (Poco::Exception &exc) {
-      SendXmlErrorResponse("DynamoDb", response, exc);
+      SendJsonErrorResponse("DynamoDb", response, exc);
     }
   }
 

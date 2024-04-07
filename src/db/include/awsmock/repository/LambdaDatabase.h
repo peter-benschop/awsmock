@@ -31,7 +31,15 @@ namespace AwsMock::Database {
      *
      * @param configuration configuration properties
      */
-    explicit LambdaDatabase(Core::Configuration &configuration);
+    explicit LambdaDatabase();
+
+    /**
+     * Singleton instance
+     */
+    static LambdaDatabase &instance() {
+      static Poco::SingletonHolder<LambdaDatabase> sh;
+      return *sh.get();
+    }
 
     /**
      * Check existence of lambda
@@ -161,9 +169,14 @@ namespace AwsMock::Database {
     Core::LogStream _logger;
 
     /**
-     * Lambda collection
+     * Use MongoDB
      */
-    mongocxx::collection _lambdaCollection{};
+    bool _useDatabase;
+
+    /**
+     * Database name
+     */
+    std::string _databaseName;
 
     /**
      * Lambda in-memory database

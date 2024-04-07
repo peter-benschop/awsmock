@@ -38,9 +38,9 @@ namespace AwsMock::Service {
     }
 
     Poco::NotificationQueue createQueue, invokeQueue;
-    Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+    Core::Configuration& _configuration = Core::Configuration::instance();
     Core::MetricService _metricService = Core::MetricService(_configuration);
-    Database::LambdaDatabase _database = Database::LambdaDatabase(_configuration);
+    Database::LambdaDatabase& _database = Database::LambdaDatabase::instance();
     LambdaService _service = LambdaService(_configuration, _metricService, createQueue, invokeQueue);
     std::string testFile;
   };

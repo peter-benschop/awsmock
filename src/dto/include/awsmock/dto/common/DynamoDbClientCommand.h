@@ -27,6 +27,10 @@ namespace AwsMock::Dto::Common {
     LIST_TABLES,
     DESCRIBE_TABLE,
     DELETE_TABLE,
+    GET_ITEM,
+    PUT_ITEM,
+    QUERY,
+    SCAN,
     UNKNOWN
   };
 
@@ -35,6 +39,10 @@ namespace AwsMock::Dto::Common {
     {DynamoDbCommandType::LIST_TABLES, "ListTables"},
     {DynamoDbCommandType::DESCRIBE_TABLE, "DescribeTable"},
     {DynamoDbCommandType::DELETE_TABLE, "DeleteTable"},
+    {DynamoDbCommandType::GET_ITEM, "GetItem"},
+    {DynamoDbCommandType::PUT_ITEM, "PutItem"},
+    {DynamoDbCommandType::QUERY, "Query"},
+    {DynamoDbCommandType::SCAN, "Scan"},
     {DynamoDbCommandType::UNKNOWN, "Unknown"},
   };
 
@@ -77,41 +85,6 @@ namespace AwsMock::Dto::Common {
      * Client command
      */
     DynamoDbCommandType command;
-
-    /**
-     * Bucket
-     */
-    std::string bucket;
-
-    /**
-     * Key
-     */
-    std::string key;
-
-    /**
-     * Versioning
-     */
-    bool versionRequest;
-
-    /**
-     * Notification
-     */
-    bool notificationRequest;
-
-    /**
-     * Multipart upload/download
-     */
-    bool multipartRequest;
-
-    /**
-     * Multipart upload/download
-     */
-    bool copyRequest;
-
-    /**
-     * Multipart upload ID
-     */
-    std::string uploadId;
 
     /**
      * Gets command type from the user agent

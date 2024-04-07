@@ -43,8 +43,8 @@ namespace AwsMock::Database {
     }
 
     std::string _region;
-    Core::Configuration _configuration = Core::TestUtils::GetTestConfiguration(false);
-    TransferDatabase _transferDatabase = TransferDatabase(_configuration);
+    Core::Configuration& _configuration = Core::TestUtils::GetTestConfiguration(false);
+    TransferDatabase& _transferDatabase = TransferDatabase::instance();
   };
 
   TEST_F(TransferMemoryDbTest, TransferCreateTest) {

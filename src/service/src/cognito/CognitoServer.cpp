@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
 
   CognitoServer::CognitoServer(Core::Configuration &configuration, Core::MetricService &metricService)
-      : AbstractWorker(configuration), AbstractServer(configuration, "cognito"), _logger(Poco::Logger::get("CognitoServer")), _configuration(configuration), _metricService(metricService), _module("cognito"), _running(false) {
+      : AbstractWorker(configuration), AbstractServer(configuration, "cognito"), _logger(Poco::Logger::get("CognitoServer")), _configuration(configuration), _metricService(metricService), _module("cognito"), _running(false),_moduleDatabase(Database::ModuleDatabase::instance()),_cognitoDatabase(Database::CognitoDatabase::instance()) {
 
     // Get HTTP configuration values
     _port = _configuration.getInt("awsmock.service.cognito.port", COGNITO_DEFAULT_PORT);
@@ -25,10 +25,6 @@ namespace AwsMock::Service {
     _accountId = _configuration.getString("awsmock.account.id", "000000000000");
     _clientId = _configuration.getString("awsmock.client.id", "00000000");
     _user = _configuration.getString("awsmock.user", "none");
-
-    // Database connections
-    _moduleDatabase = std::make_unique<Database::ModuleDatabase>(_configuration);
-    _cognitoDatabase = std::make_unique<Database::CognitoDatabase>(_configuration);
     log_debug_stream(_logger) << "Cognito module initialized, endpoint: " << _host << ":" << _port << std::endl;
   }
 

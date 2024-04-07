@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
 
   LambdaServer::LambdaServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue, Poco::NotificationQueue &invokeQueue)
-      : AbstractWorker(configuration), AbstractServer(configuration, "lambda"), _logger(Poco::Logger::get("LambdaServer")), _configuration(configuration), _metricService(metricService),
+      : AbstractWorker(configuration), AbstractServer(configuration, "lambda"), _logger(Poco::Logger::get("LambdaServer")), _configuration(configuration), _metricService(metricService), _lambdaDatabase(Database::LambdaDatabase::instance()),
         _createQueue(createQueue), _invokeQueue(invokeQueue), _module("lambda") {
 
     // Get HTTP configuration values
@@ -27,7 +27,6 @@ namespace AwsMock::Service {
 
     // Create environment
     _region = _configuration.getString("awsmock.region");
-    _lambdaDatabase = std::make_unique<Database::LambdaDatabase>(_configuration);
 
     // lambda module connection
     _lambdaServiceHost = _configuration.getString("awsmock.service.lambda.host", "localhost");
@@ -106,7 +105,7 @@ namespace AwsMock::Service {
   void LambdaServer::StartLambdaFunctions() {
 
     log_debug_stream(_logger) << "Starting lambdas" << std::endl;
-    std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase->ListLambdas(_region);
+    std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region);
 
     for (auto &lambda : lambdas) {
 

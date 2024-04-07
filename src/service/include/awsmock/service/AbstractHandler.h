@@ -336,6 +336,16 @@ namespace AwsMock::Service {
     void SendDeleteResponse(Poco::Net::HTTPServerResponse &response, const HeaderMap &extraHeader = {});
 
     /**
+     * Send generic error response.
+     *
+     * @param response HTTP response
+     * @param body HTTP body
+     * @param headers HTTP headers
+     * @param status HTTP status
+     */
+    void SendErrorResponse(Poco::Net::HTTPServerResponse &response, const std::string& body, std::map<std::string, std::string> headers, const Poco::Net::HTTPResponse::HTTPStatus& status);
+
+    /**
      * Send an error response (HTTP state code 200).
      *
      * @param service module name

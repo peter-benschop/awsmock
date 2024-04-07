@@ -29,6 +29,14 @@ namespace AwsMock::Dto::Common {
           command = DynamoDbCommandType::DESCRIBE_TABLE;
         } else if (Core::StringUtils::ContainsIgnoreCase(action, "DeleteTable")) {
           command = DynamoDbCommandType::DELETE_TABLE;
+        } else if (Core::StringUtils::ContainsIgnoreCase(action, "PutItem")) {
+          command = DynamoDbCommandType::PUT_ITEM;
+        } else if (Core::StringUtils::ContainsIgnoreCase(action, "GetItem")) {
+          command = DynamoDbCommandType::GET_ITEM;
+        } else if (Core::StringUtils::ContainsIgnoreCase(action, "Query")) {
+          command = DynamoDbCommandType::QUERY;
+        } else if (Core::StringUtils::ContainsIgnoreCase(action, "Scan")) {
+          command = DynamoDbCommandType::SCAN;
         }
         break;
       case HttpMethod::UNKNOWN: {
@@ -84,8 +92,7 @@ namespace AwsMock::Dto::Common {
   }
 
   std::ostream &operator<<(std::ostream &os, const DynamoDbClientCommand &r) {
-    os << "DynamoDbClientCommand={method='" << HttpMethodToString(r.method) << ", region='" << r.region << "', user='" << r.user << "', command='" << DynamoDbCommandTypeToString(r.command) << "' versioning=" << Core::StringUtils::ToString(r.versionRequest)
-       << " multipartRequest=" << Core::StringUtils::ToString(r.multipartRequest) << " notificationRequest=" << Core::StringUtils::ToString(r.notificationRequest) << " copyRequest=" << Core::StringUtils::ToString(r.copyRequest) << "}";
+    os << "DynamoDbClientCommand={method='" << HttpMethodToString(r.method) << ", region='" << r.region << "', user='" << r.user << "', command='" << DynamoDbCommandTypeToString(r.command) << "}";
     return os;
   }
 }

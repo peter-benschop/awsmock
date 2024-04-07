@@ -129,7 +129,7 @@ namespace AwsMock::Service {
     /**
      * Database connection
      */
-    std::shared_ptr<Database::LambdaDatabase> _lambdaDatabase;
+    Database::LambdaDatabase& _lambdaDatabase;
 
     /**
      * Data directory
