@@ -1,5 +1,5 @@
 
-#include "awsmock/service/AbstractHandler.h"
+#include "awsmock/service/common/AbstractHandler.h"
 
 namespace AwsMock::Service {
 

@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/repository/ModuleDatabase.h>
-#include <awsmock/service/ModuleService.h>
+#include "awsmock/service/common/ModuleService.h"
 
 // Test includes
 #include <awsmock/core/TestUtils.h>

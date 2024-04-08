@@ -2,7 +2,7 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#include "awsmock/service/S3Server.h"
+#include "awsmock/service/s3/S3Server.h"
 
 namespace AwsMock::Service {
 
@@ -43,7 +43,7 @@ namespace AwsMock::Service {
 
     while (IsRunning()) {
 
-      log_debug_stream(_logger) << "S3 processing started" << std::endl;
+      log_trace_stream(_logger) << "S3 processing started" << std::endl;
 
       // Wait for timeout or condition
       if (InterruptableSleep(_period)) {

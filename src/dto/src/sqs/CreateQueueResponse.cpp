@@ -3,8 +3,6 @@
 //
 
 #include <awsmock/dto/sqs/CreateQueueResponse.h>
-#include <Poco/JSON/Parser.h>
-#include "awsmock/core/JsonUtils.h"
 
 namespace AwsMock::Dto::SQS {
 

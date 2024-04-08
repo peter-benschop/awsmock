@@ -1,5 +1,5 @@
 
-#include "awsmock/service/SQSHandler.h"
+#include "awsmock/service/sqs/SQSHandler.h"
 
 namespace AwsMock::Service {
 

@@ -129,6 +129,17 @@ namespace AwsMock::Core {
     static std::string CreateTransferArn(const std::string &region, const std::string &accountId, const std::string &serverId);
 
     /**
+     * Create transfer manager ARN
+     *
+     * <p>Syntax arn:aws:secretsmanager:us-west-2:123456789012:secret:MyDatabaseSecretName-a1b2c3</p>
+     *
+     * @param region AWS region
+     * @param accountId AWS account ID
+     * @param secretId ID of the secret (name + 6 hex digits)
+     */
+    static std::string CreateSecretArn(const std::string &region, const std::string &accountId, const std::string &secretId);
+
+    /**
      * Returns a request ID.
      *
      * @return request ID

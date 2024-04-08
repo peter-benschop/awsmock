@@ -12,7 +12,7 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/repository/LambdaDatabase.h>
-#include <awsmock/service/LambdaService.h>
+#include "awsmock/service/lambda/LambdaService.h"
 
 // Test includes
 #include <awsmock/core/TestUtils.h>

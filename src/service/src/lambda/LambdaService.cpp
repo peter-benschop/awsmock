@@ -2,7 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include <awsmock/service/LambdaService.h>
+#include "awsmock/service/lambda/LambdaService.h"
 
 namespace AwsMock::Service {
 

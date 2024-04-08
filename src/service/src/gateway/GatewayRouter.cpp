@@ -2,7 +2,7 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#include <awsmock/service/GatewayRouter.h>
+#include "awsmock/service/gateway/GatewayRouter.h"
 
 namespace AwsMock::Service {
 
@@ -10,18 +10,25 @@ namespace AwsMock::Service {
 
     // Get the ports
     int s3Port = _configuration.getInt("awsmock.service.s3.port", 9500);
-    int dynamodbPort = _configuration.getInt("awsmock.service.dynamodb.port", 9500);
+    int sqsPort = _configuration.getInt("awsmock.service.sqs.port", 9501);
+    int snsPort = _configuration.getInt("awsmock.service.sns.port", 9502);
+    int lambdaPort = _configuration.getInt("awsmock.service.lambda.port", 9503);
+    int transferPort = _configuration.getInt("awsmock.service.transfer.port", 9504);
+    int cognitoPort = _configuration.getInt("awsmock.service.transfer.port", 9506);
+    int dynamodbPort = _configuration.getInt("awsmock.service.dynamodb.port", 9506);
+    int secretsManagerPort = _configuration.getInt("awsmock.service.secretsmanager.port", 9507);
 
     // Add routes
     _routingTable["s3"] = {.name="s3", .host="localhost", .port=s3Port};
-    _routingTable["s3api"] = {.name="s3", .host="localhost", .port=9500};
-    _routingTable["sqs"] = {.name="sqs", .host="localhost", .port=9501};
-    _routingTable["sns"] = {.name="sns", .host="localhost", .port=9502};
-    _routingTable["lambda"] = {.name="lambda", .host="localhost", .port=9503};
-    _routingTable["transfer"] = {.name="transfer", .host="localhost", .port=9504};
-    _routingTable["cognito-idp"] = {.name="cognito", .host="localhost", .port=9505};
-    _routingTable["cognito-identity"] = {.name="cognito", .host="localhost", .port=9505};
+    _routingTable["s3api"] = {.name="s3", .host="localhost", .port=s3Port};
+    _routingTable["sqs"] = {.name="sqs", .host="localhost", .port=sqsPort};
+    _routingTable["sns"] = {.name="sns", .host="localhost", .port=snsPort};
+    _routingTable["lambda"] = {.name="lambda", .host="localhost", .port=lambdaPort};
+    _routingTable["transfer"] = {.name="transfer", .host="localhost", .port=transferPort};
+    _routingTable["cognito-idp"] = {.name="cognito", .host="localhost", .port=cognitoPort};
+    _routingTable["cognito-identity"] = {.name="cognito", .host="localhost", .port=cognitoPort};
     _routingTable["dynamodb"] = {.name="dynamodb", .host="localhost", .port=dynamodbPort};
+    _routingTable["secretsmanager"] = {.name="secretsmanager", .host="localhost", .port=secretsManagerPort};
     log_debug_stream(_logger) << "Gateway router initialized" << std::endl;
   }
 

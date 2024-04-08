@@ -64,4 +64,5 @@ install(FILES docs/man/awsmocklambda.1 DESTINATION /usr/share/man/man1 PERMISSIO
 install(FILES docs/man/awsmocktransfer.1 DESTINATION /usr/share/man/man1 PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
 install(FILES docs/man/awsmockcognito.1 DESTINATION /usr/share/man/man1 PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
 install(FILES docs/man/awsmockdynamodb.1 DESTINATION /usr/share/man/man1 PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
+install(FILES docs/man/awsmocksecretsmanager.1 DESTINATION /usr/share/man/man1 PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
 #install(DIRECTORY docs/man DESTINATION /usr/share/man/man1 FILES_MATCHING PATTERN "*.1")

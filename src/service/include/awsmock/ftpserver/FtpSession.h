@@ -27,7 +27,7 @@
 #include <awsmock/ftpserver/Filesystem.h>
 #include <awsmock/ftpserver/UserDatabase.h>
 #include <awsmock/ftpserver/FtpUser.h>
-#include <awsmock/service/AbstractWorker.h>
+#include "awsmock/service/common/AbstractWorker.h"
 
 #define DEFAULT_BASE_DIR "/tmp/awsmock/data/transfer"
 

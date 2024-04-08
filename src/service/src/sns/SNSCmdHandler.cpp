@@ -1,5 +1,5 @@
 
-#include <awsmock/service/SNSCmdHandler.h>
+#include "awsmock/service/sns/SNSCmdHandler.h"
 
 namespace AwsMock::Service {
 

@@ -2,7 +2,7 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include <awsmock/service/SQSMonitoring.h>
+#include "awsmock/service/sqs/SQSMonitoring.h"
 
 namespace AwsMock::Service {
 
@@ -11,9 +11,6 @@ namespace AwsMock::Service {
 
     // Update period
     _period = _configuration.getInt("awsmock.monitoring.sqs.period", SQS_MONITORING_DEFAULT_PERIOD);
-
-    // Database connections
-    //_sqsDatabase = std::make_unique<Database::SQSDatabase>(_configuration);
     log_debug_stream(_logger) << "SQS monitoring initialized" << std::endl;
   }
 
@@ -28,7 +25,7 @@ namespace AwsMock::Service {
     _running = true;
     while (_running) {
 
-      _logger.debug() << "SQS monitoring processing started" << std::endl;
+      log_trace_stream(_logger) << "SQS monitoring processing started" << std::endl;
 
       // Update counter
       UpdateCounters();
@@ -56,6 +53,6 @@ namespace AwsMock::Service {
       long messagesPerQueue = _sqsDatabase.CountMessages(queue.region, queue.queueUrl);
       _metricService.SetGauge("sqs_message_count", "queue", labelValue, messagesPerQueue);
     }
-    log_debug_stream(_logger) << "SQS update counter finished" << std::endl;
+    log_trace_stream(_logger) << "SQS update counter finished" << std::endl;
   }
 } // namespace AwsMock::Worker

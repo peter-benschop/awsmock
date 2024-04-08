@@ -2,7 +2,7 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include <awsmock/service/GatewayServer.h>
+#include "awsmock/service/gateway/GatewayServer.h"
 
 namespace AwsMock::Service {
 
@@ -47,7 +47,7 @@ namespace AwsMock::Service {
     _running = true;
     while (_running) {
 
-      log_debug_stream(_logger) << "Gateway processing started" << std::endl;
+      log_trace_stream(_logger) << "Gateway processing started" << std::endl;
 
       // Wait for timeout or condition
       if (InterruptableSleep(_period)) {

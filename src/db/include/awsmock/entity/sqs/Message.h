@@ -26,6 +26,7 @@
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/NumberUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/entity/sqs/MessageAttribute.h>
 #include <awsmock/entity/sqs/MessageStatus.h>
 

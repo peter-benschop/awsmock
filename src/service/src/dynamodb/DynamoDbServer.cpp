@@ -2,7 +2,7 @@
 // Created by vogje01 on 20/12/2023.
 //
 
-#include <awsmock/service/DynamoDbServer.h>
+#include "awsmock/service/dynamodb/DynamoDbServer.h"
 
 namespace AwsMock::Service {
 
@@ -54,7 +54,7 @@ namespace AwsMock::Service {
 
     while (IsRunning()) {
 
-      log_debug_stream(_logger) << "DynamoDb processing started" << std::endl;
+      log_trace_stream(_logger) << "DynamoDb processing started" << std::endl;
 
       // Wait for timeout or condition
       if (InterruptableSleep(_period)) {

@@ -47,6 +47,8 @@ namespace AwsMock::Core {
     DefineIntProperty("awsmock.service.s3.timeout", "AWSMOCK_SERVICE_S3_TIMEOUT", 900);
     DefineStringProperty("awsmock.service.s3.data.dir", "AWSMOCK_SERVICE_S3_DATA_DIR", "tmp/awsmock/data/s3");
     DefineIntProperty("awsmock.service.s3.period", "AWSMOCK_SERVICE_S3_PERIOD", 60000);
+    DefineIntProperty("awsmock.worker.sqs.timeout", "AWSMOCK_WORKER_S3_PERIOD", 120);
+    DefineIntProperty("awsmock.monitoring.sqs.period", "AWSMOCK_MONITORING_S3_PERIOD", 60000);
 
     // SQS
     DefineBoolProperty("awsmock.service.sqs.active", "AWSMOCK_SERVICE_SQS_ACTIVE", true);
@@ -56,6 +58,8 @@ namespace AwsMock::Core {
     DefineIntProperty("awsmock.service.sqs.max.threads", "AWSMOCK_SERVICE_SQS_MAX_THREADS", 50);
     DefineIntProperty("awsmock.service.sqs.timeout", "AWSMOCK_SERVICE_SQS_TIMEOUT", 900);
     DefineIntProperty("awsmock.service.sqs.period", "AWSMOCK_SERVICE_SQS_PERIOD", 60000);
+    DefineIntProperty("awsmock.worker.sqs.timeout", "AWSMOCK_WORKER_SQS_PERIOD", 120);
+    DefineIntProperty("awsmock.monitoring.sqs.period", "AWSMOCK_MONITORING_SQS_PERIOD", 60000);
 
     // SNS
     DefineBoolProperty("awsmock.service.sns.active", "AWSMOCK_SERVICE_SNS_ACTIVE", true);
@@ -65,6 +69,8 @@ namespace AwsMock::Core {
     DefineIntProperty("awsmock.service.sns.max.threads", "AWSMOCK_SERVICE_SNS_MAX_THREADS", 50);
     DefineIntProperty("awsmock.service.sns.timeout", "AWSMOCK_SERVICE_SNS_TIMEOUT", 900);
     DefineIntProperty("awsmock.service.sns.period", "AWSMOCK_SERVICE_SNS_PERIOD", 60000);
+    DefineIntProperty("awsmock.worker.sns.timeout", "AWSMOCK_WORKER_SNS_PERIOD", 120);
+    DefineIntProperty("awsmock.monitoring.sns.period", "AWSMOCK_MONITORING_SNS_PERIOD", 60000);
 
     // Lambda
     DefineBoolProperty("awsmock.service.lambda.active", "AWSMOCK_SERVICE_LAMBDA_ACTIVE", true);
@@ -74,6 +80,8 @@ namespace AwsMock::Core {
     DefineIntProperty("awsmock.service.lambda.max.threads", "AWSMOCK_SERVICE_LAMBDA_MAX_THREADS", 50);
     DefineIntProperty("awsmock.service.lambda.timeout", "AWSMOCK_SERVICE_LAMBDA_TIMEOUT", 900);
     DefineIntProperty("awsmock.service.lambda.period", "AWSMOCK_SERVICE_LAMBDA_PERIOD", 60000);
+    DefineIntProperty("awsmock.worker.lambda.timeout", "AWSMOCK_WORKER_LAMBDA_PERIOD", 120);
+    DefineIntProperty("awsmock.monitoring.lambda.period", "AWSMOCK_MONITORING_LAMBDA_PERIOD", 60000);
 
     // Transfer server
     DefineBoolProperty("awsmock.service.transfer.active", "AWSMOCK_SERVICE_TRANSFER_ACTIVE", true);
@@ -86,6 +94,8 @@ namespace AwsMock::Core {
     DefineStringProperty("awsmock.service.transfer.bucket", "AWSMOCK_SERVICE_TRANSFER_BUCKET", "transfer-server");
     DefineStringProperty("awsmock.service.transfer.base.dir", "AWSMOCK_SERVICE_TRANSFER_BASE_DIR", "/tmp/awsmock/data/transfer");
     DefineIntProperty("awsmock.service.transfer.period", "AWSMOCK_SERVICE_TRANSFER_PERIOD", 60000);
+    DefineIntProperty("awsmock.worker.transfer.timeout", "AWSMOCK_WORKER_TRANSFER_PERIOD", 120);
+    DefineIntProperty("awsmock.monitoring.transfer.period", "AWSMOCK_MONITORING_TRANSFER_PERIOD", 60000);
 
     // Cognito
     DefineBoolProperty("awsmock.service.cognito.active", "AWSMOCK_SERVICE_COGNITO_ACTIVE", true);
@@ -95,6 +105,8 @@ namespace AwsMock::Core {
     DefineIntProperty("awsmock.service.cognito.max.threads", "AWSMOCK_SERVICE_COGNITO_MAX_THREADS", 50);
     DefineIntProperty("awsmock.service.cognito.timeout", "AWSMOCK_SERVICE_COGNITO_TIMEOUT", 120);
     DefineIntProperty("awsmock.service.cognito.period", "AWSMOCK_SERVICE_COGNITO_PERIOD", 10000);
+    DefineIntProperty("awsmock.worker.cognito.timeout", "AWSMOCK_WORKER_COGNITO_PERIOD", 120);
+    DefineIntProperty("awsmock.monitoring.cognito.period", "AWSMOCK_MONITORING_COGNITO_PERIOD", 60000);
 
     // DynamoDB
     DefineBoolProperty("awsmock.service.dynamodb.active", "AWSMOCK_SERVICE_DYNAMODB_ACTIVE", true);
@@ -104,6 +116,19 @@ namespace AwsMock::Core {
     DefineIntProperty("awsmock.service.dynamodb.max.threads", "AWSMOCK_SERVICE_DYNAMODB_MAX_THREADS", 50);
     DefineIntProperty("awsmock.service.dynamodb.timeout", "AWSMOCK_SERVICE_DYNAMODB_TIMEOUT", 120);
     DefineIntProperty("awsmock.service.dynamodb.period", "AWSMOCK_SERVICE_DYNAMODB_PERIOD", 10000);
+    DefineIntProperty("awsmock.worker.dynamodb.timeout", "AWSMOCK_WORKER_DYNAMODB_PERIOD", 120);
+    DefineIntProperty("awsmock.monitoring.dynamodb.period", "AWSMOCK_MONITORING_DYNAMODB_PERIOD", 60000);
+
+    // SecretsManager
+    DefineBoolProperty("awsmock.service.secretsmanager.active", "AWSMOCK_SERVICE_SECRETSMANAGER_ACTIVE", true);
+    DefineStringProperty("awsmock.service.secretsmanager.host", "AWSMOCK_SERVICE_SECRETSMANAGER_HOST", "localhost");
+    DefineIntProperty("awsmock.service.secretsmanager.port", "AWSMOCK_SERVICE_SECRETSMANAGER_PORT", 9507);
+    DefineIntProperty("awsmock.service.secretsmanager.max.queue", "AWSMOCK_SERVICE_SECRETSMANAGER_MAX_QUEUE", 250);
+    DefineIntProperty("awsmock.service.secretsmanager.max.threads", "AWSMOCK_SERVICE_SECRETSMANAGER_MAX_THREADS", 50);
+    DefineIntProperty("awsmock.service.secretsmanager.timeout", "AWSMOCK_SERVICE_SECRETSMANAGER_TIMEOUT", 120);
+    DefineIntProperty("awsmock.service.secretsmanager.period", "AWSMOCK_SERVICE_SECRETSMANAGER_PERIOD", 10000);
+    DefineIntProperty("awsmock.worker.secretsmanager.timeout", "AWSMOCK_WORKER_SECRETSMANAGER_PERIOD", 120);
+    DefineIntProperty("awsmock.monitoring.secretsmanager.period", "AWSMOCK_MONITORING_SECRETSMANAGER_PERIOD", 60000);
 
     // Docker
     DefineStringProperty("awsmock.docker.network.mode", "AWSMOCK_DOCKER_NETWORK_MODE", "bridge");

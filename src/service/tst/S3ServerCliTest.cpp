@@ -12,8 +12,8 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/repository/S3Database.h>
-#include <awsmock/service/S3Server.h>
-#include <awsmock/service/S3Service.h>
+#include "awsmock/service/s3/S3Server.h"
+#include "awsmock/service/s3/S3Service.h"
 
 // Test includes
 #include <awsmock/core/TestUtils.h>

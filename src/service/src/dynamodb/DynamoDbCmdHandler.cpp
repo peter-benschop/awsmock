@@ -1,5 +1,5 @@
 
-#include <awsmock/service/DynamoDbCmdHandler.h>
+#include "awsmock/service/dynamodb/DynamoDbCmdHandler.h"
 
 namespace AwsMock::Service {
 

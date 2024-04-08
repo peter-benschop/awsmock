@@ -57,27 +57,15 @@ namespace AwsMock::Core {
     return CreateArn("transfer", region, accountId, "manager/" + serverId);
   }
 
+  std::string AwsUtils::CreateSecretArn(const std::string &region, const std::string &accountId, const std::string &secretId) {
+    return CreateArn("secretsmanager", region, accountId, "secret:" + secretId);
+  }
+
   std::string AwsUtils::GetAuthorizationHeader(const Configuration &configuration, const std::string &module) {
     std::string accountId = configuration.getString("awsmock.account.id");
     std::string clientId = configuration.getString("awsmock.client.id");
     std::string region = configuration.getString("awsmock.region");
     return "AWS4-HMAC-SHA256 Credential=" + accountId + "/" + clientId + "/" + region + "/" + module + "/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840";
-  }
-
-  std::string AwsUtils::GetCliUserAgentHeader(const std::string &service, const std::string &command) {
-    return "aws-cli/2.13.38 Python/3.11.6 Linux/6.1.0-13-amd64 exe/x86_64.debian.12 prompt/off command/" + service + "." + command;
-  }
-
-  std::string AwsUtils::GetJava2UserAgentHeader(const std::string &service, const std::string &command) {
-    return "aws-sdk-java/2.13.38 Python/3.11.6 Linux/6.1.0-13-amd64 exe/x86_64.debian.12 prompt/off command/" + service + "." + command;
-  }
-
-  std::string AwsUtils::GetCppUserAgentHeader(const std::string &service, const std::string &command) {
-    return "aws-sdk-cpp/2.13.38 Python/3.11.6 Linux/6.1.0-13-amd64 exe/x86_64.debian.12 prompt/off command/" + service + "." + command;
-  }
-
-  std::string AwsUtils::GetContentTypeHeader(const std::string &contentType) {
-    return "application/x-amz-" + contentType + "-1.0";
   }
 
   std::string AwsUtils::CreateRequestId()  {

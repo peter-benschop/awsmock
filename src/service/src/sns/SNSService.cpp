@@ -2,7 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include <awsmock/service/SNSService.h>
+#include "awsmock/service/sns/SNSService.h"
 
 namespace AwsMock::Service {
 
