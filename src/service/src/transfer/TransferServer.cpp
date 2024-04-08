@@ -136,7 +136,7 @@ namespace AwsMock::Service {
 
     while (IsRunning()) {
 
-      log_debug_stream(_logger) << "TransferWorker processing started" << std::endl;
+      log_trace_stream(_logger) << "TransferWorker processing started" << std::endl;
 
       // Check transfer servers
       CheckTransferServers();

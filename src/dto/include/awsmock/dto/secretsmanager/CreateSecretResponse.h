@@ -11,20 +11,10 @@
 #include <iostream>
 
 // Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-#include <Poco/UUID.h>
-#include <Poco/UUIDGenerator.h>
-#include <Poco/DOM/AutoPtr.h>
-#include <Poco/DOM/Document.h>
-#include <Poco/DOM/Element.h>
-#include <Poco/DOM/Text.h>
-#include <Poco/DOM/DOMParser.h>
-#include <Poco/DOM/DOMWriter.h>
-#include <Poco/XML/XMLWriter.h>
-#include <Poco/JSON/Object.h>
+#include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
+#include <Poco/Dynamic/Var.h>
+#include <Poco/Net/HTTPResponse.h>
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>

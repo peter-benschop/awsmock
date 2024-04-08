@@ -53,6 +53,42 @@ namespace AwsMock::Database {
     return result;
   }
 
+  Entity::SecretsManager::Secret SecretsManagerDatabase::GetSecretById(const std::string &oid) {
+
+    if (_useDatabase) {
+
+      return GetSecretById(bsoncxx::oid(oid));
+
+    } else {
+
+      return _memoryDb.GetSecretById(oid);
+
+    }
+  }
+
+  Entity::SecretsManager::Secret SecretsManagerDatabase::GetSecretByRegionName(const std::string &region, const std::string &name) {
+
+    if (_useDatabase) {
+
+      auto client = GetClient();
+      mongocxx::collection _bucketCollection = (*client)[_databaseName][_collectionName];
+      mongocxx::stdx::optional<bsoncxx::document::value> mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
+      if (mResult->empty()) {
+        return {};
+      }
+
+      Entity::SecretsManager::Secret result;
+      result.FromDocument(mResult);
+      log_trace_stream(_logger) << "Got secret: " << result.ToString() << std::endl;
+      return result;
+
+    } else {
+
+      return _memoryDb.GetSecretByRegionName(region, name);
+
+    }
+  }
+
   Entity::SecretsManager::Secret SecretsManagerDatabase::CreateSecret(const Entity::SecretsManager::Secret &secret) {
 
     if (_useDatabase) {
@@ -83,4 +119,31 @@ namespace AwsMock::Database {
     }
   }
 
+  void SecretsManagerDatabase::DeleteSecret(const Entity::SecretsManager::Secret &secret) {
+
+    if (_useDatabase) {
+
+      auto client = GetClient();
+      mongocxx::collection _bucketCollection = (*client)[_databaseName][_collectionName];
+      auto session = client->start_session();
+
+      try {
+
+        session.start_transaction();
+        auto delete_many_result = _bucketCollection.delete_one(make_document(kvp("region", secret.region), kvp("name", secret.name)));
+        session.commit_transaction();
+        log_debug_stream(_logger) << "Secret deleted, count: " << delete_many_result->deleted_count() << std::endl;
+
+      } catch (const mongocxx::exception &exc) {
+        session.abort_transaction();
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), 500);
+      }
+
+    } else {
+
+      _memoryDb.DeleteSecret(secret);
+
+    }
+  }
 } // namespace AwsMock::Database

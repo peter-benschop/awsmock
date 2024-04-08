@@ -2,13 +2,12 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SECRETSMANAGER_CREATE_SECRET_REQUEST_H
-#define AWSMOCK_DTO_SECRETSMANAGER_CREATE_SECRET_REQUEST_H
+#ifndef AWSMOCK_DTO_SECRETMANAGER_DELETE_SECRET_RESPONSE_H
+#define AWSMOCK_DTO_SECRETMANAGER_DELETE_SECRET_RESPONSE_H
 
 // C++ standard includes
 #include <string>
 #include <sstream>
-#include <map>
 
 // Poco includes
 #include <Poco/JSON/JSON.h>
@@ -16,26 +15,16 @@
 #include <Poco/Dynamic/Var.h>
 #include <Poco/Net/HTTPResponse.h>
 
-// AwsMock includes
+// AwsMoc includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/ServiceException.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
-  /**
-   * Example:
-   *
-   * <pre>
-   * {
-   *   "Name": "test",
-   *   "ClientRequestToken": "8b0e8777-4c9a-4621-9bd7-a6449b24c3a5"
-   * }
-   * </pre>
-   */
-  struct CreateSecretRequest {
+  struct DeleteSecretResponse {
 
     /**
-     * AWS region
+     * Region
      */
     std::string region;
 
@@ -45,27 +34,14 @@ namespace AwsMock::Dto::SecretsManager {
     std::string name;
 
     /**
-     * Client request token
+     * Convert to a JSON string
+     *
+     * @return JSON string
      */
-    std::string clientRequestToken;
+    [[nodiscard]] std::string ToJson() const;
 
     /**
-     * Description
-     */
-    std::string description;
-
-    /**
-     * Tags
-     */
-    std::map<std::string, std::string> tags;
-
-    /**
-     * AWS request ID
-     */
-    std::string requestId;
-
-    /**
-     * Converts the JSON string to DTO.
+     * Convert from JSON representation
      *
      * @param jsonString JSON string
      */
@@ -83,10 +59,10 @@ namespace AwsMock::Dto::SecretsManager {
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const CreateSecretRequest &r);
+    friend std::ostream &operator<<(std::ostream &os, const DeleteSecretResponse &r);
 
   };
 
-} // namespace AwsMock::Dto::SQS
+} // namespace AwsMock::Dto
 
-#endif // AWSMOCK_DTO_SECRETSMANAGER_CREATE_SECRET_REQUEST_H
+#endif // AWSMOCK_DTO_SECRETMANAGER_DELETE_SECRET_RESPONSE_H

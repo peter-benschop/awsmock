@@ -25,6 +25,8 @@
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/dto/secretsmanager/CreateSecretRequest.h>
 #include <awsmock/dto/secretsmanager/CreateSecretResponse.h>
+#include <awsmock/dto/secretsmanager/DeleteSecretRequest.h>
+#include <awsmock/dto/secretsmanager/DeleteSecretResponse.h>
 #include <awsmock/repository/SecretsManagerDatabase.h>
 
 #define DEFAULT_ACCOUNT_ID "000000000000"
@@ -33,7 +35,7 @@ namespace AwsMock::Service {
 
   class SecretsManagerService {
 
-    public:
+  public:
 
     /**
      * Constructor
@@ -45,10 +47,21 @@ namespace AwsMock::Service {
 
     /**
      * Create a new secret
+     *
+     * @param request create secret request
+     * @return CreateSecretResponse
      */
-    Dto::SecretsManager::CreateSecretResponse CreateSecret(const Dto::SecretsManager::CreateSecretRequest& request);
+    Dto::SecretsManager::CreateSecretResponse CreateSecret(const Dto::SecretsManager::CreateSecretRequest &request);
 
-    private:
+    /**
+     * Create a new secret
+     *
+     * @param request create secret request
+     * @return CreateSecretResponse
+     */
+    Dto::SecretsManager::DeleteSecretResponse DeleteSecret(const Dto::SecretsManager::DeleteSecretRequest &request);
+
+  private:
 
     /**
      * Logger
@@ -68,7 +81,7 @@ namespace AwsMock::Service {
     /**
      * Database connection
      */
-    Database::SecretsManagerDatabase& _database;
+    Database::SecretsManagerDatabase &_database;
 
     /**
      * Shutdown condition

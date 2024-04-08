@@ -72,7 +72,7 @@ namespace AwsMock::Service {
 
     while (IsRunning()) {
 
-      log_debug_stream(_logger) << "LambdaWorker processing started" << std::endl;
+      log_trace_stream(_logger) << "LambdaWorker processing started" << std::endl;
 
       // Wait for timeout or condition
       if (InterruptableSleep(_period)) {

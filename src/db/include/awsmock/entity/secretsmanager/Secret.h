@@ -62,6 +62,11 @@ namespace AwsMock::Database::Entity::SecretsManager {
     std::string arn;
 
     /**
+     * Secret ID
+     */
+    std::string secretId;
+
+    /**
      * Version Id
      */
     std::string versionId;

@@ -74,6 +74,15 @@ namespace AwsMock::Database {
     Entity::SecretsManager::Secret GetSecretById(const std::string &oid);
 
     /**
+     * Returns the secret by region and name.
+     *
+     * @param region AWS region
+     * @param name secret name
+     * @return secret entity
+     */
+    Entity::SecretsManager::Secret GetSecretByRegionName(const std::string &region, const std::string &name);
+
+    /**
      * Creates a new secret in the secrets manager collection
      *
      * @param secret secret entity
@@ -81,6 +90,14 @@ namespace AwsMock::Database {
      * @throws DatabaseException
      */
     Entity::SecretsManager::Secret CreateSecret(const Entity::SecretsManager::Secret &secret);
+
+    /**
+     * Delete a secret.
+     *
+     * @param secret secret entity
+     * @throws DatabaseException
+     */
+    void DeleteSecret(const Entity::SecretsManager::Secret &secret);
 
   private:
 

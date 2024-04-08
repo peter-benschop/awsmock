@@ -29,6 +29,12 @@ namespace AwsMock::Service {
 
         case Dto::Common::SecretsManagerCommandType::DELETE_SECRET: {
 
+          Dto::SecretsManager::DeleteSecretRequest secretsManagerRequest = {.region=secretsManagerClientCommand.region, .requestId=requestId};
+          secretsManagerRequest.FromJson(secretsManagerClientCommand.payload);
+
+          Dto::SecretsManager::DeleteSecretResponse secretsManagerResponse = _secretsManagerService.DeleteSecret(secretsManagerRequest);
+          SendOkResponse(response, secretsManagerResponse.ToJson());
+
           break;
         }
 

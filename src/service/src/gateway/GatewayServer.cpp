@@ -47,7 +47,7 @@ namespace AwsMock::Service {
     _running = true;
     while (_running) {
 
-      log_debug_stream(_logger) << "Gateway processing started" << std::endl;
+      log_trace_stream(_logger) << "Gateway processing started" << std::endl;
 
       // Wait for timeout or condition
       if (InterruptableSleep(_period)) {
