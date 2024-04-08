@@ -29,6 +29,10 @@ namespace AwsMock::Dto::Common {
           command = SecretsManagerCommandType::CREATE_SECRET;
         } else if (Core::StringUtils::ContainsIgnoreCase(action, "DeleteSecret")) {
           command = SecretsManagerCommandType::DELETE_SECRET;
+        } else if (Core::StringUtils::ContainsIgnoreCase(action, "DescribeSecret")) {
+          command = SecretsManagerCommandType::DESCRIBE_SECRET;
+        } else if (Core::StringUtils::ContainsIgnoreCase(action, "GetSecretValue")) {
+          command = SecretsManagerCommandType::GET_SECRET_VALUE;
         }
         break;
       case HttpMethod::UNKNOWN: {
@@ -40,7 +44,6 @@ namespace AwsMock::Dto::Common {
   std::string SecretsManagerClientCommand::GetBodyAsString(Poco::Net::HTTPServerRequest &request) {
     std::stringstream sstream;
     sstream << request.stream().rdbuf();
-    request.stream().seekg(0, request.stream().beg);
     return sstream.str();
   }
 

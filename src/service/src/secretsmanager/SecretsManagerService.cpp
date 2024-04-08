@@ -42,6 +42,33 @@ namespace AwsMock::Service {
     return {.region=secret.region, .name=secret.name, .arn=secret.arn, .versionId=secret.versionId};
   }
 
+  Dto::SecretsManager::DescribeSecretResponse SecretsManagerService::DescribeSecret(const Dto::SecretsManager::DescribeSecretRequest &request) {
+    log_trace_stream(_logger) << "Describe secret request: " << request.ToString() << std::endl;
+
+    // Check bucket existence
+    if (!_database.SecretExists(request.region, request.name)) {
+      log_warning_stream(_logger) << "Secret does not exist, name: " << request.name << std::endl;
+      throw Core::ServiceException("Secret does not exist, name: " + request.name, Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+    }
+
+    try {
+
+      // Get object from database
+      Database::Entity::SecretsManager::Secret secret = _database.GetSecretByRegionName(request.region, request.name);
+
+      // Delete from database
+      // TODO: Add code
+     // _database.DeleteSecret(secret);
+      log_debug_stream(_logger) << "Database secret described, region: " << request.region<< " name: "<< request.name << std::endl;
+
+    } catch (Poco::Exception &exc) {
+      log_error_stream(_logger) << "Secret describe secret failed, message: " + exc.message() << std::endl;
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+    }
+
+    return {};
+  }
+
   Dto::SecretsManager::DeleteSecretResponse SecretsManagerService::DeleteSecret(const Dto::SecretsManager::DeleteSecretRequest &request) {
     log_trace_stream(_logger) << "Delete secret request: " << request.ToString() << std::endl;
 
@@ -61,7 +88,7 @@ namespace AwsMock::Service {
       log_debug_stream(_logger) << "Database secret deleted, region: " << request.region<< " name: "<< request.name << std::endl;
 
     } catch (Poco::Exception &exc) {
-      log_error_stream(_logger) << "S3 delete object failed, message: " + exc.message() << std::endl;
+      log_error_stream(_logger) << "Secret manager delete secret failed, message: " + exc.message() << std::endl;
       throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
 

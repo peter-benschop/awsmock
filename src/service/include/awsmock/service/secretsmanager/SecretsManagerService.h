@@ -27,6 +27,8 @@
 #include <awsmock/dto/secretsmanager/CreateSecretResponse.h>
 #include <awsmock/dto/secretsmanager/DeleteSecretRequest.h>
 #include <awsmock/dto/secretsmanager/DeleteSecretResponse.h>
+#include <awsmock/dto/secretsmanager/DescribeSecretRequest.h>
+#include <awsmock/dto/secretsmanager/DescribeSecretResponse.h>
 #include <awsmock/repository/SecretsManagerDatabase.h>
 
 #define DEFAULT_ACCOUNT_ID "000000000000"
@@ -35,63 +37,71 @@ namespace AwsMock::Service {
 
   class SecretsManagerService {
 
-  public:
+    public:
 
-    /**
-     * Constructor
-     *
-     * @param configuration module configuration
-     * @param condition stop condition
-     */
-    explicit SecretsManagerService(Core::Configuration &configuration, Poco::Condition &condition);
+      /**
+       * Constructor
+       *
+       * @param configuration module configuration
+       * @param condition stop condition
+       */
+      explicit SecretsManagerService(Core::Configuration &configuration, Poco::Condition &condition);
 
-    /**
-     * Create a new secret
-     *
-     * @param request create secret request
-     * @return CreateSecretResponse
-     */
-    Dto::SecretsManager::CreateSecretResponse CreateSecret(const Dto::SecretsManager::CreateSecretRequest &request);
+      /**
+       * Create a new secret
+       *
+       * @param request create secret request
+       * @return CreateSecretResponse
+       */
+      Dto::SecretsManager::CreateSecretResponse CreateSecret(const Dto::SecretsManager::CreateSecretRequest &request);
 
-    /**
-     * Create a new secret
-     *
-     * @param request create secret request
-     * @return CreateSecretResponse
-     */
-    Dto::SecretsManager::DeleteSecretResponse DeleteSecret(const Dto::SecretsManager::DeleteSecretRequest &request);
+      /**
+       * Describes an existing secret
+       *
+       * @param request describe secret request
+       * @return DescribeSecretResponse
+       */
+      Dto::SecretsManager::DescribeSecretResponse DescribeSecret(const Dto::SecretsManager::DescribeSecretRequest &request);
 
-  private:
+      /**
+       * Deletes an existing secret
+       *
+       * @param request delete secret request
+       * @return DeleteSecretResponse
+       */
+      Dto::SecretsManager::DeleteSecretResponse DeleteSecret(const Dto::SecretsManager::DeleteSecretRequest &request);
 
-    /**
-     * Logger
-     */
-    Core::LogStream _logger;
+    private:
 
-    /**
-     * Account ID
-     */
-    std::string _accountId;
+      /**
+       * Logger
+       */
+      Core::LogStream _logger;
 
-    /**
-     * Configuration
-     */
-    Core::Configuration &_configuration;
+      /**
+       * Account ID
+       */
+      std::string _accountId;
 
-    /**
-     * Database connection
-     */
-    Database::SecretsManagerDatabase &_database;
+      /**
+       * Configuration
+       */
+      Core::Configuration &_configuration;
 
-    /**
-     * Shutdown condition
-     */
-    Poco::Condition &_condition;
+      /**
+       * Database connection
+       */
+      Database::SecretsManagerDatabase &_database;
 
-    /**
-     * Shutdown mutex
-     */
-    Poco::Mutex _mutex;
+      /**
+       * Shutdown condition
+       */
+      Poco::Condition &_condition;
+
+      /**
+       * Shutdown mutex
+       */
+      Poco::Mutex _mutex;
   };
 
 } // namespace AwsMock::Service
