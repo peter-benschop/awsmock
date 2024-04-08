@@ -55,6 +55,16 @@ namespace AwsMock::Dto::SecretsManager {
     std::string description;
 
     /**
+     * Secret string
+     */
+    std::string secretString;
+
+    /**
+     * Base64 encoded secret binary data
+     */
+    std::string secretBinary;
+
+    /**
      * Tags
      */
     std::map<std::string, std::string> tags;

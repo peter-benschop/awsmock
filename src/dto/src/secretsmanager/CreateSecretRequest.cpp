@@ -18,6 +18,8 @@ namespace AwsMock::Dto::SecretsManager {
       Core::JsonUtils::GetJsonValueString("Name", rootObject, name);
       Core::JsonUtils::GetJsonValueString("ClientRequestToken", rootObject, clientRequestToken);
       Core::JsonUtils::GetJsonValueString("Description", rootObject, description);
+      Core::JsonUtils::GetJsonValueString("SecretString", rootObject, secretString);
+      Core::JsonUtils::GetJsonValueString("SecretBinary", rootObject, secretBinary);
 
     } catch (Poco::Exception &exc) {
       throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_BAD_REQUEST);
