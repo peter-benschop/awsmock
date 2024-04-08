@@ -10,16 +10,20 @@ namespace AwsMock::Database {
 
   bool CognitoMemoryDb::UserPoolExists(const std::string &region, const std::string &name) {
 
-    return find_if(_userPools.begin(), _userPools.end(), [region, name](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
-      return userPool.second.region == region && userPool.second.name == name;
-    }) != _userPools.end();
+    return find_if(_userPools.begin(),
+                   _userPools.end(),
+                   [region, name](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
+                     return userPool.second.region == region && userPool.second.name == name;
+                   }) != _userPools.end();
   }
 
   bool CognitoMemoryDb::UserPoolExists(const std::string &id) {
 
-    return find_if(_userPools.begin(), _userPools.end(), [id](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
-      return userPool.second.id == id;
-    }) != _userPools.end();
+    return find_if(_userPools.begin(),
+                   _userPools.end(),
+                   [id](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
+                     return userPool.second.id == id;
+                   }) != _userPools.end();
   }
 
   Entity::Cognito::UserPoolList CognitoMemoryDb::ListUserPools(const std::string &region) {
@@ -52,9 +56,11 @@ namespace AwsMock::Database {
 
   Entity::Cognito::UserPool CognitoMemoryDb::GetUserPoolByOid(const std::string &oid) {
 
-    auto it = find_if(_userPools.begin(), _userPools.end(), [oid](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
-      return userPool.first == oid;
-    });
+    auto it = find_if(_userPools.begin(),
+                      _userPools.end(),
+                      [oid](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
+                        return userPool.first == oid;
+                      });
 
     if (it == _userPools.end()) {
       log_error_stream(_logger) << "Get cognito user pool by oid failed, oid: " << oid << std::endl;
@@ -65,15 +71,20 @@ namespace AwsMock::Database {
     return it->second;
   }
 
-  Entity::Cognito::UserPool CognitoMemoryDb::GetUserPoolByRegionName(const std::string &region, const std::string &name) {
+  Entity::Cognito::UserPool CognitoMemoryDb::GetUserPoolByRegionName(const std::string &region,
+                                                                     const std::string &name) {
 
-    auto it = find_if(_userPools.begin(), _userPools.end(), [region, name](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
-      return userPool.second.region == region && userPool.second.name == name;
-    });
+    auto it = find_if(_userPools.begin(),
+                      _userPools.end(),
+                      [region, name](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
+                        return userPool.second.region == region && userPool.second.name == name;
+                      });
 
     if (it == _userPools.end()) {
-      log_error_stream(_logger) << "Get cognito user pool by region and name failed, region: " << region << " name: " << name << std::endl;
-      throw Core::DatabaseException("Get cognito user pool by region and name failed, region: " + region + " name: " + name);
+      log_error_stream(_logger) << "Get cognito user pool by region and name failed, region: " << region << " name: "
+                                << name << std::endl;
+      throw Core::DatabaseException(
+          "Get cognito user pool by region and name failed, region: " + region + " name: " + name);
     }
 
     it->second.oid = it->first;
@@ -102,13 +113,17 @@ namespace AwsMock::Database {
 
     std::string region = userPool.region;
     std::string name = userPool.name;
-    auto it = find_if(_userPools.begin(), _userPools.end(), [region, name](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
-      return userPool.second.region == region && userPool.second.name == name;
-    });
+    auto it = find_if(_userPools.begin(),
+                      _userPools.end(),
+                      [region, name](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
+                        return userPool.second.region == region && userPool.second.name == name;
+                      });
 
     if (it == _userPools.end()) {
-      log_error_stream(_logger) << "Update user pool failed, region: " << userPool.region << " name: " << userPool.name << std::endl;
-      throw Core::DatabaseException("Update cognito user pool failed, region: " + userPool.region + " name: " + userPool.name);
+      log_error_stream(_logger) << "Update user pool failed, region: " << userPool.region << " name: " << userPool.name
+                                << std::endl;
+      throw Core::DatabaseException(
+          "Update cognito user pool failed, region: " + userPool.region + " name: " + userPool.name);
     }
     _userPools[it->first] = userPool;
     return _userPools[it->first];
@@ -131,11 +146,16 @@ namespace AwsMock::Database {
     _userPools.clear();
   }
 
-  bool CognitoMemoryDb::UserExists(const std::string &region, const std::string &userPoolId, const std::string &userName) {
+  bool CognitoMemoryDb::UserExists(const std::string &region,
+                                   const std::string &userPoolId,
+                                   const std::string &userName) {
 
-    return find_if(_users.begin(), _users.end(), [region, userPoolId, userName](const std::pair<std::string, Entity::Cognito::User> &user) {
-      return user.second.region == region && user.second.userPoolId == userPoolId && user.second.userName == userName;
-    }) != _users.end();
+    return find_if(_users.begin(),
+                   _users.end(),
+                   [region, userPoolId, userName](const std::pair<std::string, Entity::Cognito::User> &user) {
+                     return user.second.region == region && user.second.userPoolId == userPoolId
+                         && user.second.userName == userName;
+                   }) != _users.end();
   }
 
   Entity::Cognito::User CognitoMemoryDb::CreateUser(const Entity::Cognito::User &user) {
@@ -162,11 +182,16 @@ namespace AwsMock::Database {
     return it->second;
   }
 
-  Entity::Cognito::User CognitoMemoryDb::GetUserByUserName(const std::string &region, const std::string &userPoolId, const std::string &userName) {
+  Entity::Cognito::User CognitoMemoryDb::GetUserByUserName(const std::string &region,
+                                                           const std::string &userPoolId,
+                                                           const std::string &userName) {
 
-    auto it = find_if(_users.begin(), _users.end(), [region, userPoolId, userName](const std::pair<std::string, Entity::Cognito::User> &user) {
-      return user.second.region == region && user.second.userPoolId == userPoolId && user.second.userName == userName;
-    });
+    auto it = find_if(_users.begin(),
+                      _users.end(),
+                      [region, userPoolId, userName](const std::pair<std::string, Entity::Cognito::User> &user) {
+                        return user.second.region == region && user.second.userPoolId == userPoolId
+                            && user.second.userName == userName;
+                      });
 
     if (it == _users.end()) {
       log_error_stream(_logger) << "Get cognito user by user name failed, userName: " << userName << std::endl;
@@ -205,7 +230,8 @@ namespace AwsMock::Database {
     return count;
   }
 
-  std::vector<Entity::Cognito::User> CognitoMemoryDb::ListUsers(const std::string &region, const std::string &userPoolId) {
+  std::vector<Entity::Cognito::User> CognitoMemoryDb::ListUsers(const std::string &region,
+                                                                const std::string &userPoolId) {
 
     Entity::Cognito::UserList userList;
     if (!region.empty() && !userPoolId.empty()) {
@@ -243,12 +269,16 @@ namespace AwsMock::Database {
     std::string region = user.region;
     std::string userPoolId = user.userPoolId;
     std::string userName = user.userName;
-    auto it = find_if(_users.begin(), _users.end(), [region, userPoolId, userName](const std::pair<std::string, Entity::Cognito::User> &user) {
-      return user.second.region == region && user.second.userPoolId == userPoolId && user.second.userName == userName;
-    });
+    auto it = find_if(_users.begin(),
+                      _users.end(),
+                      [region, userPoolId, userName](const std::pair<std::string, Entity::Cognito::User> &user) {
+                        return user.second.region == region && user.second.userPoolId == userPoolId
+                            && user.second.userName == userName;
+                      });
 
     if (it == _users.end()) {
-      log_error_stream(_logger) << "Update user failed, region: " << user.region << " name: " << user.userName << std::endl;
+      log_error_stream(_logger) << "Update user failed, region: " << user.region << " name: " << user.userName
+                                << std::endl;
       throw Core::DatabaseException("Update cognito user failed, region: " + user.region + " name: " + user.userName);
     }
     _users[it->first] = user;
@@ -259,7 +289,8 @@ namespace AwsMock::Database {
     Poco::ScopedLock lock(_userMutex);
 
     const auto count = std::erase_if(_users, [user](const std::pair<std::string, Entity::Cognito::User> &u) {
-      return u.second.region == user.region && u.second.userPoolId == user.userPoolId && u.second.userName == user.userName;
+      return u.second.region == user.region && u.second.userPoolId == user.userPoolId
+          && u.second.userName == user.userName;
     });
     log_debug_stream(_logger) << "Cognito user deleted, count: " << count << std::endl;
   }

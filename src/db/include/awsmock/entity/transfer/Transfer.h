@@ -69,6 +69,11 @@ namespace AwsMock::Database::Entity::Transfer {
       return ServerState::OFFLINE;
   }*/
 
+  /**
+   * Transfer manager server entity
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   struct Transfer {
 
     /**

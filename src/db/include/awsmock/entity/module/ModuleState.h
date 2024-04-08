@@ -11,6 +11,11 @@
 
 namespace AwsMock::Database::Entity::Module {
 
+  /**
+   * AwsMock module state
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   enum class ModuleState {
     STOPPED,
     STARTING,

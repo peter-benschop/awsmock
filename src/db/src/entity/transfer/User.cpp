@@ -22,7 +22,8 @@ namespace AwsMock::Database::Entity::Transfer {
   }
 
   std::ostream &operator<<(std::ostream &os, const User &m) {
-    os << "User={userName='" << m.userName << "' password='" << m.password << "' homeDirectory='" << m.homeDirectory << "'}";
+    os << "User={userName='" << m.userName << "' password='" << m.password << "' homeDirectory='" << m.homeDirectory
+       << "'}";
     return os;
   }
 

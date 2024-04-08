@@ -39,6 +39,11 @@ namespace AwsMock::Database::Entity::SQS {
   using bsoncxx::document::view;
   using bsoncxx::document::value;
 
+  /**
+   * SQS message entity
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   struct Message {
 
     /**

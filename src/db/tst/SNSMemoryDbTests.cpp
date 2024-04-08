@@ -28,20 +28,20 @@ namespace AwsMock::Database {
 
   class SNSMemoryDbTest : public ::testing::Test {
 
-  protected:
+    protected:
 
-    void SetUp() override {
-      _region = _configuration.getString("awsmock.region");
-    }
+      void SetUp() override {
+        _region = _configuration.getString("awsmock.region");
+      }
 
-    void TearDown() override {
-      _snsDatabase.DeleteAllTopics();
-      _snsDatabase.DeleteAllMessages();
-    }
+      void TearDown() override {
+        _snsDatabase.DeleteAllTopics();
+        _snsDatabase.DeleteAllMessages();
+      }
 
-    std::string _region;
-    Core::Configuration& _configuration = Core::TestUtils::GetTestConfiguration(false);
-    SNSDatabase& _snsDatabase = SNSDatabase::instance();
+      std::string _region;
+      Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration(false);
+      SNSDatabase &_snsDatabase = SNSDatabase::instance();
   };
 
   TEST_F(SNSMemoryDbTest, TopicCreateTest) {
@@ -138,7 +138,8 @@ namespace AwsMock::Database {
   TEST_F(SNSMemoryDbTest, TopicDeleteTest) {
 
     // arrange
-    Entity::SNS::Topic topic = _snsDatabase.CreateTopic({.region=_region, .topicName=TOPIC, .owner=OWNER, .topicArn=TOPIC_ARN});
+    Entity::SNS::Topic
+        topic = _snsDatabase.CreateTopic({.region=_region, .topicName=TOPIC, .owner=OWNER, .topicArn=TOPIC_ARN});
 
     // act
     _snsDatabase.DeleteTopic(topic);
@@ -166,8 +167,10 @@ namespace AwsMock::Database {
   TEST_F(SNSMemoryDbTest, MessageCountTest) {
 
     // arrange
-    Entity::SNS::Topic topic = _snsDatabase.CreateTopic({.region=_region, .topicName=TOPIC, .owner=OWNER, .topicArn=TOPIC_ARN});
-    Entity::SNS::Message message = _snsDatabase.CreateMessage({.region=_region, .topicArn=topic.topicArn, .message=BODY});
+    Entity::SNS::Topic
+        topic = _snsDatabase.CreateTopic({.region=_region, .topicName=TOPIC, .owner=OWNER, .topicArn=TOPIC_ARN});
+    Entity::SNS::Message
+        message = _snsDatabase.CreateMessage({.region=_region, .topicArn=topic.topicArn, .message=BODY});
 
     // act
     long result = _snsDatabase.CountMessages(_region, topic.topicArn);
@@ -179,8 +182,10 @@ namespace AwsMock::Database {
   TEST_F(SNSMemoryDbTest, MessageDeleteTest) {
 
     // arrange
-    Entity::SNS::Topic topic = _snsDatabase.CreateTopic({.region=_region, .topicName=TOPIC, .owner=OWNER, .topicArn=TOPIC_ARN});
-    Entity::SNS::Message message = _snsDatabase.CreateMessage({.region=_region, .topicArn=topic.topicArn, .message=BODY, .messageId="abcd"});
+    Entity::SNS::Topic
+        topic = _snsDatabase.CreateTopic({.region=_region, .topicName=TOPIC, .owner=OWNER, .topicArn=TOPIC_ARN});
+    Entity::SNS::Message message =
+        _snsDatabase.CreateMessage({.region=_region, .topicArn=topic.topicArn, .message=BODY, .messageId="abcd"});
 
     // act
     _snsDatabase.DeleteMessage(message);
@@ -193,11 +198,14 @@ namespace AwsMock::Database {
   TEST_F(SNSMemoryDbTest, MessagesDeleteTest) {
 
     // arrange
-    Entity::SNS::Topic topic = _snsDatabase.CreateTopic({.region=_region, .topicName=TOPIC, .owner=OWNER, .topicArn=TOPIC_ARN});
+    Entity::SNS::Topic
+        topic = _snsDatabase.CreateTopic({.region=_region, .topicName=TOPIC, .owner=OWNER, .topicArn=TOPIC_ARN});
 
     std::vector<std::string> messageIds;
     for (int i = 0; i < 10; i++) {
-      Entity::SNS::Message message = _snsDatabase.CreateMessage({.region=_region, .topicArn=topic.topicArn, .message=BODY, .messageId="test" + std::to_string(i)});
+      Entity::SNS::Message message =
+          _snsDatabase.CreateMessage({.region=_region, .topicArn=topic.topicArn, .message=BODY, .messageId="test"
+              + std::to_string(i)});
       messageIds.emplace_back(message.messageId);
     }
 
@@ -212,8 +220,10 @@ namespace AwsMock::Database {
   TEST_F(SNSMemoryDbTest, MessageDeleteAllTest) {
 
     // arrange
-    Entity::SNS::Topic topic = _snsDatabase.CreateTopic({.region=_region, .topicName=TOPIC, .owner=OWNER, .topicArn=TOPIC_ARN});
-    Entity::SNS::Message message = _snsDatabase.CreateMessage({.region=_region, .topicArn=topic.topicArn, .message=BODY, .messageId="abcd"});
+    Entity::SNS::Topic
+        topic = _snsDatabase.CreateTopic({.region=_region, .topicName=TOPIC, .owner=OWNER, .topicArn=TOPIC_ARN});
+    Entity::SNS::Message message =
+        _snsDatabase.CreateMessage({.region=_region, .topicArn=topic.topicArn, .message=BODY, .messageId="abcd"});
 
     // act
     _snsDatabase.DeleteAllMessages();

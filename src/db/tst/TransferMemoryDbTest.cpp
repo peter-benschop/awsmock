@@ -32,19 +32,19 @@ namespace AwsMock::Database {
 
   class TransferMemoryDbTest : public ::testing::Test {
 
-  protected:
+    protected:
 
-    void SetUp() override {
-      _region = _configuration.getString("awsmock.region");
-    }
+      void SetUp() override {
+        _region = _configuration.getString("awsmock.region");
+      }
 
-    void TearDown() override {
-      _transferDatabase.DeleteAllTransfers();
-    }
+      void TearDown() override {
+        _transferDatabase.DeleteAllTransfers();
+      }
 
-    std::string _region;
-    Core::Configuration& _configuration = Core::TestUtils::GetTestConfiguration(false);
-    TransferDatabase& _transferDatabase = TransferDatabase::instance();
+      std::string _region;
+      Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration(false);
+      TransferDatabase &_transferDatabase = TransferDatabase::instance();
   };
 
   TEST_F(TransferMemoryDbTest, TransferCreateTest) {

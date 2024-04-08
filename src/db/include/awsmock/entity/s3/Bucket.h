@@ -42,9 +42,9 @@ namespace AwsMock::Database::Entity::S3 {
   };
 
   static std::map<BucketVersionStatus, std::string> BucketVersionStatusNames{
-    {BucketVersionStatus::ENABLED, "enabled"},
-    {BucketVersionStatus::SUSPENDED, "suspended"},
-    {BucketVersionStatus::DISABLED, "disabled"},
+      {BucketVersionStatus::ENABLED, "enabled"},
+      {BucketVersionStatus::SUSPENDED, "suspended"},
+      {BucketVersionStatus::DISABLED, "disabled"},
   };
 
   [[maybe_unused]] static std::string BucketVersionStatusToString(BucketVersionStatus bucketVersionStatus) {
@@ -60,6 +60,11 @@ namespace AwsMock::Database::Entity::S3 {
     return BucketVersionStatus::DISABLED;
   }
 
+  /**
+   * S3 bucket entity
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   struct Bucket {
 
     /**

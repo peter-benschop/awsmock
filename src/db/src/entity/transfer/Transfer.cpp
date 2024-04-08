@@ -27,7 +27,9 @@ namespace AwsMock::Database::Entity::Transfer {
 
     auto usersDoc = bsoncxx::builder::basic::array{};
     for (const auto &user : users) {
-      usersDoc.append(make_document(kvp("userName", user.userName), kvp("password", user.password), kvp("homeDirectory", user.homeDirectory)));
+      usersDoc.append(make_document(kvp("userName", user.userName),
+                                    kvp("password", user.password),
+                                    kvp("homeDirectory", user.homeDirectory)));
     }
 
     view_or_value<view, value> transferDoc = make_document(
@@ -40,9 +42,12 @@ namespace AwsMock::Database::Entity::Transfer {
         kvp("concurrency", concurrency),
         kvp("port", port),
         kvp("listenAddress", listenAddress),
-        kvp("lastStarted", bsoncxx::types::b_date(std::chrono::milliseconds(lastStarted.timestamp().epochMicroseconds() / 1000))),
-        kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-        kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+        kvp("lastStarted",
+            bsoncxx::types::b_date(std::chrono::milliseconds(lastStarted.timestamp().epochMicroseconds() / 1000))),
+        kvp("created",
+            bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
+        kvp("modified",
+            bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
 
     return transferDoc;
   }
@@ -57,9 +62,12 @@ namespace AwsMock::Database::Entity::Transfer {
     concurrency = mResult.value()["concurrency"].get_int32().value;
     port = mResult.value()["port"].get_int32().value;
     listenAddress = bsoncxx::string::to_string(mResult.value()["listenAddress"].get_string().value);
-    lastStarted = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date().value) / 1000));
-    created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-    modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+    lastStarted = Poco::DateTime(Poco::Timestamp::fromEpochTime(
+        bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date().value) / 1000));
+    created = Poco::DateTime(Poco::Timestamp::fromEpochTime(
+        bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
+    modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(
+        bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
 
     auto protocolsDoc = mResult.value()["protocols"].get_array();
     for (auto &p : protocolsDoc.value) {
@@ -90,7 +98,7 @@ namespace AwsMock::Database::Entity::Transfer {
     jsonObject.set("lastStarted", Poco::DateTimeFormatter::format(lastStarted, Poco::DateTimeFormat::ISO8601_FORMAT));
 
     Poco::JSON::Array jsonProtocolsArray;
-    for(const auto &protocol: protocols) {
+    for (const auto &protocol : protocols) {
       jsonProtocolsArray.add(protocol);
     }
     jsonObject.set("protocols", jsonProtocolsArray);
@@ -110,7 +118,8 @@ namespace AwsMock::Database::Entity::Transfer {
    * @return output stream
    */
   std::ostream &operator<<(std::ostream &os, const Transfer &m) {
-    os << "Transfer={oid='" << m.oid << "', region='" << m.region << "', serverId='" << m.serverId << "', arn='" << m.arn << "', concurrently=" << m.concurrency
+    os << "Transfer={oid='" << m.oid << "', region='" << m.region << "', serverId='" << m.serverId << "', arn='"
+       << m.arn << "', concurrently=" << m.concurrency
        << ", port=" << m.port << ", listenAddress='" << m.listenAddress <<
        "', lastStarted='" << Poco::DateTimeFormatter().format(m.lastStarted, Poco::DateTimeFormat::HTTP_FORMAT) <<
        "', created='" << Poco::DateTimeFormatter().format(m.created, Poco::DateTimeFormat::HTTP_FORMAT) <<

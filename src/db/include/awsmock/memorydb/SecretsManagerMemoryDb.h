@@ -30,91 +30,91 @@ namespace AwsMock::Database {
 
   class SecretsManagerMemoryDb {
 
-  public:
+    public:
 
-    /**
-     * Constructor
-     */
-    SecretsManagerMemoryDb();
+      /**
+       * Constructor
+       */
+      SecretsManagerMemoryDb();
 
-    /**
-     * Singleton instance
-     */
-    static SecretsManagerMemoryDb &instance() {
-      static Poco::SingletonHolder<SecretsManagerMemoryDb> sh;
-      return *sh.get();
-    }
+      /**
+       * Singleton instance
+       */
+      static SecretsManagerMemoryDb &instance() {
+        static Poco::SingletonHolder<SecretsManagerMemoryDb> sh;
+        return *sh.get();
+      }
 
-    /**
-     * Secret exists
-     *
-     * @param region AWS region
-     * @param name secret name
-     * @return true if secret exists
-     * @throws DatabaseException
-     */
-    bool SecretExists(const std::string &region, const std::string &name);
+      /**
+       * Secret exists
+       *
+       * @param region AWS region
+       * @param name secret name
+       * @return true if secret exists
+       * @throws DatabaseException
+       */
+      bool SecretExists(const std::string &region, const std::string &name);
 
-    /**
-     * Secret exists
-     *
-     * @param bucket secret entity
-     * @return true if secret exists
-     * @throws DatabaseException
-     */
-    bool SecretExists(const Entity::SecretsManager::Secret &secret);
+      /**
+       * Secret exists
+       *
+       * @param bucket secret entity
+       * @return true if secret exists
+       * @throws DatabaseException
+       */
+      bool SecretExists(const Entity::SecretsManager::Secret &secret);
 
-    /**
-     * Returns the secret by id
-     *
-     * @param oid secret oid
-     * @return secret, if existing
-     * @throws DatabaseException
-     */
-    Entity::SecretsManager::Secret GetSecretById(const std::string &oid);
+      /**
+       * Returns the secret by id
+       *
+       * @param oid secret oid
+       * @return secret, if existing
+       * @throws DatabaseException
+       */
+      Entity::SecretsManager::Secret GetSecretById(const std::string &oid);
 
-    /**
-     * Returns the secret by region and name.
-     *
-     * @param region AWS region
-     * @param name secret name
-     * @return secret entity
-     */
-    Entity::SecretsManager::Secret GetSecretByRegionName(const std::string &region, const std::string &name);
+      /**
+       * Returns the secret by region and name.
+       *
+       * @param region AWS region
+       * @param name secret name
+       * @return secret entity
+       */
+      Entity::SecretsManager::Secret GetSecretByRegionName(const std::string &region, const std::string &name);
 
-    /**
-     * Creates a new secret in the secrets manager collection
-     *
-     * @param secret secret entity
-     * @return created secret entity
-     * @throws DatabaseException
-     */
-    Entity::SecretsManager::Secret CreateSecret(const Entity::SecretsManager::Secret &secret);
+      /**
+       * Creates a new secret in the secrets manager collection
+       *
+       * @param secret secret entity
+       * @return created secret entity
+       * @throws DatabaseException
+       */
+      Entity::SecretsManager::Secret CreateSecret(const Entity::SecretsManager::Secret &secret);
 
-    /**
-     * Delete a secret.
-     *
-     * @param secret secret entity
-     * @throws DatabaseException
-     */
-    void DeleteSecret(const Entity::SecretsManager::Secret &secret);
+      /**
+       * Delete a secret.
+       *
+       * @param secret secret entity
+       * @throws DatabaseException
+       */
+      void DeleteSecret(const Entity::SecretsManager::Secret &secret);
 
-  private:
+    private:
 
-    /**
-     * Logger
-     */
-    Core::LogStream _logger;
+      /**
+       * Logger
+       */
+      Core::LogStream _logger;
 
-    /**
-     * Lambda map
-     */
-    std::map<std::string, Entity::SecretsManager::Secret> _secrets{};
+      /**
+       * Lambda map
+       */
+      std::map<std::string, Entity::SecretsManager::Secret> _secrets{};
 
-    /**
-     * Lambda mutex
-     */
-    Poco::Mutex _secretMutex;
+      /**
+       * Lambda mutex
+       */
+      Poco::Mutex _secretMutex;
   };
 
 } // namespace AwsMock::Database

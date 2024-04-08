@@ -19,17 +19,17 @@ namespace AwsMock::Database {
 
   class TestUtils {
 
-  public:
+    public:
 
-    /**
-     * Creates all services in the module database
-     */
-    static void CreateServices();
+      /**
+       * Creates all services in the module database
+       */
+      static void CreateServices();
 
-    /**
-    * Service names
-    */
-    static std::vector<std::string> _modules;
+      /**
+      * Service names
+      */
+      static std::vector<std::string> _modules;
   };
 
 } //namespace AwsMock::Database

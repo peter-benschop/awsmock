@@ -33,20 +33,20 @@ namespace AwsMock::Database {
 
   class S3DatabaseTest : public ::testing::Test {
 
-  protected:
+    protected:
 
-    void SetUp() override {
-      _region = _configuration.getString("awsmock.region");
-    }
+      void SetUp() override {
+        _region = _configuration.getString("awsmock.region");
+      }
 
-    void TearDown() override {
-      _servicedatabase.DeleteAllBuckets();
-      _servicedatabase.DeleteAllObjects();
-    }
+      void TearDown() override {
+        _servicedatabase.DeleteAllBuckets();
+        _servicedatabase.DeleteAllObjects();
+      }
 
-    std::string _region;
-    Core::Configuration& _configuration = Core::TestUtils::GetTestConfiguration();
-    S3Database _servicedatabase = S3Database();
+      std::string _region;
+      Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration();
+      S3Database _servicedatabase = S3Database();
   };
 
   TEST_F(S3DatabaseTest, BucketCreateTest) {
@@ -156,7 +156,8 @@ namespace AwsMock::Database {
     _servicedatabase.CreateBucket(bucket);
     Entity::S3::Object object1 = {.region=_region, .bucket=bucket.name, .key=OBJECT, .owner=OWNER, .size=5};
     _servicedatabase.CreateObject(object1);
-    Entity::S3::Object object2 = {.region=_region, .bucket=bucket.name, .key="test1/" + std::string(OBJECT), .owner=OWNER, .size=5};
+    Entity::S3::Object
+        object2 = {.region=_region, .bucket=bucket.name, .key="test1/" + std::string(OBJECT), .owner=OWNER, .size=5};
     _servicedatabase.CreateObject(object2);
 
     // act
@@ -279,7 +280,8 @@ namespace AwsMock::Database {
 
     // Create objects
     for (int i = 0; i < 10; i++) {
-      _servicedatabase.CreateObject({.region=_region, .bucket=bucket.name, .key=std::string(OBJECT) + std::to_string(i), .owner=OWNER});
+      _servicedatabase.CreateObject({.region=_region, .bucket=bucket.name, .key=std::string(OBJECT)
+          + std::to_string(i), .owner=OWNER});
     }
 
     // act
@@ -297,7 +299,8 @@ namespace AwsMock::Database {
 
     // Create objects
     for (int i = 0; i < 10; i++) {
-      _servicedatabase.CreateObject({.region=_region, .bucket=bucket.name, .key=std::string(OBJECT) + std::to_string(i), .owner=OWNER});
+      _servicedatabase.CreateObject({.region=_region, .bucket=bucket.name, .key=std::string(OBJECT)
+          + std::to_string(i), .owner=OWNER});
     }
 
     // act
@@ -351,7 +354,8 @@ namespace AwsMock::Database {
     // arrange
     Entity::S3::Bucket bucket = {.region=_region, .name=BUCKET, .owner=OWNER};
     bucket = _servicedatabase.CreateBucket(bucket);
-    Entity::S3::BucketNotification notification = {.event="s3:ObjectCreated:*", .lambdaArn="aws:arn:000000000:lambda:test"};
+    Entity::S3::BucketNotification
+        notification = {.event="s3:ObjectCreated:*", .lambdaArn="aws:arn:000000000:lambda:test"};
 
     // act
     Entity::S3::Bucket result = _servicedatabase.CreateBucketNotification(bucket, notification);
@@ -365,7 +369,8 @@ namespace AwsMock::Database {
     // arrange
     Entity::S3::Bucket bucket = {.region=_region, .name=BUCKET, .owner=OWNER};
     bucket = _servicedatabase.CreateBucket(bucket);
-    Entity::S3::BucketNotification notification = {.event="s3:ObjectCreated:Put", .lambdaArn="aws:arn:000000000:lambda:test"};
+    Entity::S3::BucketNotification
+        notification = {.event="s3:ObjectCreated:Put", .lambdaArn="aws:arn:000000000:lambda:test"};
 
     // act
     Entity::S3::Bucket result = _servicedatabase.CreateBucketNotification(bucket, notification);
@@ -379,7 +384,8 @@ namespace AwsMock::Database {
     // arrange
     Entity::S3::Bucket bucket = {.region=_region, .name=BUCKET, .owner=OWNER};
     bucket = _servicedatabase.CreateBucket(bucket);
-    Entity::S3::BucketNotification notification = {.event="s3:ObjectCreated:Put", .lambdaArn="aws:arn:000000000:lambda:test"};
+    Entity::S3::BucketNotification
+        notification = {.event="s3:ObjectCreated:Put", .lambdaArn="aws:arn:000000000:lambda:test"};
     bucket = _servicedatabase.CreateBucketNotification(bucket, notification);
 
     // act
@@ -394,7 +400,8 @@ namespace AwsMock::Database {
     // arrange
     Entity::S3::Bucket bucket = {.region=_region, .name=BUCKET, .owner=OWNER};
     bucket = _servicedatabase.CreateBucket(bucket);
-    Entity::S3::BucketNotification notification = {.event="s3:ObjectCreated:*", .lambdaArn="aws:arn:000000000:lambda:test"};
+    Entity::S3::BucketNotification
+        notification = {.event="s3:ObjectCreated:*", .lambdaArn="aws:arn:000000000:lambda:test"};
     bucket = _servicedatabase.CreateBucketNotification(bucket, notification);
 
     // act
@@ -409,9 +416,11 @@ namespace AwsMock::Database {
     // arrange
     Entity::S3::Bucket bucket = {.region=_region, .name=BUCKET, .owner=OWNER};
     bucket = _servicedatabase.CreateBucket(bucket);
-    Entity::S3::BucketNotification notification = {.event="s3:ObjectCreated:*", .lambdaArn="aws:arn:000000000:lambda:test"};
+    Entity::S3::BucketNotification
+        notification = {.event="s3:ObjectCreated:*", .lambdaArn="aws:arn:000000000:lambda:test"};
     bucket = _servicedatabase.CreateBucketNotification(bucket, notification);
-    Entity::S3::BucketNotification deleteNotification = {.event="s3:ObjectCreated:Put", .lambdaArn="aws:arn:000000000:lambda:test"};
+    Entity::S3::BucketNotification
+        deleteNotification = {.event="s3:ObjectCreated:Put", .lambdaArn="aws:arn:000000000:lambda:test"};
 
     // act
     Entity::S3::Bucket result = _servicedatabase.DeleteBucketNotifications(bucket, deleteNotification);

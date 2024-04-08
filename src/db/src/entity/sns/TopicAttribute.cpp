@@ -9,35 +9,38 @@ namespace AwsMock::Database::Entity::SNS {
   view_or_value<view, value> TopicAttribute::ToDocument() const {
 
     view_or_value<view, value> topicAttributeDoc = make_document(
-      kvp("deliveryPolicy", deliveryPolicy),
-      kvp("displayName", displayName),
-      kvp("fifoTopic", fifoTopic),
-      kvp("policy", policy),
-      kvp("signatureVersion", signatureVersion),
-      kvp("tracingConfig", tracingConfig),
-      kvp("kmsMasterKeyId", kmsMasterKeyId),
-      kvp("archivePolicy", archivePolicy),
-      kvp("beginningArchiveTime", bsoncxx::types::b_date(std::chrono::milliseconds(beginningArchiveTime.timestamp().epochMicroseconds() / 1000))),
-      kvp("contentBasedDeduplication", contentBasedDeduplication));
+        kvp("deliveryPolicy", deliveryPolicy),
+        kvp("displayName", displayName),
+        kvp("fifoTopic", fifoTopic),
+        kvp("policy", policy),
+        kvp("signatureVersion", signatureVersion),
+        kvp("tracingConfig", tracingConfig),
+        kvp("kmsMasterKeyId", kmsMasterKeyId),
+        kvp("archivePolicy", archivePolicy),
+        kvp("beginningArchiveTime",
+            bsoncxx::types::b_date(std::chrono::milliseconds(
+                beginningArchiveTime.timestamp().epochMicroseconds() / 1000))),
+        kvp("contentBasedDeduplication", contentBasedDeduplication));
 
     return topicAttributeDoc;
   }
 
   void TopicAttribute::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
-    if(mResult->empty()) {
+    if (mResult->empty()) {
       return;
     }
 
-    deliveryPolicy = mResult.value()["deliveryPolicy"].get_string().value;
-    displayName = mResult.value()["displayName"].get_string().value;
+    deliveryPolicy = bsoncxx::string::to_string(mResult.value()["deliveryPolicy"].get_string().value);
+    displayName = bsoncxx::string::to_string(mResult.value()["displayName"].get_string().value);
     fifoTopic = mResult.value()["fifoTopic"].get_bool().value;
-    policy = mResult.value()["policy"].get_string().value;
-    signatureVersion = mResult.value()["signatureVersion"].get_string().value;
-    tracingConfig = mResult.value()["tracingConfig"].get_string().value;
-    kmsMasterKeyId = mResult.value()["kmsMasterKeyId"].get_string().value;
-    archivePolicy = mResult.value()["archivePolicy"].get_string().value;
-    beginningArchiveTime = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["beginningArchiveTime"].get_date().value) / 1000));
+    policy = bsoncxx::string::to_string(mResult.value()["policy"].get_string().value);
+    signatureVersion = bsoncxx::string::to_string(mResult.value()["signatureVersion"].get_string().value);
+    tracingConfig = bsoncxx::string::to_string(mResult.value()["tracingConfig"].get_string().value);
+    kmsMasterKeyId = bsoncxx::string::to_string(mResult.value()["kmsMasterKeyId"].get_string().value);
+    archivePolicy = bsoncxx::string::to_string(mResult.value()["archivePolicy"].get_string().value);
+    beginningArchiveTime = Poco::DateTime(Poco::Timestamp::fromEpochTime(
+        bsoncxx::types::b_date(mResult.value()["beginningArchiveTime"].get_date().value) / 1000));
     contentBasedDeduplication = mResult.value()["contentBasedDeduplication"].get_bool().value;
   }
 
@@ -54,7 +57,7 @@ namespace AwsMock::Database::Entity::SNS {
     return jsonObject;
   }
 
-  void TopicAttribute::FromJsonObject(const Poco::JSON::Object::Ptr& jsonObject) {
+  void TopicAttribute::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
 
     Core::JsonUtils::GetJsonValueString("deliveryPolicy", jsonObject, deliveryPolicy);
     Core::JsonUtils::GetJsonValueString("displayName", jsonObject, displayName);
@@ -73,9 +76,12 @@ namespace AwsMock::Database::Entity::SNS {
   }
 
   std::ostream &operator<<(std::ostream &os, const TopicAttribute &r) {
-    os << "TopicAttribute={deliveryPolicy='" << r.deliveryPolicy << "' displayName='" << r.displayName << "' fifoTopic='" << r.fifoTopic << "' policy='" << r.policy << "' signatureVersion='" << r.signatureVersion
-       << "' tracingConfig='" << r.tracingConfig << "' kmsMasterKeyId=" << r.kmsMasterKeyId << " archivePolicy='" << r.archivePolicy  << "' contentBasedDeduplication='" << r.contentBasedDeduplication
-      << "' beginningArchiveTime='" << Poco::DateTimeFormatter::format(r.beginningArchiveTime, Poco::DateTimeFormat::ISO8601_FORMAT) << "'}";
+    os << "TopicAttribute={deliveryPolicy='" << r.deliveryPolicy << "' displayName='" << r.displayName
+       << "' fifoTopic='" << r.fifoTopic << "' policy='" << r.policy << "' signatureVersion='" << r.signatureVersion
+       << "' tracingConfig='" << r.tracingConfig << "' kmsMasterKeyId=" << r.kmsMasterKeyId << " archivePolicy='"
+       << r.archivePolicy << "' contentBasedDeduplication='" << r.contentBasedDeduplication
+       << "' beginningArchiveTime='"
+       << Poco::DateTimeFormatter::format(r.beginningArchiveTime, Poco::DateTimeFormat::ISO8601_FORMAT) << "'}";
     return os;
   }
 

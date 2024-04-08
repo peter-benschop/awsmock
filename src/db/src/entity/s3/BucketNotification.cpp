@@ -30,7 +30,7 @@ namespace AwsMock::Database::Entity::S3 {
     return jsonObject;
   }
 
-  void BucketNotification::FromJsonObject(const Poco::JSON::Object::Ptr& jsonObject) {
+  void BucketNotification::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
 
     Core::JsonUtils::GetJsonValueString("notificationId", jsonObject, notificationId);
     Core::JsonUtils::GetJsonValueString("event", jsonObject, event);
@@ -45,7 +45,8 @@ namespace AwsMock::Database::Entity::S3 {
   }
 
   std::ostream &operator<<(std::ostream &os, const BucketNotification &q) {
-    os << "BucketNotification={notificationId='" + q.notificationId + "' queueArn='" + q.queueArn + "' lambdaArn='" + q.lambdaArn + "' event='" + q.event + "'}";
+    os << "BucketNotification={notificationId='" + q.notificationId + "' queueArn='" + q.queueArn + "' lambdaArn='"
+        + q.lambdaArn + "' event='" + q.event + "'}";
     return os;
   }
 } // namespace AwsMock::Database::Entity::S3

@@ -10,9 +10,11 @@ namespace AwsMock::Database {
 
   bool SecretsManagerMemoryDb::SecretExists(const std::string &region, const std::string &name) {
 
-    return find_if(_secrets.begin(), _secrets.end(), [region, name](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
-      return secret.second.region == region && secret.second.name == name;
-    }) != _secrets.end();
+    return find_if(_secrets.begin(),
+                   _secrets.end(),
+                   [region, name](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
+                     return secret.second.region == region && secret.second.name == name;
+                   }) != _secrets.end();
   }
 
   bool SecretsManagerMemoryDb::SecretExists(const Entity::SecretsManager::Secret &secret) {
@@ -21,9 +23,11 @@ namespace AwsMock::Database {
 
   Entity::SecretsManager::Secret SecretsManagerMemoryDb::GetSecretById(const std::string &oid) {
 
-    auto it = find_if(_secrets.begin(), _secrets.end(), [oid](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
-      return secret.first == oid;
-    });
+    auto it = find_if(_secrets.begin(),
+                      _secrets.end(),
+                      [oid](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
+                        return secret.first == oid;
+                      });
 
     if (it != _secrets.end()) {
       it->second.oid = oid;
@@ -32,13 +36,16 @@ namespace AwsMock::Database {
     return {};
   }
 
-  Entity::SecretsManager::Secret SecretsManagerMemoryDb::GetSecretByRegionName(const std::string &region, const std::string &name) {
+  Entity::SecretsManager::Secret SecretsManagerMemoryDb::GetSecretByRegionName(const std::string &region,
+                                                                               const std::string &name) {
 
     Entity::SecretsManager::Secret result;
 
-    auto it = find_if(_secrets.begin(), _secrets.end(), [region, name](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
-      return secret.second.region == region && secret.second.name == name;
-    });
+    auto it = find_if(_secrets.begin(),
+                      _secrets.end(),
+                      [region, name](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
+                        return secret.second.region == region && secret.second.name == name;
+                      });
 
     if (it != _secrets.end()) {
       it->second.oid = it->first;

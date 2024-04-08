@@ -12,11 +12,14 @@ namespace AwsMock::Database {
   using bsoncxx::builder::stream::document;
 
   std::map<std::string, std::vector<std::string>> S3Database::allowedEventTypes = {
-    {"Created", {"s3:ObjectCreated:Put", "s3:ObjectCreated:Post", "s3:ObjectCreated:Copy", "s3:ObjectCreated:CompleteMultipartUpload"}},
-    {"Deleted", {"s3:ObjectRemoved:Delete", "s3:ObjectRemoved:DeleteMarkerCreated"}}
+      {"Created", {"s3:ObjectCreated:Put", "s3:ObjectCreated:Post", "s3:ObjectCreated:Copy",
+                   "s3:ObjectCreated:CompleteMultipartUpload"}},
+      {"Deleted", {"s3:ObjectRemoved:Delete", "s3:ObjectRemoved:DeleteMarkerCreated"}}
   };
 
-  S3Database::S3Database() : _logger(Poco::Logger::get("S3Database")), _memoryDb(S3MemoryDb::instance()), _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()) {}
+  S3Database::S3Database()
+      : _logger(Poco::Logger::get("S3Database")), _memoryDb(S3MemoryDb::instance()), _useDatabase(HasDatabase()),
+        _databaseName(GetDatabaseName()) {}
 
   bool S3Database::BucketExists(const std::string &region, const std::string &name) {
 
@@ -59,7 +62,8 @@ namespace AwsMock::Database {
 
         session.start_transaction();
         auto insert_one_result = _bucketCollection.insert_one(bucket.ToDocument());
-        log_trace_stream(_logger) << "Bucket created, oid: " << insert_one_result->inserted_id().get_oid().value.to_string() << std::endl;
+        log_trace_stream(_logger) << "Bucket created, oid: "
+                                  << insert_one_result->inserted_id().get_oid().value.to_string() << std::endl;
         session.commit_transaction();
         return GetBucketById(insert_one_result->inserted_id().get_oid().value);
 
@@ -105,7 +109,8 @@ namespace AwsMock::Database {
     auto client = GetClient();
     mongocxx::collection _bucketCollection = (*client)[_databaseName]["s3_bucket"];
 
-    mongocxx::stdx::optional<bsoncxx::document::value> mResult = _bucketCollection.find_one(make_document(kvp("_id", oid)));
+    mongocxx::stdx::optional<bsoncxx::document::value>
+        mResult = _bucketCollection.find_one(make_document(kvp("_id", oid)));
     Entity::S3::Bucket result;
     result.FromDocument(mResult);
 
@@ -131,7 +136,8 @@ namespace AwsMock::Database {
 
       auto client = GetClient();
       mongocxx::collection _bucketCollection = (*client)[_databaseName]["s3_bucket"];
-      mongocxx::stdx::optional<bsoncxx::document::value> mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
+      mongocxx::stdx::optional<bsoncxx::document::value>
+          mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
       if (mResult->empty()) {
         return {};
       }
@@ -178,7 +184,8 @@ namespace AwsMock::Database {
 
       auto client = GetClient();
       mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
-      int64_t count = _objectCollection.count_documents(make_document(kvp("region", bucket.region), kvp("bucket", bucket.name)));
+      int64_t count =
+          _objectCollection.count_documents(make_document(kvp("region", bucket.region), kvp("bucket", bucket.name)));
       log_trace_stream(_logger) << "Objects exists: " << (count > 0 ? "true" : "false") << std::endl;
       return count > 0;
 
@@ -200,7 +207,9 @@ namespace AwsMock::Database {
       try {
 
         session.start_transaction();
-        auto result = _bucketCollection.replace_one(make_document(kvp("region", bucket.region), kvp("name", bucket.name)), bucket.ToDocument());
+        auto result =
+            _bucketCollection.replace_one(make_document(kvp("region", bucket.region), kvp("name", bucket.name)),
+                                          bucket.ToDocument());
         log_trace_stream(_logger) << "Bucket updated: " << bucket.ToString() << std::endl;
         session.commit_transaction();
         return GetBucketByRegionName(bucket.region, bucket.name);
@@ -248,7 +257,9 @@ namespace AwsMock::Database {
 
         auto client = GetClient();
         mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
-        auto objectCursor = _objectCollection.find(make_document(kvp("bucket", bucket), kvp("key", bsoncxx::types::b_regex{"^" + prefix + ".*"})));
+        auto objectCursor = _objectCollection.find(make_document(kvp("bucket", bucket),
+                                                                 kvp("key",
+                                                                     bsoncxx::types::b_regex{"^" + prefix + ".*"})));
         for (auto object : objectCursor) {
           Entity::S3::Object result;
           result.FromDocument(object);
@@ -286,7 +297,8 @@ namespace AwsMock::Database {
 
         auto client = GetClient();
         mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
-        auto objectCursor = _objectCollection.find(make_document(kvp("key", bsoncxx::types::b_regex{"^" + prefix + ".*"})));
+        auto objectCursor =
+            _objectCollection.find(make_document(kvp("key", bsoncxx::types::b_regex{"^" + prefix + ".*"})));
         for (auto object : objectCursor) {
           Entity::S3::Object result;
           result.FromDocument(object);
@@ -366,7 +378,9 @@ namespace AwsMock::Database {
 
       auto client = GetClient();
       mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
-      int64_t count = _objectCollection.count_documents(make_document(kvp("region", object.region), kvp("bucket", object.bucket), kvp("key", object.key)));
+      int64_t count = _objectCollection.count_documents(make_document(kvp("region", object.region),
+                                                                      kvp("bucket", object.bucket),
+                                                                      kvp("key", object.key)));
       log_trace_stream(_logger) << "Object exists: " << (count > 0 ? "true" : "false") << std::endl;
       return count > 0;
 
@@ -387,7 +401,8 @@ namespace AwsMock::Database {
 
         session.start_transaction();
         auto insert_one_result = _objectCollection.insert_one(object.ToDocument().view());
-        log_trace_stream(_logger) << "Object created, oid: " << insert_one_result->inserted_id().get_oid().value.to_string() << std::endl;
+        log_trace_stream(_logger) << "Object created, oid: "
+                                  << insert_one_result->inserted_id().get_oid().value.to_string() << std::endl;
         session.commit_transaction();
         return GetObjectById(insert_one_result->inserted_id().get_oid().value);
 
@@ -409,7 +424,8 @@ namespace AwsMock::Database {
     try {
       auto client = GetClient();
       mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
-      mongocxx::stdx::optional<bsoncxx::document::value> mResult = _objectCollection.find_one(make_document(kvp("_id", oid)));
+      mongocxx::stdx::optional<bsoncxx::document::value>
+          mResult = _objectCollection.find_one(make_document(kvp("_id", oid)));
 
       if (mResult->empty()) {
         return {};
@@ -458,7 +474,9 @@ namespace AwsMock::Database {
 
         session.start_transaction();
         auto update_one_result =
-          _objectCollection.replace_one(make_document(kvp("region", object.region), kvp("bucket", object.bucket), kvp("key", object.key)), object.ToDocument());
+            _objectCollection.replace_one(make_document(kvp("region", object.region),
+                                                        kvp("bucket", object.bucket),
+                                                        kvp("key", object.key)), object.ToDocument());
         log_trace_stream(_logger) << "Object updated: " << object.ToString() << std::endl;
         session.commit_transaction();
         return GetObject(object.region, object.bucket, object.key);
@@ -475,7 +493,9 @@ namespace AwsMock::Database {
     }
   }
 
-  Entity::S3::Object S3Database::GetObject(const std::string &region, const std::string &bucket, const std::string &key) {
+  Entity::S3::Object S3Database::GetObject(const std::string &region,
+                                           const std::string &bucket,
+                                           const std::string &key) {
 
     if (_useDatabase) {
 
@@ -483,7 +503,8 @@ namespace AwsMock::Database {
 
         auto client = GetClient();
         mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _objectCollection.find_one(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key)));
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult =
+            _objectCollection.find_one(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key)));
 
         if (mResult.has_value()) {
           Entity::S3::Object result;
@@ -506,14 +527,20 @@ namespace AwsMock::Database {
     return {};
   }
 
-  Entity::S3::Object S3Database::GetObjectMd5(const std::string &region, const std::string &bucket, const std::string &key, const std::string &md5sum) {
+  Entity::S3::Object S3Database::GetObjectMd5(const std::string &region,
+                                              const std::string &bucket,
+                                              const std::string &key,
+                                              const std::string &md5sum) {
 
     try {
 
       auto client = GetClient();
       mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
       mongocxx::stdx::optional<bsoncxx::document::value>
-        mResult = _objectCollection.find_one(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key), kvp("md5sum", md5sum)));
+          mResult = _objectCollection.find_one(make_document(kvp("region", region),
+                                                             kvp("bucket", bucket),
+                                                             kvp("key", key),
+                                                             kvp("md5sum", md5sum)));
       if (mResult.has_value()) {
         Entity::S3::Object result;
         result.FromDocument(mResult);
@@ -529,13 +556,19 @@ namespace AwsMock::Database {
     return {};
   }
 
-  Entity::S3::Object S3Database::GetObjectVersion(const std::string &region, const std::string &bucket, const std::string &key, const std::string &versionId) {
+  Entity::S3::Object S3Database::GetObjectVersion(const std::string &region,
+                                                  const std::string &bucket,
+                                                  const std::string &key,
+                                                  const std::string &versionId) {
 
     try {
 
       auto client = GetClient();
       mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
-      auto mResult = _objectCollection.find_one(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key), kvp("versionId", versionId)));
+      auto mResult = _objectCollection.find_one(make_document(kvp("region", region),
+                                                              kvp("bucket", bucket),
+                                                              kvp("key", key),
+                                                              kvp("versionId", versionId)));
       if (mResult) {
         Entity::S3::Object result;
         result.FromDocument(mResult);
@@ -592,7 +625,9 @@ namespace AwsMock::Database {
 
         auto client = GetClient();
         mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
-        auto result = _objectCollection.delete_many(make_document(kvp("region", object.region), kvp("bucket", object.bucket), kvp("key", object.key)));
+        auto result = _objectCollection.delete_many(make_document(kvp("region", object.region),
+                                                                  kvp("bucket", object.bucket),
+                                                                  kvp("key", object.key)));
         log_debug_stream(_logger) << "Objects deleted, count: " << result->deleted_count() << std::endl;
 
       } catch (const mongocxx::exception &exc) {
@@ -623,7 +658,8 @@ namespace AwsMock::Database {
       try {
 
         session.start_transaction();
-        auto result = _objectCollection.delete_many(make_document(kvp("bucket", bucket), kvp("key", make_document(kvp("$in", array)))));
+        auto result = _objectCollection.delete_many(make_document(kvp("bucket", bucket),
+                                                                  kvp("key", make_document(kvp("$in", array)))));
         log_debug_stream(_logger) << "Objects deleted, count: " << result->result().deleted_count() << std::endl;
         session.commit_transaction();
 
@@ -668,7 +704,8 @@ namespace AwsMock::Database {
     }
   }
 
-  Entity::S3::Bucket S3Database::CreateBucketNotification(const Entity::S3::Bucket &bucket, const Entity::S3::BucketNotification &bucketNotification) {
+  Entity::S3::Bucket S3Database::CreateBucketNotification(const Entity::S3::Bucket &bucket,
+                                                          const Entity::S3::BucketNotification &bucketNotification) {
 
     Entity::S3::Bucket internBucket = GetBucketByRegionName(bucket.region, bucket.name);
     internBucket.notifications.clear();
@@ -684,10 +721,10 @@ namespace AwsMock::Database {
       for (const auto &it : allowedEvents) {
 
         Entity::S3::BucketNotification notification = {
-          .event=it,
-          .notificationId=bucketNotification.notificationId,
-          .queueArn=bucketNotification.queueArn,
-          .lambdaArn=bucketNotification.lambdaArn
+            .event=it,
+            .notificationId=bucketNotification.notificationId,
+            .queueArn=bucketNotification.queueArn,
+            .lambdaArn=bucketNotification.lambdaArn
         };
         internBucket.notifications.emplace_back(notification);
       }
@@ -697,12 +734,14 @@ namespace AwsMock::Database {
       internBucket.notifications.emplace_back(bucketNotification);
     }
 
-    log_debug_stream(_logger) << "Bucket notification added, notification: " << bucketNotification.ToString() << std::endl;
+    log_debug_stream(_logger) << "Bucket notification added, notification: " << bucketNotification.ToString()
+                              << std::endl;
 
     return UpdateBucket(internBucket);
   }
 
-  Entity::S3::Bucket S3Database::DeleteBucketNotifications(const Entity::S3::Bucket &bucket, const Entity::S3::BucketNotification &bucketNotification) {
+  Entity::S3::Bucket S3Database::DeleteBucketNotifications(const Entity::S3::Bucket &bucket,
+                                                           const Entity::S3::BucketNotification &bucketNotification) {
 
     Entity::S3::Bucket internBucket = GetBucketByRegionName(bucket.region, bucket.name);
 
@@ -732,7 +771,8 @@ namespace AwsMock::Database {
                                                       }), internBucket.notifications.end());
     }
 
-    log_trace_stream(_logger) << "Bucket notification deleted, notification: " << bucketNotification.ToString() << std::endl;
+    log_trace_stream(_logger) << "Bucket notification deleted, notification: " << bucketNotification.ToString()
+                              << std::endl;
 
     return UpdateBucket(internBucket);
   }

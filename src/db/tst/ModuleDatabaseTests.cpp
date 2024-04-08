@@ -31,19 +31,19 @@ namespace AwsMock::Database {
 
   class ModuleDatabaseTest : public ::testing::Test {
 
-  protected:
+    protected:
 
-    void SetUp() override {
-      _region = _configuration.getString("awsmock.region");
-    }
+      void SetUp() override {
+        _region = _configuration.getString("awsmock.region");
+      }
 
-    void TearDown() override {
-      _moduleDatabase.DeleteAllModules();
-    }
+      void TearDown() override {
+        _moduleDatabase.DeleteAllModules();
+      }
 
-    std::string _region;
-    Core::Configuration& _configuration = Core::TestUtils::GetTestConfiguration();
-    ModuleDatabase& _moduleDatabase = ModuleDatabase::instance();
+      std::string _region;
+      Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration();
+      ModuleDatabase &_moduleDatabase = ModuleDatabase::instance();
   };
 
   TEST_F(ModuleDatabaseTest, ModuleCreateTest) {
@@ -77,7 +77,8 @@ namespace AwsMock::Database {
   TEST_F(ModuleDatabaseTest, ModuleActiveTest) {
 
     // arrange
-    Entity::Module::Module module = {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING, .status=Entity::Module::ModuleStatus::ACTIVE};
+    Entity::Module::Module module =
+        {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING, .status=Entity::Module::ModuleStatus::ACTIVE};
     module = _moduleDatabase.CreateModule(module);
 
     // act

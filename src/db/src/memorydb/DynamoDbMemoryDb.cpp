@@ -11,13 +11,17 @@ namespace AwsMock::Database {
   bool DynamoDbMemoryDb::TableExists(const std::string &region, const std::string &tableName) {
 
     if (!region.empty()) {
-      return find_if(_tables.begin(), _tables.end(), [region, tableName](const std::pair<std::string, Entity::DynamoDb::Table> &table) {
-        return table.second.region == region && table.second.name == tableName;
-      }) != _tables.end();
+      return find_if(_tables.begin(),
+                     _tables.end(),
+                     [region, tableName](const std::pair<std::string, Entity::DynamoDb::Table> &table) {
+                       return table.second.region == region && table.second.name == tableName;
+                     }) != _tables.end();
     } else {
-      return find_if(_tables.begin(), _tables.end(), [tableName](const std::pair<std::string, Entity::DynamoDb::Table> &table) {
-        return table.second.name == tableName;
-      }) != _tables.end();
+      return find_if(_tables.begin(),
+                     _tables.end(),
+                     [tableName](const std::pair<std::string, Entity::DynamoDb::Table> &table) {
+                       return table.second.name == tableName;
+                     }) != _tables.end();
     }
   }
 
@@ -51,9 +55,10 @@ namespace AwsMock::Database {
 
   Entity::DynamoDb::Table DynamoDbMemoryDb::GetTableById(const std::string &oid) {
 
-    auto it = find_if(_tables.begin(), _tables.end(), [oid](const std::pair<std::string, Entity::DynamoDb::Table> &table) {
-      return table.first == oid;
-    });
+    auto it =
+        find_if(_tables.begin(), _tables.end(), [oid](const std::pair<std::string, Entity::DynamoDb::Table> &table) {
+          return table.first == oid;
+        });
 
     if (it == _tables.end()) {
       log_error_stream(_logger) << "Get table by ID failed, oid: " << oid << std::endl;
@@ -66,12 +71,15 @@ namespace AwsMock::Database {
 
   Entity::DynamoDb::Table DynamoDbMemoryDb::GetTableByRegionName(const std::string &region, const std::string &name) {
 
-    auto it = find_if(_tables.begin(), _tables.end(), [region, name](const std::pair<std::string, Entity::DynamoDb::Table> &table) {
-      return table.second.region == region && table.second.name == name;
-    });
+    auto it = find_if(_tables.begin(),
+                      _tables.end(),
+                      [region, name](const std::pair<std::string, Entity::DynamoDb::Table> &table) {
+                        return table.second.region == region && table.second.name == name;
+                      });
 
     if (it == _tables.end()) {
-      log_error_stream(_logger) << "Get table by region and name failed, region: " << region << " name: " << name << std::endl;
+      log_error_stream(_logger) << "Get table by region and name failed, region: " << region << " name: " << name
+                                << std::endl;
       throw Core::DatabaseException("Get table by region and name failed, region: " + region + " name: " + name);
     }
 
@@ -84,9 +92,11 @@ namespace AwsMock::Database {
 
     std::string region = table.region;
     std::string name = table.name;
-    auto it = find_if(_tables.begin(), _tables.end(), [region, name](const std::pair<std::string, Entity::DynamoDb::Table> &table) {
-      return table.second.region == region && table.second.name == name;
-    });
+    auto it = find_if(_tables.begin(),
+                      _tables.end(),
+                      [region, name](const std::pair<std::string, Entity::DynamoDb::Table> &table) {
+                        return table.second.region == region && table.second.name == name;
+                      });
     _tables[it->first] = table;
     return _tables[it->first];
   }
@@ -111,13 +121,17 @@ namespace AwsMock::Database {
   bool DynamoDbMemoryDb::ItemExists(const std::string &region, const std::string &tableName, const std::string &key) {
 
     if (!region.empty()) {
-      return find_if(_items.begin(), _items.end(), [region, tableName](const std::pair<std::string, Entity::DynamoDb::Item> &item) {
-        return item.second.region == region && item.second.name == tableName;
-      }) != _items.end();
+      return find_if(_items.begin(),
+                     _items.end(),
+                     [region, tableName](const std::pair<std::string, Entity::DynamoDb::Item> &item) {
+                       return item.second.region == region && item.second.name == tableName;
+                     }) != _items.end();
     } else {
-      return find_if(_items.begin(), _items.end(), [tableName](const std::pair<std::string, Entity::DynamoDb::Item> &item) {
-        return item.second.name == tableName;
-      }) != _items.end();
+      return find_if(_items.begin(),
+                     _items.end(),
+                     [tableName](const std::pair<std::string, Entity::DynamoDb::Item> &item) {
+                       return item.second.name == tableName;
+                     }) != _items.end();
     }
   }
 

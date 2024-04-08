@@ -9,7 +9,7 @@ namespace AwsMock::Database::Entity::Lambda {
   Poco::JSON::Object Environment::ToJsonObject() const {
 
     Poco::JSON::Array jsonArray;
-    for(const auto &variable: variables) {
+    for (const auto &variable : variables) {
       Poco::JSON::Object object;
       object.set("name", variable.first);
       object.set("value", variable.second);
@@ -25,7 +25,7 @@ namespace AwsMock::Database::Entity::Lambda {
     auto varDoc = mResult.value()["variables"].get_array();
     for (auto &v : varDoc.value) {
       for (auto &it : v.get_document().value) {
-        variables[std::string{it.key()}] = it.get_string().value;
+        variables[std::string{it.key()}] = bsoncxx::string::to_string(it.get_string().value);
       }
     }
   }

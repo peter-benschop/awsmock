@@ -11,7 +11,9 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_document;
   using bsoncxx::builder::stream::document;
 
-  SNSDatabase::SNSDatabase() : _logger(Poco::Logger::get("SNSDatabase")), _memoryDb(SNSMemoryDb::instance()), _useDatabase(_useDatabase), _databaseName(GetDatabaseName()) {}
+  SNSDatabase::SNSDatabase()
+      : _logger(Poco::Logger::get("SNSDatabase")), _memoryDb(SNSMemoryDb::instance()), _useDatabase(_useDatabase),
+        _databaseName(GetDatabaseName()) {}
 
   bool SNSDatabase::TopicExists(const std::string &topicArn) {
 
@@ -45,7 +47,8 @@ namespace AwsMock::Database {
 
         auto client = GetClient();
         mongocxx::collection _topicCollection = (*client)[_databaseName]["sns_topic"];
-        int64_t count = _topicCollection.count_documents(make_document(kvp("region", region), kvp("topicName", topicName)));
+        int64_t
+            count = _topicCollection.count_documents(make_document(kvp("region", region), kvp("topicName", topicName)));
         log_trace_stream(_logger) << "Topic exists: " << (count > 0 ? "true" : "false") << std::endl;
         return count > 0;
 
@@ -74,7 +77,8 @@ namespace AwsMock::Database {
         session.start_transaction();
         auto result = _topicCollection.insert_one(topic.ToDocument());
         session.commit_transaction();
-        log_trace_stream(_logger) << "Topic created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
+        log_trace_stream(_logger) << "Topic created, oid: " << result->inserted_id().get_oid().value.to_string()
+                                  << std::endl;
 
         return GetTopicById(result->inserted_id().get_oid().value);
 
@@ -97,7 +101,8 @@ namespace AwsMock::Database {
 
       auto client = GetClient();
       mongocxx::collection _topicCollection = (*client)[_databaseName]["sns_topic"];
-      mongocxx::stdx::optional<bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("_id", oid)));
+      mongocxx::stdx::optional<bsoncxx::document::value>
+          mResult = _topicCollection.find_one(make_document(kvp("_id", oid)));
       if (mResult) {
 
         Entity::SNS::Topic result;
@@ -133,7 +138,8 @@ namespace AwsMock::Database {
 
         auto client = GetClient();
         mongocxx::collection _topicCollection = (*client)[_databaseName]["sns_topic"];
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("topicArn", topicArn)));
+        mongocxx::stdx::optional<bsoncxx::document::value>
+            mResult = _topicCollection.find_one(make_document(kvp("topicArn", topicArn)));
         Entity::SNS::Topic result;
         result.FromDocument(mResult);
         return result;
@@ -189,7 +195,7 @@ namespace AwsMock::Database {
         auto client = GetClient();
         mongocxx::collection _topicCollection = (*client)[_databaseName]["sns_topic"];
 
-        if(region.empty()) {
+        if (region.empty()) {
 
           auto queueCursor = _topicCollection.find({});
           for (auto topic : queueCursor) {
@@ -233,7 +239,9 @@ namespace AwsMock::Database {
       try {
 
         session.start_transaction();
-        auto result = _topicCollection.replace_one(make_document(kvp("region", topic.region), kvp("topicArn", topic.topicArn)), topic.ToDocument());
+        auto result =
+            _topicCollection.replace_one(make_document(kvp("region", topic.region), kvp("topicArn", topic.topicArn)),
+                                         topic.ToDocument());
         log_trace_stream(_logger) << "Topic updated: " << topic.ToString() << std::endl;
         session.commit_transaction();
 
@@ -254,7 +262,7 @@ namespace AwsMock::Database {
 
   Entity::SNS::Topic SNSDatabase::CreateOrUpdateTopic(Entity::SNS::Topic &topic) {
 
-    if(TopicExists(topic.region, topic.topicName)) {
+    if (TopicExists(topic.region, topic.topicName)) {
 
       return UpdateTopic(topic);
 
@@ -381,7 +389,8 @@ namespace AwsMock::Database {
 
         session.start_transaction();
         auto result = _messageCollection.insert_one(message.ToDocument());
-        log_trace_stream(_logger) << "Message created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
+        log_trace_stream(_logger) << "Message created, oid: " << result->inserted_id().get_oid().value.to_string()
+                                  << std::endl;
         session.commit_transaction();
 
         return GetMessageById(result->inserted_id().get_oid().value);
@@ -404,7 +413,8 @@ namespace AwsMock::Database {
 
       auto client = GetClient();
       mongocxx::collection _messageCollection = (*client)[_databaseName]["sns_message"];
-      mongocxx::stdx::optional<bsoncxx::document::value> mResult = _messageCollection.find_one(make_document(kvp("_id", oid)));
+      mongocxx::stdx::optional<bsoncxx::document::value>
+          mResult = _messageCollection.find_one(make_document(kvp("_id", oid)));
       Entity::SNS::Message result;
       result.FromDocument(mResult);
 
@@ -428,14 +438,15 @@ namespace AwsMock::Database {
         long count;
         auto client = GetClient();
         mongocxx::collection _messageCollection = (*client)[_databaseName]["sns_message"];
-        if(!region.empty() && !topicArn.empty()) {
+        if (!region.empty() && !topicArn.empty()) {
           count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("topicArn", topicArn)));
-        } else if(!region.empty()) {
+        } else if (!region.empty()) {
           count = _messageCollection.count_documents(make_document(kvp("region", region)));
         } else {
           count = _messageCollection.count_documents({});
         }
-        log_trace_stream(_logger) << "Count messages, region: " << region << " arn: " << topicArn << " result: " << count << std::endl;
+        log_trace_stream(_logger) << "Count messages, region: " << region << " arn: " << topicArn << " result: "
+                                  << count << std::endl;
         return count;
 
       } catch (const mongocxx::exception &exc) {
@@ -450,7 +461,9 @@ namespace AwsMock::Database {
     }
   }
 
-  long SNSDatabase::CountMessagesByStatus(const std::string &region, const std::string &topicArn, Entity::SNS::MessageStatus status) {
+  long SNSDatabase::CountMessagesByStatus(const std::string &region,
+                                          const std::string &topicArn,
+                                          Entity::SNS::MessageStatus status) {
 
     if (_useDatabase) {
 
@@ -458,8 +471,12 @@ namespace AwsMock::Database {
 
         auto client = GetClient();
         mongocxx::collection _messageCollection = (*client)[_databaseName]["sns_message"];
-        long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("topicArn", topicArn), kvp("status", Entity::SNS::MessageStatusToString(status))));
-        log_trace_stream(_logger) << "Count messages by state, region: " << region << " arn: " << topicArn << " result: " << count << std::endl;
+        long count = _messageCollection.count_documents(make_document(kvp("region", region),
+                                                                      kvp("topicArn", topicArn),
+                                                                      kvp("status",
+                                                                          Entity::SNS::MessageStatusToString(status))));
+        log_trace_stream(_logger) << "Count messages by state, region: " << region << " arn: " << topicArn
+                                  << " result: " << count << std::endl;
         return count;
 
       } catch (const mongocxx::exception &exc) {
@@ -519,7 +536,9 @@ namespace AwsMock::Database {
       auto client = GetClient();
       mongocxx::collection _messageCollection = (*client)[_databaseName]["sns_message"];
 
-      auto mResult = _messageCollection.find_one_and_update(make_document(kvp("_id", bsoncxx::oid{message.oid})), message.ToDocument(), opts);
+      auto mResult = _messageCollection.find_one_and_update(make_document(kvp("_id", bsoncxx::oid{message.oid})),
+                                                            message.ToDocument(),
+                                                            opts);
       log_trace_stream(_logger) << "Message updated, count: " << bsoncxx::to_json(mResult->view()) << std::endl;
 
       if (!mResult) {
@@ -538,7 +557,7 @@ namespace AwsMock::Database {
 
   Entity::SNS::Message SNSDatabase::CreateOrUpdateMessage(Entity::SNS::Message &message) {
 
-    if(MessageExists(message.messageId)) {
+    if (MessageExists(message.messageId)) {
 
       return UpdateMessage(message);
 
@@ -561,7 +580,8 @@ namespace AwsMock::Database {
 
         session.start_transaction();
         auto result = _messageCollection.delete_one(make_document(kvp("messageId", message.messageId)));
-        log_debug_stream(_logger) << "Messages deleted, messageId: " << message.messageId << " count: " << result->deleted_count() << std::endl;
+        log_debug_stream(_logger) << "Messages deleted, messageId: " << message.messageId << " count: "
+                                  << result->deleted_count() << std::endl;
         session.commit_transaction();
 
       } catch (const mongocxx::exception &exc) {
@@ -577,7 +597,9 @@ namespace AwsMock::Database {
     }
   }
 
-  void SNSDatabase::DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &receipts) {
+  void SNSDatabase::DeleteMessages(const std::string &region,
+                                   const std::string &topicArn,
+                                   const std::vector<std::string> &receipts) {
 
     if (_useDatabase) {
 
@@ -593,7 +615,9 @@ namespace AwsMock::Database {
       try {
 
         session.start_transaction();
-        auto result = _messageCollection.delete_many(make_document(kvp("region", region), kvp("topicArn", topicArn), kvp("messageId", make_document(kvp("$in", array)))));
+        auto result = _messageCollection.delete_many(make_document(kvp("region", region),
+                                                                   kvp("topicArn", topicArn),
+                                                                   kvp("messageId", make_document(kvp("$in", array)))));
         log_debug_stream(_logger) << "Messages deleted, count: " << result->result().deleted_count() << std::endl;
         session.commit_transaction();
 

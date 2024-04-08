@@ -27,16 +27,18 @@ namespace AwsMock::Database::Entity::SNS {
     }
 
     view_or_value<view, value> topicDoc = make_document(
-      kvp("region", region),
-      kvp("topicName", topicName),
-      kvp("owner", owner),
-      kvp("topicUrl", topicUrl),
-      kvp("topicArn", topicArn),
-      kvp("subscriptions", subscriptionDocs),
-      kvp("attributes", topicAttribute.ToDocument()),
-      kvp("tags", tagsDoc),
-      kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-      kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+        kvp("region", region),
+        kvp("topicName", topicName),
+        kvp("owner", owner),
+        kvp("topicUrl", topicUrl),
+        kvp("topicArn", topicArn),
+        kvp("subscriptions", subscriptionDocs),
+        kvp("attributes", topicAttribute.ToDocument()),
+        kvp("tags", tagsDoc),
+        kvp("created",
+            bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
+        kvp("modified",
+            bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
 
     return topicDoc;
   }
@@ -44,21 +46,23 @@ namespace AwsMock::Database::Entity::SNS {
   void Topic::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
     oid = mResult.value()["_id"].get_oid().value.to_string();
-    region = mResult.value()["region"].get_string().value;
-    topicName = mResult.value()["topicName"].get_string().value;
-    owner = mResult.value()["owner"].get_string().value;
-    topicUrl = mResult.value()["topicUrl"].get_string().value;
-    topicArn = mResult.value()["topicArn"].get_string().value;
+    region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
+    topicName = bsoncxx::string::to_string(mResult.value()["topicName"].get_string().value);
+    owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
+    topicUrl = bsoncxx::string::to_string(mResult.value()["topicUrl"].get_string().value);
+    topicArn = bsoncxx::string::to_string(mResult.value()["topicArn"].get_string().value);
     topicAttribute.FromDocument(mResult.value()["attributes"].get_document());
-    created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-    modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+    created = Poco::DateTime(Poco::Timestamp::fromEpochTime(
+        bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
+    modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(
+        bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
 
     bsoncxx::array::view subscriptionsView{mResult.value()["subscriptions"].get_array().value};
     for (bsoncxx::array::element subscriptionElement : subscriptionsView) {
       Subscription subscription{
-        .protocol=bsoncxx::string::to_string(subscriptionElement["protocol"].get_string().value),
-        .endpoint=bsoncxx::string::to_string(subscriptionElement["endpoint"].get_string().value),
-        .subscriptionArn=bsoncxx::string::to_string(subscriptionElement["subscriptionArn"].get_string().value)
+          .protocol=bsoncxx::string::to_string(subscriptionElement["protocol"].get_string().value),
+          .endpoint=bsoncxx::string::to_string(subscriptionElement["endpoint"].get_string().value),
+          .subscriptionArn=bsoncxx::string::to_string(subscriptionElement["subscriptionArn"].get_string().value)
       };
       subscriptions.push_back(subscription);
     }
@@ -110,7 +114,8 @@ namespace AwsMock::Database::Entity::SNS {
   }
 
   std::ostream &operator<<(std::ostream &os, const Topic &t) {
-    os << "Topic={id='" << t.oid << "', region='" << t.region << "', name='" << t.topicName << "', owner='" << t.owner << "', topicUrl='" << t.topicUrl
+    os << "Topic={id='" << t.oid << "', region='" << t.region << "', name='" << t.topicName << "', owner='" << t.owner
+       << "', topicUrl='" << t.topicUrl
        << "', topicArn='" << t.topicArn << "', topicAttribute='" << t.topicAttribute.ToString() << "', tags=[";
     for (const auto &it : t.tags) {
       os << it.first << "=" << it.second << ", ";

@@ -39,6 +39,11 @@ namespace AwsMock::Database::Entity::SecretsManager {
   using bsoncxx::document::view;
   using bsoncxx::document::value;
 
+  /**
+   * SecretManager secrets entity.
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   struct Secret {
 
     /**
@@ -94,20 +99,6 @@ namespace AwsMock::Database::Entity::SecretsManager {
      * @param mResult MongoDB document.
      */
     void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
-
-    /**
-     * Converts the entity to a JSON object
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
-
-    /**
-     * Converts the entity to a JSON object
-     *
-     * @return DTO as string for logging.
-     */
-    void FromJsonObject(Poco::JSON::Object::Ptr jsonObject);
 
     /**
      * Converts the DTO to a string representation.

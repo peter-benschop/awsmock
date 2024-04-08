@@ -34,6 +34,11 @@ namespace AwsMock::Database::Entity::SQS {
   using bsoncxx::document::view;
   using bsoncxx::document::value;
 
+  /**
+   * SQS queue entity
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   struct Queue {
 
     /**

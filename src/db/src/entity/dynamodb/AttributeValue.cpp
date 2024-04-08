@@ -88,14 +88,16 @@ namespace AwsMock::Database::Entity::DynamoDb {
     }
 
     view_or_value<view, value> attributeDoc = make_document(
-      kvp("S", stringValue),
-      kvp("SS", stringSetDoc),
-      kvp("N", numberValue),
-      kvp("NS", numberSetDoc),
-      kvp("BOOL", boolValue),
-      kvp("NULL", nullValue),
-      kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-      kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+        kvp("S", stringValue),
+        kvp("SS", stringSetDoc),
+        kvp("N", numberValue),
+        kvp("NS", numberSetDoc),
+        kvp("BOOL", boolValue),
+        kvp("NULL", nullValue),
+        kvp("created",
+            bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
+        kvp("modified",
+            bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
 
     return attributeDoc;
   }
@@ -107,7 +109,8 @@ namespace AwsMock::Database::Entity::DynamoDb {
   }
 
   std::ostream &operator<<(std::ostream &os, const AttributeValue &a) {
-    os << "AttributeValue={S='" << a.stringValue << "', N='" << a.numberValue << ", BOOL='" << a.boolValue << "', NULL='" << a.nullValue <<"'}";
+    os << "AttributeValue={S='" << a.stringValue << "', N='" << a.numberValue << ", BOOL='" << a.boolValue
+       << "', NULL='" << a.nullValue << "'}";
     return os;
   }
 

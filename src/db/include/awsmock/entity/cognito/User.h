@@ -37,6 +37,11 @@ namespace AwsMock::Database::Entity::Cognito {
   using bsoncxx::document::value;
   using bsoncxx::to_json;
 
+  /**
+   * Cognito user entity
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   struct User {
 
     /**
@@ -115,7 +120,7 @@ namespace AwsMock::Database::Entity::Cognito {
      *
      * @return DTO as string for logging.
      */
-    void FromJsonObject(const Poco::JSON::Object::Ptr& jsonObject);
+    void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 
     /**
      * Converts the entity to a string representation.

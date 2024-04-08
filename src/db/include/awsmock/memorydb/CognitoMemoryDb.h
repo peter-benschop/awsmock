@@ -165,7 +165,9 @@ namespace AwsMock::Database {
        * @return cognito user entity
        * @throws DatabaseException
        */
-      Entity::Cognito::User GetUserByUserName(const std::string &region, const std::string &userPoolId, const std::string &userName);
+      Entity::Cognito::User GetUserByUserName(const std::string &region,
+                                              const std::string &userPoolId,
+                                              const std::string &userName);
 
       /**
        * Count all user pools

@@ -34,6 +34,11 @@ namespace AwsMock::Database::Entity::Cognito {
   using bsoncxx::document::value;
   using bsoncxx::to_json;
 
+  /**
+   * Cognito user pool entity
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   struct UserPool {
 
     /**

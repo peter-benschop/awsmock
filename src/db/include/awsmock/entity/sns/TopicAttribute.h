@@ -34,6 +34,11 @@ namespace AwsMock::Database::Entity::SNS {
   using bsoncxx::document::view;
   using bsoncxx::document::value;
 
+  /**
+   * SNS topic attribute entity
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   struct TopicAttribute {
 
     /**
@@ -123,15 +128,15 @@ namespace AwsMock::Database::Entity::SNS {
      * is based on the configured message retention period set by the topic’s message archiving policy.
      * </p>
      */
-     Poco::DateTime beginningArchiveTime;
+    Poco::DateTime beginningArchiveTime;
 
-     /**
-      * Content based deduplication.
-      *
-      * <p>
-      * Enables content-based deduplication for FIFO topics.
-      * </p>
-      */
+    /**
+     * Content based deduplication.
+     *
+     * <p>
+     * Enables content-based deduplication for FIFO topics.
+     * </p>
+     */
     bool contentBasedDeduplication = false;
 
     /**

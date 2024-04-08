@@ -11,6 +11,11 @@
 
 namespace AwsMock::Database::Entity::SQS {
 
+  /**
+   * SQS message attribute entity
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   enum class MessageStatus {
     INITIAL,
     DELAYED,

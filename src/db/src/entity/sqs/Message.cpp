@@ -21,20 +21,22 @@ namespace AwsMock::Database::Entity::SQS {
     }
 
     view_or_value<view, value> messageDoc = make_document(
-      kvp("region", region),
-      kvp("queueUrl", queueUrl),
-      kvp("body", body),
-      kvp("status", MessageStatusToString(status)),
-      kvp("retries", retries),
-      kvp("messageId", messageId),
-      kvp("receiptHandle", receiptHandle),
-      kvp("md5Body", md5Body),
-      kvp("md5UserAttr", md5UserAttr),
-      kvp("md5SystemAttr", md5SystemAttr),
-      kvp("attributes", messageAttributesDoc),
-      kvp("reset", bsoncxx::types::b_date(std::chrono::milliseconds(reset.timestamp().epochMicroseconds() / 1000))),
-      kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-      kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+        kvp("region", region),
+        kvp("queueUrl", queueUrl),
+        kvp("body", body),
+        kvp("status", MessageStatusToString(status)),
+        kvp("retries", retries),
+        kvp("messageId", messageId),
+        kvp("receiptHandle", receiptHandle),
+        kvp("md5Body", md5Body),
+        kvp("md5UserAttr", md5UserAttr),
+        kvp("md5SystemAttr", md5SystemAttr),
+        kvp("attributes", messageAttributesDoc),
+        kvp("reset", bsoncxx::types::b_date(std::chrono::milliseconds(reset.timestamp().epochMicroseconds() / 1000))),
+        kvp("created",
+            bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
+        kvp("modified",
+            bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
 
     return messageDoc;
   }
@@ -52,19 +54,23 @@ namespace AwsMock::Database::Entity::SQS {
     md5Body = bsoncxx::string::to_string(mResult.value()["md5Body"].get_string().value);
     md5UserAttr = bsoncxx::string::to_string(mResult.value()["md5UserAttr"].get_string().value);
     md5SystemAttr = bsoncxx::string::to_string(mResult.value()["md5SystemAttr"].get_string().value);
-    if(mResult.value()["reset"].type() != bsoncxx::type::k_null) {
-      reset = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["reset"].get_date().value) / 1000));
+    if (mResult.value()["reset"].type() != bsoncxx::type::k_null) {
+      reset = Poco::DateTime(Poco::Timestamp::fromEpochTime(
+          bsoncxx::types::b_date(mResult.value()["reset"].get_date().value) / 1000));
     }
-    created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-    modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+    created = Poco::DateTime(Poco::Timestamp::fromEpochTime(
+        bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
+    modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(
+        bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
 
     bsoncxx::array::view attributesView{mResult.value()["attributes"].get_array().value};
     for (bsoncxx::array::element attributeElement : attributesView) {
       MessageAttribute attribute{
-        .attributeName=bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
-        .attributeValue=bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value),
-        .attributeType=Database::Entity::SQS::MessageAttributeTypeFromString(bsoncxx::string::to_string(attributeElement["attributeType"].get_string().value)),
-        .systemAttribute = attributeElement["systemAttribute"].get_bool().value,
+          .attributeName=bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
+          .attributeValue=bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value),
+          .attributeType=Database::Entity::SQS::MessageAttributeTypeFromString(bsoncxx::string::to_string(
+              attributeElement["attributeType"].get_string().value)),
+          .systemAttribute = attributeElement["systemAttribute"].get_bool().value,
       };
       attributes.push_back(attribute);
     }
@@ -132,8 +138,12 @@ namespace AwsMock::Database::Entity::SQS {
   }
 
   std::ostream &operator<<(std::ostream &os, const Message &m) {
-    os << "Message={oid='" << m.oid << "', queueUrl='" << m.queueUrl << "', body='" << m.body << "', status='" << MessageStatusToString(m.status) << "' ,reset='" << Poco::DateTimeFormatter().format(m.reset, Poco::DateTimeFormat::HTTP_FORMAT)
-       << "', retries=" << m.retries << ", messageId='" << m.messageId << "', receiptHandle='" << m.receiptHandle << "', md5body='" << m.md5Body << "', md5UserAttr='" << m.md5UserAttr << "', md5SystemAttr='" << m.md5SystemAttr << "'}";
+    os << "Message={oid='" << m.oid << "', queueUrl='" << m.queueUrl << "', body='" << m.body << "', status='"
+       << MessageStatusToString(m.status) << "' ,reset='"
+       << Poco::DateTimeFormatter().format(m.reset, Poco::DateTimeFormat::HTTP_FORMAT)
+       << "', retries=" << m.retries << ", messageId='" << m.messageId << "', receiptHandle='" << m.receiptHandle
+       << "', md5body='" << m.md5Body << "', md5UserAttr='" << m.md5UserAttr << "', md5SystemAttr='" << m.md5SystemAttr
+       << "'}";
     return os;
   }
 

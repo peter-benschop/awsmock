@@ -60,8 +60,8 @@ namespace AwsMock::Database::Entity::SQS {
   view_or_value<view, value> RedrivePolicy::ToDocument() const {
 
     view_or_value<view, value> redrivePolicyDoc = make_document(
-      kvp("deadLetterTargetArn", deadLetterTargetArn),
-      kvp("maxReceiveCount", maxReceiveCount));
+        kvp("deadLetterTargetArn", deadLetterTargetArn),
+        kvp("maxReceiveCount", maxReceiveCount));
 
     return redrivePolicyDoc;
   }
@@ -86,7 +86,8 @@ namespace AwsMock::Database::Entity::SQS {
   }
 
   std::ostream &operator<<(std::ostream &os, const RedrivePolicy &r) {
-    os << "RedrivePolicy={deadLetterTargetArn='" << r.deadLetterTargetArn << "' maxReceiveCount='" << r.maxReceiveCount << "'}";
+    os << "RedrivePolicy={deadLetterTargetArn='" << r.deadLetterTargetArn << "' maxReceiveCount='" << r.maxReceiveCount
+       << "'}";
     return os;
   }
 
