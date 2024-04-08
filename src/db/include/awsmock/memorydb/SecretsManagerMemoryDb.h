@@ -15,6 +15,7 @@
 #include <Poco/ScopedLock.h>
 #include <Poco/SingletonHolder.h>
 #include <Poco/UUIDGenerator.h>
+#include <Poco/Net/HTTPResponse.h>
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
@@ -23,7 +24,7 @@
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/repository/Database.h>
-#include <awsmock/entity/lambda/Lambda.h>
+#include <awsmock/entity/secretsmanager/Secret.h>
 
 namespace AwsMock::Database {
 
@@ -44,6 +45,43 @@ namespace AwsMock::Database {
       return *sh.get();
     }
 
+    /**
+     * Secret exists
+     *
+     * @param region AWS region
+     * @param name secret name
+     * @return true if secret exists
+     * @throws DatabaseException
+     */
+    bool SecretExists(const std::string &region, const std::string &name);
+
+    /**
+     * Secret exists
+     *
+     * @param bucket secret entity
+     * @return true if secret exists
+     * @throws DatabaseException
+     */
+    bool SecretExists(const Entity::SecretsManager::Secret &secret);
+
+    /**
+     * Returns the secret by id
+     *
+     * @param oid secret oid
+     * @return secret, if existing
+     * @throws DatabaseException
+     */
+    Entity::SecretsManager::Secret GetSecretById(const std::string &oid);
+
+    /**
+     * Creates a new secret in the secrets manager collection
+     *
+     * @param secret secret entity
+     * @return created secret entity
+     * @throws DatabaseException
+     */
+    Entity::SecretsManager::Secret CreateSecret(const Entity::SecretsManager::Secret &secret);
+
   private:
 
     /**
@@ -54,12 +92,12 @@ namespace AwsMock::Database {
     /**
      * Lambda map
      */
-    std::map<std::string, Entity::Lambda::Lambda> _lambdas{};
+    std::map<std::string, Entity::SecretsManager::Secret> _secrets{};
 
     /**
      * Lambda mutex
      */
-    Poco::Mutex _lambdaMutex;
+    Poco::Mutex _secretMutex;
   };
 
 } // namespace AwsMock::Database

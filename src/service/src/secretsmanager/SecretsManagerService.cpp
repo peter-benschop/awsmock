@@ -14,12 +14,30 @@ namespace AwsMock::Service {
   }
 
   Dto::SecretsManager::CreateSecretResponse SecretsManagerService::CreateSecret(const Dto::SecretsManager::CreateSecretRequest& request) {
+    log_trace_stream(_logger) << "Create secret request, request: " << request.ToString() << std::endl;
 
-    Dto::SecretsManager::CreateSecretResponse response;
-    response.name = request.name;
-    response.versionId = Poco::UUIDGenerator().createRandom().toString();
-    response.arn = Core::AwsUtils::CreateSecretArn(request.region, _accountId, response.name);
+    // Get region
+    std::string region = request.region;
 
-    return response;
+    // Check existence
+    if (_database.SecretExists(request.region,request.name)) {
+      log_warning_stream(_logger) << "Secret exists already, region: " << region << " name: " << request.name << std::endl;
+      throw Core::ServiceException("Secret exists already", Poco::Net::HTTPResponse::HTTP_REASON_BAD_GATEWAY);
+    }
+
+    Database::Entity::SecretsManager::Secret secret = {.region=region, .name=request.name};
+    try {
+
+      // Update database
+      secret.versionId = Poco::UUIDGenerator().createRandom().toString();
+      secret.arn = Core::AwsUtils::CreateSecretArn(request.region, _accountId, request.name);
+
+      secret = _database.CreateSecret(secret);
+
+    } catch (Poco::Exception &exc) {
+      log_error_stream(_logger) << "S3 create bucket failed, message: " << exc.message() << std::endl;
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+    }
+    return {.region=secret.region, .name=secret.name, .arn=secret.arn, .versionId=secret.versionId};
   }
 } // namespace AwsMock::Service

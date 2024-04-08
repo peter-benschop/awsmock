@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/entity/sqs/Message.h>
-#include "awsmock/core/JsonUtils.h"
 
 namespace AwsMock::Database::Entity::SQS {
 

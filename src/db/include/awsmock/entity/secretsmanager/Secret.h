@@ -2,8 +2,8 @@
 // Created by vogje01 on 01/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_SQS_MESSAGE_H
-#define AWSMOCK_DB_ENTITY_SQS_MESSAGE_H
+#ifndef AWSMOCK_DB_ENTITY_SECRETSMANAGER_MESSAGE_H
+#define AWSMOCK_DB_ENTITY_SECRETSMANAGER_MESSAGE_H
 
 // C++ includes
 #include <string>
@@ -15,6 +15,7 @@
 #include <Poco/DateTimeFormat.h>
 #include <Poco/DateTimeFormatter.h>
 #include <Poco/JSON/Parser.h>
+#include <Poco/UUIDGenerator.h>
 
 // MongoDB includes
 #include <bsoncxx/json.hpp>
@@ -26,11 +27,10 @@
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/NumberUtils.h>
-#include <awsmock/core/JsonUtils.h>
 #include <awsmock/entity/sqs/MessageAttribute.h>
 #include <awsmock/entity/sqs/MessageStatus.h>
 
-namespace AwsMock::Database::Entity::SQS {
+namespace AwsMock::Database::Entity::SecretsManager {
 
   using bsoncxx::builder::basic::kvp;
   using bsoncxx::builder::basic::make_array;
@@ -39,7 +39,7 @@ namespace AwsMock::Database::Entity::SQS {
   using bsoncxx::document::view;
   using bsoncxx::document::value;
 
-  struct Message {
+  struct Secret {
 
     /**
      * ID
@@ -52,59 +52,19 @@ namespace AwsMock::Database::Entity::SQS {
     std::string region;
 
     /**
-     * Queue URL
+     * Secret name
      */
-    std::string queueUrl;
+    std::string name;
 
     /**
-     * Message body
+     * Arn
      */
-    std::string body;
+    std::string arn;
 
     /**
-     * Status
+     * Version Id
      */
-    MessageStatus status = MessageStatus::INITIAL;
-
-    /**
-     * Last send datetime
-     */
-    Poco::DateTime reset;
-
-    /**
-     * Send retries
-     */
-    int retries = 0;
-
-    /**
-     * Message ID
-     */
-    std::string messageId;
-
-    /**
-     * Receipt handle
-     */
-    std::string receiptHandle;
-
-    /**
-     * MD5 sum body
-     */
-    std::string md5Body;
-
-    /**
-     * MD5 sum sqs user attributes
-     */
-    std::string md5UserAttr;
-
-    /**
-     * MD5 sum sqs system attributes
-     */
-    std::string md5SystemAttr;
-
-    /**
-     * List of sqs
-     */
-    MessageAttributeList attributes;
+    std::string versionId;
 
     /**
      * Creation date
@@ -158,13 +118,10 @@ namespace AwsMock::Database::Entity::SQS {
      * @param m message
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const Message &m);
+    friend std::ostream &operator<<(std::ostream &os, const Secret &m);
 
   };
 
-  typedef struct Message Message;
-  typedef std::vector<Message> MessageList;
-
 } // namespace AwsMock::Database::Entity::S3
 
-#endif // AWSMOCK_DB_ENTITY_SQS_MESSAGE_H
+#endif // AWSMOCK_DB_ENTITY_SECRETSMANAGER_MESSAGE_H
