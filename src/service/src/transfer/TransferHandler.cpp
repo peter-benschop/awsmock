@@ -1,5 +1,5 @@
 
-#include "awsmock/service/TransferHandler.h"
+#include "awsmock/service/transfer/TransferHandler.h"
 
 namespace AwsMock::Service {
 

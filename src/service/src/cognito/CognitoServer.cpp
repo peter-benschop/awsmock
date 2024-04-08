@@ -2,7 +2,7 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#include <awsmock/service/CognitoServer.h>
+#include "awsmock/service/cognito/CognitoServer.h"
 
 namespace AwsMock::Service {
 

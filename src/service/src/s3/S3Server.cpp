@@ -2,7 +2,7 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#include "awsmock/service/S3Server.h"
+#include "awsmock/service/s3/S3Server.h"
 
 namespace AwsMock::Service {
 

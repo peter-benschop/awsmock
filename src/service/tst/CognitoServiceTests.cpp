@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/repository/CognitoDatabase.h>
-#include <awsmock/service/CognitoService.h>
+#include "awsmock/service/cognito/CognitoService.h"
 
 // Test includes
 #include <awsmock/core/TestUtils.h>

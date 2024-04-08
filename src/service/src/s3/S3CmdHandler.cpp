@@ -1,5 +1,5 @@
 
-#include <awsmock/service/S3CmdHandler.h>
+#include "awsmock/service/s3/S3CmdHandler.h"
 
 namespace AwsMock::Service {
 

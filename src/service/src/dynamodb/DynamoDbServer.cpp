@@ -2,7 +2,7 @@
 // Created by vogje01 on 20/12/2023.
 //
 
-#include <awsmock/service/DynamoDbServer.h>
+#include "awsmock/service/dynamodb/DynamoDbServer.h"
 
 namespace AwsMock::Service {
 

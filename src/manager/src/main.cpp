@@ -37,8 +37,9 @@
 #include <awsmock/config/Configuration.h>
 #include <awsmock/controller/Router.h>
 #include <awsmock/controller/RestService.h>
-#include <awsmock/service/CognitoServer.h>
-#include <awsmock/service/DynamoDbServer.h>
+#include "awsmock/service/cognito/CognitoServer.h"
+#include "awsmock/service/dynamodb/DynamoDbServer.h"
+#include <awsmock/service/secretsmanager/SecretsManagerServer.h>
 
 namespace AwsMock {
 
@@ -199,6 +200,9 @@ namespace AwsMock {
       if (_configuration.has("awsmock.service.dynamodb.active") && _configuration.getBool("awsmock.service.dynamodb.active")) {
         _moduleDatabase.SetStatus("dynamodb", Database::Entity::Module::ModuleStatus::ACTIVE);
       }
+      if (_configuration.has("awsmock.service.secretsmanager.active") && _configuration.getBool("awsmock.service.secretsmanager.active")) {
+        _moduleDatabase.SetStatus("secretsmanager", Database::Entity::Module::ModuleStatus::ACTIVE);
+      }
       if (_configuration.has("awsmock.service.gateway.active") && _configuration.getBool("awsmock.service.gateway.active")) {
         _moduleDatabase.SetStatus("gateway", Database::Entity::Module::ModuleStatus::ACTIVE);
       }
@@ -234,6 +238,10 @@ namespace AwsMock {
           _dynamoDbServer = new Service::DynamoDbServer(_configuration, _metricService);
           Poco::ThreadPool::defaultPool().start(*_dynamoDbServer);
           _serverMap[module.name] = _dynamoDbServer;
+        } else if (module.name == "secretsmanager" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+          _secretsManagerServer = new Service::SecretsManagerServer(_configuration, _metricService);
+          Poco::ThreadPool::defaultPool().start(*_secretsManagerServer);
+          _serverMap[module.name] = _secretsManagerServer;
         } else if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
           _gatewayServer = new Service::GatewayServer(_configuration, _metricService);
           Poco::ThreadPool::defaultPool().start(*_gatewayServer);
@@ -370,6 +378,11 @@ namespace AwsMock {
      * DynamoDb module
      */
     Service::DynamoDbServer *_dynamoDbServer{};
+
+    /**
+     * SecretsManager module
+     */
+    Service::SecretsManagerServer *_secretsManagerServer{};
 
     /**
      * Request gateway module

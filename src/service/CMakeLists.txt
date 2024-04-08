@@ -16,15 +16,17 @@ set(COGNITO_SOURCES src/cognito/CognitoHandler.cpp src/cognito/CognitoHandler.cp
 set(TRANSFER_SOURCES src/transfer/TransferServer.cpp src/transfer/TransferHandler.cpp src/transfer/TransferService.cpp)
 set(DYNAMODB_SOURCES src/dynamodb/DynamoDbServer.cpp src/dynamodb/DynamoDbHandler.cpp src/dynamodb/DynamoDbService.cpp
         src/dynamodb/DynamoDbMonitoring.cpp src/dynamodb/DynamoDbCmdHandler.cpp)
+set(SECRETMANAGER_SOURCES src/secretsmanager/SecretsManagerServer.cpp src/secretsmanager/SecretsManagerHandler.cpp
+        src/secretsmanager/SecretsManagerCmdHandler.cpp src/secretsmanager/SecretsManagerService.cpp)
 set(FTP_SOURCES src/ftpserver/Filesystem.cpp src/ftpserver/FtpSession.cpp src/ftpserver/FtpServer.cpp
         src/ftpserver/FtpServerImpl.cpp src/ftpserver/UserDatabase.cpp)
 set(GATEWAY_SOURCES src/gateway/GatewayServer.cpp src/gateway/GatewayRouter.cpp src/gateway/GatewayHandler.cpp)
 set(DOCKER_SOURCES src/docker/DockerService.cpp)
-set(MODULE_SOURCES src/module/ModuleService.cpp)
+set(MODULE_SOURCES src/common/ModuleService.cpp)
 
 set(SOURCES src/common/AbstractHandler.cpp src/common/AbstractWorker.cpp src/common/AbstractServer.cpp ${S3_SOURCES}
         ${SQS_SOURCES} ${SNS_SOURCES} ${TRANSFER_SOURCES} ${FTP_SOURCES} ${LAMBDA_SOURCES} ${COGNITO_SOURCES}
-        ${DYNAMODB_SOURCES} ${DOCKER_SOURCES} ${GATEWAY_SOURCES} ${MODULE_SOURCES})
+        ${DYNAMODB_SOURCES} ${SECRETMANAGER_SOURCES} ${DOCKER_SOURCES} ${GATEWAY_SOURCES} ${MODULE_SOURCES})
 
 # Test directory
 add_subdirectory(tst)

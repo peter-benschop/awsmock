@@ -18,6 +18,7 @@ namespace AwsMock::Database {
     {"transfer", {.name="transfer", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
     {"cognito", {.name="cognito", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
     {"dynamodb", {.name="dynamodb", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+    {"secretsmanager", {.name="secretsmanager", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
     {"gateway", {.name="gateway", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
     {"database", {.name="database", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}}
   };

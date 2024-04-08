@@ -2,7 +2,7 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include <awsmock/service/SQSMonitoring.h>
+#include "awsmock/service/sqs/SQSMonitoring.h"
 
 namespace AwsMock::Service {
 

@@ -1,5 +1,5 @@
 
-#include <awsmock/service/LambdaHandler.h>
+#include "awsmock/service/lambda/LambdaHandler.h"
 
 namespace AwsMock::Service {
 

@@ -2,7 +2,7 @@
 // Created by vogje01 on 06/06/2023.
 //
 
-#include <awsmock/service/DockerService.h>
+#include "awsmock/service/common/DockerService.h"
 
 namespace AwsMock::Service {
 

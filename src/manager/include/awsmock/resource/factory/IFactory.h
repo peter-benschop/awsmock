@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/MetricService.h>
 #include <awsmock/core/Configuration.h>
-#include <awsmock/service/AbstractServer.h>
+#include "awsmock/service/common/AbstractServer.h"
 
 namespace AwsMock::Resource::Factory {
 

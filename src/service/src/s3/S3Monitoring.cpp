@@ -2,7 +2,7 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include "awsmock/service/S3Monitoring.h"
+#include "awsmock/service/s3/S3Monitoring.h"
 
 namespace AwsMock::Service {
 

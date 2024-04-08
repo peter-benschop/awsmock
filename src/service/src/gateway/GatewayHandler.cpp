@@ -1,5 +1,5 @@
 
-#include <awsmock/service/GatewayHandler.h>
+#include <awsmock/service/gateway/GatewayHandler.h>
 
 namespace AwsMock::Service {
 

@@ -2,7 +2,7 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include <awsmock/service/AbstractServer.h>
+#include <awsmock/service/common/AbstractServer.h>
 
 namespace AwsMock::Service {
 

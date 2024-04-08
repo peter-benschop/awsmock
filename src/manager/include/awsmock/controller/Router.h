@@ -24,7 +24,7 @@
 #include <awsmock/resource/factory/IFactory.h>
 #include <awsmock/resource/factory/Factory.h>
 #include <awsmock/controller/ResourceNotFound.h>
-#include <awsmock/service/AbstractServer.h>
+#include "awsmock/service/common/AbstractServer.h"
 
 namespace AwsMock::Controller {
 

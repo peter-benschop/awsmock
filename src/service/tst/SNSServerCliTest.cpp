@@ -15,8 +15,8 @@
 #include <awsmock/dto/sqs/CreateQueueResponse.h>
 #include <awsmock/repository/SNSDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
-#include <awsmock/service/SNSServer.h>
-#include <awsmock/service/SQSServer.h>
+#include "awsmock/service/sns/SNSServer.h"
+#include "awsmock/service/sqs/SQSServer.h"
 
 // Test includes
 #include <awsmock/core/TestUtils.h>

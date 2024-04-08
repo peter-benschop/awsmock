@@ -2,7 +2,7 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include <awsmock/service/GatewayServer.h>
+#include "awsmock/service/gateway/GatewayServer.h"
 
 namespace AwsMock::Service {
 

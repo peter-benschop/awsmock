@@ -13,7 +13,7 @@
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/CognitoDatabase.h>
-#include <awsmock/service/CognitoServer.h>
+#include "awsmock/service/cognito/CognitoServer.h"
 
 #define REGION "eu-central-1"
 #define BUCKET "test-bucket"

@@ -12,7 +12,7 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
-#include <awsmock/service/DynamoDbServer.h>
+#include "awsmock/service/dynamodb/DynamoDbServer.h"
 
 #define REGION "eu-central-1"
 #define BUCKET "test-bucket"

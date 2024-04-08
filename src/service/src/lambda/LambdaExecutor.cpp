@@ -2,7 +2,7 @@
 // Created by root on 10/9/23.
 //
 
-#include <awsmock/service/LambdaExecutor.h>
+#include "awsmock/service/lambda/LambdaExecutor.h"
 
 namespace AwsMock::Service {
 

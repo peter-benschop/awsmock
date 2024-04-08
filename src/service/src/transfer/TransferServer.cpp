@@ -2,7 +2,7 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include <awsmock/service/TransferServer.h>
+#include "awsmock/service/transfer/TransferServer.h"
 
 namespace AwsMock::Service {
 

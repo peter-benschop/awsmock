@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
-#include <awsmock/service/DockerService.h>
+#include "awsmock/service/common/DockerService.h"
 
 // Test includes
 #include <awsmock/core/TestUtils.h>

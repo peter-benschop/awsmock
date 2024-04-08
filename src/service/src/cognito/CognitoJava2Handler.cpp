@@ -1,5 +1,5 @@
 
-#include <awsmock/service/CognitoJava2Handler.h>
+#include "awsmock/service/cognito/CognitoJava2Handler.h"
 
 namespace AwsMock::Service {
 

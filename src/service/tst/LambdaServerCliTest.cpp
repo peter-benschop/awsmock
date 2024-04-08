@@ -12,8 +12,8 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/S3Database.h>
-#include <awsmock/service/LambdaServer.h>
-#include <awsmock/service/LambdaService.h>
+#include "awsmock/service/lambda/LambdaServer.h"
+#include "awsmock/service/lambda/LambdaService.h"
 
 #define REGION "eu-central-1"
 #define OWNER "test-owner"

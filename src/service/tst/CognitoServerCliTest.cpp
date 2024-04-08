@@ -12,8 +12,8 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/S3Database.h>
-#include <awsmock/service/CognitoServer.h>
-#include <awsmock/service/CognitoService.h>
+#include "awsmock/service/cognito/CognitoServer.h"
+#include "awsmock/service/cognito/CognitoService.h"
 
 #define REGION "eu-central-1"
 #define OWNER "test-owner"
