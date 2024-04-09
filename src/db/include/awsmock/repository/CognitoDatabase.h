@@ -89,14 +89,6 @@ namespace AwsMock::Database {
       Entity::Cognito::UserPool CreateOrUpdateUserPool(Entity::Cognito::UserPool &userPool);
 
       /**
-       * Created or updates an existing cognito user pool
-       *
-       * @param cognito cognito entity
-       * @return created or updated cognito entity.
-       */
-      //Entity::Cognito::Cognito CreateOrUpdateCognito(const Entity::Cognito::Cognito &cognito);
-
-      /**
        * Returns a cognito user pool entity by primary key
        *
        * @param oid cognito user pool primary key

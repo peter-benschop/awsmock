@@ -16,15 +16,17 @@ namespace AwsMock::Database::Entity::SecretsManager {
   view_or_value<view, value> Secret::ToDocument() const {
 
     view_or_value<view, value> messageDoc = make_document(
-        kvp("region", region),
-        kvp("name", name),
-        kvp("arn", arn),
-        kvp("secretId", secretId),
-        kvp("versionId", versionId),
-        kvp("created",
-            bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-        kvp("modified",
-            bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+      kvp("region", region),
+      kvp("name", name),
+      kvp("arn", arn),
+      kvp("secretId", secretId),
+      kvp("kmsKeyId", kmsKeyId),
+      kvp("versionId", versionId),
+      kvp("secretString", secretString),
+      kvp("secretBinary", secretBinary),
+      kvp("description", description),
+      kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
+      kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
 
     return messageDoc;
   }
@@ -32,15 +34,17 @@ namespace AwsMock::Database::Entity::SecretsManager {
   void Secret::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
     oid = mResult.value()["_id"].get_oid().value.to_string();
-    region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
-    name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
-    arn = bsoncxx::string::to_string(mResult.value()["arn"].get_string().value);
-    secretId = bsoncxx::string::to_string(mResult.value()["secretId"].get_string().value);
-    versionId = bsoncxx::string::to_string(mResult.value()["versionId"].get_string().value);
-    created = Poco::DateTime(Poco::Timestamp::fromEpochTime(
-        bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-    modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(
-        bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+    region = mResult.value()["region"].get_string().value;
+    name = mResult.value()["name"].get_string().value;
+    arn = mResult.value()["arn"].get_string().value;
+    secretId = mResult.value()["secretId"].get_string().value;
+    kmsKeyId = mResult.value()["kmsKeyId"].get_string().value;
+    versionId = mResult.value()["versionId"].get_string().value;
+    secretString = mResult.value()["secretString"].get_string().value;
+    secretBinary = mResult.value()["secretBinary"].get_string().value;
+    description = mResult.value()["description"].get_string().value;
+    created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
+    modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
   }
 
   std::string Secret::ToString() const {
@@ -49,9 +53,8 @@ namespace AwsMock::Database::Entity::SecretsManager {
     return ss.str();
   }
 
-  std::ostream &operator<<(std::ostream &os, const Secret &m) {
-    os << "Secret={oid='" << m.oid << "', name='" << m.name << "', arn='" << m.arn << "', secretId='" << m.secretId
-       << "', versionId='" << m.versionId << "'}";
+  std::ostream &operator<<(std::ostream &os, const Secret &s) {
+    os << "Secret=" << bsoncxx::to_json(s.ToDocument());
     return os;
   }
 

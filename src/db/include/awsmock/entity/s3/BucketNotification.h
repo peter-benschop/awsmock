@@ -14,6 +14,7 @@
 #include <Poco/JSON/Object.h>
 
 // MongoDB includes
+#include <bsoncxx/json.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <mongocxx/stdx.hpp>

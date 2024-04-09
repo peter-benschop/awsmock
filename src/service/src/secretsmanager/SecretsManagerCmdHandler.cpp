@@ -65,6 +65,28 @@ namespace AwsMock::Service {
       }
 
       case Dto::Common::SecretsManagerCommandType::GET_SECRET_VALUE:{
+
+        Dto::SecretsManager::GetSecretValueRequest
+          secretsManagerRequest = {.region=secretsManagerClientCommand.region, .requestId=requestId};
+        secretsManagerRequest.FromJson(secretsManagerClientCommand.payload);
+
+        Dto::SecretsManager::GetSecretValueResponse
+          secretsManagerResponse = _secretsManagerService.GetSecretValue(secretsManagerRequest);
+        SendOkResponse(response, secretsManagerResponse.ToJson());
+
+        break;
+      }
+
+      case Dto::Common::SecretsManagerCommandType::UPDATE_SECRET:{
+
+        Dto::SecretsManager::UpdateSecretRequest
+          secretsManagerRequest = {.region=secretsManagerClientCommand.region, .requestId=requestId};
+        secretsManagerRequest.FromJson(secretsManagerClientCommand.payload);
+
+        Dto::SecretsManager::UpdateSecretResponse
+          secretsManagerResponse = _secretsManagerService.UpdateSecret(secretsManagerRequest);
+        SendOkResponse(response, secretsManagerResponse.ToJson());
+
         break;
       }
 

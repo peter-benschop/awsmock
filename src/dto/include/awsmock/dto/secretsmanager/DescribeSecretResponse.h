@@ -18,6 +18,9 @@
 // AwsMoc includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/ServiceException.h>
+#include <awsmock/dto/secretsmanager/ReplicationStatus.h>
+#include <awsmock/dto/secretsmanager/VersionIdsToStages.h>
+#include <awsmock/dto/secretsmanager/SecretTags.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
@@ -32,6 +35,56 @@ namespace AwsMock::Dto::SecretsManager {
      * Secret name
      */
     std::string name;
+
+    /**
+     * ARN
+     */
+    std::string arn;
+
+    /**
+     * Description
+     */
+    std::string description;
+
+    /**
+     * Last accessed date
+     */
+   double lastAccessDate;
+
+    /**
+     * Last accessed date
+     */
+    double lastChangedDate;
+
+    /**
+     * Last rotation date
+     */
+    double lastRotatedDate;
+
+    /**
+     * Last rotation date
+     */
+    double nextRotationDate;
+
+    /**
+     * Rotation enabled flag
+     */
+    bool rotationEnabled;
+
+    /**
+     * Replication status
+     */
+    ReplicationStatus replicationStatus;
+
+    /**
+     * Version IDs to stages
+     */
+    VersionIdsToStages versionIdsToStages;
+
+    /**
+     * Version IDs to stages
+     */
+    SecretTags tags;
 
     /**
      * Convert to a JSON string

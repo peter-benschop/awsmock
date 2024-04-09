@@ -2,7 +2,6 @@
 // Created by vogje01 on 03/09/2023.
 //
 
-#include <bsoncxx/json.hpp>
 #include "awsmock/entity/s3/Bucket.h"
 
 namespace AwsMock::Database::Entity::S3 {
@@ -120,12 +119,8 @@ namespace AwsMock::Database::Entity::S3 {
    *
    * @return output stream
    */
-  std::ostream &operator<<(std::ostream &os, const Bucket &q) {
-    os << "Bucket={oid='" << q.oid << "', region='" << q.region << "', name='" << q.name << "', owner='" << q.owner
-       << "' versionStatus='"
-       << BucketVersionStatusToString(q.versionStatus) << "', created='"
-       << Poco::DateTimeFormatter::format(q.created, Poco::DateTimeFormat::HTTP_FORMAT)
-       << "', modified='" << Poco::DateTimeFormatter::format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) << "'}";
+  std::ostream &operator<<(std::ostream &os, const Bucket &b) {
+    os << "BucketNotification=" << bsoncxx::to_json(b.ToDocument());
     return os;
   }
 }

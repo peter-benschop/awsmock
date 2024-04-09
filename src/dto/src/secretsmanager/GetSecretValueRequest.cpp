@@ -1,17 +1,19 @@
 //
-// Created by vogje01 on 30/05/2023.
+// Created by vogje01 on 4/9/24.
 //
 
-#include <awsmock/dto/secretsmanager/DescribeSecretRequest.h>
+#include <awsmock/dto/secretsmanager/GetSecretValueRequest.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
-  std::string DescribeSecretRequest::ToJson() const {
+  std::string GetSecretValueRequest::ToJson() const {
 
     try {
 
       Poco::JSON::Object rootJson;
       rootJson.set("SecretId", secretId);
+      rootJson.set("VersionId", versionId);
+      rootJson.set("VersionStage", versionStage);
 
       std::ostringstream os;
       rootJson.stringify(os);
@@ -22,7 +24,7 @@ namespace AwsMock::Dto::SecretsManager {
     }
   }
 
-  void DescribeSecretRequest::FromJson(const std::string &jsonString) {
+  void GetSecretValueRequest::FromJson(const std::string &jsonString) {
 
     Poco::JSON::Parser parser;
     Poco::Dynamic::Var result = parser.parse(jsonString);
@@ -38,14 +40,14 @@ namespace AwsMock::Dto::SecretsManager {
     }
   }
 
-  std::string DescribeSecretRequest::ToString() const {
+  std::string GetSecretValueRequest::ToString() const {
     std::stringstream ss;
     ss << (*this);
     return ss.str();
   }
 
-  std::ostream &operator<<(std::ostream &os, const DescribeSecretRequest &r) {
-    os << "DescribeSecretRequest=" << r.ToJson();
+  std::ostream &operator<<(std::ostream &os, const GetSecretValueRequest &r) {
+    os << "GetSecretValueRequest=" << r.ToJson();
     return os;
   }
 

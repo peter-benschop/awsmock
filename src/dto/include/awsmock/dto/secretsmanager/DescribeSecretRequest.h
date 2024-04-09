@@ -29,15 +29,22 @@ namespace AwsMock::Dto::SecretsManager {
     std::string region;
 
     /**
-     * Secret name
+     * Secret Id
      */
-    std::string name;
+    std::string secretId;
 
     /**
      * AWS request ID
      */
     std::string requestId;
-    
+
+    /**
+     * Converts the DTO to a JSON representation.
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToJson() const;
+
     /**
      * Converts the JSON string to DTO.
      *

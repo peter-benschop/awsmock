@@ -72,9 +72,29 @@ namespace AwsMock::Database::Entity::SecretsManager {
     std::string secretId;
 
     /**
+     * KMS key ID ID
+     */
+    std::string kmsKeyId;
+
+    /**
+     * Secret string
+     */
+    std::string secretString;
+
+    /**
+     * Base64 encoded secret binary
+     */
+    std::string secretBinary;
+
+    /**
      * Version Id
      */
     std::string versionId;
+
+    /**
+     * Description
+     */
+    std::string description;
 
     /**
      * Creation date
@@ -99,6 +119,13 @@ namespace AwsMock::Database::Entity::SecretsManager {
      * @param mResult MongoDB document.
      */
     void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+
+    /**
+     * Converts the DTO to a JSON representation.
+     *
+     * @return DTO as JSON for logging.
+     */
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Converts the DTO to a string representation.

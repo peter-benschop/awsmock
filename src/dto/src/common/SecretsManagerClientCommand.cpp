@@ -33,6 +33,8 @@ namespace AwsMock::Dto::Common {
           command = SecretsManagerCommandType::DESCRIBE_SECRET;
         } else if (Core::StringUtils::ContainsIgnoreCase(action, "GetSecretValue")) {
           command = SecretsManagerCommandType::GET_SECRET_VALUE;
+        } else if (Core::StringUtils::ContainsIgnoreCase(action, "UpdateSecret")) {
+          command = SecretsManagerCommandType::UPDATE_SECRET;
         }
         break;
       case HttpMethod::UNKNOWN: {

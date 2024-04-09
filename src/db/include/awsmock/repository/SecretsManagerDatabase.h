@@ -27,112 +27,138 @@ namespace AwsMock::Database {
 
   class SecretsManagerDatabase : public Database {
 
-    public:
+  public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration configuration properties
-       */
-      explicit SecretsManagerDatabase();
+    /**
+     * Constructor
+     *
+     * @param configuration configuration properties
+     */
+    explicit SecretsManagerDatabase();
 
-      /**
-       * Singleton instance
-       */
-      static SecretsManagerDatabase &instance() {
-        static Poco::SingletonHolder<SecretsManagerDatabase> sh;
-        return *sh.get();
-      }
+    /**
+     * Singleton instance
+     */
+    static SecretsManagerDatabase &instance() {
+      static Poco::SingletonHolder<SecretsManagerDatabase> sh;
+      return *sh.get();
+    }
 
-      /**
-       * Secret exists
-       *
-       * @param region AWS region
-       * @param name secret name
-       * @return true if secret exists
-       * @throws DatabaseException
-       */
-      bool SecretExists(const std::string &region, const std::string &name);
+    /**
+     * Secret exists
+     *
+     * @param region AWS region
+     * @param name secret name
+     * @return true if secret exists
+     * @throws DatabaseException
+     */
+    bool SecretExists(const std::string &region, const std::string &name);
 
-      /**
-       * Secret exists
-       *
-       * @param bucket secret entity
-       * @return true if secret exists
-       * @throws DatabaseException
-       */
-      bool SecretExists(const Entity::SecretsManager::Secret &secret);
+    /**
+     * Secret exists
+     *
+     * @param secret secret entity
+     * @return true if secret exists
+     * @throws DatabaseException
+     */
+    bool SecretExists(const Entity::SecretsManager::Secret &secret);
 
-      /**
-       * Returns the secret by oid
-       *
-       * @param oid secret oid
-       * @return secret, if existing
-       * @throws DatabaseException
-       */
-      Entity::SecretsManager::Secret GetSecretById(bsoncxx::oid oid);
+    /**
+     * Secret exists
+     *
+     * @param secretId secret ID
+     * @return true if secret exists
+     * @throws DatabaseException
+     */
+    bool SecretExists(const std::string &secretId);
 
-      /**
-       * Returns the secret by id
-       *
-       * @param oid secret oid
-       * @return secret, if existing
-       * @throws DatabaseException
-       */
-      Entity::SecretsManager::Secret GetSecretById(const std::string &oid);
+    /**
+     * Returns the secret by oid
+     *
+     * @param oid secret oid
+     * @return secret, if existing
+     * @throws DatabaseException
+     */
+    Entity::SecretsManager::Secret GetSecretById(bsoncxx::oid oid);
 
-      /**
-       * Returns the secret by region and name.
-       *
-       * @param region AWS region
-       * @param name secret name
-       * @return secret entity
-       */
-      Entity::SecretsManager::Secret GetSecretByRegionName(const std::string &region, const std::string &name);
+    /**
+     * Returns the secret by id
+     *
+     * @param oid secret oid
+     * @return secret, if existing
+     * @throws DatabaseException
+     */
+    Entity::SecretsManager::Secret GetSecretById(const std::string &oid);
 
-      /**
-       * Creates a new secret in the secrets collection
-       *
-       * @param secret secret entity
-       * @return created secret entity
-       * @throws DatabaseException
-       */
-      Entity::SecretsManager::Secret CreateSecret(const Entity::SecretsManager::Secret &secret);
+    /**
+     * Returns the secret by region and name.
+     *
+     * @param region AWS region
+     * @param name secret name
+     * @return secret entity
+     */
+    Entity::SecretsManager::Secret GetSecretByRegionName(const std::string &region, const std::string &name);
 
-      /**
-       * Delete a secret.
-       *
-       * @param secret secret entity
-       * @throws DatabaseException
-       */
-      void DeleteSecret(const Entity::SecretsManager::Secret &secret);
+    /**
+     * Returns the secret by secret ID.
+     *
+     * @param secretId secret ID
+     * @return secret entity
+     */
+    Entity::SecretsManager::Secret GetSecretBySecretId(const std::string &secretId);
 
-    private:
+    /**
+     * Creates a new secret in the secrets collection
+     *
+     * @param secret secret entity
+     * @return created secret entity
+     * @throws DatabaseException
+     */
+    Entity::SecretsManager::Secret CreateSecret(const Entity::SecretsManager::Secret &secret);
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+    /**
+     * Updates an existing secret
+     *
+     * @param secret secret entity
+     * @return updated secret entity
+     * @throws DatabaseException
+     */
+    Entity::SecretsManager::Secret UpdateSecret(const Entity::SecretsManager::Secret &secret);
 
-      /**
-       * Use MongoDB
-       */
-      bool _useDatabase;
+    /**
+     * Delete a secret.
+     *
+     * @param secret secret entity
+     * @throws DatabaseException
+     */
+    void DeleteSecret(const Entity::SecretsManager::Secret &secret);
 
-      /**
-       * Database name
-       */
-      std::string _databaseName;
+  private:
 
-      /**
-       * Database collection name
-       */
-      std::string _collectionName;
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
 
-      /**
-       * Lambda in-memory database
-       */
-      SecretsManagerMemoryDb &_memoryDb;
+    /**
+     * Use MongoDB
+     */
+    bool _useDatabase;
+
+    /**
+     * Database name
+     */
+    std::string _databaseName;
+
+    /**
+     * Database collection name
+     */
+    std::string _collectionName;
+
+    /**
+     * Lambda in-memory database
+     */
+    SecretsManagerMemoryDb &_memoryDb;
 
   };
 

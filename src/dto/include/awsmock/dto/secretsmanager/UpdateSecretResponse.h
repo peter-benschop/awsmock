@@ -2,12 +2,13 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SECRETMANAGER_DELETE_SECRET_RESPONSE_H
-#define AWSMOCK_DTO_SECRETMANAGER_DELETE_SECRET_RESPONSE_H
+#ifndef AWSMOCK_DTO_SECRETSMANAGER_UPDATE_SECRET_RESPONSE_H
+#define AWSMOCK_DTO_SECRETSMANAGER_UPDATE_SECRET_RESPONSE_H
 
 // C++ standard includes
 #include <string>
 #include <sstream>
+#include <iostream>
 
 // Poco includes
 #include <Poco/JSON/JSON.h>
@@ -15,27 +16,23 @@
 #include <Poco/Dynamic/Var.h>
 #include <Poco/Net/HTTPResponse.h>
 
-// AwsMoc includes
+// AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/ServiceException.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
-
   /**
-   * Return structure for the delete secret request.
+   * Update secret response.
    *
-   * Example:
-   *
-   * <pre>
+   * Syntax:
    * {
    *   "ARN": "string",
-   *   "DeletionDate": number,
-   *   "Name": "string"
+   *   "Name": "string",
+   *   "VersionId": "string"
    * }
-   * </pre>
    */
-  struct DeleteSecretResponse {
+  struct UpdateSecretResponse {
 
     /**
      * Region
@@ -43,7 +40,7 @@ namespace AwsMock::Dto::SecretsManager {
     std::string region;
 
     /**
-     * Secret name
+     * Name
      */
     std::string name;
 
@@ -53,9 +50,9 @@ namespace AwsMock::Dto::SecretsManager {
     std::string arn;
 
     /**
-     * Secret deletion date
+     * VersionId
      */
-    double deletionDate = -1;
+    std::string versionId;
 
     /**
      * Convert to a JSON string
@@ -83,10 +80,10 @@ namespace AwsMock::Dto::SecretsManager {
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const DeleteSecretResponse &r);
+    friend std::ostream &operator<<(std::ostream &os, const UpdateSecretResponse &r);
 
   };
 
-} // namespace AwsMock::Dto
+} // namespace AwsMock::Dto::SQS
 
-#endif // AWSMOCK_DTO_SECRETMANAGER_DELETE_SECRET_RESPONSE_H
+#endif // AWSMOCK_DTO_SECRETSMANAGER_UPDATE_SECRET_RESPONSE_H

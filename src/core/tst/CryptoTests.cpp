@@ -124,6 +124,37 @@ namespace AwsMock::Core {
     EXPECT_EQ(result, "6a7323506a6493e320d27b6eb5c64e722a314e15ddb753c837738e0c174cdb03");
   }
 
+  TEST_F(CryptoTest, Aes256EncryptionText) {
+
+    // arrange
+    std::string testText = "This is a super secure text";
+    std::string key = "TestKey";
+    int len = (int)testText.length();
+
+    // act
+    unsigned char* result1 = Crypto::Aes256EncryptString((unsigned char *) testText.c_str(), &len, key);
+    unsigned char* result2 = Crypto::Aes256DecryptString(result1, &len, key);
+
+    // assert
+    EXPECT_TRUE(strcasecmp(reinterpret_cast<const char *>(result2), reinterpret_cast<const char *>(result1)));
+  }
+
+  TEST_F(CryptoTest, Aes256EncryptionBase64Text) {
+
+    // arrange
+    std::string testText = "This is a super secure text";
+    std::string key = "TestKey";
+    int len = (int)testText.length();
+
+    // act
+    std::string result1 = Core::Crypto::Base64Encode(Crypto::Aes256EncryptString((unsigned char *) testText.c_str(), &len, key));
+    std::string decoded = Core::Crypto::Base64Decode(result1);
+    std::string result2 = std::string(reinterpret_cast<char*>(Crypto::Aes256DecryptString((unsigned char *) decoded.c_str(), &len, key)));
+
+    // assert
+    EXPECT_TRUE(Core::StringUtils::Equals(result2, testText));
+  }
+
   TEST_F(CryptoTest, Base64EncodeTest) {
     // arrange
 

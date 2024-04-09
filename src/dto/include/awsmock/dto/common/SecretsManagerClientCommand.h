@@ -27,6 +27,7 @@ namespace AwsMock::Dto::Common {
     DELETE_SECRET,
     DESCRIBE_SECRET,
     GET_SECRET_VALUE,
+    UPDATE_SECRET,
     UNKNOWN
   };
 
@@ -35,6 +36,7 @@ namespace AwsMock::Dto::Common {
     {SecretsManagerCommandType::DELETE_SECRET, "DeleteSecret"},
     {SecretsManagerCommandType::DESCRIBE_SECRET, "DescribeSecret"},
     {SecretsManagerCommandType::GET_SECRET_VALUE, "GetSecretValue"},
+    {SecretsManagerCommandType::UPDATE_SECRET, "UpdateSecret"},
     {SecretsManagerCommandType::UNKNOWN, "Unknown"},
   };
 

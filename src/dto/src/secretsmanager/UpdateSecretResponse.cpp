@@ -2,11 +2,11 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include <awsmock/dto/secretsmanager/CreateSecretResponse.h>
+#include <awsmock/dto/secretsmanager/UpdateSecretResponse.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
-  std::string CreateSecretResponse::ToJson() const {
+  std::string UpdateSecretResponse::ToJson() const {
 
     try {
       Poco::JSON::Object rootJson;
@@ -23,7 +23,7 @@ namespace AwsMock::Dto::SecretsManager {
     }
   }
 
-  void CreateSecretResponse::FromJson(const std::string &jsonString) {
+  void UpdateSecretResponse::FromJson(const std::string &jsonString) {
 
     try {
       Poco::JSON::Parser parser;
@@ -34,18 +34,18 @@ namespace AwsMock::Dto::SecretsManager {
 
     } catch (Poco::Exception &exc) {
       std::cerr << exc.message() << std::endl;
-      throw Core::ServiceException(exc.message(), 500);
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
     }
   }
 
-  std::string CreateSecretResponse::ToString() const {
+  std::string UpdateSecretResponse::ToString() const {
     std::stringstream ss;
     ss << (*this);
     return ss.str();
   }
 
-  std::ostream &operator<<(std::ostream &os, const CreateSecretResponse &r) {
-    os << "CreateSecretResponse=" << r.ToJson();
+  std::ostream &operator<<(std::ostream &os, const UpdateSecretResponse &r) {
+    os << "UpdateSecretResponse=" << r.ToJson();
     return os;
   }
 

@@ -107,13 +107,10 @@ namespace AwsMock::Service {
     /**
      * Creates a new bucket
      *
-     * @param bucket bucket name
-     * @param key object key
-     * @param region AWS region
-     * @param user AWS user
+     * @param s3Request S3 multi part upload request
      * @return Dto::S3::CreateMultipartUploadResult
      */
-    Dto::S3::CreateMultipartUploadResult CreateMultipartUpload(const Dto::S3::CreateMultipartUploadRequest &request);
+    Dto::S3::CreateMultipartUploadResult CreateMultipartUpload(const Dto::S3::CreateMultipartUploadRequest &s3Request);
 
     /**
      * Upload a partial file

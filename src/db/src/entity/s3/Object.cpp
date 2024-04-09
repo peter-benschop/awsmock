@@ -121,14 +121,7 @@ namespace AwsMock::Database::Entity::S3 {
   }
 
   std::ostream &operator<<(std::ostream &os, const Object &o) {
-    os << "Object={id='" << o.oid << "', bucket='" << o.bucket << "', key='" << o.key << "', owner='" << o.owner
-       << "', size='" << o.size << "', md5sum='"
-       << o.md5sum << "', contentType='" << o.contentType << ", internalName='" << o.internalName << "', versionId='"
-       << o.versionId << "', metadata=[";
-    for (const auto &t : o.metadata) {
-      os << t.first << "=" << t.second << ", ";
-    }
-    os << "\b\b" << "]}";
+    os << "Object=" << bsoncxx::to_json(o.ToDocument());
     return os;
   }
 

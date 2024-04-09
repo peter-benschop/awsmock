@@ -202,69 +202,6 @@ namespace AwsMock::Core {
      */
     static std::string GetAuthorizationHeader(const Configuration &configuration, const std::string &module);
 
-    /**
-     * Returns the HTTP user agent header
-     *
-     * <p>
-     * Example:
-     * @verbatim
-     * aws-cli/2.13.38 Python/3.11.6 Linux/6.1.0-13-amd64 exe/x86_64.debian.12 prompt/off command/s3.ls
-     * @endverbatim
-     * </p>
-     *
-     * @param service AwsMock service
-     * @param command AWS command
-     * @return user agent header
-     */
-    static std::string GetCliUserAgentHeader(const std::string &service, const std::string &command);
-
-    /**
-     * Returns the HTTP user agent header
-     *
-     * <p>
-     * Example:
-     * <pre>
-     * aws-sdk-java/2.20.38 Python/3.11.6 Linux/6.1.0-13-amd64 exe/x86_64.debian.12 prompt/off command/s3.ls
-     * </pre>
-     * </p>
-     *
-     * @param service AwsMock service
-     * @param command AWS command
-     * @return user agent header
-     */
-    static std::string GetJava2UserAgentHeader(const std::string &service, const std::string &command);
-
-    /**
-     * Returns the HTTP user agent header
-     *
-     * <p>
-     * Example:
-     * <pre>
-     * aws-sdk-cpp/2.20.38 Python/3.11.6 Linux/6.1.0-13-amd64 exe/x86_64.debian.12 prompt/off command/s3.ls
-     * </pre>
-     * </p>
-     *
-     * @param service AwsMock service
-     * @param command AWS command
-     * @return user agent header
-     */
-    static std::string GetCppUserAgentHeader(const std::string &service, const std::string &command);
-
-    /**
-     * Returns the HTTP content type header
-     *
-     * <p>
-     * Example:
-     * @verbatim
-     * Content-Type: "application/x-amz-json-1.0"
-     * @endverbatim
-     * </p>
-     *
-     * @param service AwsMock service
-     * @param command AWS command
-     * @return user agent header
-     */
-    static std::string GetContentTypeHeader(const std::string &contentType);
   };
 
 } // namespace AwsMock::Core

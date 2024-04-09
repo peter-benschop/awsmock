@@ -1,9 +1,9 @@
 //
-// Created by vogje01 on 30/05/2023.
+// Created by vogje01 on 4/9/24.
 //
 
-#ifndef AWSMOCK_DTO_SECRETMANAGER_DELETE_SECRET_RESPONSE_H
-#define AWSMOCK_DTO_SECRETMANAGER_DELETE_SECRET_RESPONSE_H
+#ifndef AWSMOCK_DTO_SECRETSMANAGER_GET_SECRET_VALUE_REQUEST_H
+#define AWSMOCK_DTO_SECRETSMANAGER_GET_SECRET_VALUE_REQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -21,21 +21,19 @@
 
 namespace AwsMock::Dto::SecretsManager {
 
-
   /**
-   * Return structure for the delete secret request.
+   * Get a secret value
    *
    * Example:
-   *
    * <pre>
    * {
-   *   "ARN": "string",
-   *   "DeletionDate": number,
-   *   "Name": "string"
+   *    "SecretId": "string",
+   *    "VersionId": "string",
+   *    "VersionStage": "string"
    * }
    * </pre>
    */
-  struct DeleteSecretResponse {
+  struct GetSecretValueRequest {
 
     /**
      * Region
@@ -43,29 +41,34 @@ namespace AwsMock::Dto::SecretsManager {
     std::string region;
 
     /**
-     * Secret name
+     * Secret ID
      */
-    std::string name;
+    std::string secretId;
 
     /**
-     * Secret ARN
+     * Version ID
      */
-    std::string arn;
+    std::string versionId;
 
     /**
-     * Secret deletion date
+     * Version ID
      */
-    double deletionDate = -1;
+    std::string versionStage;
 
     /**
-     * Convert to a JSON string
+     * REQUEST ID
+     */
+    std::string requestId;
+
+    /**
+     * Converts the DTO to a JSON representation.
      *
-     * @return JSON string
+     * @return DTO as string for logging.
      */
     [[nodiscard]] std::string ToJson() const;
 
     /**
-     * Convert from JSON representation
+     * Converts the JSON string to DTO.
      *
      * @param jsonString JSON string
      */
@@ -83,10 +86,10 @@ namespace AwsMock::Dto::SecretsManager {
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const DeleteSecretResponse &r);
+    friend std::ostream &operator<<(std::ostream &os, const GetSecretValueRequest &r);
 
   };
 
-} // namespace AwsMock::Dto
+} // namespace AwsMock::Dto::SecretsManager
 
-#endif // AWSMOCK_DTO_SECRETMANAGER_DELETE_SECRET_RESPONSE_H
+#endif // AWSMOCK_DTO_SECRETSMANAGER_GET_SECRET_VALUE_REQUEST_H

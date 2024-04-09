@@ -52,7 +52,11 @@ set(DYNAMODB_SOURCES src/dynamodb/CreateTableRequest.cpp src/dynamodb/CreateTabl
         src/dynamodb/ScanResponse.cpp)
 set(SECRETSMANAGER_SOURCES src/secretsmanager/CreateSecretRequest.cpp src/secretsmanager/CreateSecretResponse.cpp
         src/secretsmanager/DeleteSecretRequest.cpp src/secretsmanager/DeleteSecretResponse.cpp
-        src/secretsmanager/DescribeSecretRequest.cpp src/secretsmanager/DescribeSecretResponse.cpp)
+        src/secretsmanager/DescribeSecretRequest.cpp src/secretsmanager/DescribeSecretResponse.cpp
+        src/secretsmanager/GetSecretValueRequest.cpp src/secretsmanager/GetSecretValueResponse.cpp
+        src/secretsmanager/ReplicationStatus.cpp src/secretsmanager/VersionIdsToStages.cpp
+        src/secretsmanager/UpdateSecretRequest.cpp src/secretsmanager/UpdateSecretResponse.cpp
+        src/secretsmanager/SecretTags.cpp)
 set(MODULE_SOURCES src/module/Module.cpp src/module/GatewayConfig.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
@@ -66,13 +70,9 @@ include_directories(include ../core/include ../db/include /usr/include/mongo /us
         /usr/include/mongocxx/v_noabi)
 
 add_library(${LIBRARY} SHARED ${SOURCES}
-        include/awsmock/dto/s3/Content.h
-        include/awsmock/dto/dynamodb/TableStatus.h
-        include/awsmock/dto/dynamodb/AttributeValue.h
-        src/docker/Filters.cpp
-        include/awsmock/dto/docker/Filters.h
-        include/awsmock/dto/common/HttpMethod.h
-        include/awsmock/dto/dynamodb/DynamoDbResponse.h)
+        include/awsmock/dto/secretsmanager/SecretTags.h
+        include/awsmock/dto/secretsmanager/GetSecretValueRequest.h
+        src/secretsmanager/GetSecretValueRequest.cpp)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 

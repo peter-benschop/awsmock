@@ -28,6 +28,8 @@
 #include <openssl/sha.h>
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
+#include <openssl/evp.h>
+#include <openssl/aes.h>
 
 // AwsMock includes
 #include <awsmock/core/StringUtils.h>
@@ -45,6 +47,7 @@ namespace AwsMock::Core {
    * @author jens.vogt@opitz-consulting.com
    */
   class Crypto {
+
   public:
     /**
      * Returns the MD5 hash of a string.
@@ -131,12 +134,38 @@ namespace AwsMock::Core {
     static std::array<unsigned char, EVP_MAX_MD_SIZE> GetHmacSha256FromStringRaw(const std::array<unsigned char, EVP_MAX_MD_SIZE> &key, const std::string &msg);
 
     /**
+     * AES 256 encryption
+     *
+     * @param input input string
+     * @param key encryption key
+     * @return encrypted string
+     */
+    static unsigned char* Aes256EncryptString(unsigned char* plaintext, int *len, const std::string &key);
+
+    /**
+     * AES 256 description
+     *
+     * @param input input string
+     * @param key encryption key
+     * @return decrypted string
+     */
+    static unsigned char* Aes256DecryptString(unsigned char* ciphertext, int *len, const std::string &key);
+
+    /**
      * Base64 encoding.
      *
      * @param inputString input string
      * @return BASE64 encoded string.
      */
     static std::string Base64Encode(const std::string &inputString);
+
+    /**
+     * Base64 encoding.
+     *
+     * @param input input char array
+     * @return BASE64 encoded string.
+     */
+    static std::string Base64Encode(unsigned char* input);
 
     /**
      * Base64 decoding.
@@ -170,6 +199,30 @@ namespace AwsMock::Core {
      * @return hex encoded string
      */
     static std::string HexEncode(unsigned char *hash, int size);
+
+  private:
+
+    /**
+     * Create a 256 bit key and IV using the supplied key_data. salt can be added for taste. Fills in the encryption and decryption ctx objects and returns 0 on success.
+     *
+     * @param key_data key data
+     * @param key_data_len length of key data
+     * @param salt salt value
+     * @param e_ctx openssl encryption context
+     * @param d_ctx openssl decryption
+     */
+    static int Aes256EncryptionInit(unsigned char *key_data, int key_data_len, unsigned char *salt, EVP_CIPHER_CTX *ctx);
+
+    /**
+     * Create a 256 bit key and IV using the supplied key_data. salt can be added for taste. Fills in the encryption and decryption ctx objects and returns 0 on success.
+     *
+     * @param key_data key data
+     * @param key_data_len length of key data
+     * @param salt salt value
+     * @param e_ctx openssl encryption context
+     * @param d_ctx openssl decryption
+     */
+    static int Aes256DecryptionInit(unsigned char *key_data, int key_data_len, unsigned char *salt, EVP_CIPHER_CTX *ctx);
   };
 
   static inline bool IsBase64(unsigned char c) {

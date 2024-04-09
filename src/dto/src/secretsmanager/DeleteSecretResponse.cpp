@@ -43,7 +43,7 @@ namespace AwsMock::Dto::SecretsManager {
   }
 
   std::ostream &operator<<(std::ostream &os, const DeleteSecretResponse &r) {
-    os << "DeleteSecretResponse={name='" << r.name << "', region='" << r.region << "'}";
+    os << "DeleteSecretResponse=" << r.ToJson();
     return os;
   }
 

@@ -2,13 +2,12 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SECRETSMANAGER_CREATE_SECRET_REQUEST_H
-#define AWSMOCK_DTO_SECRETSMANAGER_CREATE_SECRET_REQUEST_H
+#ifndef AWSMOCK_CORE_DTO_UPDATE_SECRET_REQUEST_H
+#define AWSMOCK_CORE_DTO_UPDATE_SECRET_REQUEST_H
 
 // C++ standard includes
 #include <string>
 #include <sstream>
-#include <map>
 
 // Poco includes
 #include <Poco/JSON/JSON.h>
@@ -16,39 +15,43 @@
 #include <Poco/Dynamic/Var.h>
 #include <Poco/Net/HTTPResponse.h>
 
-// AwsMock includes
+// AwsMoc includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/ServiceException.h>
-#include <awsmock/dto/secretsmanager/SecretTags.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
   /**
-   * Example:
+   * Update the secret values request.
    *
+   * Example:
    * <pre>
    * {
-   *   "Name": "test",
-   *   "ClientRequestToken": "8b0e8777-4c9a-4621-9bd7-a6449b24c3a5"
+   *   "ClientRequestToken": "string",
+   *   "Description": "string",
+   *   "KmsKeyId": "string",
+   *   "SecretBinary": blob,
+   *   "SecretId": "string",
+   *   "SecretString": "string"
    * }
    * </pre>
    */
-  struct CreateSecretRequest {
+  struct UpdateSecretRequest {
 
     /**
-     * AWS region
+     * Region
      */
     std::string region;
 
     /**
-     * Secret name
+     * Secret ID
      */
-    std::string name;
+    std::string secretId;
 
     /**
-     * Client request token
+     * KMS key ID
      */
-    std::string clientRequestToken;
+    std::string kmsKeyId;
 
     /**
      * Description
@@ -61,24 +64,9 @@ namespace AwsMock::Dto::SecretsManager {
     std::string secretString;
 
     /**
-     * Base64 encoded secret binary data
+     * Secret binary
      */
     std::string secretBinary;
-
-    /**
-     * Force overwrite flag
-     */
-    bool forceOverwriteReplicaSecret;
-
-    /**
-     * Force overwrite flag
-     */
-    std::string kmsKeyId;
-
-    /**
-     * Tags
-     */
-    SecretTags tags;
 
     /**
      * AWS request ID
@@ -86,11 +74,11 @@ namespace AwsMock::Dto::SecretsManager {
     std::string requestId;
 
     /**
-     * Convert to a JSON string
+     * Converts the DTO to a JSON representation.
      *
-     * @return JSON string
+     * @return DTO as string for logging.
      */
-    std::string ToJson() const;
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Converts the JSON string to DTO.
@@ -111,10 +99,10 @@ namespace AwsMock::Dto::SecretsManager {
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const CreateSecretRequest &r);
+    friend std::ostream &operator<<(std::ostream &os, const UpdateSecretRequest &r);
 
   };
 
-} // namespace AwsMock::Dto::SQS
+} // namespace AwsMock::Dto::S3
 
-#endif // AWSMOCK_DTO_SECRETSMANAGER_CREATE_SECRET_REQUEST_H
+#endif // AWSMOCK_CORE_DTO_UPDATE_SECRET_REQUEST_H

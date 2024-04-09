@@ -130,6 +130,7 @@ namespace AwsMock::Database {
        * @param tableName name of the table
        * @param key primary key of the item
        * @return true if database exists, otherwise false
+       * @throws DatabaseException
        */
       bool ItemExists(const std::string &region, const std::string &tableName, const std::string &key);
 
@@ -139,6 +140,7 @@ namespace AwsMock::Database {
        * @param region AWS region.
        * @param tableName table name
        * @return list of DynamoDB tables
+       * @throws DatabaseException
        */
       Entity::DynamoDb::ItemList ListItems(const std::string &region = {}, const std::string &tableName = {});
 
@@ -148,12 +150,14 @@ namespace AwsMock::Database {
        * @param region AWS region.
        * @param tableName name of the table
        * @param key primary key of the item
-       * @return true if database exists, otherwise false
+       * @throws DatabaseException
        */
       void DeleteItem(const std::string &region, const std::string &tableName, const std::string &key);
 
       /**
        * Deletes all items
+       *
+       * @throws DatabaseException
        */
       void DeleteAllItems();
 

@@ -10,24 +10,27 @@ namespace AwsMock::Database {
 
   bool SecretsManagerMemoryDb::SecretExists(const std::string &region, const std::string &name) {
 
-    return find_if(_secrets.begin(),
-                   _secrets.end(),
-                   [region, name](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
-                     return secret.second.region == region && secret.second.name == name;
-                   }) != _secrets.end();
+    return find_if(_secrets.begin(), _secrets.end(), [region, name](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
+      return secret.second.region == region && secret.second.name == name;
+    }) != _secrets.end();
   }
 
   bool SecretsManagerMemoryDb::SecretExists(const Entity::SecretsManager::Secret &secret) {
     return SecretExists(secret.region, secret.name);
   }
 
+  bool SecretsManagerMemoryDb::SecretExists(const std::string &secretId) {
+
+    return find_if(_secrets.begin(), _secrets.end(), [secretId](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
+      return secret.second.secretId == secretId;
+    }) != _secrets.end();
+  }
+
   Entity::SecretsManager::Secret SecretsManagerMemoryDb::GetSecretById(const std::string &oid) {
 
-    auto it = find_if(_secrets.begin(),
-                      _secrets.end(),
-                      [oid](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
-                        return secret.first == oid;
-                      });
+    auto it = find_if(_secrets.begin(), _secrets.end(), [oid](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
+      return secret.first == oid;
+    });
 
     if (it != _secrets.end()) {
       it->second.oid = oid;
@@ -36,8 +39,7 @@ namespace AwsMock::Database {
     return {};
   }
 
-  Entity::SecretsManager::Secret SecretsManagerMemoryDb::GetSecretByRegionName(const std::string &region,
-                                                                               const std::string &name) {
+  Entity::SecretsManager::Secret SecretsManagerMemoryDb::GetSecretByRegionName(const std::string &region, const std::string &name) {
 
     Entity::SecretsManager::Secret result;
 
@@ -45,6 +47,23 @@ namespace AwsMock::Database {
                       _secrets.end(),
                       [region, name](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
                         return secret.second.region == region && secret.second.name == name;
+                      });
+
+    if (it != _secrets.end()) {
+      it->second.oid = it->first;
+      return it->second;
+    }
+    return {};
+  }
+
+  Entity::SecretsManager::Secret SecretsManagerMemoryDb::GetSecretBySecretId(const std::string &secretId) {
+
+    Entity::SecretsManager::Secret result;
+
+    auto it = find_if(_secrets.begin(),
+                      _secrets.end(),
+                      [secretId](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
+                        return secret.second.secretId == secretId;
                       });
 
     if (it != _secrets.end()) {
@@ -63,6 +82,21 @@ namespace AwsMock::Database {
     return GetSecretById(oid);
 
   }
+
+  Entity::SecretsManager::Secret SecretsManagerMemoryDb::UpdateSecret(const Entity::SecretsManager::Secret &secret) {
+
+    Poco::ScopedLock lock(_secretMutex);
+
+    std::string secretId = secret.secretId;
+    auto it = find_if(_secrets.begin(),
+                      _secrets.end(),
+                      [secretId](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
+                        return secret.second.secretId == secretId;
+                      });
+    _secrets[it->first] = secret;
+    return _secrets[it->first];
+  }
+
   void SecretsManagerMemoryDb::DeleteSecret(const Entity::SecretsManager::Secret &secret) {
     Poco::ScopedLock lock(_secretMutex);
 
