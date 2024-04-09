@@ -15,7 +15,7 @@ namespace AwsMock::Core {
     std::string output;
 
     EVP_DigestInit(context, md);
-    EVP_DigestUpdate(context, reinterpret_cast<const unsigned char*>(content.c_str()), content.length());
+    EVP_DigestUpdate(context, reinterpret_cast<const unsigned char *>(content.c_str()), content.length());
     EVP_DigestFinal(context, md_value, &md_len);
     EVP_MD_CTX_free(context);
 
@@ -218,12 +218,128 @@ namespace AwsMock::Core {
     return hash;
   }
 
+  unsigned char *Crypto::Aes256EncryptString(unsigned char *plaintext, int *len, const std::string &key) {
+
+    // "opaque" encryption, decryption ctx structures that libcrypto uses to record status of enc/dec operations
+    EVP_CIPHER_CTX *en = EVP_CIPHER_CTX_new();
+
+    unsigned int salt[] = {12345, 54321};
+    auto *key_data = (unsigned char *) key.c_str();
+    int key_data_len = (int)strlen(reinterpret_cast<const char *>(key_data));
+
+    if (Aes256EncryptionInit(key_data, key_data_len, (unsigned char *) &salt, en)) {
+      printf("Couldn't initialize AES cipher\n");
+      return {};
+    }
+
+    /* max ciphertext len for a n bytes of plaintext is n + AES_BLOCK_SIZE -1 bytes */
+    int c_len = *len + AES_BLOCK_SIZE, f_len = 0;
+    auto *ciphertext = static_cast<unsigned char *>(malloc(c_len));
+
+    // Allows reusing of 'en' for multiple encryption cycles
+    EVP_EncryptInit_ex(en, nullptr, nullptr, nullptr, nullptr);
+    EVP_EncryptUpdate(en, ciphertext, &c_len, plaintext, *len);
+    EVP_EncryptFinal_ex(en, ciphertext + c_len, &f_len);
+
+    *len = c_len + f_len;
+    return ciphertext;
+  }
+
+  unsigned char* Crypto::Aes256DecryptString(unsigned char *ciphertext, int *len, const std::string &key) {
+
+    // "opaque" encryption, decryption ctx structures that libcrypto uses to record status of enc/dec operations
+    EVP_CIPHER_CTX *en = EVP_CIPHER_CTX_new();
+
+    unsigned int salt[] = {12345, 54321};
+    auto *key_data = (unsigned char *) key.c_str();
+    int key_data_len = (int)strlen(reinterpret_cast<const char *>(key_data));
+
+    if (Aes256DecryptionInit(key_data, key_data_len, (unsigned char *) &salt, en)) {
+      printf("Couldn't initialize AES cipher\n");
+      return {};
+    }
+
+    // Max ciphertext len for n bytes of plaintext is n + AES_BLOCK_SIZE -1 bytes
+    int c_len = *len + AES_BLOCK_SIZE, f_len = 0;
+    auto *plaintext = static_cast<unsigned char *>(malloc(c_len));
+
+    EVP_DecryptInit_ex(en, nullptr, nullptr, nullptr, nullptr);
+    EVP_DecryptUpdate(en, plaintext, &c_len, ciphertext, *len);
+    EVP_DecryptFinal_ex(en, plaintext + c_len, &f_len);
+
+    *len = c_len + f_len;
+    return plaintext;
+  }
+
+  int Crypto::Aes256EncryptionInit(unsigned char *key_data, int key_data_len, unsigned char *salt, EVP_CIPHER_CTX *ctx) {
+
+    int i, nrounds = 5;
+    unsigned char key[32], iv[32];
+
+    /*
+     * Gen key & IV for AES 256 CBC mode. A SHA1 digest is used to hash the supplied key material.
+     * nrounds is the number of times the we hash the material. More rounds are more secure but
+     * slower.
+     */
+    i = EVP_BytesToKey(EVP_aes_256_cbc(), EVP_sha1(), salt, key_data, key_data_len, nrounds, key, iv);
+    if (i != 32) {
+      printf("Key size is %d bits - should be 256 bits\n", i);
+      return -1;
+    }
+
+    EVP_CIPHER_CTX_init(ctx);
+    EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv);
+
+    return 0;
+  }
+
+  int Crypto::Aes256DecryptionInit(unsigned char *key_data, int key_data_len, unsigned char *salt, EVP_CIPHER_CTX *ctx) {
+
+    int i, nrounds = 5;
+    unsigned char key[32], iv[32];
+
+    /*
+     * Gen key & IV for AES 256 CBC mode. A SHA1 digest is used to hash the supplied key material.
+     * nrounds is the number of times, we hash the material. More rounds are more secure but
+     * slower.
+     */
+    i = EVP_BytesToKey(EVP_aes_256_cbc(), EVP_sha1(), salt, key_data, key_data_len, nrounds, key, iv);
+    if (i != 32) {
+      printf("Key size is %d bits - should be 256 bits\n", i);
+      return -1;
+    }
+
+    EVP_CIPHER_CTX_init(ctx);
+    EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv);
+
+    return 0;
+  }
+
   std::string Crypto::Base64Encode(const std::string &inputString) {
     std::string out;
 
     int val = 0, valb = -6;
     for (unsigned char c : inputString) {
       val = (val << 8) + c;
+      valb += 8;
+      while (valb >= 0) {
+        out.push_back(_base64Chars[(val >> valb) & 0x3F]);
+        valb -= 6;
+      }
+    }
+    if (valb > -6)
+      out.push_back(_base64Chars[((val << 8) >> (valb + 8)) & 0x3F]);
+    while (out.size() % 4)
+      out.push_back('=');
+    return out;
+  }
+
+  std::string Crypto::Base64Encode(unsigned char* input) {
+    std::string out;
+
+    int val = 0, valb = -6;
+    for (unsigned char* c = input; c != input + strlen(reinterpret_cast<const char *>(input)); c++) {
+      val = (val << 8) + *c;
       valb += 8;
       while (valb >= 0) {
         out.push_back(_base64Chars[(val >> valb) & 0x3F]);

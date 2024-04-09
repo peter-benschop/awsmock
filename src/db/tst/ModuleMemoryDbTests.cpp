@@ -31,17 +31,17 @@ namespace AwsMock::Database {
 
   class ModuleMemoryDbTest : public ::testing::Test {
 
-  protected:
+    protected:
 
-    void SetUp() override {
-    }
+      void SetUp() override {
+      }
 
-    void TearDown() override {
-      _moduleDatabase.DeleteAllModules();
-    }
+      void TearDown() override {
+        _moduleDatabase.DeleteAllModules();
+      }
 
-    Core::Configuration& _configuration = Core::TestUtils::GetTestConfiguration(false);
-    ModuleDatabase _moduleDatabase = ModuleDatabase();
+      Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration(false);
+      ModuleDatabase _moduleDatabase = ModuleDatabase();
   };
 
   TEST_F(ModuleMemoryDbTest, ModuleCreateTest) {
@@ -75,7 +75,8 @@ namespace AwsMock::Database {
   TEST_F(ModuleMemoryDbTest, ModuleActiveTest) {
 
     // arrange
-    Entity::Module::Module module = {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING, .status=Entity::Module::ModuleStatus::ACTIVE};
+    Entity::Module::Module module =
+        {.name=SERVICE, .state=Entity::Module::ModuleState::RUNNING, .status=Entity::Module::ModuleStatus::ACTIVE};
     module = _moduleDatabase.CreateModule(module);
 
     // act

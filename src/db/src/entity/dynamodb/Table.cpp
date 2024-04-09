@@ -33,13 +33,15 @@ namespace AwsMock::Database::Entity::DynamoDb {
     }
 
     view_or_value<view, value> lambdaDoc = make_document(
-      kvp("region", region),
-      kvp("name", name),
-      kvp("tags", tagsDoc),
-      kvp("attributes", attributesDoc),
-      kvp("keySchemas", keySchemaDoc),
-      kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-      kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+        kvp("region", region),
+        kvp("name", name),
+        kvp("tags", tagsDoc),
+        kvp("attributes", attributesDoc),
+        kvp("keySchemas", keySchemaDoc),
+        kvp("created",
+            bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
+        kvp("modified",
+            bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
 
     return lambdaDoc;
   }
@@ -49,8 +51,10 @@ namespace AwsMock::Database::Entity::DynamoDb {
     oid = mResult.value()["_id"].get_oid().value.to_string();
     region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
     name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
-    created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-    modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+    created = Poco::DateTime(Poco::Timestamp::fromEpochTime(
+        bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
+    modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(
+        bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
 
     // Get tags
     if (mResult.value().find("tags") != mResult.value().end()) {
@@ -136,7 +140,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
         Core::JsonUtils::GetJsonValueString("value", attributeObject, valueStr);
         attributes[keyStr] = valueStr;
       }
-      
+
       Core::JsonUtils::GetJsonValueDate("created", jsonObject, created);
       Core::JsonUtils::GetJsonValueDate("modified", jsonObject, modified);
 

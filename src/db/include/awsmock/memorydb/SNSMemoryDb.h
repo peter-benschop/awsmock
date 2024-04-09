@@ -192,7 +192,9 @@ namespace AwsMock::Database {
        * @param topicArn ARN of the topic
        * @param status message status
        */
-      long CountMessagesByStatus(const std::string &region, const std::string &topicArn, Entity::SNS::MessageStatus status);
+      long CountMessagesByStatus(const std::string &region,
+                                 const std::string &topicArn,
+                                 Entity::SNS::MessageStatus status);
 
       /**
        * Deletes a message.
@@ -210,7 +212,9 @@ namespace AwsMock::Database {
        * @param receipts vector of receipts
        * @throws Core::DatabaseException
        */
-      void DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &receipts);
+      void DeleteMessages(const std::string &region,
+                          const std::string &topicArn,
+                          const std::vector<std::string> &receipts);
 
       /**
        * Deletes a messages.

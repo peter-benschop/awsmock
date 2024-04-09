@@ -33,6 +33,11 @@ namespace AwsMock::Database::Entity::SQS {
   using bsoncxx::document::view;
   using bsoncxx::document::value;
 
+  /**
+   * SQS queue re-drive policy entity
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   struct RedrivePolicy {
 
     /**
@@ -64,7 +69,7 @@ namespace AwsMock::Database::Entity::SQS {
      *
      * @return entity as MongoDB document.
      */
-    [[maybe_unused]] [[nodiscard]] view_or_value <view, value> ToDocument() const;
+    [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
     /**
      * Converts the MongoDB document to an entity

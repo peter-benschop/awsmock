@@ -16,10 +16,16 @@
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/stdx.hpp>
 
 namespace AwsMock::Database::Entity::Lambda {
 
+  /**
+   * Lambda environment entity
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   struct Environment {
 
     /**

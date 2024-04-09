@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-  GatewayRouter::GatewayRouter(Core::Configuration &configuration, Core::MetricService &metricService) : _logger(Poco::Logger::get("Router")), _configuration(configuration), _metricService(metricService) {
+  GatewayRouter::GatewayRouter(Core::Configuration &configuration, Core::MetricService &metricService) : _logger(Poco::Logger::get("GatewayRouter")), _configuration(configuration), _metricService(metricService) {
 
     // Get the ports
     int s3Port = _configuration.getInt("awsmock.service.s3.port", 9500);

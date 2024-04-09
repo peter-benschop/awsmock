@@ -34,6 +34,11 @@ namespace AwsMock::Database::Entity::SNS {
   using bsoncxx::document::view;
   using bsoncxx::document::value;
 
+  /**
+   * SNS message attribute entity
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   struct Subscription {
 
     /**

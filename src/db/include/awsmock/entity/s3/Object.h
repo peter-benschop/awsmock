@@ -39,6 +39,11 @@ namespace AwsMock::Database::Entity::S3 {
   using bsoncxx::builder::basic::make_array;
   using bsoncxx::builder::basic::make_document;
 
+  /**
+   * S3 object entity
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   struct Object {
 
     /**

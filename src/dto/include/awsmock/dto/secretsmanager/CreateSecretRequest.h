@@ -19,6 +19,7 @@
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/ServiceException.h>
+#include <awsmock/dto/secretsmanager/SecretTags.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
@@ -65,14 +66,31 @@ namespace AwsMock::Dto::SecretsManager {
     std::string secretBinary;
 
     /**
+     * Force overwrite flag
+     */
+    bool forceOverwriteReplicaSecret;
+
+    /**
+     * Force overwrite flag
+     */
+    std::string kmsKeyId;
+
+    /**
      * Tags
      */
-    std::map<std::string, std::string> tags;
+    SecretTags tags;
 
     /**
      * AWS request ID
      */
     std::string requestId;
+
+    /**
+     * Convert to a JSON string
+     *
+     * @return JSON string
+     */
+    std::string ToJson() const;
 
     /**
      * Converts the JSON string to DTO.

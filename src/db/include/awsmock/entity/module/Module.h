@@ -34,6 +34,11 @@ namespace AwsMock::Database::Entity::Module {
   using bsoncxx::builder::basic::make_array;
   using bsoncxx::builder::basic::make_document;
 
+  /**
+   * AwsMock module entity
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   struct Module {
 
     /**

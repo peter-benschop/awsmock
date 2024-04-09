@@ -57,11 +57,20 @@ namespace AwsMock::Database {
     /**
      * Secret exists
      *
-     * @param bucket secret entity
+     * @param secret secret entity
      * @return true if secret exists
      * @throws DatabaseException
      */
     bool SecretExists(const Entity::SecretsManager::Secret &secret);
+
+    /**
+     * Secret exists
+     *
+     * @param secretId secret ID
+     * @return true if secret exists
+     * @throws DatabaseException
+     */
+    bool SecretExists(const std::string &secretId);
 
     /**
      * Returns the secret by oid
@@ -91,6 +100,14 @@ namespace AwsMock::Database {
     Entity::SecretsManager::Secret GetSecretByRegionName(const std::string &region, const std::string &name);
 
     /**
+     * Returns the secret by secret ID.
+     *
+     * @param secretId secret ID
+     * @return secret entity
+     */
+    Entity::SecretsManager::Secret GetSecretBySecretId(const std::string &secretId);
+
+    /**
      * Creates a new secret in the secrets collection
      *
      * @param secret secret entity
@@ -98,6 +115,15 @@ namespace AwsMock::Database {
      * @throws DatabaseException
      */
     Entity::SecretsManager::Secret CreateSecret(const Entity::SecretsManager::Secret &secret);
+
+    /**
+     * Updates an existing secret
+     *
+     * @param secret secret entity
+     * @return updated secret entity
+     * @throws DatabaseException
+     */
+    Entity::SecretsManager::Secret UpdateSecret(const Entity::SecretsManager::Secret &secret);
 
     /**
      * Delete a secret.

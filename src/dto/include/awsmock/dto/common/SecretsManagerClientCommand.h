@@ -25,12 +25,18 @@ namespace AwsMock::Dto::Common {
   enum class SecretsManagerCommandType {
     CREATE_SECRET,
     DELETE_SECRET,
+    DESCRIBE_SECRET,
+    GET_SECRET_VALUE,
+    UPDATE_SECRET,
     UNKNOWN
   };
 
   static std::map<SecretsManagerCommandType, std::string> SecretsManagerCommandTypeNames {
     {SecretsManagerCommandType::CREATE_SECRET, "CreateSecret"},
     {SecretsManagerCommandType::DELETE_SECRET, "DeleteSecret"},
+    {SecretsManagerCommandType::DESCRIBE_SECRET, "DescribeSecret"},
+    {SecretsManagerCommandType::GET_SECRET_VALUE, "GetSecretValue"},
+    {SecretsManagerCommandType::UPDATE_SECRET, "UpdateSecret"},
     {SecretsManagerCommandType::UNKNOWN, "Unknown"},
   };
 
@@ -85,7 +91,7 @@ namespace AwsMock::Dto::Common {
      * @param request HTTP request
      * @return message body as string
      */
-    std::string GetBodyAsString(Poco::Net::HTTPServerRequest &request);
+    static std::string GetBodyAsString(Poco::Net::HTTPServerRequest &request);
 
     /**
      * Getś the value from the user-agent string

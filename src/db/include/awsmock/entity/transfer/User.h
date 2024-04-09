@@ -31,6 +31,11 @@ namespace AwsMock::Database::Entity::Transfer {
   using bsoncxx::document::view;
   using bsoncxx::document::value;
 
+  /**
+   * Transfer manager user entity
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   struct User {
 
     /**

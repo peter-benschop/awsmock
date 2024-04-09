@@ -11,16 +11,16 @@
 #include <Poco/DateTimeFormatter.h>
 
 // AwsMock includes
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/HttpUtils.h"
-#include "awsmock/core/MetricService.h"
-#include "awsmock/core/MetricServiceTimer.h"
-#include "awsmock/core/MetricDefinition.h"
-#include "awsmock/core/NumberUtils.h"
-#include "awsmock/dto/common/UserAgent.h"
-#include "awsmock/dto/common/DynamoDbClientCommand.h"
-#include "awsmock/service/common/AbstractHandler.h"
-#include "DynamoDbService.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/HttpUtils.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/core/MetricServiceTimer.h>
+#include <awsmock/core/MetricDefinition.h>
+#include <awsmock/core/NumberUtils.h>
+#include <awsmock/dto/common/UserAgent.h>
+#include <awsmock/dto/common/DynamoDbClientCommand.h>
+#include <awsmock/service/common/AbstractHandler.h>
+#include <awsmock/service/dynamodb/DynamoDbService.h>
 
 namespace AwsMock::Service {
 
@@ -46,8 +46,7 @@ namespace AwsMock::Service {
        *
        * @param request HTTP request
        * @param response HTTP response
-       * @param region AWS region name
-       * @param user AWS user
+       * @param clientCommand standardized request
        * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
        */
       void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::DynamoDbClientCommand &clientCommand);

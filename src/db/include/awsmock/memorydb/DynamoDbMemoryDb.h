@@ -30,7 +30,7 @@ namespace AwsMock::Database {
 
   class DynamoDbMemoryDb {
 
-    public:
+  public:
 
     /**
      * Constructor
@@ -140,7 +140,6 @@ namespace AwsMock::Database {
      * @param region AWS region.
      * @param tableName name of the table
      * @param key primary key of the item
-     * @return true if database exists, otherwise false
      */
     void DeleteItem(const std::string &region, const std::string &tableName, const std::string &key);
 
@@ -149,7 +148,7 @@ namespace AwsMock::Database {
      */
     void DeleteAllItems();
 
-    private:
+  private:
 
     /**
      * Logger

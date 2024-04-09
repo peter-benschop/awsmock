@@ -52,6 +52,11 @@ namespace AwsMock::Database::Entity::SQS {
     return MessageAttributeType::STRING;
   }
 
+  /**
+   * SQS message attribute entity
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   struct MessageAttribute {
 
     /**

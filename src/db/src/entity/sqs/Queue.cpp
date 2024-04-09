@@ -17,15 +17,17 @@ namespace AwsMock::Database::Entity::SQS {
     }
 
     view_or_value<view, value> queueDoc = make_document(
-      kvp("region", region),
-      kvp("name", name),
-      kvp("owner", owner),
-      kvp("queueUrl", queueUrl),
-      kvp("queueArn", queueArn),
-      kvp("attributes", attributes.ToDocument()),
-      kvp("tags", tagsDoc),
-      kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-      kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+        kvp("region", region),
+        kvp("name", name),
+        kvp("owner", owner),
+        kvp("queueUrl", queueUrl),
+        kvp("queueArn", queueArn),
+        kvp("attributes", attributes.ToDocument()),
+        kvp("tags", tagsDoc),
+        kvp("created",
+            bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
+        kvp("modified",
+            bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
 
     return queueDoc;
   }
@@ -41,8 +43,10 @@ namespace AwsMock::Database::Entity::SQS {
       queueUrl = bsoncxx::string::to_string(mResult.value()["queueUrl"].get_string().value);
       queueArn = bsoncxx::string::to_string(mResult.value()["queueArn"].get_string().value);
       attributes.FromDocument(mResult.value()["attributes"].get_document().value);
-      created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-      modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+      created = Poco::DateTime(Poco::Timestamp::fromEpochTime(
+          bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
+      modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(
+          bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
 
       // Get tags
       if (mResult.value().find("tags") != mResult.value().end()) {
@@ -97,8 +101,10 @@ namespace AwsMock::Database::Entity::SQS {
   }
 
   std::ostream &operator<<(std::ostream &os, const Queue &q) {
-    os << "Queue={id='" << q.oid << "' region='" << q.region << "' name='" << q.name << "' owner='" << q.owner << "' queueUrl='" << q.queueUrl <<
-       "' queueArn='" << q.queueArn << "' created='" << Poco::DateTimeFormatter::format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) << "', tags=[";
+    os << "Queue={id='" << q.oid << "' region='" << q.region << "' name='" << q.name << "' owner='" << q.owner
+       << "' queueUrl='" << q.queueUrl <<
+       "' queueArn='" << q.queueArn << "' created='"
+       << Poco::DateTimeFormatter::format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) << "', tags=[";
     for (const auto &it : q.tags) {
       os << "key='" << it.first << "' value='" << it.second << "', ";
     }

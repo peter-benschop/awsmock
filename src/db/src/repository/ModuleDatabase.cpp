@@ -11,19 +11,29 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_document;
 
   std::map<std::string, Entity::Module::Module> ModuleDatabase::_existingModules = {
-    {"s3", {.name="s3", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-    {"sqs", {.name="sqs", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-    {"sns", {.name="sns", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-    {"lambda", {.name="lambda", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-    {"transfer", {.name="transfer", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-    {"cognito", {.name="cognito", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-    {"dynamodb", {.name="dynamodb", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-    {"secretsmanager", {.name="secretsmanager", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-    {"gateway", {.name="gateway", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-    {"database", {.name="database", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}}
+      {"s3", {.name="s3", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+      {"sqs",
+       {.name="sqs", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+      {"sns",
+       {.name="sns", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+      {"lambda",
+       {.name="lambda", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+      {"transfer",
+       {.name="transfer", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+      {"cognito",
+       {.name="cognito", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+      {"dynamodb",
+       {.name="dynamodb", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+      {"secretsmanager",
+       {.name="secretsmanager", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+      {"gateway",
+       {.name="gateway", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+      {"database",
+       {.name="database", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}}
   };
 
-  ModuleDatabase::ModuleDatabase() : _logger(Poco::Logger::get("ModuleDatabase")), _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()) {
+  ModuleDatabase::ModuleDatabase()
+      : _logger(Poco::Logger::get("ModuleDatabase")), _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()) {
 
     for (const auto &module : _existingModules) {
       if (_useDatabase) {
@@ -53,7 +63,8 @@ namespace AwsMock::Database {
         if (result) {
           Entity::Module::Module module;
           module.FromDocument(result);
-          log_trace_stream(_logger) << "Module state: " << Entity::Module::ModuleStateToString(module.state) << std::endl;
+          log_trace_stream(_logger) << "Module state: " << Entity::Module::ModuleStateToString(module.state)
+                                    << std::endl;
           return module.status == Entity::Module::ModuleStatus::ACTIVE;
         }
 
@@ -100,7 +111,8 @@ namespace AwsMock::Database {
       auto client = GetClient();
       mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
 
-      mongocxx::stdx::optional<bsoncxx::document::value> mResult = _moduleCollection.find_one(make_document(kvp("_id", oid)));
+      mongocxx::stdx::optional<bsoncxx::document::value>
+          mResult = _moduleCollection.find_one(make_document(kvp("_id", oid)));
       if (mResult) {
         Entity::Module::Module module;
         module.FromDocument(mResult);
@@ -163,7 +175,8 @@ namespace AwsMock::Database {
         auto client = GetClient();
         mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
         auto result = _moduleCollection.insert_one(module.ToDocument());
-        log_trace_stream(_logger) << "Module created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
+        log_trace_stream(_logger) << "Module created, oid: " << result->inserted_id().get_oid().value.to_string()
+                                  << std::endl;
         return GetModuleById(result->inserted_id().get_oid().value);
 
       } catch (mongocxx::exception::system_error &e) {
@@ -212,8 +225,13 @@ namespace AwsMock::Database {
       try {
 
         session.start_transaction();
-        auto mResult = _moduleCollection.update_one(make_document(kvp("name", name)), make_document(kvp("$set", make_document(kvp("state", Entity::Module::ModuleStateToString(state))))));
-        log_trace_stream(_logger) << "Module state updated, name: " << name << " state: " << Entity::Module::ModuleStateToString(state) << std::endl;
+        auto mResult = _moduleCollection.update_one(make_document(kvp("name", name)),
+                                                    make_document(kvp("$set",
+                                                                      make_document(kvp("state",
+                                                                                        Entity::Module::ModuleStateToString(
+                                                                                            state))))));
+        log_trace_stream(_logger) << "Module state updated, name: " << name << " state: "
+                                  << Entity::Module::ModuleStateToString(state) << std::endl;
         session.commit_transaction();
 
       } catch (mongocxx::exception::system_error &e) {
@@ -237,8 +255,13 @@ namespace AwsMock::Database {
 
         auto client = GetClient();
         mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
-        auto mResult = _moduleCollection.update_one(make_document(kvp("name", name)), make_document(kvp("$set", make_document(kvp("status", Entity::Module::ModuleStatusToString(status))))));
-        log_trace_stream(_logger) << "Module status updated, name: " << name << " state: " << Entity::Module::ModuleStatusToString(status) << std::endl;
+        auto mResult = _moduleCollection.update_one(make_document(kvp("name", name)),
+                                                    make_document(kvp("$set",
+                                                                      make_document(kvp("status",
+                                                                                        Entity::Module::ModuleStatusToString(
+                                                                                            status))))));
+        log_trace_stream(_logger) << "Module status updated, name: " << name << " state: "
+                                  << Entity::Module::ModuleStatusToString(status) << std::endl;
 
       } catch (mongocxx::exception::system_error &e) {
         log_error_stream(_logger) << "Set module status failed, error: " << e.what() << std::endl;
@@ -259,7 +282,8 @@ namespace AwsMock::Database {
 
         auto client = GetClient();
         mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
-        auto mResult = _moduleCollection.update_one(make_document(kvp("name", name)), make_document(kvp("$set", make_document(kvp("port", port)))));
+        auto mResult = _moduleCollection.update_one(make_document(kvp("name", name)),
+                                                    make_document(kvp("$set", make_document(kvp("port", port)))));
         log_trace_stream(_logger) << "Module port updated, name: " << name << " port: " << port << std::endl;
 
       } catch (mongocxx::exception::system_error &e) {

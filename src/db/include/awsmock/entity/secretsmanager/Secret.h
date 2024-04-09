@@ -39,6 +39,11 @@ namespace AwsMock::Database::Entity::SecretsManager {
   using bsoncxx::document::view;
   using bsoncxx::document::value;
 
+  /**
+   * SecretManager secrets entity.
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   struct Secret {
 
     /**
@@ -67,9 +72,29 @@ namespace AwsMock::Database::Entity::SecretsManager {
     std::string secretId;
 
     /**
+     * KMS key ID ID
+     */
+    std::string kmsKeyId;
+
+    /**
+     * Secret string
+     */
+    std::string secretString;
+
+    /**
+     * Base64 encoded secret binary
+     */
+    std::string secretBinary;
+
+    /**
      * Version Id
      */
     std::string versionId;
+
+    /**
+     * Description
+     */
+    std::string description;
 
     /**
      * Creation date
@@ -96,18 +121,11 @@ namespace AwsMock::Database::Entity::SecretsManager {
     void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
     /**
-     * Converts the entity to a JSON object
+     * Converts the DTO to a JSON representation.
      *
-     * @return DTO as string for logging.
+     * @return DTO as JSON for logging.
      */
-    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
-
-    /**
-     * Converts the entity to a JSON object
-     *
-     * @return DTO as string for logging.
-     */
-    void FromJsonObject(Poco::JSON::Object::Ptr jsonObject);
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Converts the DTO to a string representation.

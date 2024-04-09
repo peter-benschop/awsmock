@@ -40,6 +40,11 @@ namespace AwsMock::Database::Entity::Lambda {
   using bsoncxx::document::value;
   using bsoncxx::to_json;
 
+  /**
+   * Lambda state
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   enum LambdaState {
     Pending,
     Active,

@@ -11,7 +11,14 @@
 
 namespace AwsMock::Database::Entity::SNS {
 
-  enum MessageStatus { INITIAL, SEND, RESEND };
+  /**
+   * SNS message attribute entity
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
+  enum MessageStatus {
+    INITIAL, SEND, RESEND
+  };
   static std::map<MessageStatus, std::string> MessageStatusNames{
       {MessageStatus::INITIAL, "INITIAL"},
       {MessageStatus::SEND, "SEND"},

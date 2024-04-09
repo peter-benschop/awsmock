@@ -10,9 +10,11 @@ namespace AwsMock::Database {
 
   bool TransferMemoryDb::TransferExists(const std::string &region, const std::string &serverId) {
 
-    return find_if(_transfers.begin(), _transfers.end(), [region, serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
-      return transfer.second.region == region && transfer.second.serverId == serverId;
-    }) != _transfers.end();
+    return find_if(_transfers.begin(),
+                   _transfers.end(),
+                   [region, serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
+                     return transfer.second.region == region && transfer.second.serverId == serverId;
+                   }) != _transfers.end();
 
   }
 
@@ -24,17 +26,21 @@ namespace AwsMock::Database {
 
   bool TransferMemoryDb::TransferExists(const std::string &serverId) {
 
-    return find_if(_transfers.begin(), _transfers.end(), [serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
-      return transfer.second.serverId == serverId;
-    }) != _transfers.end();
+    return find_if(_transfers.begin(),
+                   _transfers.end(),
+                   [serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
+                     return transfer.second.serverId == serverId;
+                   }) != _transfers.end();
 
   }
 
   bool TransferMemoryDb::TransferExists(const std::string &region, const std::vector<std::string> &protocols) {
 
-    return find_if(_transfers.begin(), _transfers.end(), [region, protocols](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
-      return transfer.second.region == region && transfer.second.protocols == protocols;
-    }) != _transfers.end();
+    return find_if(_transfers.begin(),
+                   _transfers.end(),
+                   [region, protocols](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
+                     return transfer.second.region == region && transfer.second.protocols == protocols;
+                   }) != _transfers.end();
 
   }
 
@@ -74,9 +80,11 @@ namespace AwsMock::Database {
 
     std::string region = transfer.region;
     std::string serverId = transfer.serverId;
-    auto it = find_if(_transfers.begin(), _transfers.end(), [region, serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
-      return transfer.second.region == region && transfer.second.serverId == serverId;
-    });
+    auto it = find_if(_transfers.begin(),
+                      _transfers.end(),
+                      [region, serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
+                        return transfer.second.region == region && transfer.second.serverId == serverId;
+                      });
 
     if (it == _transfers.end()) {
       log_error_stream(_logger) << "Update transfer failed, serverId: " << serverId << std::endl;
@@ -90,9 +98,11 @@ namespace AwsMock::Database {
 
   Entity::Transfer::Transfer TransferMemoryDb::GetTransferById(const std::string &oid) {
 
-    auto it = find_if(_transfers.begin(), _transfers.end(), [oid](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
-      return transfer.first == oid;
-    });
+    auto it = find_if(_transfers.begin(),
+                      _transfers.end(),
+                      [oid](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
+                        return transfer.first == oid;
+                      });
 
     if (it == _transfers.end()) {
       log_error_stream(_logger) << "Get transfer by ID failed, oid: " << oid << std::endl;
@@ -105,9 +115,11 @@ namespace AwsMock::Database {
 
   Entity::Transfer::Transfer TransferMemoryDb::GetTransferByServerId(const std::string &serverId) {
 
-    auto it = find_if(_transfers.begin(), _transfers.end(), [serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
-      return transfer.second.serverId == serverId;
-    });
+    auto it = find_if(_transfers.begin(),
+                      _transfers.end(),
+                      [serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
+                        return transfer.second.serverId == serverId;
+                      });
 
     if (it == _transfers.end()) {
       log_error_stream(_logger) << "Get transfer by serverId failed, serverId: " << serverId << std::endl;
@@ -120,9 +132,11 @@ namespace AwsMock::Database {
 
   Entity::Transfer::Transfer TransferMemoryDb::GetTransferByArn(const std::string &arn) {
 
-    auto it = find_if(_transfers.begin(), _transfers.end(), [arn](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
-      return transfer.second.arn == arn;
-    });
+    auto it = find_if(_transfers.begin(),
+                      _transfers.end(),
+                      [arn](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
+                        return transfer.second.arn == arn;
+                      });
 
     if (it == _transfers.end()) {
       log_error_stream(_logger) << "Get transfer by arn failed, arn: " << arn << std::endl;

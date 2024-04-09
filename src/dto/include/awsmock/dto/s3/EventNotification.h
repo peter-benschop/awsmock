@@ -141,6 +141,9 @@ namespace AwsMock::Dto::S3 {
 
   struct OwnerIdentity {
 
+    /**
+     * Principal ID
+     */
     std::string principalId;
 
     /**

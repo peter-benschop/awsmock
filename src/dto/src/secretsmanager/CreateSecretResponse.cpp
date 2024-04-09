@@ -45,7 +45,7 @@ namespace AwsMock::Dto::SecretsManager {
   }
 
   std::ostream &operator<<(std::ostream &os, const CreateSecretResponse &r) {
-    os << "CreateSecretResponse={region='" << r.region << "' name='" << r.name << "' arn='" << r.arn << "', versionId='" << r.versionId << "'}";
+    os << "CreateSecretResponse=" << r.ToJson();
     return os;
   }
 

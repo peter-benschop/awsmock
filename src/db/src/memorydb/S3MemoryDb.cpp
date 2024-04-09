@@ -10,9 +10,11 @@ namespace AwsMock::Database {
 
   bool S3MemoryDb::BucketExists(const std::string &region, const std::string &name) {
 
-    return find_if(_buckets.begin(), _buckets.end(), [region, name](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
-      return bucket.second.region == region && bucket.second.name == name;
-    }) != _buckets.end();
+    return find_if(_buckets.begin(),
+                   _buckets.end(),
+                   [region, name](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
+                     return bucket.second.region == region && bucket.second.name == name;
+                   }) != _buckets.end();
   }
 
   bool S3MemoryDb::BucketExists(const Entity::S3::Bucket &bucket) {
@@ -21,7 +23,8 @@ namespace AwsMock::Database {
 
   Entity::S3::Bucket S3MemoryDb::GetBucketById(const std::string &oid) {
 
-    auto it = find_if(_buckets.begin(), _buckets.end(), [oid](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
+    auto
+        it = find_if(_buckets.begin(), _buckets.end(), [oid](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
       return bucket.first == oid;
     });
 
@@ -36,9 +39,11 @@ namespace AwsMock::Database {
 
     Entity::S3::Bucket result;
 
-    auto it = find_if(_buckets.begin(), _buckets.end(), [region, name](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
-      return bucket.second.region == region && bucket.second.name == name;
-    });
+    auto it = find_if(_buckets.begin(),
+                      _buckets.end(),
+                      [region, name](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
+                        return bucket.second.region == region && bucket.second.name == name;
+                      });
 
     if (it != _buckets.end()) {
       it->second.oid = it->first;
@@ -117,9 +122,11 @@ namespace AwsMock::Database {
 
     std::string region = bucket.region;
     std::string name = bucket.name;
-    auto it = find_if(_buckets.begin(), _buckets.end(), [region, name](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
-      return bucket.second.region == region && bucket.second.name == name;
-    });
+    auto it = find_if(_buckets.begin(),
+                      _buckets.end(),
+                      [region, name](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
+                        return bucket.second.region == region && bucket.second.name == name;
+                      });
     _buckets[it->first] = bucket;
     return _buckets[it->first];
   }
@@ -148,9 +155,12 @@ namespace AwsMock::Database {
     std::string region = object.region;
     std::string bucket = object.bucket;
     std::string key = object.key;
-    return find_if(_objects.begin(), _objects.end(), [region, bucket, key](const std::pair<std::string, Entity::S3::Object> &object) {
-      return object.second.region == region && object.second.bucket == bucket && object.second.key == key;
-    }) != _objects.end();
+    return find_if(_objects.begin(),
+                   _objects.end(),
+                   [region, bucket, key](const std::pair<std::string, Entity::S3::Object> &object) {
+                     return object.second.region == region && object.second.bucket == bucket
+                         && object.second.key == key;
+                   }) != _objects.end();
   }
 
   Entity::S3::Object S3MemoryDb::CreateObject(const Entity::S3::Object &object) {
@@ -168,16 +178,19 @@ namespace AwsMock::Database {
 
     std::string bucket = object.bucket;
     std::string key = object.key;
-    auto it = find_if(_objects.begin(), _objects.end(), [bucket, key](const std::pair<std::string, Entity::S3::Object> &object) {
-      return object.second.bucket == bucket && object.second.key == key;
-    });
+    auto it = find_if(_objects.begin(),
+                      _objects.end(),
+                      [bucket, key](const std::pair<std::string, Entity::S3::Object> &object) {
+                        return object.second.bucket == bucket && object.second.key == key;
+                      });
     _objects[it->first] = object;
     return _objects[it->first];
   }
 
   Entity::S3::Object S3MemoryDb::GetObjectById(const std::string &oid) {
 
-    auto it = find_if(_objects.begin(), _objects.end(), [oid](const std::pair<std::string, Entity::S3::Object> &object) {
+    auto
+        it = find_if(_objects.begin(), _objects.end(), [oid](const std::pair<std::string, Entity::S3::Object> &object) {
       return object.first == oid;
     });
 
@@ -188,11 +201,16 @@ namespace AwsMock::Database {
     return {};
   }
 
-  Entity::S3::Object S3MemoryDb::GetObject(const std::string &region, const std::string &bucket, const std::string &key) {
+  Entity::S3::Object S3MemoryDb::GetObject(const std::string &region,
+                                           const std::string &bucket,
+                                           const std::string &key) {
 
-    auto it = find_if(_objects.begin(), _objects.end(), [region, bucket, key](const std::pair<std::string, Entity::S3::Object> &object) {
-      return object.second.region == region && object.second.bucket == bucket && object.second.key == key;
-    });
+    auto it = find_if(_objects.begin(),
+                      _objects.end(),
+                      [region, bucket, key](const std::pair<std::string, Entity::S3::Object> &object) {
+                        return object.second.region == region && object.second.bucket == bucket
+                            && object.second.key == key;
+                      });
 
     if (it != _objects.end()) {
       it->second.oid = it->first;

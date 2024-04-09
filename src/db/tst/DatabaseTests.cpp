@@ -22,16 +22,16 @@ namespace AwsMock::Database {
 
   class DatabaseTest : public ::testing::Test {
 
-  protected:
+    protected:
 
-    void SetUp() override {
-    }
+      void SetUp() override {
+      }
 
-    void TearDown() override {
-    }
+      void TearDown() override {
+      }
 
-    Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
-    Database _database = Database();
+      Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+      Database _database = Database();
   };
 
   /*TEST_F(DatabaseTest, ConstructorTest) {

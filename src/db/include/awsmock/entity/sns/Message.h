@@ -55,6 +55,11 @@ namespace AwsMock::Database::Entity::SNS {
     return MessageStatus::INITIAL;
   }
 
+  /**
+   * SNS message entity
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   struct Message {
 
     /**

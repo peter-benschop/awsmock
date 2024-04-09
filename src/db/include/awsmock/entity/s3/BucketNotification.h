@@ -14,6 +14,7 @@
 #include <Poco/JSON/Object.h>
 
 // MongoDB includes
+#include <bsoncxx/json.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <mongocxx/stdx.hpp>
@@ -27,6 +28,11 @@ namespace AwsMock::Database::Entity::S3 {
   using bsoncxx::document::view;
   using bsoncxx::document::value;
 
+  /**
+   * S3 bucket notification entity
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   struct BucketNotification {
 
     /**
@@ -68,7 +74,7 @@ namespace AwsMock::Database::Entity::S3 {
      *
      * @return DTO as string for logging.
      */
-    void FromJsonObject(const Poco::JSON::Object::Ptr& jsonObject);
+    void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 
     /**
      * Converts the DTO to a string representation.

@@ -34,6 +34,11 @@ namespace AwsMock::Database::Entity::DynamoDb {
   using bsoncxx::document::value;
   using bsoncxx::to_json;
 
+  /**
+   * DynamoDB attribute value entity
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   struct AttributeValue {
 
     /**

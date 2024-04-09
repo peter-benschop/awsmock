@@ -33,6 +33,11 @@ namespace AwsMock::Database::Entity::SNS {
   using bsoncxx::document::view;
   using bsoncxx::document::value;
 
+  /**
+   * SNS message attribute entity
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   struct MessageAttribute {
 
     /**
@@ -55,7 +60,7 @@ namespace AwsMock::Database::Entity::SNS {
     /**
      * Converts the entity to a JSON object
      *
-     * @return DTO as string for logging.
+     * @return DTO as JSON object for logging.
      */
     [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 

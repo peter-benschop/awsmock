@@ -21,6 +21,20 @@
 
 namespace AwsMock::Dto::SecretsManager {
 
+
+  /**
+   * Return structure for the delete secret request.
+   *
+   * Example:
+   *
+   * <pre>
+   * {
+   *   "ARN": "string",
+   *   "DeletionDate": number,
+   *   "Name": "string"
+   * }
+   * </pre>
+   */
   struct DeleteSecretResponse {
 
     /**
@@ -32,6 +46,16 @@ namespace AwsMock::Dto::SecretsManager {
      * Secret name
      */
     std::string name;
+
+    /**
+     * Secret ARN
+     */
+    std::string arn;
+
+    /**
+     * Secret deletion date
+     */
+    double deletionDate = -1;
 
     /**
      * Convert to a JSON string

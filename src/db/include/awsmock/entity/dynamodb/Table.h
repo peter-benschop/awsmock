@@ -37,6 +37,11 @@ namespace AwsMock::Database::Entity::DynamoDb {
   using bsoncxx::document::value;
   using bsoncxx::to_json;
 
+  /**
+   * DynamoDB table entity
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   struct Table {
 
     /**

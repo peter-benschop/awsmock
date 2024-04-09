@@ -56,8 +56,7 @@ namespace AwsMock::Service {
      *
      * @param request HTTP request
      * @param response HTTP response
-     * @param region AWS region
-     * @param user AWS user
+     * @param sqsClientCommand standardised client command
      * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
      */
     void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::SecretsManagerClientCommand &sqsClientCommand);

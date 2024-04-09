@@ -6,6 +6,29 @@
 
 namespace AwsMock::Dto::SecretsManager {
 
+  std::string CreateSecretRequest::ToJson() const{
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("Region", region);
+      rootJson.set("Name", name);
+      rootJson.set("ClientRequestToken", clientRequestToken);
+      rootJson.set("Description", description);
+      rootJson.set("SecretString", secretString);
+      rootJson.set("SecretBinary", secretBinary);
+      rootJson.set("ForceOverwriteReplicaSecret", forceOverwriteReplicaSecret);
+      rootJson.set("KmsKeyId", kmsKeyId);
+      rootJson.set("Tags", tags.ToJsonArray());
+      rootJson.set("RequestId", requestId);
+
+      std::ostringstream os;
+      rootJson.stringify(os);
+      return os.str();
+
+    } catch (Poco::Exception &exc) {
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+    }
+  }
+
   void CreateSecretRequest::FromJson(const std::string &jsonString) {
 
     Poco::JSON::Parser parser;
@@ -20,6 +43,9 @@ namespace AwsMock::Dto::SecretsManager {
       Core::JsonUtils::GetJsonValueString("Description", rootObject, description);
       Core::JsonUtils::GetJsonValueString("SecretString", rootObject, secretString);
       Core::JsonUtils::GetJsonValueString("SecretBinary", rootObject, secretBinary);
+      Core::JsonUtils::GetJsonValueBool("ForceOverwriteReplicaSecret", rootObject, forceOverwriteReplicaSecret);
+      Core::JsonUtils::GetJsonValueString("KmsKeyId", rootObject, kmsKeyId);
+      tags.FromJson(rootObject->getObject("Tags"));
 
     } catch (Poco::Exception &exc) {
       throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_BAD_REQUEST);
@@ -33,12 +59,7 @@ namespace AwsMock::Dto::SecretsManager {
   }
 
   std::ostream &operator<<(std::ostream &os, const CreateSecretRequest &r) {
-    os << "CreateQueueRequest={region='" << r.region << "', name='" << r.name << "', clientRequestToken='" << r.clientRequestToken << "', description='" << r.description << "', tags=[";
-    for (auto &tag : r.tags) {
-      os << tag.first << "='" << tag.second << "', ";
-    }
-    os.seekp(-2, std::ostream::cur);
-    os << "]}";
+    os << "CreateQueueRequest=" << r.ToJson();
     return os;
   }
 

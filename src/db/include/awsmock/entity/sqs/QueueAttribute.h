@@ -34,6 +34,11 @@ namespace AwsMock::Database::Entity::SQS {
   using bsoncxx::document::view;
   using bsoncxx::document::value;
 
+  /**
+   * SQS queue attribute entity
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   struct QueueAttribute {
 
     /**
@@ -157,7 +162,7 @@ namespace AwsMock::Database::Entity::SQS {
      *
      * @return DTO as string for logging.
      */
-    void FromJsonObject(const Poco::JSON::Object::Ptr& jsonObject);
+    void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 
     /**
      * Converts the DTO to a string representation.
