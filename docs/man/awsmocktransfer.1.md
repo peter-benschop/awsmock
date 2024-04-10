@@ -28,7 +28,7 @@ corresponding man page ```awslocal(1)```.
 ```awslocal transfer list-servers```  
 &nbsp;&nbsp;&nbsp;&nbsp;lists all available transfer servers
 
-```awslocal transfer delete-server --server-url <server-id>```  
+```awslocal transfer delete-server --server-url <server-userPoolId>```  
 &nbsp;&nbsp;&nbsp;&nbsp;deletes a transfer server
 
 ## EXAMPLES
@@ -63,7 +63,7 @@ awslocal transfer list-servers
 
 To delete a transfer server:
 ```
-awslocal transfer delete-server --server-id s-27134679b31c0a9833ee
+awslocal transfer delete-server --server-userPoolId s-27134679b31c0a9833ee
 ```
 
 ## AUTHOR

@@ -58,7 +58,7 @@ namespace AwsMock::Database {
     /**
      * Secret exists
      *
-     * @param bucket secret entity
+     * @param secret secret entity
      * @return true if secret exists
      * @throws DatabaseException
      */
@@ -74,7 +74,7 @@ namespace AwsMock::Database {
     bool SecretExists(const std::string &secretId);
 
     /**
-     * Returns the secret by id
+     * Returns the secret by userPoolId
      *
      * @param oid secret oid
      * @return secret, if existing
@@ -116,6 +116,14 @@ namespace AwsMock::Database {
      * @throws DatabaseException
      */
     Entity::SecretsManager::Secret UpdateSecret(const Entity::SecretsManager::Secret &secret);
+
+    /**
+     * Returns a list of secrets
+     *
+     * @return list of available secrets
+     * @throws DatabaseException
+     */
+    Entity::SecretsManager::SecretList ListSecrets();
 
     /**
      * Delete a secret.

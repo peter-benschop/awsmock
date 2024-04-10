@@ -46,7 +46,7 @@ namespace AwsMock::Service {
       std::string _port = _configuration.getString("awsmock.service.lambda.port", std::to_string(LAMBDA_DEFAULT_PORT));
       std::string _host = _configuration.getString("awsmock.service.lambda.host", LAMBDA_DEFAULT_HOST);
       _configuration.setString("awsmock.service.gateway.port", _port);
-      _accountId = _configuration.getString("awsmock.account.id", ACCOUNT_ID);
+      _accountId = _configuration.getString("awsmock.account.userPoolId", ACCOUNT_ID);
       _endpoint = "http://" + _host + ":" + _port;
 
       // Start HTTP manager

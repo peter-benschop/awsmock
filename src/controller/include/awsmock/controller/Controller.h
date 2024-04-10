@@ -77,7 +77,7 @@ namespace AwsMock::Controller {
       /**
        * Show the logs
        */
-      void ShowServiceLogs();
+      static void ShowServiceLogs();
 #endif
 
       /**

@@ -84,15 +84,7 @@ namespace AwsMock::Database::Entity::SQS {
   }
 
   std::ostream &operator<<(std::ostream &os, const QueueAttribute &r) {
-    os << "QueueAttribute={delaySeconds='" << r.delaySeconds << "' maxMessageSize='" << r.maxMessageSize
-       << "' messageRetentionPeriod='" << r.messageRetentionPeriod << "' policy='" << r.policy
-       << "' receiveMessageWaitTime='" << r.receiveMessageWaitTime
-       << "' visibilityTimeout='" << r.visibilityTimeout << "' redrivePolicy=" << r.redrivePolicy.ToString()
-       << " redriveAllowPolicy='" << r.redriveAllowPolicy << "' approximateNumberOfMessages='"
-       << r.approximateNumberOfMessages
-       << "' approximateNumberOfMessagesDelayed='" << r.approximateNumberOfMessagesDelayed
-       << "' approximateNumberOfMessagesNotVisible='" << r.approximateNumberOfMessagesNotVisible << "', queueArn='"
-       << r.queueArn << "'}";
+    os << "QueueAttribute=" << bsoncxx::to_json(r.ToDocument());
     return os;
   }
 

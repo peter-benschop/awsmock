@@ -109,7 +109,7 @@ namespace AwsMock::Service {
       Database::CognitoDatabase &_database;
 
       /**
-       * S3 account id
+       * S3 account userPoolId
        */
       std::string _accountId;
   };

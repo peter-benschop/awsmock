@@ -6,6 +6,35 @@
 
 namespace AwsMock::Dto::SQS {
 
+  std::string DeleteMessageBatchEntry::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("Id", id);
+      rootJson.set("ReceiptHandle", receiptHandle);
+
+      std::ostringstream os;
+      rootJson.stringify(os);
+      return os.str();
+
+    } catch (Poco::Exception &exc) {
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  Poco::JSON::Object DeleteMessageBatchEntry::ToJsonObject() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("Id", id);
+      rootJson.set("ReceiptHandle", receiptHandle);
+      return rootJson;
+
+    } catch (Poco::Exception &exc) {
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+    }
+  }
+
   std::string DeleteMessageBatchEntry::ToString() const {
     std::stringstream ss;
     ss << (*this);
@@ -13,7 +42,7 @@ namespace AwsMock::Dto::SQS {
   }
 
   std::ostream &operator<<(std::ostream &os, const DeleteMessageBatchEntry &d) {
-    os << "DeleteMessageBatchEntry={id='" << d.id << "', receiptHandler='" + d.receiptHandle << "'}";
+    os << "DeleteMessageBatchEntry=" << d.ToJson();
     return os;
   }
 

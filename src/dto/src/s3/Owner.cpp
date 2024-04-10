@@ -13,7 +13,7 @@ namespace AwsMock::Dto::S3 {
   }
 
   std::ostream &operator<<(std::ostream &os, const Owner &o) {
-    os << "Owner={id='" << o.id << "', displayName='" << o.displayName << "'}";
+    os << "Owner={userPoolId='" << o.id << "', displayName='" << o.displayName << "'}";
     return os;
   }
 

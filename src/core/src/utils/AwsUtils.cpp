@@ -20,13 +20,13 @@ namespace AwsMock::Core {
 
   std::string AwsUtils::CreateSqsQueueUrl(const Configuration &configuration, const std::string &queueName) {
     std::string endpoint = GetEndpoint(configuration);
-    std::string accountId = configuration.getString("awsmock.account.id", SQS_DEFAULT_ACCOUNT_ID);
+    std::string accountId = configuration.getString("awsmock.account.userPoolId", SQS_DEFAULT_ACCOUNT_ID);
     return endpoint + "/" + accountId + "/" + queueName;
   }
 
   std::string AwsUtils::CreateSqsQueueArn(const Configuration &configuration, const std::string &queueName) {
     std::string region = configuration.getString("awsmock.region", GATEWAY_DEFAULT_REGION);
-    std::string accountId = configuration.getString("awsmock.account.id", SQS_DEFAULT_ACCOUNT_ID);
+    std::string accountId = configuration.getString("awsmock.account.userPoolId", SQS_DEFAULT_ACCOUNT_ID);
     return CreateArn("sqs", region, accountId, queueName);
   }
 
@@ -62,8 +62,8 @@ namespace AwsMock::Core {
   }
 
   std::string AwsUtils::GetAuthorizationHeader(const Configuration &configuration, const std::string &module) {
-    std::string accountId = configuration.getString("awsmock.account.id");
-    std::string clientId = configuration.getString("awsmock.client.id");
+    std::string accountId = configuration.getString("awsmock.account.userPoolId");
+    std::string clientId = configuration.getString("awsmock.client.userPoolId");
     std::string region = configuration.getString("awsmock.region");
     return "AWS4-HMAC-SHA256 Credential=" + accountId + "/" + clientId + "/" + region + "/" + module + "/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840";
   }

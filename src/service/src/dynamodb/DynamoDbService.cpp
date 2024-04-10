@@ -10,7 +10,7 @@ namespace AwsMock::Service {
     _logger(Poco::Logger::get("DynamoDbService")), _configuration(configuration), _metricService(metricService),_dynamoDbDatabase(Database::DynamoDbDatabase::instance()) {
 
     // Initialize environment
-    _accountId = _configuration.getString("awsmock.account.id", "000000000000");
+    _accountId = _configuration.getString("awsmock.account.userPoolId", "000000000000");
     _dockerService = std::make_shared<Service::DockerService>(_configuration);
 
     // DynamoDB docker host, port

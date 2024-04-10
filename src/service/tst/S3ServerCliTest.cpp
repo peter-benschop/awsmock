@@ -36,7 +36,7 @@ namespace AwsMock::Service {
       std::string _port = _configuration.getString("awsmock.service.s3.port", std::to_string(S3_DEFAULT_PORT));
       std::string _host = _configuration.getString("awsmock.service.s3.host", S3_DEFAULT_HOST);
       _configuration.setString("awsmock.service.gateway.port", _port);
-      _accountId = _configuration.getString("awsmock.account.id", S3_ACCOUNT_ID);
+      _accountId = _configuration.getString("awsmock.account.userPoolId", S3_ACCOUNT_ID);
       _endpoint = "http://" + _host + ":" + _port;
       _output = "json";
 
@@ -190,11 +190,11 @@ namespace AwsMock::Service {
 
     // act
     std::string filename = Core::FileUtils::CreateTempFile("json", 10 * 1024 * 1024);
-    Core::ExecResult uploadPartResult = Core::TestUtils::SendCliCommand("aws s3api upload-part --bucket test-bucket --key multipart-upload.json --part-number 1 --body " + filename + " --upload-id " + s3Result.uploadId + " --endpoint " + _endpoint);
+    Core::ExecResult uploadPartResult = Core::TestUtils::SendCliCommand("aws s3api upload-part --bucket test-bucket --key multipart-upload.json --part-number 1 --body " + filename + " --upload-userPoolId " + s3Result.uploadId + " --endpoint " + _endpoint);
     EXPECT_EQ(0, uploadPartResult.status);
 
-    //aws s3api complete-multipart-upload --multipart-upload file://fileparts.json --bucket DOC-EXAMPLE-BUCKET --key large_test_file --upload-id exampleTUVGeKAk3Ob7qMynRKqe3ROcavPRwg92eA6JPD4ybIGRxJx9R0VbgkrnOVphZFK59KCYJAO1PXlrBSW7vcH7ANHZwTTf0ovqe6XPYHwsSp7eTRnXB1qjx40Tk
-    Core::ExecResult finishPartResult = Core::TestUtils::SendCliCommand("aws s3api complete-multipart-upload --bucket test-bucket --key multipart-upload.json --upload-id " + s3Result.uploadId + " --endpoint " + _endpoint);
+    //aws s3api complete-multipart-upload --multipart-upload file://fileparts.json --bucket DOC-EXAMPLE-BUCKET --key large_test_file --upload-userPoolId exampleTUVGeKAk3Ob7qMynRKqe3ROcavPRwg92eA6JPD4ybIGRxJx9R0VbgkrnOVphZFK59KCYJAO1PXlrBSW7vcH7ANHZwTTf0ovqe6XPYHwsSp7eTRnXB1qjx40Tk
+    Core::ExecResult finishPartResult = Core::TestUtils::SendCliCommand("aws s3api complete-multipart-upload --bucket test-bucket --key multipart-upload.json --upload-userPoolId " + s3Result.uploadId + " --endpoint " + _endpoint);
     EXPECT_EQ(0, finishPartResult.status);
     Database::Entity::S3::ObjectList objectList = _database.ListBucket(TEST_BUCKET_NAME);
 

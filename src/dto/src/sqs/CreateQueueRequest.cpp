@@ -6,6 +6,21 @@
 
 namespace AwsMock::Dto::SQS {
 
+  std::string CreateQueueRequest::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("QueueName", queueName);
+
+      std::ostringstream os;
+      rootJson.stringify(os);
+      return os.str();
+
+    } catch (Poco::Exception &exc) {
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+    }
+  }
+
   void CreateQueueRequest::FromJson(const std::string &jsonString) {
 
     Poco::JSON::Parser parser;
@@ -29,17 +44,7 @@ namespace AwsMock::Dto::SQS {
   }
 
   std::ostream &operator<<(std::ostream &os, const CreateQueueRequest &r) {
-    os << "CreateQueueRequest={region='" << r.region << "', queueUrl='" << r.queueUrl << "', queueName='" << r.queueName << "', owner='" << r.owner << "', userAttributes=[";
-    for (auto &attribute : r.attributes) {
-      os << attribute.attributeName << "='" << attribute.attributeValue << "', ";
-    }
-    os.seekp(-2, std::ostream::cur);
-    os << "], tags=[";
-    for (auto &tag : r.tags) {
-      os << tag.first << "='" << tag.second << "', ";
-    }
-    os.seekp(-2, std::ostream::cur);
-    os << "]}";
+    os << "CreateQueueRequest=" << r.ToJson();
     return os;
   }
 

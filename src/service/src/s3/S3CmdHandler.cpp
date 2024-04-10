@@ -225,7 +225,7 @@ namespace AwsMock::Service {
               headerMap["x-amz-checksum-sha256"] = putObjectResponse.checksumSha256;
             }
             if (!putObjectResponse.versionId.empty()) {
-              headerMap["x-amz-version-id"] = putObjectResponse.versionId;
+              headerMap["x-amz-version-userPoolId"] = putObjectResponse.versionId;
             }
             log_debug_stream(_logger) << " size: " << putObjectResponse.contentLength << std::endl;
             SendOkResponse(response, {}, headerMap);
@@ -498,9 +498,9 @@ namespace AwsMock::Service {
       headerMap["Content-Length"] = std::to_string(s3Response.size);
       headerMap["ETag"] = "\"" + s3Response.md5Sum + "\"";
       headerMap["accept-ranges"] = "bytes";
-      headerMap["x-amz-id-2"] = Core::StringUtils::GenerateRandomString(30);
-      headerMap["x-amz-request-id"] = Poco::UUIDGenerator().createRandom().toString();
-      headerMap["x-amz-version-id"] = Core::StringUtils::GenerateRandomString(30);
+      headerMap["x-amz-userPoolId-2"] = Core::StringUtils::GenerateRandomString(30);
+      headerMap["x-amz-request-userPoolId"] = Poco::UUIDGenerator().createRandom().toString();
+      headerMap["x-amz-version-userPoolId"] = Core::StringUtils::GenerateRandomString(30);
 
       // User supplied metadata
       for (const auto &m : s3Response.metadata) {

@@ -101,15 +101,7 @@ namespace AwsMock::Database::Entity::SQS {
   }
 
   std::ostream &operator<<(std::ostream &os, const Queue &q) {
-    os << "Queue={id='" << q.oid << "' region='" << q.region << "' name='" << q.name << "' owner='" << q.owner
-       << "' queueUrl='" << q.queueUrl <<
-       "' queueArn='" << q.queueArn << "' created='"
-       << Poco::DateTimeFormatter::format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) << "', tags=[";
-    for (const auto &it : q.tags) {
-      os << "key='" << it.first << "' value='" << it.second << "', ";
-    }
-    os.seekp(-2, std::ostream::cur);
-    os << "] modified='" << Poco::DateTimeFormatter::format(q.created, Poco::DateTimeFormat::HTTP_FORMAT) << "'}";
+    os << "Queue=" << bsoncxx::to_json(q.ToDocument());
     return os;
   }
 

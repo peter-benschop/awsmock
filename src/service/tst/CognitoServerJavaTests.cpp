@@ -88,7 +88,7 @@ namespace AwsMock::Service {
     Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + "create-user-pool test-user-pool");
     EXPECT_EQ(0, createResult.status);
     Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
-    std::string userPoolId = userPoolList.front().id;
+    std::string userPoolId = userPoolList.front().userPoolId;
 
     // act
     Core::ExecResult deleteResult = Core::SystemUtils::Exec(_baseCommand + "delete-user-pool " + userPoolId);
@@ -105,7 +105,7 @@ namespace AwsMock::Service {
     Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + "create-user-pool test-user-pool");
     EXPECT_EQ(0, createResult.status);
     Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
-    std::string userPoolId = userPoolList.front().id;
+    std::string userPoolId = userPoolList.front().userPoolId;
 
     // act
     Core::ExecResult result = Core::SystemUtils::Exec(_baseCommand + "admin-create-user " + userPoolId + " test-user");
@@ -122,7 +122,7 @@ namespace AwsMock::Service {
     Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + "create-user-pool test-user-pool");
     EXPECT_EQ(0, createResult.status);
     Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
-    std::string userPoolId = userPoolList.front().id;
+    std::string userPoolId = userPoolList.front().userPoolId;
     Core::ExecResult createdUser = Core::SystemUtils::Exec(_baseCommand + "admin-create-user " + userPoolId + " test-user");
 
     // act

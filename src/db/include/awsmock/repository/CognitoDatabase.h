@@ -49,7 +49,7 @@ namespace AwsMock::Database {
       /**
        * Check existence of cognito user pool
        *
-       * @param id user pool id
+       * @param id user pool userPoolId
        * @return true if cognito user pool exists
        * @throws DatabaseException
        */

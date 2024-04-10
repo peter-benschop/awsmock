@@ -15,7 +15,7 @@ namespace AwsMock::Controller {
 
     // Get user/clientId/region
     _user = _configuration.getString("awsmock.user", AWSMOCKCTL_DEFAULT_USER);
-    _clientId = _configuration.getString("awsmock.client.id", AWSMOCKCTL_DEFAULT_CLIENT);
+    _clientId = _configuration.getString("awsmock.client.userPoolId", AWSMOCKCTL_DEFAULT_CLIENT);
     _region = _configuration.getString("awsmock.region", AWSMOCKCTL_DEFAULT_REGION);
   }
 

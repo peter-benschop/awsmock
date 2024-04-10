@@ -6,6 +6,29 @@
 
 namespace AwsMock::Dto::SQS {
 
+  std::string DeleteMessageBatchRequest::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("Region", region);
+      rootJson.set("QueueUrl", queueUrl);
+
+      // Entries
+      Poco::JSON::Array entriesArray;
+      for(const auto &e:deleteMessageBatchEntries) {
+        entriesArray.add(e.ToJsonObject());
+      }
+      rootJson.set("DeleteMessageBatchEntries", entriesArray);
+
+      std::ostringstream os;
+      rootJson.stringify(os);
+      return os.str();
+
+    } catch (Poco::Exception &exc) {
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+    }
+  }
+
   void DeleteMessageBatchRequest::FromJson(const std::string &jsonString) {
 
     Poco::JSON::Parser parser;
@@ -39,12 +62,7 @@ namespace AwsMock::Dto::SQS {
   }
 
   std::ostream &operator<<(std::ostream &os, const DeleteMessageBatchRequest &r) {
-    os << "DeleteMessageBatchRequest={region='" << r.region << "', queueUrl='" + r.queueUrl + "', entries=[";
-    for (const auto &entry : r.deleteMessageBatchEntries) {
-      os << entry.ToString() << ", ";
-    }
-    os.seekp(-2, std::ostream::cur);
-    os << "]}";
+    os << "DeleteMessageBatchRequest=" << r.ToJson();
     return os;
   }
 

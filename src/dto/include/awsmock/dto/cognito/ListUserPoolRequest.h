@@ -40,6 +40,13 @@ namespace AwsMock::Dto::Cognito {
     void FromJson(const std::string &payload);
 
     /**
+     * Convert to a JSON string
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const;
+
+    /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.

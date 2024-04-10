@@ -45,7 +45,7 @@ namespace AwsMock::Core {
   }
 
   auto randomPasswordString(std::size_t len) -> std::string {
-    static constexpr auto chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@$%&<>+";
+    static constexpr auto chars = R"(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~)";
     thread_local auto rng = RandomGenerator<>();
     auto dist = std::uniform_int_distribution{{}, std::strlen(chars) - 1};
     auto result = std::string(len, '\0');

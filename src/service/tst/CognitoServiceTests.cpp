@@ -82,7 +82,7 @@ namespace AwsMock::Service {
     Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByRegionName(_region, USER_POOL_NAME);
 
     // act
-    Dto::Cognito::DeleteUserPoolRequest deleteRequest = {.id = userPool.id};
+    Dto::Cognito::DeleteUserPoolRequest deleteRequest = {.userPoolId = userPool.userPoolId};
     _service.DeleteUserPool(deleteRequest);
     long userPoolCount = _database.CountUserPools();
 
@@ -96,7 +96,7 @@ namespace AwsMock::Service {
     Dto::Cognito::CreateUserPoolRequest createUserPoolRequest = {.region=_region, .name=USER_POOL_NAME};
     Dto::Cognito::CreateUserPoolResponse createUserPoolResponse = _service.CreateUserPool(createUserPoolRequest);
     Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByRegionName(_region, USER_POOL_NAME);
-    Dto::Cognito::AdminCreateUserRequest createUserRequest = {.region=_region, .userPoolId=userPool.id, .userName=USER_NAME};
+    Dto::Cognito::AdminCreateUserRequest createUserRequest = {.region=_region, .userPoolId=userPool.userPoolId, .userName=USER_NAME};
 
     // act
     Dto::Cognito::AdminCreateUserResponse createUserResponse = _service.AdminCreateUser(createUserRequest);
@@ -112,11 +112,11 @@ namespace AwsMock::Service {
     Dto::Cognito::CreateUserPoolRequest createUserPoolRequest = {.region=_region, .name=USER_POOL_NAME};
     Dto::Cognito::CreateUserPoolResponse createUserPoolResponse = _service.CreateUserPool(createUserPoolRequest);
     Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByRegionName(_region, USER_POOL_NAME);
-    Dto::Cognito::AdminCreateUserRequest createUserRequest = {.region=_region, .userPoolId=userPool.id, .userName=USER_NAME};
+    Dto::Cognito::AdminCreateUserRequest createUserRequest = {.region=_region, .userPoolId=userPool.userPoolId, .userName=USER_NAME};
     Dto::Cognito::AdminCreateUserResponse createUserResponse = _service.AdminCreateUser(createUserRequest);
 
     // act
-    Dto::Cognito::ListUsersRequest listRequest = {.region=_region, .userPoolId=userPool.id};
+    Dto::Cognito::ListUsersRequest listRequest = {.region=_region, .userPoolId=userPool.userPoolId};
     Dto::Cognito::ListUsersResponse listResponse = _service.ListUsers(listRequest);
 
     // assert
@@ -130,11 +130,11 @@ namespace AwsMock::Service {
     Dto::Cognito::CreateUserPoolRequest createUserPoolRequest = {.region=_region, .name=USER_POOL_NAME};
     Dto::Cognito::CreateUserPoolResponse createUserPoolResponse = _service.CreateUserPool(createUserPoolRequest);
     Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByRegionName(_region, USER_POOL_NAME);
-    Dto::Cognito::AdminCreateUserRequest createUserRequest = {.region=_region, .userPoolId=userPool.id, .userName=USER_NAME};
+    Dto::Cognito::AdminCreateUserRequest createUserRequest = {.region=_region, .userPoolId=userPool.userPoolId, .userName=USER_NAME};
     Dto::Cognito::AdminCreateUserResponse createUserResponse = _service.AdminCreateUser(createUserRequest);
 
     // act
-    Dto::Cognito::AdminDeleteUserRequest deleteUserRequest = {.region=_region, .userPoolId = userPool.id, .userName=USER_NAME};
+    Dto::Cognito::AdminDeleteUserRequest deleteUserRequest = {.region=_region, .userPoolId = userPool.userPoolId, .userName=USER_NAME};
     _service.AdminDeleteUser(deleteUserRequest);
     long userCount = _database.CountUsers();
 

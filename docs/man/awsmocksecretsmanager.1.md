@@ -31,7 +31,7 @@ see the corresponding man page ```awslocal(1)```.
 ```awslocal secretsmanager create-secret <name>```  
 &nbsp;&nbsp;&nbsp;&nbsp;creates a new secret.
 
-```awslocal dynamodb delete-secret --secret-id```  
+```awslocal dynamodb delete-secret --secret-userPoolId```  
 &nbsp;&nbsp;&nbsp;&nbsp;deletes a secret
 
 ## EXAMPLES
@@ -48,7 +48,7 @@ awslocal secretmanager create-secret --name test-table
 
 To delete a secret:
 ```
-awslocal secretmanager delete-secret --secret-id test-4f5h1d
+awslocal secretmanager delete-secret --secret-userPoolId test-4f5h1d
 ```
 
 ## AUTHOR

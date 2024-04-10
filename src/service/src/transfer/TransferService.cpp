@@ -10,7 +10,7 @@ namespace AwsMock::Service {
 
     // Initialize environment
     _ftpPort = _configuration.getInt("awsmock.module.transfer.ftp.port", TRANSFER_DEFAULT_FTP_PORT);
-    _accountId = _configuration.getString("awsmock.account.id", "000000000000");
+    _accountId = _configuration.getString("awsmock.account.userPoolId", "000000000000");
 
     log_debug_stream(_logger) << "Transfer module initialized" << std::endl;
   }

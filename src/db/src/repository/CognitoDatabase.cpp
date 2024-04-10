@@ -46,7 +46,7 @@ namespace AwsMock::Database {
 
         auto client = GetClient();
         mongocxx::collection _userPoolCollection = (*client)[_databaseName]["cognito_userpool"];
-        int64_t count = _userPoolCollection.count_documents(make_document(kvp("id", id)));
+        int64_t count = _userPoolCollection.count_documents(make_document(kvp("userPoolId", id)));
         log_trace_stream(_logger) << "Cognito user pool exists: " << (count > 0 ? "true" : "false") << std::endl;
         return count > 0;
 
@@ -273,9 +273,9 @@ namespace AwsMock::Database {
       try {
 
         session.start_transaction();
-        auto result = _userPoolCollection.delete_many(make_document(kvp("id", id)));
+        auto result = _userPoolCollection.delete_many(make_document(kvp("userPoolId", id)));
         session.commit_transaction();
-        log_debug_stream(_logger) << "User pool deleted, id: " << id << " count: " << result->deleted_count()
+        log_debug_stream(_logger) << "User pool deleted, userPoolId: " << id << " count: " << result->deleted_count()
                                   << std::endl;
 
       } catch (const mongocxx::exception &exc) {

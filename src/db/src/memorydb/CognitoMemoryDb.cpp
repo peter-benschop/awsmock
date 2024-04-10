@@ -22,7 +22,7 @@ namespace AwsMock::Database {
     return find_if(_userPools.begin(),
                    _userPools.end(),
                    [id](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
-                     return userPool.second.id == id;
+                     return userPool.second.userPoolId == id;
                    }) != _userPools.end();
   }
 
@@ -129,12 +129,12 @@ namespace AwsMock::Database {
     return _userPools[it->first];
   }
 
-  void CognitoMemoryDb::DeleteUserPool(const std::string &id) {
+  void CognitoMemoryDb::DeleteUserPool(const std::string &userPoolId) {
     Poco::ScopedLock lock(_userPoolMutex);
 
-    const auto count = std::erase_if(_userPools, [id](const auto &item) {
+    const auto count = std::erase_if(_userPools, [userPoolId](const auto &item) {
       auto const &[key, value] = item;
-      return value.id == id;
+      return value.userPoolId == userPoolId;
     });
     log_debug_stream(_logger) << "Cognito user pool deleted, count: " << count << std::endl;
   }

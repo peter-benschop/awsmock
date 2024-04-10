@@ -41,6 +41,13 @@ namespace AwsMock::Dto::Cognito {
     void FromJson(const Poco::JSON::Object::Ptr &jsonObject);
 
     /**
+     * Convert to a JSON string.
+     *
+     * @return user pools json string
+     */
+    [[nodiscard]] std::string ToJson() const;
+
+    /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.

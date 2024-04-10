@@ -31,7 +31,7 @@ corresponding man page ```awslocal(1)```.
 ```awslocal cognito-idp list-user-pools```  
 &nbsp;&nbsp;&nbsp;&nbsp;lists all available Cognito user pools.
 
-```awslocal cognito-idp user-pool --user-pool-id <user-pool-id>```  
+```awslocal cognito-idp user-pool --user-pool-userPoolId <user-pool-userPoolId>```  
 &nbsp;&nbsp;&nbsp;&nbsp;delete a Cognito user pool.
 
 ## EXAMPLES
@@ -58,7 +58,7 @@ awslocal cognito-idp list-user-pools --max-results 10
 
 To delete a Cognito user pool:
 ```
-awslocal cognito-idp delete-user-pool --user-pool-id eu-central-1_6g67LGPzz
+awslocal cognito-idp delete-user-pool --user-pool-userPoolId eu-central-1_6g67LGPzz
 ```
 
 ## AUTHOR

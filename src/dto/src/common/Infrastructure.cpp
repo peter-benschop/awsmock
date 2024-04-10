@@ -121,6 +121,15 @@ namespace AwsMock::Dto::Common {
         infrastructureJson.set("dynamodb-items", jsonDynamoDbItemArray);
       }
 
+      // SecretsManager secrets
+      if (!secrets.empty()) {
+        Poco::JSON::Array jsonSecretsArray;
+        for (const auto &secret : secrets) {
+          jsonSecretsArray.add(secret.ToJsonObject());
+        }
+        infrastructureJson.set("secretsmanager", jsonSecretsArray);
+      }
+
       // Add infrastructure JSON to root JSON
       rootJson.set("infrastructure", infrastructureJson);
 
@@ -206,6 +215,15 @@ namespace AwsMock::Dto::Common {
           Database::Entity::DynamoDb::Table dynamoDbTableObject;
           dynamoDbTableObject.FromJsonObject(dynamoDbTableArray->getObject(i));
           dynamoDbTables.emplace_back(dynamoDbTableObject);
+        }
+      }
+
+      if (infrastructureObject->has("secretsmanager")) {
+        Poco::JSON::Array::Ptr secretsArray = infrastructureObject->getArray("secrets");
+        for (int i = 0; i < secretsArray->size(); i++) {
+          Database::Entity::SecretsManager::Secret secretsObject;
+          //secretsObject.FromJsonObject(secretsArray->getObject(i));
+          secrets.emplace_back(secretsObject);
         }
       }
 

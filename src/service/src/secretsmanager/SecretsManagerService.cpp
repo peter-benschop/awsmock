@@ -10,7 +10,7 @@ namespace AwsMock::Service {
     : _logger(Poco::Logger::get("SecretsManagerService")), _configuration(configuration), _database(Database::SecretsManagerDatabase::instance()), _condition(condition) {
 
     // Initialize environment
-    _accountId = _configuration.getString("awsmock.account.id", DEFAULT_ACCOUNT_ID);
+    _accountId = _configuration.getString("awsmock.account.userPoolId", DEFAULT_ACCOUNT_ID);
 
     // Simulation of KMS key
     _kmsKey = "aGYlaHJGZk5FMjNXN05kJmpvWVpvem9GT1M+WE1qWlg=";
@@ -73,7 +73,6 @@ namespace AwsMock::Service {
       response.name = secret.name;
       response.arn = secret.arn;
       log_debug_stream(_logger) << "Database secret described, secretId: " << request.secretId << std::endl;
-      log_info_stream(_logger) << "Database secret described, secretId: " << response.ToString() << std::endl;
       return response;
 
     } catch (Poco::Exception &exc) {

@@ -73,7 +73,7 @@ namespace AwsMock::Database {
       long BucketCount();
 
       /**
-       * Returns the bucket by id
+       * Returns the bucket by userPoolId
        *
        * @param oid bucket oid
        * @return bucket, if existing
@@ -82,7 +82,7 @@ namespace AwsMock::Database {
       Entity::S3::Bucket GetBucketById(bsoncxx::oid oid);
 
       /**
-       * Returns the bucket by id
+       * Returns the bucket by userPoolId
        *
        * @param oid bucket oid
        * @return bucket, if existing

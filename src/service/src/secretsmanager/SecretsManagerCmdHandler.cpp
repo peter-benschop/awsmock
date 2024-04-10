@@ -33,6 +33,7 @@ namespace AwsMock::Service {
 
         Dto::SecretsManager::CreateSecretResponse
             secretsManagerResponse = _secretsManagerService.CreateSecret(secretsManagerRequest);
+        log_info_stream(_logger) << "Secret created, secretId: " << secretsManagerResponse.name << std::endl;
         SendOkResponse(response, secretsManagerResponse.ToJson());
 
         break;
@@ -46,6 +47,7 @@ namespace AwsMock::Service {
 
         Dto::SecretsManager::DeleteSecretResponse
             secretsManagerResponse = _secretsManagerService.DeleteSecret(secretsManagerRequest);
+        log_info_stream(_logger) << "Secret deleted, secretId: " << secretsManagerResponse.name << std::endl;
         SendOkResponse(response, secretsManagerResponse.ToJson());
 
         break;
@@ -59,6 +61,7 @@ namespace AwsMock::Service {
 
         Dto::SecretsManager::DescribeSecretResponse
             secretsManagerResponse = _secretsManagerService.DescribeSecret(secretsManagerRequest);
+        log_info_stream(_logger) << "Secret described, secretId: " << secretsManagerResponse.name << std::endl;
         SendOkResponse(response, secretsManagerResponse.ToJson());
 
         break;
@@ -72,6 +75,7 @@ namespace AwsMock::Service {
 
         Dto::SecretsManager::GetSecretValueResponse
           secretsManagerResponse = _secretsManagerService.GetSecretValue(secretsManagerRequest);
+        log_info_stream(_logger) << "Secret get value, secretId: " << secretsManagerResponse.name << std::endl;
         SendOkResponse(response, secretsManagerResponse.ToJson());
 
         break;
@@ -85,6 +89,7 @@ namespace AwsMock::Service {
 
         Dto::SecretsManager::UpdateSecretResponse
           secretsManagerResponse = _secretsManagerService.UpdateSecret(secretsManagerRequest);
+        log_info_stream(_logger) << "Secret updated, secretId: " << secretsManagerResponse.name << std::endl;
         SendOkResponse(response, secretsManagerResponse.ToJson());
 
         break;

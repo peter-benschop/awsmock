@@ -6,11 +6,28 @@
 
 namespace AwsMock::Dto::SQS {
 
+  std::string ChangeMessageVisibilityRequest::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("QueueUrl", queueUrl);
+      rootJson.set("ReceiptHandle", receiptHandle);
+      rootJson.set("VisibilityTimeout", visibilityTimeout);
+
+      std::ostringstream os;
+      rootJson.stringify(os);
+      return os.str();
+
+    } catch (Poco::Exception &exc) {
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+    }
+  }
+
   void ChangeMessageVisibilityRequest::FromJson(const std::string &jsonString) {
 
     Poco::JSON::Parser parser;
     Poco::Dynamic::Var result = parser.parse(jsonString);
-    auto rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    const auto& rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
     try {
 
@@ -20,7 +37,7 @@ namespace AwsMock::Dto::SQS {
       Core::JsonUtils::GetJsonValueInt("VisibilityTimeout", rootObject, visibilityTimeout);
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -31,7 +48,7 @@ namespace AwsMock::Dto::SQS {
   }
 
   std::ostream &operator<<(std::ostream &os, const ChangeMessageVisibilityRequest &r) {
-    os << "ChangeMessageVisibilityRequest={region='" << r.region << "', queueUrl='" << r.queueUrl << "', visibilityTimeout=" << r.visibilityTimeout << " requestId='" + r.requestId + "', receiptHandle='" << r.receiptHandle << "'}";
+    os << "ChangeMessageVisibilityRequest=" << r.ToJson();
     return os;
   }
 

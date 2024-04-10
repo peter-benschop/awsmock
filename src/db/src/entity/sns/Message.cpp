@@ -87,12 +87,7 @@ namespace AwsMock::Database::Entity::SNS {
   }
 
   std::ostream &operator<<(std::ostream &os, const Message &message) {
-    os << "Message={oid='" + message.oid + "' topicArn: " + message.topicArn + "' targetArn='" + message.targetArn
-        + "'message='" + message.message + "'messageId='" + message.messageId
-        + "' reset='" + Poco::DateTimeFormatter::format(message.lastSend, Poco::DateTimeFormat::HTTP_FORMAT)
-        + "' created='" +
-        Poco::DateTimeFormatter::format(message.created, Poco::DateTimeFormat::HTTP_FORMAT) + "' modified='" +
-        Poco::DateTimeFormatter::format(message.modified, Poco::DateTimeFormat::HTTP_FORMAT) + "'}";
+    os << "Message=" << bsoncxx::to_json(message.ToDocument());
     return os;
   }
 

@@ -31,6 +31,8 @@
 #include <awsmock/dto/secretsmanager/DescribeSecretResponse.h>
 #include <awsmock/dto/secretsmanager/GetSecretValueRequest.h>
 #include <awsmock/dto/secretsmanager/GetSecretValueResponse.h>
+#include <awsmock/dto/secretsmanager/RotateSecretRequest.h>
+#include <awsmock/dto/secretsmanager/RotateSecretResponse.h>
 #include <awsmock/dto/secretsmanager/UpdateSecretRequest.h>
 #include <awsmock/dto/secretsmanager/UpdateSecretResponse.h>
 #include <awsmock/repository/SecretsManagerDatabase.h>

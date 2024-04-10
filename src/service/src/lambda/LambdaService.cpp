@@ -11,7 +11,7 @@ namespace AwsMock::Service {
     _invokeQueue(invokeQueue) {
 
     // Initialize environment
-    _accountId = _configuration.getString("awsmock.account.id", "000000000000");
+    _accountId = _configuration.getString("awsmock.account.userPoolId", "000000000000");
     _dataDir = _configuration.getString("awsmock.data.dir", "/home/awsmock/data");
     _tempDir = _dataDir + Poco::Path::separator() + "tmp";
     _lambdaDir = _dataDir + Poco::Path::separator() + "lambda";

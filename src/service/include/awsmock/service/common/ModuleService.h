@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_MODULESERVICE_H
-#define AWSMOCK_SERVICE_MODULESERVICE_H
+#ifndef AWSMOCK_SERVICE_MODULE_SERVICE_H
+#define AWSMOCK_SERVICE_MODULE_SERVICE_H
 
 // C++ standard includes
 #include <string>
@@ -20,6 +20,7 @@
 #include "awsmock/dto/common/Services.h"
 #include "awsmock/entity/module/Module.h"
 #include "awsmock/repository/ModuleDatabase.h"
+#include "awsmock/repository/SecretsManagerDatabase.h"
 #include "awsmock/service/gateway/GatewayServer.h"
 #include "awsmock/service/s3/S3Server.h"
 #include "awsmock/service/sqs/SQSServer.h"
@@ -36,7 +37,7 @@ namespace AwsMock::Service {
    */
   class ModuleService {
 
-    public:
+  public:
 
     /**
      * Constructor
@@ -131,7 +132,7 @@ namespace AwsMock::Service {
      */
     void CleanObjects(const Dto::Common::Services &services);
 
-    private:
+  private:
 
     /**
      * Logger
@@ -161,4 +162,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_MODULESERVICE_H
+#endif // AWSMOCK_SERVICE_MODULE_SERVICE_H

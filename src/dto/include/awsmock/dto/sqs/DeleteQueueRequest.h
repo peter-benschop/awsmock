@@ -45,6 +45,13 @@ namespace AwsMock::Dto::SQS {
     std::string requestId;
 
     /**
+     * Convert to a JSON string
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const;
+
+    /**
      * Converts the JSON string to DTO.
      *
      * @param jsonString JSON string

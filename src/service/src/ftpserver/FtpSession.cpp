@@ -1184,7 +1184,7 @@ namespace AwsMock::FtpServer {
     headers["x-amz-sdk-checksum-algorithm"] = "SHA256";
     headers["x-amz-checksum-sha256"] = Core::Crypto::GetSha256FromFile(fileName);
     headers["x-amz-meta-user-agent"] = "AWSTransfer";
-    headers["x-amz-meta-user-agent-id"] = user + "@" + _serverName;
+    headers["x-amz-meta-user-agent-userPoolId"] = user + "@" + _serverName;
     SendFile("s3", url, fileName, headers);
     log_debug_stream(_logger) << "Create object message request send, url: " << url << std::endl;
   }

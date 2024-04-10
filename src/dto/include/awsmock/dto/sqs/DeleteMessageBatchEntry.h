@@ -2,13 +2,23 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_DELETEMESSAGEBATCHENTRY_H
-#define AWSMOCK_DTO_SQS_DELETEMESSAGEBATCHENTRY_H
+#ifndef AWSMOCK_DTO_SQS_DELETE_MESSAGE_BATCH_ENTRY_H
+#define AWSMOCK_DTO_SQS_DELETE_MESSAGE_BATCH_ENTRY_H
 
 // C++ standard includes
 #include <string>
 #include <sstream>
 #include <vector>
+
+// Poco includes
+#include <Poco/Dynamic/Var.h>
+#include <Poco/UUIDGenerator.h>
+#include <Poco/JSON/JSON.h>
+#include <Poco/JSON/Parser.h>
+
+// AwsMock includes
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/ServiceException.h>
 
 namespace AwsMock::Dto::SQS {
 
@@ -23,6 +33,20 @@ namespace AwsMock::Dto::SQS {
      * Receipt handle
      */
     std::string receiptHandle;
+
+    /**
+     * Convert to a JSON string
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const;
+
+    /**
+     * Convert to a JSON string
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
     /**
      * Converts the DTO to a string representation.
@@ -44,4 +68,4 @@ namespace AwsMock::Dto::SQS {
 
 } // namespace AwsMock::Dto::SQS
 
-#endif // AWSMOCK_DTO_SQS_DELETEMESSAGEBATCHENTRY_H
+#endif // AWSMOCK_DTO_SQS_DELETE_MESSAGE_BATCH_ENTRY_H

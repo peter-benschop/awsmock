@@ -87,21 +87,14 @@ namespace AwsMock::Dto::Common {
     DynamoDbCommandType command;
 
     /**
-     * Gets command type from the user agent
-     *
-     * @param httpMethod HTTP request method
-     * @param userAgent HTTP user agent
-     */
-    //void GetCommandFromUserAgent(const HttpMethod &httpMethod, const UserAgent &userAgent);
-
-    /**
      * Getś the value from the user-agent string
      *
+     * @param method HTTP method
      * @param request HTTP server request
      * @param region AWS region
      * @param user AWS user
      */
-    void FromRequest(const HttpMethod &requestType, Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user);
+    void FromRequest(const HttpMethod &method, Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user);
 
     /**
      * Converts the DTO to a string representation.

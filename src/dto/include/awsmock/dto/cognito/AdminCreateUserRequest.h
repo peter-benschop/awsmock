@@ -55,6 +55,13 @@ namespace AwsMock::Dto::Cognito {
     UserAttributeList userAttributes;
 
     /**
+     * Convert to a JSON string
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const;
+
+    /**
      * Convert from a JSON object.
      *
      * @param payload json string object

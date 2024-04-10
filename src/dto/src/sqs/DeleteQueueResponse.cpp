@@ -6,6 +6,23 @@
 
 namespace AwsMock::Dto::SQS {
 
+  std::string DeleteQueueResponse::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("Region", region);
+      rootJson.set("QueueUrl", queueUrl);
+      rootJson.set("RequestId", requestId);
+
+      std::ostringstream os;
+      rootJson.stringify(os);
+      return os.str();
+
+    } catch (Poco::Exception &exc) {
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+    }
+  }
+
   std::string DeleteQueueResponse::ToXml() const {
 
     try {
@@ -41,7 +58,7 @@ namespace AwsMock::Dto::SQS {
   }
 
   std::ostream &operator<<(std::ostream &os, const DeleteQueueResponse &r) {
-    os << "DeleteQueueResponse={queueUrl='" + r.queueUrl + "', resource='" + r.resource + "', requestId='" + r.requestId + "'}";
+    os << "DeleteQueueResponse=" << r.ToJson();
     return os;
   }
 

@@ -163,7 +163,7 @@ namespace AwsMock::Database::Entity::SNS {
     /**
      * Converts the entity to a JSON object
      *
-     * @return DTO as string for logging.
+     * @param jsonObject JSON object
      */
     void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 

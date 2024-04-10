@@ -90,7 +90,7 @@ namespace AwsMock::Dto::SecretsManager {
      *
      * @return JSON string
      */
-    std::string ToJson() const;
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Converts the JSON string to DTO.

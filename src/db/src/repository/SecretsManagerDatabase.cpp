@@ -11,9 +11,9 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_document;
 
   SecretsManagerDatabase::SecretsManagerDatabase()
-      : _logger(Poco::Logger::get("SecretsManagerDatabase")), _useDatabase(HasDatabase()),
-        _databaseName(GetDatabaseName()), _collectionName("secretsmanager_secret"),
-        _memoryDb(SecretsManagerMemoryDb::instance()) {}
+    : _logger(Poco::Logger::get("SecretsManagerDatabase")), _useDatabase(HasDatabase()),
+      _databaseName(GetDatabaseName()), _collectionName("secretsmanager_secret"),
+      _memoryDb(SecretsManagerMemoryDb::instance()) {}
 
   bool SecretsManagerDatabase::SecretExists(const std::string &region, const std::string &name) {
 
@@ -75,7 +75,7 @@ namespace AwsMock::Database {
     mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
 
     mongocxx::stdx::optional<bsoncxx::document::value>
-        mResult = _secretCollection.find_one(make_document(kvp("_id", oid)));
+      mResult = _secretCollection.find_one(make_document(kvp("_id", oid)));
     Entity::SecretsManager::Secret result;
     result.FromDocument(mResult);
 
@@ -103,7 +103,7 @@ namespace AwsMock::Database {
       auto client = GetClient();
       mongocxx::collection _bucketCollection = (*client)[_databaseName][_collectionName];
       mongocxx::stdx::optional<bsoncxx::document::value>
-          mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
+        mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
       if (mResult->empty()) {
         return {};
       }
@@ -179,13 +179,13 @@ namespace AwsMock::Database {
     if (_useDatabase) {
 
       auto client = GetClient();
-      mongocxx::collection _bucketCollection = (*client)[_databaseName]["s3_bucket"];
+      mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
       auto session = client->start_session();
 
       try {
 
         session.start_transaction();
-        auto result = _bucketCollection.replace_one(make_document(kvp("secretId", secret.secretId)), secret.ToDocument());
+        auto result = _secretCollection.replace_one(make_document(kvp("secretId", secret.secretId)), secret.ToDocument());
         session.commit_transaction();
         log_trace_stream(_logger) << "Bucket updated: " << secret.ToString() << std::endl;
 
@@ -203,6 +203,42 @@ namespace AwsMock::Database {
     }
   }
 
+  Entity::SecretsManager::Secret SecretsManagerDatabase::CreateOrUpdateSecret(const Entity::SecretsManager::Secret &secret) {
+
+    if (SecretExists(secret)) {
+
+      return UpdateSecret(secret);
+
+    } else {
+
+      return CreateSecret(secret);
+    }
+  }
+
+  Entity::SecretsManager::SecretList SecretsManagerDatabase::ListSecrets() {
+
+    Entity::SecretsManager::SecretList secretList;
+    if (_useDatabase) {
+
+      auto client = GetClient();
+      mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
+
+      auto secretCursor = _secretCollection.find({});
+      for (auto bucket : secretCursor) {
+        Entity::SecretsManager::Secret result;
+        result.FromDocument(bucket);
+        secretList.push_back(result);
+      }
+
+    } else {
+
+      secretList = _memoryDb.ListSecrets();
+
+    }
+    log_trace_stream(_logger) << "Got secret list, size:" << secretList.size() << std::endl;
+    return secretList;
+  }
+
   void SecretsManagerDatabase::DeleteSecret(const Entity::SecretsManager::Secret &secret) {
 
     if (_useDatabase) {
@@ -215,7 +251,7 @@ namespace AwsMock::Database {
 
         session.start_transaction();
         auto delete_many_result =
-            _bucketCollection.delete_one(make_document(kvp("region", secret.region), kvp("name", secret.name)));
+          _bucketCollection.delete_one(make_document(kvp("region", secret.region), kvp("name", secret.name)));
         session.commit_transaction();
         log_debug_stream(_logger) << "Secret deleted, count: " << delete_many_result->deleted_count() << std::endl;
 

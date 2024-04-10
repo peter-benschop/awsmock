@@ -80,7 +80,7 @@ namespace AwsMock::Dto::Docker {
      * @return output stream
      */
     friend std::ostream &operator<<(std::ostream &os, const CreateContainerResponse &r) {
-      os << "CreateContainerResponse={id='" + r.id + "' hostPort='" + std::to_string(r.hostPort) + "'}";
+      os << "CreateContainerResponse={userPoolId='" + r.id + "' hostPort='" + std::to_string(r.hostPort) + "'}";
       return os;
     }
 

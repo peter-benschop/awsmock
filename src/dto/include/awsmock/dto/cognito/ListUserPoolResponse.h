@@ -33,7 +33,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @return user pools json string
      */
-    std::string ToJson();
+    std::string ToJson() const;
 
     /**
      * Converts the DTO to a string representation.

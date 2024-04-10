@@ -47,6 +47,22 @@ namespace AwsMock::Database::Entity::SecretsManager {
     modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
   }
 
+  Poco::JSON::Object Secret::ToJsonObject() const {
+
+    Poco::JSON::Object jsonObject;
+    jsonObject.set("region", region);
+    jsonObject.set("name", name);
+    jsonObject.set("arn", arn);
+    jsonObject.set("secretId", secretId);
+    jsonObject.set("kmsKeyId", kmsKeyId);
+    jsonObject.set("versionId", versionId);
+    jsonObject.set("secretString", secretString);
+    jsonObject.set("secretBinary", secretBinary);
+    jsonObject.set("description", description);
+    return jsonObject;
+
+  }
+
   std::string Secret::ToString() const {
     std::stringstream ss;
     ss << (*this);

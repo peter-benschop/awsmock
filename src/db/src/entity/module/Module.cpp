@@ -47,10 +47,7 @@ namespace AwsMock::Database::Entity::Module {
   }
 
   std::ostream &operator<<(std::ostream &os, const Module &m) {
-    os << "Service={id='" << m.oid << "', name='" << m.name << "', executable='" << m.executable << "', port=" << m.port
-       << ", state='" << ModuleStateToString(m.state) << ", status='" << ModuleStatusToString(m.status)
-       << "', created=" << Poco::DateTimeFormatter().format(m.created, Poco::DateTimeFormat::HTTP_FORMAT)
-       << "', modified=" << Poco::DateTimeFormatter().format(m.modified, Poco::DateTimeFormat::HTTP_FORMAT) << "}";
+    os << "Module=" << bsoncxx::to_json(m.ToDocument());
     return os;
   }
 

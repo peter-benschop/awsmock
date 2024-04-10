@@ -75,13 +75,8 @@ namespace AwsMock::Database::Entity::SNS {
     return ss.str();
   }
 
-  std::ostream &operator<<(std::ostream &os, const TopicAttribute &r) {
-    os << "TopicAttribute={deliveryPolicy='" << r.deliveryPolicy << "' displayName='" << r.displayName
-       << "' fifoTopic='" << r.fifoTopic << "' policy='" << r.policy << "' signatureVersion='" << r.signatureVersion
-       << "' tracingConfig='" << r.tracingConfig << "' kmsMasterKeyId=" << r.kmsMasterKeyId << " archivePolicy='"
-       << r.archivePolicy << "' contentBasedDeduplication='" << r.contentBasedDeduplication
-       << "' beginningArchiveTime='"
-       << Poco::DateTimeFormatter::format(r.beginningArchiveTime, Poco::DateTimeFormat::ISO8601_FORMAT) << "'}";
+  std::ostream &operator<<(std::ostream &os, const TopicAttribute &t) {
+    os << "TopicAttribute=" << bsoncxx::to_json(t.ToDocument());
     return os;
   }
 

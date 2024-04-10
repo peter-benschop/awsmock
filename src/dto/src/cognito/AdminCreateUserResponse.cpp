@@ -32,7 +32,7 @@ namespace AwsMock::Dto::Cognito {
 
     } catch (Poco::Exception &exc) {
       Poco::Logger::get("AdminCreateUserResponse").error("JSON exception: " + exc.message());
-      throw Core::ServiceException(exc.message(), 500);
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -53,7 +53,7 @@ namespace AwsMock::Dto::Cognito {
 
     } catch (Poco::Exception &exc) {
       Poco::Logger::get("AdminCreateUserResponse").error("JSON exception: " + exc.message());
-      throw Core::ServiceException(exc.message(), 500);
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -64,11 +64,7 @@ namespace AwsMock::Dto::Cognito {
   }
 
   std::ostream &operator<<(std::ostream &os, const AdminCreateUserResponse &r) {
-    os << "AdminCreateUserResponse={region='" << r.region << "', userName='" << r.userName << "', userName='" << r.userName << "', userAttributes=[";
-    for (const auto& attribute : r.userAttributes) {
-      os << attribute.name << "='" << attribute.value << "', ";
-    }
-    os << "\b\b\b" << "]}";
+    os << "AdminCreateUserResponse=" << r.ToJson();
     return os;
   }
 }

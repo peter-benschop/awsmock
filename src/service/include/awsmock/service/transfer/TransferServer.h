@@ -166,7 +166,7 @@ namespace AwsMock::Service {
     std::string _baseUrl;
 
     /**
-     * Server id
+     * Server userPoolId
      */
     std::string _serverId;
 
