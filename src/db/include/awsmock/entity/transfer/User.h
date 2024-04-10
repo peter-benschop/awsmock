@@ -54,6 +54,13 @@ namespace AwsMock::Database::Entity::Transfer {
     std::string homeDirectory;
 
     /**
+     * Converts the entity to a MongoDB document
+     *
+     * @return entity as MongoDB document.
+     */
+    [[nodiscard]] view_or_value<view, value> ToDocument() const;
+
+    /**
      * Converts the MongoDB document to an entity
      *
      * @param mResult MongoDB document.

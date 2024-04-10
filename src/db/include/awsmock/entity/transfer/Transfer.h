@@ -112,7 +112,7 @@ namespace AwsMock::Database::Entity::Transfer {
     std::string state = ServerStateToString(ServerState::OFFLINE);
 
     /**
-     * Concurrency, nuber of FTP manager threads
+     * Concurrency, number of FTP manager threads
      */
     int concurrency = 8;
 

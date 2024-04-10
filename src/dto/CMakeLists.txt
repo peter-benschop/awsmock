@@ -71,10 +71,7 @@ add_subdirectory(tst)
 include_directories(include ../core/include ../db/include /usr/include/mongo /usr/include/bsoncxx/v_noabi
         /usr/include/mongocxx/v_noabi)
 
-add_library(${LIBRARY} SHARED ${SOURCES}
-        include/awsmock/dto/secretsmanager/SecretTags.h
-        include/awsmock/dto/secretsmanager/GetSecretValueRequest.h
-        src/secretsmanager/GetSecretValueRequest.cpp)
+add_library(${LIBRARY} SHARED ${SOURCES})
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 

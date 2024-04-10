@@ -133,6 +133,13 @@ namespace AwsMock::Database {
      */
     void DeleteSecret(const Entity::SecretsManager::Secret &secret);
 
+    /**
+     * Delete all secret.
+     *
+     * @throws DatabaseException
+     */
+    void DeleteAllSecrets();
+
   private:
 
     /**
