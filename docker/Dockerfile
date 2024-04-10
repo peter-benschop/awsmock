@@ -47,20 +47,20 @@ COPY --from=build /lib/libacl.so.1.1.2301 /lib/
 RUN ln -s /lib/libacl.so.1.1.2301 /lib/libacl.so.1
 
 # Install poco
-COPY --from=build /usr/lib/libPocoPrometheus.so.101 /usr/lib/
-COPY --from=build /usr/lib/libPocoNet.so.101 /usr/lib/
-COPY --from=build /usr/lib/libPocoJSON.so.101 /usr/lib/
-COPY --from=build /usr/lib/libPocoXML.so.101 /usr/lib/
-COPY --from=build /usr/lib/libPocoZip.so.101 /usr/lib/
-COPY --from=build /usr/lib/libPocoUtil.so.101 /usr/lib/
-COPY --from=build /usr/lib/libPocoFoundation.so.101 /usr/lib/
-RUN ln -s /usr/lib/libPocoPrometheus.so.101 /usr/lib/libPocoPrometheus.so
-RUN ln -s /usr/lib/libPocoNet.so.101 /usr/lib/libPocoNet.so
-RUN ln -s /usr/lib/libPocoJSON.so.101 /usr/lib/libPocoJSON.so
-RUN ln -s /usr/lib/libPocoXML.so.101 /usr/lib/libPocoXML.so
-RUN ln -s /usr/lib/libPocoZip.so.101 /usr/lib/libPocoZip.so
-RUN ln -s /usr/lib/libPocoUtil.so.101 /usr/lib/libPocoUtil.so
-RUN ln -s /usr/lib/libPocoFoundation.so.101 /usr/lib/libPocoFoundation.so
+COPY --from=build /usr/lib/libPocoPrometheus.so.103 /usr/lib/
+COPY --from=build /usr/lib/libPocoNet.so.103 /usr/lib/
+COPY --from=build /usr/lib/libPocoJSON.so.103 /usr/lib/
+COPY --from=build /usr/lib/libPocoXML.so.103 /usr/lib/
+COPY --from=build /usr/lib/libPocoZip.so.103 /usr/lib/
+COPY --from=build /usr/lib/libPocoUtil.so.103 /usr/lib/
+COPY --from=build /usr/lib/libPocoFoundation.so.103 /usr/lib/
+RUN ln -s /usr/lib/libPocoPrometheus.so.103 /usr/lib/libPocoPrometheus.so
+RUN ln -s /usr/lib/libPocoNet.so.103 /usr/lib/libPocoNet.so
+RUN ln -s /usr/lib/libPocoJSON.so.103 /usr/lib/libPocoJSON.so
+RUN ln -s /usr/lib/libPocoXML.so.103 /usr/lib/libPocoXML.so
+RUN ln -s /usr/lib/libPocoZip.so.103 /usr/lib/libPocoZip.so
+RUN ln -s /usr/lib/libPocoUtil.so.103 /usr/lib/libPocoUtil.so
+RUN ln -s /usr/lib/libPocoFoundation.so.103 /usr/lib/libPocoFoundation.so
 
 # Install Mongo C/C++ driver
 COPY --from=build /usr/lib/libbson-1.0.so.0.0.0 /usr/lib/
