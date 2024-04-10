@@ -267,4 +267,33 @@ namespace AwsMock::Database {
 
     }
   }
+
+  void SecretsManagerDatabase::DeleteAllSecrets() {
+
+    if (_useDatabase) {
+
+      auto client = GetClient();
+      mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
+      auto session = client->start_session();
+
+      try {
+
+        session.start_transaction();
+        auto delete_many_result = _secretCollection.delete_many({});
+        session.commit_transaction();
+        log_debug_stream(_logger) << "Secrets deleted, count: " << delete_many_result->deleted_count() << std::endl;
+
+      } catch (const mongocxx::exception &exc) {
+        session.abort_transaction();
+        _logger.error() << "Database exception " << exc.what() << std::endl;
+        throw Core::DatabaseException(exc.what(), 500);
+      }
+
+    } else {
+
+      _memoryDb.DeleteAllSecrets();
+
+    }
+  }
+
 } // namespace AwsMock::Database

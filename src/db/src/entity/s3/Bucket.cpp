@@ -115,7 +115,7 @@ namespace AwsMock::Database::Entity::S3 {
   }
 
   std::ostream &operator<<(std::ostream &os, const Bucket &b) {
-    os << "BucketNotification=" << bsoncxx::to_json(b.ToDocument());
+    os << "Bucket=" << bsoncxx::to_json(b.ToDocument());
     return os;
   }
 }

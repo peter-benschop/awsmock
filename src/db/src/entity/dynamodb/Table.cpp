@@ -33,15 +33,15 @@ namespace AwsMock::Database::Entity::DynamoDb {
     }
 
     view_or_value<view, value> lambdaDoc = make_document(
-        kvp("region", region),
-        kvp("name", name),
-        kvp("tags", tagsDoc),
-        kvp("attributes", attributesDoc),
-        kvp("keySchemas", keySchemaDoc),
-        kvp("created",
-            bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-        kvp("modified",
-            bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+      kvp("region", region),
+      kvp("name", name),
+      kvp("tags", tagsDoc),
+      kvp("attributes", attributesDoc),
+      kvp("keySchemas", keySchemaDoc),
+      kvp("created",
+          bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
+      kvp("modified",
+          bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
 
     return lambdaDoc;
   }
@@ -52,9 +52,9 @@ namespace AwsMock::Database::Entity::DynamoDb {
     region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
     name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
     created = Poco::DateTime(Poco::Timestamp::fromEpochTime(
-        bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
+      bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
     modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(
-        bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+      bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
 
     // Get tags
     if (mResult.value().find("tags") != mResult.value().end()) {
@@ -116,6 +116,10 @@ namespace AwsMock::Database::Entity::DynamoDb {
     return jsonObject;
   }
 
+  std::string Table::ToJson() const {
+    return bsoncxx::to_json(ToDocument());
+  }
+
   void Table::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
 
     try {
@@ -155,19 +159,8 @@ namespace AwsMock::Database::Entity::DynamoDb {
     return ss.str();
   }
 
-  std::ostream &operator<<(std::ostream &os, const Table &d) {
-    os << "Table={oid='" << d.oid << "', region='" << d.region << "', name='" << d.name << "', attributes=[";
-    for (const auto &attribute : d.attributes) {
-      os << attribute.first << "='" << attribute.second << "', ";
-    }
-    os.seekp(-2, std::ostream::cur);
-    os << "], tags=[";
-    for (const auto &tag : d.tags) {
-      os << tag.first << "='" << tag.second << "', ";
-    }
-    os.seekp(-2, std::ostream::cur);
-    os << "], created='" << Poco::DateTimeFormatter::format(d.created, Poco::DateTimeFormat::HTTP_FORMAT)
-       << "', modified='" << Poco::DateTimeFormatter::format(d.modified, Poco::DateTimeFormat::HTTP_FORMAT) << "'}";
+  std::ostream &operator<<(std::ostream &os, const Table &t) {
+    os << "Table=" << t.ToJson();
     return os;
   }
 }

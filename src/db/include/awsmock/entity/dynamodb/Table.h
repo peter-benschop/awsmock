@@ -103,7 +103,14 @@ namespace AwsMock::Database::Entity::DynamoDb {
      *
      * @return DTO as string for logging.
      */
-    Poco::JSON::Object ToJsonObject() const;
+    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+
+    /**
+     * Converts the entity to a JSON string
+     *
+     * @return DTO as string for logging.
+     */
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Converts an JSON object to an entity

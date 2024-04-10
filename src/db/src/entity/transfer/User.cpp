@@ -6,6 +6,16 @@
 
 namespace AwsMock::Database::Entity::Transfer {
 
+  view_or_value<view, value> User::ToDocument() const {
+
+    view_or_value<view, value> userDoc = make_document(
+      kvp("userName", userName),
+      kvp("password", password),
+      kvp("homeDirectory", homeDirectory));
+
+    return userDoc;
+  }
+
   void User::FromDocument(bsoncxx::document::view mResult) {
 
     for (auto &v : mResult) {
@@ -21,9 +31,8 @@ namespace AwsMock::Database::Entity::Transfer {
     return ss.str();
   }
 
-  std::ostream &operator<<(std::ostream &os, const User &m) {
-    os << "User={userName='" << m.userName << "' password='" << m.password << "' homeDirectory='" << m.homeDirectory
-       << "'}";
+  std::ostream &operator<<(std::ostream &os, const User &u) {
+    os << "User=" << bsoncxx::to_json(u.ToDocument());
     return os;
   }
 

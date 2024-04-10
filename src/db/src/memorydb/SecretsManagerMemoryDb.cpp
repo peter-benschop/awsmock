@@ -121,4 +121,11 @@ namespace AwsMock::Database {
     log_debug_stream(_logger) << "Secret deleted, count: " << count << std::endl;
   }
 
+  void SecretsManagerMemoryDb::DeleteAllSecrets() {
+    Poco::ScopedLock lock(_secretMutex);
+
+    log_debug_stream(_logger) << "Secrets deleted, count: " << _secrets.size() << std::endl;
+    _secrets.clear();
+  }
+
 }

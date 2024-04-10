@@ -11,6 +11,7 @@
 
 // Poco includes
 #include <Poco/NotificationQueue.h>
+#include <Poco/Notification.h>
 #include <Poco/RecursiveDirectoryIterator.h>
 #include <Poco/StreamCopier.h>
 #include <Poco/Net/HTTPClientSession.h>

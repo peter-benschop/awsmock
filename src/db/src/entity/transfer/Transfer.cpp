@@ -117,13 +117,8 @@ namespace AwsMock::Database::Entity::Transfer {
    *
    * @return output stream
    */
-  std::ostream &operator<<(std::ostream &os, const Transfer &m) {
-    os << "Transfer={oid='" << m.oid << "', region='" << m.region << "', serverId='" << m.serverId << "', arn='"
-       << m.arn << "', concurrently=" << m.concurrency
-       << ", port=" << m.port << ", listenAddress='" << m.listenAddress <<
-       "', lastStarted='" << Poco::DateTimeFormatter().format(m.lastStarted, Poco::DateTimeFormat::HTTP_FORMAT) <<
-       "', created='" << Poco::DateTimeFormatter().format(m.created, Poco::DateTimeFormat::HTTP_FORMAT) <<
-       "', modified='" << Poco::DateTimeFormatter().format(m.modified, Poco::DateTimeFormat::HTTP_FORMAT) << "'}";
+  std::ostream &operator<<(std::ostream &os, const Transfer &t) {
+    os << "Transfer=" << bsoncxx::to_json(t.ToDocument());
     return os;
   }
 }

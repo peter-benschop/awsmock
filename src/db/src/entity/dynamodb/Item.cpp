@@ -38,6 +38,10 @@ namespace AwsMock::Database::Entity::DynamoDb {
     return jsonObject;
   }
 
+  std::string Item::ToJson() const {
+    return bsoncxx::to_json(ToDocument());
+  }
+
   std::string Item::ToString() const {
     std::stringstream ss;
     ss << (*this);

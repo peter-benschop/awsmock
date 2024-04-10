@@ -13,7 +13,7 @@ include_directories(./include ../core/include ../db/include ../dto/include ../se
 link_directories(/usr/lib /usr/lib/x86_64-linux-gnu /usr/local/lib ../core ../dto ../db ../service)
 
 # External includes
-include_directories(/usr/include /usr/local/include)
+include_directories(/usr/include)
 
 add_executable(${BINARY} ${SOURCES})
 
