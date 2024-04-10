@@ -13,7 +13,7 @@ namespace AwsMock::Service {
     //_snsDatabase = std::make_unique<Database::SNSDatabase>(_configuration);
     //_sqsDatabase = std::make_unique<Database::SQSDatabase>(_configuration);
     _sqsService = std::make_unique<SQSService>(_configuration, _condition);
-    _accountId = _configuration.getString("awsmock.account.id", DEFAULT_SQS_ACCOUNT_ID);
+    _accountId = _configuration.getString("awsmock.account.userPoolId", DEFAULT_SQS_ACCOUNT_ID);
   }
 
   Dto::SNS::CreateTopicResponse SNSService::CreateTopic(const Dto::SNS::CreateTopicRequest &request) {

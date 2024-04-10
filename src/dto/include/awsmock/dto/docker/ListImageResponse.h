@@ -132,7 +132,7 @@ namespace AwsMock::Dto::Docker {
      * @return output stream
      */
     friend std::ostream &operator<<(std::ostream &os, const Image &i) {
-      os << "Image={id='" << i.id << "' parentId='" << i.parentId << "' size='" << i.size << "' sharedSize='" << i.sharedSize << "' virtualSize='" << i.virtualSize
+      os << "Image={userPoolId='" << i.id << "' parentId='" << i.parentId << "' size='" << i.size << "' sharedSize='" << i.sharedSize << "' virtualSize='" << i.virtualSize
          << "' labels='";
       for (auto &it : i.labels) {
         os << it << ",";

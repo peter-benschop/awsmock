@@ -157,20 +157,7 @@ namespace AwsMock::Database::Entity::Lambda {
   }
 
   std::ostream &operator<<(std::ostream &os, const Lambda &l) {
-    os << "lambda={oid='" << l.oid << "', region='" << l.region << "', function='" << l.function << "', runtime='"
-       << l.runtime << "', role='" << l.role <<
-       "', handler='" << l.handler << "', imageId='" << l.imageId << "', containerId='" << l.containerId << "', tags=[";
-    for (const auto &it : l.tags) {
-      os << "key='" << it.first << "' value='" << it.second << "', ";
-    }
-    os << "] hostPort='" << l.hostPort << "', timeout='" << l.timeout << "', concurrency='" << l.concurrency
-       << "', state='" << l.state << "', stateReason='"
-       << l.stateReason << "', stateReasonCode='" << l.stateReasonCode << "', memorySize='" << l.memorySize
-       << "', ephemeralStorage={" << l.ephemeralStorage.ToString()
-       << "}" << "', codeSize='" << l.codeSize << "', fileName " << l.fileName
-       << "', lastStarted='" << Poco::DateTimeFormatter::format(l.lastStarted, Poco::DateTimeFormat::HTTP_FORMAT)
-       << "', created='" << Poco::DateTimeFormatter::format(l.created, Poco::DateTimeFormat::HTTP_FORMAT)
-       << "', modified='" << Poco::DateTimeFormatter::format(l.modified, Poco::DateTimeFormat::HTTP_FORMAT) << "'}";
+    os << "Lambda=" << bsoncxx::to_json(l.ToDocument());
     return os;
   }
 }

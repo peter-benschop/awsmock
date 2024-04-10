@@ -52,7 +52,7 @@ namespace AwsMock::Dto::Docker {
   }
 
   std::ostream &operator<<(std::ostream &os, const Container &c) {
-    os << "ListContainerResponse={id='" << c.id << "' image='" << c.image << "' imageId='" << c.imageId << "' command='" << c.command << "' state='" << c.state <<
+    os << "ListContainerResponse={userPoolId='" << c.id << "' image='" << c.image << "' imageId='" << c.imageId << "' command='" << c.command << "' state='" << c.state <<
        "' state='" << c.status << "' names='";
     for (auto &it : c.names) {
       os << it << ",";

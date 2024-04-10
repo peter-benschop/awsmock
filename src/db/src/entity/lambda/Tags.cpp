@@ -31,6 +31,16 @@ namespace AwsMock::Database::Entity::Lambda {
     }
   }
 
+  view_or_value<view, value> Tags::ToDocument() const {
+
+    // Convert environment to document
+    auto tagDoc = bsoncxx::builder::basic::array{};
+    for (const auto &tag : tags) {
+      tagDoc.append(make_document(kvp(tag.first, tag.second)));
+    }
+    return make_document(kvp("Tags", tagDoc));
+  }
+
   [[nodiscard]] std::string Tags::ToString() const {
     std::stringstream ss;
     ss << (*this);
@@ -38,9 +48,7 @@ namespace AwsMock::Database::Entity::Lambda {
   }
 
   std::ostream &operator<<(std::ostream &os, const Tags &t) {
-    for (const auto &i : t.tags) {
-      os << "Tags={key='" << i.first << "', value='" << i.second << "'}";
-    }
+    os << "Tags=" << bsoncxx::to_json(t.ToDocument());
     return os;
   }
 }

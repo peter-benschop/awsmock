@@ -127,6 +127,7 @@ namespace AwsMock::Database {
       /**
        * Returns a queue by URL
        *
+       * @param region AWS region
        * @param queueUrl queue URL
        * @return queue entity
        * @throws DatabaseException
@@ -176,15 +177,6 @@ namespace AwsMock::Database {
       long CountQueues(const std::string &region = {});
 
       /**
-       * Converts a queue object to a JSON string
-       *
-       * @param queue queue entity
-       * @return queue converted to JSON string
-       * @throws Core::DatabaseException
-       */
-      //static std::string ConvertQueueToJson(const Entity::SQS::Queue &queue);
-
-      /**
        * Deletes a queue.
        *
        * @param queue queue entity
@@ -209,7 +201,7 @@ namespace AwsMock::Database {
       /**
        * Checks whether the message exists by receipt handle.
        *
-       * @param messageId message ID
+       * @param receiptHandle SQS message receipt handle
        * @return true if message exists, otherwise false
        * @throws Core::DatabaseException
        */

@@ -6,6 +6,23 @@
 
 namespace AwsMock::Dto::Cognito {
 
+  std::string AdminCreateUserRequest::ToJson() const {
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("Region", region);
+      rootJson.set("UserPoolId", userPoolId);
+      rootJson.set("Username", userName);
+      rootJson.set("TemporaryPassword", temporaryPassword);
+
+      std::ostringstream os;
+      rootJson.stringify(os);
+      return os.str();
+
+    } catch (Poco::Exception &exc) {
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+    }
+  }
+
   void AdminCreateUserRequest::FromJson(const std::string &payload) {
 
     Poco::JSON::Parser parser;
@@ -38,7 +55,7 @@ namespace AwsMock::Dto::Cognito {
       }
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -49,11 +66,7 @@ namespace AwsMock::Dto::Cognito {
   }
 
   std::ostream &operator<<(std::ostream &os, const AdminCreateUserRequest &r) {
-    os << "AdminCreateUserRequest={region='" << r.region << "', userPoolId='" << r.userPoolId << "', userName='" << r.userName << "', userAttributes=[";
-    for (const auto& attribute : r.userAttributes) {
-      os << attribute.name << "='" << attribute.value << "', ";
-    }
-    os << "\b\b\b" << "]}";
+    os << "AdminCreateUserRequest=" << r.ToJson();
     return os;
   }
 }

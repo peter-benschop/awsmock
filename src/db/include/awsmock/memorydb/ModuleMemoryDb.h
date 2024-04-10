@@ -56,7 +56,7 @@ namespace AwsMock::Database {
       bool ModuleExists(const std::string &name);
 
       /**
-       * Returns the module by id
+       * Returns the module by userPoolId
        *
        * @param oid module oid
        * @return module, if existing
@@ -65,7 +65,7 @@ namespace AwsMock::Database {
       Entity::Module::Module GetModuleById(const std::string &oid);
 
       /**
-       * Returns the module by id
+       * Returns the module by userPoolId
        *
        * @param name module name
        * @return module, if existing

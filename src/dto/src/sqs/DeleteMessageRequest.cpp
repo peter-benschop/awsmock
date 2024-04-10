@@ -6,6 +6,24 @@
 
 namespace AwsMock::Dto::SQS {
 
+  std::string DeleteMessageRequest::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("Region", region);
+      rootJson.set("QueueUrl", queueUrl);
+      rootJson.set("ReceiptHandle", receiptHandle);
+      rootJson.set("RequestId", requestId);
+
+      std::ostringstream os;
+      rootJson.stringify(os);
+      return os.str();
+
+    } catch (Poco::Exception &exc) {
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+    }
+  }
+
   void DeleteMessageRequest::FromJson(const std::string &jsonString) {
 
     Poco::JSON::Parser parser;
@@ -31,7 +49,7 @@ namespace AwsMock::Dto::SQS {
   }
 
   std::ostream &operator<<(std::ostream &os, const DeleteMessageRequest &r) {
-    os << "DeleteMessageRequest={region='" << r.region << "', queueUrl='" << r.queueUrl << "', receiptHandle='" << r.receiptHandle << "', resource='" << r.resource << "', requestId='" << r.requestId << "'}";
+    os << "DeleteMessageRequest=" << r.ToJson();
     return os;
   }
 

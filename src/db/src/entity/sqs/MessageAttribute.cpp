@@ -28,10 +28,7 @@ namespace AwsMock::Database::Entity::SQS {
   }
 
   std::ostream &operator<<(std::ostream &os, const MessageAttribute &m) {
-    os << "MessageAttribute={attributeName='" << m.attributeValue << "', attributeValue='"
-       << m.attributeValue + "', attributeType='"
-       << Database::Entity::SQS::MessageAttributeTypeToString(m.attributeType) << "', systemAttribute="
-       << (m.systemAttribute ? "true" : "false") << "}";
+    os << "MessageAttribute=" << bsoncxx::to_json(m.ToDocument());
     return os;
   }
 

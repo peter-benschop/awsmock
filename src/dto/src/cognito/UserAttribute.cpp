@@ -6,6 +6,22 @@
 
 namespace AwsMock::Dto::Cognito {
 
+  std::string UserAttribute::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootObject;
+      rootObject.set("Name", name);
+      rootObject.set("Value", value);
+
+      std::ostringstream os;
+      rootObject.stringify(os);
+      return os.str();
+
+    } catch (Poco::Exception &exc) {
+      throw Core::ServiceException(exc.message(), 500);
+    }
+  }
+
   void UserAttribute::FromJson(const Poco::JSON::Object::Ptr &object) {
 
     try {
@@ -25,7 +41,7 @@ namespace AwsMock::Dto::Cognito {
   }
 
   std::ostream &operator<<(std::ostream &os, const UserAttribute &r) {
-    os << "UserAttribute={name='" << r.name << "', value='" << r.value << "'}";
+    os << "UserAttribute=" << r.ToJson();
     return os;
   }
 }

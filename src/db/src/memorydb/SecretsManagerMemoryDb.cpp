@@ -97,6 +97,18 @@ namespace AwsMock::Database {
     return _secrets[it->first];
   }
 
+  Entity::SecretsManager::SecretList SecretsManagerMemoryDb::ListSecrets() {
+
+    Entity::SecretsManager::SecretList secretList;
+
+    for (const auto &secret : _secrets) {
+      secretList.emplace_back(secret.second);
+    }
+
+    log_trace_stream(_logger) << "Got secret list, size: " << secretList.size() << std::endl;
+    return secretList;
+  }
+
   void SecretsManagerMemoryDb::DeleteSecret(const Entity::SecretsManager::Secret &secret) {
     Poco::ScopedLock lock(_secretMutex);
 

@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::Cognito {
 
-  std::string ListUserPoolResponse::ToJson() {
+  std::string ListUserPoolResponse::ToJson() const {
 
     try {
       Poco::JSON::Object rootObject;
@@ -14,7 +14,7 @@ namespace AwsMock::Dto::Cognito {
       Poco::JSON::Array userPoolArray;
       for (const auto &userPool : userPools) {
         Poco::JSON::Object userPoolJson;
-        userPoolJson.set("Id", userPool.id);
+        userPoolJson.set("Id", userPool.userPoolId);
         userPoolJson.set("Name", userPool.name);
         userPoolJson.set("LastModifiedDate", std::to_string(userPool.modified.timestamp().epochTime()));
         userPoolJson.set("CreationDate", std::to_string(userPool.modified.timestamp().epochTime()));
@@ -39,11 +39,7 @@ namespace AwsMock::Dto::Cognito {
   }
 
   std::ostream &operator<<(std::ostream &os, const ListUserPoolResponse &r) {
-    os << "ListUserPoolResponse={userPools={";
-    for (const auto &userPool : r.userPools) {
-      os << userPool.ToString() << ", ";
-    }
-    os << "\b\b" << "}";
+    os << "ListUserPoolResponse=" << r.ToJson();
     return os;
   }
 }

@@ -39,8 +39,8 @@ namespace AwsMock::Dto::S3 {
    *           "sourceIPAddress":"ip-address-where-request-came-from"
    *        },
    *        "responseElements":{
-   *           "x-amz-request-id":"Amazon S3 generated request ID",
-   *           "x-amz-id-2":"Amazon S3 host that processed the request"
+   *           "x-amz-request-userPoolId":"Amazon S3 generated request ID",
+   *           "x-amz-userPoolId-2":"Amazon S3 host that processed the request"
    *        },
    *        "s3":{
    *           "s3SchemaVersion":"1.0",

@@ -41,7 +41,7 @@ namespace AwsMock::Database::Entity::SNS {
   }
 
   std::ostream &operator<<(std::ostream &os, const Subscription &m) {
-    os << "Subscription={protocol='" << m.protocol << "' endpoint='" << m.endpoint << "'}";
+    os << "Subscription=" << bsoncxx::to_json(m.ToDocument());
     return os;
   }
 

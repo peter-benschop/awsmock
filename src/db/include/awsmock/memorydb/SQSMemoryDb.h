@@ -173,7 +173,7 @@ namespace AwsMock::Database {
       /**
        * Checks whether the message exists by receipt handle.
        *
-       * @param messageId message ID
+       * @param receiptHandle receipt handle
        * @return true if message exists, otherwise false
        * @throws Core::DatabaseException
        */

@@ -90,8 +90,7 @@ namespace AwsMock::Dto::SQS {
   }
 
   std::ostream &operator<<(std::ostream &os, const CreateQueueResponse &r) {
-    os << "CreateQueueResponse={region='" << r.region << "' name='" << r.name << "' owner='" << r.owner << "' url='" << r.queueUrl << "', arn='" << r.queueArn
-       << "'}";
+    os << "CreateQueueResponse=" << r.ToJson();
     return os;
   }
 

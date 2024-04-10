@@ -11,7 +11,7 @@ namespace AwsMock::Service {
 
     // Create environment
     _region = _configuration.getString("awsmock.region");
-    _clientId = _configuration.getString("awsmock.client.id", "00000000");
+    _clientId = _configuration.getString("awsmock.client.userPoolId", "00000000");
     _user = _configuration.getString("awsmock.user", "none");
 
     log_debug_stream(_logger) << "AbstractWorker initialized" << std::endl;

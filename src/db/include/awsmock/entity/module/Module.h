@@ -93,13 +93,6 @@ namespace AwsMock::Database::Entity::Module {
      *
      * @param mResult MongoDB document.
      */
-    //void FromDocument(mongocxx::stdx::optional<bsoncxx::document::value> mResult);
-
-    /**
-     * Converts the MongoDB document to an entity
-     *
-     * @param mResult MongoDB document.
-     */
     [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
     /**

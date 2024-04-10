@@ -30,7 +30,7 @@ namespace AwsMock::Dto::Cognito {
   }
 
   std::ostream &operator<<(std::ostream &os, const CreateUserPoolResponse &r) {
-    os << "CreateUserPoolResponse={region='" << r.region << "', name=" << r.name << "}";
+    os << "CreateUserPoolResponse=" << r.ToJson();
     return os;
   }
 }

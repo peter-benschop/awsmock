@@ -82,7 +82,7 @@ namespace AwsMock::Database {
     Entity::SecretsManager::Secret GetSecretById(bsoncxx::oid oid);
 
     /**
-     * Returns the secret by id
+     * Returns the secret by userPoolId
      *
      * @param oid secret oid
      * @return secret, if existing
@@ -124,6 +124,23 @@ namespace AwsMock::Database {
      * @throws DatabaseException
      */
     Entity::SecretsManager::Secret UpdateSecret(const Entity::SecretsManager::Secret &secret);
+
+    /**
+     * Creates or updates a secret in the secrets collection
+     *
+     * @param secret secret entity
+     * @return created secret entity
+     * @throws DatabaseException
+     */
+    Entity::SecretsManager::Secret CreateOrUpdateSecret(const Entity::SecretsManager::Secret &secret);
+
+    /**
+     * Returns a list of secrets
+     *
+     * @return list of available secrets
+     * @throws DatabaseException
+     */
+    Entity::SecretsManager::SecretList ListSecrets();
 
     /**
      * Delete a secret.

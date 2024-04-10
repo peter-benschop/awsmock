@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_DELETEMESSAGEBATCHREQUEST_H
-#define AWSMOCK_DTO_SQS_DELETEMESSAGEBATCHREQUEST_H
+#ifndef AWSMOCK_DTO_SQS_DELETE_MESSAGE_BATCH_REQUEST_H
+#define AWSMOCK_DTO_SQS_DELETE_MESSAGE_BATCH_REQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -50,6 +50,13 @@ namespace AwsMock::Dto::SQS {
     std::string requestId = Poco::UUIDGenerator().createRandom().toString();
 
     /**
+     * Convert to a JSON string
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const;
+
+    /**
      * Converts the DTO from a JSON representation.
      *
      * @param payload HTTP message body.
@@ -74,4 +81,4 @@ namespace AwsMock::Dto::SQS {
 
 } // namespace AwsMock::Dto::SQS
 
-#endif // AWSMOCK_DTO_SQS_DELETEMESSAGEBATCHREQUEST_H
+#endif // AWSMOCK_DTO_SQS_DELETE_MESSAGE_BATCH_REQUEST_H

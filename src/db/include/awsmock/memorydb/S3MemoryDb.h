@@ -62,7 +62,7 @@ namespace AwsMock::Database {
       bool BucketExists(const Entity::S3::Bucket &bucket);
 
       /**
-       * Returns the bucket by id
+       * Returns the bucket by userPoolId
        *
        * @param oid bucket oid
        * @return bucket, if existing

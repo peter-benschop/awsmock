@@ -25,6 +25,7 @@
 #include <awsmock/entity/cognito/UserPool.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/entity/transfer/Transfer.h>
+#include <awsmock/entity/secretsmanager/Secret.h>
 #include <awsmock/entity/sns/Topic.h>
 #include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sqs/Queue.h>
@@ -94,7 +95,12 @@ namespace AwsMock::Dto::Common {
     /**
      * DynamoDb items
      */
-    Database::Entity::DynamoDb::ItemList  dynamoDbItems;
+    Database::Entity::DynamoDb::ItemList dynamoDbItems;
+
+    /**
+     * DynamoDb items
+     */
+    Database::Entity::SecretsManager::SecretList secrets;
 
     /**
      * JSON representation

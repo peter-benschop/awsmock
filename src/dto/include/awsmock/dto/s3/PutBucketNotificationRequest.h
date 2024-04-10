@@ -138,7 +138,7 @@ namespace AwsMock::Dto::S3 {
      */
     friend std::ostream &operator<<(std::ostream &os, const PutBucketNotificationRequest &r) {
       os << "PutBucketNotificationRequest={region='" + r.region + "' bucket='" + r.bucket + "' queueArn='" + r.queueArn + "' lambdaArn='" + r.lambdaArn +
-          "' event='" + r.event + "'id='" + r.notificationId + "'}";
+          "' event='" + r.event + "'userPoolId='" + r.notificationId + "'}";
       return os;
     }
 

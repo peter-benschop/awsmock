@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_SETVISIBILITYTIMEOUTREQUEST_H
-#define AWSMOCK_DTO_SQS_SETVISIBILITYTIMEOUTREQUEST_H
+#ifndef AWSMOCK_DTO_SQS_SET_VISIBILITY_TIMEOUT_REQUEST_H
+#define AWSMOCK_DTO_SQS_SET_VISIBILITY_TIMEOUT_REQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -47,6 +47,13 @@ namespace AwsMock::Dto::SQS {
      * Request ID
      */
     std::string requestId = Poco::UUIDGenerator().createRandom().toString();
+
+    /**
+     * Convert to a JSON string
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Converts the JSON string to DTO.

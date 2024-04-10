@@ -22,8 +22,8 @@ namespace AwsMock::Service {
 
     // Create environment
     _region = _configuration.getString("awsmock.region", "eu-central_1");
-    _accountId = _configuration.getString("awsmock.account.id", "000000000000");
-    _clientId = _configuration.getString("awsmock.client.id", "00000000");
+    _accountId = _configuration.getString("awsmock.account.userPoolId", "000000000000");
+    _clientId = _configuration.getString("awsmock.client.userPoolId", "00000000");
     _user = _configuration.getString("awsmock.user", "none");
     log_debug_stream(_logger) << "Cognito module initialized, endpoint: " << _host << ":" << _port << std::endl;
   }

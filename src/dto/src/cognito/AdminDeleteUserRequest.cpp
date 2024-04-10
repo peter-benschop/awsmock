@@ -6,6 +6,22 @@
 
 namespace AwsMock::Dto::Cognito {
 
+  std::string AdminDeleteUserRequest::ToJson() const {
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("Region", region);
+      rootJson.set("UserPoolId", userPoolId);
+      rootJson.set("Username", userName);
+
+      std::ostringstream os;
+      rootJson.stringify(os);
+      return os.str();
+
+    } catch (Poco::Exception &exc) {
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+    }
+  }
+
   void AdminDeleteUserRequest::FromJson(const std::string &payload) {
 
     Poco::JSON::Parser parser;
@@ -30,7 +46,7 @@ namespace AwsMock::Dto::Cognito {
   }
 
   std::ostream &operator<<(std::ostream &os, const AdminDeleteUserRequest &r) {
-    os << "AdminDeleteUserRequest={region='" << r.region << "', userPoolId='" << r.userPoolId << "', userName='" << r.userName << "'}";
+    os << "AdminDeleteUserRequest=" << r.ToJson();
     return os;
   }
 }

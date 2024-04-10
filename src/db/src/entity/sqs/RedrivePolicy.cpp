@@ -86,8 +86,7 @@ namespace AwsMock::Database::Entity::SQS {
   }
 
   std::ostream &operator<<(std::ostream &os, const RedrivePolicy &r) {
-    os << "RedrivePolicy={deadLetterTargetArn='" << r.deadLetterTargetArn << "' maxReceiveCount='" << r.maxReceiveCount
-       << "'}";
+    os << "RedrivePolicy=" << bsoncxx::to_json(r.ToDocument());
     return os;
   }
 

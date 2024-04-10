@@ -131,7 +131,7 @@ namespace AwsMock::Dto::SQS {
   }
 
   std::ostream &operator<<(std::ostream &os, const SendMessageResponse &r) {
-    os << "SendMessageResponse={id='" << r.id << "', url='" << r.queueUrl << "', messageId='" << r.messageId << "', receiptHandle='" << r.receiptHandle
+    os << "SendMessageResponse={userPoolId='" << r.id << "', url='" << r.queueUrl << "', messageId='" << r.messageId << "', receiptHandle='" << r.receiptHandle
        << "', md5body='" << r.md5Body << "', md5UserAttr='" << r.md5UserAttr << "', md5SystemAttr='" << r.md5SystemAttr << "', requestId: '" << r.requestId << "'}";
     return os;
   }

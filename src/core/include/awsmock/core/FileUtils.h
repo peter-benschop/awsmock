@@ -242,7 +242,7 @@ namespace AwsMock::Core {
     /**
      * Strip chunk signatures from file
      *
-     * @param fileName absolute file name of the file
+     * @param path absolute file path
      */
     static void StripChunkSignature(const std::string &path);
 

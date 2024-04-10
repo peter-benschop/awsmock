@@ -31,7 +31,7 @@ namespace AwsMock::Database::Entity::SNS {
   }
 
   std::ostream &operator<<(std::ostream &os, const MessageAttribute &m) {
-    os << "MessageAttribute={name='" + m.attributeValue + "'value='" + m.attributeValue + "'}";
+    os << "MessageAttribute=" << bsoncxx::to_json(m.ToDocument());
     return os;
   }
 

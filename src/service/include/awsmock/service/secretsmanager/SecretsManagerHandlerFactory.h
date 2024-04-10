@@ -34,8 +34,8 @@ namespace AwsMock::Service {
     /**
      * Create a new request handler
      *
-     * @request request HTTP request
-     * @return new request handler
+     * @param request HTTP request
+     * @return pointer to request handler
      */
     Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
       if(request.getURI().empty()) {

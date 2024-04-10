@@ -56,7 +56,7 @@ namespace AwsMock::Database {
       /**
        * Check existence of cognito user pool
        *
-       * @param id user pool id
+       * @param id user pool userPoolId
        * @return true if cognito user pool exists
        * @throws DatabaseException
        */
@@ -116,10 +116,10 @@ namespace AwsMock::Database {
       /**
        * Deletes an existing cognito user pool
        *
-       * @param id cognito user pool ID
+       * @param userPoolId cognito user pool ID
        * @throws DatabaseException
        */
-      void DeleteUserPool(const std::string &id);
+      void DeleteUserPool(const std::string &userPoolId);
 
       /**
        * Deletes all existing cognito user pools

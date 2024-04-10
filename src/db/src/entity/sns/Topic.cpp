@@ -114,15 +114,7 @@ namespace AwsMock::Database::Entity::SNS {
   }
 
   std::ostream &operator<<(std::ostream &os, const Topic &t) {
-    os << "Topic={id='" << t.oid << "', region='" << t.region << "', name='" << t.topicName << "', owner='" << t.owner
-       << "', topicUrl='" << t.topicUrl
-       << "', topicArn='" << t.topicArn << "', topicAttribute='" << t.topicAttribute.ToString() << "', tags=[";
-    for (const auto &it : t.tags) {
-      os << it.first << "=" << it.second << ", ";
-    }
-    os.seekp(-2, std::ostream::cur);
-    os << "], created='" << Poco::DateTimeFormatter::format(t.created, Poco::DateTimeFormat::HTTP_FORMAT)
-       << "', modified='" << Poco::DateTimeFormatter::format(t.created, Poco::DateTimeFormat::HTTP_FORMAT) << "'}";
+    os << "Topic=" << bsoncxx::to_json(t.ToDocument());
     return os;
   }
 

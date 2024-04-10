@@ -174,6 +174,10 @@ namespace AwsMock::Service {
       infrastructure.dynamoDbTables = _dynamoDbDatabase.ListTables();
       infrastructure.dynamoDbItems = _dynamoDbDatabase.ListItems();
     }
+    if (services.HasService("all") || services.HasService("secretsmanager")) {
+      Database::SecretsManagerDatabase &_secretsManagerDatabase = Database::SecretsManagerDatabase::instance();
+      infrastructure.secrets = _secretsManagerDatabase.ListSecrets();
+    }
     if (services.HasService("all") || services.HasService("transfer")) {
       Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
       infrastructure.transferServers = _transferDatabase.ListServers();
@@ -278,6 +282,17 @@ namespace AwsMock::Service {
           //_dynamoDatabase->CreateOrUpdateUser(user);
         }
         log_info_stream(_logger) << "DynamoDb items imported, count: " << infrastructure.dynamoDbItems.size() << std::endl;
+      }
+    }
+
+    // SecretsManager
+    if (!infrastructure.secrets.empty()) {
+      Database::SecretsManagerDatabase &_secretsDatabase = Database::SecretsManagerDatabase::instance();
+      if (!infrastructure.secrets.empty()) {
+        for (auto &secret : infrastructure.secrets) {
+          _secretsDatabase.CreateOrUpdateSecret(secret);
+        }
+        log_info_stream(_logger) << "Secrets imported, count: " << infrastructure.secrets.size() << std::endl;
       }
     }
   }

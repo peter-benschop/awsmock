@@ -10,3 +10,4 @@ GENERATE_HTML          = YES
 GENERATE_LATEX         = NO
 GENERATE_XML           = NO
 EXCLUDE_SYMBOLS        = _*
+DOT_GRAPH_MAX_NODES    = 150

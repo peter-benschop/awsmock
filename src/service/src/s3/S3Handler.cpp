@@ -62,9 +62,9 @@ namespace AwsMock::Service {
       headerMap["Content-Length"] = std::to_string(s3Response.size);
       headerMap["ETag"] = "\"" + s3Response.md5Sum + "\"";
       headerMap["accept-ranges"] = "bytes";
-      headerMap["x-amz-id-2"] = Core::StringUtils::GenerateRandomString(30);
-      headerMap["x-amz-request-id"] = Poco::UUIDGenerator().createRandom().toString();
-      headerMap["x-amz-version-id"] = Core::StringUtils::GenerateRandomString(30);
+      headerMap["x-amz-userPoolId-2"] = Core::StringUtils::GenerateRandomString(30);
+      headerMap["x-amz-request-userPoolId"] = Poco::UUIDGenerator().createRandom().toString();
+      headerMap["x-amz-version-userPoolId"] = Core::StringUtils::GenerateRandomString(30);
 
       // User supplied metadata
       for (const auto &m : s3Response.metadata) {

@@ -70,7 +70,7 @@ namespace AwsMock::Dto::Docker {
     bool experimental = false;
 
     /**
-     * Git commit id
+     * Git commit userPoolId
      */
     std::string gitCommit;
 

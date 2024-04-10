@@ -121,11 +121,11 @@ namespace AwsMock::Database::Entity::SecretsManager {
     void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
     /**
-     * Converts the DTO to a JSON representation.
+     * Converts the entity to a JSON object
      *
-     * @return DTO as JSON for logging.
+     * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToJson() const;
+    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
     /**
      * Converts the DTO to a string representation.
@@ -144,6 +144,8 @@ namespace AwsMock::Database::Entity::SecretsManager {
     friend std::ostream &operator<<(std::ostream &os, const Secret &m);
 
   };
+
+  typedef std::vector<Secret> SecretList;
 
 } // namespace AwsMock::Database::Entity::S3
 

@@ -136,7 +136,8 @@ namespace AwsMock::Core {
     /**
      * AES 256 encryption
      *
-     * @param input input string
+     * @param plaintext input string
+     * @param len plaintext length
      * @param key encryption key
      * @return encrypted string
      */
@@ -145,7 +146,8 @@ namespace AwsMock::Core {
     /**
      * AES 256 description
      *
-     * @param input input string
+     * @param ciphertext input string
+     * @param len ciphertext length
      * @param key encryption key
      * @return decrypted string
      */
@@ -208,8 +210,7 @@ namespace AwsMock::Core {
      * @param key_data key data
      * @param key_data_len length of key data
      * @param salt salt value
-     * @param e_ctx openssl encryption context
-     * @param d_ctx openssl decryption
+     * @param ctx openssl context
      */
     static int Aes256EncryptionInit(unsigned char *key_data, int key_data_len, unsigned char *salt, EVP_CIPHER_CTX *ctx);
 
@@ -219,8 +220,7 @@ namespace AwsMock::Core {
      * @param key_data key data
      * @param key_data_len length of key data
      * @param salt salt value
-     * @param e_ctx openssl encryption context
-     * @param d_ctx openssl decryption
+     * @param ctx openssl context
      */
     static int Aes256DecryptionInit(unsigned char *key_data, int key_data_len, unsigned char *salt, EVP_CIPHER_CTX *ctx);
   };

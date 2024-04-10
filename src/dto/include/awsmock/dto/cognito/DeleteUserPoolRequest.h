@@ -28,9 +28,9 @@ namespace AwsMock::Dto::Cognito {
     std::string region;
 
     /**
-     * User pool id
+     * User pool userPoolId
      */
-    std::string id;
+    std::string userPoolId;
 
     /**
      * Convert from a JSON object.
@@ -38,6 +38,13 @@ namespace AwsMock::Dto::Cognito {
      * @param payload json string object
      */
     void FromJson(const std::string &payload);
+
+    /**
+     * Convert to a JSON string
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Converts the DTO to a string representation.

@@ -138,12 +138,7 @@ namespace AwsMock::Database::Entity::SQS {
   }
 
   std::ostream &operator<<(std::ostream &os, const Message &m) {
-    os << "Message={oid='" << m.oid << "', queueUrl='" << m.queueUrl << "', body='" << m.body << "', status='"
-       << MessageStatusToString(m.status) << "' ,reset='"
-       << Poco::DateTimeFormatter().format(m.reset, Poco::DateTimeFormat::HTTP_FORMAT)
-       << "', retries=" << m.retries << ", messageId='" << m.messageId << "', receiptHandle='" << m.receiptHandle
-       << "', md5body='" << m.md5Body << "', md5UserAttr='" << m.md5UserAttr << "', md5SystemAttr='" << m.md5SystemAttr
-       << "'}";
+    os << "Message=" << bsoncxx::to_json(m.ToDocument());
     return os;
   }
 

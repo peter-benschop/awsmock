@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::Cognito {
 
-  std::string ListUsersResponse::ToJson() {
+  std::string ListUsersResponse::ToJson() const {
 
     try {
       Poco::JSON::Object rootObject;
@@ -40,11 +40,7 @@ namespace AwsMock::Dto::Cognito {
   }
 
   std::ostream &operator<<(std::ostream &os, const ListUsersResponse &r) {
-    os << "ListUsersResponse={users={";
-    for (const auto &user : r.users) {
-      os << user.ToString() << ", ";
-    }
-    os << "\b\b" << "}";
+    os << "ListUsersResponse=" << r.ToJson();
     return os;
   }
 }

@@ -114,11 +114,6 @@ namespace AwsMock::Database::Entity::S3 {
     return ss.str();
   }
 
-  /**
-   * Stream provider.
-   *
-   * @return output stream
-   */
   std::ostream &operator<<(std::ostream &os, const Bucket &b) {
     os << "BucketNotification=" << bsoncxx::to_json(b.ToDocument());
     return os;

@@ -143,6 +143,7 @@ namespace AwsMock::Dto::DynamoDb {
      * Parse a JSON stream
      *
      * @param body JSON body
+     * @param headerMap HTTP header map
      */
     void FromJson(const std::string &body, const std::map<std::string, std::string> &headerMap);
 

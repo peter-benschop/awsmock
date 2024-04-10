@@ -19,6 +19,13 @@
 
 namespace AwsMock::Database::Entity::Lambda {
 
+  using bsoncxx::builder::basic::kvp;
+  using bsoncxx::builder::basic::make_array;
+  using bsoncxx::builder::basic::make_document;
+  using bsoncxx::view_or_value;
+  using bsoncxx::document::view;
+  using bsoncxx::document::value;
+
   /**
    * Lambda tags entity
    *
@@ -53,6 +60,13 @@ namespace AwsMock::Database::Entity::Lambda {
      * @param mResult MongoDB document view.
      */
     [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+
+    /**
+     * Converts the entity to a MongoDB document
+     *
+     * @return entity as MongoDB document.
+     */
+    [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
     /**
      * Converts the DTO to a string representation.

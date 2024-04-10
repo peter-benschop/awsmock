@@ -28,6 +28,7 @@ namespace AwsMock::Dto::Common {
     DESCRIBE_SECRET,
     GET_SECRET_VALUE,
     UPDATE_SECRET,
+    ROTATE_SECRET,
     UNKNOWN
   };
 
@@ -37,6 +38,7 @@ namespace AwsMock::Dto::Common {
     {SecretsManagerCommandType::DESCRIBE_SECRET, "DescribeSecret"},
     {SecretsManagerCommandType::GET_SECRET_VALUE, "GetSecretValue"},
     {SecretsManagerCommandType::UPDATE_SECRET, "UpdateSecret"},
+    {SecretsManagerCommandType::ROTATE_SECRET, "RotateSecret"},
     {SecretsManagerCommandType::UNKNOWN, "Unknown"},
   };
 
@@ -96,11 +98,12 @@ namespace AwsMock::Dto::Common {
     /**
      * Getś the value from the user-agent string
      *
+     * @param method HTTP method
      * @param request HTTP server request
      * @param region AWS region
      * @param user AWS user
      */
-    void FromRequest(const HttpMethod &requestType, Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user);
+    void FromRequest(const HttpMethod &method, Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user);
 
     /**
      * Converts the DTO to a string representation.

@@ -168,7 +168,7 @@ namespace AwsMock::Service {
 
   Dto::Docker::Container DockerService::GetContainerById(const std::string &id) {
 
-    std::string filters = Core::StringUtils::UrlEncode(R"({"id":[")" + id + "\"]}");
+    std::string filters = Core::StringUtils::UrlEncode(R"({"userPoolId":[")" + id + "\"]}");
     Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketRequest("GET", "http://localhost/containers/json?filters=" + filters);
     log_debug_stream(_logger) << "List container request send to docker daemon" << std::endl;
     log_trace_stream(_logger) << "Response: " << curlResponse.ToString() << std::endl;
@@ -181,7 +181,7 @@ namespace AwsMock::Service {
     Dto::Docker::ListContainerResponse response(curlResponse.output);
 
     if (response.containerList.empty()) {
-      log_warning_stream(_logger) << "Docker container not found, id: " << id << std::endl;
+      log_warning_stream(_logger) << "Docker container not found, userPoolId: " << id << std::endl;
       return {};
     }
 

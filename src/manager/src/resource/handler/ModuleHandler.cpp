@@ -30,8 +30,8 @@ namespace AwsMock {
         .host=host,
         .port=port,
         .user=_configuration.getString("awsmock.user", "none"),
-        .accessId=_configuration.getString("awsmock.account.id", "000000000000"),
-        .clientId=_configuration.getString("awsmock.client.id", "00000000"),
+        .accessId=_configuration.getString("awsmock.account.userPoolId", "000000000000"),
+        .clientId=_configuration.getString("awsmock.client.userPoolId", "00000000"),
         .dataDir=_configuration.getString("awsmock.data.dir", "/tmp/awsmock/data"),
         .databaseActive=_configuration.getBool("awsmock.mongodb.active", false)
       };

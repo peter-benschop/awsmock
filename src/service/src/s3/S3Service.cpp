@@ -8,7 +8,7 @@ namespace AwsMock::Service {
 
   S3Service::S3Service(Core::Configuration &configuration) : _logger(Poco::Logger::get("S3Service")), _configuration(configuration), _database(Database::S3Database::instance()) {
 
-    _accountId = _configuration.getString("awsmock.account.id");
+    _accountId = _configuration.getString("awsmock.account.userPoolId");
 
     // Initialize directories
     _dataDir = _configuration.getString("awsmock.data.dir", DEFAULT_DATA_DIR);
@@ -16,9 +16,6 @@ namespace AwsMock::Service {
     _transferBucket = _configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
     _dataS3Dir = _dataDir + Poco::Path::separator() + "s3";
     _tempDir = _dataDir + Poco::Path::separator() + "tmp";
-
-    // Initialize database
-    //_database = std::make_unique<Database::S3Database>();
 
     // SQS module connection
     _sqsServiceHost = _configuration.getString("awsmock.module.sqs.host", "localhost");
@@ -552,7 +549,7 @@ namespace AwsMock::Service {
   }
 
   void S3Service::PutBucketNotification(const Dto::S3::PutBucketNotificationRequest &request) {
-    log_trace_stream(_logger) << "Put bucket notification request, id: " << request.notificationId << std::endl;
+    log_trace_stream(_logger) << "Put bucket notification request, userPoolId: " << request.notificationId << std::endl;
 
     // Check bucket existence
     if (!_database.BucketExists({.region=request.region, .name=request.bucket})) {

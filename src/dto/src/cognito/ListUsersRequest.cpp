@@ -18,7 +18,22 @@ namespace AwsMock::Dto::Cognito {
       Core::JsonUtils::GetJsonValueString("UserPoolId", rootObject, userPoolId);
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  std::string ListUsersRequest::ToJson() const {
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("Region", region);
+      rootJson.set("UserPoolId", userPoolId);
+
+      std::ostringstream os;
+      rootJson.stringify(os);
+      return os.str();
+
+    } catch (Poco::Exception &exc) {
+      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -29,7 +44,7 @@ namespace AwsMock::Dto::Cognito {
   }
 
   std::ostream &operator<<(std::ostream &os, const ListUsersRequest &r) {
-    os << "ListUsersRequest={region='" << r.region << "', userPoolId=" << r.userPoolId << "}";
+    os << "ListUsersRequest=" << r.ToJson();
     return os;
   }
 }

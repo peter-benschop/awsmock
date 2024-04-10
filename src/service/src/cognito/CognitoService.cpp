@@ -20,7 +20,7 @@ namespace AwsMock::Service {
     try {
       Database::Entity::Cognito::UserPool userPool = {
           .region=request.region,
-          .id=request.region + "_" + Core::StringUtils::GenerateRandomString(9),
+          .userPoolId=request.region + "_" + Core::StringUtils::GenerateRandomString(9),
           .name=request.name
       };
 
@@ -57,16 +57,16 @@ namespace AwsMock::Service {
   }
 
   void CognitoService::DeleteUserPool(const Dto::Cognito::DeleteUserPoolRequest &request) {
-    log_debug_stream(_logger) << "Delete user pool request, id:  " << request.id << std::endl;
+    log_debug_stream(_logger) << "Delete user pool request, userPoolId:  " << request.userPoolId << std::endl;
 
-    if (!_database.UserPoolExists(request.id)) {
-      throw Core::ServiceException("User pool does not exists, id: " + request.id);
+    if (!_database.UserPoolExists(request.userPoolId)) {
+      throw Core::ServiceException("User pool does not exists, userPoolId: " + request.userPoolId);
     }
 
     try {
 
-      _database.DeleteUserPool(request.id);
-      log_trace_stream(_logger) << "User pool deleted, id: " + request.id << std::endl;
+      _database.DeleteUserPool(request.userPoolId);
+      log_trace_stream(_logger) << "User pool deleted, userPoolId: " + request.userPoolId << std::endl;
 
     } catch (Poco::Exception &ex) {
       log_error_stream(_logger) << "Create user pool request failed, message: " << ex.message() << std::endl;
@@ -78,7 +78,7 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Admin create user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId << std::endl;
 
     if (!_database.UserPoolExists(request.userPoolId)) {
-      throw Core::ServiceException("User pool does not exists, id: " + request.userPoolId);
+      throw Core::ServiceException("User pool does not exists, userPoolId: " + request.userPoolId);
     }
 
     if (_database.UserExists(request.region, request.userPoolId, request.userName)) {
@@ -133,7 +133,7 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Admin delete user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId << std::endl;
 
     if (!_database.UserPoolExists(request.userPoolId)) {
-      throw Core::ServiceException("User pool does not exists, id: " + request.userPoolId);
+      throw Core::ServiceException("User pool does not exists, userPoolId: " + request.userPoolId);
     }
 
     if (!_database.UserExists(request.region, request.userPoolId, request.userName)) {
