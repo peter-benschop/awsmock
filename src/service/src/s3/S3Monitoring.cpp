@@ -32,7 +32,7 @@ namespace AwsMock::Service {
     _running = true;
     while (_running) {
 
-      _logger.debug() << "S3 monitoring processing started" << std::endl;
+      log_trace_stream(_logger) << "S3 monitoring processing started" << std::endl;
 
       // Update counter
       UpdateCounters();

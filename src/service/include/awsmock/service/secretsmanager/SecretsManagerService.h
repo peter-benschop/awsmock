@@ -23,6 +23,7 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/ServiceException.h>
+#include <awsmock/core/ResourceNotFoundException.h>
 #include <awsmock/dto/secretsmanager/CreateSecretRequest.h>
 #include <awsmock/dto/secretsmanager/CreateSecretResponse.h>
 #include <awsmock/dto/secretsmanager/DeleteSecretRequest.h>
@@ -41,6 +42,11 @@
 
 namespace AwsMock::Service {
 
+  /**
+   * Secrets manager service.
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   class SecretsManagerService {
 
   public:

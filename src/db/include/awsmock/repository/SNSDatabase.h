@@ -28,6 +28,11 @@
 
 namespace AwsMock::Database {
 
+  /**
+   * SNS MongoDB database.
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   class SNSDatabase : public Database {
 
     public:

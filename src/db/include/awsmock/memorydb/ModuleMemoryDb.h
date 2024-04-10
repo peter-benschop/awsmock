@@ -22,6 +22,11 @@
 
 namespace AwsMock::Database {
 
+  /**
+   * Module in-memory database.
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   class ModuleMemoryDb {
 
     public:

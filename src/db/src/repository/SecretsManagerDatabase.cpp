@@ -194,7 +194,7 @@ namespace AwsMock::Database {
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
         _logger.error() << "Database exception " << exc.what() << std::endl;
-        throw Core::DatabaseException(exc.what(), 500);
+        throw Core::DatabaseException(exc.what());
       }
 
     } else {
@@ -258,7 +258,7 @@ namespace AwsMock::Database {
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
         _logger.error() << "Database exception " << exc.what() << std::endl;
-        throw Core::DatabaseException(exc.what(), 500);
+        throw Core::DatabaseException(exc.what());
       }
 
     } else {
@@ -286,7 +286,7 @@ namespace AwsMock::Database {
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
         _logger.error() << "Database exception " << exc.what() << std::endl;
-        throw Core::DatabaseException(exc.what(), 500);
+        throw Core::DatabaseException(exc.what());
       }
 
     } else {

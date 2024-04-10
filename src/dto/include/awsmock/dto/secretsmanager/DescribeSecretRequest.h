@@ -17,7 +17,7 @@
 
 // AwsMoc includes
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/ServiceException.h>
+#include "awsmock/core/JsonException.h"
 
 namespace AwsMock::Dto::SecretsManager {
 

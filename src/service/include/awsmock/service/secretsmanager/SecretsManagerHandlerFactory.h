@@ -6,7 +6,7 @@
 #define AWSMOCK_SERVICE_SECRETMANAGER_HANDLER_FACTORY_H
 
 // Poco includes
-#include "Poco/Net/HTTPRequestHandlerFactory.h"
+#include <Poco/Net/HTTPRequestHandlerFactory.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
@@ -16,7 +16,9 @@
 namespace AwsMock::Service {
 
   /**
-   * S3 request handler factory
+   * Secrets manager request handler factory
+   *
+   * @author jens.vogt@opitz-consulting.com
    */
   class SecretsManagerRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 

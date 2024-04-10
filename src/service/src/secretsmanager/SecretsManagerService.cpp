@@ -48,7 +48,7 @@ namespace AwsMock::Service {
 
     } catch (Poco::Exception &exc) {
       log_error_stream(_logger) << "SecretManager create secret failed, message: " << exc.message() << std::endl;
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+      throw Core::ServiceException(exc.message());
     }
     return {.region=secret.region, .name=secret.name, .arn=secret.arn, .versionId=secret.versionId};
   }
@@ -59,7 +59,7 @@ namespace AwsMock::Service {
     // Check bucket existence
     if (!_database.SecretExists(request.secretId)) {
       log_warning_stream(_logger) << "Secret does not exist, secretId: " << request.secretId << std::endl;
-      throw Core::ServiceException("Secret does not exist, secretId: " + request.secretId, Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+      throw Core::ResourceNotFoundException("Secret does not exist, secretId: " + request.secretId);
     }
 
     Dto::SecretsManager::DescribeSecretResponse response;
@@ -77,7 +77,7 @@ namespace AwsMock::Service {
 
     } catch (Poco::Exception &exc) {
       log_error_stream(_logger) << "Secret describe secret failed, message: " + exc.message() << std::endl;
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+      throw Core::ServiceException(exc.message());
     }
 
     return {};
@@ -116,7 +116,7 @@ namespace AwsMock::Service {
 
     } catch (Poco::Exception &exc) {
       log_error_stream(_logger) << "Secret describe secret failed, message: " + exc.message() << std::endl;
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+      throw Core::ServiceException(exc.message());
     }
   }
 
@@ -148,7 +148,7 @@ namespace AwsMock::Service {
 
     } catch (Poco::Exception &exc) {
       log_error_stream(_logger) << "Secret describe secret failed, message: " + exc.message() << std::endl;
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+      throw Core::ServiceException(exc.message());
     }
 
     return {};
@@ -176,7 +176,7 @@ namespace AwsMock::Service {
 
     } catch (Poco::Exception &exc) {
       log_error_stream(_logger) << "SecretManager delete secret failed, message: " + exc.message() << std::endl;
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+      throw Core::ServiceException(exc.message());
     }
   }
 

@@ -2,8 +2,8 @@
 // Created by vogje01 on 02/09/2022.
 //
 
-#ifndef AWSMOCK_CORE_SERVICEEXCEPTION_H
-#define AWSMOCK_CORE_SERVICEEXCEPTION_H
+#ifndef AWSMOCK_CORE_JSON_EXCEPTION_H
+#define AWSMOCK_CORE_JSON_EXCEPTION_H
 
 // Poco includes
 #include <Poco/Exception.h>
@@ -13,9 +13,9 @@
 namespace AwsMock::Core {
 
   /**
-   * COM exception class. In case of a COM request failure a COMException is thrown.
+   * JSON exception class. In case of a JSON serialization/deserialization error.
    */
-  class ServiceException : public Poco::Exception {
+  class JsonException : public Poco::Exception {
 
   public:
     /**
@@ -25,7 +25,7 @@ namespace AwsMock::Core {
      * @param resource exception resource
      * @param requestId exception resource ID
      */
-    explicit ServiceException(int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR, const char *resource = nullptr, const char *requestId = nullptr);
+    explicit JsonException(int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR, const char *resource = nullptr, const char *requestId = nullptr);
 
     /**
      * Constructor.
@@ -35,7 +35,7 @@ namespace AwsMock::Core {
      * @param resource exception resource
      * @param requestId exception resource ID
      */
-    explicit ServiceException(const std::string &msg, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR, const char *resource = nullptr, const char *requestId = nullptr);
+    explicit JsonException(const std::string &msg, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR, const char *resource = nullptr, const char *requestId = nullptr);
 
     /**
      * Constructor.
@@ -46,7 +46,7 @@ namespace AwsMock::Core {
      * @param resource exception resource
      * @param requestId exception resource ID
      */
-    ServiceException(const std::string &msg, const std::string &arg, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR, const char *resource = nullptr, const char *requestId = nullptr);
+    JsonException(const std::string &msg, const std::string &arg, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR, const char *resource = nullptr, const char *requestId = nullptr);
 
     /**
      * Constructor.
@@ -57,24 +57,24 @@ namespace AwsMock::Core {
      * @param resource exception resource
      * @param requestId exception resource ID
      */
-    ServiceException(const std::string &msg, const Poco::Exception &exc, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR, const char *resource = nullptr, const char *requestId = nullptr);
+    JsonException(const std::string &msg, const Poco::Exception &exc, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR, const char *resource = nullptr, const char *requestId = nullptr);
 
     /**
      * Copy constructor.
      *
      * @param exc parent exception.
      */
-    ServiceException(const ServiceException &exc);
+    JsonException(const JsonException &exc);
 
     /**
      * Destructor
      */
-    ~ServiceException() noexcept override;
+    ~JsonException() noexcept override;
 
     /**
      * Assigment operator.
      */
-    ServiceException &operator=(const ServiceException &exc);
+    JsonException &operator=(const JsonException &exc);
 
     /**
      * Returns the exception name.
@@ -122,4 +122,4 @@ namespace AwsMock::Core {
 
 } // namespace AwsMock::Core
 
-#endif //AWSMOCK_CORE_SERVICEEXCEPTION_H
+#endif // AWSMOCK_CORE_JSON_EXCEPTION_H

@@ -35,4 +35,6 @@ namespace AwsMock::Core {
 
   void ServiceException::rethrow() const { throw *this; }
 
+  Poco::Net::HTTPResponse::HTTPStatus status() { return Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR; }
+
 } // namespace AwsMock::Core

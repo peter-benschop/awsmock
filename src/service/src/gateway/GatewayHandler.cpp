@@ -68,7 +68,7 @@ namespace AwsMock::Service {
     response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
     response.setContentType("text/plain; charset=utf-8");
 
-    handleHttpStatusCode(response, 200);
+    handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTPStatus::HTTP_OK);
     std::ostream &outputStream = response.send();
     outputStream.flush();
   }
@@ -92,7 +92,7 @@ namespace AwsMock::Service {
     for (const auto &i : clientResponse) {
       response.set(i.first, i.second);
     }
-    long send = Poco::StreamCopier::copyStream(is, response.send(), 1024 * 1024);
+    long send = Poco::StreamCopier::copyStream(is, response.send());
     log_trace_stream(_logger) << "Bytes send: " << send << std::endl;
 
     log_trace_stream(_logger) << "Backend module response send back to client" << std::endl;

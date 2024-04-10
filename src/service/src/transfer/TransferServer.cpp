@@ -94,7 +94,7 @@ namespace AwsMock::Service {
 
   void TransferServer::CheckTransferServers() {
 
-    log_debug_stream(_logger) << "Checking transfer servers" << std::endl;
+    log_trace_stream(_logger) << "Checking transfer servers" << std::endl;
     std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase.ListServers(_region);
 
     for (auto &transfer : transfers) {

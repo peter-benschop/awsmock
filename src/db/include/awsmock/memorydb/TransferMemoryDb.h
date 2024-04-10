@@ -24,6 +24,11 @@
 
 namespace AwsMock::Database {
 
+  /**
+   * Transfer manager in-memory database.
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   class TransferMemoryDb {
 
     public:

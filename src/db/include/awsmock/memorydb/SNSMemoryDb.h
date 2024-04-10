@@ -23,6 +23,11 @@
 
 namespace AwsMock::Database {
 
+  /**
+   * SNS in-memory database.
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   class SNSMemoryDb {
 
     public:

@@ -102,9 +102,17 @@ namespace AwsMock::Service {
         throw Core::ServiceException("Bad request, method: POST clientCommand: "
                                          + Dto::Common::SecretsManagerCommandTypeToString(secretsManagerClientCommand.command));
       }
+      case Dto::Common::SecretsManagerCommandType::ROTATE_SECRET:break;
       }
 
+    } catch (Core::JsonException &exc) {
+      log_error_stream(_logger) << "JsonException: " << exc.message();
+      SendJsonErrorResponse("SecretsManager", response, exc);
+    } catch (Core::DatabaseException &exc) {
+      log_error_stream(_logger) << "DatabaseException: " << exc.message();
+      SendJsonErrorResponse("SecretsManager", response, exc);
     } catch (Core::ServiceException &exc) {
+      log_error_stream(_logger) << "ServiceException: " << exc.message();
       SendJsonErrorResponse("SecretsManager", response, exc);
     }
   }

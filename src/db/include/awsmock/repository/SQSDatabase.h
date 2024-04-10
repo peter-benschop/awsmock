@@ -30,6 +30,11 @@
 
 namespace AwsMock::Database {
 
+  /**
+   * SQS MongoDB database.
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   class SQSDatabase : public Database {
 
     public:

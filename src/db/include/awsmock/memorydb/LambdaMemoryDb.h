@@ -27,6 +27,11 @@
 
 namespace AwsMock::Database {
 
+  /**
+   * Lambda in-memory database.
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   class LambdaMemoryDb {
 
     public:

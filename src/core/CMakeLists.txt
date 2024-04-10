@@ -10,7 +10,7 @@ set(UTILS_SOURCES src/utils/StringUtils.cpp src/utils/FileUtils.cpp src/utils/Di
 
 set(EXCEPTION_SOURCES src/exception/CoreException.cpp src/exception/DatabaseException.cpp
         src/exception/ServiceException.cpp src/exception/ResourceNotFoundException.cpp
-        src/exception/InvalidMethodCallException.cpp)
+        src/exception/InvalidMethodCallException.cpp src/exception/JsonException.cpp)
 set(LOGGING_SOURCES src/logging/LibriJsonFormatter.cpp src/logging/LogStream.cpp)
 set(MONITORING_SOURCES src/monitoring/MetricService.cpp src/monitoring/MetricSystemCollector.cpp)
 
