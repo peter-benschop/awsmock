@@ -1,13 +1,15 @@
 //
-// Created by vogje01 on 4/8/24.
+// Created by vogje01 on 4/11/24.
 //
 
-#ifndef AWSMOCK_DTO_SECRETSMANAGER_ROTATION_RULES_H
-#define AWSMOCK_DTO_SECRETSMANAGER_ROTATION_RULES_H
+#ifndef AWSMOCK_DTO_SECRETSMANAGER_FILTER_H
+#define AWSMOCK_DTO_SECRETSMANAGER_FILTER_H
+
 
 // C++ standard includes
 #include <string>
 #include <sstream>
+#include <vector>
 
 // Poco includes
 #include <Poco/JSON/JSON.h>
@@ -17,43 +19,39 @@
 
 // AwsMoc includes
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/ServiceException.h>
+#include <awsmock/core/JsonException.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
   /**
-   * Rotation rules
+   * Secrets list filter
    *
    * Example:
    * <pre>
-   * {
-   *   "AutomaticallyAfterDays": number,
-   *   "Duration": "string",
-   *   "ScheduleExpression": "string"
-   * }
+   * "Filters": [
+   *   {
+   *      "Key": "string",
+   *      "Values": [ "string" ]
+   *   }
+   * ]
    * </pre>
    */
-  struct RotationRules {
+  struct Filter {
 
     /**
-     * Automatic rotation period
+     * Filter key
      */
-    long automaticallyAfterDays;
+    std::string key;
 
     /**
-     * Duration
+     * Filter values array
      */
-    std::string duration;
-
-    /**
-     * Duration
-     */
-    std::string scheduleExpression;
+    std::vector<std::string> values;
 
     /**
      * Converts the DTO to a JSON object.
      *
-     * @return DTO as string for logging.
+     * @return DTO as JSON object.
      */
     [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
@@ -65,9 +63,9 @@ namespace AwsMock::Dto::SecretsManager {
     [[nodiscard]] std::string ToJson() const;
 
     /**
-     * Converts a JSON representation to s DTO.
+     * Converts the JSON object to DTO.
      *
-     * @param jsonObject JSON object.
+     * @param jsonObject JSON object
      */
     void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 
@@ -83,10 +81,10 @@ namespace AwsMock::Dto::SecretsManager {
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const RotationRules &r);
+    friend std::ostream &operator<<(std::ostream &os, const Filter &f);
 
   };
 
-} //namespace AwsMock::Dto::SecretsManager
+} // namespace AwsMock::Dto::SecretsManager
 
-#endif // AWSMOCK_DTO_SECRETSMANAGER_ROTATION_RULES_H
+#endif //AWSMOCK_DTO_SECRETSMANAGER_FILTER_H

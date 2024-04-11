@@ -7,7 +7,9 @@
 namespace AwsMock::Dto::SecretsManager {
 
   std::string CreateSecretRequest::ToJson() const {
+
     try {
+
       Poco::JSON::Object rootJson;
       rootJson.set("Region", region);
       rootJson.set("Name", name);

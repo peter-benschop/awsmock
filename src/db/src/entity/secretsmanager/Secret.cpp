@@ -15,7 +15,12 @@ namespace AwsMock::Database::Entity::SecretsManager {
 
   view_or_value<view, value> Secret::ToDocument() const {
 
-    view_or_value<view, value> messageDoc = make_document(
+    view_or_value<view, value> rotationRulesDoc = make_document(
+      kvp("automaticallyAfterDays", rotationRules.automaticallyAfterDays),
+      kvp("duration", rotationRules.duration),
+      kvp("scheduleExpression", rotationRules.scheduleExpression));
+
+    view_or_value<view, value> secretDoc = make_document(
       kvp("region", region),
       kvp("name", name),
       kvp("arn", arn),
@@ -25,26 +30,59 @@ namespace AwsMock::Database::Entity::SecretsManager {
       kvp("secretString", secretString),
       kvp("secretBinary", secretBinary),
       kvp("description", description),
+      kvp("owningService", owningService),
+      kvp("primaryRegion", primaryRegion),
+      kvp("createdDate", createdDate),
+      kvp("deletedDate", deletedDate),
+      kvp("lastAccessedDate", lastAccessedDate),
+      kvp("lastChangedDate", lastChangedDate),
+      kvp("lastRotatedDate", lastRotatedDate),
+      kvp("nextRotatedDate", nextRotatedDate),
+      kvp("rotationEnabled", rotationEnabled),
+      kvp("rotationLambdaARN", rotationLambdaARN),
+      kvp("rotationRules", rotationRulesDoc),
       kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
       kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
 
-    return messageDoc;
+    return secretDoc;
   }
 
   void Secret::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
-    oid = mResult.value()["_id"].get_oid().value.to_string();
-    region = mResult.value()["region"].get_string().value;
-    name = mResult.value()["name"].get_string().value;
-    arn = mResult.value()["arn"].get_string().value;
-    secretId = mResult.value()["secretId"].get_string().value;
-    kmsKeyId = mResult.value()["kmsKeyId"].get_string().value;
-    versionId = mResult.value()["versionId"].get_string().value;
-    secretString = mResult.value()["secretString"].get_string().value;
-    secretBinary = mResult.value()["secretBinary"].get_string().value;
-    description = mResult.value()["description"].get_string().value;
-    created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-    modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+    try {
+      oid = mResult.value()["_id"].get_oid().value.to_string();
+      region = mResult.value()["region"].get_string().value;
+      name = mResult.value()["name"].get_string().value;
+      arn = mResult.value()["arn"].get_string().value;
+      secretId = mResult.value()["secretId"].get_string().value;
+      kmsKeyId = mResult.value()["kmsKeyId"].get_string().value;
+      versionId = mResult.value()["versionId"].get_string().value;
+      secretString = mResult.value()["secretString"].get_string().value;
+      secretBinary = mResult.value()["secretBinary"].get_string().value;
+      description = mResult.value()["description"].get_string().value;
+      owningService = mResult.value()["owningService"].get_string().value;
+      primaryRegion = mResult.value()["primaryRegion"].get_string().value;
+      createdDate = mResult.value()["createdDate"].get_int64().value;
+      deletedDate = mResult.value()["deletedDate"].get_int64().value;
+      lastAccessedDate = mResult.value()["lastAccessedDate"].get_int64().value;
+      lastChangedDate = mResult.value()["lastChangedDate"].get_int64().value;
+      lastRotatedDate = mResult.value()["lastRotatedDate"].get_int64().value;
+      nextRotatedDate = mResult.value()["nextRotatedDate"].get_int64().value;
+      rotationEnabled = mResult.value()["rotationEnabled"].get_bool().value;
+      rotationLambdaARN = mResult.value()["rotationLambdaARN"].get_string().value;
+      created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
+      modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+
+      // Get rotation rules
+      if (mResult.value().find("rotationRules") != mResult.value().end()) {
+        bsoncxx::document::view rotationView = mResult.value()["rotationRules"].get_document().value;
+        rotationRules.automaticallyAfterDays = rotationView["automaticallyAfterDays"].get_int64().value;
+        rotationRules.duration = rotationView["duration"].get_string().value;
+        rotationRules.scheduleExpression = rotationView["scheduleExpression"].get_string().value;
+      }
+    } catch (const mongocxx::exception &exc) {
+      Poco::Logger::get("Secret").error("Exception: oid: " + oid + " error: " + exc.what());
+    }
   }
 
   Poco::JSON::Object Secret::ToJsonObject() const {
@@ -59,6 +97,17 @@ namespace AwsMock::Database::Entity::SecretsManager {
     jsonObject.set("secretString", secretString);
     jsonObject.set("secretBinary", secretBinary);
     jsonObject.set("description", description);
+    jsonObject.set("owningService", owningService);
+    jsonObject.set("primaryRegion", primaryRegion);
+    jsonObject.set("createdDate", createdDate);
+    jsonObject.set("deletedDate", deletedDate);
+    jsonObject.set("lastAccessedDate", lastAccessedDate);
+    jsonObject.set("lastChangedDate", lastChangedDate);
+    jsonObject.set("lastRotatedDate", lastRotatedDate);
+    jsonObject.set("nextRotatedDate", nextRotatedDate);
+    jsonObject.set("rotationEnabled", rotationEnabled);
+    jsonObject.set("rotationLambdaARN", rotationLambdaARN);
+    jsonObject.set("RotationRules", rotationRules.ToJsonObject());
     return jsonObject;
 
   }

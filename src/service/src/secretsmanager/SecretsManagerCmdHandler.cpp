@@ -95,6 +95,34 @@ namespace AwsMock::Service {
         break;
       }
 
+      case Dto::Common::SecretsManagerCommandType::ROTATE_SECRET:{
+
+        Dto::SecretsManager::RotateSecretRequest
+          secretsManagerRequest = {.region=secretsManagerClientCommand.region, .requestId=requestId};
+        secretsManagerRequest.FromJson(secretsManagerClientCommand.payload);
+
+        Dto::SecretsManager::RotateSecretResponse
+          secretsManagerResponse = _secretsManagerService.RotateSecret(secretsManagerRequest);
+        log_info_stream(_logger) << "Secret rotated, secretId: " << secretsManagerResponse.arn << std::endl;
+        SendOkResponse(response, secretsManagerResponse.ToJson());
+
+        break;
+      }
+
+      case Dto::Common::SecretsManagerCommandType::LIST_SECRETS:{
+
+        Dto::SecretsManager::ListSecretsRequest
+          secretsManagerRequest = {.region=secretsManagerClientCommand.region, .requestId=requestId};
+        secretsManagerRequest.FromJson(secretsManagerClientCommand.payload);
+
+        Dto::SecretsManager::ListSecretsResponse
+          secretsManagerResponse = _secretsManagerService.ListSecrets(secretsManagerRequest);
+        log_info_stream(_logger) << "Secrets listed, region: " << secretsManagerResponse.region << std::endl;
+        SendOkResponse(response, secretsManagerResponse.ToJson());
+
+        break;
+      }
+
       case Dto::Common::SecretsManagerCommandType::UNKNOWN: {
         log_error_stream(_logger) << "Bad request, method: POST clientCommand: "
                                   << Dto::Common::SecretsManagerCommandTypeToString(secretsManagerClientCommand.command)
@@ -102,7 +130,7 @@ namespace AwsMock::Service {
         throw Core::ServiceException("Bad request, method: POST clientCommand: "
                                          + Dto::Common::SecretsManagerCommandTypeToString(secretsManagerClientCommand.command));
       }
-      case Dto::Common::SecretsManagerCommandType::ROTATE_SECRET:break;
+
       }
 
     } catch (Core::JsonException &exc) {

@@ -24,8 +24,16 @@ namespace AwsMock::Service {
 
     // Check existence
     if (_database.SecretExists(request.region, request.name)) {
-      log_warning_stream(_logger) << "Secret exists already, region: " << region << " name: " << request.name << std::endl;
-      throw Core::ServiceException("Secret exists already", Poco::Net::HTTPResponse::HTTP_REASON_BAD_GATEWAY);
+      throw Core::ServiceException("Secret exists already");
+    }
+
+    // Check consistency
+    if (!request.secretString.empty() && !request.secretBinary.empty()) {
+      throw Core::ServiceException("Secret must not have secretString and secretBinary");
+    }
+
+    if (request.secretString.empty() && request.secretBinary.empty()) {
+      throw Core::ServiceException("Secret must have either secretString or secretBinary");
     }
 
     Database::Entity::SecretsManager::Secret secret = {.region=region, .name=request.name};
@@ -35,6 +43,7 @@ namespace AwsMock::Service {
       secret.versionId = Poco::UUIDGenerator().createRandom().toString();
       secret.secretId = request.name + "-" + Core::StringUtils::GenerateRandomHexString(6);
       secret.arn = Core::AwsUtils::CreateSecretArn(request.region, _accountId, secret.secretId);
+      secret.createdDate = Poco::Timestamp().epochTime();
 
       // Either string or binary data
       if (!request.secretString.empty()) {
@@ -47,7 +56,6 @@ namespace AwsMock::Service {
       secret = _database.CreateSecret(secret);
 
     } catch (Poco::Exception &exc) {
-      log_error_stream(_logger) << "SecretManager create secret failed, message: " << exc.message() << std::endl;
       throw Core::ServiceException(exc.message());
     }
     return {.region=secret.region, .name=secret.name, .arn=secret.arn, .versionId=secret.versionId};
@@ -106,16 +114,70 @@ namespace AwsMock::Service {
         std::string base64Decoded = Core::Crypto::Base64Decode(secret.secretString);
         int len = (int) base64Decoded.length();
         response.secretString = std::string(reinterpret_cast<char *>(Core::Crypto::Aes256DecryptString((unsigned char *) base64Decoded.c_str(), &len, _kmsKey)));
-      } else {
+        response.secretString[len] = '\0';
+      } else if (!secret.secretString.empty()) {
         std::string base64Decoded = Core::Crypto::Base64Decode(secret.secretString);
         int len = (int) base64Decoded.length();
         response.secretBinary = std::string(reinterpret_cast<char *>(Core::Crypto::Aes256DecryptString((unsigned char *) base64Decoded.c_str(), &len, _kmsKey)));
+      } else  {
+        log_warning_stream(_logger) << "Neither string nor binary, secretId: " << request.secretId << std::endl;
       }
       log_debug_stream(_logger) << "Get secret value, secretId: " << request.secretId << std::endl;
+
+      // Update database
+      secret.lastAccessedDate = Poco::Timestamp().epochTime();
+      _database.UpdateSecret(secret);
+      log_trace_stream(_logger) << "Secret updated, secretId: " << request.secretId << std::endl;
+
       return response;
 
     } catch (Poco::Exception &exc) {
       log_error_stream(_logger) << "Secret describe secret failed, message: " + exc.message() << std::endl;
+      throw Core::ServiceException(exc.message());
+    }
+  }
+
+  Dto::SecretsManager::ListSecretsResponse SecretsManagerService::ListSecrets(const Dto::SecretsManager::ListSecretsRequest &request) {
+    log_trace_stream(_logger) << "List secrets request: " << request.ToString() << std::endl;
+
+    Dto::SecretsManager::ListSecretsResponse response;
+    try {
+
+      // Get object from database
+      Database::Entity::SecretsManager::SecretList secrets = _database.ListSecrets();
+
+      // Convert to DTO
+      for(const auto &s : secrets)  {
+        Dto::SecretsManager::Secret secret;
+        secret.primaryRegion = s.primaryRegion;
+        secret.arn = s.arn;
+        secret.name = s.name;
+        secret.description = s.description;
+        secret.kmsKeyId = s.kmsKeyId;
+        secret.createdDate = s.createdDate;
+        secret.deletedDate = s.deletedDate;
+        secret.lastAccessedDate = s.lastAccessedDate;
+        secret.lastChangedDate = s.lastChangedDate;
+        secret.lastRotatedDate = s.lastRotatedDate;
+        secret.nextRotatedDate = s.nextRotatedDate;
+        secret.rotationEnabled = s.rotationEnabled;
+        secret.rotationLambdaARN = s.rotationLambdaARN;
+
+        // Rotation rules
+        secret.rotationRules.automaticallyAfterDays = s.rotationRules.automaticallyAfterDays;
+        secret.rotationRules.duration = s.rotationRules.duration;
+        secret.rotationRules.scheduleExpression = s.rotationRules.scheduleExpression;
+
+        response.secretList.emplace_back(secret);
+      }
+      //response.nextToken = secrets.back().secretId;
+
+      // Convert to DTO
+      log_debug_stream(_logger) << "Database list secrets, region: " << request.region << std::endl;
+      return response;
+
+    } catch (Poco::Exception &exc) {
+      log_error_stream(_logger) << "List secrets failed, message: " + exc.message() << std::endl;
       throw Core::ServiceException(exc.message());
     }
   }
@@ -139,6 +201,7 @@ namespace AwsMock::Service {
       secret.secretString = request.secretString;
       secret.secretBinary = request.secretBinary;
       secret.description = request.description;
+      secret.lastChangedDate = Poco::Timestamp().epochTime();
 
       secret = _database.UpdateSecret(secret);
 
@@ -150,8 +213,39 @@ namespace AwsMock::Service {
       log_error_stream(_logger) << "Secret describe secret failed, message: " + exc.message() << std::endl;
       throw Core::ServiceException(exc.message());
     }
+  }
 
-    return {};
+  Dto::SecretsManager::RotateSecretResponse SecretsManagerService::RotateSecret(const Dto::SecretsManager::RotateSecretRequest &request) {
+    log_trace_stream(_logger) << "Rotate secret request: " << request.ToString() << std::endl;
+
+    // Check bucket existence
+    if (!_database.SecretExists(request.secretId)) {
+      log_warning_stream(_logger) << "Secret does not exist, secretId: " << request.secretId << std::endl;
+      throw Core::ResourceNotFoundException("Secret does not exist, secretId: " + request.secretId);
+    }
+
+    try {
+
+      // Get object from database
+      Database::Entity::SecretsManager::Secret secret = _database.GetSecretBySecretId(request.secretId);
+      secret.lastRotatedDate = Poco::Timestamp().epochTime();
+
+      // Update database
+      //secret.rotationRules = request.rotationRules;
+      //secret.secretString = request.secretString;
+      //secret.secretBinary = request.secretBinary;
+      //secret.description = request.description;
+
+      secret = _database.UpdateSecret(secret);
+
+      // Convert to DTO
+      log_debug_stream(_logger) << "Database secret described, secretId: " << request.secretId << std::endl;
+      return {.region=secret.region, .arn=secret.arn};
+
+    } catch (Poco::Exception &exc) {
+      log_error_stream(_logger) << "Secret describe secret failed, message: " + exc.message() << std::endl;
+      throw Core::ServiceException(exc.message());
+    }
   }
 
   Dto::SecretsManager::DeleteSecretResponse SecretsManagerService::DeleteSecret(const Dto::SecretsManager::DeleteSecretRequest &request) {

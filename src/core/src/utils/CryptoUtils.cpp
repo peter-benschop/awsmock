@@ -221,13 +221,13 @@ namespace AwsMock::Core {
   unsigned char *Crypto::Aes256EncryptString(unsigned char *plaintext, int *len, const std::string &key) {
 
     // "opaque" encryption, decryption ctx structures that libcrypto uses to record status of enc/dec operations
-    EVP_CIPHER_CTX *en = EVP_CIPHER_CTX_new();
+    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
 
     unsigned int salt[] = {12345, 54321};
     auto *key_data = (unsigned char *) key.c_str();
     int key_data_len = (int)strlen(reinterpret_cast<const char *>(key_data));
 
-    if (Aes256EncryptionInit(key_data, key_data_len, (unsigned char *) &salt, en)) {
+    if (Aes256EncryptionInit(key_data, key_data_len, (unsigned char *) &salt, ctx)) {
       printf("Couldn't initialize AES cipher\n");
       return {};
     }
@@ -236,10 +236,12 @@ namespace AwsMock::Core {
     int c_len = *len + AES_BLOCK_SIZE, f_len = 0;
     auto *ciphertext = static_cast<unsigned char *>(malloc(c_len));
 
-    // Allows reusing of 'en' for multiple encryption cycles
-    EVP_EncryptInit_ex(en, nullptr, nullptr, nullptr, nullptr);
-    EVP_EncryptUpdate(en, ciphertext, &c_len, plaintext, *len);
-    EVP_EncryptFinal_ex(en, ciphertext + c_len, &f_len);
+    // Allows reusing of 'ctx' for multiple encryption cycles
+    EVP_EncryptInit_ex(ctx, nullptr, nullptr, nullptr, nullptr);
+    EVP_EncryptUpdate(ctx, ciphertext, &c_len, plaintext, *len);
+    EVP_EncryptFinal_ex(ctx, ciphertext + c_len, &f_len);
+
+    EVP_CIPHER_CTX_free(ctx);
 
     *len = c_len + f_len;
     return ciphertext;
@@ -248,26 +250,30 @@ namespace AwsMock::Core {
   unsigned char* Crypto::Aes256DecryptString(unsigned char *ciphertext, int *len, const std::string &key) {
 
     // "opaque" encryption, decryption ctx structures that libcrypto uses to record status of enc/dec operations
-    EVP_CIPHER_CTX *en = EVP_CIPHER_CTX_new();
+    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
 
     unsigned int salt[] = {12345, 54321};
     auto *key_data = (unsigned char *) key.c_str();
     int key_data_len = (int)strlen(reinterpret_cast<const char *>(key_data));
 
-    if (Aes256DecryptionInit(key_data, key_data_len, (unsigned char *) &salt, en)) {
+    if (Aes256DecryptionInit(key_data, key_data_len, (unsigned char *) &salt, ctx)) {
       printf("Couldn't initialize AES cipher\n");
       return {};
     }
 
     // Max ciphertext len for n bytes of plaintext is n + AES_BLOCK_SIZE -1 bytes
-    int c_len = *len + AES_BLOCK_SIZE, f_len = 0;
+    int c_len = *len, f_len = 0, p_len = 0;
     auto *plaintext = static_cast<unsigned char *>(malloc(c_len));
 
-    EVP_DecryptInit_ex(en, nullptr, nullptr, nullptr, nullptr);
-    EVP_DecryptUpdate(en, plaintext, &c_len, ciphertext, *len);
-    EVP_DecryptFinal_ex(en, plaintext + c_len, &f_len);
+    EVP_DecryptInit_ex(ctx, nullptr, nullptr, nullptr, nullptr);
+    EVP_DecryptUpdate(ctx, plaintext, &p_len, ciphertext, c_len);
+    p_len = *len;
+    EVP_DecryptFinal(ctx, plaintext + c_len, len);
+    p_len += *len;
 
-    *len = c_len + f_len;
+    EVP_CIPHER_CTX_free(ctx);
+
+    plaintext[p_len] = '\0';
     return plaintext;
   }
 

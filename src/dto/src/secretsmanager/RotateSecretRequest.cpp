@@ -40,7 +40,7 @@ namespace AwsMock::Dto::SecretsManager {
       Core::JsonUtils::GetJsonValueString("ClientRequestToken", rootObject, clientRequestToken);
       Core::JsonUtils::GetJsonValueString("RotationLambdaARN", rootObject, rotationLambdaARN);
       Core::JsonUtils::GetJsonValueBool("RotateImmediately", rootObject, rotateImmediately);
-      rotationRules.FromJson(rootObject->getObject("RotationRules"));
+      rotationRules.FromJsonObject(rootObject->getObject("RotationRules"));
 
     } catch (Poco::Exception &exc) {
       throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_BAD_REQUEST);

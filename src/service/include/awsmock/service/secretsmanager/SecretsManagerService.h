@@ -32,6 +32,8 @@
 #include <awsmock/dto/secretsmanager/DescribeSecretResponse.h>
 #include <awsmock/dto/secretsmanager/GetSecretValueRequest.h>
 #include <awsmock/dto/secretsmanager/GetSecretValueResponse.h>
+#include <awsmock/dto/secretsmanager/ListSecretsRequest.h>
+#include <awsmock/dto/secretsmanager/ListSecretsResponse.h>
 #include <awsmock/dto/secretsmanager/RotateSecretRequest.h>
 #include <awsmock/dto/secretsmanager/RotateSecretResponse.h>
 #include <awsmock/dto/secretsmanager/UpdateSecretRequest.h>
@@ -84,12 +86,28 @@ namespace AwsMock::Service {
     Dto::SecretsManager::GetSecretValueResponse GetSecretValue(const Dto::SecretsManager::GetSecretValueRequest &request);
 
     /**
+     * List existing secrets
+     *
+     * @param request list secrets request
+     * @return ListSecretsResponse
+     */
+    Dto::SecretsManager::ListSecretsResponse ListSecrets(const Dto::SecretsManager::ListSecretsRequest &request);
+
+    /**
      * Updates an existing secret
      *
      * @param request update secret request
      * @return UpdateSecretResponse
      */
     Dto::SecretsManager::UpdateSecretResponse UpdateSecret(const Dto::SecretsManager::UpdateSecretRequest &request);
+
+    /**
+     * Rotates an existing secret
+     *
+     * @param request rotate secret request
+     * @return RotateSecretResponse
+     */
+    Dto::SecretsManager::RotateSecretResponse RotateSecret(const Dto::SecretsManager::RotateSecretRequest &request);
 
     /**
      * Deletes an existing secret

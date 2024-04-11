@@ -57,8 +57,9 @@ set(SECRETSMANAGER_SOURCES src/secretsmanager/CreateSecretRequest.cpp src/secret
         src/secretsmanager/GetSecretValueRequest.cpp src/secretsmanager/GetSecretValueResponse.cpp
         src/secretsmanager/ReplicationStatus.cpp src/secretsmanager/VersionIdsToStages.cpp
         src/secretsmanager/UpdateSecretRequest.cpp src/secretsmanager/UpdateSecretResponse.cpp
-        src/secretsmanager/SecretTags.cpp src/secretsmanager/RotateSecretRequest.cpp
-        src/secretsmanager/RotateSecretResponse.cpp src/secretsmanager/RotationRules.cpp)
+        src/secretsmanager/SecretTags.cpp src/secretsmanager/RotateSecretRequest.cpp src/secretsmanager/Filter.cpp
+        src/secretsmanager/RotateSecretResponse.cpp src/secretsmanager/RotationRules.cpp src/secretsmanager/Secret.cpp
+        src/secretsmanager/ListSecretsRequest.cpp src/secretsmanager/ListSecretsResponse.cpp)
 set(MODULE_SOURCES src/module/Module.cpp src/module/GatewayConfig.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
@@ -71,7 +72,8 @@ add_subdirectory(tst)
 include_directories(include ../core/include ../db/include /usr/include/mongo /usr/include/bsoncxx/v_noabi
         /usr/include/mongocxx/v_noabi)
 
-add_library(${LIBRARY} SHARED ${SOURCES})
+add_library(${LIBRARY} SHARED ${SOURCES}
+        include/awsmock/dto/secretsmanager/Filter.h)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 

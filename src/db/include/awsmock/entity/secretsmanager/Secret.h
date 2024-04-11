@@ -15,6 +15,7 @@
 #include <Poco/DateTimeFormat.h>
 #include <Poco/DateTimeFormatter.h>
 #include <Poco/JSON/Parser.h>
+#include <Poco/Logger.h>
 #include <Poco/UUIDGenerator.h>
 
 // MongoDB includes
@@ -23,12 +24,12 @@
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <mongocxx/stdx.hpp>
+#include <mongocxx/exception/exception.hpp>
 
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/NumberUtils.h>
-#include <awsmock/entity/sqs/MessageAttribute.h>
-#include <awsmock/entity/sqs/MessageStatus.h>
+#include <awsmock/entity/secretsmanager/RotationRules.h>
 
 namespace AwsMock::Database::Entity::SecretsManager {
 
@@ -95,6 +96,61 @@ namespace AwsMock::Database::Entity::SecretsManager {
      * Description
      */
     std::string description;
+
+    /**
+     * Owning service
+     */
+    std::string owningService;
+
+    /**
+     * Primary region
+     */
+    std::string primaryRegion;
+
+    /**
+     * RotationRules
+     */
+    RotationRules rotationRules;
+
+    /**
+     * Creation date
+     */
+    long createdDate = 0;
+
+    /**
+     * Deleted date
+     */
+    long deletedDate = 0;
+
+    /**
+     * Last access date
+     */
+    long lastAccessedDate = 0;
+
+    /**
+     * Last changed date
+     */
+    long lastChangedDate = 0;
+
+    /**
+     * Last rotation date
+     */
+    long lastRotatedDate = 0;
+
+    /**
+     * Next rotation date
+     */
+    long nextRotatedDate = 0;
+
+    /**
+     * Next rotation date
+     */
+    bool rotationEnabled = false;
+
+    /**
+     * Rotation lambda ARN
+     */
+    std::string rotationLambdaARN;
 
     /**
      * Creation date

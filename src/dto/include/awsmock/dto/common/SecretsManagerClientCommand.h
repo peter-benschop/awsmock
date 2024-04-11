@@ -29,6 +29,7 @@ namespace AwsMock::Dto::Common {
     GET_SECRET_VALUE,
     UPDATE_SECRET,
     ROTATE_SECRET,
+    LIST_SECRETS,
     UNKNOWN
   };
 
@@ -39,6 +40,7 @@ namespace AwsMock::Dto::Common {
     {SecretsManagerCommandType::GET_SECRET_VALUE, "GetSecretValue"},
     {SecretsManagerCommandType::UPDATE_SECRET, "UpdateSecret"},
     {SecretsManagerCommandType::ROTATE_SECRET, "RotateSecret"},
+    {SecretsManagerCommandType::LIST_SECRETS, "ListSecrets"},
     {SecretsManagerCommandType::UNKNOWN, "Unknown"},
   };
 

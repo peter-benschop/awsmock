@@ -77,7 +77,6 @@ namespace AwsMock::Service {
 
     // Create HTTP request and set headers
     Poco::Net::HTTPClientSession session(host, port);
-    session.setReceiveTimeout(Poco::Timespan(120, 0));
     log_trace_stream(_logger) << "Forward session, host: " << host << " port: " << port << std::endl;
 
     // Send request with body
