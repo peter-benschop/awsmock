@@ -194,7 +194,7 @@ namespace AwsMock::Database {
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
         _logger.error() << "Database exception " << exc.what() << std::endl;
-        throw Core::DatabaseException(exc.what(), 500);
+        throw Core::DatabaseException(exc.what());
       }
 
     } else {
@@ -224,9 +224,9 @@ namespace AwsMock::Database {
       mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
 
       auto secretCursor = _secretCollection.find({});
-      for (auto bucket : secretCursor) {
+      for (auto secret : secretCursor) {
         Entity::SecretsManager::Secret result;
-        result.FromDocument(bucket);
+        result.FromDocument(secret);
         secretList.push_back(result);
       }
 
@@ -258,7 +258,7 @@ namespace AwsMock::Database {
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
         _logger.error() << "Database exception " << exc.what() << std::endl;
-        throw Core::DatabaseException(exc.what(), 500);
+        throw Core::DatabaseException(exc.what());
       }
 
     } else {
@@ -286,7 +286,7 @@ namespace AwsMock::Database {
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
         _logger.error() << "Database exception " << exc.what() << std::endl;
-        throw Core::DatabaseException(exc.what(), 500);
+        throw Core::DatabaseException(exc.what());
       }
 
     } else {

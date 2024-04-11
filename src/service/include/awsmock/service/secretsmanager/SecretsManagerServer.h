@@ -32,6 +32,15 @@
 
 namespace AwsMock::Service {
 
+  /**
+   * Secret manager server.
+   *
+   * <p>
+   * Default endpoint is localhost:9507. The server supports 50 concurrent threads and support are queue length of 250.
+   * </p>
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   class SecretsManagerServer : public AbstractServer {
 
   public:

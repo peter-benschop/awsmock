@@ -6,6 +6,7 @@
 #define AWSMOCK_CORE_RESOURCE_NOT_FOUND_EXCEPTION_H
 
 #include "Poco/Exception.h"
+#include "Poco/Net/HTTPResponse.h"
 
 namespace AwsMock::Core {
 
@@ -19,7 +20,7 @@ namespace AwsMock::Core {
      *
      * @param code exception code, default: 0
      */
-    explicit ResourceNotFoundException(int code = 0);
+    explicit ResourceNotFoundException(int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_NOT_FOUND);
 
     /**
      * Constructor.
@@ -27,7 +28,7 @@ namespace AwsMock::Core {
      * @param msg exception message
      * @param code exception code, default: 0
      */
-    explicit ResourceNotFoundException(const std::string &msg, int code = 0);
+    explicit ResourceNotFoundException(const std::string &msg, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_NOT_FOUND);
 
     /**
      * Constructor.
@@ -36,7 +37,7 @@ namespace AwsMock::Core {
      * @param arg exception argument, will be appended to the message, separated with a ':'.
      * @param code exception code, default: 0
      */
-    ResourceNotFoundException(const std::string &msg, const std::string &arg, int code = 0);
+    ResourceNotFoundException(const std::string &msg, const std::string &arg, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_NOT_FOUND);
 
     /**
      * Constructor.
@@ -45,7 +46,7 @@ namespace AwsMock::Core {
      * @param exc parent exception.
      * @param code exception code, default: 0
      */
-    ResourceNotFoundException(const std::string &msg, const Poco::Exception &exc, int code = 0);
+    ResourceNotFoundException(const std::string &msg, const Poco::Exception &exc, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_NOT_FOUND);
 
     /**
      * Copy constructor.

@@ -28,6 +28,11 @@
 
 namespace AwsMock::Database {
 
+  /**
+   * DynamoDB in-memory database.
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   class DynamoDbMemoryDb {
 
   public:

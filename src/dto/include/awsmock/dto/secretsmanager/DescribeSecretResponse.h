@@ -17,7 +17,7 @@
 
 // AwsMoc includes
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/ServiceException.h>
+#include "awsmock/core/JsonException.h"
 #include <awsmock/dto/secretsmanager/ReplicationStatus.h>
 #include <awsmock/dto/secretsmanager/VersionIdsToStages.h>
 #include <awsmock/dto/secretsmanager/SecretTags.h>

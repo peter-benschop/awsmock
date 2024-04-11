@@ -24,6 +24,11 @@
 
 namespace AwsMock::Database {
 
+  /**
+   * MongoDB database base class.
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   class Database {
 
     public:

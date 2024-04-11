@@ -7,7 +7,9 @@
 namespace AwsMock::Dto::SecretsManager {
 
   std::string CreateSecretRequest::ToJson() const {
+
     try {
+
       Poco::JSON::Object rootJson;
       rootJson.set("Region", region);
       rootJson.set("Name", name);
@@ -25,7 +27,7 @@ namespace AwsMock::Dto::SecretsManager {
       return os.str();
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+      throw Core::JsonException(exc.message());
     }
   }
 
@@ -48,7 +50,7 @@ namespace AwsMock::Dto::SecretsManager {
       tags.FromJson(rootObject->getObject("Tags"));
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_BAD_REQUEST);
+      throw Core::JsonException(exc.message());
     }
   }
 

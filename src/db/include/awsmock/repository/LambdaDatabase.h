@@ -22,6 +22,11 @@
 
 namespace AwsMock::Database {
 
+  /**
+   * Lambda MongoDB database.
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   class LambdaDatabase : public Database {
 
     public:

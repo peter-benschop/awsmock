@@ -28,7 +28,7 @@ namespace AwsMock::Dto::SecretsManager {
     return os.str();
   }
 
-  void RotationRules::FromJson(const Poco::JSON::Object::Ptr &jsonObject) {
+  void RotationRules::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
 
     try {
 

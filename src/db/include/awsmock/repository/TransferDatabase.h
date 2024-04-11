@@ -22,6 +22,11 @@
 
 namespace AwsMock::Database {
 
+  /**
+   * Transfer manager MongoDB database.
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   class TransferDatabase : public Database {
 
     public:

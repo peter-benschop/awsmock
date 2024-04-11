@@ -20,6 +20,11 @@
 
 namespace AwsMock::Database {
 
+  /**
+   * DynamoDB MongoDB database.
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   class DynamoDbDatabase : public Database {
 
     public:

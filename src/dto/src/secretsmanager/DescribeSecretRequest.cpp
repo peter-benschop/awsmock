@@ -18,7 +18,7 @@ namespace AwsMock::Dto::SecretsManager {
       return os.str();
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+      throw Core::JsonException(exc.message());
     }
   }
 
@@ -34,7 +34,7 @@ namespace AwsMock::Dto::SecretsManager {
       Core::JsonUtils::GetJsonValueString("SecretId", rootObject, secretId);
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_BAD_REQUEST);
+      throw Core::JsonException(exc.message());
     }
   }
 

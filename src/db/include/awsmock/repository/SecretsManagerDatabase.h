@@ -25,6 +25,11 @@
 
 namespace AwsMock::Database {
 
+  /**
+   * Secrets manager MongoDB database.
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   class SecretsManagerDatabase : public Database {
 
   public:

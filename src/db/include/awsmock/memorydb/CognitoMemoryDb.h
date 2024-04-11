@@ -26,6 +26,11 @@
 
 namespace AwsMock::Database {
 
+  /**
+   * Cognito in-memory database.
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   class CognitoMemoryDb {
 
     public:

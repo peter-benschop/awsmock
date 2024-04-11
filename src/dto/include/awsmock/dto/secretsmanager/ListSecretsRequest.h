@@ -2,12 +2,13 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SECRETSMANAGER_DESCRIBE_SECRET_REQUEST_H
-#define AWSMOCK_DTO_SECRETSMANAGER_DESCRIBE_SECRET_REQUEST_H
+#ifndef AWSMOCK_DTO_SECRETSMANAGER_LIST_SECRETS_REQUEST_H
+#define AWSMOCK_DTO_SECRETSMANAGER_LIST_SECRETS_REQUEST_H
 
 // C++ standard includes
 #include <string>
 #include <sstream>
+#include <vector>
 
 // Poco includes
 #include <Poco/JSON/JSON.h>
@@ -18,10 +19,29 @@
 // AwsMoc includes
 #include <awsmock/core/JsonUtils.h>
 #include "awsmock/core/JsonException.h"
+#include "awsmock/dto/secretsmanager/Filter.h"
 
 namespace AwsMock::Dto::SecretsManager {
 
-  struct DescribeSecretRequest {
+  /**
+   * List secrets request.
+   *
+   * Example:
+   * <pre>
+   * {
+   *   "Filters": [
+   *      {
+   *         "Key": "string",
+   *         "Values": [ "string" ]
+   *      }
+   *   ],
+   *   "IncludePlannedDeletion": boolean,
+   *   "MaxResults": number,
+   *   "NextToken": "string",
+   *   "SortOrder": "string"
+   * }
+   */
+  struct ListSecretsRequest {
 
     /**
      * Region
@@ -29,9 +49,29 @@ namespace AwsMock::Dto::SecretsManager {
     std::string region;
 
     /**
-     * Secret Id
+     * Next token
      */
-    std::string secretId;
+    std::string nextToken;
+
+    /**
+     * Sort order
+     */
+    std::string sortOrder;
+
+    /**
+     * Maximal number of results
+     */
+    int maxResults;
+
+    /**
+     * Include deletion flag
+     */
+    bool includePlannedDeletion = false;
+
+    /**
+     * Selection filters
+     */
+    std::vector<Filter> filters;
 
     /**
      * AWS request ID
@@ -64,10 +104,10 @@ namespace AwsMock::Dto::SecretsManager {
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const DescribeSecretRequest &r);
+    friend std::ostream &operator<<(std::ostream &os, const ListSecretsRequest &r);
 
   };
 
 } // namespace AwsMock::Dto::SecretsManager
 
-#endif // AWSMOCK_DTO_SECRETSMANAGER_DESCRIBE_SECRET_REQUEST_H
+#endif // AWSMOCK_DTO_SECRETSMANAGER_LIST_SECRETS_REQUEST_H
