@@ -184,6 +184,13 @@ namespace AwsMock::Database::Entity::SecretsManager {
     [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
     /**
+     * Converts the entity to a JSON object
+     *
+     * @param jsonObject JSON object.
+     */
+    void FromJsonObject(const Poco::JSON::Object::Ptr& jsonObject);
+
+    /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.

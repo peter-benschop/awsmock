@@ -127,7 +127,7 @@ namespace AwsMock::Dto::Common {
         for (const auto &secret : secrets) {
           jsonSecretsArray.add(secret.ToJsonObject());
         }
-        infrastructureJson.set("secretsmanager", jsonSecretsArray);
+        infrastructureJson.set("secretsmanager-secrets", jsonSecretsArray);
       }
 
       // Add infrastructure JSON to root JSON
@@ -218,17 +218,17 @@ namespace AwsMock::Dto::Common {
         }
       }
 
-      if (infrastructureObject->has("secretsmanager")) {
-        Poco::JSON::Array::Ptr secretsArray = infrastructureObject->getArray("secrets");
+      if (infrastructureObject->has("secretsmanager-secrets")) {
+        Poco::JSON::Array::Ptr secretsArray = infrastructureObject->getArray("secretsmanager-secrets");
         for (int i = 0; i < secretsArray->size(); i++) {
           Database::Entity::SecretsManager::Secret secretsObject;
-          //secretsObject.FromJsonObject(secretsArray->getObject(i));
+          secretsObject.FromJsonObject(secretsArray->getObject(i));
           secrets.emplace_back(secretsObject);
         }
       }
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      throw Core::ServiceException(exc.message());
     }
 
   }

@@ -211,12 +211,14 @@ namespace AwsMock::Service {
       if (!infrastructure.sqsQueues.empty()) {
         for (auto &queue : infrastructure.sqsQueues) {
           _sqsDatabase.CreateOrUpdateQueue(queue);
+          log_debug_stream(_logger) << "SQS queues imported, url: " << queue.queueUrl << std::endl;
         }
         log_info_stream(_logger) << "SQS queues imported, count: " << infrastructure.sqsQueues.size() << std::endl;
       }
       if (!infrastructure.sqsMessages.empty()) {
         for (auto &message : infrastructure.sqsMessages) {
           _sqsDatabase.CreateOrUpdateMessage(message);
+          log_debug_stream(_logger) << "SQS queues imported, url: " << message.queueUrl << std::endl;
         }
         log_info_stream(_logger) << "SQS messages imported, count: " << infrastructure.sqsMessages.size() << std::endl;
       }
