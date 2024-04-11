@@ -112,6 +112,33 @@ namespace AwsMock::Database::Entity::SecretsManager {
 
   }
 
+  /**
+   * Converts the JSON object to an entity
+   *
+   * @param jsonObject JSON object.
+   */
+  void Secret::FromJsonObject(const Poco::JSON::Object::Ptr& jsonObject) {
+
+    Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
+    Core::JsonUtils::GetJsonValueString("name", jsonObject, name);
+    Core::JsonUtils::GetJsonValueString("arn", jsonObject, arn);
+    Core::JsonUtils::GetJsonValueString("secretId", jsonObject, secretId);
+    Core::JsonUtils::GetJsonValueString("kmsKeyId", jsonObject, kmsKeyId);
+    Core::JsonUtils::GetJsonValueString("versionId", jsonObject, versionId);
+    Core::JsonUtils::GetJsonValueString("secretString", jsonObject, secretString);
+    Core::JsonUtils::GetJsonValueString("secretBinary", jsonObject, secretBinary);
+    Core::JsonUtils::GetJsonValueString("description", jsonObject, description);
+    Core::JsonUtils::GetJsonValueString("owningService", jsonObject, owningService);
+    Core::JsonUtils::GetJsonValueString("primaryRegion", jsonObject, primaryRegion);
+    Core::JsonUtils::GetJsonValueLong("createdDate", jsonObject, createdDate);
+    Core::JsonUtils::GetJsonValueLong("deletedDate", jsonObject, deletedDate);
+    Core::JsonUtils::GetJsonValueLong("lastAccessedDate", jsonObject, lastAccessedDate);
+    Core::JsonUtils::GetJsonValueLong("lastRotatedDate", jsonObject, lastRotatedDate);
+    Core::JsonUtils::GetJsonValueLong("nextRotatedDate", jsonObject, nextRotatedDate);
+    Core::JsonUtils::GetJsonValueBool("rotationEnabled", jsonObject, rotationEnabled);
+    Core::JsonUtils::GetJsonValueString("rotationLambdaARN", jsonObject, rotationLambdaARN);
+  }
+
   std::string Secret::ToString() const {
     std::stringstream ss;
     ss << (*this);

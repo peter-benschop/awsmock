@@ -11,16 +11,17 @@
 #include "Poco/DateTimeFormatter.h"
 
 // AwsMock includes
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/HttpUtils.h"
-#include "awsmock/core/MetricService.h"
-#include "awsmock/core/MetricServiceTimer.h"
-#include "awsmock/core/MetricDefinition.h"
-#include "awsmock/core/NumberUtils.h"
-#include "awsmock/dto/common/UserAgent.h"
-#include "awsmock/dto/common/S3ClientCommand.h"
-#include "awsmock/service/common/AbstractHandler.h"
-#include "S3Service.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/HttpUtils.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/core/MetricServiceTimer.h>
+#include <awsmock/core/MetricDefinition.h>
+#include <awsmock/core/NumberUtils.h>
+#include <awsmock/core/JsonException.h>
+#include <awsmock/dto/common/UserAgent.h>
+#include <awsmock/dto/common/S3ClientCommand.h>
+#include <awsmock/service/common/AbstractHandler.h>
+#include <awsmock/service/s3/S3Service.h>
 
 namespace AwsMock::Service {
 
