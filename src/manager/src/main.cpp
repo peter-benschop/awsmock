@@ -81,7 +81,7 @@ namespace AwsMock {
       _restService.StopServer();
 
       // Shutdown monitoring
-      _metricService.ShutdownServer();
+      _metricService.Shutdown();
 
       log_debug_stream(_logger) << "Bye, bye and thanks for all the fish" << std::endl;
     }
@@ -148,9 +148,7 @@ namespace AwsMock {
      * Initialize the Prometheus monitoring counters and StartServer the prometheus manager.
      */
     void InitializeMonitoring() {
-
-      _metricService.Initialize();
-      _metricService.StartServer();
+      _metricService.Start();
     }
 
     /**

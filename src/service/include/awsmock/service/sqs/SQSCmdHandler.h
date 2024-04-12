@@ -12,19 +12,18 @@
 #include <Poco/DateTimeFormatter.h>
 
 // AwsMock includes
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/HttpUtils.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/MetricService.h"
-#include "awsmock/core/MetricServiceTimer.h"
-#include "awsmock/core/MetricDefinition.h"
-#include "awsmock/dto/common/SQSClientCommand.h"
-#include "awsmock/dto/sqs/GetQueueUrlRequest.h"
-#include "awsmock/dto/sqs/GetQueueUrlResponse.h"
-#include "awsmock/dto/sqs/DeleteMessageBatchEntry.h"
-#include "awsmock/dto/sqs/DeleteMessageBatchRequest.h"
-#include "awsmock/service/common/AbstractHandler.h"
-#include "SQSService.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/HttpUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/core/MetricDefinition.h>
+#include <awsmock/dto/common/SQSClientCommand.h>
+#include <awsmock/dto/sqs/GetQueueUrlRequest.h>
+#include <awsmock/dto/sqs/GetQueueUrlResponse.h>
+#include <awsmock/dto/sqs/DeleteMessageBatchEntry.h>
+#include <awsmock/dto/sqs/DeleteMessageBatchRequest.h>
+#include <awsmock/service/common/AbstractHandler.h>
+#include <awsmock/service/sqs/SQSService.h>
 
 #define DEFAULT_SQS_ACCOUNT_ID "000000000000"
 

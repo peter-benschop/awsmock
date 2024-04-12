@@ -16,13 +16,13 @@
 #include <Poco/Net/HTTPClientSession.h>
 
 // AwsMock includes
-#include "awsmock/core/AwsUtils.h"
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/HttpUtils.h"
-#include "awsmock/core/MetricService.h"
-#include "awsmock/core/MetricServiceTimer.h"
-#include "awsmock/core/MetricDefinition.h"
-#include "awsmock/service/common/AbstractHandler.h"
+#include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/HttpUtils.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/core/MetricDefinition.h>
+#include <awsmock/core/MetricServiceTimer.h>
+#include <awsmock/service/common/AbstractHandler.h>
 
 namespace AwsMock::Service {
 

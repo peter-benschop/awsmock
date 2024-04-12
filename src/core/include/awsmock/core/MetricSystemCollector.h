@@ -2,8 +2,8 @@
 // Created by vogje01 on 01/05/2023.
 //
 
-#ifndef AWSMOCK_CORE_METRICSYSTEMCOLLECTOR_H
-#define AWSMOCK_CORE_METRICSYSTEMCOLLECTOR_H
+#ifndef AWSMOCK_CORE_METRIC_SYSTEM_COLLECTOR_H
+#define AWSMOCK_CORE_METRIC_SYSTEM_COLLECTOR_H
 
 // C++ Standard includes
 #include <sstream>
@@ -19,8 +19,9 @@
 #include <Poco/Prometheus/MetricsServer.h>
 
 // AwsMock includes
-#include "awsmock/core/StringUtils.h"
-#include "awsmock/core/LogStream.h"
+#include <awsmock/core/StringUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/Timer.h>
 
 // System counter
 #define VIRTUAL_MEMORY "virtual_memory_used"
@@ -37,7 +38,7 @@ namespace AwsMock::Core {
    *
    * @author jens.vogt@opitz-consulting.com
   */
-  class MetricSystemCollector {
+  class MetricSystemCollector : public Core::Timer {
 
   public:
 
@@ -52,17 +53,21 @@ namespace AwsMock::Core {
     ~MetricSystemCollector();
 
     /**
-     * Runnable method
-     *
-     * @param timer Poco timer implementation
-     */
-    void onTimer(Poco::Timer &timer);
-
-  private:
-    /**
      * Initialization
      */
-    void InitializeSystemCounter();
+    void Initialize() override;
+
+    /**
+     * Runnable method
+     */
+    void Run() override;
+
+    /**
+     * Shutdown
+     */
+    void Shutdown() override;
+
+  private:
 
     /**
      * Updates the system counter
@@ -123,7 +128,8 @@ namespace AwsMock::Core {
      * Last user CPU
      */
     clock_t lastUserCPU{};
+
   };
 } // namespace AwsMock::Core
 
-#endif //AWSMOCK_CORE_METRICSYSTEMCOLLECTOR_H
+#endif //AWSMOCK_CORE_METRIC_SYSTEM_COLLECTOR_H

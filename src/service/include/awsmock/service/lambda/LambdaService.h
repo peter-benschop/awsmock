@@ -19,26 +19,27 @@
 #include <Poco/Net/HTTPResponse.h>
 
 // AwsMock includes
-#include "awsmock/core/AwsUtils.h"
-#include "awsmock/core/CryptoUtils.h"
-#include "awsmock/core/MetricServiceTimer.h"
-#include "awsmock/core/ServiceException.h"
-#include "awsmock/core/StringUtils.h"
-#include "awsmock/core/SystemUtils.h"
-#include "awsmock/core/TarUtils.h"
-#include "awsmock/dto/s3/EventNotification.h"
-#include "awsmock/dto/lambda/CreateFunctionRequest.h"
-#include "awsmock/dto/lambda/CreateFunctionResponse.h"
-#include "awsmock/dto/lambda/CreateNotification.h"
-#include "awsmock/dto/lambda/CreateTagRequest.h"
-#include "awsmock/dto/lambda/InvocationNotification.h"
-#include "awsmock/dto/lambda/ListFunctionResponse.h"
-#include "awsmock/dto/lambda/ListTagsResponse.h"
-#include "awsmock/dto/lambda/DeleteFunctionRequest.h"
-#include "awsmock/dto/lambda/DeleteTagsRequest.h"
-#include "awsmock/repository/LambdaDatabase.h"
-#include "awsmock/repository/S3Database.h"
-#include "awsmock/service/common/DockerService.h"
+#include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/core/MetricServiceTimer.h>
+#include <awsmock/core/ServiceException.h>
+#include <awsmock/core/StringUtils.h>
+#include <awsmock/core/SystemUtils.h>
+#include <awsmock/core/TarUtils.h>
+#include <awsmock/dto/s3/EventNotification.h>
+#include <awsmock/dto/lambda/CreateFunctionRequest.h>
+#include <awsmock/dto/lambda/CreateFunctionResponse.h>
+#include <awsmock/dto/lambda/CreateNotification.h>
+#include <awsmock/dto/lambda/CreateTagRequest.h>
+#include <awsmock/dto/lambda/InvocationNotification.h>
+#include <awsmock/dto/lambda/ListFunctionResponse.h>
+#include <awsmock/dto/lambda/ListTagsResponse.h>
+#include <awsmock/dto/lambda/DeleteFunctionRequest.h>
+#include <awsmock/dto/lambda/DeleteTagsRequest.h>
+#include <awsmock/repository/LambdaDatabase.h>
+#include <awsmock/repository/S3Database.h>
+#include <awsmock/service/common/DockerService.h>
 
 namespace AwsMock::Service {
 
