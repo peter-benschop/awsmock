@@ -25,44 +25,42 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "SNSServer initialized" << std::endl;
   }
 
-  SNSServer::~SNSServer() {
-    StopServer();
-  }
-
-  void SNSServer::MainLoop() {
+  void SNSServer::Initialize() {
 
     // Check module active
     if (!IsActive("sns")) {
       log_info_stream(_logger) << "SNS module inactive" << std::endl;
       return;
     }
-
     log_info_stream(_logger) << "SNS module starting" << std::endl;
-
-    // Start monitoring thread
-    StartMonitoringServer();
 
     // Start REST module
     StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new SNSRequestHandlerFactory(_configuration, _metricService, _condition));
+  }
 
-    while (IsRunning()) {
+  void SNSServer::Run() {
+    log_trace_stream(_logger) << "S3 processing started" << std::endl;
+    UpdateCounters();
+  }
 
-      log_trace_stream(_logger) << "SNSServer processing started" << std::endl;
+  void SNSServer::Shutdown() {
+    StopHttpServer();
+  }
 
-      // Wait for timeout or condition
-      if (InterruptableSleep(_period)) {
-        StopMonitoringServer();
-        break;
-      }
+  void SNSServer::UpdateCounters() {
+
+    // Get total counts
+    long topics = _snsDatabase.CountTopics();
+    long messages = _snsDatabase.CountMessages();
+    _metricService.SetGauge("sns_topic_count_total", topics);
+    _metricService.SetGauge("sns_message_count_total", messages);
+
+    // Count messages per topic
+    for (const auto &topic : _snsDatabase.ListTopics()) {
+      std::string labelValue = Poco::replace(topic.topicName, "-", "_");
+      long messagesPerQueue = _snsDatabase.CountMessages(topic.region, topic.topicArn);
+      _metricService.SetGauge("sns_message_count", "topic", labelValue, messagesPerQueue);
     }
+    log_trace_stream(_logger) << "SNS update counter finished" << std::endl;
   }
-
-  void SNSServer::StartMonitoringServer() {
-    _threadPool.StartThread(_configuration, _metricService, _condition);
-  }
-
-  void SNSServer::StopMonitoringServer() {
-    _threadPool.stopAll();
-  }
-
 } // namespace AwsMock::Worker

@@ -15,10 +15,11 @@
 #include <Poco/Net/HTTPResponse.h>
 
 // AwsMock includes
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/MetricService.h"
-#include "awsmock/core/MetricServiceTimer.h"
-#include "awsmock/dto/lambda/InvocationNotification.h"
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/core/MetricServiceTimer.h>
+#include <awsmock/core/Timer.h>
+#include <awsmock/dto/lambda/InvocationNotification.h>
 
 namespace AwsMock::Service {
 
@@ -32,7 +33,7 @@ namespace AwsMock::Service {
    *
    * @author jens.vogt@opitz-consulting.com
    */
-  class LambdaExecutor : public Poco::Runnable {
+  class LambdaExecutor : public Core::Timer {
 
   public:
 
@@ -45,9 +46,19 @@ namespace AwsMock::Service {
     LambdaExecutor(Core::MetricService &metricService, Poco::NotificationQueue &invokeQueue);
 
     /**
+     * Initialization
+     */
+    void Initialize() override;
+
+    /**
      * Listens for invocation requests and send the invocation to the right port.
      */
-    void run() override;
+    void Run() override;
+
+    /**
+     * Shutdown executor
+     */
+    void Shutdown() override;
 
   private:
 

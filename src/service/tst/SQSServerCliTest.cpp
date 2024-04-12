@@ -40,7 +40,7 @@ namespace AwsMock::Service {
       _queueUrl = "http://" + Core::SystemUtils::GetHostName() + ":" + _port + "/" + _accountId + "/" + TEST_QUEUE;
 
       // Start HTTP manager
-      Poco::ThreadPool::defaultPool().start(_sqsServer);
+      _sqsServer.Start();
     }
 
     void TearDown() override {

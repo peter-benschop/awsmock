@@ -40,8 +40,8 @@ namespace AwsMock::Service {
       _sqsEndpoint = "http://" + _sqsHost + ":" + _sqsPort;
 
       // Start HTTP services
-      Poco::ThreadPool::defaultPool().start(_snsServer);
-      Poco::ThreadPool::defaultPool().start(_sqsServer);
+      _snsServer.Start();
+      _sqsServer.Start();
     }
 
     void TearDown() override {

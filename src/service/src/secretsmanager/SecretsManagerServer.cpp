@@ -25,11 +25,7 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "SecretsManager server initialized" << std::endl;
   }
 
-  SecretsManagerServer::~SecretsManagerServer() {
-    StopServer();
-  }
-
-  void SecretsManagerServer::MainLoop() {
+  void SecretsManagerServer::Initialize() {
 
     // Check module active
     if (!IsActive("secretsmanager")) {
@@ -38,30 +34,16 @@ namespace AwsMock::Service {
     }
     log_info_stream(_logger) << "SecretsManager server starting, port: " << _port << std::endl;
 
-    // Start monitoring thread
-    StartMonitoringServer();
-
     // Start REST module
     StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new SecretsManagerRequestHandlerFactory(_configuration, _metricService, _condition));
-
-    while (IsRunning()) {
-
-      log_trace_stream(_logger) << "SecretsManager processing started" << std::endl;
-
-      // Wait for timeout or condition
-      if (InterruptableSleep(_period)) {
-        StopMonitoringServer();
-        break;
-      }
-    }
   }
 
-  void SecretsManagerServer::StartMonitoringServer() {
-    _threadPool.StartThread(_configuration, _metricService, _condition);
+  void SecretsManagerServer::Run() {
+
   }
 
-  void SecretsManagerServer::StopMonitoringServer() {
-    _threadPool.stopAll();
+  void SecretsManagerServer::Shutdown() {
+    StopHttpServer();
   }
 
 } // namespace AwsMock::Worker

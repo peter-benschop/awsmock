@@ -50,7 +50,7 @@ namespace AwsMock::Service {
       _endpoint = "http://" + _host + ":" + _port;
 
       // Start HTTP manager
-      Poco::ThreadPool::defaultPool().start(_lambdaServer);
+      _lambdaServer.Start();
     }
 
     void TearDown() override {

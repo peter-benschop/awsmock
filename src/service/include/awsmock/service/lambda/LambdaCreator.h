@@ -15,20 +15,21 @@
 #include <Poco/StreamCopier.h>
 
 // AwsMock includes
-#include "awsmock/core/AwsUtils.h"
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/DirUtils.h"
-#include "awsmock/core/FileUtils.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/MetricService.h"
-#include "awsmock/dto/lambda/CreateNotification.h"
-#include "awsmock/entity/lambda/Lambda.h"
-#include "awsmock/repository/LambdaDatabase.h"
-#include "awsmock/service/common/DockerService.h"
+#include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/DirUtils.h>
+#include <awsmock/core/FileUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/core/Timer.h>
+#include <awsmock/dto/lambda/CreateNotification.h>
+#include <awsmock/entity/lambda/Lambda.h>
+#include <awsmock/repository/LambdaDatabase.h>
+#include <awsmock/service/common/DockerService.h>
 
 namespace AwsMock::Service {
 
-  class LambdaCreator : public Poco::Runnable {
+  class LambdaCreator : public Core::Timer {
 
   public:
 
@@ -41,9 +42,19 @@ namespace AwsMock::Service {
     explicit LambdaCreator(Core::Configuration &configuration, Poco::NotificationQueue &createQueue);
 
     /**
+     * Initialization
+     */
+    void Initialize() override;
+
+    /**
      * Listens for invocation requests and send the invocation to the right port.
      */
-    void run() override;
+    void Run() override;
+
+    /**
+     * Shutdown executor
+     */
+    void Shutdown() override;
 
   private:
 

@@ -331,7 +331,7 @@ namespace AwsMock::Service {
 
       }
 
-    } catch (Poco::Exception &exc) {
+    } catch (Core::ServiceException &exc) {
       log_error_stream(_logger) << exc.message() << std::endl;
       SendXmlErrorResponse("S3", response, exc);
     } catch (Core::JsonException &exc) {
@@ -432,7 +432,7 @@ namespace AwsMock::Service {
       }
       }
 
-    } catch (Poco::Exception &exc) {
+    } catch (Core::ServiceException &exc) {
       log_error_stream(_logger) << exc.message() << std::endl;
       SendXmlErrorResponse("S3", response, exc);
     } catch (Core::JsonException &exc) {

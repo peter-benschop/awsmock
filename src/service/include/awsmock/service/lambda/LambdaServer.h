@@ -15,20 +15,19 @@
 #include <Poco/NotificationQueue.h>
 
 // AwsMock includes
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/MetricService.h"
-#include "awsmock/dto/lambda/InvocationNotification.h"
-#include "awsmock/repository/LambdaDatabase.h"
-#include "awsmock/repository/ModuleDatabase.h"
-#include "awsmock/service/s3/S3Service.h"
-#include "awsmock/service/common/AbstractWorker.h"
-#include "awsmock/service/common/AbstractServer.h"
-#include "LambdaExecutor.h"
-#include "LambdaCreator.h"
-#include "LambdaExecutor.h"
-#include "LambdaMonitoring.h"
-#include "LambdaHandlerFactory.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/dto/lambda/InvocationNotification.h>
+#include <awsmock/repository/LambdaDatabase.h>
+#include <awsmock/repository/ModuleDatabase.h>
+#include <awsmock/service/s3/S3Service.h>
+#include <awsmock/service/common/AbstractWorker.h>
+#include <awsmock/service/common/AbstractServer.h>
+#include <awsmock/service/lambda/LambdaExecutor.h>
+#include <awsmock/service/lambda/LambdaCreator.h>
+#include <awsmock/service/lambda/LambdaExecutor.h>
+#include <awsmock/service/lambda/LambdaHandlerFactory.h>
 
 #define LAMBDA_DEFAULT_PORT 9503
 #define LAMBDA_DEFAULT_HOST "localhost"
@@ -58,26 +57,31 @@ namespace AwsMock::Service {
     ~LambdaServer() override;
 
     /**
-     * Main method
+     * Initialization
      */
-    void MainLoop() override;
+    void Initialize() override;
 
     /**
-     * Stop monitoring manager
+     * Main method
      */
-    void StopMonitoringServer();
+    void Run() override;
 
     /**
      * Stop executors
      */
-    void StopExecutors();
+    [[maybe_unused]] void StopExecutors();
+
+    /**
+     * Shutdown
+     */
+    void Shutdown() override;
 
   private:
 
     /**
-     * Start monitoring manager
+     * Update metric counters
      */
-    void StartMonitoringServer();
+    void UpdateCounters();
 
     /**
      * Delete dangling, stopped containers
@@ -131,11 +135,6 @@ namespace AwsMock::Service {
      * Invoke notification queue
      */
     Poco::NotificationQueue &_invokeQueue;
-
-    /**
-     * Thread pool
-     */
-    AwsMock::Core::ThreadPool<LambdaMonitoring> _threadPool;
 
     /**
      * lambda database

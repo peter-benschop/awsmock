@@ -14,15 +14,14 @@
 #include <Poco/Runnable.h>
 
 // AwsMock includes
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/ThreadPool.h"
-#include "awsmock/core/MetricService.h"
-#include "awsmock/repository/ModuleDatabase.h"
-#include "awsmock/repository/SQSDatabase.h"
-#include "awsmock/service/common/AbstractServer.h"
-#include "SNSMonitoring.h"
-#include "SNSHandlerFactory.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/ThreadPool.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/repository/ModuleDatabase.h>
+#include <awsmock/repository/SQSDatabase.h>
+#include <awsmock/service/common/AbstractServer.h>
+#include <awsmock/service/sns/SNSHandlerFactory.h>
 
 #define SNS_DEFAULT_PORT 9502
 #define SNS_DEFAULT_HOST "localhost"
@@ -45,26 +44,26 @@ namespace AwsMock::Service {
     explicit SNSServer(Core::Configuration &configuration, Core::MetricService &metricService);
 
     /**
-     * Destructor
+     * Initialization
      */
-    ~SNSServer() override;
+    void Initialize() override;
 
     /**
      * Main method
      */
-    void MainLoop() override;
+    void Run() override;
 
     /**
-     * Stop monitoring
+     * Shutdown
      */
-    void StopMonitoringServer();
+    void Shutdown() override;
 
   private:
 
     /**
-     * Start monitoring
+     * Update metric counters
      */
-    void StartMonitoringServer();
+    void UpdateCounters();
 
     /**
      * Logger
@@ -85,11 +84,6 @@ namespace AwsMock::Service {
      * S3 module
      */
     Database::SNSDatabase& _snsDatabase;
-
-    /**
-     * Thread pool
-     */
-    AwsMock::Core::ThreadPool<SNSMonitoring> _threadPool;
 
     /**
      * AWS region

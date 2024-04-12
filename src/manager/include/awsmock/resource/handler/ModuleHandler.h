@@ -144,7 +144,7 @@ namespace AwsMock {
       Core::MetricService &_metricService;
 
       /**
-       * Task manager
+       * Timer manager
        */
       Service::ServerMap &_serverMap;
 

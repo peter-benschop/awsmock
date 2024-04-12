@@ -3,19 +3,19 @@ set(LIBRARY awsmocksrv)
 set(LIBRARY_STATIC awsmocksrv_static)
 
 set(S3_SOURCES src/s3/S3Server.cpp src/s3/S3Handler.cpp
-        src/s3/S3CmdHandler.cpp src/s3/S3Service.cpp src/s3/S3Monitoring.cpp)
+        src/s3/S3CmdHandler.cpp src/s3/S3Service.cpp)
 set(SQS_SOURCES src/sqs/SQSServer.cpp src/sqs/SQSHandler.cpp src/sqs/SQSCmdHandler.cpp src/sqs/SQSService.cpp
-        src/sqs/SQSMonitoring.cpp)
+)
 set(SNS_SOURCES src/sns/SNSServer.cpp src/sns/SNSHandler.cpp src/sns/SNSCmdHandler.cpp
-        src/sns/SNSService.cpp src/sns/SNSMonitoring.cpp)
+        src/sns/SNSService.cpp)
 set(LAMBDA_SOURCES src/lambda/LambdaServer.cpp src/lambda/LambdaHandler.cpp src/lambda/LambdaService.cpp
-        src/lambda/LambdaMonitoring.cpp src/lambda/LambdaCreator.cpp src/lambda/LambdaExecutor.cpp)
+        src/lambda/LambdaCreator.cpp src/lambda/LambdaExecutor.cpp)
 set(COGNITO_SOURCES src/cognito/CognitoHandler.cpp src/cognito/CognitoHandler.cpp src/cognito/CognitoCliHandler.cpp
         src/cognito/CognitoJava2Handler.cpp src/cognito/CognitoService.cpp src/cognito/CognitoServer.cpp
-        src/cognito/CognitoMonitoring.cpp)
+)
 set(TRANSFER_SOURCES src/transfer/TransferServer.cpp src/transfer/TransferHandler.cpp src/transfer/TransferService.cpp)
 set(DYNAMODB_SOURCES src/dynamodb/DynamoDbServer.cpp src/dynamodb/DynamoDbHandler.cpp src/dynamodb/DynamoDbService.cpp
-        src/dynamodb/DynamoDbMonitoring.cpp src/dynamodb/DynamoDbCmdHandler.cpp)
+        src/dynamodb/DynamoDbCmdHandler.cpp)
 set(SECRETMANAGER_SOURCES src/secretsmanager/SecretsManagerServer.cpp src/secretsmanager/SecretsManagerHandler.cpp
         src/secretsmanager/SecretsManagerCmdHandler.cpp src/secretsmanager/SecretsManagerService.cpp)
 set(FTP_SOURCES src/ftpserver/Filesystem.cpp src/ftpserver/FtpSession.cpp src/ftpserver/FtpServer.cpp

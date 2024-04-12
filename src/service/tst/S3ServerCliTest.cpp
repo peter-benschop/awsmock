@@ -41,7 +41,7 @@ namespace AwsMock::Service {
       _output = "json";
 
       // Start HTTP manager
-      Poco::ThreadPool::defaultPool().start(_s3Server);
+      _s3Server.Start();
     }
 
     void TearDown() override {

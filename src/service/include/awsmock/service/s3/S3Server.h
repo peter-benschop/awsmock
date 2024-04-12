@@ -2,8 +2,8 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_S3SERVER_H
-#define AWSMOCK_SERVICE_S3SERVER_H
+#ifndef AWSMOCK_SERVICE_S3_SERVER_H
+#define AWSMOCK_SERVICE_S3_SERVER_H
 
 // Poco includes
 #include <Poco/Logger.h>
@@ -11,14 +11,14 @@
 #include <Poco/Net/HTTPServer.h>
 
 // AwsMock includes
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/MetricService.h"
-#include "awsmock/core/ThreadPool.h"
-#include "awsmock/service/common/AbstractServer.h"
-#include "awsmock/service/common/AbstractWorker.h"
-#include "S3Monitoring.h"
-#include "S3HandlerFactory.h"
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/core/Timer.h>
+#include <awsmock/core/ThreadPool.h>
+#include <awsmock/service/common/AbstractServer.h>
+#include <awsmock/service/common/AbstractWorker.h>
+#include <awsmock/service/s3/S3HandlerFactory.h>
 
 #define S3_DEFAULT_PORT 9500
 #define S3_DEFAULT_HOST "localhost"
@@ -34,6 +34,7 @@ namespace AwsMock::Service {
   class S3Server : public AbstractServer, public AbstractWorker {
 
   public:
+
     /**
      * Constructor
      *
@@ -43,26 +44,21 @@ namespace AwsMock::Service {
     explicit S3Server(Core::Configuration &configuration, Core::MetricService &metricService);
 
     /**
-     * Destructor
+     * Timer initialization
      */
-    ~S3Server() override;
+    void Initialize() override;
 
     /**
-     * Thread main method
+     * Timer main method
      */
-    void MainLoop() override;
+    void Run() override;
 
     /**
-     * Stops the monitoring module.
+     * Shutdown
      */
-    void StopMonitoringServer();
+    void Shutdown() override;
 
   private:
-
-    /**
-     * Start the monitoring module.
-     */
-    void StartMonitoringServer();
 
     /**
      * Update metric counters
@@ -97,7 +93,7 @@ namespace AwsMock::Service {
     /**
      * S3 database
      */
-    Database::S3Database& _s3Database;
+    Database::S3Database &_s3Database;
 
     /**
      * HTTP manager instance
@@ -128,11 +124,6 @@ namespace AwsMock::Service {
      * Data directory
      */
     std::string _dataDir;
-
-    /**
-     * Thread pool
-     */
-    AwsMock::Core::ThreadPool<S3Monitoring> _threadPool;
 
     /**
      * S3 module name

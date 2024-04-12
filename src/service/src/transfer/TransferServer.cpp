@@ -7,7 +7,8 @@
 namespace AwsMock::Service {
 
   TransferServer::TransferServer(Core::Configuration &configuration, Core::MetricService &metricService)
-      : AbstractServer(configuration, "transfer"), AbstractWorker(configuration), _logger(Poco::Logger::get("TransferServer")), _configuration(configuration), _metricService(metricService), _transferDatabase(Database::TransferDatabase::instance()), _module("transfer") {
+    : AbstractServer(configuration, "transfer"), AbstractWorker(configuration), _logger(Poco::Logger::get("TransferServer")), _configuration(configuration), _metricService(metricService), _transferDatabase(Database::TransferDatabase::instance()),
+      _module("transfer") {
 
     // REST manager configuration
     _port = _configuration.getInt("awsmock.module.transfer.port", TRANSFER_DEFAULT_PORT);
@@ -38,8 +39,28 @@ namespace AwsMock::Service {
     log_info_stream(_logger) << "Transfer manager initialized" << std::endl;
   }
 
-  TransferServer::~TransferServer() {
-    StopServer();
+  void TransferServer::Initialize() {
+
+    // Check module active
+    if (!IsActive("transfer")) {
+      log_info_stream(_logger) << "Transfer module inactive" << std::endl;
+      return;
+    }
+    log_info_stream(_logger) << "Transfer module starting" << std::endl;
+
+    // Start REST manager
+    StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new TransferRequestHandlerFactory(_configuration, _metricService));
+
+    // Start all transfer servers
+    StartTransferServers();
+  }
+
+  void TransferServer::Run() {
+    log_trace_stream(_logger) << "TransferWorker processing started" << std::endl;
+  }
+
+  void TransferServer::Shutdown() {
+    StopHttpServer();
   }
 
   void TransferServer::StartTransferServer(Database::Entity::Transfer::Transfer &server) {
@@ -119,32 +140,4 @@ namespace AwsMock::Service {
     }
   }
 
-  void TransferServer::MainLoop() {
-
-    // Check module active
-    if (!IsActive("transfer")) {
-      log_info_stream(_logger) << "Transfer module inactive" << std::endl;
-      return;
-    }
-    log_info_stream(_logger) << "Transfer module starting" << std::endl;
-
-    // Start REST manager
-    StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new TransferRequestHandlerFactory(_configuration, _metricService));
-
-    // Start all transfer servers
-    StartTransferServers();
-
-    while (IsRunning()) {
-
-      log_trace_stream(_logger) << "TransferWorker processing started" << std::endl;
-
-      // Check transfer servers
-      CheckTransferServers();
-
-      // Wait for timeout or condition
-      if (InterruptableSleep(_period)) {
-        break;
-      }
-    }
-  }
 } // namespace AwsMock::Service

@@ -210,7 +210,7 @@ namespace AwsMock::Resource {
 
     user = authorization.substr(posVec[1].offset, posVec[1].length);
     region = authorization.substr(posVec[2].offset, posVec[2].length);
-    log_debug_stream(_logger) << "Found user: " << user << " region: " << region << std::endl;
+    log_trace_stream(_logger) << "Found user: " << user << " region: " << region << std::endl;
   }
 
   std::string AbstractResource::GetPayload(Poco::Net::HTTPServerRequest &request) {

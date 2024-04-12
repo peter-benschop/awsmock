@@ -2,8 +2,8 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_COGNITOSERVER_H
-#define AWSMOCK_SERVICE_COGNITOSERVER_H
+#ifndef AWSMOCK_SERVICE_COGNITO_SERVER_H
+#define AWSMOCK_SERVICE_COGNITO_SERVER_H
 
 // Poco includes
 #include <Poco/Logger.h>
@@ -11,16 +11,15 @@
 #include <Poco/Net/HTTPServer.h>
 
 // AwsMock includes
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/MetricService.h"
-#include "awsmock/core/ThreadPool.h"
-#include "awsmock/repository/CognitoDatabase.h"
-#include "awsmock/repository/ModuleDatabase.h"
-#include "awsmock/service/common/AbstractServer.h"
-#include "awsmock/service/common/AbstractWorker.h"
-#include "CognitoMonitoring.h"
-#include "CognitoHandlerFactory.h"
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/core/ThreadPool.h>
+#include <awsmock/repository/CognitoDatabase.h>
+#include <awsmock/repository/ModuleDatabase.h>
+#include <awsmock/service/common/AbstractServer.h>
+#include <awsmock/service/common/AbstractWorker.h>
+#include <awsmock/service/cognito/CognitoHandlerFactory.h>
 
 #define COGNITO_DEFAULT_PORT 9505
 #define COGNITO_DEFAULT_HOST "localhost"
@@ -45,26 +44,21 @@ namespace AwsMock::Service {
     explicit CognitoServer(Core::Configuration &configuration, Core::MetricService &metricService);
 
     /**
-     * Destructor
+     * Initialization
      */
-    ~CognitoServer() override;
+    void Initialize() override;
 
     /**
-     * Thread main method
+     * Main method
      */
-    void MainLoop() override;
+    void Run() override;
+
+    /**
+     * Shutdown
+     */
+    void Shutdown() override;
 
   private:
-
-    /**
-     * Start the monitoring module.
-     */
-    void StartMonitoringServer();
-
-    /**
-     * Stop the monitoring module.
-     */
-    void StopMonitoringServer();
 
     /**
      * Update metric counters
@@ -166,13 +160,8 @@ namespace AwsMock::Service {
      */
     std::string _module;
 
-    /**
-     * Thread pool
-     */
-    AwsMock::Core::ThreadPool<CognitoMonitoring> _threadPool;
-
   };
 
 } // namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_COGNITOSERVER_H
+#endif // AWSMOCK_SERVICE_COGNITO_SERVER_H

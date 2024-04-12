@@ -29,7 +29,7 @@ namespace AwsMock::Service {
     StopServer();
   }
 
-  void GatewayServer::MainLoop() {
+  void GatewayServer::Initialize() {
 
     // Check module active
     if (!IsActive("gateway")) {
@@ -38,31 +38,15 @@ namespace AwsMock::Service {
     }
     log_info_stream(_logger) << "Gateway server starting" << std::endl;
 
-    // Start monitoring thread
-    StartMonitoringServer();
-
     // Start HTTP manager
     StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new GatewayRouter(_configuration, _metricService));
-
-    _running = true;
-    while (_running) {
-
-      log_trace_stream(_logger) << "Gateway processing started" << std::endl;
-
-      // Wait for timeout or condition
-      if (InterruptableSleep(_period)) {
-        StopMonitoringServer();
-        break;
-      }
-    }
   }
 
-  void GatewayServer::StartMonitoringServer() {
-    //_threadPool.StartThread(_configuration, _metricService, _condition);
+  void GatewayServer::Run() {
   }
 
-  void GatewayServer::StopMonitoringServer() {
-    //_threadPool.stopAll();
+  void GatewayServer::Shutdown() {
+    StopHttpServer();
   }
 
 } // namespace AwsMock::Service

@@ -40,7 +40,7 @@ namespace AwsMock::Service {
       _endpoint = "http://" + _host + ":" + _port;
 
       // Start HTTP manager
-      Poco::ThreadPool::defaultPool().start(_dynamodbServer);
+      _dynamodbServer.Start();
     }
 
     void TearDown() override {
