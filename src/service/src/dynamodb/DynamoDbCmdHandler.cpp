@@ -13,7 +13,7 @@ namespace AwsMock::Service {
     try {
 
       std::string requestId = GetHeaderValue(request, "RequestId", Poco::UUIDGenerator().createRandom().toString());
-      std::string payload = GetBodyAsString(request);
+      std::string payload = Core::HttpUtils::GetBodyAsString(request);
       std::string action = GetActionFromHeader(request, payload);
 
       switch (clientCommand.command) {

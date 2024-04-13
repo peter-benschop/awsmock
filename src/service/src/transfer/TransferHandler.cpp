@@ -34,7 +34,7 @@ namespace AwsMock::Service {
 
     try {
       std::string version, action;
-      GetVersionActionFromUri(request.getURI(), version, action);
+      Core::HttpUtils::GetVersionAction(request.getURI(), version, action);
 
     } catch (Poco::Exception &exc) {
       SendXmlErrorResponse("lambda", response, exc);
@@ -45,7 +45,7 @@ namespace AwsMock::Service {
     log_trace_stream(_logger) << "lambda POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
     try {
-      std::string body = GetBodyAsString(request);
+      std::string body = Core::HttpUtils::GetBodyAsString(request);
 
       //DumpRequest(request);
 
@@ -107,7 +107,7 @@ namespace AwsMock::Service {
 
     try {
       std::string version, action;
-      GetVersionActionFromUri(request.getURI(), version, action);
+      Core::HttpUtils::GetVersionAction(request.getURI(), version, action);
 
     } catch (Core::ServiceException &exc) {
       SendXmlErrorResponse("lambda", response, exc);
@@ -131,7 +131,7 @@ namespace AwsMock::Service {
     try {
 
       std::string version, action;
-      GetVersionActionFromUri(request.getURI(), version, action);
+      Core::HttpUtils::GetVersionAction(request.getURI(), version, action);
 
       HeaderMap headerMap;
       headerMap["Connection"] = "keep-alive";

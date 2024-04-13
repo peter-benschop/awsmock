@@ -6,14 +6,11 @@
 
 namespace AwsMock::Service {
 
-  SQSService::SQSService(Core::Configuration &configuration, Poco::Condition &condition)
-    : _logger(Poco::Logger::get("SQSService")), _configuration(configuration), _condition(condition), _database(Database::SQSDatabase::instance()) {
+  SQSService::SQSService(Core::Configuration &configuration)
+    : _logger(Poco::Logger::get("SQSService")), _configuration(configuration), _database(Database::SQSDatabase::instance()) {
 
     // Initialize environment
     _accountId = _configuration.getString("awsmock.account.userPoolId", DEFAULT_ACCOUNT_ID);
-
-    // Database connection
-    //_database = std::make_unique<Database::SQSDatabase>(_configuration);
   }
 
   Dto::SQS::CreateQueueResponse SQSService::CreateQueue(const Dto::SQS::CreateQueueRequest &request) {

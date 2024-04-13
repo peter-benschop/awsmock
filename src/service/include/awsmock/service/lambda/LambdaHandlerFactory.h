@@ -50,7 +50,7 @@ namespace AwsMock::Service {
         if(request.getURI().empty()) {
           return nullptr;
         }
-        return new LambdaHandler(_configuration, _metricService, _createQueue, _invokeQueue);
+        return new LambdaHandler(_configuration, _metricService);
       }
 
     private:

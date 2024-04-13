@@ -58,9 +58,8 @@ namespace AwsMock::Service {
      * Constructor
      *
      * @param configuration module configuration
-     * @param condition stop condition
      */
-    explicit SQSService(Core::Configuration &configuration, Poco::Condition &condition);
+    explicit SQSService(Core::Configuration &configuration);
 
     /**
      * Creates a new queue.
@@ -207,15 +206,6 @@ namespace AwsMock::Service {
      */
     Database::SQSDatabase& _database;
 
-    /**
-     * Shutdown condition
-     */
-    Poco::Condition &_condition;
-
-    /**
-     * Shutdown mutex
-     */
-    Poco::Mutex _mutex;
   };
 
 } // namespace AwsMock::Service

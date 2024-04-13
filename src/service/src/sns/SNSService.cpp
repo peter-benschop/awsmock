@@ -6,13 +6,11 @@
 
 namespace AwsMock::Service {
 
-  SNSService::SNSService(Core::Configuration &configuration, Poco::Condition &condition)
-    : _logger(Poco::Logger::get("SNSService")), _configuration(configuration), _condition(condition), _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()) {
+  SNSService::SNSService(Core::Configuration &configuration)
+    : _logger(Poco::Logger::get("SNSService")), _configuration(configuration), _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()) {
 
     // Initialize environment
-    //_snsDatabase = std::make_unique<Database::SNSDatabase>(_configuration);
-    //_sqsDatabase = std::make_unique<Database::SQSDatabase>(_configuration);
-    _sqsService = std::make_unique<SQSService>(_configuration, _condition);
+    _sqsService = std::make_unique<SQSService>(_configuration);
     _accountId = _configuration.getString("awsmock.account.userPoolId", DEFAULT_SQS_ACCOUNT_ID);
   }
 

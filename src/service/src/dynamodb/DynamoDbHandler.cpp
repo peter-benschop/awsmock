@@ -54,7 +54,7 @@ namespace AwsMock::Service {
     try {
       std::string version, action;
       Core::HttpUtils::GetVersionAction(request.getURI(), version, action);
-      std::string body = GetBodyAsString(request);
+      std::string body = Core::HttpUtils::GetBodyAsString(request);
 
     } catch (Core::ServiceException &exc) {
       SendXmlErrorResponse("dynamodb", response, exc);
@@ -80,7 +80,7 @@ namespace AwsMock::Service {
     try {
 
       std::string version, action;
-      GetVersionActionFromUri(request.getURI(), version, action);
+      Core::HttpUtils::GetVersionAction(request.getURI(), version, action);
 
       HeaderMap headerMap;
       headerMap["Connection"] = "Keep-alive: 300";

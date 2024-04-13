@@ -35,7 +35,7 @@ namespace AwsMock::Service {
     log_info_stream(_logger) << "SecretsManager server starting, port: " << _port << std::endl;
 
     // Start REST module
-    StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new SecretsManagerRequestHandlerFactory(_configuration, _metricService, _condition));
+    StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new SecretsManagerRequestHandlerFactory(_configuration, _metricService));
   }
 
   void SecretsManagerServer::Run() {

@@ -103,6 +103,18 @@ namespace AwsMock::Core {
     static std::string GetQueryParameterByPrefix(const std::string &uri, const std::string &prefix, int index);
 
     /**
+     * Returns an integer parameter
+     *
+     * @param body HTTP body
+     * @param name parameter name
+     * @param min minimum value
+     * @param max maximum value
+     * @param def default value
+     * @return integer parameter
+     */
+    static int GetIntParameter(const std::string &body, const std::string &name, int min, int max, int def);
+
+    /**
      * Returns the name of a query parameter.
      *
      * @param parameter parameter in the form name=value

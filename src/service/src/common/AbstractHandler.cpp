@@ -226,14 +226,6 @@ namespace AwsMock::Service {
     }
   }
 
-  std::string AbstractHandler::GetPathParameter(int pos) {
-    return _pathParameter[pos];
-  }
-
-  bool AbstractHandler::HeaderExists(Poco::Net::HTTPServerRequest &request, const std::string &name) {
-    return request.has(name);
-  }
-
   std::map<std::string, std::string> AbstractHandler::GetMetadata(Poco::Net::HTTPServerRequest &request) {
     std::map<std::string, std::string> metadata;
     for (const auto &m : request) {
@@ -256,110 +248,6 @@ namespace AwsMock::Service {
     user = authorization.substr(posVec[1].offset, posVec[1].length);
     region = authorization.substr(posVec[2].offset, posVec[2].length);
     log_trace_stream(_logger) << "Found user: " << user << " region: " << region << std::endl;
-  }
-
-  std::string AbstractHandler::GetPayload(Poco::Net::HTTPServerRequest &request) {
-    std::string payload;
-    Poco::StreamCopier::copyToString(request.stream(), payload);
-    log_trace_stream(_logger) << "Request payload: " << payload << std::endl;
-    request.stream().clear();
-    request.stream().seekg(0);
-    return payload;
-  }
-
-  void AbstractHandler::GetActionVersion(const std::string &body, std::string &action, std::string &version) {
-    std::vector<std::string> bodyParts = Core::StringUtils::Split(body, '&');
-    for (auto &it : bodyParts) {
-      std::vector<std::string> parts = Core::StringUtils::Split(it, '=');
-      if (parts.size() < 2) {
-        throw Core::ServiceException("Invalid request body", 400);
-      }
-      if (parts[0] == "Action") {
-        action = parts[1];
-      }
-      if (parts[0] == "Version") {
-        version = parts[1];
-      }
-    }
-    log_trace_stream(_logger) << "Found action: " << action << " version: " << version << std::endl;
-  }
-
-  std::string AbstractHandler::GetStringParameter(const std::string &path, const std::string &name) {
-    std::string value;
-    std::vector<std::string> bodyParts = Core::StringUtils::Split(path, '&');
-    for (auto &it : bodyParts) {
-      std::vector<std::string> parts = Core::StringUtils::Split(it, '=');
-      if (parts[0] == name) {
-        value = Core::StringUtils::UrlDecode(parts[1]);
-      }
-    }
-    log_trace_stream(_logger) << "Found string parameter, name: " << name << " value: " << value << std::endl;
-    return value;
-  }
-
-  int AbstractHandler::GetIntParameter(const std::string &body, const std::string &name, int min, int max, int def) {
-    int value = def;
-    std::string parameterValue = GetStringParameter(body, name);
-    if (!parameterValue.empty()) {
-      value = std::stoi(parameterValue);
-      value = value > min && value < max ? value : def;
-    }
-    log_trace_stream(_logger) << "Found integer name, name: " << name << " value: " << value << std::endl;
-    return value;
-  }
-
-  int AbstractHandler::GetAttributeCount(const std::string &body, const std::string &name) {
-    int count = 0;
-    std::string parameters = Core::StringUtils::SubStringAfter(body, "?");
-    std::vector<std::string> bodyParts = Core::StringUtils::Split(parameters, '&');
-    for (auto &it : bodyParts) {
-      if (it.starts_with(name)) {
-        count++;
-      }
-    }
-    log_trace_stream(_logger) << "Found attribute count, name: " << name << " count: " << count / 2 << std::endl;
-    return count;
-  }
-
-  int AbstractHandler::GetAttributeNameCount(const std::string &body, const std::string &name) {
-    int count = 0;
-    std::vector<std::string> bodyParts = Core::StringUtils::Split(body, '&');
-    for (auto &it : bodyParts) {
-      if (it.starts_with(name)) {
-        count++;
-      }
-    }
-    log_trace_stream(_logger) << "Found attribute count, name: " << name << " count: " << count / 2 << std::endl;
-    return count;
-  }
-
-  void AbstractHandler::GetVersionActionFromUri(const std::string &uri, std::string &version, std::string &action) {
-
-    Poco::RegularExpression::MatchVec posVec;
-    Poco::RegularExpression pattern(R"(/([a-z0-9-.]+)?/?([a-zA-Z0-9-/_.*'()]+)?\??.*$)");
-    if (!pattern.match(uri, 0, posVec)) {
-      log_error_stream(_logger) << "Invalid URI: " << uri << std::endl;
-      throw Core::ResourceNotFoundException("Could not extract version and action");
-    }
-
-    if (posVec.size() > 1) {
-      version = uri.substr(posVec[1].offset, posVec[1].length);
-    }
-    if (posVec.size() > 2) {
-      action = uri.substr(posVec[2].offset, posVec[2].length);
-    }
-    log_debug_stream(_logger) << "Found version and action, version: " << version << " action: " << action << std::endl;
-  }
-
-  std::string AbstractHandler::GetBodyAsString(Poco::Net::HTTPServerRequest &request) {
-    std::stringstream sstream;
-    sstream << request.stream().rdbuf();
-    request.stream().seekg(0, request.stream().beg);
-    return sstream.str();
-  }
-
-  std::string AbstractHandler::GetEndpoint(Poco::Net::HTTPServerRequest &request) {
-    return request.get("localstack:4566");
   }
 
   void AbstractHandler::SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &payload, const HeaderMap &extraHeader) {
@@ -596,11 +484,6 @@ namespace AwsMock::Service {
   std::string AbstractHandler::GetHeaderValue(Poco::Net::HTTPServerRequest &request, const std::string &name, const std::string &defaultValue) {
     log_trace_stream(_logger) << "Getting header values, name: " << name << std::endl;
     return request.get(name, defaultValue);
-  }
-
-  bool AbstractHandler::HasHeaderValue(Poco::Net::HTTPServerRequest &request, const std::string &name) {
-    log_trace_stream(_logger) << "Has header value, name: " << name << std::endl;
-    return request.has(name);
   }
 
   void AbstractHandler::DumpRequest(Poco::Net::HTTPServerRequest &request) {

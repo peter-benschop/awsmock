@@ -3,8 +3,8 @@
 
 namespace AwsMock::Service {
 
-  GatewayHandler::GatewayHandler(Core::Configuration &configuration, Core::MetricService &metricService, std::string host, int port)
-      : AbstractHandler(), _logger(Poco::Logger::get("GatewayHandler")), _configuration(configuration), _metricService(metricService), _host(std::move(host)), _port(port) {
+  GatewayHandler::GatewayHandler(Core::Configuration &configuration, Core::MetricService &metricService, Service::GatewayRoute* route)
+    : AbstractHandler(), _logger(Poco::Logger::get("GatewayHandler")), _configuration(configuration), _metricService(metricService), _route(route) {
   }
 
   void GatewayHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
@@ -15,7 +15,7 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Gateway GET request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
 
     SetHeaders(request, region, user);
-    ForwardRequest(request, response, _host, _port);
+    _route->_handler->handleRequest(request, response);
   }
 
   void GatewayHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
@@ -26,7 +26,7 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Gateway PUT request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
 
     SetHeaders(request, region, user);
-    ForwardRequest(request, response, _host, _port);
+    _route->_handler->handleRequest(request, response);
   }
 
   void GatewayHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
@@ -37,7 +37,7 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Gateway POST request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
 
     SetHeaders(request, region, user);
-    ForwardRequest(request, response, _host, _port);
+    _route->_handler->handleRequest(request, response);
   }
 
   void GatewayHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
@@ -48,7 +48,7 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Gateway DELETE request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
 
     SetHeaders(request, region, user);
-    ForwardRequest(request, response, _host, _port);
+    _route->_handler->handleRequest(request, response);
   }
 
   void GatewayHandler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
@@ -59,7 +59,7 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Gateway HEAD request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
 
     SetHeaders(request, region, user);
-    ForwardRequest(request, response, _host, _port);
+    _route->_handler->handleRequest(request, response);
   }
 
   void GatewayHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
@@ -71,30 +71,6 @@ namespace AwsMock::Service {
     handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTPStatus::HTTP_OK);
     std::ostream &outputStream = response.send();
     outputStream.flush();
-  }
-
-  void GatewayHandler::ForwardRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &host, int port) {
-
-    // Create HTTP request and set headers
-    Poco::Net::HTTPClientSession session(host, port);
-    log_trace_stream(_logger) << "Forward session, host: " << host << " port: " << port << std::endl;
-
-    // Send request with body
-    Poco::StreamCopier::copyStream(request.stream(), session.sendRequest(request));
-    log_trace_stream(_logger) << "Forward request send" << std::endl;
-
-    // Get the response
-    Poco::Net::HTTPResponse clientResponse;
-    std::istream &is = session.receiveResponse(clientResponse);
-
-    // Copy headers
-    for (const auto &i : clientResponse) {
-      response.set(i.first, i.second);
-    }
-    long send = Poco::StreamCopier::copyStream(is, response.send());
-    log_trace_stream(_logger) << "Bytes send: " << send << std::endl;
-
-    log_trace_stream(_logger) << "Backend module response send back to client" << std::endl;
   }
 
   void GatewayHandler::SetHeaders(Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user) {

@@ -42,7 +42,7 @@ namespace AwsMock::Service {
       if(request.getURI().empty()) {
         return nullptr;
       }
-      return new SNSHandler(_configuration, _metricService, _condition);
+      return new SNSHandler(_configuration, _metricService);
     }
 
   private:

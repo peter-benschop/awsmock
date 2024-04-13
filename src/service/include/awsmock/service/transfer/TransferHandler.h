@@ -119,7 +119,7 @@ namespace AwsMock::Service {
      * @param request HTTP request
      * @return target string
      */
-    std::string GetTarget(const Poco::Net::HTTPServerRequest &request);
+    static std::string GetTarget(const Poco::Net::HTTPServerRequest &request);
 
     /**
      * Logger

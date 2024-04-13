@@ -31,7 +31,7 @@ namespace AwsMock::Service {
      * @param metricService  monitoring
      * @param condition stop condition
      */
-    SecretsManagerRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition) : _configuration(configuration), _metricService(metricService), _condition(condition) {}
+    SecretsManagerRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService){}
 
     /**
      * Create a new request handler
@@ -43,7 +43,7 @@ namespace AwsMock::Service {
       if(request.getURI().empty()) {
         return nullptr;
       }
-      return new SecretsManagerHandler(_configuration, _metricService, _condition);
+      return new SecretsManagerHandler(_configuration, _metricService);
     }
 
   private:
@@ -58,10 +58,6 @@ namespace AwsMock::Service {
      */
     Core::MetricService &_metricService;
 
-    /**
-     * Shutdown condition
-     */
-    Poco::Condition &_condition;
   };
 
 } // namespace AwsMock::Service

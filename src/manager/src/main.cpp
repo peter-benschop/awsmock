@@ -76,12 +76,15 @@ namespace AwsMock {
 
       // Shutdown all services
       StopServices();
+      log_debug_stream(_logger) << "Service stopped" << std::endl;
 
       // Stop HTTP manager
       _restService.StopServer();
+      log_debug_stream(_logger) << "Gateway stopped" << std::endl;
 
       // Shutdown monitoring
       _metricService.Shutdown();
+      log_debug_stream(_logger) << "Monitoring stopped" << std::endl;
 
       log_debug_stream(_logger) << "Bye, bye and thanks for all the fish" << std::endl;
     }
@@ -336,7 +339,7 @@ namespace AwsMock {
     /**
      * Gateway router
      */
-    std::shared_ptr<Controller::Router> _router = std::make_shared<Controller::Router>(_configuration, _metricService, _serverMap);
+    Controller::Router* _router = new Controller::Router(_configuration, _metricService, _serverMap);
 
     /**
      * S3 module
@@ -407,6 +410,7 @@ namespace AwsMock {
      * Server map
      */
     Service::ServerMap _serverMap;
+
   };
 
 } // namespace AwsMock

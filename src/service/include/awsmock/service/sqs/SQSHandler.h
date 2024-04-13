@@ -53,9 +53,8 @@ namespace AwsMock::Service {
      *
      * @param configuration application configuration
      * @param metricService monitoring module
-     * @param condition stop condition
      */
-    SQSHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
+    SQSHandler(Core::Configuration &configuration, Core::MetricService &metricService);
 
   protected:
 

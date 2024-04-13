@@ -27,13 +27,8 @@ namespace AwsMock::Core {
   }
 
   void MetricService::Shutdown() {
-    /*if (_metricSystemTimer != nullptr) {
-      _metricSystemTimer->stop();
-    }*/
-    if (_server != nullptr) {
-      _server->stop();
-      _server.reset();
-    }
+    _server->stop();
+    _metricSystemCollector->Stop();
     log_info_stream(_logger) << "Metric module has been shutdown" << std::endl;
   }
 

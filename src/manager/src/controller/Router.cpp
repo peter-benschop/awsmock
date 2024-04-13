@@ -13,10 +13,6 @@ namespace AwsMock::Controller {
     log_debug_stream(_logger) << "Router initialized" << std::endl;
   }
 
-  Router::~Router() {
-    serverStopped.enable();
-  }
-
   Poco::Net::HTTPRequestHandler *Router::createRequestHandler(const Poco::Net::HTTPServerRequest &request) {
 
     // Get the authorization header

@@ -51,9 +51,8 @@ namespace AwsMock::Service {
      *
      * @param configuration application configuration
      * @param metricService monitoring module
-     * @param condition stop condition
      */
-    SQSCmdHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
+    SQSCmdHandler(Core::Configuration &configuration, Core::MetricService &metricService);
 
   protected:
 
@@ -130,6 +129,7 @@ namespace AwsMock::Service {
      * Default endpoint
      */
     std::string _endpoint;
+
   };
 
 } // namespace AwsMock::Service

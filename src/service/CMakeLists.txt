@@ -35,7 +35,8 @@ add_subdirectory(tst)
 include_directories(include ../core/include ../db/include ../dto/include /usr/include /usr/include/bsoncxx/v_noabi
         /usr/include/mongocxx/v_noabi tbb)
 
-add_library(${LIBRARY} SHARED ${SOURCES})
+add_library(${LIBRARY} SHARED ${SOURCES}
+        include/awsmock/service/gateway/GatewayRoute.h)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 

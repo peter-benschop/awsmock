@@ -176,112 +176,6 @@ namespace AwsMock::Service {
     void handleHttpStatusCode(Poco::Net::HTTPServerResponse &response, int statusCode, const char *reason = nullptr);
 
     /**
-     * Returns a path parameter by position.
-     *
-     * @param pos parameter position.
-     * @return The parameter value.
-     */
-    std::string GetPathParameter(int pos);
-
-    /**
-     * Returns the region and the user
-     *
-     * @param authorization HTTP authorization string
-     * @param region AWS region
-     * @param user AWS user
-     */
-    void GetRegionUser(const std::string &authorization, std::string &region, std::string &user);
-
-    /**
-     * Returns the payload as a string
-     *
-     * @param request HTTP request
-     * @return payload as a string,
-     */
-    std::string GetPayload(Poco::Net::HTTPServerRequest &request);
-
-    /**
-     * Get the action from the request body
-     *
-     * <p>Returns the action/version parameter from the message body. This is mainly used by SQS.</p>
-     *
-     * @param body HTTP request body (in)
-     * @param action SQS action (out)
-     * @param version SQS version (out)
-     */
-    void GetActionVersion(const std::string &body, std::string &action, std::string &version);
-
-    /**
-     * Get the action from the request path
-     *
-     * <p>Returns a string parameter from the message path. This is mainly used by SQS.</p>
-     *
-     * @param path HTTP request path
-     * @param name parameter name
-     * @return parameter value
-     */
-    std::string GetStringParameter(const std::string &path, const std::string &name);
-
-    /**
-     * Return an integer name.
-     *
-     * <p>Returns an integer parameter from the message body. This is mainly used by SQS.</p>
-     *
-     * @param body HTTP message body
-     * @param name name name
-     * @param min minimum value
-     * @param max maximum value
-     * @param def default value
-     * @return integer name
-     */
-    int GetIntParameter(const std::string &body, const std::string &name, int min, int max, int def);
-
-    /**
-     * Returns the attribute count.
-     *
-     * <p>Returns the number of name from the message body. This is mainly used by SQS.</p>
-     *
-     * @param body HTTP message body
-     * @param name name name
-     * @return number of sqs
-     */
-    int GetAttributeCount(const std::string &body, const std::string &name);
-
-    /**
-     * Get the attribute name count
-     *
-     * @param body message body
-     * @param name attribute name
-     * @return number of atributes with the given name
-     */
-    int GetAttributeNameCount(const std::string &body, const std::string &name);
-
-    /**
-     * Returns the version and action from URI
-     *
-     * @param uri URI to scan
-     * @param version version string
-     * @param action action
-     */
-    void GetVersionActionFromUri(const std::string &uri, std::string &version, std::string &action);
-
-    /**
-     * Get the endpoint from the request header
-     *
-     * @param request HTTP request
-     * @return endpoint
-     */
-    static std::string GetEndpoint(Poco::Net::HTTPServerRequest &request);
-
-    /**
-     * Returns the HTTP request body as string.
-     *
-     * @param request HTTP request
-     * @return request body as string
-     */
-    std::string GetBodyAsString(Poco::Net::HTTPServerRequest &request);
-
-    /**
      * Send a OK response (HTTP state code 200).
      *
      * @param response HTTP response object
@@ -394,18 +288,9 @@ namespace AwsMock::Service {
      * Send a no content response, state: 204.
      *
      * @param response HTTP response
-     * @param extraHeader extrac headers
+     * @param extraHeader extra headers
      */
     void SendNoContentResponse(Poco::Net::HTTPServerResponse &response, const HeaderMap &extraHeader = {});
-
-    /**
-     * Checks whether the request has a header with the given key
-     *
-     * @param request HTTP request
-     * @param name header key
-     * @return true if header with the specified key exists, otherwise false
-     */
-    static bool HeaderExists(Poco::Net::HTTPServerRequest &request, const std::string &name);
 
     /**
      * Gets a header values
@@ -418,20 +303,21 @@ namespace AwsMock::Service {
     std::string GetHeaderValue(Poco::Net::HTTPServerRequest &request, const std::string &name, const std::string &defaultValue);
 
     /**
-     * Gets a header values
+     * Returns the region and the user
      *
-     * @param request HTTP request
-     * @return string map of metadata
+     * @param authorization HTTP authorization string
+     * @param region AWS region
+     * @param user AWS user
      */
-    static std::map<std::string, std::string> GetMetadata(Poco::Net::HTTPServerRequest &request);
+    void GetRegionUser(const std::string &authorization, std::string &region, std::string &user);
 
     /**
-     * Check for the existence of given header key
+     * Get the header metadata values
+     *
      * @param request HTTP request
-     * @param name header key name
-     * @return true of header exists
+     * @return header values
      */
-    bool HasHeaderValue(Poco::Net::HTTPServerRequest &request, const std::string &name);
+    std::map<std::string, std::string> GetMetadata(Poco::Net::HTTPServerRequest &request);
 
     /**
      * Dump the request to std::cerr
@@ -445,21 +331,21 @@ namespace AwsMock::Service {
      *
      * @param request HTTP request
      */
-    void DumpRequestHeaders(Poco::Net::HTTPServerRequest &request);
+    [[maybe_unused]] void DumpRequestHeaders(Poco::Net::HTTPServerRequest &request);
 
     /**
      * Dump the request to std::cerr
      *
      * @param response HTTP response
      */
-    void DumpResponseHeaders(Poco::Net::HTTPServerResponse &response);
+    [[maybe_unused]] void DumpResponseHeaders(Poco::Net::HTTPServerResponse &response);
 
     /**
      * Dump the response to std::cerr
      *
      * @param response HTTP response
      */
-    void DumpResponse(Poco::Net::HTTPServerResponse &response);
+    [[maybe_unused]] void DumpResponse(Poco::Net::HTTPServerResponse &response);
 
     /**
      * Dump the request body to std::cerr
@@ -481,7 +367,7 @@ namespace AwsMock::Service {
      * @param request HTTP request
      * @param filename name fo the file
      */
-    void DumpBodyToFile(Poco::Net::HTTPServerRequest &request, const std::string &filename);
+    [[maybe_unused]] void DumpBodyToFile(Poco::Net::HTTPServerRequest &request, const std::string &filename);
 
   private:
 
@@ -525,15 +411,6 @@ namespace AwsMock::Service {
      */
     std::vector<std::string> _pathParameter;
 
-    /**
-     * Header map
-     */
-    HeaderMap _headerMap;
-
-    /**
-     * POco mutex
-     */
-    Poco::Mutex _mutex;
   };
 
 } // namespace AwsMock::Service

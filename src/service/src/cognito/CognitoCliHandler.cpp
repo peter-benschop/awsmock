@@ -25,7 +25,7 @@ namespace AwsMock::Service {
 
       if (userAgent.clientCommand == "create-user-pool") {
 
-        std::string payload = GetPayload(request);
+        std::string payload = Core::HttpUtils::GetBodyAsString(request);
         Dto::Cognito::CreateUserPoolRequest cognitoRequest{};
         cognitoRequest.FromJson(payload);
         cognitoRequest.region = region;
@@ -37,7 +37,7 @@ namespace AwsMock::Service {
 
       } else if (userAgent.clientCommand == "list-user-pools") {
 
-        std::string payload = GetPayload(request);
+        std::string payload = Core::HttpUtils::GetBodyAsString(request);
         Dto::Cognito::ListUserPoolRequest cognitoRequest{};
         cognitoRequest.FromJson(payload);
         cognitoRequest.region = region;
@@ -48,7 +48,7 @@ namespace AwsMock::Service {
 
       } else if (userAgent.clientCommand == "delete-user-pool") {
 
-        std::string payload = GetPayload(request);
+        std::string payload = Core::HttpUtils::GetBodyAsString(request);
         Dto::Cognito::DeleteUserPoolRequest cognitoRequest{};
         cognitoRequest.FromJson(payload);
         cognitoRequest.region = region;
@@ -59,7 +59,7 @@ namespace AwsMock::Service {
 
       } else if (userAgent.clientCommand == "admin-create-user") {
 
-        std::string payload = GetPayload(request);
+        std::string payload = Core::HttpUtils::GetBodyAsString(request);
         Dto::Cognito::AdminCreateUserRequest cognitoRequest{};
         cognitoRequest.FromJson(payload);
         cognitoRequest.region = region;
@@ -70,7 +70,7 @@ namespace AwsMock::Service {
 
       } else if (userAgent.clientCommand == "list-users") {
 
-        std::string payload = GetPayload(request);
+        std::string payload = Core::HttpUtils::GetBodyAsString(request);
         Dto::Cognito::ListUsersRequest cognitoRequest{};
         cognitoRequest.FromJson(payload);
         cognitoRequest.region = region;
@@ -81,7 +81,7 @@ namespace AwsMock::Service {
 
       } else if (userAgent.clientCommand == "admin-delete-user") {
 
-        std::string payload = GetPayload(request);
+        std::string payload = Core::HttpUtils::GetBodyAsString(request);
         Dto::Cognito::AdminDeleteUserRequest cognitoRequest{};
         cognitoRequest.FromJson(payload);
         cognitoRequest.region = region;

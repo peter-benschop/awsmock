@@ -2,8 +2,8 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_LAMBDAHANDLER_H
-#define AWSMOCK_SERVICE_LAMBDAHANDLER_H
+#ifndef AWSMOCK_SERVICE_LAMBDA_HANDLER_H
+#define AWSMOCK_SERVICE_LAMBDA_HANDLER_H
 
 // Poco includes
 #include "Poco/Logger.h"
@@ -40,7 +40,7 @@ namespace AwsMock::Service {
      * @param createQueue create notification queue
      * @param invokeQueue invoke notification queue
      */
-    LambdaHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue, Poco::NotificationQueue &invokeQueue);
+    LambdaHandler(Core::Configuration &configuration, Core::MetricService &metricService);
 
   protected:
 
@@ -128,8 +128,10 @@ namespace AwsMock::Service {
      * lambda module
      */
     Service::LambdaService _lambdaService;
+    Poco::NotificationQueue createQueue;
+    Poco::NotificationQueue invokeQueue;
   };
 
 } // namespace AwsMock
 
-#endif // AWSMOCK_SERVICE_LAMBDAHANDLER_H
+#endif // AWSMOCK_SERVICE_LAMBDA_HANDLER_H
