@@ -6,9 +6,9 @@
 
 namespace AwsMock::Service {
 
-  LambdaServer::LambdaServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue, Poco::NotificationQueue &invokeQueue)
+  LambdaServer::LambdaServer(Core::Configuration &configuration, Core::MetricService &metricService)
     : AbstractWorker(configuration), AbstractServer(configuration, "lambda"), _logger(Poco::Logger::get("LambdaServer")), _configuration(configuration), _metricService(metricService), _lambdaDatabase(Database::LambdaDatabase::instance()),
-      _createQueue(createQueue), _invokeQueue(invokeQueue), _module("lambda") {
+      _module("lambda") {
 
     // Get HTTP configuration values
     _port = _configuration.getInt("awsmock.service.lambda.port", LAMBDA_DEFAULT_PORT);
@@ -55,12 +55,8 @@ namespace AwsMock::Service {
     }
     log_info_stream(_logger) << "Lambda server starting" << std::endl;
 
-    // Start creator/executor
-    _lambdaCreator.Start();
-    _lambdaExecutor.Start();
-
     // Start HTTP manager
-    StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new LambdaRequestHandlerFactory(_configuration, _metricService, _createQueue, _invokeQueue));
+    StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new LambdaRequestHandlerFactory(_configuration, _metricService));
 
     // Cleanup
     CleanupContainers();
@@ -78,12 +74,6 @@ namespace AwsMock::Service {
     StopHttpServer();
   }
 
-  void LambdaServer::StopExecutors() {
-    _createQueue.wakeUpAll();
-    _invokeQueue.wakeUpAll();
-    Poco::ThreadPool::defaultPool().joinAll();
-  }
-
   void LambdaServer::CleanupContainers() {
     _dockerService->PruneContainers();
     log_debug_stream(_logger) << "Docker containers cleaned up" << std::endl;
@@ -92,7 +82,7 @@ namespace AwsMock::Service {
   void LambdaServer::StartLambdaFunctions() {
 
     log_debug_stream(_logger) << "Starting lambdas" << std::endl;
-    std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region);
+    std::vector <Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region);
 
     for (auto &lambda : lambdas) {
 

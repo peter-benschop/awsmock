@@ -38,8 +38,6 @@ namespace AwsMock::Service {
      */
     TransferHandler(Core::Configuration &configuration, Core::MetricService &metricService);
 
-  protected:
-
     /**
      * HTTP GET request.
      *

@@ -33,6 +33,9 @@ namespace AwsMock::Service {
       // Get queue ARN
       std::string queueArn = Core::AwsUtils::CreateSqsQueueArn(_configuration, request.queueName);
 
+      // Get queue URL
+      std::string queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, request.queueName);
+
       Database::Entity::SQS::QueueAttribute attributes;
       for (auto &a : request.attributes) {
         if (a.attributeName == "DelaySeconds") {
@@ -63,14 +66,14 @@ namespace AwsMock::Service {
           attributes.queueArn = a.attributeValue;
         }
       }
-      attributes.queueArn = Core::AwsUtils::CreateSqsQueueArn(_configuration, request.queueName);
+      attributes.queueArn = queueArn;
 
       // Update database
       Database::Entity::SQS::Queue queue = _database.CreateQueue({
                                                                    .region=request.region,
                                                                    .name=request.queueName,
                                                                    .owner=request.owner,
-                                                                   .queueUrl=request.queueUrl,
+                                                                   .queueUrl=queueUrl,
                                                                    .queueArn=queueArn,
                                                                    .attributes=attributes,
                                                                    .tags=request.tags
@@ -87,7 +90,7 @@ namespace AwsMock::Service {
 
     } catch (Core::DatabaseException &exc) {
       log_error_stream(_logger) << "SQS create queue failed, message: " << exc.message() << std::endl;
-      throw Core::ServiceException(exc.message(), 400);
+      throw Core::ServiceException(exc.message());
     }
   }
 

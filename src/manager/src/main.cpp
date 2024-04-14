@@ -224,7 +224,7 @@ namespace AwsMock {
           _snsServer->Start();
           _serverMap[module.name] = _snsServer;
         } else if (module.name == "lambda" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-          _lambdaServer = new Service::LambdaServer(_configuration, _metricService, _createQueue, _invokeQueue);
+          _lambdaServer = new Service::LambdaServer(_configuration, _metricService);
           _lambdaServer->Start();
           _serverMap[module.name] = _lambdaServer;
         } else if (module.name == "transfer" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
@@ -385,16 +385,6 @@ namespace AwsMock {
      * Request gateway module
      */
     Service::GatewayServer *_gatewayServer{};
-
-    /**
-     * Create notification queue
-     */
-    Poco::NotificationQueue _createQueue;
-
-    /**
-     * Invoke notification queue
-     */
-    Poco::NotificationQueue _invokeQueue;
 
     /**
      * Gateway controller

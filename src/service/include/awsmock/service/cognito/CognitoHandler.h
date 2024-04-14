@@ -37,8 +37,6 @@ namespace AwsMock::Service {
      */
     CognitoHandler(Core::Configuration &configuration, Core::MetricService &metricService);
 
-  protected:
-
     /**
      * HTTP GET request.
      *

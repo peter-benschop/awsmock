@@ -37,8 +37,6 @@ namespace AwsMock::Service {
      */
     SecretsManagerHandler(Core::Configuration &configuration, Core::MetricService &metricService);
 
-  protected:
-
     /**
      * HTTP POST request.
      *

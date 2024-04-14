@@ -30,13 +30,10 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Request send, url: " << url << std::endl;
 
     // Send request
-    if (body.empty()) {
-      session.sendRequest(request);
-    } else {
-      std::ostream &os = session.sendRequest(request);
+    std::ostream &os = session.sendRequest(request);
+    if (!body.empty()) {
       os << body;
       os.flush();
-      os.clear();
     }
 
     // Get the response state
@@ -132,31 +129,52 @@ namespace AwsMock::Service {
 
   void AbstractWorker::SendFile(const std::string &module, const std::string &url, const std::string &fileName, const std::map<std::string, std::string> &headers) {
 
-    Poco::URI uri(url);
-    std::string path(uri.getPathAndQuery());
+    try {
+      Core::CurlUtils curlUtils;
+      Core::CurlResponse response = curlUtils.SendFileHttpRequest("PUT", url, fileName, headers);
+      if(response.statusCode != 200) {
+        log_error_stream(_logger) << "Send file failed, fileName: " << fileName << " status: " << response.statusCode << " output: " << response.output <<std::endl;
+      }
 
-    // Create HTTP request and set headers
-    Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
-    Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_PUT, path, Poco::Net::HTTPMessage::HTTP_1_1);
-    for (const auto &it : headers) {
-      request.add(it.first, it.second);
+      // Setup the URI
+      /*Poco::URI uri(url);
+      std::string path(uri.getPathAndQuery());
+
+      // Create session, timeout 900sec.
+      Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
+      session.setTimeout(900);
+      session.setSendTimeout(900);
+      session.setReceiveTimeout(900);
+
+      // Get the content length
+      long contentLength = Core::FileUtils::FileSize(fileName);
+
+      // Create HTTP request and set headers
+      Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_PUT, path, Poco::Net::HTTPMessage::HTTP_1_1);
+      request.setChunkedTransferEncoding(true);
+      for (const auto &it : headers) {
+        request.add(it.first, it.second);
+      }
+      AddAuthorization(module, request);
+      log_debug_stream(_logger) << "Request send, url: " << url << std::endl;
+
+      // Send request
+      std::ifstream ifs(fileName);
+      std::ostream &os = session.sendRequest(request);
+      long copied = Poco::StreamCopier::copyStream(ifs, os);
+      log_debug_stream(_logger) << "Body send, file: " << fileName << " size: " << copied << std::endl;
+
+      // Get the response state
+      Poco::Net::HTTPResponse response;
+      session.receiveResponse(response);
+      if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
+        log_error_stream(_logger) << "HTTP error, state: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
+      }
+      log_debug_stream(_logger) << "Send file request send, state: " << response.getStatus() << std::endl;*/
+
+    } catch (Poco::Exception &exc) {
+      log_error_stream(_logger) << "Send file failed, fileName: " << fileName << " error: " << exc.message() << std::endl;
     }
-    AddAuthorization(module, request);
-    log_debug_stream(_logger) << "Request send, url: " << url << std::endl;
-
-    // Send request
-    std::ifstream ifs(fileName);
-    std::ostream &os = session.sendRequest(request);
-    long copied = Poco::StreamCopier::copyStream(ifs, os);
-    log_debug_stream(_logger) << "Body send, file: " << fileName << " size: " << copied << std::endl;
-
-    // Get the response state
-    Poco::Net::HTTPResponse response;
-    session.receiveResponse(response);
-    if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
-      log_error_stream(_logger) << "HTTP error, state: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
-    }
-    log_debug_stream(_logger) << "Send file request send, state: " << response.getStatus() << std::endl;
   }
 
   void AbstractWorker::AddAuthorization(const std::string &module, Poco::Net::HTTPRequest &request) {

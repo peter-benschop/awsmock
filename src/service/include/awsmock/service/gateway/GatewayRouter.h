@@ -91,7 +91,7 @@ namespace AwsMock::Service {
     /**
      * Routing table
      */
-    std::map<std::string, GatewayRoute*> _routingTable;
+    std::map<std::string, GatewayRoute> _routingTable;
   };
 
 } // namespace AwsMock::Service

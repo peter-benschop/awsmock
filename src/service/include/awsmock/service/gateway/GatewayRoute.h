@@ -8,11 +8,23 @@
 // C++ standard includes
 #include <map>
 #include <string>
+#include <utility>
 
 // AwsMock includes
 #include <awsmock/service/common/AbstractHandler.h>
 
 namespace AwsMock::Service {
+
+  enum HandlerType {
+    S3,
+    SQS,
+    SNS,
+    LAMBDA,
+    TRANSFER,
+    COGNITO,
+    DYNAMODB,
+    SECRETS_MANAGER
+  };
 
   struct GatewayRoute {
 
@@ -22,21 +34,9 @@ namespace AwsMock::Service {
     std::string _name;
 
     /**
-     * Service host
+     * Type
      */
-    std::string _host;
-
-    /**
-     * Service port
-     */
-    int _port;
-
-    /**
-     * Service handler
-     */
-    AbstractHandler *_handler;
-
-    GatewayRoute(std::string name, std::string host, int port, AbstractHandler *handler) : _name(std::move(name)), _host(std::move(host)), _port(port), _handler(handler) {}
+    HandlerType _handlerType;
   };
 
 } // namespace AwsMock::Service

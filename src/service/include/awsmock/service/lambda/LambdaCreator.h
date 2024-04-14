@@ -22,14 +22,13 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/MetricService.h>
 #include <awsmock/core/Timer.h>
-#include <awsmock/dto/lambda/CreateNotification.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/service/common/DockerService.h>
 
 namespace AwsMock::Service {
 
-  class LambdaCreator : public Core::Timer {
+  class LambdaCreator {
 
   public:
 
@@ -39,24 +38,7 @@ namespace AwsMock::Service {
      * @param configuration module configuration
      * @param createQueue lambda create notification queue
      */
-    explicit LambdaCreator(Core::Configuration &configuration, Poco::NotificationQueue &createQueue);
-
-    /**
-     * Initialization
-     */
-    void Initialize() override;
-
-    /**
-     * Listens for invocation requests and send the invocation to the right port.
-     */
-    void Run() override;
-
-    /**
-     * Shutdown executor
-     */
-    void Shutdown() override;
-
-  private:
+    explicit LambdaCreator(Core::Configuration &configuration);
 
     /**
      * Create new lambda function
@@ -65,6 +47,8 @@ namespace AwsMock::Service {
      * @param functionId lambda function OID
      */
     void CreateLambdaFunction(const std::string &functionCode, const std::string &functionId);
+
+  private:
 
     /**
      * Save the ZIP file and unpack it in a temporary folder
@@ -156,11 +140,6 @@ namespace AwsMock::Service {
      * Docker module
      */
     Service::DockerService _dockerService;
-
-    /**
-     * lambda create notification queue
-     */
-    Poco::NotificationQueue &_createQueue;
 
   };
 

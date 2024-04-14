@@ -30,9 +30,7 @@
 #include <awsmock/dto/s3/EventNotification.h>
 #include <awsmock/dto/lambda/CreateFunctionRequest.h>
 #include <awsmock/dto/lambda/CreateFunctionResponse.h>
-#include <awsmock/dto/lambda/CreateNotification.h>
 #include <awsmock/dto/lambda/CreateTagRequest.h>
-#include <awsmock/dto/lambda/InvocationNotification.h>
 #include <awsmock/dto/lambda/ListFunctionResponse.h>
 #include <awsmock/dto/lambda/ListTagsResponse.h>
 #include <awsmock/dto/lambda/DeleteFunctionRequest.h>
@@ -40,6 +38,8 @@
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/common/DockerService.h>
+#include <awsmock/service/lambda/LambdaCreator.h>
+#include <awsmock/service/lambda/LambdaExecutor.h>
 
 namespace AwsMock::Service {
 
@@ -74,7 +74,7 @@ namespace AwsMock::Service {
      * @param createQueue create notification queue
      * @param invokeQueue invoke notification queue
      */
-    explicit LambdaService(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue, Poco::NotificationQueue &invokeQueue);
+    explicit LambdaService(Core::Configuration &configuration, Core::MetricService &metricService);
 
     /**
      * Create lambda function
@@ -185,16 +185,6 @@ namespace AwsMock::Service {
      * Monitoring
      */
     Core::MetricService &_metricService;
-
-    /**
-     * Create notification center
-     */
-    Poco::NotificationQueue &_createQueue;
-
-    /**
-     * Invoke notification center
-     */
-    Poco::NotificationQueue &_invokeQueue;
 
     /**
      * lambda database connection

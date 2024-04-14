@@ -24,56 +24,42 @@ namespace AwsMock::Service {
    */
   class LambdaRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 
-    public:
+  public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration application configuration
-       * @param metricService  monitoring
-       * @param createQueue create notification queue
-       * @param invokeQueue invoke notification queue
-       */
-      LambdaRequestHandlerFactory(Core::Configuration &configuration,
-                                  Core::MetricService &metricService,
-                                  Poco::NotificationQueue &createQueue,
-                                  Poco::NotificationQueue &invokeQueue)
-        : _configuration(configuration), _metricService(metricService), _createQueue(createQueue), _invokeQueue(invokeQueue) {}
+    /**
+     * Constructor
+     *
+     * @param configuration application configuration
+     * @param metricService  monitoring
+     * @param createQueue create notification queue
+     * @param invokeQueue invoke notification queue
+     */
+    LambdaRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService) {}
 
-      /**
-       * Create new lambda request handler
-       *
-       * @param request HTTP request
-       * @return lambda request handler
-       */
-      Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
-        if(request.getURI().empty()) {
-          return nullptr;
-        }
-        return new LambdaHandler(_configuration, _metricService);
+    /**
+     * Create new lambda request handler
+     *
+     * @param request HTTP request
+     * @return lambda request handler
+     */
+    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
+      if (request.getURI().empty()) {
+        return nullptr;
       }
+      return new LambdaHandler(_configuration, _metricService);
+    }
 
-    private:
+  private:
 
-      /**
-       * S3 handler configuration
-       */
-      Core::Configuration &_configuration;
+    /**
+     * S3 handler configuration
+     */
+    Core::Configuration &_configuration;
 
-      /**
-       * Metric module
-       */
-      Core::MetricService &_metricService;
-
-      /**
-       * Create notification center
-       */
-      Poco::NotificationQueue &_createQueue;
-
-      /**
-       * Invoke notification center
-       */
-      Poco::NotificationQueue &_invokeQueue;
+    /**
+     * Metric module
+     */
+    Core::MetricService &_metricService;
   };
 
 } // namespace AwsMock::Service

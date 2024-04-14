@@ -56,17 +56,15 @@ namespace AwsMock::Service {
      */
     SQSHandler(Core::Configuration &configuration, Core::MetricService &metricService);
 
-  protected:
-
     /**
-     * HTTP POST request.
-     *
-     * @param request HTTP request
-     * @param response HTTP response
-     * @param region AWS region
-     * @param user AWS user
-     * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-     */
+       * HTTP POST request.
+       *
+       * @param request HTTP request
+       * @param response HTTP response
+       * @param region AWS region
+       * @param user AWS user
+       * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+       */
     void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
   private:

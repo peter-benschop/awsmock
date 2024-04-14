@@ -56,8 +56,6 @@ namespace AwsMock::Service {
      */
     S3Handler(Core::Configuration &configuration, Core::MetricService &metricService);
 
-  protected:
-
     /**
      * HTTP GET request.
      *

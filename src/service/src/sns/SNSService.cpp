@@ -67,8 +67,10 @@ namespace AwsMock::Service {
 
     Dto::SNS::DeleteTopicResponse response;
     try {
+
       // Check existence
       if (!_snsDatabase.TopicExists(topicArn)) {
+        log_warning_stream(_logger) << "Topic does not exist, arn: " << topicArn << std::endl;
         throw Core::ServiceException("Topic does not exist", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 

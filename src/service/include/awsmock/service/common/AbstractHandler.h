@@ -63,8 +63,6 @@ namespace AwsMock::Service {
      */
     void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
 
-  protected:
-
     /**
      * Handles the HTTP method GET.
      *

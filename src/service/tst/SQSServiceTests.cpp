@@ -40,10 +40,9 @@ namespace AwsMock::Service {
         _database.DeleteAllMessages();
       }
 
-      Poco::Condition _condition;
       Core::Configuration& _configuration = Core::Configuration::instance();
       Database::SQSDatabase& _database = Database::SQSDatabase::instance();
-      SQSService _service = SQSService(_configuration, _condition);
+      SQSService _service = SQSService(_configuration);
   };
 
   TEST_F(SQSServiceTest, QueueCreateTest) {

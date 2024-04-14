@@ -38,8 +38,6 @@ namespace AwsMock::Service {
      */
     SNSHandler(Core::Configuration &configuration, Core::MetricService &metricService);
 
-  protected:
-
     /**
      * HTTP POST request.
      *

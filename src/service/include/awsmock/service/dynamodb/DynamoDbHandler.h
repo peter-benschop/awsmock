@@ -42,8 +42,6 @@ namespace AwsMock::Service {
      */
     DynamoDbHandler(Core::Configuration &configuration, Core::MetricService &metricService);
 
-    protected:
-
     /**
      * HTTP GET request.
      *

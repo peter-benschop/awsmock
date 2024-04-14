@@ -42,8 +42,6 @@ namespace AwsMock::Service {
      */
     LambdaHandler(Core::Configuration &configuration, Core::MetricService &metricService);
 
-  protected:
-
     /**
      * HTTP GET request.
      *
@@ -128,8 +126,6 @@ namespace AwsMock::Service {
      * lambda module
      */
     Service::LambdaService _lambdaService;
-    Poco::NotificationQueue createQueue;
-    Poco::NotificationQueue invokeQueue;
   };
 
 } // namespace AwsMock

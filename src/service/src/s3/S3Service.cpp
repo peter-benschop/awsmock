@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-  S3Service::S3Service(Core::Configuration &configuration) : _logger(Poco::Logger::get("S3Service")), _configuration(configuration), _database(Database::S3Database::instance()) {
+  S3Service::S3Service(const Core::Configuration &configuration) : _logger(Poco::Logger::get("S3Service")), _configuration(configuration), _database(Database::S3Database::instance()) {
 
     _accountId = _configuration.getString("awsmock.account.userPoolId");
 

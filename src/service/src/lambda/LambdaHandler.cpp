@@ -1,14 +1,14 @@
 
-#include "awsmock/service/lambda/LambdaHandler.h"
+#include <awsmock/service/lambda/LambdaHandler.h>
 
 namespace AwsMock::Service {
 
   LambdaHandler::LambdaHandler(Core::Configuration &configuration, Core::MetricService &metricService)
     : AbstractHandler(), _logger(Poco::Logger::get("LambdaServiceHandler")), _configuration(configuration), _metricService(metricService),
-      _lambdaService(configuration, metricService, createQueue, invokeQueue) {
+      _lambdaService(configuration, metricService) {
   }
 
-  void LambdaHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, [[maybe_unused]]const std::string &user) {
+  void LambdaHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
     _metricService.IncrementCounter("gateway_get_counter");
     log_trace_stream(_logger) << "Lambda GET request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 

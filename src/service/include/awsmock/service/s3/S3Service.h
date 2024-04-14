@@ -46,8 +46,7 @@
 #include "awsmock/dto/s3/PutObjectResponse.h"
 #include "awsmock/service/lambda/LambdaService.h"
 
-#define DEFAULT_DATA_DIR  "/tmp/awsmock/data"
-#define DEFAULT_S3_DATA_DIR  "/tmp/awsmock/data/s3"
+#define DEFAULT_DATA_DIR  "/home/awsmock/data"
 #define DEFAULT_TRANSFER_DATA_DIR  "/tmp/awsmock/data/transfer"
 #define DEFAULT_TRANSFER_BUCKET  "transfer-server"
 
@@ -64,7 +63,7 @@ namespace AwsMock::Service {
      *
      * @param configuration module configuration
      */
-    explicit S3Service(Core::Configuration &configuration);
+    explicit S3Service(const Core::Configuration &configuration);
 
     /**
      * Returns the meta data of an S3 object
@@ -348,7 +347,7 @@ namespace AwsMock::Service {
     /**
      * Configuration
      */
-    Core::Configuration &_configuration;
+    const Core::Configuration &_configuration;
 
     /**
      * Database connection

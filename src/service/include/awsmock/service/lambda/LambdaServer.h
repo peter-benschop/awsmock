@@ -49,7 +49,7 @@ namespace AwsMock::Service {
      * @param createQueue create lambda notification queue
      * @param invokeQueue invoke lambda notification queue
      */
-    explicit LambdaServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue, Poco::NotificationQueue &invokeQueue);
+    explicit LambdaServer(Core::Configuration &configuration, Core::MetricService &metricService);
 
     /**
      * Destructor
@@ -65,11 +65,6 @@ namespace AwsMock::Service {
      * Main method
      */
     void Run() override;
-
-    /**
-     * Stop executors
-     */
-    [[maybe_unused]] void StopExecutors();
 
     /**
      * Shutdown
@@ -127,16 +122,6 @@ namespace AwsMock::Service {
     Core::MetricService &_metricService;
 
     /**
-     * Create notification queue
-     */
-    Poco::NotificationQueue &_createQueue;
-
-    /**
-     * Invoke notification queue
-     */
-    Poco::NotificationQueue &_invokeQueue;
-
-    /**
      * lambda database
      */
     Database::LambdaDatabase& _lambdaDatabase;
@@ -150,16 +135,6 @@ namespace AwsMock::Service {
      * Docker module
      */
     std::unique_ptr<Service::DockerService> _dockerService;
-
-    /**
-     * lambda creator
-     */
-    LambdaCreator _lambdaCreator = LambdaCreator(_configuration, _createQueue);
-
-    /**
-     * lambda executor
-     */
-    LambdaExecutor _lambdaExecutor = LambdaExecutor( _metricService, _invokeQueue);
 
     /**
      * Data dir

@@ -8,6 +8,7 @@
 // C++ includes
 #include <string>
 #include <utility>
+#include <future>
 
 // Poco includes
 #include <Poco/DateTime.h>
@@ -68,7 +69,7 @@ namespace AwsMock::Service {
      * @param host module host
      * @param port module port
      */
-    GatewayHandler(Core::Configuration &configuration, Core::MetricService &metricService, Service::GatewayRoute* route);
+    GatewayHandler(Core::Configuration &configuration, Core::MetricService &metricService, Service::GatewayRoute  route);
 
   protected:
 
@@ -174,7 +175,7 @@ namespace AwsMock::Service {
     /**
      * Gateway route
      */
-    Service::GatewayRoute* _route;
+    Service::GatewayRoute _route;
 
   };
 } // namespace AwsMock::Service

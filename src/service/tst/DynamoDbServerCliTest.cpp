@@ -50,7 +50,6 @@ namespace AwsMock::Service {
     }
 
     std::string _endpoint, _accountId;
-    Poco::NotificationQueue createQueue, invokeQueue;
     Core::Configuration &_configuration = Core::Configuration::instance();
     Core::MetricService _metricService = Core::MetricService(_configuration);
     Database::DynamoDbDatabase &_database = Database::DynamoDbDatabase::instance();
