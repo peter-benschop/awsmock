@@ -8,18 +8,21 @@ namespace AwsMock::FtpServer {
                          const std::string &serverName,
                          const Core::Configuration &configuration,
                          const std::function<void()> &completion_handler)
-      : AbstractWorker(configuration), _completion_handler(completion_handler), _user_database(user_database), _io_service(io_service), command_socket_(io_service),
-        command_write_strand_(io_service), data_type_binary_(false), data_acceptor_(io_service), data_buffer_strand_(io_service), file_rw_strand_(io_service),
-        _ftpWorkingDirectory("/"), _logger(Poco::Logger::get("FtpSession")), _configuration(configuration), _serverName(serverName) {
+    : AbstractWorker(configuration), _completion_handler(completion_handler), _user_database(user_database), _io_service(io_service), command_socket_(io_service),
+      command_write_strand_(io_service), data_type_binary_(false), data_acceptor_(io_service), data_buffer_strand_(io_service), file_rw_strand_(io_service),
+      _ftpWorkingDirectory("/"), _logger(Poco::Logger::get("FtpSession")), _configuration(configuration), _serverName(serverName) {
 
     // S3 module connection
     _s3ServiceHost = _configuration.getString("awsmock.service.s3.host", "localhost");
     _s3ServicePort = _configuration.getInt("awsmock.service.s3.port", 9500);
     _baseUrl = "http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort);
 
-    // Bucket
+    // Environment
+    _region = _configuration.getString("awsmock.region", DEFAULT_TRANSFER_REGION);
     _bucket = _configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
-    _baseDir = _configuration.getString("awsmock.service.transfer.base.dir", DEFAULT_BASE_DIR);
+
+    // S3 service
+    _s3Service = std::make_shared<Service::S3Service>(configuration);
   }
 
   FtpSession::~FtpSession() {
@@ -63,17 +66,17 @@ namespace AwsMock::FtpServer {
 
     log_debug_stream(_logger) << "FTP >> " << command_output_queue_.front() << std::endl;
     asio::async_write(command_socket_, asio::buffer(command_output_queue_.front()), command_write_strand_.wrap(
-        [me = shared_from_this()](asio::error_code ec, std::size_t /*bytes_to_transfer*/) {
-          if (!ec) {
-            me->command_output_queue_.pop_front();
+      [me = shared_from_this()](asio::error_code ec, std::size_t /*bytes_to_transfer*/) {
+        if (!ec) {
+          me->command_output_queue_.pop_front();
 
-            if (!me->command_output_queue_.empty()) {
-              me->startSendingMessages();
-            }
-          } else {
-            log_error_stream(me->_logger) << "Command write error: " << ec.message() << std::endl;
+          if (!me->command_output_queue_.empty()) {
+            me->startSendingMessages();
           }
+        } else {
+          log_error_stream(me->_logger) << "Command write error: " << ec.message() << std::endl;
         }
+      }
     ));
   }
 
@@ -135,48 +138,48 @@ namespace AwsMock::FtpServer {
     }
 
     const std::map<std::string, std::function<void(std::string)>> command_map{
-        // Access control commands
-        {"USER", std::bind(&FtpSession::handleFtpCommandUSER, this, std::placeholders::_1)},
-        {"PASS", std::bind(&FtpSession::handleFtpCommandPASS, this, std::placeholders::_1)},
-        {"ACCT", std::bind(&FtpSession::handleFtpCommandACCT, this, std::placeholders::_1)},
-        {"CWD", std::bind(&FtpSession::handleFtpCommandCWD, this, std::placeholders::_1)},
-        {"CDUP", std::bind(&FtpSession::handleFtpCommandCDUP, this, std::placeholders::_1)},
-        {"REIN", std::bind(&FtpSession::handleFtpCommandREIN, this, std::placeholders::_1)},
-        {"QUIT", std::bind(&FtpSession::handleFtpCommandQUIT, this, std::placeholders::_1)},
+      // Access control commands
+      {"USER", std::bind(&FtpSession::handleFtpCommandUSER, this, std::placeholders::_1)},
+      {"PASS", std::bind(&FtpSession::handleFtpCommandPASS, this, std::placeholders::_1)},
+      {"ACCT", std::bind(&FtpSession::handleFtpCommandACCT, this, std::placeholders::_1)},
+      {"CWD", std::bind(&FtpSession::handleFtpCommandCWD, this, std::placeholders::_1)},
+      {"CDUP", std::bind(&FtpSession::handleFtpCommandCDUP, this, std::placeholders::_1)},
+      {"REIN", std::bind(&FtpSession::handleFtpCommandREIN, this, std::placeholders::_1)},
+      {"QUIT", std::bind(&FtpSession::handleFtpCommandQUIT, this, std::placeholders::_1)},
 
-        // Transfer parameter commands
-        {"PORT", std::bind(&FtpSession::handleFtpCommandPORT, this, std::placeholders::_1)},
-        {"PASV", std::bind(&FtpSession::handleFtpCommandPASV, this, std::placeholders::_1)},
-        {"TYPE", std::bind(&FtpSession::handleFtpCommandTYPE, this, std::placeholders::_1)},
-        {"STRU", std::bind(&FtpSession::handleFtpCommandSTRU, this, std::placeholders::_1)},
-        {"MODE", std::bind(&FtpSession::handleFtpCommandMODE, this, std::placeholders::_1)},
+      // Transfer parameter commands
+      {"PORT", std::bind(&FtpSession::handleFtpCommandPORT, this, std::placeholders::_1)},
+      {"PASV", std::bind(&FtpSession::handleFtpCommandPASV, this, std::placeholders::_1)},
+      {"TYPE", std::bind(&FtpSession::handleFtpCommandTYPE, this, std::placeholders::_1)},
+      {"STRU", std::bind(&FtpSession::handleFtpCommandSTRU, this, std::placeholders::_1)},
+      {"MODE", std::bind(&FtpSession::handleFtpCommandMODE, this, std::placeholders::_1)},
 
-        // Ftp module commands
-        {"RETR", std::bind(&FtpSession::handleFtpCommandRETR, this, std::placeholders::_1)},
-        {"STOR", std::bind(&FtpSession::handleFtpCommandSTOR, this, std::placeholders::_1)},
-        {"STOU", std::bind(&FtpSession::handleFtpCommandSTOU, this, std::placeholders::_1)},
-        {"APPE", std::bind(&FtpSession::handleFtpCommandAPPE, this, std::placeholders::_1)},
-        {"ALLO", std::bind(&FtpSession::handleFtpCommandALLO, this, std::placeholders::_1)},
-        {"REST", std::bind(&FtpSession::handleFtpCommandREST, this, std::placeholders::_1)},
-        {"RNFR", std::bind(&FtpSession::handleFtpCommandRNFR, this, std::placeholders::_1)},
-        {"RNTO", std::bind(&FtpSession::handleFtpCommandRNTO, this, std::placeholders::_1)},
-        {"ABOR", std::bind(&FtpSession::handleFtpCommandABOR, this, std::placeholders::_1)},
-        {"DELE", std::bind(&FtpSession::handleFtpCommandDELE, this, std::placeholders::_1)},
-        {"RMD", std::bind(&FtpSession::handleFtpCommandRMD, this, std::placeholders::_1)},
-        {"MKD", std::bind(&FtpSession::handleFtpCommandMKD, this, std::placeholders::_1)},
-        {"PWD", std::bind(&FtpSession::handleFtpCommandPWD, this, std::placeholders::_1)},
-        {"LIST", std::bind(&FtpSession::handleFtpCommandLIST, this, std::placeholders::_1)},
-        {"NLST", std::bind(&FtpSession::handleFtpCommandNLST, this, std::placeholders::_1)},
-        {"SITE", std::bind(&FtpSession::handleFtpCommandSITE, this, std::placeholders::_1)},
-        {"SYST", std::bind(&FtpSession::handleFtpCommandSYST, this, std::placeholders::_1)},
-        {"STAT", std::bind(&FtpSession::handleFtpCommandSTAT, this, std::placeholders::_1)},
-        {"HELP", std::bind(&FtpSession::handleFtpCommandHELP, this, std::placeholders::_1)},
-        {"NOOP", std::bind(&FtpSession::handleFtpCommandNOOP, this, std::placeholders::_1)},
+      // Ftp module commands
+      {"RETR", std::bind(&FtpSession::handleFtpCommandRETR, this, std::placeholders::_1)},
+      {"STOR", std::bind(&FtpSession::handleFtpCommandSTOR, this, std::placeholders::_1)},
+      {"STOU", std::bind(&FtpSession::handleFtpCommandSTOU, this, std::placeholders::_1)},
+      {"APPE", std::bind(&FtpSession::handleFtpCommandAPPE, this, std::placeholders::_1)},
+      {"ALLO", std::bind(&FtpSession::handleFtpCommandALLO, this, std::placeholders::_1)},
+      {"REST", std::bind(&FtpSession::handleFtpCommandREST, this, std::placeholders::_1)},
+      {"RNFR", std::bind(&FtpSession::handleFtpCommandRNFR, this, std::placeholders::_1)},
+      {"RNTO", std::bind(&FtpSession::handleFtpCommandRNTO, this, std::placeholders::_1)},
+      {"ABOR", std::bind(&FtpSession::handleFtpCommandABOR, this, std::placeholders::_1)},
+      {"DELE", std::bind(&FtpSession::handleFtpCommandDELE, this, std::placeholders::_1)},
+      {"RMD", std::bind(&FtpSession::handleFtpCommandRMD, this, std::placeholders::_1)},
+      {"MKD", std::bind(&FtpSession::handleFtpCommandMKD, this, std::placeholders::_1)},
+      {"PWD", std::bind(&FtpSession::handleFtpCommandPWD, this, std::placeholders::_1)},
+      {"LIST", std::bind(&FtpSession::handleFtpCommandLIST, this, std::placeholders::_1)},
+      {"NLST", std::bind(&FtpSession::handleFtpCommandNLST, this, std::placeholders::_1)},
+      {"SITE", std::bind(&FtpSession::handleFtpCommandSITE, this, std::placeholders::_1)},
+      {"SYST", std::bind(&FtpSession::handleFtpCommandSYST, this, std::placeholders::_1)},
+      {"STAT", std::bind(&FtpSession::handleFtpCommandSTAT, this, std::placeholders::_1)},
+      {"HELP", std::bind(&FtpSession::handleFtpCommandHELP, this, std::placeholders::_1)},
+      {"NOOP", std::bind(&FtpSession::handleFtpCommandNOOP, this, std::placeholders::_1)},
 
-        // Modern FTP Commands
-        {"FEAT", std::bind(&FtpSession::handleFtpCommandFEAT, this, std::placeholders::_1)},
-        {"OPTS", std::bind(&FtpSession::handleFtpCommandOPTS, this, std::placeholders::_1)},
-        {"SIZE", std::bind(&FtpSession::handleFtpCommandSIZE, this, std::placeholders::_1)},
+      // Modern FTP Commands
+      {"FEAT", std::bind(&FtpSession::handleFtpCommandFEAT, this, std::placeholders::_1)},
+      {"OPTS", std::bind(&FtpSession::handleFtpCommandOPTS, this, std::placeholders::_1)},
+      {"SIZE", std::bind(&FtpSession::handleFtpCommandSIZE, this, std::placeholders::_1)},
     };
 
     auto command_it = command_map.find(ftp_command);
@@ -416,7 +419,7 @@ namespace AwsMock::FtpServer {
     const std::string local_path = toLocalPath(param);
 
     const std::ios::openmode open_mode =
-        std::ios::ate | (data_type_binary_ ? (std::ios::in | std::ios::binary) : (std::ios::in));
+      std::ios::ate | (data_type_binary_ ? (std::ios::in | std::ios::binary) : (std::ios::in));
 #if defined(WIN32) && !defined(__GNUG__)
     std::ifstream file(StrConvert::Utf8ToWide(local_path), open_mode);
 #else
@@ -468,7 +471,7 @@ namespace AwsMock::FtpServer {
     auto existing_file_filestatus = FileStatus(local_path);
     if (existing_file_filestatus.isOk()) {
       if ((existing_file_filestatus.type() == FileType::RegularFile)
-          && (static_cast<int>(_logged_in_user->permissions_ & Permission::FileDelete) == 0)) {
+        && (static_cast<int>(_logged_in_user->permissions_ & Permission::FileDelete) == 0)) {
         sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN_FILENAME_NOT_ALLOWED, "File already exists. Permission denied to overwrite file.");
         return;
       } else if (existing_file_filestatus.type() == FileType::Dir) {
@@ -512,7 +515,7 @@ namespace AwsMock::FtpServer {
 
     auto existing_file_filestatus = FileStatus(local_path);
     if (!existing_file_filestatus.isOk()
-        || (existing_file_filestatus.type() != FileType::RegularFile)) {
+      || (existing_file_filestatus.type() != FileType::RegularFile)) {
       sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "File does not exist.");
       return;
     }
@@ -976,34 +979,34 @@ namespace AwsMock::FtpServer {
 
   void FtpSession::writeDataToSocket(const std::shared_ptr<asio::ip::tcp::socket> &data_socket, const std::function<void(void)> &fetch_more) {
     data_buffer_strand_.post(
-        [me = shared_from_this(), data_socket, fetch_more]() {
-          auto data = me->data_buffer_.front();
+      [me = shared_from_this(), data_socket, fetch_more]() {
+        auto data = me->data_buffer_.front();
 
-          if (data) {
-            // Send out the buffer
-            asio::async_write(*data_socket,
-                              asio::buffer(*data),
-                              me->data_buffer_strand_.wrap([me, data_socket, data, fetch_more](asio::error_code ec, std::size_t /*bytes_to_transfer*/) {
-                                                             me->data_buffer_.pop_front();
+        if (data) {
+          // Send out the buffer
+          asio::async_write(*data_socket,
+                            asio::buffer(*data),
+                            me->data_buffer_strand_.wrap([me, data_socket, data, fetch_more](asio::error_code ec, std::size_t /*bytes_to_transfer*/) {
+                                                           me->data_buffer_.pop_front();
 
-                                                             if (ec) {
-                                                               log_error_stream(me->_logger) << "Data write error: " << ec.message() << std::endl;
-                                                               return;
-                                                             }
-
-                                                             fetch_more();
-
-                                                             if (!me->data_buffer_.empty()) {
-                                                               me->writeDataToSocket(data_socket, fetch_more);
-                                                             }
+                                                           if (ec) {
+                                                             log_error_stream(me->_logger) << "Data write error: " << ec.message() << std::endl;
+                                                             return;
                                                            }
-                              ));
-          } else {
-            // we got to the end of transmission
-            me->data_buffer_.pop_front();
-            me->sendFtpMessage(FtpReplyCode::CLOSING_DATA_CONNECTION, "Done");
-          }
+
+                                                           fetch_more();
+
+                                                           if (!me->data_buffer_.empty()) {
+                                                             me->writeDataToSocket(data_socket, fetch_more);
+                                                           }
+                                                         }
+                            ));
+        } else {
+          // we got to the end of transmission
+          me->data_buffer_.pop_front();
+          me->sendFtpMessage(FtpReplyCode::CLOSING_DATA_CONNECTION, "Done");
         }
+      }
     );
   }
 
@@ -1177,24 +1180,20 @@ namespace AwsMock::FtpServer {
   void FtpSession::SendCreateObjectRequest(const std::string &user, const std::string &fileName) {
 
     std::string key = GetKey(fileName);
-    std::string url = _baseUrl + "/" + _bucket + "/" + key;
-    std::map<std::string, std::string> headers;
-    headers["Content-MD5"] = Core::Crypto::Base64Encode(Core::Crypto::GetMd5FromFile(fileName));
-    headers["Content-Length"] = std::to_string(Core::FileUtils::FileSize(fileName));
-    headers["x-amz-sdk-checksum-algorithm"] = "SHA256";
-    headers["x-amz-checksum-sha256"] = Core::Crypto::GetSha256FromFile(fileName);
-    headers["x-amz-meta-user-agent"] = "AWSTransfer";
-    headers["x-amz-meta-user-agent-userPoolId"] = user + "@" + _serverName;
-    SendFile("s3", url, fileName, headers);
-    log_debug_stream(_logger) << "Create object message request send, url: " << url << std::endl;
+
+    Dto::S3::PutObjectRequest request = {.region=_region, .bucket=_bucket, .key=key, .owner=user};
+
+    std::ifstream ifs(fileName);
+    _s3Service->PutObject(request, ifs);
+    log_debug_stream(_logger) << "Create object message request send, fileName: " << fileName << std::endl;
   }
 
   void FtpSession::SendDeleteObjectRequest(const std::string &user, const std::string &fileName) {
 
-    std::string key = GetKey(fileName);
-    std::string url = _baseUrl + "/" + _bucket + "/" + key;
-    SendDeleteRequest("s3", url, {}, "application/json");
-    log_debug_stream(_logger) << "Create object message request send, url: " << url << std::endl;
+    Dto::S3::DeleteObjectRequest request = {.region=_region, .user=user, .bucket=_bucket, .key=GetKey(fileName)};
+    _s3Service->DeleteObject(request);
+
+    log_debug_stream(_logger) << "Delete object request send, fileName: " << fileName << std::endl;
   }
 
   std::string FtpSession::GetKey(const std::string &path) {

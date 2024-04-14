@@ -18,17 +18,18 @@
 #include <Poco/Net/HTTPServerResponse.h>
 
 // AwsMock includes
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/CurlUtils.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/repository/ModuleDatabase.h"
-#include "awsmock/entity/module/ModuleState.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/CurlUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/Timer.h>
+#include <awsmock/repository/ModuleDatabase.h>
+#include <awsmock/entity/module/ModuleState.h>
 
 namespace AwsMock::Service {
 
-  class AbstractServer : public Poco::Runnable {
+  class AbstractServer : public Core::Timer {
 
-    public:
+  public:
 
     /**
      * Constructor
@@ -37,6 +38,11 @@ namespace AwsMock::Service {
      * @param name manager name
      */
     explicit AbstractServer(Core::Configuration &configuration, std::string name);
+
+    /**
+     * Destructor
+     */
+    virtual ~AbstractServer();
 
     /**
      * Checks whether the module is active
@@ -49,11 +55,6 @@ namespace AwsMock::Service {
      * Returns the running flag
      */
     bool IsRunning() const;
-
-    /**
-     * Main thread methods
-     */
-    void run() override;
 
     /**
      * Stop the manager
@@ -77,12 +78,12 @@ namespace AwsMock::Service {
      */
     void StopHttpServer();
 
-    protected:
+  protected:
 
     /**
      * Main loop
      */
-    virtual void MainLoop() = 0;
+    virtual void Run() = 0;
 
     /**
      * Interruptable sleep
@@ -94,7 +95,7 @@ namespace AwsMock::Service {
      */
     Poco::Condition _condition;
 
-    private:
+  private:
 
     /**
      * Logger

@@ -14,7 +14,6 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/MetricService.h>
-#include <awsmock/core/MetricServiceTimer.h>
 #include <awsmock/core/MetricDefinition.h>
 #include <awsmock/core/NumberUtils.h>
 #include <awsmock/core/JsonException.h>

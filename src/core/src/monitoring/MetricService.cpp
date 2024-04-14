@@ -8,31 +8,27 @@ namespace AwsMock::Core {
 
   MetricService::MetricService(const Configuration &configuration) : MetricService(configuration.getInt("awsmock.monitoring.port", 8081), configuration.getInt("awsmock.monitoring.timeout", 10)) {}
 
-  MetricService::MetricService(int port, long timeout) : _logger(Poco::Logger::get("MetricService")), _port(port), _timeout(timeout) {}
+  MetricService::MetricService(int port, long timeout) : Core::Timer("MetricServer", 60), _logger(Poco::Logger::get("MetricService")), _port(port), _timeout(timeout) {}
 
   void MetricService::Initialize() {
     _server = std::make_shared<Poco::Prometheus::MetricsServer>(_port);
     _metricSystemTimer = std::make_shared<Poco::Timer>(0, _timeout);
     _metricSystemCollector = std::make_shared<MetricSystemCollector>();
     log_debug_stream(_logger) << "Prometheus manager initialized, port: " << _port << std::endl;
-  }
 
-  [[maybe_unused]] void MetricService::StartServer() {
-    StartSystemCounter();
     if (_server != nullptr) {
       _server->start();
     }
+    _metricSystemCollector->Start();
     log_info_stream(_logger) << "Monitoring manager started, port: " << _port << std::endl;;
   }
 
-  void MetricService::ShutdownServer() {
-    /*if (_metricSystemTimer != nullptr) {
-      _metricSystemTimer->stop();
-    }*/
-    if (_server != nullptr) {
-      _server->stop();
-      _server.reset();
-    }
+  void MetricService::Run() {
+  }
+
+  void MetricService::Shutdown() {
+    _server->stop();
+    _metricSystemCollector->Stop();
     log_info_stream(_logger) << "Metric module has been shutdown" << std::endl;
   }
 
@@ -320,14 +316,5 @@ namespace AwsMock::Core {
     uint32_t threadID = std::hash<std::thread::id>{}(std::this_thread::get_id());
     log_trace_stream(_logger) << "Timer key returned, name: " + name << std::endl;
     return name + "::" + std::to_string(threadID);
-  }
-
-  void MetricService::StartSystemCounter() {
-    if (_metricSystemTimer != nullptr && _metricSystemCollector != nullptr) {
-      _metricSystemTimer->start(Poco::TimerCallback<MetricSystemCollector>(*_metricSystemCollector, &MetricSystemCollector::onTimer));
-      log_debug_stream(_logger) << "System collector started, timeout: " << _timeout << "ms" << std::endl;
-    } else {
-      log_error_stream(_logger) << "Metric system timer not defined" << std::endl;
-    }
   }
 }

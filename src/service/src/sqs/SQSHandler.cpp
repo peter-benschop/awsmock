@@ -3,7 +3,7 @@
 
 namespace AwsMock::Service {
 
-  SQSHandler::SQSHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition) : SQSCmdHandler(configuration, metricService, condition), _logger(Poco::Logger::get("SQSHandler")) {
+  SQSHandler::SQSHandler(Core::Configuration &configuration, Core::MetricService &metricService) : SQSCmdHandler(configuration, metricService), _logger(Poco::Logger::get("SQSHandler")) {
   }
 
   void SQSHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {

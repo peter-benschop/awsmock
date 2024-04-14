@@ -21,7 +21,6 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/ThreadPool.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/sqs/SQSMonitoring.h>
 #include <awsmock/service/secretsmanager/SecretsManagerHandlerFactory.h>
 
 #define SECRETSMANAGER_DEFAULT_PORT 9507
@@ -54,26 +53,21 @@ namespace AwsMock::Service {
     explicit SecretsManagerServer(Core::Configuration &configuration, Core::MetricService &metricService);
 
     /**
-     * Destructor
+     * Timer initialization
      */
-    ~SecretsManagerServer() override;
+    void Initialize() override;
 
     /**
      * Main method
      */
-    void MainLoop() override;
+    void Run() override;
 
     /**
-     * Stop the monitoring module.
+     * Shutdown
      */
-    void StopMonitoringServer();
+    void Shutdown() override;
 
   private:
-
-    /**
-     * Start the monitoring module.
-     */
-    void StartMonitoringServer();
 
     /**
      * Logger
@@ -94,11 +88,6 @@ namespace AwsMock::Service {
      * S3 database
      */
     Database::ModuleDatabase& _moduleDatabase;
-
-    /**
-     * Thread pool
-     */
-    AwsMock::Core::ThreadPool<SQSMonitoring> _threadPool;
 
     /**
      * AWS region

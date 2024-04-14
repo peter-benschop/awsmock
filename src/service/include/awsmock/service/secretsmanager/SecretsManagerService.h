@@ -59,7 +59,7 @@ namespace AwsMock::Service {
      * @param configuration module configuration
      * @param condition stop condition
      */
-    explicit SecretsManagerService(Core::Configuration &configuration, Poco::Condition &condition);
+    explicit SecretsManagerService(Core::Configuration &configuration);
 
     /**
      * Create a new secret
@@ -138,11 +138,6 @@ namespace AwsMock::Service {
      * Database connection
      */
     Database::SecretsManagerDatabase &_database;
-
-    /**
-     * Shutdown condition
-     */
-    Poco::Condition &_condition;
 
     /**
      * Shutdown mutex

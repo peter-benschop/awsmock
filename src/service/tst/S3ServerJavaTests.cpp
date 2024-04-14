@@ -42,7 +42,7 @@ namespace AwsMock::Service {
       _tempFile = Core::FileUtils::CreateTempFile("txt");
 
       // Start HTTP manager
-      Poco::ThreadPool::defaultPool().start(_s3Server);
+      _s3Server.Start();
     }
 
     void TearDown() override {

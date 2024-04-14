@@ -32,7 +32,7 @@ namespace AwsMock::Core {
 
     std::string basePath = GetBasePath(uri);
     std::vector<std::string> parameters = StringUtils::Split(basePath, '/');
-    return Core::StringUtils::Join(parameters, '/', index);
+    return Core::StringUtils::UrlDecode(Core::StringUtils::Join(parameters, '/', index));
   }
 
   std::vector<std::string> HttpUtils::GetPathParameters(const std::string &uri) {
@@ -119,6 +119,16 @@ namespace AwsMock::Core {
       throw Core::ServiceException("Invalid path parameter index");
     }
     return parameters[index - 1];
+  }
+
+  int HttpUtils::GetIntParameter(const std::string &body, const std::string &name, int min, int max, int def) {
+    int value = def;
+    std::string parameterValue = GetQueryParameterValueByName(body, name);
+    if (!parameterValue.empty()) {
+      value = std::stoi(parameterValue);
+      value = value > min && value < max ? value : def;
+    }
+    return value;
   }
 
   bool HttpUtils::HasQueryParameter(const std::string &uri, const std::string &name) {

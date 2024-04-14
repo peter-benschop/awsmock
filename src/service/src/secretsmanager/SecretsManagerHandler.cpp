@@ -3,7 +3,7 @@
 
 namespace AwsMock::Service {
 
-  SecretsManagerHandler::SecretsManagerHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition) : SecretsManagerCmdHandler(configuration, metricService, condition), _logger(Poco::Logger::get("SecretsManagerHandler")) {
+  SecretsManagerHandler::SecretsManagerHandler(Core::Configuration &configuration, Core::MetricService &metricService) : SecretsManagerCmdHandler(configuration, metricService), _logger(Poco::Logger::get("SecretsManagerHandler")) {
   }
 
   void SecretsManagerHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {

@@ -48,6 +48,7 @@ namespace AwsMock::Service {
 
     try {
 
+      std::string tmp = request.getURI();
       std::string bucket = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
       std::string key = Core::HttpUtils::GetPathParametersFromIndex(request.getURI(), 1);
       log_debug_stream(_logger) << "S3 HEAD request, bucket: " << bucket << " key: " << key << std::endl;

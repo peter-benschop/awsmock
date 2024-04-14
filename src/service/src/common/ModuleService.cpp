@@ -45,28 +45,28 @@ namespace AwsMock::Service {
         _moduleDatabase.StartDatabase();
       } else if (module.name == "s3") {
         auto *s3server = (Service::S3Server *) _serverMap[module.name];
-        Poco::ThreadPool::defaultPool().start(*s3server);
+        s3server->Start();
       } else if (module.name == "sqs") {
         auto *sqsServer = (Service::SQSServer *) _serverMap[module.name];
-        Poco::ThreadPool::defaultPool().start(*sqsServer);
+        sqsServer->Start();
       } else if (module.name == "sns") {
         auto *snsServer = (Service::SNSServer *) _serverMap[module.name];
-        Poco::ThreadPool::defaultPool().start(*snsServer);
+        snsServer->Start();
       } else if (module.name == "lambda") {
         auto *lambdaServer = (Service::LambdaServer *) _serverMap[module.name];
-        Poco::ThreadPool::defaultPool().start(*lambdaServer);
+        lambdaServer->Start();
       } else if (module.name == "transfer") {
         auto *transferServer = (Service::TransferServer *) _serverMap[module.name];
-        Poco::ThreadPool::defaultPool().start(*transferServer);
+        transferServer->Start();
       } else if (module.name == "cognito") {
         auto *cognitoServer = (Service::CognitoServer *) _serverMap[module.name];
-        Poco::ThreadPool::defaultPool().start(*cognitoServer);
+        cognitoServer->Start();
       } else if (module.name == "dynamodb") {
         auto *dynamoDbServer = (Service::DynamoDbServer *) _serverMap[module.name];
-        Poco::ThreadPool::defaultPool().start(*dynamoDbServer);
+        dynamoDbServer->Start();
       } else if (module.name == "gateway") {
         auto *gatewayServer = (Service::GatewayServer *) _serverMap[module.name];
-        Poco::ThreadPool::defaultPool().start(*gatewayServer);
+        gatewayServer->Start();
       }
       log_info_stream(_logger) << "Module " + name + " started" << std::endl;
     }
@@ -334,6 +334,10 @@ namespace AwsMock::Service {
     if (services.HasService("all") || services.HasService("transfer")) {
       Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
       _transferDatabase.DeleteAllTransfers();
+    }
+    if (services.HasService("all") || services.HasService("secretsmanager")) {
+      Database::SecretsManagerDatabase &_secretsManagerDatabase = Database::SecretsManagerDatabase::instance();
+      _secretsManagerDatabase.DeleteAllSecrets();
     }
   }
 

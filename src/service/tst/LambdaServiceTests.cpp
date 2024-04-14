@@ -37,11 +37,10 @@ namespace AwsMock::Service {
       _database.DeleteAllLambdas();
     }
 
-    Poco::NotificationQueue createQueue, invokeQueue;
     Core::Configuration& _configuration = Core::Configuration::instance();
     Core::MetricService _metricService = Core::MetricService(_configuration);
     Database::LambdaDatabase& _database = Database::LambdaDatabase::instance();
-    LambdaService _service = LambdaService(_configuration, _metricService, createQueue, invokeQueue);
+    LambdaService _service = LambdaService(_configuration, _metricService);
     std::string testFile;
   };
 

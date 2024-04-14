@@ -17,34 +17,35 @@
 #include <Poco/Net/HTTPResponse.h>
 
 // AwsMock includes
-#include "awsmock/core/AwsUtils.h"
-#include "awsmock/core/CryptoUtils.h"
-#include "awsmock/core/MetricServiceTimer.h"
-#include "awsmock/core/ServiceException.h"
-#include "awsmock/core/StringUtils.h"
-#include "awsmock/core/SystemUtils.h"
-#include "awsmock/core/TarUtils.h"
-#include "awsmock/dto/dynamodb/CreateTableRequest.h"
-#include "awsmock/dto/dynamodb/CreateTableResponse.h"
-#include "awsmock/dto/dynamodb/DeleteItemRequest.h"
-#include "awsmock/dto/dynamodb/DeleteItemResponse.h"
-#include "awsmock/dto/dynamodb/DeleteTableRequest.h"
-#include "awsmock/dto/dynamodb/DeleteTableResponse.h"
-#include "awsmock/dto/dynamodb/DescribeTableRequest.h"
-#include "awsmock/dto/dynamodb/DescribeTableResponse.h"
-#include "awsmock/dto/dynamodb/DynamoDbResponse.h"
-#include "awsmock/dto/dynamodb/GetItemRequest.h"
-#include "awsmock/dto/dynamodb/GetItemResponse.h"
-#include "awsmock/dto/dynamodb/ListTableRequest.h"
-#include "awsmock/dto/dynamodb/ListTableResponse.h"
-#include "awsmock/dto/dynamodb/PutItemRequest.h"
-#include "awsmock/dto/dynamodb/PutItemResponse.h"
-#include "awsmock/dto/dynamodb/QueryRequest.h"
-#include "awsmock/dto/dynamodb/QueryResponse.h"
-#include "awsmock/dto/dynamodb/ScanRequest.h"
-#include "awsmock/dto/dynamodb/ScanResponse.h"
-#include "awsmock/repository/DynamoDbDatabase.h"
-#include "awsmock/service/common/DockerService.h"
+#include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/core/MetricServiceTimer.h>
+#include <awsmock/core/ServiceException.h>
+#include <awsmock/core/StringUtils.h>
+#include <awsmock/core/SystemUtils.h>
+#include <awsmock/core/TarUtils.h>
+#include <awsmock/dto/dynamodb/CreateTableRequest.h>
+#include <awsmock/dto/dynamodb/CreateTableResponse.h>
+#include <awsmock/dto/dynamodb/DeleteItemRequest.h>
+#include <awsmock/dto/dynamodb/DeleteItemResponse.h>
+#include <awsmock/dto/dynamodb/DeleteTableRequest.h>
+#include <awsmock/dto/dynamodb/DeleteTableResponse.h>
+#include <awsmock/dto/dynamodb/DescribeTableRequest.h>
+#include <awsmock/dto/dynamodb/DescribeTableResponse.h>
+#include <awsmock/dto/dynamodb/DynamoDbResponse.h>
+#include <awsmock/dto/dynamodb/GetItemRequest.h>
+#include <awsmock/dto/dynamodb/GetItemResponse.h>
+#include <awsmock/dto/dynamodb/ListTableRequest.h>
+#include <awsmock/dto/dynamodb/ListTableResponse.h>
+#include <awsmock/dto/dynamodb/PutItemRequest.h>
+#include <awsmock/dto/dynamodb/PutItemResponse.h>
+#include <awsmock/dto/dynamodb/QueryRequest.h>
+#include <awsmock/dto/dynamodb/QueryResponse.h>
+#include <awsmock/dto/dynamodb/ScanRequest.h>
+#include <awsmock/dto/dynamodb/ScanResponse.h>
+#include <awsmock/repository/DynamoDbDatabase.h>
+#include <awsmock/service/common/DockerService.h>
 
 namespace AwsMock::Service {
 

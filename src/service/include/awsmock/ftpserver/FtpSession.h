@@ -27,9 +27,11 @@
 #include <awsmock/ftpserver/Filesystem.h>
 #include <awsmock/ftpserver/UserDatabase.h>
 #include <awsmock/ftpserver/FtpUser.h>
-#include "awsmock/service/common/AbstractWorker.h"
+#include <awsmock/service/common/AbstractWorker.h>
+#include <awsmock/service/s3/S3Service.h>
 
-#define DEFAULT_BASE_DIR "/tmp/awsmock/data/transfer"
+#define DEFAULT_TRANSFER_BASE_DIR "/home/awsmock/data/transfer"
+#define DEFAULT_TRANSFER_REGION "eu-central-1"
 
 namespace AwsMock::FtpServer {
 
@@ -70,7 +72,7 @@ namespace AwsMock::FtpServer {
     FtpSession(asio::io_service &io_service,
                const UserDatabase &user_database,
                const std::string &serverName,
-               const Core::Configuration &configuration,
+               const Core::Configuration& configuration,
                const std::function<void()> &completion_handler);
 
     // Copy (disabled, as we are inheriting from shared_from_this)
@@ -223,7 +225,7 @@ namespace AwsMock::FtpServer {
      * @param path file system path
      * @return S3 key
      */
-    std::string GetKey(const std::string &path);
+    static std::string GetKey(const std::string &path);
 
     ////////////////////////////////////////////////////////
     // Member variables
@@ -301,6 +303,11 @@ namespace AwsMock::FtpServer {
     int _s3ServicePort;
 
     /**
+     * S3 service
+     */
+    std::shared_ptr<Service::S3Service> _s3Service;
+
+    /**
      * Transfer manager base dir
      */
     std::string _baseDir;
@@ -314,5 +321,10 @@ namespace AwsMock::FtpServer {
      * S3 bucket name
      */
     std::string _bucket;
+
+    /**
+     * AWS region
+     */
+    std::string _region;
   };
 }

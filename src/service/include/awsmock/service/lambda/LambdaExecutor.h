@@ -15,10 +15,9 @@
 #include <Poco/Net/HTTPResponse.h>
 
 // AwsMock includes
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/MetricService.h"
-#include "awsmock/core/MetricServiceTimer.h"
-#include "awsmock/dto/lambda/InvocationNotification.h"
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/core/MetricServiceTimer.h>
 
 namespace AwsMock::Service {
 
@@ -32,7 +31,7 @@ namespace AwsMock::Service {
    *
    * @author jens.vogt@opitz-consulting.com
    */
-  class LambdaExecutor : public Poco::Runnable {
+  class LambdaExecutor {
 
   public:
 
@@ -40,16 +39,8 @@ namespace AwsMock::Service {
      * Constructor
      *
      * @param metricService monitoring module
-     * @param invokeQueue invoke notification queue
      */
-    LambdaExecutor(Core::MetricService &metricService, Poco::NotificationQueue &invokeQueue);
-
-    /**
-     * Listens for invocation requests and send the invocation to the right port.
-     */
-    void run() override;
-
-  private:
+    explicit LambdaExecutor(Core::MetricService &metricService);
 
     /**
      * Send the invocation request to the corresponding port
@@ -59,6 +50,8 @@ namespace AwsMock::Service {
      * @param body event payload
      */
     void SendInvocationRequest(const std::string &hostName, int port, const std::string &body);
+
+  private:
 
     /**
      * Returns the URI for the invocation request.
@@ -78,11 +71,6 @@ namespace AwsMock::Service {
      * Metric module
      */
     Core::MetricService &_metricService;
-
-    /**
-     * lambda invocation notification queue
-     */
-    Poco::NotificationQueue &_invokeQueue;
   };
 
 } // namespace AwsMock::Service

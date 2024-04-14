@@ -37,7 +37,7 @@ namespace AwsMock::Service {
         _baseCommand = "java -jar /usr/local/lib/awsmock-java-test-0.0.1-SNAPSHOT-jar-with-dependencies.jar " + _endpoint + " dynamodb ";
 
         // Start HTTP manager
-        Poco::ThreadPool::defaultPool().start(_dynamoDbServer);
+        _dynamoDbServer.Start();
       }
 
       void TearDown() override {

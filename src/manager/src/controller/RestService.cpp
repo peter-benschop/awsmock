@@ -14,23 +14,16 @@ namespace AwsMock {
     _host = _configuration.getString("awsmock.manager.host", MANAGER_DEFAULT_HOST);
     _maxQueueLength = _configuration.getInt("awsmock.manager.max.queue", MANAGER_MAX_CONNECTIONS);
     _maxThreads = _configuration.getInt("awsmock.manager.max.threads", MANAGER_MAX_THREADS);
-    log_debug_stream(_logger) << "AwsMock manager initialized, endpoint: " << _host << ":" << _port << std::endl;
-  }
 
-  RestService::~RestService() {
-    StopServer();
+    log_debug_stream(_logger) << "AwsMock manager initialized, endpoint: " << _host << ":" << _port << std::endl;
   }
 
   void RestService::setPort(int port) {
     _port = port;
   }
 
-  void RestService::setRouter(std::shared_ptr<Poco::Net::HTTPRequestHandlerFactory> router) {
-    _router = std::move(router);
-  }
-
-  std::shared_ptr<Poco::Net::HTTPRequestHandlerFactory> RestService::getRouter() {
-    return _router;
+  void RestService::setRouter(Poco::Net::HTTPRequestHandlerFactory* router) {
+    _router = router;
   }
 
   void RestService::StartServer() {
@@ -40,9 +33,7 @@ namespace AwsMock {
 
     httpServerParams->setMaxQueued(_maxQueueLength);
     httpServerParams->setMaxThreads(_maxThreads);
-    Poco::ThreadPool::defaultPool().addCapacity(_maxQueueLength - Poco::ThreadPool::defaultPool().available());
-
-    _httpServer = std::make_shared<Poco::Net::HTTPServer>(_router.get(), Poco::Net::ServerSocket(Poco::UInt16(_port)), httpServerParams);
+    _httpServer = std::make_shared<Poco::Net::HTTPServer>(_router, Poco::Net::ServerSocket(Poco::UInt16(_port)), httpServerParams);
 
     if (_httpServer) {
       _httpServer->start();
@@ -50,17 +41,15 @@ namespace AwsMock {
     }
   }
 
-  void RestService::StartServer(std::shared_ptr<Poco::Net::HTTPRequestHandlerFactory> router, int port) {
+  void RestService::StartServer(Poco::Net::HTTPRequestHandlerFactory* router, int port) {
     setPort(port);
-    setRouter(std::move(router));
+    setRouter(router);
     StartServer();
   }
 
   void RestService::StopServer() {
-    //_router.reset();
     if (_httpServer) {
-      _httpServer->stopAll(true);
-      _httpServer.reset();
+      _httpServer->stop();
     }
   }
 }

@@ -17,7 +17,6 @@
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/MetricService.h>
-#include <awsmock/core/MetricServiceTimer.h>
 #include <awsmock/core/MetricDefinition.h>
 #include <awsmock/dto/common/DynamoDbClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
@@ -42,8 +41,6 @@ namespace AwsMock::Service {
      * @param metricService monitoring module
      */
     DynamoDbHandler(Core::Configuration &configuration, Core::MetricService &metricService);
-
-    protected:
 
     /**
      * HTTP GET request.

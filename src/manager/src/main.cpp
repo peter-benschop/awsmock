@@ -76,12 +76,15 @@ namespace AwsMock {
 
       // Shutdown all services
       StopServices();
+      log_debug_stream(_logger) << "Service stopped" << std::endl;
 
       // Stop HTTP manager
       _restService.StopServer();
+      log_debug_stream(_logger) << "Gateway stopped" << std::endl;
 
       // Shutdown monitoring
-      _metricService.ShutdownServer();
+      _metricService.Shutdown();
+      log_debug_stream(_logger) << "Monitoring stopped" << std::endl;
 
       log_debug_stream(_logger) << "Bye, bye and thanks for all the fish" << std::endl;
     }
@@ -148,9 +151,7 @@ namespace AwsMock {
      * Initialize the Prometheus monitoring counters and StartServer the prometheus manager.
      */
     void InitializeMonitoring() {
-
-      _metricService.Initialize();
-      _metricService.StartServer();
+      _metricService.Start();
     }
 
     /**
@@ -212,39 +213,39 @@ namespace AwsMock {
       for (const auto &module : modules) {
         if (module.name == "s3" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
           _s3Server = new Service::S3Server(_configuration, _metricService);
-          Poco::ThreadPool::defaultPool().start(*_s3Server);
+          _s3Server->Start();
           _serverMap[module.name] = _s3Server;
         } else if (module.name == "sqs" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
           _sqsServer = new Service::SQSServer(_configuration, _metricService);
-          Poco::ThreadPool::defaultPool().start(*_sqsServer);
+          _sqsServer->Start();
           _serverMap[module.name] = _sqsServer;
         } else if (module.name == "sns" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
           _snsServer = new Service::SNSServer(_configuration, _metricService);
-          Poco::ThreadPool::defaultPool().start(*_snsServer);
+          _snsServer->Start();
           _serverMap[module.name] = _snsServer;
         } else if (module.name == "lambda" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-          _lambdaServer = new Service::LambdaServer(_configuration, _metricService, _createQueue, _invokeQueue);
-          Poco::ThreadPool::defaultPool().start(*_lambdaServer);
+          _lambdaServer = new Service::LambdaServer(_configuration, _metricService);
+          _lambdaServer->Start();
           _serverMap[module.name] = _lambdaServer;
         } else if (module.name == "transfer" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
           _transferServer = new Service::TransferServer(_configuration, _metricService);
-          Poco::ThreadPool::defaultPool().start(*_transferServer);
+          _transferServer->Start();
           _serverMap[module.name] = _transferServer;
         } else if (module.name == "cognito" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
           _cognitoServer = new Service::CognitoServer(_configuration, _metricService);
-          Poco::ThreadPool::defaultPool().start(*_cognitoServer);
+          _cognitoServer->Start();
           _serverMap[module.name] = _cognitoServer;
         } else if (module.name == "dynamodb" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
           _dynamoDbServer = new Service::DynamoDbServer(_configuration, _metricService);
-          Poco::ThreadPool::defaultPool().start(*_dynamoDbServer);
+          _dynamoDbServer->Start();
           _serverMap[module.name] = _dynamoDbServer;
         } else if (module.name == "secretsmanager" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
           _secretsManagerServer = new Service::SecretsManagerServer(_configuration, _metricService);
-          Poco::ThreadPool::defaultPool().start(*_secretsManagerServer);
+          _secretsManagerServer->Start();
           _serverMap[module.name] = _secretsManagerServer;
         } else if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
           _gatewayServer = new Service::GatewayServer(_configuration, _metricService);
-          Poco::ThreadPool::defaultPool().start(*_gatewayServer);
+          _gatewayServer->Start();
           _serverMap[module.name] = _gatewayServer;
         }
         log_debug_stream(_logger) << "Module " << module.name << " started" << std::endl;
@@ -260,22 +261,18 @@ namespace AwsMock {
           if (module.name == "s3") {
             _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
             auto *s3Server = (Service::S3Server *) _serverMap[module.name];
-            s3Server->StopMonitoringServer();
             s3Server->StopServer();
           } else if (module.name == "sqs") {
             _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
             auto *sqsServer = (Service::SQSServer *) _serverMap[module.name];
-            sqsServer->StopMonitoringServer();
             sqsServer->StopServer();
           } else if (module.name == "sns") {
             _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
             auto *snsServer = (Service::SNSServer *) _serverMap[module.name];
-            snsServer->StopMonitoringServer();
             snsServer->StopServer();
           } else if (module.name == "lambda") {
             _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
             auto *lambdaServer = (Service::LambdaServer *) _serverMap[module.name];
-            lambdaServer->StopMonitoringServer();
             lambdaServer->StopServer();
           } else if (module.name == "transfer") {
             _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
@@ -342,7 +339,7 @@ namespace AwsMock {
     /**
      * Gateway router
      */
-    std::shared_ptr<Controller::Router> _router = std::make_shared<Controller::Router>(_configuration, _metricService, _serverMap);
+    Controller::Router* _router = new Controller::Router(_configuration, _metricService, _serverMap);
 
     /**
      * S3 module
@@ -390,16 +387,6 @@ namespace AwsMock {
     Service::GatewayServer *_gatewayServer{};
 
     /**
-     * Create notification queue
-     */
-    Poco::NotificationQueue _createQueue;
-
-    /**
-     * Invoke notification queue
-     */
-    Poco::NotificationQueue _invokeQueue;
-
-    /**
      * Gateway controller
      */
     RestService _restService = RestService(_configuration);
@@ -413,6 +400,7 @@ namespace AwsMock {
      * Server map
      */
     Service::ServerMap _serverMap;
+
   };
 
 } // namespace AwsMock

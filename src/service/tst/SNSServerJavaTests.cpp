@@ -47,8 +47,8 @@ namespace AwsMock::Service {
       _sqsBaseCommand = "java -jar /usr/local/lib/awsmock-java-test-0.0.1-SNAPSHOT-jar-with-dependencies.jar " + _sqsEndpoint;
 
       // Start HTTP manager
-      Poco::ThreadPool::defaultPool().start(_snsServer);
-      Poco::ThreadPool::defaultPool().start(_sqsServer);
+      _snsServer.Start();
+      _sqsServer.Start();
     }
 
     void TearDown() override {

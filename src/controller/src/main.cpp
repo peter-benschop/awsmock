@@ -91,30 +91,7 @@ namespace AwsMock::Controller {
 
         if (name == "help") {
 
-          std::cout << std::endl;
-          Poco::Util::HelpFormatter helpFormatter(options());
-          helpFormatter.setHeader("\nAwsMock - AWS simulation written in C++ " + Configuration::GetVersion() + "\n\nOptions:");
-          helpFormatter.setCommand(commandName());
-          helpFormatter.setUsage("<options> <command>");
-          helpFormatter.format(std::cout);
-          std::cout << "\nCommands:\n" << std::endl;
-          std::cout << "list\t\t\t: lists all available services" << std::endl;
-          std::cout << "start [<module>]\t: starts the given module. If no argument is given, starts all services." << std::endl;
-          std::cout << "stop [<module>]\t\t: stops the given module. If no argument is given, stops all services" << std::endl;
-          std::cout << "restart [<module>]\t: restarts the given module. If no argument is given, restarts all services" << std::endl;
-#ifdef HAS_SYSTEMD
-          std::cout << "logs\t\t\t: shows the manager logs" << std::endl;
-#endif
-          std::cout << "loglevel <level>\t: sets the manager log to level" << std::endl;
-          std::cout << "config\t\t\t: shows the gateway configuration" << std::endl;
-          std::cout << "export [modules]\t: dumps the current infrastructure to stdout. Modules is a space separated list of module names." << std::endl;
-          std::cout << "import\t\t\t: imports the infrastructure from stdin." << std::endl;
-          std::cout << "clean [modules]\t\t: cleans the current infrastructure. Modules is a space separated list of module names." << std::endl;
-          std::cout << "\nModules:\n" << std::endl;
-          std::cout << "Valid modules are: all, s3, sqs, sns, lambda, transfer, cognito, dynamodb." << std::endl;
-
-          stopOptionsProcessing();
-          exit(0);
+          usage();
 
         } else if (name == "file") {
 
@@ -137,10 +114,40 @@ namespace AwsMock::Controller {
         }
       }
 
+      void usage() {
+        std::cout << std::endl;
+        Poco::Util::HelpFormatter helpFormatter(options());
+        helpFormatter.setHeader("\nAwsMock - AWS simulation written in C++ " + Configuration::GetVersion() + "\n\nOptions:");
+        helpFormatter.setCommand(commandName());
+        helpFormatter.setUsage("<options> <command>");
+        helpFormatter.format(std::cout);
+        std::cout << "\nCommands:\n" << std::endl;
+        std::cout << "list\t\t\t: lists all available services" << std::endl;
+        std::cout << "start [<module>]\t: starts the given module. If no argument is given, starts all services." << std::endl;
+        std::cout << "stop [<module>]\t\t: stops the given module. If no argument is given, stops all services" << std::endl;
+        std::cout << "restart [<module>]\t: restarts the given module. If no argument is given, restarts all services" << std::endl;
+#ifdef HAS_SYSTEMD
+        std::cout << "logs\t\t\t: shows the manager logs" << std::endl;
+#endif
+        std::cout << "loglevel <level>\t: sets the manager log to level" << std::endl;
+        std::cout << "config\t\t\t: shows the gateway configuration" << std::endl;
+        std::cout << "export [modules]\t: dumps the current infrastructure to stdout. Modules is a space separated list of module names." << std::endl;
+        std::cout << "import\t\t\t: imports the infrastructure from stdin." << std::endl;
+        std::cout << "clean [modules]\t\t: cleans the current infrastructure. Modules is a space separated list of module names." << std::endl;
+        std::cout << "\nModules:\n" << std::endl;
+        std::cout << "Valid modules are: all, s3, sqs, sns, lambda, transfer, cognito, dynamodb." << std::endl;
+        stopOptionsProcessing();
+        exit(0);
+      }
+
       int ProcessCommand(const ArgVec &args) {
 
         const std::string &name = args[0];
-        if (name == "list") {
+        if(name == "awsmockctl") {
+
+          usage();
+
+        } else if (name == "list") {
 
           _controller.ListServices();
 
@@ -159,7 +166,7 @@ namespace AwsMock::Controller {
 #ifdef HAS_SYSTEMD
         } else if (name == "logs") {
 
-          _controller.ShowServiceLogs();
+          AwsMock::Controller::Controller::ShowServiceLogs();
 #endif
         } else if (name == "loglevel") {
 
@@ -193,7 +200,7 @@ namespace AwsMock::Controller {
         } else {
 
           std::cerr << "Unknown command: " << name << std::endl;
-          return -1;
+          usage();
 
         }
         return 0;

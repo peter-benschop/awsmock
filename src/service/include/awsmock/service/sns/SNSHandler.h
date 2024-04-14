@@ -11,14 +11,13 @@
 #include <Poco/DateTimeFormatter.h>
 
 // AwsMock includes
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/MetricService.h"
-#include "awsmock/core/MetricServiceTimer.h"
-#include "awsmock/core/MetricDefinition.h"
-#include "awsmock/dto/common/SNSClientCommand.h"
-#include "awsmock/service/common/AbstractHandler.h"
-#include "SNSService.h"
-#include "SNSCmdHandler.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/core/MetricDefinition.h>
+#include <awsmock/dto/common/SNSClientCommand.h>
+#include <awsmock/service/common/AbstractHandler.h>
+#include <awsmock/service/sns/SNSService.h>
+#include <awsmock/service/sns/SNSCmdHandler.h>
 
 namespace AwsMock::Service {
 
@@ -36,11 +35,8 @@ namespace AwsMock::Service {
      *
      * @param configuration application configuration
      * @param metricService monitoring module
-     * @param condition stop condition
      */
-    SNSHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
-
-  protected:
+    SNSHandler(Core::Configuration &configuration, Core::MetricService &metricService);
 
     /**
      * HTTP POST request.

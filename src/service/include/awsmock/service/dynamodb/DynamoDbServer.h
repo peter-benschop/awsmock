@@ -15,15 +15,14 @@
 #include <Poco/NotificationQueue.h>
 
 // AwsMock includes
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/MetricService.h"
-#include "awsmock/repository/DynamoDbDatabase.h"
-#include "awsmock/repository/ModuleDatabase.h"
-#include "awsmock/service/common/AbstractWorker.h"
-#include "awsmock/service/common/AbstractServer.h"
-#include "DynamoDbMonitoring.h"
-#include "DynamoDbHandlerFactory.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/repository/DynamoDbDatabase.h>
+#include <awsmock/repository/ModuleDatabase.h>
+#include <awsmock/service/common/AbstractWorker.h>
+#include <awsmock/service/common/AbstractServer.h>
+#include <awsmock/service/dynamodb/DynamoDbHandlerFactory.h>
 
 #define DYNAMODB_DEFAULT_PORT 9507
 #define DYNAMODB_DEFAULT_HOST "localhost"
@@ -49,131 +48,131 @@ namespace AwsMock::Service {
    */
   class DynamoDbServer : public AbstractServer, public AbstractWorker {
 
-    public:
+  public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration aws-mock configuration
-       * @param metricService aws-mock monitoring
-       */
-      explicit DynamoDbServer(Core::Configuration &configuration, Core::MetricService &metricService);
+    /**
+     * Constructor
+     *
+     * @param configuration aws-mock configuration
+     * @param metricService aws-mock monitoring
+     */
+    explicit DynamoDbServer(Core::Configuration &configuration, Core::MetricService &metricService);
 
-      /**
-       * Destructor
-       */
-      ~DynamoDbServer() override;
+    /**
+     * Destructor
+     */
+    ~DynamoDbServer() override;
 
-      /**
-       * Main method
-       */
-      void MainLoop() override;
+    /**
+     * Initialization
+     */
+    void Initialize() override;
 
-      /**
-       * Stop monitoring manager
-       */
-      void StopMonitoringServer();
+    /**
+     * Main method
+     */
+    void Run() override;
 
-    private:
+    /**
+     * Shutdown
+     */
+    void Shutdown() override;
 
-      /**
-       * Start monitoring manager
-       */
-      void StartMonitoringServer();
+  private:
 
-      /**
-       * Delete dangling, stopped containers
-       */
-      void CleanupContainers();
+    /**
+     * Update metric counters
+     */
+    void UpdateCounters();
 
-      /**
-       * Start the local DynamoDB container.
-       *
-       * <p>
-       * If the AWS DynamoDb docker image does not already exists, it will be downloaded. Otherwise the local docker
-       * image will be started as container.
-       * </p>
-       */
-      void StartLocalDynamoDb();
+    /**
+     * Delete dangling, stopped containers
+     */
+    void CleanupContainers();
 
-      /**
-       * Stop the local DynamoDB container.
-       *
-       * <p>
-       * The AWS DynamoDb docker container will be stopped.
-       * </p>
-       */
-      void StopLocalDynamoDb();
+    /**
+     * Start the local DynamoDB container.
+     *
+     * <p>
+     * If the AWS DynamoDb docker image does not already exists, it will be downloaded. Otherwise the local docker
+     * image will be started as container.
+     * </p>
+     */
+    void StartLocalDynamoDb();
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+    /**
+     * Stop the local DynamoDB container.
+     *
+     * <p>
+     * The AWS DynamoDb docker container will be stopped.
+     * </p>
+     */
+    void StopLocalDynamoDb();
 
-      /**
-       * Configuration
-       */
-      Core::Configuration &_configuration;
+    /**
+     * Logger
+     */
+    Core::LogStream _logger;
 
-      /**
-       * Metric module
-       */
-      Core::MetricService &_metricService;
+    /**
+     * Configuration
+     */
+    Core::Configuration &_configuration;
 
-      /**
-       * Thread pool
-       */
-      AwsMock::Core::ThreadPool<DynamoDbMonitoring> _threadPool;
+    /**
+     * Metric module
+     */
+    Core::MetricService &_metricService;
 
-      /**
-       * DynamoDb database
-       */
-      Database::DynamoDbDatabase& _dynamoDbDatabase;
+    /**
+     * DynamoDb database
+     */
+    Database::DynamoDbDatabase &_dynamoDbDatabase;
 
-      /**
-       * Docker module
-       */
-      std::unique_ptr<Service::DockerService> _dockerService;
+    /**
+     * Docker module
+     */
+    std::unique_ptr<Service::DockerService> _dockerService;
 
-      /**
-       * AWS region
-       */
-      std::string _region;
+    /**
+     * AWS region
+     */
+    std::string _region;
 
-      /**
-       * Sleeping period in ms
-       */
-      int _period;
+    /**
+     * Sleeping period in ms
+     */
+    int _period;
 
-      /**
-       * Rest port
-       */
-      int _port;
+    /**
+     * Rest port
+     */
+    int _port;
 
-      /**
-       * Rest host
-       */
-      std::string _host;
+    /**
+     * Rest host
+     */
+    std::string _host;
 
-      /**
-       * HTTP max message queue length
-       */
-      int _maxQueueLength;
+    /**
+     * HTTP max message queue length
+     */
+    int _maxQueueLength;
 
-      /**
-       * HTTP max concurrent connection
-       */
-      int _maxThreads;
+    /**
+     * HTTP max concurrent connection
+     */
+    int _maxThreads;
 
-      /**
-       * HTTP request timeout in seconds
-       */
-      int _requestTimeout;
+    /**
+     * HTTP request timeout in seconds
+     */
+    int _requestTimeout;
 
-      /**
-       * Module name
-       */
-      std::string _module;
+    /**
+     * Module name
+     */
+    std::string _module;
   };
 
 } // namespace AwsMock::Service

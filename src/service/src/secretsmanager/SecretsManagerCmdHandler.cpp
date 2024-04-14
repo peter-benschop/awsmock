@@ -3,11 +3,9 @@
 
 namespace AwsMock::Service {
 
-  SecretsManagerCmdHandler::SecretsManagerCmdHandler(Core::Configuration &configuration,
-                                                     Core::MetricService &metricService,
-                                                     Poco::Condition &condition)
+  SecretsManagerCmdHandler::SecretsManagerCmdHandler(Core::Configuration &configuration, Core::MetricService &metricService)
       : AbstractHandler(), _logger(Poco::Logger::get("SecretsManagerCmdHandler")), _configuration(configuration),
-        _metricService(metricService), _secretsManagerService(configuration, condition) {
+        _metricService(metricService), _secretsManagerService(configuration) {
   }
 
   void SecretsManagerCmdHandler::handlePost(Poco::Net::HTTPServerRequest &request,

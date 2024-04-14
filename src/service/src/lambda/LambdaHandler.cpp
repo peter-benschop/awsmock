@@ -1,19 +1,16 @@
 
-#include "awsmock/service/lambda/LambdaHandler.h"
+#include <awsmock/service/lambda/LambdaHandler.h>
 
 namespace AwsMock::Service {
 
-  LambdaHandler::LambdaHandler(Core::Configuration &configuration,
-                               Core::MetricService &metricService,
-                               Poco::NotificationQueue &createQueue,
-                               Poco::NotificationQueue &invokeQueue)
-      : AbstractHandler(), _logger(Poco::Logger::get("LambdaServiceHandler")), _configuration(configuration), _metricService(metricService),
-        _lambdaService(configuration, metricService, createQueue, invokeQueue) {
+  LambdaHandler::LambdaHandler(Core::Configuration &configuration, Core::MetricService &metricService)
+    : AbstractHandler(), _logger(Poco::Logger::get("LambdaServiceHandler")), _configuration(configuration), _metricService(metricService),
+      _lambdaService(configuration, metricService) {
   }
 
-  void LambdaHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, [[maybe_unused]]const std::string &user) {
+  void LambdaHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
     _metricService.IncrementCounter("gateway_get_counter");
-    log_trace_stream(_logger) << "lambda GET request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+    log_trace_stream(_logger) << "Lambda GET request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
     try {
 
@@ -23,6 +20,7 @@ namespace AwsMock::Service {
       if (action == "functions") {
 
         Dto::Lambda::ListFunctionResponse lambdaResponse = _lambdaService.ListFunctions(region);
+        log_trace_stream(_logger) << "Lambda function list" << std::endl;
         SendOkResponse(response, lambdaResponse.ToJson());
 
       } else if (action == "tags") {
@@ -31,6 +29,7 @@ namespace AwsMock::Service {
         log_debug_stream(_logger) << "Found lambda arn, arn: " << arn << std::endl;
 
         Dto::Lambda::ListTagsResponse lambdaResponse = _lambdaService.ListTags(arn);
+        log_trace_stream(_logger) << "Lambda tag list" << std::endl;
         SendOkResponse(response, lambdaResponse.ToJson());
       }
 
@@ -43,7 +42,7 @@ namespace AwsMock::Service {
 
   void LambdaHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
     _metricService.IncrementCounter("gateway_put_counter");
-    log_trace_stream(_logger) << "lambda PUT request, URI: " << request.getURI() << " region: " << region << " user: " + user << std::endl;
+    log_trace_stream(_logger) << "Lambda PUT request, URI: " << request.getURI() << " region: " << region << " user: " + user << std::endl;
 
     try {
 
@@ -57,7 +56,7 @@ namespace AwsMock::Service {
 
   void LambdaHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
     _metricService.IncrementCounter("gateway_post_counter");
-    log_trace_stream(_logger) << "lambda POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+    log_trace_stream(_logger) << "Lambda POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
     try {
       std::string tmp = request.getURI();
@@ -71,10 +70,10 @@ namespace AwsMock::Service {
         if (Core::HttpUtils::GetPathParameter(request.getURI(), 3) == "invocations") {
 
           std::string functionName = Core::HttpUtils::GetPathParameter(request.getURI(), 2);
-          log_debug_stream(_logger) << "lambda function invocation, name: " << functionName << std::endl;
+          log_debug_stream(_logger) << "Lambda function invocation, name: " << functionName << std::endl;
 
           _lambdaService.InvokeLambdaFunction(functionName, body, region, user);
-          log_debug_stream(_logger) << "lambda function invoked, name: " << functionName << std::endl;
+          log_info_stream(_logger) << "Lambda function invoked, name: " << functionName << std::endl;
           SendOkResponse(response);
 
         } else {
@@ -85,6 +84,7 @@ namespace AwsMock::Service {
           lambdaRequest.user = user;
 
           Dto::Lambda::CreateFunctionResponse lambdaResponse = _lambdaService.CreateFunction(lambdaRequest);
+          log_info_stream(_logger) << "Lambda function created, name: " << lambdaResponse.functionName << std::endl;
           SendOkResponse(response, lambdaResponse.ToJson());
         }
 
@@ -99,6 +99,7 @@ namespace AwsMock::Service {
 
         _lambdaService.CreateTag(lambdaRequest);
         SendOkResponse(response, {}, Poco::Net::HTTPResponse::HTTP_NO_CONTENT);
+        log_info_stream(_logger) << "Lambda tag created, name: " << lambdaRequest.arn << std::endl;
 
       }
 
@@ -109,12 +110,12 @@ namespace AwsMock::Service {
 
   void LambdaHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
     _metricService.IncrementCounter("gateway_delete_counter");
-    log_trace_stream(_logger) << "lambda DELETE request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+    log_trace_stream(_logger) << "Lambda DELETE request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
 
     try {
       std::string version, action;
       Core::HttpUtils::GetVersionAction(request.getURI(), version, action);
-      std::string body = GetBodyAsString(request);
+      std::string body = Core::HttpUtils::GetBodyAsString(request);
 
       if (action == "functions") {
 
@@ -147,7 +148,7 @@ namespace AwsMock::Service {
 
   void LambdaHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
     _metricService.IncrementCounter("gateway_options_counter");
-    log_trace_stream(_logger) << "lambda OPTIONS request" << std::endl;
+    log_trace_stream(_logger) << "Lambda OPTIONS request" << std::endl;
 
     response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
     response.setContentType("text/plain; charset=utf-8");
@@ -159,12 +160,12 @@ namespace AwsMock::Service {
 
   void LambdaHandler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
     _metricService.IncrementCounter("gateway_head_counter");
-    log_trace_stream(_logger) << "lambda HEAD request, address: " << request.clientAddress().toString() << std::endl;
+    log_trace_stream(_logger) << "Lambda HEAD request, address: " << request.clientAddress().toString() << std::endl;
 
     try {
 
       std::string version, action;
-      GetVersionActionFromUri(request.getURI(), version, action);
+      Core::HttpUtils::GetVersionAction(request.getURI(), version, action);
 
       HeaderMap headerMap;
       headerMap["Connection"] = "Keep-alive: 300";

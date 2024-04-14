@@ -53,9 +53,8 @@ namespace AwsMock::Service {
        * Constructor
        *
        * @param configuration module configuration
-       * @param condition stop condition
        */
-      explicit SNSService(Core::Configuration &configuration, Poco::Condition &condition);
+      explicit SNSService(Core::Configuration &configuration);
 
       /**
        * Creates a new queue
@@ -179,11 +178,6 @@ namespace AwsMock::Service {
        * SQS module
        */
       std::unique_ptr<SQSService> _sqsService;
-
-      /**
-       * Shutdown condition
-       */
-      Poco::Condition &_condition;
   };
 
 } // namespace AwsMock::Service

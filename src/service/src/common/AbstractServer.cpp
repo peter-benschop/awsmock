@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
 
   AbstractServer::AbstractServer(Core::Configuration &configuration, std::string name)
-    : _logger(Poco::Logger::get("AbstractServer")), _configuration(configuration), _moduleDatabase(Database::ModuleDatabase::instance()), _name(std::move(name)), _running(false) {
+    : Timer(name, 10), _logger(Poco::Logger::get("AbstractServer")), _configuration(configuration), _moduleDatabase(Database::ModuleDatabase::instance()), _name(std::move(name)), _running(false) {
 
     // Create environment
     log_debug_stream(_logger) << "AbstractServer initialized, name: " << _name << std::endl;
@@ -19,14 +19,6 @@ namespace AwsMock::Service {
 
   bool AbstractServer::IsRunning() const {
     return _running;
-  }
-
-  void AbstractServer::run() {
-    MainLoop();
-    StopHttpServer();
-    _moduleDatabase.SetState(_name, Database::Entity::Module::ModuleState::STOPPED);
-    _running = false;
-    log_info_stream(_logger) << "Module " << _name << " has been shutdown" << std::endl;
   }
 
   bool AbstractServer::InterruptableSleep(int period) {
@@ -67,6 +59,10 @@ namespace AwsMock::Service {
       _httpServer->stopAll(true);
       log_debug_stream(_logger) << "HTTP server stopped: " << _name << std::endl;
     }
+  }
+
+  AbstractServer::~AbstractServer() {
+    Stop();
   }
 
 } // namespace AwsMock::Worker

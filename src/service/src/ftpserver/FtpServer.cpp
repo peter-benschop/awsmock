@@ -11,9 +11,6 @@ namespace AwsMock::FtpServer {
   FtpServer::FtpServer(const Core::Configuration &configuration, std::string serverName, int port, std::string address)
       : _logger(Poco::Logger::get("FtpServer")), _configuration(configuration), _serverName(std::move(serverName)), _address(std::move(address)), _port(port) {
 
-    // Get configuration
-    _dataDir = _configuration.getString("awsmock.worker.transfer.base.dir", FTP_BASE_DIR);
-
     _ftp_server = std::make_unique<FtpServerImpl>(_serverName, _address, _port, _configuration);
     log_debug_stream(_logger) << "FTP manager configured, name: " << _serverName << " endpoint: " << _address << ":" << port << std::endl;
   }

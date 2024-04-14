@@ -6,14 +6,11 @@
 
 namespace AwsMock::Service {
 
-  SQSService::SQSService(Core::Configuration &configuration, Poco::Condition &condition)
-    : _logger(Poco::Logger::get("SQSService")), _configuration(configuration), _condition(condition), _database(Database::SQSDatabase::instance()) {
+  SQSService::SQSService(Core::Configuration &configuration)
+    : _logger(Poco::Logger::get("SQSService")), _configuration(configuration), _database(Database::SQSDatabase::instance()) {
 
     // Initialize environment
     _accountId = _configuration.getString("awsmock.account.userPoolId", DEFAULT_ACCOUNT_ID);
-
-    // Database connection
-    //_database = std::make_unique<Database::SQSDatabase>(_configuration);
   }
 
   Dto::SQS::CreateQueueResponse SQSService::CreateQueue(const Dto::SQS::CreateQueueRequest &request) {
@@ -35,6 +32,9 @@ namespace AwsMock::Service {
     try {
       // Get queue ARN
       std::string queueArn = Core::AwsUtils::CreateSqsQueueArn(_configuration, request.queueName);
+
+      // Get queue URL
+      std::string queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, request.queueName);
 
       Database::Entity::SQS::QueueAttribute attributes;
       for (auto &a : request.attributes) {
@@ -66,14 +66,14 @@ namespace AwsMock::Service {
           attributes.queueArn = a.attributeValue;
         }
       }
-      attributes.queueArn = Core::AwsUtils::CreateSqsQueueArn(_configuration, request.queueName);
+      attributes.queueArn = queueArn;
 
       // Update database
       Database::Entity::SQS::Queue queue = _database.CreateQueue({
                                                                    .region=request.region,
                                                                    .name=request.queueName,
                                                                    .owner=request.owner,
-                                                                   .queueUrl=request.queueUrl,
+                                                                   .queueUrl=queueUrl,
                                                                    .queueArn=queueArn,
                                                                    .attributes=attributes,
                                                                    .tags=request.tags
@@ -90,7 +90,7 @@ namespace AwsMock::Service {
 
     } catch (Core::DatabaseException &exc) {
       log_error_stream(_logger) << "SQS create queue failed, message: " << exc.message() << std::endl;
-      throw Core::ServiceException(exc.message(), 400);
+      throw Core::ServiceException(exc.message());
     }
   }
 

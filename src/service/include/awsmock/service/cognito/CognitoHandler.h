@@ -11,15 +11,14 @@
 #include "Poco/DateTimeFormatter.h"
 
 // AwsMock includes
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/HttpUtils.h"
-#include "awsmock/core/MetricService.h"
-#include "awsmock/core/MetricServiceTimer.h"
-#include "awsmock/core/MetricDefinition.h"
-#include "awsmock/service/common/AbstractHandler.h"
-#include "CognitoCliHandler.h"
-#include "CognitoJava2Handler.h"
-#include "CognitoService.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/HttpUtils.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/core/MetricDefinition.h>
+#include <awsmock/service/common/AbstractHandler.h>
+#include <awsmock/service/cognito/CognitoCliHandler.h>
+#include <awsmock/service/cognito/CognitoJava2Handler.h>
+#include <awsmock/service/cognito/CognitoService.h>
 
 namespace AwsMock::Service {
 
@@ -37,8 +36,6 @@ namespace AwsMock::Service {
      * @param metricService monitoring module
      */
     CognitoHandler(Core::Configuration &configuration, Core::MetricService &metricService);
-
-  protected:
 
     /**
      * HTTP GET request.

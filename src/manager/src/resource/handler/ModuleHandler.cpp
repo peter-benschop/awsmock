@@ -101,6 +101,7 @@ namespace AwsMock {
           // Send response
           std::string body = Dto::Module::Module::ToJson(module);
           SendOkResponse(response, body);
+
         }
 
       } else if (action == "restart") {

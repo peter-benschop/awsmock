@@ -56,13 +56,16 @@ namespace AwsMock::Controller {
       std::cout << "All modules started" << std::endl;
 
     } else {
+
       Dto::Module::Module module = Dto::Module::Module::FromJson(response.output);
       if (response.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
+
         if (module.port > 0) {
           std::cout << "Module " << module.name << "(" << module.port << ") started" << std::endl;
         } else {
           std::cout << "Module " << module.name << " started" << std::endl;
         }
+
       } else {
         std::cout << "Module " << name << " could not be started: " << response.output << std::endl;
       }
@@ -273,7 +276,7 @@ namespace AwsMock::Controller {
 
     std::map<std::string, std::string> headers;
     AddAuthorization(headers);
-    Core::CurlResponse response = _curlUtils.SendHttpRequest("GET", _baseUrl + "/clean", headers, exportServices.ToJson());
+    Core::CurlResponse response = _curlUtils.SendHttpRequest("GET", _baseUrl + "/all/clean", headers, exportServices.ToJson());
 
     if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
       std::cerr << "Error: " << response.statusReason << std::endl;

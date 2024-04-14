@@ -2,8 +2,8 @@
 // Created by vogje01 on 17/06/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_SQSHANDLERFACTORY_H
-#define AWSMOCK_SERVICE_SQSHANDLERFACTORY_H
+#ifndef AWSMOCK_SERVICE_SQS_HANDLER_FACTORY_H
+#define AWSMOCK_SERVICE_SQS_HANDLER_FACTORY_H
 
 // Poco includes
 #include "Poco/Condition.h"
@@ -31,7 +31,7 @@ namespace AwsMock::Service {
      * @param metricService  monitoring
      * @param condition stop condition
      */
-    SQSRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition) : _configuration(configuration), _metricService(metricService), _condition(condition) {}
+    SQSRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService) {}
 
     /**
      * Create a new request handler
@@ -43,7 +43,7 @@ namespace AwsMock::Service {
       if(request.getURI().empty()) {
         return nullptr;
       }
-      return new SQSHandler(_configuration, _metricService, _condition);
+      return new SQSHandler(_configuration, _metricService);
     }
 
   private:
@@ -58,12 +58,8 @@ namespace AwsMock::Service {
      */
     Core::MetricService &_metricService;
 
-    /**
-     * Shutdown condition
-     */
-    Poco::Condition &_condition;
   };
 
 } // namespace AwsMock::Service
 
-#endif //AWSMOCK_SERVICE_SQSHANDLERFACTORY_H
+#endif //AWSMOCK_SERVICE_SQS_HANDLER_FACTORY_H

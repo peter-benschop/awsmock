@@ -6,19 +6,7 @@
 
 namespace AwsMock::Service {
 
-  LambdaExecutor::LambdaExecutor(Core::MetricService &metricService, Poco::NotificationQueue &invokeQueue) : _logger(Poco::Logger::get("LambdaExecutor")), _metricService(metricService), _invokeQueue(invokeQueue) {}
-
-  void LambdaExecutor::run() {
-    log_debug_stream(_logger) << "lambda invocation notification received, queueSize:" << _invokeQueue.size() << std::endl;
-    Poco::AutoPtr<Poco::Notification> pNf(_invokeQueue.waitDequeueNotification());
-    while (pNf) {
-      auto *pWorkNf = dynamic_cast<Dto::Lambda::InvocationNotification *>(pNf.get());
-      if (pWorkNf) {
-        SendInvocationRequest(pWorkNf->hostName, pWorkNf->port, pWorkNf->payload);
-      }
-      pNf = _invokeQueue.waitDequeueNotification(1000);
-    }
-  }
+  LambdaExecutor::LambdaExecutor(Core::MetricService &metricService) : _logger(Poco::Logger::get("LambdaExecutor")), _metricService(metricService) {}
 
   void LambdaExecutor::SendInvocationRequest(const std::string &hostName, int port, const std::string &body) {
     Core::MetricServiceTimer measure(_metricService, "lambda_invocation_timer");

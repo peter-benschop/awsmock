@@ -2,8 +2,8 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_SQSSERVER_H
-#define AWSMOCK_SERVICE_SQSSERVER_H
+#ifndef AWSMOCK_SERVICE_SQS_SERVER_H
+#define AWSMOCK_SERVICE_SQS_SERVER_H
 
 // C++ standard includes
 #include <string>
@@ -17,14 +17,13 @@
 #include <Poco/Condition.h>
 
 // AwsMock includes
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/ThreadPool.h"
-#include "awsmock/repository/ModuleDatabase.h"
-#include "awsmock/repository/SQSDatabase.h"
-#include "awsmock/service/common/AbstractServer.h"
-#include "SQSMonitoring.h"
-#include "SQSHandlerFactory.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/ThreadPool.h>
+#include <awsmock/repository/ModuleDatabase.h>
+#include <awsmock/repository/SQSDatabase.h>
+#include <awsmock/service/common/AbstractServer.h>
+#include <awsmock/service/sqs/SQSHandlerFactory.h>
 
 #define SQS_DEFAULT_PORT 9501
 #define SQS_DEFAULT_HOST "localhost"
@@ -47,26 +46,26 @@ namespace AwsMock::Service {
     explicit SQSServer(Core::Configuration &configuration, Core::MetricService &metricService);
 
     /**
-     * Destructor
+     * Initialization
      */
-    ~SQSServer() override;
+    void Initialize() override;
 
     /**
      * Main method
      */
-    void MainLoop() override;
+    void Run() override;
 
     /**
-     * Stop the monitoring module.
+     * Shutdown
      */
-    void StopMonitoringServer();
+    void Shutdown() override;
 
   private:
 
     /**
-     * Start the monitoring module.
+     * Update metric counters
      */
-    void StartMonitoringServer();
+    void UpdateCounters();
 
     /**
      * Reset messages
@@ -109,11 +108,6 @@ namespace AwsMock::Service {
     Database::SQSDatabase& _sqsDatabase;
 
     /**
-     * Thread pool
-     */
-    AwsMock::Core::ThreadPool<SQSMonitoring> _threadPool;
-
-    /**
      * AWS region
      */
     std::string _region;
@@ -151,4 +145,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_SQSSERVER_H
+#endif // AWSMOCK_SERVICE_SQS_SERVER_H

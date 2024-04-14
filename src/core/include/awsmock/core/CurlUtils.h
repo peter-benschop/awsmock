@@ -55,6 +55,17 @@ namespace AwsMock::Core {
     CurlResponse SendHttpRequest(const std::string &method, const std::string &path, const std::map<std::string, std::string> &extraHeaders = {}, const std::string &body = {});
 
     /**
+     * Send request to a HTTP URL
+     *
+     * @param method HTTP method
+     * @param path request path
+     * @param fileName name of the file to send
+     * @param extraHeaders header map
+     * @return Dto::Curl::CurlResponse
+     */
+    CurlResponse SendFileHttpRequest(const std::string &method, const std::string &path, const std::string& fileName, const std::map<std::string, std::string> &extraHeaders = {});
+
+    /**
      * Send request
      *
      * @param method HTTP method

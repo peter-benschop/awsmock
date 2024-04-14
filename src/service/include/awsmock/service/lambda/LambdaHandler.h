@@ -2,8 +2,8 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_LAMBDAHANDLER_H
-#define AWSMOCK_SERVICE_LAMBDAHANDLER_H
+#ifndef AWSMOCK_SERVICE_LAMBDA_HANDLER_H
+#define AWSMOCK_SERVICE_LAMBDA_HANDLER_H
 
 // Poco includes
 #include "Poco/Logger.h"
@@ -13,14 +13,13 @@
 #include <Poco/NotificationQueue.h>
 
 // AwsMock includes
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/HttpUtils.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/MetricService.h"
-#include "awsmock/core/MetricServiceTimer.h"
-#include "awsmock/core/MetricDefinition.h"
-#include "awsmock/service/common/AbstractHandler.h"
-#include "LambdaService.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/HttpUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/core/MetricDefinition.h>
+#include <awsmock/service/common/AbstractHandler.h>
+#include <awsmock/service/lambda/LambdaService.h>
 
 namespace AwsMock::Service {
 
@@ -41,9 +40,7 @@ namespace AwsMock::Service {
      * @param createQueue create notification queue
      * @param invokeQueue invoke notification queue
      */
-    LambdaHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue, Poco::NotificationQueue &invokeQueue);
-
-  protected:
+    LambdaHandler(Core::Configuration &configuration, Core::MetricService &metricService);
 
     /**
      * HTTP GET request.
@@ -133,4 +130,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock
 
-#endif // AWSMOCK_SERVICE_LAMBDAHANDLER_H
+#endif // AWSMOCK_SERVICE_LAMBDA_HANDLER_H

@@ -29,9 +29,6 @@
 #include "awsmock/dto/cognito/ListUserPoolResponse.h"
 #include "awsmock/repository/CognitoDatabase.h"
 
-#define DEFAULT_DATA_DIR  "/tmp/awsmock/data"
-#define DEFAULT_S3_DATA_DIR  "/tmp/awsmock/data/s3"
-
 namespace AwsMock::Service {
 
   class CognitoService {

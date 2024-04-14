@@ -2,13 +2,14 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_GATEWAYROUTER_H
-#define AWSMOCK_SERVICE_GATEWAYROUTER_H
+#ifndef AWSMOCK_SERVICE_GATEWAY_ROUTER_H
+#define AWSMOCK_SERVICE_GATEWAY_ROUTER_H
 
 // C++ standard includes
 #include <map>
 #include <string>
 #include <iostream>
+#include <utility>
 
 // Poco includes
 #include "Poco/URI.h"
@@ -19,31 +20,14 @@
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 
 // AwsMock includes
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/MetricService.h"
-#include "awsmock/core/ResourceNotFoundException.h"
-#include "GatewayHandler.h"
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/core/ResourceNotFoundException.h>
+#include <awsmock/service/gateway/GatewayHandler.h>
+#include <awsmock/service/gateway/GatewayRoute.h>
 
 namespace AwsMock::Service {
-
-  struct GatewayRoute {
-
-    /**
-     * Service name
-     */
-    std::string name;
-
-    /**
-     * Service host
-     */
-    std::string host;
-
-    /**
-     * Service port
-     */
-    int port;
-  };
 
   class GatewayRouter : public Poco::Net::HTTPRequestHandlerFactory {
 
@@ -61,14 +45,6 @@ namespace AwsMock::Service {
      * Destructor
      */
     ~GatewayRouter() override;
-
-    /**
-     * Add a route
-     *
-     * @param route request route
-     * @param factory resource factory
-     */
-    void AddRoute(const std::string &route, const GatewayRoute &factory);
 
     /**
      * HTTP request handler
@@ -120,4 +96,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_GATEWAYROUTER_H
+#endif // AWSMOCK_SERVICE_GATEWAY_ROUTER_H

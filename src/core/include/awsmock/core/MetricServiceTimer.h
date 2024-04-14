@@ -2,8 +2,8 @@
 // Created by vogje01 on 18/05/2023.
 //
 
-#ifndef AWSMOCK_CORE_METRICSERVICETIMER_H
-#define AWSMOCK_CORE_METRICSERVICETIMER_H
+#ifndef AWSMOCK_CORE_METRIC_SERVICE_TIMER_H
+#define AWSMOCK_CORE_METRIC_SERVICE_TIMER_H
 
 #include <awsmock/core/MetricService.h>
 
@@ -68,4 +68,4 @@ namespace AwsMock::Core {
 
 } // namespace AwsMock::Core
 
-#endif //AWSMOCK_CORE_METRICSERVICETIMER_H
+#endif //AWSMOCK_CORE_METRIC_SERVICE_TIMER_H

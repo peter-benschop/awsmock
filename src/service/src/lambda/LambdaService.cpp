@@ -3,12 +3,26 @@
 //
 
 #include "awsmock/service/lambda/LambdaService.h"
+#include "awsmock/service/lambda/LambdaExecutor.h"
 
 namespace AwsMock::Service {
 
-  LambdaService::LambdaService(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue, Poco::NotificationQueue &invokeQueue) :
-    _logger(Poco::Logger::get("LambdaService")), _configuration(configuration), _metricService(metricService), _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()), _createQueue(createQueue),
-    _invokeQueue(invokeQueue) {
+  template<class F, class code, class id>
+  void CallAsyncCreate(F &&fun, code &&c, id &&i) {
+    std::make_unique < std::future < void >> ((std::async(std::launch::async, [&fun, &c, &i]() {
+      fun.CreateLambdaFunction(c, i);
+    }))).reset();
+  }
+
+  template<class F, class host, class port, class body>
+  void CallAsyncInvoke(F &&fun, host &&h, port &&p, body &&b) {
+    std::make_unique < std::future < void >> ((std::async(std::launch::async, [&fun, &h, &p, &b]() {
+      fun.SendInvocationRequest(h, p, b);
+    }))).reset();
+  }
+
+  LambdaService::LambdaService(Core::Configuration &configuration, Core::MetricService &metricService) :
+    _logger(Poco::Logger::get("LambdaService")), _configuration(configuration), _metricService(metricService), _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()) {
 
     // Initialize environment
     _accountId = _configuration.getString("awsmock.account.userPoolId", "000000000000");
@@ -64,8 +78,8 @@ namespace AwsMock::Service {
     lambdaEntity = _lambdaDatabase.CreateOrUpdateLambda(lambdaEntity);
 
     // Create lambda function asynchronously
-    _createQueue.enqueueNotification(new Dto::Lambda::CreateNotification(request.code.zipFile, lambdaEntity.oid));
-    log_debug_stream(_logger) << "lambda create notification send, function: " + lambdaEntity.function << std::endl;
+    CallAsyncCreate(Service::LambdaCreator(_configuration), request.code.zipFile, lambdaEntity.oid);
+    log_debug_stream(_logger) << "Lambda create started, function: " + lambdaEntity.function << std::endl;
 
     // Create response
     Dto::Lambda::CreateFunctionResponse response{
@@ -89,14 +103,14 @@ namespace AwsMock::Service {
   Dto::Lambda::ListFunctionResponse LambdaService::ListFunctions(const std::string &region) {
 
     try {
-      std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(region);
+      std::vector <Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(region);
 
       auto response = Dto::Lambda::ListFunctionResponse(lambdas);
-      log_trace_stream(_logger) << "lambda list outcome: " + response.ToJson() << std::endl;
+      log_trace_stream(_logger) << "Lambda list outcome: " + response.ToJson() << std::endl;
       return response;
 
     } catch (Poco::Exception &ex) {
-      log_error_stream(_logger) << "lambda list request failed, message: " << ex.message() << std::endl;
+      log_error_stream(_logger) << "Lambda list request failed, message: " << ex.message() << std::endl;
       throw Core::ServiceException(ex.message(), 500);
     }
   }
@@ -118,8 +132,8 @@ namespace AwsMock::Service {
         log_debug_stream(_logger) << "Got lambda entity eventNotification: " + lambda.ToString() << std::endl;
 
         // Send invocation request
-        _invokeQueue.enqueueNotification(new Dto::Lambda::InvocationNotification(lambda.function, eventNotification.ToJson(), region, user, "localhost", lambda.hostPort));
-        log_debug_stream(_logger) << "lambda executor notification send, name: " + lambda.function << std::endl;
+        //_invokeQueue.enqueueNotification(new Dto::Lambda::InvocationNotification(lambda.function, eventNotification.ToJson(), region, user, "localhost", lambda.hostPort));
+        log_debug_stream(_logger) << "Lambda executor notification send, name: " + lambda.function << std::endl;
       }
     }
   }
@@ -134,21 +148,22 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Got lambda entity, name: " + lambda.function << std::endl;
 
     // Send invocation request
-    _invokeQueue.enqueueNotification(new Dto::Lambda::InvocationNotification(functionName, payload, region, user, "localhost", lambda.hostPort));
-    log_debug_stream(_logger) << "lambda executor notification send, name: " + lambda.function << std::endl;
+    CallAsyncInvoke(Service::LambdaExecutor(_metricService), "localhost", lambda.hostPort, payload);
+    log_debug_stream(_logger) << "Lambda executor notification send, name: " + lambda.function << std::endl;
 
     // Update database
     lambda.lastInvocation = Poco::DateTime();
     lambda.state = Database::Entity::Lambda::Active;
     lambda = _lambdaDatabase.UpdateLambda(lambda);
-    log_debug_stream(_logger) << "lambda entity invoked, name: " + lambda.function << std::endl;
+    log_debug_stream(_logger) << "Lambda entity invoked, name: " + lambda.function << std::endl;
   }
 
   void LambdaService::CreateTag(const Dto::Lambda::CreateTagRequest &request) {
     log_debug_stream(_logger) << "Create tag request, arn: " << request.arn << std::endl;
 
     if (!_lambdaDatabase.LambdaExistsByArn(request.arn)) {
-      throw Core::ServiceException("lambda function does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+      log_warning_stream(_logger) << "Lambda function does not exist, arn: " << request.arn << std::endl;
+      throw Core::ServiceException("Lambda function does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
     // Get the existing entity
@@ -164,7 +179,8 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "List tags request, arn: " << arn << std::endl;
 
     if (!_lambdaDatabase.LambdaExistsByArn(arn)) {
-      throw Core::ServiceException("lambda function does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+      log_warning_stream(_logger) << "Lambda function does not exist, arn: " << arn << std::endl;
+      throw Core::ServiceException("Lambda function does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
     // Get the existing entity
@@ -182,8 +198,8 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Delete function: " + request.ToString() << std::endl;
 
     if (!_lambdaDatabase.LambdaExists(request.functionName)) {
-      log_error_stream(_logger) << "lambda function does not exist, function: " + request.functionName << std::endl;
-      throw Core::ServiceException("lambda function does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+      log_error_stream(_logger) << "Lambda function does not exist, function: " + request.functionName << std::endl;
+      throw Core::ServiceException("Lambda function does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
     // Delete the container, if existing
@@ -201,15 +217,15 @@ namespace AwsMock::Service {
     }
 
     _lambdaDatabase.DeleteLambda(request.functionName);
-    _logger.information() << "lambda function deleted, function: " + request.functionName << std::endl;
+    _logger.information() << "Lambda function deleted, function: " + request.functionName << std::endl;
   }
 
   void LambdaService::DeleteTags(Dto::Lambda::DeleteTagsRequest &request) {
     log_trace_stream(_logger) << "Delete tags: " + request.ToString() << std::endl;
 
     if (!_lambdaDatabase.LambdaExistsByArn(request.arn)) {
-      log_error_stream(_logger) << "lambda function does not exist, arn: " + request.arn << std::endl;
-      throw Core::ServiceException("lambda function does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+      log_error_stream(_logger) << "Lambda function does not exist, arn: " + request.arn << std::endl;
+      throw Core::ServiceException("Lambda function does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
     // Get the existing entity

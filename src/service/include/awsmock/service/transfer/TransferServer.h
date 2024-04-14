@@ -50,14 +50,19 @@ namespace AwsMock::Service {
     explicit TransferServer(Core::Configuration &configuration, Core::MetricService &metricService);
 
     /**
-     * Destructor
+     * Initialization
      */
-    ~TransferServer() override;
+    void Initialize() override;
 
     /**
      * Main method
      */
-    void MainLoop() override;
+    void Run() override;
+
+    /**
+     * Shutdown
+     */
+    void Shutdown() override;
 
   private:
 

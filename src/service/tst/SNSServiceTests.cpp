@@ -43,12 +43,11 @@ namespace AwsMock::Service {
         _sqsDatabase.DeleteAllQueues();
       }
 
-      Poco::Condition _condition;
       Core::Configuration& _configuration = Core::TestUtils::GetTestConfiguration(false);
       Database::SNSDatabase& _snsDatabase = Database::SNSDatabase::instance();
       Database::SQSDatabase& _sqsDatabase = Database::SQSDatabase::instance();
-      SNSService _snsService = SNSService(_configuration, _condition);
-      SQSService _sqsService = SQSService(_configuration, _condition);
+      SNSService _snsService = SNSService(_configuration);
+      SQSService _sqsService = SQSService(_configuration);
   };
 
   TEST_F(SNSServiceTest, TopicCreateTest) {

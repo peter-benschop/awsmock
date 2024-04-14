@@ -14,21 +14,20 @@
 #include <Poco/Runnable.h>
 
 // AwsMock includes
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/MetricService.h"
-#include "awsmock/dto/lambda/InvocationNotification.h"
-#include "awsmock/repository/LambdaDatabase.h"
-#include "awsmock/repository/ModuleDatabase.h"
-#include "awsmock/service/s3/S3Service.h"
-#include "awsmock/service/common/AbstractWorker.h"
-#include "awsmock/service/common/AbstractServer.h"
-#include "GatewayRouter.h"
-#include "awsmock/service/lambda/LambdaExecutor.h"
-#include "awsmock/service/lambda/LambdaCreator.h"
-#include "awsmock/service/lambda/LambdaExecutor.h"
-#include "awsmock/service/lambda/LambdaMonitoring.h"
-#include "awsmock/service/lambda/LambdaHandlerFactory.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/dto/lambda/InvocationNotification.h>
+#include <awsmock/repository/LambdaDatabase.h>
+#include <awsmock/repository/ModuleDatabase.h>
+#include <awsmock/service/s3/S3Service.h>
+#include <awsmock/service/common/AbstractWorker.h>
+#include <awsmock/service/common/AbstractServer.h>
+#include <awsmock/service/gateway/GatewayRouter.h>
+#include <awsmock/service/lambda/LambdaExecutor.h>
+#include <awsmock/service/lambda/LambdaCreator.h>
+#include <awsmock/service/lambda/LambdaExecutor.h>
+#include <awsmock/service/lambda/LambdaHandlerFactory.h>
 
 #define GATEWAY_DEFAULT_HOST "localhost"
 #define GATEWAY_MAX_QUEUE 250
@@ -55,21 +54,21 @@ namespace AwsMock::Service {
     ~GatewayServer() override;
 
     /**
+     * Timer initialization
+     */
+    void Initialize() override;
+
+    /**
      * Main method
      */
-    void MainLoop() override;
+    void Run() override;
 
     /**
-     * Stop monitoring manager
+     * Shutdown
      */
-    void StopMonitoringServer();
+    void Shutdown() override;
 
   private:
-
-    /**
-     * Start monitoring manager
-     */
-    void StartMonitoringServer();
 
     /**
      * Logger

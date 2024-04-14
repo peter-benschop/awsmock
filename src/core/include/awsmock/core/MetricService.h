@@ -2,8 +2,8 @@
 // Created by vogje01 on 07/01/2023.
 //
 
-#ifndef AWSMOCK_CORE_METRICSERVICE_H
-#define AWSMOCK_CORE_METRICSERVICE_H
+#ifndef AWSMOCK_CORE_METRIC_SERVICE_H
+#define AWSMOCK_CORE_METRIC_SERVICE_H
 
 // C++ Standard includes
 #include <chrono>
@@ -17,16 +17,17 @@
 // Poco includes
 #include <Poco/Logger.h>
 #include <Poco/Timer.h>
-#include "Poco/Runnable.h"
-#include "Poco/Thread.h"
+#include <Poco/Runnable.h>
+#include <Poco/Thread.h>
 #include <Poco/Prometheus/Counter.h>
 #include <Poco/Prometheus/Gauge.h>
 #include <Poco/Prometheus/MetricsServer.h>
-#include "Poco/Util/ServerApplication.h"
+#include <Poco/Util/ServerApplication.h>
 
 // AwsMock utils
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Timer.h>
 #include <awsmock/core/MetricSystemCollector.h>
 
 #define TIME_DIFF(x) ((double) std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - _timerStartMap[GetTimerKey(x)]).count())
@@ -44,14 +45,14 @@ namespace AwsMock::Core {
    *
    * @author jens.vogt@opitz-consulting.com
    */
-  class MetricService {
+  class MetricService : public Core::Timer {
 
   public:
 
     /**
      * Default constructor
      */
-    MetricService() : _logger(Poco::Logger::get("MetricService")), _port(8081), _timeout(60000) {}
+    MetricService() : Core::Timer("MetricServer", 60), _logger(Poco::Logger::get("MetricService")), _port(8081), _timeout(60000) {}
 
     /**
      * Constructor
@@ -71,19 +72,17 @@ namespace AwsMock::Core {
     /**
      * Initialization
      */
-    [[maybe_unused]] virtual void Initialize();
+    void Initialize() override;
+
+    /**
+     * Run main loop
+     */
+    void Run() override;
 
     /**
      * Gracefully shutdown
      */
-    [[maybe_unused]]
-    void ShutdownServer();
-
-    /**
-     * Starts the HTTP manager
-     */
-    [[maybe_unused]]
-    void StartServer();
+    void Shutdown() override;
 
     /**
      * Adds a counter to the map.
@@ -360,11 +359,6 @@ namespace AwsMock::Core {
      * @param name name of the timer.
      */
     std::string GetTimerKey(const std::string &name);
-
-    /**
-     * Initialize system counter
-     */
-    void StartSystemCounter();
 
     /**
      * Logger

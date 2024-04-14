@@ -2,12 +2,13 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_GATEWAYHANDLER_H
-#define AWSMOCK_SERVICE_GATEWAYHANDLER_H
+#ifndef AWSMOCK_SERVICE_GATEWAY_HANDLER_H
+#define AWSMOCK_SERVICE_GATEWAY_HANDLER_H
 
 // C++ includes
 #include <string>
 #include <utility>
+#include <future>
 
 // Poco includes
 #include <Poco/DateTime.h>
@@ -16,13 +17,23 @@
 #include <Poco/Net/HTTPClientSession.h>
 
 // AwsMock includes
-#include "awsmock/core/AwsUtils.h"
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/HttpUtils.h"
-#include "awsmock/core/MetricService.h"
-#include "awsmock/core/MetricServiceTimer.h"
-#include "awsmock/core/MetricDefinition.h"
-#include "awsmock/service/common/AbstractHandler.h"
+#include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/HttpUtils.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/core/MetricDefinition.h>
+#include <awsmock/core/MetricServiceTimer.h>
+#include <awsmock/service/common/AbstractHandler.h>
+#include <awsmock/service/gateway/GatewayRoute.h>
+#include <awsmock/service/gateway/GatewayRouter.h>
+#include <awsmock/service/s3/S3Handler.h>
+#include <awsmock/service/sqs/SQSHandler.h>
+#include <awsmock/service/sns/SNSHandler.h>
+#include <awsmock/service/lambda/LambdaHandler.h>
+#include <awsmock/service/transfer/TransferHandler.h>
+#include <awsmock/service/dynamodb/DynamoDbHandler.h>
+#include <awsmock/service/cognito/CognitoHandler.h>
+#include <awsmock/service/secretsmanager/SecretsManagerHandler.h>
 
 namespace AwsMock::Service {
 
@@ -58,7 +69,7 @@ namespace AwsMock::Service {
      * @param host module host
      * @param port module port
      */
-    GatewayHandler(Core::Configuration &configuration, Core::MetricService &metricService, std::string host, int port);
+    GatewayHandler(Core::Configuration &configuration, Core::MetricService &metricService, Service::GatewayRoute  route);
 
   protected:
 
@@ -128,16 +139,6 @@ namespace AwsMock::Service {
   private:
 
     /**
-     * Forward request to the corresponding module
-     *
-     * @param request HTTP request
-     * @param response HTTP response
-     * @param host module host
-     * @param port module port
-     */
-    void ForwardRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &host, int port);
-
-    /**
      * Sets extra header values
      *
      * @param request HTTP request
@@ -170,6 +171,11 @@ namespace AwsMock::Service {
      * Service port
      */
     int _port;
+
+    /**
+     * Gateway route
+     */
+    Service::GatewayRoute _route;
 
   };
 } // namespace AwsMock::Service

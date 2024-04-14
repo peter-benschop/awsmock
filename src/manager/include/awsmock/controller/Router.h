@@ -24,7 +24,7 @@
 #include <awsmock/resource/factory/IFactory.h>
 #include <awsmock/resource/factory/Factory.h>
 #include <awsmock/controller/ResourceNotFound.h>
-#include "awsmock/service/common/AbstractServer.h"
+#include <awsmock/service/common/AbstractServer.h>
 
 namespace AwsMock::Controller {
 
@@ -40,11 +40,6 @@ namespace AwsMock::Controller {
      * @param serverMap map of services
      */
     Router(Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap);
-
-    /**
-     * Destructor
-     */
-    ~Router() override;
 
     /**
      * Add a route

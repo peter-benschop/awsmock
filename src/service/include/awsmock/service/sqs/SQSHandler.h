@@ -12,20 +12,19 @@
 #include <Poco/DateTimeFormatter.h>
 
 // AwsMock includes
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/HttpUtils.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/MetricService.h"
-#include "awsmock/core/MetricServiceTimer.h"
-#include "awsmock/core/MetricDefinition.h"
-#include "awsmock/dto/common/SQSClientCommand.h"
-#include "awsmock/dto/sqs/GetQueueUrlRequest.h"
-#include "awsmock/dto/sqs/GetQueueUrlResponse.h"
-#include "awsmock/dto/sqs/DeleteMessageBatchEntry.h"
-#include "awsmock/dto/sqs/DeleteMessageBatchRequest.h"
-#include "awsmock/service/common/AbstractHandler.h"
-#include "SQSService.h"
-#include "SQSCmdHandler.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/HttpUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/core/MetricDefinition.h>
+#include <awsmock/dto/common/SQSClientCommand.h>
+#include <awsmock/dto/sqs/GetQueueUrlRequest.h>
+#include <awsmock/dto/sqs/GetQueueUrlResponse.h>
+#include <awsmock/dto/sqs/DeleteMessageBatchEntry.h>
+#include <awsmock/dto/sqs/DeleteMessageBatchRequest.h>
+#include <awsmock/service/common/AbstractHandler.h>
+#include <awsmock/service/sqs/SQSService.h>
+#include <awsmock/service/sqs/SQSCmdHandler.h>
 
 #define DEFAULT_SQS_ENDPOINT "localhost:4566"
 #define DEFAULT_SQS_ACCOUNT_ID "000000000000"
@@ -54,21 +53,18 @@ namespace AwsMock::Service {
      *
      * @param configuration application configuration
      * @param metricService monitoring module
-     * @param condition stop condition
      */
-    SQSHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
-
-  protected:
+    SQSHandler(Core::Configuration &configuration, Core::MetricService &metricService);
 
     /**
-     * HTTP POST request.
-     *
-     * @param request HTTP request
-     * @param response HTTP response
-     * @param region AWS region
-     * @param user AWS user
-     * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-     */
+       * HTTP POST request.
+       *
+       * @param request HTTP request
+       * @param response HTTP response
+       * @param region AWS region
+       * @param user AWS user
+       * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+       */
     void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
   private:

@@ -15,20 +15,19 @@
 #include <Poco/NotificationQueue.h>
 
 // AwsMock includes
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/MetricService.h"
-#include "awsmock/dto/lambda/InvocationNotification.h"
-#include "awsmock/repository/LambdaDatabase.h"
-#include "awsmock/repository/ModuleDatabase.h"
-#include "awsmock/service/s3/S3Service.h"
-#include "awsmock/service/common/AbstractWorker.h"
-#include "awsmock/service/common/AbstractServer.h"
-#include "LambdaExecutor.h"
-#include "LambdaCreator.h"
-#include "LambdaExecutor.h"
-#include "LambdaMonitoring.h"
-#include "LambdaHandlerFactory.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/dto/lambda/InvocationNotification.h>
+#include <awsmock/repository/LambdaDatabase.h>
+#include <awsmock/repository/ModuleDatabase.h>
+#include <awsmock/service/s3/S3Service.h>
+#include <awsmock/service/common/AbstractWorker.h>
+#include <awsmock/service/common/AbstractServer.h>
+#include <awsmock/service/lambda/LambdaExecutor.h>
+#include <awsmock/service/lambda/LambdaCreator.h>
+#include <awsmock/service/lambda/LambdaExecutor.h>
+#include <awsmock/service/lambda/LambdaHandlerFactory.h>
 
 #define LAMBDA_DEFAULT_PORT 9503
 #define LAMBDA_DEFAULT_HOST "localhost"
@@ -50,7 +49,7 @@ namespace AwsMock::Service {
      * @param createQueue create lambda notification queue
      * @param invokeQueue invoke lambda notification queue
      */
-    explicit LambdaServer(Core::Configuration &configuration, Core::MetricService &metricService, Poco::NotificationQueue &createQueue, Poco::NotificationQueue &invokeQueue);
+    explicit LambdaServer(Core::Configuration &configuration, Core::MetricService &metricService);
 
     /**
      * Destructor
@@ -58,26 +57,26 @@ namespace AwsMock::Service {
     ~LambdaServer() override;
 
     /**
+     * Initialization
+     */
+    void Initialize() override;
+
+    /**
      * Main method
      */
-    void MainLoop() override;
+    void Run() override;
 
     /**
-     * Stop monitoring manager
+     * Shutdown
      */
-    void StopMonitoringServer();
-
-    /**
-     * Stop executors
-     */
-    void StopExecutors();
+    void Shutdown() override;
 
   private:
 
     /**
-     * Start monitoring manager
+     * Update metric counters
      */
-    void StartMonitoringServer();
+    void UpdateCounters();
 
     /**
      * Delete dangling, stopped containers
@@ -123,21 +122,6 @@ namespace AwsMock::Service {
     Core::MetricService &_metricService;
 
     /**
-     * Create notification queue
-     */
-    Poco::NotificationQueue &_createQueue;
-
-    /**
-     * Invoke notification queue
-     */
-    Poco::NotificationQueue &_invokeQueue;
-
-    /**
-     * Thread pool
-     */
-    AwsMock::Core::ThreadPool<LambdaMonitoring> _threadPool;
-
-    /**
      * lambda database
      */
     Database::LambdaDatabase& _lambdaDatabase;
@@ -151,16 +135,6 @@ namespace AwsMock::Service {
      * Docker module
      */
     std::unique_ptr<Service::DockerService> _dockerService;
-
-    /**
-     * lambda creator
-     */
-    LambdaCreator _lambdaCreator = LambdaCreator(_configuration, _createQueue);
-
-    /**
-     * lambda executor
-     */
-    LambdaExecutor _lambdaExecutor = LambdaExecutor( _metricService, _invokeQueue);
 
     /**
      * Data dir

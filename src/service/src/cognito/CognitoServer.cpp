@@ -28,11 +28,7 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Cognito module initialized, endpoint: " << _host << ":" << _port << std::endl;
   }
 
-  CognitoServer::~CognitoServer() {
-    StopServer();
-  }
-
-  void CognitoServer::MainLoop() {
+  void CognitoServer::Initialize() {
 
     // Check module active
     if (!IsActive("cognito")) {
@@ -41,37 +37,22 @@ namespace AwsMock::Service {
     }
     log_info_stream(_logger) << "Cognito module starting" << std::endl;
 
-    // Start monitoring thread
-    StartMonitoringServer();
-
     // Start REST module
     StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new CognitoHandlerFactory(_configuration, _metricService));
+  }
 
-    while (IsRunning()) {
-
+  void CognitoServer::Run() {
       log_trace_stream(_logger) << "Cognito processing started" << std::endl;
-
-      // Wait for timeout or condition
-      if (InterruptableSleep(_period)) {
-        StopMonitoringServer();
-        break;
-      }
       UpdateCounters();
-    }
   }
 
-  void CognitoServer::StartMonitoringServer() {
-    _threadPool.StartThread(_configuration, _metricService, _condition);
-  }
-
-  void CognitoServer::StopMonitoringServer() {
-    _threadPool.stopAll();
+  void CognitoServer::Shutdown() {
+    StopHttpServer();
   }
 
   void CognitoServer::UpdateCounters() {
-    /*long buckets = _cognitoDatabase->BucketCount();
-    long objects = _cognitoDatabase->ObjectCount();
-    _metricService.SetGauge("s3_bucket_count", buckets);
-    _metricService.SetGauge("s3_object_count", objects);*/
+    long userPools = _cognitoDatabase.CountUserPools();
+    _metricService.SetGauge("cognito_userpool_count_total", userPools);
   }
+
 }

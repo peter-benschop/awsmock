@@ -6,27 +6,11 @@
 
 namespace AwsMock::Service {
 
-  LambdaCreator::LambdaCreator(Core::Configuration &configuration, Poco::NotificationQueue &createQueue)
-    : _logger(Poco::Logger::get("LambdaCreator")), _configuration(configuration), _lambdaDatabase(Database::LambdaDatabase::instance()), _dockerService(configuration), _createQueue(createQueue) {
+  LambdaCreator::LambdaCreator(Core::Configuration &configuration) : _logger(Poco::Logger::get("LambdaCreator")), _configuration(configuration), _lambdaDatabase(Database::LambdaDatabase::instance()), _dockerService(configuration) {
 
     // Configuration
     _dataDir = _configuration.getString("awsmock.data.dir", "/tmp/awsmock/data");
     _tempDir = _dataDir + Poco::Path::separator() + "tmp";
-  }
-
-  void LambdaCreator::run() {
-
-    log_debug_stream(_logger) << "Lambda create notification received, queueSize:" << _createQueue.size() << std::endl;
-
-    Poco::AutoPtr<Poco::Notification> pNf(_createQueue.waitDequeueNotification());
-    while (pNf) {
-
-      auto *pWorkNf = dynamic_cast<Dto::Lambda::CreateNotification *>(pNf.get());
-      if (pWorkNf) {
-        CreateLambdaFunction(pWorkNf->zipFileContent, pWorkNf->functionId);
-      }
-      pNf = _createQueue.waitDequeueNotification(1000);
-    }
   }
 
   void LambdaCreator::CreateLambdaFunction(const std::string &functionCode, const std::string &functionId) {

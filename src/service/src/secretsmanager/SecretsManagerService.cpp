@@ -6,8 +6,8 @@
 
 namespace AwsMock::Service {
 
-  SecretsManagerService::SecretsManagerService(Core::Configuration &configuration, Poco::Condition &condition)
-    : _logger(Poco::Logger::get("SecretsManagerService")), _configuration(configuration), _database(Database::SecretsManagerDatabase::instance()), _condition(condition) {
+  SecretsManagerService::SecretsManagerService(Core::Configuration &configuration)
+    : _logger(Poco::Logger::get("SecretsManagerService")), _configuration(configuration), _database(Database::SecretsManagerDatabase::instance()) {
 
     // Initialize environment
     _accountId = _configuration.getString("awsmock.account.userPoolId", DEFAULT_ACCOUNT_ID);
@@ -119,7 +119,7 @@ namespace AwsMock::Service {
         std::string base64Decoded = Core::Crypto::Base64Decode(secret.secretString);
         int len = (int) base64Decoded.length();
         response.secretBinary = std::string(reinterpret_cast<char *>(Core::Crypto::Aes256DecryptString((unsigned char *) base64Decoded.c_str(), &len, _kmsKey)));
-      } else  {
+      } else {
         log_warning_stream(_logger) << "Neither string nor binary, secretId: " << request.secretId << std::endl;
       }
       log_debug_stream(_logger) << "Get secret value, secretId: " << request.secretId << std::endl;
@@ -147,7 +147,7 @@ namespace AwsMock::Service {
       Database::Entity::SecretsManager::SecretList secrets = _database.ListSecrets();
 
       // Convert to DTO
-      for(const auto &s : secrets)  {
+      for (const auto &s : secrets) {
         Dto::SecretsManager::Secret secret;
         secret.primaryRegion = s.primaryRegion;
         secret.arn = s.arn;

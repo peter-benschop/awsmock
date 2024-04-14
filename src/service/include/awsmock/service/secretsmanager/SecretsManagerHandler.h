@@ -12,7 +12,6 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/MetricService.h>
-#include <awsmock/core/MetricServiceTimer.h>
 #include <awsmock/core/MetricDefinition.h>
 #include <awsmock/dto/common/SecretsManagerClientCommand.h>
 #include "awsmock/service/common/AbstractHandler.h"
@@ -35,11 +34,8 @@ namespace AwsMock::Service {
      *
      * @param configuration application configuration
      * @param metricService monitoring module
-     * @param condition stop condition
      */
-    SecretsManagerHandler(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition);
-
-  protected:
+    SecretsManagerHandler(Core::Configuration &configuration, Core::MetricService &metricService);
 
     /**
      * HTTP POST request.
