@@ -6,6 +6,28 @@
 
 namespace AwsMock::Dto::S3 {
 
+  std::string CompleteMultipartUploadResult::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("location", location);
+      rootJson.set("bucket", bucket);
+      rootJson.set("key", key);
+      rootJson.set("etag", etag);
+      rootJson.set("checksumCrc32", checksumCrc32);
+      rootJson.set("checksumCrc32c", checksumCrc32c);
+      rootJson.set("checksumSha1", checksumSha1);
+      rootJson.set("checksumSha256", checksumSha256);
+
+      std::ostringstream os;
+      rootJson.stringify(os);
+      return os.str();
+
+    } catch (Poco::Exception &exc) {
+      throw Core::JsonException(exc.message());
+    }
+  }
+
   std::string CompleteMultipartUploadResult::ToXml() const {
     Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
     Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("CompleteMultipartUploadResult");
@@ -45,9 +67,7 @@ namespace AwsMock::Dto::S3 {
   }
 
   std::ostream &operator<<(std::ostream &os, const CompleteMultipartUploadResult &r) {
-    os << "CompleteMultipartUploadResult={location='" + r.location + ", bucket='" + r.bucket + "', key='" + r.key + "', etag='" + r.etag +
-        "' checksumCrc32='" + r.checksumCrc32 + "' checksumCrc32c='" + r.checksumCrc32c + " checksumSha1='" + r.checksumSha1 +
-        "' checksumSha256='" + r.checksumSha256 + "'}";
+    os << "CompleteMultipartUploadResult=" << r.ToJson();
     return os;
   }
 

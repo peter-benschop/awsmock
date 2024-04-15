@@ -22,7 +22,11 @@ namespace AwsMock::Dto::Common {
 
     // Qualifiers
     std::string url = request.getURI();
-    multipartRequest = Core::HttpUtils::HasQueryParameter(request.getURI(), "uploads") || Core::HttpUtils::HasQueryParameter(request.getURI(), "uploadId");
+    multipartRequest = Core::HttpUtils::HasQueryParameter(request.getURI(), "uploads")
+      || Core::HttpUtils::HasQueryParameter(request.getURI(), "uploadId")
+      || Core::HttpUtils::HasQueryParameter(request.getURI(), "partNumber");
+    uploads = Core::HttpUtils::HasQueryParameter(request.getURI(), "uploads");
+    partNumber = Core::HttpUtils::HasQueryParameter(request.getURI(), "partNumber");
     notificationRequest = Core::HttpUtils::HasQueryParameter(request.getURI(), "notification");
     versionRequest = Core::HttpUtils::HasQueryParameter(request.getURI(), "versioning");
     copyRequest = request.has("x-amz-copy-source");
@@ -35,37 +39,51 @@ namespace AwsMock::Dto::Common {
     } else {
 
       switch (method) {
-        case HttpMethod::GET:
-          if (bucket.empty() && key.empty()) {
-            command = S3CommandType::LIST_BUCKETS;
-          } else if (!bucket.empty() && key.empty()) {
-            command = S3CommandType::LIST_OBJECTS;
+      case HttpMethod::GET:
+        if (bucket.empty() && key.empty()) {
+          command = S3CommandType::LIST_BUCKETS;
+        } else if (!bucket.empty() && key.empty()) {
+          command = S3CommandType::LIST_OBJECTS;
+        } else {
+          command = S3CommandType::GET_OBJECT;
+        }
+        break;
+      case HttpMethod::PUT:
+        if (multipartRequest) {
+          command = S3CommandType::UPLOAD_PART;
+        } else if (!bucket.empty() && key.empty()) {
+          command = S3CommandType::CREATE_BUCKET;
+        } else if (!bucket.empty() && !key.empty()) {
+          command = S3CommandType::PUT_OBJECT;
+        }
+        break;
+      case HttpMethod::DELETE:
+        if (multipartRequest) {
+          command = S3CommandType::ABORT_MULTIPART_UPLOAD;
+        } else if (!bucket.empty() && key.empty()) {
+          command = S3CommandType::DELETE_BUCKET;
+        } else if (!bucket.empty() && !key.empty()) {
+          command = S3CommandType::DELETE_OBJECT;
+        }
+        break;
+
+      case HttpMethod::POST:
+        if (!bucket.empty() && !key.empty()) {
+          if (uploads) {
+            command = S3CommandType::CREATE_MULTIPART_UPLOAD;
           } else {
-            command = S3CommandType::GET_OBJECT;
+            command = S3CommandType::COMPLETE_MULTIPART_UPLOAD;
           }
-          break;
-        case HttpMethod::PUT:
-          if (!bucket.empty() && key.empty()) {
-            command = S3CommandType::CREATE_BUCKET;
-          } else if (!bucket.empty() && !key.empty()) {
-            command = S3CommandType::PUT_OBJECT;
-          }
-          break;
-        case HttpMethod::DELETE:
-          if (!bucket.empty() && key.empty()) {
-            command = S3CommandType::DELETE_BUCKET;
-          } else if (!bucket.empty() && !key.empty()) {
-            command = S3CommandType::DELETE_OBJECT;
-          }
-          break;
-        case HttpMethod::POST:
-          if (!bucket.empty()) {
+        } else if (!bucket.empty()) {
+          if (multipartRequest) {
+          } else {
             command = S3CommandType::DELETE_OBJECTS;
           }
-          break;
-        case HttpMethod::UNKNOWN: {
-          break;
         }
+        break;
+      case HttpMethod::UNKNOWN: {
+        break;
+      }
       }
     }
   }

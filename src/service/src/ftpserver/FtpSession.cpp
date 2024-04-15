@@ -1180,11 +1180,15 @@ namespace AwsMock::FtpServer {
   void FtpSession::SendCreateObjectRequest(const std::string &user, const std::string &fileName) {
 
     std::string key = GetKey(fileName);
+    std::map<std::string, std::string> metadata;
+    metadata["user-agent"] = _serverName;
+    metadata["user-agent-id"] = _logged_in_user->_username + "@" + _serverName;
 
-    Dto::S3::PutObjectRequest request = {.region=_region, .bucket=_bucket, .key=key, .owner=user};
+    Dto::S3::PutObjectRequest request = {.region=_region, .bucket=_bucket, .key=key, .owner=user, .metadata=metadata};
 
     std::ifstream ifs(fileName);
     _s3Service->PutObject(request, ifs);
+    ifs.close();
     log_debug_stream(_logger) << "Create object message request send, fileName: " << fileName << std::endl;
   }
 

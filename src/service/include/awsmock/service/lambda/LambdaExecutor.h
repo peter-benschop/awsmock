@@ -15,6 +15,7 @@
 #include <Poco/Net/HTTPResponse.h>
 
 // AwsMock includes
+#include <awsmock/core/CurlUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/MetricService.h>
 #include <awsmock/core/MetricServiceTimer.h>
@@ -60,7 +61,7 @@ namespace AwsMock::Service {
      * @param port lambda docker external port
      * @return URI of the invocation request
      */
-    static Poco::URI GetRequestUri(const std::string &hostName, int port);
+    static std::string GetRequestUrl(const std::string &hostName, int port);
 
     /**
      * Logger
@@ -71,6 +72,11 @@ namespace AwsMock::Service {
      * Metric module
      */
     Core::MetricService &_metricService;
+
+    /**
+     * Mutex
+     */
+    static Poco::Mutex _mutex;
   };
 
 } // namespace AwsMock::Service

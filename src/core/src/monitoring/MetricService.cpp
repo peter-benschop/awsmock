@@ -6,6 +6,8 @@
 
 namespace AwsMock::Core {
 
+  Poco::Mutex MetricService::_mutex;
+
   MetricService::MetricService(const Configuration &configuration) : MetricService(configuration.getInt("awsmock.monitoring.port", 8081), configuration.getInt("awsmock.monitoring.timeout", 10)) {}
 
   MetricService::MetricService(int port, long timeout) : Core::Timer("MetricServer", 60), _logger(Poco::Logger::get("MetricService")), _port(port), _timeout(timeout) {}
@@ -58,13 +60,14 @@ namespace AwsMock::Core {
   }
 
   bool MetricService::CounterExists(const std::string &name) {
-    Poco::Mutex::ScopedLock lock(_mutex);
-    auto it = _counterMap.find(name);
-    return it != _counterMap.end();
+    return std::find_if(_counterMap.begin(),
+                        _counterMap.end(),
+                        [name](const std::pair<std::string, Poco::Prometheus::Counter*> &timer) {
+                          return timer.first == name;
+                        }) != _counterMap.end();
   }
 
   bool MetricService::CounterExists(const std::string &name, const std::string &label) {
-    Poco::Mutex::ScopedLock lock(_mutex);
     auto it = _counterMap.find(name);
     return it != _counterMap.end() && std::find(it->second->labelNames().begin(), it->second->labelNames().end(), label) != it->second->labelNames().end();
   }
@@ -247,13 +250,11 @@ namespace AwsMock::Core {
   }
 
   bool MetricService::GaugeExists(const std::string &name) {
-    Poco::Mutex::ScopedLock lock(_mutex);
     auto it = _gaugeMap.find(name);
     return it != _gaugeMap.end();
   }
 
   bool MetricService::GaugeExists(const std::string &name, const std::string &label) {
-    Poco::Mutex::ScopedLock lock(_mutex);
     auto it = _gaugeMap.find(name);
     return it != _gaugeMap.end() && std::find(it->second->labelNames().begin(), it->second->labelNames().end(), label) != it->second->labelNames().end();
   }
@@ -292,8 +293,11 @@ namespace AwsMock::Core {
   }
 
   bool MetricService::TimerExists(const std::string &name) {
-    Poco::Mutex::ScopedLock lock(_mutex);
-    return _timerMap.find(name) != _timerMap.end();
+    return std::find_if(_timerMap.begin(),
+            _timerMap.end(),
+            [name](const std::pair<std::string, Poco::Prometheus::Gauge*> &timer) {
+              return timer.first == name;
+            }) != _timerMap.end();
   }
 
   void MetricService::ResetTimer(const std::string &name) {

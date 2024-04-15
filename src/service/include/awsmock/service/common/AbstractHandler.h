@@ -253,6 +253,15 @@ namespace AwsMock::Service {
      * @param response HTTP response object
      * @param exc module exception object
      */
+    void SendXmlErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, std::exception &exc);
+
+    /**
+     * Send an error response (HTTP state code 200).
+     *
+     * @param service module name
+     * @param response HTTP response object
+     * @param exc module exception object
+     */
     void SendXmlErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Core::ServiceException &exc);
 
     /**
@@ -408,6 +417,11 @@ namespace AwsMock::Service {
      * Path parameters
      */
     std::vector<std::string> _pathParameter;
+
+    /**
+     * Memory mapped file
+     */
+    Core::MemoryMappedFile _memoryMappedFile;
 
   };
 

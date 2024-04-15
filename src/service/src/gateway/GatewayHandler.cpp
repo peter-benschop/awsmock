@@ -152,7 +152,7 @@ namespace AwsMock::Service {
 
     Core::MetricServiceTimer measure(_metricService, GATEWAY_POST_TIMER);
     _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "POST");
-    log_debug_stream(_logger) << "Gateway POST request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
+    log_trace_stream(_logger) << "Gateway POST request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
 
     SetHeaders(request, region, user);
     switch (_route._handlerType) {

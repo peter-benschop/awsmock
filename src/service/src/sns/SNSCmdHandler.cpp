@@ -4,7 +4,7 @@
 namespace AwsMock::Service {
 
   SNSCmdHandler::SNSCmdHandler(Core::Configuration &configuration, Core::MetricService &metricService)
-    : AbstractHandler(), _logger(Poco::Logger::get("SNSCliHandler")), _configuration(configuration), _metricService(metricService), _snsService(configuration) {
+    : AbstractHandler(), _logger(Poco::Logger::get("SNSCmdHandler")), _configuration(configuration), _metricService(metricService), _snsService(configuration) {
   }
 
   void SNSCmdHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::SNSClientCommand &snsClientCommand) {

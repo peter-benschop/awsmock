@@ -7,7 +7,7 @@
 
 // C includes
 #include <fcntl.h>
-#include <errno.h>
+#include <cerrno>
 #include <unistd.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -102,7 +102,17 @@ namespace AwsMock::Core {
      */
     bool _mapped;
 
+    /**
+     * Mutex
+     */
     Poco::Mutex _mutex;
+
+    /**
+     * Start pointer
+    */
+    std::string _filename;
+
+    int _fd;
   };
 
 } // namespace AwsMock::Core

@@ -14,6 +14,12 @@
 #include <Poco/DOM/DOMParser.h>
 #include <Poco/DOM/Document.h>
 #include <Poco/DOM/Element.h>
+#include <Poco/JSON/JSON.h>
+#include <Poco/JSON/Parser.h>
+#include <Poco/Dynamic/Var.h>
+
+// AwsMock includes
+#include <awsmock/core/JsonException.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -43,6 +49,18 @@ namespace AwsMock::Dto::S3 {
      * AWS upload ID
      */
     std::string uploadId;
+
+    /**
+     * AWS upload ID
+     */
+    std::string checksumAlgorithm;
+
+    /**
+     * Convert to a JSON string
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Convert from XML representation
