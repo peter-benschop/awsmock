@@ -126,6 +126,7 @@ namespace AwsMock::Service {
      * lambda module
      */
     Service::LambdaService _lambdaService;
+
   };
 
 } // namespace AwsMock

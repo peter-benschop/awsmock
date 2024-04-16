@@ -60,6 +60,7 @@ namespace AwsMock::Service {
      * Metric module
      */
     Core::MetricService &_metricService;
+
   };
 
 } // namespace AwsMock::Service

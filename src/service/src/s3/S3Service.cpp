@@ -6,6 +6,13 @@
 
 namespace AwsMock::Service {
 
+  template<class F, class entity>
+  void CallAsyncCalculateHashes(F *&&fun, entity &&e) {
+    std::make_unique<std::future<void >>((std::async(std::launch::async, [&fun, &e]() {
+      fun->CalculateHashes(e);
+    }))).reset();
+  }
+
   S3Service::S3Service(const Core::Configuration &configuration) : _logger(Poco::Logger::get("S3Service")), _configuration(configuration), _database(Database::S3Database::instance()) {
 
     _accountId = _configuration.getString("awsmock.account.userPoolId");
@@ -271,9 +278,7 @@ namespace AwsMock::Service {
     // Get file size, MD5 sum
     long fileSize = (long) Core::FileUtils::FileSize(outFile);
     std::string md5sum = Core::Crypto::GetMd5FromFile(outFile);
-    std::string sha1sum = Core::Crypto::GetSha1FromFile(outFile);
-    std::string sha256sum = Core::Crypto::GetSha256FromFile(outFile);
-    log_debug_stream(_logger) << "Metadata, bucket: " << request.bucket << " key: " << request.key << " md5: " << md5sum << " sha256: " << sha256sum << std::endl;
+    log_debug_stream(_logger) << "Metadata, bucket: " << request.bucket << " key: " << request.key << " md5: " << md5sum << std::endl;
 
     // Create database object
     Database::Entity::S3::Object object = _database.CreateOrUpdateObject(
@@ -284,10 +289,14 @@ namespace AwsMock::Service {
         .owner=request.user,
         .size=fileSize,
         .md5sum=md5sum,
-        .sha1sum=sha1sum,
-        .sha256sum=sha256sum,
         .internalName=filename,
       });
+
+    // Calculate the hashes asynchronously
+    if (request.checksumAlgorithm == "SHA1" || request.checksumAlgorithm == "SHA256") {
+      CallAsyncCalculateHashes(this, object);
+      log_debug_stream(_logger) << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum << std::endl;
+    }
 
     // Cleanup
     Core::DirUtils::DeleteDirectory(uploadDir);
@@ -301,9 +310,7 @@ namespace AwsMock::Service {
       .bucket=request.bucket,
       .key=request.key,
       .etag=md5sum,
-      .md5sum=md5sum,
-      .checksumSha1=sha1sum,
-      .checksumSha256=sha256sum
+      .md5sum=md5sum
     };
   }
 
@@ -327,8 +334,8 @@ namespace AwsMock::Service {
       }
 
     } catch (Poco::Exception &ex) {
-      log_error_stream(_logger) << "S3 put object failed, message: " << ex.message() << std::endl;
-      throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+      log_error_stream(_logger) << "S3 put object failed, message: " << ex.what() << " key: " << request.key << std::endl;
+      throw Core::ServiceException(ex.message());
     }
   }
 
@@ -351,6 +358,7 @@ namespace AwsMock::Service {
     Dto::S3::CopyObjectResponse response;
     Database::Entity::S3::Object sourceObject, targetObject;
     try {
+
       // Check existence of target bucket
       if (!_database.BucketExists({.region=request.region, .name=request.targetBucket})) {
         log_error_stream(_logger) << "Target bucket does not exist, region: " << request.region + " bucket: " << request.targetBucket << std::endl;
@@ -397,8 +405,8 @@ namespace AwsMock::Service {
                                << request.targetBucket << " targetKey: " << request.targetKey << std::endl;
 
     } catch (Poco::Exception &ex) {
-      log_error_stream(_logger) << "S3 copy object request failed, message: " << ex.message() << std::endl;
-      throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+      log_error_stream(_logger) << "S3 copy object request failed, error: " << ex.what() << std::endl;
+      throw Core::ServiceException(ex.message());
     }
     return {.eTag=targetObject.md5sum, .lastModified=Poco::DateTimeFormatter::format(Poco::DateTime(), Poco::DateTimeFormat::ISO8601_FRAC_FORMAT)};
   }
@@ -480,7 +488,7 @@ namespace AwsMock::Service {
 
     // Check bucket existence
     if (!_database.BucketExists({.region=request.region, .name=request.bucket})) {
-      throw Core::ServiceException("Bucket does not exist, bucket: " + request.bucket, Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+      throw Core::ServiceException("Bucket does not exist, bucket: " + request.bucket);
     }
 
     if (_database.ObjectExists({.region=request.region, .bucket=request.bucket, .key=request.key})) {
@@ -504,7 +512,7 @@ namespace AwsMock::Service {
 
       } catch (Poco::Exception &exc) {
         log_error_stream(_logger) << "S3 delete object failed, message: " + exc.message() << std::endl;
-        throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+        throw Core::ServiceException(exc.message());
       }
     }
   }
@@ -583,17 +591,17 @@ namespace AwsMock::Service {
 
     // Check existence
     if (!_database.BucketExists(bucket)) {
-      throw Core::ServiceException("Bucket does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+      throw Core::ServiceException("Bucket does not exist");
     }
 
     // Check empty
     if (_database.HasObjects(bucket)) {
-      throw Core::ServiceException("Bucket is not empty", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+      throw Core::ServiceException("Bucket is not empty");
     }
 
     // Check transfer bucket
     if (request.bucket == _transferBucket) {
-      throw Core::ServiceException("Transfer bucket cannot be deleted", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+      throw Core::ServiceException("Transfer bucket cannot be deleted");
     }
 
     try {
@@ -607,7 +615,7 @@ namespace AwsMock::Service {
 
     } catch (Poco::Exception &ex) {
       log_error_stream(_logger) << "S3 Delete Bucket failed, message: " << ex.message() << std::endl;
-      throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+      throw Core::ServiceException(ex.message());
     }
   }
 
@@ -744,33 +752,19 @@ namespace AwsMock::Service {
     std::string functionName = parts[6];
     log_debug_stream(_logger) << "Invocation request function name: " << functionName << std::endl;
 
-    //"Credential=none/20230618/eu-central-1/s3/aws4_request, SignedHeaders=content-md5;content-type;host;x-amz-content-sha256;x-amz-date;x-amz-security-token, Signature=fe9766ea2c032ac7b17033a567f6b361192bddcf73f89d25c15019977c544e1c"
-    Poco::URI uri("http://" + _lambdaServiceHost + ":" + std::to_string(_lambdaServicePort) + "/2015-03-31/functions/" + functionName + "/invocations");
-    std::string path(uri.getPathAndQuery());
-
-    // Set payload
     std::string body = eventNotification.ToJson();
+    std::map<std::string, std::string> headers;
+    headers["Content-Type"] = "application/json";
+    headers["Content-Length"] = std::to_string(body.length());
+    headers["Authorization"] = "AWS4-HMAC-SHA256 Credential=none/20230618/eu-central-1/lambda/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840";
 
-    // Create HTTP request and set headers
-    Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
-    Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, path, Poco::Net::HTTPMessage::HTTP_1_1);
-    request.setContentLength((long) body.length());
-    request.add("Content-Type", "application/json");
-    request.add("Authorization",
-                "AWS4-HMAC-SHA256 Credential=none/20230618/eu-central-1/lambda/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840");
-    log_trace_stream(_logger) << "Invocation request created, body: " + body << std::endl;
-
-    // Send request
-    std::ostream &os = session.sendRequest(request);
-    os << body;
-
-    // Get the response state
-    Poco::Net::HTTPResponse response;
-    session.receiveResponse(response);
-    if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
-      log_error_stream(_logger) << "HTTP error, state: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
+    std::string url = "http://" + _lambdaServiceHost + ":" + std::to_string(_lambdaServicePort) + "/2015-03-31/functions/" + functionName + "/invocations";
+    Core::CurlUtils _curlUtils;
+    Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", url, headers, body);
+    if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
+      log_error_stream(_logger) << "HTTP error, status: " << response.statusCode << " reason: " + response.output << std::endl;
     }
-    log_debug_stream(_logger) << "Invocation request send, state: " << response.getStatus() << std::endl;
+    log_debug_stream(_logger) << "Lambda invocation finished send, status: " << response.statusCode << std::endl;
   }
 
   Dto::S3::PutObjectResponse S3Service::SaveUnversionedObject(Dto::S3::PutObjectRequest &request, std::istream &stream) {
@@ -781,6 +775,7 @@ namespace AwsMock::Service {
     std::ofstream ofs(filePath);
     long size = Poco::StreamCopier::copyStream(stream, ofs);
     ofs.close();
+
     //Core::FileUtils::StripChunkSignature(filePath);
     log_debug_stream(_logger) << "File received, fileName: " << filePath << " size: " << size << std::endl;
 
@@ -799,13 +794,9 @@ namespace AwsMock::Service {
     // Meta data
     object.md5sum = Core::Crypto::GetMd5FromFile(filePath);
     log_debug_stream(_logger) << "Checksum, bucket: " << request.bucket << " key: " << request.key << " md5: " << object.md5sum << std::endl;
-    if (request.checksumAlgorithm == "SHA1") {
-      object.sha1sum = Core::Crypto::GetSha1FromFile(filePath);
-      log_debug_stream(_logger) << "Checksum SHA1, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << std::endl;
-    }
-    if (request.checksumAlgorithm == "SHA256") {
-      object.sha256sum = Core::Crypto::GetSha256FromFile(filePath);
-      log_debug_stream(_logger) << "Checksum SHA256, bucket: " << request.bucket << " key: " << request.key << " sha256: " << object.sha256sum << std::endl;
+    if (request.checksumAlgorithm == "SHA1" || request.checksumAlgorithm == "SHA256") {
+      CallAsyncCalculateHashes(this, object);
+      log_debug_stream(_logger) << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum << std::endl;
     }
 
     // Update database
@@ -860,9 +851,19 @@ namespace AwsMock::Service {
         .versionId=versionId,
       };
 
+      // Checksums
+      object.md5sum = Core::Crypto::GetMd5FromFile(filePath);
+      log_debug_stream(_logger) << "Checksum, bucket: " << request.bucket << " key: " << request.key << " md5: " << object.md5sum << std::endl;
+
       // Create new version in database
       object = _database.CreateObject(object);
       log_debug_stream(_logger) << "Database updated, bucket: " << object.bucket << " key: " << object.key << std::endl;
+
+      // Checksums
+      if (request.checksumAlgorithm == "SHA1" || request.checksumAlgorithm == "SHA256") {
+        CallAsyncCalculateHashes(this, object);
+        log_debug_stream(_logger) << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum << std::endl;
+      }
 
       // Check notification
       CheckNotifications(request.region, request.bucket, request.key, object.size, "s3:ObjectCreated:Put");
@@ -897,5 +898,13 @@ namespace AwsMock::Service {
       .metadata=request.metadata,
       .versionId=object.versionId
     };
+  }
+
+  void S3Service::CalculateHashes(Database::Entity::S3::Object &object) {
+    std::string filename = _dataS3Dir + Poco::Path::separator() + object.internalName;
+    object.sha1sum = Core::Crypto::GetSha1FromFile(filename);
+    object.sha256sum = Core::Crypto::GetSha256FromFile(filename);
+    _database.UpdateObject(object);
+    log_debug_stream(_logger) << "Calculated hashes, key: " << object.key << std::endl;
   }
 } // namespace AwsMock::Service

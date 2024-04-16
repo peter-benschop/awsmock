@@ -6,6 +6,8 @@
 
 namespace AwsMock::Core {
 
+  Poco::Mutex MetricService::_mutex;
+
   MetricService::MetricService(const Configuration &configuration) : MetricService(configuration.getInt("awsmock.monitoring.port", 8081), configuration.getInt("awsmock.monitoring.timeout", 10)) {}
 
   MetricService::MetricService(int port, long timeout) : Core::Timer("MetricServer", 60), _logger(Poco::Logger::get("MetricService")), _port(port), _timeout(timeout) {}
@@ -58,13 +60,14 @@ namespace AwsMock::Core {
   }
 
   bool MetricService::CounterExists(const std::string &name) {
-    Poco::Mutex::ScopedLock lock(_mutex);
-    auto it = _counterMap.find(name);
-    return it != _counterMap.end();
+    return std::find_if(_counterMap.begin(),
+                        _counterMap.end(),
+                        [name](const std::pair<std::string, Poco::Prometheus::Counter*> &timer) {
+                          return timer.first == name;
+                        }) != _counterMap.end();
   }
 
   bool MetricService::CounterExists(const std::string &name, const std::string &label) {
-    Poco::Mutex::ScopedLock lock(_mutex);
     auto it = _counterMap.find(name);
     return it != _counterMap.end() && std::find(it->second->labelNames().begin(), it->second->labelNames().end(), label) != it->second->labelNames().end();
   }
@@ -141,7 +144,7 @@ namespace AwsMock::Core {
   void MetricService::IncrementGauge(const std::string &name, int value) {
     Poco::Mutex::ScopedLock lock(_mutex);
     if (!GaugeExists(name)) {
-      AddGauge(name);
+      _gaugeMap[name] = new Poco::Prometheus::Gauge(name);
     }
     _gaugeMap[name]->inc((double) value);
     log_trace_stream(_logger) << "Gauge incremented, name: " + name << std::endl;
@@ -177,7 +180,7 @@ namespace AwsMock::Core {
   void MetricService::SetGauge(const std::string &name, long value) {
     Poco::Mutex::ScopedLock lock(_mutex);
     if (!GaugeExists(name)) {
-      AddGauge(name);
+      _gaugeMap[name] = new Poco::Prometheus::Gauge(name);
     }
     _gaugeMap[name]->set((double) value);
     log_trace_stream(_logger) << "Gauge value set, name: " + name << std::endl;
@@ -186,7 +189,7 @@ namespace AwsMock::Core {
   void MetricService::SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, long value) {
     Poco::Mutex::ScopedLock lock(_mutex);
     if (!GaugeExists(name, labelName)) {
-      AddGauge(name, labelName);
+      _gaugeMap[name] = new Poco::Prometheus::Gauge(name);
     }
     _gaugeMap[name]->labels({labelValue}).set((double) value);
     log_trace_stream(_logger) << "Gauge value set, name: " + name << std::endl;
@@ -195,7 +198,7 @@ namespace AwsMock::Core {
   void MetricService::SetGauge(const std::string &name, unsigned long value) {
     Poco::Mutex::ScopedLock lock(_mutex);
     if (!GaugeExists(name)) {
-      AddGauge(name);
+      _gaugeMap[name] = new Poco::Prometheus::Gauge(name);
     }
     _gaugeMap[name]->set((double) value);
     log_trace_stream(_logger) << "Gauge value set, name: " + name << std::endl;
@@ -204,7 +207,7 @@ namespace AwsMock::Core {
   void MetricService::SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, unsigned long value) {
     Poco::Mutex::ScopedLock lock(_mutex);
     if (!GaugeExists(name, labelName)) {
-      AddGauge(name, labelName);
+      _gaugeMap[name] = new Poco::Prometheus::Gauge(name);
     }
     _gaugeMap[name]->labels({labelValue}).set((double) value);
     log_trace_stream(_logger) << "Gauge value set, name: " + name << std::endl;
@@ -213,7 +216,7 @@ namespace AwsMock::Core {
   void MetricService::SetGauge(const std::string &name, float value) {
     Poco::Mutex::ScopedLock lock(_mutex);
     if (!GaugeExists(name)) {
-      AddGauge(name);
+      _gaugeMap[name] = new Poco::Prometheus::Gauge(name);
     }
     _gaugeMap[name]->set((double) value);
     log_trace_stream(_logger) << "Gauge value set, name: " + name << std::endl;
@@ -222,7 +225,7 @@ namespace AwsMock::Core {
   void MetricService::SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, float value) {
     Poco::Mutex::ScopedLock lock(_mutex);
     if (!GaugeExists(name, labelName)) {
-      AddGauge(name, labelName);
+      _gaugeMap[name] = new Poco::Prometheus::Gauge(name);
     }
     _gaugeMap[name]->labels({labelValue}).set((double) value);
     log_trace_stream(_logger) << "Gauge value set, name: " + name << std::endl;
@@ -231,7 +234,7 @@ namespace AwsMock::Core {
   void MetricService::SetGauge(const std::string &name, double value) {
     Poco::Mutex::ScopedLock lock(_mutex);
     if (!GaugeExists(name)) {
-      AddGauge(name);
+      _gaugeMap[name] = new Poco::Prometheus::Gauge(name);
     }
     _gaugeMap[name]->set(value);
     log_trace_stream(_logger) << "Gauge value set, name: " + name << std::endl;
@@ -240,20 +243,17 @@ namespace AwsMock::Core {
   void MetricService::SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, double value) {
     Poco::Mutex::ScopedLock lock(_mutex);
     if (!GaugeExists(name, labelName)) {
-      AddGauge(name, labelName);
+      _gaugeMap[name] = new Poco::Prometheus::Gauge(name);
     }
     _gaugeMap[name]->labels({labelValue}).set(value);
     log_trace_stream(_logger) << "Gauge value set, name: " + name << std::endl;
   }
 
   bool MetricService::GaugeExists(const std::string &name) {
-    Poco::Mutex::ScopedLock lock(_mutex);
-    auto it = _gaugeMap.find(name);
-    return it != _gaugeMap.end();
+    return _gaugeMap.find(name) != _gaugeMap.end();
   }
 
   bool MetricService::GaugeExists(const std::string &name, const std::string &label) {
-    Poco::Mutex::ScopedLock lock(_mutex);
     auto it = _gaugeMap.find(name);
     return it != _gaugeMap.end() && std::find(it->second->labelNames().begin(), it->second->labelNames().end(), label) != it->second->labelNames().end();
   }
@@ -271,7 +271,7 @@ namespace AwsMock::Core {
   void MetricService::StartTimer(const std::string &name) {
     Poco::Mutex::ScopedLock lock(_mutex);
     if (!TimerExists(name)) {
-      AddTimer(name);
+      _timerMap[name] = new Poco::Prometheus::Gauge(name);
     }
     if (_timerStartMap.find(GetTimerKey(name)) == _timerStartMap.end()) {
       _timerStartMap[GetTimerKey(name)] = std::chrono::high_resolution_clock::now();
@@ -292,7 +292,6 @@ namespace AwsMock::Core {
   }
 
   bool MetricService::TimerExists(const std::string &name) {
-    Poco::Mutex::ScopedLock lock(_mutex);
     return _timerMap.find(name) != _timerMap.end();
   }
 

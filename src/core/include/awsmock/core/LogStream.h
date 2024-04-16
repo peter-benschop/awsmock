@@ -53,6 +53,9 @@ namespace AwsMock::Core {
     void setLine(int line);
     /// Sets the line for log messages.
 
+    void setThreadId(int tid);
+    /// Sets the line for log messages.
+
     [[nodiscard]] Poco::Logger &logger() const;
     /// Returns a reference to the Logger.
 
@@ -78,6 +81,7 @@ namespace AwsMock::Core {
     std::string _message;
     const char *_file;
     int _line = 0;
+    int _threadId;
   };
 
   class Foundation_API LogIOS : public virtual std::ios
@@ -123,14 +127,11 @@ namespace AwsMock::Core {
      */
     static const std::string priorities[];
 
-    void setChannel(const Poco::Channel::Ptr& channel);
-    /// Sets the log channel
-
     void setFileChannel(const std::string &filename);
     /// Sets the file channel for the root logger
 
-    void setConsoleChannel();
-    /// Sets the standard console log channel for root logger
+    void setThreadId(int tid);
+    /// Sets the thread ID
 
     LogStream &level(const std::string &level);
     /// Sets the logging level

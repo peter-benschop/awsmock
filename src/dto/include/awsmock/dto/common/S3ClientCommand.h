@@ -36,6 +36,7 @@ namespace AwsMock::Dto::Common {
     CREATE_MULTIPART_UPLOAD,
     UPLOAD_PART,
     COMPLETE_MULTIPART_UPLOAD,
+    ABORT_MULTIPART_UPLOAD,
     UNKNOWN
   };
 
@@ -53,6 +54,7 @@ namespace AwsMock::Dto::Common {
     {S3CommandType::CREATE_MULTIPART_UPLOAD, "CreateMultipartUpload"},
     {S3CommandType::UPLOAD_PART, "PartMultipartUpload"},
     {S3CommandType::COMPLETE_MULTIPART_UPLOAD, "CompleteMultipartUpload"},
+    {S3CommandType::ABORT_MULTIPART_UPLOAD, "AbortMultipartUpload"},
   };
 
   [[maybe_unused]]static std::string S3CommandTypeToString(S3CommandType commandType) {
@@ -119,6 +121,16 @@ namespace AwsMock::Dto::Common {
      * Multipart upload/download
      */
     bool multipartRequest;
+
+    /**
+     * Multipart uploads
+     */
+    bool uploads;
+
+    /**
+     * Multipart part number
+     */
+    bool partNumber;
 
     /**
      * Multipart upload/download

@@ -26,6 +26,8 @@
 #include <awsmock/core/ResourceNotFoundException.h>
 #include <awsmock/service/gateway/GatewayHandler.h>
 #include <awsmock/service/gateway/GatewayRoute.h>
+#include <awsmock/service/lambda/LambdaCreator.h>
+#include <awsmock/service/lambda/LambdaExecutor.h>
 
 namespace AwsMock::Service {
 
@@ -92,6 +94,7 @@ namespace AwsMock::Service {
      * Routing table
      */
     std::map<std::string, GatewayRoute> _routingTable;
+
   };
 
 } // namespace AwsMock::Service

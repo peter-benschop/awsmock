@@ -191,6 +191,13 @@ namespace AwsMock::Service {
      */
     void DeleteBucket(const Dto::S3::DeleteBucketRequest &request);
 
+    /**
+     * Calculates the MD5, SHA1, SHA256 asynchronously
+     *
+     * @param object S3 object
+     */
+    void CalculateHashes(Database::Entity::S3::Object& object);
+
   private:
 
     /**

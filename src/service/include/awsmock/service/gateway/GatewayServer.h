@@ -134,6 +134,7 @@ namespace AwsMock::Service {
      * Gateway router
      */
     std::shared_ptr<Service::GatewayRouter> _router = std::make_shared<Service::GatewayRouter>(_configuration, _metricService);
+
   };
 
 } // namespace AwsMock::Service

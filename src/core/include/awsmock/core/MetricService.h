@@ -413,7 +413,7 @@ namespace AwsMock::Core {
     /**
      * Mutex
      */
-    Poco::Mutex _mutex;
+    static Poco::Mutex _mutex;
   };
 
 }// namespace AwsMock::Core

@@ -309,8 +309,8 @@ namespace AwsMock::Service {
   void AbstractHandler::SendRangeResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long min, long max, long size, const HeaderMap &extraHeader) {
     log_trace_stream(_logger) << "Sending OK response, state: 200, filename: " << fileName << " min: " << min << " max: " << max << std::endl;
 
-    if (!Core::MemoryMappedFile::instance().IsMapped()) {
-      if(!Core::MemoryMappedFile::instance().OpenFile(fileName)) {
+    if (!_memoryMappedFile.IsMapped()) {
+      if(!_memoryMappedFile.OpenFile(fileName)) {
         throw Core::ServiceException("Could not open memory mapped file");
       }
     }
@@ -330,16 +330,15 @@ namespace AwsMock::Service {
       // Send body
       if (range > 0) {
         char *buffer = new char[range + 1];
-        Core::MemoryMappedFile::instance().ReadChunk(min, range, (char *) buffer);
+        _memoryMappedFile.ReadChunk(min, range, (char *) buffer);
         os.write(buffer, range);
         os.flush();
-        os.clear();
         delete[] buffer;
       }
 
       // Close file
       if (min + range >= size) {
-        Core::MemoryMappedFile::instance().CloseFile();
+        _memoryMappedFile.CloseFile();
       }
 
     } catch (Poco::Exception &exc) {
@@ -353,11 +352,16 @@ namespace AwsMock::Service {
     try {
 
       // Set headers
-      for (auto &it : extraHeader) {
-        response.set(it.first, it.second);
+      // Extra headers
+      if (!extraHeader.empty()) {
+        log_trace_stream(_logger) << "Setting extra header values, count: " << extraHeader.size() << std::endl;
+        for (auto &it : extraHeader) {
+          response.set(it.first, it.second);
+        }
       }
       //DumpResponseHeaders(response);
 
+      handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_OK);
       response.send();
 
     } catch (Poco::Exception &exc) {
@@ -426,6 +430,10 @@ namespace AwsMock::Service {
     std::ostream &outputStream = response.send();
     outputStream << payload;
     outputStream.flush();
+  }
+
+  void AbstractHandler::SendXmlErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, std::exception &exc) {
+    SendXmlErrorResponse(service, response, exc.what());
   }
 
   void AbstractHandler::SendXmlErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, const std::string &payload) {

@@ -58,7 +58,7 @@ namespace AwsMock::Service {
 
       HeaderMap headerMap;
       headerMap["Server"] = "awsmock";
-      headerMap["Content-Type"] = "application/json";
+      headerMap["Content-Type"] = "application/octet-stream";
       headerMap["Last-Modified"] = Poco::DateTimeFormatter().format(s3Response.modified, Poco::DateTimeFormat::HTTP_FORMAT);
       headerMap["Content-Length"] = std::to_string(s3Response.size);
       headerMap["ETag"] = "\"" + s3Response.md5Sum + "\"";

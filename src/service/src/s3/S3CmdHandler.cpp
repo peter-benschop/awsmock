@@ -113,10 +113,10 @@ namespace AwsMock::Service {
           headerMap["Accept-Ranges"] = "bytes";
           headerMap["Content-Range"] = "bytes " + std::to_string(s3Request.min) + "-" + std::to_string(s3Request.max) + "/" + std::to_string(s3Response.size);
           headerMap["Content-Length"] = std::to_string(range);
-          log_info_stream(_logger) << "Progress: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << "/" << std::to_string(s3Response.size) << std::endl;
+          log_info_stream(_logger) << "Multi-part progress: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << "/" << std::to_string(s3Response.size) << std::endl;
 
           SendRangeResponse(response, s3Response.filename, s3Request.min, s3Request.max, s3Response.size, headerMap);
-          log_info_stream(_logger) << "Get object, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
+          log_info_stream(_logger) << "Multi-part range, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
 
         } else {
 
@@ -145,6 +145,9 @@ namespace AwsMock::Service {
     } catch (Core::JsonException &exc) {
       log_error_stream(_logger) << exc.message() << std::endl;
       SendXmlErrorResponse("S3", response, exc);
+    } catch (std::exception &exc) {
+      log_error_stream(_logger) << exc.what() << std::endl;
+      SendXmlErrorResponse("S3", response, exc);
     }
   }
 
@@ -171,8 +174,6 @@ namespace AwsMock::Service {
         std::map<std::string, std::string> metadata = GetMetadata(request);
 
         if (s3ClientCommand.copyRequest) {
-
-          log_debug_stream(_logger) << "Object copy request, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
 
           // Get S3 source bucket/key
           std::string sourceHeader = GetHeaderValue(request, "x-amz-copy-source", "empty");
@@ -230,9 +231,8 @@ namespace AwsMock::Service {
           if (!putObjectResponse.versionId.empty()) {
             headerMap["x-amz-version-userPoolId"] = putObjectResponse.versionId;
           }
-          log_debug_stream(_logger) << " size: " << putObjectResponse.contentLength << std::endl;
+          log_info_stream(_logger) << "Put object, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << " size: " << putObjectResponse.contentLength << std::endl;
           SendOkResponse(response, {}, headerMap);
-          log_info_stream(_logger) << "Put object, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
         }
         break;
       }
@@ -337,6 +337,12 @@ namespace AwsMock::Service {
     } catch (Core::JsonException &exc) {
       log_error_stream(_logger) << exc.message() << std::endl;
       SendXmlErrorResponse("S3", response, exc);
+    } catch (Poco::Exception &exc) {
+      log_error_stream(_logger) << exc.message() << std::endl;
+      SendXmlErrorResponse("S3", response, exc);
+    } catch (std::exception &exc) {
+      log_error_stream(_logger) << exc.what() << std::endl;
+      SendXmlErrorResponse("S3", response, exc);
     }
   }
 
@@ -374,9 +380,13 @@ namespace AwsMock::Service {
 
       case Dto::Common::S3CommandType::DELETE_OBJECTS: {
 
+        //DumpRequest(request);
         log_debug_stream(_logger) << "Starting delete objects request" << std::endl;
 
         std::string payload = Core::HttpUtils::GetBodyAsString(request);
+        if (payload.empty()) {
+          return SendNoContentResponse(response);
+        }
         Dto::S3::DeleteObjectsRequest s3Request;
         s3Request.FromXml(payload);
         s3Request.region = s3ClientCommand.region;
@@ -391,20 +401,20 @@ namespace AwsMock::Service {
 
       case Dto::Common::S3CommandType::CREATE_MULTIPART_UPLOAD: {
 
-        log_debug_stream(_logger) << "Starting multipart upload" << std::endl;
+        log_debug_stream(_logger) << "Starting multipart upload, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
 
         Dto::S3::CreateMultipartUploadRequest s3Request = {.region=s3ClientCommand.region, .bucket=s3ClientCommand.bucket, .key=s3ClientCommand.key, .user=s3ClientCommand.user};
         Dto::S3::CreateMultipartUploadResult result = _s3Service.CreateMultipartUpload(s3Request);
 
         SendOkResponse(response, result.ToXml());
-        log_info_stream(_logger) << "Create mutl-part upload, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
+        log_info_stream(_logger) << "Create multi-part upload, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
 
         break;
       }
 
       case Dto::Common::S3CommandType::COMPLETE_MULTIPART_UPLOAD: {
 
-        log_debug_stream(_logger) << "Starting completing multipart upload" << std::endl;
+        log_debug_stream(_logger) << "Start completing multipart upload, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
 
         std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "uploadId");
         Dto::S3::CompleteMultipartUploadRequest s3Request = {.region=s3ClientCommand.region, .bucket=s3ClientCommand.bucket, .key=s3ClientCommand.key, .user=s3ClientCommand.user, .uploadId=uploadId};
@@ -438,6 +448,9 @@ namespace AwsMock::Service {
     } catch (Core::JsonException &exc) {
       log_error_stream(_logger) << exc.message() << std::endl;
       SendXmlErrorResponse("S3", response, exc);
+    } catch (std::exception &exc) {
+      log_error_stream(_logger) << exc.what() << std::endl;
+      SendXmlErrorResponse("S3", response, exc);
     }
   }
 
@@ -468,6 +481,14 @@ namespace AwsMock::Service {
         break;
       }
 
+      case Dto::Common::S3CommandType::ABORT_MULTIPART_UPLOAD: {
+
+        log_info_stream(_logger) << "Abort multipart upload request, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
+        SendNoContentResponse(response);
+
+        break;
+      }
+
         // Should not happen
       case Dto::Common::S3CommandType::CREATE_BUCKET:
       case Dto::Common::S3CommandType::PUT_OBJECT:
@@ -490,6 +511,9 @@ namespace AwsMock::Service {
       SendXmlErrorResponse("S3", response, exc);
     } catch (Core::JsonException &exc) {
       log_error_stream(_logger) << exc.message() << std::endl;
+      SendXmlErrorResponse("S3", response, exc);
+    } catch (std::exception &exc) {
+      log_error_stream(_logger) << exc.what() << std::endl;
       SendXmlErrorResponse("S3", response, exc);
     }
   }
@@ -521,6 +545,9 @@ namespace AwsMock::Service {
       for (const auto &m : s3Response.metadata) {
         headerMap["x-amz-meta-" + m.first] = m.second;
       }
+      for (const auto &m : request) {
+        headerMap[m.first] = m.second;
+      }
       SendHeadResponse(response, headerMap);
 
     } catch (Poco::Exception &exc) {
@@ -528,17 +555,17 @@ namespace AwsMock::Service {
       SendXmlErrorResponse("S3", response, exc);
     } catch (std::exception &exc) {
       log_error_stream(_logger) << exc.what() << std::endl;
+      SendXmlErrorResponse("S3", response, exc);
     }
   }
 
   void S3CmdHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
     log_debug_stream(_logger) << "S3 OPTIONS request" << std::endl;
 
-    response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
+    response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS HEAD");
     response.setContentType("text/plain; charset=utf-8");
 
-    handleHttpStatusCode(response, 200);
-    std::ostream &outputStream = response.send();
-    outputStream.flush();
+    handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_OK);
+    response.send();
   }
 }
