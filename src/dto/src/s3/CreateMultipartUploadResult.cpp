@@ -8,7 +8,7 @@ namespace AwsMock::Dto::S3 {
 
   std::string CreateMultipartUploadResult::ToXml() const {
     Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-    Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("CreateMultipartUploadResult");
+    Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("InitiateMultipartUploadResult");
     pDoc->appendChild(pRoot);
 
     Poco::XML::AutoPtr<Poco::XML::Element> pBucket = pDoc->createElement("Bucket");

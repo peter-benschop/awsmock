@@ -49,7 +49,6 @@ namespace AwsMock::Service {
       Core::FileUtils::DeleteFile(_tempFile);
       _database.DeleteAllObjects();
       _database.DeleteAllBuckets();
-      _s3Server.StopServer();
     }
 
     std::string _endpoint, _baseCommand, _tempFile;
@@ -170,6 +169,57 @@ namespace AwsMock::Service {
     // assert
     EXPECT_EQ(0, deleteResult.status);
     EXPECT_EQ(0, count);
+  }
+
+  // Java client tries to upload a 10 MB file.
+  TEST_F(S3ServerJavaTest, ObjectsUpdloadBigFileTest) {
+
+    // arrange
+    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " s3 create-bucket test-bucket");
+    EXPECT_EQ(0, createResult.status);
+
+    // act
+    Core::ExecResult uploadResult = Core::SystemUtils::Exec(_baseCommand + " s3 upload-big-object test-bucket test-key 10");
+    long count = _database.ObjectCount();
+
+    // assert
+    EXPECT_EQ(0, uploadResult.status);
+    EXPECT_EQ(1, count);
+  }
+
+  // Java client tries to download a 10 MB file.
+  TEST_F(S3ServerJavaTest, ObjectsDownloadBigFileTest) {
+
+    // arrange
+    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " s3 create-bucket test-bucket");
+    EXPECT_EQ(0, createResult.status);
+    Core::ExecResult uploadResult = Core::SystemUtils::Exec(_baseCommand + " s3 upload-big-object test-bucket test-key 10");
+    EXPECT_EQ(0, uploadResult.status);
+
+    // act
+    Core::ExecResult downloadResult = Core::SystemUtils::Exec(_baseCommand + " s3 download-big-object test-bucket test-key");
+    long count = _database.ObjectCount();
+
+    // assert
+    EXPECT_EQ(0, downloadResult.status);
+    EXPECT_EQ(1, count);
+  }
+
+  // Java client tries to get the file size.
+  TEST_F(S3ServerJavaTest, ObjectGetSizeTest) {
+
+    // arrange
+    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " s3 create-bucket test-bucket");
+    EXPECT_EQ(0, createResult.status);
+    Core::ExecResult uploadResult = Core::SystemUtils::Exec(_baseCommand + " s3 upload-big-object test-bucket test-key 10");
+    EXPECT_EQ(0, uploadResult.status);
+
+    // act
+    Core::ExecResult headResult = Core::SystemUtils::Exec(_baseCommand + " s3 head-object test-bucket test-key");
+
+    // assert
+    EXPECT_EQ(0, headResult.status);
+    EXPECT_TRUE(Core::StringUtils::ContainsIgnoreCase(headResult.output, "ContentLength=10485852"));
   }
 
   TEST_F(S3ServerJavaTest, ObjectsDeleteTest) {

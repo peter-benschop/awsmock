@@ -7,18 +7,14 @@
 
 namespace AwsMock::Service {
 
-  template<class F, class code, class id>
-  void CallAsyncCreate(F &&fun, code &&c, id &&i) {
-    std::make_unique < std::future < void >> ((std::async(std::launch::async, [&fun, &c, &i]() {
-      fun.CreateLambdaFunction(c, i);
-    }))).reset();
+  template<typename T, typename C, typename I>
+  void CallAsyncCreate(T &&m, C &&u, I &&b) {
+    std::thread(&LambdaCreator::CreateLambdaFunction, &m, u, b).join();
   }
 
-  template<class F, class host, class port, class body>
-  void CallAsyncInvoke(F &&fun, host &&h, port &&p, body &&b) {
-    std::make_unique < std::future < void >> ((std::async(std::launch::async, [&fun, &h, &p, &b]() {
-      fun.SendInvocationRequest(h, p, b);
-    }))).reset();
+  template<typename M, typename T, typename B>
+  void CallAsyncInvoke(M &&m, T &&u, B &&b) {
+    std::thread(&LambdaExecutor::SendInvocationRequest, &m, u, b).detach();
   }
 
   LambdaService::LambdaService(Core::Configuration &configuration, Core::MetricService &metricService) :
@@ -30,6 +26,9 @@ namespace AwsMock::Service {
     _tempDir = _dataDir + Poco::Path::separator() + "tmp";
     _lambdaDir = _dataDir + Poco::Path::separator() + "lambda";
     _dockerService = std::make_shared<Service::DockerService>(_configuration);
+
+    _lambdaCreator = std::make_shared<LambdaCreator>(configuration);
+    _lambdaExecutor = std::make_shared<LambdaExecutor>(metricService);
 
     // Create temp directory
     Core::DirUtils::EnsureDirectory(_tempDir);
@@ -78,7 +77,7 @@ namespace AwsMock::Service {
     lambdaEntity = _lambdaDatabase.CreateOrUpdateLambda(lambdaEntity);
 
     // Create lambda function asynchronously
-    CallAsyncCreate(Service::LambdaCreator(_configuration), request.code.zipFile, lambdaEntity.oid);
+    CallAsyncCreate<LambdaCreator&, const char *, const char *>(*_lambdaCreator, request.code.zipFile.c_str(), lambdaEntity.oid.c_str());
     log_debug_stream(_logger) << "Lambda create started, function: " + lambdaEntity.function << std::endl;
 
     // Create response
@@ -103,7 +102,7 @@ namespace AwsMock::Service {
   Dto::Lambda::ListFunctionResponse LambdaService::ListFunctions(const std::string &region) {
 
     try {
-      std::vector <Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(region);
+      std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(region);
 
       auto response = Dto::Lambda::ListFunctionResponse(lambdas);
       log_trace_stream(_logger) << "Lambda list outcome: " + response.ToJson() << std::endl;
@@ -148,7 +147,8 @@ namespace AwsMock::Service {
     log_debug_stream(_logger) << "Got lambda entity, name: " + lambda.function << std::endl;
 
     // Send invocation request
-    CallAsyncInvoke(Service::LambdaExecutor(_metricService), "localhost", lambda.hostPort, payload);
+    std::string url = GetRequestUrl("localhost", lambda.hostPort);
+    CallAsyncInvoke<LambdaExecutor &, const char *, const char *>(*_lambdaExecutor, url.c_str(), payload.c_str());
     log_debug_stream(_logger) << "Lambda executor notification send, name: " + lambda.function << std::endl;
 
     // Update database
@@ -156,6 +156,9 @@ namespace AwsMock::Service {
     lambda.state = Database::Entity::Lambda::Active;
     lambda = _lambdaDatabase.UpdateLambda(lambda);
     log_debug_stream(_logger) << "Lambda entity invoked, name: " + lambda.function << std::endl;
+  }
+  void CallAsyncInvoke1(const char *String, int I, const char *String1, Core::LogStream Stream) {
+
   }
 
   void LambdaService::CreateTag(const Dto::Lambda::CreateTagRequest &request) {
@@ -240,4 +243,12 @@ namespace AwsMock::Service {
     lambdaEntity = _lambdaDatabase.UpdateLambda(lambdaEntity);
     log_debug_stream(_logger) << "Delete tag request succeeded, arn: " + request.arn << " size: " << lambdaEntity.tags.size() << std::endl;
   }
+
+  std::string LambdaService::GetRequestUrl(const std::string &hostName, int port) {
+    if (hostName.empty()) {
+      return "http://localhost:" + std::to_string(port) + "/2015-03-31/functions/function/invocations";
+    }
+    return "http://" + hostName + ":" + std::to_string(port) + "/2015-03-31/functions/function/invocations";
+  }
+
 } // namespace AwsMock::Service

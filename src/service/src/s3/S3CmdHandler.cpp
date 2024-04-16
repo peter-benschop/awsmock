@@ -113,10 +113,10 @@ namespace AwsMock::Service {
           headerMap["Accept-Ranges"] = "bytes";
           headerMap["Content-Range"] = "bytes " + std::to_string(s3Request.min) + "-" + std::to_string(s3Request.max) + "/" + std::to_string(s3Response.size);
           headerMap["Content-Length"] = std::to_string(range);
-          log_info_stream(_logger) << "Progress: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << "/" << std::to_string(s3Response.size) << std::endl;
+          log_info_stream(_logger) << "Multi-part progress: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << "/" << std::to_string(s3Response.size) << std::endl;
 
           SendRangeResponse(response, s3Response.filename, s3Request.min, s3Request.max, s3Response.size, headerMap);
-          log_info_stream(_logger) << "Get object, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
+          log_info_stream(_logger) << "Multi-part range, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
 
         } else {
 
@@ -174,8 +174,6 @@ namespace AwsMock::Service {
         std::map<std::string, std::string> metadata = GetMetadata(request);
 
         if (s3ClientCommand.copyRequest) {
-
-          log_debug_stream(_logger) << "Object copy request, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
 
           // Get S3 source bucket/key
           std::string sourceHeader = GetHeaderValue(request, "x-amz-copy-source", "empty");
@@ -409,7 +407,7 @@ namespace AwsMock::Service {
         Dto::S3::CreateMultipartUploadResult result = _s3Service.CreateMultipartUpload(s3Request);
 
         SendOkResponse(response, result.ToXml());
-        log_info_stream(_logger) << "Create mutl-part upload, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
+        log_info_stream(_logger) << "Create multi-part upload, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
 
         break;
       }

@@ -190,6 +190,7 @@ namespace AwsMock::Service {
      * Module name
      */
     std::string _module;
+
   };
 
 } // namespace AwsMock::Service

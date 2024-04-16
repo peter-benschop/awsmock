@@ -147,6 +147,15 @@ namespace AwsMock::Service {
   private:
 
     /**
+     * Returns the URI for the invocation request.
+     *
+     * @param hostName host name of the docker instance
+     * @param port lambda docker external port
+     * @return URI of the invocation request
+     */
+    static std::string GetRequestUrl(const std::string &hostName, int port);
+
+    /**
      * Logger
      */
     Core::LogStream _logger;
@@ -189,12 +198,22 @@ namespace AwsMock::Service {
     /**
      * lambda database connection
      */
-    Database::LambdaDatabase& _lambdaDatabase;
+    Database::LambdaDatabase &_lambdaDatabase;
 
     /**
      * S3 database connection
      */
-    Database::S3Database& _s3Database;
+    Database::S3Database &_s3Database;
+
+    /**
+     * Creator
+     */
+    std::shared_ptr<LambdaCreator> _lambdaCreator;
+
+    /**
+     * Executor
+     */
+    std::shared_ptr<LambdaExecutor> _lambdaExecutor;
 
     /**
      * Docker module
