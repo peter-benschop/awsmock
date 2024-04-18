@@ -13,13 +13,13 @@ namespace AwsMock::Service {
 
     Core::MetricServiceTimer measure(Core::MetricService::instance(), "lambda_invocation_timer");
     Core::MetricService::instance().IncrementCounter("lambda_invocation_counter");
-    Poco::Logger::get("LambdaExecutor").debug("Sending lambda invocation request, endpoint: " + url);
+    log_debug<<"Sending lambda invocation request, endpoint: " << url;
 
     Core::CurlUtils _curlUtils;
     Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", url, {}, body);
     if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
-      Poco::Logger::get("LambdaExecutor").debug("HTTP error, status: " + std::to_string(response.statusCode) + " reason: " + response.output);
+      log_debug << "HTTP error, status: " << response.statusCode << " reason: " << response.output;
     }
-    Poco::Logger::get("LambdaExecutor").debug("Lambda invocation finished send, status: " + std::to_string(response.statusCode));
+    log_debug << "Lambda invocation finished send, status: " <<response.statusCode;
   }
 }

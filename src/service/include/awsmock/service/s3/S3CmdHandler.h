@@ -120,11 +120,6 @@ namespace AwsMock::Service {
   private:
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * S3 handler configuration
      */
     Core::Configuration &_configuration;

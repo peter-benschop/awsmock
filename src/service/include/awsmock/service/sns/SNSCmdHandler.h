@@ -55,11 +55,6 @@ namespace AwsMock::Service {
   private:
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * ImageHandler import configuration
      */
     Core::Configuration &_configuration;

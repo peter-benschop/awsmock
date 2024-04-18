@@ -3,7 +3,7 @@
 
 namespace AwsMock::Resource {
 
-  AbstractResource::AbstractResource() : _logger(Poco::Logger::get("AbstractResource")), _baseUrl(), _requestURI(), _requestHost() {}
+  AbstractResource::AbstractResource() : _baseUrl(), _requestURI(), _requestHost() {}
 
   AbstractResource::~AbstractResource() = default;
 
@@ -12,7 +12,7 @@ namespace AwsMock::Resource {
     if (request.getMethod() != Poco::Net::HTTPRequest::HTTP_GET && request.getMethod() != Poco::Net::HTTPRequest::HTTP_PUT
         && request.getMethod() != Poco::Net::HTTPRequest::HTTP_POST && request.getMethod() != Poco::Net::HTTPRequest::HTTP_DELETE
         && request.getMethod() != Poco::Net::HTTPRequest::HTTP_OPTIONS && request.getMethod() != Poco::Net::HTTPRequest::HTTP_HEAD) {
-      log_error_stream(_logger) << "Invalid request method, method: " << request.getMethod() << std::endl;
+      log_error << "Invalid request method, method: " << request.getMethod();
       throw HandlerException("Not Implemented", "The request method is not supported by the manager and cannot be handled.", 501);
     }
 
@@ -29,7 +29,7 @@ namespace AwsMock::Resource {
       handleHttpHeaders(request, response);
     } catch (HandlerException &exception) {
 
-      log_error_stream(_logger) << "Exception: msg: " << exception.message() << std::endl;
+      log_error << "Exception: msg: " << exception.message();
 
       handleHttpStatusCode(response, exception.code());
       return;
@@ -73,7 +73,7 @@ namespace AwsMock::Resource {
                                    Poco::Net::HTTPServerResponse &response,
                                    [[maybe_unused]]const std::string &region,
                                    [[maybe_unused]]const std::string &user) {
-    log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user << std::endl;
+    log_trace << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user;
     handleHttpStatusCode(response, 501);
     std::ostream &errorStream = response.send();
     errorStream.flush();
@@ -83,7 +83,7 @@ namespace AwsMock::Resource {
                                    Poco::Net::HTTPServerResponse &response,
                                    [[maybe_unused]]const std::string &region,
                                    [[maybe_unused]]const std::string &user) {
-    log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user << std::endl;
+    log_trace << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user;
     handleHttpStatusCode(response, 501);
     std::ostream &errorStream = response.send();
     errorStream.flush();
@@ -93,7 +93,7 @@ namespace AwsMock::Resource {
                                     Poco::Net::HTTPServerResponse &response,
                                     [[maybe_unused]]const std::string &region,
                                     [[maybe_unused]]const std::string &user) {
-    log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user << std::endl;
+    log_trace << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user;
     handleHttpStatusCode(response, 501);
     std::ostream &errorStream = response.send();
     errorStream.flush();
@@ -103,14 +103,14 @@ namespace AwsMock::Resource {
                                       Poco::Net::HTTPServerResponse &response,
                                       [[maybe_unused]]const std::string &region,
                                       [[maybe_unused]]const std::string &user) {
-    log_trace_stream(_logger) << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user << std::endl;
+    log_trace << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user;
     handleHttpStatusCode(response, 501);
     std::ostream &errorStream = response.send();
     errorStream.flush();
   }
 
   void AbstractResource::handleOptions(Poco::Net::HTTPServerResponse &response) {
-    log_trace_stream(_logger) << "Request, method: OPTIONS" << std::endl;
+    log_trace << "Request, method: OPTIONS";
     response.setStatusAndReason(
         Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED,
         Poco::Net::HTTPResponse::HTTP_REASON_NOT_IMPLEMENTED
@@ -123,7 +123,7 @@ namespace AwsMock::Resource {
   void AbstractResource::handleHead([[maybe_unused]]Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response,
                                     [[maybe_unused]]const std::string &region,
                                     [[maybe_unused]]const std::string &user) {
-    log_trace_stream(_logger) << "Request, method: " << request.getMethod() << std::endl;
+    log_trace << "Request, method: " << request.getMethod();
     response.setStatusAndReason(
         Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED,
         Poco::Net::HTTPResponse::HTTP_REASON_NOT_IMPLEMENTED
@@ -210,18 +210,18 @@ namespace AwsMock::Resource {
 
     user = authorization.substr(posVec[1].offset, posVec[1].length);
     region = authorization.substr(posVec[2].offset, posVec[2].length);
-    log_trace_stream(_logger) << "Found user: " << user << " region: " << region << std::endl;
+    log_trace << "Found user: " << user << " region: " << region;
   }
 
   std::string AbstractResource::GetPayload(Poco::Net::HTTPServerRequest &request) {
     std::string payload;
     Poco::StreamCopier::copyToString(request.stream(), payload);
-    log_trace_stream(_logger) << "Request payload: " << payload << std::endl;
+    log_trace << "Request payload: " << payload;
     return payload;
   }
 
   void AbstractResource::SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &payload, HeaderMap *extraHeader) {
-    log_trace_stream(_logger) << "Sending OK response, state: 200 payload: " << payload << std::endl;
+    log_trace << "Sending OK response, state: 200 payload: " << payload;
 
     // Get content length
     unsigned long contentLength = 0;
@@ -257,7 +257,7 @@ namespace AwsMock::Resource {
     }
     SetHeaders(response, payload.length());
 
-    log_error_stream(_logger) << "Exception, code: " << exc.code() << " message: " << exc.message() << std::endl;
+    log_error << "Exception, code: " << exc.code() << " message: " << exc.message();
     handleHttpStatusCode(response, exc.code(), exc.message().c_str());
     std::ostream &outputStream = response.send();
     outputStream << payload;
@@ -268,7 +268,7 @@ namespace AwsMock::Resource {
 
     SetHeaders(response, payload.length());
 
-    log_error_stream(_logger) << "Exception, code: " << response.getStatus() << " message: " << payload << std::endl;
+    log_error << "Exception, code: " << response.getStatus() << " message: " << payload;
     handleHttpStatusCode(response, response.getStatus());
     std::ostream &outputStream = response.send();
     outputStream << payload;
@@ -276,7 +276,7 @@ namespace AwsMock::Resource {
   }
 
   void AbstractResource::SetHeaders(Poco::Net::HTTPServerResponse &response, unsigned long contentLength, HeaderMap *extraHeader) {
-    log_trace_stream(_logger) << "Setting header values, contentLength: " << contentLength << std::endl;
+    log_trace << "Setting header values, contentLength: " << contentLength;
 
     // Default headers
     response.set("Date", Poco::DateTimeFormatter::format(Poco::DateTime(), Poco::DateTimeFormat::HTTP_FORMAT));
@@ -287,7 +287,7 @@ namespace AwsMock::Resource {
 
     // Extra headers
     if (extraHeader != nullptr) {
-      log_trace_stream(_logger) << "Setting extra header values, count: " << extraHeader->size() << std::endl;
+      log_trace << "Setting extra header values, count: " << extraHeader->size();
       for (auto &it : *extraHeader) {
         response.set(it.first, it.second);
       }
@@ -295,7 +295,7 @@ namespace AwsMock::Resource {
   }
 
   void AbstractResource::SetHeaders(Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user) {
-    log_trace_stream(_logger) << "Setting request header values, region: " << region << " user: " << user << std::endl;
+    log_trace << "Setting request header values, region: " << region << " user: " << user;
 
     // Default headers
     request.set("Region", region);
@@ -304,28 +304,28 @@ namespace AwsMock::Resource {
   }
 
   void AbstractResource::DumpRequest(Poco::Net::HTTPServerRequest &request) {
-    log_trace_stream(_logger) << "Dump request" << std::endl;
-    std::cerr << "==================== Request =====================" << std::endl;
+    log_trace << "Dump request";
+    std::cerr << "==================== Request =====================";
     request.write(std::cerr);
-    std::cerr << "==================================================" << std::endl;
+    std::cerr << "==================================================";
   }
 
   void AbstractResource::DumpResponse(Poco::Net::HTTPServerResponse &response) {
-    log_trace_stream(_logger) << "Dump response" << std::endl;
-    std::cerr << "==================== Response ====================" << std::endl;
+    log_trace << "Dump response";
+    std::cerr << "==================== Response ====================";
     response.write(std::cerr);
-    std::cerr << "==================================================" << std::endl;
+    std::cerr << "==================================================";
   }
 
   [[maybe_unused]] void AbstractResource::DumpBody(Poco::Net::HTTPServerRequest &request) {
-    log_trace_stream(_logger) << "Dump request body" << std::endl;
-    std::cerr << "================== Request Body ==================" << std::endl;
-    std::cerr << request.stream().rdbuf() << std::endl;
-    std::cerr << "==================================================" << std::endl;
+    log_trace << "Dump request body";
+    std::cerr << "================== Request Body ==================";
+    std::cerr << request.stream().rdbuf();
+    std::cerr << "==================================================";
   }
 
   void AbstractResource::DumpBodyToFile(Poco::Net::HTTPServerRequest &request, const std::string &filename) {
-    log_trace_stream(_logger) << "Dump request body to file: " + filename << std::endl;
+    log_trace << "Dump request body to file: " + filename;
     std::ofstream ofs(filename);
     ofs << request.stream().rdbuf();
     ofs.close();

@@ -7,8 +7,7 @@
 namespace AwsMock::Service {
 
   LambdaServer::LambdaServer(Core::Configuration &configuration, Core::MetricService &metricService)
-    : AbstractWorker(configuration), AbstractServer(configuration, "lambda"), _logger(Poco::Logger::get("LambdaServer")), _configuration(configuration), _metricService(metricService), _lambdaDatabase(Database::LambdaDatabase::instance()),
-      _module("lambda") {
+    : AbstractWorker(configuration), AbstractServer(configuration, "lambda"), _configuration(configuration), _metricService(metricService), _lambdaDatabase(Database::LambdaDatabase::instance()), _module("lambda") {
 
     // Get HTTP configuration values
     _port = _configuration.getInt("awsmock.service.lambda.port", LAMBDA_DEFAULT_PORT);
@@ -19,11 +18,11 @@ namespace AwsMock::Service {
 
     // Directories
     _dataDir = _configuration.getString("awsmock.data.dir") + Poco::Path::separator() + "lambda";
-    _logger.debug() << "lambda directory: " << _dataDir << std::endl;
+    log_debug << "lambda directory: " << _dataDir;
 
     // Sleeping period
     _period = _configuration.getInt("awsmock.worker.lambda.period", 10000);
-    log_debug_stream(_logger) << "lambda manager period: " << _period << std::endl;
+    log_debug << "lambda manager period: " << _period;
 
     // Create environment
     _region = _configuration.getString("awsmock.region");
@@ -31,14 +30,14 @@ namespace AwsMock::Service {
     // lambda module connection
     _lambdaServiceHost = _configuration.getString("awsmock.service.lambda.host", "localhost");
     _lambdaServicePort = _configuration.getInt("awsmock.service.lambda.port", 9503);
-    log_debug_stream(_logger) << "lambda module endpoint: http://" << _lambdaServiceHost << ":" << _lambdaServicePort << std::endl;
+    log_debug << "lambda module endpoint: http://" << _lambdaServiceHost << ":" << _lambdaServicePort;
 
     // Docker module
     _dockerService = std::make_unique<Service::DockerService>(_configuration);
 
     // Create lambda directory
     Core::DirUtils::EnsureDirectory(_dataDir);
-    log_debug_stream(_logger) << "LambdaWorker initialized" << std::endl;
+    log_debug << "LambdaWorker initialized";
   }
 
   LambdaServer::~LambdaServer() {
@@ -50,10 +49,10 @@ namespace AwsMock::Service {
 
     // Check module active
     if (!IsActive("lambda")) {
-      log_info_stream(_logger) << "Lambda module inactive" << std::endl;
+      log_info << "Lambda module inactive";
       return;
     }
-    log_info_stream(_logger) << "Lambda server starting" << std::endl;
+    log_info << "Lambda server starting";
 
     // Start HTTP manager
     StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new LambdaRequestHandlerFactory(_configuration, _metricService));
@@ -66,7 +65,7 @@ namespace AwsMock::Service {
   }
 
   void LambdaServer::Run() {
-    log_trace_stream(_logger) << "S3 processing started" << std::endl;
+    log_trace << "S3 processing started";
     UpdateCounters();
   }
 
@@ -76,13 +75,13 @@ namespace AwsMock::Service {
 
   void LambdaServer::CleanupContainers() {
     _dockerService->PruneContainers();
-    log_debug_stream(_logger) << "Docker containers cleaned up" << std::endl;
+    log_debug << "Docker containers cleaned up";
   }
 
   void LambdaServer::StartLambdaFunctions() {
 
-    log_debug_stream(_logger) << "Starting lambdas" << std::endl;
-    std::vector <Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region);
+    log_debug << "Starting lambdas";
+    std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region);
 
     for (auto &lambda : lambdas) {
 
@@ -97,7 +96,7 @@ namespace AwsMock::Service {
         .tags=lambda.tags
       };
       SendCreateFunctionRequest(request, "application/json");
-      log_debug_stream(_logger) << "lambda started, name:" << lambda.function << std::endl;
+      log_debug << "lambda started, name:" << lambda.function;
     }
   }
 
@@ -113,7 +112,7 @@ namespace AwsMock::Service {
       code = {
         .zipFile=ss.str()
       };
-      log_debug_stream(_logger) << "Loaded lambda from file:" << lambda.fileName << " size: " << Core::FileUtils::FileSize(lambda.fileName) << std::endl;
+      log_debug << "Loaded lambda from file:" << lambda.fileName << " size: " << Core::FileUtils::FileSize(lambda.fileName);
     }
     return code;
   }
@@ -123,7 +122,7 @@ namespace AwsMock::Service {
     std::string url = "http://" + _lambdaServiceHost + ":" + std::to_string(_lambdaServicePort) + "/2015-03-31/functions";
     std::string body = lambdaRequest.ToJson();
     SendPostRequest(_module, url, body, contentType);
-    log_debug_stream(_logger) << "lambda create function request send" << std::endl;
+    log_debug << "lambda create function request send";
   }
 
   void LambdaServer::UpdateCounters() {

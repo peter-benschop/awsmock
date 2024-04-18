@@ -8,6 +8,8 @@
 // C++ standard includes
 #include <istream>
 #include <iostream>
+#include <string_view>
+#include <filesystem>
 
 // Poco includes
 #include <Poco/Foundation.h>
@@ -21,9 +23,20 @@
 #include <Poco/DateTimeFormatter.h>
 #include <Poco/FileChannel.h>
 
+// plog includes
+#include <awsmock/core/logging/plog/Log.h>
+#include <awsmock/core/logging/plog/Init.h>
+#include <awsmock/core/logging/plog/Formatters/TxtFormatter.h>
+#include <awsmock/core/logging/plog/Initializers/ConsoleInitializer.h>
+
 #define LOG_PATTERN "%d-%m-%Y %H:%M:%S.%i [%q] %I %s:%u - %t"
 
 namespace AwsMock::Core {
+
+  class PLogStream {
+  public:
+    PLogStream();
+  };
 
   class LogStreamBuf : public Poco::UnbufferedStreamBuf
     /// This class implements a streambuf interface to a Logger.
@@ -253,5 +266,12 @@ namespace AwsMock::Core {
     if ((logger).debug()) (logger).debug( __FILE__, __LINE__)
 #define log_trace_stream(logger) \
     if ((logger).trace()) (logger).trace( __FILE__, __LINE__)
+
+#define log_fatal PLOG_FATAL
+#define log_error PLOG_ERROR
+#define log_warning PLOG_WARNING
+#define log_info PLOG_INFO
+#define log_debug PLOG_DEBUG
+#define log_trace PLOG_VERBOSE
 
 #endif // AWS_MOCK_CORE_LOG_STREAM_H

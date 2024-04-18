@@ -77,11 +77,6 @@ namespace AwsMock::Controller {
     std::string GetModule(const std::string &authorization);
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * Configuration
      */
     Configuration &_configuration;

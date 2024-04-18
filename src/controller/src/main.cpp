@@ -34,7 +34,7 @@
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/controller/Configuration.h>
-#include "awsmock/controller/Controller.h"
+#include <awsmock/controller/Controller.h>
 
 namespace AwsMock::Controller {
 
@@ -60,7 +60,7 @@ namespace AwsMock::Controller {
       [[maybe_unused]] void uninitialize() override {
 
         Poco::Util::Application::uninitialize();
-        log_debug_stream(_logger) << "Bye, bye, and thanks for all the fish" << std::endl;
+        log_debug << "Bye, bye, and thanks for all the fish";
       }
 
       /**
@@ -99,7 +99,7 @@ namespace AwsMock::Controller {
 
         } else if (name == "version") {
 
-          std::cout << "awsmockctl" << " " << Configuration::GetVersion() << std::endl;
+          std::cout << "awsmockctl" << " " << Configuration::GetVersion();
           exit(0);
 
         } else if (name == "level") {

@@ -50,113 +50,108 @@ namespace AwsMock {
    */
   class ModuleHandler : public AwsMock::Resource::AbstractResource {
 
-    public:
+  public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration application configuration
-       * @param metricService monitoring module
-       * @param serverMap map of services
-       */
-      ModuleHandler(Core::Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap);
+    /**
+     * Constructor
+     *
+     * @param configuration application configuration
+     * @param metricService monitoring module
+     * @param serverMap map of services
+     */
+    ModuleHandler(Core::Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap);
 
-    protected:
+  protected:
 
-      /**
-       * HTTP GET request.
-       *
-       * @param request HTTP request
-       * @param response HTTP response
-       * @param region AWS region name
-       * @param user AWS user
-       * @see AbstractResource::handleGet(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-       */
-      void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+    /**
+     * HTTP GET request.
+     *
+     * @param request HTTP request
+     * @param response HTTP response
+     * @param region AWS region name
+     * @param user AWS user
+     * @see AbstractResource::handleGet(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+     */
+    void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
-      /**
-       * HTTP PUT request.
-       *
-       * @param request HTTP request
-       * @param response HTTP response
-       * @param region AWS region name
-       * @param user AWS user
-       * @see AbstractResource::handlePut(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-       */
-      void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+    /**
+     * HTTP PUT request.
+     *
+     * @param request HTTP request
+     * @param response HTTP response
+     * @param region AWS region name
+     * @param user AWS user
+     * @see AbstractResource::handlePut(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+     */
+    void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
-      /**
-       * HTTP POST request.
-       *
-       * @param request HTTP request
-       * @param response HTTP response
-       * @param region AWS region name
-       * @param user AWS user
-       * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-       */
-      void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+    /**
+     * HTTP POST request.
+     *
+     * @param request HTTP request
+     * @param response HTTP response
+     * @param region AWS region name
+     * @param user AWS user
+     * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+     */
+    void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
-      /**
-       * Delete DELETE request.
-       *
-       * @param request HTTP request
-       * @param response HTTP response
-       * @param region AWS region name
-       * @param user AWS user
-       * @see AbstractResource::handleDelete(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-       */
-      void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+    /**
+     * Delete DELETE request.
+     *
+     * @param request HTTP request
+     * @param response HTTP response
+     * @param region AWS region name
+     * @param user AWS user
+     * @see AbstractResource::handleDelete(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+     */
+    void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
-      /**
-       * Options request.
-       *
-       * @param response HTTP response
-       * @see AbstractResource::handleOption(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-       */
-      void handleOptions(Poco::Net::HTTPServerResponse &response) override;
+    /**
+     * Options request.
+     *
+     * @param response HTTP response
+     * @see AbstractResource::handleOption(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+     */
+    void handleOptions(Poco::Net::HTTPServerResponse &response) override;
 
-      /**
-       * Head request.
-       *
-       * @param request HTTP request
-       * @param response HTTP response
-       * @param region AWS region name
-       * @param user AWS user
-       * @see AbstractResource::handleHead(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-       */
-      void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+    /**
+     * Head request.
+     *
+     * @param request HTTP request
+     * @param response HTTP response
+     * @param region AWS region name
+     * @param user AWS user
+     * @see AbstractResource::handleHead(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+     */
+    void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
-    private:
+  private:
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+    /**
+     * S3 handler configuration
+     */
+    Core::Configuration &_configuration;
 
-      /**
-       * S3 handler configuration
-       */
-      Core::Configuration &_configuration;
+    /**
+     * Metric module
+     */
+    Core::MetricService &_metricService;
 
-      /**
-       * Metric module
-       */
-      Core::MetricService &_metricService;
+    /**
+     * Timer manager
+     */
+    Service::ServerMap &_serverMap;
 
-      /**
-       * Timer manager
-       */
-      Service::ServerMap &_serverMap;
+    /**
+     * Module database
+     */
+    std::shared_ptr<Database::ModuleDatabase> _serviceDatabase;
 
-      /**
-       * Module database
-       */
-      std::shared_ptr<Database::ModuleDatabase> _serviceDatabase;
-
-      /**
-       * Module module
-       */
-      std::shared_ptr<Service::ModuleService> _moduleService;
+    /**
+     * Module module
+     */
+    std::shared_ptr<Service::ModuleService> _moduleService;
   };
 
 } // namespace AwsMock

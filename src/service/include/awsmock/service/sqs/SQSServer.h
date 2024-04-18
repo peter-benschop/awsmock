@@ -83,11 +83,6 @@ namespace AwsMock::Service {
     void MessageRetention();
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * Configuration
      */
     Core::Configuration &_configuration;

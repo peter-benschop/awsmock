@@ -25,7 +25,7 @@
 #include <iostream>
 
 // Poco includes
-#include <Poco/Logger.h>
+
 #include <Poco/TaskManager.h>
 #include <Poco/Util/HelpFormatter.h>
 #include <Poco/Util/Option.h>
@@ -49,7 +49,7 @@ namespace AwsMock {
   class AwsMockServer : public Poco::Util::ServerApplication {
 
     public:
-    AwsMockServer() : _logger(Core::LogStream(Poco::Logger::get("AwsMockManager"))) {}
+    AwsMockServer() = default;
 
     protected:
 
@@ -63,9 +63,8 @@ namespace AwsMock {
       InitializeMonitoring();
       InitializeIndexes();
       InitializeCurl();
-      log_info_stream(_logger) << "Starting " << Configuration::GetAppName() << " " << Configuration::GetVersion() << " pid: " << getpid() << " loglevel: "
-                               << _configuration.getString("awsmock.log.level") << std::endl;
-      log_info_stream(_logger) << "Configuration file: " << _configuration.GetFilename() << std::endl;
+      log_info << "Starting " << Configuration::GetAppName() << " " << Configuration::GetVersion() << " pid: " << getpid() << " loglevel: " << _configuration.getString("awsmock.log.level");
+      log_info << "Configuration file: " << _configuration.GetFilename();
       Poco::Util::ServerApplication::initialize(self);
     }
 
@@ -76,17 +75,17 @@ namespace AwsMock {
 
       // Shutdown all services
       StopServices();
-      log_debug_stream(_logger) << "Service stopped" << std::endl;
+      log_debug << "Service stopped";
 
       // Stop HTTP manager
       _restService.StopServer();
-      log_debug_stream(_logger) << "Gateway stopped" << std::endl;
+      log_debug << "Gateway stopped";
 
       // Shutdown monitoring
       _metricService.Shutdown();
-      log_debug_stream(_logger) << "Monitoring stopped" << std::endl;
+      log_debug << "Monitoring stopped";
 
-      log_debug_stream(_logger) << "Bye, bye and thanks for all the fish" << std::endl;
+      log_debug << "Bye, bye and thanks for all the fish";
     }
 
     /**
@@ -139,11 +138,11 @@ namespace AwsMock {
       } else if (name == "loglevel") {
 
         _configuration.setString("awsmock.log.level", value);
-        Poco::Logger::root().setLevel(value);
+        plog::get()->setMaxSeverity(plog::severityFromString(value.c_str()));
 
       } else if (name == "logfile") {
 
-        _logger.setFileChannel(value);
+        //_logger.setFileChannel(value);
       }
     }
 
@@ -161,7 +160,7 @@ namespace AwsMock {
 
       // Create database indexes
       //_database.CreateIndexes();
-      log_debug_stream(_logger) << "Database indexes created" << std::endl;
+      log_debug << "Database indexes created";
     }
 
     /**
@@ -169,7 +168,7 @@ namespace AwsMock {
      */
     void InitializeCurl() {
       curl_global_init(CURL_GLOBAL_ALL);
-      log_debug_stream(_logger) << "Curl library initialized" << std::endl;
+      log_debug << "Curl library initialized";
 
     }
 
@@ -248,7 +247,7 @@ namespace AwsMock {
           _gatewayServer->Start();
           _serverMap[module.name] = _gatewayServer;
         }
-        log_debug_stream(_logger) << "Module " << module.name << " started" << std::endl;
+        log_debug << "Module " << module.name << " started";
       }
     }
 
@@ -257,7 +256,7 @@ namespace AwsMock {
       Database::Entity::Module::ModuleList modules = _moduleDatabase.ListModules();
       for (const auto &module : modules) {
         if (module.state == Database::Entity::Module::ModuleState::RUNNING) {
-          log_info_stream(_logger) << "Stopping module: " << module.name << std::endl;
+          log_info << "Stopping module: " << module.name;
           if (module.name == "s3") {
             _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
             auto *s3Server = (Service::S3Server *) _serverMap[module.name];
@@ -290,7 +289,7 @@ namespace AwsMock {
             auto *gatewayServer = (Service::GatewayServer *) _serverMap[module.name];
             gatewayServer->StopServer();
           }
-          log_debug_stream(_logger) << "Module " << module.name << " stopped" << std::endl;
+          log_debug << "Module " << module.name << " stopped";
         }
       }
     }
@@ -303,7 +302,7 @@ namespace AwsMock {
      */
     int main([[maybe_unused]]const ArgVec &args) override {
 
-      log_debug_stream(_logger) << "Entering main routine" << std::endl;
+      log_debug << "Entering main routine";
 
       // Start module and worker. Services needed to StartServer first, as the worker could possibly use the services.
       StartServices();
@@ -314,7 +313,7 @@ namespace AwsMock {
 
       // Wait for termination
       this->waitForTerminationRequest();
-      log_debug_stream(_logger) << "Starting termination" << std::endl;
+      log_debug << "Starting termination";
 
       return Application::EXIT_OK;
     }
@@ -324,7 +323,7 @@ namespace AwsMock {
     /**
      * Logger
      */
-    Core::LogStream _logger = Core::LogStream(Poco::Logger::root());
+    Core::PLogStream _logger;
 
     /**
      * Application configuration

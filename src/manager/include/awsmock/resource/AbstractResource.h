@@ -260,11 +260,6 @@ namespace AwsMock::Resource {
                     HeaderMap *headerMap = nullptr);
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * Base URL
      */
     std::string _baseUrl;

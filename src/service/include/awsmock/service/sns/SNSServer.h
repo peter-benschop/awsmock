@@ -66,11 +66,6 @@ namespace AwsMock::Service {
     void UpdateCounters();
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * Configuration
      */
     Core::Configuration &_configuration;

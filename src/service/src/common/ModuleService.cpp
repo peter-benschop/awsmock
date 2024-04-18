@@ -16,14 +16,14 @@ namespace AwsMock::Service {
   Database::Entity::Module::ModuleList ModuleService::ListModules() {
 
     Database::Entity::Module::ModuleList modules = _moduleDatabase.ListModules();
-    log_debug_stream(_logger) << "Module list, count: " << modules.size() << std::endl;
+    log_debug << "Module list, count: " << modules.size();
     return modules;
   }
 
   bool ModuleService::IsRunning(const std::string &moduleName) {
 
     Database::Entity::Module::Module module = _moduleDatabase.GetModuleByName(moduleName);
-    log_debug_stream(_logger) << "Module state, state: " << Database::Entity::Module::ModuleStateToString(module.state) << std::endl;
+    log_debug << "Module state, state: " << Database::Entity::Module::ModuleStateToString(module.state);
     return module.state == Database::Entity::Module::ModuleState::RUNNING;
   }
 
@@ -33,7 +33,7 @@ namespace AwsMock::Service {
     Database::Entity::Module::Module module = _moduleDatabase.GetModuleByName(name);
     if (module.state == Database::Entity::Module::ModuleState::RUNNING) {
 
-      log_info_stream(_logger) << "Module " + name + " already running" << std::endl;
+      log_info << "Module " + name + " already running";
       throw Core::ServiceException("Module " + name + " already running", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
 
     } else {
@@ -68,7 +68,7 @@ namespace AwsMock::Service {
         auto *gatewayServer = (Service::GatewayServer *) _serverMap[module.name];
         gatewayServer->Start();
       }
-      log_info_stream(_logger) << "Module " + name + " started" << std::endl;
+      log_info << "Module " + name + " started";
     }
     return module;
   }
@@ -88,12 +88,12 @@ namespace AwsMock::Service {
     if (module.state == Database::Entity::Module::ModuleState::RUNNING) {
 
       StopService(name);
-      log_info_stream(_logger) << "Module " + name + " already running" << std::endl;
+      log_info << "Module " + name + " already running";
       throw Core::ServiceException("Module " + name + " already running", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
 
     }
 
-    log_info_stream(_logger) << "Module " + name + " restarted" << std::endl;
+    log_info << "Module " + name + " restarted";
     return StartService(name);
   }
 
@@ -129,7 +129,7 @@ namespace AwsMock::Service {
         }
       }
     }
-    log_info_stream(_logger) << "Module " + name + " stopped" << std::endl;
+    log_info << "Module " + name + " stopped";
     return module;
   }
 
@@ -186,7 +186,7 @@ namespace AwsMock::Service {
   }
 
   void ModuleService::ImportInfrastructure(const std::string &jsonString) {
-    log_info_stream(_logger) << "Importing services, length: " << jsonString.length() << std::endl;
+    log_info << "Importing services, length: " << jsonString.length();
 
     Dto::Common::Infrastructure infrastructure;
     infrastructure.FromJson(jsonString);
@@ -197,13 +197,13 @@ namespace AwsMock::Service {
         for (const auto &bucket : infrastructure.s3Buckets) {
           _s3Database->CreateOrUpdateBucket(bucket);
         }
-        log_info_stream(_logger) << "S3 buckets imported, count: " << infrastructure.s3Buckets.size() << std::endl;
+        log_info << "S3 buckets imported, count: " << infrastructure.s3Buckets.size();
       }
       if (!infrastructure.s3Objects.empty()) {
         for (const auto &object : infrastructure.s3Objects) {
           _s3Database->CreateOrUpdateObject(object);
         }
-        log_info_stream(_logger) << "S3 objects imported, count: " << infrastructure.s3Objects.size() << std::endl;
+        log_info << "S3 objects imported, count: " << infrastructure.s3Objects.size();
       }
     }
     if (!infrastructure.sqsQueues.empty() || !infrastructure.sqsMessages.empty()) {
@@ -211,16 +211,16 @@ namespace AwsMock::Service {
       if (!infrastructure.sqsQueues.empty()) {
         for (auto &queue : infrastructure.sqsQueues) {
           _sqsDatabase.CreateOrUpdateQueue(queue);
-          log_debug_stream(_logger) << "SQS queues imported, url: " << queue.queueUrl << std::endl;
+          log_debug << "SQS queues imported, url: " << queue.queueUrl;
         }
-        log_info_stream(_logger) << "SQS queues imported, count: " << infrastructure.sqsQueues.size() << std::endl;
+        log_info << "SQS queues imported, count: " << infrastructure.sqsQueues.size();
       }
       if (!infrastructure.sqsMessages.empty()) {
         for (auto &message : infrastructure.sqsMessages) {
           _sqsDatabase.CreateOrUpdateMessage(message);
-          log_debug_stream(_logger) << "SQS queues imported, url: " << message.queueUrl << std::endl;
+          log_debug << "SQS queues imported, url: " << message.queueUrl;
         }
-        log_info_stream(_logger) << "SQS messages imported, count: " << infrastructure.sqsMessages.size() << std::endl;
+        log_info << "SQS messages imported, count: " << infrastructure.sqsMessages.size();
       }
     }
     if (!infrastructure.snsTopics.empty() || !infrastructure.snsMessages.empty()) {
@@ -229,13 +229,13 @@ namespace AwsMock::Service {
         for (auto &topic : infrastructure.snsTopics) {
           _snsDatabase.CreateOrUpdateTopic(topic);
         }
-        log_info_stream(_logger) << "SNS topics imported, count: " << infrastructure.snsTopics.size() << std::endl;
+        log_info << "SNS topics imported, count: " << infrastructure.snsTopics.size();
       }
       if (!infrastructure.snsMessages.empty()) {
         for (auto &message : infrastructure.snsMessages) {
           _snsDatabase.CreateOrUpdateMessage(message);
         }
-        log_info_stream(_logger) << "SNS messages imported, count: " << infrastructure.snsMessages.size() << std::endl;
+        log_info << "SNS messages imported, count: " << infrastructure.snsMessages.size();
       }
     }
     if (!infrastructure.lambdas.empty()) {
@@ -243,14 +243,14 @@ namespace AwsMock::Service {
       for (auto &lambda : infrastructure.lambdas) {
         _lambdaDatabase.CreateOrUpdateLambda(lambda);
       }
-      log_info_stream(_logger) << "Lambda functions imported, count: " << infrastructure.lambdas.size() << std::endl;
+      log_info << "Lambda functions imported, count: " << infrastructure.lambdas.size();
     }
     if (!infrastructure.transferServers.empty()) {
       Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
       for (auto &transfer : infrastructure.transferServers) {
         _transferDatabase.CreateOrUpdateTransfer(transfer);
       }
-      log_info_stream(_logger) << "Transfer servers imported, count: " << infrastructure.transferServers.size() << std::endl;
+      log_info << "Transfer servers imported, count: " << infrastructure.transferServers.size();
     }
 
     // Cognito
@@ -260,13 +260,13 @@ namespace AwsMock::Service {
         for (auto &userPool : infrastructure.cognitoUserPools) {
           _cognitoDatabase.CreateOrUpdateUserPool(userPool);
         }
-        log_info_stream(_logger) << "Cognito user pools imported, count: " << infrastructure.cognitoUserPools.size() << std::endl;
+        log_info << "Cognito user pools imported, count: " << infrastructure.cognitoUserPools.size();
       }
       if (!infrastructure.cognitoUsers.empty()) {
         for (auto &user : infrastructure.cognitoUsers) {
           _cognitoDatabase.CreateOrUpdateUser(user);
         }
-        log_info_stream(_logger) << "Cognito users imported, count: " << infrastructure.cognitoUsers.size() << std::endl;
+        log_info << "Cognito users imported, count: " << infrastructure.cognitoUsers.size();
       }
     }
 
@@ -277,13 +277,13 @@ namespace AwsMock::Service {
         for (auto &table : infrastructure.dynamoDbTables) {
           _dynamoDatabase.CreateOrUpdateTable(table);
         }
-        log_info_stream(_logger) << "DynamoDb tables imported, count: " << infrastructure.dynamoDbTables.size() << std::endl;
+        log_info << "DynamoDb tables imported, count: " << infrastructure.dynamoDbTables.size();
       }
       if (!infrastructure.dynamoDbItems.empty()) {
         for (auto &item : infrastructure.dynamoDbItems) {
           //_dynamoDatabase->CreateOrUpdateUser(user);
         }
-        log_info_stream(_logger) << "DynamoDb items imported, count: " << infrastructure.dynamoDbItems.size() << std::endl;
+        log_info << "DynamoDb items imported, count: " << infrastructure.dynamoDbItems.size();
       }
     }
 
@@ -294,13 +294,13 @@ namespace AwsMock::Service {
         for (auto &secret : infrastructure.secrets) {
           _secretsDatabase.CreateOrUpdateSecret(secret);
         }
-        log_info_stream(_logger) << "Secrets imported, count: " << infrastructure.secrets.size() << std::endl;
+        log_info << "Secrets imported, count: " << infrastructure.secrets.size();
       }
     }
   }
 
   void ModuleService::CleanInfrastructure(const Dto::Common::Services &services) {
-    log_info_stream(_logger) << "Cleaning services, length: " << services.serviceNames.size() << std::endl;
+    log_info << "Cleaning services, length: " << services.serviceNames.size();
 
     if (services.HasService("all") || services.HasService("s3")) {
       std::shared_ptr<Database::S3Database> _s3Database = std::make_shared<Database::S3Database>();
@@ -342,7 +342,7 @@ namespace AwsMock::Service {
   }
 
   void ModuleService::CleanObjects(const Dto::Common::Services &services) {
-    log_info_stream(_logger) << "Cleaning objects, length: " << services.serviceNames.size() << std::endl;
+    log_info << "Cleaning objects, length: " << services.serviceNames.size();
 
     if (services.HasService("all") || services.HasService("s3")) {
       std::shared_ptr<Database::S3Database> _s3Database = std::make_shared<Database::S3Database>();

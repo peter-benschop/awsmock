@@ -389,11 +389,6 @@ namespace AwsMock::Service {
     void SetHeaders(Poco::Net::HTTPServerResponse &response, unsigned long contentLength, const HeaderMap &headerMap = {}, const std::string &contentType = "application/xml");
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * Base URL
      */
     std::string _baseUrl;

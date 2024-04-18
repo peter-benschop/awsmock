@@ -120,11 +120,6 @@ namespace AwsMock::Service {
     static std::string GetTarget(const Poco::Net::HTTPServerRequest &request);
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * S3 handler configuration
      */
     Core::Configuration &_configuration;

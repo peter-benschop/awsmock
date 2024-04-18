@@ -5,6 +5,14 @@
 
 namespace AwsMock::Core {
 
+  void CoreLogInitialize(plog::Severity severity, plog::IAppender* appender) {
+    plog::init(severity, appender);
+  }
+
+  PLogStream::PLogStream() {
+    plog::init<plog::TxtFormatter>(plog::verbose, plog::streamStdOut);
+  }
+
   Poco::Mutex LogStreamBuf::_mutex;
 
   //
@@ -219,7 +227,7 @@ namespace AwsMock::Core {
   void LogStream::SetGlobalLevel(const std::string &level) {
     Poco::Logger::root().setLevel(level);
 
-    std::vector<std::string> names;
+    std::vector <std::string> names;
     Poco::Logger::names(names);
     for (const auto &n : names) {
       Poco::Logger::get(n).setLevel(level);

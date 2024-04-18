@@ -21,12 +21,14 @@ namespace AwsMock::Core {
   std::string AwsUtils::CreateSqsQueueUrl(const Configuration &configuration, const std::string &queueName) {
     std::string endpoint = GetEndpoint(configuration);
     std::string accountId = configuration.getString("awsmock.account.userPoolId", SQS_DEFAULT_ACCOUNT_ID);
+    log_trace << "Endpoint: " << endpoint << " accountId: " << accountId;
     return endpoint + "/" + accountId + "/" + queueName;
   }
 
   std::string AwsUtils::CreateSqsQueueArn(const Configuration &configuration, const std::string &queueName) {
     std::string region = configuration.getString("awsmock.region", GATEWAY_DEFAULT_REGION);
     std::string accountId = configuration.getString("awsmock.account.userPoolId", SQS_DEFAULT_ACCOUNT_ID);
+    log_trace << "Region: " << region << " accountId: " << accountId;
     return CreateArn("sqs", region, accountId, queueName);
   }
 

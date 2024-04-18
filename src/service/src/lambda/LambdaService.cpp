@@ -30,11 +30,11 @@ namespace AwsMock::Service {
 
     // Create temp directory
     Core::DirUtils::EnsureDirectory(_tempDir);
-    log_trace_stream(_logger) << "lambda module initialized" << std::endl;
+    log_trace << "lambda module initialized";
   }
 
   Dto::Lambda::CreateFunctionResponse LambdaService::CreateFunction(Dto::Lambda::CreateFunctionRequest &request) {
-    log_debug_stream(_logger) << "Create function request, name: " + request.functionName << std::endl;
+    log_debug << "Create function request, name: " + request.functionName;
 
     // Save to file
     Database::Entity::Lambda::Lambda lambdaEntity;
@@ -76,7 +76,7 @@ namespace AwsMock::Service {
 
     // Create lambda function asynchronously
     CallAsyncCreate<const char*, const char *, Core::Configuration&>(request.code.zipFile.c_str(), lambdaEntity.oid.c_str(),_configuration);
-    log_debug_stream(_logger) << "Lambda create started, function: " + lambdaEntity.function << std::endl;
+    log_debug << "Lambda create started, function: " + lambdaEntity.function;
 
     // Create response
     Dto::Lambda::CreateFunctionResponse response{
@@ -92,7 +92,7 @@ namespace AwsMock::Service {
       .ephemeralStorage=request.ephemeralStorage,
     };
 
-    log_info_stream(_logger) << "Function created, name: " + request.functionName << std::endl;
+    log_info << "Function created, name: " + request.functionName;
 
     return response;
   }
@@ -103,17 +103,17 @@ namespace AwsMock::Service {
       std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(region);
 
       auto response = Dto::Lambda::ListFunctionResponse(lambdas);
-      log_trace_stream(_logger) << "Lambda list outcome: " + response.ToJson() << std::endl;
+      log_trace << "Lambda list outcome: " + response.ToJson();
       return response;
 
     } catch (Poco::Exception &ex) {
-      log_error_stream(_logger) << "Lambda list request failed, message: " << ex.message() << std::endl;
+      log_error << "Lambda list request failed, message: " << ex.message();
       throw Core::ServiceException(ex.message(), 500);
     }
   }
 
   void LambdaService::InvokeEventFunction(const Dto::S3::EventNotification &eventNotification, const std::string &region, const std::string &user) {
-    log_debug_stream(_logger) << "Invocation event function eventNotification: " + eventNotification.ToString() << std::endl;
+    log_debug << "Invocation event function eventNotification: " + eventNotification.ToString();
 
     for (const auto &record : eventNotification.records) {
 
@@ -122,48 +122,48 @@ namespace AwsMock::Service {
       if (bucket.HasNotification(record.eventName)) {
 
         Database::Entity::S3::BucketNotification notification = bucket.GetNotification(record.eventName);
-        log_debug_stream(_logger) << "Got bucket eventNotification: " << notification.ToString() << std::endl;
+        log_debug << "Got bucket eventNotification: " << notification.ToString();
 
         // Get the lambda entity
         Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(notification.lambdaArn);
-        log_debug_stream(_logger) << "Got lambda entity eventNotification: " + lambda.ToString() << std::endl;
+        log_debug << "Got lambda entity eventNotification: " + lambda.ToString();
 
         // Send invocation request
         //_invokeQueue.enqueueNotification(new Dto::Lambda::InvocationNotification(lambda.function, eventNotification.ToJson(), region, user, "localhost", lambda.hostPort));
-        log_debug_stream(_logger) << "Lambda executor notification send, name: " + lambda.function << std::endl;
+        log_debug << "Lambda executor notification send, name: " + lambda.function;
       }
     }
   }
 
   void LambdaService::InvokeLambdaFunction(const std::string &functionName, const std::string &payload, const std::string &region, const std::string &user) {
-    log_debug_stream(_logger) << "Invocation lambda function, functionName: " + functionName << std::endl;
+    log_debug << "Invocation lambda function, functionName: " + functionName;
 
     std::string lambdaArn = Core::AwsUtils::CreateLambdaArn(region, _accountId, functionName);
 
     // Get the lambda entity
     Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(lambdaArn);
-    log_debug_stream(_logger) << "Got lambda entity, name: " + lambda.function << std::endl;
+    log_debug << "Got lambda entity, name: " + lambda.function;
 
     // Send invocation request
     std::string url = GetRequestUrl("localhost", lambda.hostPort);
     CallAsyncInvoke<const char *, const char *>(url.c_str(), payload.c_str());
-    log_debug_stream(_logger) << "Lambda executor notification send, name: " + lambda.function << std::endl;
+    log_debug << "Lambda executor notification send, name: " + lambda.function;
 
     // Update database
     lambda.lastInvocation = Poco::DateTime();
     lambda.state = Database::Entity::Lambda::Active;
     lambda = _lambdaDatabase.UpdateLambda(lambda);
-    log_debug_stream(_logger) << "Lambda entity invoked, name: " + lambda.function << std::endl;
+    log_debug << "Lambda entity invoked, name: " + lambda.function;
   }
   void CallAsyncInvoke1(const char *String, int I, const char *String1, Core::LogStream Stream) {
 
   }
 
   void LambdaService::CreateTag(const Dto::Lambda::CreateTagRequest &request) {
-    log_debug_stream(_logger) << "Create tag request, arn: " << request.arn << std::endl;
+    log_debug << "Create tag request, arn: " << request.arn;
 
     if (!_lambdaDatabase.LambdaExistsByArn(request.arn)) {
-      log_warning_stream(_logger) << "Lambda function does not exist, arn: " << request.arn << std::endl;
+      log_warning_stream(_logger) << "Lambda function does not exist, arn: " << request.arn;
       throw Core::ServiceException("Lambda function does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
@@ -173,14 +173,14 @@ namespace AwsMock::Service {
       lambdaEntity.tags.emplace(it.first, it.second);
     }
     lambdaEntity = _lambdaDatabase.UpdateLambda(lambdaEntity);
-    log_debug_stream(_logger) << "Create tag request succeeded, arn: " + request.arn << " size: " << lambdaEntity.tags.size() << std::endl;
+    log_debug << "Create tag request succeeded, arn: " + request.arn << " size: " << lambdaEntity.tags.size();
   }
 
   Dto::Lambda::ListTagsResponse LambdaService::ListTags(const std::string &arn) {
-    log_debug_stream(_logger) << "List tags request, arn: " << arn << std::endl;
+    log_debug << "List tags request, arn: " << arn;
 
     if (!_lambdaDatabase.LambdaExistsByArn(arn)) {
-      log_warning_stream(_logger) << "Lambda function does not exist, arn: " << arn << std::endl;
+      log_warning_stream(_logger) << "Lambda function does not exist, arn: " << arn;
       throw Core::ServiceException("Lambda function does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
@@ -190,16 +190,16 @@ namespace AwsMock::Service {
     for (const auto &it : lambdaEntity.tags) {
       response.tags.emplace(it.first, it.second);
     }
-    log_debug_stream(_logger) << "List tag request succeeded, arn: " + arn << " size: " << lambdaEntity.tags.size() << std::endl;
+    log_debug << "List tag request succeeded, arn: " + arn << " size: " << lambdaEntity.tags.size();
 
     return response;
   }
 
   void LambdaService::DeleteFunction(Dto::Lambda::DeleteFunctionRequest &request) {
-    log_debug_stream(_logger) << "Delete function: " + request.ToString() << std::endl;
+    log_debug << "Delete function: " + request.ToString();
 
     if (!_lambdaDatabase.LambdaExists(request.functionName)) {
-      log_error_stream(_logger) << "Lambda function does not exist, function: " + request.functionName << std::endl;
+      log_error << "Lambda function does not exist, function: " + request.functionName;
       throw Core::ServiceException("Lambda function does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
@@ -207,25 +207,25 @@ namespace AwsMock::Service {
     if (_dockerService->ContainerExists(request.functionName, "latest")) {
       Dto::Docker::Container container = _dockerService->GetContainerByName(request.functionName, "latest");
       _dockerService->DeleteContainer(container);
-      log_debug_stream(_logger) << "Docker container deleted, function: " + request.functionName << std::endl;
+      log_debug << "Docker container deleted, function: " + request.functionName;
     }
 
     // Delete the image, if existing
     if (_dockerService->ImageExists(request.functionName, "latest")) {
       Dto::Docker::Image image = _dockerService->GetImageByName(request.functionName, "latest");
       _dockerService->DeleteImage(image.id);
-      log_debug_stream(_logger) << "Docker image deleted, function: " + request.functionName << std::endl;
+      log_debug << "Docker image deleted, function: " + request.functionName;
     }
 
     _lambdaDatabase.DeleteLambda(request.functionName);
-    _logger.information() << "Lambda function deleted, function: " + request.functionName << std::endl;
+    _logger.information() << "Lambda function deleted, function: " + request.functionName;
   }
 
   void LambdaService::DeleteTags(Dto::Lambda::DeleteTagsRequest &request) {
-    log_trace_stream(_logger) << "Delete tags: " + request.ToString() << std::endl;
+    log_trace << "Delete tags: " + request.ToString();
 
     if (!_lambdaDatabase.LambdaExistsByArn(request.arn)) {
-      log_error_stream(_logger) << "Lambda function does not exist, arn: " + request.arn << std::endl;
+      log_error << "Lambda function does not exist, arn: " + request.arn;
       throw Core::ServiceException("Lambda function does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
@@ -239,7 +239,7 @@ namespace AwsMock::Service {
       }
     }
     lambdaEntity = _lambdaDatabase.UpdateLambda(lambdaEntity);
-    log_debug_stream(_logger) << "Delete tag request succeeded, arn: " + request.arn << " size: " << lambdaEntity.tags.size() << std::endl;
+    log_debug << "Delete tag request succeeded, arn: " + request.arn << " size: " << lambdaEntity.tags.size();
   }
 
   std::string LambdaService::GetRequestUrl(const std::string &hostName, int port) {

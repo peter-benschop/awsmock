@@ -1,14 +1,13 @@
 
-#include "awsmock/service/transfer/TransferHandler.h"
+#include <awsmock/service/transfer/TransferHandler.h>
 
 namespace AwsMock::Service {
 
-  TransferHandler::TransferHandler(Core::Configuration &configuration, Core::MetricService &metricService)
-      : AbstractHandler(), _logger(Poco::Logger::get("TransferServiceHandler")), _configuration(configuration), _metricService(metricService), _transferService(configuration) {
+  TransferHandler::TransferHandler(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractHandler(), _configuration(configuration), _metricService(metricService), _transferService(configuration) {
   }
 
   void TransferHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, [[maybe_unused]]const std::string &user) {
-    log_trace_stream(_logger) << "lambda GET request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+    log_trace << "lambda GET request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 
     try {
 
@@ -30,7 +29,7 @@ namespace AwsMock::Service {
   }
 
   void TransferHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
-    log_trace_stream(_logger) << "lambda PUT request, URI: " << request.getURI() << " region: " << region << " user: " + user << std::endl;
+    log_trace << "lambda PUT request, URI: " << request.getURI() << " region: " << region << " user: " + user;
 
     try {
       std::string version, action;
@@ -42,7 +41,7 @@ namespace AwsMock::Service {
   }
 
   void TransferHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    log_trace_stream(_logger) << "lambda POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+    log_trace << "lambda POST request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 
     try {
       std::string body = Core::HttpUtils::GetBodyAsString(request);
@@ -103,7 +102,7 @@ namespace AwsMock::Service {
   }
 
   void TransferHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    log_trace_stream(_logger) << "lambda DELETE request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+    log_trace << "lambda DELETE request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 
     try {
       std::string version, action;
@@ -115,7 +114,7 @@ namespace AwsMock::Service {
   }
 
   void TransferHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
-    log_trace_stream(_logger) << "lambda OPTIONS request" << std::endl;
+    log_trace << "lambda OPTIONS request";
 
     response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
     response.setContentType("text/plain; charset=utf-8");
@@ -126,7 +125,7 @@ namespace AwsMock::Service {
   }
 
   void TransferHandler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    log_trace_stream(_logger) << "lambda HEAD request, address: " << request.clientAddress().toString() << std::endl;
+    log_trace << "lambda HEAD request, address: " << request.clientAddress().toString();
 
     try {
 
@@ -157,7 +156,7 @@ namespace AwsMock::Service {
     } else if (Core::StringUtils::Contains(body, "Role") && Core::StringUtils::Contains(body, "UserName") && Core::StringUtils::Contains(body, "ServerId")) {
       return "CreateUser";
     }
-    log_warning_stream(_logger) << "Could not determine request type, body: " << body << std::endl;
+    log_warning << "Could not determine request type, body: " << body;
     return "Unknown";
   }
 }

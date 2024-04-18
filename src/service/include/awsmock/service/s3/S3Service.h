@@ -333,11 +333,6 @@ namespace AwsMock::Service {
     Dto::S3::PutObjectResponse SaveUnversionedObject(Dto::S3::PutObjectRequest &request, std::istream &stream);
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * Data directory
      */
     std::string _dataDir;

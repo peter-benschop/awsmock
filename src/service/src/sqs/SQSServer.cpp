@@ -2,12 +2,12 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include "awsmock/service/sqs/SQSServer.h"
+#include <awsmock/service/sqs/SQSServer.h>
 
 namespace AwsMock::Service {
 
-  SQSServer::SQSServer(Core::Configuration &configuration, Core::MetricService &metricService)
-    : AbstractServer(configuration, "sqs"), _logger(Poco::Logger::get("SQSServer")), _configuration(configuration), _metricService(metricService), _serviceDatabase(Database::ModuleDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()) {
+  SQSServer::SQSServer(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractServer(configuration, "sqs"), _configuration(configuration), _metricService(metricService), _serviceDatabase(Database::ModuleDatabase::instance()),
+                                                                                                 _sqsDatabase(Database::SQSDatabase::instance()) {
 
     // HTTP manager configuration
     _port = _configuration.getInt("awsmock.service.sqs.port", SQS_DEFAULT_PORT);
@@ -15,31 +15,31 @@ namespace AwsMock::Service {
     _maxQueueLength = _configuration.getInt("awsmock.service.sqs.max.queue", SQS_DEFAULT_QUEUE_LENGTH);
     _maxThreads = _configuration.getInt("awsmock.service.sqs.max.threads", SQS_DEFAULT_THREADS);
     _requestTimeout = _configuration.getInt("awsmock.service.sqs.timeout", SQS_DEFAULT_TIMEOUT);
-    log_debug_stream(_logger) << "SQS rest module initialized, endpoint: " << _host << ":" << _port << std::endl;
+    log_debug << "SQS rest module initialized, endpoint: " << _host << ":" << _port;
 
     // Sleeping period
     _period = _configuration.getInt("awsmock.worker.sqs.period", 10000);
 
     // Create environment
     _region = _configuration.getString("awsmock.region");
-    log_debug_stream(_logger) << "SQSServer initialized" << std::endl;
+    log_debug << "SQSServer initialized";
   }
 
   void SQSServer::Initialize() {
 
     // Check module active
     if (!IsActive("sqs")) {
-      log_info_stream(_logger) << "SQS module inactive" << std::endl;
+      log_info << "SQS module inactive";
       return;
     }
-    log_info_stream(_logger) << "SQS server starting, port: " << _port << std::endl;
+    log_info << "SQS server starting, port: " << _port;
 
     // Start REST module
     StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new SQSRequestHandlerFactory(_configuration, _metricService));
   }
 
   void SQSServer::Run() {
-    log_trace_stream(_logger) << "SQSServer processing started" << std::endl;
+    log_trace << "SQSServer processing started";
 
     // Reset messages
     ResetMessages();
@@ -55,7 +55,7 @@ namespace AwsMock::Service {
   void SQSServer::ResetMessages() {
 
     Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(_region);
-    log_trace_stream(_logger) << "Working on queue list, count" << queueList.size() << std::endl;
+    log_trace << "Working on queue list, count" << queueList.size();
 
     for (auto &queue : queueList) {
 
@@ -83,7 +83,7 @@ namespace AwsMock::Service {
       }
 
       _sqsDatabase.UpdateQueue(queue);
-      log_trace_stream(_logger) << "Queue updated, queueName" << queue.name << std::endl;
+      log_trace << "Queue updated, queueName" << queue.name;
     }
   }
 
@@ -101,7 +101,7 @@ namespace AwsMock::Service {
       long messagesPerQueue = _sqsDatabase.CountMessages(queue.region, queue.queueUrl);
       _metricService.SetGauge("sqs_message_count", "queue", labelValue, messagesPerQueue);
     }
-    log_trace_stream(_logger) << "SQS update counter finished" << std::endl;
+    log_trace << "SQS update counter finished";
   }
 
 } // namespace AwsMock::Worker
