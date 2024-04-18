@@ -41,7 +41,7 @@ namespace AwsMock::Core {
 
   /**
    * Maintains a list of counter and gauges for monitoring via Prometheus. The data is made available via a HTTP
-   * manager listening on port 8081. The port ist configurable.
+   * manager listening on port 9100. The port ist configurable.
    *
    * @author jens.vogt@opitz-consulting.com
    */

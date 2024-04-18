@@ -76,7 +76,7 @@ namespace AwsMock::Core {
     ofs << "awsmock.docker.default.temp.size=10240";
     ofs << "awsmock.docker.container.port=8080";
     // Monitoring configuration
-    ofs << "awsmock.monitoring.port=8081";
+    ofs << "awsmock.monitoring.port=9100";
     // Logging
     ofs << "awsmock.log.level=debug";
     ofs.close();
