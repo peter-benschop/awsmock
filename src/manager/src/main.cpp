@@ -334,7 +334,7 @@ namespace AwsMock {
     /**
      * Monitoring module
      */
-    Core::MetricService _metricService = Core::MetricService(_configuration);
+    Core::MetricService& _metricService = Core::MetricService::instance();
 
     /**
      * Gateway router

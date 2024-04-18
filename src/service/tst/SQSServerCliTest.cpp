@@ -73,7 +73,7 @@ namespace AwsMock::Service {
 
     std::string _endpoint, _queueUrl, _accountId;
     Core::Configuration& _configuration = Core::Configuration::instance();
-    Core::MetricService _metricService = Core::MetricService(_configuration);
+    Core::MetricService& _metricService = Core::MetricService::instance();
     Database::SQSDatabase& _sqsDatabase = Database::SQSDatabase::instance();
     SQSServer _sqsServer = SQSServer(_configuration, _metricService);
   };

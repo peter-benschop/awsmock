@@ -54,7 +54,7 @@ namespace AwsMock::Service {
     std::string _endpoint, _baseCommand, _tempFile;
     std::map<std::string, std::string> _extraHeaders;
     Core::Configuration& _configuration = Core::Configuration::instance();
-    Core::MetricService _metricService = Core::MetricService(_configuration);
+    Core::MetricService& _metricService = Core::MetricService::instance();
     Database::S3Database _database = Database::S3Database();
     S3Server _s3Server = S3Server(_configuration, _metricService);
   };
@@ -220,6 +220,23 @@ namespace AwsMock::Service {
     // assert
     EXPECT_EQ(0, headResult.status);
     EXPECT_TRUE(Core::StringUtils::ContainsIgnoreCase(headResult.output, "ContentLength=10485852"));
+  }
+
+  // Java client tries to get the file size.
+  TEST_F(S3ServerJavaTest, ObjectVersionListTest) {
+
+    // arrange
+    Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " s3 create-bucket test-bucket");
+    EXPECT_EQ(0, createResult.status);
+    Core::ExecResult putResult = Core::SystemUtils::Exec(_baseCommand + " s3 put-object test-bucket test-key \"test-object\"");
+    EXPECT_EQ(0, putResult.status);
+
+    // act
+    Core::ExecResult listVersionsResult = Core::SystemUtils::Exec(_baseCommand + " s3 list-versions test-bucket test-key");
+
+    // assert
+    EXPECT_EQ(0, listVersionsResult.status);
+    //EXPECT_TRUE(Core::StringUtils::ContainsIgnoreCase(headResult.output, "ContentLength=10485852"));
   }
 
   TEST_F(S3ServerJavaTest, ObjectsDeleteTest) {

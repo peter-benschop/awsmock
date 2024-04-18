@@ -156,6 +156,14 @@ namespace AwsMock::Service {
     static std::string GetRequestUrl(const std::string &hostName, int port);
 
     /**
+     * Send the invocation request to the corresponding port
+     *
+     * @param url lambda URL
+     * @param body event payload
+     */
+    void SendInvocationRequest(const std::string &url, const std::string &body);
+
+    /**
      * Logger
      */
     Core::LogStream _logger;
@@ -206,19 +214,15 @@ namespace AwsMock::Service {
     Database::S3Database &_s3Database;
 
     /**
-     * Creator
-     */
-    std::shared_ptr<LambdaCreator> _lambdaCreator;
-
-    /**
-     * Executor
-     */
-    std::shared_ptr<LambdaExecutor> _lambdaExecutor;
-
-    /**
      * Docker module
      */
     std::shared_ptr<Service::DockerService> _dockerService;
+
+    /**
+     * Mutex
+     */
+    static Poco::Mutex _mutex;
+
   };
 
 } // namespace AwsMock::Service

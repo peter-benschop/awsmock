@@ -2,15 +2,18 @@
 // Created by vogje01 on 07/01/2023.
 //
 
-#include "awsmock/core/MetricService.h"
+#include <awsmock/core/MetricService.h>
 
 namespace AwsMock::Core {
 
   Poco::Mutex MetricService::_mutex;
 
-  MetricService::MetricService(const Configuration &configuration) : MetricService(configuration.getInt("awsmock.monitoring.port", 8081), configuration.getInt("awsmock.monitoring.timeout", 10)) {}
+  MetricService::MetricService() : Core::Timer("MetricServer", 60), _logger(Poco::Logger::get("MetricService")) {
 
-  MetricService::MetricService(int port, long timeout) : Core::Timer("MetricServer", 60), _logger(Poco::Logger::get("MetricService")), _port(port), _timeout(timeout) {}
+    Core::Configuration &configuration = Core::Configuration::instance();
+    _port = configuration.getInt("awsmock.monitoring.port", 8081);
+    _timeout = configuration.getInt("awsmock.monitoring.timeout", 10);
+  }
 
   void MetricService::Initialize() {
     _server = std::make_shared<Poco::Prometheus::MetricsServer>(_port);
@@ -62,7 +65,7 @@ namespace AwsMock::Core {
   bool MetricService::CounterExists(const std::string &name) {
     return std::find_if(_counterMap.begin(),
                         _counterMap.end(),
-                        [name](const std::pair<std::string, Poco::Prometheus::Counter*> &timer) {
+                        [name](const std::pair<std::string, Poco::Prometheus::Counter *> &timer) {
                           return timer.first == name;
                         }) != _counterMap.end();
   }

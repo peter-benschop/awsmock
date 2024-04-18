@@ -9,6 +9,15 @@
 #include <string>
 #include <sstream>
 
+// Poco includes
+#include <Poco/JSON/JSON.h>
+#include <Poco/JSON/Parser.h>
+#include <Poco/Dynamic/Var.h>
+
+// AwsMock includes
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/JsonException.h>
+
 namespace AwsMock::Dto::S3 {
 
   struct Owner {
@@ -22,6 +31,20 @@ namespace AwsMock::Dto::S3 {
      * Display name
      */
     std::string displayName;
+
+    /**
+     * Convert to a JSON string
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const;
+
+    /**
+     * Convert to a JSON object
+     *
+     * @return JSON object
+     */
+    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
     /**
      * Converts the DTO to a string representation.

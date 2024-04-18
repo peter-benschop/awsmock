@@ -1,5 +1,5 @@
 
-#include "awsmock/core/JsonUtils.h"
+#include <awsmock/core/JsonUtils.h>
 
 namespace AwsMock::Core {
 

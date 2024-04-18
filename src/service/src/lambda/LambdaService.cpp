@@ -7,14 +7,15 @@
 
 namespace AwsMock::Service {
 
-  template<typename T, typename C, typename I>
-  void CallAsyncCreate(T &&m, C &&u, I &&b) {
-    std::thread(&LambdaCreator::CreateLambdaFunction, &m, u, b).join();
+  template<typename C, typename I, typename K>
+  void CallAsyncCreate(C &&u, I &&b, K &&c) {
+    Service::LambdaCreator creator(c);
+    std::thread(&LambdaCreator::CreateLambdaFunction, &creator, u, b).join();
   }
 
-  template<typename M, typename T, typename B>
-  void CallAsyncInvoke(M &&m, T &&u, B &&b) {
-    std::thread(&LambdaExecutor::SendInvocationRequest, &m, u, b).detach();
+  template<typename U, typename B>
+  void CallAsyncInvoke(U &&u, B &&b) {
+    std::thread(&LambdaExecutor::SendInvocationRequest, u, b).detach();
   }
 
   LambdaService::LambdaService(Core::Configuration &configuration, Core::MetricService &metricService) :
@@ -26,9 +27,6 @@ namespace AwsMock::Service {
     _tempDir = _dataDir + Poco::Path::separator() + "tmp";
     _lambdaDir = _dataDir + Poco::Path::separator() + "lambda";
     _dockerService = std::make_shared<Service::DockerService>(_configuration);
-
-    _lambdaCreator = std::make_shared<LambdaCreator>(configuration);
-    _lambdaExecutor = std::make_shared<LambdaExecutor>(metricService);
 
     // Create temp directory
     Core::DirUtils::EnsureDirectory(_tempDir);
@@ -77,7 +75,7 @@ namespace AwsMock::Service {
     lambdaEntity = _lambdaDatabase.CreateOrUpdateLambda(lambdaEntity);
 
     // Create lambda function asynchronously
-    CallAsyncCreate<LambdaCreator&, const char *, const char *>(*_lambdaCreator, request.code.zipFile.c_str(), lambdaEntity.oid.c_str());
+    CallAsyncCreate<const char*, const char *, Core::Configuration&>(request.code.zipFile.c_str(), lambdaEntity.oid.c_str(),_configuration);
     log_debug_stream(_logger) << "Lambda create started, function: " + lambdaEntity.function << std::endl;
 
     // Create response
@@ -148,7 +146,7 @@ namespace AwsMock::Service {
 
     // Send invocation request
     std::string url = GetRequestUrl("localhost", lambda.hostPort);
-    CallAsyncInvoke<LambdaExecutor &, const char *, const char *>(*_lambdaExecutor, url.c_str(), payload.c_str());
+    CallAsyncInvoke<const char *, const char *>(url.c_str(), payload.c_str());
     log_debug_stream(_logger) << "Lambda executor notification send, name: " + lambda.function << std::endl;
 
     // Update database

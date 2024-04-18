@@ -584,6 +584,13 @@ namespace AwsMock::Service {
     }
   }
 
+  Dto::S3::ListObjectVersionsResponse S3Service::ListObjectVersions(const Dto::S3::ListObjectVersionsRequest request){
+    log_trace_stream(_logger) << "List object versions request: " << request.ToString() << std::endl;
+
+    Dto::S3::ListObjectVersionsResponse response;
+    return response;
+  }
+
   void S3Service::DeleteBucket(const Dto::S3::DeleteBucketRequest &request) {
     log_trace_stream(_logger) << "Delete bucket request, name: " << request.bucket << std::endl;
 

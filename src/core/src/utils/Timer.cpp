@@ -19,7 +19,6 @@ namespace AwsMock::Core {
 
     auto future = std::shared_future<void>(_stop.get_future());
     _thread_handle = std::async(std::launch::async, [future, this]() {
-      _logger.setThreadId(pthread_self());
 
       std::future_status status;
       do {
