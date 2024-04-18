@@ -6,7 +6,7 @@
 
 namespace AwsMock::Controller {
 
-  Controller::Controller(const Configuration &configuration) : _logger(Poco::Logger::get("Controller")), _configuration(configuration) {
+  Controller::Controller(const Configuration &configuration) : _configuration(configuration) {
 
     // Initialize database
     _host = configuration.getString("awsmock.manager.host", AWSMOCKCTL_DEFAULT_HOST);

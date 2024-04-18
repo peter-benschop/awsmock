@@ -2,11 +2,11 @@
 // Created by vogje01 on 01/05/2023.
 //
 
-#include "awsmock/core/MetricSystemCollector.h"
+#include <awsmock/core/MetricSystemCollector.h>
 
 namespace AwsMock::Core {
 
-  MetricSystemCollector::MetricSystemCollector() : Core::Timer("SystemCollector", 5), _logger(Poco::Logger::get("root")) {
+  MetricSystemCollector::MetricSystemCollector() : Core::Timer("SystemCollector", 5) {
 
     _virtualMemory = new Poco::Prometheus::Gauge(VIRTUAL_MEMORY);
     _realMemory = new Poco::Prometheus::Gauge(REAL_MEMORY);
@@ -43,7 +43,7 @@ namespace AwsMock::Core {
     }
     fclose(file);
     numProcessors /= 2;
-    log_debug_stream(_logger) << "Got number of processors, numProcs: " << numProcessors << std::endl;
+    log_debug << "Got number of processors, numProcs: " << numProcessors;
   }
 
   void MetricSystemCollector::Run() {
@@ -54,7 +54,7 @@ namespace AwsMock::Core {
   }
 
   void MetricSystemCollector::CollectSystemCounter() {
-    log_trace_stream(_logger) << "System collector starting" << std::endl;
+    log_trace << "System collector starting";
 
     std::string line;
     std::ifstream ifs("/proc/self/state");
@@ -64,17 +64,17 @@ namespace AwsMock::Core {
       if (StringUtils::Contains(line, "VmSize:")) {
         double value = std::stod(StringUtils::Split(line, ':')[1]);
         _virtualMemory->set(value);
-        log_trace_stream(_logger) << "Virtual memory: " << value << std::endl;
+        log_trace << "Virtual memory: " << value;
       }
       if (StringUtils::Contains(line, "VmRSS:")) {
         double value = std::stod(StringUtils::Split(line, ':')[1]);
         _realMemory->set(value);
-        log_trace_stream(_logger) << "Real Memory: " << value << std::endl;
+        log_trace << "Real Memory: " << value;
       }
       if (StringUtils::Contains(line, "Threads:")) {
         double value = std::stod(StringUtils::Split(line, ':')[1]);
         _totalThreads->set(value);
-        log_trace_stream(_logger) << "Total Threads: " << value << std::endl;
+        log_trace << "Total Threads: " << value;
       }
     }
     ifs.close();
@@ -84,32 +84,32 @@ namespace AwsMock::Core {
     now = times(&timeSample);
     double totalPercent, userPercent, systemPercent;
 
-    log_trace_stream(_logger) << "Now: " << now << "/" << lastCPU << "/" << lastSysCPU << "/" << lastUserCPU << std::endl;
+    log_trace << "Now: " << now << "/" << lastCPU << "/" << lastSysCPU << "/" << lastUserCPU;
     if (now <= lastCPU || timeSample.tms_stime < lastSysCPU || timeSample.tms_utime < lastUserCPU) {
       // Overflow detection. Just skip this value.
       totalPercent = -1.0;
-      log_debug_stream(_logger) << "Invalid CPU values, skipping" << std::endl;
+      log_debug << "Invalid CPU values, skipping";
     } else {
       totalPercent = (double) ((timeSample.tms_stime - lastSysCPU) + (timeSample.tms_utime - lastUserCPU));
       totalPercent /= (double) (now - lastCPU);
       totalPercent /= numProcessors;
       totalPercent *= 100;
       _totalCpu->set(totalPercent);
-      log_trace_stream(_logger) << "Total CPU: " << totalPercent << std::endl;
+      log_trace << "Total CPU: " << totalPercent;
 
       userPercent = (double) (timeSample.tms_utime - lastUserCPU);
       userPercent /= (double) (now - lastCPU);
       userPercent /= numProcessors;
       userPercent *= 100;
       _userCpu->set(userPercent);
-      log_trace_stream(_logger) << "User CPU: " << userPercent << std::endl;
+      log_trace << "User CPU: " << userPercent;
 
       systemPercent = (double) (timeSample.tms_stime - lastSysCPU);
       systemPercent /= (double) (now - lastCPU);
       systemPercent /= numProcessors;
       systemPercent *= 100;
       _systemCpu->set(systemPercent);
-      log_trace_stream(_logger) << "System CPU: " << systemPercent << std::endl;
+      log_trace << "System CPU: " << systemPercent;
     }
     lastCPU = now;
     lastSysCPU = timeSample.tms_stime;

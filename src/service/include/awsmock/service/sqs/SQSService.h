@@ -187,11 +187,6 @@ namespace AwsMock::Service {
     static bool CheckAttribute(const std::vector<std::string> &attributes, const std::string &value);
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * Account ID
      */
     std::string _accountId;

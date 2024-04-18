@@ -175,11 +175,6 @@ namespace AwsMock::Core {
     void Initialize();
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * Name of the configuration file
      */
     std::string _filename;

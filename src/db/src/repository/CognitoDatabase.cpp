@@ -10,9 +10,7 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_array;
   using bsoncxx::builder::basic::make_document;
 
-  CognitoDatabase::CognitoDatabase()
-      : _logger(Poco::Logger::get("CognitoDatabase")), _memoryDb(CognitoMemoryDb::instance()),
-        _hasDatabase(Database::HasDatabase()), _databaseName(GetDatabaseName()) {}
+  CognitoDatabase::CognitoDatabase() : _memoryDb(CognitoMemoryDb::instance()), _hasDatabase(Database::HasDatabase()), _databaseName(GetDatabaseName()) {}
 
   bool CognitoDatabase::UserPoolExists(const std::string &region, const std::string &name) {
 
@@ -23,11 +21,11 @@ namespace AwsMock::Database {
         auto client = GetClient();
         mongocxx::collection _userPoolCollection = (*client)[_databaseName]["cognito_userpool"];
         int64_t count = _userPoolCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
-        log_trace_stream(_logger) << "Cognito user pool exists: " << (count > 0 ? "true" : "false") << std::endl;
+        log_trace << "Cognito user pool exists: " << (count > 0 ? "true" : "false");
         return count > 0;
 
       } catch (const mongocxx::exception &exc) {
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
       }
 
@@ -47,11 +45,11 @@ namespace AwsMock::Database {
         auto client = GetClient();
         mongocxx::collection _userPoolCollection = (*client)[_databaseName]["cognito_userpool"];
         int64_t count = _userPoolCollection.count_documents(make_document(kvp("userPoolId", id)));
-        log_trace_stream(_logger) << "Cognito user pool exists: " << (count > 0 ? "true" : "false") << std::endl;
+        log_trace << "Cognito user pool exists: " << (count > 0 ? "true" : "false");
         return count > 0;
 
       } catch (const mongocxx::exception &exc) {
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
       }
 
@@ -75,13 +73,13 @@ namespace AwsMock::Database {
         session.start_transaction();
         auto result = _userPoolCollection.insert_one(userPool.ToDocument());
         session.commit_transaction();
-        log_trace_stream(_logger) << "User pool created, oid: " << result->inserted_id().get_oid().value.to_string()
-                                  << std::endl;
+        log_trace << "User pool created, oid: " << result->inserted_id().get_oid().value.to_string()
+                                 ;
         return GetUserPoolById(result->inserted_id().get_oid().value);
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
       }
 
@@ -101,7 +99,7 @@ namespace AwsMock::Database {
       mongocxx::stdx::optional<bsoncxx::document::value>
           mResult = _userPoolCollection.find_one(make_document(kvp("_id", oid)));
       if (!mResult) {
-        _logger.error() << "Database exception: Cognito not found " << std::endl;
+        log_error << "Database exception: Cognito not found ";
         throw Core::DatabaseException("Database exception, Cognito not found ", 500);
       }
 
@@ -110,7 +108,7 @@ namespace AwsMock::Database {
       return result;
 
     } catch (const mongocxx::exception &exc) {
-      _logger.error() << "Database exception " << exc.what() << std::endl;
+      log_error << "Database exception " << exc.what();
       throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
     }
 
@@ -128,7 +126,7 @@ namespace AwsMock::Database {
         mongocxx::stdx::optional<bsoncxx::document::value>
             mResult = _userPoolCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
         if (!mResult) {
-          _logger.error() << "Database exception: Cognito not found " << std::endl;
+          log_error << "Database exception: Cognito not found ";
           throw Core::DatabaseException("Database exception, Cognito not found ", 500);
         }
 
@@ -137,7 +135,7 @@ namespace AwsMock::Database {
         return result;
 
       } catch (const mongocxx::exception &exc) {
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
       }
 
@@ -176,12 +174,12 @@ namespace AwsMock::Database {
             _userPoolCollection.replace_one(make_document(kvp("region", userPool.region), kvp("name", userPool.name)),
                                             userPool.ToDocument());
         session.commit_transaction();
-        log_trace_stream(_logger) << "Cognito user pool updated: " << userPool.ToString() << std::endl;
+        log_trace << "Cognito user pool updated: " << userPool.ToString();
         return GetUserPoolByRegionName(userPool.region, userPool.name);
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
       }
 
@@ -221,7 +219,7 @@ namespace AwsMock::Database {
 
         }
       } catch (const mongocxx::exception &exc) {
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
       }
 
@@ -230,7 +228,7 @@ namespace AwsMock::Database {
       userPools = _memoryDb.ListUserPools(region);
     }
 
-    log_trace_stream(_logger) << "Got user pool list, size:" << userPools.size() << std::endl;
+    log_trace << "Got user pool list, size:" << userPools.size();
     return userPools;
   }
 
@@ -247,11 +245,11 @@ namespace AwsMock::Database {
         } else {
           count = _userPoolCollection.count_documents(make_document(kvp("region", region)));
         }
-        log_trace_stream(_logger) << "User pool count: " << count << std::endl;
+        log_trace << "User pool count: " << count;
         return count;
 
       } catch (mongocxx::exception::system_error &exc) {
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
       }
 
@@ -275,12 +273,12 @@ namespace AwsMock::Database {
         session.start_transaction();
         auto result = _userPoolCollection.delete_many(make_document(kvp("userPoolId", id)));
         session.commit_transaction();
-        log_debug_stream(_logger) << "User pool deleted, userPoolId: " << id << " count: " << result->deleted_count()
-                                  << std::endl;
+        log_debug << "User pool deleted, userPoolId: " << id << " count: " << result->deleted_count()
+                                 ;
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
       }
 
@@ -304,11 +302,11 @@ namespace AwsMock::Database {
         session.start_transaction();
         auto result = _userPoolCollection.delete_many({});
         session.commit_transaction();
-        log_debug_stream(_logger) << "All cognito user pools deleted, count: " << result->deleted_count() << std::endl;
+        log_debug << "All cognito user pools deleted, count: " << result->deleted_count();
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
       }
 
@@ -332,11 +330,11 @@ namespace AwsMock::Database {
         int64_t count = _userCollection.count_documents(make_document(kvp("region", region),
                                                                       kvp("userPoolId", userPoolId),
                                                                       kvp("userName", userName)));
-        log_trace_stream(_logger) << "Cognito user exists: " << (count > 0 ? "true" : "false") << std::endl;
+        log_trace << "Cognito user exists: " << (count > 0 ? "true" : "false");
         return count > 0;
 
       } catch (const mongocxx::exception &exc) {
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
       }
 
@@ -360,13 +358,13 @@ namespace AwsMock::Database {
         session.start_transaction();
         auto result = _userCollection.insert_one(user.ToDocument());
         session.commit_transaction();
-        log_trace_stream(_logger) << "User created, oid: " << result->inserted_id().get_oid().value.to_string()
-                                  << std::endl;
+        log_trace << "User created, oid: " << result->inserted_id().get_oid().value.to_string()
+                                 ;
         return GetUserById(result->inserted_id().get_oid().value);
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
       }
 
@@ -386,7 +384,7 @@ namespace AwsMock::Database {
       mongocxx::stdx::optional<bsoncxx::document::value>
           mResult = _userCollection.find_one(make_document(kvp("_id", oid)));
       if (!mResult) {
-        _logger.error() << "Database exception: user not found " << std::endl;
+        log_error << "Database exception: user not found ";
         throw Core::DatabaseException("Database exception, user not found ", 500);
       }
 
@@ -395,7 +393,7 @@ namespace AwsMock::Database {
       return result;
 
     } catch (const mongocxx::exception &exc) {
-      _logger.error() << "Database exception " << exc.what() << std::endl;
+      log_error << "Database exception " << exc.what();
       throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
     }
 
@@ -415,7 +413,7 @@ namespace AwsMock::Database {
                                                               kvp("userPoolId", userPoolId),
                                                               kvp("userName", userName)));
         if (!mResult) {
-          _logger.error() << "Database exception: user not found " << std::endl;
+          log_error << "Database exception: user not found ";
           throw Core::DatabaseException("Database exception, user not found ", 500);
         }
 
@@ -424,7 +422,7 @@ namespace AwsMock::Database {
         return result;
 
       } catch (const mongocxx::exception &exc) {
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
       }
 
@@ -465,11 +463,11 @@ namespace AwsMock::Database {
         } else {
           count = _userCollection.count_documents(make_document());
         }
-        log_trace_stream(_logger) << "User count: " << count << std::endl;
+        log_trace << "User count: " << count;
         return count;
 
       } catch (mongocxx::exception::system_error &exc) {
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
       }
 
@@ -519,7 +517,7 @@ namespace AwsMock::Database {
         }
 
       } catch (const mongocxx::exception &exc) {
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
       }
 
@@ -528,7 +526,7 @@ namespace AwsMock::Database {
       users = _memoryDb.ListUsers(region, userPoolId);
     }
 
-    log_trace_stream(_logger) << "Got user list, size:" << users.size() << std::endl;
+    log_trace << "Got user list, size:" << users.size();
     return users;
   }
 
@@ -547,12 +545,12 @@ namespace AwsMock::Database {
                                                                 kvp("userPoolId", user.userPoolId),
                                                                 kvp("userName", user.userName)), user.ToDocument());
         session.commit_transaction();
-        log_trace_stream(_logger) << "Cognito user updated: " << user.ToString() << std::endl;
+        log_trace << "Cognito user updated: " << user.ToString();
         return GetUserByUserName(user.region, user.userPoolId, user.userName);
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
       }
 
@@ -591,12 +589,12 @@ namespace AwsMock::Database {
                                                                 kvp("userPoolId", user.userPoolId),
                                                                 kvp("userName", user.userName)));
         session.commit_transaction();
-        log_debug_stream(_logger) << "User deleted, userName: " << user.userName << " count: "
-                                  << result->deleted_count() << std::endl;
+        log_debug << "User deleted, userName: " << user.userName << " count: "
+                                  << result->deleted_count();
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
       }
 
@@ -620,11 +618,11 @@ namespace AwsMock::Database {
         session.start_transaction();
         auto result = _userCollection.delete_many({});
         session.commit_transaction();
-        log_debug_stream(_logger) << "All cognito users deleted, count: " << result->deleted_count() << std::endl;
+        log_debug << "All cognito users deleted, count: " << result->deleted_count();
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
       }
 

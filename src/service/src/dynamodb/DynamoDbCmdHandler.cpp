@@ -3,12 +3,11 @@
 
 namespace AwsMock::Service {
 
-  DynamoDbCmdHandler::DynamoDbCmdHandler(Core::Configuration &configuration, Core::MetricService &metricService)
-    : AbstractHandler(), _logger(Poco::Logger::get("DynamoDbCmdHandler")), _configuration(configuration), _metricService(metricService), _dynamoDbService(configuration, metricService) {
+  DynamoDbCmdHandler::DynamoDbCmdHandler(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractHandler(), _configuration(configuration), _metricService(metricService), _dynamoDbService(configuration, metricService) {
   }
 
   void DynamoDbCmdHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::DynamoDbClientCommand &clientCommand) {
-    log_debug_stream(_logger) << "DynamoDb POST request, URI: " << request.getURI() << " region: " << clientCommand.region << " user: " << clientCommand.user << " command: " << Dto::Common::DynamoDbCommandTypeToString(clientCommand.command) << std::endl;
+    log_debug << "DynamoDb POST request, URI: " << request.getURI() << " region: " << clientCommand.region << " user: " << clientCommand.user << " command: " << Dto::Common::DynamoDbCommandTypeToString(clientCommand.command);
 
     try {
 
@@ -36,7 +35,7 @@ namespace AwsMock::Service {
           } else {
             SendErrorResponse(response, tableResponse.body, tableResponse.headers, tableResponse.status);
           }
-          log_info_stream(_logger) << "Table created, name: " << tableRequest.tableName << std::endl;
+          log_info << "Table created, name: " << tableRequest.tableName;
 
           break;
         }
@@ -58,7 +57,7 @@ namespace AwsMock::Service {
           } else {
             SendErrorResponse(response, tableResponse.body, tableResponse.headers, tableResponse.status);
           }
-          log_info_stream(_logger) << "Table listed, region: " << tableRequest.region << std::endl;
+          log_info << "Table listed, region: " << tableRequest.region;
 
           break;
         }
@@ -190,12 +189,12 @@ namespace AwsMock::Service {
         }
 
         case Dto::Common::DynamoDbCommandType::UNKNOWN: {
-          log_error_stream(_logger) << "Bad request, method: POST clientCommand: " << Dto::Common::DynamoDbCommandTypeToString(clientCommand.command) << std::endl;
+          log_error << "Bad request, method: POST clientCommand: " << Dto::Common::DynamoDbCommandTypeToString(clientCommand.command);
           throw Core::ServiceException("Bad request, method: POST clientCommand: " + Dto::Common::DynamoDbCommandTypeToString(clientCommand.command));
         }
 
         default: {
-          log_error_stream(_logger) << "Bad request, method: POST clientCommand: " << Dto::Common::DynamoDbCommandTypeToString(clientCommand.command) << std::endl;
+          log_error << "Bad request, method: POST clientCommand: " << Dto::Common::DynamoDbCommandTypeToString(clientCommand.command);
           SendOkResponse(response);
         }
       }

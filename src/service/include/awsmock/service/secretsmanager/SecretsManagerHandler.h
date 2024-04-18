@@ -48,12 +48,6 @@ namespace AwsMock::Service {
      */
     void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
-  private:
-
-    /**
-     * Logger
-     */
-    Core::LogStream _logger;
   };
 
 } // namespace AwsMock::Service

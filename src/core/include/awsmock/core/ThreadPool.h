@@ -49,16 +49,15 @@ namespace AwsMock::Core {
      * @param max max size
      * @param waitTime thread wait time
 x       */
-    explicit ThreadPool(const std::string &name = DEFAULT_NAME, int initial = DEFAULT_INITIAL, int max = DEFAULT_MAX, int waitTime = DEFAULT_WAITTIME)
-        : _logger(Poco::Logger::get("ThreadPool")), Poco::ThreadPool(name, initial, max, waitTime), _initial(initial), _max(max), _idleTime(waitTime) {
-      log_debug_stream(_logger) << "Thread pool initialized, name: " + name + " initial: " << initial << " max: " << max << " waitTime: " << waitTime << std::endl;
+    explicit ThreadPool(const std::string &name = DEFAULT_NAME, int initial = DEFAULT_INITIAL, int max = DEFAULT_MAX, int waitTime = DEFAULT_WAITTIME) : Poco::ThreadPool(name, initial, max, waitTime), _initial(initial), _max(max), _idleTime(waitTime) {
+      log_debug << "Thread pool initialized, name: " + name + " initial: " << initial << " max: " << max << " waitTime: " << waitTime;
     }
 
     /**
      * Destructor
      */
     virtual ~ThreadPool() {
-      log_debug_stream(_logger) << "Shutting down thread pool, name: " << _name << std::endl;
+      log_debug << "Shutting down thread pool, name: " << _name;
       joinAll();
       _threads.clear();
     }
@@ -91,7 +90,7 @@ x       */
      */
     void DumpThreads() {
       for (auto &it : _threads) {
-        log_info_stream(_logger) << "Thread, name: " << it.first << " running: " << it.second->GetRunning() << std::endl;
+        log_info << "Thread, name: " << it.first << " running: " << it.second->GetRunning();
       }
     }
 
@@ -113,17 +112,12 @@ x       */
      */
     void WaitForAvailableThread() {
       while (!available()) {
-        log_debug_stream(_logger) << "Waiting for thread" << std::endl;
+        log_debug << "Waiting for thread";
         Poco::Thread::sleep(_idleTime);
         collect();
         CleanupThreads();
       }
     }
-
-    /**
-     * Logger
-     */
-    Core::LogStream _logger;
 
     /**
      * Name

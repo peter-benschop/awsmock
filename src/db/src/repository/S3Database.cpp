@@ -17,9 +17,7 @@ namespace AwsMock::Database {
       {"Deleted", {"s3:ObjectRemoved:Delete", "s3:ObjectRemoved:DeleteMarkerCreated"}}
   };
 
-  S3Database::S3Database()
-      : _logger(Poco::Logger::get("S3Database")), _memoryDb(S3MemoryDb::instance()), _useDatabase(HasDatabase()),
-        _databaseName(GetDatabaseName()) {}
+  S3Database::S3Database() : _memoryDb(S3MemoryDb::instance()), _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()) {}
 
   bool S3Database::BucketExists(const std::string &region, const std::string &name) {
 
@@ -31,11 +29,11 @@ namespace AwsMock::Database {
         mongocxx::collection _bucketCollection = (*client)[_databaseName]["s3_bucket"];
 
         int64_t count = _bucketCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
-        log_trace_stream(_logger) << "Bucket exists: " << (count > 0 ? "true" : "false") << std::endl;
+        log_trace << "Bucket exists: " << (count > 0 ? "true" : "false");
         return count > 0;
 
       } catch (const mongocxx::exception &exc) {
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -62,14 +60,14 @@ namespace AwsMock::Database {
 
         session.start_transaction();
         auto insert_one_result = _bucketCollection.insert_one(bucket.ToDocument());
-        log_trace_stream(_logger) << "Bucket created, oid: "
-                                  << insert_one_result->inserted_id().get_oid().value.to_string() << std::endl;
+        log_trace << "Bucket created, oid: "
+                  << insert_one_result->inserted_id().get_oid().value.to_string();
         session.commit_transaction();
         return GetBucketById(insert_one_result->inserted_id().get_oid().value);
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -89,11 +87,11 @@ namespace AwsMock::Database {
         mongocxx::collection _bucketCollection = (*client)[_databaseName]["s3_bucket"];
 
         long count = _bucketCollection.count_documents(make_document());
-        log_trace_stream(_logger) << "Bucket count: " << count << std::endl;
+        log_trace << "Bucket count: " << count;
         return count;
 
       } catch (mongocxx::exception::system_error &e) {
-        log_error_stream(_logger) << "Bucket count failed, error: " << e.what() << std::endl;
+        log_error << "Bucket count failed, error: " << e.what();
       }
 
     } else {
@@ -144,7 +142,7 @@ namespace AwsMock::Database {
 
       Entity::S3::Bucket result;
       result.FromDocument(mResult);
-      log_trace_stream(_logger) << "Got bucket: " << result.ToString() << std::endl;
+      log_trace << "Got bucket: " << result.ToString();
       return result;
 
     } else {
@@ -174,7 +172,7 @@ namespace AwsMock::Database {
       bucketList = _memoryDb.ListBuckets();
 
     }
-    log_trace_stream(_logger) << "Got bucket list, size:" << bucketList.size() << std::endl;
+    log_trace << "Got bucket list, size:" << bucketList.size();
     return bucketList;
   }
 
@@ -186,7 +184,7 @@ namespace AwsMock::Database {
       mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
       int64_t count =
           _objectCollection.count_documents(make_document(kvp("region", bucket.region), kvp("bucket", bucket.name)));
-      log_trace_stream(_logger) << "Objects exists: " << (count > 0 ? "true" : "false") << std::endl;
+      log_trace << "Objects exists: " << (count > 0 ? "true" : "false");
       return count > 0;
 
     } else {
@@ -210,13 +208,13 @@ namespace AwsMock::Database {
         auto result =
             _bucketCollection.replace_one(make_document(kvp("region", bucket.region), kvp("name", bucket.name)),
                                           bucket.ToDocument());
-        log_trace_stream(_logger) << "Bucket updated: " << bucket.ToString() << std::endl;
+        log_trace << "Bucket updated: " << bucket.ToString();
         session.commit_transaction();
         return GetBucketByRegionName(bucket.region, bucket.name);
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -273,7 +271,7 @@ namespace AwsMock::Database {
 
     }
 
-    log_trace_stream(_logger) << "Got object list, size:" << objectList.size() << std::endl;
+    log_trace << "Got object list, size:" << objectList.size();
 
     return objectList;
   }
@@ -312,7 +310,7 @@ namespace AwsMock::Database {
 
     }
 
-    log_trace_stream(_logger) << "Got object list in all buckets, size:" << objectList.size() << std::endl;
+    log_trace << "Got object list in all buckets, size:" << objectList.size();
     return objectList;
   }
 
@@ -329,11 +327,11 @@ namespace AwsMock::Database {
         session.start_transaction();
         auto delete_many_result = _bucketCollection.delete_one(make_document(kvp("name", bucket.name)));
         session.commit_transaction();
-        log_debug_stream(_logger) << "Bucket deleted, count: " << delete_many_result->deleted_count() << std::endl;
+        log_debug << "Bucket deleted, count: " << delete_many_result->deleted_count();
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -357,11 +355,11 @@ namespace AwsMock::Database {
         session.start_transaction();
         auto delete_many_result = _bucketCollection.delete_many({});
         session.commit_transaction();
-        log_debug_stream(_logger) << "All buckets deleted, count: " << delete_many_result->deleted_count() << std::endl;
+        log_debug << "All buckets deleted, count: " << delete_many_result->deleted_count();
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -381,7 +379,7 @@ namespace AwsMock::Database {
       int64_t count = _objectCollection.count_documents(make_document(kvp("region", object.region),
                                                                       kvp("bucket", object.bucket),
                                                                       kvp("key", object.key)));
-      log_trace_stream(_logger) << "Object exists: " << (count > 0 ? "true" : "false") << std::endl;
+      log_trace << "Object exists: " << (count > 0 ? "true" : "false");
       return count > 0;
 
     } else {
@@ -401,14 +399,14 @@ namespace AwsMock::Database {
 
         session.start_transaction();
         auto insert_one_result = _objectCollection.insert_one(object.ToDocument().view());
-        log_trace_stream(_logger) << "Object created, oid: "
-                                  << insert_one_result->inserted_id().get_oid().value.to_string() << std::endl;
+        log_trace << "Object created, oid: "
+                  << insert_one_result->inserted_id().get_oid().value.to_string();
         session.commit_transaction();
         return GetObjectById(insert_one_result->inserted_id().get_oid().value);
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -435,7 +433,7 @@ namespace AwsMock::Database {
       return result;
 
     } catch (mongocxx::exception::system_error &e) {
-      log_error_stream(_logger) << "Get object by ID failed, error: " << e.what() << std::endl;
+      log_error << "Get object by ID failed, error: " << e.what();
     }
     return {};
   }
@@ -477,13 +475,13 @@ namespace AwsMock::Database {
             _objectCollection.replace_one(make_document(kvp("region", object.region),
                                                         kvp("bucket", object.bucket),
                                                         kvp("key", object.key)), object.ToDocument());
-        log_trace_stream(_logger) << "Object updated: " << object.ToString() << std::endl;
+        log_trace << "Object updated: " << object.ToString();
         session.commit_transaction();
         return GetObject(object.region, object.bucket, object.key);
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -510,12 +508,12 @@ namespace AwsMock::Database {
           Entity::S3::Object result;
           result.FromDocument(mResult);
 
-          log_trace_stream(_logger) << "Got object: " << result.ToString() << std::endl;
+          log_trace << "Got object: " << result.ToString();
           return result;
         }
 
       } catch (const mongocxx::exception &exc) {
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -545,12 +543,12 @@ namespace AwsMock::Database {
         Entity::S3::Object result;
         result.FromDocument(mResult);
 
-        log_trace_stream(_logger) << "Got object MD5: " << result.ToString() << std::endl;
+        log_trace << "Got object MD5: " << result.ToString();
         return result;
       }
 
     } catch (const mongocxx::exception &exc) {
-      _logger.error() << "Database exception " << exc.what() << std::endl;
+      log_error << "Database exception " << exc.what();
       throw Core::DatabaseException(exc.what(), 500);
     }
     return {};
@@ -573,12 +571,12 @@ namespace AwsMock::Database {
         Entity::S3::Object result;
         result.FromDocument(mResult);
 
-        log_trace_stream(_logger) << "Got object version: " << result.ToString() << std::endl;
+        log_trace << "Got object version: " << result.ToString();
         return result;
       }
 
     } catch (const mongocxx::exception &exc) {
-      _logger.error() << "Database exception " << exc.what() << std::endl;
+      log_error << "Database exception " << exc.what();
       throw Core::DatabaseException(exc.what(), 500);
     }
     return {};
@@ -602,11 +600,11 @@ namespace AwsMock::Database {
         auto client = GetClient();
         mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
         long count = _objectCollection.count_documents({filter});
-        log_trace_stream(_logger) << "Object count: " << count << std::endl;
+        log_trace << "Object count: " << count;
         return count;
 
       } catch (mongocxx::exception::system_error &e) {
-        log_error_stream(_logger) << "Object count failed, error: " << e.what() << std::endl;
+        log_error << "Object count failed, error: " << e.what();
       }
 
     } else {
@@ -628,10 +626,10 @@ namespace AwsMock::Database {
         auto result = _objectCollection.delete_many(make_document(kvp("region", object.region),
                                                                   kvp("bucket", object.bucket),
                                                                   kvp("key", object.key)));
-        log_debug_stream(_logger) << "Objects deleted, count: " << result->deleted_count() << std::endl;
+        log_debug << "Objects deleted, count: " << result->deleted_count();
 
       } catch (const mongocxx::exception &exc) {
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -660,12 +658,12 @@ namespace AwsMock::Database {
         session.start_transaction();
         auto result = _objectCollection.delete_many(make_document(kvp("bucket", bucket),
                                                                   kvp("key", make_document(kvp("$in", array)))));
-        log_debug_stream(_logger) << "Objects deleted, count: " << result->result().deleted_count() << std::endl;
+        log_debug << "Objects deleted, count: " << result->result().deleted_count();
         session.commit_transaction();
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -689,11 +687,11 @@ namespace AwsMock::Database {
         session.start_transaction();
         auto result = _objectCollection.delete_many({});
         session.commit_transaction();
-        log_debug_stream(_logger) << "All objects deleted, count: " << result->deleted_count() << std::endl;
+        log_debug << "All objects deleted, count: " << result->deleted_count();
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -734,8 +732,7 @@ namespace AwsMock::Database {
       internBucket.notifications.emplace_back(bucketNotification);
     }
 
-    log_debug_stream(_logger) << "Bucket notification added, notification: " << bucketNotification.ToString()
-                              << std::endl;
+    log_debug << "Bucket notification added, notification: " << bucketNotification.ToString();
 
     return UpdateBucket(internBucket);
   }
@@ -771,8 +768,7 @@ namespace AwsMock::Database {
                                                       }), internBucket.notifications.end());
     }
 
-    log_trace_stream(_logger) << "Bucket notification deleted, notification: " << bucketNotification.ToString()
-                              << std::endl;
+    log_trace << "Bucket notification deleted, notification: " << bucketNotification.ToString();
 
     return UpdateBucket(internBucket);
   }

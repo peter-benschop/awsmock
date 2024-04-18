@@ -98,11 +98,6 @@ namespace AwsMock::Core {
   private:
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * Curl
      */
     CURL *curl{};

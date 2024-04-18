@@ -110,11 +110,6 @@ namespace AwsMock::Service {
     void StopLocalDynamoDb();
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * Configuration
      */
     Core::Configuration &_configuration;

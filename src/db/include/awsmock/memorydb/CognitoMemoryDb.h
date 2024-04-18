@@ -218,11 +218,6 @@ namespace AwsMock::Database {
     private:
 
       /**
-       * Logger
-       */
-      Core::LogStream _logger;
-
-      /**
        * Cognito user pool map
        */
       std::map<std::string, Entity::Cognito::UserPool> _userPools{};

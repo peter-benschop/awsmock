@@ -112,11 +112,6 @@ namespace AwsMock::Service {
     static std::string GetDockerTag(const Database::Entity::Lambda::Lambda &lambda);
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * Configuration
      */
     Core::Configuration &_configuration;

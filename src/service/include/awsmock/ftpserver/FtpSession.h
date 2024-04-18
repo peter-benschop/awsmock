@@ -233,11 +233,6 @@ namespace AwsMock::FtpServer {
   private:
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * Configuration
      */
     const Core::Configuration &_configuration;

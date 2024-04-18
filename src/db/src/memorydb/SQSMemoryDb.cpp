@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database {
 
-  SQSMemoryDb::SQSMemoryDb() : _logger(Poco::Logger::get("SQSMemoryDb")) {}
+  SQSMemoryDb::SQSMemoryDb() {}
 
   bool SQSMemoryDb::QueueExists(const std::string &region, const std::string &name) {
 
@@ -38,7 +38,7 @@ namespace AwsMock::Database {
 
     std::string oid = Poco::UUIDGenerator().createRandom().toString();
     _queues[oid] = queue;
-    log_trace_stream(_logger) << "Queue created, oid: " << oid << std::endl;
+    log_trace << "Queue created, oid: " << oid;
     return GetQueueById(oid);
   }
 
@@ -109,7 +109,7 @@ namespace AwsMock::Database {
       queueList.emplace_back(queue.second);
     }
 
-    log_trace_stream(_logger) << "Got queue list, size: " << queueList.size() << std::endl;
+    log_trace << "Got queue list, size: " << queueList.size();
     return queueList;
   }
 
@@ -120,7 +120,7 @@ namespace AwsMock::Database {
       auto const &[key, value] = item;
       return value.region == region && value.queueUrl == queueUrl;
     });
-    log_debug_stream(_logger) << "Purged queue, count: " << count << std::endl;
+    log_debug << "Purged queue, count: " << count;
   }
 
   Entity::SQS::Queue SQSMemoryDb::UpdateQueue(Entity::SQS::Queue &queue) {
@@ -153,7 +153,7 @@ namespace AwsMock::Database {
         }
       }
     }
-    log_trace_stream(_logger) << "Count queues, result: " << count << std::endl;
+    log_trace << "Count queues, result: " << count;
     return count;
   }
 
@@ -166,13 +166,13 @@ namespace AwsMock::Database {
       auto const &[key, value] = item;
       return value.region == region && value.queueUrl == queueUrl;
     });
-    log_debug_stream(_logger) << "Queue deleted, count: " << count << std::endl;
+    log_debug << "Queue deleted, count: " << count;
   }
 
   void SQSMemoryDb::DeleteAllQueues() {
     Poco::ScopedLock lock(_queueMutex);
 
-    log_debug_stream(_logger) << "All queues deleted, count: " << _queues.size() << std::endl;
+    log_debug << "All queues deleted, count: " << _queues.size();
     _queues.clear();
   }
 
@@ -181,7 +181,7 @@ namespace AwsMock::Database {
 
     std::string oid = Poco::UUIDGenerator().createRandom().toString();
     _messages[oid] = message;
-    log_trace_stream(_logger) << "Message created, oid: " << oid << std::endl;
+    log_trace << "Message created, oid: " << oid;
 
     return GetMessageById(oid);
   }
@@ -258,7 +258,7 @@ namespace AwsMock::Database {
 
     }
 
-    log_trace_stream(_logger) << "Got message list, size: " << messageList.size() << std::endl;
+    log_trace << "Got message list, size: " << messageList.size();
     return messageList;
   }
 
@@ -295,8 +295,8 @@ namespace AwsMock::Database {
       }
     }
 
-    log_trace_stream(_logger) << "Messages received, region: " << region << " queue: " << queueUrl + " count: "
-                              << messageList.size() << std::endl;
+    log_trace << "Messages received, region: " << region << " queue: " << queueUrl + " count: "
+                              << messageList.size();
   }
 
   void SQSMemoryDb::ResetMessages(const std::string &queueUrl, long visibility) {
@@ -317,8 +317,8 @@ namespace AwsMock::Database {
         _messages[message.first] = message.second;
         count++;
       }
-      log_trace_stream(_logger) << "Message reset, visibilityTimeout: " << visibility << " updated: " << count
-                                << " queue: " << queueUrl << std::endl;
+      log_trace << "Message reset, visibilityTimeout: " << visibility << " updated: " << count
+                                << " queue: " << queueUrl;
     }
   }
 
@@ -341,8 +341,8 @@ namespace AwsMock::Database {
         count++;
       }
     }
-    log_trace_stream(_logger) << "Message redrive, arn: " << redrivePolicy.deadLetterTargetArn << " updated: " << count
-                              << " queue: " << queueUrl << std::endl;
+    log_trace << "Message redrive, arn: " << redrivePolicy.deadLetterTargetArn << " updated: " << count
+                              << " queue: " << queueUrl;
   }
 
   void SQSMemoryDb::ResetDelayedMessages(const std::string &queueUrl, long delay) {
@@ -362,7 +362,7 @@ namespace AwsMock::Database {
         count++;
       }
     }
-    log_trace_stream(_logger) << "Delayed message reset, updated: " << count << " queue: " << queueUrl << std::endl;
+    log_trace << "Delayed message reset, updated: " << count << " queue: " << queueUrl;
   }
 
   void SQSMemoryDb::MessageRetention(const std::string &queueUrl, long retentionPeriod) {
@@ -380,7 +380,7 @@ namespace AwsMock::Database {
         count++;
       }
     }
-    log_trace_stream(_logger) << "Nessage retention reset, deleted: " << count << " queue: " << queueUrl << std::endl;
+    log_trace << "Nessage retention reset, deleted: " << count << " queue: " << queueUrl;
   }
 
   long SQSMemoryDb::CountMessages(const std::string &region, const std::string &queueUrl) {
@@ -416,7 +416,7 @@ namespace AwsMock::Database {
         }
       }
     }
-    log_trace_stream(_logger) << "Count messages, result: " << count << std::endl;
+    log_trace << "Count messages, result: " << count;
     return count;
   }
 
@@ -432,7 +432,7 @@ namespace AwsMock::Database {
         count++;
       }
     }
-    log_trace_stream(_logger) << "Count messages by status, result: " << count << std::endl;
+    log_trace << "Count messages by status, result: " << count;
     return count;
   }
 
@@ -444,7 +444,7 @@ namespace AwsMock::Database {
       return value.queueUrl == queueUrl;
     });
 
-    log_debug_stream(_logger) << "Messages deleted, queue: " << queueUrl << " count: " << count << std::endl;
+    log_debug << "Messages deleted, queue: " << queueUrl << " count: " << count;
   }
 
   void SQSMemoryDb::DeleteMessage(const Entity::SQS::Message &message) {
@@ -455,14 +455,14 @@ namespace AwsMock::Database {
       auto const &[key, value] = item;
       return value.receiptHandle == receiptHandle;
     });
-    log_debug_stream(_logger) << "Messages deleted, receiptHandle: " << message.receiptHandle << " count: " << count
-                              << std::endl;
+    log_debug << "Messages deleted, receiptHandle: " << message.receiptHandle << " count: " << count
+                             ;
   }
 
   void SQSMemoryDb::DeleteAllMessages() {
     Poco::ScopedLock lock(_messageMutex);
 
-    log_debug_stream(_logger) << "All messages deleted, count: " << _messages.size() << std::endl;
+    log_debug << "All messages deleted, count: " << _messages.size();
     _messages.clear();
   }
 }

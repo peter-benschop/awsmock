@@ -11,7 +11,7 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_document;
   using bsoncxx::builder::stream::document;
 
-  SNSDatabase::SNSDatabase() : _logger(Poco::Logger::get("SNSDatabase")), _memoryDb(SNSMemoryDb::instance()), _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()), _topicCollectionName("sns_topic"), _messageCollectionName("sns_message") {}
+  SNSDatabase::SNSDatabase() : _memoryDb(SNSMemoryDb::instance()), _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()), _topicCollectionName("sns_topic"), _messageCollectionName("sns_message") {}
 
   bool SNSDatabase::TopicExists(const std::string &topicArn) {
 
@@ -22,11 +22,11 @@ namespace AwsMock::Database {
         auto client = GetClient();
         mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
         int64_t count = _topicCollection.count_documents(make_document(kvp("topicArn", topicArn)));
-        log_trace_stream(_logger) << "Topic exists: " << (count > 0 ? "true" : "false") << std::endl;
+        log_trace << "Topic exists: " << (count > 0 ? "true" : "false");
         return count > 0;
 
       } catch (const mongocxx::exception &exc) {
-        _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+        log_error << "SNS Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -47,11 +47,11 @@ namespace AwsMock::Database {
         mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
         int64_t
           count = _topicCollection.count_documents(make_document(kvp("region", region), kvp("topicName", topicName)));
-        log_trace_stream(_logger) << "Topic exists: " << (count > 0 ? "true" : "false") << std::endl;
+        log_trace << "Topic exists: " << (count > 0 ? "true" : "false");
         return count > 0;
 
       } catch (const mongocxx::exception &exc) {
-        _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+        log_error << "SNS Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -75,14 +75,14 @@ namespace AwsMock::Database {
         session.start_transaction();
         auto result = _topicCollection.insert_one(topic.ToDocument());
         session.commit_transaction();
-        log_trace_stream(_logger) << "Topic created, oid: " << result->inserted_id().get_oid().value.to_string()
-                                  << std::endl;
+        log_trace << "Topic created, oid: " << result->inserted_id().get_oid().value.to_string()
+                                 ;
 
         return GetTopicById(result->inserted_id().get_oid().value);
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+        log_error << "SNS Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -109,7 +109,7 @@ namespace AwsMock::Database {
       }
 
     } catch (const mongocxx::exception &exc) {
-      _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+      log_error << "SNS Database exception " << exc.what();
       throw Core::DatabaseException(exc.what(), 500);
     }
     return {};
@@ -143,7 +143,7 @@ namespace AwsMock::Database {
         return result;
 
       } catch (const mongocxx::exception &exc) {
-        _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+        log_error << "SNS Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -171,7 +171,7 @@ namespace AwsMock::Database {
         }
 
       } catch (const mongocxx::exception &exc) {
-        _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+        log_error << "SNS Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -213,7 +213,7 @@ namespace AwsMock::Database {
         }
 
       } catch (const mongocxx::exception &exc) {
-        _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+        log_error << "SNS Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -222,7 +222,7 @@ namespace AwsMock::Database {
       topicList = _memoryDb.ListTopics(region);
 
     }
-    log_trace_stream(_logger) << "Got topic list, size:" << topicList.size() << std::endl;
+    log_trace << "Got topic list, size:" << topicList.size();
     return topicList;
   }
 
@@ -240,14 +240,14 @@ namespace AwsMock::Database {
         auto result =
           _topicCollection.replace_one(make_document(kvp("region", topic.region), kvp("topicArn", topic.topicArn)),
                                        topic.ToDocument());
-        log_trace_stream(_logger) << "Topic updated: " << topic.ToString() << std::endl;
+        log_trace << "Topic updated: " << topic.ToString();
         session.commit_transaction();
 
         return GetTopicByArn(topic.topicArn);
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+        log_error << "SNS Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -280,11 +280,11 @@ namespace AwsMock::Database {
         auto client = GetClient();
         mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
         long count = _topicCollection.count_documents(make_document(kvp("region", region)));
-        log_trace_stream(_logger) << "Count topics, result: " << count << std::endl;
+        log_trace << "Count topics, result: " << count;
         return count;
 
       } catch (const mongocxx::exception &exc) {
-        _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+        log_error << "SNS Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -307,12 +307,12 @@ namespace AwsMock::Database {
 
         session.start_transaction();
         auto result = _topicCollection.delete_many(make_document(kvp("topicArn", topic.topicArn)));
-        log_debug_stream(_logger) << "Topic deleted, count: " << result->deleted_count() << std::endl;
+        log_debug << "Topic deleted, count: " << result->deleted_count();
         session.commit_transaction();
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+        log_error << "SNS Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -336,11 +336,11 @@ namespace AwsMock::Database {
         session.start_transaction();
         auto result = _topicCollection.delete_many({});
         session.commit_transaction();
-        log_debug_stream(_logger) << "All topics deleted, count: " << result->deleted_count() << std::endl;
+        log_debug << "All topics deleted, count: " << result->deleted_count();
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+        log_error << "SNS Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -360,11 +360,11 @@ namespace AwsMock::Database {
         auto client = GetClient();
         mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
         int64_t count = _messageCollection.count_documents(make_document(kvp("_id", id)));
-        log_trace_stream(_logger) << "Message exists: " << (count > 0 ? "true" : "false") << std::endl;
+        log_trace << "Message exists: " << (count > 0 ? "true" : "false");
         return count > 0;
 
       } catch (const mongocxx::exception &exc) {
-        _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+        log_error << "SNS Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -387,14 +387,14 @@ namespace AwsMock::Database {
 
         session.start_transaction();
         auto result = _messageCollection.insert_one(message.ToDocument());
-        log_trace_stream(_logger) << "Message created, oid: " << result->inserted_id().get_oid().value.to_string() << std::endl;
+        log_trace << "Message created, oid: " << result->inserted_id().get_oid().value.to_string();
         session.commit_transaction();
 
         return GetMessageById(result->inserted_id().get_oid().value);
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+        log_error << "SNS Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -417,7 +417,7 @@ namespace AwsMock::Database {
 
       return result;
     } catch (const mongocxx::exception &exc) {
-      _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+      log_error << "SNS Database exception " << exc.what();
       throw Core::DatabaseException(exc.what(), 500);
     }
   }
@@ -442,12 +442,12 @@ namespace AwsMock::Database {
         } else {
           count = _messageCollection.count_documents({});
         }
-        log_trace_stream(_logger) << "Count messages, region: " << region << " arn: " << topicArn << " result: "
-                                  << count << std::endl;
+        log_trace << "Count messages, region: " << region << " arn: " << topicArn << " result: "
+                                  << count;
         return count;
 
       } catch (const mongocxx::exception &exc) {
-        _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+        log_error << "SNS Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -472,12 +472,12 @@ namespace AwsMock::Database {
                                                                       kvp("topicArn", topicArn),
                                                                       kvp("status",
                                                                           Entity::SNS::MessageStatusToString(status))));
-        log_trace_stream(_logger) << "Count messages by state, region: " << region << " arn: " << topicArn
-                                  << " result: " << count << std::endl;
+        log_trace << "Count messages by state, region: " << region << " arn: " << topicArn
+                                  << " result: " << count;
         return count;
 
       } catch (const mongocxx::exception &exc) {
-        _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+        log_error << "SNS Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -519,7 +519,7 @@ namespace AwsMock::Database {
       messageList = _memoryDb.ListMessages(region);
 
     }
-    log_trace_stream(_logger) << "Got message list, size: " << messageList.size() << std::endl;
+    log_trace << "Got message list, size: " << messageList.size();
     return messageList;
   }
 
@@ -536,7 +536,7 @@ namespace AwsMock::Database {
       auto mResult = _messageCollection.find_one_and_update(make_document(kvp("_id", bsoncxx::oid{message.oid})),
                                                             message.ToDocument(),
                                                             opts);
-      log_trace_stream(_logger) << "Message updated, count: " << bsoncxx::to_json(mResult->view()) << std::endl;
+      log_trace << "Message updated, count: " << bsoncxx::to_json(mResult->view());
 
       if (!mResult) {
         throw Core::DatabaseException("Update message failed, oid: " + message.oid);
@@ -577,13 +577,13 @@ namespace AwsMock::Database {
 
         session.start_transaction();
         auto result = _messageCollection.delete_one(make_document(kvp("messageId", message.messageId)));
-        log_debug_stream(_logger) << "Messages deleted, messageId: " << message.messageId << " count: "
-                                  << result->deleted_count() << std::endl;
+        log_debug << "Messages deleted, messageId: " << message.messageId << " count: "
+                                  << result->deleted_count();
         session.commit_transaction();
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+        log_error << "SNS Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -615,12 +615,12 @@ namespace AwsMock::Database {
         auto result = _messageCollection.delete_many(make_document(kvp("region", region),
                                                                    kvp("topicArn", topicArn),
                                                                    kvp("messageId", make_document(kvp("$in", array)))));
-        log_debug_stream(_logger) << "Messages deleted, count: " << result->result().deleted_count() << std::endl;
+        log_debug << "Messages deleted, count: " << result->result().deleted_count();
         session.commit_transaction();
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+        log_error << "SNS Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 
@@ -640,10 +640,10 @@ namespace AwsMock::Database {
         auto client = GetClient();
         mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
         auto result = _messageCollection.delete_many({});
-        log_debug_stream(_logger) << "All messages deleted, count: " << result->deleted_count() << std::endl;
+        log_debug << "All messages deleted, count: " << result->deleted_count();
 
       } catch (const mongocxx::exception &exc) {
-        _logger.error() << "SNS Database exception " << exc.what() << std::endl;
+        log_error << "SNS Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), 500);
       }
 

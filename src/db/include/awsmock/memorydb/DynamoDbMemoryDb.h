@@ -156,11 +156,6 @@ namespace AwsMock::Database {
   private:
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * Table map
      */
     std::map<std::string, Entity::DynamoDb::Table> _tables{};

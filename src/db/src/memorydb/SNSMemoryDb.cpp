@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database {
 
-  SNSMemoryDb::SNSMemoryDb() : _logger(Poco::Logger::get("SQSMemoryDb")) {}
+  SNSMemoryDb::SNSMemoryDb() {}
 
   bool SNSMemoryDb::TopicExists(const std::string &region, const std::string &name) {
 
@@ -76,7 +76,7 @@ namespace AwsMock::Database {
 
     std::string oid = Poco::UUIDGenerator().createRandom().toString();
     _topics[oid] = topic;
-    log_trace_stream(_logger) << "Topic created, oid: " << oid << std::endl;
+    log_trace << "Topic created, oid: " << oid;
     return GetTopicById(oid);
 
   }
@@ -115,7 +115,7 @@ namespace AwsMock::Database {
 
     }
 
-    log_trace_stream(_logger) << "Got topic list, size: " << topicList.size() << std::endl;
+    log_trace << "Got topic list, size: " << topicList.size();
     return topicList;
   }
 
@@ -146,13 +146,13 @@ namespace AwsMock::Database {
       auto const &[key, value] = item;
       return value.region == region && value.topicArn == arn;
     });
-    log_debug_stream(_logger) << "Topic deleted, count: " << count << std::endl;
+    log_debug << "Topic deleted, count: " << count;
   }
 
   void SNSMemoryDb::DeleteAllTopics() {
     Poco::ScopedLock loc(_topicMutex);
 
-    log_debug_stream(_logger) << "All topics deleted, count: " << _topics.size() << std::endl;
+    log_debug << "All topics deleted, count: " << _topics.size();
     _topics.clear();
   }
 
@@ -170,7 +170,7 @@ namespace AwsMock::Database {
 
     std::string oid = Poco::UUIDGenerator().createRandom().toString();
     _messages[oid] = message;
-    log_trace_stream(_logger) << "Message created, oid: " << oid << std::endl;
+    log_trace << "Message created, oid: " << oid;
     return GetMessageById(oid);
 
   }
@@ -239,7 +239,7 @@ namespace AwsMock::Database {
       }
     }
 
-    log_trace_stream(_logger) << "Got message list, size: " << messageList.size() << std::endl;
+    log_trace << "Got message list, size: " << messageList.size();
     return messageList;
   }
 
@@ -263,8 +263,8 @@ namespace AwsMock::Database {
       auto const &[key, value] = item;
       return value.messageId == messageId;
     });
-    log_debug_stream(_logger) << "Message deleted, messageId: " << message.messageId << " count: " << count
-                              << std::endl;
+    log_debug << "Message deleted, messageId: " << message.messageId << " count: " << count
+                             ;
   }
 
   void SNSMemoryDb::DeleteMessages(const std::string &region,
@@ -279,13 +279,13 @@ namespace AwsMock::Database {
         return value.region == region && value.topicArn == topicArn && value.messageId == messageId;
       }));
     }
-    log_debug_stream(_logger) << "Messages deleted, count: " << count << " count: " << count << std::endl;
+    log_debug << "Messages deleted, count: " << count << " count: " << count;
   }
 
   void SNSMemoryDb::DeleteAllMessages() {
     Poco::ScopedLock loc(_messageMutex);
 
-    log_debug_stream(_logger) << "All messages deleted, count: " << _messages.size() << std::endl;
+    log_debug << "All messages deleted, count: " << _messages.size();
     _messages.clear();
   }
 }

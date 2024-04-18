@@ -2,23 +2,23 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include "awsmock/service/transfer/TransferService.h"
+#include <awsmock/service/transfer/TransferService.h>
 
 namespace AwsMock::Service {
 
-  TransferService::TransferService(Core::Configuration &configuration) : _logger(Poco::Logger::get("TransferService")), _configuration(configuration),_transferDatabase(Database::TransferDatabase::instance()) {
+  TransferService::TransferService(Core::Configuration &configuration) : _configuration(configuration),_transferDatabase(Database::TransferDatabase::instance()) {
 
     // Initialize environment
     _ftpPort = _configuration.getInt("awsmock.module.transfer.ftp.port", TRANSFER_DEFAULT_FTP_PORT);
     _accountId = _configuration.getString("awsmock.account.userPoolId", "000000000000");
 
-    log_trace_stream(_logger) << "Transfer module initialized" << std::endl;
+    log_trace << "Transfer module initialized";
   }
 
   Dto::Transfer::CreateServerResponse
   TransferService::CreateTransferServer(Dto::Transfer::CreateServerRequest &request) {
 
-    log_debug_stream(_logger) << "Create transfer manager" << std::endl;
+    log_debug << "Create transfer manager";
 
     // Check existence
     if (_transferDatabase.TransferExists(request.region, request.protocols)) {
@@ -48,7 +48,7 @@ namespace AwsMock::Service {
 
   Dto::Transfer::CreateUserResponse
   TransferService::CreateUser(Dto::Transfer::CreateUserRequest &request) {
-    log_debug_stream(_logger) << "Create user request" << std::endl;
+    log_debug << "Create user request";
 
     Database::Entity::Transfer::Transfer transferEntity;
 
@@ -82,7 +82,7 @@ namespace AwsMock::Service {
 
       // Update database
       transferEntity = _transferDatabase.UpdateTransfer(transferEntity);
-      log_debug_stream(_logger) << "Updated transfer manager, serverId: " << transferEntity.serverId << std::endl;
+      log_debug << "Updated transfer manager, serverId: " << transferEntity.serverId;
     }
 
     // Create response
@@ -107,11 +107,11 @@ namespace AwsMock::Service {
         response.servers.emplace_back(server);
       }
 
-      log_trace_stream(_logger) << "Server list outcome: " + response.ToJson() << std::endl;
+      log_trace << "Server list outcome: " + response.ToJson();
       return response;
 
     } catch (Poco::Exception &ex) {
-      log_error_stream(_logger) << "Server list request failed, message: " << ex.message() << std::endl;
+      log_error << "Server list request failed, message: " << ex.message();
       throw Core::ServiceException(ex.message(), 500);
     }
   }
@@ -130,7 +130,7 @@ namespace AwsMock::Service {
       // Update state, rest will be done by transfer worker
       server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::ONLINE);
       server = _transferDatabase.UpdateTransfer(server);
-      log_info_stream(_logger) << "Transfer manager started, serverId: " << server.serverId << std::endl;
+      log_info << "Transfer manager started, serverId: " << server.serverId;
 
     } catch (Poco::Exception &ex) {
 
@@ -138,7 +138,7 @@ namespace AwsMock::Service {
       server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::START_FAILED);
       server = _transferDatabase.UpdateTransfer(server);
 
-      log_error_stream(_logger) << "Start manager request failed, serverId: " << server.serverId << " message: " << ex.message() << std::endl;
+      log_error << "Start manager request failed, serverId: " << server.serverId << " message: " << ex.message();
       throw Core::ServiceException(ex.message(), 500);
     }
   }
@@ -157,7 +157,7 @@ namespace AwsMock::Service {
       // Update state, rest will be done by transfer worker
       server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::OFFLINE);
       server = _transferDatabase.UpdateTransfer(server);
-      log_info_stream(_logger) << "Transfer manager stopped, serverId: " << server.serverId << std::endl;
+      log_info << "Transfer manager stopped, serverId: " << server.serverId;
 
     } catch (Poco::Exception &ex) {
 
@@ -165,7 +165,7 @@ namespace AwsMock::Service {
       server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::STOP_FAILED);
       server = _transferDatabase.UpdateTransfer(server);
 
-      log_error_stream(_logger) << "Stop manager request failed, serverId: " << server.serverId << " message: " << ex.message() << std::endl;
+      log_error << "Stop manager request failed, serverId: " << server.serverId << " message: " << ex.message();
       throw Core::ServiceException(ex.message(), 500);
     }
   }
@@ -184,10 +184,10 @@ namespace AwsMock::Service {
       // Update state, rest will be done by transfer worker
       server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::OFFLINE);
       server = _transferDatabase.UpdateTransfer(server);
-      log_info_stream(_logger) << "Transfer manager stopped, serverId: " << server.serverId << std::endl;
+      log_info << "Transfer manager stopped, serverId: " << server.serverId;
 
       _transferDatabase.DeleteTransfer(request.serverId);
-      log_info_stream(_logger) << "Transfer manager deleted, serverId: " << server.serverId << std::endl;
+      log_info << "Transfer manager deleted, serverId: " << server.serverId;
 
     } catch (Poco::Exception &ex) {
 
@@ -195,7 +195,7 @@ namespace AwsMock::Service {
       server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::STOP_FAILED);
       server = _transferDatabase.UpdateTransfer(server);
 
-      log_error_stream(_logger) << "Start manager request failed, serverId: " << server.serverId << " message: " << ex.message() << std::endl;
+      log_error << "Start manager request failed, serverId: " << server.serverId << " message: " << ex.message();
       throw Core::ServiceException(ex.message(), 500);
     }
   }

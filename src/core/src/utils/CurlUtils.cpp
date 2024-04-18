@@ -6,7 +6,7 @@
 
 namespace AwsMock::Core {
 
-  CurlUtils::CurlUtils() : _logger(Poco::Logger::get("CurlUtils")) {}
+  CurlUtils::CurlUtils() {}
 
   CurlResponse CurlUtils::SendUnixSocketRequest(const std::string &method, const std::string &path) {
 
@@ -16,7 +16,7 @@ namespace AwsMock::Core {
 
     curl = curl_easy_init();
     if (!curl) {
-      log_error_stream(_logger) << "Error while initiating curl" << std::endl;
+      log_error << "Error while initiating curl";
       curl_easy_cleanup(curl);
       return {};
     }
@@ -36,7 +36,7 @@ namespace AwsMock::Core {
 
     res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
-      log_error_stream(_logger) << "Request send failed, url: " << path << " error: " << curl_easy_strerror(res) << std::endl;
+      log_error << "Request send failed, url: " << path << " error: " << curl_easy_strerror(res);
     }
 
     int status = 0;
@@ -59,7 +59,7 @@ namespace AwsMock::Core {
     }
     curl = curl_easy_init();
     if (!curl) {
-      log_error_stream(_logger) << "Error while initiating curl" << std::endl;
+      log_error << "Error while initiating curl";
       curl_easy_cleanup(curl);
       return {};
     }
@@ -80,7 +80,7 @@ namespace AwsMock::Core {
 
     res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
-      log_error_stream(_logger) << "Request send failed, path: " << path << " error: " << curl_easy_strerror(res) << std::endl;
+      log_error << "Request send failed, path: " << path << " error: " << curl_easy_strerror(res);
     }
 
     int status = 0;
@@ -101,7 +101,7 @@ namespace AwsMock::Core {
     _readBuffer = {};
     curl = curl_easy_init();
     if (!curl) {
-      log_error_stream(_logger) << "Error while initiating curl" << std::endl;
+      log_error << "Error while initiating curl";
       curl_easy_cleanup(curl);
       return {};
     }
@@ -129,7 +129,7 @@ namespace AwsMock::Core {
 
     res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
-      log_error_stream(_logger) << "Request send failed, path: " << path << " error: " << curl_easy_strerror(res) << std::endl;
+      log_error << "Request send failed, path: " << path << " error: " << curl_easy_strerror(res);
     }
 
     int status = 0;
@@ -150,7 +150,7 @@ namespace AwsMock::Core {
     _readBuffer = {};
     curl = curl_easy_init();
     if (!curl) {
-      log_error_stream(_logger) << "Error while initiating curl" << std::endl;
+      log_error << "Error while initiating curl";
       curl_easy_cleanup(curl);
       return {};
     }
@@ -191,7 +191,7 @@ namespace AwsMock::Core {
 
     res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
-      log_error_stream(_logger) << "Request send failed, path: " << path << " error: " << curl_easy_strerror(res) << std::endl;
+      log_error << "Request send failed, path: " << path << " error: " << curl_easy_strerror(res);
     }
 
     int status = 0;
@@ -214,7 +214,7 @@ namespace AwsMock::Core {
     }
     curl = curl_easy_init();
     if (!curl) {
-      log_error_stream(_logger) << "Error while initiating curl" << std::endl;
+      log_error << "Error while initiating curl";
       curl_easy_cleanup(curl);
       return {};
     }
@@ -249,7 +249,7 @@ namespace AwsMock::Core {
 
     res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
-      log_error_stream(_logger) << "Request send failed, url: " << path << " error: " << curl_easy_strerror(res) << std::endl;
+      log_error << "Request send failed, url: " << path << " error: " << curl_easy_strerror(res);
     }
 
     int status = 0;
@@ -259,7 +259,7 @@ namespace AwsMock::Core {
     if (status == 200 && !_readBuffer.empty()) {
       response.output = _readBuffer;
     }
-    log_debug_stream(_logger) << "Request send to docker daemon, state: " << status << std::endl;
+    log_debug << "Request send to docker daemon, state: " << status;
 
     // Cleanup
     curl_easy_cleanup(curl);

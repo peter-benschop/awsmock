@@ -10,7 +10,7 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_array;
   using bsoncxx::builder::basic::make_document;
 
-  DynamoDbDatabase::DynamoDbDatabase() : _logger(Poco::Logger::get("DynamoDbDatabase")), _memoryDb(DynamoDbMemoryDb::instance()), _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()), _tableCollectionName("dynamodb_table") {}
+  DynamoDbDatabase::DynamoDbDatabase() : _memoryDb(DynamoDbMemoryDb::instance()), _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()), _tableCollectionName("dynamodb_table") {}
 
   Entity::DynamoDb::Table DynamoDbDatabase::CreateTable(const Entity::DynamoDb::Table &table) {
 
@@ -25,13 +25,13 @@ namespace AwsMock::Database {
         session.start_transaction();
         auto result = _tableCollection.insert_one(table.ToDocument());
         session.commit_transaction();
-        log_trace_stream(_logger) << "DynamoDb table created, oid: "
-                                  << result->inserted_id().get_oid().value.to_string() << std::endl;
+        log_trace << "DynamoDb table created, oid: "
+                                  << result->inserted_id().get_oid().value.to_string();
         return GetTableById(result->inserted_id().get_oid().value);
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        log_error_stream(_logger) << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()));
       }
 
@@ -51,17 +51,17 @@ namespace AwsMock::Database {
       mongocxx::stdx::optional<bsoncxx::document::value>
         mResult = _tableCollection.find_one(make_document(kvp("_id", oid)));
       if (!mResult) {
-        log_error_stream(_logger) << "Database exception: Table not found " << std::endl;
+        log_error << "Database exception: Table not found ";
         throw Core::DatabaseException("Database exception, Table not found ");
       }
 
       Entity::DynamoDb::Table result;
       result.FromDocument(mResult);
-      _logger.debug() << "Got table by ID, table: " << result.ToString() << std::endl;
+      log_debug << "Got table by ID, table: " << result.ToString();
       return result;
 
     } catch (const mongocxx::exception &exc) {
-      log_error_stream(_logger) << "Database exception " << exc.what() << std::endl;
+      log_error << "Database exception " << exc.what();
       throw Core::DatabaseException("Database exception " + std::string(exc.what()));
     }
 
@@ -78,17 +78,17 @@ namespace AwsMock::Database {
         mongocxx::stdx::optional<bsoncxx::document::value>
           mResult = _tableCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
         if (!mResult) {
-          log_error_stream(_logger) << "Database exception: Table not found " << std::endl;
+          log_error << "Database exception: Table not found ";
           throw Core::DatabaseException("Database exception, Table not found ");
         }
 
         Entity::DynamoDb::Table result;
         result.FromDocument(mResult);
-        _logger.debug() << "Got table by ID, table: " << result.ToString() << std::endl;
+        log_debug << "Got table by ID, table: " << result.ToString();
         return result;
 
       } catch (const mongocxx::exception &exc) {
-        log_error_stream(_logger) << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()));
       }
 
@@ -126,11 +126,11 @@ namespace AwsMock::Database {
         } else {
           count = _tableCollection.count_documents(make_document(kvp("name", tableName)));
         }
-        log_trace_stream(_logger) << "DynamoDb table exists: " << (count > 0 ? "true" : "false") << std::endl;
+        log_trace << "DynamoDb table exists: " << (count > 0 ? "true" : "false");
         return count > 0;
 
       } catch (const mongocxx::exception &exc) {
-        log_error_stream(_logger) << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()));
       }
 
@@ -171,7 +171,7 @@ namespace AwsMock::Database {
         }
 
       } catch (const mongocxx::exception &exc) {
-        log_error_stream(_logger) << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()));
       }
 
@@ -180,7 +180,7 @@ namespace AwsMock::Database {
       tables = _memoryDb.ListTables(region);
     }
 
-    log_trace_stream(_logger) << "Got DynamoDb table list, size:" << tables.size() << std::endl;
+    log_trace << "Got DynamoDb table list, size:" << tables.size();
     return tables;
   }
 
@@ -211,12 +211,12 @@ namespace AwsMock::Database {
         auto result = _tableCollection.replace_one(make_document(kvp("region", table.region), kvp("name", table.name)),
                                                    table.ToDocument());
         session.commit_transaction();
-        log_trace_stream(_logger) << "DynamoDB table updated: " << table.ToString() << std::endl;
+        log_trace << "DynamoDB table updated: " << table.ToString();
         return GetTableByRegionName(table.region, table.name);
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        log_error_stream(_logger) << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
       }
 
@@ -240,11 +240,11 @@ namespace AwsMock::Database {
         session.start_transaction();
         auto result = _tableCollection.delete_many(make_document(kvp("region", region), kvp("name", tableName)));
         session.commit_transaction();
-        log_debug_stream(_logger) << "DynamoDB table deleted, tableName: " << tableName << " region: " << region << std::endl;
+        log_debug << "DynamoDB table deleted, tableName: " << tableName << " region: " << region;
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        log_error_stream(_logger) << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()));
       }
 
@@ -268,11 +268,11 @@ namespace AwsMock::Database {
         session.start_transaction();
         auto result = _tableCollection.delete_many({});
         session.commit_transaction();
-        log_debug_stream(_logger) << "All DynamoDb tables deleted, count: " << result->deleted_count() << std::endl;
+        log_debug << "All DynamoDb tables deleted, count: " << result->deleted_count();
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        log_error_stream(_logger) << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()));
       }
 
@@ -297,11 +297,11 @@ namespace AwsMock::Database {
         } else {
           count = _tableCollection.count_documents(make_document(kvp("name", tableName)));
         }
-        log_trace_stream(_logger) << "DynamoDb table exists: " << (count > 0 ? "true" : "false") << std::endl;
+        log_trace << "DynamoDb table exists: " << (count > 0 ? "true" : "false");
         return count > 0;
 
       } catch (const mongocxx::exception &exc) {
-        log_error_stream(_logger) << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()));
       }
 
@@ -351,7 +351,7 @@ namespace AwsMock::Database {
         }
 
       } catch (const mongocxx::exception &exc) {
-        log_error_stream(_logger) << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()));
       }
 
@@ -360,7 +360,7 @@ namespace AwsMock::Database {
       items = _memoryDb.ListItems(region, tableName);
     }
 
-    log_trace_stream(_logger) << "Got DynamoDb item list, size:" << items.size() << std::endl;
+    log_trace << "Got DynamoDb item list, size:" << items.size();
     return items;
   }
 
@@ -373,11 +373,11 @@ namespace AwsMock::Database {
         auto client = GetClient();
         mongocxx::collection _itemCollection = (*client)[_databaseName]["dynamodb_item"];
         auto result = _itemCollection.delete_many(make_document(kvp("name", tableName)));
-        log_debug_stream(_logger) << "DynamoDB item deleted, tableName: " << tableName << " count: "
-                                  << result->deleted_count() << std::endl;
+        log_debug << "DynamoDB item deleted, tableName: " << tableName << " count: "
+                                  << result->deleted_count();
 
       } catch (const mongocxx::exception &exc) {
-        log_error_stream(_logger) << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()));
       }
 
@@ -397,10 +397,10 @@ namespace AwsMock::Database {
         auto client = GetClient();
         mongocxx::collection _itemCollection = (*client)[_databaseName]["dynamodb_item"];
         auto result = _itemCollection.delete_many({});
-        log_debug_stream(_logger) << "DynamoDB items deleted, count: " << result->deleted_count() << std::endl;
+        log_debug << "DynamoDB items deleted, count: " << result->deleted_count();
 
       } catch (const mongocxx::exception &exc) {
-        log_error_stream(_logger) << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException("Database exception " + std::string(exc.what()));
       }
 

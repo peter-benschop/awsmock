@@ -53,11 +53,6 @@ namespace AwsMock::Service {
   private:
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * Metric module
      */
     Core::MetricService& _metricService = Core::MetricService::instance();

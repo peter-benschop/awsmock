@@ -82,12 +82,6 @@ namespace AwsMock {
      * Initialize the configuration and add the default configuration options.
      */
     void InitializeConfig();
-
-  private:
-    /**
-     * Logger
-     */
-    Poco::Logger &_logger = Poco::Logger::get("Configuration");
   };
 }
 #endif //AWS_MOCK_CONFIGURATION_H

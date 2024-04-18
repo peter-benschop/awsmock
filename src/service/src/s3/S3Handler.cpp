@@ -1,14 +1,13 @@
 
-#include "awsmock/service/s3/S3Handler.h"
+#include <awsmock/service/s3/S3Handler.h>
 
 namespace AwsMock::Service {
 
-  S3Handler::S3Handler(Core::Configuration &configuration, Core::MetricService &metricService) : S3CmdHandler(configuration, metricService), _logger(Poco::Logger::get("S3Handler")), _configuration(configuration), _metricService(metricService),
-                                                                                                 _s3Service(configuration) {
+  S3Handler::S3Handler(Core::Configuration &configuration, Core::MetricService &metricService) : S3CmdHandler(configuration, metricService), _configuration(configuration), _metricService(metricService), _s3Service(configuration) {
   }
 
   void S3Handler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    log_debug_stream(_logger) << "S3 GET request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
+    log_debug << "S3 GET request, URI: " + request.getURI() << " region: " << region << " user: " + user;
 
     Dto::Common::S3ClientCommand clientCommand;
     clientCommand.FromRequest(Dto::Common::HttpMethod::GET, request, region, user);
@@ -17,7 +16,7 @@ namespace AwsMock::Service {
   }
 
   void S3Handler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    log_debug_stream(_logger) << "S3 PUT request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+    log_debug << "S3 PUT request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 
     Dto::Common::S3ClientCommand clientCommand;
     clientCommand.FromRequest(Dto::Common::HttpMethod::PUT, request, region, user);
@@ -26,7 +25,7 @@ namespace AwsMock::Service {
   }
 
   void S3Handler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    log_debug_stream(_logger) << "S3 POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+    log_debug << "S3 POST request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 
     Dto::Common::S3ClientCommand clientCommand;
     clientCommand.FromRequest(Dto::Common::HttpMethod::POST, request, region, user);
@@ -35,7 +34,7 @@ namespace AwsMock::Service {
   }
 
   void S3Handler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    log_debug_stream(_logger) << "S3 DELETE request, URI: " + request.getURI() << " region: " << region << " user: " << user << std::endl;
+    log_debug << "S3 DELETE request, URI: " + request.getURI() << " region: " << region << " user: " << user;
 
     Dto::Common::S3ClientCommand clientCommand;
     clientCommand.FromRequest(Dto::Common::HttpMethod::DELETE, request, region, user);
@@ -44,14 +43,14 @@ namespace AwsMock::Service {
   }
 
   void S3Handler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    log_trace_stream(_logger) << "S3 HEAD request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+    log_trace << "S3 HEAD request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 
     try {
 
       std::string tmp = request.getURI();
       std::string bucket = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
       std::string key = Core::HttpUtils::GetPathParametersFromIndex(request.getURI(), 1);
-      log_debug_stream(_logger) << "S3 HEAD request, bucket: " << bucket << " key: " << key << std::endl;
+      log_debug << "S3 HEAD request, bucket: " << bucket << " key: " << key;
 
       Dto::S3::GetMetadataRequest s3Request = {.region=region, .bucket=bucket, .key=key};
       Dto::S3::GetMetadataResponse s3Response = _s3Service.GetMetadata(s3Request);
@@ -74,10 +73,10 @@ namespace AwsMock::Service {
       SendHeadResponse(response, headerMap);
 
     } catch (Poco::Exception &exc) {
-      log_warning_stream(_logger) << exc.message() << std::endl;
+      log_warning << exc.message();
       SendXmlErrorResponse("S3", response, exc);
     } catch (std::exception &exc) {
-      log_error_stream(_logger) << exc.what() << std::endl;
+      log_error << exc.what();
     }
   }
 }

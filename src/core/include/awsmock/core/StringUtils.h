@@ -201,6 +201,16 @@ namespace AwsMock::Core {
     static std::string SubStringAfter(const std::string &string, const std::string &delimiter);
 
     /**
+     * Replace in C-string.
+     *
+     * @param original original
+     * @param pattern pattern
+     * @param replacement replacement string
+     * @return
+     */
+    static char *Replace(char const *original, char const *pattern, char const *replacement);
+
+    /**
      * Left trim a string.
      *
      * @param s input string

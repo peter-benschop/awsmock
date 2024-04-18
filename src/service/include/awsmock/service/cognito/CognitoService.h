@@ -33,82 +33,77 @@ namespace AwsMock::Service {
 
   class CognitoService {
 
-    public:
+  public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration module configuration
-       */
-      explicit CognitoService(Core::Configuration &configuration);
+    /**
+     * Constructor
+     *
+     * @param configuration module configuration
+     */
+    explicit CognitoService(Core::Configuration &configuration);
 
-      /**
-       * Create a new cognito user pool
-       *
-       * @param request create user pool request
-       * @return CreateUserPoolRequest DTO
-       */
-      Dto::Cognito::CreateUserPoolResponse CreateUserPool(const Dto::Cognito::CreateUserPoolRequest &request);
+    /**
+     * Create a new cognito user pool
+     *
+     * @param request create user pool request
+     * @return CreateUserPoolRequest DTO
+     */
+    Dto::Cognito::CreateUserPoolResponse CreateUserPool(const Dto::Cognito::CreateUserPoolRequest &request);
 
-      /**
-       * List cognito user pools
-       *
-       * @param request list user pool request
-       * @return ListUserPoolResponse DTO
-       */
-      Dto::Cognito::ListUserPoolResponse ListUserPools(const Dto::Cognito::ListUserPoolRequest &request);
+    /**
+     * List cognito user pools
+     *
+     * @param request list user pool request
+     * @return ListUserPoolResponse DTO
+     */
+    Dto::Cognito::ListUserPoolResponse ListUserPools(const Dto::Cognito::ListUserPoolRequest &request);
 
-      /**
-       * Delete a cognito user pool
-       *
-       * @param request delete user pool request
-       */
-      void DeleteUserPool(const Dto::Cognito::DeleteUserPoolRequest &request);
+    /**
+     * Delete a cognito user pool
+     *
+     * @param request delete user pool request
+     */
+    void DeleteUserPool(const Dto::Cognito::DeleteUserPoolRequest &request);
 
-      /**
-       * Create a new cognito user
-       *
-       * @param request create user request
-       * @return AdminCreateUserResponse DTO
-       */
-      Dto::Cognito::AdminCreateUserResponse AdminCreateUser(const Dto::Cognito::AdminCreateUserRequest &request);
+    /**
+     * Create a new cognito user
+     *
+     * @param request create user request
+     * @return AdminCreateUserResponse DTO
+     */
+    Dto::Cognito::AdminCreateUserResponse AdminCreateUser(const Dto::Cognito::AdminCreateUserRequest &request);
 
-      /**
-       * List cognito users
-       *
-       * @param request list user request
-       * @return ListUsersResponse DTO
-       */
-      Dto::Cognito::ListUsersResponse ListUsers(const Dto::Cognito::ListUsersRequest &request);
+    /**
+     * List cognito users
+     *
+     * @param request list user request
+     * @return ListUsersResponse DTO
+     */
+    Dto::Cognito::ListUsersResponse ListUsers(const Dto::Cognito::ListUsersRequest &request);
 
-      /**
-       * Deletes a cognito user
-       *
-       * @param request delete user request
-       */
-      void AdminDeleteUser(const Dto::Cognito::AdminDeleteUserRequest &request);
+    /**
+     * Deletes a cognito user
+     *
+     * @param request delete user request
+     */
+    void AdminDeleteUser(const Dto::Cognito::AdminDeleteUserRequest &request);
 
-    private:
+  private:
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+    /**
+     * Configuration
+     */
+    Core::Configuration &_configuration;
 
-      /**
-       * Configuration
-       */
-      Core::Configuration &_configuration;
+    /**
+     * Database connection
+     */
+    Database::CognitoDatabase &_database;
 
-      /**
-       * Database connection
-       */
-      Database::CognitoDatabase &_database;
-
-      /**
-       * S3 account userPoolId
-       */
-      std::string _accountId;
+    /**
+     * S3 account userPoolId
+     */
+    std::string _accountId;
   };
 
 } // namespace AwsMock::Service

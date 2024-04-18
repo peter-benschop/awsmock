@@ -31,7 +31,7 @@ namespace AwsMock::Core {
      * @param exc poco exception
      */
     void exception(const Poco::Exception &exc) override {
-      log_error_stream(_logger) << "Unhandled POCO exception: " + exc.displayText() + " in class: " + exc.className() << std::endl;
+      log_error << "Unhandled POCO exception: " + exc.displayText() + " in class: " + exc.className();
     }
 
     /**
@@ -40,14 +40,14 @@ namespace AwsMock::Core {
      * @param exc standard exception
      */
     void exception(const std::exception &exc) override {
-      log_error_stream(_logger) << "Unhandled STD exception: " << std::string(exc.what()) << std::endl;
+      log_error << "Unhandled STD exception: " << std::string(exc.what());
     }
 
     /**
      * All other exceptions
      */
     void exception() override {
-      log_error_stream(_logger) << "Unknown exception" << std::endl;
+      log_error << "Unknown exception";
     }
 
   private:

@@ -6,11 +6,11 @@
 
 namespace AwsMock::Service {
 
-  CognitoService::CognitoService(Core::Configuration &configuration) : _logger(Poco::Logger::get("CognitoService")), _configuration(configuration), _database(Database::CognitoDatabase::instance()) {
+  CognitoService::CognitoService(Core::Configuration &configuration) : _configuration(configuration), _database(Database::CognitoDatabase::instance()) {
   }
 
   Dto::Cognito::CreateUserPoolResponse CognitoService::CreateUserPool(const Dto::Cognito::CreateUserPoolRequest &request) {
-    log_debug_stream(_logger) << "Create user pool request, region:  " << request.region << " name: " << request.name << std::endl;
+    log_debug << "Create user pool request, region:  " << request.region << " name: " << request.name;
 
     Dto::Cognito::CreateUserPoolResponse response{};
     if (_database.UserPoolExists(request.region, request.name)) {
@@ -29,17 +29,17 @@ namespace AwsMock::Service {
           .region=userPool.region,
           .name=userPool.name
       };
-      log_trace_stream(_logger) << "Create user pool outcome: " + response.ToJson() << std::endl;
+      log_trace << "Create user pool outcome: " + response.ToJson();
       return response;
 
     } catch (Poco::Exception &ex) {
-      log_error_stream(_logger) << "Create user pool request failed, message: " << ex.message() << std::endl;
+      log_error << "Create user pool request failed, message: " << ex.message();
       throw Core::ServiceException(ex.message(), 500);
     }
   }
 
   Dto::Cognito::ListUserPoolResponse CognitoService::ListUserPools(const Dto::Cognito::ListUserPoolRequest &request) {
-    log_debug_stream(_logger) << "List user pools request, maxResults: " << request.maxResults << std::endl;
+    log_debug << "List user pools request, maxResults: " << request.maxResults;
 
     Dto::Cognito::ListUserPoolResponse response{};
 
@@ -47,17 +47,17 @@ namespace AwsMock::Service {
 
       std::vector<Database::Entity::Cognito::UserPool> userPools = _database.ListUserPools(request.region);
       response = Dto::Cognito::ListUserPoolResponse(userPools);
-      log_trace_stream(_logger) << "User pool list outcome: " + response.ToJson() << std::endl;
+      log_trace << "User pool list outcome: " + response.ToJson();
       return response;
 
     } catch (Poco::Exception &ex) {
-      log_error_stream(_logger) << "User pool list request failed, message: " << ex.message() << std::endl;
+      log_error << "User pool list request failed, message: " << ex.message();
       throw Core::ServiceException(ex.message(), 500);
     }
   }
 
   void CognitoService::DeleteUserPool(const Dto::Cognito::DeleteUserPoolRequest &request) {
-    log_debug_stream(_logger) << "Delete user pool request, userPoolId:  " << request.userPoolId << std::endl;
+    log_debug << "Delete user pool request, userPoolId:  " << request.userPoolId;
 
     if (!_database.UserPoolExists(request.userPoolId)) {
       throw Core::ServiceException("User pool does not exists, userPoolId: " + request.userPoolId);
@@ -66,16 +66,16 @@ namespace AwsMock::Service {
     try {
 
       _database.DeleteUserPool(request.userPoolId);
-      log_trace_stream(_logger) << "User pool deleted, userPoolId: " + request.userPoolId << std::endl;
+      log_trace << "User pool deleted, userPoolId: " + request.userPoolId;
 
     } catch (Poco::Exception &ex) {
-      log_error_stream(_logger) << "Create user pool request failed, message: " << ex.message() << std::endl;
+      log_error << "Create user pool request failed, message: " << ex.message();
       throw Core::ServiceException(ex.message(), 500);
     }
   }
 
   Dto::Cognito::AdminCreateUserResponse CognitoService::AdminCreateUser(const Dto::Cognito::AdminCreateUserRequest &request) {
-    log_debug_stream(_logger) << "Admin create user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId << std::endl;
+    log_debug << "Admin create user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId;
 
     if (!_database.UserPoolExists(request.userPoolId)) {
       throw Core::ServiceException("User pool does not exists, userPoolId: " + request.userPoolId);
@@ -101,18 +101,18 @@ namespace AwsMock::Service {
           .userName=user.userName,
           .enabled=user.enabled
       };
-      log_trace_stream(_logger) << "Create user response: " + response.ToJson() << std::endl;
+      log_trace << "Create user response: " + response.ToJson();
       return response;
 
     } catch (Poco::Exception &ex) {
-      log_error_stream(_logger) << "Create user request failed, message: " << ex.message() << std::endl;
+      log_error << "Create user request failed, message: " << ex.message();
       throw Core::ServiceException(ex.message(), 500);
     }
 
   }
 
   Dto::Cognito::ListUsersResponse CognitoService::ListUsers(const Dto::Cognito::ListUsersRequest &request) {
-    log_debug_stream(_logger) << "List users request, region: " << request.region << " userPoolId: " << request.userPoolId << std::endl;
+    log_debug << "List users request, region: " << request.region << " userPoolId: " << request.userPoolId;
 
     Dto::Cognito::ListUsersResponse response{};
 
@@ -120,17 +120,17 @@ namespace AwsMock::Service {
 
       Database::Entity::Cognito::UserList users = _database.ListUsers(request.region, request.userPoolId);
       response.users = users;
-      log_trace_stream(_logger) << "Users list outcome: " + response.ToJson() << std::endl;
+      log_trace << "Users list outcome: " + response.ToJson();
       return response;
 
     } catch (Poco::Exception &ex) {
-      log_error_stream(_logger) << "User list request failed, message: " << ex.message() << std::endl;
+      log_error << "User list request failed, message: " << ex.message();
       throw Core::ServiceException(ex.message(), 500);
     }
   }
 
   void CognitoService::AdminDeleteUser(const Dto::Cognito::AdminDeleteUserRequest &request) {
-    log_debug_stream(_logger) << "Admin delete user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId << std::endl;
+    log_debug << "Admin delete user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId;
 
     if (!_database.UserPoolExists(request.userPoolId)) {
       throw Core::ServiceException("User pool does not exists, userPoolId: " + request.userPoolId);
@@ -144,10 +144,10 @@ namespace AwsMock::Service {
       Database::Entity::Cognito::User user = _database.GetUserByUserName(request.region, request.userPoolId, request.userName);
 
       _database.DeleteUser(user);
-      log_trace_stream(_logger) << "User deleted, userName:  " << request.userName << " userPoolId: " << request.userPoolId << std::endl;
+      log_trace << "User deleted, userName:  " << request.userName << " userPoolId: " << request.userPoolId;
 
     } catch (Poco::Exception &ex) {
-      log_error_stream(_logger) << "Delete user request failed, message: " << ex.message() << std::endl;
+      log_error << "Delete user request failed, message: " << ex.message();
       throw Core::ServiceException(ex.message(), 500);
     }
 

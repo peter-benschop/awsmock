@@ -336,11 +336,6 @@ namespace AwsMock::Database {
     private:
 
       /**
-       * Logger
-       */
-      Core::LogStream _logger;
-
-      /**
        * Allowed event types
        */
       static std::map<std::string, std::vector<std::string>> allowedEventTypes;

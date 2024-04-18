@@ -6,11 +6,11 @@
 
 namespace AwsMock::Controller {
 
-  Router::Router(Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap) : _logger(Poco::Logger::get("Router")), _configuration(configuration), _metricService(metricService), _serverMap(serverMap) {
+  Router::Router(Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap) : _configuration(configuration), _metricService(metricService), _serverMap(serverMap) {
 
     // Add routes
     AddRoute("module", "AwsMock::Resource::Factory::ModuleFactory");
-    log_debug_stream(_logger) << "Router initialized" << std::endl;
+    log_debug << "Router initialized";
   }
 
   Poco::Net::HTTPRequestHandler *Router::createRequestHandler(const Poco::Net::HTTPServerRequest &request) {
@@ -18,7 +18,7 @@ namespace AwsMock::Controller {
     // Get the authorization header
     std::string scheme, authInfo;
     request.getCredentials(scheme, authInfo);
-    log_debug_stream(_logger) << "Schema: " << scheme << " Authorization: " << authInfo << "URI: " << request.getURI() << " Method: " + request.getMethod() << std::endl;
+    log_debug << "Schema: " << scheme << " Authorization: " << authInfo << "URI: " << request.getURI() << " Method: " + request.getMethod();
 
     // Get the module from the request authorization header. Currently, no credentials checks are made.
     std::string service = GetModule(authInfo);
@@ -33,23 +33,23 @@ namespace AwsMock::Controller {
     // Get the resource factory index for the module
     auto factoryIndex = _routingTable.find(service);
     if (factoryIndex == _routingTable.end()) {
-      log_error_stream(_logger) << "No routing found, module: " + service << std::endl;
+      log_error << "No routing found, module: " + service;
       return new AwsMock::ResourceNotFound();
     }
 
     // Get the resource factory for the module
     Resource::Factory::IFactory *factory = Resource::Factory::Factory::createResourceFactory(factoryIndex->second);
     if (!factory) {
-      log_error_stream(_logger) << "Request handler for route: " << route << " not found" << std::endl;
+      log_error << "Request handler for route: " << route << " not found";
       return new AwsMock::ResourceNotFound();
     }
-    log_debug_stream(_logger) << "Found request handler for route: " << route << " factory: " << factoryIndex->second << std::endl;
+    log_debug << "Found request handler for route: " << route << " factory: " << factoryIndex->second;
     return factory->createResource(_configuration, _metricService, _serverMap);
   }
 
   void Router::AddRoute(const std::string &route, const std::string &factory) {
 
-    log_debug_stream(_logger) << "Route added, route: " << route << " factory: " << factory << std::endl;
+    log_debug << "Route added, route: " << route << " factory: " << factory;
     _routingTable[route] = factory;
   }
 
@@ -58,12 +58,12 @@ namespace AwsMock::Controller {
     Poco::RegularExpression::MatchVec posVec;
     Poco::RegularExpression pattern(R"(Credential=[a-zA-Z0-9]+\/[0-9]{8}\/[a-zA-Z0-9\-]+\/([a-zA-Z0-9]+)\/aws4_request,.*$)");
     if (!pattern.match(authorization, 0, posVec)) {
-      log_error_stream(_logger) << "Could not extract module, authorization: " << authorization << std::endl;
+      log_error << "Could not extract module, authorization: " << authorization;
       throw Core::ResourceNotFoundException("Could not extract module");
     }
 
     std::string module = authorization.substr(posVec[1].offset, posVec[1].length);
-    log_debug_stream(_logger) << "Found module: " << module << std::endl;
+    log_debug << "Found module: " << module;
 
     return module;
   }

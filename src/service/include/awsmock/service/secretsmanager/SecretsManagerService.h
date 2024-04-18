@@ -120,11 +120,6 @@ namespace AwsMock::Service {
   private:
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * Account ID
      */
     std::string _accountId;

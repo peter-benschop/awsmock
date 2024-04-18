@@ -238,11 +238,6 @@ namespace AwsMock::Database {
     private:
 
       /**
-       * Logger
-       */
-      Core::LogStream _logger;
-
-      /**
        * S3 bucket map, when running without database
        */
       std::map<std::string, Entity::S3::Bucket> _buckets;

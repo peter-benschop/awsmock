@@ -6,15 +6,14 @@
 
 namespace AwsMock::Service {
 
-  AbstractWorker::AbstractWorker(const Core::Configuration &configuration)
-      : _logger(Poco::Logger::get("AbstractWorker")), _configuration(configuration) {
+  AbstractWorker::AbstractWorker(const Core::Configuration &configuration) : _configuration(configuration) {
 
     // Create environment
     _region = _configuration.getString("awsmock.region");
     _clientId = _configuration.getString("awsmock.client.userPoolId", "00000000");
     _user = _configuration.getString("awsmock.user", "none");
 
-    log_debug_stream(_logger) << "AbstractWorker initialized" << std::endl;
+    log_debug << "AbstractWorker initialized";
   }
 
   void AbstractWorker::SendPostRequest(const std::string &module, const std::string &url, const std::string &body, const std::string &contentType) {
@@ -27,7 +26,7 @@ namespace AwsMock::Service {
     Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, path, Poco::Net::HTTPMessage::HTTP_1_1);
     request.add("Content-Type", contentType);
     AddAuthorization(module, request);
-    log_debug_stream(_logger) << "Request send, url: " << url << std::endl;
+    log_debug << "Request send, url: " << url;
 
     // Send request
     std::ostream &os = session.sendRequest(request);
@@ -39,9 +38,9 @@ namespace AwsMock::Service {
     // Get the response state
     Poco::Net::HTTPResponse response;
     if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
-      log_error_stream(_logger) << "HTTP error, state: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
+      log_error << "HTTP error, state: " + std::to_string(response.getStatus()) + " reason: " + response.getReason();
     }
-    log_debug_stream(_logger) << "POST request send, state: " << response.getStatus() << std::endl;
+    log_debug << "POST request send, state: " << response.getStatus();
 
   }
 
@@ -55,7 +54,7 @@ namespace AwsMock::Service {
     Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_PUT, path, Poco::Net::HTTPMessage::HTTP_1_1);
     request.add("Content-Type", contentType);
     AddAuthorization(module, request);
-    log_debug_stream(_logger) << "Request send, url: " << url << std::endl;
+    log_debug << "Request send, url: " << url;
 
     // Send request
     if (body.empty()) {
@@ -70,9 +69,9 @@ namespace AwsMock::Service {
     // Get the response state
     Poco::Net::HTTPResponse response;
     if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
-      log_error_stream(_logger) << "HTTP error, state: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
+      log_error << "HTTP error, state: " + std::to_string(response.getStatus()) + " reason: " + response.getReason();
     }
-    log_debug_stream(_logger) << "PUT request send, state: " << response.getStatus() << std::endl;
+    log_debug << "PUT request send, state: " << response.getStatus();
 
   }
 
@@ -86,7 +85,7 @@ namespace AwsMock::Service {
     Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_DELETE, path, Poco::Net::HTTPMessage::HTTP_1_1);
     request.add("Content-Type", contentType);
     AddAuthorization(module, request);
-    log_debug_stream(_logger) << "Request send, url: " << url << std::endl;
+    log_debug << "Request send, url: " << url;
 
     // Send request
     if (body.empty()) {
@@ -101,9 +100,9 @@ namespace AwsMock::Service {
     // Get the response state
     Poco::Net::HTTPResponse response;
     if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
-      log_error_stream(_logger) << "HTTP error, state: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
+      log_error << "HTTP error, state: " + std::to_string(response.getStatus()) + " reason: " + response.getReason();
     }
-    log_debug_stream(_logger) << "DELETE request send, state: " << response.getStatus() << std::endl;
+    log_debug << "DELETE request send, state: " << response.getStatus();
   }
 
   bool AbstractWorker::SendHeadRequest(const std::string &module, const std::string &url, const std::string &contentType) {
@@ -116,14 +115,14 @@ namespace AwsMock::Service {
     Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_HEAD, path, Poco::Net::HTTPMessage::HTTP_1_1);
     request.add("Content-Type", contentType);
     AddAuthorization(module, request);
-    log_debug_stream(_logger) << "HEAD request created, url: " << url << std::endl;
+    log_debug << "HEAD request created, url: " << url;
 
     // Send request
     session.sendRequest(request);
 
     // Get the response state
     Poco::Net::HTTPResponse response;
-    log_debug_stream(_logger) << "HEAD head request send, state: " << response.getStatus() << std::endl;
+    log_debug << "HEAD head request send, state: " << response.getStatus();
     return response.getStatus() == Poco::Net::HTTPResponse::HTTP_OK;
   }
 
@@ -133,7 +132,7 @@ namespace AwsMock::Service {
       Core::CurlUtils curlUtils;
       Core::CurlResponse response = curlUtils.SendFileHttpRequest("PUT", url, fileName, headers);
       if(response.statusCode != 200) {
-        log_error_stream(_logger) << "Send file failed, fileName: " << fileName << " status: " << response.statusCode << " output: " << response.output <<std::endl;
+        log_error << "Send file failed, fileName: " << fileName << " status: " << response.statusCode << " output: " << response.output <<std::endl;
       }
 
       // Setup the URI
@@ -156,24 +155,24 @@ namespace AwsMock::Service {
         request.add(it.first, it.second);
       }
       AddAuthorization(module, request);
-      log_debug_stream(_logger) << "Request send, url: " << url << std::endl;
+      log_debug<< "Request send, url: " << url;
 
       // Send request
       std::ifstream ifs(fileName);
       std::ostream &os = session.sendRequest(request);
       long copied = Poco::StreamCopier::copyStream(ifs, os);
-      log_debug_stream(_logger) << "Body send, file: " << fileName << " size: " << copied << std::endl;
+      log_debug<< "Body send, file: " << fileName << " size: " << copied;
 
       // Get the response state
       Poco::Net::HTTPResponse response;
       session.receiveResponse(response);
       if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
-        log_error_stream(_logger) << "HTTP error, state: " + std::to_string(response.getStatus()) + " reason: " + response.getReason() << std::endl;
+        log_error << "HTTP error, state: " + std::to_string(response.getStatus()) + " reason: " + response.getReason();
       }
-      log_debug_stream(_logger) << "Send file request send, state: " << response.getStatus() << std::endl;*/
+      log_debug<< "Send file request send, state: " << response.getStatus();*/
 
     } catch (Poco::Exception &exc) {
-      log_error_stream(_logger) << "Send file failed, fileName: " << fileName << " error: " << exc.message() << std::endl;
+      log_error << "Send file failed, fileName: " << fileName << " error: " << exc.message();
     }
   }
 

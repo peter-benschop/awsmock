@@ -213,7 +213,7 @@ namespace AwsMock::Core {
     // Write all lines to temp other than the line marked for erasing
     while (getline(fin, line)) {
       if (!StringUtils::ContainsIgnoreCase(line, "chunk-signature"))
-        temp << line << std::endl;
+        temp << line;
     }
 
     temp.close();

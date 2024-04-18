@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-  LambdaCreator::LambdaCreator(Core::Configuration &configuration) : _logger(Poco::Logger::get("LambdaCreator")), _configuration(configuration), _lambdaDatabase(Database::LambdaDatabase::instance()), _dockerService(configuration) {
+  LambdaCreator::LambdaCreator(Core::Configuration &configuration) : _configuration(configuration), _lambdaDatabase(Database::LambdaDatabase::instance()), _dockerService(configuration) {
 
     // Configuration
     _dataDir = _configuration.getString("awsmock.data.dir", "/tmp/awsmock/data");
@@ -15,14 +15,14 @@ namespace AwsMock::Service {
 
   void LambdaCreator::CreateLambdaFunction(const std::string &functionCode, const std::string &functionId) {
 
-    log_debug_stream(_logger) << "Start creating lambda function, oid: " << functionId << std::endl;
+    log_debug << "Start creating lambda function, oid: " << functionId;
 
     // Make local copy
     Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase.GetLambdaById(functionId);
 
     // Docker tag
     std::string dockerTag = GetDockerTag(lambdaEntity);
-    log_debug_stream(_logger) << "Using docker tag: " << dockerTag << std::endl;
+    log_debug << "Using docker tag: " << dockerTag;
 
     // Build the docker image, if not existing
     if (!_dockerService.ImageExists(lambdaEntity.function, dockerTag)) {
@@ -52,19 +52,19 @@ namespace AwsMock::Service {
     lambdaEntity.stateReason = "Activated";
     _lambdaDatabase.UpdateLambda(lambdaEntity);
 
-    log_debug_stream(_logger) << "Lambda function started: " << lambdaEntity.function << ":" << dockerTag << std::endl;
+    log_debug << "Lambda function started: " << lambdaEntity.function << ":" << dockerTag;
   }
 
   void LambdaCreator::CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {
 
     if (zipFile.empty()) {
-      log_error_stream(_logger) << "Empty lambda zip file" << std::endl;
+      log_error << "Empty lambda zip file";
       return;
     }
 
     // Unzip provided zip-file into a temporary directory
     std::string codeDir = UnpackZipFile(zipFile, lambdaEntity.runtime, lambdaEntity.fileName);
-    log_debug_stream(_logger) << "Lambda file unzipped, codeDir: " << codeDir << std::endl;
+    log_debug << "Lambda file unzipped, codeDir: " << codeDir;
 
     // Build the docker image using the docker module
     std::string imageFile = _dockerService.BuildImage(codeDir, lambdaEntity.function, dockerTag, lambdaEntity.handler, lambdaEntity.runtime, lambdaEntity.environment.variables);
@@ -78,8 +78,8 @@ namespace AwsMock::Service {
 
     // Cleanup
     Core::DirUtils::DeleteDirectory(codeDir);
-    log_debug_stream(_logger) << "Docker image created, name: " << lambdaEntity.function << " size: " << lambdaEntity.codeSize << std::endl;
-    log_debug_stream(_logger) << "Using port: " << lambdaEntity.hostPort << std::endl;
+    log_debug << "Docker image created, name: " << lambdaEntity.function << " size: " << lambdaEntity.codeSize;
+    log_debug << "Using port: " << lambdaEntity.hostPort;
   }
 
   void LambdaCreator::CreateDockerContainer(Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {
@@ -88,9 +88,9 @@ namespace AwsMock::Service {
       std::vector<std::string> environment = GetEnvironment(lambdaEntity.environment);
       Dto::Docker::CreateContainerResponse
         containerCreateResponse = _dockerService.CreateContainer(lambdaEntity.function, dockerTag, environment, lambdaEntity.hostPort);
-      log_debug_stream(_logger) << "Lambda container created, hostPort: " << lambdaEntity.hostPort << std::endl;
+      log_debug << "Lambda container created, hostPort: " << lambdaEntity.hostPort;
     } catch (std::exception &exc) {
-      log_error_stream(_logger) << exc.what() << std::endl;
+      log_error << exc.what();
     }
   }
 
@@ -120,7 +120,7 @@ namespace AwsMock::Service {
         Poco::Zip::Decompress dec(input, Poco::Path(classesDir));
         dec.decompressAllFiles();
         input.clear();
-        log_debug_stream(_logger) << "ZIP file unpacked, dir: " << codeDir << std::endl;
+        log_debug << "ZIP file unpacked, dir: " << codeDir;
 
       } else {
 
@@ -134,12 +134,12 @@ namespace AwsMock::Service {
 
         // Decompress
         Core::ExecResult result = Core::SystemUtils::Exec("unzip -o -d " + codeDir + " " + _tempDir + "/zipfile.zip");
-        log_debug_stream(_logger) << "ZIP file unpacked, dir: " << codeDir << " result: " << result.status << std::endl;
+        log_debug << "ZIP file unpacked, dir: " << codeDir << " result: " << result.status;
       }
       return codeDir;
 
     } catch (Poco::Exception &exc) {
-      log_error_stream(_logger) << "Could not unzip lambda code, error: " << exc.message() << std::endl;
+      log_error << "Could not unzip lambda code, error: " << exc.message();
     }
     return {};
   }
@@ -151,7 +151,7 @@ namespace AwsMock::Service {
     for (const auto &variable : lambdaEnvironment.variables) {
       environment.emplace_back(variable.first + "=" + variable.second);
     }
-    log_debug_stream(_logger) << "lambda runtime environment converted, size: " << environment.size() << std::endl;
+    log_debug << "lambda runtime environment converted, size: " << environment.size();
     return environment;
   }
 

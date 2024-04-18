@@ -366,11 +366,6 @@ namespace AwsMock::Database {
   private:
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * SQS queue vector, when running without database
      */
     std::map<std::string, Entity::SQS::Queue> _queues;

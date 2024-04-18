@@ -68,7 +68,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
       }
 
     } catch (Poco::Exception &exc) {
-      std::cerr << exc.message() << std::endl;
+      std::cerr << exc.message();
       throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
   }

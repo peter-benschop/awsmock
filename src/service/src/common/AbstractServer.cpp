@@ -6,11 +6,10 @@
 
 namespace AwsMock::Service {
 
-  AbstractServer::AbstractServer(Core::Configuration &configuration, std::string name)
-    : Timer(name, 10), _logger(Poco::Logger::get("AbstractServer")), _configuration(configuration), _moduleDatabase(Database::ModuleDatabase::instance()), _name(std::move(name)), _running(false) {
+  AbstractServer::AbstractServer(Core::Configuration &configuration, std::string name) : Timer(name, 10), _configuration(configuration), _moduleDatabase(Database::ModuleDatabase::instance()), _name(std::move(name)), _running(false) {
 
     // Create environment
-    log_debug_stream(_logger) << "AbstractServer initialized, name: " << _name << std::endl;
+    log_debug << "AbstractServer initialized, name: " << _name;
   }
 
   bool AbstractServer::IsActive(const std::string &name) {
@@ -30,7 +29,7 @@ namespace AwsMock::Service {
 
   void AbstractServer::StopServer() {
     _condition.broadcast();
-    log_debug_stream(_logger) << "Stop broadcast" << std::endl;
+    log_debug << "Stop broadcast";
   }
 
   void AbstractServer::StartHttpServer(int maxQueueLength, int maxThreads, int requestTimeout, const std::string &host, int port, Poco::Net::HTTPRequestHandlerFactory *requestFactory) {
@@ -41,7 +40,7 @@ namespace AwsMock::Service {
     httpServerParams->setMaxThreads(maxThreads);
     httpServerParams->setTimeout(Poco::Timespan(requestTimeout, 0));
     httpServerParams->setKeepAlive(true);
-    log_debug_stream(_logger) << "HTTP server parameter set, name: " << _name << " maxQueue: " << maxQueueLength << " maxThreads: " << maxThreads << std::endl;
+    log_debug << "HTTP server parameter set, name: " << _name << " maxQueue: " << maxQueueLength << " maxThreads: " << maxThreads;
 
     _moduleDatabase.SetPort(_name, port);
     _httpServer = std::make_shared<Poco::Net::HTTPServer>(requestFactory, Poco::Net::ServerSocket(Poco::UInt16(port)), httpServerParams);
@@ -51,13 +50,13 @@ namespace AwsMock::Service {
     _running = true;
     _moduleDatabase.SetState(_name, Database::Entity::Module::ModuleState::RUNNING);
 
-    log_info_stream(_logger) << "HTTP server " << _name << " started, endpoint: http://" << host << ":" << port << std::endl;
+    log_info << "HTTP server " << _name << " started, endpoint: http://" << host << ":" << port;
   }
 
   void AbstractServer::StopHttpServer() {
     if (_httpServer) {
       _httpServer->stopAll(true);
-      log_debug_stream(_logger) << "HTTP server stopped: " << _name << std::endl;
+      log_debug << "HTTP server stopped: " << _name;
     }
   }
 

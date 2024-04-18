@@ -3,11 +3,11 @@
 
 namespace AwsMock::Service {
 
-  SecretsManagerHandler::SecretsManagerHandler(Core::Configuration &configuration, Core::MetricService &metricService) : SecretsManagerCmdHandler(configuration, metricService), _logger(Poco::Logger::get("SecretsManagerHandler")) {
+  SecretsManagerHandler::SecretsManagerHandler(Core::Configuration &configuration, Core::MetricService &metricService) : SecretsManagerCmdHandler(configuration, metricService) {
   }
 
   void SecretsManagerHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    log_debug_stream(_logger) << "SecretsManager POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+    log_debug << "SecretsManager POST request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 
     Dto::Common::SecretsManagerClientCommand clientCommand;
     clientCommand.FromRequest(Dto::Common::HttpMethod::POST, request, region, user);

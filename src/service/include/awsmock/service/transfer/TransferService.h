@@ -97,11 +97,6 @@ namespace AwsMock::Service {
   private:
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * AWS region
      */
     std::string _region;

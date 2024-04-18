@@ -32,8 +32,7 @@ namespace AwsMock::Database {
        {.name="database", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}}
   };
 
-  ModuleDatabase::ModuleDatabase()
-      : _logger(Poco::Logger::get("ModuleDatabase")), _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()) {
+  ModuleDatabase::ModuleDatabase() : _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()) {
 
     for (const auto &module : _existingModules) {
       if (_useDatabase) {
@@ -63,13 +62,12 @@ namespace AwsMock::Database {
         if (result) {
           Entity::Module::Module module;
           module.FromDocument(result);
-          log_trace_stream(_logger) << "Module state: " << Entity::Module::ModuleStateToString(module.state)
-                                    << std::endl;
+          log_trace << "Module state: " << Entity::Module::ModuleStateToString(module.state);
           return module.status == Entity::Module::ModuleStatus::ACTIVE;
         }
 
       } catch (mongocxx::exception::system_error &e) {
-        log_error_stream(_logger) << "IsActive failed, module: " << name << " error: " << e.what() << std::endl;
+        log_error << "IsActive failed, module: " << name << " error: " << e.what();
       }
 
     } else {
@@ -89,11 +87,11 @@ namespace AwsMock::Database {
         auto client = GetClient();
         mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
         int64_t count = _moduleCollection.count_documents(make_document(kvp("name", name)));
-        log_trace_stream(_logger) << "Module exists: " << (count > 0 ? "true" : "false") << std::endl;
+        log_trace << "Module exists: " << (count > 0 ? "true" : "false");
         return count > 0;
 
       } catch (mongocxx::exception::system_error &e) {
-        log_error_stream(_logger) << "Module exists failed, error: " << e.what() << std::endl;
+        log_error << "Module exists failed, error: " << e.what();
       }
 
     } else {
@@ -120,7 +118,7 @@ namespace AwsMock::Database {
       }
 
     } catch (mongocxx::exception::system_error &e) {
-      log_error_stream(_logger) << "Get module by ID failed, error: " << e.what() << std::endl;
+      log_error << "Get module by ID failed, error: " << e.what();
       throw Core::DatabaseException("Module not found, oid: " + oid.to_string());
     }
     return {};
@@ -156,7 +154,7 @@ namespace AwsMock::Database {
         }
 
       } catch (mongocxx::exception::system_error &e) {
-        log_error_stream(_logger) << "Get module by name failed, name: " << name << " error: " << e.what() << std::endl;
+        log_error << "Get module by name failed, name: " << name << " error: " << e.what();
       }
     } else {
 
@@ -175,12 +173,12 @@ namespace AwsMock::Database {
         auto client = GetClient();
         mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
         auto result = _moduleCollection.insert_one(module.ToDocument());
-        log_trace_stream(_logger) << "Module created, oid: " << result->inserted_id().get_oid().value.to_string()
-                                  << std::endl;
+        log_trace << "Module created, oid: " << result->inserted_id().get_oid().value.to_string()
+                                 ;
         return GetModuleById(result->inserted_id().get_oid().value);
 
       } catch (mongocxx::exception::system_error &e) {
-        log_error_stream(_logger) << "Create module failed, error: " << e.what() << std::endl;
+        log_error << "Create module failed, error: " << e.what();
         throw Core::DatabaseException("Create module failed, error: " + std::string(e.what()));
       }
 
@@ -199,11 +197,11 @@ namespace AwsMock::Database {
         auto client = GetClient();
         mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
         auto mResult = _moduleCollection.replace_one(make_document(kvp("name", module.name)), module.ToDocument());
-        log_trace_stream(_logger) << "Module updated: " << module.ToString() << std::endl;
+        log_trace << "Module updated: " << module.ToString();
         return GetModuleByName(module.name);
 
       } catch (mongocxx::exception::system_error &e) {
-        log_error_stream(_logger) << "Update module failed, error: " << e.what() << std::endl;
+        log_error << "Update module failed, error: " << e.what();
         throw Core::DatabaseException("Update module failed, error: " + std::string(e.what()));
       }
 
@@ -230,12 +228,12 @@ namespace AwsMock::Database {
                                                                       make_document(kvp("state",
                                                                                         Entity::Module::ModuleStateToString(
                                                                                             state))))));
-        log_trace_stream(_logger) << "Module state updated, name: " << name << " state: "
-                                  << Entity::Module::ModuleStateToString(state) << std::endl;
+        log_trace << "Module state updated, name: " << name << " state: "
+                                  << Entity::Module::ModuleStateToString(state);
         session.commit_transaction();
 
       } catch (mongocxx::exception::system_error &e) {
-        log_error_stream(_logger) << "Set module state failed, error: " << e.what() << std::endl;
+        log_error << "Set module state failed, error: " << e.what();
         session.abort_transaction();
       }
       return GetModuleByName(name);
@@ -260,11 +258,11 @@ namespace AwsMock::Database {
                                                                       make_document(kvp("status",
                                                                                         Entity::Module::ModuleStatusToString(
                                                                                             status))))));
-        log_trace_stream(_logger) << "Module status updated, name: " << name << " state: "
-                                  << Entity::Module::ModuleStatusToString(status) << std::endl;
+        log_trace << "Module status updated, name: " << name << " state: "
+                                  << Entity::Module::ModuleStatusToString(status);
 
       } catch (mongocxx::exception::system_error &e) {
-        log_error_stream(_logger) << "Set module status failed, error: " << e.what() << std::endl;
+        log_error << "Set module status failed, error: " << e.what();
       }
 
     } else {
@@ -284,10 +282,10 @@ namespace AwsMock::Database {
         mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
         auto mResult = _moduleCollection.update_one(make_document(kvp("name", name)),
                                                     make_document(kvp("$set", make_document(kvp("port", port)))));
-        log_trace_stream(_logger) << "Module port updated, name: " << name << " port: " << port << std::endl;
+        log_trace << "Module port updated, name: " << name << " port: " << port;
 
       } catch (mongocxx::exception::system_error &e) {
-        log_error_stream(_logger) << "Set module port failed, error: " << e.what() << std::endl;
+        log_error << "Set module port failed, error: " << e.what();
       }
 
     } else {
@@ -315,11 +313,11 @@ namespace AwsMock::Database {
         auto client = GetClient();
         mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
         int64_t count = _moduleCollection.count_documents(make_document());
-        log_trace_stream(_logger) << "Service state: " << (count > 0 ? "true" : "false") << std::endl;
+        log_trace << "Service state: " << (count > 0 ? "true" : "false");
         return static_cast<int>(count);
 
       } catch (mongocxx::exception::system_error &e) {
-        log_error_stream(_logger) << "Service exists failed, error: " << e.what() << std::endl;
+        log_error << "Service exists failed, error: " << e.what();
       }
 
     } else {
@@ -350,7 +348,7 @@ namespace AwsMock::Database {
 
     }
 
-    log_trace_stream(_logger) << "Got module list, size:" << modulesList.size() << std::endl;
+    log_trace << "Got module list, size:" << modulesList.size();
     return modulesList;
   }
 
@@ -363,10 +361,10 @@ namespace AwsMock::Database {
         mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
 
         auto result = _moduleCollection.delete_many(make_document(kvp("name", module.name)));
-        log_debug_stream(_logger) << "Service deleted, count: " << result->deleted_count() << std::endl;
+        log_info << "Service deleted, count: " << result->deleted_count();
 
       } catch (mongocxx::exception::system_error &e) {
-        log_error_stream(_logger) << "Delete module failed, error: " << e.what() << std::endl;
+        log_error << "Delete module failed, error: " << e.what();
       }
 
     } else {
@@ -385,10 +383,10 @@ namespace AwsMock::Database {
         mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
 
         auto result = _moduleCollection.delete_many(make_document());
-        log_debug_stream(_logger) << "All module deleted, count: " << result->deleted_count() << std::endl;
+        log_info << "All module deleted, count: " << result->deleted_count();
 
       } catch (mongocxx::exception::system_error &e) {
-        log_error_stream(_logger) << "Delete all module failed, error: " << e.what() << std::endl;
+        log_error << "Delete all module failed, error: " << e.what();
       }
 
     } else {

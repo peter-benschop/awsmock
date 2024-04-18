@@ -3,12 +3,11 @@
 
 namespace AwsMock::Service {
 
-  SNSHandler::SNSHandler(Core::Configuration &configuration, Core::MetricService &metricService) : SNSCmdHandler(configuration, metricService), _logger(Poco::Logger::get("SNSHandler")),
-                                                                                                   _configuration(configuration), _metricService(metricService), _snsService(configuration) {
+  SNSHandler::SNSHandler(Core::Configuration &configuration, Core::MetricService &metricService) : SNSCmdHandler(configuration, metricService), _configuration(configuration), _metricService(metricService), _snsService(configuration) {
   }
 
   void SNSHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    log_trace_stream(_logger) << "SNS POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << " length: " << response.getContentLength() << std::endl;
+    log_trace << "SNS POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << " length: " << response.getContentLength();
 
     Dto::Common::SNSClientCommand clientCommand;
     clientCommand.FromRequest(Dto::Common::HttpMethod::GET, request, region, user);
@@ -30,7 +29,7 @@ namespace AwsMock::Service {
       }
 
     } catch (Core::ServiceException &exc) {
-      _logger.error() << "SQS module exception: " << exc.message() << std::endl;
+      _logger.error() << "SQS module exception: " << exc.message();
       SendXmlErrorResponse("SQS", response, exc);
     }*/
   }

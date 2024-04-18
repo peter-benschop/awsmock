@@ -10,8 +10,8 @@
 #include "Poco/Net/HTTPServer.h"
 
 // AwsMock includes
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/Configuration.h"
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/Configuration.h>
 
 #define MANAGER_DEFAULT_PORT 4567
 #define MANAGER_DEFAULT_HOST "localhost"
@@ -78,11 +78,6 @@ namespace AwsMock {
        * Rest host
        */
       std::string _host;
-
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
 
       /**
       * Logger

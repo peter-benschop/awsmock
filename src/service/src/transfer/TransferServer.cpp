@@ -2,12 +2,12 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include "awsmock/service/transfer/TransferServer.h"
+#include <awsmock/service/transfer/TransferServer.h>
 
 namespace AwsMock::Service {
 
   TransferServer::TransferServer(Core::Configuration &configuration, Core::MetricService &metricService)
-    : AbstractServer(configuration, "transfer"), AbstractWorker(configuration), _logger(Poco::Logger::get("TransferServer")), _configuration(configuration), _metricService(metricService), _transferDatabase(Database::TransferDatabase::instance()),
+    : AbstractServer(configuration, "transfer"), AbstractWorker(configuration), _configuration(configuration), _metricService(metricService), _transferDatabase(Database::TransferDatabase::instance()),
       _module("transfer") {
 
     // REST manager configuration
@@ -19,7 +19,7 @@ namespace AwsMock::Service {
 
     // Sleeping period
     _period = _configuration.getInt("awsmock.module.transfer.period", 10000);
-    log_debug_stream(_logger) << "Transfer manager module period: " << _period << std::endl;
+    log_debug << "Transfer manager module period: " << _period;
 
     // Create environment
     _region = _configuration.getString("awsmock.region");
@@ -30,23 +30,23 @@ namespace AwsMock::Service {
     _s3ServiceHost = _configuration.getString("awsmock.module.s3.host", "localhost");
     _s3ServicePort = _configuration.getInt("awsmock.module.s3.port", 9501);
     _baseUrl = "http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort);
-    log_debug_stream(_logger) << "S3 module endpoint: http://" << _s3ServiceHost << ":" << _s3ServicePort << std::endl;
+    log_debug << "S3 module endpoint: http://" << _s3ServiceHost << ":" << _s3ServicePort;
 
     // Ensure base directory exists
     Core::DirUtils::EnsureDirectory(_baseDir);
-    log_debug_stream(_logger) << "Using baseDir: " << _baseDir << std::endl;
+    log_debug << "Using baseDir: " << _baseDir;
 
-    log_info_stream(_logger) << "Transfer manager initialized" << std::endl;
+    log_info << "Transfer manager initialized";
   }
 
   void TransferServer::Initialize() {
 
     // Check module active
     if (!IsActive("transfer")) {
-      log_info_stream(_logger) << "Transfer module inactive" << std::endl;
+      log_info << "Transfer module inactive";
       return;
     }
-    log_info_stream(_logger) << "Transfer module starting" << std::endl;
+    log_info << "Transfer module starting";
 
     // Start REST manager
     StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new TransferRequestHandlerFactory(_configuration, _metricService));
@@ -56,7 +56,7 @@ namespace AwsMock::Service {
   }
 
   void TransferServer::Run() {
-    log_trace_stream(_logger) << "TransferWorker processing started" << std::endl;
+    log_trace << "TransferWorker processing started";
   }
 
   void TransferServer::Shutdown() {
@@ -76,7 +76,7 @@ namespace AwsMock::Service {
 
       // Ensure the home directory exists
       Core::DirUtils::EnsureDirectory(homeDir);
-      log_debug_stream(_logger) << "Using homeDir: " << homeDir << std::endl;
+      log_debug << "Using homeDir: " << homeDir;
 
       // Add to FTP manager
       _ftpServer->addUser(user.userName, user.password, homeDir, FtpServer::Permission::All);
@@ -86,7 +86,7 @@ namespace AwsMock::Service {
     // Update database
     server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::ONLINE);
 
-    log_info_stream(_logger) << "Transfer manager " << server.serverId << " started " << std::endl;
+    log_info << "Transfer manager " << server.serverId << " started ";
   }
 
   void TransferServer::StopTransferServer(Database::Entity::Transfer::Transfer &server) {
@@ -98,12 +98,12 @@ namespace AwsMock::Service {
     // Update database
     server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::OFFLINE);
 
-    log_debug_stream(_logger) << "Transfer manager " << server.serverId << " stopped " << std::endl;
+    log_debug << "Transfer manager " << server.serverId << " stopped ";
   }
 
   void TransferServer::StartTransferServers() {
 
-    log_debug_stream(_logger) << "Starting transfer servers" << std::endl;
+    log_debug << "Starting transfer servers";
     std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase.ListServers(_region);
 
     for (auto &transfer : transfers) {
@@ -115,7 +115,7 @@ namespace AwsMock::Service {
 
   void TransferServer::CheckTransferServers() {
 
-    log_trace_stream(_logger) << "Checking transfer servers" << std::endl;
+    log_trace << "Checking transfer servers";
     std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase.ListServers(_region);
 
     for (auto &transfer : transfers) {

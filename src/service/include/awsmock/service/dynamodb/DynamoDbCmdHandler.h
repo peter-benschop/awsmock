@@ -28,58 +28,53 @@ namespace AwsMock::Service {
    */
   class DynamoDbCmdHandler : public virtual AbstractHandler {
 
-    public:
+  public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration application configuration
-       * @param metricService monitoring module
-       */
-      DynamoDbCmdHandler(Core::Configuration &configuration, Core::MetricService &metricService);
+    /**
+     * Constructor
+     *
+     * @param configuration application configuration
+     * @param metricService monitoring module
+     */
+    DynamoDbCmdHandler(Core::Configuration &configuration, Core::MetricService &metricService);
 
-    protected:
+  protected:
 
-      /**
-       * HTTP POST request.
-       *
-       * @param request HTTP request
-       * @param response HTTP response
-       * @param clientCommand standardized request
-       * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-       */
-      void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::DynamoDbClientCommand &clientCommand);
+    /**
+     * HTTP POST request.
+     *
+     * @param request HTTP request
+     * @param response HTTP response
+     * @param clientCommand standardized request
+     * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+     */
+    void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::DynamoDbClientCommand &clientCommand);
 
-    private:
+  private:
 
-      /**
-       * Return the command from the header or from the payload.
-       *
-       * @param request HTTP request
-       * @param payload HTTP payload
-       * @return SQS action
-       */
-      static std::string GetActionFromHeader(Poco::Net::HTTPServerRequest &request, const std::string &payload);
+    /**
+     * Return the command from the header or from the payload.
+     *
+     * @param request HTTP request
+     * @param payload HTTP payload
+     * @return SQS action
+     */
+    static std::string GetActionFromHeader(Poco::Net::HTTPServerRequest &request, const std::string &payload);
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+    /**
+     * S3 handler configuration
+     */
+    Core::Configuration &_configuration;
 
-      /**
-       * S3 handler configuration
-       */
-      Core::Configuration &_configuration;
+    /**
+     * Metric module
+     */
+    Core::MetricService &_metricService;
 
-      /**
-       * Metric module
-       */
-      Core::MetricService &_metricService;
-
-      /**
-       * DynamoDB module
-       */
-      Service::DynamoDbService _dynamoDbService;
+    /**
+     * DynamoDB module
+     */
+    Service::DynamoDbService _dynamoDbService;
 
   };
 

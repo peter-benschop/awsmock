@@ -148,11 +148,6 @@ namespace AwsMock::Service {
     void SetHeaders(Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user);
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * S3 handler configuration
      */
     Core::Configuration &_configuration;

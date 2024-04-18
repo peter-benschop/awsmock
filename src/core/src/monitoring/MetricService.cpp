@@ -8,7 +8,7 @@ namespace AwsMock::Core {
 
   Poco::Mutex MetricService::_mutex;
 
-  MetricService::MetricService() : Core::Timer("MetricServer", 60), _logger(Poco::Logger::get("MetricService")) {
+  MetricService::MetricService() : Core::Timer("MetricServer", 60) {
 
     Core::Configuration &configuration = Core::Configuration::instance();
     _port = configuration.getInt("awsmock.monitoring.port", 8081);
@@ -19,13 +19,13 @@ namespace AwsMock::Core {
     _server = std::make_shared<Poco::Prometheus::MetricsServer>(_port);
     _metricSystemTimer = std::make_shared<Poco::Timer>(0, _timeout);
     _metricSystemCollector = std::make_shared<MetricSystemCollector>();
-    log_debug_stream(_logger) << "Prometheus manager initialized, port: " << _port << std::endl;
+    log_debug << "Prometheus manager initialized, port: " << _port;
 
     if (_server != nullptr) {
       _server->start();
     }
     _metricSystemCollector->Start();
-    log_info_stream(_logger) << "Monitoring manager started, port: " << _port << std::endl;;
+    log_info << "Monitoring manager started, port: " << _port;;
   }
 
   void MetricService::Run() {
@@ -34,7 +34,7 @@ namespace AwsMock::Core {
   void MetricService::Shutdown() {
     _server->stop();
     _metricSystemCollector->Stop();
-    log_info_stream(_logger) << "Metric module has been shutdown" << std::endl;
+    log_info << "Metric module has been shutdown";
   }
 
   void MetricService::AddCounter(const std::string &name) {
@@ -42,10 +42,10 @@ namespace AwsMock::Core {
     if (!CounterExists(name)) {
       _counterMap[name] = new Poco::Prometheus::Counter(name);
       _counterMap[name]->clear();
-      log_trace_stream(_logger) << "Counter added, name: " + name << std::endl;
+      log_trace << "Counter added, name: " + name;
       return;
     }
-    log_error_stream(_logger) << "Gauge exists already, name: " + name << std::endl;
+    log_error << "Gauge exists already, name: " + name;
   }
 
   void MetricService::AddCounter(const std::string &name, const std::string &label) {
@@ -56,10 +56,10 @@ namespace AwsMock::Core {
       _counterMap[name] = new Poco::Prometheus::Counter(name);
       _counterMap[name]->labelNames(labels);
       _counterMap[name]->clear();
-      log_trace_stream(_logger) << "Counter added, name: " + name << std::endl;
+      log_trace << "Counter added, name: " + name;
       return;
     }
-    log_error_stream(_logger) << "Gauge exists already, name: " + name << std::endl;
+    log_error << "Gauge exists already, name: " + name;
   }
 
   bool MetricService::CounterExists(const std::string &name) {
@@ -79,10 +79,10 @@ namespace AwsMock::Core {
     Poco::Mutex::ScopedLock lock(_mutex);
     if (CounterExists(name)) {
       _counterMap[name]->clear();
-      log_trace_stream(_logger) << "Counter cleared, name: " + name << std::endl;
+      log_trace << "Counter cleared, name: " + name;
       return;
     }
-    log_error_stream(_logger) << "Counter not found, name: " + name << std::endl;
+    log_error << "Counter not found, name: " + name;
   }
 
   void MetricService::IncrementCounter(const std::string &name, int value) {
@@ -91,7 +91,7 @@ namespace AwsMock::Core {
       AddCounter(name);
     }
     _counterMap[name]->inc((double) value);
-    log_trace_stream(_logger) << "Counter incremented, name: " + name << std::endl;
+    log_trace << "Counter incremented, name: " + name;
   }
 
   void MetricService::IncrementCounter(const std::string &name, const std::string &labelName, const std::string &labelValue, int value) {
@@ -100,7 +100,7 @@ namespace AwsMock::Core {
       AddCounter(name, labelName);
     }
     _counterMap[name]->labels({labelValue}).inc((double) value);
-    log_trace_stream(_logger) << "Counter incremented, name: " + name << " labelName: " << labelName << " labelValue: " << labelValue << std::endl;
+    log_trace << "Counter incremented, name: " + name << " labelName: " << labelName << " labelValue: " << labelValue;
   }
 
   void MetricService::DecrementCounter(const std::string &name, int value) {
@@ -109,7 +109,7 @@ namespace AwsMock::Core {
       AddCounter(name);
     }
     _counterMap[name]->inc((double) -value);
-    log_trace_stream(_logger) << "Counter incremented, name: " + name << std::endl;
+    log_trace << "Counter incremented, name: " + name;
   }
 
   void MetricService::DecrementCounter(const std::string &name, const std::string &labelName, const std::string &labelValue, int value) {
@@ -118,17 +118,17 @@ namespace AwsMock::Core {
       AddCounter(name, labelName);
     }
     _counterMap[name]->labels({labelValue}).inc((double) -value);
-    log_trace_stream(_logger) << "Counter incremented, name: " + name << std::endl;
+    log_trace << "Counter incremented, name: " + name;
   }
 
   void MetricService::AddGauge(const std::string &name) {
     Poco::Mutex::ScopedLock lock(_mutex);
     if (!GaugeExists(name)) {
       _gaugeMap[name] = new Poco::Prometheus::Gauge(name);
-      log_trace_stream(_logger) << "Gauge added, name: " + name << std::endl;
+      log_trace << "Gauge added, name: " + name;
       return;
     }
-    log_error_stream(_logger) << "Gauge exists already, name: " + name << std::endl;
+    log_error << "Gauge exists already, name: " + name;
   }
 
   void MetricService::AddGauge(const std::string &name, const std::string &label) {
@@ -138,10 +138,10 @@ namespace AwsMock::Core {
       labels.push_back(label);
       _gaugeMap[name] = new Poco::Prometheus::Gauge(name);
       _gaugeMap[name]->labelNames(labels);
-      log_trace_stream(_logger) << "Gauge added, name: " + name << std::endl;
+      log_trace << "Gauge added, name: " + name;
       return;
     }
-    log_error_stream(_logger) << "Gauge exists already, name: " + name << std::endl;
+    log_error << "Gauge exists already, name: " + name;
   }
 
   void MetricService::IncrementGauge(const std::string &name, int value) {
@@ -150,7 +150,7 @@ namespace AwsMock::Core {
       _gaugeMap[name] = new Poco::Prometheus::Gauge(name);
     }
     _gaugeMap[name]->inc((double) value);
-    log_trace_stream(_logger) << "Gauge incremented, name: " + name << std::endl;
+    log_trace << "Gauge incremented, name: " + name;
   }
 
   void MetricService::IncrementGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, int value) {
@@ -159,7 +159,7 @@ namespace AwsMock::Core {
       AddGauge(name, labelName);
     }
     _gaugeMap[name]->labels({labelValue}).inc((double) value);
-    log_trace_stream(_logger) << "Gauge incremented, name: " + name << std::endl;
+    log_trace << "Gauge incremented, name: " + name;
   }
 
   void MetricService::SetGauge(const std::string &name, int value) {
@@ -168,7 +168,7 @@ namespace AwsMock::Core {
       AddGauge(name);
     }
     _gaugeMap[name]->set((double) value);
-    log_trace_stream(_logger) << "Gauge value set, name: " + name << std::endl;
+    log_trace << "Gauge value set, name: " + name;
   }
 
   void MetricService::SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, int value) {
@@ -177,7 +177,7 @@ namespace AwsMock::Core {
       AddGauge(name, labelName);
     }
     _gaugeMap[name]->labels({labelValue}).set((double) value);
-    log_trace_stream(_logger) << "Gauge value set, name: " + name << std::endl;
+    log_trace << "Gauge value set, name: " + name;
   }
 
   void MetricService::SetGauge(const std::string &name, long value) {
@@ -186,7 +186,7 @@ namespace AwsMock::Core {
       _gaugeMap[name] = new Poco::Prometheus::Gauge(name);
     }
     _gaugeMap[name]->set((double) value);
-    log_trace_stream(_logger) << "Gauge value set, name: " + name << std::endl;
+    log_trace << "Gauge value set, name: " + name;
   }
 
   void MetricService::SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, long value) {
@@ -195,7 +195,7 @@ namespace AwsMock::Core {
       _gaugeMap[name] = new Poco::Prometheus::Gauge(name);
     }
     _gaugeMap[name]->labels({labelValue}).set((double) value);
-    log_trace_stream(_logger) << "Gauge value set, name: " + name << std::endl;
+    log_trace << "Gauge value set, name: " + name;
   }
 
   void MetricService::SetGauge(const std::string &name, unsigned long value) {
@@ -204,7 +204,7 @@ namespace AwsMock::Core {
       _gaugeMap[name] = new Poco::Prometheus::Gauge(name);
     }
     _gaugeMap[name]->set((double) value);
-    log_trace_stream(_logger) << "Gauge value set, name: " + name << std::endl;
+    log_trace << "Gauge value set, name: " + name;
   }
 
   void MetricService::SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, unsigned long value) {
@@ -213,7 +213,7 @@ namespace AwsMock::Core {
       _gaugeMap[name] = new Poco::Prometheus::Gauge(name);
     }
     _gaugeMap[name]->labels({labelValue}).set((double) value);
-    log_trace_stream(_logger) << "Gauge value set, name: " + name << std::endl;
+    log_trace << "Gauge value set, name: " + name;
   }
 
   void MetricService::SetGauge(const std::string &name, float value) {
@@ -222,7 +222,7 @@ namespace AwsMock::Core {
       _gaugeMap[name] = new Poco::Prometheus::Gauge(name);
     }
     _gaugeMap[name]->set((double) value);
-    log_trace_stream(_logger) << "Gauge value set, name: " + name << std::endl;
+    log_trace << "Gauge value set, name: " + name;
   }
 
   void MetricService::SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, float value) {
@@ -231,7 +231,7 @@ namespace AwsMock::Core {
       _gaugeMap[name] = new Poco::Prometheus::Gauge(name);
     }
     _gaugeMap[name]->labels({labelValue}).set((double) value);
-    log_trace_stream(_logger) << "Gauge value set, name: " + name << std::endl;
+    log_trace << "Gauge value set, name: " + name;
   }
 
   void MetricService::SetGauge(const std::string &name, double value) {
@@ -240,7 +240,7 @@ namespace AwsMock::Core {
       _gaugeMap[name] = new Poco::Prometheus::Gauge(name);
     }
     _gaugeMap[name]->set(value);
-    log_trace_stream(_logger) << "Gauge value set, name: " + name << std::endl;
+    log_trace << "Gauge value set, name: " + name;
   }
 
   void MetricService::SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, double value) {
@@ -249,7 +249,7 @@ namespace AwsMock::Core {
       _gaugeMap[name] = new Poco::Prometheus::Gauge(name);
     }
     _gaugeMap[name]->labels({labelValue}).set(value);
-    log_trace_stream(_logger) << "Gauge value set, name: " + name << std::endl;
+    log_trace << "Gauge value set, name: " + name;
   }
 
   bool MetricService::GaugeExists(const std::string &name) {
@@ -265,10 +265,10 @@ namespace AwsMock::Core {
     Poco::Mutex::ScopedLock lock(_mutex);
     if (!TimerExists(name)) {
       _timerMap[name] = new Poco::Prometheus::Gauge(name);
-      log_trace_stream(_logger) << "Timer added, name: " + name << std::endl;
+      log_trace << "Timer added, name: " + name;
       return;
     }
-    log_error_stream(_logger) << "Timer exists already, name: " + name << std::endl;
+    log_warning << "Timer exists already, name: " + name;
   }
 
   void MetricService::StartTimer(const std::string &name) {
@@ -278,7 +278,7 @@ namespace AwsMock::Core {
     }
     if (_timerStartMap.find(GetTimerKey(name)) == _timerStartMap.end()) {
       _timerStartMap[GetTimerKey(name)] = std::chrono::high_resolution_clock::now();
-      log_trace_stream(_logger) << "Timer started, name: " + name << std::endl;
+      log_trace << "Timer started, name: " + name;
     }
   }
 
@@ -291,7 +291,7 @@ namespace AwsMock::Core {
     if (it != _timerStartMap.end()) {
       _timerStartMap.erase(it);
     }
-    log_trace_stream(_logger) << "Timer stopped, name: " + name << std::endl;
+    log_trace << "Timer stopped, name: " + name;
   }
 
   bool MetricService::TimerExists(const std::string &name) {
@@ -304,7 +304,7 @@ namespace AwsMock::Core {
       StopTimer(name);
       _timerMap.find(name)->second->set(0.0);
     }
-    log_trace_stream(_logger) << "Timer cleared, name: " + name << std::endl;
+    log_trace << "Timer cleared, name: " + name;
   }
 
   void MetricService::ResetAllTimer() {
@@ -316,7 +316,7 @@ namespace AwsMock::Core {
 
   std::string MetricService::GetTimerKey(const std::string &name) {
     uint32_t threadID = std::hash<std::thread::id>{}(std::this_thread::get_id());
-    log_trace_stream(_logger) << "Timer key returned, name: " + name << std::endl;
+    log_trace << "Timer key returned, name: " + name;
     return name + "::" + std::to_string(threadID);
   }
 }

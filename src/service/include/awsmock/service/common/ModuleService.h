@@ -13,22 +13,22 @@
 #include <Poco/Net/HTTPResponse.h>
 
 // AwsMock includes
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/ServiceException.h"
-#include "awsmock/dto/common/Infrastructure.h"
-#include "awsmock/dto/common/Services.h"
-#include "awsmock/entity/module/Module.h"
-#include "awsmock/repository/ModuleDatabase.h"
-#include "awsmock/repository/SecretsManagerDatabase.h"
-#include "awsmock/service/gateway/GatewayServer.h"
-#include "awsmock/service/s3/S3Server.h"
-#include "awsmock/service/sqs/SQSServer.h"
-#include "awsmock/service/sns/SNSServer.h"
-#include "awsmock/service/lambda/LambdaServer.h"
-#include "awsmock/service/cognito/CognitoServer.h"
-#include "awsmock/service/dynamodb/DynamoDbServer.h"
-#include "awsmock/service/transfer/TransferServer.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/ServiceException.h>
+#include <awsmock/dto/common/Infrastructure.h>
+#include <awsmock/dto/common/Services.h>
+#include <awsmock/entity/module/Module.h>
+#include <awsmock/repository/ModuleDatabase.h>
+#include <awsmock/repository/SecretsManagerDatabase.h>
+#include <awsmock/service/gateway/GatewayServer.h>
+#include <awsmock/service/s3/S3Server.h>
+#include <awsmock/service/sqs/SQSServer.h>
+#include <awsmock/service/sns/SNSServer.h>
+#include <awsmock/service/lambda/LambdaServer.h>
+#include <awsmock/service/cognito/CognitoServer.h>
+#include <awsmock/service/dynamodb/DynamoDbServer.h>
+#include <awsmock/service/transfer/TransferServer.h>
 
 namespace AwsMock::Service {
 
@@ -133,11 +133,6 @@ namespace AwsMock::Service {
     void CleanObjects(const Dto::Common::Services &services);
 
   private:
-
-    /**
-     * Logger
-     */
-    Core::LogStream _logger;
 
     /**
      * Configuration

@@ -164,11 +164,6 @@ namespace AwsMock::Service {
     void SendInvocationRequest(const std::string &url, const std::string &body);
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * Data directory
      */
     std::string _dataDir;

@@ -101,11 +101,6 @@ namespace AwsMock::Service {
     std::map<std::string, Dto::SQS::MessageAttribute> GetMessageAttributes(const std::string &payload);
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * ImageHandler import configuration
      */
     Core::Configuration &_configuration;

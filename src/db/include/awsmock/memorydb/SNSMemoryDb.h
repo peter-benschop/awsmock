@@ -231,11 +231,6 @@ namespace AwsMock::Database {
     private:
 
       /**
-       * Logger
-       */
-      Core::LogStream _logger;
-
-      /**
        * SNS topic vector, when running without database
        */
       std::map<std::string, Entity::SNS::Topic> _topics;

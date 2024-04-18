@@ -6,8 +6,7 @@
 
 namespace AwsMock::Service {
 
-  SecretsManagerService::SecretsManagerService(Core::Configuration &configuration)
-    : _logger(Poco::Logger::get("SecretsManagerService")), _configuration(configuration), _database(Database::SecretsManagerDatabase::instance()) {
+  SecretsManagerService::SecretsManagerService(Core::Configuration &configuration) : _configuration(configuration), _database(Database::SecretsManagerDatabase::instance()) {
 
     // Initialize environment
     _accountId = _configuration.getString("awsmock.account.userPoolId", DEFAULT_ACCOUNT_ID);
@@ -17,7 +16,7 @@ namespace AwsMock::Service {
   }
 
   Dto::SecretsManager::CreateSecretResponse SecretsManagerService::CreateSecret(const Dto::SecretsManager::CreateSecretRequest &request) {
-    log_trace_stream(_logger) << "Create secret request, request: " << request.ToString() << std::endl;
+    log_trace << "Create secret request, request: " << request.ToString();
 
     // Get region
     std::string region = request.region;
@@ -62,11 +61,11 @@ namespace AwsMock::Service {
   }
 
   Dto::SecretsManager::DescribeSecretResponse SecretsManagerService::DescribeSecret(const Dto::SecretsManager::DescribeSecretRequest &request) {
-    log_trace_stream(_logger) << "Describe secret request: " << request.ToString() << std::endl;
+    log_trace << "Describe secret request: " << request.ToString();
 
     // Check bucket existence
     if (!_database.SecretExists(request.secretId)) {
-      log_warning_stream(_logger) << "Secret does not exist, secretId: " << request.secretId << std::endl;
+      log_warning<< "Secret does not exist, secretId: " << request.secretId;
       throw Core::ResourceNotFoundException("Secret does not exist, secretId: " + request.secretId);
     }
 
@@ -80,11 +79,11 @@ namespace AwsMock::Service {
       response.region = secret.region;
       response.name = secret.name;
       response.arn = secret.arn;
-      log_debug_stream(_logger) << "Database secret described, secretId: " << request.secretId << std::endl;
+      log_debug << "Database secret described, secretId: " << request.secretId;
       return response;
 
     } catch (Poco::Exception &exc) {
-      log_error_stream(_logger) << "Secret describe secret failed, message: " + exc.message() << std::endl;
+      log_error << "Secret describe secret failed, message: " + exc.message();
       throw Core::ServiceException(exc.message());
     }
 
@@ -92,11 +91,11 @@ namespace AwsMock::Service {
   }
 
   Dto::SecretsManager::GetSecretValueResponse SecretsManagerService::GetSecretValue(const Dto::SecretsManager::GetSecretValueRequest &request) {
-    log_trace_stream(_logger) << "Get secret value request: " << request.ToString() << std::endl;
+    log_trace << "Get secret value request: " << request.ToString();
 
     // Check bucket existence
     if (!_database.SecretExists(request.secretId)) {
-      log_warning_stream(_logger) << "Secret does not exist, secretId: " << request.secretId << std::endl;
+      log_warning<< "Secret does not exist, secretId: " << request.secretId;
       throw Core::ServiceException("Secret does not exist, secretId: " + request.secretId, Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
@@ -120,25 +119,25 @@ namespace AwsMock::Service {
         int len = (int) base64Decoded.length();
         response.secretBinary = std::string(reinterpret_cast<char *>(Core::Crypto::Aes256DecryptString((unsigned char *) base64Decoded.c_str(), &len, _kmsKey)));
       } else {
-        log_warning_stream(_logger) << "Neither string nor binary, secretId: " << request.secretId << std::endl;
+        log_warning<< "Neither string nor binary, secretId: " << request.secretId;
       }
-      log_debug_stream(_logger) << "Get secret value, secretId: " << request.secretId << std::endl;
+      log_debug << "Get secret value, secretId: " << request.secretId;
 
       // Update database
       secret.lastAccessedDate = Poco::Timestamp().epochTime();
       _database.UpdateSecret(secret);
-      log_trace_stream(_logger) << "Secret updated, secretId: " << request.secretId << std::endl;
+      log_trace << "Secret updated, secretId: " << request.secretId;
 
       return response;
 
     } catch (Poco::Exception &exc) {
-      log_error_stream(_logger) << "Secret describe secret failed, message: " + exc.message() << std::endl;
+      log_error << "Secret describe secret failed, message: " + exc.message();
       throw Core::ServiceException(exc.message());
     }
   }
 
   Dto::SecretsManager::ListSecretsResponse SecretsManagerService::ListSecrets(const Dto::SecretsManager::ListSecretsRequest &request) {
-    log_trace_stream(_logger) << "List secrets request: " << request.ToString() << std::endl;
+    log_trace << "List secrets request: " << request.ToString();
 
     Dto::SecretsManager::ListSecretsResponse response;
     try {
@@ -173,21 +172,21 @@ namespace AwsMock::Service {
       //response.nextToken = secrets.back().secretId;
 
       // Convert to DTO
-      log_debug_stream(_logger) << "Database list secrets, region: " << request.region << std::endl;
+      log_debug << "Database list secrets, region: " << request.region;
       return response;
 
     } catch (Poco::Exception &exc) {
-      log_error_stream(_logger) << "List secrets failed, message: " + exc.message() << std::endl;
+      log_error << "List secrets failed, message: " + exc.message();
       throw Core::ServiceException(exc.message());
     }
   }
 
   Dto::SecretsManager::UpdateSecretResponse SecretsManagerService::UpdateSecret(const Dto::SecretsManager::UpdateSecretRequest &request) {
-    log_trace_stream(_logger) << "Update secret request: " << request.ToString() << std::endl;
+    log_trace << "Update secret request: " << request.ToString();
 
     // Check bucket existence
     if (!_database.SecretExists(request.secretId)) {
-      log_warning_stream(_logger) << "Secret does not exist, secretId: " << request.secretId << std::endl;
+      log_warning<< "Secret does not exist, secretId: " << request.secretId;
       throw Core::ServiceException("Secret does not exist, secretId: " + request.secretId, Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
@@ -206,21 +205,21 @@ namespace AwsMock::Service {
       secret = _database.UpdateSecret(secret);
 
       // Convert to DTO
-      log_debug_stream(_logger) << "Database secret described, secretId: " << request.secretId << std::endl;
+      log_debug << "Database secret described, secretId: " << request.secretId;
       return {.region=secret.region, .name=secret.name, .arn=secret.arn, .versionId=secret.versionId};
 
     } catch (Poco::Exception &exc) {
-      log_error_stream(_logger) << "Secret describe secret failed, message: " + exc.message() << std::endl;
+      log_error << "Secret describe secret failed, message: " + exc.message();
       throw Core::ServiceException(exc.message());
     }
   }
 
   Dto::SecretsManager::RotateSecretResponse SecretsManagerService::RotateSecret(const Dto::SecretsManager::RotateSecretRequest &request) {
-    log_trace_stream(_logger) << "Rotate secret request: " << request.ToString() << std::endl;
+    log_trace << "Rotate secret request: " << request.ToString();
 
     // Check bucket existence
     if (!_database.SecretExists(request.secretId)) {
-      log_warning_stream(_logger) << "Secret does not exist, secretId: " << request.secretId << std::endl;
+      log_warning<< "Secret does not exist, secretId: " << request.secretId;
       throw Core::ResourceNotFoundException("Secret does not exist, secretId: " + request.secretId);
     }
 
@@ -239,21 +238,21 @@ namespace AwsMock::Service {
       secret = _database.UpdateSecret(secret);
 
       // Convert to DTO
-      log_debug_stream(_logger) << "Database secret described, secretId: " << request.secretId << std::endl;
+      log_debug << "Database secret described, secretId: " << request.secretId;
       return {.region=secret.region, .arn=secret.arn};
 
     } catch (Poco::Exception &exc) {
-      log_error_stream(_logger) << "Secret describe secret failed, message: " + exc.message() << std::endl;
+      log_error << "Secret describe secret failed, message: " + exc.message();
       throw Core::ServiceException(exc.message());
     }
   }
 
   Dto::SecretsManager::DeleteSecretResponse SecretsManagerService::DeleteSecret(const Dto::SecretsManager::DeleteSecretRequest &request) {
-    log_trace_stream(_logger) << "Delete secret request: " << request.ToString() << std::endl;
+    log_trace << "Delete secret request: " << request.ToString();
 
     // Check bucket existence
     if (!_database.SecretExists(request.region, request.name)) {
-      log_warning_stream(_logger) << "Secret does not exist, name: " << request.name << std::endl;
+      log_warning<< "Secret does not exist, name: " << request.name;
       throw Core::ServiceException("Secret does not exist, name: " + request.name, Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
@@ -265,11 +264,11 @@ namespace AwsMock::Service {
 
       // Delete from database
       _database.DeleteSecret(secret);
-      log_debug_stream(_logger) << "Database secret deleted, region: " << request.region << " name: " << request.name << std::endl;
+      log_debug << "Database secret deleted, region: " << request.region << " name: " << request.name;
       return {.region=request.region, .name=secret.name, .arn=secret.arn, .deletionDate=static_cast<double>(Poco::Timestamp().epochTime())};
 
     } catch (Poco::Exception &exc) {
-      log_error_stream(_logger) << "SecretManager delete secret failed, message: " + exc.message() << std::endl;
+      log_error << "SecretManager delete secret failed, message: " + exc.message();
       throw Core::ServiceException(exc.message());
     }
   }

@@ -8,14 +8,14 @@
 
 namespace AwsMock {
 
-  RestService::RestService(Core::Configuration &configuration) : _port(MANAGER_DEFAULT_PORT), _host(MANAGER_DEFAULT_HOST), _logger(Poco::Logger::get("RestService")), _configuration(configuration) {
+  RestService::RestService(Core::Configuration &configuration) : _port(MANAGER_DEFAULT_PORT), _host(MANAGER_DEFAULT_HOST), _configuration(configuration) {
 
     _port = _configuration.getInt("awsmock.manager.port", MANAGER_DEFAULT_PORT);
     _host = _configuration.getString("awsmock.manager.host", MANAGER_DEFAULT_HOST);
     _maxQueueLength = _configuration.getInt("awsmock.manager.max.queue", MANAGER_MAX_CONNECTIONS);
     _maxThreads = _configuration.getInt("awsmock.manager.max.threads", MANAGER_MAX_THREADS);
 
-    log_debug_stream(_logger) << "AwsMock manager initialized, endpoint: " << _host << ":" << _port << std::endl;
+    log_debug << "AwsMock manager initialized, endpoint: " << _host << ":" << _port;
   }
 
   void RestService::setPort(int port) {
@@ -37,7 +37,7 @@ namespace AwsMock {
 
     if (_httpServer) {
       _httpServer->start();
-      log_info_stream(_logger) << "AwsMock manager started, endpoint: http://" << _host << ":" << _port << std::endl;
+      log_info << "AwsMock manager started, endpoint: http://" << _host << ":" << _port;
     }
   }
 

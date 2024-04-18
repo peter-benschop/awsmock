@@ -39,7 +39,7 @@ namespace AwsMock::Core {
     /**
      * Constructor
      */
-    MemoryMappedFile() : _logger(Poco::Logger::get("MemoryMappedFile")), _start(nullptr), _membuffer(nullptr), _mapped(false) {}
+    MemoryMappedFile() : _start(nullptr), _membuffer(nullptr), _mapped(false) {}
 
     /**
      * Singleton
@@ -81,11 +81,6 @@ namespace AwsMock::Core {
     bool IsMapped() const { return _mapped; }
 
   private:
-
-    /**
-     * Logger
-     */
-    Core::LogStream _logger;
 
     /**
      * Start pointer

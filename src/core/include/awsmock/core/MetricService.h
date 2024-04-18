@@ -359,11 +359,6 @@ namespace AwsMock::Core {
     std::string GetTimerKey(const std::string &name);
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * Metric manager for Prometheus
      */
     std::shared_ptr<Poco::Prometheus::MetricsServer> _server;
