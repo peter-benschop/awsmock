@@ -111,11 +111,6 @@ namespace AwsMock::Service {
     std::string GetActionFromHeader(Poco::Net::HTTPServerRequest &request);
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * AwsMock configuration
      */
     Core::Configuration &_configuration;

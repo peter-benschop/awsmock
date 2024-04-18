@@ -8,7 +8,7 @@ namespace AwsMock::Core {
 
   Poco::Mutex MetricService::_mutex;
 
-  MetricService::MetricService() : Core::Timer("MetricServer", 60), _logger(Poco::Logger::get("MetricService")) {
+  MetricService::MetricService() : Core::Timer("MetricServer", 60) {
 
     Core::Configuration &configuration = Core::Configuration::instance();
     _port = configuration.getInt("awsmock.monitoring.port", 8081);
@@ -19,13 +19,13 @@ namespace AwsMock::Core {
     _server = std::make_shared<Poco::Prometheus::MetricsServer>(_port);
     _metricSystemTimer = std::make_shared<Poco::Timer>(0, _timeout);
     _metricSystemCollector = std::make_shared<MetricSystemCollector>();
-    log_debug_stream(_logger) << "Prometheus manager initialized, port: " << _port;
+    log_debug << "Prometheus manager initialized, port: " << _port;
 
     if (_server != nullptr) {
       _server->start();
     }
     _metricSystemCollector->Start();
-    log_info_stream(_logger) << "Monitoring manager started, port: " << _port;;
+    log_info << "Monitoring manager started, port: " << _port;;
   }
 
   void MetricService::Run() {
@@ -34,7 +34,7 @@ namespace AwsMock::Core {
   void MetricService::Shutdown() {
     _server->stop();
     _metricSystemCollector->Stop();
-    log_info_stream(_logger) << "Metric module has been shutdown";
+    log_info << "Metric module has been shutdown";
   }
 
   void MetricService::AddCounter(const std::string &name) {
@@ -268,7 +268,7 @@ namespace AwsMock::Core {
       log_trace << "Timer added, name: " + name;
       return;
     }
-    log_error << "Timer exists already, name: " + name;
+    log_warning << "Timer exists already, name: " + name;
   }
 
   void MetricService::StartTimer(const std::string &name) {

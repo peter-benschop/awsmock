@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database {
 
-  ModuleMemoryDb::ModuleMemoryDb() : _logger(Poco::Logger::get("ModuleMemoryDb")) {}
+  ModuleMemoryDb::ModuleMemoryDb() {}
 
   bool ModuleMemoryDb::ModuleExists(const std::string &name) {
 
@@ -32,7 +32,7 @@ namespace AwsMock::Database {
         });
 
     if (it == _modules.end()) {
-      log_error_stream(_logger) << "Get module by ID failed, oid: " << oid << std::endl;
+      log_error << "Get module by ID failed, oid: " << oid;
       throw Core::DatabaseException("Get module by ID failed, oid: " + oid);
     }
     it->second.oid = oid;
@@ -47,7 +47,7 @@ namespace AwsMock::Database {
         });
 
     if (it == _modules.end()) {
-      log_error_stream(_logger) << "Get module by name failed, oid: " << name << std::endl;
+      log_error << "Get module by name failed, oid: " << name;
       throw Core::DatabaseException("Get module by name failed, oid: " + name);
     }
     it->second.oid = it->first;
@@ -59,7 +59,7 @@ namespace AwsMock::Database {
 
     std::string oid = Poco::UUIDGenerator().createRandom().toString();
     _modules[oid] = module;
-    log_trace_stream(_logger) << "Module created, oid: " << oid << std::endl;
+    log_trace << "Module created, oid: " << oid;
     return GetModuleById(oid);
 
   }
@@ -71,7 +71,7 @@ namespace AwsMock::Database {
       moduleList.emplace_back(module.second);
     }
 
-    log_trace_stream(_logger) << "Got module list, size: " << moduleList.size() << std::endl;
+    log_trace << "Got module list, size: " << moduleList.size();
     return moduleList;
   }
 
@@ -85,7 +85,7 @@ namespace AwsMock::Database {
         });
 
     if (it == _modules.end()) {
-      log_error_stream(_logger) << "Update module failed, module: " << name << std::endl;
+      log_error << "Update module failed, module: " << name;
       throw Core::DatabaseException("Update module failed, module: " + name);
     }
 
@@ -102,7 +102,7 @@ namespace AwsMock::Database {
         });
 
     if (it == _modules.end()) {
-      log_error_stream(_logger) << "Set state failed, module: " << name << std::endl;
+      log_error << "Set state failed, module: " << name;
       throw Core::DatabaseException("Set state failed, module: " + name);
     }
 
@@ -120,7 +120,7 @@ namespace AwsMock::Database {
         });
 
     if (it == _modules.end()) {
-      log_error_stream(_logger) << "Set status failed, module: " << name << std::endl;
+      log_error << "Set status failed, module: " << name;
       throw Core::DatabaseException("Set status failed, module: " + name);
     }
 
@@ -137,7 +137,7 @@ namespace AwsMock::Database {
         });
 
     if (it == _modules.end()) {
-      log_error_stream(_logger) << "Set port failed, module: " << name << std::endl;
+      log_error << "Set port failed, module: " << name;
       throw Core::DatabaseException("Set port failed, module: " + name);
     }
 
@@ -157,13 +157,13 @@ namespace AwsMock::Database {
       auto const &[key, value] = item;
       return value.name == name;
     });
-    log_debug_stream(_logger) << "Module deleted, count: " << count << std::endl;
+    log_debug << "Module deleted, count: " << count;
   }
 
   void ModuleMemoryDb::DeleteAllModules() {
     Poco::ScopedLock lock(_moduleMutex);
 
-    log_debug_stream(_logger) << "All modules deleted, count: " << _modules.size() << std::endl;
+    log_debug << "All modules deleted, count: " << _modules.size();
     _modules.clear();
   }
 }

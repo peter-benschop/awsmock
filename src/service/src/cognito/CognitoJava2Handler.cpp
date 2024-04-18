@@ -3,20 +3,19 @@
 
 namespace AwsMock::Service {
 
-  CognitoJava2Handler::CognitoJava2Handler(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractHandler(), _logger(Poco::Logger::get("CognitoJava2Handler")), _configuration(configuration), _metricService(metricService),
-                                                                                                                     _cognitoService(configuration) {
+  CognitoJava2Handler::CognitoJava2Handler(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractHandler(), _configuration(configuration), _metricService(metricService), _cognitoService(configuration) {
   }
 
   void CognitoJava2Handler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    log_debug_stream(_logger) << "Cognito GET request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
+    log_debug << "Cognito GET request, URI: " + request.getURI() << " region: " << region << " user: " + user;
   }
 
   void CognitoJava2Handler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    log_debug_stream(_logger) << "Cognito POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+    log_debug << "Cognito POST request, URI: " << request.getURI() << " region: " << region << " user: " << user;
   }
 
   void CognitoJava2Handler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    log_debug_stream(_logger) << "Cognito POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+    log_debug << "Cognito POST request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 
     try {
 
@@ -31,7 +30,7 @@ namespace AwsMock::Service {
         cognitoRequest.FromJson(payload);
         cognitoRequest.region = region;
 
-        log_debug_stream(_logger) << "Got list user pool request, json: " << cognitoRequest.ToString() << std::endl;
+        log_debug << "Got list user pool request, json: " << cognitoRequest.ToString();
 
         Dto::Cognito::CreateUserPoolResponse serviceResponse = _cognitoService.CreateUserPool(cognitoRequest);
         SendOkResponse(response, serviceResponse.ToJson());
@@ -41,7 +40,7 @@ namespace AwsMock::Service {
         Dto::Cognito::ListUserPoolRequest cognitoRequest{};
         cognitoRequest.FromJson(payload);
         cognitoRequest.region = region;
-        log_debug_stream(_logger) << "Got list user pool request, json: " << cognitoRequest.ToString() << std::endl;
+        log_debug << "Got list user pool request, json: " << cognitoRequest.ToString();
 
         Dto::Cognito::ListUserPoolResponse serviceResponse = _cognitoService.ListUserPools(cognitoRequest);
         SendOkResponse(response, serviceResponse.ToJson());
@@ -51,7 +50,7 @@ namespace AwsMock::Service {
         Dto::Cognito::DeleteUserPoolRequest cognitoRequest{};
         cognitoRequest.FromJson(payload);
         cognitoRequest.region = region;
-        log_debug_stream(_logger) << "Got delete user pool request, json: " << cognitoRequest.ToString() << std::endl;
+        log_debug << "Got delete user pool request, json: " << cognitoRequest.ToString();
 
         _cognitoService.DeleteUserPool(cognitoRequest);
         SendOkResponse(response);
@@ -61,7 +60,7 @@ namespace AwsMock::Service {
         Dto::Cognito::AdminCreateUserRequest cognitoRequest{};
         cognitoRequest.FromJson(payload);
         cognitoRequest.region = region;
-        log_debug_stream(_logger) << "Got admin create user request, json: " << cognitoRequest.ToString() << std::endl;
+        log_debug << "Got admin create user request, json: " << cognitoRequest.ToString();
 
         Dto::Cognito::AdminCreateUserResponse cognitoResponse = _cognitoService.AdminCreateUser(cognitoRequest);
         SendOkResponse(response, cognitoResponse.ToJson());
@@ -71,7 +70,7 @@ namespace AwsMock::Service {
         Dto::Cognito::ListUsersRequest cognitoRequest{};
         cognitoRequest.FromJson(payload);
         cognitoRequest.region = region;
-        log_debug_stream(_logger) << "Got list users request: " << cognitoRequest.ToString() << std::endl;
+        log_debug << "Got list users request: " << cognitoRequest.ToString();
 
         Dto::Cognito::ListUsersResponse cognitoResponse = _cognitoService.ListUsers(cognitoRequest);
         SendOkResponse(response, cognitoResponse.ToJson());
@@ -81,7 +80,7 @@ namespace AwsMock::Service {
         Dto::Cognito::AdminDeleteUserRequest cognitoRequest{};
         cognitoRequest.FromJson(payload);
         cognitoRequest.region = region;
-        log_debug_stream(_logger) << "Got admin delete user request, json: " << cognitoRequest.ToString() << std::endl;
+        log_debug << "Got admin delete user request, json: " << cognitoRequest.ToString();
 
         _cognitoService.AdminDeleteUser(cognitoRequest);
         SendOkResponse(response);
@@ -94,15 +93,15 @@ namespace AwsMock::Service {
   }
 
   void CognitoJava2Handler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    log_debug_stream(_logger) << "Cognito DELETE request, URI: " + request.getURI() << " region: " << region << " user: " << user << std::endl;
+    log_debug << "Cognito DELETE request, URI: " + request.getURI() << " region: " << region << " user: " << user;
   }
 
   void CognitoJava2Handler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    log_debug_stream(_logger) << "Cognito HEAD request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+    log_debug << "Cognito HEAD request, URI: " << request.getURI() << " region: " << region << " user: " << user;
   }
 
   void CognitoJava2Handler::handleOptions(Poco::Net::HTTPServerResponse &response) {
-    log_debug_stream(_logger) << "Cognito OPTIONS request" << std::endl;
+    log_debug << "Cognito OPTIONS request";
 
     response.set("Allow", "GET, PUT, POST, DELETE, HEAD, OPTIONS");
     response.setContentType("text/plain; charset=utf-8");
@@ -115,7 +114,7 @@ namespace AwsMock::Service {
   std::string CognitoJava2Handler::GetActionFromHeader(Poco::Net::HTTPServerRequest &request) {
 
     if (!request.has("X-Amz-Target")) {
-      log_error_stream(_logger) << "Could not extract action" << std::endl;
+      log_error << "Could not extract action";
       throw Core::ServiceException("Could not extract action");
     }
 

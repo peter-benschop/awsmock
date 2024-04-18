@@ -11,8 +11,7 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_document;
 
   Database::Database()
-      : _configuration(Core::Configuration::instance()), _logger(Poco::Logger::get("Database")), _useDatabase(false),
-        _initialized(false) {
+      : _configuration(Core::Configuration::instance()), _useDatabase(false), _initialized(false) {
 
     _useDatabase = _configuration.getBool("awsmock.mongodb.active", false);
     _name = _configuration.getString("awsmock.mongodb.name", "awsmock");
@@ -55,7 +54,7 @@ namespace AwsMock::Database {
     mongocxx::pool::entry _client = _pool->acquire();
     (*_client)[_name]["module"].update_one(make_document(kvp("name", "database")),
                                            make_document(kvp("$set", make_document(kvp("state", "RUNNING")))));
-    log_info_stream(_logger) << "Database module started, poolSize: " << _poolSize << std::endl;
+    log_info << "Database module started, poolSize: " << _poolSize;
   }
 
   void Database::StopDatabase() {
@@ -67,7 +66,7 @@ namespace AwsMock::Database {
                                            make_document(kvp("$set", make_document(kvp("state", "STOPPED")))));
 
     _useDatabase = false;
-    log_info_stream(_logger) << "Database module stopped" << std::endl;
+    log_info << "Database module stopped";
   }
 
   void Database::CreateIndexes() {
@@ -88,7 +87,7 @@ namespace AwsMock::Database {
                                                 make_document(kvp("name", "s3_region_name_idx1")));
       GetConnection()["module"].create_index(make_document(kvp("name", 1), kvp("state", 1)),
                                              make_document(kvp("name", "module_name_status_idx1")));
-      log_debug_stream(_logger) << "SQS indexes created" << std::endl;
+      log_debug << "SQS indexes created";
     }
   }
 

@@ -14,7 +14,7 @@ namespace AwsMock::Core {
 
     _fd = open(filename.c_str(), O_RDWR | O_CREAT, 0644);
     if (_fd < 0) {
-      log_error_stream(_logger) << "Could not open file for memory mapping, filename: " << filename << " errno: " << errno << std::endl;
+      log_error << "Could not open file for memory mapping, filename: " << filename << " errno: " << errno;
       return false;
     }
 
@@ -24,12 +24,12 @@ namespace AwsMock::Core {
     _membuffer = (char *) _start;
 
     if (_membuffer == MAP_FAILED) {
-      log_error_stream(_logger) << "Memory map file failed, filename: " << filename << " errno: " << errno << std::endl;
+      log_error << "Memory map file failed, filename: " << filename << " errno: " << errno;
       return false;
     }
 
     _mapped = true;
-    log_info_stream(_logger) << "Memory map file opened, filename: " << filename << std::endl;
+    log_info << "Memory map file opened, filename: " << filename;
 
     return _mapped;
   }
@@ -37,10 +37,10 @@ namespace AwsMock::Core {
   void MemoryMappedFile::CloseFile() {
     Poco::Mutex::ScopedLock lock(_mutex);
     /*if (munmap(_start, MEMORY_SIZE) < 0) {
-      log_error_stream(_logger) << "Could not unmap file, filename: " << _filename << std::endl;
+      log_error << "Could not unmap file, filename: " << _filename;
     }*/
     close(_fd);
-    log_debug_stream(_logger) << "Memory mapped file closed, filename: " << _filename << std::endl;
+    log_debug << "Memory mapped file closed, filename: " << _filename;
     _mapped = false;
   }
 

@@ -220,11 +220,6 @@ namespace AwsMock::Controller {
     private:
 
       /**
-       * Logger
-       */
-      Core::LogStream _logger = Core::LogStream(Poco::Logger::get("Gateway"));
-
-      /**
        * Application configuration
        */
       Configuration _configuration = Configuration(CONFIGURATION_BASE_PATH);

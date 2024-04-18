@@ -6,8 +6,8 @@
 
 namespace AwsMock::Service {
 
-  SecretsManagerServer::SecretsManagerServer(Core::Configuration &configuration, Core::MetricService &metricService)
-    : AbstractServer(configuration, "secretsmanager"), _logger(Poco::Logger::get("SecretsManagerServer")), _configuration(configuration), _metricService(metricService), _moduleDatabase(Database::ModuleDatabase::instance()) {
+  SecretsManagerServer::SecretsManagerServer(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractServer(configuration, "secretsmanager"), _configuration(configuration), _metricService(metricService),
+                                                                                                                       _moduleDatabase(Database::ModuleDatabase::instance()) {
 
     // HTTP manager configuration
     _port = _configuration.getInt("awsmock.service.secretsmanager.port", SECRETSMANAGER_DEFAULT_PORT);
@@ -15,24 +15,24 @@ namespace AwsMock::Service {
     _maxQueueLength = _configuration.getInt("awsmock.service.secretsmanager.max.queue", SECRETSMANAGER_DEFAULT_QUEUE_LENGTH);
     _maxThreads = _configuration.getInt("awsmock.service.secretsmanager.max.threads", SECRETSMANAGER_DEFAULT_THREADS);
     _requestTimeout = _configuration.getInt("awsmock.service.secretsmanager.timeout", SECRETSMANAGER_DEFAULT_TIMEOUT);
-    log_debug_stream(_logger) << "SecretsManager rest module initialized, endpoint: " << _host << ":" << _port << std::endl;
+    log_debug << "SecretsManager rest module initialized, endpoint: " << _host << ":" << _port;
 
     // Sleeping period
     _period = _configuration.getInt("awsmock.worker.secretsmanager.period", 10000);
 
     // Create environment
     _region = _configuration.getString("awsmock.region");
-    log_debug_stream(_logger) << "SecretsManager server initialized" << std::endl;
+    log_debug << "SecretsManager server initialized";
   }
 
   void SecretsManagerServer::Initialize() {
 
     // Check module active
     if (!IsActive("secretsmanager")) {
-      log_info_stream(_logger) << "SecretsManager module inactive" << std::endl;
+      log_info << "SecretsManager module inactive";
       return;
     }
-    log_info_stream(_logger) << "SecretsManager server starting, port: " << _port << std::endl;
+    log_info << "SecretsManager server starting, port: " << _port;
 
     // Start REST module
     StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new SecretsManagerRequestHandlerFactory(_configuration, _metricService));

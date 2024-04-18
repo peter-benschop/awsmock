@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database {
 
-  TransferMemoryDb::TransferMemoryDb() : _logger(Poco::Logger::get("TransferMemoryDb")) {}
+  TransferMemoryDb::TransferMemoryDb() {}
 
   bool TransferMemoryDb::TransferExists(const std::string &region, const std::string &serverId) {
 
@@ -62,7 +62,7 @@ namespace AwsMock::Database {
       }
     }
 
-    log_trace_stream(_logger) << "Got transfer list, size: " << transferList.size() << std::endl;
+    log_trace << "Got transfer list, size: " << transferList.size();
     return transferList;
   }
 
@@ -71,7 +71,7 @@ namespace AwsMock::Database {
 
     std::string oid = Poco::UUIDGenerator().createRandom().toString();
     _transfers[oid] = transfer;
-    log_trace_stream(_logger) << "Transfer created, oid: " << oid << std::endl;
+    log_trace << "Transfer created, oid: " << oid;
     return GetTransferById(oid);
   }
 
@@ -87,7 +87,7 @@ namespace AwsMock::Database {
                       });
 
     if (it == _transfers.end()) {
-      log_error_stream(_logger) << "Update transfer failed, serverId: " << serverId << std::endl;
+      log_error << "Update transfer failed, serverId: " << serverId;
       throw Core::DatabaseException("Update transfer failed, serverId: " + serverId);
     }
 
@@ -105,7 +105,7 @@ namespace AwsMock::Database {
                       });
 
     if (it == _transfers.end()) {
-      log_error_stream(_logger) << "Get transfer by ID failed, oid: " << oid << std::endl;
+      log_error << "Get transfer by ID failed, oid: " << oid;
       throw Core::DatabaseException("Get transfer by ID failed, oid: " + oid);
     }
 
@@ -122,7 +122,7 @@ namespace AwsMock::Database {
                       });
 
     if (it == _transfers.end()) {
-      log_error_stream(_logger) << "Get transfer by serverId failed, serverId: " << serverId << std::endl;
+      log_error << "Get transfer by serverId failed, serverId: " << serverId;
       throw Core::DatabaseException("Get transfer by serverId failed, serverId: " + serverId);
     }
 
@@ -139,7 +139,7 @@ namespace AwsMock::Database {
                       });
 
     if (it == _transfers.end()) {
-      log_error_stream(_logger) << "Get transfer by arn failed, arn: " << arn << std::endl;
+      log_error << "Get transfer by arn failed, arn: " << arn;
       throw Core::DatabaseException("Get transfer by arn failed, arn: " + arn);
     }
 
@@ -154,13 +154,13 @@ namespace AwsMock::Database {
       auto const &[key, value] = item;
       return value.serverId == serverId;
     });
-    log_debug_stream(_logger) << "Transfer server deleted, count: " << count << std::endl;
+    log_debug << "Transfer server deleted, count: " << count;
   }
 
   void TransferMemoryDb::DeleteAllTransfers() {
     Poco::ScopedLock lock(_transferMutex);
 
-    log_debug_stream(_logger) << "All transfer servers deleted, count: " << _transfers.size() << std::endl;
+    log_debug << "All transfer servers deleted, count: " << _transfers.size();
     _transfers.clear();
   }
 }

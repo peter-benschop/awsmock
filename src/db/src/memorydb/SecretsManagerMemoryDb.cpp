@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database {
 
-  SecretsManagerMemoryDb::SecretsManagerMemoryDb() : _logger(Poco::Logger::get("SecretsManagerDb")) {}
+  SecretsManagerMemoryDb::SecretsManagerMemoryDb() {}
 
   bool SecretsManagerMemoryDb::SecretExists(const std::string &region, const std::string &name) {
 
@@ -78,7 +78,7 @@ namespace AwsMock::Database {
 
     std::string oid = Poco::UUIDGenerator().createRandom().toString();
     _secrets[oid] = secret;
-    log_trace_stream(_logger) << "Secret created, oid: " << oid << std::endl;
+    log_trace << "Secret created, oid: " << oid;
     return GetSecretById(oid);
 
   }
@@ -105,7 +105,7 @@ namespace AwsMock::Database {
       secretList.emplace_back(secret.second);
     }
 
-    log_trace_stream(_logger) << "Got secret list, size: " << secretList.size() << std::endl;
+    log_trace << "Got secret list, size: " << secretList.size();
     return secretList;
   }
 
@@ -118,13 +118,13 @@ namespace AwsMock::Database {
       auto const &[key, value] = item;
       return value.region == region && value.name == name;
     });
-    log_debug_stream(_logger) << "Secret deleted, count: " << count << std::endl;
+    log_debug << "Secret deleted, count: " << count;
   }
 
   void SecretsManagerMemoryDb::DeleteAllSecrets() {
     Poco::ScopedLock lock(_secretMutex);
 
-    log_debug_stream(_logger) << "Secrets deleted, count: " << _secrets.size() << std::endl;
+    log_debug << "Secrets deleted, count: " << _secrets.size();
     _secrets.clear();
   }
 

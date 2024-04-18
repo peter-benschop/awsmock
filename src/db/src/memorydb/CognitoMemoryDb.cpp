@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database {
 
-  CognitoMemoryDb::CognitoMemoryDb() : _logger(Poco::Logger::get("SQSMemoryDb")) {}
+  CognitoMemoryDb::CognitoMemoryDb() {}
 
   bool CognitoMemoryDb::UserPoolExists(const std::string &region, const std::string &name) {
 
@@ -41,7 +41,7 @@ namespace AwsMock::Database {
       }
     }
 
-    log_trace_stream(_logger) << "Got user pool list, size: " << userPoolList.size() << std::endl;
+    log_trace << "Got user pool list, size: " << userPoolList.size();
     return userPoolList;
   }
 
@@ -50,7 +50,7 @@ namespace AwsMock::Database {
 
     std::string oid = Poco::UUIDGenerator().createRandom().toString();
     _userPools[oid] = userPool;
-    log_trace_stream(_logger) << "Cognito user pool created, oid: " << oid << std::endl;
+    log_trace << "Cognito user pool created, oid: " << oid;
     return GetUserPoolByOid(oid);
   }
 
@@ -63,7 +63,7 @@ namespace AwsMock::Database {
                       });
 
     if (it == _userPools.end()) {
-      log_error_stream(_logger) << "Get cognito user pool by oid failed, oid: " << oid << std::endl;
+      log_error << "Get cognito user pool by oid failed, oid: " << oid;
       throw Core::DatabaseException("Get cognito user pool by oid failed, oid: " + oid);
     }
 
@@ -81,8 +81,8 @@ namespace AwsMock::Database {
                       });
 
     if (it == _userPools.end()) {
-      log_error_stream(_logger) << "Get cognito user pool by region and name failed, region: " << region << " name: "
-                                << name << std::endl;
+      log_error << "Get cognito user pool by region and name failed, region: " << region << " name: "
+                                << name;
       throw Core::DatabaseException(
           "Get cognito user pool by region and name failed, region: " + region + " name: " + name);
     }
@@ -103,7 +103,7 @@ namespace AwsMock::Database {
       }
     }
 
-    log_trace_stream(_logger) << "Count user pools, size: " << count << std::endl;
+    log_trace << "Count user pools, size: " << count;
     return count;
   }
 
@@ -120,8 +120,8 @@ namespace AwsMock::Database {
                       });
 
     if (it == _userPools.end()) {
-      log_error_stream(_logger) << "Update user pool failed, region: " << userPool.region << " name: " << userPool.name
-                                << std::endl;
+      log_error << "Update user pool failed, region: " << userPool.region << " name: " << userPool.name
+                               ;
       throw Core::DatabaseException(
           "Update cognito user pool failed, region: " + userPool.region + " name: " + userPool.name);
     }
@@ -136,13 +136,13 @@ namespace AwsMock::Database {
       auto const &[key, value] = item;
       return value.userPoolId == userPoolId;
     });
-    log_debug_stream(_logger) << "Cognito user pool deleted, count: " << count << std::endl;
+    log_debug << "Cognito user pool deleted, count: " << count;
   }
 
   void CognitoMemoryDb::DeleteAllUserPools() {
     Poco::ScopedLock lock(_userPoolMutex);
 
-    log_debug_stream(_logger) << "All cognito user pools deleted, count: " << _userPools.size() << std::endl;
+    log_debug << "All cognito user pools deleted, count: " << _userPools.size();
     _userPools.clear();
   }
 
@@ -163,7 +163,7 @@ namespace AwsMock::Database {
 
     std::string oid = Poco::UUIDGenerator().createRandom().toString();
     _users[oid] = user;
-    log_trace_stream(_logger) << "Cognito user created, oid: " << oid << std::endl;
+    log_trace << "Cognito user created, oid: " << oid;
     return GetUserByOid(oid);
   }
 
@@ -174,7 +174,7 @@ namespace AwsMock::Database {
     });
 
     if (it == _users.end()) {
-      log_error_stream(_logger) << "Get cognito user by oid failed, oid: " << oid << std::endl;
+      log_error << "Get cognito user by oid failed, oid: " << oid;
       throw Core::DatabaseException("Get cognito user by oid failed, oid: " + oid);
     }
 
@@ -194,7 +194,7 @@ namespace AwsMock::Database {
                       });
 
     if (it == _users.end()) {
-      log_error_stream(_logger) << "Get cognito user by user name failed, userName: " << userName << std::endl;
+      log_error << "Get cognito user by user name failed, userName: " << userName;
       throw Core::DatabaseException("Get cognito user by user name failed, userName: " + userName);
     }
 
@@ -226,7 +226,7 @@ namespace AwsMock::Database {
       count = static_cast<long>(_users.size());
     }
 
-    log_trace_stream(_logger) << "Count user pools, size: " << count << std::endl;
+    log_trace << "Count user pools, size: " << count;
     return count;
   }
 
@@ -258,7 +258,7 @@ namespace AwsMock::Database {
 
     }
 
-    log_trace_stream(_logger) << "Got user list, size: " << userList.size() << std::endl;
+    log_trace << "Got user list, size: " << userList.size();
     return userList;
   }
 
@@ -277,8 +277,8 @@ namespace AwsMock::Database {
                       });
 
     if (it == _users.end()) {
-      log_error_stream(_logger) << "Update user failed, region: " << user.region << " name: " << user.userName
-                                << std::endl;
+      log_error << "Update user failed, region: " << user.region << " name: " << user.userName
+                               ;
       throw Core::DatabaseException("Update cognito user failed, region: " + user.region + " name: " + user.userName);
     }
     _users[it->first] = user;
@@ -292,13 +292,13 @@ namespace AwsMock::Database {
       return u.second.region == user.region && u.second.userPoolId == user.userPoolId
           && u.second.userName == user.userName;
     });
-    log_debug_stream(_logger) << "Cognito user deleted, count: " << count << std::endl;
+    log_debug << "Cognito user deleted, count: " << count;
   }
 
   void CognitoMemoryDb::DeleteAllUsers() {
     Poco::ScopedLock lock(_userMutex);
 
-    log_debug_stream(_logger) << "All cognito users deleted, count: " << _userPools.size() << std::endl;
+    log_debug << "All cognito users deleted, count: " << _userPools.size();
     _users.clear();
   }
 

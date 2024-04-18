@@ -6,11 +6,11 @@
 
 namespace AwsMock::Core {
 
-  Configuration::Configuration() : _logger(Poco::Logger::get("Configuration")) {
+  Configuration::Configuration() {
     Initialize();
   }
 
-  Configuration::Configuration(const std::string &filename) : _logger(Poco::Logger::get("Configuration")) {
+  Configuration::Configuration(const std::string &filename) {
     SetFilename(filename);
     Initialize();
   }
@@ -159,7 +159,7 @@ namespace AwsMock::Core {
     } else if (!has(key)) {
       setString(key, defaultValue);
     }
-    log_trace_stream(_logger) << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue << std::endl;
+    log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
   }
 
   void Configuration::DefineBoolProperty(const std::string &key, const std::string &envProperty, bool defaultValue) {
@@ -168,7 +168,7 @@ namespace AwsMock::Core {
     } else if (!has(key)) {
       setBool(key, defaultValue);
     }
-    log_trace_stream(_logger) << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue << std::endl;
+    log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
   }
 
   void Configuration::DefineIntProperty(const std::string &key, const std::string &envProperty, int defaultValue) {
@@ -177,7 +177,7 @@ namespace AwsMock::Core {
     } else if (!has(key)) {
       setInt(key, defaultValue);
     }
-    log_trace_stream(_logger) << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue << std::endl;
+    log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
   }
 
   std::string Configuration::GetFilename() const {
@@ -200,7 +200,7 @@ namespace AwsMock::Core {
       throw CoreException("Property not found, key: " + key);
     }
     setString(key, value);
-    log_trace_stream(_logger) << "Value set, key: " << key << std::endl;
+    log_trace << "Value set, key: " << key;
   }
 
   void Configuration::SetValue(const std::string &key, bool value) {
@@ -208,7 +208,7 @@ namespace AwsMock::Core {
       throw CoreException("Property not found, key: " + key);
     }
     setBool(key, value);
-    log_trace_stream(_logger) << "Value set, key: " << key << std::endl;
+    log_trace << "Value set, key: " << key;
   }
 
   void Configuration::SetValue(const std::string &key, int value) {
@@ -216,7 +216,7 @@ namespace AwsMock::Core {
       throw CoreException("Property not found, key: " + key);
     }
     setInt(key, value);
-    log_trace_stream(_logger) << "Value set, key: " << key << std::endl;
+    log_trace << "Value set, key: " << key;
   }
 
   std::string Configuration::GetAppName() {
@@ -238,7 +238,7 @@ namespace AwsMock::Core {
     this->keys(pKeys);
     std::ofstream ofs(filename, std::ofstream::trunc);
     for (const auto &key : *this) {
-      ofs << key.first << "=" << key.second << std::endl;
+      ofs << key.first << "=" << key.second;
     }
   }
 

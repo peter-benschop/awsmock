@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database {
 
-  S3MemoryDb::S3MemoryDb() : _logger(Poco::Logger::get("SQSMemoryDb")) {}
+  S3MemoryDb::S3MemoryDb() {}
 
   bool S3MemoryDb::BucketExists(const std::string &region, const std::string &name) {
 
@@ -57,7 +57,7 @@ namespace AwsMock::Database {
 
     std::string oid = Poco::UUIDGenerator().createRandom().toString();
     _buckets[oid] = bucket;
-    log_trace_stream(_logger) << "Bucket created, oid: " << oid << std::endl;
+    log_trace << "Bucket created, oid: " << oid;
     return GetBucketById(oid);
 
   }
@@ -69,7 +69,7 @@ namespace AwsMock::Database {
       bucketList.emplace_back(bucket.second);
     }
 
-    log_trace_stream(_logger) << "Got bucket list, size: " << bucketList.size() << std::endl;
+    log_trace << "Got bucket list, size: " << bucketList.size();
     return bucketList;
   }
 
@@ -112,7 +112,7 @@ namespace AwsMock::Database {
 
     }
 
-    log_trace_stream(_logger) << "Got object list, size: " << objectList.size() << std::endl;
+    log_trace << "Got object list, size: " << objectList.size();
     return objectList;
   }
 
@@ -140,13 +140,13 @@ namespace AwsMock::Database {
       auto const &[key, value] = item;
       return value.region == region && value.name == name;
     });
-    log_debug_stream(_logger) << "Bucket deleted, count: " << count << std::endl;
+    log_debug << "Bucket deleted, count: " << count;
   }
 
   void S3MemoryDb::DeleteAllBuckets() {
     Poco::ScopedLock lock(_bucketMutex);
 
-    log_debug_stream(_logger) << "All buckets deleted, count: " << _buckets.size() << std::endl;
+    log_debug << "All buckets deleted, count: " << _buckets.size();
     _buckets.clear();
   }
 
@@ -168,7 +168,7 @@ namespace AwsMock::Database {
 
     std::string oid = Poco::UUIDGenerator().createRandom().toString();
     _objects[oid] = object;
-    log_trace_stream(_logger) << "Object created, oid: " << oid << std::endl;
+    log_trace << "Object created, oid: " << oid;
     return GetObjectById(oid);
 
   }
@@ -249,7 +249,7 @@ namespace AwsMock::Database {
       }
     }
 
-    log_trace_stream(_logger) << "Got object list, size: " << objectList.size() << std::endl;
+    log_trace << "Got object list, size: " << objectList.size();
     return objectList;
   }
 
@@ -262,7 +262,7 @@ namespace AwsMock::Database {
       auto const &[k, v] = item;
       return v.bucket == bucket && v.key == key;
     });
-    log_debug_stream(_logger) << "Object deleted, count: " << count << std::endl;
+    log_debug << "Object deleted, count: " << count;
   }
 
   void S3MemoryDb::DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys) {
@@ -275,7 +275,7 @@ namespace AwsMock::Database {
         return v.bucket == bucket && v.key == key;
       });
     }
-    log_debug_stream(_logger) << "Objects deleted, count: " << count << std::endl;
+    log_debug << "Objects deleted, count: " << count;
   }
 
   void S3MemoryDb::DeleteAllObjects() {

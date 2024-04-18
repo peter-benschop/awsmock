@@ -58,11 +58,6 @@ namespace AwsMock::Core {
   private:
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * Timer name
      */
     std::string _name;

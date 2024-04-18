@@ -99,11 +99,6 @@ namespace AwsMock::Database {
       void UpdateModuleStatus();
 
       /**
-       * Logger
-       */
-      Core::LogStream _logger;
-
-      /**
        * Application configuration
        */
       Core::Configuration &_configuration;

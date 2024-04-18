@@ -6,8 +6,7 @@
 
 namespace AwsMock::Service {
 
-  GatewayServer::GatewayServer(Core::Configuration &configuration, Core::MetricService &metricService)
-      : AbstractServer(configuration, "gateway"), _logger(Poco::Logger::get("GatewayServer")), _configuration(configuration), _metricService(metricService), _running(false){
+  GatewayServer::GatewayServer(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractServer(configuration, "gateway"), _configuration(configuration), _metricService(metricService), _running(false){
 
     // Get HTTP configuration values
     _port = _configuration.getInt("awsmock.service.gateway.port", GATEWAY_DEFAULT_PORT);
@@ -18,11 +17,11 @@ namespace AwsMock::Service {
 
     // Sleeping period
     _period = _configuration.getInt("awsmock.worker.lambda.period", 10000);
-    log_debug_stream(_logger) << "Gateway worker period: " << _period << std::endl;
+    log_debug << "Gateway worker period: " << _period;
 
     // Create environment
     _region = _configuration.getString("awsmock.region");
-    log_debug_stream(_logger) << "GatewayServer initialized" << std::endl;
+    log_debug << "GatewayServer initialized";
   }
 
   GatewayServer::~GatewayServer() {
@@ -33,10 +32,10 @@ namespace AwsMock::Service {
 
     // Check module active
     if (!IsActive("gateway")) {
-      log_info_stream(_logger) << "Gateway module inactive" << std::endl;
+      log_info << "Gateway module inactive";
       return;
     }
-    log_info_stream(_logger) << "Gateway server starting" << std::endl;
+    log_info << "Gateway server starting";
 
     // Start HTTP manager
     StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new GatewayRouter(_configuration, _metricService));

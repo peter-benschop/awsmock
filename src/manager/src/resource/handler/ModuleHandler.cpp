@@ -152,8 +152,7 @@ namespace AwsMock {
       } else if (action == "loglevel") {
 
         std::string level = Core::HttpUtils::GetPathParameter(request.getURI(), 2);
-        Core::LogStream::SetGlobalLevel(level);
-
+        plog::get()->setMaxSeverity(plog::severityFromString(level.c_str()));
         // Send response
         SendOkResponse(response, {});
       }

@@ -18,8 +18,8 @@ namespace AwsMock::Service {
     std::thread(&LambdaExecutor::SendInvocationRequest, u, b).detach();
   }
 
-  LambdaService::LambdaService(Core::Configuration &configuration, Core::MetricService &metricService) :
-    _logger(Poco::Logger::get("LambdaService")), _configuration(configuration), _metricService(metricService), _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()) {
+  LambdaService::LambdaService(Core::Configuration &configuration, Core::MetricService &metricService)
+    : _configuration(configuration), _metricService(metricService), _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()) {
 
     // Initialize environment
     _accountId = _configuration.getString("awsmock.account.userPoolId", "000000000000");
@@ -155,15 +155,12 @@ namespace AwsMock::Service {
     lambda = _lambdaDatabase.UpdateLambda(lambda);
     log_debug << "Lambda entity invoked, name: " + lambda.function;
   }
-  void CallAsyncInvoke1(const char *String, int I, const char *String1, Core::LogStream Stream) {
-
-  }
 
   void LambdaService::CreateTag(const Dto::Lambda::CreateTagRequest &request) {
     log_debug << "Create tag request, arn: " << request.arn;
 
     if (!_lambdaDatabase.LambdaExistsByArn(request.arn)) {
-      log_warning_stream(_logger) << "Lambda function does not exist, arn: " << request.arn;
+      log_warning << "Lambda function does not exist, arn: " << request.arn;
       throw Core::ServiceException("Lambda function does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
@@ -180,7 +177,7 @@ namespace AwsMock::Service {
     log_debug << "List tags request, arn: " << arn;
 
     if (!_lambdaDatabase.LambdaExistsByArn(arn)) {
-      log_warning_stream(_logger) << "Lambda function does not exist, arn: " << arn;
+      log_warning << "Lambda function does not exist, arn: " << arn;
       throw Core::ServiceException("Lambda function does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 
@@ -218,7 +215,7 @@ namespace AwsMock::Service {
     }
 
     _lambdaDatabase.DeleteLambda(request.functionName);
-    _logger.information() << "Lambda function deleted, function: " + request.functionName;
+    log_info << "Lambda function deleted, function: " + request.functionName;
   }
 
   void LambdaService::DeleteTags(Dto::Lambda::DeleteTagsRequest &request) {

@@ -6,8 +6,7 @@
 
 namespace AwsMock::Service {
 
-  AbstractWorker::AbstractWorker(const Core::Configuration &configuration)
-      : _logger(Poco::Logger::get("AbstractWorker")), _configuration(configuration) {
+  AbstractWorker::AbstractWorker(const Core::Configuration &configuration) : _configuration(configuration) {
 
     // Create environment
     _region = _configuration.getString("awsmock.region");

@@ -6,7 +6,7 @@
 
 namespace AwsMock::Core {
 
-  MetricSystemCollector::MetricSystemCollector() : Core::Timer("SystemCollector", 5), _logger(Poco::Logger::get("root")) {
+  MetricSystemCollector::MetricSystemCollector() : Core::Timer("SystemCollector", 5) {
 
     _virtualMemory = new Poco::Prometheus::Gauge(VIRTUAL_MEMORY);
     _realMemory = new Poco::Prometheus::Gauge(REAL_MEMORY);

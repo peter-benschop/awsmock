@@ -29,7 +29,7 @@ namespace AwsMock::Service {
      * @param configuration application configuration
      * @param metricService  monitoring
      */
-    CognitoHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _logger(Poco::Logger::get("CognitoHandlerFactory")), _configuration(configuration), _metricService(metricService) {}
+    CognitoHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService) {}
 
     /**
      * Create a new request handler instance.
@@ -45,11 +45,6 @@ namespace AwsMock::Service {
     }
 
   private:
-
-    /**
-     * Logger
-     */
-    Core::LogStream _logger;
 
     /**
      * S3 handler configuration

@@ -10,7 +10,7 @@ namespace AwsMock::FtpServer {
                          const std::function<void()> &completion_handler)
     : AbstractWorker(configuration), _completion_handler(completion_handler), _user_database(user_database), _io_service(io_service), command_socket_(io_service),
       command_write_strand_(io_service), data_type_binary_(false), data_acceptor_(io_service), data_buffer_strand_(io_service), file_rw_strand_(io_service),
-      _ftpWorkingDirectory("/"), _logger(Poco::Logger::get("FtpSession")), _configuration(configuration), _serverName(serverName) {
+      _ftpWorkingDirectory("/"), _configuration(configuration), _serverName(serverName) {
 
     // S3 module connection
     _s3ServiceHost = _configuration.getString("awsmock.service.s3.host", "localhost");
@@ -26,7 +26,7 @@ namespace AwsMock::FtpServer {
   }
 
   FtpSession::~FtpSession() {
-    log_debug_stream(_logger) << "Ftp Session shutting down" << std::endl;
+    log_debug << "Ftp Session shutting down";
     _completion_handler();
   }
 
@@ -34,7 +34,7 @@ namespace AwsMock::FtpServer {
     asio::error_code ec;
     command_socket_.set_option(asio::ip::tcp::no_delay(true), ec);
     if (ec)
-      log_error_stream(_logger) << "Unable to set socket option tcp::no_delay: " << ec.message() << std::endl;
+      log_error << "Unable to set socket option tcp::no_delay: " << ec.message();
 
     sendFtpMessage(FtpMessage(FtpReplyCode::SERVICE_READY_FOR_NEW_USER, "Welcome to AWS Transfer FTP Server"));
     readFtpCommand();
@@ -64,7 +64,7 @@ namespace AwsMock::FtpServer {
 
   void FtpSession::startSendingMessages() {
 
-    log_debug_stream(_logger) << "FTP >> " << command_output_queue_.front() << std::endl;
+    log_debug << "FTP >> " << command_output_queue_.front();
     asio::async_write(command_socket_, asio::buffer(command_output_queue_.front()), command_write_strand_.wrap(
       [me = shared_from_this()](asio::error_code ec, std::size_t /*bytes_to_transfer*/) {
         if (!ec) {
@@ -74,7 +74,7 @@ namespace AwsMock::FtpServer {
             me->startSendingMessages();
           }
         } else {
-          log_error_stream(me->_logger) << "Command write error: " << ec.message() << std::endl;
+          log_error << "Command write error: " << ec.message();
         }
       }
     ));
@@ -85,9 +85,9 @@ namespace AwsMock::FtpServer {
                            [me = shared_from_this()](asio::error_code ec, std::size_t length) {
                              if (ec) {
                                if (ec != asio::error::eof) {
-                                 log_error_stream(me->_logger) << "Read_until error: " << ec.message() << std::endl;
+                                 log_error << "Read_until error: " << ec.message();
                                } else {
-                                 log_debug_stream(me->_logger) << "Control connection closed by client." << std::endl;
+                                 log_debug << "Control connection closed by client.";
                                }
 
                                // Close the data connection, if it is open
@@ -115,7 +115,7 @@ namespace AwsMock::FtpServer {
                              stream.read(&packet_string[0], length - 2);
 
                              stream.ignore(2); // Remove the "\r\n"
-                             log_debug_stream(me->_logger) << "FTP << " << packet_string << std::endl;
+                             log_debug << "FTP << " << packet_string;
 
                              me->handleFtpCommand(packet_string);
                            });
@@ -297,7 +297,7 @@ namespace AwsMock::FtpServer {
       asio::error_code ec;
       data_acceptor_.close(ec);
       if (ec) {
-        log_error_stream(_logger) << "Error closing data acceptor: " << ec.message() << std::endl;
+        log_error << "Error closing data acceptor: " << ec.message();
       }
     }
 
@@ -307,7 +307,7 @@ namespace AwsMock::FtpServer {
       asio::error_code ec;
       data_acceptor_.open(endpoint.protocol(), ec);
       if (ec) {
-        log_error_stream(_logger) << "Error opening data acceptor: " << ec.message() << std::endl;
+        log_error << "Error opening data acceptor: " << ec.message();
         sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
         return;
       }
@@ -316,7 +316,7 @@ namespace AwsMock::FtpServer {
       asio::error_code ec;
       data_acceptor_.bind(endpoint, ec);
       if (ec) {
-        log_error_stream(_logger) << "Error binding data acceptor: " << ec.message() << std::endl;
+        log_error << "Error binding data acceptor: " << ec.message();
         sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
         return;
       }
@@ -325,7 +325,7 @@ namespace AwsMock::FtpServer {
       asio::error_code ec;
       data_acceptor_.listen(asio::socket_base::max_connections, ec);
       if (ec) {
-        log_error_stream(_logger) << "Error listening on data acceptor: " << ec.message() << std::endl;
+        log_error << "Error listening on data acceptor: " << ec.message();
         sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
         return;
       }
@@ -490,7 +490,7 @@ namespace AwsMock::FtpServer {
 
     sendFtpMessage(FtpReplyCode::FILE_STATUS_OK_OPENING_DATA_CONNECTION, "Receiving file");
     receiveFile(file);
-    log_debug_stream(_logger) << "STOR ended" << std::endl;
+    log_debug << "STOR ended";
   }
 
   void FtpSession::handleFtpCommandSTOU(const std::string & /*param*/) {
@@ -990,7 +990,7 @@ namespace AwsMock::FtpServer {
                                                            me->data_buffer_.pop_front();
 
                                                            if (ec) {
-                                                             log_error_stream(me->_logger) << "Data write error: " << ec.message() << std::endl;
+                                                             log_error << "Data write error: " << ec.message();
                                                              return;
                                                            }
 
@@ -1189,7 +1189,7 @@ namespace AwsMock::FtpServer {
     std::ifstream ifs(fileName);
     _s3Service->PutObject(request, ifs);
     ifs.close();
-    log_debug_stream(_logger) << "Create object message request send, fileName: " << fileName << std::endl;
+    log_debug << "Create object message request send, fileName: " << fileName;
   }
 
   void FtpSession::SendDeleteObjectRequest(const std::string &user, const std::string &fileName) {
@@ -1197,7 +1197,7 @@ namespace AwsMock::FtpServer {
     Dto::S3::DeleteObjectRequest request = {.region=_region, .user=user, .bucket=_bucket, .key=GetKey(fileName)};
     _s3Service->DeleteObject(request);
 
-    log_debug_stream(_logger) << "Delete object request send, fileName: " << fileName << std::endl;
+    log_debug << "Delete object request send, fileName: " << fileName;
   }
 
   std::string FtpSession::GetKey(const std::string &path) {

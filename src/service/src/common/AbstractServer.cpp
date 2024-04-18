@@ -6,8 +6,7 @@
 
 namespace AwsMock::Service {
 
-  AbstractServer::AbstractServer(Core::Configuration &configuration, std::string name)
-    : Timer(name, 10), _logger(Poco::Logger::get("AbstractServer")), _configuration(configuration), _moduleDatabase(Database::ModuleDatabase::instance()), _name(std::move(name)), _running(false) {
+  AbstractServer::AbstractServer(Core::Configuration &configuration, std::string name) : Timer(name, 10), _configuration(configuration), _moduleDatabase(Database::ModuleDatabase::instance()), _name(std::move(name)), _running(false) {
 
     // Create environment
     log_debug << "AbstractServer initialized, name: " << _name;

@@ -9,22 +9,22 @@ namespace AwsMock::FtpServer {
 
     if (isUsernameAnonymousUser(username)) {
       if (anonymous_user_) {
-        log_error_stream(_logger) << "Error adding user with username \"" << username
-                                  << "\". The username denotes the anonymous user, which is already present." << std::endl;
+        log_error << "Error adding user with username \"" << username
+                                  << "\". The username denotes the anonymous user, which is already present.";
         return false;
       } else {
         anonymous_user_ = std::make_shared<FtpUser>(username, password, local_root_path, permissions);
-        log_debug_stream(_logger) << "Successfully added anonymous user." << std::endl;
+        log_debug << "Successfully added anonymous user.";
         return true;
       }
     } else {
       auto user_it = database_.find(username);
       if (user_it == database_.end()) {
         database_.emplace(username, std::make_shared<FtpUser>(username, password, local_root_path, permissions));
-        log_debug_stream(_logger) << "Successfully added user: " << username << " home: " << local_root_path << std::endl;
+        log_debug << "Successfully added user: " << username << " home: " << local_root_path;
         return true;
       } else {
-        std::cerr << "Error adding user with username \"" << username << "\". The user already exists." << std::endl;
+        std::cerr << "Error adding user with username \"" << username << "\". The user already exists.";
         return false;
       }
     }

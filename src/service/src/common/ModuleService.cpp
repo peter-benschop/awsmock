@@ -7,8 +7,7 @@
 
 namespace AwsMock::Service {
 
-  ModuleService::ModuleService(Core::Configuration &configuration, Service::ServerMap &serverMap)
-    : _logger(Poco::Logger::get("ModuleService")), _configuration(configuration), _serverMap(serverMap), _prettyPrint(false), _moduleDatabase(Database::ModuleDatabase::instance()) {
+  ModuleService::ModuleService(Core::Configuration &configuration, Service::ServerMap &serverMap) : _configuration(configuration), _serverMap(serverMap), _prettyPrint(false), _moduleDatabase(Database::ModuleDatabase::instance()) {
 
     _prettyPrint = _configuration.getBool("awsmock.pretty", false);
   }

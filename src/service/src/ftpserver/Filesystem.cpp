@@ -201,7 +201,7 @@ namespace AwsMock::FtpServer {
     DIR *dp = opendir(path.c_str());
     struct dirent *dirp;
     if (dp == nullptr) {
-      std::cerr << "Error opening directory: " << strerror(errno) << std::endl;
+      std::cerr << "Error opening directory: " << strerror(errno);
       return content;
     }
 

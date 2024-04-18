@@ -76,11 +76,6 @@ namespace AwsMock::Service {
     std::string GetService(const std::string &authInfo);
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * Configuration
      */
     Core::Configuration &_configuration;

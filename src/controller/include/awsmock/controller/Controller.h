@@ -121,11 +121,6 @@ namespace AwsMock::Controller {
       void AddAuthorization(std::map<std::string, std::string> &headers);
 
       /**
-       * Logger
-       */
-      Core::LogStream _logger;
-
-      /**
        * Application configuration
        */
       const Configuration &_configuration;

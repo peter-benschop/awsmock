@@ -32,8 +32,7 @@ namespace AwsMock::Database {
        {.name="database", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}}
   };
 
-  ModuleDatabase::ModuleDatabase()
-      : _logger(Poco::Logger::get("ModuleDatabase")), _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()) {
+  ModuleDatabase::ModuleDatabase() : _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()) {
 
     for (const auto &module : _existingModules) {
       if (_useDatabase) {

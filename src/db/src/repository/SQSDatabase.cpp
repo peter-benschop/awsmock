@@ -10,9 +10,7 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_array;
   using bsoncxx::builder::basic::make_document;
 
-  SQSDatabase::SQSDatabase()
-    : _logger(Poco::Logger::get("SQSDatabase")), _memoryDb(SQSMemoryDb::instance()), _useDatabase(HasDatabase()),
-      _databaseName(GetDatabaseName()), _collectionNameQueue("sqs_queue"), _collectionNameMessage("sqs_message") {
+  SQSDatabase::SQSDatabase() : _memoryDb(SQSMemoryDb::instance()), _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()), _collectionNameQueue("sqs_queue"), _collectionNameMessage("sqs_message") {
   }
 
   bool SQSDatabase::QueueExists(const std::string &region, const std::string &name) {
@@ -23,7 +21,7 @@ namespace AwsMock::Database {
       mongocxx::collection _queueCollection = (*client)[_databaseName][_collectionNameQueue];
 
       int64_t count = _queueCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
-      log_trace_stream(_logger) << "Queue exists: " << (count > 0 ? "true" : "false") << std::endl;
+      log_trace << "Queue exists: " << (count > 0 ? "true" : "false");
       return count > 0;
 
     } else {
@@ -41,7 +39,7 @@ namespace AwsMock::Database {
       mongocxx::collection _queueCollection = (*client)[_databaseName][_collectionNameQueue];
 
       int64_t count = _queueCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
-      log_trace_stream(_logger) << "Queue exists: " << (count > 0 ? "true" : "false") << std::endl;
+      log_trace << "Queue exists: " << (count > 0 ? "true" : "false");
       return count > 0;
 
     } else {
@@ -59,7 +57,7 @@ namespace AwsMock::Database {
       mongocxx::collection _queueCollection = (*client)[_databaseName][_collectionNameQueue];
 
       int64_t count = _queueCollection.count_documents(make_document(kvp("queueArn", queueArn)));
-      log_trace_stream(_logger) << "Queue exists: " << (count > 0 ? "true" : "false") << std::endl;
+      log_trace << "Queue exists: " << (count > 0 ? "true" : "false");
       return count > 0;
 
     } else {
@@ -81,15 +79,15 @@ namespace AwsMock::Database {
 
         session.start_transaction();
         auto result = _queueCollection.insert_one(queue.ToDocument());
-        log_trace_stream(_logger) << "Queue created, oid: " << result->inserted_id().get_oid().value.to_string()
-                                  << std::endl;
+        log_trace << "Queue created, oid: " << result->inserted_id().get_oid().value.to_string()
+                                 ;
         session.commit_transaction();
 
         return GetQueueById(result->inserted_id().get_oid().value);
 
       } catch (mongocxx::exception &e) {
         session.abort_transaction();
-        log_error_stream(_logger) << "Collection transaction exception: " << e.what() << std::endl;
+        log_error << "Collection transaction exception: " << e.what();
         throw Core::DatabaseException(
           "Insert queue failed, region: " + queue.region + " queueUrl: " + queue.queueUrl + " message: " + e.what());
       }
@@ -190,7 +188,7 @@ namespace AwsMock::Database {
       mongocxx::stdx::optional<bsoncxx::document::value>
         mResult = _queueCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
       if (!mResult) {
-        log_warning_stream(_logger) << "GetQueueByName failed, name: " << name << std::endl;
+        log_warning<< "GetQueueByName failed, name: " << name;
         return {};
       }
 
@@ -237,7 +235,7 @@ namespace AwsMock::Database {
       queueList = _memoryDb.ListQueues(region);
 
     }
-    log_trace_stream(_logger) << "Got queue list, size: " << queueList.size() << std::endl;
+    log_trace << "Got queue list, size: " << queueList.size();
     return queueList;
   }
 
@@ -254,18 +252,18 @@ namespace AwsMock::Database {
         session.start_transaction();
         auto result = messageCollection.delete_many(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
         session.commit_transaction();
-        log_debug_stream(_logger) << "Purged queue, count: " << result->deleted_count() << " url: " << queueUrl
-                                  << std::endl;
+        log_debug << "Purged queue, count: " << result->deleted_count() << " url: " << queueUrl
+                                 ;
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
     } else {
 
-      log_debug_stream(_logger) << "Purged queue, count: " << _messages.size() << std::endl;
+      log_debug << "Purged queue, count: " << _messages.size();
       _memoryDb.PurgeQueue(region, queueUrl);
 
     }
@@ -290,14 +288,14 @@ namespace AwsMock::Database {
                                                queue.ToDocument(),
                                                opts);
         session.commit_transaction();
-        log_trace_stream(_logger) << "Queue updated: " << queue.ToString() << std::endl;
+        log_trace << "Queue updated: " << queue.ToString();
 
         queue.FromDocument(mResult->view());
         return queue;
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
@@ -340,7 +338,7 @@ namespace AwsMock::Database {
       return _memoryDb.CountQueues(region);
 
     }
-    log_trace_stream(_logger) << "Count queues, result: " << count << std::endl;
+    log_trace << "Count queues, result: " << count;
     return count;
   }
 
@@ -358,11 +356,11 @@ namespace AwsMock::Database {
         auto result =
           _queueCollection.delete_many(make_document(kvp("region", queue.region), kvp("queueUrl", queue.queueUrl)));
         session.commit_transaction();
-        log_debug_stream(_logger) << "Queue deleted, count: " << result->deleted_count() << std::endl;
+        log_debug << "Queue deleted, count: " << result->deleted_count();
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
@@ -386,11 +384,11 @@ namespace AwsMock::Database {
         session.start_transaction();
         auto result = _queueCollection.delete_many({});
         session.commit_transaction();
-        log_debug_stream(_logger) << "All queues deleted, count: " << result->deleted_count() << std::endl;
+        log_debug << "All queues deleted, count: " << result->deleted_count();
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
@@ -414,13 +412,13 @@ namespace AwsMock::Database {
         session.start_transaction();
         auto result = messageCollection.insert_one(message.ToDocument());
         session.commit_transaction();
-        log_trace_stream(_logger) << "Message created, oid: " << result->inserted_id().get_oid().value.to_string()
-                                  << std::endl;
+        log_trace << "Message created, oid: " << result->inserted_id().get_oid().value.to_string()
+                                 ;
         return GetMessageById(result->inserted_id().get_oid().value);
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
@@ -439,7 +437,7 @@ namespace AwsMock::Database {
       auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
 
       int64_t count = messageCollection.count_documents(make_document(kvp("receiptHandle", receiptHandle)));
-      log_trace_stream(_logger) << "Message exists: " << (count > 0 ? "true" : "false") << std::endl;
+      log_trace << "Message exists: " << (count > 0 ? "true" : "false");
       return count > 0;
 
     } else {
@@ -513,7 +511,7 @@ namespace AwsMock::Database {
                                                              message.ToDocument(),
                                                              opts);
         session.commit_transaction();
-        log_trace_stream(_logger) << "Message updated: " << ConvertMessageToJson(mResult.value()) << std::endl;
+        log_trace << "Message updated: " << ConvertMessageToJson(mResult.value());
         if (mResult) {
           message.FromDocument(mResult->view());
           return message;
@@ -521,7 +519,7 @@ namespace AwsMock::Database {
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
@@ -578,7 +576,7 @@ namespace AwsMock::Database {
       messageList = _memoryDb.ListMessages(region);
 
     }
-    log_trace_stream(_logger) << "Got message list, size: " << messageList.size() << std::endl;
+    log_trace << "Got message list, size: " << messageList.size();
     return messageList;
   }
 
@@ -635,7 +633,7 @@ namespace AwsMock::Database {
         session.commit_transaction();
 
       } catch (mongocxx::exception &e) {
-        log_error_stream(_logger) << "Collection transaction exception: " << e.what() << std::endl;
+        log_error << "Collection transaction exception: " << e.what();
         session.abort_transaction();
       }
 
@@ -644,8 +642,8 @@ namespace AwsMock::Database {
       _memoryDb.ReceiveMessages(region, queueUrl, visibility, maxMessages, messageList);
 
     }
-    log_trace_stream(_logger) << "Messages received, region: " << region << " queue: " << queueUrl + " count: "
-                              << messageList.size() << std::endl;
+    log_trace << "Messages received, region: " << region << " queue: " << queueUrl + " count: "
+                              << messageList.size();
   }
 
   void SQSDatabase::ResetMessages(const std::string &queueUrl, long visibility) {
@@ -673,11 +671,11 @@ namespace AwsMock::Database {
                               kvp("reset", bsoncxx::types::b_null())))));
         session.commit_transaction();
 
-        log_trace_stream(_logger) << "Message reset, updated: " << result->upserted_count() << " queue: " << queueUrl
-                                  << std::endl;
+        log_trace << "Message reset, updated: " << result->upserted_count() << " queue: " << queueUrl
+                                 ;
 
       } catch (mongocxx::exception &e) {
-        log_error_stream(_logger) << "Collection transaction exception: " << e.what() << std::endl;
+        log_error << "Collection transaction exception: " << e.what();
         session.abort_transaction();
       }
 
@@ -712,12 +710,12 @@ namespace AwsMock::Database {
                                                                                             kvp("queueUrl",
                                                                                                 dlqQueueUrl)))));
         session.commit_transaction();
-        log_trace_stream(_logger) << "Message redrive, arn: " << redrivePolicy.deadLetterTargetArn << " updated: "
+        log_trace << "Message redrive, arn: " << redrivePolicy.deadLetterTargetArn << " updated: "
                                   << result->modified_count() << " queue: "
-                                  << queueUrl << std::endl;
+                                  << queueUrl;
 
       } catch (mongocxx::exception &e) {
-        log_error_stream(_logger) << "Collection transaction exception: " << e.what() << std::endl;
+        log_error << "Collection transaction exception: " << e.what();
         session.abort_transaction();
       }
 
@@ -752,12 +750,12 @@ namespace AwsMock::Database {
                   kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))))));
         session.commit_transaction();
 
-        log_trace_stream(_logger) << "Delayed message reset, updated: " << result->upserted_count() << " queue: "
-                                  << queueUrl << std::endl;
+        log_trace << "Delayed message reset, updated: " << result->upserted_count() << " queue: "
+                                  << queueUrl;
 
       } catch (mongocxx::exception &exc) {
         session.abort_transaction();
-        log_error_stream(_logger) << "Collection transaction exception: " << exc.what() << std::endl;
+        log_error << "Collection transaction exception: " << exc.what();
         throw Core::DatabaseException(exc.what(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
@@ -789,11 +787,11 @@ namespace AwsMock::Database {
               kvp("$lt", bsoncxx::types::b_date(reset))))));
         session.commit_transaction();
 
-        log_trace_stream(_logger) << "Message retention reset, deleted: " << result->deleted_count() << " queue: "
-                                  << queueUrl << std::endl;
+        log_trace << "Message retention reset, deleted: " << result->deleted_count() << " queue: "
+                                  << queueUrl;
 
       } catch (const mongocxx::exception &exc) {
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
@@ -814,14 +812,14 @@ namespace AwsMock::Database {
 
       if (!region.empty() && !queueUrl.empty()) {
         count = messageCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
-        log_trace_stream(_logger) << "Count messages, region: " << region << " url: " << queueUrl << " result: "
-                                  << count << std::endl;
+        log_trace << "Count messages, region: " << region << " url: " << queueUrl << " result: "
+                                  << count;
       } else if (!region.empty()) {
         count = messageCollection.count_documents(make_document(kvp("region", region)));
-        log_trace_stream(_logger) << "Count messages, region: " << region << " result: " << count << std::endl;
+        log_trace << "Count messages, region: " << region << " result: " << count;
       } else {
         count = messageCollection.count_documents({});
-        log_trace_stream(_logger) << "Count messages, result: " << count << std::endl;
+        log_trace << "Count messages, result: " << count;
       }
       return count;
 
@@ -845,8 +843,8 @@ namespace AwsMock::Database {
                                                                    kvp("queueUrl", queueUrl),
                                                                    kvp("status",
                                                                        Entity::SQS::MessageStatusToString(status))));
-      log_trace_stream(_logger) << "Count messages by status, status: " << Entity::SQS::MessageStatusToString(status)
-                                << " result: " << count << std::endl;
+      log_trace << "Count messages by status, status: " << Entity::SQS::MessageStatusToString(status)
+                                << " result: " << count;
       return count;
 
     } else {
@@ -869,12 +867,12 @@ namespace AwsMock::Database {
         session.start_transaction();
         auto result = messageCollection.delete_many(make_document(kvp("queueUrl", queueUrl)));
         session.commit_transaction();
-        log_debug_stream(_logger) << "Messages deleted, queue: " << queueUrl << " count: " << result->deleted_count()
-                                  << std::endl;
+        log_debug << "Messages deleted, queue: " << queueUrl << " count: " << result->deleted_count()
+                                 ;
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
@@ -898,12 +896,12 @@ namespace AwsMock::Database {
         session.start_transaction();
         auto result = messageCollection.delete_one(make_document(kvp("receiptHandle", message.receiptHandle)));
         session.commit_transaction();
-        log_debug_stream(_logger) << "Messages deleted, receiptHandle: "
+        log_debug << "Messages deleted, receiptHandle: "
                                   << Core::StringUtils::SubString(message.receiptHandle, 0, 40) << "... count: "
-                                  << result->deleted_count() << std::endl;
+                                  << result->deleted_count();
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 
@@ -927,11 +925,11 @@ namespace AwsMock::Database {
         session.start_transaction();
         auto result = messageCollection.delete_many({});
         session.commit_transaction();
-        log_debug_stream(_logger) << "All messages deleted, count: " << result->deleted_count() << std::endl;
+        log_debug << "All messages deleted, count: " << result->deleted_count();
 
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
-        _logger.error() << "Database exception " << exc.what() << std::endl;
+        log_error << "Database exception " << exc.what();
         throw Core::DatabaseException(exc.what(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
 

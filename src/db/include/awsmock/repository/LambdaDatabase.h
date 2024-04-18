@@ -169,11 +169,6 @@ namespace AwsMock::Database {
     private:
 
       /**
-       * Logger
-       */
-      Core::LogStream _logger;
-
-      /**
        * Use MongoDB
        */
       bool _useDatabase;

@@ -155,11 +155,6 @@ namespace AwsMock::Service {
     Dto::DynamoDb::DynamoDbResponse SendDynamoDbRequest(const std::string &body, const std::map<std::string, std::string> &headers);
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * AWS region
      */
     std::string _region;

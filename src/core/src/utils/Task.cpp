@@ -12,10 +12,10 @@ namespace AwsMock::Core {
 
   void Task::Start() {
 
-    log_debug_stream(_logger) << "Timer starting, name: " << _name << std::endl;
+    log_debug << "Timer starting, name: " << _name;
 
     Initialize();
-    log_debug_stream(_logger) << "Timer initialized, name: " << _name << std::endl;
+    log_debug << "Timer initialized, name: " << _name;
 
     auto future = std::shared_future<void>(_stop.get_future());
     _thread_handle = std::async(std::launch::async, [future, this]() {
@@ -29,7 +29,7 @@ namespace AwsMock::Core {
 
         } else if (status == std::future_status::ready) {
 
-          log_debug_stream(_logger) << "Timer stopped, name: " << _name << std::endl;
+          log_debug << "Timer stopped, name: " << _name;
 
         }
       } while (status != std::future_status::ready);

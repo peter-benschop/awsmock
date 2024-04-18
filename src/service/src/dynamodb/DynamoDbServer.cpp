@@ -6,8 +6,7 @@
 
 namespace AwsMock::Service {
 
-  DynamoDbServer::DynamoDbServer(Core::Configuration &configuration, Core::MetricService &metricService)
-    : AbstractWorker(configuration), AbstractServer(configuration, "dynamodb"), _logger(Poco::Logger::get("DynamoDbServer")), _configuration(configuration), _metricService(metricService), _module("dynamodb"),
+  DynamoDbServer::DynamoDbServer(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractWorker(configuration), AbstractServer(configuration, "dynamodb"), _configuration(configuration), _metricService(metricService), _module("dynamodb"),
       _dynamoDbDatabase(Database::DynamoDbDatabase::instance()) {
 
     // Get HTTP configuration values
@@ -20,11 +19,11 @@ namespace AwsMock::Service {
 
     // Sleeping period
     _period = _configuration.getInt("awsmock.worker.dynamodb.period", 10000);
-    log_debug_stream(_logger) << "DynamoDB server period: " << _period << std::endl;
+    log_debug << "DynamoDB server period: " << _period;
 
     // Docker module
     _dockerService = std::make_unique<Service::DockerService>(_configuration);
-    log_debug_stream(_logger) << "DynamoDbServer initialized" << std::endl;
+    log_debug << "DynamoDbServer initialized";
 
     // Start DynamoDb docker image
     StartLocalDynamoDb();
@@ -38,10 +37,10 @@ namespace AwsMock::Service {
 
     // Check module active
     if (!IsActive("dynamodb")) {
-      log_info_stream(_logger) << "DynamoDb module inactive" << std::endl;
+      log_info << "DynamoDb module inactive";
       return;
     }
-    log_info_stream(_logger) << "DynamoDb server started" << std::endl;
+    log_info << "DynamoDb server started";
 
     // Start HTTP manager
     StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new DynamoDbRequestHandlerFactory(_configuration, _metricService));
@@ -51,7 +50,7 @@ namespace AwsMock::Service {
   }
 
   void DynamoDbServer::Run() {
-    log_trace_stream(_logger) << "DynamoDB processing started" << std::endl;
+    log_trace << "DynamoDB processing started";
     UpdateCounters();
   }
 
@@ -61,11 +60,11 @@ namespace AwsMock::Service {
 
   void DynamoDbServer::CleanupContainers() {
     _dockerService->PruneContainers();
-    log_debug_stream(_logger) << "Docker containers cleaned up" << std::endl;
+    log_debug << "Docker containers cleaned up";
   }
 
   void DynamoDbServer::StartLocalDynamoDb() {
-    log_debug_stream(_logger) << "Starting DynamoDB docker image" << std::endl;
+    log_debug << "Starting DynamoDB docker image";
 
     // Check docker image
     if (!_dockerService->ImageExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
@@ -83,15 +82,15 @@ namespace AwsMock::Service {
     // Start docker container, in case it is not already running.
     if (container.state != "running") {
       _dockerService->StartDockerContainer(container.id);
-      log_info_stream(_logger) << "Docker containers for DynamoDB started" << std::endl;
+      log_info << "Docker containers for DynamoDB started";
     } else {
-      log_warning_stream(_logger) << "Docker containers for DynamoDB already running" << std::endl;
+      log_warning<< "Docker containers for DynamoDB already running";
     }
 
   }
 
   void DynamoDbServer::StopLocalDynamoDb() {
-    log_debug_stream(_logger) << "Starting DynamoDB docker image" << std::endl;
+    log_debug << "Starting DynamoDB docker image";
 
     // Check docker image
     if (!_dockerService->ImageExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
@@ -109,9 +108,9 @@ namespace AwsMock::Service {
     // Stop docker container, in case it is running.
     if (container.state == "running") {
       _dockerService->StopContainer(container);
-      log_info_stream(_logger) << "Docker containers for DynamoDB stopped" << std::endl;
+      log_info << "Docker containers for DynamoDB stopped";
     } else {
-      log_warning_stream(_logger) << "Docker containers for DynamoDB not running" << std::endl;
+      log_warning<< "Docker containers for DynamoDB not running";
     }
 
   }

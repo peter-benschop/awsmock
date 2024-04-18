@@ -75,11 +75,6 @@ namespace AwsMock::Core {
     void CollectSystemCounter();
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * Virtual memory gauge
      */
     Poco::Prometheus::Gauge *_virtualMemory;

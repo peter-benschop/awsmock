@@ -91,11 +91,6 @@ namespace AwsMock::Service {
     void AddAuthorization(const std::string &module, Poco::Net::HTTPRequest &request);
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
      * Configuration
      */
     const Core::Configuration &_configuration;

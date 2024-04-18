@@ -162,11 +162,6 @@ namespace AwsMock::Database {
     private:
 
       /**
-       * Logger
-       */
-      Core::LogStream _logger;
-
-      /**
        * Modules map
        */
       std::map<std::string, Entity::Module::Module> _modules;

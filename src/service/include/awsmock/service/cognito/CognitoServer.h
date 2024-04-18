@@ -76,11 +76,6 @@ namespace AwsMock::Service {
     std::string _host;
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
     * Application configuration
     */
     Core::Configuration &_configuration;

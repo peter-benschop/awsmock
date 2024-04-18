@@ -18,7 +18,7 @@ namespace AwsMock::FtpServer {
     /**
      * Constructor
      */
-    UserDatabase() : _logger(Poco::Logger::get("FtpUser")) {}
+    UserDatabase() {}
 
     /**
      * Add a new user to the database.
@@ -66,10 +66,5 @@ namespace AwsMock::FtpServer {
      * Anonymous user
      */
     std::shared_ptr<FtpUser> anonymous_user_;
-
-    /**
-     * Logger
-     */
-    Core::LogStream _logger;
   };
 }

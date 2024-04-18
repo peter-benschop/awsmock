@@ -3,19 +3,19 @@
 
 namespace AwsMock::Service {
 
-  CognitoHandler::CognitoHandler(Core::Configuration &configuration, Core::MetricService &metricService) : CognitoCliHandler(configuration, metricService), CognitoJava2Handler(configuration, metricService), _logger(Poco::Logger::get("CognitoHandler")),
+  CognitoHandler::CognitoHandler(Core::Configuration &configuration, Core::MetricService &metricService) : CognitoCliHandler(configuration, metricService), CognitoJava2Handler(configuration, metricService),
                                                                                                            _configuration(configuration), _metricService(metricService), _cognitoService(configuration) {}
 
   void CognitoHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    log_debug_stream(_logger) << "Cognito GET request, URI: " + request.getURI() << " region: " << region << " user: " + user << std::endl;
+    log_debug << "Cognito GET request, URI: " + request.getURI() << " region: " << region << " user: " + user;
   }
 
   void CognitoHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    log_debug_stream(_logger) << "Cognito POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+    log_debug << "Cognito POST request, URI: " << request.getURI() << " region: " << region << " user: " << user;
   }
 
   void CognitoHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    log_debug_stream(_logger) << "Cognito POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+    log_debug << "Cognito POST request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 
     try {
 
@@ -32,21 +32,21 @@ namespace AwsMock::Service {
       }
 
     } catch (Core::ServiceException &exc) {
-      _logger.error() << "SQS module exception: " << exc.message() << std::endl;
+      log_error << "SQS module exception: " << exc.message();
       SendXmlErrorResponse("SQS", response, exc);
     }
   }
 
   void CognitoHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    log_debug_stream(_logger) << "Cognito DELETE request, URI: " + request.getURI() << " region: " << region << " user: " << user << std::endl;
+    log_debug << "Cognito DELETE request, URI: " + request.getURI() << " region: " << region << " user: " << user;
   }
 
   void CognitoHandler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    log_debug_stream(_logger) << "Cognito HEAD request, URI: " << request.getURI() << " region: " << region << " user: " << user << std::endl;
+    log_debug << "Cognito HEAD request, URI: " << request.getURI() << " region: " << region << " user: " << user;
   }
 
   void CognitoHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
-    log_debug_stream(_logger) << "Cognito OPTIONS request" << std::endl;
+    log_debug << "Cognito OPTIONS request";
 
     response.set("Allow", "GET, PUT, POST, DELETE, HEAD, OPTIONS");
     response.setContentType("text/plain; charset=utf-8");

@@ -153,11 +153,6 @@ namespace AwsMock::Database {
     private:
 
       /**
-       * Logger
-       */
-      Core::LogStream _logger;
-
-      /**
        * Transfer server map, when running without database
        */
       std::map<std::string, Entity::Transfer::Transfer> _transfers;

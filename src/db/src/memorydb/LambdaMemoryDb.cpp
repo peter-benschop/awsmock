@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database {
 
-  LambdaMemoryDb::LambdaMemoryDb() : _logger(Poco::Logger::get("LambdaMemoryDb")) {}
+  LambdaMemoryDb::LambdaMemoryDb() {}
 
   bool LambdaMemoryDb::LambdaExists(const std::string &function) {
 
@@ -63,7 +63,7 @@ namespace AwsMock::Database {
       }
     }
 
-    log_trace_stream(_logger) << "Got lambda list, size: " << lambdaList.size() << std::endl;
+    log_trace << "Got lambda list, size: " << lambdaList.size();
     return lambdaList;
   }
 
@@ -72,7 +72,7 @@ namespace AwsMock::Database {
 
     std::string oid = Poco::UUIDGenerator().createRandom().toString();
     _lambdas[oid] = lambda;
-    log_trace_stream(_logger) << "Lambda created, oid: " << oid << std::endl;
+    log_trace << "Lambda created, oid: " << oid;
     return GetLambdaById(oid);
   }
 
@@ -84,7 +84,7 @@ namespace AwsMock::Database {
         });
 
     if (it == _lambdas.end()) {
-      log_error_stream(_logger) << "Get lambda by ID failed, arn: " << oid << std::endl;
+      log_error << "Get lambda by ID failed, arn: " << oid;
       throw Core::DatabaseException("Get lambda by ID failed, arn: " + oid);
     }
 
@@ -100,7 +100,7 @@ namespace AwsMock::Database {
         });
 
     if (it == _lambdas.end()) {
-      log_error_stream(_logger) << "Get lambda by ARN failed, arn: " << arn << std::endl;
+      log_error << "Get lambda by ARN failed, arn: " << arn;
       throw Core::DatabaseException("Get lambda by ARN failed, arn: " + arn);
     }
 
@@ -136,8 +136,8 @@ namespace AwsMock::Database {
                       });
 
     if (it == _lambdas.end()) {
-      log_error_stream(_logger) << "Update lambda failed, region: " << lambda.region << " function: " << lambda.function
-                                << std::endl;
+      log_error << "Update lambda failed, region: " << lambda.region << " function: " << lambda.function
+                               ;
       throw Core::DatabaseException("Update lambda failed, region: " + lambda.region + " function: " + lambda.function);
     }
     _lambdas[it->first] = lambda;
@@ -151,13 +151,13 @@ namespace AwsMock::Database {
       auto const &[key, value] = item;
       return value.function == functionName;
     });
-    log_debug_stream(_logger) << "Lambda deleted, count: " << count << std::endl;
+    log_debug << "Lambda deleted, count: " << count;
   }
 
   void LambdaMemoryDb::DeleteAllLambdas() {
     Poco::ScopedLock lock(_lambdaMutex);
 
-    log_debug_stream(_logger) << "All lambdas deleted, count: " << _lambdas.size() << std::endl;
+    log_debug << "All lambdas deleted, count: " << _lambdas.size();
     _lambdas.clear();
   }
 }

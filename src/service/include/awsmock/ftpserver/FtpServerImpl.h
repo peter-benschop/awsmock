@@ -171,12 +171,7 @@ namespace AwsMock::FtpServer {
     std::string _serverName;
 
     /**
-     * Logger
-     */
-    Core::LogStream _logger;
-
-    /**
-     * Logger
+     * Configuration
      */
     const Core::Configuration &_configuration;
   };

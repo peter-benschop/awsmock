@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database {
 
-  DynamoDbMemoryDb::DynamoDbMemoryDb() : _logger(Poco::Logger::get("DynamoDbMemoryDb")) {}
+  DynamoDbMemoryDb::DynamoDbMemoryDb() {}
 
   bool DynamoDbMemoryDb::TableExists(const std::string &region, const std::string &tableName) {
 
@@ -40,7 +40,7 @@ namespace AwsMock::Database {
       }
     }
 
-    log_trace_stream(_logger) << "Got DynamoDB table, size: " << tables.size() << std::endl;
+    log_trace << "Got DynamoDB table, size: " << tables.size();
     return tables;
   }
 
@@ -49,7 +49,7 @@ namespace AwsMock::Database {
 
     std::string oid = Poco::UUIDGenerator().createRandom().toString();
     _tables[oid] = table;
-    log_trace_stream(_logger) << "Lambda created, oid: " << oid << std::endl;
+    log_trace << "Lambda created, oid: " << oid;
     return GetTableById(oid);
   }
 
@@ -61,7 +61,7 @@ namespace AwsMock::Database {
         });
 
     if (it == _tables.end()) {
-      log_error_stream(_logger) << "Get table by ID failed, oid: " << oid << std::endl;
+      log_error << "Get table by ID failed, oid: " << oid;
       throw Core::DatabaseException("Get table by ID failed, oid: " + oid);
     }
 
@@ -78,8 +78,8 @@ namespace AwsMock::Database {
                       });
 
     if (it == _tables.end()) {
-      log_error_stream(_logger) << "Get table by region and name failed, region: " << region << " name: " << name
-                                << std::endl;
+      log_error << "Get table by region and name failed, region: " << region << " name: " << name
+                               ;
       throw Core::DatabaseException("Get table by region and name failed, region: " + region + " name: " + name);
     }
 
@@ -108,13 +108,13 @@ namespace AwsMock::Database {
       auto const &[key, value] = item;
       return value.name == tableName;
     });
-    log_debug_stream(_logger) << "DynamoDB table deleted, count: " << count << std::endl;
+    log_debug << "DynamoDB table deleted, count: " << count;
   }
 
   void DynamoDbMemoryDb::DeleteAllTables() {
     Poco::ScopedLock lock(_tableMutex);
 
-    log_debug_stream(_logger) << "All DynamoDb tables deleted, count: " << _tables.size() << std::endl;
+    log_debug << "All DynamoDb tables deleted, count: " << _tables.size();
     _tables.clear();
   }
 
@@ -161,7 +161,7 @@ namespace AwsMock::Database {
       }
     }
 
-    log_trace_stream(_logger) << "Got DynamoDB items, size: " << items.size() << std::endl;
+    log_trace << "Got DynamoDB items, size: " << items.size();
     return items;
   }
 
@@ -172,13 +172,13 @@ namespace AwsMock::Database {
       auto const &[k, v] = item;
       return v.region == region && v.name == tableName;
     });
-    log_debug_stream(_logger) << "DynamoDB items deleted, count: " << count << std::endl;
+    log_debug << "DynamoDB items deleted, count: " << count;
   }
 
   void DynamoDbMemoryDb::DeleteAllItems() {
     Poco::ScopedLock lock(_itemMutex);
 
-    log_debug_stream(_logger) << "DynamoDB items deleted, count: " << _items.size() << std::endl;
+    log_debug << "DynamoDB items deleted, count: " << _items.size();
 
     _items.clear();
   }

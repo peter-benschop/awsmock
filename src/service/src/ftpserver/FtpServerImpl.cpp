@@ -9,8 +9,7 @@
 namespace AwsMock::FtpServer {
 
   FtpServerImpl::FtpServerImpl(std::string serverName, std::string address, uint16_t port, const Core::Configuration &configuration)
-      : _serverName(std::move(serverName)), _port(port), _address(std::move(address)), _acceptor(_ioService), _openConnectionCount(0),
-        _logger(Poco::Logger::get("FtpServerImpl")), _configuration(configuration) {}
+    : _serverName(std::move(serverName)), _port(port), _address(std::move(address)), _acceptor(_ioService), _openConnectionCount(0), _configuration(configuration) {}
 
   FtpServerImpl::~FtpServerImpl() {
     stop();
@@ -31,7 +30,7 @@ namespace AwsMock::FtpServer {
     asio::error_code make_address_ec;
     const asio::ip::tcp::endpoint endpoint(asio::ip::make_address(_address, make_address_ec), _port);
     if (make_address_ec) {
-      log_error_stream(_logger) << "Error creating address from string \"" << _address << "\": " << make_address_ec.message() << std::endl;
+      log_error << "Error creating address from string \"" << _address << "\": " << make_address_ec.message();
       return false;
     }
 
@@ -39,7 +38,7 @@ namespace AwsMock::FtpServer {
       asio::error_code ec;
       _acceptor.open(endpoint.protocol(), ec);
       if (ec) {
-        log_error_stream(_logger) << "Error opening acceptor: " << ec.message() << std::endl;
+        log_error << "Error opening acceptor: " << ec.message();
         return false;
       }
     }
@@ -48,7 +47,7 @@ namespace AwsMock::FtpServer {
       asio::error_code ec;
       _acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true), ec);
       if (ec) {
-        log_error_stream(_logger) << "Error setting reuse_address option: " << ec.message() << std::endl;
+        log_error << "Error setting reuse_address option: " << ec.message();
         return false;
       }
     }
@@ -57,7 +56,7 @@ namespace AwsMock::FtpServer {
       asio::error_code ec;
       _acceptor.bind(endpoint, ec);
       if (ec) {
-        log_error_stream(_logger) << "Error binding acceptor: " << ec.message() << std::endl;
+        log_error << "Error binding acceptor: " << ec.message();
         return false;
       }
     }
@@ -66,13 +65,13 @@ namespace AwsMock::FtpServer {
       asio::error_code ec;
       _acceptor.listen(asio::socket_base::max_listen_connections, ec);
       if (ec) {
-        log_error_stream(_logger) << "Error listening on acceptor: " << ec.message() << std::endl;
+        log_error << "Error listening on acceptor: " << ec.message();
         return false;
       }
     }
 
-    log_debug_stream(_logger) << "FTP Server created." << std::endl;
-    log_debug_stream(_logger) << "Listening at address " << _acceptor.local_endpoint().address() << ":" << _acceptor.local_endpoint().port() << ":" << std::endl;
+    log_debug << "FTP Server created.";
+    log_debug << "Listening at address " << _acceptor.local_endpoint().address() << ":" << _acceptor.local_endpoint().port() << ":";
 
     _acceptor.async_accept(ftp_session->getSocket(), [this, ftp_session](auto ec) {
       _openConnectionCount++;
@@ -97,11 +96,11 @@ namespace AwsMock::FtpServer {
 
   void FtpServerImpl::acceptFtpSession(const std::shared_ptr<FtpSession> &ftp_session, asio::error_code const &error) {
     if (error) {
-      log_error_stream(_logger) << "Error handling connection: " << error.message() << std::endl;
+      log_error << "Error handling connection: " << error.message();
       return;
     }
-    log_debug_stream(_logger) << "FTP Client connected: " << ftp_session->getSocket().remote_endpoint().address().to_string() << ":"
-                              << ftp_session->getSocket().remote_endpoint().port() << std::endl;
+    log_debug << "FTP Client connected: " << ftp_session->getSocket().remote_endpoint().address().to_string() << ":"
+              << ftp_session->getSocket().remote_endpoint().port();
 
     ftp_session->start();
 
