@@ -127,6 +127,25 @@ namespace AwsMock::Service {
         break;
       }
 
+      case Dto::Common::S3CommandType::LIST_OBJECT_VERSIONS: {
+
+        // Get object request
+        log_debug_stream(_logger) << "S3 list object versions request, bucket: " << s3ClientCommand.bucket << " prefix: " << s3ClientCommand.prefix << std::endl;
+        Dto::S3::ListObjectVersionsRequest s3Request = {
+          .region=s3ClientCommand.region,
+          .bucket=s3ClientCommand.bucket,
+          .prefix=s3ClientCommand.prefix
+        };
+
+        // Get object versions
+        Dto::S3::ListObjectVersionsResponse s3Response = _s3Service.ListObjectVersions(s3Request);
+
+        SendOkResponse(response, s3Response.ToXml());
+        log_info_stream(_logger) << "List object versions, bucket: " << s3ClientCommand.bucket << " prefix: " << s3ClientCommand.prefix << std::endl;
+
+        break;
+      }
+
         // Should not happen
       case Dto::Common::S3CommandType::CREATE_BUCKET:
       case Dto::Common::S3CommandType::PUT_OBJECT:
@@ -414,14 +433,14 @@ namespace AwsMock::Service {
 
       case Dto::Common::S3CommandType::COMPLETE_MULTIPART_UPLOAD: {
 
-        log_debug_stream(_logger) << "Start completing multipart upload, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
+        log_debug_stream(_logger) << "Completing multipart upload, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
 
         std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "uploadId");
         Dto::S3::CompleteMultipartUploadRequest s3Request = {.region=s3ClientCommand.region, .bucket=s3ClientCommand.bucket, .key=s3ClientCommand.key, .user=s3ClientCommand.user, .uploadId=uploadId};
         Dto::S3::CompleteMultipartUploadResult result = _s3Service.CompleteMultipartUpload(s3Request);
 
         SendOkResponse(response, result.ToXml());
-        log_info_stream(_logger) << "Complete mutl-part upload, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
+        log_info_stream(_logger) << "Completed multipart upload, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << std::endl;
 
         break;
       }

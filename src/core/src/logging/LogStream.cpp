@@ -34,10 +34,6 @@ namespace AwsMock::Core {
     _line = line;
   }
 
-  void LogStreamBuf::setThreadId(int tid) {
-    _threadId = tid;
-  }
-
   void LogStreamBuf::reserve(std::size_t capacity) {
     _message.reserve(capacity);
   }
@@ -47,7 +43,6 @@ namespace AwsMock::Core {
       if (!_message.empty()) {
         Poco::Mutex::ScopedLock lock(_mutex);
         Poco::Message msg(_logger.name(), _message, _priority, _file, _line);
-        //msg.setThread(std::to_string(_threadId));
         _logger.log(msg);
         _message.clear();
       }
@@ -89,10 +84,6 @@ namespace AwsMock::Core {
     _pFileChannel->setProperty("archive", "timestamp");
     _pFormattingChannel = new Poco::FormattingChannel(_pFormatter, _pFileChannel);
     Poco::Logger::root().setChannel(_pFormattingChannel);
-  }
-
-  void LogStream::setThreadId(int tid) {
-    _buf.setThreadId(tid);
   }
 
   LogStream &LogStream::fatal() {

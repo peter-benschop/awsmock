@@ -52,22 +52,20 @@ namespace AwsMock::Core {
     /**
      * Default constructor
      */
-    MetricService() : Core::Timer("MetricServer", 60), _logger(Poco::Logger::get("MetricService")), _port(8081), _timeout(60000) {}
+    MetricService();
 
     /**
-     * Constructor
-     *
-     * @param configuration application configuration
+     * Singleton instance
      */
-    explicit MetricService(const Configuration &configuration);
+    static MetricService &instance() {
+      static Poco::SingletonHolder<MetricService> sh;
+      return *sh.get();
+    }
 
     /**
-     * Constructor.
-     *
-     * @param port prometheus serer port
-     * @param timeout timout for the system collector
+     * Destructor
      */
-    explicit MetricService(int port, long timeout);
+    virtual ~MetricService() = default;
 
     /**
      * Initialization

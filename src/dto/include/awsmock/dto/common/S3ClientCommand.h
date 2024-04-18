@@ -10,11 +10,15 @@
 #include <sstream>
 
 // Poco includes
+#include <Poco/Dynamic/Var.h>
+#include <Poco/JSON/JSON.h>
+#include <Poco/JSON/Parser.h>
 #include <Poco/RegularExpression.h>
 #include <Poco/Net/HTTPServerRequest.h>
 
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
+#include <awsmock/core/JsonException.h>
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/dto/common/HttpMethod.h>
@@ -37,6 +41,7 @@ namespace AwsMock::Dto::Common {
     UPLOAD_PART,
     COMPLETE_MULTIPART_UPLOAD,
     ABORT_MULTIPART_UPLOAD,
+    LIST_OBJECT_VERSIONS,
     UNKNOWN
   };
 
@@ -55,6 +60,7 @@ namespace AwsMock::Dto::Common {
     {S3CommandType::UPLOAD_PART, "PartMultipartUpload"},
     {S3CommandType::COMPLETE_MULTIPART_UPLOAD, "CompleteMultipartUpload"},
     {S3CommandType::ABORT_MULTIPART_UPLOAD, "AbortMultipartUpload"},
+    {S3CommandType::LIST_OBJECT_VERSIONS, "ListObjectVersions"},
   };
 
   [[maybe_unused]]static std::string S3CommandTypeToString(S3CommandType commandType) {
@@ -108,6 +114,11 @@ namespace AwsMock::Dto::Common {
     std::string key;
 
     /**
+     * Key
+     */
+    std::string prefix;
+
+    /**
      * Versioning
      */
     bool versionRequest;
@@ -141,6 +152,18 @@ namespace AwsMock::Dto::Common {
      * Multipart upload ID
      */
     std::string uploadId;
+
+    /**
+     * Request URL
+     */
+    std::string url;
+
+    /**
+     * Convert to a JSON string
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Gets command type from the user agent

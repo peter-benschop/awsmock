@@ -14,37 +14,39 @@
 #include <Poco/DateTimeFormatter.h>
 
 // AwsMock includes
-#include "awsmock/core/CryptoUtils.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/ServiceException.h"
-#include "awsmock/repository/S3Database.h"
-#include "awsmock/dto/s3/CompleteMultipartUploadResult.h"
-#include "awsmock/dto/s3/CopyObjectRequest.h"
-#include "awsmock/dto/s3/CopyObjectResponse.h"
-#include "awsmock/dto/s3/CompleteMultipartUploadRequest.h"
-#include "awsmock/dto/s3/CreateBucketRequest.h"
-#include "awsmock/dto/s3/CreateBucketResponse.h"
-#include "awsmock/dto/s3/CreateMultipartUploadRequest.h"
-#include "awsmock/dto/s3/DeleteBucketRequest.h"
-#include "awsmock/dto/s3/DeleteObjectRequest.h"
-#include "awsmock/dto/s3/DeleteObjectsRequest.h"
-#include "awsmock/dto/s3/DeleteObjectsResponse.h"
-#include "awsmock/dto/s3/EventNotification.h"
-#include "awsmock/dto/s3/GetMetadataRequest.h"
-#include "awsmock/dto/s3/GetMetadataResponse.h"
-#include "awsmock/dto/s3/GetObjectRequest.h"
-#include "awsmock/dto/s3/GetObjectResponse.h"
-#include "awsmock/dto/s3/CreateMultipartUploadResult.h"
-#include "awsmock/dto/s3/ListBucketRequest.h"
-#include "awsmock/dto/s3/ListBucketResponse.h"
-#include "awsmock/dto/s3/ListAllBucketResponse.h"
-#include "awsmock/dto/s3/MoveObjectRequest.h"
-#include "awsmock/dto/s3/MoveObjectResponse.h"
-#include "awsmock/dto/s3/PutBucketNotificationRequest.h"
-#include "awsmock/dto/s3/PutBucketVersioningRequest.h"
-#include "awsmock/dto/s3/PutObjectRequest.h"
-#include "awsmock/dto/s3/PutObjectResponse.h"
-#include "awsmock/service/lambda/LambdaService.h"
+#include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/ServiceException.h>
+#include <awsmock/repository/S3Database.h>
+#include <awsmock/dto/s3/CompleteMultipartUploadResult.h>
+#include <awsmock/dto/s3/CopyObjectRequest.h>
+#include <awsmock/dto/s3/CopyObjectResponse.h>
+#include <awsmock/dto/s3/CompleteMultipartUploadRequest.h>
+#include <awsmock/dto/s3/CreateBucketRequest.h>
+#include <awsmock/dto/s3/CreateBucketResponse.h>
+#include <awsmock/dto/s3/CreateMultipartUploadRequest.h>
+#include <awsmock/dto/s3/DeleteBucketRequest.h>
+#include <awsmock/dto/s3/DeleteObjectRequest.h>
+#include <awsmock/dto/s3/DeleteObjectsRequest.h>
+#include <awsmock/dto/s3/DeleteObjectsResponse.h>
+#include <awsmock/dto/s3/EventNotification.h>
+#include <awsmock/dto/s3/GetMetadataRequest.h>
+#include <awsmock/dto/s3/GetMetadataResponse.h>
+#include <awsmock/dto/s3/GetObjectRequest.h>
+#include <awsmock/dto/s3/GetObjectResponse.h>
+#include <awsmock/dto/s3/CreateMultipartUploadResult.h>
+#include <awsmock/dto/s3/ListBucketRequest.h>
+#include <awsmock/dto/s3/ListBucketResponse.h>
+#include <awsmock/dto/s3/ListAllBucketResponse.h>
+#include <awsmock/dto/s3/ListObjectVersionsRequest.h>
+#include <awsmock/dto/s3/ListObjectVersionsResponse.h>
+#include <awsmock/dto/s3/MoveObjectRequest.h>
+#include <awsmock/dto/s3/MoveObjectResponse.h>
+#include <awsmock/dto/s3/PutBucketNotificationRequest.h>
+#include <awsmock/dto/s3/PutBucketVersioningRequest.h>
+#include <awsmock/dto/s3/PutObjectRequest.h>
+#include <awsmock/dto/s3/PutObjectResponse.h>
+#include <awsmock/service/lambda/LambdaService.h>
 
 #define DEFAULT_DATA_DIR  "/home/awsmock/data"
 #define DEFAULT_TRANSFER_DATA_DIR  "/tmp/awsmock/data/transfer"
@@ -183,6 +185,15 @@ namespace AwsMock::Service {
      * @param request bucket notification request.
      */
     void PutBucketNotification(const Dto::S3::PutBucketNotificationRequest &request);
+
+    /**
+     * Returns a list object versions
+     *
+     * @param request list object versions request
+     * @return ListObjectVersionsResponse
+     * @see @link ListObjectVersionsResponse()
+     */
+    Dto::S3::ListObjectVersionsResponse ListObjectVersions(const Dto::S3::ListObjectVersionsRequest s3Request);
 
     /**
      * Delete a bucket

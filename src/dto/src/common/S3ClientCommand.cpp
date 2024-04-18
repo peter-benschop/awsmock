@@ -21,7 +21,7 @@ namespace AwsMock::Dto::Common {
     key = Core::HttpUtils::GetPathParametersFromIndex(request.getURI(), 1);
 
     // Qualifiers
-    std::string url = request.getURI();
+    url = request.getURI();
     multipartRequest = Core::HttpUtils::HasQueryParameter(request.getURI(), "uploads")
       || Core::HttpUtils::HasQueryParameter(request.getURI(), "uploadId")
       || Core::HttpUtils::HasQueryParameter(request.getURI(), "partNumber");
@@ -39,15 +39,22 @@ namespace AwsMock::Dto::Common {
     } else {
 
       switch (method) {
+
       case HttpMethod::GET:
         if (bucket.empty() && key.empty()) {
           command = S3CommandType::LIST_BUCKETS;
         } else if (!bucket.empty() && key.empty()) {
-          command = S3CommandType::LIST_OBJECTS;
+          if(Core::HttpUtils::HasQueryParameter(request.getURI(), "versions")) {
+            prefix = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "prefix");
+            command = S3CommandType::LIST_OBJECT_VERSIONS;
+          } else {
+            command = S3CommandType::LIST_OBJECTS;
+          }
         } else {
           command = S3CommandType::GET_OBJECT;
         }
         break;
+
       case HttpMethod::PUT:
         if (multipartRequest) {
           command = S3CommandType::UPLOAD_PART;
@@ -57,6 +64,21 @@ namespace AwsMock::Dto::Common {
           command = S3CommandType::PUT_OBJECT;
         }
         break;
+
+      case HttpMethod::POST:
+        if (!bucket.empty() && !key.empty()) {
+          if (uploads) {
+            command = S3CommandType::CREATE_MULTIPART_UPLOAD;
+          }
+        } else if (!bucket.empty()) {
+          if (multipartRequest) {
+            command = S3CommandType::COMPLETE_MULTIPART_UPLOAD;
+          } else {
+            command = S3CommandType::DELETE_OBJECTS;
+          }
+        }
+        break;
+
       case HttpMethod::DELETE:
         if (multipartRequest) {
           command = S3CommandType::ABORT_MULTIPART_UPLOAD;
@@ -67,20 +89,6 @@ namespace AwsMock::Dto::Common {
         }
         break;
 
-      case HttpMethod::POST:
-        if (!bucket.empty() && !key.empty()) {
-          if (uploads) {
-            command = S3CommandType::CREATE_MULTIPART_UPLOAD;
-          } else {
-            command = S3CommandType::COMPLETE_MULTIPART_UPLOAD;
-          }
-        } else if (!bucket.empty()) {
-          if (multipartRequest) {
-          } else {
-            command = S3CommandType::DELETE_OBJECTS;
-          }
-        }
-        break;
       case HttpMethod::UNKNOWN: {
         break;
       }
@@ -128,6 +136,34 @@ namespace AwsMock::Dto::Common {
     }
   }
 
+  std::string S3ClientCommand::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("method", method);
+      rootJson.set("region", region);
+      rootJson.set("user", user);
+      rootJson.set("command", Dto::Common::S3CommandTypeToString(command));
+      rootJson.set("bucket", bucket);
+      rootJson.set("key", key);
+      rootJson.set("prefix", prefix);
+      rootJson.set("versionRequest", versionRequest);
+      rootJson.set("notificationRequest", notificationRequest);
+      rootJson.set("multipartRequest", multipartRequest);
+      rootJson.set("uploads", uploads);
+      rootJson.set("partNumber", partNumber);
+      rootJson.set("copyRequest", copyRequest);
+      rootJson.set("uploadId", uploadId);
+
+      std::ostringstream os;
+      rootJson.stringify(os);
+      return os.str();
+
+    } catch (Poco::Exception &exc) {
+      throw Core::JsonException(exc.message());
+    }
+  }
+
   std::string S3ClientCommand::ToString() const {
     std::stringstream ss;
     ss << (*this);
@@ -135,8 +171,7 @@ namespace AwsMock::Dto::Common {
   }
 
   std::ostream &operator<<(std::ostream &os, const S3ClientCommand &r) {
-    os << "S3ClientCommand={method='" << HttpMethodToString(r.method) << ", region='" << r.region << "', user='" << r.user << "', command='" << S3CommandTypeToString(r.command) << "' versioning=" << Core::StringUtils::ToString(r.versionRequest)
-       << " multipartRequest=" << Core::StringUtils::ToString(r.multipartRequest) << " notificationRequest=" << Core::StringUtils::ToString(r.notificationRequest) << " copyRequest=" << Core::StringUtils::ToString(r.copyRequest) << "}";
+    os << "S3ClientCommand=" << r.ToJson();
     return os;
   }
 }

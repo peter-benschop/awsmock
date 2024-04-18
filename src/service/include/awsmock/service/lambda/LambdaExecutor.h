@@ -38,10 +38,8 @@ namespace AwsMock::Service {
 
     /**
      * Constructor
-     *
-     * @param metricService monitoring module
      */
-    explicit LambdaExecutor(Core::MetricService &metricService);
+    explicit LambdaExecutor();
 
     /**
      * Send the invocation request to the corresponding port
@@ -50,7 +48,7 @@ namespace AwsMock::Service {
      * @param port lambda docker external port
      * @param body event payload
      */
-    void SendInvocationRequest(const std::string &url, const std::string &body);
+    static void SendInvocationRequest(const std::string &url, const std::string &body);
 
   private:
 
@@ -62,7 +60,7 @@ namespace AwsMock::Service {
     /**
      * Metric module
      */
-    Core::MetricService &_metricService;
+    Core::MetricService& _metricService = Core::MetricService::instance();
 
     /**
      * Mutex
