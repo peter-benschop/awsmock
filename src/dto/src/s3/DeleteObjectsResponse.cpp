@@ -6,33 +6,29 @@
 
 namespace AwsMock::Dto::S3 {
 
+  std::string DeleteObjectsResponse::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("keys", Core::JsonUtils::GetJsonStringArray(keys));
+
+      return Core::JsonUtils::ToJsonString(rootJson);
+
+    } catch (Poco::Exception &exc) {
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
+    }
+  }
+
   std::string DeleteObjectsResponse::ToXml() const {
 
     // Root
-    Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-    Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("DeleteResult");
-    pDoc->appendChild(pRoot);
+    Poco::XML::AutoPtr<Poco::XML::Document> pDoc = Core::XmlUtils::CreateDocument();
+    Poco::XML::AutoPtr<Poco::XML::Element> pRoot = Core::XmlUtils::CreateRootNode(pDoc, "DeleteResult");
 
-    for (const auto &it : keys) {
+    Core::XmlUtils::CreateTextArray(pDoc, pRoot, "Deleted", "Key", keys);
 
-      // Deleted
-      Poco::XML::AutoPtr<Poco::XML::Element> pDeleted = pDoc->createElement("Deleted");
-      pRoot->appendChild(pDeleted);
-
-      // Key
-      Poco::XML::AutoPtr<Poco::XML::Element> pKey = pDoc->createElement("Key");
-      pDeleted->appendChild(pKey);
-      Poco::XML::AutoPtr<Poco::XML::Text> pKeyText = pDoc->createTextNode(it);
-      pKey->appendChild(pKeyText);
-    }
-
-    std::stringstream output;
-    Poco::XML::DOMWriter writer;
-    writer.setNewLine("\n");
-    writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
-    writer.writeNode(output, pDoc);
-
-    return output.str();
+    return Core::XmlUtils::ToXmlString(pDoc);
   }
 
   std::string DeleteObjectsResponse::ToString() const {
@@ -42,11 +38,7 @@ namespace AwsMock::Dto::S3 {
   }
 
   std::ostream &operator<<(std::ostream &os, const DeleteObjectsResponse &r) {
-    os << "DeleteObjectsResponse={";
-    for (auto &it : r.keys) {
-      os << "' key='" + it;
-    }
-    os << "'}";
+    os << "DeleteObjectsResponse=" << r.ToJson();
     return os;
   }
 

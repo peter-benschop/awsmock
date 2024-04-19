@@ -66,10 +66,9 @@ namespace AwsMock::Service {
      *
      * @param configuration application configuration
      * @param metricService monitoring module
-     * @param host module host
-     * @param port module port
+     * @param route routing structure
      */
-    GatewayHandler(Core::Configuration &configuration, Core::MetricService &metricService, Service::GatewayRoute  route);
+    GatewayHandler(Core::Configuration &configuration, Core::MetricService &metricService, Service::GatewayRoute route);
 
   protected:
 

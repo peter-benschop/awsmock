@@ -37,15 +37,9 @@ namespace AwsMock::Service {
   public:
 
     /**
-     * Constructor
-     */
-    explicit LambdaExecutor();
-
-    /**
      * Send the invocation request to the corresponding port
      *
-     * @param hostName host name of the docker instance
-     * @param port lambda docker external port
+     * @param url lambda docker URL
      * @param body event payload
      */
     static void SendInvocationRequest(const std::string &url, const std::string &body);

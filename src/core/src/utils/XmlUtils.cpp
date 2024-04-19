@@ -5,6 +5,22 @@
 
 namespace AwsMock::Core {
 
+  Poco::XML::AutoPtr<Poco::XML::Document> XmlUtils::CreateDocument() {
+    return new Poco::XML::Document;
+  }
+
+  Poco::XML::AutoPtr<Poco::XML::Element> XmlUtils::CreateRootNode(Poco::XML::AutoPtr<Poco::XML::Document> &document, const std::string &name) {
+    Poco::XML::AutoPtr<Poco::XML::Element> pRoot = document->createElement(name);
+    document->appendChild(pRoot);
+    return pRoot;
+  }
+
+  Poco::XML::AutoPtr<Poco::XML::Element> XmlUtils::CreateNode(Poco::XML::AutoPtr<Poco::XML::Document> &document, Poco::XML::AutoPtr<Poco::XML::Element> &parent, const std::string &name) {
+    Poco::XML::AutoPtr<Poco::XML::Element> pNode = document->createElement(name);
+    parent->appendChild(pNode);
+    return pNode;
+  }
+
   void XmlUtils::CreateTextNode(const Poco::XML::AutoPtr<Poco::XML::Document> &document, Poco::XML::AutoPtr<Poco::XML::Element> &parent, const std::string &name, const std::string &value) {
 
     auto pElement = document->createElement(name);

@@ -87,6 +87,42 @@ namespace AwsMock::Core {
      * @param attribute JSON attribute
      */
     static void GetJsonValueDate(const std::string &name, Poco::JSON::Object::Ptr jsonObject, Poco::DateTime &attribute);
+
+    /**
+     * Creates a JSON string array.
+     *
+     * @param values vector of string values
+     * @return JSON string array
+     */
+    static Poco::JSON::Array GetJsonStringArray(const std::vector<std::string> &values);
+
+    /**
+     * Creates a JSON object from a string map.
+     *
+     * <p>
+     * Each key, value pair will be converted to a attribute with name key and value=value.
+     * </p>
+     *
+     * Example map<std::string, std::string>:
+     * <pre>
+     * {
+     *  "map.first": "map.second"
+     * }
+     * </pre
+     *
+     * @param values vector of string values
+     * @return JSON object
+     */
+    static Poco::JSON::Object GetJsonObject(const std::map<std::string, std::string> &values);
+
+    /**
+     * Returns the JSON string for the document.
+     *
+     * @param jsonObject JSON object
+     * @return JSON string
+     */
+    static std::string ToJsonString(const Poco::JSON::Object &jsonObject);
+
   };
 
 } // namespace AwsMock::Core

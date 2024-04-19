@@ -6,6 +6,24 @@
 
 namespace AwsMock::Dto::S3 {
 
+  std::string ListBucketRequest::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("region", region);
+      rootJson.set("prefix", prefix);
+      rootJson.set("listType", listType);
+      rootJson.set("delimiter", delimiter);
+      rootJson.set("encodingType", encodingType);
+
+      return Core::JsonUtils::ToJsonString(rootJson);
+
+    } catch (Poco::Exception &exc) {
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
+    }
+  }
+
   std::string ListBucketRequest::ToString() const {
       std::stringstream ss;
       ss << (*this);
@@ -13,8 +31,7 @@ namespace AwsMock::Dto::S3 {
     }
 
     std::ostream &operator<<(std::ostream &os, const ListBucketRequest &r) {
-      os << "ListBucketRequest={name='" << r.name << "' prefix='" << r.prefix << "' listType='" << r.listType << "' delimiter='" << r.delimiter
-         << "' encodingType='" << r.encodingType << "'}";
+      os << "ListBucketRequest=" << r.ToJson();
       return os;
     }
 

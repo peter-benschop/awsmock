@@ -2,12 +2,18 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_CORE_DTO_DELETEOBJECTREQUEST_H
-#define AWSMOCK_CORE_DTO_DELETEOBJECTREQUEST_H
+#ifndef AWSMOCK_CORE_DTO_DELETE_OBJECT_REQUEST_H
+#define AWSMOCK_CORE_DTO_DELETE_OBJECT_REQUEST_H
 
 // C++ standard includes
 #include <string>
 #include <sstream>
+
+// AwsMock includes
+#include <awsmock/core/JsonException.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/XmlUtils.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -34,6 +40,13 @@ namespace AwsMock::Dto::S3 {
     std::string key;
 
     /**
+     * Convert to a JSON string
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const;
+
+    /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
@@ -51,4 +64,4 @@ namespace AwsMock::Dto::S3 {
 
 } // namespace AwsMock::Dto::S3
 
-#endif //AWSMOCK_CORE_DTO_DELETEOBJECTSREQUEST_H
+#endif // AWSMOCK_CORE_DTO_DELETE_OBJECT_REQUEST_H

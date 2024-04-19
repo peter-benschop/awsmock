@@ -45,13 +45,13 @@ namespace AwsMock::Service {
     std::string region = s3Request.region;
 
     // Check existence
-    if (_database.BucketExists({.region=region, .name=s3Request.bucketName})) {
-      log_warning << "Bucket exists already, region: " << region << " name: " << s3Request.bucketName;
-      Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(region, s3Request.bucketName);
-      log_debug << "Got bucket: " << s3Request.bucketName;
+    if (_database.BucketExists({.region=region, .name=s3Request.name})) {
+      log_warning << "Bucket exists already, region: " << region << " name: " << s3Request.name;
+      Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(region, s3Request.name);
+      log_debug << "Got bucket: " << s3Request.name;
       return {
         .location=bucket.region,
-        .arn=Core::AwsUtils::CreateArn("s3", region, _accountId, s3Request.bucketName)
+        .arn=Core::AwsUtils::CreateArn("s3", region, _accountId, s3Request.name)
       };
 //      throw Core::ServiceException("Bucket exists already", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
@@ -61,11 +61,11 @@ namespace AwsMock::Service {
     try {
 
       // Update database
-      _database.CreateBucket({.region=region, .name=s3Request.bucketName, .owner=s3Request.bucketOwner});
+      _database.CreateBucket({.region=region, .name=s3Request.name, .owner=s3Request.owner});
 
-      createBucketResponse = Dto::S3::CreateBucketResponse(region, Core::AwsUtils::CreateArn("s3", region, _accountId, s3Request.bucketName));
+      createBucketResponse = Dto::S3::CreateBucketResponse(region, Core::AwsUtils::CreateArn("s3", region, _accountId, s3Request.name));
       log_trace << "S3 create bucket response: " << createBucketResponse.ToXml();
-      log_info << "Bucket created, bucket: " << s3Request.bucketName;
+      log_info << "Bucket created, bucket: " << s3Request.name;
 
     } catch (Poco::Exception &exc) {
       log_error << "S3 create bucket failed, message: " << exc.message();
@@ -247,7 +247,7 @@ namespace AwsMock::Service {
     log_trace << "Part uploaded, part: " << part << " dir: " << uploadDir;
 
     // Get md5sum a ETag
-    std::string eTag = Core::Crypto::Base64Encode(Core::Crypto::GetMd5FromFile(fileName));
+    std::string eTag = Core::Crypto::GetMd5FromFile(fileName);
 
     log_info << "Upload part succeeded, part: " << part;
     return eTag;

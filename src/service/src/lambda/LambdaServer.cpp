@@ -18,11 +18,11 @@ namespace AwsMock::Service {
 
     // Directories
     _dataDir = _configuration.getString("awsmock.data.dir") + Poco::Path::separator() + "lambda";
-    log_debug << "lambda directory: " << _dataDir;
+    log_debug << "Lambda directory: " << _dataDir;
 
     // Sleeping period
     _period = _configuration.getInt("awsmock.worker.lambda.period", 10000);
-    log_debug << "lambda manager period: " << _period;
+    log_debug << "Lambda manager period: " << _period;
 
     // Create environment
     _region = _configuration.getString("awsmock.region");
@@ -30,14 +30,14 @@ namespace AwsMock::Service {
     // lambda module connection
     _lambdaServiceHost = _configuration.getString("awsmock.service.lambda.host", "localhost");
     _lambdaServicePort = _configuration.getInt("awsmock.service.lambda.port", 9503);
-    log_debug << "lambda module endpoint: http://" << _lambdaServiceHost << ":" << _lambdaServicePort;
+    log_debug << "Lambda module endpoint: http://" << _lambdaServiceHost << ":" << _lambdaServicePort;
 
     // Docker module
     _dockerService = std::make_unique<Service::DockerService>(_configuration);
 
     // Create lambda directory
     Core::DirUtils::EnsureDirectory(_dataDir);
-    log_debug << "LambdaWorker initialized";
+    log_debug << "Lambda server initialized";
   }
 
   LambdaServer::~LambdaServer() {
@@ -96,7 +96,7 @@ namespace AwsMock::Service {
         .tags=lambda.tags
       };
       SendCreateFunctionRequest(request, "application/json");
-      log_debug << "lambda started, name:" << lambda.function;
+      log_debug << "Lambda started, name:" << lambda.function;
     }
   }
 
@@ -122,7 +122,7 @@ namespace AwsMock::Service {
     std::string url = "http://" + _lambdaServiceHost + ":" + std::to_string(_lambdaServicePort) + "/2015-03-31/functions";
     std::string body = lambdaRequest.ToJson();
     SendPostRequest(_module, url, body, contentType);
-    log_debug << "lambda create function request send";
+    log_debug << "Lambda create function request send";
   }
 
   void LambdaServer::UpdateCounters() {

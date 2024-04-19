@@ -6,6 +6,27 @@
 
 namespace AwsMock::Dto::S3 {
 
+  std::string PutObjectRequest::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("region", region);
+      rootJson.set("bucket", bucket);
+      rootJson.set("key", key);
+      rootJson.set("md5sum", md5Sum);
+      rootJson.set("contentType", contentType);
+      rootJson.set("contentLength", contentLength);
+      rootJson.set("owner", owner);
+      rootJson.set("metadata", Core::JsonUtils::GetJsonObject(metadata));
+
+      return Core::JsonUtils::ToJsonString(rootJson);
+
+    } catch (Poco::Exception &exc) {
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
+    }
+  }
+
   std::string PutObjectRequest::ToString() const {
     std::stringstream ss;
     ss << (*this);
@@ -13,12 +34,7 @@ namespace AwsMock::Dto::S3 {
   }
 
   std::ostream &operator<<(std::ostream &os, const PutObjectRequest &r) {
-    os << "PutObjectRequest={bucket='" << r.bucket << "', key='" << r.key << "', md5sum='" << r.md5Sum << "', contentType='" << r.contentType << "', contentLength='"
-       << r.contentLength << "', owner='" << r.owner << "', region=' " << r.region << "', metadata={";
-    for (const auto &m : r.metadata) {
-      os << m.first << "=" << m.second << ", ";
-    }
-    os << '\b' << '\b' << "}}";
+    os << "PutObjectRequest=" << r.ToJson();
     return os;
   }
 

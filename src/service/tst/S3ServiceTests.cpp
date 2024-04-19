@@ -49,7 +49,7 @@ namespace AwsMock::Service {
   TEST_F(S3ServiceTest, BucketCreateTest) {
 
     // arrange
-    Dto::S3::CreateBucketRequest request = {.region=REGION, .bucketName=BUCKET, .bucketOwner=OWNER};
+    Dto::S3::CreateBucketRequest request = {.region=REGION, .name=BUCKET, .owner=OWNER};
 
     // act
     Dto::S3::CreateBucketResponse response = _service.CreateBucket(request);
@@ -61,7 +61,7 @@ namespace AwsMock::Service {
   TEST_F(S3ServiceTest, BucketDeleteTest) {
 
     // arrange
-    Dto::S3::CreateBucketRequest request = {.region=REGION, .bucketName=BUCKET, .bucketOwner=OWNER};
+    Dto::S3::CreateBucketRequest request = {.region=REGION, .name=BUCKET, .owner=OWNER};
     Dto::S3::CreateBucketResponse response = _service.CreateBucket(request);
 
     // act
@@ -76,7 +76,7 @@ namespace AwsMock::Service {
   TEST_F(S3ServiceTest, ObjectPutTest) {
 
     // arrange
-    Dto::S3::CreateBucketRequest request = {.region=REGION, .bucketName=BUCKET, .bucketOwner=OWNER};
+    Dto::S3::CreateBucketRequest request = {.region=REGION, .name=BUCKET, .owner=OWNER};
     Dto::S3::CreateBucketResponse response = _service.CreateBucket(request);
     std::ifstream ifs(testFile);
 
@@ -92,7 +92,7 @@ namespace AwsMock::Service {
   TEST_F(S3ServiceTest, ObjectDeleteTest) {
 
     // arrange
-    Dto::S3::CreateBucketRequest request = {.region=REGION, .bucketName=BUCKET, .bucketOwner=OWNER};
+    Dto::S3::CreateBucketRequest request = {.region=REGION, .name=BUCKET, .owner=OWNER};
     Dto::S3::CreateBucketResponse response = _service.CreateBucket(request);
     std::ifstream ifs(testFile);
     Dto::S3::PutObjectRequest putRequest = {.region=REGION, .bucket=BUCKET, .key=KEY};

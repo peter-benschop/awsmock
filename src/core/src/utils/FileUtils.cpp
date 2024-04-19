@@ -77,7 +77,9 @@ namespace AwsMock::Core {
     ofs.close();
   }
 
+  // TODO: Calculate correct checksum: https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html
   void FileUtils::AppendTextFiles(const std::string &outFile, const std::string &inDir, const std::vector<std::string> &files) {
+
     std::ofstream ofs(outFile, std::ios::out | std::ios::app);
     for (auto &it : files) {
       std::string inFile = inDir;

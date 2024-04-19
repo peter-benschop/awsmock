@@ -9,11 +9,11 @@
 #include <string>
 #include <sstream>
 
-// Poco includes
-#include <Poco/DOM/AutoPtr.h>
-#include <Poco/DOM/DOMParser.h>
-#include <Poco/DOM/Document.h>
-#include <Poco/DOM/Element.h>
+// AwsMock includes
+#include <awsmock/core/JsonException.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/XmlUtils.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -43,6 +43,13 @@ namespace AwsMock::Dto::S3 {
      * AWS upload ID
      */
     std::string uploadId;
+
+    /**
+     * Convert to a JSON string
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Convert from XML representation

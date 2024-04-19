@@ -72,23 +72,18 @@ namespace AwsMock::Service {
     return {};
   }
 
-  std::string DockerService::BuildImage(const std::string &codeDir,
-                                        const std::string &name,
-                                        const std::string &tag,
-                                        const std::string &handler,
-                                        const std::string &runtime,
-                                        const std::map<std::string, std::string> &environment) {
+  std::string DockerService::BuildImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) {
     log_debug << "Build image request, name: " << name << " tags: " << tag << " runtime: " << runtime;
 
     std::string dockerFile = WriteDockerFile(codeDir, handler, runtime, environment);
     std::string imageFile = BuildImageFile(codeDir, name);
 
-    Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketFileRequest("POST", "http://localhost/build?t=" + name + ":" + tag + "&q=true", {}, imageFile);
+    Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketFileRequest("POST", "http://localhost/build?t=" + name + ":" + tag, {}, imageFile);
     log_debug << "Docker image build, image: " << name << ":" << tag;
     log_trace << "Response: " << curlResponse.ToString();
 
     if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
-      log_error << "Build image failed, state: " << curlResponse.statusCode;
+      log_error << "Build image failed, state: " << curlResponse.statusCode << " reason: " << curlResponse.output;
     }
     return imageFile;
   }
@@ -134,7 +129,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Docker::ListContainerResponse response(curlResponse.output);
-    log_debug << "Docker image found, name: " << name << ":" << tag << (response.containerList.empty() ? "true" : "false");
+    log_debug << "Docker image found, name: " << name << ":" << tag << " " << (response.containerList.empty() ? "true" : "false");
     return !response.containerList.empty();
   }
 
@@ -188,10 +183,7 @@ namespace AwsMock::Service {
     return response.containerList[0];
   }
 
-  Dto::Docker::CreateContainerResponse DockerService::CreateContainer(const std::string &name,
-                                                                      const std::string &tag,
-                                                                      const std::vector<std::string> &environment,
-                                                                      int hostPort) {
+  Dto::Docker::CreateContainerResponse DockerService::CreateContainer(const std::string &name, const std::string &tag, const std::vector<std::string> &environment, int hostPort) {
 
     // Create the request
     Dto::Docker::CreateContainerRequest request = {
@@ -327,45 +319,52 @@ namespace AwsMock::Service {
     // TODO: Fix environment
     std::ofstream ofs(dockerFilename);
     if (Core::StringUtils::EqualsIgnoreCase(runtime, "java11")) {
-      ofs << "FROM public.ecr.aws/lambda/java:11";
+      ofs << "FROM public.ecr.aws/lambda/java:11" << std::endl;
       for (auto &env : environment) {
-        ofs << "ENV " << env.first << "=\"" << env.second << "\"";
+        ofs << "ENV " << env.first << "=\"" << env.second << "\"" << std::endl;
       }
-      ofs << "COPY classes ${LAMBDA_TASK_ROOT}";
-      ofs << "CMD [ \"" + handler + "::handleRequest\" ]";
+      ofs << "COPY classes ${LAMBDA_TASK_ROOT}" << std::endl;
+      ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
     } else if (Core::StringUtils::EqualsIgnoreCase(runtime, "java17")) {
-      ofs << "FROM public.ecr.aws/lambda/java:latest";
+      ofs << "FROM public.ecr.aws/lambda/java:17" << std::endl;
       for (auto &env : environment) {
-        ofs << "ENV " << env.first << "=\"" << env.second << "\"";
+        ofs << "ENV " << env.first << "=\"" << env.second << "\"" << std::endl;
       }
-      ofs << "COPY classes ${LAMBDA_TASK_ROOT}";
-      ofs << "CMD [ \"" + handler + "::handleRequest\" ]";
+      ofs << "COPY classes ${LAMBDA_TASK_ROOT}" << std::endl;
+      ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
+    } else if (Core::StringUtils::EqualsIgnoreCase(runtime, "java21")) {
+      ofs << "FROM public.ecr.aws/lambda/java:21" << std::endl;
+      for (auto &env : environment) {
+        ofs << "ENV " << env.first << "=\"" << env.second << "\"" << std::endl;
+      }
+      ofs << "COPY classes ${LAMBDA_TASK_ROOT}" << std::endl;
+      ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
     } else if (Core::StringUtils::EqualsIgnoreCase(runtime, "provided.al2")) {
-      ofs << "FROM public.ecr.aws/lambda/provided:al2";
+      ofs << "FROM public.ecr.aws/lambda/provided:al2" << std::endl;
       for (auto &env : environment) {
-        ofs << "ENV " << env.first << "=\"" << env.second << "\"";
+        ofs << "ENV " << env.first << "=\"" << env.second << "\"" << std::endl;
       }
-      ofs << "COPY bootstrap ${LAMBDA_RUNTIME_DIR}";
-      ofs << "RUN chmod 755 ${LAMBDA_RUNTIME_DIR}/bootstrap";
-      ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/lib";
-      ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/bin";
-      ofs << "COPY bin/* ${LAMBDA_TASK_ROOT}/bin/";
-      ofs << "COPY lib/* ${LAMBDA_TASK_ROOT}/lib/";
-      ofs << "RUN chmod 755 ${LAMBDA_TASK_ROOT}/lib/ld-linux-x86-64.so.2";
-      ofs << "CMD [ \"" + handler + "\" ]";
+      ofs << "COPY bootstrap ${LAMBDA_RUNTIME_DIR}" << std::endl;
+      ofs << "RUN chmod 755 ${LAMBDA_RUNTIME_DIR}/bootstrap" << std::endl;
+      ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/lib" << std::endl;
+      ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/bin" << std::endl;
+      ofs << "COPY bin/* ${LAMBDA_TASK_ROOT}/bin/" << std::endl;
+      ofs << "COPY lib/* ${LAMBDA_TASK_ROOT}/lib/" << std::endl;
+      ofs << "RUN chmod 755 ${LAMBDA_TASK_ROOT}/lib/ld-linux-x86-64.so.2" << std::endl;
+      ofs << "CMD [ \"" + handler + "\" ]" << std::endl;
     } else if (Core::StringUtils::EqualsIgnoreCase(runtime, "provided.latest")) {
-      ofs << "FROM public.ecr.aws/lambda/provided:latest";
+      ofs << "FROM public.ecr.aws/lambda/provided:latest" << std::endl;
       for (auto &env : environment) {
-        ofs << "ENV " << env.first << "=\"" << env.second << "\"";
+        ofs << "ENV " << env.first << "=\"" << env.second << "\"" << std::endl;
       }
-      ofs << "COPY bootstrap ${LAMBDA_RUNTIME_DIR}";
-      ofs << "RUN chmod 755 ${LAMBDA_RUNTIME_DIR}/bootstrap";
-      ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/lib";
-      ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/bin";
-      ofs << "COPY bin/* ${LAMBDA_TASK_ROOT}/bin/";
-      ofs << "COPY lib/* ${LAMBDA_TASK_ROOT}/lib/";
-      ofs << "RUN chmod 755 ${LAMBDA_TASK_ROOT}/lib/ld-linux-x86-64.so.2";
-      ofs << "CMD [ \"" + handler + "\" ]";
+      ofs << "COPY bootstrap ${LAMBDA_RUNTIME_DIR}" << std::endl;
+      ofs << "RUN chmod 755 ${LAMBDA_RUNTIME_DIR}/bootstrap" << std::endl;
+      ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/lib" << std::endl;
+      ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/bin" << std::endl;
+      ofs << "COPY bin/* ${LAMBDA_TASK_ROOT}/bin/" << std::endl;
+      ofs << "COPY lib/* ${LAMBDA_TASK_ROOT}/lib/" << std::endl;
+      ofs << "RUN chmod 755 ${LAMBDA_TASK_ROOT}/lib/ld-linux-x86-64.so.2" << std::endl;
+      ofs << "CMD [ \"" + handler + "\" ]" << std::endl;
     }
     ofs.close();
     log_debug << "Dockerfile written, filename: " << dockerFilename;

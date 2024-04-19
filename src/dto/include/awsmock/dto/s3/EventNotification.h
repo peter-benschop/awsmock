@@ -2,23 +2,19 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_S3_EVENTNOTIFICATION_H
-#define AWSMOCK_DTO_S3_EVENTNOTIFICATION_H
+#ifndef AWSMOCK_DTO_S3_EVENT_NOTIFICATION_H
+#define AWSMOCK_DTO_S3_EVENT_NOTIFICATION_H
 
 // C++ standard includes
 #include <string>
 #include <vector>
 
-// Poco includes
-#include "Poco/DateTime.h"
-#include "Poco/DateTimeFormat.h"
-#include "Poco/DateTimeFormatter.h"
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
+#include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/XmlUtils.h>
 #include <awsmock/dto/s3/UserIdentity.h>
 
 namespace AwsMock::Dto::S3 {
@@ -174,7 +170,7 @@ namespace AwsMock::Dto::S3 {
       try {
         Core::JsonUtils::GetJsonValueString("principalId", jsonObject, principalId);
       } catch (Poco::Exception &exc) {
-        std::cerr << exc.message() << std::endl;
+        log_error << exc.message();
         throw Core::ServiceException(exc.message(), 500);
       }
     }
@@ -254,7 +250,7 @@ namespace AwsMock::Dto::S3 {
         }
 
       } catch (Poco::Exception &exc) {
-        std::cerr << exc.message() << std::endl;
+        log_error << exc.message();
         throw Core::ServiceException(exc.message(), 500);
       }
     }
@@ -292,7 +288,7 @@ namespace AwsMock::Dto::S3 {
     /**
      * Object file size
      */
-    long size;
+    long size = 0;
 
     /**
      * Etag
@@ -336,7 +332,7 @@ namespace AwsMock::Dto::S3 {
      *
      * @param jsonObject JSON object
      */
-    void FromJson(Poco::JSON::Object::Ptr jsonObject) {
+    void FromJson(const Poco::JSON::Object::Ptr &jsonObject) {
 
       try {
         Core::JsonUtils::GetJsonValueString("key", jsonObject, key);
@@ -345,8 +341,8 @@ namespace AwsMock::Dto::S3 {
         Core::JsonUtils::GetJsonValueString("versionId", jsonObject, versionId);
         Core::JsonUtils::GetJsonValueString("sequencer", jsonObject, sequencer);
       } catch (Poco::Exception &exc) {
-        std::cerr << exc.message() << std::endl;
-        throw Core::ServiceException(exc.message(), 500);
+        log_error << exc.message();
+        throw Core::ServiceException(exc.message());
       }
     }
 
@@ -368,7 +364,7 @@ namespace AwsMock::Dto::S3 {
      */
     friend std::ostream &operator<<(std::ostream &os, const Object &o) {
       os << "Object={key='" + o.key + "' size='" + std::to_string(o.size) + "' etag='" + o.etag + "' versionId='" + o.versionId +
-          "' sequencer='" + o.sequencer + "'}";
+        "' sequencer='" + o.sequencer + "'}";
       return os;
     }
 
@@ -435,8 +431,8 @@ namespace AwsMock::Dto::S3 {
         }
 
       } catch (Poco::Exception &exc) {
-        std::cerr << exc.message() << std::endl;
-        throw Core::ServiceException(exc.message(), 500);
+        log_error << exc.message();
+        throw Core::ServiceException(exc.message());
       }
     }
 
@@ -458,7 +454,7 @@ namespace AwsMock::Dto::S3 {
      */
     friend std::ostream &operator<<(std::ostream &os, const S3 &s) {
       os << "S3={s3SchemaVersion='" + s.s3SchemaVersion + "' configurationId='" + s.configurationId + "' bucket='" + s.bucket.ToString() +
-          "' object='" + s.object.ToString() + "'}";
+        "' object='" + s.object.ToString() + "'}";
       return os;
     }
 
@@ -551,8 +547,8 @@ namespace AwsMock::Dto::S3 {
         s3.FromJson(object->getObject("s3"));
 
       } catch (Poco::Exception &exc) {
-        std::cerr << exc.message() << std::endl;
-        throw Core::ServiceException(exc.message(), 500);
+        log_error << exc.message();
+        throw Core::ServiceException(exc.message());
       }
     }
 
@@ -574,8 +570,8 @@ namespace AwsMock::Dto::S3 {
      */
     friend std::ostream &operator<<(std::ostream &os, const Record &r) {
       os << "Record={eventVersion='" + r.eventVersion + "' eventSource='" + r.eventSource + "' region='" + r.region + "' eventTime='" + r.eventTime +
-          "' eventName='" + r.eventName + "' userIdentity='" + r.userIdentity.ToString() + "' requestParameter='" + r.requestParameter.ToString() +
-          "' responseElements='" + r.responseElements.ToString() + "' s3='" + r.s3.ToString() + "'}";
+        "' eventName='" + r.eventName + "' userIdentity='" + r.userIdentity.ToString() + "' requestParameter='" + r.requestParameter.ToString() +
+        "' responseElements='" + r.responseElements.ToString() + "' s3='" + r.s3.ToString() + "'}";
       return os;
     }
 
@@ -608,7 +604,7 @@ namespace AwsMock::Dto::S3 {
         return os.str();
 
       } catch (Poco::Exception &exc) {
-        throw Core::ServiceException(exc.message(), 500);
+        throw Core::ServiceException(exc.message());
       }
     }
 
@@ -634,8 +630,8 @@ namespace AwsMock::Dto::S3 {
         }
 
       } catch (Poco::Exception &exc) {
-        std::cerr << exc.message() << std::endl;
-        throw Core::ServiceException(exc.message(), 500);
+        log_error << exc.message();
+        throw Core::ServiceException(exc.message());
       }
     }
 
@@ -666,4 +662,4 @@ namespace AwsMock::Dto::S3 {
 
   };
 }
-#endif // AWSMOCK_DTO_S3_EVENTNOTIFICATION_H
+#endif // AWSMOCK_DTO_S3_EVENT_NOTIFICATION_H

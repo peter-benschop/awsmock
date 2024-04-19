@@ -46,8 +46,6 @@ namespace AwsMock::Service {
      *
      * @param configuration aws-mock configuration
      * @param metricService aws-mock monitoring
-     * @param createQueue create lambda notification queue
-     * @param invokeQueue invoke lambda notification queue
      */
     explicit LambdaServer(Core::Configuration &configuration, Core::MetricService &metricService);
 

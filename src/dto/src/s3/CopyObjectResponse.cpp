@@ -6,30 +6,29 @@
 
 namespace AwsMock::Dto::S3 {
 
+  std::string CopyObjectResponse::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("eTag", eTag);
+      rootJson.set("lastModified", lastModified);
+
+      return Core::JsonUtils::ToJsonString(rootJson);
+
+    } catch (Poco::Exception &exc) {
+      throw Core::JsonException(exc.message());
+    }
+  }
+
   std::string CopyObjectResponse::ToXml() const {
 
-    // Root
-    Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-    Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("CopyObjectResult");
-    pDoc->appendChild(pRoot);
+    Poco::XML::AutoPtr<Poco::XML::Document> pDoc = Core::XmlUtils::CreateDocument();
+    Poco::XML::AutoPtr<Poco::XML::Element> pRoot = Core::XmlUtils::CreateRootNode(pDoc, "CopyObjectResult");
 
-    // ETag
-    Poco::XML::AutoPtr<Poco::XML::Element> pETag = pDoc->createElement("ETag");
-    pRoot->appendChild(pETag);
-    Poco::XML::AutoPtr<Poco::XML::Text> pETagText = pDoc->createTextNode(eTag);
-    pETag->appendChild(pETagText);
+    Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ETag", eTag);
+    Core::XmlUtils::CreateTextNode(pDoc, pRoot, "LastModified", lastModified);
 
-    // LastModified
-    Poco::XML::AutoPtr<Poco::XML::Element> pLastModified = pDoc->createElement("LastModified");
-    pRoot->appendChild(pLastModified);
-    Poco::XML::AutoPtr<Poco::XML::Text> pLastModifiedTest = pDoc->createTextNode(lastModified);
-    pLastModified->appendChild(pLastModifiedTest);
-
-    std::stringstream output;
-    Poco::XML::DOMWriter writer;
-    writer.writeNode(output, pDoc);
-
-    return output.str();
+    return Core::XmlUtils::ToXmlString(pDoc);
   }
 
   std::string CopyObjectResponse::ToString() const {
@@ -39,7 +38,7 @@ namespace AwsMock::Dto::S3 {
   }
 
   std::ostream &operator<<(std::ostream &os, const CopyObjectResponse &r) {
-    os << "CopyObjectResponse={eTag:'" + r.eTag + "'}";
+    os << "CopyObjectResponse=" << r.ToJson();
     return os;
   }
 

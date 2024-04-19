@@ -156,7 +156,7 @@ namespace AwsMock {
     /**
      * Initialize database indexes
      */
-    void InitializeIndexes() {
+    static void InitializeIndexes() {
 
       // Create database indexes
       //_database.CreateIndexes();
@@ -166,7 +166,7 @@ namespace AwsMock {
     /**
      * Initialize CURL library
      */
-    void InitializeCurl() {
+    static void InitializeCurl() {
       curl_global_init(CURL_GLOBAL_ALL);
       log_debug << "Curl library initialized";
 
@@ -211,39 +211,39 @@ namespace AwsMock {
       Database::Entity::Module::ModuleList modules = _moduleDatabase.ListModules();
       for (const auto &module : modules) {
         if (module.name == "s3" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-          _s3Server = new Service::S3Server(_configuration, _metricService);
+          _s3Server = std::make_shared<Service::S3Server>(_configuration, _metricService);
           _s3Server->Start();
           _serverMap[module.name] = _s3Server;
         } else if (module.name == "sqs" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-          _sqsServer = new Service::SQSServer(_configuration, _metricService);
+          _sqsServer = std::make_shared<Service::SQSServer>(_configuration, _metricService);
           _sqsServer->Start();
           _serverMap[module.name] = _sqsServer;
         } else if (module.name == "sns" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-          _snsServer = new Service::SNSServer(_configuration, _metricService);
+          _snsServer = std::make_shared<Service::SNSServer>(_configuration, _metricService);
           _snsServer->Start();
           _serverMap[module.name] = _snsServer;
         } else if (module.name == "lambda" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-          _lambdaServer = new Service::LambdaServer(_configuration, _metricService);
+          _lambdaServer = std::make_shared<Service::LambdaServer>(_configuration, _metricService);
           _lambdaServer->Start();
           _serverMap[module.name] = _lambdaServer;
         } else if (module.name == "transfer" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-          _transferServer = new Service::TransferServer(_configuration, _metricService);
+          _transferServer =std::make_shared<Service::TransferServer>(_configuration, _metricService);
           _transferServer->Start();
           _serverMap[module.name] = _transferServer;
         } else if (module.name == "cognito" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-          _cognitoServer = new Service::CognitoServer(_configuration, _metricService);
+          _cognitoServer = std::make_shared<Service::CognitoServer>(_configuration, _metricService);
           _cognitoServer->Start();
           _serverMap[module.name] = _cognitoServer;
         } else if (module.name == "dynamodb" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-          _dynamoDbServer = new Service::DynamoDbServer(_configuration, _metricService);
+          _dynamoDbServer = std::make_shared<Service::DynamoDbServer>(_configuration, _metricService);
           _dynamoDbServer->Start();
           _serverMap[module.name] = _dynamoDbServer;
         } else if (module.name == "secretsmanager" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-          _secretsManagerServer = new Service::SecretsManagerServer(_configuration, _metricService);
+          _secretsManagerServer = std::make_shared<Service::SecretsManagerServer>(_configuration, _metricService);
           _secretsManagerServer->Start();
           _serverMap[module.name] = _secretsManagerServer;
         } else if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-          _gatewayServer = new Service::GatewayServer(_configuration, _metricService);
+          _gatewayServer = std::make_shared<Service::GatewayServer>(_configuration, _metricService);
           _gatewayServer->Start();
           _serverMap[module.name] = _gatewayServer;
         }
@@ -259,34 +259,34 @@ namespace AwsMock {
           log_info << "Stopping module: " << module.name;
           if (module.name == "s3") {
             _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
-            auto *s3Server = (Service::S3Server *) _serverMap[module.name];
+            auto s3Server = _serverMap[module.name];
             s3Server->StopServer();
           } else if (module.name == "sqs") {
             _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
-            auto *sqsServer = (Service::SQSServer *) _serverMap[module.name];
+            auto sqsServer = _serverMap[module.name];
             sqsServer->StopServer();
           } else if (module.name == "sns") {
             _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
-            auto *snsServer = (Service::SNSServer *) _serverMap[module.name];
+            auto snsServer = _serverMap[module.name];
             snsServer->StopServer();
           } else if (module.name == "lambda") {
             _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
-            auto *lambdaServer = (Service::LambdaServer *) _serverMap[module.name];
+            auto lambdaServer = _serverMap[module.name];
             lambdaServer->StopServer();
           } else if (module.name == "transfer") {
             _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
-            auto *transferServer = (Service::LambdaServer *) _serverMap[module.name];
+            auto transferServer = _serverMap[module.name];
             transferServer->StopServer();
           } else if (module.name == "cognito") {
             _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
-            auto *cognitoServer = (Service::CognitoServer *) _serverMap[module.name];
+            auto cognitoServer = _serverMap[module.name];
             cognitoServer->StopServer();
           } else if (module.name == "dynamodb") {
             _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
             _serverMap[module.name]->StopServer();
           } else if (module.name == "gateway") {
             _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
-            auto *gatewayServer = (Service::GatewayServer *) _serverMap[module.name];
+            auto gatewayServer = _serverMap[module.name];
             gatewayServer->StopServer();
           }
           log_debug << "Module " << module.name << " stopped";
@@ -323,7 +323,7 @@ namespace AwsMock {
     /**
      * Logger
      */
-    Core::PLogStream _logger;
+    [[maybe_unused]] Core::PLogStream _logger;
 
     /**
      * Application configuration
@@ -343,47 +343,47 @@ namespace AwsMock {
     /**
      * S3 module
      */
-    Service::S3Server *_s3Server{};
+    std::shared_ptr<Service::S3Server> _s3Server;
 
     /**
      * SQS module
      */
-    Service::SQSServer *_sqsServer{};
+    std::shared_ptr<Service::SQSServer> _sqsServer;
 
     /**
      * SNS module
      */
-    Service::SNSServer *_snsServer{};
+    std::shared_ptr<Service::SNSServer> _snsServer;
 
     /**
      * Lambda module
      */
-    Service::LambdaServer *_lambdaServer{};
+    std::shared_ptr<Service::LambdaServer> _lambdaServer;
 
     /**
      * Transfer module
      */
-    Service::TransferServer *_transferServer{};
+    std::shared_ptr<Service::TransferServer> _transferServer;
 
     /**
      * Cognito module
      */
-    Service::CognitoServer *_cognitoServer{};
+    std::shared_ptr<Service::CognitoServer> _cognitoServer;
 
     /**
      * DynamoDb module
      */
-    Service::DynamoDbServer *_dynamoDbServer{};
+    std::shared_ptr<Service::DynamoDbServer> _dynamoDbServer;
 
     /**
      * SecretsManager module
      */
-    Service::SecretsManagerServer *_secretsManagerServer{};
+    std::shared_ptr<Service::SecretsManagerServer> _secretsManagerServer;
 
     /**
      * Request gateway module
      */
-    Service::GatewayServer *_gatewayServer{};
+    std::shared_ptr<Service::GatewayServer> _gatewayServer{};
 
     /**
      * Gateway controller

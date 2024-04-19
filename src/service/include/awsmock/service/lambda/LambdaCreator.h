@@ -36,9 +36,8 @@ namespace AwsMock::Service {
      * Constructor
      *
      * @param configuration module configuration
-     * @param createQueue lambda create notification queue
      */
-    explicit LambdaCreator(Core::Configuration &configuration);
+    [[maybe_unused]] explicit LambdaCreator(Core::Configuration &configuration);
 
     /**
      * Create new lambda function

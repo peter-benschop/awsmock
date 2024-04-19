@@ -6,6 +6,22 @@
 
 namespace AwsMock::Dto::S3 {
 
+  std::string GetMetadataRequest::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("region", region);
+      rootJson.set("bucket", bucket);
+      rootJson.set("key", key);
+
+      return Core::JsonUtils::ToJsonString(rootJson);
+
+    } catch (Poco::Exception &exc) {
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
+    }
+  }
+
   std::string GetMetadataRequest::ToString() const {
     std::stringstream ss;
     ss << (*this);
@@ -13,7 +29,7 @@ namespace AwsMock::Dto::S3 {
   }
 
   std::ostream &operator<<(std::ostream &os, const GetMetadataRequest &r) {
-    os << "GetMetadataRequest={region='" << r.region << " bucket='" << r.bucket << "' key='" << r.key << "'}";
+    os << "GetMetadataRequest=" << r.ToJson();
     return os;
   }
 

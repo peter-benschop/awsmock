@@ -132,7 +132,7 @@ namespace AwsMock::Service {
   /**
    * Server map
    */
-  typedef std::map<std::string, Service::AbstractServer *> ServerMap;
+  typedef std::map<std::string, std::shared_ptr<Service::AbstractServer>> ServerMap;
 
 } // namespace AwsMock::Service
 

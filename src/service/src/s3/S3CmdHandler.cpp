@@ -179,7 +179,7 @@ namespace AwsMock::Service {
 
       case Dto::Common::S3CommandType::CREATE_BUCKET: {
 
-        Dto::S3::CreateBucketRequest s3Request = {.region=s3ClientCommand.region, .bucketName=s3ClientCommand.bucket, .bucketOwner=s3ClientCommand.user};
+        Dto::S3::CreateBucketRequest s3Request = {.region=s3ClientCommand.region, .name=s3ClientCommand.bucket, .owner=s3ClientCommand.user};
         Dto::S3::CreateBucketResponse s3Response = _s3Service.CreateBucket(s3Request);
         SendOkResponse(response, s3Response.ToXml());
         log_info << "Create bucket, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key;
@@ -454,7 +454,6 @@ namespace AwsMock::Service {
       case Dto::Common::S3CommandType::GET_OBJECT:
       case Dto::Common::S3CommandType::MOVE_OBJECT:
       case Dto::Common::S3CommandType::DELETE_OBJECT:
-      case Dto::Common::S3CommandType::UPLOAD_PART:
       case Dto::Common::S3CommandType::UNKNOWN: {
         log_error << "Bad request, method: POST clientCommand: " << Dto::Common::S3CommandTypeToString(s3ClientCommand.command);
         throw Core::ServiceException("Bad request, method: POST clientCommand: " + Dto::Common::S3CommandTypeToString(s3ClientCommand.command));

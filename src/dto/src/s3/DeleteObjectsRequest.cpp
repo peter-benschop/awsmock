@@ -6,6 +6,22 @@
 
 namespace AwsMock::Dto::S3 {
 
+  std::string DeleteObjectsRequest::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("region", region);
+      rootJson.set("bucket", bucket);
+      rootJson.set("keys", Core::JsonUtils::GetJsonStringArray(keys));
+
+      return Core::JsonUtils::ToJsonString(rootJson);
+
+    } catch (Poco::Exception &exc) {
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
+    }
+  }
+
   void DeleteObjectsRequest::FromXml(const std::string &xmlString) {
 
     Poco::XML::DOMParser parser;
@@ -28,11 +44,7 @@ namespace AwsMock::Dto::S3 {
   }
 
   std::ostream &operator<<(std::ostream &os, const DeleteObjectsRequest &r) {
-    os << "DeleteObjectsRequest={region='" + r.region + "' bucket='" + r.bucket;
-    for (auto &it : r.keys) {
-      os << "' key='" + it;
-    }
-    os << "'}";
+    os << "DeleteObjectsRequest=" << r.ToJson();
     return os;
   }
 

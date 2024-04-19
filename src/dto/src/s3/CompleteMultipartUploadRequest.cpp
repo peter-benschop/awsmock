@@ -16,9 +16,7 @@ namespace AwsMock::Dto::S3 {
       rootJson.set("user", user);
       rootJson.set("uploadId", uploadId);
 
-      std::ostringstream os;
-      rootJson.stringify(os);
-      return os.str();
+      return Core::JsonUtils::ToJsonString(rootJson);
 
     } catch (Poco::Exception &exc) {
       throw Core::JsonException(exc.message());

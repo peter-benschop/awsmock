@@ -6,29 +6,30 @@
 
 namespace AwsMock::Dto::S3 {
 
+  std::string CreateBucketResponse::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("location", location);
+      rootJson.set("arn", arn);
+
+      return Core::JsonUtils::ToJsonString(rootJson);
+
+    } catch (Poco::Exception &exc) {
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
+    }
+  }
+
   std::string CreateBucketResponse::ToXml() const {
-    Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-    Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("CreateBucketResult");
-    pDoc->appendChild(pRoot);
 
-    // Bucket ARN
-    Poco::XML::AutoPtr<Poco::XML::Element> pArn = pDoc->createElement("BucketArn");
-    pRoot->appendChild(pArn);
-    Poco::XML::AutoPtr<Poco::XML::Text> pArnText = pDoc->createTextNode(arn);
-    pArn->appendChild(pArnText);
+    Poco::XML::AutoPtr<Poco::XML::Document> pDoc = Core::XmlUtils::CreateDocument();
+    Poco::XML::AutoPtr<Poco::XML::Element> pRoot = Core::XmlUtils::CreateRootNode(pDoc, "CreateBucketResult");
 
-    // Bucket location
-    Poco::XML::AutoPtr<Poco::XML::Element> pLocation = pDoc->createElement("Location");
-    pRoot->appendChild(pLocation);
-    Poco::XML::AutoPtr<Poco::XML::Text> pLocationText = pDoc->createTextNode(arn);
-    pLocation->appendChild(pLocationText);
+    Core::XmlUtils::CreateTextNode(pDoc, pRoot, "BucketArn", arn);
+    Core::XmlUtils::CreateTextNode(pDoc, pRoot, "Location", location);
 
-    std::stringstream output;
-    Poco::XML::DOMWriter writer;
-    writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION);
-    writer.writeNode(output, pDoc);
-
-    return output.str();
+    return Core::XmlUtils::ToXmlString(pDoc);
   }
 
   std::string CreateBucketResponse::ToString() const {

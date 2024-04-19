@@ -69,13 +69,11 @@ namespace AwsMock::Dto::Common {
         if (!bucket.empty() && !key.empty()) {
           if (uploads) {
             command = S3CommandType::CREATE_MULTIPART_UPLOAD;
+          } else if(multipartRequest){
+            command = S3CommandType::COMPLETE_MULTIPART_UPLOAD;
           }
         } else if (!bucket.empty()) {
-          if (multipartRequest) {
-            command = S3CommandType::COMPLETE_MULTIPART_UPLOAD;
-          } else {
             command = S3CommandType::DELETE_OBJECTS;
-          }
         }
         break;
 
@@ -94,6 +92,7 @@ namespace AwsMock::Dto::Common {
       }
       }
     }
+    //log_debug << ToJson();
   }
 
   void S3ClientCommand::GetCommandFromUserAgent(const HttpMethod &httpMethod, const UserAgent &userAgent) {
@@ -155,9 +154,7 @@ namespace AwsMock::Dto::Common {
       rootJson.set("copyRequest", copyRequest);
       rootJson.set("uploadId", uploadId);
 
-      std::ostringstream os;
-      rootJson.stringify(os);
-      return os.str();
+      return Core::JsonUtils::ToJsonString(rootJson);
 
     } catch (Poco::Exception &exc) {
       throw Core::JsonException(exc.message());

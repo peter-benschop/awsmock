@@ -264,7 +264,7 @@ namespace AwsMock::Service {
 
       // Set the message userAttributes
       SendOkResponse(response, sqsClientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
-      log_info << "Receive message, queueUrl: " << sqsRequest.queueUrl;
+      log_info << "Receive message, queueUrl: " << sqsRequest.queueUrl << " count: " << sqsResponse.messageList.size();
 
       break;
     }

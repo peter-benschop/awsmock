@@ -29,7 +29,6 @@ namespace AwsMock::Service {
      *
      * @param configuration application configuration
      * @param metricService  monitoring
-     * @param condition stop condition
      */
     SQSRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService) {}
 

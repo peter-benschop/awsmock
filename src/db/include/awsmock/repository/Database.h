@@ -136,7 +136,7 @@ namespace AwsMock::Database {
       /**
        * Database client
        */
-      mongocxx::pool *_pool;
+      std::shared_ptr<mongocxx::pool> _pool;
 
       /**
        * Database connection pool size

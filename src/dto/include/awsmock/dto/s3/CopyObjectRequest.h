@@ -2,13 +2,19 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_CORE_DTO_COPYOBJECTREQUEST_H
-#define AWSMOCK_CORE_DTO_COPYOBJECTREQUEST_H
+#ifndef AWSMOCK_CORE_DTO_COPY_OBJECT_REQUEST_H
+#define AWSMOCK_CORE_DTO_COPY_OBJECT_REQUEST_H
 
 // C++ standard includes
 #include <map>
 #include <string>
 #include <sstream>
+
+// AwsMock includes
+#include <awsmock/core/JsonException.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/XmlUtils.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -50,11 +56,18 @@ namespace AwsMock::Dto::S3 {
     std::map<std::string, std::string> metadata;
 
     /**
+     * Convert to a JSON string
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const;
+
+    /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    std::string ToString() const;
+    [[nodiscard]] std::string ToString() const;
 
     /**
      * Stream provider.
@@ -67,4 +80,4 @@ namespace AwsMock::Dto::S3 {
 
 } // namespace AwsMock::Dto::S3
 
-#endif // AWSMOCK_CORE_DTO_COPYOBJECTREQUEST_H
+#endif // AWSMOCK_CORE_DTO_COPY_OBJECT_REQUEST_H

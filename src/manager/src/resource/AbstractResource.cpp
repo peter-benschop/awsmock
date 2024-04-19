@@ -249,12 +249,7 @@ namespace AwsMock::Resource {
 
   void AbstractResource::SendErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Core::ServiceException &exc) {
 
-    std::string payload;
-    if (service == "SQS") {
-      payload = Dto::SQS::RestErrorResponse(exc).ToXml();
-    } else if (service == "S3") {
-      payload = Dto::S3::RestErrorResponse(exc).ToXml();
-    }
+    std::string payload = exc.message();
     SetHeaders(response, payload.length());
 
     log_error << "Exception, code: " << exc.code() << " message: " << exc.message();

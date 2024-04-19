@@ -6,6 +6,23 @@
 
 namespace AwsMock::Dto::S3 {
 
+  std::string CreateMultipartUploadRequest::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("region", region);
+      rootJson.set("bucket", bucket);
+      rootJson.set("key", key);
+      rootJson.set("user", user);
+      rootJson.set("uploadId", uploadId);
+
+      return Core::JsonUtils::ToJsonString(rootJson);
+
+    } catch (Poco::Exception &exc) {
+      throw Core::JsonException(exc.message());
+    }
+  }
+
   void CreateMultipartUploadRequest::FromXml(const std::string &xmlString) {
 
     Poco::XML::DOMParser parser;
@@ -22,7 +39,7 @@ namespace AwsMock::Dto::S3 {
   }
 
   std::ostream &operator<<(std::ostream &os, const CreateMultipartUploadRequest &r) {
-    os << "CreateMultipartUploadRequest={region='" << r.region << "', bucket='" << r.bucket << "', key='" << r.key << "', user='" << r.user << "', uploadId='" << r.uploadId << "'}";
+    os << "CreateMultipartUploadRequest=" << r.ToJson();
     return os;
   }
 

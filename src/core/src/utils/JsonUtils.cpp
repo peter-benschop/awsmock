@@ -46,4 +46,30 @@ namespace AwsMock::Core {
       Poco::DateTimeParser::parse(Poco::DateTimeFormat::ISO8601_FRAC_FORMAT, stringValue, attribute, tz);
     }
   }
+
+  Poco::JSON::Array JsonUtils::GetJsonStringArray(const std::vector<std::string> &values) {
+
+    Poco::JSON::Array jsonArray;
+    for (const auto &it : values) {
+      jsonArray.add(it);
+    }
+    return jsonArray;
+  }
+
+  Poco::JSON::Object JsonUtils::GetJsonObject(const std::map<std::string, std::string> &values) {
+
+    Poco::JSON::Object jsonObject;
+    for (const auto &it : values) {
+      jsonObject.set(it.first, it.second);
+    }
+    return jsonObject;
+  }
+
+  std::string JsonUtils::ToJsonString(const Poco::JSON::Object &jsonObject) {
+
+    std::ostringstream os;
+    jsonObject.stringify(os);
+    return os.str();
+  }
+
 }
