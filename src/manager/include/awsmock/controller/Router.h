@@ -20,7 +20,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/config/Configuration.h>
+#include <awsmock/core/Configuration.h>
 #include <awsmock/resource/factory/IFactory.h>
 #include <awsmock/resource/factory/Factory.h>
 #include <awsmock/controller/ResourceNotFound.h>
@@ -39,7 +39,7 @@ namespace AwsMock::Controller {
      * @param metricService common monitoring module
      * @param serverMap map of services
      */
-    Router(Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap);
+    Router(Core::Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap);
 
     /**
      * Add a route
@@ -79,7 +79,7 @@ namespace AwsMock::Controller {
     /**
      * Configuration
      */
-    Configuration &_configuration;
+    Core::Configuration &_configuration;
 
     /**
      * Metric module

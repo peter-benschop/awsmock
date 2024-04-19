@@ -65,10 +65,14 @@ namespace AwsMock::Core {
     return jsonObject;
   }
 
-  std::string JsonUtils::ToJsonString(const Poco::JSON::Object &jsonObject) {
+  std::string JsonUtils::ToJsonString(const Poco::JSON::Object &jsonObject, bool prettyPrint, int indent) {
 
     std::ostringstream os;
-    jsonObject.stringify(os);
+    if (prettyPrint) {
+      jsonObject.stringify(os, indent);
+    } else {
+      jsonObject.stringify(os);
+    }
     return os.str();
   }
 

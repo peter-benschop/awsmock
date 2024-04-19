@@ -29,12 +29,17 @@ testing functions packaged as container images). It also simplifies running your
 You can include the Lambda Runtime Interface Emulator in your container image to have it accept HTTP requests instead
 of the JSON events required for deployment to Lambda. This component does not emulate Lambda’s orchestrator, or security
 and authentication configurations. You can get started by downloading and installing it on your local machine. When the
-Lambda Runtime API emulator is executed, a /2015-03-31/functions/function/invocations endpoint will be stood up within
-the container that you post data to it in order to invoke your function for testing.
+Lambda Runtime API emulator is executed, a ```/2015-03-31/functions/function/invocations``` endpoint will be stood up 
+within the container that you post data to it in order to invoke your function for testing.
 
 Due to the lack of a orchestrator, invocations will be stored in a AwsMock internal queue and executed sequentially. This
 internal queue has an arbitrary length and stores the invocation events, which will be executed sequentially by the
 lambda executor thread one after the other. 
+
+The lambda functions are executed inside the RIE (Runtime Interface Emulator). Lambdas run as docker container using port
+8080 as REST API port for invocation requests. The internal port 8080 are connected to the host via a port forwarding, 
+therefore the host port is randomly chosen between 32768 and 65536. You can see the docker host port via the 
+```docker ps``` command. 
 
 The Lambda module can be configured using the ```awslocal``` command. For details of the ```awslocal``` command see the 
 corresponding man page ```awslocal(1)```.

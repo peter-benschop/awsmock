@@ -57,8 +57,14 @@ namespace AwsMock::Service {
    * <li>Invoke lambda function with AWS SQS notification payload.</li>
    * </ul>
    *
-   * As the AWS lambda runtime environment (RIE) cannot handle several concurrent requests, the lambda invocation requests are queued and are send sequentially. THe incoming requests are posted to a Poco notification center. The target of the notification
-   * is the LambdaExecutor (@see AwsMock::Worker::LambdaExecutor).
+   * <p>
+   * As the AWS lambda runtime environment (RIE) cannot handle several concurrent requests, the lambda invocation requests are queued and are send sequentially to the lambda function
+   * running as docker container. The incoming requests are posted to a Poco notification center. The target of the notification is the LambdaExecutor (@see AwsMock::Worker::LambdaExecutor).
+   * </p>
+   * <p>
+   * The execution command are send via HTTP to the docker image. RIE is using port 8080 for the REST invocation requests. This port is mapped to the docker host on a randomly chosen port,
+   * between 32768 and 65536.
+   * </p>
    *
    * @author jens.vogt@opitz-consulting.com
    */

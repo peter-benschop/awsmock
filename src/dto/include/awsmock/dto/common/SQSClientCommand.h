@@ -14,11 +14,15 @@
 #include <Poco/Net/HTTPServerRequest.h>
 
 // AwsMock includes
+#include <awsmock/core/JsonException.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/HttpUtils.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/dto/common/HttpMethod.h>
 #include <awsmock/dto/common/UserAgent.h>
+
 
 namespace AwsMock::Dto::Common {
 
@@ -111,7 +115,7 @@ namespace AwsMock::Dto::Common {
      * @param request HTTP request
      * @return message body as string
      */
-    std::string GetBodyAsString(Poco::Net::HTTPServerRequest &request);
+    static std::string GetBodyAsString(Poco::Net::HTTPServerRequest &request);
 
     /**
      * Returns the command from HTTP header
@@ -119,7 +123,7 @@ namespace AwsMock::Dto::Common {
      * @param request HTTP request
      * @return command string
      */
-    std::string GetCommandFromHeader(Poco::Net::HTTPServerRequest &request);
+    std::string GetCommandFromHeader(Poco::Net::HTTPServerRequest &request) const;
 
     /**
      * Getś the value from the user-agent string
@@ -130,6 +134,13 @@ namespace AwsMock::Dto::Common {
      * @param user AWS user
      */
     void FromRequest(const HttpMethod &method, Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user);
+
+    /**
+     * Convert to a JSON string
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Converts the DTO to a string representation.

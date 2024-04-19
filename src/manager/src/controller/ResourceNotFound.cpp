@@ -1,7 +1,7 @@
 
 #include "awsmock/controller/ResourceNotFound.h"
 
-namespace AwsMock {
+namespace AwsMock::Core {
 
   void ResourceNotFound::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
     response.setStatus(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);

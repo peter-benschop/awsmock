@@ -19,6 +19,7 @@ namespace AwsMock::Dto::Common {
     // We have a user agent, so use it
     std::vector<std::string> parts = Core::StringUtils::Split(request["User-Agent"], ' ');
     if (parts.empty() || parts.size() < 4) {
+      log_error << "Could not extract user agent DTO";
       throw Core::ServiceException("Could not extract user agent DTO");
     } else {
 
@@ -44,6 +45,26 @@ namespace AwsMock::Dto::Common {
     FromRequest(request);
   }
 
+  std::string UserAgent::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("clientApplication", clientApplication);
+      rootJson.set("clientLanguage", clientLanguage);
+      rootJson.set("clientOs", clientOs);
+      rootJson.set("clientExecutableType", clientExecutableType);
+      rootJson.set("clientPrompt", clientPrompt);
+      rootJson.set("clientModule", clientModule);
+      rootJson.set("clientCommand", clientCommand);
+      rootJson.set("contentType", contentType);
+
+      return Core::JsonUtils::ToJsonString(rootJson);
+
+    } catch (Poco::Exception &exc) {
+      throw Core::JsonException(exc.message());
+    }
+  }
+
   std::string UserAgent::ToString() const {
     std::stringstream ss;
     ss << (*this);
@@ -51,8 +72,7 @@ namespace AwsMock::Dto::Common {
   }
 
   std::ostream &operator<<(std::ostream &os, const UserAgent &r) {
-    os << "UserAgent={clientApplication='" << r.clientApplication << ", clientLanguage='" << r.clientLanguage << "', clientOs='" << r.clientOs << "', clientExecutableType='" << r.clientExecutableType << "', clientPrompt=" << r.clientPrompt
-       << ", clientModule='" << r.clientModule << "', clientCommand='" << r.clientCommand << "' contentType='" << r.contentType << "'}";
+    os << "UserAgent=" << r.ToJson();
     return os;
   }
 }

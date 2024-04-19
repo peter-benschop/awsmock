@@ -6,15 +6,15 @@
 
 namespace AwsMock::Dto::Common {
 
-  void SQSClientCommand::FromRequest(const HttpMethod &method, Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user) {
+  void SQSClientCommand::FromRequest(const HttpMethod &httpMethod, Poco::Net::HTTPServerRequest &request, const std::string &awsRegion, const std::string &awsUser) {
 
     Dto::Common::UserAgent userAgent;
     userAgent.FromRequest(request, "sqs");
 
     // Basic values
-    this->region = region;
-    this->user = user;
-    this->method = method;
+    this->method = httpMethod;
+    this->region = awsRegion;
+    this->user = awsUser;
     this->contentType = userAgent.contentType;
     this->payload = GetBodyAsString(request);
 
@@ -31,25 +31,43 @@ namespace AwsMock::Dto::Common {
   std::string SQSClientCommand::GetBodyAsString(Poco::Net::HTTPServerRequest &request) {
     std::stringstream sstream;
     sstream << request.stream().rdbuf();
-    request.stream().seekg(0, request.stream().beg);
     return sstream.str();
   }
 
-  std::string SQSClientCommand::GetCommandFromHeader(Poco::Net::HTTPServerRequest &request) {
+  std::string SQSClientCommand::GetCommandFromHeader(Poco::Net::HTTPServerRequest &request) const {
 
-    std::string command;
+    std::string cmd;
     std::string cType = request["Content-Type"];
     if (Core::StringUtils::ContainsIgnoreCase(cType, "application/x-www-form-urlencoded")) {
 
-      command = Core::HttpUtils::GetQueryParameterValueByName(payload, "Action");
+      cmd = Core::HttpUtils::GetQueryParameterValueByName(payload, "Action");
 
     } else if (Core::StringUtils::ContainsIgnoreCase(cType, "application/x-amz-json-1.0")) {
 
       std::string headerValue = request["X-Amz-Target"];
-      command = Core::StringUtils::Split(headerValue, '.')[1];
+      cmd = Core::StringUtils::Split(headerValue, '.')[1];
 
     }
-    return Core::StringUtils::ToSnakeCase(command);
+    return Core::StringUtils::ToSnakeCase(cmd);
+  }
+
+  std::string SQSClientCommand::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("method", method);
+      rootJson.set("region", region);
+      rootJson.set("user", user);
+      rootJson.set("command", command);
+      rootJson.set("contentType", contentType);
+      rootJson.set("payload", payload);
+
+      return Core::JsonUtils::ToJsonString(rootJson);
+
+    } catch (Poco::Exception &exc) {
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
+    }
   }
 
   std::string SQSClientCommand::ToString() const {
@@ -59,7 +77,7 @@ namespace AwsMock::Dto::Common {
   }
 
   std::ostream &operator<<(std::ostream &os, const SQSClientCommand &r) {
-    os << "SQSClientCommand={method='" << HttpMethodToString(r.method) << ", region='" << r.region << "', user='" << r.user << "', command='" << SqsCommandTypeToString(r.command) << " contentType='" << r.contentType << "' payload='" << r.payload << "'}";
+    os << "SQSClientCommand=" << r.ToJson();
     return os;
   }
 }

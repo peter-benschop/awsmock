@@ -27,22 +27,11 @@ namespace AwsMock::Service {
   /**
    * AWS S3 mock handler
    *
-   * <p>AWS S3 HTTP request handler. All S3 related REST call are ending here. Depending on the request header the S3 module will be selected in case the
-   * authorization header contains the S3 module.<p>
-   *
-   * <p><h3>GET Requests</h3>
-   * <ul>
-   * <li>S3 bucket list command: <pre>aws s3 ls --endpoint http://localhost:4567</pre></li>
-   * <li>S3 object list command: <pre>aws s3 ls s3://example-bucket --recursive --endpoint http://localhost:4567</pre></li>
-   * </ul>
-   * </p>
-   * <p><h3>POST Requests</h3>
-   * <ul>
-   * <li>Bigfile (>4MB) Initial Multipart upload: <pre>aws cp example.txt s3://example-bucket/test/example.txt --endpoint http://localhost:4567</pre></li>
-   * <li>Upload part</li>
-   * <li>Complete Multipart upload</li>
-   * </ul>
    * <p>
+   * AWS S3 HTTP request handler. All S3 related REST call are ending here. Depending on the request header the S3 module will be selected in case the
+   * authorization header contains the S3 module. As the different clients (Java, C++, Python, nodejs) are using different request structure, the request
+   * are first send to the S3CmdHandler, which normalizes the commands.
+   * </p>
    */
   class S3CmdHandler : public virtual AbstractHandler {
 
