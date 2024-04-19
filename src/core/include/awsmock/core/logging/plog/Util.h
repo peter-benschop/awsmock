@@ -155,8 +155,8 @@ namespace plog {
     };
 
     inline void ftime(Time *t) {
-      timeval tv;
-      ::gettimeofday(&tv, NULL);
+      timeval tv{};
+      ::gettimeofday(&tv, nullptr);
 
       t->time = tv.tv_sec;
       t->millitm = static_cast<unsigned short>(tv.tv_usec / 1000);
@@ -167,7 +167,7 @@ namespace plog {
 #ifdef _WIN32
       return GetCurrentThreadId();
 #elif defined(__linux__)
-      return static_cast<unsigned int>(::syscall(__NR_gettid));
+      return static_cast<unsigned int>(::syscall(__NR_gettid)) - static_cast<unsigned int>(::syscall(__NR_getpid)) + 1;
 #elif defined(__FreeBSD__)
       long tid;
       syscall(SYS_thr_self, &tid);
@@ -326,26 +326,29 @@ namespace plog {
         return str;
     }
 #endif
+#pragma GCC diagnostic ignored "-Wstringop-overread"
 
-    inline char* replace(const char *func) {
-      func = AwsMock::Core::StringUtils::Replace(func, "AwsMock::", "");
-      func = AwsMock::Core::StringUtils::Replace(func, "Core::", "");
-      func = AwsMock::Core::StringUtils::Replace(func, "Service::", "");
-      func = AwsMock::Core::StringUtils::Replace(func, "Dto::", "");
-      func = AwsMock::Core::StringUtils::Replace(func, "Database::", "");
-      return (char*)func;
+    inline const char *nth_strchr(const char *s, int c, int n) {
+
+      int c_count;
+      const char *nth_ptr;
+
+      for (c_count = 1, nth_ptr = strchr(s, c); nth_ptr != nullptr && c_count < n && c != 0; c_count++) {
+        nth_ptr = strchr(nth_ptr + 1, c);
+      }
+
+      return nth_ptr + 1;
     }
 
     inline std::string processFuncName(const char *func) {
 #if (defined(_WIN32) && !defined(__MINGW32__)) || defined(__OBJC__)
       return std::string(func);
 #else
-      const char *funcBegin = func;
+      const char *funcBegin = nth_strchr(func, ':', 4);
       const char *funcEnd = ::strchr(funcBegin, '(');
       int foundTemplate = 0;
 
       if (!funcEnd) {
-        //replace(func);
         return {func};
       }
 
@@ -360,8 +363,6 @@ namespace plog {
           break;
         }
       }
-
-      //replace(func);
       return {funcBegin, funcEnd};
 #endif
     }

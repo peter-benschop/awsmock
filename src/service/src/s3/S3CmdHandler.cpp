@@ -3,9 +3,6 @@
 
 namespace AwsMock::Service {
 
-  S3CmdHandler::S3CmdHandler(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractHandler(), _configuration(configuration), _metricService(metricService), _s3Service(configuration) {
-  }
-
   void S3CmdHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3ClientCommand) {
     log_debug << "S3 GET request, URI: " + request.getURI() << " region: " << s3ClientCommand.region << " user: " + s3ClientCommand.user;
 
@@ -99,9 +96,9 @@ namespace AwsMock::Service {
         Dto::S3::GetObjectResponse s3Response = _s3Service.GetObject(s3Request);
 
         HeaderMap headerMap;
-        headerMap["ETag"] = "\"" + s3Response.md5sum + "\"";
+/*        headerMap["ETag"] = "\"" + s3Response.md5sum + "\"";
         headerMap["Content-Type"] = s3Response.contentType;
-        headerMap["Last-Modified"] = Poco::DateTimeFormatter::format(s3Response.modified, Poco::DateTimeFormat::HTTP_FORMAT);
+        headerMap["Last-Modified"] = Poco::DateTimeFormatter::format(s3Response.modified, Poco::DateTimeFormat::HTTP_FORMAT);*/
 
         // Set user headers
         for (const auto &m : s3Response.metadata) {
@@ -211,10 +208,7 @@ namespace AwsMock::Service {
 
           Dto::S3::CopyObjectResponse s3Response = _s3Service.CopyObject(s3Request);
 
-          HeaderMap headerMap;
-          headerMap["ETag"] = s3Response.eTag;
-
-          SendOkResponse(response, s3Response.ToXml(), headerMap);
+          SendOkResponse(response, s3Response.ToXml());
           log_info << "Copy object, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key;
 
         } else {
@@ -238,20 +232,8 @@ namespace AwsMock::Service {
 
           Dto::S3::PutObjectResponse putObjectResponse = _s3Service.PutObject(putObjectRequest, request.stream());
 
-          HeaderMap headerMap;
-          //headerMap["Content-MD5"] = putObjectResponse.md5Sum;
-          headerMap["ETag"] = Core::StringUtils::Quoted(putObjectResponse.md5Sum);
-          if (!putObjectResponse.checksumSha1.empty()) {
-            headerMap["x-amz-checksum-sha1"] = putObjectResponse.checksumSha1;
-          }
-          if (!putObjectResponse.checksumSha256.empty()) {
-            headerMap["x-amz-checksum-sha256"] = putObjectResponse.checksumSha256;
-          }
-          if (!putObjectResponse.versionId.empty()) {
-            headerMap["x-amz-version-userPoolId"] = putObjectResponse.versionId;
-          }
           log_info << "Put object, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << " size: " << putObjectResponse.contentLength;
-          SendOkResponse(response, {}, headerMap);
+          SendOkResponse(response, {});
         }
         break;
       }
@@ -279,10 +261,7 @@ namespace AwsMock::Service {
 
         Dto::S3::MoveObjectResponse s3Response = _s3Service.MoveObject(s3Request);
 
-        HeaderMap headerMap;
-        headerMap["ETag"] = s3Response.eTag;
-
-        SendOkResponse(response, s3Response.ToXml(), headerMap);
+        SendOkResponse(response, s3Response.ToXml());
         log_info << "Move object, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key;
 
         break;
@@ -297,7 +276,7 @@ namespace AwsMock::Service {
         std::string eTag = _s3Service.UploadPart(request.stream(), std::stoi(partNumber), uploadId);
 
         HeaderMap headerMap;
-        headerMap["ETag"] = eTag;
+        headerMap["ETag"] = Core::StringUtils::Quoted(eTag);
 
         SendNoContentResponse(response, headerMap);
         log_debug << "Finished S3 multipart upload part: " << partNumber;
@@ -553,7 +532,7 @@ namespace AwsMock::Service {
       headerMap["Content-Type"] = "application/json";
       headerMap["Last-Modified"] = Poco::DateTimeFormatter::format(s3Response.modified, Poco::DateTimeFormat::HTTP_FORMAT);
       headerMap["Content-Length"] = std::to_string(s3Response.size);
-      headerMap["ETag"] = "\"" + s3Response.md5Sum + "\"";
+      //headerMap["ETag"] = "\"" + s3Response.md5Sum + "\"";
       headerMap["accept-ranges"] = "bytes";
       headerMap["x-amz-userPoolId-2"] = Core::StringUtils::GenerateRandomString(30);
       headerMap["x-amz-request-userPoolId"] = Poco::UUIDGenerator().createRandom().toString();

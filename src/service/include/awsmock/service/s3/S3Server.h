@@ -29,7 +29,13 @@
 namespace AwsMock::Service {
 
   /**
-   * S3 module
+   * S3 server
+   *
+   * <p>
+   * Default port is 9500.
+   * </p>
+   *
+   * @author jens.vogt@opitz-consulting.com
    */
   class S3Server : public AbstractServer, public AbstractWorker {
 

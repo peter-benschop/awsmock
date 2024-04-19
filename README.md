@@ -9,6 +9,7 @@ aws-mock is a high performance, persistent AWS simulation. Currently, the follow
 - [Cognito](docs/man/awsmockcognito.1.md): Amazon Cognito identity service
 - [DynamoDB](docs/man/awsmockdynamodb.1.md): Amazon Dynamo database service
 - [Transfer](docs/man/awsmocktransfer.1.md): Amazon transfer family, supporting FTP
+- [SecretsManager](docs/man/awsmocktransfer.1.md): Amazon secrets manager service
 
 aws-mock is written in C++ with an optional MongoDB persistence layer. If needed all objects can be stored in the
 database. The simulation reacts to all AWS commands send to the default port 4566. For a lists of supported command see

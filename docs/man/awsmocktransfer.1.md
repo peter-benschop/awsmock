@@ -2,7 +2,7 @@
 title: awsmocktransfer(1)
 section: 1
 header: awsmocktransfer AwsMock Transfer Server module
-footer: awsmocktransfer 0.5.167
+footer: awsmocktransfer 0.5.210
 date: December 22, 2023
 ---
 
@@ -71,7 +71,7 @@ awslocal transfer delete-server --server-userPoolId s-27134679b31c0a9833ee
 Jens Vogt <jens.vogt@opitz-consulting.com>
 
 ## VERSION
-0.5.167
+0.5.210
 
 ## BUGS
 

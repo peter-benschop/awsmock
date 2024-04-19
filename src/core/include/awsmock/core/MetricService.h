@@ -15,10 +15,6 @@
 #include <sys/resource.h>
 
 // Poco includes
-#include <Poco/Logger.h>
-#include <Poco/Timer.h>
-#include <Poco/Runnable.h>
-#include <Poco/Thread.h>
 #include <Poco/Prometheus/Counter.h>
 #include <Poco/Prometheus/Gauge.h>
 #include <Poco/Prometheus/MetricsServer.h>

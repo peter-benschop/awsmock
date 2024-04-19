@@ -2,7 +2,7 @@
 title: awsmockmgr(1)
 section: 1
 header: awsmockmgr AwsMock Manager
-footer: awsmockmgr 0.5.167
+footer: awsmockmgr 0.5.210
 date: December 18, 2023
 ---
 
@@ -81,7 +81,7 @@ Start the AwsMock manager as background daemon process with the 'debug' log leve
 Jens Vogt <jens.vogt@opitz-consulting.com>
 
 ## VERSION
-0.5.167
+0.5.210
 
 ## BUGS
 

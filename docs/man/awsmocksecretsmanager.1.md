@@ -2,7 +2,7 @@
 title: awsmockdynamodb(1)
 section: 1
 header: awsmockdynamodb AwsMock DynamoDB module
-footer: awsmockdynamodb 0.5.167
+footer: awsmockdynamodb 0.5.210
 date: December 18, 2023
 ---
 

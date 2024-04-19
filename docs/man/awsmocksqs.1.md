@@ -2,7 +2,7 @@
 title: awsmocksqs(1)
 section: 1
 header: awsmocksqs AwsMock SQS module
-footer: awsmocksqs 0.5.167
+footer: awsmocksqs 0.5.210
 date: December 18, 2023
 ---
 
@@ -138,7 +138,7 @@ awslocal sqs delete-queue --queue-url "http://localhost:4566/000000000000/test-q
 Jens Vogt <jens.vogt@opitz-consulting.com>
 
 ## VERSION
-0.5.167
+0.5.210
 
 ## BUGS
 
