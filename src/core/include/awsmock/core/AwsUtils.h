@@ -11,7 +11,6 @@
 
 // Poco includes
 #include <Poco/UUIDGenerator.h>
-#include <Poco/Net/HTTPServerResponse.h>
 
 // AwsMock includes
 #include <awsmock/core/StringUtils.h>

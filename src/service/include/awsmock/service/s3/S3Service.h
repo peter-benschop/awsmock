@@ -56,6 +56,11 @@ namespace AwsMock::Service {
 
   typedef std::map<std::string, std::ofstream> MultiPartUploads;
 
+  /**
+   * S3 service.
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   class S3Service {
 
   public:

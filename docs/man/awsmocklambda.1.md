@@ -2,7 +2,7 @@
 title: awsmocklambda(1)
 section: 1
 header: awsmocklambda AwsMock Lambda module
-footer: awsmocklambda 0.5.167
+footer: awsmocklambda 0.5.210
 date: December 18, 2023
 ---
 
@@ -127,7 +127,7 @@ awslocal lambda delete-function --function-name test-function
 Jens Vogt <jens.vogt@opitz-consulting.com>
 
 ## VERSION
-0.5.167
+0.5.210
 
 ## BUGS
 

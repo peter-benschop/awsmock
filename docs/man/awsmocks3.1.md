@@ -2,7 +2,7 @@
 title: awsmocks3(1)
 section: 1
 header: awsmocks3 AwsMock S3 module
-footer: awsmocks3 0.5.167
+footer: awsmocks3 0.5.210
 date: December 18, 2023
 ---
 
@@ -22,6 +22,30 @@ provides information on the extent of S3’s integration with AwsMock.
 
 The S3 module can be configured using the ```awslocal``` command. For details of the ```awslocal``` command see the 
 corresponding man page ```awslocal(1)```.
+
+## NOTES
+The S3 client should be configured to use the path style bucket name. Additionally, the S3 client should not use 
+checksum validation, as checksums are not calculated correctly yet. Following are examples for synchronous and
+asynchronous client configurations:
+```   
+  s3Client = S3Client.builder()
+         .credentialsProvider(ProfileCredentialsProvider.create())
+         .region(Region.US_EAST_1)
+         .endpointOverride(new URI(endpoint))
+         .forcePathStyle(true)
+         .serviceConfiguration(S3Configuration.builder().checksumValidationEnabled(false).build())
+         .build();
+```   
+and for the async client:
+```   
+  s3AsyncClient = S3CrtAsyncClient.builder()
+        .credentialsProvider(ProfileCredentialsProvider.create())
+        .checksumValidationEnabled(false)
+        .region(Region.US_EAST_1)
+        .endpointOverride(new URI(endpoint))
+        .forcePathStyle(true)
+       .build();
+```   
 
 ## COMMANDS
 
@@ -63,13 +87,61 @@ To download a S3 object from a S3 bucket ```s3://test-bucket-1```
 ```
 awslocal s3 cp s3://test-bucket-1/test/README.md test.md
 ```
+## JAVA EXAMPLES
+The following section are Java example using the synchronous S3 client, as well as the transfer manager for bigger files.
+```
+// Create a new bucket 
+CreateBucketResponse response = s3Client.createBucket(CreateBucketRequest.builder().bucket(name).build());
+
+// List buckets 
+ListBucketsResponse response = s3Client.listBuckets();
+
+// Delete a bucket 
+DeleteBucketResponse response = s3Client.deleteBucket(DeleteBucketRequest.builder().bucket(name).build());
+
+// Put small object 
+PutObjectResponse response = s3Client.putObject(PutObjectRequest.builder().bucket(bucket).key(key).build(), RequestBody.fromString(body));
+
+// Get object 
+ResponseInputStream<GetObjectResponse> response = s3Client.getObject(GetObjectRequest.builder().bucket(bucket).key(key).build());
+try (OutputStream ofs = new FileOutputStream(filename)) {
+  IOUtils.copy(response, ofs);
+}
+
+// Copy object 
+CopyObjectRequest copyRequest = CopyObjectRequest.builder()
+    .sourceBucket(sourceBucket)
+    .sourceKey(sourceKey)
+    .destinationBucket(destinationBucket)
+    .destinationKey(destinationKey)
+    .build();
+CopyObjectResponse response = s3Client.copyObject(copyRequest);
+
+// Download using transfer manager
+DownloadFileRequest downloadFileRequest =
+    DownloadFileRequest.builder()
+            .getObjectRequest(b -> b.bucket(bucket).key(key))
+            .destination(destination)
+            .build();
+FileDownload downloadFile = s3TransferManager.downloadFile(downloadFileRequest);
+CompletedFileDownload downloadResult = downloadFile.completionFuture().join();
+
+// Upload using transfer manager
+UploadFileRequest uploadFileRequest =
+    UploadFileRequest.builder()
+            .putObjectRequest(r -> r.bucket(bucket).key(key))
+            .source(destination)
+            .build();
+FileUpload uploadFile = s3TransferManager.uploadFile(uploadFileRequest);
+CompletedFileUpload uploadResult = uploadFile.completionFuture().join();
+```
 
 ## AUTHOR
 
 Jens Vogt <jens.vogt@opitz-consulting.com>
 
 ## VERSION
-0.5.167
+0.5.210
 
 ## BUGS
 

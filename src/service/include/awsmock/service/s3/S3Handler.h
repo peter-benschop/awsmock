@@ -43,6 +43,27 @@ namespace AwsMock::Service {
    * <li>Complete Multipart upload</li>
    * </ul>
    * <p>
+   * <p>
+   * The S3 client should not use checksum validation, as checksums are not calculated correctly yet.
+   * <pre>
+   *    s3Client = S3Client.builder()
+   *             .credentialsProvider(ProfileCredentialsProvider.create())
+   *             .region(Region.US_EAST_1)
+   *             .endpointOverride(new URI(endpoint))
+   *             .forcePathStyle(true)
+   *             .serviceConfiguration(S3Configuration.builder().checksumValidationEnabled(false).build())
+   *             .build();
+   * </pre>
+   * and for the async client:
+   * <pre>
+   *   s3AsyncClient = S3CrtAsyncClient.builder()
+   *             .credentialsProvider(ProfileCredentialsProvider.create())
+   *             .checksumValidationEnabled(false)
+   *             .region(Region.US_EAST_1)
+   *             .endpointOverride(new URI(endpoint))
+   *             .forcePathStyle(true)
+   *             .build();
+   * </pre>
    */
   class S3Handler : public S3CmdHandler {
 

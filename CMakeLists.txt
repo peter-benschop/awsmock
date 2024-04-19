@@ -6,6 +6,10 @@ set(CMAKE_CXX_STANDARD 20)
 set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dist/modules/modules)
 
+#set(CMAKE_CXX_FLAGS "-Wstringop-overread")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
 # Doxygen
 option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation (requires Doxygen)" OFF)
 

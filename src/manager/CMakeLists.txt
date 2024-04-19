@@ -1,9 +1,5 @@
 set(BINARY awsmockmgr)
 
-set(CMAKE_CXX_FLAGS "-Wall -Wextra")
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
-
 set(SOURCES src/config/Configuration.cpp src/resource/HandlerException.cpp src/resource/AbstractResource.cpp
         src/resource/factory/Factory.cpp src/resource/factory/ModuleFactory.cpp src/resource/handler/ModuleHandler.cpp
         src/controller/ResourceNotFound.cpp src/controller/Router.cpp src/controller/RestService.cpp src/main.cpp)

@@ -2,7 +2,7 @@
 title: awsmockcognito(1)
 section: 1
 header: awsmockcognito AwsMock Cognito module
-footer: awsmockcognito 0.5.167
+footer: awsmockcognito 0.5.210
 date: December 22, 2023
 ---
 
@@ -66,7 +66,7 @@ awslocal cognito-idp delete-user-pool --user-pool-userPoolId eu-central-1_6g67LG
 Jens Vogt <jens.vogt@opitz-consulting.com>
 
 ## VERSION
-0.5.167
+0.5.210
 
 ## BUGS
 

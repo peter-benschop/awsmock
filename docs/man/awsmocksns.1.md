@@ -2,7 +2,7 @@
 title: awsmocksns(1)
 section: 1
 header: awsmocksns AwsMock SNS module
-footer: awsmocksns 0.5.167
+footer: awsmocksns 0.5.210
 date: December 18, 2023
 ---
 
@@ -102,7 +102,7 @@ awslocal sns delete-topic --topic-arn arn:aws:sns:eu-central-1:000000000000:test
 Jens Vogt <jens.vogt@opitz-consulting.com>
 
 ## VERSION
-0.5.167
+0.5.210
 
 ## BUGS
 
