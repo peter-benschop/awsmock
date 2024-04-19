@@ -26,9 +26,10 @@ namespace AwsMock::Core {
     /**
      * Constructor
      *
-     * @param timeout
+     * @param name timer name
+     * @param timeout timeout in seconds
      */
-    explicit Timer(std::string  _name, int timeout);
+    explicit Timer(std::string name, int timeout);
 
     /**
      * Start the task

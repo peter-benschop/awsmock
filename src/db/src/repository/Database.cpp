@@ -25,7 +25,7 @@ namespace AwsMock::Database {
     _uri = mongocxx::uri(
         "mongodb://" + _user + ":" + _password + "@" + _host + ":" + std::to_string(_port) + "/?maxPoolSize="
             + std::to_string(_poolSize));
-    _pool = new mongocxx::pool(_uri);
+    _pool = std::make_shared<mongocxx::pool>(_uri);
   }
 
   mongocxx::database Database::GetConnection() {

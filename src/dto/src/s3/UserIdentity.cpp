@@ -6,13 +6,28 @@
 
 namespace AwsMock::Dto::S3 {
 
+  std::string UserIdentity::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("principalId", principalId);
+
+      return Core::JsonUtils::ToJsonString(rootJson);
+
+    } catch (Poco::Exception &exc) {
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
+    }
+  }
+
   Poco::JSON::Object UserIdentity::ToJsonObject() const {
     try {
       Poco::JSON::Object rootJson;
       rootJson.set("principalId", principalId);
       return rootJson;
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
   }
 
@@ -23,7 +38,7 @@ namespace AwsMock::Dto::S3 {
   }
 
   std::ostream &operator<<(std::ostream &os, const UserIdentity &r) {
-    os << "UserIdentity={principalId='" + r.principalId + "'}";
+    os << "UserIdentity=" << r.ToJson();
     return os;
   }
 }

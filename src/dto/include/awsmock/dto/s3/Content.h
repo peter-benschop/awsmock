@@ -10,12 +10,11 @@
 #include <sstream>
 #include <vector>
 
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-
 // AwsMock includes
+#include <awsmock/core/JsonException.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/XmlUtils.h>
 #include <awsmock/dto/s3/Owner.h>
 
 namespace AwsMock::Dto::S3 {
@@ -58,11 +57,18 @@ namespace AwsMock::Dto::S3 {
     std::string lastModified;
 
     /**
+     * Convert to a JSON string
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const;
+
+    /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    std::string ToString() const;
+    [[nodiscard]] std::string ToString() const;
 
     /**
      * Stream provider.

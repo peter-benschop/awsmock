@@ -43,28 +43,28 @@ namespace AwsMock::Service {
       if (module.name == "database") {
         _moduleDatabase.StartDatabase();
       } else if (module.name == "s3") {
-        auto *s3server = (Service::S3Server *) _serverMap[module.name];
+        auto s3server = _serverMap[module.name];
         s3server->Start();
       } else if (module.name == "sqs") {
-        auto *sqsServer = (Service::SQSServer *) _serverMap[module.name];
+        auto sqsServer = _serverMap[module.name];
         sqsServer->Start();
       } else if (module.name == "sns") {
-        auto *snsServer = (Service::SNSServer *) _serverMap[module.name];
+        auto snsServer = _serverMap[module.name];
         snsServer->Start();
       } else if (module.name == "lambda") {
-        auto *lambdaServer = (Service::LambdaServer *) _serverMap[module.name];
+        auto lambdaServer = _serverMap[module.name];
         lambdaServer->Start();
       } else if (module.name == "transfer") {
-        auto *transferServer = (Service::TransferServer *) _serverMap[module.name];
+        auto transferServer = _serverMap[module.name];
         transferServer->Start();
       } else if (module.name == "cognito") {
-        auto *cognitoServer = (Service::CognitoServer *) _serverMap[module.name];
+        auto cognitoServer = _serverMap[module.name];
         cognitoServer->Start();
       } else if (module.name == "dynamodb") {
-        auto *dynamoDbServer = (Service::DynamoDbServer *) _serverMap[module.name];
+        auto dynamoDbServer = _serverMap[module.name];
         dynamoDbServer->Start();
       } else if (module.name == "gateway") {
-        auto *gatewayServer = (Service::GatewayServer *) _serverMap[module.name];
+        auto gatewayServer = _serverMap[module.name];
         gatewayServer->Start();
       }
       log_info << "Module " + name + " started";

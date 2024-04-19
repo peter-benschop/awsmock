@@ -12,6 +12,7 @@
 #include <filesystem>
 
 // Plog includes
+#define PLOG_OMIT_LOG_DEFINES
 #include <awsmock/core/logging/plog/Log.h>
 #include <awsmock/core/logging/plog/Init.h>
 #include <awsmock/core/logging/plog/Formatters/TxtFormatter.h>

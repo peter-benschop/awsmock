@@ -57,7 +57,6 @@ namespace AwsMock::Service {
      * Constructor
      *
      * @param configuration module configuration
-     * @param condition stop condition
      */
     explicit SecretsManagerService(Core::Configuration &configuration);
 

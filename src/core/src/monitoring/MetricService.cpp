@@ -11,7 +11,7 @@ namespace AwsMock::Core {
   MetricService::MetricService() : Core::Timer("MetricServer", 60) {
 
     Core::Configuration &configuration = Core::Configuration::instance();
-    _port = configuration.getInt("awsmock.monitoring.port", 8081);
+    _port = configuration.getInt("awsmock.monitoring.port", 9100);
     _timeout = configuration.getInt("awsmock.monitoring.timeout", 10);
   }
 

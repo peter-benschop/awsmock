@@ -189,9 +189,9 @@ namespace AwsMock::Service {
     /**
      * Returns a list object versions
      *
-     * @param request list object versions request
+     * @param s3Request list object versions request
      * @return ListObjectVersionsResponse
-     * @see @link ListObjectVersionsResponse()
+     * @see AwsMock::Dto::S3::ListObjectVersionsResponse()
      */
     Dto::S3::ListObjectVersionsResponse ListObjectVersions(const Dto::S3::ListObjectVersionsRequest s3Request);
 

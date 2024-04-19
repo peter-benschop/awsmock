@@ -6,6 +6,25 @@
 
 namespace AwsMock::Dto::S3 {
 
+  std::string Content::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("etag", etag);
+      rootJson.set("key", key);
+      rootJson.set("owner", owner);
+      rootJson.set("size", size);
+      rootJson.set("storageClass", storageClass);
+      rootJson.set("lastModified", lastModified);
+      rootJson.set("checksumAlgorithms", Core::JsonUtils::GetJsonStringArray(checksumAlgorithms));
+
+      return Core::JsonUtils::ToJsonString(rootJson);
+
+    } catch (Poco::Exception &exc) {
+      throw Core::JsonException(exc.message());
+    }
+  }
+
   std::string Content::ToString() const {
     std::stringstream ss;
     ss << (*this);
@@ -13,11 +32,7 @@ namespace AwsMock::Dto::S3 {
   }
 
   std::ostream &operator<<(std::ostream &os, const Content &c) {
-    os << "Content={etag='" << c.etag << "'. key='" << c.key << "', owner='" << c.owner << "', size='" << c.size << "', storageClass='" << c.storageClass << "', checksumAlgorithms=[";
-    for (const auto &algorithm : c.checksumAlgorithms) {
-      os << "'" << algorithm << ", ";
-    }
-    os << "], lastModified='" << c.lastModified << "'}";
+    os << "Content=" << c.ToJson();
     return os;
   }
 

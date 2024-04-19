@@ -2,24 +2,18 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_S3_USERIDENTITY_H
-#define AWSMOCK_DTO_S3_USERIDENTITY_H
+#ifndef AWSMOCK_DTO_S3_USER_IDENTITY_H
+#define AWSMOCK_DTO_S3_USER_IDENTITY_H
 
 // C++ standard includes
 #include <string>
 #include <vector>
 
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-
 // AwsMock includes
-#include <awsmock/core/DateTimeUtils.h>
+#include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/ServiceException.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/XmlUtils.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -29,6 +23,13 @@ namespace AwsMock::Dto::S3 {
      * AWS principal ID
      */
     std::string principalId;
+
+    /**
+     * Convert to a JSON string
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Converts the DTO to a JSON representation.
@@ -53,4 +54,4 @@ namespace AwsMock::Dto::S3 {
 
   };
 }
-#endif // AWSMOCK_DTO_S3_USERIDENTITY_H
+#endif // AWSMOCK_DTO_S3_USER_IDENTITY_H

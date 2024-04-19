@@ -30,14 +30,14 @@ namespace AwsMock::Core {
    * <ul>
    * <li>AWSMOCK_COM_BASENAME: the base name of the configuration file</li>
    * <li>AWSMOCK_COM_PROFILE: the profile of the configuration file</li>
-   * <li>AWSMOCK_COM_METRIC_PORT: the port for the prometheus manager (default: 8081)</li>
+   * <li>AWSMOCK_COM_METRIC_PORT: the port for the prometheus manager (default: 9100)</li>
    * <li>AWSMOCK_COM_METRIC_TIMEOUT: the timeout for the prometheus system monitoring (default: 60000)</li>
    * <li>AWSMOCK_COM_LOGLEVEL: the logging level (default: information, possible values: debug, information, warning, error, fatal)</li>
    * </ul>
    *
    * Properties in a configuration file are key-vale pairs. The following list shows all supported keys with their default values:
    * <pre>
-   * awsmock.monitoring.port=8081
+   * awsmock.monitoring.port=9100
    * awsmock.monitoring.timeout=60000
    * awsmock.logging.level=debug
    * </pre>

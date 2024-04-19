@@ -6,6 +6,22 @@
 
 namespace AwsMock::Dto::S3 {
 
+  std::string DeleteObjectRequest::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("region", region);
+      rootJson.set("bucket", bucket);
+      rootJson.set("user", user);
+
+      return Core::JsonUtils::ToJsonString(rootJson);
+
+    } catch (Poco::Exception &exc) {
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
+    }
+  }
+
   std::string DeleteObjectRequest::ToString() const {
     std::stringstream ss;
     ss << (*this);
@@ -13,7 +29,7 @@ namespace AwsMock::Dto::S3 {
   }
 
   std::ostream &operator<<(std::ostream &os, const DeleteObjectRequest &r) {
-    os << "DeleteObjectRequest={region='" + r.region + "' user='" + r.user + "' bucket='" + r.bucket + "' key='" + r.key + "'}";
+    os << "DeleteObjectRequest=" << r.ToJson();
     return os;
   }
 

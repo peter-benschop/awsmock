@@ -9,6 +9,12 @@
 #include <string>
 #include <sstream>
 
+// AwsMock includes
+#include <awsmock/core/JsonException.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/XmlUtils.h>
+
 namespace AwsMock::Dto::S3 {
 
   struct ListBucketRequest {
@@ -42,6 +48,13 @@ namespace AwsMock::Dto::S3 {
      * Encoding type
      */
     std::string encodingType;
+
+    /**
+     * Convert to a JSON string
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Converts the DTO to a string representation.

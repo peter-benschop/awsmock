@@ -71,8 +71,6 @@ namespace AwsMock::Service {
      *
      * @param configuration module configuration
      * @param metricService aws-mock monitoring module
-     * @param createQueue create notification queue
-     * @param invokeQueue invoke notification queue
      */
     explicit LambdaService(Core::Configuration &configuration, Core::MetricService &metricService);
 
@@ -154,14 +152,6 @@ namespace AwsMock::Service {
      * @return URI of the invocation request
      */
     static std::string GetRequestUrl(const std::string &hostName, int port);
-
-    /**
-     * Send the invocation request to the corresponding port
-     *
-     * @param url lambda URL
-     * @param body event payload
-     */
-    void SendInvocationRequest(const std::string &url, const std::string &body);
 
     /**
      * Data directory

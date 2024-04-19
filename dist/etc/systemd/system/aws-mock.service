@@ -7,7 +7,7 @@ StartLimitIntervalSec=0
 Type=simple
 Restart=always
 RestartSec=1
-User=awsmock
+User=root
 ExecStart=/usr/bin/awsmockmgr --loglevel information --config /etc/aws-mock.properties
 
 [Install]

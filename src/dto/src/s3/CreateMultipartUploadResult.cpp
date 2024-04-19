@@ -6,33 +6,34 @@
 
 namespace AwsMock::Dto::S3 {
 
+  std::string CreateMultipartUploadResult::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("region", region);
+      rootJson.set("bucket", bucket);
+      rootJson.set("key", key);
+      rootJson.set("uploadId", uploadId);
+
+      return Core::JsonUtils::ToJsonString(rootJson);
+
+    } catch (Poco::Exception &exc) {
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
+    }
+  }
+
+
   std::string CreateMultipartUploadResult::ToXml() const {
-    Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-    Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("InitiateMultipartUploadResult");
-    pDoc->appendChild(pRoot);
 
-    Poco::XML::AutoPtr<Poco::XML::Element> pBucket = pDoc->createElement("Bucket");
-    pRoot->appendChild(pBucket);
-    Poco::XML::AutoPtr<Poco::XML::Text> pBucketText = pDoc->createTextNode(bucket);
-    pBucket->appendChild(pBucketText);
+    Poco::XML::AutoPtr<Poco::XML::Document> pDoc = Core::XmlUtils::CreateDocument();
+    Poco::XML::AutoPtr<Poco::XML::Element> pRoot = Core::XmlUtils::CreateRootNode(pDoc, "InitiateMultipartUploadResult");
 
-    Poco::XML::AutoPtr<Poco::XML::Element> pKey = pDoc->createElement("Key");
-    pRoot->appendChild(pKey);
-    Poco::XML::AutoPtr<Poco::XML::Text> pKeyText = pDoc->createTextNode(key);
-    pKey->appendChild(pKeyText);
+    Core::XmlUtils::CreateTextNode(pDoc, pRoot, "Bucket", bucket);
+    Core::XmlUtils::CreateTextNode(pDoc, pRoot, "Key", key);
+    Core::XmlUtils::CreateTextNode(pDoc, pRoot, "UploadId", uploadId);
 
-    Poco::XML::AutoPtr<Poco::XML::Element> pUploadId = pDoc->createElement("UploadId");
-    pRoot->appendChild(pUploadId);
-    Poco::XML::AutoPtr<Poco::XML::Text> pUploadIdText = pDoc->createTextNode(uploadId);
-    pUploadId->appendChild(pUploadIdText);
-
-    std::stringstream output;
-    Poco::XML::DOMWriter writer;
-    writer.setNewLine("\n");
-    writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
-    writer.writeNode(output, pDoc);
-
-    return output.str();
+    return Core::XmlUtils::ToXmlString(pDoc);
   }
 
   void CreateMultipartUploadResult::FromJson(const std::string &jsonString) {
@@ -49,7 +50,8 @@ namespace AwsMock::Dto::S3 {
       Core::JsonUtils::GetJsonValueString("UploadId", rootObject, uploadId);
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
   }
 
@@ -70,7 +72,7 @@ namespace AwsMock::Dto::S3 {
    * @return output stream
    */
   std::ostream &operator<<(std::ostream &os, const CreateMultipartUploadResult &r) {
-    os << "CreateMultipartUploadResult={bucket='" + r.bucket + "', key='" + r.key + "', uploadId='" + r.uploadId + "'}";
+    os << "CreateMultipartUploadResult=" << r.ToJson();
     return os;
   }
 

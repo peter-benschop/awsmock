@@ -138,7 +138,7 @@ namespace AwsMock::Core {
     DefineIntProperty("awsmock.docker.container.port", "AWSMOCK_DOCKER_CONTAINER_PORT", 8080);
 
     // Monitoring
-    DefineIntProperty("awsmock.monitoring.port", "AWSMOCK_CORE_METRIC_PORT",  8081);
+    DefineIntProperty("awsmock.monitoring.port", "AWSMOCK_CORE_METRIC_PORT", 9100);
     DefineIntProperty("awsmock.monitoring.timeout", "AWSMOCK_CORE_METRIC_TIMEOUT", 60000);
 
     // Logging

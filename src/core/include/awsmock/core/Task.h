@@ -26,7 +26,7 @@ namespace AwsMock::Core {
     /**
      * Constructor
      *
-     * @param timeout
+     * @param _name task name
      */
     explicit Task(std::string  _name);
 

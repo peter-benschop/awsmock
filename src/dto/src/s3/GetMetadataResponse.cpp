@@ -6,6 +6,26 @@
 
 namespace AwsMock::Dto::S3 {
 
+  std::string GetMetadataResponse::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("region", region);
+      rootJson.set("bucket", bucket);
+      rootJson.set("key", key);
+      rootJson.set("md5sum", md5Sum);
+      rootJson.set("contentType", contentType);
+      rootJson.set("size", size);
+      rootJson.set("metadata", Core::JsonUtils::GetJsonObject(metadata));
+
+      return Core::JsonUtils::ToJsonString(rootJson);
+
+    } catch (Poco::Exception &exc) {
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
+    }
+  }
+
   std::string GetMetadataResponse::ToString() const {
     std::stringstream ss;
     ss << (*this);
@@ -13,11 +33,7 @@ namespace AwsMock::Dto::S3 {
   }
 
   std::ostream &operator<<(std::ostream &os, const GetMetadataResponse &r) {
-    os << "GetMetadataResponse={bucket='" << r.bucket << "', key='" << r.key << "', md5sum='" << r.md5Sum << "', contentType='" << r.contentType << "', size=" << r.size << ", metadata={";
-    for (const auto &m : r.metadata) {
-      os << m.first << "=" << m.second << ", ";
-    }
-    os << "\b\b" << "}, created='" << Poco::DateTimeFormatter().format(r.created, Poco::DateTimeFormat::HTTP_FORMAT) << "', modified='" << Poco::DateTimeFormatter().format(r.modified, Poco::DateTimeFormat::HTTP_FORMAT) << "'}";
+    os << "GetMetadataResponse="<<r.ToJson();
     return os;
   }
 

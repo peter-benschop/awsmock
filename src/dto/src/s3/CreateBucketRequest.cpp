@@ -6,6 +6,21 @@
 
 namespace AwsMock::Dto::S3 {
 
+  std::string CreateBucketRequest::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("region", region);
+      rootJson.set("name", name);
+      rootJson.set("owner", owner);
+
+      return Core::JsonUtils::ToJsonString(rootJson);
+
+    } catch (Poco::Exception &exc) {
+      throw Core::JsonException(exc.message());
+    }
+  }
+
   void CreateBucketRequest::FromXml(const std::string &xmlString) {
 
     Poco::XML::DOMParser parser;
@@ -22,7 +37,7 @@ namespace AwsMock::Dto::S3 {
   }
 
   std::ostream &operator<<(std::ostream &os, const CreateBucketRequest &r) {
-    os << "CreateBucketRequest={region='" << r.region << "', name='" << r.bucketName << "', owner='" << r.bucketOwner << "'}";
+    os << "CreateBucketRequest=" << r.ToJson();
     return os;
   }
 

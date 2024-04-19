@@ -6,6 +6,25 @@
 
 namespace AwsMock::Dto::S3 {
 
+  std::string GetObjectRequest::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("region", region);
+      rootJson.set("bucket", bucket);
+      rootJson.set("key", key);
+      rootJson.set("versionId", versionId);
+      rootJson.set("min", min);
+      rootJson.set("max", max);
+
+      return Core::JsonUtils::ToJsonString(rootJson);
+
+    } catch (Poco::Exception &exc) {
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
+    }
+  }
+
   std::string GetObjectRequest::ToString() const {
     std::stringstream ss;
     ss << (*this);
@@ -13,7 +32,7 @@ namespace AwsMock::Dto::S3 {
   }
 
   std::ostream &operator<<(std::ostream &os, const GetObjectRequest &r) {
-    os << "GetObjectRequest={region='" << r.region << ", bucket='" << r.bucket << "' key='" << r.key << "', versionId='" << r.versionId << ", min=" << r.min << ", max=" << r.max << "}";
+    os << "GetObjectRequest=" << r.ToJson();
     return os;
   }
 

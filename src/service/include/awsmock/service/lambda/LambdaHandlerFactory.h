@@ -31,8 +31,6 @@ namespace AwsMock::Service {
      *
      * @param configuration application configuration
      * @param metricService  monitoring
-     * @param createQueue create notification queue
-     * @param invokeQueue invoke notification queue
      */
     LambdaRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService) {}
 

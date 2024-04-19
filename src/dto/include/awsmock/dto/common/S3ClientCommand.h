@@ -19,6 +19,8 @@
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/JsonException.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/dto/common/HttpMethod.h>
