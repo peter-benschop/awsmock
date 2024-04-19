@@ -34,12 +34,12 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/config/Configuration.h>
+#include <awsmock/core/Configuration.h>
 #include <awsmock/controller/Router.h>
 #include <awsmock/controller/RestService.h>
-#include "awsmock/service/cognito/CognitoServer.h"
-#include "awsmock/service/dynamodb/DynamoDbServer.h"
-#include <awsmock/service/secretsmanager/SecretsManagerServer.h>
+
+#define DEFAULT_CONFIG_FILE "/etc/aws-mock.properties"
+#define DEFAULT_LOG_LEVEL  "debug"
 
 namespace AwsMock {
 
@@ -60,10 +60,12 @@ namespace AwsMock {
      */
     [[maybe_unused]] void initialize(Application &self) override {
 
+      IntializeConfig();
+      IntializeLogging();
       InitializeMonitoring();
       InitializeIndexes();
       InitializeCurl();
-      log_info << "Starting " << Configuration::GetAppName() << " " << Configuration::GetVersion() << " pid: " << getpid() << " loglevel: " << _configuration.getString("awsmock.log.level");
+      log_info << "Starting " << Core::Configuration::GetAppName() << " " << Core::Configuration::GetVersion() << " pid: " << getpid() << " loglevel: " << _configuration.getString("awsmock.log.level");
       log_info << "Configuration file: " << _configuration.GetFilename();
       Poco::Util::ServerApplication::initialize(self);
     }
@@ -121,7 +123,7 @@ namespace AwsMock {
         Poco::Util::HelpFormatter helpFormatter(options());
         helpFormatter.setCommand(commandName());
         helpFormatter.setUsage("OPTIONS");
-        helpFormatter.setHeader("AwsMock - AWS simulation written in C++ v" + Configuration::GetVersion());
+        helpFormatter.setHeader("AwsMock - AWS simulation written in C++ v" + Core::Configuration::GetVersion());
         helpFormatter.format(std::cout);
         stopOptionsProcessing();
         exit(0);
@@ -132,7 +134,7 @@ namespace AwsMock {
 
       } else if (name == "version") {
 
-        std::cout << Configuration::GetAppName() << " v" << Configuration::GetVersion() << std::endl;
+        std::cout << Core::Configuration::GetAppName() << " v" << Core::Configuration::GetVersion() << std::endl;
         exit(0);
 
       } else if (name == "loglevel") {
@@ -144,6 +146,21 @@ namespace AwsMock {
 
         //_logger.setFileChannel(value);
       }
+    }
+
+    /**
+     * Initialize the configuration
+     */
+    void IntializeConfig() {
+      _configuration.SetFilename(DEFAULT_CONFIG_FILE);
+    }
+
+    /**
+     * Initialize the logging
+     */
+    void IntializeLogging() {
+      std::string logLevel = _configuration.getString("awsmock.log.level", DEFAULT_LOG_LEVEL);
+      plog::get()->setMaxSeverity(plog::severityFromString(logLevel.c_str()));
     }
 
     /**
@@ -328,7 +345,7 @@ namespace AwsMock {
     /**
      * Application configuration
      */
-    Configuration _configuration = Configuration(CONFIGURATION_BASE_PATH);
+    Core::Configuration& _configuration = Core::Configuration::instance();
 
     /**
      * Monitoring module

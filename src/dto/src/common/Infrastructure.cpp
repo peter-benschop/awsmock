@@ -133,16 +133,11 @@ namespace AwsMock::Dto::Common {
       // Add infrastructure JSON to root JSON
       rootJson.set("infrastructure", infrastructureJson);
 
-      int indent = 0;
-      std::ostringstream os;
-      if (prettyPrint) {
-        indent = JSON_DEFAULT_INDENT;
-      }
-      rootJson.stringify(os, indent);
-      return os.str();
+      return Core::JsonUtils::ToJsonString(rootJson, prettyPrint);
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
   }
 
@@ -228,8 +223,8 @@ namespace AwsMock::Dto::Common {
       }
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message());
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
-
   }
 }

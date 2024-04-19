@@ -29,10 +29,11 @@
 namespace AwsMock::Service {
 
   /**
-   * S3 server
+   * S3 HTTP server
    *
    * <p>
-   * Default port is 9500.
+   * The S3 HTTP server gates the requests from the gateway, which acts like a API gateway. The S3 default port is 9500 and can set in the AwsMOck configuration file
+   * <i>/etc/aws-mock.properties</i>
    * </p>
    *
    * @author jens.vogt@opitz-consulting.com

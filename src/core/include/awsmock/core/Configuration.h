@@ -2,8 +2,8 @@
 // Created by vogje01 on 22/08/2022.
 //
 
-#ifndef AWS_MOCK_CORE_CONFIGURATION_H
-#define AWS_MOCK_CORE_CONFIGURATION_H
+#ifndef AWSMOCK_CORE_CONFIGURATION_H
+#define AWSMOCK_CORE_CONFIGURATION_H
 
 // Standard C++ includes
 #include <string>
@@ -194,4 +194,4 @@ namespace AwsMock::Core {
 
 } // namespace AwsMock::Core
 
-#endif //AWS_MOCK_CORE_CONFIGURATION_H
+#endif //A WSMOCK_CORE_CONFIGURATION_H

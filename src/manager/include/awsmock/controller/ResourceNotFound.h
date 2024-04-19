@@ -2,8 +2,8 @@
 // Created by vogje01 on 02/09/2022.
 //
 
-#ifndef AWSMOCK_CONTROLLER_RESOURCENOTFOUND_H
-#define AWSMOCK_CONTROLLER_RESOURCENOTFOUND_H
+#ifndef AWSMOCK_CONTROLLER_RESOURCE_NOT_FOUND_H
+#define AWSMOCK_CONTROLLER_RESOURCE_NOT_FOUND_H
 
 // Poco includes
 #include "Poco/Net/HTTPServerRequest.h"
@@ -13,7 +13,7 @@
 // AwsMock includes
 #include "awsmock/dto/common/ResourceNotFoundResponse.h"
 
-namespace AwsMock {
+namespace AwsMock::Core {
 
   /**
    * AwsMock resource not found response.
@@ -32,4 +32,4 @@ namespace AwsMock {
   };
 } // namespace AwsMock
 
-#endif // AWSMOCK_CONTROLLER_RESOURCENOTFOUND_H
+#endif // AWSMOCK_CONTROLLER_RESOURCE_NOT_FOUND_H

@@ -14,8 +14,12 @@
 #include <Poco/Net/HTTPServerRequest.h>
 
 // AwsMock includes
+#include <awsmock/core/JsonException.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/core/StringUtils.h>
+#include <awsmock/core/XmlUtils.h>
 
 namespace AwsMock::Dto::Common {
 
@@ -94,6 +98,13 @@ namespace AwsMock::Dto::Common {
      * User agent type
      */
     UserAgentType type;
+
+    /**
+     * Convert to a JSON string
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Getś the value from the user-agent string

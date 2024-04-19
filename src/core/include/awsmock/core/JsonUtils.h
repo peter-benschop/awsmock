@@ -119,9 +119,11 @@ namespace AwsMock::Core {
      * Returns the JSON string for the document.
      *
      * @param jsonObject JSON object
+     * @param prettyPrint use indentation
+     * @param indent indentation size
      * @return JSON string
      */
-    static std::string ToJsonString(const Poco::JSON::Object &jsonObject);
+    static std::string ToJsonString(const Poco::JSON::Object &jsonObject, bool prettyPrint = false, int indent = JSON_DEFAULT_INDENT);
 
   };
 
