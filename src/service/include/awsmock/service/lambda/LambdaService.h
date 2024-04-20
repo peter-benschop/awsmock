@@ -31,10 +31,12 @@
 #include <awsmock/dto/lambda/CreateFunctionRequest.h>
 #include <awsmock/dto/lambda/CreateFunctionResponse.h>
 #include <awsmock/dto/lambda/CreateTagRequest.h>
-#include <awsmock/dto/lambda/ListFunctionResponse.h>
-#include <awsmock/dto/lambda/ListTagsResponse.h>
 #include <awsmock/dto/lambda/DeleteFunctionRequest.h>
 #include <awsmock/dto/lambda/DeleteTagsRequest.h>
+#include <awsmock/dto/lambda/Function.h>
+#include <awsmock/dto/lambda/GetFunctionResponse.h>
+#include <awsmock/dto/lambda/ListFunctionResponse.h>
+#include <awsmock/dto/lambda/ListTagsResponse.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/common/DockerService.h>
@@ -127,8 +129,20 @@ namespace AwsMock::Service {
      *
      * @param arn lambda function ARN
      * @return ListTagsResponse
+     * @see AwsMock::Dto::Lambda::ListTagsResponse
      */
     Dto::Lambda::ListTagsResponse ListTags(const std::string &arn);
+
+    /**
+     * Gets a single lambda function
+     *
+     * @param region AWS region
+     * @param name function name
+     * @return GetFunctionResponse
+     * @throws ServiceException
+     * @see AwsMock::Dto::Lambda::GetFunctionResponse
+     */
+    Dto::Lambda::GetFunctionResponse GetFunction(const std::string &region, const std::string &name);
 
     /**
      * Delete lambda function

@@ -10,12 +10,20 @@
 #include <vector>
 
 // AwsMock includes
+#include <awsmock/core/JsonException.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/dto/lambda/DeadLetterConfig.h>
 #include <awsmock/dto/lambda/Environment.h>
 
 namespace AwsMock::Dto::Lambda {
 
   struct Function {
+
+    /**
+     * AWS region
+     */
+    std::string region = {};
 
     /**
      * Architectures
@@ -118,6 +126,13 @@ namespace AwsMock::Dto::Lambda {
      * @return DTO as string for logging.
      */
     [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+
+    /**
+     * Converts the DTO to a JSON string.
+     *
+     * @return DTO as JSON string
+     */
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Converts the DTO to a string representation.

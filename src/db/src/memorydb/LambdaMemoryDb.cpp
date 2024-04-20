@@ -108,6 +108,22 @@ namespace AwsMock::Database {
     return it->second;
   }
 
+  Entity::Lambda::Lambda LambdaMemoryDb::GetLambdaByName(const std::string &region, const std::string& name) {
+
+    auto it =
+      find_if(_lambdas.begin(), _lambdas.end(), [region, name](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
+        return lambda.second.region == region && lambda.second.function == name;
+      });
+
+    if (it == _lambdas.end()) {
+      log_error << "Get lambda by name failed, name: " << name;
+      throw Core::DatabaseException("Get lambda by name failed, name: " + name);
+    }
+
+    it->second.oid = it->first;
+    return it->second;
+  }
+
   long LambdaMemoryDb::LambdaCount(const std::string &region) {
 
     long count = 0;

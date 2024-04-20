@@ -112,6 +112,22 @@ namespace AwsMock::Service {
     }
   }
 
+  Dto::Lambda::GetFunctionResponse LambdaService::GetFunction(const std::string &region,const std::string&name) {
+
+    try {
+
+      Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByName(region, name);
+
+      Dto::Lambda::GetFunctionResponse response = {.region=lambda.region, .functionName=lambda.function};
+      log_trace << "Lambda function: " + response.ToJson();
+      return response;
+
+    } catch (Poco::Exception &ex) {
+      log_error << "Lambda list request failed, message: " << ex.message();
+      throw Core::ServiceException(ex.message());
+    }
+  }
+
   void LambdaService::InvokeEventFunction(const Dto::S3::EventNotification &eventNotification, const std::string &region, const std::string &user) {
     log_debug << "Invocation event function eventNotification: " + eventNotification.ToString();
 

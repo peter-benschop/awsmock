@@ -207,6 +207,35 @@ namespace AwsMock::Database {
     return {};
   }
 
+  Entity::Lambda::Lambda LambdaDatabase::GetLambdaByName(const std::string &region, const std::string& name) {
+
+    if (_useDatabase) {
+
+      try {
+
+        auto client = GetClient();
+        mongocxx::collection _lambdaCollection = (*client)[_databaseName]["lambda"];
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _lambdaCollection.find_one(make_document(kvp("region", region),kvp("function", name)));
+        if (!mResult.has_value()) {
+          log_error << "Database exception: Lambda not found ";
+          throw Core::DatabaseException("Database exception, Lambda not found ", 500);
+        }
+
+        Entity::Lambda::Lambda result;
+        result.FromDocument(mResult);
+        return result;
+
+      } catch (mongocxx::exception::system_error &e) {
+        log_error << "Get lambda by ARN failed, error: " << e.what();
+      }
+
+    } else {
+
+      return _memoryDb.GetLambdaByName(region, name);
+    }
+    return {};
+  }
+
   Entity::Lambda::Lambda LambdaDatabase::CreateOrUpdateLambda(const Entity::Lambda::Lambda &lambda) {
 
     if (LambdaExists(lambda)) {
