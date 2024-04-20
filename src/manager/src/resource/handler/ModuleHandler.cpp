@@ -153,6 +153,8 @@ namespace AwsMock {
 
         std::string level = Core::HttpUtils::GetPathParameter(request.getURI(), 2);
         plog::get()->setMaxSeverity(plog::severityFromString(level.c_str()));
+        log_info << "Logevel set to '" << level << "'";
+
         // Send response
         SendOkResponse(response, {});
       }

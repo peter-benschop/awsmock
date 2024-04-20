@@ -12,24 +12,15 @@ namespace AwsMock::Database {
 
   std::map<std::string, Entity::Module::Module> ModuleDatabase::_existingModules = {
       {"s3", {.name="s3", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-      {"sqs",
-       {.name="sqs", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-      {"sns",
-       {.name="sns", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-      {"lambda",
-       {.name="lambda", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-      {"transfer",
-       {.name="transfer", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-      {"cognito",
-       {.name="cognito", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-      {"dynamodb",
-       {.name="dynamodb", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-      {"secretsmanager",
-       {.name="secretsmanager", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-      {"gateway",
-       {.name="gateway", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-      {"database",
-       {.name="database", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}}
+      {"sqs", {.name="sqs", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+      {"sns", {.name="sns", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+      {"lambda", {.name="lambda", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+      {"transfer", {.name="transfer", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+      {"cognito", {.name="cognito", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+      {"dynamodb", {.name="dynamodb", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+      {"secretsmanager", {.name="secretsmanager", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+      {"gateway", {.name="gateway", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
+      {"database", {.name="database", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}}
   };
 
   ModuleDatabase::ModuleDatabase() : _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()) {

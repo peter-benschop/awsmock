@@ -108,6 +108,16 @@ namespace AwsMock::Database {
     Entity::SNS::Topic GetTopicByArn(const std::string &topicArn);
 
     /**
+     * Returns a topic by its region and name
+     *
+     * @param region AWS region
+     * @param topicName topic name
+     * @return topic entity
+     * @throws DatabaseException
+     */
+    Entity::SNS::Topic GetTopicByName(const std::string &region, const std::string &topicName);
+
+    /**
      * Return a list of topics with the given subscription ARN
      *
      * @param subscriptionArn subscription ARN

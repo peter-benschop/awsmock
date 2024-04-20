@@ -289,7 +289,7 @@ namespace AwsMock::Service {
 
       _sqsService.SetVisibilityTimeout(sqsRequest);
       SendOkResponse(response);
-      log_info << "Change visibility, queueUrl: " << sqsRequest.queueUrl;
+      log_info << "Change visibility, queueUrl: " << sqsRequest.queueUrl << " timeout: " << sqsRequest.visibilityTimeout;
 
       break;
     }

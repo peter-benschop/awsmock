@@ -10,8 +10,8 @@ namespace AwsMock::Service {
   void AbstractHandler::handleHttpHeaders(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
 
     if (request.getMethod() != Poco::Net::HTTPRequest::HTTP_GET && request.getMethod() != Poco::Net::HTTPRequest::HTTP_PUT
-        && request.getMethod() != Poco::Net::HTTPRequest::HTTP_POST && request.getMethod() != Poco::Net::HTTPRequest::HTTP_DELETE
-        && request.getMethod() != Poco::Net::HTTPRequest::HTTP_OPTIONS && request.getMethod() != Poco::Net::HTTPRequest::HTTP_HEAD) {
+      && request.getMethod() != Poco::Net::HTTPRequest::HTTP_POST && request.getMethod() != Poco::Net::HTTPRequest::HTTP_DELETE
+      && request.getMethod() != Poco::Net::HTTPRequest::HTTP_OPTIONS && request.getMethod() != Poco::Net::HTTPRequest::HTTP_HEAD) {
       log_error << "Invalid request method, method: " << request.getMethod();
       throw Core::ServiceException("The request method is not supported by the manager and cannot be handled.", Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
     }
@@ -147,8 +147,8 @@ namespace AwsMock::Service {
   void AbstractHandler::handleHead([[maybe_unused]]Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
     log_trace << "Request, method: " << request.getMethod();
     response.setStatusAndReason(
-        Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED,
-        Poco::Net::HTTPResponse::HTTP_REASON_NOT_IMPLEMENTED
+      Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED,
+      Poco::Net::HTTPResponse::HTTP_REASON_NOT_IMPLEMENTED
     );
 
     std::ostream &errorStream = response.send();
@@ -310,7 +310,7 @@ namespace AwsMock::Service {
     log_trace << "Sending OK response, state: 200, filename: " << fileName << " min: " << min << " max: " << max;
 
     if (!_memoryMappedFile.IsMapped()) {
-      if(!_memoryMappedFile.OpenFile(fileName)) {
+      if (!_memoryMappedFile.OpenFile(fileName)) {
         throw Core::ServiceException("Could not open memory mapped file");
       }
     }
@@ -318,26 +318,28 @@ namespace AwsMock::Service {
     try {
 
       // Set headers
-      long range = max - min + 1;
-      SetHeaders(response, range, extraHeader);
+      long length = max - min;
+      SetHeaders(response, length, extraHeader);
 
       // Set state
-      handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_PARTIAL_CONTENT);
+      if (min + length >= size) {
+        handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_OK);
+      } else {
+        handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_PARTIAL_CONTENT);
+      }
 
       // Send response
       std::ostream &os = response.send();
 
       // Send body
-      if (range > 0) {
-        char *buffer = new char[range + 1];
-        _memoryMappedFile.ReadChunk(min, range, (char *) buffer);
-        os.write(buffer, range);
-        os.flush();
-        delete[] buffer;
-      }
+      char *buffer = new char[length];
+      _memoryMappedFile.ReadChunk(min, length, (char *) buffer);
+      os.write(buffer, length);
+      os.flush();
+      delete[] buffer;
 
       // Close file
-      if (min + range >= size) {
+      if (min + length >= size) {
         _memoryMappedFile.CloseFile();
       }
 
@@ -400,7 +402,7 @@ namespace AwsMock::Service {
     outputStream.flush();
   }
 
-  void AbstractHandler::SendErrorResponse(Poco::Net::HTTPServerResponse &response, const std::string& body, std::map<std::string, std::string> headers, const Poco::Net::HTTPResponse::HTTPStatus& status) {
+  void AbstractHandler::SendErrorResponse(Poco::Net::HTTPServerResponse &response, const std::string &body, std::map<std::string, std::string> headers, const Poco::Net::HTTPResponse::HTTPStatus &status) {
 
     SetHeaders(response, body.length(), headers);
 

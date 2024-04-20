@@ -7,47 +7,44 @@
 namespace AwsMock::Core {
 
   bool MemoryMappedFile::OpenFile(const std::string &filename) {
-    Poco::Mutex::ScopedLock lock(_mutex);
 
-    _mapped = false;
-    _filename=filename;
+    int fd = open(filename.c_str(), O_RDONLY);
 
-    _fd = open(filename.c_str(), O_RDWR | O_CREAT, 0644);
-    if (_fd < 0) {
-      log_error << "Could not open file for memory mapping, filename: " << filename << " errno: " << errno;
+    if (fd < 0) {
+      log_error << "Could not open file for memory mapping";
       return false;
     }
 
-    long fileSize = FileUtils::FileSize(filename);
+    _fileSize = FileUtils::FileSize(filename);
 
-    _start = mmap(nullptr, fileSize, PROT_READ, MAP_PRIVATE, _fd, 0);
+    _start = mmap(nullptr, _fileSize, PROT_READ, MAP_SHARED, fd, 0);
     _membuffer = (char *) _start;
 
     if (_membuffer == MAP_FAILED) {
-      log_error << "Memory map file failed, filename: " << filename << " errno: " << errno;
+      close(fd);
+      log_error << "Could not memory map file: " << filename;
       return false;
     }
+    close(fd);
 
     _mapped = true;
-    log_info << "Memory map file opened, filename: " << filename;
-
     return _mapped;
   }
 
   void MemoryMappedFile::CloseFile() {
-    Poco::Mutex::ScopedLock lock(_mutex);
-    /*if (munmap(_start, MEMORY_SIZE) < 0) {
-      log_error << "Could not unmap file, filename: " << _filename;
-    }*/
-    close(_fd);
-    log_debug << "Memory mapped file closed, filename: " << _filename;
+    if (munmap(_start, _fileSize) < 0) {
+      log_error << "Could not unmap file";
+    }
     _mapped = false;
   }
 
-  void MemoryMappedFile::ReadChunk(long start, long length, char *buffer) {
+  long MemoryMappedFile::ReadChunk(long start, long length, char *buffer) {
     Poco::ScopedLock Lock(_mutex);
-    read(_fd, buffer, length);
-    //memcpy(buffer, _membuffer + start, length);
+    if(length > _fileSize) {
+      length = _fileSize;
+    }
+    memcpy(buffer, _membuffer + start, length);
+    return length;
   }
 
 } // namespace AwsMock::Core

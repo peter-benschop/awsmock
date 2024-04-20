@@ -10,8 +10,7 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_array;
   using bsoncxx::builder::basic::make_document;
 
-  Database::Database()
-      : _configuration(Core::Configuration::instance()), _useDatabase(false), _initialized(false) {
+  Database::Database() : _configuration(Core::Configuration::instance()), _useDatabase(false) {
 
     _useDatabase = _configuration.getBool("awsmock.mongodb.active", false);
     _name = _configuration.getString("awsmock.mongodb.name", "awsmock");
@@ -22,10 +21,8 @@ namespace AwsMock::Database {
     _poolSize = _configuration.getInt("awsmock.mongodb.pool.size", 256);
 
     // MongoDB URI
-    _uri = mongocxx::uri(
-        "mongodb://" + _user + ":" + _password + "@" + _host + ":" + std::to_string(_port) + "/?maxPoolSize="
-            + std::to_string(_poolSize));
-    _pool = std::make_shared<mongocxx::pool>(_uri);
+    _uri = mongocxx::uri("mongodb://" + _user + ":" + _password + "@" + _host + ":" + std::to_string(_port) + "/?maxPoolSize=" + std::to_string(_poolSize));
+    _pool = std::make_unique<mongocxx::pool>(_uri);
   }
 
   mongocxx::database Database::GetConnection() {
@@ -52,8 +49,7 @@ namespace AwsMock::Database {
 
     // Update module database
     mongocxx::pool::entry _client = _pool->acquire();
-    (*_client)[_name]["module"].update_one(make_document(kvp("name", "database")),
-                                           make_document(kvp("$set", make_document(kvp("state", "RUNNING")))));
+    (*_client)[_name]["module"].update_one(make_document(kvp("name", "database")), make_document(kvp("$set", make_document(kvp("state", "RUNNING")))));
     log_info << "Database module started, poolSize: " << _poolSize;
   }
 

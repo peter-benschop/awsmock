@@ -27,7 +27,7 @@ namespace AwsMock::Database {
 
       } catch (const mongocxx::exception &exc) {
         log_error << "SNS Database exception " << exc.what();
-        throw Core::DatabaseException(exc.what(), 500);
+        throw Core::DatabaseException(exc.what());
       }
 
     } else {
@@ -52,7 +52,7 @@ namespace AwsMock::Database {
 
       } catch (const mongocxx::exception &exc) {
         log_error << "SNS Database exception " << exc.what();
-        throw Core::DatabaseException(exc.what(), 500);
+        throw Core::DatabaseException(exc.what());
       }
 
     } else {
@@ -83,7 +83,7 @@ namespace AwsMock::Database {
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
         log_error << "SNS Database exception " << exc.what();
-        throw Core::DatabaseException(exc.what(), 500);
+        throw Core::DatabaseException(exc.what());
       }
 
     } else {
@@ -110,7 +110,7 @@ namespace AwsMock::Database {
 
     } catch (const mongocxx::exception &exc) {
       log_error << "SNS Database exception " << exc.what();
-      throw Core::DatabaseException(exc.what(), 500);
+      throw Core::DatabaseException(exc.what());
     }
     return {};
   }
@@ -136,20 +136,51 @@ namespace AwsMock::Database {
 
         auto client = GetClient();
         mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
-        mongocxx::stdx::optional<bsoncxx::document::value>
-          mResult = _topicCollection.find_one(make_document(kvp("topicArn", topicArn)));
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("topicArn", topicArn)));
+
         Entity::SNS::Topic result;
         result.FromDocument(mResult);
         return result;
 
       } catch (const mongocxx::exception &exc) {
         log_error << "SNS Database exception " << exc.what();
-        throw Core::DatabaseException(exc.what(), 500);
+        throw Core::DatabaseException(exc.what());
       }
 
     } else {
 
       return _memoryDb.GetTopicByArn(topicArn);
+
+    }
+  }
+
+  Entity::SNS::Topic SNSDatabase::GetTopicByName(const std::string &region, const std::string &topicName) {
+
+    if (_useDatabase) {
+
+      try {
+
+        auto client = GetClient();
+        mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("region", region), kvp("topicName", topicName)));
+
+        if (mResult.has_value()) {
+          Entity::SNS::Topic result;
+          result.FromDocument(mResult);
+          return result;
+        } else {
+          log_warning << "Topic not found, region: " << region << " name: " << topicName;
+          return {};
+        }
+
+      } catch (const mongocxx::exception &exc) {
+        log_error << "SNS Database exception " << exc.what();
+        throw Core::DatabaseException(exc.what());
+      }
+
+    } else {
+
+      return _memoryDb.GetTopicByName(region, topicName);
 
     }
   }
@@ -172,7 +203,7 @@ namespace AwsMock::Database {
 
       } catch (const mongocxx::exception &exc) {
         log_error << "SNS Database exception " << exc.what();
-        throw Core::DatabaseException(exc.what(), 500);
+        throw Core::DatabaseException(exc.what());
       }
 
     } else {
@@ -214,7 +245,7 @@ namespace AwsMock::Database {
 
       } catch (const mongocxx::exception &exc) {
         log_error << "SNS Database exception " << exc.what();
-        throw Core::DatabaseException(exc.what(), 500);
+        throw Core::DatabaseException(exc.what());
       }
 
     } else {
@@ -248,7 +279,7 @@ namespace AwsMock::Database {
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
         log_error << "SNS Database exception " << exc.what();
-        throw Core::DatabaseException(exc.what(), 500);
+        throw Core::DatabaseException(exc.what());
       }
 
     } else {
@@ -285,7 +316,7 @@ namespace AwsMock::Database {
 
       } catch (const mongocxx::exception &exc) {
         log_error << "SNS Database exception " << exc.what();
-        throw Core::DatabaseException(exc.what(), 500);
+        throw Core::DatabaseException(exc.what());
       }
 
     } else {
@@ -313,7 +344,7 @@ namespace AwsMock::Database {
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
         log_error << "SNS Database exception " << exc.what();
-        throw Core::DatabaseException(exc.what(), 500);
+        throw Core::DatabaseException(exc.what());
       }
 
     } else {
@@ -341,7 +372,7 @@ namespace AwsMock::Database {
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
         log_error << "SNS Database exception " << exc.what();
-        throw Core::DatabaseException(exc.what(), 500);
+        throw Core::DatabaseException(exc.what());
       }
 
     } else {
@@ -365,7 +396,7 @@ namespace AwsMock::Database {
 
       } catch (const mongocxx::exception &exc) {
         log_error << "SNS Database exception " << exc.what();
-        throw Core::DatabaseException(exc.what(), 500);
+        throw Core::DatabaseException(exc.what());
       }
 
     } else {
@@ -395,7 +426,7 @@ namespace AwsMock::Database {
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
         log_error << "SNS Database exception " << exc.what();
-        throw Core::DatabaseException(exc.what(), 500);
+        throw Core::DatabaseException(exc.what());
       }
 
     } else {
@@ -418,7 +449,7 @@ namespace AwsMock::Database {
       return result;
     } catch (const mongocxx::exception &exc) {
       log_error << "SNS Database exception " << exc.what();
-      throw Core::DatabaseException(exc.what(), 500);
+      throw Core::DatabaseException(exc.what());
     }
   }
 
@@ -448,7 +479,7 @@ namespace AwsMock::Database {
 
       } catch (const mongocxx::exception &exc) {
         log_error << "SNS Database exception " << exc.what();
-        throw Core::DatabaseException(exc.what(), 500);
+        throw Core::DatabaseException(exc.what());
       }
 
     } else {
@@ -478,7 +509,7 @@ namespace AwsMock::Database {
 
       } catch (const mongocxx::exception &exc) {
         log_error << "SNS Database exception " << exc.what();
-        throw Core::DatabaseException(exc.what(), 500);
+        throw Core::DatabaseException(exc.what());
       }
 
     } else {
@@ -584,7 +615,7 @@ namespace AwsMock::Database {
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
         log_error << "SNS Database exception " << exc.what();
-        throw Core::DatabaseException(exc.what(), 500);
+        throw Core::DatabaseException(exc.what());
       }
 
     } else {
@@ -621,7 +652,7 @@ namespace AwsMock::Database {
       } catch (const mongocxx::exception &exc) {
         session.abort_transaction();
         log_error << "SNS Database exception " << exc.what();
-        throw Core::DatabaseException(exc.what(), 500);
+        throw Core::DatabaseException(exc.what());
       }
 
     } else {
@@ -644,7 +675,7 @@ namespace AwsMock::Database {
 
       } catch (const mongocxx::exception &exc) {
         log_error << "SNS Database exception " << exc.what();
-        throw Core::DatabaseException(exc.what(), 500);
+        throw Core::DatabaseException(exc.what());
       }
 
     } else {

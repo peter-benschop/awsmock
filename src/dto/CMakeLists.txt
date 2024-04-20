@@ -39,7 +39,8 @@ set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPool
         src/cognito/CreateUserPoolRequest.cpp src/cognito/CreateUserPoolResponse.cpp src/cognito/UserAttribute.cpp
         src/cognito/DeleteUserPoolRequest.cpp src/cognito/AdminCreateUserRequest.cpp
         src/cognito/AdminCreateUserResponse.cpp src/cognito/AdminDeleteUserRequest.cpp src/cognito/ListUsersRequest.cpp
-        src/cognito/ListUsersResponse.cpp)
+        src/cognito/ListUsersResponse.cpp src/cognito/LambdaConfig.cpp src/cognito/CustomEmailSender.cpp
+        src/cognito/CustomSmsSender.cpp src/cognito/PreTokenGenerationConfig.cpp)
 set(TRANSFER_SOURCES src/transfer/Tag.cpp src/transfer/CreateServerRequest.cpp src/transfer/CreateServerResponse.cpp
         src/transfer/CreateUserRequest.cpp src/transfer/CreateUserResponse.cpp src/transfer/DeleteServerRequest.cpp
         src/transfer/IdentityProviderDetails.cpp src/transfer/ListServerRequest.cpp src/transfer/ListServerResponse.cpp
@@ -74,7 +75,8 @@ include_directories(include ../core/include ../db/include /usr/include/mongo /us
         /usr/include/mongocxx/v_noabi)
 
 add_library(${LIBRARY} SHARED ${SOURCES}
-        include/awsmock/dto/secretsmanager/Filter.h)
+        include/awsmock/dto/secretsmanager/Filter.h
+        include/awsmock/dto/cognito/LambdaConfig.h)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 

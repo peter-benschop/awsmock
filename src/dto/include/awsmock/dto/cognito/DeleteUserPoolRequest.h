@@ -2,21 +2,17 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_COGNITO_DELETEUSERPOOLREQUEST_H
-#define AWSMOCK_DTO_COGNITO_DELETEUSERPOOLREQUEST_H
+#ifndef AWSMOCK_DTO_COGNITO_DELETE_USERPOOL_REQUEST_H
+#define AWSMOCK_DTO_COGNITO_DELETE_USERPOOL_REQUEST_H
 
 // C++ standard includes
 #include <string>
 #include <sstream>
 
-// Poco includes
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/Dynamic/Var.h>
-
-// AwsMOck includes
+// AwsMock includes
+#include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/ServiceException.h>
+#include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -64,4 +60,4 @@ namespace AwsMock::Dto::Cognito {
 
 } // namespace AwsMock::Dto::Cognito
 
-#endif // AWSMOCK_DTO_COGNITO_DELETEUSERPOOLREQUEST_H
+#endif // AWSMOCK_DTO_COGNITO_DELETE_USERPOOL_REQUEST_H

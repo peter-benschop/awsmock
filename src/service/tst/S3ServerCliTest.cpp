@@ -41,20 +41,19 @@ namespace AwsMock::Service {
       _output = "json";
 
       // Start HTTP manager
-      _s3Server.Start();
+      _s3Server->Start();
     }
 
     void TearDown() override {
       _database.DeleteAllObjects();
       _database.DeleteAllBuckets();
-      _s3Server.StopServer();
     }
 
     std::string _endpoint, _accountId, _output;
     Core::Configuration& _configuration = Core::Configuration::instance();
     Core::MetricService& _metricService = Core::MetricService::instance();
     Database::S3Database _database = Database::S3Database();
-    S3Server _s3Server = S3Server(_configuration, _metricService);
+    std::shared_ptr<S3Server> _s3Server = std::make_shared<S3Server>(_configuration, _metricService);
   };
 
   TEST_F(S3ServerCliTest, BucketCreateTest) {
