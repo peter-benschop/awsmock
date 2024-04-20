@@ -106,13 +106,14 @@ namespace AwsMock::Service {
         }
 
         if (request.has("Range")) {
+          long range = s3Request.max - s3Request.min + 1;
           headerMap["Accept-Ranges"] = "bytes";
           headerMap["Content-Range"] = "bytes " + std::to_string(s3Request.min) + "-" + std::to_string(s3Request.max) + "/" + std::to_string(s3Response.size);
-          headerMap["Content-Length"] = std::to_string(s3Request.max - s3Request.min);
+          headerMap["Content-Length"] = std::to_string(range);
           log_info << "Multi-part progress: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << "/" << std::to_string(s3Response.size);
 
           SendRangeResponse(response, s3Response.filename, s3Request.min, s3Request.max, s3Response.size, headerMap);
-          log_info << "Multi-part range, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << " etag: " << s3Response.md5sum;
+          log_info << "Multi-part range, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key;
 
         } else {
 
