@@ -38,7 +38,7 @@ namespace AwsMock::Service {
      * @param configuration application configuration
      * @param metricService monitoring module
      */
-    LambdaHandler(Core::Configuration &configuration, Core::MetricService &metricService);
+    LambdaHandler(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractHandler(), _configuration(configuration), _metricService(metricService), _lambdaService(configuration, metricService) {}
 
     /**
      * HTTP GET request.

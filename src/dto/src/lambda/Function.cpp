@@ -45,6 +45,10 @@ namespace AwsMock::Dto::Lambda {
     }
   }
 
+  std::string Function::ToJson() const {
+    return Core::JsonUtils::ToJsonString(ToJsonObject());
+  }
+
   std::string Function::ToString() const {
     std::stringstream ss;
     ss << (*this);
@@ -52,8 +56,7 @@ namespace AwsMock::Dto::Lambda {
   }
 
   std::ostream &operator<<(std::ostream &os, const Function &f) {
-    os << "Function={functionName='" << f.functionName << "' handler='" << f.handler << "' functionName='" << f.functionName << "' version='" << f.version <<
-       "' timeout='" << f.timeout << "' state='" << f.state << "' stateReason='" << f.stateReason << "' stateReasonCode='" << f.stateReasonCode << "'}";
+    os << "Function=" << f.ToJson();
     return os;
   }
 }

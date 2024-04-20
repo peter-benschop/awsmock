@@ -3,9 +3,6 @@
 
 namespace AwsMock::Service {
 
-  LambdaHandler::LambdaHandler(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractHandler(), _configuration(configuration), _metricService(metricService), _lambdaService(configuration, metricService) {
-  }
-
   void LambdaHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
     _metricService.IncrementCounter("gateway_get_counter");
     log_trace << "Lambda GET request, URI: " << request.getURI() << " region: " << region << " user: " << user;
@@ -17,9 +14,21 @@ namespace AwsMock::Service {
 
       if (action == "functions") {
 
-        Dto::Lambda::ListFunctionResponse lambdaResponse = _lambdaService.ListFunctions(region);
-        log_trace << "Lambda function list";
-        SendOkResponse(response, lambdaResponse.ToJson());
+        std::string functionName = Core::HttpUtils::GetPathParameters(request.getURI())[2];
+
+        if (functionName.empty()) {
+
+          Dto::Lambda::ListFunctionResponse lambdaResponse = _lambdaService.ListFunctions(region);
+          log_trace << "Lambda function list";
+          SendOkResponse(response, lambdaResponse.ToJson());
+
+        } else {
+
+          Dto::Lambda::GetFunctionResponse lambdaResponse = _lambdaService.GetFunction(region, functionName);
+          log_trace << "Lambda function region: " << region << " name: " << functionName;
+          SendOkResponse(response, lambdaResponse.ToJson());
+
+        }
 
       } else if (action == "tags") {
 
@@ -29,6 +38,7 @@ namespace AwsMock::Service {
         Dto::Lambda::ListTagsResponse lambdaResponse = _lambdaService.ListTags(arn);
         log_trace << "Lambda tag list";
         SendOkResponse(response, lambdaResponse.ToJson());
+
       }
 
     } catch (Core::ServiceException &exc) {

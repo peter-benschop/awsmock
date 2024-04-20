@@ -33,8 +33,8 @@ set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp sr
 set(DOCKER_SOURCES src/docker/Port.cpp src/docker/Container.cpp src/docker/ListContainerResponse.cpp
         src/docker/CreateContainerRequest.cpp src/docker/Filters.cpp)
 set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionResponse.cpp src/lambda/DeadLetterConfig.cpp
-        src/lambda/Function.cpp
-        src/lambda/CreateTagRequest.cpp)
+        src/lambda/Function.cpp src/lambda/Code.cpp src/lambda/CreateTagRequest.cpp src/lambda/CreateFunctionRequest.cpp
+        src/lambda/GetFunctionResponse.cpp)
 set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPoolResponse.cpp
         src/cognito/CreateUserPoolRequest.cpp src/cognito/CreateUserPoolResponse.cpp src/cognito/UserAttribute.cpp
         src/cognito/DeleteUserPoolRequest.cpp src/cognito/AdminCreateUserRequest.cpp
