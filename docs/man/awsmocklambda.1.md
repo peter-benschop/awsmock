@@ -121,7 +121,36 @@ awslocal lambda list-functions
     "EphemeralStorage": {}
 }
 ```
-
+To get a single lambda function:
+```
+awslocal lambda get-lambda --function-name test-function
+{
+    "FunctionName": "test-function",
+    "FunctionArn": "arn:aws:lambda:eu-central-1:000000000000:function:test-function",
+    "Runtime": "java17",
+    "Role": "arn:aws:iam::000000000000:role/lambda-role",
+    "Handler": "org.springframework.cloud.function.adapter.aws.FunctionInvoker",
+    "CodeSize": 0,
+    "Timeout": 3,
+    "MemorySize": 128,
+    "LastModified": "2023-12-20T11:14:19.074357Z",
+    "CodeSha256": "",
+    "Environment": {
+        "Variables": {
+            "AWS_ACCESS_KEY_ID": "none",
+            "AWS_ACCOUNT_ID": "000000000000",
+            "AWS_REGION": "eu-central-1",
+            "AWS_SECRET_ACCESS_KEY": "none",
+            "AWS_SESSION_TOKEN": "none",
+        },
+        "Error": {
+            "ErrorCode": "",
+            "Message": ""
+        }
+    },
+    "EphemeralStorage": {}
+}
+```
 To delete a lambda function:
 ```
 awslocal lambda delete-function --function-name test-function
