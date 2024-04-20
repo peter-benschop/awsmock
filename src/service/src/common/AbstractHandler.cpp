@@ -309,8 +309,8 @@ namespace AwsMock::Service {
   void AbstractHandler::SendRangeResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long min, long max, long size, const HeaderMap &extraHeader) {
     log_trace << "Sending OK response, state: 200, filename: " << fileName << " min: " << min << " max: " << max;
 
-    if (!_memoryMappedFile.IsMapped()) {
-      if (!_memoryMappedFile.OpenFile(fileName)) {
+    if (!Core::MemoryMappedFile::instance().IsMapped()) {
+      if (!Core::MemoryMappedFile::instance().OpenFile(fileName)) {
         throw Core::ServiceException("Could not open memory mapped file");
       }
     }
@@ -318,11 +318,11 @@ namespace AwsMock::Service {
     try {
 
       // Set headers
-      long length = max - min;
-      SetHeaders(response, length, extraHeader);
+      long range = max - min + 1;
+      SetHeaders(response, range, extraHeader);
 
       // Set state
-      if (min + length >= size) {
+      if (max == size) {
         handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_OK);
       } else {
         handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_PARTIAL_CONTENT);
@@ -332,15 +332,15 @@ namespace AwsMock::Service {
       std::ostream &os = response.send();
 
       // Send body
-      char *buffer = new char[length];
-      _memoryMappedFile.ReadChunk(min, length, (char *) buffer);
-      os.write(buffer, length);
+      char *buffer = new char[range + 1];
+      Core::MemoryMappedFile::instance().ReadChunk(min, range, (char *) buffer);
+      os.write(buffer, range);
       os.flush();
       delete[] buffer;
 
       // Close file
-      if (min + length >= size) {
-        _memoryMappedFile.CloseFile();
+      if (min + range >= size) {
+        Core::MemoryMappedFile::instance().CloseFile();
       }
 
     } catch (Poco::Exception &exc) {
@@ -361,7 +361,6 @@ namespace AwsMock::Service {
           response.set(it.first, it.second);
         }
       }
-      //DumpResponseHeaders(response);
 
       handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_OK);
       response.send();
