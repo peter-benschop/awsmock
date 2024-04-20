@@ -9,17 +9,16 @@ namespace AwsMock::Dto::Cognito {
   std::string CreateUserPoolResponse::ToJson() const {
 
     try {
-      Poco::JSON::Object rootObject;
 
+      Poco::JSON::Object rootObject;
       rootObject.set("Region", region);
       rootObject.set("Name", name);
 
-      std::ostringstream os;
-      rootObject.stringify(os);
-      return os.str();
+      return Core::JsonUtils::ToJsonString(rootObject);
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
   }
 

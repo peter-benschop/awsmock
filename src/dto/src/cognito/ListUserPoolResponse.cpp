@@ -9,8 +9,8 @@ namespace AwsMock::Dto::Cognito {
   std::string ListUserPoolResponse::ToJson() const {
 
     try {
-      Poco::JSON::Object rootObject;
 
+      Poco::JSON::Object rootObject;
       Poco::JSON::Array userPoolArray;
       for (const auto &userPool : userPools) {
         Poco::JSON::Object userPoolJson;
@@ -20,15 +20,13 @@ namespace AwsMock::Dto::Cognito {
         userPoolJson.set("CreationDate", std::to_string(userPool.modified.timestamp().epochTime()));
         userPoolArray.add(userPoolJson);
       }
-
       rootObject.set("UserPools", userPoolArray);
-      std::ostringstream os;
-      rootObject.stringify(os);
-      std::string tmp = os.str();
-      return os.str();
+
+      return Core::JsonUtils::ToJsonString(rootObject);
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
   }
 

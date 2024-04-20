@@ -6,8 +6,6 @@
 
 namespace AwsMock::Database {
 
-  CognitoMemoryDb::CognitoMemoryDb() {}
-
   bool CognitoMemoryDb::UserPoolExists(const std::string &region, const std::string &name) {
 
     return find_if(_userPools.begin(),
@@ -81,10 +79,8 @@ namespace AwsMock::Database {
                       });
 
     if (it == _userPools.end()) {
-      log_error << "Get cognito user pool by region and name failed, region: " << region << " name: "
-                                << name;
-      throw Core::DatabaseException(
-          "Get cognito user pool by region and name failed, region: " + region + " name: " + name);
+      log_error << "Get cognito user pool by region and name failed, region: " << region << " name: " << name;
+      throw Core::DatabaseException("Get cognito user pool by region and name failed, region: " + region + " name: " + name);
     }
 
     it->second.oid = it->first;
@@ -120,10 +116,8 @@ namespace AwsMock::Database {
                       });
 
     if (it == _userPools.end()) {
-      log_error << "Update user pool failed, region: " << userPool.region << " name: " << userPool.name
-                               ;
-      throw Core::DatabaseException(
-          "Update cognito user pool failed, region: " + userPool.region + " name: " + userPool.name);
+      log_error << "Update user pool failed, region: " << userPool.region << " name: " << userPool.name;
+      throw Core::DatabaseException("Update cognito user pool failed, region: " + userPool.region + " name: " + userPool.name);
     }
     _userPools[it->first] = userPool;
     return _userPools[it->first];
@@ -146,9 +140,7 @@ namespace AwsMock::Database {
     _userPools.clear();
   }
 
-  bool CognitoMemoryDb::UserExists(const std::string &region,
-                                   const std::string &userPoolId,
-                                   const std::string &userName) {
+  bool CognitoMemoryDb::UserExists(const std::string &region, const std::string &userPoolId, const std::string &userName) {
 
     return find_if(_users.begin(),
                    _users.end(),

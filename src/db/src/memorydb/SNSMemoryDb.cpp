@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database {
 
-  SNSMemoryDb::SNSMemoryDb() {}
+
 
   bool SNSMemoryDb::TopicExists(const std::string &region, const std::string &name) {
 
@@ -36,6 +36,8 @@ namespace AwsMock::Database {
       it->second.oid = oid;
       return it->second;
     }
+
+    log_warning << "Topic not found, oid: " << oid;
     return {};
   }
 
@@ -50,6 +52,23 @@ namespace AwsMock::Database {
       it->second.oid = it->first;
       return it->second;
     }
+    log_warning << "Topic not found, topicArn: " << topicArn;
+    return {};
+  }
+
+  Entity::SNS::Topic SNSMemoryDb::GetTopicByName(const std::string &region, const std::string &topicName) {
+
+    auto it =
+      find_if(_topics.begin(), _topics.end(), [region, topicName](const std::pair<std::string, Entity::SNS::Topic> &topic) {
+        return topic.second.region == region && topic.second.topicArn == topicName;
+      });
+
+    if (it != _topics.end()) {
+      it->second.oid = it->first;
+      return it->second;
+    }
+
+    log_warning << "Topic not found, region: " << region << " name: " << topicName;
     return {};
   }
 
@@ -57,7 +76,7 @@ namespace AwsMock::Database {
 
     Entity::SNS::TopicList topics;
     for (const auto &topic : _topics) {
-      if (topic.second.subscriptions.size() > 0) {
+      if (!topic.second.subscriptions.empty()) {
         auto it = find_if(topic.second.subscriptions.begin(),
                           topic.second.subscriptions.end(),
                           [subscriptionArn](const Entity::SNS::Subscription &subcription) {

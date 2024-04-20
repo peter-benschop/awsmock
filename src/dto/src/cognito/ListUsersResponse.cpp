@@ -21,15 +21,12 @@ namespace AwsMock::Dto::Cognito {
         userJson.set("CreationDate", std::to_string(user.modified.timestamp().epochTime()));
         usersArray.add(userJson);
       }
-
       rootObject.set("Users", usersArray);
-      std::ostringstream os;
-      rootObject.stringify(os);
-      std::string tmp = os.str();
-      return os.str();
+
+      return Core::JsonUtils::ToJsonString(rootObject);
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      throw Core::JsonException(exc.message());
     }
   }
 

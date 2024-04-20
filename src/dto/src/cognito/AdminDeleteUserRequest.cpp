@@ -13,12 +13,11 @@ namespace AwsMock::Dto::Cognito {
       rootJson.set("UserPoolId", userPoolId);
       rootJson.set("Username", userName);
 
-      std::ostringstream os;
-      rootJson.stringify(os);
-      return os.str();
+      return Core::JsonUtils::ToJsonString(rootJson);
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
   }
 
@@ -35,7 +34,8 @@ namespace AwsMock::Dto::Cognito {
       Core::JsonUtils::GetJsonValueString("Username", rootObject, userName);
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
   }
 

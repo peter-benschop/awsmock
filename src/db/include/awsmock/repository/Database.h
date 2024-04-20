@@ -31,127 +31,122 @@ namespace AwsMock::Database {
    */
   class Database {
 
-    public:
+  public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration configuration properties
-       */
-      explicit Database();
+    /**
+     * Constructor
+     *
+     * @param configuration configuration properties
+     */
+    explicit Database();
 
-      /**
-       * Singleton instance
-       */
-      /*static Database &instance() {
-        static Poco::SingletonHolder<Database> sh;
-        return *sh.get();
-      }*/
+    /**
+     * Singleton instance
+     */
+    /*static Database &instance() {
+      static Poco::SingletonHolder<Database> sh;
+      return *sh.get();
+    }*/
 
-      /**
-       * Returns a MongoDB connection from the pool
-       *
-       * @return MongoDB database client
-       */
-      mongocxx::database GetConnection();
+    /**
+     * Returns a MongoDB connection from the pool
+     *
+     * @return MongoDB database client
+     */
+    mongocxx::database GetConnection();
 
-      /**
-       * Returns a MongoDB client from the pool
-       *
-       * @return MongoDB database client
-       */
-      mongocxx::pool::entry GetClient();
+    /**
+     * Returns a MongoDB client from the pool
+     *
+     * @return MongoDB database client
+     */
+    mongocxx::pool::entry GetClient();
 
-      /**
-       * Check all indexes.
-       *
-       * <p>Normally done during manager StartServer.</p>
-       */
-      void CreateIndexes();
+    /**
+     * Check all indexes.
+     *
+     * <p>Normally done during manager StartServer.</p>
+     */
+    void CreateIndexes();
 
-      /**
-       * Check whether we are running without database
-       */
-      bool HasDatabase() const;
+    /**
+     * Check whether we are running without database
+     */
+    [[nodiscard]] bool HasDatabase() const;
 
-      /**
-       * Returns the database name
-       *
-       * @return database name
-       */
-      std::string GetDatabaseName() const;
+    /**
+     * Returns the database name
+     *
+     * @return database name
+     */
+    [[nodiscard]] std::string GetDatabaseName() const;
 
-      /**
-       * Start the database
-       */
-      void StartDatabase();
+    /**
+     * Start the database
+     */
+    void StartDatabase();
 
-      /**
-       * Stops the database
-       */
-      void StopDatabase();
+    /**
+     * Stops the database
+     */
+    void StopDatabase();
 
-    private:
+  private:
 
-      /**
-       * Update module status
-       */
-      void UpdateModuleStatus();
+    /**
+     * Update module status
+     */
+    void UpdateModuleStatus();
 
-      /**
-       * Application configuration
-       */
-      Core::Configuration &_configuration;
+    /**
+     * Application configuration
+     */
+    Core::Configuration &_configuration;
 
-      /**
-       * Database name
-       */
-      std::string _name;
+    /**
+     * Database name
+     */
+    std::string _name;
 
-      /**
-       * Database host
-       */
-      std::string _host;
+    /**
+     * Database host
+     */
+    std::string _host;
 
-      /**
-       * Database port
-       */
-      int _port;
+    /**
+     * Database port
+     */
+    int _port;
 
-      /**
-       * Database user
-       */
-      std::string _user;
+    /**
+     * Database user
+     */
+    std::string _user;
 
-      /**
-       * Database password
-       */
-      std::string _password;
+    /**
+     * Database password
+     */
+    std::string _password;
 
-      /**
-       * MongoDB URI
-       */
-      mongocxx::uri _uri;
+    /**
+     * MongoDB URI
+     */
+    mongocxx::uri _uri;
 
-      /**
-       * Database client
-       */
-      std::shared_ptr<mongocxx::pool> _pool;
+    /**
+     * Database client
+     */
+    std::unique_ptr<mongocxx::pool> _pool;
 
-      /**
-       * Database connection pool size
-       */
-      int _poolSize;
+    /**
+     * Database connection pool size
+     */
+    int _poolSize;
 
-      /**
-       * Database flag
-       */
-      bool _useDatabase;
-
-      /**
-       * Initialization flag
-       */
-      bool _initialized;
+    /**
+     * Database flag
+     */
+    bool _useDatabase;
   };
 
 } // namespace AwsMock::Database

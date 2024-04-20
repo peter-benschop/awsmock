@@ -70,15 +70,16 @@ namespace AwsMock::Core {
      * @param start start index
      * @param end end index
      * @param buffer char buffer
+     * @return number of bytes actually read
      */
-    void ReadChunk(long start, long end, char *buffer);
+    long ReadChunk(long start, long end, char *buffer);
 
     /**
      * Returns true in case the file is mapped already.
      *
      * @return true, in case file is already mapped.
      */
-    bool IsMapped() const { return _mapped; }
+    [[nodiscard]] bool IsMapped() const { return _mapped; }
 
   private:
 
@@ -107,7 +108,15 @@ namespace AwsMock::Core {
     */
     std::string _filename;
 
-    int _fd;
+    /**
+     * File handle
+     */
+    int _fd{};
+
+    /**
+     * File size
+     */
+    long _fileSize = 0;
   };
 
 } // namespace AwsMock::Core

@@ -139,7 +139,7 @@ namespace AwsMock::Controller {
       return;
     }
 
-    r = sd_journal_add_match(jd, "_SYSTEMD_UNIT=aws-mock.service", 0);
+    r = sd_journal_add_match(jd, "_SYSTEMD_UNIT=awsmock.service", 0);
     if (r != 0) {
       std::cerr << "Failed to set matching entries: " << strerror(r) << std::endl;
       return;

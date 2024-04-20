@@ -16,21 +16,23 @@ namespace AwsMock::Dto::Cognito {
       Core::JsonUtils::GetJsonValueInt("MaxResults", rootObject, maxResults);
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
   }
 
   std::string ListUserPoolRequest::ToJson() const {
+
     try {
+
       Poco::JSON::Object rootJson;
       rootJson.set("MaxResults", maxResults);
 
-      std::ostringstream os;
-      rootJson.stringify(os);
-      return os.str();
+      return Core::JsonUtils::ToJsonString(rootJson);
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
   }
 

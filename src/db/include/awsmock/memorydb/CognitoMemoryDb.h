@@ -38,7 +38,7 @@ namespace AwsMock::Database {
       /**
        * Constructor
        */
-      CognitoMemoryDb();
+      CognitoMemoryDb() = default;
 
       /**
        * Singleton instance

@@ -60,7 +60,7 @@ details of the manager.
 
 ```loglevel```  
 &nbsp;&nbsp;&nbsp;&nbsp;sets the log level of the AwsMock manager ```awsmockmgr```. ```<loglevel>``` can be one of: 
-trace, debug, information, warning, error, critical or fatal.
+verbose, debug, info, warning, error, fatal or none.
 
 ```config```  
 &nbsp;&nbsp;&nbsp;&nbsp;shows the configuration of the AwsMock API gateway.

@@ -18,7 +18,8 @@ namespace AwsMock::Dto::Cognito {
       return os.str();
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
   }
 
@@ -30,7 +31,8 @@ namespace AwsMock::Dto::Cognito {
       Core::JsonUtils::GetJsonValueString("Value", object, value);
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
   }
 

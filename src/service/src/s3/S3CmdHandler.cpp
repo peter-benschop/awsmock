@@ -96,9 +96,9 @@ namespace AwsMock::Service {
         Dto::S3::GetObjectResponse s3Response = _s3Service.GetObject(s3Request);
 
         HeaderMap headerMap;
-/*        headerMap["ETag"] = "\"" + s3Response.md5sum + "\"";
+        headerMap["ETag"] = Core::StringUtils::Quoted(s3Response.md5sum);
         headerMap["Content-Type"] = s3Response.contentType;
-        headerMap["Last-Modified"] = Poco::DateTimeFormatter::format(s3Response.modified, Poco::DateTimeFormat::HTTP_FORMAT);*/
+        headerMap["Last-Modified"] = Poco::DateTimeFormatter::format(s3Response.modified, Poco::DateTimeFormat::HTTP_FORMAT);
 
         // Set user headers
         for (const auto &m : s3Response.metadata) {
@@ -106,14 +106,13 @@ namespace AwsMock::Service {
         }
 
         if (request.has("Range")) {
-          long range = s3Request.max - s3Request.min + 1;
           headerMap["Accept-Ranges"] = "bytes";
           headerMap["Content-Range"] = "bytes " + std::to_string(s3Request.min) + "-" + std::to_string(s3Request.max) + "/" + std::to_string(s3Response.size);
-          headerMap["Content-Length"] = std::to_string(range);
+          headerMap["Content-Length"] = std::to_string(s3Request.max - s3Request.min);
           log_info << "Multi-part progress: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << "/" << std::to_string(s3Response.size);
 
           SendRangeResponse(response, s3Response.filename, s3Request.min, s3Request.max, s3Response.size, headerMap);
-          log_info << "Multi-part range, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key;
+          log_info << "Multi-part range, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key << " etag: " << s3Response.md5sum;
 
         } else {
 
@@ -369,7 +368,11 @@ namespace AwsMock::Service {
 
           Dto::S3::CompleteMultipartUploadRequest s3Request = {.region=s3ClientCommand.region, .bucket=s3ClientCommand.bucket, .key=s3ClientCommand.key, .user=s3ClientCommand.user, .uploadId=uploadId};
           Dto::S3::CompleteMultipartUploadResult result = _s3Service.CompleteMultipartUpload(s3Request);
-          SendOkResponse(response, result.ToXml());
+
+          HeaderMap headers;
+          headers["ETag"] = Core::StringUtils::Quoted(result.etag);
+
+          SendOkResponse(response, result.ToXml(), headers);
           log_info << "Copy object, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key;
 
         }
@@ -416,9 +419,12 @@ namespace AwsMock::Service {
 
         std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "uploadId");
         Dto::S3::CompleteMultipartUploadRequest s3Request = {.region=s3ClientCommand.region, .bucket=s3ClientCommand.bucket, .key=s3ClientCommand.key, .user=s3ClientCommand.user, .uploadId=uploadId};
-        Dto::S3::CompleteMultipartUploadResult result = _s3Service.CompleteMultipartUpload(s3Request);
+        Dto::S3::CompleteMultipartUploadResult s3Response = _s3Service.CompleteMultipartUpload(s3Request);
 
-        SendOkResponse(response, result.ToXml());
+        HeaderMap headers;
+        headers["ETag"] = Core::StringUtils::Quoted(s3Response.etag);
+
+        SendOkResponse(response, s3Response.ToXml(), headers);
         log_info << "Completed multipart upload, bucket: " << s3ClientCommand.bucket << " key: " << s3ClientCommand.key;
 
         break;

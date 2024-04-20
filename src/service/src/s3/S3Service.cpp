@@ -147,14 +147,14 @@ namespace AwsMock::Service {
 
       std::string filename = _dataS3Dir + Poco::Path::separator() + object.internalName;
       Dto::S3::GetObjectResponse response = {
-        .bucket = object.bucket,
-        .key = object.key,
-        .size = object.size,
-        .filename = filename,
-        .contentType = object.contentType,
-        .metadata = object.metadata,
+        .bucket=object.bucket,
+        .key=object.key,
+        .size=object.size,
+        .filename=filename,
+        .contentType=object.contentType,
+        .metadata=object.metadata,
         .md5sum=object.md5sum,
-        .modified = object.modified,
+        .modified=object.modified,
       };
       log_trace << "S3 get object response: " << response.ToString();
       log_info << "Object returned, bucket: " << request.bucket << " key: " << request.key;
@@ -242,14 +242,16 @@ namespace AwsMock::Service {
 
     std::string fileName = uploadDir + Poco::Path::separator() + uploadId + "-" + std::to_string(part);
     std::ofstream ofs(fileName);
-    Poco::StreamCopier::copyStream(stream, ofs);
+    ofs << stream.rdbuf();
+    ofs.flush();
     ofs.close();
     log_trace << "Part uploaded, part: " << part << " dir: " << uploadDir;
 
-    // Get md5sum a ETag
+    // Get md5sum as ETag
     std::string eTag = Core::Crypto::GetMd5FromFile(fileName);
+    long size = Core::FileUtils::FileSize(fileName);
 
-    log_info << "Upload part succeeded, part: " << part;
+    log_info << "Upload part succeeded, part: " << part << " size: " << size;
     return eTag;
   }
 
