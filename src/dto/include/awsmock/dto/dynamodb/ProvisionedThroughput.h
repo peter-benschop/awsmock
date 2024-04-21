@@ -9,72 +9,77 @@
 #include <string>
 #include <sstream>
 
-// Poco includes
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-
 // AwsMock includes
+#include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/ServiceException.h>
+#include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
-  struct ProvisionedThroughput {
+    struct ProvisionedThroughput {
 
-    /**
-     * Read capacity units
-     */
-    int readCapacityUnits;
+        /**
+         * Read capacity units
+         */
+        int readCapacityUnits;
 
-    /**
-     * Write capacity units
-     */
-    int writeCapacityUnits;
+        /**
+         * Write capacity units
+         */
+        int writeCapacityUnits;
 
-    /**
-     * Last decrease time
-     */
-    long lastDecreaseDateTime;
+        /**
+         * Last decrease time
+         */
+        long lastDecreaseDateTime;
 
-    /**
-     * Last increase time
-     */
-    long lastIncreaseDateTime;
+        /**
+         * Last increase time
+         */
+        long lastIncreaseDateTime;
 
-    /**
-     * NUmber of decreases
-     */
-    long numberOfDecreasesToday;
+        /**
+         * NUmber of decreases
+         */
+        long numberOfDecreasesToday;
 
-    /**
-     * Converts the entity to a JSON object
-     *
-     * @return JSON object
-     */
-    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
-    /**
-     * Parse a JSON stream
-     *
-     * @param jsonBody JSON string
-     */
-    void FromJson(const std::string &jsonBody);
+        /**
+         * Converts the entity to a JSON object
+         *
+         * @return JSON object
+         */
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * Converts the entity to a JSON object
+         *
+         * @return JSON object
+         */
+        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
-    /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const ProvisionedThroughput &r);
+        /**
+         * Parse a JSON stream
+         *
+         * @param jsonBody JSON string
+         */
+        void FromJson(const std::string &jsonBody);
 
-  };
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
+
+        /**
+         * Stream provider.
+         *
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const ProvisionedThroughput &r);
+
+    };
 
 } // namespace AwsMock::Dto::DynamoDb
 
