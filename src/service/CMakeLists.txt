@@ -11,11 +11,10 @@ set(SNS_SOURCES src/sns/SNSServer.cpp src/sns/SNSHandler.cpp src/sns/SNSCmdHandl
 set(LAMBDA_SOURCES src/lambda/LambdaServer.cpp src/lambda/LambdaHandler.cpp src/lambda/LambdaService.cpp
         src/lambda/LambdaCreator.cpp src/lambda/LambdaExecutor.cpp src/lambda/LambdaMonitoring.cpp)
 set(COGNITO_SOURCES src/cognito/CognitoHandler.cpp src/cognito/CognitoHandler.cpp src/cognito/CognitoCliHandler.cpp
-        src/cognito/CognitoJava2Handler.cpp src/cognito/CognitoService.cpp src/cognito/CognitoServer.cpp
-)
+        src/cognito/CognitoJava2Handler.cpp src/cognito/CognitoService.cpp src/cognito/CognitoServer.cpp)
 set(TRANSFER_SOURCES src/transfer/TransferServer.cpp src/transfer/TransferHandler.cpp src/transfer/TransferService.cpp)
 set(DYNAMODB_SOURCES src/dynamodb/DynamoDbServer.cpp src/dynamodb/DynamoDbHandler.cpp src/dynamodb/DynamoDbService.cpp
-        src/dynamodb/DynamoDbCmdHandler.cpp)
+        src/dynamodb/DynamoDbCmdHandler.cpp src/dynamodb/DynamoDbMonitoring.cpp)
 set(SECRETMANAGER_SOURCES src/secretsmanager/SecretsManagerServer.cpp src/secretsmanager/SecretsManagerHandler.cpp
         src/secretsmanager/SecretsManagerCmdHandler.cpp src/secretsmanager/SecretsManagerService.cpp)
 set(FTP_SOURCES src/ftpserver/Filesystem.cpp src/ftpserver/FtpSession.cpp src/ftpserver/FtpServer.cpp

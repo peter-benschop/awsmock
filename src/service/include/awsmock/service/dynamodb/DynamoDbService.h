@@ -62,9 +62,8 @@ namespace AwsMock::Service {
      * Constructor
      *
      * @param configuration module configuration
-     * @param metricService aws-mock monitoring module
      */
-    explicit DynamoDbService(Core::Configuration &configuration, Core::MetricService &metricService);
+    explicit DynamoDbService(Core::Configuration &configuration);
 
     /**
      * Creates a new table
@@ -168,11 +167,6 @@ namespace AwsMock::Service {
      * Configuration
      */
     Core::Configuration &_configuration;
-
-    /**
-     * Monitoring
-     */
-    Core::MetricService &_metricService;
 
     /**
      * Docker module

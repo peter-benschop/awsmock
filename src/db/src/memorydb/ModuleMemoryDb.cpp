@@ -6,8 +6,6 @@
 
 namespace AwsMock::Database {
 
-  ModuleMemoryDb::ModuleMemoryDb() {}
-
   bool ModuleMemoryDb::ModuleExists(const std::string &name) {
 
     return

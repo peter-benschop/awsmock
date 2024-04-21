@@ -273,7 +273,7 @@ namespace AwsMock {
                     _serverMap[module.name] = _cognitoServer;
                 } else if (module.name == "dynamodb" &&
                            module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                    _dynamoDbServer = std::make_shared<Service::DynamoDbServer>(_configuration, _metricService);
+                    _dynamoDbServer = std::make_shared<Service::DynamoDbServer>(_configuration);
                     _dynamoDbServer->Start();
                     _serverMap[module.name] = _dynamoDbServer;
                 } else if (module.name == "secretsmanager" &&

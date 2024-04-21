@@ -84,7 +84,7 @@ namespace AwsMock::Service {
             }
 
             case DYNAMODB: {
-                CallAsyncGet(DynamoDbHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncGet(DynamoDbHandler(_configuration), request, response, region, user);
                 break;
             }
 
@@ -136,7 +136,7 @@ namespace AwsMock::Service {
             }
 
             case DYNAMODB: {
-                CallAsyncPut(DynamoDbHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncPut(DynamoDbHandler(_configuration), request, response, region, user);
                 break;
             }
             case SECRETS_MANAGER: {
@@ -187,7 +187,7 @@ namespace AwsMock::Service {
             }
 
             case DYNAMODB: {
-                CallAsyncPost(DynamoDbHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncPost(DynamoDbHandler(_configuration), request, response, region, user);
                 break;
             }
 
@@ -239,7 +239,7 @@ namespace AwsMock::Service {
             }
 
             case DYNAMODB: {
-                CallAsyncDelete(DynamoDbHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncDelete(DynamoDbHandler(_configuration), request, response, region, user);
                 break;
             }
 
@@ -291,7 +291,7 @@ namespace AwsMock::Service {
             }
 
             case DYNAMODB: {
-                CallAsyncHead(DynamoDbHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncHead(DynamoDbHandler(_configuration), request, response, region, user);
                 break;
             }
 

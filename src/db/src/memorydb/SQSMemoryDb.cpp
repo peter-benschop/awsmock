@@ -6,8 +6,6 @@
 
 namespace AwsMock::Database {
 
-    SQSMemoryDb::SQSMemoryDb() {}
-
     bool SQSMemoryDb::QueueExists(const std::string &region, const std::string &name) {
 
         return find_if(_queues.begin(),

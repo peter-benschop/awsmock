@@ -40,7 +40,7 @@ namespace AwsMock::Database {
     /**
      * Constructor
      */
-    SecretsManagerMemoryDb();
+    SecretsManagerMemoryDb() = default;
 
     /**
      * Singleton instance

@@ -29,11 +29,8 @@ namespace AwsMock::Service {
      * Constructor
      *
      * @param configuration application configuration
-     * @param metricService  monitoring
      */
-    DynamoDbRequestHandlerFactory(Core::Configuration &configuration,
-                                Core::MetricService &metricService)
-        : _configuration(configuration), _metricService(metricService) {}
+    DynamoDbRequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
 
     /**
      * Create new lambda request handler
@@ -45,7 +42,7 @@ namespace AwsMock::Service {
       if(request.getURI().empty()) {
         return nullptr;
       }
-      return new DynamoDbHandler(_configuration, _metricService);
+      return new DynamoDbHandler(_configuration);
     }
 
   private:
@@ -54,11 +51,6 @@ namespace AwsMock::Service {
      * S3 handler configuration
      */
     Core::Configuration &_configuration;
-
-    /**
-     * Metric module
-     */
-    Core::MetricService &_metricService;
 
   };
 

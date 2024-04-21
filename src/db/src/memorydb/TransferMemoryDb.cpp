@@ -6,8 +6,6 @@
 
 namespace AwsMock::Database {
 
-  TransferMemoryDb::TransferMemoryDb() {}
-
   bool TransferMemoryDb::TransferExists(const std::string &region, const std::string &serverId) {
 
     return find_if(_transfers.begin(),

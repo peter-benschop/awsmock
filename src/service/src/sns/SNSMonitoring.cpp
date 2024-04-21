@@ -6,7 +6,9 @@
 
 namespace AwsMock::Service {
 
-    void SNSMonitoring::Initialize() {}
+    void SNSMonitoring::Initialize() {
+        UpdateCounter();
+    }
 
     void SNSMonitoring::Run() {
         UpdateCounter();

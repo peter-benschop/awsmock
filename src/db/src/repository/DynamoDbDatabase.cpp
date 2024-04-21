@@ -6,409 +6,438 @@
 
 namespace AwsMock::Database {
 
-  using bsoncxx::builder::basic::kvp;
-  using bsoncxx::builder::basic::make_array;
-  using bsoncxx::builder::basic::make_document;
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
 
-  DynamoDbDatabase::DynamoDbDatabase() : _memoryDb(DynamoDbMemoryDb::instance()), _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()), _tableCollectionName("dynamodb_table") {}
+    DynamoDbDatabase::DynamoDbDatabase() : _memoryDb(DynamoDbMemoryDb::instance()), _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()), _tableCollectionName("dynamodb_table") {}
 
-  Entity::DynamoDb::Table DynamoDbDatabase::CreateTable(const Entity::DynamoDb::Table &table) {
+    Entity::DynamoDb::Table DynamoDbDatabase::CreateTable(const Entity::DynamoDb::Table &table) {
 
-    if (_useDatabase) {
+        if (_useDatabase) {
 
-      auto client = GetClient();
-      mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-      auto session = client->start_session();
+            auto client = GetClient();
+            mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
+            auto session = client->start_session();
 
-      try {
+            try {
 
-        session.start_transaction();
-        auto result = _tableCollection.insert_one(table.ToDocument());
-        session.commit_transaction();
-        log_trace << "DynamoDb table created, oid: "
-                                  << result->inserted_id().get_oid().value.to_string();
-        return GetTableById(result->inserted_id().get_oid().value);
+                session.start_transaction();
+                auto result = _tableCollection.insert_one(table.ToDocument());
+                session.commit_transaction();
+                log_trace << "DynamoDb table created, oid: "
+                          << result->inserted_id().get_oid().value.to_string();
+                return GetTableById(result->inserted_id().get_oid().value);
 
-      } catch (const mongocxx::exception &exc) {
-        session.abort_transaction();
-        log_error << "Database exception " << exc.what();
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()));
-      }
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
 
-    } else {
-
-      return _memoryDb.CreateTable(table);
-
-    }
-  }
-
-  Entity::DynamoDb::Table DynamoDbDatabase::GetTableById(bsoncxx::oid oid) {
-
-    try {
-
-      auto client = GetClient();
-      mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-      mongocxx::stdx::optional<bsoncxx::document::value>
-        mResult = _tableCollection.find_one(make_document(kvp("_id", oid)));
-      if (!mResult) {
-        log_error << "Database exception: Table not found ";
-        throw Core::DatabaseException("Database exception, Table not found ");
-      }
-
-      Entity::DynamoDb::Table result;
-      result.FromDocument(mResult);
-      log_debug << "Got table by ID, table: " << result.ToString();
-      return result;
-
-    } catch (const mongocxx::exception &exc) {
-      log_error << "Database exception " << exc.what();
-      throw Core::DatabaseException("Database exception " + std::string(exc.what()));
-    }
-
-  }
-
-  Entity::DynamoDb::Table DynamoDbDatabase::GetTableByRegionName(const std::string &region, const std::string &name) {
-
-    if (_useDatabase) {
-
-      try {
-
-        auto client = GetClient();
-        mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-        mongocxx::stdx::optional<bsoncxx::document::value>
-          mResult = _tableCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
-        if (!mResult) {
-          log_error << "Database exception: Table not found ";
-          throw Core::DatabaseException("Database exception, Table not found ");
-        }
-
-        Entity::DynamoDb::Table result;
-        result.FromDocument(mResult);
-        log_debug << "Got table by ID, table: " << result.ToString();
-        return result;
-
-      } catch (const mongocxx::exception &exc) {
-        log_error << "Database exception " << exc.what();
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()));
-      }
-
-    } else {
-
-      return _memoryDb.GetTableByRegionName(region, name);
-    }
-
-  }
-
-  Entity::DynamoDb::Table DynamoDbDatabase::GetTableById(const std::string &oid) {
-
-    if (_useDatabase) {
-
-      return GetTableById(bsoncxx::oid(oid));
-
-    } else {
-
-      return _memoryDb.GetTableById(oid);
-    }
-  }
-
-  bool DynamoDbDatabase::TableExists(const std::string &region, const std::string &tableName) {
-
-    if (_useDatabase) {
-
-      try {
-
-        int64_t count;
-        auto client = GetClient();
-        mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-
-        if (!region.empty()) {
-          count = _tableCollection.count_documents(make_document(kvp("region", region), kvp("name", tableName)));
         } else {
-          count = _tableCollection.count_documents(make_document(kvp("name", tableName)));
+
+            return _memoryDb.CreateTable(table);
+
         }
-        log_trace << "DynamoDb table exists: " << (count > 0 ? "true" : "false");
-        return count > 0;
-
-      } catch (const mongocxx::exception &exc) {
-        log_error << "Database exception " << exc.what();
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()));
-      }
-
-    } else {
-
-      return _memoryDb.TableExists(region, tableName);
-
     }
-  }
 
-  std::vector<Entity::DynamoDb::Table> DynamoDbDatabase::ListTables(const std::string &region) {
+    Entity::DynamoDb::Table DynamoDbDatabase::GetTableById(bsoncxx::oid oid) {
 
-    Entity::DynamoDb::TableList tables;
-    if (_useDatabase) {
+        try {
 
-      try {
+            auto client = GetClient();
+            mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
+            mongocxx::stdx::optional<bsoncxx::document::value>
+                    mResult = _tableCollection.find_one(make_document(kvp("_id", oid)));
+            if (!mResult) {
+                log_error << "Database exception: Table not found ";
+                throw Core::DatabaseException("Database exception, Table not found ");
+            }
 
-        auto client = GetClient();
-        mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-        if (region.empty()) {
-
-          auto tableCursor = _tableCollection.find({});
-          for (auto table : tableCursor) {
             Entity::DynamoDb::Table result;
-            result.FromDocument(table);
-            tables.push_back(result);
-          }
+            result.FromDocument(mResult);
+            log_debug << "Got table by ID, table: " << result.ToString();
+            return result;
+
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+        }
+
+    }
+
+    Entity::DynamoDb::Table DynamoDbDatabase::GetTableByRegionName(const std::string &region, const std::string &name) {
+
+        if (_useDatabase) {
+
+            try {
+
+                auto client = GetClient();
+                mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
+                mongocxx::stdx::optional<bsoncxx::document::value>
+                        mResult = _tableCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
+                if (!mResult) {
+                    log_error << "Database exception: Table not found ";
+                    throw Core::DatabaseException("Database exception, Table not found ");
+                }
+
+                Entity::DynamoDb::Table result;
+                result.FromDocument(mResult);
+                log_debug << "Got table by ID, table: " << result.ToString();
+                return result;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
 
         } else {
 
-          auto tableCursor = _tableCollection.find(make_document(kvp("region", region)));
-          for (auto table : tableCursor) {
-            Entity::DynamoDb::Table result;
-            result.FromDocument(table);
-            tables.push_back(result);
-          }
-
+            return _memoryDb.GetTableByRegionName(region, name);
         }
 
-      } catch (const mongocxx::exception &exc) {
-        log_error << "Database exception " << exc.what();
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()));
-      }
-
-    } else {
-
-      tables = _memoryDb.ListTables(region);
     }
 
-    log_trace << "Got DynamoDb table list, size:" << tables.size();
-    return tables;
-  }
+    Entity::DynamoDb::Table DynamoDbDatabase::GetTableById(const std::string &oid) {
 
-  Entity::DynamoDb::Table DynamoDbDatabase::CreateOrUpdateTable(const Entity::DynamoDb::Table &table) {
+        if (_useDatabase) {
 
-    if (TableExists(table.region, table.name)) {
-
-      return UpdateTable(table);
-
-    } else {
-
-      return CreateTable(table);
-
-    }
-  }
-
-  Entity::DynamoDb::Table DynamoDbDatabase::UpdateTable(const Entity::DynamoDb::Table &table) {
-
-    if (_useDatabase) {
-
-      auto client = GetClient();
-      mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-      auto session = client->start_session();
-
-      try {
-
-        session.start_transaction();
-        auto result = _tableCollection.replace_one(make_document(kvp("region", table.region), kvp("name", table.name)),
-                                                   table.ToDocument());
-        session.commit_transaction();
-        log_trace << "DynamoDB table updated: " << table.ToString();
-        return GetTableByRegionName(table.region, table.name);
-
-      } catch (const mongocxx::exception &exc) {
-        session.abort_transaction();
-        log_error << "Database exception " << exc.what();
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
-      }
-
-    } else {
-
-      return _memoryDb.UpdateTable(table);
-
-    }
-  }
-
-  void DynamoDbDatabase::DeleteTable(const std::string &region, const std::string &tableName) {
-
-    if (_useDatabase) {
-
-      auto client = GetClient();
-      mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-      auto session = client->start_session();
-
-      try {
-
-        session.start_transaction();
-        auto result = _tableCollection.delete_many(make_document(kvp("region", region), kvp("name", tableName)));
-        session.commit_transaction();
-        log_debug << "DynamoDB table deleted, tableName: " << tableName << " region: " << region;
-
-      } catch (const mongocxx::exception &exc) {
-        session.abort_transaction();
-        log_error << "Database exception " << exc.what();
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()));
-      }
-
-    } else {
-
-      _memoryDb.DeleteTable(tableName);
-
-    }
-  }
-
-  void DynamoDbDatabase::DeleteAllTables() {
-
-    if (_useDatabase) {
-
-      auto client = GetClient();
-      mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-      auto session = client->start_session();
-
-      try {
-
-        session.start_transaction();
-        auto result = _tableCollection.delete_many({});
-        session.commit_transaction();
-        log_debug << "All DynamoDb tables deleted, count: " << result->deleted_count();
-
-      } catch (const mongocxx::exception &exc) {
-        session.abort_transaction();
-        log_error << "Database exception " << exc.what();
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()));
-      }
-
-    } else {
-
-      _memoryDb.DeleteAllTables();
-
-    }
-  }
-
-  bool DynamoDbDatabase::ItemExists(const std::string &region, const std::string &tableName, const std::string &key) {
-
-    if (_useDatabase) {
-
-      try {
-
-        int64_t count;
-        auto client = GetClient();
-        mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-        if (!region.empty()) {
-          count = _tableCollection.count_documents(make_document(kvp("region", region), kvp("name", tableName)));
-        } else {
-          count = _tableCollection.count_documents(make_document(kvp("name", tableName)));
-        }
-        log_trace << "DynamoDb table exists: " << (count > 0 ? "true" : "false");
-        return count > 0;
-
-      } catch (const mongocxx::exception &exc) {
-        log_error << "Database exception " << exc.what();
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()));
-      }
-
-    } else {
-
-      return _memoryDb.ItemExists(region, tableName, key);
-
-    }
-  }
-
-  Entity::DynamoDb::ItemList DynamoDbDatabase::ListItems(const std::string &region, const std::string &tableName) {
-
-    Entity::DynamoDb::ItemList items;
-    if (_useDatabase) {
-
-      auto client = GetClient();
-      mongocxx::collection _itemCollection = (*client)[_databaseName]["dynamodb_item"];
-      try {
-
-        if (region.empty() && tableName.empty()) {
-
-          auto itemCursor = _itemCollection.find({});
-          for (auto item : itemCursor) {
-            Entity::DynamoDb::Item result;
-            result.FromDocument(item);
-            items.push_back(result);
-          }
-
-        } else if (tableName.empty()) {
-
-          auto itemCursor = _itemCollection.find(make_document(kvp("region", region)));
-          for (auto item : itemCursor) {
-            Entity::DynamoDb::Item result;
-            result.FromDocument(item);
-            items.push_back(result);
-          }
+            return GetTableById(bsoncxx::oid(oid));
 
         } else {
 
-          auto itemCursor = _itemCollection.find(make_document(kvp("region", region), kvp("name", tableName)));
-          for (auto item : itemCursor) {
-            Entity::DynamoDb::Item result;
-            result.FromDocument(item);
-            items.push_back(result);
-          }
+            return _memoryDb.GetTableById(oid);
+        }
+    }
+
+    bool DynamoDbDatabase::TableExists(const std::string &region, const std::string &tableName) {
+
+        if (_useDatabase) {
+
+            try {
+
+                int64_t count;
+                auto client = GetClient();
+                mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
+
+                if (!region.empty()) {
+                    count = _tableCollection.count_documents(make_document(kvp("region", region), kvp("name", tableName)));
+                } else {
+                    count = _tableCollection.count_documents(make_document(kvp("name", tableName)));
+                }
+                log_trace << "DynamoDb table exists: " << (count > 0 ? "true" : "false");
+                return count > 0;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+
+        } else {
+
+            return _memoryDb.TableExists(region, tableName);
 
         }
-
-      } catch (const mongocxx::exception &exc) {
-        log_error << "Database exception " << exc.what();
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()));
-      }
-
-    } else {
-
-      items = _memoryDb.ListItems(region, tableName);
     }
 
-    log_trace << "Got DynamoDb item list, size:" << items.size();
-    return items;
-  }
+    std::vector<Entity::DynamoDb::Table> DynamoDbDatabase::ListTables(const std::string &region) {
 
-  void DynamoDbDatabase::DeleteItem(const std::string &region, const std::string &tableName, const std::string &key) {
+        Entity::DynamoDb::TableList tables;
+        if (_useDatabase) {
 
-    if (_useDatabase) {
+            try {
 
-      try {
+                auto client = GetClient();
+                mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
+                if (region.empty()) {
 
-        auto client = GetClient();
-        mongocxx::collection _itemCollection = (*client)[_databaseName]["dynamodb_item"];
-        auto result = _itemCollection.delete_many(make_document(kvp("name", tableName)));
-        log_debug << "DynamoDB item deleted, tableName: " << tableName << " count: "
-                                  << result->deleted_count();
+                    auto tableCursor = _tableCollection.find({});
+                    for (auto table: tableCursor) {
+                        Entity::DynamoDb::Table result;
+                        result.FromDocument(table);
+                        tables.push_back(result);
+                    }
 
-      } catch (const mongocxx::exception &exc) {
-        log_error << "Database exception " << exc.what();
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()));
-      }
+                } else {
 
-    } else {
+                    auto tableCursor = _tableCollection.find(make_document(kvp("region", region)));
+                    for (auto table: tableCursor) {
+                        Entity::DynamoDb::Table result;
+                        result.FromDocument(table);
+                        tables.push_back(result);
+                    }
 
-      _memoryDb.DeleteItem(region, tableName, key);
+                }
 
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+
+        } else {
+
+            tables = _memoryDb.ListTables(region);
+        }
+
+        log_trace << "Got DynamoDb table list, size:" << tables.size();
+        return tables;
     }
-  }
 
-  void DynamoDbDatabase::DeleteAllItems() {
+    long DynamoDbDatabase::CountTables(const std::string &region) {
 
-    if (_useDatabase) {
+        if (_useDatabase) {
 
-      try {
+            try {
 
-        auto client = GetClient();
-        mongocxx::collection _itemCollection = (*client)[_databaseName]["dynamodb_item"];
-        auto result = _itemCollection.delete_many({});
-        log_debug << "DynamoDB items deleted, count: " << result->deleted_count();
+                auto client = GetClient();
+                mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
+                if (region.empty()) {
 
-      } catch (const mongocxx::exception &exc) {
-        log_error << "Database exception " << exc.what();
-        throw Core::DatabaseException("Database exception " + std::string(exc.what()));
-      }
+                    _tableCollection.count_documents({});
 
-    } else {
+                } else {
 
-      _memoryDb.DeleteAllItems();
+                    _tableCollection.count_documents(make_document(kvp("region", region)));
 
+                }
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+
+        } else {
+
+            return _memoryDb.CountTables(region);
+        }
     }
-  }
+
+    Entity::DynamoDb::Table DynamoDbDatabase::CreateOrUpdateTable(const Entity::DynamoDb::Table &table) {
+
+        if (TableExists(table.region, table.name)) {
+
+            return UpdateTable(table);
+
+        } else {
+
+            return CreateTable(table);
+
+        }
+    }
+
+    Entity::DynamoDb::Table DynamoDbDatabase::UpdateTable(const Entity::DynamoDb::Table &table) {
+
+        if (_useDatabase) {
+
+            auto client = GetClient();
+            mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
+            auto session = client->start_session();
+
+            try {
+
+                session.start_transaction();
+                auto result = _tableCollection.replace_one(make_document(kvp("region", table.region), kvp("name", table.name)),
+                                                           table.ToDocument());
+                session.commit_transaction();
+                log_trace << "DynamoDB table updated: " << table.ToString();
+                return GetTableByRegionName(table.region, table.name);
+
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+            }
+
+        } else {
+
+            return _memoryDb.UpdateTable(table);
+
+        }
+    }
+
+    void DynamoDbDatabase::DeleteTable(const std::string &region, const std::string &tableName) {
+
+        if (_useDatabase) {
+
+            auto client = GetClient();
+            mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
+            auto session = client->start_session();
+
+            try {
+
+                session.start_transaction();
+                auto result = _tableCollection.delete_many(make_document(kvp("region", region), kvp("name", tableName)));
+                session.commit_transaction();
+                log_debug << "DynamoDB table deleted, tableName: " << tableName << " region: " << region;
+
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+
+        } else {
+
+            _memoryDb.DeleteTable(tableName);
+
+        }
+    }
+
+    void DynamoDbDatabase::DeleteAllTables() {
+
+        if (_useDatabase) {
+
+            auto client = GetClient();
+            mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
+            auto session = client->start_session();
+
+            try {
+
+                session.start_transaction();
+                auto result = _tableCollection.delete_many({});
+                session.commit_transaction();
+                log_debug << "All DynamoDb tables deleted, count: " << result->deleted_count();
+
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+
+        } else {
+
+            _memoryDb.DeleteAllTables();
+
+        }
+    }
+
+    bool DynamoDbDatabase::ItemExists(const std::string &region, const std::string &tableName, const std::string &key) {
+
+        if (_useDatabase) {
+
+            try {
+
+                int64_t count;
+                auto client = GetClient();
+                mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
+                if (!region.empty()) {
+                    count = _tableCollection.count_documents(make_document(kvp("region", region), kvp("name", tableName)));
+                } else {
+                    count = _tableCollection.count_documents(make_document(kvp("name", tableName)));
+                }
+                log_trace << "DynamoDb table exists: " << (count > 0 ? "true" : "false");
+                return count > 0;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+
+        } else {
+
+            return _memoryDb.ItemExists(region, tableName, key);
+
+        }
+    }
+
+    Entity::DynamoDb::ItemList DynamoDbDatabase::ListItems(const std::string &region, const std::string &tableName) {
+
+        Entity::DynamoDb::ItemList items;
+        if (_useDatabase) {
+
+            auto client = GetClient();
+            mongocxx::collection _itemCollection = (*client)[_databaseName]["dynamodb_item"];
+            try {
+
+                if (region.empty() && tableName.empty()) {
+
+                    auto itemCursor = _itemCollection.find({});
+                    for (auto item: itemCursor) {
+                        Entity::DynamoDb::Item result;
+                        result.FromDocument(item);
+                        items.push_back(result);
+                    }
+
+                } else if (tableName.empty()) {
+
+                    auto itemCursor = _itemCollection.find(make_document(kvp("region", region)));
+                    for (auto item: itemCursor) {
+                        Entity::DynamoDb::Item result;
+                        result.FromDocument(item);
+                        items.push_back(result);
+                    }
+
+                } else {
+
+                    auto itemCursor = _itemCollection.find(make_document(kvp("region", region), kvp("name", tableName)));
+                    for (auto item: itemCursor) {
+                        Entity::DynamoDb::Item result;
+                        result.FromDocument(item);
+                        items.push_back(result);
+                    }
+
+                }
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+
+        } else {
+
+            items = _memoryDb.ListItems(region, tableName);
+        }
+
+        log_trace << "Got DynamoDb item list, size:" << items.size();
+        return items;
+    }
+
+    void DynamoDbDatabase::DeleteItem(const std::string &region, const std::string &tableName, const std::string &key) {
+
+        if (_useDatabase) {
+
+            try {
+
+                auto client = GetClient();
+                mongocxx::collection _itemCollection = (*client)[_databaseName]["dynamodb_item"];
+                auto result = _itemCollection.delete_many(make_document(kvp("name", tableName)));
+                log_debug << "DynamoDB item deleted, tableName: " << tableName << " count: "
+                          << result->deleted_count();
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+
+        } else {
+
+            _memoryDb.DeleteItem(region, tableName, key);
+
+        }
+    }
+
+    void DynamoDbDatabase::DeleteAllItems() {
+
+        if (_useDatabase) {
+
+            try {
+
+                auto client = GetClient();
+                mongocxx::collection _itemCollection = (*client)[_databaseName]["dynamodb_item"];
+                auto result = _itemCollection.delete_many({});
+                log_debug << "DynamoDB items deleted, count: " << result->deleted_count();
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+
+        } else {
+
+            _memoryDb.DeleteAllItems();
+
+        }
+    }
 
 } // namespace AwsMock::Database
