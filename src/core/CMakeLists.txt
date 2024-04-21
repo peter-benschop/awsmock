@@ -20,7 +20,7 @@ set(SOURCES ${UTILS_SOURCES} ${EXCEPTION_SOURCES} ${LOGGING_SOURCES} ${MONITORIN
 add_subdirectory(tst)
 
 # Includes
-include_directories(./include /usr/include /usr/local/include)
+include_directories(./include)
 
 add_library(${LIBRARY} SHARED ${SOURCES})
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})

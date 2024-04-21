@@ -5,8 +5,12 @@
 
 namespace AwsMock::Core {
 
-  PLogStream::PLogStream() {
-    plog::init<plog::TxtFormatter>(plog::verbose, plog::streamStdOut);
-  }
+    LogStream::LogStream() {
+        plog::init<plog::TxtFormatter>(plog::verbose, plog::streamStdOut);
+    }
+
+    LogStream::LogStream(const std::string& severity) {
+        plog::init<plog::TxtFormatter>(plog::severityFromString(severity.c_str()), plog::streamStdOut);
+    }
 
 } // namespace AwsMock::Core

@@ -13,6 +13,7 @@
 
 // Plog includes
 #define PLOG_OMIT_LOG_DEFINES
+
 #include <awsmock/core/logging/plog/Log.h>
 #include <awsmock/core/logging/plog/Init.h>
 #include <awsmock/core/logging/plog/Formatters/TxtFormatter.h>
@@ -20,10 +21,22 @@
 
 namespace AwsMock::Core {
 
-  class PLogStream {
-  public:
-    PLogStream();
-  };
+    class LogStream {
+
+      public:
+
+        /**
+         * Constructor
+         */
+        LogStream();
+
+        /**
+         * Constructor
+         *
+         * @param severity PLog severity string
+         */
+        LogStream(const std::string &severity);
+    };
 
 } // namespace AwsMock::Core
 
