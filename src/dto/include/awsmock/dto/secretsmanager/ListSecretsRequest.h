@@ -40,6 +40,7 @@ namespace AwsMock::Dto::SecretsManager {
    *   "NextToken": "string",
    *   "SortOrder": "string"
    * }
+   * </pre>
    */
   struct ListSecretsRequest {
 

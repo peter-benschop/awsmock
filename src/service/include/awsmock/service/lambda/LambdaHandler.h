@@ -36,9 +36,8 @@ namespace AwsMock::Service {
      * Constructor
      *
      * @param configuration application configuration
-     * @param metricService monitoring module
      */
-    LambdaHandler(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractHandler(), _configuration(configuration), _metricService(metricService), _lambdaService(configuration, metricService) {}
+    LambdaHandler(Core::Configuration &configuration) : AbstractHandler(), _configuration(configuration), _lambdaService(configuration) {}
 
     /**
      * HTTP GET request.
@@ -106,14 +105,9 @@ namespace AwsMock::Service {
   private:
 
     /**
-     * S3 handler configuration
+     * Lambda handler configuration
      */
     Core::Configuration &_configuration;
-
-    /**
-     * Metric module
-     */
-    Core::MetricService &_metricService;
 
     /**
      * lambda module

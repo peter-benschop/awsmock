@@ -28,163 +28,164 @@
 #include <awsmock/service/lambda/LambdaCreator.h>
 #include <awsmock/service/lambda/LambdaExecutor.h>
 #include <awsmock/service/lambda/LambdaHandlerFactory.h>
+#include <awsmock/service/lambda/LambdaMonitoring.h>
 
 #define LAMBDA_DEFAULT_PORT 9503
 #define LAMBDA_DEFAULT_HOST "localhost"
 #define LAMBDA_DEFAULT_QUEUE 150
 #define LAMBDA_DEFAULT_THREADS 50
 #define LAMBDA_DEFAULT_TIMEOUT 120
+#define LAMBDA_DEFAULT_MONITORING_PERIOD 300
 
 namespace AwsMock::Service {
 
-  class LambdaServer : public AbstractServer, public AbstractWorker {
+    class LambdaServer : public AbstractServer, public AbstractWorker {
 
-  public:
+      public:
 
-    /**
-     * Constructor
-     *
-     * @param configuration aws-mock configuration
-     * @param metricService aws-mock monitoring
-     */
-    explicit LambdaServer(Core::Configuration &configuration, Core::MetricService &metricService);
+        /**
+         * Constructor
+         *
+         * @param configuration aws-mock configuration
+         */
+        explicit LambdaServer(Core::Configuration &configuration);
 
-    /**
-     * Destructor
-     */
-    ~LambdaServer() override;
+        /**
+         * Destructor
+         */
+        ~LambdaServer() override;
 
-    /**
-     * Initialization
-     */
-    void Initialize() override;
+        /**
+         * Initialization
+         */
+        void Initialize() override;
 
-    /**
-     * Main method
-     */
-    void Run() override;
+        /**
+         * Main method
+         */
+        void Run() override;
 
-    /**
-     * Shutdown
-     */
-    void Shutdown() override;
+        /**
+         * Shutdown
+         */
+        void Shutdown() override;
 
-  private:
+      private:
 
-    /**
-     * Update metric counters
-     */
-    void UpdateCounters();
+        /**
+         * Delete dangling, stopped containers
+         */
+        void CleanupContainers();
 
-    /**
-     * Delete dangling, stopped containers
-     */
-    void CleanupContainers();
+        /**
+         * Start all lambdas if they are not existing
+         */
+        void StartLambdaFunctions();
 
-    /**
-     * Start all lambdas if they are not existing
-     */
-    void StartLambdaFunctions();
+        /**
+         * Send a lambda create function request.
+         *
+         * @param request HTTP request
+         * @param contentType HTTP content type
+         */
+        void SendCreateFunctionRequest(Dto::Lambda::CreateFunctionRequest &request, const std::string &contentType);
 
-    /**
-     * Send a lambda create function request.
-     *
-     * @param request HTTP request
-     * @param contentType HTTP content type
-     */
-    void SendCreateFunctionRequest(Dto::Lambda::CreateFunctionRequest &request, const std::string &contentType);
+        /**
+         * Returns the code from a local file.
+         *
+         * <p>The code will provided as a Base64 encoded zip file.</p>
+         *
+         * @param lambda lambda to get the code from.
+         * @return Dto::lambda::Code
+         */
+        static Dto::Lambda::Code GetCode(const Database::Entity::Lambda::Lambda &lambda);
 
-    /**
-     * Returns the code from a local file.
-     *
-     * <p>The code will provided as a Base64 encoded zip file.</p>
-     *
-     * @param lambda lambda to get the code from.
-     * @return Dto::lambda::Code
-     */
-    Dto::Lambda::Code GetCode(const Database::Entity::Lambda::Lambda &lambda);
+        /**
+         * Configuration
+         */
+        Core::Configuration &_configuration;
 
-    /**
-     * Configuration
-     */
-    Core::Configuration &_configuration;
+        /**
+         * lambda database
+         */
+        Database::LambdaDatabase &_lambdaDatabase;
 
-    /**
-     * Metric module
-     */
-    Core::MetricService &_metricService;
+        /**
+         * lambda module
+         */
+        std::unique_ptr<Service::LambdaService> _lambdaService;
 
-    /**
-     * lambda database
-     */
-    Database::LambdaDatabase& _lambdaDatabase;
+        /**
+         * Docker module
+         */
+        std::unique_ptr<Service::DockerService> _dockerService;
 
-    /**
-     * lambda module
-     */
-    std::unique_ptr<Service::LambdaService> _lambdaService;
+        /**
+         * Monitoring
+         */
+        std::shared_ptr<LambdaMonitoring> _lambdaMonitoring;
 
-    /**
-     * Docker module
-     */
-    std::unique_ptr<Service::DockerService> _dockerService;
+        /**
+         * Data dir
+         */
+        std::string _dataDir;
 
-    /**
-     * Data dir
-     */
-    std::string _dataDir;
+        /**
+         * AWS region
+         */
+        std::string _region;
 
-    /**
-     * AWS region
-     */
-    std::string _region;
+        /**
+         * Sleeping period in ms
+         */
+        int _period;
 
-    /**
-     * Sleeping period in ms
-     */
-    int _period;
+        /**
+         * Rest port
+         */
+        int _port;
 
-    /**
-     * Rest port
-     */
-    int _port;
+        /**
+         * Rest host
+         */
+        std::string _host;
 
-    /**
-     * Rest host
-     */
-    std::string _host;
+        /**
+         * HTTP max message queue length
+         */
+        int _maxQueueLength;
 
-    /**
-     * HTTP max message queue length
-     */
-    int _maxQueueLength;
+        /**
+         * HTTP max concurrent connection
+         */
+        int _maxThreads;
 
-    /**
-     * HTTP max concurrent connection
-     */
-    int _maxThreads;
+        /**
+         * HTTP request timeout in seconds
+         */
+        int _requestTimeout;
 
-    /**
-     * HTTP request timeout in seconds
-     */
-    int _requestTimeout;
+        /**
+         * Lambda module host
+         */
+        std::string _lambdaServiceHost;
 
-    /**
-     * Lambda module host
-     */
-    std::string _lambdaServiceHost;
+        /**
+         * Lambda module port
+         */
+        int _lambdaServicePort;
 
-    /**
-     * Lambda module port
-     */
-    int _lambdaServicePort;
+        /**
+         * Module name
+         */
+        std::string _module;
 
-    /**
-     * Module name
-     */
-    std::string _module;
+        /**
+         * Monitoring period
+         */
+        int _monitoringPeriod;
 
-  };
+    };
 
 } // namespace AwsMock::Service
 

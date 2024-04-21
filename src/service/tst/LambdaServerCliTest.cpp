@@ -60,9 +60,8 @@ namespace AwsMock::Service {
 
     std::string _endpoint, _accountId;
     Core::Configuration& _configuration = Core::Configuration().instance();
-    Core::MetricService& _metricService = Core::MetricService::instance();
     Database::LambdaDatabase& _database = Database::LambdaDatabase::instance();
-    LambdaServer _lambdaServer = LambdaServer(_configuration, _metricService);
+    LambdaServer _lambdaServer = LambdaServer(_configuration);
   };
 
   TEST_F(LambdaServerCliTest, LambdaCreateTest) {

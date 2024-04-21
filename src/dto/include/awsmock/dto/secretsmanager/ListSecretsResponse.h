@@ -36,6 +36,7 @@ namespace AwsMock::Dto::SecretsManager {
    *    .....
    *   ]
    * }
+   * </pre>
    */
   struct ListSecretsResponse {
 

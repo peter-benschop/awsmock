@@ -258,7 +258,7 @@ namespace AwsMock {
                     _snsServer->Start();
                     _serverMap[module.name] = _snsServer;
                 } else if (module.name == "lambda" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                    _lambdaServer = std::make_shared<Service::LambdaServer>(_configuration, _metricService);
+                    _lambdaServer = std::make_shared<Service::LambdaServer>(_configuration);
                     _lambdaServer->Start();
                     _serverMap[module.name] = _lambdaServer;
                 } else if (module.name == "transfer" &&

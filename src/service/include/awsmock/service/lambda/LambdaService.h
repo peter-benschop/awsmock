@@ -78,9 +78,8 @@ namespace AwsMock::Service {
      * Constructor
      *
      * @param configuration module configuration
-     * @param metricService aws-mock monitoring module
      */
-    explicit LambdaService(Core::Configuration &configuration, Core::MetricService &metricService);
+    explicit LambdaService(Core::Configuration &configuration);
 
     /**
      * Create lambda function
@@ -202,11 +201,6 @@ namespace AwsMock::Service {
      * Configuration
      */
     Core::Configuration &_configuration;
-
-    /**
-     * Monitoring
-     */
-    Core::MetricService &_metricService;
 
     /**
      * lambda database connection

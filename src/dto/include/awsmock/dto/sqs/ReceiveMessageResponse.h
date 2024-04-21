@@ -55,7 +55,7 @@ namespace AwsMock::Dto::SQS {
    *      }
    *   ]
    *   }
-   * <pre>
+   * </pre>
    */
   struct ReceiveMessageResponse {
 

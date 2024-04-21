@@ -129,11 +129,10 @@ namespace AwsMock::Service {
 
     std::string _snsEndpoint, _sqsEndpoint;
     Core::Configuration& _configuration = Core::Configuration::instance();
-    Core::MetricService& _metricService = Core::MetricService::instance();
     Database::SNSDatabase& _snsDatabase = Database::SNSDatabase::instance();
     Database::SQSDatabase& _sqsDatabase = Database::SQSDatabase::instance();
-    SNSServer _snsServer = SNSServer(_configuration, _metricService);
-    SQSServer _sqsServer = SQSServer(_configuration, _metricService);
+    SNSServer _snsServer = SNSServer(_configuration);
+    SQSServer _sqsServer = SQSServer(_configuration);
   };
 
   TEST_F(SNSServerCliTest, TopicCreateTest) {

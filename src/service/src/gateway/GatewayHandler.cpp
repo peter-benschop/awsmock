@@ -69,7 +69,7 @@ namespace AwsMock::Service {
             }
 
             case LAMBDA: {
-                CallAsyncGet(LambdaHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncGet(LambdaHandler(_configuration), request, response, region, user);
                 break;
             }
 
@@ -121,7 +121,7 @@ namespace AwsMock::Service {
             }
 
             case LAMBDA: {
-                CallAsyncPut(LambdaHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncPut(LambdaHandler(_configuration), request, response, region, user);
                 break;
             }
 
@@ -172,7 +172,7 @@ namespace AwsMock::Service {
             }
 
             case LAMBDA: {
-                CallAsyncPost(LambdaHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncPost(LambdaHandler(_configuration), request, response, region, user);
                 break;
             }
 
@@ -224,7 +224,7 @@ namespace AwsMock::Service {
             }
 
             case LAMBDA: {
-                CallAsyncDelete(LambdaHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncDelete(LambdaHandler(_configuration), request, response, region, user);
                 break;
             }
 
@@ -276,7 +276,7 @@ namespace AwsMock::Service {
             }
 
             case LAMBDA: {
-                CallAsyncHead(LambdaHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncHead(LambdaHandler(_configuration), request, response, region, user);
                 break;
             }
 

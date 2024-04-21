@@ -18,8 +18,7 @@ namespace AwsMock::Service {
     std::thread(&LambdaExecutor::SendInvocationRequest, u, b).detach();
   }
 
-  LambdaService::LambdaService(Core::Configuration &configuration, Core::MetricService &metricService)
-    : _configuration(configuration), _metricService(metricService), _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()) {
+  LambdaService::LambdaService(Core::Configuration &configuration) : _configuration(configuration), _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()) {
 
     // Initialize environment
     _accountId = _configuration.getString("awsmock.account.userPoolId", "000000000000");
