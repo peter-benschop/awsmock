@@ -144,7 +144,7 @@ namespace AwsMock::Service {
      * @param region AWS region
      * @param user AWS user
      */
-    void SetHeaders(Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user);
+    static void SetHeaders(Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user);
 
     /**
      * S3 handler configuration

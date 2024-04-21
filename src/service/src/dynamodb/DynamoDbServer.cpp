@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-  DynamoDbServer::DynamoDbServer(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractWorker(configuration), AbstractServer(configuration, "dynamodb"), _configuration(configuration), _metricService(metricService), _module("dynamodb"),
+  DynamoDbServer::DynamoDbServer(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractWorker(configuration), AbstractServer(configuration, "dynamodb", 10), _configuration(configuration), _metricService(metricService), _module("dynamodb"),
       _dynamoDbDatabase(Database::DynamoDbDatabase::instance()) {
 
     // Get HTTP configuration values

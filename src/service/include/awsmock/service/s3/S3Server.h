@@ -19,119 +19,111 @@
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/common/AbstractWorker.h>
 #include <awsmock/service/s3/S3HandlerFactory.h>
+#include <awsmock/service/s3/S3Monitoring.h>
 
 #define S3_DEFAULT_PORT 9500
 #define S3_DEFAULT_HOST "localhost"
 #define S3_DEFAULT_QUEUE_SIZE 250
 #define S3_DEFAULT_MAX_THREADS 50
 #define S3_DEFAULT_TIMEOUT 900
+#define S3_DEFAULT_MONITORING_PERIOD 300
 
 namespace AwsMock::Service {
 
-  /**
-   * S3 HTTP server
-   *
-   * <p>
-   * The S3 HTTP server gates the requests from the gateway, which acts like a API gateway. The S3 default port is 9500 and can set in the AwsMOck configuration file
-   * <i>/etc/aws-mock.properties</i>
-   * </p>
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  class S3Server : public AbstractServer, public AbstractWorker {
-
-  public:
-
     /**
-     * Constructor
+     * S3 HTTP server
      *
-     * @param configuration application configuration
-     * @param metricService monitoring module
+     * <p>
+     * The S3 HTTP server gates the requests from the gateway, which acts like a API gateway. The S3 default port is 9500 and can set in the AwsMOck configuration file
+     * <i>/etc/aws-mock.properties</i>
+     * </p>
+     *
+     * @author jens.vogt@opitz-consulting.com
      */
-    explicit S3Server(Core::Configuration &configuration, Core::MetricService &metricService);
+    class S3Server : public AbstractServer, public AbstractWorker {
 
-    /**
-     * Timer initialization
-     */
-    void Initialize() override;
+      public:
 
-    /**
-     * Timer main method
-     */
-    void Run() override;
+        /**
+         * Constructor
+         *
+         * @param configuration application configuration
+         */
+        explicit S3Server(Core::Configuration &configuration);
 
-    /**
-     * Shutdown
-     */
-    void Shutdown() override;
+        /**
+         * Timer initialization
+         */
+        void Initialize() override;
 
-  private:
+        /**
+         * Timer main method
+         */
+        void Run() override;
 
-    /**
-     * Update metric counters
-     */
-    void UpdateCounters();
+        /**
+         * Shutdown
+         */
+        void Shutdown() override;
 
-    /**
-     * Rest port
-     */
-    int _port;
+      private:
 
-    /**
-     * Rest host
-     */
-    std::string _host;
+        /**
+         * Rest port
+         */
+        int _port;
 
-    /**
-    * Application configuration
-    */
-    Core::Configuration &_configuration;
+        /**
+         * Rest host
+         */
+        std::string _host;
 
-    /**
-     * Metric module
-     */
-    Core::MetricService &_metricService;
+        /**
+        * Application configuration
+        */
+        Core::Configuration &_configuration;
 
-    /**
-     * S3 database
-     */
-    Database::S3Database &_s3Database;
+        /**
+         * HTTP manager instance
+         */
+        std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
 
-    /**
-     * HTTP manager instance
-     */
-    std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
+        /**
+         * S3 monitoring
+         */
+        std::shared_ptr<S3Monitoring> _s3Monitoring;
 
-    /**
-     * HTTP max message queue length
-     */
-    int _maxQueueLength;
+        /**
+         * HTTP max message queue length
+         */
+        int _maxQueueLength;
 
-    /**
-     * HTTP max concurrent connection
-     */
-    int _maxThreads;
+        /**
+         * HTTP max concurrent connection
+         */
+        int _maxThreads;
 
-    /**
-     * HTTP request timeout in seconds
-     */
-    int _requestTimeout;
+        /**
+         * HTTP request timeout in seconds
+         */
+        int _requestTimeout;
 
-    /**
-     * Sleeping period in ms
-     */
-    int _period;
+        /**
+         * Data directory
+         */
+        std::string _dataDir;
 
-    /**
-     * Data directory
-     */
-    std::string _dataDir;
+        /**
+         * S3 module name
+         */
+        std::string _module;
 
-    /**
-     * S3 module name
-     */
-    std::string _module;
-  };
+        /**
+         * SQS monitoring period
+         */
+        int _monitoringPeriod;
+
+    };
 
 } // namespace AwsMock::Service
 

@@ -50,9 +50,8 @@ namespace AwsMock::Service {
      * Constructor
      *
      * @param configuration application configuration
-     * @param metricService monitoring module
      */
-    SQSCmdHandler(Core::Configuration &configuration, Core::MetricService &metricService);
+    SQSCmdHandler(Core::Configuration &configuration);
 
   protected:
 
@@ -104,11 +103,6 @@ namespace AwsMock::Service {
      * ImageHandler import configuration
      */
     Core::Configuration &_configuration;
-
-    /**
-     * Metric module
-     */
-    Core::MetricService &_metricService;
 
     /**
      * SQS module

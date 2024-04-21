@@ -24,119 +24,103 @@
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/sqs/SQSHandlerFactory.h>
+#include <awsmock/service/sqs/SQSMonitoring.h>
 
 #define SQS_DEFAULT_PORT 9501
 #define SQS_DEFAULT_HOST "localhost"
 #define SQS_DEFAULT_QUEUE_LENGTH  250
 #define SQS_DEFAULT_THREADS 50
 #define SQS_DEFAULT_TIMEOUT 120
+#define SQS_DEFAULT_MONITORING_PERIOD 300
 
 namespace AwsMock::Service {
 
-  class SQSServer : public AbstractServer {
+    class SQSServer : public AbstractServer {
 
-  public:
+      public:
 
-    /**
-     * Constructor
-     *
-     * @param configuration aws-mock configuration
-     * @param metricService aws-mock monitoring module
-     */
-    explicit SQSServer(Core::Configuration &configuration, Core::MetricService &metricService);
+        /**
+         * Constructor
+         *
+         * @param configuration aws-mock configuration
+         */
+        explicit SQSServer(Core::Configuration &configuration);
 
-    /**
-     * Initialization
-     */
-    void Initialize() override;
+        /**
+         * Initialization
+         */
+        void Initialize() override;
 
-    /**
-     * Main method
-     */
-    void Run() override;
+        /**
+         * Main method
+         */
+        void Run() override;
 
-    /**
-     * Shutdown
-     */
-    void Shutdown() override;
+        /**
+         * Shutdown
+         */
+        void Shutdown() override;
 
-  private:
+      private:
 
-    /**
-     * Update metric counters
-     */
-    void UpdateCounters();
+        /**
+         * Reset messages
+         *
+         * <p>Loops over all SQS queues and sets the state to INITIAL in case the visibilityTimeout timeout has been reached. Also the retry count in increased by one.</p>
+         * <p>Checks also the expiration date and removed the messages, which are older than the max retention period.</>
+         */
+        void ResetMessages();
 
-    /**
-     * Reset messages
-     *
-     * <p>Loops over all SQS queues and sets the state to INITIAL in case the visibilityTimeout timeout has been reached. Also the retry count in increased by one.</p>
-     * <p>Checks also the expiration date and removed the messages, which are older than the max retention period.</>
-     */
-    void ResetMessages();
+        /**
+         * Configuration
+         */
+        Core::Configuration &_configuration;
 
-    /**
-     * Check the retention period of messages.
-     *
-     * <p>Deletes all message which are older than the retention period. Rge default retention period is 14 days, but can ve change on a per queue level.</p>
-     */
-    void MessageRetention();
+        /**
+         * SQS database
+         */
+        Database::SQSDatabase &_sqsDatabase;
 
-    /**
-     * Configuration
-     */
-    Core::Configuration &_configuration;
+        /**
+         * SQS monitoring
+         */
+        std::shared_ptr<SQSMonitoring> _sqsMonitoring;
 
-    /**
-     * Metric module
-     */
-    Core::MetricService &_metricService;
+        /**
+         * AWS region
+         */
+        std::string _region;
 
-    /**
-     * Service database
-     */
-    Database::ModuleDatabase &_serviceDatabase;
+        /**
+         * Rest port
+         */
+        int _port;
 
-    /**
-     * S3 module
-     */
-    Database::SQSDatabase& _sqsDatabase;
+        /**
+         * Rest host
+         */
+        std::string _host;
 
-    /**
-     * AWS region
-     */
-    std::string _region;
+        /**
+         * HTTP max message queue length
+         */
+        int _maxQueueLength;
 
-    /**
-     * Sleeping period in ms
-     */
-    int _period;
+        /**
+         * HTTP max concurrent connections
+         */
+        int _maxThreads;
 
-    /**
-     * Rest port
-     */
-    int _port;
+        /**
+         * HTTP request timeout in seconds
+         */
+        int _requestTimeout;
 
-    /**
-     * Rest host
-     */
-    std::string _host;
-
-    /**
-     * HTTP max message queue length
-     */
-    int _maxQueueLength;
-
-    /**
-     * HTTP max concurrent connections
-     */
-    int _maxThreads;
-
-    /**
-     * HTTP request timeout in seconds
-     */
-    int _requestTimeout;
-  };
+        /**
+         * SQS monitoring period
+         */
+        int _monitoringPeriod;
+    };
 
 } // namespace AwsMock::Service
 

@@ -22,6 +22,7 @@
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/sns/SNSHandlerFactory.h>
+#include <awsmock/service/sns/SNSMonitoring.h>
 
 #define SNS_DEFAULT_PORT 9502
 #define SNS_DEFAULT_HOST "localhost"
@@ -29,6 +30,7 @@
 #define SNS_DEFAULT_THREADS 50
 #define SNS_DEFAULT_TIMEOUT 120
 #define SNS_DEFAULT_MESSAGE_TIMEOUT 14
+#define SNS_DEFAULT_MONITORING_PERIOD 300
 
 namespace AwsMock::Service {
 
@@ -40,9 +42,8 @@ namespace AwsMock::Service {
          * Constructor
          *
          * @param configuration aws-mock configuration
-         * @param metricService aws-mock monitoring module
          */
-        explicit SNSServer(Core::Configuration &configuration, Core::MetricService &metricService);
+        explicit SNSServer(Core::Configuration &configuration);
 
         /**
          * Initialization
@@ -62,11 +63,6 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Update metric counters
-         */
-        void UpdateCounters();
-
-        /**
          * Delete old messages
          */
         void DeleteOldMessages();
@@ -77,14 +73,14 @@ namespace AwsMock::Service {
         Core::Configuration &_configuration;
 
         /**
-         * Metric module
-         */
-        Core::MetricService &_metricService;
-
-        /**
-         * S3 module
+         * SNS database
          */
         Database::SNSDatabase &_snsDatabase;
+
+        /**
+         * SNS monitoring
+         */
+        std::shared_ptr<SNSMonitoring> _snsMonitoring;
 
         /**
          * AWS region
@@ -125,6 +121,12 @@ namespace AwsMock::Service {
          * Message timeout in seconds
          */
         int _messageTimeout;
+
+        /**
+         * SNS monitoring period
+         */
+        int _monitoringPeriod;
+
     };
 
 } // namespace AwsMock::Service

@@ -19,65 +19,78 @@
 
 namespace AwsMock::Core {
 
-  class Timer {
+    class Timer {
 
-  public:
+      public:
 
-    /**
-     * Constructor
-     *
-     * @param name timer name
-     * @param timeout timeout in seconds
-     */
-    explicit Timer(std::string name, int timeout);
+        /**
+         * Constructor
+         *
+         * @param name timer name
+         * @param timeout timeout in seconds
+         */
+        explicit Timer(std::string name, int timeout) : _name(std::move(name)), _timeout(timeout) {}
 
-    /**
-     * Start the task
-     */
-    void Start();
+        /**
+         * Constructor
+         *
+         * @param name timer name
+         * @param timeout timeout in seconds
+         */
+        explicit Timer(std::string name) : _name(std::move(name)) {}
 
-    /**
-     * Stop the task
-     */
-    void Stop();
+        /**
+         * Start the task
+         */
+        void Start();
 
-    /**
-     * Main loop
-     */
-    virtual void Initialize() = 0;
+        /**
+         * Start the task
+         */
+        void Start(int timeout);
 
-    /**
-     * Main loop
-     */
-    virtual void Run() = 0;
+        /**
+         * Stop the task
+         */
+        void Stop();
 
-    /**
-     * Shutdown
-     */
-    virtual void Shutdown() = 0;
+        /**
+         * Main loop
+         */
+        virtual void Initialize() = 0;
 
-  private:
+        /**
+         * Main loop
+         */
+        virtual void Run() = 0;
 
-    /**
-     * Timer name
-     */
-    std::string _name;
+        /**
+         * Shutdown
+         */
+        virtual void Shutdown() = 0;
 
-    /**
-     * Loop timeout
-     */
-    int _timeout;
+      private:
 
-    /**
-     * Promise for stopping thread
-     */
-    std::promise<void> _stop;
+        /**
+         * Timer name
+         */
+        std::string _name;
 
-    /**
-     * Thread handle
-     */
-    std::future<void> _thread_handle;
-  };
+        /**
+         * Loop timeout
+         */
+        int _timeout;
+
+        /**
+         * Promise for stopping thread
+         */
+        std::promise<void> _stop;
+
+        /**
+         * Thread handle
+         */
+        std::future<void> _thread_handle;
+    };
 }
 
 #endif //AWSMOCK_CORE_TASK_H

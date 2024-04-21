@@ -11,8 +11,8 @@ namespace AwsMock {
 
   void ModuleHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]] const std::string &region, [[maybe_unused]] const std::string &user) {
 
-    Core::MetricServiceTimer measure(_metricService, GATEWAY_GET_TIMER);
-    _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "GET");
+    Core::MetricServiceTimer measure(_metricService, MODULE_GET_TIMER);
+    _metricService.IncrementCounter(MODULE_COUNTER, "method", "GET");
     log_debug << "Module GET request, URI: " + request.getURI() << " region: " << region << " user: " + user;
 
     std::string action = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
@@ -76,8 +76,8 @@ namespace AwsMock {
   }
 
   void ModuleHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]] const std::string &region, [[maybe_unused]] const std::string &user) {
-    Core::MetricServiceTimer measure(_metricService, GATEWAY_PUT_TIMER);
-    _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "PUT");
+    Core::MetricServiceTimer measure(_metricService, MODULE_PUT_TIMER);
+    _metricService.IncrementCounter(MODULE_COUNTER, "method", "PUT");
     log_debug << "Module PUT request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 
     try {
@@ -165,29 +165,29 @@ namespace AwsMock {
   }
 
   void ModuleHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]] const std::string &region, [[maybe_unused]] const std::string &user) {
-    Core::MetricServiceTimer measure(_metricService, GATEWAY_POST_TIMER);
-    _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "POST");
+    Core::MetricServiceTimer measure(_metricService, MODULE_POST_TIMER);
+    _metricService.IncrementCounter(MODULE_COUNTER, "method", "POST");
     log_debug << "Module POST request, URI: " << request.getURI() << " region: " << region << " user: " << user;
     SendOkResponse(response);
   }
 
   void ModuleHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]] const std::string &region, [[maybe_unused]] const std::string &user) {
-    Core::MetricServiceTimer measure(_metricService, GATEWAY_DELETE_TIMER);
-    _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "DELETE");
+    Core::MetricServiceTimer measure(_metricService, MODULE_DELETE_TIMER);
+    _metricService.IncrementCounter(MODULE_COUNTER, "method", "DELETE");
     log_debug << "Module DELETE request, URI: " + request.getURI() << " region: " << region << " user: " << user;
     SendOkResponse(response);
   }
 
   void ModuleHandler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]] const std::string &region, [[maybe_unused]] const std::string &user) {
-    Core::MetricServiceTimer measure(_metricService, GATEWAY_HEAD_TIMER);
-    _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "HEAD");
+    Core::MetricServiceTimer measure(_metricService, MODULE_HEAD_TIMER);
+    _metricService.IncrementCounter(MODULE_COUNTER, "method", "HEAD");
     log_debug << "Module HEAD request, address: " << request.clientAddress().toString();
     SendOkResponse(response);
   }
 
   void ModuleHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
-    Core::MetricServiceTimer measure(_metricService, GATEWAY_OPTIONS_TIMER);
-    _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "OPTIONS");
+    Core::MetricServiceTimer measure(_metricService, MODULE_OPTIONS_TIMER);
+    _metricService.IncrementCounter(MODULE_COUNTER, "method", "OPTIONS");
     log_debug << "Module OPTIONS request";
 
     response.set("Allow", "GET, PUT, POST, DELETE, HEAD, OPTIONS");

@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
 
   LambdaServer::LambdaServer(Core::Configuration &configuration, Core::MetricService &metricService)
-    : AbstractWorker(configuration), AbstractServer(configuration, "lambda"), _configuration(configuration), _metricService(metricService), _lambdaDatabase(Database::LambdaDatabase::instance()), _module("lambda") {
+    : AbstractWorker(configuration), AbstractServer(configuration, "lambda", 10), _configuration(configuration), _metricService(metricService), _lambdaDatabase(Database::LambdaDatabase::instance()), _module("lambda") {
 
     // Get HTTP configuration values
     _port = _configuration.getInt("awsmock.service.lambda.port", LAMBDA_DEFAULT_PORT);

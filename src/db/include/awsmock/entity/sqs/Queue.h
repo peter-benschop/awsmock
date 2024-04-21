@@ -103,7 +103,7 @@ namespace AwsMock::Database::Entity::SQS {
      *
      * @param mResult MongoDB document.
      */
-    [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+    Entity::SQS::Queue FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
     /**
      * Converts the entity to a JSON object

@@ -52,9 +52,8 @@ namespace AwsMock::Service {
      * Constructor
      *
      * @param configuration application configuration
-     * @param metricService monitoring module
      */
-    SQSHandler(Core::Configuration &configuration, Core::MetricService &metricService);
+    SQSHandler(Core::Configuration &configuration);
 
     /**
        * HTTP POST request.
