@@ -28,93 +28,104 @@
 #define SNS_DEFAULT_QUEUE_LENGTH  250
 #define SNS_DEFAULT_THREADS 50
 #define SNS_DEFAULT_TIMEOUT 120
+#define SNS_DEFAULT_MESSAGE_TIMEOUT 14
 
 namespace AwsMock::Service {
 
-  class SNSServer : public AbstractServer {
+    class SNSServer : public AbstractServer {
 
-  public:
+      public:
 
-    /**
-     * Constructor
-     *
-     * @param configuration aws-mock configuration
-     * @param metricService aws-mock monitoring module
-     */
-    explicit SNSServer(Core::Configuration &configuration, Core::MetricService &metricService);
+        /**
+         * Constructor
+         *
+         * @param configuration aws-mock configuration
+         * @param metricService aws-mock monitoring module
+         */
+        explicit SNSServer(Core::Configuration &configuration, Core::MetricService &metricService);
 
-    /**
-     * Initialization
-     */
-    void Initialize() override;
+        /**
+         * Initialization
+         */
+        void Initialize() override;
 
-    /**
-     * Main method
-     */
-    void Run() override;
+        /**
+         * Main method
+         */
+        void Run() override;
 
-    /**
-     * Shutdown
-     */
-    void Shutdown() override;
+        /**
+         * Shutdown
+         */
+        void Shutdown() override;
 
-  private:
+      private:
 
-    /**
-     * Update metric counters
-     */
-    void UpdateCounters();
+        /**
+         * Update metric counters
+         */
+        void UpdateCounters();
 
-    /**
-     * Configuration
-     */
-    Core::Configuration &_configuration;
+        /**
+         * Delete old messages
+         */
+        void DeleteOldMessages();
 
-    /**
-     * Metric module
-     */
-    Core::MetricService &_metricService;
+        /**
+         * Configuration
+         */
+        Core::Configuration &_configuration;
 
-    /**
-     * S3 module
-     */
-    Database::SNSDatabase& _snsDatabase;
+        /**
+         * Metric module
+         */
+        Core::MetricService &_metricService;
 
-    /**
-     * AWS region
-     */
-    std::string _region;
+        /**
+         * S3 module
+         */
+        Database::SNSDatabase &_snsDatabase;
 
-    /**
-     * Sleeping period in ms
-     */
-    int _period;
+        /**
+         * AWS region
+         */
+        std::string _region;
 
-    /**
-     * Rest port
-     */
-    int _port;
+        /**
+         * Sleeping period in ms
+         */
+        int _period;
 
-    /**
-     * Rest host
-     */
-    std::string _host;
+        /**
+         * Rest port
+         */
+        int _port;
 
-    /**
-     * HTTP max message queue length
-     */
-    int _maxQueueLength;
+        /**
+         * Rest host
+         */
+        std::string _host;
 
-    /**
-     * HTTP max concurrent connections
-     */
-    int _maxThreads;
+        /**
+         * HTTP max message queue length
+         */
+        int _maxQueueLength;
 
-    /**
-     * HTTP request timeout in seconds
-     */
-    int _requestTimeout;
-  };
+        /**
+         * HTTP max concurrent connections
+         */
+        int _maxThreads;
+
+        /**
+         * HTTP request timeout in seconds
+         */
+        int _requestTimeout;
+
+        /**
+         * Message timeout in seconds
+         */
+        int _messageTimeout;
+    };
 
 } // namespace AwsMock::Service
 
