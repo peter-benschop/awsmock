@@ -36,7 +36,7 @@ namespace AwsMock::Database {
       /**
        * Constructor
        */
-      TransferMemoryDb();
+      TransferMemoryDb() = default;
 
       /**
        * Singleton instance

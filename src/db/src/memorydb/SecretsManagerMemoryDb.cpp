@@ -6,8 +6,6 @@
 
 namespace AwsMock::Database {
 
-  SecretsManagerMemoryDb::SecretsManagerMemoryDb() {}
-
   bool SecretsManagerMemoryDb::SecretExists(const std::string &region, const std::string &name) {
 
     return find_if(_secrets.begin(), _secrets.end(), [region, name](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {

@@ -48,10 +48,9 @@ namespace AwsMock::Service {
 
       std::string _endpoint, _baseCommand;
       Core::Configuration& _configuration = Core::Configuration::instance();
-      Core::MetricService& _metricService = Core::MetricService::instance();
       Database::DynamoDbDatabase& _database = Database::DynamoDbDatabase::instance();
-      DynamoDbServer _dynamoDbServer = DynamoDbServer(_configuration, _metricService);
-      DynamoDbService _dynamoDbService = DynamoDbService(_configuration, _metricService);
+      DynamoDbServer _dynamoDbServer = DynamoDbServer(_configuration);
+      DynamoDbService _dynamoDbService = DynamoDbService(_configuration);
   };
 
   TEST_F(DynamoDbServerJavaTest, TableCreateTest) {

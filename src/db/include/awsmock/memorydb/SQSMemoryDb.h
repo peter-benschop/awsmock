@@ -35,7 +35,7 @@ namespace AwsMock::Database {
       /**
        * Constructor
        */
-      SQSMemoryDb();
+      SQSMemoryDb() = default;
 
       /**
        * Singleton instance

@@ -6,8 +6,6 @@
 
 namespace AwsMock::Database {
 
-  S3MemoryDb::S3MemoryDb() {}
-
   bool S3MemoryDb::BucketExists(const std::string &region, const std::string &name) {
 
     return find_if(_buckets.begin(),

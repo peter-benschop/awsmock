@@ -38,4 +38,6 @@
 
 #define LAMBDA_FUNCTION_COUNT "lambda_function_count_total"
 
+#define DYNAMODB_TABLE_COUNT "dynamodb_table_count_total"
+
 #endif  // AWSMOCK_CORE_METRIC_DEFINITION_H

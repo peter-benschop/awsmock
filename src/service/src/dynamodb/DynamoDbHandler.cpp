@@ -3,12 +3,9 @@
 
 namespace AwsMock::Service {
 
-  DynamoDbHandler::DynamoDbHandler(Core::Configuration &configuration, Core::MetricService &metricService) : DynamoDbCmdHandler(configuration, metricService), _configuration(configuration), _metricService(metricService),
-                                                                                                             _dynamoDbService(configuration, metricService) {
-  }
+  DynamoDbHandler::DynamoDbHandler(Core::Configuration &configuration) : DynamoDbCmdHandler(configuration), _configuration(configuration), _dynamoDbService(configuration) {}
 
   void DynamoDbHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, [[maybe_unused]]const std::string &user) {
-    _metricService.IncrementCounter("gateway_get_counter");
     log_trace << "DynamoDb GET request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 
     try {
@@ -24,7 +21,6 @@ namespace AwsMock::Service {
   }
 
   void DynamoDbHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
-    _metricService.IncrementCounter("gateway_put_counter");
     log_trace << "DynamoDb PUT request, URI: " << request.getURI() << " region: " << region << " user: " + user;
 
     try {
@@ -38,7 +34,6 @@ namespace AwsMock::Service {
   }
 
   void DynamoDbHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    _metricService.IncrementCounter("gateway_post_counter");
     log_trace << "DynamoDb POST request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 
     Dto::Common::DynamoDbClientCommand clientCommand;
@@ -48,7 +43,6 @@ namespace AwsMock::Service {
   }
 
   void DynamoDbHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    _metricService.IncrementCounter("gateway_delete_counter");
     log_trace << "DynamoDb DELETE request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 
     try {
@@ -62,7 +56,6 @@ namespace AwsMock::Service {
   }
 
   void DynamoDbHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
-    _metricService.IncrementCounter("gateway_options_counter");
     log_trace << "DynamoDb OPTIONS request";
 
     response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
@@ -74,7 +67,6 @@ namespace AwsMock::Service {
   }
 
   void DynamoDbHandler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-    _metricService.IncrementCounter("gateway_head_counter");
     log_trace << "DynamoDb HEAD request, address: " << request.clientAddress().toString();
 
     try {

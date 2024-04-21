@@ -3,7 +3,7 @@
 
 namespace AwsMock::Service {
 
-  DynamoDbCmdHandler::DynamoDbCmdHandler(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractHandler(), _configuration(configuration), _metricService(metricService), _dynamoDbService(configuration, metricService) {
+  DynamoDbCmdHandler::DynamoDbCmdHandler(Core::Configuration &configuration) : AbstractHandler(), _configuration(configuration), _dynamoDbService(configuration) {
   }
 
   void DynamoDbCmdHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::DynamoDbClientCommand &clientCommand) {

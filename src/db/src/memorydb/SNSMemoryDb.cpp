@@ -6,7 +6,6 @@
 
 namespace AwsMock::Database {
 
-
     bool SNSMemoryDb::TopicExists(const std::string &region, const std::string &name) {
 
         return find_if(_topics.begin(),

@@ -6,7 +6,9 @@
 
 namespace AwsMock::Service {
 
-    void S3Monitoring::Initialize() {}
+    void S3Monitoring::Initialize() {
+        UpdateCounter();
+    }
 
     void S3Monitoring::Run() {
         UpdateCounter();

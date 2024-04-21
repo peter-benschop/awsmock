@@ -34,9 +34,8 @@ namespace AwsMock::Service {
      * Constructor
      *
      * @param configuration application configuration
-     * @param metricService monitoring module
      */
-    DynamoDbCmdHandler(Core::Configuration &configuration, Core::MetricService &metricService);
+    DynamoDbCmdHandler(Core::Configuration &configuration);
 
   protected:
 
@@ -65,11 +64,6 @@ namespace AwsMock::Service {
      * S3 handler configuration
      */
     Core::Configuration &_configuration;
-
-    /**
-     * Metric module
-     */
-    Core::MetricService &_metricService;
 
     /**
      * DynamoDB module

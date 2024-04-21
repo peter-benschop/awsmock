@@ -27,153 +27,153 @@
 
 namespace AwsMock::Database {
 
-  /**
-   * Lambda in-memory database.
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  class LambdaMemoryDb {
-
-  public:
-
     /**
-     * Constructor
-     */
-    LambdaMemoryDb();
-
-    /**
-     * Singleton instance
-     */
-    static LambdaMemoryDb &instance() {
-      static Poco::SingletonHolder<LambdaMemoryDb> sh;
-      return *sh.get();
-    }
-
-    /**
-     * Check existence of lambda
+     * Lambda in-memory database.
      *
-     * @param region AWS region name
-     * @param function AWS function
-     * @param runtime lambda runtime
-     * @return true if lambda already exists
-     * @throws DatabaseException
+     * @author jens.vogt@opitz-consulting.com
      */
-    bool LambdaExists(const std::string &region, const std::string &function, const std::string &runtime);
+    class LambdaMemoryDb {
 
-    /**
-     * Check existence of lambda
-     *
-     * @param lambda AWS function
-     * @return true if lambda already exists
-     * @throws DatabaseException
-     */
-    bool LambdaExists(const Entity::Lambda::Lambda &lambda);
+      public:
 
-    /**
-     * Check existence of lambda
-     *
-     * @param function AWS function
-     * @return true if lambda already exists
-     * @throws DatabaseException
-     */
-    bool LambdaExists(const std::string &function);
+        /**
+         * Constructor
+         */
+        LambdaMemoryDb() = default;
 
-    /**
-     * Check existence of lambda
-     *
-     * @param arn AWS ARN
-     * @return true if lambda exists
-     * @throws DatabaseException
-     */
-    bool LambdaExistsByArn(const std::string &arn);
+        /**
+         * Singleton instance
+         */
+        static LambdaMemoryDb &instance() {
+            static Poco::SingletonHolder<LambdaMemoryDb> sh;
+            return *sh.get();
+        }
 
-    /**
-     * Create a new lambda function
-     *
-     * @param lambda lambda entity
-     * @return created lambda entity.
-     */
-    Entity::Lambda::Lambda CreateLambda(const Entity::Lambda::Lambda &lambda);
+        /**
+         * Check existence of lambda
+         *
+         * @param region AWS region name
+         * @param function AWS function
+         * @param runtime lambda runtime
+         * @return true if lambda already exists
+         * @throws DatabaseException
+         */
+        bool LambdaExists(const std::string &region, const std::string &function, const std::string &runtime);
 
-    /**
-     * Returns a lambda entity by primary key
-     *
-     * @param oid lambda primary key
-     * @return lambda entity
-     * @throws DatabaseException
-     */
-    Entity::Lambda::Lambda GetLambdaById(const std::string &oid);
+        /**
+         * Check existence of lambda
+         *
+         * @param lambda AWS function
+         * @return true if lambda already exists
+         * @throws DatabaseException
+         */
+        bool LambdaExists(const Entity::Lambda::Lambda &lambda);
 
-    /**
-      * Returns a lambda entity by ARN
-      *
-      * @param arn lambda ARN
-      * @return lambda entity
-      * @throws DatabaseException
-      */
-    Entity::Lambda::Lambda GetLambdaByArn(const std::string &arn);
+        /**
+         * Check existence of lambda
+         *
+         * @param function AWS function
+         * @return true if lambda already exists
+         * @throws DatabaseException
+         */
+        bool LambdaExists(const std::string &function);
 
-    /**
-     * Returns a lambda entity by name
-     *
-     * @param region AWS region
-     * @param name function name
-     * @return lambda entity
-     * @throws DatabaseException
-     */
-    Entity::Lambda::Lambda GetLambdaByName(const std::string &region, const std::string &name);
+        /**
+         * Check existence of lambda
+         *
+         * @param arn AWS ARN
+         * @return true if lambda exists
+         * @throws DatabaseException
+         */
+        bool LambdaExistsByArn(const std::string &arn);
 
-    /**
-     * Count all lambdas
-     *
-     * @param region aws-mock region.
-     * @return total number of lambdas.
-     */
-    long LambdaCount(const std::string &region = {});
+        /**
+         * Create a new lambda function
+         *
+         * @param lambda lambda entity
+         * @return created lambda entity.
+         */
+        Entity::Lambda::Lambda CreateLambda(const Entity::Lambda::Lambda &lambda);
 
-    /**
-     * Returns a list of lambda functions.
-     *
-     * @param region AWS region name
-     * @return list of lambda functions
-     */
-    std::vector<Entity::Lambda::Lambda> ListLambdas(const std::string &region);
+        /**
+         * Returns a lambda entity by primary key
+         *
+         * @param oid lambda primary key
+         * @return lambda entity
+         * @throws DatabaseException
+         */
+        Entity::Lambda::Lambda GetLambdaById(const std::string &oid);
 
-    /**
-     * Updates an existing lambda lambda function
-     *
-     * @param lambda lambda entity
-     * @return updated lambda entity.
-     */
-    Entity::Lambda::Lambda UpdateLambda(const Entity::Lambda::Lambda &lambda);
+        /**
+          * Returns a lambda entity by ARN
+          *
+          * @param arn lambda ARN
+          * @return lambda entity
+          * @throws DatabaseException
+          */
+        Entity::Lambda::Lambda GetLambdaByArn(const std::string &arn);
 
-    /**
-     * Deletes an existing lambda function
-     *
-     * @param functionName lambda function name
-     * @throws DatabaseException
-     */
-    void DeleteLambda(const std::string &functionName);
+        /**
+         * Returns a lambda entity by name
+         *
+         * @param region AWS region
+         * @param name function name
+         * @return lambda entity
+         * @throws DatabaseException
+         */
+        Entity::Lambda::Lambda GetLambdaByName(const std::string &region, const std::string &name);
 
-    /**
-     * Deletes all existing lambda functions
-     *
-     * @throws DatabaseException
-     */
-    void DeleteAllLambdas();
+        /**
+         * Count all lambdas
+         *
+         * @param region aws-mock region.
+         * @return total number of lambdas.
+         */
+        long LambdaCount(const std::string &region = {});
 
-  private:
+        /**
+         * Returns a list of lambda functions.
+         *
+         * @param region AWS region name
+         * @return list of lambda functions
+         */
+        std::vector<Entity::Lambda::Lambda> ListLambdas(const std::string &region);
 
-    /**
-     * Lambda map
-     */
-    std::map<std::string, Entity::Lambda::Lambda> _lambdas{};
+        /**
+         * Updates an existing lambda lambda function
+         *
+         * @param lambda lambda entity
+         * @return updated lambda entity.
+         */
+        Entity::Lambda::Lambda UpdateLambda(const Entity::Lambda::Lambda &lambda);
 
-    /**
-     * Lambda mutex
-     */
-    Poco::Mutex _lambdaMutex;
-  };
+        /**
+         * Deletes an existing lambda function
+         *
+         * @param functionName lambda function name
+         * @throws DatabaseException
+         */
+        void DeleteLambda(const std::string &functionName);
+
+        /**
+         * Deletes all existing lambda functions
+         *
+         * @throws DatabaseException
+         */
+        void DeleteAllLambdas();
+
+      private:
+
+        /**
+         * Lambda map
+         */
+        std::map<std::string, Entity::Lambda::Lambda> _lambdas{};
+
+        /**
+         * Lambda mutex
+         */
+        Poco::Mutex _lambdaMutex;
+    };
 
 } // namespace AwsMock::Database
 

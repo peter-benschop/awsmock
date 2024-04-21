@@ -2,25 +2,25 @@
 // Created by vogje01 on 4/21/24.
 //
 
-#ifndef AWSMOCK_SERVICE_LAMBDA_MONITORING_H
-#define AWSMOCK_SERVICE_LAMBDA_MONITORING_H
+#ifndef AWSMOCK_SERVICE_DYNAMODB_MONITORING_H
+#define AWSMOCK_SERVICE_DYNAMODB_MONITORING_H
 
 // AwsMock includes
 #include <awsmock/core/MetricDefinition.h>
 #include <awsmock/core/MetricService.h>
 #include <awsmock/core/Timer.h>
-#include <awsmock/repository/LambdaDatabase.h>
+#include <awsmock/repository/DynamoDbDatabase.h>
 
 namespace AwsMock::Service {
 
-    class LambdaMonitoring : public Core::Timer {
+    class DynamoDbMonitoring : public Core::Timer {
 
       public:
 
         /**
          * Constructor
          */
-        explicit LambdaMonitoring(int timeout) : Core::Timer("lambda-monitoring", timeout) {}
+        explicit DynamoDbMonitoring(int timeout) : Core::Timer("dynamodb-monitoring", timeout) {}
 
         /**
          * Initialization
@@ -52,7 +52,7 @@ namespace AwsMock::Service {
         /**
          * Database connection
          */
-        Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
+        Database::DynamoDbDatabase &_dynamoDbDatabase = Database::DynamoDbDatabase::instance();
 
         /**
          * Period
@@ -61,4 +61,4 @@ namespace AwsMock::Service {
 
     };
 }
-#endif // AWSMOCK_SERVICE_LAMBDA_MONITORING_H
+#endif // AWSMOCK_SERVICE_DYNAMODB_MONITORING_H

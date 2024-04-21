@@ -35,7 +35,7 @@ namespace AwsMock::Database {
       /**
        * Constructor
        */
-      S3MemoryDb();
+      S3MemoryDb() = default;
 
       /**
        * Singleton instance
