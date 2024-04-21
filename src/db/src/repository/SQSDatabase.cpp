@@ -136,14 +136,13 @@ namespace AwsMock::Database {
       auto client = GetClient();
       mongocxx::collection _queueCollection = (*client)[_databaseName][_collectionNameQueue];
 
-      mongocxx::stdx::optional<bsoncxx::document::value>
-        mResult = _queueCollection.find_one(make_document(kvp("queueArn", queueArn)));
+      mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("queueArn", queueArn)));
 
-      if (!mResult) {
-        return {};
+      if (mResult.has_value()) {
+          result.FromDocument(mResult);
       }
+        return {};
 
-      result.FromDocument(mResult);
 
     } else {
 

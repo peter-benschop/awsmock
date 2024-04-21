@@ -15,7 +15,7 @@ add_executable(${BINARY} ${SOURCES})
 
 target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb awsmocksrv mongocxx bsoncxx
         PocoPrometheus PocoNet PocoJSON PocoXML PocoZip PocoFoundation PocoUtil pthread crypto ssl z archive
-        curl tbb)
+        curl tbb )
 add_library(${BINARY}_lib STATIC ${SOURCES})
 
 install(TARGETS ${BINARY} DESTINATION bin)
