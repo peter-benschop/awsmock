@@ -38,9 +38,8 @@ namespace AwsMock::Service {
     }
 
     Core::Configuration& _configuration = Core::Configuration::instance();
-    Core::MetricService& _metricService = Core::MetricService::instance();
     Database::LambdaDatabase& _database = Database::LambdaDatabase::instance();
-    LambdaService _service = LambdaService(_configuration, _metricService);
+    LambdaService _service = LambdaService(_configuration);
     std::string testFile;
   };
 

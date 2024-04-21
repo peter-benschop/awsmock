@@ -3,9 +3,7 @@
 
 namespace AwsMock::Service {
 
-    void LambdaHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response,
-                                  const std::string &region, const std::string &user) {
-        _metricService.IncrementCounter("gateway_get_counter");
+    void LambdaHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         log_trace << "Lambda GET request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 
         try {
@@ -52,7 +50,6 @@ namespace AwsMock::Service {
 
     void LambdaHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response,
                                   [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
-        _metricService.IncrementCounter("gateway_put_counter");
         log_trace << "Lambda PUT request, URI: " << request.getURI() << " region: " << region << " user: " + user;
 
         try {
@@ -65,9 +62,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void LambdaHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response,
-                                   const std::string &region, const std::string &user) {
-        _metricService.IncrementCounter("gateway_post_counter");
+    void LambdaHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         log_trace << "Lambda POST request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 
         try {
@@ -120,9 +115,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void LambdaHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response,
-                                     const std::string &region, const std::string &user) {
-        _metricService.IncrementCounter("gateway_delete_counter");
+    void LambdaHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         log_trace << "Lambda DELETE request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 
         try {
@@ -161,7 +154,6 @@ namespace AwsMock::Service {
     }
 
     void LambdaHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
-        _metricService.IncrementCounter("gateway_options_counter");
         log_trace << "Lambda OPTIONS request";
 
         response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
@@ -172,9 +164,7 @@ namespace AwsMock::Service {
         outputStream.flush();
     }
 
-    void LambdaHandler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response,
-                                   const std::string &region, const std::string &user) {
-        _metricService.IncrementCounter("gateway_head_counter");
+    void LambdaHandler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         log_trace << "Lambda HEAD request, address: " << request.clientAddress().toString();
 
         try {

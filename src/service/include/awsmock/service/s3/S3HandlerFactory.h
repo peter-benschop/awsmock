@@ -29,7 +29,6 @@ namespace AwsMock::Service {
      * Constructor
      *
      * @param configuration application configuration
-     * @param metricService  monitoring
      */
     S3RequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
 

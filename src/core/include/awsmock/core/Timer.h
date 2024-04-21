@@ -35,7 +35,6 @@ namespace AwsMock::Core {
          * Constructor
          *
          * @param name timer name
-         * @param timeout timeout in seconds
          */
         explicit Timer(std::string name) : _name(std::move(name)) {}
 

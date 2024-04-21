@@ -21,7 +21,8 @@ namespace AwsMock::Dto::Transfer {
    *     "InvocationRole": "string",
    *     "SftpAuthenticationMethods": "string",
    *     "Url": "string"
-   *  },
+   *  }
+   * </pre>
    */
   struct IdentityProviderDetails {
 

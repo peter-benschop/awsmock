@@ -396,7 +396,9 @@
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Min",
+          "sortDesc": true
         },
         "tooltip": {
           "mode": "single",
@@ -595,6 +597,6 @@
   "timezone": "",
   "title": "AWS-Mock",
   "uid": "cdae61d8-610f-49e4-bd3f-e7f1bf336d20",
-  "version": 7,
+  "version": 8,
   "weekStart": ""
 }

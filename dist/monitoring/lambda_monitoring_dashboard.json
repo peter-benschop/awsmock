@@ -113,7 +113,7 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "lambda_count_total",
+          "expr": "lambda_function_count_total",
           "instant": false,
           "legendFormat": "Lambdas",
           "range": true,

@@ -114,12 +114,12 @@ namespace AwsMock::Service {
         std::string _dataDir;
 
         /**
-         * S3 module name
+         * Module name
          */
         std::string _module;
 
         /**
-         * SQS monitoring period
+         * Monitoring period
          */
         int _monitoringPeriod;
 

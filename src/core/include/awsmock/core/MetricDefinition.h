@@ -36,4 +36,6 @@
 #define S3_OBJECT_COUNT "s3_object_count_total"
 #define S3_OBJECT_BY_BUCKET_COUNT "s3_object_by_bucket_count"
 
+#define LAMBDA_FUNCTION_COUNT "lambda_function_count_total"
+
 #endif  // AWSMOCK_CORE_METRIC_DEFINITION_H

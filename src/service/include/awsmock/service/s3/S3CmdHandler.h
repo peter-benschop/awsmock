@@ -41,7 +41,6 @@ namespace AwsMock::Service {
      * Constructor
      *
      * @param configuration application configuration
-     * @param metricService monitoring module
      */
     S3CmdHandler(Core::Configuration &configuration) : AbstractHandler(), _configuration(configuration), _s3Service(configuration) {}
 
