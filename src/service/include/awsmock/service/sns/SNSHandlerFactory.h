@@ -27,10 +27,8 @@ namespace AwsMock::Service {
      * Constructor
      *
      * @param configuration application configuration
-     * @param metricService  monitoring
-     * @param condition stop condition
      */
-    SNSRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService, Poco::Condition &condition) : _configuration(configuration), _metricService(metricService), _condition(condition) {}
+    SNSRequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
 
     /**
      * Create request handler
@@ -42,7 +40,7 @@ namespace AwsMock::Service {
       if(request.getURI().empty()) {
         return nullptr;
       }
-      return new SNSHandler(_configuration, _metricService);
+      return new SNSHandler(_configuration);
     }
 
   private:
@@ -51,16 +49,6 @@ namespace AwsMock::Service {
      * S3 handler configuration
      */
     Core::Configuration &_configuration;
-
-    /**
-     * Metric module
-     */
-    Core::MetricService &_metricService;
-
-    /**
-     * Shutdown condition
-     */
-    Poco::Condition &_condition;
   };
 
 } // namespace AwsMock::Service

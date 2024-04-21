@@ -2,8 +2,8 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_ABSTRACTSERVER_H
-#define AWSMOCK_SERVICE_ABSTRACTSERVER_H
+#ifndef AWSMOCK_SERVICE_ABSTRACT_SERVER_H
+#define AWSMOCK_SERVICE_ABSTRACT_SERVER_H
 
 // C++ standard includes
 #include <string>
@@ -36,8 +36,9 @@ namespace AwsMock::Service {
      *
      * @param configuration AwsMock configuration
      * @param name manager name
+     * @param timeout run timeout in seconds
      */
-    explicit AbstractServer(Core::Configuration &configuration, std::string name);
+    explicit AbstractServer(Core::Configuration &configuration, std::string name, int timeout);
 
     /**
      * Destructor
@@ -54,7 +55,7 @@ namespace AwsMock::Service {
     /**
      * Returns the running flag
      */
-    bool IsRunning() const;
+    [[nodiscard]] bool IsRunning() const;
 
     /**
      * Stop the manager
@@ -83,12 +84,7 @@ namespace AwsMock::Service {
     /**
      * Main loop
      */
-    virtual void Run() = 0;
-
-    /**
-     * Interruptable sleep
-     */
-    bool InterruptableSleep(int period);
+    void Run() override = 0;
 
     /**
      * Shutdown condition
@@ -136,4 +132,4 @@ namespace AwsMock::Service {
 
 } // namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_ABSTRACTSERVER_H
+#endif // AWSMOCK_SERVICE_ABSTRACT_SERVER_H

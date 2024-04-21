@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-  AbstractServer::AbstractServer(Core::Configuration &configuration, std::string name) : Timer(name, 10), _configuration(configuration), _moduleDatabase(Database::ModuleDatabase::instance()), _name(std::move(name)), _running(false) {
+  AbstractServer::AbstractServer(Core::Configuration &configuration, std::string name, int timeout) : Timer(name, timeout), _configuration(configuration), _moduleDatabase(Database::ModuleDatabase::instance()), _name(std::move(name)), _running(false) {
 
     // Create environment
     log_debug << "AbstractServer initialized, name: " << _name;
@@ -18,13 +18,6 @@ namespace AwsMock::Service {
 
   bool AbstractServer::IsRunning() const {
     return _running;
-  }
-
-  bool AbstractServer::InterruptableSleep(int period) {
-    _mutex.lock();
-    bool signalled = _condition.tryWait(_mutex, period);
-    _mutex.unlock();
-    return signalled;
   }
 
   void AbstractServer::StopServer() {

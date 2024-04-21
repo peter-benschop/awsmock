@@ -4,6 +4,7 @@
 
 #include <awsmock/entity/sqs/Queue.h>
 #include <Poco/Logger.h>
+#include "awsmock/core/LogStream.h"
 
 namespace AwsMock::Database::Entity::SQS {
 
@@ -32,7 +33,7 @@ namespace AwsMock::Database::Entity::SQS {
     return queueDoc;
   }
 
-  void Queue::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+  Entity::SQS::Queue Queue::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
     try {
 
@@ -58,8 +59,10 @@ namespace AwsMock::Database::Entity::SQS {
         }
       }
     } catch (std::exception &exc) {
+        log_error << exc.what();
       Poco::Logger::get("Queue").error("Exception: oid: " + oid + " error: " + exc.what());
     }
+    return *this;
   }
 
   Poco::JSON::Object Queue::ToJsonObject() const {

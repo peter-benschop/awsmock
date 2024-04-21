@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-  SecretsManagerServer::SecretsManagerServer(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractServer(configuration, "secretsmanager"), _configuration(configuration), _metricService(metricService),
+  SecretsManagerServer::SecretsManagerServer(Core::Configuration &configuration, Core::MetricService &metricService) : AbstractServer(configuration, "secretsmanager", 10), _configuration(configuration), _metricService(metricService),
                                                                                                                        _moduleDatabase(Database::ModuleDatabase::instance()) {
 
     // HTTP manager configuration

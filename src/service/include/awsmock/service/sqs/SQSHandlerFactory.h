@@ -28,9 +28,8 @@ namespace AwsMock::Service {
      * Constructor
      *
      * @param configuration application configuration
-     * @param metricService  monitoring
      */
-    SQSRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService) {}
+    SQSRequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
 
     /**
      * Create a new request handler
@@ -42,7 +41,7 @@ namespace AwsMock::Service {
       if(request.getURI().empty()) {
         return nullptr;
       }
-      return new SQSHandler(_configuration, _metricService);
+      return new SQSHandler(_configuration);
     }
 
   private:
@@ -51,11 +50,6 @@ namespace AwsMock::Service {
      * S3 handler configuration
      */
     Core::Configuration &_configuration;
-
-    /**
-     * Metric module
-     */
-    Core::MetricService &_metricService;
 
   };
 

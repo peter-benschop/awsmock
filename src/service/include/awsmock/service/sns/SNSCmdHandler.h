@@ -36,9 +36,8 @@ namespace AwsMock::Service {
      * Constructor
      *
      * @param configuration application configuration
-     * @param metricService monitoring module
      */
-    SNSCmdHandler(Core::Configuration &configuration, Core::MetricService &metricService);
+    SNSCmdHandler(Core::Configuration &configuration);
 
   protected:
 
@@ -58,11 +57,6 @@ namespace AwsMock::Service {
      * ImageHandler import configuration
      */
     Core::Configuration &_configuration;
-
-    /**
-     * Metric module
-     */
-    Core::MetricService &_metricService;
 
     /**
      * SNS module

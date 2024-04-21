@@ -3,8 +3,7 @@
 
 namespace AwsMock::Service {
 
-  S3Handler::S3Handler(Core::Configuration &configuration, Core::MetricService &metricService) : S3CmdHandler(configuration, metricService), _configuration(configuration), _metricService(metricService), _s3Service(configuration) {
-  }
+  S3Handler::S3Handler(Core::Configuration &configuration) : S3CmdHandler(configuration), _configuration(configuration), _s3Service(configuration) {}
 
   void S3Handler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
     log_debug << "S3 GET request, URI: " + request.getURI() << " region: " << region << " user: " + user;

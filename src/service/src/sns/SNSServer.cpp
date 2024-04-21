@@ -6,8 +6,7 @@
 
 namespace AwsMock::Service {
 
-    SNSServer::SNSServer(Core::Configuration &configuration, Core::MetricService &metricService)
-            : AbstractServer(configuration, "sns"), _configuration(configuration), _metricService(metricService), _snsDatabase(Database::SNSDatabase::instance()) {
+    SNSServer::SNSServer(Core::Configuration &configuration) : AbstractServer(configuration, "sns", 10), _configuration(configuration), _snsDatabase(Database::SNSDatabase::instance()) {
 
         // HTTP manager configuration
         _port = _configuration.getInt("awsmock.service.sns.port", SNS_DEFAULT_PORT);
@@ -16,16 +15,17 @@ namespace AwsMock::Service {
         _maxThreads = _configuration.getInt("awsmock.service.sns.max.threads", SNS_DEFAULT_THREADS);
         _requestTimeout = _configuration.getInt("awsmock.service.sns.timeout", SNS_DEFAULT_TIMEOUT);
         _messageTimeout = _configuration.getInt("awsmock.service.sns.message.timeout", SNS_DEFAULT_MESSAGE_TIMEOUT);
+        _monitoringPeriod = _configuration.getInt("awsmock.service.sns.monitoring.period", SNS_DEFAULT_MONITORING_PERIOD);
         log_debug << "SNS rest module initialized, endpoint: " << _host << ":" << _port;
-
-        // Sleeping period
-        _period = _configuration.getInt("awsmock.worker.sqs.period", 10000);
 
         // Create environment
         _region = _configuration.getString("awsmock.region");
 
-        // Message tieout in seconds
-        _messageTimeout *= 60 *24;
+        // Message timeout in seconds
+        _messageTimeout *= 60 * 24;
+
+        // Monitoring
+        _snsMonitoring = std::make_unique<SNSMonitoring>(_monitoringPeriod);
 
         log_debug << "SNSServer initialized, timeout: " << _messageTimeout;
     }
@@ -39,13 +39,15 @@ namespace AwsMock::Service {
         }
         log_info << "SNS module starting";
 
+        // Start monitoring
+        _snsMonitoring->Start();
+
         // Start REST module
-        StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new SNSRequestHandlerFactory(_configuration, _metricService, _condition));
+        StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new SNSRequestHandlerFactory(_configuration));
     }
 
     void SNSServer::Run() {
         log_trace << "S3 processing started";
-        UpdateCounters();
         DeleteOldMessages();
     }
 
@@ -57,20 +59,4 @@ namespace AwsMock::Service {
         _snsDatabase.DeleteOldMessages(_messageTimeout);
     }
 
-    void SNSServer::UpdateCounters() {
-
-        // Get total counts
-        long topics = _snsDatabase.CountTopics();
-        long messages = _snsDatabase.CountMessages();
-        _metricService.SetGauge("sns_topic_count_total", topics);
-        _metricService.SetGauge("sns_message_count_total", messages);
-
-        // Count messages per topic
-        for (const auto &topic: _snsDatabase.ListTopics()) {
-            std::string labelValue = Poco::replace(topic.topicName, "-", "_");
-            long messagesPerQueue = _snsDatabase.CountMessages(topic.region, topic.topicArn);
-            _metricService.SetGauge("sns_message_count", "topic", labelValue, messagesPerQueue);
-        }
-        log_trace << "SNS update counter finished";
-    }
 } // namespace AwsMock::Worker

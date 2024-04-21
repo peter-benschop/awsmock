@@ -34,6 +34,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -83,7 +84,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 17,
         "w": 8,
         "x": 0,
         "y": 0
@@ -91,7 +92,11 @@
       "id": 1,
       "options": {
         "legend": {
-          "calcs": [],
+          "calcs": [
+            "min",
+            "max",
+            "last"
+          ],
           "displayMode": "list",
           "placement": "bottom",
           "showLegend": true
@@ -108,7 +113,7 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "s3_bucket_count_total",
+          "expr": "avg_over_time(s3_bucket_count[5m])",
           "instant": false,
           "legendFormat": "Buckets",
           "range": true,
@@ -130,6 +135,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -178,7 +184,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 17,
         "w": 8,
         "x": 8,
         "y": 0
@@ -186,7 +192,11 @@
       "id": 2,
       "options": {
         "legend": {
-          "calcs": [],
+          "calcs": [
+            "min",
+            "max",
+            "last"
+          ],
           "displayMode": "list",
           "placement": "bottom",
           "showLegend": true
@@ -203,7 +213,7 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "s3_object_count_total",
+          "expr": "avg_over_time(s3_object_count[5m])",
           "instant": false,
           "legendFormat": "Objects",
           "range": true,
@@ -225,6 +235,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -273,7 +284,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 17,
         "w": 8,
         "x": 16,
         "y": 0
@@ -281,8 +292,12 @@
       "id": 3,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": [
+            "min",
+            "max",
+            "last"
+          ],
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
@@ -298,7 +313,7 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(s3_bucket_count{}[5m])",
+          "expr": "avg_over_time(s3_object_by_bucket_count[5m])",
           "instant": false,
           "legendFormat": "{{bucket}}",
           "range": true,
@@ -310,20 +325,19 @@
     }
   ],
   "refresh": "30s",
-  "schemaVersion": 38,
-  "style": "dark",
+  "schemaVersion": 39,
   "tags": [],
   "templating": {
     "list": []
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-6h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "S3",
   "uid": "fefe4481-e1b3-430e-88bb-cf49d22f25e9",
-  "version": 5,
+  "version": 9,
   "weekStart": ""
 }

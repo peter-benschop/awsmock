@@ -352,7 +352,7 @@ namespace AwsMock::Core {
      *
      * @param name name of the timer.
      */
-    std::string GetTimerKey(const std::string &name);
+    static std::string GetTimerKey(const std::string &name);
 
     /**
      * Metric manager for Prometheus

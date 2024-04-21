@@ -246,15 +246,15 @@ namespace AwsMock {
             Database::Entity::Module::ModuleList modules = _moduleDatabase.ListModules();
             for (const auto &module: modules) {
                 if (module.name == "s3" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                    _s3Server = std::make_shared<Service::S3Server>(_configuration, _metricService);
+                    _s3Server = std::make_shared<Service::S3Server>(_configuration);
                     _s3Server->Start();
                     _serverMap[module.name] = _s3Server;
                 } else if (module.name == "sqs" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                    _sqsServer = std::make_shared<Service::SQSServer>(_configuration, _metricService);
+                    _sqsServer = std::make_shared<Service::SQSServer>(_configuration);
                     _sqsServer->Start();
                     _serverMap[module.name] = _sqsServer;
                 } else if (module.name == "sns" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                    _snsServer = std::make_shared<Service::SNSServer>(_configuration, _metricService);
+                    _snsServer = std::make_shared<Service::SNSServer>(_configuration);
                     _snsServer->Start();
                     _serverMap[module.name] = _snsServer;
                 } else if (module.name == "lambda" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {

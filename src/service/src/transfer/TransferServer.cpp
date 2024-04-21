@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
 
   TransferServer::TransferServer(Core::Configuration &configuration, Core::MetricService &metricService)
-    : AbstractServer(configuration, "transfer"), AbstractWorker(configuration), _configuration(configuration), _metricService(metricService), _transferDatabase(Database::TransferDatabase::instance()),
+    : AbstractServer(configuration, "transfer", 10), AbstractWorker(configuration), _configuration(configuration), _metricService(metricService), _transferDatabase(Database::TransferDatabase::instance()),
       _module("transfer") {
 
     // REST manager configuration

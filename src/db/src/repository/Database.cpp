@@ -31,6 +31,9 @@ namespace AwsMock::Database {
   }
 
   mongocxx::pool::entry Database::GetClient() {
+      if(!_pool) {
+          log_fatal << "Pool is NULL";
+      }
     return _pool->acquire();
   }
 
