@@ -194,11 +194,11 @@ namespace AwsMock::Database {
                 mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
                 if (region.empty()) {
 
-                    _tableCollection.count_documents({});
+                    return _tableCollection.count_documents({});
 
                 } else {
 
-                    _tableCollection.count_documents(make_document(kvp("region", region)));
+                    return _tableCollection.count_documents(make_document(kvp("region", region)));
 
                 }
 

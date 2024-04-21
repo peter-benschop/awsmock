@@ -11,69 +11,65 @@
 #include <vector>
 #include <utility>
 
-// Poco includes
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/Dynamic/Var.h>
-
 // AwsMock includes
+#include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/ServiceException.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/dto/dynamodb/GetItemKey.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
-  struct DeleteItemRequest {
+    struct DeleteItemRequest {
 
-    /**
-     * Region
-     */
-    std::string region;
+        /**
+         * Region
+         */
+        std::string region;
 
-    /**
-     * Table name
-     */
-    std::string tableName;
+        /**
+         * Table name
+         */
+        std::string tableName;
 
-    /**
-     * Original HTTP request body
-     */
-    std::string body;
+        /**
+         * Original HTTP request body
+         */
+        std::string body;
 
-    /**
-     * Original HTTP request headers
-     */
-    std::map<std::string, std::string> headers;
+        /**
+         * Original HTTP request headers
+         */
+        std::map<std::string, std::string> headers;
 
-    /**
-     * Creates a JSON string from the object.
-     *
-     * @return JSON string
-     */
-    [[nodiscard]] std::string ToJson();
+        /**
+         * Creates a JSON string from the object.
+         *
+         * @return JSON string
+         */
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
-     * Parse a JSON stream
-     *
-     * @param jsonBody JSON string
-     */
-    void FromJson(const std::string &jsonBody);
+        /**
+         * Parse a JSON stream
+         *
+         * @param jsonBody JSON string
+         */
+        void FromJson(const std::string &jsonBody);
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
 
-    /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const DeleteItemRequest &r);
+        /**
+         * Stream provider.
+         *
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const DeleteItemRequest &r);
 
-  };
+    };
 
 } // namespace AwsMock::Dto::DynamoDb
 

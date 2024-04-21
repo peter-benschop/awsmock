@@ -9,13 +9,10 @@
 #include <string>
 #include <map>
 
-// Poco includes
-#include <Poco/JSON/Parser.h>
-#include <Poco/JSON/Object.h>
-
-// AwsMock include
+// AwsMock includes
+#include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/ServiceException.h>
+#include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -60,6 +57,13 @@ namespace AwsMock::Dto::DynamoDb {
      * Null value
      */
     bool nullValue;
+
+      /**
+       * Convert to JSON value
+       *
+       * @return JSON object
+       */
+      [[nodiscard]] std::string ToJson() const;
 
     /**
      * Convert to JSON value

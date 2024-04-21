@@ -11,157 +11,153 @@
 #include <vector>
 #include <utility>
 
-// Poco includes
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/Dynamic/Var.h>
-
-// AwsMock includes
+/// AwsMock includes
+#include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/ServiceException.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/dto/dynamodb/TableStatus.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
-  /**
-   * Example:
-   * <pre>
-   * {
-   *   "TableDescription":
-   *     {
-   *       "AttributeDefinitions": [
-   *           {
-   *             "attributeName":"orgaNr",
-   *             "AttributeType":"N"
-   *           }
-   *       ],
-   *       "TableName":"test-table",
-   *       "KeySchema":[
-   *         {
-   *           "attributeName":"orgaNr",
-   *           "KeyType":"HASH"
-   *         }
-   *       ],
-   *       "TableStatus":"ACTIVE",
-   *       "CreationDateTime":1703158038.811,
-   *       "ProvisionedThroughput":
-   *         {
-   *           "LastIncreaseDateTime":0.000,
-   *           "LastDecreaseDateTime":0.000,
-   *           "NumberOfDecreasesToday":0,
-   *           "ReadCapacityUnits":1,
-   *           "WriteCapacityUnits":1
-   *         },
-   *       "TableSizeBytes":0,
-   *       "ItemCount":0,
-   *       "TableArn":"arn:aws:dynamodb:ddblocal:000000000000:table/test-table",
-   *       "DeletionProtectionEnabled":false
-   *    }
-   * }
-   * </pre>
-   */
-  struct CreateTableResponse {
-
     /**
-     * Region
+     * Example:
+     * <pre>
+     * {
+     *   "TableDescription":
+     *     {
+     *       "AttributeDefinitions": [
+     *           {
+     *             "attributeName":"orgaNr",
+     *             "AttributeType":"N"
+     *           }
+     *       ],
+     *       "TableName":"test-table",
+     *       "KeySchema":[
+     *         {
+     *           "attributeName":"orgaNr",
+     *           "KeyType":"HASH"
+     *         }
+     *       ],
+     *       "TableStatus":"ACTIVE",
+     *       "CreationDateTime":1703158038.811,
+     *       "ProvisionedThroughput":
+     *         {
+     *           "LastIncreaseDateTime":0.000,
+     *           "LastDecreaseDateTime":0.000,
+     *           "NumberOfDecreasesToday":0,
+     *           "ReadCapacityUnits":1,
+     *           "WriteCapacityUnits":1
+     *         },
+     *       "TableSizeBytes":0,
+     *       "ItemCount":0,
+     *       "TableArn":"arn:aws:dynamodb:ddblocal:000000000000:table/test-table",
+     *       "DeletionProtectionEnabled":false
+     *    }
+     * }
+     * </pre>
      */
-    std::string region;
+    struct CreateTableResponse {
 
-    /**
-     * Table class
-     */
-    std::string tableClass;
+        /**
+         * Region
+         */
+        std::string region;
 
-    /**
-     * Table name
-     */
-    std::string tableName;
+        /**
+         * Table class
+         */
+        std::string tableClass;
 
-    /**
-     * Table ARN
-     */
-    std::string tableArn;
+        /**
+         * Table name
+         */
+        std::string tableName;
 
-    /**
-     * Table size
-     */
-    long tableSizeBytes;
+        /**
+         * Table ARN
+         */
+        std::string tableArn;
 
-    /**
-     * Item count
-     */
-    long itemCount;
+        /**
+         * Table size
+         */
+        long tableSizeBytes;
 
-    /**
-     * Delete protection enabled
-     */
-    bool deleteProtectionEnabled;
+        /**
+         * Item count
+         */
+        long itemCount;
 
-    /**
-     * Key schema
-     */
-    std::map<std::string, std::string> keySchemas;
+        /**
+         * Delete protection enabled
+         */
+        bool deleteProtectionEnabled;
 
-    /**
-     * Tags
-     */
-    std::map<std::string, std::string> tags;
+        /**
+         * Key schema
+         */
+        std::map<std::string, std::string> keySchemas;
 
-    /**
-     * Attribute definitions
-     */
-    std::map<std::string, std::string> attributes;
+        /**
+         * Tags
+         */
+        std::map<std::string, std::string> tags;
 
-    /**
-     * Table status
-     */
-    TableStatus tableStatus;
+        /**
+         * Attribute definitions
+         */
+        std::map<std::string, std::string> attributes;
 
-    /**
-     * Original HTTP response body
-     */
-    std::string body;
+        /**
+         * Table status
+         */
+        TableStatus tableStatus;
 
-    /**
-     * Original HTTP response headers
-     */
-    std::map<std::string, std::string> headers;
+        /**
+         * Original HTTP response body
+         */
+        std::string body;
 
-    /**
-     * HTTP status from docker image
-     */
-    Poco::Net::HTTPResponse::HTTPStatus status;
+        /**
+         * Original HTTP response headers
+         */
+        std::map<std::string, std::string> headers;
 
-    /**
-     * Creates a JSON string from the object.
-     *
-     * @return JSON string
-     */
-    [[nodiscard]] std::string ToJson();
+        /**
+         * HTTP status from docker image
+         */
+        Poco::Net::HTTPResponse::HTTPStatus status;
 
-    /**
-     * Parse a JSON stream
-     *
-     * @param body JSON body
-     * @param headerMap HTTP header map
-     */
-    void FromJson(const std::string &body, const std::map<std::string, std::string> &headerMap);
+        /**
+         * Creates a JSON string from the object.
+         *
+         * @return JSON string
+         */
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * Parse a JSON stream
+         *
+         * @param body JSON body
+         * @param headerMap HTTP header map
+         */
+        void FromJson(const std::string &body, const std::map<std::string, std::string> &headerMap);
 
-    /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const CreateTableResponse &r);
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
 
-  };
+        /**
+         * Stream provider.
+         *
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const CreateTableResponse &r);
+
+    };
 
 } // namespace AwsMock::Dto::DynamoDb
 
