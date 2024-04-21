@@ -6,57 +6,57 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
-  std::string ListTableRequest::ToJson() {
+    std::string ListTableRequest::ToJson() const {
 
-    try {
-      Poco::JSON::Object rootJson;
-      if (!region.empty()) {
-        rootJson.set("Region", region);
-      }
-      if (!exclusiveStartTableName.empty()) {
-        rootJson.set("ExclusiveStartTableName", exclusiveStartTableName);
-      }
-      if (limit > 0) {
-        rootJson.set("Limit", limit);
-      }
+        try {
+            Poco::JSON::Object rootJson;
+            if (!region.empty()) {
+                rootJson.set("Region", region);
+            }
+            if (!exclusiveStartTableName.empty()) {
+                rootJson.set("ExclusiveStartTableName", exclusiveStartTableName);
+            }
+            if (limit > 0) {
+                rootJson.set("Limit", limit);
+            }
 
-      std::ostringstream os;
-      rootJson.stringify(os);
-      return os.str();
+            return Core::JsonUtils::ToJsonString(rootJson);
 
-    } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }
     }
-  }
 
-  void ListTableRequest::FromJson(const std::string &jsonBody) {
+    void ListTableRequest::FromJson(const std::string &jsonBody) {
 
-    // Save original body
-    body = jsonBody;
+        // Save original body
+        body = jsonBody;
 
-    Poco::JSON::Parser parser;
-    Poco::Dynamic::Var result = parser.parse(jsonBody);
-    const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+        Poco::JSON::Parser parser;
+        Poco::Dynamic::Var result = parser.parse(jsonBody);
+        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
-    try {
-      Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-      Core::JsonUtils::GetJsonValueString("ExclusiveStartTableName", rootObject, exclusiveStartTableName);
-      Core::JsonUtils::GetJsonValueInt("Limit", rootObject, limit);
+        try {
+            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
+            Core::JsonUtils::GetJsonValueString("ExclusiveStartTableName", rootObject, exclusiveStartTableName);
+            Core::JsonUtils::GetJsonValueInt("Limit", rootObject, limit);
 
-    } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }
     }
-  }
 
-  std::string ListTableRequest::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+    std::string ListTableRequest::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
+    }
 
-  std::ostream &operator<<(std::ostream &os, const ListTableRequest &r) {
-    os << "ListTableRequest={region='" << r.region << "', exclusiveStartTableName='" << r.exclusiveStartTableName << "', limit='" << r.limit << "}";
-    return os;
-  }
+    std::ostream &operator<<(std::ostream &os, const ListTableRequest &r) {
+        os << "ListTableRequest=" << r.ToJson();
+        return os;
+    }
 
 } // namespace AwsMock::Dto::DynamoDb

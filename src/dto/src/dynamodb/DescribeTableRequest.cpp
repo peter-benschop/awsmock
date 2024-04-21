@@ -6,49 +6,50 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
-  std::string DescribeTableRequest::ToJson() {
+    std::string DescribeTableRequest::ToJson() const {
 
-    try {
-      Poco::JSON::Object rootJson;
-      rootJson.set("Region", region);
-      rootJson.set("TableName", tableName);
+        try {
 
-      std::ostringstream os;
-      rootJson.stringify(os);
-      return os.str();
+            Poco::JSON::Object rootJson;
+            rootJson.set("Region", region);
+            rootJson.set("TableName", tableName);
 
-    } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+            return Core::JsonUtils::ToJsonString(rootJson);
+
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }
     }
-  }
 
-  void DescribeTableRequest::FromJson(const std::string &jsonBody) {
+    void DescribeTableRequest::FromJson(const std::string &jsonBody) {
 
-    body = jsonBody;
+        body = jsonBody;
 
-    Poco::JSON::Parser parser;
-    Poco::Dynamic::Var result = parser.parse(jsonBody);
-    const auto& rootObject = result.extract<Poco::JSON::Object::Ptr>();
+        Poco::JSON::Parser parser;
+        Poco::Dynamic::Var result = parser.parse(jsonBody);
+        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
-    try {
+        try {
 
-      Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-      Core::JsonUtils::GetJsonValueString("TableName", rootObject, tableName);
+            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
+            Core::JsonUtils::GetJsonValueString("TableName", rootObject, tableName);
 
-    } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }
     }
-  }
 
-  std::string DescribeTableRequest::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+    std::string DescribeTableRequest::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
+    }
 
-  std::ostream &operator<<(std::ostream &os, const DescribeTableRequest &r) {
-    os << "DescribeTableRequest={region='" << r.region << "', tableName='" << r.tableName << "'}";
-    return os;
-  }
+    std::ostream &operator<<(std::ostream &os, const DescribeTableRequest &r) {
+        os << "DescribeTableRequest=" << r.ToJson();
+        return os;
+    }
 
 } // namespace AwsMock::Dto::DynamoDb

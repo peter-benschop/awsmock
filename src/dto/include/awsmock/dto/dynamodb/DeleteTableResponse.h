@@ -11,14 +11,10 @@
 #include <vector>
 #include <utility>
 
-// Poco includes
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/Dynamic/Var.h>
-
 // AwsMock includes
+#include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/ServiceException.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/dto/dynamodb/ProvisionedThroughput.h>
 #include <awsmock/dto/dynamodb/TableStatus.h>
 
@@ -91,7 +87,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @return JSON string
      */
-    [[nodiscard]] std::string ToJson();
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Parse a JSON stream
