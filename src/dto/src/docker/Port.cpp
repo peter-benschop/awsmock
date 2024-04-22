@@ -10,7 +10,7 @@ namespace AwsMock::Dto::Docker {
     FromJson(object);
   }
 
-  void Port::FromJson(Poco::JSON::Object::Ptr object) {
+  void Port::FromJson(const Poco::JSON::Object::Ptr &object) {
 
     try {
 
@@ -19,7 +19,25 @@ namespace AwsMock::Dto::Docker {
       Core::JsonUtils::GetJsonValueString("Type", object, type);
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
+    }
+  }
+
+  std::string Port::ToJson() const {
+
+    try {
+
+      Poco::JSON::Object rootJson;
+      rootJson.set("privatePort", privatePort);
+      rootJson.set("publicPort", publicPort);
+      rootJson.set("type", type);
+
+      return Core::JsonUtils::ToJsonString(rootJson);
+
+    } catch (Poco::Exception &exc) {
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
   }
 
@@ -30,7 +48,7 @@ namespace AwsMock::Dto::Docker {
   }
 
   std::ostream &operator<<(std::ostream &os, const Port &p) {
-    os << "Port={privatePort=" << p.privatePort << ", publicPort=" << p.publicPort << ", type='" << p.type << "'}";
+    os << "Port=" << p.ToJson();
     return os;
   }
 

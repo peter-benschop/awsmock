@@ -35,7 +35,7 @@ namespace AwsMock {
         .dataDir=_configuration.getString("awsmock.data.dir", "/tmp/awsmock/data"),
         .databaseActive=_configuration.getBool("awsmock.mongodb.active", false)
       };
-      SendOkResponse(response, Dto::Module::GatewayConfig::ToJson(config));
+      SendOkResponse(response, config.ToJson());
 
     } else if (action == "running") {
 
@@ -99,8 +99,7 @@ namespace AwsMock {
           Database::Entity::Module::Module module = _moduleService->StartService(name);
 
           // Send response
-          std::string body = Dto::Module::Module::ToJson(module);
-          SendOkResponse(response, body);
+          SendOkResponse(response, module.ToJson());
 
         }
 
@@ -119,8 +118,7 @@ namespace AwsMock {
           Database::Entity::Module::Module module = _moduleService->RestartService(name);
 
           // Send response
-          std::string body = Dto::Module::Module::ToJson(module);
-          SendOkResponse(response, body);
+          SendOkResponse(response, module.ToJson());
         }
 
       } else if (action == "stop") {
@@ -138,8 +136,7 @@ namespace AwsMock {
           Database::Entity::Module::Module module = _moduleService->StopService(name);
 
           // Send response
-          std::string body = Dto::Module::Module::ToJson(module);
-          SendOkResponse(response, body);
+          SendOkResponse(response, module.ToJson());
         }
 
       } else if (action == "import") {

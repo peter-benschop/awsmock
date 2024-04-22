@@ -5,9 +5,14 @@
 #ifndef AWSMOCK_DTO_TRANSFER_IDENTITY_PROVIDER_DETAILS_H
 #define AWSMOCK_DTO_TRANSFER_IDENTITY_PROVIDER_DETAILS_H
 
-// C** includes
+// C++ includes
 #include <string>
 #include <sstream>
+
+// AwsMock includes
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/JsonException.h>
+#include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Dto::Transfer {
 
@@ -50,6 +55,13 @@ namespace AwsMock::Dto::Transfer {
      * Authentication URL
      */
     std::string url;
+
+    /**
+     * Creates a JSON string from the object.
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Converts the DTO to a string representation.

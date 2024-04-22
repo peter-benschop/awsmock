@@ -10,7 +10,7 @@ namespace AwsMock::Dto::Transfer {
 
     Poco::JSON::Parser parser;
     Poco::Dynamic::Var result = parser.parse(body);
-    const auto& rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
     try {
 
@@ -19,7 +19,24 @@ namespace AwsMock::Dto::Transfer {
       Core::JsonUtils::GetJsonValueString("ServerId", rootObject, serverId);
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
+    }
+  }
+
+  std::string StopServerRequest::ToJson() const {
+
+    try {
+
+      Poco::JSON::Object rootJson;
+      rootJson.set("Region", region);
+      rootJson.set("ServerId", serverId);
+
+      return Core::JsonUtils::ToJsonString(rootJson);
+
+    } catch (Poco::Exception &exc) {
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
   }
 
@@ -30,7 +47,7 @@ namespace AwsMock::Dto::Transfer {
   }
 
   std::ostream &operator<<(std::ostream &os, const StopServerRequest &r) {
-    os << "StopServerRequest={region='" << r.region << "' serverId='" << r.serverId << "'}";
+    os << "StopServerRequest=" << r.ToJson();
     return os;
   }
 

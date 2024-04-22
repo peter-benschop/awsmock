@@ -2,25 +2,16 @@
 // Created by vogje01 on 10/23/23.
 //
 
-#ifndef AWSMOCK_DTO_MODULE_GATEWAYCONFIG_H
-#define AWSMOCK_DTO_MODULE_GATEWAYCONFIG_H
+#ifndef AWSMOCK_DTO_MODULE_GATEWAY_CONFIG_H
+#define AWSMOCK_DTO_MODULE_GATEWAY_CONFIG_H
 
 // C++ includes
 #include <string>
 
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Array.h>
-#include <Poco/JSON/Object.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/Net/HTTPServerResponse.h>
-
 // AwsMock includes
 #include "awsmock/core/JsonUtils.h"
-#include <awsmock/core/ServiceException.h>
+#include <awsmock/core/JsonException.h>
+#include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Dto::Module {
 
@@ -94,10 +85,9 @@ namespace AwsMock::Dto::Module {
     /**
      * Convert to JSON representation
      *
-     * @param gatewayConfig gateway config
      * @return JSON string
      */
-    static std::string ToJson(const GatewayConfig &gatewayConfig);
+    std::string ToJson() const;
 
     /**
      * Convert from JSON representation
@@ -127,4 +117,4 @@ namespace AwsMock::Dto::Module {
 
 } // namespace AwsMock::Dto
 
-#endif // AWSMOCK_DTO_MODULE_GATEWAYCONFIG_H
+#endif // AWSMOCK_DTO_MODULE_GATEWAY_CONFIG_H

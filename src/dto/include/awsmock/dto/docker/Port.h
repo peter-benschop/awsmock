@@ -10,17 +10,10 @@
 #include <sstream>
 #include <vector>
 
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/Dynamic/Var.h>
-
 // AwsMock includes
+#include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/ServiceException.h>
+#include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Dto::Docker {
 
@@ -29,17 +22,17 @@ namespace AwsMock::Dto::Docker {
     /**
      * Constructor
      */
-    Port(const Poco::JSON::Object::Ptr &object);
+    explicit Port(const Poco::JSON::Object::Ptr &object);
 
     /**
      * Private port, means port inside the container
      */
-    int privatePort;
+    int privatePort{};
 
     /**
      * Public port, means port visible from docker host
      */
-    int publicPort;
+    int publicPort{};
 
     /**
      * Port type (tcp,udp, etc.)
@@ -51,7 +44,14 @@ namespace AwsMock::Dto::Docker {
      *
      * @param object JSON object
      */
-    void FromJson(Poco::JSON::Object::Ptr object);
+    void FromJson(const Poco::JSON::Object::Ptr& object);
+
+    /**
+     * Convert to a JSON string
+     *
+     * @param object JSON object
+     */
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Converts the DTO to a string representation.

@@ -19,8 +19,8 @@ namespace AwsMock::Database::Entity::SecretsManager {
   void RotationRules::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
     automaticallyAfterDays = mResult.value()["automaticallyAfterDays"].get_int64().value;
-    duration = mResult.value()["duration"].get_string().value;
-    scheduleExpression = mResult.value()["scheduleExpression"].get_string().value;
+    duration = bsoncxx::string::to_string(mResult.value()["duration"].get_string().value);
+    scheduleExpression = bsoncxx::string::to_string(mResult.value()["scheduleExpression"].get_string().value);
   }
 
   Poco::JSON::Object RotationRules::ToJsonObject() const {

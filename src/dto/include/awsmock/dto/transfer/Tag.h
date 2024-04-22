@@ -10,6 +10,11 @@
 #include <sstream>
 #include <vector>
 
+// AwsMock includes
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/JsonException.h>
+#include <awsmock/core/LogStream.h>
+
 namespace AwsMock::Dto::Transfer {
 
   struct Tag {
@@ -23,6 +28,13 @@ namespace AwsMock::Dto::Transfer {
      * Value
      */
     std::string value;
+
+    /**
+     * Creates a JSON string from the object.
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Converts the DTO to a string representation.

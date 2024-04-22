@@ -9,17 +9,17 @@ namespace AwsMock::Dto::Transfer {
   std::string ListServerRequest::ToJson() const {
 
     try {
+
       Poco::JSON::Object rootJson;
       rootJson.set("Region", region);
       rootJson.set("MaxResults", maxResults);
       rootJson.set("NextToken", nextToken);
 
-      std::ostringstream os;
-      rootJson.stringify(os);
-      return os.str();
+      return Core::JsonUtils::ToJsonString(rootJson);
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
   }
 
@@ -27,7 +27,7 @@ namespace AwsMock::Dto::Transfer {
 
     Poco::JSON::Parser parser;
     Poco::Dynamic::Var result = parser.parse(body);
-    Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
     try {
 
@@ -37,7 +37,8 @@ namespace AwsMock::Dto::Transfer {
       Core::JsonUtils::GetJsonValueString("NextToken", rootObject, nextToken);
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
   }
 
@@ -48,7 +49,7 @@ namespace AwsMock::Dto::Transfer {
   }
 
   std::ostream &operator<<(std::ostream &os, const ListServerRequest &r) {
-    os << "ListServerRequest={region='" << r.region << "' maxResults='" << r.maxResults << "' nextToken='" << r.nextToken << "'}";
+    os << "ListServerRequest=" << r.ToJson();
     return os;
   }
 

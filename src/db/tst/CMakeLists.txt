@@ -16,7 +16,7 @@ link_directories(/usr/lib /usr/lib/x86_64-linux-gnu /usr/local/lib ../ ../../cor
 
 add_executable(${BINARY} DatabaseTests.cpp ${SQS_SOURCES} ${S3_SOURCES} ${SNS_SOURCES} ${MODULE_SOURCES}
         ${LAMBDA_SOURCES} ${TRANSFER_SOURCES} ${COGNITO_SOURCES} ${SECRETSMANAGER_SOURCES} main.cpp)
-target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore mongocxx bsoncxx PocoUtil PocoFoundation PocoNetSSL
-        PocoNet PocoJSON PocoZip PocoPrometheus gtest ${CMAKE_DL_LIBS} pthread ssl crypto z archive curl tbb)
+target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore mongocxx bsoncxx PocoUtil PocoFoundation PocoNet PocoJSON
+        PocoPrometheus PocoZip gtest ${CMAKE_DL_LIBS} pthread ssl crypto z archive curl tbb)
 
 add_test(NAME ${BINARY} COMMAND ${BINARY})

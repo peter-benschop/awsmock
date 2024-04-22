@@ -364,7 +364,7 @@ namespace AwsMock {
         /**
          * Logger
          */
-        [[maybe_unused]] Core::LogStream _logger = Core::LogStream("info");
+        Core::LogStream _logger = Core::LogStream("info");
 
         /**
          * Application configuration

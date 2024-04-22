@@ -53,6 +53,23 @@ namespace AwsMock::Dto::Common {
     return sstream.str();
   }
 
+  std::string SecretsManagerClientCommand::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("region", region);
+      rootJson.set("method", HttpMethodToString(method));
+      rootJson.set("command", SecretsManagerCommandTypeToString(command));
+      rootJson.set("user", user);
+
+      return Core::JsonUtils::ToJsonString(rootJson);
+
+    } catch (Poco::Exception &exc) {
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
+    }
+  }
+
   std::string SecretsManagerClientCommand::ToString() const {
     std::stringstream ss;
     ss << (*this);
@@ -60,7 +77,7 @@ namespace AwsMock::Dto::Common {
   }
 
   std::ostream &operator<<(std::ostream &os, const SecretsManagerClientCommand &r) {
-    os << "SecretsManagerClientCommand={method='" << HttpMethodToString(r.method) << ", region='" << r.region << "', user='" << r.user << "', command='" << SecretsManagerCommandTypeToString(r.command) << "}";
+    os << "SecretsManagerClientCommand="<<r.ToJson();
     return os;
   }
 }

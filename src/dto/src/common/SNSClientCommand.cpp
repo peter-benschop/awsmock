@@ -52,6 +52,23 @@ namespace AwsMock::Dto::Common {
     return Core::StringUtils::ToSnakeCase(cmd);
   }
 
+  std::string SNSClientCommand::ToJson() const {
+
+    try {
+      Poco::JSON::Object rootJson;
+      rootJson.set("region", region);
+      rootJson.set("method", HttpMethodToString(method));
+      rootJson.set("command", SNSCommandTypeToString(command));
+      rootJson.set("user", user);
+
+      return Core::JsonUtils::ToJsonString(rootJson);
+
+    } catch (Poco::Exception &exc) {
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
+    }
+  }
+
   std::string SNSClientCommand::ToString() const {
     std::stringstream ss;
     ss << (*this);

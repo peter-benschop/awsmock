@@ -6,27 +6,26 @@
 
 namespace AwsMock::Dto::Module {
 
-  std::string GatewayConfig::ToJson(const GatewayConfig &gatewayConfig) {
+  std::string GatewayConfig::ToJson() const {
     try {
       Poco::JSON::Object gatewayConfigJson;
-      gatewayConfigJson.set("region", gatewayConfig.region);
-      gatewayConfigJson.set("protocol", gatewayConfig.protocol);
-      gatewayConfigJson.set("endpoint", gatewayConfig.endpoint);
-      gatewayConfigJson.set("host", gatewayConfig.host);
-      gatewayConfigJson.set("port", gatewayConfig.port);
-      gatewayConfigJson.set("accessId", gatewayConfig.accessId);
-      gatewayConfigJson.set("clientId", gatewayConfig.clientId);
-      gatewayConfigJson.set("user", gatewayConfig.user);
-      gatewayConfigJson.set("dataDir", gatewayConfig.dataDir);
-      gatewayConfigJson.set("prettyPrint", gatewayConfig.prettyPrint);
-      gatewayConfigJson.set("databaseActive", gatewayConfig.databaseActive);
+      gatewayConfigJson.set("region", region);
+      gatewayConfigJson.set("protocol", protocol);
+      gatewayConfigJson.set("endpoint", endpoint);
+      gatewayConfigJson.set("host", host);
+      gatewayConfigJson.set("port", port);
+      gatewayConfigJson.set("accessId", accessId);
+      gatewayConfigJson.set("clientId", clientId);
+      gatewayConfigJson.set("user", user);
+      gatewayConfigJson.set("dataDir", dataDir);
+      gatewayConfigJson.set("prettyPrint", prettyPrint);
+      gatewayConfigJson.set("databaseActive", databaseActive);
 
-      std::ostringstream os;
-      gatewayConfigJson.stringify(os);
-      return os.str();
+      return Core::JsonUtils::ToJsonString(gatewayConfigJson);
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
   }
 
@@ -57,7 +56,8 @@ namespace AwsMock::Dto::Module {
       parser.reset();
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
     return gatewayConfig;
   }
@@ -69,8 +69,7 @@ namespace AwsMock::Dto::Module {
   }
 
   std::ostream &operator<<(std::ostream &os, const GatewayConfig &g) {
-    os << "GatewayConfig={region='" << g.region << "', protocol='" << g.protocol << "', endpoint=" << g.endpoint << "', host='" << g.host << "', port=" << g.port << ", accessId='" << g.accessId << "', clientId='" << g.clientId << "', user='" << g.user
-       << "', dataDir='" << g.dataDir << "', databaseActive=" << (g.databaseActive ? "true" : "false") << "}";
+    os << "GatewayConfig=" << g.ToJson();
     return os;
   }
 

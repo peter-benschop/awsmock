@@ -6,22 +6,21 @@
 
 namespace AwsMock::Dto::Module {
 
-  std::string Module::ToJson(const Database::Entity::Module::Module &module) {
+  std::string Module::ToJson() const {
     try {
       Poco::JSON::Object moduleJson;
-      moduleJson.set("name", module.name);
-      moduleJson.set("executable", module.executable);
-      moduleJson.set("port", module.port);
-      moduleJson.set("state", Database::Entity::Module::ModuleStateToString(module.state));
-      moduleJson.set("created", Poco::DateTimeFormatter().format(module.created, Poco::DateTimeFormat::HTTP_FORMAT));
-      moduleJson.set("modified", Poco::DateTimeFormatter().format(module.modified, Poco::DateTimeFormat::HTTP_FORMAT));
+      moduleJson.set("name", name);
+      moduleJson.set("executable", executable);
+      moduleJson.set("port", port);
+      moduleJson.set("state", Database::Entity::Module::ModuleStateToString(status));
+      moduleJson.set("created", Poco::DateTimeFormatter::format(created, Poco::DateTimeFormat::HTTP_FORMAT));
+      moduleJson.set("modified", Poco::DateTimeFormatter::format(modified, Poco::DateTimeFormat::HTTP_FORMAT));
 
-      std::ostringstream os;
-      moduleJson.stringify(os);
-      return os.str();
+      return Core::JsonUtils::ToJsonString(moduleJson);
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
   }
 
@@ -34,8 +33,8 @@ namespace AwsMock::Dto::Module {
         serviceJson.set("executable", service.executable);
         serviceJson.set("port", service.port);
         serviceJson.set("state", Database::Entity::Module::ModuleStateToString(service.state));
-        serviceJson.set("created", Poco::DateTimeFormatter().format(service.created, Poco::DateTimeFormat::HTTP_FORMAT));
-        serviceJson.set("modified", Poco::DateTimeFormatter().format(service.modified, Poco::DateTimeFormat::HTTP_FORMAT));
+        serviceJson.set("created",Poco::DateTimeFormatter::format(service.created, Poco::DateTimeFormat::HTTP_FORMAT));
+        serviceJson.set("modified",Poco::DateTimeFormatter::format(service.modified, Poco::DateTimeFormat::HTTP_FORMAT));
         moduleJsonArray.add(serviceJson);
       }
 
@@ -44,7 +43,8 @@ namespace AwsMock::Dto::Module {
       return os.str();
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
   }
 
@@ -52,6 +52,7 @@ namespace AwsMock::Dto::Module {
     if (payload.empty()) {
       return {};
     }
+
     Module module;
 
     Poco::JSON::Parser parser;
@@ -63,14 +64,13 @@ namespace AwsMock::Dto::Module {
       Core::JsonUtils::GetJsonValueString("executable", rootObject, module.executable);
       Core::JsonUtils::GetJsonValueInt("port", rootObject, module.port);
       if (rootObject->has("state")) {
-        module.status = Database::Entity::Module::ModuleStateFromString(rootObject->get("state").convert<std::string>());
+        module.status =
+            Database::Entity::Module::ModuleStateFromString(rootObject->get("state").convert<std::string>());
       }
 
-      // Cleanup
-      parser.reset();
-
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
     return module;
   }
@@ -89,10 +89,14 @@ namespace AwsMock::Dto::Module {
       for (const auto &jsonModule : *rootArray) {
         Module module;
         Core::JsonUtils::GetJsonValueString("name", jsonModule.extract<Poco::JSON::Object::Ptr>(), module.name);
-        Core::JsonUtils::GetJsonValueString("executable", jsonModule.extract<Poco::JSON::Object::Ptr>(), module.executable);
+        Core::JsonUtils::GetJsonValueString("executable",
+                                            jsonModule.extract<Poco::JSON::Object::Ptr>(),
+                                            module.executable);
         Core::JsonUtils::GetJsonValueInt("port", jsonModule.extract<Poco::JSON::Object::Ptr>(), module.port);
         if (jsonModule.extract<Poco::JSON::Object::Ptr>()->has("state")) {
-          module.status = Database::Entity::Module::ModuleStateFromString(jsonModule.extract<Poco::JSON::Object::Ptr>()->get("state").convert<std::string>());
+          module.status =
+              Database::Entity::Module::ModuleStateFromString(jsonModule.extract<Poco::JSON::Object::Ptr>()->get("state").convert<
+                  std::string>());
         }
         modules.emplace_back(module);
       }
@@ -101,7 +105,8 @@ namespace AwsMock::Dto::Module {
       parser.reset();
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
     return modules;
   }
@@ -113,7 +118,7 @@ namespace AwsMock::Dto::Module {
   }
 
   std::ostream &operator<<(std::ostream &os, const Module &m) {
-    os << "Module={name='" << m.name << "', executable='" << m.executable << "', port=" << m.port << "'}";
+    os << "Module=" << m.ToJson();
     return os;
   }
 

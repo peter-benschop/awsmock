@@ -2,8 +2,8 @@
 // Created by vogje01 on 31/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_COMMON_RESOURCENOTFOUNDRESTERRORRESPONSE_H
-#define AWSMOCK_DTO_COMMON_RESOURCENOTFOUNDRESTERRORRESPONSE_H
+#ifndef AWSMOCK_DTO_COMMON_RESOURCE_NOT_FOUND_REST_ERROR_RESPONSE_H
+#define AWSMOCK_DTO_COMMON_RESOURCE_NOT_FOUND_REST_ERROR_RESPONSE_H
 
 // C++ standard includes
 #include <string>
@@ -20,6 +20,7 @@
 
 // AwsMok includes
 #include "awsmock/core/ServiceException.h"
+#include "awsmock/core/XmlUtils.h"
 
 namespace AwsMock::Dto::Common {
 
@@ -87,13 +88,7 @@ namespace AwsMock::Dto::Common {
         pRequestId->appendChild(pRequestIdText);
       }
 
-      std::stringstream output;
-      Poco::XML::DOMWriter writer;
-      writer.setNewLine("\n");
-      writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
-      writer.writeNode(output, pDoc);
-
-      return output.str();
+      return Core::XmlUtils::ToXmlString(pDoc);
     }
 
     /**
@@ -121,4 +116,4 @@ namespace AwsMock::Dto::Common {
 
 } // namespace AwsMock::Dto::S3
 
-#endif // AWSMOCK_DTO_COMMON_RESOURCENOTFOUNDRESTERRORRESPONSE_H
+#endif // AWSMOCK_DTO_COMMON_RESOURCE_NOT_FOUND_REST_ERROR_RESPONSE_H

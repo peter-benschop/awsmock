@@ -96,6 +96,14 @@ namespace AwsMock::Database::Entity::Module {
     [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
     /**
+     * Convert to JSON representation
+     *
+     * @param moduleEntity module entity
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const;
+
+    /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.

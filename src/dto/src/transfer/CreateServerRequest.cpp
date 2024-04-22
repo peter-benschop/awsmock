@@ -9,17 +9,16 @@ namespace AwsMock::Dto::Transfer {
   std::string CreateServerRequest::ToJson() const {
 
     try {
+
       Poco::JSON::Object rootJson;
       rootJson.set("Region", region);
       rootJson.set("Domain", domain);
 
-
-      std::ostringstream os;
-      rootJson.stringify(os);
-      return os.str();
+      return Core::JsonUtils::ToJsonString(rootJson);
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
   }
 
@@ -59,7 +58,8 @@ namespace AwsMock::Dto::Transfer {
       parser.reset();
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
   }
 
@@ -70,17 +70,7 @@ namespace AwsMock::Dto::Transfer {
   }
 
   std::ostream &operator<<(std::ostream &os, const CreateServerRequest &r) {
-    os << "CreateServerRequest={region='" << r.region << "', tags=[";
-    for (const auto &tag : r.tags) {
-      os << tag.ToString() << ", ";
-    }
-    os.seekp(-2,std::ostream::cur);
-    os << "], protocols=[";
-    for (const auto &protocol : r.protocols) {
-      os << "'" << protocol << "', ";
-    }
-    os.seekp(-2,std::ostream::cur);
-    os << "]}";
+    os << "CreateServerRequest="<<r.ToJson();
     return os;
   }
 

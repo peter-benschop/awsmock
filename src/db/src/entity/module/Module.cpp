@@ -40,6 +40,10 @@ namespace AwsMock::Database::Entity::Module {
         bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
   }
 
+  std::string Module::ToJson() const {
+    return bsoncxx::to_json(ToDocument());
+  }
+
   std::string Module::ToString() const {
     std::stringstream ss;
     ss << (*this);

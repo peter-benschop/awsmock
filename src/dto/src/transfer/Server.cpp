@@ -22,9 +22,13 @@ namespace AwsMock::Dto::Transfer {
       return rootJson;
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
+  }
 
+  std::string Server::ToJson() const {
+    return Core::JsonUtils::ToJsonString(ToJsonObject());
   }
 
   std::string Server::ToString() const {
@@ -34,8 +38,7 @@ namespace AwsMock::Dto::Transfer {
   }
 
   std::ostream &operator<<(std::ostream &os, const Server &r) {
-    os << "Server={arn='" << r.arn << "' domain='" << r.domain << "' identityProviderType='" << r.identityProviderType << "' endpointType='" << r.endpointType
-       << "' loggingRole='" << r.loggingRole << "' serverId='" << r.serverId << "' state='" << r.state << "' userCount='" << r.userCount << "'}";
+    os << "Server="<<r.ToJson();
     return os;
   }
 

@@ -9,13 +9,11 @@
 #include <string>
 #include <sstream>
 
-// Poco includes
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/ServiceException.h>
+#include <awsmock/core/JsonException.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/dto/transfer/Server.h>
 
 namespace AwsMock::Dto::Transfer {
 
@@ -37,6 +35,13 @@ namespace AwsMock::Dto::Transfer {
      * @param body json input stream
      */
     void FromJson(const std::string &body);
+
+    /**
+     * Creates a JSON string from the object.
+     *
+     * @return JSON string
+     */
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Converts the DTO to a string representation.
