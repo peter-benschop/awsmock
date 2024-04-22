@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_SQSSERVICE_H
-#define AWSMOCK_SERVICE_SQSSERVICE_H
+#ifndef AWSMOCK_SERVICE_SQS_SERVICE_H
+#define AWSMOCK_SERVICE_SQS_SERVICE_H
 
 // C++ standard includes
 #include <string>
