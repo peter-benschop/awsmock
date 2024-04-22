@@ -18,7 +18,7 @@ release-notes:
         - name: Breaking Changes
           section-type: breaking-changes
 branches:
-    prefix: ([a-z]+\/)?
+    prefix: ([0-9]+-[a-z-]+)?
     suffix: (-.*)?
     disable-issue: false
     skip: [master, main, developer]

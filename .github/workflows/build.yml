@@ -20,7 +20,6 @@ jobs:
       - name: Create release tag
         id: create-release-tag
         run: |
-          git sv tag
           VERSION=$(git sv cv)
           gh release create $VERSION --latest --target=main --notes ""
 
@@ -33,18 +32,10 @@ jobs:
       - name: Build
         run: cmake --build ./build --config Release
 
-#      - name: Run tests
-#        run: cd build && ctest -V
-
-#      - name: Create docs
-#        run: cd build && make docs
-
   release:
     name: Release
     runs-on: self-hosted
     needs: [ build ]
-    env:
-      GH_TOKEN: '${{ github.token }}'
     steps:
       - name: Check out code
         uses: actions/checkout@v3
