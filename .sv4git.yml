@@ -6,7 +6,7 @@ versioning:
     ignore-unknown: false
 tag:
     pattern: '%d.%d.%d'
-    filter: ""
+    filter: "v*.*.*"
 release-notes:
     sections:
         - name: Features
