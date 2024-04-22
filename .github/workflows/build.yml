@@ -23,25 +23,6 @@ jobs:
           VERSION=$(git sv cv)
           gh release create $VERSION --latest --target=main --notes ""
 
-      - name: Build project
-        run: cmake -E make_directory ${{github.workspace}}/build
-
-      - name: Configure CMake
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-
-      - name: Build
-        run: cmake --build ./build --config Release
-
-  release:
-    name: Release
-    runs-on: self-hosted
-    needs: [ build ]
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
       - name: Build Docker
         run: |
           VERSION=$(git sv cv)
@@ -51,7 +32,7 @@ jobs:
   push_to_registry:
     name: Push Docker image to Docker Hub
     runs-on: self-hosted
-    needs: [ release ]
+    needs: [ build ]
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
