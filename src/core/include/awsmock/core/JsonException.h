@@ -14,6 +14,8 @@ namespace AwsMock::Core {
 
   /**
    * JSON exception class. In case of a JSON serialization/deserialization error.
+   *
+   * @author jens.vogt@opitz-consulting.com
    */
   class JsonException : public Poco::Exception {
 

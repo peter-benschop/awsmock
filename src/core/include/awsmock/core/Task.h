@@ -19,63 +19,68 @@
 
 namespace AwsMock::Core {
 
+  /**
+   * Task class
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   class Task {
 
-  public:
+    public:
 
-    /**
-     * Constructor
-     *
-     * @param _name task name
-     */
-    explicit Task(std::string  _name);
+      /**
+       * Constructor
+       *
+       * @param _name task name
+       */
+      explicit Task(std::string _name);
 
-    /**
-     * Start the task
-     */
-    void Start();
+      /**
+       * Start the task
+       */
+      void Start();
 
-    /**
-     * Stop the task
-     */
-    void Stop();
+      /**
+       * Stop the task
+       */
+      void Stop();
 
-    /**
-     * Main loop
-     */
-    virtual void Initialize() = 0;
+      /**
+       * Main loop
+       */
+      virtual void Initialize() = 0;
 
-    /**
-     * Main loop
-     */
-    virtual void Run() = 0;
+      /**
+       * Main loop
+       */
+      virtual void Run() = 0;
 
-  private:
+    private:
 
-    /**
-     * Logger
-     */
-    Core::LogStream _logger;
+      /**
+       * Logger
+       */
+      Core::LogStream _logger;
 
-    /**
-     * Timer name
-     */
-    std::string _name;
+      /**
+       * Timer name
+       */
+      std::string _name;
 
-    /**
-     * Loop timeout
-     */
-    int _timeout;
+      /**
+       * Loop timeout
+       */
+      int _timeout;
 
-    /**
-     * Promise for stopping thread
-     */
-    std::promise<void> _stop;
+      /**
+       * Promise for stopping thread
+       */
+      std::promise<void> _stop;
 
-    /**
-     * Thread handle
-     */
-    std::future<void> _thread_handle;
+      /**
+       * Thread handle
+       */
+      std::future<void> _thread_handle;
   };
 }
 

@@ -33,9 +33,8 @@ namespace AwsMock::Service {
      * Constructor
      *
      * @param configuration application configuration
-     * @param metricService monitoring module
      */
-    SecretsManagerHandler(Core::Configuration &configuration, Core::MetricService &metricService);
+    SecretsManagerHandler(Core::Configuration &configuration);
 
     /**
      * HTTP POST request.

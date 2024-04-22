@@ -100,14 +100,7 @@ namespace AwsMock::Database::Entity::Cognito {
   }
 
   std::ostream &operator<<(std::ostream &os, const User &u) {
-    os << "User={oid='" << u.oid << "', region='" + u.region + "', userName='" << u.userName << "', enabled='"
-       << u.enabled << "', userStatus='" << Entity::Cognito::UserStatusToString(u.userStatus) << "', userAttributes={";
-    for (const auto &attribute : u.userAttributes) {
-      os << attribute.name << "'" << attribute.value << "', ";
-    }
-    os << "\b\b" << "}";
-    os << ", created='" << Poco::DateTimeFormatter().format(u.created, Poco::DateTimeFormat::HTTP_FORMAT)
-       << "', modified='" << Poco::DateTimeFormatter().format(u.modified, Poco::DateTimeFormat::HTTP_FORMAT) << "'}";
+    os << "User=" << bsoncxx::to_json(u.ToDocument());
     return os;
   }
 }

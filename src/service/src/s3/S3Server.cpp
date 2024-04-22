@@ -14,7 +14,7 @@ namespace AwsMock::Service {
         _maxQueueLength = _configuration.getInt("awsmock.service.s3.max.queue", S3_DEFAULT_QUEUE_SIZE);
         _maxThreads = _configuration.getInt("awsmock.service.s3.max.threads", S3_DEFAULT_MAX_THREADS);
         _requestTimeout = _configuration.getInt("awsmock.service.s3.timeout", S3_DEFAULT_TIMEOUT);
-        _monitoringPeriod = _configuration.getInt("awsmock.service.s3.monitoring.timeout", S3_DEFAULT_MONITORING_PERIOD);
+        _monitoringPeriod = _configuration.getInt("awsmock.service.s3.monitoring.period", S3_DEFAULT_MONITORING_PERIOD);
 
         // Monitoring
         _s3Monitoring = std::make_unique<S3Monitoring>(_monitoringPeriod);

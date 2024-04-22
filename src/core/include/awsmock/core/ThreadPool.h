@@ -26,6 +26,11 @@
 
 namespace AwsMock::Core {
 
+  /**
+   * Thread pool
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
   template<typename C>
   class ThreadPool : public Poco::ThreadPool {
 

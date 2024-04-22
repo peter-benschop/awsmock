@@ -35,127 +35,136 @@ namespace AwsMock::Database {
    */
   class SecretsManagerMemoryDb {
 
-  public:
+    public:
 
-    /**
-     * Constructor
-     */
-    SecretsManagerMemoryDb() = default;
+      /**
+       * Constructor
+       */
+      SecretsManagerMemoryDb() = default;
 
-    /**
-     * Singleton instance
-     */
-    static SecretsManagerMemoryDb &instance() {
-      static Poco::SingletonHolder<SecretsManagerMemoryDb> sh;
-      return *sh.get();
-    }
+      /**
+       * Singleton instance
+       */
+      static SecretsManagerMemoryDb &instance() {
+        static Poco::SingletonHolder<SecretsManagerMemoryDb> sh;
+        return *sh.get();
+      }
 
-    /**
-     * Secret exists
-     *
-     * @param region AWS region
-     * @param name secret name
-     * @return true if secret exists
-     * @throws DatabaseException
-     */
-    bool SecretExists(const std::string &region, const std::string &name);
+      /**
+       * Secret exists
+       *
+       * @param region AWS region
+       * @param name secret name
+       * @return true if secret exists
+       * @throws DatabaseException
+       */
+      bool SecretExists(const std::string &region, const std::string &name);
 
-    /**
-     * Secret exists
-     *
-     * @param secret secret entity
-     * @return true if secret exists
-     * @throws DatabaseException
-     */
-    bool SecretExists(const Entity::SecretsManager::Secret &secret);
+      /**
+       * Secret exists
+       *
+       * @param secret secret entity
+       * @return true if secret exists
+       * @throws DatabaseException
+       */
+      bool SecretExists(const Entity::SecretsManager::Secret &secret);
 
-    /**
-     * Secret exists
-     *
-     * @param secretId secret ID
-     * @return true if secret exists
-     * @throws DatabaseException
-     */
-    bool SecretExists(const std::string &secretId);
+      /**
+       * Secret exists
+       *
+       * @param secretId secret ID
+       * @return true if secret exists
+       * @throws DatabaseException
+       */
+      bool SecretExists(const std::string &secretId);
 
-    /**
-     * Returns the secret by userPoolId
-     *
-     * @param oid secret oid
-     * @return secret, if existing
-     * @throws DatabaseException
-     */
-    Entity::SecretsManager::Secret GetSecretById(const std::string &oid);
+      /**
+       * Returns the secret by userPoolId
+       *
+       * @param oid secret oid
+       * @return secret, if existing
+       * @throws DatabaseException
+       */
+      Entity::SecretsManager::Secret GetSecretById(const std::string &oid);
 
-    /**
-     * Returns the secret by region and name.
-     *
-     * @param region AWS region
-     * @param name secret name
-     * @return secret entity
-     */
-    Entity::SecretsManager::Secret GetSecretByRegionName(const std::string &region, const std::string &name);
+      /**
+       * Returns the secret by region and name.
+       *
+       * @param region AWS region
+       * @param name secret name
+       * @return secret entity
+       */
+      Entity::SecretsManager::Secret GetSecretByRegionName(const std::string &region, const std::string &name);
 
-    /**
-     * Returns the secret by secret ID.
-     *
-     * @param secretId secret ID
-     * @return secret entity
-     */
-    Entity::SecretsManager::Secret GetSecretBySecretId(const std::string &secretId);
+      /**
+       * Returns the secret by secret ID.
+       *
+       * @param secretId secret ID
+       * @return secret entity
+       */
+      Entity::SecretsManager::Secret GetSecretBySecretId(const std::string &secretId);
 
-    /**
-     * Creates a new secret in the secrets manager collection
-     *
-     * @param secret secret entity
-     * @return created secret entity
-     * @throws DatabaseException
-     */
-    Entity::SecretsManager::Secret CreateSecret(const Entity::SecretsManager::Secret &secret);
+      /**
+       * Creates a new secret in the secrets manager collection
+       *
+       * @param secret secret entity
+       * @return created secret entity
+       * @throws DatabaseException
+       */
+      Entity::SecretsManager::Secret CreateSecret(const Entity::SecretsManager::Secret &secret);
 
-    /**
-     * Updates an existing secret
-     *
-     * @param secret secret entity
-     * @return updated secret entity
-     * @throws DatabaseException
-     */
-    Entity::SecretsManager::Secret UpdateSecret(const Entity::SecretsManager::Secret &secret);
+      /**
+       * Updates an existing secret
+       *
+       * @param secret secret entity
+       * @return updated secret entity
+       * @throws DatabaseException
+       */
+      Entity::SecretsManager::Secret UpdateSecret(const Entity::SecretsManager::Secret &secret);
 
-    /**
-     * Returns a list of secrets
-     *
-     * @return list of available secrets
-     * @throws DatabaseException
-     */
-    Entity::SecretsManager::SecretList ListSecrets();
+      /**
+       * Returns a list of secrets
+       *
+       * @return list of available secrets
+       * @throws DatabaseException
+       */
+      Entity::SecretsManager::SecretList ListSecrets();
 
-    /**
-     * Delete a secret.
-     *
-     * @param secret secret entity
-     * @throws DatabaseException
-     */
-    void DeleteSecret(const Entity::SecretsManager::Secret &secret);
+      /**
+       * Returns the total number of secrets
+       *
+       * @param region AWS region
+       * @return total number of secrets
+       * @throws DatabaseException
+       */
+      long CountSecrets(const std::string &region = {});
 
-    /**
-     * Delete all secret.
-     *
-     * @throws DatabaseException
-     */
-    void DeleteAllSecrets();
+      /**
+       * Delete a secret.
+       *
+       * @param secret secret entity
+       * @throws DatabaseException
+       */
+      void DeleteSecret(const Entity::SecretsManager::Secret &secret);
 
-  private:
+      /**
+       * Delete all secret.
+       *
+       * @throws DatabaseException
+       */
+      void DeleteAllSecrets();
 
-    /**
-     * Lambda map
-     */
-    std::map<std::string, Entity::SecretsManager::Secret> _secrets{};
+    private:
 
-    /**
-     * Lambda mutex
-     */
-    Poco::Mutex _secretMutex;
+      /**
+       * Lambda map
+       */
+      std::map<std::string, Entity::SecretsManager::Secret> _secrets{};
+
+      /**
+       * Lambda mutex
+       */
+      Poco::Mutex _secretMutex;
   };
 
 } // namespace AwsMock::Database

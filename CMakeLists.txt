@@ -53,7 +53,7 @@ if (BUILD_DOCUMENTATION)
 endif ()
 
 # Installation
-install(FILES dist/etc/aws-mock.properties DESTINATION /etc)
+install(FILES dist/etc/awsmock.properties DESTINATION /etc)
 install(FILES dist/etc/systemd/system/awsmock.service DESTINATION /etc/systemd/system)
 install(FILES dist/bin/awslocal DESTINATION ${CMAKE_INSTALL_PREFIX}/bin PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
         GROUP_EXECUTE GROUP_READ WORLD_EXECUTE)

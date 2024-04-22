@@ -160,7 +160,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
   }
 
   std::ostream &operator<<(std::ostream &os, const Table &t) {
-    os << "Table=" << t.ToJson();
+    os << "Table=" << bsoncxx::to_json(t.ToDocument());
     return os;
   }
 }

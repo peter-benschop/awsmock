@@ -44,11 +44,11 @@ namespace AwsMock::Service {
     }
 
     void GatewayHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-        log_trace << "Gateway GET request, URI: " + request.getURI() << " region: " << region << " user: " + user;
+        log_trace << "Gateway GET request, URI: " << request.getURI() << " region: " << region << " user: " << user << " remoteAddress: " << request.clientAddress().toString();
 
         Core::MetricServiceTimer measure(_metricService, GATEWAY_GET_TIMER);
         _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "GET");
-        log_debug << "Gateway GET request, URI: " + request.getURI() << " region: " << region << " user: " + user;
+        log_debug << "Gateway GET request, URI: " + request.getURI() << " region: " << region << " user: " << user;
 
         SetHeaders(request, region, user);
         switch (_route._handlerType) {
@@ -89,14 +89,14 @@ namespace AwsMock::Service {
             }
 
             case SECRETS_MANAGER: {
-                CallAsyncGet(SecretsManagerHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncGet(SecretsManagerHandler(_configuration), request, response, region, user);
                 break;
             }
         }
     }
 
     void GatewayHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-        log_trace << "Gateway PUT request, URI: " << request.getURI() << " region: " << region << " user: " << user;
+        log_trace << "Gateway PUT request, URI: " << request.getURI() << " region: " << region << " user: " << user << " remoteAddress: " << request.clientAddress().toString();
 
         Core::MetricServiceTimer measure(_metricService, GATEWAY_PUT_TIMER);
         _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "PUT");
@@ -140,14 +140,14 @@ namespace AwsMock::Service {
                 break;
             }
             case SECRETS_MANAGER: {
-                CallAsyncPut(SecretsManagerHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncPut(SecretsManagerHandler(_configuration), request, response, region, user);
                 break;
             }
         }
     }
 
     void GatewayHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-        log_trace << "Gateway POST request, URI: " << request.getURI() << " region: " << region << " user: " << user;
+        log_trace << "Gateway POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << " remoteAddress: " << request.clientAddress().toString();
 
         Core::MetricServiceTimer measure(_metricService, GATEWAY_POST_TIMER);
         _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "POST");
@@ -192,14 +192,14 @@ namespace AwsMock::Service {
             }
 
             case SECRETS_MANAGER: {
-                CallAsyncPost(SecretsManagerHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncPost(SecretsManagerHandler(_configuration), request, response, region, user);
                 break;
             }
         }
     }
 
     void GatewayHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-        log_debug << "Gateway DELETE request, URI: " + request.getURI() << " region: " << region << " user: " << user;
+        log_trace << "Gateway DELETE request, URI: " << request.getURI() << " region: " << region << " user: " << user << " remoteAddress: " << request.clientAddress().toString();
 
         Core::MetricServiceTimer measure(_metricService, GATEWAY_DELETE_TIMER);
         _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "DELETE");
@@ -244,14 +244,14 @@ namespace AwsMock::Service {
             }
 
             case SECRETS_MANAGER: {
-                CallAsyncDelete(SecretsManagerHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncDelete(SecretsManagerHandler(_configuration), request, response, region, user);
                 break;
             }
         }
     }
 
     void GatewayHandler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-        log_trace << "Gateway HEAD request, URI: " << request.getURI() << " region: " << region << " user: " << user;
+        log_trace << "Gateway HEAD request, URI: " << request.getURI() << " region: " << region << " user: " << user << " remoteAddress: " << request.clientAddress().toString();
 
         Core::MetricServiceTimer measure(_metricService, GATEWAY_HEAD_TIMER);
         _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "HEAD");
@@ -296,7 +296,7 @@ namespace AwsMock::Service {
             }
 
             case SECRETS_MANAGER: {
-                CallAsyncHead(SecretsManagerHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncHead(SecretsManagerHandler(_configuration), request, response, region, user);
                 break;
             }
         }

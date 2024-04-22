@@ -49,7 +49,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
   }
 
   std::ostream &operator<<(std::ostream &os, const Item &i) {
-    os << "Item={oid='" << i.oid << "', region='" << i.region << "', name='" << i.name << "'}";
+    os << "Item=" << bsoncxx::to_json(i.ToDocument());
     return os;
   }
 }

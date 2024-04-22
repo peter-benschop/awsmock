@@ -80,7 +80,7 @@ COPY --from=build /usr/bin/aws /usr/bin/
 COPY --from=build /usr/bin/awsmockmgr /usr/bin/
 COPY --from=build /usr/bin/awsmockctl /usr/bin/
 COPY --from=build /usr/lib/libawsmock* /usr/lib/
-COPY --from=build /etc/aws-mock.properties /etc/
+COPY --from=build /etc/awsmock.properties /etc/
 COPY --from=build /usr/bin/awslocal /usr/bin/
 
 # Configure awslocal

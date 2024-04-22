@@ -109,8 +109,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
   }
 
   std::ostream &operator<<(std::ostream &os, const AttributeValue &a) {
-    os << "AttributeValue={S='" << a.stringValue << "', N='" << a.numberValue << ", BOOL='" << a.boolValue
-       << "', NULL='" << a.nullValue << "'}";
+    os << "AttributeValue=" << bsoncxx::to_json(a.ToDocument());
     return os;
   }
 

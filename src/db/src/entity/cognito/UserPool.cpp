@@ -59,10 +59,7 @@ namespace AwsMock::Database::Entity::Cognito {
   }
 
   std::ostream &operator<<(std::ostream &os, const UserPool &u) {
-    os << "UserPool={oid='" << u.oid << "' region='" << u.region << "' userPoolId='" << u.userPoolId << "'name='" << u.name
-       << "', clientId='" << u.clientId
-       << "', created='" << Poco::DateTimeFormatter::format(u.created, Poco::DateTimeFormat::HTTP_FORMAT)
-       << "' modified='" << Poco::DateTimeFormatter::format(u.modified, Poco::DateTimeFormat::HTTP_FORMAT) << "'}";
+    os << "UserPool=" << bsoncxx::to_json(u.ToDocument());
     return os;
   }
 }
