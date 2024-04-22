@@ -21,22 +21,27 @@
 
 namespace AwsMock::Core {
 
-    class LogStream {
+  /**
+   * Logging setup
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
+  class LogStream {
 
-      public:
+    public:
 
-        /**
-         * Constructor
-         */
-        LogStream();
+      /**
+       * Constructor
+       */
+      LogStream();
 
-        /**
-         * Constructor
-         *
-         * @param severity PLog severity string
-         */
-        LogStream(const std::string &severity);
-    };
+      /**
+       * Constructor
+       *
+       * @param severity PLog severity string
+       */
+      explicit LogStream(const std::string &severity);
+  };
 
 } // namespace AwsMock::Core
 

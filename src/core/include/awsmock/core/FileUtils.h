@@ -48,7 +48,7 @@
 namespace AwsMock::Core {
 
   /**
-   * Directory utilities.
+   * File utilities.
    *
    * @author jens.vogt@opitz-consulting.com
    */

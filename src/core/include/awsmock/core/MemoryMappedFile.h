@@ -23,8 +23,6 @@
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
 
-#define MEMORY_SIZE (10 * 1024 * 1024) // 10GB
-
 namespace AwsMock::Core {
 
   /**

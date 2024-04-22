@@ -5,12 +5,14 @@
 #ifndef AWS_MOCK_CORE_CORE_EXCEPTION_H
 #define AWS_MOCK_CORE_CORE_EXCEPTION_H
 
-#include "Poco/Exception.h"
+#include <Poco/Exception.h>
 
 namespace AwsMock::Core {
 
   /**
    * COM exception class. In case of a COM request failure a COMException is thrown.
+   *
+   * @author jens.vogt@opitz-consulting.com
    */
   class CoreException : public Poco::Exception {
   public:

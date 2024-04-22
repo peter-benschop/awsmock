@@ -41,6 +41,8 @@ namespace AwsMock::Core {
    * awsmock.monitoring.timeout=60000
    * awsmock.logging.level=debug
    * </pre>
+   *
+   * @author jens.vogt@opitz-consulting.com
    */
   class Configuration : public Poco::Util::PropertyFileConfiguration {
 
