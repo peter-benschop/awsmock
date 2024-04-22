@@ -13,7 +13,11 @@ date: December 18, 2023
 ```awslocal``` is a short bash script, which can be used to simplify the command line execution of AWS commands against 
 the AwsMock AWS simulation. It sets the endpoint and the profile to be used for the AwsMock command line commands. 
 Credentials are normally not used during the work with AwsMock. Nevertheless, you can give a AWS profile name in the
-bash script in order to provide AWS login credentials. ```awslocal``` is per default installed in ```/usr/bin```.
+bash script in order to provide AWS login credentials.
+
+```awslocal``` is per default installed in ```/usr/bin``` (if you
+use the docker image, it will be in ```/usr/bin``` inside the docker image). If you need it locally, copy it from the
+docker image.
 
 ## SOURCE
 

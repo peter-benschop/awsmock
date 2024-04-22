@@ -96,12 +96,10 @@ Building of the AwsMOck executables is CMake based.
 
 #### Minimum Requirements:
 
-- GNU Compiler Collection (GCC) 4.9 or later
-- OR Clang 3.3 or later
-- Aws SDK C++ installed (see [AWS SDK for C++](https://pocoproject.org/))
+- GNU Compiler Collection (GCC) 4.9 or later or Clang 3.3 or later
 - Poco installed (see [Simplify C++ development](https://pocoproject.org/))
-- MongoDB C and CXX clients (see [MongoDB C++ driver](https://www.mongodb.com/docs/drivers/cxx/))
-- libcurl, libz, libssl, libcrypto, libarchive, libtbb
+- MongoDB C and CXX driver (see [MongoDB C++ driver](https://www.mongodb.com/docs/drivers/cxx/))
+- Development releaases of libcurl, libz, libssl, libcrypto, libarchive, libtbb
 - 4GB of RAM.
 
 #### Building from Source:
@@ -114,8 +112,8 @@ To create an out-of-source build:
 1. Install CMake and the relevant build tools for your platform. Ensure these are available in your executable path.
 2. Download the source tree
    ```
-   git clone https://github.com/jensvogt/aws-mock.git
-   cd aws-mock
+   git clone https://github.com/jensvogt/awsmock.git
+   cd awsmock
    ```
 3. Build the project:
    ```
@@ -151,11 +149,11 @@ To start the docker image:
   docker run -p 4566:4566 -p 4567:4567 -p 8080:8080 jensvogt/aws-mock:latest
   ```
 
-This invocation will run with the in-memory database, as the alpine image does not have a own MongoDb instance.
+This invocation will run with the in-memory database, as the alpine image does not have an own MongoDb instance.
 
 To connect a MongoDB instance use the provided docker-compose file:
 
-  ```
+```
   cd docker
   docker-compose up
-  ```
+```

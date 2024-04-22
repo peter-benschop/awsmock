@@ -210,7 +210,7 @@
           "refId": "A"
         }
       ],
-      "title": "Real Memory",
+      "title": "Real Memory Usage",
       "type": "timeseries"
     },
     {
@@ -353,7 +353,6 @@
             }
           },
           "mappings": [],
-          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -367,7 +366,7 @@
               }
             ]
           },
-          "unit": "ms"
+          "unit": "none"
         },
         "overrides": []
       },
@@ -377,19 +376,13 @@
         "x": 0,
         "y": 15
       },
-      "id": 2,
+      "id": 4,
       "options": {
         "legend": {
-          "calcs": [
-            "min",
-            "max",
-            "last"
-          ],
-          "displayMode": "table",
+          "calcs": [],
+          "displayMode": "list",
           "placement": "bottom",
-          "showLegend": true,
-          "sortBy": "Min",
-          "sortDesc": true
+          "showLegend": true
         },
         "tooltip": {
           "mode": "single",
@@ -403,73 +396,13 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(gateway_get_time[5m]) or vector(0)",
-          "legendFormat": "GET",
+          "expr": "avg_over_time(total_threads[5m])",
+          "legendFormat": "Total",
           "range": true,
           "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
-          },
-          "editorMode": "code",
-          "expr": "avg_over_time(gateway_put_time[5m]) or vector(0)",
-          "hide": false,
-          "legendFormat": "PUT",
-          "range": true,
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
-          },
-          "editorMode": "code",
-          "expr": "avg_over_time(gateway_post_time[5m]) or vector(0)",
-          "hide": false,
-          "legendFormat": "POST",
-          "range": true,
-          "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
-          },
-          "editorMode": "code",
-          "expr": "avg_over_time(gateway_delete_time[5m]) or vector(0)",
-          "hide": false,
-          "legendFormat": "DELETE",
-          "range": true,
-          "refId": "D"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
-          },
-          "editorMode": "code",
-          "expr": "avg_over_time(gateway_options_time[5m]) or vector(0)",
-          "hide": false,
-          "legendFormat": "OPTIONS",
-          "range": true,
-          "refId": "E"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
-          },
-          "editorMode": "code",
-          "expr": "avg_over_time(gateway_head_time[5m]) or vector(0)",
-          "hide": false,
-          "legendFormat": "HEAD",
-          "range": true,
-          "refId": "F"
         }
       ],
-      "title": "HTTP Request Time",
+      "title": "Threads",
       "type": "timeseries"
     },
     {
@@ -616,6 +549,7 @@
             }
           },
           "mappings": [],
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -629,7 +563,7 @@
               }
             ]
           },
-          "unit": "none"
+          "unit": "ms"
         },
         "overrides": []
       },
@@ -639,13 +573,19 @@
         "x": 16,
         "y": 15
       },
-      "id": 4,
+      "id": 2,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": [
+            "min",
+            "max",
+            "last"
+          ],
+          "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Min",
+          "sortDesc": true
         },
         "tooltip": {
           "mode": "single",
@@ -659,13 +599,73 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(total_threads[5m])",
-          "legendFormat": "Total",
+          "expr": "avg_over_time(gateway_get_time[5m]) or vector(0)",
+          "legendFormat": "GET",
           "range": true,
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+          },
+          "editorMode": "code",
+          "expr": "avg_over_time(gateway_put_time[5m]) or vector(0)",
+          "hide": false,
+          "legendFormat": "PUT",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+          },
+          "editorMode": "code",
+          "expr": "avg_over_time(gateway_post_time[5m]) or vector(0)",
+          "hide": false,
+          "legendFormat": "POST",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+          },
+          "editorMode": "code",
+          "expr": "avg_over_time(gateway_delete_time[5m]) or vector(0)",
+          "hide": false,
+          "legendFormat": "DELETE",
+          "range": true,
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+          },
+          "editorMode": "code",
+          "expr": "avg_over_time(gateway_options_time[5m]) or vector(0)",
+          "hide": false,
+          "legendFormat": "OPTIONS",
+          "range": true,
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+          },
+          "editorMode": "code",
+          "expr": "avg_over_time(gateway_head_time[5m]) or vector(0)",
+          "hide": false,
+          "legendFormat": "HEAD",
+          "range": true,
+          "refId": "F"
         }
       ],
-      "title": "Threads",
+      "title": "HTTP Request Time",
       "type": "timeseries"
     }
   ],
@@ -683,6 +683,6 @@
   "timezone": "",
   "title": "Manager",
   "uid": "cdae61d8-610f-49e4-bd3f-e7f1bf336d20",
-  "version": 11,
+  "version": 13,
   "weekStart": ""
 }
