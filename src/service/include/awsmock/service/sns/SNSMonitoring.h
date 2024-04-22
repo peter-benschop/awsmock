@@ -13,6 +13,11 @@
 
 namespace AwsMock::Service {
 
+    /**
+     * SNS monitoring thread
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class SNSMonitoring : public Core::Timer {
 
       public:

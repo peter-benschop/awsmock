@@ -3,9 +3,6 @@
 
 namespace AwsMock::Service {
 
-  SQSHandler::SQSHandler(Core::Configuration &configuration) : SQSCmdHandler(configuration) {
-  }
-
   void SQSHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
     log_debug << "SQS POST request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 

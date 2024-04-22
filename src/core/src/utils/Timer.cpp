@@ -37,6 +37,17 @@ namespace AwsMock::Core {
         });
     }
 
+    void Timer::Restart() {
+        Stop();
+        Start();
+        log_info << "Timer restarted, name: " << _name << " timeout: " << _timeout;
+    }
+
+    void Timer::SetTimeout(int timeout) {
+        _timeout = timeout;
+        Restart();
+    }
+
     void Timer::Stop() {
         _stop.set_value();
     }

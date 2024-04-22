@@ -35,7 +35,7 @@ namespace AwsMock::Service {
      *
      * @param configuration application configuration
      */
-    SNSHandler(Core::Configuration &configuration);
+    explicit SNSHandler(Core::Configuration &configuration) : SNSCmdHandler(configuration), _configuration(configuration), _snsService(configuration) {}
 
     /**
      * HTTP POST request.

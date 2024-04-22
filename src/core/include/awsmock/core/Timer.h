@@ -44,9 +44,14 @@ namespace AwsMock::Core {
       explicit Timer(std::string name) : _name(std::move(name)) {}
 
       /**
-       * Start the task
+       * Start the timer
        */
       void Start();
+
+      /**
+       * Restart the timer
+       */
+      void Restart();
 
       /**
        * Start the task
@@ -73,6 +78,15 @@ namespace AwsMock::Core {
        */
       virtual void Shutdown() = 0;
 
+      /**
+       * Sets the timeout.
+       *
+       * <p>
+       * The time will be stopped and restarted
+       * </p>
+       */
+      void SetTimeout(int timeout);
+
     private:
 
       /**
@@ -83,7 +97,7 @@ namespace AwsMock::Core {
       /**
        * Loop timeout
        */
-      int _timeout;
+      int _timeout{};
 
       /**
        * Promise for stopping thread

@@ -79,7 +79,7 @@ namespace AwsMock::Service {
             }
 
             case COGNITO: {
-                CallAsyncGet(CognitoHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncGet(CognitoHandler(_configuration), request, response, region, user);
                 break;
             }
 
@@ -131,7 +131,7 @@ namespace AwsMock::Service {
             }
 
             case COGNITO: {
-                CallAsyncPut(CognitoHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncPut(CognitoHandler(_configuration), request, response, region, user);
                 break;
             }
 
@@ -182,7 +182,7 @@ namespace AwsMock::Service {
             }
 
             case COGNITO: {
-                CallAsyncPost(CognitoHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncPost(CognitoHandler(_configuration), request, response, region, user);
                 break;
             }
 
@@ -234,7 +234,7 @@ namespace AwsMock::Service {
             }
 
             case COGNITO: {
-                CallAsyncDelete(CognitoHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncDelete(CognitoHandler(_configuration), request, response, region, user);
                 break;
             }
 
@@ -286,7 +286,7 @@ namespace AwsMock::Service {
             }
 
             case COGNITO: {
-                CallAsyncHead(CognitoHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncHead(CognitoHandler(_configuration), request, response, region, user);
                 break;
             }
 

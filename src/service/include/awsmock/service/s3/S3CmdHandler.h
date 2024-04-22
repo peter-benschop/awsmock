@@ -24,100 +24,92 @@
 
 namespace AwsMock::Service {
 
-  /**
-   * AWS S3 mock handler
-   *
-   * <p>
-   * AWS S3 HTTP request handler. All S3 related REST call are ending here. Depending on the request header the S3 module will be selected in case the
-   * authorization header contains the S3 module. As the different clients (Java, C++, Python, nodejs) are using different request structure, the request
-   * are first send to the S3CmdHandler, which normalizes the commands.
-   * </p>
-   */
-  class S3CmdHandler : public virtual AbstractHandler {
-
-  public:
-
     /**
-     * Constructor
+     * AWS S3 mock handler
      *
-     * @param configuration application configuration
+     * <p>
+     * AWS S3 HTTP request handler. All S3 related REST call are ending here. Depending on the request header the S3 module will be selected in case the
+     * authorization header contains the S3 module. As the different clients (Java, C++, Python, nodejs) are using different request structure, the request
+     * are first send to the S3CmdHandler, which normalizes the commands.
+     * </p>
      */
-    S3CmdHandler(Core::Configuration &configuration) : AbstractHandler(), _configuration(configuration), _s3Service(configuration) {}
+    class S3CmdHandler : public virtual AbstractHandler {
 
-  protected:
+      public:
 
-    /**
-     * HTTP GET request.
-     *
-     * @param request HTTP request
-     * @param response HTTP response
-     * @param s3Command S3 client command
-     * @see AbstractResource::handleGet(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-     */
-    void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3Command) override;
+        /**
+         * Constructor
+         *
+         * @param configuration application configuration
+         */
+        explicit S3CmdHandler(Core::Configuration &configuration) : AbstractHandler(), _configuration(configuration), _s3Service(configuration) {}
 
-    /**
-     * HTTP PUT request.
-     *
-     * @param request HTTP request
-     * @param response HTTP response
-     * @param s3Command S3 client command
-     * @see AbstractResource::handlePut(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-     */
-    void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3Command) override;
+      protected:
 
-    /**
-     * HTTP POST request.
-     *
-     * @param request HTTP request
-     * @param response HTTP response
-     * @param s3Command S3 client command
-     * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-     */
-    void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3Command) override;
+        /**
+         * HTTP GET request.
+         *
+         * @param request HTTP request
+         * @param response HTTP response
+         * @param s3Command S3 client command
+         * @see AbstractResource::handleGet(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+         */
+        void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3Command) override;
 
-    /**
-     * Delete DELETE request.
-     *
-     * @param request HTTP request
-     * @param response HTTP response
-     * @param s3Command S3 client command
-     * @see AbstractResource::handleDelete(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-     */
-    void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3Command) override;
+        /**
+         * HTTP PUT request.
+         *
+         * @param request HTTP request
+         * @param response HTTP response
+         * @param s3Command S3 client command
+         * @see AbstractResource::handlePut(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+         */
+        void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3Command) override;
 
-    /**
-     * Options request.
-     *
-     * @param response HTTP response
-     * @see AbstractResource::handleOption(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-     */
-    void handleOptions(Poco::Net::HTTPServerResponse &response) override;
+        /**
+         * HTTP POST request.
+         *
+         * @param request HTTP request
+         * @param response HTTP response
+         * @param s3Command S3 client command
+         * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+         */
+        void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3Command) override;
 
-    /**
-     * Head request.
-     *
-     * @param request HTTP request
-     * @param response HTTP response
-     * @param region AWS region name
-     * @param user AWS user
-     * @see AbstractResource::handleHead(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-     */
-    void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+        /**
+         * Delete DELETE request.
+         *
+         * @param request HTTP request
+         * @param response HTTP response
+         * @param s3Command S3 client command
+         * @see AbstractResource::handleDelete(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+         */
+        void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3Command) override;
 
-  private:
+        /**
+         * Head request.
+         *
+         * @param request HTTP request
+         * @param response HTTP response
+         * @param region AWS region name
+         * @param user AWS user
+         * @see AbstractResource::handleHead(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+         */
+        void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
-    /**
-     * S3 handler configuration
-     */
-    Core::Configuration &_configuration;
+      private:
 
-    /**
-     * S3 module
-     */
-    Service::S3Service _s3Service;
+        /**
+         * S3 handler configuration
+         */
+        Core::Configuration &_configuration;
 
-  };
+        /**
+         * S3 module
+         */
+        Service::S3Service _s3Service;
+
+    };
 
 } // namespace AwsMock::Service
 

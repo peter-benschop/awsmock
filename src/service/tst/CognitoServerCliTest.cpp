@@ -51,9 +51,8 @@ namespace AwsMock::Service {
 
     std::string _endpoint, _accountId;
     Core::Configuration& _configuration = Core::Configuration::instance();
-    Core::MetricService& _metricService = Core::MetricService::instance();
     Database::CognitoDatabase _database = Database::CognitoDatabase();
-    CognitoServer _dynamodbServer = CognitoServer(_configuration, _metricService);
+    CognitoServer _dynamodbServer = CognitoServer(_configuration);
   };
 
   TEST_F(CognitoServerCliTest, UserPoolCreateTest) {
