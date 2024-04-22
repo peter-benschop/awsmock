@@ -10,16 +10,10 @@
 #include <sstream>
 #include <vector>
 
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/Dynamic/Var.h>
-
 // AwsMock includes
-#include <awsmock/core/ServiceException.h>
+#include <awsmock/core/JsonException.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Dto::Docker {
 
@@ -84,7 +78,7 @@ namespace AwsMock::Dto::Docker {
      *
      * @return JSON string
      */
-    std::string ToJson();
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Converts the DTO to a string representation.

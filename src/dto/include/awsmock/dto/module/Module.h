@@ -8,19 +8,10 @@
 // C++ includes
 #include <string>
 
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Array.h>
-#include <Poco/JSON/Object.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/Net/HTTPServerResponse.h>
-
 // AwsMock includes
 #include "awsmock/core/JsonUtils.h"
-#include <awsmock/core/ServiceException.h>
+#include <awsmock/core/JsonException.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/entity/module/Module.h>
 #include <awsmock/entity/module/ModuleState.h>
 
@@ -64,7 +55,7 @@ namespace AwsMock::Dto::Module {
      * @param moduleEntity module entity
      * @return JSON string
      */
-    static std::string ToJson(const Database::Entity::Module::Module &moduleEntity);
+    [[nodiscard]] std::string ToJson() const;
 
     /**
      * Convert to JSON representation

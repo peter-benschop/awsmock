@@ -6,9 +6,11 @@
 
 namespace AwsMock::Dto::Docker {
 
-  std::string Filters::ToJson() {
+  std::string Filters::ToJson() const {
+
     try {
-      Poco::JSON::Object rootObject;
+
+      Poco::JSON::Object rootJson;
 
       Poco::JSON::Array filterArray;
       for (const auto &filter : filters) {
@@ -17,14 +19,13 @@ namespace AwsMock::Dto::Docker {
         filterArray.add(filterObject);
       }
 
-      rootObject.set("reference", filterArray);
+      rootJson.set("reference", filterArray);
 
-      std::ostringstream os;
-      rootObject.stringify(os);
-      return os.str();
+      return Core::JsonUtils::ToJsonString(rootJson);
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
   }
 
@@ -35,12 +36,7 @@ namespace AwsMock::Dto::Docker {
   }
 
   std::ostream &operator<<(std::ostream &os, const Filters &p) {
-    os << "Filters={[";
-    for (const auto &filter : p.filters) {
-      os << filter.name << "='" << filter.value << "', ";
-    }
-    os.seekp(-2, std::ostream::cur);
-    os << "]}";
+    os << "Filters=" << p.ToJson();
     return os;
   }
 

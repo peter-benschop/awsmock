@@ -2,26 +2,25 @@
 // Created by vogje01 on 06/06/2023.
 //
 
-#include <awsmock/dto/docker/ListContainerResponse.h>
+#include <awsmock/dto/docker/ListImageResponse.h>
 
 namespace AwsMock::Dto::Docker {
 
-  ListContainerResponse::ListContainerResponse(const std::string &body) {
+  ListImageResponse::ListImageResponse(const std::string &body) {
     FromJson(body);
   }
 
-  void ListContainerResponse::FromJson(const std::string &body) {
+  void ListImageResponse::FromJson(const std::string &jsonString) {
 
     try {
       Poco::JSON::Parser parser;
-      Poco::Dynamic::Var result = parser.parse(body);
+      Poco::Dynamic::Var result = parser.parse(jsonString);
       Poco::JSON::Array::Ptr rootArray = result.extract<Poco::JSON::Array::Ptr>();
-
       if (rootArray != nullptr) {
         for (const auto &it : *rootArray) {
-          Container container;
-          container.FromJson(it.extract<Poco::JSON::Object::Ptr>());
-          containerList.push_back(container);
+          Image image;
+          image.FromJson(it.extract<Poco::JSON::Object::Ptr>());
+          imageList.push_back(image);
         }
       }
 
@@ -31,15 +30,15 @@ namespace AwsMock::Dto::Docker {
     }
   }
 
-  std::string ListContainerResponse::ToJson() const {
+  std::string ListImageResponse::ToJson() const {
 
     try {
 
       Poco::JSON::Object rootJson;
 
-      Poco::JSON::Array containerArray;
-      for (const auto &container : containerList) {
-        containerArray.add(container.ToJsonObject());
+      Poco::JSON::Array imageArray;
+      for (const auto &image : imageList) {
+        imageArray.add(image.ToJsonObject());
       }
 
       return Core::JsonUtils::ToJsonString(rootJson);
@@ -50,14 +49,14 @@ namespace AwsMock::Dto::Docker {
     }
   }
 
-  std::string ListContainerResponse::ToString() const {
+  std::string ListImageResponse::ToString() const {
     std::stringstream ss;
     ss << (*this);
     return ss.str();
   }
 
-  std::ostream &operator<<(std::ostream &os, const ListContainerResponse &r) {
-    os << "ListContainerResponse="<<r.ToJson();
+  std::ostream &operator<<(std::ostream &os, const ListImageResponse &r) {
+    os << "ImageListResponse=" << r.ToJson();
     return os;
   }
 

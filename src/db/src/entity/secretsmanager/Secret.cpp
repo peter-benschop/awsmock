@@ -51,17 +51,17 @@ namespace AwsMock::Database::Entity::SecretsManager {
 
     try {
       oid = mResult.value()["_id"].get_oid().value.to_string();
-      region = mResult.value()["region"].get_string().value;
-      name = mResult.value()["name"].get_string().value;
-      arn = mResult.value()["arn"].get_string().value;
-      secretId = mResult.value()["secretId"].get_string().value;
-      kmsKeyId = mResult.value()["kmsKeyId"].get_string().value;
-      versionId = mResult.value()["versionId"].get_string().value;
-      secretString = mResult.value()["secretString"].get_string().value;
-      secretBinary = mResult.value()["secretBinary"].get_string().value;
-      description = mResult.value()["description"].get_string().value;
-      owningService = mResult.value()["owningService"].get_string().value;
-      primaryRegion = mResult.value()["primaryRegion"].get_string().value;
+      region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
+      name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
+      arn = bsoncxx::string::to_string(mResult.value()["arn"].get_string().value);
+      secretId = bsoncxx::string::to_string(mResult.value()["secretId"].get_string().value);
+      kmsKeyId = bsoncxx::string::to_string(mResult.value()["kmsKeyId"].get_string().value);
+      versionId = bsoncxx::string::to_string(mResult.value()["versionId"].get_string().value);
+      secretString = bsoncxx::string::to_string(mResult.value()["secretString"].get_string().value);
+      secretBinary = bsoncxx::string::to_string(mResult.value()["secretBinary"].get_string().value);
+      description = bsoncxx::string::to_string(mResult.value()["description"].get_string().value);
+      owningService = bsoncxx::string::to_string(mResult.value()["owningService"].get_string().value);
+      primaryRegion = bsoncxx::string::to_string(mResult.value()["primaryRegion"].get_string().value);
       createdDate = mResult.value()["createdDate"].get_int64().value;
       deletedDate = mResult.value()["deletedDate"].get_int64().value;
       lastAccessedDate = mResult.value()["lastAccessedDate"].get_int64().value;
@@ -69,7 +69,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
       lastRotatedDate = mResult.value()["lastRotatedDate"].get_int64().value;
       nextRotatedDate = mResult.value()["nextRotatedDate"].get_int64().value;
       rotationEnabled = mResult.value()["rotationEnabled"].get_bool().value;
-      rotationLambdaARN = mResult.value()["rotationLambdaARN"].get_string().value;
+      rotationLambdaARN = bsoncxx::string::to_string(mResult.value()["rotationLambdaARN"].get_string().value);
       created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
       modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
 
@@ -77,8 +77,8 @@ namespace AwsMock::Database::Entity::SecretsManager {
       if (mResult.value().find("rotationRules") != mResult.value().end()) {
         bsoncxx::document::view rotationView = mResult.value()["rotationRules"].get_document().value;
         rotationRules.automaticallyAfterDays = rotationView["automaticallyAfterDays"].get_int64().value;
-        rotationRules.duration = rotationView["duration"].get_string().value;
-        rotationRules.scheduleExpression = rotationView["scheduleExpression"].get_string().value;
+        rotationRules.duration = bsoncxx::string::to_string(rotationView["duration"].get_string().value);
+        rotationRules.scheduleExpression = bsoncxx::string::to_string(rotationView["scheduleExpression"].get_string().value);
       }
     } catch (const mongocxx::exception &exc) {
       Poco::Logger::get("Secret").error("Exception: oid: " + oid + " error: " + exc.what());

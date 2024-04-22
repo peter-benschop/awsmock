@@ -16,12 +16,11 @@ namespace AwsMock::Dto::Transfer {
       rootJson.set("Password", password);
       rootJson.set("HomeDirectory", homeDirectory);
 
-      std::ostringstream os;
-      rootJson.stringify(os);
-      return os.str();
+      return Core::JsonUtils::ToJsonString(rootJson);
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
   }
 
@@ -45,7 +44,8 @@ namespace AwsMock::Dto::Transfer {
       parser.reset();
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
   }
 
@@ -56,8 +56,7 @@ namespace AwsMock::Dto::Transfer {
   }
 
   std::ostream &operator<<(std::ostream &os, const CreateUserRequest &r) {
-    os << "CreateUserRequest={region='" << r.region << "', serverId='" << r.serverId << "', userName='" << r.userName << "', password:='" << r.password
-       << "', homeDirectory='" << r.homeDirectory << "}";
+    os << "CreateUserRequest="<<r.ToJson();
     return os;
   }
 

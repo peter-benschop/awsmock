@@ -6,6 +6,25 @@
 
 namespace AwsMock::Dto::Transfer {
 
+  std::string IdentityProviderDetails::ToJson() const {
+
+    try {
+
+      Poco::JSON::Object rootJson;
+      rootJson.set("directoryId", directoryId);
+      rootJson.set("function", function);
+      rootJson.set("url", url);
+      rootJson.set("invocationRole", invocationRole);
+      rootJson.set("sftpAuthenticationMethods", sftpAuthenticationMethods);
+
+      return Core::JsonUtils::ToJsonString(rootJson);
+
+    } catch (Poco::Exception &exc) {
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
+    }
+  }
+
   std::string IdentityProviderDetails::ToString() const {
     std::stringstream ss;
     ss << (*this);
@@ -13,7 +32,7 @@ namespace AwsMock::Dto::Transfer {
   }
 
   std::ostream &operator<<(std::ostream &os, const IdentityProviderDetails &r) {
-    os << "IdentityProviderDetails={directoryId='" << r.directoryId << "' function='" << r.function << "' invocationRole='" << r.invocationRole << "', sftpAuthenticationMethods='" << r.sftpAuthenticationMethods << "', url='" << r.url << "'}";
+    os << "IdentityProviderDetails="<<r.ToJson();
     return os;
   }
 

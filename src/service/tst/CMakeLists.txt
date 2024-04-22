@@ -18,7 +18,6 @@ link_directories(/usr/lib /usr/lib/x86_64-linux-gnu /usr/local/lib ../../core ..
 add_executable(${BINARY}  ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
         ${COGNITO_SOURCES} ${DYNAMODB_SOURCES} ${MAIN_SOURCES})
 target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore awsmockdto awsmockdb mongocxx bsoncxx PocoUtil
-        PocoFoundation PocoNetSSL PocoNet PocoJSON PocoXML PocoZip PocoPrometheus gtest pthread ssl crypto z archive
-        curl tbb)
+        PocoFoundation PocoNet PocoJSON PocoXML PocoZip PocoPrometheus gtest pthread ssl crypto z archive curl tbb)
 
 add_test(NAME ${BINARY} COMMAND ${BINARY} WORKING_DIRECTORY ${CMAKE_CURRENT_SRC_DIR})

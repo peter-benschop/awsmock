@@ -9,12 +9,10 @@
 #include <string>
 #include <vector>
 
-// Poco includes
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-
 // AwsMock includes
-#include <awsmock/core/ServiceException.h>
+#include <awsmock/core/JsonException.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Dto::Docker {
 
@@ -43,7 +41,7 @@ namespace AwsMock::Dto::Docker {
        *
        * @param object JSON object
        */
-      std::string ToJson();
+      [[nodiscard]] std::string ToJson() const;
 
       /**
        * Converts the DTO to a string representation.

@@ -11,12 +11,11 @@ namespace AwsMock::Dto::Transfer {
       rootJson.set("ServerId", serverId);
       rootJson.set("Arn", arn);
 
-      std::ostringstream os;
-      rootJson.stringify(os);
-      return os.str();
+      return Core::JsonUtils::ToJsonString(rootJson);
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
   }
 
@@ -27,7 +26,7 @@ namespace AwsMock::Dto::Transfer {
   }
 
   std::ostream &operator<<(std::ostream &os, const CreateServerResponse &r) {
-    os << "CreateServerResponse={region='" << r.region << "', serverId='" << r.serverId << "', arn='" << r.arn << "'}";
+    os << "CreateServerResponse=" << r.ToJson();
     return os;
   }
 

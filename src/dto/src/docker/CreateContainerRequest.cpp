@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::Docker {
 
-  std::string CreateContainerRequest::ToJson() {
+  std::string CreateContainerRequest::ToJson() const {
 
     try {
       Poco::JSON::Object rootJson;
@@ -49,12 +49,11 @@ namespace AwsMock::Dto::Docker {
       hostConfigObject.set("NetworkMode", networkMode);
       rootJson.set("HostConfig", hostConfigObject);
 
-      std::ostringstream os;
-      rootJson.stringify(os);
-      return os.str();
+      return Core::JsonUtils::ToJsonString(rootJson);
 
     } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+      log_error << exc.message();
+      throw Core::JsonException(exc.message());
     }
   }
 
@@ -65,12 +64,7 @@ namespace AwsMock::Dto::Docker {
   }
 
   std::ostream &operator<<(std::ostream &os, const CreateContainerRequest &r) {
-    os << "CreateContainerRequest={hostName='" << r.hostName << "' domainName='" << r.domainName << "' user='" << r.user << "' containerPort='"
-       << r.containerPort + "' ";
-    for (auto &it : r.environment) {
-      os << it << ",";
-    };
-    os << "}";
+    os << "CreateContainerRequest="<<r.ToJson();
     return os;
   }
 
