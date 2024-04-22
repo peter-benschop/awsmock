@@ -20,6 +20,7 @@ jobs:
       - name: Create release tag
         id: create-release-tag
         run: |
+          git sv tag
           VERSION=$(git sv cv)
           gh release create $VERSION --latest --target=main --notes ""
 
@@ -38,28 +39,10 @@ jobs:
 #      - name: Create docs
 #        run: cd build && make docs
 
-  tag:
-    name: Tag
-    runs-on: self-hosted
-    needs: [ build ]
-    env:
-      GH_TOKEN: ${{ github.token }}
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Set GitHub Actions as commit author
-        shell: bash
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
   release:
     name: Release
     runs-on: self-hosted
-    needs: [ tag ]
+    needs: [ build ]
     env:
       GH_TOKEN: '${{ github.token }}'
     steps:

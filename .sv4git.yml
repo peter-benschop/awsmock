@@ -35,4 +35,4 @@ commit-message:
             use-hash: false
             add-value-prefix: ""
     issue:
-        regex: '[0-9]+-[A-Z]+'
+        regex: '[0-9]+-[A-Za-z-]+'
