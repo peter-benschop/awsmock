@@ -3,8 +3,7 @@
 
 namespace AwsMock::Service {
 
-  CognitoHandler::CognitoHandler(Core::Configuration &configuration, Core::MetricService &metricService) : CognitoCliHandler(configuration, metricService), CognitoJava2Handler(configuration, metricService),
-                                                                                                           _configuration(configuration), _metricService(metricService), _cognitoService(configuration) {}
+  CognitoHandler::CognitoHandler(Core::Configuration &configuration) : CognitoCliHandler(configuration), CognitoJava2Handler(configuration), _configuration(configuration), _cognitoService(configuration) {}
 
   void CognitoHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
     log_debug << "Cognito GET request, URI: " + request.getURI() << " region: " << region << " user: " + user;

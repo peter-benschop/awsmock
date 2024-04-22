@@ -3,8 +3,6 @@
 
 namespace AwsMock::Service {
 
-    SQSCmdHandler::SQSCmdHandler(Core::Configuration &configuration) : AbstractHandler(), _configuration(configuration), _sqsService(configuration) {}
-
     void SQSCmdHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::SQSClientCommand &sqsClientCommand) {
         log_debug << "SQS POST request, URI: " << request.getURI() << " region: " << sqsClientCommand.region << " user: " << sqsClientCommand.user << " command: " << Dto::Common::SqsCommandTypeToString(sqsClientCommand.command);
 

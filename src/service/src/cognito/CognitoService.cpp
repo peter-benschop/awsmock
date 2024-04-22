@@ -2,12 +2,9 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include "awsmock/service/cognito/CognitoService.h"
+#include <awsmock/service/cognito/CognitoService.h>
 
 namespace AwsMock::Service {
-
-  CognitoService::CognitoService(Core::Configuration &configuration) : _configuration(configuration), _database(Database::CognitoDatabase::instance()) {
-  }
 
   Dto::Cognito::CreateUserPoolResponse CognitoService::CreateUserPool(const Dto::Cognito::CreateUserPoolRequest &request) {
     log_debug << "Create user pool request, region:  " << request.region << " name: " << request.name;
@@ -34,7 +31,7 @@ namespace AwsMock::Service {
 
     } catch (Poco::Exception &ex) {
       log_error << "Create user pool request failed, message: " << ex.message();
-      throw Core::ServiceException(ex.message(), 500);
+      throw Core::ServiceException(ex.message());
     }
   }
 
@@ -52,7 +49,7 @@ namespace AwsMock::Service {
 
     } catch (Poco::Exception &ex) {
       log_error << "User pool list request failed, message: " << ex.message();
-      throw Core::ServiceException(ex.message(), 500);
+      throw Core::ServiceException(ex.message());
     }
   }
 
@@ -70,7 +67,7 @@ namespace AwsMock::Service {
 
     } catch (Poco::Exception &ex) {
       log_error << "Create user pool request failed, message: " << ex.message();
-      throw Core::ServiceException(ex.message(), 500);
+      throw Core::ServiceException(ex.message());
     }
   }
 
@@ -106,7 +103,7 @@ namespace AwsMock::Service {
 
     } catch (Poco::Exception &ex) {
       log_error << "Create user request failed, message: " << ex.message();
-      throw Core::ServiceException(ex.message(), 500);
+      throw Core::ServiceException(ex.message());
     }
 
   }
@@ -125,7 +122,7 @@ namespace AwsMock::Service {
 
     } catch (Poco::Exception &ex) {
       log_error << "User list request failed, message: " << ex.message();
-      throw Core::ServiceException(ex.message(), 500);
+      throw Core::ServiceException(ex.message());
     }
   }
 
@@ -148,7 +145,7 @@ namespace AwsMock::Service {
 
     } catch (Poco::Exception &ex) {
       log_error << "Delete user request failed, message: " << ex.message();
-      throw Core::ServiceException(ex.message(), 500);
+      throw Core::ServiceException(ex.message());
     }
 
   }

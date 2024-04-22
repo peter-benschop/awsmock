@@ -11,7 +11,8 @@ set(SNS_SOURCES src/sns/SNSServer.cpp src/sns/SNSHandler.cpp src/sns/SNSCmdHandl
 set(LAMBDA_SOURCES src/lambda/LambdaServer.cpp src/lambda/LambdaHandler.cpp src/lambda/LambdaService.cpp
         src/lambda/LambdaCreator.cpp src/lambda/LambdaExecutor.cpp src/lambda/LambdaMonitoring.cpp)
 set(COGNITO_SOURCES src/cognito/CognitoHandler.cpp src/cognito/CognitoHandler.cpp src/cognito/CognitoCliHandler.cpp
-        src/cognito/CognitoJava2Handler.cpp src/cognito/CognitoService.cpp src/cognito/CognitoServer.cpp)
+        src/cognito/CognitoJava2Handler.cpp src/cognito/CognitoService.cpp src/cognito/CognitoServer.cpp
+        src/cognito/CognitoMonitoring.cpp)
 set(TRANSFER_SOURCES src/transfer/TransferServer.cpp src/transfer/TransferHandler.cpp src/transfer/TransferService.cpp)
 set(DYNAMODB_SOURCES src/dynamodb/DynamoDbServer.cpp src/dynamodb/DynamoDbHandler.cpp src/dynamodb/DynamoDbService.cpp
         src/dynamodb/DynamoDbCmdHandler.cpp src/dynamodb/DynamoDbMonitoring.cpp)
@@ -32,12 +33,9 @@ set(SOURCES src/common/AbstractHandler.cpp src/common/AbstractWorker.cpp src/com
 add_subdirectory(tst)
 
 # Includes
-include_directories(include ../core/include ../db/include ../dto/include /usr/include /usr/include/bsoncxx/v_noabi
-        /usr/include/mongocxx/v_noabi tbb)
+include_directories(include ../core/include ../db/include ../dto/include /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
 
-add_library(${LIBRARY} SHARED ${SOURCES}
-        include/awsmock/service/gateway/GatewayRoute.h
-        include/awsmock/service/sqs/SQSMonitoring.h)
+add_library(${LIBRARY} SHARED ${SOURCES})
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 

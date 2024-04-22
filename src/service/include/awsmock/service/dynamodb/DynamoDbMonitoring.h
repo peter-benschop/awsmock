@@ -13,6 +13,11 @@
 
 namespace AwsMock::Service {
 
+    /**
+     * DynamoDB monitoring thread
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class DynamoDbMonitoring : public Core::Timer {
 
       public:

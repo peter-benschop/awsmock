@@ -2,30 +2,30 @@
 // Created by vogje01 on 4/21/24.
 //
 
-#ifndef AWSMOCK_SERVICE_SQS_MONITORING_H
-#define AWSMOCK_SERVICE_SQS_MONITORING_H
+#ifndef AWSMOCK_SERVICE_COGNITO_MONITORING_H
+#define AWSMOCK_SERVICE_COGNITO_MONITORING_H
 
 // AwsMock includes
 #include <awsmock/core/MetricDefinition.h>
 #include <awsmock/core/MetricService.h>
 #include <awsmock/core/Timer.h>
-#include <awsmock/repository/SQSDatabase.h>
+#include <awsmock/repository/CognitoDatabase.h>
 
 namespace AwsMock::Service {
 
     /**
-     * SQS monitoring thread
+     * Cognito monitoring thread
      *
      * @author jens.vogt@opitz-consulting.com
      */
-    class SQSMonitoring : public Core::Timer {
+    class CognitoMonitoring : public Core::Timer {
 
       public:
 
         /**
          * Constructor
          */
-        explicit SQSMonitoring(int timeout) : Core::Timer("sqs-monitoring", timeout) {}
+        explicit CognitoMonitoring(int timeout) : Core::Timer("cognito-monitoring", timeout) {}
 
         /**
          * Initialization
@@ -57,8 +57,13 @@ namespace AwsMock::Service {
         /**
          * Database connection
          */
-        Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
+        Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
+
+        /**
+         * Period
+         */
+        int _period{};
 
     };
 }
-#endif // AWSMOCK_SERVICE_SQS_MONITORING_H
+#endif // AWSMOCK_SERVICE_COGNITO_MONITORING_H

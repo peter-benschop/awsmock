@@ -13,149 +13,139 @@
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
-#include <awsmock/core/MetricService.h>
-#include <awsmock/core/ThreadPool.h>
 #include <awsmock/repository/CognitoDatabase.h>
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/common/AbstractWorker.h>
 #include <awsmock/service/cognito/CognitoHandlerFactory.h>
+#include <awsmock/service/cognito/CognitoMonitoring.h>
 
 #define COGNITO_DEFAULT_PORT 9505
 #define COGNITO_DEFAULT_HOST "localhost"
 #define COGNITO_DEFAULT_QUEUE_SIZE 250
 #define COGNITO_DEFAULT_MAX_THREADS 50
 #define COGNITO_DEFAULT_TIMEOUT 900
+#define COGNITO_DEFAULT_MONITORING_PERIOD 300
 
 namespace AwsMock::Service {
 
-  /**
-   * Cognito module
-   */
-  class CognitoServer : public AbstractServer, public AbstractWorker {
-
-  public:
     /**
-     * Constructor
+     * Cognito module
      *
-     * @param configuration application configuration
-     * @param metricService monitoring module
+     * @author jens.vogt@opitz-consulting.com
      */
-    explicit CognitoServer(Core::Configuration &configuration, Core::MetricService &metricService);
+    class CognitoServer : public AbstractServer, public AbstractWorker {
 
-    /**
-     * Initialization
-     */
-    void Initialize() override;
+      public:
+        /**
+         * Constructor
+         *
+         * @param configuration application configuration
+         */
+        explicit CognitoServer(Core::Configuration &configuration);
 
-    /**
-     * Main method
-     */
-    void Run() override;
+        /**
+         * Initialization
+         */
+        void Initialize() override;
 
-    /**
-     * Shutdown
-     */
-    void Shutdown() override;
+        /**
+         * Main method
+         */
+        void Run() override;
 
-  private:
+        /**
+         * Shutdown
+         */
+        void Shutdown() override;
 
-    /**
-     * Update metric counters
-     */
-    void UpdateCounters();
+      private:
 
-    /**
-     * Rest port
-     */
-    int _port;
+        /**
+         * Rest port
+         */
+        int _port;
 
-    /**
-     * Rest host
-     */
-    std::string _host;
+        /**
+         * Rest host
+         */
+        std::string _host;
 
-    /**
-    * Application configuration
-    */
-    Core::Configuration &_configuration;
+        /**
+        * Application configuration
+        */
+        Core::Configuration &_configuration;
 
-    /**
-     * Metric module
-     */
-    Core::MetricService &_metricService;
+        /**
+         * HTTP manager instance
+         */
+        std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
 
-    /**
-     * HTTP manager instance
-     */
-    std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
+        /**
+         * Service database
+         */
+        Database::ModuleDatabase &_moduleDatabase;
 
-    /**
-     * Service database
-     */
-    Database::ModuleDatabase &_moduleDatabase;
+        /**
+         * Cognito database
+         */
+        Database::CognitoDatabase &_cognitoDatabase;
 
-    /**
-     * S3 database
-     */
-    Database::CognitoDatabase &_cognitoDatabase;
+        /**
+         * Cognito monitoring
+         */
+        std::shared_ptr<CognitoMonitoring> _cognitoMonitoring;
 
-    /**
-     * HTTP max message queue length
-     */
-    int _maxQueueLength;
+        /**
+         * HTTP max message queue length
+         */
+        int _maxQueueLength;
 
-    /**
-     * HTTP max concurrent connection
-     */
-    int _maxThreads;
+        /**
+         * HTTP max concurrent connection
+         */
+        int _maxThreads;
 
-    /**
-     * HTTP request timeout in seconds
-     */
-    int _requestTimeout;
+        /**
+         * HTTP request timeout in seconds
+         */
+        int _requestTimeout;
 
-    /**
-     * Sleeping period in ms
-     */
-    int _period;
+        /**
+         * Data directory
+         */
+        std::string _dataDir;
 
-    /**
-     * Running flag
-     */
-    bool _running;
+        /**
+         * AWS region
+         */
+        std::string _region;
 
-    /**
-     * Data directory
-     */
-    std::string _dataDir;
+        /**
+         * AWS account ID
+         */
+        std::string _accountId;
 
-    /**
-     * AWS region
-     */
-    std::string _region;
+        /**
+         * AWS client ID
+         */
+        std::string _clientId;
 
-    /**
-     * AWS account ID
-     */
-    std::string _accountId;
+        /**
+         * AWS user
+         */
+        std::string _user;
 
-    /**
-     * AWS client ID
-     */
-    std::string _clientId;
+        /**
+         * Cognito module name
+         */
+        std::string _module;
 
-    /**
-     * AWS user
-     */
-    std::string _user;
-
-    /**
-     * S3 module name
-     */
-    std::string _module;
-
-  };
+        /**
+         * Monitoring period
+         */
+        int _monitoringPeriod;
+    };
 
 } // namespace AwsMock::Service
 

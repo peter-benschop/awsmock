@@ -26,7 +26,6 @@
 #include <awsmock/service/sqs/SQSService.h>
 #include <awsmock/service/sqs/SQSCmdHandler.h>
 
-#define DEFAULT_SQS_ENDPOINT "localhost:4566"
 #define DEFAULT_SQS_ACCOUNT_ID "000000000000"
 
 namespace AwsMock::Service {
@@ -53,7 +52,7 @@ namespace AwsMock::Service {
      *
      * @param configuration application configuration
      */
-    SQSHandler(Core::Configuration &configuration);
+    explicit SQSHandler(Core::Configuration &configuration) : SQSCmdHandler(configuration) {}
 
     /**
        * HTTP POST request.

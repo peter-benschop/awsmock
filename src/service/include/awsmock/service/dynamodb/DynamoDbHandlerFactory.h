@@ -18,41 +18,43 @@
 
 namespace AwsMock::Service {
 
-  /**
-   * DynamoDB request handler factory
-   */
-  class DynamoDbRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
-
-  public:
-
     /**
-     * Constructor
+     * DynamoDB request handler factory
      *
-     * @param configuration application configuration
+     * @author jens.vogt@opitz-consulting.com
      */
-    DynamoDbRequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
+    class DynamoDbRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 
-    /**
-     * Create new lambda request handler
-     *
-     * @param request HTTP request
-     * @return lambda request handler
-     */
-    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
-      if(request.getURI().empty()) {
-        return nullptr;
-      }
-      return new DynamoDbHandler(_configuration);
-    }
+      public:
 
-  private:
+        /**
+         * Constructor
+         *
+         * @param configuration application configuration
+         */
+        explicit DynamoDbRequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
 
-    /**
-     * S3 handler configuration
-     */
-    Core::Configuration &_configuration;
+        /**
+         * Create new lambda request handler
+         *
+         * @param request HTTP request
+         * @return lambda request handler
+         */
+        Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
+            if (request.getURI().empty()) {
+                return nullptr;
+            }
+            return new DynamoDbHandler(_configuration);
+        }
 
-  };
+      private:
+
+        /**
+         * S3 handler configuration
+         */
+        Core::Configuration &_configuration;
+
+    };
 
 } // namespace AwsMock::Service
 

@@ -13,52 +13,57 @@
 
 namespace AwsMock::Service {
 
-  class SecretsManagerMonitoring : public Core::Timer {
+    /**
+     * Cognito monitoring thread
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
+    class SecretsManagerMonitoring : public Core::Timer {
 
-    public:
+      public:
 
-      /**
-       * Constructor
-       */
-      explicit SecretsManagerMonitoring(int timeout) : Core::Timer("secretsmanager-monitoring", timeout) {}
+        /**
+         * Constructor
+         */
+        explicit SecretsManagerMonitoring(int timeout) : Core::Timer("secretsmanager-monitoring", timeout) {}
 
-      /**
-       * Initialization
-       */
-      void Initialize() override;
+        /**
+         * Initialization
+         */
+        void Initialize() override;
 
-      /**
-       * Main method
-       */
-      void Run() override;
+        /**
+         * Main method
+         */
+        void Run() override;
 
-      /**
-       * Shutdown
-       */
-      void Shutdown() override;
+        /**
+         * Shutdown
+         */
+        void Shutdown() override;
 
-    private:
+      private:
 
-      /**
-       * Update counters
-       */
-      void UpdateCounter();
+        /**
+         * Update counters
+         */
+        void UpdateCounter();
 
-      /**
-       * Metric service
-       */
-      Core::MetricService &_metricService = Core::MetricService::instance();
+        /**
+         * Metric service
+         */
+        Core::MetricService &_metricService = Core::MetricService::instance();
 
-      /**
-       * Database connection
-       */
-      Database::SecretsManagerDatabase &_secretsManagerDatabase = Database::SecretsManagerDatabase::instance();
+        /**
+         * Database connection
+         */
+        Database::SecretsManagerDatabase &_secretsManagerDatabase = Database::SecretsManagerDatabase::instance();
 
-      /**
-       * Period
-       */
-      int _period{};
+        /**
+         * Period
+         */
+        int _period{};
 
-  };
+    };
 }
 #endif // AWSMOCK_SERVICE_SECRETSMANAGER_MONITORING_H

@@ -51,7 +51,7 @@ namespace AwsMock::Service {
      *
      * @param configuration application configuration
      */
-    SQSCmdHandler(Core::Configuration &configuration);
+    explicit SQSCmdHandler(Core::Configuration &configuration) : AbstractHandler(), _configuration(configuration), _sqsService(configuration) {}
 
   protected:
 

@@ -2,8 +2,8 @@
 // Created by vogje01 on 17/06/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_COGNITOHANDLERFACTORY_H
-#define AWSMOCK_SERVICE_COGNITOHANDLERFACTORY_H
+#ifndef AWSMOCK_SERVICE_COGNITO_HANDLER_FACTORY_H
+#define AWSMOCK_SERVICE_COGNITO_HANDLER_FACTORY_H
 
 // Poco includes
 #include <Poco/Net/HTTPRequestHandlerFactory.h>
@@ -16,48 +16,44 @@
 
 namespace AwsMock::Service {
 
-  /**
-   * S3 request handler factory
-   */
-  class CognitoHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
-
-  public:
-
     /**
-     * Constructor
+     * Cognito request handler factory
      *
-     * @param configuration application configuration
-     * @param metricService  monitoring
+     * @author jens.vogt@opitz-consulting.com
      */
-    CognitoHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService) {}
+    class CognitoHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 
-    /**
-     * Create a new request handler instance.
-     *
-     * @param request HTTP request
-     * @return HTTP request handler
-     */
-    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
-      if(request.getURI().empty()) {
-        return nullptr;
-      }
-      return new CognitoHandler(_configuration, _metricService);
-    }
+      public:
 
-  private:
+        /**
+         * Constructor
+         *
+         * @param configuration application configuration
+         */
+        explicit CognitoHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
 
-    /**
-     * S3 handler configuration
-     */
-    Core::Configuration &_configuration;
+        /**
+         * Create a new request handler instance.
+         *
+         * @param request HTTP request
+         * @return HTTP request handler
+         */
+        Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
+            if (request.getURI().empty()) {
+                return nullptr;
+            }
+            return new CognitoHandler(_configuration);
+        }
 
-    /**
-     * Metric module
-     */
-    Core::MetricService &_metricService;
+      private:
 
-  };
+        /**
+         * Cognito handler configuration
+         */
+        Core::Configuration &_configuration;
+
+    };
 
 } // namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_COGNITOHANDLERFACTORY_H
+#endif // AWSMOCK_SERVICE_COGNITO_HANDLER_FACTORY_H

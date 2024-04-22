@@ -13,6 +13,11 @@
 
 namespace AwsMock::Service {
 
+    /**
+     * Lambda monitoring thread
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class LambdaMonitoring : public Core::Timer {
 
       public:
