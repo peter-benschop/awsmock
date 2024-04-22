@@ -89,7 +89,7 @@ namespace AwsMock::Service {
             }
 
             case SECRETS_MANAGER: {
-                CallAsyncGet(SecretsManagerHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncGet(SecretsManagerHandler(_configuration), request, response, region, user);
                 break;
             }
         }
@@ -140,7 +140,7 @@ namespace AwsMock::Service {
                 break;
             }
             case SECRETS_MANAGER: {
-                CallAsyncPut(SecretsManagerHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncPut(SecretsManagerHandler(_configuration), request, response, region, user);
                 break;
             }
         }
@@ -192,7 +192,7 @@ namespace AwsMock::Service {
             }
 
             case SECRETS_MANAGER: {
-                CallAsyncPost(SecretsManagerHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncPost(SecretsManagerHandler(_configuration), request, response, region, user);
                 break;
             }
         }
@@ -244,7 +244,7 @@ namespace AwsMock::Service {
             }
 
             case SECRETS_MANAGER: {
-                CallAsyncDelete(SecretsManagerHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncDelete(SecretsManagerHandler(_configuration), request, response, region, user);
                 break;
             }
         }
@@ -296,7 +296,7 @@ namespace AwsMock::Service {
             }
 
             case SECRETS_MANAGER: {
-                CallAsyncHead(SecretsManagerHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncHead(SecretsManagerHandler(_configuration), request, response, region, user);
                 break;
             }
         }

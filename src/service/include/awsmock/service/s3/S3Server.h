@@ -30,100 +30,100 @@
 
 namespace AwsMock::Service {
 
-    /**
-     * S3 HTTP server
-     *
-     * <p>
-     * The S3 HTTP server gates the requests from the gateway, which acts like a API gateway. The S3 default port is 9500 and can set in the AwsMOck configuration file
-     * <i>/etc/awsmock.properties</i>
-     * </p>
-     *
-     * @author jens.vogt@opitz-consulting.com
-     */
-    class S3Server : public AbstractServer, public AbstractWorker {
+  /**
+   * S3 HTTP server
+   *
+   * <p>
+   * The S3 HTTP server gates the requests from the gateway, which acts like a API gateway. The S3 default port is 9500 and can set in the AwsMOck configuration file
+   * <i>/etc/awsmock.properties</i>
+   * </p>
+   *
+   * @author jens.vogt@opitz-consulting.com
+   */
+  class S3Server : public AbstractServer, public AbstractWorker {
 
-      public:
+    public:
 
-        /**
-         * Constructor
-         *
-         * @param configuration application configuration
-         */
-        explicit S3Server(Core::Configuration &configuration);
+      /**
+       * Constructor
+       *
+       * @param configuration application configuration
+       */
+      explicit S3Server(Core::Configuration &configuration);
 
-        /**
-         * Timer initialization
-         */
-        void Initialize() override;
+      /**
+       * Timer initialization
+       */
+      void Initialize() override;
 
-        /**
-         * Timer main method
-         */
-        void Run() override;
+      /**
+       * Timer main method
+       */
+      void Run() override;
 
-        /**
-         * Shutdown
-         */
-        void Shutdown() override;
+      /**
+       * Shutdown
+       */
+      void Shutdown() override;
 
-      private:
+    private:
 
-        /**
-         * Rest port
-         */
-        int _port;
+      /**
+       * Rest port
+       */
+      int _port;
 
-        /**
-         * Rest host
-         */
-        std::string _host;
+      /**
+       * Rest host
+       */
+      std::string _host;
 
-        /**
-        * Application configuration
-        */
-        Core::Configuration &_configuration;
+      /**
+      * Application configuration
+      */
+      Core::Configuration &_configuration;
 
-        /**
-         * HTTP manager instance
-         */
-        std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
+      /**
+       * HTTP manager instance
+       */
+      std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
 
-        /**
-         * S3 monitoring
-         */
-        std::shared_ptr<S3Monitoring> _s3Monitoring;
+      /**
+       * S3 monitoring
+       */
+      std::shared_ptr<S3Monitoring> _s3Monitoring;
 
-        /**
-         * HTTP max message queue length
-         */
-        int _maxQueueLength;
+      /**
+       * HTTP max message queue length
+       */
+      int _maxQueueLength;
 
-        /**
-         * HTTP max concurrent connection
-         */
-        int _maxThreads;
+      /**
+       * HTTP max concurrent connection
+       */
+      int _maxThreads;
 
-        /**
-         * HTTP request timeout in seconds
-         */
-        int _requestTimeout;
+      /**
+       * HTTP request timeout in seconds
+       */
+      int _requestTimeout;
 
-        /**
-         * Data directory
-         */
-        std::string _dataDir;
+      /**
+       * Data directory
+       */
+      std::string _dataDir;
 
-        /**
-         * Module name
-         */
-        std::string _module;
+      /**
+       * Module name
+       */
+      std::string _module;
 
-        /**
-         * Monitoring period
-         */
-        int _monitoringPeriod;
+      /**
+       * Monitoring period
+       */
+      int _monitoringPeriod;
 
-    };
+  };
 
 } // namespace AwsMock::Service
 

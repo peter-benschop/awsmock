@@ -40,4 +40,6 @@
 
 #define DYNAMODB_TABLE_COUNT "dynamodb_table_count_total"
 
+#define SECRETSMANAGER_SECRETS_COUNT "secretsmanager_secret_count_total"
+
 #endif  // AWSMOCK_CORE_METRIC_DEFINITION_H

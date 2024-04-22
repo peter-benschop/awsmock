@@ -22,12 +22,14 @@
 #include <awsmock/core/ThreadPool.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/secretsmanager/SecretsManagerHandlerFactory.h>
+#include <awsmock/service/secretsmanager/SecretsManagerMonitoring.h>
 
 #define SECRETSMANAGER_DEFAULT_PORT 9507
 #define SECRETSMANAGER_DEFAULT_HOST "localhost"
 #define SECRETSMANAGER_DEFAULT_QUEUE_LENGTH  250
 #define SECRETSMANAGER_DEFAULT_THREADS 50
 #define SECRETSMANAGER_DEFAULT_TIMEOUT 120
+#define SECRETSMANAGER_DEFAULT_MONITORING_PERIOD 300
 
 namespace AwsMock::Service {
 
@@ -42,82 +44,81 @@ namespace AwsMock::Service {
    */
   class SecretsManagerServer : public AbstractServer {
 
-  public:
+    public:
 
-    /**
-     * Constructor
-     *
-     * @param configuration aws-mock configuration
-     * @param metricService aws-mock monitoring module
-     */
-    explicit SecretsManagerServer(Core::Configuration &configuration, Core::MetricService &metricService);
+      /**
+       * Constructor
+       *
+       * @param configuration aws-mock configuration
+       */
+      explicit SecretsManagerServer(Core::Configuration &configuration);
 
-    /**
-     * Timer initialization
-     */
-    void Initialize() override;
+      /**
+       * Timer initialization
+       */
+      void Initialize() override;
 
-    /**
-     * Main method
-     */
-    void Run() override;
+      /**
+       * Main method
+       */
+      void Run() override;
 
-    /**
-     * Shutdown
-     */
-    void Shutdown() override;
+      /**
+       * Shutdown
+       */
+      void Shutdown() override;
 
-  private:
+    private:
 
-    /**
-     * Configuration
-     */
-    Core::Configuration &_configuration;
+      /**
+       * Configuration
+       */
+      Core::Configuration &_configuration;
 
-    /**
-     * Metric module
-     */
-    Core::MetricService &_metricService;
+      /**
+       * S3 database
+       */
+      Database::ModuleDatabase &_moduleDatabase;
 
-    /**
-     * S3 database
-     */
-    Database::ModuleDatabase& _moduleDatabase;
+      /**
+       * S3 monitoring
+       */
+      std::shared_ptr<SecretsManagerMonitoring> _secretsManagerMonitoring;
 
-    /**
-     * AWS region
-     */
-    std::string _region;
+      /**
+       * AWS region
+       */
+      std::string _region;
 
-    /**
-     * Sleeping period in ms
-     */
-    int _period;
+      /**
+       * Rest port
+       */
+      int _port;
 
-    /**
-     * Rest port
-     */
-    int _port;
+      /**
+       * Rest host
+       */
+      std::string _host;
 
-    /**
-     * Rest host
-     */
-    std::string _host;
+      /**
+       * HTTP max message queue length
+       */
+      int _maxQueueLength;
 
-    /**
-     * HTTP max message queue length
-     */
-    int _maxQueueLength;
+      /**
+       * HTTP max concurrent connections
+       */
+      int _maxThreads;
 
-    /**
-     * HTTP max concurrent connections
-     */
-    int _maxThreads;
+      /**
+       * HTTP request timeout in seconds
+       */
+      int _requestTimeout;
 
-    /**
-     * HTTP request timeout in seconds
-     */
-    int _requestTimeout;
+      /**
+       * Monitoring period
+       */
+      int _monitoringPeriod;
   };
 
 } // namespace AwsMock::Service

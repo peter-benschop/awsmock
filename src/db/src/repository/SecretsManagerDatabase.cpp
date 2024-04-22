@@ -10,7 +10,9 @@ namespace AwsMock::Database {
   using bsoncxx::builder::basic::make_array;
   using bsoncxx::builder::basic::make_document;
 
-  SecretsManagerDatabase::SecretsManagerDatabase() : _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()), _collectionName("secretsmanager_secret"), _memoryDb(SecretsManagerMemoryDb::instance()) {}
+  SecretsManagerDatabase::SecretsManagerDatabase()
+      : _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()), _collectionName("secretsmanager_secret"),
+        _memoryDb(SecretsManagerMemoryDb::instance()) {}
 
   bool SecretsManagerDatabase::SecretExists(const std::string &region, const std::string &name) {
 
@@ -72,7 +74,7 @@ namespace AwsMock::Database {
     mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
 
     mongocxx::stdx::optional<bsoncxx::document::value>
-      mResult = _secretCollection.find_one(make_document(kvp("_id", oid)));
+        mResult = _secretCollection.find_one(make_document(kvp("_id", oid)));
     Entity::SecretsManager::Secret result;
     result.FromDocument(mResult);
 
@@ -100,7 +102,7 @@ namespace AwsMock::Database {
       auto client = GetClient();
       mongocxx::collection _bucketCollection = (*client)[_databaseName][_collectionName];
       mongocxx::stdx::optional<bsoncxx::document::value>
-        mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
+          mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
       if (mResult->empty()) {
         return {};
       }
@@ -123,7 +125,8 @@ namespace AwsMock::Database {
 
       auto client = GetClient();
       mongocxx::collection _bucketCollection = (*client)[_databaseName][_collectionName];
-      mongocxx::stdx::optional<bsoncxx::document::value> mResult = _bucketCollection.find_one(make_document(kvp("secretId", secretId)));
+      mongocxx::stdx::optional<bsoncxx::document::value>
+          mResult = _bucketCollection.find_one(make_document(kvp("secretId", secretId)));
       if (mResult->empty()) {
         return {};
       }
@@ -182,7 +185,8 @@ namespace AwsMock::Database {
       try {
 
         session.start_transaction();
-        auto result = _secretCollection.replace_one(make_document(kvp("secretId", secret.secretId)), secret.ToDocument());
+        auto result =
+            _secretCollection.replace_one(make_document(kvp("secretId", secret.secretId)), secret.ToDocument());
         session.commit_transaction();
         log_trace << "Bucket updated: " << secret.ToString();
 
@@ -236,6 +240,35 @@ namespace AwsMock::Database {
     return secretList;
   }
 
+  long SecretsManagerDatabase::CountSecrets(const std::string &region) {
+
+    if (_useDatabase) {
+
+      try {
+        auto client = GetClient();
+        mongocxx::collection _secretsCollection = (*client)[_databaseName][_collectionName];
+
+        long count;
+        if (region.empty()) {
+          count = _secretsCollection.count_documents(make_document());
+        } else {
+          count = _secretsCollection.count_documents(make_document(kvp("region", region)));
+        }
+        log_trace << "Secrets count: " << count;
+        return count;
+
+      } catch (mongocxx::exception::system_error &e) {
+        log_error << "Secrets count failed, error: " << e.what();
+      }
+
+    } else {
+
+      return _memoryDb.CountSecrets(region);
+
+    }
+    return -1;
+  }
+
   void SecretsManagerDatabase::DeleteSecret(const Entity::SecretsManager::Secret &secret) {
 
     if (_useDatabase) {
@@ -248,7 +281,7 @@ namespace AwsMock::Database {
 
         session.start_transaction();
         auto delete_many_result =
-          _bucketCollection.delete_one(make_document(kvp("region", secret.region), kvp("name", secret.name)));
+            _bucketCollection.delete_one(make_document(kvp("region", secret.region), kvp("name", secret.name)));
         session.commit_transaction();
         log_debug << "Secret deleted, count: " << delete_many_result->deleted_count();
 
