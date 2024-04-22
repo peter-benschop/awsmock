@@ -83,7 +83,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 14,
+        "h": 15,
         "w": 8,
         "x": 0,
         "y": 0
@@ -122,6 +122,7 @@
         "type": "prometheus",
         "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
       },
+      "description": "Real memory usage versus time",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -178,7 +179,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 14,
+        "h": 15,
         "w": 8,
         "x": 8,
         "y": 0
@@ -207,21 +208,9 @@
           "legendFormat": "Real Memory",
           "range": true,
           "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
-          },
-          "editorMode": "code",
-          "expr": "avg_over_time(virtual_memory_used [5m])",
-          "hide": false,
-          "legendFormat": "VIrtual Memory",
-          "range": true,
-          "refId": "B"
         }
       ],
-      "title": "Memory Usage",
+      "title": "Real Memory",
       "type": "timeseries"
     },
     {
@@ -229,6 +218,7 @@
         "type": "prometheus",
         "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
       },
+      "description": "Virtual memopy usage versus time",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -280,17 +270,17 @@
               }
             ]
           },
-          "unit": "none"
+          "unit": "deckbytes"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 14,
+        "h": 15,
         "w": 8,
         "x": 16,
         "y": 0
       },
-      "id": 4,
+      "id": 6,
       "options": {
         "legend": {
           "calcs": [],
@@ -310,13 +300,14 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(total_threads[5m])",
-          "legendFormat": "Total",
+          "expr": "avg_over_time(virtual_memory_used [5m])",
+          "hide": false,
+          "legendFormat": "VIrtual Memory",
           "range": true,
-          "refId": "A"
+          "refId": "B"
         }
       ],
-      "title": "Threads",
+      "title": "Virtual Memory Usage",
       "type": "timeseries"
     },
     {
@@ -384,7 +375,7 @@
         "h": 15,
         "w": 8,
         "x": 0,
-        "y": 14
+        "y": 15
       },
       "id": 2,
       "options": {
@@ -547,7 +538,7 @@
         "h": 15,
         "w": 8,
         "x": 8,
-        "y": 14
+        "y": 15
       },
       "id": 5,
       "options": {
@@ -581,6 +572,101 @@
       ],
       "title": "HTTP Request Counts",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 15,
+        "w": 8,
+        "x": 16,
+        "y": 15
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+          },
+          "editorMode": "code",
+          "expr": "avg_over_time(total_threads[5m])",
+          "legendFormat": "Total",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Threads",
+      "type": "timeseries"
     }
   ],
   "refresh": "30s",
@@ -595,8 +681,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "AWS-Mock",
+  "title": "Manager",
   "uid": "cdae61d8-610f-49e4-bd3f-e7f1bf336d20",
-  "version": 8,
+  "version": 11,
   "weekStart": ""
 }
