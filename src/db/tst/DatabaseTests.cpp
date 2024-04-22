@@ -16,7 +16,7 @@
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/Database.h>
 
-#define CONFIG_FILE "/tmp/aws-mock.properties"
+#define CONFIG_FILE "/tmp/awsmock.properties"
 
 namespace AwsMock::Database {
 

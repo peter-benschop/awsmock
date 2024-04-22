@@ -14,7 +14,7 @@
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 
-#define CONFIGURATION_BASE_PATH std::string("/etc/aws-mock.properties")
+#define CONFIGURATION_BASE_PATH std::string("/etc/awsmock.properties")
 
 namespace AwsMock::Controller {
 

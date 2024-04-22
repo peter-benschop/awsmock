@@ -13,7 +13,7 @@
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/Configuration.h>
 
-#define TMP_PROPERTIES_FILE "/tmp/aws-mock.properties"
+#define TMP_PROPERTIES_FILE "/tmp/awsmock.properties"
 
 namespace AwsMock::Core {
 
