@@ -112,11 +112,6 @@ namespace AwsMock::Database::Entity::SecretsManager {
 
   }
 
-  /**
-   * Converts the JSON object to an entity
-   *
-   * @param jsonObject JSON object.
-   */
   void Secret::FromJsonObject(const Poco::JSON::Object::Ptr& jsonObject) {
 
     Core::JsonUtils::GetJsonValueString("region", jsonObject, region);

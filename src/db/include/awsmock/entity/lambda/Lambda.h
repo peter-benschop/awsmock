@@ -328,6 +328,7 @@ namespace AwsMock::Database::Entity::Lambda {
      * @return output stream
      */
     friend std::ostream &operator<<(std::ostream &os, const Lambda &lambda);
+
   };
 
   typedef std::vector<Lambda> LambdaList;

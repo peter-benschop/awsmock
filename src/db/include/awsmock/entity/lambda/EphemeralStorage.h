@@ -14,11 +14,21 @@
 #include <Poco/JSON/Object.h>
 
 // MongoDB includes
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/array/view.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <mongocxx/stdx.hpp>
 
 namespace AwsMock::Database::Entity::Lambda {
+
+  using bsoncxx::builder::basic::kvp;
+  using bsoncxx::builder::basic::make_array;
+  using bsoncxx::builder::basic::make_document;
+  using bsoncxx::view_or_value;
+  using bsoncxx::document::view;
+  using bsoncxx::document::value;
+  using bsoncxx::to_json;
 
   /**
    * Lambda ephemeral storage entity
@@ -38,6 +48,13 @@ namespace AwsMock::Database::Entity::Lambda {
      * @param mResult database document.
      */
     [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+
+    /**
+     * Converts the entity to a MongoDB document
+     *
+     * @return entity as MongoDB document.
+     */
+    [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
     /**
      * Converts the entity to a JSON object

@@ -75,7 +75,7 @@ namespace AwsMock::Database::Entity::Transfer {
     }
 
     bsoncxx::array::view usersView{mResult.value()["users"].get_array().value};
-    for (bsoncxx::array::element userElement : usersView) {
+    for (const bsoncxx::array::element& userElement : usersView) {
       User user{
           .userName=bsoncxx::string::to_string(userElement["userName"].get_string().value),
           .password=bsoncxx::string::to_string(userElement["password"].get_string().value),
