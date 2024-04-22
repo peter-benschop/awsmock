@@ -35,6 +35,11 @@
 
 namespace AwsMock::Service {
 
+    /**
+     * SQS server
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class SQSServer : public AbstractServer {
 
       public:
