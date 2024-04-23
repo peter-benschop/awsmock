@@ -352,8 +352,7 @@ namespace AwsMock::Service {
 
     // Check existence of source key
     if (!_database.ObjectExists({.region=request.region, .bucket=request.sourceBucket, .key=request.sourceKey})) {
-      log_error << "Source object does not exist, region: " << request.region + " bucket: " << request.sourceBucket << " key: "
-                                << request.sourceKey;
+        log_error << "Source object does not exist, region: " << request.region + " bucket: " << request.sourceBucket << " key: " << request.sourceKey;
       throw Core::ServiceException("Source object does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
     }
 

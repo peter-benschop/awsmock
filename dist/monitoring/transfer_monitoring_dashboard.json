@@ -18,16 +18,15 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 5,
+  "id": 9,
   "links": [],
-  "liveNow": false,
   "panels": [
     {
       "datasource": {
         "type": "prometheus",
         "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
       },
-      "description": "Total number of lambdas",
+      "description": "Number of transfer servers",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -84,12 +83,114 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 15,
+        "h": 16,
         "w": 8,
         "x": 0,
         "y": 0
       },
       "id": 3,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+          },
+          "editorMode": "code",
+          "expr": "avg_over_time(transfer_server_count_total[5m])",
+          "instant": false,
+          "legendFormat": "Servers",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Transfer Server",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+      },
+      "description": "Number of transfer server uploads",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "fieldMinMax": false,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 8,
+        "x": 8,
+        "y": 0
+      },
+      "id": 1,
       "options": {
         "legend": {
           "calcs": [
@@ -113,14 +214,14 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "lambda_function_count_total",
+          "expr": "avg_over_time(transfer_upload_count_total[5m])",
           "instant": false,
-          "legendFormat": "Lambdas",
+          "legendFormat": "Uploads",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Lambda count",
+      "title": "Uploads",
       "type": "timeseries"
     },
     {
@@ -128,7 +229,7 @@
         "type": "prometheus",
         "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
       },
-      "description": "Total number of lambda invocation",
+      "description": "Number of transfer servers",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -184,19 +285,15 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 15,
+        "h": 16,
         "w": 8,
-        "x": 8,
+        "x": 16,
         "y": 0
       },
-      "id": 1,
+      "id": 2,
       "options": {
         "legend": {
-          "calcs": [
-            "min",
-            "max",
-            "last"
-          ],
+          "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
           "showLegend": true
@@ -213,115 +310,14 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "increase(lambda_invocation_count[5m])",
+          "expr": "avg_over_time(transfer_download_count_total[5m])",
           "instant": false,
-          "legendFormat": "Lambdas",
+          "legendFormat": "__auto",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Lambda invocations",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
-      },
-      "description": "Invocation time in milliseconds",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "ms"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 15,
-        "w": 8,
-        "x": 16,
-        "y": 0
-      },
-      "id": 2,
-      "options": {
-        "legend": {
-          "calcs": [
-            "min",
-            "max",
-            "last"
-          ],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
-          },
-          "editorMode": "code",
-          "expr": "rate(lambda_invocation_time[5m])",
-          "instant": false,
-          "legendFormat": "Lambdas",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Lambda Invocation time",
+      "title": "Downloads",
       "type": "timeseries"
     }
   ],
@@ -336,9 +332,9 @@
     "to": "now"
   },
   "timepicker": {},
-  "timezone": "",
-  "title": "Lambda",
-  "uid": "d8bf9557-4e70-46c3-a762-d7ba3761d0b3",
-  "version": 7,
+  "timezone": "browser",
+  "title": "New dashboard",
+  "uid": "bdjhx40ysuyv4c",
+  "version": 1,
   "weekStart": ""
 }

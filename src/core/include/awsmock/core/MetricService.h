@@ -17,6 +17,7 @@
 // Poco includes
 #include <Poco/Prometheus/Counter.h>
 #include <Poco/Prometheus/Gauge.h>
+#include <Poco/Prometheus/Histogram.h>
 #include <Poco/Prometheus/MetricsServer.h>
 #include <Poco/Util/ServerApplication.h>
 
@@ -30,381 +31,419 @@
 
 namespace AwsMock::Core {
 
-  typedef std::map<std::string, Poco::Prometheus::Counter *> CounterMap;
-  typedef std::map<std::string, Poco::Prometheus::Gauge *> GaugeMap;
-  typedef std::map<std::string, Poco::Prometheus::Gauge *> TimerMap;
-  typedef std::map<std::string, std::chrono::time_point<std::chrono::high_resolution_clock>> TimerStartMap;
-
-  /**
-   * Maintains a list of counter and gauges for monitoring via Prometheus. The data is made available via a HTTP
-   * manager listening on port 9100. The port ist configurable.
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  class MetricService : public Core::Timer {
-
-  public:
+    typedef std::map<std::string, Poco::Prometheus::Counter *> CounterMap;
+    typedef std::map<std::string, Poco::Prometheus::Gauge *> GaugeMap;
+    typedef std::map<std::string, Poco::Prometheus::Histogram *> HistogramMap;
+    typedef std::map<std::string, Poco::Prometheus::Gauge *> TimerMap;
+    typedef std::map<std::string, std::chrono::time_point<std::chrono::high_resolution_clock>> TimerStartMap;
 
     /**
-     * Default constructor
-     */
-    MetricService();
-
-    /**
-     * Singleton instance
-     */
-    static MetricService &instance() {
-      static Poco::SingletonHolder<MetricService> sh;
-      return *sh.get();
-    }
-
-    /**
-     * Destructor
-     */
-    virtual ~MetricService() = default;
-
-    /**
-     * Initialization
-     */
-    void Initialize() override;
-
-    /**
-     * Run main loop
-     */
-    void Run() override;
-
-    /**
-     * Gracefully shutdown
-     */
-    void Shutdown() override;
-
-    /**
-     * Adds a counter to the map.
+     * Maintains a list of counter and gauges for monitoring via Prometheus. The data is made available via a HTTP
+     * manager listening on port 9100. The port ist configurable.
      *
-     * @param name name of the counter
+     * @author jens.vogt@opitz-consulting.com
      */
-    void AddCounter(const std::string &name);
+    class MetricService : public Core::Timer {
 
-    /**
-     * Adds a counter to the map.
-     *
-     * @param name name of the counter
-     * @param label label name of the counter
-     */
-    void AddCounter(const std::string &name, const std::string &label);
+      public:
 
-    /**
-     * Check whether a counter exists
-     *
-     * @param name name of the counter.
-     * @return true if counter exists.
-     */
-    bool CounterExists(const std::string &name);
+        /**
+         * Default constructor
+         */
+        MetricService();
 
-    /**
-     * Check whether a counter exists
-     *
-     * @param name name of the counter.
-     * @param label label name of the counter
-     * @return true if counter exists.
-     */
-    bool CounterExists(const std::string &name, const std::string &label);
+        /**
+         * Singleton instance
+         */
+        static MetricService &instance() {
+            static Poco::SingletonHolder<MetricService> sh;
+            return *sh.get();
+        }
 
-    /**
-     * Increments a counter.
-     *
-     * @param name of the counter
-     * @param value value for the incrementation (default: 1), can be negative
-     */
-    void IncrementCounter(const std::string &name, int value = 1);
+        /**
+         * Destructor
+         */
+        virtual ~MetricService() = default;
 
-    /**
-     * Increments a labeled counter.
-     *
-     * @param name of the counter
-     * @param labelName name of the label
-     * @param labelValue label value of the counter
-     * @param value value for the incrementation (default: 1), can be negative
-     */
-    void IncrementCounter(const std::string &name, const std::string &labelName, const std::string &labelValue, int value = 1);
+        /**
+         * Initialization
+         */
+        void Initialize() override;
 
-    /**
-     * Decrements a counter.
-     *
-     * @param name of the counter
-     * @param value value for the incrementation (default: 1), can be negative
-     */
-    void DecrementCounter(const std::string &name, int value = 1);
+        /**
+         * Run main loop
+         */
+        void Run() override;
 
-    /**
-     * Decrements a labeled counter.
-     *
-     * @param name of the counter
-     * @param labelName name of the label
-     * @param labelValue label value of the counter
-     * @param value value for the incrementation (default: 1), can be negative
-     */
-    void DecrementCounter(const std::string &name, const std::string &labelName, const std::string &labelValue, int value = 1);
+        /**
+         * Gracefully shutdown
+         */
+        void Shutdown() override;
 
-    /**
-     * Clears a counter.
-     *
-     * @param name of the counter
-     */
-    void ClearCounter(const std::string &name);
+        /**
+         * Adds a counter to the map.
+         *
+         * @param name name of the counter
+         */
+        void AddCounter(const std::string &name);
 
-    /**
-     * Adds a gauge to the map.
-     *
-     * @param name name of the gauge
-     */
-    void AddGauge(const std::string &name);
+        /**
+         * Adds a counter to the map.
+         *
+         * @param name name of the counter
+         * @param label label name of the counter
+         */
+        void AddCounter(const std::string &name, const std::string &label);
 
-    /**
-     * Adds a gauge to the map.
-     *
-     * @param name name of the gauge
-     * @param label label of the gauge
-     */
-    void AddGauge(const std::string &name, const std::string &label);
+        /**
+         * Check whether a counter exists
+         *
+         * @param name name of the counter.
+         * @return true if counter exists.
+         */
+        bool CounterExists(const std::string &name);
 
-    /**
-     * Check whether a gauge exists
-     *
-     * @param name name of the gauge.
-     * @return true if gauge exists.
-     */
-    bool GaugeExists(const std::string &name);
+        /**
+         * Check whether a counter exists
+         *
+         * @param name name of the counter.
+         * @param label label name of the counter
+         * @return true if counter exists.
+         */
+        bool CounterExists(const std::string &name, const std::string &label);
 
-    /**
-     * Check whether a gauge exists
-     *
-     * @param name name of the gauge.
-     * @param label label of the gauge.
-     * @return true if gauge exists.
-     */
-    bool GaugeExists(const std::string &name, const std::string &label);
+        /**
+         * Increments a counter.
+         *
+         * @param name of the counter
+         * @param value value for the incrementation (default: 1), can be negative
+         */
+        void IncrementCounter(const std::string &name, int value = 1);
 
-    /**
-     * Sets a integer gauge value in the map.
-     *
-     * @param name name of the gauge
-     * @param value value of the gauge
-     */
-    [[maybe_unused]]
-    void SetGauge(const std::string &name, int value);
+        /**
+         * Increments a labeled counter.
+         *
+         * @param name of the counter
+         * @param labelName name of the label
+         * @param labelValue label value of the counter
+         * @param value value for the incrementation (default: 1), can be negative
+         */
+        void IncrementCounter(const std::string &name, const std::string &labelName, const std::string &labelValue, int value = 1);
 
-    /**
-     * Sets a integer gauge value in the map.
-     *
-     * @param name name of the gauge
-     * @param labelName label name of the gauge
-     * @param labelValue label value of the gauge
-     * @param value value of the gauge
-     */
-    [[maybe_unused]]
-    void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, int value);
+        /**
+         * Decrements a counter.
+         *
+         * @param name of the counter
+         * @param value value for the incrementation (default: 1), can be negative
+         */
+        void DecrementCounter(const std::string &name, int value = 1);
 
-    /**
-     * Sets a long integer gauge value in the map.
-     *
-     * @param name name of the gauge
-     * @param value value of the gauge
-     */
-    [[maybe_unused]]
-    void SetGauge(const std::string &name, long value);
+        /**
+         * Decrements a labeled counter.
+         *
+         * @param name of the counter
+         * @param labelName name of the label
+         * @param labelValue label value of the counter
+         * @param value value for the incrementation (default: 1), can be negative
+         */
+        void DecrementCounter(const std::string &name, const std::string &labelName, const std::string &labelValue, int value = 1);
 
-    /**
-     * Sets a long integer gauge value in the map.
-     *
-     * @param name name of the gauge
-     * @param labelName label name of the gauge
-     * @param labelValue label value of the gauge
-     * @param value value of the gauge
-     */
-    [[maybe_unused]]
-    void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, long value);
+        /**
+         * Clears a counter.
+         *
+         * @param name of the counter
+         */
+        void ClearCounter(const std::string &name);
 
-    /**
-     * Sets a unsigned long integer gauge value in the map.
-     *
-     * @param name name of the gauge
-     * @param value value of the gauge
-     */
-    [[maybe_unused]]
-    void SetGauge(const std::string &name, unsigned long value);
+        /**
+         * Adds a gauge to the map.
+         *
+         * @param name name of the gauge
+         */
+        void AddGauge(const std::string &name);
 
-    /**
-     * Sets a unsigned long integer gauge value in the map.
-     *
-     * @param name name of the gauge
-     * @param labelName label name of the gauge
-     * @param labelValue label value of the gauge
-     * @param value value of the gauge
-     */
-    [[maybe_unused]]
-    void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, unsigned long value);
+        /**
+         * Adds a gauge to the map.
+         *
+         * @param name name of the gauge
+         * @param label label of the gauge
+         */
+        void AddGauge(const std::string &name, const std::string &label);
 
-    /**
-     * Sets a float gauge value in the map.
-     *
-     * @param name name of the gauge
-     * @param value value of the gauge
-     */
-    [[maybe_unused]]
-    void SetGauge(const std::string &name, float value);
+        /**
+         * Check whether a gauge exists
+         *
+         * @param name name of the gauge.
+         * @return true if gauge exists.
+         */
+        bool GaugeExists(const std::string &name);
 
-    /**
-     * Sets a float gauge value in the map.
-     *
-     * @param name name of the gauge
-     * @param labelName label name of the gauge
-     * @param labelValue label value of the gauge
-     * @param value value of the gauge
-     */
-    [[maybe_unused]]
-    void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, float value);
+        /**
+         * Check whether a gauge exists
+         *
+         * @param name name of the gauge.
+         * @param label label of the gauge.
+         * @return true if gauge exists.
+         */
+        bool GaugeExists(const std::string &name, const std::string &label);
 
-    /**
-     * Sets a double gauge value in the map.
-     *
-     * @param name name of the gauge
-     * @param value value of the gauge
-     */
-    [[maybe_unused]]
-    void SetGauge(const std::string &name, double value);
+        /**
+         * Sets a integer gauge value in the map.
+         *
+         * @param name name of the gauge
+         * @param value value of the gauge
+         */
+        [[maybe_unused]]
+        void SetGauge(const std::string &name, int value);
 
-    /**
-     * Sets a double gauge value in the map.
-     *
-     * @param name name of the gauge
-     * @param labelName label name of the gauge
-     * @param labelValue label value of the gauge
-     * @param value value of the gauge
-     */
-    void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, double value);
+        /**
+         * Sets a integer gauge value in the map.
+         *
+         * @param name name of the gauge
+         * @param labelName label name of the gauge
+         * @param labelValue label value of the gauge
+         * @param value value of the gauge
+         */
+        [[maybe_unused]]
+        void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, int value);
 
-    /**
-     * Increments a gauge.
-     *
-     * @param name of the gauge
-     * @param value value for the incrementation (default: 1), can be negative
-     */
-    void IncrementGauge(const std::string &name, int value = 1);
+        /**
+         * Sets a long integer gauge value in the map.
+         *
+         * @param name name of the gauge
+         * @param value value of the gauge
+         */
+        [[maybe_unused]]
+        void SetGauge(const std::string &name, long value);
 
-    /**
-     * Increments a gauge.
-     *
-     * @param name of the gauge
-     * @param labelName label name of the gauge
-     * @param labelValue label value of the gauge
-     * @param value value for the incrementation (default: 1), can be negative
-     */
-    void IncrementGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, int value = 1);
+        /**
+         * Sets a long integer gauge value in the map.
+         *
+         * @param name name of the gauge
+         * @param labelName label name of the gauge
+         * @param labelValue label value of the gauge
+         * @param value value of the gauge
+         */
+        [[maybe_unused]]
+        void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, long value);
 
-    /**
-     * Add timer
-     */
-    void AddTimer(const std::string &name);
+        /**
+         * Sets a unsigned long integer gauge value in the map.
+         *
+         * @param name name of the gauge
+         * @param value value of the gauge
+         */
+        [[maybe_unused]]
+        void SetGauge(const std::string &name, unsigned long value);
 
-    /**
-     * Starts a timer
-     *
-     * @param name name of the timer.
-     */
-    void StartTimer(const std::string &name);
+        /**
+         * Sets a unsigned long integer gauge value in the map.
+         *
+         * @param name name of the gauge
+         * @param labelName label name of the gauge
+         * @param labelValue label value of the gauge
+         * @param value value of the gauge
+         */
+        [[maybe_unused]]
+        void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, unsigned long value);
 
-    /**
-     * Stop and fill in the duration of a timer
-     *
-     * @param name name of the timer.
-     */
-    void StopTimer(const std::string &name);
+        /**
+         * Sets a float gauge value in the map.
+         *
+         * @param name name of the gauge
+         * @param value value of the gauge
+         */
+        [[maybe_unused]]
+        void SetGauge(const std::string &name, float value);
 
-    /**
-     * Resets a timers.
-     *
-     * @param name name of the timer.
-     */
-    [[maybe_unused]]
-    void ResetTimer(const std::string &name);
+        /**
+         * Sets a float gauge value in the map.
+         *
+         * @param name name of the gauge
+         * @param labelName label name of the gauge
+         * @param labelValue label value of the gauge
+         * @param value value of the gauge
+         */
+        [[maybe_unused]]
+        void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, float value);
 
-    /**
-     * Resets all timers.
-     *
-     * @param name name of the timer.
-     */
-    [[maybe_unused]]
-    void ResetAllTimer();
+        /**
+         * Sets a double gauge value in the map.
+         *
+         * @param name name of the gauge
+         * @param value value of the gauge
+         */
+        [[maybe_unused]]
+        void SetGauge(const std::string &name, double value);
 
-    /**
-     * Check whether a timer exists
-     *
-     * @param name name of the timer.
-     * @return true if timer exists.
-     */
-    bool TimerExists(const std::string &name);
+        /**
+         * Sets a double gauge value in the map.
+         *
+         * @param name name of the gauge
+         * @param labelName label name of the gauge
+         * @param labelValue label value of the gauge
+         * @param value value of the gauge
+         */
+        void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, double value);
 
-  private:
+        /**
+         * Increments a gauge.
+         *
+         * @param name of the gauge
+         * @param value value for the incrementation (default: 1), can be negative
+         */
+        void IncrementGauge(const std::string &name, int value = 1);
 
-    /**
-     * Returns a thread safe timer key string.
-     *
-     * @param name name of the timer.
-     */
-    static std::string GetTimerKey(const std::string &name);
+        /**
+         * Increments a gauge.
+         *
+         * @param name of the gauge
+         * @param labelName label name of the gauge
+         * @param labelValue label value of the gauge
+         * @param value value for the incrementation (default: 1), can be negative
+         */
+        void IncrementGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, int value = 1);
 
-    /**
-     * Metric manager for Prometheus
-     */
-    std::shared_ptr<Poco::Prometheus::MetricsServer> _server;
+        /**
+         * Adds a histogram to the map.
+         *
+         * @param name name of the histogram
+         */
+        void AddHistogram(const std::string &name);
 
-    /**
-     * System monitoring thread
-     */
-    std::shared_ptr<MetricSystemCollector> _metricSystemCollector{};
+        /**
+         * Adds a histogram to the map.
+         *
+         * @param name name of the histogram
+         * @param label label of the histogram
+         */
+        void AddHistogram(const std::string &name, const std::string &label);
 
-    /**
-     * System monitoring thread
-     */
-    std::shared_ptr<Poco::Timer> _metricSystemTimer{};
+        /**
+         * Check whether a histogram exists
+         *
+         * @param name name of the histogram.
+         * @return true if histogram exists.
+         */
+        bool HistogramExists(const std::string &name);
 
-    /**
-     * Counter map
-     */
-    CounterMap _counterMap;
+        /**
+         * Check whether a histogram exists
+         *
+         * @param name name of the histogram.
+         * @param label label of the histogram.
+         * @return true if histogram exists.
+         */
+        bool HistogramExists(const std::string &name, const std::string &label);
 
-    /**
-     * Counter map
-     */
-    GaugeMap _gaugeMap;
+        /**
+         * Add timer
+         */
+        void AddTimer(const std::string &name);
 
-    /**
-     * Timer map
-     */
-    TimerMap _timerMap;
+        /**
+         * Starts a timer
+         *
+         * @param name name of the timer.
+         */
+        void StartTimer(const std::string &name);
 
-    /**
-     * Timer StartServer map
-     */
-    TimerStartMap _timerStartMap;
+        /**
+         * Stop and fill in the duration of a timer
+         *
+         * @param name name of the timer.
+         */
+        void StopTimer(const std::string &name);
 
-    /**
-     * Port for the monitoring manager
-     */
-    long _port;
+        /**
+         * Resets a timers.
+         *
+         * @param name name of the timer.
+         */
+        [[maybe_unused]]
+        void ResetTimer(const std::string &name);
 
-    /**
-     * System collector timeout
-     */
-    long _timeout;
+        /**
+         * Resets all timers.
+         *
+         * @param name name of the timer.
+         */
+        [[maybe_unused]]
+        void ResetAllTimer();
 
-    /**
-     * Mutex
-     */
-    static Poco::Mutex _mutex;
-  };
+        /**
+         * Check whether a timer exists
+         *
+         * @param name name of the timer.
+         * @return true if timer exists.
+         */
+        bool TimerExists(const std::string &name);
+
+      private:
+
+        /**
+         * Returns a thread safe timer key string.
+         *
+         * @param name name of the timer.
+         */
+        static std::string GetTimerKey(const std::string &name);
+
+        /**
+         * Metric manager for Prometheus
+         */
+        std::shared_ptr<Poco::Prometheus::MetricsServer> _server;
+
+        /**
+         * System monitoring thread
+         */
+        std::shared_ptr<MetricSystemCollector> _metricSystemCollector{};
+
+        /**
+         * System monitoring thread
+         */
+        std::shared_ptr<Poco::Timer> _metricSystemTimer{};
+
+        /**
+         * Counter map
+         */
+        CounterMap _counterMap;
+
+        /**
+         * Counter map
+         */
+        GaugeMap _gaugeMap;
+
+        /**
+         * Counter map
+         */
+        HistogramMap _histogramMap;
+
+        /**
+         * Timer map
+         */
+        TimerMap _timerMap;
+
+        /**
+         * Timer StartServer map
+         */
+        TimerStartMap _timerStartMap;
+
+        /**
+         * Port for the monitoring manager
+         */
+        long _port;
+
+        /**
+         * System collector timeout
+         */
+        long _timeout;
+
+        /**
+         * Mutex
+         */
+        static Poco::Mutex _mutex;
+    };
 
 }// namespace AwsMock::Core
 
-#endif  // AWSMOCK_CORE_METRICSERVICE_H
+#endif  // AWSMOCK_CORE_METRIC_SERVICE_H

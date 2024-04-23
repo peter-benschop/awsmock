@@ -19,8 +19,8 @@ namespace AwsMock::Service {
 
         // Create environment
         _region = _configuration.getString("awsmock.region");
-        _bucket = _configuration.getString("awsmock.module.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
-        _baseDir = _configuration.getString("awsmock.module.transfer.base.dir", DEFAULT_BASE_DIR);
+        _bucket = _configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
+        _baseDir = _configuration.getString("awsmock.service.transfer.base.dir", DEFAULT_BASE_DIR);
 
         // S3 module connection
         _s3ServiceHost = _configuration.getString("awsmock.service.s3.host", "localhost");

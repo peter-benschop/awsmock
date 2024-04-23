@@ -263,7 +263,7 @@ namespace AwsMock {
             _serverMap[module.name] = _lambdaServer;
           } else if (module.name == "transfer" &&
               module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-            _transferServer = std::make_shared<Service::TransferServer>(_configuration, _metricService);
+              _transferServer = std::make_shared<Service::TransferServer>(_configuration);
             _transferServer->Start();
             _serverMap[module.name] = _transferServer;
           } else if (module.name == "cognito" &&
