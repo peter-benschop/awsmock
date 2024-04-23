@@ -16,41 +16,43 @@
 
 namespace AwsMock::Service {
 
-  /**
-   * Transfer request handler factory
-   */
-  class TransferRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
-
-  public:
-
     /**
-     * Constructor
+     * Transfer request handler factory
      *
-     * @param configuration application configuration
+     * @author jens.vogt@opitz-consulting.com
      */
-    explicit TransferRequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
+    class TransferRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 
-    /**
-     * Create new request handler instance
-     *
-     * @param request HTTP request
-     * @return request handler instance pointer
-     */
-    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
-      if(request.getURI().empty()) {
-        return nullptr;
-      }
-        return new TransferHandler(_configuration);
-    }
+      public:
 
-  private:
+        /**
+         * Constructor
+         *
+         * @param configuration application configuration
+         */
+        explicit TransferRequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
 
-    /**
-     * S3 handler configuration
-     */
-    Core::Configuration &_configuration;
+        /**
+         * Create new request handler instance
+         *
+         * @param request HTTP request
+         * @return request handler instance pointer
+         */
+        Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
+            if (request.getURI().empty()) {
+                return nullptr;
+            }
+            return new TransferHandler(_configuration);
+        }
 
-  };
+      private:
+
+        /**
+         * S3 handler configuration
+         */
+        Core::Configuration &_configuration;
+
+    };
 
 } // namespace AwsMock::Service
 

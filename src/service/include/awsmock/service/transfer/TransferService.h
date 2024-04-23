@@ -38,6 +38,11 @@
 
 namespace AwsMock::Service {
 
+    /**
+     * Transfer family service
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class TransferService {
 
       public:
