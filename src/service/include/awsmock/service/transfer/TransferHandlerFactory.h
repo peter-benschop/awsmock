@@ -2,8 +2,8 @@
 // Created by vogje01 on 17/06/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_TRANSFERHANDLERFACTORY_H
-#define AWSMOCK_SERVICE_TRANSFERHANDLERFACTORY_H
+#ifndef AWSMOCK_SERVICE_TRANSFER_HANDLER_FACTORY_H
+#define AWSMOCK_SERVICE_TRANSFER_HANDLER_FACTORY_H
 
 // Poco includes
 #include "Poco/Logger.h"
@@ -27,9 +27,8 @@ namespace AwsMock::Service {
      * Constructor
      *
      * @param configuration application configuration
-     * @param metricService  monitoring
      */
-    TransferRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService) {}
+    explicit TransferRequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
 
     /**
      * Create new request handler instance
@@ -41,7 +40,7 @@ namespace AwsMock::Service {
       if(request.getURI().empty()) {
         return nullptr;
       }
-      return new TransferHandler(_configuration, _metricService);
+        return new TransferHandler(_configuration);
     }
 
   private:
@@ -51,13 +50,8 @@ namespace AwsMock::Service {
      */
     Core::Configuration &_configuration;
 
-    /**
-     * Metric module
-     */
-    Core::MetricService &_metricService;
-
   };
 
 } // namespace AwsMock::Service
 
-#endif //AWSMOCK_SERVICE_TRANSFERHANDLERFACTORY_H
+#endif // AWSMOCK_SERVICE_TRANSFER_HANDLER_FACTORY_H

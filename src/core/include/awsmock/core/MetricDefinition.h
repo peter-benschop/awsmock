@@ -46,5 +46,6 @@
 #define COGNITO_USERPOOL_COUNT "cognito_userpool_count_total"
 #define COGNITO_USER_BY_USERPOOL_COUNT "cognito_user_by_userpool_count"
 
+#define TRANSFER_SERVER_COUNT "transfer_server_count_total"
 
 #endif  // AWSMOCK_CORE_METRIC_DEFINITION_H
