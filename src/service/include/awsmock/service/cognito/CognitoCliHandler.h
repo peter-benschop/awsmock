@@ -21,7 +21,7 @@
 namespace AwsMock::Service {
 
     /**
-     * Cognito HTTP handler
+     * Cognito command line handler
      *
      * @author jens.vogt@opitz-consulting.com
      */
