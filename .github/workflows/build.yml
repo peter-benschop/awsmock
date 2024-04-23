@@ -1,8 +1,7 @@
 name: AWSMockBuild
 on:
-  pull_request:
-    branches:
-      - main
+  release:
+    types: [ published ]
   workflow_dispatch:
   
 jobs:
@@ -13,12 +12,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2.0.0
-
-      - name: Create release tag
-        id: create-release-tag
-        run: |
-          VERSION=$(git sv cv)
-          gh release create $VERSION --latest --target=main --notes ""
 
       - name: Build Docker
         run: |
