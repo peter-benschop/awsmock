@@ -1,7 +1,7 @@
 name: AWSMockBuild
 on:
   release:
-    types: [ published ]
+    types: [ created ]
   workflow_dispatch:
   
 jobs:
