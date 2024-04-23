@@ -17,8 +17,7 @@ jobs:
       - name: Create release tag
         id: create-release-tag
         run: |
-          VERSION=$(git sv cv)
-          gh release create $VERSION --latest --target=main --notes ""
+          gh release create --latest --target=main --notes ""
 
       - name: Build Docker
         run: |
