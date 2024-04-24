@@ -8,45 +8,41 @@
 // Standard C++ includes
 #include <string>
 
-// Poco includes
-#include "Poco/Logger.h"
-
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
+#include <awsmock/core/LogStream.h>
 
 #define CONFIGURATION_BASE_PATH std::string("/etc/awsmock.properties")
 
 namespace AwsMock::Controller {
 
-  /**
-   * AwsMock controller configuration
-   */
-  class Configuration : public Core::Configuration {
-  public:
-
     /**
-     * Constructor
-     */
-    Configuration();
-
-    /**
-     * Constructor.
+     * AwsMock controller configuration
      *
-     * @param basename base name of the configuration file.
+     * @author jens.vogt@opitz-consulting.com
      */
-    explicit Configuration(const std::string &basename);
+    class Configuration : public Core::Configuration {
 
-    /**
-     * Initialize the configuration and add the default configuration options.
-     */
-    void InitializeConfig();
+      public:
 
-  private:
-    /**
-     * Logger
-     */
-    Poco::Logger &_logger = Poco::Logger::get("Configuration");
-  };
+        /**
+         * Constructor
+         */
+        Configuration();
+
+        /**
+         * Constructor.
+         *
+         * @param basename base name of the configuration file.
+         */
+        explicit Configuration(const std::string &basename);
+
+        /**
+         * Initialize the configuration and add the default configuration options.
+         */
+        void InitializeConfig();
+
+    };
 
 } // namespace AwsMock::Controller
 

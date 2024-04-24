@@ -6,8 +6,6 @@
 
 namespace AwsMock::Core {
 
-    Poco::Mutex MemoryMappedFile::_mutex;
-
     bool MemoryMappedFile::OpenFile(const std::string &filename) {
 
         int fd = open(filename.c_str(), O_RDONLY);
@@ -37,11 +35,11 @@ namespace AwsMock::Core {
         if (munmap(_start, _fileSize) < 0) {
             log_error << "Could not unmap file";
         }
+        log_debug << "Memory mapped file closed";
         _mapped = false;
     }
 
     long MemoryMappedFile::ReadChunk(long start, long length, char *buffer) {
-        Poco::ScopedLock Lock(_mutex);
         if (length > _fileSize) {
             length = _fileSize;
         }

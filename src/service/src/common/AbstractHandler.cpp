@@ -325,7 +325,7 @@ namespace AwsMock::Service {
     }
 
     void AbstractHandler::SendRangeResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long min, long max, long size, const HeaderMap &extraHeader) {
-        log_trace << "Sending OK response, state: 200, filename: " << fileName << " min: " << min << " max: " << max;
+        log_trace << "Sending OK response, state: 200, filename: " << fileName << " min: " << min << " max: " << max << " size: " << size;
 
         if (!Core::MemoryMappedFile::instance().IsMapped()) {
             if (!Core::MemoryMappedFile::instance().OpenFile(fileName)) {
@@ -336,28 +336,27 @@ namespace AwsMock::Service {
         try {
 
             // Set headers
-            long range = max - min + 1;
-            SetHeaders(response, range, extraHeader);
+            long contentLength = max - min;
+            if (contentLength > size) {
+                contentLength = size - min;
+            }
+            SetHeaders(response, contentLength, extraHeader);
 
             // Set state
-            if (max == size) {
                 handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_OK);
-            } else {
-                handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_PARTIAL_CONTENT);
-            }
 
             // Send response
             std::ostream &os = response.send();
 
             // Send body
-            char *buffer = new char[range + 1];
-            Core::MemoryMappedFile::instance().ReadChunk(min, range, (char *) buffer);
-            os.write(buffer, range);
+            char *buffer = new char[contentLength + 1];
+            Core::MemoryMappedFile::instance().ReadChunk(min, contentLength, (char *) buffer);
+            os.write(buffer, contentLength);
             os.flush();
             delete[] buffer;
 
             // Close file
-            if (min + range >= size) {
+            if (max >= size) {
                 Core::MemoryMappedFile::instance().CloseFile();
             }
 

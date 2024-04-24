@@ -188,12 +188,12 @@ namespace AwsMock::Core {
 
         int fd = open(fileName.c_str(), O_WRONLY | O_CREAT | O_NOCTTY | O_NONBLOCK, 0666);
         if (fd < 0) {
-            poco_error(Poco::Logger::get("FileUtils"), "Could not open file: " + fileName);
+            log_error << "Could not open file: " << fileName;
             return false;
         }
         int rc = utimensat(AT_FDCWD, fileName.c_str(), nullptr, 0);
         if (rc) {
-            poco_error(Poco::Logger::get("FileUtils"), "Could not utimensat file: " + fileName);
+            log_error << "Could not utimensat file: " << fileName;
             return false;
         }
         close(fd);

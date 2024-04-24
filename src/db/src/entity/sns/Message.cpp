@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/entity/sns/Message.h>
-#include <Poco/JSON/Object.h>
 
 namespace AwsMock::Database::Entity::SNS {
 
@@ -59,7 +58,7 @@ namespace AwsMock::Database::Entity::SNS {
         }
       }
     } catch (std::exception &exc) {
-      Poco::Logger::get("SNSMessage").error("SNS message exception: " + std::string(exc.what()));
+        log_error << "SNS message exception: " << exc.what();
     }
   }
 

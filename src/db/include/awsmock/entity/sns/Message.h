@@ -11,10 +11,10 @@
 #include <vector>
 
 // Poco includes
-#include <Poco/Logger.h>
 #include <Poco/DateTime.h>
 #include <Poco/DateTimeFormat.h>
 #include <Poco/DateTimeFormatter.h>
+#include <Poco/JSON/Object.h>
 
 // MongoDB includes
 #include <bsoncxx/json.hpp>
@@ -24,6 +24,7 @@
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
+#include <awsmock/core/LogStream.h>
 #include <awsmock/entity/sns/MessageAttribute.h>
 
 namespace AwsMock::Database::Entity::SNS {

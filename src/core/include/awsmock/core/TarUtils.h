@@ -11,13 +11,15 @@
 #include <unistd.h>
 
 // Poco includes
-#include <Poco/Logger.h>
 #include <Poco/String.h>
 #include <Poco/RecursiveDirectoryIterator.h>
 
 // Archive includes
 #include <archive.h>
 #include <archive_entry.h>
+
+// AwsMock includes
+#include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Core {
 
@@ -33,7 +35,7 @@ namespace AwsMock::Core {
       /**
        * Constructor
        */
-      TarUtils() : _logger(Poco::Logger::get("TarUtils")) {}
+      TarUtils() = default;
 
       /**
        * Archive a whole directory tree to a tar file.
@@ -68,10 +70,6 @@ namespace AwsMock::Core {
        */
       static std::string Readsymlink(const std::string &path);
 
-      /**
-       * Logger
-       */
-      Poco::Logger &_logger;
   };
 
 } // namespace AwsMock::Core

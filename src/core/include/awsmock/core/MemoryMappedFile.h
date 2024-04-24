@@ -111,11 +111,6 @@ namespace AwsMock::Core {
          */
         long _fileSize = 0;
 
-        /**
-         * Mutex
-         */
-        static Poco::Mutex _mutex;
-
     };
 
 } // namespace AwsMock::Core

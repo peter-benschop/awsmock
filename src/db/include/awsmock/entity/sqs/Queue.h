@@ -9,10 +9,6 @@
 #include <string>
 #include <vector>
 
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/JSON/Parser.h>
-
 // MongoDB includes
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/string/to_string.hpp>
@@ -22,6 +18,7 @@
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/entity/sqs/QueueAttribute.h>
 
