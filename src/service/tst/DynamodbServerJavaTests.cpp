@@ -31,7 +31,6 @@ namespace AwsMock::Service {
         std::string _port = _configuration.getString("awsmock.service.dynamodb.port", std::to_string(DYNAMODB_DEFAULT_PORT));
         std::string _host = _configuration.getString("awsmock.service.dynamodb.host", DYNAMODB_DEFAULT_HOST);
         _endpoint = "http://" + _host + ":" + _port;
-        Poco::Logger::root().setLevel("debug");
 
         // Set base command
         _baseCommand = "java -jar /usr/local/lib/awsmock-java-test-0.0.1-SNAPSHOT-jar-with-dependencies.jar " + _endpoint + " dynamodb ";

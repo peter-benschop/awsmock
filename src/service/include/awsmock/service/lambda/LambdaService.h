@@ -21,6 +21,7 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/MetricService.h>
 #include <awsmock/core/MetricServiceTimer.h>
 #include <awsmock/core/ServiceException.h>
@@ -45,184 +46,184 @@
 
 namespace AwsMock::Service {
 
-  /**
-   * AWS lambda module. Handles all lambda related requests:
-   *
-   * <ul>
-   * <li>Create lambda function.</li>
-   * <li>Delete lambda function.</li>
-   * <li>List lambda function.</li>
-   * <li>Create lambda function tags.</li>
-   * <li>List lambda function tags.</li>
-   * <li>Delete lambda function tags.</li>
-   * <li>Invoke lambda function with AWS S3 notification payload.</li>
-   * <li>Invoke lambda function with AWS SQS notification payload.</li>
-   * </ul>
-   *
-   * <p>
-   * As the AWS lambda runtime environment (RIE) cannot handle several concurrent requests, the lambda invocation requests are queued and are send sequentially to the lambda function
-   * running as docker container. The incoming requests are posted to a Poco notification center. The target of the notification is the LambdaExecutor (@see AwsMock::Worker::LambdaExecutor).
-   * </p>
-   * <p>
-   * The execution command are send via HTTP to the docker image. RIE is using port 8080 for the REST invocation requests. This port is mapped to the docker host on a randomly chosen port,
-   * between 32768 and 65536.
-   * </p>
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  class LambdaService {
-
-  public:
-
     /**
-     * Constructor
+     * AWS lambda module. Handles all lambda related requests:
      *
-     * @param configuration module configuration
-     */
-    explicit LambdaService(Core::Configuration &configuration);
-
-    /**
-     * Create lambda function
+     * <ul>
+     * <li>Create lambda function.</li>
+     * <li>Delete lambda function.</li>
+     * <li>List lambda function.</li>
+     * <li>Create lambda function tags.</li>
+     * <li>List lambda function tags.</li>
+     * <li>Delete lambda function tags.</li>
+     * <li>Invoke lambda function with AWS S3 notification payload.</li>
+     * <li>Invoke lambda function with AWS SQS notification payload.</li>
+     * </ul>
      *
-     * @param request create lambda request
-     * @return CreateFunctionResponse
-     */
-    Dto::Lambda::CreateFunctionResponse CreateFunction(Dto::Lambda::CreateFunctionRequest &request);
-
-    /**
-     * List lambda functions
+     * <p>
+     * As the AWS lambda runtime environment (RIE) cannot handle several concurrent requests, the lambda invocation requests are queued and are send sequentially to the lambda function
+     * running as docker container. The incoming requests are posted to a Poco notification center. The target of the notification is the LambdaExecutor (@see AwsMock::Worker::LambdaExecutor).
+     * </p>
+     * <p>
+     * The execution command are send via HTTP to the docker image. RIE is using port 8080 for the REST invocation requests. This port is mapped to the docker host on a randomly chosen port,
+     * between 32768 and 65536.
+     * </p>
      *
-     * @param region AWS region name
-     * @return CreateFunctionResponse
+     * @author jens.vogt@opitz-consulting.com
      */
-    Dto::Lambda::ListFunctionResponse ListFunctions(const std::string &region);
+    class LambdaService {
 
-    /**
-     * Invoke lambda function
-     *
-     * @param eventNotification S3 event eventNotification
-     * @param region AWS region
-     * @param user user
-     */
-    void InvokeEventFunction(const Dto::S3::EventNotification &eventNotification, const std::string &region, const std::string &user);
+      public:
 
-    /**
-     * Invoke SQS function.
-     *
-     * @param functionName lambda function name
-     * @param payload SQS message
-     * @param region AWS region
-     * @param user user
-     */
-    void InvokeLambdaFunction(const std::string &functionName, const std::string &payload, const std::string &region, const std::string &user);
+        /**
+         * Constructor
+         *
+         * @param configuration module configuration
+         */
+        explicit LambdaService(Core::Configuration &configuration);
 
-    /**
-     * Create a new tag for a lambda functions.
-     *
-     * @param request lambda create tag request
-     */
-    void CreateTag(const Dto::Lambda::CreateTagRequest &request);
+        /**
+         * Create lambda function
+         *
+         * @param request create lambda request
+         * @return CreateFunctionResponse
+         */
+        Dto::Lambda::CreateFunctionResponse CreateFunction(Dto::Lambda::CreateFunctionRequest &request);
 
-    /**
-     * Returns a list of tags for a ARN.
-     *
-     * @param arn lambda function ARN
-     * @return ListTagsResponse
-     * @see AwsMock::Dto::Lambda::ListTagsResponse
-     */
-    Dto::Lambda::ListTagsResponse ListTags(const std::string &arn);
+        /**
+         * List lambda functions
+         *
+         * @param region AWS region name
+         * @return CreateFunctionResponse
+         */
+        Dto::Lambda::ListFunctionResponse ListFunctions(const std::string &region);
 
-    /**
-     * Gets a single lambda function
-     *
-     * @param region AWS region
-     * @param name function name
-     * @return GetFunctionResponse
-     * @throws ServiceException
-     * @see AwsMock::Dto::Lambda::GetFunctionResponse
-     */
-    Dto::Lambda::GetFunctionResponse GetFunction(const std::string &region, const std::string &name);
+        /**
+         * Invoke lambda function
+         *
+         * @param eventNotification S3 event eventNotification
+         * @param region AWS region
+         * @param user user
+         */
+        void InvokeEventFunction(const Dto::S3::EventNotification &eventNotification, const std::string &region, const std::string &user);
 
-    /**
-     * Delete lambda function
-     *
-     * <p>This method will also delete the corresponding container and images.
-     *
-     * @param request delete lambda request
-     * @throws ServiceException
-     */
-    void DeleteFunction(Dto::Lambda::DeleteFunctionRequest &request);
+        /**
+         * Invoke SQS function.
+         *
+         * @param functionName lambda function name
+         * @param payload SQS message
+         * @param region AWS region
+         * @param user user
+         */
+        void InvokeLambdaFunction(const std::string &functionName, const std::string &payload, const std::string &region, const std::string &user);
 
-    /**
-     * Delete lambda function tags
-     *
-     * @param request delete tags request
-     * @throws ServiceException
-     */
-    void DeleteTags(Dto::Lambda::DeleteTagsRequest &request);
+        /**
+         * Create a new tag for a lambda functions.
+         *
+         * @param request lambda create tag request
+         */
+        void CreateTag(const Dto::Lambda::CreateTagRequest &request);
 
-  private:
+        /**
+         * Returns a list of tags for a ARN.
+         *
+         * @param arn lambda function ARN
+         * @return ListTagsResponse
+         * @see AwsMock::Dto::Lambda::ListTagsResponse
+         */
+        Dto::Lambda::ListTagsResponse ListTags(const std::string &arn);
 
-    /**
-     * Returns the URI for the invocation request.
-     *
-     * @param hostName host name of the docker instance
-     * @param port lambda docker external port
-     * @return URI of the invocation request
-     */
-    static std::string GetRequestUrl(const std::string &hostName, int port);
+        /**
+         * Gets a single lambda function
+         *
+         * @param region AWS region
+         * @param name function name
+         * @return GetFunctionResponse
+         * @throws ServiceException
+         * @see AwsMock::Dto::Lambda::GetFunctionResponse
+         */
+        Dto::Lambda::GetFunctionResponse GetFunction(const std::string &region, const std::string &name);
 
-    /**
-     * Data directory
-     */
-    std::string _dataDir;
+        /**
+         * Delete lambda function
+         *
+         * <p>This method will also delete the corresponding container and images.
+         *
+         * @param request delete lambda request
+         * @throws ServiceException
+         */
+        void DeleteFunction(Dto::Lambda::DeleteFunctionRequest &request);
 
-    /**
-     * lambda directory
-     */
-    std::string _lambdaDir;
+        /**
+         * Delete lambda function tags
+         *
+         * @param request delete tags request
+         * @throws ServiceException
+         */
+        void DeleteTags(Dto::Lambda::DeleteTagsRequest &request);
 
-    /**
-     * Temp directory
-     */
-    std::string _tempDir;
+      private:
 
-    /**
-     * AWS region
-     */
-    std::string _region;
+        /**
+         * Returns the URI for the invocation request.
+         *
+         * @param hostName host name of the docker instance
+         * @param port lambda docker external port
+         * @return URI of the invocation request
+         */
+        static std::string GetRequestUrl(const std::string &hostName, int port);
 
-    /**
-     * AWS account ID
-     */
-    std::string _accountId;
+        /**
+         * Data directory
+         */
+        std::string _dataDir;
 
-    /**
-     * Configuration
-     */
-    Core::Configuration &_configuration;
+        /**
+         * lambda directory
+         */
+        std::string _lambdaDir;
 
-    /**
-     * lambda database connection
-     */
-    Database::LambdaDatabase &_lambdaDatabase;
+        /**
+         * Temp directory
+         */
+        std::string _tempDir;
 
-    /**
-     * S3 database connection
-     */
-    Database::S3Database &_s3Database;
+        /**
+         * AWS region
+         */
+        std::string _region;
 
-    /**
-     * Docker module
-     */
-    std::shared_ptr<Service::DockerService> _dockerService;
+        /**
+         * AWS account ID
+         */
+        std::string _accountId;
 
-    /**
-     * Mutex
-     */
-    static Poco::Mutex _mutex;
+        /**
+         * Configuration
+         */
+        Core::Configuration &_configuration;
 
-  };
+        /**
+         * lambda database connection
+         */
+        Database::LambdaDatabase &_lambdaDatabase;
+
+        /**
+         * S3 database connection
+         */
+        Database::S3Database &_s3Database;
+
+        /**
+         * Docker module
+         */
+        std::shared_ptr<Service::DockerService> _dockerService;
+
+        /**
+         * Mutex
+         */
+        static Poco::Mutex _mutex;
+
+    };
 
 } // namespace AwsMock::Service
 

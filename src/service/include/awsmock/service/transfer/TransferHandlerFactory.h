@@ -2,8 +2,8 @@
 // Created by vogje01 on 17/06/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_TRANSFERHANDLERFACTORY_H
-#define AWSMOCK_SERVICE_TRANSFERHANDLERFACTORY_H
+#ifndef AWSMOCK_SERVICE_TRANSFER_HANDLER_FACTORY_H
+#define AWSMOCK_SERVICE_TRANSFER_HANDLER_FACTORY_H
 
 // Poco includes
 #include "Poco/Logger.h"
@@ -16,48 +16,44 @@
 
 namespace AwsMock::Service {
 
-  /**
-   * Transfer request handler factory
-   */
-  class TransferRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
-
-  public:
-
     /**
-     * Constructor
+     * Transfer request handler factory
      *
-     * @param configuration application configuration
-     * @param metricService  monitoring
+     * @author jens.vogt@opitz-consulting.com
      */
-    TransferRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService) {}
+    class TransferRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 
-    /**
-     * Create new request handler instance
-     *
-     * @param request HTTP request
-     * @return request handler instance pointer
-     */
-    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
-      if(request.getURI().empty()) {
-        return nullptr;
-      }
-      return new TransferHandler(_configuration, _metricService);
-    }
+      public:
 
-  private:
+        /**
+         * Constructor
+         *
+         * @param configuration application configuration
+         */
+        explicit TransferRequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
 
-    /**
-     * S3 handler configuration
-     */
-    Core::Configuration &_configuration;
+        /**
+         * Create new request handler instance
+         *
+         * @param request HTTP request
+         * @return request handler instance pointer
+         */
+        Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
+            if (request.getURI().empty()) {
+                return nullptr;
+            }
+            return new TransferHandler(_configuration);
+        }
 
-    /**
-     * Metric module
-     */
-    Core::MetricService &_metricService;
+      private:
 
-  };
+        /**
+         * S3 handler configuration
+         */
+        Core::Configuration &_configuration;
+
+    };
 
 } // namespace AwsMock::Service
 
-#endif //AWSMOCK_SERVICE_TRANSFERHANDLERFACTORY_H
+#endif // AWSMOCK_SERVICE_TRANSFER_HANDLER_FACTORY_H

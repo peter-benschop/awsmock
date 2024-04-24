@@ -309,10 +309,7 @@ namespace AwsMock::Service {
     log_debug << "Prune containers, count: " << response.containersDeleted.size() << " spaceReclaimed: " << response.spaceReclaimed;
   }
 
-  std::string DockerService::WriteDockerFile(const std::string &codeDir,
-                                             const std::string &handler,
-                                             const std::string &runtime,
-                                             const std::map<std::string, std::string> &environment) {
+    std::string DockerService::WriteDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) {
 
     std::string dockerFilename = codeDir + Poco::Path::separator() + "Dockerfile";
 

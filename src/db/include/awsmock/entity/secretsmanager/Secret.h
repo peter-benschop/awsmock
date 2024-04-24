@@ -10,14 +10,6 @@
 #include <vector>
 #include <algorithm>
 
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/Logger.h>
-#include <Poco/UUIDGenerator.h>
-
 // MongoDB includes
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/string/to_string.hpp>
@@ -28,6 +20,7 @@
 
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/NumberUtils.h>
 #include <awsmock/entity/secretsmanager/RotationRules.h>
 

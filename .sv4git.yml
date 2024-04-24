@@ -3,7 +3,7 @@ versioning:
     update-major: [major]
     update-minor: [feat]
     update-patch: [build, ci, chore, docs, fix, perf, refactor, style, test]
-    ignore-unknown: false
+    ignore-unknown: true
 tag:
     pattern: '%d.%d.%d'
     filter: ""
@@ -24,7 +24,7 @@ branches:
     skip: [master, main, developer]
     skip-detached: false
 commit-message:
-    types: [build, ci, chore, docs, feat, fix, perf, refactor, revert, style, test, major]
+    types: [ build, ci, chore, docs, feat, fix, perf, refactor, revert, style, test, major, develop ]
     header-selector: ""
     scope:
         values: []

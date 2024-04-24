@@ -11,9 +11,6 @@
 #include <thread>
 #include <utility>
 
-// Poco includes
-#include <Poco/Logger.h>
-
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 
@@ -33,7 +30,7 @@ namespace AwsMock::Core {
        *
        * @param _name task name
        */
-      explicit Task(std::string _name);
+      explicit Task(std::string name, int timeout) : _name(name), _timeout(timeout) {}
 
       /**
        * Start the task

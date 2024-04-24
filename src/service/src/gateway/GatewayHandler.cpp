@@ -40,8 +40,7 @@ namespace AwsMock::Service {
         }))).reset();
     }
 
-    GatewayHandler::GatewayHandler(Core::Configuration &configuration, Core::MetricService &metricService, Service::GatewayRoute route) : AbstractHandler(), _configuration(configuration), _metricService(metricService), _route(std::move(route)) {
-    }
+    GatewayHandler::GatewayHandler(Core::Configuration &configuration, Core::MetricService &metricService, Service::GatewayRoute route) : AbstractHandler(), _configuration(configuration), _metricService(metricService), _route(std::move(route)) {}
 
     void GatewayHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         log_trace << "Gateway GET request, URI: " << request.getURI() << " region: " << region << " user: " << user << " remoteAddress: " << request.clientAddress().toString();
@@ -74,7 +73,7 @@ namespace AwsMock::Service {
             }
 
             case TRANSFER: {
-                CallAsyncGet(TransferHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncGet(TransferHandler(_configuration), request, response, region, user);
                 break;
             }
 
@@ -126,7 +125,7 @@ namespace AwsMock::Service {
             }
 
             case TRANSFER: {
-                CallAsyncPut(TransferHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncPut(TransferHandler(_configuration), request, response, region, user);
                 break;
             }
 
@@ -177,7 +176,7 @@ namespace AwsMock::Service {
             }
 
             case TRANSFER: {
-                CallAsyncPost(TransferHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncPost(TransferHandler(_configuration), request, response, region, user);
                 break;
             }
 
@@ -229,7 +228,7 @@ namespace AwsMock::Service {
             }
 
             case TRANSFER: {
-                CallAsyncDelete(TransferHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncDelete(TransferHandler(_configuration), request, response, region, user);
                 break;
             }
 
@@ -281,7 +280,7 @@ namespace AwsMock::Service {
             }
 
             case TRANSFER: {
-                CallAsyncHead(TransferHandler(_configuration, _metricService), request, response, region, user);
+                CallAsyncHead(TransferHandler(_configuration), request, response, region, user);
                 break;
             }
 

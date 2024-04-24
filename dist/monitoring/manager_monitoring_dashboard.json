@@ -599,7 +599,7 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(gateway_get_time[5m]) or vector(0)",
+          "expr": "rate(gateway_get_time[5m]) or vector(0)",
           "legendFormat": "GET",
           "range": true,
           "refId": "A"
@@ -610,7 +610,7 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(gateway_put_time[5m]) or vector(0)",
+          "expr": "rate(gateway_put_time[5m]) or vector(0)",
           "hide": false,
           "legendFormat": "PUT",
           "range": true,
@@ -622,7 +622,7 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(gateway_post_time[5m]) or vector(0)",
+          "expr": "rate(gateway_post_time[5m]) or vector(0)",
           "hide": false,
           "legendFormat": "POST",
           "range": true,
@@ -634,7 +634,7 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(gateway_delete_time[5m]) or vector(0)",
+          "expr": "rate(gateway_delete_time[5m]) or vector(0)",
           "hide": false,
           "legendFormat": "DELETE",
           "range": true,
@@ -646,7 +646,7 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(gateway_options_time[5m]) or vector(0)",
+          "expr": "rate(gateway_options_time[5m]) or vector(0)",
           "hide": false,
           "legendFormat": "OPTIONS",
           "range": true,
@@ -658,7 +658,7 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(gateway_head_time[5m]) or vector(0)",
+          "expr": "rate(gateway_head_time[5m]) or vector(0)",
           "hide": false,
           "legendFormat": "HEAD",
           "range": true,
@@ -676,13 +676,13 @@
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-3h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Manager",
   "uid": "cdae61d8-610f-49e4-bd3f-e7f1bf336d20",
-  "version": 13,
+  "version": 14,
   "weekStart": ""
 }

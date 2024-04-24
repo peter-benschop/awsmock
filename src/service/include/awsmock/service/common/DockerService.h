@@ -232,7 +232,7 @@ namespace AwsMock::Service {
      * @param environment runtime environment
      * @return return docker file path
      */
-    std::string WriteDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment);
+    static std::string WriteDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment);
 
     /**
      * Write the compressed docker imagefile.
@@ -241,7 +241,7 @@ namespace AwsMock::Service {
      * @param name function name
      * @return return docker file path
      */
-    std::string BuildImageFile(const std::string &codeDir, const std::string &name);
+    static std::string BuildImageFile(const std::string &codeDir, const std::string &name);
 
     /**
      * Configuration

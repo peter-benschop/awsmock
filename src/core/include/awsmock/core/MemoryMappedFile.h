@@ -25,97 +25,93 @@
 
 namespace AwsMock::Core {
 
-  /**
-   * Memory mapped file utility.
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  class MemoryMappedFile {
-
-  public:
-
     /**
-     * Constructor
-     */
-    MemoryMappedFile() : _start(nullptr), _membuffer(nullptr), _mapped(false) {}
-
-    /**
-     * Singleton
+     * Memory mapped file utility.
      *
-     * @return singleton instance
+     * @author jens.vogt@opitz-consulting.com
      */
-    static MemoryMappedFile &instance() {
-      static Poco::SingletonHolder<MemoryMappedFile> memoryMappedFile;
-      return *memoryMappedFile.get();
-    }
+    class MemoryMappedFile {
 
-    /**
-     * Opens a file and prepares the memory map
-     *
-     * @param filename name of the file.
-     * @return true on success
-     */
-    bool OpenFile(const std::string &filename);
+      public:
 
-    /**
-     * Release all resources
-     */
-    void CloseFile();
+        /**
+         * Constructor
+         */
+        MemoryMappedFile() : _start(nullptr), _membuffer(nullptr), _mapped(false) {}
 
-    /**
-     * Copy a chunk of data from the memory mapped file the provided output buffer
-     *
-     * @param start start index
-     * @param end end index
-     * @param buffer char buffer
-     * @return number of bytes actually read
-     */
-    long ReadChunk(long start, long end, char *buffer);
+        /**
+         * Singleton
+         *
+         * @return singleton instance
+         */
+        static MemoryMappedFile &instance() {
+            static Poco::SingletonHolder<MemoryMappedFile> memoryMappedFile;
+            return *memoryMappedFile.get();
+        }
 
-    /**
-     * Returns true in case the file is mapped already.
-     *
-     * @return true, in case file is already mapped.
-     */
-    [[nodiscard]] bool IsMapped() const { return _mapped; }
+        /**
+         * Opens a file and prepares the memory map
+         *
+         * @param filename name of the file.
+         * @return true on success
+         */
+        bool OpenFile(const std::string &filename);
 
-  private:
+        /**
+         * Release all resources
+         */
+        void CloseFile();
 
-    /**
-     * Start pointer
-     */
-    void *_start;
+        /**
+         * Copy a chunk of data from the memory mapped file the provided output buffer
+         *
+         * @param start start index
+         * @param end end index
+         * @param buffer char buffer
+         * @return number of bytes actually read
+         */
+        long ReadChunk(long start, long end, char *buffer);
 
-    /**
-     * Char buffer
-     */
-    char *_membuffer;
+        /**
+         * Returns true in case the file is mapped already.
+         *
+         * @return true, in case file is already mapped.
+         */
+        [[nodiscard]] bool IsMapped() const { return _mapped; }
 
-    /**
-     * Mapped flag
-     */
-    bool _mapped;
+      private:
 
-    /**
-     * Mutex
-     */
-    Poco::Mutex _mutex;
+        /**
+         * Start pointer
+         */
+        void *_start;
 
-    /**
-     * Start pointer
-    */
-    std::string _filename;
+        /**
+         * Char buffer
+         */
+        char *_membuffer;
 
-    /**
-     * File handle
-     */
-    int _fd{};
+        /**
+         * Mapped flag
+         */
+        bool _mapped;
 
-    /**
-     * File size
-     */
-    long _fileSize = 0;
-  };
+        /**
+         * Start pointer
+        */
+        std::string _filename;
+
+        /**
+         * File handle
+         */
+        int _fd{};
+
+        /**
+         * File size
+         */
+        long _fileSize = 0;
+
+    };
 
 } // namespace AwsMock::Core
 

@@ -254,6 +254,36 @@ namespace AwsMock::Core {
         return it != _gaugeMap.end() && std::find(it->second->labelNames().begin(), it->second->labelNames().end(), label) != it->second->labelNames().end();
     }
 
+    void MetricService::AddHistogram(const std::string &name) {
+        Poco::Mutex::ScopedLock lock(_mutex);
+        if (!HistogramExists(name)) {
+            _histogramMap[name] = new Poco::Prometheus::Histogram(name);
+            log_trace << "Gauge added, name: " << name;
+            return;
+        }
+        log_error << "Gauge exists already, name: " << name;
+    }
+
+    void MetricService::AddHistogram(const std::string &name, const std::string &label) {
+        Poco::Mutex::ScopedLock lock(_mutex);
+        if (!HistogramExists(name)) {
+            _histogramMap[name] = new Poco::Prometheus::Histogram(name, {.labelNames{label}});
+            log_trace << "Histogram added, name: " << name;
+            return;
+        }
+        log_error << "Histogram exists already, name: " << name;
+    }
+
+    bool MetricService::HistogramExists(const std::string &name) {
+        return _histogramMap.find(name) != _histogramMap.end();
+    }
+
+    bool MetricService::HistogramExists(const std::string &name, const std::string &label) {
+        auto it = _histogramMap.find(name);
+        return it != _histogramMap.end() && std::find(it->second->labelNames().begin(), it->second->labelNames().end(), label) != it->second->labelNames().end();
+    }
+
+
     void MetricService::AddTimer(const std::string &name) {
         Poco::Mutex::ScopedLock lock(_mutex);
         if (!TimerExists(name)) {

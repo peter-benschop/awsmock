@@ -9,6 +9,7 @@
 #include <string>
 #include <map>
 #include <utility>
+#include <iostream>
 
 // Poco includes
 #include <Poco/Condition.h>

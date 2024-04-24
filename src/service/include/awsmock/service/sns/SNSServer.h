@@ -2,8 +2,8 @@
 // Created by vogje01 on 06/10/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_SNSSERVER_H
-#define AWSMOCK_SERVICE_SNSSERVER_H
+#ifndef AWSMOCK_SERVICE_SNS_SERVER_H
+#define AWSMOCK_SERVICE_SNS_SERVER_H
 
 // C++ standard includes
 #include <string>
@@ -23,13 +23,14 @@
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/sns/SNSHandlerFactory.h>
 #include <awsmock/service/sns/SNSMonitoring.h>
+#include <awsmock/service/sns/SNSWorker.h>
 
 #define SNS_DEFAULT_PORT 9502
 #define SNS_DEFAULT_HOST "localhost"
 #define SNS_DEFAULT_QUEUE_LENGTH  250
 #define SNS_DEFAULT_THREADS 50
 #define SNS_DEFAULT_TIMEOUT 120
-#define SNS_DEFAULT_MESSAGE_TIMEOUT 14
+#define SNS_DEFAULT_WORKER_PERIOD 300
 #define SNS_DEFAULT_MONITORING_PERIOD 300
 
 namespace AwsMock::Service {
@@ -63,11 +64,6 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Delete old messages
-         */
-        void DeleteOldMessages();
-
-        /**
          * Configuration
          */
         Core::Configuration &_configuration;
@@ -83,14 +79,9 @@ namespace AwsMock::Service {
         std::shared_ptr<SNSMonitoring> _snsMonitoring;
 
         /**
-         * AWS region
+         * SNS worker
          */
-        std::string _region;
-
-        /**
-         * Sleeping period in ms
-         */
-        int _period;
+        std::shared_ptr<SNSWorker> _snsWorker;
 
         /**
          * Rest port
@@ -118,9 +109,13 @@ namespace AwsMock::Service {
         int _requestTimeout;
 
         /**
-         * Message timeout in seconds
+         * SNS server period
+         *
+         * <p>
+         * Used for the background threads (cleanup, reset, retention, etc.)
+         * </p>
          */
-        int _messageTimeout;
+        int _workerPeriod;
 
         /**
          * SNS monitoring period

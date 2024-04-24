@@ -16,185 +16,196 @@
 #include <Poco/Runnable.h>
 
 // AwsMock includes
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/dto/s3/CreateBucketConstraint.h"
-#include "awsmock/ftpserver/FtpServer.h"
-#include "awsmock/repository/ModuleDatabase.h"
-#include "awsmock/repository/TransferDatabase.h"
-#include "awsmock/service/common/AbstractServer.h"
-#include "awsmock/service/common/AbstractWorker.h"
-#include "TransferHandlerFactory.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/dto/s3/CreateBucketConstraint.h>
+#include <awsmock/ftpserver/FtpServer.h>
+#include <awsmock/repository/ModuleDatabase.h>
+#include <awsmock/repository/TransferDatabase.h>
+#include <awsmock/service/common/AbstractServer.h>
+#include <awsmock/service/common/AbstractWorker.h>
+#include <awsmock/service/transfer/TransferHandlerFactory.h>
+#include <awsmock/service/transfer/TransferMonitoring.h>
 
 #define TRANSFER_DEFAULT_PORT 9504
 #define TRANSFER_DEFAULT_HOST "localhost"
 #define TRANSFER_DEFAULT_QUEUE_LENGTH  250
 #define TRANSFER_DEFAULT_THREADS 50
 #define TRANSFER_DEFAULT_TIMEOUT 120
+#define TRANSFER_DEFAULT_MONITORING_PERIOD 300
 
 #define DEFAULT_BASE_DIR "transfer"
-#define CONTENT_TYPE_JSON "application/json"
 
 namespace AwsMock::Service {
 
-  class TransferServer : public AbstractServer, public AbstractWorker {
-
-  public:
-
     /**
-     * Constructor
+     * Transfer server HTTP server
      *
-     * @param configuration aws-mock configuration
-     * @param metricService aws-mock monitoring module
+     * @author jens.vogt@opitz-consulting.com
      */
-    explicit TransferServer(Core::Configuration &configuration, Core::MetricService &metricService);
+    class TransferServer : public AbstractServer, public AbstractWorker {
 
-    /**
-     * Initialization
-     */
-    void Initialize() override;
+      public:
 
-    /**
-     * Main method
-     */
-    void Run() override;
+        /**
+         * Constructor
+         *
+         * @param configuration aws-mock configuration
+         */
+        explicit TransferServer(Core::Configuration &configuration);
 
-    /**
-     * Shutdown
-     */
-    void Shutdown() override;
+        /**
+         * Initialization
+         */
+        void Initialize() override;
 
-  private:
+        /**
+         * Main method
+         */
+        void Run() override;
 
-    /**
-     * Starts a single transfer manager
-     *
-     * @param server transfer manager entity
-     */
-    void StartTransferServer(Database::Entity::Transfer::Transfer &server);
+        /**
+         * Shutdown
+         */
+        void Shutdown() override;
 
-    /**
-     * Stops a single transfer manager
-     *
-     * @param server transfer manager entity
-     */
-    void StopTransferServer(Database::Entity::Transfer::Transfer &server);
+      private:
 
-    /**
-     * Start all transfer servers, if they are not existing
-     */
-    void StartTransferServers();
+        /**
+         * Starts a single transfer manager
+         *
+         * @param server transfer manager entity
+         */
+        void StartTransferServer(Database::Entity::Transfer::Transfer &server);
 
-    /**
-     * Check transfer servers
-     */
-    void CheckTransferServers();
+        /**
+         * Stops a single transfer manager
+         *
+         * @param server transfer manager entity
+         */
+        void StopTransferServer(Database::Entity::Transfer::Transfer &server);
 
-    /**
-     * Configuration
-     */
-    Core::Configuration &_configuration;
+        /**
+         * Start all transfer servers, if they are not existing
+         */
+        void StartTransferServers();
 
-    /**
-     * Metric module
-     */
-    Core::MetricService &_metricService;
+        /**
+         * Check transfer servers
+         */
+        void CheckTransferServers();
 
-    /**
-     * lambda database
-     */
-    Database::TransferDatabase& _transferDatabase;
+        /**
+         * Configuration
+         */
+        Core::Configuration &_configuration;
 
-    /**
-     * Sleeping period in ms
-     */
-    int _period;
+        /**
+         * Transfer database
+         */
+        Database::TransferDatabase &_transferDatabase;
 
-    /**
-     * Rest port
-     */
-    int _port;
+        /**
+         * Transfer monitoring
+         */
+        std::shared_ptr<TransferMonitoring> _transferMonitoring;
 
-    /**
-     * Rest host
-     */
-    std::string _host;
+        /**
+         * Sleeping period in ms
+         */
+        int _period;
 
-    /**
-     * HTTP max message queue length
-     */
-    int _maxQueueLength;
+        /**
+         * Rest port
+         */
+        int _port;
 
-    /**
-     * HTTP max concurrent connection
-     */
-    int _maxThreads;
+        /**
+         * Rest host
+         */
+        std::string _host;
 
-    /**
-     * HTTP request timeout in seconds
-     */
-    int _requestTimeout;
+        /**
+         * HTTP max message queue length
+         */
+        int _maxQueueLength;
 
-    /**
-     * AWS region
-     */
-    std::string _region;
+        /**
+         * HTTP max concurrent connection
+         */
+        int _maxThreads;
 
-    /**
-     * AWS client ID
-     */
-    std::string _clientId;
+        /**
+         * HTTP request timeout in seconds
+         */
+        int _requestTimeout;
 
-    /**
-     * AWS user
-     */
-    std::string _user;
+        /**
+         * AWS region
+         */
+        std::string _region;
 
-    /**
-     * AWS S3 bucket
-     */
-    std::string _bucket;
+        /**
+         * AWS client ID
+         */
+        std::string _clientId;
 
-    /**
-     * Base dir for all FTP users
-     */
-    std::string _baseDir;
+        /**
+         * AWS user
+         */
+        std::string _user;
 
-    /**
-     * Base URL for all S3 request
-     */
-    std::string _baseUrl;
+        /**
+         * AWS S3 bucket
+         */
+        std::string _bucket;
 
-    /**
-     * Server userPoolId
-     */
-    std::string _serverId;
+        /**
+         * Base dir for all FTP users
+         */
+        std::string _baseDir;
 
-    /**
-     * List of transfer servers
-     */
-    std::map<std::string, std::shared_ptr<FtpServer::FtpServer>> _transferServerList;
+        /**
+         * Base URL for all S3 request
+         */
+        std::string _baseUrl;
 
-    /**
-     * Actual FTP manager
-     */
-    std::shared_ptr<FtpServer::FtpServer> _ftpServer;
+        /**
+         * Server userPoolId
+         */
+        std::string _serverId;
 
-    /**
-     * S3 module host
-     */
-    std::string _s3ServiceHost;
+        /**
+         * List of transfer servers
+         */
+        std::map<std::string, std::shared_ptr<FtpServer::FtpServer>> _transferServerList;
 
-    /**
-     * S3 module port
-     */
-    int _s3ServicePort;
+        /**
+         * Actual FTP manager
+         */
+        std::shared_ptr<FtpServer::FtpServer> _ftpServer;
 
-    /**
-     * Module name
-     */
-    std::string _module;
-  };
+        /**
+         * S3 module host
+         */
+        std::string _s3ServiceHost;
+
+        /**
+         * S3 module port
+         */
+        int _s3ServicePort;
+
+        /**
+         * Module name
+         */
+        std::string _module;
+
+        /**
+         * Monitoring period
+         */
+        int _monitoringPeriod;
+
+    };
 
 } // namespace AwsMock::Service
 

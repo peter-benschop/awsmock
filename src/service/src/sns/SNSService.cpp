@@ -84,19 +84,20 @@ namespace AwsMock::Service {
 
     Dto::SNS::PublishResponse SNSService::Publish(const Dto::SNS::PublishRequest &request) {
 
+        // Check topic/target ARN
+        if (request.topicArn.empty()) {
+            log_error << "Either topicARN or targetArn must exist";
+            throw Core::ServiceException("Either topicARN or targetArn must exist", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        // Check existence
+        if (!_snsDatabase.TopicExists(request.topicArn)) {
+            log_error << "Topic does not exist: " << request.topicArn;
+            throw Core::ServiceException("SNS topic does not exists", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
         Database::Entity::SNS::Message message;
         try {
-            // Check topic/target ARN
-            if (request.topicArn.empty()) {
-                log_error << "Either topicARN or targetArn must exist";
-                throw Core::ServiceException("Either topicARN or targetArn must exist", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-            }
-
-            // Check existence
-            if (!_snsDatabase.TopicExists(request.topicArn)) {
-                log_error << "Topic does not exist: " << request.topicArn;
-                throw Core::ServiceException("SNS topic does not exists", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-            }
 
             // Update database
             std::string messageId = Core::AwsUtils::CreateMessageId();

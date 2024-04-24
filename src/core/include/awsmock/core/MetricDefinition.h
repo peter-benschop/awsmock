@@ -37,6 +37,8 @@
 #define S3_OBJECT_BY_BUCKET_COUNT "s3_object_by_bucket_count"
 
 #define LAMBDA_FUNCTION_COUNT "lambda_function_count_total"
+#define LAMBDA_INVOCATION_TIMER "lambda_invocation_time"
+#define LAMBDA_INVOCATION_COUNT "lambda_invocation_count"
 
 #define DYNAMODB_TABLE_COUNT "dynamodb_table_count_total"
 
@@ -46,5 +48,8 @@
 #define COGNITO_USERPOOL_COUNT "cognito_userpool_count_total"
 #define COGNITO_USER_BY_USERPOOL_COUNT "cognito_user_by_userpool_count"
 
+#define TRANSFER_SERVER_COUNT "transfer_server_count_total"
+#define TRANSFER_SERVER_UPLOAD_COUNT "transfer_upload_count_total"
+#define TRANSFER_SERVER_DOWNLOAD_COUNT "transfer_download_count_total"
 
 #endif  // AWSMOCK_CORE_METRIC_DEFINITION_H

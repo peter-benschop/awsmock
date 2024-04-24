@@ -81,7 +81,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
         rotationRules.scheduleExpression = bsoncxx::string::to_string(rotationView["scheduleExpression"].get_string().value);
       }
     } catch (const mongocxx::exception &exc) {
-      Poco::Logger::get("Secret").error("Exception: oid: " + oid + " error: " + exc.what());
+        log_error << "Exception: oid: " << oid << " error: " << exc.what();
     }
   }
 

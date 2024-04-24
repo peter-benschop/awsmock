@@ -34,6 +34,9 @@ namespace AwsMock::Core {
 
                 }
             } while (status != std::future_status::ready);
+
+            Shutdown();
+            log_debug << "Timer shutdown, name: " << _name;
         });
     }
 

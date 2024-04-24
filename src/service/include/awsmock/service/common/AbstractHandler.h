@@ -171,7 +171,7 @@ namespace AwsMock::Service {
      * @param statusCode HTTP Status Code.
      * @param reason state reason.
      */
-    void handleHttpStatusCode(Poco::Net::HTTPServerResponse &response, int statusCode, const char *reason = nullptr);
+    static void handleHttpStatusCode(Poco::Net::HTTPServerResponse &response, int statusCode, const char *reason = nullptr);
 
     /**
      * Send a OK response (HTTP state code 200).
@@ -180,7 +180,7 @@ namespace AwsMock::Service {
      * @param payload HTTP body payload
      * @param extraHeader HTTP header map values, added to the default headers
      */
-    void SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &payload = {}, const HeaderMap &extraHeader = {});
+    static void SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &payload = {}, const HeaderMap &extraHeader = {});
 
     /**
      * Send a OK response (HTTP state code 200) with an output stream.
@@ -190,14 +190,14 @@ namespace AwsMock::Service {
      * @param contentLength content length of the stream in bytes
      * @param extraHeader HTTP header map values, added to the default headers
      */
-    void SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long contentLength, const HeaderMap &extraHeader = {});
+    static void SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long contentLength, const HeaderMap &extraHeader = {});
 
     /**
      * Send a CONTINUE response (HTTP state code 100).
      *
      * @param response HTTP response object
      */
-    void SendContinueResponse(Poco::Net::HTTPServerResponse &response);
+    static void SendContinueResponse(Poco::Net::HTTPServerResponse &response);
 
     /**
      * Send a OK response (HTTP state code 200) with an part of an output.
@@ -209,7 +209,7 @@ namespace AwsMock::Service {
      * @param size total size of the file
      * @param extraHeader HTTP header map values, added to the default headers
      */
-    void SendRangeResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long min, long max, long size, const HeaderMap &extraHeader = {});
+    static void SendRangeResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long min, long max, long size, const HeaderMap &extraHeader = {});
 
     /**
      * Send a HEAD response (HTTP state code 200)
@@ -217,7 +217,7 @@ namespace AwsMock::Service {
      * @param response HTTP response object
      * @param headerMap HTTP header map values
      */
-    void SendHeadResponse(Poco::Net::HTTPServerResponse &response, const HeaderMap &headerMap);
+    static void SendHeadResponse(Poco::Net::HTTPServerResponse &response, const HeaderMap &headerMap);
 
     /**
      * Send a DELETE response (HTTP state code 204) with an output stream.
@@ -225,7 +225,7 @@ namespace AwsMock::Service {
      * @param response HTTP response object
      * @param extraHeader HTTP header map values, added to the default headers
      */
-    void SendDeleteResponse(Poco::Net::HTTPServerResponse &response, const HeaderMap &extraHeader = {});
+    static void SendDeleteResponse(Poco::Net::HTTPServerResponse &response, const HeaderMap &extraHeader = {});
 
     /**
      * Send generic error response.
@@ -235,7 +235,7 @@ namespace AwsMock::Service {
      * @param headers HTTP headers
      * @param status HTTP status
      */
-    void SendErrorResponse(Poco::Net::HTTPServerResponse &response, const std::string& body, std::map<std::string, std::string> headers, const Poco::Net::HTTPResponse::HTTPStatus& status);
+    static void SendErrorResponse(Poco::Net::HTTPServerResponse &response, const std::string &body, std::map<std::string, std::string> headers, const Poco::Net::HTTPResponse::HTTPStatus &status);
 
     /**
      * Send an error response (HTTP state code 200).
@@ -262,7 +262,7 @@ namespace AwsMock::Service {
      * @param response HTTP response object
      * @param exc module exception object
      */
-    void SendXmlErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Core::ServiceException &exc);
+    static void SendXmlErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Core::ServiceException &exc);
 
     /**
      * Send an error response (HTTP state code 200).
@@ -271,7 +271,7 @@ namespace AwsMock::Service {
      * @param response HTTP response object
      * @param payload response body
      */
-    void SendXmlErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, const std::string &payload);
+    static void SendXmlErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, const std::string &payload);
 
     /**
      * Send an error response (HTTP state code 200).
@@ -280,7 +280,7 @@ namespace AwsMock::Service {
      * @param response HTTP response object
      * @param exc exception object
      */
-    void SendJsonErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Poco::Exception &exc);
+    static void SendJsonErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Poco::Exception &exc);
 
     /**
      * Send an error response (HTTP state code 200).
@@ -289,7 +289,7 @@ namespace AwsMock::Service {
      * @param response HTTP response object
      * @param exc module exception object
      */
-    void SendJsonErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Core::ServiceException &exc);
+    static void SendJsonErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Core::ServiceException &exc);
 
     /**
      * Send a no content response, state: 204.
@@ -297,7 +297,7 @@ namespace AwsMock::Service {
      * @param response HTTP response
      * @param extraHeader extra headers
      */
-    void SendNoContentResponse(Poco::Net::HTTPServerResponse &response, const HeaderMap &extraHeader = {});
+    static void SendNoContentResponse(Poco::Net::HTTPServerResponse &response, const HeaderMap &extraHeader = {});
 
     /**
      * Gets a header values
@@ -307,7 +307,7 @@ namespace AwsMock::Service {
      * @param defaultValue default value
      * @return value or default value
      */
-    std::string GetHeaderValue(Poco::Net::HTTPServerRequest &request, const std::string &name, const std::string &defaultValue);
+    static std::string GetHeaderValue(Poco::Net::HTTPServerRequest &request, const std::string &name, const std::string &defaultValue);
 
     /**
      * Returns the region and the user
@@ -316,7 +316,7 @@ namespace AwsMock::Service {
      * @param region AWS region
      * @param user AWS user
      */
-    void GetRegionUser(const std::string &authorization, std::string &region, std::string &user);
+    static void GetRegionUser(const std::string &authorization, std::string &region, std::string &user);
 
     /**
      * Get the header metadata values
@@ -324,49 +324,49 @@ namespace AwsMock::Service {
      * @param request HTTP request
      * @return header values
      */
-    std::map<std::string, std::string> GetMetadata(Poco::Net::HTTPServerRequest &request);
+    static std::map<std::string, std::string> GetMetadata(Poco::Net::HTTPServerRequest &request);
 
     /**
      * Dump the request to std::cerr
      *
      * @param request HTTP request
      */
-    void DumpRequest(Poco::Net::HTTPServerRequest &request);
+    static void DumpRequest(Poco::Net::HTTPServerRequest &request);
 
     /**
      * Dump the request to std::cerr
      *
      * @param request HTTP request
      */
-    [[maybe_unused]] void DumpRequestHeaders(Poco::Net::HTTPServerRequest &request);
+    [[maybe_unused]] static void DumpRequestHeaders(Poco::Net::HTTPServerRequest &request);
 
     /**
      * Dump the request to std::cerr
      *
      * @param response HTTP response
      */
-    [[maybe_unused]] void DumpResponseHeaders(Poco::Net::HTTPServerResponse &response);
+    [[maybe_unused]] static void DumpResponseHeaders(Poco::Net::HTTPServerResponse &response);
 
     /**
      * Dump the response to std::cerr
      *
      * @param response HTTP response
      */
-    [[maybe_unused]] void DumpResponse(Poco::Net::HTTPServerResponse &response);
+    [[maybe_unused]] static void DumpResponse(Poco::Net::HTTPServerResponse &response);
 
     /**
      * Dump the request body to std::cerr
      *
      * @param request HTTP request
      */
-    [[maybe_unused]] void DumpBody(Poco::Net::HTTPServerRequest &request);
+    [[maybe_unused]] static void DumpBody(Poco::Net::HTTPServerRequest &request);
 
     /**
      * Dump the request body to std::cerr
      *
      * @param payload HTTP request body
      */
-    [[maybe_unused]] void DumpPayload(const std::string &payload);
+    [[maybe_unused]] static void DumpPayload(const std::string &payload);
 
     /**
      * Dump the request body to a file
@@ -374,7 +374,7 @@ namespace AwsMock::Service {
      * @param request HTTP request
      * @param filename name fo the file
      */
-    [[maybe_unused]] void DumpBodyToFile(Poco::Net::HTTPServerRequest &request, const std::string &filename);
+    [[maybe_unused]] static void DumpBodyToFile(Poco::Net::HTTPServerRequest &request, const std::string &filename);
 
   private:
 
@@ -386,7 +386,7 @@ namespace AwsMock::Service {
      * @param headerMap vector of header key/values pairs
      * @param contentType content type
      */
-    void SetHeaders(Poco::Net::HTTPServerResponse &response, unsigned long contentLength, const HeaderMap &headerMap = {}, const std::string &contentType = "application/xml");
+    static void SetHeaders(Poco::Net::HTTPServerResponse &response, unsigned long contentLength, const HeaderMap &headerMap = {}, const std::string &contentType = "application/xml");
 
     /**
      * Base URL
