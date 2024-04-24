@@ -10,7 +10,7 @@ namespace AwsMock::Database {
 
         return find_if(_queues.begin(),
                        _queues.end(),
-                       [region, name](const std::pair<std::string, Entity::SQS::Queue> &queue) {
+                       [region, name](const std::pair <std::string, Entity::SQS::Queue> &queue) {
                            return queue.second.region == region && queue.second.name == name;
                        }) != _queues.end();
     }
@@ -19,14 +19,14 @@ namespace AwsMock::Database {
 
         return find_if(_queues.begin(),
                        _queues.end(),
-                       [region, queueUrl](const std::pair<std::string, Entity::SQS::Queue> &queue) {
+                       [region, queueUrl](const std::pair <std::string, Entity::SQS::Queue> &queue) {
                            return queue.second.region == region && queue.second.queueUrl == queueUrl;
                        }) != _queues.end();
     }
 
     bool SQSMemoryDb::QueueArnExists(const std::string &queueArn) {
 
-        return find_if(_queues.begin(), _queues.end(), [queueArn](const std::pair<std::string, Entity::SQS::Queue> &queue) {
+        return find_if(_queues.begin(), _queues.end(), [queueArn](const std::pair <std::string, Entity::SQS::Queue> &queue) {
             return queue.second.queueArn == queueArn;
         }) != _queues.end();
     }
@@ -42,7 +42,7 @@ namespace AwsMock::Database {
 
     Entity::SQS::Queue SQSMemoryDb::GetQueueById(const std::string &oid) {
 
-        auto it = find_if(_queues.begin(), _queues.end(), [oid](const std::pair<std::string, Entity::SQS::Queue> &queue) {
+        auto it = find_if(_queues.begin(), _queues.end(), [oid](const std::pair <std::string, Entity::SQS::Queue> &queue) {
             return queue.first == oid;
         });
 
@@ -58,7 +58,7 @@ namespace AwsMock::Database {
         Entity::SQS::Queue result;
 
         auto it =
-                find_if(_queues.begin(), _queues.end(), [queueArn](const std::pair<std::string, Entity::SQS::Queue> &queue) {
+                find_if(_queues.begin(), _queues.end(), [queueArn](const std::pair <std::string, Entity::SQS::Queue> &queue) {
                     return queue.second.queueArn == queueArn;
                 });
 
@@ -73,7 +73,7 @@ namespace AwsMock::Database {
 
         Entity::SQS::Queue result;
         auto it =
-                find_if(_queues.begin(), _queues.end(), [queueUrl](const std::pair<std::string, Entity::SQS::Queue> &queue) {
+                find_if(_queues.begin(), _queues.end(), [queueUrl](const std::pair <std::string, Entity::SQS::Queue> &queue) {
                     return queue.second.queueUrl == queueUrl;
                 });
 
@@ -89,7 +89,7 @@ namespace AwsMock::Database {
         Entity::SQS::Queue result;
         auto it = find_if(_queues.begin(),
                           _queues.end(),
-                          [region, name](const std::pair<std::string, Entity::SQS::Queue> &queue) {
+                          [region, name](const std::pair <std::string, Entity::SQS::Queue> &queue) {
                               return queue.second.region == region && queue.second.name == name;
                           });
 
@@ -128,7 +128,7 @@ namespace AwsMock::Database {
         std::string name = queue.name;
         auto it = find_if(_queues.begin(),
                           _queues.end(),
-                          [region, name](const std::pair<std::string, Entity::SQS::Queue> &queue) {
+                          [region, name](const std::pair <std::string, Entity::SQS::Queue> &queue) {
                               return queue.second.region == region && queue.second.name == name;
                           });
         _queues[it->first] = queue;
@@ -188,7 +188,7 @@ namespace AwsMock::Database {
 
         return find_if(_messages.begin(),
                        _messages.end(),
-                       [receiptHandle](const std::pair<std::string, Entity::SQS::Message> &message) {
+                       [receiptHandle](const std::pair <std::string, Entity::SQS::Message> &message) {
                            return message.second.receiptHandle == receiptHandle;
                        }) != _messages.end();
 
@@ -197,7 +197,7 @@ namespace AwsMock::Database {
     Entity::SQS::Message SQSMemoryDb::GetMessageById(const std::string &oid) {
 
         auto it =
-                find_if(_messages.begin(), _messages.end(), [oid](const std::pair<std::string, Entity::SQS::Message> &message) {
+                find_if(_messages.begin(), _messages.end(), [oid](const std::pair <std::string, Entity::SQS::Message> &message) {
                     return message.first == oid;
                 });
 
@@ -213,7 +213,7 @@ namespace AwsMock::Database {
         Entity::SQS::Message result;
         auto it = find_if(_messages.begin(),
                           _messages.end(),
-                          [receiptHandle](const std::pair<std::string, Entity::SQS::Message> &message) {
+                          [receiptHandle](const std::pair <std::string, Entity::SQS::Message> &message) {
                               return message.second.receiptHandle == receiptHandle;
                           });
 
@@ -229,7 +229,7 @@ namespace AwsMock::Database {
 
         std::string oid = message.oid;
         auto it =
-                find_if(_messages.begin(), _messages.end(), [oid](const std::pair<std::string, Entity::SQS::Message> &message) {
+                find_if(_messages.begin(), _messages.end(), [oid](const std::pair <std::string, Entity::SQS::Message> &message) {
                     return message.second.oid == oid;
                 });
         _messages[it->first] = message;

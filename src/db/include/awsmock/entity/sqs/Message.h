@@ -32,143 +32,143 @@
 
 namespace AwsMock::Database::Entity::SQS {
 
-  using bsoncxx::builder::basic::kvp;
-  using bsoncxx::builder::basic::make_array;
-  using bsoncxx::builder::basic::make_document;
-  using bsoncxx::view_or_value;
-  using bsoncxx::document::view;
-  using bsoncxx::document::value;
-
-  /**
-   * SQS message entity
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  struct Message {
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
+    using bsoncxx::view_or_value;
+    using bsoncxx::document::view;
+    using bsoncxx::document::value;
 
     /**
-     * ID
-     */
-    std::string oid;
-
-    /**
-     * Aws region name
-     */
-    std::string region;
-
-    /**
-     * Queue URL
-     */
-    std::string queueUrl;
-
-    /**
-     * Message body
-     */
-    std::string body;
-
-    /**
-     * Status
-     */
-    MessageStatus status = MessageStatus::INITIAL;
-
-    /**
-     * Last send datetime
-     */
-    Poco::DateTime reset;
-
-    /**
-     * Send retries
-     */
-    int retries = 0;
-
-    /**
-     * Message ID
-     */
-    std::string messageId;
-
-    /**
-     * Receipt handle
-     */
-    std::string receiptHandle;
-
-    /**
-     * MD5 sum body
-     */
-    std::string md5Body;
-
-    /**
-     * MD5 sum sqs user attributes
-     */
-    std::string md5UserAttr;
-
-    /**
-     * MD5 sum sqs system attributes
-     */
-    std::string md5SystemAttr;
-
-    /**
-     * List of sqs
-     */
-    MessageAttributeList attributes;
-
-    /**
-     * Creation date
-     */
-    Poco::DateTime created = Poco::DateTime();
-
-    /**
-     * Last modification date
-     */
-    Poco::DateTime modified = Poco::DateTime();
-
-    /**
-     * Converts the entity to a MongoDB document
+     * SQS message entity
      *
-     * @return entity as MongoDB document.
+     * @author jens.vogt@opitz-consulting.com
      */
-    [[nodiscard]] view_or_value<view, value> ToDocument() const;
+    struct Message {
 
-    /**
-     * Converts the MongoDB document to an entity
-     *
-     * @param mResult MongoDB document.
-     */
-    void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+        /**
+         * ID
+         */
+        std::string oid;
 
-    /**
-     * Converts the entity to a JSON object
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        /**
+         * Aws region name
+         */
+        std::string region;
 
-    /**
-     * Converts the entity to a JSON object
-     *
-     * @param jsonObject JSON object
-     */
-    void FromJsonObject(Poco::JSON::Object::Ptr jsonObject);
+        /**
+         * Queue URL
+         */
+        std::string queueUrl;
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * Message body
+         */
+        std::string body;
 
-    /**
-     * Stream provider.
-     *
-     * @param os output stream
-     * @param m message
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const Message &m);
+        /**
+         * Status
+         */
+        MessageStatus status = MessageStatus::INITIAL;
 
-  };
+        /**
+         * Last send datetime
+         */
+        Poco::DateTime reset;
 
-  typedef struct Message Message;
-  typedef std::vector<Message> MessageList;
+        /**
+         * Send retries
+         */
+        int retries = 0;
+
+        /**
+         * Message ID
+         */
+        std::string messageId;
+
+        /**
+         * Receipt handle
+         */
+        std::string receiptHandle;
+
+        /**
+         * MD5 sum body
+         */
+        std::string md5Body;
+
+        /**
+         * MD5 sum sqs user attributes
+         */
+        std::string md5UserAttr;
+
+        /**
+         * MD5 sum sqs system attributes
+         */
+        std::string md5SystemAttr;
+
+        /**
+         * List of sqs
+         */
+        MessageAttributeList attributes;
+
+        /**
+         * Creation date
+         */
+        Poco::DateTime created = Poco::DateTime();
+
+        /**
+         * Last modification date
+         */
+        Poco::DateTime modified = Poco::DateTime();
+
+        /**
+         * Converts the entity to a MongoDB document
+         *
+         * @return entity as MongoDB document.
+         */
+        [[nodiscard]] view_or_value <view, value> ToDocument() const;
+
+        /**
+         * Converts the MongoDB document to an entity
+         *
+         * @param mResult MongoDB document.
+         */
+        void FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult);
+
+        /**
+         * Converts the entity to a JSON object
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+
+        /**
+         * Converts the entity to a JSON object
+         *
+         * @param jsonObject JSON object
+         */
+        void FromJsonObject(Poco::JSON::Object::Ptr jsonObject);
+
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
+
+        /**
+         * Stream provider.
+         *
+         * @param os output stream
+         * @param m message
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const Message &m);
+
+    };
+
+    typedef struct Message Message;
+    typedef std::vector <Message> MessageList;
 
 } // namespace AwsMock::Database::Entity::S3
 

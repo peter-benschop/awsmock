@@ -22,62 +22,62 @@
 
 namespace AwsMock::Database::Entity::Lambda {
 
-  using bsoncxx::builder::basic::kvp;
-  using bsoncxx::builder::basic::make_array;
-  using bsoncxx::builder::basic::make_document;
-  using bsoncxx::view_or_value;
-  using bsoncxx::document::view;
-  using bsoncxx::document::value;
-  using bsoncxx::to_json;
-
-  /**
-   * Lambda ephemeral storage entity
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  struct EphemeralStorage {
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
+    using bsoncxx::view_or_value;
+    using bsoncxx::document::view;
+    using bsoncxx::document::value;
+    using bsoncxx::to_json;
 
     /**
-     * Temporary disk space in MB. Default: 512 MB, Range: 512 - 10240 MB
-     */
-    long size = 512;
-
-    /**
-     * Converts the MongoDB document to an entity
+     * Lambda ephemeral storage entity
      *
-     * @param mResult database document.
+     * @author jens.vogt@opitz-consulting.com
      */
-    [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+    struct EphemeralStorage {
 
-    /**
-     * Converts the entity to a MongoDB document
-     *
-     * @return entity as MongoDB document.
-     */
-    [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        /**
+         * Temporary disk space in MB. Default: 512 MB, Range: 512 - 10240 MB
+         */
+        long size = 512;
 
-    /**
-     * Converts the entity to a JSON object
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        /**
+         * Converts the MongoDB document to an entity
+         *
+         * @param mResult database document.
+         */
+        [[maybe_unused]] void FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult);
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * Converts the entity to a MongoDB document
+         *
+         * @return entity as MongoDB document.
+         */
+        [[nodiscard]] view_or_value <view, value> ToDocument() const;
 
-    /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const EphemeralStorage &m);
+        /**
+         * Converts the entity to a JSON object
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
-  };
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
+
+        /**
+         * Stream provider.
+         *
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const EphemeralStorage &m);
+
+    };
 
 } // namespace AwsMock::Database::Entity::lambda
 

@@ -24,115 +24,115 @@
 
 namespace AwsMock::Database::Entity::SQS {
 
-  using bsoncxx::builder::basic::kvp;
-  using bsoncxx::builder::basic::make_array;
-  using bsoncxx::builder::basic::make_document;
-  using bsoncxx::view_or_value;
-  using bsoncxx::document::view;
-  using bsoncxx::document::value;
-
-  /**
-   * SQS queue entity
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  struct Queue {
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
+    using bsoncxx::view_or_value;
+    using bsoncxx::document::view;
+    using bsoncxx::document::value;
 
     /**
-     * ID
-     */
-    std::string oid;
-
-    /**
-     * AWS region
-     */
-    std::string region;
-
-    /**
-     * Queue name
-     */
-    std::string name;
-
-    /**
-     * Owner
-     */
-    std::string owner;
-
-    /**
-     * Queue URL
-     */
-    std::string queueUrl;
-
-    /**
-     * Queue ARN
-     */
-    std::string queueArn;
-
-    /**
-     * Queue userAttributes
-     */
-    QueueAttribute attributes;
-
-    /**
-     * Queue tags
-     */
-    std::map<std::string, std::string> tags;
-
-    /**
-     * Creation date
-     */
-    Poco::DateTime created = Poco::DateTime();
-
-    /**
-     * Last modification date
-     */
-    Poco::DateTime modified = Poco::DateTime();
-
-    /**
-     * Converts the entity to a MongoDB document
+     * SQS queue entity
      *
-     * @return entity as MongoDB document.
+     * @author jens.vogt@opitz-consulting.com
      */
-    [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
+    struct Queue {
 
-    /**
-     * Converts the MongoDB document to an entity
-     *
-     * @param mResult MongoDB document.
-     */
-    Entity::SQS::Queue FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+        /**
+         * ID
+         */
+        std::string oid;
 
-    /**
-     * Converts the entity to a JSON object
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        /**
+         * AWS region
+         */
+        std::string region;
 
-    /**
-     * Converts the entity to a JSON object
-     *
-     * @param jsonObject JSON object
-     */
-    void FromJsonObject(Poco::JSON::Object::Ptr jsonObject);
+        /**
+         * Queue name
+         */
+        std::string name;
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * Owner
+         */
+        std::string owner;
 
-    /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const Queue &q);
+        /**
+         * Queue URL
+         */
+        std::string queueUrl;
 
-  };
+        /**
+         * Queue ARN
+         */
+        std::string queueArn;
 
-  typedef std::vector<Queue> QueueList;
+        /**
+         * Queue userAttributes
+         */
+        QueueAttribute attributes;
+
+        /**
+         * Queue tags
+         */
+        std::map <std::string, std::string> tags;
+
+        /**
+         * Creation date
+         */
+        Poco::DateTime created = Poco::DateTime();
+
+        /**
+         * Last modification date
+         */
+        Poco::DateTime modified = Poco::DateTime();
+
+        /**
+         * Converts the entity to a MongoDB document
+         *
+         * @return entity as MongoDB document.
+         */
+        [[maybe_unused]] [[nodiscard]] view_or_value <view, value> ToDocument() const;
+
+        /**
+         * Converts the MongoDB document to an entity
+         *
+         * @param mResult MongoDB document.
+         */
+        Entity::SQS::Queue FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult);
+
+        /**
+         * Converts the entity to a JSON object
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+
+        /**
+         * Converts the entity to a JSON object
+         *
+         * @param jsonObject JSON object
+         */
+        void FromJsonObject(Poco::JSON::Object::Ptr jsonObject);
+
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
+
+        /**
+         * Stream provider.
+         *
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const Queue &q);
+
+    };
+
+    typedef std::vector <Queue> QueueList;
 
 } // namespace AwsMock::Database::Entity::S3
 

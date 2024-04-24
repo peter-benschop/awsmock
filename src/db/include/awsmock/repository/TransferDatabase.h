@@ -42,7 +42,7 @@ namespace AwsMock::Database {
          * Singleton instance
          */
         static TransferDatabase &instance() {
-            static Poco::SingletonHolder<TransferDatabase> sh;
+            static Poco::SingletonHolder <TransferDatabase> sh;
             return *sh.get();
         }
 
@@ -82,7 +82,7 @@ namespace AwsMock::Database {
          * @return true if transfer manager already exists
          * @throws DatabaseException
          */
-        bool TransferExists(const std::string &region, const std::vector<std::string> &protocols);
+        bool TransferExists(const std::string &region, const std::vector <std::string> &protocols);
 
         /**
          * Create a new lambda function
@@ -150,7 +150,7 @@ namespace AwsMock::Database {
          * @param region AWS region name
          * @return list of transfer manager
          */
-        std::vector<Entity::Transfer::Transfer> ListServers(const std::string &region = {});
+        std::vector <Entity::Transfer::Transfer> ListServers(const std::string &region = {});
 
         /**
          * Returns the total number of servers.

@@ -19,72 +19,72 @@
 
 namespace AwsMock::Database::Entity::Lambda {
 
-  using bsoncxx::builder::basic::kvp;
-  using bsoncxx::builder::basic::make_array;
-  using bsoncxx::builder::basic::make_document;
-  using bsoncxx::view_or_value;
-  using bsoncxx::document::view;
-  using bsoncxx::document::value;
-
-  /**
-   * Lambda tags entity
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  struct Tags {
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
+    using bsoncxx::view_or_value;
+    using bsoncxx::document::view;
+    using bsoncxx::document::value;
 
     /**
-     * Variables
-     */
-    std::vector<std::pair<std::string, std::string>> tags;
-
-    /**
-     * Checks whether a tags with the given tags key exists.
+     * Lambda tags entity
      *
-     * @param key key of the tags
-     * @return true if tags with the given key exists.
+     * @author jens.vogt@opitz-consulting.com
      */
-    bool HasTag(const std::string &key);
+    struct Tags {
 
-    /**
-     * Returns a given tags value by key
-     *
-     * @param key name of the tag
-     * @return found notification or notifications.end().
-     */
-    std::string GetTagValue(const std::string &key);
+        /**
+         * Variables
+         */
+        std::vector <std::pair<std::string, std::string>> tags;
 
-    /**
-     * Converts the MongoDB document to an entity
-     *
-     * @param mResult MongoDB document view.
-     */
-    [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+        /**
+         * Checks whether a tags with the given tags key exists.
+         *
+         * @param key key of the tags
+         * @return true if tags with the given key exists.
+         */
+        bool HasTag(const std::string &key);
 
-    /**
-     * Converts the entity to a MongoDB document
-     *
-     * @return entity as MongoDB document.
-     */
-    [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        /**
+         * Returns a given tags value by key
+         *
+         * @param key name of the tag
+         * @return found notification or notifications.end().
+         */
+        std::string GetTagValue(const std::string &key);
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * Converts the MongoDB document to an entity
+         *
+         * @param mResult MongoDB document view.
+         */
+        [[maybe_unused]] void FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult);
 
-    /**
-     * Stream provider.
-     *
-     * @param os output stream
-     * @param tag tag entity
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const Tags &tag);
+        /**
+         * Converts the entity to a MongoDB document
+         *
+         * @return entity as MongoDB document.
+         */
+        [[nodiscard]] view_or_value <view, value> ToDocument() const;
 
-  };
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
+
+        /**
+         * Stream provider.
+         *
+         * @param os output stream
+         * @param tag tag entity
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const Tags &tag);
+
+    };
 
 } // namespace AwsMock::Database::Entity::lambda
 

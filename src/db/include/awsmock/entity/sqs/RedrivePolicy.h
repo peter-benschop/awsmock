@@ -26,89 +26,89 @@
 
 namespace AwsMock::Database::Entity::SQS {
 
-  using bsoncxx::builder::basic::kvp;
-  using bsoncxx::builder::basic::make_array;
-  using bsoncxx::builder::basic::make_document;
-  using bsoncxx::view_or_value;
-  using bsoncxx::document::view;
-  using bsoncxx::document::value;
-
-  /**
-   * SQS queue re-drive policy entity
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  struct RedrivePolicy {
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
+    using bsoncxx::view_or_value;
+    using bsoncxx::document::view;
+    using bsoncxx::document::value;
 
     /**
-     * Dead letter queue target ARN
-     */
-    std::string deadLetterTargetArn;
-
-    /**
-     * Maximal number of retries, before the message will be send to the DQL
-     */
-    int maxReceiveCount = 0;
-
-    /**
-     * Parse values from a JSON stream
+     * SQS queue re-drive policy entity
      *
-     * @param body json input stream
+     * @author jens.vogt@opitz-consulting.com
      */
-    void FromJson(const std::string &body);
+    struct RedrivePolicy {
 
-    /**
-     * Converts the DTO to a JSON representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToJson() const;
+        /**
+         * Dead letter queue target ARN
+         */
+        std::string deadLetterTargetArn;
 
-    /**
-     * Converts the entity to a MongoDB document
-     *
-     * @return entity as MongoDB document.
-     */
-    [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        /**
+         * Maximal number of retries, before the message will be send to the DQL
+         */
+        int maxReceiveCount = 0;
 
-    /**
-     * Converts the MongoDB document to an entity
-     *
-     * @param mResult MongoDB document.
-     */
-    [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+        /**
+         * Parse values from a JSON stream
+         *
+         * @param body json input stream
+         */
+        void FromJson(const std::string &body);
 
-    /**
-     * Converts the entity to a JSON object
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        /**
+         * Converts the DTO to a JSON representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
-     * Converts the entity to a JSON object
-     *
-     * @param jsonObject JSON object
-     */
-    void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+        /**
+         * Converts the entity to a MongoDB document
+         *
+         * @return entity as MongoDB document.
+         */
+        [[maybe_unused]] [[nodiscard]] view_or_value <view, value> ToDocument() const;
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * Converts the MongoDB document to an entity
+         *
+         * @param mResult MongoDB document.
+         */
+        [[maybe_unused]] void FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult);
 
-    /**
-     * Stream provider.
-     *
-     * @param os output stream
-     * @param r redrive policy
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const RedrivePolicy &r);
+        /**
+         * Converts the entity to a JSON object
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
-  };
+        /**
+         * Converts the entity to a JSON object
+         *
+         * @param jsonObject JSON object
+         */
+        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
+
+        /**
+         * Stream provider.
+         *
+         * @param os output stream
+         * @param r redrive policy
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const RedrivePolicy &r);
+
+    };
 
 } // namespace AwsMock::Database::Entity::SQS
 

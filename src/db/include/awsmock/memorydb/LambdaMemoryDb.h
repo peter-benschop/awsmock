@@ -45,7 +45,7 @@ namespace AwsMock::Database {
          * Singleton instance
          */
         static LambdaMemoryDb &instance() {
-            static Poco::SingletonHolder<LambdaMemoryDb> sh;
+            static Poco::SingletonHolder <LambdaMemoryDb> sh;
             return *sh.get();
         }
 
@@ -137,7 +137,7 @@ namespace AwsMock::Database {
          * @param region AWS region name
          * @return list of lambda functions
          */
-        std::vector<Entity::Lambda::Lambda> ListLambdas(const std::string &region);
+        std::vector <Entity::Lambda::Lambda> ListLambdas(const std::string &region);
 
         /**
          * Updates an existing lambda lambda function
@@ -167,7 +167,7 @@ namespace AwsMock::Database {
         /**
          * Lambda map
          */
-        std::map<std::string, Entity::Lambda::Lambda> _lambdas{};
+        std::map <std::string, Entity::Lambda::Lambda> _lambdas{};
 
         /**
          * Lambda mutex

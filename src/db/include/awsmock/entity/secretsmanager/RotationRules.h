@@ -28,78 +28,78 @@
 
 namespace AwsMock::Database::Entity::SecretsManager {
 
-  using bsoncxx::builder::basic::kvp;
-  using bsoncxx::builder::basic::make_array;
-  using bsoncxx::builder::basic::make_document;
-  using bsoncxx::view_or_value;
-  using bsoncxx::document::view;
-  using bsoncxx::document::value;
-
-  /**
-   * Rotation rules
-   *
-   * Example:
-   * <pre>
-   * {
-   *   "AutomaticallyAfterDays": number,
-   *   "Duration": "string",
-   *   "ScheduleExpression": "string"
-   * }
-   * </pre>
-   */
-  struct RotationRules {
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
+    using bsoncxx::view_or_value;
+    using bsoncxx::document::view;
+    using bsoncxx::document::value;
 
     /**
-     * Automatic rotation period
-     */
-    long automaticallyAfterDays;
-
-    /**
-     * Duration
-     */
-    std::string duration;
-
-    /**
-     * Duration
-     */
-    std::string scheduleExpression;
-
-    /**
-     * Converts the entity to a MongoDB document
+     * Rotation rules
      *
-     * @return entity as MongoDB document.
+     * Example:
+     * <pre>
+     * {
+     *   "AutomaticallyAfterDays": number,
+     *   "Duration": "string",
+     *   "ScheduleExpression": "string"
+     * }
+     * </pre>
      */
-    [[nodiscard]] view_or_value<view, value> ToDocument() const;
+    struct RotationRules {
 
-    /**
-     * Converts the MongoDB document to an entity
-     *
-     * @param mResult MongoDB document.
-     */
-    void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+        /**
+         * Automatic rotation period
+         */
+        long automaticallyAfterDays;
 
-    /**
-     * Converts the entity to a string representation.
-     *
-     * @return entity as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * Duration
+         */
+        std::string duration;
 
-    /**
-     * Converts the entity to a string representation.
-     *
-     * @return entity as string for logging.
-     */
-    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        /**
+         * Duration
+         */
+        std::string scheduleExpression;
 
-    /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const RotationRules &r);
+        /**
+         * Converts the entity to a MongoDB document
+         *
+         * @return entity as MongoDB document.
+         */
+        [[nodiscard]] view_or_value <view, value> ToDocument() const;
 
-  };
+        /**
+         * Converts the MongoDB document to an entity
+         *
+         * @param mResult MongoDB document.
+         */
+        void FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult);
+
+        /**
+         * Converts the entity to a string representation.
+         *
+         * @return entity as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
+
+        /**
+         * Converts the entity to a string representation.
+         *
+         * @return entity as string for logging.
+         */
+        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+
+        /**
+         * Stream provider.
+         *
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const RotationRules &r);
+
+    };
 
 } //namespace AwsMock::Dto::SecretsManager
 

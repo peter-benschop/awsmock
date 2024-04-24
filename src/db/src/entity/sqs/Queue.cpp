@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database::Entity::SQS {
 
-    view_or_value<view, value> Queue::ToDocument() const {
+    view_or_value <view, value> Queue::ToDocument() const {
 
         auto tagsDoc = bsoncxx::builder::basic::document{};
         if (!tags.empty()) {
@@ -15,7 +15,7 @@ namespace AwsMock::Database::Entity::SQS {
             }
         }
 
-        view_or_value<view, value> queueDoc = make_document(
+        view_or_value <view, value> queueDoc = make_document(
                 kvp("region", region),
                 kvp("name", name),
                 kvp("owner", owner),
@@ -29,7 +29,7 @@ namespace AwsMock::Database::Entity::SQS {
         return queueDoc;
     }
 
-    Entity::SQS::Queue Queue::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+    Entity::SQS::Queue Queue::FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult) {
 
         try {
 

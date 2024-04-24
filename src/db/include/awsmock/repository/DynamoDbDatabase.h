@@ -38,7 +38,7 @@ namespace AwsMock::Database {
          * Singleton instance
          */
         static DynamoDbDatabase &instance() {
-            static Poco::SingletonHolder<DynamoDbDatabase> sh;
+            static Poco::SingletonHolder <DynamoDbDatabase> sh;
             return *sh.get();
         }
 

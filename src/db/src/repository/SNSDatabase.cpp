@@ -98,7 +98,7 @@ namespace AwsMock::Database {
 
             auto client = GetClient();
             mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
-            mongocxx::stdx::optional<bsoncxx::document::value>
+            mongocxx::stdx::optional <bsoncxx::document::value>
                     mResult = _topicCollection.find_one(make_document(kvp("_id", oid)));
             if (mResult) {
 
@@ -135,7 +135,7 @@ namespace AwsMock::Database {
 
                 auto client = GetClient();
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
-                mongocxx::stdx::optional<bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("topicArn", topicArn)));
+                mongocxx::stdx::optional <bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("topicArn", topicArn)));
 
                 Entity::SNS::Topic result;
                 result.FromDocument(mResult);
@@ -161,7 +161,7 @@ namespace AwsMock::Database {
 
                 auto client = GetClient();
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
-                mongocxx::stdx::optional<bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("region", region), kvp("topicName", topicName)));
+                mongocxx::stdx::optional <bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("region", region), kvp("topicName", topicName)));
 
                 if (mResult.has_value()) {
                     Entity::SNS::Topic result;
@@ -440,7 +440,7 @@ namespace AwsMock::Database {
 
             auto client = GetClient();
             mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
-            mongocxx::stdx::optional<bsoncxx::document::value>
+            mongocxx::stdx::optional <bsoncxx::document::value>
                     mResult = _messageCollection.find_one(make_document(kvp("_id", oid)));
             Entity::SNS::Message result;
             result.FromDocument(mResult);
@@ -624,7 +624,7 @@ namespace AwsMock::Database {
         }
     }
 
-    void SNSDatabase::DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &receipts) {
+    void SNSDatabase::DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector <std::string> &receipts) {
 
         if (_useDatabase) {
 

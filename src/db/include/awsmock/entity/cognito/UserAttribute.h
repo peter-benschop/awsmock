@@ -11,25 +11,25 @@
 
 namespace AwsMock::Database::Entity::Cognito {
 
-  /**
-   * Cognito user attribute entity
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  struct UserAttribute {
-
     /**
-     * Name
+     * Cognito user attribute entity
+     *
+     * @author jens.vogt@opitz-consulting.com
      */
-    std::string name;
+    struct UserAttribute {
 
-    /**
-     * Value
-     */
-    std::string value;
-  };
+        /**
+         * Name
+         */
+        std::string name;
 
-  typedef std::vector<UserAttribute> UserAttributeList;
+        /**
+         * Value
+         */
+        std::string value;
+    };
+
+    typedef std::vector <UserAttribute> UserAttributeList;
 }
 
 #endif // AWSMOCK_DB_ENTITY_COGNITO_USERATTRIBUTE_H

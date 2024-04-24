@@ -141,14 +141,14 @@ namespace AwsMock::Database::Entity::SQS {
          *
          * @return entity as MongoDB document.
          */
-        [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[maybe_unused]] [[nodiscard]] view_or_value <view, value> ToDocument() const;
 
         /**
          * Converts the MongoDB document to an entity
          *
          * @param mResult MongoDB document view.
          */
-        [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+        [[maybe_unused]] void FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult);
 
         /**
          * Converts the entity to a JSON object

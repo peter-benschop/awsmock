@@ -48,7 +48,7 @@ namespace AwsMock::Database {
 
             auto client = GetClient();
             mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-            mongocxx::stdx::optional<bsoncxx::document::value>
+            mongocxx::stdx::optional <bsoncxx::document::value>
                     mResult = _tableCollection.find_one(make_document(kvp("_id", oid)));
             if (!mResult) {
                 log_error << "Database exception: Table not found ";
@@ -75,7 +75,7 @@ namespace AwsMock::Database {
 
                 auto client = GetClient();
                 mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-                mongocxx::stdx::optional<bsoncxx::document::value>
+                mongocxx::stdx::optional <bsoncxx::document::value>
                         mResult = _tableCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
                 if (!mResult) {
                     log_error << "Database exception: Table not found ";
@@ -141,7 +141,7 @@ namespace AwsMock::Database {
         }
     }
 
-    std::vector<Entity::DynamoDb::Table> DynamoDbDatabase::ListTables(const std::string &region) {
+    std::vector <Entity::DynamoDb::Table> DynamoDbDatabase::ListTables(const std::string &region) {
 
         Entity::DynamoDb::TableList tables;
         if (_useDatabase) {

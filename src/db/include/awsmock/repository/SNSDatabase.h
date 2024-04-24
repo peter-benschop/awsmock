@@ -48,7 +48,7 @@ namespace AwsMock::Database {
          * Singleton instance
          */
         static SNSDatabase &instance() {
-            static Poco::SingletonHolder<SNSDatabase> sh;
+            static Poco::SingletonHolder <SNSDatabase> sh;
             return *sh.get();
         }
 
@@ -269,7 +269,7 @@ namespace AwsMock::Database {
          * @param receipts vector of receipts
          * @throws Core::DatabaseException
          */
-        void DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &receipts);
+        void DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector <std::string> &receipts);
 
         /**
          * Deletes old messages message.

@@ -29,121 +29,121 @@
 
 namespace AwsMock::Database::Entity::SNS {
 
-  using bsoncxx::builder::basic::kvp;
-  using bsoncxx::builder::basic::make_array;
-  using bsoncxx::builder::basic::make_document;
-  using bsoncxx::view_or_value;
-  using bsoncxx::document::view;
-  using bsoncxx::document::value;
-
-  /**
-   * SNS topic entity
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  struct Topic {
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
+    using bsoncxx::view_or_value;
+    using bsoncxx::document::view;
+    using bsoncxx::document::value;
 
     /**
-     * ID
-     */
-    std::string oid;
-
-    /**
-     * AWS region
-     */
-    std::string region;
-
-    /**
-     * Topic name
-     */
-    std::string topicName;
-
-    /**
-     * Owner
-     */
-    std::string owner;
-
-    /**
-     * Topic URL
-     */
-    std::string topicUrl;
-
-    /**
-     * Topic ARN
-     */
-    std::string topicArn;
-
-    /**
-     * Subscriptions
-     */
-    SubscriptionList subscriptions;
-
-    /**
-     * Attributes
-     */
-    TopicAttribute topicAttribute;
-
-    /**
-     * Topic tags
-     */
-    std::map<std::string, std::string> tags;
-
-    /**
-     * Creation date
-     */
-    Poco::DateTime created = Poco::DateTime();
-
-    /**
-     * Last modification date
-     */
-    Poco::DateTime modified = Poco::DateTime();
-
-    /**
-     * Checks whether a subscription with the given protocol/endpoint exists already.
+     * SNS topic entity
      *
-     * @param subscription name of the event
-     * @return true if notification with the given event name exists.
+     * @author jens.vogt@opitz-consulting.com
      */
-    bool HasSubscription(const Subscription &subscription);
+    struct Topic {
 
-    /**
-     * Converts the entity to a MongoDB document
-     *
-     * @return entity as MongoDB document.
-     */
-    [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        /**
+         * ID
+         */
+        std::string oid;
 
-    /**
-     * Converts the MongoDB document to an entity
-     *
-     * @param mResult MongoDB document view.
-     */
-    void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+        /**
+         * AWS region
+         */
+        std::string region;
 
-    /**
-     * Converts the entity to a JSON object
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        /**
+         * Topic name
+         */
+        std::string topicName;
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * Owner
+         */
+        std::string owner;
 
-    /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const Topic &q);
+        /**
+         * Topic URL
+         */
+        std::string topicUrl;
 
-  };
+        /**
+         * Topic ARN
+         */
+        std::string topicArn;
 
-  typedef std::vector<Topic> TopicList;
+        /**
+         * Subscriptions
+         */
+        SubscriptionList subscriptions;
+
+        /**
+         * Attributes
+         */
+        TopicAttribute topicAttribute;
+
+        /**
+         * Topic tags
+         */
+        std::map <std::string, std::string> tags;
+
+        /**
+         * Creation date
+         */
+        Poco::DateTime created = Poco::DateTime();
+
+        /**
+         * Last modification date
+         */
+        Poco::DateTime modified = Poco::DateTime();
+
+        /**
+         * Checks whether a subscription with the given protocol/endpoint exists already.
+         *
+         * @param subscription name of the event
+         * @return true if notification with the given event name exists.
+         */
+        bool HasSubscription(const Subscription &subscription);
+
+        /**
+         * Converts the entity to a MongoDB document
+         *
+         * @return entity as MongoDB document.
+         */
+        [[nodiscard]] view_or_value <view, value> ToDocument() const;
+
+        /**
+         * Converts the MongoDB document to an entity
+         *
+         * @param mResult MongoDB document view.
+         */
+        void FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult);
+
+        /**
+         * Converts the entity to a JSON object
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
+
+        /**
+         * Stream provider.
+         *
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const Topic &q);
+
+    };
+
+    typedef std::vector <Topic> TopicList;
 
 } // namespace AwsMock::Database::Entity::SNS
 

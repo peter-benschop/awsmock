@@ -10,7 +10,7 @@ namespace AwsMock::Database {
 
         return find_if(_transfers.begin(),
                        _transfers.end(),
-                       [region, serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
+                       [region, serverId](const std::pair <std::string, Entity::Transfer::Transfer> &transfer) {
                            return transfer.second.region == region && transfer.second.serverId == serverId;
                        }) != _transfers.end();
 
@@ -26,23 +26,23 @@ namespace AwsMock::Database {
 
         return find_if(_transfers.begin(),
                        _transfers.end(),
-                       [serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
+                       [serverId](const std::pair <std::string, Entity::Transfer::Transfer> &transfer) {
                            return transfer.second.serverId == serverId;
                        }) != _transfers.end();
 
     }
 
-    bool TransferMemoryDb::TransferExists(const std::string &region, const std::vector<std::string> &protocols) {
+    bool TransferMemoryDb::TransferExists(const std::string &region, const std::vector <std::string> &protocols) {
 
         return find_if(_transfers.begin(),
                        _transfers.end(),
-                       [region, protocols](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
+                       [region, protocols](const std::pair <std::string, Entity::Transfer::Transfer> &transfer) {
                            return transfer.second.region == region && transfer.second.protocols == protocols;
                        }) != _transfers.end();
 
     }
 
-    std::vector<Entity::Transfer::Transfer> TransferMemoryDb::ListServers(const std::string &region) {
+    std::vector <Entity::Transfer::Transfer> TransferMemoryDb::ListServers(const std::string &region) {
 
         Entity::Transfer::TransferList transferList;
         if (region.empty()) {
@@ -80,7 +80,7 @@ namespace AwsMock::Database {
         std::string serverId = transfer.serverId;
         auto it = find_if(_transfers.begin(),
                           _transfers.end(),
-                          [region, serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
+                          [region, serverId](const std::pair <std::string, Entity::Transfer::Transfer> &transfer) {
                               return transfer.second.region == region && transfer.second.serverId == serverId;
                           });
 
@@ -98,7 +98,7 @@ namespace AwsMock::Database {
 
         auto it = find_if(_transfers.begin(),
                           _transfers.end(),
-                          [oid](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
+                          [oid](const std::pair <std::string, Entity::Transfer::Transfer> &transfer) {
                               return transfer.first == oid;
                           });
 
@@ -115,7 +115,7 @@ namespace AwsMock::Database {
 
         auto it = find_if(_transfers.begin(),
                           _transfers.end(),
-                          [serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
+                          [serverId](const std::pair <std::string, Entity::Transfer::Transfer> &transfer) {
                               return transfer.second.serverId == serverId;
                           });
 
@@ -132,7 +132,7 @@ namespace AwsMock::Database {
 
         auto it = find_if(_transfers.begin(),
                           _transfers.end(),
-                          [arn](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
+                          [arn](const std::pair <std::string, Entity::Transfer::Transfer> &transfer) {
                               return transfer.second.arn == arn;
                           });
 
@@ -156,7 +156,7 @@ namespace AwsMock::Database {
         } else {
 
             return std::count_if(std::begin(_transfers), std::end(_transfers),
-                                 [region](std::pair<std::string, Entity::Transfer::Transfer> const &p) {
+                                 [region](std::pair <std::string, Entity::Transfer::Transfer> const &p) {
                                      return p.second.region == region;
                                  });
 

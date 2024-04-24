@@ -32,305 +32,305 @@
 
 namespace AwsMock::Database::Entity::Lambda {
 
-  using bsoncxx::builder::basic::kvp;
-  using bsoncxx::builder::basic::make_array;
-  using bsoncxx::builder::basic::make_document;
-  using bsoncxx::view_or_value;
-  using bsoncxx::document::view;
-  using bsoncxx::document::value;
-  using bsoncxx::to_json;
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
+    using bsoncxx::view_or_value;
+    using bsoncxx::document::view;
+    using bsoncxx::document::value;
+    using bsoncxx::to_json;
 
-  /**
-   * Lambda state
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  enum LambdaState {
-    Pending,
-    Active,
-    Inactive,
-    Failed
-  };
+    /**
+     * Lambda state
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
+    enum LambdaState {
+        Pending,
+        Active,
+        Inactive,
+        Failed
+    };
 
-  static std::map<LambdaState, std::string> LambdaStateNames{
-      {LambdaState::Pending, "Pending"},
-      {LambdaState::Active, "Active"},
-      {LambdaState::Inactive, "Inactive"},
-      {LambdaState::Failed, "Failed"},
-  };
+    static std::map <LambdaState, std::string> LambdaStateNames{
+            {LambdaState::Pending,  "Pending"},
+            {LambdaState::Active,   "Active"},
+            {LambdaState::Inactive, "Inactive"},
+            {LambdaState::Failed,   "Failed"},
+    };
 
-  [[maybe_unused]] static std::string LambdaStateToString(LambdaState lambdaState) {
-    return LambdaStateNames[lambdaState];
-  }
-
-  [[maybe_unused]] static LambdaState LambdaStateFromString(const std::string &lambdaState) {
-    for (auto &it : LambdaStateNames) {
-      if (it.second == lambdaState) {
-        return it.first;
-      }
+    [[maybe_unused]] static std::string LambdaStateToString(LambdaState lambdaState) {
+        return LambdaStateNames[lambdaState];
     }
-    return LambdaState::Inactive;
-  }
 
-  enum LambdaStateReasonCode {
-    Idle,
-    Creating,
-    Restoring,
-    EniLimitExceeded,
-    InsufficientRolePermissions,
-    InvalidConfiguration,
-    InternalError,
-    SubnetOutOfIPAddresses,
-    InvalidSubnet,
-    InvalidSecurityGroup,
-    ImageDeleted,
-    ImageAccessDenied,
-    InvalidImage,
-    KMSKeyAccessDenied,
-    KMSKeyNotFound,
-    InvalidStateKMSKey,
-    DisabledKMSKey,
-    EFSIOError,
-    EFSMountConnectivityError,
-    EFSMountFailure,
-    EFSMountTimeout,
-    InvalidRuntime,
-    InvalidZipFileException,
-    FunctionError
-  };
-
-  static std::map<LambdaStateReasonCode, std::string> LambdaStateReasonCodeNames{
-      {LambdaStateReasonCode::Idle, "Idle"},
-      {LambdaStateReasonCode::Creating, "Creating"},
-      {LambdaStateReasonCode::Restoring, "Restoring"},
-      {LambdaStateReasonCode::EniLimitExceeded, "EniLimitExceeded"},
-      {LambdaStateReasonCode::InsufficientRolePermissions, "InsufficientRolePermissions"},
-      {LambdaStateReasonCode::InvalidConfiguration, "InvalidConfiguration"},
-      {LambdaStateReasonCode::InternalError, "InternalError"},
-      {LambdaStateReasonCode::SubnetOutOfIPAddresses, "SubnetOutOfIPAddresses"},
-      {LambdaStateReasonCode::InvalidSubnet, "InvalidSubnet"},
-      {LambdaStateReasonCode::InvalidSecurityGroup, "InvalidSecurityGroup"},
-      {LambdaStateReasonCode::ImageDeleted, "ImageDeleted"},
-      {LambdaStateReasonCode::ImageAccessDenied, "ImageAccessDenied"},
-      {LambdaStateReasonCode::InvalidImage, "InvalidImage"},
-      {LambdaStateReasonCode::KMSKeyAccessDenied, "KMSKeyAccessDenied"},
-      {LambdaStateReasonCode::KMSKeyNotFound, "KMSKeyNotFound"},
-      {LambdaStateReasonCode::InvalidStateKMSKey, "InvalidStateKMSKey"},
-      {LambdaStateReasonCode::DisabledKMSKey, "DisabledKMSKey"},
-      {LambdaStateReasonCode::EFSIOError, "EFSIOError"},
-      {LambdaStateReasonCode::EFSMountConnectivityError, "EFSMountConnectivityError"},
-      {LambdaStateReasonCode::EFSMountFailure, "EFSMountFailure"},
-      {LambdaStateReasonCode::EFSMountTimeout, "EFSMountTimeout"},
-      {LambdaStateReasonCode::InvalidRuntime, "InvalidRuntime"},
-      {LambdaStateReasonCode::InvalidZipFileException, "InvalidZipFileException"},
-      {LambdaStateReasonCode::FunctionError, "FunctionError"},
-  };
-
-  [[maybe_unused]] static std::string LambdaStateReasonCodeToString(LambdaStateReasonCode lambdaStateReasonCode) {
-    return LambdaStateReasonCodeNames[lambdaStateReasonCode];
-  }
-
-  [[maybe_unused]] static LambdaStateReasonCode LambdaStateReasonCodeFromString(const std::string &lambdaStateReasonCode) {
-    for (auto &it : LambdaStateReasonCodeNames) {
-      if (it.second == lambdaStateReasonCode) {
-        return it.first;
-      }
+    [[maybe_unused]] static LambdaState LambdaStateFromString(const std::string &lambdaState) {
+        for (auto &it: LambdaStateNames) {
+            if (it.second == lambdaState) {
+                return it.first;
+            }
+        }
+        return LambdaState::Inactive;
     }
-    return LambdaStateReasonCode::Idle;
-  }
 
-  struct Lambda {
+    enum LambdaStateReasonCode {
+        Idle,
+        Creating,
+        Restoring,
+        EniLimitExceeded,
+        InsufficientRolePermissions,
+        InvalidConfiguration,
+        InternalError,
+        SubnetOutOfIPAddresses,
+        InvalidSubnet,
+        InvalidSecurityGroup,
+        ImageDeleted,
+        ImageAccessDenied,
+        InvalidImage,
+        KMSKeyAccessDenied,
+        KMSKeyNotFound,
+        InvalidStateKMSKey,
+        DisabledKMSKey,
+        EFSIOError,
+        EFSMountConnectivityError,
+        EFSMountFailure,
+        EFSMountTimeout,
+        InvalidRuntime,
+        InvalidZipFileException,
+        FunctionError
+    };
 
-    /**
-     * ID
-     */
-    std::string oid;
+    static std::map <LambdaStateReasonCode, std::string> LambdaStateReasonCodeNames{
+            {LambdaStateReasonCode::Idle,                        "Idle"},
+            {LambdaStateReasonCode::Creating,                    "Creating"},
+            {LambdaStateReasonCode::Restoring,                   "Restoring"},
+            {LambdaStateReasonCode::EniLimitExceeded,            "EniLimitExceeded"},
+            {LambdaStateReasonCode::InsufficientRolePermissions, "InsufficientRolePermissions"},
+            {LambdaStateReasonCode::InvalidConfiguration,        "InvalidConfiguration"},
+            {LambdaStateReasonCode::InternalError,               "InternalError"},
+            {LambdaStateReasonCode::SubnetOutOfIPAddresses,      "SubnetOutOfIPAddresses"},
+            {LambdaStateReasonCode::InvalidSubnet,               "InvalidSubnet"},
+            {LambdaStateReasonCode::InvalidSecurityGroup,        "InvalidSecurityGroup"},
+            {LambdaStateReasonCode::ImageDeleted,                "ImageDeleted"},
+            {LambdaStateReasonCode::ImageAccessDenied,           "ImageAccessDenied"},
+            {LambdaStateReasonCode::InvalidImage,                "InvalidImage"},
+            {LambdaStateReasonCode::KMSKeyAccessDenied,          "KMSKeyAccessDenied"},
+            {LambdaStateReasonCode::KMSKeyNotFound,              "KMSKeyNotFound"},
+            {LambdaStateReasonCode::InvalidStateKMSKey,          "InvalidStateKMSKey"},
+            {LambdaStateReasonCode::DisabledKMSKey,              "DisabledKMSKey"},
+            {LambdaStateReasonCode::EFSIOError,                  "EFSIOError"},
+            {LambdaStateReasonCode::EFSMountConnectivityError,   "EFSMountConnectivityError"},
+            {LambdaStateReasonCode::EFSMountFailure,             "EFSMountFailure"},
+            {LambdaStateReasonCode::EFSMountTimeout,             "EFSMountTimeout"},
+            {LambdaStateReasonCode::InvalidRuntime,              "InvalidRuntime"},
+            {LambdaStateReasonCode::InvalidZipFileException,     "InvalidZipFileException"},
+            {LambdaStateReasonCode::FunctionError,               "FunctionError"},
+    };
 
-    /**
-     * AWS region name
-     */
-    std::string region;
+    [[maybe_unused]] static std::string LambdaStateReasonCodeToString(LambdaStateReasonCode lambdaStateReasonCode) {
+        return LambdaStateReasonCodeNames[lambdaStateReasonCode];
+    }
 
-    /**
-     * User
-     */
-    std::string user;
+    [[maybe_unused]] static LambdaStateReasonCode LambdaStateReasonCodeFromString(const std::string &lambdaStateReasonCode) {
+        for (auto &it: LambdaStateReasonCodeNames) {
+            if (it.second == lambdaStateReasonCode) {
+                return it.first;
+            }
+        }
+        return LambdaStateReasonCode::Idle;
+    }
 
-    /**
-     * Function
-     */
-    std::string function;
+    struct Lambda {
 
-    /**
-     * Runtime
-     */
-    std::string runtime;
+        /**
+         * ID
+         */
+        std::string oid;
 
-    /**
-     * Role
-     */
-    std::string role;
+        /**
+         * AWS region name
+         */
+        std::string region;
 
-    /**
-     * Handler
-     */
-    std::string handler;
+        /**
+         * User
+         */
+        std::string user;
 
-    /**
-     * Memory size in MB, Default: 128, Range: 128 - 10240 MB
-     */
-    long memorySize = 128;
+        /**
+         * Function
+         */
+        std::string function;
 
-    /**
-     * Temporary dask space in MB, Default: 512, Range: 512 - 10240 MB
-     */
-    EphemeralStorage ephemeralStorage;
+        /**
+         * Runtime
+         */
+        std::string runtime;
 
-    /**
-     * Size of the code in bytes
-     */
-    long codeSize;
+        /**
+         * Role
+         */
+        std::string role;
 
-    /**
-     * Image ID
-     */
-    std::string imageId;
+        /**
+         * Handler
+         */
+        std::string handler;
 
-    /**
-     * Container ID
-     */
-    std::string containerId;
+        /**
+         * Memory size in MB, Default: 128, Range: 128 - 10240 MB
+         */
+        long memorySize = 128;
 
-    /**
-     * Tags
-     */
-    std::map<std::string, std::string> tags;
+        /**
+         * Temporary dask space in MB, Default: 512, Range: 512 - 10240 MB
+         */
+        EphemeralStorage ephemeralStorage;
 
-    /**
-     * ARN
-     */
-    std::string arn;
+        /**
+         * Size of the code in bytes
+         */
+        long codeSize;
 
-    /**
-     * Random host port
-     */
-    int hostPort;
+        /**
+         * Image ID
+         */
+        std::string imageId;
 
-    /**
-     * Timeout in seconds
-     */
-    int timeout;
+        /**
+         * Container ID
+         */
+        std::string containerId;
 
-    /**
-     * Concurrency
-     */
-    int concurrency = 5;
+        /**
+         * Tags
+         */
+        std::map <std::string, std::string> tags;
 
-    /**
-     * Environment
-     */
-    Environment environment;
+        /**
+         * ARN
+         */
+        std::string arn;
 
-    /**
-     * lambda state
-     */
-    LambdaState state = LambdaState::Pending;
+        /**
+         * Random host port
+         */
+        int hostPort;
 
-    /**
-     * State reason
-     */
-    std::string stateReason;
+        /**
+         * Timeout in seconds
+         */
+        int timeout;
 
-    /**
-     * State reason code
-     */
-    LambdaStateReasonCode stateReasonCode = LambdaStateReasonCode::Creating;
+        /**
+         * Concurrency
+         */
+        int concurrency = 5;
 
-    /**
-     * Code SHA256
-     */
-    std::string codeSha256;
+        /**
+         * Environment
+         */
+        Environment environment;
 
-    /**
-     * Filename of the code
-     */
-    std::string fileName;
+        /**
+         * lambda state
+         */
+        LambdaState state = LambdaState::Pending;
 
-    /**
-     * Last function StartServer
-     */
-    Poco::DateTime lastStarted;
+        /**
+         * State reason
+         */
+        std::string stateReason;
 
-    /**
-     * Last function invocation
-     */
-    Poco::DateTime lastInvocation;
+        /**
+         * State reason code
+         */
+        LambdaStateReasonCode stateReasonCode = LambdaStateReasonCode::Creating;
 
-    /**
-     * Creation date
-     */
-    Poco::DateTime created = Poco::DateTime();
+        /**
+         * Code SHA256
+         */
+        std::string codeSha256;
 
-    /**
-     * Last modification date
-     */
-    Poco::DateTime modified = Poco::DateTime();
+        /**
+         * Filename of the code
+         */
+        std::string fileName;
 
-    /**
-     * Checks whether a tags with the given tags key exists.
-     *
-     * @param key key of the tags
-     * @return true if tags with the given key exists.
-     */
-    [[nodiscard]] bool HasTag(const std::string &key) const;
+        /**
+         * Last function StartServer
+         */
+        Poco::DateTime lastStarted;
 
-    /**
-     * Returns a given tags value by key
-     *
-     * @param key name of the tag
-     * @return found notification or notifications.end().
-     */
-    [[nodiscard]] std::string GetTagValue(const std::string &key) const;
+        /**
+         * Last function invocation
+         */
+        Poco::DateTime lastInvocation;
 
-    /**
-     * Converts the entity to a MongoDB document
-     *
-     * @return entity as MongoDB document.
-     */
-    [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        /**
+         * Creation date
+         */
+        Poco::DateTime created = Poco::DateTime();
 
-    /**
-     * Converts the MongoDB document to an entity
-     *
-     * @param mResult query result.
-     */
-    void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+        /**
+         * Last modification date
+         */
+        Poco::DateTime modified = Poco::DateTime();
 
-    /**
-     * Converts the entity to a JSON object
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        /**
+         * Checks whether a tags with the given tags key exists.
+         *
+         * @param key key of the tags
+         * @return true if tags with the given key exists.
+         */
+        [[nodiscard]] bool HasTag(const std::string &key) const;
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * Returns a given tags value by key
+         *
+         * @param key name of the tag
+         * @return found notification or notifications.end().
+         */
+        [[nodiscard]] std::string GetTagValue(const std::string &key) const;
 
-    /**
-     * Stream provider.
-     *
-     * @param os output stream
-     * @param lambda lambda entity
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const Lambda &lambda);
+        /**
+         * Converts the entity to a MongoDB document
+         *
+         * @return entity as MongoDB document.
+         */
+        [[nodiscard]] view_or_value <view, value> ToDocument() const;
 
-  };
+        /**
+         * Converts the MongoDB document to an entity
+         *
+         * @param mResult query result.
+         */
+        void FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult);
 
-  typedef std::vector<Lambda> LambdaList;
+        /**
+         * Converts the entity to a JSON object
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
+
+        /**
+         * Stream provider.
+         *
+         * @param os output stream
+         * @param lambda lambda entity
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const Lambda &lambda);
+
+    };
+
+    typedef std::vector <Lambda> LambdaList;
 }
 #endif //AWSMOCK_DB_ENTITY_LAMBDA_H

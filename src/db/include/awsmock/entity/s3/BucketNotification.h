@@ -24,73 +24,73 @@
 
 namespace AwsMock::Database::Entity::S3 {
 
-  using bsoncxx::view_or_value;
-  using bsoncxx::document::view;
-  using bsoncxx::document::value;
-
-  /**
-   * S3 bucket notification entity
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  struct BucketNotification {
+    using bsoncxx::view_or_value;
+    using bsoncxx::document::view;
+    using bsoncxx::document::value;
 
     /**
-     * Event
-     */
-    std::string event;
-
-    /**
-     * Notification ID
-     */
-    std::string notificationId;
-
-    /**
-     * Queue ARN
-     */
-    std::string queueArn;
-
-    /**
-     * lambda ARN
-     */
-    std::string lambdaArn;
-
-    /**
-     * Converts the entity to a MongoDB document
+     * S3 bucket notification entity
      *
-     * @return entity as MongoDB document.
+     * @author jens.vogt@opitz-consulting.com
      */
-    [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
+    struct BucketNotification {
 
-    /**
-     * Converts the entity to a JSON object
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        /**
+         * Event
+         */
+        std::string event;
 
-    /**
-     * Converts the entity to a JSON object
-     *
-     * @param jsonObject JSON object.
-     */
-    void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+        /**
+         * Notification ID
+         */
+        std::string notificationId;
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * Queue ARN
+         */
+        std::string queueArn;
 
-    /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const BucketNotification &q);
+        /**
+         * lambda ARN
+         */
+        std::string lambdaArn;
 
-  };
+        /**
+         * Converts the entity to a MongoDB document
+         *
+         * @return entity as MongoDB document.
+         */
+        [[maybe_unused]] [[nodiscard]] view_or_value <view, value> ToDocument() const;
+
+        /**
+         * Converts the entity to a JSON object
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+
+        /**
+         * Converts the entity to a JSON object
+         *
+         * @param jsonObject JSON object.
+         */
+        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
+
+        /**
+         * Stream provider.
+         *
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const BucketNotification &q);
+
+    };
 
 } // namespace AwsMock::Database::Entity::S3
 

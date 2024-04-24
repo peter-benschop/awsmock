@@ -42,7 +42,7 @@ namespace AwsMock::Database {
          * Singleton instance
          */
         static TransferMemoryDb &instance() {
-            static Poco::SingletonHolder<TransferMemoryDb> sh;
+            static Poco::SingletonHolder <TransferMemoryDb> sh;
             return *sh.get();
         }
 
@@ -82,7 +82,7 @@ namespace AwsMock::Database {
          * @return true if transfer manager already exists
          * @throws DatabaseException
          */
-        bool TransferExists(const std::string &region, const std::vector<std::string> &protocols);
+        bool TransferExists(const std::string &region, const std::vector <std::string> &protocols);
 
         /**
          * Returns a list of transfer manager.
@@ -90,7 +90,7 @@ namespace AwsMock::Database {
          * @param region AWS region name
          * @return list of transfer manager
          */
-        std::vector<Entity::Transfer::Transfer> ListServers(const std::string &region);
+        std::vector <Entity::Transfer::Transfer> ListServers(const std::string &region);
 
         /**
          * Create a new transfer servers
@@ -163,12 +163,12 @@ namespace AwsMock::Database {
         /**
          * Transfer server map, when running without database
          */
-        std::map<std::string, Entity::Transfer::Transfer> _transfers;
+        std::map <std::string, Entity::Transfer::Transfer> _transfers;
 
         /**
          * Transfer user map, when running without database
          */
-        std::map<std::string, Entity::Transfer::User> _users;
+        std::map <std::string, Entity::Transfer::User> _users;
 
         /**
          * Transfer mutex

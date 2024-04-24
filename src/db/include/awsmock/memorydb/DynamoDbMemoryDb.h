@@ -48,7 +48,7 @@ namespace AwsMock::Database {
          * @return singleton instance
          */
         static DynamoDbMemoryDb &instance() {
-            static Poco::SingletonHolder<DynamoDbMemoryDb> sh;
+            static Poco::SingletonHolder <DynamoDbMemoryDb> sh;
             return *sh.get();
         }
 
@@ -103,7 +103,7 @@ namespace AwsMock::Database {
          * @param region AWS region name
          * @return list of DynamoDB tables
          */
-        std::vector<Entity::DynamoDb::Table> ListTables(const std::string &region = {});
+        std::vector <Entity::DynamoDb::Table> ListTables(const std::string &region = {});
 
         /**
          * Deletes an existing DynamoDB table
@@ -166,12 +166,12 @@ namespace AwsMock::Database {
         /**
          * Table map
          */
-        std::map<std::string, Entity::DynamoDb::Table> _tables{};
+        std::map <std::string, Entity::DynamoDb::Table> _tables{};
 
         /**
          * Item map
          */
-        std::map<std::string, Entity::DynamoDb::Item> _items{};
+        std::map <std::string, Entity::DynamoDb::Item> _items{};
 
         /**
          * Table mutex

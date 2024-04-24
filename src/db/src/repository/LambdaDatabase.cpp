@@ -154,7 +154,7 @@ namespace AwsMock::Database {
 
             auto client = GetClient();
             mongocxx::collection _lambdaCollection = (*client)[_databaseName]["lambda"];
-            mongocxx::stdx::optional<bsoncxx::document::value>
+            mongocxx::stdx::optional <bsoncxx::document::value>
                     mResult = _lambdaCollection.find_one(make_document(kvp("_id", oid)));
             if (!mResult) {
                 log_error << "Database exception: Lambda not found ";
@@ -192,7 +192,7 @@ namespace AwsMock::Database {
 
                 auto client = GetClient();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName]["lambda"];
-                mongocxx::stdx::optional<bsoncxx::document::value> mResult = _lambdaCollection.find_one(make_document(kvp("arn", arn)));
+                mongocxx::stdx::optional <bsoncxx::document::value> mResult = _lambdaCollection.find_one(make_document(kvp("arn", arn)));
                 if (!mResult) {
                     log_error << "Database exception: Lambda not found ";
                     throw Core::DatabaseException("Database exception, Lambda not found ", 500);
@@ -221,7 +221,7 @@ namespace AwsMock::Database {
 
                 auto client = GetClient();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName]["lambda"];
-                mongocxx::stdx::optional<bsoncxx::document::value> mResult = _lambdaCollection.find_one(make_document(kvp("region", region), kvp("function", name)));
+                mongocxx::stdx::optional <bsoncxx::document::value> mResult = _lambdaCollection.find_one(make_document(kvp("region", region), kvp("function", name)));
                 if (!mResult.has_value()) {
                     log_error << "Database exception: Lambda not found ";
                     throw Core::DatabaseException("Database exception, Lambda not found ", 500);
@@ -277,9 +277,9 @@ namespace AwsMock::Database {
         }
     }
 
-    std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdas(const std::string &region) {
+    std::vector <Entity::Lambda::Lambda> LambdaDatabase::ListLambdas(const std::string &region) {
 
-        std::vector<Entity::Lambda::Lambda> lambdas;
+        std::vector <Entity::Lambda::Lambda> lambdas;
         if (_useDatabase) {
 
             try {

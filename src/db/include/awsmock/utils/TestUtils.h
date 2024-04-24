@@ -2,8 +2,8 @@
 // Created by vogje01 on 07/09/2023.
 //
 
-#ifndef AWSMOCK_DB_TESTUTILS_H
-#define AWSMOCK_DB_TESTUTILS_H
+#ifndef AWSMOCK_DB_TEST_UTILS_H
+#define AWSMOCK_DB_TEST_UTILS_H
 
 // C++ includes
 #include <string>
@@ -17,21 +17,21 @@
 
 namespace AwsMock::Database {
 
-  class TestUtils {
+    class TestUtils {
 
-    public:
+      public:
 
-      /**
-       * Creates all services in the module database
-       */
-      static void CreateServices();
+        /**
+         * Creates all services in the module database
+         */
+        static void CreateServices();
 
-      /**
-      * Service names
-      */
-      static std::vector<std::string> _modules;
-  };
+        /**
+        * Service names
+        */
+        static std::vector <std::string> _modules;
+    };
 
 } //namespace AwsMock::Database
 
-#endif // AWSMOCK_DB_TESTUTILS_H
+#endif // AWSMOCK_DB_TEST_UTILS_H
