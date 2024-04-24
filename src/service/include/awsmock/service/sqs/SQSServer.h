@@ -8,23 +8,14 @@
 // C++ standard includes
 #include <string>
 #include <chrono>
-#include <condition_variable>
-
-// Poco includes
-#include <Poco/Logger.h>
-#include <Poco/Runnable.h>
-#include <Poco/SignalHandler.h>
-#include <Poco/Condition.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/ThreadPool.h>
-#include <awsmock/repository/ModuleDatabase.h>
-#include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/sqs/SQSHandlerFactory.h>
 #include <awsmock/service/sqs/SQSMonitoring.h>
+#include <awsmock/service/sqs/SQSWorker.h>
 
 #define SQS_DEFAULT_PORT 9501
 #define SQS_DEFAULT_HOST "localhost"
@@ -32,6 +23,7 @@
 #define SQS_DEFAULT_THREADS 50
 #define SQS_DEFAULT_TIMEOUT 120
 #define SQS_DEFAULT_MONITORING_PERIOD 300
+#define SQS_DEFAULT_WORKER_PERIOD 30
 
 namespace AwsMock::Service {
 
@@ -69,14 +61,6 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Reset messages
-         *
-         * <p>Loops over all SQS queues and sets the state to INITIAL in case the visibilityTimeout timeout has been reached. Also the retry count in increased by one.</p>
-         * <p>Checks also the expiration date and removed the messages, which are older than the max retention period.</>
-         */
-        void ResetMessages();
-
-        /**
          * Configuration
          */
         Core::Configuration &_configuration;
@@ -92,9 +76,9 @@ namespace AwsMock::Service {
         std::shared_ptr<SQSMonitoring> _sqsMonitoring;
 
         /**
-         * AWS region
+         * SQS worker
          */
-        std::string _region;
+        std::shared_ptr<SQSWorker> _sqsWorker;
 
         /**
          * Rest port
@@ -125,6 +109,12 @@ namespace AwsMock::Service {
          * SQS monitoring period
          */
         int _monitoringPeriod;
+
+        /**
+         * SQS worker period
+         */
+        int _workerPeriod;
+
     };
 
 } // namespace AwsMock::Service

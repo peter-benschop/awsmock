@@ -106,10 +106,10 @@ namespace AwsMock::Service {
                     }
 
                     if (request.has("Range")) {
-                        long range = s3Request.max - s3Request.min + 1;
+                        long size = s3Request.max - s3Request.max;
                         headerMap["Accept-Ranges"] = "bytes";
                         headerMap["Content-Range"] = "bytes " + std::to_string(s3Request.min) + "-" + std::to_string(s3Request.max) + "/" + std::to_string(s3Response.size);
-                        headerMap["Content-Length"] = std::to_string(range);
+                        headerMap["Content-Length"] = std::to_string(s3Response.size < size ? s3Response.size : size);
                         log_info << "Multi-part progress: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << "/" << std::to_string(s3Response.size);
 
                         SendRangeResponse(response, s3Response.filename, s3Request.min, s3Request.max, s3Response.size, headerMap);
@@ -302,14 +302,12 @@ namespace AwsMock::Service {
                 case Dto::Common::S3CommandType::DELETE_OBJECTS:
                 case Dto::Common::S3CommandType::CREATE_MULTIPART_UPLOAD:
                 case Dto::Common::S3CommandType::COMPLETE_MULTIPART_UPLOAD:
+                case Dto::Common::S3CommandType::ABORT_MULTIPART_UPLOAD:
+                case Dto::Common::S3CommandType::LIST_OBJECT_VERSIONS:
                 case Dto::Common::S3CommandType::UNKNOWN: {
                     log_error << "Bad request, method: PUT clientCommand: " << Dto::Common::S3CommandTypeToString(s3ClientCommand.command);
                     throw Core::ServiceException("Bad request, method: PUT clientCommand: " + Dto::Common::S3CommandTypeToString(s3ClientCommand.command));
                 }
-                case Dto::Common::S3CommandType::ABORT_MULTIPART_UPLOAD:
-                    break;
-                case Dto::Common::S3CommandType::LIST_OBJECT_VERSIONS:
-                    break;
             }
 
             if (s3ClientCommand.versionRequest) {

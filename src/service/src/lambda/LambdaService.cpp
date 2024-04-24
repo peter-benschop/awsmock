@@ -29,11 +29,11 @@ namespace AwsMock::Service {
 
     // Create temp directory
     Core::DirUtils::EnsureDirectory(_tempDir);
-    log_trace << "lambda module initialized";
+      log_trace << "Lambda module initialized";
   }
 
   Dto::Lambda::CreateFunctionResponse LambdaService::CreateFunction(Dto::Lambda::CreateFunctionRequest &request) {
-    log_debug << "Create function request, name: " + request.functionName;
+      log_debug << "Create function request, name: " << request.functionName;
 
     // Save to file
     Database::Entity::Lambda::Lambda lambdaEntity;
@@ -75,7 +75,7 @@ namespace AwsMock::Service {
 
     // Create lambda function asynchronously
     CallAsyncCreate<const char*, const char *, Core::Configuration&>(request.code.zipFile.c_str(), lambdaEntity.oid.c_str(),_configuration);
-    log_debug << "Lambda create started, function: " + lambdaEntity.function;
+      log_debug << "Lambda create started, function: " << lambdaEntity.function;
 
     // Create response
     Dto::Lambda::CreateFunctionResponse response{
@@ -91,7 +91,7 @@ namespace AwsMock::Service {
       .ephemeralStorage=request.ephemeralStorage,
     };
 
-    log_info << "Function created, name: " + request.functionName;
+      log_info << "Function created, name: " << request.functionName;
 
     return response;
   }
@@ -102,7 +102,7 @@ namespace AwsMock::Service {
       std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(region);
 
       auto response = Dto::Lambda::ListFunctionResponse(lambdas);
-      log_trace << "Lambda list outcome: " + response.ToJson();
+        log_trace << "Lambda list outcome: " << response.ToJson();
       return response;
 
     } catch (Poco::Exception &ex) {

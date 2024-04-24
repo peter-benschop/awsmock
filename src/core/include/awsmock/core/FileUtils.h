@@ -191,16 +191,17 @@ namespace AwsMock::Core {
      * @param outFile output file name
      * @param inDir input directory
      * @param files string vector of text files to append to output file
+     * @return output file size
      */
-    static void AppendTextFiles(const std::string &outFile, const std::string &inDir, const std::vector<std::string> &files);
+    static long AppendTextFiles(const std::string &outFile, const std::string &inDir, const std::vector<std::string> &files);
 
-    /**
-     * Strips the path from the filename
-     *
-     * @param fileName name of the file
-     * @return file name without base path
-     */
-    static std::string StripBasePath(const std::string &fileName);
+      /**
+       * Strips the path from the filename
+       *
+       * @param fileName name of the file
+       * @return file name without base path
+       */
+      static std::string StripBasePath(const std::string &fileName);
 
     /**
      * Returns the file owner.
