@@ -93,12 +93,11 @@ namespace AwsMock::Service {
 
             // Create create function request
             Dto::Lambda::CreateFunctionRequest request = {
-                    .region=lambda.region,
-                    .functionName=lambda.function,
-                    .runtime=lambda.runtime,
-                    .code=code,
-                    .tags=lambda.tags
-            };
+                    .region = lambda.region,
+                    .functionName = lambda.function,
+                    .runtime = lambda.runtime,
+                    .code = code,
+                    .tags = lambda.tags};
             SendCreateFunctionRequest(request, "application/json");
             log_debug << "Lambda started, name:" << lambda.function;
         }
@@ -114,8 +113,7 @@ namespace AwsMock::Service {
             ifs.close();
 
             code = {
-                    .zipFile=ss.str()
-            };
+                    .zipFile = ss.str()};
             log_debug << "Loaded lambda from file:" << lambda.fileName << " size: " << Core::FileUtils::FileSize(lambda.fileName);
         }
         return code;
@@ -129,4 +127,4 @@ namespace AwsMock::Service {
         log_debug << "Lambda create function request send";
     }
 
-} // namespace AwsMock::Worker
+}// namespace AwsMock::Service

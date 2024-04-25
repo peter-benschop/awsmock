@@ -6,61 +6,61 @@
 
 namespace AwsMock::Dto::SecretsManager {
 
-  std::string GetSecretValueResponse::ToJson() const {
+    std::string GetSecretValueResponse::ToJson() const {
 
-    try {
+        try {
 
-      Poco::JSON::Object rootJson;
-      rootJson.set("Name", name);
-      rootJson.set("ARN", arn);
-      rootJson.set("versionId", versionId);
-      if (!secretString.empty()) {
-        rootJson.set("SecretString", secretString);
-      } else {
-        rootJson.set("SecretBinary", secretBinary);
-      }
+            Poco::JSON::Object rootJson;
+            rootJson.set("Name", name);
+            rootJson.set("ARN", arn);
+            rootJson.set("versionId", versionId);
+            if (!secretString.empty()) {
+                rootJson.set("SecretString", secretString);
+            } else {
+                rootJson.set("SecretBinary", secretBinary);
+            }
 
-      // Stages
-      Poco::JSON::Array stagesArray;
-      for (const auto &s : versionStages) {
-        stagesArray.add(s);
-      }
-      rootJson.set("VersionStages", versionStages);
+            // Stages
+            Poco::JSON::Array stagesArray;
+            for (const auto &s: versionStages) {
+                stagesArray.add(s);
+            }
+            rootJson.set("VersionStages", versionStages);
 
-      std::ostringstream os;
-      rootJson.stringify(os);
-      return os.str();
+            std::ostringstream os;
+            rootJson.stringify(os);
+            return os.str();
 
-    } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+        } catch (Poco::Exception &exc) {
+            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
-  }
 
-  void GetSecretValueResponse::FromJson(const std::string &jsonString) {
+    void GetSecretValueResponse::FromJson(const std::string &jsonString) {
 
-    Poco::JSON::Parser parser;
-    Poco::Dynamic::Var result = parser.parse(jsonString);
-    const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+        Poco::JSON::Parser parser;
+        Poco::Dynamic::Var result = parser.parse(jsonString);
+        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
-    try {
+        try {
 
-      // Attributes
-      Core::JsonUtils::GetJsonValueString("Name", rootObject, name);
+            // Attributes
+            Core::JsonUtils::GetJsonValueString("Name", rootObject, name);
 
-    } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_BAD_REQUEST);
+        } catch (Poco::Exception &exc) {
+            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_BAD_REQUEST);
+        }
     }
-  }
 
-  std::string GetSecretValueResponse::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+    std::string GetSecretValueResponse::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
+    }
 
-  std::ostream &operator<<(std::ostream &os, const GetSecretValueResponse &r) {
-    os << "GetSecretValueResponse=" << r.ToJson();
-    return os;
-  }
+    std::ostream &operator<<(std::ostream &os, const GetSecretValueResponse &r) {
+        os << "GetSecretValueResponse=" << r.ToJson();
+        return os;
+    }
 
-} // namespace AwsMock::Dto::S3
+}// namespace AwsMock::Dto::SecretsManager

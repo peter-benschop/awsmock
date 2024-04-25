@@ -13,30 +13,30 @@
 
 namespace AwsMock::Core {
 
-  class SystemUtilsTest : public ::testing::Test {};
+    class SystemUtilsTest : public ::testing::Test {};
 
-  TEST_F(SystemUtilsTest, GetNodeNameTest) {
+    TEST_F(SystemUtilsTest, GetNodeNameTest) {
 
-    // arrange
+        // arrange
 
-    // act
-    std::string nodeName = SystemUtils::GetNodeName();
+        // act
+        std::string nodeName = SystemUtils::GetNodeName();
 
-    // assert
-    EXPECT_FALSE(nodeName.empty());
-  }
+        // assert
+        EXPECT_FALSE(nodeName.empty());
+    }
 
-  TEST_F(SystemUtilsTest, GetHostNameTest) {
+    TEST_F(SystemUtilsTest, GetHostNameTest) {
 
-    // arrange
+        // arrange
 
-    // act
-    std::string hostName = SystemUtils::GetHostName();
+        // act
+        std::string hostName = SystemUtils::GetHostName();
 
-    // assert
-    EXPECT_FALSE(hostName.empty());
-  }
+        // assert
+        EXPECT_FALSE(hostName.empty());
+    }
 
-} // namespace AwsMock::Core
+}// namespace AwsMock::Core
 
-#endif // AWSMOCK_CORE_SYSTEM_UTILS_TEST_H
+#endif// AWSMOCK_CORE_SYSTEM_UTILS_TEST_H

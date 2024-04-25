@@ -7,27 +7,27 @@
 
 // C includes
 #ifdef HAS_SYSTEMD
-#include <systemd/sd-journal.h>
 #include <systemd/sd-daemon.h>
+#include <systemd/sd-journal.h>
 #endif
 
 // C++ includes
-#include <string>
-#include <sstream>
-#include <iostream>
-#include <iomanip>
 #include <cstdlib>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <string>
 
 // Poco includes
 #include <Poco/Logger.h>
 
 // AwsMock includes
+#include <awsmock/controller/Configuration.h>
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CurlUtils.h>
 #include <awsmock/dto/common/Services.h>
-#include <awsmock/dto/module/Module.h>
 #include <awsmock/dto/module/GatewayConfig.h>
-#include <awsmock/controller/Configuration.h>
+#include <awsmock/dto/module/Module.h>
 #include <awsmock/repository/ModuleDatabase.h>
 
 #define AWSMOCKCTL_DEFAULT_HOST "localhost"
@@ -38,129 +38,128 @@
 
 namespace AwsMock::Controller {
 
-  class Controller {
+    class Controller {
 
-    public:
-
-      /**
+      public:
+        /**
        * Constructor
        */
-      explicit Controller(const Configuration &configuration);
+        explicit Controller(const Configuration &configuration);
 
-      /**
+        /**
        * List all available services
        */
-      void ListServices();
+        void ListServices();
 
-      /**
+        /**
        * Start a module
        *
        * @param name module name, or 'all'
        */
-      void StartService(const std::string &name);
+        void StartService(const std::string &name);
 
-      /**
+        /**
        * Restart a module
        *
        * @param name module name, or 'all'
        */
-      void RestartService(const std::string &name);
+        void RestartService(const std::string &name);
 
-      /**
+        /**
        * Stops a module
        *
        * @param name module name, or 'all'
        */
-      void StopService(const std::string &name);
+        void StopService(const std::string &name);
 
 #ifdef HAS_SYSTEMD
-      /**
+        /**
        * Show the logs
        */
-      static void ShowServiceLogs();
+        static void ShowServiceLogs();
 #endif
 
-      /**
+        /**
        * Sets the managers log level
        *
        * @param level log level
        */
-      void SetLogLevel(const std::string &level);
+        void SetLogLevel(const std::string &level);
 
-      /**
+        /**
        * Returns the current AwsMock configuration
        */
-      void GetDefaults();
+        void GetDefaults();
 
-      /**
+        /**
        * Dumps the current infrastructure as JSON file to stdout.
        *
        * @param services list of services
        * @param pretty JSON pretty print (indent=4)
        */
-      void ExportInfrastructure(const std::vector<std::string> &services, bool pretty = true);
+        void ExportInfrastructure(const std::vector<std::string> &services, bool pretty = true);
 
-      /**
+        /**
        * Imports the current infrastructure from stdin
        */
-      void ImportInfrastructure();
+        void ImportInfrastructure();
 
-      /**
+        /**
        * Cleans the current infrastructure.
        *
        * @param services list of services
        */
-      void CleanInfrastructure(const std::vector<std::string> &services);
+        void CleanInfrastructure(const std::vector<std::string> &services);
 
-    private:
-      /**
+      private:
+        /**
        * Add authorization header.
        *
        * @param headers headers
        */
-      void AddAuthorization(std::map<std::string, std::string> &headers);
+        void AddAuthorization(std::map<std::string, std::string> &headers);
 
-      /**
+        /**
        * Application configuration
        */
-      const Configuration &_configuration;
+        const Configuration &_configuration;
 
-      /**
+        /**
        * Curl utils
        */
-      Core::CurlUtils _curlUtils;
+        Core::CurlUtils _curlUtils;
 
-      /**
+        /**
        * Host
        */
-      std::string _host;
+        std::string _host;
 
-      /**
+        /**
        * Port
        */
-      int _port;
+        int _port;
 
-      /**
+        /**
        * Base URL
        */
-      std::string _baseUrl;
+        std::string _baseUrl;
 
-      /**
+        /**
        * User
        */
-      std::string _user;
+        std::string _user;
 
-      /**
+        /**
        * Client ID
        */
-      std::string _clientId;
+        std::string _clientId;
 
-      /**
+        /**
        * AWS region
        */
-      std::string _region;
-  };
+        std::string _region;
+    };
 
-} // namespace AwsMock::Controller
+}// namespace AwsMock::Controller
 
-#endif // AWSMOCK_CONTROLLER_CONTROLLER_H
+#endif// AWSMOCK_CONTROLLER_CONTROLLER_H

@@ -2,12 +2,12 @@
 // Created by vogje01 on 12/21/23.
 //
 
-#ifndef AWSMOCK_DTO_DYNAMODB_ATTRIBUTEVALUE_H
-#define AWSMOCK_DTO_DYNAMODB_ATTRIBUTEVALUE_H
+#ifndef AWSMOCK_DTO_DYNAMODB_ATTRIBUTE_VALUE_H
+#define AWSMOCK_DTO_DYNAMODB_ATTRIBUTE_VALUE_H
 
 // C++ includes
-#include <string>
 #include <map>
+#include <string>
 
 // AwsMock includes
 #include <awsmock/core/JsonException.h>
@@ -16,84 +16,89 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
-  struct AttributeValue {
-
     /**
-     * Type
-     */
-    std::string type;
-
-    /**
-     * Value
-     */
-    std::string value;
-
-    /**
-     * String value
-     */
-    std::string stringValue;
-
-    /**
-     * String set value
-     */
-    std::vector<std::string> stringSetValue;
-
-    /**
-     * Number value
-     */
-    std::string numberValue;
-
-    /**
-     * Number set value
-     */
-    std::vector<std::string> numberSetValue;
-
-    /**
-     * Boolean value
-     */
-    bool boolValue;
-
-    /**
-     * Null value
-     */
-    bool nullValue;
-
-      /**
-       * Convert to JSON value
-       *
-       * @return JSON object
-       */
-      [[nodiscard]] std::string ToJson() const;
-
-    /**
-     * Convert to JSON value
+     * DynamoDB attribute value
      *
-     * @return JSON object
+     * @author jens.vogt@opitz-consulting.com
      */
-    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+    struct AttributeValue {
 
-    /**
-     * Convert from JSON object.
-     *
-     * @param jsonObject JSON object
-     */
-    void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+        /**
+         * Type
+         */
+        std::string type;
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * Value
+         */
+        std::string value;
 
-    /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const AttributeValue &r);
+        /**
+         * String value
+         */
+        std::string stringValue;
 
-  };
-} // namespace AwsMock::Dto::DynamoDb
+        /**
+         * String set value
+         */
+        std::vector<std::string> stringSetValue;
 
-#endif // AWSMOCK_DTO_DYNAMODB_ATTRIBUTEVALUE_H
+        /**
+         * Number value
+         */
+        std::string numberValue;
+
+        /**
+         * Number set value
+         */
+        std::vector<std::string> numberSetValue;
+
+        /**
+         * Boolean value
+         */
+        bool boolValue;
+
+        /**
+         * Null value
+         */
+        bool nullValue;
+
+        /**
+         * Convert to JSON value
+         *
+         * @return JSON object
+         */
+        [[nodiscard]] std::string ToJson() const;
+
+        /**
+         * Convert to JSON value
+         *
+         * @return JSON object
+         */
+        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+
+        /**
+         * Convert from JSON object.
+         *
+         * @param jsonObject JSON object
+         */
+        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
+
+        /**
+         * Stream provider.
+         *
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const AttributeValue &r);
+    };
+
+}// namespace AwsMock::Dto::DynamoDb
+
+#endif// AWSMOCK_DTO_DYNAMODB_ATTRIBUTE_VALUE_H

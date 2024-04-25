@@ -6,15 +6,15 @@
 #define AWSMOCK_SERVICE_TRANSFER_SERVICE_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // Poco includes
 #include <Poco/Net/HTTPClientSession.h>
 #include <Poco/Net/HTTPRequest.h>
 #include <Poco/Net/HTTPResponse.h>
-#include <Poco/StreamCopier.h>
 #include <Poco/RecursiveDirectoryIterator.h>
+#include <Poco/StreamCopier.h>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
@@ -59,6 +59,7 @@ namespace AwsMock::Service {
          *
          * @param request create server request
          * @return CreateServerResponse
+         * @see Dto::Transfer::CreateServerResponse
          */
         Dto::Transfer::CreateServerResponse CreateTransferServer(Dto::Transfer::CreateServerRequest &request);
 
@@ -67,6 +68,7 @@ namespace AwsMock::Service {
          *
          * @param request create user request
          * @return CreateUserResponse
+         * @see Dto::Transfer::CreateUserResponse
          */
         Dto::Transfer::CreateUserResponse CreateUser(Dto::Transfer::CreateUserRequest &request);
 
@@ -75,6 +77,7 @@ namespace AwsMock::Service {
          *
          * @param request list manager request
          * @return ListServerResponse
+         * @see Dto::Transfer::ListServerResponse
          */
         Dto::Transfer::ListServerResponse ListServers(const Dto::Transfer::ListServerRequest &request);
 
@@ -127,6 +130,6 @@ namespace AwsMock::Service {
         int _ftpPort;
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_TRANSFER_SERVICE_H
+#endif// AWSMOCK_SERVICE_TRANSFER_SERVICE_H

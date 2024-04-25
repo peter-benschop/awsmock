@@ -6,55 +6,55 @@
 
 namespace AwsMock::Dto::SecretsManager {
 
-  Poco::JSON::Array SecretTags::ToJsonArray() const {
+    Poco::JSON::Array SecretTags::ToJsonArray() const {
 
-    try {
+        try {
 
-      Poco::JSON::Array rootJson;
+            Poco::JSON::Array rootJson;
 
-      for(const auto &t : tags) {
-        Poco::JSON::Object tagJsonObject;
-        tagJsonObject.set("Key", t.first);
-        tagJsonObject.set("Value", t.second);
-        rootJson.add(tagJsonObject);
-      }
-      return rootJson;
+            for (const auto &t: tags) {
+                Poco::JSON::Object tagJsonObject;
+                tagJsonObject.set("Key", t.first);
+                tagJsonObject.set("Value", t.second);
+                rootJson.add(tagJsonObject);
+            }
+            return rootJson;
 
-    } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+        } catch (Poco::Exception &exc) {
+            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
-  }
 
-  std::string SecretTags::ToJson() const {
+    std::string SecretTags::ToJson() const {
 
-    std::ostringstream os;
-    ToJsonArray().stringify(os);
-    return os.str();
-  }
-
-  void SecretTags::FromJson(const Poco::JSON::Object::Ptr &jsonObject) {
-
-    try {
-
-      //Core::JsonUtils::GetJsonValueString("Region", jsonObject, region);
-      //
-      //
-      // Core::JsonUtils::GetJsonValueString("ARN", jsonObject, arn);
-
-    } catch (Poco::Exception &exc) {
-      std::cerr << exc.message() << std::endl;
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+        std::ostringstream os;
+        ToJsonArray().stringify(os);
+        return os.str();
     }
-  }
 
-  std::string SecretTags::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+    void SecretTags::FromJson(const Poco::JSON::Object::Ptr &jsonObject) {
 
-  std::ostream &operator<<(std::ostream &os, const SecretTags &tags) {
-    os << "SecretTags=" << tags.ToJson();
-    return os;
-  }
-}
+        try {
+
+            //Core::JsonUtils::GetJsonValueString("Region", jsonObject, region);
+            //
+            //
+            // Core::JsonUtils::GetJsonValueString("ARN", jsonObject, arn);
+
+        } catch (Poco::Exception &exc) {
+            std::cerr << exc.message() << std::endl;
+            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    std::string SecretTags::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
+    }
+
+    std::ostream &operator<<(std::ostream &os, const SecretTags &tags) {
+        os << "SecretTags=" << tags.ToJson();
+        return os;
+    }
+}// namespace AwsMock::Dto::SecretsManager

@@ -11,21 +11,63 @@
 
 namespace AwsMock {
 
-  class HandlerException : public std::exception {
-  public:
-    HandlerException(std::string type, std::string message, int statusCode);
+    /**
+     * Handler exception
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
+    class HandlerException : public std::exception {
 
-    [[nodiscard]] int code() const;
+      public:
 
-    [[nodiscard]] std::string type() const;
+        /**
+         * Handler exception
+         *
+         * @param type exception type
+         * @param message exception message
+         * @param statusCode HTTP status code
+         */
+        HandlerException(std::string type, std::string message, int statusCode);
 
-    [[nodiscard]] std::string message() const;
+        /**
+         * Status code
+         *
+         * @return code
+         */
+        [[nodiscard]] int code() const;
 
-  private:
-    int _statusCode;
-    std::string _type;
-    std::string _message;
-  };
-} // namespace AwsMock
+        /**
+         * Type
+         *
+         * @return type
+         */
+        [[nodiscard]] std::string type() const;
 
-#endif // AWSMOCK_RESOURCE_HANDLEREXCEPTION_H
+        /**
+         * Status message
+         *
+         * @return message
+         */
+        [[nodiscard]] std::string message() const;
+
+      private:
+
+        /**
+         * HTTP status code
+         */
+        int _statusCode;
+
+        /**
+         * Exception type
+         */
+        std::string _type;
+
+        /**
+         * Exception message
+         */
+        std::string _message;
+    };
+
+}// namespace AwsMock
+
+#endif// AWSMOCK_RESOURCE_HANDLEREXCEPTION_H

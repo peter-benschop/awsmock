@@ -10,59 +10,64 @@
 #include <utility>
 
 // Poco includes
+#include <Poco/JSON/Array.h>
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Object.h>
-#include <Poco/JSON/Array.h>
 #include <Poco/JSON/Parser.h>
 #include <Poco/UUID.h>
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
-#include <awsmock/core/ServiceException.h>
 #include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/ServiceException.h>
 #include <awsmock/entity/cognito/User.h>
 #include <awsmock/entity/cognito/UserPool.h>
 #include <awsmock/entity/lambda/Lambda.h>
-#include <awsmock/entity/transfer/Transfer.h>
-#include <awsmock/entity/sns/Topic.h>
-#include <awsmock/entity/sns/Message.h>
-#include <awsmock/entity/sqs/Queue.h>
-#include <awsmock/entity/sqs/Message.h>
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/Object.h>
+#include <awsmock/entity/sns/Message.h>
+#include <awsmock/entity/sns/Topic.h>
+#include <awsmock/entity/sqs/Message.h>
+#include <awsmock/entity/sqs/Queue.h>
+#include <awsmock/entity/transfer/Transfer.h>
 
 namespace AwsMock::Dto::Common {
 
-  struct Services {
-
     /**
-     * Service names
-     */
-    std::vector<std::string>serviceNames;
-
-    /**
-     * Check existence of given service name
+     * Services
      *
-     * @param service name of the service
-     * @return true in case the service exists
+     * @author jens.vogt@opitz-consulting.com
      */
-    bool HasService(const std::string &service)const;
+    struct Services {
 
-    /**
-     * JSON representation
-     *
-     * @return Infrastructure as JSON string
-     */
-    std::string ToJson();
+        /**
+         * Service names
+         */
+        std::vector<std::string> serviceNames;
 
-    /**
-     * JSON representation
-     *
-     * @param payload HTTP request body
-     */
-    void FromJson(const std::string &payload);
-  };
+        /**
+         * Check existence of given service name
+         *
+         * @param service name of the service
+         * @return true in case the service exists
+         */
+        bool HasService(const std::string &service) const;
 
-} // namespace AwsMock::Dto
+        /**
+         * JSON representation
+         *
+         * @return Infrastructure as JSON string
+         */
+        std::string ToJson();
 
-#endif // AWSMOCK_DTO_COMMON_SERVICES_H
+        /**
+         * JSON representation
+         *
+         * @param payload HTTP request body
+         */
+        void FromJson(const std::string &payload);
+    };
+
+}// namespace AwsMock::Dto::Common
+
+#endif// AWSMOCK_DTO_COMMON_SERVICES_H

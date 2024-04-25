@@ -6,12 +6,12 @@
 #define AWSMOCK_DTO_S3_PUTBUCKETNOTIFICATIONREQUEST_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 
 namespace AwsMock::Dto::S3 {
 
-  /**
+    /**
    * Process the S3 notification configuration:
    *
    * <p>
@@ -38,112 +38,111 @@ namespace AwsMock::Dto::S3 {
    * @endverbatim
    * </p>
    */
-  struct PutBucketNotificationRequest {
+    struct PutBucketNotificationRequest {
 
-    /**
+        /**
      * Constructor
      *
      * @param xmlString XML string
      * @param region AWS region name
      * @param bucket AWS S3 bucket name
      */
-    explicit PutBucketNotificationRequest(const std::string &xmlString, const std::string &region, const std::string &bucket) {
+        explicit PutBucketNotificationRequest(const std::string &xmlString, const std::string &region, const std::string &bucket) {
 
-      this->region = region;
-      this->bucket = bucket;
+            this->region = region;
+            this->bucket = bucket;
 
-      FromXML(xmlString);
-    }
+            FromXML(xmlString);
+        }
 
-    /**
+        /**
      * AWS region
      */
-    std::string region;
+        std::string region;
 
-    /**
+        /**
      * AWS region
      */
-    std::string bucket;
+        std::string bucket;
 
-    /**
+        /**
      * lambda ARN
      */
-    std::string lambdaArn;
+        std::string lambdaArn;
 
-    /**
+        /**
      * Queue ARN
      */
-    std::string queueArn;
+        std::string queueArn;
 
-    /**
+        /**
      * Id
      */
-    std::string notificationId;
+        std::string notificationId;
 
-    /**
+        /**
      * Event
      */
-    std::string event;
+        std::string event;
 
-    /**
+        /**
      * Parse the notification XML.
      *
      * @param xmlString notification XML string
      */
-    void FromXML(const std::string &xmlString) {
+        void FromXML(const std::string &xmlString) {
 
-      Poco::XML::DOMParser parser;
-      Poco::AutoPtr<Poco::XML::Document> pDoc = parser.parseString(xmlString);
+            Poco::XML::DOMParser parser;
+            Poco::AutoPtr<Poco::XML::Document> pDoc = parser.parseString(xmlString);
 
-      Poco::XML::Node *cloudNode = pDoc->getNodeByPath("/NotificationConfiguration/CloudFunctionConfiguration");
-      if (cloudNode) {
-        Poco::XML::Node *idNode = pDoc->getNodeByPath("/NotificationConfiguration/CloudFunctionConfiguration/Id");
-        notificationId = idNode->innerText();
+            Poco::XML::Node *cloudNode = pDoc->getNodeByPath("/NotificationConfiguration/CloudFunctionConfiguration");
+            if (cloudNode) {
+                Poco::XML::Node *idNode = pDoc->getNodeByPath("/NotificationConfiguration/CloudFunctionConfiguration/Id");
+                notificationId = idNode->innerText();
 
-        Poco::XML::Node *functionNode = pDoc->getNodeByPath("/NotificationConfiguration/CloudFunctionConfiguration/CloudFunction");
-        lambdaArn = functionNode->innerText();
+                Poco::XML::Node *functionNode = pDoc->getNodeByPath("/NotificationConfiguration/CloudFunctionConfiguration/CloudFunction");
+                lambdaArn = functionNode->innerText();
 
-        Poco::XML::Node *eventNode = pDoc->getNodeByPath("/NotificationConfiguration/CloudFunctionConfiguration/Event");
-        event = eventNode->innerText();
-      }
+                Poco::XML::Node *eventNode = pDoc->getNodeByPath("/NotificationConfiguration/CloudFunctionConfiguration/Event");
+                event = eventNode->innerText();
+            }
 
-      Poco::XML::Node *queueNode = pDoc->getNodeByPath("/NotificationConfiguration/QueueConfiguration");
-      if (queueNode) {
-        Poco::XML::Node *idNode = pDoc->getNodeByPath("/NotificationConfiguration/QueueConfiguration/Id");
-        notificationId = idNode->innerText();
+            Poco::XML::Node *queueNode = pDoc->getNodeByPath("/NotificationConfiguration/QueueConfiguration");
+            if (queueNode) {
+                Poco::XML::Node *idNode = pDoc->getNodeByPath("/NotificationConfiguration/QueueConfiguration/Id");
+                notificationId = idNode->innerText();
 
-        Poco::XML::Node *queueArnNode = pDoc->getNodeByPath("/NotificationConfiguration/QueueConfiguration/Queue");
-        queueArn = queueArnNode->innerText();
+                Poco::XML::Node *queueArnNode = pDoc->getNodeByPath("/NotificationConfiguration/QueueConfiguration/Queue");
+                queueArn = queueArnNode->innerText();
 
-        Poco::XML::Node *eventNode = pDoc->getNodeByPath("/NotificationConfiguration/QueueConfiguration/Event");
-        event = eventNode->innerText();
-      }
-    }
+                Poco::XML::Node *eventNode = pDoc->getNodeByPath("/NotificationConfiguration/QueueConfiguration/Event");
+                event = eventNode->innerText();
+            }
+        }
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const {
-      std::stringstream ss;
-      ss << (*this);
-      return ss.str();
-    }
+        [[nodiscard]] std::string ToString() const {
+            std::stringstream ss;
+            ss << (*this);
+            return ss.str();
+        }
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const PutBucketNotificationRequest &r) {
-      os << "PutBucketNotificationRequest={region='" + r.region + "' bucket='" + r.bucket + "' queueArn='" + r.queueArn + "' lambdaArn='" + r.lambdaArn +
-          "' event='" + r.event + "'userPoolId='" + r.notificationId + "'}";
-      return os;
-    }
+        friend std::ostream &operator<<(std::ostream &os, const PutBucketNotificationRequest &r) {
+            os << "PutBucketNotificationRequest={region='" + r.region + "' bucket='" + r.bucket + "' queueArn='" + r.queueArn + "' lambdaArn='" + r.lambdaArn +
+                            "' event='" + r.event + "'userPoolId='" + r.notificationId + "'}";
+            return os;
+        }
+    };
 
-  };
+}// namespace AwsMock::Dto::S3
 
-} // namespace AwsMock::Dto::S3
-
-#endif // AWSMOCK_DTO_S3_PUTBUCKETNOTIFICATIONREQUEST_H
+#endif// AWSMOCK_DTO_S3_PUTBUCKETNOTIFICATIONREQUEST_H

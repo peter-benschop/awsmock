@@ -6,10 +6,10 @@
 #define AWSMOCK_DTO_DYNAMODB_GET_ITEM_KEY_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
-#include <vector>
+#include <string>
 #include <utility>
+#include <vector>
 
 // AwsMock includes
 #include <awsmock/core/JsonException.h>
@@ -19,48 +19,52 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
-  struct GetItemKey {
-
     /**
-     * Region
-     */
-    std::string type;
-
-    /**
-     * Table name
-     */
-    std::string value;
-
-    /**
-     * Creates a JSON string from the object.
+     * DynamoDB get item key
      *
-     * @return JSON string
+     * @author jens.vogt@opitz-consulting.com
      */
-    [[nodiscard]] std::string ToJson() const;
+    struct GetItemKey {
 
-    /**
-     * Parse a JSON stream
-     *
-     * @param jsonBody JSON string
-     */
-    void FromJson(const std::string &jsonBody);
+        /**
+         * Region
+         */
+        std::string type;
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * Table name
+         */
+        std::string value;
 
-    /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const GetItemKey &r);
+        /**
+         * Creates a JSON string from the object.
+         *
+         * @return JSON string
+         */
+        [[nodiscard]] std::string ToJson() const;
 
-  };
+        /**
+         * Parse a JSON stream
+         *
+         * @param jsonBody JSON string
+         */
+        void FromJson(const std::string &jsonBody);
 
-} // namespace AwsMock::Dto::DynamoDb
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
 
-#endif // GetItemRequest.h
+        /**
+         * Stream provider.
+         *
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const GetItemKey &r);
+    };
+
+}// namespace AwsMock::Dto::DynamoDb
+
+#endif// AWSMOCK_DTO_DYNAMODB_GET_ITEM_KEY_H

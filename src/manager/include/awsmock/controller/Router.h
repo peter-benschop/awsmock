@@ -6,97 +6,102 @@
 #define AWSMOCK_MANAGER_ROUTER_H
 
 // C++ standard includes
+#include <iostream>
 #include <map>
 #include <string>
-#include <iostream>
 
 // Poco includes
-#include <Poco/URI.h>
-#include <Poco/Logger.h>
 #include <Poco/ClassLibrary.h>
 #include <Poco/DynamicFactory.h>
-#include <Poco/Net/HTTPServerRequest.h>
+#include <Poco/Logger.h>
 #include <Poco/Net/HTTPRequestHandlerFactory.h>
+#include <Poco/Net/HTTPServerRequest.h>
+#include <Poco/URI.h>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/Configuration.h>
-#include <awsmock/resource/factory/IFactory.h>
-#include <awsmock/resource/factory/Factory.h>
 #include <awsmock/controller/ResourceNotFound.h>
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/resource/factory/Factory.h>
+#include <awsmock/resource/factory/IFactory.h>
 #include <awsmock/service/common/AbstractServer.h>
 
 namespace AwsMock::Controller {
 
-  class Router : public Poco::Net::HTTPRequestHandlerFactory {
-
-  public:
-
     /**
-     * Constructor
+     * Management router
      *
-     * @param configuration application configuration
-     * @param metricService common monitoring module
-     * @param serverMap map of services
+     * @author jens.vogt@opitz-consulting.com
      */
-    Router(Core::Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap);
+    class Router : public Poco::Net::HTTPRequestHandlerFactory {
 
-    /**
-     * Add a route
-     *
-     * @param route request route
-     * @param factory resource factory
-     */
-    void AddRoute(const std::string &route, const std::string &factory);
+      public:
 
-    /**
-     * HTTP request handler
-     *
-     * @param request HTTP request
-     * @return request handler or null in case of failure
-     */
-    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override;
+        /**
+         * Constructor
+         *
+         * @param configuration application configuration
+         * @param metricService common monitoring module
+         * @param serverMap map of services
+         */
+        Router(Core::Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap);
 
-  private:
+        /**
+         * Add a route
+         *
+         * @param route request route
+         * @param factory resource factory
+         */
+        void AddRoute(const std::string &route, const std::string &factory);
 
-    /**
-     * Return HTTP restful resource.
-     *
-     * @param service AWS module name
-     * @param uri request URI
-     * @return restfull resource
-     */
-    Poco::Net::HTTPRequestHandler *GetResource(const std::string &service, const std::string &uri);
+        /**
+         * HTTP request handler
+         *
+         * @param request HTTP request
+         * @return request handler or null in case of failure
+         */
+        Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override;
 
-    /**
-     * Returns the AWS module, region and user from the authorization string.
-     *
-     * @param authorization authorization string
-     * @return module name
-     */
-    std::string GetModule(const std::string &authorization);
+      private:
 
-    /**
-     * Configuration
-     */
-    Core::Configuration &_configuration;
+        /**
+         * Return HTTP restful resource.
+         *
+         * @param service AWS module name
+         * @param uri request URI
+         * @return restfull resource
+         */
+        Poco::Net::HTTPRequestHandler *GetResource(const std::string &service, const std::string &uri);
 
-    /**
-     * Metric module
-     */
-    Core::MetricService &_metricService;
+        /**
+         * Returns the AWS module, region and user from the authorization string.
+         *
+         * @param authorization authorization string
+         * @return module name
+         */
+        std::string GetModule(const std::string &authorization);
 
-    /**
-     * Server map
-     */
-    Service::ServerMap &_serverMap;
+        /**
+         * Configuration
+         */
+        Core::Configuration &_configuration;
 
-    /**
-     * Routing table
-     */
-    std::map<std::string, std::string> _routingTable;
-  };
+        /**
+         * Metric module
+         */
+        Core::MetricService &_metricService;
 
-} // namespace AwsMock::Controller
+        /**
+         * Server map
+         */
+        Service::ServerMap &_serverMap;
 
-#endif // AWSMOCK_MANAGER_ROUTER_H
+        /**
+         * Routing table
+         */
+        std::map<std::string, std::string> _routingTable;
+    };
+
+}// namespace AwsMock::Controller
+
+#endif// AWSMOCK_MANAGER_ROUTER_H

@@ -34,7 +34,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.LambdaExists(region, function, runtime);
-
         }
     }
 
@@ -63,7 +62,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.LambdaExists(functionName);
-
         }
     }
 
@@ -87,7 +85,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.LambdaExistsByArn(arn);
-
         }
     }
 
@@ -118,7 +115,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.LambdaCount(region);
-
         }
         return -1;
     }
@@ -144,7 +140,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.CreateLambda(lambda);
-
         }
     }
 
@@ -169,7 +164,6 @@ namespace AwsMock::Database {
             log_error << "Database exception " << exc.what();
             throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
         }
-
     }
 
     Entity::Lambda::Lambda LambdaDatabase::GetLambdaById(const std::string &oid) {
@@ -261,7 +255,8 @@ namespace AwsMock::Database {
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName]["lambda"];
                 auto result = _lambdaCollection.replace_one(make_document(kvp("region", lambda.region),
                                                                           kvp("function", lambda.function),
-                                                                          kvp("runtime", lambda.runtime)), lambda.ToDocument());
+                                                                          kvp("runtime", lambda.runtime)),
+                                                            lambda.ToDocument());
                 log_trace << "lambda updated: " << lambda.ToString();
                 return GetLambdaByArn(lambda.arn);
 
@@ -273,7 +268,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.UpdateLambda(lambda);
-
         }
     }
 
@@ -301,7 +295,6 @@ namespace AwsMock::Database {
                         result.FromDocument(lambda);
                         lambdas.push_back(result);
                     }
-
                 }
 
             } catch (const mongocxx::exception &exc) {
@@ -338,7 +331,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteLambda(functionName);
-
         }
     }
 
@@ -361,8 +353,7 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteAllLambdas();
-
         }
     }
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database

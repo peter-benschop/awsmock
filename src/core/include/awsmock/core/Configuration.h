@@ -6,14 +6,14 @@
 #define AWSMOCK_CORE_CONFIGURATION_H
 
 // Standard C++ includes
-#include <string>
 #include <fstream>
 #include <sstream>
+#include <string>
 #include <utility>
 
 // Poco includes
-#include <Poco/String.h>
 #include <Poco/SingletonHolder.h>
+#include <Poco/String.h>
 #include <Poco/Util/LayeredConfiguration.h>
 #include <Poco/Util/PropertyFileConfiguration.h>
 
@@ -24,176 +24,177 @@
 
 namespace AwsMock::Core {
 
-  /**
-   * Configuration handler. Configuration are read from the given configuration file and can be overruled by environment variables. Supported environment variables
-   * are:
-   * <ul>
-   * <li>AWSMOCK_COM_BASENAME: the base name of the configuration file</li>
-   * <li>AWSMOCK_COM_PROFILE: the profile of the configuration file</li>
-   * <li>AWSMOCK_COM_METRIC_PORT: the port for the prometheus manager (default: 9100)</li>
-   * <li>AWSMOCK_COM_METRIC_TIMEOUT: the timeout for the prometheus system monitoring (default: 60000)</li>
-   * <li>AWSMOCK_COM_LOGLEVEL: the logging level (default: information, possible values: debug, information, warning, error, fatal)</li>
-   * </ul>
-   *
-   * Properties in a configuration file are key-vale pairs. The following list shows all supported keys with their default values:
-   * <pre>
-   * awsmock.monitoring.port=9100
-   * awsmock.monitoring.timeout=60000
-   * awsmock.logging.level=debug
-   * </pre>
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  class Configuration : public Poco::Util::PropertyFileConfiguration {
-
-    public:
     /**
-     * Constructor
-     */
-    Configuration();
-
-    /**
-     * Singleton instance
-     */
-    static Configuration &instance() {
-      static Poco::SingletonHolder<Configuration> sh;
-      return *sh.get();
-    }
-
-    /**
-     * Constructor
+     * Configuration handler. Configuration are read from the given configuration file and can be overruled by environment variables. Supported environment variables
+     * are:
+     * <ul>
+     * <li>AWSMOCK_COM_BASENAME: the base name of the configuration file</li>
+     * <li>AWSMOCK_COM_PROFILE: the profile of the configuration file</li>
+     * <li>AWSMOCK_COM_METRIC_PORT: the port for the prometheus manager (default: 9100)</li>
+     * <li>AWSMOCK_COM_METRIC_TIMEOUT: the timeout for the prometheus system monitoring (default: 60000)</li>
+     * <li>AWSMOCK_COM_LOGLEVEL: the logging level (default: information, possible values: debug, information, warning, error, fatal)</li>
+     * </ul>
      *
-     * @param basename basename of the configuration file.
-     */
-    explicit Configuration(const std::string &basename);
-
-    /**
-     * Define a new configuration property.
+     * Properties in a configuration file are key-vale pairs. The following list shows all supported keys with their default values:
+     * <pre>
+     * awsmock.monitoring.port=9100
+     * awsmock.monitoring.timeout=60000
+     * awsmock.logging.level=debug
+     * </pre>
      *
-     * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
-     * key, the key is preserved, otherwise the default value is taken. </p>
-     *
-     * @param key configuration key
-     * @param envProperty environment variable name
-     * @param defaultValue string default value
+     * @author jens.vogt@opitz-consulting.com
      */
-    void DefineStringProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue);
+    class Configuration : public Poco::Util::PropertyFileConfiguration {
 
-    /**
-     * Define a new configuration property.
-     *
-     * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
-     * key, the key is preserved, otherwise the default value is taken. </p>
-     *
-     * @param key configuration key
-     * @param envProperty environment variable name
-     * @param defaultValue boolean default value
-     */
-    void DefineBoolProperty(const std::string &key, const std::string &envProperty, bool defaultValue);
+      public:
 
-    /**
-     * Define a new configuration property.
-     *
-     * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
-     * key, the key is preserved, otherwise the default value is taken. </p>
-     *
-     * @param key configuration key
-     * @param envProperty environment variable name
-     * @param defaultValue integer default value
-     */
-    void DefineIntProperty(const std::string &key, const std::string &envProperty, int defaultValue);
+        /**
+         * Constructor
+         */
+        Configuration();
 
-    /**
-     * Returns the file name of the configuration file.
-     *
-     * @return file name of the configuration file.
-     */
-    std::string GetFilename() const;
+        /**
+         * Singleton instance
+         */
+        static Configuration &instance() {
+            static Poco::SingletonHolder<Configuration> sh;
+            return *sh.get();
+        }
 
-    /**
-     * Sets the file name of the configuration file.
-     *
-     * @param filename file name of the configuration file.
-     */
-    void SetFilename(const std::string &filename);
+        /**
+         * Constructor
+         *
+         * @param basename basename of the configuration file.
+         */
+        explicit Configuration(const std::string &basename);
 
-    /**
-     * Sets a string configuration value
-     *
-     * @param key property key
-     * @param value configuration value
-     */
-    void SetValue(const std::string &key, const std::string &value);
+        /**
+         * Define a new configuration property.
+         *
+         * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
+         * key, the key is preserved, otherwise the default value is taken. </p>
+         *
+         * @param key configuration key
+         * @param envProperty environment variable name
+         * @param defaultValue string default value
+         */
+        void DefineStringProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue);
 
-    /**
-     * Sets a bool configuration value
-     *
-     * @param key property key
-     * @param value configuration value
-     */
-    void SetValue(const std::string &key, bool value);
+        /**
+         * Define a new configuration property.
+         *
+         * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
+         * key, the key is preserved, otherwise the default value is taken. </p>
+         *
+         * @param key configuration key
+         * @param envProperty environment variable name
+         * @param defaultValue boolean default value
+         */
+        void DefineBoolProperty(const std::string &key, const std::string &envProperty, bool defaultValue);
 
-    /**
-     * Sets an integer configuration value
-     *
-     * @param key property key
-     * @param value configuration value
-     */
-    void SetValue(const std::string &key, int value);
+        /**
+         * Define a new configuration property.
+         *
+         * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
+         * key, the key is preserved, otherwise the default value is taken. </p>
+         *
+         * @param key configuration key
+         * @param envProperty environment variable name
+         * @param defaultValue integer default value
+         */
+        void DefineIntProperty(const std::string &key, const std::string &envProperty, int defaultValue);
 
-    /**
-     * Returns the application name
-     *
-     * @return application name
-     */
-    static std::string GetAppName();
+        /**
+         * Returns the file name of the configuration file.
+         *
+         * @return file name of the configuration file.
+         */
+        std::string GetFilename() const;
 
-    /**
-     * Returns the version of the library.
-     *
-     * @return library version
-     */
-    static std::string GetVersion();
+        /**
+         * Sets the file name of the configuration file.
+         *
+         * @param filename file name of the configuration file.
+         */
+        void SetFilename(const std::string &filename);
 
-    /**
-     * Writes the current configuration the given file
-     *
-     * @param filename name of the configuration file
-     */
-    void WriteFile(const std::string &filename);
+        /**
+         * Sets a string configuration value
+         *
+         * @param key property key
+         * @param value configuration value
+         */
+        void SetValue(const std::string &key, const std::string &value);
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * Sets a bool configuration value
+         *
+         * @param key property key
+         * @param value configuration value
+         */
+        void SetValue(const std::string &key, bool value);
 
-    private:
+        /**
+         * Sets an integer configuration value
+         *
+         * @param key property key
+         * @param value configuration value
+         */
+        void SetValue(const std::string &key, int value);
 
-    /**
-     * Initialize the base properties
-     */
-    void Initialize();
+        /**
+         * Returns the application name
+         *
+         * @return application name
+         */
+        static std::string GetAppName();
 
-    /**
-     * Name of the configuration file
-     */
-    std::string _filename;
+        /**
+         * Returns the version of the library.
+         *
+         * @return library version
+         */
+        static std::string GetVersion();
 
-    /**
-     * Profile configuration file
-     */
-    std::string _profile;
+        /**
+         * Writes the current configuration the given file
+         *
+         * @param filename name of the configuration file
+         */
+        void WriteFile(const std::string &filename);
 
-    /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &, const Configuration &);
-  };
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
 
-} // namespace AwsMock::Core
+      private:
 
-#endif //A WSMOCK_CORE_CONFIGURATION_H
+        /**
+         * Initialize the base properties
+         */
+        void Initialize();
+
+        /**
+         * Name of the configuration file
+         */
+        std::string _filename;
+
+        /**
+         * Profile configuration file
+         */
+        std::string _profile;
+
+        /**
+         * Stream provider.
+         *
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &, const Configuration &);
+    };
+
+}// namespace AwsMock::Core
+
+#endif//A WSMOCK_CORE_CONFIGURATION_H

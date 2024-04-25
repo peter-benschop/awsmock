@@ -58,7 +58,8 @@ namespace AwsMock::Service {
          * Database connection
          */
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
-
     };
-}
-#endif // AWSMOCK_SERVICE_SQS_MONITORING_H
+
+}// namespace AwsMock::Service
+
+#endif// AWSMOCK_SERVICE_SQS_MONITORING_H

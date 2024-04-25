@@ -76,4 +76,4 @@ namespace AwsMock::Core {
         return os.str();
     }
 
-}
+}// namespace AwsMock::Core

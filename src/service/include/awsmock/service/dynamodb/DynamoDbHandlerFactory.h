@@ -8,13 +8,13 @@
 // Poco includes
 #include <Poco/Logger.h>
 #include <Poco/Mutex.h>
-#include <Poco/ScopedLock.h>
 #include <Poco/Net/HTTPRequestHandlerFactory.h>
+#include <Poco/ScopedLock.h>
 
 // AwsMock includes
+#include "DynamoDbHandler.h"
 #include "awsmock/core/Configuration.h"
 #include "awsmock/core/MetricService.h"
-#include "DynamoDbHandler.h"
 
 namespace AwsMock::Service {
 
@@ -53,9 +53,8 @@ namespace AwsMock::Service {
          * S3 handler configuration
          */
         Core::Configuration &_configuration;
-
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_DYNAMODB_HANDLER_FACTORY_H
+#endif// AWSMOCK_SERVICE_DYNAMODB_HANDLER_FACTORY_H

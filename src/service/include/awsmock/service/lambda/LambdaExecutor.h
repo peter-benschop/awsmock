@@ -7,12 +7,12 @@
 
 // Poco includes
 #include <Poco/Logger.h>
-#include <Poco/Runnable.h>
-#include <Poco/Notification.h>
-#include <Poco/NotificationQueue.h>
 #include <Poco/Net/HTTPClientSession.h>
 #include <Poco/Net/HTTPRequest.h>
 #include <Poco/Net/HTTPResponse.h>
+#include <Poco/Notification.h>
+#include <Poco/NotificationQueue.h>
+#include <Poco/Runnable.h>
 
 // AwsMock includes
 #include <awsmock/core/CurlUtils.h>
@@ -23,41 +23,41 @@
 
 namespace AwsMock::Service {
 
-  /**
-   * AWS lambda executor. The executor is launched asynchronously.
-   *
-   * <p>
-   * As the dockerized lambda runtime using AWS RIE only allows the execution of a lambda function at a time, the lambda function invocation will be queued up in a Poco notification queue and executed one by one. Each invocation will wait for the
-   * finishing of the last invocation request. The lambda image can run on a remote docker instance. In this case the hostname on the invocation request has to be filled in. Default is 'localhost'.
-   * </p>
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  class LambdaExecutor {
-
-  public:
-
     /**
-     * Send the invocation request to the corresponding port
+     * AWS lambda executor. The executor is launched asynchronously.
      *
-     * @param url lambda docker URL
-     * @param body event payload
+     * <p>
+     * As the dockerized lambda runtime using AWS RIE only allows the execution of a lambda function at a time, the lambda function invocation will be queued up in a Poco notification queue and executed one by one. Each invocation will wait for the
+     * finishing of the last invocation request. The lambda image can run on a remote docker instance. In this case the hostname on the invocation request has to be filled in. Default is 'localhost'.
+     * </p>
+     *
+     * @author jens.vogt@opitz-consulting.com
      */
-    static void SendInvocationRequest(const std::string &url, const std::string &body);
+    class LambdaExecutor {
 
-  private:
+      public:
 
-    /**
-     * Metric module
-     */
-    Core::MetricService& _metricService = Core::MetricService::instance();
+        /**
+         * Send the invocation request to the corresponding port
+         *
+         * @param url lambda docker URL
+         * @param body event payload
+         */
+        static void SendInvocationRequest(const std::string &url, const std::string &body);
 
-    /**
-     * Mutex
-     */
-    static Poco::Mutex _mutex;
-  };
+      private:
 
-} // namespace AwsMock::Service
+        /**
+         * Metric module
+         */
+        Core::MetricService &_metricService = Core::MetricService::instance();
 
-#endif // AWSMOCK_SERVICE_LAMBDAEXECUTOR_H
+        /**
+         * Mutex
+         */
+        static Poco::Mutex _mutex;
+    };
+
+}// namespace AwsMock::Service
+
+#endif// AWSMOCK_SERVICE_LAMBDAEXECUTOR_H

@@ -6,31 +6,31 @@
 
 namespace AwsMock::Dto::SecretsManager {
 
-  void DeleteSecretRequest::FromJson(const std::string &jsonString) {
+    void DeleteSecretRequest::FromJson(const std::string &jsonString) {
 
-    Poco::JSON::Parser parser;
-    Poco::Dynamic::Var result = parser.parse(jsonString);
-    const auto& rootObject = result.extract<Poco::JSON::Object::Ptr>();
+        Poco::JSON::Parser parser;
+        Poco::Dynamic::Var result = parser.parse(jsonString);
+        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
-    try {
+        try {
 
-      // Attributes
-      Core::JsonUtils::GetJsonValueString("Name", rootObject, name);
+            // Attributes
+            Core::JsonUtils::GetJsonValueString("Name", rootObject, name);
 
-    } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_BAD_REQUEST);
+        } catch (Poco::Exception &exc) {
+            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_BAD_REQUEST);
+        }
     }
-  }
 
-  std::string DeleteSecretRequest::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+    std::string DeleteSecretRequest::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
+    }
 
-  std::ostream &operator<<(std::ostream &os, const DeleteSecretRequest &r) {
-    os << "DeleteSecretRequest={region='" << r.region << "', name='" << r.name << "'}";
-    return os;
-  }
+    std::ostream &operator<<(std::ostream &os, const DeleteSecretRequest &r) {
+        os << "DeleteSecretRequest={region='" << r.region << "', name='" << r.name << "'}";
+        return os;
+    }
 
-} // namespace AwsMock::Dto::S3
+}// namespace AwsMock::Dto::SecretsManager

@@ -61,8 +61,9 @@ namespace AwsMock::Service {
         /**
          * Message timeout in seconds
          */
-        int _messageTimeout;
-
+        int _messageTimeout{};
     };
-}
-#endif // AWSMOCK_SERVICE_SNS_WORKER_H
+
+}// namespace AwsMock::Service
+
+#endif// AWSMOCK_SERVICE_SNS_WORKER_H

@@ -13,31 +13,36 @@
 
 namespace AwsMock::Resource::Factory {
 
-  class IFactory;
-
-  /**
-   * HTTP resource factory
-   */
-  class Factory {
-
-  public:
-
     /**
-     * Creates a new resource factory.
+     * Management router
      *
-     * @param name resource factory name.
-     * @return resource factory
+     * @author jens.vogt@opitz-consulting.com
      */
-    static IFactory *createResourceFactory(std::string &name);
-
-  private:
+    class IFactory;
 
     /**
-     * Default constructor
+     * HTTP resource factory
      */
-    Factory() = default;
-  };
+    class Factory {
 
-} // namespace AwsMock::Resource::Factory
+      public:
 
-#endif // AWSMOCK_RESOURCE_FACTORY_H
+        /**
+         * Creates a new resource factory.
+         *
+         * @param name resource factory name.
+         * @return resource factory
+         */
+        static IFactory *createResourceFactory(std::string &name);
+
+      private:
+
+        /**
+         * Default constructor
+         */
+        Factory() = default;
+    };
+
+}// namespace AwsMock::Resource::Factory
+
+#endif// AWSMOCK_RESOURCE_FACTORY_H

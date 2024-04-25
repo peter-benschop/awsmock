@@ -6,91 +6,91 @@
 
 namespace AwsMock::Dto::SQS {
 
-  std::string GetQueueAttributesResponse::ToJson() const {
+    std::string GetQueueAttributesResponse::ToJson() const {
 
-    try {
+        try {
 
-      Poco::JSON::Object attributeObject;
-      for (const auto &attribute : attributes) {
-        attributeObject.set(attribute.first, attribute.second);
-      }
+            Poco::JSON::Object attributeObject;
+            for (const auto &attribute: attributes) {
+                attributeObject.set(attribute.first, attribute.second);
+            }
 
-      Poco::JSON::Object rootJson;
-      rootJson.set("Attributes", attributeObject);
+            Poco::JSON::Object rootJson;
+            rootJson.set("Attributes", attributeObject);
 
-      std::ostringstream os;
-      rootJson.stringify(os);
-      return os.str();
+            std::ostringstream os;
+            rootJson.stringify(os);
+            return os.str();
 
-    } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+        } catch (Poco::Exception &exc) {
+            throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
-  }
 
-  std::string GetQueueAttributesResponse::ToXml() const {
+    std::string GetQueueAttributesResponse::ToXml() const {
 
-    try {
+        try {
 
-      // Root
-      Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-      Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("GetQueueAttributesResponse");
-      pDoc->appendChild(pRoot);
+            // Root
+            Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
+            Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("GetQueueAttributesResponse");
+            pDoc->appendChild(pRoot);
 
-      // Metadata
-      Poco::XML::AutoPtr<Poco::XML::Element> pAttributeResult = pDoc->createElement("GetQueueAttributesResult");
-      pRoot->appendChild(pAttributeResult);
+            // Metadata
+            Poco::XML::AutoPtr<Poco::XML::Element> pAttributeResult = pDoc->createElement("GetQueueAttributesResult");
+            pRoot->appendChild(pAttributeResult);
 
-      for (const auto &attribute : attributes) {
+            for (const auto &attribute: attributes) {
 
-        // UserAttribute
-        Poco::XML::AutoPtr<Poco::XML::Element> pAttribute = pDoc->createElement("Attribute");
-        pAttributeResult->appendChild(pAttribute);
+                // UserAttribute
+                Poco::XML::AutoPtr<Poco::XML::Element> pAttribute = pDoc->createElement("Attribute");
+                pAttributeResult->appendChild(pAttribute);
 
-        // Name
-        Poco::XML::AutoPtr<Poco::XML::Element> pName = pDoc->createElement("Name");
-        pAttribute->appendChild(pName);
-        Poco::XML::AutoPtr<Poco::XML::Text> pNameText = pDoc->createTextNode(attribute.first);
-        pName->appendChild(pNameText);
+                // Name
+                Poco::XML::AutoPtr<Poco::XML::Element> pName = pDoc->createElement("Name");
+                pAttribute->appendChild(pName);
+                Poco::XML::AutoPtr<Poco::XML::Text> pNameText = pDoc->createTextNode(attribute.first);
+                pName->appendChild(pNameText);
 
-        // Value
-        Poco::XML::AutoPtr<Poco::XML::Element> pValue = pDoc->createElement("Value");
-        pAttribute->appendChild(pValue);
-        Poco::XML::AutoPtr<Poco::XML::Text> pValueText = pDoc->createTextNode(attribute.second);
-        pValue->appendChild(pValueText);
-      }
+                // Value
+                Poco::XML::AutoPtr<Poco::XML::Element> pValue = pDoc->createElement("Value");
+                pAttribute->appendChild(pValue);
+                Poco::XML::AutoPtr<Poco::XML::Text> pValueText = pDoc->createTextNode(attribute.second);
+                pValue->appendChild(pValueText);
+            }
 
-      // Metadata
-      Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = pDoc->createElement("ResponseMetadata");
-      pRoot->appendChild(pMetaData);
+            // Metadata
+            Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = pDoc->createElement("ResponseMetadata");
+            pRoot->appendChild(pMetaData);
 
-      Poco::XML::AutoPtr<Poco::XML::Element> pRequestId = pDoc->createElement("RequestId");
-      pMetaData->appendChild(pRequestId);
-      Poco::XML::AutoPtr<Poco::XML::Text> pRequestText = pDoc->createTextNode(requestId);
-      pRequestId->appendChild(pRequestText);
+            Poco::XML::AutoPtr<Poco::XML::Element> pRequestId = pDoc->createElement("RequestId");
+            pMetaData->appendChild(pRequestId);
+            Poco::XML::AutoPtr<Poco::XML::Text> pRequestText = pDoc->createTextNode(requestId);
+            pRequestId->appendChild(pRequestText);
 
-      std::stringstream output;
-      Poco::XML::DOMWriter writer;
-      writer.writeNode(output, pDoc);
-      return output.str();
+            std::stringstream output;
+            Poco::XML::DOMWriter writer;
+            writer.writeNode(output, pDoc);
+            return output.str();
 
-    } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+        } catch (Poco::Exception &exc) {
+            throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
-  }
 
-  std::string GetQueueAttributesResponse::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
-
-  std::ostream &operator<<(std::ostream &os, const GetQueueAttributesResponse &r) {
-    os << "GetQueueAttributesResponse={resource='" << r.resource << "', requestId: '" << r.requestId << "', userAttributes={";
-    for (const auto &attribute : r.attributes) {
-      os << attribute.first << "='" << attribute.second << "', ";
+    std::string GetQueueAttributesResponse::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
     }
-    os << "\b\b}}";
-    return os;
-  }
 
-} // namespace AwsMock::Dto::SQS
+    std::ostream &operator<<(std::ostream &os, const GetQueueAttributesResponse &r) {
+        os << "GetQueueAttributesResponse={resource='" << r.resource << "', requestId: '" << r.requestId << "', userAttributes={";
+        for (const auto &attribute: r.attributes) {
+            os << attribute.first << "='" << attribute.second << "', ";
+        }
+        os << "\b\b}}";
+        return os;
+    }
+
+}// namespace AwsMock::Dto::SQS

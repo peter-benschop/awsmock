@@ -6,34 +6,34 @@
 
 namespace AwsMock::Dto::Transfer {
 
-  std::string IdentityProviderDetails::ToJson() const {
+    std::string IdentityProviderDetails::ToJson() const {
 
-    try {
+        try {
 
-      Poco::JSON::Object rootJson;
-      rootJson.set("directoryId", directoryId);
-      rootJson.set("function", function);
-      rootJson.set("url", url);
-      rootJson.set("invocationRole", invocationRole);
-      rootJson.set("sftpAuthenticationMethods", sftpAuthenticationMethods);
+            Poco::JSON::Object rootJson;
+            rootJson.set("directoryId", directoryId);
+            rootJson.set("function", function);
+            rootJson.set("url", url);
+            rootJson.set("invocationRole", invocationRole);
+            rootJson.set("sftpAuthenticationMethods", sftpAuthenticationMethods);
 
-      return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::JsonUtils::ToJsonString(rootJson);
 
-    } catch (Poco::Exception &exc) {
-      log_error << exc.message();
-      throw Core::JsonException(exc.message());
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }
     }
-  }
 
-  std::string IdentityProviderDetails::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+    std::string IdentityProviderDetails::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
+    }
 
-  std::ostream &operator<<(std::ostream &os, const IdentityProviderDetails &r) {
-    os << "IdentityProviderDetails="<<r.ToJson();
-    return os;
-  }
+    std::ostream &operator<<(std::ostream &os, const IdentityProviderDetails &r) {
+        os << "IdentityProviderDetails=" << r.ToJson();
+        return os;
+    }
 
-} // namespace AwsMock::Dto::Transfer
+}// namespace AwsMock::Dto::Transfer

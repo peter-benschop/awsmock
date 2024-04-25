@@ -10,9 +10,9 @@
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 
 // AwsMock includes
+#include "TransferHandler.h"
 #include "awsmock/core/Configuration.h"
 #include "awsmock/core/MetricService.h"
-#include "TransferHandler.h"
 
 namespace AwsMock::Service {
 
@@ -51,9 +51,8 @@ namespace AwsMock::Service {
          * S3 handler configuration
          */
         Core::Configuration &_configuration;
-
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_TRANSFER_HANDLER_FACTORY_H
+#endif// AWSMOCK_SERVICE_TRANSFER_HANDLER_FACTORY_H

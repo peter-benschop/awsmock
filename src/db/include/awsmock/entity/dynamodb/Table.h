@@ -6,16 +6,16 @@
 #define AWSMOCK_DB_ENTITY_DYNAMODB_TABLE_H
 
 // C++ includes
-#include <string>
-#include <vector>
 #include <iostream>
 #include <sstream>
+#include <string>
+#include <vector>
 
 // MongoDB includes
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/stdx.hpp>
 
 // Poco includes
@@ -29,115 +29,115 @@
 
 namespace AwsMock::Database::Entity::DynamoDb {
 
-  using bsoncxx::builder::basic::kvp;
-  using bsoncxx::builder::basic::make_array;
-  using bsoncxx::builder::basic::make_document;
-  using bsoncxx::view_or_value;
-  using bsoncxx::document::view;
-  using bsoncxx::document::value;
-  using bsoncxx::to_json;
-
-  /**
-   * DynamoDB table entity
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  struct Table {
+    using bsoncxx::to_json;
+    using bsoncxx::view_or_value;
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
+    using bsoncxx::document::value;
+    using bsoncxx::document::view;
 
     /**
-     * ID
-     */
-    std::string oid;
-
-    /**
-     * AWS region name
-     */
-    std::string region;
-
-    /**
-     * Name
-     */
-    std::string name;
-
-    /**
-     * Attributes
-     */
-    std::map<std::string, std::string> attributes;
-
-    /**
-     * Tags
-     */
-    std::map<std::string, std::string> tags;
-
-    /**
-     * Key schemas
-     */
-    std::map<std::string, std::string> keySchemas;
-
-    /**
-     * Creation date
-     */
-    Poco::DateTime created = Poco::DateTime();
-
-    /**
-     * Last modification date
-     */
-    Poco::DateTime modified = Poco::DateTime();
-
-    /**
-     * Converts the entity to a MongoDB document
+     * DynamoDB table entity
      *
-     * @return entity as MongoDB document.
+     * @author jens.vogt@opitz-consulting.com
      */
-    [[nodiscard]] view_or_value<view, value> ToDocument() const;
+    struct Table {
 
-    /**
-     * Converts the MongoDB document to an entity
-     *
-     * @param mResult query result.
-     */
-    void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+        /**
+         * ID
+         */
+        std::string oid;
 
-    /**
-     * Converts the entity to a JSON object
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        /**
+         * AWS region name
+         */
+        std::string region;
 
-    /**
-     * Converts the entity to a JSON string
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToJson() const;
+        /**
+         * Name
+         */
+        std::string name;
 
-    /**
-     * Converts an JSON object to an entity
-     *
-     * @param jsonObject JSON object.
-     */
-    void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+        /**
+         * Attributes
+         */
+        std::map<std::string, std::string> attributes;
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * Tags
+         */
+        std::map<std::string, std::string> tags;
 
-    /**
-     * Stream provider.
-     *
-     * @param os output stream
-     * @param d DynamoDB  entity
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const Table &d);
-  };
+        /**
+         * Key schemas
+         */
+        std::map<std::string, std::string> keySchemas;
 
-  typedef std::vector<Table> TableList;
+        /**
+         * Creation date
+         */
+        Poco::DateTime created = Poco::DateTime();
 
-} // namespace AwsMock::Database::Entity::DynamoDb
+        /**
+         * Last modification date
+         */
+        Poco::DateTime modified = Poco::DateTime();
 
-#endif // AWSMOCK_DB_ENTITY_DYNAMODB_TABLE_H
+        /**
+         * Converts the entity to a MongoDB document
+         *
+         * @return entity as MongoDB document.
+         */
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+
+        /**
+         * Converts the MongoDB document to an entity
+         *
+         * @param mResult query result.
+         */
+        void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+
+        /**
+         * Converts the entity to a JSON object
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+
+        /**
+         * Converts the entity to a JSON string
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToJson() const;
+
+        /**
+         * Converts an JSON object to an entity
+         *
+         * @param jsonObject JSON object.
+         */
+        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
+
+        /**
+         * Stream provider.
+         *
+         * @param os output stream
+         * @param d DynamoDB  entity
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const Table &d);
+    };
+
+    typedef std::vector<Table> TableList;
+
+}// namespace AwsMock::Database::Entity::DynamoDb
+
+#endif// AWSMOCK_DB_ENTITY_DYNAMODB_TABLE_H

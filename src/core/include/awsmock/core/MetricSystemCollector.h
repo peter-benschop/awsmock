@@ -6,21 +6,21 @@
 #define AWSMOCK_CORE_METRIC_SYSTEM_COLLECTOR_H
 
 // C++ Standard includes
-#include <sstream>
-#include <fstream>
-#include <string>
 #include <cassert>
+#include <fstream>
+#include <sstream>
+#include <string>
 #include <sys/times.h>
 
 // Poco includes
-#include <Poco/Timer.h>
 #include <Poco/Prometheus/Counter.h>
 #include <Poco/Prometheus/Gauge.h>
 #include <Poco/Prometheus/MetricsServer.h>
+#include <Poco/Timer.h>
 
 // AwsMock includes
-#include <awsmock/core/StringUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/StringUtils.h>
 #include <awsmock/core/Timer.h>
 
 // System counter
@@ -33,98 +33,98 @@
 
 namespace AwsMock::Core {
 
-  /**
-   * Collect system information like CPU and Memory. Runs as background thread with a given timeout in ms.
-   *
-   * @author jens.vogt@opitz-consulting.com
-  */
-  class MetricSystemCollector : public Core::Timer {
-
-  public:
-
     /**
-     * Constructor.
+     * Collect system information like CPU and Memory. Runs as background thread with a given timeout in ms.
+     *
+     * @author jens.vogt@opitz-consulting.com
      */
-    explicit MetricSystemCollector();
+    class MetricSystemCollector : public Core::Timer {
 
-    /**
-     * Destructor.
-     */
-    ~MetricSystemCollector();
+      public:
 
-    /**
-     * Initialization
-     */
-    void Initialize() override;
+        /**
+         * Constructor.
+         */
+        explicit MetricSystemCollector();
 
-    /**
-     * Runnable method
-     */
-    void Run() override;
+        /**
+         * Destructor.
+         */
+        ~MetricSystemCollector();
 
-    /**
-     * Shutdown
-     */
-    void Shutdown() override;
+        /**
+         * Initialization
+         */
+        void Initialize() override;
 
-  private:
+        /**
+         * Runnable method
+         */
+        void Run() override;
 
-    /**
-     * Updates the system counter
-     */
-    void CollectSystemCounter();
+        /**
+         * Shutdown
+         */
+        void Shutdown() override;
 
-    /**
-     * Virtual memory gauge
-     */
-    Poco::Prometheus::Gauge *_virtualMemory;
+      private:
 
-    /**
-     * Real memory gauge
-     */
-    Poco::Prometheus::Gauge *_realMemory;
+        /**
+         * Updates the system counter
+         */
+        void CollectSystemCounter();
 
-    /**
-     * Total thread gauge
-     */
-    Poco::Prometheus::Gauge *_totalThreads;
+        /**
+         * Virtual memory gauge
+         */
+        Poco::Prometheus::Gauge *_virtualMemory;
 
-    /**
-     * Total CPU gauge
-     */
-    Poco::Prometheus::Gauge *_totalCpu;
+        /**
+         * Real memory gauge
+         */
+        Poco::Prometheus::Gauge *_realMemory;
 
-    /**
-     * User CPU gauge
-     */
-    Poco::Prometheus::Gauge *_userCpu;
+        /**
+         * Total thread gauge
+         */
+        Poco::Prometheus::Gauge *_totalThreads;
 
-    /**
-     * System CPU gauge
-     */
-    Poco::Prometheus::Gauge *_systemCpu;
+        /**
+         * Total CPU gauge
+         */
+        Poco::Prometheus::Gauge *_totalCpu;
 
-    /**
-     * Number of processors
-     */
-    int numProcessors{};
+        /**
+         * User CPU gauge
+         */
+        Poco::Prometheus::Gauge *_userCpu;
 
-    /**
-     * Last CPU
-     */
-    clock_t lastCPU{};
+        /**
+         * System CPU gauge
+         */
+        Poco::Prometheus::Gauge *_systemCpu;
 
-    /**
-     * Last system CPU
-     */
-    clock_t lastSysCPU{};
+        /**
+         * Number of processors
+         */
+        int numProcessors{};
 
-    /**
-     * Last user CPU
-     */
-    clock_t lastUserCPU{};
+        /**
+         * Last CPU
+         */
+        clock_t lastCPU{};
 
-  };
-} // namespace AwsMock::Core
+        /**
+         * Last system CPU
+         */
+        clock_t lastSysCPU{};
 
-#endif //AWSMOCK_CORE_METRIC_SYSTEM_COLLECTOR_H
+        /**
+         * Last user CPU
+         */
+        clock_t lastUserCPU{};
+    };
+
+}// namespace AwsMock::Core
+
+#endif// AWSMOCK_CORE_METRIC_SYSTEM_COLLECTOR_H

@@ -6,9 +6,9 @@
 #define AWSMOCK_SERVICE_TRANSFERSERVER_H
 
 // C++ standard includes
-#include <string>
 #include <map>
 #include <memory>
+#include <string>
 
 // Poco includes
 #include <Poco/Condition.h>
@@ -29,7 +29,7 @@
 
 #define TRANSFER_DEFAULT_PORT 9504
 #define TRANSFER_DEFAULT_HOST "localhost"
-#define TRANSFER_DEFAULT_QUEUE_LENGTH  250
+#define TRANSFER_DEFAULT_QUEUE_LENGTH 250
 #define TRANSFER_DEFAULT_THREADS 50
 #define TRANSFER_DEFAULT_TIMEOUT 120
 #define TRANSFER_DEFAULT_MONITORING_PERIOD 300
@@ -204,9 +204,8 @@ namespace AwsMock::Service {
          * Monitoring period
          */
         int _monitoringPeriod;
-
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_TRANSFERSERVER_H
+#endif// AWSMOCK_SERVICE_TRANSFERSERVER_H

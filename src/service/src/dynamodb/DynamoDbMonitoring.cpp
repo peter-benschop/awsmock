@@ -21,4 +21,4 @@ namespace AwsMock::Service {
         _metricService.SetGauge(DYNAMODB_TABLE_COUNT, tables);
         log_trace << "DynamoDb update counter finished";
     }
-}
+}// namespace AwsMock::Service

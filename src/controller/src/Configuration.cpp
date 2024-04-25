@@ -6,15 +6,15 @@
 
 namespace AwsMock::Controller {
 
-  Configuration::Configuration() : Core::Configuration() {
-    InitializeConfig();
-  }
+    Configuration::Configuration() : Core::Configuration() {
+        InitializeConfig();
+    }
 
-  Configuration::Configuration(const std::string &basename) : Core::Configuration(basename) {
-    InitializeConfig();
-  }
+    Configuration::Configuration(const std::string &basename) : Core::Configuration(basename) {
+        InitializeConfig();
+    }
 
-  void Configuration::InitializeConfig() {
-  }
+    void Configuration::InitializeConfig() {
+    }
 
-} // namespace AwsMock
+}// namespace AwsMock::Controller

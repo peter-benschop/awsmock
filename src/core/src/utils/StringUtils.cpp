@@ -7,10 +7,8 @@ namespace AwsMock::Core {
 
     template<typename T = std::mt19937>
     auto RandomGenerator() -> T {
-        auto constexpr
-                seed_bytes = sizeof(typename T::result_type) * T::state_size;
-        auto constexpr
-                seed_len = seed_bytes / sizeof(std::seed_seq::result_type);
+        auto constexpr seed_bytes = sizeof(typename T::result_type) * T::state_size;
+        auto constexpr seed_len = seed_bytes / sizeof(std::seed_seq::result_type);
         auto seed = std::array<std::seed_seq::result_type, seed_len>();
         auto dev = std::random_device();
         std::generate_n(begin(seed), seed_len, std::ref(dev));
@@ -141,11 +139,11 @@ namespace AwsMock::Core {
     std::string StringUtils::SubString(const std::string &string, int beginIndex, int endIndex) {
         int size = (int) string.size();
         if (beginIndex < 0 || beginIndex > size - 1)
-            return "-1"; // Index out of bounds
+            return "-1";// Index out of bounds
         if (endIndex < 0 || endIndex > size - 1)
-            return "-1"; // Index out of bounds
+            return "-1";// Index out of bounds
         if (beginIndex > endIndex)
-            return "-1"; // Begin index should not be bigger that end.
+            return "-1";// Begin index should not be bigger that end.
 
         std::string substr;
         for (int i = 0; i < size; i++)
@@ -293,4 +291,4 @@ namespace AwsMock::Core {
         // Return the result
         return result;
     }
-}
+}// namespace AwsMock::Core

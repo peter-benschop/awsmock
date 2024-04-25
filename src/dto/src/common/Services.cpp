@@ -6,57 +6,57 @@
 
 namespace AwsMock::Dto::Common {
 
-  bool Services::HasService(const std::string &service) const {
+    bool Services::HasService(const std::string &service) const {
 
-    if (Core::StringUtils::EqualsIgnoreCase(service, "all")) {
-      return true;
+        if (Core::StringUtils::EqualsIgnoreCase(service, "all")) {
+            return true;
+        }
+
+        return find_if(serviceNames.begin(), serviceNames.end(), [service](const std::string &t) {
+                   return t == service;
+               }) != serviceNames.end();
     }
 
-    return find_if(serviceNames.begin(), serviceNames.end(), [service](const std::string &t) {
-      return t == service;
-    }) != serviceNames.end();
-  }
+    std::string Services::ToJson() {
 
-  std::string Services::ToJson() {
+        try {
+            Poco::JSON::Object jsonServices;
+            Poco::JSON::Array jsonServiceArray;
+            for (const auto &service: serviceNames) {
+                jsonServiceArray.add(service);
+            }
+            jsonServices.set("services", jsonServiceArray);
 
-    try {
-      Poco::JSON::Object jsonServices;
-      Poco::JSON::Array jsonServiceArray;
-      for (const auto &service : serviceNames) {
-        jsonServiceArray.add(service);
-      }
-      jsonServices.set("services", jsonServiceArray);
+            std::ostringstream os;
+            jsonServices.stringify(os);
+            return os.str();
 
-      std::ostringstream os;
-      jsonServices.stringify(os);
-      return os.str();
-
-    } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
-    }
-  }
-
-  void Services::FromJson(const std::string &jsonString) {
-
-    if(jsonString.empty()) {
-      serviceNames.emplace_back("all");
-      return;
+        } catch (Poco::Exception &exc) {
+            throw Core::ServiceException(exc.message(), 500);
+        }
     }
 
-    Poco::JSON::Parser parser;
-    Poco::Dynamic::Var result = parser.parse(jsonString);
-    auto rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    void Services::FromJson(const std::string &jsonString) {
 
-    try {
+        if (jsonString.empty()) {
+            serviceNames.emplace_back("all");
+            return;
+        }
 
-      // Services
-      Poco::JSON::Array::Ptr jsonArray = rootObject->getArray("services");
-      for (const auto &service : *jsonArray) {
-        serviceNames.emplace_back(service);
-      }
+        Poco::JSON::Parser parser;
+        Poco::Dynamic::Var result = parser.parse(jsonString);
+        auto rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
-    } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+        try {
+
+            // Services
+            Poco::JSON::Array::Ptr jsonArray = rootObject->getArray("services");
+            for (const auto &service: *jsonArray) {
+                serviceNames.emplace_back(service);
+            }
+
+        } catch (Poco::Exception &exc) {
+            throw Core::ServiceException(exc.message(), 500);
+        }
     }
-  }
-}
+}// namespace AwsMock::Dto::Common

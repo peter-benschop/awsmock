@@ -173,7 +173,7 @@ namespace AwsMock::Database {
             }
             return count;
         } else {
-            return (long)_tables.size();
+            return (long) _tables.size();
         }
     }
 
@@ -196,4 +196,4 @@ namespace AwsMock::Database {
         _items.clear();
     }
 
-}
+}// namespace AwsMock::Database

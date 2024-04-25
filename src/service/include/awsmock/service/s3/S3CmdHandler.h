@@ -13,12 +13,12 @@
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/MetricService.h>
-#include <awsmock/core/MetricDefinition.h>
-#include <awsmock/core/NumberUtils.h>
 #include <awsmock/core/JsonException.h>
-#include <awsmock/dto/common/UserAgent.h>
+#include <awsmock/core/MetricDefinition.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/core/NumberUtils.h>
 #include <awsmock/dto/common/S3ClientCommand.h>
+#include <awsmock/dto/common/UserAgent.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/s3/S3Service.h>
 
@@ -32,6 +32,8 @@ namespace AwsMock::Service {
      * authorization header contains the S3 module. As the different clients (Java, C++, Python, nodejs) are using different request structure, the request
      * are first send to the S3CmdHandler, which normalizes the commands.
      * </p>
+     *
+     * @author jens.vogt@opitz-consulting.com
      */
     class S3CmdHandler : public virtual AbstractHandler {
 
@@ -100,17 +102,16 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * S3 handler configuration
+         * Handler configuration
          */
         Core::Configuration &_configuration;
 
         /**
-         * S3 module
+         * S3 service
          */
         Service::S3Service _s3Service;
-
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_S3_CMD_HANDLER_H
+#endif// AWSMOCK_SERVICE_S3_CMD_HANDLER_H

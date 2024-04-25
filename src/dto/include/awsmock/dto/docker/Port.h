@@ -6,8 +6,8 @@
 #define AWSMOCK_DTO_DOCKER_PORT_H
 
 // C++ includes
-#include <string>
 #include <sstream>
+#include <string>
 #include <vector>
 
 // AwsMock includes
@@ -17,58 +17,62 @@
 
 namespace AwsMock::Dto::Docker {
 
-  struct Port {
-
     /**
-     * Constructor
-     */
-    explicit Port(const Poco::JSON::Object::Ptr &object);
-
-    /**
-     * Private port, means port inside the container
-     */
-    int privatePort{};
-
-    /**
-     * Public port, means port visible from docker host
-     */
-    int publicPort{};
-
-    /**
-     * Port type (tcp,udp, etc.)
-     */
-    std::string type;
-
-    /**
-     * Convert to a JSON string
+     * Docker port
      *
-     * @param object JSON object
+     * @author jens.vogt@opitz-consulting.com
      */
-    void FromJson(const Poco::JSON::Object::Ptr& object);
+    struct Port {
 
-    /**
-     * Convert to a JSON string
-     *
-     * @param object JSON object
-     */
-    [[nodiscard]] std::string ToJson() const;
+        /**
+         * Constructor
+         */
+        explicit Port(const Poco::JSON::Object::Ptr &object);
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * Private port, means port inside the container
+         */
+        int privatePort{};
 
-    /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const Port &c);
+        /**
+         * Public port, means port visible from docker host
+         */
+        int publicPort{};
 
-  };
+        /**
+         * Port type (tcp,udp, etc.)
+         */
+        std::string type;
 
-} // namespace AwsMock::Dto::Docker
+        /**
+         * Convert to a JSON string
+         *
+         * @param object JSON object
+         */
+        void FromJson(const Poco::JSON::Object::Ptr &object);
 
-#endif // AWSMOCK_DTO_DOCKER_PORT_H
+        /**
+         * Convert to a JSON string
+         *
+         * @param object JSON object
+         */
+        [[nodiscard]] std::string ToJson() const;
+
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
+
+        /**
+         * Stream provider.
+         *
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const Port &c);
+    };
+
+}// namespace AwsMock::Dto::Docker
+
+#endif// AWSMOCK_DTO_DOCKER_PORT_H

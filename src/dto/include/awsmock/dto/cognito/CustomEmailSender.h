@@ -6,8 +6,8 @@
 #define AWSMOCK_DTO_COGNITO_CUSTOM_EMAIL_SENDER_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // AwsMock includes
 #include <awsmock/core/JsonException.h>
@@ -17,59 +17,60 @@
 
 namespace AwsMock::Dto::Cognito {
 
-  /**
-   * Cognito lambda configuration
-   *
-   * Example:
-   * <pre>
-   * "CustomEmailSender": {
-   *    "LambdaArn": "string",
-   *    "LambdaVersion": "string"
-   * },
-   * </pre>
-   */
-  struct CustomEmailSender {
-
     /**
-     * Lambda ARN
-     */
-    std::string lambdaArn;
-
-    /**
-     * Lambda version
-     */
-    std::string lambdaVersion;
-
-    /**
-     * Convert to a JSON string
+     * Cognito custom email sender
      *
-     * @return JSON string
-     */
-    [[nodiscard]] std::string ToJson() const;
-
-    /**
-     * Convert to a JSON object
+     * Example:
+     * <pre>
+     * "CustomEmailSender": {
+     *    "LambdaArn": "string",
+     *    "LambdaVersion": "string"
+     * },
+     * </pre>
      *
-     * @return JSON object
+     * @author jens.vogt@opitz-consulting.com
      */
-    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+    struct CustomEmailSender {
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * Lambda ARN
+         */
+        std::string lambdaArn;
 
-    /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const CustomEmailSender &r);
+        /**
+         * Lambda version
+         */
+        std::string lambdaVersion;
 
-  };
+        /**
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
+        [[nodiscard]] std::string ToJson() const;
 
-} // namespace AwsMock::Dto::Cognito
+        /**
+         * Convert to a JSON object
+         *
+         * @return JSON object
+         */
+        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
-#endif // AWSMOCK_DTO_COGNITO_CUSTOM_EMAIL_SENDER_H
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
+
+        /**
+         * Stream provider.
+         *
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const CustomEmailSender &r);
+    };
+
+}// namespace AwsMock::Dto::Cognito
+
+#endif// AWSMOCK_DTO_COGNITO_CUSTOM_EMAIL_SENDER_H

@@ -6,8 +6,8 @@
 #define AWSMOCK_DTO_SQS_DELETE_MESSAGE_BATCH_REQUEST_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // Poco includes
 #include "Poco/UUID.h"
@@ -22,63 +22,62 @@
 
 namespace AwsMock::Dto::SQS {
 
-  struct DeleteMessageBatchRequest {
+    struct DeleteMessageBatchRequest {
 
-    /**
+        /**
      * AWS region
      */
-    std::string region;
+        std::string region;
 
-    /**
+        /**
      * Queue URL
      */
-    std::string queueUrl;
+        std::string queueUrl;
 
-    /**
+        /**
      * Entries
      */
-    DeleteMessageBatchEntries deleteMessageBatchEntries;
+        DeleteMessageBatchEntries deleteMessageBatchEntries;
 
-    /**
+        /**
      * Resource
      */
-    std::string resource = "SQS";
+        std::string resource = "SQS";
 
-    /**
+        /**
      * Resource
      */
-    std::string requestId = Poco::UUIDGenerator().createRandom().toString();
+        std::string requestId = Poco::UUIDGenerator().createRandom().toString();
 
-    /**
+        /**
      * Convert to a JSON string
      *
      * @return JSON string
      */
-    [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
+        /**
      * Converts the DTO from a JSON representation.
      *
      * @param payload HTTP message body.
      */
-    void FromJson(const std::string &payload);
+        void FromJson(const std::string &payload);
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const DeleteMessageBatchRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const DeleteMessageBatchRequest &r);
+    };
 
-  };
+}// namespace AwsMock::Dto::SQS
 
-} // namespace AwsMock::Dto::SQS
-
-#endif // AWSMOCK_DTO_SQS_DELETE_MESSAGE_BATCH_REQUEST_H
+#endif// AWSMOCK_DTO_SQS_DELETE_MESSAGE_BATCH_REQUEST_H

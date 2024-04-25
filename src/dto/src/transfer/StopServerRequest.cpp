@@ -6,49 +6,49 @@
 
 namespace AwsMock::Dto::Transfer {
 
-  void StopServerRequest::FromJson(const std::string &body) {
+    void StopServerRequest::FromJson(const std::string &body) {
 
-    Poco::JSON::Parser parser;
-    Poco::Dynamic::Var result = parser.parse(body);
-    const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+        Poco::JSON::Parser parser;
+        Poco::Dynamic::Var result = parser.parse(body);
+        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
-    try {
+        try {
 
-      // Get root values
-      Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-      Core::JsonUtils::GetJsonValueString("ServerId", rootObject, serverId);
+            // Get root values
+            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
+            Core::JsonUtils::GetJsonValueString("ServerId", rootObject, serverId);
 
-    } catch (Poco::Exception &exc) {
-      log_error << exc.message();
-      throw Core::JsonException(exc.message());
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }
     }
-  }
 
-  std::string StopServerRequest::ToJson() const {
+    std::string StopServerRequest::ToJson() const {
 
-    try {
+        try {
 
-      Poco::JSON::Object rootJson;
-      rootJson.set("Region", region);
-      rootJson.set("ServerId", serverId);
+            Poco::JSON::Object rootJson;
+            rootJson.set("Region", region);
+            rootJson.set("ServerId", serverId);
 
-      return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::JsonUtils::ToJsonString(rootJson);
 
-    } catch (Poco::Exception &exc) {
-      log_error << exc.message();
-      throw Core::JsonException(exc.message());
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }
     }
-  }
 
-  std::string StopServerRequest::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+    std::string StopServerRequest::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
+    }
 
-  std::ostream &operator<<(std::ostream &os, const StopServerRequest &r) {
-    os << "StopServerRequest=" << r.ToJson();
-    return os;
-  }
+    std::ostream &operator<<(std::ostream &os, const StopServerRequest &r) {
+        os << "StopServerRequest=" << r.ToJson();
+        return os;
+    }
 
-} // namespace AwsMock::Dto::lambda
+}// namespace AwsMock::Dto::Transfer

@@ -6,8 +6,8 @@
 #define AWSMOCK_DTO_COGNITO_USER_ATTRIBUTE_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 #include <vector>
 
 // AwsMock includes
@@ -18,50 +18,54 @@
 
 namespace AwsMock::Dto::Cognito {
 
-  struct UserAttribute {
-
     /**
-     * User attribute name
-     */
-    std::string name;
-
-    /**
-     * MessageAttribute value
-     */
-    std::string value;
-
-    /**
-     * Converts the JSON string to a DTO
+     * User attribute
      *
-     * @param jsonObject JSON object
+     * @author jens.vogt@opitz-consulting.com
      */
-    void FromJson(const Poco::JSON::Object::Ptr &jsonObject);
+    struct UserAttribute {
 
-    /**
-     * Convert to a JSON string.
-     *
-     * @return user pools json string
-     */
-    [[nodiscard]] std::string ToJson() const;
+        /**
+         * User attribute name
+         */
+        std::string name;
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * MessageAttribute value
+         */
+        std::string value;
 
-    /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const UserAttribute &r);
+        /**
+         * Converts the JSON string to a DTO
+         *
+         * @param jsonObject JSON object
+         */
+        void FromJson(const Poco::JSON::Object::Ptr &jsonObject);
 
-  };
+        /**
+         * Convert to a JSON string.
+         *
+         * @return user pools json string
+         */
+        [[nodiscard]] std::string ToJson() const;
 
-  typedef std::vector<UserAttribute> UserAttributeList;
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
 
-} // namespace AwsMock::Dto::SQS
+        /**
+         * Stream provider.
+         *
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const UserAttribute &r);
+    };
 
-#endif // AWSMOCK_DTO_COGNITO_USER_ATTRIBUTE_H
+    typedef std::vector<UserAttribute> UserAttributeList;
+
+}// namespace AwsMock::Dto::Cognito
+
+#endif// AWSMOCK_DTO_COGNITO_USER_ATTRIBUTE_H

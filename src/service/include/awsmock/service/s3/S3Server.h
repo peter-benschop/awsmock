@@ -11,11 +11,11 @@
 #include <Poco/Net/HTTPServer.h>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/MetricService.h>
-#include <awsmock/core/Timer.h>
 #include <awsmock/core/ThreadPool.h>
+#include <awsmock/core/Timer.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/common/AbstractWorker.h>
 #include <awsmock/service/s3/S3HandlerFactory.h>
@@ -122,9 +122,8 @@ namespace AwsMock::Service {
          * Monitoring period
          */
         int _monitoringPeriod;
-
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_S3SERVER_H
+#endif// AWSMOCK_SERVICE_S3_SERVER_H

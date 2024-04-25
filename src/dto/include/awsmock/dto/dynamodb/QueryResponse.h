@@ -6,10 +6,10 @@
 #define AWSMOCK_DTO_DYNAMODB_QUERY_RESPONSE_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
-#include <vector>
+#include <string>
 #include <utility>
+#include <vector>
 
 // AwsMock includes
 #include <awsmock/core/JsonException.h>
@@ -19,75 +19,78 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
-  /**
-   * Example:
-   * <pre>
-   * {
-   *   "ConsumedCapacity":
-   *     {
-   *       "TableName":"test-table",
-   *       "CapacityUnits":1.0
-   *     }
-   * }
-   * </pre>
-   */
-  struct QueryResponse {
-
     /**
-     * Region
-     */
-    std::string region;
-
-    /**
-     * Table name
-     */
-    std::string tableName;
-
-    /**
-     * Original HTTP response body
-     */
-    std::string body;
-
-    /**
-     * Original HTTP response headers
-     */
-    std::map<std::string, std::string> headers;
-
-    /**
-     * HTTP status from docker image
-     */
-    Poco::Net::HTTPResponse::HTTPStatus status;
-
-    /**
-     * Creates a JSON string from the object.
+     * Query request
      *
-     * @return JSON string
-     */
-    [[nodiscard]] std::string ToJson() const;
-
-    /**
-     * Parse a JSON stream
+     * Example:
+     * <pre>
+     * {
+     *   "ConsumedCapacity":
+     *     {
+     *       "TableName":"test-table",
+     *       "CapacityUnits":1.0
+     *     }
+     * }
+     * </pre>
      *
-     * @param jsonString JSON string
+     * @author jens.vogt@opitz-consulting.com
      */
-    void FromJson(const std::string &jsonString);
+    struct QueryResponse {
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * Region
+         */
+        std::string region;
 
-    /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const QueryResponse &r);
+        /**
+         * Table name
+         */
+        std::string tableName;
 
-  };
+        /**
+         * Original HTTP response body
+         */
+        std::string body;
 
-} // namespace AwsMock::Dto::DynamoDb
+        /**
+         * Original HTTP response headers
+         */
+        std::map<std::string, std::string> headers;
 
-#endif // AWSMOCK_DTO_DYNAMODB_QUERY_RESPONSE_H
+        /**
+         * HTTP status from docker image
+         */
+        Poco::Net::HTTPResponse::HTTPStatus status;
+
+        /**
+         * Creates a JSON string from the object.
+         *
+         * @return JSON string
+         */
+        [[nodiscard]] std::string ToJson() const;
+
+        /**
+         * Parse a JSON stream
+         *
+         * @param jsonString JSON string
+         */
+        void FromJson(const std::string &jsonString);
+
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
+
+        /**
+         * Stream provider.
+         *
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const QueryResponse &r);
+    };
+
+}// namespace AwsMock::Dto::DynamoDb
+
+#endif// AWSMOCK_DTO_DYNAMODB_QUERY_RESPONSE_H

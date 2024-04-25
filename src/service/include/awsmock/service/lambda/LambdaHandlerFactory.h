@@ -8,53 +8,54 @@
 // Poco includes
 #include <Poco/Logger.h>
 #include <Poco/Mutex.h>
-#include <Poco/ScopedLock.h>
-#include <Poco/NotificationQueue.h>
 #include <Poco/Net/HTTPRequestHandlerFactory.h>
+#include <Poco/NotificationQueue.h>
+#include <Poco/ScopedLock.h>
 
 // AwsMock includes
+#include "LambdaHandler.h"
 #include "awsmock/core/Configuration.h"
 #include "awsmock/core/MetricService.h"
-#include "LambdaHandler.h"
 
 namespace AwsMock::Service {
 
-  /**
-   * lambda request handler factory
-   */
-  class LambdaRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
-
-  public:
-
     /**
-     * Constructor
+     * Lambda request handler factory
      *
-     * @param configuration application configuration
+     * @author jens.vogt@opitz-consulting.com
      */
-    LambdaRequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
+    class LambdaRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 
-    /**
-     * Create new lambda request handler
-     *
-     * @param request HTTP request
-     * @return lambda request handler
-     */
-    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
-      if (request.getURI().empty()) {
-        return nullptr;
-      }
-      return new LambdaHandler(_configuration);
-    }
+      public:
 
-  private:
+        /**
+         * Constructor
+         *
+         * @param configuration application configuration
+         */
+        explicit LambdaRequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
 
-    /**
-     * S3 handler configuration
-     */
-    Core::Configuration &_configuration;
+        /**
+         * Create new lambda request handler
+         *
+         * @param request HTTP request
+         * @return lambda request handler
+         */
+        Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
+            if (request.getURI().empty()) {
+                return nullptr;
+            }
+            return new LambdaHandler(_configuration);
+        }
 
-  };
+      private:
 
-} // namespace AwsMock::Service
+        /**
+         * Configuration
+         */
+        Core::Configuration &_configuration;
+    };
 
-#endif // AWSMOCK_SERVICE_LAMBDA_HANDLER_FACTORY_H
+}// namespace AwsMock::Service
+
+#endif// AWSMOCK_SERVICE_LAMBDA_HANDLER_FACTORY_H

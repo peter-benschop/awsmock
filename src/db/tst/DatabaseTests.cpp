@@ -20,21 +20,21 @@
 
 namespace AwsMock::Database {
 
-  class DatabaseTest : public ::testing::Test {
+    class DatabaseTest : public ::testing::Test {
 
-    protected:
+      protected:
 
-      void SetUp() override {
-      }
+        void SetUp() override {
+        }
 
-      void TearDown() override {
-      }
+        void TearDown() override {
+        }
 
-      Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
-      Database _database = Database();
-  };
+        Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+        Database _database = Database();
+    };
 
-  /*TEST_F(DatabaseTest, ConstructorTest) {
+    /*TEST_F(DatabaseTest, ConstructorTest) {
 
       // arrange
       int count = 0;
@@ -48,6 +48,6 @@ namespace AwsMock::Database {
       EXPECT_EQ(count, 4);
   }*/
 
-} // namespace AwsMock::Core
+}// namespace AwsMock::Database
 
-#endif // AWMOCK_CORE_DIRUTILSTEST_H
+#endif// AWMOCK_CORE_DIRUTILSTEST_H

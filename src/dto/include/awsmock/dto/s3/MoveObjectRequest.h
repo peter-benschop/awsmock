@@ -7,64 +7,63 @@
 
 // C++ standard includes
 #include <map>
-#include <string>
 #include <sstream>
+#include <string>
 
 namespace AwsMock::Dto::S3 {
 
-  struct MoveObjectRequest {
+    struct MoveObjectRequest {
 
-    /**
+        /**
      * Region
      */
-    std::string region;
+        std::string region;
 
-    /**
+        /**
      * Region
      */
-    std::string user;
+        std::string user;
 
-    /**
+        /**
      * Source bucket
      */
-    std::string sourceBucket;
+        std::string sourceBucket;
 
-    /**
+        /**
      * Source key
      */
-    std::string sourceKey;
+        std::string sourceKey;
 
-    /**
+        /**
      * Target bucket
      */
-    std::string targetBucket;
+        std::string targetBucket;
 
-    /**
+        /**
      * Target key
      */
-    std::string targetKey;
+        std::string targetKey;
 
-    /**
+        /**
      * Metadata
      */
-    std::map<std::string, std::string> metadata;
+        std::map<std::string, std::string> metadata;
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    std::string ToString() const;
+        std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const MoveObjectRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const MoveObjectRequest &r);
+    };
 
-  };
+}// namespace AwsMock::Dto::S3
 
-} // namespace AwsMock::Dto::S3
-
-#endif // AWSMOCK_CORE_DTO_MOVEOBJECTREQUEST_H
+#endif// AWSMOCK_CORE_DTO_MOVEOBJECTREQUEST_H

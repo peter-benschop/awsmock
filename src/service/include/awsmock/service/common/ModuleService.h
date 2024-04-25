@@ -21,140 +21,142 @@
 #include <awsmock/entity/module/Module.h>
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/repository/SecretsManagerDatabase.h>
-#include <awsmock/service/gateway/GatewayServer.h>
-#include <awsmock/service/s3/S3Server.h>
-#include <awsmock/service/sqs/SQSServer.h>
-#include <awsmock/service/sns/SNSServer.h>
-#include <awsmock/service/lambda/LambdaServer.h>
 #include <awsmock/service/cognito/CognitoServer.h>
 #include <awsmock/service/dynamodb/DynamoDbServer.h>
+#include <awsmock/service/gateway/GatewayServer.h>
+#include <awsmock/service/lambda/LambdaServer.h>
+#include <awsmock/service/s3/S3Server.h>
+#include <awsmock/service/sns/SNSServer.h>
+#include <awsmock/service/sqs/SQSServer.h>
 #include <awsmock/service/transfer/TransferServer.h>
 
 namespace AwsMock::Service {
 
-  /**
-   * The ModuleService controls the different services
-   */
-  class ModuleService {
-
-  public:
-
     /**
-     * Constructor
+     * The ModuleService controls the different services
      *
-     * @param configuration module configuration
-     * @param serverMap module map
+     * @author jens.vogt@opitz-consulting.com
      */
-    explicit ModuleService(Core::Configuration &configuration, Service::ServerMap &serverMap);
+    class ModuleService {
 
-    /**
-     * Return all list of all modules
-     *
-     * @param list of all modules
-     */
-    Database::Entity::Module::ModuleList ListModules();
+      public:
 
-    /**
-     * Returns the running state
-     *
-     * @param module module name
-     * @return module state
-     */
-    bool IsRunning(const std::string &module);
+        /**
+         * Constructor
+         *
+         * @param configuration module configuration
+         * @param serverMap module map
+         */
+        explicit ModuleService(Core::Configuration &configuration, Service::ServerMap &serverMap);
 
-    /**
-     * Starts a module
-     *
-     * @param name module name
-     */
-    Database::Entity::Module::Module StartService(const std::string &name);
+        /**
+         * Return all list of all modules
+         *
+         * @param list of all modules
+         */
+        Database::Entity::Module::ModuleList ListModules();
 
-    /**
-     * Starts all services
-     */
-    void StartAllServices();
+        /**
+         * Returns the running state
+         *
+         * @param module module name
+         * @return module state
+         */
+        bool IsRunning(const std::string &module);
 
-    /**
-     * Restarts a module
-     *
-     * @param name module name
-     */
-    Database::Entity::Module::Module RestartService(const std::string &name);
+        /**
+         * Starts a module
+         *
+         * @param name module name
+         */
+        Database::Entity::Module::Module StartService(const std::string &name);
 
-    /**
-     * Restarts all services
-     */
-    void RestartAllServices();
+        /**
+         * Starts all services
+         */
+        void StartAllServices();
 
-    /**
-     * Stops a module
-     *
-     * @param name module name
-     */
-    Database::Entity::Module::Module StopService(const std::string &name);
+        /**
+         * Restarts a module
+         *
+         * @param name module name
+         */
+        Database::Entity::Module::Module RestartService(const std::string &name);
 
-    /**
-     * Stops all services
-     */
-    void StopAllServices();
+        /**
+         * Restarts all services
+         */
+        void RestartAllServices();
 
-    /**
-     * Exports the current infrastructure
-     *
-     * @param services service name list
-     * @param prettyPrint JSON pretty print, if true JSON indent = 4
-     * @return JSON string
-     */
-    std::string ExportInfrastructure(const Dto::Common::Services &services, bool prettyPrint = false);
+        /**
+         * Stops a module
+         *
+         * @param name module name
+         */
+        Database::Entity::Module::Module StopService(const std::string &name);
 
-    /**
+        /**
+         * Stops all services
+         */
+        void StopAllServices();
+
+        /**
+         * Exports the current infrastructure
+         *
+         * @param services service name list
+         * @param prettyPrint JSON pretty print, if true JSON indent = 4
+         * @return JSON string
+         */
+        std::string ExportInfrastructure(const Dto::Common::Services &services, bool prettyPrint = false);
+
+        /**
      * Import the infrastructure
      *
      * @param jsonString infrastructure JSON string
      */
-    void ImportInfrastructure(const std::string &jsonString);
+        void ImportInfrastructure(const std::string &jsonString);
 
-    /**
-     * Cleans the current infrastructure.
-     *
-     * <p>All SQS queues, SNS topics, S3 buckets etc. will be deleted, as well as all objects.</p>
-     *
-     * @param services service name list
-     */
-    void CleanInfrastructure(const Dto::Common::Services &services);
+        /**
+         * Cleans the current infrastructure.
+         *
+         * <p>All SQS queues, SNS topics, S3 buckets etc. will be deleted, as well as all objects.</p>
+         *
+         * @param services service name list
+         */
+        void CleanInfrastructure(const Dto::Common::Services &services);
 
-    /**
-     * Cleans the objects from the infrastructure.
-     *
-     * <p>Cleans all objects from the infrastructure. This means all SQS messages, SNS messages, S3 object keys, etc. will be deleted.</p>
-     *
-     * @param services service name list
-     */
-    void CleanObjects(const Dto::Common::Services &services);
+        /**
+         * Cleans the objects from the infrastructure.
+         *
+         * <p>Cleans all objects from the infrastructure. This means all SQS messages, SNS messages, S3 object keys, etc. will be deleted.</p>
+         *
+         * @param services service name list
+         */
+        void CleanObjects(const Dto::Common::Services &services);
 
-  private:
+      private:
 
-    /**
-     * Configuration
-     */
-    Core::Configuration &_configuration;
+        /**
+         * Configuration
+         */
+        Core::Configuration &_configuration;
 
-    /**
-     * Server map
-     */
-    Service::ServerMap &_serverMap;
+        /**
+         * Server map
+         */
+        Service::ServerMap &_serverMap;
 
-    /**
-     * Module database
-     */
-    Database::ModuleDatabase &_moduleDatabase;
+        /**
+         * Module database
+         */
+        Database::ModuleDatabase &_moduleDatabase;
 
-    /**
-     * JSON pretty print
-     */
-    bool _prettyPrint;
-  };
+        /**
+         * JSON pretty print
+         */
+        bool _prettyPrint;
+    };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_MODULE_SERVICE_H
+#endif// AWSMOCK_SERVICE_MODULE_SERVICE_H

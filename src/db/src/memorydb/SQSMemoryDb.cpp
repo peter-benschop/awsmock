@@ -27,8 +27,8 @@ namespace AwsMock::Database {
     bool SQSMemoryDb::QueueArnExists(const std::string &queueArn) {
 
         return find_if(_queues.begin(), _queues.end(), [queueArn](const std::pair<std::string, Entity::SQS::Queue> &queue) {
-            return queue.second.queueArn == queueArn;
-        }) != _queues.end();
+                   return queue.second.queueArn == queueArn;
+               }) != _queues.end();
     }
 
     Entity::SQS::Queue SQSMemoryDb::CreateQueue(const Entity::SQS::Queue &queue) {
@@ -133,7 +133,6 @@ namespace AwsMock::Database {
                           });
         _queues[it->first] = queue;
         return _queues[it->first];
-
     }
 
     long SQSMemoryDb::CountQueues(const std::string &region) {
@@ -191,7 +190,6 @@ namespace AwsMock::Database {
                        [receiptHandle](const std::pair<std::string, Entity::SQS::Message> &message) {
                            return message.second.receiptHandle == receiptHandle;
                        }) != _messages.end();
-
     }
 
     Entity::SQS::Message SQSMemoryDb::GetMessageById(const std::string &oid) {
@@ -251,9 +249,7 @@ namespace AwsMock::Database {
                 if (message.second.region == region) {
                     messageList.emplace_back(message.second);
                 }
-
             }
-
         }
 
         log_trace << "Got message list, size: " << messageList.size();
@@ -268,8 +264,7 @@ namespace AwsMock::Database {
         // Get the cursor
         for (auto message: _messages) {
 
-            if (message.second.region == region && message.second.queueUrl == queueUrl
-                && message.second.status == Entity::SQS::MessageStatus::INITIAL) {
+            if (message.second.region == region && message.second.queueUrl == queueUrl && message.second.status == Entity::SQS::MessageStatus::INITIAL) {
 
                 message.second.retries++;
                 message.second.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
@@ -300,8 +295,7 @@ namespace AwsMock::Database {
         auto now = std::chrono::high_resolution_clock::now();
         for (auto message: _messages) {
 
-            if (message.second.queueUrl == queueUrl && message.second.status == Entity::SQS::MessageStatus::INVISIBLE
-                && message.second.reset < Poco::Timestamp(now.time_since_epoch().count() / 1000)) {
+            if (message.second.queueUrl == queueUrl && message.second.status == Entity::SQS::MessageStatus::INVISIBLE && message.second.reset < Poco::Timestamp(now.time_since_epoch().count() / 1000)) {
 
                 // Reset status
                 message.second.status = Entity::SQS::MessageStatus::INITIAL;
@@ -325,8 +319,7 @@ namespace AwsMock::Database {
         std::string dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(configuration, redrivePolicy.deadLetterTargetArn);
         for (auto message: _messages) {
 
-            if (message.second.queueUrl == queueUrl && message.second.status == Entity::SQS::MessageStatus::INITIAL
-                && message.second.retries > redrivePolicy.maxReceiveCount) {
+            if (message.second.queueUrl == queueUrl && message.second.status == Entity::SQS::MessageStatus::INITIAL && message.second.retries > redrivePolicy.maxReceiveCount) {
 
                 message.second.retries = 0;
                 message.second.queueUrl = dlqQueueUrl;
@@ -347,8 +340,7 @@ namespace AwsMock::Database {
 
         for (auto &message: _messages) {
 
-            if (message.second.queueUrl == queueUrl && message.second.status == Entity::SQS::MessageStatus::DELAYED
-                && message.second.reset < Poco::Timestamp(now.time_since_epoch().count() / 1000)) {
+            if (message.second.queueUrl == queueUrl && message.second.status == Entity::SQS::MessageStatus::DELAYED && message.second.reset < Poco::Timestamp(now.time_since_epoch().count() / 1000)) {
 
                 message.second.status = Entity::SQS::MessageStatus::INITIAL;
                 _messages[message.first] = message.second;
@@ -367,8 +359,7 @@ namespace AwsMock::Database {
 
         for (auto &message: _messages) {
 
-            if (message.second.queueUrl == queueUrl && message.second.status == Entity::SQS::MessageStatus::DELAYED
-                && message.second.reset < Poco::Timestamp(reset.time_since_epoch().count() / 1000)) {
+            if (message.second.queueUrl == queueUrl && message.second.status == Entity::SQS::MessageStatus::DELAYED && message.second.reset < Poco::Timestamp(reset.time_since_epoch().count() / 1000)) {
 
                 DeleteMessage(message.second);
                 count++;
@@ -458,4 +449,4 @@ namespace AwsMock::Database {
         log_debug << "All messages deleted, count: " << _messages.size();
         _messages.clear();
     }
-}
+}// namespace AwsMock::Database

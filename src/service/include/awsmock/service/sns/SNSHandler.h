@@ -12,60 +12,62 @@
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
-#include <awsmock/core/MetricService.h>
 #include <awsmock/core/MetricDefinition.h>
+#include <awsmock/core/MetricService.h>
 #include <awsmock/dto/common/SNSClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
-#include <awsmock/service/sns/SNSService.h>
 #include <awsmock/service/sns/SNSCmdHandler.h>
+#include <awsmock/service/sns/SNSService.h>
 
 namespace AwsMock::Service {
 
-  typedef std::map<std::string, std::string> AttributeList;
-
-  /**
-   * AWS SNS mock handler
-   */
-  class SNSHandler : public SNSCmdHandler {
-
-  public:
+    typedef std::map<std::string, std::string> AttributeList;
 
     /**
-     * Constructor
+     * AWS SNS mock handler
      *
-     * @param configuration application configuration
+     * @author jens.vogt@opitz-consulting.com
      */
-    explicit SNSHandler(Core::Configuration &configuration) : SNSCmdHandler(configuration), _configuration(configuration), _snsService(configuration) {}
+    class SNSHandler : public SNSCmdHandler {
 
-    /**
-     * HTTP POST request.
-     *
-     * @param request HTTP request
-     * @param response HTTP response
-     * @param region AWS region
-     * @param user AWS user
-     * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-     */
-    void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+      public:
 
-  private:
+        /**
+         * Constructor
+         *
+         * @param configuration application configuration
+         */
+        explicit SNSHandler(Core::Configuration &configuration) : SNSCmdHandler(configuration), _configuration(configuration), _snsService(configuration) {}
 
-    /**
-     * ImageHandler import configuration
-     */
-    Core::Configuration &_configuration;
+        /**
+         * HTTP POST request.
+         *
+         * @param request HTTP request
+         * @param response HTTP response
+         * @param region AWS region
+         * @param user AWS user
+         * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+         */
+        void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
-    /**
-     * SNS module
-     */
-    Service::SNSService _snsService;
+      private:
 
-    /**
-     * Default account ID
-     */
-    std::string _accountId;
-  };
+        /**
+         * ImageHandler import configuration
+         */
+        Core::Configuration &_configuration;
 
-} // namespace AwsMock::Service
+        /**
+         * SNS module
+         */
+        Service::SNSService _snsService;
 
-#endif // AWSMOCK_SERVICE_SNSHANDLER_H
+        /**
+         * Default account ID
+         */
+        std::string _accountId;
+    };
+
+}// namespace AwsMock::Service
+
+#endif// AWSMOCK_SERVICE_SNSHANDLER_H

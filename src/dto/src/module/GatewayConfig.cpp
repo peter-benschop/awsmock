@@ -6,71 +6,71 @@
 
 namespace AwsMock::Dto::Module {
 
-  std::string GatewayConfig::ToJson() const {
-    try {
-      Poco::JSON::Object gatewayConfigJson;
-      gatewayConfigJson.set("region", region);
-      gatewayConfigJson.set("protocol", protocol);
-      gatewayConfigJson.set("endpoint", endpoint);
-      gatewayConfigJson.set("host", host);
-      gatewayConfigJson.set("port", port);
-      gatewayConfigJson.set("accessId", accessId);
-      gatewayConfigJson.set("clientId", clientId);
-      gatewayConfigJson.set("user", user);
-      gatewayConfigJson.set("dataDir", dataDir);
-      gatewayConfigJson.set("prettyPrint", prettyPrint);
-      gatewayConfigJson.set("databaseActive", databaseActive);
+    std::string GatewayConfig::ToJson() const {
+        try {
+            Poco::JSON::Object gatewayConfigJson;
+            gatewayConfigJson.set("region", region);
+            gatewayConfigJson.set("protocol", protocol);
+            gatewayConfigJson.set("endpoint", endpoint);
+            gatewayConfigJson.set("host", host);
+            gatewayConfigJson.set("port", port);
+            gatewayConfigJson.set("accessId", accessId);
+            gatewayConfigJson.set("clientId", clientId);
+            gatewayConfigJson.set("user", user);
+            gatewayConfigJson.set("dataDir", dataDir);
+            gatewayConfigJson.set("prettyPrint", prettyPrint);
+            gatewayConfigJson.set("databaseActive", databaseActive);
 
-      return Core::JsonUtils::ToJsonString(gatewayConfigJson);
+            return Core::JsonUtils::ToJsonString(gatewayConfigJson);
 
-    } catch (Poco::Exception &exc) {
-      log_error << exc.message();
-      throw Core::JsonException(exc.message());
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }
     }
-  }
 
-  GatewayConfig GatewayConfig::FromJson(const std::string &payload) {
-    if (payload.empty()) {
-      return {};
+    GatewayConfig GatewayConfig::FromJson(const std::string &payload) {
+        if (payload.empty()) {
+            return {};
+        }
+        GatewayConfig gatewayConfig;
+
+        Poco::JSON::Parser parser;
+        Poco::Dynamic::Var result = parser.parse(payload);
+        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+
+        try {
+            Core::JsonUtils::GetJsonValueString("region", rootObject, gatewayConfig.region);
+            Core::JsonUtils::GetJsonValueString("protocol", rootObject, gatewayConfig.protocol);
+            Core::JsonUtils::GetJsonValueString("endpoint", rootObject, gatewayConfig.endpoint);
+            Core::JsonUtils::GetJsonValueString("host", rootObject, gatewayConfig.host);
+            Core::JsonUtils::GetJsonValueInt("port", rootObject, gatewayConfig.port);
+            Core::JsonUtils::GetJsonValueString("accessId", rootObject, gatewayConfig.accessId);
+            Core::JsonUtils::GetJsonValueString("clientId", rootObject, gatewayConfig.clientId);
+            Core::JsonUtils::GetJsonValueString("user", rootObject, gatewayConfig.user);
+            Core::JsonUtils::GetJsonValueString("dataDir", rootObject, gatewayConfig.dataDir);
+            Core::JsonUtils::GetJsonValueBool("prettyPrint", rootObject, gatewayConfig.prettyPrint);
+            Core::JsonUtils::GetJsonValueBool("databaseActive", rootObject, gatewayConfig.databaseActive);
+
+            // Cleanup
+            parser.reset();
+
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }
+        return gatewayConfig;
     }
-    GatewayConfig gatewayConfig;
 
-    Poco::JSON::Parser parser;
-    Poco::Dynamic::Var result = parser.parse(payload);
-    const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
-    try {
-      Core::JsonUtils::GetJsonValueString("region", rootObject, gatewayConfig.region);
-      Core::JsonUtils::GetJsonValueString("protocol", rootObject, gatewayConfig.protocol);
-      Core::JsonUtils::GetJsonValueString("endpoint", rootObject, gatewayConfig.endpoint);
-      Core::JsonUtils::GetJsonValueString("host", rootObject, gatewayConfig.host);
-      Core::JsonUtils::GetJsonValueInt("port", rootObject, gatewayConfig.port);
-      Core::JsonUtils::GetJsonValueString("accessId", rootObject, gatewayConfig.accessId);
-      Core::JsonUtils::GetJsonValueString("clientId", rootObject, gatewayConfig.clientId);
-      Core::JsonUtils::GetJsonValueString("user", rootObject, gatewayConfig.user);
-      Core::JsonUtils::GetJsonValueString("dataDir", rootObject, gatewayConfig.dataDir);
-      Core::JsonUtils::GetJsonValueBool("prettyPrint", rootObject, gatewayConfig.prettyPrint);
-      Core::JsonUtils::GetJsonValueBool("databaseActive", rootObject, gatewayConfig.databaseActive);
-
-      // Cleanup
-      parser.reset();
-
-    } catch (Poco::Exception &exc) {
-      log_error << exc.message();
-      throw Core::JsonException(exc.message());
+    std::string GatewayConfig::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
     }
-    return gatewayConfig;
-  }
 
-  std::string GatewayConfig::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+    std::ostream &operator<<(std::ostream &os, const GatewayConfig &g) {
+        os << "GatewayConfig=" << g.ToJson();
+        return os;
+    }
 
-  std::ostream &operator<<(std::ostream &os, const GatewayConfig &g) {
-    os << "GatewayConfig=" << g.ToJson();
-    return os;
-  }
-
-} // namespace AwsMock::Dto
+}// namespace AwsMock::Dto::Module

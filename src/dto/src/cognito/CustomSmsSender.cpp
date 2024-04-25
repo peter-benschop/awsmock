@@ -6,47 +6,47 @@
 
 namespace AwsMock::Dto::Cognito {
 
-  std::string CustomSmsSender::ToJson() const {
+    std::string CustomSmsSender::ToJson() const {
 
-    try {
+        try {
 
-      Poco::JSON::Object rootJson;
-      rootJson.set("lambdaArn", lambdaArn);
-      rootJson.set("lambdaVersion", lambdaVersion);
+            Poco::JSON::Object rootJson;
+            rootJson.set("lambdaArn", lambdaArn);
+            rootJson.set("lambdaVersion", lambdaVersion);
 
-      return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::JsonUtils::ToJsonString(rootJson);
 
-    } catch (Poco::Exception &exc) {
-      log_error << exc.message();
-      throw Core::JsonException(exc.message());
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }
     }
-  }
 
-  Poco::JSON::Object CustomSmsSender::ToJsonObject() const {
+    Poco::JSON::Object CustomSmsSender::ToJsonObject() const {
 
-    try {
+        try {
 
-      Poco::JSON::Object rootJson;
-      rootJson.set("lambdaArn", lambdaArn);
-      rootJson.set("lambdaVersion", lambdaVersion);
+            Poco::JSON::Object rootJson;
+            rootJson.set("lambdaArn", lambdaArn);
+            rootJson.set("lambdaVersion", lambdaVersion);
 
-      return rootJson;
+            return rootJson;
 
-    } catch (Poco::Exception &exc) {
-      log_error << exc.message();
-      throw Core::JsonException(exc.message());
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }
     }
-  }
 
-  std::string CustomSmsSender::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+    std::string CustomSmsSender::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
+    }
 
-  std::ostream &operator<<(std::ostream &os, const CustomSmsSender &r) {
-    os << "CustomSmsSender=" << r.ToJson();
-    return os;
-  }
+    std::ostream &operator<<(std::ostream &os, const CustomSmsSender &r) {
+        os << "CustomSmsSender=" << r.ToJson();
+        return os;
+    }
 
-}
+}// namespace AwsMock::Dto::Cognito

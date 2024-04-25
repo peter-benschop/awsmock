@@ -6,42 +6,41 @@
 #define AWSMOCK_DTO_SQS_QUEUEATTRIBUTE_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 #include <vector>
 
 namespace AwsMock::Dto::SQS {
 
-  struct QueueAttribute {
+    struct QueueAttribute {
 
-    /**
+        /**
      * MessageAttribute name
      */
-    std::string attributeName;
+        std::string attributeName;
 
-    /**
+        /**
      * MessageAttribute value
      */
-    std::string attributeValue;
+        std::string attributeValue;
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const QueueAttribute &r);
+        friend std::ostream &operator<<(std::ostream &os, const QueueAttribute &r);
+    };
 
-  };
+    typedef std::vector<QueueAttribute> QueueAttributeList;
 
-  typedef std::vector<QueueAttribute> QueueAttributeList;
+}// namespace AwsMock::Dto::SQS
 
-} // namespace AwsMock::Dto::SQS
-
-#endif // AWSMOCK_DTO_SQS_QUEUEATTRIBUTE_H
+#endif// AWSMOCK_DTO_SQS_QUEUEATTRIBUTE_H

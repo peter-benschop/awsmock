@@ -15,58 +15,59 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/MetricService.h>
 #include <awsmock/core/MetricDefinition.h>
+#include <awsmock/core/MetricService.h>
 #include <awsmock/dto/common/SQSClientCommand.h>
-#include <awsmock/dto/sqs/GetQueueUrlRequest.h>
-#include <awsmock/dto/sqs/GetQueueUrlResponse.h>
 #include <awsmock/dto/sqs/DeleteMessageBatchEntry.h>
 #include <awsmock/dto/sqs/DeleteMessageBatchRequest.h>
+#include <awsmock/dto/sqs/GetQueueUrlRequest.h>
+#include <awsmock/dto/sqs/GetQueueUrlResponse.h>
 #include <awsmock/service/common/AbstractHandler.h>
-#include <awsmock/service/sqs/SQSService.h>
 #include <awsmock/service/sqs/SQSCmdHandler.h>
+#include <awsmock/service/sqs/SQSService.h>
 
 #define DEFAULT_SQS_ACCOUNT_ID "000000000000"
 
 namespace AwsMock::Service {
 
-  /**
-   * UserAttribute  list
-   */
-  typedef std::map<std::string, std::string> AttributeList;
-
-  /**
-   * AWS S3 mock handler.
-   *
-   * <p>The SQS request are coming in two different flavours. Using the AWS CLI the queue URL is part of the HTTP parameters in the body of the message. Both are
-   * using POST request, whereas the Java SDK is providing the queue-url as part of the HTTP URL in the header of the request.</p>
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  class SQSHandler : public SQSCmdHandler {
-
-  public:
-
     /**
-     * Constructor
+     * SQS handler
      *
-     * @param configuration application configuration
+     * @author jens.vogt@opitz-consulting.com
      */
-    explicit SQSHandler(Core::Configuration &configuration) : SQSCmdHandler(configuration) {}
+    typedef std::map<std::string, std::string> AttributeList;
 
     /**
-       * HTTP POST request.
-       *
-       * @param request HTTP request
-       * @param response HTTP response
-       * @param region AWS region
-       * @param user AWS user
-       * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-       */
-    void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+     * AWS S3 mock handler.
+     *
+     * <p>The SQS request are coming in two different flavours. Using the AWS CLI the queue URL is part of the HTTP parameters in the body of the message. Both are
+     * using POST request, whereas the Java SDK is providing the queue-url as part of the HTTP URL in the header of the request.</p>
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
+    class SQSHandler : public SQSCmdHandler {
 
-  };
+      public:
 
-} // namespace AwsMock::Service
+        /**
+         * Constructor
+         *
+         * @param configuration application configuration
+         */
+        explicit SQSHandler(Core::Configuration &configuration) : SQSCmdHandler(configuration) {}
 
-#endif // AWSMOCK_SERVICE_SQS_HANDLER_H
+        /**
+         * HTTP POST request.
+         *
+         * @param request HTTP request
+         * @param response HTTP response
+         * @param region AWS region
+         * @param user AWS user
+         * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+         */
+        void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+    };
+
+}// namespace AwsMock::Service
+
+#endif// AWSMOCK_SERVICE_SQS_HANDLER_H

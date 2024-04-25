@@ -412,11 +412,7 @@ namespace AwsMock::Core {
     }
 
     std::string Crypto::HexEncode(const std::string &hash) {
-        std::stringstream ss;
-        for (unsigned char i: hash) {
-            ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(i);
-        }
-        return {ss.str()};
+        return HexEncode((unsigned char *) hash.c_str(), (int) hash.length());
     }
 
     std::string Crypto::HexEncode(unsigned char *hash, int size) {
@@ -426,4 +422,93 @@ namespace AwsMock::Core {
         }
         return {ss.str()};
     }
-}
+
+    EVP_PKEY *Crypto::GenerateRsaKeys(unsigned int keyLength) {
+        EVP_PKEY *pRSA = EVP_RSA_gen(keyLength);
+        if (!pRSA) {
+            log_error << "Could not generate RSA key, length:" << keyLength;
+            return nullptr;
+        }
+        std::string tmp = GetRsaPublicKey(pRSA);
+        return pRSA;
+    }
+
+    std::string Crypto::GetRsaPublicKey(EVP_PKEY *pRSA) {
+
+        BIO *bp = BIO_new(BIO_s_mem());
+        PEM_write_bio_PUBKEY(bp, pRSA);
+
+        int size;
+        char *buf = (char *) malloc(CRYPTO_RSA_KEY_LINE_LENGTH);
+        std::ostringstream sstream;
+        do {
+            size = BIO_gets(bp, buf, CRYPTO_RSA_KEY_LINE_LENGTH);
+            sstream << buf;
+        } while (size > 0);
+        free(buf);
+
+        return sstream.str();
+    }
+
+    std::string Crypto::GetRsaPrivateKey(EVP_PKEY *pRSA) {
+
+        BIO *bp = BIO_new(BIO_s_mem());
+        PEM_write_bio_PUBKEY(bp, pRSA);
+
+        int size;
+        char *buf = (char *) malloc(CRYPTO_RSA_KEY_LINE_LENGTH);
+        std::ostringstream sstream;
+        PEM_write_bio_PrivateKey(bp, pRSA, nullptr, nullptr, 0, nullptr, nullptr);
+        do {
+            size = BIO_gets(bp, buf, CRYPTO_RSA_KEY_LINE_LENGTH);
+            sstream << buf;
+        } while (size > 0);
+        free(buf);
+
+        return sstream.str();
+    }
+
+    std::string Crypto::RsaEncrypt(EVP_PKEY *keyPair, const std::string &in) {
+
+        EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new(keyPair, nullptr);
+        EVP_PKEY_encrypt_init(ctx);
+        EVP_PKEY_CTX_set_rsa_padding(ctx, RSA_PKCS1_OAEP_PADDING);
+
+        size_t outLen;
+        if (EVP_PKEY_encrypt(ctx, nullptr, &outLen, reinterpret_cast<const unsigned char *>(in.c_str()), in.length()) < 0) {
+            log_error << "Could not get length of encrypted string";
+        };
+
+        auto *encrypt = (unsigned char *) OPENSSL_malloc(outLen);
+        if (EVP_PKEY_encrypt(ctx, encrypt, &outLen, reinterpret_cast<const unsigned char *>(in.c_str()), in.length()) < 0) {
+            log_error << "Could not encrypt string";
+        }
+        EVP_PKEY_CTX_free(ctx);
+        encrypt[outLen] = '0';
+        return Base64Encode({reinterpret_cast<const char *>(encrypt), outLen});
+    }
+
+    std::string Crypto::RsaDecrypt(EVP_PKEY *keyPair, const std::string &in) {
+
+        std::string inString = Base64Decode(in);
+        auto *bytes = reinterpret_cast<const unsigned char *>(inString.c_str());
+
+        EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new(keyPair, nullptr);
+        EVP_PKEY_decrypt_init(ctx);
+        EVP_PKEY_CTX_set_rsa_padding(ctx, RSA_PKCS1_OAEP_PADDING);
+
+        size_t outLen;
+        if (EVP_PKEY_decrypt(ctx, nullptr, &outLen, bytes, inString.length()) < 0) {
+            log_error << "Could not get length of encrypted string";
+        };
+
+        auto *decrypt = (unsigned char *) OPENSSL_malloc(outLen);
+        if (EVP_PKEY_decrypt(ctx, decrypt, &outLen, bytes, inString.length()) < 0) {
+            log_error << "Could not decrypt string";
+        }
+        EVP_PKEY_CTX_free(ctx);
+        decrypt[outLen] = '\0';
+        return {reinterpret_cast<const char *>(decrypt)};
+    }
+
+}// namespace AwsMock::Core

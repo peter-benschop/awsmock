@@ -30,17 +30,17 @@ namespace AwsMock::Service {
         std::string transferArn = Core::AwsUtils::CreateTransferArn(request.region, _accountId, serverId);
 
         // Create entity
-        transferEntity = {.region=request.region, .serverId=serverId, .arn=transferArn, .protocols=request.protocols, .port=_ftpPort};
+        transferEntity = {.region = request.region, .serverId = serverId, .arn = transferArn, .protocols = request.protocols, .port = _ftpPort};
 
         // Add anonymous user
-        Database::Entity::Transfer::User anonymousUser = {.userName="anonymous", .password="123", .homeDirectory="/"};
+        Database::Entity::Transfer::User anonymousUser = {.userName = "anonymous", .password = "123", .homeDirectory = "/"};
         transferEntity.users.emplace_back(anonymousUser);
 
         transferEntity = _transferDatabase.CreateTransfer(transferEntity);
 
         // Create response
         Dto::Transfer::CreateServerResponse
-                response{.region=transferEntity.region, .serverId=serverId, .arn=transferArn};
+                response{.region = transferEntity.region, .serverId = serverId, .arn = transferArn};
 
         return response;
     }
@@ -72,10 +72,9 @@ namespace AwsMock::Service {
             // Add user
             Database::Entity::Transfer::User
                     user = {
-                    .userName=request.userName,
-                    .password=Core::StringUtils::GenerateRandomPassword(8),
-                    .homeDirectory=request.homeDirectory
-            };
+                            .userName = request.userName,
+                            .password = Core::StringUtils::GenerateRandomPassword(8),
+                            .homeDirectory = request.homeDirectory};
             transferEntity.users.emplace_back(user);
 
             // Update database
@@ -84,7 +83,7 @@ namespace AwsMock::Service {
         }
 
         // Create response
-        Dto::Transfer::CreateUserResponse response{.region=transferEntity.region, .serverId=transferEntity.serverId, .userName=request.userName};
+        Dto::Transfer::CreateUserResponse response{.region = transferEntity.region, .serverId = transferEntity.serverId, .userName = request.userName};
 
         return response;
     }
@@ -98,10 +97,10 @@ namespace AwsMock::Service {
             response.nextToken = Poco::UUIDGenerator().createRandom().toString();
             for (const auto &s: servers) {
                 Dto::Transfer::Server server = {
-                        .arn=s.arn,
-                        .serverId=s.serverId,
-                        .state=s.state,
-                        .userCount=static_cast<int>(s.users.size())};
+                        .arn = s.arn,
+                        .serverId = s.serverId,
+                        .state = s.state,
+                        .userCount = static_cast<int>(s.users.size())};
                 response.servers.emplace_back(server);
             }
 
@@ -197,4 +196,4 @@ namespace AwsMock::Service {
             throw Core::ServiceException(ex.message(), 500);
         }
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

@@ -22,4 +22,4 @@ namespace AwsMock::Service {
         }
         log_debug << "Lambda invocation finished send, status: " << response.statusCode;
     }
-}
+}// namespace AwsMock::Service

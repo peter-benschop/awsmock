@@ -6,15 +6,15 @@
 #define AWSMOCK_SERVICE_SECRETSMANAGER_SERVER_H
 
 // C++ standard includes
-#include <string>
 #include <chrono>
 #include <condition_variable>
+#include <string>
 
 // Poco includes
+#include <Poco/Condition.h>
 #include <Poco/Logger.h>
 #include <Poco/Runnable.h>
 #include <Poco/SignalHandler.h>
-#include <Poco/Condition.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
@@ -26,14 +26,14 @@
 
 #define SECRETSMANAGER_DEFAULT_PORT 9507
 #define SECRETSMANAGER_DEFAULT_HOST "localhost"
-#define SECRETSMANAGER_DEFAULT_QUEUE_LENGTH  250
+#define SECRETSMANAGER_DEFAULT_QUEUE_LENGTH 250
 #define SECRETSMANAGER_DEFAULT_THREADS 50
 #define SECRETSMANAGER_DEFAULT_TIMEOUT 120
 #define SECRETSMANAGER_DEFAULT_MONITORING_PERIOD 300
 
 namespace AwsMock::Service {
 
-  /**
+    /**
    * Secret manager server.
    *
    * <p>
@@ -42,85 +42,85 @@ namespace AwsMock::Service {
    *
    * @author jens.vogt@opitz-consulting.com
    */
-  class SecretsManagerServer : public AbstractServer {
+    class SecretsManagerServer : public AbstractServer {
 
-    public:
+      public:
 
-      /**
-       * Constructor
-       *
-       * @param configuration aws-mock configuration
-       */
-      explicit SecretsManagerServer(Core::Configuration &configuration);
+        /**
+         * Constructor
+         *
+         * @param configuration aws-mock configuration
+         */
+        explicit SecretsManagerServer(Core::Configuration &configuration);
 
-      /**
-       * Timer initialization
-       */
-      void Initialize() override;
+        /**
+         * Timer initialization
+         */
+        void Initialize() override;
 
-      /**
-       * Main method
-       */
-      void Run() override;
+        /**
+         * Main method
+         */
+        void Run() override;
 
-      /**
-       * Shutdown
-       */
-      void Shutdown() override;
+        /**
+         * Shutdown
+         */
+        void Shutdown() override;
 
-    private:
+      private:
 
-      /**
-       * Configuration
-       */
-      Core::Configuration &_configuration;
+        /**
+         * Configuration
+         */
+        Core::Configuration &_configuration;
 
-      /**
-       * S3 database
-       */
-      Database::ModuleDatabase &_moduleDatabase;
+        /**
+         * Module database
+         */
+        Database::ModuleDatabase &_moduleDatabase;
 
-      /**
-       * S3 monitoring
-       */
-      std::shared_ptr<SecretsManagerMonitoring> _secretsManagerMonitoring;
+        /**
+         * Monitoring
+         */
+        std::shared_ptr<SecretsManagerMonitoring> _secretsManagerMonitoring;
 
-      /**
-       * AWS region
-       */
-      std::string _region;
+        /**
+         * AWS region
+         */
+        std::string _region;
 
-      /**
-       * Rest port
-       */
-      int _port;
+        /**
+         * Rest port
+         */
+        int _port;
 
-      /**
-       * Rest host
-       */
-      std::string _host;
+        /**
+         * Rest host
+         */
+        std::string _host;
 
-      /**
-       * HTTP max message queue length
-       */
-      int _maxQueueLength;
+        /**
+         * HTTP max message queue length
+         */
+        int _maxQueueLength;
 
-      /**
-       * HTTP max concurrent connections
-       */
-      int _maxThreads;
+        /**
+         * HTTP max concurrent connections
+         */
+        int _maxThreads;
 
-      /**
-       * HTTP request timeout in seconds
-       */
-      int _requestTimeout;
+        /**
+         * HTTP request timeout in seconds
+         */
+        int _requestTimeout;
 
-      /**
-       * Monitoring period
-       */
-      int _monitoringPeriod;
-  };
+        /**
+         * Monitoring period
+         */
+        int _monitoringPeriod;
+    };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_SECRETSMANAGER_SERVER_H
+#endif// AWSMOCK_SERVICE_SECRETSMANAGER_SERVER_H

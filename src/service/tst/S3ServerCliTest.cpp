@@ -9,11 +9,11 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
+#include "awsmock/service/s3/S3Server.h"
+#include "awsmock/service/s3/S3Service.h"
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/repository/S3Database.h>
-#include "awsmock/service/s3/S3Server.h"
-#include "awsmock/service/s3/S3Service.h"
 
 // Test includes
 #include <awsmock/core/TestUtils.h>
@@ -26,198 +26,198 @@
 
 namespace AwsMock::Service {
 
-  class S3ServerCliTest : public ::testing::Test {
+    class S3ServerCliTest : public ::testing::Test {
 
-    protected:
+      protected:
 
-    void SetUp() override {
+        void SetUp() override {
 
-      // Define endpoint
-      std::string _port = _configuration.getString("awsmock.service.s3.port", std::to_string(S3_DEFAULT_PORT));
-      std::string _host = _configuration.getString("awsmock.service.s3.host", S3_DEFAULT_HOST);
-      _configuration.setString("awsmock.service.gateway.port", _port);
-      _accountId = _configuration.getString("awsmock.account.userPoolId", S3_ACCOUNT_ID);
-      _endpoint = "http://" + _host + ":" + _port;
-      _output = "json";
+            // Define endpoint
+            std::string _port = _configuration.getString("awsmock.service.s3.port", std::to_string(S3_DEFAULT_PORT));
+            std::string _host = _configuration.getString("awsmock.service.s3.host", S3_DEFAULT_HOST);
+            _configuration.setString("awsmock.service.gateway.port", _port);
+            _accountId = _configuration.getString("awsmock.account.userPoolId", S3_ACCOUNT_ID);
+            _endpoint = "http://" + _host + ":" + _port;
+            _output = "json";
 
-      // Start HTTP manager
-      _s3Server->Start();
+            // Start HTTP manager
+            _s3Server->Start();
+        }
+
+        void TearDown() override {
+            _database.DeleteAllObjects();
+            _database.DeleteAllBuckets();
+        }
+
+        std::string _endpoint, _accountId, _output;
+        Core::Configuration &_configuration = Core::Configuration::instance();
+        Database::S3Database _database = Database::S3Database();
+        std::shared_ptr<S3Server> _s3Server = std::make_shared<S3Server>(_configuration);
+    };
+
+    TEST_F(S3ServerCliTest, BucketCreateTest) {
+
+        // arrange
+
+        // act
+        Core::ExecResult result = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint + " --output " + _output);
+        EXPECT_EQ(0, result.status);
+        Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
+
+        // assert
+        EXPECT_EQ(0, result.status);
+        EXPECT_EQ(1, bucketList.size());
     }
 
-    void TearDown() override {
-      _database.DeleteAllObjects();
-      _database.DeleteAllBuckets();
+    TEST_F(S3ServerCliTest, BucketListTest) {
+
+        // arrange
+        std::string filename = Core::FileUtils::CreateTempFile("json", 10);
+        Core::ExecResult createResult = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createResult.status);
+
+        // act
+        Core::ExecResult result = Core::TestUtils::SendCliCommand("aws s3 ls --endpoint " + _endpoint);
+
+        // assert
+        EXPECT_EQ(0, result.status);
+        EXPECT_FALSE(result.output.empty());
+        EXPECT_TRUE(Core::StringUtils::Contains(result.output, TEST_BUCKET_NAME));
     }
 
-    std::string _endpoint, _accountId, _output;
-    Core::Configuration& _configuration = Core::Configuration::instance();
-    Database::S3Database _database = Database::S3Database();
-    std::shared_ptr<S3Server> _s3Server = std::make_shared<S3Server>(_configuration);
-  };
+    TEST_F(S3ServerCliTest, BucketDeleteTest) {
 
-  TEST_F(S3ServerCliTest, BucketCreateTest) {
+        // arrange
+        Core::ExecResult createResult = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createResult.status);
 
-    // arrange
+        // act
+        Core::ExecResult result = Core::TestUtils::SendCliCommand("aws s3 rb " + TEST_BUCKET + " --endpoint " + _endpoint);
+        Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
 
-    // act
-    Core::ExecResult result = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint + " --output " + _output);
-    EXPECT_EQ(0, result.status);
-    Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
+        // assert
+        EXPECT_EQ(0, result.status);
+        EXPECT_EQ(0, bucketList.size());
+    }
 
-    // assert
-    EXPECT_EQ(0, result.status);
-    EXPECT_EQ(1, bucketList.size());
-  }
+    TEST_F(S3ServerCliTest, ObjectCreateTest) {
 
-  TEST_F(S3ServerCliTest, BucketListTest) {
+        // arrange
+        std::string filename = Core::FileUtils::CreateTempFile("json", 10);
+        Core::ExecResult createResult = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createResult.status);
 
-    // arrange
-    std::string filename = Core::FileUtils::CreateTempFile("json", 10);
-    Core::ExecResult createResult = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
-    EXPECT_EQ(0, createResult.status);
+        // act
+        Core::ExecResult result = Core::TestUtils::SendCliCommand("aws s3 cp " + filename + " " + TEST_BUCKET + "/" + filename + " --endpoint " + _endpoint);
+        Database::Entity::S3::ObjectList objectList = _database.ListBucket("test-bucket");
 
-    // act
-    Core::ExecResult result = Core::TestUtils::SendCliCommand("aws s3 ls --endpoint " + _endpoint);
+        // assert
+        EXPECT_EQ(0, result.status);
+        EXPECT_EQ(1, objectList.size());
+    }
 
-    // assert
-    EXPECT_EQ(0, result.status);
-    EXPECT_FALSE(result.output.empty());
-    EXPECT_TRUE(Core::StringUtils::Contains(result.output, TEST_BUCKET_NAME));
-  }
+    TEST_F(S3ServerCliTest, ObjectGetTest) {
 
-  TEST_F(S3ServerCliTest, BucketDeleteTest) {
+        // arrange
+        std::string filename = Core::FileUtils::CreateTempFile("json", 10);
+        Core::ExecResult createBucketResult = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createBucketResult.status);
+        Core::ExecResult createObjectResult = Core::TestUtils::SendCliCommand("aws s3 cp " + filename + " " + TEST_BUCKET + "/" + filename + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createObjectResult.status);
 
-    // arrange
-    Core::ExecResult createResult = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
-    EXPECT_EQ(0, createResult.status);
+        // act
+        Core::ExecResult result = Core::TestUtils::SendCliCommand("aws s3 cp " + TEST_BUCKET + "/" + filename + " " + filename + " --endpoint " + _endpoint);
 
-    // act
-    Core::ExecResult result = Core::TestUtils::SendCliCommand("aws s3 rb " + TEST_BUCKET + " --endpoint " + _endpoint);
-    Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
+        // assert
+        EXPECT_EQ(0, result.status);
+        EXPECT_EQ(10, Core::FileUtils::FileSize(filename));
+        EXPECT_TRUE(Core::FileUtils::FileExists(filename));
+    }
 
-    // assert
-    EXPECT_EQ(0, result.status);
-    EXPECT_EQ(0, bucketList.size());
-  }
+    TEST_F(S3ServerCliTest, ObjectCopyTest) {
 
-  TEST_F(S3ServerCliTest, ObjectCreateTest) {
+        // arrange
+        std::string filename = Core::FileUtils::CreateTempFile("json", 10);
+        Core::ExecResult createBucketResult = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createBucketResult.status);
+        Core::ExecResult createObjectResult = Core::TestUtils::SendCliCommand("aws s3 cp " + filename + " " + TEST_BUCKET + "/" + filename + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createObjectResult.status);
 
-    // arrange
-    std::string filename = Core::FileUtils::CreateTempFile("json", 10);
-    Core::ExecResult createResult = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
-    EXPECT_EQ(0, createResult.status);
+        // act
+        Core::ExecResult copyResult = Core::TestUtils::SendCliCommand("aws s3 cp " + TEST_BUCKET + "/" + filename + " " + TEST_BUCKET + "/test/" + filename + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createObjectResult.status);
+        Database::Entity::S3::ObjectList objectList = _database.ListBucket(TEST_BUCKET_NAME);
 
-    // act
-    Core::ExecResult result = Core::TestUtils::SendCliCommand("aws s3 cp " + filename + " " + TEST_BUCKET + "/" + filename + " --endpoint " + _endpoint);
-    Database::Entity::S3::ObjectList objectList = _database.ListBucket("test-bucket");
+        // assert
+        EXPECT_EQ(2, objectList.size());
+        EXPECT_TRUE(objectList[0].key == "test/" + filename || objectList[0].key == filename);
+        EXPECT_TRUE(objectList[1].key == "test/" + filename || objectList[1].key == filename);
+    }
 
-    // assert
-    EXPECT_EQ(0, result.status);
-    EXPECT_EQ(1, objectList.size());
-  }
+    TEST_F(S3ServerCliTest, ObjectMoveTest) {
 
-  TEST_F(S3ServerCliTest, ObjectGetTest) {
+        // arrange
+        std::string filename = Core::FileUtils::CreateTempFile("json", 10);
+        std::string objectName = Core::StringUtils::Split(filename, '/')[2];
+        Core::ExecResult createBucketResult = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createBucketResult.status);
+        Core::ExecResult createObjectResult = Core::TestUtils::SendCliCommand("aws s3 cp " + filename + " " + TEST_BUCKET + "/" + objectName + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createObjectResult.status);
 
-    // arrange
-    std::string filename = Core::FileUtils::CreateTempFile("json", 10);
-    Core::ExecResult createBucketResult = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
-    EXPECT_EQ(0, createBucketResult.status);
-    Core::ExecResult createObjectResult = Core::TestUtils::SendCliCommand("aws s3 cp " + filename + " " + TEST_BUCKET + "/" + filename + " --endpoint " + _endpoint);
-    EXPECT_EQ(0, createObjectResult.status);
+        // act
+        Core::ExecResult moveResult = Core::TestUtils::SendCliCommand("aws s3 mv " + TEST_BUCKET + "/" + objectName + " " + TEST_BUCKET + "/test/" + objectName + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, moveResult.status);
+        Database::Entity::S3::ObjectList objectList = _database.ListBucket(TEST_BUCKET_NAME);
 
-    // act
-    Core::ExecResult result = Core::TestUtils::SendCliCommand("aws s3 cp " + TEST_BUCKET + "/" + filename + " " + filename + " --endpoint " + _endpoint);
+        // assert
+        EXPECT_EQ(1, objectList.size());
+        EXPECT_TRUE(objectList[0].key == "test/" + objectName);
+    }
 
-    // assert
-    EXPECT_EQ(0, result.status);
-    EXPECT_EQ(10, Core::FileUtils::FileSize(filename));
-    EXPECT_TRUE(Core::FileUtils::FileExists(filename));
-  }
+    TEST_F(S3ServerCliTest, ObjectMultipartUploadTest) {
 
-  TEST_F(S3ServerCliTest, ObjectCopyTest) {
+        // arrange: Create bucket
+        Core::ExecResult createBucketResult = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createBucketResult.status);
+        Core::ExecResult createMultipartResult = Core::TestUtils::SendCliCommand("aws s3api create-multipart-upload --bucket test-bucket --key multipart-upload.json --endpoint " + _endpoint);
+        EXPECT_EQ(0, createMultipartResult.status);
 
-    // arrange
-    std::string filename = Core::FileUtils::CreateTempFile("json", 10);
-    Core::ExecResult createBucketResult = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
-    EXPECT_EQ(0, createBucketResult.status);
-    Core::ExecResult createObjectResult = Core::TestUtils::SendCliCommand("aws s3 cp " + filename + " " + TEST_BUCKET + "/" + filename + " --endpoint " + _endpoint);
-    EXPECT_EQ(0, createObjectResult.status);
+        // arrange: CreateMultipartUpload
+        Dto::S3::CreateMultipartUploadResult s3Result;
+        s3Result.FromJson(createMultipartResult.output);
 
-    // act
-    Core::ExecResult copyResult = Core::TestUtils::SendCliCommand("aws s3 cp " + TEST_BUCKET + "/" + filename + " " + TEST_BUCKET + "/test/" + filename + " --endpoint " + _endpoint);
-    EXPECT_EQ(0, createObjectResult.status);
-    Database::Entity::S3::ObjectList objectList = _database.ListBucket(TEST_BUCKET_NAME);
+        // act
+        std::string filename = Core::FileUtils::CreateTempFile("json", 10 * 1024 * 1024);
+        Core::ExecResult uploadPartResult = Core::TestUtils::SendCliCommand("aws s3api upload-part --bucket test-bucket --key multipart-upload.json --part-number 1 --body " + filename + " --upload-userPoolId " + s3Result.uploadId + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, uploadPartResult.status);
 
-    // assert
-    EXPECT_EQ(2, objectList.size());
-    EXPECT_TRUE(objectList[0].key == "test/" + filename || objectList[0].key == filename);
-    EXPECT_TRUE(objectList[1].key == "test/" + filename || objectList[1].key == filename);
-  }
+        //aws s3api complete-multipart-upload --multipart-upload file://fileparts.json --bucket DOC-EXAMPLE-BUCKET --key large_test_file --upload-userPoolId exampleTUVGeKAk3Ob7qMynRKqe3ROcavPRwg92eA6JPD4ybIGRxJx9R0VbgkrnOVphZFK59KCYJAO1PXlrBSW7vcH7ANHZwTTf0ovqe6XPYHwsSp7eTRnXB1qjx40Tk
+        Core::ExecResult finishPartResult = Core::TestUtils::SendCliCommand("aws s3api complete-multipart-upload --bucket test-bucket --key multipart-upload.json --upload-userPoolId " + s3Result.uploadId + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, finishPartResult.status);
+        Database::Entity::S3::ObjectList objectList = _database.ListBucket(TEST_BUCKET_NAME);
 
-  TEST_F(S3ServerCliTest, ObjectMoveTest) {
+        // assert
+        EXPECT_EQ(1, objectList.size());
+        EXPECT_TRUE(objectList[0].key == "multipart-upload.json");
+    }
 
-    // arrange
-    std::string filename = Core::FileUtils::CreateTempFile("json", 10);
-    std::string objectName = Core::StringUtils::Split(filename, '/')[2];
-    Core::ExecResult createBucketResult = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
-    EXPECT_EQ(0, createBucketResult.status);
-    Core::ExecResult createObjectResult = Core::TestUtils::SendCliCommand("aws s3 cp " + filename + " " + TEST_BUCKET + "/" + objectName + " --endpoint " + _endpoint);
-    EXPECT_EQ(0, createObjectResult.status);
+    TEST_F(S3ServerCliTest, ObjectDeleteTest) {
 
-    // act
-    Core::ExecResult moveResult = Core::TestUtils::SendCliCommand("aws s3 mv " + TEST_BUCKET + "/" + objectName + " " + TEST_BUCKET + "/test/" + objectName + " --endpoint " + _endpoint);
-    EXPECT_EQ(0, moveResult.status);
-    Database::Entity::S3::ObjectList objectList = _database.ListBucket(TEST_BUCKET_NAME);
+        // arrange
+        std::string filename = Core::FileUtils::CreateTempFile("json", 10);
+        Core::ExecResult createBucketResult = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createBucketResult.status);
+        Core::ExecResult createObjectResult = Core::TestUtils::SendCliCommand("aws s3 cp " + filename + " " + TEST_BUCKET + "/" + filename + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createObjectResult.status);
 
-    // assert
-    EXPECT_EQ(1, objectList.size());
-    EXPECT_TRUE(objectList[0].key == "test/" + objectName);
-  }
+        // act
+        Core::ExecResult result = Core::TestUtils::SendCliCommand("aws s3 rm " + TEST_BUCKET + "/" + filename + " --endpoint " + _endpoint);
+        Database::Entity::S3::ObjectList objectList = _database.ListBucket("test-bucket");
 
-  TEST_F(S3ServerCliTest, ObjectMultipartUploadTest) {
+        // assert
+        EXPECT_EQ(0, result.status);
+        EXPECT_EQ(0, objectList.size());
+    }
+}// namespace AwsMock::Service
 
-    // arrange: Create bucket
-    Core::ExecResult createBucketResult = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
-    EXPECT_EQ(0, createBucketResult.status);
-    Core::ExecResult createMultipartResult = Core::TestUtils::SendCliCommand("aws s3api create-multipart-upload --bucket test-bucket --key multipart-upload.json --endpoint " + _endpoint);
-    EXPECT_EQ(0, createMultipartResult.status);
-
-    // arrange: CreateMultipartUpload
-    Dto::S3::CreateMultipartUploadResult s3Result;
-    s3Result.FromJson(createMultipartResult.output);
-
-    // act
-    std::string filename = Core::FileUtils::CreateTempFile("json", 10 * 1024 * 1024);
-    Core::ExecResult uploadPartResult = Core::TestUtils::SendCliCommand("aws s3api upload-part --bucket test-bucket --key multipart-upload.json --part-number 1 --body " + filename + " --upload-userPoolId " + s3Result.uploadId + " --endpoint " + _endpoint);
-    EXPECT_EQ(0, uploadPartResult.status);
-
-    //aws s3api complete-multipart-upload --multipart-upload file://fileparts.json --bucket DOC-EXAMPLE-BUCKET --key large_test_file --upload-userPoolId exampleTUVGeKAk3Ob7qMynRKqe3ROcavPRwg92eA6JPD4ybIGRxJx9R0VbgkrnOVphZFK59KCYJAO1PXlrBSW7vcH7ANHZwTTf0ovqe6XPYHwsSp7eTRnXB1qjx40Tk
-    Core::ExecResult finishPartResult = Core::TestUtils::SendCliCommand("aws s3api complete-multipart-upload --bucket test-bucket --key multipart-upload.json --upload-userPoolId " + s3Result.uploadId + " --endpoint " + _endpoint);
-    EXPECT_EQ(0, finishPartResult.status);
-    Database::Entity::S3::ObjectList objectList = _database.ListBucket(TEST_BUCKET_NAME);
-
-    // assert
-    EXPECT_EQ(1, objectList.size());
-    EXPECT_TRUE(objectList[0].key == "multipart-upload.json");
-  }
-
-  TEST_F(S3ServerCliTest, ObjectDeleteTest) {
-
-    // arrange
-    std::string filename = Core::FileUtils::CreateTempFile("json", 10);
-    Core::ExecResult createBucketResult = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
-    EXPECT_EQ(0, createBucketResult.status);
-    Core::ExecResult createObjectResult = Core::TestUtils::SendCliCommand("aws s3 cp " + filename + " " + TEST_BUCKET + "/" + filename + " --endpoint " + _endpoint);
-    EXPECT_EQ(0, createObjectResult.status);
-
-    // act
-    Core::ExecResult result = Core::TestUtils::SendCliCommand("aws s3 rm " + TEST_BUCKET + "/" + filename + " --endpoint " + _endpoint);
-    Database::Entity::S3::ObjectList objectList = _database.ListBucket("test-bucket");
-
-    // assert
-    EXPECT_EQ(0, result.status);
-    EXPECT_EQ(0, objectList.size());
-  }
-} // namespace AwsMock::Service
-
-#endif // AWMOCK_SERVICE_S3_SERVER_CLI_TEST_H
+#endif// AWMOCK_SERVICE_S3_SERVER_CLI_TEST_H

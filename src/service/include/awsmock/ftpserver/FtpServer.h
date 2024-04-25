@@ -17,10 +17,10 @@
 
 namespace AwsMock::FtpServer {
 
-  /** Private implementation */
-  class FtpServerImpl;
+    /** Private implementation */
+    class FtpServerImpl;
 
-  /**
+    /**
    * @brief The fineftp::TransferFtpServer is a simple FTP manager library.
    *
    * Using the TransferFtpServer class is simple:
@@ -39,11 +39,10 @@ namespace AwsMock::FtpServer {
    * @endcode
    *
    */
-  class FtpServer {
+    class FtpServer {
 
-  public:
-
-    /**
+      public:
+        /**
      * @brief Creates an FTP Server instance that will listen on the the given control port.
      *
      * If no port is provided, the default FTP Port 21 is used. If you want to
@@ -63,14 +62,14 @@ namespace AwsMock::FtpServer {
      * @param port: The port to StartServer the FTP manager on. Defaults to 21.
      * @param address: listen address
      */
-    explicit FtpServer(const Core::Configuration &configuration, std::string serverName, int port, std::string address);
+        explicit FtpServer(const Core::Configuration &configuration, std::string serverName, int port, std::string address);
 
-    /**
+        /**
      * Destructor
      */
-    ~FtpServer();
+        ~FtpServer();
 
-    /**
+        /**
      * @brief Adds a new user
      *
      * Adds a new user with a given username, password, local root path and
@@ -91,9 +90,9 @@ namespace AwsMock::FtpServer {
      *
      * @return True if adding the user was successful (i.e. it didn't exit already).
      */
-    bool addUser(const std::string &username, const std::string &password, const std::string &local_root_path, Permission permissions);
+        bool addUser(const std::string &username, const std::string &password, const std::string &local_root_path, Permission permissions);
 
-    /**
+        /**
      * @brief Adds the "anonymous" / "ftp" user that FTP clients use to access FTP servers without password
      *
      * @param local_root_path:  A path to any resource on the local filesystem that will be accessed by the user
@@ -101,43 +100,43 @@ namespace AwsMock::FtpServer {
      *
      * @return True if adding the anonymous user was successful (i.e. it didn't exit already).
      */
-    bool addUserAnonymous(const std::string &local_root_path, Permission permissions);
+        bool addUserAnonymous(const std::string &local_root_path, Permission permissions);
 
-    /**
+        /**
      * @brief Starts the FTP Server
      *
      * @param thread_count: The size of the thread pool to use. Must not be 0.
      *
      * @return True if the Server has been started successfully.
      */
-    bool start(size_t thread_count = 1);
+        bool start(size_t thread_count = 1);
 
-    /**
+        /**
      * @brief Stops the FTP Server
      *
      * All operations will be cancelled as fast as possible. The clients will
      * not be informed about the shutdown.
      */
-    void stop();
+        void stop();
 
-    /**
+        /**
      * @brief Sets the name of the manager
      */
-    void setName(const std::string &name) { _name = name; }
+        void setName(const std::string &name) { _name = name; }
 
-    /**
+        /**
      * @brief Returns the name of the manager
      */
-    std::string getName() { return _name; }
+        std::string getName() { return _name; }
 
-    /**
+        /**
      * @brief Returns the number of currently open connections
      *
      * @return the number of open connections
      */
-    int getOpenConnectionCount() const;
+        int getOpenConnectionCount() const;
 
-    /**
+        /**
      * @brief Get the control port that the FTP manager is listening on
      *
      * When the manager was created with a specific port (not 0), this port will
@@ -147,61 +146,60 @@ namespace AwsMock::FtpServer {
      *
      * @return The control port the manager is listening on
      */
-    [[nodiscard]] int getPort() const;
+        [[nodiscard]] int getPort() const;
 
-    /**
+        /**
      * @brief Get the ip address that the FTP manager is listening for.
      *
      * @return The ip address the FTP manager is listening for.
      */
-    [[nodiscard]] std::string getAddress() const;
+        [[nodiscard]] std::string getAddress() const;
 
-  private:
-
-    /**
+      private:
+        /**
      * Configuration
      */
-    const Core::Configuration &_configuration;
+        const Core::Configuration &_configuration;
 
-    /**
+        /**
      * Actual implementation
      */
-    std::unique_ptr<FtpServerImpl> _ftp_server;
+        std::unique_ptr<FtpServerImpl> _ftp_server;
 
-    /**
+        /**
      * Name of the manager
      */
-    std::string _serverName;
+        std::string _serverName;
 
-    /**
+        /**
      * Hostname for the manager
      */
-    std::string _host;
+        std::string _host;
 
-    /**
+        /**
      * IP address for the manager
      */
-    std::string _address;
+        std::string _address;
 
-    /**
+        /**
      * Hostname for the manager
      */
-    int _port;
+        int _port;
 
-    /**
+        /**
      * Name of the manager
      */
-    std::string _name;
+        std::string _name;
 
-    /**
+        /**
      * Maximal number of threads
      */
-    int _maxThreads;
+        int _maxThreads;
 
-    /**
+        /**
      * Data directory
      */
-    std::string _dataDir;
-  };
+        std::string _dataDir;
+    };
 
-}
+}// namespace AwsMock::FtpServer

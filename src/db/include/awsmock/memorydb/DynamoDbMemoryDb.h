@@ -6,9 +6,9 @@
 #define AWSMOCK_REPOSITORY_DYNAMODB_MEMORYDB_H
 
 // C++ standard includes
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
 
 // Poco includes
 #include <Poco/Mutex.h>
@@ -17,13 +17,13 @@
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include "awsmock/entity/dynamodb/Table.h"
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/entity/dynamodb/Item.h>
-#include "awsmock/entity/dynamodb/Table.h"
 #include <awsmock/repository/Database.h>
 
 namespace AwsMock::Database {
@@ -36,7 +36,6 @@ namespace AwsMock::Database {
     class DynamoDbMemoryDb {
 
       public:
-
         /**
          * Constructor
          */
@@ -162,7 +161,6 @@ namespace AwsMock::Database {
         void DeleteAllItems();
 
       private:
-
         /**
          * Table map
          */
@@ -184,6 +182,6 @@ namespace AwsMock::Database {
         Poco::Mutex _itemMutex;
     };
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
 
-#endif // AWSMOCK_REPOSITORY_DYNAMODB_MEMORYDB_H
+#endif// AWSMOCK_REPOSITORY_DYNAMODB_MEMORYDB_H

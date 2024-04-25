@@ -6,8 +6,8 @@
 #define AWMOCK_DTO_SQS_MESSAGE_ATTRBUTE_TEST_H
 
 // GTest includes
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
@@ -20,30 +20,30 @@
 
 namespace AwsMock::Dto::SQS {
 
-  class MessageAttributeTest : public ::testing::Test {
-    protected:
+    class MessageAttributeTest : public ::testing::Test {
+      protected:
 
-      void SetUp() override {
-      }
+        void SetUp() override {
+        }
 
-      void TearDown() override {
-      }
-  };
+        void TearDown() override {
+        }
+    };
 
-  TEST_F(MessageAttributeTest, AttributeMd5Test) {
+    TEST_F(MessageAttributeTest, AttributeMd5Test) {
 
-    // arrange
-    Dto::SQS::MessageAttributeList messageAttributes;
-    messageAttributes["my_attribute_name_1"] = {.stringValue="my_attribute_value_1", .type=Dto::SQS::MessageAttributeDataType::STRING, .systemAttribute=false};
-    messageAttributes["my_attribute_name_2"] = {.stringValue="my_attribute_value_2", .type=Dto::SQS::MessageAttributeDataType::STRING, .systemAttribute=false};
+        // arrange
+        Dto::SQS::MessageAttributeList messageAttributes;
+        messageAttributes["my_attribute_name_1"] = {.stringValue = "my_attribute_value_1", .type = Dto::SQS::MessageAttributeDataType::STRING, .systemAttribute = false};
+        messageAttributes["my_attribute_name_2"] = {.stringValue = "my_attribute_value_2", .type = Dto::SQS::MessageAttributeDataType::STRING, .systemAttribute = false};
 
-    // act
-    std::string result = MessageAttribute::GetMd5Attributes(messageAttributes);
+        // act
+        std::string result = MessageAttribute::GetMd5Attributes(messageAttributes);
 
-    // assert
-    EXPECT_FALSE(result.empty());
-    EXPECT_STREQ(result.c_str(), MD5_RESULT);
-  }
-}
+        // assert
+        EXPECT_FALSE(result.empty());
+        EXPECT_STREQ(result.c_str(), MD5_RESULT);
+    }
+}// namespace AwsMock::Dto::SQS
 
-#endif // AWMOCK_DTO_SQS_MESSAGE_ATTRBUTE_TEST_H
+#endif// AWMOCK_DTO_SQS_MESSAGE_ATTRBUTE_TEST_H

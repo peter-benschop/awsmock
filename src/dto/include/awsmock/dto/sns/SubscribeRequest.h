@@ -6,54 +6,53 @@
 #define AWSMOCK_DTO_SNS_SUBSCRIBEREQUEST_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 
 namespace AwsMock::Dto::SNS {
 
-  struct SubscribeRequest {
+    struct SubscribeRequest {
 
-    /**
+        /**
      * AWS region
      */
-    std::string region;
+        std::string region;
 
-    /**
+        /**
      * Topic ARN
      */
-    std::string topicArn;
+        std::string topicArn;
 
-    /**
+        /**
      * Protocol
      */
-    std::string protocol;
+        std::string protocol;
 
-    /**
+        /**
      * Endpoint
      */
-    std::string endpoint;
+        std::string endpoint;
 
-    /**
+        /**
      * Owner
      */
-    std::string owner;
+        std::string owner;
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const SubscribeRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const SubscribeRequest &r);
+    };
 
-  };
+}// namespace AwsMock::Dto::SNS
 
-} // namespace AwsMock::Dto::SNS
-
-#endif // AWSMOCK_DTO_SNS_SUBSCRIBEREQUEST_H
+#endif// AWSMOCK_DTO_SNS_SUBSCRIBEREQUEST_H

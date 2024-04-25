@@ -15,45 +15,43 @@
 
 namespace AwsMock::Service {
 
-  /**
-   * Secrets manager request handler factory
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  class SecretsManagerRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
-
-  public:
-
     /**
-     * Constructor
+     * Secrets manager request handler factory
      *
-     * @param configuration application configuration
-     * @param metricService  monitoring
+     * @author jens.vogt@opitz-consulting.com
      */
-    explicit SecretsManagerRequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
+    class SecretsManagerRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 
-    /**
-     * Create a new request handler
-     *
-     * @param request HTTP request
-     * @return pointer to request handler
-     */
-    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
-      if(request.getURI().empty()) {
-        return nullptr;
-      }
-      return new SecretsManagerHandler(_configuration);
-    }
+      public:
 
-  private:
+        /**
+         * Constructor
+         *
+         * @param configuration application configuration
+         */
+        explicit SecretsManagerRequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
 
-    /**
-     * S3 handler configuration
-     */
-    Core::Configuration &_configuration;
+        /**
+         * Create a new request handler
+         *
+         * @param request HTTP request
+         * @return pointer to request handler
+         */
+        Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
+            if (request.getURI().empty()) {
+                return nullptr;
+            }
+            return new SecretsManagerHandler(_configuration);
+        }
 
-  };
+      private:
 
-} // namespace AwsMock::Service
+        /**
+         * Configuration
+         */
+        Core::Configuration &_configuration;
+    };
 
-#endif //AWSMOCK_SERVICE_SECRETMANAGER_HANDLER_FACTORY_H
+}// namespace AwsMock::Service
+
+#endif//AWSMOCK_SERVICE_SECRETMANAGER_HANDLER_FACTORY_H

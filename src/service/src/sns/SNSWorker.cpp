@@ -26,4 +26,4 @@ namespace AwsMock::Service {
     void SNSWorker::DeleteOldMessages() {
         _snsDatabase.DeleteOldMessages(_messageTimeout);
     }
-}
+}// namespace AwsMock::Service

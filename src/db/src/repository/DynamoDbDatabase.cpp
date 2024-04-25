@@ -38,7 +38,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.CreateTable(table);
-
         }
     }
 
@@ -64,7 +63,6 @@ namespace AwsMock::Database {
             log_error << "Database exception " << exc.what();
             throw Core::DatabaseException("Database exception " + std::string(exc.what()));
         }
-
     }
 
     Entity::DynamoDb::Table DynamoDbDatabase::GetTableByRegionName(const std::string &region, const std::string &name) {
@@ -96,7 +94,6 @@ namespace AwsMock::Database {
 
             return _memoryDb.GetTableByRegionName(region, name);
         }
-
     }
 
     Entity::DynamoDb::Table DynamoDbDatabase::GetTableById(const std::string &oid) {
@@ -137,7 +134,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.TableExists(region, tableName);
-
         }
     }
 
@@ -167,7 +163,6 @@ namespace AwsMock::Database {
                         result.FromDocument(table);
                         tables.push_back(result);
                     }
-
                 }
 
             } catch (const mongocxx::exception &exc) {
@@ -199,7 +194,6 @@ namespace AwsMock::Database {
                 } else {
 
                     return _tableCollection.count_documents(make_document(kvp("region", region)));
-
                 }
 
             } catch (const mongocxx::exception &exc) {
@@ -222,7 +216,6 @@ namespace AwsMock::Database {
         } else {
 
             return CreateTable(table);
-
         }
     }
 
@@ -252,7 +245,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.UpdateTable(table);
-
         }
     }
 
@@ -280,7 +272,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteTable(tableName);
-
         }
     }
 
@@ -308,7 +299,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteAllTables();
-
         }
     }
 
@@ -337,7 +327,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.ItemExists(region, tableName, key);
-
         }
     }
 
@@ -376,7 +365,6 @@ namespace AwsMock::Database {
                         result.FromDocument(item);
                         items.push_back(result);
                     }
-
                 }
 
             } catch (const mongocxx::exception &exc) {
@@ -413,7 +401,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteItem(region, tableName, key);
-
         }
     }
 
@@ -436,8 +423,7 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteAllItems();
-
         }
     }
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database

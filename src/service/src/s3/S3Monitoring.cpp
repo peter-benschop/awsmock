@@ -30,4 +30,4 @@ namespace AwsMock::Service {
         }
         log_trace << "S3 update counter finished";
     }
-}
+}// namespace AwsMock::Service

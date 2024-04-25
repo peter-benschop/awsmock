@@ -1,13 +1,12 @@
 #pragma once
 
+#include <algorithm>
 #include <deque>
 #include <fstream>
-#include <iostream>
-#include <iomanip>
-#include <algorithm>
-#include <map>
 #include <functional>
-#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <map>
 #include <sstream>
 #include <utility>
 
@@ -19,14 +18,14 @@
 #include "Poco/Net/HTTPRequest.h"
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/ftpserver/FtpMessage.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/ftpserver/Filesystem.h>
-#include <awsmock/ftpserver/UserDatabase.h>
+#include <awsmock/ftpserver/FtpMessage.h>
 #include <awsmock/ftpserver/FtpUser.h>
+#include <awsmock/ftpserver/UserDatabase.h>
 #include <awsmock/service/common/AbstractWorker.h>
 #include <awsmock/service/s3/S3Service.h>
 
@@ -38,7 +37,6 @@ namespace AwsMock::FtpServer {
     class FtpSession : public std::enable_shared_from_this<FtpSession>, public Service::AbstractWorker {
 
       private:
-
         struct IoFile {
             IoFile(const std::string &filename, std::string user, std::ios::openmode mode) : file_stream_(filename, mode), stream_buffer_(1024 * 1024),
                                                                                              _fileName(filename), _user(std::move(user)) {
@@ -191,7 +189,6 @@ namespace AwsMock::FtpServer {
         // FTP data-socket send
         ////////////////////////////////////////////////////////
       private:
-
         void sendDirectoryListing(const std::map<std::string, FileStatus> &directory_content);
 
         void sendNameList(const std::map<std::string, FileStatus> &directory_content);
@@ -200,9 +197,10 @@ namespace AwsMock::FtpServer {
 
         void readDataFromFileAndSend(const std::shared_ptr<IoFile> &file, const std::shared_ptr<asio::ip::tcp::socket> &data_socket);
 
-        void addDataToBufferAndSend(const std::shared_ptr<std::vector<char>> &data,
-                                    const std::shared_ptr<asio::ip::tcp::socket> &data_socket,
-                                    const std::function<void(void)> &fetch_more = []() { return; });
+        void addDataToBufferAndSend(
+                const std::shared_ptr<std::vector<char>> &data,
+                const std::shared_ptr<asio::ip::tcp::socket> &data_socket,
+                const std::function<void(void)> &fetch_more = []() { return; });
 
         void writeDataToSocket(const std::shared_ptr<asio::ip::tcp::socket> &data_socket, const std::function<void(void)> &fetch_more);
 
@@ -214,9 +212,10 @@ namespace AwsMock::FtpServer {
 
         void receiveDataFromSocketAndWriteToFile(const std::shared_ptr<IoFile> &file, const std::shared_ptr<asio::ip::tcp::socket> &data_socket);
 
-        void writeDataToFile(const std::shared_ptr<std::vector<char>> &data,
-                             const std::shared_ptr<IoFile> &file,
-                             const std::function<void(void)> &fetch_more = []() { return; });
+        void writeDataToFile(
+                const std::shared_ptr<std::vector<char>> &data,
+                const std::shared_ptr<IoFile> &file,
+                const std::function<void(void)> &fetch_more = []() { return; });
 
         void endDataReceiving(const std::shared_ptr<IoFile> &file);
 
@@ -272,7 +271,6 @@ namespace AwsMock::FtpServer {
         // Member variables
         ////////////////////////////////////////////////////////
       private:
-
         /**
          * Configuration
          */
@@ -373,4 +371,4 @@ namespace AwsMock::FtpServer {
          */
         std::string _region;
     };
-}
+}// namespace AwsMock::FtpServer

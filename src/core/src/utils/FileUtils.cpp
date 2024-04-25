@@ -1,6 +1,6 @@
-#include <execution>
 #include "awsmock/core/FileUtils.h"
 #include "awsmock/core/ResourceNotFoundException.h"
+#include <execution>
 
 namespace AwsMock::Core {
 
@@ -24,8 +24,7 @@ namespace AwsMock::Core {
     }
 
     std::string FileUtils::GetTempFile(const std::string &dir, const std::string &extension) {
-        return dir + Poco::Path::separator()
-               + Poco::replace(Poco::toLower(Poco::Path::temp() + Poco::UUIDGenerator().createRandom().toString() + "." + extension), "-", "");
+        return dir + Poco::Path::separator() + Poco::replace(Poco::toLower(Poco::Path::temp() + Poco::UUIDGenerator().createRandom().toString() + "." + extension), "-", "");
     }
 
     std::string FileUtils::GetParentPath(const std::string &fileName) {
@@ -143,8 +142,8 @@ namespace AwsMock::Core {
     }
 
     std::string FileUtils::GetOwner(const std::string &fileName) {
-        struct stat info{};
-        stat(fileName.c_str(), &info);  // Error check omitted
+        struct stat info {};
+        stat(fileName.c_str(), &info);// Error check omitted
         struct passwd *pw = getpwuid(info.st_uid);
         if (pw) {
             return pw->pw_name;
@@ -224,4 +223,4 @@ namespace AwsMock::Core {
         CopyTo(tempFile, path);
         DeleteFile(tempFile);
     }
-}
+}// namespace AwsMock::Core

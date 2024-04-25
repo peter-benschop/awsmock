@@ -6,8 +6,8 @@
 #define AWSMOCK_DTO_COGNITO_LIST_USERPOOL_REQUEST_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // AwsMock includes
 #include <awsmock/core/JsonException.h>
@@ -16,48 +16,52 @@
 
 namespace AwsMock::Dto::Cognito {
 
-  struct ListUserPoolRequest {
-
     /**
-     * AWS region
-     */
-    std::string region;
-
-    /**
-     * Maximal number of results
-     */
-    int maxResults;
-
-    /**
-     * Convert from a JSON object.
+     * List user pool request
      *
-     * @param payload json string object
+     * @author jens.vogt@opitz-consulting.com
      */
-    void FromJson(const std::string &payload);
+    struct ListUserPoolRequest {
 
-    /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
-    [[nodiscard]] std::string ToJson() const;
+        /**
+         * AWS region
+         */
+        std::string region;
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * Maximal number of results
+         */
+        int maxResults;
 
-    /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const ListUserPoolRequest &i);
+        /**
+         * Convert from a JSON object.
+         *
+         * @param payload json string object
+         */
+        void FromJson(const std::string &payload);
 
-  };
+        /**
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
+        [[nodiscard]] std::string ToJson() const;
 
-} // namespace AwsMock::Dto::Cognito
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
 
-#endif // AWSMOCK_DTO_COGNITO_LIST_USERPOOL_REQUEST_H
+        /**
+         * Stream provider.
+         *
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const ListUserPoolRequest &i);
+    };
+
+}// namespace AwsMock::Dto::Cognito
+
+#endif// AWSMOCK_DTO_COGNITO_LIST_USERPOOL_REQUEST_H

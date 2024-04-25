@@ -11,14 +11,14 @@
 #include <Poco/Net/HTTPServer.h>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/repository/CognitoDatabase.h>
 #include <awsmock/repository/ModuleDatabase.h>
-#include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/common/AbstractWorker.h>
 #include <awsmock/service/cognito/CognitoHandlerFactory.h>
 #include <awsmock/service/cognito/CognitoMonitoring.h>
+#include <awsmock/service/common/AbstractServer.h>
+#include <awsmock/service/common/AbstractWorker.h>
 
 #define COGNITO_DEFAULT_PORT 9505
 #define COGNITO_DEFAULT_HOST "localhost"
@@ -37,6 +37,7 @@ namespace AwsMock::Service {
     class CognitoServer : public AbstractServer, public AbstractWorker {
 
       public:
+
         /**
          * Constructor
          *
@@ -147,6 +148,6 @@ namespace AwsMock::Service {
         int _monitoringPeriod;
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_COGNITO_SERVER_H
+#endif// AWSMOCK_SERVICE_COGNITO_SERVER_H

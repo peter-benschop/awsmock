@@ -6,45 +6,45 @@
 
 namespace AwsMock::Dto::Cognito {
 
-  void DeleteUserPoolRequest::FromJson(const std::string &payload) {
+    void DeleteUserPoolRequest::FromJson(const std::string &payload) {
 
-    Poco::JSON::Parser parser;
-    Poco::Dynamic::Var result = parser.parse(payload);
-    const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+        Poco::JSON::Parser parser;
+        Poco::Dynamic::Var result = parser.parse(payload);
+        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
-    try {
+        try {
 
-      Core::JsonUtils::GetJsonValueString("UserPoolId", rootObject, userPoolId);
+            Core::JsonUtils::GetJsonValueString("UserPoolId", rootObject, userPoolId);
 
-    } catch (Poco::Exception &exc) {
-      log_error << exc.message();
-      throw Core::JsonException(exc.message());
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }
     }
-  }
 
-  std::string DeleteUserPoolRequest::ToJson() const {
+    std::string DeleteUserPoolRequest::ToJson() const {
 
-    try {
+        try {
 
-      Poco::JSON::Object rootJson;
-      rootJson.set("UserPoolId", userPoolId);
+            Poco::JSON::Object rootJson;
+            rootJson.set("UserPoolId", userPoolId);
 
-      return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::JsonUtils::ToJsonString(rootJson);
 
-    } catch (Poco::Exception &exc) {
-      log_error << exc.message();
-      throw Core::JsonException(exc.message());
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }
     }
-  }
 
-  std::string DeleteUserPoolRequest::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+    std::string DeleteUserPoolRequest::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
+    }
 
-  std::ostream &operator<<(std::ostream &os, const DeleteUserPoolRequest &r) {
-    os << "DeleteUserPoolRequest=" << r.ToJson();
-    return os;
-  }
-}
+    std::ostream &operator<<(std::ostream &os, const DeleteUserPoolRequest &r) {
+        os << "DeleteUserPoolRequest=" << r.ToJson();
+        return os;
+    }
+}// namespace AwsMock::Dto::Cognito

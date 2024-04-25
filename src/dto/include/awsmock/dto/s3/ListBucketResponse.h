@@ -6,8 +6,8 @@
 #define AWSMOCK_DTO_S3_LIST_BUCKET_RESPONSE_H
 
 // C++ Standard includes
-#include <string>
 #include <sstream>
+#include <string>
 #include <vector>
 
 // AwsMock includes
@@ -21,109 +21,108 @@
 
 namespace AwsMock::Dto::S3 {
 
-  struct CommonPrefix {
+    struct CommonPrefix {
 
-    /**
+        /**
      * Prefix
      */
-    std::string _prefix;
-  };
+        std::string _prefix;
+    };
 
-  struct ListBucketResponse {
+    struct ListBucketResponse {
 
-    /**
+        /**
      * Truncation flag
      */
-    bool isTruncated = false;
+        bool isTruncated = false;
 
-    /**
+        /**
      * Contents
      */
-    std::vector<Content> contents;
+        std::vector<Content> contents;
 
-    /**
+        /**
      * Name
      */
-    std::string name;
+        std::string name;
 
-    /**
+        /**
      * Prefix
      */
-    std::string prefix;
+        std::string prefix;
 
-    /**
+        /**
      * Delimiter
      */
-    std::string delimiter;
+        std::string delimiter;
 
-    /**
+        /**
      * Maximal keys
      */
-    int maxKeys = 1000;
+        int maxKeys = 1000;
 
-    /**
+        /**
      * Encoding type
      */
-    std::string encodingType;
+        std::string encodingType;
 
-    /**
+        /**
      * Key count
      */
-    int keyCount = 0;
+        int keyCount = 0;
 
-    /**
+        /**
      * Continuation token
      */
-    std::string continuationToken;
+        std::string continuationToken;
 
-    /**
+        /**
      * Next continuation token
      */
-    std::string nextContinuationToken;
+        std::string nextContinuationToken;
 
-    /**
+        /**
      * Start after
      */
-    std::string startAfter;
+        std::string startAfter;
 
-    /**
+        /**
      * Convert to a JSON string
      *
      * @return JSON string
      */
-    [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
+        /**
      * Constructor
      *
      * @param bucket bucket
      * @param objectList object list
      */
-    ListBucketResponse(const std::string &bucket, const Database::Entity::S3::ObjectList &objectList);
+        ListBucketResponse(const std::string &bucket, const Database::Entity::S3::ObjectList &objectList);
 
-    /**
+        /**
      * Convert to XML representation
      *
      * @return XML string
      */
-    std::string ToXml();
+        std::string ToXml();
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const ListBucketResponse &r);
+        friend std::ostream &operator<<(std::ostream &os, const ListBucketResponse &r);
+    };
 
-  };
+}// namespace AwsMock::Dto::S3
 
-} // namespace AwsMock::Dto::S3
-
-#endif // AWSMOCK_DTO_S3_LIST_BUCKET_RESPONSE_H
+#endif// AWSMOCK_DTO_S3_LIST_BUCKET_RESPONSE_H

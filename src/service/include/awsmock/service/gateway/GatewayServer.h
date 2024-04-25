@@ -20,14 +20,13 @@
 #include <awsmock/dto/lambda/InvocationNotification.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/ModuleDatabase.h>
-#include <awsmock/service/s3/S3Service.h>
-#include <awsmock/service/common/AbstractWorker.h>
 #include <awsmock/service/common/AbstractServer.h>
+#include <awsmock/service/common/AbstractWorker.h>
 #include <awsmock/service/gateway/GatewayRouter.h>
-#include <awsmock/service/lambda/LambdaExecutor.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
 #include <awsmock/service/lambda/LambdaExecutor.h>
 #include <awsmock/service/lambda/LambdaHandlerFactory.h>
+#include <awsmock/service/s3/S3Service.h>
 
 #define GATEWAY_DEFAULT_HOST "localhost"
 #define GATEWAY_MAX_QUEUE 250
@@ -36,102 +35,106 @@
 
 namespace AwsMock::Service {
 
-  class GatewayServer : public AbstractServer {
-
-  public:
-
     /**
-     * Constructor
+     * Gateway server
      *
-     * @param configuration aws-mock configuration
-     * @param metricService aws-mock monitoring
+     * @author jens.vogt@opitz-consulting.com
      */
-    explicit GatewayServer(Core::Configuration &configuration, Core::MetricService &metricService);
+    class GatewayServer : public AbstractServer {
 
-    /**
-     * Destructor
-     */
-    ~GatewayServer() override;
+      public:
 
-    /**
-     * Timer initialization
-     */
-    void Initialize() override;
+        /**
+         * Constructor
+         *
+         * @param configuration aws-mock configuration
+         * @param metricService aws-mock monitoring
+         */
+        explicit GatewayServer(Core::Configuration &configuration, Core::MetricService &metricService);
 
-    /**
-     * Main method
-     */
-    void Run() override;
+        /**
+         * Destructor
+         */
+        ~GatewayServer() override;
 
-    /**
-     * Shutdown
-     */
-    void Shutdown() override;
+        /**
+         * Timer initialization
+         */
+        void Initialize() override;
 
-  private:
+        /**
+         * Main method
+         */
+        void Run() override;
 
-    /**
-     * Configuration
-     */
-    Core::Configuration &_configuration;
+        /**
+         * Shutdown
+         */
+        void Shutdown() override;
 
-    /**
-     * Metric module
-     */
-    Core::MetricService &_metricService;
+      private:
 
-    /**
-     * Service database
-     */
-    std::unique_ptr<Database::ModuleDatabase> _serviceDatabase;
+        /**
+         * Configuration
+         */
+        Core::Configuration &_configuration;
 
-    /**
-     * Running flag
-     */
-    bool _running;
+        /**
+         * Metric module
+         */
+        Core::MetricService &_metricService;
 
-    /**
-     * AWS region
-     */
-    std::string _region;
+        /**
+         * Service database
+         */
+        std::unique_ptr<Database::ModuleDatabase> _serviceDatabase;
 
-    /**
-     * Sleeping period in ms
-     */
-    int _period;
+        /**
+         * Running flag
+         */
+        bool _running;
 
-    /**
-     * Rest port
-     */
-    int _port;
+        /**
+         * AWS region
+         */
+        std::string _region;
 
-    /**
-     * Rest host
-     */
-    std::string _host;
+        /**
+         * Sleeping period in ms
+         */
+        int _period;
 
-    /**
-     * HTTP max message queue length
-     */
-    int _maxQueueLength;
+        /**
+         * Rest port
+         */
+        int _port;
 
-    /**
-     * HTTP max concurrent connection
-     */
-    int _maxThreads;
+        /**
+         * Rest host
+         */
+        std::string _host;
 
-    /**
-     * HTTP request timeout
-     */
-    int _requestTimeout;
+        /**
+         * HTTP max message queue length
+         */
+        int _maxQueueLength;
 
-    /**
-     * Gateway router
-     */
-    std::shared_ptr<Service::GatewayRouter> _router = std::make_shared<Service::GatewayRouter>(_configuration, _metricService);
+        /**
+         * HTTP max concurrent connection
+         */
+        int _maxThreads;
 
-  };
+        /**
+         * HTTP request timeout
+         */
+        int _requestTimeout;
 
-} // namespace AwsMock::Service
+        /**
+         * Gateway router
+         */
+        std::shared_ptr<Service::GatewayRouter> _router = std::make_shared<Service::GatewayRouter>(_configuration, _metricService);
+    };
 
-#endif // AWSMOCK_SERVER_GATEWAYSERVER_H
+}// namespace AwsMock::Service
+
+#endif// AWSMOCK_SERVER_GATEWAYSERVER_H

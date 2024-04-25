@@ -22,20 +22,19 @@ namespace AwsMock::Service {
             Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByName(request.region, request.topicName);
             log_debug << "Got topic: " << topic.topicArn;
             return {
-                    .region=topic.region,
-                    .name=topic.topicName,
-                    .owner=topic.owner,
-                    .topicArn=topic.topicArn
-            };
+                    .region = topic.region,
+                    .name = topic.topicName,
+                    .owner = topic.owner,
+                    .topicArn = topic.topicArn};
         }
 
         try {
             // Update database
             std::string topicArn = Core::AwsUtils::CreateSNSTopicArn(request.region, _accountId, request.topicName);
-            Database::Entity::SNS::Topic topic = _snsDatabase.CreateTopic({.region=request.region, .topicName=request.topicName, .owner=request.owner, .topicArn=topicArn});
+            Database::Entity::SNS::Topic topic = _snsDatabase.CreateTopic({.region = request.region, .topicName = request.topicName, .owner = request.owner, .topicArn = topicArn});
             log_trace << "SNS topic created: " << topic.ToString();
 
-            return {.region=topic.region, .name=topic.topicName, .owner=topic.owner, .topicArn=topic.topicArn};
+            return {.region = topic.region, .name = topic.topicName, .owner = topic.owner, .topicArn = topic.topicArn};
 
         } catch (Core::DatabaseException &exc) {
             log_error << "SNS create topic failed, message: " << exc.message();
@@ -73,7 +72,7 @@ namespace AwsMock::Service {
             }
 
             // Update database
-            _snsDatabase.DeleteTopic({.region=region, .topicArn=topicArn});
+            _snsDatabase.DeleteTopic({.region = region, .topicArn = topicArn});
 
         } catch (Poco::Exception &ex) {
             log_error << "SNS delete topic failed, message: " << ex.message();
@@ -101,18 +100,16 @@ namespace AwsMock::Service {
 
             // Update database
             std::string messageId = Core::AwsUtils::CreateMessageId();
-            message = _snsDatabase.CreateMessage({
-                                                         .region=request.region,
-                                                         .topicArn=request.topicArn,
-                                                         .targetArn=request.targetArn,
-                                                         .message=request.message,
-                                                         .messageId=messageId
-                                                 });
+            message = _snsDatabase.CreateMessage({.region = request.region,
+                                                  .topicArn = request.topicArn,
+                                                  .targetArn = request.targetArn,
+                                                  .message = request.message,
+                                                  .messageId = messageId});
 
             // Check subscriptions
             CheckSubscriptions(request);
 
-            return {.messageId=message.messageId};
+            return {.messageId = message.messageId};
 
         } catch (Poco::Exception &ex) {
             log_error << "SNS create message failed, message: " << ex.message();
@@ -138,22 +135,20 @@ namespace AwsMock::Service {
             Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
             std::string subscriptionArn = Core::AwsUtils::CreateSNSSubscriptionArn(request.region, _accountId, topic.topicName);
 
-            Database::Entity::SNS::Subscription subscription = {.protocol=request.protocol, .endpoint=request.endpoint};
+            Database::Entity::SNS::Subscription subscription = {.protocol = request.protocol, .endpoint = request.endpoint};
             if (!topic.HasSubscription(subscription)) {
 
                 // Add subscription
-                topic.subscriptions.push_back({
-                                                      .protocol=request.protocol,
-                                                      .endpoint=request.endpoint,
-                                                      .subscriptionArn=subscriptionArn
-                                              });
+                topic.subscriptions.push_back({.protocol = request.protocol,
+                                               .endpoint = request.endpoint,
+                                               .subscriptionArn = subscriptionArn});
 
                 // Save to database
                 topic = _snsDatabase.UpdateTopic(topic);
                 log_debug << "Subscription added, topic: " << topic.ToString();
             }
 
-            return {.subscriptionArn=subscriptionArn};
+            return {.subscriptionArn = subscriptionArn};
 
         } catch (Poco::Exception &ex) {
             log_error << "SNS subscription failed, message: " << ex.message();
@@ -177,15 +172,16 @@ namespace AwsMock::Service {
 
                 // Add subscription
                 topic.subscriptions.erase(std::remove_if(topic.subscriptions.begin(), topic.subscriptions.end(), [&request](const auto &item) {
-                    return item.subscriptionArn == request.subscriptionArn;
-                }), end(topic.subscriptions));
+                                              return item.subscriptionArn == request.subscriptionArn;
+                                          }),
+                                          end(topic.subscriptions));
 
                 // Save to database
                 topic = _snsDatabase.UpdateTopic(topic);
                 log_debug << "Subscription added, topic: " << topic.ToString();
             }
 
-            return {.subscriptionArn=request.subscriptionArn};
+            return {.subscriptionArn = request.subscriptionArn};
 
         } catch (Poco::Exception &ex) {
             log_error << "SNS subscription failed, message: " << ex.message();
@@ -204,10 +200,9 @@ namespace AwsMock::Service {
 
             Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
             return {
-                    .region=topic.region,
-                    .topicArn=topic.topicArn,
-                    .owner=topic.owner
-            };
+                    .region = topic.region,
+                    .topicArn = topic.topicArn,
+                    .owner = topic.owner};
 
         } catch (Poco::Exception &ex) {
             log_error << "SNS get topic attributes failed, message: " << ex.message();
@@ -228,7 +223,7 @@ namespace AwsMock::Service {
 
             Dto::SNS::ListSubscriptionsByTopicResponse response;
             for (const auto &s: topic.subscriptions) {
-                Dto::SNS::Subscription subscription = {.topicArn=request.topicArn, .protocol=s.protocol, .subscriptionArn=s.subscriptionArn, .endpoint=s.endpoint};
+                Dto::SNS::Subscription subscription = {.topicArn = request.topicArn, .protocol = s.protocol, .subscriptionArn = s.subscriptionArn, .endpoint = s.endpoint};
                 response.subscriptions.emplace_back(subscription);
             }
             return response;
@@ -275,7 +270,6 @@ namespace AwsMock::Service {
 
                     SendSQSMessage(it, request);
                     log_debug << "Message send to SQS queue, queueArn: " << it.endpoint;
-
                 }
             }
         }
@@ -288,24 +282,23 @@ namespace AwsMock::Service {
 
         // Create a SQS notification request
         AwsMock::Dto::SNS::SqsNotificationRequest sqsNotificationRequest = {
-                .type="Notification",
-                .messageId=Core::AwsUtils::CreateMessageId(),
-                .topicArn=request.topicArn,
-                .message=request.message,
-                .timestamp=Poco::Timestamp().epochMicroseconds() / 1000
-        };
+                .type = "Notification",
+                .messageId = Core::AwsUtils::CreateMessageId(),
+                .topicArn = request.topicArn,
+                .message = request.message,
+                .timestamp = Poco::Timestamp().epochMicroseconds() / 1000};
 
         // Wrap it in a SQS message request
         Dto::SQS::SendMessageRequest sendMessageRequest = {
-                .region=request.region,
-                .queueUrl=sqsQueue.queueUrl,
-                .queueArn=sqsQueue.queueArn,
-                .body=sqsNotificationRequest.ToJson(),
-                .messageId=Core::AwsUtils::CreateMessageId(),
-                .requestId=Core::AwsUtils::CreateRequestId(),
+                .region = request.region,
+                .queueUrl = sqsQueue.queueUrl,
+                .queueArn = sqsQueue.queueArn,
+                .body = sqsNotificationRequest.ToJson(),
+                .messageId = Core::AwsUtils::CreateMessageId(),
+                .requestId = Core::AwsUtils::CreateRequestId(),
         };
 
         _sqsService->SendMessage(sendMessageRequest);
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

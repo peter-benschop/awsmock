@@ -6,39 +6,39 @@
 
 namespace AwsMock::Dto::S3 {
 
-  std::string CreateBucketRequest::ToJson() const {
+    std::string CreateBucketRequest::ToJson() const {
 
-    try {
-      Poco::JSON::Object rootJson;
-      rootJson.set("region", region);
-      rootJson.set("name", name);
-      rootJson.set("owner", owner);
+        try {
+            Poco::JSON::Object rootJson;
+            rootJson.set("region", region);
+            rootJson.set("name", name);
+            rootJson.set("owner", owner);
 
-      return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::JsonUtils::ToJsonString(rootJson);
 
-    } catch (Poco::Exception &exc) {
-      throw Core::JsonException(exc.message());
+        } catch (Poco::Exception &exc) {
+            throw Core::JsonException(exc.message());
+        }
     }
-  }
 
-  void CreateBucketRequest::FromXml(const std::string &xmlString) {
+    void CreateBucketRequest::FromXml(const std::string &xmlString) {
 
-    Poco::XML::DOMParser parser;
-    Poco::AutoPtr<Poco::XML::Document> pDoc = parser.parseString(xmlString);
+        Poco::XML::DOMParser parser;
+        Poco::AutoPtr<Poco::XML::Document> pDoc = parser.parseString(xmlString);
 
-    Poco::XML::Node *node = pDoc->getNodeByPath("/CreateBucketConfiguration/LocationConstraint");
-    region = node->innerText();
-  }
+        Poco::XML::Node *node = pDoc->getNodeByPath("/CreateBucketConfiguration/LocationConstraint");
+        region = node->innerText();
+    }
 
-  std::string CreateBucketRequest::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+    std::string CreateBucketRequest::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
+    }
 
-  std::ostream &operator<<(std::ostream &os, const CreateBucketRequest &r) {
-    os << "CreateBucketRequest=" << r.ToJson();
-    return os;
-  }
+    std::ostream &operator<<(std::ostream &os, const CreateBucketRequest &r) {
+        os << "CreateBucketRequest=" << r.ToJson();
+        return os;
+    }
 
-} // namespace AwsMock::Dto::s3
+}// namespace AwsMock::Dto::S3

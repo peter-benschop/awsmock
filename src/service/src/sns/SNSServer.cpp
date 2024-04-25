@@ -54,4 +54,4 @@ namespace AwsMock::Service {
         StopHttpServer();
     }
 
-} // namespace AwsMock::Worker
+}// namespace AwsMock::Service

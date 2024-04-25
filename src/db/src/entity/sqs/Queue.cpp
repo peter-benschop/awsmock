@@ -101,4 +101,4 @@ namespace AwsMock::Database::Entity::SQS {
         return os;
     }
 
-} // namespace AwsMock::Database::Entity::SQS
+}// namespace AwsMock::Database::Entity::SQS

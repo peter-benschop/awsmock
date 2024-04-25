@@ -6,9 +6,9 @@
 #define AWSMOCK_REPOSITORY_SNS_DATABASE_H
 
 // C++ standard includes
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
 
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
@@ -16,15 +16,15 @@
 #include <bsoncxx/builder/stream/document.hpp>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/memorydb/SNSMemoryDb.h>
-#include <awsmock/repository/Database.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sns/Topic.h>
+#include <awsmock/memorydb/SNSMemoryDb.h>
+#include <awsmock/repository/Database.h>
 
 namespace AwsMock::Database {
 
@@ -36,7 +36,6 @@ namespace AwsMock::Database {
     class SNSDatabase : public Database {
 
       public:
-
         /**
          * Constructor
          *
@@ -287,7 +286,6 @@ namespace AwsMock::Database {
         void DeleteAllMessages();
 
       private:
-
         /**
          * Use MongoDB
          */
@@ -312,9 +310,8 @@ namespace AwsMock::Database {
          * SNS in-memory database
          */
         SNSMemoryDb &_memoryDb;
-
     };
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
 
-#endif // AWSMOCK_REPOSITORY_SNS_DATABASE_H
+#endif// AWSMOCK_REPOSITORY_SNS_DATABASE_H

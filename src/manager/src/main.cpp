@@ -18,8 +18,8 @@
 // along with aws-mock.  If not, see <http://www.gnu.org/licenses/>.
 
 // C includes
-#include <unistd.h>
 #include <cstdlib>
+#include <unistd.h>
 
 // C++ standard includes
 #include <iostream>
@@ -32,13 +32,13 @@
 #include <Poco/Util/ServerApplication.h>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/Configuration.h>
-#include <awsmock/controller/Router.h>
 #include <awsmock/controller/RestService.h>
+#include <awsmock/controller/Router.h>
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/LogStream.h>
 
 #define DEFAULT_CONFIG_FILE "/etc/awsmock.properties"
-#define DEFAULT_LOG_LEVEL  "debug"
+#define DEFAULT_LOG_LEVEL "debug"
 
 namespace AwsMock {
 
@@ -48,6 +48,7 @@ namespace AwsMock {
     class AwsMockServer : public Poco::Util::ServerApplication {
 
       public:
+
         AwsMockServer() = default;
 
       protected:
@@ -98,24 +99,14 @@ namespace AwsMock {
         [[maybe_unused]] void defineOptions(Poco::Util::OptionSet &options) override {
 
             Poco::Util::ServerApplication::defineOptions(options);
-            options.addOption(Poco::Util::Option("config", "", "set the configuration file").required(false).repeatable(
-                    false).argument("value").callback(
-                    Poco::Util::OptionCallback<AwsMockServer>(this, &AwsMockServer::handleOption)));
+            options.addOption(Poco::Util::Option("config", "", "set the configuration file").required(false).repeatable(false).argument("value").callback(Poco::Util::OptionCallback<AwsMockServer>(this, &AwsMockServer::handleOption)));
             options.addOption(
-                    Poco::Util::Option("loglevel", "", "set the log level").required(false).repeatable(false).argument(
-                            "value").callback(
-                            Poco::Util::OptionCallback<AwsMockServer>(this, &AwsMockServer::handleOption)));
+                    Poco::Util::Option("loglevel", "", "set the log level").required(false).repeatable(false).argument("value").callback(Poco::Util::OptionCallback<AwsMockServer>(this, &AwsMockServer::handleOption)));
             options.addOption(
-                    Poco::Util::Option("logfile", "", "set the log file").required(false).repeatable(false).argument(
-                            "value").callback(
-                            Poco::Util::OptionCallback<AwsMockServer>(this, &AwsMockServer::handleOption)));
+                    Poco::Util::Option("logfile", "", "set the log file").required(false).repeatable(false).argument("value").callback(Poco::Util::OptionCallback<AwsMockServer>(this, &AwsMockServer::handleOption)));
             options.addOption(
-                    Poco::Util::Option("version", "", "display version information").required(false).repeatable(
-                            false).callback(
-                            Poco::Util::OptionCallback<AwsMockServer>(this, &AwsMockServer::handleOption)));
-            options.addOption(Poco::Util::Option("help", "", "display help information").required(false).repeatable(
-                    false).callback(
-                    Poco::Util::OptionCallback<AwsMockServer>(this, &AwsMockServer::handleOption)));
+                    Poco::Util::Option("version", "", "display version information").required(false).repeatable(false).callback(Poco::Util::OptionCallback<AwsMockServer>(this, &AwsMockServer::handleOption)));
+            options.addOption(Poco::Util::Option("help", "", "display help information").required(false).repeatable(false).callback(Poco::Util::OptionCallback<AwsMockServer>(this, &AwsMockServer::handleOption)));
         }
 
         /**
@@ -343,7 +334,7 @@ namespace AwsMock {
          * @param args command line arguments.
          * @return system exit code.
          */
-        int main([[maybe_unused]]const ArgVec &args) override {
+        int main([[maybe_unused]] const ArgVec &args) override {
 
             log_debug << "Entering main routine";
 
@@ -447,13 +438,12 @@ namespace AwsMock {
          * Log level set
          */
         bool _logLevelSet = false;
-
     };
 
-} // namespace AwsMock
+}// namespace AwsMock
 
 #ifndef TESTING
 
-POCO_SERVER_MAIN (AwsMock::AwsMockServer)
+POCO_SERVER_MAIN(AwsMock::AwsMockServer)
 
 #endif

@@ -20,12 +20,11 @@ namespace AwsMock::Service {
             Database::Entity::SQS::Queue queue = _database.GetQueueByName(request.region, request.queueName);
             log_debug << "Got queue: " << queue.queueUrl;
             return {
-                    .region=queue.region,
-                    .name=queue.name,
-                    .owner=queue.owner,
-                    .queueUrl=queue.queueUrl,
-                    .queueArn=queue.queueArn
-            };
+                    .region = queue.region,
+                    .name = queue.name,
+                    .owner = queue.owner,
+                    .queueUrl = queue.queueUrl,
+                    .queueArn = queue.queueArn};
         }
 
         try {
@@ -68,24 +67,21 @@ namespace AwsMock::Service {
             attributes.queueArn = queueArn;
 
             // Update database
-            Database::Entity::SQS::Queue queue = _database.CreateQueue({
-                                                                               .region=request.region,
-                                                                               .name=request.queueName,
-                                                                               .owner=request.owner,
-                                                                               .queueUrl=queueUrl,
-                                                                               .queueArn=queueArn,
-                                                                               .attributes=attributes,
-                                                                               .tags=request.tags
-                                                                       });
+            Database::Entity::SQS::Queue queue = _database.CreateQueue({.region = request.region,
+                                                                        .name = request.queueName,
+                                                                        .owner = request.owner,
+                                                                        .queueUrl = queueUrl,
+                                                                        .queueArn = queueArn,
+                                                                        .attributes = attributes,
+                                                                        .tags = request.tags});
             log_trace << "SQS queue created: " << queue.ToString();
 
             return {
-                    .region=queue.region,
-                    .name=queue.name,
-                    .owner=queue.owner,
-                    .queueUrl=queue.queueUrl,
-                    .queueArn=queue.queueArn
-            };
+                    .region = queue.region,
+                    .name = queue.name,
+                    .owner = queue.owner,
+                    .queueUrl = queue.queueUrl,
+                    .queueArn = queue.queueArn};
 
         } catch (Core::DatabaseException &exc) {
             log_error << "SQS create queue failed, message: " << exc.message();
@@ -140,7 +136,7 @@ namespace AwsMock::Service {
             // Get queue
             Database::Entity::SQS::Queue queue = _database.GetQueueByName(request.region, request.queueName);
             log_info << "SQS get queue URL, region: " << request.region << " queueName: " << queue.queueUrl;
-            return {.queueUrl=queue.queueUrl};
+            return {.queueUrl = queue.queueUrl};
 
         } catch (Poco::Exception &ex) {
             log_error << "SQS get queue failed, message: " << ex.message();
@@ -263,7 +259,7 @@ namespace AwsMock::Service {
             log_error << "SQS delete queue failed, message: " << ex.message();
             throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
-        return {.resource="sqs", .requestId=request.requestId};
+        return {.resource = "sqs", .requestId = request.requestId};
     }
 
     void SQSService::SetVisibilityTimeout(Dto::SQS::ChangeMessageVisibilityRequest &request) {
@@ -282,7 +278,7 @@ namespace AwsMock::Service {
             log_trace << "Got message: " << message.ToString();
 
             // Reset all userAttributes
-            Database::Entity::SQS::MessageAttribute attribute = {.attributeName="VisibilityTimeout", .attributeValue=std::to_string(request.visibilityTimeout), .attributeType=Database::Entity::SQS::MessageAttributeType::NUMBER};
+            Database::Entity::SQS::MessageAttribute attribute = {.attributeName = "VisibilityTimeout", .attributeValue = std::to_string(request.visibilityTimeout), .attributeType = Database::Entity::SQS::MessageAttributeType::NUMBER};
             message.attributes.push_back(attribute);
             message.reset = Poco::DateTime() + Poco::Timespan(request.visibilityTimeout, 0);
 
@@ -336,9 +332,9 @@ namespace AwsMock::Service {
             _database.DeleteMessages(request.queueUrl);
 
             // Update database
-            _database.DeleteQueue({.region=request.region, .queueUrl=request.queueUrl});
+            _database.DeleteQueue({.region = request.region, .queueUrl = request.queueUrl});
 
-            return {.region=request.region, .queueUrl=request.queueUrl, .requestId=request.requestId};
+            return {.region = request.region, .queueUrl = request.queueUrl, .requestId = request.requestId};
 
         } catch (Poco::Exception &ex) {
             log_error << "SQS delete queue failed, message: " << ex.message();
@@ -365,14 +361,13 @@ namespace AwsMock::Service {
 
             // Set userAttributes
             Database::Entity::SQS::MessageAttributeList attributes;
-            attributes.push_back({.attributeName="SentTimestamp", .attributeValue=std::to_string(Poco::Timestamp().epochMicroseconds() / 1000), .attributeType=Database::Entity::SQS::MessageAttributeType::NUMBER, .systemAttribute=true});
-            attributes.push_back({.attributeName="ApproximateFirstReceivedTimestamp", .attributeValue=std::to_string(Poco::Timestamp().epochMicroseconds() / 1000), .attributeType=Database::Entity::SQS::MessageAttributeType::NUMBER, .systemAttribute=true});
-            attributes.push_back({.attributeName="ApproximateReceivedCount", .attributeValue=std::to_string(0), .attributeType=Database::Entity::SQS::MessageAttributeType::NUMBER, .systemAttribute=true});
-            attributes.push_back({.attributeName="VisibilityTimeout", .attributeValue=visibilityStr, .attributeType=Database::Entity::SQS::MessageAttributeType::NUMBER});
-            attributes.push_back({.attributeName="SenderId", .attributeValue=request.region, .attributeType=Database::Entity::SQS::MessageAttributeType::STRING, .systemAttribute=true});
+            attributes.push_back({.attributeName = "SentTimestamp", .attributeValue = std::to_string(Poco::Timestamp().epochMicroseconds() / 1000), .attributeType = Database::Entity::SQS::MessageAttributeType::NUMBER, .systemAttribute = true});
+            attributes.push_back({.attributeName = "ApproximateFirstReceivedTimestamp", .attributeValue = std::to_string(Poco::Timestamp().epochMicroseconds() / 1000), .attributeType = Database::Entity::SQS::MessageAttributeType::NUMBER, .systemAttribute = true});
+            attributes.push_back({.attributeName = "ApproximateReceivedCount", .attributeValue = std::to_string(0), .attributeType = Database::Entity::SQS::MessageAttributeType::NUMBER, .systemAttribute = true});
+            attributes.push_back({.attributeName = "VisibilityTimeout", .attributeValue = visibilityStr, .attributeType = Database::Entity::SQS::MessageAttributeType::NUMBER});
+            attributes.push_back({.attributeName = "SenderId", .attributeValue = request.region, .attributeType = Database::Entity::SQS::MessageAttributeType::STRING, .systemAttribute = true});
             for (const auto &attribute: request.attributes) {
-                attributes.push_back({.attributeName=attribute.first, .attributeValue=attribute.second.stringValue, .attributeType=Database::Entity::SQS::MessageAttributeTypeFromString(
-                        Dto::SQS::MessageAttributeDataTypeToString(attribute.second.type)), .systemAttribute=false});
+                attributes.push_back({.attributeName = attribute.first, .attributeValue = attribute.second.stringValue, .attributeType = Database::Entity::SQS::MessageAttributeTypeFromString(Dto::SQS::MessageAttributeDataTypeToString(attribute.second.type)), .systemAttribute = false});
             }
 
             // Set delay
@@ -393,29 +388,28 @@ namespace AwsMock::Service {
             // Update database
             Database::Entity::SQS::Message message = _database.CreateMessage(
                     {
-                            .region= request.region,
-                            .queueUrl=queue.queueUrl,
-                            .body=messageBody,
-                            .status=messageStatus,
-                            .reset=reset,
-                            .messageId=messageId,
-                            .receiptHandle=receiptHandle,
-                            .md5Body=md5Body,
-                            .md5UserAttr=md5UserAttr,
-                            .md5SystemAttr=md5SystemAttr,
-                            .attributes=attributes,
+                            .region = request.region,
+                            .queueUrl = queue.queueUrl,
+                            .body = messageBody,
+                            .status = messageStatus,
+                            .reset = reset,
+                            .messageId = messageId,
+                            .receiptHandle = receiptHandle,
+                            .md5Body = md5Body,
+                            .md5UserAttr = md5UserAttr,
+                            .md5SystemAttr = md5SystemAttr,
+                            .attributes = attributes,
                     });
             log_info << "Message send, messageId: " << request.messageId << " md5Body: " << md5Body;
 
             return {
-                    .queueUrl=message.queueUrl,
-                    .messageId=message.messageId,
-                    .receiptHandle=message.receiptHandle,
-                    .md5Body=md5Body,
-                    .md5UserAttr=md5UserAttr,
-                    .md5SystemAttr=md5SystemAttr,
-                    .requestId=request.requestId
-            };
+                    .queueUrl = message.queueUrl,
+                    .messageId = message.messageId,
+                    .receiptHandle = message.receiptHandle,
+                    .md5Body = md5Body,
+                    .md5UserAttr = md5UserAttr,
+                    .md5SystemAttr = md5SystemAttr,
+                    .requestId = request.requestId};
 
         } catch (Poco::Exception &ex) {
             log_error << "SQS create message failed, message: " << ex.message();
@@ -454,7 +448,8 @@ namespace AwsMock::Service {
                                                             message.attributes.end(),
                                                             [attributeName](const Database::Entity::SQS::MessageAttribute &attribute) {
                                                                 return attributeName == attribute.attributeName;
-                                                            }), message.attributes.end());
+                                                            }),
+                                             message.attributes.end());
                 }
             }
 
@@ -484,7 +479,7 @@ namespace AwsMock::Service {
             }
 
             // Delete from database
-            _database.DeleteMessage({.queueUrl=request.queueUrl, .receiptHandle=request.receiptHandle});
+            _database.DeleteMessage({.queueUrl = request.queueUrl, .receiptHandle = request.receiptHandle});
             log_debug << "Message deleted, receiptHandle: " << request.receiptHandle;
 
         } catch (Poco::Exception &ex) {
@@ -506,7 +501,7 @@ namespace AwsMock::Service {
                 }
 
                 // Delete from database
-                _database.DeleteMessage({.queueUrl=request.queueUrl, .receiptHandle=entry.receiptHandle});
+                _database.DeleteMessage({.queueUrl = request.queueUrl, .receiptHandle = entry.receiptHandle});
             }
             log_debug << "Message batch deleted, count: " << request.deleteMessageBatchEntries.size();
 
@@ -518,7 +513,7 @@ namespace AwsMock::Service {
 
     bool SQSService::CheckAttribute(const std::vector<std::string> &attributes, const std::string &value) {
         return find_if(attributes.begin(), attributes.end(), [&value](const std::string &attribute) {
-            return Core::StringUtils::EqualsIgnoreCase(attribute, value);
-        }) != attributes.end();
+                   return Core::StringUtils::EqualsIgnoreCase(attribute, value);
+               }) != attributes.end();
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

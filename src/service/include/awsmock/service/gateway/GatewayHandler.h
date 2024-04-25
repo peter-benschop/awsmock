@@ -6,9 +6,9 @@
 #define AWSMOCK_SERVICE_GATEWAY_HANDLER_H
 
 // C++ includes
+#include <future>
 #include <string>
 #include <utility>
-#include <future>
 
 // Poco includes
 #include <Poco/DateTime.h>
@@ -21,17 +21,17 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/MetricService.h>
+#include <awsmock/service/cognito/CognitoHandler.h>
 #include <awsmock/service/common/AbstractHandler.h>
+#include <awsmock/service/dynamodb/DynamoDbHandler.h>
 #include <awsmock/service/gateway/GatewayRoute.h>
 #include <awsmock/service/gateway/GatewayRouter.h>
-#include <awsmock/service/s3/S3Handler.h>
-#include <awsmock/service/sqs/SQSHandler.h>
-#include <awsmock/service/sns/SNSHandler.h>
 #include <awsmock/service/lambda/LambdaHandler.h>
-#include <awsmock/service/transfer/TransferHandler.h>
-#include <awsmock/service/dynamodb/DynamoDbHandler.h>
-#include <awsmock/service/cognito/CognitoHandler.h>
+#include <awsmock/service/s3/S3Handler.h>
 #include <awsmock/service/secretsmanager/SecretsManagerHandler.h>
+#include <awsmock/service/sns/SNSHandler.h>
+#include <awsmock/service/sqs/SQSHandler.h>
+#include <awsmock/service/transfer/TransferHandler.h>
 
 namespace AwsMock::Service {
 
@@ -52,10 +52,9 @@ namespace AwsMock::Service {
          * Constructor
          *
          * @param configuration application configuration
-         * @param metricService monitoring module
          * @param route routing structure
          */
-        GatewayHandler(Core::Configuration &configuration, Core::MetricService &metricService, Service::GatewayRoute route);
+        GatewayHandler(Core::Configuration &configuration, Service::GatewayRoute route);
 
       protected:
 
@@ -141,15 +140,14 @@ namespace AwsMock::Service {
         /**
          * Metric module
          */
-        Core::MetricService &_metricService;
+        Core::MetricService &_metricService = Core::MetricService::instance();
 
         /**
          * Gateway route
          */
         Service::GatewayRoute _route;
-
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_GATEWAY_HANDLER_H
+#endif// AWSMOCK_SERVICE_GATEWAY_HANDLER_H

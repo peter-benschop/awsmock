@@ -9,84 +9,85 @@
 
 namespace AwsMock::Core {
 
-  /**
-   * COM exception class. In case of a COM request failure a COMException is thrown.
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  class CoreException : public Poco::Exception {
-  public:
     /**
-     * Constructor.
+     * Exception class. In case of a COM request failure a COMException is thrown.
      *
-     * @param code exception code, default: 0
+     * @author jens.vogt@opitz-consulting.com
      */
-    explicit CoreException(int code = 0);
+    class CoreException : public Poco::Exception {
+      public:
 
-    /**
-     * Constructor.
-     *
-     * @param msg exception message
-     * @param code exception code, default: 0
-     */
-    explicit CoreException(const std::string &msg, int code = 0);
+        /**
+         * Constructor.
+         *
+         * @param code exception code, default: 0
+         */
+        explicit CoreException(int code = 0);
 
-    /**
-     * Constructor.
-     *
-     * @param msg exception message
-     * @param arg exception argument, will be appended to the message, separated with a ':'.
-     * @param code exception code, default: 0
-     */
-    CoreException(const std::string &msg, const std::string &arg, int code = 0);
+        /**
+         * Constructor.
+         *
+         * @param msg exception message
+         * @param code exception code, default: 0
+         */
+        explicit CoreException(const std::string &msg, int code = 0);
 
-    /**
-     * Constructor.
-     *
-     * @param msg exception message
-     * @param exc parent exception.
-     * @param code exception code, default: 0
-     */
-    CoreException(const std::string &msg, const Poco::Exception &exc, int code = 0);
+        /**
+         * Constructor.
+         *
+         * @param msg exception message
+         * @param arg exception argument, will be appended to the message, separated with a ':'.
+         * @param code exception code, default: 0
+         */
+        CoreException(const std::string &msg, const std::string &arg, int code = 0);
 
-    /**
-     * Copy constructor.
-     *
-     * @param exc parent exception.
-     */
-    CoreException(const CoreException &exc);
+        /**
+         * Constructor.
+         *
+         * @param msg exception message
+         * @param exc parent exception.
+         * @param code exception code, default: 0
+         */
+        CoreException(const std::string &msg, const Poco::Exception &exc, int code = 0);
 
-    /**
-     * Destructor
-     */
-    ~CoreException() noexcept override;
+        /**
+         * Copy constructor.
+         *
+         * @param exc parent exception.
+         */
+        CoreException(const CoreException &exc);
 
-    /**
-     * Assigment operator.
-     */
-    CoreException &operator=(const CoreException &exc);
+        /**
+         * Destructor
+         */
+        ~CoreException() noexcept override;
 
-    /**
-     * Returns the exception name.
-     */
-    const char *name() const noexcept override;
+        /**
+         * Assigment operator.
+         */
+        CoreException &operator=(const CoreException &exc);
 
-    /**
-     * Returns the exception class name.
-     */
-    const char *className() const noexcept override;
+        /**
+         * Returns the exception name.
+         */
+        [[nodiscard]] const char *name() const noexcept override;
 
-    /**
-     * Returns a clone of the exception
-     */
-    Poco::Exception *clone() const override;
+        /**
+         * Returns the exception class name.
+         */
+        [[nodiscard]] const char *className() const noexcept override;
 
-    /**
-     * Rethrows the exception.
-     */
-    void rethrow() const override;
-  };
+        /**
+         * Returns a clone of the exception
+         */
+        [[nodiscard]] Poco::Exception *clone() const override;
 
-} // namespace AwsMock::Core
+        /**
+         * Rethrows the exception.
+         */
+        void rethrow() const override;
+    };
 
-#endif //AWS_MOCK_CORE_CORE_EXCEPTION_H
+}// namespace AwsMock::Core
+
+#endif//AWS_MOCK_CORE_CORE_EXCEPTION_H

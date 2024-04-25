@@ -6,14 +6,14 @@
 #define AWSMOCK_DTO_SECRETSMANAGER_CREATE_SECRET_RESPONSE_H
 
 // C++ standard includes
-#include <string>
-#include <sstream>
 #include <iostream>
+#include <sstream>
+#include <string>
 
 // Poco includes
+#include <Poco/Dynamic/Var.h>
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
-#include <Poco/Dynamic/Var.h>
 #include <Poco/Net/HTTPResponse.h>
 
 // AwsMock includes
@@ -22,58 +22,57 @@
 
 namespace AwsMock::Dto::SecretsManager {
 
-  struct CreateSecretResponse {
+    struct CreateSecretResponse {
 
-    /**
+        /**
      * Region
      */
-    std::string region;
+        std::string region;
 
-    /**
+        /**
      * Name
      */
-    std::string name;
+        std::string name;
 
-    /**
+        /**
      * Secret ARN
      */
-    std::string arn;
+        std::string arn;
 
-    /**
+        /**
      * VersionId
      */
-    std::string versionId;
+        std::string versionId;
 
-    /**
+        /**
      * Convert to a JSON string
      *
      * @return JSON string
      */
-    [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
+        /**
      * Convert from JSON representation
      *
      * @param jsonString JSON string
      */
-    void FromJson(const std::string &jsonString);
+        void FromJson(const std::string &jsonString);
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const CreateSecretResponse &r);
+        friend std::ostream &operator<<(std::ostream &os, const CreateSecretResponse &r);
+    };
 
-  };
+}// namespace AwsMock::Dto::SecretsManager
 
-} // namespace AwsMock::Dto::SQS
-
-#endif // AWSMOCK_DTO_SECRETSMANAGER_CREATE_SECRET_RESPONSE_H
+#endif// AWSMOCK_DTO_SECRETSMANAGER_CREATE_SECRET_RESPONSE_H

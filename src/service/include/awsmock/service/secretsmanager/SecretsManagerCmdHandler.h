@@ -12,75 +12,75 @@
 #include <Poco/DateTimeFormatter.h>
 
 // AwsMock includes
+#include "awsmock/service/common/AbstractHandler.h"
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/MetricService.h>
 #include <awsmock/core/MetricDefinition.h>
+#include <awsmock/core/MetricService.h>
 #include <awsmock/dto/common/SecretsManagerClientCommand.h>
-#include "awsmock/service/common/AbstractHandler.h"
 #include <awsmock/service/secretsmanager/SecretsManagerService.h>
 
 #define DEFAULT_SQS_ACCOUNT_ID "000000000000"
 
 namespace AwsMock::Service {
 
-  /**
-   * UserAttribute  list
-   */
-  typedef std::map<std::string, std::string> AttributeList;
-
-  /**
-   * AWS Secrets manager mock handler.
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  class SecretsManagerCmdHandler : public virtual AbstractHandler {
-
-  public:
+    /**
+     * UserAttribute  list
+     */
+    typedef std::map<std::string, std::string> AttributeList;
 
     /**
-     * Constructor
+     * AWS Secrets manager mock handler.
      *
-     * @param configuration application configuration
+     * @author jens.vogt@opitz-consulting.com
      */
-    SecretsManagerCmdHandler(Core::Configuration &configuration);
+    class SecretsManagerCmdHandler : public virtual AbstractHandler {
 
-  protected:
+      public:
 
-    /**
-     * HTTP POST request.
-     *
-     * @param request HTTP request
-     * @param response HTTP response
-     * @param sqsClientCommand standardised client command
-     * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-     */
-    void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::SecretsManagerClientCommand &sqsClientCommand);
+        /**
+         * Constructor
+         *
+         * @param configuration application configuration
+         */
+        explicit SecretsManagerCmdHandler(Core::Configuration &configuration);
 
-  private:
+      protected:
 
-    /**
-     * ImageHandler import configuration
-     */
-    Core::Configuration &_configuration;
+        /**
+         * HTTP POST request.
+         *
+         * @param request HTTP request
+         * @param response HTTP response
+         * @param sqsClientCommand standardised client command
+         * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+         */
+        void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::SecretsManagerClientCommand &sqsClientCommand);
 
-    /**
-     * SQS module
-     */
-    Service::SecretsManagerService _secretsManagerService;
+      private:
 
-    /**
-     * Default account ID
-     */
-    std::string _accountId;
+        /**
+         * Configuration
+         */
+        Core::Configuration &_configuration;
 
-    /**
-     * Default endpoint
-     */
-    std::string _endpoint;
-  };
+        /**
+         * Secrets manager module
+         */
+        Service::SecretsManagerService _secretsManagerService;
 
-} // namespace AwsMock::Service
+        /**
+         * Default account ID
+         */
+        std::string _accountId;
 
-#endif // AWSMOCK_SERVICE_SECRETSMANAGER_CMD_HANDLER_H
+        /**
+         * Default endpoint
+         */
+        std::string _endpoint;
+    };
+
+}// namespace AwsMock::Service
+
+#endif// AWSMOCK_SERVICE_SECRETSMANAGER_CMD_HANDLER_H

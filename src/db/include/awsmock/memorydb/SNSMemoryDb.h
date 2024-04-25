@@ -2,8 +2,8 @@
 // Created by vogje01 on 11/19/23.
 //
 
-#ifndef AWSMOCK_REPOSITORY_SNSMEMORYDB_H
-#define AWSMOCK_REPOSITORY_SNSMEMORYDB_H
+#ifndef AWSMOCK_REPOSITORY_SNS_MEMORYDB_H
+#define AWSMOCK_REPOSITORY_SNS_MEMORYDB_H
 
 // C++ includes
 #include <string>
@@ -17,8 +17,8 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/entity/sns/Topic.h>
 #include <awsmock/entity/sns/Message.h>
+#include <awsmock/entity/sns/Topic.h>
 #include <awsmock/repository/Database.h>
 
 namespace AwsMock::Database {
@@ -265,6 +265,6 @@ namespace AwsMock::Database {
         Poco::Mutex _messageMutex;
     };
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
 
-#endif // AWSMOCK_REPOSITORY_SNSMEMORYDB_H
+#endif// AWSMOCK_REPOSITORY_SNS_MEMORYDB_H

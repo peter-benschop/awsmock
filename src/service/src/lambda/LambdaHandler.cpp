@@ -27,7 +27,6 @@ namespace AwsMock::Service {
                     Dto::Lambda::ListFunctionResponse lambdaResponse = _lambdaService.ListFunctions(region);
                     log_trace << "Lambda function list";
                     SendOkResponse(response, lambdaResponse.ToJson());
-
                 }
 
             } else if (action == "tags") {
@@ -38,7 +37,6 @@ namespace AwsMock::Service {
                 Dto::Lambda::ListTagsResponse lambdaResponse = _lambdaService.ListTags(arn);
                 log_trace << "Lambda tag list";
                 SendOkResponse(response, lambdaResponse.ToJson());
-
             }
 
         } catch (Core::ServiceException &exc) {
@@ -49,7 +47,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response,
-                                  [[maybe_unused]]const std::string &region, [[maybe_unused]]const std::string &user) {
+                                  [[maybe_unused]] const std::string &region, [[maybe_unused]] const std::string &user) {
         log_trace << "Lambda PUT request, URI: " << request.getURI() << " region: " << region << " user: " + user;
 
         try {
@@ -107,7 +105,6 @@ namespace AwsMock::Service {
                 _lambdaService.CreateTag(lambdaRequest);
                 SendOkResponse(response, {}, Poco::Net::HTTPResponse::HTTP_NO_CONTENT);
                 log_info << "Lambda tag created, name: " << lambdaRequest.arn;
-
             }
 
         } catch (Poco::Exception &exc) {
@@ -129,7 +126,7 @@ namespace AwsMock::Service {
                 std::string qualifier = Core::HttpUtils::GetPathParameter(request.getURI(), 3);
                 log_debug << "Found lambda name, name: " << functionName << " qualifier: " << qualifier;
 
-                Dto::Lambda::DeleteFunctionRequest lambdaRequest = {.functionName=functionName, .qualifier=qualifier};
+                Dto::Lambda::DeleteFunctionRequest lambdaRequest = {.functionName = functionName, .qualifier = qualifier};
                 _lambdaService.DeleteFunction(lambdaRequest);
                 SendOkResponse(response);
 
@@ -145,7 +142,6 @@ namespace AwsMock::Service {
                 Dto::Lambda::DeleteTagsRequest lambdaRequest(arn, tagKeys);
                 _lambdaService.DeleteTags(lambdaRequest);
                 SendNoContentResponse(response);
-
             }
 
         } catch (Core::ServiceException &exc) {
@@ -182,4 +178,4 @@ namespace AwsMock::Service {
             SendXmlErrorResponse("lambda", response, exc);
         }
     }
-}
+}// namespace AwsMock::Service

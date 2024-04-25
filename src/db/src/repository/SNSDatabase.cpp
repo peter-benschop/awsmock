@@ -33,7 +33,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.TopicExists(topicArn);
-
         }
     }
 
@@ -58,7 +57,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.TopicExists(region, topicName);
-
         }
     }
 
@@ -88,7 +86,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.CreateTopic(topic);
-
         }
     }
 
@@ -123,7 +120,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.GetTopicById(oid);
-
         }
     }
 
@@ -149,7 +145,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.GetTopicByArn(topicArn);
-
         }
     }
 
@@ -180,7 +175,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.GetTopicByName(region, topicName);
-
         }
     }
 
@@ -208,7 +202,6 @@ namespace AwsMock::Database {
         } else {
 
             topicList = _memoryDb.GetTopicsBySubscriptionArn(subscriptionArn);
-
         }
         return topicList;
     }
@@ -250,7 +243,6 @@ namespace AwsMock::Database {
         } else {
 
             topicList = _memoryDb.ListTopics(region);
-
         }
         log_trace << "Got topic list, size:" << topicList.size();
         return topicList;
@@ -284,7 +276,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.UpdateTopic(topic);
-
         }
     }
 
@@ -297,7 +288,6 @@ namespace AwsMock::Database {
         } else {
 
             return CreateTopic(topic);
-
         }
     }
 
@@ -321,7 +311,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.CountTopics();
-
         }
     }
 
@@ -349,7 +338,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteTopic(topic);
-
         }
     }
 
@@ -377,7 +365,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteAllTopics();
-
         }
     }
 
@@ -401,7 +388,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.MessageExists(id);
-
         }
     }
 
@@ -431,7 +417,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.CreateMessage(message);
-
         }
     }
 
@@ -484,7 +469,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.CountMessages(region, topicArn);
-
         }
     }
 
@@ -514,7 +498,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.CountMessagesByStatus(region, topicArn, status);
-
         }
     }
 
@@ -547,7 +530,6 @@ namespace AwsMock::Database {
         } else {
 
             messageList = _memoryDb.ListMessages(region);
-
         }
         log_trace << "Got message list, size: " << messageList.size();
         return messageList;
@@ -578,7 +560,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.UpdateMessage(message);
-
         }
     }
 
@@ -591,7 +572,6 @@ namespace AwsMock::Database {
         } else {
 
             return CreateMessage(message);
-
         }
     }
 
@@ -620,7 +600,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteMessage(message);
-
         }
     }
 
@@ -655,7 +634,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteMessages(region, topicArn, receipts);
-
         }
     }
 
@@ -685,7 +663,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteOldMessages(timeout);
-
         }
     }
 
@@ -708,8 +685,7 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteAllMessages();
-
         }
     }
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database

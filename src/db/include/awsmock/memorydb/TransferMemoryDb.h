@@ -2,8 +2,8 @@
 // Created by vogje01 on 11/19/23.
 //
 
-#ifndef AWSMOCK_REPOSITORY_TRANSFERMEMORYDB_H
-#define AWSMOCK_REPOSITORY_TRANSFERMEMORYDB_H
+#ifndef AWSMOCK_REPOSITORY_TRANSFER_MEMORYDB_H
+#define AWSMOCK_REPOSITORY_TRANSFER_MEMORYDB_H
 
 // C++ includes
 #include <string>
@@ -16,8 +16,8 @@
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/DatabaseException.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/entity/transfer/Transfer.h>
 #include <awsmock/entity/transfer/User.h>
 #include <awsmock/repository/Database.h>
@@ -181,6 +181,6 @@ namespace AwsMock::Database {
         Poco::Mutex _userMutex;
     };
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
 
-#endif // AWSMOCK_REPOSITORY_TRANSFERMEMORYDB_H
+#endif// AWSMOCK_REPOSITORY_TRANSFER_MEMORYDB_H

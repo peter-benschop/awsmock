@@ -6,292 +6,286 @@
 
 namespace AwsMock::Database {
 
-  bool CognitoMemoryDb::UserPoolExists(const std::string &region, const std::string &name) {
+    bool CognitoMemoryDb::UserPoolExists(const std::string &region, const std::string &name) {
 
-    return find_if(_userPools.begin(),
-                   _userPools.end(),
-                   [region, name](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
-                     return userPool.second.region == region && userPool.second.name == name;
-                   }) != _userPools.end();
-  }
+        return find_if(_userPools.begin(),
+                       _userPools.end(),
+                       [region, name](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
+                           return userPool.second.region == region && userPool.second.name == name;
+                       }) != _userPools.end();
+    }
 
-  bool CognitoMemoryDb::UserPoolExists(const std::string &id) {
+    bool CognitoMemoryDb::UserPoolExists(const std::string &id) {
 
-    return find_if(_userPools.begin(),
-                   _userPools.end(),
-                   [id](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
-                     return userPool.second.userPoolId == id;
-                   }) != _userPools.end();
-  }
+        return find_if(_userPools.begin(),
+                       _userPools.end(),
+                       [id](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
+                           return userPool.second.userPoolId == id;
+                       }) != _userPools.end();
+    }
 
-  Entity::Cognito::UserPoolList CognitoMemoryDb::ListUserPools(const std::string &region) {
+    Entity::Cognito::UserPoolList CognitoMemoryDb::ListUserPools(const std::string &region) {
 
-    Entity::Cognito::UserPoolList userPoolList;
-    if (region.empty()) {
-      for (const auto &userPool : _userPools) {
-        userPoolList.emplace_back(userPool.second);
-      }
-    } else {
-      for (const auto &userPool : _userPools) {
-        if (userPool.second.region == region) {
-          userPoolList.emplace_back(userPool.second);
+        Entity::Cognito::UserPoolList userPoolList;
+        if (region.empty()) {
+            for (const auto &userPool: _userPools) {
+                userPoolList.emplace_back(userPool.second);
+            }
+        } else {
+            for (const auto &userPool: _userPools) {
+                if (userPool.second.region == region) {
+                    userPoolList.emplace_back(userPool.second);
+                }
+            }
         }
-      }
+
+        log_trace << "Got user pool list, size: " << userPoolList.size();
+        return userPoolList;
     }
 
-    log_trace << "Got user pool list, size: " << userPoolList.size();
-    return userPoolList;
-  }
+    Entity::Cognito::UserPool CognitoMemoryDb::CreateUserPool(const Entity::Cognito::UserPool &userPool) {
+        Poco::ScopedLock lock(_userPoolMutex);
 
-  Entity::Cognito::UserPool CognitoMemoryDb::CreateUserPool(const Entity::Cognito::UserPool &userPool) {
-    Poco::ScopedLock lock(_userPoolMutex);
-
-    std::string oid = Poco::UUIDGenerator().createRandom().toString();
-    _userPools[oid] = userPool;
-    log_trace << "Cognito user pool created, oid: " << oid;
-    return GetUserPoolByOid(oid);
-  }
-
-  Entity::Cognito::UserPool CognitoMemoryDb::GetUserPoolByOid(const std::string &oid) {
-
-    auto it = find_if(_userPools.begin(),
-                      _userPools.end(),
-                      [oid](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
-                        return userPool.first == oid;
-                      });
-
-    if (it == _userPools.end()) {
-      log_error << "Get cognito user pool by oid failed, oid: " << oid;
-      throw Core::DatabaseException("Get cognito user pool by oid failed, oid: " + oid);
+        std::string oid = Poco::UUIDGenerator().createRandom().toString();
+        _userPools[oid] = userPool;
+        log_trace << "Cognito user pool created, oid: " << oid;
+        return GetUserPoolByOid(oid);
     }
 
-    it->second.oid = oid;
-    return it->second;
-  }
+    Entity::Cognito::UserPool CognitoMemoryDb::GetUserPoolByOid(const std::string &oid) {
 
-  Entity::Cognito::UserPool CognitoMemoryDb::GetUserPoolByRegionName(const std::string &region,
-                                                                     const std::string &name) {
+        auto it = find_if(_userPools.begin(),
+                          _userPools.end(),
+                          [oid](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
+                              return userPool.first == oid;
+                          });
 
-    auto it = find_if(_userPools.begin(),
-                      _userPools.end(),
-                      [region, name](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
-                        return userPool.second.region == region && userPool.second.name == name;
-                      });
-
-    if (it == _userPools.end()) {
-      log_error << "Get cognito user pool by region and name failed, region: " << region << " name: " << name;
-      throw Core::DatabaseException("Get cognito user pool by region and name failed, region: " + region + " name: " + name);
-    }
-
-    it->second.oid = it->first;
-    return it->second;
-  }
-
-  long CognitoMemoryDb::CountUserPools(const std::string &region) {
-    long count = 0;
-    if (region.empty()) {
-      count = static_cast<long>(_userPools.size());
-    } else {
-      for (const auto &userPool : _userPools) {
-        if (userPool.second.region == region) {
-          count++;
+        if (it == _userPools.end()) {
+            log_error << "Get cognito user pool by oid failed, oid: " << oid;
+            throw Core::DatabaseException("Get cognito user pool by oid failed, oid: " + oid);
         }
-      }
+
+        it->second.oid = oid;
+        return it->second;
     }
 
-    log_trace << "Count user pools, size: " << count;
-    return count;
-  }
+    Entity::Cognito::UserPool CognitoMemoryDb::GetUserPoolByRegionName(const std::string &region,
+                                                                       const std::string &name) {
 
-  Entity::Cognito::UserPool CognitoMemoryDb::UpdateUserPool(const Entity::Cognito::UserPool &userPool) {
+        auto it = find_if(_userPools.begin(),
+                          _userPools.end(),
+                          [region, name](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
+                              return userPool.second.region == region && userPool.second.name == name;
+                          });
 
-    Poco::ScopedLock lock(_userPoolMutex);
-
-    std::string region = userPool.region;
-    std::string name = userPool.name;
-    auto it = find_if(_userPools.begin(),
-                      _userPools.end(),
-                      [region, name](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
-                        return userPool.second.region == region && userPool.second.name == name;
-                      });
-
-    if (it == _userPools.end()) {
-      log_error << "Update user pool failed, region: " << userPool.region << " name: " << userPool.name;
-      throw Core::DatabaseException("Update cognito user pool failed, region: " + userPool.region + " name: " + userPool.name);
-    }
-    _userPools[it->first] = userPool;
-    return _userPools[it->first];
-  }
-
-  void CognitoMemoryDb::DeleteUserPool(const std::string &userPoolId) {
-    Poco::ScopedLock lock(_userPoolMutex);
-
-    const auto count = std::erase_if(_userPools, [userPoolId](const auto &item) {
-      auto const &[key, value] = item;
-      return value.userPoolId == userPoolId;
-    });
-    log_debug << "Cognito user pool deleted, count: " << count;
-  }
-
-  void CognitoMemoryDb::DeleteAllUserPools() {
-    Poco::ScopedLock lock(_userPoolMutex);
-
-    log_debug << "All cognito user pools deleted, count: " << _userPools.size();
-    _userPools.clear();
-  }
-
-  bool CognitoMemoryDb::UserExists(const std::string &region, const std::string &userPoolId, const std::string &userName) {
-
-    return find_if(_users.begin(),
-                   _users.end(),
-                   [region, userPoolId, userName](const std::pair<std::string, Entity::Cognito::User> &user) {
-                     return user.second.region == region && user.second.userPoolId == userPoolId
-                         && user.second.userName == userName;
-                   }) != _users.end();
-  }
-
-  Entity::Cognito::User CognitoMemoryDb::CreateUser(const Entity::Cognito::User &user) {
-    Poco::ScopedLock lock(_userMutex);
-
-    std::string oid = Poco::UUIDGenerator().createRandom().toString();
-    _users[oid] = user;
-    log_trace << "Cognito user created, oid: " << oid;
-    return GetUserByOid(oid);
-  }
-
-  Entity::Cognito::User CognitoMemoryDb::GetUserByOid(const std::string &oid) {
-
-    auto it = find_if(_users.begin(), _users.end(), [oid](const std::pair<std::string, Entity::Cognito::User> &user) {
-      return user.first == oid;
-    });
-
-    if (it == _users.end()) {
-      log_error << "Get cognito user by oid failed, oid: " << oid;
-      throw Core::DatabaseException("Get cognito user by oid failed, oid: " + oid);
-    }
-
-    it->second.oid = oid;
-    return it->second;
-  }
-
-  Entity::Cognito::User CognitoMemoryDb::GetUserByUserName(const std::string &region,
-                                                           const std::string &userPoolId,
-                                                           const std::string &userName) {
-
-    auto it = find_if(_users.begin(),
-                      _users.end(),
-                      [region, userPoolId, userName](const std::pair<std::string, Entity::Cognito::User> &user) {
-                        return user.second.region == region && user.second.userPoolId == userPoolId
-                            && user.second.userName == userName;
-                      });
-
-    if (it == _users.end()) {
-      log_error << "Get cognito user by user name failed, userName: " << userName;
-      throw Core::DatabaseException("Get cognito user by user name failed, userName: " + userName);
-    }
-
-    it->second.oid = it->first;
-    return it->second;
-  }
-
-  long CognitoMemoryDb::CountUsers(const std::string &region, const std::string &userPoolId) {
-
-    long count = 0;
-    if (!region.empty() && !userPoolId.empty()) {
-
-      for (const auto &user : _users) {
-        if (user.second.region == region && user.second.userPoolId == userPoolId) {
-          count++;
+        if (it == _userPools.end()) {
+            log_error << "Get cognito user pool by region and name failed, region: " << region << " name: " << name;
+            throw Core::DatabaseException("Get cognito user pool by region and name failed, region: " + region + " name: " + name);
         }
-      }
 
-    } else if (!region.empty()) {
-
-      for (const auto &user : _users) {
-        if (user.second.region == region) {
-          count++;
-        }
-      }
-
-    } else {
-
-      count = static_cast<long>(_users.size());
+        it->second.oid = it->first;
+        return it->second;
     }
 
-    log_trace << "Count user pools, size: " << count;
-    return count;
-  }
-
-  std::vector<Entity::Cognito::User> CognitoMemoryDb::ListUsers(const std::string &region,
-                                                                const std::string &userPoolId) {
-
-    Entity::Cognito::UserList userList;
-    if (!region.empty() && !userPoolId.empty()) {
-
-      for (const auto &user : _users) {
-        if (user.second.region == region && user.second.userPoolId == userPoolId) {
-          userList.emplace_back(user.second);
+    long CognitoMemoryDb::CountUserPools(const std::string &region) {
+        long count = 0;
+        if (region.empty()) {
+            count = static_cast<long>(_userPools.size());
+        } else {
+            for (const auto &userPool: _userPools) {
+                if (userPool.second.region == region) {
+                    count++;
+                }
+            }
         }
-      }
 
-    } else if (!region.empty()) {
-
-      for (const auto &user : _users) {
-        if (user.second.region == region) {
-          userList.emplace_back(user.second);
-        }
-      }
-
-    } else {
-
-      for (const auto &user : _users) {
-        userList.emplace_back(user.second);
-      }
-
+        log_trace << "Count user pools, size: " << count;
+        return count;
     }
 
-    log_trace << "Got user list, size: " << userList.size();
-    return userList;
-  }
+    Entity::Cognito::UserPool CognitoMemoryDb::UpdateUserPool(const Entity::Cognito::UserPool &userPool) {
 
-  Entity::Cognito::User CognitoMemoryDb::UpdateUser(const Entity::Cognito::User &user) {
+        Poco::ScopedLock lock(_userPoolMutex);
 
-    Poco::ScopedLock lock(_userMutex);
+        std::string region = userPool.region;
+        std::string name = userPool.name;
+        auto it = find_if(_userPools.begin(),
+                          _userPools.end(),
+                          [region, name](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
+                              return userPool.second.region == region && userPool.second.name == name;
+                          });
 
-    std::string region = user.region;
-    std::string userPoolId = user.userPoolId;
-    std::string userName = user.userName;
-    auto it = find_if(_users.begin(),
-                      _users.end(),
-                      [region, userPoolId, userName](const std::pair<std::string, Entity::Cognito::User> &user) {
-                        return user.second.region == region && user.second.userPoolId == userPoolId
-                            && user.second.userName == userName;
-                      });
-
-    if (it == _users.end()) {
-      log_error << "Update user failed, region: " << user.region << " name: " << user.userName
-                               ;
-      throw Core::DatabaseException("Update cognito user failed, region: " + user.region + " name: " + user.userName);
+        if (it == _userPools.end()) {
+            log_error << "Update user pool failed, region: " << userPool.region << " name: " << userPool.name;
+            throw Core::DatabaseException("Update cognito user pool failed, region: " + userPool.region + " name: " + userPool.name);
+        }
+        _userPools[it->first] = userPool;
+        return _userPools[it->first];
     }
-    _users[it->first] = user;
-    return _users[it->first];
-  }
 
-  void CognitoMemoryDb::DeleteUser(const Entity::Cognito::User &user) {
-    Poco::ScopedLock lock(_userMutex);
+    void CognitoMemoryDb::DeleteUserPool(const std::string &userPoolId) {
+        Poco::ScopedLock lock(_userPoolMutex);
 
-    const auto count = std::erase_if(_users, [user](const std::pair<std::string, Entity::Cognito::User> &u) {
-      return u.second.region == user.region && u.second.userPoolId == user.userPoolId
-          && u.second.userName == user.userName;
-    });
-    log_debug << "Cognito user deleted, count: " << count;
-  }
+        const auto count = std::erase_if(_userPools, [userPoolId](const auto &item) {
+            auto const &[key, value] = item;
+            return value.userPoolId == userPoolId;
+        });
+        log_debug << "Cognito user pool deleted, count: " << count;
+    }
 
-  void CognitoMemoryDb::DeleteAllUsers() {
-    Poco::ScopedLock lock(_userMutex);
+    void CognitoMemoryDb::DeleteAllUserPools() {
+        Poco::ScopedLock lock(_userPoolMutex);
 
-    log_debug << "All cognito users deleted, count: " << _userPools.size();
-    _users.clear();
-  }
+        log_debug << "All cognito user pools deleted, count: " << _userPools.size();
+        _userPools.clear();
+    }
 
-}
+    bool CognitoMemoryDb::UserExists(const std::string &region, const std::string &userPoolId, const std::string &userName) {
+
+        return find_if(_users.begin(),
+                       _users.end(),
+                       [region, userPoolId, userName](const std::pair<std::string, Entity::Cognito::User> &user) {
+                           return user.second.region == region && user.second.userPoolId == userPoolId && user.second.userName == userName;
+                       }) != _users.end();
+    }
+
+    Entity::Cognito::User CognitoMemoryDb::CreateUser(const Entity::Cognito::User &user) {
+        Poco::ScopedLock lock(_userMutex);
+
+        std::string oid = Poco::UUIDGenerator().createRandom().toString();
+        _users[oid] = user;
+        log_trace << "Cognito user created, oid: " << oid;
+        return GetUserByOid(oid);
+    }
+
+    Entity::Cognito::User CognitoMemoryDb::GetUserByOid(const std::string &oid) {
+
+        auto it = find_if(_users.begin(), _users.end(), [oid](const std::pair<std::string, Entity::Cognito::User> &user) {
+            return user.first == oid;
+        });
+
+        if (it == _users.end()) {
+            log_error << "Get cognito user by oid failed, oid: " << oid;
+            throw Core::DatabaseException("Get cognito user by oid failed, oid: " + oid);
+        }
+
+        it->second.oid = oid;
+        return it->second;
+    }
+
+    Entity::Cognito::User CognitoMemoryDb::GetUserByUserName(const std::string &region,
+                                                             const std::string &userPoolId,
+                                                             const std::string &userName) {
+
+        auto it = find_if(_users.begin(),
+                          _users.end(),
+                          [region, userPoolId, userName](const std::pair<std::string, Entity::Cognito::User> &user) {
+                              return user.second.region == region && user.second.userPoolId == userPoolId && user.second.userName == userName;
+                          });
+
+        if (it == _users.end()) {
+            log_error << "Get cognito user by user name failed, userName: " << userName;
+            throw Core::DatabaseException("Get cognito user by user name failed, userName: " + userName);
+        }
+
+        it->second.oid = it->first;
+        return it->second;
+    }
+
+    long CognitoMemoryDb::CountUsers(const std::string &region, const std::string &userPoolId) {
+
+        long count = 0;
+        if (!region.empty() && !userPoolId.empty()) {
+
+            for (const auto &user: _users) {
+                if (user.second.region == region && user.second.userPoolId == userPoolId) {
+                    count++;
+                }
+            }
+
+        } else if (!region.empty()) {
+
+            for (const auto &user: _users) {
+                if (user.second.region == region) {
+                    count++;
+                }
+            }
+
+        } else {
+
+            count = static_cast<long>(_users.size());
+        }
+
+        log_trace << "Count user pools, size: " << count;
+        return count;
+    }
+
+    std::vector<Entity::Cognito::User> CognitoMemoryDb::ListUsers(const std::string &region,
+                                                                  const std::string &userPoolId) {
+
+        Entity::Cognito::UserList userList;
+        if (!region.empty() && !userPoolId.empty()) {
+
+            for (const auto &user: _users) {
+                if (user.second.region == region && user.second.userPoolId == userPoolId) {
+                    userList.emplace_back(user.second);
+                }
+            }
+
+        } else if (!region.empty()) {
+
+            for (const auto &user: _users) {
+                if (user.second.region == region) {
+                    userList.emplace_back(user.second);
+                }
+            }
+
+        } else {
+
+            for (const auto &user: _users) {
+                userList.emplace_back(user.second);
+            }
+        }
+
+        log_trace << "Got user list, size: " << userList.size();
+        return userList;
+    }
+
+    Entity::Cognito::User CognitoMemoryDb::UpdateUser(const Entity::Cognito::User &user) {
+
+        Poco::ScopedLock lock(_userMutex);
+
+        std::string region = user.region;
+        std::string userPoolId = user.userPoolId;
+        std::string userName = user.userName;
+        auto it = find_if(_users.begin(),
+                          _users.end(),
+                          [region, userPoolId, userName](const std::pair<std::string, Entity::Cognito::User> &user) {
+                              return user.second.region == region && user.second.userPoolId == userPoolId && user.second.userName == userName;
+                          });
+
+        if (it == _users.end()) {
+            log_error << "Update user failed, region: " << user.region << " name: " << user.userName;
+            throw Core::DatabaseException("Update cognito user failed, region: " + user.region + " name: " + user.userName);
+        }
+        _users[it->first] = user;
+        return _users[it->first];
+    }
+
+    void CognitoMemoryDb::DeleteUser(const Entity::Cognito::User &user) {
+        Poco::ScopedLock lock(_userMutex);
+
+        const auto count = std::erase_if(_users, [user](const std::pair<std::string, Entity::Cognito::User> &u) {
+            return u.second.region == user.region && u.second.userPoolId == user.userPoolId && u.second.userName == user.userName;
+        });
+        log_debug << "Cognito user deleted, count: " << count;
+    }
+
+    void CognitoMemoryDb::DeleteAllUsers() {
+        Poco::ScopedLock lock(_userMutex);
+
+        log_debug << "All cognito users deleted, count: " << _userPools.size();
+        _users.clear();
+    }
+
+}// namespace AwsMock::Database

@@ -11,96 +11,94 @@
 #include <unistd.h>
 
 // C++ includes
-#include <cstdio>
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <stdexcept>
-#include <string>
 #include <array>
 #include <climits>
-#include <unistd.h>
+#include <cstdio>
 #include <cstdlib>
 #include <filesystem>
+#include <fstream>
+#include <iostream>
 #include <regex>
+#include <stdexcept>
+#include <string>
+#include <unistd.h>
 
 // Poco includes
-#include <Poco/String.h>
-#include <Poco/RegularExpression.h>
 #include <Poco/Environment.h>
+#include <Poco/RegularExpression.h>
+#include <Poco/String.h>
 
 // AwsMock includes
 #include <awsmock/core/CoreException.h>
+#include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/RandomUtils.h>
 #include <awsmock/core/StreamFilter.h>
-#include <awsmock/core/FileUtils.h>
 
 #define RANDOM_PORT_MIN 32768
 #define RANDOM_PORT_MAX 65536
 
 namespace AwsMock::Core {
 
-  struct ExecResult {
-    int status = -1;
-    std::string output;
-  };
-  typedef struct ExecResult ExecResult;
-
-  /**
-   * System utils for command line execution and other system routines.
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  class SystemUtils {
-
-  public:
+    struct ExecResult {
+        int status = -1;
+        std::string output;
+    };
+    typedef struct ExecResult ExecResult;
 
     /**
-     * Execute system command and capture the stdout output result.
+     * System utils for command line execution and other system routines.
      *
-     * @param command command string
-     * @return command output.
+     * @author jens.vogt@opitz-consulting.com
      */
-    static ExecResult Exec(const std::string &command);
+    class SystemUtils {
 
-    /**
-     * Returns the current working directory.
-     *
-     * @return absolute path of the current work directory.
-     */
-    static std::string GetCurrentWorkingDir();
+      public:
 
-    /**
-     * Returns the home directory of the user
-     *
-     * @return absolute path of the home directory.
-     */
-    static std::string GetHomeDir();
+        /**
+         * Execute system command and capture the stdout output result.
+         *
+         * @param command command string
+         * @return command output.
+         */
+        static ExecResult Exec(const std::string &command);
 
-    /**
-     * Returns the node name (uname -n) of the server
-     *
-     * @return node name of the server
-     */
-    static std::string GetNodeName();
+        /**
+         * Returns the current working directory.
+         *
+         * @return absolute path of the current work directory.
+         */
+        static std::string GetCurrentWorkingDir();
 
-    /**
-     * Returns the DNS host name of the server
-     *
-     * @return host name of the server
-     */
-    static std::string GetHostName();
+        /**
+         * Returns the home directory of the user
+         *
+         * @return absolute path of the home directory.
+         */
+        static std::string GetHomeDir();
 
-    /**
-     * Returns a random port number between 32768 and 65536
-     *
-     * @return random port
-     */
-    static int GetRandomPort();
+        /**
+         * Returns the node name (uname -n) of the server
+         *
+         * @return node name of the server
+         */
+        static std::string GetNodeName();
 
-  };
+        /**
+         * Returns the DNS host name of the server
+         *
+         * @return host name of the server
+         */
+        static std::string GetHostName();
 
-} // namespace AwsMock::Core
+        /**
+         * Returns a random port number between 32768 and 65536
+         *
+         * @return random port
+         */
+        static int GetRandomPort();
+    };
 
-#endif // AWSMOCK_CORE_SYSTEM_UTILS_H_
+}// namespace AwsMock::Core
+
+#endif// AWSMOCK_CORE_SYSTEM_UTILS_H_

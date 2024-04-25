@@ -6,15 +6,15 @@
 
 namespace AwsMock::Dto::SNS {
 
-  std::string UnsubscribeRequest::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+    std::string UnsubscribeRequest::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
+    }
 
-  std::ostream &operator<<(std::ostream &os, const UnsubscribeRequest &r) {
-    os << "UnsubscribeRequest={region='" << r.region << "', subscriptionArn='" << r.subscriptionArn << "'}";
-    return os;
-  }
+    std::ostream &operator<<(std::ostream &os, const UnsubscribeRequest &r) {
+        os << "UnsubscribeRequest={region='" << r.region << "', subscriptionArn='" << r.subscriptionArn << "'}";
+        return os;
+    }
 
-} // namespace AwsMock::Dto::SNS
+}// namespace AwsMock::Dto::SNS

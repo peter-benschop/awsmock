@@ -21,141 +21,146 @@
 
 namespace AwsMock::Service {
 
-  class AbstractWorker {
-
-  public:
-
     /**
-     * Constructor
-     */
-    explicit AbstractWorker(const Core::Configuration &configuration);
-
-    /**
-     * Send a lambda create function request.
+     * Abstract HTTP request worker
      *
-     * @param module AwsMock module name
-     * @param url HTTP URL
-     * @param body HTTP message body
-     * @param contentType HTTP content type
+     * @author jens.vogt@opitz-consulting.com
      */
-    void SendPostRequest(const std::string &module, const std::string &url, const std::string &body, const std::string &contentType);
+    class AbstractWorker {
 
-    /**
-     * Send a PUT request.
-     *
-     * @param module AwsMock module name
-     * @param url HTTP URL
-     * @param body HTTP message body
-     * @param contentType HTTP content type
-     */
-    void SendPutRequest(const std::string &module, const std::string &url, const std::string &body, const std::string &contentType);
+      public:
 
-    /**
-     * Send a DELETE request
-     *
-     * @param module AwsMock module name
-     * @param url HTTP URL
-     * @param body HTTP message body
-     * @param contentType HTTP content type
-     */
-    void SendDeleteRequest(const std::string &module, const std::string &url, const std::string &body, const std::string &contentType);
+        /**
+         * Constructor
+         */
+        explicit AbstractWorker(const Core::Configuration &configuration);
 
-    /**
-     * Send a HEAD request
-     *
-     * @param module AwsMock module name
-     * @param url HTTP URL
-     * @param contentType HTTP content type
-     * @return true, if state = 200
-     */
-    bool SendHeadRequest(const std::string &module, const std::string &url, const std::string &contentType);
+        /**
+         * Send a lambda create function request.
+         *
+         * @param module AwsMock module name
+         * @param url HTTP URL
+         * @param body HTTP message body
+         * @param contentType HTTP content type
+         */
+        void SendPostRequest(const std::string &module, const std::string &url, const std::string &body, const std::string &contentType);
 
-    /**
-     * Send a lambda create function request.
-     *
-     * @param module AwsMock module name
-     * @param url HTTP URL
-     * @param fileName name of the file to send
-     * @param headers HTTP header map
-     */
-    void SendFile(const std::string &module, const std::string &url, const std::string &fileName, const std::map<std::string, std::string> &headers);
+        /**
+         * Send a PUT request.
+         *
+         * @param module AwsMock module name
+         * @param url HTTP URL
+         * @param body HTTP message body
+         * @param contentType HTTP content type
+         */
+        void SendPutRequest(const std::string &module, const std::string &url, const std::string &body, const std::string &contentType);
 
-  private:
+        /**
+         * Send a DELETE request
+         *
+         * @param module AwsMock module name
+         * @param url HTTP URL
+         * @param body HTTP message body
+         * @param contentType HTTP content type
+         */
+        void SendDeleteRequest(const std::string &module, const std::string &url, const std::string &body, const std::string &contentType);
 
-    /**
-     * Adds the authorization header.
-     *
-     * @param module AwsMock module name
-     * @param request HTTP request
-     */
-    void AddAuthorization(const std::string &module, Poco::Net::HTTPRequest &request);
+        /**
+         * Send a HEAD request
+         *
+         * @param module AwsMock module name
+         * @param url HTTP URL
+         * @param contentType HTTP content type
+         * @return true, if state = 200
+         */
+        bool SendHeadRequest(const std::string &module, const std::string &url, const std::string &contentType);
 
-    /**
-     * Configuration
-     */
-    const Core::Configuration &_configuration;
+        /**
+         * Send a lambda create function request.
+         *
+         * @param module AwsMock module name
+         * @param url HTTP URL
+         * @param fileName name of the file to send
+         * @param headers HTTP header map
+         */
+        void SendFile(const std::string &module, const std::string &url, const std::string &fileName, const std::map<std::string, std::string> &headers);
 
-    /**
-     * Service database
-     */
-    std::unique_ptr<Database::ModuleDatabase> _serviceDatabase;
+      private:
 
-    /**
-     * lambda database
-     */
-    std::unique_ptr<Database::LambdaDatabase> _lambdaDatabase;
+        /**
+         * Adds the authorization header.
+         *
+         * @param module AwsMock module name
+         * @param request HTTP request
+         */
+        void AddAuthorization(const std::string &module, Poco::Net::HTTPRequest &request);
 
-    /**
-     * S3 module
-     */
-    std::unique_ptr<Service::S3Service> _s3Service;
+        /**
+         * Configuration
+         */
+        const Core::Configuration &_configuration;
 
-    /**
-     * lambda module
-     */
-    std::unique_ptr<Service::LambdaService> _lambdaService;
+        /**
+         * Service database
+         */
+        std::unique_ptr<Database::ModuleDatabase> _serviceDatabase;
 
-    /**
-     * Data dir
-     */
-    std::string _dataDir;
+        /**
+         * lambda database
+         */
+        std::unique_ptr<Database::LambdaDatabase> _lambdaDatabase;
 
-    /**
-     * AWS region
-     */
-    std::string _region;
+        /**
+         * S3 module
+         */
+        std::unique_ptr<Service::S3Service> _s3Service;
 
-    /**
-     * Running flag
-     */
-    bool _running;
+        /**
+         * Lambda module
+         */
+        std::unique_ptr<Service::LambdaService> _lambdaService;
 
-    /**
-     * Sleeping period in ms
-     */
-    int _period;
+        /**
+         * Data dir
+         */
+        std::string _dataDir;
 
-    /**
-     * AWS client ID
-     */
-    std::string _clientId;
+        /**
+         * AWS region
+         */
+        std::string _region;
 
-    /**
-     * AWS user
-     */
-    std::string _user;
+        /**
+         * Running flag
+         */
+        bool _running;
 
-    /**
-     * lambda module host
-     */
-    std::string _lambdaServiceHost;
+        /**
+         * Sleeping period in ms
+         */
+        int _period;
 
-    /**
-     * lambda module port
-     */
-    int _lambdaServicePort;
-  };
+        /**
+         * AWS client ID
+         */
+        std::string _clientId;
 
-} // namespace AwsMock::Worker
+        /**
+         * AWS user
+         */
+        std::string _user;
 
-#endif // AWSMOCK_SERVICE_ABSTRACTWORKER_H
+        /**
+         * Lambda module host
+         */
+        std::string _lambdaServiceHost;
+
+        /**
+         * Lambda module port
+         */
+        int _lambdaServicePort;
+    };
+
+}// namespace AwsMock::Service
+
+#endif// AWSMOCK_SERVICE_ABSTRACTWORKER_H

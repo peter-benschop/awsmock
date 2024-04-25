@@ -6,12 +6,12 @@
 #define AWMOCK_DTO_TRANSFER_CREATE_USER_RESPONSE_TEST_H
 
 // C++ includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // GTest includes
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
@@ -26,35 +26,35 @@
 
 namespace AwsMock::Dto::Transfer {
 
-  class CreateUserResponseTest : public ::testing::Test {
-    protected:
+    class CreateUserResponseTest : public ::testing::Test {
+      protected:
 
-      void SetUp() override {
-        // General configuration
-        _region = _configuration.getString("awsmock.region", "eu-central-1");
-      }
+        void SetUp() override {
+            // General configuration
+            _region = _configuration.getString("awsmock.region", "eu-central-1");
+        }
 
-      void TearDown() override {
-      }
+        void TearDown() override {
+        }
 
-      std::string _region;
-      Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
-  };
+        std::string _region;
+        Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+    };
 
-  TEST_F(CreateUserResponseTest, ToStringTest) {
+    TEST_F(CreateUserResponseTest, ToStringTest) {
 
-    // arrange
-    Dto::Transfer::CreateUserResponse createResponse = {.region=_region, .serverId="test-server_id", .userName="test-user"};
+        // arrange
+        Dto::Transfer::CreateUserResponse createResponse = {.region = _region, .serverId = "test-server_id", .userName = "test-user"};
 
-    // act
-    std::string stringRepresentation = createRequest.ToString();
+        // act
+        std::string stringRepresentation = createRequest.ToString();
 
-    // assert
-    EXPECT_FALSE(stringRepresentation.empty());
-    EXPECT_STREQ(stringRepresentation.c_str(), CREATE_USER_RESPONSE_TO_STRING);
-  }
+        // assert
+        EXPECT_FALSE(stringRepresentation.empty());
+        EXPECT_STREQ(stringRepresentation.c_str(), CREATE_USER_RESPONSE_TO_STRING);
+    }
 
-  /*TEST_F(CreateUserResponseTest, ToJsonTest) {
+    /*TEST_F(CreateUserResponseTest, ToJsonTest) {
 
     // arrange
     Dto::Transfer::CreateUserRequest createRequest = {.region=_region, .serverId="test-server_id", .userName="test-user", .password="password", .homeDirectory="test-user"};
@@ -81,6 +81,6 @@ namespace AwsMock::Dto::Transfer {
     EXPECT_TRUE(createRequest.serverId == "test-server_id");
     ASSERT_THAT(createRequest.userName, "test-user");
   }*/
-}
+}// namespace AwsMock::Dto::Transfer
 
-#endif // AWMOCK_DTO_TRANSFER_CREATE_USER_RESPONSE_TEST_H
+#endif// AWMOCK_DTO_TRANSFER_CREATE_USER_RESPONSE_TEST_H

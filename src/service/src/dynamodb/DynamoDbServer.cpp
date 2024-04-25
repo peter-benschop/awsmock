@@ -91,7 +91,6 @@ namespace AwsMock::Service {
         } else {
             log_warning << "Docker containers for DynamoDB already running";
         }
-
     }
 
     void DynamoDbServer::StopLocalDynamoDb() {
@@ -117,7 +116,6 @@ namespace AwsMock::Service {
         } else {
             log_warning << "Docker containers for DynamoDB not running";
         }
-
     }
 
-} // namespace AwsMock::Worker
+}// namespace AwsMock::Service

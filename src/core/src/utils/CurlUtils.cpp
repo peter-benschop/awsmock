@@ -6,8 +6,6 @@
 
 namespace AwsMock::Core {
 
-    CurlUtils::CurlUtils() {}
-
     CurlResponse CurlUtils::SendUnixSocketRequest(const std::string &method, const std::string &path) {
 
         if (!_readBuffer.empty()) {
@@ -40,9 +38,9 @@ namespace AwsMock::Core {
         }
 
         int status = 0;
-        curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &status);
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &status);
 
-        CurlResponse response = {.statusCode=status, .statusReason=curl_easy_strerror(res)};
+        CurlResponse response = {.statusCode = status, .statusReason = curl_easy_strerror(res)};
         if (status == 200 && !_readBuffer.empty()) {
             response.output = _readBuffer;
         }
@@ -84,9 +82,9 @@ namespace AwsMock::Core {
         }
 
         int status = 0;
-        curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &status);
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &status);
 
-        CurlResponse response = {.statusCode=res, .statusReason=curl_easy_strerror(res)};
+        CurlResponse response = {.statusCode = res, .statusReason = curl_easy_strerror(res)};
         if (res == CURLE_OK && !_readBuffer.empty()) {
             response.output = _readBuffer;
         }
@@ -133,9 +131,9 @@ namespace AwsMock::Core {
         }
 
         int status = 0;
-        curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &status);
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &status);
 
-        CurlResponse response = {.statusCode=status, .statusReason=curl_easy_strerror(res)};
+        CurlResponse response = {.statusCode = status, .statusReason = curl_easy_strerror(res)};
         if (status == 200 && !_readBuffer.empty()) {
             response.output = _readBuffer;
         }
@@ -164,7 +162,7 @@ namespace AwsMock::Core {
         }
 
         // Get the file size
-        struct stat fileInfo{};
+        struct stat fileInfo {};
         if (fstat(fileno(fd), &fileInfo) != 0)
             return {};
 
@@ -195,9 +193,9 @@ namespace AwsMock::Core {
         }
 
         int status = 0;
-        curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &status);
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &status);
 
-        CurlResponse response = {.statusCode=status, .statusReason=curl_easy_strerror(res)};
+        CurlResponse response = {.statusCode = status, .statusReason = curl_easy_strerror(res)};
         if (status == 200 && !_readBuffer.empty()) {
             response.output = _readBuffer;
         }
@@ -227,7 +225,7 @@ namespace AwsMock::Core {
         }
 
         // Get the file size
-        struct stat fileInfo{};
+        struct stat fileInfo {};
         if (fstat(fileno(fd), &fileInfo) != 0)
             return {};
 
@@ -253,9 +251,9 @@ namespace AwsMock::Core {
         }
 
         int status = 0;
-        curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &status);
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &status);
 
-        CurlResponse response = {.statusCode=status, .statusReason=curl_easy_strerror(res)};
+        CurlResponse response = {.statusCode = status, .statusReason = curl_easy_strerror(res)};
         if (status == 200 && !_readBuffer.empty()) {
             response.output = _readBuffer;
         }
@@ -268,4 +266,5 @@ namespace AwsMock::Core {
 
         return response;
     }
-}
+
+}// namespace AwsMock::Core

@@ -63,9 +63,8 @@ namespace AwsMock::Service {
          * Transfer module
          */
         Service::TransferService _transferService;
-
     };
 
-} // namespace AwsMock
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_TRANSFER_HANDLER_H
+#endif// AWSMOCK_SERVICE_TRANSFER_HANDLER_H

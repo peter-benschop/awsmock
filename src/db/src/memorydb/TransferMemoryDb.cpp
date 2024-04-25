@@ -13,13 +13,11 @@ namespace AwsMock::Database {
                        [region, serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
                            return transfer.second.region == region && transfer.second.serverId == serverId;
                        }) != _transfers.end();
-
     }
 
     bool TransferMemoryDb::TransferExists(const Entity::Transfer::Transfer &transfer) {
 
         return TransferExists(transfer.region, transfer.serverId);
-
     }
 
     bool TransferMemoryDb::TransferExists(const std::string &serverId) {
@@ -29,7 +27,6 @@ namespace AwsMock::Database {
                        [serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
                            return transfer.second.serverId == serverId;
                        }) != _transfers.end();
-
     }
 
     bool TransferMemoryDb::TransferExists(const std::string &region, const std::vector<std::string> &protocols) {
@@ -39,7 +36,6 @@ namespace AwsMock::Database {
                        [region, protocols](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
                            return transfer.second.region == region && transfer.second.protocols == protocols;
                        }) != _transfers.end();
-
     }
 
     std::vector<Entity::Transfer::Transfer> TransferMemoryDb::ListServers(const std::string &region) {
@@ -91,7 +87,6 @@ namespace AwsMock::Database {
 
         _transfers[it->first] = transfer;
         return _transfers[it->first];
-
     }
 
     Entity::Transfer::Transfer TransferMemoryDb::GetTransferById(const std::string &oid) {
@@ -159,7 +154,6 @@ namespace AwsMock::Database {
                                  [region](std::pair<std::string, Entity::Transfer::Transfer> const &p) {
                                      return p.second.region == region;
                                  });
-
         }
         log_trace << "Count servers, result: " << count;
         return count;
@@ -182,4 +176,4 @@ namespace AwsMock::Database {
         log_debug << "All transfer servers deleted, count: " << _transfers.size();
         _transfers.clear();
     }
-}
+}// namespace AwsMock::Database

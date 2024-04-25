@@ -11,8 +11,8 @@
 // Poco includes
 #include <Poco/Condition.h>
 #include <Poco/Logger.h>
-#include <Poco/Runnable.h>
 #include <Poco/NotificationQueue.h>
+#include <Poco/Runnable.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
@@ -21,14 +21,13 @@
 #include <awsmock/dto/lambda/InvocationNotification.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/ModuleDatabase.h>
-#include <awsmock/service/s3/S3Service.h>
-#include <awsmock/service/common/AbstractWorker.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/lambda/LambdaExecutor.h>
+#include <awsmock/service/common/AbstractWorker.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
 #include <awsmock/service/lambda/LambdaExecutor.h>
 #include <awsmock/service/lambda/LambdaHandlerFactory.h>
 #include <awsmock/service/lambda/LambdaMonitoring.h>
+#include <awsmock/service/s3/S3Service.h>
 
 #define LAMBDA_DEFAULT_PORT 9503
 #define LAMBDA_DEFAULT_HOST "localhost"
@@ -39,6 +38,11 @@
 
 namespace AwsMock::Service {
 
+    /**
+     * Lambda server
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class LambdaServer : public AbstractServer, public AbstractWorker {
 
       public:
@@ -184,9 +188,8 @@ namespace AwsMock::Service {
          * Monitoring period
          */
         int _monitoringPeriod;
-
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVER_LAMBDASERVER_H
+#endif// AWSMOCK_SERVER_LAMBDASERVER_H

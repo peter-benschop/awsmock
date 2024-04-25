@@ -6,8 +6,8 @@
 #define AWSMOCK_DTO_DOCKER_LIST_IMAGE_RESPONSE_H
 
 // C++ includes
-#include <string>
 #include <sstream>
+#include <string>
 #include <vector>
 
 // AwsMock includes
@@ -18,50 +18,54 @@
 
 namespace AwsMock::Dto::Docker {
 
-  struct ListImageResponse {
-
     /**
-     * Image list
-     */
-    std::vector<Image> imageList;
-
-    /**
-     * Constructor
+     * List container request
      *
-     * @param body HTTP response body
+     * @author jens.vogt@opitz-consulting.com
      */
-    explicit ListImageResponse(const std::string &body);
+    struct ListImageResponse {
 
-    /**
-     * Convert to a JSON string
-     *
-     * @param jsonString JSON string
-     */
-    void FromJson(const std::string &jsonString);
+        /**
+         * Image list
+         */
+        std::vector<Image> imageList;
 
-    /**
-     * Convert to a JSON string
-     *
-     * @param object JSON object
-     */
-    [[nodiscard]] std::string ToJson() const;
+        /**
+         * Constructor
+         *
+         * @param body HTTP response body
+         */
+        explicit ListImageResponse(const std::string &body);
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * Convert to a JSON string
+         *
+         * @param jsonString JSON string
+         */
+        void FromJson(const std::string &jsonString);
 
-    /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const ListImageResponse &r);
+        /**
+         * Convert to a JSON string
+         *
+         * @param object JSON object
+         */
+        [[nodiscard]] std::string ToJson() const;
 
-  };
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
 
-} // namespace AwsMock::Dto::Docker
+        /**
+         * Stream provider.
+         *
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const ListImageResponse &r);
+    };
 
-#endif // AWSMOCK_DTO_DOCKER_LIST_IMAGE_RESPONSE_H
+}// namespace AwsMock::Dto::Docker
+
+#endif// AWSMOCK_DTO_DOCKER_LIST_IMAGE_RESPONSE_H

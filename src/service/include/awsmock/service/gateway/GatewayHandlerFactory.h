@@ -10,53 +10,49 @@
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 
 // AwsMock includes
+#include "GatewayHandler.h"
 #include "awsmock/core/Configuration.h"
 #include "awsmock/core/MetricService.h"
-#include "GatewayHandler.h"
 
 namespace AwsMock::Service {
 
-  /**
-   * S3 request handler factory
-   */
-  class GatewayRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
-
-  public:
-
     /**
-     * Constructor
+     * Gateway request handler factory
      *
-     * @param configuration application configuration
-     * @param metricService  monitoring
+     * @author jens.vogt@opitz-consulting.com
      */
-    GatewayRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService) {}
+    class GatewayRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 
-    /**
-     * Creates a new request handler
-     *
-     * @param request HTTP request
-     * @param host module host
-     * @param port module port
-     * @return request HTTP request handler
-     */
-    virtual Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request, const std::string &host, int port) {
-      return new GatewayHandler(_configuration, _metricService, host, port);
-    }
+      public:
 
-  private:
+        /**
+         * Constructor
+         *
+         * @param configuration application configuration
+         * @param metricService  monitoring
+         */
+        GatewayRequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
 
-    /**
-     * S3 handler configuration
-     */
-    Core::Configuration &_configuration;
+        /**
+         * Creates a new request handler
+         *
+         * @param request HTTP request
+         * @param host module host
+         * @param port module port
+         * @return request HTTP request handler
+         */
+        virtual Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request, const std::string &host, int port) {
+            return new GatewayHandler(_configuration, host, port);
+        }
 
-    /**
-     * Metric module
-     */
-    Core::MetricService &_metricService;
+      private:
 
-  };
+        /**
+         * Configuration
+         */
+        Core::Configuration &_configuration;
+    };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_GATEWAYHANDLERFACTORY_H
+#endif// AWSMOCK_SERVICE_GATEWAYHANDLERFACTORY_H

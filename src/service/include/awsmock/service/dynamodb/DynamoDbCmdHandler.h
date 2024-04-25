@@ -13,65 +13,66 @@
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/MetricService.h>
 #include <awsmock/core/MetricDefinition.h>
+#include <awsmock/core/MetricService.h>
 #include <awsmock/core/NumberUtils.h>
-#include <awsmock/dto/common/UserAgent.h>
 #include <awsmock/dto/common/DynamoDbClientCommand.h>
+#include <awsmock/dto/common/UserAgent.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/dynamodb/DynamoDbService.h>
 
 namespace AwsMock::Service {
 
-  /**
-   * AWS DynamoDB command handler
-   */
-  class DynamoDbCmdHandler : public virtual AbstractHandler {
-
-  public:
-
     /**
-     * Constructor
+     * DynamoDB command handler
      *
-     * @param configuration application configuration
+     * @author jens.vogt@opitz-consulting.com
      */
-    DynamoDbCmdHandler(Core::Configuration &configuration);
+    class DynamoDbCmdHandler : public virtual AbstractHandler {
 
-  protected:
+      public:
 
-    /**
-     * HTTP POST request.
-     *
-     * @param request HTTP request
-     * @param response HTTP response
-     * @param clientCommand standardized request
-     * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-     */
-    void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::DynamoDbClientCommand &clientCommand);
+        /**
+         * Constructor
+         *
+         * @param configuration application configuration
+         */
+        explicit DynamoDbCmdHandler(Core::Configuration &configuration);
 
-  private:
+      protected:
 
-    /**
-     * Return the command from the header or from the payload.
-     *
-     * @param request HTTP request
-     * @param payload HTTP payload
-     * @return SQS action
-     */
-    static std::string GetActionFromHeader(Poco::Net::HTTPServerRequest &request, const std::string &payload);
+        /**
+         * HTTP POST request.
+         *
+         * @param request HTTP request
+         * @param response HTTP response
+         * @param clientCommand standardized request
+         * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+         */
+        void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::DynamoDbClientCommand &clientCommand);
 
-    /**
-     * S3 handler configuration
-     */
-    Core::Configuration &_configuration;
+      private:
 
-    /**
-     * DynamoDB module
-     */
-    Service::DynamoDbService _dynamoDbService;
+        /**
+         * Return the command from the header or from the payload.
+         *
+         * @param request HTTP request
+         * @param payload HTTP payload
+         * @return SQS action
+         */
+        static std::string GetActionFromHeader(Poco::Net::HTTPServerRequest &request, const std::string &payload);
 
-  };
+        /**
+         * S3 handler configuration
+         */
+        Core::Configuration &_configuration;
 
-} // namespace AwsMock::Service
+        /**
+         * DynamoDB module
+         */
+        Service::DynamoDbService _dynamoDbService;
+    };
 
-#endif // AWSMOCK_SERVICE_DYNAMODB_CMD_HANDLER_H
+}// namespace AwsMock::Service
+
+#endif// AWSMOCK_SERVICE_DYNAMODB_CMD_HANDLER_H

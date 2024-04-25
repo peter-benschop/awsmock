@@ -6,24 +6,24 @@
 #define AWSMOCK_DTO_SNS_SQSNOTIFICAITONREQUEST_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // Poco includes
 #include <Poco/DateTime.h>
 #include <Poco/DateTimeFormat.h>
 #include <Poco/DateTimeFormatter.h>
-#include <Poco/Timestamp.h>
+#include <Poco/Dynamic/Var.h>
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
-#include <Poco/Dynamic/Var.h>
+#include <Poco/Timestamp.h>
 
 // AwsMock includes
 #include <awsmock/core/ServiceException.h>
 
 namespace AwsMock::Dto::SNS {
 
-  /**
+    /**
    * SQS notification request, used to send a notification from an SNS topic to a SQS queue
    *
    * <p>
@@ -40,76 +40,75 @@ namespace AwsMock::Dto::SNS {
    *   "UnsubscribeURL" : "https://sns.eu-central-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-central-1:012096702153:pim-prod-protokollierung-topic:a278c03b-c5de-42a4-9c0e-f9c3412de940"
    * }
    */
-  struct SqsNotificationRequest {
+    struct SqsNotificationRequest {
 
-    /**
+        /**
      * Notification type
      */
-    std::string type = "Notification";
+        std::string type = "Notification";
 
-    /**
+        /**
      * Message ID
      */
-    std::string messageId;
+        std::string messageId;
 
-    /**
+        /**
      * Source SNS topic ARN
      */
-    std::string topicArn;
+        std::string topicArn;
 
-    /**
+        /**
      * SQS message body
      */
-    std::string message;
+        std::string message;
 
-    /**
+        /**
      * Send time stamp
      */
-    long timestamp;
+        long timestamp;
 
-    /**
+        /**
      * Signature
      */
-    std::string signature;
+        std::string signature;
 
-    /**
+        /**
      * Signature version
      */
-    std::string signatureVersion = "1";
+        std::string signatureVersion = "1";
 
-    /**
+        /**
      * Signing CERT URL
      */
-    std::string signingCertURL;
+        std::string signingCertURL;
 
-    /**
+        /**
      * Unsubscribe URL
      */
-    std::string unsubscribeURL;
+        std::string unsubscribeURL;
 
-    /**
+        /**
      * Converts the DTO to a JSON representation.
      *
      * @return DTO as JSON string.
      */
-    [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const SqsNotificationRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const SqsNotificationRequest &r);
+    };
 
-  };
+}// namespace AwsMock::Dto::SNS
 
-} // namespace AwsMock::Dto::SNS
-
-#endif // AWSMOCK_DTO_SNS_SQSNOTIFICAITONREQUEST_H
+#endif// AWSMOCK_DTO_SNS_SQSNOTIFICAITONREQUEST_H

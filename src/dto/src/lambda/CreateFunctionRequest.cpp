@@ -84,4 +84,4 @@ namespace AwsMock::Dto::Lambda {
         return os;
     }
 
-} // namespace AwsMock::Dto::lambda
+}// namespace AwsMock::Dto::Lambda

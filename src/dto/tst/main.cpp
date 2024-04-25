@@ -13,20 +13,20 @@
 #include <awsmock/utils/TestUtils.h>
 
 class TestEnvironment : public ::testing::Environment {
-public:
+  public:
 
-  // Initialise a test configuration.
-  void SetUp() override {
-    AwsMock::Core::TestUtils::CreateTestConfigurationFile();
-  }
+    // Initialise a test configuration.
+    void SetUp() override {
+        AwsMock::Core::TestUtils::CreateTestConfigurationFile();
+    }
 };
 
 int main(int argc, char **argv) {
 
-  // Run tests
-  ::testing::InitGoogleTest(&argc, argv);
-  ::testing::AddGlobalTestEnvironment(new TestEnvironment);
-  int ret = RUN_ALL_TESTS();
+    // Run tests
+    ::testing::InitGoogleTest(&argc, argv);
+    ::testing::AddGlobalTestEnvironment(new TestEnvironment);
+    int ret = RUN_ALL_TESTS();
 
-  return ret;
+    return ret;
 }

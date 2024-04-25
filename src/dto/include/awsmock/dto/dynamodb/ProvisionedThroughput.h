@@ -6,8 +6,8 @@
 #define AWSMOCK_DTO_DYNAMODB_PROVISIONED_THROUGHPUT_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // AwsMock includes
 #include <awsmock/core/JsonException.h>
@@ -16,6 +16,11 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
+    /**
+     * DynamoDB provisioned throughput
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct ProvisionedThroughput {
 
         /**
@@ -78,9 +83,8 @@ namespace AwsMock::Dto::DynamoDb {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const ProvisionedThroughput &r);
-
     };
 
-} // namespace AwsMock::Dto::DynamoDb
+}// namespace AwsMock::Dto::DynamoDb
 
-#endif // AWSMOCK_DTO_DYNAMODB_PROVISIONED_THROUGHPUT_H
+#endif// AWSMOCK_DTO_DYNAMODB_PROVISIONED_THROUGHPUT_H

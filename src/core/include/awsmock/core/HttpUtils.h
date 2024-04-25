@@ -6,19 +6,19 @@
 #define AWS_MOCK_CORE_HTTP_UTILS_H
 
 // Standard C++ includes
-#include <string>
-#include <sstream>
-#include <vector>
 #include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
 
 // Poco includes
+#include <Poco/Net/HTTPServerRequest.h>
 #include <Poco/RegularExpression.h>
 #include <Poco/StreamCopier.h>
-#include <Poco/Net/HTTPServerRequest.h>
 
 // AwsMock includes
-#include <awsmock/core/StringUtils.h>
 #include <awsmock/core/ServiceException.h>
+#include <awsmock/core/StringUtils.h>
 
 namespace AwsMock::Core {
 
@@ -29,7 +29,7 @@ namespace AwsMock::Core {
      */
     class HttpUtils {
 
-    public:
+      public:
 
         /**
          * Returns the base path of the URI.
@@ -185,7 +185,8 @@ namespace AwsMock::Core {
          */
         static std::string GetBodyAsString(Poco::Net::HTTPServerRequest &request);
 
-    private:
+      private:
+
         /**
          * Checks whether the query parameter value is URL encoded
          *
@@ -193,9 +194,8 @@ namespace AwsMock::Core {
          * @return true if value is URL encoded
          */
         static bool IsUrlEncoded(const std::string &value);
-
     };
 
-} // namespace AwsMock::Core
+}// namespace AwsMock::Core
 
-#endif // AWS_MOCK_CORE_HTTP_UTILS_H
+#endif// AWS_MOCK_CORE_HTTP_UTILS_H

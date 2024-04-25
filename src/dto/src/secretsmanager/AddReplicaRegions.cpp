@@ -6,48 +6,48 @@
 
 namespace AwsMock::Dto::SecretsManager {
 
-  Poco::JSON::Object AddReplicaRegions::ToJsonObject() const {
+    Poco::JSON::Object AddReplicaRegions::ToJsonObject() const {
 
-    try {
+        try {
 
-      Poco::JSON::Object rootJson;
-      rootJson.set("Region", region);
-      rootJson.set("KmsKeyId", kmsKeyId);
-      return rootJson;
+            Poco::JSON::Object rootJson;
+            rootJson.set("Region", region);
+            rootJson.set("KmsKeyId", kmsKeyId);
+            return rootJson;
 
-    } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+        } catch (Poco::Exception &exc) {
+            throw Core::ServiceException(exc.message(), 500);
+        }
     }
-  }
 
-  std::string AddReplicaRegions::ToJson() const {
+    std::string AddReplicaRegions::ToJson() const {
 
-    std::ostringstream os;
-    ToJsonObject().stringify(os);
-    return os.str();
-  }
-
-  void AddReplicaRegions::FromJson(const Poco::JSON::Object::Ptr &jsonObject) {
-
-    try {
-
-      Core::JsonUtils::GetJsonValueString("Region", jsonObject, region);
-      Core::JsonUtils::GetJsonValueString("KmsKeyId", jsonObject, kmsKeyId);
-
-    } catch (Poco::Exception &exc) {
-      std::cerr << exc.message() << std::endl;
-      throw Core::ServiceException(exc.message(), 500);
+        std::ostringstream os;
+        ToJsonObject().stringify(os);
+        return os.str();
     }
-  }
 
-  std::string AddReplicaRegions::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+    void AddReplicaRegions::FromJson(const Poco::JSON::Object::Ptr &jsonObject) {
 
-  std::ostream &operator<<(std::ostream &os, const AddReplicaRegions &r) {
-    os << "AddReplicaRegions=" << r.ToJson();
-    return os;
-  }
-}
+        try {
+
+            Core::JsonUtils::GetJsonValueString("Region", jsonObject, region);
+            Core::JsonUtils::GetJsonValueString("KmsKeyId", jsonObject, kmsKeyId);
+
+        } catch (Poco::Exception &exc) {
+            std::cerr << exc.message() << std::endl;
+            throw Core::ServiceException(exc.message(), 500);
+        }
+    }
+
+    std::string AddReplicaRegions::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
+    }
+
+    std::ostream &operator<<(std::ostream &os, const AddReplicaRegions &r) {
+        os << "AddReplicaRegions=" << r.ToJson();
+        return os;
+    }
+}// namespace AwsMock::Dto::SecretsManager

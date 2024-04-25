@@ -51,4 +51,4 @@ namespace AwsMock::Service {
             log_trace << "Queue updated, queueName" << queue.name;
         }
     }
-}
+}// namespace AwsMock::Service

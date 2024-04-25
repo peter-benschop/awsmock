@@ -10,8 +10,8 @@
 #include "Poco/Net/HTTPServer.h"
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
+#include <awsmock/core/LogStream.h>
 
 #define MANAGER_DEFAULT_PORT 4567
 #define MANAGER_DEFAULT_HOST "localhost"
@@ -20,90 +20,93 @@
 
 namespace AwsMock {
 
-  /**
-   * General REST module
-   */
-  class RestService {
+    /**
+     * General REST module
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
+    class RestService {
 
-    public:
-      /**
-       * Constructor
-       *
-       * @param configuration application configuration
-       */
-      explicit RestService(Core::Configuration &configuration);
+      public:
 
-      /**
-       * Sets the REST port.
-       *
-       * @param port REST port.
-       */
-      void setPort(int port);
+        /**
+         * Constructor
+         *
+         * @param configuration application configuration
+         */
+        explicit RestService(Core::Configuration &configuration);
 
-      /**
-       * Sets the REST URL router
-       *
-       * @param router HTTP request router.
-       */
-      void setRouter(Poco::Net::HTTPRequestHandlerFactory* router);
+        /**
+         * Sets the REST port.
+         *
+         * @param port REST port.
+         */
+        void setPort(int port);
 
-      /**
-       * Start the restfull module.
-       *
-       * The router has to be defined before the HTTP manager is started.
-       */
-      void StartServer();
+        /**
+         * Sets the REST URL router
+         *
+         * @param router HTTP request router.
+         */
+        void setRouter(Poco::Net::HTTPRequestHandlerFactory *router);
 
-      /**
-       * Start with port and router.
-       *
-       * @param router router to use
-       * @param port port to use (default: 9100)
-       */
-      void StartServer(Poco::Net::HTTPRequestHandlerFactory* router, int port = MANAGER_DEFAULT_PORT);
+        /**
+         * Start the restfull module.
+         *
+         * The router has to be defined before the HTTP manager is started.
+         */
+        void StartServer();
 
-      /**
-       * Stop the manager
-       */
-      void StopServer();
+        /**
+         * Start with port and router.
+         *
+         * @param router router to use
+         * @param port port to use (default: 9100)
+         */
+        void StartServer(Poco::Net::HTTPRequestHandlerFactory *router, int port = MANAGER_DEFAULT_PORT);
 
-    private:
+        /**
+         * Stop the manager
+         */
+        void StopServer();
 
-      /**
-       * Rest port
-       */
-      int _port;
+      private:
 
-      /**
-       * Rest host
-       */
-      std::string _host;
+        /**
+         * Rest port
+         */
+        int _port;
 
-      /**
-      * Logger
-      */
-      Core::Configuration &_configuration;
+        /**
+         * Rest host
+         */
+        std::string _host;
 
-      /**
-       * REST router
-       */
-      Poco::Net::HTTPRequestHandlerFactory* _router{};
+        /**
+        * Logger
+        */
+        Core::Configuration &_configuration;
 
-      /**
-       * HTTP manager instance
-       */
-      std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
+        /**
+         * REST router
+         */
+        Poco::Net::HTTPRequestHandlerFactory *_router{};
 
-      /**
-       * HTTP max message queue length
-       */
-      int _maxQueueLength;
+        /**
+         * HTTP manager instance
+         */
+        std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
 
-      /**
-       * HTTP max concurrent connection
-       */
-      int _maxThreads;
-  };
-} // namespace AwsMock
+        /**
+         * HTTP max message queue length
+         */
+        int _maxQueueLength;
 
-#endif // AWSMOCK_MANAGER_REST_SERVICE_H
+        /**
+         * HTTP max concurrent connection
+         */
+        int _maxThreads;
+    };
+}// namespace AwsMock
+
+#endif// AWSMOCK_MANAGER_REST_SERVICE_H

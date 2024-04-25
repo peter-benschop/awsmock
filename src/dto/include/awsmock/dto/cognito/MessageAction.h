@@ -13,29 +13,28 @@
 
 namespace AwsMock::Dto::Cognito {
 
-  enum MessageAction {
-    RESEND,
-    SUPPRESS
-  };
+    enum MessageAction {
+        RESEND,
+        SUPPRESS
+    };
 
-  static std::map<MessageAction, std::string> MessageActionNames{
-      {MessageAction::RESEND, "RESEND"},
-      {MessageAction::SUPPRESS, "SUPPRESS"}
-  };
+    static std::map<MessageAction, std::string> MessageActionNames{
+            {MessageAction::RESEND, "RESEND"},
+            {MessageAction::SUPPRESS, "SUPPRESS"}};
 
-  [[maybe_unused]] static std::string MessageActionToString(MessageAction messageAction) {
-    return MessageActionNames[messageAction];
-  }
-
-  [[maybe_unused]] static MessageAction MessageActionFromString(const std::string &messageActionName) {
-    for (auto &it : MessageActionNames) {
-      if (it.second == messageActionName) {
-        return it.first;
-      }
+    [[maybe_unused]] static std::string MessageActionToString(MessageAction messageAction) {
+        return MessageActionNames[messageAction];
     }
-    return MessageAction::SUPPRESS;
-  }
 
-} // namespace AwsMock::Dto::SQS
+    [[maybe_unused]] static MessageAction MessageActionFromString(const std::string &messageActionName) {
+        for (auto &it: MessageActionNames) {
+            if (it.second == messageActionName) {
+                return it.first;
+            }
+        }
+        return MessageAction::SUPPRESS;
+    }
 
-#endif // AWSMOCK_DTO_COGNITO_MESSAGE_ACTION_H
+}// namespace AwsMock::Dto::Cognito
+
+#endif// AWSMOCK_DTO_COGNITO_MESSAGE_ACTION_H

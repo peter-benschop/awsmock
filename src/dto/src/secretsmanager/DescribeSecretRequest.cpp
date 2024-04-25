@@ -6,47 +6,47 @@
 
 namespace AwsMock::Dto::SecretsManager {
 
-  std::string DescribeSecretRequest::ToJson() const {
+    std::string DescribeSecretRequest::ToJson() const {
 
-    try {
+        try {
 
-      Poco::JSON::Object rootJson;
-      rootJson.set("SecretId", secretId);
+            Poco::JSON::Object rootJson;
+            rootJson.set("SecretId", secretId);
 
-      std::ostringstream os;
-      rootJson.stringify(os);
-      return os.str();
+            std::ostringstream os;
+            rootJson.stringify(os);
+            return os.str();
 
-    } catch (Poco::Exception &exc) {
-      throw Core::JsonException(exc.message());
+        } catch (Poco::Exception &exc) {
+            throw Core::JsonException(exc.message());
+        }
     }
-  }
 
-  void DescribeSecretRequest::FromJson(const std::string &jsonString) {
+    void DescribeSecretRequest::FromJson(const std::string &jsonString) {
 
-    Poco::JSON::Parser parser;
-    Poco::Dynamic::Var result = parser.parse(jsonString);
-    const auto& rootObject = result.extract<Poco::JSON::Object::Ptr>();
+        Poco::JSON::Parser parser;
+        Poco::Dynamic::Var result = parser.parse(jsonString);
+        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
-    try {
+        try {
 
-      // Attributes
-      Core::JsonUtils::GetJsonValueString("SecretId", rootObject, secretId);
+            // Attributes
+            Core::JsonUtils::GetJsonValueString("SecretId", rootObject, secretId);
 
-    } catch (Poco::Exception &exc) {
-      throw Core::JsonException(exc.message());
+        } catch (Poco::Exception &exc) {
+            throw Core::JsonException(exc.message());
+        }
     }
-  }
 
-  std::string DescribeSecretRequest::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+    std::string DescribeSecretRequest::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
+    }
 
-  std::ostream &operator<<(std::ostream &os, const DescribeSecretRequest &r) {
-    os << "DescribeSecretRequest=" << r.ToJson();
-    return os;
-  }
+    std::ostream &operator<<(std::ostream &os, const DescribeSecretRequest &r) {
+        os << "DescribeSecretRequest=" << r.ToJson();
+        return os;
+    }
 
-} // namespace AwsMock::Dto::S3
+}// namespace AwsMock::Dto::SecretsManager

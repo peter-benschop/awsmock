@@ -6,8 +6,8 @@
 #define AWSMOCK_SERVICE_SQS_SERVER_H
 
 // C++ standard includes
-#include <string>
 #include <chrono>
+#include <string>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
@@ -19,7 +19,7 @@
 
 #define SQS_DEFAULT_PORT 9501
 #define SQS_DEFAULT_HOST "localhost"
-#define SQS_DEFAULT_QUEUE_LENGTH  250
+#define SQS_DEFAULT_QUEUE_LENGTH 250
 #define SQS_DEFAULT_THREADS 50
 #define SQS_DEFAULT_TIMEOUT 120
 #define SQS_DEFAULT_MONITORING_PERIOD 300
@@ -114,9 +114,8 @@ namespace AwsMock::Service {
          * SQS worker period
          */
         int _workerPeriod;
-
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_SQS_SERVER_H
+#endif// AWSMOCK_SERVICE_SQS_SERVER_H

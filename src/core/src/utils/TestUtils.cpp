@@ -97,4 +97,4 @@ namespace AwsMock::Core {
         return Core::SystemUtils::Exec(command);
     }
 
-}
+}// namespace AwsMock::Core

@@ -6,8 +6,8 @@
 #define AWSMOCK_DTO_COGNITO_ADMIN_DELETE_USER_REQUEST_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // AwsMock includes
 #include <awsmock/core/JsonException.h>
@@ -18,53 +18,57 @@
 
 namespace AwsMock::Dto::Cognito {
 
-  struct AdminDeleteUserRequest {
-
     /**
-     * AWS region
-     */
-    std::string region;
-
-    /**
-     * ID of the user pool
-     */
-    std::string userPoolId;
-
-    /**
-     * Name of the user
-     */
-    std::string userName;
-
-    /**
-     * Convert to a JSON string
+     * Delete user request
      *
-     * @return JSON string
+     * @author jens.vogt@opitz-consulting.com
      */
-    [[nodiscard]] std::string ToJson() const;
+    struct AdminDeleteUserRequest {
 
-    /**
-     * Convert from a JSON object.
-     *
-     * @param payload json string object
-     */
-    void FromJson(const std::string &payload);
+        /**
+         * AWS region
+         */
+        std::string region;
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * ID of the user pool
+         */
+        std::string userPoolId;
 
-    /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const AdminDeleteUserRequest &i);
+        /**
+         * Name of the user
+         */
+        std::string userName;
 
-  };
+        /**
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
+        [[nodiscard]] std::string ToJson() const;
 
-} // namespace AwsMock::Dto::Cognito
+        /**
+         * Convert from a JSON object.
+         *
+         * @param payload json string object
+         */
+        void FromJson(const std::string &payload);
 
-#endif // AWSMOCK_DTO_COGNITO_ADMIN_DELETE_USER_REQUEST_H
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
+
+        /**
+         * Stream provider.
+         *
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const AdminDeleteUserRequest &i);
+    };
+
+}// namespace AwsMock::Dto::Cognito
+
+#endif// AWSMOCK_DTO_COGNITO_ADMIN_DELETE_USER_REQUEST_H

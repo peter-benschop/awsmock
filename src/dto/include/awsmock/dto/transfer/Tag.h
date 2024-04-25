@@ -6,54 +6,53 @@
 #define AWSMOCK_DTO_TRANSFER_TAG_H
 
 // C++ includes
-#include <string>
 #include <sstream>
+#include <string>
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/JsonException.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Dto::Transfer {
 
-  struct Tag {
+    struct Tag {
 
-    /**
+        /**
      * Key
      */
-    std::string key;
+        std::string key;
 
-    /**
+        /**
      * Value
      */
-    std::string value;
+        std::string value;
 
-    /**
+        /**
      * Creates a JSON string from the object.
      *
      * @return JSON string
      */
-    [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const Tag &r);
+        friend std::ostream &operator<<(std::ostream &os, const Tag &r);
+    };
 
-  };
+    typedef std::vector<Tag> TagList;
 
-  typedef std::vector<Tag> TagList;
+}// namespace AwsMock::Dto::Transfer
 
-} // namespace AwsMock::Dto::Transfer
-
-#endif // AWSMOCK_DTO_TRANSFER_TAG_H
+#endif// AWSMOCK_DTO_TRANSFER_TAG_H

@@ -6,10 +6,10 @@
 #define AWSMOCK_DTO_DYNAMODB_DELETE_ITEM_REQUEST_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
-#include <vector>
+#include <string>
 #include <utility>
+#include <vector>
 
 // AwsMock includes
 #include <awsmock/core/JsonException.h>
@@ -19,6 +19,11 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
+    /**
+     * DynamoDB delete item request
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct DeleteItemRequest {
 
         /**
@@ -68,9 +73,8 @@ namespace AwsMock::Dto::DynamoDb {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const DeleteItemRequest &r);
-
     };
 
-} // namespace AwsMock::Dto::DynamoDb
+}// namespace AwsMock::Dto::DynamoDb
 
-#endif // AWSMOCK_DTO_DYNAMODB_DELETE_ITEM_REQUEST_H
+#endif// AWSMOCK_DTO_DYNAMODB_DELETE_ITEM_REQUEST_H

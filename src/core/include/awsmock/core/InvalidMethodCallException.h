@@ -12,116 +12,116 @@
 
 namespace AwsMock::Core {
 
-  /**
-   * Invalid method call exception. Can be thrown when a method should not be used anymore.
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  class InvalidMethodCallException : public Poco::Exception {
-
-  public:
     /**
-     * Constructor.
+     * Invalid method call exception. Can be thrown when a method should not be used anymore.
      *
-     * @param code exception code, default: 0
-     * @param resource exception resource
-     * @param requestId exception resource ID
+     * @author jens.vogt@opitz-consulting.com
      */
-    explicit InvalidMethodCallException(int code = 0, const char *resource = nullptr, const char *requestId = nullptr);
+    class InvalidMethodCallException : public Poco::Exception {
 
-    /**
-     * Constructor.
-     *
-     * @param msg exception message
-     * @param code exception code, default: 0
-     * @param resource exception resource
-     * @param requestId exception resource ID
-     */
-    explicit InvalidMethodCallException(const std::string &msg, int code = 0, const char *resource = nullptr, const char *requestId = nullptr);
+      public:
 
-    /**
-     * Constructor.
-     *
-     * @param msg exception message
-     * @param arg exception argument, will be appended to the message, separated with a ':'.
-     * @param code exception code, default: 0
-     * @param resource exception resource
-     * @param requestId exception resource ID
-     */
-    InvalidMethodCallException(const std::string &msg, const std::string &arg, int code = 0, const char *resource = nullptr, const char *requestId = nullptr);
+        /**
+         * Constructor.
+         *
+         * @param code exception code, default: 0
+         * @param resource exception resource
+         * @param requestId exception resource ID
+         */
+        explicit InvalidMethodCallException(int code = 0, const char *resource = nullptr, const char *requestId = nullptr);
 
-    /**
-     * Constructor.
-     *
-     * @param msg exception message
-     * @param exc parent exception.
-     * @param code exception code, default: 0
-     * @param resource exception resource
-     * @param requestId exception resource ID
-     */
-    InvalidMethodCallException(const std::string &msg, const Poco::Exception &exc, int code = 0, const char *resource = nullptr, const char *requestId = nullptr);
+        /**
+         * Constructor.
+         *
+         * @param msg exception message
+         * @param code exception code, default: 0
+         * @param resource exception resource
+         * @param requestId exception resource ID
+         */
+        explicit InvalidMethodCallException(const std::string &msg, int code = 0, const char *resource = nullptr, const char *requestId = nullptr);
 
-    /**
-     * Copy constructor.
-     *
-     * @param exc parent exception.
-     */
-    InvalidMethodCallException(const InvalidMethodCallException &exc);
+        /**
+         * Constructor.
+         *
+         * @param msg exception message
+         * @param arg exception argument, will be appended to the message, separated with a ':'.
+         * @param code exception code, default: 0
+         * @param resource exception resource
+         * @param requestId exception resource ID
+         */
+        InvalidMethodCallException(const std::string &msg, const std::string &arg, int code = 0, const char *resource = nullptr, const char *requestId = nullptr);
 
-    /**
-     * Destructor
-     */
-    ~InvalidMethodCallException() noexcept override;
+        /**
+         * Constructor.
+         *
+         * @param msg exception message
+         * @param exc parent exception.
+         * @param code exception code, default: 0
+         * @param resource exception resource
+         * @param requestId exception resource ID
+         */
+        InvalidMethodCallException(const std::string &msg, const Poco::Exception &exc, int code = 0, const char *resource = nullptr, const char *requestId = nullptr);
 
-    /**
-     * Assigment operator.
-     */
-    InvalidMethodCallException &operator=(const InvalidMethodCallException &exc);
+        /**
+         * Copy constructor.
+         *
+         * @param exc parent exception.
+         */
+        InvalidMethodCallException(const InvalidMethodCallException &exc);
 
-    /**
-     * Returns the exception name.
-     */
-    [[nodiscard]] const char *name() const noexcept override;
+        /**
+         * Destructor
+         */
+        ~InvalidMethodCallException() noexcept override;
 
-    /**
-     * Returns the exception class name.
-     */
-    [[nodiscard]] const char *className() const noexcept override;
+        /**
+         * Assigment operator.
+         */
+        InvalidMethodCallException &operator=(const InvalidMethodCallException &exc);
 
-    /**
-     * Returns the exception resource.
-     */
-    [[nodiscard]] const char *resource() const noexcept;
+        /**
+         * Returns the exception name.
+         */
+        [[nodiscard]] const char *name() const noexcept override;
 
-    /**
-     * Returns the exception request ID.
-     */
-    [[nodiscard]] const char *requestId() const noexcept;
+        /**
+         * Returns the exception class name.
+         */
+        [[nodiscard]] const char *className() const noexcept override;
 
-    /**
-     * Returns a clone of the exception
-     */
-    [[nodiscard]] Poco::Exception *clone() const override;
+        /**
+         * Returns the exception resource.
+         */
+        [[nodiscard]] const char *resource() const noexcept;
 
-    /**
-     * Rethrows the exception.
-     */
-    void rethrow() const override;
+        /**
+         * Returns the exception request ID.
+         */
+        [[nodiscard]] const char *requestId() const noexcept;
 
-  private:
+        /**
+         * Returns a clone of the exception
+         */
+        [[nodiscard]] Poco::Exception *clone() const override;
 
-    /**
-     * Resource
-     */
-    const char *_resource;
+        /**
+         * Rethrows the exception.
+         */
+        void rethrow() const override;
 
-    /**
-     * Request ID
-     */
-    const char *_requestId;
+      private:
 
-  };
+        /**
+         * Resource
+         */
+        const char *_resource;
 
-} // namespace AwsMock::Core
+        /**
+         * Request ID
+         */
+        const char *_requestId;
+    };
 
-#endif // AWSMOCK_CORE_INVALID_METHOD_CALL_EXCEPTION_H
+}// namespace AwsMock::Core
+
+#endif// AWSMOCK_CORE_INVALID_METHOD_CALL_EXCEPTION_H

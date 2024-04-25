@@ -51,9 +51,8 @@ namespace AwsMock::Service {
          * Cognito handler configuration
          */
         Core::Configuration &_configuration;
-
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_COGNITO_HANDLER_FACTORY_H
+#endif// AWSMOCK_SERVICE_COGNITO_HANDLER_FACTORY_H

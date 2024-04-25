@@ -16,69 +16,71 @@
 
 namespace AwsMock::Core {
 
-  /**
-   * Task class
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  class Task {
+    /**
+     * Task class
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
+    class Task {
 
-    public:
+      public:
 
-      /**
-       * Constructor
-       *
-       * @param _name task name
-       */
-      explicit Task(std::string name, int timeout) : _name(name), _timeout(timeout) {}
+        /**
+         * Constructor
+         *
+         * @param name task name
+         * @param timeout timeout in milliseconds
+         */
+        explicit Task(std::string name, int timeout) : _name(name), _timeout(timeout) {}
 
-      /**
-       * Start the task
-       */
-      void Start();
+        /**
+         * Start the task
+         */
+        void Start();
 
-      /**
-       * Stop the task
-       */
-      void Stop();
+        /**
+         * Stop the task
+         */
+        void Stop();
 
-      /**
-       * Main loop
-       */
-      virtual void Initialize() = 0;
+        /**
+         * Main loop
+         */
+        virtual void Initialize() = 0;
 
-      /**
-       * Main loop
-       */
-      virtual void Run() = 0;
+        /**
+         * Main loop
+         */
+        virtual void Run() = 0;
 
-    private:
+      private:
 
-      /**
-       * Logger
-       */
-      Core::LogStream _logger;
+        /**
+         * Logger
+         */
+        Core::LogStream _logger;
 
-      /**
-       * Timer name
-       */
-      std::string _name;
+        /**
+         * Timer name
+         */
+        std::string _name;
 
-      /**
-       * Loop timeout
-       */
-      int _timeout;
+        /**
+         * Loop timeout
+         */
+        int _timeout;
 
-      /**
-       * Promise for stopping thread
-       */
-      std::promise<void> _stop;
+        /**
+         * Promise for stopping thread
+         */
+        std::promise<void> _stop;
 
-      /**
-       * Thread handle
-       */
-      std::future<void> _thread_handle;
-  };
-}
+        /**
+         * Thread handle
+         */
+        std::future<void> _thread_handle;
+    };
 
-#endif //AWSMOCK_CORE_TASK_H
+}// namespace AwsMock::Core
+
+#endif// AWSMOCK_CORE_TASK_H

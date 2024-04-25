@@ -13,15 +13,13 @@ namespace AwsMock::Database {
                        [region, name](const std::pair<std::string, Entity::SNS::Topic> &topic) {
                            return topic.second.region == region && topic.second.topicName == name;
                        }) != _topics.end();
-
     }
 
     bool SNSMemoryDb::TopicExists(const std::string &arn) {
 
         return find_if(_topics.begin(), _topics.end(), [arn](const std::pair<std::string, Entity::SNS::Topic> &topic) {
-            return topic.second.topicArn == arn;
-        }) != _topics.end();
-
+                   return topic.second.topicArn == arn;
+               }) != _topics.end();
     }
 
     Entity::SNS::Topic SNSMemoryDb::GetTopicById(const std::string &oid) {
@@ -95,7 +93,6 @@ namespace AwsMock::Database {
         _topics[oid] = topic;
         log_trace << "Topic created, oid: " << oid;
         return GetTopicById(oid);
-
     }
 
     Entity::SNS::Topic SNSMemoryDb::UpdateTopic(const Entity::SNS::Topic &topic) {
@@ -110,7 +107,6 @@ namespace AwsMock::Database {
                           });
         _topics[it->first] = topic;
         return _topics[it->first];
-
     }
 
     Entity::SNS::TopicList SNSMemoryDb::ListTopics(const std::string &region) {
@@ -129,7 +125,6 @@ namespace AwsMock::Database {
                     topicList.emplace_back(topic.second);
                 }
             }
-
         }
 
         log_trace << "Got topic list, size: " << topicList.size();
@@ -175,11 +170,9 @@ namespace AwsMock::Database {
 
     bool SNSMemoryDb::MessageExists(const std::string &id) {
 
-        return
-                find_if(_messages.begin(), _messages.end(), [id](const std::pair<std::string, Entity::SNS::Message> &message) {
-                    return message.first == id;
-                }) != _messages.end();
-
+        return find_if(_messages.begin(), _messages.end(), [id](const std::pair<std::string, Entity::SNS::Message> &message) {
+                   return message.first == id;
+               }) != _messages.end();
     }
 
     Entity::SNS::Message SNSMemoryDb::CreateMessage(const Entity::SNS::Message &message) {
@@ -189,7 +182,6 @@ namespace AwsMock::Database {
         _messages[oid] = message;
         log_trace << "Message created, oid: " << oid;
         return GetMessageById(oid);
-
     }
 
     Entity::SNS::Message SNSMemoryDb::GetMessageById(const std::string &oid) {
@@ -210,8 +202,7 @@ namespace AwsMock::Database {
 
         long count = 0;
         for (const auto &message: _messages) {
-            if (!region.empty() && message.second.region == region && !topicArn.empty()
-                && message.second.topicArn == topicArn) {
+            if (!region.empty() && message.second.region == region && !topicArn.empty() && message.second.topicArn == topicArn) {
                 count++;
             } else if (!region.empty() && message.second.region == region) {
                 count++;
@@ -228,8 +219,7 @@ namespace AwsMock::Database {
 
         long count = 0;
         for (const auto &message: _messages) {
-            if (!region.empty() && message.second.region == region && !topicArn.empty() && message.second.topicArn == topicArn
-                && message.second.status == status) {
+            if (!region.empty() && message.second.region == region && !topicArn.empty() && message.second.topicArn == topicArn && message.second.status == status) {
                 count++;
             }
         }
@@ -306,7 +296,7 @@ namespace AwsMock::Database {
                 return value.created < Poco::Timestamp(reset.time_since_epoch().count() / 1000);
             }));
         }
-        log_debug << "Old messages deleted, timeout: " << timeout<< " count: " << count;
+        log_debug << "Old messages deleted, timeout: " << timeout << " count: " << count;
     }
 
     void SNSMemoryDb::DeleteAllMessages() {
@@ -315,4 +305,4 @@ namespace AwsMock::Database {
         log_debug << "All messages deleted, count: " << _messages.size();
         _messages.clear();
     }
-}
+}// namespace AwsMock::Database

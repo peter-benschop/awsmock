@@ -23,10 +23,10 @@
 #include "awsmock/dto/cognito/CreateUserPoolRequest.h"
 #include "awsmock/dto/cognito/CreateUserPoolResponse.h"
 #include "awsmock/dto/cognito/DeleteUserPoolRequest.h"
-#include "awsmock/dto/cognito/ListUsersRequest.h"
-#include "awsmock/dto/cognito/ListUsersResponse.h"
 #include "awsmock/dto/cognito/ListUserPoolRequest.h"
 #include "awsmock/dto/cognito/ListUserPoolResponse.h"
+#include "awsmock/dto/cognito/ListUsersRequest.h"
+#include "awsmock/dto/cognito/ListUsersResponse.h"
 #include "awsmock/repository/CognitoDatabase.h"
 
 namespace AwsMock::Service {
@@ -111,6 +111,6 @@ namespace AwsMock::Service {
         std::string _accountId;
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_COGNITO_SERVICE_H
+#endif// AWSMOCK_SERVICE_COGNITO_SERVICE_H

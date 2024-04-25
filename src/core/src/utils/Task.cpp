@@ -15,7 +15,6 @@ namespace AwsMock::Core {
 
         auto future = std::shared_future<void>(_stop.get_future());
         _thread_handle = std::async(std::launch::async, [future, this]() {
-
             std::future_status status;
             do {
                 status = future.wait_for(std::chrono::seconds(_timeout));
@@ -26,7 +25,6 @@ namespace AwsMock::Core {
                 } else if (status == std::future_status::ready) {
 
                     log_debug << "Timer stopped, name: " << _name;
-
                 }
             } while (status != std::future_status::ready);
         });
@@ -35,4 +33,4 @@ namespace AwsMock::Core {
     void Task::Stop() {
         _stop.set_value();
     }
-}
+}// namespace AwsMock::Core

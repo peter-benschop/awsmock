@@ -2,8 +2,8 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_COGNITO_USERATTRIBUTE_H
-#define AWSMOCK_DB_ENTITY_COGNITO_USERATTRIBUTE_H
+#ifndef AWSMOCK_DB_ENTITY_COGNITO_USER_ATTRIBUTE_H
+#define AWSMOCK_DB_ENTITY_COGNITO_USER_ATTRIBUTE_H
 
 // C++ includes
 #include <string>
@@ -11,25 +11,26 @@
 
 namespace AwsMock::Database::Entity::Cognito {
 
-  /**
-   * Cognito user attribute entity
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  struct UserAttribute {
-
     /**
-     * Name
+     * Cognito user attribute entity
+     *
+     * @author jens.vogt@opitz-consulting.com
      */
-    std::string name;
+    struct UserAttribute {
 
-    /**
-     * Value
-     */
-    std::string value;
-  };
+        /**
+         * Name
+         */
+        std::string name;
 
-  typedef std::vector<UserAttribute> UserAttributeList;
-}
+        /**
+         * Value
+         */
+        std::string value;
+    };
 
-#endif // AWSMOCK_DB_ENTITY_COGNITO_USERATTRIBUTE_H
+    typedef std::vector<UserAttribute> UserAttributeList;
+
+}// namespace AwsMock::Database::Entity::Cognito
+
+#endif// AWSMOCK_DB_ENTITY_COGNITO_USER_ATTRIBUTE_H

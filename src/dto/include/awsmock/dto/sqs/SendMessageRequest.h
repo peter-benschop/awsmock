@@ -22,71 +22,70 @@
 
 namespace AwsMock::Dto::SQS {
 
-  struct SendMessageRequest {
+    struct SendMessageRequest {
 
-    /**
+        /**
      * AWS region
      */
-    std::string region;
+        std::string region;
 
-    /**
+        /**
      * Queue URL
      */
-    std::string queueUrl;
+        std::string queueUrl;
 
-    /**
+        /**
      * Queue ARN
      */
-    std::string queueArn;
+        std::string queueArn;
 
-    /**
+        /**
      * Queue name
      */
-    std::string queueName;
+        std::string queueName;
 
-    /**
+        /**
      * Message body
      */
-    std::string body;
+        std::string body;
 
-    /**
+        /**
      * Message userAttributes
      */
-    MessageAttributeList attributes;
+        MessageAttributeList attributes;
 
-    /**
+        /**
      * Message ID
      */
-    std::string messageId;
+        std::string messageId;
 
-    /**
+        /**
      * Request ID
      */
-    std::string requestId;
+        std::string requestId;
 
-    /**
+        /**
      * Converts the JSON string to a DTO
      *
      * @param jsonString JSON string
      */
-    void FromJson(const std::string &jsonString);
+        void FromJson(const std::string &jsonString);
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const SendMessageRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const SendMessageRequest &r);
+    };
 
-  };
+}// namespace AwsMock::Dto::SQS
 
-} // namespace AwsMock::Dto::SQS
-
-#endif // AWSMOCK_DTO_SQS_SEND_MESSAGE_REQUEST_H
+#endif// AWSMOCK_DTO_SQS_SEND_MESSAGE_REQUEST_H

@@ -16,8 +16,8 @@
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/ThreadPool.h>
 #include <awsmock/core/MetricService.h>
+#include <awsmock/core/ThreadPool.h>
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
@@ -27,7 +27,7 @@
 
 #define SNS_DEFAULT_PORT 9502
 #define SNS_DEFAULT_HOST "localhost"
-#define SNS_DEFAULT_QUEUE_LENGTH  250
+#define SNS_DEFAULT_QUEUE_LENGTH 250
 #define SNS_DEFAULT_THREADS 50
 #define SNS_DEFAULT_TIMEOUT 120
 #define SNS_DEFAULT_WORKER_PERIOD 300
@@ -35,6 +35,11 @@
 
 namespace AwsMock::Service {
 
+    /**
+     * SNS server thread
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class SNSServer : public AbstractServer {
 
       public:
@@ -121,9 +126,8 @@ namespace AwsMock::Service {
          * SNS monitoring period
          */
         int _monitoringPeriod;
-
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_SNSSERVER_H
+#endif// AWSMOCK_SERVICE_SNSSERVER_H

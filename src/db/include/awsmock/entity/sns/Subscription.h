@@ -16,10 +16,10 @@
 #include <Poco/JSON/Object.h>
 
 // MongoDB includes
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
@@ -27,75 +27,74 @@
 
 namespace AwsMock::Database::Entity::SNS {
 
-  using bsoncxx::builder::basic::kvp;
-  using bsoncxx::builder::basic::make_array;
-  using bsoncxx::builder::basic::make_document;
-  using bsoncxx::view_or_value;
-  using bsoncxx::document::view;
-  using bsoncxx::document::value;
-
-  /**
-   * SNS message attribute entity
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  struct Subscription {
+    using bsoncxx::view_or_value;
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
+    using bsoncxx::document::value;
+    using bsoncxx::document::view;
 
     /**
-     * Protocol
-     */
-    std::string protocol;
-
-    /**
-     * Endpoint
-     */
-    std::string endpoint;
-
-    /**
-     * Subscription ARN
-     */
-    std::string subscriptionArn;
-
-    /**
-     * Converts the entity to a MongoDB document
+     * SNS message attribute entity
      *
-     * @return entity as MongoDB document.
+     * @author jens.vogt@opitz-consulting.com
      */
-    [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
+    struct Subscription {
 
-    /**
-     * Converts the MongoDB document to an entity
-     *
-     * @param mResult MongoDB document.
-     */
-    [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view_or_value> mResult);
+        /**
+         * Protocol
+         */
+        std::string protocol;
 
-    /**
-     * Converts the entity to a JSON object
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        /**
+         * Endpoint
+         */
+        std::string endpoint;
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * Subscription ARN
+         */
+        std::string subscriptionArn;
 
-    /**
-     * Stream provider.
-     *
-     * @param os output stream
-     * @param m subscription entity
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const Subscription &m);
+        /**
+         * Converts the entity to a MongoDB document
+         *
+         * @return entity as MongoDB document.
+         */
+        [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
-  };
+        /**
+         * Converts the MongoDB document to an entity
+         *
+         * @param mResult MongoDB document.
+         */
+        [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view_or_value> mResult);
 
-  typedef std::vector<Subscription> SubscriptionList;
+        /**
+         * Converts the entity to a JSON object
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
-} // namespace AwsMock::Database::Entity::SNS
-#endif // AWSMOCK_DB_ENTITY_SNS_SUBSCRIPTION_H
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
+
+        /**
+         * Stream provider.
+         *
+         * @param os output stream
+         * @param m subscription entity
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const Subscription &m);
+    };
+
+    typedef std::vector<Subscription> SubscriptionList;
+
+}// namespace AwsMock::Database::Entity::SNS
+#endif// AWSMOCK_DB_ENTITY_SNS_SUBSCRIPTION_H

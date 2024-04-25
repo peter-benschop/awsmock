@@ -6,8 +6,8 @@
 #define AWSMOCK_DTO_DOCKER_LIST_CONTAINER_RESPONSE_H
 
 // C++ includes
-#include <string>
 #include <sstream>
+#include <string>
 #include <vector>
 
 // AwsMock includes
@@ -18,48 +18,52 @@
 
 namespace AwsMock::Dto::Docker {
 
-  struct ListContainerResponse {
-
     /**
-     * Container list
-     */
-    std::vector<Container> containerList;
-
-    /**
-     * Constructor
-     */
-    explicit ListContainerResponse(const std::string &body);
-
-    /**
-     * Convert to a JSON string
+     * List container request
      *
-     * @param jsonString JSON string
+     * @author jens.vogt@opitz-consulting.com
      */
-    void FromJson(const std::string &jsonString);
+    struct ListContainerResponse {
 
-    /**
-     * Convert to a JSON string
-     *
-     * @param object JSON object
-     */
-    [[nodiscard]] std::string ToJson() const;
+        /**
+         * Container list
+         */
+        std::vector<Container> containerList;
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * Constructor
+         */
+        explicit ListContainerResponse(const std::string &body);
 
-    /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const ListContainerResponse &r);
+        /**
+         * Convert to a JSON string
+         *
+         * @param jsonString JSON string
+         */
+        void FromJson(const std::string &jsonString);
 
-  };
+        /**
+         * Convert to a JSON string
+         *
+         * @param object JSON object
+         */
+        [[nodiscard]] std::string ToJson() const;
 
-} // namespace AwsMock::Dto::Docker
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
 
-#endif // AWSMOCK_DTO_DOCKER_LIST_CONTAINER_RESPONSE_H
+        /**
+         * Stream provider.
+         *
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const ListContainerResponse &r);
+    };
+
+}// namespace AwsMock::Dto::Docker
+
+#endif// AWSMOCK_DTO_DOCKER_LIST_CONTAINER_RESPONSE_H

@@ -6,8 +6,8 @@
 #define AWSMOCK_DTO_COGNITO_LIST_USERPOOL_RESPONSE_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // AwsMock includes
 #include <awsmock/core/JsonException.h>
@@ -17,36 +17,40 @@
 
 namespace AwsMock::Dto::Cognito {
 
-  struct ListUserPoolResponse {
-
     /**
-     * User pool entities
-     */
-    Database::Entity::Cognito::UserPoolList userPools;
-
-    /**
-     * Convert to a JSON string.
+     * List user pool response
      *
-     * @return user pools json string
+     * @author jens.vogt@opitz-consulting.com
      */
-    [[nodiscard]] std::string ToJson() const;
+    struct ListUserPoolResponse {
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * User pool entities
+         */
+        Database::Entity::Cognito::UserPoolList userPools;
 
-    /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const ListUserPoolResponse &i);
+        /**
+         * Convert to a JSON string.
+         *
+         * @return user pools json string
+         */
+        [[nodiscard]] std::string ToJson() const;
 
-  };
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
 
-} // namespace AwsMock::Dto::Cognito
+        /**
+         * Stream provider.
+         *
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const ListUserPoolResponse &i);
+    };
 
-#endif // AWSMOCK_DTO_COGNITO_LIST_USERPOOL_RESPONSE_H
+}// namespace AwsMock::Dto::Cognito
+
+#endif// AWSMOCK_DTO_COGNITO_LIST_USERPOOL_RESPONSE_H

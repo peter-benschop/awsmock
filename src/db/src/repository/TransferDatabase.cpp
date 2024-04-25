@@ -26,7 +26,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.TransferExists(region, serverId);
-
         }
     }
 
@@ -48,7 +47,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.TransferExists(serverId);
-
         }
     }
 
@@ -72,7 +70,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.TransferExists(region, protocols);
-
         }
     }
 
@@ -90,7 +87,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.CreateTransfer(transfer);
-
         }
     }
 
@@ -103,7 +99,6 @@ namespace AwsMock::Database {
         Entity::Transfer::Transfer result;
         result.FromDocument(mResult);
         return result;
-
     }
 
     Entity::Transfer::Transfer TransferDatabase::GetTransferById(const std::string &oid) {
@@ -115,7 +110,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.GetTransferById(oid);
-
         }
     }
 
@@ -134,7 +128,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.GetTransferByServerId(serverId);
-
         }
     }
 
@@ -162,7 +155,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.UpdateTransfer(transfer);
-
         }
     }
 
@@ -181,7 +173,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.GetTransferByArn(arn);
-
         }
     }
 
@@ -222,7 +213,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.ListServers(region);
-
         }
         return transfers;
     }
@@ -244,7 +234,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.CountServers(region);
-
         }
         log_trace << "Count servers, result: " << count;
         return count;
@@ -262,7 +251,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteTransfer(serverId);
-
         }
     }
 
@@ -278,8 +266,7 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteAllTransfers();
-
         }
     }
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database

@@ -6,15 +6,15 @@
 
 namespace AwsMock::Dto::SNS {
 
-  std::string CreateTopicRequest::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+    std::string CreateTopicRequest::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
+    }
 
-  std::ostream &operator<<(std::ostream &os, const CreateTopicRequest &r) {
-    os << "CreateTopicRequest={region='" << r.region << "', topicName='" << r.topicName << "', owner='" << r.owner << "'}";
-    return os;
-  }
+    std::ostream &operator<<(std::ostream &os, const CreateTopicRequest &r) {
+        os << "CreateTopicRequest={region='" << r.region << "', topicName='" << r.topicName << "', owner='" << r.owner << "'}";
+        return os;
+    }
 
-} // namespace AwsMock::Dto::SNS
+}// namespace AwsMock::Dto::SNS

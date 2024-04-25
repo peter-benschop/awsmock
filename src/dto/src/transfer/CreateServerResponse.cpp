@@ -3,31 +3,31 @@
 
 namespace AwsMock::Dto::Transfer {
 
-  std::string CreateServerResponse::ToJson() const {
+    std::string CreateServerResponse::ToJson() const {
 
-    try {
-      Poco::JSON::Object rootJson;
-      rootJson.set("Region", region);
-      rootJson.set("ServerId", serverId);
-      rootJson.set("Arn", arn);
+        try {
+            Poco::JSON::Object rootJson;
+            rootJson.set("Region", region);
+            rootJson.set("ServerId", serverId);
+            rootJson.set("Arn", arn);
 
-      return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::JsonUtils::ToJsonString(rootJson);
 
-    } catch (Poco::Exception &exc) {
-      log_error << exc.message();
-      throw Core::JsonException(exc.message());
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }
     }
-  }
 
-  std::string CreateServerResponse::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+    std::string CreateServerResponse::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
+    }
 
-  std::ostream &operator<<(std::ostream &os, const CreateServerResponse &r) {
-    os << "CreateServerResponse=" << r.ToJson();
-    return os;
-  }
+    std::ostream &operator<<(std::ostream &os, const CreateServerResponse &r) {
+        os << "CreateServerResponse=" << r.ToJson();
+        return os;
+    }
 
-} // namespace AwsMock::Dto::Transfer
+}// namespace AwsMock::Dto::Transfer

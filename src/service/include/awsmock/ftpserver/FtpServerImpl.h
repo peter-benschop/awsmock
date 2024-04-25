@@ -1,10 +1,10 @@
 #pragma once
 
 // C++ includes
-#include <vector>
+#include <atomic>
 #include <string>
 #include <thread>
-#include <atomic>
+#include <vector>
 
 // Asio includes
 #include <asio.hpp>
@@ -17,11 +17,10 @@
 
 namespace AwsMock::FtpServer {
 
-  class FtpServerImpl {
+    class FtpServerImpl {
 
-  public:
-
-    /**
+      public:
+        /**
      * Constructor
      *
      * @param serverName name of the manager
@@ -29,44 +28,44 @@ namespace AwsMock::FtpServer {
      * @param port listen port
      * @param configuration AwsMock configuration
      */
-    FtpServerImpl(std::string serverName, std::string address, uint16_t port, const Core::Configuration &configuration);
+        FtpServerImpl(std::string serverName, std::string address, uint16_t port, const Core::Configuration &configuration);
 
-    /**
+        /**
      * Copy (constrcutor disabled)
      *
      * @param ftpServerImpl server implementation
      */
-    FtpServerImpl(const FtpServerImpl &ftpServerImpl) = delete;
+        FtpServerImpl(const FtpServerImpl &ftpServerImpl) = delete;
 
-    /**
+        /**
      * Copy (constrcutor disabled)
      *
      * @param ftpServerImpl server implementation
      * @return FTP server implementation
      */
-    FtpServerImpl &operator=(const FtpServerImpl &ftpServerImpl) = delete;
+        FtpServerImpl &operator=(const FtpServerImpl &ftpServerImpl) = delete;
 
-    /**
+        /**
      * Assigment constructor (disabled, as we are storing the this pointer in lambda captures)
      *
      * @param ftpServerImpl server implementation
      * @return FTP manager implementation
      */
-    FtpServerImpl &operator=(FtpServerImpl &&ftpServerImpl) = delete;
+        FtpServerImpl &operator=(FtpServerImpl &&ftpServerImpl) = delete;
 
-    /**
+        /**
      * Assigment constructor (disabled, as we are storing the this pointer in lambda captures)
      *
      * @param ftpServerImpl server implementation
      */
-    FtpServerImpl(FtpServerImpl &&ftpServerImpl) = delete;
+        FtpServerImpl(FtpServerImpl &&ftpServerImpl) = delete;
 
-    /**
+        /**
      * Destructor
      */
-    ~FtpServerImpl();
+        ~FtpServerImpl();
 
-    /**
+        /**
      * Add normal user.
      *
      * @param username name of the user
@@ -75,104 +74,103 @@ namespace AwsMock::FtpServer {
      * @param permissions permissions
      * @return true if successful
      */
-    bool addUser(const std::string &username, const std::string &password, const std::string &local_root_path, Permission permissions);
+        bool addUser(const std::string &username, const std::string &password, const std::string &local_root_path, Permission permissions);
 
-    /**
+        /**
      * Add normal user.
      *
      * @param local_root_path home directory
      * @param permissions permissions
      * @return true if successful
      */
-    bool addUserAnonymous(const std::string &local_root_path, Permission permissions);
+        bool addUserAnonymous(const std::string &local_root_path, Permission permissions);
 
-    /**
+        /**
      * Start the manager
      *
      * @param thread_count thread count
      * @return true if successful
      */
-    bool start(size_t thread_count = 1);
+        bool start(size_t thread_count = 1);
 
-    /**
+        /**
      * Stop the manager
      */
-    void stop();
+        void stop();
 
-    /**
+        /**
      * Return the number of open connections
      *
      * @return number of open connections
      */
-    int getOpenConnectionCount();
+        int getOpenConnectionCount();
 
-    /**
+        /**
      * Return the listen port
      *
      * @return listening port
      */
-    uint16_t getPort();
+        uint16_t getPort();
 
-    /**
+        /**
      * Return the listen address
      *
      * @return listening address
      */
-    std::string getAddress();
+        std::string getAddress();
 
-  private:
-
-    /**
+      private:
+        /**
      * Accept FTP session
      *
      * @param ftp_session FTP session
      * @param error error handler
      */
-    void acceptFtpSession(const std::shared_ptr<FtpSession> &ftp_session, asio::error_code const &error);
+        void acceptFtpSession(const std::shared_ptr<FtpSession> &ftp_session, asio::error_code const &error);
 
-    /**
+        /**
      * User database
      */
-    UserDatabase _ftpUsers;
+        UserDatabase _ftpUsers;
 
-    /**
+        /**
      * FTP port
      */
-    const uint16_t _port;
+        const uint16_t _port;
 
-    /**
+        /**
      * Socket listen address
      */
-    const std::string _address;
+        const std::string _address;
 
-    /**
+        /**
      * FTP session thread pool
      */
-    std::vector<std::thread> _threadPool;
+        std::vector<std::thread> _threadPool;
 
-    /**
+        /**
      * Asio IO module
      */
-    asio::io_service _ioService;
+        asio::io_service _ioService;
 
-    /**
+        /**
      * Asio session acceptor
      */
-    asio::ip::tcp::acceptor _acceptor;
+        asio::ip::tcp::acceptor _acceptor;
 
-    /**
+        /**
      * Nuber of open connections
      */
-    std::atomic<int> _openConnectionCount;
+        std::atomic<int> _openConnectionCount;
 
-    /**
+        /**
      * Name of the manager
      */
-    std::string _serverName;
+        std::string _serverName;
 
-    /**
+        /**
      * Configuration
      */
-    const Core::Configuration &_configuration;
-  };
-}
+        const Core::Configuration &_configuration;
+    };
+}// namespace AwsMock::FtpServer

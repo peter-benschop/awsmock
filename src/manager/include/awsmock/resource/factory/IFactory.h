@@ -9,30 +9,32 @@
 #include "Poco/Net/HTTPRequestHandler.h"
 
 // AwsMock includes
-#include <awsmock/core/MetricService.h>
-#include <awsmock/core/Configuration.h>
 #include "awsmock/service/common/AbstractServer.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/MetricService.h>
 
 namespace AwsMock::Resource::Factory {
 
-  /**
-   * Factory interface
-   */
-  class IFactory {
-
-  public:
-
     /**
-     * Create a new resource.
+     * Factory interface
      *
-     * @param configuration configuration
-     * @param metricService monitoring
-     * @param serverMap module map
-     * @return HTTP request handler
+     * @author jens.vogt@opitz-consulting.com
      */
-    virtual Poco::Net::HTTPRequestHandler *createResource(Core::Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap) = 0;
-  };
+    class IFactory {
 
-} // namespace AwsMock
+      public:
 
-#endif // AWSMOCK_RESOURCE_IFACTORY_H
+        /**
+         * Create a new resource.
+         *
+         * @param configuration configuration
+         * @param metricService monitoring
+         * @param serverMap module map
+         * @return HTTP request handler
+         */
+        virtual Poco::Net::HTTPRequestHandler *createResource(Core::Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap) = 0;
+    };
+
+}// namespace AwsMock::Resource::Factory
+
+#endif// AWSMOCK_RESOURCE_IFACTORY_H

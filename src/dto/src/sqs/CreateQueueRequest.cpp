@@ -6,46 +6,46 @@
 
 namespace AwsMock::Dto::SQS {
 
-  std::string CreateQueueRequest::ToJson() const {
+    std::string CreateQueueRequest::ToJson() const {
 
-    try {
-      Poco::JSON::Object rootJson;
-      rootJson.set("QueueName", queueName);
+        try {
+            Poco::JSON::Object rootJson;
+            rootJson.set("QueueName", queueName);
 
-      std::ostringstream os;
-      rootJson.stringify(os);
-      return os.str();
+            std::ostringstream os;
+            rootJson.stringify(os);
+            return os.str();
 
-    } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+        } catch (Poco::Exception &exc) {
+            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
-  }
 
-  void CreateQueueRequest::FromJson(const std::string &jsonString) {
+    void CreateQueueRequest::FromJson(const std::string &jsonString) {
 
-    Poco::JSON::Parser parser;
-    Poco::Dynamic::Var result = parser.parse(jsonString);
-    const auto& rootObject = result.extract<Poco::JSON::Object::Ptr>();
+        Poco::JSON::Parser parser;
+        Poco::Dynamic::Var result = parser.parse(jsonString);
+        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
-    try {
+        try {
 
-      // Attributes
-      Core::JsonUtils::GetJsonValueString("QueueName", rootObject, queueName);
+            // Attributes
+            Core::JsonUtils::GetJsonValueString("QueueName", rootObject, queueName);
 
-    } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), 500);
+        } catch (Poco::Exception &exc) {
+            throw Core::ServiceException(exc.message(), 500);
+        }
     }
-  }
 
-  std::string CreateQueueRequest::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+    std::string CreateQueueRequest::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
+    }
 
-  std::ostream &operator<<(std::ostream &os, const CreateQueueRequest &r) {
-    os << "CreateQueueRequest=" << r.ToJson();
-    return os;
-  }
+    std::ostream &operator<<(std::ostream &os, const CreateQueueRequest &r) {
+        os << "CreateQueueRequest=" << r.ToJson();
+        return os;
+    }
 
-} // namespace AwsMock::Dto::SQS
+}// namespace AwsMock::Dto::SQS

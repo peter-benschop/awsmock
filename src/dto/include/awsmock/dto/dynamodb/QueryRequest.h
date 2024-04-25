@@ -6,10 +6,10 @@
 #define AWSMOCK_DTO_DYNAMODB_QUERY_REQUEST_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
-#include <vector>
+#include <string>
 #include <utility>
+#include <vector>
 
 // AwsMock includes
 #include <awsmock/core/JsonException.h>
@@ -18,58 +18,62 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
-  struct QueryRequest {
-
     /**
-     * Region
-     */
-    std::string region;
-
-    /**
-     * Table name
-     */
-    std::string tableName;
-
-    /**
-     * Original HTTP request body
-     */
-    std::string body;
-
-    /**
-     * Original HTTP request headers
-     */
-    std::map<std::string, std::string> headers;
-
-    /**
-     * Creates a JSON string from the object.
+     * Query request
      *
-     * @return JSON string
+     * @author jens.vogt@opitz-consulting.com
      */
-    [[nodiscard]] std::string ToJson() const;
+    struct QueryRequest {
 
-    /**
-     * Parse a JSON stream
-     *
-     * @param jsonBody JSON string
-     */
-    void FromJson(const std::string &jsonBody);
+        /**
+         * Region
+         */
+        std::string region;
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * Table name
+         */
+        std::string tableName;
 
-    /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const QueryRequest &r);
+        /**
+         * Original HTTP request body
+         */
+        std::string body;
 
-  };
+        /**
+         * Original HTTP request headers
+         */
+        std::map<std::string, std::string> headers;
 
-} // namespace AwsMock::Dto::DynamoDb
+        /**
+         * Creates a JSON string from the object.
+         *
+         * @return JSON string
+         */
+        [[nodiscard]] std::string ToJson() const;
 
-#endif // AWSMOCK_DTO_DYNAMODB_QUERY_REQUEST_H
+        /**
+         * Parse a JSON stream
+         *
+         * @param jsonBody JSON string
+         */
+        void FromJson(const std::string &jsonBody);
+
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
+
+        /**
+         * Stream provider.
+         *
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const QueryRequest &r);
+    };
+
+}// namespace AwsMock::Dto::DynamoDb
+
+#endif// AWSMOCK_DTO_DYNAMODB_QUERY_REQUEST_H

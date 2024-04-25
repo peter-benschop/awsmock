@@ -50,7 +50,6 @@ namespace AwsMock::Dto::DynamoDb {
 
         body = jsonString;
         headers = headerMap;
-
     }
 
     std::string DescribeTableResponse::ToString() const {
@@ -64,4 +63,4 @@ namespace AwsMock::Dto::DynamoDb {
         return os;
     }
 
-} // namespace AwsMock::Dto::DynamoDb
+}// namespace AwsMock::Dto::DynamoDb

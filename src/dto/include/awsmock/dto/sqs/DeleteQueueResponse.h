@@ -6,20 +6,20 @@
 #define AWSMOCK_DTO_SQS_DELETE_QUEUE_RESPONSE_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // Poco includes
-#include <Poco/UUIDGenerator.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/Dynamic/Var.h>
 #include <Poco/DOM/AutoPtr.h>
+#include <Poco/DOM/DOMWriter.h>
 #include <Poco/DOM/Document.h>
 #include <Poco/DOM/Element.h>
 #include <Poco/DOM/Text.h>
-#include <Poco/DOM/DOMWriter.h>
+#include <Poco/Dynamic/Var.h>
+#include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Object.h>
+#include <Poco/JSON/Parser.h>
+#include <Poco/UUIDGenerator.h>
 #include <Poco/XML/XMLWriter.h>
 
 // AwsMock includes
@@ -29,58 +29,57 @@
 
 namespace AwsMock::Dto::SQS {
 
-  struct DeleteQueueResponse {
+    struct DeleteQueueResponse {
 
-    /**
+        /**
      * AWS region
      */
-    std::string region;
+        std::string region;
 
-    /**
+        /**
      * Queue URL
      */
-    std::string queueUrl;
+        std::string queueUrl;
 
-    /**
+        /**
      * Resource
      */
-    std::string resource = "Unknown resource";
+        std::string resource = "Unknown resource";
 
-    /**
+        /**
      * AWS request ID
      */
-    std::string requestId;
+        std::string requestId;
 
-    /**
+        /**
      * Convert to a JSON string
      *
      * @return JSON string
      */
-    [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
+        /**
      * Converts response to XML.
      *
      * @return XML string
      */
-    std::string ToXml() const;
+        std::string ToXml() const;
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const DeleteQueueResponse &r);
+        friend std::ostream &operator<<(std::ostream &os, const DeleteQueueResponse &r);
+    };
 
-  };
+}// namespace AwsMock::Dto::SQS
 
-} // namespace AwsMock::Dto::SQS
-
-#endif // AWSMOCK_DTO_SQS_DELETE_QUEUE_RESPONSE_H
+#endif// AWSMOCK_DTO_SQS_DELETE_QUEUE_RESPONSE_H

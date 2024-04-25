@@ -2,13 +2,13 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#ifndef AWSMOCK_REPOSITORY_LAMBDAMEMORYDB_H
-#define AWSMOCK_REPOSITORY_LAMBDAMEMORYDB_H
+#ifndef AWSMOCK_REPOSITORY_LAMBDA_MEMORYDB_H
+#define AWSMOCK_REPOSITORY_LAMBDA_MEMORYDB_H
 
 // C++ standard includes
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
 
 // Poco includes
 #include <Poco/Mutex.h>
@@ -17,13 +17,13 @@
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/repository/Database.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/entity/lambda/Lambda.h>
+#include <awsmock/repository/Database.h>
 
 namespace AwsMock::Database {
 
@@ -175,6 +175,6 @@ namespace AwsMock::Database {
         Poco::Mutex _lambdaMutex;
     };
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
 
-#endif // AWSMOCK_REPOSITORY_LAMBDAMEMORYDB_H
+#endif// AWSMOCK_REPOSITORY_LAMBDA_MEMORYDB_H

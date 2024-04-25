@@ -10,50 +10,49 @@
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 
 // AwsMock includes
+#include "S3Handler.h"
 #include "awsmock/core/Configuration.h"
 #include "awsmock/core/MetricService.h"
-#include "S3Handler.h"
 
 namespace AwsMock::Service {
 
-  /**
-   * S3 request handler factory
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
-  class S3RequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
-
-  public:
-
     /**
-     * Constructor
+     * S3 request handler factory
      *
-     * @param configuration application configuration
+     * @author jens.vogt@opitz-consulting.com
      */
-    S3RequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
+    class S3RequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 
-    /**
-     * Creates a new request handler
-     *
-     * @param request HTTP request
-     * @return request HTTP request handler
-     */
-    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
-      if(request.getURI().empty()) {
-        return nullptr;
-      }
-      return new S3Handler(_configuration);
-    }
+      public:
 
-  private:
+        /**
+         * Constructor
+         *
+         * @param configuration application configuration
+         */
+        explicit S3RequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
 
-    /**
-     * Configuration
-     */
-    Core::Configuration &_configuration;
+        /**
+         * Creates a new request handler
+         *
+         * @param request HTTP request
+         * @return request HTTP request handler
+         */
+        Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
+            if (request.getURI().empty()) {
+                return nullptr;
+            }
+            return new S3Handler(_configuration);
+        }
 
-  };
+      private:
 
-} // namespace AwsMock::Service
+        /**
+         * Configuration
+         */
+        Core::Configuration &_configuration;
+    };
 
-#endif // AWSMOCK_SERVICE_S3_HANDLER_FACTORY_H
+}// namespace AwsMock::Service
+
+#endif// AWSMOCK_SERVICE_S3_HANDLER_FACTORY_H

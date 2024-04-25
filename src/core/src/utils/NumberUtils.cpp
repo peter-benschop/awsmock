@@ -29,4 +29,4 @@ namespace AwsMock::Core {
         bytes[offset] = (n & 0xff000000) >> 24;
     }
 
-}
+}// namespace AwsMock::Core

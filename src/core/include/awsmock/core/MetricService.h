@@ -9,10 +9,10 @@
 #include <chrono>
 #include <sstream>
 #include <string>
-#include <thread>
+#include <sys/resource.h>
 #include <sys/time.h>
 #include <sys/times.h>
-#include <sys/resource.h>
+#include <thread>
 
 // Poco includes
 #include <Poco/Prometheus/Counter.h>
@@ -24,8 +24,8 @@
 // AwsMock utils
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Timer.h>
 #include <awsmock/core/MetricSystemCollector.h>
+#include <awsmock/core/Timer.h>
 
 #define TIME_DIFF(x) ((double) std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - _timerStartMap[GetTimerKey(x)]).count())
 
@@ -46,7 +46,6 @@ namespace AwsMock::Core {
     class MetricService : public Core::Timer {
 
       public:
-
         /**
          * Default constructor
          */
@@ -193,8 +192,7 @@ namespace AwsMock::Core {
          * @param name name of the gauge
          * @param value value of the gauge
          */
-        [[maybe_unused]]
-        void SetGauge(const std::string &name, int value);
+        [[maybe_unused]] void SetGauge(const std::string &name, int value);
 
         /**
          * Sets a integer gauge value in the map.
@@ -204,8 +202,7 @@ namespace AwsMock::Core {
          * @param labelValue label value of the gauge
          * @param value value of the gauge
          */
-        [[maybe_unused]]
-        void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, int value);
+        [[maybe_unused]] void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, int value);
 
         /**
          * Sets a long integer gauge value in the map.
@@ -213,8 +210,7 @@ namespace AwsMock::Core {
          * @param name name of the gauge
          * @param value value of the gauge
          */
-        [[maybe_unused]]
-        void SetGauge(const std::string &name, long value);
+        [[maybe_unused]] void SetGauge(const std::string &name, long value);
 
         /**
          * Sets a long integer gauge value in the map.
@@ -224,8 +220,7 @@ namespace AwsMock::Core {
          * @param labelValue label value of the gauge
          * @param value value of the gauge
          */
-        [[maybe_unused]]
-        void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, long value);
+        [[maybe_unused]] void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, long value);
 
         /**
          * Sets a unsigned long integer gauge value in the map.
@@ -233,8 +228,7 @@ namespace AwsMock::Core {
          * @param name name of the gauge
          * @param value value of the gauge
          */
-        [[maybe_unused]]
-        void SetGauge(const std::string &name, unsigned long value);
+        [[maybe_unused]] void SetGauge(const std::string &name, unsigned long value);
 
         /**
          * Sets a unsigned long integer gauge value in the map.
@@ -244,8 +238,7 @@ namespace AwsMock::Core {
          * @param labelValue label value of the gauge
          * @param value value of the gauge
          */
-        [[maybe_unused]]
-        void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, unsigned long value);
+        [[maybe_unused]] void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, unsigned long value);
 
         /**
          * Sets a float gauge value in the map.
@@ -253,8 +246,7 @@ namespace AwsMock::Core {
          * @param name name of the gauge
          * @param value value of the gauge
          */
-        [[maybe_unused]]
-        void SetGauge(const std::string &name, float value);
+        [[maybe_unused]] void SetGauge(const std::string &name, float value);
 
         /**
          * Sets a float gauge value in the map.
@@ -264,8 +256,7 @@ namespace AwsMock::Core {
          * @param labelValue label value of the gauge
          * @param value value of the gauge
          */
-        [[maybe_unused]]
-        void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, float value);
+        [[maybe_unused]] void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, float value);
 
         /**
          * Sets a double gauge value in the map.
@@ -273,8 +264,7 @@ namespace AwsMock::Core {
          * @param name name of the gauge
          * @param value value of the gauge
          */
-        [[maybe_unused]]
-        void SetGauge(const std::string &name, double value);
+        [[maybe_unused]] void SetGauge(const std::string &name, double value);
 
         /**
          * Sets a double gauge value in the map.
@@ -360,16 +350,14 @@ namespace AwsMock::Core {
          *
          * @param name name of the timer.
          */
-        [[maybe_unused]]
-        void ResetTimer(const std::string &name);
+        [[maybe_unused]] void ResetTimer(const std::string &name);
 
         /**
          * Resets all timers.
          *
          * @param name name of the timer.
          */
-        [[maybe_unused]]
-        void ResetAllTimer();
+        [[maybe_unused]] void ResetAllTimer();
 
         /**
          * Check whether a timer exists
@@ -380,7 +368,6 @@ namespace AwsMock::Core {
         bool TimerExists(const std::string &name);
 
       private:
-
         /**
          * Returns a thread safe timer key string.
          *
@@ -446,4 +433,4 @@ namespace AwsMock::Core {
 
 }// namespace AwsMock::Core
 
-#endif  // AWSMOCK_CORE_METRIC_SERVICE_H
+#endif// AWSMOCK_CORE_METRIC_SERVICE_H

@@ -12,21 +12,26 @@
 
 namespace AwsMock::Resource::Factory {
 
-  class ModuleFactory : public IFactory {
-
-  public:
-
     /**
-     * Create a new resource handler.
+     * Module factory
      *
-     * @param configuration application configuration
-     * @param metricService monitoring module
-     * @param serverMap server map
-     * @return resource handler
+     * @author jens.vogt@opitz-consulting.com
      */
-    Poco::Net::HTTPRequestHandler *createResource(Core::Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap) override;
-  };
+    class ModuleFactory : public IFactory {
+
+      public:
+
+        /**
+         * Create a new resource handler.
+         *
+         * @param configuration application configuration
+         * @param metricService monitoring module
+         * @param serverMap server map
+         * @return resource handler
+         */
+        Poco::Net::HTTPRequestHandler *createResource(Core::Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap) override;
+    };
 
 }// namespace AwsMock::Resource::Factory
 
-#endif // AWSMOCK_RESOURCE_FACTORY_MODULEFACTORY_H
+#endif// AWSMOCK_RESOURCE_FACTORY_MODULEFACTORY_H

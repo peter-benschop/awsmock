@@ -7,14 +7,14 @@
 
 
 // C++ standard includes
-#include <string>
-#include <sstream>
 #include <map>
+#include <sstream>
+#include <string>
 
 // Poco includes
+#include <Poco/Dynamic/Var.h>
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
-#include <Poco/Dynamic/Var.h>
 #include <Poco/Net/HTTPResponse.h>
 
 // AwsMoc includes
@@ -23,7 +23,7 @@
 
 namespace AwsMock::Dto::SecretsManager {
 
-  /**
+    /**
    * Secret tags
    *
    * Example:
@@ -38,49 +38,48 @@ namespace AwsMock::Dto::SecretsManager {
    *
    * @author jens.vogt@opitz-consulting.com
    */
-  struct SecretTags {
+    struct SecretTags {
 
-    /**
+        /**
      * Map of Tags
      */
-    std::map<std::string, std::string> tags;
+        std::map<std::string, std::string> tags;
 
-    /**
+        /**
      * Converts the DTO to a JSON representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] Poco::JSON::Array ToJsonArray() const;
+        [[nodiscard]] Poco::JSON::Array ToJsonArray() const;
 
-    /**
+        /**
      * Converts the DTO to a JSON representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
+        /**
      * Converts a JSON representation to s DTO.
      *
      * @param jsonObject JSON object.
      */
-    void FromJson(const Poco::JSON::Object::Ptr &jsonObject);
+        void FromJson(const Poco::JSON::Object::Ptr &jsonObject);
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const SecretTags &r);
+        friend std::ostream &operator<<(std::ostream &os, const SecretTags &r);
+    };
 
-  };
-
-} // namespace AwsMock::Dto::SecretsManager
-#endif //AWSMOCK_DTO_SECRETSMANAGER_SECRET_TAGS_H
+}// namespace AwsMock::Dto::SecretsManager
+#endif//AWSMOCK_DTO_SECRETSMANAGER_SECRET_TAGS_H

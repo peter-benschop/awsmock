@@ -65,7 +65,8 @@ namespace AwsMock::Service {
          * Period
          */
         int _period{};
-
     };
-}
-#endif // AWSMOCK_SERVICE_TRANSFER_MONITORING_H
+
+}// namespace AwsMock::Service
+
+#endif// AWSMOCK_SERVICE_TRANSFER_MONITORING_H

@@ -6,8 +6,8 @@
 #define AWSMOCK_DTO_COGNITO_DELETE_USERPOOL_REQUEST_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // AwsMock includes
 #include <awsmock/core/JsonException.h>
@@ -16,48 +16,52 @@
 
 namespace AwsMock::Dto::Cognito {
 
-  struct DeleteUserPoolRequest {
-
     /**
-     * AWS region
-     */
-    std::string region;
-
-    /**
-     * User pool userPoolId
-     */
-    std::string userPoolId;
-
-    /**
-     * Convert from a JSON object.
+     * Delete user pool request
      *
-     * @param payload json string object
+     * @author jens.vogt@opitz-consulting.com
      */
-    void FromJson(const std::string &payload);
+    struct DeleteUserPoolRequest {
 
-    /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
-    [[nodiscard]] std::string ToJson() const;
+        /**
+         * AWS region
+         */
+        std::string region;
 
-    /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-    [[nodiscard]] std::string ToString() const;
+        /**
+         * User pool userPoolId
+         */
+        std::string userPoolId;
 
-    /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
-    friend std::ostream &operator<<(std::ostream &os, const DeleteUserPoolRequest &i);
+        /**
+         * Convert from a JSON object.
+         *
+         * @param payload json string object
+         */
+        void FromJson(const std::string &payload);
 
-  };
+        /**
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
+        [[nodiscard]] std::string ToJson() const;
 
-} // namespace AwsMock::Dto::Cognito
+        /**
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
 
-#endif // AWSMOCK_DTO_COGNITO_DELETE_USERPOOL_REQUEST_H
+        /**
+         * Stream provider.
+         *
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const DeleteUserPoolRequest &i);
+    };
+
+}// namespace AwsMock::Dto::Cognito
+
+#endif// AWSMOCK_DTO_COGNITO_DELETE_USERPOOL_REQUEST_H
