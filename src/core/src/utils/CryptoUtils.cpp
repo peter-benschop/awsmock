@@ -429,6 +429,7 @@ namespace AwsMock::Core {
             log_error << "Could not generate RSA key, length:" << keyLength;
             return nullptr;
         }
+        std::string tmp = GetRsaPublicKey(pRSA);
         return pRSA;
     }
 
@@ -440,6 +441,24 @@ namespace AwsMock::Core {
         int size;
         char *buf = (char *) malloc(CRYPTO_RSA_KEY_LINE_LENGTH);
         std::ostringstream sstream;
+        do {
+            size = BIO_gets(bp, buf, CRYPTO_RSA_KEY_LINE_LENGTH);
+            sstream << buf;
+        } while (size > 0);
+        free(buf);
+
+        return sstream.str();
+    }
+
+    std::string Crypto::GetRsaPrivateKey(EVP_PKEY *pRSA) {
+
+        BIO *bp = BIO_new(BIO_s_mem());
+        PEM_write_bio_PUBKEY(bp, pRSA);
+
+        int size;
+        char *buf = (char *) malloc(CRYPTO_RSA_KEY_LINE_LENGTH);
+        std::ostringstream sstream;
+        PEM_write_bio_PrivateKey(bp, pRSA, nullptr, nullptr, 0, nullptr, nullptr);
         do {
             size = BIO_gets(bp, buf, CRYPTO_RSA_KEY_LINE_LENGTH);
             sstream << buf;

@@ -6,8 +6,6 @@
 
 namespace AwsMock::Core {
 
-    CurlUtils::CurlUtils() {}
-
     CurlResponse CurlUtils::SendUnixSocketRequest(const std::string &method, const std::string &path) {
 
         if (!_readBuffer.empty()) {
@@ -268,4 +266,5 @@ namespace AwsMock::Core {
 
         return response;
     }
+
 }// namespace AwsMock::Core

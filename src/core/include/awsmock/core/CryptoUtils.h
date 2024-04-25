@@ -229,6 +229,13 @@ namespace AwsMock::Core {
         static std::string GetRsaPublicKey(EVP_PKEY *pRSA);
 
         /**
+         * Converts the private key to a string.
+         *
+         * @param pRSA pointer to RSA key pair
+         */
+        static std::string GetRsaPrivateKey(EVP_PKEY *pRSA);
+
+        /**
          * Encrypt a string using RSA encryption.
          *
          * <p>

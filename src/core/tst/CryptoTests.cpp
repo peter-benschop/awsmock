@@ -205,17 +205,20 @@ namespace AwsMock::Core {
         EXPECT_TRUE(StringUtils::Equals(testText, decrypted));
     }
 
-    TEST_F(CryptoTest, GetRsaPublicKeyTest) {
+    TEST_F(CryptoTest, GetRsaKeyTest) {
 
         // arrange
         EVP_PKEY *keyPair = Crypto::GenerateRsaKeys(4096);
 
         // Generate key pair and initialize
-        std::string result = Crypto::GetRsaPublicKey(keyPair);
+        std::string publicKey = Crypto::GetRsaPublicKey(keyPair);
+        std::string privateKey = Crypto::GetRsaPrivateKey(keyPair);
 
         // assert
-        EXPECT_TRUE(!result.empty());
-        EXPECT_TRUE(result.length() == 800);
+        EXPECT_TRUE(!publicKey.empty());
+        EXPECT_TRUE(publicKey.length() == 800);
+        EXPECT_TRUE(!privateKey.empty());
+        EXPECT_TRUE(privateKey.length() == 4072);
     }
 
 }// namespace AwsMock::Core
