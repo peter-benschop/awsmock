@@ -22,7 +22,8 @@ namespace AwsMock::Database {
 
     class DatabaseTest : public ::testing::Test {
 
-          protected:
+      protected:
+
         void SetUp() override {
         }
 

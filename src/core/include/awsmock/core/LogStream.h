@@ -11,9 +11,7 @@
 #include <istream>
 #include <string_view>
 
-// Plog includes
-#define PLOG_OMIT_LOG_DEFINES
-
+// AwsMock includes
 #include <awsmock/core/logging/plog/Formatters/TxtFormatter.h>
 #include <awsmock/core/logging/plog/Init.h>
 #include <awsmock/core/logging/plog/Initializers/ConsoleInitializer.h>
@@ -22,23 +20,24 @@
 namespace AwsMock::Core {
 
     /**
-   * Logging setup
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
+     * Logging setup
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class LogStream {
 
       public:
+
         /**
-       * Constructor
-       */
+         * Constructor
+         */
         LogStream();
 
         /**
-       * Constructor
-       *
-       * @param severity PLog severity string
-       */
+         * Constructor
+         *
+         * @param severity PLog severity string
+         */
         explicit LogStream(const std::string &severity);
     };
 

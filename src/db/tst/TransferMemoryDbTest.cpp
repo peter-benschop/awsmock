@@ -32,7 +32,8 @@ namespace AwsMock::Database {
 
     class TransferMemoryDbTest : public ::testing::Test {
 
-          protected:
+      protected:
+
         void SetUp() override {
             _region = _configuration.getString("awsmock.region");
         }

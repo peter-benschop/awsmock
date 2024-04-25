@@ -47,10 +47,12 @@ namespace AwsMock {
      */
     class AwsMockServer : public Poco::Util::ServerApplication {
 
-          public:
+      public:
+
         AwsMockServer() = default;
 
-          protected:
+      protected:
+
         /**
          * Initialization callback from Poco Application class.
          *
@@ -350,7 +352,8 @@ namespace AwsMock {
             return Application::EXIT_OK;
         }
 
-          private:
+      private:
+
         /**
          * Logger
          */

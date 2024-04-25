@@ -15,18 +15,18 @@ namespace AwsMock::Core {
     class MetricServiceTimer {
 
       public:
+
         /**
-       * Constructor
-       *
-       * <p>Measure a methods execution time.</p>
-       *
-       * @param metricService metric module
-       * @param name name of the underlying timer
-       *
-       * @author jens.vogt@opitz-consulting.com
-       */
-        explicit MetricServiceTimer(M &metricService, std::string name)
-            : _metricService(metricService), _name(std::move(name)) {
+         * Constructor
+         *
+         * <p>Measure a methods execution time.</p>
+         *
+         * @param metricService metric module
+         * @param name name of the underlying timer
+         *
+         * @author jens.vogt@opitz-consulting.com
+         */
+        explicit MetricServiceTimer(M &metricService, std::string name) : _metricService(metricService), _name(std::move(name)) {
             if (!_metricService.TimerExists(_name)) {
                 _metricService.AddTimer(_name);
             }
@@ -34,36 +34,37 @@ namespace AwsMock::Core {
         }
 
         /**
-       * Destructor
-       */
+         * Destructor
+         */
         ~MetricServiceTimer() {
             _metricService.StopTimer(_name);
         }
 
         /**
-       * Default constructor
-       */
+         * Default constructor
+         */
         MetricServiceTimer() = delete;
 
         /**
-       * Copy constructor
-       */
+         * Copy constructor
+         */
         MetricServiceTimer(const MetricServiceTimer &) = delete;
 
         /**
-       * Equals operator
-       */
+         * Equals operator
+         */
         MetricServiceTimer &operator=(const MetricServiceTimer &) = delete;
 
       private:
+
         /**
-       * Metric module
-       */
+         * Metric module
+         */
         M &_metricService;
 
         /**
-       * Name of the timer
-       */
+         * Name of the timer
+         */
         const std::string _name;
     };
 

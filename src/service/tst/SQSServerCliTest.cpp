@@ -27,7 +27,8 @@ namespace AwsMock::Service {
 
     class SQSServerCliTest : public ::testing::Test {
 
-          protected:
+      protected:
+
         void SetUp() override {
 
             // Define endpoint. This is the endpoint of the SQS server, not the gateway

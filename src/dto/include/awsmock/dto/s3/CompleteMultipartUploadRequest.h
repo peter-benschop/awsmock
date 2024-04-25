@@ -20,61 +20,61 @@ namespace AwsMock::Dto::S3 {
     struct CompleteMultipartUploadRequest {
 
         /**
-     * Bucket location
-     */
+         * Bucket location
+         */
         std::string region;
 
         /**
-     * Bucket name
-     */
+         * Bucket name
+         */
         std::string bucket;
 
         /**
-     * Bucket owner
-     */
+         * Bucket owner
+         */
         std::string key;
 
         /**
-     * AWS user
-     */
+         * AWS user
+         */
         std::string user;
 
         /**
-     * AWS upload ID
-     */
+         * AWS upload ID
+         */
         std::string uploadId;
 
         /**
-     * AWS upload ID
-     */
+         * AWS upload ID
+         */
         std::string checksumAlgorithm;
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Convert from XML representation
-     *
-     * @param xmlString XML string
-     */
+         * Convert from XML representation
+         *
+         * @param xmlString XML string
+         */
         void FromXml(const std::string &xmlString);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const CompleteMultipartUploadRequest &r);
     };
 

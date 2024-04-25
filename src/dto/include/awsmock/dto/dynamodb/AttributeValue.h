@@ -2,8 +2,8 @@
 // Created by vogje01 on 12/21/23.
 //
 
-#ifndef AWSMOCK_DTO_DYNAMODB_ATTRIBUTEVALUE_H
-#define AWSMOCK_DTO_DYNAMODB_ATTRIBUTEVALUE_H
+#ifndef AWSMOCK_DTO_DYNAMODB_ATTRIBUTE_VALUE_H
+#define AWSMOCK_DTO_DYNAMODB_ATTRIBUTE_VALUE_H
 
 // C++ includes
 #include <map>
@@ -95,4 +95,4 @@ namespace AwsMock::Dto::DynamoDb {
     };
 }// namespace AwsMock::Dto::DynamoDb
 
-#endif// AWSMOCK_DTO_DYNAMODB_ATTRIBUTEVALUE_H
+#endif// AWSMOCK_DTO_DYNAMODB_ATTRIBUTE_VALUE_H

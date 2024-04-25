@@ -63,10 +63,12 @@ set(SECRETSMANAGER_SOURCES src/secretsmanager/CreateSecretRequest.cpp src/secret
         src/secretsmanager/SecretTags.cpp src/secretsmanager/RotateSecretRequest.cpp src/secretsmanager/Filter.cpp
         src/secretsmanager/RotateSecretResponse.cpp src/secretsmanager/RotationRules.cpp src/secretsmanager/Secret.cpp
         src/secretsmanager/ListSecretsRequest.cpp src/secretsmanager/ListSecretsResponse.cpp)
+set(KMS_SOURCES src/kms/CreateKeyRequest.cpp src/kms/CreateKeyResponse.cpp)
 set(MODULE_SOURCES src/module/Module.cpp src/module/GatewayConfig.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
-        ${COGNITO_SOURCES} ${TRANSFER_SOURCES} ${DYNAMODB_SOURCES} ${SECRETSMANAGER_SOURCES} ${MODULE_SOURCES})
+        ${COGNITO_SOURCES} ${TRANSFER_SOURCES} ${DYNAMODB_SOURCES} ${SECRETSMANAGER_SOURCES} ${KMS_SOURCES}
+        ${MODULE_SOURCES})
 
 # Test directory
 add_subdirectory(tst)
@@ -78,7 +80,8 @@ include_directories(include ../core/include ../db/include /usr/include/mongo /us
 add_library(${LIBRARY} SHARED ${SOURCES}
         include/awsmock/dto/secretsmanager/Filter.h
         include/awsmock/dto/cognito/LambdaConfig.h
-        include/awsmock/dto/docker/Image.h)
+        include/awsmock/dto/docker/Image.h
+        include/awsmock/dto/kms/CreateKeyRequest.h)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 

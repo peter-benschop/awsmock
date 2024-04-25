@@ -22,7 +22,8 @@
 namespace AwsMock::Dto::Transfer {
 
     class CreateServerResponseTest : public ::testing::Test {
-          protected:
+      protected:
+
         void SetUp() override {
             // General configuration
             _region = _configuration.getString("awsmock.region", "eu-central-1");

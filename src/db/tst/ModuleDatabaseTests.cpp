@@ -31,7 +31,8 @@ namespace AwsMock::Database {
 
     class ModuleDatabaseTest : public ::testing::Test {
 
-          protected:
+      protected:
+
         void SetUp() override {
             _region = _configuration.getString("awsmock.region");
         }

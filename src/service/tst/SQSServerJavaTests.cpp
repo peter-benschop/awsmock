@@ -27,7 +27,8 @@ namespace AwsMock::Service {
    */
     class SQSServerJavaTest : public ::testing::Test {
 
-          protected:
+      protected:
+
         void SetUp() override {
 
             // General configuration

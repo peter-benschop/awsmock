@@ -40,7 +40,8 @@ namespace AwsMock::Controller {
      */
     class AwsMockCtl : public Poco::Util::Application {
 
-          protected:
+      protected:
+
         /**
          * Initialization callback from Poco Application class.
          *
@@ -210,7 +211,8 @@ namespace AwsMock::Controller {
             return ProcessCommand(args);
         }
 
-          private:
+      private:
+
         /**
          * Application configuration
          */

@@ -45,7 +45,7 @@ namespace AwsMock::Core {
         pElement->appendChild(pElementText);
     }
 
-    void XmlUtils::CreateTextNode(const Poco::XML::AutoPtr<Poco::XML::Document> &document, Poco::XML::AutoPtr<Poco::XML::Element> &parent, const std::string &name, Poco::DateTime value) {
+    void XmlUtils::CreateTextNode(const Poco::XML::AutoPtr<Poco::XML::Document> &document, Poco::XML::AutoPtr<Poco::XML::Element> &parent, const std::string &name, const Poco::DateTime &value) {
 
         auto pElement = document->createElement(name);
         parent->appendChild(pElement);

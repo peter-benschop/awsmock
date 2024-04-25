@@ -19,7 +19,8 @@ namespace AwsMock::Service {
 
     class DockerServiceTest : public ::testing::Test {
 
-          protected:
+      protected:
+
         void SetUp() override {
         }
 

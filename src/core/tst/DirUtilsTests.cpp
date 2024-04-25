@@ -22,7 +22,8 @@ namespace AwsMock::Core {
 
     class DirUtilsTest : public ::testing::Test {
 
-          protected:
+      protected:
+
         void SetUp() override {
             tempDir = Core::DirUtils::CreateTempDir();
         }

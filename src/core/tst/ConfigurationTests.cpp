@@ -16,7 +16,8 @@ namespace AwsMock::Core {
 
     class ConfigurationTest : public ::testing::Test {
 
-          protected:
+      protected:
+
         void SetUp() override {
         }
 
@@ -38,9 +39,7 @@ namespace AwsMock::Core {
                 EXPECT_STREQ("Empty filename", e.message().c_str());
                 EXPECT_STREQ("CoreException: ", e.name());
                 throw;
-            }
-        },
-                     CoreException);
+            } }, CoreException);
 
         // assert
     }

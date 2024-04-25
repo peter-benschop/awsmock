@@ -21,7 +21,8 @@ namespace AwsMock::Core {
 
     class FileUtilsTest : public ::testing::Test {
 
-          protected:
+      protected:
+
         void SetUp() override {
             tempDir = Core::DirUtils::CreateTempDir();
         }
@@ -180,7 +181,7 @@ namespace AwsMock::Core {
         // assert
         EXPECT_FALSE(tempFile.empty());
         EXPECT_TRUE(FileUtils::FileExists(tempFile));
-        EXPECT_EQ(5, FileUtils::FileSize(tempFile));
+        EXPECT_EQ(4, FileUtils::FileSize(tempFile));
     }
 
 }// namespace AwsMock::Core

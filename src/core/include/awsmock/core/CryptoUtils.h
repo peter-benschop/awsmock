@@ -25,201 +25,255 @@
 
 // Openssl includes
 #include <openssl/aes.h>
+#include <openssl/bio.h>
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
 #include <openssl/md5.h>
+#include <openssl/pem.h>
+#include <openssl/rsa.h>
 #include <openssl/sha.h>
 
 // AwsMock includes
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
 
 // 64kB buffer
 #define AWSMOCK_BUFFER_SIZE 4096
+
+#define CRYPTO_RSA_KEY_LEN_4096 4096
+#define CRYPTO_RSA_KEY_LEN_2048 2048
+#define CRYPTO_RSA_KEY_LEN_1024 1024
+#define CRYPTO_RSA_KEY_EXP 65535
+#define CRYPTO_RSA_KEY_LINE_LENGTH 64
 
 namespace AwsMock::Core {
 
     static const std::string _base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
     /**
-   * Cryptographic utilities like MD5 hash, SHA1, SHA256 etc.
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
+     * Cryptographic utilities like MD5 hash, SHA1, SHA256 etc.
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class Crypto {
 
       public:
+
         /**
-     * Returns the MD5 hash of a string.
-     *
-     * @param content string to hash
-     * @return MD5 hash of the given string
-     */
+         * Returns the MD5 hash of a string.
+         *
+         * @param content string to hash
+         * @return MD5 hash of the given string
+         */
         static std::string GetMd5FromString(const std::string &content);
 
         /**
-     * Returns the MD5 hash of a file.
-     *
-     * @param fileName file name to hash
-     * @return MD5 hash of the given file
-     */
+         * Returns the MD5 hash of a file.
+         *
+         * @param fileName file name to hash
+         * @return MD5 hash of the given file
+         */
         static std::string GetMd5FromFile(const std::string &fileName);
 
         /**
-     * Returns the SHA1 hash of a string.
-     *
-     * @param content string to hash
-     * @return SHA1 hash of the given string
-     */
+         * Returns the SHA1 hash of a string.
+         *
+         * @param content string to hash
+         * @return SHA1 hash of the given string
+         */
         static std::string GetSha1FromString(const std::string &content);
 
         /**
-     * Returns the SHA1 hash of a file.
-     *
-     * @param fileName file name to hash
-     * @return SHA1 hash of the given file
-     */
+         * Returns the SHA1 hash of a file.
+         *
+         * @param fileName file name to hash
+         * @return SHA1 hash of the given file
+         */
         static std::string GetSha1FromFile(const std::string &fileName);
 
         /**
-     * Returns the SHA256 hash of a string.
-     *
-     * @param content string to hash
-     * @return SHA256 hash of the given string
-     */
+         * Returns the SHA256 hash of a string.
+         *
+         * @param content string to hash
+         * @return SHA256 hash of the given string
+         */
         static std::string GetSha256FromString(const std::string &content);
 
         /**
-     * Returns the SHA256 hash of a file.
-     *
-     * @param fileName file name to hash
-     * @return SHA256 hash of the given file
-     */
+         * Returns the SHA256 hash of a file.
+         *
+         * @param fileName file name to hash
+         * @return SHA256 hash of the given file
+         */
         static std::string GetSha256FromFile(const std::string &fileName);
 
         /**
-     * Returns the hex encoded SHA256 hash of a string.
-     *
-     * @param key string for hashing
-     * @param content string to hash
-     * @return SHA256 hash of the given string
-     */
+         * Returns the hex encoded SHA256 hash of a string.
+         *
+         * @param key string for hashing
+         * @param content string to hash
+         * @return SHA256 hash of the given string
+         */
         static std::string GetHmacSha256FromString(const std::string &key, const std::string &content);
 
         /**
-     * Returns the hex encoded SHA256 hash of a string.
-     *
-     * @param key byte array for hashing
-     * @param content string to hash
-     * @return SHA256 hash of the given string
-     */
+         * Returns the hex encoded SHA256 hash of a string.
+         *
+         * @param key byte array for hashing
+         * @param content string to hash
+         * @return SHA256 hash of the given string
+         */
         static std::string GetHmacSha256FromString(const std::array<unsigned char, EVP_MAX_MD_SIZE> &key, const std::string &content);
 
         /**
-     * Returns the SHA256 hash of a string.
-     *
-     * @param key string for hashing
-     * @param msg string to hash
-     * @return SHA256 hash of the given string
-     */
+         * Returns the SHA256 hash of a string.
+         *
+         * @param key string for hashing
+         * @param msg string to hash
+         * @return SHA256 hash of the given string
+         */
         static std::array<unsigned char, EVP_MAX_MD_SIZE> GetHmacSha256FromStringRaw(const std::string &key, const std::string &msg);
 
         /**
-     * Returns the SHA256 hash of a string.
-     *
-     * @param key byte array for hashing
-     * @param msg string to hash
-     * @return SHA256 hash of the given string
-     */
+         * Returns the SHA256 hash of a string.
+         *
+         * @param key byte array for hashing
+         * @param msg string to hash
+         * @return SHA256 hash of the given string
+         */
         static std::array<unsigned char, EVP_MAX_MD_SIZE> GetHmacSha256FromStringRaw(const std::array<unsigned char, EVP_MAX_MD_SIZE> &key, const std::string &msg);
 
         /**
-     * AES 256 encryption
-     *
-     * @param plaintext input string
-     * @param len plaintext length
-     * @param key encryption key
-     * @return encrypted string
-     */
+         * AES 256 encryption
+         *
+         * @param plaintext input string
+         * @param len plaintext length
+         * @param key encryption key
+         * @return encrypted string
+         */
         static unsigned char *Aes256EncryptString(unsigned char *plaintext, int *len, const std::string &key);
 
         /**
-     * AES 256 description
-     *
-     * @param ciphertext input string
-     * @param len ciphertext length
-     * @param key encryption key
-     * @return decrypted string
-     */
+         * AES 256 description
+         *
+         * @param ciphertext input string
+         * @param len ciphertext length
+         * @param key encryption key
+         * @return decrypted string
+         */
         static unsigned char *Aes256DecryptString(unsigned char *ciphertext, int *len, const std::string &key);
 
         /**
-     * Base64 encoding.
-     *
-     * @param inputString input string
-     * @return BASE64 encoded string.
-     */
+         * Base64 encoding.
+         *
+         * @param inputString input string
+         * @return BASE64 encoded string.
+         */
         static std::string Base64Encode(const std::string &inputString);
 
         /**
-     * Base64 encoding.
-     *
-     * @param input input char array
-     * @return BASE64 encoded string.
-     */
+         * Base64 encoding.
+         *
+         * @param input input char array
+         * @return BASE64 encoded string.
+         */
         static std::string Base64Encode(unsigned char *input);
 
         /**
-     * Base64 decoding.
-     *
-     * @param encodedString encoded input string
-     * @return BASE64 decoded string.
-     */
+         * Base64 decoding.
+         *
+         * @param encodedString encoded input string
+         * @return BASE64 decoded string.
+         */
         static std::string Base64Decode(const std::string &encodedString);
 
         /**
-     * Convert to hex string
-     *
-     * @param input input byte array
-     * @return hex encoded string
-     */
+         * Convert to hex string
+         *
+         * @param input input byte array
+         * @return hex encoded string
+         */
         static std::string HexEncode(std::array<unsigned char, EVP_MAX_MD_SIZE> input);
 
         /**
-     * Convert to hex string
-     *
-     * @param input input byte array
-     * @return hex encoded string
-     */
+         * Convert to hex string
+         *
+         * @param input input byte array
+         * @return hex encoded string
+         */
         static std::string HexEncode(const std::string &input);
 
         /**
-     * Convert to hex string
-     *
-     * @param hash input char array
-     * @param size input char length
-     * @return hex encoded string
-     */
+         * Convert to hex string
+         *
+         * @param hash input char array
+         * @param size input char length
+         * @return hex encoded string
+         */
         static std::string HexEncode(unsigned char *hash, int size);
 
-      private:
+
         /**
-     * Create a 256 bit key and IV using the supplied key_data. salt can be added for taste. Fills in the encryption and decryption ctx objects and returns 0 on success.
-     *
-     * @param key_data key data
-     * @param key_data_len length of key data
-     * @param salt salt value
-     * @param ctx openssl context
-     */
+         * Generate a RSA key pair of the given length.
+         *
+         * @param keyLength key length
+         * @return RSA key pair.
+         */
+        static EVP_PKEY *GenerateRsaKeys(unsigned int keyLength);
+
+        /**
+         * Converts the public key to a string.
+         *
+         * @param pRSA pointer to RSA key pair
+         */
+        static std::string GetRsaPublicKey(EVP_PKEY *pRSA);
+
+        /**
+         * Encrypt a string using RSA encryption.
+         *
+         * <p>
+         * The output string will be Base64 encoded.
+         * </p>
+         *
+         * @param keyPair RSA keypair.
+         * @param in ini string
+         * @return Base64 encoded string
+         */
+        static std::string RsaEncrypt(EVP_PKEY *keyPair, const std::string &in);
+
+        /**
+         * Decrypts a string using RSA encryption.
+         *
+         * <p>
+         * The input string must be Base64 encoded.
+         * </p>
+         *
+         * @param keyPair RSA keypair.
+         * @param in ini string
+         * @return Base64 encoded string
+         */
+        static std::string RsaDecrypt(EVP_PKEY *keyPair, const std::string &in);
+
+      private:
+
+        /**
+         * Create a 256 bit key and IV using the supplied key_data. salt can be added for taste. Fills in the encryption and decryption ctx objects and returns 0 on success.
+         *
+         * @param key_data key data
+         * @param key_data_len length of key data
+         * @param salt salt value
+         * @param ctx openssl context
+         */
         static int Aes256EncryptionInit(unsigned char *key_data, int key_data_len, unsigned char *salt, EVP_CIPHER_CTX *ctx);
 
         /**
-     * Create a 256 bit key and IV using the supplied key_data. salt can be added for taste. Fills in the encryption and decryption ctx objects and returns 0 on success.
-     *
-     * @param key_data key data
-     * @param key_data_len length of key data
-     * @param salt salt value
-     * @param ctx openssl context
-     */
+         * Create a 256 bit key and IV using the supplied key_data. salt can be added for taste. Fills in the encryption and decryption ctx objects and returns 0 on success.
+         *
+         * @param key_data key data
+         * @param key_data_len length of key data
+         * @param salt salt value
+         * @param ctx openssl context
+         */
         static int Aes256DecryptionInit(unsigned char *key_data, int key_data_len, unsigned char *salt, EVP_CIPHER_CTX *ctx);
     };
 

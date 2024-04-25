@@ -29,7 +29,8 @@ namespace AwsMock::Service {
 
     class S3ServiceTest : public ::testing::Test {
 
-          protected:
+      protected:
+
         void SetUp() override {
             testFile = Core::FileUtils::CreateTempFile("/tmp", "json", 10);
         }

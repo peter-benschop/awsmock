@@ -1,6 +1,7 @@
 # Generated from CLion C/C++ Code Style settings
+Language: Cpp
 BasedOnStyle: LLVM
-AccessModifierOffset: 0
+AccessModifierOffset: -2
 AlignAfterOpenBracket: Align
 AlignConsecutiveAssignments: None
 AlignOperands: Align
@@ -36,6 +37,7 @@ BreakInheritanceList: BeforeColon
 ColumnLimit: 0
 CompactNamespaces: false
 ContinuationIndentWidth: 8
+EmptyLineAfterAccessModifier: Always
 IndentCaseLabels: true
 IndentPPDirectives: None
 IndentWidth: 4

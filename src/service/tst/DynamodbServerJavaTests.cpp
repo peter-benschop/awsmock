@@ -23,7 +23,8 @@ namespace AwsMock::Service {
 
     class DynamoDbServerJavaTest : public ::testing::Test {
 
-          protected:
+      protected:
+
         void SetUp() override {
 
             // Define endpoint

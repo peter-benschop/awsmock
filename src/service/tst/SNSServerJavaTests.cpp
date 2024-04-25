@@ -26,7 +26,8 @@ namespace AwsMock::Service {
    */
     class SNSServerJavaTest : public ::testing::Test {
 
-          protected:
+      protected:
+
         void SetUp() override {
 
             // General configuration

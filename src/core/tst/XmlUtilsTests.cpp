@@ -23,12 +23,13 @@ namespace AwsMock::Core {
     TEST_F(XmlUtilsTest, CreateTextNodeTest) {
 
         // arrange
+        std::string testValue = "TestValue";
         Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
         Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("Root");
         pDoc->appendChild(pRoot);
 
         // act
-        XmlUtils::CreateTextNode(pDoc, pRoot, "Test", "TestValue");
+        XmlUtils::CreateTextNode(pDoc, pRoot, "Test", testValue);
         std::string result = XmlUtils::ToXmlString(pDoc);
 
         // assert

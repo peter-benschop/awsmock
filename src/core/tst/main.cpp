@@ -12,7 +12,9 @@
 #include <awsmock/core/TestUtils.h>
 
 class TestEnvironment : public ::testing::Environment {
-      public:
+
+  public:
+
     // Initialise a test configuration.
     void SetUp() override {
         AwsMock::Core::TestUtils::CreateTestConfigurationFile();

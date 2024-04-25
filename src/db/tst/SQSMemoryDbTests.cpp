@@ -22,7 +22,8 @@ namespace AwsMock::Database {
 
     class SQSMemoryDbTest : public ::testing::Test {
 
-          protected:
+      protected:
+
         void SetUp() override {
             _queueArn = Core::AwsUtils::CreateSqsQueueArn(_configuration, QUEUE_NAME);
             _queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, QUEUE_NAME);

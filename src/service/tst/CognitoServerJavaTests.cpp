@@ -24,7 +24,8 @@ namespace AwsMock::Service {
 
     class CognitoServerJavaTest : public ::testing::Test {
 
-          protected:
+      protected:
+
         void SetUp() override {
 
             // Define endpoint

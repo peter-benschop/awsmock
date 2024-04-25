@@ -30,6 +30,7 @@ namespace AwsMock::Core {
     class XmlUtils {
 
       public:
+
         /**
      * Creates a new XML document
      *
@@ -120,7 +121,7 @@ namespace AwsMock::Core {
      * @param name node
      * @param value node value
      */
-        static void CreateTextNode(const Poco::XML::AutoPtr<Poco::XML::Document> &document, Poco::XML::AutoPtr<Poco::XML::Element> &parent, const std::string &name, Poco::DateTime value);
+        static void CreateTextNode(const Poco::XML::AutoPtr<Poco::XML::Document> &document, Poco::XML::AutoPtr<Poco::XML::Element> &parent, const std::string &name, const Poco::DateTime &value);
 
         /**
      * Creates a new text node from a boolean value.

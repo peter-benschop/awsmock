@@ -31,7 +31,8 @@ namespace AwsMock::Database {
 
     class ModuleMemoryDbTest : public ::testing::Test {
 
-          protected:
+      protected:
+
         void SetUp() override {
         }
 

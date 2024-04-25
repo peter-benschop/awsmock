@@ -37,6 +37,7 @@ namespace AwsMock::Service {
     class S3Handler : public S3CmdHandler {
 
       public:
+
         /**
          * Constructor
          *
@@ -100,6 +101,7 @@ namespace AwsMock::Service {
         void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
       private:
+
         /**
          * S3 handler configuration
          */

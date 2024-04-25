@@ -2,8 +2,8 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#ifndef AWSMOCK_REPOSITORY_MODULEMEMORYDB_H
-#define AWSMOCK_REPOSITORY_MODULEMEMORYDB_H
+#ifndef AWSMOCK_REPOSITORY_MODULE_MEMORYDB_H
+#define AWSMOCK_REPOSITORY_MODULE_MEMORYDB_H
 
 // C++ standard includes
 #include <string>
@@ -125,14 +125,6 @@ namespace AwsMock::Database {
         void SetPort(const std::string &name, int port);
 
         /**
-         * Creates or updates a modules
-         *
-         * @param modules modules entity
-         * @return updated modules
-         */
-        Entity::Module::Module CreateOrUpdateModule(const Entity::Module::Module &modules);
-
-        /**
          * Counts the number of modules
          *
          * @return total number of modules
@@ -177,4 +169,4 @@ namespace AwsMock::Database {
 
 }// namespace AwsMock::Database
 
-#endif// AWSMOCK_REPOSITORY_MODULEMEMORYDB_H
+#endif// AWSMOCK_REPOSITORY_MODULE_MEMORYDB_H

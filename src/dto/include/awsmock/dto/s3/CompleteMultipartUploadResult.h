@@ -20,76 +20,76 @@ namespace AwsMock::Dto::S3 {
     struct CompleteMultipartUploadResult {
 
         /**
-     * AWS location
-     */
+         * AWS location
+         */
         std::string location;
 
         /**
-     * Bucket name
-     */
+         * Bucket name
+         */
         std::string bucket;
 
         /**
-     * Key name
-     */
+         * Key name
+         */
         std::string key;
 
         /**
-     * ETag
-     */
+         * ETag
+         */
         std::string etag;
 
         /**
-     * MD5 sum
-     */
+         * MD5 sum
+         */
         std::string md5sum;
 
         /**
-     * Checksum CRC32
-     */
+         * Checksum CRC32
+         */
         std::string checksumCrc32;
 
         /**
-     * Checksum CRC32C
-     */
+         * Checksum CRC32C
+         */
         std::string checksumCrc32c;
 
         /**
-     * Checksum SHA1
-     */
+         * Checksum SHA1
+         */
         std::string checksumSha1;
 
         /**
-     * Checksum SHA256
-     */
+         * Checksum SHA256
+         */
         std::string checksumSha256;
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Convert to XML representation
-     *
-     * @return XML string
-     */
+         * Convert to XML representation
+         *
+         * @return XML string
+         */
         [[nodiscard]] std::string ToXml() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const CompleteMultipartUploadResult &r);
     };
 

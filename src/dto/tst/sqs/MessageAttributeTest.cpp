@@ -21,7 +21,8 @@
 namespace AwsMock::Dto::SQS {
 
     class MessageAttributeTest : public ::testing::Test {
-          protected:
+      protected:
+
         void SetUp() override {
         }
 

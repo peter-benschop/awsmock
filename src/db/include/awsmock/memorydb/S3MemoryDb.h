@@ -2,8 +2,8 @@
 // Created by vogje01 on 11/19/23.
 //
 
-#ifndef AWSMOCK_REPOSITORY_S3MEMORYDB_H
-#define AWSMOCK_REPOSITORY_S3MEMORYDB_H
+#ifndef AWSMOCK_REPOSITORY_S3_MEMORYDB_H
+#define AWSMOCK_REPOSITORY_S3_MEMORYDB_H
 
 // C++ includes
 #include <string>
@@ -258,4 +258,4 @@ namespace AwsMock::Database {
 
 }// namespace AwsMock::Database
 
-#endif// AWSMOCK_REPOSITORY_S3MEMORYDB_H
+#endif// AWSMOCK_REPOSITORY_S3_MEMORYDB_H

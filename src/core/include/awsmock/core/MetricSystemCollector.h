@@ -34,94 +34,97 @@
 namespace AwsMock::Core {
 
     /**
-   * Collect system information like CPU and Memory. Runs as background thread with a given timeout in ms.
-   *
-   * @author jens.vogt@opitz-consulting.com
-  */
+     * Collect system information like CPU and Memory. Runs as background thread with a given timeout in ms.
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class MetricSystemCollector : public Core::Timer {
 
       public:
+
         /**
-     * Constructor.
-     */
+         * Constructor.
+         */
         explicit MetricSystemCollector();
 
         /**
-     * Destructor.
-     */
+         * Destructor.
+         */
         ~MetricSystemCollector();
 
         /**
-     * Initialization
-     */
+         * Initialization
+         */
         void Initialize() override;
 
         /**
-     * Runnable method
-     */
+         * Runnable method
+         */
         void Run() override;
 
         /**
-     * Shutdown
-     */
+         * Shutdown
+         */
         void Shutdown() override;
 
       private:
+
         /**
-     * Updates the system counter
-     */
+         * Updates the system counter
+         */
         void CollectSystemCounter();
 
         /**
-     * Virtual memory gauge
-     */
+         * Virtual memory gauge
+         */
         Poco::Prometheus::Gauge *_virtualMemory;
 
         /**
-     * Real memory gauge
-     */
+         * Real memory gauge
+         */
         Poco::Prometheus::Gauge *_realMemory;
 
         /**
-     * Total thread gauge
-     */
+         * Total thread gauge
+         */
         Poco::Prometheus::Gauge *_totalThreads;
 
         /**
-     * Total CPU gauge
-     */
+         * Total CPU gauge
+         */
         Poco::Prometheus::Gauge *_totalCpu;
 
         /**
-     * User CPU gauge
-     */
+         * User CPU gauge
+         */
         Poco::Prometheus::Gauge *_userCpu;
 
         /**
-     * System CPU gauge
-     */
+         * System CPU gauge
+         */
         Poco::Prometheus::Gauge *_systemCpu;
 
         /**
-     * Number of processors
-     */
+         * Number of processors
+         */
         int numProcessors{};
 
         /**
-     * Last CPU
-     */
+         * Last CPU
+         */
         clock_t lastCPU{};
 
         /**
-     * Last system CPU
-     */
+         * Last system CPU
+         */
         clock_t lastSysCPU{};
 
         /**
-     * Last user CPU
-     */
+         * Last user CPU
+         */
         clock_t lastUserCPU{};
     };
+
 }// namespace AwsMock::Core
 
-#endif//AWSMOCK_CORE_METRIC_SYSTEM_COLLECTOR_H
+#endif// AWSMOCK_CORE_METRIC_SYSTEM_COLLECTOR_H

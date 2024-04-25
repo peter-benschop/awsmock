@@ -21,59 +21,59 @@ namespace AwsMock::Dto::S3 {
     struct CopyObjectRequest {
 
         /**
-     * Region
-     */
+         * Region
+         */
         std::string region;
 
         /**
-     * Region
-     */
+         * Region
+         */
         std::string user;
 
         /**
-     * Source bucket
-     */
+         * Source bucket
+         */
         std::string sourceBucket;
 
         /**
-     * Source key
-     */
+         * Source key
+         */
         std::string sourceKey;
 
         /**
-     * Target bucket
-     */
+         * Target bucket
+         */
         std::string targetBucket;
 
         /**
-     * Target key
-     */
+         * Target key
+         */
         std::string targetKey;
 
         /**
-     * Metadata
-     */
+         * Metadata
+         */
         std::map<std::string, std::string> metadata;
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const CopyObjectRequest &r);
     };
 

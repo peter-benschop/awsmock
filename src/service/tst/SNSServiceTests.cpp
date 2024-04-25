@@ -29,7 +29,8 @@ namespace AwsMock::Service {
 
     class SNSServiceTest : public ::testing::Test {
 
-          protected:
+      protected:
+
         void SetUp() override {
         }
 

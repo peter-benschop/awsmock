@@ -28,7 +28,8 @@ namespace AwsMock::Service {
 
     class S3ServerCliTest : public ::testing::Test {
 
-          protected:
+      protected:
+
         void SetUp() override {
 
             // Define endpoint

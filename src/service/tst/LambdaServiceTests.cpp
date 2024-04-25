@@ -28,7 +28,8 @@ namespace AwsMock::Service {
 
     class LambdaServiceTest : public ::testing::Test {
 
-          protected:
+      protected:
+
         void SetUp() override {
         }
 

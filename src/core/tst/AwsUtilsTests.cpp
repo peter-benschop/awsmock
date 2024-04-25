@@ -19,14 +19,16 @@ namespace AwsMock::Core {
 
     class AwsUtilsTest : public ::testing::Test {
 
-          public:
+      public:
+
         void SetUp() override {
             _region = _configuration.getString("awsmock.region");
             _accountId = _configuration.getString("awsmock.account.userPoolId");
             _endpoint = SystemUtils::GetHostName() + ":" + _configuration.getString("awsmock.service.gateway.port");
         }
 
-          protected:
+      protected:
+
         std::string _region, _accountId, _endpoint;
         Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
     };

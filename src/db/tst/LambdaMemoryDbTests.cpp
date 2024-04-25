@@ -24,7 +24,8 @@ namespace AwsMock::Database {
 
     class LambdaMemoryDbTest : public ::testing::Test {
 
-          protected:
+      protected:
+
         void SetUp() override {
             _region = _configuration.getString("awsmock.region");
             _accountId = _configuration.getString("awsmock.account.userPoolId");
