@@ -12,32 +12,31 @@
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
-#include <awsmock/core/MetricService.h>
 #include <awsmock/core/MetricDefinition.h>
+#include <awsmock/core/MetricService.h>
 #include <awsmock/dto/common/SNSClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
-#include <awsmock/service/sns/SNSService.h>
 #include <awsmock/service/sns/SNSCmdHandler.h>
+#include <awsmock/service/sns/SNSService.h>
 
 namespace AwsMock::Service {
 
-  typedef std::map<std::string, std::string> AttributeList;
-
-  /**
-   * AWS SNS mock handler
-   */
-  class SNSHandler : public SNSCmdHandler {
-
-  public:
+    typedef std::map<std::string, std::string> AttributeList;
 
     /**
+   * AWS SNS mock handler
+   */
+    class SNSHandler : public SNSCmdHandler {
+
+      public:
+        /**
      * Constructor
      *
      * @param configuration application configuration
      */
-    explicit SNSHandler(Core::Configuration &configuration) : SNSCmdHandler(configuration), _configuration(configuration), _snsService(configuration) {}
+        explicit SNSHandler(Core::Configuration &configuration) : SNSCmdHandler(configuration), _configuration(configuration), _snsService(configuration) {}
 
-    /**
+        /**
      * HTTP POST request.
      *
      * @param request HTTP request
@@ -46,26 +45,25 @@ namespace AwsMock::Service {
      * @param user AWS user
      * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
      */
-    void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+        void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
-  private:
-
-    /**
+      private:
+        /**
      * ImageHandler import configuration
      */
-    Core::Configuration &_configuration;
+        Core::Configuration &_configuration;
 
-    /**
+        /**
      * SNS module
      */
-    Service::SNSService _snsService;
+        Service::SNSService _snsService;
 
-    /**
+        /**
      * Default account ID
      */
-    std::string _accountId;
-  };
+        std::string _accountId;
+    };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_SNSHANDLER_H
+#endif// AWSMOCK_SERVICE_SNSHANDLER_H

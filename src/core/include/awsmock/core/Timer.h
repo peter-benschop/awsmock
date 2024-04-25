@@ -19,96 +19,94 @@
 
 namespace AwsMock::Core {
 
-  /**
+    /**
    * General asynchronous job execution class
    *
    * @author jens.vogt@opitz-consulting.com
    */
-  class Timer {
+    class Timer {
 
-    public:
-
-      /**
+      public:
+        /**
        * Constructor
        *
        * @param name timer name
        * @param timeout timeout in seconds
        */
-      explicit Timer(std::string name, int timeout) : _name(std::move(name)), _timeout(timeout) {}
+        explicit Timer(std::string name, int timeout) : _name(std::move(name)), _timeout(timeout) {}
 
-      /**
+        /**
        * Constructor
        *
        * @param name timer name
        */
-      explicit Timer(std::string name) : _name(std::move(name)) {}
+        explicit Timer(std::string name) : _name(std::move(name)) {}
 
-      /**
+        /**
        * Start the timer
        */
-      void Start();
+        void Start();
 
-      /**
+        /**
        * Restart the timer
        */
-      void Restart();
+        void Restart();
 
-      /**
+        /**
        * Start the task
        */
-      void Start(int timeout);
+        void Start(int timeout);
 
-      /**
+        /**
        * Stop the task
        */
-      void Stop();
+        void Stop();
 
-      /**
+        /**
        * Main loop
        */
-      virtual void Initialize() = 0;
+        virtual void Initialize() = 0;
 
-      /**
+        /**
        * Main loop
        */
-      virtual void Run() = 0;
+        virtual void Run() = 0;
 
-      /**
+        /**
        * Shutdown
        */
-      virtual void Shutdown() = 0;
+        virtual void Shutdown() = 0;
 
-      /**
+        /**
        * Sets the timeout.
        *
        * <p>
        * The time will be stopped and restarted
        * </p>
        */
-      void SetTimeout(int timeout);
+        void SetTimeout(int timeout);
 
-    private:
-
-      /**
+      private:
+        /**
        * Timer name
        */
-      std::string _name;
+        std::string _name;
 
-      /**
+        /**
        * Loop timeout
        */
-      int _timeout{};
+        int _timeout{};
 
-      /**
+        /**
        * Promise for stopping thread
        */
-      std::promise<void> _stop;
+        std::promise<void> _stop;
 
-      /**
+        /**
        * Thread handle
        */
-      std::future<void> _thread_handle;
-  };
-}
+        std::future<void> _thread_handle;
+    };
+}// namespace AwsMock::Core
 
-#endif //AWSMOCK_CORE_TASK_H
+#endif//AWSMOCK_CORE_TASK_H

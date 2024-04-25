@@ -6,50 +6,50 @@
 
 namespace AwsMock::Dto::SecretsManager {
 
-  std::string RotateSecretResponse::ToJson() const {
+    std::string RotateSecretResponse::ToJson() const {
 
-    try {
+        try {
 
-      Poco::JSON::Object rootJson;
-      rootJson.set("Region", region);
-      rootJson.set("ARN", arn);
-      rootJson.set("VersionId", versionId);
+            Poco::JSON::Object rootJson;
+            rootJson.set("Region", region);
+            rootJson.set("ARN", arn);
+            rootJson.set("VersionId", versionId);
 
-      std::ostringstream os;
-      rootJson.stringify(os);
-      return os.str();
+            std::ostringstream os;
+            rootJson.stringify(os);
+            return os.str();
 
-    } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+        } catch (Poco::Exception &exc) {
+            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
-  }
 
-  void RotateSecretResponse::FromJson(const std::string &jsonString) {
+    void RotateSecretResponse::FromJson(const std::string &jsonString) {
 
-    try {
-      Poco::JSON::Parser parser;
-      Poco::Dynamic::Var result = parser.parse(jsonString);
+        try {
+            Poco::JSON::Parser parser;
+            Poco::Dynamic::Var result = parser.parse(jsonString);
 
-      const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-      Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-      Core::JsonUtils::GetJsonValueString("ARN", rootObject, arn);
-      Core::JsonUtils::GetJsonValueString("VersionId", rootObject, versionId);
+            const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
+            Core::JsonUtils::GetJsonValueString("ARN", rootObject, arn);
+            Core::JsonUtils::GetJsonValueString("VersionId", rootObject, versionId);
 
-    } catch (Poco::Exception &exc) {
-      std::cerr << exc.message() << std::endl;
-      throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+        } catch (Poco::Exception &exc) {
+            std::cerr << exc.message() << std::endl;
+            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
-  }
 
-  std::string RotateSecretResponse::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+    std::string RotateSecretResponse::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
+    }
 
-  std::ostream &operator<<(std::ostream &os, const RotateSecretResponse &r) {
-    os << "RotateSecretResponse=" << r.ToJson();
-    return os;
-  }
+    std::ostream &operator<<(std::ostream &os, const RotateSecretResponse &r) {
+        os << "RotateSecretResponse=" << r.ToJson();
+        return os;
+    }
 
-} // namespace AwsMock::Dto
+}// namespace AwsMock::Dto::SecretsManager

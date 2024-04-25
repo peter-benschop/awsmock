@@ -1,7 +1,7 @@
 
-#include <awsmock/core/XmlUtils.h>
 #include <Poco/DOM/DOMWriter.h>
 #include <Poco/XML/XMLWriter.h>
+#include <awsmock/core/XmlUtils.h>
 
 namespace AwsMock::Core {
 
@@ -79,7 +79,6 @@ namespace AwsMock::Core {
         writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION);
         writer.writeNode(output, document);
         return output.str();
-
     }
 
-}
+}// namespace AwsMock::Core

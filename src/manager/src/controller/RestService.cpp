@@ -52,4 +52,4 @@ namespace AwsMock {
             _httpServer->stop();
         }
     }
-}
+}// namespace AwsMock

@@ -6,9 +6,9 @@
 #define AWSMOCK_REPOSITORY_SQSDATABASE_H
 
 // C++ standard includes
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
 
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
@@ -18,15 +18,15 @@
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/memorydb/SQSMemoryDb.h>
-#include <awsmock/repository/Database.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/entity/sqs/Queue.h>
+#include <awsmock/memorydb/SQSMemoryDb.h>
+#include <awsmock/repository/Database.h>
 
 namespace AwsMock::Database {
 
@@ -38,7 +38,6 @@ namespace AwsMock::Database {
     class SQSDatabase : public Database {
 
       public:
-
         /**
          * Constructor
          *
@@ -50,7 +49,7 @@ namespace AwsMock::Database {
          * Singleton instance
          */
         static SQSDatabase &instance() {
-            static Poco::SingletonHolder <SQSDatabase> sh;
+            static Poco::SingletonHolder<SQSDatabase> sh;
             return *sh.get();
         }
 
@@ -338,7 +337,7 @@ namespace AwsMock::Database {
          * @return message converted to JSON string
          * @throws Core::DatabaseException
          */
-        static std::string ConvertMessageToJson(mongocxx::stdx::optional <bsoncxx::document::value> document);
+        static std::string ConvertMessageToJson(mongocxx::stdx::optional<bsoncxx::document::value> document);
 
         /**
          * Deletes all messages of a queue
@@ -364,16 +363,15 @@ namespace AwsMock::Database {
         void DeleteAllMessages();
 
       private:
-
         /**
          * SQS queue vector, when running without database
          */
-        std::map <std::string, Entity::SQS::Queue> _queues;
+        std::map<std::string, Entity::SQS::Queue> _queues;
 
         /**
          * SQS message vector, when running without database
          */
-        std::map <std::string, Entity::SQS::Message> _messages;
+        std::map<std::string, Entity::SQS::Message> _messages;
 
         /**
          * Use MongoDB
@@ -401,6 +399,6 @@ namespace AwsMock::Database {
         SQSMemoryDb &_memoryDb;
     };
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
 
-#endif // AWSMOCK_REPOSITORY_SQSDATABASE_H
+#endif// AWSMOCK_REPOSITORY_SQSDATABASE_H

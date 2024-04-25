@@ -6,38 +6,38 @@
 
 namespace AwsMock::Dto::S3 {
 
-  std::string GetObjectResponse::ToJson() const {
+    std::string GetObjectResponse::ToJson() const {
 
-    try {
-      Poco::JSON::Object rootJson;
-      rootJson.set("region", region);
-      rootJson.set("bucket", bucket);
-      rootJson.set("key", key);
-      rootJson.set("size", size);
-      rootJson.set("filename", filename);
-      rootJson.set("contentType", contentType);
-      rootJson.set("md5sum", md5sum);
-      rootJson.set("metadata", Core::JsonUtils::GetJsonObject(metadata));
-      rootJson.set("created", created);
-      rootJson.set("modified", modified);
+        try {
+            Poco::JSON::Object rootJson;
+            rootJson.set("region", region);
+            rootJson.set("bucket", bucket);
+            rootJson.set("key", key);
+            rootJson.set("size", size);
+            rootJson.set("filename", filename);
+            rootJson.set("contentType", contentType);
+            rootJson.set("md5sum", md5sum);
+            rootJson.set("metadata", Core::JsonUtils::GetJsonObject(metadata));
+            rootJson.set("created", created);
+            rootJson.set("modified", modified);
 
-      return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::JsonUtils::ToJsonString(rootJson);
 
-    } catch (Poco::Exception &exc) {
-      log_error << exc.message();
-      throw Core::JsonException(exc.message());
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }
     }
-  }
 
-  std::string GetObjectResponse::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+    std::string GetObjectResponse::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
+    }
 
-  std::ostream &operator<<(std::ostream &os, const GetObjectResponse &r) {
-    os << "GetObjectResponse=" << r.ToJson();
-    return os;
-  }
+    std::ostream &operator<<(std::ostream &os, const GetObjectResponse &r) {
+        os << "GetObjectResponse=" << r.ToJson();
+        return os;
+    }
 
-} // namespace AwsMock::Dto::S3
+}// namespace AwsMock::Dto::S3

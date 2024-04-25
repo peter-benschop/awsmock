@@ -6,18 +6,18 @@
 #define AWSMOCK_DB_ENTITY_SQS_REDRIVE_POLICY_H
 
 // C++ includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // Poco includes
 #include <Poco/DateTime.h>
 #include <Poco/JSON/Parser.h>
 
 // MongoDB includes
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
@@ -26,12 +26,12 @@
 
 namespace AwsMock::Database::Entity::SQS {
 
+    using bsoncxx::view_or_value;
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
-    using bsoncxx::view_or_value;
-    using bsoncxx::document::view;
     using bsoncxx::document::value;
+    using bsoncxx::document::view;
 
     /**
      * SQS queue re-drive policy entity
@@ -69,14 +69,14 @@ namespace AwsMock::Database::Entity::SQS {
          *
          * @return entity as MongoDB document.
          */
-        [[maybe_unused]] [[nodiscard]] view_or_value <view, value> ToDocument() const;
+        [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * Converts the MongoDB document to an entity
          *
          * @param mResult MongoDB document.
          */
-        [[maybe_unused]] void FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult);
+        [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
         /**
          * Converts the entity to a JSON object
@@ -107,9 +107,8 @@ namespace AwsMock::Database::Entity::SQS {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const RedrivePolicy &r);
-
     };
 
-} // namespace AwsMock::Database::Entity::SQS
+}// namespace AwsMock::Database::Entity::SQS
 
-#endif // AWSMOCK_DB_ENTITY_SQS_REDRIVE_POLICY_H
+#endif// AWSMOCK_DB_ENTITY_SQS_REDRIVE_POLICY_H

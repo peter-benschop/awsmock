@@ -6,9 +6,9 @@
 
 namespace AwsMock::Database::Entity::Cognito {
 
-    view_or_value <view, value> UserPool::ToDocument() const {
+    view_or_value<view, value> UserPool::ToDocument() const {
 
-        view_or_value <view, value> userPoolDocument = make_document(
+        view_or_value<view, value> userPoolDocument = make_document(
                 kvp("region", region),
                 kvp("userPoolId", userPoolId),
                 kvp("name", name),
@@ -16,10 +16,9 @@ namespace AwsMock::Database::Entity::Cognito {
                 kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
                 kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
         return userPoolDocument;
-
     }
 
-    void UserPool::FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult) {
+    void UserPool::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         oid = mResult.value()["_id"].get_oid().value.to_string();
         userPoolId = bsoncxx::string::to_string(mResult.value()["userPoolId"].get_string().value);
@@ -28,7 +27,6 @@ namespace AwsMock::Database::Entity::Cognito {
         clientId = bsoncxx::string::to_string(mResult.value()["clientId"].get_string().value);
         created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
         modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
-
     }
 
     Poco::JSON::Object UserPool::ToJsonObject() const {
@@ -58,4 +56,4 @@ namespace AwsMock::Database::Entity::Cognito {
         os << "UserPool=" << bsoncxx::to_json(u.ToDocument());
         return os;
     }
-}
+}// namespace AwsMock::Database::Entity::Cognito

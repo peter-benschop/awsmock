@@ -18,138 +18,137 @@
 
 namespace AwsMock::Dto::Lambda {
 
-  struct Function {
+    struct Function {
 
-    /**
+        /**
      * AWS region
      */
-    std::string region = {};
+        std::string region = {};
 
-    /**
+        /**
      * Architectures
      */
-    std::vector<std::string> architectures = {};
+        std::vector<std::string> architectures = {};
 
-    /**
+        /**
      * SHA256 checksum
      */
-    std::string codeSha256 = {};
+        std::string codeSha256 = {};
 
-    /**
+        /**
      * Code size
      */
-    long codeSize = 0;
+        long codeSize = 0;
 
-    /**
+        /**
      * Dead letter config
      */
-    DeadLetterConfig deadLetterConfig = {};
+        DeadLetterConfig deadLetterConfig = {};
 
-    /**
+        /**
      * Description
      */
-    std::string description = {};
-    // TODO: Environment, EpheremalStorage, FileSystemConfig
+        std::string description = {};
+        // TODO: Environment, EpheremalStorage, FileSystemConfig
 
-    /**
+        /**
      * Function ARN
      */
-    std::string functionArn = {};
+        std::string functionArn = {};
 
-    /**
+        /**
      * Function name
      */
-    std::string functionName = {};
+        std::string functionName = {};
 
-    /**
+        /**
      * Function handler
      */
-    std::string handler = {};
+        std::string handler = {};
 
-    // TODO: ImageConfigResponse
+        // TODO: ImageConfigResponse
 
-    /**
+        /**
      * Last modification datetime
      */
-    Poco::DateTime lastModified = {};
+        Poco::DateTime lastModified = {};
 
-    /**
+        /**
      * Last update state
      */
-    std::string lastUpdateStatus = {};
+        std::string lastUpdateStatus = {};
 
-    /**
+        /**
      * Last update state reason
      */
-    std::string lastUpdateStatusReason = {};
+        std::string lastUpdateStatusReason = {};
 
-    /**
+        /**
      * Last update state reason
      */
-    std::string lastUpdateStatusReasonCode = {};
+        std::string lastUpdateStatusReasonCode = {};
 
-    // TODO: Layers
+        // TODO: Layers
 
-    /**
+        /**
      * State
      */
-    std::string state = {};
+        std::string state = {};
 
-    /**
+        /**
      * State reason
      */
-    std::string stateReason = {};
+        std::string stateReason = {};
 
-    /**
+        /**
      * State reason code
      */
-    std::string stateReasonCode = {};
+        std::string stateReasonCode = {};
 
-    /**
+        /**
      * Timeout
      */
-    int timeout = 15;
+        int timeout = 15;
 
-    /**
+        /**
      * Version
      */
-    std::string version = {};
+        std::string version = {};
 
-    /**
+        /**
      * Environment
      */
-    EnvironmentVariables environment = {};
+        EnvironmentVariables environment = {};
 
-    /**
+        /**
      * Converts the DTO to a JSON representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
-    /**
+        /**
      * Converts the DTO to a JSON string.
      *
      * @return DTO as JSON string
      */
-    [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const Function &f);
+        friend std::ostream &operator<<(std::ostream &os, const Function &f);
+    };
 
-  };
-
-  typedef std::vector<Function> FunctionList;
-}
-#endif // AWSMOCK_DTO_LAMBDA_FUNCTION_H
+    typedef std::vector<Function> FunctionList;
+}// namespace AwsMock::Dto::Lambda
+#endif// AWSMOCK_DTO_LAMBDA_FUNCTION_H

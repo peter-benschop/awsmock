@@ -9,9 +9,7 @@ namespace AwsMock::Resource {
 
     void AbstractResource::handleHttpHeaders(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
 
-        if (request.getMethod() != Poco::Net::HTTPRequest::HTTP_GET && request.getMethod() != Poco::Net::HTTPRequest::HTTP_PUT
-            && request.getMethod() != Poco::Net::HTTPRequest::HTTP_POST && request.getMethod() != Poco::Net::HTTPRequest::HTTP_DELETE
-            && request.getMethod() != Poco::Net::HTTPRequest::HTTP_OPTIONS && request.getMethod() != Poco::Net::HTTPRequest::HTTP_HEAD) {
+        if (request.getMethod() != Poco::Net::HTTPRequest::HTTP_GET && request.getMethod() != Poco::Net::HTTPRequest::HTTP_PUT && request.getMethod() != Poco::Net::HTTPRequest::HTTP_POST && request.getMethod() != Poco::Net::HTTPRequest::HTTP_DELETE && request.getMethod() != Poco::Net::HTTPRequest::HTTP_OPTIONS && request.getMethod() != Poco::Net::HTTPRequest::HTTP_HEAD) {
             log_error << "Invalid request method, method: " << request.getMethod();
             throw HandlerException("Not Implemented", "The request method is not supported by the manager and cannot be handled.", 501);
         }
@@ -69,40 +67,40 @@ namespace AwsMock::Resource {
         }
     }
 
-    void AbstractResource::handleGet([[maybe_unused]]Poco::Net::HTTPServerRequest &request,
+    void AbstractResource::handleGet([[maybe_unused]] Poco::Net::HTTPServerRequest &request,
                                      Poco::Net::HTTPServerResponse &response,
-                                     [[maybe_unused]]const std::string &region,
-                                     [[maybe_unused]]const std::string &user) {
+                                     [[maybe_unused]] const std::string &region,
+                                     [[maybe_unused]] const std::string &user) {
         log_trace << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user;
         handleHttpStatusCode(response, 501);
         std::ostream &errorStream = response.send();
         errorStream.flush();
     }
 
-    void AbstractResource::handlePut([[maybe_unused]]Poco::Net::HTTPServerRequest &request,
+    void AbstractResource::handlePut([[maybe_unused]] Poco::Net::HTTPServerRequest &request,
                                      Poco::Net::HTTPServerResponse &response,
-                                     [[maybe_unused]]const std::string &region,
-                                     [[maybe_unused]]const std::string &user) {
+                                     [[maybe_unused]] const std::string &region,
+                                     [[maybe_unused]] const std::string &user) {
         log_trace << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user;
         handleHttpStatusCode(response, 501);
         std::ostream &errorStream = response.send();
         errorStream.flush();
     }
 
-    void AbstractResource::handlePost([[maybe_unused]]Poco::Net::HTTPServerRequest &request,
+    void AbstractResource::handlePost([[maybe_unused]] Poco::Net::HTTPServerRequest &request,
                                       Poco::Net::HTTPServerResponse &response,
-                                      [[maybe_unused]]const std::string &region,
-                                      [[maybe_unused]]const std::string &user) {
+                                      [[maybe_unused]] const std::string &region,
+                                      [[maybe_unused]] const std::string &user) {
         log_trace << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user;
         handleHttpStatusCode(response, 501);
         std::ostream &errorStream = response.send();
         errorStream.flush();
     }
 
-    void AbstractResource::handleDelete([[maybe_unused]]Poco::Net::HTTPServerRequest &request,
+    void AbstractResource::handleDelete([[maybe_unused]] Poco::Net::HTTPServerRequest &request,
                                         Poco::Net::HTTPServerResponse &response,
-                                        [[maybe_unused]]const std::string &region,
-                                        [[maybe_unused]]const std::string &user) {
+                                        [[maybe_unused]] const std::string &region,
+                                        [[maybe_unused]] const std::string &user) {
         log_trace << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user;
         handleHttpStatusCode(response, 501);
         std::ostream &errorStream = response.send();
@@ -113,21 +111,19 @@ namespace AwsMock::Resource {
         log_trace << "Request, method: OPTIONS";
         response.setStatusAndReason(
                 Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED,
-                Poco::Net::HTTPResponse::HTTP_REASON_NOT_IMPLEMENTED
-        );
+                Poco::Net::HTTPResponse::HTTP_REASON_NOT_IMPLEMENTED);
 
         std::ostream &errorStream = response.send();
         errorStream.flush();
     }
 
-    void AbstractResource::handleHead([[maybe_unused]]Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response,
-                                      [[maybe_unused]]const std::string &region,
-                                      [[maybe_unused]]const std::string &user) {
+    void AbstractResource::handleHead([[maybe_unused]] Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response,
+                                      [[maybe_unused]] const std::string &region,
+                                      [[maybe_unused]] const std::string &user) {
         log_trace << "Request, method: " << request.getMethod();
         response.setStatusAndReason(
                 Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED,
-                Poco::Net::HTTPResponse::HTTP_REASON_NOT_IMPLEMENTED
-        );
+                Poco::Net::HTTPResponse::HTTP_REASON_NOT_IMPLEMENTED);
 
         std::ostream &errorStream = response.send();
         errorStream.flush();
@@ -343,4 +339,4 @@ namespace AwsMock::Resource {
         ofs << request.stream().rdbuf();
         ofs.close();
     }
-}
+}// namespace AwsMock::Resource

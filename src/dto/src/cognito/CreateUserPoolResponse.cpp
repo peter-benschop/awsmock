@@ -6,30 +6,30 @@
 
 namespace AwsMock::Dto::Cognito {
 
-  std::string CreateUserPoolResponse::ToJson() const {
+    std::string CreateUserPoolResponse::ToJson() const {
 
-    try {
+        try {
 
-      Poco::JSON::Object rootObject;
-      rootObject.set("Region", region);
-      rootObject.set("Name", name);
+            Poco::JSON::Object rootObject;
+            rootObject.set("Region", region);
+            rootObject.set("Name", name);
 
-      return Core::JsonUtils::ToJsonString(rootObject);
+            return Core::JsonUtils::ToJsonString(rootObject);
 
-    } catch (Poco::Exception &exc) {
-      log_error << exc.message();
-      throw Core::JsonException(exc.message());
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }
     }
-  }
 
-  std::string CreateUserPoolResponse::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+    std::string CreateUserPoolResponse::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
+    }
 
-  std::ostream &operator<<(std::ostream &os, const CreateUserPoolResponse &r) {
-    os << "CreateUserPoolResponse=" << r.ToJson();
-    return os;
-  }
-}
+    std::ostream &operator<<(std::ostream &os, const CreateUserPoolResponse &r) {
+        os << "CreateUserPoolResponse=" << r.ToJson();
+        return os;
+    }
+}// namespace AwsMock::Dto::Cognito

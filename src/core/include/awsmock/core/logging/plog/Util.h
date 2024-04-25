@@ -1,20 +1,20 @@
 #pragma once
 
+#include <awsmock/core/StringUtils.h>
 #include <cassert>
-#include <cstring>
 #include <cstdio>
 #include <cstdlib>
-#include <sstream>
+#include <cstring>
 #include <fcntl.h>
+#include <sstream>
 #include <sys/stat.h>
-#include <awsmock/core/StringUtils.h>
 
 #ifndef PLOG_ENABLE_WCHAR_INPUT
-#   ifdef _WIN32
-#       define PLOG_ENABLE_WCHAR_INPUT 1
-#   else
-#       define PLOG_ENABLE_WCHAR_INPUT 0
-#   endif
+#ifdef _WIN32
+#define PLOG_ENABLE_WCHAR_INPUT 1
+#else
+#define PLOG_ENABLE_WCHAR_INPUT 0
+#endif
 #endif
 
 //////////////////////////////////////////////////////////////////////////
@@ -25,87 +25,87 @@
 // This option allows to support http://utf8everywhere.org approach.
 
 #ifndef PLOG_CHAR_IS_UTF8
-#   if defined(_WIN32) && !defined(_UTF8)
-#       define PLOG_CHAR_IS_UTF8 0
-#   else
-#       define PLOG_CHAR_IS_UTF8 1
-#   endif
+#if defined(_WIN32) && !defined(_UTF8)
+#define PLOG_CHAR_IS_UTF8 0
+#else
+#define PLOG_CHAR_IS_UTF8 1
+#endif
 #endif
 
 #ifdef _WIN32
-#   if defined(PLOG_EXPORT)
-#       define PLOG_LINKAGE __declspec(dllexport)
-#   elif defined(PLOG_IMPORT)
-#       define PLOG_LINKAGE __declspec(dllimport)
-#   endif
-#   if defined(PLOG_GLOBAL)
-#       error "PLOG_GLOBAL isn't supported on Windows"
-#   endif
+#if defined(PLOG_EXPORT)
+#define PLOG_LINKAGE __declspec(dllexport)
+#elif defined(PLOG_IMPORT)
+#define PLOG_LINKAGE __declspec(dllimport)
+#endif
+#if defined(PLOG_GLOBAL)
+#error "PLOG_GLOBAL isn't supported on Windows"
+#endif
 #else
-#   if defined(PLOG_GLOBAL)
-#       define PLOG_LINKAGE __attribute__ ((visibility ("default")))
-#   elif defined(PLOG_LOCAL)
-#       define PLOG_LINKAGE __attribute__ ((visibility ("hidden")))
-#       define PLOG_LINKAGE_HIDDEN PLOG_LINKAGE
-#   endif
-#   if defined(PLOG_EXPORT) || defined(PLOG_IMPORT)
-#       error "PLOG_EXPORT/PLOG_IMPORT is supported only on Windows"
-#   endif
+#if defined(PLOG_GLOBAL)
+#define PLOG_LINKAGE __attribute__((visibility("default")))
+#elif defined(PLOG_LOCAL)
+#define PLOG_LINKAGE __attribute__((visibility("hidden")))
+#define PLOG_LINKAGE_HIDDEN PLOG_LINKAGE
+#endif
+#if defined(PLOG_EXPORT) || defined(PLOG_IMPORT)
+#error "PLOG_EXPORT/PLOG_IMPORT is supported only on Windows"
+#endif
 #endif
 
 #ifndef PLOG_LINKAGE
-#   define PLOG_LINKAGE
+#define PLOG_LINKAGE
 #endif
 
 #ifndef PLOG_LINKAGE_HIDDEN
-#   define PLOG_LINKAGE_HIDDEN
+#define PLOG_LINKAGE_HIDDEN
 #endif
 
 #ifdef _WIN32
-#   include <plog/WinApi.h>
-#   include <time.h>
-#   include <sys/timeb.h>
-#   include <io.h>
-#   include <share.h>
+#include <io.h>
+#include <plog/WinApi.h>
+#include <share.h>
+#include <sys/timeb.h>
+#include <time.h>
 #else
 
-#   include <unistd.h>
-#   include <sys/time.h>
+#include <sys/time.h>
+#include <unistd.h>
 
-#   if defined(__linux__) || defined(__FreeBSD__)
+#if defined(__linux__) || defined(__FreeBSD__)
 
-#       include <sys/syscall.h>
+#include <sys/syscall.h>
 
-#   elif defined(__rtems__)
-#       include <rtems.h>
-#   endif
-#   if defined(_POSIX_THREADS)
+#elif defined(__rtems__)
+#include <rtems.h>
+#endif
+#if defined(_POSIX_THREADS)
 
-#       include <pthread.h>
+#include <pthread.h>
 
-#   endif
-#   if PLOG_ENABLE_WCHAR_INPUT
-#       include <iconv.h>
-#   endif
+#endif
+#if PLOG_ENABLE_WCHAR_INPUT
+#include <iconv.h>
+#endif
 #endif
 
 #if PLOG_CHAR_IS_UTF8
-#   define PLOG_NSTR(x)    x
+#define PLOG_NSTR(x) x
 #else
-#   define _PLOG_NSTR(x)   L##x
-#   define PLOG_NSTR(x)    _PLOG_NSTR(x)
+#define _PLOG_NSTR(x) L##x
+#define PLOG_NSTR(x) _PLOG_NSTR(x)
 #endif
 
 #ifdef _WIN32
-#   define PLOG_CDECL      __cdecl
+#define PLOG_CDECL __cdecl
 #else
-#   define PLOG_CDECL
+#define PLOG_CDECL
 #endif
 
 #if __cplusplus >= 201103L || defined(_MSC_VER) && _MSC_VER >= 1700
-#   define PLOG_OVERRIDE override
+#define PLOG_OVERRIDE override
 #else
-#   define PLOG_OVERRIDE
+#define PLOG_OVERRIDE
 #endif
 #pragma GCC diagnostic ignored "-Wstringop-overread"
 
@@ -152,8 +152,7 @@ namespace plog {
 #ifdef _WIN32
         typedef timeb Time;
 
-        inline void ftime(Time* t)
-        {
+        inline void ftime(Time *t) {
             ::ftime(t);
         }
 #else
@@ -187,7 +186,7 @@ namespace plog {
             }
 
             int n = 0;
-            for (const char *i = funcEnd - 1; i >= funcBegin; --i) // search backwards for the first space char
+            for (const char *i = funcEnd - 1; i >= funcBegin; --i)// search backwards for the first space char
             {
                 if (*i == '>') {
                     foundTemplate++;
@@ -260,11 +259,12 @@ namespace plog {
             size_t write(const void *buf, size_t count) {
                 return m_file != -1 ? static_cast<size_t>(
 #ifdef _WIN32
-                        ::_write(m_file, buf, static_cast<unsigned int>(count))
+                                              ::_write(m_file, buf, static_cast<unsigned int>(count))
 #else
-                        ::write(m_file, buf, count)
+                                              ::write(m_file, buf, count)
 #endif
-                ) : static_cast<size_t>(-1);
+                                                      )
+                                    : static_cast<size_t>(-1);
             }
 
             template<class CharType>
@@ -275,13 +275,14 @@ namespace plog {
             size_t seek(size_t offset, int whence) {
                 return m_file != -1 ? static_cast<size_t>(
 #if defined(_WIN32) && (defined(__BORLANDC__) || defined(__MINGW32__))
-                        ::_lseek(m_file, static_cast<off_t>(offset), whence)
+                                              ::_lseek(m_file, static_cast<off_t>(offset), whence)
 #elif defined(_WIN32)
-                        ::_lseeki64(m_file, static_cast<off_t>(offset), whence)
+                                              ::_lseeki64(m_file, static_cast<off_t>(offset), whence)
 #else
-                        ::lseek(m_file, static_cast<off_t>(offset), whence)
+                                              ::lseek(m_file, static_cast<off_t>(offset), whence)
 #endif
-                ) : static_cast<size_t>(-1);
+                                                      )
+                                    : static_cast<size_t>(-1);
             }
 
             void close() {
@@ -322,9 +323,10 @@ namespace plog {
                 InitializeCriticalSection(&m_sync);
 #elif defined(__rtems__)
                 rtems_semaphore_create(0, 1,
-                            RTEMS_PRIORITY |
-                            RTEMS_BINARY_SEMAPHORE |
-                            RTEMS_INHERIT_PRIORITY, 1, &m_sync);
+                                       RTEMS_PRIORITY |
+                                               RTEMS_BINARY_SEMAPHORE |
+                                               RTEMS_INHERIT_PRIORITY,
+                                       1, &m_sync);
 #elif defined(_POSIX_THREADS)
                 ::pthread_mutex_init(&m_sync, 0);
 #endif
@@ -421,5 +423,5 @@ namespace plog {
 
         template<class T>
         T *Singleton<T>::m_instance = NULL;
-    }
-}
+    }// namespace util
+}// namespace plog

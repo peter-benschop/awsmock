@@ -6,8 +6,8 @@
 #define AWSMOCK_DTO_S3_OWNER_H
 
 // C++ includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // AwsMock includes
 #include <awsmock/core/JsonException.h>
@@ -17,47 +17,46 @@
 
 namespace AwsMock::Dto::S3 {
 
-  struct Owner {
+    struct Owner {
 
-    /**
+        /**
      * ID
      */
-    std::string id;
+        std::string id;
 
-    /**
+        /**
      * Display name
      */
-    std::string displayName;
+        std::string displayName;
 
-    /**
+        /**
      * Convert to a JSON string
      *
      * @return JSON string
      */
-    [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
+        /**
      * Convert to a JSON object
      *
      * @return JSON object
      */
-    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    std::string ToString() const;
+        std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const Owner &r);
+        friend std::ostream &operator<<(std::ostream &os, const Owner &r);
+    };
 
-  };
-
-} // namespace AwsMock::Dto::S3
-#endif // AWSMOCK_DTO_S3_OWNER_H
+}// namespace AwsMock::Dto::S3
+#endif// AWSMOCK_DTO_S3_OWNER_H

@@ -11,12 +11,11 @@
 
 namespace AwsMock::Core {
 
-  template<class M>
-  class MetricServiceTimer {
+    template<class M>
+    class MetricServiceTimer {
 
-    public:
-
-      /**
+      public:
+        /**
        * Constructor
        *
        * <p>Measure a methods execution time.</p>
@@ -26,49 +25,48 @@ namespace AwsMock::Core {
        *
        * @author jens.vogt@opitz-consulting.com
        */
-      explicit MetricServiceTimer(M &metricService, std::string name)
-          : _metricService(metricService), _name(std::move(name)) {
-        if (!_metricService.TimerExists(_name)) {
-          _metricService.AddTimer(_name);
+        explicit MetricServiceTimer(M &metricService, std::string name)
+            : _metricService(metricService), _name(std::move(name)) {
+            if (!_metricService.TimerExists(_name)) {
+                _metricService.AddTimer(_name);
+            }
+            _metricService.StartTimer(_name);
         }
-        _metricService.StartTimer(_name);
-      }
 
-      /**
+        /**
        * Destructor
        */
-      ~MetricServiceTimer() {
-        _metricService.StopTimer(_name);
-      }
+        ~MetricServiceTimer() {
+            _metricService.StopTimer(_name);
+        }
 
-      /**
+        /**
        * Default constructor
        */
-      MetricServiceTimer() = delete;
+        MetricServiceTimer() = delete;
 
-      /**
+        /**
        * Copy constructor
        */
-      MetricServiceTimer(const MetricServiceTimer &) = delete;
+        MetricServiceTimer(const MetricServiceTimer &) = delete;
 
-      /**
+        /**
        * Equals operator
        */
-      MetricServiceTimer &operator=(const MetricServiceTimer &) = delete;
+        MetricServiceTimer &operator=(const MetricServiceTimer &) = delete;
 
-    private:
-
-      /**
+      private:
+        /**
        * Metric module
        */
-      M &_metricService;
+        M &_metricService;
 
-      /**
+        /**
        * Name of the timer
        */
-      const std::string _name;
-  };
+        const std::string _name;
+    };
 
-} // namespace AwsMock::Core
+}// namespace AwsMock::Core
 
-#endif //AWSMOCK_CORE_METRIC_SERVICE_TIMER_H
+#endif//AWSMOCK_CORE_METRIC_SERVICE_TIMER_H

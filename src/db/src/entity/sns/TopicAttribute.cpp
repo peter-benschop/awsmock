@@ -6,9 +6,9 @@
 
 namespace AwsMock::Database::Entity::SNS {
 
-    view_or_value <view, value> TopicAttribute::ToDocument() const {
+    view_or_value<view, value> TopicAttribute::ToDocument() const {
 
-        view_or_value <view, value> topicAttributeDoc = make_document(
+        view_or_value<view, value> topicAttributeDoc = make_document(
                 kvp("deliveryPolicy", deliveryPolicy),
                 kvp("displayName", displayName),
                 kvp("fifoTopic", fifoTopic),
@@ -23,7 +23,7 @@ namespace AwsMock::Database::Entity::SNS {
         return topicAttributeDoc;
     }
 
-    void TopicAttribute::FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult) {
+    void TopicAttribute::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         if (mResult->empty()) {
             return;
@@ -77,4 +77,4 @@ namespace AwsMock::Database::Entity::SNS {
         return os;
     }
 
-} // namespace AwsMock::Database::Entity::SQS
+}// namespace AwsMock::Database::Entity::SNS

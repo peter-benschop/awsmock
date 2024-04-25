@@ -6,9 +6,9 @@
 #define AWSMOCK_ENTITY_LAMBDA_ENVIRONMENT_H
 
 // C++ includes
-#include <string>
-#include <sstream>
 #include <map>
+#include <sstream>
+#include <string>
 
 // Poco includes
 #include <Poco/JSON/Object.h>
@@ -31,14 +31,14 @@ namespace AwsMock::Database::Entity::Lambda {
         /**
          * Variables
          */
-        std::map <std::string, std::string> variables;
+        std::map<std::string, std::string> variables;
 
         /**
          * Converts the MongoDB document to an entity
          *
          * @param mResult database view.
          */
-        void FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult);
+        void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
         /**
          * Converts the entity to a JSON object
@@ -48,6 +48,6 @@ namespace AwsMock::Database::Entity::Lambda {
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
     };
 
-} // namespace AwsMock::Database::Entity::lambda {
+}// namespace AwsMock::Database::Entity::Lambda
 
-#endif // AWSMOCK_ENTITY_LAMBDA_ENVIRONMENT_H
+#endif// AWSMOCK_ENTITY_LAMBDA_ENVIRONMENT_H

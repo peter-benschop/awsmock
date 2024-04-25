@@ -6,64 +6,63 @@
 #define AWSMOCK_CORE_TESTUTILS_H
 
 // C++ includes
-#include <string>
 #include <fstream>
+#include <string>
 
 // AwsMock includes
-#include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/Configuration.h>
+#include <awsmock/core/SystemUtils.h>
 
 #define TMP_PROPERTIES_FILE "/tmp/awsmock.properties"
 
 namespace AwsMock::Core {
 
-  /**
+    /**
    * Test utilities
    *
    * @author jens.vogt@opitz-consulting.com
    */
-  class TestUtils {
+    class TestUtils {
 
-    public:
-
-      /**
+      public:
+        /**
        * Creates a test configuration file.
        *
        * <p>Database will be switched off.</p>
        */
-      static void CreateTestConfigurationFile();
+        static void CreateTestConfigurationFile();
 
-      /**
+        /**
        * Creates a test configuration file.
        *
        * @param withDatabase set to true when the configuration should be for a database
        */
-      static void CreateTestConfigurationFile(bool withDatabase);
+        static void CreateTestConfigurationFile(bool withDatabase);
 
-      /**
+        /**
        * Returns the name of the generated test configuration properties file.
        *
        * @return name of the generated test configuration file
        */
-      static std::string GetTestConfigurationFilename();
+        static std::string GetTestConfigurationFilename();
 
-      /**
+        /**
        * Returns the name of the generated test configuration properties file.
        *
        * @param withDatabase run with MongoDB database
        * @return name of the generated test configuration file
        */
-      static Core::Configuration &GetTestConfiguration(bool withDatabase = true);
+        static Core::Configuration &GetTestConfiguration(bool withDatabase = true);
 
-      /**
+        /**
        * Send a CLI command
        *
        * @param command command name
        * @return exec result
        */
-      static Core::ExecResult SendCliCommand(const std::string &command);
-  };
+        static Core::ExecResult SendCliCommand(const std::string &command);
+    };
 
-} // namespace AwsMock::Core
+}// namespace AwsMock::Core
 
-#endif //AWSMOCK_CORE_TESTUTILS_H
+#endif//AWSMOCK_CORE_TESTUTILS_H

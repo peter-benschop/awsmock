@@ -6,24 +6,24 @@
 #define AWSMOCK_DB_ENTITY_TRANSFER_H
 
 // C++ includes
-#include <string>
-#include <sstream>
 #include <iostream>
-#include <vector>
 #include <map>
+#include <sstream>
+#include <string>
+#include <vector>
 
 // Poco includes
 #include <Poco/DateTime.h>
 #include <Poco/DateTimeFormat.h>
 #include <Poco/DateTimeFormatter.h>
-#include <Poco/JSON/Object.h>
 #include <Poco/JSON/Array.h>
+#include <Poco/JSON/Object.h>
 
 // MongoDB includes
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/stdx.hpp>
 
 // AwsMOck includes
@@ -31,12 +31,12 @@
 
 namespace AwsMock::Database::Entity::Transfer {
 
+    using bsoncxx::view_or_value;
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
-    using bsoncxx::view_or_value;
-    using bsoncxx::document::view;
     using bsoncxx::document::value;
+    using bsoncxx::document::view;
 
     enum ServerState {
         OFFLINE,
@@ -47,14 +47,13 @@ namespace AwsMock::Database::Entity::Transfer {
         STOP_FAILED
     };
 
-    static std::map <ServerState, std::string> ServerStateNames{
-            {ServerState::OFFLINE,      "OFFLINE"},
-            {ServerState::ONLINE,       "ONLINE"},
-            {ServerState::STARTING,     "STARTING"},
-            {ServerState::STOPPING,     "STOPPING"},
+    static std::map<ServerState, std::string> ServerStateNames{
+            {ServerState::OFFLINE, "OFFLINE"},
+            {ServerState::ONLINE, "ONLINE"},
+            {ServerState::STARTING, "STARTING"},
+            {ServerState::STOPPING, "STOPPING"},
             {ServerState::START_FAILED, "START_FAILED"},
-            {ServerState::STOP_FAILED,  "STOP_FAILED"}
-    };
+            {ServerState::STOP_FAILED, "STOP_FAILED"}};
 
     static std::string ServerStateToString(const ServerState &serverState) {
         return ServerStateNames[serverState];
@@ -99,12 +98,12 @@ namespace AwsMock::Database::Entity::Transfer {
         /**
          * Server protocols
          */
-        std::vector <std::string> protocols;
+        std::vector<std::string> protocols;
 
         /**
          * Users
          */
-        std::vector <User> users;
+        std::vector<User> users;
 
         /**
          * State
@@ -162,14 +161,14 @@ namespace AwsMock::Database::Entity::Transfer {
          *
          * @return entity as MongoDB document.
          */
-        [[nodiscard]] view_or_value <view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * Converts the MongoDB document to an entity
          *
          * @param mResult MongoDB document.
          */
-        void FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult);
+        void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
         /**
          * Converts the entity to a JSON object
@@ -193,10 +192,9 @@ namespace AwsMock::Database::Entity::Transfer {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const Transfer &m);
-
     };
 
     typedef struct Transfer Transfer;
-    typedef std::vector <Transfer> TransferList;
-}
-#endif // AWSMOCK_DB_ENTITY_TRANSFER_H
+    typedef std::vector<Transfer> TransferList;
+}// namespace AwsMock::Database::Entity::Transfer
+#endif// AWSMOCK_DB_ENTITY_TRANSFER_H

@@ -46,7 +46,6 @@ namespace AwsMock::Dto::Common {
 
             std::string headerValue = request["X-Amz-Target"];
             cmd = Core::StringUtils::Split(headerValue, '.')[1];
-
         }
         return Core::StringUtils::ToSnakeCase(cmd);
     }
@@ -80,4 +79,4 @@ namespace AwsMock::Dto::Common {
         os << "SQSClientCommand=" << r.ToJson();
         return os;
     }
-}
+}// namespace AwsMock::Dto::Common

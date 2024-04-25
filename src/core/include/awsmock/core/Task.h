@@ -16,69 +16,68 @@
 
 namespace AwsMock::Core {
 
-  /**
+    /**
    * Task class
    *
    * @author jens.vogt@opitz-consulting.com
    */
-  class Task {
+    class Task {
 
-    public:
-
-      /**
+      public:
+        /**
        * Constructor
        *
-       * @param _name task name
+       * @param name task name
+       * @param timeout timeout in milliseconds
        */
-      explicit Task(std::string name, int timeout) : _name(name), _timeout(timeout) {}
+        explicit Task(std::string name, int timeout) : _name(name), _timeout(timeout) {}
 
-      /**
+        /**
        * Start the task
        */
-      void Start();
+        void Start();
 
-      /**
+        /**
        * Stop the task
        */
-      void Stop();
+        void Stop();
 
-      /**
+        /**
        * Main loop
        */
-      virtual void Initialize() = 0;
+        virtual void Initialize() = 0;
 
-      /**
+        /**
        * Main loop
        */
-      virtual void Run() = 0;
+        virtual void Run() = 0;
 
-    private:
-
-      /**
+      private:
+        /**
        * Logger
        */
-      Core::LogStream _logger;
+        Core::LogStream _logger;
 
-      /**
+        /**
        * Timer name
        */
-      std::string _name;
+        std::string _name;
 
-      /**
+        /**
        * Loop timeout
        */
-      int _timeout;
+        int _timeout;
 
-      /**
+        /**
        * Promise for stopping thread
        */
-      std::promise<void> _stop;
+        std::promise<void> _stop;
 
-      /**
+        /**
        * Thread handle
        */
-      std::future<void> _thread_handle;
-  };
-}
+        std::future<void> _thread_handle;
+    };
+}// namespace AwsMock::Core
 
-#endif //AWSMOCK_CORE_TASK_H
+#endif//AWSMOCK_CORE_TASK_H

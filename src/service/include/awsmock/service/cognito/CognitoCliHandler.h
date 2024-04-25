@@ -13,10 +13,10 @@
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/MetricService.h>
 #include <awsmock/core/MetricDefinition.h>
-#include <awsmock/service/common/AbstractHandler.h>
+#include <awsmock/core/MetricService.h>
 #include <awsmock/service/cognito/CognitoService.h>
+#include <awsmock/service/common/AbstractHandler.h>
 
 namespace AwsMock::Service {
 
@@ -28,16 +28,14 @@ namespace AwsMock::Service {
     class CognitoCliHandler : public virtual AbstractHandler {
 
       public:
-
         /**
          * Constructor
          *
          * @param configuration application configuration
          */
-        explicit CognitoCliHandler(Core::Configuration &configuration) : AbstractHandler(), _configuration(configuration), _cognitoService(configuration) {};
+        explicit CognitoCliHandler(Core::Configuration &configuration) : AbstractHandler(), _configuration(configuration), _cognitoService(configuration){};
 
       protected:
-
         /**
          * HTTP POST request.
          *
@@ -50,7 +48,6 @@ namespace AwsMock::Service {
         void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
       private:
-
         /**
          * AwsMock configuration
          */
@@ -60,9 +57,8 @@ namespace AwsMock::Service {
          * Cognito service
          */
         Service::CognitoService _cognitoService;
-
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_COGNITO_CLI_HANDLER_H
+#endif// AWSMOCK_SERVICE_COGNITO_CLI_HANDLER_H

@@ -6,9 +6,9 @@
 
 namespace AwsMock::Database::Entity::SNS {
 
-    view_or_value <view, value> MessageAttribute::ToDocument() const {
+    view_or_value<view, value> MessageAttribute::ToDocument() const {
 
-        view_or_value <view, value> messageAttributeDoc = make_document(
+        view_or_value<view, value> messageAttributeDoc = make_document(
                 kvp("name", attributeName),
                 kvp("value", attributeValue));
 
@@ -21,7 +21,6 @@ namespace AwsMock::Database::Entity::SNS {
         jsonObject.set("name", attributeName);
         jsonObject.set("value", attributeValue);
         return jsonObject;
-
     }
 
     std::string MessageAttribute::ToString() const {
@@ -35,4 +34,4 @@ namespace AwsMock::Database::Entity::SNS {
         return os;
     }
 
-} // namespace AwsMock::Database::Entity::SNS
+}// namespace AwsMock::Database::Entity::SNS

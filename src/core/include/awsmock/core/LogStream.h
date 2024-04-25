@@ -6,44 +6,43 @@
 #define AWS_MOCK_CORE_LOG_STREAM_H
 
 // C++ standard includes
-#include <istream>
-#include <iostream>
-#include <string_view>
 #include <filesystem>
+#include <iostream>
+#include <istream>
+#include <string_view>
 
 // Plog includes
 #define PLOG_OMIT_LOG_DEFINES
 
-#include <awsmock/core/logging/plog/Log.h>
-#include <awsmock/core/logging/plog/Init.h>
 #include <awsmock/core/logging/plog/Formatters/TxtFormatter.h>
+#include <awsmock/core/logging/plog/Init.h>
 #include <awsmock/core/logging/plog/Initializers/ConsoleInitializer.h>
+#include <awsmock/core/logging/plog/Log.h>
 
 namespace AwsMock::Core {
 
-  /**
+    /**
    * Logging setup
    *
    * @author jens.vogt@opitz-consulting.com
    */
-  class LogStream {
+    class LogStream {
 
-    public:
-
-      /**
+      public:
+        /**
        * Constructor
        */
-      LogStream();
+        LogStream();
 
-      /**
+        /**
        * Constructor
        *
        * @param severity PLog severity string
        */
-      explicit LogStream(const std::string &severity);
-  };
+        explicit LogStream(const std::string &severity);
+    };
 
-} // namespace AwsMock::Core
+}// namespace AwsMock::Core
 
 #define log_fatal PLOG_FATAL
 #define log_error PLOG_ERROR
@@ -52,4 +51,4 @@ namespace AwsMock::Core {
 #define log_debug PLOG_DEBUG
 #define log_trace PLOG_VERBOSE
 
-#endif // AWS_MOCK_CORE_LOG_STREAM_H
+#endif// AWS_MOCK_CORE_LOG_STREAM_H

@@ -6,15 +6,15 @@
 #define AWSMOCK_SERVICE_TRANSFER_SERVICE_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // Poco includes
 #include <Poco/Net/HTTPClientSession.h>
 #include <Poco/Net/HTTPRequest.h>
 #include <Poco/Net/HTTPResponse.h>
-#include <Poco/StreamCopier.h>
 #include <Poco/RecursiveDirectoryIterator.h>
+#include <Poco/StreamCopier.h>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
@@ -46,7 +46,6 @@ namespace AwsMock::Service {
     class TransferService {
 
       public:
-
         /**
          * Constructor
          *
@@ -100,7 +99,6 @@ namespace AwsMock::Service {
         void DeleteServer(const Dto::Transfer::DeleteServerRequest &request);
 
       private:
-
         /**
          * AWS region
          */
@@ -127,6 +125,6 @@ namespace AwsMock::Service {
         int _ftpPort;
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_TRANSFER_SERVICE_H
+#endif// AWSMOCK_SERVICE_TRANSFER_SERVICE_H

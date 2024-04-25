@@ -6,10 +6,10 @@
 #define AWSMOCK_DB_ENTITY_SNS_MESSAGEATTRIBUTE_H
 
 // C++ includes
-#include <string>
-#include <sstream>
-#include <vector>
 #include <map>
+#include <sstream>
+#include <string>
+#include <vector>
 
 // Poco includes
 #include <Poco/DateTime.h>
@@ -18,20 +18,20 @@
 #include <Poco/JSON/Object.h>
 
 // MongoDB includes
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/stdx.hpp>
 
 namespace AwsMock::Database::Entity::SNS {
 
+    using bsoncxx::view_or_value;
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
-    using bsoncxx::view_or_value;
-    using bsoncxx::document::view;
     using bsoncxx::document::value;
+    using bsoncxx::document::view;
 
     /**
      * SNS message attribute entity
@@ -55,7 +55,7 @@ namespace AwsMock::Database::Entity::SNS {
          *
          * @return entity as MongoDB document.
          */
-        [[maybe_unused]] [[nodiscard]] view_or_value <view, value> ToDocument() const;
+        [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * Converts the entity to a JSON object
@@ -79,12 +79,11 @@ namespace AwsMock::Database::Entity::SNS {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const MessageAttribute &m);
-
     };
 
     typedef struct MessageAttribute MessageAttribute;
-    typedef std::vector <MessageAttribute> MessageAttributeList;
+    typedef std::vector<MessageAttribute> MessageAttributeList;
 
-} // namespace AwsMock::Database::Entity::SNS
+}// namespace AwsMock::Database::Entity::SNS
 
-#endif // AWSMOCK_DB_ENTITY_SNS_MESSAGEATTRIBUTE_H
+#endif// AWSMOCK_DB_ENTITY_SNS_MESSAGEATTRIBUTE_H

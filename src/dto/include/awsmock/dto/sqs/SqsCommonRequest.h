@@ -6,8 +6,8 @@
 #define AWSMOCK_DTO_SQS_COMMON_REQUEST_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // Poco includes
 #include <Poco/JSON/Object.h>
@@ -19,41 +19,40 @@
 
 namespace AwsMock::Dto::SQS {
 
-  struct SqsCommonRequest {
+    struct SqsCommonRequest {
 
-    /**
+        /**
      * AWS region
      */
-    std::string region;
+        std::string region;
 
-    /**
+        /**
      * AWS request ID
      */
-    std::string requestId;
+        std::string requestId;
 
-    /**
+        /**
      * Converts the JSON string to DTO.
      *
      * @param jsonString JSON string
      */
-    virtual void FromJson(const std::string &jsonString);
+        virtual void FromJson(const std::string &jsonString);
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    virtual std::string ToString() const;
+        virtual std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const SqsCommonRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const SqsCommonRequest &r);
+    };
 
-  };
+}// namespace AwsMock::Dto::SQS
 
-} // namespace AwsMock::Dto::SQS
-
-#endif // AWSMOCK_DTO_SQS_COMMON_REQUEST_H
+#endif// AWSMOCK_DTO_SQS_COMMON_REQUEST_H

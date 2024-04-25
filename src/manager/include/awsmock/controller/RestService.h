@@ -10,8 +10,8 @@
 #include "Poco/Net/HTTPServer.h"
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
+#include <awsmock/core/LogStream.h>
 
 #define MANAGER_DEFAULT_PORT 4567
 #define MANAGER_DEFAULT_HOST "localhost"
@@ -68,7 +68,6 @@ namespace AwsMock {
         void StopServer();
 
       private:
-
         /**
          * Rest port
          */
@@ -104,6 +103,6 @@ namespace AwsMock {
          */
         int _maxThreads;
     };
-} // namespace AwsMock
+}// namespace AwsMock
 
-#endif // AWSMOCK_MANAGER_REST_SERVICE_H
+#endif// AWSMOCK_MANAGER_REST_SERVICE_H

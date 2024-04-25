@@ -6,17 +6,17 @@
 #define AWSMOCK_DTO_TRANSFER_IDENTITY_PROVIDER_DETAILS_H
 
 // C++ includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/JsonException.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Dto::Transfer {
 
-  /**
+    /**
    *
    * Example JSON:
    * <pre>
@@ -29,56 +29,55 @@ namespace AwsMock::Dto::Transfer {
    *  }
    * </pre>
    */
-  struct IdentityProviderDetails {
+    struct IdentityProviderDetails {
 
-    /**
+        /**
      * Directory ID
      */
-    std::string directoryId;
+        std::string directoryId;
 
-    /**
+        /**
      * Lambda function
      */
-    std::string function;
+        std::string function;
 
-    /**
+        /**
      * Invocation role
      */
-    std::string invocationRole;
+        std::string invocationRole;
 
-    /**
+        /**
      * SFTP authentication method
      */
-    std::string sftpAuthenticationMethods;
+        std::string sftpAuthenticationMethods;
 
-    /**
+        /**
      * Authentication URL
      */
-    std::string url;
+        std::string url;
 
-    /**
+        /**
      * Creates a JSON string from the object.
      *
      * @return JSON string
      */
-    [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const IdentityProviderDetails &r);
+        friend std::ostream &operator<<(std::ostream &os, const IdentityProviderDetails &r);
+    };
 
-  };
+}// namespace AwsMock::Dto::Transfer
 
-} // namespace AwsMock::Dto::Transfer
-
-#endif // AWSMOCK_DTO_TRANSFER_IDENTITY_PROVIDER_DETAILS_H
+#endif// AWSMOCK_DTO_TRANSFER_IDENTITY_PROVIDER_DETAILS_H

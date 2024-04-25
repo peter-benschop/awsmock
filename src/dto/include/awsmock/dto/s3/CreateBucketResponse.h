@@ -6,8 +6,8 @@
 #define AWSMOCK_DTO_S3_CREATE_BUCKET_RESPONSE_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // AwsMock includes
 #include <awsmock/core/JsonException.h>
@@ -17,48 +17,47 @@
 
 namespace AwsMock::Dto::S3 {
 
-  struct CreateBucketResponse {
+    struct CreateBucketResponse {
 
-    /**
+        /**
      * Bucket location
      */
-    std::string location;
+        std::string location;
 
-    /**
+        /**
      * Bucket ARN
      */
-    std::string arn;
+        std::string arn;
 
-    /**
+        /**
      * Convert to a JSON string
      *
      * @return JSON string
      */
-    [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
+        /**
      * Convert to XML representation
      *
      * @return XML string
      */
-    [[nodiscard]] std::string ToXml() const;
+        [[nodiscard]] std::string ToXml() const;
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const CreateBucketResponse &r);
+        friend std::ostream &operator<<(std::ostream &os, const CreateBucketResponse &r);
+    };
 
-  };
+}// namespace AwsMock::Dto::S3
 
-} // namespace AwsMock::Dto
-
-#endif // AWSMOCK_DTO_S3_CREATE_BUCKET_RESPONSE_H
+#endif// AWSMOCK_DTO_S3_CREATE_BUCKET_RESPONSE_H

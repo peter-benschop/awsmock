@@ -52,4 +52,4 @@
 #define TRANSFER_SERVER_UPLOAD_COUNT "transfer_upload_count_total"
 #define TRANSFER_SERVER_DOWNLOAD_COUNT "transfer_download_count_total"
 
-#endif  // AWSMOCK_CORE_METRIC_DEFINITION_H
+#endif// AWSMOCK_CORE_METRIC_DEFINITION_H

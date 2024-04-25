@@ -8,11 +8,11 @@ namespace AwsMock::Database::Entity::SNS {
 
     bool Topic::HasSubscription(const Subscription &subscription) {
         return find_if(subscriptions.begin(), subscriptions.end(), [subscription](const Subscription &s) {
-            return s.protocol == subscription.protocol && s.endpoint == subscription.endpoint;
-        }) != subscriptions.end();
+                   return s.protocol == subscription.protocol && s.endpoint == subscription.endpoint;
+               }) != subscriptions.end();
     }
 
-    view_or_value <view, value> Topic::ToDocument() const {
+    view_or_value<view, value> Topic::ToDocument() const {
 
         auto subscriptionDocs = bsoncxx::builder::basic::array{};
         for (const auto &subscription: subscriptions) {
@@ -26,7 +26,7 @@ namespace AwsMock::Database::Entity::SNS {
             }
         }
 
-        view_or_value <view, value> topicDoc = make_document(
+        view_or_value<view, value> topicDoc = make_document(
                 kvp("region", region),
                 kvp("topicName", topicName),
                 kvp("owner", owner),
@@ -43,7 +43,7 @@ namespace AwsMock::Database::Entity::SNS {
         return topicDoc;
     }
 
-    void Topic::FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult) {
+    void Topic::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         oid = mResult.value()["_id"].get_oid().value.to_string();
         region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
@@ -58,10 +58,9 @@ namespace AwsMock::Database::Entity::SNS {
         bsoncxx::array::view subscriptionsView{mResult.value()["subscriptions"].get_array().value};
         for (bsoncxx::array::element subscriptionElement: subscriptionsView) {
             Subscription subscription{
-                    .protocol=bsoncxx::string::to_string(subscriptionElement["protocol"].get_string().value),
-                    .endpoint=bsoncxx::string::to_string(subscriptionElement["endpoint"].get_string().value),
-                    .subscriptionArn=bsoncxx::string::to_string(subscriptionElement["subscriptionArn"].get_string().value)
-            };
+                    .protocol = bsoncxx::string::to_string(subscriptionElement["protocol"].get_string().value),
+                    .endpoint = bsoncxx::string::to_string(subscriptionElement["endpoint"].get_string().value),
+                    .subscriptionArn = bsoncxx::string::to_string(subscriptionElement["subscriptionArn"].get_string().value)};
             subscriptions.push_back(subscription);
         }
 
@@ -116,4 +115,4 @@ namespace AwsMock::Database::Entity::SNS {
         return os;
     }
 
-} // namespace AwsMock::Database::Entity::SNS
+}// namespace AwsMock::Database::Entity::SNS

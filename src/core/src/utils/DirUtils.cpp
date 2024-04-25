@@ -146,4 +146,4 @@ namespace AwsMock::Core {
             }
         }
     }
-}
+}// namespace AwsMock::Core

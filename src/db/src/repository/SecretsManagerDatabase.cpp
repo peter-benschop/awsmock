@@ -11,8 +11,8 @@ namespace AwsMock::Database {
     using bsoncxx::builder::basic::make_document;
 
     SecretsManagerDatabase::SecretsManagerDatabase()
-            : _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()), _collectionName("secretsmanager_secret"),
-              _memoryDb(SecretsManagerMemoryDb::instance()) {}
+        : _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()), _collectionName("secretsmanager_secret"),
+          _memoryDb(SecretsManagerMemoryDb::instance()) {}
 
     bool SecretsManagerDatabase::SecretExists(const std::string &region, const std::string &name) {
 
@@ -35,7 +35,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.SecretExists(region, name);
-
         }
     }
 
@@ -64,7 +63,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.SecretExists(secretId);
-
         }
     }
 
@@ -73,7 +71,7 @@ namespace AwsMock::Database {
         auto client = GetClient();
         mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
 
-        mongocxx::stdx::optional <bsoncxx::document::value>
+        mongocxx::stdx::optional<bsoncxx::document::value>
                 mResult = _secretCollection.find_one(make_document(kvp("_id", oid)));
         Entity::SecretsManager::Secret result;
         result.FromDocument(mResult);
@@ -90,7 +88,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.GetSecretById(oid);
-
         }
     }
 
@@ -101,7 +98,7 @@ namespace AwsMock::Database {
 
             auto client = GetClient();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_collectionName];
-            mongocxx::stdx::optional <bsoncxx::document::value>
+            mongocxx::stdx::optional<bsoncxx::document::value>
                     mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
             if (mResult->empty()) {
                 return {};
@@ -115,7 +112,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.GetSecretByRegionName(region, name);
-
         }
     }
 
@@ -125,7 +121,7 @@ namespace AwsMock::Database {
 
             auto client = GetClient();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_collectionName];
-            mongocxx::stdx::optional <bsoncxx::document::value>
+            mongocxx::stdx::optional<bsoncxx::document::value>
                     mResult = _bucketCollection.find_one(make_document(kvp("secretId", secretId)));
             if (mResult->empty()) {
                 return {};
@@ -139,7 +135,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.GetSecretBySecretId(secretId);
-
         }
     }
 
@@ -170,7 +165,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.CreateSecret(secret);
-
         }
     }
 
@@ -234,7 +228,6 @@ namespace AwsMock::Database {
         } else {
 
             secretList = _memoryDb.ListSecrets();
-
         }
         log_trace << "Got secret list, size:" << secretList.size();
         return secretList;
@@ -264,7 +257,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.CountSecrets(region);
-
         }
         return -1;
     }
@@ -294,7 +286,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteSecret(secret);
-
         }
     }
 
@@ -322,8 +313,7 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteAllSecrets();
-
         }
     }
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database

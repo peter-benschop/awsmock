@@ -6,47 +6,47 @@
 
 namespace AwsMock::Dto::Cognito {
 
-  void CreateUserPoolRequest::FromJson(const std::string &payload) {
+    void CreateUserPoolRequest::FromJson(const std::string &payload) {
 
-    Poco::JSON::Parser parser;
-    Poco::Dynamic::Var result = parser.parse(payload);
-    const auto& rootObject = result.extract<Poco::JSON::Object::Ptr>();
+        Poco::JSON::Parser parser;
+        Poco::Dynamic::Var result = parser.parse(payload);
+        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
-    try {
+        try {
 
-      Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-      Core::JsonUtils::GetJsonValueString("PoolName", rootObject, name);
+            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
+            Core::JsonUtils::GetJsonValueString("PoolName", rootObject, name);
 
-    } catch (Poco::Exception &exc) {
-      log_error << exc.message();
-      throw Core::JsonException(exc.message());
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }
     }
-  }
 
-  std::string CreateUserPoolRequest::ToJson() const {
+    std::string CreateUserPoolRequest::ToJson() const {
 
-    try {
+        try {
 
-      Poco::JSON::Object rootJson;
-      rootJson.set("Region", region);
-      rootJson.set("PoolName", name);
+            Poco::JSON::Object rootJson;
+            rootJson.set("Region", region);
+            rootJson.set("PoolName", name);
 
-      return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::JsonUtils::ToJsonString(rootJson);
 
-    } catch (Poco::Exception &exc) {
-      log_error << exc.message();
-      throw Core::JsonException(exc.message());
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }
     }
-  }
 
-  std::string CreateUserPoolRequest::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+    std::string CreateUserPoolRequest::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
+    }
 
-  std::ostream &operator<<(std::ostream &os, const CreateUserPoolRequest &r) {
-    os << "CreateUserPoolRequest=" << r.ToJson();
-    return os;
-  }
-}
+    std::ostream &operator<<(std::ostream &os, const CreateUserPoolRequest &r) {
+        os << "CreateUserPoolRequest=" << r.ToJson();
+        return os;
+    }
+}// namespace AwsMock::Dto::Cognito

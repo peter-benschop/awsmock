@@ -7,8 +7,8 @@
 namespace AwsMock::Service {
 
     CognitoServer::CognitoServer(Core::Configuration &configuration)
-            : AbstractWorker(configuration), AbstractServer(configuration, "cognito", 10), _configuration(configuration), _module("cognito"), _moduleDatabase(Database::ModuleDatabase::instance()),
-              _cognitoDatabase(Database::CognitoDatabase::instance()) {
+        : AbstractWorker(configuration), AbstractServer(configuration, "cognito", 10), _configuration(configuration), _module("cognito"), _moduleDatabase(Database::ModuleDatabase::instance()),
+          _cognitoDatabase(Database::CognitoDatabase::instance()) {
 
         // Get HTTP configuration values
         _port = _configuration.getInt("awsmock.service.cognito.port", COGNITO_DEFAULT_PORT);
@@ -49,4 +49,4 @@ namespace AwsMock::Service {
         _cognitoMonitoring->Stop();
     }
 
-}
+}// namespace AwsMock::Service

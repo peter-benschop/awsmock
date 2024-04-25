@@ -6,24 +6,24 @@
 #define AWSMOCK_MANAGER_ROUTER_H
 
 // C++ standard includes
+#include <iostream>
 #include <map>
 #include <string>
-#include <iostream>
 
 // Poco includes
-#include <Poco/URI.h>
-#include <Poco/Logger.h>
 #include <Poco/ClassLibrary.h>
 #include <Poco/DynamicFactory.h>
-#include <Poco/Net/HTTPServerRequest.h>
+#include <Poco/Logger.h>
 #include <Poco/Net/HTTPRequestHandlerFactory.h>
+#include <Poco/Net/HTTPServerRequest.h>
+#include <Poco/URI.h>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/Configuration.h>
-#include <awsmock/resource/factory/IFactory.h>
-#include <awsmock/resource/factory/Factory.h>
 #include <awsmock/controller/ResourceNotFound.h>
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/resource/factory/Factory.h>
+#include <awsmock/resource/factory/IFactory.h>
 #include <awsmock/service/common/AbstractServer.h>
 
 namespace AwsMock::Controller {
@@ -31,7 +31,6 @@ namespace AwsMock::Controller {
     class Router : public Poco::Net::HTTPRequestHandlerFactory {
 
       public:
-
         /**
          * Constructor
          *
@@ -58,7 +57,6 @@ namespace AwsMock::Controller {
         Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override;
 
       private:
-
         /**
          * Return HTTP restful resource.
          *
@@ -97,6 +95,6 @@ namespace AwsMock::Controller {
         std::map<std::string, std::string> _routingTable;
     };
 
-} // namespace AwsMock::Controller
+}// namespace AwsMock::Controller
 
-#endif // AWSMOCK_MANAGER_ROUTER_H
+#endif// AWSMOCK_MANAGER_ROUTER_H

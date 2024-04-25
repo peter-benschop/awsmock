@@ -6,15 +6,15 @@
 #define AWS_MOCK_CORE_MEMORY_MAPPED_FILE_H
 
 // C includes
-#include <fcntl.h>
 #include <cerrno>
-#include <unistd.h>
+#include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 // C++ includes
-#include <string>
 #include <mutex>
+#include <string>
 
 // Poco includes
 #include <Poco/SingletonHolder.h>
@@ -33,7 +33,6 @@ namespace AwsMock::Core {
     class MemoryMappedFile {
 
       public:
-
         /**
          * Constructor
          */
@@ -80,7 +79,6 @@ namespace AwsMock::Core {
         [[nodiscard]] bool IsMapped() const { return _mapped; }
 
       private:
-
         /**
          * Start pointer
          */
@@ -110,9 +108,8 @@ namespace AwsMock::Core {
          * File size
          */
         long _fileSize = 0;
-
     };
 
-} // namespace AwsMock::Core
+}// namespace AwsMock::Core
 
-#endif // AWS_MOCK_CORE_MEMORY_MAPPED_FILE_H
+#endif// AWS_MOCK_CORE_MEMORY_MAPPED_FILE_H

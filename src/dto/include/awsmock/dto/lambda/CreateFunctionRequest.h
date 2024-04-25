@@ -6,14 +6,14 @@
 #define AWSMOCK_DTO_LAMBDA_CREATE_FUNCTION_REQUEST_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
-#include <vector>
+#include <string>
 #include <utility>
+#include <vector>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/JsonException.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/lambda/Code.h>
 #include <awsmock/dto/lambda/Environment.h>
@@ -21,76 +21,76 @@
 
 namespace AwsMock::Dto::Lambda {
 
-  struct CreateFunctionRequest {
+    struct CreateFunctionRequest {
 
-    /**
+        /**
      * Region
      */
-    std::string region;
+        std::string region;
 
-    /**
+        /**
      * User
      */
-    std::string user;
+        std::string user;
 
-    /**
+        /**
      * Name of the function
      */
-    std::string functionName;
+        std::string functionName;
 
-    /**
+        /**
      * Runtime environment
      */
-    std::string runtime;
+        std::string runtime;
 
-    /**
+        /**
      * Role
      */
-    std::string role;
+        std::string role;
 
-    /**
+        /**
      * Role
      */
-    std::string handler;
+        std::string handler;
 
-    /**
+        /**
      * Environment
      */
-    EnvironmentVariables environmentVariables;
+        EnvironmentVariables environmentVariables;
 
-    /**
+        /**
      * Memory size in MB. Default: 128, Range: 128 - 10240 MB
      */
-    long memorySize = 128;
+        long memorySize = 128;
 
-    /**
+        /**
      * Temporary disk space in MB
      */
-    EphemeralStorage ephemeralStorage;
+        EphemeralStorage ephemeralStorage;
 
-    /**
+        /**
      * Code
      */
-    Code code;
+        Code code;
 
-    /**
+        /**
      * Tags
      */
-    std::map<std::string, std::string> tags;
+        std::map<std::string, std::string> tags;
 
-    /**
+        /**
      * Timeout
      */
-    int timeout = 3;
+        int timeout = 3;
 
-    /**
+        /**
      * Creates a JSON string from the object.
      *
      * @return JSON string
      */
-    [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
+        /**
      * Parse a JSON stream.
      *
      * @verbatim
@@ -99,24 +99,23 @@ namespace AwsMock::Dto::Lambda {
      *
      * @param jsonString JSON string
      */
-    void FromJson(const std::string &jsonString);
+        void FromJson(const std::string &jsonString);
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const CreateFunctionRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const CreateFunctionRequest &r);
+    };
 
-  };
+}// namespace AwsMock::Dto::Lambda
 
-} // namespace AwsMock::Dto::lambda
-
-#endif // AWSMOCK_DTO_LAMBDA_CREATE_FUNCTION_REQUEST_H
+#endif// AWSMOCK_DTO_LAMBDA_CREATE_FUNCTION_REQUEST_H

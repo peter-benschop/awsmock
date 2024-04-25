@@ -11,13 +11,13 @@ namespace AwsMock::Database {
         if (!region.empty()) {
             return find_if(_tables.begin(),
                            _tables.end(),
-                           [region, tableName](const std::pair <std::string, Entity::DynamoDb::Table> &table) {
+                           [region, tableName](const std::pair<std::string, Entity::DynamoDb::Table> &table) {
                                return table.second.region == region && table.second.name == tableName;
                            }) != _tables.end();
         } else {
             return find_if(_tables.begin(),
                            _tables.end(),
-                           [tableName](const std::pair <std::string, Entity::DynamoDb::Table> &table) {
+                           [tableName](const std::pair<std::string, Entity::DynamoDb::Table> &table) {
                                return table.second.name == tableName;
                            }) != _tables.end();
         }
@@ -54,7 +54,7 @@ namespace AwsMock::Database {
     Entity::DynamoDb::Table DynamoDbMemoryDb::GetTableById(const std::string &oid) {
 
         auto it =
-                find_if(_tables.begin(), _tables.end(), [oid](const std::pair <std::string, Entity::DynamoDb::Table> &table) {
+                find_if(_tables.begin(), _tables.end(), [oid](const std::pair<std::string, Entity::DynamoDb::Table> &table) {
                     return table.first == oid;
                 });
 
@@ -71,7 +71,7 @@ namespace AwsMock::Database {
 
         auto it = find_if(_tables.begin(),
                           _tables.end(),
-                          [region, name](const std::pair <std::string, Entity::DynamoDb::Table> &table) {
+                          [region, name](const std::pair<std::string, Entity::DynamoDb::Table> &table) {
                               return table.second.region == region && table.second.name == name;
                           });
 
@@ -91,7 +91,7 @@ namespace AwsMock::Database {
         std::string name = table.name;
         auto it = find_if(_tables.begin(),
                           _tables.end(),
-                          [region, name](const std::pair <std::string, Entity::DynamoDb::Table> &table) {
+                          [region, name](const std::pair<std::string, Entity::DynamoDb::Table> &table) {
                               return table.second.region == region && table.second.name == name;
                           });
         _tables[it->first] = table;
@@ -120,13 +120,13 @@ namespace AwsMock::Database {
         if (!region.empty()) {
             return find_if(_items.begin(),
                            _items.end(),
-                           [region, tableName](const std::pair <std::string, Entity::DynamoDb::Item> &item) {
+                           [region, tableName](const std::pair<std::string, Entity::DynamoDb::Item> &item) {
                                return item.second.region == region && item.second.name == tableName;
                            }) != _items.end();
         } else {
             return find_if(_items.begin(),
                            _items.end(),
-                           [tableName](const std::pair <std::string, Entity::DynamoDb::Item> &item) {
+                           [tableName](const std::pair<std::string, Entity::DynamoDb::Item> &item) {
                                return item.second.name == tableName;
                            }) != _items.end();
         }
@@ -196,4 +196,4 @@ namespace AwsMock::Database {
         _items.clear();
     }
 
-}
+}// namespace AwsMock::Database

@@ -6,15 +6,15 @@
 #define AWSMOCK_SERVICE_DYNAMODB_SERVICE_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // Poco includes
-#include <Poco/NotificationQueue.h>
-#include <Poco/StreamCopier.h>
 #include <Poco/Net/HTTPClientSession.h>
 #include <Poco/Net/HTTPRequest.h>
 #include <Poco/Net/HTTPResponse.h>
+#include <Poco/NotificationQueue.h>
+#include <Poco/StreamCopier.h>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
@@ -49,147 +49,144 @@
 
 namespace AwsMock::Service {
 
-  /**
+    /**
    * AWS DynamoDb module. Handles all DynamoDb related requests:
    *
    * @author jens.vogt@opitz-consulting.com
    */
-  class DynamoDbService {
+    class DynamoDbService {
 
-    public:
-
-    /**
+      public:
+        /**
      * Constructor
      *
      * @param configuration module configuration
      */
-    explicit DynamoDbService(Core::Configuration &configuration);
+        explicit DynamoDbService(Core::Configuration &configuration);
 
-    /**
+        /**
      * Creates a new table
      *
      * @param request create table request DTO
      * @return CreateTableResponse
      */
-    Dto::DynamoDb::CreateTableResponse CreateTable(const Dto::DynamoDb::CreateTableRequest &request);
+        Dto::DynamoDb::CreateTableResponse CreateTable(const Dto::DynamoDb::CreateTableRequest &request);
 
-    /**
+        /**
      * Lists all available tables
      *
      * @param request list table request DTO
      * @return ListTableResponse
      */
-    Dto::DynamoDb::ListTableResponse ListTables(const Dto::DynamoDb::ListTableRequest &request);
+        Dto::DynamoDb::ListTableResponse ListTables(const Dto::DynamoDb::ListTableRequest &request);
 
-    /**
+        /**
      * Describes a table
      *
      * @param request describe table request DTO
      * @return DescribeTableResponse
      */
-    Dto::DynamoDb::DescribeTableResponse DescribeTable(const Dto::DynamoDb::DescribeTableRequest &request);
+        Dto::DynamoDb::DescribeTableResponse DescribeTable(const Dto::DynamoDb::DescribeTableRequest &request);
 
-    /**
+        /**
      * Deletes a table
      *
      * @param request delete table request DTO
      * @return DeleteTableResponse
      */
-    Dto::DynamoDb::DeleteTableResponse DeleteTable(const Dto::DynamoDb::DeleteTableRequest &request);
+        Dto::DynamoDb::DeleteTableResponse DeleteTable(const Dto::DynamoDb::DeleteTableRequest &request);
 
-    /**
+        /**
      * Deletes all tables with all items
      */
-    void DeleteAllTables();
+        void DeleteAllTables();
 
-    /**
+        /**
      * Gets an item
      *
      * @param request get item request DTO
      * @return GetItemResponse
      */
-    Dto::DynamoDb::GetItemResponse GetItem(const Dto::DynamoDb::GetItemRequest &request);
+        Dto::DynamoDb::GetItemResponse GetItem(const Dto::DynamoDb::GetItemRequest &request);
 
-    /**
+        /**
      * Puts an item
      *
      * @param request put item request DTO
      * @return GetItemResponse
      */
-    Dto::DynamoDb::PutItemResponse PutItem(const Dto::DynamoDb::PutItemRequest &request);
+        Dto::DynamoDb::PutItemResponse PutItem(const Dto::DynamoDb::PutItemRequest &request);
 
-    /**
+        /**
      * Query the database
      *
      * @param request query item request DTO
      * @return QueryResponse
      */
-    Dto::DynamoDb::QueryResponse Query(const Dto::DynamoDb::QueryRequest &request);
+        Dto::DynamoDb::QueryResponse Query(const Dto::DynamoDb::QueryRequest &request);
 
-    /**
+        /**
      * Scan the database
      *
      * @param request scan request DTO
      * @return ScanResponse
      */
-    Dto::DynamoDb::ScanResponse Scan(const Dto::DynamoDb::ScanRequest &request);
+        Dto::DynamoDb::ScanResponse Scan(const Dto::DynamoDb::ScanRequest &request);
 
-    /**
+        /**
      * Deletes a item
      *
      * @param request delete item request DTO
      * @return DeleteItemResponse
      */
-    Dto::DynamoDb::DeleteItemResponse DeleteItem(const Dto::DynamoDb::DeleteItemRequest &request);
+        Dto::DynamoDb::DeleteItemResponse DeleteItem(const Dto::DynamoDb::DeleteItemRequest &request);
 
-    private:
-
-    /**
+      private:
+        /**
      * Send the request to the DynamoDB container
      *
      * @param body original HTTP request body
      * @param headers original HTTP request headers
      * @return response body
      */
-    Dto::DynamoDb::DynamoDbResponse SendDynamoDbRequest(const std::string &body, const std::map<std::string, std::string> &headers);
+        Dto::DynamoDb::DynamoDbResponse SendDynamoDbRequest(const std::string &body, const std::map<std::string, std::string> &headers);
 
-    /**
+        /**
      * AWS region
      */
-    std::string _region;
+        std::string _region;
 
-    /**
+        /**
      * AWS account ID
      */
-    std::string _accountId;
+        std::string _accountId;
 
-    /**
+        /**
      * Configuration
      */
-    Core::Configuration &_configuration;
+        Core::Configuration &_configuration;
 
-    /**
+        /**
      * Docker module
      */
-    std::shared_ptr<Service::DockerService> _dockerService;
+        std::shared_ptr<Service::DockerService> _dockerService;
 
-    /**
+        /**
      * Database connection
      */
-    Database::DynamoDbDatabase& _dynamoDbDatabase;
+        Database::DynamoDbDatabase &_dynamoDbDatabase;
 
-    /**
+        /**
      * DynamoDb docker host
      */
-    std::string _dockerHost;
+        std::string _dockerHost;
 
-    /**
+        /**
      * DynamoDb docker port
      */
-    int _dockerPort;
+        int _dockerPort;
+    };
 
-  };
+}// namespace AwsMock::Service
 
-} // namespace AwsMock::Service
-
-#endif // AWSMOCK_SERVICE_DYNAMODB_SERVICE_H
+#endif// AWSMOCK_SERVICE_DYNAMODB_SERVICE_H

@@ -6,56 +6,55 @@
 #define AWS_MOCK_DTO_CURL_CURL_RESPONSE_H
 
 // C++ includes
-#include <string>
 #include <sstream>
+#include <string>
 
 namespace AwsMock::Core {
 
-  /**
+    /**
    * Curl library response structure
    *
    * @author jens.vogt@opitz-consulting.com
    */
-  struct CurlResponse {
+    struct CurlResponse {
 
-    /**
+        /**
      * HTTP state code
      */
-    int statusCode;
+        int statusCode;
 
-    /**
+        /**
      * HTTP state reason
      */
-    std::string statusReason;
+        std::string statusReason;
 
-    /**
+        /**
      * Command output
      */
-    std::string output;
+        std::string output;
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const {
-      std::stringstream ss;
-      ss << (*this);
-      return ss.str();
-    }
+        [[nodiscard]] std::string ToString() const {
+            std::stringstream ss;
+            ss << (*this);
+            return ss.str();
+        }
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const CurlResponse &r) {
-      os << "CurlResponse={statusCode='" << r.statusCode << "', statusReason='" << r.statusReason << "', output='" << r.output << "'}";
-      return os;
-    }
+        friend std::ostream &operator<<(std::ostream &os, const CurlResponse &r) {
+            os << "CurlResponse={statusCode='" << r.statusCode << "', statusReason='" << r.statusReason << "', output='" << r.output << "'}";
+            return os;
+        }
+    };
 
-  };
+}// namespace AwsMock::Core
 
-} // namespace AwsMock::Dto::Curl
-
-#endif // AWS_MOCK_DTO_CURL_CURL_RESPONSE_H
+#endif// AWS_MOCK_DTO_CURL_CURL_RESPONSE_H

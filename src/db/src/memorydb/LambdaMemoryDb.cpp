@@ -10,7 +10,7 @@ namespace AwsMock::Database {
 
         return find_if(_lambdas.begin(),
                        _lambdas.end(),
-                       [function](const std::pair <std::string, Entity::Lambda::Lambda> &lambda) {
+                       [function](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
                            return lambda.second.function == function;
                        }) != _lambdas.end();
     }
@@ -21,7 +21,7 @@ namespace AwsMock::Database {
         std::string function = lambda.function;
         return find_if(_lambdas.begin(),
                        _lambdas.end(),
-                       [region, function](const std::pair <std::string, Entity::Lambda::Lambda> &lambda) {
+                       [region, function](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
                            return lambda.second.region == region && lambda.second.function == function;
                        }) != _lambdas.end();
     }
@@ -32,18 +32,16 @@ namespace AwsMock::Database {
 
         return find_if(_lambdas.begin(),
                        _lambdas.end(),
-                       [region, function, runtime](const std::pair <std::string, Entity::Lambda::Lambda> &lambda) {
-                           return lambda.second.region == region && lambda.second.function == function
-                                  && lambda.second.runtime == runtime;
+                       [region, function, runtime](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
+                           return lambda.second.region == region && lambda.second.function == function && lambda.second.runtime == runtime;
                        }) != _lambdas.end();
     }
 
     bool LambdaMemoryDb::LambdaExistsByArn(const std::string &arn) {
 
-        return
-                find_if(_lambdas.begin(), _lambdas.end(), [arn](const std::pair <std::string, Entity::Lambda::Lambda> &lambda) {
-                    return lambda.second.arn == arn;
-                }) != _lambdas.end();
+        return find_if(_lambdas.begin(), _lambdas.end(), [arn](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
+                   return lambda.second.arn == arn;
+               }) != _lambdas.end();
     }
 
     Entity::Lambda::LambdaList LambdaMemoryDb::ListLambdas(const std::string &region) {
@@ -77,7 +75,7 @@ namespace AwsMock::Database {
     Entity::Lambda::Lambda LambdaMemoryDb::GetLambdaById(const std::string &oid) {
 
         auto it =
-                find_if(_lambdas.begin(), _lambdas.end(), [oid](const std::pair <std::string, Entity::Lambda::Lambda> &lambda) {
+                find_if(_lambdas.begin(), _lambdas.end(), [oid](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
                     return lambda.first == oid;
                 });
 
@@ -93,7 +91,7 @@ namespace AwsMock::Database {
     Entity::Lambda::Lambda LambdaMemoryDb::GetLambdaByArn(const std::string &arn) {
 
         auto it =
-                find_if(_lambdas.begin(), _lambdas.end(), [arn](const std::pair <std::string, Entity::Lambda::Lambda> &lambda) {
+                find_if(_lambdas.begin(), _lambdas.end(), [arn](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
                     return lambda.second.arn == arn;
                 });
 
@@ -109,7 +107,7 @@ namespace AwsMock::Database {
     Entity::Lambda::Lambda LambdaMemoryDb::GetLambdaByName(const std::string &region, const std::string &name) {
 
         auto it =
-                find_if(_lambdas.begin(), _lambdas.end(), [region, name](const std::pair <std::string, Entity::Lambda::Lambda> &lambda) {
+                find_if(_lambdas.begin(), _lambdas.end(), [region, name](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
                     return lambda.second.region == region && lambda.second.function == name;
                 });
 
@@ -145,7 +143,7 @@ namespace AwsMock::Database {
         std::string function = lambda.function;
         auto it = find_if(_lambdas.begin(),
                           _lambdas.end(),
-                          [region, function](const std::pair <std::string, Entity::Lambda::Lambda> &lambda) {
+                          [region, function](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
                               return lambda.second.region == region && lambda.second.function == function;
                           });
 
@@ -173,4 +171,4 @@ namespace AwsMock::Database {
         log_debug << "All lambdas deleted, count: " << _lambdas.size();
         _lambdas.clear();
     }
-}
+}// namespace AwsMock::Database

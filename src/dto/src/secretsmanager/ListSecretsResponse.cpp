@@ -6,37 +6,37 @@
 
 namespace AwsMock::Dto::SecretsManager {
 
-  std::string ListSecretsResponse::ToJson() const {
+    std::string ListSecretsResponse::ToJson() const {
 
-    try {
+        try {
 
-      Poco::JSON::Object rootJson;
-      rootJson.set("NextToken", nextToken);
+            Poco::JSON::Object rootJson;
+            rootJson.set("NextToken", nextToken);
 
-      Poco::JSON::Array jsonSecretsArray;
-      for(const auto &secret:secretList) {
-        jsonSecretsArray.add(secret.ToJsonObject());
-      }
-      rootJson.set("SecretList", jsonSecretsArray);
+            Poco::JSON::Array jsonSecretsArray;
+            for (const auto &secret: secretList) {
+                jsonSecretsArray.add(secret.ToJsonObject());
+            }
+            rootJson.set("SecretList", jsonSecretsArray);
 
-      std::ostringstream os;
-      rootJson.stringify(os);
-      return os.str();
+            std::ostringstream os;
+            rootJson.stringify(os);
+            return os.str();
 
-    } catch (Poco::Exception &exc) {
-      throw Core::JsonException(exc.message());
+        } catch (Poco::Exception &exc) {
+            throw Core::JsonException(exc.message());
+        }
     }
-  }
 
-  std::string ListSecretsResponse::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+    std::string ListSecretsResponse::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
+    }
 
-  std::ostream &operator<<(std::ostream &os, const ListSecretsResponse &r) {
-    os << "ListSecretsResponse=" << r.ToJson();
-    return os;
-  }
+    std::ostream &operator<<(std::ostream &os, const ListSecretsResponse &r) {
+        os << "ListSecretsResponse=" << r.ToJson();
+        return os;
+    }
 
-} // namespace AwsMock::Dto
+}// namespace AwsMock::Dto::SecretsManager

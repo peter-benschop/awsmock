@@ -10,9 +10,9 @@ namespace AwsMock::Database::Entity::SQS {
 
     //MessageAttribute::MessageAttribute(std::string name, std::string value, const MessageAttributeType &type) : attributeName(std::move(name)), attributeValue(std::move(value)), attributeType(type) {}
 
-    view_or_value <view, value> MessageAttribute::ToDocument() const {
+    view_or_value<view, value> MessageAttribute::ToDocument() const {
 
-        view_or_value <view, value> messageAttributeDoc = make_document(
+        view_or_value<view, value> messageAttributeDoc = make_document(
                 kvp("attributeName", attributeName),
                 kvp("attributeValue", attributeValue),
                 kvp("systemAttribute", systemAttribute),
@@ -32,4 +32,4 @@ namespace AwsMock::Database::Entity::SQS {
         return os;
     }
 
-} // namespace AwsMock::Database::Entity::S3
+}// namespace AwsMock::Database::Entity::SQS

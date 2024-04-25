@@ -44,4 +44,4 @@ namespace AwsMock::Core {
         }
         return result;
     }
-}
+}// namespace AwsMock::Core

@@ -11,48 +11,45 @@
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 
 // AwsMock includes
+#include "SQSHandler.h"
 #include "awsmock/core/Configuration.h"
 #include "awsmock/core/MetricService.h"
-#include "SQSHandler.h"
 
 namespace AwsMock::Service {
 
-  /**
+    /**
    * S3 request handler factory
    */
-  class SQSRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
+    class SQSRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 
-  public:
-
-    /**
+      public:
+        /**
      * Constructor
      *
      * @param configuration application configuration
      */
-    SQSRequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
+        SQSRequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
 
-    /**
+        /**
      * Create a new request handler
      *
      * @param request HTTP request
      * @return pointer to request handler
      */
-    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
-      if(request.getURI().empty()) {
-        return nullptr;
-      }
-      return new SQSHandler(_configuration);
-    }
+        Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
+            if (request.getURI().empty()) {
+                return nullptr;
+            }
+            return new SQSHandler(_configuration);
+        }
 
-  private:
-
-    /**
+      private:
+        /**
      * S3 handler configuration
      */
-    Core::Configuration &_configuration;
+        Core::Configuration &_configuration;
+    };
 
-  };
+}// namespace AwsMock::Service
 
-} // namespace AwsMock::Service
-
-#endif //AWSMOCK_SERVICE_SQS_HANDLER_FACTORY_H
+#endif//AWSMOCK_SERVICE_SQS_HANDLER_FACTORY_H

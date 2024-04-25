@@ -6,9 +6,9 @@
 #define AWSMOCK_REPOSITORY_S3DATABASE_H
 
 // C++ standard includes
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
 
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
@@ -16,15 +16,15 @@
 #include <bsoncxx/builder/stream/document.hpp>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/memorydb/S3MemoryDb.h>
-#include <awsmock/repository/Database.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/Object.h>
+#include <awsmock/memorydb/S3MemoryDb.h>
+#include <awsmock/repository/Database.h>
 
 namespace AwsMock::Database {
 
@@ -36,7 +36,6 @@ namespace AwsMock::Database {
     class S3Database : public Database {
 
       public:
-
         /**
          * Constructor
          */
@@ -46,7 +45,7 @@ namespace AwsMock::Database {
          * Singleton instance
          */
         static S3Database &instance() {
-            static Poco::SingletonHolder <S3Database> sh;
+            static Poco::SingletonHolder<S3Database> sh;
             return *sh.get();
         }
 
@@ -326,7 +325,7 @@ namespace AwsMock::Database {
          * @param keys vector of object keys
          * @throws DatabaseException
          */
-        void DeleteObjects(const std::string &bucket, const std::vector <std::string> &keys);
+        void DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys);
 
         /**
          * Deletes all objects
@@ -334,11 +333,10 @@ namespace AwsMock::Database {
         void DeleteAllObjects();
 
       private:
-
         /**
          * Allowed event types
          */
-        static std::map <std::string, std::vector<std::string>> allowedEventTypes;
+        static std::map<std::string, std::vector<std::string>> allowedEventTypes;
 
         /**
          * Use MongoDB
@@ -354,9 +352,8 @@ namespace AwsMock::Database {
          * S3 in-memory database
          */
         S3MemoryDb &_memoryDb;
-
     };
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
 
-#endif // AWSMOCK_REPOSITORY_S3DATABASE_H
+#endif// AWSMOCK_REPOSITORY_S3DATABASE_H

@@ -6,20 +6,20 @@
 #define AWSMOCK_DB_ENTITY_SECRETSMANAGER_ROTATION_RULES_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // Poco includes
+#include <Poco/Dynamic/Var.h>
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
-#include <Poco/Dynamic/Var.h>
 #include <Poco/Net/HTTPResponse.h>
 
 // MongoDB includes
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/stdx.hpp>
 
 // AwsMoc includes
@@ -28,12 +28,12 @@
 
 namespace AwsMock::Database::Entity::SecretsManager {
 
+    using bsoncxx::view_or_value;
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
-    using bsoncxx::view_or_value;
-    using bsoncxx::document::view;
     using bsoncxx::document::value;
+    using bsoncxx::document::view;
 
     /**
      * Rotation rules
@@ -69,14 +69,14 @@ namespace AwsMock::Database::Entity::SecretsManager {
          *
          * @return entity as MongoDB document.
          */
-        [[nodiscard]] view_or_value <view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * Converts the MongoDB document to an entity
          *
          * @param mResult MongoDB document.
          */
-        void FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult);
+        void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
         /**
          * Converts the entity to a string representation.
@@ -98,9 +98,8 @@ namespace AwsMock::Database::Entity::SecretsManager {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const RotationRules &r);
-
     };
 
-} //namespace AwsMock::Dto::SecretsManager
+}// namespace AwsMock::Database::Entity::SecretsManager
 
-#endif // AWSMOCK_ENTITY_SECRETSMANAGER_ROTATION_RULES_H
+#endif// AWSMOCK_ENTITY_SECRETSMANAGER_ROTATION_RULES_H

@@ -16,49 +16,48 @@
 
 namespace AwsMock::Dto::Docker {
 
-  struct Filter {
+    struct Filter {
 
-      /**
+        /**
        * Docker image/container name
        */
-      std::string name;
+        std::string name;
 
-      /**
+        /**
        * Docker image/container tag
        */
-      std::string value;
-  };
+        std::string value;
+    };
 
-  struct Filters {
+    struct Filters {
 
-      /**
+        /**
        * Vector of filters
        */
-      std::vector<Filter> filters;
+        std::vector<Filter> filters;
 
-      /**
+        /**
        * Convert to a JSON string
        *
        * @param object JSON object
        */
-      [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-      /**
+        /**
        * Converts the DTO to a string representation.
        *
        * @return DTO as string for logging.
        */
-      [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-      /**
+        /**
        * Stream provider.
        *
        * @return output stream
        */
-      friend std::ostream &operator<<(std::ostream &os, const Filters &c);
+        friend std::ostream &operator<<(std::ostream &os, const Filters &c);
+    };
 
-  };
+}// namespace AwsMock::Dto::Docker
 
-} // namespace AwsMock::Dto::Docker
-
-#endif //AWSMOCK_DTO_DOCKER_FILTERS_H
+#endif//AWSMOCK_DTO_DOCKER_FILTERS_H

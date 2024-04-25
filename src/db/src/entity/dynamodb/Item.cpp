@@ -6,9 +6,9 @@
 
 namespace AwsMock::Database::Entity::DynamoDb {
 
-    view_or_value <view, value> Item::ToDocument() const {
+    view_or_value<view, value> Item::ToDocument() const {
 
-        view_or_value <view, value> lambdaDoc = make_document(
+        view_or_value<view, value> lambdaDoc = make_document(
                 kvp("region", region),
                 kvp("name", name),
                 kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
@@ -17,7 +17,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
         return lambdaDoc;
     }
 
-    void Item::FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult) {
+    void Item::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         oid = mResult.value()["_id"].get_oid().value.to_string();
         region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
@@ -50,4 +50,4 @@ namespace AwsMock::Database::Entity::DynamoDb {
         os << "Item=" << bsoncxx::to_json(i.ToDocument());
         return os;
     }
-}
+}// namespace AwsMock::Database::Entity::DynamoDb

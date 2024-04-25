@@ -6,19 +6,19 @@
 #define AWSMOCK_REPOSITORY_LAMBDADATABASE_H
 
 // C++ standard includes
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/memorydb/LambdaMemoryDb.h>
 #include <awsmock/repository/Database.h>
-#include <awsmock/entity/lambda/Lambda.h>
 
 namespace AwsMock::Database {
 
@@ -30,7 +30,6 @@ namespace AwsMock::Database {
     class LambdaDatabase : public Database {
 
       public:
-
         /**
          * Constructor
          *
@@ -42,7 +41,7 @@ namespace AwsMock::Database {
          * Singleton instance
          */
         static LambdaDatabase &instance() {
-            static Poco::SingletonHolder <LambdaDatabase> sh;
+            static Poco::SingletonHolder<LambdaDatabase> sh;
             return *sh.get();
         }
 
@@ -159,7 +158,7 @@ namespace AwsMock::Database {
          * @param region AWS region name
          * @return list of lambda functions
          */
-        std::vector <Entity::Lambda::Lambda> ListLambdas(const std::string &region = {});
+        std::vector<Entity::Lambda::Lambda> ListLambdas(const std::string &region = {});
 
         /**
          * Deletes an existing lambda function
@@ -177,7 +176,6 @@ namespace AwsMock::Database {
         void DeleteAllLambdas();
 
       private:
-
         /**
          * Use MongoDB
          */
@@ -192,9 +190,8 @@ namespace AwsMock::Database {
          * Lambda in-memory database
          */
         LambdaMemoryDb &_memoryDb;
-
     };
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
 
-#endif // AWSMOCK_REPOSITORY_LAMBDADATABASE_H
+#endif// AWSMOCK_REPOSITORY_LAMBDADATABASE_H

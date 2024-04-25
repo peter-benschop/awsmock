@@ -26,213 +26,211 @@
 
 namespace AwsMock::Database {
 
-  class SNSDatabaseTest : public ::testing::Test {
+    class SNSDatabaseTest : public ::testing::Test {
 
-    protected:
+          protected:
+        void SetUp() override {
+            _region = _configuration.getString("awsmock.region");
+        }
 
-      void SetUp() override {
-        _region = _configuration.getString("awsmock.region");
-      }
+        void TearDown() override {
+            _snsDatabase.DeleteAllTopics();
+            _snsDatabase.DeleteAllMessages();
+        }
 
-      void TearDown() override {
-        _snsDatabase.DeleteAllTopics();
-        _snsDatabase.DeleteAllMessages();
-      }
+        std::string _region;
+        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration();
+        SNSDatabase &_snsDatabase = SNSDatabase::instance();
+    };
 
-      std::string _region;
-      Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration();
-      SNSDatabase &_snsDatabase = SNSDatabase::instance();
-  };
+    TEST_F(SNSDatabaseTest, TopicCreateTest) {
 
-  TEST_F(SNSDatabaseTest, TopicCreateTest) {
+        // arrange
+        Entity::SNS::Topic topic = {.region = _region, .topicName = TOPIC, .owner = OWNER};
 
-    // arrange
-    Entity::SNS::Topic topic = {.region=_region, .topicName=TOPIC, .owner=OWNER};
+        // act
+        Entity::SNS::Topic result = _snsDatabase.CreateTopic(topic);
 
-    // act
-    Entity::SNS::Topic result = _snsDatabase.CreateTopic(topic);
-
-    // assert
-    EXPECT_TRUE(result.topicName == TOPIC);
-    EXPECT_TRUE(result.region == REGION);
-    EXPECT_FALSE(result.oid.empty());
-  }
-
-  TEST_F(SNSDatabaseTest, TopicGetByIdTest) {
-
-    // arrange
-    Entity::SNS::Topic topic = _snsDatabase.CreateTopic({.region=_region, .topicName=TOPIC, .owner=OWNER});
-
-    // act
-    Entity::SNS::Topic result = _snsDatabase.GetTopicById(topic.oid);
-
-    // assert
-    EXPECT_TRUE(result.topicArn == topic.topicArn);
-  }
-
-  TEST_F(SNSDatabaseTest, TopicGetByArnTest) {
-
-    // arrange
-    Entity::SNS::Topic topic = _snsDatabase.CreateTopic({.region=_region, .topicName=TOPIC, .owner=OWNER});
-
-    // act
-    Entity::SNS::Topic result = _snsDatabase.GetTopicByArn(topic.topicArn);
-
-    // assert
-    EXPECT_TRUE(result.topicArn == topic.topicArn);
-  }
-
-  TEST_F(SNSDatabaseTest, TopicUpdateTest) {
-
-    // arrange
-    Entity::SNS::Topic topic = _snsDatabase.CreateTopic({.region=_region, .topicName=TOPIC, .owner=OWNER});
-
-    // act
-    std::string url = "http://localhost:4567/" + topic.topicName;
-    topic.topicUrl = url;
-    Entity::SNS::Topic result = _snsDatabase.UpdateTopic(topic);
-
-    // assert
-    EXPECT_TRUE(result.topicUrl == topic.topicUrl);
-  }
-
-  TEST_F(SNSDatabaseTest, TopicCountTest) {
-
-    // arrange
-    Entity::SNS::Topic topic = _snsDatabase.CreateTopic({.region=_region, .topicName=TOPIC, .owner=OWNER});
-
-    // act
-    long result = _snsDatabase.CountTopics(topic.region);
-
-    // assert
-    EXPECT_EQ(1, result);
-  }
-
-  TEST_F(SNSDatabaseTest, TopicListTest) {
-
-    // arrange
-    Entity::SNS::Topic topic = _snsDatabase.CreateTopic({.region=_region, .topicName=TOPIC, .owner=OWNER});
-
-    // act
-    Entity::SNS::TopicList result = _snsDatabase.ListTopics(topic.region);
-
-    // assert
-    EXPECT_EQ(result.size(), 1);
-  }
-
-  TEST_F(SNSDatabaseTest, TopicGetBySubscriptionArnTest) {
-
-    // arrange
-    Entity::SNS::Topic topic = _snsDatabase.CreateTopic({.region=_region, .topicName=TOPIC, .owner=OWNER});
-    topic.subscriptions.push_back({.protocol="sqs", .endpoint=QUEUE_URL, .subscriptionArn=SUBSCRIPTION_ARN});
-    topic = _snsDatabase.UpdateTopic(topic);
-
-    // act
-    Entity::SNS::TopicList result = _snsDatabase.GetTopicsBySubscriptionArn(SUBSCRIPTION_ARN);
-
-    // assert
-    EXPECT_EQ(result.size(), 1);
-    EXPECT_TRUE(result[0].topicName == TOPIC);
-  }
-
-  TEST_F(SNSDatabaseTest, TopicDeleteTest) {
-
-    // arrange
-    Entity::SNS::Topic
-        topic = _snsDatabase.CreateTopic({.region=_region, .topicName=TOPIC, .owner=OWNER, .topicArn=TOPIC_ARN});
-
-    // act
-    _snsDatabase.DeleteTopic(topic);
-    bool result = _snsDatabase.TopicExists(topic.region, topic.topicName);
-
-    // assert
-    EXPECT_FALSE(result);
-  }
-
-  TEST_F(SNSDatabaseTest, MessageCreateTest) {
-
-    // arrange
-    Entity::SNS::Topic topic = {.region=_region, .topicName=TOPIC, .owner=OWNER, .topicArn=TOPIC_ARN};
-    topic = _snsDatabase.CreateTopic(topic);
-    Entity::SNS::Message message = {.region=_region, .topicArn=topic.topicArn, .message=BODY};
-
-    // act
-    Entity::SNS::Message result = _snsDatabase.CreateMessage(message);
-
-    // assert
-    EXPECT_FALSE(result.oid.empty());
-    EXPECT_TRUE(result.message == BODY);
-  }
-
-  TEST_F(SNSDatabaseTest, MessageCountTest) {
-
-    // arrange
-    Entity::SNS::Topic
-        topic = _snsDatabase.CreateTopic({.region=_region, .topicName=TOPIC, .owner=OWNER, .topicArn=TOPIC_ARN});
-    Entity::SNS::Message
-        message = _snsDatabase.CreateMessage({.region=_region, .topicArn=topic.topicArn, .message=BODY});
-
-    // act
-    long result = _snsDatabase.CountMessages(_region, topic.topicArn);
-
-    // assert
-    EXPECT_EQ(1, result);
-  }
-
-  TEST_F(SNSDatabaseTest, MessageDeleteTest) {
-
-    // arrange
-    Entity::SNS::Topic
-        topic = _snsDatabase.CreateTopic({.region=_region, .topicName=TOPIC, .owner=OWNER, .topicArn=TOPIC_ARN});
-    Entity::SNS::Message message =
-        _snsDatabase.CreateMessage({.region=_region, .topicArn=topic.topicArn, .message=BODY, .messageId="abcd"});
-
-    // act
-    _snsDatabase.DeleteMessage(message);
-    long result = _snsDatabase.CountMessages(_region, topic.topicArn);
-
-    // assert
-    EXPECT_EQ(0, result);
-  }
-
-  TEST_F(SNSDatabaseTest, MessagesDeleteTest) {
-
-    // arrange
-    Entity::SNS::Topic
-        topic = _snsDatabase.CreateTopic({.region=_region, .topicName=TOPIC, .owner=OWNER, .topicArn=TOPIC_ARN});
-
-    std::vector<std::string> messageIds;
-    for (int i = 0; i < 10; i++) {
-      Entity::SNS::Message message =
-          _snsDatabase.CreateMessage({.region=_region, .topicArn=topic.topicArn, .message=BODY, .messageId="test"
-              + std::to_string(i)});
-      messageIds.emplace_back(message.messageId);
+        // assert
+        EXPECT_TRUE(result.topicName == TOPIC);
+        EXPECT_TRUE(result.region == REGION);
+        EXPECT_FALSE(result.oid.empty());
     }
 
-    // act
-    _snsDatabase.DeleteMessages(_region, TOPIC_ARN, messageIds);
-    long result = _snsDatabase.CountMessages(_region, topic.topicArn);
+    TEST_F(SNSDatabaseTest, TopicGetByIdTest) {
 
-    // assert
-    EXPECT_EQ(0, result);
-  }
+        // arrange
+        Entity::SNS::Topic topic = _snsDatabase.CreateTopic({.region = _region, .topicName = TOPIC, .owner = OWNER});
 
-  TEST_F(SNSDatabaseTest, MessageDeleteAllTest) {
+        // act
+        Entity::SNS::Topic result = _snsDatabase.GetTopicById(topic.oid);
 
-    // arrange
-    Entity::SNS::Topic
-        topic = _snsDatabase.CreateTopic({.region=_region, .topicName=TOPIC, .owner=OWNER, .topicArn=TOPIC_ARN});
-    Entity::SNS::Message message =
-        _snsDatabase.CreateMessage({.region=_region, .topicArn=topic.topicArn, .message=BODY, .messageId="abcd"});
+        // assert
+        EXPECT_TRUE(result.topicArn == topic.topicArn);
+    }
 
-    // act
-    _snsDatabase.DeleteAllMessages();
-    long result = _snsDatabase.CountMessages(_region, topic.topicArn);
+    TEST_F(SNSDatabaseTest, TopicGetByArnTest) {
 
-    // assert
-    EXPECT_EQ(0, result);
-  }
+        // arrange
+        Entity::SNS::Topic topic = _snsDatabase.CreateTopic({.region = _region, .topicName = TOPIC, .owner = OWNER});
 
-} // namespace AwsMock::Core
+        // act
+        Entity::SNS::Topic result = _snsDatabase.GetTopicByArn(topic.topicArn);
 
-#endif // AWMOCK_CORE_SNSDATABASETEST_H
+        // assert
+        EXPECT_TRUE(result.topicArn == topic.topicArn);
+    }
+
+    TEST_F(SNSDatabaseTest, TopicUpdateTest) {
+
+        // arrange
+        Entity::SNS::Topic topic = _snsDatabase.CreateTopic({.region = _region, .topicName = TOPIC, .owner = OWNER});
+
+        // act
+        std::string url = "http://localhost:4567/" + topic.topicName;
+        topic.topicUrl = url;
+        Entity::SNS::Topic result = _snsDatabase.UpdateTopic(topic);
+
+        // assert
+        EXPECT_TRUE(result.topicUrl == topic.topicUrl);
+    }
+
+    TEST_F(SNSDatabaseTest, TopicCountTest) {
+
+        // arrange
+        Entity::SNS::Topic topic = _snsDatabase.CreateTopic({.region = _region, .topicName = TOPIC, .owner = OWNER});
+
+        // act
+        long result = _snsDatabase.CountTopics(topic.region);
+
+        // assert
+        EXPECT_EQ(1, result);
+    }
+
+    TEST_F(SNSDatabaseTest, TopicListTest) {
+
+        // arrange
+        Entity::SNS::Topic topic = _snsDatabase.CreateTopic({.region = _region, .topicName = TOPIC, .owner = OWNER});
+
+        // act
+        Entity::SNS::TopicList result = _snsDatabase.ListTopics(topic.region);
+
+        // assert
+        EXPECT_EQ(result.size(), 1);
+    }
+
+    TEST_F(SNSDatabaseTest, TopicGetBySubscriptionArnTest) {
+
+        // arrange
+        Entity::SNS::Topic topic = _snsDatabase.CreateTopic({.region = _region, .topicName = TOPIC, .owner = OWNER});
+        topic.subscriptions.push_back({.protocol = "sqs", .endpoint = QUEUE_URL, .subscriptionArn = SUBSCRIPTION_ARN});
+        topic = _snsDatabase.UpdateTopic(topic);
+
+        // act
+        Entity::SNS::TopicList result = _snsDatabase.GetTopicsBySubscriptionArn(SUBSCRIPTION_ARN);
+
+        // assert
+        EXPECT_EQ(result.size(), 1);
+        EXPECT_TRUE(result[0].topicName == TOPIC);
+    }
+
+    TEST_F(SNSDatabaseTest, TopicDeleteTest) {
+
+        // arrange
+        Entity::SNS::Topic
+                topic = _snsDatabase.CreateTopic({.region = _region, .topicName = TOPIC, .owner = OWNER, .topicArn = TOPIC_ARN});
+
+        // act
+        _snsDatabase.DeleteTopic(topic);
+        bool result = _snsDatabase.TopicExists(topic.region, topic.topicName);
+
+        // assert
+        EXPECT_FALSE(result);
+    }
+
+    TEST_F(SNSDatabaseTest, MessageCreateTest) {
+
+        // arrange
+        Entity::SNS::Topic topic = {.region = _region, .topicName = TOPIC, .owner = OWNER, .topicArn = TOPIC_ARN};
+        topic = _snsDatabase.CreateTopic(topic);
+        Entity::SNS::Message message = {.region = _region, .topicArn = topic.topicArn, .message = BODY};
+
+        // act
+        Entity::SNS::Message result = _snsDatabase.CreateMessage(message);
+
+        // assert
+        EXPECT_FALSE(result.oid.empty());
+        EXPECT_TRUE(result.message == BODY);
+    }
+
+    TEST_F(SNSDatabaseTest, MessageCountTest) {
+
+        // arrange
+        Entity::SNS::Topic
+                topic = _snsDatabase.CreateTopic({.region = _region, .topicName = TOPIC, .owner = OWNER, .topicArn = TOPIC_ARN});
+        Entity::SNS::Message
+                message = _snsDatabase.CreateMessage({.region = _region, .topicArn = topic.topicArn, .message = BODY});
+
+        // act
+        long result = _snsDatabase.CountMessages(_region, topic.topicArn);
+
+        // assert
+        EXPECT_EQ(1, result);
+    }
+
+    TEST_F(SNSDatabaseTest, MessageDeleteTest) {
+
+        // arrange
+        Entity::SNS::Topic
+                topic = _snsDatabase.CreateTopic({.region = _region, .topicName = TOPIC, .owner = OWNER, .topicArn = TOPIC_ARN});
+        Entity::SNS::Message message =
+                _snsDatabase.CreateMessage({.region = _region, .topicArn = topic.topicArn, .message = BODY, .messageId = "abcd"});
+
+        // act
+        _snsDatabase.DeleteMessage(message);
+        long result = _snsDatabase.CountMessages(_region, topic.topicArn);
+
+        // assert
+        EXPECT_EQ(0, result);
+    }
+
+    TEST_F(SNSDatabaseTest, MessagesDeleteTest) {
+
+        // arrange
+        Entity::SNS::Topic
+                topic = _snsDatabase.CreateTopic({.region = _region, .topicName = TOPIC, .owner = OWNER, .topicArn = TOPIC_ARN});
+
+        std::vector<std::string> messageIds;
+        for (int i = 0; i < 10; i++) {
+            Entity::SNS::Message message =
+                    _snsDatabase.CreateMessage({.region = _region, .topicArn = topic.topicArn, .message = BODY, .messageId = "test" + std::to_string(i)});
+            messageIds.emplace_back(message.messageId);
+        }
+
+        // act
+        _snsDatabase.DeleteMessages(_region, TOPIC_ARN, messageIds);
+        long result = _snsDatabase.CountMessages(_region, topic.topicArn);
+
+        // assert
+        EXPECT_EQ(0, result);
+    }
+
+    TEST_F(SNSDatabaseTest, MessageDeleteAllTest) {
+
+        // arrange
+        Entity::SNS::Topic
+                topic = _snsDatabase.CreateTopic({.region = _region, .topicName = TOPIC, .owner = OWNER, .topicArn = TOPIC_ARN});
+        Entity::SNS::Message message =
+                _snsDatabase.CreateMessage({.region = _region, .topicArn = topic.topicArn, .message = BODY, .messageId = "abcd"});
+
+        // act
+        _snsDatabase.DeleteAllMessages();
+        long result = _snsDatabase.CountMessages(_region, topic.topicArn);
+
+        // assert
+        EXPECT_EQ(0, result);
+    }
+
+}// namespace AwsMock::Database
+
+#endif// AWMOCK_CORE_SNSDATABASETEST_H

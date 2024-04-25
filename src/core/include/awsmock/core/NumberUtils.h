@@ -13,57 +13,56 @@
 
 namespace AwsMock::Core {
 
-  /**
+    /**
    * Number utilities.
    *
    * @author jens.vogt@opitz-consulting.com
    */
-  class NumberUtils {
+    class NumberUtils {
 
-  public:
-
-    /**
+      public:
+        /**
      * Return a string with the value in kilobytes.
      *
      * @param value value to print
      * @return value string
      */
-    static std::string ToKilobytesStr(long value);
+        static std::string ToKilobytesStr(long value);
 
-    /**
+        /**
      * Converts the given number to kilobytes.
      *
      * @param value value to convert
      * @return value in kilobytes
      */
-    static long ToKilobytes(long value);
+        static long ToKilobytes(long value);
 
-    /**
+        /**
      * Return a string with the value in megabytes.
      *
      * @param value value to print
      * @return value string
      */
-    static std::string ToMegabytesStr(long value);
+        static std::string ToMegabytesStr(long value);
 
-    /**
+        /**
      * Converts the given number to megabytes.
      *
      * @param value value to convert
      * @return value in kilobytes
      */
-    static long ToMegabytes(long value);
+        static long ToMegabytes(long value);
 
-    /**
+        /**
      * Returns a byte array from an integer
      *
      * @param n integer value
      * @param bytes output bytes
      * @param offset offset
      */
-    static void GetIntAsByteArray(int n, unsigned char *bytes, int offset);
-  };
+        static void GetIntAsByteArray(int n, unsigned char *bytes, int offset);
+    };
 
-} // namespace AwsMock::Core
+}// namespace AwsMock::Core
 
-#endif // AWSMOCK_CORE_NUMBERUTILS_H
+#endif// AWSMOCK_CORE_NUMBERUTILS_H

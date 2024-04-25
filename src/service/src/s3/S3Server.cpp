@@ -47,4 +47,4 @@ namespace AwsMock::Service {
         StopHttpServer();
         _s3Monitoring->Stop();
     }
-}
+}// namespace AwsMock::Service

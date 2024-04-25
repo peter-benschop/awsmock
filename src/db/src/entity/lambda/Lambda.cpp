@@ -7,26 +7,26 @@
 namespace AwsMock::Database::Entity::Lambda {
 
     bool Lambda::HasTag(const std::string &key) const {
-        return find_if(tags.begin(), tags.end(), [key](const std::pair <std::string, std::string> &t) {
-            return t.first == key;
-        }) != tags.end();
+        return find_if(tags.begin(), tags.end(), [key](const std::pair<std::string, std::string> &t) {
+                   return t.first == key;
+               }) != tags.end();
     }
 
     std::string Lambda::GetTagValue(const std::string &key) const {
-        auto it = find_if(tags.begin(), tags.end(), [key](const std::pair <std::string, std::string> &t) {
+        auto it = find_if(tags.begin(), tags.end(), [key](const std::pair<std::string, std::string> &t) {
             return t.first == key;
         });
         return it->second;
     }
 
-    view_or_value <view, value> Lambda::ToDocument() const {
+    view_or_value<view, value> Lambda::ToDocument() const {
 
         // Convert environment to document
         auto variablesDoc = bsoncxx::builder::basic::array{};
         for (const auto &variables: environment.variables) {
             variablesDoc.append(make_document(kvp(variables.first, variables.second)));
         }
-        view_or_value <view, value> varDoc = make_document(kvp("variables", variablesDoc));
+        view_or_value<view, value> varDoc = make_document(kvp("variables", variablesDoc));
 
         // Convert tags to document
         auto tagsDoc = bsoncxx::builder::basic::document{};
@@ -34,9 +34,9 @@ namespace AwsMock::Database::Entity::Lambda {
             tagsDoc.append(kvp(t.first, t.second));
         }
 
-        view_or_value <view, value> ephemeralStorageDoc = make_document(kvp("size", ephemeralStorage.size));
+        view_or_value<view, value> ephemeralStorageDoc = make_document(kvp("size", ephemeralStorage.size));
 
-        view_or_value <view, value> lambdaDoc = make_document(
+        view_or_value<view, value> lambdaDoc = make_document(
                 kvp("region", region),
                 kvp("user", user),
                 kvp("function", function),
@@ -70,7 +70,7 @@ namespace AwsMock::Database::Entity::Lambda {
         return lambdaDoc;
     }
 
-    void Lambda::FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult) {
+    void Lambda::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         oid = mResult.value()["_id"].get_oid().value.to_string();
         region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
@@ -160,4 +160,4 @@ namespace AwsMock::Database::Entity::Lambda {
         os << "Lambda=" << bsoncxx::to_json(l.ToDocument());
         return os;
     }
-}
+}// namespace AwsMock::Database::Entity::Lambda

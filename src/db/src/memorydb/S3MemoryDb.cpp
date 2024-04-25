@@ -10,7 +10,7 @@ namespace AwsMock::Database {
 
         return find_if(_buckets.begin(),
                        _buckets.end(),
-                       [region, name](const std::pair <std::string, Entity::S3::Bucket> &bucket) {
+                       [region, name](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
                            return bucket.second.region == region && bucket.second.name == name;
                        }) != _buckets.end();
     }
@@ -22,9 +22,9 @@ namespace AwsMock::Database {
     Entity::S3::Bucket S3MemoryDb::GetBucketById(const std::string &oid) {
 
         auto
-                it = find_if(_buckets.begin(), _buckets.end(), [oid](const std::pair <std::string, Entity::S3::Bucket> &bucket) {
-            return bucket.first == oid;
-        });
+                it = find_if(_buckets.begin(), _buckets.end(), [oid](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
+                    return bucket.first == oid;
+                });
 
         if (it != _buckets.end()) {
             it->second.oid = oid;
@@ -39,7 +39,7 @@ namespace AwsMock::Database {
 
         auto it = find_if(_buckets.begin(),
                           _buckets.end(),
-                          [region, name](const std::pair <std::string, Entity::S3::Bucket> &bucket) {
+                          [region, name](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
                               return bucket.second.region == region && bucket.second.name == name;
                           });
 
@@ -57,7 +57,6 @@ namespace AwsMock::Database {
         _buckets[oid] = bucket;
         log_trace << "Bucket created, oid: " << oid;
         return GetBucketById(oid);
-
     }
 
     Entity::S3::BucketList S3MemoryDb::ListBuckets() {
@@ -85,7 +84,6 @@ namespace AwsMock::Database {
     long S3MemoryDb::BucketCount() {
 
         return _buckets.size();
-
     }
 
     Entity::S3::ObjectList S3MemoryDb::ListBucket(const std::string &bucket, const std::string &prefix) {
@@ -107,7 +105,6 @@ namespace AwsMock::Database {
                     objectList.emplace_back(object.second);
                 }
             }
-
         }
 
         log_trace << "Got object list, size: " << objectList.size();
@@ -122,7 +119,7 @@ namespace AwsMock::Database {
         std::string name = bucket.name;
         auto it = find_if(_buckets.begin(),
                           _buckets.end(),
-                          [region, name](const std::pair <std::string, Entity::S3::Bucket> &bucket) {
+                          [region, name](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
                               return bucket.second.region == region && bucket.second.name == name;
                           });
         _buckets[it->first] = bucket;
@@ -155,9 +152,8 @@ namespace AwsMock::Database {
         std::string key = object.key;
         return find_if(_objects.begin(),
                        _objects.end(),
-                       [region, bucket, key](const std::pair <std::string, Entity::S3::Object> &object) {
-                           return object.second.region == region && object.second.bucket == bucket
-                                  && object.second.key == key;
+                       [region, bucket, key](const std::pair<std::string, Entity::S3::Object> &object) {
+                           return object.second.region == region && object.second.bucket == bucket && object.second.key == key;
                        }) != _objects.end();
     }
 
@@ -168,7 +164,6 @@ namespace AwsMock::Database {
         _objects[oid] = object;
         log_trace << "Object created, oid: " << oid;
         return GetObjectById(oid);
-
     }
 
     Entity::S3::Object S3MemoryDb::UpdateObject(const Entity::S3::Object &object) {
@@ -178,7 +173,7 @@ namespace AwsMock::Database {
         std::string key = object.key;
         auto it = find_if(_objects.begin(),
                           _objects.end(),
-                          [bucket, key](const std::pair <std::string, Entity::S3::Object> &object) {
+                          [bucket, key](const std::pair<std::string, Entity::S3::Object> &object) {
                               return object.second.bucket == bucket && object.second.key == key;
                           });
         _objects[it->first] = object;
@@ -188,9 +183,9 @@ namespace AwsMock::Database {
     Entity::S3::Object S3MemoryDb::GetObjectById(const std::string &oid) {
 
         auto
-                it = find_if(_objects.begin(), _objects.end(), [oid](const std::pair <std::string, Entity::S3::Object> &object) {
-            return object.first == oid;
-        });
+                it = find_if(_objects.begin(), _objects.end(), [oid](const std::pair<std::string, Entity::S3::Object> &object) {
+                    return object.first == oid;
+                });
 
         if (it != _objects.end()) {
             it->second.oid = oid;
@@ -205,9 +200,8 @@ namespace AwsMock::Database {
 
         auto it = find_if(_objects.begin(),
                           _objects.end(),
-                          [region, bucket, key](const std::pair <std::string, Entity::S3::Object> &object) {
-                              return object.second.region == region && object.second.bucket == bucket
-                                     && object.second.key == key;
+                          [region, bucket, key](const std::pair<std::string, Entity::S3::Object> &object) {
+                              return object.second.region == region && object.second.bucket == bucket && object.second.key == key;
                           });
 
         if (it != _objects.end()) {
@@ -263,7 +257,7 @@ namespace AwsMock::Database {
         log_debug << "Object deleted, count: " << count;
     }
 
-    void S3MemoryDb::DeleteObjects(const std::string &bucket, const std::vector <std::string> &keys) {
+    void S3MemoryDb::DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys) {
         Poco::ScopedLock lock(_objectMutex);
 
         auto count = 0;
@@ -281,4 +275,4 @@ namespace AwsMock::Database {
 
         _objects.clear();
     }
-}
+}// namespace AwsMock::Database

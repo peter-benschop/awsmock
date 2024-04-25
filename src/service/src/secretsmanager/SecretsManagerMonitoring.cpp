@@ -21,4 +21,4 @@ namespace AwsMock::Service {
         _metricService.SetGauge(SECRETSMANAGER_SECRETS_COUNT, secrets);
         log_trace << "Secrets manager update counter finished";
     }
-}
+}// namespace AwsMock::Service

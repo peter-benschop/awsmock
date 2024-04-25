@@ -6,9 +6,9 @@
 
 namespace AwsMock::Database::Entity::SQS {
 
-    view_or_value <view, value> QueueAttribute::ToDocument() const {
+    view_or_value<view, value> QueueAttribute::ToDocument() const {
 
-        view_or_value <view, value> queueAttributetDoc = make_document(
+        view_or_value<view, value> queueAttributetDoc = make_document(
                 kvp("delaySeconds", delaySeconds),
                 kvp("maxMessageSize", maxMessageSize),
                 kvp("messageRetentionPeriod", messageRetentionPeriod),
@@ -25,7 +25,7 @@ namespace AwsMock::Database::Entity::SQS {
         return queueAttributetDoc;
     }
 
-    void QueueAttribute::FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult) {
+    void QueueAttribute::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         delaySeconds = mResult.value()["delaySeconds"].get_int32().value;
         maxMessageSize = mResult.value()["maxMessageSize"].get_int32().value;
@@ -88,4 +88,4 @@ namespace AwsMock::Database::Entity::SQS {
         return os;
     }
 
-} // namespace AwsMock::Database::Entity::SQS
+}// namespace AwsMock::Database::Entity::SQS

@@ -9,13 +9,11 @@ namespace AwsMock::Database::Entity::S3 {
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
-    using bsoncxx::builder::basic::kvp;
 
     bool Bucket::HasNotification(const std::string &eventName) {
-        return
-                find_if(notifications.begin(), notifications.end(), [eventName](const BucketNotification &eventNotification) {
-                    return eventNotification.event == eventName;
-                }) != notifications.end();
+        return find_if(notifications.begin(), notifications.end(), [eventName](const BucketNotification &eventNotification) {
+                   return eventNotification.event == eventName;
+               }) != notifications.end();
     }
 
     BucketNotification Bucket::GetNotification(const std::string &eventName) {
@@ -30,14 +28,14 @@ namespace AwsMock::Database::Entity::S3 {
         return versionStatus == ENABLED;
     }
 
-    view_or_value <view, value> Bucket::ToDocument() const {
+    view_or_value<view, value> Bucket::ToDocument() const {
 
         auto notificationsDoc = bsoncxx::builder::basic::array{};
         for (const auto &notification: notifications) {
             notificationsDoc.append(notification.ToDocument());
         }
 
-        view_or_value <view, value> bucketDoc = make_document(
+        view_or_value<view, value> bucketDoc = make_document(
                 kvp("region", region),
                 kvp("name", name),
                 kvp("owner", owner),
@@ -49,7 +47,7 @@ namespace AwsMock::Database::Entity::S3 {
         return bucketDoc;
     }
 
-    void Bucket::FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult) {
+    void Bucket::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         oid = mResult.value()["_id"].get_oid().value.to_string();
         region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
@@ -62,11 +60,10 @@ namespace AwsMock::Database::Entity::S3 {
         bsoncxx::array::view notificationView{mResult.value()["notifications"].get_array().value};
         for (bsoncxx::array::element notificationElement: notificationView) {
             BucketNotification notification{
-                    .event=bsoncxx::string::to_string(notificationElement["event"].get_string().value),
-                    .notificationId=bsoncxx::string::to_string(notificationElement["notificationId"].get_string().value),
-                    .queueArn=bsoncxx::string::to_string(notificationElement["queueArn"].get_string().value),
-                    .lambdaArn=bsoncxx::string::to_string(notificationElement["lambdaArn"].get_string().value)
-            };
+                    .event = bsoncxx::string::to_string(notificationElement["event"].get_string().value),
+                    .notificationId = bsoncxx::string::to_string(notificationElement["notificationId"].get_string().value),
+                    .queueArn = bsoncxx::string::to_string(notificationElement["queueArn"].get_string().value),
+                    .lambdaArn = bsoncxx::string::to_string(notificationElement["lambdaArn"].get_string().value)};
             notifications.push_back(notification);
         }
     }
@@ -113,4 +110,4 @@ namespace AwsMock::Database::Entity::S3 {
         os << "Bucket=" << bsoncxx::to_json(b.ToDocument());
         return os;
     }
-}
+}// namespace AwsMock::Database::Entity::S3

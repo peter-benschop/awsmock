@@ -9,10 +9,10 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
+#include "awsmock/service/s3/S3Server.h"
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/repository/S3Database.h>
-#include "awsmock/service/s3/S3Server.h"
 
 // Test includes
 #include <awsmock/core/TestUtils.h>
@@ -26,8 +26,7 @@ namespace AwsMock::Service {
 
     class S3ServerJavaTest : public ::testing::Test {
 
-      protected:
-
+          protected:
         void SetUp() override {
 
             // Define endpoint
@@ -257,6 +256,6 @@ namespace AwsMock::Service {
         EXPECT_EQ(0, count);
     }
 
-} // namespace AwsMock::Core
+}// namespace AwsMock::Service
 
-#endif // AWMOCK_SERVICE_S3_SERVER_JAVA_TEST_H
+#endif// AWMOCK_SERVICE_S3_SERVER_JAVA_TEST_H

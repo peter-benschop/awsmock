@@ -6,8 +6,8 @@
 #define AWSMOCK_CORE_DTO_DELETE_BUCKET_REQUEST_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // AwsMock includes
 #include <awsmock/core/JsonException.h>
@@ -17,46 +17,45 @@
 
 namespace AwsMock::Dto::S3 {
 
-  struct DeleteBucketRequest {
+    struct DeleteBucketRequest {
 
-    /**
+        /**
      * Region
      */
-    std::string region;
+        std::string region;
 
-    /**
+        /**
      * Region
      */
-    std::string owner;
+        std::string owner;
 
-    /**
+        /**
      * Bucket
      */
-    std::string bucket;
+        std::string bucket;
 
-    /**
+        /**
      * Convert to a JSON string
      *
      * @return JSON string
      */
-    [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const DeleteBucketRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const DeleteBucketRequest &r);
+    };
 
-  };
+}// namespace AwsMock::Dto::S3
 
-} // namespace AwsMock::Dto::S3
-
-#endif // AWSMOCK_CORE_DTO_DELETE_BUCKET_REQUEST_H
+#endif// AWSMOCK_CORE_DTO_DELETE_BUCKET_REQUEST_H

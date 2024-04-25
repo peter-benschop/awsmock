@@ -6,49 +6,48 @@
 #define AWSMOCK_DTO_SNS_PUBLISH_REQUEST_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 
 namespace AwsMock::Dto::SNS {
 
-  struct PublishRequest {
+    struct PublishRequest {
 
-    /**
+        /**
      * Region
      */
-    std::string region;
+        std::string region;
 
-    /**
+        /**
      * Topic ARN
      */
-    std::string topicArn;
+        std::string topicArn;
 
-    /**
+        /**
      * Target ARN
      */
-    std::string targetArn;
+        std::string targetArn;
 
-    /**
+        /**
      * Message body
      */
-    std::string message;
+        std::string message;
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const PublishRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const PublishRequest &r);
+    };
 
-  };
+}// namespace AwsMock::Dto::SNS
 
-} // namespace AwsMock::Dto::SNS
-
-#endif // AWSMOCK_DTO_SNS_PUBLISH_REQUEST_H
+#endif// AWSMOCK_DTO_SNS_PUBLISH_REQUEST_H

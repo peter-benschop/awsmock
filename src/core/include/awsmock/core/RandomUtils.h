@@ -6,36 +6,35 @@
 #define AWSMOCK_CORE_RANDOMUTILS_H
 
 // Standard C++ includes
+#include <algorithm>
+#include <array>
+#include <iterator>
+#include <random>
 #include <string>
 #include <vector>
-#include <array>
-#include <random>
-#include <iterator>
-#include <algorithm>
 
 namespace AwsMock::Core {
 
-  /**
+    /**
    * Random utilities.
    *
    * <p>Using the Mersenne Twister random generator with a uniform distribution.</p>
        *
        * @author jens.vogt@opitz-consulting.com
    */
-  class RandomUtils {
+    class RandomUtils {
 
-    public:
-
-      /**
+      public:
+        /**
        * Generates a random integer between min and max
        *
        * @param min minimum integer
        * @param max minimum integer
        * @return random number between min and max
        */
-      static int NextInt(int min, int max);
+        static int NextInt(int min, int max);
 
-      /**
+        /**
        * Generates a random integer array, with random numbers between min and max with the given size
        *
        * @param size number of random numbers to generate
@@ -43,18 +42,18 @@ namespace AwsMock::Core {
        * @param max minimum integer
        * @return random number between min and max
        */
-      static std::vector<int> IntArray(int size, int min, int max);
+        static std::vector<int> IntArray(int size, int min, int max);
 
-      /**
+        /**
        * Generates a double between min and max
        *
        * @param min minimum integer
        * @param max minimum integer
        * @return double random number between min and max
        */
-      static double NextDouble(double min, double max);
+        static double NextDouble(double min, double max);
 
-      /**
+        /**
        * Generates a random double array, with random numbers between min and max with the given size
        *
        * @param size number of random numbers to generate
@@ -62,10 +61,9 @@ namespace AwsMock::Core {
        * @param max minimum integer
        * @return double random number between min and max
        */
-      static std::vector<double> DoubleArray(int size, double min, double max);
+        static std::vector<double> DoubleArray(int size, double min, double max);
+    };
 
-  };
+}// namespace AwsMock::Core
 
-}
-
-#endif // AWSMOCK_CORE_RANDOMUTILS_H
+#endif// AWSMOCK_CORE_RANDOMUTILS_H

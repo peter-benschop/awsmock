@@ -91,10 +91,10 @@ namespace AwsMock::Database {
     }
 
     void Database::UpdateModuleStatus() {
-/*    auto session = GetSession();
+        /*    auto session = GetSession();
     session.start_transaction();
     session.client()[_name]["module"].update_one(make_document(kvp("name", "database")), make_document(kvp("$set", make_document(kvp("state", "RUNNING")))));
     session.commit_transaction();*/
     }
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database

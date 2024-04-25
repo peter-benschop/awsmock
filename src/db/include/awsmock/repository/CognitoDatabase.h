@@ -6,14 +6,14 @@
 #define AWSMOCK_REPOSITORY_COGNITODATABASE_H
 
 // C++ standard includes
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/DatabaseException.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/memorydb/CognitoMemoryDb.h>
 #include <awsmock/repository/Database.h>
 
@@ -27,17 +27,16 @@ namespace AwsMock::Database {
     class CognitoDatabase : public Database {
 
       public:
-
         /**
          * Constructor
          */
-        explicit CognitoDatabase() : _memoryDb(CognitoMemoryDb::instance()), _hasDatabase(Database::HasDatabase()), _databaseName(GetDatabaseName()), _userpoolCollectionName("cognito_userpool"), _userCollectionName("cognito_user") {};
+        explicit CognitoDatabase() : _memoryDb(CognitoMemoryDb::instance()), _hasDatabase(Database::HasDatabase()), _databaseName(GetDatabaseName()), _userpoolCollectionName("cognito_userpool"), _userCollectionName("cognito_user"){};
 
         /**
          * Singleton instance
          */
         static CognitoDatabase &instance() {
-            static Poco::SingletonHolder <CognitoDatabase> sh;
+            static Poco::SingletonHolder<CognitoDatabase> sh;
             return *sh.get();
         }
 
@@ -118,7 +117,7 @@ namespace AwsMock::Database {
          * @param region AWS region name
          * @return list of cognito user pools
          */
-        std::vector <Entity::Cognito::UserPool> ListUserPools(const std::string &region = {});
+        std::vector<Entity::Cognito::UserPool> ListUserPools(const std::string &region = {});
 
         /**
          * Deletes an existing cognito user pool
@@ -199,7 +198,7 @@ namespace AwsMock::Database {
          * @param userPoolId user pool ID
          * @return list of cognito users
          */
-        std::vector <Entity::Cognito::User> ListUsers(const std::string &region = {}, const std::string &userPoolId = {});
+        std::vector<Entity::Cognito::User> ListUsers(const std::string &region = {}, const std::string &userPoolId = {});
 
         /**
          * Updates an existing cognito user
@@ -234,7 +233,6 @@ namespace AwsMock::Database {
         void DeleteAllUsers();
 
       private:
-
         /**
          * Use MongoDB
          */
@@ -259,9 +257,8 @@ namespace AwsMock::Database {
          * S3 in-memory database
          */
         CognitoMemoryDb &_memoryDb;
-
     };
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
 
-#endif // AWSMOCK_REPOSITORY_COGNITODATABASE_H
+#endif// AWSMOCK_REPOSITORY_COGNITODATABASE_H

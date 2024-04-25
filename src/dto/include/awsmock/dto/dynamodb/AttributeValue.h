@@ -6,8 +6,8 @@
 #define AWSMOCK_DTO_DYNAMODB_ATTRIBUTEVALUE_H
 
 // C++ includes
-#include <string>
 #include <map>
+#include <string>
 
 // AwsMock includes
 #include <awsmock/core/JsonException.h>
@@ -16,84 +16,83 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
-  struct AttributeValue {
+    struct AttributeValue {
 
-    /**
+        /**
      * Type
      */
-    std::string type;
+        std::string type;
 
-    /**
+        /**
      * Value
      */
-    std::string value;
+        std::string value;
 
-    /**
+        /**
      * String value
      */
-    std::string stringValue;
+        std::string stringValue;
 
-    /**
+        /**
      * String set value
      */
-    std::vector<std::string> stringSetValue;
+        std::vector<std::string> stringSetValue;
 
-    /**
+        /**
      * Number value
      */
-    std::string numberValue;
+        std::string numberValue;
 
-    /**
+        /**
      * Number set value
      */
-    std::vector<std::string> numberSetValue;
+        std::vector<std::string> numberSetValue;
 
-    /**
+        /**
      * Boolean value
      */
-    bool boolValue;
+        bool boolValue;
 
-    /**
+        /**
      * Null value
      */
-    bool nullValue;
+        bool nullValue;
 
-      /**
+        /**
        * Convert to JSON value
        *
        * @return JSON object
        */
-      [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
+        /**
      * Convert to JSON value
      *
      * @return JSON object
      */
-    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
-    /**
+        /**
      * Convert from JSON object.
      *
      * @param jsonObject JSON object
      */
-    void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const AttributeValue &r);
+        friend std::ostream &operator<<(std::ostream &os, const AttributeValue &r);
+    };
+}// namespace AwsMock::Dto::DynamoDb
 
-  };
-} // namespace AwsMock::Dto::DynamoDb
-
-#endif // AWSMOCK_DTO_DYNAMODB_ATTRIBUTEVALUE_H
+#endif// AWSMOCK_DTO_DYNAMODB_ATTRIBUTEVALUE_H

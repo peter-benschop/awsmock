@@ -77,4 +77,4 @@ namespace AwsMock::Core {
     std::string AwsUtils::CreateMessageId() {
         return Poco::UUIDGenerator().createRandom().toString();
     }
-}
+}// namespace AwsMock::Core

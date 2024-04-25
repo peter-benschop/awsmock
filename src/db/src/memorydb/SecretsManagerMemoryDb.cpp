@@ -10,7 +10,7 @@ namespace AwsMock::Database {
 
         return find_if(_secrets.begin(),
                        _secrets.end(),
-                       [region, name](const std::pair <std::string, Entity::SecretsManager::Secret> &secret) {
+                       [region, name](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
                            return secret.second.region == region && secret.second.name == name;
                        }) != _secrets.end();
     }
@@ -23,7 +23,7 @@ namespace AwsMock::Database {
 
         return find_if(_secrets.begin(),
                        _secrets.end(),
-                       [secretId](const std::pair <std::string, Entity::SecretsManager::Secret> &secret) {
+                       [secretId](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
                            return secret.second.secretId == secretId;
                        }) != _secrets.end();
     }
@@ -32,7 +32,7 @@ namespace AwsMock::Database {
 
         auto it = find_if(_secrets.begin(),
                           _secrets.end(),
-                          [oid](const std::pair <std::string, Entity::SecretsManager::Secret> &secret) {
+                          [oid](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
                               return secret.first == oid;
                           });
 
@@ -50,7 +50,7 @@ namespace AwsMock::Database {
 
         auto it = find_if(_secrets.begin(),
                           _secrets.end(),
-                          [region, name](const std::pair <std::string, Entity::SecretsManager::Secret> &secret) {
+                          [region, name](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
                               return secret.second.region == region && secret.second.name == name;
                           });
 
@@ -67,7 +67,7 @@ namespace AwsMock::Database {
 
         auto it = find_if(_secrets.begin(),
                           _secrets.end(),
-                          [secretId](const std::pair <std::string, Entity::SecretsManager::Secret> &secret) {
+                          [secretId](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
                               return secret.second.secretId == secretId;
                           });
 
@@ -85,7 +85,6 @@ namespace AwsMock::Database {
         _secrets[oid] = secret;
         log_trace << "Secret created, oid: " << oid;
         return GetSecretById(oid);
-
     }
 
     Entity::SecretsManager::Secret SecretsManagerMemoryDb::UpdateSecret(const Entity::SecretsManager::Secret &secret) {
@@ -95,7 +94,7 @@ namespace AwsMock::Database {
         std::string secretId = secret.secretId;
         auto it = find_if(_secrets.begin(),
                           _secrets.end(),
-                          [secretId](const std::pair <std::string, Entity::SecretsManager::Secret> &secret) {
+                          [secretId](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
                               return secret.second.secretId == secretId;
                           });
         _secrets[it->first] = secret;
@@ -151,4 +150,4 @@ namespace AwsMock::Database {
         _secrets.clear();
     }
 
-}
+}// namespace AwsMock::Database

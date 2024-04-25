@@ -10,10 +10,10 @@
 #include <vector>
 
 // MongoDB includes
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
@@ -24,12 +24,12 @@
 
 namespace AwsMock::Database::Entity::SQS {
 
+    using bsoncxx::view_or_value;
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
-    using bsoncxx::view_or_value;
-    using bsoncxx::document::view;
     using bsoncxx::document::value;
+    using bsoncxx::document::view;
 
     /**
      * SQS queue entity
@@ -76,7 +76,7 @@ namespace AwsMock::Database::Entity::SQS {
         /**
          * Queue tags
          */
-        std::map <std::string, std::string> tags;
+        std::map<std::string, std::string> tags;
 
         /**
          * Creation date
@@ -93,14 +93,14 @@ namespace AwsMock::Database::Entity::SQS {
          *
          * @return entity as MongoDB document.
          */
-        [[maybe_unused]] [[nodiscard]] view_or_value <view, value> ToDocument() const;
+        [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * Converts the MongoDB document to an entity
          *
          * @param mResult MongoDB document.
          */
-        Entity::SQS::Queue FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult);
+        Entity::SQS::Queue FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
         /**
          * Converts the entity to a JSON object
@@ -129,11 +129,10 @@ namespace AwsMock::Database::Entity::SQS {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const Queue &q);
-
     };
 
-    typedef std::vector <Queue> QueueList;
+    typedef std::vector<Queue> QueueList;
 
-} // namespace AwsMock::Database::Entity::S3
+}// namespace AwsMock::Database::Entity::SQS
 
-#endif // AWSMOCK_DB_ENTITY_SQS_QUEUE_H
+#endif// AWSMOCK_DB_ENTITY_SQS_QUEUE_H

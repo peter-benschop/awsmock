@@ -9,9 +9,9 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
+#include "awsmock/service/common/ModuleService.h"
 #include <awsmock/core/Configuration.h>
 #include <awsmock/repository/ModuleDatabase.h>
-#include "awsmock/service/common/ModuleService.h"
 
 // Test includes
 #include <awsmock/core/TestUtils.h>
@@ -23,60 +23,59 @@
 
 namespace AwsMock::Service {
 
-  class ModuleServiceTest : public ::testing::Test {
+    class ModuleServiceTest : public ::testing::Test {
 
-    protected:
+          protected:
+        void SetUp() override {
+            // General configuration
+            _region = _configuration.getString("awsmock.region", "eu-central-1");
+        }
 
-      void SetUp() override {
-        // General configuration
-        _region = _configuration.getString("awsmock.region", "eu-central-1");
-      }
+        void TearDown() override {
+        }
 
-      void TearDown() override {
-      }
+        std::string _region;
+        Core::Configuration &_configuration = Core::Configuration::instance();
+        Database::ModuleDatabase &_database = Database::ModuleDatabase::instance();
 
-      std::string _region;
-      Core::Configuration& _configuration = Core::Configuration::instance();
-      Database::ModuleDatabase& _database = Database::ModuleDatabase::instance();
+        Service::ServerMap serverMap = {{"s3", std::make_shared<S3Server>(_configuration)}};
+        ModuleService _service = ModuleService(_configuration, serverMap);
+    };
 
-      Service::ServerMap serverMap = {{"s3", std::make_shared<S3Server>(_configuration)}};
-      ModuleService _service = ModuleService(_configuration, serverMap);
-  };
+    TEST_F(ModuleServiceTest, ModuleListTest) {
 
-  TEST_F(ModuleServiceTest, ModuleListTest) {
+        // arrange
 
-    // arrange
+        // act
+        Database::Entity::Module::ModuleList listResponse = _service.ListModules();
 
-    // act
-    Database::Entity::Module::ModuleList listResponse = _service.ListModules();
+        // assert
+        EXPECT_FALSE(listResponse.empty());
+    }
 
-    // assert
-    EXPECT_FALSE(listResponse.empty());
-  }
+    TEST_F(ModuleServiceTest, ModuleStopTest) {
 
-  TEST_F(ModuleServiceTest, ModuleStopTest) {
+        // arrange
 
-    // arrange
+        // act
+        Database::Entity::Module::Module stopResponse = _service.StopService("sqs");
 
-    // act
-    Database::Entity::Module::Module stopResponse = _service.StopService("sqs");
+        // assert
+        EXPECT_TRUE(stopResponse.state == Database::Entity::Module::ModuleState::STOPPED);
+    }
 
-    // assert
-    EXPECT_TRUE(stopResponse.state == Database::Entity::Module::ModuleState::STOPPED);
-  }
+    TEST_F(ModuleServiceTest, ModuleStartTest) {
 
-  TEST_F(ModuleServiceTest, ModuleStartTest) {
+        // arrange
+        Database::Entity::Module::Module stopResponse = _service.StopService("sqs");
 
-    // arrange
-    Database::Entity::Module::Module stopResponse = _service.StopService("sqs");
+        // act
+        Database::Entity::Module::Module startResponse = _service.StartService("sqs");
 
-    // act
-    Database::Entity::Module::Module startResponse = _service.StartService("sqs");
+        // assert
+        EXPECT_TRUE(startResponse.state == Database::Entity::Module::ModuleState::RUNNING);
+    }
 
-    // assert
-    EXPECT_TRUE(startResponse.state == Database::Entity::Module::ModuleState::RUNNING);
-  }
+}// namespace AwsMock::Service
 
-} // namespace AwsMock::Service
-
-#endif // AWMOCK_SERVICE_MODULE_SERVICE_TEST_H
+#endif// AWMOCK_SERVICE_MODULE_SERVICE_TEST_H

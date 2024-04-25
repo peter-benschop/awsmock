@@ -17,4 +17,4 @@ namespace AwsMock::Core {
         outputStream << errorResponse.ToXml();
         outputStream.flush();
     }
-}
+}// namespace AwsMock::Core

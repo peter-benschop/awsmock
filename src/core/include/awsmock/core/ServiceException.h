@@ -12,26 +12,26 @@
 
 namespace AwsMock::Core {
 
-  /**
+    /**
    * COM exception class. In case of a COM request failure a COMException is thrown.
    *
    * @author jens.vogt@opitz-consulting.com
    */
-  class ServiceException : public Poco::Exception {
+    class ServiceException : public Poco::Exception {
 
-    public:
-      /**
+      public:
+        /**
        * Constructor.
        *
        * @param code exception code, default: 0
        * @param resource exception resource
        * @param requestId exception resource ID
        */
-      explicit ServiceException(int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR,
-                                const char *resource = nullptr,
-                                const char *requestId = nullptr);
+        explicit ServiceException(int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR,
+                                  const char *resource = nullptr,
+                                  const char *requestId = nullptr);
 
-      /**
+        /**
        * Constructor.
        *
        * @param msg exception message
@@ -39,12 +39,12 @@ namespace AwsMock::Core {
        * @param resource exception resource
        * @param requestId exception resource ID
        */
-      explicit ServiceException(const std::string &msg,
-                                int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR,
-                                const char *resource = nullptr,
-                                const char *requestId = nullptr);
+        explicit ServiceException(const std::string &msg,
+                                  int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR,
+                                  const char *resource = nullptr,
+                                  const char *requestId = nullptr);
 
-      /**
+        /**
        * Constructor.
        *
        * @param msg exception message
@@ -53,13 +53,13 @@ namespace AwsMock::Core {
        * @param resource exception resource
        * @param requestId exception resource ID
        */
-      ServiceException(const std::string &msg,
-                       const std::string &arg,
-                       int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR,
-                       const char *resource = nullptr,
-                       const char *requestId = nullptr);
+        ServiceException(const std::string &msg,
+                         const std::string &arg,
+                         int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR,
+                         const char *resource = nullptr,
+                         const char *requestId = nullptr);
 
-      /**
+        /**
        * Constructor.
        *
        * @param msg exception message
@@ -68,73 +68,71 @@ namespace AwsMock::Core {
        * @param resource exception resource
        * @param requestId exception resource ID
        */
-      ServiceException(const std::string &msg,
-                       const Poco::Exception &exc,
-                       int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR,
-                       const char *resource = nullptr,
-                       const char *requestId = nullptr);
+        ServiceException(const std::string &msg,
+                         const Poco::Exception &exc,
+                         int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR,
+                         const char *resource = nullptr,
+                         const char *requestId = nullptr);
 
-      /**
+        /**
        * Copy constructor.
        *
        * @param exc parent exception.
        */
-      ServiceException(const ServiceException &exc);
+        ServiceException(const ServiceException &exc);
 
-      /**
+        /**
        * Destructor
        */
-      ~ServiceException() noexcept override;
+        ~ServiceException() noexcept override;
 
-      /**
+        /**
        * Assigment operator.
        */
-      ServiceException &operator=(const ServiceException &exc);
+        ServiceException &operator=(const ServiceException &exc);
 
-      /**
+        /**
        * Returns the exception name.
        */
-      [[nodiscard]] const char *name() const noexcept override;
+        [[nodiscard]] const char *name() const noexcept override;
 
-      /**
+        /**
        * Returns the exception class name.
        */
-      [[nodiscard]] const char *className() const noexcept override;
+        [[nodiscard]] const char *className() const noexcept override;
 
-      /**
+        /**
        * Returns the exception resource.
        */
-      [[nodiscard]] const char *resource() const noexcept;
+        [[nodiscard]] const char *resource() const noexcept;
 
-      /**
+        /**
        * Returns the exception request ID.
        */
-      [[nodiscard]] const char *requestId() const noexcept;
+        [[nodiscard]] const char *requestId() const noexcept;
 
-      /**
+        /**
        * Returns a clone of the exception
        */
-      [[nodiscard]] Poco::Exception *clone() const override;
+        [[nodiscard]] Poco::Exception *clone() const override;
 
-      /**
+        /**
        * Rethrows the exception.
        */
-      void rethrow() const override;
+        void rethrow() const override;
 
-    private:
-
-      /**
+      private:
+        /**
        * Resource
        */
-      const char *_resource;
+        const char *_resource;
 
-      /**
+        /**
        * Request ID
        */
-      const char *_requestId;
+        const char *_requestId;
+    };
 
-  };
+}// namespace AwsMock::Core
 
-} // namespace AwsMock::Core
-
-#endif //AWSMOCK_CORE_SERVICEEXCEPTION_H
+#endif//AWSMOCK_CORE_SERVICEEXCEPTION_H

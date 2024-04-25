@@ -83,4 +83,4 @@ namespace AwsMock::Service {
             SendXmlErrorResponse("Cognito", response, exc);
         }
     }
-}
+}// namespace AwsMock::Service

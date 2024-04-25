@@ -47,7 +47,6 @@ namespace AwsMock::Service {
     }
 
     void AbstractServer::StopHttpServer() {
-        std::cerr << "HTTP server " << _name << " stopped" << std::endl;
         if (_httpServer) {
             _httpServer->stopAll(true);
             log_debug << "HTTP server stopped: " << _name;
@@ -55,8 +54,8 @@ namespace AwsMock::Service {
     }
 
     AbstractServer::~AbstractServer() {
-        std::cerr << "HTTP server " << _name << " destroyed" << std::endl;
+        log_info << "HTTP server " << _name << " destroyed";
         Stop();
     }
 
-} // namespace AwsMock::Worker
+}// namespace AwsMock::Service

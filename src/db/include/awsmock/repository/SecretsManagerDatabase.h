@@ -6,22 +6,22 @@
 #define AWSMOCK_REPOSITORY_SECRETSMANAGER_DATABASE_H
 
 // C++ standard includes
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
 
 // Poco includes
 #include <Poco/Net/HTTPResponse.h>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/entity/secretsmanager/Secret.h>
 #include <awsmock/memorydb/SecretsManagerMemoryDb.h>
 #include <awsmock/repository/Database.h>
-#include <awsmock/entity/secretsmanager/Secret.h>
 
 namespace AwsMock::Database {
 
@@ -33,7 +33,6 @@ namespace AwsMock::Database {
     class SecretsManagerDatabase : public Database {
 
       public:
-
         /**
          * Constructor
          *
@@ -45,7 +44,7 @@ namespace AwsMock::Database {
          * Singleton instance
          */
         static SecretsManagerDatabase &instance() {
-            static Poco::SingletonHolder <SecretsManagerDatabase> sh;
+            static Poco::SingletonHolder<SecretsManagerDatabase> sh;
             return *sh.get();
         }
 
@@ -172,7 +171,6 @@ namespace AwsMock::Database {
         void DeleteAllSecrets();
 
       private:
-
         /**
          * Use MongoDB
          */
@@ -192,9 +190,8 @@ namespace AwsMock::Database {
          * Lambda in-memory database
          */
         SecretsManagerMemoryDb &_memoryDb;
-
     };
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
 
-#endif // AWSMOCK_REPOSITORY_SECRETSMANAGER_DATABASE_H
+#endif// AWSMOCK_REPOSITORY_SECRETSMANAGER_DATABASE_H

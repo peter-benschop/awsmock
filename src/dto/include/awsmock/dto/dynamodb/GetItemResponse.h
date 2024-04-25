@@ -6,10 +6,10 @@
 #define AWSMOCK_DTO_DYNAMODB_GET_ITEM_RESPONSE_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
-#include <vector>
+#include <string>
 #include <utility>
+#include <vector>
 
 // AwsMock includes
 #include <awsmock/core/JsonException.h>
@@ -19,7 +19,7 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
-  /**
+    /**
    * Example:
    * <pre>
    * {
@@ -37,63 +37,62 @@ namespace AwsMock::Dto::DynamoDb {
    * }
    * </pre>
    */
-  struct GetItemResponse {
+    struct GetItemResponse {
 
-    /**
+        /**
      * Region
      */
-    std::string region;
+        std::string region;
 
-    /**
+        /**
      * Table name
      */
-    std::string tableName;
+        std::string tableName;
 
-    /**
+        /**
      * Original HTTP response body
      */
-    std::string body;
+        std::string body;
 
-    /**
+        /**
      * Original HTTP response headers
      */
-    std::map<std::string, std::string> headers;
+        std::map<std::string, std::string> headers;
 
-    /**
+        /**
      * HTTP status from docker image
      */
-    Poco::Net::HTTPResponse::HTTPStatus status;
+        Poco::Net::HTTPResponse::HTTPStatus status;
 
-    /**
+        /**
      * Creates a JSON string from the object.
      *
      * @return JSON string
      */
-    [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
+        /**
      * Parse a JSON stream
      *
      * @param jsonString JSON string
      */
-    void FromJson(const std::string &jsonString);
+        void FromJson(const std::string &jsonString);
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const GetItemResponse &r);
+        friend std::ostream &operator<<(std::ostream &os, const GetItemResponse &r);
+    };
 
-  };
+}// namespace AwsMock::Dto::DynamoDb
 
-} // namespace AwsMock::Dto::DynamoDb
-
-#endif // AWSMOCK_DTO_DYNAMODB_GET_ITEM_RESPONSE_H
+#endif// AWSMOCK_DTO_DYNAMODB_GET_ITEM_RESPONSE_H

@@ -6,9 +6,9 @@
 
 namespace AwsMock::Database::Entity::Transfer {
 
-    view_or_value <view, value> User::ToDocument() const {
+    view_or_value<view, value> User::ToDocument() const {
 
-        view_or_value <view, value> userDoc = make_document(
+        view_or_value<view, value> userDoc = make_document(
                 kvp("userName", userName),
                 kvp("password", password),
                 kvp("homeDirectory", homeDirectory));
@@ -36,4 +36,4 @@ namespace AwsMock::Database::Entity::Transfer {
         return os;
     }
 
-}
+}// namespace AwsMock::Database::Entity::Transfer

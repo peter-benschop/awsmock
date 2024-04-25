@@ -6,10 +6,10 @@
 #define AWSMOCK_DB_ENTITY_SQS_MESSAGEATTRIBUTE_H
 
 // C++ includes
-#include <string>
-#include <sstream>
-#include <vector>
 #include <map>
+#include <sstream>
+#include <string>
+#include <vector>
 
 // Poco includes
 #include "Poco/DateTime.h"
@@ -17,25 +17,27 @@
 #include "Poco/DateTimeFormatter.h"
 
 // MongoDB includes
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/stdx.hpp>
 
 namespace AwsMock::Database::Entity::SQS {
 
+    using bsoncxx::view_or_value;
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
-    using bsoncxx::view_or_value;
-    using bsoncxx::document::view;
     using bsoncxx::document::value;
+    using bsoncxx::document::view;
 
     enum MessageAttributeType {
-        STRING, NUMBER, BINARY
+        STRING,
+        NUMBER,
+        BINARY
     };
-    static std::map <MessageAttributeType, std::string> MessageAttributeTypeNames{
+    static std::map<MessageAttributeType, std::string> MessageAttributeTypeNames{
             {MessageAttributeType::STRING, "String"},
             {MessageAttributeType::NUMBER, "Number"},
             {MessageAttributeType::BINARY, "Binary"},
@@ -86,7 +88,7 @@ namespace AwsMock::Database::Entity::SQS {
          *
          * @return entity as MongoDB document.
          */
-        [[nodiscard]] view_or_value <view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * Converts the DTO to a string representation.
@@ -103,12 +105,11 @@ namespace AwsMock::Database::Entity::SQS {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const MessageAttribute &m);
-
     };
 
     typedef struct MessageAttribute MessageAttribute;
-    typedef std::vector <MessageAttribute> MessageAttributeList;
+    typedef std::vector<MessageAttribute> MessageAttributeList;
 
-} // namespace AwsMock::Database::Entity::S3
+}// namespace AwsMock::Database::Entity::SQS
 
-#endif // AWSMOCK_DB_ENTITY_SQS_MESSAGEATTRIBUTE_H
+#endif// AWSMOCK_DB_ENTITY_SQS_MESSAGEATTRIBUTE_H

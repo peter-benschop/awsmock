@@ -17,8 +17,8 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/entity/sqs/Queue.h>
 #include <awsmock/entity/sqs/Message.h>
+#include <awsmock/entity/sqs/Queue.h>
 #include <awsmock/repository/Database.h>
 
 namespace AwsMock::Database {
@@ -31,7 +31,6 @@ namespace AwsMock::Database {
     class SQSMemoryDb {
 
       public:
-
         /**
          * Constructor
          */
@@ -41,7 +40,7 @@ namespace AwsMock::Database {
          * Singleton instance
          */
         static SQSMemoryDb &instance() {
-            static Poco::SingletonHolder <SQSMemoryDb> sh;
+            static Poco::SingletonHolder<SQSMemoryDb> sh;
             return *sh.get();
         }
 
@@ -312,16 +311,15 @@ namespace AwsMock::Database {
         void DeleteAllMessages();
 
       private:
-
         /**
          * SQS queue vector, when running without database
          */
-        std::map <std::string, Entity::SQS::Queue> _queues;
+        std::map<std::string, Entity::SQS::Queue> _queues;
 
         /**
          * SQS message vector, when running without database
          */
-        std::map <std::string, Entity::SQS::Message> _messages;
+        std::map<std::string, Entity::SQS::Message> _messages;
 
         /**
          * Queue mutex
@@ -334,6 +332,6 @@ namespace AwsMock::Database {
         Poco::Mutex _messageMutex;
     };
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
 
-#endif // AWSMOCK_REPOSITORY_SQSMEMORYDB_H
+#endif// AWSMOCK_REPOSITORY_SQSMEMORYDB_H

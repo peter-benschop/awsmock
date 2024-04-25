@@ -21,4 +21,4 @@ namespace AwsMock::Service {
         _metricService.SetGauge(LAMBDA_FUNCTION_COUNT, lambdas);
         log_trace << "Lambda update counter finished";
     }
-}
+}// namespace AwsMock::Service

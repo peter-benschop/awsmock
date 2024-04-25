@@ -6,8 +6,8 @@
 #define AWSMOCK_DTO_S3_CONTENT_H
 
 // C++ includes
-#include <string>
 #include <sstream>
+#include <string>
 #include <vector>
 
 // AwsMock includes
@@ -19,66 +19,65 @@
 
 namespace AwsMock::Dto::S3 {
 
-  struct Content {
+    struct Content {
 
-    /**
+        /**
      * Checksum algorithms
      */
-    std::vector <std::string> checksumAlgorithms;
+        std::vector<std::string> checksumAlgorithms;
 
-    /**
+        /**
      * ETag
      */
-    std::string etag;
+        std::string etag;
 
-    /**
+        /**
      * Key
      */
-    std::string key;
+        std::string key;
 
-    /**
+        /**
      * Owner
      */
-    Owner owner;
+        Owner owner;
 
-    /**
+        /**
      * Size
      */
-    long size = 0;
+        long size = 0;
 
-    /**
+        /**
      * Storage class
      */
-    std::string storageClass;
+        std::string storageClass;
 
-    /**
+        /**
      * Last modified
      */
-    std::string lastModified;
+        std::string lastModified;
 
-    /**
+        /**
      * Convert to a JSON string
      *
      * @return JSON string
      */
-    [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const Content &r);
+        friend std::ostream &operator<<(std::ostream &os, const Content &r);
+    };
 
-  };
+}// namespace AwsMock::Dto::S3
 
-} // namespace AwsMock::Dto::S3
-
-#endif // AWSMOCK_DTO_S3_CONTENT_H
+#endif// AWSMOCK_DTO_S3_CONTENT_H

@@ -9,9 +9,9 @@
 #include "Poco/Net/HTTPRequestHandler.h"
 
 // AwsMock includes
-#include <awsmock/core/MetricService.h>
-#include <awsmock/core/Configuration.h>
 #include "awsmock/service/common/AbstractServer.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/MetricService.h>
 
 namespace AwsMock::Resource::Factory {
 
@@ -21,7 +21,6 @@ namespace AwsMock::Resource::Factory {
     class IFactory {
 
       public:
-
         /**
          * Create a new resource.
          *
@@ -33,6 +32,6 @@ namespace AwsMock::Resource::Factory {
         virtual Poco::Net::HTTPRequestHandler *createResource(Core::Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap) = 0;
     };
 
-} // namespace AwsMock
+}// namespace AwsMock::Resource::Factory
 
-#endif // AWSMOCK_RESOURCE_IFACTORY_H
+#endif// AWSMOCK_RESOURCE_IFACTORY_H

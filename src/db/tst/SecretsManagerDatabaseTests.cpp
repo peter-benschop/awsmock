@@ -22,158 +22,157 @@
 
 namespace AwsMock::Database {
 
-  class SecretsManagerDatabaseTest : public ::testing::Test {
+    class SecretsManagerDatabaseTest : public ::testing::Test {
 
-  protected:
+          protected:
+        void SetUp() override {
+            _region = _configuration.getString("awsmock.region");
+        }
 
-    void SetUp() override {
-      _region = _configuration.getString("awsmock.region");
+        void TearDown() override {
+            _secretsManagerDatabase.DeleteAllSecrets();
+        }
+
+        std::string _region;
+        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration();
+        SecretsManagerDatabase &_secretsManagerDatabase = SecretsManagerDatabase::instance();
+    };
+
+    TEST_F(SecretsManagerDatabaseTest, SecretCreateTest) {
+
+        // arrange
+        Entity::SecretsManager::Secret secret = {.region = _region, .name = SECRET_NAME, .description = "Test secret"};
+
+        // act
+        Entity::SecretsManager::Secret result = _secretsManagerDatabase.CreateSecret(secret);
+
+        // assert
+        EXPECT_TRUE(result.name == SECRET_NAME);
+        EXPECT_TRUE(result.region == REGION);
+        EXPECT_FALSE(result.oid.empty());
     }
 
-    void TearDown() override {
-      _secretsManagerDatabase.DeleteAllSecrets();
+    TEST_F(SecretsManagerDatabaseTest, SecretGetByIdTest) {
+
+        // arrange
+        Entity::SecretsManager::Secret secret = {.region = _region, .name = SECRET_NAME, .description = "Test secret"};
+        secret = _secretsManagerDatabase.CreateSecret(secret);
+
+        // act
+        Entity::SecretsManager::Secret result = _secretsManagerDatabase.GetSecretBySecretId(secret.secretId);
+
+        // assert
+        EXPECT_TRUE(result.name == SECRET_NAME);
+        EXPECT_TRUE(result.region == REGION);
+        EXPECT_FALSE(result.oid.empty());
     }
 
-    std::string _region;
-    Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration();
-    SecretsManagerDatabase &_secretsManagerDatabase = SecretsManagerDatabase::instance();
-  };
+    TEST_F(SecretsManagerDatabaseTest, SecretGetByRegionNameTest) {
 
-  TEST_F(SecretsManagerDatabaseTest, SecretCreateTest) {
+        // arrange
+        Entity::SecretsManager::Secret secret = {.region = _region, .name = SECRET_NAME, .description = "Test secret"};
+        secret = _secretsManagerDatabase.CreateSecret(secret);
 
-    // arrange
-    Entity::SecretsManager::Secret secret = {.region=_region, .name=SECRET_NAME, .description="Test secret"};
+        // act
+        Entity::SecretsManager::Secret result = _secretsManagerDatabase.GetSecretByRegionName(secret.region, secret.name);
 
-    // act
-    Entity::SecretsManager::Secret result = _secretsManagerDatabase.CreateSecret(secret);
+        // assert
+        EXPECT_TRUE(result.name == SECRET_NAME);
+        EXPECT_TRUE(result.region == REGION);
+        EXPECT_FALSE(result.oid.empty());
+    }
 
-    // assert
-    EXPECT_TRUE(result.name == SECRET_NAME);
-    EXPECT_TRUE(result.region == REGION);
-    EXPECT_FALSE(result.oid.empty());
-  }
+    TEST_F(SecretsManagerDatabaseTest, SecretGetByOidTest) {
 
-  TEST_F(SecretsManagerDatabaseTest, SecretGetByIdTest) {
+        // arrange
+        Entity::SecretsManager::Secret secret = {.region = _region, .name = SECRET_NAME, .description = "Test secret"};
+        secret = _secretsManagerDatabase.CreateSecret(secret);
 
-    // arrange
-    Entity::SecretsManager::Secret secret = {.region=_region, .name=SECRET_NAME, .description="Test secret"};
-    secret = _secretsManagerDatabase.CreateSecret(secret);
+        // act
+        Entity::SecretsManager::Secret result = _secretsManagerDatabase.GetSecretById(secret.oid);
 
-    // act
-    Entity::SecretsManager::Secret result = _secretsManagerDatabase.GetSecretBySecretId(secret.secretId);
+        // assert
+        EXPECT_TRUE(result.name == SECRET_NAME);
+        EXPECT_TRUE(result.region == REGION);
+        EXPECT_FALSE(result.oid.empty());
+    }
 
-    // assert
-    EXPECT_TRUE(result.name == SECRET_NAME);
-    EXPECT_TRUE(result.region == REGION);
-    EXPECT_FALSE(result.oid.empty());
-  }
+    TEST_F(SecretsManagerDatabaseTest, SecretExistsTest) {
 
-  TEST_F(SecretsManagerDatabaseTest, SecretGetByRegionNameTest) {
+        // arrange
+        Entity::SecretsManager::Secret secret = {.region = _region, .name = SECRET_NAME, .description = "Test secret"};
+        secret = _secretsManagerDatabase.CreateSecret(secret);
 
-    // arrange
-    Entity::SecretsManager::Secret secret = {.region=_region, .name=SECRET_NAME, .description="Test secret"};
-    secret = _secretsManagerDatabase.CreateSecret(secret);
+        // act
+        bool result = _secretsManagerDatabase.SecretExists(secret.secretId);
 
-    // act
-    Entity::SecretsManager::Secret result = _secretsManagerDatabase.GetSecretByRegionName(secret.region, secret.name);
+        // assert
+        EXPECT_TRUE(result);
+    }
 
-    // assert
-    EXPECT_TRUE(result.name == SECRET_NAME);
-    EXPECT_TRUE(result.region == REGION);
-    EXPECT_FALSE(result.oid.empty());
-  }
+    TEST_F(SecretsManagerDatabaseTest, SecretUpdateTest) {
 
-  TEST_F(SecretsManagerDatabaseTest, SecretGetByOidTest) {
+        // arrange
+        // arrange
+        Entity::SecretsManager::Secret secret = {.region = _region, .name = SECRET_NAME, .description = "Test secret"};
+        secret = _secretsManagerDatabase.CreateSecret(secret);
 
-    // arrange
-    Entity::SecretsManager::Secret secret = {.region=_region, .name=SECRET_NAME, .description="Test secret"};
-    secret = _secretsManagerDatabase.CreateSecret(secret);
+        // act
+        secret.description += "update";
+        secret = _secretsManagerDatabase.UpdateSecret(secret);
 
-    // act
-    Entity::SecretsManager::Secret result = _secretsManagerDatabase.GetSecretById(secret.oid);
+        // assert
+        EXPECT_TRUE(secret.name == SECRET_NAME);
+        EXPECT_TRUE(secret.region == REGION);
+        EXPECT_TRUE(Core::StringUtils::EqualsIgnoreCase(secret.description, "Test secretupdate"));
+        EXPECT_FALSE(secret.oid.empty());
+    }
 
-    // assert
-    EXPECT_TRUE(result.name == SECRET_NAME);
-    EXPECT_TRUE(result.region == REGION);
-    EXPECT_FALSE(result.oid.empty());
-  }
+    TEST_F(SecretsManagerDatabaseTest, SecretListTest) {
 
-  TEST_F(SecretsManagerDatabaseTest, SecretExistsTest) {
+        // arrange
+        // arrange
+        Entity::SecretsManager::Secret secret = {.region = _region, .name = SECRET_NAME, .description = "Test secret"};
+        secret = _secretsManagerDatabase.CreateSecret(secret);
 
-    // arrange
-    Entity::SecretsManager::Secret secret = {.region=_region, .name=SECRET_NAME, .description="Test secret"};
-    secret = _secretsManagerDatabase.CreateSecret(secret);
+        // act
+        Entity::SecretsManager::SecretList secretList = _secretsManagerDatabase.ListSecrets();
 
-    // act
-    bool result = _secretsManagerDatabase.SecretExists(secret.secretId);
+        // assert
+        EXPECT_FALSE(secretList.empty());
+        EXPECT_EQ(1, secretList.size());
+    }
 
-    // assert
-    EXPECT_TRUE(result);
-  }
+    TEST_F(SecretsManagerDatabaseTest, SecretDeleteTest) {
 
-  TEST_F(SecretsManagerDatabaseTest, SecretUpdateTest) {
+        // arrange
+        Entity::SecretsManager::Secret secret = {.region = _region, .name = SECRET_NAME, .description = "Test secret"};
+        secret = _secretsManagerDatabase.CreateSecret(secret);
 
-    // arrange
-    // arrange
-    Entity::SecretsManager::Secret secret = {.region=_region, .name=SECRET_NAME, .description="Test secret"};
-    secret = _secretsManagerDatabase.CreateSecret(secret);
+        // act
+        _secretsManagerDatabase.DeleteSecret(secret);
+        Entity::SecretsManager::SecretList secretList = _secretsManagerDatabase.ListSecrets();
 
-    // act
-    secret.description += "update";
-    secret = _secretsManagerDatabase.UpdateSecret(secret);
+        // assert
+        EXPECT_TRUE(secretList.empty());
+    }
 
-    // assert
-    EXPECT_TRUE(secret.name == SECRET_NAME);
-    EXPECT_TRUE(secret.region == REGION);
-    EXPECT_TRUE(Core::StringUtils::EqualsIgnoreCase(secret.description, "Test secretupdate"));
-    EXPECT_FALSE(secret.oid.empty());
-  }
+    TEST_F(SecretsManagerDatabaseTest, SecretDeleteAllTest) {
 
-  TEST_F(SecretsManagerDatabaseTest, SecretListTest) {
+        // arrange
+        Entity::SecretsManager::Secret secret1 = {.region = _region, .name = SECRET_NAME, .description = "Test secret1"};
+        secret1 = _secretsManagerDatabase.CreateSecret(secret1);
+        Entity::SecretsManager::Secret secret2 = {.region = _region, .name = std::string(SECRET_NAME) + "1", .description = "Test secret2"};
+        secret2 = _secretsManagerDatabase.CreateSecret(secret2);
 
-    // arrange
-    // arrange
-    Entity::SecretsManager::Secret secret = {.region=_region, .name=SECRET_NAME, .description="Test secret"};
-    secret = _secretsManagerDatabase.CreateSecret(secret);
+        // act
+        _secretsManagerDatabase.DeleteAllSecrets();
+        Entity::SecretsManager::SecretList secretList = _secretsManagerDatabase.ListSecrets();
 
-    // act
-    Entity::SecretsManager::SecretList secretList = _secretsManagerDatabase.ListSecrets();
+        // assert
+        EXPECT_TRUE(secretList.empty());
+    }
 
-    // assert
-    EXPECT_FALSE(secretList.empty());
-    EXPECT_EQ(1, secretList.size());
-  }
+}// namespace AwsMock::Database
 
-  TEST_F(SecretsManagerDatabaseTest, SecretDeleteTest) {
-
-    // arrange
-    Entity::SecretsManager::Secret secret = {.region=_region, .name=SECRET_NAME, .description="Test secret"};
-    secret = _secretsManagerDatabase.CreateSecret(secret);
-
-    // act
-    _secretsManagerDatabase.DeleteSecret(secret);
-    Entity::SecretsManager::SecretList secretList = _secretsManagerDatabase.ListSecrets();
-
-    // assert
-    EXPECT_TRUE(secretList.empty());
-  }
-
-  TEST_F(SecretsManagerDatabaseTest, SecretDeleteAllTest) {
-
-    // arrange
-    Entity::SecretsManager::Secret secret1 = {.region=_region, .name=SECRET_NAME, .description="Test secret1"};
-    secret1 = _secretsManagerDatabase.CreateSecret(secret1);
-    Entity::SecretsManager::Secret secret2 = {.region=_region, .name=std::string(SECRET_NAME) + "1", .description="Test secret2"};
-    secret2 = _secretsManagerDatabase.CreateSecret(secret2);
-
-    // act
-    _secretsManagerDatabase.DeleteAllSecrets();
-    Entity::SecretsManager::SecretList secretList = _secretsManagerDatabase.ListSecrets();
-
-    // assert
-    EXPECT_TRUE(secretList.empty());
-  }
-
-} // namespace AwsMock::Core
-
-#endif // AWMOCK_CORE_SECRETSMANAGER_DATABASE_TEST_H
+#endif// AWMOCK_CORE_SECRETSMANAGER_DATABASE_TEST_H

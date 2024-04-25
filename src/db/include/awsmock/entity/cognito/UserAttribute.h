@@ -29,7 +29,7 @@ namespace AwsMock::Database::Entity::Cognito {
         std::string value;
     };
 
-    typedef std::vector <UserAttribute> UserAttributeList;
-}
+    typedef std::vector<UserAttribute> UserAttributeList;
+}// namespace AwsMock::Database::Entity::Cognito
 
-#endif // AWSMOCK_DB_ENTITY_COGNITO_USERATTRIBUTE_H
+#endif// AWSMOCK_DB_ENTITY_COGNITO_USERATTRIBUTE_H

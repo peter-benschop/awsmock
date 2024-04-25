@@ -6,33 +6,30 @@
 
 namespace AwsMock::Core {
 
-  InvalidMethodCallException::InvalidMethodCallException(int code, const char *resource, const char *requestId) : Poco::Exception(code), _resource(resource), _requestId(requestId) {}
+    InvalidMethodCallException::InvalidMethodCallException(int code, const char *resource, const char *requestId) : Poco::Exception(code), _resource(resource), _requestId(requestId) {}
 
-  InvalidMethodCallException::InvalidMethodCallException(const std::string &msg, int code, const char *resource, const char *requestId) :
-      Poco::Exception(msg, code), _resource(resource), _requestId(requestId) {}
+    InvalidMethodCallException::InvalidMethodCallException(const std::string &msg, int code, const char *resource, const char *requestId) : Poco::Exception(msg, code), _resource(resource), _requestId(requestId) {}
 
-  InvalidMethodCallException::InvalidMethodCallException(const std::string &msg, const std::string &arg, int code, const char *resource, const char *requestId) :
-      Poco::Exception(msg, arg, code), _resource(resource), _requestId(requestId) {}
+    InvalidMethodCallException::InvalidMethodCallException(const std::string &msg, const std::string &arg, int code, const char *resource, const char *requestId) : Poco::Exception(msg, arg, code), _resource(resource), _requestId(requestId) {}
 
-  InvalidMethodCallException::InvalidMethodCallException(const std::string &msg, const Poco::Exception &exc, int code, const char *resource, const char *requestId) :
-      Poco::Exception(msg, exc, code), _resource(resource), _requestId(requestId) {}
+    InvalidMethodCallException::InvalidMethodCallException(const std::string &msg, const Poco::Exception &exc, int code, const char *resource, const char *requestId) : Poco::Exception(msg, exc, code), _resource(resource), _requestId(requestId) {}
 
-  InvalidMethodCallException::InvalidMethodCallException(const InvalidMethodCallException &exc) = default;
+    InvalidMethodCallException::InvalidMethodCallException(const InvalidMethodCallException &exc) = default;
 
-  InvalidMethodCallException::~InvalidMethodCallException() noexcept = default;
+    InvalidMethodCallException::~InvalidMethodCallException() noexcept = default;
 
-  InvalidMethodCallException &InvalidMethodCallException::operator=(const InvalidMethodCallException &exc) = default;
+    InvalidMethodCallException &InvalidMethodCallException::operator=(const InvalidMethodCallException &exc) = default;
 
-  const char *InvalidMethodCallException::name() const noexcept { return "InvalidMethodCallException: "; }
+    const char *InvalidMethodCallException::name() const noexcept { return "InvalidMethodCallException: "; }
 
-  const char *InvalidMethodCallException::className() const noexcept { return typeid(*this).name(); }
+    const char *InvalidMethodCallException::className() const noexcept { return typeid(*this).name(); }
 
-  const char *InvalidMethodCallException::resource() const noexcept { return _resource; }
+    const char *InvalidMethodCallException::resource() const noexcept { return _resource; }
 
-  const char *InvalidMethodCallException::requestId() const noexcept { return _requestId; }
+    const char *InvalidMethodCallException::requestId() const noexcept { return _requestId; }
 
-  Poco::Exception *InvalidMethodCallException::clone() const { return new InvalidMethodCallException(*this); }
+    Poco::Exception *InvalidMethodCallException::clone() const { return new InvalidMethodCallException(*this); }
 
-  void InvalidMethodCallException::rethrow() const { throw *this; }
+    void InvalidMethodCallException::rethrow() const { throw *this; }
 
-} // namespace AwsMock::Core
+}// namespace AwsMock::Core

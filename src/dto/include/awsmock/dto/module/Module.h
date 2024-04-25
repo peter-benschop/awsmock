@@ -17,87 +17,88 @@
 
 namespace AwsMock::Dto::Module {
 
-  struct Module {
+    struct Module {
 
-    /**
+        /**
      * Name
      */
-    std::string name;
+        std::string name;
 
-    /**
+        /**
      * Status
      */
-    Database::Entity::Module::ModuleState status;
+        Database::Entity::Module::ModuleState status;
 
-    /**
+        /**
      * Executable
      */
-    std::string executable = {};
+        std::string executable = {};
 
-    /**
+        /**
      * HTTP port
      */
-    int port = -1;
+        int port = -1;
 
-    /**
+        /**
      * Creation date
      */
-    Poco::DateTime created = Poco::DateTime();
+        Poco::DateTime created = Poco::DateTime();
 
-    /**
+        /**
      * Last modification date
      */
-    Poco::DateTime modified = Poco::DateTime();;
+        Poco::DateTime modified = Poco::DateTime();
+        ;
 
-    /**
+        /**
      * Convert to JSON representation
      *
      * @param moduleEntity module entity
      * @return JSON string
      */
-    [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
+        /**
      * Convert to JSON representation
      *
      * @param moduleList module entity list
      * @return JSON string
      */
-    static std::string ToJson(const Database::Entity::Module::ModuleList &moduleList);
+        static std::string ToJson(const Database::Entity::Module::ModuleList &moduleList);
 
-    /**
+        /**
      * Convert from JSON representation
      *
      * @param payload JSON representation
      * @return Module
      */
-    static Module FromJson(const std::string &payload);
+        static Module FromJson(const std::string &payload);
 
-    /**
+        /**
      * Convert from JSON representation
      *
      * @param payload JSON representation
      * @return ModuleList
      */
-    static std::vector<Module> FromJsonList(const std::string &payload);
+        static std::vector<Module> FromJsonList(const std::string &payload);
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @param os output stream
      * @param m module struct
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const Module &m);
-  };
+        friend std::ostream &operator<<(std::ostream &os, const Module &m);
+    };
 
-} // namespace AwsMock::Dto
+}// namespace AwsMock::Dto::Module
 
-#endif // AWSMOCK_DTO_MODULE_MODULE_H
+#endif// AWSMOCK_DTO_MODULE_MODULE_H

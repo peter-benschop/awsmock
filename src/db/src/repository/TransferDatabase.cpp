@@ -26,7 +26,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.TransferExists(region, serverId);
-
         }
     }
 
@@ -48,11 +47,10 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.TransferExists(serverId);
-
         }
     }
 
-    bool TransferDatabase::TransferExists(const std::string &region, const std::vector <std::string> &protocols) {
+    bool TransferDatabase::TransferExists(const std::string &region, const std::vector<std::string> &protocols) {
 
         if (_useDatabase) {
 
@@ -72,7 +70,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.TransferExists(region, protocols);
-
         }
     }
 
@@ -90,7 +87,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.CreateTransfer(transfer);
-
         }
     }
 
@@ -98,12 +94,11 @@ namespace AwsMock::Database {
 
         auto client = GetClient();
         mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
-        mongocxx::stdx::optional <bsoncxx::document::value>
+        mongocxx::stdx::optional<bsoncxx::document::value>
                 mResult = _transferCollection.find_one(make_document(kvp("_id", oid)));
         Entity::Transfer::Transfer result;
         result.FromDocument(mResult);
         return result;
-
     }
 
     Entity::Transfer::Transfer TransferDatabase::GetTransferById(const std::string &oid) {
@@ -115,7 +110,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.GetTransferById(oid);
-
         }
     }
 
@@ -125,7 +119,7 @@ namespace AwsMock::Database {
 
             auto client = GetClient();
             mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
-            mongocxx::stdx::optional <bsoncxx::document::value>
+            mongocxx::stdx::optional<bsoncxx::document::value>
                     mResult = _transferCollection.find_one(make_document(kvp("serverId", serverId)));
             Entity::Transfer::Transfer result;
             result.FromDocument(mResult);
@@ -134,7 +128,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.GetTransferByServerId(serverId);
-
         }
     }
 
@@ -162,7 +155,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.UpdateTransfer(transfer);
-
         }
     }
 
@@ -172,7 +164,7 @@ namespace AwsMock::Database {
 
             auto client = GetClient();
             mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
-            mongocxx::stdx::optional <bsoncxx::document::value>
+            mongocxx::stdx::optional<bsoncxx::document::value>
                     mResult = _transferCollection.find_one(make_document(kvp("arn", arn)));
             Entity::Transfer::Transfer result;
             result.FromDocument(mResult);
@@ -181,13 +173,12 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.GetTransferByArn(arn);
-
         }
     }
 
-    std::vector <Entity::Transfer::Transfer> TransferDatabase::ListServers(const std::string &region) {
+    std::vector<Entity::Transfer::Transfer> TransferDatabase::ListServers(const std::string &region) {
 
-        std::vector <Entity::Transfer::Transfer> transfers;
+        std::vector<Entity::Transfer::Transfer> transfers;
 
         if (_useDatabase) {
 
@@ -222,7 +213,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.ListServers(region);
-
         }
         return transfers;
     }
@@ -244,7 +234,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.CountServers(region);
-
         }
         log_trace << "Count servers, result: " << count;
         return count;
@@ -262,7 +251,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteTransfer(serverId);
-
         }
     }
 
@@ -278,8 +266,7 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteAllTransfers();
-
         }
     }
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database

@@ -4,7 +4,7 @@
 namespace AwsMock {
 
     ModuleHandler::ModuleHandler(Core::Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap)
-            : AbstractResource(), _configuration(configuration), _metricService(metricService), _serverMap(serverMap) {
+        : AbstractResource(), _configuration(configuration), _metricService(metricService), _serverMap(serverMap) {
 
         _moduleService = std::make_shared<Service::ModuleService>(_configuration, _serverMap);
     }
@@ -25,16 +25,15 @@ namespace AwsMock {
             int port = _configuration.getInt("awsmock.service.gateway.port", 4566);
             std::string endpoint = "http://" + host + ":" + std::to_string(port);
             Dto::Module::GatewayConfig config = {
-                    .region=_configuration.getString("awsmock.region", "eu-central-1"),
-                    .endpoint=endpoint,
-                    .host=host,
-                    .port=port,
-                    .user=_configuration.getString("awsmock.user", "none"),
-                    .accessId=_configuration.getString("awsmock.account.userPoolId", "000000000000"),
-                    .clientId=_configuration.getString("awsmock.client.userPoolId", "00000000"),
-                    .dataDir=_configuration.getString("awsmock.data.dir", "/tmp/awsmock/data"),
-                    .databaseActive=_configuration.getBool("awsmock.mongodb.active", false)
-            };
+                    .region = _configuration.getString("awsmock.region", "eu-central-1"),
+                    .endpoint = endpoint,
+                    .host = host,
+                    .port = port,
+                    .user = _configuration.getString("awsmock.user", "none"),
+                    .accessId = _configuration.getString("awsmock.account.userPoolId", "000000000000"),
+                    .clientId = _configuration.getString("awsmock.client.userPoolId", "00000000"),
+                    .dataDir = _configuration.getString("awsmock.data.dir", "/tmp/awsmock/data"),
+                    .databaseActive = _configuration.getBool("awsmock.mongodb.active", false)};
             SendOkResponse(response, config.ToJson());
 
         } else if (action == "running") {
@@ -100,7 +99,6 @@ namespace AwsMock {
 
                     // Send response
                     SendOkResponse(response, module.ToJson());
-
                 }
 
             } else if (action == "restart") {
@@ -194,4 +192,4 @@ namespace AwsMock {
         std::ostream &outputStream = response.send();
         outputStream.flush();
     }
-}
+}// namespace AwsMock

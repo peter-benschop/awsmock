@@ -426,4 +426,4 @@ namespace AwsMock::Core {
         }
         return {ss.str()};
     }
-}
+}// namespace AwsMock::Core

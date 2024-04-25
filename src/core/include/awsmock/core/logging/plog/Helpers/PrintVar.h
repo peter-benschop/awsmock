@@ -14,11 +14,11 @@
 #define PLOG_IMPL_PRINT_VAR_EXPAND(x) x
 
 #ifdef __GNUC__
-#pragma GCC system_header // disable warning: variadic macros are a C99 feature
+#pragma GCC system_header// disable warning: variadic macros are a C99 feature
 #endif
 
 #define PLOG_IMPL_PRINT_VAR_GET_MACRO(x1, x2, x3, x4, x5, x6, x7, x8, x9, NAME, ...) NAME
 
-#define PLOG_PRINT_VAR(...) PLOG_IMPL_PRINT_VAR_EXPAND(PLOG_IMPL_PRINT_VAR_GET_MACRO(__VA_ARGS__,\
-    PLOG_IMPL_PRINT_VAR_9, PLOG_IMPL_PRINT_VAR_8, PLOG_IMPL_PRINT_VAR_7, PLOG_IMPL_PRINT_VAR_6, PLOG_IMPL_PRINT_VAR_5,\
-    PLOG_IMPL_PRINT_VAR_4, PLOG_IMPL_PRINT_VAR_3, PLOG_IMPL_PRINT_VAR_2, PLOG_IMPL_PRINT_VAR_1, UNUSED)(__VA_ARGS__))
+#define PLOG_PRINT_VAR(...) PLOG_IMPL_PRINT_VAR_EXPAND(PLOG_IMPL_PRINT_VAR_GET_MACRO(__VA_ARGS__,                                                                                                       \
+                                                                                     PLOG_IMPL_PRINT_VAR_9, PLOG_IMPL_PRINT_VAR_8, PLOG_IMPL_PRINT_VAR_7, PLOG_IMPL_PRINT_VAR_6, PLOG_IMPL_PRINT_VAR_5, \
+                                                                                     PLOG_IMPL_PRINT_VAR_4, PLOG_IMPL_PRINT_VAR_3, PLOG_IMPL_PRINT_VAR_2, PLOG_IMPL_PRINT_VAR_1, UNUSED)(__VA_ARGS__))

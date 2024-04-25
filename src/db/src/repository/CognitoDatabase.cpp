@@ -30,7 +30,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.UserPoolExists(region, name);
-
         }
     }
 
@@ -54,7 +53,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.UserPoolExists(id);
-
         }
     }
 
@@ -83,7 +81,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.CreateUserPool(userPool);
-
         }
     }
 
@@ -93,7 +90,7 @@ namespace AwsMock::Database {
 
             auto client = GetClient();
             mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
-            mongocxx::stdx::optional <bsoncxx::document::value> mResult = _userPoolCollection.find_one(make_document(kvp("_id", oid)));
+            mongocxx::stdx::optional<bsoncxx::document::value> mResult = _userPoolCollection.find_one(make_document(kvp("_id", oid)));
             if (!mResult) {
                 log_error << "Database exception: Cognito not found ";
                 throw Core::DatabaseException("Database exception, Cognito not found ");
@@ -107,7 +104,6 @@ namespace AwsMock::Database {
             log_error << "Database exception " << exc.what();
             throw Core::DatabaseException("Database exception " + std::string(exc.what()));
         }
-
     }
 
     Entity::Cognito::UserPool CognitoDatabase::GetUserPoolByRegionName(const std::string &region,
@@ -119,7 +115,7 @@ namespace AwsMock::Database {
 
                 auto client = GetClient();
                 mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
-                mongocxx::stdx::optional <bsoncxx::document::value> mResult = _userPoolCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
+                mongocxx::stdx::optional<bsoncxx::document::value> mResult = _userPoolCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
                 if (!mResult) {
                     log_error << "Database exception: Cognito not found ";
                     throw Core::DatabaseException("Database exception, Cognito not found ");
@@ -137,7 +133,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.GetUserPoolByRegionName(region, name);
-
         }
     }
 
@@ -150,7 +145,6 @@ namespace AwsMock::Database {
         } else {
 
             return CreateUserPool(userPool);
-
         }
     }
 
@@ -180,13 +174,12 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.UpdateUserPool(userPool);
-
         }
     }
 
-    std::vector <Entity::Cognito::UserPool> CognitoDatabase::ListUserPools(const std::string &region) {
+    std::vector<Entity::Cognito::UserPool> CognitoDatabase::ListUserPools(const std::string &region) {
 
-        std::vector <Entity::Cognito::UserPool> userPools;
+        std::vector<Entity::Cognito::UserPool> userPools;
         if (_hasDatabase) {
 
             try {
@@ -210,7 +203,6 @@ namespace AwsMock::Database {
                         result.FromDocument(userPool);
                         userPools.push_back(result);
                     }
-
                 }
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
@@ -250,7 +242,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.CountUserPools(region);
-
         }
     }
 
@@ -278,7 +269,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteUserPool(id);
-
         }
     }
 
@@ -306,7 +296,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteAllUserPools();
-
         }
     }
 
@@ -332,7 +321,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.UserExists(region, userPoolId, userName);
-
         }
     }
 
@@ -361,7 +349,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.CreateUser(user);
-
         }
     }
 
@@ -371,7 +358,7 @@ namespace AwsMock::Database {
 
             auto client = GetClient();
             mongocxx::collection _userCollection = (*client)[_databaseName]["cognito_user"];
-            mongocxx::stdx::optional <bsoncxx::document::value>
+            mongocxx::stdx::optional<bsoncxx::document::value>
                     mResult = _userCollection.find_one(make_document(kvp("_id", oid)));
             if (!mResult) {
                 log_error << "Database exception: user not found ";
@@ -386,7 +373,6 @@ namespace AwsMock::Database {
             log_error << "Database exception " << exc.what();
             throw Core::DatabaseException("Database exception " + std::string(exc.what()));
         }
-
     }
 
     Entity::Cognito::User CognitoDatabase::GetUserByUserName(const std::string &region, const std::string &userPoolId, const std::string &userName) {
@@ -415,7 +401,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.GetUserByUserName(region, userPoolId, userName);
-
         }
     }
 
@@ -428,9 +413,7 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.GetUserByOid(oid);
-
         }
-
     }
 
     long CognitoDatabase::CountUsers(const std::string &region, const std::string &userPoolId) {
@@ -460,14 +443,13 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.CountUsers(region);
-
         }
     }
 
-    std::vector <Entity::Cognito::User> CognitoDatabase::ListUsers(const std::string &region,
-                                                                   const std::string &userPoolId) {
+    std::vector<Entity::Cognito::User> CognitoDatabase::ListUsers(const std::string &region,
+                                                                  const std::string &userPoolId) {
 
-        std::vector <Entity::Cognito::User> users;
+        std::vector<Entity::Cognito::User> users;
         if (_hasDatabase) {
 
             try {
@@ -541,7 +523,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.UpdateUser(user);
-
         }
     }
 
@@ -554,7 +535,6 @@ namespace AwsMock::Database {
         } else {
 
             return CreateUser(user);
-
         }
     }
 
@@ -582,7 +562,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteUser(user);
-
         }
     }
 
@@ -610,8 +589,7 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteAllUsers();
-
         }
     }
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database

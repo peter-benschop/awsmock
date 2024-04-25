@@ -6,58 +6,58 @@
 
 namespace AwsMock::Dto::Docker {
 
-  ListImageResponse::ListImageResponse(const std::string &body) {
-    FromJson(body);
-  }
+    ListImageResponse::ListImageResponse(const std::string &body) {
+        FromJson(body);
+    }
 
-  void ListImageResponse::FromJson(const std::string &jsonString) {
+    void ListImageResponse::FromJson(const std::string &jsonString) {
 
-    try {
-      Poco::JSON::Parser parser;
-      Poco::Dynamic::Var result = parser.parse(jsonString);
-      Poco::JSON::Array::Ptr rootArray = result.extract<Poco::JSON::Array::Ptr>();
-      if (rootArray != nullptr) {
-        for (const auto &it : *rootArray) {
-          Image image;
-          image.FromJson(it.extract<Poco::JSON::Object::Ptr>());
-          imageList.push_back(image);
+        try {
+            Poco::JSON::Parser parser;
+            Poco::Dynamic::Var result = parser.parse(jsonString);
+            Poco::JSON::Array::Ptr rootArray = result.extract<Poco::JSON::Array::Ptr>();
+            if (rootArray != nullptr) {
+                for (const auto &it: *rootArray) {
+                    Image image;
+                    image.FromJson(it.extract<Poco::JSON::Object::Ptr>());
+                    imageList.push_back(image);
+                }
+            }
+
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
         }
-      }
-
-    } catch (Poco::Exception &exc) {
-      log_error << exc.message();
-      throw Core::JsonException(exc.message());
     }
-  }
 
-  std::string ListImageResponse::ToJson() const {
+    std::string ListImageResponse::ToJson() const {
 
-    try {
+        try {
 
-      Poco::JSON::Object rootJson;
+            Poco::JSON::Object rootJson;
 
-      Poco::JSON::Array imageArray;
-      for (const auto &image : imageList) {
-        imageArray.add(image.ToJsonObject());
-      }
+            Poco::JSON::Array imageArray;
+            for (const auto &image: imageList) {
+                imageArray.add(image.ToJsonObject());
+            }
 
-      return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::JsonUtils::ToJsonString(rootJson);
 
-    } catch (Poco::Exception &exc) {
-      log_error << exc.message();
-      throw Core::JsonException(exc.message());
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }
     }
-  }
 
-  std::string ListImageResponse::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+    std::string ListImageResponse::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
+    }
 
-  std::ostream &operator<<(std::ostream &os, const ListImageResponse &r) {
-    os << "ImageListResponse=" << r.ToJson();
-    return os;
-  }
+    std::ostream &operator<<(std::ostream &os, const ListImageResponse &r) {
+        os << "ImageListResponse=" << r.ToJson();
+        return os;
+    }
 
-} // namespace AwsMock::Dto::Docker
+}// namespace AwsMock::Dto::Docker

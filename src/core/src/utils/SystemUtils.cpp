@@ -52,4 +52,4 @@ namespace AwsMock::Core {
     int SystemUtils::GetRandomPort() {
         return Core::RandomUtils::NextInt(RANDOM_PORT_MIN, RANDOM_PORT_MAX);
     }
-}
+}// namespace AwsMock::Core

@@ -6,271 +6,271 @@
 
 namespace AwsMock::Service {
 
-  SecretsManagerService::SecretsManagerService(Core::Configuration &configuration) : _configuration(configuration), _database(Database::SecretsManagerDatabase::instance()) {
+    SecretsManagerService::SecretsManagerService(Core::Configuration &configuration) : _configuration(configuration), _database(Database::SecretsManagerDatabase::instance()) {
 
-    // Initialize environment
-    _accountId = _configuration.getString("awsmock.account.userPoolId", DEFAULT_ACCOUNT_ID);
+        // Initialize environment
+        _accountId = _configuration.getString("awsmock.account.userPoolId", DEFAULT_ACCOUNT_ID);
 
-    // Simulation of KMS key
-    _kmsKey = "aGYlaHJGZk5FMjNXN05kJmpvWVpvem9GT1M+WE1qWlg=";
-  }
-
-  Dto::SecretsManager::CreateSecretResponse SecretsManagerService::CreateSecret(const Dto::SecretsManager::CreateSecretRequest &request) {
-    log_trace << "Create secret request, request: " << request.ToString();
-
-    // Get region
-    std::string region = request.region;
-
-    // Check existence
-    if (_database.SecretExists(request.region, request.name)) {
-      throw Core::ServiceException("Secret exists already");
+        // Simulation of KMS key
+        _kmsKey = "aGYlaHJGZk5FMjNXN05kJmpvWVpvem9GT1M+WE1qWlg=";
     }
 
-    // Check consistency
-    if (!request.secretString.empty() && !request.secretBinary.empty()) {
-      throw Core::ServiceException("Secret must not have secretString and secretBinary");
+    Dto::SecretsManager::CreateSecretResponse SecretsManagerService::CreateSecret(const Dto::SecretsManager::CreateSecretRequest &request) {
+        log_trace << "Create secret request, request: " << request.ToString();
+
+        // Get region
+        std::string region = request.region;
+
+        // Check existence
+        if (_database.SecretExists(request.region, request.name)) {
+            throw Core::ServiceException("Secret exists already");
+        }
+
+        // Check consistency
+        if (!request.secretString.empty() && !request.secretBinary.empty()) {
+            throw Core::ServiceException("Secret must not have secretString and secretBinary");
+        }
+
+        if (request.secretString.empty() && request.secretBinary.empty()) {
+            throw Core::ServiceException("Secret must have either secretString or secretBinary");
+        }
+
+        Database::Entity::SecretsManager::Secret secret = {.region = region, .name = request.name};
+        try {
+
+            // Update database
+            secret.versionId = Poco::UUIDGenerator().createRandom().toString();
+            secret.secretId = request.name + "-" + Core::StringUtils::GenerateRandomHexString(6);
+            secret.arn = Core::AwsUtils::CreateSecretArn(request.region, _accountId, secret.secretId);
+            secret.createdDate = Poco::Timestamp().epochTime();
+
+            // Either string or binary data
+            if (!request.secretString.empty()) {
+                auto *plaintext = (unsigned char *) request.secretString.c_str();
+                int len = (int) strlen(reinterpret_cast<const char *>(plaintext));
+                secret.secretString = Core::Crypto::Base64Encode(Core::Crypto::Aes256EncryptString(plaintext, &len, _kmsKey));
+            } else {
+                secret.secretBinary = request.secretBinary;
+            }
+            secret = _database.CreateSecret(secret);
+
+        } catch (Poco::Exception &exc) {
+            throw Core::ServiceException(exc.message());
+        }
+        return {.region = secret.region, .name = secret.name, .arn = secret.arn, .versionId = secret.versionId};
     }
 
-    if (request.secretString.empty() && request.secretBinary.empty()) {
-      throw Core::ServiceException("Secret must have either secretString or secretBinary");
+    Dto::SecretsManager::DescribeSecretResponse SecretsManagerService::DescribeSecret(const Dto::SecretsManager::DescribeSecretRequest &request) {
+        log_trace << "Describe secret request: " << request.ToString();
+
+        // Check bucket existence
+        if (!_database.SecretExists(request.secretId)) {
+            log_warning << "Secret does not exist, secretId: " << request.secretId;
+            throw Core::ResourceNotFoundException("Secret does not exist, secretId: " + request.secretId);
+        }
+
+        Dto::SecretsManager::DescribeSecretResponse response;
+        try {
+
+            // Get object from database
+            Database::Entity::SecretsManager::Secret secret = _database.GetSecretBySecretId(request.secretId);
+
+            // Convert to DTO
+            response.region = secret.region;
+            response.name = secret.name;
+            response.arn = secret.arn;
+            log_debug << "Database secret described, secretId: " << request.secretId;
+            return response;
+
+        } catch (Poco::Exception &exc) {
+            log_error << "Secret describe secret failed, message: " + exc.message();
+            throw Core::ServiceException(exc.message());
+        }
+
+        return {};
     }
 
-    Database::Entity::SecretsManager::Secret secret = {.region=region, .name=request.name};
-    try {
+    Dto::SecretsManager::GetSecretValueResponse SecretsManagerService::GetSecretValue(const Dto::SecretsManager::GetSecretValueRequest &request) {
+        log_trace << "Get secret value request: " << request.ToString();
 
-      // Update database
-      secret.versionId = Poco::UUIDGenerator().createRandom().toString();
-      secret.secretId = request.name + "-" + Core::StringUtils::GenerateRandomHexString(6);
-      secret.arn = Core::AwsUtils::CreateSecretArn(request.region, _accountId, secret.secretId);
-      secret.createdDate = Poco::Timestamp().epochTime();
+        // Check bucket existence
+        if (!_database.SecretExists(request.secretId)) {
+            log_warning << "Secret does not exist, secretId: " << request.secretId;
+            throw Core::ServiceException("Secret does not exist, secretId: " + request.secretId, Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+        }
 
-      // Either string or binary data
-      if (!request.secretString.empty()) {
-        auto *plaintext = (unsigned char *) request.secretString.c_str();
-        int len = (int) strlen(reinterpret_cast<const char *>(plaintext));
-        secret.secretString = Core::Crypto::Base64Encode(Core::Crypto::Aes256EncryptString(plaintext, &len, _kmsKey));
-      } else {
-        secret.secretBinary = request.secretBinary;
-      }
-      secret = _database.CreateSecret(secret);
+        Dto::SecretsManager::GetSecretValueResponse response;
+        try {
 
-    } catch (Poco::Exception &exc) {
-      throw Core::ServiceException(exc.message());
-    }
-    return {.region=secret.region, .name=secret.name, .arn=secret.arn, .versionId=secret.versionId};
-  }
+            // Get object from database
+            Database::Entity::SecretsManager::Secret secret = _database.GetSecretBySecretId(request.secretId);
 
-  Dto::SecretsManager::DescribeSecretResponse SecretsManagerService::DescribeSecret(const Dto::SecretsManager::DescribeSecretRequest &request) {
-    log_trace << "Describe secret request: " << request.ToString();
+            // Convert to DTO
+            response.name = secret.name;
+            response.arn = secret.arn;
+            response.versionId = secret.versionId;
+            if (!secret.secretString.empty()) {
+                std::string base64Decoded = Core::Crypto::Base64Decode(secret.secretString);
+                int len = (int) base64Decoded.length();
+                response.secretString = std::string(reinterpret_cast<char *>(Core::Crypto::Aes256DecryptString((unsigned char *) base64Decoded.c_str(), &len, _kmsKey)));
+                response.secretString[len] = '\0';
+            } else if (!secret.secretString.empty()) {
+                std::string base64Decoded = Core::Crypto::Base64Decode(secret.secretString);
+                int len = (int) base64Decoded.length();
+                response.secretBinary = std::string(reinterpret_cast<char *>(Core::Crypto::Aes256DecryptString((unsigned char *) base64Decoded.c_str(), &len, _kmsKey)));
+            } else {
+                log_warning << "Neither string nor binary, secretId: " << request.secretId;
+            }
+            log_debug << "Get secret value, secretId: " << request.secretId;
 
-    // Check bucket existence
-    if (!_database.SecretExists(request.secretId)) {
-      log_warning<< "Secret does not exist, secretId: " << request.secretId;
-      throw Core::ResourceNotFoundException("Secret does not exist, secretId: " + request.secretId);
-    }
+            // Update database
+            secret.lastAccessedDate = Poco::Timestamp().epochTime();
+            _database.UpdateSecret(secret);
+            log_trace << "Secret updated, secretId: " << request.secretId;
 
-    Dto::SecretsManager::DescribeSecretResponse response;
-    try {
+            return response;
 
-      // Get object from database
-      Database::Entity::SecretsManager::Secret secret = _database.GetSecretBySecretId(request.secretId);
-
-      // Convert to DTO
-      response.region = secret.region;
-      response.name = secret.name;
-      response.arn = secret.arn;
-      log_debug << "Database secret described, secretId: " << request.secretId;
-      return response;
-
-    } catch (Poco::Exception &exc) {
-      log_error << "Secret describe secret failed, message: " + exc.message();
-      throw Core::ServiceException(exc.message());
+        } catch (Poco::Exception &exc) {
+            log_error << "Secret describe secret failed, message: " + exc.message();
+            throw Core::ServiceException(exc.message());
+        }
     }
 
-    return {};
-  }
+    Dto::SecretsManager::ListSecretsResponse SecretsManagerService::ListSecrets(const Dto::SecretsManager::ListSecretsRequest &request) {
+        log_trace << "List secrets request: " << request.ToString();
 
-  Dto::SecretsManager::GetSecretValueResponse SecretsManagerService::GetSecretValue(const Dto::SecretsManager::GetSecretValueRequest &request) {
-    log_trace << "Get secret value request: " << request.ToString();
+        Dto::SecretsManager::ListSecretsResponse response;
+        try {
 
-    // Check bucket existence
-    if (!_database.SecretExists(request.secretId)) {
-      log_warning<< "Secret does not exist, secretId: " << request.secretId;
-      throw Core::ServiceException("Secret does not exist, secretId: " + request.secretId, Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+            // Get object from database
+            Database::Entity::SecretsManager::SecretList secrets = _database.ListSecrets();
+
+            // Convert to DTO
+            for (const auto &s: secrets) {
+                Dto::SecretsManager::Secret secret;
+                secret.primaryRegion = s.primaryRegion;
+                secret.arn = s.arn;
+                secret.name = s.name;
+                secret.description = s.description;
+                secret.kmsKeyId = s.kmsKeyId;
+                secret.createdDate = s.createdDate;
+                secret.deletedDate = s.deletedDate;
+                secret.lastAccessedDate = s.lastAccessedDate;
+                secret.lastChangedDate = s.lastChangedDate;
+                secret.lastRotatedDate = s.lastRotatedDate;
+                secret.nextRotatedDate = s.nextRotatedDate;
+                secret.rotationEnabled = s.rotationEnabled;
+                secret.rotationLambdaARN = s.rotationLambdaARN;
+
+                // Rotation rules
+                secret.rotationRules.automaticallyAfterDays = s.rotationRules.automaticallyAfterDays;
+                secret.rotationRules.duration = s.rotationRules.duration;
+                secret.rotationRules.scheduleExpression = s.rotationRules.scheduleExpression;
+
+                response.secretList.emplace_back(secret);
+            }
+            //response.nextToken = secrets.back().secretId;
+
+            // Convert to DTO
+            log_debug << "Database list secrets, region: " << request.region;
+            return response;
+
+        } catch (Poco::Exception &exc) {
+            log_error << "List secrets failed, message: " + exc.message();
+            throw Core::ServiceException(exc.message());
+        }
     }
 
-    Dto::SecretsManager::GetSecretValueResponse response;
-    try {
+    Dto::SecretsManager::UpdateSecretResponse SecretsManagerService::UpdateSecret(const Dto::SecretsManager::UpdateSecretRequest &request) {
+        log_trace << "Update secret request: " << request.ToString();
 
-      // Get object from database
-      Database::Entity::SecretsManager::Secret secret = _database.GetSecretBySecretId(request.secretId);
+        // Check bucket existence
+        if (!_database.SecretExists(request.secretId)) {
+            log_warning << "Secret does not exist, secretId: " << request.secretId;
+            throw Core::ServiceException("Secret does not exist, secretId: " + request.secretId, Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+        }
 
-      // Convert to DTO
-      response.name = secret.name;
-      response.arn = secret.arn;
-      response.versionId = secret.versionId;
-      if (!secret.secretString.empty()) {
-        std::string base64Decoded = Core::Crypto::Base64Decode(secret.secretString);
-        int len = (int) base64Decoded.length();
-        response.secretString = std::string(reinterpret_cast<char *>(Core::Crypto::Aes256DecryptString((unsigned char *) base64Decoded.c_str(), &len, _kmsKey)));
-        response.secretString[len] = '\0';
-      } else if (!secret.secretString.empty()) {
-        std::string base64Decoded = Core::Crypto::Base64Decode(secret.secretString);
-        int len = (int) base64Decoded.length();
-        response.secretBinary = std::string(reinterpret_cast<char *>(Core::Crypto::Aes256DecryptString((unsigned char *) base64Decoded.c_str(), &len, _kmsKey)));
-      } else {
-        log_warning<< "Neither string nor binary, secretId: " << request.secretId;
-      }
-      log_debug << "Get secret value, secretId: " << request.secretId;
+        try {
 
-      // Update database
-      secret.lastAccessedDate = Poco::Timestamp().epochTime();
-      _database.UpdateSecret(secret);
-      log_trace << "Secret updated, secretId: " << request.secretId;
+            // Get object from database
+            Database::Entity::SecretsManager::Secret secret = _database.GetSecretBySecretId(request.secretId);
 
-      return response;
+            // Update database
+            secret.kmsKeyId = request.kmsKeyId;
+            secret.secretString = request.secretString;
+            secret.secretBinary = request.secretBinary;
+            secret.description = request.description;
+            secret.lastChangedDate = Poco::Timestamp().epochTime();
 
-    } catch (Poco::Exception &exc) {
-      log_error << "Secret describe secret failed, message: " + exc.message();
-      throw Core::ServiceException(exc.message());
-    }
-  }
+            secret = _database.UpdateSecret(secret);
 
-  Dto::SecretsManager::ListSecretsResponse SecretsManagerService::ListSecrets(const Dto::SecretsManager::ListSecretsRequest &request) {
-    log_trace << "List secrets request: " << request.ToString();
+            // Convert to DTO
+            log_debug << "Database secret described, secretId: " << request.secretId;
+            return {.region = secret.region, .name = secret.name, .arn = secret.arn, .versionId = secret.versionId};
 
-    Dto::SecretsManager::ListSecretsResponse response;
-    try {
-
-      // Get object from database
-      Database::Entity::SecretsManager::SecretList secrets = _database.ListSecrets();
-
-      // Convert to DTO
-      for (const auto &s : secrets) {
-        Dto::SecretsManager::Secret secret;
-        secret.primaryRegion = s.primaryRegion;
-        secret.arn = s.arn;
-        secret.name = s.name;
-        secret.description = s.description;
-        secret.kmsKeyId = s.kmsKeyId;
-        secret.createdDate = s.createdDate;
-        secret.deletedDate = s.deletedDate;
-        secret.lastAccessedDate = s.lastAccessedDate;
-        secret.lastChangedDate = s.lastChangedDate;
-        secret.lastRotatedDate = s.lastRotatedDate;
-        secret.nextRotatedDate = s.nextRotatedDate;
-        secret.rotationEnabled = s.rotationEnabled;
-        secret.rotationLambdaARN = s.rotationLambdaARN;
-
-        // Rotation rules
-        secret.rotationRules.automaticallyAfterDays = s.rotationRules.automaticallyAfterDays;
-        secret.rotationRules.duration = s.rotationRules.duration;
-        secret.rotationRules.scheduleExpression = s.rotationRules.scheduleExpression;
-
-        response.secretList.emplace_back(secret);
-      }
-      //response.nextToken = secrets.back().secretId;
-
-      // Convert to DTO
-      log_debug << "Database list secrets, region: " << request.region;
-      return response;
-
-    } catch (Poco::Exception &exc) {
-      log_error << "List secrets failed, message: " + exc.message();
-      throw Core::ServiceException(exc.message());
-    }
-  }
-
-  Dto::SecretsManager::UpdateSecretResponse SecretsManagerService::UpdateSecret(const Dto::SecretsManager::UpdateSecretRequest &request) {
-    log_trace << "Update secret request: " << request.ToString();
-
-    // Check bucket existence
-    if (!_database.SecretExists(request.secretId)) {
-      log_warning<< "Secret does not exist, secretId: " << request.secretId;
-      throw Core::ServiceException("Secret does not exist, secretId: " + request.secretId, Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+        } catch (Poco::Exception &exc) {
+            log_error << "Secret describe secret failed, message: " + exc.message();
+            throw Core::ServiceException(exc.message());
+        }
     }
 
-    try {
+    Dto::SecretsManager::RotateSecretResponse SecretsManagerService::RotateSecret(const Dto::SecretsManager::RotateSecretRequest &request) {
+        log_trace << "Rotate secret request: " << request.ToString();
 
-      // Get object from database
-      Database::Entity::SecretsManager::Secret secret = _database.GetSecretBySecretId(request.secretId);
+        // Check bucket existence
+        if (!_database.SecretExists(request.secretId)) {
+            log_warning << "Secret does not exist, secretId: " << request.secretId;
+            throw Core::ResourceNotFoundException("Secret does not exist, secretId: " + request.secretId);
+        }
 
-      // Update database
-      secret.kmsKeyId = request.kmsKeyId;
-      secret.secretString = request.secretString;
-      secret.secretBinary = request.secretBinary;
-      secret.description = request.description;
-      secret.lastChangedDate = Poco::Timestamp().epochTime();
+        try {
 
-      secret = _database.UpdateSecret(secret);
+            // Get object from database
+            Database::Entity::SecretsManager::Secret secret = _database.GetSecretBySecretId(request.secretId);
+            secret.lastRotatedDate = Poco::Timestamp().epochTime();
 
-      // Convert to DTO
-      log_debug << "Database secret described, secretId: " << request.secretId;
-      return {.region=secret.region, .name=secret.name, .arn=secret.arn, .versionId=secret.versionId};
+            // Update database
+            //secret.rotationRules = request.rotationRules;
+            //secret.secretString = request.secretString;
+            //secret.secretBinary = request.secretBinary;
+            //secret.description = request.description;
 
-    } catch (Poco::Exception &exc) {
-      log_error << "Secret describe secret failed, message: " + exc.message();
-      throw Core::ServiceException(exc.message());
-    }
-  }
+            secret = _database.UpdateSecret(secret);
 
-  Dto::SecretsManager::RotateSecretResponse SecretsManagerService::RotateSecret(const Dto::SecretsManager::RotateSecretRequest &request) {
-    log_trace << "Rotate secret request: " << request.ToString();
+            // Convert to DTO
+            log_debug << "Database secret described, secretId: " << request.secretId;
+            return {.region = secret.region, .arn = secret.arn};
 
-    // Check bucket existence
-    if (!_database.SecretExists(request.secretId)) {
-      log_warning<< "Secret does not exist, secretId: " << request.secretId;
-      throw Core::ResourceNotFoundException("Secret does not exist, secretId: " + request.secretId);
-    }
-
-    try {
-
-      // Get object from database
-      Database::Entity::SecretsManager::Secret secret = _database.GetSecretBySecretId(request.secretId);
-      secret.lastRotatedDate = Poco::Timestamp().epochTime();
-
-      // Update database
-      //secret.rotationRules = request.rotationRules;
-      //secret.secretString = request.secretString;
-      //secret.secretBinary = request.secretBinary;
-      //secret.description = request.description;
-
-      secret = _database.UpdateSecret(secret);
-
-      // Convert to DTO
-      log_debug << "Database secret described, secretId: " << request.secretId;
-      return {.region=secret.region, .arn=secret.arn};
-
-    } catch (Poco::Exception &exc) {
-      log_error << "Secret describe secret failed, message: " + exc.message();
-      throw Core::ServiceException(exc.message());
-    }
-  }
-
-  Dto::SecretsManager::DeleteSecretResponse SecretsManagerService::DeleteSecret(const Dto::SecretsManager::DeleteSecretRequest &request) {
-    log_trace << "Delete secret request: " << request.ToString();
-
-    // Check bucket existence
-    if (!_database.SecretExists(request.region, request.name)) {
-      log_warning<< "Secret does not exist, name: " << request.name;
-      throw Core::ServiceException("Secret does not exist, name: " + request.name, Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+        } catch (Poco::Exception &exc) {
+            log_error << "Secret describe secret failed, message: " + exc.message();
+            throw Core::ServiceException(exc.message());
+        }
     }
 
-    Dto::SecretsManager::DeleteSecretResponse response;
-    try {
+    Dto::SecretsManager::DeleteSecretResponse SecretsManagerService::DeleteSecret(const Dto::SecretsManager::DeleteSecretRequest &request) {
+        log_trace << "Delete secret request: " << request.ToString();
 
-      // Get object from database
-      Database::Entity::SecretsManager::Secret secret = _database.GetSecretByRegionName(request.region, request.name);
+        // Check bucket existence
+        if (!_database.SecretExists(request.region, request.name)) {
+            log_warning << "Secret does not exist, name: " << request.name;
+            throw Core::ServiceException("Secret does not exist, name: " + request.name, Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+        }
 
-      // Delete from database
-      _database.DeleteSecret(secret);
-      log_debug << "Database secret deleted, region: " << request.region << " name: " << request.name;
-      return {.region=request.region, .name=secret.name, .arn=secret.arn, .deletionDate=static_cast<double>(Poco::Timestamp().epochTime())};
+        Dto::SecretsManager::DeleteSecretResponse response;
+        try {
 
-    } catch (Poco::Exception &exc) {
-      log_error << "SecretManager delete secret failed, message: " + exc.message();
-      throw Core::ServiceException(exc.message());
+            // Get object from database
+            Database::Entity::SecretsManager::Secret secret = _database.GetSecretByRegionName(request.region, request.name);
+
+            // Delete from database
+            _database.DeleteSecret(secret);
+            log_debug << "Database secret deleted, region: " << request.region << " name: " << request.name;
+            return {.region = request.region, .name = secret.name, .arn = secret.arn, .deletionDate = static_cast<double>(Poco::Timestamp().epochTime())};
+
+        } catch (Poco::Exception &exc) {
+            log_error << "SecretManager delete secret failed, message: " + exc.message();
+            throw Core::ServiceException(exc.message());
+        }
     }
-  }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

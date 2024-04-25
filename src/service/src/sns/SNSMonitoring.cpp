@@ -32,4 +32,4 @@ namespace AwsMock::Service {
         }
         log_trace << "SNS update counter finished";
     }
-}
+}// namespace AwsMock::Service

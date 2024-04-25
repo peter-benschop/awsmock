@@ -67,4 +67,4 @@ namespace AwsMock::Controller {
 
         return module;
     }
-} // namespace AwsMock::Controller
+}// namespace AwsMock::Controller

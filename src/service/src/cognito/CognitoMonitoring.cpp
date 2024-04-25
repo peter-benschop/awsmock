@@ -30,4 +30,4 @@ namespace AwsMock::Service {
         }
         log_trace << "Cognito update counter finished";
     }
-}
+}// namespace AwsMock::Service

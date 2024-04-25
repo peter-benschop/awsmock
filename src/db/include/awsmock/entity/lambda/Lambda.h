@@ -6,17 +6,17 @@
 #define AWSMOCK_DB_ENTITY_LAMBDA_H
 
 // C++ includes
+#include <iostream>
+#include <map>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <map>
-#include <iostream>
-#include <sstream>
 
 // MongoDB includes
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/stdx.hpp>
 
 // Poco includes
@@ -26,19 +26,19 @@
 #include <Poco/JSON/Object.h>
 
 // AwsMock includes
-#include <awsmock/entity/lambda/Tags.h>
 #include <awsmock/entity/lambda/Environment.h>
 #include <awsmock/entity/lambda/EphemeralStorage.h>
+#include <awsmock/entity/lambda/Tags.h>
 
 namespace AwsMock::Database::Entity::Lambda {
 
+    using bsoncxx::to_json;
+    using bsoncxx::view_or_value;
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
-    using bsoncxx::view_or_value;
-    using bsoncxx::document::view;
     using bsoncxx::document::value;
-    using bsoncxx::to_json;
+    using bsoncxx::document::view;
 
     /**
      * Lambda state
@@ -52,11 +52,11 @@ namespace AwsMock::Database::Entity::Lambda {
         Failed
     };
 
-    static std::map <LambdaState, std::string> LambdaStateNames{
-            {LambdaState::Pending,  "Pending"},
-            {LambdaState::Active,   "Active"},
+    static std::map<LambdaState, std::string> LambdaStateNames{
+            {LambdaState::Pending, "Pending"},
+            {LambdaState::Active, "Active"},
             {LambdaState::Inactive, "Inactive"},
-            {LambdaState::Failed,   "Failed"},
+            {LambdaState::Failed, "Failed"},
     };
 
     [[maybe_unused]] static std::string LambdaStateToString(LambdaState lambdaState) {
@@ -99,31 +99,31 @@ namespace AwsMock::Database::Entity::Lambda {
         FunctionError
     };
 
-    static std::map <LambdaStateReasonCode, std::string> LambdaStateReasonCodeNames{
-            {LambdaStateReasonCode::Idle,                        "Idle"},
-            {LambdaStateReasonCode::Creating,                    "Creating"},
-            {LambdaStateReasonCode::Restoring,                   "Restoring"},
-            {LambdaStateReasonCode::EniLimitExceeded,            "EniLimitExceeded"},
+    static std::map<LambdaStateReasonCode, std::string> LambdaStateReasonCodeNames{
+            {LambdaStateReasonCode::Idle, "Idle"},
+            {LambdaStateReasonCode::Creating, "Creating"},
+            {LambdaStateReasonCode::Restoring, "Restoring"},
+            {LambdaStateReasonCode::EniLimitExceeded, "EniLimitExceeded"},
             {LambdaStateReasonCode::InsufficientRolePermissions, "InsufficientRolePermissions"},
-            {LambdaStateReasonCode::InvalidConfiguration,        "InvalidConfiguration"},
-            {LambdaStateReasonCode::InternalError,               "InternalError"},
-            {LambdaStateReasonCode::SubnetOutOfIPAddresses,      "SubnetOutOfIPAddresses"},
-            {LambdaStateReasonCode::InvalidSubnet,               "InvalidSubnet"},
-            {LambdaStateReasonCode::InvalidSecurityGroup,        "InvalidSecurityGroup"},
-            {LambdaStateReasonCode::ImageDeleted,                "ImageDeleted"},
-            {LambdaStateReasonCode::ImageAccessDenied,           "ImageAccessDenied"},
-            {LambdaStateReasonCode::InvalidImage,                "InvalidImage"},
-            {LambdaStateReasonCode::KMSKeyAccessDenied,          "KMSKeyAccessDenied"},
-            {LambdaStateReasonCode::KMSKeyNotFound,              "KMSKeyNotFound"},
-            {LambdaStateReasonCode::InvalidStateKMSKey,          "InvalidStateKMSKey"},
-            {LambdaStateReasonCode::DisabledKMSKey,              "DisabledKMSKey"},
-            {LambdaStateReasonCode::EFSIOError,                  "EFSIOError"},
-            {LambdaStateReasonCode::EFSMountConnectivityError,   "EFSMountConnectivityError"},
-            {LambdaStateReasonCode::EFSMountFailure,             "EFSMountFailure"},
-            {LambdaStateReasonCode::EFSMountTimeout,             "EFSMountTimeout"},
-            {LambdaStateReasonCode::InvalidRuntime,              "InvalidRuntime"},
-            {LambdaStateReasonCode::InvalidZipFileException,     "InvalidZipFileException"},
-            {LambdaStateReasonCode::FunctionError,               "FunctionError"},
+            {LambdaStateReasonCode::InvalidConfiguration, "InvalidConfiguration"},
+            {LambdaStateReasonCode::InternalError, "InternalError"},
+            {LambdaStateReasonCode::SubnetOutOfIPAddresses, "SubnetOutOfIPAddresses"},
+            {LambdaStateReasonCode::InvalidSubnet, "InvalidSubnet"},
+            {LambdaStateReasonCode::InvalidSecurityGroup, "InvalidSecurityGroup"},
+            {LambdaStateReasonCode::ImageDeleted, "ImageDeleted"},
+            {LambdaStateReasonCode::ImageAccessDenied, "ImageAccessDenied"},
+            {LambdaStateReasonCode::InvalidImage, "InvalidImage"},
+            {LambdaStateReasonCode::KMSKeyAccessDenied, "KMSKeyAccessDenied"},
+            {LambdaStateReasonCode::KMSKeyNotFound, "KMSKeyNotFound"},
+            {LambdaStateReasonCode::InvalidStateKMSKey, "InvalidStateKMSKey"},
+            {LambdaStateReasonCode::DisabledKMSKey, "DisabledKMSKey"},
+            {LambdaStateReasonCode::EFSIOError, "EFSIOError"},
+            {LambdaStateReasonCode::EFSMountConnectivityError, "EFSMountConnectivityError"},
+            {LambdaStateReasonCode::EFSMountFailure, "EFSMountFailure"},
+            {LambdaStateReasonCode::EFSMountTimeout, "EFSMountTimeout"},
+            {LambdaStateReasonCode::InvalidRuntime, "InvalidRuntime"},
+            {LambdaStateReasonCode::InvalidZipFileException, "InvalidZipFileException"},
+            {LambdaStateReasonCode::FunctionError, "FunctionError"},
     };
 
     [[maybe_unused]] static std::string LambdaStateReasonCodeToString(LambdaStateReasonCode lambdaStateReasonCode) {
@@ -204,7 +204,7 @@ namespace AwsMock::Database::Entity::Lambda {
         /**
          * Tags
          */
-        std::map <std::string, std::string> tags;
+        std::map<std::string, std::string> tags;
 
         /**
          * ARN
@@ -297,14 +297,14 @@ namespace AwsMock::Database::Entity::Lambda {
          *
          * @return entity as MongoDB document.
          */
-        [[nodiscard]] view_or_value <view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * Converts the MongoDB document to an entity
          *
          * @param mResult query result.
          */
-        void FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult);
+        void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
         /**
          * Converts the entity to a JSON object
@@ -328,9 +328,8 @@ namespace AwsMock::Database::Entity::Lambda {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const Lambda &lambda);
-
     };
 
-    typedef std::vector <Lambda> LambdaList;
-}
-#endif //AWSMOCK_DB_ENTITY_LAMBDA_H
+    typedef std::vector<Lambda> LambdaList;
+}// namespace AwsMock::Database::Entity::Lambda
+#endif//AWSMOCK_DB_ENTITY_LAMBDA_H

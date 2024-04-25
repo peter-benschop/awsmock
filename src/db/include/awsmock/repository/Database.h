@@ -10,17 +10,17 @@
 
 // MongoDB includes
 #include <mongocxx/client.hpp>
-#include <mongocxx/pool.hpp>
-#include <mongocxx/uri.hpp>
 #include <mongocxx/exception/exception.hpp>
 #include <mongocxx/exception/query_exception.hpp>
+#include <mongocxx/pool.hpp>
+#include <mongocxx/uri.hpp>
 
 // Poco includes
 #include <Poco/Util/AbstractConfiguration.h>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
+#include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Database {
 
@@ -32,7 +32,6 @@ namespace AwsMock::Database {
     class Database {
 
       public:
-
         /**
          * Constructor
          *
@@ -84,7 +83,6 @@ namespace AwsMock::Database {
         void StopDatabase();
 
       private:
-
         /**
          * Update module status
          */
@@ -128,7 +126,7 @@ namespace AwsMock::Database {
         /**
          * Database client
          */
-        std::unique_ptr <mongocxx::pool> _pool;
+        std::unique_ptr<mongocxx::pool> _pool;
 
         /**
          * Database connection pool size
@@ -141,6 +139,6 @@ namespace AwsMock::Database {
         bool _useDatabase;
     };
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
 
-#endif // AWSMOCK_REPOSITORY_DATABASE_H
+#endif// AWSMOCK_REPOSITORY_DATABASE_H

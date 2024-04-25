@@ -6,47 +6,47 @@
 #define AWSMOCK_DTO_LAMBDA_INVOCATIONNOTIFICATION_H
 
 // C++ includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // Poco includes
 #include <Poco/Notification.h>
 
 namespace AwsMock::Dto::Lambda {
 
-  struct InvocationNotification : public Poco::Notification {
+    struct InvocationNotification : public Poco::Notification {
 
-    /**
+        /**
      * Function name
      */
-    std::string functionName;
+        std::string functionName;
 
-    /**
+        /**
      * Payload
      */
-    std::string payload;
+        std::string payload;
 
-    /**
+        /**
      * AWS region
      */
-    std::string region;
+        std::string region;
 
-    /**
+        /**
      * AWS user
      */
-    std::string user;
+        std::string user;
 
-    /**
+        /**
      * Host name
      */
-    std::string hostName;
+        std::string hostName;
 
-    /**
+        /**
      * Host name
      */
-    int port;
+        int port;
 
-    /**
+        /**
      * Constructor
      *
      * @param functionName name of the lambda function
@@ -56,21 +56,21 @@ namespace AwsMock::Dto::Lambda {
      * @param hostName hostname of the lambda function
      * @param port lambda function port
      */
-    InvocationNotification(const std::string &functionName, const std::string &payload, const std::string &region, const std::string &user, const std::string &hostName, int port);
+        InvocationNotification(const std::string &functionName, const std::string &payload, const std::string &region, const std::string &user, const std::string &hostName, int port);
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const InvocationNotification &i);
-  };
-}
-#endif // AWSMOCK_DTO_LAMBDA_INVOCATIONNOTIFICATION_H
+        friend std::ostream &operator<<(std::ostream &os, const InvocationNotification &i);
+    };
+}// namespace AwsMock::Dto::Lambda
+#endif// AWSMOCK_DTO_LAMBDA_INVOCATIONNOTIFICATION_H

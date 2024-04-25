@@ -6,29 +6,29 @@
 #define AWSMOCK_DTO_DYNAMODB_DYNAMODB_RESPONSE_H
 
 // C++ standard includes
-#include <string>
 #include <map>
+#include <string>
 
 namespace AwsMock::Dto::DynamoDb {
 
-  struct DynamoDbResponse {
+    struct DynamoDbResponse {
 
-    /**
+        /**
      * Body
      */
-    std::string body;
+        std::string body;
 
-    /**
+        /**
      * Headers
      */
-    std::map<std::string, std::string> headers;
+        std::map<std::string, std::string> headers;
 
-    /**
+        /**
      * Status from DynamoDb docker image
      */
-    Poco::Net::HTTPResponse::HTTPStatus status;
-  };
+        Poco::Net::HTTPResponse::HTTPStatus status;
+    };
 
-} // namespace AwsMock::Dto::DynamoDb
+}// namespace AwsMock::Dto::DynamoDb
 
-#endif //AWSMOCK_DTO_DYNAMODB_DYNAMODB_RESPONSE_H
+#endif//AWSMOCK_DTO_DYNAMODB_DYNAMODB_RESPONSE_H

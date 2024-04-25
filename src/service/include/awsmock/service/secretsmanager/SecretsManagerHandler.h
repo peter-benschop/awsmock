@@ -9,34 +9,33 @@
 #include <Poco/Condition.h>
 
 // AwsMock includes
+#include "awsmock/service/common/AbstractHandler.h"
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/MetricService.h>
 #include <awsmock/core/MetricDefinition.h>
+#include <awsmock/core/MetricService.h>
 #include <awsmock/dto/common/SecretsManagerClientCommand.h>
-#include "awsmock/service/common/AbstractHandler.h"
-#include <awsmock/service/secretsmanager/SecretsManagerService.h>
 #include <awsmock/service/secretsmanager/SecretsManagerCmdHandler.h>
+#include <awsmock/service/secretsmanager/SecretsManagerService.h>
 
 namespace AwsMock::Service {
 
-  /**
+    /**
    * AWS secrets manager mock handler.
    *
    * @author jens.vogt@opitz-consulting.com
    */
-  class SecretsManagerHandler : public SecretsManagerCmdHandler {
+    class SecretsManagerHandler : public SecretsManagerCmdHandler {
 
-  public:
-
-    /**
+      public:
+        /**
      * Constructor
      *
      * @param configuration application configuration
      */
-    SecretsManagerHandler(Core::Configuration &configuration);
+        SecretsManagerHandler(Core::Configuration &configuration);
 
-    /**
+        /**
      * HTTP POST request.
      *
      * @param request HTTP request
@@ -45,10 +44,9 @@ namespace AwsMock::Service {
      * @param user AWS user
      * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
      */
-    void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+        void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+    };
 
-  };
+}// namespace AwsMock::Service
 
-} // namespace AwsMock::Service
-
-#endif // AWSMOCK_SERVICE_SECRETSMANAGER_HANDLER_H
+#endif// AWSMOCK_SERVICE_SECRETSMANAGER_HANDLER_H

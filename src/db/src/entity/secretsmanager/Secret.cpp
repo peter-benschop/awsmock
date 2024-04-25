@@ -6,21 +6,21 @@
 
 namespace AwsMock::Database::Entity::SecretsManager {
 
+    using bsoncxx::view_or_value;
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
-    using bsoncxx::view_or_value;
-    using bsoncxx::document::view;
     using bsoncxx::document::value;
+    using bsoncxx::document::view;
 
-    view_or_value <view, value> Secret::ToDocument() const {
+    view_or_value<view, value> Secret::ToDocument() const {
 
-        view_or_value <view, value> rotationRulesDoc = make_document(
+        view_or_value<view, value> rotationRulesDoc = make_document(
                 kvp("automaticallyAfterDays", rotationRules.automaticallyAfterDays),
                 kvp("duration", rotationRules.duration),
                 kvp("scheduleExpression", rotationRules.scheduleExpression));
 
-        view_or_value <view, value> secretDoc = make_document(
+        view_or_value<view, value> secretDoc = make_document(
                 kvp("region", region),
                 kvp("name", name),
                 kvp("arn", arn),
@@ -47,7 +47,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
         return secretDoc;
     }
 
-    void Secret::FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult) {
+    void Secret::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         try {
             oid = mResult.value()["_id"].get_oid().value.to_string();
@@ -109,7 +109,6 @@ namespace AwsMock::Database::Entity::SecretsManager {
         jsonObject.set("rotationLambdaARN", rotationLambdaARN);
         jsonObject.set("RotationRules", rotationRules.ToJsonObject());
         return jsonObject;
-
     }
 
     void Secret::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
@@ -145,4 +144,4 @@ namespace AwsMock::Database::Entity::SecretsManager {
         return os;
     }
 
-} // namespace AwsMock::Database::Entity::S3
+}// namespace AwsMock::Database::Entity::SecretsManager

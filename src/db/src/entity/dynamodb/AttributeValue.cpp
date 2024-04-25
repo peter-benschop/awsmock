@@ -74,7 +74,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
         }
     }
 
-    view_or_value <view, value> AttributeValue::ToDocument() const {
+    view_or_value<view, value> AttributeValue::ToDocument() const {
 
         // Convert string set to document
         auto stringSetDoc = bsoncxx::builder::basic::array{};
@@ -88,7 +88,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
             numberSetDoc.append(nValue);
         }
 
-        view_or_value <view, value> attributeDoc = make_document(
+        view_or_value<view, value> attributeDoc = make_document(
                 kvp("S", stringValue),
                 kvp("SS", stringSetDoc),
                 kvp("N", numberValue),
@@ -114,4 +114,4 @@ namespace AwsMock::Database::Entity::DynamoDb {
         return os;
     }
 
-} // namespace AwsMock::Dto::lambda
+}// namespace AwsMock::Database::Entity::DynamoDb

@@ -6,14 +6,14 @@
 #define AWSMOCK_DTO_LAMBDA_CREATEFUNCTIONRESPONSE_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 #include <vector>
 
 // Poco includes
+#include <Poco/Dynamic/Var.h>
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
-#include <Poco/Dynamic/Var.h>
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
@@ -22,7 +22,7 @@
 
 namespace AwsMock::Dto::Lambda {
 
-  /**
+    /**
    * Create function response
    *
    * Example:
@@ -69,139 +69,138 @@ namespace AwsMock::Dto::Lambda {
    * }
    * </pre>
    */
-  struct CreateFunctionResponse {
+    struct CreateFunctionResponse {
 
-    /**
+        /**
      * Name of the function
      */
-    std::string functionArn;
+        std::string functionArn;
 
-    /**
+        /**
      * Name of the function
      */
-    std::string functionName;
+        std::string functionName;
 
-    /**
+        /**
      * Runtime environment
      */
-    std::string runtime;
+        std::string runtime;
 
-    /**
+        /**
      * Role
      */
-    std::string role;
+        std::string role;
 
-    /**
+        /**
      * Role
      */
-    std::string handler;
+        std::string handler;
 
-    /**
+        /**
      * Environment
      */
-    EnvironmentVariables environment;
+        EnvironmentVariables environment;
 
-    /**
+        /**
      * Memory size
      */
-    long memorySize = 128;
+        long memorySize = 128;
 
-    /**
+        /**
      * Code size
      */
-    long codeSize;
+        long codeSize;
 
-    /**
+        /**
      * Description
      */
-    std::string description;
+        std::string description;
 
-    /**
+        /**
      * Timeout
      */
-    int timeout = 3;
+        int timeout = 3;
 
-    /**
+        /**
      * Code SHA256
      */
-    std::string codeSha256;
+        std::string codeSha256;
 
-    /**
+        /**
      * Temporary disk space in MB
      */
-    EphemeralStorage ephemeralStorage;
+        EphemeralStorage ephemeralStorage;
 
-    /**
+        /**
      * Modified
      */
-    std::string modified = Core::DateTimeUtils::AwsDatetimeNow();
+        std::string modified = Core::DateTimeUtils::AwsDatetimeNow();
 
-    /**
+        /**
      * Docker image ID
      */
-    std::string dockerImageId;
+        std::string dockerImageId;
 
-    /**
+        /**
      * Docker container ID
      */
-    std::string dockerContainerId;
+        std::string dockerContainerId;
 
-    /**
+        /**
      * Convert to a JSON string
      *
      * @return JSON string
      */
-    [[nodiscard]] std::string ToJson() const {
+        [[nodiscard]] std::string ToJson() const {
 
-      try {
-        Poco::JSON::Object rootJson;
-        rootJson.set("FunctionArn", functionArn);
-        rootJson.set("FunctionName", functionName);
-        rootJson.set("Runtime", runtime);
-        rootJson.set("Role", role);
-        rootJson.set("Handler", handler);
-        rootJson.set("MemorySize", memorySize);
-        rootJson.set("CodeSize", codeSize);
-        rootJson.set("Timeout", timeout);
-        rootJson.set("CodeSha256", codeSha256);
-        rootJson.set("LastModified", modified);
-        rootJson.set("Environment", environment.ToJson());
-        rootJson.set("EphemeralStorage", ephemeralStorage.ToJson());
-        rootJson.set("MemorySize", memorySize);
+            try {
+                Poco::JSON::Object rootJson;
+                rootJson.set("FunctionArn", functionArn);
+                rootJson.set("FunctionName", functionName);
+                rootJson.set("Runtime", runtime);
+                rootJson.set("Role", role);
+                rootJson.set("Handler", handler);
+                rootJson.set("MemorySize", memorySize);
+                rootJson.set("CodeSize", codeSize);
+                rootJson.set("Timeout", timeout);
+                rootJson.set("CodeSha256", codeSha256);
+                rootJson.set("LastModified", modified);
+                rootJson.set("Environment", environment.ToJson());
+                rootJson.set("EphemeralStorage", ephemeralStorage.ToJson());
+                rootJson.set("MemorySize", memorySize);
 
-        std::ostringstream os;
-        rootJson.stringify(os);
-        return os.str();
+                std::ostringstream os;
+                rootJson.stringify(os);
+                return os.str();
 
-      } catch (Poco::Exception &exc) {
-        throw Core::ServiceException(exc.message(), 500);
-      }
-    }
+            } catch (Poco::Exception &exc) {
+                throw Core::ServiceException(exc.message(), 500);
+            }
+        }
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const {
-      std::stringstream ss;
-      ss << (*this);
-      return ss.str();
-    }
+        [[nodiscard]] std::string ToString() const {
+            std::stringstream ss;
+            ss << (*this);
+            return ss.str();
+        }
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const CreateFunctionResponse &r) {
-      os << "CreateFunctionResponse={functionName='" << r.functionName << "' runtime: '" << r.runtime + "' role='" << r.role << "' handler='" << r.handler +
-          "' memorySize='" << r.memorySize << "' {" << r.environment.ToString() << "}" << " dockerImageId='" << r.dockerImageId << "' dockerContainerId='" <<
-         r.dockerImageId << "'}";
-      return os;
-    }
-  };
+        friend std::ostream &operator<<(std::ostream &os, const CreateFunctionResponse &r) {
+            os << "CreateFunctionResponse={functionName='" << r.functionName << "' runtime: '" << r.runtime + "' role='" << r.role << "' handler='" << r.handler + "' memorySize='" << r.memorySize << "' {" << r.environment.ToString() << "}"
+               << " dockerImageId='" << r.dockerImageId << "' dockerContainerId='" << r.dockerImageId << "'}";
+            return os;
+        }
+    };
 
-} // namespace AwsMock::Dto::lambda
+}// namespace AwsMock::Dto::Lambda
 
-#endif // AWSMOCK_DTO_LAMBDA_CREATEFUNCTIONRESPONSE_H
+#endif// AWSMOCK_DTO_LAMBDA_CREATEFUNCTIONRESPONSE_H

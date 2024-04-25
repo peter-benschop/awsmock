@@ -7,12 +7,12 @@
 
 // Poco includes
 #include <Poco/Logger.h>
-#include <Poco/Runnable.h>
-#include <Poco/Notification.h>
-#include <Poco/NotificationQueue.h>
 #include <Poco/Net/HTTPClientSession.h>
 #include <Poco/Net/HTTPRequest.h>
 #include <Poco/Net/HTTPResponse.h>
+#include <Poco/Notification.h>
+#include <Poco/NotificationQueue.h>
+#include <Poco/Runnable.h>
 
 // AwsMock includes
 #include <awsmock/core/CurlUtils.h>
@@ -23,7 +23,7 @@
 
 namespace AwsMock::Service {
 
-  /**
+    /**
    * AWS lambda executor. The executor is launched asynchronously.
    *
    * <p>
@@ -33,31 +33,29 @@ namespace AwsMock::Service {
    *
    * @author jens.vogt@opitz-consulting.com
    */
-  class LambdaExecutor {
+    class LambdaExecutor {
 
-  public:
-
-    /**
+      public:
+        /**
      * Send the invocation request to the corresponding port
      *
      * @param url lambda docker URL
      * @param body event payload
      */
-    static void SendInvocationRequest(const std::string &url, const std::string &body);
+        static void SendInvocationRequest(const std::string &url, const std::string &body);
 
-  private:
-
-    /**
+      private:
+        /**
      * Metric module
      */
-    Core::MetricService& _metricService = Core::MetricService::instance();
+        Core::MetricService &_metricService = Core::MetricService::instance();
 
-    /**
+        /**
      * Mutex
      */
-    static Poco::Mutex _mutex;
-  };
+        static Poco::Mutex _mutex;
+    };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_LAMBDAEXECUTOR_H
+#endif// AWSMOCK_SERVICE_LAMBDAEXECUTOR_H

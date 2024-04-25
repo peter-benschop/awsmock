@@ -57,16 +57,16 @@ namespace AwsMock::Database::Entity::SQS {
         Core::JsonUtils::GetJsonValueString("deadLetterTargetArn", jsonObject, deadLetterTargetArn);
     }
 
-    view_or_value <view, value> RedrivePolicy::ToDocument() const {
+    view_or_value<view, value> RedrivePolicy::ToDocument() const {
 
-        view_or_value <view, value> redrivePolicyDoc = make_document(
+        view_or_value<view, value> redrivePolicyDoc = make_document(
                 kvp("deadLetterTargetArn", deadLetterTargetArn),
                 kvp("maxReceiveCount", maxReceiveCount));
 
         return redrivePolicyDoc;
     }
 
-    void RedrivePolicy::FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult) {
+    void RedrivePolicy::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         deadLetterTargetArn = bsoncxx::string::to_string(mResult.value()["deadLetterTargetArn"].get_string().value);
         maxReceiveCount = mResult.value()["maxReceiveCount"].get_int32().value;
@@ -90,4 +90,4 @@ namespace AwsMock::Database::Entity::SQS {
         return os;
     }
 
-} // namespace AwsMock::Database::Entity::SQS
+}// namespace AwsMock::Database::Entity::SQS

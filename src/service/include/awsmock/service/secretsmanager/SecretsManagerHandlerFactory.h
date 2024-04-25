@@ -15,45 +15,41 @@
 
 namespace AwsMock::Service {
 
-  /**
+    /**
    * Secrets manager request handler factory
    *
    * @author jens.vogt@opitz-consulting.com
    */
-  class SecretsManagerRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
+    class SecretsManagerRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 
-  public:
-
-    /**
+      public:
+        /**
      * Constructor
      *
      * @param configuration application configuration
-     * @param metricService  monitoring
      */
-    explicit SecretsManagerRequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
+        explicit SecretsManagerRequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
 
-    /**
+        /**
      * Create a new request handler
      *
      * @param request HTTP request
      * @return pointer to request handler
      */
-    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
-      if(request.getURI().empty()) {
-        return nullptr;
-      }
-      return new SecretsManagerHandler(_configuration);
-    }
+        Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
+            if (request.getURI().empty()) {
+                return nullptr;
+            }
+            return new SecretsManagerHandler(_configuration);
+        }
 
-  private:
-
-    /**
+      private:
+        /**
      * S3 handler configuration
      */
-    Core::Configuration &_configuration;
+        Core::Configuration &_configuration;
+    };
 
-  };
+}// namespace AwsMock::Service
 
-} // namespace AwsMock::Service
-
-#endif //AWSMOCK_SERVICE_SECRETMANAGER_HANDLER_FACTORY_H
+#endif//AWSMOCK_SERVICE_SECRETMANAGER_HANDLER_FACTORY_H

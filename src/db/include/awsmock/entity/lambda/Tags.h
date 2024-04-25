@@ -6,25 +6,25 @@
 #define AWSMOCK_DB_ENTITY_LAMBDA_TAGS_H
 
 // C++ includes
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
 
 // MongoDB includes
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/stdx.hpp>
 
 namespace AwsMock::Database::Entity::Lambda {
 
+    using bsoncxx::view_or_value;
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
-    using bsoncxx::view_or_value;
-    using bsoncxx::document::view;
     using bsoncxx::document::value;
+    using bsoncxx::document::view;
 
     /**
      * Lambda tags entity
@@ -36,7 +36,7 @@ namespace AwsMock::Database::Entity::Lambda {
         /**
          * Variables
          */
-        std::vector <std::pair<std::string, std::string>> tags;
+        std::vector<std::pair<std::string, std::string>> tags;
 
         /**
          * Checks whether a tags with the given tags key exists.
@@ -59,14 +59,14 @@ namespace AwsMock::Database::Entity::Lambda {
          *
          * @param mResult MongoDB document view.
          */
-        [[maybe_unused]] void FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult);
+        [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
         /**
          * Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
          */
-        [[nodiscard]] view_or_value <view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * Converts the DTO to a string representation.
@@ -83,9 +83,8 @@ namespace AwsMock::Database::Entity::Lambda {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const Tags &tag);
-
     };
 
-} // namespace AwsMock::Database::Entity::lambda
+}// namespace AwsMock::Database::Entity::Lambda
 
-#endif // AWSMOCK_DB_ENTITY_LAMBDA_TAGS_H
+#endif// AWSMOCK_DB_ENTITY_LAMBDA_TAGS_H

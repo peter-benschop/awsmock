@@ -21,4 +21,4 @@ namespace AwsMock::Service {
         _metricService.SetGauge(TRANSFER_SERVER_COUNT, servers);
         log_trace << "Transfer update counter finished";
     }
-}
+}// namespace AwsMock::Service

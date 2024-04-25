@@ -6,11 +6,11 @@
 #define AWSMOCK_DB_ENTITY_S3_OBJECT_H
 
 // C++ includes
-#include <string>
-#include <sstream>
-#include <iostream>
 #include <chrono>
+#include <iostream>
 #include <map>
+#include <sstream>
+#include <string>
 
 // Poco includes
 #include <Poco/DateTime.h>
@@ -20,12 +20,12 @@
 #include <Poco/JSON/Object.h>
 
 // MongoDB includes
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
-#include <mongocxx/stdx.hpp>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/exception/exception.hpp>
+#include <mongocxx/stdx.hpp>
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
@@ -33,11 +33,11 @@
 namespace AwsMock::Database::Entity::S3 {
 
     using bsoncxx::view_or_value;
-    using bsoncxx::document::view;
-    using bsoncxx::document::value;
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
+    using bsoncxx::document::value;
+    using bsoncxx::document::view;
 
     /**
      * S3 object entity
@@ -99,7 +99,7 @@ namespace AwsMock::Database::Entity::S3 {
         /**
          * Metadata
          */
-        std::map <std::string, std::string> metadata;
+        std::map<std::string, std::string> metadata;
 
         /**
          * Object internal name
@@ -126,14 +126,14 @@ namespace AwsMock::Database::Entity::S3 {
          *
          * @return entity as MongoDB document.
          */
-        [[nodiscard]] view_or_value <view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * Converts the MongoDB document to an entity
          *
          * @param mResult MongoDB document.
          */
-        void FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult);
+        void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
         /**
          * Converts the entity to a JSON object
@@ -167,9 +167,9 @@ namespace AwsMock::Database::Entity::S3 {
     };
 
     typedef struct Object Object;
-    typedef std::vector <Object> ObjectList;
+    typedef std::vector<Object> ObjectList;
 
-}
+}// namespace AwsMock::Database::Entity::S3
 // namespace AwsMock::Database::S3::Entity
 
-#endif //AWSMOCK_DB_ENTITY_S3_OBJECT_H
+#endif//AWSMOCK_DB_ENTITY_S3_OBJECT_H

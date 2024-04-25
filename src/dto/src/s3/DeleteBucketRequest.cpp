@@ -6,31 +6,31 @@
 
 namespace AwsMock::Dto::S3 {
 
-  std::string DeleteBucketRequest::ToJson() const {
+    std::string DeleteBucketRequest::ToJson() const {
 
-    try {
-      Poco::JSON::Object rootJson;
-      rootJson.set("region", region);
-      rootJson.set("bucket", bucket);
-      rootJson.set("owner", owner);
+        try {
+            Poco::JSON::Object rootJson;
+            rootJson.set("region", region);
+            rootJson.set("bucket", bucket);
+            rootJson.set("owner", owner);
 
-      return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::JsonUtils::ToJsonString(rootJson);
 
-    } catch (Poco::Exception &exc) {
-      log_error << exc.message();
-      throw Core::JsonException(exc.message());
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }
     }
-  }
 
-  std::string DeleteBucketRequest::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+    std::string DeleteBucketRequest::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
+    }
 
-  std::ostream &operator<<(std::ostream &os, const DeleteBucketRequest &r) {
-    os << "DeleteBucketRequest=" << r.ToJson();
-    return os;
-  }
+    std::ostream &operator<<(std::ostream &os, const DeleteBucketRequest &r) {
+        os << "DeleteBucketRequest=" << r.ToJson();
+        return os;
+    }
 
-} // namespace AwsMock::Dto::S3
+}// namespace AwsMock::Dto::S3

@@ -11,8 +11,8 @@
 // Poco includes
 #include <Poco/Condition.h>
 #include <Poco/Logger.h>
-#include <Poco/Runnable.h>
 #include <Poco/NotificationQueue.h>
+#include <Poco/Runnable.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
@@ -20,8 +20,8 @@
 #include <awsmock/core/MetricService.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
 #include <awsmock/repository/ModuleDatabase.h>
-#include <awsmock/service/common/AbstractWorker.h>
 #include <awsmock/service/common/AbstractServer.h>
+#include <awsmock/service/common/AbstractWorker.h>
 #include <awsmock/service/dynamodb/DynamoDbHandlerFactory.h>
 #include <awsmock/service/dynamodb/DynamoDbMonitoring.h>
 
@@ -35,10 +35,10 @@
 #define DYNAMODB_DOCKER_TAG std::string("latest")
 #define DYNAMODB_INTERNAL_PORT 8000
 #define DYNAMODB_EXTERNAL_PORT 8000
-#define DYNAMODB_DOCKER_FILE "FROM amazon/dynamodb-local:latest\n" \
+#define DYNAMODB_DOCKER_FILE "FROM amazon/dynamodb-local:latest\n"                           \
                              "VOLUME /home/awsmock/data/dynamodb /home/dynamodblocal/data\n" \
-                             "WORKDIR /home/dynamodblocal\n" \
-                             "EXPOSE 8000 8000\n" \
+                             "WORKDIR /home/dynamodblocal\n"                                 \
+                             "EXPOSE 8000 8000\n"                                            \
                              "ENTRYPOINT [\"java\", \"-Djava.library.path=./DynamoDBLocal_lib\", \"-jar\", \"DynamoDBLocal.jar\", \"-sharedDb\"]\n"
 
 namespace AwsMock::Service {
@@ -51,7 +51,6 @@ namespace AwsMock::Service {
     class DynamoDbServer : public AbstractServer, public AbstractWorker {
 
       public:
-
         /**
          * Constructor
          *
@@ -80,7 +79,6 @@ namespace AwsMock::Service {
         void Shutdown() override;
 
       private:
-
         /**
          * Delete dangling, stopped containers
          */
@@ -166,6 +164,6 @@ namespace AwsMock::Service {
         std::string _module;
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVER_DYNAMODB_SERVER_H
+#endif// AWSMOCK_SERVER_DYNAMODB_SERVER_H

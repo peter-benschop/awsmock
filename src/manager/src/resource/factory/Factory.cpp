@@ -14,4 +14,4 @@ namespace AwsMock::Resource::Factory {
         }
         return factory;
     }
-}
+}// namespace AwsMock::Resource::Factory

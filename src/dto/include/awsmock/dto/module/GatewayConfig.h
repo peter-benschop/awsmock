@@ -15,106 +15,105 @@
 
 namespace AwsMock::Dto::Module {
 
-  struct GatewayConfig {
+    struct GatewayConfig {
 
-    /**
+        /**
      * Default region
      */
-    std::string region;
+        std::string region;
 
-    /**
+        /**
      * Endpoint
      */
-    std::string endpoint;
+        std::string endpoint;
 
-    /**
+        /**
      * Protocol
      */
-    std::string protocol = "http";
+        std::string protocol = "http";
 
-    /**
+        /**
      * Host
      */
-    std::string host = "localhost";
+        std::string host = "localhost";
 
-    /**
+        /**
      * Port
      */
-    int port = 4566;
+        int port = 4566;
 
-    /**
+        /**
      * User ID
      */
-    std::string user = "none";
+        std::string user = "none";
 
-    /**
+        /**
      * Access ID
      */
-    std::string accessId = "000000000000";
+        std::string accessId = "000000000000";
 
-    /**
+        /**
      * Client ID
      */
-    std::string clientId = "000000000000";
+        std::string clientId = "000000000000";
 
-    /**
+        /**
      * Access key ID
      */
-    std::string accessKeyId = "none";
+        std::string accessKeyId = "none";
 
-    /**
+        /**
      * Secret access key
      */
-    std::string secretAccessKey = "none";
+        std::string secretAccessKey = "none";
 
-    /**
+        /**
      * Data directory
      */
-    std::string dataDir = "/tmp/awsmock/data";
+        std::string dataDir = "/tmp/awsmock/data";
 
-    /**
+        /**
      * Pretty print
      */
-    bool prettyPrint = false;
+        bool prettyPrint = false;
 
-    /**
+        /**
      * Database active
      */
-    bool databaseActive = false;
+        bool databaseActive = false;
 
-    /**
+        /**
      * Convert to JSON representation
      *
      * @return JSON string
      */
-    std::string ToJson() const;
+        std::string ToJson() const;
 
-    /**
+        /**
      * Convert from JSON representation
      *
      * @param payload JSON representation
      * @return GatewayConfig
      */
-    static GatewayConfig FromJson(const std::string &payload);
+        static GatewayConfig FromJson(const std::string &payload);
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @param os output stream
      * @param m module struct
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const GatewayConfig &m);
+        friend std::ostream &operator<<(std::ostream &os, const GatewayConfig &m);
+    };
 
-  };
+}// namespace AwsMock::Dto::Module
 
-} // namespace AwsMock::Dto
-
-#endif // AWSMOCK_DTO_MODULE_GATEWAY_CONFIG_H
+#endif// AWSMOCK_DTO_MODULE_GATEWAY_CONFIG_H

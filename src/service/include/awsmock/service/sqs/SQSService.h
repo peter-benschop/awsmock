@@ -6,33 +6,33 @@
 #define AWSMOCK_SERVICE_SQS_SERVICE_H
 
 // C++ standard includes
-#include <string>
 #include <chrono>
 #include <ctime>
-#include <thread>
 #include <map>
+#include <string>
+#include <thread>
 
 // Poco includes
 #include <Poco/Condition.h>
-#include <Poco/TextConverter.h>
 #include <Poco/Latin1Encoding.h>
+#include <Poco/TextConverter.h>
 #include <Poco/UTF8Encoding.h>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/dto/sqs/ChangeMessageVisibilityRequest.h>
 #include <awsmock/dto/sqs/CreateQueueRequest.h>
 #include <awsmock/dto/sqs/CreateQueueResponse.h>
-#include <awsmock/dto/sqs/GetQueueAttributesRequest.h>
-#include <awsmock/dto/sqs/GetQueueAttributesResponse.h>
-#include <awsmock/dto/sqs/DeleteMessageRequest.h>
 #include <awsmock/dto/sqs/DeleteMessageBatchRequest.h>
+#include <awsmock/dto/sqs/DeleteMessageRequest.h>
 #include <awsmock/dto/sqs/DeleteMessageResponse.h>
 #include <awsmock/dto/sqs/DeleteQueueRequest.h>
 #include <awsmock/dto/sqs/DeleteQueueResponse.h>
+#include <awsmock/dto/sqs/GetQueueAttributesRequest.h>
+#include <awsmock/dto/sqs/GetQueueAttributesResponse.h>
 #include <awsmock/dto/sqs/GetQueueUrlRequest.h>
 #include <awsmock/dto/sqs/GetQueueUrlResponse.h>
 #include <awsmock/dto/sqs/ListQueueResponse.h>
@@ -59,7 +59,6 @@ namespace AwsMock::Service {
     class SQSService {
 
       public:
-
         /**
          * Constructor
          *
@@ -183,7 +182,6 @@ namespace AwsMock::Service {
         void DeleteMessageBatch(const Dto::SQS::DeleteMessageBatchRequest &request);
 
       private:
-
         /**
          * Checks the attributes for a entry with 'all'. The search is case insensitive.
          *
@@ -206,9 +204,8 @@ namespace AwsMock::Service {
          * Database connection
          */
         Database::SQSDatabase &_database;
-
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_SQSSERVICE_H
+#endif// AWSMOCK_SERVICE_SQSSERVICE_H

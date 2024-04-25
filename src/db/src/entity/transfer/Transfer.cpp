@@ -8,17 +8,17 @@ namespace AwsMock::Database::Entity::Transfer {
 
     bool Transfer::HasUser(const std::string &userName) {
         return find_if(users.begin(), users.end(), [userName](const User &user) {
-            return user.userName == userName;
-        }) != users.end();
+                   return user.userName == userName;
+               }) != users.end();
     }
 
     bool Transfer::HasProtocol(const std::string &p) {
         return find_if(protocols.begin(), protocols.end(), [p](const std::string &protocol) {
-            return protocol == p;
-        }) != protocols.end();
+                   return protocol == p;
+               }) != protocols.end();
     }
 
-    view_or_value <view, value> Transfer::ToDocument() const {
+    view_or_value<view, value> Transfer::ToDocument() const {
 
         auto protocolsDoc = bsoncxx::builder::basic::array{};
         for (const auto &protocol: protocols) {
@@ -32,7 +32,7 @@ namespace AwsMock::Database::Entity::Transfer {
                                           kvp("homeDirectory", user.homeDirectory)));
         }
 
-        view_or_value <view, value> transferDoc = make_document(
+        view_or_value<view, value> transferDoc = make_document(
                 kvp("region", region),
                 kvp("serverId", serverId),
                 kvp("arn", arn),
@@ -49,7 +49,7 @@ namespace AwsMock::Database::Entity::Transfer {
         return transferDoc;
     }
 
-    void Transfer::FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult) {
+    void Transfer::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         oid = mResult.value()["_id"].get_oid().value.to_string();
         region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
@@ -71,10 +71,9 @@ namespace AwsMock::Database::Entity::Transfer {
         bsoncxx::array::view usersView{mResult.value()["users"].get_array().value};
         for (const bsoncxx::array::element &userElement: usersView) {
             User user{
-                    .userName=bsoncxx::string::to_string(userElement["userName"].get_string().value),
-                    .password=bsoncxx::string::to_string(userElement["password"].get_string().value),
-                    .homeDirectory=bsoncxx::string::to_string(userElement["homeDirectory"].get_string().value)
-            };
+                    .userName = bsoncxx::string::to_string(userElement["userName"].get_string().value),
+                    .password = bsoncxx::string::to_string(userElement["password"].get_string().value),
+                    .homeDirectory = bsoncxx::string::to_string(userElement["homeDirectory"].get_string().value)};
             users.push_back(user);
         }
     }
@@ -115,4 +114,4 @@ namespace AwsMock::Database::Entity::Transfer {
         os << "Transfer=" << bsoncxx::to_json(t.ToDocument());
         return os;
     }
-}
+}// namespace AwsMock::Database::Entity::Transfer

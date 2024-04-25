@@ -15,7 +15,6 @@ namespace AwsMock::Resource::Factory {
     class ModuleFactory : public IFactory {
 
       public:
-
         /**
          * Create a new resource handler.
          *
@@ -29,4 +28,4 @@ namespace AwsMock::Resource::Factory {
 
 }// namespace AwsMock::Resource::Factory
 
-#endif // AWSMOCK_RESOURCE_FACTORY_MODULEFACTORY_H
+#endif// AWSMOCK_RESOURCE_FACTORY_MODULEFACTORY_H

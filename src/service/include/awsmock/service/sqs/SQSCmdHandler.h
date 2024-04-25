@@ -15,13 +15,13 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/MetricService.h>
 #include <awsmock/core/MetricDefinition.h>
+#include <awsmock/core/MetricService.h>
 #include <awsmock/dto/common/SQSClientCommand.h>
-#include <awsmock/dto/sqs/GetQueueUrlRequest.h>
-#include <awsmock/dto/sqs/GetQueueUrlResponse.h>
 #include <awsmock/dto/sqs/DeleteMessageBatchEntry.h>
 #include <awsmock/dto/sqs/DeleteMessageBatchRequest.h>
+#include <awsmock/dto/sqs/GetQueueUrlRequest.h>
+#include <awsmock/dto/sqs/GetQueueUrlResponse.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/sqs/SQSService.h>
 
@@ -29,12 +29,12 @@
 
 namespace AwsMock::Service {
 
-  /**
+    /**
    * UserAttribute  list
    */
-  typedef std::map<std::string, std::string> AttributeList;
+    typedef std::map<std::string, std::string> AttributeList;
 
-  /**
+    /**
    * AWS SQS mock handler.
    *
    * <p>The SQS request are coming in two different flavours. Using the AWS CLI the queue URL is part of the HTTP parameters in the body of the message. Both are
@@ -42,20 +42,18 @@ namespace AwsMock::Service {
    *
    * @author jens.vogt@opitz-consulting.com
    */
-  class SQSCmdHandler : public virtual AbstractHandler {
+    class SQSCmdHandler : public virtual AbstractHandler {
 
-  public:
-
-    /**
+      public:
+        /**
      * Constructor
      *
      * @param configuration application configuration
      */
-    explicit SQSCmdHandler(Core::Configuration &configuration) : AbstractHandler(), _configuration(configuration), _sqsService(configuration) {}
+        explicit SQSCmdHandler(Core::Configuration &configuration) : AbstractHandler(), _configuration(configuration), _sqsService(configuration) {}
 
-  protected:
-
-    /**
+      protected:
+        /**
      * HTTP POST request.
      *
      * @param request HTTP request
@@ -63,64 +61,62 @@ namespace AwsMock::Service {
      * @param sqsClientCommand standardised client command
      * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
      */
-    void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::SQSClientCommand &sqsClientCommand);
+        void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::SQSClientCommand &sqsClientCommand);
 
-  private:
-
-    /**
+      private:
+        /**
      * Get the queue userAttributes.
      *
      * @param payload HTTP body
      * @return list of queue userAttributes
      */
-    std::vector<Dto::SQS::QueueAttribute> GetQueueAttributes(const std::string &payload);
+        std::vector<Dto::SQS::QueueAttribute> GetQueueAttributes(const std::string &payload);
 
-    /**
+        /**
      * Get the queue tags.
      *
      * @param payload HTTP body
      * @return list of queue tags
      */
-    std::map<std::string, std::string> GetQueueTags(const std::string &payload);
+        std::map<std::string, std::string> GetQueueTags(const std::string &payload);
 
-    /**
+        /**
      * Get the queue attribute names.
      *
      * @param payload HTTP body
      * @return list of queue attribute names
      */
-    std::vector<std::string> GetQueueAttributeNames(const std::string &payload);
+        std::vector<std::string> GetQueueAttributeNames(const std::string &payload);
 
-    /**
+        /**
      * Get the message attributes.
      *
      * @param payload HTTP body
      * @return list of message userAttributes
      */
-    std::map<std::string, Dto::SQS::MessageAttribute> GetMessageAttributes(const std::string &payload);
+        std::map<std::string, Dto::SQS::MessageAttribute> GetMessageAttributes(const std::string &payload);
 
-    /**
+        /**
      * ImageHandler import configuration
      */
-    Core::Configuration &_configuration;
+        Core::Configuration &_configuration;
 
-    /**
+        /**
      * SQS module
      */
-    Service::SQSService _sqsService;
+        Service::SQSService _sqsService;
 
-    /**
+        /**
      * Default account ID
      */
-    std::string _accountId;
+        std::string _accountId;
 
-    /**
+        /**
      * Default endpoint
      */
-    std::string _endpoint;
+        std::string _endpoint;
+    };
 
-  };
+}// namespace AwsMock::Service
 
-} // namespace AwsMock::Service
-
-#endif // AWSMOCK_SERVICE_SQS_CMD_HANDLER_H
+#endif// AWSMOCK_SERVICE_SQS_CMD_HANDLER_H

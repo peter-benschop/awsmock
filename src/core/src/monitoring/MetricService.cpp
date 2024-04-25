@@ -25,7 +25,8 @@ namespace AwsMock::Core {
             _server->start();
         }
         _metricSystemCollector->Start();
-        log_info << "Monitoring manager started, port: " << _port;;
+        log_info << "Monitoring manager started, port: " << _port;
+        ;
     }
 
     void MetricService::Run() {
@@ -342,4 +343,4 @@ namespace AwsMock::Core {
         log_trace << "Timer key returned, name: " << name;
         return name + "::" + std::to_string(threadID);
     }
-}
+}// namespace AwsMock::Core

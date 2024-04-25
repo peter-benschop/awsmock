@@ -6,9 +6,9 @@
 #define AWSMOCK_CORE_DTO_PUT_OBJECT_REQUEST_H
 
 // C++ standard includes
-#include <string>
-#include <sstream>
 #include <map>
+#include <sstream>
+#include <string>
 
 // AwsMock includes
 #include <awsmock/core/JsonException.h>
@@ -18,76 +18,75 @@
 
 namespace AwsMock::Dto::S3 {
 
-  struct PutObjectRequest {
+    struct PutObjectRequest {
 
-    /**
+        /**
      * Region
      */
-    std::string region;
+        std::string region;
 
-    /**
+        /**
      * Bucket
      */
-    std::string bucket;
+        std::string bucket;
 
-    /**
+        /**
      * Key
      */
-    std::string key;
+        std::string key;
 
-    /**
+        /**
      * Owner
      */
-    std::string owner;
+        std::string owner;
 
-    /**
+        /**
      * MD5 sum
      */
-    std::string md5Sum;
+        std::string md5Sum;
 
-    /**
+        /**
      * Content type
      */
-    std::string contentType;
+        std::string contentType;
 
-    /**
+        /**
      * Content type
      */
-    long contentLength;
+        long contentLength;
 
-    /**
+        /**
      * Checksum algorithm
      */
-    std::string checksumAlgorithm;
+        std::string checksumAlgorithm;
 
-    /**
+        /**
      * Metadata
      */
-    std::map<std::string, std::string> metadata;
+        std::map<std::string, std::string> metadata;
 
-    /**
+        /**
      * Convert to a JSON string
      *
      * @return JSON string
      */
-    [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const PutObjectRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const PutObjectRequest &r);
+    };
 
-  };
+}// namespace AwsMock::Dto::S3
 
-} // namespace AwsMock::Dto::s3
-
-#endif //AWSMOCK_CORE_DTO_PUT_OBJECT_REQUEST_H
+#endif//AWSMOCK_CORE_DTO_PUT_OBJECT_REQUEST_H

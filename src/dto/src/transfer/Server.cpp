@@ -6,40 +6,40 @@
 
 namespace AwsMock::Dto::Transfer {
 
-  Poco::JSON::Object Server::ToJsonObject() const {
+    Poco::JSON::Object Server::ToJsonObject() const {
 
-    try {
-      Poco::JSON::Object rootJson;
-      rootJson.set("Arn", arn);
-      rootJson.set("Domain", domain);
-      rootJson.set("IdentityProviderType", identityProviderType);
-      rootJson.set("EndpointType", endpointType);
-      rootJson.set("LoggingRole", loggingRole);
-      rootJson.set("ServerId", serverId);
-      rootJson.set("State", state);
-      rootJson.set("UserCount", userCount);
+        try {
+            Poco::JSON::Object rootJson;
+            rootJson.set("Arn", arn);
+            rootJson.set("Domain", domain);
+            rootJson.set("IdentityProviderType", identityProviderType);
+            rootJson.set("EndpointType", endpointType);
+            rootJson.set("LoggingRole", loggingRole);
+            rootJson.set("ServerId", serverId);
+            rootJson.set("State", state);
+            rootJson.set("UserCount", userCount);
 
-      return rootJson;
+            return rootJson;
 
-    } catch (Poco::Exception &exc) {
-      log_error << exc.message();
-      throw Core::JsonException(exc.message());
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }
     }
-  }
 
-  std::string Server::ToJson() const {
-    return Core::JsonUtils::ToJsonString(ToJsonObject());
-  }
+    std::string Server::ToJson() const {
+        return Core::JsonUtils::ToJsonString(ToJsonObject());
+    }
 
-  std::string Server::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+    std::string Server::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
+    }
 
-  std::ostream &operator<<(std::ostream &os, const Server &r) {
-    os << "Server="<<r.ToJson();
-    return os;
-  }
+    std::ostream &operator<<(std::ostream &os, const Server &r) {
+        os << "Server=" << r.ToJson();
+        return os;
+    }
 
-} // namespace AwsMock::Dto::Transfer
+}// namespace AwsMock::Dto::Transfer

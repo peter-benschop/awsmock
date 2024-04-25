@@ -16,7 +16,6 @@ namespace AwsMock::Dto::DynamoDb {
         jsonObject.set("LastIncreaseDateTime", lastIncreaseDateTime);
         jsonObject.set("NumberOfDecreasesToday", numberOfDecreasesToday);
         return jsonObject;
-
     }
 
     std::string ProvisionedThroughput::ToJson() const {
@@ -34,4 +33,4 @@ namespace AwsMock::Dto::DynamoDb {
         return os;
     }
 
-} // namespace AwsMock::Dto::DynamoDb
+}// namespace AwsMock::Dto::DynamoDb

@@ -7,21 +7,21 @@
 namespace AwsMock::Database::Entity::Lambda {
 
     bool Tags::HasTag(const std::string &key) {
-        return find_if(tags.begin(), tags.end(), [key](const std::pair <std::string, std::string> &t) {
-            return t.first == key;
-        }) != tags.end();
+        return find_if(tags.begin(), tags.end(), [key](const std::pair<std::string, std::string> &t) {
+                   return t.first == key;
+               }) != tags.end();
     }
 
     std::string Tags::GetTagValue(const std::string &key) {
-        auto it = find_if(tags.begin(), tags.end(), [key](const std::pair <std::string, std::string> &t) {
+        auto it = find_if(tags.begin(), tags.end(), [key](const std::pair<std::string, std::string> &t) {
             return t.first == key;
         });
         return it->second;
     }
 
-    void Tags::FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult) {
+    void Tags::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
-        std::vector <std::string> keys;
+        std::vector<std::string> keys;
         std::transform(mResult->begin(), mResult->end(), std::back_inserter(keys), [](bsoncxx::document::element ele) {
             return bsoncxx::string::to_string(ele.key());
         });
@@ -31,7 +31,7 @@ namespace AwsMock::Database::Entity::Lambda {
         }
     }
 
-    view_or_value <view, value> Tags::ToDocument() const {
+    view_or_value<view, value> Tags::ToDocument() const {
 
         // Convert environment to document
         auto tagDoc = bsoncxx::builder::basic::array{};
@@ -51,4 +51,4 @@ namespace AwsMock::Database::Entity::Lambda {
         os << "Tags=" << bsoncxx::to_json(t.ToDocument());
         return os;
     }
-}
+}// namespace AwsMock::Database::Entity::Lambda

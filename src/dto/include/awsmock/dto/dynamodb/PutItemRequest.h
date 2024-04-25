@@ -6,37 +6,37 @@
 #define AWSMOCK_DTO_DYNAMODB_PUT_ITEM_REQUEST_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
-#include <vector>
+#include <string>
 #include <utility>
+#include <vector>
 
 // AwsMock includes
 #include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/dynamodb/GetItemKey.h>
 #include <awsmock/dto/dynamodb/AttributeValue.h>
+#include <awsmock/dto/dynamodb/GetItemKey.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
-  struct PutItemRequest {
+    struct PutItemRequest {
 
-    /**
+        /**
      * Region
      */
-    std::string region;
+        std::string region;
 
-    /**
+        /**
      * The name of the table to contain the item.
      *
      * <p>
      * Pattern: [a-zA-Z0-9_.-]+
      * </p>
      */
-    std::string tableName;
+        std::string tableName;
 
-    /**
+        /**
      * Item
      *
      * <p>
@@ -48,18 +48,18 @@ namespace AwsMock::Dto::DynamoDb {
      * need to provide a value for the partition key. For a composite primary key, you must provide both values for
      * both the partition key and the sort key.
      */
-    std::map<std::string, AttributeValue> item;
+        std::map<std::string, AttributeValue> item;
 
-    /**
+        /**
      * Conditional expression
      *
      * <p>
      * A condition that must be satisfied in order for a conditional PutItem operation to succeed.
      * </p>
      */
-    std::string conditionalExpression;
+        std::string conditionalExpression;
 
-    /**
+        /**
      * Return consumed capacity.
      *
      * <p>
@@ -67,65 +67,64 @@ namespace AwsMock::Dto::DynamoDb {
      * the response: INDEXES | TOTAL | NONE
      * </p>
      */
-    bool returnConsumedCapacity;
+        bool returnConsumedCapacity;
 
-    /**
+        /**
      * Return values
      *
      * <p>
      * Use ReturnValues if you want to get the item attributes as they appeared before they were updated with the
      * PutItem request. For PutItem, the valid values are: NONE | ALL_OLD.
      */
-    std::string returnValues;
+        std::string returnValues;
 
-    /**
+        /**
      * Original HTTP request body.
      *
      * <p>
      * Needed for the request to the docker image.
      * </p>
      */
-    std::string body;
+        std::string body;
 
-    /**
+        /**
      * Original HTTP request headers.
      *
      * <p>
      * Needed for the request to the docker image.
      * </p>
      */
-    std::map<std::string, std::string> headers;
+        std::map<std::string, std::string> headers;
 
-    /**
+        /**
      * Creates a JSON string from the object.
      *
      * @return JSON string
      */
-    [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
+        /**
      * Parse a JSON stream
      *
      * @param jsonBody JSON string
      */
-    void FromJson(const std::string &jsonBody);
+        void FromJson(const std::string &jsonBody);
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const PutItemRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const PutItemRequest &r);
+    };
 
-  };
+}// namespace AwsMock::Dto::DynamoDb
 
-} // namespace AwsMock::Dto::DynamoDb
-
-#endif // AWSMOCK_DTO_DYNAMODB_PUT_ITEM_REQUEST_H
+#endif// AWSMOCK_DTO_DYNAMODB_PUT_ITEM_REQUEST_H

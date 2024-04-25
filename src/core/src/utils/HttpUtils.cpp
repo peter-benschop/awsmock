@@ -163,4 +163,4 @@ namespace AwsMock::Core {
         Poco::StreamCopier::copyToString(request.stream(), body);
         return body;
     }
-}
+}// namespace AwsMock::Core

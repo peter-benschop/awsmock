@@ -73,7 +73,6 @@ namespace AwsMock::Service {
 
                 _cognitoService.AdminDeleteUser(cognitoRequest);
                 SendOkResponse(response);
-
             }
 
         } catch (Poco::Exception &exc) {
@@ -92,4 +91,4 @@ namespace AwsMock::Service {
         return Core::StringUtils::Split(headerValue, '.')[1];
     }
 
-}
+}// namespace AwsMock::Service

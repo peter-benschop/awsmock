@@ -24,14 +24,14 @@
 // Poco includes
 #include <Poco/Util/HelpFormatter.h>
 #include <Poco/Util/Option.h>
-#include <Poco/Util/OptionSet.h>
 #include <Poco/Util/OptionProcessor.h>
+#include <Poco/Util/OptionSet.h>
 #include <Poco/Util/ServerApplication.h>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
 #include <awsmock/controller/Configuration.h>
 #include <awsmock/controller/Controller.h>
+#include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Controller {
 
@@ -40,8 +40,7 @@ namespace AwsMock::Controller {
      */
     class AwsMockCtl : public Poco::Util::Application {
 
-      protected:
-
+          protected:
         /**
          * Initialization callback from Poco Application class.
          *
@@ -68,14 +67,10 @@ namespace AwsMock::Controller {
         [[maybe_unused]] void defineOptions(Poco::Util::OptionSet &options) override {
 
             Poco::Util::Application::defineOptions(options);
-            options.addOption(Poco::Util::Option("config", "", "set the configuration file").required(false).repeatable(false).argument("file").callback(
-                    Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
-            options.addOption(Poco::Util::Option("pretty", "", "set the export pretty print flag").required(false).repeatable(false).argument("pretty").callback(
-                    Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
-            options.addOption(Poco::Util::Option("version", "", "display version information").required(false).repeatable(false).callback(
-                    Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
-            options.addOption(Poco::Util::Option("help", "", "display help information").required(false).repeatable(false).callback(
-                    Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
+            options.addOption(Poco::Util::Option("config", "", "set the configuration file").required(false).repeatable(false).argument("file").callback(Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
+            options.addOption(Poco::Util::Option("pretty", "", "set the export pretty print flag").required(false).repeatable(false).argument("pretty").callback(Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
+            options.addOption(Poco::Util::Option("version", "", "display version information").required(false).repeatable(false).callback(Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
+            options.addOption(Poco::Util::Option("help", "", "display help information").required(false).repeatable(false).callback(Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
         }
 
         /**
@@ -96,7 +91,8 @@ namespace AwsMock::Controller {
 
             } else if (name == "version") {
 
-                std::cout << "awsmockctl" << " " << Configuration::GetVersion();
+                std::cout << "awsmockctl"
+                          << " " << Configuration::GetVersion();
                 exit(0);
 
             } else if (name == "level") {
@@ -107,7 +103,6 @@ namespace AwsMock::Controller {
             } else if (name == "pretty") {
 
                 _configuration.setBool("awsmock.pretty", value == "true");
-
             }
         }
 
@@ -118,7 +113,8 @@ namespace AwsMock::Controller {
             helpFormatter.setCommand(commandName());
             helpFormatter.setUsage("<options> <command>");
             helpFormatter.format(std::cout);
-            std::cout << "\nCommands:\n" << std::endl;
+            std::cout << "\nCommands:\n"
+                      << std::endl;
             std::cout << "list\t\t\t: lists all available services" << std::endl;
             std::cout << "start [<module>]\t: starts the given module. If no argument is given, starts all services." << std::endl;
             std::cout << "stop [<module>]\t\t: stops the given module. If no argument is given, stops all services" << std::endl;
@@ -131,7 +127,8 @@ namespace AwsMock::Controller {
             std::cout << "export [modules]\t: dumps the current infrastructure to stdout. Modules is a space separated list of module names." << std::endl;
             std::cout << "import\t\t\t: imports the infrastructure from stdin." << std::endl;
             std::cout << "clean [modules]\t\t: cleans the current infrastructure. Modules is a space separated list of module names." << std::endl;
-            std::cout << "\nModules:\n" << std::endl;
+            std::cout << "\nModules:\n"
+                      << std::endl;
             std::cout << "Valid modules are: all, s3, sqs, sns, lambda, transfer, cognito, dynamodb." << std::endl;
             stopOptionsProcessing();
             exit(0);
@@ -198,7 +195,6 @@ namespace AwsMock::Controller {
 
                 std::cerr << "Unknown command: " << name << std::endl;
                 usage();
-
             }
             return 0;
         }
@@ -209,13 +205,12 @@ namespace AwsMock::Controller {
          * @param args command line arguments.
          * @return system exit code.
          */
-        int main([[maybe_unused]]const ArgVec &args) override {
+        int main([[maybe_unused]] const ArgVec &args) override {
 
             return ProcessCommand(args);
         }
 
-      private:
-
+          private:
         /**
          * Application configuration
          */
@@ -225,10 +220,9 @@ namespace AwsMock::Controller {
          * Controller
          */
         Controller _controller = Controller(_configuration);
-
     };
 
-} // namespace AwsMock
+}// namespace AwsMock::Controller
 
 #ifndef TESTING
 

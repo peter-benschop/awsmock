@@ -6,8 +6,8 @@
 #define AWSMOCK_DB_ENTITY_SQS_MESSAGESTATUS_H
 
 // C++ includes
-#include <string>
 #include <map>
+#include <string>
 
 namespace AwsMock::Database::Entity::SQS {
 
@@ -23,17 +23,17 @@ namespace AwsMock::Database::Entity::SQS {
         UNKNOWN
     };
 
-    static std::map <MessageStatus, std::string> MessageStatusNames{
-            {MessageStatus::INITIAL,   "INITIAL"},
-            {MessageStatus::DELAYED,   "DELAYED"},
+    static std::map<MessageStatus, std::string> MessageStatusNames{
+            {MessageStatus::INITIAL, "INITIAL"},
+            {MessageStatus::DELAYED, "DELAYED"},
             {MessageStatus::INVISIBLE, "INVISIBLE"},
     };
 
-    [[maybe_unused]]static std::string MessageStatusToString(MessageStatus messageStatus) {
+    [[maybe_unused]] static std::string MessageStatusToString(MessageStatus messageStatus) {
         return MessageStatusNames[messageStatus];
     }
 
-    [[maybe_unused]]static MessageStatus MessageStatusFromString(const std::string &messageStatus) {
+    [[maybe_unused]] static MessageStatus MessageStatusFromString(const std::string &messageStatus) {
         for (auto &it: MessageStatusNames) {
             if (it.second == messageStatus) {
                 return it.first;
@@ -41,6 +41,6 @@ namespace AwsMock::Database::Entity::SQS {
         }
         return MessageStatus::UNKNOWN;
     }
-} // namespace AwsMock::Database::Entity::S3
+}// namespace AwsMock::Database::Entity::SQS
 
-#endif // AWSMOCK_DB_ENTITY_SQS_MESSAGESTATUS_H
+#endif// AWSMOCK_DB_ENTITY_SQS_MESSAGESTATUS_H

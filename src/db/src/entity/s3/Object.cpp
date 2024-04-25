@@ -10,14 +10,14 @@ namespace AwsMock::Database::Entity::S3 {
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
 
-    view_or_value <view, value> Object::ToDocument() const {
+    view_or_value<view, value> Object::ToDocument() const {
 
         auto metadataDoc = bsoncxx::builder::basic::document{};
         for (const auto &m: metadata) {
             metadataDoc.append(kvp(m.first, m.second));
         }
 
-        view_or_value <view, value> objectDoc = make_document(
+        view_or_value<view, value> objectDoc = make_document(
                 kvp("region", region),
                 kvp("bucket", bucket),
                 kvp("key", key),
@@ -36,7 +36,7 @@ namespace AwsMock::Database::Entity::S3 {
         return objectDoc;
     }
 
-    void Object::FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult) {
+    void Object::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
         oid = mResult.value()["_id"].get_oid().value.to_string();
         region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
         bucket = bsoncxx::string::to_string(mResult.value()["bucket"].get_string().value);
@@ -121,4 +121,4 @@ namespace AwsMock::Database::Entity::S3 {
         return os;
     }
 
-}
+}// namespace AwsMock::Database::Entity::S3

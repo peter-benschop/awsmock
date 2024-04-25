@@ -15,4 +15,4 @@ namespace AwsMock {
     std::string HandlerException::message() const {
         return _message;
     }
-}
+}// namespace AwsMock

@@ -15,30 +15,30 @@
 
 namespace AwsMock::Service {
 
-  enum HandlerType {
-    S3,
-    SQS,
-    SNS,
-    LAMBDA,
-    TRANSFER,
-    COGNITO,
-    DYNAMODB,
-    SECRETS_MANAGER
-  };
+    enum HandlerType {
+        S3,
+        SQS,
+        SNS,
+        LAMBDA,
+        TRANSFER,
+        COGNITO,
+        DYNAMODB,
+        SECRETS_MANAGER
+    };
 
-  struct GatewayRoute {
+    struct GatewayRoute {
 
-    /**
+        /**
      * Service name
      */
-    std::string _name;
+        std::string _name;
 
-    /**
+        /**
      * Type
      */
-    HandlerType _handlerType;
-  };
+        HandlerType _handlerType;
+    };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
-#endif //AWSMOCK_SERVICE_GATEWAY_GATEWAY_ROUTE_H
+#endif//AWSMOCK_SERVICE_GATEWAY_GATEWAY_ROUTE_H

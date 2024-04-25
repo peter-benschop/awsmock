@@ -8,53 +8,50 @@
 // Poco includes
 #include <Poco/Logger.h>
 #include <Poco/Mutex.h>
-#include <Poco/ScopedLock.h>
-#include <Poco/NotificationQueue.h>
 #include <Poco/Net/HTTPRequestHandlerFactory.h>
+#include <Poco/NotificationQueue.h>
+#include <Poco/ScopedLock.h>
 
 // AwsMock includes
+#include "LambdaHandler.h"
 #include "awsmock/core/Configuration.h"
 #include "awsmock/core/MetricService.h"
-#include "LambdaHandler.h"
 
 namespace AwsMock::Service {
 
-  /**
+    /**
    * lambda request handler factory
    */
-  class LambdaRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
+    class LambdaRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 
-  public:
-
-    /**
+      public:
+        /**
      * Constructor
      *
      * @param configuration application configuration
      */
-    LambdaRequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
+        LambdaRequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
 
-    /**
+        /**
      * Create new lambda request handler
      *
      * @param request HTTP request
      * @return lambda request handler
      */
-    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
-      if (request.getURI().empty()) {
-        return nullptr;
-      }
-      return new LambdaHandler(_configuration);
-    }
+        Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
+            if (request.getURI().empty()) {
+                return nullptr;
+            }
+            return new LambdaHandler(_configuration);
+        }
 
-  private:
-
-    /**
+      private:
+        /**
      * S3 handler configuration
      */
-    Core::Configuration &_configuration;
+        Core::Configuration &_configuration;
+    };
 
-  };
+}// namespace AwsMock::Service
 
-} // namespace AwsMock::Service
-
-#endif // AWSMOCK_SERVICE_LAMBDA_HANDLER_FACTORY_H
+#endif// AWSMOCK_SERVICE_LAMBDA_HANDLER_FACTORY_H

@@ -6,9 +6,9 @@
 #define AWSMOCK_DB_ENTITY_USER_H
 
 // C++ includes
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
 
 // Poco includes
 #include <Poco/DateTime.h>
@@ -16,20 +16,20 @@
 #include <Poco/DateTimeFormatter.h>
 
 // MongoDB includes
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/stdx.hpp>
 
 namespace AwsMock::Database::Entity::Transfer {
 
+    using bsoncxx::view_or_value;
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
-    using bsoncxx::view_or_value;
-    using bsoncxx::document::view;
     using bsoncxx::document::value;
+    using bsoncxx::document::view;
 
     /**
      * Transfer manager user entity
@@ -58,7 +58,7 @@ namespace AwsMock::Database::Entity::Transfer {
          *
          * @return entity as MongoDB document.
          */
-        [[nodiscard]] view_or_value <view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * Converts the MongoDB document to an entity
@@ -82,8 +82,7 @@ namespace AwsMock::Database::Entity::Transfer {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const User &m);
-
     };
 
-}
-#endif // AWSMOCK_DB_ENTITY_USER_H
+}// namespace AwsMock::Database::Entity::Transfer
+#endif// AWSMOCK_DB_ENTITY_USER_H

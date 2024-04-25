@@ -322,4 +322,4 @@ namespace AwsMock::Service {
         request.set("User", user);
         request.set("RequestId", Core::AwsUtils::CreateRequestId());
     }
-}
+}// namespace AwsMock::Service

@@ -6,14 +6,14 @@
 
 namespace AwsMock::Database::Entity::Cognito {
 
-    view_or_value <view, value> User::ToDocument() const {
+    view_or_value<view, value> User::ToDocument() const {
 
         auto userAttributesDoc = bsoncxx::builder::basic::array{};
         for (const auto &attribute: userAttributes) {
             userAttributesDoc.append(make_document(kvp(attribute.name, attribute.value)));
         }
 
-        view_or_value <view, value> userDocument = make_document(
+        view_or_value<view, value> userDocument = make_document(
                 kvp("region", region),
                 kvp("userName", userName),
                 kvp("userPoolId", userPoolId),
@@ -23,10 +23,9 @@ namespace AwsMock::Database::Entity::Cognito {
                 kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
                 kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
         return userDocument;
-
     }
 
-    void User::FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult) {
+    void User::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         oid = mResult.value()["_id"].get_oid().value.to_string();
         region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
@@ -40,9 +39,8 @@ namespace AwsMock::Database::Entity::Cognito {
         bsoncxx::array::view attributesView{mResult.value()["userAttributes"].get_array().value};
         for (bsoncxx::array::element attributeElement: attributesView) {
             UserAttribute attribute{
-                    .name=bsoncxx::string::to_string(attributeElement["name"].get_string().value),
-                    .value=bsoncxx::string::to_string(attributeElement["value"].get_string().value)
-            };
+                    .name = bsoncxx::string::to_string(attributeElement["name"].get_string().value),
+                    .value = bsoncxx::string::to_string(attributeElement["value"].get_string().value)};
             userAttributes.push_back(attribute);
         }
     }
@@ -98,4 +96,4 @@ namespace AwsMock::Database::Entity::Cognito {
         os << "User=" << bsoncxx::to_json(u.ToDocument());
         return os;
     }
-}
+}// namespace AwsMock::Database::Entity::Cognito

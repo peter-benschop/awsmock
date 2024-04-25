@@ -20,7 +20,7 @@ namespace AwsMock::Database::Entity::Lambda {
         return jsonObject;
     }
 
-    void Environment::FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult) {
+    void Environment::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         auto varDoc = mResult.value()["variables"].get_array();
         for (auto &v: varDoc.value) {
@@ -29,4 +29,4 @@ namespace AwsMock::Database::Entity::Lambda {
             }
         }
     }
-}
+}// namespace AwsMock::Database::Entity::Lambda

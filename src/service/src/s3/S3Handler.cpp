@@ -48,7 +48,7 @@ namespace AwsMock::Service {
             std::string key = Core::HttpUtils::GetPathParametersFromIndex(request.getURI(), 1);
             log_debug << "S3 HEAD request, bucket: " << bucket << " key: " << key;
 
-            Dto::S3::GetMetadataRequest s3Request = {.region=region, .bucket=bucket, .key=key};
+            Dto::S3::GetMetadataRequest s3Request = {.region = region, .bucket = bucket, .key = key};
             Dto::S3::GetMetadataResponse s3Response = _s3Service.GetMetadata(s3Request);
 
             HeaderMap headerMap;
@@ -75,4 +75,4 @@ namespace AwsMock::Service {
             log_error << exc.what();
         }
     }
-}
+}// namespace AwsMock::Service

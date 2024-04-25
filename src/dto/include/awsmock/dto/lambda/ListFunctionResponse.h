@@ -6,14 +6,14 @@
 #define AWSMOCK_DTO_LAMBDA_LISTFUNCTIONREQUEST_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 #include <vector>
 
 // Poco includes
+#include <Poco/Dynamic/Var.h>
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
-#include <Poco/Dynamic/Var.h>
 
 // AwsMock includes
 #include <awsmock/dto/lambda/Environment.h>
@@ -22,41 +22,40 @@
 
 namespace AwsMock::Dto::Lambda {
 
-  struct ListFunctionResponse {
+    struct ListFunctionResponse {
 
-    /**
+        /**
      * List of queues
      */
-    Database::Entity::Lambda::LambdaList lambdaList;
+        Database::Entity::Lambda::LambdaList lambdaList;
 
-    /**
+        /**
      * Name of the function
      */
-    FunctionList functions;
+        FunctionList functions;
 
-    /**
+        /**
      * Convert to a JSON string
      *
      * @return JSON string
      */
-    [[nodiscard]] std::string ToJson();
+        [[nodiscard]] std::string ToJson();
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const ListFunctionResponse &r);
+        friend std::ostream &operator<<(std::ostream &os, const ListFunctionResponse &r);
+    };
 
-  };
+}// namespace AwsMock::Dto::Lambda
 
-} // namespace AwsMock::Dto::lambda
-
-#endif // AWSMOCK_DTO_LAMBDA_LISTFUNCTIONREQUEST_H
+#endif// AWSMOCK_DTO_LAMBDA_LISTFUNCTIONREQUEST_H

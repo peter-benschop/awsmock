@@ -6,10 +6,10 @@
 #define AWSMOCK_DB_ENTITY_S3_BUCKET_H
 
 // C++ includes
-#include <string>
 #include <chrono>
-#include <sstream>
 #include <map>
+#include <sstream>
+#include <string>
 
 // Poco includes
 #include <Poco/DateTime.h>
@@ -19,10 +19,10 @@
 #include <Poco/JSON/Object.h>
 
 // MongoDB includes
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/stdx.hpp>
 
 // AwsMock include
@@ -32,8 +32,8 @@
 namespace AwsMock::Database::Entity::S3 {
 
     using bsoncxx::view_or_value;
-    using bsoncxx::document::view;
     using bsoncxx::document::value;
+    using bsoncxx::document::view;
 
     enum BucketVersionStatus {
         ENABLED,
@@ -41,10 +41,10 @@ namespace AwsMock::Database::Entity::S3 {
         DISABLED
     };
 
-    static std::map <BucketVersionStatus, std::string> BucketVersionStatusNames{
-            {BucketVersionStatus::ENABLED,   "enabled"},
+    static std::map<BucketVersionStatus, std::string> BucketVersionStatusNames{
+            {BucketVersionStatus::ENABLED, "enabled"},
             {BucketVersionStatus::SUSPENDED, "suspended"},
-            {BucketVersionStatus::DISABLED,  "disabled"},
+            {BucketVersionStatus::DISABLED, "disabled"},
     };
 
     [[maybe_unused]] static std::string BucketVersionStatusToString(BucketVersionStatus bucketVersionStatus) {
@@ -90,7 +90,7 @@ namespace AwsMock::Database::Entity::S3 {
         /**
          * Bucket notifications
          */
-        std::vector <BucketNotification> notifications;
+        std::vector<BucketNotification> notifications;
 
         /**
          * Bucket versioning state
@@ -133,14 +133,14 @@ namespace AwsMock::Database::Entity::S3 {
          *
          * @return entity as MongoDB document.
          */
-        [[nodiscard]] view_or_value <view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * Converts the MongoDB document to an entity
          *
          * @param mResult MongoDB document.
          */
-        [[maybe_unused]] void FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult);
+        [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
         /**
          * Converts the entity to a JSON object
@@ -174,8 +174,8 @@ namespace AwsMock::Database::Entity::S3 {
     };
 
     typedef struct Bucket Bucket;
-    typedef std::vector <Bucket> BucketList;
+    typedef std::vector<Bucket> BucketList;
 
-} // namespace AwsMock::Database::S3::Entity
+}// namespace AwsMock::Database::Entity::S3
 
-#endif //AWSMOCK_DB_ENTITY_S3_BUCKET_H
+#endif//AWSMOCK_DB_ENTITY_S3_BUCKET_H

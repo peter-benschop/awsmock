@@ -6,8 +6,8 @@
 #define AWSMOCK_DTO_DOCKER_PORT_H
 
 // C++ includes
-#include <string>
 #include <sstream>
+#include <string>
 #include <vector>
 
 // AwsMock includes
@@ -17,58 +17,57 @@
 
 namespace AwsMock::Dto::Docker {
 
-  struct Port {
+    struct Port {
 
-    /**
+        /**
      * Constructor
      */
-    explicit Port(const Poco::JSON::Object::Ptr &object);
+        explicit Port(const Poco::JSON::Object::Ptr &object);
 
-    /**
+        /**
      * Private port, means port inside the container
      */
-    int privatePort{};
+        int privatePort{};
 
-    /**
+        /**
      * Public port, means port visible from docker host
      */
-    int publicPort{};
+        int publicPort{};
 
-    /**
+        /**
      * Port type (tcp,udp, etc.)
      */
-    std::string type;
+        std::string type;
 
-    /**
+        /**
      * Convert to a JSON string
      *
      * @param object JSON object
      */
-    void FromJson(const Poco::JSON::Object::Ptr& object);
+        void FromJson(const Poco::JSON::Object::Ptr &object);
 
-    /**
+        /**
      * Convert to a JSON string
      *
      * @param object JSON object
      */
-    [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const Port &c);
+        friend std::ostream &operator<<(std::ostream &os, const Port &c);
+    };
 
-  };
+}// namespace AwsMock::Dto::Docker
 
-} // namespace AwsMock::Dto::Docker
-
-#endif // AWSMOCK_DTO_DOCKER_PORT_H
+#endif// AWSMOCK_DTO_DOCKER_PORT_H

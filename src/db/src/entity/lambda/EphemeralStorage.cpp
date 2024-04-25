@@ -6,15 +6,14 @@
 
 namespace AwsMock::Database::Entity::Lambda {
 
-    void EphemeralStorage::FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult) {
+    void EphemeralStorage::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
         size = mResult.value()["size"].get_int64();
     }
 
-    view_or_value <view, value> EphemeralStorage::ToDocument() const {
+    view_or_value<view, value> EphemeralStorage::ToDocument() const {
 
-        view_or_value <view, value> ephemeralStorageDocument = make_document(kvp("size", size));
+        view_or_value<view, value> ephemeralStorageDocument = make_document(kvp("size", size));
         return ephemeralStorageDocument;
-
     }
 
     Poco::JSON::Object EphemeralStorage::ToJsonObject() const {
@@ -34,4 +33,4 @@ namespace AwsMock::Database::Entity::Lambda {
         os << "EphemeralStorage=" << bsoncxx::to_json(m.ToDocument());
         return os;
     }
-}
+}// namespace AwsMock::Database::Entity::Lambda

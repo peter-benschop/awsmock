@@ -6,17 +6,17 @@
 #define AWSMOCK_SERVICE_LAMBDA_SERVICE_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // Poco includes
-#include <Poco/NotificationQueue.h>
-#include <Poco/Notification.h>
-#include <Poco/RecursiveDirectoryIterator.h>
-#include <Poco/StreamCopier.h>
 #include <Poco/Net/HTTPClientSession.h>
 #include <Poco/Net/HTTPRequest.h>
 #include <Poco/Net/HTTPResponse.h>
+#include <Poco/Notification.h>
+#include <Poco/NotificationQueue.h>
+#include <Poco/RecursiveDirectoryIterator.h>
+#include <Poco/StreamCopier.h>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
@@ -28,7 +28,6 @@
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
-#include <awsmock/dto/s3/EventNotification.h>
 #include <awsmock/dto/lambda/CreateFunctionRequest.h>
 #include <awsmock/dto/lambda/CreateFunctionResponse.h>
 #include <awsmock/dto/lambda/CreateTagRequest.h>
@@ -38,6 +37,7 @@
 #include <awsmock/dto/lambda/GetFunctionResponse.h>
 #include <awsmock/dto/lambda/ListFunctionResponse.h>
 #include <awsmock/dto/lambda/ListTagsResponse.h>
+#include <awsmock/dto/s3/EventNotification.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/common/DockerService.h>
@@ -74,7 +74,6 @@ namespace AwsMock::Service {
     class LambdaService {
 
       public:
-
         /**
          * Constructor
          *
@@ -163,7 +162,6 @@ namespace AwsMock::Service {
         void DeleteTags(Dto::Lambda::DeleteTagsRequest &request);
 
       private:
-
         /**
          * Returns the URI for the invocation request.
          *
@@ -222,9 +220,8 @@ namespace AwsMock::Service {
          * Mutex
          */
         static Poco::Mutex _mutex;
-
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_LAMBDA_SERVICE_H
+#endif// AWSMOCK_SERVICE_LAMBDA_SERVICE_H

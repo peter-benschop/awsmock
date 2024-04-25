@@ -6,33 +6,33 @@
 
 namespace AwsMock::Core {
 
-  ResourceNotFoundException::ResourceNotFoundException(int code) : Poco::Exception(code) {
-  }
+    ResourceNotFoundException::ResourceNotFoundException(int code) : Poco::Exception(code) {
+    }
 
-  ResourceNotFoundException::ResourceNotFoundException(const std::string &msg, int code) : Poco::Exception(msg, code) {
-  }
+    ResourceNotFoundException::ResourceNotFoundException(const std::string &msg, int code) : Poco::Exception(msg, code) {
+    }
 
-  ResourceNotFoundException::ResourceNotFoundException(const std::string &msg, const std::string &arg, int code) : Poco::Exception(msg, arg, code) {
-  }
+    ResourceNotFoundException::ResourceNotFoundException(const std::string &msg, const std::string &arg, int code) : Poco::Exception(msg, arg, code) {
+    }
 
-  ResourceNotFoundException::ResourceNotFoundException(const std::string &msg, const Poco::Exception &exc, int code) : Poco::Exception(msg, exc, code) {
-  }
+    ResourceNotFoundException::ResourceNotFoundException(const std::string &msg, const Poco::Exception &exc, int code) : Poco::Exception(msg, exc, code) {
+    }
 
-  ResourceNotFoundException::ResourceNotFoundException(const ResourceNotFoundException &exc) = default;
+    ResourceNotFoundException::ResourceNotFoundException(const ResourceNotFoundException &exc) = default;
 
-  ResourceNotFoundException::~ResourceNotFoundException() noexcept = default;
+    ResourceNotFoundException::~ResourceNotFoundException() noexcept = default;
 
-  ResourceNotFoundException &ResourceNotFoundException::operator=(const ResourceNotFoundException &exc) {
-    Poco::Exception::operator=(exc);
-    return *this;
-  }
+    ResourceNotFoundException &ResourceNotFoundException::operator=(const ResourceNotFoundException &exc) {
+        Poco::Exception::operator=(exc);
+        return *this;
+    }
 
-  const char *ResourceNotFoundException::name() const noexcept { return "ResourceNotFoundException: "; }
+    const char *ResourceNotFoundException::name() const noexcept { return "ResourceNotFoundException: "; }
 
-  const char *ResourceNotFoundException::className() const noexcept { return typeid(*this).name(); }
+    const char *ResourceNotFoundException::className() const noexcept { return typeid(*this).name(); }
 
-  Poco::Exception *ResourceNotFoundException::clone() const { return new ResourceNotFoundException(*this); }
+    Poco::Exception *ResourceNotFoundException::clone() const { return new ResourceNotFoundException(*this); }
 
-  void ResourceNotFoundException::rethrow() const { throw *this; }
+    void ResourceNotFoundException::rethrow() const { throw *this; }
 
-} // namespace AwsMock::Core
+}// namespace AwsMock::Core

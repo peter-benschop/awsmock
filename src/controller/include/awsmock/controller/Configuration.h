@@ -24,7 +24,6 @@ namespace AwsMock::Controller {
     class Configuration : public Core::Configuration {
 
       public:
-
         /**
          * Constructor
          */
@@ -41,9 +40,8 @@ namespace AwsMock::Controller {
          * Initialize the configuration and add the default configuration options.
          */
         void InitializeConfig();
-
     };
 
-} // namespace AwsMock::Controller
+}// namespace AwsMock::Controller
 
-#endif //AWSMOCK_CONTROLLER_CONFIGURATION_H
+#endif//AWSMOCK_CONTROLLER_CONFIGURATION_H

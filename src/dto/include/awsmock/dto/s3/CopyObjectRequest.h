@@ -7,8 +7,8 @@
 
 // C++ standard includes
 #include <map>
-#include <string>
 #include <sstream>
+#include <string>
 
 // AwsMock includes
 #include <awsmock/core/JsonException.h>
@@ -18,66 +18,65 @@
 
 namespace AwsMock::Dto::S3 {
 
-  struct CopyObjectRequest {
+    struct CopyObjectRequest {
 
-    /**
+        /**
      * Region
      */
-    std::string region;
+        std::string region;
 
-    /**
+        /**
      * Region
      */
-    std::string user;
+        std::string user;
 
-    /**
+        /**
      * Source bucket
      */
-    std::string sourceBucket;
+        std::string sourceBucket;
 
-    /**
+        /**
      * Source key
      */
-    std::string sourceKey;
+        std::string sourceKey;
 
-    /**
+        /**
      * Target bucket
      */
-    std::string targetBucket;
+        std::string targetBucket;
 
-    /**
+        /**
      * Target key
      */
-    std::string targetKey;
+        std::string targetKey;
 
-    /**
+        /**
      * Metadata
      */
-    std::map<std::string, std::string> metadata;
+        std::map<std::string, std::string> metadata;
 
-    /**
+        /**
      * Convert to a JSON string
      *
      * @return JSON string
      */
-    [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const CopyObjectRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const CopyObjectRequest &r);
+    };
 
-  };
+}// namespace AwsMock::Dto::S3
 
-} // namespace AwsMock::Dto::S3
-
-#endif // AWSMOCK_CORE_DTO_COPY_OBJECT_REQUEST_H
+#endif// AWSMOCK_CORE_DTO_COPY_OBJECT_REQUEST_H

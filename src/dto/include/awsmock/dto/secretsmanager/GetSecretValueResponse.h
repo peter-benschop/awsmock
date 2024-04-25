@@ -6,13 +6,13 @@
 #define AWSMOCK_DTO_SECRETSMANAGER_GET_SECRET_VALUE_RESPONSE_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // Poco includes
+#include <Poco/Dynamic/Var.h>
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
-#include <Poco/Dynamic/Var.h>
 #include <Poco/Net/HTTPResponse.h>
 
 // AwsMoc includes
@@ -21,7 +21,7 @@
 
 namespace AwsMock::Dto::SecretsManager {
 
-  /**
+    /**
    * Get a secret value
    *
    * Example:
@@ -37,73 +37,72 @@ namespace AwsMock::Dto::SecretsManager {
    * }
    * </pre>
    */
-  struct GetSecretValueResponse {
+    struct GetSecretValueResponse {
 
-    /*+
+        /*+
      * Name
      */
-    std::string name;
+        std::string name;
 
-    /**
+        /**
      * ARN
      */
-    std::string arn;
+        std::string arn;
 
-    /**
+        /**
      * Created date
      */
-    double createdDate = -1;
+        double createdDate = -1;
 
-    /**
+        /**
      * Secret string
      */
-    std::string secretString;
+        std::string secretString;
 
-    /**
+        /**
      * Base64 encoded secret binary data
      */
-    std::string secretBinary;
+        std::string secretBinary;
 
-    /**
+        /**
      * Version ID
      */
-    std::string versionId;
+        std::string versionId;
 
-    /**
+        /**
      * Version ID
      */
-    std::vector<std::string> versionStages;
+        std::vector<std::string> versionStages;
 
-    /**
+        /**
      * Converts the DTO to a JSON representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
+        /**
      * Converts the JSON string to DTO.
      *
      * @param jsonString JSON string
      */
-    void FromJson(const std::string &jsonString);
+        void FromJson(const std::string &jsonString);
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const GetSecretValueResponse &r);
+        friend std::ostream &operator<<(std::ostream &os, const GetSecretValueResponse &r);
+    };
 
-  };
+}// namespace AwsMock::Dto::SecretsManager
 
-} // namespace AwsMock::Dto::SecretsManager
-
-#endif // AWSMOCK_DTO_SECRETSMANAGER_GET_SECRET_VALUE_RESPONSE_H
+#endif// AWSMOCK_DTO_SECRETSMANAGER_GET_SECRET_VALUE_RESPONSE_H

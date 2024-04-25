@@ -21,7 +21,6 @@ namespace AwsMock::Service {
     class TransferMonitoring : public Core::Timer {
 
       public:
-
         /**
          * Constructor
          *
@@ -45,7 +44,6 @@ namespace AwsMock::Service {
         void Shutdown() override;
 
       private:
-
         /**
          * Update counters
          */
@@ -65,7 +63,6 @@ namespace AwsMock::Service {
          * Period
          */
         int _period{};
-
     };
-}
-#endif // AWSMOCK_SERVICE_TRANSFER_MONITORING_H
+}// namespace AwsMock::Service
+#endif// AWSMOCK_SERVICE_TRANSFER_MONITORING_H

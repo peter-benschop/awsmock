@@ -7,23 +7,23 @@
 
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 #include <vector>
 
 // Poco includes
+#include <Poco/Dynamic/Var.h>
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
-#include <Poco/Dynamic/Var.h>
 #include <Poco/Net/HTTPResponse.h>
 
 // AwsMoc includes
-#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/JsonException.h>
+#include <awsmock/core/JsonUtils.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
-  /**
+    /**
    * Secrets list filter
    *
    * Example:
@@ -36,55 +36,54 @@ namespace AwsMock::Dto::SecretsManager {
    * ]
    * </pre>
    */
-  struct Filter {
+    struct Filter {
 
-    /**
+        /**
      * Filter key
      */
-    std::string key;
+        std::string key;
 
-    /**
+        /**
      * Filter values array
      */
-    std::vector<std::string> values;
+        std::vector<std::string> values;
 
-    /**
+        /**
      * Converts the DTO to a JSON object.
      *
      * @return DTO as JSON object.
      */
-    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
-    /**
+        /**
      * Converts the DTO to a JSON representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
+        /**
      * Converts the JSON object to DTO.
      *
      * @param jsonObject JSON object
      */
-    void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const Filter &f);
+        friend std::ostream &operator<<(std::ostream &os, const Filter &f);
+    };
 
-  };
+}// namespace AwsMock::Dto::SecretsManager
 
-} // namespace AwsMock::Dto::SecretsManager
-
-#endif //AWSMOCK_DTO_SECRETSMANAGER_FILTER_H
+#endif//AWSMOCK_DTO_SECRETSMANAGER_FILTER_H

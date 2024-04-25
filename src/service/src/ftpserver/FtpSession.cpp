@@ -1,6 +1,6 @@
 
-#include <awsmock/ftpserver/FtpSession.h>
 #include "awsmock/core/MetricDefinition.h"
+#include <awsmock/ftpserver/FtpSession.h>
 
 namespace AwsMock::FtpServer {
 
@@ -9,9 +9,9 @@ namespace AwsMock::FtpServer {
                            const std::string &serverName,
                            const Core::Configuration &configuration,
                            const std::function<void()> &completion_handler)
-            : AbstractWorker(configuration), _completion_handler(completion_handler), _user_database(user_database), _io_service(io_service), command_socket_(io_service),
-              command_write_strand_(io_service), data_type_binary_(false), data_acceptor_(io_service), data_buffer_strand_(io_service), file_rw_strand_(io_service),
-              _ftpWorkingDirectory("/"), _configuration(configuration), _serverName(serverName) {
+        : AbstractWorker(configuration), _completion_handler(completion_handler), _user_database(user_database), _io_service(io_service), command_socket_(io_service),
+          command_write_strand_(io_service), data_type_binary_(false), data_acceptor_(io_service), data_buffer_strand_(io_service), file_rw_strand_(io_service),
+          _ftpWorkingDirectory("/"), _configuration(configuration), _serverName(serverName) {
 
         // S3 module connection
         _s3ServiceHost = _configuration.getString("awsmock.service.s3.host", "localhost");
@@ -67,19 +67,17 @@ namespace AwsMock::FtpServer {
     void FtpSession::startSendingMessages() {
 
         log_debug << "FTP >> " << command_output_queue_.front();
-        asio::async_write(command_socket_, asio::buffer(command_output_queue_.front()), command_write_strand_.wrap(
-                [me = shared_from_this()](asio::error_code ec, std::size_t /*bytes_to_transfer*/) {
-                    if (!ec) {
-                        me->command_output_queue_.pop_front();
+        asio::async_write(command_socket_, asio::buffer(command_output_queue_.front()), command_write_strand_.wrap([me = shared_from_this()](asio::error_code ec, std::size_t /*bytes_to_transfer*/) {
+            if (!ec) {
+                me->command_output_queue_.pop_front();
 
-                        if (!me->command_output_queue_.empty()) {
-                            me->startSendingMessages();
-                        }
-                    } else {
-                        log_error << "Command write error: " << ec.message();
-                    }
+                if (!me->command_output_queue_.empty()) {
+                    me->startSendingMessages();
                 }
-        ));
+            } else {
+                log_error << "Command write error: " << ec.message();
+            }
+        }));
     }
 
     void FtpSession::readFtpCommand() {
@@ -116,7 +114,7 @@ namespace AwsMock::FtpServer {
                                    // in contiguous memory.
                                    stream.read(&packet_string[0], length - 2);
 
-                                   stream.ignore(2); // Remove the "\r\n"
+                                   stream.ignore(2);// Remove the "\r\n"
                                    log_debug << "FTP << " << packet_string;
 
                                    me->handleFtpCommand(packet_string);
@@ -144,7 +142,7 @@ namespace AwsMock::FtpServer {
                 {"USER", std::bind(&FtpSession::handleFtpCommandUSER, this, std::placeholders::_1)},
                 {"PASS", std::bind(&FtpSession::handleFtpCommandPASS, this, std::placeholders::_1)},
                 {"ACCT", std::bind(&FtpSession::handleFtpCommandACCT, this, std::placeholders::_1)},
-                {"CWD",  std::bind(&FtpSession::handleFtpCommandCWD, this, std::placeholders::_1)},
+                {"CWD", std::bind(&FtpSession::handleFtpCommandCWD, this, std::placeholders::_1)},
                 {"CDUP", std::bind(&FtpSession::handleFtpCommandCDUP, this, std::placeholders::_1)},
                 {"REIN", std::bind(&FtpSession::handleFtpCommandREIN, this, std::placeholders::_1)},
                 {"QUIT", std::bind(&FtpSession::handleFtpCommandQUIT, this, std::placeholders::_1)},
@@ -167,9 +165,9 @@ namespace AwsMock::FtpServer {
                 {"RNTO", std::bind(&FtpSession::handleFtpCommandRNTO, this, std::placeholders::_1)},
                 {"ABOR", std::bind(&FtpSession::handleFtpCommandABOR, this, std::placeholders::_1)},
                 {"DELE", std::bind(&FtpSession::handleFtpCommandDELE, this, std::placeholders::_1)},
-                {"RMD",  std::bind(&FtpSession::handleFtpCommandRMD, this, std::placeholders::_1)},
-                {"MKD",  std::bind(&FtpSession::handleFtpCommandMKD, this, std::placeholders::_1)},
-                {"PWD",  std::bind(&FtpSession::handleFtpCommandPWD, this, std::placeholders::_1)},
+                {"RMD", std::bind(&FtpSession::handleFtpCommandRMD, this, std::placeholders::_1)},
+                {"MKD", std::bind(&FtpSession::handleFtpCommandMKD, this, std::placeholders::_1)},
+                {"PWD", std::bind(&FtpSession::handleFtpCommandPWD, this, std::placeholders::_1)},
                 {"LIST", std::bind(&FtpSession::handleFtpCommandLIST, this, std::placeholders::_1)},
                 {"NLST", std::bind(&FtpSession::handleFtpCommandNLST, this, std::placeholders::_1)},
                 {"SITE", std::bind(&FtpSession::handleFtpCommandSITE, this, std::placeholders::_1)},
@@ -473,8 +471,7 @@ namespace AwsMock::FtpServer {
 
         auto existing_file_filestatus = FileStatus(local_path);
         if (existing_file_filestatus.isOk()) {
-            if ((existing_file_filestatus.type() == FileType::RegularFile)
-                && (static_cast<int>(_logged_in_user->permissions_ & Permission::FileDelete) == 0)) {
+            if ((existing_file_filestatus.type() == FileType::RegularFile) && (static_cast<int>(_logged_in_user->permissions_ & Permission::FileDelete) == 0)) {
                 sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN_FILENAME_NOT_ALLOWED, "File already exists. Permission denied to overwrite file.");
                 return;
             } else if (existing_file_filestatus.type() == FileType::Dir) {
@@ -517,8 +514,7 @@ namespace AwsMock::FtpServer {
         const std::string local_path = toLocalPath(param);
 
         auto existing_file_filestatus = FileStatus(local_path);
-        if (!existing_file_filestatus.isOk()
-            || (existing_file_filestatus.type() != FileType::RegularFile)) {
+        if (!existing_file_filestatus.isOk() || (existing_file_filestatus.type() != FileType::RegularFile)) {
             sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "File does not exist.");
             return;
         }
@@ -873,7 +869,7 @@ namespace AwsMock::FtpServer {
             // TODO: close acceptor after connect?
             // TODO: get the data from S3 buckets/keys
             // Create a Unix-like file list
-            std::stringstream stream; // NOLINT(misc-const-correctness) Reason: False detection, this cannot be made const
+            std::stringstream stream;// NOLINT(misc-const-correctness) Reason: False detection, this cannot be made const
             for (const auto &entry: directory_content) {
                 const std::string &filename(entry.first);
                 const FileStatus &file_status(entry.second);
@@ -911,7 +907,7 @@ namespace AwsMock::FtpServer {
             }
 
             // Create a file list
-            std::stringstream stream; // NOLINT(misc-const-correctness) Reason: False detection, this cannot be made const
+            std::stringstream stream;// NOLINT(misc-const-correctness) Reason: False detection, this cannot be made const
             for (const auto &entry: directory_content) {
                 stream << entry.first;
                 stream << "\r\n";
@@ -944,7 +940,6 @@ namespace AwsMock::FtpServer {
             me->readDataFromFileAndSend(file, data_socket);
             me->readDataFromFileAndSend(file, data_socket);
         });
-
     }
 
     void FtpSession::readDataFromFileAndSend(const std::shared_ptr<IoFile> &file, const std::shared_ptr<asio::ip::tcp::socket> &data_socket) {
@@ -990,27 +985,25 @@ namespace AwsMock::FtpServer {
                         asio::async_write(*data_socket,
                                           asio::buffer(*data),
                                           me->data_buffer_strand_.wrap([me, data_socket, data, fetch_more](asio::error_code ec, std::size_t /*bytes_to_transfer*/) {
-                                                                           me->data_buffer_.pop_front();
+                                              me->data_buffer_.pop_front();
 
-                                                                           if (ec) {
-                                                                               log_error << "Data write error: " << ec.message();
-                                                                               return;
-                                                                           }
+                                              if (ec) {
+                                                  log_error << "Data write error: " << ec.message();
+                                                  return;
+                                              }
 
-                                                                           fetch_more();
+                                              fetch_more();
 
-                                                                           if (!me->data_buffer_.empty()) {
-                                                                               me->writeDataToSocket(data_socket, fetch_more);
-                                                                           }
-                                                                       }
-                                          ));
+                                              if (!me->data_buffer_.empty()) {
+                                                  me->writeDataToSocket(data_socket, fetch_more);
+                                              }
+                                          }));
                     } else {
                         // we got to the end of transmission
                         me->data_buffer_.pop_front();
                         me->sendFtpMessage(FtpReplyCode::CLOSING_DATA_CONNECTION, "Done");
                     }
-                }
-        );
+                });
     }
 
     ////////////////////////////////////////////////////////
@@ -1102,7 +1095,7 @@ namespace AwsMock::FtpServer {
 
         for (const char c: unquoted_ftp_path) {
             output.push_back(c);
-            if (c == '\"')            // Escape quote by double-quote
+            if (c == '\"')// Escape quote by double-quote
                 output.push_back(c);
         }
 
@@ -1187,7 +1180,7 @@ namespace AwsMock::FtpServer {
         metadata["user-agent"] = _serverName;
         metadata["user-agent-id"] = _logged_in_user->_username + "@" + _serverName;
 
-        Dto::S3::PutObjectRequest request = {.region=_region, .bucket=_bucket, .key=key, .owner=user, .metadata=metadata};
+        Dto::S3::PutObjectRequest request = {.region = _region, .bucket = _bucket, .key = key, .owner = user, .metadata = metadata};
 
         std::ifstream ifs(fileName);
         _s3Service->PutObject(request, ifs);
@@ -1200,7 +1193,7 @@ namespace AwsMock::FtpServer {
 
     void FtpSession::SendDeleteObjectRequest(const std::string &user, const std::string &fileName) {
 
-        Dto::S3::DeleteObjectRequest request = {.region=_region, .user=user, .bucket=_bucket, .key=GetKey(fileName)};
+        Dto::S3::DeleteObjectRequest request = {.region = _region, .user = user, .bucket = _bucket, .key = GetKey(fileName)};
         _s3Service->DeleteObject(request);
 
         log_debug << "Delete object request send, fileName: " << fileName;
@@ -1214,4 +1207,4 @@ namespace AwsMock::FtpServer {
         return key;
     }
 
-}
+}// namespace AwsMock::FtpServer

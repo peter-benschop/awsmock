@@ -14,5 +14,4 @@ namespace AwsMock::Core {
         Poco::DateTime now;
         return Poco::DateTimeFormatter::format(now, Poco::DateTimeFormat::ISO8601_FRAC_FORMAT);
     }
-};
-
+};// namespace AwsMock::Core

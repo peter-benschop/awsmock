@@ -24,7 +24,6 @@ namespace AwsMock::Service {
     class TransferHandler : public AbstractHandler {
 
       public:
-
         /**
          * Constructor
          *
@@ -45,7 +44,6 @@ namespace AwsMock::Service {
 
 
       private:
-
         /**
          * Get the request target.
          *
@@ -63,9 +61,8 @@ namespace AwsMock::Service {
          * Transfer module
          */
         Service::TransferService _transferService;
-
     };
 
-} // namespace AwsMock
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_TRANSFER_HANDLER_H
+#endif// AWSMOCK_SERVICE_TRANSFER_HANDLER_H

@@ -6,8 +6,8 @@
 #define AWSMOCK_DB_ENTITY_MODULE_MODULE_H
 
 // C++ includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // Poco includes
 #include <Poco/DateTime.h>
@@ -15,12 +15,12 @@
 #include <Poco/DateTimeFormatter.h>
 
 // MongoDB includes
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
-#include <mongocxx/stdx.hpp>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/exception/exception.hpp>
+#include <mongocxx/stdx.hpp>
 
 // AwsMock includes
 #include <awsmock/entity/module/ModuleState.h>
@@ -28,11 +28,11 @@
 namespace AwsMock::Database::Entity::Module {
 
     using bsoncxx::view_or_value;
-    using bsoncxx::document::view;
-    using bsoncxx::document::value;
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
+    using bsoncxx::document::value;
+    using bsoncxx::document::view;
 
     /**
      * AwsMock module entity
@@ -86,14 +86,14 @@ namespace AwsMock::Database::Entity::Module {
          *
          * @return entity as MongoDB document.
          */
-        [[nodiscard]] view_or_value <view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * Converts the MongoDB document to an entity
          *
          * @param mResult MongoDB document.
          */
-        [[maybe_unused]] void FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult);
+        [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
         /**
          * Convert to JSON representation
@@ -118,11 +118,10 @@ namespace AwsMock::Database::Entity::Module {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const Module &module);
-
     };
 
-    typedef std::vector <Module> ModuleList;
+    typedef std::vector<Module> ModuleList;
 
-} // AwsMock::Database::Entity::Service
+}// namespace AwsMock::Database::Entity::Module
 
-#endif // AWSMOCK_DB_ENTITY_MODULE_MODULE_H
+#endif// AWSMOCK_DB_ENTITY_MODULE_MODULE_H

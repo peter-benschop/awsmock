@@ -27,7 +27,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.QueueExists(region, name);
-
         }
     }
 
@@ -45,7 +44,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.QueueUrlExists(region, queueUrl);
-
         }
     }
 
@@ -63,7 +61,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.QueueArnExists(queueArn);
-
         }
     }
 
@@ -93,7 +90,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.CreateQueue(queue);
-
         }
     }
 
@@ -122,7 +118,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.GetQueueById(oid);
-
         }
     }
 
@@ -146,7 +141,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.GetQueueByArn(queueArn);
-
         }
     }
 
@@ -172,7 +166,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.GetQueueByUrl(queueUrl);
-
         }
     }
 
@@ -200,7 +193,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.GetQueueByName(region, name);
-
         }
     }
 
@@ -229,13 +221,11 @@ namespace AwsMock::Database {
                     result.FromDocument(queue);
                     queueList.push_back(result);
                 }
-
             }
 
         } else {
 
             queueList = _memoryDb.ListQueues(region);
-
         }
         log_trace << "Got queue list, size: " << queueList.size();
         return queueList;
@@ -266,7 +256,6 @@ namespace AwsMock::Database {
 
             log_debug << "Purged queue, count: " << _messages.size();
             _memoryDb.PurgeQueue(region, queueUrl);
-
         }
     }
 
@@ -301,7 +290,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.UpdateQueue(queue);
-
         }
     }
 
@@ -314,7 +302,6 @@ namespace AwsMock::Database {
         } else {
 
             return CreateQueue(queue);
-
         }
     }
 
@@ -335,7 +322,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.CountQueues(region);
-
         }
         log_trace << "Count queues, result: " << count;
         return count;
@@ -365,7 +351,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteQueue(queue);
-
         }
     }
 
@@ -393,7 +378,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteAllQueues();
-
         }
     }
 
@@ -422,7 +406,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.CreateMessage(message);
-
         }
     }
 
@@ -440,7 +423,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.MessageExists(receiptHandle);
-
         }
     }
 
@@ -472,7 +454,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.GetMessageByReceiptHandle(receiptHandle);
-
         }
     }
 
@@ -485,7 +466,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.GetMessageById(oid);
-
         }
     }
 
@@ -521,7 +501,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.UpdateMessage(message);
-
         }
         return {};
     }
@@ -535,7 +514,6 @@ namespace AwsMock::Database {
         } else {
 
             return CreateMessage(message);
-
         }
     }
 
@@ -569,7 +547,6 @@ namespace AwsMock::Database {
         } else {
 
             messageList = _memoryDb.ListMessages(region);
-
         }
         log_trace << "Got message list, size: " << messageList.size();
         return messageList;
@@ -631,7 +608,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.ReceiveMessages(region, queueUrl, visibility, maxMessages, messageList);
-
         }
         log_trace << "Messages received, region: " << region << " queue: " << queueUrl + " count: " << messageList.size();
     }
@@ -652,7 +628,7 @@ namespace AwsMock::Database {
                                 kvp("queueUrl", queueUrl),
                                 kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)),
                                 kvp("reset", make_document(
-                                        kvp("$lt", bsoncxx::types::b_date(std::chrono::system_clock::now()))))),
+                                                     kvp("$lt", bsoncxx::types::b_date(std::chrono::system_clock::now()))))),
                         make_document(kvp("$set",
                                           make_document(
                                                   kvp("status",
@@ -671,7 +647,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.ResetMessages(queueUrl, visibility);
-
         }
     }
 
@@ -692,7 +667,7 @@ namespace AwsMock::Database {
                                                                           kvp("status",
                                                                               Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)),
                                                                           kvp("retries", make_document(
-                                                                                  kvp("$gt", redrivePolicy.maxReceiveCount)))),
+                                                                                                 kvp("$gt", redrivePolicy.maxReceiveCount)))),
                                                             make_document(kvp("$set", make_document(kvp("retries", 0),
                                                                                                     kvp("queueArn",
                                                                                                         redrivePolicy.deadLetterTargetArn),
@@ -711,7 +686,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.RedriveMessages(queueUrl, redrivePolicy, Core::Configuration::instance());
-
         }
     }
 
@@ -732,7 +706,7 @@ namespace AwsMock::Database {
                                 kvp("queueUrl", queueUrl),
                                 kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)),
                                 kvp("reset", make_document(
-                                        kvp("$lt", bsoncxx::types::b_date(now))))),
+                                                     kvp("$lt", bsoncxx::types::b_date(now))))),
                         make_document(
                                 kvp("$set",
                                     make_document(
@@ -751,7 +725,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.ResetDelayedMessages(queueUrl, delay);
-
         }
     }
 
@@ -773,7 +746,7 @@ namespace AwsMock::Database {
                         make_document(
                                 kvp("queueUrl", queueUrl),
                                 kvp("created", make_document(
-                                        kvp("$lt", bsoncxx::types::b_date(reset))))));
+                                                       kvp("$lt", bsoncxx::types::b_date(reset))))));
                 session.commit_transaction();
 
                 log_trace << "Message retention reset, deleted: " << result->deleted_count() << " queue: " << queueUrl;
@@ -786,7 +759,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.MessageRetention(queueUrl, retentionPeriod);
-
         }
     }
 
@@ -814,7 +786,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.CountMessages(region, queueUrl);
-
         }
     }
 
@@ -836,7 +807,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.CountMessagesByStatus(region, queueUrl, status);
-
         }
     }
 
@@ -864,7 +834,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteMessages(queueUrl);
-
         }
     }
 
@@ -893,7 +862,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteMessage(message);
-
         }
     }
 
@@ -921,7 +889,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteAllMessages();
-
         }
     }
 
@@ -929,4 +896,4 @@ namespace AwsMock::Database {
         return bsoncxx::to_json(document->view());
     }
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database

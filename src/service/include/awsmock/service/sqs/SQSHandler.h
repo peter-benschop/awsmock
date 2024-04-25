@@ -15,27 +15,27 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/MetricService.h>
 #include <awsmock/core/MetricDefinition.h>
+#include <awsmock/core/MetricService.h>
 #include <awsmock/dto/common/SQSClientCommand.h>
-#include <awsmock/dto/sqs/GetQueueUrlRequest.h>
-#include <awsmock/dto/sqs/GetQueueUrlResponse.h>
 #include <awsmock/dto/sqs/DeleteMessageBatchEntry.h>
 #include <awsmock/dto/sqs/DeleteMessageBatchRequest.h>
+#include <awsmock/dto/sqs/GetQueueUrlRequest.h>
+#include <awsmock/dto/sqs/GetQueueUrlResponse.h>
 #include <awsmock/service/common/AbstractHandler.h>
-#include <awsmock/service/sqs/SQSService.h>
 #include <awsmock/service/sqs/SQSCmdHandler.h>
+#include <awsmock/service/sqs/SQSService.h>
 
 #define DEFAULT_SQS_ACCOUNT_ID "000000000000"
 
 namespace AwsMock::Service {
 
-  /**
+    /**
    * UserAttribute  list
    */
-  typedef std::map<std::string, std::string> AttributeList;
+    typedef std::map<std::string, std::string> AttributeList;
 
-  /**
+    /**
    * AWS S3 mock handler.
    *
    * <p>The SQS request are coming in two different flavours. Using the AWS CLI the queue URL is part of the HTTP parameters in the body of the message. Both are
@@ -43,18 +43,17 @@ namespace AwsMock::Service {
    *
    * @author jens.vogt@opitz-consulting.com
    */
-  class SQSHandler : public SQSCmdHandler {
+    class SQSHandler : public SQSCmdHandler {
 
-  public:
-
-    /**
+      public:
+        /**
      * Constructor
      *
      * @param configuration application configuration
      */
-    explicit SQSHandler(Core::Configuration &configuration) : SQSCmdHandler(configuration) {}
+        explicit SQSHandler(Core::Configuration &configuration) : SQSCmdHandler(configuration) {}
 
-    /**
+        /**
        * HTTP POST request.
        *
        * @param request HTTP request
@@ -63,10 +62,9 @@ namespace AwsMock::Service {
        * @param user AWS user
        * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
        */
-    void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+        void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+    };
 
-  };
+}// namespace AwsMock::Service
 
-} // namespace AwsMock::Service
-
-#endif // AWSMOCK_SERVICE_SQS_HANDLER_H
+#endif// AWSMOCK_SERVICE_SQS_HANDLER_H

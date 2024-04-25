@@ -6,8 +6,8 @@
 #define AWSMOCK_DB_ENTITY_COGNITO_USERSTATUS_H
 
 // C++ includes
-#include <string>
 #include <map>
+#include <string>
 
 namespace AwsMock::Database::Entity::Cognito {
 
@@ -25,20 +25,20 @@ namespace AwsMock::Database::Entity::Cognito {
         FORCE_CHANGE_PASSWORD
     };
 
-    static std::map <UserStatus, std::string> UserStatusNames{
-            {UserStatus::UNCONFIRMED,           "UNCONFIRMED"},
-            {UserStatus::CONFIRMED,             "CONFIRMED"},
-            {UserStatus::EXTERNAL_PROVIDER,     "EXTERNAL_PROVIDER"},
-            {UserStatus::UNKNOWN,               "UNKNOWN"},
-            {UserStatus::RESET_REQUIRED,        "RESET_REQUIRED"},
+    static std::map<UserStatus, std::string> UserStatusNames{
+            {UserStatus::UNCONFIRMED, "UNCONFIRMED"},
+            {UserStatus::CONFIRMED, "CONFIRMED"},
+            {UserStatus::EXTERNAL_PROVIDER, "EXTERNAL_PROVIDER"},
+            {UserStatus::UNKNOWN, "UNKNOWN"},
+            {UserStatus::RESET_REQUIRED, "RESET_REQUIRED"},
             {UserStatus::FORCE_CHANGE_PASSWORD, "FORCE_CHANGE_PASSWORD"},
     };
 
-    [[maybe_unused]]static std::string UserStatusToString(UserStatus userStatus) {
+    [[maybe_unused]] static std::string UserStatusToString(UserStatus userStatus) {
         return UserStatusNames[userStatus];
     }
 
-    [[maybe_unused]]static UserStatus UserStatusFromString(const std::string &userStatus) {
+    [[maybe_unused]] static UserStatus UserStatusFromString(const std::string &userStatus) {
         for (auto &it: UserStatusNames) {
             if (it.second == userStatus) {
                 return it.first;
@@ -47,6 +47,6 @@ namespace AwsMock::Database::Entity::Cognito {
         return UserStatus::UNKNOWN;
     }
 
-} // namespace AwsMock::Database::Entity::S3
+}// namespace AwsMock::Database::Entity::Cognito
 
-#endif //AWSMOCK_DB_ENTITY_COGNITO_USERSTATUS_H
+#endif//AWSMOCK_DB_ENTITY_COGNITO_USERSTATUS_H

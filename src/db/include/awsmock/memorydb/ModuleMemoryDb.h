@@ -14,9 +14,9 @@
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/DatabaseException.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/entity/module/Module.h>
 #include <awsmock/repository/Database.h>
 
@@ -30,7 +30,6 @@ namespace AwsMock::Database {
     class ModuleMemoryDb {
 
       public:
-
         /**
          * Constructor
          */
@@ -160,7 +159,6 @@ namespace AwsMock::Database {
         void DeleteAllModules();
 
       private:
-
         /**
          * Modules map
          */
@@ -177,6 +175,6 @@ namespace AwsMock::Database {
         Poco::Mutex _moduleMutex;
     };
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
 
-#endif // AWSMOCK_REPOSITORY_MODULEMEMORYDB_H
+#endif// AWSMOCK_REPOSITORY_MODULEMEMORYDB_H

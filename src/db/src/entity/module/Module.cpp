@@ -10,9 +10,9 @@ namespace AwsMock::Database::Entity::Module {
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
 
-    view_or_value <view, value> Module::ToDocument() const {
+    view_or_value<view, value> Module::ToDocument() const {
 
-        view_or_value <view, value> objectDoc = make_document(
+        view_or_value<view, value> objectDoc = make_document(
                 kvp("name", name),
                 kvp("executable", executable),
                 kvp("port", port),
@@ -24,7 +24,7 @@ namespace AwsMock::Database::Entity::Module {
         return objectDoc;
     }
 
-    void Module::FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult) {
+    void Module::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         oid = mResult.value()["_id"].get_oid().value.to_string();
         name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
@@ -51,4 +51,4 @@ namespace AwsMock::Database::Entity::Module {
         return os;
     }
 
-} // AwsMock::Database::Entity::Service
+}// namespace AwsMock::Database::Entity::Module

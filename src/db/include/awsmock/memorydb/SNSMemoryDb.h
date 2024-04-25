@@ -17,8 +17,8 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/entity/sns/Topic.h>
 #include <awsmock/entity/sns/Message.h>
+#include <awsmock/entity/sns/Topic.h>
 #include <awsmock/repository/Database.h>
 
 namespace AwsMock::Database {
@@ -31,7 +31,6 @@ namespace AwsMock::Database {
     class SNSMemoryDb {
 
       public:
-
         /**
          * Constructor
          */
@@ -243,7 +242,6 @@ namespace AwsMock::Database {
         void DeleteAllMessages();
 
       private:
-
         /**
          * SNS topic vector, when running without database
          */
@@ -265,6 +263,6 @@ namespace AwsMock::Database {
         Poco::Mutex _messageMutex;
     };
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
 
-#endif // AWSMOCK_REPOSITORY_SNSMEMORYDB_H
+#endif// AWSMOCK_REPOSITORY_SNSMEMORYDB_H

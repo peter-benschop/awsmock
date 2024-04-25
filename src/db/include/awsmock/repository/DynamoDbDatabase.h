@@ -10,11 +10,11 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/memorydb/DynamoDbMemoryDb.h>
 #include <awsmock/repository/Database.h>
 
@@ -28,7 +28,6 @@ namespace AwsMock::Database {
     class DynamoDbDatabase : public Database {
 
       public:
-
         /**
          * Constructor
          */
@@ -38,7 +37,7 @@ namespace AwsMock::Database {
          * Singleton instance
          */
         static DynamoDbDatabase &instance() {
-            static Poco::SingletonHolder <DynamoDbDatabase> sh;
+            static Poco::SingletonHolder<DynamoDbDatabase> sh;
             return *sh.get();
         }
 
@@ -175,7 +174,6 @@ namespace AwsMock::Database {
         void DeleteAllItems();
 
       private:
-
         /**
          * Use MongoDB
          */
@@ -195,9 +193,8 @@ namespace AwsMock::Database {
          * DynamoDB in-memory database
          */
         DynamoDbMemoryDb &_memoryDb;
-
     };
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
 
-#endif // AWSMOCK_REPOSITORY_DYNAMODB_DATABASE_H
+#endif// AWSMOCK_REPOSITORY_DYNAMODB_DATABASE_H

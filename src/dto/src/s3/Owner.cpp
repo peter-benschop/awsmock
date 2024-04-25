@@ -6,43 +6,43 @@
 
 namespace AwsMock::Dto::S3 {
 
-  std::string Owner::ToJson() const {
+    std::string Owner::ToJson() const {
 
-    try {
-      Poco::JSON::Object rootJson;
-      rootJson.set("id", id);
-      rootJson.set("displayName", displayName);
+        try {
+            Poco::JSON::Object rootJson;
+            rootJson.set("id", id);
+            rootJson.set("displayName", displayName);
 
-      return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::JsonUtils::ToJsonString(rootJson);
 
-    } catch (Poco::Exception &exc) {
-      log_error << exc.message();
-      throw Core::JsonException(exc.message());
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }
     }
-  }
 
-  Poco::JSON::Object Owner::ToJsonObject() const {
+    Poco::JSON::Object Owner::ToJsonObject() const {
 
-    try {
-      Poco::JSON::Object rootJson;
-      rootJson.set("DisplayName", displayName);
-      rootJson.set("Id", id);
-      return rootJson;
+        try {
+            Poco::JSON::Object rootJson;
+            rootJson.set("DisplayName", displayName);
+            rootJson.set("Id", id);
+            return rootJson;
 
-    } catch (Poco::Exception &exc) {
-      throw Core::JsonException(exc.message());
+        } catch (Poco::Exception &exc) {
+            throw Core::JsonException(exc.message());
+        }
     }
-  }
 
-  std::string Owner::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+    std::string Owner::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
+    }
 
-  std::ostream &operator<<(std::ostream &os, const Owner &o) {
-    os << "Owner=" << o.ToJson();
-    return os;
-  }
+    std::ostream &operator<<(std::ostream &os, const Owner &o) {
+        os << "Owner=" << o.ToJson();
+        return os;
+    }
 
-} // namespace AwsMock::Dto::S3
+}// namespace AwsMock::Dto::S3

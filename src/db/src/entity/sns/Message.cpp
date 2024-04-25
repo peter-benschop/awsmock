@@ -6,14 +6,14 @@
 
 namespace AwsMock::Database::Entity::SNS {
 
-    view_or_value <view, value> Message::ToDocument() const {
+    view_or_value<view, value> Message::ToDocument() const {
 
         auto messageAttributesDoc = bsoncxx::builder::basic::array{};
         for (const auto &attribute: attributes) {
             messageAttributesDoc.append(attribute.ToDocument());
         }
 
-        view_or_value <view, value> messageDoc = make_document(
+        view_or_value<view, value> messageDoc = make_document(
                 kvp("region", region),
                 kvp("topicArn", topicArn),
                 kvp("targetArn", targetArn),
@@ -28,7 +28,7 @@ namespace AwsMock::Database::Entity::SNS {
         return messageDoc;
     }
 
-    void Message::FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult) {
+    void Message::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         try {
             oid = mResult.value()["_id"].get_oid().value.to_string();
@@ -46,9 +46,8 @@ namespace AwsMock::Database::Entity::SNS {
             if (!attributesView.empty()) {
                 for (bsoncxx::array::element attributeElement: attributesView) {
                     MessageAttribute attribute{
-                            .attributeName=bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
-                            .attributeValue=bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value)
-                    };
+                            .attributeName = bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
+                            .attributeValue = bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value)};
                     attributes.push_back(attribute);
                 }
             }
@@ -85,4 +84,4 @@ namespace AwsMock::Database::Entity::SNS {
         return os;
     }
 
-} // namespace AwsMock::Database::Entity::SNS
+}// namespace AwsMock::Database::Entity::SNS

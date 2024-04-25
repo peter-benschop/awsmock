@@ -6,29 +6,29 @@
 #define AWSMOCK_RESOURCE_ABSTRACTRESOURCE_H
 
 // C++ includes
-#include <string>
 #include <fstream>
+#include <string>
 
 // Poco includes
 #include "Poco/DateTime.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTimeFormatter.h"
-#include "Poco/Logger.h"
 #include "Poco/LogStream.h"
-#include "Poco/URI.h"
-#include "Poco/StreamCopier.h"
-#include <Poco/RegularExpression.h>
+#include "Poco/Logger.h"
+#include "Poco/Net/HTTPRequestHandler.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
-#include "Poco/Net/HTTPRequestHandler.h"
+#include "Poco/StreamCopier.h"
+#include "Poco/URI.h"
 #include <Poco/Net/HTTPClientSession.h>
+#include <Poco/RegularExpression.h>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/StringUtils.h>
-#include <awsmock/core/ServiceException.h>
 #include <awsmock/core/ResourceNotFoundException.h>
+#include <awsmock/core/ServiceException.h>
+#include <awsmock/core/StringUtils.h>
 #include <awsmock/resource/HandlerException.h>
 
 namespace AwsMock::Resource {
@@ -61,7 +61,6 @@ namespace AwsMock::Resource {
         void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
 
       protected:
-
         /**
          * Handles the HTTP method GET.
          *
@@ -245,7 +244,6 @@ namespace AwsMock::Resource {
         void SetHeaders(Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user);
 
       private:
-
         /**
          * Set the header values
          *
@@ -288,6 +286,6 @@ namespace AwsMock::Resource {
         HeaderMap _headerMap;
     };
 
-} // namespace AwsMock::Resource
+}// namespace AwsMock::Resource
 
-#endif // AWSMOCK_RESOURCE_ABSTRACTRESOURCE_H
+#endif// AWSMOCK_RESOURCE_ABSTRACTRESOURCE_H

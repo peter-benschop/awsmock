@@ -6,8 +6,8 @@
 #define AWSMOCK_DB_ENTITY_SNS_MESSAGESTATUS_H
 
 // C++ includes
-#include <string>
 #include <map>
+#include <string>
 
 namespace AwsMock::Database::Entity::SNS {
 
@@ -17,12 +17,14 @@ namespace AwsMock::Database::Entity::SNS {
      * @author jens.vogt@opitz-consulting.com
      */
     enum MessageStatus {
-        INITIAL, SEND, RESEND
+        INITIAL,
+        SEND,
+        RESEND
     };
-    static std::map <MessageStatus, std::string> MessageStatusNames{
+    static std::map<MessageStatus, std::string> MessageStatusNames{
             {MessageStatus::INITIAL, "INITIAL"},
-            {MessageStatus::SEND,    "SEND"},
-            {MessageStatus::RESEND,  "RESEND"},
+            {MessageStatus::SEND, "SEND"},
+            {MessageStatus::RESEND, "RESEND"},
     };
 
     [[maybe_unused]] static std::string MessageStatusToString(MessageStatus messageStatus) {
@@ -38,6 +40,6 @@ namespace AwsMock::Database::Entity::SNS {
         return MessageStatus::INITIAL;
     }
 
-} // namespace AwsMock::Database::Entity::SNS
+}// namespace AwsMock::Database::Entity::SNS
 
-#endif // AWSMOCK_DB_ENTITY_SNS_MESSAGESTATUS_H
+#endif// AWSMOCK_DB_ENTITY_SNS_MESSAGESTATUS_H

@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database::Entity::DynamoDb {
 
-    view_or_value <view, value> Table::ToDocument() const {
+    view_or_value<view, value> Table::ToDocument() const {
 
         // Tags
         auto tagsDoc = bsoncxx::builder::basic::document{};
@@ -32,7 +32,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
             }
         }
 
-        view_or_value <view, value> lambdaDoc = make_document(
+        view_or_value<view, value> lambdaDoc = make_document(
                 kvp("region", region),
                 kvp("name", name),
                 kvp("tags", tagsDoc),
@@ -44,7 +44,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
         return lambdaDoc;
     }
 
-    void Table::FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult) {
+    void Table::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         oid = mResult.value()["_id"].get_oid().value.to_string();
         region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
@@ -145,7 +145,6 @@ namespace AwsMock::Database::Entity::DynamoDb {
             Core::JsonUtils::GetJsonValueDate("modified", jsonObject, modified);
 
         } catch (Poco::Exception &exc) {
-
         }
     }
 
@@ -159,4 +158,4 @@ namespace AwsMock::Database::Entity::DynamoDb {
         os << "Table=" << bsoncxx::to_json(t.ToDocument());
         return os;
     }
-}
+}// namespace AwsMock::Database::Entity::DynamoDb

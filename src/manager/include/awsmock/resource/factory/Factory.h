@@ -21,7 +21,6 @@ namespace AwsMock::Resource::Factory {
     class Factory {
 
       public:
-
         /**
          * Creates a new resource factory.
          *
@@ -31,13 +30,12 @@ namespace AwsMock::Resource::Factory {
         static IFactory *createResourceFactory(std::string &name);
 
       private:
-
         /**
          * Default constructor
          */
         Factory() = default;
     };
 
-} // namespace AwsMock::Resource::Factory
+}// namespace AwsMock::Resource::Factory
 
-#endif // AWSMOCK_RESOURCE_FACTORY_H
+#endif// AWSMOCK_RESOURCE_FACTORY_H

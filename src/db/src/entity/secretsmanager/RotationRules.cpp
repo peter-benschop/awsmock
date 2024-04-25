@@ -6,9 +6,9 @@
 
 namespace AwsMock::Database::Entity::SecretsManager {
 
-    view_or_value <view, value> RotationRules::ToDocument() const {
+    view_or_value<view, value> RotationRules::ToDocument() const {
 
-        view_or_value <view, value> rotationRulesDoc = make_document(
+        view_or_value<view, value> rotationRulesDoc = make_document(
                 kvp("automaticallyAfterDays", automaticallyAfterDays),
                 kvp("duration", duration),
                 kvp("scheduleExpression", scheduleExpression));
@@ -16,7 +16,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
         return rotationRulesDoc;
     }
 
-    void RotationRules::FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult) {
+    void RotationRules::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         automaticallyAfterDays = mResult.value()["automaticallyAfterDays"].get_int64().value;
         duration = bsoncxx::string::to_string(mResult.value()["duration"].get_string().value);
@@ -30,7 +30,6 @@ namespace AwsMock::Database::Entity::SecretsManager {
         jsonObject.set("duration", duration);
         jsonObject.set("scheduleExpression", scheduleExpression);
         return jsonObject;
-
     }
 
     std::string RotationRules::ToString() const {
@@ -44,4 +43,4 @@ namespace AwsMock::Database::Entity::SecretsManager {
         return os;
     }
 
-} // namespace AwsMock::Database::Entity::S3
+}// namespace AwsMock::Database::Entity::SecretsManager

@@ -17,22 +17,21 @@
 
 class TestEnvironment : public ::testing::Environment {
 
-public:
-
-  // Initialise a test configuration.
-  void SetUp() override {
-    AwsMock::Core::TestUtils::CreateTestConfigurationFile();
-    AwsMock::Database::TestUtils::CreateServices();
-    Poco::ThreadPool::defaultPool().addCapacity(256);
-  }
+      public:
+    // Initialise a test configuration.
+    void SetUp() override {
+        AwsMock::Core::TestUtils::CreateTestConfigurationFile();
+        AwsMock::Database::TestUtils::CreateServices();
+        Poco::ThreadPool::defaultPool().addCapacity(256);
+    }
 };
 
 int main(int argc, char **argv) {
 
-  // Run tests
-  ::testing::InitGoogleTest(&argc, argv);
-  ::testing::AddGlobalTestEnvironment(new TestEnvironment);
-  int ret = RUN_ALL_TESTS();
+    // Run tests
+    ::testing::InitGoogleTest(&argc, argv);
+    ::testing::AddGlobalTestEnvironment(new TestEnvironment);
+    int ret = RUN_ALL_TESTS();
 
-  return ret;
+    return ret;
 }

@@ -10,18 +10,17 @@ namespace AwsMock::Database {
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
 
-    std::map <std::string, Entity::Module::Module> ModuleDatabase::_existingModules = {
-            {"s3",             {.name="s3", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-            {"sqs",            {.name="sqs", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-            {"sns",            {.name="sns", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-            {"lambda",         {.name="lambda", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-            {"transfer",       {.name="transfer", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-            {"cognito",        {.name="cognito", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-            {"dynamodb",       {.name="dynamodb", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-            {"secretsmanager", {.name="secretsmanager", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-            {"gateway",        {.name="gateway", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}},
-            {"database",       {.name="database", .state=Entity::Module::ModuleState::STOPPED, .status=Entity::Module::ModuleStatus::INACTIVE}}
-    };
+    std::map<std::string, Entity::Module::Module> ModuleDatabase::_existingModules = {
+            {"s3", {.name = "s3", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
+            {"sqs", {.name = "sqs", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
+            {"sns", {.name = "sns", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
+            {"lambda", {.name = "lambda", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
+            {"transfer", {.name = "transfer", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
+            {"cognito", {.name = "cognito", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
+            {"dynamodb", {.name = "dynamodb", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
+            {"secretsmanager", {.name = "secretsmanager", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
+            {"gateway", {.name = "gateway", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
+            {"database", {.name = "database", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}}};
 
     ModuleDatabase::ModuleDatabase() : _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()) {
 
@@ -64,7 +63,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.IsActive(name);
-
         }
         return false;
     }
@@ -88,7 +86,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.ModuleExists(name);
-
         }
         return false;
     }
@@ -100,7 +97,7 @@ namespace AwsMock::Database {
             auto client = GetClient();
             mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
 
-            mongocxx::stdx::optional <bsoncxx::document::value>
+            mongocxx::stdx::optional<bsoncxx::document::value>
                     mResult = _moduleCollection.find_one(make_document(kvp("_id", oid)));
             if (mResult) {
                 Entity::Module::Module module;
@@ -113,7 +110,6 @@ namespace AwsMock::Database {
             throw Core::DatabaseException("Module not found, oid: " + oid.to_string());
         }
         return {};
-
     }
 
     Entity::Module::Module ModuleDatabase::GetModuleById(const std::string &oid) {
@@ -125,7 +121,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.GetModuleById(oid);
-
         }
     }
 
@@ -150,7 +145,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.GetModuleByName(name);
-
         }
         return {};
     }
@@ -175,7 +169,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.CreateModule(module);
-
         }
     }
 
@@ -198,7 +191,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.UpdateModule(module);
-
         }
     }
 
@@ -231,7 +223,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.SetState(name, state);
-
         }
     }
 
@@ -258,7 +249,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.SetStatus(name, status);
-
         }
     }
 
@@ -281,7 +271,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.SetPort(name, port);
-
         }
     }
 
@@ -313,7 +302,6 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.ModuleCount();
-
         }
         return -1;
     }
@@ -335,7 +323,6 @@ namespace AwsMock::Database {
         } else {
 
             modulesList = _memoryDb.ListModules();
-
         }
 
         log_trace << "Got module list, size:" << modulesList.size();
@@ -360,7 +347,6 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteModule(module);
-
         }
     }
 
@@ -382,8 +368,7 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.DeleteAllModules();
-
         }
     }
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database

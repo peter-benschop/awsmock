@@ -6,9 +6,9 @@
 
 namespace AwsMock::Database::Entity::SNS {
 
-    view_or_value <view, value> Subscription::ToDocument() const {
+    view_or_value<view, value> Subscription::ToDocument() const {
 
-        view_or_value <view, value> subscriptionDoc = make_document(
+        view_or_value<view, value> subscriptionDoc = make_document(
                 kvp("protocol", protocol),
                 kvp("endpoint", endpoint),
                 kvp("subscriptionArn", subscriptionArn));
@@ -16,12 +16,11 @@ namespace AwsMock::Database::Entity::SNS {
         return subscriptionDoc;
     }
 
-    void Subscription::FromDocument(mongocxx::stdx::optional <bsoncxx::document::view_or_value> mResult) {
+    void Subscription::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view_or_value> mResult) {
 
         protocol = bsoncxx::string::to_string(mResult.value().view()["protocol"].get_string().value);
         endpoint = bsoncxx::string::to_string(mResult.value().view()["endpoint"].get_string().value);
         subscriptionArn = bsoncxx::string::to_string(mResult.value().view()["subscriptionArn"].get_string().value);
-
     }
 
     Poco::JSON::Object Subscription::ToJsonObject() const {
@@ -31,7 +30,6 @@ namespace AwsMock::Database::Entity::SNS {
         jsonObject.set("endpoint", endpoint);
         jsonObject.set("subscriptionArn", subscriptionArn);
         return jsonObject;
-
     }
 
     std::string Subscription::ToString() const {
@@ -45,4 +43,4 @@ namespace AwsMock::Database::Entity::SNS {
         return os;
     }
 
-} // namespace AwsMock::Database::Entity::SNS
+}// namespace AwsMock::Database::Entity::SNS

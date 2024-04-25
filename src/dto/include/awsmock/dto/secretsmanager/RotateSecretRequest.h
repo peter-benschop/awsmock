@@ -6,13 +6,13 @@
 #define AWSMOCK_CORE_DTO_ROTATE_SECRET_REQUEST_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // Poco includes
+#include <Poco/Dynamic/Var.h>
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
-#include <Poco/Dynamic/Var.h>
 #include <Poco/Net/HTTPResponse.h>
 
 // AwsMoc includes
@@ -22,7 +22,7 @@
 
 namespace AwsMock::Dto::SecretsManager {
 
-  /**
+    /**
    * Rotate a secret value request.
    *
    * Example:
@@ -40,73 +40,72 @@ namespace AwsMock::Dto::SecretsManager {
    * }
    * </pre>
    */
-  struct RotateSecretRequest {
+    struct RotateSecretRequest {
 
-    /**
+        /**
      * Region
      */
-    std::string region;
+        std::string region;
 
-    /**
+        /**
      * Secret ID
      */
-    std::string secretId;
+        std::string secretId;
 
-    /**
+        /**
      * Client request token
      */
-    std::string clientRequestToken;
+        std::string clientRequestToken;
 
-    /**
+        /**
      * Rotation lambda ARN
      */
-    std::string rotationLambdaARN;
+        std::string rotationLambdaARN;
 
-    /**
+        /**
      * Rotate immediately
      */
-    bool rotateImmediately;
+        bool rotateImmediately;
 
-    /**
+        /**
      * Rotation rules
      */
-     RotationRules rotationRules;
+        RotationRules rotationRules;
 
-    /**
+        /**
      * AWS request ID
      */
-    std::string requestId;
+        std::string requestId;
 
-    /**
+        /**
      * Converts the DTO to a JSON representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
+        /**
      * Converts the JSON string to DTO.
      *
      * @param jsonString JSON string
      */
-    void FromJson(const std::string &jsonString);
+        void FromJson(const std::string &jsonString);
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const RotateSecretRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const RotateSecretRequest &r);
+    };
 
-  };
+}// namespace AwsMock::Dto::SecretsManager
 
-} // namespace AwsMock::Dto::S3
-
-#endif // AWSMOCK_CORE_DTO_ROTATE_SECRET_REQUEST_H
+#endif// AWSMOCK_CORE_DTO_ROTATE_SECRET_REQUEST_H

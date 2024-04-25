@@ -21,16 +21,15 @@
 
 namespace AwsMock::Service {
 
-  class AbstractWorker {
+    class AbstractWorker {
 
-  public:
-
-    /**
+      public:
+        /**
      * Constructor
      */
-    explicit AbstractWorker(const Core::Configuration &configuration);
+        explicit AbstractWorker(const Core::Configuration &configuration);
 
-    /**
+        /**
      * Send a lambda create function request.
      *
      * @param module AwsMock module name
@@ -38,9 +37,9 @@ namespace AwsMock::Service {
      * @param body HTTP message body
      * @param contentType HTTP content type
      */
-    void SendPostRequest(const std::string &module, const std::string &url, const std::string &body, const std::string &contentType);
+        void SendPostRequest(const std::string &module, const std::string &url, const std::string &body, const std::string &contentType);
 
-    /**
+        /**
      * Send a PUT request.
      *
      * @param module AwsMock module name
@@ -48,9 +47,9 @@ namespace AwsMock::Service {
      * @param body HTTP message body
      * @param contentType HTTP content type
      */
-    void SendPutRequest(const std::string &module, const std::string &url, const std::string &body, const std::string &contentType);
+        void SendPutRequest(const std::string &module, const std::string &url, const std::string &body, const std::string &contentType);
 
-    /**
+        /**
      * Send a DELETE request
      *
      * @param module AwsMock module name
@@ -58,9 +57,9 @@ namespace AwsMock::Service {
      * @param body HTTP message body
      * @param contentType HTTP content type
      */
-    void SendDeleteRequest(const std::string &module, const std::string &url, const std::string &body, const std::string &contentType);
+        void SendDeleteRequest(const std::string &module, const std::string &url, const std::string &body, const std::string &contentType);
 
-    /**
+        /**
      * Send a HEAD request
      *
      * @param module AwsMock module name
@@ -68,9 +67,9 @@ namespace AwsMock::Service {
      * @param contentType HTTP content type
      * @return true, if state = 200
      */
-    bool SendHeadRequest(const std::string &module, const std::string &url, const std::string &contentType);
+        bool SendHeadRequest(const std::string &module, const std::string &url, const std::string &contentType);
 
-    /**
+        /**
      * Send a lambda create function request.
      *
      * @param module AwsMock module name
@@ -78,84 +77,83 @@ namespace AwsMock::Service {
      * @param fileName name of the file to send
      * @param headers HTTP header map
      */
-    void SendFile(const std::string &module, const std::string &url, const std::string &fileName, const std::map<std::string, std::string> &headers);
+        void SendFile(const std::string &module, const std::string &url, const std::string &fileName, const std::map<std::string, std::string> &headers);
 
-  private:
-
-    /**
+      private:
+        /**
      * Adds the authorization header.
      *
      * @param module AwsMock module name
      * @param request HTTP request
      */
-    void AddAuthorization(const std::string &module, Poco::Net::HTTPRequest &request);
+        void AddAuthorization(const std::string &module, Poco::Net::HTTPRequest &request);
 
-    /**
+        /**
      * Configuration
      */
-    const Core::Configuration &_configuration;
+        const Core::Configuration &_configuration;
 
-    /**
+        /**
      * Service database
      */
-    std::unique_ptr<Database::ModuleDatabase> _serviceDatabase;
+        std::unique_ptr<Database::ModuleDatabase> _serviceDatabase;
 
-    /**
+        /**
      * lambda database
      */
-    std::unique_ptr<Database::LambdaDatabase> _lambdaDatabase;
+        std::unique_ptr<Database::LambdaDatabase> _lambdaDatabase;
 
-    /**
+        /**
      * S3 module
      */
-    std::unique_ptr<Service::S3Service> _s3Service;
+        std::unique_ptr<Service::S3Service> _s3Service;
 
-    /**
+        /**
      * lambda module
      */
-    std::unique_ptr<Service::LambdaService> _lambdaService;
+        std::unique_ptr<Service::LambdaService> _lambdaService;
 
-    /**
+        /**
      * Data dir
      */
-    std::string _dataDir;
+        std::string _dataDir;
 
-    /**
+        /**
      * AWS region
      */
-    std::string _region;
+        std::string _region;
 
-    /**
+        /**
      * Running flag
      */
-    bool _running;
+        bool _running;
 
-    /**
+        /**
      * Sleeping period in ms
      */
-    int _period;
+        int _period;
 
-    /**
+        /**
      * AWS client ID
      */
-    std::string _clientId;
+        std::string _clientId;
 
-    /**
+        /**
      * AWS user
      */
-    std::string _user;
+        std::string _user;
 
-    /**
+        /**
      * lambda module host
      */
-    std::string _lambdaServiceHost;
+        std::string _lambdaServiceHost;
 
-    /**
+        /**
      * lambda module port
      */
-    int _lambdaServicePort;
-  };
+        int _lambdaServicePort;
+    };
 
-} // namespace AwsMock::Worker
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_ABSTRACTWORKER_H
+#endif// AWSMOCK_SERVICE_ABSTRACTWORKER_H

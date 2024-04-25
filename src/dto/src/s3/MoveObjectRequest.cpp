@@ -6,20 +6,21 @@
 
 namespace AwsMock::Dto::S3 {
 
-  std::string MoveObjectRequest::ToString() const {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
-
-  std::ostream &operator<<(std::ostream &os, const MoveObjectRequest &r) {
-    os << "MoveObjectRequest={region='" << r.region << "' user='" << r.user << "' sourceBucket='" << r.sourceBucket << "' sourceKey='" << r.sourceKey
-       << "' targetBucket='" << r.targetBucket << "' targetKey='" << r.targetKey << "' metadata={";
-    for (const auto &m : r.metadata) {
-      os << m.first << "=" << m.second << ", ";
+    std::string MoveObjectRequest::ToString() const {
+        std::stringstream ss;
+        ss << (*this);
+        return ss.str();
     }
-    os << "\b\b" << "}}";
-    return os;
-  }
 
-} // namespace AwsMock::Dto::S3
+    std::ostream &operator<<(std::ostream &os, const MoveObjectRequest &r) {
+        os << "MoveObjectRequest={region='" << r.region << "' user='" << r.user << "' sourceBucket='" << r.sourceBucket << "' sourceKey='" << r.sourceKey
+           << "' targetBucket='" << r.targetBucket << "' targetKey='" << r.targetKey << "' metadata={";
+        for (const auto &m: r.metadata) {
+            os << m.first << "=" << m.second << ", ";
+        }
+        os << "\b\b"
+           << "}}";
+        return os;
+    }
+
+}// namespace AwsMock::Dto::S3

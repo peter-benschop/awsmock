@@ -15,10 +15,10 @@
 #include <Poco/JSON/Object.h>
 
 // MongoDB includes
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
@@ -26,13 +26,13 @@
 
 namespace AwsMock::Database::Entity::Cognito {
 
+    using bsoncxx::to_json;
+    using bsoncxx::view_or_value;
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
-    using bsoncxx::view_or_value;
-    using bsoncxx::document::view;
     using bsoncxx::document::value;
-    using bsoncxx::to_json;
+    using bsoncxx::document::view;
 
     /**
      * Cognito user pool entity
@@ -81,14 +81,14 @@ namespace AwsMock::Database::Entity::Cognito {
          *
          * @return entity as MongoDB document.
          */
-        [[nodiscard]] view_or_value <view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * Converts the MongoDB document to an entity
          *
          * @param mResult query result.
          */
-        void FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult);
+        void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
         /**
          * Converts the entity to a JSON object
@@ -119,11 +119,10 @@ namespace AwsMock::Database::Entity::Cognito {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const UserPool &userPool);
-
     };
 
-    typedef std::vector <Entity::Cognito::UserPool> UserPoolList;
+    typedef std::vector<Entity::Cognito::UserPool> UserPoolList;
 
-} // namespace AwsMock::Database::Entity::Cognito
+}// namespace AwsMock::Database::Entity::Cognito
 
-#endif // AWSMOCK_DB_ENTITY_COGNITO_USERPOOL_H
+#endif// AWSMOCK_DB_ENTITY_COGNITO_USERPOOL_H

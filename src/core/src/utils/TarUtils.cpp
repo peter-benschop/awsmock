@@ -32,7 +32,7 @@ namespace AwsMock::Core {
 
     void TarUtils::WriteFile(struct archive *archive, const std::string &fileName, const std::string &removeDir, bool isDir, bool isLink) {
 
-        struct stat st{};
+        struct stat st {};
         struct archive_entry *entry;
         char buff[8192];
         long len;
@@ -42,7 +42,7 @@ namespace AwsMock::Core {
         log_trace << "Removed directory, name: " << entryName;
 
         stat(fileName.c_str(), &st);
-        entry = archive_entry_new(); // Note 2
+        entry = archive_entry_new();// Note 2
         archive_entry_set_pathname(entry, entryName.c_str());
         archive_entry_set_size(entry, st.st_size);
         std::string link;
@@ -85,4 +85,4 @@ namespace AwsMock::Core {
         }
         return "";
     }
-}
+}// namespace AwsMock::Core

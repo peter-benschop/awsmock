@@ -26,6 +26,6 @@ namespace AwsMock {
         std::string _type;
         std::string _message;
     };
-} // namespace AwsMock
+}// namespace AwsMock
 
-#endif // AWSMOCK_RESOURCE_HANDLEREXCEPTION_H
+#endif// AWSMOCK_RESOURCE_HANDLEREXCEPTION_H

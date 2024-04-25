@@ -13,14 +13,14 @@
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/MetricService.h>
 #include <awsmock/core/MetricDefinition.h>
+#include <awsmock/core/MetricService.h>
 #include <awsmock/core/NumberUtils.h>
-#include <awsmock/dto/common/UserAgent.h>
 #include <awsmock/dto/common/S3ClientCommand.h>
+#include <awsmock/dto/common/UserAgent.h>
 #include <awsmock/service/common/AbstractHandler.h>
-#include <awsmock/service/s3/S3Service.h>
 #include <awsmock/service/s3/S3CmdHandler.h>
+#include <awsmock/service/s3/S3Service.h>
 
 namespace AwsMock::Service {
 
@@ -37,7 +37,6 @@ namespace AwsMock::Service {
     class S3Handler : public S3CmdHandler {
 
       public:
-
         /**
          * Constructor
          *
@@ -101,7 +100,6 @@ namespace AwsMock::Service {
         void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
       private:
-
         /**
          * S3 handler configuration
          */
@@ -111,9 +109,8 @@ namespace AwsMock::Service {
          * S3 module
          */
         Service::S3Service _s3Service;
-
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_S3_HANDLER_H
+#endif// AWSMOCK_SERVICE_S3_HANDLER_H

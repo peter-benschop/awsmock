@@ -6,36 +6,35 @@
 #define AWSMOCK_DTO_LAMBDA_DEADLETTERCONFIG_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 #include <vector>
 
 // Poco includes
+#include <Poco/Dynamic/Var.h>
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
-#include <Poco/Dynamic/Var.h>
 
 // AwsMock includes
 #include <awsmock/core/ServiceException.h>
 
 namespace AwsMock::Dto::Lambda {
 
-  struct DeadLetterConfig {
+    struct DeadLetterConfig {
 
-    /**
+        /**
      * Target ARN
      */
-    std::string targetArn = {};
+        std::string targetArn = {};
 
-    /**
+        /**
      * Converts the DTO to a JSON representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+    };
 
-  };
+}// namespace AwsMock::Dto::Lambda
 
-} // namespace AwsMock::Dto::lambda
-
-#endif // AWSMOCK_DTO_LAMBDA_DEADLETTERCONFIG_H
+#endif// AWSMOCK_DTO_LAMBDA_DEADLETTERCONFIG_H

@@ -12,43 +12,41 @@
 #include <Poco/DateTimeFormatter.h>
 
 // AwsMock includes
+#include "awsmock/service/common/AbstractHandler.h"
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/MetricService.h>
 #include <awsmock/core/MetricDefinition.h>
+#include <awsmock/core/MetricService.h>
 #include <awsmock/dto/common/SecretsManagerClientCommand.h>
-#include "awsmock/service/common/AbstractHandler.h"
 #include <awsmock/service/secretsmanager/SecretsManagerService.h>
 
 #define DEFAULT_SQS_ACCOUNT_ID "000000000000"
 
 namespace AwsMock::Service {
 
-  /**
+    /**
    * UserAttribute  list
    */
-  typedef std::map<std::string, std::string> AttributeList;
+    typedef std::map<std::string, std::string> AttributeList;
 
-  /**
+    /**
    * AWS Secrets manager mock handler.
    *
    * @author jens.vogt@opitz-consulting.com
    */
-  class SecretsManagerCmdHandler : public virtual AbstractHandler {
+    class SecretsManagerCmdHandler : public virtual AbstractHandler {
 
-  public:
-
-    /**
+      public:
+        /**
      * Constructor
      *
      * @param configuration application configuration
      */
-    SecretsManagerCmdHandler(Core::Configuration &configuration);
+        SecretsManagerCmdHandler(Core::Configuration &configuration);
 
-  protected:
-
-    /**
+      protected:
+        /**
      * HTTP POST request.
      *
      * @param request HTTP request
@@ -56,31 +54,30 @@ namespace AwsMock::Service {
      * @param sqsClientCommand standardised client command
      * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
      */
-    void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::SecretsManagerClientCommand &sqsClientCommand);
+        void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::SecretsManagerClientCommand &sqsClientCommand);
 
-  private:
-
-    /**
+      private:
+        /**
      * ImageHandler import configuration
      */
-    Core::Configuration &_configuration;
+        Core::Configuration &_configuration;
 
-    /**
+        /**
      * SQS module
      */
-    Service::SecretsManagerService _secretsManagerService;
+        Service::SecretsManagerService _secretsManagerService;
 
-    /**
+        /**
      * Default account ID
      */
-    std::string _accountId;
+        std::string _accountId;
 
-    /**
+        /**
      * Default endpoint
      */
-    std::string _endpoint;
-  };
+        std::string _endpoint;
+    };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
-#endif // AWSMOCK_SERVICE_SECRETSMANAGER_CMD_HANDLER_H
+#endif// AWSMOCK_SERVICE_SECRETSMANAGER_CMD_HANDLER_H

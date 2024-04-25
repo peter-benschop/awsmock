@@ -6,21 +6,21 @@
 
 namespace AwsMock::Database::Entity::SQS {
 
+    using bsoncxx::view_or_value;
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
-    using bsoncxx::view_or_value;
-    using bsoncxx::document::view;
     using bsoncxx::document::value;
+    using bsoncxx::document::view;
 
-    view_or_value <view, value> Message::ToDocument() const {
+    view_or_value<view, value> Message::ToDocument() const {
 
         auto messageAttributesDoc = bsoncxx::builder::basic::array{};
         for (const auto &attribute: attributes) {
             messageAttributesDoc.append(attribute.ToDocument());
         }
 
-        view_or_value <view, value> messageDoc = make_document(
+        view_or_value<view, value> messageDoc = make_document(
                 kvp("region", region),
                 kvp("queueUrl", queueUrl),
                 kvp("body", body),
@@ -39,7 +39,7 @@ namespace AwsMock::Database::Entity::SQS {
         return messageDoc;
     }
 
-    void Message::FromDocument(mongocxx::stdx::optional <bsoncxx::document::view> mResult) {
+    void Message::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         oid = mResult.value()["_id"].get_oid().value.to_string();
         region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
@@ -61,9 +61,9 @@ namespace AwsMock::Database::Entity::SQS {
         bsoncxx::array::view attributesView{mResult.value()["attributes"].get_array().value};
         for (bsoncxx::array::element attributeElement: attributesView) {
             MessageAttribute attribute{
-                    .attributeName=bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
-                    .attributeValue=bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value),
-                    .attributeType=Database::Entity::SQS::MessageAttributeTypeFromString(bsoncxx::string::to_string(attributeElement["attributeType"].get_string().value)),
+                    .attributeName = bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
+                    .attributeValue = bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value),
+                    .attributeType = Database::Entity::SQS::MessageAttributeTypeFromString(bsoncxx::string::to_string(attributeElement["attributeType"].get_string().value)),
                     .systemAttribute = attributeElement["systemAttribute"].get_bool().value,
             };
             attributes.push_back(attribute);
@@ -136,4 +136,4 @@ namespace AwsMock::Database::Entity::SQS {
         return os;
     }
 
-} // namespace AwsMock::Database::Entity::S3
+}// namespace AwsMock::Database::Entity::SQS

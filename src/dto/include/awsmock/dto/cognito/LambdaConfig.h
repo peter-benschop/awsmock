@@ -6,8 +6,8 @@
 #define AWSMOCK_DTO_COGNITO_LAMBDACONFIG_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // AwsMock includes
 #include <awsmock/core/JsonException.h>
@@ -20,7 +20,7 @@
 
 namespace AwsMock::Dto::Cognito {
 
-  /**
+    /**
    * Cognito lambda configuration
    *
    * Example:
@@ -52,101 +52,100 @@ namespace AwsMock::Dto::Cognito {
    * },
    * </pre>
    */
-  struct LambdaConfig {
+    struct LambdaConfig {
 
-    /**
+        /**
      * Create authentication challenge
      */
-    std::string createAuthChallenge;
+        std::string createAuthChallenge;
 
-    /**
+        /**
      * Custom message
      */
-    std::string customMessage;
+        std::string customMessage;
 
-    /**
+        /**
      * Custom email sender
      */
-    CustomEmailSender customEmailSender;
+        CustomEmailSender customEmailSender;
 
-    /**
+        /**
      * Custom SMS sender
      */
-    CustomSmsSender customSmsSender;
+        CustomSmsSender customSmsSender;
 
-    /**
+        /**
      * Define authentication challenge
      */
-    std::string defineAuthChallenge;
+        std::string defineAuthChallenge;
 
-    /**
+        /**
      * KMS key
      */
-    std::string kmsKeyId;
+        std::string kmsKeyId;
 
-    /**
+        /**
      * Post authentication
      */
-    std::string postAuthentication;
+        std::string postAuthentication;
 
-    /**
+        /**
      * Post confirmation
      */
-    std::string postConfirmation;
+        std::string postConfirmation;
 
-    /**
+        /**
      * Pre confirmation
      */
-    std::string preAuthentication;
+        std::string preAuthentication;
 
-    /**
+        /**
      * Pre signup
      */
-    std::string preSignUp;
+        std::string preSignUp;
 
-    /**
+        /**
      * Pre token generation
      */
-    std::string preTokenGeneration;
+        std::string preTokenGeneration;
 
-    /**
+        /**
      * Pre token generation config
      */
-    PreTokenGenerationConfig preTokenGenerationConfig;
+        PreTokenGenerationConfig preTokenGenerationConfig;
 
-    /**
+        /**
      * User migration
      */
-    std::string userMigration;
+        std::string userMigration;
 
-    /**
+        /**
      * Verify auth challenge
      */
-    std::string verifyAuthChallengeResponse;
+        std::string verifyAuthChallengeResponse;
 
-    /**
+        /**
      * Convert to a JSON string
      *
      * @return JSON string
      */
-    [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const LambdaConfig &r);
+        friend std::ostream &operator<<(std::ostream &os, const LambdaConfig &r);
+    };
 
-  };
+}// namespace AwsMock::Dto::Cognito
 
-} // namespace AwsMock::Dto::Cognito
-
-#endif // AWSMOCK_DTO_COGNITO_LAMBDACONFIG_H
+#endif// AWSMOCK_DTO_COGNITO_LAMBDACONFIG_H

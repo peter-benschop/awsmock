@@ -11,4 +11,4 @@ namespace AwsMock::Service {
 
         SNSCmdHandler::handlePost(request, response, clientCommand);
     }
-}
+}// namespace AwsMock::Service

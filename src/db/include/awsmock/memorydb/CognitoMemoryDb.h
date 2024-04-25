@@ -6,9 +6,9 @@
 #define AWSMOCK_REPOSITORY_COGNITO_MEMORYDB_H
 
 // C++ standard includes
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
 
 // Poco includes
 #include <Poco/Mutex.h>
@@ -17,24 +17,25 @@
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/DatabaseException.h>
-#include <awsmock/repository/Database.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/entity/cognito/User.h>
 #include <awsmock/entity/cognito/UserPool.h>
+#include <awsmock/repository/Database.h>
 
 namespace AwsMock::Database {
 
     /**
      * Cognito in-memory database.
      *
+     * <p>Provides a in-memory database using a simple hash map.</p>
+     *
      * @author jens.vogt@opitz-consulting.com
      */
     class CognitoMemoryDb {
 
       public:
-
         /**
          * Constructor
          */
@@ -44,7 +45,7 @@ namespace AwsMock::Database {
          * Singleton instance
          */
         static CognitoMemoryDb &instance() {
-            static Poco::SingletonHolder <CognitoMemoryDb> sh;
+            static Poco::SingletonHolder<CognitoMemoryDb> sh;
             return *sh.get();
         }
 
@@ -108,7 +109,7 @@ namespace AwsMock::Database {
          * @param region AWS region name
          * @return list of cognito user pools
          */
-        std::vector <Entity::Cognito::UserPool> ListUserPools(const std::string &region);
+        std::vector<Entity::Cognito::UserPool> ListUserPools(const std::string &region);
 
         /**
          * Updates an existing cognito user pool
@@ -170,9 +171,7 @@ namespace AwsMock::Database {
          * @return cognito user entity
          * @throws DatabaseException
          */
-        Entity::Cognito::User GetUserByUserName(const std::string &region,
-                                                const std::string &userPoolId,
-                                                const std::string &userName);
+        Entity::Cognito::User GetUserByUserName(const std::string &region, const std::string &userPoolId, const std::string &userName);
 
         /**
          * Count all user pools
@@ -190,7 +189,7 @@ namespace AwsMock::Database {
          * @param userPoolId user pool ID
          * @return list of cognito users
          */
-        std::vector <Entity::Cognito::User> ListUsers(const std::string &region = {}, const std::string &userPoolId = {});
+        std::vector<Entity::Cognito::User> ListUsers(const std::string &region = {}, const std::string &userPoolId = {});
 
         /**
          * Updates an existing cognito user
@@ -216,16 +215,15 @@ namespace AwsMock::Database {
         void DeleteAllUsers();
 
       private:
-
         /**
          * Cognito user pool map
          */
-        std::map <std::string, Entity::Cognito::UserPool> _userPools{};
+        std::map<std::string, Entity::Cognito::UserPool> _userPools{};
 
         /**
          * Cognito user map
          */
-        std::map <std::string, Entity::Cognito::User> _users{};
+        std::map<std::string, Entity::Cognito::User> _users{};
 
         /**
          * Cognito user pool mutex
@@ -238,6 +236,6 @@ namespace AwsMock::Database {
         Poco::Mutex _userMutex;
     };
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
 
-#endif // AWSMOCK_REPOSITORY_COGNITO_MEMORYDB_H
+#endif// AWSMOCK_REPOSITORY_COGNITO_MEMORYDB_H

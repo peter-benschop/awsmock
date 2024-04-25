@@ -18,115 +18,115 @@
 
 namespace AwsMock::Core {
 
-  class JsonUtilsTest : public ::testing::Test {};
+    class JsonUtilsTest : public ::testing::Test {};
 
-  TEST_F(JsonUtilsTest, BoolTest) {
+    TEST_F(JsonUtilsTest, BoolTest) {
 
-    // arrange
-    Poco::JSON::Parser parser;
-    Poco::Dynamic::Var parsed = parser.parse(TEST_JSON);
-    const auto &rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
+        // arrange
+        Poco::JSON::Parser parser;
+        Poco::Dynamic::Var parsed = parser.parse(TEST_JSON);
+        const auto &rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
 
-    // act
-    bool result;
-    JsonUtils::GetJsonValueBool("testBool", rootObject, result);
+        // act
+        bool result;
+        JsonUtils::GetJsonValueBool("testBool", rootObject, result);
 
-    // assert
-    EXPECT_FALSE(result);
-  }
+        // assert
+        EXPECT_FALSE(result);
+    }
 
-  TEST_F(JsonUtilsTest, StringTest) {
+    TEST_F(JsonUtilsTest, StringTest) {
 
-    // arrange
-    Poco::JSON::Parser parser;
-    Poco::Dynamic::Var parsed = parser.parse(TEST_JSON);
-    const auto &rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
+        // arrange
+        Poco::JSON::Parser parser;
+        Poco::Dynamic::Var parsed = parser.parse(TEST_JSON);
+        const auto &rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
 
-    // act
-    std::string result;
-    JsonUtils::GetJsonValueString("testString", rootObject, result);
+        // act
+        std::string result;
+        JsonUtils::GetJsonValueString("testString", rootObject, result);
 
-    // assert
-    EXPECT_STREQ(result.c_str(), "testValue");
-  }
+        // assert
+        EXPECT_STREQ(result.c_str(), "testValue");
+    }
 
-  TEST_F(JsonUtilsTest, LongTest) {
+    TEST_F(JsonUtilsTest, LongTest) {
 
-    // arrange
-    Poco::JSON::Parser parser;
-    Poco::Dynamic::Var parsed = parser.parse(TEST_JSON);
-    const auto &rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
+        // arrange
+        Poco::JSON::Parser parser;
+        Poco::Dynamic::Var parsed = parser.parse(TEST_JSON);
+        const auto &rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
 
-    // act
-    long result;
-    JsonUtils::GetJsonValueLong("testLong", rootObject, result);
+        // act
+        long result;
+        JsonUtils::GetJsonValueLong("testLong", rootObject, result);
 
-    // assert
-    EXPECT_EQ(result, 10000);
-  }
+        // assert
+        EXPECT_EQ(result, 10000);
+    }
 
-  TEST_F(JsonUtilsTest, IntTest) {
+    TEST_F(JsonUtilsTest, IntTest) {
 
-    // arrange
-    Poco::JSON::Parser parser;
-    Poco::Dynamic::Var parsed = parser.parse(TEST_JSON);
-    const auto &rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
+        // arrange
+        Poco::JSON::Parser parser;
+        Poco::Dynamic::Var parsed = parser.parse(TEST_JSON);
+        const auto &rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
 
-    // act
-    int result;
-    JsonUtils::GetJsonValueInt("testInt", rootObject, result);
+        // act
+        int result;
+        JsonUtils::GetJsonValueInt("testInt", rootObject, result);
 
-    // assert
-    EXPECT_EQ(result, 10);
-  }
+        // assert
+        EXPECT_EQ(result, 10);
+    }
 
-  TEST_F(JsonUtilsTest, FloatTest) {
+    TEST_F(JsonUtilsTest, FloatTest) {
 
-    // arrange
-    Poco::JSON::Parser parser;
-    Poco::Dynamic::Var parsed = parser.parse(TEST_JSON);
-    const auto &rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
+        // arrange
+        Poco::JSON::Parser parser;
+        Poco::Dynamic::Var parsed = parser.parse(TEST_JSON);
+        const auto &rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
 
-    // act
-    float result;
-    JsonUtils::GetJsonValueFloat("testFloat", rootObject, result);
+        // act
+        float result;
+        JsonUtils::GetJsonValueFloat("testFloat", rootObject, result);
 
-    // assert
-    EXPECT_EQ(result, 100.0);
-  }
+        // assert
+        EXPECT_EQ(result, 100.0);
+    }
 
-  TEST_F(JsonUtilsTest, DoubleTest) {
+    TEST_F(JsonUtilsTest, DoubleTest) {
 
-    // arrange
-    Poco::JSON::Parser parser;
-    Poco::Dynamic::Var parsed = parser.parse(TEST_JSON);
-    const auto &rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
+        // arrange
+        Poco::JSON::Parser parser;
+        Poco::Dynamic::Var parsed = parser.parse(TEST_JSON);
+        const auto &rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
 
-    // act
-    double result;
-    JsonUtils::GetJsonValueDouble("testDouble", rootObject, result);
+        // act
+        double result;
+        JsonUtils::GetJsonValueDouble("testDouble", rootObject, result);
 
-    // assert
-    EXPECT_EQ(result, 1000.0);
-  }
+        // assert
+        EXPECT_EQ(result, 1000.0);
+    }
 
-  TEST_F(JsonUtilsTest, DateTest) {
+    TEST_F(JsonUtilsTest, DateTest) {
 
-    // arrange
-    Poco::JSON::Parser parser;
-    Poco::Dynamic::Var parsed = parser.parse(TEST_JSON);
-    const auto &rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
+        // arrange
+        Poco::JSON::Parser parser;
+        Poco::Dynamic::Var parsed = parser.parse(TEST_JSON);
+        const auto &rootObject = parsed.extract<Poco::JSON::Object::Ptr>();
 
-    // act
-    Poco::DateTime result;
-    JsonUtils::GetJsonValueDate("testDate", rootObject, result);
+        // act
+        Poco::DateTime result;
+        JsonUtils::GetJsonValueDate("testDate", rootObject, result);
 
-    // assert
-    EXPECT_EQ(result.year(), 2023);
-    EXPECT_EQ(result.month(), 5);
-    EXPECT_EQ(result.day(), 25);
-  }
+        // assert
+        EXPECT_EQ(result.year(), 2023);
+        EXPECT_EQ(result.month(), 5);
+        EXPECT_EQ(result.day(), 25);
+    }
 
-} // namespace AwsMock::Core
+}// namespace AwsMock::Core
 
-#endif // AWMOCK_CORE_JSON_UTILS_TEST_H
+#endif// AWMOCK_CORE_JSON_UTILS_TEST_H

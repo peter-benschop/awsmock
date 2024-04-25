@@ -16,7 +16,7 @@ namespace AwsMock::Service {
                 std::string name = Core::HttpUtils::GetQueryParameterValueByName(snsClientCommand.payload, "Name");
                 log_debug << "Topic name: " << name;
 
-                Dto::SNS::CreateTopicRequest snsRequest = {.region=snsClientCommand.region, .topicName = name, .owner=snsClientCommand.user};
+                Dto::SNS::CreateTopicRequest snsRequest = {.region = snsClientCommand.region, .topicName = name, .owner = snsClientCommand.user};
                 Dto::SNS::CreateTopicResponse snsResponse = _snsService.CreateTopic(snsRequest);
                 SendOkResponse(response, snsResponse.ToXml());
                 log_info << "Topic created, name: " << name;
@@ -39,7 +39,7 @@ namespace AwsMock::Service {
                 std::string targetArn = Core::HttpUtils::GetQueryParameterValueByName(snsClientCommand.payload, "TargetArn");
                 std::string message = Core::HttpUtils::GetQueryParameterValueByName(snsClientCommand.payload, "Message");
 
-                Dto::SNS::PublishResponse snsResponse = _snsService.Publish({.region=snsClientCommand.region, .topicArn=topicArn, .targetArn=targetArn, .message=message});
+                Dto::SNS::PublishResponse snsResponse = _snsService.Publish({.region = snsClientCommand.region, .topicArn = topicArn, .targetArn = targetArn, .message = message});
                 SendOkResponse(response, snsResponse.ToXml());
                 log_info << "Message published, topic: " << topicArn;
 
@@ -52,7 +52,7 @@ namespace AwsMock::Service {
                 std::string protocol = Core::HttpUtils::GetQueryParameterValueByName(snsClientCommand.payload, "Protocol");
                 std::string endpoint = Core::HttpUtils::GetQueryParameterValueByName(snsClientCommand.payload, "Endpoint");
 
-                Dto::SNS::SubscribeResponse snsResponse = _snsService.Subscribe({.region=snsClientCommand.region, .topicArn=topicArn, .protocol=protocol, .endpoint=endpoint, .owner=snsClientCommand.user});
+                Dto::SNS::SubscribeResponse snsResponse = _snsService.Subscribe({.region = snsClientCommand.region, .topicArn = topicArn, .protocol = protocol, .endpoint = endpoint, .owner = snsClientCommand.user});
                 SendOkResponse(response, snsResponse.ToXml());
                 log_info << "Subscribed to topic, topicArn: " << topicArn;
 
@@ -63,7 +63,7 @@ namespace AwsMock::Service {
 
                 std::string subscriptionArn = Core::HttpUtils::GetQueryParameterValueByName(snsClientCommand.payload, "SubscriptionArn");
 
-                Dto::SNS::UnsubscribeResponse snsResponse = _snsService.Unsubscribe({.region=snsClientCommand.region, .subscriptionArn=subscriptionArn});
+                Dto::SNS::UnsubscribeResponse snsResponse = _snsService.Unsubscribe({.region = snsClientCommand.region, .subscriptionArn = subscriptionArn});
                 SendOkResponse(response, snsResponse.ToXml());
                 log_info << "Unsubscribed from topic, subscriptionArn: " << subscriptionArn;
 
@@ -84,7 +84,7 @@ namespace AwsMock::Service {
                     std::string tagValue = Core::HttpUtils::GetQueryParameterValueByName(snsClientCommand.payload, "Tags.member." + std::to_string(i) + ".Value");
                     tags[tagKey] = tagValue;
                 }
-                Dto::SNS::TagResourceRequest snsRequest = {.region=snsClientCommand.region, .resourceArn= resourceArn, .tags=tags};
+                Dto::SNS::TagResourceRequest snsRequest = {.region = snsClientCommand.region, .resourceArn = resourceArn, .tags = tags};
                 Dto::SNS::TagResourceResponse snsResponse = _snsService.TagResource(snsRequest);
                 SendOkResponse(response, snsResponse.ToXml());
                 log_info << "Topic tagged, resourceArn: " << resourceArn;
@@ -109,4 +109,4 @@ namespace AwsMock::Service {
             }
         }
     }
-}
+}// namespace AwsMock::Service

@@ -6,9 +6,9 @@
 #define AWSMOCK_REPOSITORY_LAMBDAMEMORYDB_H
 
 // C++ standard includes
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
 
 // Poco includes
 #include <Poco/Mutex.h>
@@ -17,13 +17,13 @@
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/repository/Database.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/entity/lambda/Lambda.h>
+#include <awsmock/repository/Database.h>
 
 namespace AwsMock::Database {
 
@@ -35,7 +35,6 @@ namespace AwsMock::Database {
     class LambdaMemoryDb {
 
       public:
-
         /**
          * Constructor
          */
@@ -45,7 +44,7 @@ namespace AwsMock::Database {
          * Singleton instance
          */
         static LambdaMemoryDb &instance() {
-            static Poco::SingletonHolder <LambdaMemoryDb> sh;
+            static Poco::SingletonHolder<LambdaMemoryDb> sh;
             return *sh.get();
         }
 
@@ -137,7 +136,7 @@ namespace AwsMock::Database {
          * @param region AWS region name
          * @return list of lambda functions
          */
-        std::vector <Entity::Lambda::Lambda> ListLambdas(const std::string &region);
+        std::vector<Entity::Lambda::Lambda> ListLambdas(const std::string &region);
 
         /**
          * Updates an existing lambda lambda function
@@ -163,11 +162,10 @@ namespace AwsMock::Database {
         void DeleteAllLambdas();
 
       private:
-
         /**
          * Lambda map
          */
-        std::map <std::string, Entity::Lambda::Lambda> _lambdas{};
+        std::map<std::string, Entity::Lambda::Lambda> _lambdas{};
 
         /**
          * Lambda mutex
@@ -175,6 +173,6 @@ namespace AwsMock::Database {
         Poco::Mutex _lambdaMutex;
     };
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
 
-#endif // AWSMOCK_REPOSITORY_LAMBDAMEMORYDB_H
+#endif// AWSMOCK_REPOSITORY_LAMBDAMEMORYDB_H

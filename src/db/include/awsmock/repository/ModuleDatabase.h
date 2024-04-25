@@ -12,10 +12,10 @@
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/Configuration.h>
 #include "awsmock/core/DatabaseException.h"
 #include "awsmock/memorydb/ModuleMemoryDb.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/entity/module/Module.h>
 #include <awsmock/repository/Database.h>
 
@@ -29,7 +29,6 @@ namespace AwsMock::Database {
     class ModuleDatabase : public Database {
 
       public:
-
         /**
          * Constructor
          *
@@ -41,7 +40,7 @@ namespace AwsMock::Database {
          * Singleton instance
          */
         static ModuleDatabase &instance() {
-            static Poco::SingletonHolder <ModuleDatabase> sh;
+            static Poco::SingletonHolder<ModuleDatabase> sh;
             return *sh.get();
         }
 
@@ -170,7 +169,6 @@ namespace AwsMock::Database {
         void DeleteAllModules();
 
       private:
-
         /**
          * Use MongoDB
          */
@@ -189,9 +187,9 @@ namespace AwsMock::Database {
         /**
          * Existing modules
          */
-        static std::map <std::string, Entity::Module::Module> _existingModules;
+        static std::map<std::string, Entity::Module::Module> _existingModules;
     };
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
 
-#endif // AWSMOCK_REPOSITORY_MODULEDATABASE_H
+#endif// AWSMOCK_REPOSITORY_MODULEDATABASE_H

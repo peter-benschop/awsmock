@@ -6,9 +6,9 @@
 #define AWSMOCK_REPOSITORY_DYNAMODB_MEMORYDB_H
 
 // C++ standard includes
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
 
 // Poco includes
 #include <Poco/Mutex.h>
@@ -17,13 +17,13 @@
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include "awsmock/entity/dynamodb/Table.h"
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/entity/dynamodb/Item.h>
-#include "awsmock/entity/dynamodb/Table.h"
 #include <awsmock/repository/Database.h>
 
 namespace AwsMock::Database {
@@ -36,7 +36,6 @@ namespace AwsMock::Database {
     class DynamoDbMemoryDb {
 
       public:
-
         /**
          * Constructor
          */
@@ -48,7 +47,7 @@ namespace AwsMock::Database {
          * @return singleton instance
          */
         static DynamoDbMemoryDb &instance() {
-            static Poco::SingletonHolder <DynamoDbMemoryDb> sh;
+            static Poco::SingletonHolder<DynamoDbMemoryDb> sh;
             return *sh.get();
         }
 
@@ -103,7 +102,7 @@ namespace AwsMock::Database {
          * @param region AWS region name
          * @return list of DynamoDB tables
          */
-        std::vector <Entity::DynamoDb::Table> ListTables(const std::string &region = {});
+        std::vector<Entity::DynamoDb::Table> ListTables(const std::string &region = {});
 
         /**
          * Deletes an existing DynamoDB table
@@ -162,16 +161,15 @@ namespace AwsMock::Database {
         void DeleteAllItems();
 
       private:
-
         /**
          * Table map
          */
-        std::map <std::string, Entity::DynamoDb::Table> _tables{};
+        std::map<std::string, Entity::DynamoDb::Table> _tables{};
 
         /**
          * Item map
          */
-        std::map <std::string, Entity::DynamoDb::Item> _items{};
+        std::map<std::string, Entity::DynamoDb::Item> _items{};
 
         /**
          * Table mutex
@@ -184,6 +182,6 @@ namespace AwsMock::Database {
         Poco::Mutex _itemMutex;
     };
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
 
-#endif // AWSMOCK_REPOSITORY_DYNAMODB_MEMORYDB_H
+#endif// AWSMOCK_REPOSITORY_DYNAMODB_MEMORYDB_H

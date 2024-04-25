@@ -6,17 +6,17 @@
 #define AWSMOCK_DB_ENTITY_S3_BUCKETNOTIFICATION_H
 
 // C++ includes
-#include <string>
 #include <chrono>
 #include <sstream>
+#include <string>
 
 // Poco includes
 #include <Poco/JSON/Object.h>
 
 // MongoDB includes
-#include <bsoncxx/json.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/json.hpp>
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
@@ -25,8 +25,8 @@
 namespace AwsMock::Database::Entity::S3 {
 
     using bsoncxx::view_or_value;
-    using bsoncxx::document::view;
     using bsoncxx::document::value;
+    using bsoncxx::document::view;
 
     /**
      * S3 bucket notification entity
@@ -60,7 +60,7 @@ namespace AwsMock::Database::Entity::S3 {
          *
          * @return entity as MongoDB document.
          */
-        [[maybe_unused]] [[nodiscard]] view_or_value <view, value> ToDocument() const;
+        [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * Converts the entity to a JSON object
@@ -89,9 +89,8 @@ namespace AwsMock::Database::Entity::S3 {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const BucketNotification &q);
-
     };
 
-} // namespace AwsMock::Database::Entity::S3
+}// namespace AwsMock::Database::Entity::S3
 
-#endif // AWSMOCK_DB_ENTITY_S3_BUCKETNOTIFICATION_H
+#endif// AWSMOCK_DB_ENTITY_S3_BUCKETNOTIFICATION_H

@@ -6,8 +6,8 @@
 #define AWSMOCK_DTO_S3_CREATE_BUCKET_CONSTRAINT_H
 
 // C++ standard includes
-#include <string>
 #include <sstream>
+#include <string>
 
 // AwsMock includes
 #include <awsmock/core/JsonException.h>
@@ -17,21 +17,21 @@
 
 namespace AwsMock::Dto::S3 {
 
-  struct CreateBucketConstraint {
+    struct CreateBucketConstraint {
 
-    /**
+        /**
      * Bucket location
      */
-    std::string location;
+        std::string location;
 
-    /**
+        /**
      * Convert to a JSON string
      *
      * @return JSON string
      */
-    [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
-    /**
+        /**
      * Convert to XML representation
      *
      * Example:
@@ -43,24 +43,23 @@ namespace AwsMock::Dto::S3 {
      *
      * @return XML string
      */
-    [[nodiscard]] std::string ToXml() const;
+        [[nodiscard]] std::string ToXml() const;
 
-    /**
+        /**
      * Converts the DTO to a string representation.
      *
      * @return DTO as string for logging.
      */
-    [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
-    /**
+        /**
      * Stream provider.
      *
      * @return output stream
      */
-    friend std::ostream &operator<<(std::ostream &os, const CreateBucketConstraint &r);
+        friend std::ostream &operator<<(std::ostream &os, const CreateBucketConstraint &r);
+    };
 
-  };
+}// namespace AwsMock::Dto::S3
 
-} // namespace AwsMock::Dto
-
-#endif // AWSMOCK_DTO_S3_CREATE_BUCKET_CONSTRAINT_H
+#endif// AWSMOCK_DTO_S3_CREATE_BUCKET_CONSTRAINT_H

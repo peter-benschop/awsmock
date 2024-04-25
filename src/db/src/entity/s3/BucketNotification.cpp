@@ -10,9 +10,9 @@ namespace AwsMock::Database::Entity::S3 {
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
 
-    view_or_value <view, value> BucketNotification::ToDocument() const {
+    view_or_value<view, value> BucketNotification::ToDocument() const {
 
-        view_or_value <view, value> notificationDoc = make_document(
+        view_or_value<view, value> notificationDoc = make_document(
                 kvp("notificationId", notificationId),
                 kvp("event", event),
                 kvp("queueArn", queueArn),
@@ -49,5 +49,4 @@ namespace AwsMock::Database::Entity::S3 {
         return os;
     }
 
-} // namespace AwsMock::Database::Entity::S3
-
+}// namespace AwsMock::Database::Entity::S3

@@ -6,13 +6,13 @@
 #define AWSMOCK_CORE_TARUTILS_H
 
 // C++ standard includes
-#include <string>
 #include <fcntl.h>
+#include <string>
 #include <unistd.h>
 
 // Poco includes
-#include <Poco/String.h>
 #include <Poco/RecursiveDirectoryIterator.h>
+#include <Poco/String.h>
 
 // Archive includes
 #include <archive.h>
@@ -23,31 +23,29 @@
 
 namespace AwsMock::Core {
 
-  /**
+    /**
    * TAR compresion utilities
    *
    * @author jens.vogt@opitz-consulting.com
    */
-  class TarUtils {
+    class TarUtils {
 
-    public:
-
-      /**
+      public:
+        /**
        * Constructor
        */
-      TarUtils() = default;
+        TarUtils() = default;
 
-      /**
+        /**
        * Archive a whole directory tree to a tar file.
        *
        * @param tarFile name of the tar file
        * @param directory directory name
        */
-      static void TarDirectory(const std::string &tarFile, const std::string &directory);
+        static void TarDirectory(const std::string &tarFile, const std::string &directory);
 
-    private:
-
-      /**
+      private:
+        /**
        * Writes archive single file to the Tar archive.
        *
        * @param archive tar archive.
@@ -56,22 +54,21 @@ namespace AwsMock::Core {
        * @param isDir directory flag
        * @param isLink link flag, needed to preserve links
        */
-      static void WriteFile(struct archive *archive,
-                            const std::string &fileName,
-                            const std::string &removeDir,
-                            bool isDir,
-                            bool isLink);
+        static void WriteFile(struct archive *archive,
+                              const std::string &fileName,
+                              const std::string &removeDir,
+                              bool isDir,
+                              bool isLink);
 
-      /**
+        /**
        * Read a symbolic link.
        *
        * @param path path to link.
        * @return target path.
        */
-      static std::string Readsymlink(const std::string &path);
+        static std::string Readsymlink(const std::string &path);
+    };
 
-  };
+}// namespace AwsMock::Core
 
-} // namespace AwsMock::Core
-
-#endif //AWSMOCK_CORE_TARUTILS_H
+#endif//AWSMOCK_CORE_TARUTILS_H
