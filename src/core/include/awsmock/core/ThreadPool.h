@@ -2,8 +2,8 @@
 // Created by vogje01 on 22/05/2023.
 //
 
-#ifndef AWSMOCK_CORE_THREADPOOL_H
-#define AWSMOCK_CORE_THREADPOOL_H
+#ifndef AWSMOCK_CORE_THREAD_POOL_H
+#define AWSMOCK_CORE_THREAD_POOL_H
 
 // Poco includes
 #include <Poco/Logger.h>
@@ -27,38 +27,39 @@
 namespace AwsMock::Core {
 
     /**
-   * Thread pool
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
+     * Thread pool
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     template<typename C>
     class ThreadPool : public Poco::ThreadPool {
 
       public:
+
         /**
-     * Constructor.
-     *
-     * @param configuration thread configuration
-     */
+         * Constructor.
+         *
+         * @param configuration thread configuration
+         */
         [[maybe_unused]] explicit ThreadPool(const Configuration &configuration) : ThreadPool(configuration.getString(CONFIG_NAME_TAG, DEFAULT_NAME),
                                                                                               configuration.getInt(CONFIG_INITIAL_TAG, DEFAULT_INITIAL),
                                                                                               configuration.getInt(CONFIG_MAX_TAG, DEFAULT_MAX),
                                                                                               configuration.getInt(CONFIG_WAIT_TIME_TAG, DEFAULT_IDLETIME)){};
         /**
-     * Constructor.
-     *
-     * @param waitTime thread wait time
-     * @param initial initial size
-     * @param max max size
-     * @param waitTime thread wait time
-x       */
+         * Constructor.
+         *
+         * @param waitTime thread wait time
+         * @param initial initial size
+         * @param max max size
+         * @param waitTime thread wait time
+ x       */
         explicit ThreadPool(const std::string &name = DEFAULT_NAME, int initial = DEFAULT_INITIAL, int max = DEFAULT_MAX, int waitTime = DEFAULT_WAITTIME) : Poco::ThreadPool(name, initial, max, waitTime), _initial(initial), _max(max), _idleTime(waitTime) {
             log_debug << "Thread pool initialized, name: " + name + " initial: " << initial << " max: " << max << " waitTime: " << waitTime;
         }
 
         /**
-     * Destructor
-     */
+         * Destructor
+         */
         virtual ~ThreadPool() {
             log_debug << "Shutting down thread pool, name: " << _name;
             joinAll();
@@ -66,19 +67,19 @@ x       */
         }
 
         /**
-     * Set name.
-     *
-     * @param name name of the threads
-     */
+         * Set name.
+         *
+         * @param name name of the threads
+         */
         void SetName(const std::string &name) {
             _name = name;
         }
 
         /**
-     * Start thread.
-     *
-     * @param args variable list of process arguments
-     */
+         * Start thread.
+         *
+         * @param args variable list of process arguments
+         */
         template<class... Args>
         void StartThread(Args &&...args) {
             Poco::ScopedLock lock(_mutex);
@@ -89,8 +90,8 @@ x       */
         }
 
         /**
-     * Dumps thread list to the logger.
-     */
+         * Dumps thread list to the logger.
+         */
         void DumpThreads() {
             for (auto &it: _threads) {
                 log_info << "Thread, name: " << it.first << " running: " << it.second->GetRunning();
@@ -98,9 +99,10 @@ x       */
         }
 
       private:
+
         /**
-     * Cleanup the internal thread map
-     */
+         * Cleanup the internal thread map
+         */
         void CleanupThreads() {
             for (auto &it: _threads) {
                 if (!it.second->GetRunning()) {
@@ -110,8 +112,8 @@ x       */
         }
 
         /**
-     * Blocks until a thread is available
-     */
+         * Blocks until a thread is available
+         */
         void WaitForAvailableThread() {
             while (!available()) {
                 log_debug << "Waiting for thread";
@@ -122,36 +124,36 @@ x       */
         }
 
         /**
-     * Name
-     */
+         * Name
+         */
         std::string _name;
 
         /**
-     * Initial size
-     */
+         * Initial size
+         */
         int _initial;
 
         /**
-     * Maximal size
-     */
+         * Maximal size
+         */
         int _max;
 
         /**
-     * Thread wait time
-     */
+         * Thread wait time
+         */
         int _idleTime;
 
         /**
-     * Thread vector
-     */
+         * Thread vector
+         */
         std::map<std::string, std::unique_ptr<C>> _threads;
 
         /**
-     * Mutex
-     */
+         * Mutex
+         */
         Poco::Mutex _mutex;
     };
 
 }// namespace AwsMock::Core
 
-#endif// AWSMOCK_CORE_THREADPOOL_H
+#endif// AWSMOCK_CORE_THREAD_POOL_H

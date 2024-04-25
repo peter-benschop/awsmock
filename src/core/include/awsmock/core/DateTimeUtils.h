@@ -16,16 +16,19 @@
 namespace AwsMock::Core {
 
     /**
-   * Date time utilities.
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
+     * Date time utilities.
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class DateTimeUtils {
 
       public:
+
         static std::string AwsDatetime(const Poco::DateTime &dateTime);
 
         static std::string AwsDatetimeNow();
     };
+
 }// namespace AwsMock::Core
+
 #endif//AWS_MOCK_CORE_DATETIME_UTILS_H

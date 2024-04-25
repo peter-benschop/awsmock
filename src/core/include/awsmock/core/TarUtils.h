@@ -24,36 +24,38 @@
 namespace AwsMock::Core {
 
     /**
-   * TAR compresion utilities
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
+     * TAR compresion utilities
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class TarUtils {
 
       public:
+
         /**
-       * Constructor
-       */
+         * Constructor
+         */
         TarUtils() = default;
 
         /**
-       * Archive a whole directory tree to a tar file.
-       *
-       * @param tarFile name of the tar file
-       * @param directory directory name
-       */
+           * Archive a whole directory tree to a tar file.
+           *
+           * @param tarFile name of the tar file
+           * @param directory directory name
+           */
         static void TarDirectory(const std::string &tarFile, const std::string &directory);
 
       private:
+
         /**
-       * Writes archive single file to the Tar archive.
-       *
-       * @param archive tar archive.
-       * @param fileName name of the file to write
-       * @param removeDir remove name of the directory from filename
-       * @param isDir directory flag
-       * @param isLink link flag, needed to preserve links
-       */
+         * Writes archive single file to the Tar archive.
+         *
+         * @param archive tar archive.
+         * @param fileName name of the file to write
+         * @param removeDir remove name of the directory from filename
+         * @param isDir directory flag
+         * @param isLink link flag, needed to preserve links
+         */
         static void WriteFile(struct archive *archive,
                               const std::string &fileName,
                               const std::string &removeDir,
@@ -61,11 +63,11 @@ namespace AwsMock::Core {
                               bool isLink);
 
         /**
-       * Read a symbolic link.
-       *
-       * @param path path to link.
-       * @return target path.
-       */
+         * Read a symbolic link.
+         *
+         * @param path path to link.
+         * @return target path.
+         */
         static std::string Readsymlink(const std::string &path);
     };
 

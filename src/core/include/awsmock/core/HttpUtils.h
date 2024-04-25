@@ -30,6 +30,7 @@ namespace AwsMock::Core {
     class HttpUtils {
 
       public:
+
         /**
          * Returns the base path of the URI.
          *
@@ -185,6 +186,7 @@ namespace AwsMock::Core {
         static std::string GetBodyAsString(Poco::Net::HTTPServerRequest &request);
 
       private:
+
         /**
          * Checks whether the query parameter value is URL encoded
          *

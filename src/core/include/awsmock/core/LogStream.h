@@ -11,6 +11,9 @@
 #include <istream>
 #include <string_view>
 
+// Plog includes
+#define PLOG_OMIT_LOG_DEFINES
+
 // AwsMock includes
 #include <awsmock/core/logging/plog/Formatters/TxtFormatter.h>
 #include <awsmock/core/logging/plog/Init.h>
