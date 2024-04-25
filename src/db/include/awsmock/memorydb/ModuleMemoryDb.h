@@ -30,6 +30,7 @@ namespace AwsMock::Database {
     class ModuleMemoryDb {
 
       public:
+
         /**
          * Constructor
          */
@@ -151,6 +152,7 @@ namespace AwsMock::Database {
         void DeleteAllModules();
 
       private:
+
         /**
          * Modules map
          */

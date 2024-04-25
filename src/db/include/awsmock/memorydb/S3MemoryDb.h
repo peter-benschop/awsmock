@@ -31,6 +31,7 @@ namespace AwsMock::Database {
     class S3MemoryDb {
 
       public:
+
         /**
          * Constructor
          */
@@ -235,6 +236,7 @@ namespace AwsMock::Database {
         void DeleteAllObjects();
 
       private:
+
         /**
          * S3 bucket map, when running without database
          */
