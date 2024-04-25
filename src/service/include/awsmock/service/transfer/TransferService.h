@@ -59,6 +59,7 @@ namespace AwsMock::Service {
          *
          * @param request create server request
          * @return CreateServerResponse
+         * @see Dto::Transfer::CreateServerResponse
          */
         Dto::Transfer::CreateServerResponse CreateTransferServer(Dto::Transfer::CreateServerRequest &request);
 
@@ -67,6 +68,7 @@ namespace AwsMock::Service {
          *
          * @param request create user request
          * @return CreateUserResponse
+         * @see Dto::Transfer::CreateUserResponse
          */
         Dto::Transfer::CreateUserResponse CreateUser(Dto::Transfer::CreateUserRequest &request);
 
@@ -75,6 +77,7 @@ namespace AwsMock::Service {
          *
          * @param request list manager request
          * @return ListServerResponse
+         * @see Dto::Transfer::ListServerResponse
          */
         Dto::Transfer::ListServerResponse ListServers(const Dto::Transfer::ListServerRequest &request);
 
