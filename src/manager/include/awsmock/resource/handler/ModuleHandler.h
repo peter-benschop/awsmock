@@ -44,6 +44,8 @@ namespace AwsMock {
 
     /**
      * AwsMock module handler
+     *
+     * @author jens.vogt@opitz-consulting.com
      */
     class ModuleHandler : public AwsMock::Resource::AbstractResource {
 

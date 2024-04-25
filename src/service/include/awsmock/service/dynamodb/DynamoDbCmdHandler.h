@@ -24,47 +24,52 @@
 namespace AwsMock::Service {
 
     /**
-   * AWS DynamoDB command handler
-   */
+     * DynamoDB command handler
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class DynamoDbCmdHandler : public virtual AbstractHandler {
 
       public:
+
         /**
-     * Constructor
-     *
-     * @param configuration application configuration
-     */
-        DynamoDbCmdHandler(Core::Configuration &configuration);
+         * Constructor
+         *
+         * @param configuration application configuration
+         */
+        explicit DynamoDbCmdHandler(Core::Configuration &configuration);
 
       protected:
+
         /**
-     * HTTP POST request.
-     *
-     * @param request HTTP request
-     * @param response HTTP response
-     * @param clientCommand standardized request
-     * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-     */
+         * HTTP POST request.
+         *
+         * @param request HTTP request
+         * @param response HTTP response
+         * @param clientCommand standardized request
+         * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+         */
         void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::DynamoDbClientCommand &clientCommand);
 
       private:
+
         /**
-     * Return the command from the header or from the payload.
-     *
-     * @param request HTTP request
-     * @param payload HTTP payload
-     * @return SQS action
-     */
+         * Return the command from the header or from the payload.
+         *
+         * @param request HTTP request
+         * @param payload HTTP payload
+         * @return SQS action
+         */
         static std::string GetActionFromHeader(Poco::Net::HTTPServerRequest &request, const std::string &payload);
 
         /**
-     * S3 handler configuration
-     */
+         * S3 handler configuration
+         */
         Core::Configuration &_configuration;
 
         /**
-     * DynamoDB module
-     */
+         * DynamoDB module
+         */
         Service::DynamoDbService _dynamoDbService;
     };
 

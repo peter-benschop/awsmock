@@ -35,9 +35,15 @@
 
 namespace AwsMock::Service {
 
+    /**
+     * SNS server thread
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class SNSServer : public AbstractServer {
 
       public:
+
         /**
          * Constructor
          *
@@ -61,6 +67,7 @@ namespace AwsMock::Service {
         void Shutdown() override;
 
       private:
+
         /**
          * Configuration
          */

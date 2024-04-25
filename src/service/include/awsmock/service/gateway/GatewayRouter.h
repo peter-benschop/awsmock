@@ -31,61 +31,68 @@
 
 namespace AwsMock::Service {
 
+    /**
+     * Gateway router
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class GatewayRouter : public Poco::Net::HTTPRequestHandlerFactory {
 
       public:
+
         /**
-     * Constructor
-     *
-     * @param configuration application configuration
-     * @param metricService common monitoring module
-     */
+         * Constructor
+         *
+         * @param configuration application configuration
+         * @param metricService common monitoring module
+         */
         GatewayRouter(Core::Configuration &configuration, Core::MetricService &metricService);
 
         /**
-     * Destructor
-     */
+         * Destructor
+         */
         ~GatewayRouter() override;
 
         /**
-     * HTTP request handler
-     *
-     * @param request HTTP request
-     * @return request handler or null in case of failure
-     */
+         * HTTP request handler
+         *
+         * @param request HTTP request
+         * @return request handler or null in case of failure
+         */
         Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override;
 
       private:
+
         /**
-     * Return HTTP restful resource.
-     *
-     * @param service AWS module name
-     * @param uri request URI
-     * @return restfull resource
-     */
+         * Return HTTP restful resource.
+         *
+         * @param service AWS module name
+         * @param uri request URI
+         * @return restfull resource
+         */
         Poco::Net::HTTPRequestHandler *GetResource(const std::string &service, const std::string &uri);
 
         /**
-     * Returns the AWS module, region and user from the authorization string.
-     *
-     * @param authInfo authorization string
-     * @return module name
-     */
+         * Returns the AWS module, region and user from the authorization string.
+         *
+         * @param authInfo authorization string
+         * @return module name
+         */
         std::string GetService(const std::string &authInfo);
 
         /**
-     * Configuration
-     */
+         * Configuration
+         */
         Core::Configuration &_configuration;
 
         /**
-     * Metric module
-     */
+         * Metric module
+         */
         Core::MetricService &_metricService;
 
         /**
-     * Routing table
-     */
+         * Routing table
+         */
         std::map<std::string, GatewayRoute> _routingTable;
     };
 

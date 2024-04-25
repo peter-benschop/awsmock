@@ -24,43 +24,47 @@ namespace AwsMock::Service {
     typedef std::map<std::string, std::string> AttributeList;
 
     /**
-   * AWS SNS mock handler
-   */
+     * AWS SNS mock handler
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class SNSHandler : public SNSCmdHandler {
 
       public:
+
         /**
-     * Constructor
-     *
-     * @param configuration application configuration
-     */
+         * Constructor
+         *
+         * @param configuration application configuration
+         */
         explicit SNSHandler(Core::Configuration &configuration) : SNSCmdHandler(configuration), _configuration(configuration), _snsService(configuration) {}
 
         /**
-     * HTTP POST request.
-     *
-     * @param request HTTP request
-     * @param response HTTP response
-     * @param region AWS region
-     * @param user AWS user
-     * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-     */
+         * HTTP POST request.
+         *
+         * @param request HTTP request
+         * @param response HTTP response
+         * @param region AWS region
+         * @param user AWS user
+         * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+         */
         void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
       private:
+
         /**
-     * ImageHandler import configuration
-     */
+         * ImageHandler import configuration
+         */
         Core::Configuration &_configuration;
 
         /**
-     * SNS module
-     */
+         * SNS module
+         */
         Service::SNSService _snsService;
 
         /**
-     * Default account ID
-     */
+         * Default account ID
+         */
         std::string _accountId;
     };
 

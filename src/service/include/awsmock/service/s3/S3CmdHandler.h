@@ -32,10 +32,13 @@ namespace AwsMock::Service {
      * authorization header contains the S3 module. As the different clients (Java, C++, Python, nodejs) are using different request structure, the request
      * are first send to the S3CmdHandler, which normalizes the commands.
      * </p>
+     *
+     * @author jens.vogt@opitz-consulting.com
      */
     class S3CmdHandler : public virtual AbstractHandler {
 
       public:
+
         /**
          * Constructor
          *
@@ -44,6 +47,7 @@ namespace AwsMock::Service {
         explicit S3CmdHandler(Core::Configuration &configuration) : AbstractHandler(), _configuration(configuration), _s3Service(configuration) {}
 
       protected:
+
         /**
          * HTTP GET request.
          *
@@ -96,13 +100,14 @@ namespace AwsMock::Service {
         void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
       private:
+
         /**
-         * S3 handler configuration
+         * Handler configuration
          */
         Core::Configuration &_configuration;
 
         /**
-         * S3 module
+         * S3 service
          */
         Service::S3Service _s3Service;
     };

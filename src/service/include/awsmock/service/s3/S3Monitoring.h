@@ -21,6 +21,7 @@ namespace AwsMock::Service {
     class S3Monitoring : public Core::Timer {
 
       public:
+
         /**
          * Constructor
          */
@@ -42,6 +43,7 @@ namespace AwsMock::Service {
         void Shutdown() override;
 
       private:
+
         /**
          * Update counters
          */
@@ -62,5 +64,7 @@ namespace AwsMock::Service {
          */
         int _period{};
     };
+
 }// namespace AwsMock::Service
+
 #endif// AWSMOCK_SERVICE_S3_MONITORING_H

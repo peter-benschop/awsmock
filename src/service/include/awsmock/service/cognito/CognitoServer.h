@@ -37,6 +37,7 @@ namespace AwsMock::Service {
     class CognitoServer : public AbstractServer, public AbstractWorker {
 
       public:
+
         /**
          * Constructor
          *
@@ -60,6 +61,7 @@ namespace AwsMock::Service {
         void Shutdown() override;
 
       private:
+
         /**
          * Rest port
          */

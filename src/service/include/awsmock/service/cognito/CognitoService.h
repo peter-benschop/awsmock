@@ -39,6 +39,7 @@ namespace AwsMock::Service {
     class CognitoService {
 
       public:
+
         /**
          * Constructor
          *
@@ -93,6 +94,7 @@ namespace AwsMock::Service {
         void AdminDeleteUser(const Dto::Cognito::AdminDeleteUserRequest &request);
 
       private:
+
         /**
          * Configuration
          */

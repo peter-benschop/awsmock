@@ -28,9 +28,15 @@
 
 namespace AwsMock::Controller {
 
+    /**
+     * Management router
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class Router : public Poco::Net::HTTPRequestHandlerFactory {
 
       public:
+
         /**
          * Constructor
          *
@@ -57,6 +63,7 @@ namespace AwsMock::Controller {
         Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override;
 
       private:
+
         /**
          * Return HTTP restful resource.
          *

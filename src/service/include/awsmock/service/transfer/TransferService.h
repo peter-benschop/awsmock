@@ -46,6 +46,7 @@ namespace AwsMock::Service {
     class TransferService {
 
       public:
+
         /**
          * Constructor
          *
@@ -99,6 +100,7 @@ namespace AwsMock::Service {
         void DeleteServer(const Dto::Transfer::DeleteServerRequest &request);
 
       private:
+
         /**
          * AWS region
          */

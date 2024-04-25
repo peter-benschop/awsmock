@@ -20,24 +20,27 @@
 namespace AwsMock::Service {
 
     /**
-   * lambda request handler factory
-   */
+     * Lambda request handler factory
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class LambdaRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 
       public:
-        /**
-     * Constructor
-     *
-     * @param configuration application configuration
-     */
-        LambdaRequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
 
         /**
-     * Create new lambda request handler
-     *
-     * @param request HTTP request
-     * @return lambda request handler
-     */
+         * Constructor
+         *
+         * @param configuration application configuration
+         */
+        explicit LambdaRequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
+
+        /**
+         * Create new lambda request handler
+         *
+         * @param request HTTP request
+         * @return lambda request handler
+         */
         Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
             if (request.getURI().empty()) {
                 return nullptr;
@@ -46,9 +49,10 @@ namespace AwsMock::Service {
         }
 
       private:
+
         /**
-     * S3 handler configuration
-     */
+         * Configuration
+         */
         Core::Configuration &_configuration;
     };
 

@@ -31,37 +31,40 @@
 namespace AwsMock::Service {
 
     /**
-   * UserAttribute  list
-   */
+     * SQS handler
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     typedef std::map<std::string, std::string> AttributeList;
 
     /**
-   * AWS S3 mock handler.
-   *
-   * <p>The SQS request are coming in two different flavours. Using the AWS CLI the queue URL is part of the HTTP parameters in the body of the message. Both are
-   * using POST request, whereas the Java SDK is providing the queue-url as part of the HTTP URL in the header of the request.</p>
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
+     * AWS S3 mock handler.
+     *
+     * <p>The SQS request are coming in two different flavours. Using the AWS CLI the queue URL is part of the HTTP parameters in the body of the message. Both are
+     * using POST request, whereas the Java SDK is providing the queue-url as part of the HTTP URL in the header of the request.</p>
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class SQSHandler : public SQSCmdHandler {
 
       public:
+
         /**
-     * Constructor
-     *
-     * @param configuration application configuration
-     */
+         * Constructor
+         *
+         * @param configuration application configuration
+         */
         explicit SQSHandler(Core::Configuration &configuration) : SQSCmdHandler(configuration) {}
 
         /**
-       * HTTP POST request.
-       *
-       * @param request HTTP request
-       * @param response HTTP response
-       * @param region AWS region
-       * @param user AWS user
-       * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-       */
+         * HTTP POST request.
+         *
+         * @param request HTTP request
+         * @param response HTTP response
+         * @param region AWS region
+         * @param user AWS user
+         * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+         */
         void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
     };
 

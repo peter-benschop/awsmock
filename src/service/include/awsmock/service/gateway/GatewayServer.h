@@ -35,96 +35,103 @@
 
 namespace AwsMock::Service {
 
+    /**
+     * Gateway server
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class GatewayServer : public AbstractServer {
 
       public:
+
         /**
-     * Constructor
-     *
-     * @param configuration aws-mock configuration
-     * @param metricService aws-mock monitoring
-     */
+         * Constructor
+         *
+         * @param configuration aws-mock configuration
+         * @param metricService aws-mock monitoring
+         */
         explicit GatewayServer(Core::Configuration &configuration, Core::MetricService &metricService);
 
         /**
-     * Destructor
-     */
+         * Destructor
+         */
         ~GatewayServer() override;
 
         /**
-     * Timer initialization
-     */
+         * Timer initialization
+         */
         void Initialize() override;
 
         /**
-     * Main method
-     */
+         * Main method
+         */
         void Run() override;
 
         /**
-     * Shutdown
-     */
+         * Shutdown
+         */
         void Shutdown() override;
 
       private:
+
         /**
-     * Configuration
-     */
+         * Configuration
+         */
         Core::Configuration &_configuration;
 
         /**
-     * Metric module
-     */
+         * Metric module
+         */
         Core::MetricService &_metricService;
 
         /**
-     * Service database
-     */
+         * Service database
+         */
         std::unique_ptr<Database::ModuleDatabase> _serviceDatabase;
 
         /**
-     * Running flag
-     */
+         * Running flag
+         */
         bool _running;
 
         /**
-     * AWS region
-     */
+         * AWS region
+         */
         std::string _region;
 
         /**
-     * Sleeping period in ms
-     */
+         * Sleeping period in ms
+         */
         int _period;
 
         /**
-     * Rest port
-     */
+         * Rest port
+         */
         int _port;
 
         /**
-     * Rest host
-     */
+         * Rest host
+         */
         std::string _host;
 
         /**
-     * HTTP max message queue length
-     */
+         * HTTP max message queue length
+         */
         int _maxQueueLength;
 
         /**
-     * HTTP max concurrent connection
-     */
+         * HTTP max concurrent connection
+         */
         int _maxThreads;
 
         /**
-     * HTTP request timeout
-     */
+         * HTTP request timeout
+         */
         int _requestTimeout;
 
         /**
-     * Gateway router
-     */
+         * Gateway router
+         */
         std::shared_ptr<Service::GatewayRouter> _router = std::make_shared<Service::GatewayRouter>(_configuration, _metricService);
     };
 

@@ -24,45 +24,48 @@ namespace AwsMock::Service {
     typedef std::map<std::string, std::string> AttributeList;
 
     /**
-   * AWS SNS command handler
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
+     * AWS SNS command handler
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class SNSCmdHandler : public virtual AbstractHandler {
 
       public:
+
         /**
-     * Constructor
-     *
-     * @param configuration application configuration
-     */
+         * Constructor
+         *
+         * @param configuration application configuration
+         */
         explicit SNSCmdHandler(Core::Configuration &configuration) : AbstractHandler(), _configuration(configuration), _snsService(configuration) {}
 
       protected:
+
         /**
-     * HTTP POST request.
-     *
-     * @param request HTTP request
-     * @param response HTTP response
-     * @param snsClientCommand standardised client command
-     * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-     */
+         * HTTP POST request.
+         *
+         * @param request HTTP request
+         * @param response HTTP response
+         * @param snsClientCommand standardised client command
+         * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+         */
         void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::SNSClientCommand &snsClientCommand);
 
       private:
+
         /**
-     * ImageHandler import configuration
-     */
+         * ImageHandler import configuration
+         */
         Core::Configuration &_configuration;
 
         /**
-     * SNS module
-     */
+         * SNS module
+         */
         Service::SNSService _snsService;
 
         /**
-     * Default account ID
-     */
+         * Default account ID
+         */
         std::string _accountId;
     };
 

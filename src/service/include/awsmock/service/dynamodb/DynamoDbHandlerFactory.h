@@ -26,6 +26,7 @@ namespace AwsMock::Service {
     class DynamoDbRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 
       public:
+
         /**
          * Constructor
          *
@@ -47,6 +48,7 @@ namespace AwsMock::Service {
         }
 
       private:
+
         /**
          * S3 handler configuration
          */

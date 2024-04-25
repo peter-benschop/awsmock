@@ -28,103 +28,111 @@
 
 namespace AwsMock::Service {
 
+    /**
+     * Abstract HTTP request server
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class AbstractServer : public Core::Timer {
 
       public:
+
         /**
-     * Constructor
-     *
-     * @param configuration AwsMock configuration
-     * @param name manager name
-     * @param timeout run timeout in seconds
-     */
+         * Constructor
+         *
+         * @param configuration AwsMock configuration
+         * @param name manager name
+         * @param timeout run timeout in seconds
+         */
         explicit AbstractServer(Core::Configuration &configuration, std::string name, int timeout);
 
         /**
-     * Destructor
-     */
+         * Destructor
+         */
         virtual ~AbstractServer();
 
         /**
-     * Checks whether the module is active
-     *
-     * @param name module name
-     */
+         * Checks whether the module is active
+         *
+         * @param name module name
+         */
         bool IsActive(const std::string &name);
 
         /**
-     * Returns the running flag
-     */
+         * Returns the running flag
+         */
         [[nodiscard]] bool IsRunning() const;
 
         /**
-     * Stop the manager
-     */
+         * Stop the manager
+         */
         void StopServer();
 
         /**
-     * Start the HTTP manager
-     *
-     * @param maxQueueLength maximal request queue length
-     * @param maxThreads maximal number of worker threads
-     * @param requestTimeout request timeout in seconds
-     * @param host HTTP host name
-     * @param port HTTP port
-     * @param requestFactory HTTP request factory
-     */
+         * Start the HTTP manager
+         *
+         * @param maxQueueLength maximal request queue length
+         * @param maxThreads maximal number of worker threads
+         * @param requestTimeout request timeout in seconds
+         * @param host HTTP host name
+         * @param port HTTP port
+         * @param requestFactory HTTP request factory
+         */
         void StartHttpServer(int maxQueueLength, int maxThreads, int requestTimeout, const std::string &host, int port, Poco::Net::HTTPRequestHandlerFactory *requestFactory);
 
         /**
-     * Stops the HTTP manager
-     */
+         * Stops the HTTP manager
+         */
         void StopHttpServer();
 
       protected:
+
         /**
-     * Main loop
-     */
+         * Main loop
+         */
         void Run() override = 0;
 
         /**
-     * Shutdown condition
-     */
+         * Shutdown condition
+         */
         Poco::Condition _condition;
 
       private:
+
         /**
-     * Configuration
-     */
+         * Configuration
+         */
         Core::Configuration &_configuration;
 
         /**
-     * Service name
-     */
+         * Service name
+         */
         std::string _name;
 
         /**
-     * Service database
-     */
+         * Service database
+         */
         Database::ModuleDatabase &_moduleDatabase;
 
         /**
-     * Shutdown mutex
-     */
+         * Shutdown mutex
+         */
         Poco::Mutex _mutex;
 
         /**
-     * Running flag
-     */
+         * Running flag
+         */
         bool _running;
 
         /**
-     * HTTP manager instance
-     */
+         * HTTP manager instance
+         */
         std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
     };
 
     /**
-   * Server map
-   */
+     * Server map
+     */
     typedef std::map<std::string, std::shared_ptr<Service::AbstractServer>> ServerMap;
 
 }// namespace AwsMock::Service

@@ -47,16 +47,17 @@ namespace AwsMock::Service {
     class GatewayHandler : public AbstractHandler {
 
       public:
+
         /**
          * Constructor
          *
          * @param configuration application configuration
-         * @param metricService monitoring module
          * @param route routing structure
          */
-        GatewayHandler(Core::Configuration &configuration, Core::MetricService &metricService, Service::GatewayRoute route);
+        GatewayHandler(Core::Configuration &configuration, Service::GatewayRoute route);
 
       protected:
+
         /**
          * HTTP GET request.
          *
@@ -121,6 +122,7 @@ namespace AwsMock::Service {
         void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
       private:
+
         /**
          * Sets extra header values
          *
@@ -138,7 +140,7 @@ namespace AwsMock::Service {
         /**
          * Metric module
          */
-        Core::MetricService &_metricService;
+        Core::MetricService &_metricService = Core::MetricService::instance();
 
         /**
          * Gateway route

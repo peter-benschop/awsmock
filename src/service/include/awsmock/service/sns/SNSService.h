@@ -45,131 +45,138 @@
 
 namespace AwsMock::Service {
 
+    /**
+     * SNS server thread
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class SNSService {
 
       public:
+
         /**
-     * Constructor
-     *
-     * @param configuration module configuration
-     */
+         * Constructor
+         *
+         * @param configuration module configuration
+         */
         explicit SNSService(Core::Configuration &configuration);
 
         /**
-     * Creates a new queue
-     *
-     * <p>In case the topic exists already, return the existing topic.</p>
-     *
-     * @param request create queue request
-     * @return CreateQueueResponse
-     */
+         * Creates a new queue
+         *
+         * <p>In case the topic exists already, return the existing topic.</p>
+         *
+         * @param request create queue request
+         * @return CreateQueueResponse
+         */
         Dto::SNS::CreateTopicResponse CreateTopic(const Dto::SNS::CreateTopicRequest &request);
 
         /**
-     * Returns a list of all available queues
-     *
-     * @param region AWS region
-     * @return ListQueuesResponse
-     */
+         * Returns a list of all available queues
+         *
+         * @param region AWS region
+         * @return ListQueuesResponse
+         */
         Dto::SNS::ListTopicsResponse ListTopics(const std::string &region);
 
         /**
-     * Publish a message to a SNS topic
-     *
-     * @param request AWS region
-     * @return PublishResponse
-     */
+         * Publish a message to a SNS topic
+         *
+         * @param request AWS region
+         * @return PublishResponse
+         */
         Dto::SNS::PublishResponse Publish(const Dto::SNS::PublishRequest &request);
 
         /**
-     * Subscribe to a topic
-     *
-     * @param request subscribe request DTO
-     * @return SubscribeResponse DTO
-     */
+         * Subscribe to a topic
+         *
+         * @param request subscribe request DTO
+         * @return SubscribeResponse DTO
+         */
         Dto::SNS::SubscribeResponse Subscribe(const Dto::SNS::SubscribeRequest &request);
 
         /**
-     * Unsubscribe from a topic
-     *
-     * @param request unsubscribe request DTO
-     * @return UnsubscribeResponse DTO
-     */
+         * Unsubscribe from a topic
+         *
+         * @param request unsubscribe request DTO
+         * @return UnsubscribeResponse DTO
+         */
         Dto::SNS::UnsubscribeResponse Unsubscribe(const Dto::SNS::UnsubscribeRequest &request);
 
         /**
-     * Sets tags for a topic
-     *
-     * @param request tag resource request DTO
-     * @return TagResourceResponse DTO
-     */
+         * Sets tags for a topic
+         *
+         * @param request tag resource request DTO
+         * @return TagResourceResponse DTO
+         */
         Dto::SNS::TagResourceResponse TagResource(const Dto::SNS::TagResourceRequest &request);
 
         /**
-     * Returns the topic attributes
-     *
-     * @param request get topic attributes request DTO
-     * @return GetTopicAttributesResponse DTO
-     */
+         * Returns the topic attributes
+         *
+         * @param request get topic attributes request DTO
+         * @return GetTopicAttributesResponse DTO
+         */
         Dto::SNS::GetTopicAttributesResponse GetTopicAttributes(const Dto::SNS::GetTopicAttributesRequest &request);
 
         /**
-     * Returns a list of subscriptions for a topic
-     *
-     * @param request list subscriptions request DTO
-     * @return ListSubscriptionByTopicResponse DTO
-     */
+         * Returns a list of subscriptions for a topic
+         *
+         * @param request list subscriptions request DTO
+         * @return ListSubscriptionByTopicResponse DTO
+         */
         Dto::SNS::ListSubscriptionsByTopicResponse ListSubscriptionsByTopic(const Dto::SNS::ListSubscriptionsByTopicRequest &request);
 
         /**
-     * Delete a queue
-     *
-     * @param region AWS region name
-     * @param topicArn topic ARN
-     * @return DeleteQueueResponse
-     * @throws ServiceException
-     */
+         * Delete a queue
+         *
+         * @param region AWS region name
+         * @param topicArn topic ARN
+         * @return DeleteQueueResponse
+         * @throws ServiceException
+         */
         Dto::SNS::DeleteTopicResponse DeleteTopic(const std::string &region, const std::string &topicArn);
 
       private:
+
         /**
-     * Checks the subscriptions.
-     *
-     * <p>If a SQS queue subscription is found send the message to the SQS queue.</p>
-     */
+         * Checks the subscriptions.
+         *
+         * <p>If a SQS queue subscription is found send the message to the SQS queue.</p>
+         */
         void CheckSubscriptions(const Dto::SNS::PublishRequest &request);
 
         /**
-     * Send a SNS message to an SQS queue
-     *
-     * @param subscription SNS subscription
-     * @param request SNS publish request
-     */
+         * Send a SNS message to an SQS queue
+         *
+         * @param subscription SNS subscription
+         * @param request SNS publish request
+         */
         void SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request);
 
         /**
-     * Account ID
-     */
+         * Account ID
+         */
         std::string _accountId;
 
         /**
-     * Configuration
-     */
+         * Configuration
+         */
         Core::Configuration &_configuration;
 
         /**
-     * SNS database connection
-     */
+         * SNS database connection
+         */
         Database::SNSDatabase &_snsDatabase;
 
         /**
-     * SQS database connection
-     */
+         * SQS database connection
+         */
         Database::SQSDatabase &_sqsDatabase;
 
         /**
-     * SQS module
-     */
+         * SQS module
+         */
         std::unique_ptr<SQSService> _sqsService;
     };
 

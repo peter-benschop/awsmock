@@ -46,6 +46,7 @@ namespace AwsMock::Service {
     class TransferServer : public AbstractServer, public AbstractWorker {
 
       public:
+
         /**
          * Constructor
          *
@@ -69,6 +70,7 @@ namespace AwsMock::Service {
         void Shutdown() override;
 
       private:
+
         /**
          * Starts a single transfer manager
          *

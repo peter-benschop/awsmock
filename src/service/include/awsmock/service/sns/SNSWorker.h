@@ -25,6 +25,7 @@ namespace AwsMock::Service {
     class SNSWorker : public Core::Timer {
 
       public:
+
         /**
          * Constructor
          */
@@ -46,6 +47,7 @@ namespace AwsMock::Service {
         void Shutdown() override;
 
       private:
+
         /**
          * Delete messages, which are over the retention period.
          */
@@ -59,7 +61,9 @@ namespace AwsMock::Service {
         /**
          * Message timeout in seconds
          */
-        int _messageTimeout;
+        int _messageTimeout{};
     };
+
 }// namespace AwsMock::Service
+
 #endif// AWSMOCK_SERVICE_SNS_WORKER_H

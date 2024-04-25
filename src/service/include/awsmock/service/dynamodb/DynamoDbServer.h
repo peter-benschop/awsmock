@@ -51,6 +51,7 @@ namespace AwsMock::Service {
     class DynamoDbServer : public AbstractServer, public AbstractWorker {
 
       public:
+
         /**
          * Constructor
          *
@@ -79,6 +80,7 @@ namespace AwsMock::Service {
         void Shutdown() override;
 
       private:
+
         /**
          * Delete dangling, stopped containers
          */

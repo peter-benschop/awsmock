@@ -26,55 +26,58 @@
 namespace AwsMock::Service {
 
     /**
-   * UserAttribute  list
-   */
+     * UserAttribute  list
+     */
     typedef std::map<std::string, std::string> AttributeList;
 
     /**
-   * AWS Secrets manager mock handler.
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
+     * AWS Secrets manager mock handler.
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class SecretsManagerCmdHandler : public virtual AbstractHandler {
 
       public:
+
         /**
-     * Constructor
-     *
-     * @param configuration application configuration
-     */
-        SecretsManagerCmdHandler(Core::Configuration &configuration);
+         * Constructor
+         *
+         * @param configuration application configuration
+         */
+        explicit SecretsManagerCmdHandler(Core::Configuration &configuration);
 
       protected:
+
         /**
-     * HTTP POST request.
-     *
-     * @param request HTTP request
-     * @param response HTTP response
-     * @param sqsClientCommand standardised client command
-     * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-     */
+         * HTTP POST request.
+         *
+         * @param request HTTP request
+         * @param response HTTP response
+         * @param sqsClientCommand standardised client command
+         * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+         */
         void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::SecretsManagerClientCommand &sqsClientCommand);
 
       private:
+
         /**
-     * ImageHandler import configuration
-     */
+         * Configuration
+         */
         Core::Configuration &_configuration;
 
         /**
-     * SQS module
-     */
+         * Secrets manager module
+         */
         Service::SecretsManagerService _secretsManagerService;
 
         /**
-     * Default account ID
-     */
+         * Default account ID
+         */
         std::string _accountId;
 
         /**
-     * Default endpoint
-     */
+         * Default endpoint
+         */
         std::string _endpoint;
     };
 

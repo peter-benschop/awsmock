@@ -24,6 +24,7 @@ namespace AwsMock::Service {
     class CognitoHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 
       public:
+
         /**
          * Constructor
          *
@@ -45,6 +46,7 @@ namespace AwsMock::Service {
         }
 
       private:
+
         /**
          * Cognito handler configuration
          */

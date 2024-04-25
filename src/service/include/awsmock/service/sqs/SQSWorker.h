@@ -23,6 +23,7 @@ namespace AwsMock::Service {
     class SQSWorker : public Core::Timer {
 
       public:
+
         /**
          * Constructor
          */
@@ -44,6 +45,7 @@ namespace AwsMock::Service {
         void Shutdown() override;
 
       private:
+
         /**
          * Reset messages
          *
@@ -57,5 +59,7 @@ namespace AwsMock::Service {
          */
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
     };
+
 }// namespace AwsMock::Service
+
 #endif// AWSMOCK_SERVICE_SQS_WORKER_H

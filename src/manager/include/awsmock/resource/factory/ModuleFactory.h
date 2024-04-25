@@ -12,9 +12,15 @@
 
 namespace AwsMock::Resource::Factory {
 
+    /**
+     * Module factory
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class ModuleFactory : public IFactory {
 
       public:
+
         /**
          * Create a new resource handler.
          *

@@ -33,77 +33,80 @@
 namespace AwsMock::Service {
 
     /**
-   * The ModuleService controls the different services
-   */
+     * The ModuleService controls the different services
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class ModuleService {
 
       public:
+
         /**
-     * Constructor
-     *
-     * @param configuration module configuration
-     * @param serverMap module map
-     */
+         * Constructor
+         *
+         * @param configuration module configuration
+         * @param serverMap module map
+         */
         explicit ModuleService(Core::Configuration &configuration, Service::ServerMap &serverMap);
 
         /**
-     * Return all list of all modules
-     *
-     * @param list of all modules
-     */
+         * Return all list of all modules
+         *
+         * @param list of all modules
+         */
         Database::Entity::Module::ModuleList ListModules();
 
         /**
-     * Returns the running state
-     *
-     * @param module module name
-     * @return module state
-     */
+         * Returns the running state
+         *
+         * @param module module name
+         * @return module state
+         */
         bool IsRunning(const std::string &module);
 
         /**
-     * Starts a module
-     *
-     * @param name module name
-     */
+         * Starts a module
+         *
+         * @param name module name
+         */
         Database::Entity::Module::Module StartService(const std::string &name);
 
         /**
-     * Starts all services
-     */
+         * Starts all services
+         */
         void StartAllServices();
 
         /**
-     * Restarts a module
-     *
-     * @param name module name
-     */
+         * Restarts a module
+         *
+         * @param name module name
+         */
         Database::Entity::Module::Module RestartService(const std::string &name);
 
         /**
-     * Restarts all services
-     */
+         * Restarts all services
+         */
         void RestartAllServices();
 
         /**
-     * Stops a module
-     *
-     * @param name module name
-     */
+         * Stops a module
+         *
+         * @param name module name
+         */
         Database::Entity::Module::Module StopService(const std::string &name);
 
         /**
-     * Stops all services
-     */
+         * Stops all services
+         */
         void StopAllServices();
 
         /**
-     * Exports the current infrastructure
-     *
-     * @param services service name list
-     * @param prettyPrint JSON pretty print, if true JSON indent = 4
-     * @return JSON string
-     */
+         * Exports the current infrastructure
+         *
+         * @param services service name list
+         * @param prettyPrint JSON pretty print, if true JSON indent = 4
+         * @return JSON string
+         */
         std::string ExportInfrastructure(const Dto::Common::Services &services, bool prettyPrint = false);
 
         /**
@@ -114,42 +117,43 @@ namespace AwsMock::Service {
         void ImportInfrastructure(const std::string &jsonString);
 
         /**
-     * Cleans the current infrastructure.
-     *
-     * <p>All SQS queues, SNS topics, S3 buckets etc. will be deleted, as well as all objects.</p>
-     *
-     * @param services service name list
-     */
+         * Cleans the current infrastructure.
+         *
+         * <p>All SQS queues, SNS topics, S3 buckets etc. will be deleted, as well as all objects.</p>
+         *
+         * @param services service name list
+         */
         void CleanInfrastructure(const Dto::Common::Services &services);
 
         /**
-     * Cleans the objects from the infrastructure.
-     *
-     * <p>Cleans all objects from the infrastructure. This means all SQS messages, SNS messages, S3 object keys, etc. will be deleted.</p>
-     *
-     * @param services service name list
-     */
+         * Cleans the objects from the infrastructure.
+         *
+         * <p>Cleans all objects from the infrastructure. This means all SQS messages, SNS messages, S3 object keys, etc. will be deleted.</p>
+         *
+         * @param services service name list
+         */
         void CleanObjects(const Dto::Common::Services &services);
 
       private:
+
         /**
-     * Configuration
-     */
+         * Configuration
+         */
         Core::Configuration &_configuration;
 
         /**
-     * Server map
-     */
+         * Server map
+         */
         Service::ServerMap &_serverMap;
 
         /**
-     * Module database
-     */
+         * Module database
+         */
         Database::ModuleDatabase &_moduleDatabase;
 
         /**
-     * JSON pretty print
-     */
+         * JSON pretty print
+         */
         bool _prettyPrint;
     };
 

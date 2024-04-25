@@ -28,6 +28,7 @@ namespace AwsMock::Service {
     class CognitoCliHandler : public virtual AbstractHandler {
 
       public:
+
         /**
          * Constructor
          *
@@ -36,6 +37,7 @@ namespace AwsMock::Service {
         explicit CognitoCliHandler(Core::Configuration &configuration) : AbstractHandler(), _configuration(configuration), _cognitoService(configuration){};
 
       protected:
+
         /**
          * HTTP POST request.
          *
@@ -48,6 +50,7 @@ namespace AwsMock::Service {
         void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
       private:
+
         /**
          * AwsMock configuration
          */

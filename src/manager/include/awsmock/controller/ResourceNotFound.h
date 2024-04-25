@@ -21,7 +21,9 @@ namespace AwsMock::Core {
      * @author jens.vogt@opitz-consulting.com
      */
     class [[maybe_unused]] ResourceNotFound : public Poco::Net::HTTPRequestHandler {
+
       public:
+
         /**
          * Constructor
          *
@@ -30,6 +32,7 @@ namespace AwsMock::Core {
          */
         void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
     };
+
 }// namespace AwsMock::Core
 
 #endif// AWSMOCK_CONTROLLER_RESOURCE_NOT_FOUND_H

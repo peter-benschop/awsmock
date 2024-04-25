@@ -22,10 +22,13 @@ namespace AwsMock {
 
     /**
      * General REST module
+     *
+     * @author jens.vogt@opitz-consulting.com
      */
     class RestService {
 
       public:
+
         /**
          * Constructor
          *
@@ -68,6 +71,7 @@ namespace AwsMock {
         void StopServer();
 
       private:
+
         /**
          * Rest port
          */

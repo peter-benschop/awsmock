@@ -38,9 +38,15 @@
 
 namespace AwsMock::Service {
 
+    /**
+     * Lambda server
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class LambdaServer : public AbstractServer, public AbstractWorker {
 
       public:
+
         /**
          * Constructor
          *
@@ -69,6 +75,7 @@ namespace AwsMock::Service {
         void Shutdown() override;
 
       private:
+
         /**
          * Delete dangling, stopped containers
          */

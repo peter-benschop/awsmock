@@ -17,10 +17,13 @@ namespace AwsMock::Resource::Factory {
 
     /**
      * Factory interface
+     *
+     * @author jens.vogt@opitz-consulting.com
      */
     class IFactory {
 
       public:
+
         /**
          * Create a new resource.
          *

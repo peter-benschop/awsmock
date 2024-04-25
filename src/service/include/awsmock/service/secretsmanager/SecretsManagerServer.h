@@ -45,77 +45,79 @@ namespace AwsMock::Service {
     class SecretsManagerServer : public AbstractServer {
 
       public:
+
         /**
-       * Constructor
-       *
-       * @param configuration aws-mock configuration
-       */
+         * Constructor
+         *
+         * @param configuration aws-mock configuration
+         */
         explicit SecretsManagerServer(Core::Configuration &configuration);
 
         /**
-       * Timer initialization
-       */
+         * Timer initialization
+         */
         void Initialize() override;
 
         /**
-       * Main method
-       */
+         * Main method
+         */
         void Run() override;
 
         /**
-       * Shutdown
-       */
+         * Shutdown
+         */
         void Shutdown() override;
 
       private:
+
         /**
-       * Configuration
-       */
+         * Configuration
+         */
         Core::Configuration &_configuration;
 
         /**
-       * S3 database
-       */
+         * Module database
+         */
         Database::ModuleDatabase &_moduleDatabase;
 
         /**
-       * S3 monitoring
-       */
+         * Monitoring
+         */
         std::shared_ptr<SecretsManagerMonitoring> _secretsManagerMonitoring;
 
         /**
-       * AWS region
-       */
+         * AWS region
+         */
         std::string _region;
 
         /**
-       * Rest port
-       */
+         * Rest port
+         */
         int _port;
 
         /**
-       * Rest host
-       */
+         * Rest host
+         */
         std::string _host;
 
         /**
-       * HTTP max message queue length
-       */
+         * HTTP max message queue length
+         */
         int _maxQueueLength;
 
         /**
-       * HTTP max concurrent connections
-       */
+         * HTTP max concurrent connections
+         */
         int _maxThreads;
 
         /**
-       * HTTP request timeout in seconds
-       */
+         * HTTP request timeout in seconds
+         */
         int _requestTimeout;
 
         /**
-       * Monitoring period
-       */
+         * Monitoring period
+         */
         int _monitoringPeriod;
     };
 

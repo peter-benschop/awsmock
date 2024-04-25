@@ -43,6 +43,7 @@ namespace AwsMock::Service {
     class S3Server : public AbstractServer, public AbstractWorker {
 
       public:
+
         /**
          * Constructor
          *
@@ -66,6 +67,7 @@ namespace AwsMock::Service {
         void Shutdown() override;
 
       private:
+
         /**
          * Rest port
          */
@@ -124,4 +126,4 @@ namespace AwsMock::Service {
 
 }// namespace AwsMock::Service
 
-#endif// AWSMOCK_SERVICE_S3SERVER_H
+#endif// AWSMOCK_SERVICE_S3_SERVER_H

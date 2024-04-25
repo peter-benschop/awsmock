@@ -29,13 +29,13 @@ namespace AwsMock::Service {
     struct GatewayRoute {
 
         /**
-     * Service name
-     */
+         * Service name
+         */
         std::string _name;
 
         /**
-     * Type
-     */
+         * Type
+         */
         HandlerType _handlerType;
     };
 

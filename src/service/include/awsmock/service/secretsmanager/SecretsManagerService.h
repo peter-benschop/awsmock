@@ -45,100 +45,102 @@
 namespace AwsMock::Service {
 
     /**
-   * Secrets manager service.
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
+     * Secrets manager service.
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class SecretsManagerService {
 
       public:
+
         /**
-     * Constructor
-     *
-     * @param configuration module configuration
-     */
+         * Constructor
+         *
+         * @param configuration module configuration
+         */
         explicit SecretsManagerService(Core::Configuration &configuration);
 
         /**
-     * Create a new secret
-     *
-     * @param request create secret request
-     * @return CreateSecretResponse
-     */
+         * Create a new secret
+         *
+         * @param request create secret request
+         * @return CreateSecretResponse
+         */
         Dto::SecretsManager::CreateSecretResponse CreateSecret(const Dto::SecretsManager::CreateSecretRequest &request);
 
         /**
-     * Describes an existing secret
-     *
-     * @param request describe secret request
-     * @return DescribeSecretResponse
-     */
+         * Describes an existing secret
+         *
+         * @param request describe secret request
+         * @return DescribeSecretResponse
+         */
         Dto::SecretsManager::DescribeSecretResponse DescribeSecret(const Dto::SecretsManager::DescribeSecretRequest &request);
 
         /**
-     * Returns the secret value
-     *
-     * @param request get secret value request
-     * @return GetSecretValueResponse
-     */
+         * Returns the secret value
+         *
+         * @param request get secret value request
+         * @return GetSecretValueResponse
+         */
         Dto::SecretsManager::GetSecretValueResponse GetSecretValue(const Dto::SecretsManager::GetSecretValueRequest &request);
 
         /**
-     * List existing secrets
-     *
-     * @param request list secrets request
-     * @return ListSecretsResponse
-     */
+         * List existing secrets
+         *
+         * @param request list secrets request
+         * @return ListSecretsResponse
+         */
         Dto::SecretsManager::ListSecretsResponse ListSecrets(const Dto::SecretsManager::ListSecretsRequest &request);
 
         /**
-     * Updates an existing secret
-     *
-     * @param request update secret request
-     * @return UpdateSecretResponse
-     */
+         * Updates an existing secret
+         *
+         * @param request update secret request
+         * @return UpdateSecretResponse
+         */
         Dto::SecretsManager::UpdateSecretResponse UpdateSecret(const Dto::SecretsManager::UpdateSecretRequest &request);
 
         /**
-     * Rotates an existing secret
-     *
-     * @param request rotate secret request
-     * @return RotateSecretResponse
-     */
+         * Rotates an existing secret
+         *
+         * @param request rotate secret request
+         * @return RotateSecretResponse
+         */
         Dto::SecretsManager::RotateSecretResponse RotateSecret(const Dto::SecretsManager::RotateSecretRequest &request);
 
         /**
-     * Deletes an existing secret
-     *
-     * @param request delete secret request
-     * @return DeleteSecretResponse
-     */
+         * Deletes an existing secret
+         *
+         * @param request delete secret request
+         * @return DeleteSecretResponse
+         */
         Dto::SecretsManager::DeleteSecretResponse DeleteSecret(const Dto::SecretsManager::DeleteSecretRequest &request);
 
       private:
+
         /**
-     * Account ID
-     */
+         * Account ID
+         */
         std::string _accountId;
 
         /**
-     * Configuration
-     */
+         * Configuration
+         */
         Core::Configuration &_configuration;
 
         /**
-     * Database connection
-     */
+         * Database connection
+         */
         Database::SecretsManagerDatabase &_database;
 
         /**
-     * Shutdown mutex
-     */
+         * Shutdown mutex
+         */
         Poco::Mutex _mutex;
 
         /**
-     * Key management system key
-     */
+         * Key management system key
+         */
         std::string _kmsKey;
     };
 

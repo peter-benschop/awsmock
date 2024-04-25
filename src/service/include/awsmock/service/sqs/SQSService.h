@@ -59,6 +59,7 @@ namespace AwsMock::Service {
     class SQSService {
 
       public:
+
         /**
          * Constructor
          *
@@ -182,6 +183,7 @@ namespace AwsMock::Service {
         void DeleteMessageBatch(const Dto::SQS::DeleteMessageBatchRequest &request);
 
       private:
+
         /**
          * Checks the attributes for a entry with 'all'. The search is case insensitive.
          *
@@ -208,4 +210,4 @@ namespace AwsMock::Service {
 
 }// namespace AwsMock::Service
 
-#endif// AWSMOCK_SERVICE_SQSSERVICE_H
+#endif// AWSMOCK_SERVICE_SQS_SERVICE_H

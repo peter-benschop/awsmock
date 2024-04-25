@@ -24,6 +24,7 @@ namespace AwsMock::Service {
     class TransferHandler : public AbstractHandler {
 
       public:
+
         /**
          * Constructor
          *
@@ -44,6 +45,7 @@ namespace AwsMock::Service {
 
 
       private:
+
         /**
          * Get the request target.
          *

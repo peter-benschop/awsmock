@@ -74,6 +74,7 @@ namespace AwsMock::Service {
     class LambdaService {
 
       public:
+
         /**
          * Constructor
          *
@@ -162,6 +163,7 @@ namespace AwsMock::Service {
         void DeleteTags(Dto::Lambda::DeleteTagsRequest &request);
 
       private:
+
         /**
          * Returns the URI for the invocation request.
          *

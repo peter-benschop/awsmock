@@ -21,6 +21,7 @@ namespace AwsMock::Service {
     class DynamoDbMonitoring : public Core::Timer {
 
       public:
+
         /**
          * Constructor
          */
@@ -42,6 +43,7 @@ namespace AwsMock::Service {
         void Shutdown() override;
 
       private:
+
         /**
          * Update counters
          */

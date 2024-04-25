@@ -17,41 +17,40 @@
 namespace AwsMock::Service {
 
     /**
-   * S3 request handler factory
-   */
+     * Gateway request handler factory
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     class GatewayRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 
       public:
-        /**
-     * Constructor
-     *
-     * @param configuration application configuration
-     * @param metricService  monitoring
-     */
-        GatewayRequestHandlerFactory(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService) {}
 
         /**
-     * Creates a new request handler
-     *
-     * @param request HTTP request
-     * @param host module host
-     * @param port module port
-     * @return request HTTP request handler
-     */
+         * Constructor
+         *
+         * @param configuration application configuration
+         * @param metricService  monitoring
+         */
+        GatewayRequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
+
+        /**
+         * Creates a new request handler
+         *
+         * @param request HTTP request
+         * @param host module host
+         * @param port module port
+         * @return request HTTP request handler
+         */
         virtual Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request, const std::string &host, int port) {
-            return new GatewayHandler(_configuration, _metricService, host, port);
+            return new GatewayHandler(_configuration, host, port);
         }
 
       private:
-        /**
-     * S3 handler configuration
-     */
-        Core::Configuration &_configuration;
 
         /**
-     * Metric module
-     */
-        Core::MetricService &_metricService;
+         * Configuration
+         */
+        Core::Configuration &_configuration;
     };
 
 }// namespace AwsMock::Service

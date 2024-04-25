@@ -30,6 +30,7 @@ namespace AwsMock::Service {
     class CognitoHandler : public CognitoCliHandler, public CognitoJava2Handler {
 
       public:
+
         /**
          * Constructor
          *
@@ -101,6 +102,7 @@ namespace AwsMock::Service {
         void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
       private:
+
         /**
          * AwsMock configuration
          */

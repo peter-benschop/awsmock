@@ -35,6 +35,7 @@ namespace AwsMock::Service {
     class SQSServer : public AbstractServer {
 
       public:
+
         /**
          * Constructor
          *
@@ -58,6 +59,7 @@ namespace AwsMock::Service {
         void Shutdown() override;
 
       private:
+
         /**
          * Configuration
          */

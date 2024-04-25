@@ -40,7 +40,7 @@ namespace AwsMock::Service {
         }))).reset();
     }
 
-    GatewayHandler::GatewayHandler(Core::Configuration &configuration, Core::MetricService &metricService, Service::GatewayRoute route) : AbstractHandler(), _configuration(configuration), _metricService(metricService), _route(std::move(route)) {}
+    GatewayHandler::GatewayHandler(Core::Configuration &configuration, Service::GatewayRoute route) : AbstractHandler(), _configuration(configuration), _route(std::move(route)) {}
 
     void GatewayHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         log_trace << "Gateway GET request, URI: " << request.getURI() << " region: " << region << " user: " << user << " remoteAddress: " << request.clientAddress().toString();
@@ -322,4 +322,5 @@ namespace AwsMock::Service {
         request.set("User", user);
         request.set("RequestId", Core::AwsUtils::CreateRequestId());
     }
+
 }// namespace AwsMock::Service
