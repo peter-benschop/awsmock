@@ -2,8 +2,8 @@
 // Created by vogje01 on 01/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_SQS_MESSAGEATTRIBUTE_H
-#define AWSMOCK_DB_ENTITY_SQS_MESSAGEATTRIBUTE_H
+#ifndef AWSMOCK_DB_ENTITY_SQS_MESSAGE_ATTRIBUTE_H
+#define AWSMOCK_DB_ENTITY_SQS_MESSAGE_ATTRIBUTE_H
 
 // C++ includes
 #include <map>
@@ -112,4 +112,4 @@ namespace AwsMock::Database::Entity::SQS {
 
 }// namespace AwsMock::Database::Entity::SQS
 
-#endif// AWSMOCK_DB_ENTITY_SQS_MESSAGEATTRIBUTE_H
+#endif// AWSMOCK_DB_ENTITY_SQS_MESSAGE_ATTRIBUTE_H

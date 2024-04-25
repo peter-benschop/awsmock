@@ -2,8 +2,8 @@
 // Created by vogje01 on 29/11/2023.
 //
 
-#ifndef AWSMOCK_REPOSITORY_COGNITODATABASE_H
-#define AWSMOCK_REPOSITORY_COGNITODATABASE_H
+#ifndef AWSMOCK_REPOSITORY_COGNITO_DATABASE_H
+#define AWSMOCK_REPOSITORY_COGNITO_DATABASE_H
 
 // C++ standard includes
 #include <iostream>
@@ -27,6 +27,7 @@ namespace AwsMock::Database {
     class CognitoDatabase : public Database {
 
       public:
+
         /**
          * Constructor
          */
@@ -233,6 +234,7 @@ namespace AwsMock::Database {
         void DeleteAllUsers();
 
       private:
+
         /**
          * Use MongoDB
          */
@@ -261,4 +263,4 @@ namespace AwsMock::Database {
 
 }// namespace AwsMock::Database
 
-#endif// AWSMOCK_REPOSITORY_COGNITODATABASE_H
+#endif// AWSMOCK_REPOSITORY_COGNITO_DATABASE_H

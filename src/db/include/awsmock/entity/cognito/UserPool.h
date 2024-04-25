@@ -2,8 +2,8 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_COGNITO_USERPOOL_H
-#define AWSMOCK_DB_ENTITY_COGNITO_USERPOOL_H
+#ifndef AWSMOCK_DB_ENTITY_COGNITO_USER_POOL_H
+#define AWSMOCK_DB_ENTITY_COGNITO_USER_POOL_H
 
 // C++ includes
 #include <string>
@@ -125,4 +125,4 @@ namespace AwsMock::Database::Entity::Cognito {
 
 }// namespace AwsMock::Database::Entity::Cognito
 
-#endif// AWSMOCK_DB_ENTITY_COGNITO_USERPOOL_H
+#endif// AWSMOCK_DB_ENTITY_COGNITO_USER_POOL_H

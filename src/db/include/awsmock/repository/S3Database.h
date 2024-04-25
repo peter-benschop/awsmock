@@ -2,8 +2,8 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#ifndef AWSMOCK_REPOSITORY_S3DATABASE_H
-#define AWSMOCK_REPOSITORY_S3DATABASE_H
+#ifndef AWSMOCK_REPOSITORY_S3_DATABASE_H
+#define AWSMOCK_REPOSITORY_S3_DATABASE_H
 
 // C++ standard includes
 #include <iostream>
@@ -36,6 +36,7 @@ namespace AwsMock::Database {
     class S3Database : public Database {
 
       public:
+
         /**
          * Constructor
          */
@@ -210,10 +211,7 @@ namespace AwsMock::Database {
          * @return S3 object
          * @throws DatabaseException
          */
-        Entity::S3::Object GetObjectMd5(const std::string &region,
-                                        const std::string &bucket,
-                                        const std::string &key,
-                                        const std::string &md5sum);
+        Entity::S3::Object GetObjectMd5(const std::string &region, const std::string &bucket, const std::string &key, const std::string &md5sum);
 
         /**
          * Gets an object from a bucket using the bucket, key and MD5 sum as query parameter
@@ -225,10 +223,7 @@ namespace AwsMock::Database {
          * @return S3 object
          * @throws DatabaseException
          */
-        Entity::S3::Object GetObjectVersion(const std::string &region,
-                                            const std::string &bucket,
-                                            const std::string &key,
-                                            const std::string &version);
+        Entity::S3::Object GetObjectVersion(const std::string &region, const std::string &bucket, const std::string &key, const std::string &version);
 
         /**
          * Gets an object from an bucket
@@ -284,8 +279,7 @@ namespace AwsMock::Database {
          * @param bucketNotification bucket notification
          * @return updated Bucket entity
          */
-        Entity::S3::Bucket CreateBucketNotification(const Entity::S3::Bucket &bucket,
-                                                    const Entity::S3::BucketNotification &bucketNotification);
+        Entity::S3::Bucket CreateBucketNotification(const Entity::S3::Bucket &bucket, const Entity::S3::BucketNotification &bucketNotification);
 
         /**
          * Creates a bucket notification-
@@ -294,8 +288,7 @@ namespace AwsMock::Database {
          * @param bucketNotification bucket notification
          * @return updated Bucket entity
          */
-        Entity::S3::Bucket DeleteBucketNotifications(const Entity::S3::Bucket &bucket,
-                                                     const Entity::S3::BucketNotification &bucketNotification);
+        Entity::S3::Bucket DeleteBucketNotifications(const Entity::S3::Bucket &bucket, const Entity::S3::BucketNotification &bucketNotification);
 
         /**
          * Delete a bucket.
@@ -333,6 +326,7 @@ namespace AwsMock::Database {
         void DeleteAllObjects();
 
       private:
+
         /**
          * Allowed event types
          */
@@ -356,4 +350,4 @@ namespace AwsMock::Database {
 
 }// namespace AwsMock::Database
 
-#endif// AWSMOCK_REPOSITORY_S3DATABASE_H
+#endif// AWSMOCK_REPOSITORY_S3_DATABASE_H

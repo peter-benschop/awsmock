@@ -2,8 +2,8 @@
 // Created by vogje01 on 11/19/23.
 //
 
-#ifndef AWSMOCK_REPOSITORY_SQSMEMORYDB_H
-#define AWSMOCK_REPOSITORY_SQSMEMORYDB_H
+#ifndef AWSMOCK_REPOSITORY_SQS_MEMORYDB_H
+#define AWSMOCK_REPOSITORY_SQS_MEMORYDB_H
 
 // C++ includes
 #include <string>
@@ -31,6 +31,7 @@ namespace AwsMock::Database {
     class SQSMemoryDb {
 
       public:
+
         /**
          * Constructor
          */
@@ -218,11 +219,7 @@ namespace AwsMock::Database {
          * @param maxMessages maximal number of messages
          * @param messageList message list
          */
-        void ReceiveMessages(const std::string &region,
-                             const std::string &queueUrl,
-                             int visibility,
-                             int maxMessages,
-                             Entity::SQS::MessageList &messageList);
+        void ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, int maxMessages, Entity::SQS::MessageList &messageList);
 
         /**
          * Reset expired messages
@@ -239,9 +236,7 @@ namespace AwsMock::Database {
          * @param redrivePolicy redrive policy
          * @param configuration AwsMock configuration
          */
-        void RedriveMessages(const std::string &queueUrl,
-                             const Entity::SQS::RedrivePolicy &redrivePolicy,
-                             const Core::Configuration &configuration);
+        void RedriveMessages(const std::string &queueUrl, const Entity::SQS::RedrivePolicy &redrivePolicy, const Core::Configuration &configuration);
 
         /**
          * Any message, which has a message state is DELAYED is reset when the delay period is over.
@@ -283,9 +278,7 @@ namespace AwsMock::Database {
          * @param queueUrl URL of the queue
          * @param status message state
          */
-        long CountMessagesByStatus(const std::string &region,
-                                   const std::string &queueUrl,
-                                   Entity::SQS::MessageStatus status);
+        long CountMessagesByStatus(const std::string &region, const std::string &queueUrl, Entity::SQS::MessageStatus status);
 
         /**
          * Deletes all messages of a queue
@@ -311,6 +304,7 @@ namespace AwsMock::Database {
         void DeleteAllMessages();
 
       private:
+
         /**
          * SQS queue vector, when running without database
          */
@@ -334,4 +328,4 @@ namespace AwsMock::Database {
 
 }// namespace AwsMock::Database
 
-#endif// AWSMOCK_REPOSITORY_SQSMEMORYDB_H
+#endif// AWSMOCK_REPOSITORY_SQS_MEMORYDB_H

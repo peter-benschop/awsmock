@@ -196,5 +196,7 @@ namespace AwsMock::Database::Entity::Transfer {
 
     typedef struct Transfer Transfer;
     typedef std::vector<Transfer> TransferList;
+
 }// namespace AwsMock::Database::Entity::Transfer
+
 #endif// AWSMOCK_DB_ENTITY_TRANSFER_H

@@ -2,8 +2,8 @@
 // Created by vogje01 on 11/19/23.
 //
 
-#ifndef AWSMOCK_REPOSITORY_TRANSFERMEMORYDB_H
-#define AWSMOCK_REPOSITORY_TRANSFERMEMORYDB_H
+#ifndef AWSMOCK_REPOSITORY_TRANSFER_MEMORYDB_H
+#define AWSMOCK_REPOSITORY_TRANSFER_MEMORYDB_H
 
 // C++ includes
 #include <string>
@@ -32,6 +32,7 @@ namespace AwsMock::Database {
     class TransferMemoryDb {
 
       public:
+
         /**
          * Constructor
          */
@@ -158,6 +159,7 @@ namespace AwsMock::Database {
         void DeleteAllTransfers();
 
       private:
+
         /**
          * Transfer server map, when running without database
          */
@@ -181,4 +183,4 @@ namespace AwsMock::Database {
 
 }// namespace AwsMock::Database
 
-#endif// AWSMOCK_REPOSITORY_TRANSFERMEMORYDB_H
+#endif// AWSMOCK_REPOSITORY_TRANSFER_MEMORYDB_H

@@ -2,8 +2,8 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#ifndef AWSMOCK_REPOSITORY_MODULEDATABASE_H
-#define AWSMOCK_REPOSITORY_MODULEDATABASE_H
+#ifndef AWSMOCK_REPOSITORY_MODULE_DATABASE_H
+#define AWSMOCK_REPOSITORY_MODULE_DATABASE_H
 
 // C++ standard includes
 #include <string>
@@ -29,6 +29,7 @@ namespace AwsMock::Database {
     class ModuleDatabase : public Database {
 
       public:
+
         /**
          * Constructor
          *
@@ -169,6 +170,7 @@ namespace AwsMock::Database {
         void DeleteAllModules();
 
       private:
+
         /**
          * Use MongoDB
          */
@@ -192,4 +194,4 @@ namespace AwsMock::Database {
 
 }// namespace AwsMock::Database
 
-#endif// AWSMOCK_REPOSITORY_MODULEDATABASE_H
+#endif// AWSMOCK_REPOSITORY_MODULE_DATABASE_H

@@ -2,8 +2,8 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#ifndef AWSMOCK_REPOSITORY_SQSDATABASE_H
-#define AWSMOCK_REPOSITORY_SQSDATABASE_H
+#ifndef AWSMOCK_REPOSITORY_SQS_DATABASE_H
+#define AWSMOCK_REPOSITORY_SQS_DATABASE_H
 
 // C++ standard includes
 #include <iostream>
@@ -38,6 +38,7 @@ namespace AwsMock::Database {
     class SQSDatabase : public Database {
 
       public:
+
         /**
          * Constructor
          *
@@ -363,6 +364,7 @@ namespace AwsMock::Database {
         void DeleteAllMessages();
 
       private:
+
         /**
          * SQS queue vector, when running without database
          */
@@ -401,4 +403,4 @@ namespace AwsMock::Database {
 
 }// namespace AwsMock::Database
 
-#endif// AWSMOCK_REPOSITORY_SQSDATABASE_H
+#endif// AWSMOCK_REPOSITORY_SQS_DATABASE_H

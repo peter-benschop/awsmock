@@ -2,8 +2,8 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_COGNITO_USERSTATUS_H
-#define AWSMOCK_DB_ENTITY_COGNITO_USERSTATUS_H
+#ifndef AWSMOCK_DB_ENTITY_COGNITO_USER_STATUS_H
+#define AWSMOCK_DB_ENTITY_COGNITO_USER_STATUS_H
 
 // C++ includes
 #include <map>
@@ -49,4 +49,4 @@ namespace AwsMock::Database::Entity::Cognito {
 
 }// namespace AwsMock::Database::Entity::Cognito
 
-#endif//AWSMOCK_DB_ENTITY_COGNITO_USERSTATUS_H
+#endif// AWSMOCK_DB_ENTITY_COGNITO_USER_STATUS_H

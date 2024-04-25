@@ -2,8 +2,8 @@
 // Created by vogje01 on 10/22/23.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_MODULE_MODULESTATUS_H
-#define AWSMOCK_DB_ENTITY_MODULE_MODULESTATUS_H
+#ifndef AWSMOCK_DB_ENTITY_MODULE_MODULE_STATUS_H
+#define AWSMOCK_DB_ENTITY_MODULE_MODULE_STATUS_H
 
 // C++ includes
 #include <map>
@@ -71,4 +71,4 @@ namespace AwsMock::Database::Entity::Module {
 
 }// namespace AwsMock::Database::Entity::Module
 
-#endif// AWSMOCK_DB_ENTITY_MODULE_MODULESTATUS_H
+#endif// AWSMOCK_DB_ENTITY_MODULE_MODULE_STATUS_H

@@ -2,8 +2,8 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#ifndef AWSMOCK_REPOSITORY_LAMBDAMEMORYDB_H
-#define AWSMOCK_REPOSITORY_LAMBDAMEMORYDB_H
+#ifndef AWSMOCK_REPOSITORY_LAMBDA_MEMORYDB_H
+#define AWSMOCK_REPOSITORY_LAMBDA_MEMORYDB_H
 
 // C++ standard includes
 #include <iostream>
@@ -35,6 +35,7 @@ namespace AwsMock::Database {
     class LambdaMemoryDb {
 
       public:
+
         /**
          * Constructor
          */
@@ -162,6 +163,7 @@ namespace AwsMock::Database {
         void DeleteAllLambdas();
 
       private:
+
         /**
          * Lambda map
          */
@@ -175,4 +177,4 @@ namespace AwsMock::Database {
 
 }// namespace AwsMock::Database
 
-#endif// AWSMOCK_REPOSITORY_LAMBDAMEMORYDB_H
+#endif// AWSMOCK_REPOSITORY_LAMBDA_MEMORYDB_H
