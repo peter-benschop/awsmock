@@ -17,49 +17,54 @@
 
 namespace AwsMock::Dto::Docker {
 
+    /**
+     * Create container response
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct CreateContainerResponse {
 
         /**
-     * ID
-     */
+         * ID
+         */
         std::string id;
 
         /**
-     * Warnings
-     */
+         * Warnings
+         */
         std::vector<std::string> warnings;
 
         /**
-     * Assigned random port
-     */
+         * Assigned random port
+         */
         int hostPort;
 
         /**
-     * Convert to a JSON string
-     *
-     * @param jsonString JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @param jsonString JSON string
+         */
         void FromJson(const std::string &jsonString);
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const CreateContainerResponse &r);
     };
 

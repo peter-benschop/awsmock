@@ -15,24 +15,29 @@
 
 namespace AwsMock::Dto {
 
+    /**
+     * Common DTO
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct CommonDto {
 
         /**
-     * Constructor
-     *
-     * @param resource AWS resource
-     * @param requestId AWS request ID
-     */
+         * Constructor
+         *
+         * @param resource AWS resource
+         * @param requestId AWS request ID
+         */
         CommonDto(std::string resource, std::string requestId) : resource(std::move(resource)), requestId(std::move(requestId)) {}
 
         /**
-     * Resource
-     */
+         * Resource
+         */
         std::string resource = "Unknown resource";
 
         /**
-     * Resource
-     */
+         * Resource
+         */
         std::string requestId = Poco::UUIDGenerator().createRandom().toString();
     };
 

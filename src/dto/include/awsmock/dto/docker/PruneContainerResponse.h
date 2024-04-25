@@ -24,23 +24,28 @@
 
 namespace AwsMock::Dto::Docker {
 
+    /**
+     * Prune docker response
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct PruneContainerResponse {
 
         /**
-     * Image ID
-     */
+         * Image ID
+         */
         std::vector<std::string> containersDeleted;
 
         /**
-     * Space reclaimed
-     */
+         * Space reclaimed
+         */
         long spaceReclaimed;
 
         /**
-     * Convert to a JSON string
-     *
-     * @param jsonString JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @param jsonString JSON string
+         */
         void FromJson(const std::string &jsonString) {
 
             try {
@@ -62,10 +67,10 @@ namespace AwsMock::Dto::Docker {
         }
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string
         ToString() const {
             std::stringstream ss;
@@ -74,10 +79,10 @@ namespace AwsMock::Dto::Docker {
         }
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const PruneContainerResponse &i) {
             os << "PruneContainerResponse={spaceReclaimed='" << i.spaceReclaimed << "' containersDeleted=[";
             for (auto &it: i.containersDeleted) {

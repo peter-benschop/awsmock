@@ -18,49 +18,54 @@
 
 namespace AwsMock::Dto::Cognito {
 
+    /**
+     * Delete user request
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct AdminDeleteUserRequest {
 
         /**
-     * AWS region
-     */
+         * AWS region
+         */
         std::string region;
 
         /**
-     * ID of the user pool
-     */
+         * ID of the user pool
+         */
         std::string userPoolId;
 
         /**
-     * Name of the user
-     */
+         * Name of the user
+         */
         std::string userName;
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Convert from a JSON object.
-     *
-     * @param payload json string object
-     */
+         * Convert from a JSON object.
+         *
+         * @param payload json string object
+         */
         void FromJson(const std::string &payload);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const AdminDeleteUserRequest &i);
     };
 

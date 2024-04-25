@@ -18,44 +18,49 @@
 
 namespace AwsMock::Dto::Docker {
 
+    /**
+     * List container request
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct ListContainerResponse {
 
         /**
-     * Container list
-     */
+         * Container list
+         */
         std::vector<Container> containerList;
 
         /**
-     * Constructor
-     */
+         * Constructor
+         */
         explicit ListContainerResponse(const std::string &body);
 
         /**
-     * Convert to a JSON string
-     *
-     * @param jsonString JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @param jsonString JSON string
+         */
         void FromJson(const std::string &jsonString);
 
         /**
-     * Convert to a JSON string
-     *
-     * @param object JSON object
-     */
+         * Convert to a JSON string
+         *
+         * @param object JSON object
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const ListContainerResponse &r);
     };
 

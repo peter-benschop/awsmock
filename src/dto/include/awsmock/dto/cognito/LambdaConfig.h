@@ -21,128 +21,130 @@
 namespace AwsMock::Dto::Cognito {
 
     /**
-   * Cognito lambda configuration
-   *
-   * Example:
-   * <pre>
-   * "LambdaConfig": {
-   *    "CreateAuthChallenge": "string",
-   *    "CustomEmailSender": {
-   *       "LambdaArn": "string",
-   *       "LambdaVersion": "string"
-   *    },
-   *    "CustomMessage": "string",
-   *    "CustomSMSSender": {
-   *       "LambdaArn": "string",
-   *       "LambdaVersion": "string"
-   *    },
-   *    "DefineAuthChallenge": "string",
-   *    "KMSKeyID": "string",
-   *    "PostAuthentication": "string",
-   *    "PostConfirmation": "string",
-   *    "PreAuthentication": "string",
-   *    "PreSignUp": "string",
-   *    "PreTokenGeneration": "string",
-   *    "PreTokenGenerationConfig": {
-   *       "LambdaArn": "string",
-   *       "LambdaVersion": "string"
-   *    },
-   *    "UserMigration": "string",
-   *    "VerifyAuthChallengeResponse": "string"
-   * },
-   * </pre>
-   */
+     * Cognito lambda configuration
+     *
+     * Example:
+     * <pre>
+     * "LambdaConfig": {
+     *    "CreateAuthChallenge": "string",
+     *    "CustomEmailSender": {
+     *       "LambdaArn": "string",
+     *       "LambdaVersion": "string"
+     *    },
+     *    "CustomMessage": "string",
+     *    "CustomSMSSender": {
+     *       "LambdaArn": "string",
+     *       "LambdaVersion": "string"
+     *    },
+     *    "DefineAuthChallenge": "string",
+     *    "KMSKeyID": "string",
+     *    "PostAuthentication": "string",
+     *    "PostConfirmation": "string",
+     *    "PreAuthentication": "string",
+     *    "PreSignUp": "string",
+     *    "PreTokenGeneration": "string",
+     *    "PreTokenGenerationConfig": {
+     *       "LambdaArn": "string",
+     *       "LambdaVersion": "string"
+     *    },
+     *    "UserMigration": "string",
+     *    "VerifyAuthChallengeResponse": "string"
+     * },
+     * </pre>
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct LambdaConfig {
 
         /**
-     * Create authentication challenge
-     */
+         * Create authentication challenge
+         */
         std::string createAuthChallenge;
 
         /**
-     * Custom message
-     */
+         * Custom message
+         */
         std::string customMessage;
 
         /**
-     * Custom email sender
-     */
+         * Custom email sender
+         */
         CustomEmailSender customEmailSender;
 
         /**
-     * Custom SMS sender
-     */
+         * Custom SMS sender
+         */
         CustomSmsSender customSmsSender;
 
         /**
-     * Define authentication challenge
-     */
+         * Define authentication challenge
+         */
         std::string defineAuthChallenge;
 
         /**
-     * KMS key
-     */
+         * KMS key
+         */
         std::string kmsKeyId;
 
         /**
-     * Post authentication
-     */
+         * Post authentication
+         */
         std::string postAuthentication;
 
         /**
-     * Post confirmation
-     */
+         * Post confirmation
+         */
         std::string postConfirmation;
 
         /**
-     * Pre confirmation
-     */
+         * Pre confirmation
+         */
         std::string preAuthentication;
 
         /**
-     * Pre signup
-     */
+         * Pre signup
+         */
         std::string preSignUp;
 
         /**
-     * Pre token generation
-     */
+         * Pre token generation
+         */
         std::string preTokenGeneration;
 
         /**
-     * Pre token generation config
-     */
+         * Pre token generation config
+         */
         PreTokenGenerationConfig preTokenGenerationConfig;
 
         /**
-     * User migration
-     */
+         * User migration
+         */
         std::string userMigration;
 
         /**
-     * Verify auth challenge
-     */
+         * Verify auth challenge
+         */
         std::string verifyAuthChallengeResponse;
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const LambdaConfig &r);
     };
 

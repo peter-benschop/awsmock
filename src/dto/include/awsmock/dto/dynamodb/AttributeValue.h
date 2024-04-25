@@ -16,83 +16,89 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
+    /**
+     * DynamoDB attribute value
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct AttributeValue {
 
         /**
-     * Type
-     */
+         * Type
+         */
         std::string type;
 
         /**
-     * Value
-     */
+         * Value
+         */
         std::string value;
 
         /**
-     * String value
-     */
+         * String value
+         */
         std::string stringValue;
 
         /**
-     * String set value
-     */
+         * String set value
+         */
         std::vector<std::string> stringSetValue;
 
         /**
-     * Number value
-     */
+         * Number value
+         */
         std::string numberValue;
 
         /**
-     * Number set value
-     */
+         * Number set value
+         */
         std::vector<std::string> numberSetValue;
 
         /**
-     * Boolean value
-     */
+         * Boolean value
+         */
         bool boolValue;
 
         /**
-     * Null value
-     */
+         * Null value
+         */
         bool nullValue;
 
         /**
-       * Convert to JSON value
-       *
-       * @return JSON object
-       */
+         * Convert to JSON value
+         *
+         * @return JSON object
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Convert to JSON value
-     *
-     * @return JSON object
-     */
+         * Convert to JSON value
+         *
+         * @return JSON object
+         */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
-     * Convert from JSON object.
-     *
-     * @param jsonObject JSON object
-     */
+         * Convert from JSON object.
+         *
+         * @param jsonObject JSON object
+         */
         void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const AttributeValue &r);
     };
+
 }// namespace AwsMock::Dto::DynamoDb
 
 #endif// AWSMOCK_DTO_DYNAMODB_ATTRIBUTE_VALUE_H

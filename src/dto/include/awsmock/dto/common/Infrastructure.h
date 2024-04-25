@@ -37,86 +37,91 @@
 
 namespace AwsMock::Dto::Common {
 
+    /**
+     * Infrastructure
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct Infrastructure {
 
         /**
-     * S3 buckets
-     */
+         * S3 buckets
+         */
         Database::Entity::S3::BucketList s3Buckets;
 
         /**
-     * S3 objects
-     */
+         * S3 objects
+         */
         Database::Entity::S3::ObjectList s3Objects;
 
         /**
-     * SQS queues
-     */
+         * SQS queues
+         */
         Database::Entity::SQS::QueueList sqsQueues;
 
         /**
-     * SQS messages
-     */
+         * SQS messages
+         */
         Database::Entity::SQS::MessageList sqsMessages;
 
         /**
-     * SNS topics
-     */
+         * SNS topics
+         */
         Database::Entity::SNS::TopicList snsTopics;
 
         /**
-     * SQS messages
-     */
+         * SQS messages
+         */
         Database::Entity::SNS::MessageList snsMessages;
 
         /**
-     * Lambda functions
-     */
+         * Lambda functions
+         */
         Database::Entity::Lambda::LambdaList lambdas;
 
         /**
-     * Transfer servers
-     */
+         * Transfer servers
+         */
         Database::Entity::Transfer::TransferList transferServers;
 
         /**
-     * Cognito user pools
-     */
+         * Cognito user pools
+         */
         Database::Entity::Cognito::UserPoolList cognitoUserPools;
 
         /**
-     * Cognito users
-     */
+         * Cognito users
+         */
         Database::Entity::Cognito::UserList cognitoUsers;
 
         /**
-     * DynamoDb tables
-     */
+         * DynamoDb tables
+         */
         Database::Entity::DynamoDb::TableList dynamoDbTables;
 
         /**
-     * DynamoDb items
-     */
+         * DynamoDb items
+         */
         Database::Entity::DynamoDb::ItemList dynamoDbItems;
 
         /**
-     * DynamoDb items
-     */
+         * DynamoDb items
+         */
         Database::Entity::SecretsManager::SecretList secrets;
 
         /**
-     * JSON representation
-     *
-     * @param prettyPrint pretty print, if true JSON indent=4
-     * @return Infrastructure as JSON string
-     */
+         * JSON representation
+         *
+         * @param prettyPrint pretty print, if true JSON indent=4
+         * @return Infrastructure as JSON string
+         */
         std::string ToJson(bool prettyPrint = false);
 
         /**
-     * From JSON representation
-     *
-     * @param jsonString JSON string
-     */
+         * From JSON representation
+         *
+         * @param jsonString JSON string
+         */
         void FromJson(const std::string &jsonString);
     };
 

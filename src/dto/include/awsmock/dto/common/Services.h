@@ -33,33 +33,38 @@
 
 namespace AwsMock::Dto::Common {
 
+    /**
+     * Services
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct Services {
 
         /**
-     * Service names
-     */
+         * Service names
+         */
         std::vector<std::string> serviceNames;
 
         /**
-     * Check existence of given service name
-     *
-     * @param service name of the service
-     * @return true in case the service exists
-     */
+         * Check existence of given service name
+         *
+         * @param service name of the service
+         * @return true in case the service exists
+         */
         bool HasService(const std::string &service) const;
 
         /**
-     * JSON representation
-     *
-     * @return Infrastructure as JSON string
-     */
+         * JSON representation
+         *
+         * @return Infrastructure as JSON string
+         */
         std::string ToJson();
 
         /**
-     * JSON representation
-     *
-     * @param payload HTTP request body
-     */
+         * JSON representation
+         *
+         * @param payload HTTP request body
+         */
         void FromJson(const std::string &payload);
     };
 

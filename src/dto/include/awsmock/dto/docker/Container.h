@@ -20,88 +20,93 @@
 
 namespace AwsMock::Dto::Docker {
 
+    /**
+     * Docker container
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct Container {
 
         /**
-     * Image ID
-     */
+         * Image ID
+         */
         std::string id;
 
         /**
-     * Container names
-     */
+         * Container names
+         */
         std::vector<std::string> names;
 
         /**
-     * Image
-     */
+         * Image
+         */
         std::string image;
 
         /**
-     * Image ID
-     */
+         * Image ID
+         */
         std::string imageId;
 
         /**
-     * Command
-     */
+         * Command
+         */
         std::string command;
 
         /**
-     * State
-     */
+         * State
+         */
         std::string state;
 
         /**
-     * Status
-     */
+         * Status
+         */
         std::string status;
 
         /**
-     * Ports
-     */
+         * Ports
+         */
         std::vector<Port> ports;
 
         /**
-     * Returns the lambda host port. The lambda host port is the public port for which the private port is 8080.
-     *
-     * @return lambda public port, or -1 if port does not exist.
-     */
+         * Returns the lambda host port. The lambda host port is the public port for which the private port is 8080.
+         *
+         * @return lambda public port, or -1 if port does not exist.
+         */
         int GetLambdaPort();
 
         /**
-     * Convert to a JSON string
-     *
-     * @param jsonObject JSON object
-     */
+         * Convert to a JSON string
+         *
+         * @param jsonObject JSON object
+         */
         void FromJson(Poco::JSON::Object::Ptr jsonObject);
 
         /**
-     * Convert to a JSON object
-     *
-     * @return JSON object
-     */
+         * Convert to a JSON object
+         *
+         * @return JSON object
+         */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const Container &c);
     };
 

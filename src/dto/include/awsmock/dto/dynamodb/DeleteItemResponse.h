@@ -20,70 +20,72 @@
 namespace AwsMock::Dto::DynamoDb {
 
     /**
-   * Example:
-   * <pre>
-   * {
-   *   "ConsumedCapacity":
-   *     {
-   *       "TableName":"test-table",
-   *       "CapacityUnits":1.0
-   *     }
-   * }
-   * </pre>
-   */
+     * Example:
+     * <pre>
+     * {
+     *   "ConsumedCapacity":
+     *     {
+     *       "TableName":"test-table",
+     *       "CapacityUnits":1.0
+     *    }
+     * }
+     * </pre>
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct DeleteItemResponse {
 
         /**
-     * Region
-     */
+         * Region
+         */
         std::string region;
 
         /**
-     * Table name
-     */
+         * Table name
+         */
         std::string tableName;
 
         /**
-     * Original HTTP response body
-     */
+         * Original HTTP response body
+         */
         std::string body;
 
         /**
-     * HTTP response headers
-     */
+         * HTTP response headers
+         */
         std::map<std::string, std::string> headers;
 
         /**
-     * HTTP status from docker image
-     */
+         * HTTP status from docker image
+         */
         Poco::Net::HTTPResponse::HTTPStatus status;
 
         /**
-     * Creates a JSON string from the object.
-     *
-     * @return JSON string
-     */
+         * Creates a JSON string from the object.
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Parse a JSON stream
-     *
-     * @param jsonString JSON string
-     */
+         * Parse a JSON stream
+         *
+         * @param jsonString JSON string
+         */
         void FromJson(const std::string &jsonString);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const DeleteItemResponse &r);
     };
 

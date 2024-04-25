@@ -17,80 +17,90 @@
 
 namespace AwsMock::Dto::Docker {
 
+    /**
+     * Exposed port
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct ExposedPort {
 
         /**
-     * Internal port
-     */
+         * Internal port
+         */
         std::string internalPort;
 
         /**
-     * Internal protocol
-     */
+         * Internal protocol
+         */
         std::string protocol;
     };
 
+    /**
+     * Create container request
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct CreateContainerRequest {
 
         /**
-     * Hostname
-     */
+         * Hostname
+         */
         std::string hostName;
 
         /**
-     * Domain name
-     */
+         * Domain name
+         */
         std::string domainName;
 
         /**
-     * User
-     */
+         * User
+         */
         std::string user;
 
         /**
-     * Image
-     */
+         * Image
+         */
         std::string image;
 
         /**
-     * Network mode
-     */
+         * Network mode
+         */
         std::string networkMode = "bridge";
 
         /**
-     * Environment
-     */
+         * Environment
+         */
         std::vector<std::string> environment;
 
         /**
-     * Container ports
-     */
+         * Container ports
+         */
         std::string containerPort;
 
         /**
-     * Host ports
-     */
+         * Host ports
+         */
         std::string hostPort;
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const CreateContainerRequest &r);
     };
 

@@ -19,65 +19,70 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
+    /**
+     * DynamoDB list table response
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct ListTableResponse {
 
         /**
-     * Region
-     */
+         * Region
+         */
         std::string region;
 
         /**
-     * Table names
-     */
+         * Table names
+         */
         std::vector<std::string> tableNames;
 
         /**
-     * Last evaluated table name
-     */
+         * Last evaluated table name
+         */
         std::string lastEvaluatedTableName;
 
         /**
-     * HTTP response body
-     */
+         * HTTP response body
+         */
         std::string body;
 
         /**
-     * HTTP headers
-     */
+         * HTTP headers
+         */
         std::map<std::string, std::string> headers;
 
         /**
-     * HTTP status from docker image
-     */
+         * HTTP status from docker image
+         */
         Poco::Net::HTTPResponse::HTTPStatus status;
 
         /**
-     * Creates a JSON string from the object.
-     *
-     * @return JSON string
-     */
+         * Creates a JSON string from the object.
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Parse a JSON stream
-     *
-     * @param body JSON body
-     * @param headers HTTP headers
-     */
+         * Parse a JSON stream
+         *
+         * @param body JSON body
+         * @param headers HTTP headers
+         */
         void FromJson(const std::string &body, const std::map<std::string, std::string> &headers);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const ListTableResponse &r);
     };
 

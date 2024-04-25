@@ -48,89 +48,95 @@ namespace AwsMock::Dto::Common {
         return UserAgentType::AWS_SDK_UNKNOWN;
     }
 
+    /**
+     * HTTP user agent
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct UserAgent {
 
         /**
-     * Client application
-     */
+         * Client application
+         */
         std::string clientApplication;
 
         /**
-     * Client language
-     */
+         * Client language
+         */
         std::string clientLanguage;
 
         /**
-     * Client OS
-     */
+         * Client OS
+         */
         std::string clientOs;
 
         /**
-     * Client executable type
-     */
+         * Client executable type
+         */
         std::string clientExecutableType;
 
         /**
-     * Client prompt
-     */
+         * Client prompt
+         */
         bool clientPrompt;
 
         /**
-     * Client request module
-     */
+         * Client request module
+         */
         std::string clientModule;
 
         /**
-     * Client command
-     */
+         * Client command
+         */
         std::string clientCommand;
 
         /**
-     * Client content type, default: application/xml
-     */
+         * Client content type, default: application/xml
+         */
         std::string contentType = "application/xml";
 
         /**
-     * User agent type
-     */
+         * User agent type
+         */
         UserAgentType type;
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Getś the value from the user-agent string
-     *
-     * @param request HTTP server request
-     */
+         * Gets the value from the user-agent string
+         *
+         * @param request HTTP server request
+         */
         void FromRequest(Poco::Net::HTTPServerRequest &request);
 
         /**
-     * Getś the value from the user-agent string
-     *
-     * @param request HTTP server request
-     * @param service AWS service name
-     */
+         * Gets the value from the user-agent string
+         *
+         * @param request HTTP server request
+         * @param service AWS service name
+         */
         void FromRequest(Poco::Net::HTTPServerRequest &request, const std::string &service);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const UserAgent &i);
     };
 
 }// namespace AwsMock::Dto::Common
+
 #endif// AWSMOCK_DTO_COMMON_USER_AGENT_H

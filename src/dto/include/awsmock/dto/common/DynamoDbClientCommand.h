@@ -56,61 +56,61 @@ namespace AwsMock::Dto::Common {
     }
 
     /**
-   * The DynamoDB client command is used as a standardized way of interpreting the different ways the clients are calling the REST services. Each client type is using a different way of calling the AWS REST services.
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
+     * The DynamoDB client command is used as a standardized way of interpreting the different ways the clients are calling the REST services. Each client type is using a different way of calling the AWS REST services.
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct DynamoDbClientCommand {
 
         /**
-     * HTTP request type
-     */
+         * HTTP request type
+         */
         HttpMethod method;
 
         /**
-     * Client region
-     */
+         * Client region
+         */
         std::string region;
 
         /**
-     * Client user
-     */
+         * Client user
+         */
         std::string user;
 
         /**
-     * Client command
-     */
+         * Client command
+         */
         DynamoDbCommandType command;
 
         /**
-     * Getś the value from the user-agent string
-     *
-     * @param method HTTP method
-     * @param request HTTP server request
-     * @param region AWS region
-     * @param user AWS user
-     */
+         * Getś the value from the user-agent string
+         *
+         * @param method HTTP method
+         * @param request HTTP server request
+         * @param region AWS region
+         * @param user AWS user
+         */
         void FromRequest(const HttpMethod &method, Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user);
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const DynamoDbClientCommand &i);
     };
 

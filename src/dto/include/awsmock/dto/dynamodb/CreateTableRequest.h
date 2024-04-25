@@ -19,79 +19,84 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
+    /**
+     * DynamoDB create table request
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct CreateTableRequest {
 
         /**
-     * Region
-     */
+         * Region
+         */
         std::string region;
 
         /**
-     * Table class
-     */
+         * Table class
+         */
         std::string tableClass;
 
         /**
-     * Table name
-     */
+         * Table name
+         */
         std::string tableName;
 
         /**
-     * Tags
-     */
+         * Tags
+         */
         std::map<std::string, std::string> tags;
 
         /**
-     * Attribute definitions
-     */
+         * Attribute definitions
+         */
         std::map<std::string, std::string> attributes;
 
         /**
-     * Key schemas
-     */
+         * Key schemas
+         */
         std::map<std::string, std::string> keySchemas;
 
         /**
-     * Provisioned throughput
-     */
+         * Provisioned throughput
+         */
         ProvisionedThroughput provisionedThroughput;
 
         /**
-     * Original HTTP request body
-     */
+         * Original HTTP request body
+         */
         std::string body;
 
         /**
-     * Original HTTP request headers
-     */
+         * Original HTTP request headers
+         */
         std::map<std::string, std::string> headers;
 
         /**
-     * Creates a JSON string from the object.
-     *
-     * @return JSON string
-     */
+         * Creates a JSON string from the object.
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Parse a JSON stream
-     *
-     * @param jsonBody JSON string
-     */
+         * Parse a JSON stream
+         *
+         * @param jsonBody JSON string
+         */
         void FromJson(const std::string &jsonBody);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const CreateTableRequest &r);
     };
 

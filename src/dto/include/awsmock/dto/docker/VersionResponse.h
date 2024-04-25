@@ -24,18 +24,23 @@
 
 namespace AwsMock::Dto::Docker {
 
+    /**
+     * Docker platform
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct Platform {
 
         /**
-     * Platform name
-     */
+         * Platform name
+         */
         std::string name;
 
         /**
-     * Deserialize from a JSON object
-     *
-     * @param jsonObject JSON object
-     */
+         * Deserialize from a JSON object
+         *
+         * @param jsonObject JSON object
+         */
         void FromJson(Poco::JSON::Object::Ptr jsonObject) {
 
             try {
@@ -47,38 +52,43 @@ namespace AwsMock::Dto::Docker {
         }
     };
 
+    /**
+     * Docker details
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct Details {
 
         /**
-     * API version
-     */
+         * API version
+         */
         std::string apiVersion;
 
         /**
-     * Architecture
-     */
+         * Architecture
+         */
         std::string architecture;
 
         /**
-     * Build time
-     */
+         * Build time
+         */
         Poco::DateTime buildTime;
 
         /**
-     * Experimental
-     */
+         * Experimental
+         */
         bool experimental = false;
 
         /**
-     * Git commit userPoolId
-     */
+         * Git commit userPoolId
+         */
         std::string gitCommit;
 
         /**
-     * Deserialize from a JSON object
-     *
-     * @param jsonObject JSON object
-     */
+         * Deserialize from a JSON object
+         *
+         * @param jsonObject JSON object
+         */
         void FromJson(Poco::JSON::Object::Ptr jsonObject) {
 
             try {
@@ -95,28 +105,33 @@ namespace AwsMock::Dto::Docker {
         }
     };
 
+    /**
+     * Docker component
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct Component {
 
         /**
-     * Platform name
-     */
+         * Platform name
+         */
         std::string name;
 
         /**
-     * Version
-     */
+         * Version
+         */
         std::string version;
 
         /**
-     * Details
-     */
+         * Details
+         */
         Details details;
 
         /**
-     * Deserialize from a JSON object
-     *
-     * @param jsonObject JSON object
-     */
+         * Deserialize from a JSON object
+         *
+         * @param jsonObject JSON object
+         */
         void FromJson(Poco::JSON::Object::Ptr jsonObject) {
 
             try {
@@ -133,23 +148,28 @@ namespace AwsMock::Dto::Docker {
         }
     };
 
+    /**
+     * Docker version
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct DockerVersion {
 
         /**
-     * Platform object
-     */
+         * Platform object
+         */
         Platform platform;
 
         /**
-     * Components
-     */
+         * Components
+         */
         std::vector<Component> components;
 
         /**
-     * Deserialize from a JSON object
-     *
-     * @param jsonString JSON string
-     */
+         * Deserialize from a JSON object
+         *
+         * @param jsonString JSON string
+         */
         void FromJson(const std::string &jsonString) {
 
             try {
@@ -180,6 +200,7 @@ namespace AwsMock::Dto::Docker {
             }
         }
     };
+
 }// namespace AwsMock::Dto::Docker
 
 #endif//AWSMOCK_DTO_DOCKER_VERSIONRESPONSE_H

@@ -19,47 +19,52 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
+    /**
+     * DynamoDB get item key
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct GetItemKey {
 
         /**
-     * Region
-     */
+         * Region
+         */
         std::string type;
 
         /**
-     * Table name
-     */
+         * Table name
+         */
         std::string value;
 
         /**
-     * Creates a JSON string from the object.
-     *
-     * @return JSON string
-     */
+         * Creates a JSON string from the object.
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Parse a JSON stream
-     *
-     * @param jsonBody JSON string
-     */
+         * Parse a JSON stream
+         *
+         * @param jsonBody JSON string
+         */
         void FromJson(const std::string &jsonBody);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const GetItemKey &r);
     };
 
 }// namespace AwsMock::Dto::DynamoDb
 
-#endif// GetItemRequest.h
+#endif// AWSMOCK_DTO_DYNAMODB_GET_ITEM_KEY_H

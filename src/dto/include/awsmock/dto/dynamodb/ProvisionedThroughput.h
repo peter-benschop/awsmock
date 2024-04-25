@@ -16,6 +16,11 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
+    /**
+     * DynamoDB provisioned throughput
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct ProvisionedThroughput {
 
         /**

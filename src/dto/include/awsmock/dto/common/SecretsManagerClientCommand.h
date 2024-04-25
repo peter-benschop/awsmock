@@ -59,74 +59,74 @@ namespace AwsMock::Dto::Common {
     }
 
     /**
-   * The SecretsManager client command is used as a standardized way of interpreting the different ways the clients are calling the REST services. Each client type is using a different way of calling the AWS REST services.
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
+     * The SecretsManager client command is used as a standardized way of interpreting the different ways the clients are calling the REST services. Each client type is using a different way of calling the AWS REST services.
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct SecretsManagerClientCommand {
 
         /**
-     * HTTP request type
-     */
+         * HTTP request type
+         */
         HttpMethod method;
 
         /**
-     * Client region
-     */
+         * Client region
+         */
         std::string region;
 
         /**
-     * Client user
-     */
+         * Client user
+         */
         std::string user;
 
         /**
-     * Client command
-     */
+         * Client command
+         */
         SecretsManagerCommandType command;
 
         /**
-     * HTTP body
-     */
+         * HTTP body
+         */
         std::string payload;
 
         /**
-     * Returns the message body as string.
-     *
-     * @param request HTTP request
-     * @return message body as string
-     */
+         * Returns the message body as string.
+         *
+         * @param request HTTP request
+         * @return message body as string
+         */
         static std::string GetBodyAsString(Poco::Net::HTTPServerRequest &request);
 
         /**
-     * Getś the value from the user-agent string
-     *
-     * @param method HTTP method
-     * @param request HTTP server request
-     * @param region AWS region
-     * @param user AWS user
-     */
+         * Getś the value from the user-agent string
+         *
+         * @param method HTTP method
+         * @param request HTTP server request
+         * @param region AWS region
+         * @param user AWS user
+         */
         void FromRequest(const HttpMethod &method, Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user);
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const SecretsManagerClientCommand &i);
     };
 

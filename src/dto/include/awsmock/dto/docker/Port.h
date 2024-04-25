@@ -17,54 +17,59 @@
 
 namespace AwsMock::Dto::Docker {
 
+    /**
+     * Docker port
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct Port {
 
         /**
-     * Constructor
-     */
+         * Constructor
+         */
         explicit Port(const Poco::JSON::Object::Ptr &object);
 
         /**
-     * Private port, means port inside the container
-     */
+         * Private port, means port inside the container
+         */
         int privatePort{};
 
         /**
-     * Public port, means port visible from docker host
-     */
+         * Public port, means port visible from docker host
+         */
         int publicPort{};
 
         /**
-     * Port type (tcp,udp, etc.)
-     */
+         * Port type (tcp,udp, etc.)
+         */
         std::string type;
 
         /**
-     * Convert to a JSON string
-     *
-     * @param object JSON object
-     */
+         * Convert to a JSON string
+         *
+         * @param object JSON object
+         */
         void FromJson(const Poco::JSON::Object::Ptr &object);
 
         /**
-     * Convert to a JSON string
-     *
-     * @param object JSON object
-     */
+         * Convert to a JSON string
+         *
+         * @param object JSON object
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const Port &c);
     };
 

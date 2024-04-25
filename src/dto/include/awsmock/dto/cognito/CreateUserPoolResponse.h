@@ -16,37 +16,42 @@
 
 namespace AwsMock::Dto::Cognito {
 
+    /**
+     * Create user pool response
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct CreateUserPoolResponse {
 
         /**
-     * AWS region
-     */
+         * AWS region
+         */
         std::string region;
 
         /**
-     * Name of the user pool
-     */
+         * Name of the user pool
+         */
         std::string name;
 
         /**
-     * Convert to a JSON string.
-     *
-     * @return json string
-     */
+         * Convert to a JSON string.
+         *
+         * @return json string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const CreateUserPoolResponse &i);
     };
 

@@ -18,54 +18,56 @@
 namespace AwsMock::Dto::Cognito {
 
     /**
-   * Cognito lambda configuration
-   *
-   * Example:
-   * <pre>
-   * "CustomEmailSender": {
-   *    "LambdaArn": "string",
-   *    "LambdaVersion": "string"
-   * },
-   * </pre>
-   */
+     * Cognito custom email sender
+     *
+     * Example:
+     * <pre>
+     * "CustomEmailSender": {
+     *    "LambdaArn": "string",
+     *    "LambdaVersion": "string"
+     * },
+     * </pre>
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct CustomEmailSender {
 
         /**
-     * Lambda ARN
-     */
+         * Lambda ARN
+         */
         std::string lambdaArn;
 
         /**
-     * Lambda version
-     */
+         * Lambda version
+         */
         std::string lambdaVersion;
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Convert to a JSON object
-     *
-     * @return JSON object
-     */
+         * Convert to a JSON object
+         *
+         * @return JSON object
+         */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const CustomEmailSender &r);
     };
 

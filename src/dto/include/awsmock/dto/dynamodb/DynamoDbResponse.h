@@ -11,21 +11,26 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
+    /**
+     * DynamoDB response from docker image
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct DynamoDbResponse {
 
         /**
-     * Body
-     */
+         * Body
+         */
         std::string body;
 
         /**
-     * Headers
-     */
+         * Headers
+         */
         std::map<std::string, std::string> headers;
 
         /**
-     * Status from DynamoDb docker image
-     */
+         * Status from DynamoDb docker image
+         */
         Poco::Net::HTTPResponse::HTTPStatus status;
     };
 

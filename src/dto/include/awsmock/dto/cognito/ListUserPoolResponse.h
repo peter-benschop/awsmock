@@ -17,32 +17,37 @@
 
 namespace AwsMock::Dto::Cognito {
 
+    /**
+     * List user pool response
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct ListUserPoolResponse {
 
         /**
-     * User pool entities
-     */
+         * User pool entities
+         */
         Database::Entity::Cognito::UserPoolList userPools;
 
         /**
-     * Convert to a JSON string.
-     *
-     * @return user pools json string
-     */
+         * Convert to a JSON string.
+         *
+         * @return user pools json string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const ListUserPoolResponse &i);
     };
 
