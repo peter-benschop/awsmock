@@ -6,12 +6,12 @@
 
 namespace AwsMock::Resource::Factory {
 
-  IFactory *Factory::createResourceFactory(std::string &index) {
+    IFactory *Factory::createResourceFactory(std::string &index) {
 
-    IFactory *factory = nullptr;
-    if (index == "AwsMock::Resource::Factory::ModuleFactory") {
-      factory = new ModuleFactory();
+        IFactory *factory = nullptr;
+        if (index == "AwsMock::Resource::Factory::ModuleFactory") {
+            factory = new ModuleFactory();
+        }
+        return factory;
     }
-    return factory;
-  }
 }

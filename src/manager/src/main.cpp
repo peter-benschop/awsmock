@@ -38,7 +38,7 @@
 #include <awsmock/controller/RestService.h>
 
 #define DEFAULT_CONFIG_FILE "/etc/awsmock.properties"
-#define DEFAULT_LOG_LEVEL  "debug"
+#define DEFAULT_LOG_LEVEL "debug"
 
 namespace AwsMock {
 

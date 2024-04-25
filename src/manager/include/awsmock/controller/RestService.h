@@ -20,90 +20,90 @@
 
 namespace AwsMock {
 
-  /**
-   * General REST module
-   */
-  class RestService {
+    /**
+     * General REST module
+     */
+    class RestService {
 
-    public:
-      /**
-       * Constructor
-       *
-       * @param configuration application configuration
-       */
-      explicit RestService(Core::Configuration &configuration);
+      public:
+        /**
+         * Constructor
+         *
+         * @param configuration application configuration
+         */
+        explicit RestService(Core::Configuration &configuration);
 
-      /**
-       * Sets the REST port.
-       *
-       * @param port REST port.
-       */
-      void setPort(int port);
+        /**
+         * Sets the REST port.
+         *
+         * @param port REST port.
+         */
+        void setPort(int port);
 
-      /**
-       * Sets the REST URL router
-       *
-       * @param router HTTP request router.
-       */
-      void setRouter(Poco::Net::HTTPRequestHandlerFactory* router);
+        /**
+         * Sets the REST URL router
+         *
+         * @param router HTTP request router.
+         */
+        void setRouter(Poco::Net::HTTPRequestHandlerFactory *router);
 
-      /**
-       * Start the restfull module.
-       *
-       * The router has to be defined before the HTTP manager is started.
-       */
-      void StartServer();
+        /**
+         * Start the restfull module.
+         *
+         * The router has to be defined before the HTTP manager is started.
+         */
+        void StartServer();
 
-      /**
-       * Start with port and router.
-       *
-       * @param router router to use
-       * @param port port to use (default: 9100)
-       */
-      void StartServer(Poco::Net::HTTPRequestHandlerFactory* router, int port = MANAGER_DEFAULT_PORT);
+        /**
+         * Start with port and router.
+         *
+         * @param router router to use
+         * @param port port to use (default: 9100)
+         */
+        void StartServer(Poco::Net::HTTPRequestHandlerFactory *router, int port = MANAGER_DEFAULT_PORT);
 
-      /**
-       * Stop the manager
-       */
-      void StopServer();
+        /**
+         * Stop the manager
+         */
+        void StopServer();
 
-    private:
+      private:
 
-      /**
-       * Rest port
-       */
-      int _port;
+        /**
+         * Rest port
+         */
+        int _port;
 
-      /**
-       * Rest host
-       */
-      std::string _host;
+        /**
+         * Rest host
+         */
+        std::string _host;
 
-      /**
-      * Logger
-      */
-      Core::Configuration &_configuration;
+        /**
+        * Logger
+        */
+        Core::Configuration &_configuration;
 
-      /**
-       * REST router
-       */
-      Poco::Net::HTTPRequestHandlerFactory* _router{};
+        /**
+         * REST router
+         */
+        Poco::Net::HTTPRequestHandlerFactory *_router{};
 
-      /**
-       * HTTP manager instance
-       */
-      std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
+        /**
+         * HTTP manager instance
+         */
+        std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
 
-      /**
-       * HTTP max message queue length
-       */
-      int _maxQueueLength;
+        /**
+         * HTTP max message queue length
+         */
+        int _maxQueueLength;
 
-      /**
-       * HTTP max concurrent connection
-       */
-      int _maxThreads;
-  };
+        /**
+         * HTTP max concurrent connection
+         */
+        int _maxThreads;
+    };
 } // namespace AwsMock
 
 #endif // AWSMOCK_MANAGER_REST_SERVICE_H

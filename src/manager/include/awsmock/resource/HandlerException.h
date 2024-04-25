@@ -11,21 +11,21 @@
 
 namespace AwsMock {
 
-  class HandlerException : public std::exception {
-  public:
-    HandlerException(std::string type, std::string message, int statusCode);
+    class HandlerException : public std::exception {
+      public:
+        HandlerException(std::string type, std::string message, int statusCode);
 
-    [[nodiscard]] int code() const;
+        [[nodiscard]] int code() const;
 
-    [[nodiscard]] std::string type() const;
+        [[nodiscard]] std::string type() const;
 
-    [[nodiscard]] std::string message() const;
+        [[nodiscard]] std::string message() const;
 
-  private:
-    int _statusCode;
-    std::string _type;
-    std::string _message;
-  };
+      private:
+        int _statusCode;
+        std::string _type;
+        std::string _message;
+    };
 } // namespace AwsMock
 
 #endif // AWSMOCK_RESOURCE_HANDLEREXCEPTION_H
