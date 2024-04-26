@@ -2,7 +2,7 @@ version: "1.1"
 versioning:
   update-major: [ major ]
   update-minor: [ feat ]
-  update-patch: [ build, ci, chore, docs, fix, perf, refactor, style, test ]
+  update-patch: [ build, ci, chore, fix, perf, refactor, style, test ]
   ignore-unknown: true
 tag:
   pattern: '%d.%d.%d'
