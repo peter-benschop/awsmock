@@ -4,7 +4,7 @@
 namespace AwsMock::Service {
 
     void KMSCmdHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::KMSClientCommand &kmsClientCommand) {
-        log_trace << "KMS POST request, URI: " << request.getURI() << " region: " << kmsClientCommand.region << " user: " << kmsClientCommand.user << " command: " << Dto::Common::KMSCommandTypeToString(kmsClientCommand.command);
+        log_trace << "KMS POST request: " << kmsClientCommand.ToJson();
 
         std::string requestId = GetHeaderValue(request, "RequestId", Poco::UUIDGenerator().createRandom().toString());
 
