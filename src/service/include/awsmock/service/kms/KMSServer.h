@@ -2,8 +2,8 @@
 // Created by vogje01 on 06/10/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_SNS_SERVER_H
-#define AWSMOCK_SERVICE_SNS_SERVER_H
+#ifndef AWSMOCK_SERVICE_KMS_SERVER_H
+#define AWSMOCK_SERVICE_KMS_SERVER_H
 
 // C++ standard includes
 #include <string>
@@ -16,26 +16,26 @@
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/sns/SNSHandlerFactory.h>
-#include <awsmock/service/sns/SNSMonitoring.h>
-#include <awsmock/service/sns/SNSWorker.h>
+#include <awsmock/service/kms/KMSHandlerFactory.h>
+#include <awsmock/service/kms/KMSMonitoring.h>
+#include <awsmock/service/kms/KMSWorker.h>
 
 #define KMS_DEFAULT_PORT 9502
-#define SNS_DEFAULT_HOST "localhost"
-#define SNS_DEFAULT_QUEUE_LENGTH 250
-#define SNS_DEFAULT_THREADS 50
-#define SNS_DEFAULT_TIMEOUT 120
-#define SNS_DEFAULT_WORKER_PERIOD 300
-#define SNS_DEFAULT_MONITORING_PERIOD 300
+#define KMS_DEFAULT_HOST "localhost"
+#define KMS_DEFAULT_QUEUE_LENGTH 250
+#define KMS_DEFAULT_THREADS 50
+#define KMS_DEFAULT_TIMEOUT 120
+#define KMS_DEFAULT_WORKER_PERIOD 300
+#define KMS_DEFAULT_MONITORING_PERIOD 300
 
 namespace AwsMock::Service {
 
     /**
-     * SNS server thread
+     * KMS server thread
      *
      * @author jens.vogt@opitz-consulting.com
      */
-    class SNSServer : public AbstractServer {
+    class KMSServer : public AbstractServer {
 
       public:
 
@@ -44,7 +44,7 @@ namespace AwsMock::Service {
          *
          * @param configuration aws-mock configuration
          */
-        explicit SNSServer(Core::Configuration &configuration);
+        explicit KMSServer(Core::Configuration &configuration);
 
         /**
          * Initialization
@@ -69,19 +69,19 @@ namespace AwsMock::Service {
         Core::Configuration &_configuration;
 
         /**
-         * SNS database
+         * KMS database
          */
-        Database::SNSDatabase &_snsDatabase;
+        Database::KMSDatabase &_kmsDatabase;
 
         /**
          * SNS monitoring
          */
-        std::shared_ptr<SNSMonitoring> _snsMonitoring;
+        std::shared_ptr<KMSMonitoring> _kmsMonitoring;
 
         /**
          * SNS worker
          */
-        std::shared_ptr<SNSWorker> _snsWorker;
+        std::shared_ptr<KMSWorker> _kmsWorker;
 
         /**
          * Rest port
@@ -125,4 +125,4 @@ namespace AwsMock::Service {
 
 }// namespace AwsMock::Service
 
-#endif// AWSMOCK_SERVICE_SNSSERVER_H
+#endif// AWSMOCK_SERVICE_KMS_SERVER_H

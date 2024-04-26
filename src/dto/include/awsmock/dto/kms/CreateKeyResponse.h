@@ -18,9 +18,9 @@
 #include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/kms/CustomerMasterKeySpec.h>
+#include <awsmock/dto/kms/KeySpec.h>
 
-namespace AwsMock::Dto::Kms {
+namespace AwsMock::Dto::KMS {
 
     /**
      * Create KMS key response
@@ -33,7 +33,7 @@ namespace AwsMock::Dto::Kms {
      *      "AWSAccountId": "string",
      *      "CloudHsmClusterId": "string",
      *      "CreationDate": number,
-     *      "CustomerMasterKeySpec": "string",
+     *      "KeySpec": "string",
      *      "CustomKeyStoreId": "string",
      *      "DeletionDate": number,
      *      "Description": "string",
@@ -76,9 +76,19 @@ namespace AwsMock::Dto::Kms {
     struct CreateKeyResponse {
 
         /**
+         * AWS region
+         */
+        std::string region;
+
+        /**
+         * AWS ARN
+         */
+        std::string arn;
+
+        /**
          * Customer master key specification
          */
-        CustomerMasterKeySpec customerMasterKeySpec = CustomerMasterKeySpec::SYMMETRIC_DEFAULT;
+        KeySpec customerMasterKeySpec = KeySpec::SYMMETRIC_DEFAULT;
 
         /**
          * Customer key store ID
@@ -149,6 +159,6 @@ namespace AwsMock::Dto::Kms {
         friend std::ostream &operator<<(std::ostream &os, const CreateKeyResponse &r);
     };
 
-}// namespace AwsMock::Dto::Kms
+}// namespace AwsMock::Dto::KMS
 
 #endif// AWSMOCK_DTO_KMS_CREATE_KEY_RESPONSE_H

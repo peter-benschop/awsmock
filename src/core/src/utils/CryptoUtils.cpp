@@ -218,6 +218,16 @@ namespace AwsMock::Core {
         return hash;
     }
 
+    void Crypto::CreateAes256Key(unsigned char *key, unsigned char *iv) {
+
+        if (RAND_bytes(key, 32) < 0) {
+            log_error << "Failed to generate 256bit random key";
+        }
+        if (RAND_bytes(iv, 32) < 0) {
+            log_error << "Failed to generate 256bit random iv";
+        }
+    }
+
     unsigned char *Crypto::Aes256EncryptString(unsigned char *plaintext, int *len, const std::string &key) {
 
         // "opaque" encryption, decryption ctx structures that libcrypto uses to record status of enc/dec operations

@@ -6,15 +6,15 @@
 
 namespace AwsMock::Dto::Common {
 
-    void SNSClientCommand::FromRequest(const HttpMethod &method, Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user) {
+    void SNSClientCommand::FromRequest(const HttpMethod &httpMethod, Poco::Net::HTTPServerRequest &request, const std::string &awsRegion, const std::string &awsUser) {
 
         Dto::Common::UserAgent userAgent;
         userAgent.FromRequest(request, "sqs");
 
         // Basic values
-        this->region = region;
-        this->user = user;
-        this->method = method;
+        this->region = awsRegion;
+        this->user = awsUser;
+        this->method = httpMethod;
         this->contentType = userAgent.contentType;
         this->payload = GetBodyAsString(request);
 
@@ -75,7 +75,7 @@ namespace AwsMock::Dto::Common {
     }
 
     std::ostream &operator<<(std::ostream &os, const SNSClientCommand &r) {
-        os << "SNSClientCommand={method='" << HttpMethodToString(r.method) << ", region='" << r.region << "', user='" << r.user << "', command='" << SNSCommandTypeToString(r.command) << " contentType='" << r.contentType << "' payload='" << r.payload << "'}";
+        os << "SNSClientCommand=" << r.ToJson();
         return os;
     }
 }// namespace AwsMock::Dto::Common

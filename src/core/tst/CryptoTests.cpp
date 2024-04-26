@@ -156,6 +156,20 @@ namespace AwsMock::Core {
         EXPECT_TRUE(StringUtils::Equals(testText, decrypted));
     }
 
+    TEST_F(CryptoTest, Aes256KeyText) {
+
+        // arrange
+        unsigned char key[32];
+        unsigned char iv[32];
+
+        // act
+        Crypto::CreateAes256Key(key, iv);
+
+        // assert
+        EXPECT_TRUE(sizeof(key) / sizeof(key[0]) == 32);
+        EXPECT_TRUE(sizeof(iv) / sizeof(iv[0]) == 32);
+    }
+
     TEST_F(CryptoTest, Aes256EncryptionText) {
 
         // arrange

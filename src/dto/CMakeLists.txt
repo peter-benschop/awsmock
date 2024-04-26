@@ -4,7 +4,7 @@ set(LIBRARY_STATIC awsmockdto_static)
 
 set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/common/SQSClientCommand.cpp
         src/common/SNSClientCommand.cpp src/common/DynamoDbClientCommand.cpp src/common/Infrastructure.cpp
-        src/common/Services.cpp src/common/SecretsManagerClientCommand.cpp)
+        src/common/Services.cpp src/common/SecretsManagerClientCommand.cpp src/common/KMSClientCommand.cpp)
 set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp src/sqs/MessageAttribute.cpp
         src/sqs/SendMessageRequest.cpp src/sqs/SendMessageResponse.cpp src/sqs/ListQueueResponse.cpp
         src/sqs/GetQueueAttributesRequest.cpp src/sqs/GetQueueAttributesResponse.cpp src/sqs/TagQueueRequest.cpp
@@ -81,7 +81,8 @@ add_library(${LIBRARY} SHARED ${SOURCES}
         include/awsmock/dto/secretsmanager/Filter.h
         include/awsmock/dto/cognito/LambdaConfig.h
         include/awsmock/dto/docker/Image.h
-        include/awsmock/dto/kms/CreateKeyRequest.h)
+        include/awsmock/dto/kms/CreateKeyRequest.h
+        include/awsmock/dto/kms/KeyUsage.h)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 

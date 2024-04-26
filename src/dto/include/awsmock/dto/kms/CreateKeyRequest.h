@@ -9,18 +9,14 @@
 #include <string>
 #include <vector>
 
-// Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-
 // AwsMock includes
 #include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/kms/CustomerMasterKeySpec.h>
+#include <awsmock/dto/kms/KeySpec.h>
+#include <awsmock/dto/kms/KeyUsage.h>
 
-namespace AwsMock::Dto::Kms {
+namespace AwsMock::Dto::KMS {
 
     /**
      * Create KMS key request
@@ -29,7 +25,7 @@ namespace AwsMock::Dto::Kms {
      * <pre>
      * {
      *   "BypassPolicyLockoutSafetyCheck": boolean,
-     *   "CustomerMasterKeySpec": "string",
+     *   "KeySpec": "string",
      *   "CustomKeyStoreId": "string",
      *   "Description": "string",
      *   "KeySpec": "string",
@@ -52,9 +48,14 @@ namespace AwsMock::Dto::Kms {
     struct CreateKeyRequest {
 
         /**
+         * AWS region
+         */
+        std::string region;
+
+        /**
          * Customer master key specification
          */
-        CustomerMasterKeySpec customerMasterKeySpec = CustomerMasterKeySpec::SYMMETRIC_DEFAULT;
+        KeySpec customerMasterKeySpec = KeySpec::SYMMETRIC_DEFAULT;
 
         /**
          * Customer key store ID
@@ -74,7 +75,7 @@ namespace AwsMock::Dto::Kms {
         /**
          * Key usage
          */
-        std::string keyUsage;
+        KeyUsage keyUsage;
 
         /**
          * Multi region
@@ -125,6 +126,6 @@ namespace AwsMock::Dto::Kms {
         friend std::ostream &operator<<(std::ostream &os, const CreateKeyRequest &r);
     };
 
-}// namespace AwsMock::Dto::Kms
+}// namespace AwsMock::Dto::KMS
 
 #endif// AWSMOCK_DTO_KMS_CREATE_KEY_REQUEST_H

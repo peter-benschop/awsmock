@@ -4,7 +4,7 @@
 
 #include <awsmock/dto/kms/CreateKeyResponse.h>
 
-namespace AwsMock::Dto::Kms {
+namespace AwsMock::Dto::KMS {
 
     void CreateKeyResponse::FromJson(const std::string &jsonString) {
 
@@ -17,7 +17,7 @@ namespace AwsMock::Dto::Kms {
             // Attributes
             std::string tmpStr;
             Core::JsonUtils::GetJsonValueBool("BypassPolicyLockoutSafetyCheck", rootObject, bypassPolicyLockoutSafetyCheck);
-            Core::JsonUtils::GetJsonValueString("CustomerMasterKeySpec", rootObject, tmpStr);
+            Core::JsonUtils::GetJsonValueString("KeySpec", rootObject, tmpStr);
             customerMasterKeySpec = CustomerMasterKeySpecFromString(tmpStr);
             Core::JsonUtils::GetJsonValueString("CustomKeyStoreId", rootObject, customKeyStoreId);
             Core::JsonUtils::GetJsonValueString("Description", rootObject, description);
@@ -33,7 +33,7 @@ namespace AwsMock::Dto::Kms {
         try {
             Poco::JSON::Object rootJson;
             rootJson.set("BypassPolicyLockoutSafetyCheck", bypassPolicyLockoutSafetyCheck);
-            rootJson.set("CustomerMasterKeySpec", CustomerMasterKeySpecToString(customerMasterKeySpec));
+            rootJson.set("KeySpec", CustomerMasterKeySpecToString(customerMasterKeySpec));
             rootJson.set("CustomKeyStoreId", customKeyStoreId);
             rootJson.set("Description", description);
 
@@ -56,4 +56,4 @@ namespace AwsMock::Dto::Kms {
         return os;
     }
 
-}// namespace AwsMock::Dto::Kms
+}// namespace AwsMock::Dto::KMS

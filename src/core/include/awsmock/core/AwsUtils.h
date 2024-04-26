@@ -133,7 +133,7 @@ namespace AwsMock::Core {
         static std::string CreateTransferArn(const std::string &region, const std::string &accountId, const std::string &serverId);
 
         /**
-         * Create transfer manager ARN
+         * Create secrets manager ARN
          *
          * <p>Syntax arn:aws:secretsmanager:us-west-2:123456789012:secret:MyDatabaseSecretName-a1b2c3</p>
          *
@@ -142,6 +142,17 @@ namespace AwsMock::Core {
          * @param secretId ID of the secret (name + 6 hex digits)
          */
         static std::string CreateSecretArn(const std::string &region, const std::string &accountId, const std::string &secretId);
+
+        /**
+         * Create KMS key ARN
+         *
+         * <p>Syntax arn:aws:kms:us-west-2:123456789012:name</p>
+         *
+         * @param region AWS region
+         * @param accountId AWS account ID
+         * @param secretId ID of the secret (name + 6 hex digits)
+         */
+        static std::string CreateKMSKeyArn(const std::string &region, const std::string &accountId, const std::string &kmsId);
 
         /**
          * Returns a request ID.

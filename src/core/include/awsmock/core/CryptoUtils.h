@@ -30,6 +30,7 @@
 #include <openssl/hmac.h>
 #include <openssl/md5.h>
 #include <openssl/pem.h>
+#include <openssl/rand.h>
 #include <openssl/rsa.h>
 #include <openssl/sha.h>
 
@@ -142,6 +143,14 @@ namespace AwsMock::Core {
          * @return SHA256 hash of the given string
          */
         static std::array<unsigned char, EVP_MAX_MD_SIZE> GetHmacSha256FromStringRaw(const std::array<unsigned char, EVP_MAX_MD_SIZE> &key, const std::string &msg);
+
+        /**
+         * Creates a AES 256 encryption key.
+         *
+         * @param key 265bit key material
+         * @param iv iv
+         */
+        static void CreateAes256Key(unsigned char *key, unsigned char *iv);
 
         /**
          * AES 256 encryption

@@ -19,6 +19,7 @@ namespace AwsMock::Service {
         _routingTable["cognito-identity"] = {._name = "cognito", ._handlerType = HandlerType::COGNITO};
         _routingTable["dynamodb"] = {._name = "dynamodb", ._handlerType = HandlerType::DYNAMODB};
         _routingTable["secretsmanager"] = {._name = "secretsmanager", ._handlerType = HandlerType::SECRETS_MANAGER};
+        _routingTable["kms"] = {._name = "kms", ._handlerType = HandlerType::KMS};
         log_debug << "Gateway router initialized, routes: " << _routingTable.size();
     }
 

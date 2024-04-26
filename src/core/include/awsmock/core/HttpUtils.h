@@ -17,6 +17,7 @@
 #include <Poco/StreamCopier.h>
 
 // AwsMock includes
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/core/StringUtils.h>
 
@@ -184,6 +185,19 @@ namespace AwsMock::Core {
          * @return HTTP body as string
          */
         static std::string GetBodyAsString(Poco::Net::HTTPServerRequest &request);
+
+        /**
+         * Returns a header value by key.
+         *
+         * <p>
+         * Returns an empty string and logs a warning message, in case the request has no value for the given key.
+         * </p>
+         *
+         * @param request HTTP request
+         * @param key header key
+         * @return header value of empty string.
+         */
+        [[maybe_unused]] static std::string GetHeaderValue(const Poco::Net::HTTPRequest &request, const std::string &key);
 
       private:
 

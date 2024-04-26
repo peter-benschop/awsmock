@@ -2,22 +2,22 @@
 // Created by vogje01 on 17/06/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_SNS_HANDLER_FACTORY_H
-#define AWSMOCK_SERVICE_SNS_HANDLER_FACTORY_H
+#ifndef AWSMOCK_SERVICE_KMS_HANDLER_FACTORY_H
+#define AWSMOCK_SERVICE_KMS_HANDLER_FACTORY_H
 
 // Poco includes
 #include "Poco/Logger.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 
 // AwsMock includes
-#include "SNSHandler.h"
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/MetricService.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/service/kms/KMSHandler.h>
 
 namespace AwsMock::Service {
 
     /**
-     * S3 request handler factory
+     * KMS request handler factory
      *
      * @author jens.vogt@opitz-consulting.com
      */
@@ -42,7 +42,7 @@ namespace AwsMock::Service {
             if (request.getURI().empty()) {
                 return nullptr;
             }
-            return new SNSHandler(_configuration);
+            return new KMSHandler(_configuration);
         }
 
       private:
@@ -55,4 +55,4 @@ namespace AwsMock::Service {
 
 }// namespace AwsMock::Service
 
-#endif// AWSMOCK_SERVICE_SNS_HANDLER_FACTORY_H
+#endif//AWSMOCK_SERVICE_KMS_HANDLER_FACTORY_H
