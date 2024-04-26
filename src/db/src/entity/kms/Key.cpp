@@ -22,7 +22,13 @@ namespace AwsMock::Database::Entity::KMS {
                 kvp("keyUsage", keyUsage),
                 kvp("keySpec", keySpec),
                 kvp("keyState", keyState),
+                kvp("aes256Key", aes256Key),
+                kvp("aes256Iv", aes256Iv),
+                kvp("rsaPrivateKey", rsaPrivateKey),
+                kvp("rsaPublicKey", rsaPublicKey),
                 kvp("tags", tagsDoc),
+                kvp("pendingWindowInDays", pendingWindowInDays),
+                kvp("scheduledDeletion", bsoncxx::types::b_date(std::chrono::milliseconds(scheduledDeletion.timestamp().epochMicroseconds() / 1000))),
                 kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
                 kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
 
@@ -38,6 +44,14 @@ namespace AwsMock::Database::Entity::KMS {
         keyUsage = bsoncxx::string::to_string(mResult.value()["keyUsage"].get_string().value);
         keySpec = bsoncxx::string::to_string(mResult.value()["keySpec"].get_string().value);
         keyState = bsoncxx::string::to_string(mResult.value()["keyState"].get_string().value);
+        aes256Key = bsoncxx::string::to_string(mResult.value()["aes256Key"].get_string().value);
+        aes256Iv = bsoncxx::string::to_string(mResult.value()["aes256Iv"].get_string().value);
+        rsaPrivateKey = bsoncxx::string::to_string(mResult.value()["rsaPrivateKey"].get_string().value);
+        rsaPublicKey = bsoncxx::string::to_string(mResult.value()["rsaPublicKey"].get_string().value);
+        pendingWindowInDays = mResult.value()["pendingWindowInDays"].get_int32().value;
+        if (mResult.value()["scheduledDeletion"].type() != bsoncxx::type::k_null) {
+            scheduledDeletion = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["scheduledDeletion"].get_date().value) / 1000));
+        }
         created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
         modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
 

@@ -10,7 +10,7 @@ namespace AwsMock::Dto::KMS {
 
         try {
             Poco::JSON::Object rootJson;
-            rootJson.set("KeyMetadata", metaData.ToJsonObject());
+            rootJson.set("KeyMetadata", key.ToJsonObject());
 
             return Core::JsonUtils::ToJsonString(rootJson);
 

@@ -19,6 +19,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -36,6 +37,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/RandomUtils.h>
 #include <awsmock/core/StringUtils.h>
 
 // 64kB buffer
@@ -46,6 +48,9 @@
 #define CRYPTO_RSA_KEY_LEN_1024 1024
 #define CRYPTO_RSA_KEY_EXP 65535
 #define CRYPTO_RSA_KEY_LINE_LENGTH 64
+
+#define CRYPTO_AES256_KEY_SIZE 32
+#define CRYPTO_AES256_BLOCK_SIZE 16
 
 namespace AwsMock::Core {
 

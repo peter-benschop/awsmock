@@ -63,7 +63,9 @@ set(SECRETSMANAGER_SOURCES src/secretsmanager/CreateSecretRequest.cpp src/secret
         src/secretsmanager/SecretTags.cpp src/secretsmanager/RotateSecretRequest.cpp src/secretsmanager/Filter.cpp
         src/secretsmanager/RotateSecretResponse.cpp src/secretsmanager/RotationRules.cpp src/secretsmanager/Secret.cpp
         src/secretsmanager/ListSecretsRequest.cpp src/secretsmanager/ListSecretsResponse.cpp)
-set(KMS_SOURCES src/kms/CreateKeyRequest.cpp src/kms/CreateKeyResponse.cpp src/kms/KeyMetadata.cpp)
+set(KMS_SOURCES src/kms/CreateKeyRequest.cpp src/kms/CreateKeyResponse.cpp src/kms/Key.cpp src/kms/ListKey.cpp
+        src/kms/ScheduleKeyDeletionRequest.cpp src/kms/ScheduleKeyDeletionResponse.cpp src/kms/ListKeysRequest.cpp
+        src/kms/ListKeysResponse.cpp)
 set(MODULE_SOURCES src/module/Module.cpp src/module/GatewayConfig.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
@@ -83,7 +85,7 @@ add_library(${LIBRARY} SHARED ${SOURCES}
         include/awsmock/dto/docker/Image.h
         include/awsmock/dto/kms/CreateKeyRequest.h
         include/awsmock/dto/kms/KeyUsage.h
-        include/awsmock/dto/kms/KeyMetadata.h)
+        include/awsmock/dto/kms/Key.h)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 

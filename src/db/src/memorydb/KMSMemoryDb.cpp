@@ -8,19 +8,10 @@ namespace AwsMock::Database {
 
     Poco::Mutex KMSMemoryDb::_keyMutex;
 
-    bool KMSMemoryDb::KeyExists(const std::string &region, const std::string &name) {
+    bool KMSMemoryDb::KeyExists(const std::string &keyId) {
 
-        return find_if(_keys.begin(),
-                       _keys.end(),
-                       [region, name](const std::pair<std::string, Entity::KMS::Key> &key) {
-                           return key.second.region == region && key.second.description == name;
-                       }) != _keys.end();
-    }
-
-    bool KMSMemoryDb::KeyExists(const std::string &arn) {
-
-        return find_if(_keys.begin(), _keys.end(), [arn](const std::pair<std::string, Entity::KMS::Key> &topic) {
-                   return topic.second.arn == arn;
+        return find_if(_keys.begin(), _keys.end(), [keyId](const std::pair<std::string, Entity::KMS::Key> &topic) {
+                   return topic.second.keyId == keyId;
                }) != _keys.end();
     }
 
@@ -54,6 +45,29 @@ namespace AwsMock::Database {
         return {};
     }
 
+    Entity::KMS::KeyList KMSMemoryDb::ListKeys(const std::string &region) {
+
+        Entity::KMS::KeyList keyList;
+
+        if (region.empty()) {
+
+            for (const auto &key: _keys) {
+                keyList.emplace_back(key.second);
+            }
+
+        } else {
+
+            for (const auto &key: _keys) {
+                if (key.second.region == region) {
+                    keyList.emplace_back(key.second);
+                }
+            }
+        }
+
+        log_trace << "Got key list, size: " << keyList.size();
+        return keyList;
+    }
+
     Entity::KMS::Key KMSMemoryDb::CreateKey(const Entity::KMS::Key &topic) {
         Poco::ScopedLock loc(_keyMutex);
 
@@ -61,6 +75,34 @@ namespace AwsMock::Database {
         _keys[oid] = topic;
         log_trace << "Key created, oid: " << oid;
         return GetKeyById(oid);
+    }
+    Entity::KMS::Key KMSMemoryDb::UpdateKey(const Entity::KMS::Key &key) {
+
+        Poco::ScopedLock lock(_keyMutex);
+
+        std::string keyId = key.keyId;
+        auto it = find_if(_keys.begin(),
+                          _keys.end(),
+                          [keyId](const std::pair<std::string, Entity::KMS::Key> &key) {
+                              return key.second.keyId == keyId;
+                          });
+        if (it != _keys.end()) {
+            _keys[it->first] = key;
+            return _keys[it->first];
+        }
+        log_warning << "Key not found, keyId: " << keyId;
+        return key;
+    }
+
+    void KMSMemoryDb::DeleteKey(const Entity::KMS::Key &key) {
+        Poco::ScopedLock lock(_keyMutex);
+
+        std::string keyId = key.keyId;
+        const auto count = std::erase_if(_keys, [keyId](const auto &item) {
+            auto const &[k, v] = item;
+            return v.keyId == keyId;
+        });
+        log_debug << "Key deleted, count: " << count;
     }
 
 }// namespace AwsMock::Database

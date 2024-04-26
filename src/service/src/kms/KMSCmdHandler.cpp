@@ -18,12 +18,38 @@ namespace AwsMock::Service {
 
                 Dto::KMS::CreateKeyResponse kmsResponse = _kmsService.CreateKey(kmsRequest);
                 SendOkResponse(response, kmsResponse.ToJson());
-                log_info << "Key created, keyId: " << kmsResponse.metaData.keyId;
+                log_info << "Key created, keyId: " << kmsResponse.key.keyId;
 
                 break;
             }
 
-            case Dto::Common::KMSCommandType::DELETE_KEY:
+            case Dto::Common::KMSCommandType::SCHEDULE_KEY_DELETION: {
+
+                Dto::KMS::ScheduleKeyDeletionRequest kmsRequest;
+                kmsRequest.FromJson(kmsClientCommand.payload);
+                kmsRequest.region = kmsClientCommand.region;
+
+                Dto::KMS::ScheduledKeyDeletionResponse kmsResponse = _kmsService.ScheduleKeyDeletion(kmsRequest);
+                SendOkResponse(response, kmsResponse.ToJson());
+                log_info << "Key deletion scheduled, keyId: " << kmsResponse.keyId;
+
+                break;
+            }
+
+            case Dto::Common::KMSCommandType::LIST_KEYS: {
+
+                Dto::KMS::ListKeysRequest kmsRequest;
+                kmsRequest.FromJson(kmsClientCommand.payload);
+                kmsRequest.region = kmsClientCommand.region;
+
+                Dto::KMS::ListKeysResponse kmsResponse = _kmsService.ListKeys(kmsRequest);
+                SendOkResponse(response, kmsResponse.ToJson());
+                log_info << "List keys received, count: " << kmsResponse.keys.size();
+
+                break;
+            }
+
+            case Dto::Common::KMSCommandType::DESCRIBE_KEY:
             case Dto::Common::KMSCommandType::UNKNOWN: {
 
                 break;

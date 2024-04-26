@@ -20,11 +20,17 @@
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/dto/kms/CreateKeyRequest.h>
 #include <awsmock/dto/kms/CreateKeyResponse.h>
-#include <awsmock/dto/kms/KeyMetadata.h>
+#include <awsmock/dto/kms/Key.h>
+#include <awsmock/dto/kms/ListKey.h>
+#include <awsmock/dto/kms/ListKeysRequest.h>
+#include <awsmock/dto/kms/ListKeysResponse.h>
+#include <awsmock/dto/kms/ScheduleKeyDeletionRequest.h>
+#include <awsmock/dto/kms/ScheduleKeyDeletionResponse.h>
 #include <awsmock/repository/KMSDatabase.h>
 #include <awsmock/service/kms/KMSCreator.h>
 
 #define DEFAULT_KMS_ACCOUNT_ID "000000000000"
+#define DEFAULT_PENDING_PERIOD 30
 
 namespace AwsMock::Service {
 
@@ -45,14 +51,35 @@ namespace AwsMock::Service {
         explicit KMSService(Core::Configuration &configuration);
 
         /**
-         * Creates a new queue
+         * List all keys
          *
-         * <p>In case the topic exists already, return the existing topic.</p>
+         * @param request list queue request
+         * @return ListKeysResponse
+         * @throws Core::DatabaseException
+         * @see Dto::KMS::ListKeysRequest
+         * @see Dto::KMS::ListKeysResponse
+         */
+        Dto::KMS::ListKeysResponse ListKeys(const Dto::KMS::ListKeysRequest &request);
+
+        /**
+         * Creates a new key
          *
-         * @param request create queue request
-         * @return CreateQueueResponse
+         * @param request create key request
+         * @return CreateKeyResponse
+         * @see Dto::KMS::CreateKeyRequest
+         * @see Dto::KMS::CreateKeyResponse
          */
         Dto::KMS::CreateKeyResponse CreateKey(const Dto::KMS::CreateKeyRequest &request);
+
+        /**
+         * Schedules a key deletion
+         *
+         * @param request create queue request
+         * @return ScheduleKeyDeletionRequest
+         * @throws Core::DatabaseException
+         * @see Dto::KMS::ScheduledKeyDeletionResponse
+         */
+        Dto::KMS::ScheduledKeyDeletionResponse ScheduleKeyDeletion(const Dto::KMS::ScheduleKeyDeletionRequest &request);
 
       private:
 

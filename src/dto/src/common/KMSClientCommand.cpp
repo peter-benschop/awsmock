@@ -16,7 +16,7 @@ namespace AwsMock::Dto::Common {
         this->user = awsUser;
         this->method = httpMethod;
         this->contentType = Core::HttpUtils::GetHeaderValue(request, "Content-Type");
-        this->payload = GetBodyAsString(request);
+        this->payload = Core::HttpUtils::GetBodyAsString(request);
 
         if (userAgent.clientCommand.empty()) {
 
@@ -28,22 +28,10 @@ namespace AwsMock::Dto::Common {
         }
     }
 
-    std::string KMSClientCommand::GetBodyAsString(Poco::Net::HTTPServerRequest &request) {
-        std::stringstream sstream;
-        sstream << request.stream().rdbuf();
-        request.stream().seekg(0, request.stream().beg);
-        return sstream.str();
-    }
+    std::string KMSClientCommand::GetCommandFromHeader(Poco::Net::HTTPServerRequest &request) {
 
-    std::string KMSClientCommand::GetCommandFromHeader(Poco::Net::HTTPServerRequest &request) const {
-
-        std::string cmd;
-        std::string cType = request["Content-Type"];
-        if (Core::StringUtils::ContainsIgnoreCase(cType, "application/x-amz-json")) {
-
-            std::string headerValue = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target");
-            cmd = Core::StringUtils::Split(headerValue, '.')[1];
-        }
+        std::string headerValue = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target");
+        std::string cmd = Core::StringUtils::Split(headerValue, '.')[1];
         return Core::StringUtils::ToSnakeCase(cmd);
     }
 
@@ -55,6 +43,8 @@ namespace AwsMock::Dto::Common {
             rootJson.set("method", HttpMethodToString(method));
             rootJson.set("command", KMSCommandTypeToString(command));
             rootJson.set("user", user);
+            rootJson.set("contentType", contentType);
+            rootJson.set("payload", payload.length() > 256 ? Core::StringUtils::SubString(payload, 0, 256) : payload);
 
             return Core::JsonUtils::ToJsonString(rootJson);
 

@@ -21,6 +21,12 @@ namespace AwsMock::Core {
         return dist(rng);
     }
 
+    unsigned int RandomUtils::NextUInt(unsigned int min, unsigned int max) {
+        thread_local auto rng = RandomGenerator<>();
+        auto dist = std::uniform_int_distribution{min, max};
+        return dist(rng);
+    }
+
     std::vector<int> RandomUtils::IntArray(int size, int min, int max) {
         std::vector<int> result;
         result.reserve(size);

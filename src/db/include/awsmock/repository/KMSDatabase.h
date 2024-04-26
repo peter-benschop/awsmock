@@ -51,23 +51,13 @@ namespace AwsMock::Database {
         }
 
         /**
-         * Check existence of key
+         * Check existence of key by keyId
          *
-         * @param region AWS region
-         * @param name key name
+         * @param arn key ID
          * @return true if key already exists
          * @throws DatabaseException
          */
-        bool KeyExists(const std::string &region, const std::string &name);
-
-        /**
-         * Check existence of key
-         *
-         * @param arn key ARN
-         * @return true if key already exists
-         * @throws DatabaseException
-         */
-        bool KeyExists(const std::string &arn);
+        bool KeyExists(const std::string &keyId);
 
         /**
          * Returns a KMS key by primary key
@@ -97,6 +87,14 @@ namespace AwsMock::Database {
         Entity::KMS::Key GetKeyByKeyId(const std::string &keyId);
 
         /**
+         * List all keys
+         *
+         * @param region AWS region
+         * @return KeyList
+         */
+        Entity::KMS::KeyList ListKeys(const std::string &region = {});
+
+        /**
          * Create a new topic in the KMS topic table
          *
          * @param topic topic entity
@@ -104,6 +102,23 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         Entity::KMS::Key CreateKey(const Entity::KMS::Key &topic);
+
+        /**
+         * Updates a key
+         *
+         * @param key key entity
+         * @return created key entity
+         * @throws DatabaseException
+         */
+        Entity::KMS::Key UpdateKey(const Entity::KMS::Key &key);
+
+        /**
+         * Delete a key
+         *
+         * @param key key entity
+         * @throws DatabaseException
+         */
+        void DeleteKey(const Entity::KMS::Key &key);
 
       private:
 

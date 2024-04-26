@@ -2,8 +2,8 @@
 // Created by vogje01 on 4/26/24.
 //
 
-#ifndef AWS_MOCK_KEYMETADATA_H
-#define AWS_MOCK_KEYMETADATA_H
+#ifndef AWSMOCK_DTO_KMS_KEY_H
+#define AWSMOCK_DTO_KMS_KEY_H
 
 // C++ standard includes
 #include <string>
@@ -71,7 +71,7 @@ namespace AwsMock::Dto::KMS {
      *
      * @author jens.vogt@opitz-consulting.com
      */
-    struct KeyMetadata {
+    struct Key {
 
         /**
          * Key ID
@@ -146,9 +146,9 @@ namespace AwsMock::Dto::KMS {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const KeyMetadata &r);
+        friend std::ostream &operator<<(std::ostream &os, const Key &r);
     };
 
 }// namespace AwsMock::Dto::KMS
 
-#endif// AWS_MOCK_KEYMETADATA_H
+#endif// AWSMOCK_DTO_KMS_KEY_H

@@ -18,7 +18,7 @@
 #include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/kms/KeyMetadata.h>
+#include <awsmock/dto/kms/Key.h>
 #include <awsmock/dto/kms/KeySpec.h>
 
 namespace AwsMock::Dto::KMS {
@@ -29,7 +29,7 @@ namespace AwsMock::Dto::KMS {
      * Example:
      * <pre>
      * {
-     *   "KeyMetadata": {
+     *   "Key": {
      *      "Arn": "string",
      *      "AWSAccountId": "string",
      *      "CloudHsmClusterId": "string",
@@ -77,9 +77,9 @@ namespace AwsMock::Dto::KMS {
     struct CreateKeyResponse {
 
         /**
-         * Metadata
+         * Key metadata
          */
-        KeyMetadata metaData;
+        Key key;
 
         /**
          * Convert to a JSON string

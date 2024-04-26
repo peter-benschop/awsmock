@@ -7,7 +7,7 @@ namespace AwsMock::Service {
         log_trace << "KMS POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << " length: " << response.getContentLength();
 
         Dto::Common::KMSClientCommand clientCommand;
-        clientCommand.FromRequest(Dto::Common::HttpMethod::GET, request, region, user);
+        clientCommand.FromRequest(Dto::Common::HttpMethod::POST, request, region, user);
 
         KMSCmdHandler::handlePost(request, response, clientCommand);
     }

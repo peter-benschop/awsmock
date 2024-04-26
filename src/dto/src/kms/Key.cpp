@@ -2,11 +2,11 @@
 // Created by vogje01 on 4/25/24.
 //
 
-#include <awsmock/dto/kms/KeyMetadata.h>
+#include <awsmock/dto/kms/Key.h>
 
 namespace AwsMock::Dto::KMS {
 
-    void KeyMetadata::FromJson(const std::string &jsonString) {
+    void Key::FromJson(const std::string &jsonString) {
 
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(jsonString);
@@ -37,7 +37,7 @@ namespace AwsMock::Dto::KMS {
         }
     }
 
-    Poco::JSON::Object KeyMetadata::ToJsonObject() const {
+    Poco::JSON::Object Key::ToJsonObject() const {
 
         try {
 
@@ -56,18 +56,18 @@ namespace AwsMock::Dto::KMS {
         }
     }
 
-    std::string KeyMetadata::ToJson() const {
+    std::string Key::ToJson() const {
         return Core::JsonUtils::ToJsonString(ToJsonObject());
     }
 
-    std::string KeyMetadata::ToString() const {
+    std::string Key::ToString() const {
         std::stringstream ss;
         ss << (*this);
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const KeyMetadata &r) {
-        os << "KeyMetadata=" << r.ToJson();
+    std::ostream &operator<<(std::ostream &os, const Key &r) {
+        os << "Key=" << r.ToJson();
         return os;
     }
 

@@ -220,11 +220,11 @@ namespace AwsMock::Core {
 
     void Crypto::CreateAes256Key(unsigned char *key, unsigned char *iv) {
 
-        if (RAND_bytes(key, 32) < 0) {
+        if (RAND_bytes(key, CRYPTO_AES256_KEY_SIZE) < 0) {
             log_error << "Failed to generate 256bit random key";
         }
-        if (RAND_bytes(iv, 32) < 0) {
-            log_error << "Failed to generate 256bit random iv";
+        if (RAND_bytes(iv, CRYPTO_AES256_BLOCK_SIZE) < 0) {
+            log_error << "Failed to generate 128bit random iv";
         }
     }
 
@@ -233,17 +233,17 @@ namespace AwsMock::Core {
         // "opaque" encryption, decryption ctx structures that libcrypto uses to record status of enc/dec operations
         EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
 
-        unsigned int salt[] = {12345, 54321};
+        unsigned int salt[] = {Core::RandomUtils::NextUInt(0, UINT32_MAX), Core::RandomUtils::NextUInt(0, UINT32_MAX)};
         auto *key_data = (unsigned char *) key.c_str();
         int key_data_len = (int) strlen(reinterpret_cast<const char *>(key_data));
 
         if (Aes256EncryptionInit(key_data, key_data_len, (unsigned char *) &salt, ctx)) {
-            printf("Couldn't initialize AES cipher\n");
+            log_error << "Couldn't initialize AES256 cipher";
             return {};
         }
 
         /* max ciphertext len for a n bytes of plaintext is n + AES_BLOCK_SIZE -1 bytes */
-        int c_len = *len + AES_BLOCK_SIZE, f_len = 0;
+        int c_len = *len + CRYPTO_AES256_BLOCK_SIZE, f_len = 0;
         auto *ciphertext = static_cast<unsigned char *>(malloc(c_len));
 
         // Allows reusing of 'ctx' for multiple encryption cycles
@@ -259,15 +259,15 @@ namespace AwsMock::Core {
 
     unsigned char *Crypto::Aes256DecryptString(unsigned char *ciphertext, int *len, const std::string &key) {
 
-        // "opaque" encryption, decryption ctx structures that libcrypto uses to record status of enc/dec operations
+        // Opaque encryption, decryption ctx structures that libcrypto uses to record status of enc/dec operations
         EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
 
-        unsigned int salt[] = {12345, 54321};
+        unsigned int salt[] = {Core::RandomUtils::NextUInt(0, UINT32_MAX), Core::RandomUtils::NextUInt(0, UINT32_MAX)};
         auto *key_data = (unsigned char *) key.c_str();
         int key_data_len = (int) strlen(reinterpret_cast<const char *>(key_data));
 
         if (Aes256DecryptionInit(key_data, key_data_len, (unsigned char *) &salt, ctx)) {
-            printf("Couldn't initialize AES cipher\n");
+            log_error << "Couldn't initialize AES cipher";
             return {};
         }
 
@@ -290,21 +290,19 @@ namespace AwsMock::Core {
     int Crypto::Aes256EncryptionInit(unsigned char *key_data, int key_data_len, unsigned char *salt, EVP_CIPHER_CTX *ctx) {
 
         int i, nrounds = 5;
-        unsigned char key[32], iv[32];
+        unsigned char key[CRYPTO_AES256_KEY_SIZE], iv[CRYPTO_AES256_BLOCK_SIZE];
 
-        /*
-         * Gen key & IV for AES 256 CBC mode. A SHA1 digest is used to hash the supplied key material.
-         * nrounds is the number of times the we hash the material. More rounds are more secure but
-         * slower.
-         */
+
+        // Gen key & IV for AES 256 CBC mode. A SHA1 digest is used to hash the supplied key material. nrounds is the number of times
+        // we hash the material. More rounds are more secure but slower.
         i = EVP_BytesToKey(EVP_aes_256_cbc(), EVP_sha1(), salt, key_data, key_data_len, nrounds, key, iv);
         if (i != 32) {
-            printf("Key size is %d bits - should be 256 bits\n", i);
+            log_error << "Key size is " << i << " bits - should be 256 bits";
             return -1;
         }
 
         EVP_CIPHER_CTX_init(ctx);
-        EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv);
+        EVP_EncryptInit_ex(ctx, EVP_aes_256_gcm(), nullptr, key, iv);
 
         return 0;
     }
@@ -312,21 +310,18 @@ namespace AwsMock::Core {
     int Crypto::Aes256DecryptionInit(unsigned char *key_data, int key_data_len, unsigned char *salt, EVP_CIPHER_CTX *ctx) {
 
         int i, nrounds = 5;
-        unsigned char key[32], iv[32];
+        unsigned char key[CRYPTO_AES256_KEY_SIZE], iv[CRYPTO_AES256_BLOCK_SIZE];
 
-        /*
-         * Gen key & IV for AES 256 CBC mode. A SHA1 digest is used to hash the supplied key material.
-         * nrounds is the number of times, we hash the material. More rounds are more secure but
-         * slower.
-         */
+        // Gen key & IV for AES 256 CBC mode. A SHA1 digest is used to hash the supplied key material. nrounds is the number of times,
+        // we hash the material. More rounds are more secure but slower.
         i = EVP_BytesToKey(EVP_aes_256_cbc(), EVP_sha1(), salt, key_data, key_data_len, nrounds, key, iv);
         if (i != 32) {
-            printf("Key size is %d bits - should be 256 bits\n", i);
+            log_error << "Key size is " << i << " bits - should be 256 bits";
             return -1;
         }
 
         EVP_CIPHER_CTX_init(ctx);
-        EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv);
+        EVP_DecryptInit_ex(ctx, EVP_aes_256_gcm(), nullptr, key, iv);
 
         return 0;
     }

@@ -24,8 +24,6 @@
 
 // AwsMock includes
 #include <awsmock/core/ServiceException.h>
-#include <awsmock/entity/sns/Subscription.h>
-#include <awsmock/entity/sns/TopicAttribute.h>
 
 namespace AwsMock::Database::Entity::KMS {
 
@@ -84,9 +82,39 @@ namespace AwsMock::Database::Entity::KMS {
         std::string description;
 
         /**
+         * Key material
+         */
+        std::string aes256Key;
+
+        /**
+         * IV
+         */
+        std::string aes256Iv;
+
+        /**
+         * RSA private key
+         */
+        std::string rsaPrivateKey;
+
+        /**
+         * RSA public key
+         */
+        std::string rsaPublicKey;
+
+        /**
          * Topic tags
          */
         std::map<std::string, std::string> tags;
+
+        /**
+         * Pending window in days
+         */
+        int pendingWindowInDays;
+
+        /**
+         * Scheduled deletion datetime
+         */
+        Poco::DateTime scheduledDeletion;
 
         /**
          * Creation date

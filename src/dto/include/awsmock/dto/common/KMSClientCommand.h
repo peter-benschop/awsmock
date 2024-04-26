@@ -21,13 +21,17 @@ namespace AwsMock::Dto::Common {
 
     enum class KMSCommandType {
         CREATE_KEY,
-        DELETE_KEY,
+        SCHEDULE_KEY_DELETION,
+        DESCRIBE_KEY,
+        LIST_KEYS,
         UNKNOWN
     };
 
     static std::map<KMSCommandType, std::string> KMSCommandTypeNames{
             {KMSCommandType::CREATE_KEY, "create-key"},
-            {KMSCommandType::DELETE_KEY, "delete-key"},
+            {KMSCommandType::SCHEDULE_KEY_DELETION, "schedule-key-deletion"},
+            {KMSCommandType::DESCRIBE_KEY, "describe-key"},
+            {KMSCommandType::LIST_KEYS, "list-keys"},
     };
 
     [[maybe_unused]] static std::string KMSCommandTypeToString(KMSCommandType commandType) {
@@ -85,20 +89,12 @@ namespace AwsMock::Dto::Common {
         std::string payload;
 
         /**
-         * Returns the message body as string.
-         *
-         * @param request HTTP request
-         * @return message body as string
-         */
-        static std::string GetBodyAsString(Poco::Net::HTTPServerRequest &request);
-
-        /**
          * Returns the command from HTTP header
          *
          * @param request HTTP request
          * @return command string
          */
-        std::string GetCommandFromHeader(Poco::Net::HTTPServerRequest &request) const;
+        static std::string GetCommandFromHeader(Poco::Net::HTTPServerRequest &request);
 
         /**
          * Getś the value from the user-agent string
