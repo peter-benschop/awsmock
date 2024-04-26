@@ -28,8 +28,7 @@ namespace AwsMock::Dto::KMS {
         HMAC_224,
         HMAC_256,
         HMAC_384,
-        HMAC_512,
-        SM2
+        HMAC_512
     };
 
     static std::map<KeySpec, std::string> KeySpecNames{
@@ -44,9 +43,7 @@ namespace AwsMock::Dto::KMS {
             {KeySpec::HMAC_224, "HMAC_224"},
             {KeySpec::HMAC_256, "HMAC_256"},
             {KeySpec::HMAC_384, "HMAC_384"},
-            {KeySpec::HMAC_512, "HMAC_512"},
-            {KeySpec::SM2, "SM2"},
-    };
+            {KeySpec::HMAC_512, "HMAC_512"}};
 
     [[maybe_unused]] static std::string KeySpecToString(KeySpec keySpec) {
         return KeySpecNames[keySpec];

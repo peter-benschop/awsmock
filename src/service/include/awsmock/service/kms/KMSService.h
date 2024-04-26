@@ -20,7 +20,9 @@
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/dto/kms/CreateKeyRequest.h>
 #include <awsmock/dto/kms/CreateKeyResponse.h>
+#include <awsmock/dto/kms/KeyMetadata.h>
 #include <awsmock/repository/KMSDatabase.h>
+#include <awsmock/service/kms/KMSCreator.h>
 
 #define DEFAULT_KMS_ACCOUNT_ID "000000000000"
 

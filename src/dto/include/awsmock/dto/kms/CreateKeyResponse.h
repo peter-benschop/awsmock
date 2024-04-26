@@ -18,6 +18,7 @@
 #include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/dto/kms/KeyMetadata.h>
 #include <awsmock/dto/kms/KeySpec.h>
 
 namespace AwsMock::Dto::KMS {
@@ -76,66 +77,9 @@ namespace AwsMock::Dto::KMS {
     struct CreateKeyResponse {
 
         /**
-         * AWS region
+         * Metadata
          */
-        std::string region;
-
-        /**
-         * AWS ARN
-         */
-        std::string arn;
-
-        /**
-         * Customer master key specification
-         */
-        KeySpec customerMasterKeySpec = KeySpec::SYMMETRIC_DEFAULT;
-
-        /**
-         * Customer key store ID
-         */
-        std::string customKeyStoreId;
-
-        /**
-         * Description
-         */
-        std::string description;
-
-        /**
-         * Key specification
-         */
-        std::string keySpec;
-
-        /**
-         * Key usage
-         */
-        std::string keyUsage;
-
-        /**
-         * Multi region
-         */
-        bool multiRegion = false;
-
-        /**
-         * Bypass policy lockout safety check
-         */
-        bool bypassPolicyLockoutSafetyCheck = false;
-
-        /**
-         * Origin
-         */
-        std::string origin;
-
-        /**
-         * Policy
-         */
-        std::string policy;
-
-        /**
-         * Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-        */
-        void FromJson(const std::string &jsonString);
+        KeyMetadata metaData;
 
         /**
          * Convert to a JSON string

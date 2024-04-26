@@ -8,14 +8,23 @@ namespace AwsMock::Database::Entity::KMS {
 
     view_or_value<view, value> Key::ToDocument() const {
 
+        auto tagsDoc = bsoncxx::builder::basic::document{};
+        if (!tags.empty()) {
+            for (const auto &t: tags) {
+                tagsDoc.append(kvp(t.first, t.second));
+            }
+        }
+
         view_or_value<view, value> keyDoc = make_document(
                 kvp("region", region),
                 kvp("arn", arn),
-                //kvp("tags", tagsDoc),
-                kvp("created",
-                    bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-                kvp("modified",
-                    bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+                kvp("keyId", keyId),
+                kvp("keyUsage", keyUsage),
+                kvp("keySpec", keySpec),
+                kvp("keyState", keyState),
+                kvp("tags", tagsDoc),
+                kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
+                kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
 
         return keyDoc;
     }
@@ -25,6 +34,10 @@ namespace AwsMock::Database::Entity::KMS {
         oid = mResult.value()["_id"].get_oid().value.to_string();
         region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
         arn = bsoncxx::string::to_string(mResult.value()["arn"].get_string().value);
+        keyId = bsoncxx::string::to_string(mResult.value()["keyId"].get_string().value);
+        keyUsage = bsoncxx::string::to_string(mResult.value()["keyUsage"].get_string().value);
+        keySpec = bsoncxx::string::to_string(mResult.value()["keySpec"].get_string().value);
+        keyState = bsoncxx::string::to_string(mResult.value()["keyState"].get_string().value);
         created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
         modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
 

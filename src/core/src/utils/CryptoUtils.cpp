@@ -433,6 +433,17 @@ namespace AwsMock::Core {
         return {ss.str()};
     }
 
+    std::string Crypto::HexDecode(const std::string &hex) {
+        int len = hex.length();
+        std::string newString;
+        for (int i = 0; i < len; i += 2) {
+            std::string byte = hex.substr(i, 2);
+            char chr = (char) (int) strtol(byte.c_str(), nullptr, 16);
+            newString.push_back(chr);
+        }
+        return newString;
+    }
+
     EVP_PKEY *Crypto::GenerateRsaKeys(unsigned int keyLength) {
         EVP_PKEY *pRSA = EVP_RSA_gen(keyLength);
         if (!pRSA) {

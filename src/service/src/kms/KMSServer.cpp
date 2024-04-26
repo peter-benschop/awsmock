@@ -43,7 +43,7 @@ namespace AwsMock::Service {
         _kmsWorker->Start();
 
         // Start REST module
-        StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new SNSRequestHandlerFactory(_configuration));
+        StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new KMSRequestHandlerFactory(_configuration));
     }
 
     void KMSServer::Run() {}

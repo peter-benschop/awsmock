@@ -54,6 +54,26 @@ namespace AwsMock::Database::Entity::KMS {
         std::string region;
 
         /**
+         * Key ID
+         */
+        std::string keyId;
+
+        /**
+         * Key usage
+         */
+        std::string keyUsage;
+
+        /**
+         * Key specification
+         */
+        std::string keySpec;
+
+        /**
+         * Key state
+         */
+        std::string keyState;
+
+        /**
          * AWS ARN
          */
         std::string arn;

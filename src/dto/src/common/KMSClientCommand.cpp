@@ -8,13 +8,24 @@ namespace AwsMock::Dto::Common {
 
     void KMSClientCommand::FromRequest(const HttpMethod &httpMethod, Poco::Net::HTTPServerRequest &request, const std::string &awsRegion, const std::string &awsUser) {
 
+        Dto::Common::UserAgent userAgent;
+        userAgent.FromRequest(request, "kms");
+
         // Basic values
         this->region = awsRegion;
         this->user = awsUser;
         this->method = httpMethod;
         this->contentType = Core::HttpUtils::GetHeaderValue(request, "Content-Type");
         this->payload = GetBodyAsString(request);
-        this->command = Dto::Common::KMSCommandTypeFromString(GetCommandFromHeader(request));
+
+        if (userAgent.clientCommand.empty()) {
+
+            this->command = Dto::Common::KMSCommandTypeFromString(GetCommandFromHeader(request));
+
+        } else {
+
+            this->command = Dto::Common::KMSCommandTypeFromString(userAgent.clientCommand);
+        }
     }
 
     std::string KMSClientCommand::GetBodyAsString(Poco::Net::HTTPServerRequest &request) {

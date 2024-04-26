@@ -39,6 +39,21 @@ namespace AwsMock::Database {
         return {};
     }
 
+    Entity::KMS::Key KMSMemoryDb::GetKeyByKeyId(const std::string &keyId) {
+
+        auto it = find_if(_keys.begin(), _keys.end(), [keyId](const std::pair<std::string, Entity::KMS::Key> &topic) {
+            return topic.second.keyId == keyId;
+        });
+
+        if (it != _keys.end()) {
+            it->second.oid = it->first;
+            return it->second;
+        }
+
+        log_warning << "Key not found, keyId: " << keyId;
+        return {};
+    }
+
     Entity::KMS::Key KMSMemoryDb::CreateKey(const Entity::KMS::Key &topic) {
         Poco::ScopedLock loc(_keyMutex);
 

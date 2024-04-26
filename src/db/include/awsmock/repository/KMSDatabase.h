@@ -88,6 +88,15 @@ namespace AwsMock::Database {
         Entity::KMS::Key GetKeyById(bsoncxx::oid oid);
 
         /**
+         * Returns a KMS key by key ID
+         *
+         * @param keyId key ID
+         * @return key entity
+         * @throws DatabaseException
+         */
+        Entity::KMS::Key GetKeyByKeyId(const std::string &keyId);
+
+        /**
          * Create a new topic in the KMS topic table
          *
          * @param topic topic entity

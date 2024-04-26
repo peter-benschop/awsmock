@@ -221,6 +221,13 @@ namespace AwsMock::Core {
          */
         static std::string HexEncode(unsigned char *hash, int size);
 
+        /**
+         * Decodes a hex string to an unsigned char array.
+         *
+         * @param hex hex string
+         * @return unsigned char array.
+         */
+        static std::string HexDecode(const std::string &hex);
 
         /**
          * Generate a RSA key pair of the given length.

@@ -26,13 +26,13 @@ namespace AwsMock::Dto::KMS {
             {KeyUsage::ENCRYPT_DECRYPT, "ENCRYPT_DECRYPT"},
             {KeyUsage::GENERATE_VERIFY_MAC, "GENERATE_VERIFY_MAC"}};
 
-    [[maybe_unused]] static std::string KeySpecToString(KeyUsage keyUsage) {
+    [[maybe_unused]] static std::string KeyUsageToString(KeyUsage keyUsage) {
         return KeyUsageNames[keyUsage];
     }
 
     [[maybe_unused]] static KeyUsage KeyUsageFromString(const std::string &keyUsage) {
         for (auto &it: KeyUsageNames) {
-            if (it.second == keySpec) {
+            if (it.second == keyUsage) {
                 return it.first;
             }
         }

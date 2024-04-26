@@ -94,6 +94,36 @@ namespace AwsMock::Database {
         }
     }
 
+    Entity::KMS::Key KMSDatabase::GetKeyByKeyId(const std::string &keyId) {
+
+        if (_useDatabase) {
+
+            auto client = GetClient();
+            mongocxx::collection _topicCollection = (*client)[_databaseName][_keyCollectionName];
+
+            try {
+
+                mongocxx::stdx::optional<bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("keyId", keyId)));
+                if (!mResult.has_value()) {
+                    log_error << "KMS key not found, keyId: " << keyId;
+                    throw Core::DatabaseException("KMS key not found, keyId" + keyId);
+                }
+
+                Entity::KMS::Key result;
+                result.FromDocument(mResult);
+                return result;
+
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "KMS Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
+        } else {
+
+            return _memoryDb.GetKeyByKeyId(keyId);
+        }
+    }
+
     Entity::KMS::Key KMSDatabase::CreateKey(const Entity::KMS::Key &key) {
 
         if (_useDatabase) {

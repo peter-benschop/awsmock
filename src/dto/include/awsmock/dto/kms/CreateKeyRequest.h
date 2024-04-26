@@ -53,11 +53,6 @@ namespace AwsMock::Dto::KMS {
         std::string region;
 
         /**
-         * Customer master key specification
-         */
-        KeySpec customerMasterKeySpec = KeySpec::SYMMETRIC_DEFAULT;
-
-        /**
          * Customer key store ID
          */
         std::string customKeyStoreId;
@@ -70,12 +65,12 @@ namespace AwsMock::Dto::KMS {
         /**
          * Key specification
          */
-        std::string keySpec;
+        KeySpec keySpec = KeySpec::SYMMETRIC_DEFAULT;
 
         /**
          * Key usage
          */
-        KeyUsage keyUsage;
+        KeyUsage keyUsage = KeyUsage::ENCRYPT_DECRYPT;
 
         /**
          * Multi region
@@ -96,6 +91,16 @@ namespace AwsMock::Dto::KMS {
          * Policy
          */
         std::string policy;
+
+        /**
+         * Xks key ID
+         */
+        std::string xksKeyId;
+
+        /**
+         * Tags
+         */
+        std::map<std::string, std::string> tags;
 
         /**
          * Converts the JSON string to DTO.

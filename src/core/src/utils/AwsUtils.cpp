@@ -63,8 +63,8 @@ namespace AwsMock::Core {
         return CreateArn("secretsmanager", region, accountId, "secret:" + secretId);
     }
 
-    std::string AwsUtils::CreateKMSKeyArn(const std::string &region, const std::string &accountId, const std::string &name) {
-        return CreateArn("kms", region, accountId, name);
+    std::string AwsUtils::CreateKMSKeyArn(const std::string &region, const std::string &accountId, const std::string &keyId) {
+        return CreateArn("kms", region, accountId, "key/" + keyId);
     }
 
     std::string AwsUtils::GetAuthorizationHeader(const Configuration &configuration, const std::string &module) {

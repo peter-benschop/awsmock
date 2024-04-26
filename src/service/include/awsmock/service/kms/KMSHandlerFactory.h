@@ -21,7 +21,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt@opitz-consulting.com
      */
-    class SNSRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
+    class KMSRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 
       public:
 
@@ -30,7 +30,7 @@ namespace AwsMock::Service {
          *
          * @param configuration application configuration
          */
-        explicit SNSRequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
+        explicit KMSRequestHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
 
         /**
          * Create request handler

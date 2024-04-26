@@ -10,9 +10,9 @@
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 
 // AwsMock includes
-#include "SNSHandler.h"
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/MetricService.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/service/sns/SNSHandler.h>
 
 namespace AwsMock::Service {
 

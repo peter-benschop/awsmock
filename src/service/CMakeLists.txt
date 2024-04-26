@@ -21,7 +21,7 @@ set(SECRETMANAGER_SOURCES src/secretsmanager/SecretsManagerServer.cpp src/secret
         src/secretsmanager/SecretsManagerCmdHandler.cpp src/secretsmanager/SecretsManagerService.cpp
         src/secretsmanager/SecretsManagerMonitoring.cpp)
 set(KMS_SOURCES src/kms/KMSServer.cpp src/kms/KMSHandler.cpp src/kms/KMSCmdHandler.cpp src/kms/KMSWorker.cpp
-        src/kms/KMSService.cpp src/kms/KMSMonitoring.cpp)
+        src/kms/KMSService.cpp src/kms/KMSMonitoring.cpp src/kms/KMSCreator.cpp)
 set(FTP_SOURCES src/ftpserver/Filesystem.cpp src/ftpserver/FtpSession.cpp src/ftpserver/FtpServer.cpp
         src/ftpserver/FtpServerImpl.cpp src/ftpserver/UserDatabase.cpp)
 set(GATEWAY_SOURCES src/gateway/GatewayServer.cpp src/gateway/GatewayRouter.cpp src/gateway/GatewayHandler.cpp)

@@ -12,13 +12,13 @@ namespace AwsMock::Service {
 
             case Dto::Common::KMSCommandType::CREATE_KEY: {
 
-                std::string name = Core::HttpUtils::GetQueryParameterValueByName(kmsClientCommand.payload, "Name");
-                log_debug << "Topic name: " << name;
+                Dto::KMS::CreateKeyRequest kmsRequest;
+                kmsRequest.FromJson(kmsClientCommand.payload);
+                kmsRequest.region = kmsClientCommand.region;
 
-                Dto::KMS::CreateKeyRequest kmsRequest = {.region = kmsClientCommand.region};
                 Dto::KMS::CreateKeyResponse kmsResponse = _kmsService.CreateKey(kmsRequest);
                 SendOkResponse(response, kmsResponse.ToJson());
-                log_info << "Key created, name: " << name;
+                log_info << "Key created, keyId: " << kmsResponse.metaData.keyId;
 
                 break;
             }
