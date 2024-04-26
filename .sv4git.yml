@@ -24,7 +24,7 @@ branches:
   skip: [ master, main, develop ]
   skip-detached: false
 commit-message:
-  types: [ build, ci, chore, docs, feat, fix, perf, refactor, revert, style, test, major, develop, version ]
+  types: [ build, ci, chore, docs, feat, fix, perf, refactor, revert, style, test, major, develop ]
     header-selector: ""
     scope:
       values: [ ]
