@@ -19,6 +19,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -30,11 +31,13 @@
 #include <openssl/hmac.h>
 #include <openssl/md5.h>
 #include <openssl/pem.h>
+#include <openssl/rand.h>
 #include <openssl/rsa.h>
 #include <openssl/sha.h>
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/RandomUtils.h>
 #include <awsmock/core/StringUtils.h>
 
 // 64kB buffer
@@ -45,6 +48,9 @@
 #define CRYPTO_RSA_KEY_LEN_1024 1024
 #define CRYPTO_RSA_KEY_EXP 65535
 #define CRYPTO_RSA_KEY_LINE_LENGTH 64
+
+#define CRYPTO_AES256_KEY_SIZE 32
+#define CRYPTO_AES256_BLOCK_SIZE 16
 
 namespace AwsMock::Core {
 
@@ -144,6 +150,14 @@ namespace AwsMock::Core {
         static std::array<unsigned char, EVP_MAX_MD_SIZE> GetHmacSha256FromStringRaw(const std::array<unsigned char, EVP_MAX_MD_SIZE> &key, const std::string &msg);
 
         /**
+         * Creates a AES 256 encryption key.
+         *
+         * @param key 265bit key material
+         * @param iv iv
+         */
+        static void CreateAes256Key(unsigned char *key, unsigned char *iv);
+
+        /**
          * AES 256 encryption
          *
          * @param plaintext input string
@@ -212,6 +226,13 @@ namespace AwsMock::Core {
          */
         static std::string HexEncode(unsigned char *hash, int size);
 
+        /**
+         * Decodes a hex string to an unsigned char array.
+         *
+         * @param hex hex string
+         * @return unsigned char array.
+         */
+        static std::string HexDecode(const std::string &hex);
 
         /**
          * Generate a RSA key pair of the given length.

@@ -15,102 +15,107 @@
 
 namespace AwsMock::Dto::Module {
 
+    /**
+     * Gateway configuration
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct GatewayConfig {
 
         /**
-     * Default region
-     */
+         * Default region
+         */
         std::string region;
 
         /**
-     * Endpoint
-     */
+         * Endpoint
+         */
         std::string endpoint;
 
         /**
-     * Protocol
-     */
+         * Protocol
+         */
         std::string protocol = "http";
 
         /**
-     * Host
-     */
+         * Host
+         */
         std::string host = "localhost";
 
         /**
-     * Port
-     */
+         * Port
+         */
         int port = 4566;
 
         /**
-     * User ID
-     */
+         * User ID
+         */
         std::string user = "none";
 
         /**
-     * Access ID
-     */
+         * Access ID
+         */
         std::string accessId = "000000000000";
 
         /**
-     * Client ID
-     */
+         * Client ID
+         */
         std::string clientId = "000000000000";
 
         /**
-     * Access key ID
-     */
+         * Access key ID
+         */
         std::string accessKeyId = "none";
 
         /**
-     * Secret access key
-     */
+         * Secret access key
+         */
         std::string secretAccessKey = "none";
 
         /**
-     * Data directory
-     */
+         * Data directory
+         */
         std::string dataDir = "/tmp/awsmock/data";
 
         /**
-     * Pretty print
-     */
+         * Pretty print
+         */
         bool prettyPrint = false;
 
         /**
-     * Database active
-     */
+         * Database active
+         */
         bool databaseActive = false;
 
         /**
-     * Convert to JSON representation
-     *
-     * @return JSON string
-     */
+         * Convert to JSON representation
+         *
+         * @return JSON string
+         */
         std::string ToJson() const;
 
         /**
-     * Convert from JSON representation
-     *
-     * @param payload JSON representation
-     * @return GatewayConfig
-     */
+         * Convert from JSON representation
+         *
+         * @param payload JSON representation
+         * @return GatewayConfig
+         */
         static GatewayConfig FromJson(const std::string &payload);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @param os output stream
-     * @param m module struct
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @param os output stream
+         * @param m module struct
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const GatewayConfig &m);
     };
 

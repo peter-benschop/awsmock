@@ -78,7 +78,7 @@ namespace AwsMock::Service {
          * @param authInfo authorization string
          * @return module name
          */
-        std::string GetService(const std::string &authInfo);
+        static std::string GetService(const std::string &authInfo);
 
         /**
          * Configuration

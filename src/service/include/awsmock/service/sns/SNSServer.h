@@ -8,11 +8,6 @@
 // C++ standard includes
 #include <string>
 
-// Poco includes
-#include <Poco/Condition.h>
-#include <Poco/Logger.h>
-#include <Poco/Runnable.h>
-
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
@@ -25,7 +20,7 @@
 #include <awsmock/service/sns/SNSMonitoring.h>
 #include <awsmock/service/sns/SNSWorker.h>
 
-#define SNS_DEFAULT_PORT 9502
+#define KMS_DEFAULT_PORT 9502
 #define SNS_DEFAULT_HOST "localhost"
 #define SNS_DEFAULT_QUEUE_LENGTH 250
 #define SNS_DEFAULT_THREADS 50

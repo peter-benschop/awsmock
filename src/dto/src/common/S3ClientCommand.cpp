@@ -6,15 +6,15 @@
 
 namespace AwsMock::Dto::Common {
 
-    void S3ClientCommand::FromRequest(const HttpMethod &method, Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user) {
+    void S3ClientCommand::FromRequest(const HttpMethod &httpMethod, Poco::Net::HTTPServerRequest &request, const std::string &awsRegion, const std::string &awsUser) {
 
         Dto::Common::UserAgent userAgent;
         userAgent.FromRequest(request, "s3");
 
         // Basic values
-        this->region = region;
-        this->user = user;
-        this->method = method;
+        this->region = awsRegion;
+        this->user = awsUser;
+        this->method = httpMethod;
 
         // Core values
         bucket = Core::HttpUtils::GetPathParameter(request.getURI(), 0);

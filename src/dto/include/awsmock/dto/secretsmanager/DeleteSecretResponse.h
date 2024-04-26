@@ -23,66 +23,68 @@ namespace AwsMock::Dto::SecretsManager {
 
 
     /**
-   * Return structure for the delete secret request.
-   *
-   * Example:
-   *
-   * <pre>
-   * {
-   *   "ARN": "string",
-   *   "DeletionDate": number,
-   *   "Name": "string"
-   * }
-   * </pre>
-   */
+     * Return structure for the delete secret request.
+     *
+     * Example:
+     *
+     * <pre>
+     * {
+     *   "ARN": "string",
+     *   "DeletionDate": number,
+     *   "Name": "string"
+     * }
+     * </pre>
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct DeleteSecretResponse {
 
         /**
-     * Region
-     */
+         * Region
+         */
         std::string region;
 
         /**
-     * Secret name
-     */
+         * Secret name
+         */
         std::string name;
 
         /**
-     * Secret ARN
-     */
+         * Secret ARN
+         */
         std::string arn;
 
         /**
-     * Secret deletion date
-     */
+         * Secret deletion date
+         */
         double deletionDate = -1;
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Convert from JSON representation
-     *
-     * @param jsonString JSON string
-     */
+         * Convert from JSON representation
+         *
+         * @param jsonString JSON string
+         */
         void FromJson(const std::string &jsonString);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const DeleteSecretResponse &r);
     };
 

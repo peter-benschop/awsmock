@@ -23,7 +23,8 @@ namespace AwsMock::Service {
         TRANSFER,
         COGNITO,
         DYNAMODB,
-        SECRETS_MANAGER
+        SECRETS_MANAGER,
+        KMS
     };
 
     struct GatewayRoute {

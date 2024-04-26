@@ -17,85 +17,89 @@
 
 namespace AwsMock::Dto::Module {
 
+    /**
+     * AwsMock module
+     *
+     * @author jens.vogt@opitz-consulting.com
+     */
     struct Module {
 
         /**
-     * Name
-     */
+         * Name
+         */
         std::string name;
 
         /**
-     * Status
-     */
+         * Status
+         */
         Database::Entity::Module::ModuleState status;
 
         /**
-     * Executable
-     */
+         * Executable
+         */
         std::string executable = {};
 
         /**
-     * HTTP port
-     */
+         * HTTP port
+         */
         int port = -1;
 
         /**
-     * Creation date
-     */
+         * Creation date
+         */
         Poco::DateTime created = Poco::DateTime();
 
         /**
-     * Last modification date
-     */
+         * Last modification date
+         */
         Poco::DateTime modified = Poco::DateTime();
-        ;
 
         /**
-     * Convert to JSON representation
-     *
-     * @param moduleEntity module entity
-     * @return JSON string
-     */
+         * Convert to JSON representation
+         *
+         * @param moduleEntity module entity
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Convert to JSON representation
-     *
-     * @param moduleList module entity list
-     * @return JSON string
-     */
+         * Convert to JSON representation
+         *
+         * @param moduleList module entity list
+         * @return JSON string
+         */
         static std::string ToJson(const Database::Entity::Module::ModuleList &moduleList);
 
         /**
-     * Convert from JSON representation
-     *
-     * @param payload JSON representation
-     * @return Module
-     */
+         * Convert from JSON representation
+         *
+         * @param payload JSON representation
+         * @return Module
+         */
         static Module FromJson(const std::string &payload);
 
         /**
-     * Convert from JSON representation
-     *
-     * @param payload JSON representation
-     * @return ModuleList
-     */
+         * Convert from JSON representation
+         *
+         * @param payload JSON representation
+         * @return ModuleList
+         */
         static std::vector<Module> FromJsonList(const std::string &payload);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @param os output stream
-     * @param m module struct
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @param os output stream
+         * @param m module struct
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const Module &m);
     };
 

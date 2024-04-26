@@ -270,23 +270,21 @@ namespace AwsMock::Database {
         Entity::S3::ObjectList objectList;
         if (_useDatabase) {
 
+            auto client = GetClient();
+            mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
+
             if (prefix.empty()) {
 
-                auto client = GetClient();
-                mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
                 auto objectCursor = _objectCollection.find({});
-                for (auto object: objectCursor) {
+                for (const auto &object: objectCursor) {
                     Entity::S3::Object result;
                     result.FromDocument(object);
                     objectList.push_back(result);
                 }
             } else {
 
-                auto client = GetClient();
-                mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
-                auto objectCursor =
-                        _objectCollection.find(make_document(kvp("key", bsoncxx::types::b_regex{"^" + prefix + ".*"})));
-                for (auto object: objectCursor) {
+                auto objectCursor = _objectCollection.find(make_document(kvp("key", bsoncxx::types::b_regex{"^" + prefix + ".*"})));
+                for (const auto &object: objectCursor) {
                     Entity::S3::Object result;
                     result.FromDocument(object);
                     objectList.push_back(result);

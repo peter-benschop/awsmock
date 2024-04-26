@@ -2,17 +2,17 @@
 // Created by vogje01 on 17/06/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_SNSHANDLERFACTORY_H
-#define AWSMOCK_SERVICE_SNSHANDLERFACTORY_H
+#ifndef AWSMOCK_SERVICE_SNS_HANDLER_FACTORY_H
+#define AWSMOCK_SERVICE_SNS_HANDLER_FACTORY_H
 
 // Poco includes
 #include "Poco/Logger.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 
 // AwsMock includes
-#include "SNSHandler.h"
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/MetricService.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/service/sns/SNSHandler.h>
 
 namespace AwsMock::Service {
 
@@ -55,4 +55,4 @@ namespace AwsMock::Service {
 
 }// namespace AwsMock::Service
 
-#endif//AWSMOCK_SERVICE_SNSHANDLERFACTORY_H
+#endif// AWSMOCK_SERVICE_SNS_HANDLER_FACTORY_H

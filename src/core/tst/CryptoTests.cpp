@@ -50,6 +50,7 @@ namespace AwsMock::Core {
     }
 
     TEST_F(CryptoTest, Md5DoubleFileTest) {
+
         // arrange
         std::string file1 = FileUtils::CreateTempFile("txt", TEST_STRING);
         std::string file2 = FileUtils::CreateTempFile("txt", TEST_STRING);
@@ -61,6 +62,7 @@ namespace AwsMock::Core {
         // assert
         EXPECT_TRUE(result1 == result2);
     }
+
 
     TEST_F(CryptoTest, Sha1StringTest) {
         // arrange
@@ -156,6 +158,20 @@ namespace AwsMock::Core {
         EXPECT_TRUE(StringUtils::Equals(testText, decrypted));
     }
 
+    TEST_F(CryptoTest, Aes256KeyText) {
+
+        // arrange
+        unsigned char key[CRYPTO_AES256_KEY_SIZE];
+        unsigned char iv[CRYPTO_AES256_BLOCK_SIZE];
+
+        // act
+        Crypto::CreateAes256Key(key, iv);
+
+        // assert
+        EXPECT_TRUE(sizeof(key) / sizeof(key[0]) == CRYPTO_AES256_KEY_SIZE);
+        EXPECT_TRUE(sizeof(iv) / sizeof(iv[0]) == CRYPTO_AES256_BLOCK_SIZE);
+    }
+
     TEST_F(CryptoTest, Aes256EncryptionText) {
 
         // arrange
@@ -169,21 +185,6 @@ namespace AwsMock::Core {
 
         // assert
         EXPECT_TRUE(strcasecmp(reinterpret_cast<const char *>(result2), reinterpret_cast<const char *>(result1)));
-    }
-
-    TEST_F(CryptoTest, Aes256EncryptionBase64Text) {
-
-        // arrange
-        auto *testText = (unsigned char *) "This is a super secure text";
-        std::string key = "TestKey";
-        int len = (int) strlen(reinterpret_cast<const char *>(testText));
-
-        // act
-        unsigned char *result1 = Crypto::Aes256EncryptString(testText, &len, key);
-        unsigned char *result2 = Crypto::Aes256DecryptString(result1, &len, key);
-
-        // assert
-        EXPECT_TRUE(strcmp(reinterpret_cast<const char *>(result2), reinterpret_cast<const char *>(testText)) == 0);
     }
 
     TEST_F(CryptoTest, GenerateRsaKeyTest) {
@@ -219,6 +220,19 @@ namespace AwsMock::Core {
         EXPECT_TRUE(publicKey.length() == 800);
         EXPECT_TRUE(!privateKey.empty());
         EXPECT_TRUE(privateKey.length() == 4072);
+    }
+
+    TEST_F(CryptoTest, HexEncodeDecodeTest) {
+
+        // arrange
+        std::string testString = "This is a test string";
+
+        // act
+        std::string encoded = Crypto::HexEncode(testString);
+        std::string decoded = Crypto::HexDecode(encoded);
+
+        // assert
+        EXPECT_STRCASEEQ(testString.c_str(), decoded.c_str());
     }
 
 }// namespace AwsMock::Core

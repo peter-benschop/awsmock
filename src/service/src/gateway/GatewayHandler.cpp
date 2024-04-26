@@ -91,6 +91,11 @@ namespace AwsMock::Service {
                 CallAsyncGet(SecretsManagerHandler(_configuration), request, response, region, user);
                 break;
             }
+
+            case KMS: {
+                CallAsyncGet(KMSHandler(_configuration), request, response, region, user);
+                break;
+            }
         }
     }
 
@@ -142,6 +147,9 @@ namespace AwsMock::Service {
                 CallAsyncPut(SecretsManagerHandler(_configuration), request, response, region, user);
                 break;
             }
+            case KMS:
+                CallAsyncPut(KMSHandler(_configuration), request, response, region, user);
+                break;
         }
     }
 
@@ -194,6 +202,10 @@ namespace AwsMock::Service {
                 CallAsyncPost(SecretsManagerHandler(_configuration), request, response, region, user);
                 break;
             }
+
+            case KMS:
+                CallAsyncPost(KMSHandler(_configuration), request, response, region, user);
+                break;
         }
     }
 
@@ -246,6 +258,10 @@ namespace AwsMock::Service {
                 CallAsyncDelete(SecretsManagerHandler(_configuration), request, response, region, user);
                 break;
             }
+
+            case KMS:
+                CallAsyncDelete(KMSHandler(_configuration), request, response, region, user);
+                break;
         }
     }
 
@@ -298,6 +314,10 @@ namespace AwsMock::Service {
                 CallAsyncHead(SecretsManagerHandler(_configuration), request, response, region, user);
                 break;
             }
+
+            case KMS:
+                CallAsyncHead(KMSHandler(_configuration), request, response, region, user);
+                break;
         }
     }
 

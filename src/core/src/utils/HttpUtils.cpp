@@ -125,6 +125,7 @@ namespace AwsMock::Core {
         if (index > parameters.size()) {
             throw Core::ServiceException("Invalid path parameter index");
         }
+        log_trace << "Query parameter found, prefix: " << prefix << " index: " << index;
         return parameters[index - 1];
     }
 
@@ -135,6 +136,7 @@ namespace AwsMock::Core {
             value = std::stoi(parameterValue);
             value = value > min && value < max ? value : def;
         }
+        log_warning << "Query parameter found, name: " << name << " value: " << value;
         return value;
     }
 
@@ -146,7 +148,16 @@ namespace AwsMock::Core {
                 return true;
             }
         }
+        log_warning << "Query parameter not found, name: " << name;
         return false;
+    }
+
+    [[maybe_unused]] std::string HttpUtils::GetHeaderValue(const Poco::Net::HTTPRequest &request, const std::string &name) {
+        std::string headerValue = request.get(name);
+        if (headerValue.empty()) {
+            log_warning << "Header value not found, key: " << name;
+        }
+        return headerValue;
     }
 
     bool HttpUtils::IsUrlEncoded(const std::string &value) {

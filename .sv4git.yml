@@ -1,38 +1,38 @@
 version: "1.1"
 versioning:
-    update-major: [major]
-    update-minor: [feat]
-    update-patch: [build, ci, chore, docs, fix, perf, refactor, style, test]
-    ignore-unknown: true
+  update-major: [ major ]
+  update-minor: [ feat ]
+  update-patch: [ build, ci, chore, fix, perf, refactor, style, test ]
+  ignore-unknown: true
 tag:
-    pattern: '%d.%d.%d'
-    filter: ""
+  pattern: '%d.%d.%d'
+  filter: ""
 release-notes:
-    sections:
-        - name: Features
-          section-type: commits
-          commit-types: [feat]
-        - name: Bug Fixes
-          section-type: commits
-          commit-types: [fix]
-        - name: Breaking Changes
-          section-type: breaking-changes
+  sections:
+    - name: Features
+      section-type: commits
+      commit-types: [ feat ]
+    - name: Bug Fixes
+      section-type: commits
+      commit-types: [ fix ]
+    - name: Breaking Changes
+      section-type: breaking-changes
 branches:
-    prefix: ([0-9]+-[a-z-]+)?
-    suffix: (-.*)?
-    disable-issue: false
-    skip: [master, main, developer]
-    skip-detached: false
+  prefix: ([0-9]+-[a-z-]+)?
+  suffix: (-.*)?
+  disable-issue: false
+  skip: [ master, main, develop ]
+  skip-detached: false
 commit-message:
-    types: [ build, ci, chore, docs, feat, fix, perf, refactor, revert, style, test, major, develop ]
+  types: [ build, ci, chore, docs, feat, fix, perf, refactor, revert, style, test, major, develop ]
     header-selector: ""
     scope:
-        values: []
+      values: [ ]
     footer:
-        issue:
-            key: jira
-            key-synonyms: [Jira, JIRA]
-            use-hash: false
-            add-value-prefix: ""
+      issue:
+        key: jira
+        key-synonyms: [ Jira, JIRA ]
+        use-hash: false
+        add-value-prefix: ""
     issue:
-        regex: '[0-9]+-[A-Za-z-]+'
+      regex: '[0-9]+-[A-Za-z-]+'

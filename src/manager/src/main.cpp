@@ -32,6 +32,7 @@
 #include <Poco/Util/ServerApplication.h>
 
 // AwsMock includes
+#include "awsmock/service/kms/KMSServer.h"
 #include <awsmock/controller/RestService.h>
 #include <awsmock/controller/Router.h>
 #include <awsmock/core/Configuration.h>
@@ -194,92 +195,45 @@ namespace AwsMock {
 
         void StartServices() {
 
-            // Handle environment variables
-            if (_configuration.has("awsmock.mongodb.active") && _configuration.getBool("awsmock.mongodb.active")) {
-                _moduleDatabase.SetStatus("database", Database::Entity::Module::ModuleStatus::ACTIVE);
-                //_database.StartDatabase();
-            }
-            if (_configuration.has("awsmock.service.sqs.active") &&
-                _configuration.getBool("awsmock.service.sqs.active")) {
-                _moduleDatabase.SetStatus("sqs", Database::Entity::Module::ModuleStatus::ACTIVE);
-            }
-            if (_configuration.has("awsmock.service.s3.active") &&
-                _configuration.getBool("awsmock.service.s3.active")) {
-                _moduleDatabase.SetStatus("s3", Database::Entity::Module::ModuleStatus::ACTIVE);
-            }
-            if (_configuration.has("awsmock.service.sns.active") &&
-                _configuration.getBool("awsmock.service.sns.active")) {
-                _moduleDatabase.SetStatus("sns", Database::Entity::Module::ModuleStatus::ACTIVE);
-            }
-            if (_configuration.has("awsmock.service.lambda.active") &&
-                _configuration.getBool("awsmock.service.lambda.active")) {
-                _moduleDatabase.SetStatus("lambda", Database::Entity::Module::ModuleStatus::ACTIVE);
-            }
-            if (_configuration.has("awsmock.service.transfer.active") &&
-                _configuration.getBool("awsmock.service.transfer.active")) {
-                _moduleDatabase.SetStatus("transfer", Database::Entity::Module::ModuleStatus::ACTIVE);
-            }
-            if (_configuration.has("awsmock.service.cognito.active") &&
-                _configuration.getBool("awsmock.service.cognito.active")) {
-                _moduleDatabase.SetStatus("cognito", Database::Entity::Module::ModuleStatus::ACTIVE);
-            }
-            if (_configuration.has("awsmock.service.dynamodb.active") &&
-                _configuration.getBool("awsmock.service.dynamodb.active")) {
-                _moduleDatabase.SetStatus("dynamodb", Database::Entity::Module::ModuleStatus::ACTIVE);
-            }
-            if (_configuration.has("awsmock.service.secretsmanager.active") &&
-                _configuration.getBool("awsmock.service.secretsmanager.active")) {
-                _moduleDatabase.SetStatus("secretsmanager", Database::Entity::Module::ModuleStatus::ACTIVE);
-            }
-            if (_configuration.has("awsmock.service.gateway.active") &&
-                _configuration.getBool("awsmock.service.gateway.active")) {
-                _moduleDatabase.SetStatus("gateway", Database::Entity::Module::ModuleStatus::ACTIVE);
+            Database::Entity::Module::ModuleList modules = _moduleDatabase.ListModules();
+            for (const auto &module: modules) {
+                if (_configuration.has("awsmock." + module.name + ".active") && _configuration.getBool("awsmock." + module.name + ".active")) {
+                    _moduleDatabase.SetStatus(module.name, Database::Entity::Module::ModuleStatus::ACTIVE);
+                }
             }
 
             // Get last module configuration
-            Database::Entity::Module::ModuleList modules = _moduleDatabase.ListModules();
             for (const auto &module: modules) {
                 if (module.name == "s3" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                    _s3Server = std::make_shared<Service::S3Server>(_configuration);
-                    _s3Server->Start();
-                    _serverMap[module.name] = _s3Server;
+                    _serverMap[module.name] = std::make_shared<Service::S3Server>(_configuration);
+                    _serverMap[module.name]->Start();
                 } else if (module.name == "sqs" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                    _sqsServer = std::make_shared<Service::SQSServer>(_configuration);
-                    _sqsServer->Start();
-                    _serverMap[module.name] = _sqsServer;
+                    _serverMap[module.name] = std::make_shared<Service::SQSServer>(_configuration);
+                    _serverMap[module.name]->Start();
                 } else if (module.name == "sns" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                    _snsServer = std::make_shared<Service::SNSServer>(_configuration);
-                    _snsServer->Start();
-                    _serverMap[module.name] = _snsServer;
+                    _serverMap[module.name] = std::make_shared<Service::SNSServer>(_configuration);
+                    _serverMap[module.name]->Start();
                 } else if (module.name == "lambda" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                    _lambdaServer = std::make_shared<Service::LambdaServer>(_configuration);
-                    _lambdaServer->Start();
-                    _serverMap[module.name] = _lambdaServer;
-                } else if (module.name == "transfer" &&
-                           module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                    _transferServer = std::make_shared<Service::TransferServer>(_configuration);
-                    _transferServer->Start();
-                    _serverMap[module.name] = _transferServer;
-                } else if (module.name == "cognito" &&
-                           module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                    _cognitoServer = std::make_shared<Service::CognitoServer>(_configuration);
-                    _cognitoServer->Start();
-                    _serverMap[module.name] = _cognitoServer;
-                } else if (module.name == "dynamodb" &&
-                           module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                    _dynamoDbServer = std::make_shared<Service::DynamoDbServer>(_configuration);
-                    _dynamoDbServer->Start();
-                    _serverMap[module.name] = _dynamoDbServer;
-                } else if (module.name == "secretsmanager" &&
-                           module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                    _secretsManagerServer = std::make_shared<Service::SecretsManagerServer>(_configuration);
-                    _secretsManagerServer->Start();
-                    _serverMap[module.name] = _secretsManagerServer;
-                } else if (module.name == "gateway" &&
-                           module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                    _gatewayServer = std::make_shared<Service::GatewayServer>(_configuration, _metricService);
-                    _gatewayServer->Start();
-                    _serverMap[module.name] = _gatewayServer;
+                    _serverMap[module.name] = std::make_shared<Service::LambdaServer>(_configuration);
+                    _serverMap[module.name]->Start();
+                } else if (module.name == "transfer" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                    _serverMap[module.name] = std::make_shared<Service::TransferServer>(_configuration);
+                    _serverMap[module.name]->Start();
+                } else if (module.name == "cognito" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                    _serverMap[module.name] = std::make_shared<Service::CognitoServer>(_configuration);
+                    _serverMap[module.name]->Start();
+                } else if (module.name == "dynamodb" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                    _serverMap[module.name] = std::make_shared<Service::DynamoDbServer>(_configuration);
+                    _serverMap[module.name]->Start();
+                } else if (module.name == "kms" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                    _serverMap[module.name] = std::make_shared<Service::KMSServer>(_configuration);
+                    _serverMap[module.name]->Start();
+                } else if (module.name == "secretsmanager" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                    _serverMap[module.name] = std::make_shared<Service::SecretsManagerServer>(_configuration);
+                    _serverMap[module.name]->Start();
+                } else if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                    _serverMap[module.name] = std::make_shared<Service::GatewayServer>(_configuration, _metricService);
+                    _serverMap[module.name]->Start();
                 }
                 log_debug << "Module " << module.name << " started";
             }
@@ -291,38 +245,8 @@ namespace AwsMock {
             for (const auto &module: modules) {
                 if (module.state == Database::Entity::Module::ModuleState::RUNNING) {
                     log_info << "Stopping module: " << module.name;
-                    if (module.name == "s3") {
-                        _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
-                        auto s3Server = _serverMap[module.name];
-                        s3Server->StopServer();
-                    } else if (module.name == "sqs") {
-                        _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
-                        auto sqsServer = _serverMap[module.name];
-                        sqsServer->StopServer();
-                    } else if (module.name == "sns") {
-                        _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
-                        auto snsServer = _serverMap[module.name];
-                        snsServer->StopServer();
-                    } else if (module.name == "lambda") {
-                        _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
-                        auto lambdaServer = _serverMap[module.name];
-                        lambdaServer->StopServer();
-                    } else if (module.name == "transfer") {
-                        _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
-                        auto transferServer = _serverMap[module.name];
-                        transferServer->StopServer();
-                    } else if (module.name == "cognito") {
-                        _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
-                        auto cognitoServer = _serverMap[module.name];
-                        cognitoServer->StopServer();
-                    } else if (module.name == "dynamodb") {
-                        _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
-                        _serverMap[module.name]->StopServer();
-                    } else if (module.name == "gateway") {
-                        _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
-                        auto gatewayServer = _serverMap[module.name];
-                        gatewayServer->StopServer();
-                    }
+                    _moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
+                    _serverMap[module.name]->StopServer();
                     log_debug << "Module " << module.name << " stopped";
                 }
             }
@@ -373,46 +297,6 @@ namespace AwsMock {
          * Gateway router
          */
         Controller::Router *_router = new Controller::Router(_configuration, _metricService, _serverMap);
-
-        /**
-         * S3 module
-         */
-        std::shared_ptr<Service::S3Server> _s3Server;
-
-        /**
-         * SQS module
-         */
-        std::shared_ptr<Service::SQSServer> _sqsServer;
-
-        /**
-         * SNS module
-         */
-        std::shared_ptr<Service::SNSServer> _snsServer;
-
-        /**
-         * Lambda module
-         */
-        std::shared_ptr<Service::LambdaServer> _lambdaServer;
-
-        /**
-         * Transfer module
-         */
-        std::shared_ptr<Service::TransferServer> _transferServer;
-
-        /**
-         * Cognito module
-         */
-        std::shared_ptr<Service::CognitoServer> _cognitoServer;
-
-        /**
-         * DynamoDb module
-         */
-        std::shared_ptr<Service::DynamoDbServer> _dynamoDbServer;
-
-        /**
-         * SecretsManager module
-         */
-        std::shared_ptr<Service::SecretsManagerServer> _secretsManagerServer;
 
         /**
          * Request gateway module

@@ -18,9 +18,10 @@
 #include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/kms/CustomerMasterKeySpec.h>
+#include <awsmock/dto/kms/Key.h>
+#include <awsmock/dto/kms/KeySpec.h>
 
-namespace AwsMock::Dto::Kms {
+namespace AwsMock::Dto::KMS {
 
     /**
      * Create KMS key response
@@ -28,12 +29,12 @@ namespace AwsMock::Dto::Kms {
      * Example:
      * <pre>
      * {
-     *   "KeyMetadata": {
+     *   "Key": {
      *      "Arn": "string",
      *      "AWSAccountId": "string",
      *      "CloudHsmClusterId": "string",
      *      "CreationDate": number,
-     *      "CustomerMasterKeySpec": "string",
+     *      "KeySpec": "string",
      *      "CustomKeyStoreId": "string",
      *      "DeletionDate": number,
      *      "Description": "string",
@@ -76,56 +77,9 @@ namespace AwsMock::Dto::Kms {
     struct CreateKeyResponse {
 
         /**
-         * Customer master key specification
+         * Key metadata
          */
-        CustomerMasterKeySpec customerMasterKeySpec = CustomerMasterKeySpec::SYMMETRIC_DEFAULT;
-
-        /**
-         * Customer key store ID
-         */
-        std::string customKeyStoreId;
-
-        /**
-         * Description
-         */
-        std::string description;
-
-        /**
-         * Key specification
-         */
-        std::string keySpec;
-
-        /**
-         * Key usage
-         */
-        std::string keyUsage;
-
-        /**
-         * Multi region
-         */
-        bool multiRegion = false;
-
-        /**
-         * Bypass policy lockout safety check
-         */
-        bool bypassPolicyLockoutSafetyCheck = false;
-
-        /**
-         * Origin
-         */
-        std::string origin;
-
-        /**
-         * Policy
-         */
-        std::string policy;
-
-        /**
-         * Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-        */
-        void FromJson(const std::string &jsonString);
+        Key key;
 
         /**
          * Convert to a JSON string
@@ -149,6 +103,6 @@ namespace AwsMock::Dto::Kms {
         friend std::ostream &operator<<(std::ostream &os, const CreateKeyResponse &r);
     };
 
-}// namespace AwsMock::Dto::Kms
+}// namespace AwsMock::Dto::KMS
 
 #endif// AWSMOCK_DTO_KMS_CREATE_KEY_RESPONSE_H

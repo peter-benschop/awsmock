@@ -40,11 +40,11 @@ namespace AwsMock::Core {
 
         // S3
         DefineBoolProperty("awsmock.service.s3.active", "AWSMOCK_SERVICE_S3_ACTIVE", true);
-        DefineStringProperty("awsmock.service.s3.host", "AWSMOCK_SERVICE_S3_HOST", "localhost");
-        DefineIntProperty("awsmock.service.s3.port", "AWSMOCK_SERVICE_S3_PORT", 9500);
-        DefineIntProperty("awsmock.service.s3.max.queue", "AWSMOCK_SERVICE_S3_MAX_QUEUE", 250);
-        DefineIntProperty("awsmock.service.s3.max.threads", "AWSMOCK_SERVICE_S3_MAX_THREADS", 50);
-        DefineIntProperty("awsmock.service.s3.timeout", "AWSMOCK_SERVICE_S3_TIMEOUT", 900);
+        DefineStringProperty("awsmock.service.s3.http.host", "AWSMOCK_SERVICE_S3_HOST", "localhost");
+        DefineIntProperty("awsmock.service.s3.http.port", "AWSMOCK_SERVICE_S3_PORT", 9500);
+        DefineIntProperty("awsmock.service.s3.http.max.queue", "AWSMOCK_SERVICE_S3_MAX_QUEUE", 250);
+        DefineIntProperty("awsmock.service.s3.http.max.threads", "AWSMOCK_SERVICE_S3_MAX_THREADS", 50);
+        DefineIntProperty("awsmock.service.s3.http.timeout", "AWSMOCK_SERVICE_S3_TIMEOUT", 900);
         DefineStringProperty("awsmock.service.s3.data.dir", "AWSMOCK_SERVICE_S3_DATA_DIR", "tmp/awsmock/data/s3");
         DefineIntProperty("awsmock.service.s3.period", "AWSMOCK_SERVICE_S3_PERIOD", 60000);
         DefineIntProperty("awsmock.worker.sqs.timeout", "AWSMOCK_WORKER_S3_PERIOD", 120);
@@ -52,22 +52,22 @@ namespace AwsMock::Core {
 
         // SQS
         DefineBoolProperty("awsmock.service.sqs.active", "AWSMOCK_SERVICE_SQS_ACTIVE", true);
-        DefineStringProperty("awsmock.service.sqs.host", "AWSMOCK_SERVICE_SQS_HOST", "localhost");
-        DefineIntProperty("awsmock.service.sqs.port", "AWSMOCK_SERVICE_SQS_PORT", 9501);
-        DefineIntProperty("awsmock.service.sqs.max.queue", "AWSMOCK_SERVICE_SQS_MAX_QUEUE", 250);
-        DefineIntProperty("awsmock.service.sqs.max.threads", "AWSMOCK_SERVICE_SQS_MAX_THREADS", 50);
-        DefineIntProperty("awsmock.service.sqs.timeout", "AWSMOCK_SERVICE_SQS_TIMEOUT", 900);
+        DefineStringProperty("awsmock.service.sqs.http.host", "AWSMOCK_SERVICE_SQS_HOST", "localhost");
+        DefineIntProperty("awsmock.service.sqs.http.port", "AWSMOCK_SERVICE_SQS_PORT", 9501);
+        DefineIntProperty("awsmock.service.sqs.http.max.queue", "AWSMOCK_SERVICE_SQS_MAX_QUEUE", 250);
+        DefineIntProperty("awsmock.service.sqs.http.max.threads", "AWSMOCK_SERVICE_SQS_MAX_THREADS", 50);
+        DefineIntProperty("awsmock.service.sqs.http.timeout", "AWSMOCK_SERVICE_SQS_TIMEOUT", 900);
         DefineIntProperty("awsmock.service.sqs.period", "AWSMOCK_SERVICE_SQS_PERIOD", 60000);
         DefineIntProperty("awsmock.worker.sqs.timeout", "AWSMOCK_WORKER_SQS_PERIOD", 120);
         DefineIntProperty("awsmock.monitoring.sqs.period", "AWSMOCK_MONITORING_SQS_PERIOD", 60000);
 
         // SNS
         DefineBoolProperty("awsmock.service.sns.active", "AWSMOCK_SERVICE_SNS_ACTIVE", true);
-        DefineStringProperty("awsmock.service.sns.host", "AWSMOCK_SERVICE_SNS_HOST", "localhost");
-        DefineIntProperty("awsmock.service.sns.port", "AWSMOCK_SERVICE_SNS_PORT", 9502);
-        DefineIntProperty("awsmock.service.sns.max.queue", "AWSMOCK_SERVICE_SNS_MAX_QUEUE", 250);
-        DefineIntProperty("awsmock.service.sns.max.threads", "AWSMOCK_SERVICE_SNS_MAX_THREADS", 50);
-        DefineIntProperty("awsmock.service.sns.timeout", "AWSMOCK_SERVICE_SNS_TIMEOUT", 900);
+        DefineStringProperty("awsmock.service.sns.http.host", "AWSMOCK_SERVICE_SNS_HOST", "localhost");
+        DefineIntProperty("awsmock.service.sns.http.port", "AWSMOCK_SERVICE_SNS_PORT", 9502);
+        DefineIntProperty("awsmock.service.sns.http.max.queue", "AWSMOCK_SERVICE_SNS_MAX_QUEUE", 250);
+        DefineIntProperty("awsmock.service.sns.http.max.threads", "AWSMOCK_SERVICE_SNS_MAX_THREADS", 50);
+        DefineIntProperty("awsmock.service.sns.http.timeout", "AWSMOCK_SERVICE_SNS_TIMEOUT", 900);
         DefineIntProperty("awsmock.service.sns.period", "AWSMOCK_SERVICE_SNS_PERIOD", 60000);
         DefineIntProperty("awsmock.worker.sns.timeout", "AWSMOCK_WORKER_SNS_PERIOD", 120);
         DefineIntProperty("awsmock.monitoring.sns.period", "AWSMOCK_MONITORING_SNS_PERIOD", 60000);
@@ -129,6 +129,17 @@ namespace AwsMock::Core {
         DefineIntProperty("awsmock.service.secretsmanager.period", "AWSMOCK_SERVICE_SECRETSMANAGER_PERIOD", 10000);
         DefineIntProperty("awsmock.worker.secretsmanager.timeout", "AWSMOCK_WORKER_SECRETSMANAGER_PERIOD", 120);
         DefineIntProperty("awsmock.monitoring.secretsmanager.period", "AWSMOCK_MONITORING_SECRETSMANAGER_PERIOD", 60000);
+
+        // KMS
+        DefineBoolProperty("awsmock.service.kms.active", "AWSMOCK_SERVICE_KMS_ACTIVE", true);
+        DefineStringProperty("awsmock.service.kms.http.host", "AWSMOCK_SERVICE_KMS_HOST", "localhost");
+        DefineIntProperty("awsmock.service.kms.http.port", "AWSMOCK_SERVICE_KMS_PORT", 9508);
+        DefineIntProperty("awsmock.service.kms.http.max.queue", "AWSMOCK_SERVICE_KMS_MAX_QUEUE", 250);
+        DefineIntProperty("awsmock.service.kms.http.max.threads", "AWSMOCK_SERVICE_KMS_MAX_THREADS", 50);
+        DefineIntProperty("awsmock.service.kms.http.timeout", "AWSMOCK_SERVICE_KMS_TIMEOUT", 900);
+        DefineIntProperty("awsmock.service.kms.period", "AWSMOCK_SERVICE_KMS_PERIOD", 60000);
+        DefineIntProperty("awsmock.worker.kms.timeout", "AWSMOCK_WORKER_KMS_PERIOD", 120);
+        DefineIntProperty("awsmock.monitoring.kms.period", "AWSMOCK_MONITORING_KMS_PERIOD", 60000);
 
         // Docker
         DefineStringProperty("awsmock.docker.network.mode", "AWSMOCK_DOCKER_NETWORK_MODE", "bridge");
@@ -224,7 +235,7 @@ namespace AwsMock::Core {
     }
 
     std::string Configuration::GetVersion() {
-        return PROJECT_VER;
+        return PROJECT_VERSION;
     }
 
     std::string Configuration::ToString() const {

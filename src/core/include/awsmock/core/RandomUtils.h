@@ -36,6 +36,15 @@ namespace AwsMock::Core {
         static int NextInt(int min, int max);
 
         /**
+         * Generates a random integer between min and max
+         *
+         * @param min minimum integer
+         * @param max minimum integer
+         * @return random number between min and max
+         */
+        static unsigned int NextUInt(unsigned int min, unsigned int max);
+
+        /**
          * Generates a random integer array, with random numbers between min and max with the given size
          *
          * @param size number of random numbers to generate
