@@ -6,6 +6,8 @@
 
 namespace AwsMock::Core {
 
+    unsigned int Crypto::_salt[] = {1214370622, 264849915};
+
     std::string Crypto::GetMd5FromString(const std::string &content) {
 
         EVP_MD_CTX *context = EVP_MD_CTX_new();
@@ -185,7 +187,7 @@ namespace AwsMock::Core {
              static_cast<int>(key.size()),
              hash.data(),
              &hashLen);
-        return HexEncode(hash);
+        return HexEncode(hash.data(), hash.size());
     }
 
     std::array<unsigned char, EVP_MAX_MD_SIZE> Crypto::GetHmacSha256FromStringRaw(const std::string &key, const std::string &msg) {
@@ -228,16 +230,15 @@ namespace AwsMock::Core {
         }
     }
 
-    unsigned char *Crypto::Aes256EncryptString(unsigned char *plaintext, int *len, const std::string &key) {
+    unsigned char *Crypto::Aes256EncryptString(unsigned char *plaintext, int *len, unsigned char *key) {
 
         // "opaque" encryption, decryption ctx structures that libcrypto uses to record status of enc/dec operations
         EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
 
-        unsigned int salt[] = {Core::RandomUtils::NextUInt(0, UINT32_MAX), Core::RandomUtils::NextUInt(0, UINT32_MAX)};
-        auto *key_data = (unsigned char *) key.c_str();
+        auto *key_data = key;
         int key_data_len = (int) strlen(reinterpret_cast<const char *>(key_data));
 
-        if (Aes256EncryptionInit(key_data, key_data_len, (unsigned char *) &salt, ctx)) {
+        if (Aes256EncryptionInit(key_data, key_data_len, (unsigned char *) &_salt, ctx)) {
             log_error << "Couldn't initialize AES256 cipher";
             return {};
         }
@@ -257,16 +258,15 @@ namespace AwsMock::Core {
         return ciphertext;
     }
 
-    unsigned char *Crypto::Aes256DecryptString(unsigned char *ciphertext, int *len, const std::string &key) {
+    unsigned char *Crypto::Aes256DecryptString(unsigned char *ciphertext, int *len, unsigned char *key) {
 
         // Opaque encryption, decryption ctx structures that libcrypto uses to record status of enc/dec operations
         EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
 
-        unsigned int salt[] = {Core::RandomUtils::NextUInt(0, UINT32_MAX), Core::RandomUtils::NextUInt(0, UINT32_MAX)};
-        auto *key_data = (unsigned char *) key.c_str();
+        auto *key_data = key;
         int key_data_len = (int) strlen(reinterpret_cast<const char *>(key_data));
 
-        if (Aes256DecryptionInit(key_data, key_data_len, (unsigned char *) &salt, ctx)) {
+        if (Aes256DecryptionInit(key_data, key_data_len, (unsigned char *) &_salt, ctx)) {
             log_error << "Couldn't initialize AES cipher";
             return {};
         }
@@ -292,10 +292,9 @@ namespace AwsMock::Core {
         int i, nrounds = 5;
         unsigned char key[CRYPTO_AES256_KEY_SIZE], iv[CRYPTO_AES256_BLOCK_SIZE];
 
-
         // Gen key & IV for AES 256 CBC mode. A SHA1 digest is used to hash the supplied key material. nrounds is the number of times
         // we hash the material. More rounds are more secure but slower.
-        i = EVP_BytesToKey(EVP_aes_256_cbc(), EVP_sha1(), salt, key_data, key_data_len, nrounds, key, iv);
+        i = EVP_BytesToKey(EVP_aes_256_gcm(), EVP_sha1(), salt, key_data, key_data_len, nrounds, key, iv);
         if (i != 32) {
             log_error << "Key size is " << i << " bits - should be 256 bits";
             return -1;
@@ -314,7 +313,7 @@ namespace AwsMock::Core {
 
         // Gen key & IV for AES 256 CBC mode. A SHA1 digest is used to hash the supplied key material. nrounds is the number of times,
         // we hash the material. More rounds are more secure but slower.
-        i = EVP_BytesToKey(EVP_aes_256_cbc(), EVP_sha1(), salt, key_data, key_data_len, nrounds, key, iv);
+        i = EVP_BytesToKey(EVP_aes_256_gcm(), EVP_sha1(), salt, key_data, key_data_len, nrounds, key, iv);
         if (i != 32) {
             log_error << "Key size is " << i << " bits - should be 256 bits";
             return -1;
@@ -327,125 +326,51 @@ namespace AwsMock::Core {
     }
 
     std::string Crypto::Base64Encode(const std::string &inputString) {
-        std::string out;
-
-        int val = 0, valb = -6;
-        for (unsigned char c: inputString) {
-            val = (val << 8) + c;
-            valb += 8;
-            while (valb >= 0) {
-                out.push_back(_base64Chars[(val >> valb) & 0x3F]);
-                valb -= 6;
-            }
-        }
-        if (valb > -6)
-            out.push_back(_base64Chars[((val << 8) >> (valb + 8)) & 0x3F]);
-        while (out.size() % 4)
-            out.push_back('=');
-        return out;
-    }
-
-    std::string Crypto::Base64Encode(unsigned char *input) {
-        std::string out;
-
-        int val = 0, valb = -6;
-        for (unsigned char *c = input; c != input + strlen(reinterpret_cast<const char *>(input)); c++) {
-            val = (val << 8) + *c;
-            valb += 8;
-            while (valb >= 0) {
-                out.push_back(_base64Chars[(val >> valb) & 0x3F]);
-                valb -= 6;
-            }
-        }
-        if (valb > -6)
-            out.push_back(_base64Chars[((val << 8) >> (valb + 8)) & 0x3F]);
-        while (out.size() % 4)
-            out.push_back('=');
-        return out;
+        std::istringstream in(inputString);
+        std::ostringstream out;
+        Poco::Base64Encoder encoder(out);
+        Poco::StreamCopier::copyStream(in, encoder);
+        encoder.close();
+        return out.str();
     }
 
     std::string Crypto::Base64Decode(const std::string &encodedString) {
-
-        size_t in_len = encodedString.size();
-        int i = 0;
-        int j = 0;
-        int in_ = 0;
-        unsigned char char_array_4[4], char_array_3[3];
-        std::string ret;
-
-        while (in_len-- && (encodedString[in_] != '=') && IsBase64(encodedString[in_])) {
-            char_array_4[i++] = encodedString[in_];
-            in_++;
-            if (i == 4) {
-                for (i = 0; i < 4; i++)
-                    char_array_4[i] = _base64Chars.find((char) char_array_4[i]);
-
-                char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-                char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-                char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
-
-                for (i = 0; (i < 3); i++)
-                    ret += (char) char_array_3[i];
-                i = 0;
-            }
-        }
-
-        if (i) {
-            for (j = i; j < 4; j++)
-                char_array_4[j] = 0;
-
-            for (j = 0; j < 4; j++)
-                char_array_4[j] = _base64Chars.find((char) char_array_4[j]);
-
-            char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-            char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-            char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
-
-            for (j = 0; (j < i - 1); j++)
-                ret += (char) char_array_3[j];
-        }
-
-        return ret;
+        std::istringstream in(encodedString);
+        std::ostringstream out;
+        Poco::Base64Decoder decoder(in);
+        Poco::StreamCopier::copyStream(decoder, out);
+        return out.str();
     }
 
-    std::string Crypto::HexEncode(const std::array<unsigned char, EVP_MAX_MD_SIZE> hash) {
+    std::string Crypto::HexEncode(const std::string &inputString) {
         std::stringstream ss;
-        for (unsigned char i: hash) {
-            ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(i);
-        }
-        return {ss.str(), 0, hash.size()};
-    }
-
-    std::string Crypto::HexEncode(const std::string &hash) {
-        return HexEncode((unsigned char *) hash.c_str(), (int) hash.length());
+        ss.str("");
+        Poco::HexBinaryEncoder encoder(ss);
+        encoder << inputString;
+        encoder.close();
+        return ss.str();
     }
 
     std::string Crypto::HexEncode(unsigned char *hash, int size) {
-        std::stringstream ss;
-        for (int i = 0; i < size; i++) {
-            ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(hash[i]);
-        }
-        return {ss.str()};
+        return HexEncode({(char *) hash, static_cast<size_t>(size)});
     }
 
     std::string Crypto::HexDecode(const std::string &hex) {
-        int len = hex.length();
-        std::string newString;
-        for (int i = 0; i < len; i += 2) {
-            std::string byte = hex.substr(i, 2);
-            char chr = (char) (int) strtol(byte.c_str(), nullptr, 16);
-            newString.push_back(chr);
-        }
-        return newString;
+        std::stringstream ss;
+        ss.str("");
+        Poco::HexBinaryDecoder decoder(ss);
+        ss << hex;
+        std::stringstream ss1;
+        ss1 << decoder.rdbuf();
+        return ss1.str();
     }
 
     EVP_PKEY *Crypto::GenerateRsaKeys(unsigned int keyLength) {
         EVP_PKEY *pRSA = EVP_RSA_gen(keyLength);
         if (!pRSA) {
-            log_error << "Could not generate RSA key, length:" << keyLength;
+            log_error << "Could not generate RSA key, length: " << keyLength;
             return nullptr;
         }
-        std::string tmp = GetRsaPublicKey(pRSA);
         return pRSA;
     }
 
@@ -486,45 +411,48 @@ namespace AwsMock::Core {
 
     std::string Crypto::RsaEncrypt(EVP_PKEY *keyPair, const std::string &in) {
 
+        size_t outLen;
+        auto inLen = static_cast<size_t>(in.length());
+        auto bytes = reinterpret_cast<const unsigned char *>(in.c_str());
+
         EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new(keyPair, nullptr);
         EVP_PKEY_encrypt_init(ctx);
         EVP_PKEY_CTX_set_rsa_padding(ctx, RSA_PKCS1_OAEP_PADDING);
 
-        size_t outLen;
-        if (EVP_PKEY_encrypt(ctx, nullptr, &outLen, reinterpret_cast<const unsigned char *>(in.c_str()), in.length()) < 0) {
-            log_error << "Could not get length of encrypted string";
+        // Get output length
+        if (EVP_PKEY_encrypt(ctx, nullptr, &outLen, bytes, inLen) <= 0) {
+            log_error << "Could not get length of encrypted string, error: " << ERR_error_string(ERR_get_error(), nullptr);
         };
 
         auto *encrypt = (unsigned char *) OPENSSL_malloc(outLen);
-        if (EVP_PKEY_encrypt(ctx, encrypt, &outLen, reinterpret_cast<const unsigned char *>(in.c_str()), in.length()) < 0) {
-            log_error << "Could not encrypt string";
+        if (EVP_PKEY_encrypt(ctx, encrypt, &outLen, bytes, inLen) <= 0) {
+            log_error << "Could not encrypt string, error: " << ERR_error_string(ERR_get_error(), nullptr);
         }
         EVP_PKEY_CTX_free(ctx);
-        encrypt[outLen] = '0';
-        return Base64Encode({reinterpret_cast<const char *>(encrypt), outLen});
+        return {reinterpret_cast<const char *>(encrypt), static_cast<size_t>(outLen)};
     }
 
     std::string Crypto::RsaDecrypt(EVP_PKEY *keyPair, const std::string &in) {
 
-        std::string inString = Base64Decode(in);
-        auto *bytes = reinterpret_cast<const unsigned char *>(inString.c_str());
+        size_t outLen;
+        int inLen = static_cast<int>(in.length());
+        auto *bytes = (unsigned char *) in.c_str();
 
         EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new(keyPair, nullptr);
         EVP_PKEY_decrypt_init(ctx);
         EVP_PKEY_CTX_set_rsa_padding(ctx, RSA_PKCS1_OAEP_PADDING);
 
-        size_t outLen;
-        if (EVP_PKEY_decrypt(ctx, nullptr, &outLen, bytes, inString.length()) < 0) {
-            log_error << "Could not get length of encrypted string";
+        // Get output length
+        if (EVP_PKEY_decrypt(ctx, nullptr, &outLen, bytes, inLen) <= 0) {
+            log_error << "Could not get length of encrypted string, error: " << ERR_error_string(ERR_get_error(), nullptr);
         };
 
         auto *decrypt = (unsigned char *) OPENSSL_malloc(outLen);
-        if (EVP_PKEY_decrypt(ctx, decrypt, &outLen, bytes, inString.length()) < 0) {
-            log_error << "Could not decrypt string";
+        if (EVP_PKEY_decrypt(ctx, decrypt, &outLen, bytes, inLen) <= 0) {
+            log_error << "Could not decrypt string, error: " << ERR_error_string(ERR_get_error(), nullptr);
         }
         EVP_PKEY_CTX_free(ctx);
-        decrypt[outLen] = '\0';
-        return {reinterpret_cast<const char *>(decrypt)};
+        return {(char *) decrypt, outLen};
     }
 
 }// namespace AwsMock::Core

@@ -20,6 +20,12 @@
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/dto/kms/CreateKeyRequest.h>
 #include <awsmock/dto/kms/CreateKeyResponse.h>
+#include <awsmock/dto/kms/DecryptRequest.h>
+#include <awsmock/dto/kms/DecryptResponse.h>
+#include <awsmock/dto/kms/DescribeKeyRequest.h>
+#include <awsmock/dto/kms/DescribeKeyResponse.h>
+#include <awsmock/dto/kms/EncryptRequest.h>
+#include <awsmock/dto/kms/EncryptResponse.h>
 #include <awsmock/dto/kms/Key.h>
 #include <awsmock/dto/kms/ListKey.h>
 #include <awsmock/dto/kms/ListKeysRequest.h>
@@ -81,7 +87,74 @@ namespace AwsMock::Service {
          */
         Dto::KMS::ScheduledKeyDeletionResponse ScheduleKeyDeletion(const Dto::KMS::ScheduleKeyDeletionRequest &request);
 
+        /**
+         * Describe a key
+         *
+         * @param request describe key request
+         * @return DescribeKeyResponse
+         * @throws Core::DatabaseException
+         * @see Dto::KMS::DescribeKeyRequest
+         * @see Dto::KMS::DescribeKeyResponse
+         */
+        Dto::KMS::DescribeKeyResponse DescribeKey(const Dto::KMS::DescribeKeyRequest &request);
+
+        /**
+         * Encrypt a plain text using a given algorithm
+         *
+         * @param request encrypt request
+         * @return EncryptResponse
+         * @throws Core::DatabaseException, Core::ServiceException
+         * @see Dto::KMS::EncryptRequest
+         * @see Dto::KMS::EncryptResponse
+         */
+        Dto::KMS::EncryptResponse Encrypt(const Dto::KMS::EncryptRequest &request);
+
+        /**
+         * Decrypts a cipher text using a given algorithm
+         *
+         * @param request decrypt request
+         * @return DecryptResponse
+         * @throws Core::DatabaseException, Core::ServiceException
+         * @see Dto::KMS::DecryptRequest
+         * @see Dto::KMS::DecryptResponse
+         */
+        Dto::KMS::DecryptResponse Decrypt(const Dto::KMS::DecryptRequest &request);
+
       private:
+
+        /**
+         * Encrypt a plaintext.
+         *
+         * @param key KMS key
+         * @param plainText plain text
+         * @return ciphertext
+         */
+        static std::string EncryptPlaintext(const Database::Entity::KMS::Key &key, const std::string &plainText);
+
+        /**
+         * Decrypt a ciphertext.
+         *
+         * @param key KMS key
+         * @param ciphertext cipher text
+         * @return plaintext
+         */
+        static std::string DecryptPlaintext(const Database::Entity::KMS::Key &key, const std::string &ciphertext);
+
+        /**
+         * Read an EVP_PKEY from a string.
+         *
+         * @param inKey key as string
+         * @return *EVP_PKEY
+         */
+        static EVP_PKEY *ReadRsaPrivateKey(const std::string &inKey);
+
+        /**
+         * Read an EVP_PKEY from a string.
+         *
+         * @param inKey key as string
+         * @return *EVP_PKEY
+         */
+        static EVP_PKEY *ReadRsaPublicKey(const std::string &ublicKey);
 
         /**
          * Account ID

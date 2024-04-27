@@ -150,7 +150,7 @@ namespace AwsMock::Core {
          *
          * @param region AWS region
          * @param accountId AWS account ID
-         * @param secretId ID of the secret (name + 6 hex digits)
+         * @param kmsId ID of the key
          */
         static std::string CreateKMSKeyArn(const std::string &region, const std::string &accountId, const std::string &kmsId);
 

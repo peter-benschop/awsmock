@@ -52,4 +52,9 @@
 #define TRANSFER_SERVER_UPLOAD_COUNT "transfer_upload_count_total"
 #define TRANSFER_SERVER_DOWNLOAD_COUNT "transfer_download_count_total"
 
+#define KMS_KEY_COUNT "kms_key_count_total"
+#define KMS_KEYACCESS_COUNT "kms_key_access_count_total"
+#define KMS_ENCRYPTION_COUNT "kms_encryption_count_totel"
+#define KMS_DECRYPTION_COUNT "kms_decryption_count_totel"
+
 #endif// AWSMOCK_CORE_METRIC_DEFINITION_H

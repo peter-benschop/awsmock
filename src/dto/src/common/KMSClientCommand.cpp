@@ -15,7 +15,7 @@ namespace AwsMock::Dto::Common {
         this->region = awsRegion;
         this->user = awsUser;
         this->method = httpMethod;
-        this->contentType = Core::HttpUtils::GetHeaderValue(request, "Content-Type");
+        this->contentType = request.getContentType();
         this->payload = Core::HttpUtils::GetBodyAsString(request);
 
         if (userAgent.clientCommand.empty()) {

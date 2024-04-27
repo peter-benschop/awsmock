@@ -180,8 +180,8 @@ namespace AwsMock::Core {
         int len = (int) testText.length();
 
         // act
-        unsigned char *result1 = Crypto::Aes256EncryptString((unsigned char *) testText.c_str(), &len, key);
-        unsigned char *result2 = Crypto::Aes256DecryptString(result1, &len, key);
+        unsigned char *result1 = Crypto::Aes256EncryptString((unsigned char *) testText.c_str(), &len, (unsigned char *) key.c_str());
+        unsigned char *result2 = Crypto::Aes256DecryptString(result1, &len, (unsigned char *) key.c_str());
 
         // assert
         EXPECT_TRUE(strcasecmp(reinterpret_cast<const char *>(result2), reinterpret_cast<const char *>(result1)));
@@ -190,7 +190,7 @@ namespace AwsMock::Core {
     TEST_F(CryptoTest, GenerateRsaKeyTest) {
 
         // arrange
-        std::string testText = "This is a super secure text";
+        std::string testText = "This_is_a_super_secure_text";
 
         // Generate key pair and initialize
         EVP_PKEY *keyPair = Crypto::GenerateRsaKeys(4096);

@@ -1,42 +1,42 @@
 //
-// Created by vogje01 on 4/26/24.
+// Created by vogje01 on 4/25/24.
 //
 
-#ifndef AWSMOCK_DTO_KMS_LIST_KEY_H
-#define AWSMOCK_DTO_KMS_LIST_KEY_H
+#ifndef AWSMOCK_DTO_KMS_DESCRIBE_KEY_REQUEST_H
+#define AWSMOCK_DTO_KMS_DESCRIBE_KEY_REQUEST_H
 
 // C++ standard includes
 #include <string>
-
-// Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
+#include <vector>
 
 // AwsMock includes
 #include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/kms/KeySpec.h>
-#include <awsmock/dto/kms/KeyState.h>
 #include <awsmock/dto/kms/KeyUsage.h>
 
 namespace AwsMock::Dto::KMS {
 
     /**
-     * KMS metadata
+     * Create KMS key request
      *
      * Example:
      * <pre>
      * {
-     *   "KeyArn": "string",
-     *   "KeyId": "string",
+     *   "GrantTokens": [ "string" ],
+     *   "KeyId": "string"
      * }
      * </pre>
      *
      * @author jens.vogt@opitz-consulting.com
      */
-    struct ListKey {
+    struct DescribeKeyRequest {
+
+        /**
+         * AWS region
+         */
+        std::string region;
 
         /**
          * Key ID
@@ -44,16 +44,16 @@ namespace AwsMock::Dto::KMS {
         std::string keyId;
 
         /**
-         * Arn
+         * Grant token
          */
-        std::string keyArn;
+        std::vector<std::string> grantTokens;
 
         /**
-         * Convert to a JSON object
+         * Converts the JSON string to DTO.
          *
-         * @return JSON object
-         */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+         * @param jsonString JSON string
+        */
+        void FromJson(const std::string &jsonString);
 
         /**
          * Convert to a JSON string
@@ -63,16 +63,9 @@ namespace AwsMock::Dto::KMS {
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Convert from JSON representation
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
          * Converts the DTO to a string representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as JSON string.
          */
         [[nodiscard]] std::string ToString() const;
 
@@ -81,9 +74,9 @@ namespace AwsMock::Dto::KMS {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ListKey &r);
+        friend std::ostream &operator<<(std::ostream &os, const DescribeKeyRequest &r);
     };
 
 }// namespace AwsMock::Dto::KMS
 
-#endif// AWSMOCK_DTO_KMS_LIST_KEY_H
+#endif// AWSMOCK_DTO_KMS_DESCRIBE_KEY_REQUEST_H

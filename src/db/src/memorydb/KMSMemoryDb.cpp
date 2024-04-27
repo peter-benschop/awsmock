@@ -68,6 +68,11 @@ namespace AwsMock::Database {
         return keyList;
     }
 
+    long KMSMemoryDb::CountKeys() {
+
+        return (long) _keys.size();
+    }
+
     Entity::KMS::Key KMSMemoryDb::CreateKey(const Entity::KMS::Key &topic) {
         Poco::ScopedLock loc(_keyMutex);
 
@@ -76,6 +81,7 @@ namespace AwsMock::Database {
         log_trace << "Key created, oid: " << oid;
         return GetKeyById(oid);
     }
+
     Entity::KMS::Key KMSMemoryDb::UpdateKey(const Entity::KMS::Key &key) {
 
         Poco::ScopedLock lock(_keyMutex);
