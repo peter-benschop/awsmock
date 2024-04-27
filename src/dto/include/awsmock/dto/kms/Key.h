@@ -17,9 +17,11 @@
 #include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/dto/kms/EncryptionAlgorithm.h>
 #include <awsmock/dto/kms/KeySpec.h>
 #include <awsmock/dto/kms/KeyState.h>
 #include <awsmock/dto/kms/KeyUsage.h>
+#include <awsmock/dto/kms/Origin.h>
 
 namespace AwsMock::Dto::KMS {
 
@@ -67,7 +69,7 @@ namespace AwsMock::Dto::KMS {
      *     "Id": "string"
      *   }
      * }
-     * <pre>
+     * </pre>
      *
      * @author jens.vogt@opitz-consulting.com
      */
@@ -112,6 +114,26 @@ namespace AwsMock::Dto::KMS {
          * Creation date
          */
         long creationDate;
+
+        /**
+         * Deletion date
+         */
+        long deletionDate;
+
+        /**
+         * Enabled flag
+         */
+        bool enabled;
+
+        /**
+         * Origin
+         */
+        Origin origin;
+
+        /**
+         * Encryption algorithms
+         */
+        std::vector<Dto::KMS::EncryptionAlgorithm> encryptionAlgorithms;
 
         /**
          * Convert to a JSON object

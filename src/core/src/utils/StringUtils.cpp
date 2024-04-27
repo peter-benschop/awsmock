@@ -98,10 +98,21 @@ namespace AwsMock::Core {
         return result;
     }
 
-    std::string StringUtils::StripWhiteSpaces(const std::string &str) {
-        if (str.find_first_not_of(" \t\n\v\f\r") == std::string::npos) {
-            return "";
-        }
+    std::string StringUtils::StripWhiteSpaces(std::string &str) {
+        const std::string &chars = "\t\n\r\v\f";
+        str.erase(remove_if(str.begin(), str.end(), [&chars](const char &c) {
+                      return chars.find(c) != std::string::npos;
+                  }),
+                  str.end());
+        return str;
+    }
+
+    std::string StringUtils::StripLineEndings(std::basic_string<char, std::char_traits<char>, std::allocator<char>> str) {
+        const std::string &chars = "\n\r";
+        str.erase(remove_if(str.begin(), str.end(), [&chars](const char &c) {
+                      return chars.find(c) != std::string::npos;
+                  }),
+                  str.end());
         return str;
     }
 

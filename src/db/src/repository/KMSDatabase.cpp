@@ -137,6 +137,29 @@ namespace AwsMock::Database {
         return keyList;
     }
 
+    long KMSDatabase::CountKeys() {
+
+        if (_useDatabase) {
+
+            try {
+                auto client = GetClient();
+                mongocxx::collection _keyCollection = (*client)[_databaseName][_keyCollectionName];
+
+                long count = _keyCollection.count_documents(make_document());
+                log_trace << "Key count: " << count;
+                return count;
+
+            } catch (mongocxx::exception::system_error &e) {
+                log_error << "Key count failed, error: " << e.what();
+            }
+
+        } else {
+
+            return _memoryDb.CountKeys();
+        }
+        return -1;
+    }
+
     Entity::KMS::Key KMSDatabase::CreateKey(const Entity::KMS::Key &key) {
 
         if (_useDatabase) {

@@ -53,7 +53,7 @@ namespace AwsMock::Database {
         /**
          * Check existence of key by keyId
          *
-         * @param arn key ID
+         * @param keyId key ID
          * @return true if key already exists
          * @throws DatabaseException
          */
@@ -93,6 +93,14 @@ namespace AwsMock::Database {
          * @return KeyList
          */
         Entity::KMS::KeyList ListKeys(const std::string &region = {});
+
+        /**
+         * Returns the total number of keys
+         *
+         * @return total number of keys
+         * @throws DatabaseException
+         */
+        long CountKeys();
 
         /**
          * Create a new topic in the KMS topic table

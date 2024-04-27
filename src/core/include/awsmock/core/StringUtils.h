@@ -106,9 +106,17 @@ namespace AwsMock::Core {
          * Strip whitespaces
          *
          * @param s string to split
-         * @return string having all whiteplaces removed
+         * @return string having all whitespaces removed
          */
-        static std::string StripWhiteSpaces(const std::string &s);
+        static std::string StripWhiteSpaces(std::string &s);
+
+        /**
+         * Strip line endings
+         *
+         * @param s string to split
+         * @return string having all line endings removed
+         */
+        static std::string StripLineEndings(std::basic_string<char, std::char_traits<char>, std::allocator<char>> s);
 
         /**
          * Strip beginning of string
@@ -238,23 +246,10 @@ namespace AwsMock::Core {
          * @param s input string
          * @return trimmed string
          */
-        static inline std::string Trim(std::string &s) {
+        static inline std::string Trim(std::basic_string<char> s) {
             s = Rtrim(s);
             s = Ltrim(s);
             return s;
-        }
-
-        /**
-         * Strip common line endings.
-         *
-         * @param input input string
-         * @return string with stripped line endings.
-         */
-        static inline std::string StripLineEndings(const std::string &input) {
-            std::string output;
-            output.reserve(input.length());
-            std::copy_if(input.begin(), input.end(), std::back_inserter(output), [](char c) { return c != '\r' && c != '\n'; });
-            return output;
         }
 
         /**

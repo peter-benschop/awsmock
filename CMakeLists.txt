@@ -1,31 +1,28 @@
 cmake_minimum_required(VERSION 3.18)
 project(aws-mock)
 
-# required modules for our task
-set(CMAKE_CXX_STANDARD 20)
 set(BUILD_SHARED_LIBS OFF)
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dist/modules/modules)
-
-#set(CMAKE_CXX_FLAGS "-Wstringop-overread")
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 # Doxygen
-option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation (requires Doxygen)" ON)
-
-# Semantic versioning (sv4git)
-execute_process(COMMAND dist/bin/git-sv cv OUTPUT_VARIABLE CMAKE_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-configure_file(src/core/include/awsmock/core/Version.h.in src/core/include/awsmock/core/Version.h)
+option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation (requires Doxygen and dot)" ON)
 
 # Set defaults
-IF(NOT CMAKE_BUILD_TYPE)
+IF (NOT CMAKE_BUILD_TYPE)
     SET(CMAKE_BUILD_TYPE Release CACHE PATH "" FORCE)
-ENDIF()
-IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+ENDIF ()
+IF (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     SET(CMAKE_INSTALL_PREFIX /usr CACHE PATH "" FORCE)
-ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+ENDIF (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 
-message("-- Building ${PROJECT_NAME} ${CMAKE_VERSION} type: ${CMAKE_BUILD_TYPE}, install prefix: ${CMAKE_INSTALL_PREFIX}")
+# Current version
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/src/core/include/awsmock/core/Version.h" ver)
+string(REGEX MATCH "#define PROJECT_VERSION \"([0-9\.]+)\"" _ ${ver})
+
+# Build message
+message("-- Building ${PROJECT_NAME} v${CMAKE_MATCH_1} type: ${CMAKE_BUILD_TYPE}, install prefix: ${CMAKE_INSTALL_PREFIX}")
 
 # Testing
 enable_testing()

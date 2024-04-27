@@ -9,12 +9,12 @@
 #include <awsmock/core/MetricDefinition.h>
 #include <awsmock/core/MetricService.h>
 #include <awsmock/core/Timer.h>
-#include <awsmock/repository/SNSDatabase.h>
+#include <awsmock/repository/KMSDatabase.h>
 
 namespace AwsMock::Service {
 
     /**
-     * SNS monitoring thread
+     * KMS monitoring thread
      *
      * @author jens.vogt@opitz-consulting.com
      */
@@ -57,7 +57,7 @@ namespace AwsMock::Service {
         /**
          * Database connection
          */
-        Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
+        Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
 
         /**
          * Period

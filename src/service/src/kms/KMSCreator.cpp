@@ -65,11 +65,11 @@ namespace AwsMock::Service {
         Core::Crypto::CreateAes256Key(keyMaterial, iv);
 
         // Base64 hashing
-        std::string heyKex = Core::Crypto::HexEncode(keyMaterial, 32);
+        std::string hexKey = Core::Crypto::HexEncode(keyMaterial, 32);
         std::string hexIv = Core::Crypto::HexEncode(iv, 16);
         log_debug << "KMS keys created";
 
-        key.aes256Key = heyKex;
+        key.aes256Key = hexKey;
         key.aes256Iv = hexIv;
 
         log_debug << "AES256 KMS key created, keyId: " << key.keyId;

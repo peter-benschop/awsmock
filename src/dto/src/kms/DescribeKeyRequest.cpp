@@ -2,11 +2,11 @@
 // Created by vogje01 on 4/25/24.
 //
 
-#include <awsmock/dto/kms/ScheduleKeyDeletionRequest.h>
+#include <awsmock/dto/kms/DescribeKeyRequest.h>
 
 namespace AwsMock::Dto::KMS {
 
-    void ScheduleKeyDeletionRequest::FromJson(const std::string &jsonString) {
+    void DescribeKeyRequest::FromJson(const std::string &jsonString) {
 
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(jsonString);
@@ -15,9 +15,14 @@ namespace AwsMock::Dto::KMS {
         try {
 
             // Attributes
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
             Core::JsonUtils::GetJsonValueString("KeyId", rootObject, keyId);
-            Core::JsonUtils::GetJsonValueInt("PendingWindowInDays", rootObject, pendingWindowInDays);
+
+            if (rootObject->has("GrantTokens")) {
+                Poco::JSON::Array::Ptr jsonTokenArray = rootObject->getArray("GrantTokens");
+                for (int i = 0; i < jsonTokenArray->size(); i++) {
+                    grantTokens.emplace_back(jsonTokenArray->getElement<std::string>(i));
+                }
+            }
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
@@ -25,13 +30,17 @@ namespace AwsMock::Dto::KMS {
         }
     }
 
-    std::string ScheduleKeyDeletionRequest::ToJson() const {
+    std::string DescribeKeyRequest::ToJson() const {
 
         try {
             Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
             rootJson.set("KeyId", keyId);
-            rootJson.set("PendingWindowInDays", pendingWindowInDays);
+
+            Poco::JSON::Array tokenArray;
+            for (const auto &token: grantTokens) {
+                tokenArray.add(token);
+            }
+            rootJson.set("GrantTokens", tokenArray);
 
             return Core::JsonUtils::ToJsonString(rootJson);
 
@@ -41,14 +50,15 @@ namespace AwsMock::Dto::KMS {
         }
     }
 
-    std::string ScheduleKeyDeletionRequest::ToString() const {
+
+    std::string DescribeKeyRequest::ToString() const {
         std::stringstream ss;
         ss << (*this);
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const ScheduleKeyDeletionRequest &r) {
-        os << "ScheduleKeyDeletionRequest=" << r.ToJson();
+    std::ostream &operator<<(std::ostream &os, const DescribeKeyRequest &r) {
+        os << "DescribeKeyRequest=" << r.ToJson();
         return os;
     }
 

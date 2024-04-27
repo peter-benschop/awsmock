@@ -27,6 +27,7 @@
 // Openssl includes
 #include <openssl/aes.h>
 #include <openssl/bio.h>
+#include <openssl/err.h>
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
 #include <openssl/md5.h>
@@ -42,6 +43,13 @@
 
 // 64kB buffer
 #define AWSMOCK_BUFFER_SIZE 4096
+
+// Poco
+#include <Poco/Base64Decoder.h>
+#include <Poco/Base64Encoder.h>
+#include <Poco/HexBinaryDecoder.h>
+#include <Poco/HexBinaryEncoder.h>
+#include <Poco/StreamCopier.h>
 
 #define CRYPTO_RSA_KEY_LEN_4096 4096
 #define CRYPTO_RSA_KEY_LEN_2048 2048
@@ -165,7 +173,7 @@ namespace AwsMock::Core {
          * @param key encryption key
          * @return encrypted string
          */
-        static unsigned char *Aes256EncryptString(unsigned char *plaintext, int *len, const std::string &key);
+        static unsigned char *Aes256EncryptString(unsigned char *plaintext, int *len, unsigned char *key);
 
         /**
          * AES 256 description
@@ -175,7 +183,7 @@ namespace AwsMock::Core {
          * @param key encryption key
          * @return decrypted string
          */
-        static unsigned char *Aes256DecryptString(unsigned char *ciphertext, int *len, const std::string &key);
+        static unsigned char *Aes256DecryptString(unsigned char *ciphertext, int *len, unsigned char *key);
 
         /**
          * Base64 encoding.
@@ -184,14 +192,6 @@ namespace AwsMock::Core {
          * @return BASE64 encoded string.
          */
         static std::string Base64Encode(const std::string &inputString);
-
-        /**
-         * Base64 encoding.
-         *
-         * @param input input char array
-         * @return BASE64 encoded string.
-         */
-        static std::string Base64Encode(unsigned char *input);
 
         /**
          * Base64 decoding.
@@ -205,9 +205,10 @@ namespace AwsMock::Core {
          * Convert to hex string
          *
          * @param input input byte array
+         * @param len input length
          * @return hex encoded string
          */
-        static std::string HexEncode(std::array<unsigned char, EVP_MAX_MD_SIZE> input);
+        static std::string HexEncode(const unsigned char *buf, long &len);
 
         /**
          * Convert to hex string
@@ -303,6 +304,8 @@ namespace AwsMock::Core {
          * @param ctx openssl context
          */
         static int Aes256DecryptionInit(unsigned char *key_data, int key_data_len, unsigned char *salt, EVP_CIPHER_CTX *ctx);
+
+        static unsigned int _salt[];
     };
 
     static inline bool IsBase64(unsigned char c) {

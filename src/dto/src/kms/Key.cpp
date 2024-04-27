@@ -29,7 +29,20 @@ namespace AwsMock::Dto::KMS {
                 keyState = KeyStateFromString(tmpStr);
             }
             Core::JsonUtils::GetJsonValueString("Description", rootObject, description);
+            Core::JsonUtils::GetJsonValueLong("CreationDate", rootObject, creationDate);
             Core::JsonUtils::GetJsonValueBool("MultiRegion", rootObject, multiRegion);
+            Core::JsonUtils::GetJsonValueBool("Enabled", rootObject, enabled);
+            Core::JsonUtils::GetJsonValueString("Origin", rootObject, tmpStr);
+            if (!tmpStr.empty()) {
+                origin = Dto::KMS::OriginFromString(tmpStr);
+            }
+
+            if (rootObject->has("EncryptionAlgorithms")) {
+                Poco::JSON::Array::Ptr algoArray = rootObject->getArray("EncryptionAlgorithms");
+                for (int i = 0; i < algoArray->size(); i++) {
+                    encryptionAlgorithms.emplace_back(Dto::KMS::EncryptionAlgorithmsFromString(algoArray->getElement<std::string>(i)));
+                }
+            }
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
@@ -47,7 +60,19 @@ namespace AwsMock::Dto::KMS {
             rootJson.set("KeyUsage", KeyUsageToString(keyUsage));
             rootJson.set("KeyState", KeyStateToString(keyState));
             rootJson.set("Description", description);
+            rootJson.set("CreationDate", creationDate);
+            rootJson.set("DeletionDate", deletionDate);
             rootJson.set("MultiRegion", multiRegion);
+            rootJson.set("Enabled", enabled);
+            rootJson.set("Origin", OriginToString(origin));
+
+            // Algorithms
+            Poco::JSON::Array algoArray;
+            for (const auto &algo: encryptionAlgorithms) {
+                algoArray.add(algo);
+            }
+            rootJson.set("EncryptionAlgorithms", algoArray);
+
             return rootJson;
 
         } catch (Poco::Exception &exc) {

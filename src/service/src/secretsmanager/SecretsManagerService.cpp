@@ -48,7 +48,8 @@ namespace AwsMock::Service {
             if (!request.secretString.empty()) {
                 auto *plaintext = (unsigned char *) request.secretString.c_str();
                 int len = (int) strlen(reinterpret_cast<const char *>(plaintext));
-                secret.secretString = Core::Crypto::Base64Encode(Core::Crypto::Aes256EncryptString(plaintext, &len, _kmsKey));
+                unsigned char *encrypted = Core::Crypto::Aes256EncryptString(plaintext, &len, (unsigned char *) _kmsKey.c_str());
+                secret.secretString = Core::Crypto::Base64Encode({(char *) encrypted, static_cast<size_t>(len)});
             } else {
                 secret.secretBinary = request.secretBinary;
             }
@@ -110,15 +111,17 @@ namespace AwsMock::Service {
             response.arn = secret.arn;
             response.versionId = secret.versionId;
             if (!secret.secretString.empty()) {
-                std::string base64Decoded = Core::Crypto::Base64Decode(secret.secretString);
-                int len = (int) base64Decoded.length();
-                response.secretString = std::string(reinterpret_cast<char *>(Core::Crypto::Aes256DecryptString((unsigned char *) base64Decoded.c_str(), &len, _kmsKey)));
+                unsigned char *base64Decoded;
+                int len;
+                base64Decoded = (unsigned char *) Core::Crypto::Base64Decode(secret.secretString).c_str();
+                response.secretString = std::string(reinterpret_cast<char *>(Core::Crypto::Aes256DecryptString(base64Decoded, &len, (unsigned char *) _kmsKey.c_str())));
                 response.secretString[len] = '\0';
-            } else if (!secret.secretString.empty()) {
+            } /*else if (!secret.secretString.empty()) {
                 std::string base64Decoded = Core::Crypto::Base64Decode(secret.secretString);
                 int len = (int) base64Decoded.length();
-                response.secretBinary = std::string(reinterpret_cast<char *>(Core::Crypto::Aes256DecryptString((unsigned char *) base64Decoded.c_str(), &len, _kmsKey)));
-            } else {
+                response.secretBinary = std::string(reinterpret_cast<char *>(Core::Crypto::Aes256DecryptString((unsigned char *) base64Decoded.c_str(), &len, (unsigned char *) _kmsKey.c_str())));
+            }*/
+            else {
                 log_warning << "Neither string nor binary, secretId: " << request.secretId;
             }
             log_debug << "Get secret value, secretId: " << request.secretId;

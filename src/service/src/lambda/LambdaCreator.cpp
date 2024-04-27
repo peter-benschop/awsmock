@@ -104,7 +104,8 @@ namespace AwsMock::Service {
             ofs.close();
         }
 
-        std::string decodedZipFile = Core::Crypto::Base64Decode(zipFile);
+        int len;
+        std::string decoded = Core::Crypto::Base64Decode(zipFile);
 
         // Create directory
         try {
@@ -116,7 +117,7 @@ namespace AwsMock::Service {
                 Core::DirUtils::EnsureDirectory(classesDir);
 
                 // Decompress
-                std::stringstream input(decodedZipFile);
+                std::stringstream input(decoded);
                 Poco::Zip::Decompress dec(input, Poco::Path(classesDir));
                 dec.decompressAllFiles();
                 input.clear();
@@ -129,7 +130,7 @@ namespace AwsMock::Service {
 
                 // Write to temp file
                 std::ofstream ofs(_tempDir + "/zipfile.zip");
-                ofs << decodedZipFile;
+                ofs << decoded;
                 ofs.close();
 
                 // Decompress

@@ -61,7 +61,7 @@ namespace AwsMock::Service {
          *
          * @param key key
          * @param length length
-         * @return pointer to RSA key pair
+         * @see AwsMock::Core::CryptoUtils
          */
         [[maybe_unused]] static void GenerateRsaKeyPair(Database::Entity::KMS::Key &key, int length);
     };
