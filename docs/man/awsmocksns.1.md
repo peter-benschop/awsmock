@@ -1,24 +1,28 @@
 ---
 title: awsmocksns(1)
 section: 1
+version: 1.0.1
+builddate: 1.0.1
+date: $builddate$
 header: awsmocksns AwsMock SNS module
-footer: awsmocksns 0.5.210
-date: December 18, 2023
+footer: awsmocksns $version$
 ---
 
 ## NAME
+
 ```awsmocksns``` AwsMock SNS module
 
 ## DESCRIPTION
-Amazon Simple Notification Service (Amazon SNS) is a managed service that provides message delivery from publishers to 
-subscribers (also known as producers and consumers). Publishers communicate asynchronously with subscribers by sending 
-messages to a topic, which is a logical access point and communication channel. Clients can subscribe to the SNS topic 
-and receive published messages using a supported endpoint type, such as Amazon Kinesis Data Firehose, Amazon SQS, AWS 
+
+Amazon Simple Notification Service (Amazon SNS) is a managed service that provides message delivery from publishers to
+subscribers (also known as producers and consumers). Publishers communicate asynchronously with subscribers by sending
+messages to a topic, which is a logical access point and communication channel. Clients can subscribe to the SNS topic
+and receive published messages using a supported endpoint type, such as Amazon Kinesis Data Firehose, Amazon SQS, AWS
 Lambda, HTTP, email, mobile push notifications, and mobile text messages (SMS).
 
 Currently only SQS is supported as endpoint type.
 
-The SQS module can be configured using the ```awslocal``` command. For details of the ```awslocal``` command see the 
+The SQS module can be configured using the ```awslocal``` command. For details of the ```awslocal``` command see the
 corresponding man page ```awslocal(1)```.
 
 ## COMMANDS
@@ -47,6 +51,7 @@ corresponding man page ```awslocal(1)```.
 ## EXAMPLES
 
 To create a new topic:
+
 ```
 awslocal sns create-topic --name test-topic
 {
@@ -55,6 +60,7 @@ awslocal sns create-topic --name test-topic
 ```
 
 To get a list of all currently available topics:
+
 ```
 awslocal sns list-topics
 {
@@ -67,6 +73,7 @@ awslocal sns list-topics
 ```
 
 To subscribe a SQS Queue to a SNS topic:
+
 ```
 awslocal sns subscribe --topic-arn arn:aws:sns:eu-central-1:000000000000:test-topic --protocol sqs --notification-endpoint arn:aws:sqs:eu-central-1:000000000000:test-queue
 {
@@ -75,11 +82,13 @@ awslocal sns subscribe --topic-arn arn:aws:sns:eu-central-1:000000000000:test-to
 ```
 
 To unsubscribe a SQS Queue from a SNS topic:
+
 ```
 awslocal sns unsubscribe --subscription-arn arn:aws:sns:eu-central-1:000000000000:test-topic:2f3cef01-3662-4e66-9180-a11e32e256db
 ```
 
 To publish a message to a topic
+
 ```
 awslocal sns publish --topic-arn arn:aws:sns:eu-central-1:000000000000:test-topic --message hello
 {
@@ -88,11 +97,13 @@ awslocal sns publish --topic-arn arn:aws:sns:eu-central-1:000000000000:test-topi
 ```
 
 To tag a topic
+
 ```
 awslocal sns tag-resource --resource-arn arn:aws:sns:eu-central-1:000000000000:test-topic --tags=Key=Team,Value=Alpha
 ```
 
 To delete a topic:
+
 ```
 awslocal sns delete-topic --topic-arn arn:aws:sns:eu-central-1:000000000000:test-topic
 ```
@@ -102,7 +113,8 @@ awslocal sns delete-topic --topic-arn arn:aws:sns:eu-central-1:000000000000:test
 Jens Vogt <jens.vogt@opitz-consulting.com>
 
 ## VERSION
-0.5.210
+
+$version$ ($builddate$)
 
 ## BUGS
 
@@ -111,4 +123,4 @@ Bugs and enhancement requests can be reported and filed at https://github.com/je
 ## SEE ALSO
 
 ```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocks3(1)```, ```awsmocksqs(1)```, ```awsmocklambda(1)```,
-```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```, ```awsmocksecretsmanager(1)```
+```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```, ```awsmocksecretsmanager(1)```, ```awsmocksqs(1)```

@@ -67,12 +67,8 @@ namespace AwsMock::Database::Entity::SQS {
         Core::JsonUtils::GetJsonValueInt("visibilityTimeout", jsonObject, visibilityTimeout);
         Core::JsonUtils::GetJsonValueString("redriveAllowPolicy", jsonObject, redriveAllowPolicy);
         Core::JsonUtils::GetJsonValueLong("approximateNumberOfMessages", jsonObject, approximateNumberOfMessages);
-        Core::JsonUtils::GetJsonValueLong("approximateNumberOfMessagesDelayed",
-                                          jsonObject,
-                                          approximateNumberOfMessagesDelayed);
-        Core::JsonUtils::GetJsonValueLong("approximateNumberOfMessagesNotVisible",
-                                          jsonObject,
-                                          approximateNumberOfMessagesNotVisible);
+        Core::JsonUtils::GetJsonValueLong("approximateNumberOfMessagesDelayed", jsonObject, approximateNumberOfMessagesDelayed);
+        Core::JsonUtils::GetJsonValueLong("approximateNumberOfMessagesNotVisible", jsonObject, approximateNumberOfMessagesNotVisible);
 
         redrivePolicy.FromJsonObject(jsonObject->getObject("redrivePolicy"));
     }

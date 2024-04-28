@@ -20,6 +20,7 @@
 
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/NumberUtils.h>
 #include <awsmock/entity/secretsmanager/RotationRules.h>

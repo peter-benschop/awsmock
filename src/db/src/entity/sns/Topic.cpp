@@ -55,13 +55,16 @@ namespace AwsMock::Database::Entity::SNS {
         created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
         modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
 
-        bsoncxx::array::view subscriptionsView{mResult.value()["subscriptions"].get_array().value};
-        for (bsoncxx::array::element subscriptionElement: subscriptionsView) {
-            Subscription subscription{
-                    .protocol = bsoncxx::string::to_string(subscriptionElement["protocol"].get_string().value),
-                    .endpoint = bsoncxx::string::to_string(subscriptionElement["endpoint"].get_string().value),
-                    .subscriptionArn = bsoncxx::string::to_string(subscriptionElement["subscriptionArn"].get_string().value)};
-            subscriptions.push_back(subscription);
+        // Subscriptions
+        if (mResult.value().find("subscriptions") != mResult.value().end()) {
+            bsoncxx::array::view subscriptionsView{mResult.value()["subscriptions"].get_array().value};
+            for (bsoncxx::array::element subscriptionElement: subscriptionsView) {
+                Subscription subscription{
+                        .protocol = bsoncxx::string::to_string(subscriptionElement["protocol"].get_string().value),
+                        .endpoint = bsoncxx::string::to_string(subscriptionElement["endpoint"].get_string().value),
+                        .subscriptionArn = bsoncxx::string::to_string(subscriptionElement["subscriptionArn"].get_string().value)};
+                subscriptions.push_back(subscription);
+            }
         }
 
         // Get tags
@@ -86,20 +89,24 @@ namespace AwsMock::Database::Entity::SNS {
         jsonObject.set("topicAttribute", topicAttribute.ToJsonObject());
 
         // Subscription array
-        Poco::JSON::Array jsonSubscriptionArray;
-        for (const auto &subscription: subscriptions) {
-            jsonSubscriptionArray.add(subscription.ToJsonObject());
+        if (!subscriptions.empty()) {
+            Poco::JSON::Array jsonSubscriptionArray;
+            for (const auto &subscription: subscriptions) {
+                jsonSubscriptionArray.add(subscription.ToJsonObject());
+            }
+            jsonObject.set("subscriptions", jsonSubscriptionArray);
         }
-        jsonObject.set("subscriptions", jsonSubscriptionArray);
 
         // Tags array
-        Poco::JSON::Array jsonTagArray;
-        for (const auto &tag: tags) {
-            Poco::JSON::Object jsonTagObject;
-            jsonTagObject.set(tag.first, tag.second);
-            jsonTagArray.add(jsonTagObject);
+        if (!tags.empty()) {
+            Poco::JSON::Array jsonTagArray;
+            for (const auto &tag: tags) {
+                Poco::JSON::Object jsonTagObject;
+                jsonTagObject.set(tag.first, tag.second);
+                jsonTagArray.add(jsonTagObject);
+            }
+            jsonObject.set("tags", jsonTagArray);
         }
-        jsonObject.set("tags", jsonTagArray);
 
         return jsonObject;
     }

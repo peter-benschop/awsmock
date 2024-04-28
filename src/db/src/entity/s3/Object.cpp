@@ -53,11 +53,13 @@ namespace AwsMock::Database::Entity::S3 {
         modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
 
         // Get metadata
-        bsoncxx::document::view metadataView = mResult.value()["metadata"].get_document().value;
-        for (bsoncxx::document::element metadataElement: metadataView) {
-            std::string metadataKey = bsoncxx::string::to_string(metadataElement.key());
-            std::string metadataValue = bsoncxx::string::to_string(metadataView[metadataKey].get_string().value);
-            metadata.emplace(metadataKey, metadataValue);
+        if (mResult.value().find("metadata") != mResult.value().end()) {
+            bsoncxx::document::view metadataView = mResult.value()["metadata"].get_document().value;
+            for (bsoncxx::document::element metadataElement: metadataView) {
+                std::string metadataKey = bsoncxx::string::to_string(metadataElement.key());
+                std::string metadataValue = bsoncxx::string::to_string(metadataView[metadataKey].get_string().value);
+                metadata.emplace(metadataKey, metadataValue);
+            }
         }
     }
 
@@ -75,14 +77,16 @@ namespace AwsMock::Database::Entity::S3 {
         jsonObject.set("internalName", internalName);
         jsonObject.set("versionId", versionId);
 
-        Poco::JSON::Array jsonMetadataArray;
-        for (const auto &meta: metadata) {
-            Poco::JSON::Object jsonMetadata;
-            jsonMetadata.set("name", meta.first);
-            jsonMetadata.set("value", meta.second);
-            jsonMetadataArray.add(jsonMetadata);
+        if (!metadata.empty()) {
+            Poco::JSON::Array jsonMetadataArray;
+            for (const auto &meta: metadata) {
+                Poco::JSON::Object jsonMetadata;
+                jsonMetadata.set("name", meta.first);
+                jsonMetadata.set("value", meta.second);
+                jsonMetadataArray.add(jsonMetadata);
+            }
+            jsonObject.set("metadata", jsonMetadataArray);
         }
-        jsonObject.set("metadata", jsonMetadataArray);
 
         return jsonObject;
     }
@@ -101,12 +105,14 @@ namespace AwsMock::Database::Entity::S3 {
         Core::JsonUtils::GetJsonValueString("internalName", jsonObject, internalName);
         Core::JsonUtils::GetJsonValueString("versionId", jsonObject, versionId);
 
-        Poco::JSON::Array::Ptr jsonMetadataArray = jsonObject->getArray("metadata");
-        for (int i = 0; i < jsonMetadataArray->size(); i++) {
-            Poco::JSON::Object::Ptr jsonMetadataObject = jsonMetadataArray->getObject(i);
-            std::string keyString = jsonMetadataObject->get("name");
-            std::string valueString = jsonMetadataObject->get("value");
-            metadata[keyString] = valueString;
+        if (jsonObject->has("metadata")) {
+            Poco::JSON::Array::Ptr jsonMetadataArray = jsonObject->getArray("metadata");
+            for (int i = 0; i < jsonMetadataArray->size(); i++) {
+                Poco::JSON::Object::Ptr jsonMetadataObject = jsonMetadataArray->getObject(i);
+                std::string keyString = jsonMetadataObject->get("name");
+                std::string valueString = jsonMetadataObject->get("value");
+                metadata[keyString] = valueString;
+            }
         }
     }
 

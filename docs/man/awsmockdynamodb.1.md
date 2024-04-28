@@ -1,29 +1,33 @@
 ---
 title: awsmockdynamodb(1)
 section: 1
+version: 1.0.1
+builddate: 1.0.1
+date: $builddate$
 header: awsmockdynamodb AwsMock DynamoDB module
-footer: awsmockdynamodb 0.5.210
-date: December 18, 2023
+footer: awsmockdynamodb $version$
 ---
 
 ## NAME
+
 ```awsmockdynamodb``` AwsMock DynamoDB module
 
 ## DESCRIPTION
-DynamoDB is a fully managed NoSQL database service provided by AWS. It offers a flexible and highly scalable way to 
-store and retrieve data, making it suitable for a wide range of applications. DynamoDB provides a fast and scalable 
-key-value datastore with support for replication, automatic scaling, data encryption at rest, and on-demand backup, 
+
+DynamoDB is a fully managed NoSQL database service provided by AWS. It offers a flexible and highly scalable way to
+store and retrieve data, making it suitable for a wide range of applications. DynamoDB provides a fast and scalable
+key-value datastore with support for replication, automatic scaling, data encryption at rest, and on-demand backup,
 among other capabilities.
 
-AwsMock supports DynamoDB, allowing you to use the DynamoDB APIs in your local environment to manage key-value and 
-document data models. The supported APIs are available on our API coverage page, which provides information on the 
+AwsMock supports DynamoDB, allowing you to use the DynamoDB APIs in your local environment to manage key-value and
+document data models. The supported APIs are available on our API coverage page, which provides information on the
 extent of DynamoDB’s integration with AwsMock.
 
 The AwsMock DynamoDB module uses the AWS DynamoDB docker image as backing store. For mor information about the AWS
-DynamodDB docker image see 
+DynamodDB docker image see
 https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.DownloadingAndRunning.html#docker
 
-The DynamoDB module can be configured using the ```awslocal``` command. For details of the ```awslocal``` command see 
+The DynamoDB module can be configured using the ```awslocal``` command. For details of the ```awslocal``` command see
 the corresponding man page ```awslocal(1)```.
 
 ## COMMANDS
@@ -52,6 +56,7 @@ the corresponding man page ```awslocal(1)```.
 ## EXAMPLES
 
 To create a new table:
+
 ```
 awslocal dynamodb create-table --table-name test-table --attribute-definitions attributeName=orgaNr,AttributeType=N \
                                --key-schema attributeName=orgaNr,KeyType=HASH \
@@ -89,6 +94,7 @@ awslocal dynamodb create-table --table-name test-table --attribute-definitions a
 ```
 
 To get a list of all currently available tables:
+
 ```
 awslocal dynamodb list-tables
 {
@@ -99,6 +105,7 @@ awslocal dynamodb list-tables
 ```
 
 To delete a lambda function:
+
 ```
 awslocal lambda delete-function --function-name test-function
 ```
@@ -108,7 +115,8 @@ awslocal lambda delete-function --function-name test-function
 Jens Vogt <jens.vogt@opitz-consulting.com>
 
 ## VERSION
-0.5.210
+
+$version$ ($builddate$)
 
 ## BUGS
 
@@ -116,6 +124,6 @@ Bugs and enhancement requests can be reported and filed at https://github.com/je
 
 ## SEE ALSO
 
-```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocks3(1)```, ```awsmocksqs(1)```, ```awsmocksns(1)```, 
-```awsmocklambda(1)```, ```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```, 
-```awsmocksecretsmanager(1)```
+```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocks3(1)```, ```awsmocksqs(1)```, ```awsmocksns(1)```,
+```awsmocklambda(1)```, ```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```,
+```awsmocksecretsmanager(1)```, ```awsmocksqs(1)```

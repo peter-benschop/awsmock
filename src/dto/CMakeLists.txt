@@ -78,19 +78,10 @@ set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCK
 add_subdirectory(tst)
 
 # Includes
-include_directories(include ../core/include ../db/include /usr/include/mongo /usr/include/bsoncxx/v_noabi
-        /usr/include/mongocxx/v_noabi)
+include_directories(include ../core/include ../db/include /usr/include/mongo /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
 
-add_library(${LIBRARY} SHARED ${SOURCES}
-        include/awsmock/dto/secretsmanager/Filter.h
-        include/awsmock/dto/cognito/LambdaConfig.h
-        include/awsmock/dto/docker/Image.h
-        include/awsmock/dto/kms/CreateKeyRequest.h
-        include/awsmock/dto/kms/KeyUsage.h
-        include/awsmock/dto/kms/Key.h
-        src/kms/EncryptRequest.h)
+add_library(${LIBRARY} SHARED ${SOURCES})
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 
 install(TARGETS ${LIBRARY} DESTINATION lib)
-install(TARGETS ${LIBRARY_STATIC} DESTINATION lib)

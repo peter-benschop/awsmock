@@ -45,15 +45,19 @@ namespace AwsMock::Database::Entity::SQS {
 
             // Get tags
             if (mResult.value().find("tags") != mResult.value().end()) {
-                bsoncxx::document::view tagsView = mResult.value()["tags"].get_document().value;
-                for (bsoncxx::document::element tagElement: tagsView) {
-                    std::string key = bsoncxx::string::to_string(tagElement.key());
-                    std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
-                    tags.emplace(key, value);
+                if (mResult.value().find("tags") != mResult.value().end()) {
+                    bsoncxx::document::view tagsView = mResult.value()["tags"].get_document().value;
+                    for (bsoncxx::document::element tagElement: tagsView) {
+                        std::string key = bsoncxx::string::to_string(tagElement.key());
+                        std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
+                        tags.emplace(key, value);
+                    }
                 }
             }
+
         } catch (std::exception &exc) {
             log_error << exc.what();
+            throw Core::DatabaseException(exc.what());
         }
         return *this;
     }
@@ -68,13 +72,15 @@ namespace AwsMock::Database::Entity::SQS {
         jsonObject.set("attributes", attributes.ToJsonObject());
 
         // Tags array
-        Poco::JSON::Array jsonTagArray;
-        for (const auto &tag: tags) {
-            Poco::JSON::Object jsonTagObject;
-            jsonTagObject.set(tag.first, tag.second);
-            jsonTagArray.add(jsonTagObject);
+        if (!tags.empty()) {
+            Poco::JSON::Array jsonTagArray;
+            for (const auto &tag: tags) {
+                Poco::JSON::Object jsonTagObject;
+                jsonTagObject.set(tag.first, tag.second);
+                jsonTagArray.add(jsonTagObject);
+            }
+            jsonObject.set("tags", jsonTagArray);
         }
-        jsonObject.set("tags", jsonTagArray);
 
         return jsonObject;
     }

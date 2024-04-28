@@ -73,13 +73,15 @@ namespace AwsMock::Database::Entity::KMS {
         jsonObject.set("arn", arn);
 
         // Tags array
-        Poco::JSON::Array jsonTagArray;
-        for (const auto &tag: tags) {
-            Poco::JSON::Object jsonTagObject;
-            jsonTagObject.set(tag.first, tag.second);
-            jsonTagArray.add(jsonTagObject);
+        if (!tags.empty()) {
+            Poco::JSON::Array jsonTagArray;
+            for (const auto &tag: tags) {
+                Poco::JSON::Object jsonTagObject;
+                jsonTagObject.set(tag.first, tag.second);
+                jsonTagArray.add(jsonTagObject);
+            }
+            jsonObject.set("tags", jsonTagArray);
         }
-        jsonObject.set("tags", jsonTagArray);
 
         return jsonObject;
     }

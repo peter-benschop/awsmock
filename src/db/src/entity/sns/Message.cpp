@@ -24,7 +24,6 @@ namespace AwsMock::Database::Entity::SNS {
                 kvp("reset", bsoncxx::types::b_date(std::chrono::milliseconds(0))),
                 kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
                 kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
-
         return messageDoc;
     }
 
@@ -42,17 +41,20 @@ namespace AwsMock::Database::Entity::SNS {
             created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
             modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
 
-            bsoncxx::array::view attributesView{mResult.value()["userAttributes"].get_array().value};
-            if (!attributesView.empty()) {
-                for (bsoncxx::array::element attributeElement: attributesView) {
-                    MessageAttribute attribute{
-                            .attributeName = bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
-                            .attributeValue = bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value)};
-                    attributes.push_back(attribute);
+            if (mResult.value().find("userAttributes") != mResult.value().end()) {
+                bsoncxx::array::view attributesView{mResult.value()["userAttributes"].get_array().value};
+                if (!attributesView.empty()) {
+                    for (bsoncxx::array::element attributeElement: attributesView) {
+                        MessageAttribute attribute{
+                                .attributeName = bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
+                                .attributeValue = bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value)};
+                        attributes.push_back(attribute);
+                    }
                 }
             }
         } catch (std::exception &exc) {
             log_error << "SNS message exception: " << exc.what();
+            throw Core::DatabaseException(exc.what());
         }
     }
 
@@ -66,9 +68,13 @@ namespace AwsMock::Database::Entity::SNS {
         jsonObject.set("messageId", messageId);
         jsonObject.set("lastSend", Poco::DateTimeFormatter::format(lastSend, Poco::DateTimeFormat::ISO8601_FORMAT));
 
-        Poco::JSON::Array jsonAttributeArray;
-        for (const auto &attribute: attributes) {
-            jsonAttributeArray.add(attribute.ToJsonObject());
+        // Attributes
+        if (!attributes.empty()) {
+            Poco::JSON::Array jsonAttributeArray;
+            for (const auto &attribute: attributes) {
+                jsonAttributeArray.add(attribute.ToJsonObject());
+            }
+            jsonObject.set("attributes", jsonAttributeArray);
         }
         return jsonObject;
     }
