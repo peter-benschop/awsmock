@@ -4,9 +4,11 @@ versioning:
   update-minor: [ feat ]
   update-patch: [ build, ci, chore, fix, perf, refactor, style, test ]
   ignore-unknown: true
+  
 tag:
   pattern: '%d.%d.%d'
   filter: ""
+
 release-notes:
   sections:
     - name: Features
@@ -17,15 +19,17 @@ release-notes:
       commit-types: [ fix ]
     - name: Breaking Changes
       section-type: breaking-changes
+
 branches:
   prefix: ([0-9]+-[a-z-]+)?
   suffix: (-.*)?
   disable-issue: false
   skip: [ master, main, develop ]
   skip-detached: false
+
 commit-message:
   types: [ build, ci, chore, docs, feat, fix, perf, refactor, revert, style, test, major, develop ]
-    header-selector: ""
+    header-selector: ''
     scope:
       values: [ ]
     footer:
