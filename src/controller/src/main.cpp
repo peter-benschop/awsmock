@@ -93,7 +93,8 @@ namespace AwsMock::Controller {
 
             } else if (name == "version") {
 
-                std::cout << "awsmockctl" << " " << Configuration::GetVersion() << std::endl;
+                std::cout << "awsmockctl"
+                          << " " << Configuration::GetVersion() << std::endl;
                 exit(0);
 
             } else if (name == "level") {
@@ -121,24 +122,36 @@ namespace AwsMock::Controller {
             helpFormatter.format(std::cout);
             std::cout << "\nCommands:\n"
                       << std::endl;
-            std::cout << std::left << std::setw(leftIndent) << "list" << ": lists all available services" << std::endl;
-            std::cout << std::left << std::setw(leftIndent) << "start [<module>]" << ": starts the given module. If no argument is given, starts all services." << std::endl;
-            std::cout << std::left << std::setw(leftIndent) << "stop [<module>]" << ": stops the given module. If no argument is given, stops all services" << std::endl;
-            std::cout << std::left << std::setw(leftIndent) << "restart [<module>]" << ": restarts the given module. If no argument is given, restarts all services" << std::endl;
+            std::cout << std::left << std::setw(leftIndent) << "list"
+                      << ": lists all available services" << std::endl;
+            std::cout << std::left << std::setw(leftIndent) << "start [<module>]"
+                      << ": starts the given module. If no argument is given, starts all services." << std::endl;
+            std::cout << std::left << std::setw(leftIndent) << "stop [<module>]"
+                      << ": stops the given module. If no argument is given, stops all services" << std::endl;
+            std::cout << std::left << std::setw(leftIndent) << "restart [<module>]"
+                      << ": restarts the given module. If no argument is given, restarts all services" << std::endl;
 #ifdef HAS_SYSTEMD
-            std::cout << std::left << std::setw(leftIndent) << "logs" << ": shows the manager logs" << std::endl;
+            std::cout << std::left << std::setw(leftIndent) << "logs"
+                      << ": shows the manager logs" << std::endl;
 #endif
-            std::cout << std::left << std::setw(leftIndent) << "loglevel <level>" << ": sets the manager log to level" << std::endl;
-            std::cout << std::left << std::setw(leftIndent) << "config" << ": shows the gateway configuration" << std::endl;
-            std::cout << std::left << std::setw(leftIndent) << "export [<modules>] [export-options]" << ": dumps the current infrastructure to stdout. Modules is a space separated list of module names." << std::endl;
-            std::cout << std::left << std::setw(leftIndent) << "import" << ": imports the infrastructure from stdin." << std::endl;
-            std::cout << std::left << std::setw(leftIndent) << "clean [modules]" << ": cleans the current infrastructure. Modules is a space separated list of module names." << std::endl;
+            std::cout << std::left << std::setw(leftIndent) << "loglevel <level>"
+                      << ": sets the manager log to level" << std::endl;
+            std::cout << std::left << std::setw(leftIndent) << "config"
+                      << ": shows the gateway configuration" << std::endl;
+            std::cout << std::left << std::setw(leftIndent) << "export [<modules>] [export-options]"
+                      << ": dumps the current infrastructure to stdout. Modules is a space separated list of module names." << std::endl;
+            std::cout << std::left << std::setw(leftIndent) << "import"
+                      << ": imports the infrastructure from stdin." << std::endl;
+            std::cout << std::left << std::setw(leftIndent) << "clean [modules]"
+                      << ": cleans the current infrastructure. Modules is a space separated list of module names." << std::endl;
             std::cout << "\nModules:\n"
                       << std::endl;
             std::cout << "Valid modules are: all, s3, sqs, sns, lambda, transfer, cognito, dynamodb." << std::endl;
             std::cout << "\nExport options:\n";
-            std::cout << std::left << std::setw(leftIndent) << "--includeObjects" << ": export objects as well" << std::endl;
-            std::cout << std::left << std::setw(leftIndent) << "--pretty" << ": indent output" << std::endl;
+            std::cout << std::left << std::setw(leftIndent) << "--includeObjects"
+                      << ": export objects as well" << std::endl;
+            std::cout << std::left << std::setw(leftIndent) << "--pretty"
+                      << ": indent output" << std::endl;
             stopOptionsProcessing();
             exit(0);
         }
