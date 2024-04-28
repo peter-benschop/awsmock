@@ -42,9 +42,9 @@ namespace AwsMock::Database::Entity::Transfer {
                 kvp("concurrency", concurrency),
                 kvp("port", port),
                 kvp("listenAddress", listenAddress),
-                kvp("lastStarted", bsoncxx::types::b_date(std::chrono::milliseconds(lastStarted.timestamp().epochMicroseconds() / 1000))),
-                kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-                kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+                kvp("lastStarted", MongoUtils::ToBson(lastStarted)),
+                kvp("created", MongoUtils::ToBson(created)),
+                kvp("modified", MongoUtils::ToBson(modified)));
 
         return transferDoc;
     }
@@ -59,9 +59,9 @@ namespace AwsMock::Database::Entity::Transfer {
         concurrency = mResult.value()["concurrency"].get_int32().value;
         port = mResult.value()["port"].get_int32().value;
         listenAddress = bsoncxx::string::to_string(mResult.value()["listenAddress"].get_string().value);
-        lastStarted = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date().value) / 1000));
-        created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-        modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+        lastStarted = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date()));
+        created = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["created"].get_date()));
+        modified = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["modified"].get_date()));
 
         // Protocols
         if (mResult.value().find("protocols") != mResult.value().end()) {

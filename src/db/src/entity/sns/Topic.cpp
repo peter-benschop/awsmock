@@ -35,10 +35,8 @@ namespace AwsMock::Database::Entity::SNS {
                 kvp("subscriptions", subscriptionDocs),
                 kvp("attributes", topicAttribute.ToDocument()),
                 kvp("tags", tagsDoc),
-                kvp("created",
-                    bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-                kvp("modified",
-                    bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+                kvp("created", MongoUtils::ToBson(created)),
+                kvp("modified", MongoUtils::ToBson(modified)));
 
         return topicDoc;
     }
@@ -52,8 +50,8 @@ namespace AwsMock::Database::Entity::SNS {
         topicUrl = bsoncxx::string::to_string(mResult.value()["topicUrl"].get_string().value);
         topicArn = bsoncxx::string::to_string(mResult.value()["topicArn"].get_string().value);
         topicAttribute.FromDocument(mResult.value()["attributes"].get_document());
-        created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-        modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+        created = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["created"].get_date()));
+        modified = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["modified"].get_date()));
 
         // Subscriptions
         if (mResult.value().find("subscriptions") != mResult.value().end()) {

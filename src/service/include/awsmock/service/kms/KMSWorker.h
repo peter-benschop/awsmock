@@ -7,6 +7,7 @@
 
 // AwsMock includes
 #include <awsmock/core/Timer.h>
+#include <awsmock/dto/kms/KeyState.h>
 #include <awsmock/repository/KMSDatabase.h>
 
 namespace AwsMock::Service {
@@ -45,6 +46,11 @@ namespace AwsMock::Service {
         void Shutdown() override;
 
       private:
+
+        /**
+         * Delete keys which are pending for deletion
+         */
+        void DeleteKeys();
 
         /**
          * Database connection

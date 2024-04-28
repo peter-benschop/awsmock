@@ -22,8 +22,8 @@ namespace AwsMock::Database::Entity::SNS {
                 kvp("status", MessageStatusToString(status)),
                 kvp("userAttributes", messageAttributesDoc),
                 kvp("reset", bsoncxx::types::b_date(std::chrono::milliseconds(0))),
-                kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-                kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+                kvp("created", MongoUtils::ToBson(created)),
+                kvp("modified", MongoUtils::ToBson(modified)));
         return messageDoc;
     }
 
@@ -37,9 +37,9 @@ namespace AwsMock::Database::Entity::SNS {
             message = bsoncxx::string::to_string(mResult.value()["message"].get_string().value);
             status = MessageStatusFromString(bsoncxx::string::to_string(mResult.value()["status"].get_string().value));
             messageId = bsoncxx::string::to_string(mResult.value()["messageId"].get_string().value);
-            lastSend = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["reset"].get_date().value) / 1000));
-            created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-            modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+            lastSend = MongoUtils::FromBson(mResult.value()["reset"].get_date());
+            created = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["created"].get_date()));
+            modified = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["modified"].get_date()));
 
             if (mResult.value().find("userAttributes") != mResult.value().end()) {
                 bsoncxx::array::view attributesView{mResult.value()["userAttributes"].get_array().value};

@@ -14,17 +14,13 @@ namespace AwsMock::Core {
         const EVP_MD *md = EVP_md5();
         unsigned char md_value[EVP_MAX_MD_SIZE];
         unsigned int md_len;
-        std::string output;
 
         EVP_DigestInit(context, md);
         EVP_DigestUpdate(context, reinterpret_cast<const unsigned char *>(content.c_str()), content.length());
         EVP_DigestFinal(context, md_value, &md_len);
         EVP_MD_CTX_free(context);
 
-        output.resize(md_len * 2);
-        for (unsigned int i = 0; i < md_len; ++i)
-            std::sprintf(&output[i * 2], "%02x", md_value[i]);
-        return output;
+        return HexEncode(md_value, static_cast<int>(md_len));
     }
 
     std::string Crypto::GetMd5FromFile(const std::string &fileName) {
@@ -48,12 +44,9 @@ namespace AwsMock::Core {
 
         EVP_DigestFinal(context, md_value, &md_len);
         EVP_MD_CTX_free(context);
-
-        output.resize(md_len * 2);
-        for (unsigned int i = 0; i < md_len; ++i)
-            std::sprintf(&output[i * 2], "%02x", md_value[i]);
         delete[] buffer;
-        return output;
+
+        return HexEncode(md_value, static_cast<int>(md_len));
     }
 
     std::string Crypto::GetSha1FromString(const std::string &content) {
@@ -69,10 +62,7 @@ namespace AwsMock::Core {
         EVP_DigestFinal_ex(context, md_value, &md_len);
         EVP_MD_CTX_free(context);
 
-        output.resize(md_len * 2);
-        for (unsigned int i = 0; i < md_len; ++i)
-            std::sprintf(&output[i * 2], "%02x", md_value[i]);
-        return output;
+        return HexEncode(md_value, static_cast<int>(md_len));
     }
 
     std::string Crypto::GetSha1FromFile(const std::string &fileName) {
@@ -95,14 +85,12 @@ namespace AwsMock::Core {
         }
         is.close();
 
+        // Finalize
         EVP_DigestFinal_ex(context, md_value, &md_len);
         EVP_MD_CTX_free(context);
-
-        output.resize(md_len * 2);
-        for (unsigned int i = 0; i < md_len; ++i)
-            std::sprintf(&output[i * 2], "%02x", md_value[i]);
         delete[] buffer;
-        return output;
+
+        return HexEncode(md_value, static_cast<int>(md_len));
     }
 
     std::string Crypto::GetSha256FromString(const std::string &content) {
@@ -117,10 +105,7 @@ namespace AwsMock::Core {
         EVP_DigestFinal(context, md_value, &md_len);
         EVP_MD_CTX_free(context);
 
-        output.resize(md_len * 2);
-        for (unsigned int i = 0; i < md_len; ++i)
-            std::sprintf(&output[i * 2], "%02x", md_value[i]);
-        return output;
+        return HexEncode(md_value, static_cast<int>(md_len));
     }
 
     std::string Crypto::GetHmacSha256FromString(const std::string &key, const std::string &msg) {
@@ -136,11 +121,7 @@ namespace AwsMock::Core {
              hash.data(),
              &hashLen);
 
-        std::string output;
-        output.resize(hashLen * 2);
-        for (unsigned int i = 0; i < hashLen; ++i)
-            std::sprintf(&output[i * 2], "%02x", hash[i]);
-        return output;
+        return HexEncode(hash.data(), static_cast<int>(hashLen));
     }
 
     std::string Crypto::GetSha256FromFile(const std::string &fileName) {
@@ -163,16 +144,12 @@ namespace AwsMock::Core {
         }
         is.close();
 
+        // Finalize
         EVP_DigestFinal_ex(context, md_value, &md_len);
         EVP_MD_CTX_free(context);
-
-        output.resize(md_len * 2);
-        for (unsigned int i = 0; i < md_len; ++i)
-            std::sprintf(&output[i * 2], "%02x", md_value[i]);
-
         delete[] buffer;
 
-        return output;
+        return HexEncode(md_value, static_cast<int>(md_len));
     }
 
     std::string Crypto::GetHmacSha256FromString(const std::array<unsigned char, EVP_MAX_MD_SIZE> &key, const std::string &msg) {
@@ -357,12 +334,11 @@ namespace AwsMock::Core {
 
     std::string Crypto::HexDecode(const std::string &hex) {
         std::stringstream ss;
-        ss.str("");
+        std::stringstream sout;
         Poco::HexBinaryDecoder decoder(ss);
         ss << hex;
-        std::stringstream ss1;
-        ss1 << decoder.rdbuf();
-        return ss1.str();
+        sout << decoder.rdbuf();
+        return sout.str();
     }
 
     EVP_PKEY *Crypto::GenerateRsaKeys(unsigned int keyLength) {
@@ -407,6 +383,29 @@ namespace AwsMock::Core {
         free(buf);
 
         return sstream.str();
+    }
+
+    EVP_PKEY *Crypto::ReadRsaPrivateKey(const std::string &inKey) {
+
+        BIO *bo = BIO_new(BIO_s_mem());
+        BIO_write(bo, inKey.c_str(), static_cast<int>(inKey.length()));
+
+        EVP_PKEY *pKey = nullptr;
+        PEM_read_bio_PrivateKey(bo, &pKey, nullptr, nullptr);
+
+        BIO_free(bo);
+        return pKey;
+    }
+
+    EVP_PKEY *Crypto::ReadRsaPublicKey(const std::string &publicKey) {
+
+        EVP_PKEY *pKey = nullptr;
+        BIO *bo2 = BIO_new(BIO_s_mem());
+        BIO_write(bo2, publicKey.c_str(), static_cast<int>(publicKey.length()));
+        PEM_read_bio_PUBKEY(bo2, &pKey, nullptr, nullptr);
+        BIO_free(bo2);
+
+        return pKey;
     }
 
     std::string Crypto::RsaEncrypt(EVP_PKEY *keyPair, const std::string &in) {

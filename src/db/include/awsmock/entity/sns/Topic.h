@@ -26,6 +26,7 @@
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/entity/sns/Subscription.h>
 #include <awsmock/entity/sns/TopicAttribute.h>
+#include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::SNS {
 

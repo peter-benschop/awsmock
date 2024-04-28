@@ -24,7 +24,8 @@ namespace AwsMock::Database::Entity::SQS {
             }
 
         } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), 500);
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
         }
     }
 
@@ -44,7 +45,8 @@ namespace AwsMock::Database::Entity::SQS {
             return os.str();
 
         } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), 500);
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
         }
     }
 

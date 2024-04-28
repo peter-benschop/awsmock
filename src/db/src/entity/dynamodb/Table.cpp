@@ -93,11 +93,11 @@ namespace AwsMock::Database::Entity::DynamoDb {
             Poco::JSON::Array jsonTagsArray;
             for (const auto &tag: tags) {
                 Poco::JSON::Object object;
-                object.set("Key", tag.first);
-                object.set("Value", tag.second);
+                object.set("key", tag.first);
+                object.set("value", tag.second);
                 jsonTagsArray.add(object);
             }
-            jsonObject.set("Tags", jsonTagsArray);
+            jsonObject.set("tags", jsonTagsArray);
         }
 
         // Attributes
@@ -106,10 +106,10 @@ namespace AwsMock::Database::Entity::DynamoDb {
             for (const auto &attribute: attributes) {
                 Poco::JSON::Object object;
                 object.set("attributeName", attribute.first);
-                object.set("AttributeType", attribute.second);
+                object.set("attributeType", attribute.second);
                 jsonAttributeArray.add(object);
             }
-            jsonObject.set("Attributes", jsonAttributeArray);
+            jsonObject.set("attributes", jsonAttributeArray);
         }
 
         jsonObject.set("created", Poco::DateTimeFormatter::format(created, Poco::DateTimeFormat::ISO8601_FORMAT));

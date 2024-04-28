@@ -23,8 +23,8 @@ namespace AwsMock::Database::Entity::SQS {
                 kvp("queueArn", queueArn),
                 kvp("attributes", attributes.ToDocument()),
                 kvp("tags", tagsDoc),
-                kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-                kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+                kvp("created", MongoUtils::ToBson(created)),
+                kvp("modified", MongoUtils::ToBson(modified)));
 
         return queueDoc;
     }
@@ -40,8 +40,8 @@ namespace AwsMock::Database::Entity::SQS {
             queueUrl = bsoncxx::string::to_string(mResult.value()["queueUrl"].get_string().value);
             queueArn = bsoncxx::string::to_string(mResult.value()["queueArn"].get_string().value);
             attributes.FromDocument(mResult.value()["attributes"].get_document().value);
-            created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-            modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+            created = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["created"].get_date()));
+            modified = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["modified"].get_date()));
 
             // Get tags
             if (mResult.value().find("tags") != mResult.value().end()) {

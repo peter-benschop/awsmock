@@ -2,6 +2,7 @@
 // Created by vogje01 on 01/06/2023.
 //
 
+#include "awsmock/utils/MongoUtils.h"
 #include <awsmock/entity/kms/Key.h>
 
 namespace AwsMock::Database::Entity::KMS {
@@ -28,9 +29,9 @@ namespace AwsMock::Database::Entity::KMS {
                 kvp("rsaPublicKey", rsaPublicKey),
                 kvp("tags", tagsDoc),
                 kvp("pendingWindowInDays", pendingWindowInDays),
-                kvp("scheduledDeletion", bsoncxx::types::b_date(std::chrono::milliseconds(scheduledDeletion.timestamp().epochMicroseconds() / 1000))),
-                kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-                kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+                kvp("scheduledDeletion", MongoUtils::ToBson(scheduledDeletion)),
+                kvp("created", MongoUtils::ToBson(created)),
+                kvp("modified", MongoUtils::ToBson(modified)));
 
         return keyDoc;
     }
@@ -50,10 +51,10 @@ namespace AwsMock::Database::Entity::KMS {
         rsaPublicKey = bsoncxx::string::to_string(mResult.value()["rsaPublicKey"].get_string().value);
         pendingWindowInDays = mResult.value()["pendingWindowInDays"].get_int32().value;
         if (mResult.value()["scheduledDeletion"].type() != bsoncxx::type::k_null) {
-            scheduledDeletion = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["scheduledDeletion"].get_date().value) / 1000));
+            scheduledDeletion = MongoUtils::FromBson(mResult.value()["scheduledDeletion"].get_date());
         }
-        created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-        modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+        created = MongoUtils::FromBson(mResult.value()["created"].get_date());
+        modified = MongoUtils::FromBson(mResult.value()["modified"].get_date());
 
         // Get tags
         if (mResult.value().find("tags") != mResult.value().end()) {
@@ -71,6 +72,20 @@ namespace AwsMock::Database::Entity::KMS {
         Poco::JSON::Object jsonObject;
         jsonObject.set("region", region);
         jsonObject.set("arn", arn);
+        jsonObject.set("keyId", keyId);
+        jsonObject.set("keyUsage", keyUsage);
+        jsonObject.set("keySpec", keySpec);
+        jsonObject.set("keyState", keyState);
+        jsonObject.set("aes256Key", aes256Key);
+        jsonObject.set("aes256Iv", aes256Iv);
+        jsonObject.set("rsaPrivateKey", rsaPrivateKey);
+        jsonObject.set("rsaPublicKey", rsaPublicKey);
+        jsonObject.set("pendingWindowInDays", pendingWindowInDays);
+        if (scheduledDeletion.timestamp().epochTime() > 0) {
+            jsonObject.set("scheduledDeletion", scheduledDeletion);
+        }
+        jsonObject.set("created", created);
+        jsonObject.set("modified", modified);
 
         // Tags array
         if (!tags.empty()) {

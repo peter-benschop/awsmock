@@ -152,6 +152,33 @@ namespace AwsMock::Core {
         return false;
     }
 
+    std::string HttpUtils::AddQueryParameter(std::string &url, const std::string &name, bool value) {
+        url = AddQueryDelimiter(url);
+        url += name + "=" + (value ? "true" : "false");
+        return url;
+    }
+
+    std::string HttpUtils::AddQueryParameter(std::string &url, const std::string &name, const std::string &value) {
+        url = AddQueryDelimiter(url);
+        url += name + "=" + value;
+        return url;
+    }
+
+    std::string HttpUtils::AddQueryParameter(std::string &url, const std::string &name, int value) {
+        url = AddQueryDelimiter(url);
+        url += name + "=" + std::to_string(value);
+        return url;
+    }
+
+    std::string HttpUtils::AddQueryDelimiter(std::string &url) {
+        if (Core::StringUtils::Contains(url, "?")) {
+            url += "&";
+        } else {
+            url += "?";
+        }
+        return url;
+    }
+
     [[maybe_unused]] std::string HttpUtils::GetHeaderValue(const Poco::Net::HTTPRequest &request, const std::string &name) {
         std::string headerValue = request.get(name);
         if (headerValue.empty()) {

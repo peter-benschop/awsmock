@@ -29,6 +29,7 @@
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
+#include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::S3 {
 

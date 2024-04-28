@@ -5,7 +5,6 @@ set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
-SET(CMAKE_BUILD_TYPE Release CACHE PATH "" FORCE)
 set(CMAKE_INSTALL_PREFIX "/usr" CACHE PATH " ..." FORCE)
 
 # Doxygen
@@ -19,6 +18,11 @@ string(TIMESTAMP PROJECT_BUILDDATE "%d-%m-%Y")
 
 # Build message
 message("-- Building ${PROJECT_NAME} v${PROJECT_VERSION} type: ${CMAKE_BUILD_TYPE}, install prefix: ${CMAKE_INSTALL_PREFIX}")
+
+# Set default build type release
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE PATH "" FORCE)
+endif ()
 
 # Testing
 enable_testing()

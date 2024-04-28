@@ -30,21 +30,30 @@ as well as to show the current configuration.
 
 ## OPTIONS
 
+```--includeObjects```:  
+adds objects to the export. By default, only the infrastructure elements are export (SQS queues,
+SNS topic, S3 buckets etc.). Settings this option will export also all object (S3 objects, SQS messages, SNS messages,
+etc.). Exporting also the objects will result in a rather huge output file, depending on your objects in the different
+infrastructure elements.
+
+```--pretty```:  
+indent the resulting JSON string to make it more readable. Will increase the output size.
+
 ```--config <config-file-path>```:  
-&nbsp;&nbsp;&nbsp;&nbsp;starts the controller with a given configuration file. Per default the configuration
+starts the controller with a given configuration file. Per default the configuration
 file ```/etc/aws-mock.properties``` will
 be used. The path should be the absolute path to the configuration file.
 
 ```--help```    
-&nbsp;&nbsp;&nbsp;&nbsp;shows the usage screen and exists
+shows the usage screen and exists
 
 ```--version```    
-&nbsp;&nbsp;&nbsp;&nbsp;shows the current version and exists.
+shows the current version and exists.
 
 ## COMMANDS
 
 ```list```  
-&nbsp;&nbsp;&nbsp;&nbsp;lists the currently running AwsMock modules like S3, SQS, SNS etc. Each line has the format:
+lists the currently running AwsMock modules like S3, SQS, SNS etc. Each line has the format:
 
 ```
 SQS         RUNNING
@@ -53,38 +62,36 @@ SNS         STOPPED
 ```
 
 ```stop <module>```  
-&nbsp;&nbsp;&nbsp;&nbsp;stops the given module. Modules are S3, SQS, SNS, Transfer, Cognito. Modules names can be given
-case-insensitive.
+stops the given module. Modules are S3, SQS, SNS, Transfer, Cognito. Modules names can be given case-insensitive.
 
 ```start <module>```  
-&nbsp;&nbsp;&nbsp;&nbsp;starts the given module.
+starts the given module.
 
 ```restart <module>```  
-&nbsp;&nbsp;&nbsp;&nbsp;restarts the given module.
+restarts the given module.
 
 ```logs```  
-&nbsp;&nbsp;&nbsp;&nbsp;shows the console logs of the AwsMock manager application ```awsmockmgr```.
-See ```awsmockmgr(1)``` for
-details of the manager.
+shows the console logs of the AwsMock manager application ```awsmockmgr```.
+See ```awsmockmgr(1)``` for details of the manager.
 
 ```loglevel```  
-&nbsp;&nbsp;&nbsp;&nbsp;sets the log level of the AwsMock manager ```awsmockmgr```. ```<loglevel>``` can be one of:
-verbose, debug, info, warning, error, fatal or none.
+sets the log level of the AwsMock manager ```awsmockmgr```. ```<loglevel>``` can be one of: verbose, debug, info,
+warning, error, fatal or none.
 
 ```config```  
-&nbsp;&nbsp;&nbsp;&nbsp;shows the configuration of the AwsMock API gateway.
+shows the configuration of the AwsMock API gateway.
 
-```export [modules]```  
-&nbsp;&nbsp;&nbsp;&nbsp;export the current infrastructure to stdout in JSON format. ```modules``` can be space separated
+```export [modules] [--includeObjects] [--pretty]```  
+export the current infrastructure to stdout in JSON format. ```modules``` can be space separated
 list of AwsMock modules. If no modules are given or the module list contains ```all```, all modules will be exported.
 
 ```import```  
-&nbsp;&nbsp;&nbsp;&nbsp;import the infrastructure from stdin in JSON format.
+import the infrastructure from stdin in JSON format.
 
 ```clean```  
-&nbsp;&nbsp;&nbsp;&nbsp;cleans the infrastructure. This means all SQS queues plus messages, SNS topics plus messages, S3
-buckets with all objects, transfer servers, and lambda functions will be deleted. ALl modules will be still running, but
-all AwsMock objects will be emptied
+cleans the infrastructure. This means all SQS queues plus messages, SNS topics plus messages, S3 buckets with all
+objects, transfer servers, and lambda functions will be deleted. ALl modules will be still running, but all AwsMock
+objects will be emptied.
 
 ## EXAMPLES
 

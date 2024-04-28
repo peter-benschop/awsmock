@@ -28,6 +28,7 @@
 // AwsMock include
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/entity/s3/BucketNotification.h>
+#include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::S3 {
 

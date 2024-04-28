@@ -27,6 +27,7 @@
 #include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/entity/sns/MessageAttribute.h>
+#include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::SNS {
 

@@ -114,7 +114,7 @@ namespace AwsMock::Database::Entity::KMS {
         /**
          * Scheduled deletion datetime
          */
-        Poco::DateTime scheduledDeletion;
+        Poco::DateTime scheduledDeletion = Poco::DateTime(0);
 
         /**
          * Creation date

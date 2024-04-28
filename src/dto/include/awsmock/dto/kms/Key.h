@@ -113,12 +113,12 @@ namespace AwsMock::Dto::KMS {
         /**
          * Creation date
          */
-        long creationDate;
+        long creationDate = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 
         /**
          * Deletion date
          */
-        long deletionDate;
+        long deletionDate = 0;
 
         /**
          * Enabled flag

@@ -113,6 +113,36 @@ namespace AwsMock::Core {
         static std::string GetQueryParameterByPrefix(const std::string &uri, const std::string &prefix, int index);
 
         /**
+         * Adds a bool query parameter to the given URL.
+         *
+         * @param url url to add to
+         * @param name parameter name
+         * @param value parameter value
+         * @return
+         */
+        static std::string AddQueryParameter(std::string &url, const std::string &name, bool value);
+
+        /**
+         * Adds a string query parameter to the given URL.
+         *
+         * @param url url to add to
+         * @param name parameter name
+         * @param value parameter value
+         * @return
+         */
+        static std::string AddQueryParameter(std::string &url, const std::string &name, const std::string &value);
+
+        /**
+         * Adds a integer query parameter to the given URL.
+         *
+         * @param url url to add to
+         * @param name parameter name
+         * @param value parameter value
+         * @return
+         */
+        static std::string AddQueryParameter(std::string &url, const std::string &name, int value);
+
+        /**
          * Returns an integer parameter
          *
          * @param body HTTP body
@@ -208,6 +238,14 @@ namespace AwsMock::Core {
          * @return true if value is URL encoded
          */
         static bool IsUrlEncoded(const std::string &value);
+
+        /**
+         * Add query delimiter
+         *
+         * @param uri HTTP request URL
+         * @return URL with delimiter
+         */
+        static std::string AddQueryDelimiter(std::string &url);
     };
 
 }// namespace AwsMock::Core

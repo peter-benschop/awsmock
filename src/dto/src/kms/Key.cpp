@@ -60,8 +60,12 @@ namespace AwsMock::Dto::KMS {
             rootJson.set("KeyUsage", KeyUsageToString(keyUsage));
             rootJson.set("KeyState", KeyStateToString(keyState));
             rootJson.set("Description", description);
-            rootJson.set("CreationDate", creationDate);
-            rootJson.set("DeletionDate", deletionDate);
+            if (creationDate > 0) {
+                rootJson.set("CreationDate", creationDate);
+            }
+            if (deletionDate > 0) {
+                rootJson.set("DeletionDate", deletionDate);
+            }
             rootJson.set("MultiRegion", multiRegion);
             rootJson.set("Enabled", enabled);
             rootJson.set("Origin", OriginToString(origin));

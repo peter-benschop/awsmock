@@ -25,6 +25,7 @@
 #include <awsmock/controller/Configuration.h>
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CurlUtils.h>
+#include <awsmock/core/HttpUtils.h>
 #include <awsmock/dto/common/Services.h>
 #include <awsmock/dto/module/GatewayConfig.h>
 #include <awsmock/dto/module/Module.h>
@@ -41,122 +42,125 @@ namespace AwsMock::Controller {
     class Controller {
 
       public:
+
         /**
-       * Constructor
-       */
+         * Constructor
+         */
         explicit Controller(const Configuration &configuration);
 
         /**
-       * List all available services
-       */
+         * List all available services
+         */
         void ListServices();
 
         /**
-       * Start a module
-       *
-       * @param name module name, or 'all'
-       */
+         * Start a module
+         *
+         * @param name module name, or 'all'
+         */
         void StartService(const std::string &name);
 
         /**
-       * Restart a module
-       *
-       * @param name module name, or 'all'
-       */
+         * Restart a module
+         *
+         * @param name module name, or 'all'
+         */
         void RestartService(const std::string &name);
 
         /**
-       * Stops a module
-       *
-       * @param name module name, or 'all'
-       */
+         * Stops a module
+         *
+         * @param name module name, or 'all'
+         */
         void StopService(const std::string &name);
 
 #ifdef HAS_SYSTEMD
         /**
-       * Show the logs
-       */
+         * Show the logs
+         */
         static void ShowServiceLogs();
 #endif
 
         /**
-       * Sets the managers log level
-       *
-       * @param level log level
-       */
+         * Sets the managers log level
+         *
+         * @param level log level
+         */
         void SetLogLevel(const std::string &level);
 
         /**
-       * Returns the current AwsMock configuration
-       */
+         * Returns the current AwsMock configuration
+         */
         void GetDefaults();
 
         /**
-       * Dumps the current infrastructure as JSON file to stdout.
-       *
-       * @param services list of services
-       * @param pretty JSON pretty print (indent=4)
-       */
-        void ExportInfrastructure(const std::vector<std::string> &services, bool pretty = true);
+         * Dumps the current infrastructure as JSON file to stdout.
+         *
+         * @param services list of services
+         * @param pretty JSON pretty print (indent=4)
+         * @param pretty JSON pretty print (indent=4)
+         */
+        void ExportInfrastructure(const std::vector<std::string> &services, bool pretty = true, bool includeObjects = false);
 
         /**
-       * Imports the current infrastructure from stdin
-       */
+         * Imports the current infrastructure from stdin
+         */
         void ImportInfrastructure();
 
         /**
-       * Cleans the current infrastructure.
-       *
-       * @param services list of services
-       */
+         * Cleans the current infrastructure.
+         *
+         * @param services list of services
+         */
         void CleanInfrastructure(const std::vector<std::string> &services);
 
       private:
+
         /**
-       * Add authorization header.
-       *
-       * @param headers headers
-       */
+         * Add authorization header.
+         *
+         * @param headers headers
+         */
         void AddAuthorization(std::map<std::string, std::string> &headers);
 
         /**
-       * Application configuration
-       */
+         * Application configuration
+         */
         const Configuration &_configuration;
 
         /**
-       * Curl utils
-       */
+         * Curl utils
+         */
         Core::CurlUtils _curlUtils;
 
         /**
-       * Host
-       */
+         * Host
+         */
         std::string _host;
 
         /**
-       * Port
-       */
+         * Port
+         */
         int _port;
 
         /**
-       * Base URL
-       */
+         * Base URL
+         */
         std::string _baseUrl;
 
         /**
-       * User
-       */
+         * User
+         */
         std::string _user;
 
         /**
-       * Client ID
-       */
+         * Client ID
+         */
         std::string _clientId;
 
         /**
-       * AWS region
-       */
+         * AWS region
+         */
         std::string _region;
     };
 

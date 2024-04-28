@@ -141,22 +141,6 @@ namespace AwsMock::Service {
         static std::string DecryptPlaintext(const Database::Entity::KMS::Key &key, const std::string &ciphertext);
 
         /**
-         * Read an EVP_PKEY from a string.
-         *
-         * @param inKey key as string
-         * @return *EVP_PKEY
-         */
-        static EVP_PKEY *ReadRsaPrivateKey(const std::string &inKey);
-
-        /**
-         * Read an EVP_PKEY from a string.
-         *
-         * @param inKey key as string
-         * @return *EVP_PKEY
-         */
-        static EVP_PKEY *ReadRsaPublicKey(const std::string &ublicKey);
-
-        /**
          * Account ID
          */
         std::string _accountId;

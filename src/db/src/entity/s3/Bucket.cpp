@@ -41,8 +41,8 @@ namespace AwsMock::Database::Entity::S3 {
                 kvp("owner", owner),
                 kvp("notifications", notificationsDoc),
                 kvp("versionStatus", BucketVersionStatusToString(versionStatus)),
-                kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-                kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+                kvp("created", MongoUtils::ToBson(created)),
+                kvp("modified", MongoUtils::ToBson(modified)));
 
         return bucketDoc;
     }
@@ -54,8 +54,8 @@ namespace AwsMock::Database::Entity::S3 {
         name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
         owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
         versionStatus = BucketVersionStatusFromString(bsoncxx::string::to_string(mResult.value()["versionStatus"].get_string().value));
-        created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-        modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+        created = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["created"].get_date()));
+        modified = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["modified"].get_date()));
 
         if (mResult.value().find("notifications") != mResult.value().end()) {
             bsoncxx::array::view notificationView{mResult.value()["notifications"].get_array().value};

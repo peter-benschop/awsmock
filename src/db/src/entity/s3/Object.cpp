@@ -30,8 +30,8 @@ namespace AwsMock::Database::Entity::S3 {
                 kvp("metadata", metadataDoc),
                 kvp("internalName", internalName),
                 kvp("versionId", versionId),
-                kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-                kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+                kvp("created", MongoUtils::ToBson(created)),
+                kvp("modified", MongoUtils::ToBson(modified)));
 
         return objectDoc;
     }
@@ -49,8 +49,8 @@ namespace AwsMock::Database::Entity::S3 {
         contentType = bsoncxx::string::to_string(mResult.value()["contentType"].get_string().value);
         internalName = bsoncxx::string::to_string(mResult.value()["internalName"].get_string().value);
         versionId = bsoncxx::string::to_string(mResult.value()["versionId"].get_string().value);
-        created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-        modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+        created = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["created"].get_date()));
+        modified = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["modified"].get_date()));
 
         // Get metadata
         if (mResult.value().find("metadata") != mResult.value().end()) {

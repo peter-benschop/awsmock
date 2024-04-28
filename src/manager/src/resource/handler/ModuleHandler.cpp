@@ -46,10 +46,11 @@ namespace AwsMock {
         } else if (action == "export") {
 
             bool prettyPrint = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "pretty") == "true";
+            bool includeObjects = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "includeObjects") == "true";
 
             Dto::Common::Services services;
             services.FromJson(payload);
-            std::string infrastructure = _moduleService->ExportInfrastructure(services, prettyPrint);
+            std::string infrastructure = _moduleService->ExportInfrastructure(services, prettyPrint, includeObjects);
             SendOkResponse(response, infrastructure);
 
         } else if (action == "clean-infrastructure") {
