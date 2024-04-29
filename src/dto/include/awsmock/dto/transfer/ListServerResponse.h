@@ -21,39 +21,39 @@ namespace AwsMock::Dto::Transfer {
     struct ListServerResponse {
 
         /**
-     * Region
-     */
+         * Region
+         */
         std::string region;
 
         /**
-     * Next token ID
-     */
+         * Next token ID
+         */
         std::string nextToken;
 
         /**
-     * Server list
-     */
+         * Server list
+         */
         std::vector<Server> servers;
 
         /**
-     * Creates a JSON string from the object.
-     *
-     * @return JSON string
-     */
+         * Creates a JSON string from the object.
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const ListServerResponse &r);
     };
 

@@ -17,64 +17,64 @@
 namespace AwsMock::Dto::Transfer {
 
     /**
-   *
-   * Example JSON:
-   * @verbatim
-   *   "IdentityProviderDetails": {
-   *     "DirectoryId": "string",
-   *     "Function": "string",
-   *     "InvocationRole": "string",
-   *     "SftpAuthenticationMethods": "string",
-   *     "Url": "string"
-   *  }
-   * @endverbatim
-   */
+     *
+     * Example JSON:
+     * @verbatim
+     *   "IdentityProviderDetails": {
+     *     "DirectoryId": "string",
+     *     "Function": "string",
+     *     "InvocationRole": "string",
+     *     "SftpAuthenticationMethods": "string",
+     *     "Url": "string"
+     *  }
+     * @endverbatim
+     */
     struct IdentityProviderDetails {
 
         /**
-     * Directory ID
-     */
+         * Directory ID
+         */
         std::string directoryId;
 
         /**
-     * Lambda function
-     */
+         * Lambda function
+         */
         std::string function;
 
         /**
-     * Invocation role
-     */
+         * Invocation role
+         */
         std::string invocationRole;
 
         /**
-     * SFTP authentication method
-     */
+         * SFTP authentication method
+         */
         std::string sftpAuthenticationMethods;
 
         /**
-     * Authentication URL
-     */
+         * Authentication URL
+         */
         std::string url;
 
         /**
-     * Creates a JSON string from the object.
-     *
-     * @return JSON string
-     */
+         * Creates a JSON string from the object.
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const IdentityProviderDetails &r);
     };
 
