@@ -24,7 +24,7 @@ namespace AwsMock::Database::Entity::Lambda {
     /**
      * Lambda environment entity
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Environment {
 

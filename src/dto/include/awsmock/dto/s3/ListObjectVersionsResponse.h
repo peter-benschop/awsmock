@@ -32,224 +32,224 @@ namespace AwsMock::Dto::S3 {
     struct DeleteMarker {
 
         /**
-     * Is latest
-     */
+         * Is latest
+         */
         bool isLatest;
 
         /**
-     * Key
-     */
+         * Key
+         */
         std::string key;
 
         /**
-     * Last modified
-     */
+         * Last modified
+         */
         Poco::DateTime lastModified;
 
         /**
-     * Owner
-     */
+         * Owner
+         */
         Owner owner;
 
         /**
-     * Version ID
-     */
+         * Version ID
+         */
         std::string versionId;
 
         /**
-     * Convert to a JSON object
-     *
-     * @return JSON object
-     */
+         * Convert to a JSON object
+         *
+         * @return JSON object
+         */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
     };
 
     struct RestoreStatus {
 
         /**
-     * Is restore in progress
-     */
+         * Is restore in progress
+         */
         bool isRestoreInProgress;
 
         /**
-     * Expiration datetime
-     */
+         * Expiration datetime
+         */
         Poco::DateTime restoreExpiryDate;
 
         /**
-     * Convert to a JSON object
-     *
-     * @return JSON object
-     */
+         * Convert to a JSON object
+         *
+         * @return JSON object
+         */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
     };
 
     struct Version {
 
         /**
-     * Key
-     */
+         * Key
+         */
         std::string key;
 
         /**
-     * ETag
-     */
+         * ETag
+         */
         std::string eTag;
 
         /**
-     * VersionId
-     */
+         * VersionId
+         */
         std::string versionId;
 
         /**
-     * Storage class
-     */
+         * Storage class
+         */
         std::string storageClass;
 
         /**
-     * Checksum algorithm
-     */
+         * Checksum algorithm
+         */
         std::string checksumAlgorithm;
 
         /**
-     * Is latest
-     */
+         * Is latest
+         */
         bool isLatest;
 
         /**
-     * Size
-     */
+         * Size
+         */
         long size;
 
         /**
-     * Is latest
-     */
+         * Is latest
+         */
         Poco::DateTime lastModified;
 
         /**
-     * Owner
-     */
+         * Owner
+         */
         Owner owner;
 
         /**
-     * Restore status
-     */
+         * Restore status
+         */
         RestoreStatus restoreStatue;
 
         /**
-     * Convert to a JSON object
-     *
-     * @return JSON object
-     */
+         * Convert to a JSON object
+         *
+         * @return JSON object
+         */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
-     * Convert to a XML element
-     *
-     * @param pDoc XML document
-     * @return XML element
-     */
+         * Convert to a XML element
+         *
+         * @param pDoc XML document
+         * @return XML element
+         */
         [[nodiscard]] Poco::XML::AutoPtr<Poco::XML::Element> ToXmlElement(Poco::XML::AutoPtr<Poco::XML::Document> pDoc) const;
     };
 
     struct ListObjectVersionsResponse {
 
         /**
-     * Region
-     */
+         * Region
+         */
         std::string region;
 
         /**
-     * Name
-     */
+         * Name
+         */
         std::string name;
 
         /**
-     * Prefix
-     */
+         * Prefix
+         */
         std::string prefix;
 
         /**
-     * Delimiter
-     */
+         * Delimiter
+         */
         std::string delimiter;
 
         /**
-     * Encoding type
-     */
+         * Encoding type
+         */
         std::string encodingType;
 
         /**
-     * Maximal keys
-     */
+         * Maximal keys
+         */
         int maxKeys;
 
         /**
-     * Truncation flag
-     */
+         * Truncation flag
+         */
         bool isTruncated = false;
 
         /**
-     * Key marker
-     */
+         * Key marker
+         */
         std::string keyMarker;
 
         /**
-     * Version ID marker
-     */
+         * Version ID marker
+         */
         std::string versionIdMarker;
 
         /**
-     * Next key marker
-     */
+         * Next key marker
+         */
         std::string nextKeyMarker;
 
         /**
-     * Next version ID marker
-     */
+         * Next version ID marker
+         */
         std::string nextVersionIdMarker;
 
         /**
-     * Common prefixes
-     */
+         * Common prefixes
+         */
         std::vector<std::string> commonPrefixes;
 
         /**
-     * Versions
-     */
+         * Versions
+         */
         std::vector<Version> versions;
 
         /**
-     * Delete markers
-     */
+         * Delete markers
+         */
         std::vector<DeleteMarker> deleteMarkers;
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Convert to XML representation
-     *
-     * @return XML string
-     */
+         * Convert to XML representation
+         *
+         * @return XML string
+         */
         [[nodiscard]] std::string ToXml() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const ListObjectVersionsResponse &r);
     };
 

@@ -23,11 +23,12 @@ namespace AwsMock::Database {
     /**
      * DynamoDB MongoDB database.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class DynamoDbDatabase : public Database {
 
       public:
+
         /**
          * Constructor
          */
@@ -174,6 +175,7 @@ namespace AwsMock::Database {
         void DeleteAllItems();
 
       private:
+
         /**
          * Use MongoDB
          */

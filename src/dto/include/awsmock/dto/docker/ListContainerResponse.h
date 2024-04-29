@@ -21,7 +21,7 @@ namespace AwsMock::Dto::Docker {
     /**
      * List container request
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct ListContainerResponse {
 

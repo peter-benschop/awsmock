@@ -40,7 +40,7 @@ namespace AwsMock::Database::Entity::SNS {
     /**
      * SNS topic entity
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Topic {
 

@@ -38,7 +38,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
     /**
      * DynamoDB attribute value entity
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct AttributeValue {
 

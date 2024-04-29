@@ -26,7 +26,7 @@ namespace AwsMock::Core {
     /**
      * HTTP utilities.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class HttpUtils {
 

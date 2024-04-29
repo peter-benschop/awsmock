@@ -16,7 +16,7 @@ namespace AwsMock::Service {
     /**
      * Transfer family monitoring thread
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class TransferMonitoring : public Core::Timer {
 

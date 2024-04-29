@@ -19,7 +19,7 @@ namespace AwsMock::Service {
      * Used as background thread to do maintenance work.
      * </p>
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class KMSWorker : public Core::Timer {
 

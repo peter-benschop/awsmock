@@ -31,7 +31,7 @@ namespace AwsMock::Service {
      * finishing of the last invocation request. The lambda image can run on a remote docker instance. In this case the hostname on the invocation request has to be filled in. Default is 'localhost'.
      * </p>
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class LambdaExecutor {
 

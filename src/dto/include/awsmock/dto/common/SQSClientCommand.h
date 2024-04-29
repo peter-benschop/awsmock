@@ -68,7 +68,7 @@ namespace AwsMock::Dto::Common {
     /**
      * The S3 client command is used as a standardized way of interpreting the different ways the clients are calling the REST services. Each client type is using a different way of calling the AWS REST services.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct SQSClientCommand {
 

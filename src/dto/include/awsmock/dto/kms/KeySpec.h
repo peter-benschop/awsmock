@@ -14,7 +14,7 @@ namespace AwsMock::Dto::KMS {
     /**
      * KMS master key specification
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     enum class KeySpec {
         RSA_2048,

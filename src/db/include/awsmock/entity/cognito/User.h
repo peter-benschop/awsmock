@@ -40,7 +40,7 @@ namespace AwsMock::Database::Entity::Cognito {
     /**
      * Cognito user entity
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct User {
 

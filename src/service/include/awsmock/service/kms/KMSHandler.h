@@ -20,7 +20,7 @@ namespace AwsMock::Service {
     /**
      * AWS KMS mock handler
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class KMSHandler : public KMSCmdHandler {
 

@@ -49,7 +49,7 @@ namespace AwsMock::Core {
     /**
      * System utils for command line execution and other system routines.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class SystemUtils {
 

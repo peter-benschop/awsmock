@@ -31,7 +31,7 @@ namespace AwsMock::Service {
     /**
      * Lambda async creator
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class LambdaCreator {
 

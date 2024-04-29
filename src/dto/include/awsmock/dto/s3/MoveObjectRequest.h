@@ -15,52 +15,52 @@ namespace AwsMock::Dto::S3 {
     struct MoveObjectRequest {
 
         /**
-     * Region
-     */
+         * Region
+         */
         std::string region;
 
         /**
-     * Region
-     */
+         * User
+         */
         std::string user;
 
         /**
-     * Source bucket
-     */
+         * Source bucket
+         */
         std::string sourceBucket;
 
         /**
-     * Source key
-     */
+         * Source key
+         */
         std::string sourceKey;
 
         /**
-     * Target bucket
-     */
+         * Target bucket
+         */
         std::string targetBucket;
 
         /**
-     * Target key
-     */
+         * Target key
+         */
         std::string targetKey;
 
         /**
-     * Metadata
-     */
+         * Metadata
+         */
         std::map<std::string, std::string> metadata;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const MoveObjectRequest &r);
     };
 

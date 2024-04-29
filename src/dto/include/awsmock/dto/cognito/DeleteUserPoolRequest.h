@@ -19,7 +19,7 @@ namespace AwsMock::Dto::Cognito {
     /**
      * Delete user pool request
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct DeleteUserPoolRequest {
 

@@ -37,7 +37,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
     /**
      * SecretManager secrets entity.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Secret {
 

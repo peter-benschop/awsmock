@@ -18,7 +18,7 @@ namespace AwsMock::Dto {
     /**
      * Common DTO
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct CommonDto {
 

@@ -13,7 +13,7 @@ namespace AwsMock::Core {
     /**
      * Database exception class.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class DatabaseException : public Poco::Exception {
 

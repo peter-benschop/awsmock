@@ -31,11 +31,12 @@ namespace AwsMock::Database {
     /**
      * SNS MongoDB database.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class SNSDatabase : public Database {
 
       public:
+
         /**
          * Constructor
          *
@@ -286,6 +287,7 @@ namespace AwsMock::Database {
         void DeleteAllMessages();
 
       private:
+
         /**
          * Use MongoDB
          */

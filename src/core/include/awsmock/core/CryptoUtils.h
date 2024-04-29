@@ -67,7 +67,7 @@ namespace AwsMock::Core {
     /**
      * Cryptographic utilities like MD5 hash, SHA1, SHA256 etc.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class Crypto {
 

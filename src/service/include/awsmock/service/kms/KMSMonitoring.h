@@ -16,7 +16,7 @@ namespace AwsMock::Service {
     /**
      * KMS monitoring thread
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class KMSMonitoring : public Core::Timer {
 

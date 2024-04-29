@@ -33,7 +33,7 @@ namespace AwsMock::Service {
     /**
      * KMS server thread
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class KMSServer : public AbstractServer {
 

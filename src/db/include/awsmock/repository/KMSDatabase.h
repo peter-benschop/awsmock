@@ -29,7 +29,7 @@ namespace AwsMock::Database {
     /**
      * KMS MongoDB database.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class KMSDatabase : public Database {
 

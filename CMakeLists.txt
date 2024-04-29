@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 set(CMAKE_INSTALL_PREFIX "/usr" CACHE PATH " ..." FORCE)
+set(CMAKE_BUILD_PARALLEL_LEVEL 30)
 
 # Doxygen
 option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation (requires Doxygen and dot) " ON)

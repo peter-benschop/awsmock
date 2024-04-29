@@ -18,7 +18,7 @@ namespace AwsMock::Core {
     /**
      * Date time utilities.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class DateTimeUtils {
 

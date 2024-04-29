@@ -26,7 +26,7 @@ namespace AwsMock::Service {
     /**
      * DynamoDB command handler
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class DynamoDbCmdHandler : public virtual AbstractHandler {
 

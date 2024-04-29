@@ -76,4 +76,15 @@ namespace AwsMock::Core {
         return os.str();
     }
 
+    std::string JsonUtils::ToJsonString(const Poco::JSON::Array &jsonArray, bool prettyPrint, int indent) {
+
+        std::ostringstream os;
+        if (prettyPrint) {
+            jsonArray.stringify(os, indent);
+        } else {
+            jsonArray.stringify(os);
+        }
+        return os.str();
+    }
+
 }// namespace AwsMock::Core

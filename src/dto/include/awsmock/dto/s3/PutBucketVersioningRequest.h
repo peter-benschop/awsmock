@@ -21,50 +21,50 @@ namespace AwsMock::Dto::S3 {
     struct PutBucketVersioningRequest {
 
         /**
-     * AWS region
-     */
+         * AWS region
+         */
         std::string region;
 
         /**
-     * AWS user
-     */
+         * AWS user
+         */
         std::string user;
 
         /**
-     * Bucket name
-     */
+         * Bucket name
+         */
         std::string bucket;
 
         /**
-     * Status
-     */
+         * Status
+         */
         std::string status;
         /**
-     * Constructor
-     *
-     * @param xmlString XML string
-     */
+         * Constructor
+         *
+         * @param xmlString XML string
+         */
         explicit PutBucketVersioningRequest(const std::string &xmlString);
 
         /**
-     * Convert from XML representation
-     *
-     * @param xmlString XML string
-     */
+         * Convert from XML representation
+         *
+         * @param xmlString XML string
+         */
         void FromXml(const std::string &xmlString);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const PutBucketVersioningRequest &r);
     };
 

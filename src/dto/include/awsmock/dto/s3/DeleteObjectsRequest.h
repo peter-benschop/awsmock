@@ -21,46 +21,46 @@ namespace AwsMock::Dto::S3 {
     struct DeleteObjectsRequest {
 
         /**
-     * Region
-     */
+         * Region
+         */
         std::string region;
 
         /**
-     * Bucket
-     */
+         * Bucket
+         */
         std::string bucket;
 
         /**
-     * Key
-     */
+         * Key
+         */
         std::vector<std::string> keys;
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Parse the delete objects request XML.
-     *
-     * @param xmlString notification XML string
-     */
+         * Parse the delete objects request XML.
+         *
+         * @param xmlString notification XML string
+         */
         void FromXml(const std::string &xmlString);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const DeleteObjectsRequest &r);
     };
 

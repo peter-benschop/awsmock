@@ -14,7 +14,7 @@ namespace AwsMock::Database::Entity::Cognito {
     /**
      * Cognito user status entity
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     enum class UserStatus {
         UNCONFIRMED,

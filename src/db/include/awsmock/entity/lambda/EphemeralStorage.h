@@ -33,7 +33,7 @@ namespace AwsMock::Database::Entity::Lambda {
     /**
      * Lambda ephemeral storage entity
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct EphemeralStorage {
 

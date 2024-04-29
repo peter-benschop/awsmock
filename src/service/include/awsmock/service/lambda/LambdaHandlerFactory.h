@@ -22,7 +22,7 @@ namespace AwsMock::Service {
     /**
      * Lambda request handler factory
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class LambdaRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 

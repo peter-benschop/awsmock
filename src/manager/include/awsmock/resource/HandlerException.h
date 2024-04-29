@@ -14,7 +14,7 @@ namespace AwsMock {
     /**
      * Handler exception
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class HandlerException : public std::exception {
 

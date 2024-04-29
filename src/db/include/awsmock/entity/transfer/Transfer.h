@@ -72,7 +72,7 @@ namespace AwsMock::Database::Entity::Transfer {
     /**
      * Transfer manager server entity
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Transfer {
 

@@ -21,7 +21,7 @@ namespace AwsMock::Dto::Cognito {
     /**
      * Delete user request
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct AdminDeleteUserRequest {
 

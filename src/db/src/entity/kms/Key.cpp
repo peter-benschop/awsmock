@@ -2,22 +2,15 @@
 // Created by vogje01 on 01/06/2023.
 //
 
-#include "awsmock/utils/MongoUtils.h"
 #include <awsmock/entity/kms/Key.h>
 
 namespace AwsMock::Database::Entity::KMS {
 
     view_or_value<view, value> Key::ToDocument() const {
 
-        auto tagsDoc = bsoncxx::builder::basic::document{};
-        if (!tags.empty()) {
-            for (const auto &t: tags) {
-                tagsDoc.append(kvp(t.first, t.second));
-            }
-        }
-
-        view_or_value<view, value> keyDoc = make_document(
-                kvp("region", region),
+        bsoncxx::builder::basic::document keyDoc;
+        keyDoc.append(
+                kvp("region", region)),
                 kvp("arn", arn),
                 kvp("keyId", keyId),
                 kvp("keyUsage", keyUsage),
@@ -27,13 +20,25 @@ namespace AwsMock::Database::Entity::KMS {
                 kvp("aes256Iv", aes256Iv),
                 kvp("rsaPrivateKey", rsaPrivateKey),
                 kvp("rsaPublicKey", rsaPublicKey),
-                kvp("tags", tagsDoc),
                 kvp("pendingWindowInDays", pendingWindowInDays),
-                kvp("scheduledDeletion", MongoUtils::ToBson(scheduledDeletion)),
                 kvp("created", MongoUtils::ToBson(created)),
-                kvp("modified", MongoUtils::ToBson(modified)));
+                kvp("modified", MongoUtils::ToBson(modified));
 
-        return keyDoc;
+        // Scheduled deletion
+        if (scheduledDeletion.timestamp() > 0) {
+            keyDoc.append(kvp("scheduledDeletion", MongoUtils::ToBson(scheduledDeletion)));
+        }
+
+        // Tags
+        if (!tags.empty()) {
+            auto tagsDoc = bsoncxx::builder::basic::document{};
+            for (const auto &t: tags) {
+                tagsDoc.append(kvp(t.first, t.second));
+            }
+            keyDoc.append(kvp("tags", tagsDoc));
+        }
+
+        return keyDoc.extract();
     }
 
     void Key::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
@@ -81,11 +86,13 @@ namespace AwsMock::Database::Entity::KMS {
         jsonObject.set("rsaPrivateKey", rsaPrivateKey);
         jsonObject.set("rsaPublicKey", rsaPublicKey);
         jsonObject.set("pendingWindowInDays", pendingWindowInDays);
+        jsonObject.set("created", created);
+        jsonObject.set("modified", modified);
+
+        // Scheduled deletion
         if (scheduledDeletion.timestamp().epochTime() > 0) {
             jsonObject.set("scheduledDeletion", scheduledDeletion);
         }
-        jsonObject.set("created", created);
-        jsonObject.set("modified", modified);
 
         // Tags array
         if (!tags.empty()) {

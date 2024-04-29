@@ -20,7 +20,7 @@ namespace AwsMock::Service {
     /**
      * SQS request handler factory
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class SQSRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 

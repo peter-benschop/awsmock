@@ -28,7 +28,7 @@ namespace AwsMock::Dto::Cognito {
      * },
      * </pre>
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct CustomEmailSender {
 

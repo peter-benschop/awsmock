@@ -31,11 +31,12 @@ namespace AwsMock::Database {
     /**
      * DynamoDB in-memory database.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class DynamoDbMemoryDb {
 
       public:
+
         /**
          * Constructor
          */
@@ -161,6 +162,7 @@ namespace AwsMock::Database {
         void DeleteAllItems();
 
       private:
+
         /**
          * Table map
          */

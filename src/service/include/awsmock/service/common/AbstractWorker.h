@@ -24,7 +24,7 @@ namespace AwsMock::Service {
     /**
      * Abstract HTTP request worker
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class AbstractWorker {
 

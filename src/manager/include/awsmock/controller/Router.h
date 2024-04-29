@@ -31,7 +31,7 @@ namespace AwsMock::Controller {
     /**
      * Management router
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class Router : public Poco::Net::HTTPRequestHandlerFactory {
 

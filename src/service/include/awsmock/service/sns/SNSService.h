@@ -48,7 +48,7 @@ namespace AwsMock::Service {
     /**
      * SNS server thread
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class SNSService {
 

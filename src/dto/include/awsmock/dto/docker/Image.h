@@ -19,7 +19,7 @@ namespace AwsMock::Dto::Docker {
     /**
      * Docker image
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Image {
 

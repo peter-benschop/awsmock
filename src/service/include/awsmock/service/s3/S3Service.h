@@ -41,6 +41,8 @@
 #include <awsmock/dto/s3/ListObjectVersionsResponse.h>
 #include <awsmock/dto/s3/MoveObjectRequest.h>
 #include <awsmock/dto/s3/MoveObjectResponse.h>
+#include <awsmock/dto/s3/PutBucketNotificationConfigurationRequest.h>
+#include <awsmock/dto/s3/PutBucketNotificationConfigurationResponse.h>
 #include <awsmock/dto/s3/PutBucketNotificationRequest.h>
 #include <awsmock/dto/s3/PutBucketVersioningRequest.h>
 #include <awsmock/dto/s3/PutObjectRequest.h>
@@ -59,7 +61,7 @@ namespace AwsMock::Service {
     /**
      * S3 service.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class S3Service {
 
@@ -190,6 +192,16 @@ namespace AwsMock::Service {
          * @param request bucket notification request.
          */
         void PutBucketNotification(const Dto::S3::PutBucketNotificationRequest &request);
+
+        /**
+         * Adds a bucket notification configuration
+         *
+         * @param request bucket notification configuration request.
+         * @return PutBucketNotificationConfigurationResponse,
+         * @see PutBucketNotificationConfigurationRequest
+         * @see PutBucketNotificationConfigurationResponse
+         */
+        Dto::S3::PutBucketNotificationConfigurationResponse PutBucketNotificationConfiguration(const Dto::S3::PutBucketNotificationConfigurationRequest &request);
 
         /**
          * Returns a list object versions

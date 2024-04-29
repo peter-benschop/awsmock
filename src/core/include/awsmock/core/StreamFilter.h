@@ -33,7 +33,7 @@ namespace AwsMock::Core {
      *
      * @see https://cplusplus.com/forum/general/173565/
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class StreamFilter {
 

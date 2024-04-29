@@ -21,7 +21,7 @@ namespace AwsMock::Dto::DynamoDb {
     /**
      * Query request
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct QueryRequest {
 

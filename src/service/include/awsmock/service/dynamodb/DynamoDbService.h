@@ -52,7 +52,7 @@ namespace AwsMock::Service {
     /**
      * DynamoDb module. Handles all DynamoDb related requests:
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class DynamoDbService {
 

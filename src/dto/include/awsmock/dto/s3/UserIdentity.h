@@ -20,36 +20,36 @@ namespace AwsMock::Dto::S3 {
     struct UserIdentity {
 
         /**
-     * AWS principal ID
-     */
+         * AWS principal ID
+         */
         std::string principalId;
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the DTO to a JSON representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a JSON representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const UserIdentity &r);
     };
 }// namespace AwsMock::Dto::S3

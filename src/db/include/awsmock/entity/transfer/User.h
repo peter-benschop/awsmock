@@ -34,7 +34,7 @@ namespace AwsMock::Database::Entity::Transfer {
     /**
      * Transfer manager user entity
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct User {
 

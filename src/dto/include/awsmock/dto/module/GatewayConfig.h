@@ -18,7 +18,7 @@ namespace AwsMock::Dto::Module {
     /**
      * Gateway configuration
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct GatewayConfig {
 

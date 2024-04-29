@@ -16,7 +16,7 @@ namespace AwsMock::Core {
     /**
      * Number utilities.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class NumberUtils {
 

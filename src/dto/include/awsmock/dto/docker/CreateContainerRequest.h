@@ -20,7 +20,7 @@ namespace AwsMock::Dto::Docker {
     /**
      * Exposed port
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct ExposedPort {
 
@@ -38,7 +38,7 @@ namespace AwsMock::Dto::Docker {
     /**
      * Create container request
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct CreateContainerRequest {
 

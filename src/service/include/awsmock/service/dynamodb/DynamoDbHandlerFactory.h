@@ -21,7 +21,7 @@ namespace AwsMock::Service {
     /**
      * DynamoDB request handler factory
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class DynamoDbRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 

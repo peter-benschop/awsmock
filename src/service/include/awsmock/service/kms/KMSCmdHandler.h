@@ -26,7 +26,7 @@ namespace AwsMock::Service {
     /**
      * AWS KMS command handler
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class KMSCmdHandler : public virtual AbstractHandler {
 

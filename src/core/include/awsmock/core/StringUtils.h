@@ -29,7 +29,7 @@ namespace AwsMock::Core {
     /**
      * String utilities.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class StringUtils {
 

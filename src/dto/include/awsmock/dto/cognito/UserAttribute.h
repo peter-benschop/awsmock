@@ -21,7 +21,7 @@ namespace AwsMock::Dto::Cognito {
     /**
      * User attribute
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct UserAttribute {
 

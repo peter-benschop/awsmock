@@ -19,7 +19,7 @@ namespace AwsMock::Service {
     /**
      * Gateway request handler factory
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class GatewayRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 

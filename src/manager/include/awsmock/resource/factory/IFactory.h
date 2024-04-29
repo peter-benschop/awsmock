@@ -18,7 +18,7 @@ namespace AwsMock::Resource::Factory {
     /**
      * Factory interface
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class IFactory {
 

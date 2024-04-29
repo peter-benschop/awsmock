@@ -41,7 +41,7 @@ namespace AwsMock::Service {
     /**
      * Transfer server HTTP server
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class TransferServer : public AbstractServer, public AbstractWorker {
 

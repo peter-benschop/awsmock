@@ -29,7 +29,9 @@ set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp sr
         src/s3/ListAllBucketResponse.cpp src/s3/ListBucketRequest.cpp src/s3/ListBucketResponse.cpp
         src/s3/ListAllBucketResponse.cpp src/s3/DeleteBucketRequest.cpp src/s3/CreateMultipartUploadRequest.cpp
         src/s3/Owner.cpp src/s3/Content.cpp src/s3/CreateMultipartUploadResult.cpp src/s3/ListObjectVersionsRequest.cpp
-        src/s3/ListObjectVersionsResponse.cpp)
+        src/s3/ListObjectVersionsResponse.cpp src/s3/PutBucketNotificationRequest.cpp src/s3/FilterRule.cpp
+        src/s3/QueueConfiguration.cpp src/s3/PutBucketNotificationConfigurationRequest.cpp
+        src/s3/PutBucketNotificationConfigurationResponse.cpp)
 set(DOCKER_SOURCES src/docker/Port.cpp src/docker/Container.cpp src/docker/Image.cpp src/docker/ListContainerResponse.cpp
         src/docker/ListImageResponse.cpp src/docker/CreateContainerRequest.cpp src/docker/Filters.cpp
         src/docker/CreateContainerResponse.cpp)
@@ -80,7 +82,8 @@ add_subdirectory(tst)
 # Includes
 include_directories(include ../core/include ../db/include /usr/include/mongo /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
 
-add_library(${LIBRARY} SHARED ${SOURCES})
+add_library(${LIBRARY} SHARED ${SOURCES}
+        include/awsmock/dto/s3/FilterRule.h)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 

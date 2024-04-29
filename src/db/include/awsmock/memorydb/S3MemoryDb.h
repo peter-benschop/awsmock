@@ -26,7 +26,7 @@ namespace AwsMock::Database {
     /**
      * S3 in-memory database.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class S3MemoryDb {
 

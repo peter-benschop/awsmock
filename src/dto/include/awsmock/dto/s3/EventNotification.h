@@ -20,69 +20,69 @@
 namespace AwsMock::Dto::S3 {
 
     /**
-   * {
-   *   "Records":[
-   *       {
-   *        "eventVersion":"2.2",
-   *        "eventSource":"aws:s3",
-   *        "awsRegion":"us-west-2",
-   *        "eventTime":"The time, in ISO-8601 format, for example, 1970-01-01T00:00:00.000Z, when Amazon S3 finished processing the request",
-   *        "eventName":"event-type",
-   *        "userIdentity":{
-   *           "principalId":"Amazon-customer-ID-of-the-user-who-caused-the-event"
-   *        },
-   *        "requestParameters":{
-   *           "sourceIPAddress":"ip-address-where-request-came-from"
-   *        },
-   *        "responseElements":{
-   *           "x-amz-request-userPoolId":"Amazon S3 generated request ID",
-   *           "x-amz-userPoolId-2":"Amazon S3 host that processed the request"
-   *        },
-   *        "s3":{
-   *           "s3SchemaVersion":"1.0",
-   *           "configurationId":"ID found in the bucket notification configuration",
-   *           "bucket":{
-   *              "name":"bucket-name",
-   *              "ownerIdentity":{
-   *                 "principalId":"Amazon-customer-ID-of-the-bucket-owner"
-   *              },
-   *              "arn":"bucket-ARN"
-   *           },
-   *           "object":{
-   *              "key":"object-key",
-   *              "size":"object-size in bytes",
-   *              "eTag":"object eTag",
-   *              "versionId":"object version if bucket is versioning-enabled, otherwise null",
-   *              "sequencer": "a string representation of a hexadecimal value used to determine event sequence, only used with PUTs and DELETEs"
-   *           }
-   *        },
-   *        "glacierEventData": {
-   *           "restoreEventData": {
-   *              "lifecycleRestorationExpiryTime": "The time, in ISO-8601 format, for example, 1970-01-01T00:00:00.000Z, of Restore Expiry",
-   *              "lifecycleRestoreStorageClass": "Source storage class for restore"
-   *           }
-   *        }
-   *     }
-   *   ]
-   * }
-   */
+     * {
+     *   "Records":[
+     *       {
+     *        "eventVersion":"2.2",
+     *        "eventSource":"aws:s3",
+     *        "awsRegion":"us-west-2",
+     *        "eventTime":"The time, in ISO-8601 format, for example, 1970-01-01T00:00:00.000Z, when Amazon S3 finished processing the request",
+     *        "eventName":"event-type",
+     *        "userIdentity":{
+     *           "principalId":"Amazon-customer-ID-of-the-user-who-caused-the-event"
+     *        },
+     *        "requestParameters":{
+     *           "sourceIPAddress":"ip-address-where-request-came-from"
+     *        },
+     *        "responseElements":{
+     *           "x-amz-request-userPoolId":"Amazon S3 generated request ID",
+     *           "x-amz-userPoolId-2":"Amazon S3 host that processed the request"
+     *        },
+     *        "s3":{
+     *           "s3SchemaVersion":"1.0",
+     *           "configurationId":"ID found in the bucket notification configuration",
+     *           "bucket":{
+     *              "name":"bucket-name",
+     *              "ownerIdentity":{
+     *                 "principalId":"Amazon-customer-ID-of-the-bucket-owner"
+     *              },
+     *              "arn":"bucket-ARN"
+     *           },
+     *           "object":{
+     *               "key":"object-key",
+     *              "size":"object-size in bytes",
+     *              "eTag":"object eTag",
+     *              "versionId":"object version if bucket is versioning-enabled, otherwise null",
+     *              "sequencer": "a string representation of a hexadecimal value used to determine event sequence, only used with PUTs and DELETEs"
+     *           }
+     *        },
+     *        "glacierEventData": {
+     *           "restoreEventData": {
+     *              "lifecycleRestorationExpiryTime": "The time, in ISO-8601 format, for example, 1970-01-01T00:00:00.000Z, of Restore Expiry",
+     *              "lifecycleRestoreStorageClass": "Source storage class for restore"
+     *           }
+     *        }
+     *     }
+     *   ]
+     * }
+     */
     struct RequestParameter {
 
         /**
-     * Request parameters
-     */
+         * Request parameters
+         */
         std::string requestParameters;
 
         /**
-     * Source IP address
-     */
+         * Source IP address
+         */
         std::string sourceIPAddress;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const {
             std::stringstream ss;
             ss << (*this);
@@ -90,10 +90,10 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const RequestParameter &r) {
             os << "RequestParameter={requestParameters='" + r.requestParameters + "' sourceIPAddress='" + r.sourceIPAddress + "'}";
             return os;
@@ -103,20 +103,20 @@ namespace AwsMock::Dto::S3 {
     struct ResponseElements {
 
         /**
-     * Request ID
-     */
+         * Request ID
+         */
         std::string xAmzRequestId;
 
         /**
-     * ID2
-     */
+         * ID2
+         */
         std::string xAmzId2;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const {
             std::stringstream ss;
             ss << (*this);
@@ -124,10 +124,10 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const ResponseElements &r) {
             os << "ResponseElements={xAmzRequestId='" + r.xAmzRequestId + "' xAmzId2='" + r.xAmzId2 + "'}";
             return os;
@@ -137,15 +137,15 @@ namespace AwsMock::Dto::S3 {
     struct OwnerIdentity {
 
         /**
-     * Principal ID
-     */
+         * Principal ID
+         */
         std::string principalId;
 
         /**
-     * Converts the DTO to a JSON representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a JSON representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const {
 
             try {
@@ -160,10 +160,10 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-     * Converts a JSON representation to s DTO.
-     *
-     * @param jsonObject JSON object.
-     */
+         * Converts a JSON representation to s DTO.
+         *
+         * @param jsonObject JSON object.
+         */
         void FromJson(const Poco::JSON::Object::Ptr &jsonObject) {
 
             try {
@@ -175,10 +175,10 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const {
             std::stringstream ss;
             ss << (*this);
@@ -186,10 +186,10 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const OwnerIdentity &o) {
             os << "OwnerIdentity={principalId='" + o.principalId + "'}";
             return os;
@@ -199,25 +199,25 @@ namespace AwsMock::Dto::S3 {
     struct Bucket {
 
         /**
-     * Bucket name
-     */
+         * Bucket name
+         */
         std::string name;
 
         /**
-     * Owner
-     */
+         * Owner
+         */
         OwnerIdentity ownerIdentity;
 
         /**
-     * ARN
-     */
+         * ARN
+         */
         std::string arn;
 
         /**
-     * Converts the DTO to a JSON representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a JSON representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const {
 
             try {
@@ -234,10 +234,10 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-     * Converts a JSON representation to s DTO.
-     *
-     * @param jsonObject JSON object.
-     */
+         * Converts a JSON representation to s DTO.
+         *
+         * @param jsonObject JSON object.
+         */
         void FromJson(Poco::JSON::Object::Ptr jsonObject) {
 
             try {
@@ -254,10 +254,10 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const {
             std::stringstream ss;
             ss << (*this);
@@ -265,10 +265,10 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const Bucket &s) {
             os << "Bucket={name='" + s.name + "' ownerIdentity='" + s.ownerIdentity.ToString() + "' arn='" + s.arn + "'}";
             return os;
@@ -278,35 +278,35 @@ namespace AwsMock::Dto::S3 {
     struct Object {
 
         /**
-     * S3 object key
-     */
+         * S3 object key
+         */
         std::string key;
 
         /**
-     * Object file size
-     */
+         * Object file size
+         */
         long size = 0;
 
         /**
-     * Etag
-     */
+         * Etag
+         */
         std::string etag;
 
         /**
-     * Object version
-     */
+         * Object version
+         */
         std::string versionId;
 
         /**
-     * S3 sequencer
-     */
+         * S3 sequencer
+         */
         std::string sequencer;
 
         /**
-     * Converts the DTO to a JSON representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a JSON representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const {
 
             try {
@@ -325,10 +325,10 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-     * Converts a JSON representation to s DTO.
-     *
-     * @param jsonObject JSON object
-     */
+         * Converts a JSON representation to s DTO.
+         *
+         * @param jsonObject JSON object
+         */
         void FromJson(const Poco::JSON::Object::Ptr &jsonObject) {
 
             try {
@@ -344,10 +344,10 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const {
             std::stringstream ss;
             ss << (*this);
@@ -355,10 +355,10 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const Object &o) {
             os << "Object={key='" + o.key + "' size='" + std::to_string(o.size) + "' etag='" + o.etag + "' versionId='" + o.versionId +
                             "' sequencer='" + o.sequencer + "'}";
@@ -369,30 +369,30 @@ namespace AwsMock::Dto::S3 {
     struct S3 {
 
         /**
-     * Schema version
-     */
+         * Schema version
+         */
         std::string s3SchemaVersion = "1.0";
 
         /**
-     * S3 event configuration ID
-     */
+         * S3 event configuration ID
+         */
         std::string configurationId;
 
         /**
-     * S3 bucket
-     */
+         * S3 bucket
+         */
         Bucket bucket;
 
         /**
-     * S3 object
-     */
+         * S3 object
+         */
         Object object;
 
         /**
-     * Converts the DTO to a JSON representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a JSON representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const {
 
             try {
@@ -410,10 +410,10 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-     * Converts a JSON representation to s DTO.
-     *
-     * @param jsonObject JSON object.
-     */
+         * Converts a JSON representation to s DTO.
+         *
+         * @param jsonObject JSON object.
+         */
         void FromJson(Poco::JSON::Object::Ptr jsonObject) {
 
             try {
@@ -433,10 +433,10 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const {
             std::stringstream ss;
             ss << (*this);
@@ -444,10 +444,10 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const S3 &s) {
             os << "S3={s3SchemaVersion='" + s.s3SchemaVersion + "' configurationId='" + s.configurationId + "' bucket='" + s.bucket.ToString() +
                             "' object='" + s.object.ToString() + "'}";
@@ -458,55 +458,55 @@ namespace AwsMock::Dto::S3 {
     struct Record {
 
         /**
-     * Record version
-     */
+         * Record version
+         */
         std::string eventVersion = "2.2";
 
         /**
-     * Event source
-     */
+         * Event source
+         */
         std::string eventSource = "aws:s3";
 
         /**
-     * Region
-     */
+         * Region
+         */
         std::string region;
 
         /**
-     * Event time
-     */
+         * Event time
+         */
         std::string eventTime = Core::DateTimeUtils::AwsDatetimeNow();
 
         /**
-     * Event name
-     */
+         * Event name
+         */
         std::string eventName;
 
         /**
-     * Event user
-     */
+         * Event user
+         */
         UserIdentity userIdentity;
 
         /**
-     * Event request parameter
-     */
+         * Event request parameter
+         */
         RequestParameter requestParameter;
 
         /**
-     * Response element
-     */
+         * Response element
+         */
         ResponseElements responseElements;
 
         /**
-     * S3 event parameter
-     */
+         * S3 event parameter
+         */
         S3 s3;
 
         /**
-     * Converts the DTO to a JSON representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a JSON representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const {
 
             try {
@@ -527,10 +527,10 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-     * Converts a JSON representation to s DTO.
-     *
-     * @param object JSON object.
-     */
+         * Converts a JSON representation to s DTO.
+         *
+         * @param object JSON object.
+         */
         void FromJson(Poco::JSON::Object::Ptr object) {
 
             try {
@@ -548,10 +548,10 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const {
             std::stringstream ss;
             ss << (*this);
@@ -559,10 +559,10 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const Record &r) {
             os << "Record={eventVersion='" + r.eventVersion + "' eventSource='" + r.eventSource + "' region='" + r.region + "' eventTime='" + r.eventTime +
                             "' eventName='" + r.eventName + "' userIdentity='" + r.userIdentity.ToString() + "' requestParameter='" + r.requestParameter.ToString() +
@@ -574,15 +574,15 @@ namespace AwsMock::Dto::S3 {
     struct EventNotification {
 
         /**
-     * S3 event record
-     */
+         * S3 event record
+         */
         std::vector<Record> records;
 
         /**
-     * Converts the DTO to a JSON representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a JSON representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToJson() const {
 
             try {
@@ -603,10 +603,10 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-     * Converts a JSON representation to s DTO.
-     *
-     * @param jsonString JSON string.
-     */
+         * Converts a JSON representation to s DTO.
+         *
+         * @param jsonString JSON string.
+         */
         void FromJson(const std::string &jsonString) {
 
             try {
@@ -630,10 +630,10 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const {
             std::stringstream ss;
             ss << (*this);
@@ -641,10 +641,10 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const EventNotification &e) {
             os << "EventNotification={";
             for (const auto &r: e.records) {
@@ -654,5 +654,7 @@ namespace AwsMock::Dto::S3 {
             return os;
         }
     };
+
 }// namespace AwsMock::Dto::S3
+
 #endif// AWSMOCK_DTO_S3_EVENT_NOTIFICATION_H

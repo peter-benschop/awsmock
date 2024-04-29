@@ -33,7 +33,7 @@ namespace AwsMock::Service {
      * are first send to the S3CmdHandler, which normalizes the commands.
      * <p>
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class S3Handler : public S3CmdHandler {
 

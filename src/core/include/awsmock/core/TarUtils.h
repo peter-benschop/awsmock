@@ -26,7 +26,7 @@ namespace AwsMock::Core {
     /**
      * TAR compresion utilities
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class TarUtils {
 

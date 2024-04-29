@@ -20,7 +20,7 @@ namespace AwsMock::Dto::Docker {
     /**
      * Create container response
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct CreateContainerResponse {
 

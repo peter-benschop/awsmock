@@ -43,7 +43,7 @@ namespace AwsMock::Database::Entity::Lambda {
     /**
      * Lambda state
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     enum LambdaState {
         Pending,

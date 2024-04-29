@@ -39,7 +39,7 @@ namespace AwsMock::Dto::DynamoDb {
      * }
      * </pre>
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct GetItemResponse {
 

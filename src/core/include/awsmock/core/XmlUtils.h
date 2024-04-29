@@ -25,7 +25,7 @@ namespace AwsMock::Core {
     /**
      * XML utilities.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class XmlUtils {
 

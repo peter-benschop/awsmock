@@ -43,7 +43,7 @@ namespace AwsMock::Service {
      * The gateway handler acts a as SPI gateway for thew different AwsMock services. It routes the client requests to the appropriate service port. The service will extracted from the AWS authorization header.
      * </p>
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class GatewayHandler : public AbstractHandler {
 

@@ -23,7 +23,7 @@ namespace AwsMock::Service {
     /**
      * Cognito command line handler
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class CognitoCliHandler : public virtual AbstractHandler {
 

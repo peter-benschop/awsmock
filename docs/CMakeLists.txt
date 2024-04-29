@@ -6,7 +6,7 @@ set(MAN_NAMES awsmockmgr.1 awsmockctl.1 awsmockcfg.1 awslocal.1 awsmocksqs.1 aws
 set(MAN_FILES)
 
 if (BUILD_DOCUMENTATION)
-    set(doxyfile ${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile)
+    set(doxyfile ./Doxyfile)
     find_package(Doxygen)
     if (NOT DOXYGEN_FOUND)
         message(FATAL_ERROR "Doxygen is needed to build the documentation.")
@@ -14,7 +14,7 @@ if (BUILD_DOCUMENTATION)
     add_custom_target(
             docs
             COMMAND ${DOXYGEN_EXECUTABLE} ${doxyfile}
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/docs
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
             COMMENT "Generating API documentation with Doxygen"
             VERBATIM)
 endif ()

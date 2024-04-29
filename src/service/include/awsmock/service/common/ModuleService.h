@@ -35,7 +35,7 @@ namespace AwsMock::Service {
     /**
      * The ModuleService controls the different services
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class ModuleService {
 

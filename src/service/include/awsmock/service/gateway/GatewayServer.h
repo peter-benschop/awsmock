@@ -38,7 +38,7 @@ namespace AwsMock::Service {
     /**
      * Gateway server
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class GatewayServer : public AbstractServer {
 

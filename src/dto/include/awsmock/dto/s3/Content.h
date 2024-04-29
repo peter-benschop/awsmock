@@ -22,59 +22,59 @@ namespace AwsMock::Dto::S3 {
     struct Content {
 
         /**
-     * Checksum algorithms
-     */
+         * Checksum algorithms
+         */
         std::vector<std::string> checksumAlgorithms;
 
         /**
-     * ETag
-     */
+         * ETag
+         */
         std::string etag;
 
         /**
-     * Key
-     */
+         * Key
+         */
         std::string key;
 
         /**
-     * Owner
-     */
+         * Owner
+         */
         Owner owner;
 
         /**
-     * Size
-     */
+         * Size
+         */
         long size = 0;
 
         /**
-     * Storage class
-     */
+         * Storage class
+         */
         std::string storageClass;
 
         /**
-     * Last modified
-     */
+         * Last modified
+         */
         std::string lastModified;
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const Content &r);
     };
 

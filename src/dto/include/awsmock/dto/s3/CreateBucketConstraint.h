@@ -20,43 +20,43 @@ namespace AwsMock::Dto::S3 {
     struct CreateBucketConstraint {
 
         /**
-     * Bucket location
-     */
+         * Bucket location
+         */
         std::string location;
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Convert to XML representation
-     *
-     * Example:
-     * @verbatim
-     * <CreateBucketConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
-     *     <LocationConstraint>eu-central-1</LocationConstraint>
-     * </CreateBucketConfiguration>
-     * @endverbatim
-     *
-     * @return XML string
-     */
+         * Convert to XML representation
+         *
+         * Example:
+         * @verbatim
+         * <CreateBucketConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+         *     <LocationConstraint>eu-central-1</LocationConstraint>
+         * </CreateBucketConfiguration>
+         * @endverbatim
+         *
+         * @return XML string
+         */
         [[nodiscard]] std::string ToXml() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const CreateBucketConstraint &r);
     };
 

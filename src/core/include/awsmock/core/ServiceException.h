@@ -2,8 +2,8 @@
 // Created by vogje01 on 02/09/2022.
 //
 
-#ifndef AWSMOCK_CORE_SERVICEEXCEPTION_H
-#define AWSMOCK_CORE_SERVICEEXCEPTION_H
+#ifndef AWSMOCK_CORE_SERVICE_EXCEPTION_H
+#define AWSMOCK_CORE_SERVICE_EXCEPTION_H
 
 // Poco includes
 #include <Poco/Exception.h>
@@ -13,9 +13,9 @@
 namespace AwsMock::Core {
 
     /**
-     * COM exception class. In case of a COM request failure a COMException is thrown.
+     * Service exception class. In case of a request failure a ServiceException is thrown.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class ServiceException : public Poco::Exception {
 
@@ -28,9 +28,7 @@ namespace AwsMock::Core {
          * @param resource exception resource
          * @param requestId exception resource ID
          */
-        explicit ServiceException(int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR,
-                                  const char *resource = nullptr,
-                                  const char *requestId = nullptr);
+        explicit ServiceException(int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR, const char *resource = nullptr, const char *requestId = nullptr);
 
         /**
          * Constructor.
@@ -40,10 +38,7 @@ namespace AwsMock::Core {
          * @param resource exception resource
          * @param requestId exception resource ID
          */
-        explicit ServiceException(const std::string &msg,
-                                  int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR,
-                                  const char *resource = nullptr,
-                                  const char *requestId = nullptr);
+        explicit ServiceException(const std::string &msg, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR, const char *resource = nullptr, const char *requestId = nullptr);
 
         /**
          * Constructor.
@@ -54,11 +49,7 @@ namespace AwsMock::Core {
          * @param resource exception resource
          * @param requestId exception resource ID
          */
-        ServiceException(const std::string &msg,
-                         const std::string &arg,
-                         int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR,
-                         const char *resource = nullptr,
-                         const char *requestId = nullptr);
+        ServiceException(const std::string &msg, const std::string &arg, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR, const char *resource = nullptr, const char *requestId = nullptr);
 
         /**
          * Constructor.
@@ -69,11 +60,7 @@ namespace AwsMock::Core {
          * @param resource exception resource
          * @param requestId exception resource ID
          */
-        ServiceException(const std::string &msg,
-                         const Poco::Exception &exc,
-                         int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR,
-                         const char *resource = nullptr,
-                         const char *requestId = nullptr);
+        ServiceException(const std::string &msg, const Poco::Exception &exc, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR, const char *resource = nullptr, const char *requestId = nullptr);
 
         /**
          * Copy constructor.
@@ -137,4 +124,4 @@ namespace AwsMock::Core {
 
 }// namespace AwsMock::Core
 
-#endif//AWSMOCK_CORE_SERVICEEXCEPTION_H
+#endif//AWSMOCK_CORE_SERVICE_EXCEPTION_H

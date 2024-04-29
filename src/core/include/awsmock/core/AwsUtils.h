@@ -33,7 +33,7 @@ namespace AwsMock::Core {
     /**
      * General AWS utilities.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class AwsUtils {
 

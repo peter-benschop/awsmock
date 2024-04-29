@@ -35,7 +35,7 @@ namespace AwsMock::Dto::SecretsManager {
    * ]
    * </pre>
    *
-   * @author jens.vogt@opitz-consulting.com
+   * @author jens.vogt\@opitz-consulting.com
    */
     struct VersionIdsToStages {
 

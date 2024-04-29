@@ -40,7 +40,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
     /**
      * DynamoDB item entity
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Item {
 

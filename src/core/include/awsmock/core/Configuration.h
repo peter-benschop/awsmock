@@ -42,7 +42,7 @@ namespace AwsMock::Core {
      * awsmock.logging.level=debug
      * </pre>
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class Configuration : public Poco::Util::PropertyFileConfiguration {
 

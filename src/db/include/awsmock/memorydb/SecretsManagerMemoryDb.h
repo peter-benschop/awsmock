@@ -31,7 +31,7 @@ namespace AwsMock::Database {
     /**
      * Secrets manager in-memory database.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class SecretsManagerMemoryDb {
 

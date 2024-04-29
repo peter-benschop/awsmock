@@ -29,7 +29,7 @@ namespace AwsMock::Dto::KMS {
      * }
      * </pre>
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct ListKeysRequest {
 

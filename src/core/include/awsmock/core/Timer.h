@@ -22,7 +22,7 @@ namespace AwsMock::Core {
     /**
      * General asynchronous job execution class
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class Timer {
 

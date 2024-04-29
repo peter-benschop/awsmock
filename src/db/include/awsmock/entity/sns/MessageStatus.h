@@ -14,7 +14,7 @@ namespace AwsMock::Database::Entity::SNS {
     /**
      * SNS message attribute entity
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     enum MessageStatus {
         INITIAL,

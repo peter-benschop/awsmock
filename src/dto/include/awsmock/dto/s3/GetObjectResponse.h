@@ -21,74 +21,74 @@ namespace AwsMock::Dto::S3 {
     struct GetObjectResponse {
 
         /**
-     * AWS region
-     */
+         * AWS region
+         */
         std::string region;
 
         /**
-     * Bucket
-     */
+         * Bucket
+         */
         std::string bucket;
 
         /**
-     * Key
-     */
+         * Key
+         */
         std::string key;
 
         /**
-     * Content length
-     */
+         * Content length
+         */
         long size;
 
         /**
-     * File name
-     */
+         * File name
+         */
         std::string filename;
 
         /**
-     * Content type
-     */
+         * Content type
+         */
         std::string contentType;
 
         /**
-     * Metadata
-     */
+         * Metadata
+         */
         std::map<std::string, std::string> metadata;
 
         /**
-     * MD5 sum
-     */
+         * MD5 sum
+         */
         std::string md5sum;
 
         /**
-     * Created
-     */
+         * Created
+         */
         Poco::DateTime created;
 
         /**
-     * Modified
-     */
+         * Modified
+         */
         Poco::DateTime modified;
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const GetObjectResponse &r);
     };
 

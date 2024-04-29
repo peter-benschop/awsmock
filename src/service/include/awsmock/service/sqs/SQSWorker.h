@@ -18,7 +18,7 @@ namespace AwsMock::Service {
      * Used as background thread to do maintenance work, like resetting messages, deleted old message etc.
      * </p>
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class SQSWorker : public Core::Timer {
 

@@ -31,7 +31,7 @@ namespace AwsMock::Database::Entity::S3 {
     /**
      * S3 bucket notification entity
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct BucketNotification {
 
@@ -51,7 +51,7 @@ namespace AwsMock::Database::Entity::S3 {
         std::string queueArn;
 
         /**
-         * lambda ARN
+         * Lambda ARN
          */
         std::string lambdaArn;
 

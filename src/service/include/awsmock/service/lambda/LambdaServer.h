@@ -41,7 +41,7 @@ namespace AwsMock::Service {
     /**
      * Lambda server
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class LambdaServer : public AbstractServer, public AbstractWorker {
 

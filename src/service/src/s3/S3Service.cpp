@@ -673,6 +673,11 @@ namespace AwsMock::Service {
         return _database.CreateBucketNotification(bucket, bucketNotification);
     }
 
+    Dto::S3::PutBucketNotificationConfigurationResponse S3Service::PutBucketNotificationConfiguration(const Dto::S3::PutBucketNotificationConfigurationRequest &request) {
+        Dto::S3::PutBucketNotificationConfigurationResponse response;
+        return response;
+    }
+
     std::string S3Service::GetDirFromKey(const std::string &key) {
 
         if (key.find('/') != std::string::npos) {

@@ -16,7 +16,7 @@ namespace AwsMock::Service {
     /**
      * S3 monitoring thread
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class S3Monitoring : public Core::Timer {
 

@@ -43,7 +43,7 @@ namespace AwsMock::Database::Entity::S3 {
     /**
      * S3 object entity
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Object {
 

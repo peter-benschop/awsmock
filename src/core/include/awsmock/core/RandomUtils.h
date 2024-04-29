@@ -20,7 +20,7 @@ namespace AwsMock::Core {
      *
      * <p>Using the Mersenne Twister random generator with a uniform distribution.</p>
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class RandomUtils {
 

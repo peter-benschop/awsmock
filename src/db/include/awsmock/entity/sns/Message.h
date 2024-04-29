@@ -68,7 +68,7 @@ namespace AwsMock::Database::Entity::SNS {
     /**
      * SNS message entity
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Message {
 

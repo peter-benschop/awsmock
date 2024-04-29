@@ -64,7 +64,7 @@ namespace AwsMock::Database::Entity::S3 {
     /**
      * S3 bucket entity
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Bucket {
 

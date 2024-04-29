@@ -136,7 +136,7 @@ namespace AwsMock::Core {
             value = std::stoi(parameterValue);
             value = value > min && value < max ? value : def;
         }
-        log_warning << "Query parameter found, name: " << name << " value: " << value;
+        log_trace << "Query parameter found, name: " << name << " value: " << value;
         return value;
     }
 
@@ -148,7 +148,7 @@ namespace AwsMock::Core {
                 return true;
             }
         }
-        log_warning << "Query parameter not found, name: " << name;
+        log_trace << "Query parameter not found, name: " << name;
         return false;
     }
 

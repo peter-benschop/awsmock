@@ -69,7 +69,7 @@ namespace AwsMock::Service {
      * between 32768 and 65536.
      * </p>
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class LambdaService {
 

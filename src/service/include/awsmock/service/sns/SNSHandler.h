@@ -26,7 +26,7 @@ namespace AwsMock::Service {
     /**
      * AWS SNS mock handler
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class SNSHandler : public SNSCmdHandler {
 

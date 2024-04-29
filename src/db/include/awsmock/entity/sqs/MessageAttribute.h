@@ -59,7 +59,7 @@ namespace AwsMock::Database::Entity::SQS {
     /**
      * SQS message attribute entity
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct MessageAttribute {
 

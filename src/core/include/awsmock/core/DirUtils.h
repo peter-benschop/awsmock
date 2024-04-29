@@ -41,7 +41,7 @@ namespace AwsMock::Core {
     /**
      * Directory utilities.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class DirUtils {
 

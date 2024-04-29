@@ -19,7 +19,7 @@ namespace AwsMock::Dto::Cognito {
     /**
      * Create user pool response
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct CreateUserPoolResponse {
 

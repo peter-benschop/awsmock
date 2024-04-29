@@ -37,7 +37,7 @@ namespace AwsMock::Database::Entity::SQS {
     /**
      * SQS queue re-drive policy entity
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct RedrivePolicy {
 

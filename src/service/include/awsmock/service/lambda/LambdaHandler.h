@@ -28,7 +28,7 @@ namespace AwsMock::Service {
      *
      * <p>AWS lambda HTTP request handler. All lambda related REST call are ending here.</p>
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class LambdaHandler : public AbstractHandler {
 

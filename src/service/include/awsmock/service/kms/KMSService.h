@@ -43,7 +43,7 @@ namespace AwsMock::Service {
     /**
      * KMS service
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class KMSService {
 
