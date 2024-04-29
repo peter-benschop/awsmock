@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_LAMBDACREATOR_H
-#define AWSMOCK_SERVICE_LAMBDACREATOR_H
+#ifndef AWSMOCK_SERVICE_LAMBDA_CREATOR_H
+#define AWSMOCK_SERVICE_LAMBDA_CREATOR_H
 
 // C++ standard includes
 #include <sstream>
@@ -143,4 +143,4 @@ namespace AwsMock::Service {
 
 }//namespace AwsMock::Service
 
-#endif// AWSMOCK_SERVICE_LAMBDACREATOR_H
+#endif// AWSMOCK_SERVICE_LAMBDA_CREATOR_H

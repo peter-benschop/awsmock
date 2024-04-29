@@ -2,8 +2,8 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_TRANSFERSERVER_H
-#define AWSMOCK_SERVICE_TRANSFERSERVER_H
+#ifndef AWSMOCK_SERVICE_TRANSFER_SERVER_H
+#define AWSMOCK_SERVICE_TRANSFER_SERVER_H
 
 // C++ standard includes
 #include <map>
@@ -208,4 +208,4 @@ namespace AwsMock::Service {
 
 }// namespace AwsMock::Service
 
-#endif// AWSMOCK_SERVICE_TRANSFERSERVER_H
+#endif// AWSMOCK_SERVICE_TRANSFER_SERVER_H

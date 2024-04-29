@@ -11,11 +11,11 @@ namespace AwsMock::Service {
           _cognitoDatabase(Database::CognitoDatabase::instance()) {
 
         // Get HTTP configuration values
-        _port = _configuration.getInt("awsmock.service.cognito.port", COGNITO_DEFAULT_PORT);
-        _host = _configuration.getString("awsmock.service.cognito.host", COGNITO_DEFAULT_HOST);
-        _maxQueueLength = _configuration.getInt("awsmock.service.cognito.max.queue", COGNITO_DEFAULT_QUEUE_SIZE);
-        _maxThreads = _configuration.getInt("awsmock.service.cognito.max.threads", COGNITO_DEFAULT_MAX_THREADS);
-        _requestTimeout = _configuration.getInt("awsmock.service.cognito.timeout", COGNITO_DEFAULT_TIMEOUT);
+        _port = _configuration.getInt("awsmock.service.cognito.http.port", COGNITO_DEFAULT_PORT);
+        _host = _configuration.getString("awsmock.service.cognito.http.host", COGNITO_DEFAULT_HOST);
+        _maxQueueLength = _configuration.getInt("awsmock.service.cognito.http.max.queue", COGNITO_DEFAULT_QUEUE_SIZE);
+        _maxThreads = _configuration.getInt("awsmock.service.cognito.http.max.threads", COGNITO_DEFAULT_MAX_THREADS);
+        _requestTimeout = _configuration.getInt("awsmock.service.cognito.http.timeout", COGNITO_DEFAULT_TIMEOUT);
         _monitoringPeriod = _configuration.getInt("awsmock.service.cognito.monitoring.period", COGNITO_DEFAULT_MONITORING_PERIOD);
 
         // Monitoring

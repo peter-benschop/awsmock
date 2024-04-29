@@ -2,8 +2,8 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#ifndef AWSMOCK_SERVER_LAMBDASERVER_H
-#define AWSMOCK_SERVER_LAMBDASERVER_H
+#ifndef AWSMOCK_SERVER_LAMBDA_SERVER_H
+#define AWSMOCK_SERVER_LAMBDA_SERVER_H
 
 // C++ standard includes
 #include <string>
@@ -192,4 +192,4 @@ namespace AwsMock::Service {
 
 }// namespace AwsMock::Service
 
-#endif// AWSMOCK_SERVER_LAMBDASERVER_H
+#endif// AWSMOCK_SERVER_LAMBDA_SERVER_H

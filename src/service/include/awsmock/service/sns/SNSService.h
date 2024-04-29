@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_SNSSERVICE_H
-#define AWSMOCK_SERVICE_SNSSERVICE_H
+#ifndef AWSMOCK_SERVICE_SNS_SERVICE_H
+#define AWSMOCK_SERVICE_SNS_SERVICE_H
 
 // C++ standard includes
 #include <chrono>
@@ -182,4 +182,4 @@ namespace AwsMock::Service {
 
 }// namespace AwsMock::Service
 
-#endif// AWSMOCK_SERVICE_SNSSERVICE_H
+#endif// AWSMOCK_SERVICE_SNS_SERVICE_H
