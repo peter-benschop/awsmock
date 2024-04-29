@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_RECEIVEMESSAGERESPONSE_H
-#define AWSMOCK_DTO_SQS_RECEIVEMESSAGERESPONSE_H
+#ifndef AWSMOCK_DTO_SQS_RECEIVE_MESSAGE_RESPONSE_H
+#define AWSMOCK_DTO_SQS_RECEIVE_MESSAGE_RESPONSE_H
 
 // C++ standard includes
 #include <sstream>
@@ -28,80 +28,80 @@
 namespace AwsMock::Dto::SQS {
 
     /**
-   * Receive message response.
-   * <p>
-   * Example:
-   * @verbatim
-   * {
-   *   "messages": [
-   *      {
-   *         "Attributes": {
-   *            "string" : "string"
-   *         },
-   *         "Body": "string",
-   *         "MD5OfBody": "string",
-   *         "MD5OfMessageAttributes": "string",
-   *         "MessageAttributes": {
-   *            "string" : {
-   *               "BinaryListValues": [ blob ],
-   *               "BinaryValue": blob,
-   *               "DataType": "string",
-   *               "StringListValues": [ "string" ],
-   *               "StringValue": "string"
-   *            }
-   *         },
-   *         "MessageId": "string",
-   *         "ReceiptHandle": "string"
-   *      }
-   *   ]
-   *   }
-   * @endverbatim
-   */
+     * Receive message response.
+     *
+     * Example:
+     * @verbatim
+     * {
+     *   "messages": [
+     *      {
+     *         "Attributes": {
+     *            "string" : "string"
+     *         },
+     *         "Body": "string",
+     *         "MD5OfBody": "string",
+     *         "MD5OfMessageAttributes": "string",
+     *         "MessageAttributes": {
+     *            "string" : {
+     *               "BinaryListValues": [ blob ],
+     *               "BinaryValue": blob,
+     *               "DataType": "string",
+     *               "StringListValues": [ "string" ],
+     *               "StringValue": "string"
+     *            }
+     *         },
+     *         "MessageId": "string",
+     *         "ReceiptHandle": "string"
+     *      }
+     *   ]
+     * }
+     * @endverbatim
+     */
     struct ReceiveMessageResponse {
 
         /**
-     * Message list
-     */
+         * Message list
+         */
         Database::Entity::SQS::MessageList messageList;
 
         /**
-     * Resource
-     */
+         * Resource
+         */
         std::string resource = "SQS";
 
         /**
-     * Resource
-     */
+         * Resource
+         */
         std::string requestId;
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson();
 
         /**
-     * Convert to XML representation
-     *
-     * @return XML string
-     */
+         * Convert to XML representation
+         *
+         * @return XML string
+         */
         [[nodiscard]] std::string ToXml() const;
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const ReceiveMessageResponse &r);
     };
 
 }// namespace AwsMock::Dto::SQS
 
-#endif// AWSMOCK_DTO_SQS_RECEIVEMESSAGERESPONSE_H
+#endif// AWSMOCK_DTO_SQS_RECEIVE_MESSAGE_RESPONSE_H

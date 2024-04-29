@@ -25,56 +25,56 @@ namespace AwsMock::Dto::SQS {
     struct DeleteMessageBatchRequest {
 
         /**
-     * AWS region
-     */
+         * AWS region
+         */
         std::string region;
 
         /**
-     * Queue URL
-     */
+         * Queue URL
+         */
         std::string queueUrl;
 
         /**
-     * Entries
-     */
+         * Entries
+         */
         DeleteMessageBatchEntries deleteMessageBatchEntries;
 
         /**
-     * Resource
-     */
+         * Resource
+         */
         std::string resource = "SQS";
 
         /**
-     * Resource
-     */
+         * Resource
+         */
         std::string requestId = Poco::UUIDGenerator().createRandom().toString();
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the DTO from a JSON representation.
-     *
-     * @param payload HTTP message body.
-     */
+         * Converts the DTO from a JSON representation.
+         *
+         * @param payload HTTP message body.
+         */
         void FromJson(const std::string &payload);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const DeleteMessageBatchRequest &r);
     };
 

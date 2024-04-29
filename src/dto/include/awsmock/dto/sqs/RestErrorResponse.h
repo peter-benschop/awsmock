@@ -2,8 +2,8 @@
 // Created by vogje01 on 31/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_RESTERRORRESPONSE_H
-#define AWSMOCK_DTO_SQS_RESTERRORRESPONSE_H
+#ifndef AWSMOCK_DTO_SQS_REST_ERROR_RESPONSE_H
+#define AWSMOCK_DTO_SQS_REST_ERROR_RESPONSE_H
 
 // C++ standard includes
 #include <iostream>
@@ -29,63 +29,63 @@ namespace AwsMock::Dto::SQS {
     struct RestErrorResponse {
 
         /**
-     * Constructor.
-     *
-     * @param exc module exception
-     */
+         * Constructor.
+         *
+         * @param exc module exception
+         */
         explicit RestErrorResponse(const Core::ServiceException &exc);
 
         /**
-     * Error code
-     */
+         * Error code
+         */
         int code = 0;
 
         /**
-     * Error message
-     */
+         * Error message
+         */
         std::string message;
 
         /**
-     * Resource.
-     *
-     * <p>The bucket or object that is involved in the error.</p>
-     */
+         * Resource.
+         *
+         * <p>The bucket or object that is involved in the error.</p>
+         */
         std::string resource;
 
         /**
-     * Request ID
-     */
+         * Request ID
+         */
         std::string requestId;
 
         /**
-     * Converts the DTO to a JSON string representation.
-     *
-     * @return DTO as JSON string.
-     */
+         * Converts the DTO to a JSON string representation.
+         *
+         * @return DTO as JSON string.
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the DTO to a XML string representation.
-     *
-     * @return DTO as XML string.
-     */
+         * Converts the DTO to a XML string representation.
+         *
+         * @return DTO as XML string.
+         */
         [[nodiscard]] std::string ToXml() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const RestErrorResponse &r);
     };
 
 }// namespace AwsMock::Dto::SQS
 
-#endif// AWSMOCK_DTO_SQS_RESTERRORRESPONSE_H
+#endif// AWSMOCK_DTO_SQS_REST_ERROR_RESPONSE_H

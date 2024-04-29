@@ -30,88 +30,88 @@
 namespace AwsMock::Dto::SQS {
 
     /**
-   * Receive message request.
-   * <p>
-   * Example:
-   * @verbatim
-   * {
-   *   "AttributeNames": [ "string" ],
-   *   "MaxNumberOfMessages": number,
-   *   "MessageAttributeNames": [ "string" ],
-   *   "MessageSystemAttributeNames": [ "string" ],
-   *   "QueueUrl": "string",
-   *   "ReceiveRequestAttemptId": "string",
-   *   "VisibilityTimeout": number,
-   *   "WaitTimeSeconds": number
-   * }
-   * @endverbatim
-   */
+     * Receive message request.
+     *
+     * Example:
+     * @verbatim
+     * {
+     *   "AttributeNames": [ "string" ],
+     *   "MaxNumberOfMessages": number,
+     *   "MessageAttributeNames": [ "string" ],
+     *   "MessageSystemAttributeNames": [ "string" ],
+     *   "QueueUrl": "string",
+     *   "ReceiveRequestAttemptId": "string",
+     *   "VisibilityTimeout": number,
+     *   "WaitTimeSeconds": number
+     * }
+     * @endverbatim
+     */
     struct ReceiveMessageRequest {
 
         /**
-     * AWS region
-     */
+         * AWS region
+         */
         std::string region;
 
         /**
-     * Queue URL
-     */
+         * Queue URL
+         */
         std::string queueUrl;
 
         /**
-     * Queue name
-     */
+         * Queue name
+         */
         std::string queueName;
 
         /**
-     * Maximal number of messages
-     */
+         * Maximal number of messages
+         */
         int maxMessages = 10;
 
         /**
-     * Visibility
-     */
+         * Visibility
+         */
         int visibilityTimeout = 15;
 
         /**
-     * Wait time in seconds
-     */
+         * Wait time in seconds
+         */
         int waitTimeSeconds = 1;
 
         /**
-     * MessageAttribute names
-     */
+         * MessageAttribute names
+         */
         std::vector<std::string> attributeName = {"All"};
 
         /**
-     * Resource
-     */
+         * Resource
+         */
         std::string resource = "SQS";
 
         /**
-     * Resource
-     */
+         * Resource
+         */
         std::string requestId;
 
         /**
-     * Converts the JSON string to DTO.
-     *
-     * @param jsonString JSON string
-     */
+         * Converts the JSON string to DTO.
+         *
+         * @param jsonString JSON string
+         */
         void FromJson(const std::string &jsonString);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const ReceiveMessageRequest &r);
     };
 
