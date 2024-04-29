@@ -2,8 +2,8 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_S3_QUEUE_CONFIGURATION_H
-#define AWSMOCK_DTO_S3_QUEUE_CONFIGURATION_H
+#ifndef AWSMOCK_DTO_S3_TOPIC_CONFIGURATION_H
+#define AWSMOCK_DTO_S3_TOPIC_CONFIGURATION_H
 
 // C++ standard includes
 #include <string>
@@ -21,16 +21,16 @@
 namespace AwsMock::Dto::S3 {
 
     /**
-     * S3 notification configuration for a SQS queue.
+     * S3 notification configuration for a SNS topic.
      *
      * <p>
-     * This configures the S3 module to send a message to the supplied SQS queue. Depending on the event type and the
-     * filter rules, the event is executed and a message is send to the provided SQS queue.
+     * This configures the S3 module to send a message to the supplied SNS topic. Depending on the event type and the
+     * filter rules, the event is executed and a message is send to the provided SNS queue.
      * </p>
      *
      * Example:
      * @verbatim
-     *   <QueueConfiguration>
+     *   <TopicConfiguration>
      *     <Event>string</Event>
      *     ...
      *     <Filter>
@@ -43,13 +43,13 @@ namespace AwsMock::Dto::S3 {
      *      </S3Key>
      *     </Filter>
      *     <Id>string</Id>
-     *     <Queue>string</Queue>
-     *   </QueueConfiguration>
-     * @endverbatim
+     *     <Topic>string</Topic>
+     *   </TopicConfiguration>
+     * @endverbatimindex
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct QueueConfiguration {
+    struct TopicConfiguration {
 
         /**
          * ID, optional, if empty a random ID will be generated
@@ -57,9 +57,9 @@ namespace AwsMock::Dto::S3 {
         std::string id;
 
         /**
-         * Queue ARN
+         * Topic ARN
          */
-        std::string queueArn;
+        std::string topicArn;
 
         /**
          * S3 filter rules
@@ -104,9 +104,9 @@ namespace AwsMock::Dto::S3 {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const QueueConfiguration &r);
+        friend std::ostream &operator<<(std::ostream &os, const TopicConfiguration &r);
     };
 
 }// namespace AwsMock::Dto::S3
 
-#endif// AWSMOCK_DTO_S3_QUEUE_CONFIGURATION_H
+#endif// AWSMOCK_DTO_S3_TOPIC_CONFIGURATION_H

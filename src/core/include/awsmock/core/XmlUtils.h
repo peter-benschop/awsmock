@@ -159,6 +159,15 @@ namespace AwsMock::Core {
         static void CreateTextArray(const Poco::XML::AutoPtr<Poco::XML::Document> &document, Poco::XML::AutoPtr<Poco::XML::Element> &parent, const std::string &parentName, const std::string &elementName, const std::vector<std::string> &elements);
 
         /**
+         * Check existence of specific child node
+         *
+         * @param node XML node
+         * @param name child name
+         * @return true if child exists
+         */
+        static bool HasChild(const Poco::XML::AutoPtr<Poco::XML::Node> &node, const std::string &name);
+
+        /**
          * Returns the XML string for the document.
          *
          * @param document XML document

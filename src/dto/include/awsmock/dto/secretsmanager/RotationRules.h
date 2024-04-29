@@ -22,67 +22,69 @@
 namespace AwsMock::Dto::SecretsManager {
 
     /**
-   * Rotation rules
-   *
-   * Example:
-   * <pre>
-   * {
-   *   "AutomaticallyAfterDays": number,
-   *   "Duration": "string",
-   *   "ScheduleExpression": "string"
-   * }
-   * </pre>
-   */
+     * Rotation rules
+     *
+     * Example:
+     * @verbatim
+     * {
+     *   "AutomaticallyAfterDays": number,
+     *   "Duration": "string",
+     *   "ScheduleExpression": "string"
+     * }
+     * @endverbatim
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct RotationRules {
 
         /**
-     * Automatic rotation period
-     */
+         * Automatic rotation period
+         */
         long automaticallyAfterDays;
 
         /**
-     * Duration
-     */
+         * Duration
+         */
         std::string duration;
 
         /**
-     * Duration
-     */
+         * Duration
+         */
         std::string scheduleExpression;
 
         /**
-     * Converts the DTO to a JSON object.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a JSON object.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
-     * Converts the DTO to a JSON representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a JSON representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts a JSON representation to s DTO.
-     *
-     * @param jsonObject JSON object.
-     */
+         * Converts a JSON representation to s DTO.
+         *
+         * @param jsonObject JSON object.
+         */
         void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const RotationRules &r);
     };
 

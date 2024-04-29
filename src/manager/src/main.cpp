@@ -64,7 +64,7 @@ namespace AwsMock {
             IntializeConfig();
             IntializeLogging();
             InitializeMonitoring();
-            InitializeIndexes();
+            InitializeDatabase();
             InitializeCurl();
             log_info << "Starting " << Core::Configuration::GetAppName() << " " << Core::Configuration::GetVersion()
                      << " pid: " << getpid() << " loglevel: " << _configuration.getString("awsmock.log.level");
@@ -176,9 +176,9 @@ namespace AwsMock {
         }
 
         /**
-         * Initialize database indexes
+         * Initialize database
          */
-        void InitializeIndexes() {
+        void InitializeDatabase() {
 
             // Create database indexes
             _moduleDatabase.CreateIndexes();
@@ -197,10 +197,11 @@ namespace AwsMock {
 
             Database::Entity::Module::ModuleList modules = _moduleDatabase.ListModules();
             for (const auto &module: modules) {
-                if (_configuration.has("awsmock." + module.name + ".active") && _configuration.getBool("awsmock." + module.name + ".active")) {
+                if (_configuration.has("awsmock.service." + module.name + ".active") && _configuration.getBool("awsmock.service." + module.name + ".active")) {
                     _moduleDatabase.SetStatus(module.name, Database::Entity::Module::ModuleStatus::ACTIVE);
                 }
             }
+            modules = _moduleDatabase.ListModules();
 
             // Get last module configuration
             for (const auto &module: modules) {

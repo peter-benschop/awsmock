@@ -27,8 +27,8 @@ namespace AwsMock::Dto::Common {
     struct RestErrorResponse {
 
         /**
-        * Error code
-        */
+         * Error code
+         */
         int code = 0;
 
         /**

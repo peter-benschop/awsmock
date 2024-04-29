@@ -9,19 +9,25 @@ namespace AwsMock::Core {
         return new Poco::XML::Document;
     }
 
-    Poco::XML::AutoPtr<Poco::XML::Element> XmlUtils::CreateRootNode(Poco::XML::AutoPtr<Poco::XML::Document> &document, const std::string &name) {
+    Poco::XML::AutoPtr<Poco::XML::Element> XmlUtils::CreateRootNode(Poco::XML::AutoPtr<Poco::XML::Document> &document,
+                                                                    const std::string &name) {
         Poco::XML::AutoPtr<Poco::XML::Element> pRoot = document->createElement(name);
         document->appendChild(pRoot);
         return pRoot;
     }
 
-    Poco::XML::AutoPtr<Poco::XML::Element> XmlUtils::CreateNode(Poco::XML::AutoPtr<Poco::XML::Document> &document, Poco::XML::AutoPtr<Poco::XML::Element> &parent, const std::string &name) {
+    Poco::XML::AutoPtr<Poco::XML::Element> XmlUtils::CreateNode(Poco::XML::AutoPtr<Poco::XML::Document> &document,
+                                                                Poco::XML::AutoPtr<Poco::XML::Element> &parent,
+                                                                const std::string &name) {
         Poco::XML::AutoPtr<Poco::XML::Element> pNode = document->createElement(name);
         parent->appendChild(pNode);
         return pNode;
     }
 
-    void XmlUtils::CreateTextNode(const Poco::XML::AutoPtr<Poco::XML::Document> &document, Poco::XML::AutoPtr<Poco::XML::Element> &parent, const std::string &name, const std::string &value) {
+    void XmlUtils::CreateTextNode(const Poco::XML::AutoPtr<Poco::XML::Document> &document,
+                                  Poco::XML::AutoPtr<Poco::XML::Element> &parent,
+                                  const std::string &name,
+                                  const std::string &value) {
 
         auto pElement = document->createElement(name);
         parent->appendChild(pElement);
@@ -29,7 +35,10 @@ namespace AwsMock::Core {
         pElement->appendChild(pElementText);
     }
 
-    void XmlUtils::CreateTextNode(const Poco::XML::AutoPtr<Poco::XML::Document> &document, Poco::XML::AutoPtr<Poco::XML::Element> &parent, const std::string &name, int value) {
+    void XmlUtils::CreateTextNode(const Poco::XML::AutoPtr<Poco::XML::Document> &document,
+                                  Poco::XML::AutoPtr<Poco::XML::Element> &parent,
+                                  const std::string &name,
+                                  int value) {
 
         auto pElement = document->createElement(name);
         parent->appendChild(pElement);
@@ -37,7 +46,10 @@ namespace AwsMock::Core {
         pElement->appendChild(pElementText);
     }
 
-    void XmlUtils::CreateTextNode(const Poco::XML::AutoPtr<Poco::XML::Document> &document, Poco::XML::AutoPtr<Poco::XML::Element> &parent, const std::string &name, long value) {
+    void XmlUtils::CreateTextNode(const Poco::XML::AutoPtr<Poco::XML::Document> &document,
+                                  Poco::XML::AutoPtr<Poco::XML::Element> &parent,
+                                  const std::string &name,
+                                  long value) {
 
         auto pElement = document->createElement(name);
         parent->appendChild(pElement);
@@ -45,15 +57,22 @@ namespace AwsMock::Core {
         pElement->appendChild(pElementText);
     }
 
-    void XmlUtils::CreateTextNode(const Poco::XML::AutoPtr<Poco::XML::Document> &document, Poco::XML::AutoPtr<Poco::XML::Element> &parent, const std::string &name, const Poco::DateTime &value) {
+    void XmlUtils::CreateTextNode(const Poco::XML::AutoPtr<Poco::XML::Document> &document,
+                                  Poco::XML::AutoPtr<Poco::XML::Element> &parent,
+                                  const std::string &name,
+                                  const Poco::DateTime &value) {
 
         auto pElement = document->createElement(name);
         parent->appendChild(pElement);
-        auto pElementText = document->createTextNode(Poco::DateTimeFormatter::format(value, Poco::DateTimeFormat::ISO8601_FORMAT));
+        auto pElementText =
+                document->createTextNode(Poco::DateTimeFormatter::format(value, Poco::DateTimeFormat::ISO8601_FORMAT));
         pElement->appendChild(pElementText);
     }
 
-    void XmlUtils::CreateTextNode(const Poco::XML::AutoPtr<Poco::XML::Document> &document, Poco::XML::AutoPtr<Poco::XML::Element> &parent, const std::string &name, bool value) {
+    void XmlUtils::CreateTextNode(const Poco::XML::AutoPtr<Poco::XML::Document> &document,
+                                  Poco::XML::AutoPtr<Poco::XML::Element> &parent,
+                                  const std::string &name,
+                                  bool value) {
 
         auto pElement = document->createElement(name);
         parent->appendChild(pElement);
@@ -61,7 +80,11 @@ namespace AwsMock::Core {
         pElement->appendChild(pElementText);
     }
 
-    void XmlUtils::CreateTextArray(const Poco::XML::AutoPtr<Poco::XML::Document> &document, Poco::XML::AutoPtr<Poco::XML::Element> &parent, const std::string &parentName, const std::string &elementName, const std::vector<std::string> &elements) {
+    void XmlUtils::CreateTextArray(const Poco::XML::AutoPtr<Poco::XML::Document> &document,
+                                   Poco::XML::AutoPtr<Poco::XML::Element> &parent,
+                                   const std::string &parentName,
+                                   const std::string &elementName,
+                                   const std::vector<std::string> &elements) {
 
         Poco::XML::AutoPtr<Poco::XML::Element> array;
         array = document->createElement(parentName);
@@ -70,6 +93,9 @@ namespace AwsMock::Core {
         for (const auto &element: elements) {
             CreateTextNode(document, array, elementName, element);
         }
+    }
+
+    bool XmlUtils::HasChild(const Poco::XML::AutoPtr<Poco::XML::Node> &node, const std::string &name) {
     }
 
     std::string XmlUtils::ToXmlString(const Poco::XML::AutoPtr<Poco::XML::Document> &document) {

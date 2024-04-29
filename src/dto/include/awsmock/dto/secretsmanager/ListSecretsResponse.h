@@ -26,18 +26,20 @@
 namespace AwsMock::Dto::SecretsManager {
 
     /**
-   * List secrets response
-   *
-   * Example:
-   * <pre>
-   * {
-   *    "NextToken": "string",
-   *    "SecretList": [
-   *    .....
-   *   ]
-   * }
-   * </pre>
-   */
+     * List secrets response
+     *
+     * Example:
+     * @verbatim
+     * {
+     *    "NextToken": "string",
+     *    "SecretList": [
+     *    .....
+     *   ]
+     * }
+     * @endverbatim
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct ListSecretsResponse {
 
         /**

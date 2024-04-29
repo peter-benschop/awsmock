@@ -22,21 +22,23 @@
 namespace AwsMock::Dto::SecretsManager {
 
     /**
-   * Get a secret value
-   *
-   * Example:
-   * <pre>
-   * {
-   *   "Name": "string",
-   *   "ARN": "string",
-   *   "CreatedDate": number,
-   *   "SecretBinary": blob,
-   *   "SecretString": "string",
-   *   "VersionId": "string",
-   *   "VersionStages": [ "string" ]
-   * }
-   * </pre>
-   */
+     * Get a secret value
+     *
+     * Example:
+     * @verbatim
+     * {
+     *   "Name": "string",
+     *   "ARN": "string",
+     *   "CreatedDate": number,
+     *   "SecretBinary": blob,
+     *   "SecretString": "string",
+     *   "VersionId": "string",
+     *   "VersionStages": [ "string" ]
+     * }
+     * @endverbatim
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct GetSecretValueResponse {
 
         /*+

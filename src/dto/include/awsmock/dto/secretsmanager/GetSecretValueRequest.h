@@ -22,17 +22,19 @@
 namespace AwsMock::Dto::SecretsManager {
 
     /**
-   * Get a secret value
-   *
-   * Example:
-   * <pre>
-   * {
-   *    "SecretId": "string",
-   *    "VersionId": "string",
-   *    "VersionStage": "string"
-   * }
-   * </pre>
-   */
+     * Get a secret value
+     *
+     * Example:
+     * @verabtim
+     * {
+     *    "SecretId": "string",
+     *    "VersionId": "string",
+     *    "VersionStage": "string"
+     * }
+     * @endverbatim
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct GetSecretValueRequest {
 
         /**

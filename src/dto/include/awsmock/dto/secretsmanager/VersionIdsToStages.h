@@ -23,20 +23,20 @@
 namespace AwsMock::Dto::SecretsManager {
 
     /**
-   * Secrets manager version ID and stages
-   *
-   * Example:
-   * <pre>
-   * "EXAMPLE1-90ab-cdef-fedc-ba987SECRET1": [
-   *   "AWSPREVIOUS"
-   * ],
-   * "EXAMPLE2-90ab-cdef-fedc-ba987SECRET2": [
-   *   "AWSCURRENT"
-   * ]
-   * </pre>
-   *
-   * @author jens.vogt\@opitz-consulting.com
-   */
+     * Secrets manager version ID and stages
+     *
+     * Example:
+     * @verbatim
+     * "EXAMPLE1-90ab-cdef-fedc-ba987SECRET1": [
+     *   "AWSPREVIOUS"
+     * ],
+     * "EXAMPLE2-90ab-cdef-fedc-ba987SECRET2": [
+     *   "AWSCURRENT"
+     * ]
+     * @endverbatim
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct VersionIdsToStages {
 
         /**

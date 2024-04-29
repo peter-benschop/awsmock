@@ -27,91 +27,91 @@ namespace AwsMock::Dto::SecretsManager {
     struct DescribeSecretResponse {
 
         /**
-     * Region
-     */
+         * Region
+         */
         std::string region;
 
         /**
-     * Secret name
-     */
+         * Secret name
+         */
         std::string name;
 
         /**
-     * ARN
-     */
+         * ARN
+         */
         std::string arn;
 
         /**
-     * Description
-     */
+         * Description
+         */
         std::string description;
 
         /**
-     * Last accessed date
-     */
+         * Last accessed date
+         */
         double lastAccessDate;
 
         /**
-     * Last accessed date
-     */
+         * Last accessed date
+         */
         double lastChangedDate;
 
         /**
-     * Last rotation date
-     */
+         * Last rotation date
+         */
         double lastRotatedDate;
 
         /**
-     * Last rotation date
-     */
+         * Last rotation date
+         */
         double nextRotationDate;
 
         /**
-     * Rotation enabled flag
-     */
+         * Rotation enabled flag
+         */
         bool rotationEnabled;
 
         /**
-     * Replication status
-     */
+         * Replication status
+         */
         ReplicationStatus replicationStatus;
 
         /**
-     * Version IDs to stages
-     */
+         * Version IDs to stages
+         */
         VersionIdsToStages versionIdsToStages;
 
         /**
-     * Version IDs to stages
-     */
+         * Version IDs to stages
+         */
         SecretTags tags;
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Convert from JSON representation
-     *
-     * @param jsonString JSON string
-     */
+         * Convert from JSON representation
+         *
+         * @param jsonString JSON string
+         */
         void FromJson(const std::string &jsonString);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const DescribeSecretResponse &r);
     };
 

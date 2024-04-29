@@ -56,12 +56,12 @@ namespace AwsMock::Dto::Common {
                 case HttpMethod::PUT:
                     if (multipartRequest) {
                         command = S3CommandType::UPLOAD_PART;
+                    } else if (notificationRequest) {
+                        command = S3CommandType::BUCKET_NOTIFICATION;
                     } else if (!bucket.empty() && key.empty()) {
                         command = S3CommandType::CREATE_BUCKET;
                     } else if (!bucket.empty() && !key.empty()) {
                         command = S3CommandType::PUT_OBJECT;
-                    } else if (notificationRequest) {
-                        command = S3CommandType::BUCKET_NOTIFICATION;
                     }
                     break;
 
