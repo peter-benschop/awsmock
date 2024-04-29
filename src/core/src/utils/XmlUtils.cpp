@@ -95,9 +95,6 @@ namespace AwsMock::Core {
         }
     }
 
-    bool XmlUtils::HasChild(const Poco::XML::AutoPtr<Poco::XML::Node> &node, const std::string &name) {
-    }
-
     std::string XmlUtils::ToXmlString(const Poco::XML::AutoPtr<Poco::XML::Document> &document) {
 
         std::stringstream output;
