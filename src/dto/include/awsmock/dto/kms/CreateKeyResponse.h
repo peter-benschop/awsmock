@@ -27,7 +27,7 @@ namespace AwsMock::Dto::KMS {
      * Create KMS key response
      *
      * Example:
-     * <pre>
+     * @verbatim
      * {
      *   "Key": {
      *      "Arn": "string",
@@ -70,7 +70,7 @@ namespace AwsMock::Dto::KMS {
      *      }
      *    }
      * }
-     * </pre>
+     * @endverbatim
      *
      * @author jens.vogt\@opitz-consulting.com
      */

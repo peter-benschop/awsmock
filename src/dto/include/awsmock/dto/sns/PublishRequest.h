@@ -14,37 +14,37 @@ namespace AwsMock::Dto::SNS {
     struct PublishRequest {
 
         /**
-     * Region
-     */
+         * Region
+         */
         std::string region;
 
         /**
-     * Topic ARN
-     */
+         * Topic ARN
+         */
         std::string topicArn;
 
         /**
-     * Target ARN
-     */
+         * Target ARN
+         */
         std::string targetArn;
 
         /**
-     * Message body
-     */
+         * Message body
+         */
         std::string message;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const PublishRequest &r);
     };
 

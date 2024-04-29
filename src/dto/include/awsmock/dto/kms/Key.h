@@ -29,7 +29,7 @@ namespace AwsMock::Dto::KMS {
      * KMS metadata
      *
      * Example:
-     * <pre>
+     * @verbatim
      *   "Arn": "string",
      *   "AWSAccountId": "string",
      *   "CloudHsmClusterId": "string",
@@ -69,7 +69,7 @@ namespace AwsMock::Dto::KMS {
      *     "Id": "string"
      *   }
      * }
-     * </pre>
+     * @endverbatim
      *
      * @author jens.vogt\@opitz-consulting.com
      */

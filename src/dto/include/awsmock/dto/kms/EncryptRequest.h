@@ -21,7 +21,7 @@ namespace AwsMock::Dto::KMS {
      * Encryption of supplied blob request
      *
      * Example:
-     * <pre>
+     * @verbatim
      * {
      *   "DryRun": boolean,
      *   "EncryptionAlgorithm": "string",
@@ -32,7 +32,7 @@ namespace AwsMock::Dto::KMS {
      *   "KeyId": "string",
      *   "Plaintext": blob
      * }
-     * </pre>
+     * @endverbatim
      *
      * @author jens.vogt\@opitz-consulting.com
      */

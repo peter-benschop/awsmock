@@ -15,32 +15,32 @@ namespace AwsMock::Dto::SNS {
     struct TagResourceRequest {
 
         /**
-     * AWS region
-     */
+         * AWS region
+         */
         std::string region;
 
         /**
-     * Resource ARN (topic ARN)
-     */
+         * Resource ARN (topic ARN)
+         */
         std::string resourceArn;
 
         /**
-     * Tags map
-     */
+         * Tags map
+         */
         std::map<std::string, std::string> tags;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const TagResourceRequest &r);
     };
 

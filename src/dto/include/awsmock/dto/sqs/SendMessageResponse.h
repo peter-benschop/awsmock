@@ -38,7 +38,7 @@ namespace AwsMock::Dto::SQS {
    * Send message response
    * <p>
    * Example:
-   * <pre>
+   * @verbatim
    * {
    *   "MD5OfMessageAttributes": "string",
    *   "MD5OfMessageBody": "string",
@@ -46,7 +46,7 @@ namespace AwsMock::Dto::SQS {
    *   "MessageId": "string",
    *   "SequenceNumber": "string"
    *}
-   * </pre>
+   * @endverbatim
    */
     struct SendMessageResponse {
 

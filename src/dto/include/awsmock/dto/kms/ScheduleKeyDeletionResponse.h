@@ -27,14 +27,14 @@ namespace AwsMock::Dto::KMS {
      * Create KMS key response
      *
      * Example:
-     * <pre>
+     * @verbatim
      * {
      *   "DeletionDate": number,
      *   "KeyId": "string",
      *   "KeyState": "string",
      *   "PendingWindowInDays": number
      * }
-     * </pre>
+     * @endverbatim
      *
      * @author jens.vogt\@opitz-consulting.com
      */

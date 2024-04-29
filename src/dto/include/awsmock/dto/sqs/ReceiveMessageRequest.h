@@ -33,7 +33,7 @@ namespace AwsMock::Dto::SQS {
    * Receive message request.
    * <p>
    * Example:
-   * <pre>
+   * @verbatim
    * {
    *   "AttributeNames": [ "string" ],
    *   "MaxNumberOfMessages": number,
@@ -44,7 +44,7 @@ namespace AwsMock::Dto::SQS {
    *   "VisibilityTimeout": number,
    *   "WaitTimeSeconds": number
    * }
-   * </pre>
+   * @endverbatim
    */
     struct ReceiveMessageRequest {
 

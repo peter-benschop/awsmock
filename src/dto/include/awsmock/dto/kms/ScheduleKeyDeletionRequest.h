@@ -22,12 +22,12 @@ namespace AwsMock::Dto::KMS {
      * Schedule a KMS key deletion
      *
      * Example:
-     * <pre>
+     * @verbatim
      * {
      *   "KeyId": "string",
      *   "PendingWindowInDays": number
      * }
-     * </pre>
+     * @endverbatim
      *
      * @author jens.vogt\@opitz-consulting.com
      */

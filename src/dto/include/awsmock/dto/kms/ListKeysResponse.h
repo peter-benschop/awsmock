@@ -21,7 +21,7 @@ namespace AwsMock::Dto::KMS {
      * List all KMS keys request
      *
      * Example:
-     * <pre>
+     * @verbatim
      * {
      *   "Keys": [
      *     {
@@ -32,7 +32,7 @@ namespace AwsMock::Dto::KMS {
      *  "NextMarker": "string",
      *  "Truncated": boolean
      * }
-     * </pre>
+     * @endverbatim
      *
      * @author jens.vogt\@opitz-consulting.com
      */

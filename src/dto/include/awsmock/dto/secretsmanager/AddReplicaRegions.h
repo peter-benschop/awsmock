@@ -39,7 +39,7 @@ namespace AwsMock::Dto::SecretsManager {
     struct AddReplicaRegions {
 
         /**
-         * Region
+         * AWS Region
          */
         std::string region;
 
@@ -51,14 +51,14 @@ namespace AwsMock::Dto::SecretsManager {
         /**
          * Converts the DTO to a JSON object.
          *
-         * @return DTO as string for logging.
+         * @return DTO as JSON object
          */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
          * Converts the DTO to a JSON representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
@@ -84,6 +84,6 @@ namespace AwsMock::Dto::SecretsManager {
         friend std::ostream &operator<<(std::ostream &os, const AddReplicaRegions &r);
     };
 
-}//namespace AwsMock::Dto::SecretsManager
+}// namespace AwsMock::Dto::SecretsManager
 
 #endif// AWSMOCK_DTO_SECRETSMANAGER_ADD_REPLICA_REGIONS_H

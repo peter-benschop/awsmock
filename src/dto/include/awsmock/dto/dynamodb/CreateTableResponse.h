@@ -21,7 +21,7 @@ namespace AwsMock::Dto::DynamoDb {
 
     /**
      * Example:
-     * <pre>
+     * @verbatim
      * {
      *   "TableDescription":
      *     {
@@ -54,7 +54,7 @@ namespace AwsMock::Dto::DynamoDb {
      *       "DeletionProtectionEnabled":false
      *    }
      * }
-     * </pre>
+     * @endverbatim
      *
      * @author jens.vogt\@opitz-consulting.com
      */

@@ -21,12 +21,12 @@ namespace AwsMock::Dto::Cognito {
      * Cognito pre generation config
      *
      * Example:
-     * <pre>
+     * @verbatim
      * "PreTokenGenerationConfig": {
      *    "LambdaArn": "string",
      *    "LambdaVersion": "string"
      * }
-     * </pre>
+     * @endverbatim
      *
      * @author jens.vogt\@opitz-consulting.com
      */

@@ -19,7 +19,7 @@ namespace AwsMock::Dto::Transfer {
     /**
    *
    * Example JSON:
-   * <pre>
+   * @verbatim
    *   "IdentityProviderDetails": {
    *     "DirectoryId": "string",
    *     "Function": "string",
@@ -27,7 +27,7 @@ namespace AwsMock::Dto::Transfer {
    *     "SftpAuthenticationMethods": "string",
    *     "Url": "string"
    *  }
-   * </pre>
+   * @endverbatim
    */
     struct IdentityProviderDetails {
 

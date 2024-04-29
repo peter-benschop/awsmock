@@ -21,13 +21,13 @@ namespace AwsMock::Dto::KMS {
      * Encryption of supplied blob response
      *
      * Example:
-     * <pre>
+     * @verbatim
      * {
      *   "CiphertextBlob": blob,
      *   "EncryptionAlgorithm": "string",
      *   "KeyId": "string"
      * }
-     * </pre>
+     * @endverbatim
      *
      * @author jens.vogt\@opitz-consulting.com
      */

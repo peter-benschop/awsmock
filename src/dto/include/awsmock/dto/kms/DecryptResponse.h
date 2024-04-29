@@ -25,14 +25,14 @@ namespace AwsMock::Dto::KMS {
      * </p>
      *
      * Example:
-     * <pre>
+     * @verbatim
      * {
      *   "CiphertextForRecipient": blob,
      *   "EncryptionAlgorithm": "string",
      *   "KeyId": "string",
      *   "Plaintext": blob
      * }
-     * </pre>
+     * @endverbatim
      *
      * @author jens.vogt\@opitz-consulting.com
      */

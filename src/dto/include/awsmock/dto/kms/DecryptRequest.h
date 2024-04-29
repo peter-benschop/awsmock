@@ -25,7 +25,7 @@ namespace AwsMock::Dto::KMS {
      * </p>
      *
      * Example:
-     * <pre>
+     * @verbatim
      * {
      *   "CiphertextBlob": blob,
      *   "DryRun": boolean,
@@ -40,7 +40,7 @@ namespace AwsMock::Dto::KMS {
      *     "KeyEncryptionAlgorithm": "string"
      *   }
      * }
-     * </pre>
+     * @endverbatim
      *
      * @author jens.vogt\@opitz-consulting.com
      */

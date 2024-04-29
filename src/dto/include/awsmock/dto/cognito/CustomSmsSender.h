@@ -21,12 +21,12 @@ namespace AwsMock::Dto::Cognito {
      * Cognito sms sender
      *
      * Example:
-     * <pre>
+     * @verbatim
      * "CustomSMSSender": {
      *   "LambdaArn": "string",
      *   "LambdaVersion": "string"
      * }
-     * </pre>
+     * @endverbatim
      *
      * @author jens.vogt\@opitz-consulting.com
      */

@@ -58,11 +58,11 @@ namespace AwsMock::Core {
         /**
          * Creates a new text node, from a string value.
          *
-         * <pre>
+         * @verbatim
          * \<parent\>
          *   \<name\>value<\>
          * \</parent\>
-         * </pre>
+         * @endverbatim
          *
          * @param document XML document
          * @param parent parent node
@@ -74,11 +74,11 @@ namespace AwsMock::Core {
         /**
          * Creates a new text node from a integer value.
          *
-         * <pre>
+         * @verbatim
          * \<parent\>
          *   \<name\>value<\>
          * \</parent\>
-         * </pre>
+         * @endverbatim
          *
          * @param document XML document
          * @param parent parent node
@@ -90,11 +90,11 @@ namespace AwsMock::Core {
         /**
          * Creates a new text node from a long integer value.
          *
-         * <pre>
+         * @verbatim
          * \<parent\>
          *   \<name\>value<\>
          * \</parent\>
-         * </pre>
+         * @endverbatim
          *
          * @param document XML document
          * @param parent parent node
@@ -110,11 +110,11 @@ namespace AwsMock::Core {
          * The value will be formatted as a ISO-8601 datetime string
          * </p>
          *
-         * <pre>
+         * @verbatim
          * \<parent\>
          *   \<name\>value<\>
          * \</parent\>
-         * </pre>
+         * @endverbatim
          *
          * @param document XML document
          * @param parent parent node
@@ -126,11 +126,11 @@ namespace AwsMock::Core {
         /**
          * Creates a new text node from a boolean value.
          *
-         * <pre>
+         * @verbatim
          * \<parent\>
          *   \<name\>value<\>
          * \</parent\>
-         * </pre>
+         * @endverbatim
          *
          * @param document XML document
          * @param parent parent node
@@ -143,12 +143,12 @@ namespace AwsMock::Core {
          * Creates a simple XML string array.
          *
          * Example:
-         * <pre>
+         * @verbatim
          *   \<parentName\>
          *     \<elementName\>element\<elementName\>
          *     ....
          *   \</parentName\>
-         * </pre>
+         * @endverbatim
          *
          * @param document XML document
          * @param parent parent node

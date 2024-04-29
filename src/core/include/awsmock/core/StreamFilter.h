@@ -19,17 +19,17 @@ namespace AwsMock::Core {
      *
      * <p>Can be used with the standard filter classes as described in https://en.cppreference.com/w/cpp/header/cctype</p>
      * <p>Usage:
-     * <pre>
+     * @verbatim
      * std::stringstream input;
      * std::istream filtered;
      * filtered = XmlCharacterStreamFilter(input, filtered);
-     * </pre>
+     * @endverbatim
      * or with a standard filter (filtering all digits)
-     * <pre>
+     * @verbatim
      * std::stringstream input;
      * std::istream filtered;
      * filtered = ApplyFilter(input, filtered, std::isdigit);
-     * </pre>
+     * @endverbatim
      *
      * @see https://cplusplus.com/forum/general/173565/
      *
