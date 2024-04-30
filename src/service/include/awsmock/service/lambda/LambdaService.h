@@ -37,7 +37,7 @@
 #include <awsmock/dto/lambda/GetFunctionResponse.h>
 #include <awsmock/dto/lambda/ListFunctionResponse.h>
 #include <awsmock/dto/lambda/ListTagsResponse.h>
-#include <awsmock/dto/s3/EventNotification.h>
+#include <awsmock/dto/s3/model/EventNotification.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/common/DockerService.h>

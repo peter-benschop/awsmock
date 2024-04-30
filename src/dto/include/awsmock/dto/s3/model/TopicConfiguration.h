@@ -15,8 +15,8 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
-#include <awsmock/dto/s3/FilterRule.h>
-#include <awsmock/dto/s3/NotificationEvent.h>
+#include <awsmock/dto/s3/model/FilterRule.h>
+#include <awsmock/dto/s3/model/NotificationEvent.h>
 
 namespace AwsMock::Dto::S3 {
 

@@ -2,7 +2,7 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include <awsmock/dto/s3/QueueConfiguration.h>
+#include <awsmock/dto/s3/model/QueueConfiguration.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -30,12 +30,9 @@ namespace AwsMock::Dto::S3 {
 
                         // Filter rules
                         if (s3KeyNode->hasChildNodes()) {
-                            Poco::XML::NodeList *filterRulesNodes = s3KeyNode->childNodes();
-                            for (int j = 0; j < filterRulesNodes->length(); j++) {
-                                FilterRule filterRule;
-                                filterRule.FromXmlNode(filterRulesNodes->item(j));
-                                filterRules.emplace_back(filterRule);
-                            }
+                            FilterRule filterRule;
+                            filterRule.FromXmlNode(s3KeyNode);
+                            filterRules.emplace_back(filterRule);
                         }
                     }
                 } else if (child->nodeName() == "Event") {

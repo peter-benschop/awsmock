@@ -15,7 +15,9 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
-#include <awsmock/dto/s3/QueueConfiguration.h>
+#include <awsmock/dto/s3/model/LambdaConfiguration.h>
+#include <awsmock/dto/s3/model/QueueConfiguration.h>
+#include <awsmock/dto/s3/model/TopicConfiguration.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -83,9 +85,19 @@ namespace AwsMock::Dto::S3 {
     struct PutBucketNotificationConfigurationRequest {
 
         /**
+         * AWS region
+         */
+        std::string region;
+
+        /**
+         * Bucket
+         */
+        std::string bucket;
+
+        /**
          * Topic configurations
          */
-        //std::vector<TopicConfiguration> topicConfigurations;
+        std::vector<TopicConfiguration> topicConfigurations;
 
         /**
          * SQS queue configurations
@@ -95,7 +107,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * Lambda function configurations
          */
-        //std::vector<CloudWatchFunctionConfiguration> queueConfigurations;
+        std::vector<LambdaConfiguration> lambdaConfigurations;
 
         /**
           * Convert from XML representation

@@ -62,7 +62,7 @@ namespace AwsMock::Dto::KMS {
         EncryptionAlgorithm encryptionAlgorithm;
 
         /**
-         * Encryption context
+         * Encryption model
          */
         std::map<std::string, std::string> encryptionContext;
 

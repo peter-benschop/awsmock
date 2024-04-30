@@ -1,33 +1,28 @@
 //
-// Created by vogje01 on 12/18/23.
+// Created by vogje01 on 03/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_S3_OWNER_H
-#define AWSMOCK_DTO_S3_OWNER_H
+#ifndef AWSMOCK_DTO_S3_USER_IDENTITY_H
+#define AWSMOCK_DTO_S3_USER_IDENTITY_H
 
-// C++ includes
-#include <sstream>
+// C++ standard includes
 #include <string>
+#include <vector>
 
 // AwsMock includes
-#include <awsmock/core/JsonException.h>
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/XmlUtils.h>
+#include "awsmock/core/JsonException.h"
+#include "awsmock/core/JsonUtils.h"
+#include "awsmock/core/LogStream.h"
+#include "awsmock/core/XmlUtils.h"
 
 namespace AwsMock::Dto::S3 {
 
-    struct Owner {
+    struct UserIdentity {
 
         /**
-         * ID
+         * AWS principal ID
          */
-        std::string id;
-
-        /**
-         * Display name
-         */
-        std::string displayName;
+        std::string principalId;
 
         /**
          * Convert to a JSON string
@@ -37,9 +32,9 @@ namespace AwsMock::Dto::S3 {
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Convert to a JSON object
+         * Converts the DTO to a JSON representation.
          *
-         * @return JSON object
+         * @return DTO as string for logging.
          */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
@@ -55,9 +50,7 @@ namespace AwsMock::Dto::S3 {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const Owner &r);
+        friend std::ostream &operator<<(std::ostream &os, const UserIdentity &r);
     };
-
 }// namespace AwsMock::Dto::S3
-
-#endif// AWSMOCK_DTO_S3_OWNER_H
+#endif// AWSMOCK_DTO_S3_USER_IDENTITY_H

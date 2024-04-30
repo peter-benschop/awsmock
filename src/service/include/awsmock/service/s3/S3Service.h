@@ -29,7 +29,6 @@
 #include <awsmock/dto/s3/DeleteObjectRequest.h>
 #include <awsmock/dto/s3/DeleteObjectsRequest.h>
 #include <awsmock/dto/s3/DeleteObjectsResponse.h>
-#include <awsmock/dto/s3/EventNotification.h>
 #include <awsmock/dto/s3/GetMetadataRequest.h>
 #include <awsmock/dto/s3/GetMetadataResponse.h>
 #include <awsmock/dto/s3/GetObjectRequest.h>
@@ -47,6 +46,11 @@
 #include <awsmock/dto/s3/PutBucketVersioningRequest.h>
 #include <awsmock/dto/s3/PutObjectRequest.h>
 #include <awsmock/dto/s3/PutObjectResponse.h>
+#include <awsmock/dto/s3/model/EventNotification.h>
+#include <awsmock/dto/s3/model/TopicConfiguration.h>
+#include <awsmock/entity/s3/LambdaNotification.h>
+#include <awsmock/entity/s3/QueueNotification.h>
+#include <awsmock/entity/s3/TopicNotification.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/lambda/LambdaService.h>
 
@@ -248,32 +252,6 @@ namespace AwsMock::Service {
         void SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::BucketNotification &bucketNotification);
 
         /**
-         * Get the directory from the object key.
-         *
-         * @param key S3 object key
-         * @return all directories before file
-         */
-        static std::string GetDirFromKey(const std::string &key);
-
-        /**
-         * Get the directory for a given bucket/key combination.
-         *
-         * @param bucket S3 bucket name
-         * @param key S3 object key.
-         * @return directory path.
-         */
-        std::string GetDirectory(const std::string &bucket, const std::string &key);
-
-        /**
-         * Get the absolute filename for a given bucket/key combination.
-         *
-         * @param bucket S3 bucket name
-         * @param key S3 object key.
-         * @return absolute filename path.
-         */
-        std::string GetFilename(const std::string &bucket, const std::string &key);
-
-        /**
          * Check for bucket notifications.
          *
          * @param region AWS region.
@@ -328,8 +306,6 @@ namespace AwsMock::Service {
          */
         void DeleteBucket(const std::string &bucket);
 
-      private:
-
         /**
          * Save a versioned S3 object.
          *
@@ -348,6 +324,30 @@ namespace AwsMock::Service {
          * @return file name
          */
         Dto::S3::PutObjectResponse SaveUnversionedObject(Dto::S3::PutObjectRequest &request, std::istream &stream);
+
+        /**
+         * Adds the queue notification configuration to the provided bucket.
+         *
+         * @param bucket bucket entity.
+         * @param queueConfigurations queue notification configurations vector.
+         */
+        static void GetQueueNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::QueueConfiguration> &queueConfigurations);
+
+        /**
+         * Adds the topic notification configuration to the provided bucket.
+         *
+         * @param bucket bucket entity.
+         * @param topicConfigurations topic notification configurations vector.
+         */
+        static void GetTopicNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::TopicConfiguration> &topicConfigurations);
+
+        /**
+         * Adds the lambda notification configuration to the provided bucket.
+         *
+         * @param bucket bucket entity.
+         * @param lambdaConfigurations lambda notification configurations vector.
+         */
+        static void GetLambdaNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::LambdaConfiguration> &lambdaConfigurations);
 
         /**
          * Data directory

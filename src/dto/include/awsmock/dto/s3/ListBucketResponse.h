@@ -15,8 +15,8 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
-#include <awsmock/dto/s3/Content.h>
-#include <awsmock/dto/s3/Owner.h>
+#include <awsmock/dto/s3/model/Content.h>
+#include <awsmock/dto/s3/model/Owner.h>
 #include <awsmock/entity/s3/Object.h>
 
 namespace AwsMock::Dto::S3 {

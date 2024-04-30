@@ -2,8 +2,8 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_S3_LAMBDA_CONFIGURATION_H
-#define AWSMOCK_DTO_S3_LAMBDA_CONFIGURATION_H
+#ifndef AWSMOCK_DTO_S3_QUEUE_CONFIGURATION_H
+#define AWSMOCK_DTO_S3_QUEUE_CONFIGURATION_H
 
 // C++ standard includes
 #include <string>
@@ -15,22 +15,22 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
-#include <awsmock/dto/s3/FilterRule.h>
-#include <awsmock/dto/s3/NotificationEvent.h>
+#include <awsmock/dto/s3/model/FilterRule.h>
+#include <awsmock/dto/s3/model/NotificationEvent.h>
 
 namespace AwsMock::Dto::S3 {
 
     /**
-     * S3 notification configuration for a Lambda function.
+     * S3 notification configuration for a SQS queue.
      *
      * <p>
-     * This configures the S3 module to send a message to the supplied Lambda function. Depending on the event type
-     * and the filter rules, the event is executed and a lambda function is called.
+     * This configures the S3 module to send a message to the supplied SQS queue. Depending on the event type and the
+     * filter rules, the event is executed and a message is send to the provided SQS queue.
      * </p>
      *
      * Example:
      * @verbatim
-     *   <CloudFunctionConfiguration>
+     *   <QueueConfiguration>
      *     <Event>string</Event>
      *     ...
      *     <Filter>
@@ -43,13 +43,13 @@ namespace AwsMock::Dto::S3 {
      *      </S3Key>
      *     </Filter>
      *     <Id>string</Id>
-     *     <CloudFunction>string</CloudFunction>
-     *   </CloudFunctionConfiguration>
-     * @endverbatimindex
+     *     <Queue>string</Queue>
+     *   </QueueConfiguration>
+     * @endverbatim
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct LambdaConfiguration {
+    struct QueueConfiguration {
 
         /**
          * ID, optional, if empty a random ID will be generated
@@ -57,9 +57,9 @@ namespace AwsMock::Dto::S3 {
         std::string id;
 
         /**
-         * Lambda ARN
+         * Queue ARN
          */
-        std::string lambdaArn;
+        std::string queueArn;
 
         /**
          * S3 filter rules
@@ -104,9 +104,9 @@ namespace AwsMock::Dto::S3 {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const LambdaConfiguration &r);
+        friend std::ostream &operator<<(std::ostream &os, const QueueConfiguration &r);
     };
 
 }// namespace AwsMock::Dto::S3
 
-#endif// AWSMOCK_DTO_S3_TOPIC_CONFIGURATION_H
+#endif// AWSMOCK_DTO_S3_QUEUE_CONFIGURATION_H

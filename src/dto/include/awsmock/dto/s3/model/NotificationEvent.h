@@ -9,10 +9,10 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonException.h>
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/XmlUtils.h>
+#include "awsmock/core/JsonException.h"
+#include "awsmock/core/JsonUtils.h"
+#include "awsmock/core/LogStream.h"
+#include "awsmock/core/XmlUtils.h"
 
 namespace AwsMock::Dto::S3 {
 
@@ -35,7 +35,7 @@ namespace AwsMock::Dto::S3 {
         OBJECT_TAGGING
     };
 
-    static std::map<NotificationEventType, std::string> EventTypeNames {
+    static std::map<NotificationEventType, std::string> EventTypeNames{
             {NotificationEventType::REDUCED_REDUNDANCY_LOST_OBJECT, "ReducedRedundancyLostObject "},
             {NotificationEventType::OBJECT_CREATED, "ObjectCreated"},
             {NotificationEventType::OBJECT_REMOVED, "ObjectRemoved"},
@@ -61,5 +61,5 @@ namespace AwsMock::Dto::S3 {
         }
         return NotificationEventType::OBJECT_CREATED;
     }
-}
+}// namespace AwsMock::Dto::S3
 #endif// AWSMOCK_DTO_S3_EVENT_H

@@ -2,11 +2,11 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include <awsmock/dto/s3/LambdaConfiguration.h>
+#include <awsmock/dto/s3/model/TopicConfiguration.h>
 
 namespace AwsMock::Dto::S3 {
 
-    void LambdaConfiguration::FromXmlNode(Poco::XML::Node *rootNode) {
+    void TopicConfiguration::FromXmlNode(Poco::XML::Node *rootNode) {
 
         if (rootNode->hasChildNodes()) {
             Poco::XML::NodeList *childNodes = rootNode->childNodes();
@@ -17,9 +17,9 @@ namespace AwsMock::Dto::S3 {
 
                     id = child->innerText();
 
-                } else if (child->nodeName() == "CloudFunction") {
+                } else if (child->nodeName() == "Topic") {
 
-                    lambdaArn = child->innerText();
+                    topicArn = child->innerText();
 
                 } else if (child->nodeName() == "Filter") {
 
@@ -52,7 +52,7 @@ namespace AwsMock::Dto::S3 {
         }
     }
 
-    Poco::JSON::Object LambdaConfiguration::ToJsonObject() const {
+    Poco::JSON::Object TopicConfiguration::ToJsonObject() const {
 
         try {
 
@@ -65,18 +65,18 @@ namespace AwsMock::Dto::S3 {
         }
     }
 
-    std::string LambdaConfiguration::ToJson() const {
+    std::string TopicConfiguration::ToJson() const {
         return Core::JsonUtils::ToJsonString(ToJsonObject());
     }
 
-    std::string LambdaConfiguration::ToString() const {
+    std::string TopicConfiguration::ToString() const {
         std::stringstream ss;
         ss << (*this);
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const LambdaConfiguration &r) {
-        os << "LambdaConfiguration=" << r.ToJson();
+    std::ostream &operator<<(std::ostream &os, const TopicConfiguration &r) {
+        os << "TopicConfiguration=" << r.ToJson();
         return os;
     }
 

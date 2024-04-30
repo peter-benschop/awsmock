@@ -16,6 +16,24 @@ namespace AwsMock::Database::Entity::S3 {
                }) != notifications.end();
     }
 
+    bool Bucket::HasQueueNotification(const std::string &eventName) {
+        return find_if(queueNotifications.begin(), queueNotifications.end(), [eventName](const QueueNotification &notification) {
+                   return std::find(notification.events.begin(), notification.events.end(), eventName) != notification.events.end();
+               }) != queueNotifications.end();
+    }
+
+    bool Bucket::HasTopicNotification(const std::string &eventName) {
+        return find_if(topicNotifications.begin(), topicNotifications.end(), [eventName](const TopicNotification &notification) {
+                   return std::find(notification.events.begin(), notification.events.end(), eventName) != notification.events.end();
+               }) != topicNotifications.end();
+    }
+
+    bool Bucket::HasLambdaNotification(const std::string &eventName) {
+        return find_if(lambdaNotifications.begin(), lambdaNotifications.end(), [eventName](const LambdaNotification &notification) {
+                   return std::find(notification.events.begin(), notification.events.end(), eventName) != notification.events.end();
+               }) != lambdaNotifications.end();
+    }
+
     BucketNotification Bucket::GetNotification(const std::string &eventName) {
         auto it =
                 find_if(notifications.begin(), notifications.end(), [eventName](const BucketNotification &eventNotification) {
@@ -24,15 +42,52 @@ namespace AwsMock::Database::Entity::S3 {
         return *it;
     }
 
+    QueueNotification Bucket::GetQueueNotification(const std::string &eventName) {
+        return *find_if(queueNotifications.begin(), queueNotifications.end(), [eventName](const QueueNotification &eventNotification) {
+            return std::find(eventNotification.events.begin(), eventNotification.events.end(), eventName) != eventNotification.events.end();
+        });
+    }
+
+    TopicNotification Bucket::GetTopicNotification(const std::string &eventName) {
+        return *find_if(topicNotifications.begin(), topicNotifications.end(), [eventName](const TopicNotification &eventNotification) {
+            return std::find(eventNotification.events.begin(), eventNotification.events.end(), eventName) != eventNotification.events.end();
+        });
+    }
+
+    LambdaNotification Bucket::GetLambdaNotification(const std::string &eventName) {
+        return *find_if(lambdaNotifications.begin(), lambdaNotifications.end(), [eventName](const LambdaNotification &eventNotification) {
+            return std::find(eventNotification.events.begin(), eventNotification.events.end(), eventName) != eventNotification.events.end();
+        });
+    }
+
     bool Bucket::IsVersioned() const {
         return versionStatus == ENABLED;
     }
 
     view_or_value<view, value> Bucket::ToDocument() const {
 
+        // Bucket notification are deprecated, should be removed at a certain point
         auto notificationsDoc = bsoncxx::builder::basic::array{};
         for (const auto &notification: notifications) {
             notificationsDoc.append(notification.ToDocument());
+        }
+
+        // Queue notifications
+        auto queueNotificationsDoc = bsoncxx::builder::basic::array{};
+        for (const auto &notification: queueNotifications) {
+            queueNotificationsDoc.append(notification.ToDocument());
+        }
+
+        // Topic notifications
+        auto topicNotificationsDoc = bsoncxx::builder::basic::array{};
+        for (const auto &notification: topicNotifications) {
+            topicNotificationsDoc.append(notification.ToDocument());
+        }
+
+        // Lambda notifications
+        auto lambdaNotificationsDoc = bsoncxx::builder::basic::array{};
+        for (const auto &notification: lambdaNotifications) {
+            lambdaNotificationsDoc.append(notification.ToDocument());
         }
 
         view_or_value<view, value> bucketDoc = make_document(
@@ -40,6 +95,9 @@ namespace AwsMock::Database::Entity::S3 {
                 kvp("name", name),
                 kvp("owner", owner),
                 kvp("notifications", notificationsDoc),
+                kvp("queueNotifications", queueNotificationsDoc),
+                kvp("topicNotifications", topicNotificationsDoc),
+                kvp("lambdaNotifications", lambdaNotificationsDoc),
                 kvp("versionStatus", BucketVersionStatusToString(versionStatus)),
                 kvp("created", MongoUtils::ToBson(created)),
                 kvp("modified", MongoUtils::ToBson(modified)));
@@ -57,6 +115,7 @@ namespace AwsMock::Database::Entity::S3 {
         created = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["created"].get_date()));
         modified = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["modified"].get_date()));
 
+        // Deprecated (should be removed)
         if (mResult.value().find("notifications") != mResult.value().end()) {
             bsoncxx::array::view notificationView{mResult.value()["notifications"].get_array().value};
             for (bsoncxx::array::element notificationElement: notificationView) {
@@ -66,6 +125,33 @@ namespace AwsMock::Database::Entity::S3 {
                         .queueArn = bsoncxx::string::to_string(notificationElement["queueArn"].get_string().value),
                         .lambdaArn = bsoncxx::string::to_string(notificationElement["lambdaArn"].get_string().value)};
                 notifications.push_back(notification);
+            }
+        }
+
+        // SQS queue notification configuration
+        if (mResult.value().find("queueNotifications") != mResult.value().end()) {
+            bsoncxx::array::view notificationView{mResult.value()["queueNotifications"].get_array().value};
+            for (bsoncxx::array::element notificationElement: notificationView) {
+                QueueNotification notification;
+                queueNotifications.emplace_back(notification.FromDocument(notificationElement.get_document()));
+            }
+        }
+
+        // SNS topic notification configuration
+        if (mResult.value().find("topicNotifications") != mResult.value().end()) {
+            bsoncxx::array::view notificationView{mResult.value()["topicNotifications"].get_array().value};
+            for (bsoncxx::array::element notificationElement: notificationView) {
+                TopicNotification notification;
+                topicNotifications.emplace_back(notification.FromDocument(notificationElement.get_document()));
+            }
+        }
+
+        // Lambda function notification configuration
+        if (mResult.value().find("lambdaNotifications") != mResult.value().end()) {
+            bsoncxx::array::view notificationView{mResult.value()["lambdaNotifications"].get_array().value};
+            for (bsoncxx::array::element notificationElement: notificationView) {
+                LambdaNotification notification;
+                lambdaNotifications.emplace_back(notification.FromDocument(notificationElement.get_document()));
             }
         }
     }
@@ -78,12 +164,40 @@ namespace AwsMock::Database::Entity::S3 {
         jsonObject.set("owner", owner);
         jsonObject.set("versionStatus", BucketVersionStatusToString(versionStatus));
 
+        // Bucket notifications (deprecated)
         if (!notifications.empty()) {
             Poco::JSON::Array jsonArray;
             for (const auto &notification: notifications) {
                 jsonArray.add(notification.ToJsonObject());
             }
             jsonObject.set("notifications", jsonArray);
+        }
+
+        // Queue notifications
+        if (!queueNotifications.empty()) {
+            Poco::JSON::Array jsonArray;
+            for (const auto &notification: queueNotifications) {
+                jsonArray.add(notification.ToJsonObject());
+            }
+            jsonObject.set("queueNotifications", jsonArray);
+        }
+
+        // Topic notifications
+        if (!queueNotifications.empty()) {
+            Poco::JSON::Array jsonArray;
+            for (const auto &notification: topicNotifications) {
+                jsonArray.add(notification.ToJsonObject());
+            }
+            jsonObject.set("topicNotifications", jsonArray);
+        }
+
+        // Lambda notifications
+        if (!lambdaNotifications.empty()) {
+            Poco::JSON::Array jsonArray;
+            for (const auto &notification: lambdaNotifications) {
+                jsonArray.add(notification.ToJsonObject());
+            }
+            jsonObject.set("topicNotifications", jsonArray);
         }
         return jsonObject;
     }
@@ -103,6 +217,15 @@ namespace AwsMock::Database::Entity::S3 {
                 BucketNotification nofication;
                 nofication.FromJsonObject(jsonNotificationArray->getObject(i));
                 notifications.emplace_back(nofication);
+            }
+        }
+
+        if (jsonObject->has("queueNotifications")) {
+            Poco::JSON::Array::Ptr jsonNotificationArray = jsonObject->getArray("queueNotifications");
+            for (int i = 0; i < jsonNotificationArray->size(); i++) {
+                QueueNotification notification;
+                notification.FromJsonObject(jsonNotificationArray->getObject(i));
+                queueNotifications.emplace_back(notification);
             }
         }
     }

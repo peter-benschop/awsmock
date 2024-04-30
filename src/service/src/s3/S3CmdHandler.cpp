@@ -305,6 +305,8 @@ namespace AwsMock::Service {
                     std::string body = Core::HttpUtils::GetBodyAsString(request);
                     Dto::S3::PutBucketNotificationConfigurationRequest s3Request;
                     s3Request.FromXml(body);
+                    s3Request.region = s3ClientCommand.region;
+                    s3Request.bucket = s3ClientCommand.bucket;
 
                     Dto::S3::PutBucketNotificationConfigurationResponse s3Response = _s3Service.PutBucketNotificationConfiguration(s3Request);
 

@@ -10,12 +10,12 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/JsonException.h>
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/XmlUtils.h>
-#include <awsmock/dto/s3/UserIdentity.h>
+#include "UserIdentity.h"
+#include "awsmock/core/DateTimeUtils.h"
+#include "awsmock/core/JsonException.h"
+#include "awsmock/core/JsonUtils.h"
+#include "awsmock/core/LogStream.h"
+#include "awsmock/core/XmlUtils.h"
 
 namespace AwsMock::Dto::S3 {
 
@@ -155,7 +155,7 @@ namespace AwsMock::Dto::S3 {
                 return rootJson;
 
             } catch (Poco::Exception &exc) {
-                throw Core::ServiceException(exc.message(), 500);
+                throw Core::JsonException(exc.message());
             }
         }
 
@@ -170,7 +170,7 @@ namespace AwsMock::Dto::S3 {
                 Core::JsonUtils::GetJsonValueString("principalId", jsonObject, principalId);
             } catch (Poco::Exception &exc) {
                 log_error << exc.message();
-                throw Core::ServiceException(exc.message(), 500);
+                throw Core::JsonException(exc.message());
             }
         }
 
@@ -229,7 +229,7 @@ namespace AwsMock::Dto::S3 {
                 return rootJson;
 
             } catch (Poco::Exception &exc) {
-                throw Core::ServiceException(exc.message(), 500);
+                throw Core::JsonException(exc.message());
             }
         }
 
@@ -249,7 +249,7 @@ namespace AwsMock::Dto::S3 {
 
             } catch (Poco::Exception &exc) {
                 log_error << exc.message();
-                throw Core::ServiceException(exc.message(), 500);
+                throw Core::JsonException(exc.message());
             }
         }
 
@@ -320,7 +320,7 @@ namespace AwsMock::Dto::S3 {
 
                 return rootJson;
             } catch (Poco::Exception &exc) {
-                throw Core::ServiceException(exc.message(), 500);
+                throw Core::JsonException(exc.message());
             }
         }
 
@@ -339,7 +339,7 @@ namespace AwsMock::Dto::S3 {
                 Core::JsonUtils::GetJsonValueString("sequencer", jsonObject, sequencer);
             } catch (Poco::Exception &exc) {
                 log_error << exc.message();
-                throw Core::ServiceException(exc.message());
+                throw Core::JsonException(exc.message());
             }
         }
 
@@ -405,7 +405,8 @@ namespace AwsMock::Dto::S3 {
                 return rootJson;
 
             } catch (Poco::Exception &exc) {
-                throw Core::ServiceException(exc.message(), 500);
+                log_error << exc.message();
+                throw Core::JsonException(exc.message());
             }
         }
 
@@ -428,7 +429,7 @@ namespace AwsMock::Dto::S3 {
 
             } catch (Poco::Exception &exc) {
                 log_error << exc.message();
-                throw Core::ServiceException(exc.message());
+                throw Core::JsonException(exc.message());
             }
         }
 
@@ -522,7 +523,8 @@ namespace AwsMock::Dto::S3 {
                 return rootJson;
 
             } catch (Poco::Exception &exc) {
-                throw Core::ServiceException(exc.message(), 500);
+                log_error << exc.message();
+                throw Core::JsonException(exc.message());
             }
         }
 
@@ -543,7 +545,7 @@ namespace AwsMock::Dto::S3 {
 
             } catch (Poco::Exception &exc) {
                 log_error << exc.message();
-                throw Core::ServiceException(exc.message());
+                throw Core::JsonException(exc.message());
             }
         }
 
@@ -598,7 +600,8 @@ namespace AwsMock::Dto::S3 {
                 return os.str();
 
             } catch (Poco::Exception &exc) {
-                throw Core::ServiceException(exc.message());
+                log_error << exc.message();
+                throw Core::JsonException(exc.message());
             }
         }
 
@@ -625,7 +628,7 @@ namespace AwsMock::Dto::S3 {
 
             } catch (Poco::Exception &exc) {
                 log_error << exc.message();
-                throw Core::ServiceException(exc.message());
+                throw Core::JsonException(exc.message());
             }
         }
 

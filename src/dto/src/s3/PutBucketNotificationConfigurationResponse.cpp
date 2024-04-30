@@ -6,34 +6,39 @@
 
 namespace AwsMock::Dto::S3 {
 
-    std::string PutBucketNotificationConfigurationResponse::ToXml() const {
+    std::string PutBucketNotificationConfigurationResponse::ToXml() {
 
-        /*Poco::XML::DOMParser parser;
-        Poco::AutoPtr<Poco::XML::Document> pDoc = parser.parseString(xmlString);
+        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = Core::XmlUtils::CreateDocument();
+        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = Core::XmlUtils::CreateRootNode(pDoc, "NotificationConfiguration");
 
-        Poco::XML::Node *cloudNode = pDoc->getNodeByPath("/NotificationConfiguration/CloudFunctionConfiguration");
-        if (cloudNode) {
-            Poco::XML::Node *idNode = pDoc->getNodeByPath("/NotificationConfiguration/CloudFunctionConfiguration/Id");
-            notificationId = idNode->innerText();
+        // Queue notification configurations
+        for (const auto &queueConfiguration: queueConfigurations) {
 
-            Poco::XML::Node *functionNode = pDoc->getNodeByPath("/NotificationConfiguration/CloudFunctionConfiguration/CloudFunction");
-            lambdaArn = functionNode->innerText();
-
-            Poco::XML::Node *eventNode = pDoc->getNodeByPath("/NotificationConfiguration/CloudFunctionConfiguration/Event");
-            event = eventNode->innerText();
+            Poco::XML::AutoPtr<Poco::XML::Element> pQueueConfiguration = Core::XmlUtils::CreateNode(pDoc, pRoot, "QueueNotification");
+            Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "Id", queueConfiguration.id);
+            Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "Queue", queueConfiguration.queueArn);
+            Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "Event", EventTypeToString(queueConfiguration.events.front()));
         }
 
-        Poco::XML::Node *queueNodes = pDoc->getNodeByPath("/NotificationConfiguration/QueueConfigurations");
-        if (queueNodes) {
+        // Topic notification configurations
+        for (const auto &topicConfiguration: topicConfigurations) {
 
-            for (int i = 0; i < queueNodes->childNodes()->length(); i++) {
-                Poco::XML::Node *queueNode = queueNodes->childNodes()->item(i);
-                QueueConfiguration queueConfiguration;
-                //queueConfiguration.FromXml(queueNode);
-                queueConfigurations.emplace_back(queueConfiguration);
-            }
-        }*/
-        return {};
+            Poco::XML::AutoPtr<Poco::XML::Element> pQueueConfiguration = Core::XmlUtils::CreateNode(pDoc, pRoot, "TopicNotification");
+            Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "Id", topicConfiguration.id);
+            Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "Topic", topicConfiguration.topicArn);
+            Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "Event", EventTypeToString(topicConfiguration.events.front()));
+        }
+
+        // Lambda notification configurations
+        for (const auto &lambdaConfiguration: lambdaConfigurations) {
+
+            Poco::XML::AutoPtr<Poco::XML::Element> pQueueConfiguration = Core::XmlUtils::CreateNode(pDoc, pRoot, "CloudFunctionNotification");
+            Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "Id", lambdaConfiguration.id);
+            Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "CloudFunction", lambdaConfiguration.lambdaArn);
+            Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "Event", EventTypeToString(lambdaConfiguration.events.front()));
+        }
+
+        return Core::XmlUtils::ToXmlString(pDoc);
     }
 
     std::string PutBucketNotificationConfigurationResponse::ToJson() const {

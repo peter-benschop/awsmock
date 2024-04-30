@@ -307,7 +307,7 @@ namespace AwsMock::Core {
          * @param key_data key data
          * @param key_data_len length of key data
          * @param salt salt value
-         * @param ctx openssl context
+         * @param ctx openssl model
          */
         static int Aes256EncryptionInit(unsigned char *key_data, int key_data_len, unsigned char *salt, EVP_CIPHER_CTX *ctx);
 
@@ -317,7 +317,7 @@ namespace AwsMock::Core {
          * @param key_data key data
          * @param key_data_len length of key data
          * @param salt salt value
-         * @param ctx openssl context
+         * @param ctx openssl model
          */
         static int Aes256DecryptionInit(unsigned char *key_data, int key_data_len, unsigned char *salt, EVP_CIPHER_CTX *ctx);
 

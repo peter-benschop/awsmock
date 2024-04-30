@@ -21,14 +21,14 @@ namespace AwsMock::Dto::S3 {
                         QueueConfiguration queueConfiguration;
                         queueConfiguration.FromXmlNode(childNode);
                         queueConfigurations.emplace_back(queueConfiguration);
-                    } else if (childNode->nodeName() == "CloudFunctionConfiguration") {
-                        QueueConfiguration queueConfiguration;
-                        queueConfiguration.FromXmlNode(childNode);
-                        queueConfigurations.emplace_back(queueConfiguration);
                     } else if (childNode->nodeName() == "TopicConfiguration") {
-                        QueueConfiguration queueConfiguration;
-                        queueConfiguration.FromXmlNode(childNode);
-                        queueConfigurations.emplace_back(queueConfiguration);
+                        TopicConfiguration topicConfiguration;
+                        topicConfiguration.FromXmlNode(childNode);
+                        topicConfigurations.emplace_back(topicConfiguration);
+                    } else if (childNode->nodeName() == "CloudFunctionConfiguration") {
+                        LambdaConfiguration lambdaConfiguration;
+                        lambdaConfiguration.FromXmlNode(childNode);
+                        lambdaConfigurations.emplace_back(lambdaConfiguration);
                     }
                 }
             }

@@ -25,7 +25,7 @@
 #include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/XmlUtils.h>
-#include <awsmock/dto/s3/Owner.h>
+#include <awsmock/dto/s3/model/Owner.h>
 
 namespace AwsMock::Dto::S3 {
 

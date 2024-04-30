@@ -2,7 +2,7 @@
 // Created by vogje01 on 4/28/24.
 //
 
-#include "awsmock/dto/s3/FilterRule.h"
+#include <awsmock/dto/s3/model/FilterRule.h>
 
 namespace AwsMock::Dto::S3 {
 

@@ -70,7 +70,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Update the MD5 hash with a given value
          *
-         * @param context MD5 hash context
+         * @param context MD5 hash model
          * @param str string to append
          */
         static void UpdateLengthAndBytes(EVP_MD_CTX *context, const std::string &str);

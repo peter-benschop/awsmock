@@ -15,7 +15,9 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
-#include <awsmock/dto/s3/QueueConfiguration.h>
+#include <awsmock/dto/s3/model/LambdaConfiguration.h>
+#include <awsmock/dto/s3/model/QueueConfiguration.h>
+#include <awsmock/dto/s3/model/TopicConfiguration.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -24,58 +26,16 @@ namespace AwsMock::Dto::S3 {
      *
      * Example:
      * @verbatim
-     * <NotificationConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
-     *   <TopicConfiguration>
-     *     <Event>string</Event>
-     *       ...
-     *     <Filter>
-     *       <S3Key>
-     *          <FilterRule>
-     *            <Name>string</Name>
-     *            <Value>string</Value>
-     *         </FilterRule>
-     *         ...
-     *       </S3Key>
-     *     </Filter>
-     *     <Id>string</Id>
-     *     <Topic>string</Topic>
-     *   </TopicConfiguration>
-     *   ...
-     *   <QueueConfiguration>
-     *     <Event>string</Event>
-     *     ...
-     *     <Filter>
-     *       <S3Key>
-     *         <FilterRule>
-     *           <Name>string</Name>
-     *           <Value>string</Value>
-     *         </FilterRule>
-     *         ...
-     *      </S3Key>
-     *     </Filter>
-     *     <Id>string</Id>
-     *     <Queue>string</Queue>
-     *   </QueueConfiguration>
-     *   ...
-     *   <CloudFunctionConfiguration>
-     *    <Event>string</Event>
-     *    ...
-     *    <Filter>
-     *      <S3Key>
-     *        <FilterRule>
-     *          <Name>string</Name>
-     *          <Value>string</Value>
-     *       </FilterRule>
-     *       ...
-     *      </S3Key>
-     *    </Filter>
-     *    <Id>string</Id>
-     *    <CloudFunction>string</CloudFunction>
-     *   </CloudFunctionConfiguration>
-     *   ...
-     *   <EventBridgeConfiguration>
-     *   </EventBridgeConfiguration>
-     * </NotificationConfiguration>
+       <NotificationConfiguration>
+         <TopicConfiguration>
+            <Topic>arn:aws:sns:us-east-1:356671443308:s3notificationtopic2</Topic>
+            <Event>s3:ReducedRedundancyLostObject</Event>
+         </TopicConfiguration>
+         <QueueConfiguration>
+            <Queue>arn:aws:sqs:us-east-1:356671443308:s3notificationqueue</Queue>
+            <Event>s3:ObjectCreated:*</Event>
+         </QueueConfiguration>
+       </NotificationConfiguration>
      * @endverbatim
      *
      * @author jens.vogt\@opitz-consulting.com
@@ -85,7 +45,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * Topic configurations
          */
-        //std::vector<TopicConfiguration> topicConfigurations;
+        std::vector<TopicConfiguration> topicConfigurations;
 
         /**
          * SQS queue configurations
@@ -95,14 +55,14 @@ namespace AwsMock::Dto::S3 {
         /**
          * Lambda function configurations
          */
-        //std::vector<CloudWatchFunctionConfiguration> queueConfigurations;
+        std::vector<LambdaConfiguration> lambdaConfigurations;
 
         /**
           * Convert from XML representation
           *
           * @param xmlString XML string
           */
-        std::string ToXml() const;
+        [[nodiscard]] std::string ToXml();
 
         /**
          * Convert to a JSON string

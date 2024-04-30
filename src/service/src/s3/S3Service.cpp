@@ -674,26 +674,35 @@ namespace AwsMock::Service {
     }
 
     Dto::S3::PutBucketNotificationConfigurationResponse S3Service::PutBucketNotificationConfiguration(const Dto::S3::PutBucketNotificationConfigurationRequest &request) {
-        Dto::S3::PutBucketNotificationConfigurationResponse response;
-        return response;
-    }
 
-    std::string S3Service::GetDirFromKey(const std::string &key) {
-
-        if (key.find('/') != std::string::npos) {
-            return key.substr(0, key.find_last_of('/'));
+        // Check existence
+        if (!_database.BucketExists({.region = request.region, .name = request.bucket})) {
+            throw Core::ServiceException("Bucket does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
         }
-        return {};
-    }
 
-    std::string S3Service::GetDirectory(const std::string &bucket, const std::string &key) {
+        Dto::S3::PutBucketNotificationConfigurationResponse response;
+        try {
 
-        return _dataS3Dir + Poco::Path::separator() + bucket + Poco::Path::separator() + GetDirFromKey(key);
-    }
+            // Get bucket
+            Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
+            log_debug << "Bucket received, region:" << bucket.region << " bucket: " << bucket.name;
 
-    std::string S3Service::GetFilename(const std::string &bucket, const std::string &key) {
+            // Add notification configurations
+            GetQueueNotificationConfigurations(bucket, request.queueConfigurations);
+            GetTopicNotificationConfigurations(bucket, request.topicConfigurations);
+            GetLambdaNotificationConfigurations(bucket, request.lambdaConfigurations);
 
-        return _dataS3Dir + Poco::Path::separator() + bucket + Poco::Path::separator() + key;
+            // Update database
+            bucket = _database.UpdateBucket(bucket);
+            log_debug << "Bucket updated, region:" << bucket.region << " bucket: " << bucket.name;
+
+            response.queueConfigurations = request.queueConfigurations;
+            return response;
+
+        } catch (Poco::Exception &ex) {
+            log_error << "S3 put notification configurations failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
     }
 
     void S3Service::DeleteObject(const std::string &bucket, const std::string &key, const std::string &internalName) {
@@ -902,6 +911,84 @@ namespace AwsMock::Service {
                 .checksumSha256 = object.sha256sum,
                 .metadata = request.metadata,
                 .versionId = object.versionId};
+    }
+
+    void S3Service::GetQueueNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::QueueConfiguration> &queueConfigurations) {
+
+        for (auto &queueConfiguration: queueConfigurations) {
+
+            // General attributes
+            std::string id = queueConfiguration.id.empty() ? Poco::UUIDGenerator().createOne().toString() : queueConfiguration.id;
+            Database::Entity::S3::QueueNotification queueNotification = {
+                    .id = id,
+                    .queueArn = queueConfiguration.queueArn,
+            };
+
+            // Get events
+            for (const auto &event: queueConfiguration.events) {
+                queueNotification.events.emplace_back(Dto::S3::EventTypeToString(event));
+            }
+
+            // Get filter rules
+            for (const auto &filterRule: queueConfiguration.filterRules) {
+                Database::Entity::S3::FilterRule filterRuleEntity = {.name = Dto::S3::NameTypeToString(filterRule.name), .value = filterRule.value};
+                queueNotification.filterRules.emplace_back(filterRuleEntity);
+            }
+            bucket.queueNotifications.emplace_back(queueNotification);
+        }
+        log_debug << "Added queue notification configurations, count: " << bucket.queueNotifications.size();
+    }
+
+    void S3Service::GetTopicNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::TopicConfiguration> &topicConfigurations) {
+
+        for (auto &topicConfiguration: topicConfigurations) {
+
+            // General attributes
+            std::string id = topicConfiguration.id.empty() ? Poco::UUIDGenerator().createOne().toString() : topicConfiguration.id;
+            Database::Entity::S3::TopicNotification topicNotification = {
+                    .id = id,
+                    .topicArn = topicConfiguration.topicArn,
+            };
+
+            // Get events
+            for (const auto &event: topicConfiguration.events) {
+                topicNotification.events.emplace_back(Dto::S3::EventTypeToString(event));
+            }
+
+            // Get filter rules
+            for (const auto &filterRule: topicConfiguration.filterRules) {
+                Database::Entity::S3::FilterRule filterRuleEntity = {.name = Dto::S3::NameTypeToString(filterRule.name), .value = filterRule.value};
+                topicNotification.filterRules.emplace_back(filterRuleEntity);
+            }
+            bucket.topicNotifications.emplace_back(topicNotification);
+        }
+        log_debug << "Added queue notification configurations, count: " << bucket.queueNotifications.size();
+    }
+
+    void S3Service::GetLambdaNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::LambdaConfiguration> &lambdaConfigurations) {
+
+        for (auto &lambdaConfiguration: lambdaConfigurations) {
+
+            // General attributes
+            std::string id = lambdaConfiguration.id.empty() ? Poco::UUIDGenerator().createOne().toString() : lambdaConfiguration.id;
+            Database::Entity::S3::LambdaNotification lambdaNotification = {
+                    .id = id,
+                    .lambdaArn = lambdaConfiguration.lambdaArn,
+            };
+
+            // Get events
+            for (const auto &event: lambdaConfiguration.events) {
+                lambdaNotification.events.emplace_back(Dto::S3::EventTypeToString(event));
+            }
+
+            // Get filter rules
+            for (const auto &filterRule: lambdaConfiguration.filterRules) {
+                Database::Entity::S3::FilterRule filterRuleEntity = {.name = Dto::S3::NameTypeToString(filterRule.name), .value = filterRule.value};
+                lambdaNotification.filterRules.emplace_back(filterRuleEntity);
+            }
+            bucket.lambdaNotifications.emplace_back(lambdaNotification);
+        }
+        log_debug << "Added queue notification configurations, count: " << bucket.queueNotifications.size();
     }
 
     void S3Service::CalculateHashes(Database::Entity::S3::Object &object) {

@@ -2,7 +2,7 @@
 // Created by vogje01 on 12/18/23.
 //
 
-#include <awsmock/dto/s3/Content.h>
+#include <awsmock/dto/s3/model/Content.h>
 
 namespace AwsMock::Dto::S3 {
 
