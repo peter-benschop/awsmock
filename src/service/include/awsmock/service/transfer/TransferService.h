@@ -34,14 +34,14 @@
 #include <awsmock/dto/transfer/StopServerRequest.h>
 #include <awsmock/repository/TransferDatabase.h>
 
-#define TRANSFER_DEFAULT_FTP_PORT 2121
+#define TRANSFER_DEFAULT_FTP_PORT 21
 
 namespace AwsMock::Service {
 
     /**
      * Transfer family service
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class TransferService {
 

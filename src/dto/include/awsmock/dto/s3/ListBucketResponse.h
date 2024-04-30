@@ -15,8 +15,8 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
-#include <awsmock/dto/s3/Content.h>
-#include <awsmock/dto/s3/Owner.h>
+#include <awsmock/dto/s3/model/Content.h>
+#include <awsmock/dto/s3/model/Owner.h>
 #include <awsmock/entity/s3/Object.h>
 
 namespace AwsMock::Dto::S3 {
@@ -24,102 +24,102 @@ namespace AwsMock::Dto::S3 {
     struct CommonPrefix {
 
         /**
-     * Prefix
-     */
+         * Prefix
+         */
         std::string _prefix;
     };
 
     struct ListBucketResponse {
 
         /**
-     * Truncation flag
-     */
+         * Truncation flag
+         */
         bool isTruncated = false;
 
         /**
-     * Contents
-     */
+         * Contents
+         */
         std::vector<Content> contents;
 
         /**
-     * Name
-     */
+         * Name
+         */
         std::string name;
 
         /**
-     * Prefix
-     */
+         * Prefix
+         */
         std::string prefix;
 
         /**
-     * Delimiter
-     */
+         * Delimiter
+         */
         std::string delimiter;
 
         /**
-     * Maximal keys
-     */
+         * Maximal keys
+         */
         int maxKeys = 1000;
 
         /**
-     * Encoding type
-     */
+         * Encoding type
+         */
         std::string encodingType;
 
         /**
-     * Key count
-     */
+         * Key count
+         */
         int keyCount = 0;
 
         /**
-     * Continuation token
-     */
+         * Continuation token
+         */
         std::string continuationToken;
 
         /**
-     * Next continuation token
-     */
+         * Next continuation token
+         */
         std::string nextContinuationToken;
 
         /**
-     * Start after
-     */
+         * Start after
+         */
         std::string startAfter;
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Constructor
-     *
-     * @param bucket bucket
-     * @param objectList object list
-     */
+         * Constructor
+         *
+         * @param bucket bucket
+         * @param objectList object list
+         */
         ListBucketResponse(const std::string &bucket, const Database::Entity::S3::ObjectList &objectList);
 
         /**
-     * Convert to XML representation
-     *
-     * @return XML string
-     */
+         * Convert to XML representation
+         *
+         * @return XML string
+         */
         std::string ToXml();
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const ListBucketResponse &r);
     };
 

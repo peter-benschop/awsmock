@@ -36,13 +36,13 @@ namespace AwsMock::Core {
      * </ul>
      *
      * Properties in a configuration file are key-vale pairs. The following list shows all supported keys with their default values:
-     * <pre>
+     * @verbatim
      * awsmock.monitoring.port=9100
      * awsmock.monitoring.timeout=60000
      * awsmock.logging.level=debug
-     * </pre>
+     * @endverbatim
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class Configuration : public Poco::Util::PropertyFileConfiguration {
 

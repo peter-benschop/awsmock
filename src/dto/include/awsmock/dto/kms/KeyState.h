@@ -14,7 +14,7 @@ namespace AwsMock::Dto::KMS {
     /**
      * KMS key state
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     enum class KeyState {
         CREATING,

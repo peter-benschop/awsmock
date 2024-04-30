@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_GETQUEUEATTRIBUTESRESPONSE_H
-#define AWSMOCK_DTO_SQS_GETQUEUEATTRIBUTESRESPONSE_H
+#ifndef AWSMOCK_DTO_SQS_GET_QUEUE_ATTRIBUTE_RESPONSE_H
+#define AWSMOCK_DTO_SQS_GET_QUEUE_ATTRIBUTE_RESPONSE_H
 
 // C++ standard includes
 #include <sstream>
@@ -31,49 +31,49 @@ namespace AwsMock::Dto::SQS {
     struct GetQueueAttributesResponse {
 
         /**
-     * Attributes
-     */
+         * Attributes
+         */
         std::vector<std::pair<std::string, std::string>> attributes;
 
         /**
-     * Resource
-     */
+         * Resource
+         */
         std::string resource = "SQS";
 
         /**
-     * Resource
-     */
+         * Resource
+         */
         std::string requestId = Poco::UUIDGenerator().createRandom().toString();
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Convert to XML representation
-     *
-     * @return XML string
-     */
+         * Convert to XML representation
+         *
+         * @return XML string
+         */
         [[nodiscard]] std::string ToXml() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const GetQueueAttributesResponse &r);
     };
 
 }// namespace AwsMock::Dto::SQS
 
-#endif// AWSMOCK_DTO_SQS_GETQUEUEATTRIBUTESRESPONSE_H
+#endif// AWSMOCK_DTO_SQS_GET_QUEUE_ATTRIBUTE_RESPONSE_H

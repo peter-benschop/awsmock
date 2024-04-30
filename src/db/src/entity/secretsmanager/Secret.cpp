@@ -82,6 +82,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
             }
         } catch (const mongocxx::exception &exc) {
             log_error << "Exception: oid: " << oid << " error: " << exc.what();
+            throw Core::DatabaseException(exc.what());
         }
     }
 

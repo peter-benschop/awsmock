@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_GETQUEUEURLREQUEST_H
-#define AWSMOCK_DTO_SQS_GETQUEUEURLREQUEST_H
+#ifndef AWSMOCK_DTO_SQS_GET_QUEUE_URL_REQUEST_H
+#define AWSMOCK_DTO_SQS_GET_QUEUE_URL_REQUEST_H
 
 // C++ standard includes
 #include <sstream>
@@ -23,37 +23,37 @@ namespace AwsMock::Dto::SQS {
     struct GetQueueUrlRequest {
 
         /**
-     * AWS region name
-     */
+         * AWS region name
+         */
         std::string region;
 
         /**
-     * Name of the queue
-     */
+         * Name of the queue
+         */
         std::string queueName;
 
         /**
-     * Converts the JSON string to a DTO
-     *
-     * @param jsonString JSON string
-     */
+         * Converts the JSON string to a DTO
+         *
+         * @param jsonString JSON string
+         */
         void FromJson(const std::string &jsonString);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const GetQueueUrlRequest &r);
     };
 
 }// namespace AwsMock::Dto::SQS
 
-#endif// AWSMOCK_DTO_SQS_GETQUEUEURLREQUEST_H
+#endif// AWSMOCK_DTO_SQS_GET_QUEUE_URL_REQUEST_H

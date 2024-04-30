@@ -196,9 +196,7 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                auto result =
-                        _bucketCollection.replace_one(make_document(kvp("region", bucket.region), kvp("name", bucket.name)),
-                                                      bucket.ToDocument());
+                auto result = _bucketCollection.replace_one(make_document(kvp("region", bucket.region), kvp("name", bucket.name)), bucket.ToDocument());
                 log_trace << "Bucket updated: " << bucket.ToString();
                 session.commit_transaction();
                 return GetBucketByRegionName(bucket.region, bucket.name);

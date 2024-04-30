@@ -23,7 +23,7 @@ namespace AwsMock::Dto::DynamoDb {
     /**
      * DynamoDB delete table response
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct DeleteTableResponse {
 

@@ -32,9 +32,9 @@ namespace AwsMock::Database::Entity::SQS {
                 kvp("md5UserAttr", md5UserAttr),
                 kvp("md5SystemAttr", md5SystemAttr),
                 kvp("attributes", messageAttributesDoc),
-                kvp("reset", bsoncxx::types::b_date(std::chrono::milliseconds(reset.timestamp().epochMicroseconds() / 1000))),
-                kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-                kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+                kvp("reset", MongoUtils::ToBson(reset)),
+                kvp("created", MongoUtils::ToBson(created)),
+                kvp("modified", MongoUtils::ToBson(modified)));
 
         return messageDoc;
     }
@@ -53,20 +53,23 @@ namespace AwsMock::Database::Entity::SQS {
         md5UserAttr = bsoncxx::string::to_string(mResult.value()["md5UserAttr"].get_string().value);
         md5SystemAttr = bsoncxx::string::to_string(mResult.value()["md5SystemAttr"].get_string().value);
         if (mResult.value()["reset"].type() != bsoncxx::type::k_null) {
-            reset = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["reset"].get_date().value) / 1000));
+            reset = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["reset"].get_date()));
         }
-        created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-        modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+        created = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["created"].get_date()));
+        modified = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["modified"].get_date()));
 
-        bsoncxx::array::view attributesView{mResult.value()["attributes"].get_array().value};
-        for (bsoncxx::array::element attributeElement: attributesView) {
-            MessageAttribute attribute{
-                    .attributeName = bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
-                    .attributeValue = bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value),
-                    .attributeType = Database::Entity::SQS::MessageAttributeTypeFromString(bsoncxx::string::to_string(attributeElement["attributeType"].get_string().value)),
-                    .systemAttribute = attributeElement["systemAttribute"].get_bool().value,
-            };
-            attributes.push_back(attribute);
+        // Attributes
+        if (mResult.value().find("attributes") != mResult.value().end()) {
+            bsoncxx::array::view attributesView{mResult.value()["attributes"].get_array().value};
+            for (bsoncxx::array::element attributeElement: attributesView) {
+                MessageAttribute attribute{
+                        .attributeName = bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
+                        .attributeValue = bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value),
+                        .attributeType = Database::Entity::SQS::MessageAttributeTypeFromString(bsoncxx::string::to_string(attributeElement["attributeType"].get_string().value)),
+                        .systemAttribute = attributeElement["systemAttribute"].get_bool().value,
+                };
+                attributes.push_back(attribute);
+            }
         }
     }
 
@@ -84,16 +87,18 @@ namespace AwsMock::Database::Entity::SQS {
         jsonObject.set("reset", Poco::DateTimeFormatter::format(reset, Poco::DateTimeFormat::ISO8601_FORMAT));
 
         // Attributes
-        Poco::JSON::Array jsonAttributeArray;
-        for (const auto &attribute: attributes) {
-            if (!attribute.systemAttribute) {
-                Poco::JSON::Object jsonAttributeObject;
-                jsonAttributeObject.set("name", attribute.attributeName);
-                jsonAttributeObject.set("value", attribute.attributeValue);
-                jsonAttributeArray.add(jsonAttributeObject);
+        if (!attributes.empty()) {
+            Poco::JSON::Array jsonAttributeArray;
+            for (const auto &attribute: attributes) {
+                if (!attribute.systemAttribute) {
+                    Poco::JSON::Object jsonAttributeObject;
+                    jsonAttributeObject.set("name", attribute.attributeName);
+                    jsonAttributeObject.set("value", attribute.attributeValue);
+                    jsonAttributeArray.add(jsonAttributeObject);
+                }
             }
+            jsonObject.set("userAttributes", jsonAttributeArray);
         }
-        jsonObject.set("userAttributes", jsonAttributeArray);
 
         return jsonObject;
     }

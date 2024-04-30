@@ -144,7 +144,11 @@ namespace AwsMock::Core {
     }
 
     bool StringUtils::StartsWith(const std::string &s1, const std::string &s2) {
-        return s1.rfind(s2, 0) == 0;
+        return s1.starts_with(s2);
+    }
+
+    bool StringUtils::EndsWith(const std::string &s1, const std::string &s2) {
+        return s1.ends_with(s2);
     }
 
     std::string StringUtils::SubString(const std::string &string, int beginIndex, int endIndex) {

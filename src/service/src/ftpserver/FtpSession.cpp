@@ -2,16 +2,18 @@
 #include "awsmock/core/MetricDefinition.h"
 #include <awsmock/ftpserver/FtpSession.h>
 
+#include <utility>
+
 namespace AwsMock::FtpServer {
 
     FtpSession::FtpSession(asio::io_service &io_service,
                            const UserDatabase &user_database,
-                           const std::string &serverName,
-                           const Core::Configuration &configuration,
+                           std::string serverName,
+                           Core::Configuration &configuration,
                            const std::function<void()> &completion_handler)
         : AbstractWorker(configuration), _completion_handler(completion_handler), _user_database(user_database), _io_service(io_service), command_socket_(io_service),
           command_write_strand_(io_service), data_type_binary_(false), data_acceptor_(io_service), data_buffer_strand_(io_service), file_rw_strand_(io_service),
-          _ftpWorkingDirectory("/"), _configuration(configuration), _serverName(serverName) {
+          _ftpWorkingDirectory("/"), _configuration(configuration), _serverName(std::move(serverName)) {
 
         // S3 module connection
         _s3ServiceHost = _configuration.getString("awsmock.service.s3.host", "localhost");

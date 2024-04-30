@@ -47,7 +47,7 @@ namespace AwsMock::Service {
     /**
      * Secrets manager service.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class SecretsManagerService {
 

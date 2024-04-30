@@ -18,7 +18,7 @@ namespace AwsMock::Core {
     /**
      * AwsMock resource not found response.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class [[maybe_unused]] ResourceNotFound : public Poco::Net::HTTPRequestHandler {
 

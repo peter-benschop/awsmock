@@ -7,7 +7,7 @@
 #include <awsmock/core/logging/plog/Logger.h>
 
 //////////////////////////////////////////////////////////////////////////
-// Helper macros that get context info
+// Helper macros that get model info
 
 #if defined(PLOG_ENABLE_GET_THIS) && defined(_MSC_VER) && _MSC_VER >= 1600 && !defined(__INTELLISENSE__) && !defined(__INTEL_COMPILER) && !defined(__llvm__) && !defined(__RESHARPER__)// >= Visual Studio 2010, skip IntelliSense, Intel Compiler, Clang Code Model and ReSharper
 #define PLOG_GET_THIS()        \

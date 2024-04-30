@@ -23,7 +23,7 @@ namespace AwsMock::Service {
     /**
      * Cognito HTTP handler
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class CognitoJava2Handler : public virtual AbstractHandler {
 

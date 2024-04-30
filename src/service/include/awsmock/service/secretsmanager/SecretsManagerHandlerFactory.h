@@ -18,7 +18,7 @@ namespace AwsMock::Service {
     /**
      * Secrets manager request handler factory
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class SecretsManagerRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 

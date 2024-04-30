@@ -22,68 +22,68 @@
 namespace AwsMock::Dto::SecretsManager {
 
     /**
-   * Secrets manager replication status.
-   *
-   * Example:
-   * <pre>
-   * "AddReplicaRegions": [
-   *   {
-   *     "KmsKeyId": "string",
-   *     "Region": "string"
-   *   }
-   * ],
-   * </pre>
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
+     * Secrets manager replication status.
+     *
+     * Example:
+     * @verbatim
+     * "AddReplicaRegions": [
+     *   {
+     *     "KmsKeyId": "string",
+     *     "Region": "string"
+     *   }
+     * ],
+     * @endverbatim
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct AddReplicaRegions {
 
         /**
-     * Region
-     */
+         * AWS Region
+         */
         std::string region;
 
         /**
-     * KMS key ID
-     */
+         * KMS key ID
+         */
         std::string kmsKeyId;
 
         /**
-     * Converts the DTO to a JSON object.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a JSON object.
+         *
+         * @return DTO as JSON object
+         */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
-     * Converts the DTO to a JSON representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a JSON representation.
+         *
+         * @return DTO as JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts a JSON representation to s DTO.
-     *
-     * @param jsonObject JSON object.
-     */
+         * Converts a JSON representation to s DTO.
+         *
+         * @param jsonObject JSON object.
+         */
         void FromJson(const Poco::JSON::Object::Ptr &jsonObject);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const AddReplicaRegions &r);
     };
 
-}//namespace AwsMock::Dto::SecretsManager
+}// namespace AwsMock::Dto::SecretsManager
 
 #endif// AWSMOCK_DTO_SECRETSMANAGER_ADD_REPLICA_REGIONS_H

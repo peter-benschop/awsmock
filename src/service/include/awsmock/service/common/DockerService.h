@@ -50,7 +50,7 @@ namespace AwsMock::Service {
      * docker REST API available at the UNIX domain socket. Depending on your Linux distribution this docker socket under different directory normally its: <i>/var/run/docker.sock</i> (Debian, Ubuntu).
      * </p>
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class DockerService {
 

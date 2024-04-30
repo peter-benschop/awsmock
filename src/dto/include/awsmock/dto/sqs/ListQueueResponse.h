@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_LISTQUEUERESPONSE_H
-#define AWSMOCK_DTO_SQS_LISTQUEUERESPONSE_H
+#ifndef AWSMOCK_DTO_SQS_LIST_QUEUE_RESPONSE_H
+#define AWSMOCK_DTO_SQS_LIST_QUEUE_RESPONSE_H
 
 // C++ standard includes
 #include <iostream>
@@ -31,39 +31,39 @@ namespace AwsMock::Dto::SQS {
     struct ListQueueResponse {
 
         /**
-     * List of queues
-     */
+         * List of queues
+         */
         Database::Entity::SQS::QueueList queueList;
 
         /**
-     * Convert to XML representation
-     *
-     * @return XML string
-     */
+         * Convert to XML representation
+         *
+         * @return XML string
+         */
         [[nodiscard]] std::string ToXml() const;
 
         /**
-     * Convert to JSON representation
-     *
-     * @return JSON string
-     */
+         * Convert to JSON representation
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const ListQueueResponse &r);
     };
 
 }// namespace AwsMock::Dto::SQS
 
-#endif// AWSMOCK_DTO_SQS_LISTQUEUERESPONSE_H
+#endif// AWSMOCK_DTO_SQS_LIST_QUEUE_RESPONSE_H

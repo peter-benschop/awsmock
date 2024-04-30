@@ -1,24 +1,29 @@
 ---
 title: awsmocksqs(1)
 section: 1
+version: 1.0.1
+builddate: 1.0.1
+date: $builddate$
 header: awsmocksqs AwsMock SQS module
-footer: awsmocksqs 0.5.210
-date: December 18, 2023
+footer: awsmocksqs $version$
 ---
 
 ## NAME
+
 ```awsmocksqs``` AwsMock SQS module
 
 ## DESCRIPTION
+
 Simple Queue Service (SQS) is a managed messaging service offered by AWS. It allows you to decouple different components
-of your applications by enabling asynchronous communication through message queues. SQS allows you to reliably send, store,
+of your applications by enabling asynchronous communication through message queues. SQS allows you to reliably send,
+store,
 and receive messages with support for standard and FIFO queues.
 
 AwsMock allows you to use the SQS APIs in your local environment to integrate and decouple distributed systems via
 hosted queues. The supported APIs are available on our API coverage page, which provides information on the extent of
 SQS’s integration with AwsMock.
 
-The SQS module can be configured using the ```awslocal``` command. For details of the ```awslocal``` command see the 
+The SQS module can be configured using the ```awslocal``` command. For details of the ```awslocal``` command see the
 corresponding man page ```awslocal(1)```.
 
 ## COMMANDS
@@ -56,6 +61,7 @@ corresponding man page ```awslocal(1)```.
 ## EXAMPLES
 
 To create a new queue:
+
 ```
 awslocal sqs create-queue --queue-name test-queue
 {
@@ -64,6 +70,7 @@ awslocal sqs create-queue --queue-name test-queue
 ```
 
 To get a list of all currently available queues:
+
 ```
 awslocal sqs list-queues
 {
@@ -77,6 +84,7 @@ awslocal sqs list-queues
 ```
 
 To get a list of all SQS queue attributes:
+
 ```
 awslocal sqs get-queue-attributes --queue-url http://localhost:4566/000000000000/test-queue --attribute-name All
 {
@@ -98,11 +106,13 @@ awslocal sqs get-queue-attributes --queue-url http://localhost:4566/000000000000
 ```
 
 To send a message to a queue:
+
 ```
 awslocal sqs send-message --queue-url http://localhost:4566/000000000000/test-queue --message-body file://message.json
 ```
 
 To receive a message from a queue:
+
 ```
 awslocal sqs receive-message --queue-url http://localhost:4566/000000000000/test-queue
 {
@@ -119,16 +129,19 @@ awslocal sqs receive-message --queue-url http://localhost:4566/000000000000/test
 ```
 
 To change the visibility of a message:
+
 ```
 awslocal sqs change-message-visibility --queue-url http://localhost:4566/000000000000/test-queue-queue --receipt-handle file://receipt-handle --visibility-timeout 120
 ```
 
 To tag a queue (Key=Key1, Value=Value1):
+
 ```
 awslocal sqs tag-queue --queue-url http://localhost:4566/000000000000/test-queue-queue --tags Key1=Value1
 ```
 
 To delete a queue:
+
 ```
 awslocal sqs delete-queue --queue-url "http://localhost:4566/000000000000/test-queue-queue
 ```
@@ -138,7 +151,8 @@ awslocal sqs delete-queue --queue-url "http://localhost:4566/000000000000/test-q
 Jens Vogt <jens.vogt@opitz-consulting.com>
 
 ## VERSION
-0.5.210
+
+$version$ ($builddate$)
 
 ## BUGS
 
@@ -147,4 +161,4 @@ Bugs and enhancement requests can be reported and filed at https://github.com/je
 ## SEE ALSO
 
 ```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocks3(1)```, ```awsmocksns(1)```, ```awsmocklambda(1)```,
-```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```, ```awsmocksecretsmanager(1)```
+```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```, ```awsmocksecretsmanager(1)```, ```awsmocksqs(1)```

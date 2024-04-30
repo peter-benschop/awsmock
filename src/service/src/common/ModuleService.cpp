@@ -139,24 +139,30 @@ namespace AwsMock::Service {
         }
     }
 
-    std::string ModuleService::ExportInfrastructure(const Dto::Common::Services &services, bool prettyPrint) {
+    std::string ModuleService::ExportInfrastructure(const Dto::Common::Services &services, bool prettyPrint, bool includeObjects) {
 
         Dto::Common::Infrastructure infrastructure;
 
         if (services.HasService("all") || services.HasService("s3")) {
-            std::shared_ptr<Database::S3Database> _s3Database = std::make_shared<Database::S3Database>();
-            infrastructure.s3Buckets = _s3Database->ListBuckets();
-            infrastructure.s3Objects = _s3Database->ListObjects();
+            Database::S3Database &_s3Database = Database::S3Database::instance();
+            infrastructure.s3Buckets = _s3Database.ListBuckets();
+            if (includeObjects) {
+                infrastructure.s3Objects = _s3Database.ListObjects();
+            }
         }
         if (services.HasService("all") || services.HasService("sqs")) {
             Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
             infrastructure.sqsQueues = _sqsDatabase.ListQueues();
-            infrastructure.sqsMessages = _sqsDatabase.ListMessages();
+            if (includeObjects) {
+                infrastructure.sqsMessages = _sqsDatabase.ListMessages();
+            }
         }
         if (services.HasService("all") || services.HasService("sns")) {
             Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
             infrastructure.snsTopics = _snsDatabase.ListTopics();
-            infrastructure.snsMessages = _snsDatabase.ListMessages();
+            if (includeObjects) {
+                infrastructure.snsMessages = _snsDatabase.ListMessages();
+            }
         }
         if (services.HasService("all") || services.HasService("lambda")) {
             Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
@@ -165,12 +171,16 @@ namespace AwsMock::Service {
         if (services.HasService("all") || services.HasService("cognito")) {
             Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
             infrastructure.cognitoUserPools = _cognitoDatabase.ListUserPools();
-            infrastructure.cognitoUsers = _cognitoDatabase.ListUsers();
+            if (includeObjects) {
+                infrastructure.cognitoUsers = _cognitoDatabase.ListUsers();
+            }
         }
         if (services.HasService("all") || services.HasService("dynamodb")) {
             Database::DynamoDbDatabase &_dynamoDbDatabase = Database::DynamoDbDatabase::instance();
             infrastructure.dynamoDbTables = _dynamoDbDatabase.ListTables();
-            infrastructure.dynamoDbItems = _dynamoDbDatabase.ListItems();
+            if (includeObjects) {
+                infrastructure.dynamoDbItems = _dynamoDbDatabase.ListItems();
+            }
         }
         if (services.HasService("all") || services.HasService("secretsmanager")) {
             Database::SecretsManagerDatabase &_secretsManagerDatabase = Database::SecretsManagerDatabase::instance();

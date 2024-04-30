@@ -35,7 +35,7 @@ namespace AwsMock::Service {
     /**
      * The ModuleService controls the different services
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class ModuleService {
 
@@ -105,16 +105,17 @@ namespace AwsMock::Service {
          *
          * @param services service name list
          * @param prettyPrint JSON pretty print, if true JSON indent = 4
+         * @param includeObjects include objects in the export
          * @return JSON string
          */
-        std::string ExportInfrastructure(const Dto::Common::Services &services, bool prettyPrint = false);
+        static std::string ExportInfrastructure(const Dto::Common::Services &services, bool prettyPrint = false, bool includeObjects = false);
 
         /**
      * Import the infrastructure
      *
      * @param jsonString infrastructure JSON string
      */
-        void ImportInfrastructure(const std::string &jsonString);
+        static void ImportInfrastructure(const std::string &jsonString);
 
         /**
          * Cleans the current infrastructure.
@@ -123,7 +124,7 @@ namespace AwsMock::Service {
          *
          * @param services service name list
          */
-        void CleanInfrastructure(const Dto::Common::Services &services);
+        static void CleanInfrastructure(const Dto::Common::Services &services);
 
         /**
          * Cleans the objects from the infrastructure.
@@ -132,7 +133,7 @@ namespace AwsMock::Service {
          *
          * @param services service name list
          */
-        void CleanObjects(const Dto::Common::Services &services);
+        static void CleanObjects(const Dto::Common::Services &services);
 
       private:
 

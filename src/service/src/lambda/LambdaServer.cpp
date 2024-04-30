@@ -2,18 +2,18 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include "awsmock/service/lambda/LambdaServer.h"
+#include <awsmock/service/lambda/LambdaServer.h>
 
 namespace AwsMock::Service {
 
     LambdaServer::LambdaServer(Core::Configuration &configuration) : AbstractWorker(configuration), AbstractServer(configuration, "lambda", 10), _configuration(configuration), _lambdaDatabase(Database::LambdaDatabase::instance()), _module("lambda") {
 
         // Get HTTP configuration values
-        _port = _configuration.getInt("awsmock.service.lambda.port", LAMBDA_DEFAULT_PORT);
-        _host = _configuration.getString("awsmock.service.lambda.host", LAMBDA_DEFAULT_HOST);
-        _maxQueueLength = _configuration.getInt("awsmock.service.lambda.max.queue", LAMBDA_DEFAULT_QUEUE);
-        _maxThreads = _configuration.getInt("awsmock.service.lambda.max.threads", LAMBDA_DEFAULT_THREADS);
-        _requestTimeout = _configuration.getInt("awsmock.service.lambda.timeout", LAMBDA_DEFAULT_TIMEOUT);
+        _port = _configuration.getInt("awsmock.service.lambda.http.port", LAMBDA_DEFAULT_PORT);
+        _host = _configuration.getString("awsmock.service.lambda.http.host", LAMBDA_DEFAULT_HOST);
+        _maxQueueLength = _configuration.getInt("awsmock.service.lambda.http.max.queue", LAMBDA_DEFAULT_QUEUE);
+        _maxThreads = _configuration.getInt("awsmock.service.lambda.http.max.threads", LAMBDA_DEFAULT_THREADS);
+        _requestTimeout = _configuration.getInt("awsmock.service.lambda.http.timeout", LAMBDA_DEFAULT_TIMEOUT);
         _monitoringPeriod = _configuration.getInt("awsmock.service.sns.monitoring.period", LAMBDA_DEFAULT_MONITORING_PERIOD);
 
         // Directories

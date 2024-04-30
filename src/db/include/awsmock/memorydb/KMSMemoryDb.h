@@ -25,7 +25,7 @@ namespace AwsMock::Database {
     /**
      * KMS in-memory database.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class KMSMemoryDb {
 

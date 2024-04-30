@@ -16,7 +16,7 @@ namespace AwsMock::Resource::Factory {
     /**
      * Management router
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class IFactory;
 

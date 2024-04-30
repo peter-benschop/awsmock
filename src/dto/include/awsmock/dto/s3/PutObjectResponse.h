@@ -20,69 +20,69 @@ namespace AwsMock::Dto::S3 {
     struct PutObjectResponse {
 
         /**
-     * Bucket
-     */
+         * Bucket
+         */
         std::string bucket;
 
         /**
-     * Key
-     */
+         * Key
+         */
         std::string key;
 
         /**
-     * ETag
-     */
+         * ETag
+         */
         std::string etag = {};
 
         /**
-     * Base64 encoded MD5 sum
-     */
+         * Base64 encoded MD5 sum
+         */
         std::string md5Sum = {};
 
         /**
-     * Content length
-     */
+         * Content length
+         */
         long contentLength;
 
         /**
-     * Base64 encoded SHA1 checksum
-     */
+         * Base64 encoded SHA1 checksum
+         */
         std::string checksumSha1 = {};
 
         /**
-     * Base64 encoded SHA256 checksum
-     */
+         * Base64 encoded SHA256 checksum
+         */
         std::string checksumSha256 = {};
 
         /**
-     * Metadata
-     */
+         * Metadata
+         */
         std::map<std::string, std::string> metadata;
 
         /**
-     * Version ID
-     */
+         * Version ID
+         */
         std::string versionId;
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const PutObjectResponse &p);
     };
 

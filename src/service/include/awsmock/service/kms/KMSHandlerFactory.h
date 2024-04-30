@@ -19,7 +19,7 @@ namespace AwsMock::Service {
     /**
      * KMS request handler factory
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class KMSRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 

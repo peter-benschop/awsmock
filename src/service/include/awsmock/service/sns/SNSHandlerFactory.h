@@ -19,7 +19,7 @@ namespace AwsMock::Service {
     /**
      * S3 request handler factory
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class SNSRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 

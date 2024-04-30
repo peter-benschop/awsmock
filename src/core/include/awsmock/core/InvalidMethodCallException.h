@@ -15,7 +15,7 @@ namespace AwsMock::Core {
     /**
      * Invalid method call exception. Can be thrown when a method should not be used anymore.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class InvalidMethodCallException : public Poco::Exception {
 

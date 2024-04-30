@@ -29,7 +29,7 @@ namespace AwsMock::Database::Entity::Lambda {
     /**
      * Lambda tags entity
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Tags {
 

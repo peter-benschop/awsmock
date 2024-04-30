@@ -9,10 +9,9 @@ namespace AwsMock::Dto::KMS {
     std::string DescribeKeyResponse::ToJson() const {
 
         try {
+
             Poco::JSON::Object rootJson;
             rootJson.set("KeyMetadata", key.ToJsonObject());
-
-
             return Core::JsonUtils::ToJsonString(rootJson);
 
         } catch (Poco::Exception &exc) {

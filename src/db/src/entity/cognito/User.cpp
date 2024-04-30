@@ -36,12 +36,15 @@ namespace AwsMock::Database::Entity::Cognito {
         created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
         modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
 
-        bsoncxx::array::view attributesView{mResult.value()["userAttributes"].get_array().value};
-        for (bsoncxx::array::element attributeElement: attributesView) {
-            UserAttribute attribute{
-                    .name = bsoncxx::string::to_string(attributeElement["name"].get_string().value),
-                    .value = bsoncxx::string::to_string(attributeElement["value"].get_string().value)};
-            userAttributes.push_back(attribute);
+        // Attributes
+        if (mResult.value().find("userAttributes") != mResult.value().end()) {
+            bsoncxx::array::view attributesView{mResult.value()["userAttributes"].get_array().value};
+            for (bsoncxx::array::element attributeElement: attributesView) {
+                UserAttribute attribute{
+                        .name = bsoncxx::string::to_string(attributeElement["name"].get_string().value),
+                        .value = bsoncxx::string::to_string(attributeElement["value"].get_string().value)};
+                userAttributes.push_back(attribute);
+            }
         }
     }
 
@@ -54,14 +57,16 @@ namespace AwsMock::Database::Entity::Cognito {
         jsonObject.set("userStatus", Entity::Cognito::UserStatusToString(userStatus));
 
         // Attributes
-        Poco::JSON::Array jsonAttributeArray;
-        for (const auto &attribute: userAttributes) {
-            Poco::JSON::Object jsonAttribute;
-            jsonAttribute.set("name", attribute.name);
-            jsonAttribute.set("value", attribute.value);
-            jsonAttributeArray.add(jsonAttribute);
+        if (!userAttributes.empty()) {
+            Poco::JSON::Array jsonAttributeArray;
+            for (const auto &attribute: userAttributes) {
+                Poco::JSON::Object jsonAttribute;
+                jsonAttribute.set("name", attribute.name);
+                jsonAttribute.set("value", attribute.value);
+                jsonAttributeArray.add(jsonAttribute);
+            }
+            jsonObject.set("userAttributes", jsonAttributeArray);
         }
-        jsonObject.set("userAttributes", jsonAttributeArray);
 
         return jsonObject;
     }
@@ -76,13 +81,15 @@ namespace AwsMock::Database::Entity::Cognito {
         Core::JsonUtils::GetJsonValueString("userStatus", jsonObject, userStatusStr);
         userStatus = UserStatusFromString(userStatusStr);
 
-        Poco::JSON::Array::Ptr jsonAttributeArray = jsonObject->getArray("userAttributes");
-        for (int i = 0; i < jsonAttributeArray->size(); i++) {
-            UserAttribute userAttribute;
-            Poco::JSON::Object::Ptr jsonAttributeObject = jsonAttributeArray->getObject(i);
-            Core::JsonUtils::GetJsonValueString("name", jsonAttributeObject, userAttribute.name);
-            Core::JsonUtils::GetJsonValueString("value", jsonAttributeObject, userAttribute.value);
-            userAttributes.emplace_back(userAttribute);
+        if (jsonObject->has("userAttributes")) {
+            Poco::JSON::Array::Ptr jsonAttributeArray = jsonObject->getArray("userAttributes");
+            for (int i = 0; i < jsonAttributeArray->size(); i++) {
+                UserAttribute userAttribute;
+                Poco::JSON::Object::Ptr jsonAttributeObject = jsonAttributeArray->getObject(i);
+                Core::JsonUtils::GetJsonValueString("name", jsonAttributeObject, userAttribute.name);
+                Core::JsonUtils::GetJsonValueString("value", jsonAttributeObject, userAttribute.value);
+                userAttributes.emplace_back(userAttribute);
+            }
         }
     }
 

@@ -46,7 +46,7 @@ namespace AwsMock::Service {
     /**
      * AwsMock DynamoDB server
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class DynamoDbServer : public AbstractServer, public AbstractWorker {
 

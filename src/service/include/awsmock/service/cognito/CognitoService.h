@@ -34,7 +34,7 @@ namespace AwsMock::Service {
     /**
      * Cognito service
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class CognitoService {
 

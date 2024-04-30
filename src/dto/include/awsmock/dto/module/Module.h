@@ -20,7 +20,7 @@ namespace AwsMock::Dto::Module {
     /**
      * AwsMock module
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Module {
 

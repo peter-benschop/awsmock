@@ -21,69 +21,69 @@ namespace AwsMock::Dto::S3 {
     struct PutObjectRequest {
 
         /**
-     * Region
-     */
+         * Region
+         */
         std::string region;
 
         /**
-     * Bucket
-     */
+         * Bucket
+         */
         std::string bucket;
 
         /**
-     * Key
-     */
+         * Key
+         */
         std::string key;
 
         /**
-     * Owner
-     */
+         * Owner
+         */
         std::string owner;
 
         /**
-     * MD5 sum
-     */
+         * MD5 sum
+         */
         std::string md5Sum;
 
         /**
-     * Content type
-     */
+         * Content type
+         */
         std::string contentType;
 
         /**
-     * Content type
-     */
+         * Content type
+         */
         long contentLength;
 
         /**
-     * Checksum algorithm
-     */
+         * Checksum algorithm
+         */
         std::string checksumAlgorithm;
 
         /**
-     * Metadata
-     */
+         * Metadata
+         */
         std::map<std::string, std::string> metadata;
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const PutObjectRequest &r);
     };
 

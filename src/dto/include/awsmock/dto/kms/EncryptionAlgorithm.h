@@ -14,7 +14,7 @@ namespace AwsMock::Dto::KMS {
     /**
      * KMS key expiration model
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     enum class EncryptionAlgorithm {
         SYMMETRIC_DEFAULT,

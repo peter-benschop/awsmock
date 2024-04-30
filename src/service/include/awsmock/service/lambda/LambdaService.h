@@ -37,7 +37,7 @@
 #include <awsmock/dto/lambda/GetFunctionResponse.h>
 #include <awsmock/dto/lambda/ListFunctionResponse.h>
 #include <awsmock/dto/lambda/ListTagsResponse.h>
-#include <awsmock/dto/s3/EventNotification.h>
+#include <awsmock/dto/s3/model/EventNotification.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/common/DockerService.h>
@@ -69,7 +69,7 @@ namespace AwsMock::Service {
      * between 32768 and 65536.
      * </p>
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class LambdaService {
 
@@ -80,7 +80,7 @@ namespace AwsMock::Service {
          *
          * @param configuration module configuration
          */
-        explicit LambdaService(Core::Configuration &configuration);
+        explicit LambdaService(const Core::Configuration &configuration);
 
         /**
          * Create lambda function
@@ -201,7 +201,7 @@ namespace AwsMock::Service {
         /**
          * Configuration
          */
-        Core::Configuration &_configuration;
+        const Core::Configuration &_configuration;
 
         /**
          * lambda database connection

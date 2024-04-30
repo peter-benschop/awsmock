@@ -48,7 +48,7 @@ namespace AwsMock::Core {
     /**
      * File utilities.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class FileUtils {
 

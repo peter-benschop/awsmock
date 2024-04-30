@@ -21,7 +21,7 @@ namespace AwsMock::Dto::Cognito {
     /**
      * Create user request
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct AdminCreateUserRequest {
 

@@ -19,7 +19,7 @@ namespace AwsMock::Dto::Cognito {
     /**
      * List user request
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct ListUsersRequest {
 

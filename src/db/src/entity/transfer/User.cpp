@@ -25,6 +25,16 @@ namespace AwsMock::Database::Entity::Transfer {
         }
     }
 
+    Poco::JSON::Object User::ToJsonObject() const {
+
+        Poco::JSON::Object jsonObject;
+        jsonObject.set("userName", userName);
+        jsonObject.set("password", password);
+        jsonObject.set("homeDirectory", homeDirectory);
+
+        return jsonObject;
+    }
+
     std::string User::ToString() const {
         std::stringstream ss;
         ss << (*this);

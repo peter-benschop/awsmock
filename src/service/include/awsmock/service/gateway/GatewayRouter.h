@@ -34,7 +34,7 @@ namespace AwsMock::Service {
     /**
      * Gateway router
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class GatewayRouter : public Poco::Net::HTTPRequestHandlerFactory {
 

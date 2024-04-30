@@ -35,106 +35,106 @@
 namespace AwsMock::Dto::SQS {
 
     /**
-   * Send message response
-   * <p>
-   * Example:
-   * <pre>
-   * {
-   *   "MD5OfMessageAttributes": "string",
-   *   "MD5OfMessageBody": "string",
-   *   "MD5OfMessageSystemAttributes": "string",
-   *   "MessageId": "string",
-   *   "SequenceNumber": "string"
-   *}
-   * </pre>
-   */
+     * Send message response
+     *
+     * Example:
+     * @verbatim
+     * {
+     *   "MD5OfMessageAttributes": "string",
+     *   "MD5OfMessageBody": "string",
+     *   "MD5OfMessageSystemAttributes": "string",
+     *   "MessageId": "string",
+     *   "SequenceNumber": "string"
+     * }
+     * @endverbatim
+     */
     struct SendMessageResponse {
 
         /**
-     * ID
-     */
+         * ID
+         */
         long id;
 
         /**
-     * Queue URL
-     */
+         * Queue URL
+         */
         std::string queueUrl;
 
         /**
-     * Message ID
-     */
+         * Message ID
+         */
         std::string messageId;
 
         /**
-     * Receipt handle
-     */
+         * Receipt handle
+         */
         std::string receiptHandle;
 
         /**
-     * MD5 sum of body
-     */
+         * MD5 sum of body
+         */
         std::string md5Body;
 
         /**
-     * MD5 sum of sqs of user attributes
-     */
+         * MD5 sum of sqs of user attributes
+         */
         std::string md5UserAttr;
 
         /**
-     * MD5 sum of sqs system attributes
-     */
+         * MD5 sum of sqs system attributes
+         */
         std::string md5SystemAttr;
 
         /**
-     * Message sequence number
-     */
+         * Message sequence number
+         */
         std::string sequenceNumber = Poco::UUIDGenerator().createRandom().toString();
 
         /**
-     * Request ID
-     */
+         * Request ID
+         */
         std::string requestId;
 
         /**
-     * Convert to JSON representation
-     *
-     * @return JSON string
-     */
+         * Convert to JSON representation
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Convert from JSON representation
-     *
-     * @param jsonString JSON string
-     */
+         * Convert from JSON representation
+         *
+         * @param jsonString JSON string
+         */
         void FromJson(const std::string &jsonString);
 
         /**
-     * Convert to XML representation
-     *
-     * @return XML string
-     */
+         * Convert to XML representation
+         *
+         * @return XML string
+         */
         [[nodiscard]] std::string ToXml() const;
 
         /**
-     * Convert from XML representation
-     *
-     * @param xmlString  XML string
-     */
+         * Convert from XML representation
+         *
+         * @param xmlString  XML string
+         */
         void FromXml(const std::string &xmlString);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const SendMessageResponse &r);
     };
 

@@ -24,7 +24,7 @@ namespace AwsMock::Core {
          * @param metricService metric module
          * @param name name of the underlying timer
          *
-         * @author jens.vogt@opitz-consulting.com
+         * @author jens.vogt\@opitz-consulting.com
          */
         explicit MetricServiceTimer(M &metricService, std::string name) : _metricService(metricService), _name(std::move(name)) {
             if (!_metricService.TimerExists(_name)) {

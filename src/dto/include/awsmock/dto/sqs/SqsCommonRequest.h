@@ -22,34 +22,34 @@ namespace AwsMock::Dto::SQS {
     struct SqsCommonRequest {
 
         /**
-     * AWS region
-     */
+         * AWS region
+         */
         std::string region;
 
         /**
-     * AWS request ID
-     */
+         * AWS request ID
+         */
         std::string requestId;
 
         /**
-     * Converts the JSON string to DTO.
-     *
-     * @param jsonString JSON string
-     */
+         * Converts the JSON string to DTO.
+         *
+         * @param jsonString JSON string
+         */
         virtual void FromJson(const std::string &jsonString);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         virtual std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const SqsCommonRequest &r);
     };
 

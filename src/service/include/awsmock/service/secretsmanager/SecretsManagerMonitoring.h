@@ -16,7 +16,7 @@ namespace AwsMock::Service {
     /**
      * Cognito monitoring thread
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class SecretsManagerMonitoring : public Core::Timer {
 

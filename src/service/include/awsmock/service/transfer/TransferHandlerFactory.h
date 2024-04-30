@@ -19,7 +19,7 @@ namespace AwsMock::Service {
     /**
      * Transfer request handler factory
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class TransferRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 

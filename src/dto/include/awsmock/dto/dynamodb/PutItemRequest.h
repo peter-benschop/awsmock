@@ -23,7 +23,7 @@ namespace AwsMock::Dto::DynamoDb {
     /**
      * DynamoDB put item request
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct PutItemRequest {
 

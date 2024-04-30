@@ -31,7 +31,7 @@ namespace AwsMock::Service {
     /**
      * Abstract HTTP request server
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class AbstractServer : public Core::Timer {
 

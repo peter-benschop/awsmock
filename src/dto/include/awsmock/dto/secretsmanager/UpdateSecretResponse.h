@@ -23,63 +23,67 @@
 namespace AwsMock::Dto::SecretsManager {
 
     /**
-   * Update secret response.
-   *
-   * Syntax:
-   * {
-   *   "ARN": "string",
-   *   "Name": "string",
-   *   "VersionId": "string"
-   * }
-   */
+     * Update secret response.
+     *
+     * Syntax:
+     * @verbatim
+     * {
+     *   "ARN": "string",
+     *   "Name": "string",
+     *   "VersionId": "string"
+     * }
+     * @endverbatim
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct UpdateSecretResponse {
 
         /**
-     * Region
-     */
+         * Region
+         */
         std::string region;
 
         /**
-     * Name
-     */
+         * Name
+         */
         std::string name;
 
         /**
-     * Secret ARN
-     */
+         * Secret ARN
+         */
         std::string arn;
 
         /**
-     * VersionId
-     */
+         * VersionId
+         */
         std::string versionId;
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Convert from JSON representation
-     *
-     * @param jsonString JSON string
-     */
+         * Convert from JSON representation
+         *
+         * @param jsonString JSON string
+         */
         void FromJson(const std::string &jsonString);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const UpdateSecretResponse &r);
     };
 

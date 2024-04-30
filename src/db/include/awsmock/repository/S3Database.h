@@ -31,7 +31,7 @@ namespace AwsMock::Database {
     /**
      * S3 MongoDB database.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class S3Database : public Database {
 

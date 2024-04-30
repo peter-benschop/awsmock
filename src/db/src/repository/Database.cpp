@@ -20,9 +20,11 @@ namespace AwsMock::Database {
         _password = _configuration.getString("awsmock.mongodb.password", "admin");
         _poolSize = _configuration.getInt("awsmock.mongodb.pool.size", 256);
 
-        // MongoDB URI
-        _uri = mongocxx::uri("mongodb://" + _user + ":" + _password + "@" + _host + ":" + std::to_string(_port) + "/?maxPoolSize=" + std::to_string(_poolSize));
-        _pool = std::make_unique<mongocxx::pool>(_uri);
+        if (_useDatabase) {
+            // MongoDB connection pool
+            _uri = mongocxx::uri("mongodb://" + _user + ":" + _password + "@" + _host + ":" + std::to_string(_port) + "/?maxPoolSize=" + std::to_string(_poolSize));
+            _pool = std::make_unique<mongocxx::pool>(_uri);
+        }
     }
 
     mongocxx::database Database::GetConnection() {
@@ -82,10 +84,22 @@ namespace AwsMock::Database {
                                                       make_document(kvp("name", "sqs_region_name_idx1")));
             GetConnection()["sqs_queue"].create_index(make_document(kvp("region", 1), kvp("url", 1)),
                                                       make_document(kvp("name", "sqs_region_url_idx2")));
+            GetConnection()["sns_topic"].create_index(make_document(kvp("region", 1), kvp("arn", 1)),
+                                                      make_document(kvp("name", "sns_region_arn_idx1")));
+            GetConnection()["sns_message"].create_index(make_document(kvp("region", 1), kvp("topicArn", 1)),
+                                                        make_document(kvp("name", "sns_region_topicarn_idx1")));
             GetConnection()["s3_bucket"].create_index(make_document(kvp("region", 1), kvp("name", 1)),
                                                       make_document(kvp("name", "s3_region_name_idx1")));
+            GetConnection()["s3_object"].create_index(make_document(kvp("bucket", 1)),
+                                                      make_document(kvp("name", "s3_object_bucket_idx1")));
             GetConnection()["module"].create_index(make_document(kvp("name", 1), kvp("state", 1)),
                                                    make_document(kvp("name", "module_name_status_idx1")));
+            GetConnection()["kms_key"].create_index(make_document(kvp("region", 1)),
+                                                    make_document(kvp("name", "kms_key_region_idx1")));
+            GetConnection()["kms_key"].create_index(make_document(kvp("keyId", 1)),
+                                                    make_document(kvp("name", "kms_key_keyid_idx1")));
+            GetConnection()["kms_key"].create_index(make_document(kvp("keyState", 1)),
+                                                    make_document(kvp("name", "kms_key_keystate_idx1")));
             log_debug << "SQS indexes created";
         }
     }

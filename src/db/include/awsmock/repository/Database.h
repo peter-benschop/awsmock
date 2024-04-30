@@ -27,11 +27,12 @@ namespace AwsMock::Database {
     /**
      * MongoDB database base class.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class Database {
 
       public:
+
         /**
          * Constructor
          *
@@ -83,6 +84,7 @@ namespace AwsMock::Database {
         void StopDatabase();
 
       private:
+
         /**
          * Update module status
          */

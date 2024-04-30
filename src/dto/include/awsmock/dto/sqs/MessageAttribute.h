@@ -22,94 +22,94 @@ namespace AwsMock::Dto::SQS {
     struct MessageAttribute {
 
         /**
-     * Message attribute name
-     */
+         * Message attribute name
+         */
         std::string name;
 
         /**
-     * Message attribute string value
-     */
+         * Message attribute string value
+         */
         std::string stringValue = {};
 
         /**
-     * Message attribute number value
-     */
+         * Message attribute number value
+         */
         long numberValue = -1;
 
         /**
-     * Message attribute binary value
-     */
+         * Message attribute binary value
+         */
         unsigned char *binaryValue = nullptr;
 
         /**
-     * Logical data type
-     */
+         * Logical data type
+         */
         MessageAttributeDataType type;
 
         /**
-     * System attribute flag
-     */
+         * System attribute flag
+         */
         bool systemAttribute = true;
 
         /**
-     * Returns the MD5 sum of all user attributes.
-     *
-     * @param attributes vector of user attributes
-     * @return MD5 sum of userAttributes string
-     */
+         * Returns the MD5 sum of all user attributes.
+         *
+         * @param attributes vector of user attributes
+         * @return MD5 sum of userAttributes string
+         */
         static std::string GetMd5SystemAttributes(const std::map<std::string, MessageAttribute> &attributes);
 
         /**
-     * Returns the MD5 sum of all user attributes.
-     *
-     * @param attributes vector of user attributes
-     * @return MD5 sum of userAttributes string
-     */
+         * Returns the MD5 sum of all user attributes.
+         *
+         * @param attributes vector of user attributes
+         * @return MD5 sum of userAttributes string
+         */
         static std::string GetMd5Attributes(const std::map<std::string, MessageAttribute> &attributes);
 
         /**
-     * Update the MD5 hash with a given value
-     *
-     * @param context MD5 hash context
-     * @param str string to append
-     */
+         * Update the MD5 hash with a given value
+         *
+         * @param context MD5 hash model
+         * @param str string to append
+         */
         static void UpdateLengthAndBytes(EVP_MD_CTX *context, const std::string &str);
 
         /**
-     * Returns a integer as byte array and fill it in the given byte array at position offset.
-     *
-     * @param n integer value
-     * @param bytes output byte array
-     */
+         * Returns a integer as byte array and fill it in the given byte array at position offset.
+         *
+         * @param n integer value
+         * @param bytes output byte array
+         */
         static void GetIntAsByteArray(size_t n, unsigned char *bytes);
 
         /**
-     * Convert from JSON string
-     *
-     * @param attributeObject attribute object
-     */
+         * Convert from JSON string
+         *
+         * @param attributeObject attribute object
+         */
         void FromJsonObject(const Poco::JSON::Object::Ptr &attributeObject);
 
         /**
-     * Name comparator
-     *
-     * @param other
-     * @return
-     */
+         * Name comparator
+         *
+         * @param other
+         * @return
+         */
         bool operator<(const MessageAttribute &other) const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const MessageAttribute &r);
     };
 

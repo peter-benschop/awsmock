@@ -23,65 +23,67 @@
 namespace AwsMock::Dto::SecretsManager {
 
     /**
-   * Rotate a secret value response.
-   *
-   * Example:
-   * <pre>
-   * {
-   *   "ARN": "string",
-   *   "Name": "string",
-   *   "VersionId": "string"
-   * }
-   * </pre>
-   */
+     * Rotate a secret value response.
+     *
+     * Example:
+     * @verbatim
+     * {
+     *   "ARN": "string",
+     *   "Name": "string",
+     *   "VersionId": "string"
+     * }
+     * @endverbatim
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct RotateSecretResponse {
 
         /**
-     * Region
-     */
+         * Region
+         */
         std::string region;
 
         /**
-     * Secret ARN
-     */
+         * Secret ARN
+         */
         std::string arn;
 
         /**
-     * Version ID
-     */
+         * Version ID
+         */
         std::string versionId;
 
         /**
-     * AWS request ID
-     */
+         * AWS request ID
+         */
         std::string requestId;
 
         /**
-     * Converts the DTO to a JSON representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a JSON representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the JSON string to DTO.
-     *
-     * @param jsonString JSON string
-     */
+         * Converts the JSON string to DTO.
+         *
+         * @param jsonString JSON string
+         */
         void FromJson(const std::string &jsonString);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const RotateSecretResponse &r);
     };
 

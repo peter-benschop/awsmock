@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_LAMBDACREATOR_H
-#define AWSMOCK_SERVICE_LAMBDACREATOR_H
+#ifndef AWSMOCK_SERVICE_LAMBDA_CREATOR_H
+#define AWSMOCK_SERVICE_LAMBDA_CREATOR_H
 
 // C++ standard includes
 #include <sstream>
@@ -31,7 +31,7 @@ namespace AwsMock::Service {
     /**
      * Lambda async creator
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class LambdaCreator {
 
@@ -42,7 +42,7 @@ namespace AwsMock::Service {
          *
          * @param configuration module configuration
          */
-        [[maybe_unused]] explicit LambdaCreator(Core::Configuration &configuration);
+        [[maybe_unused]] explicit LambdaCreator(const Core::Configuration &configuration);
 
         /**
          * Create new lambda function
@@ -118,7 +118,7 @@ namespace AwsMock::Service {
         /**
          * Configuration
          */
-        Core::Configuration &_configuration;
+        const Core::Configuration &_configuration;
 
         /**
          * Database connection
@@ -143,4 +143,4 @@ namespace AwsMock::Service {
 
 }//namespace AwsMock::Service
 
-#endif// AWSMOCK_SERVICE_LAMBDACREATOR_H
+#endif// AWSMOCK_SERVICE_LAMBDA_CREATOR_H

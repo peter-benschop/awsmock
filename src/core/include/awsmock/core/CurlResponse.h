@@ -14,7 +14,7 @@ namespace AwsMock::Core {
     /**
    * Curl library response structure
    *
-   * @author jens.vogt@opitz-consulting.com
+   * @author jens.vogt\@opitz-consulting.com
    */
     struct CurlResponse {
 

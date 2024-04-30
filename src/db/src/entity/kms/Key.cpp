@@ -8,15 +8,9 @@ namespace AwsMock::Database::Entity::KMS {
 
     view_or_value<view, value> Key::ToDocument() const {
 
-        auto tagsDoc = bsoncxx::builder::basic::document{};
-        if (!tags.empty()) {
-            for (const auto &t: tags) {
-                tagsDoc.append(kvp(t.first, t.second));
-            }
-        }
-
-        view_or_value<view, value> keyDoc = make_document(
-                kvp("region", region),
+        bsoncxx::builder::basic::document keyDoc;
+        keyDoc.append(
+                kvp("region", region)),
                 kvp("arn", arn),
                 kvp("keyId", keyId),
                 kvp("keyUsage", keyUsage),
@@ -26,13 +20,25 @@ namespace AwsMock::Database::Entity::KMS {
                 kvp("aes256Iv", aes256Iv),
                 kvp("rsaPrivateKey", rsaPrivateKey),
                 kvp("rsaPublicKey", rsaPublicKey),
-                kvp("tags", tagsDoc),
                 kvp("pendingWindowInDays", pendingWindowInDays),
-                kvp("scheduledDeletion", bsoncxx::types::b_date(std::chrono::milliseconds(scheduledDeletion.timestamp().epochMicroseconds() / 1000))),
-                kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-                kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+                kvp("created", MongoUtils::ToBson(created)),
+                kvp("modified", MongoUtils::ToBson(modified));
 
-        return keyDoc;
+        // Scheduled deletion
+        if (scheduledDeletion.timestamp() > 0) {
+            keyDoc.append(kvp("scheduledDeletion", MongoUtils::ToBson(scheduledDeletion)));
+        }
+
+        // Tags
+        if (!tags.empty()) {
+            auto tagsDoc = bsoncxx::builder::basic::document{};
+            for (const auto &t: tags) {
+                tagsDoc.append(kvp(t.first, t.second));
+            }
+            keyDoc.append(kvp("tags", tagsDoc));
+        }
+
+        return keyDoc.extract();
     }
 
     void Key::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
@@ -50,10 +56,10 @@ namespace AwsMock::Database::Entity::KMS {
         rsaPublicKey = bsoncxx::string::to_string(mResult.value()["rsaPublicKey"].get_string().value);
         pendingWindowInDays = mResult.value()["pendingWindowInDays"].get_int32().value;
         if (mResult.value()["scheduledDeletion"].type() != bsoncxx::type::k_null) {
-            scheduledDeletion = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["scheduledDeletion"].get_date().value) / 1000));
+            scheduledDeletion = MongoUtils::FromBson(mResult.value()["scheduledDeletion"].get_date());
         }
-        created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-        modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+        created = MongoUtils::FromBson(mResult.value()["created"].get_date());
+        modified = MongoUtils::FromBson(mResult.value()["modified"].get_date());
 
         // Get tags
         if (mResult.value().find("tags") != mResult.value().end()) {
@@ -71,15 +77,33 @@ namespace AwsMock::Database::Entity::KMS {
         Poco::JSON::Object jsonObject;
         jsonObject.set("region", region);
         jsonObject.set("arn", arn);
+        jsonObject.set("keyId", keyId);
+        jsonObject.set("keyUsage", keyUsage);
+        jsonObject.set("keySpec", keySpec);
+        jsonObject.set("keyState", keyState);
+        jsonObject.set("aes256Key", aes256Key);
+        jsonObject.set("aes256Iv", aes256Iv);
+        jsonObject.set("rsaPrivateKey", rsaPrivateKey);
+        jsonObject.set("rsaPublicKey", rsaPublicKey);
+        jsonObject.set("pendingWindowInDays", pendingWindowInDays);
+        jsonObject.set("created", created);
+        jsonObject.set("modified", modified);
+
+        // Scheduled deletion
+        if (scheduledDeletion.timestamp().epochTime() > 0) {
+            jsonObject.set("scheduledDeletion", scheduledDeletion);
+        }
 
         // Tags array
-        Poco::JSON::Array jsonTagArray;
-        for (const auto &tag: tags) {
-            Poco::JSON::Object jsonTagObject;
-            jsonTagObject.set(tag.first, tag.second);
-            jsonTagArray.add(jsonTagObject);
+        if (!tags.empty()) {
+            Poco::JSON::Array jsonTagArray;
+            for (const auto &tag: tags) {
+                Poco::JSON::Object jsonTagObject;
+                jsonTagObject.set(tag.first, tag.second);
+                jsonTagArray.add(jsonTagObject);
+            }
+            jsonObject.set("tags", jsonTagArray);
         }
-        jsonObject.set("tags", jsonTagArray);
 
         return jsonObject;
     }

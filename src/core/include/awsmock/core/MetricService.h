@@ -41,11 +41,12 @@ namespace AwsMock::Core {
      * Maintains a list of counter and gauges for monitoring via Prometheus. The data is made available via a HTTP
      * manager listening on port 9100. The port ist configurable.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class MetricService : public Core::Timer {
 
       public:
+
         /**
          * Default constructor
          */
@@ -368,6 +369,7 @@ namespace AwsMock::Core {
         bool TimerExists(const std::string &name);
 
       private:
+
         /**
          * Returns a thread safe timer key string.
          *

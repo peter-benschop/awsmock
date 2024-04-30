@@ -28,11 +28,12 @@ namespace AwsMock::Core {
     /**
      * Memory mapped file utility.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class MemoryMappedFile {
 
       public:
+
         /**
          * Constructor
          */
@@ -79,6 +80,7 @@ namespace AwsMock::Core {
         [[nodiscard]] bool IsMapped() const { return _mapped; }
 
       private:
+
         /**
          * Start pointer
          */

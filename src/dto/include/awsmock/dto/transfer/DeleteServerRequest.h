@@ -20,41 +20,41 @@ namespace AwsMock::Dto::Transfer {
     struct DeleteServerRequest {
 
         /**
-     * Region
-     */
+         * Region
+         */
         std::string region;
 
         /**
-     * Maximal number of results
-     */
+         * Maximal number of results
+         */
         std::string serverId;
 
         /**
-     * Parse a JSON stream
-     *
-     * @param body json input stream
-     */
+         * Parse a JSON stream
+         *
+         * @param body json input stream
+         */
         void FromJson(const std::string &body);
 
         /**
-     * Creates a JSON string from the object.
-     *
-     * @return JSON string
-     */
+         * Creates a JSON string from the object.
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const DeleteServerRequest &r);
     };
 

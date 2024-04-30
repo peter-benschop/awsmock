@@ -26,7 +26,7 @@ namespace AwsMock::Service {
     /**
      * AWS SNS command handler
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class SNSCmdHandler : public virtual AbstractHandler {
 

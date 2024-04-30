@@ -28,7 +28,7 @@ namespace AwsMock::Service {
     /**
      * KMS async key creator
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class KMSCreator {
 

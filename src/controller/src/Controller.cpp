@@ -229,16 +229,22 @@ namespace AwsMock::Controller {
         }
     }
 
-    void Controller::ExportInfrastructure(const std::vector<std::string> &services, bool pretty) {
+    void Controller::ExportInfrastructure(const std::vector<std::string> &services, bool pretty, bool includeObjects) {
 
         Dto::Common::Services exportServices;
         for (const auto &service: services) {
             exportServices.serviceNames.emplace_back(service);
         }
 
-        std::string url = pretty ? "/export?pretty=true" : "/export?pretty=false";
+        // Create URL
+        std::string url = "/export";
+        url = Core::HttpUtils::AddQueryParameter(url, "pretty", pretty);
+        url = Core::HttpUtils::AddQueryParameter(url, "includeObjects", includeObjects);
+
         std::map<std::string, std::string> headers;
         AddAuthorization(headers);
+
+        // Send request
         Core::CurlResponse response = _curlUtils.SendHttpRequest("GET", _baseUrl + url, headers, exportServices.ToJson());
 
         if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {

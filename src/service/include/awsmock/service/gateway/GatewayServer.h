@@ -2,8 +2,8 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#ifndef AWSMOCK_SERVER_GATEWAYSERVER_H
-#define AWSMOCK_SERVER_GATEWAYSERVER_H
+#ifndef AWSMOCK_SERVER_GATEWAY_SERVER_H
+#define AWSMOCK_SERVER_GATEWAY_SERVER_H
 
 // C++ standard includes
 #include <string>
@@ -38,7 +38,7 @@ namespace AwsMock::Service {
     /**
      * Gateway server
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class GatewayServer : public AbstractServer {
 
@@ -137,4 +137,4 @@ namespace AwsMock::Service {
 
 }// namespace AwsMock::Service
 
-#endif// AWSMOCK_SERVER_GATEWAYSERVER_H
+#endif// AWSMOCK_SERVER_GATEWAY_SERVER_H

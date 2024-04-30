@@ -39,13 +39,13 @@ namespace AwsMock::Database::Entity::SecretsManager {
      * Rotation rules
      *
      * Example:
-     * <pre>
+     * @verbatim
      * {
      *   "AutomaticallyAfterDays": number,
      *   "Duration": "string",
      *   "ScheduleExpression": "string"
      * }
-     * </pre>
+     * @endverbatim
      */
     struct RotationRules {
 

@@ -28,6 +28,10 @@
 // AwsMock include
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/entity/s3/BucketNotification.h>
+#include <awsmock/entity/s3/LambdaNotification.h>
+#include <awsmock/entity/s3/QueueNotification.h>
+#include <awsmock/entity/s3/TopicNotification.h>
+#include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::S3 {
 
@@ -63,7 +67,7 @@ namespace AwsMock::Database::Entity::S3 {
     /**
      * S3 bucket entity
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Bucket {
 
@@ -93,6 +97,21 @@ namespace AwsMock::Database::Entity::S3 {
         std::vector<BucketNotification> notifications;
 
         /**
+         * Queue notification configurations
+         */
+        std::vector<QueueNotification> queueNotifications;
+
+        /**
+         * Topic notification configurations
+         */
+        std::vector<TopicNotification> topicNotifications;
+
+        /**
+         * Lambda notification configurations
+         */
+        std::vector<LambdaNotification> lambdaNotifications;
+
+        /**
          * Bucket versioning state
          */
         BucketVersionStatus versionStatus = DISABLED;
@@ -112,16 +131,90 @@ namespace AwsMock::Database::Entity::S3 {
          *
          * @param eventName name of the event
          * @return true if notification with the given event name exists.
+         * @deprecated use HasQueueNotification,HasTopicNotification, HasLambdaNotification
          */
         bool HasNotification(const std::string &eventName);
+
+        /**
+         * Checks whether a notification with the given ID exists.
+         *
+         * @param id other queue notification id.
+         * @return true if notification with the given ID exists.
+         */
+        bool HasQueueNotificationId(const std::string &queueNotification);
+
+        /**
+         * Checks whether a topic notification with the given ID exists.
+         *
+         * @param id other topic notification id.
+         * @return true if notification with the given ID exists.
+         */
+        bool HasTopicNotificationId(const std::string &topicNotification);
+
+        /**
+         * Checks whether a lambda notification with the given ID exists.
+         *
+         * @param id other lambda notification ID.
+         * @return true if notification with the given ID exists.
+         */
+        bool HasLambdaNotificationId(const std::string &lambdaNotification);
+
+        /**
+         * Checks whether a SQS queue notification with the given event name exists.
+         *
+         * @param eventName name of the event
+         * @return true if notification with the given event name exists.
+         */
+        bool HasQueueNotification(const std::string &eventName);
+
+        /**
+         * Checks whether a SNS topic notification with the given event name exists.
+         *
+         * @param eventName name of the event
+         * @return true if notification with the given event name exists.
+         */
+        bool HasTopicNotification(const std::string &eventName);
+
+        /**
+         * Checks whether a lambda notification with the given event name exists.
+         *
+         * @param eventName name of the event
+         * @return true if notification with the given event name exists.
+         */
+        bool HasLambdaNotification(const std::string &eventName);
 
         /**
          * Returns a given notification by name
          *
          * @param eventName name of the event
          * @return found notification or notifications.end().
+         * @deprecated use GetQueueNotification,GetTopicNotification, GetLambdaNotification
          */
         BucketNotification GetNotification(const std::string &eventName);
+
+        /**
+         * Returns a given SQS queue notification by name
+         *
+         * @param eventName name of the event
+         * @return found notification or notifications.end().
+         */
+        QueueNotification GetQueueNotification(const std::string &eventName);
+
+        /**
+         * Returns a given SNS queue notification by name
+         *
+         * @param eventName name of the event
+         * @return found notification or notifications.end().
+         */
+        TopicNotification GetTopicNotification(const std::string &eventName);
+
+        /**
+         * Returns a given lambda notification by name
+         *
+         * @param eventName name of the event
+         * @return found notification or notifications.end().
+         */
+        LambdaNotification GetLambdaNotification(const std::string &eventName);
 
         /**
          * Returns a boolean indicating the versioinig state
@@ -173,7 +266,6 @@ namespace AwsMock::Database::Entity::S3 {
         friend std::ostream &operator<<(std::ostream &os, const Bucket &bucket);
     };
 
-    typedef struct Bucket Bucket;
     typedef std::vector<Bucket> BucketList;
 
 }// namespace AwsMock::Database::Entity::S3

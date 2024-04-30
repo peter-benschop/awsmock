@@ -16,7 +16,7 @@ namespace AwsMock::Service {
     /**
      * SQS monitoring thread
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class SQSMonitoring : public Core::Timer {
 

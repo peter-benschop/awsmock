@@ -29,6 +29,7 @@
 #include <awsmock/core/NumberUtils.h>
 #include <awsmock/entity/sqs/MessageAttribute.h>
 #include <awsmock/entity/sqs/MessageStatus.h>
+#include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::SQS {
 
@@ -42,7 +43,7 @@ namespace AwsMock::Database::Entity::SQS {
     /**
      * SQS message entity
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Message {
 

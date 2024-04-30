@@ -12,7 +12,7 @@ namespace AwsMock::Core {
     /**
      * Exception class. In case of a COM request failure a COMException is thrown.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class CoreException : public Poco::Exception {
       public:

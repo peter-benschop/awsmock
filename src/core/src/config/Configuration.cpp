@@ -23,20 +23,22 @@ namespace AwsMock::Core {
         DefineStringProperty("awsmock.client.userPoolId", "AWSMOCK_CLIENT_ID", "00000000");
         DefineStringProperty("awsmock.user", "AWSMOCK_USER", "none");
         DefineStringProperty("awsmock.data.dir", "AWSMOCK_DATA_DIR", "/tmp/awsmock/data");
+        DefineStringProperty("awsmock.temp.dir", "AWSMOCK_TEMP_DIR", "/tmp/awsmock/tmp");
         DefineBoolProperty("awsmock.pretty", "AWSMOCK_PRETTY", false);
 
         // Manager
         DefineStringProperty("awsmock.manager.host", "AWSMOCK_MANAGER_HOST", "localhost");
         DefineIntProperty("awsmock.manager.port", "AWSMOCK_MANAGER_PORT", 4567);
-        DefineIntProperty("awsmock.manager.max.queue", "AWSMOCK_MANAGER_MAX_QUEUE", 250);
-        DefineIntProperty("awsmock.manager.max.threads", "AWSMOCK_MANAGER_MAX_THREADS", 50);
+        DefineIntProperty("awsmock.manager.http.max.queue", "AWSMOCK_MANAGER_MAX_QUEUE", 50);
+        DefineIntProperty("awsmock.manager.http.max.threads", "AWSMOCK_MANAGER_MAX_THREADS", 10);
 
         // Gateway
-        DefineStringProperty("awsmock.service.gateway.host", "AWSMOCK_SERVICE_GATEWAY_HOST", "localhost");
-        DefineIntProperty("awsmock.service.gateway.port", "AWSMOCK_SERVICE_GATEWAY_PORT", 4566);
-        DefineIntProperty("awsmock.service.gateway.max.queue", "AWSMOCK_SERVICE_GATEWAY_MAX_QUEUE", 250);
-        DefineIntProperty("awsmock.service.gateway.max.threads", "AWSMOCK_SERVICE_GATEWAY_MAX_THREADS", 50);
-        DefineIntProperty("awsmock.service.gateway.timeout", "AWSMOCK_SERVICE_GATEWAY_TIMEOUT", 900);
+        DefineBoolProperty("awsmock.service.gateway.active", "AWSMOCK_SERVICE_GATEWAY_ACTIVE", true);
+        DefineStringProperty("awsmock.service.gateway.http.host", "AWSMOCK_SERVICE_GATEWAY_HOST", "localhost");
+        DefineIntProperty("awsmock.service.gateway.http.port", "AWSMOCK_SERVICE_GATEWAY_PORT", 4566);
+        DefineIntProperty("awsmock.service.gateway.http.max.queue", "AWSMOCK_SERVICE_GATEWAY_MAX_QUEUE", 250);
+        DefineIntProperty("awsmock.service.gateway.http.max.threads", "AWSMOCK_SERVICE_GATEWAY_MAX_THREADS", 50);
+        DefineIntProperty("awsmock.service.gateway.http.timeout", "AWSMOCK_SERVICE_GATEWAY_TIMEOUT", 900);
 
         // S3
         DefineBoolProperty("awsmock.service.s3.active", "AWSMOCK_SERVICE_S3_ACTIVE", true);
@@ -45,10 +47,7 @@ namespace AwsMock::Core {
         DefineIntProperty("awsmock.service.s3.http.max.queue", "AWSMOCK_SERVICE_S3_MAX_QUEUE", 250);
         DefineIntProperty("awsmock.service.s3.http.max.threads", "AWSMOCK_SERVICE_S3_MAX_THREADS", 50);
         DefineIntProperty("awsmock.service.s3.http.timeout", "AWSMOCK_SERVICE_S3_TIMEOUT", 900);
-        DefineStringProperty("awsmock.service.s3.data.dir", "AWSMOCK_SERVICE_S3_DATA_DIR", "tmp/awsmock/data/s3");
-        DefineIntProperty("awsmock.service.s3.period", "AWSMOCK_SERVICE_S3_PERIOD", 60000);
-        DefineIntProperty("awsmock.worker.sqs.timeout", "AWSMOCK_WORKER_S3_PERIOD", 120);
-        DefineIntProperty("awsmock.monitoring.sqs.period", "AWSMOCK_MONITORING_S3_PERIOD", 60000);
+        DefineIntProperty("awsmock.service.s3.monitoring.period", "AWSMOCK_SERVICE_S3_MONITORING_PERIOD", 900);
 
         // SQS
         DefineBoolProperty("awsmock.service.sqs.active", "AWSMOCK_SERVICE_SQS_ACTIVE", true);
@@ -57,9 +56,9 @@ namespace AwsMock::Core {
         DefineIntProperty("awsmock.service.sqs.http.max.queue", "AWSMOCK_SERVICE_SQS_MAX_QUEUE", 250);
         DefineIntProperty("awsmock.service.sqs.http.max.threads", "AWSMOCK_SERVICE_SQS_MAX_THREADS", 50);
         DefineIntProperty("awsmock.service.sqs.http.timeout", "AWSMOCK_SERVICE_SQS_TIMEOUT", 900);
-        DefineIntProperty("awsmock.service.sqs.period", "AWSMOCK_SERVICE_SQS_PERIOD", 60000);
-        DefineIntProperty("awsmock.worker.sqs.timeout", "AWSMOCK_WORKER_SQS_PERIOD", 120);
-        DefineIntProperty("awsmock.monitoring.sqs.period", "AWSMOCK_MONITORING_SQS_PERIOD", 60000);
+        DefineStringProperty("awsmock.service.sqs.hostname", "AWSMOCK_SERVICE_SQS_HOSTNAME", "localstack");
+        DefineIntProperty("awsmock.service.s3.monitoring.period", "AWSMOCK_MONITORING_SQS_PERIOD", 300);
+        DefineIntProperty("awsmock.service.s3.worker.period", "AWSMOCK_WORKER_SQS_PERIOD", 30);
 
         // SNS
         DefineBoolProperty("awsmock.service.sns.active", "AWSMOCK_SERVICE_SNS_ACTIVE", true);
@@ -68,67 +67,58 @@ namespace AwsMock::Core {
         DefineIntProperty("awsmock.service.sns.http.max.queue", "AWSMOCK_SERVICE_SNS_MAX_QUEUE", 250);
         DefineIntProperty("awsmock.service.sns.http.max.threads", "AWSMOCK_SERVICE_SNS_MAX_THREADS", 50);
         DefineIntProperty("awsmock.service.sns.http.timeout", "AWSMOCK_SERVICE_SNS_TIMEOUT", 900);
-        DefineIntProperty("awsmock.service.sns.period", "AWSMOCK_SERVICE_SNS_PERIOD", 60000);
-        DefineIntProperty("awsmock.worker.sns.timeout", "AWSMOCK_WORKER_SNS_PERIOD", 120);
-        DefineIntProperty("awsmock.monitoring.sns.period", "AWSMOCK_MONITORING_SNS_PERIOD", 60000);
+        DefineIntProperty("awsmock.service.sns.message.timeout", "AWSMOCK_SERVICE_SNS_MESSAGE_TIMEOUT", 14);
+        DefineStringProperty("awsmock.service.sns.hostname", "AWSMOCK_SERVICE_SNS_HOSTNAME", "localhost");
+        DefineIntProperty("awsmock.monitoring.sns.worker.period", "AWSMOCK_SNS_WORKER_PERIOD", 300);
+        DefineIntProperty("awsmock.monitoring.sns.monitoring.period", "AWSMOCK_SNS_MONITORING_PERIOD", 300);
 
         // Lambda
         DefineBoolProperty("awsmock.service.lambda.active", "AWSMOCK_SERVICE_LAMBDA_ACTIVE", true);
-        DefineStringProperty("awsmock.service.lambda.host", "AWSMOCK_SERVICE_LAMBDA_HOST", "localhost");
-        DefineIntProperty("awsmock.service.lambda.port", "AWSMOCK_SERVICE_LAMBDA_PORT", 9503);
-        DefineIntProperty("awsmock.service.lambda.max.queue", "AWSMOCK_SERVICE_LAMBDA_MAX_QUEUE", 250);
-        DefineIntProperty("awsmock.service.lambda.max.threads", "AWSMOCK_SERVICE_LAMBDA_MAX_THREADS", 50);
-        DefineIntProperty("awsmock.service.lambda.timeout", "AWSMOCK_SERVICE_LAMBDA_TIMEOUT", 900);
-        DefineIntProperty("awsmock.service.lambda.period", "AWSMOCK_SERVICE_LAMBDA_PERIOD", 60000);
-        DefineIntProperty("awsmock.worker.lambda.timeout", "AWSMOCK_WORKER_LAMBDA_PERIOD", 120);
-        DefineIntProperty("awsmock.monitoring.lambda.period", "AWSMOCK_MONITORING_LAMBDA_PERIOD", 60000);
+        DefineStringProperty("awsmock.service.lambda.http.host", "AWSMOCK_SERVICE_LAMBDA_HOST", "localhost");
+        DefineIntProperty("awsmock.service.lambda.http.port", "AWSMOCK_SERVICE_LAMBDA_PORT", 9503);
+        DefineIntProperty("awsmock.service.lambda.http.max.queue", "AWSMOCK_SERVICE_LAMBDA_MAX_QUEUE", 250);
+        DefineIntProperty("awsmock.service.lambda.http.max.threads", "AWSMOCK_SERVICE_LAMBDA_MAX_THREADS", 50);
+        DefineIntProperty("awsmock.service.lambda.http.timeout", "AWSMOCK_SERVICE_LAMBDA_TIMEOUT", 900);
+        DefineIntProperty("awsmock.monitoring.lambda.period", "AWSMOCK_MONITORING_LAMBDA_PERIOD", 300);
 
         // Transfer server
         DefineBoolProperty("awsmock.service.transfer.active", "AWSMOCK_SERVICE_TRANSFER_ACTIVE", true);
-        DefineStringProperty("awsmock.service.transfer.host", "AWSMOCK_SERVICE_TRANSFER_HOST", "localhost");
-        DefineIntProperty("awsmock.service.transfer.port", "AWSMOCK_SERVICE_TRANSFER_PORT", 9504);
-        DefineIntProperty("awsmock.service.transfer.max.queue", "AWSMOCK_SERVICE_TRANSFER_MAX_QUEUE", 250);
-        DefineIntProperty("awsmock.service.transfer.max.threads", "AWSMOCK_SERVICE_TRANSFER_MAX_THREADS", 50);
-        DefineIntProperty("awsmock.service.transfer.timeout", "AWSMOCK_SERVICE_TRANSFER_TIMEOUT", 900);
-        DefineIntProperty("awsmock.service.transfer.ftp.port", "AWSMOCK_SERVICE_TRANSFER_FTP_PORT", 2121);
+        DefineStringProperty("awsmock.service.transfer.http.host", "AWSMOCK_SERVICE_TRANSFER_HOST", "localhost");
+        DefineIntProperty("awsmock.service.transfer.http.port", "AWSMOCK_SERVICE_TRANSFER_PORT", 9504);
+        DefineIntProperty("awsmock.service.transfer.http.max.queue", "AWSMOCK_SERVICE_TRANSFER_MAX_QUEUE", 250);
+        DefineIntProperty("awsmock.service.transfer.http.max.threads", "AWSMOCK_SERVICE_TRANSFER_MAX_THREADS", 50);
+        DefineIntProperty("awsmock.service.transfer.http.timeout", "AWSMOCK_SERVICE_TRANSFER_TIMEOUT", 900);
+        DefineIntProperty("awsmock.service.transfer.ftp.port", "AWSMOCK_SERVICE_TRANSFER_FTP_PORT", 21);
         DefineStringProperty("awsmock.service.transfer.bucket", "AWSMOCK_SERVICE_TRANSFER_BUCKET", "transfer-server");
         DefineStringProperty("awsmock.service.transfer.base.dir", "AWSMOCK_SERVICE_TRANSFER_BASE_DIR", "/tmp/awsmock/data/transfer");
-        DefineIntProperty("awsmock.service.transfer.period", "AWSMOCK_SERVICE_TRANSFER_PERIOD", 60000);
-        DefineIntProperty("awsmock.worker.transfer.timeout", "AWSMOCK_WORKER_TRANSFER_PERIOD", 120);
-        DefineIntProperty("awsmock.monitoring.transfer.period", "AWSMOCK_MONITORING_TRANSFER_PERIOD", 60000);
+        DefineIntProperty("awsmock.service.transfer.monitoring.period", "AWSMOCK_SERVICE_TRANSFER_MONITORING_PERIOD", 300);
 
         // Cognito
         DefineBoolProperty("awsmock.service.cognito.active", "AWSMOCK_SERVICE_COGNITO_ACTIVE", true);
-        DefineStringProperty("awsmock.service.cognito.host", "AWSMOCK_SERVICE_COGNITO_HOST", "localhost");
-        DefineIntProperty("awsmock.service.cognito.port", "AWSMOCK_SERVICE_COGNITO_PORT", 9505);
-        DefineIntProperty("awsmock.service.cognito.max.queue", "AWSMOCK_SERVICE_COGNITO_MAX_QUEUE", 250);
-        DefineIntProperty("awsmock.service.cognito.max.threads", "AWSMOCK_SERVICE_COGNITO_MAX_THREADS", 50);
-        DefineIntProperty("awsmock.service.cognito.timeout", "AWSMOCK_SERVICE_COGNITO_TIMEOUT", 120);
-        DefineIntProperty("awsmock.service.cognito.period", "AWSMOCK_SERVICE_COGNITO_PERIOD", 10000);
-        DefineIntProperty("awsmock.worker.cognito.timeout", "AWSMOCK_WORKER_COGNITO_PERIOD", 120);
-        DefineIntProperty("awsmock.monitoring.cognito.period", "AWSMOCK_MONITORING_COGNITO_PERIOD", 60000);
+        DefineStringProperty("awsmock.service.cognito.http.host", "AWSMOCK_SERVICE_COGNITO_HOST", "localhost");
+        DefineIntProperty("awsmock.service.cognito.http.port", "AWSMOCK_SERVICE_COGNITO_PORT", 9505);
+        DefineIntProperty("awsmock.service.cognito.http.max.queue", "AWSMOCK_SERVICE_COGNITO_MAX_QUEUE", 250);
+        DefineIntProperty("awsmock.service.cognito.http.max.threads", "AWSMOCK_SERVICE_COGNITO_MAX_THREADS", 50);
+        DefineIntProperty("awsmock.service.cognito.http.timeout", "AWSMOCK_SERVICE_COGNITO_TIMEOUT", 120);
+        DefineIntProperty("awsmock.service.cognito.monitoring.period", "AWSMOCK_SERVICE_COGNITO_MONITORING_PERIOD", 300);
 
         // DynamoDB
         DefineBoolProperty("awsmock.service.dynamodb.active", "AWSMOCK_SERVICE_DYNAMODB_ACTIVE", true);
-        DefineStringProperty("awsmock.service.dynamodb.host", "AWSMOCK_SERVICE_DYNAMODB_HOST", "localhost");
-        DefineIntProperty("awsmock.service.dynamodb.port", "AWSMOCK_SERVICE_DYNAMODB_PORT", 9506);
-        DefineIntProperty("awsmock.service.dynamodb.max.queue", "AWSMOCK_SERVICE_DYNAMODB_MAX_QUEUE", 250);
-        DefineIntProperty("awsmock.service.dynamodb.max.threads", "AWSMOCK_SERVICE_DYNAMODB_MAX_THREADS", 50);
-        DefineIntProperty("awsmock.service.dynamodb.timeout", "AWSMOCK_SERVICE_DYNAMODB_TIMEOUT", 120);
-        DefineIntProperty("awsmock.service.dynamodb.period", "AWSMOCK_SERVICE_DYNAMODB_PERIOD", 10000);
-        DefineIntProperty("awsmock.worker.dynamodb.timeout", "AWSMOCK_WORKER_DYNAMODB_PERIOD", 120);
-        DefineIntProperty("awsmock.monitoring.dynamodb.period", "AWSMOCK_MONITORING_DYNAMODB_PERIOD", 60000);
+        DefineStringProperty("awsmock.service.dynamodb.http.host", "AWSMOCK_SERVICE_DYNAMODB_HOST", "localhost");
+        DefineIntProperty("awsmock.service.dynamodb.http.port", "AWSMOCK_SERVICE_DYNAMODB_PORT", 9506);
+        DefineIntProperty("awsmock.service.dynamodb.http.max.queue", "AWSMOCK_SERVICE_DYNAMODB_MAX_QUEUE", 250);
+        DefineIntProperty("awsmock.service.dynamodb.http.max.threads", "AWSMOCK_SERVICE_DYNAMODB_MAX_THREADS", 50);
+        DefineIntProperty("awsmock.service.dynamodb.http.timeout", "AWSMOCK_SERVICE_DYNAMODB_TIMEOUT", 120);
+        DefineIntProperty("awsmock.monitoring.dynamodb.period", "AWSMOCK_MONITORING_DYNAMODB_PERIOD", 300);
 
         // SecretsManager
         DefineBoolProperty("awsmock.service.secretsmanager.active", "AWSMOCK_SERVICE_SECRETSMANAGER_ACTIVE", true);
-        DefineStringProperty("awsmock.service.secretsmanager.host", "AWSMOCK_SERVICE_SECRETSMANAGER_HOST", "localhost");
-        DefineIntProperty("awsmock.service.secretsmanager.port", "AWSMOCK_SERVICE_SECRETSMANAGER_PORT", 9507);
-        DefineIntProperty("awsmock.service.secretsmanager.max.queue", "AWSMOCK_SERVICE_SECRETSMANAGER_MAX_QUEUE", 250);
-        DefineIntProperty("awsmock.service.secretsmanager.max.threads", "AWSMOCK_SERVICE_SECRETSMANAGER_MAX_THREADS", 50);
-        DefineIntProperty("awsmock.service.secretsmanager.timeout", "AWSMOCK_SERVICE_SECRETSMANAGER_TIMEOUT", 120);
-        DefineIntProperty("awsmock.service.secretsmanager.period", "AWSMOCK_SERVICE_SECRETSMANAGER_PERIOD", 10000);
-        DefineIntProperty("awsmock.worker.secretsmanager.timeout", "AWSMOCK_WORKER_SECRETSMANAGER_PERIOD", 120);
-        DefineIntProperty("awsmock.monitoring.secretsmanager.period", "AWSMOCK_MONITORING_SECRETSMANAGER_PERIOD", 60000);
+        DefineStringProperty("awsmock.service.secretsmanager.http.host", "AWSMOCK_SERVICE_SECRETSMANAGER_HOST", "localhost");
+        DefineIntProperty("awsmock.service.secretsmanager.http.port", "AWSMOCK_SERVICE_SECRETSMANAGER_PORT", 9507);
+        DefineIntProperty("awsmock.service.secretsmanager.http.max.queue", "AWSMOCK_SERVICE_SECRETSMANAGER_MAX_QUEUE", 250);
+        DefineIntProperty("awsmock.service.secretsmanager.http.max.threads", "AWSMOCK_SERVICE_SECRETSMANAGER_MAX_THREADS", 50);
+        DefineIntProperty("awsmock.service.secretsmanager.http.timeout", "AWSMOCK_SERVICE_SECRETSMANAGER_TIMEOUT", 120);
+        DefineIntProperty("awsmock.service.secretsmanager.monitoring.period", "AWSMOCK_SERVICE_SECRETSMANAGER_MONITORING_PERIOD", 300);
 
         // KMS
         DefineBoolProperty("awsmock.service.kms.active", "AWSMOCK_SERVICE_KMS_ACTIVE", true);
@@ -137,9 +127,8 @@ namespace AwsMock::Core {
         DefineIntProperty("awsmock.service.kms.http.max.queue", "AWSMOCK_SERVICE_KMS_MAX_QUEUE", 250);
         DefineIntProperty("awsmock.service.kms.http.max.threads", "AWSMOCK_SERVICE_KMS_MAX_THREADS", 50);
         DefineIntProperty("awsmock.service.kms.http.timeout", "AWSMOCK_SERVICE_KMS_TIMEOUT", 900);
-        DefineIntProperty("awsmock.service.kms.period", "AWSMOCK_SERVICE_KMS_PERIOD", 60000);
-        DefineIntProperty("awsmock.worker.kms.timeout", "AWSMOCK_WORKER_KMS_PERIOD", 120);
-        DefineIntProperty("awsmock.monitoring.kms.period", "AWSMOCK_MONITORING_KMS_PERIOD", 60000);
+        DefineIntProperty("awsmock.service.kms.monitoring.period", "AWSMOCK_SERVICEK_KMS_MONITORING_PERIOD", 300);
+        DefineIntProperty("awsmock.service.kms.worker.period", "AWSMOCK_WORKER_KMS_PERIOD", 300);
 
         // Docker
         DefineStringProperty("awsmock.docker.network.mode", "AWSMOCK_DOCKER_NETWORK_MODE", "bridge");

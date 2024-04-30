@@ -25,7 +25,7 @@ namespace AwsMock::Dto::KMS {
      * </p>
      *
      * Example:
-     * <pre>
+     * @verbatim
      * {
      *   "CiphertextBlob": blob,
      *   "DryRun": boolean,
@@ -40,9 +40,9 @@ namespace AwsMock::Dto::KMS {
      *     "KeyEncryptionAlgorithm": "string"
      *   }
      * }
-     * </pre>
+     * @endverbatim
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct DecryptRequest {
 
@@ -62,7 +62,7 @@ namespace AwsMock::Dto::KMS {
         EncryptionAlgorithm encryptionAlgorithm;
 
         /**
-         * Encryption context
+         * Encryption model
          */
         std::map<std::string, std::string> encryptionContext;
 

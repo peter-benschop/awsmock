@@ -2,8 +2,8 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_COGNITOHANDLER_H
-#define AWSMOCK_SERVICE_COGNITOHANDLER_H
+#ifndef AWSMOCK_SERVICE_COGNITO_HANDLER_H
+#define AWSMOCK_SERVICE_COGNITO_HANDLER_H
 
 // Poco includes
 #include "Poco/DateTime.h"
@@ -25,7 +25,7 @@ namespace AwsMock::Service {
     /**
      * Cognito HTTP handler
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class CognitoHandler : public CognitoCliHandler, public CognitoJava2Handler {
 
@@ -116,4 +116,4 @@ namespace AwsMock::Service {
 
 }// namespace AwsMock::Service
 
-#endif// AWSMOCK_SERVICE_COGNITOHANDLER_H
+#endif// AWSMOCK_SERVICE_COGNITO_HANDLER_H

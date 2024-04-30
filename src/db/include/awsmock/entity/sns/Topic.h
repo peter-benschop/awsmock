@@ -26,6 +26,7 @@
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/entity/sns/Subscription.h>
 #include <awsmock/entity/sns/TopicAttribute.h>
+#include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::SNS {
 
@@ -39,7 +40,7 @@ namespace AwsMock::Database::Entity::SNS {
     /**
      * SNS topic entity
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Topic {
 

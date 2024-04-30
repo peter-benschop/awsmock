@@ -5,6 +5,7 @@ namespace AwsMock::Service {
 
     void S3CmdHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3ClientCommand) {
         log_debug << "S3 GET request, URI: " + request.getURI() << " region: " << s3ClientCommand.region << " user: " + s3ClientCommand.user;
+        Core::MetricServiceTimer measure(_metricService, S3_SERVICE_TIMER);
 
         try {
 
@@ -146,17 +147,16 @@ namespace AwsMock::Service {
                 case Dto::Common::S3CommandType::DELETE_BUCKET:
                 case Dto::Common::S3CommandType::DELETE_OBJECT:
                 case Dto::Common::S3CommandType::DELETE_OBJECTS:
+                case Dto::Common::S3CommandType::CREATE_MULTIPART_UPLOAD:
+                case Dto::Common::S3CommandType::UPLOAD_PART:
+                case Dto::Common::S3CommandType::COMPLETE_MULTIPART_UPLOAD:
+                case Dto::Common::S3CommandType::ABORT_MULTIPART_UPLOAD:
+                case Dto::Common::S3CommandType::BUCKET_NOTIFICATION:
+                case Dto::Common::S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION:
+                    break;
                 case Dto::Common::S3CommandType::UNKNOWN: {
                     throw Core::ServiceException("Bad request, method: GET clientCommand: " + Dto::Common::S3CommandTypeToString(s3ClientCommand.command));
                 }
-                case Dto::Common::S3CommandType::CREATE_MULTIPART_UPLOAD:
-                    break;
-                case Dto::Common::S3CommandType::UPLOAD_PART:
-                    break;
-                case Dto::Common::S3CommandType::COMPLETE_MULTIPART_UPLOAD:
-                    break;
-                case Dto::Common::S3CommandType::ABORT_MULTIPART_UPLOAD:
-                    break;
             }
         } catch (Core::ServiceException &exc) {
             log_error << exc.message();
@@ -172,6 +172,7 @@ namespace AwsMock::Service {
 
     void S3CmdHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3ClientCommand) {
         log_debug << "S3 PUT request, URI: " << request.getURI() << " region: " << s3ClientCommand.region << " user: " << s3ClientCommand.user;
+        Core::MetricServiceTimer measure(_metricService, S3_SERVICE_TIMER);
 
         try {
 
@@ -284,6 +285,38 @@ namespace AwsMock::Service {
                     break;
                 }
 
+                case Dto::Common::S3CommandType::BUCKET_NOTIFICATION: {
+
+                    log_debug << "Bucket notification request, bucket: " << s3ClientCommand.bucket;
+
+                    // S3 notification setup
+                    std::string body = Core::HttpUtils::GetBodyAsString(request);
+                    Dto::S3::PutBucketNotificationRequest s3Request = Dto::S3::PutBucketNotificationRequest(body, s3ClientCommand.region, s3ClientCommand.bucket);
+
+                    _s3Service.PutBucketNotification(s3Request);
+
+                    SendOkResponse(response);
+
+                    break;
+                }
+
+                case Dto::Common::S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION: {
+
+                    log_debug << "Put bucket notification configuration request, bucket: " << s3ClientCommand.bucket;
+
+                    // S3 notification setup
+                    std::string body = Core::HttpUtils::GetBodyAsString(request);
+                    Dto::S3::PutBucketNotificationConfigurationRequest s3Request;
+                    s3Request.FromXml(body);
+                    s3Request.region = s3ClientCommand.region;
+                    s3Request.bucket = s3ClientCommand.bucket;
+
+                    Dto::S3::PutBucketNotificationConfigurationResponse s3Response = _s3Service.PutBucketNotificationConfiguration(s3Request);
+
+                    SendOkResponse(response, s3Response.ToXml());
+                    break;
+                }
+
                     // Should not happen
                 case Dto::Common::S3CommandType::GET_OBJECT:
                 case Dto::Common::S3CommandType::COPY_OBJECT:
@@ -316,18 +349,6 @@ namespace AwsMock::Service {
                 _s3Service.PutBucketVersioning(s3Request);
 
                 SendNoContentResponse(response);
-
-            } else if (s3ClientCommand.notificationRequest) {
-
-                log_debug << "Bucket notification request, bucket: " << s3ClientCommand.bucket;
-
-                // S3 notification setup
-                std::string body = Core::HttpUtils::GetBodyAsString(request);
-                Dto::S3::PutBucketNotificationRequest s3Request = Dto::S3::PutBucketNotificationRequest(body, s3ClientCommand.region, s3ClientCommand.bucket);
-
-                _s3Service.PutBucketNotification(s3Request);
-
-                SendOkResponse(response);
             }
 
         } catch (Core::ServiceException &exc) {
@@ -347,6 +368,7 @@ namespace AwsMock::Service {
 
     void S3CmdHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3ClientCommand) {
         log_debug << "S3 POST request, URI: " << request.getURI() << " region: " << s3ClientCommand.region << " user: " << s3ClientCommand.user;
+        Core::MetricServiceTimer measure(_metricService, S3_SERVICE_TIMER);
 
         try {
             switch (s3ClientCommand.command) {
@@ -431,6 +453,7 @@ namespace AwsMock::Service {
                     break;
                 }
 
+
                     // Should not happen
                 case Dto::Common::S3CommandType::CREATE_BUCKET:
                 case Dto::Common::S3CommandType::LIST_BUCKETS:
@@ -440,16 +463,16 @@ namespace AwsMock::Service {
                 case Dto::Common::S3CommandType::GET_OBJECT:
                 case Dto::Common::S3CommandType::MOVE_OBJECT:
                 case Dto::Common::S3CommandType::DELETE_OBJECT:
+                case Dto::Common::S3CommandType::UPLOAD_PART:
+                case Dto::Common::S3CommandType::ABORT_MULTIPART_UPLOAD:
+                case Dto::Common::S3CommandType::LIST_OBJECT_VERSIONS:
+                case Dto::Common::S3CommandType::BUCKET_NOTIFICATION:
+                case Dto::Common::S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION:
+                    break;
                 case Dto::Common::S3CommandType::UNKNOWN: {
                     log_error << "Bad request, method: POST clientCommand: " << Dto::Common::S3CommandTypeToString(s3ClientCommand.command);
                     throw Core::ServiceException("Bad request, method: POST clientCommand: " + Dto::Common::S3CommandTypeToString(s3ClientCommand.command));
                 }
-                case Dto::Common::S3CommandType::UPLOAD_PART:
-                    break;
-                case Dto::Common::S3CommandType::ABORT_MULTIPART_UPLOAD:
-                    break;
-                case Dto::Common::S3CommandType::LIST_OBJECT_VERSIONS:
-                    break;
             }
 
         } catch (Core::ServiceException &exc) {
@@ -466,6 +489,7 @@ namespace AwsMock::Service {
 
     void S3CmdHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3ClientCommand) {
         log_debug << "S3 DELETE request, URI: " + request.getURI() << " region: " << s3ClientCommand.region << " user: " << s3ClientCommand.user;
+        Core::MetricServiceTimer measure(_metricService, S3_SERVICE_TIMER);
 
         try {
 
@@ -510,12 +534,14 @@ namespace AwsMock::Service {
                 case Dto::Common::S3CommandType::CREATE_MULTIPART_UPLOAD:
                 case Dto::Common::S3CommandType::UPLOAD_PART:
                 case Dto::Common::S3CommandType::COMPLETE_MULTIPART_UPLOAD:
+                case Dto::Common::S3CommandType::LIST_OBJECT_VERSIONS:
+                case Dto::Common::S3CommandType::BUCKET_NOTIFICATION:
+                case Dto::Common::S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION:
+                    break;
                 case Dto::Common::S3CommandType::UNKNOWN: {
                     log_error << "Bad request, method: DELETE clientCommand: " << Dto::Common::S3CommandTypeToString(s3ClientCommand.command);
                     throw Core::ServiceException("Bad request, method: DELETE clientCommand: " + Dto::Common::S3CommandTypeToString(s3ClientCommand.command));
                 }
-                case Dto::Common::S3CommandType::LIST_OBJECT_VERSIONS:
-                    break;
             }
 
         } catch (Core::ServiceException &exc) {
@@ -532,6 +558,7 @@ namespace AwsMock::Service {
 
     void S3CmdHandler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         log_trace << "S3 HEAD request, URI: " << request.getURI() << " region: " << region << " user: " << user;
+        Core::MetricServiceTimer measure(_metricService, S3_SERVICE_TIMER);
 
         try {
 

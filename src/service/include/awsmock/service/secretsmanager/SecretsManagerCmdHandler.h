@@ -33,7 +33,7 @@ namespace AwsMock::Service {
     /**
      * AWS Secrets manager mock handler.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class SecretsManagerCmdHandler : public virtual AbstractHandler {
 

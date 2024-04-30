@@ -2,8 +2,8 @@
 // Created by vogje01 on 17/06/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_GATEWAYHANDLERFACTORY_H
-#define AWSMOCK_SERVICE_GATEWAYHANDLERFACTORY_H
+#ifndef AWSMOCK_SERVICE_GATEWAY_HANDLER_FACTORY_H
+#define AWSMOCK_SERVICE_GATEWAY_HANDLER_FACTORY_H
 
 // Poco includes
 #include "Poco/Logger.h"
@@ -19,7 +19,7 @@ namespace AwsMock::Service {
     /**
      * Gateway request handler factory
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class GatewayRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 

@@ -27,7 +27,7 @@ namespace AwsMock::Dto::Docker {
     /**
      * Docker platform
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Platform {
 
@@ -55,7 +55,7 @@ namespace AwsMock::Dto::Docker {
     /**
      * Docker details
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Details {
 
@@ -108,7 +108,7 @@ namespace AwsMock::Dto::Docker {
     /**
      * Docker component
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Component {
 
@@ -151,7 +151,7 @@ namespace AwsMock::Dto::Docker {
     /**
      * Docker version
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct DockerVersion {
 

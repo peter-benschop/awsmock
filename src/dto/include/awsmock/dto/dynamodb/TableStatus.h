@@ -14,7 +14,7 @@ namespace AwsMock::Dto::DynamoDb {
     /**
      * DynamoDB table status
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     enum class TableStatus {
         CREATING,

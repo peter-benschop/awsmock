@@ -15,47 +15,47 @@ namespace AwsMock::Dto::SNS {
     struct Subscription {
 
         /**
-     * AWS region
-     */
+         * AWS region
+         */
         std::string region;
 
         /**
-     * Topic ARN
-     */
+         * Topic ARN
+         */
         std::string topicArn;
 
         /**
-     * Protocol
-     */
+         * Protocol
+         */
         std::string protocol;
 
         /**
-     * Subscription ARN
-     */
+         * Subscription ARN
+         */
         std::string subscriptionArn;
 
         /**
-     * Endpoint
-     */
+         * Endpoint
+         */
         std::string endpoint;
 
         /**
-     * Owner
-     */
+         * Owner
+         */
         std::string owner;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const Subscription &r);
     };
 

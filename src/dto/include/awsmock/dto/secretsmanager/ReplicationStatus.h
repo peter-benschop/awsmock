@@ -22,21 +22,21 @@
 namespace AwsMock::Dto::SecretsManager {
 
     /**
-   * Secrets manager replication status.
-   *
-   * Example:
-   * <pre>
-   * {
-   *   "KmsKeyId": "string",
-   *   "LastAccessedDate": number,
-   *   "Region": "string",
-   *   "Status": "string",
-   *   "StatusMessage": "string"
-   * }
-   * </pre>
-   *
-   * @author jens.vogt@opitz-consulting.com
-   */
+     * Secrets manager replication status.
+     *
+     * Example:
+     * @verbatim
+     * {
+     *   "KmsKeyId": "string",
+     *   "LastAccessedDate": number,
+     *   "Region": "string",
+     *   "Status": "string",
+     *   "StatusMessage": "string"
+     * }
+     * @endverbatim
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct ReplicationStatus {
 
         /**

@@ -22,14 +22,14 @@ namespace AwsMock::Dto::KMS {
      * List all KMS keys request
      *
      * Example:
-     * <pre>
+     * @verbatim
      * {
      *   "Limit": number,
      *   "Marker": "string"
      * }
-     * </pre>
+     * @endverbatim
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct ListKeysRequest {
 

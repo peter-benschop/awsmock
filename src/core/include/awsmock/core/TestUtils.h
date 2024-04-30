@@ -20,7 +20,7 @@ namespace AwsMock::Core {
     /**
      * Test utilities
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class TestUtils {
 

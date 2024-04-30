@@ -36,7 +36,7 @@ namespace AwsMock::Dto::Common {
     /**
      * Services
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Services {
 

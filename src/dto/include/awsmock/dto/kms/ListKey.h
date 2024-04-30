@@ -27,14 +27,14 @@ namespace AwsMock::Dto::KMS {
      * KMS metadata
      *
      * Example:
-     * <pre>
+     * @verbatim
      * {
      *   "KeyArn": "string",
      *   "KeyId": "string",
      * }
-     * </pre>
+     * @endverbatim
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct ListKey {
 

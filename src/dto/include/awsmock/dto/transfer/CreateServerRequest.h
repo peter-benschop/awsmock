@@ -22,56 +22,56 @@ namespace AwsMock::Dto::Transfer {
     struct CreateServerRequest {
 
         /**
-     * Region
-     */
+         * Region
+         */
         std::string region;
 
         /**
-     * Domain
-     */
+         * Domain
+         */
         std::string domain;
 
         /**
-     * Protocols
-     */
+         * Protocols
+         */
         std::vector<std::string> protocols;
 
         /**
-     * Tags
-     */
+         * Tags
+         */
         TagList tags;
 
         /**
-     * Identity provider details
-     */
+         * Identity provider details
+         */
         IdentityProviderDetails identityProviderDetails;
 
         /**
-     * Parse a JSON stream
-     *
-     * @param body json input stream
-     */
+         * Parse a JSON stream
+         *
+         * @param body json input stream
+         */
         void FromJson(const std::string &body);
 
         /**
-     * Creates a JSON string from the object.
-     *
-     * @return JSON string
-     */
+         * Creates a JSON string from the object.
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const CreateServerRequest &r);
     };
 

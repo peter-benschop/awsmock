@@ -20,7 +20,7 @@ namespace AwsMock::Dto::Docker {
     /**
      * Docker port
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Port {
 

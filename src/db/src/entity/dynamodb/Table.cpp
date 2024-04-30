@@ -88,23 +88,29 @@ namespace AwsMock::Database::Entity::DynamoDb {
         jsonObject.set("region", region);
         jsonObject.set("name", name);
 
-        Poco::JSON::Array jsonTagsArray;
-        for (const auto &tag: tags) {
-            Poco::JSON::Object object;
-            object.set("Key", tag.first);
-            object.set("Value", tag.second);
-            jsonTagsArray.add(object);
+        // Tags
+        if (!tags.empty()) {
+            Poco::JSON::Array jsonTagsArray;
+            for (const auto &tag: tags) {
+                Poco::JSON::Object object;
+                object.set("key", tag.first);
+                object.set("value", tag.second);
+                jsonTagsArray.add(object);
+            }
+            jsonObject.set("tags", jsonTagsArray);
         }
-        jsonObject.set("Tags", jsonTagsArray);
 
-        Poco::JSON::Array jsonAttributeArray;
-        for (const auto &attribute: attributes) {
-            Poco::JSON::Object object;
-            object.set("attributeName", attribute.first);
-            object.set("AttributeType", attribute.second);
-            jsonAttributeArray.add(object);
+        // Attributes
+        if (!attributes.empty()) {
+            Poco::JSON::Array jsonAttributeArray;
+            for (const auto &attribute: attributes) {
+                Poco::JSON::Object object;
+                object.set("attributeName", attribute.first);
+                object.set("attributeType", attribute.second);
+                jsonAttributeArray.add(object);
+            }
+            jsonObject.set("attributes", jsonAttributeArray);
         }
-        jsonObject.set("Attributes", jsonAttributeArray);
 
         jsonObject.set("created", Poco::DateTimeFormatter::format(created, Poco::DateTimeFormat::ISO8601_FORMAT));
         jsonObject.set("modified", Poco::DateTimeFormatter::format(modified, Poco::DateTimeFormat::ISO8601_FORMAT));
@@ -123,22 +129,28 @@ namespace AwsMock::Database::Entity::DynamoDb {
             Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
             Core::JsonUtils::GetJsonValueString("name", jsonObject, name);
 
-            Poco::JSON::Array::Ptr jsonTagsArray = jsonObject->getArray("tags");
-            for (int i = 0; i < jsonTagsArray->size(); i++) {
-                Poco::JSON::Object::Ptr tagObject = jsonTagsArray->getObject(i);
-                std::string keyStr, valueStr;
-                Core::JsonUtils::GetJsonValueString("key", tagObject, keyStr);
-                Core::JsonUtils::GetJsonValueString("value", tagObject, valueStr);
-                tags[keyStr] = valueStr;
+            // Tags
+            if (jsonObject->has("tags")) {
+                Poco::JSON::Array::Ptr jsonTagsArray = jsonObject->getArray("tags");
+                for (int i = 0; i < jsonTagsArray->size(); i++) {
+                    Poco::JSON::Object::Ptr tagObject = jsonTagsArray->getObject(i);
+                    std::string keyStr, valueStr;
+                    Core::JsonUtils::GetJsonValueString("key", tagObject, keyStr);
+                    Core::JsonUtils::GetJsonValueString("value", tagObject, valueStr);
+                    tags[keyStr] = valueStr;
+                }
             }
 
-            Poco::JSON::Array::Ptr jsonAttributesArray = jsonObject->getArray("attributes");
-            for (int i = 0; i < jsonAttributesArray->size(); i++) {
-                Poco::JSON::Object::Ptr attributeObject = jsonAttributesArray->getObject(i);
-                std::string keyStr, valueStr;
-                Core::JsonUtils::GetJsonValueString("key", attributeObject, keyStr);
-                Core::JsonUtils::GetJsonValueString("value", attributeObject, valueStr);
-                attributes[keyStr] = valueStr;
+            // Attributes
+            if (jsonObject->has("attributes")) {
+                Poco::JSON::Array::Ptr jsonAttributesArray = jsonObject->getArray("attributes");
+                for (int i = 0; i < jsonAttributesArray->size(); i++) {
+                    Poco::JSON::Object::Ptr attributeObject = jsonAttributesArray->getObject(i);
+                    std::string keyStr, valueStr;
+                    Core::JsonUtils::GetJsonValueString("key", attributeObject, keyStr);
+                    Core::JsonUtils::GetJsonValueString("value", attributeObject, valueStr);
+                    attributes[keyStr] = valueStr;
+                }
             }
 
             Core::JsonUtils::GetJsonValueDate("created", jsonObject, created);

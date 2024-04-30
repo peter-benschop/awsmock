@@ -24,8 +24,10 @@
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
+#include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/entity/sns/MessageAttribute.h>
+#include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::SNS {
 
@@ -66,7 +68,7 @@ namespace AwsMock::Database::Entity::SNS {
     /**
      * SNS message entity
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Message {
 

@@ -22,7 +22,7 @@ namespace AwsMock::Dto::KMS {
      * Create KMS key request
      *
      * Example:
-     * <pre>
+     * @verbatim
      * {
      *   "BypassPolicyLockoutSafetyCheck": boolean,
      *   "KeySpec": "string",
@@ -41,9 +41,9 @@ namespace AwsMock::Dto::KMS {
      *   ],
      *   "XksKeyId": "string"
      * }
-     * </pre>
+     * @endverbatim
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct CreateKeyRequest {
 

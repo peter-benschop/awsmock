@@ -23,7 +23,7 @@ namespace AwsMock::Dto::DynamoDb {
     /**
      * DynamoDB describe table response
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct DescribeTableResponse {
 

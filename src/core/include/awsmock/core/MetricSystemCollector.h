@@ -36,7 +36,7 @@ namespace AwsMock::Core {
     /**
      * Collect system information like CPU and Memory. Runs as background thread with a given timeout in ms.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class MetricSystemCollector : public Core::Timer {
 

@@ -2,7 +2,7 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include <awsmock/dto/s3/UserIdentity.h>
+#include <awsmock/dto/s3/model/UserIdentity.h>
 
 namespace AwsMock::Dto::S3 {
 

@@ -27,7 +27,7 @@ namespace AwsMock::Dto::Docker {
     /**
      * Prune docker response
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct PruneContainerResponse {
 

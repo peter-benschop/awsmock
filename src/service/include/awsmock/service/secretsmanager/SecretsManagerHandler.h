@@ -23,7 +23,7 @@ namespace AwsMock::Service {
     /**
      * AWS secrets manager mock handler.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class SecretsManagerHandler : public SecretsManagerCmdHandler {
 

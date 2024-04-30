@@ -13,7 +13,7 @@ namespace AwsMock::Dto::KMS {
     /**
      * KMS key usage
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     enum class KeyUsage {
         SIGN_VERIFY,

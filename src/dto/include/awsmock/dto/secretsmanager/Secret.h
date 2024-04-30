@@ -25,152 +25,154 @@
 namespace AwsMock::Dto::SecretsManager {
 
     /**
-   * Secrets list filter
-   *
-   * Example:
-   * <pre>
-   *  {
-   *     "Name": "string",
-   *     "OwningService": "string",
-   *     "ARN": "string",
-   *     "Description": "string",
-   *     "KmsKeyId": "string",
-   *     "PrimaryRegion": "string",
-   *     "CreatedDate": number,
-   *     "DeletedDate": number,
-   *     "LastAccessedDate": number,
-   *     "LastChangedDate": number,
-   *     "LastRotatedDate": number,
-   *     "NextRotationDate": number,
-   *     "RotationEnabled": boolean,
-   *     "RotationLambdaARN": "string",
-   *     "RotationRules": {
-   *        "AutomaticallyAfterDays": number,
-   *        "Duration": "string",
-   *        "ScheduleExpression": "string"
-   *     },
-   *     "SecretVersionsToStages": {
-   *        "string" : [ "string" ]
-   *     },
-   *     "Tags": [
-   *       {
-   *          "Key": "string",
-   *          "Value": "string"
-   *       }
-   *    ]
-   * }
-   * </pre>
-   */
+     * Secrets list filter
+     *
+     * Example:
+     * @verbatim
+     *  {
+     *     "Name": "string",
+     *     "OwningService": "string",
+     *     "ARN": "string",
+     *     "Description": "string",
+     *     "KmsKeyId": "string",
+     *     "PrimaryRegion": "string",
+     *     "CreatedDate": number,
+     *     "DeletedDate": number,
+     *     "LastAccessedDate": number,
+     *     "LastChangedDate": number,
+     *     "LastRotatedDate": number,
+     *     "NextRotationDate": number,
+     *     "RotationEnabled": boolean,
+     *     "RotationLambdaARN": "string",
+     *     "RotationRules": {
+     *        "AutomaticallyAfterDays": number,
+     *        "Duration": "string",
+     *        "ScheduleExpression": "string"
+     *     },
+     *     "SecretVersionsToStages": {
+     *        "string" : [ "string" ]
+     *     },
+     *     "Tags": [
+     *       {
+     *          "Key": "string",
+     *          "Value": "string"
+     *       }
+     *    ]
+     * }
+     * @endverbatim
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct Secret {
 
         /**
-     * AWS ARN
-     */
+         * AWS ARN
+         */
         std::string arn;
 
         /**
-     * Name
-     */
+         * Name
+         */
         std::string name;
 
         /**
-     * Description
-     */
+         * Description
+         */
         std::string description;
 
         /**
-     * KMS key ID
-     */
+         * KMS key ID
+         */
         std::string kmsKeyId;
 
         /**
-     * Secret owner
-     */
+         * Secret owner
+         */
         std::string owningService;
 
         /**
-     * Primary region
-     */
+         * Primary region
+         */
         std::string primaryRegion;
 
         /**
-     * Creation date
-     */
+         * Creation date
+         */
         long createdDate = 0;
 
         /**
-     * Deleted date
-     */
+         * Deleted date
+         */
         long deletedDate = 0;
 
         /**
-     * Last access date
-     */
+         * Last access date
+         */
         long lastAccessedDate = 0;
 
         /**
-     * Last changed date
-     */
+         * Last changed date
+         */
         long lastChangedDate = 0;
 
         /**
-     * Last rotation date
-     */
+         * Last rotation date
+         */
         long lastRotatedDate = 0;
 
         /**
-     * Next rotation date
-     */
+         * Next rotation date
+         */
         long nextRotatedDate = 0;
 
         /**
-     * Next rotation date
-     */
+         * Next rotation date
+         */
         bool rotationEnabled = false;
 
         /**
-     * Rotation lambda ARN
-     */
+         * Rotation lambda ARN
+         */
         std::string rotationLambdaARN;
 
         /**
-     * Rotation rules
-     */
+         * Rotation rules
+         */
         RotationRules rotationRules;
 
         /**
-     * Converts the DTO to a JSON object.
-     *
-     * @return DTO as JSON object.
-     */
+         * Converts the DTO to a JSON object.
+         *
+         * @return DTO as JSON object.
+         */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
-     * Converts the DTO to a JSON representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a JSON representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the JSON object to DTO.
-     *
-     * @param jsonObject JSON object
-     */
+         * Converts the JSON object to DTO.
+         *
+         * @param jsonObject JSON object
+         */
         void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const Secret &f);
     };
 

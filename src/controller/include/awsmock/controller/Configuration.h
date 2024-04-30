@@ -19,11 +19,12 @@ namespace AwsMock::Controller {
     /**
      * AwsMock controller configuration
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class Configuration : public Core::Configuration {
 
       public:
+
         /**
          * Constructor
          */

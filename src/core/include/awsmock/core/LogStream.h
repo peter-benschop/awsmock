@@ -25,7 +25,7 @@ namespace AwsMock::Core {
     /**
      * Logging setup
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class LogStream {
 

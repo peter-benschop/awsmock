@@ -23,7 +23,7 @@ namespace AwsMock::Dto::DynamoDb {
      * Scan response
      *
      * Example:
-     * <pre>
+     * @verbatim
      * {
      *   "ConsumedCapacity":
      *     {
@@ -31,9 +31,9 @@ namespace AwsMock::Dto::DynamoDb {
      *       "CapacityUnits":1.0
      *     }
      * }
-     * </pre>
+     * @endverbatim
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct ScanResponse {
 

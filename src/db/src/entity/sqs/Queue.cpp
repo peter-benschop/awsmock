@@ -23,8 +23,8 @@ namespace AwsMock::Database::Entity::SQS {
                 kvp("queueArn", queueArn),
                 kvp("attributes", attributes.ToDocument()),
                 kvp("tags", tagsDoc),
-                kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-                kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+                kvp("created", MongoUtils::ToBson(created)),
+                kvp("modified", MongoUtils::ToBson(modified)));
 
         return queueDoc;
     }
@@ -40,20 +40,24 @@ namespace AwsMock::Database::Entity::SQS {
             queueUrl = bsoncxx::string::to_string(mResult.value()["queueUrl"].get_string().value);
             queueArn = bsoncxx::string::to_string(mResult.value()["queueArn"].get_string().value);
             attributes.FromDocument(mResult.value()["attributes"].get_document().value);
-            created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-            modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+            created = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["created"].get_date()));
+            modified = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["modified"].get_date()));
 
             // Get tags
             if (mResult.value().find("tags") != mResult.value().end()) {
-                bsoncxx::document::view tagsView = mResult.value()["tags"].get_document().value;
-                for (bsoncxx::document::element tagElement: tagsView) {
-                    std::string key = bsoncxx::string::to_string(tagElement.key());
-                    std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
-                    tags.emplace(key, value);
+                if (mResult.value().find("tags") != mResult.value().end()) {
+                    bsoncxx::document::view tagsView = mResult.value()["tags"].get_document().value;
+                    for (bsoncxx::document::element tagElement: tagsView) {
+                        std::string key = bsoncxx::string::to_string(tagElement.key());
+                        std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
+                        tags.emplace(key, value);
+                    }
                 }
             }
+
         } catch (std::exception &exc) {
             log_error << exc.what();
+            throw Core::DatabaseException(exc.what());
         }
         return *this;
     }
@@ -68,13 +72,15 @@ namespace AwsMock::Database::Entity::SQS {
         jsonObject.set("attributes", attributes.ToJsonObject());
 
         // Tags array
-        Poco::JSON::Array jsonTagArray;
-        for (const auto &tag: tags) {
-            Poco::JSON::Object jsonTagObject;
-            jsonTagObject.set(tag.first, tag.second);
-            jsonTagArray.add(jsonTagObject);
+        if (!tags.empty()) {
+            Poco::JSON::Array jsonTagArray;
+            for (const auto &tag: tags) {
+                Poco::JSON::Object jsonTagObject;
+                jsonTagObject.set(tag.first, tag.second);
+                jsonTagArray.add(jsonTagObject);
+            }
+            jsonObject.set("tags", jsonTagArray);
         }
-        jsonObject.set("tags", jsonTagArray);
 
         return jsonObject;
     }

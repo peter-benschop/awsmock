@@ -14,7 +14,7 @@ namespace AwsMock::Dto::KMS {
     /**
      * KMS key origin
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     enum class Origin {
         AWS_KMS,

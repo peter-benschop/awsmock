@@ -40,7 +40,7 @@ namespace AwsMock::Dto::Common {
     /**
      * Infrastructure
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Infrastructure {
 

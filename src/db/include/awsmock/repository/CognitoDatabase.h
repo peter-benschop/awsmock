@@ -22,7 +22,7 @@ namespace AwsMock::Database {
     /**
      * Cognito MongoDB database.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class CognitoDatabase : public Database {
 

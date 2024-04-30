@@ -44,6 +44,8 @@ namespace AwsMock::Dto::Common {
         COMPLETE_MULTIPART_UPLOAD,
         ABORT_MULTIPART_UPLOAD,
         LIST_OBJECT_VERSIONS,
+        BUCKET_NOTIFICATION,
+        PUT_BUCKET_NOTIFICATION_CONFIGURATION,
         UNKNOWN
     };
 
@@ -63,6 +65,8 @@ namespace AwsMock::Dto::Common {
             {S3CommandType::COMPLETE_MULTIPART_UPLOAD, "CompleteMultipartUpload"},
             {S3CommandType::ABORT_MULTIPART_UPLOAD, "AbortMultipartUpload"},
             {S3CommandType::LIST_OBJECT_VERSIONS, "ListObjectVersions"},
+            {S3CommandType::BUCKET_NOTIFICATION, "BucketNotification"},
+            {S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION, "PUT_BUCKET_NOTIFICATION_CONFIGURATION"},
     };
 
     [[maybe_unused]] static std::string S3CommandTypeToString(S3CommandType commandType) {
@@ -81,7 +85,7 @@ namespace AwsMock::Dto::Common {
     /**
      * The S3 client command is used as a standardized way of interpreting the different ways the clients are calling the REST services. Each client type is using a different way of calling the AWS REST services.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct S3ClientCommand {
 

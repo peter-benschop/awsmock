@@ -23,34 +23,34 @@ namespace AwsMock::Dto::S3 {
     struct MoveObjectResponse {
 
         /**
-     * Etag
-     */
+         * Etag
+         */
         std::string eTag;
 
         /**
-     * Last modified
-     */
+         * Last modified
+         */
         std::string lastModified;
 
         /**
-     * Convert to XML representation
-     *
-     * @return XML string
-     */
+         * Convert to XML representation
+         *
+         * @return XML string
+         */
         std::string ToXml() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const MoveObjectResponse &r);
     };
 

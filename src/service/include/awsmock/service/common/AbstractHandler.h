@@ -41,7 +41,7 @@ namespace AwsMock::Service {
     /**
      * Abstract HTTP request handler
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class AbstractHandler : public Poco::Net::HTTPRequestHandler {
 

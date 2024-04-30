@@ -32,7 +32,7 @@ namespace AwsMock::Service {
     /**
      * Cognito module
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class CognitoServer : public AbstractServer, public AbstractWorker {
 

@@ -26,16 +26,15 @@ namespace AwsMock::Dto::SecretsManager {
      * Return structure for the delete secret request.
      *
      * Example:
-     *
-     * <pre>
+     * @verbatim
      * {
      *   "ARN": "string",
      *   "DeletionDate": number,
      *   "Name": "string"
      * }
-     * </pre>
+     * @endverbatim
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct DeleteSecretResponse {
 

@@ -42,9 +42,9 @@ namespace AwsMock::Database::Entity::Transfer {
                 kvp("concurrency", concurrency),
                 kvp("port", port),
                 kvp("listenAddress", listenAddress),
-                kvp("lastStarted", bsoncxx::types::b_date(std::chrono::milliseconds(lastStarted.timestamp().epochMicroseconds() / 1000))),
-                kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-                kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+                kvp("lastStarted", MongoUtils::ToBson(lastStarted)),
+                kvp("created", MongoUtils::ToBson(created)),
+                kvp("modified", MongoUtils::ToBson(modified)));
 
         return transferDoc;
     }
@@ -59,22 +59,28 @@ namespace AwsMock::Database::Entity::Transfer {
         concurrency = mResult.value()["concurrency"].get_int32().value;
         port = mResult.value()["port"].get_int32().value;
         listenAddress = bsoncxx::string::to_string(mResult.value()["listenAddress"].get_string().value);
-        lastStarted = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date().value) / 1000));
-        created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-        modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+        lastStarted = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date()));
+        created = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["created"].get_date()));
+        modified = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["modified"].get_date()));
 
-        auto protocolsDoc = mResult.value()["protocols"].get_array();
-        for (auto &p: protocolsDoc.value) {
-            protocols.emplace_back(bsoncxx::string::to_string(p.get_string().value));
+        // Protocols
+        if (mResult.value().find("protocols") != mResult.value().end()) {
+            auto protocolsDoc = mResult.value()["protocols"].get_array();
+            for (auto &p: protocolsDoc.value) {
+                protocols.emplace_back(bsoncxx::string::to_string(p.get_string().value));
+            }
         }
 
-        bsoncxx::array::view usersView{mResult.value()["users"].get_array().value};
-        for (const bsoncxx::array::element &userElement: usersView) {
-            User user{
-                    .userName = bsoncxx::string::to_string(userElement["userName"].get_string().value),
-                    .password = bsoncxx::string::to_string(userElement["password"].get_string().value),
-                    .homeDirectory = bsoncxx::string::to_string(userElement["homeDirectory"].get_string().value)};
-            users.push_back(user);
+        // Users
+        if (mResult.value().find("users") != mResult.value().end()) {
+            bsoncxx::array::view usersView{mResult.value()["users"].get_array().value};
+            for (const bsoncxx::array::element &userElement: usersView) {
+                User user{
+                        .userName = bsoncxx::string::to_string(userElement["userName"].get_string().value),
+                        .password = bsoncxx::string::to_string(userElement["password"].get_string().value),
+                        .homeDirectory = bsoncxx::string::to_string(userElement["homeDirectory"].get_string().value)};
+                users.push_back(user);
+            }
         }
     }
 
@@ -90,11 +96,21 @@ namespace AwsMock::Database::Entity::Transfer {
         jsonObject.set("listenAddress", listenAddress);
         jsonObject.set("lastStarted", Poco::DateTimeFormatter::format(lastStarted, Poco::DateTimeFormat::ISO8601_FORMAT));
 
-        Poco::JSON::Array jsonProtocolsArray;
-        for (const auto &protocol: protocols) {
-            jsonProtocolsArray.add(protocol);
+        if (!protocols.empty()) {
+            Poco::JSON::Array jsonProtocolsArray;
+            for (const auto &protocol: protocols) {
+                jsonProtocolsArray.add(protocol);
+            }
+            jsonObject.set("protocols", jsonProtocolsArray);
         }
-        jsonObject.set("protocols", jsonProtocolsArray);
+
+        if (!users.empty()) {
+            Poco::JSON::Array jsonUsersArray;
+            for (const auto &user: users) {
+                jsonUsersArray.add(user.ToJsonObject());
+            }
+            jsonObject.set("users", jsonUsersArray);
+        }
 
         return jsonObject;
     }

@@ -13,7 +13,7 @@ namespace AwsMock::Core {
     /**
      * Resource not found exception class.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class ResourceNotFoundException : public Poco::Exception {
 

@@ -54,7 +54,7 @@ namespace AwsMock::Service {
     /**
      * SQS service
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class SQSService {
 

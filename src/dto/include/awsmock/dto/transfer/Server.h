@@ -19,71 +19,71 @@ namespace AwsMock::Dto::Transfer {
     struct Server {
 
         /**
-     * ARN
-     */
+         * ARN
+         */
         std::string arn;
 
         /**
-     * Domain
-     */
+         * Domain
+         */
         std::string domain;
 
         /**
-     * Identity provider type
-     */
+         * Identity provider type
+         */
         std::string identityProviderType;
 
         /**
-     * Endpoint type
-     */
+         * Endpoint type
+         */
         std::string endpointType;
 
         /**
-     * Logging role
-     */
+         * Logging role
+         */
         std::string loggingRole;
 
         /**
-     * Server ID
-     */
+         * Server ID
+         */
         std::string serverId;
 
         /**
-     * State
-     */
+         * State
+         */
         std::string state;
 
         /**
-     * User count
-     */
+         * User count
+         */
         int userCount;
 
         /**
-     * Converts the DTO to a JSON representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a JSON representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
-     * Converts the DTO to a JSON representation.
-     *
-     * @return DTO as JSON string
-     */
+         * Converts the DTO to a JSON representation.
+         *
+         * @return DTO as JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const Server &r);
     };
 

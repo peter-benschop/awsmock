@@ -17,10 +17,12 @@
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
+#include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/entity/sqs/QueueAttribute.h>
+#include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::SQS {
 
@@ -34,7 +36,7 @@ namespace AwsMock::Database::Entity::SQS {
     /**
      * SQS queue entity
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Queue {
 

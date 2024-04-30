@@ -19,7 +19,7 @@ namespace AwsMock::Core {
     /**
      * Task class
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class Task {
 

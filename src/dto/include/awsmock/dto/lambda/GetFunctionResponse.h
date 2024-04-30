@@ -24,7 +24,7 @@ namespace AwsMock::Dto::Lambda {
    * Get function response
    *
    * Example:
-   * <pre>
+   * @verbatim
    * {
    *   "Code": {
    *      "ImageUri": "string",
@@ -132,7 +132,7 @@ namespace AwsMock::Dto::Lambda {
    *      "string" : "string"
    *   }
    *}
-   * </pre>
+   * @endverbatim
    */
     struct GetFunctionResponse {
 

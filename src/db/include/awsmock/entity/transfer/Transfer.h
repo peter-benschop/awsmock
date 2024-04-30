@@ -26,8 +26,9 @@
 #include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/stdx.hpp>
 
-// AwsMOck includes
+// AwsMock includes
 #include <awsmock/entity/transfer/User.h>
+#include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::Transfer {
 
@@ -71,7 +72,7 @@ namespace AwsMock::Database::Entity::Transfer {
     /**
      * Transfer manager server entity
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Transfer {
 

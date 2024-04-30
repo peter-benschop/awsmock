@@ -8,7 +8,7 @@
 
 namespace AwsMock::FtpServer {
 
-    FtpServerImpl::FtpServerImpl(std::string serverName, std::string address, uint16_t port, const Core::Configuration &configuration)
+    FtpServerImpl::FtpServerImpl(std::string serverName, std::string address, uint16_t port, Core::Configuration &configuration)
         : _serverName(std::move(serverName)), _port(port), _address(std::move(address)), _acceptor(_ioService), _openConnectionCount(0), _configuration(configuration) {}
 
     FtpServerImpl::~FtpServerImpl() {

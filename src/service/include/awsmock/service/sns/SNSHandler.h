@@ -2,8 +2,8 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_SNSHANDLER_H
-#define AWSMOCK_SERVICE_SNSHANDLER_H
+#ifndef AWSMOCK_SERVER_LAMBDA_SERVER_H
+#define AWSMOCK_SERVER_LAMBDA_SERVER_H
 
 // Poco includes
 #include <Poco/DateTime.h>
@@ -26,7 +26,7 @@ namespace AwsMock::Service {
     /**
      * AWS SNS mock handler
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class SNSHandler : public SNSCmdHandler {
 
@@ -70,4 +70,4 @@ namespace AwsMock::Service {
 
 }// namespace AwsMock::Service
 
-#endif// AWSMOCK_SERVICE_SNSHANDLER_H
+#endif// AWSMOCK_SERVER_LAMBDA_SERVER_H

@@ -26,10 +26,10 @@ namespace AwsMock::Dto::S3 {
     struct RestErrorResponse {
 
         /**
-     * Constructor.
-     *
-     * @param exc module exception
-     */
+         * Constructor.
+         *
+         * @param exc module exception
+         */
         explicit RestErrorResponse(const Core::ServiceException &exc) {
             message = exc.message();
             code = exc.code();
@@ -42,32 +42,32 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-     * Error code
-     */
+         * Error code
+         */
         int code = 0;
 
         /**
-     * Error message
-     */
+         * Error message
+         */
         std::string message;
 
         /**
-     * Resource.
-     *
-     * <p>The bucket or object that is involved in the error.</p>
-     */
+         * Resource.
+         *
+         * <p>The bucket or object that is involved in the error.</p>
+         */
         std::string resource;
 
         /**
-     * Request ID
-     */
+         * Request ID
+         */
         std::string requestId;
 
         /**
-     * Converts the DTO to a XML string representation.
-     *
-     * @return DTO as XML string.
-     */
+         * Converts the DTO to a XML string representation.
+         *
+         * @return DTO as XML string.
+         */
         [[nodiscard]] std::string ToXml() const {
             Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
 
@@ -113,10 +113,10 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const {
             std::stringstream ss;
             ss << (*this);
@@ -124,10 +124,10 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const RestErrorResponse &r) {
             os << "RestErrorResponse={code='" + std::to_string(r.code) + "' message='" + r.message + "' resource='" + r.resource + "' requestId='" + r.requestId + "'}";
             return os;

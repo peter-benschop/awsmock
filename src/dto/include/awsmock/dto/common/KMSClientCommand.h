@@ -58,7 +58,7 @@ namespace AwsMock::Dto::Common {
      * calling the AWS REST services.
      * </p>
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct KMSClientCommand {
 

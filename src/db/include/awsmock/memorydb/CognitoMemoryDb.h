@@ -31,11 +31,12 @@ namespace AwsMock::Database {
      *
      * <p>Provides a in-memory database using a simple hash map.</p>
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class CognitoMemoryDb {
 
       public:
+
         /**
          * Constructor
          */
@@ -215,6 +216,7 @@ namespace AwsMock::Database {
         void DeleteAllUsers();
 
       private:
+
         /**
          * Cognito user pool map
          */

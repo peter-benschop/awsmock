@@ -19,7 +19,7 @@ namespace AwsMock::Dto::Docker {
     /**
      * Docker filter
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Filter {
 
@@ -37,7 +37,7 @@ namespace AwsMock::Dto::Docker {
     /**
      * Docker filter list
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Filters {
 

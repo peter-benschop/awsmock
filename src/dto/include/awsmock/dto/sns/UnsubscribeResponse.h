@@ -27,29 +27,29 @@ namespace AwsMock::Dto::SNS {
     struct UnsubscribeResponse {
 
         /**
-     * Subscription ARN
-     */
+         * Subscription ARN
+         */
         std::string subscriptionArn;
 
         /**
-     * Convert to XML representation
-     *
-     * @return XML string
-     */
+         * Convert to XML representation
+         *
+         * @return XML string
+         */
         [[nodiscard]] std::string ToXml();
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const UnsubscribeResponse &r);
     };
 

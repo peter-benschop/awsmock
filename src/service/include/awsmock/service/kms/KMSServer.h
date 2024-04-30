@@ -25,7 +25,7 @@
 #define KMS_DEFAULT_QUEUE_LENGTH 250
 #define KMS_DEFAULT_THREADS 50
 #define KMS_DEFAULT_TIMEOUT 120
-#define KMS_DEFAULT_WORKER_PERIOD 300
+#define KMS_DEFAULT_WORKER_PERIOD 3600
 #define KMS_DEFAULT_MONITORING_PERIOD 300
 
 namespace AwsMock::Service {
@@ -33,7 +33,7 @@ namespace AwsMock::Service {
     /**
      * KMS server thread
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class KMSServer : public AbstractServer {
 

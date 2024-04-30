@@ -22,7 +22,7 @@ namespace AwsMock::Dto::DynamoDb {
     /**
      * DynamoDB create table request
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct CreateTableRequest {
 

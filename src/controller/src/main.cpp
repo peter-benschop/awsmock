@@ -68,8 +68,9 @@ namespace AwsMock::Controller {
         [[maybe_unused]] void defineOptions(Poco::Util::OptionSet &options) override {
 
             Poco::Util::Application::defineOptions(options);
+            options.addOption(Poco::Util::Option("includeObjects", "", "include objects in export").required(false).repeatable(false).callback(Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
+            options.addOption(Poco::Util::Option("pretty", "", "set the export pretty print flag").required(false).repeatable(false).callback(Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
             options.addOption(Poco::Util::Option("config", "", "set the configuration file").required(false).repeatable(false).argument("file").callback(Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
-            options.addOption(Poco::Util::Option("pretty", "", "set the export pretty print flag").required(false).repeatable(false).argument("pretty").callback(Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
             options.addOption(Poco::Util::Option("version", "", "display version information").required(false).repeatable(false).callback(Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
             options.addOption(Poco::Util::Option("help", "", "display help information").required(false).repeatable(false).callback(Poco::Util::OptionCallback<AwsMockCtl>(this, &AwsMockCtl::handleOption)));
         }
@@ -93,7 +94,7 @@ namespace AwsMock::Controller {
             } else if (name == "version") {
 
                 std::cout << "awsmockctl"
-                          << " " << Configuration::GetVersion();
+                          << " " << Configuration::GetVersion() << std::endl;
                 exit(0);
 
             } else if (name == "level") {
@@ -103,11 +104,16 @@ namespace AwsMock::Controller {
 
             } else if (name == "pretty") {
 
-                _configuration.setBool("awsmock.pretty", value == "true");
+                _pretty = true;
+
+            } else if (name == "includeObjects") {
+
+                _includeObjects = true;
             }
         }
 
         void usage() {
+            int leftIndent = 36;
             std::cout << std::endl;
             Poco::Util::HelpFormatter helpFormatter(options());
             helpFormatter.setHeader("\nAwsMock - AWS simulation written in C++ " + Configuration::GetVersion() + "\n\nOptions:");
@@ -116,21 +122,36 @@ namespace AwsMock::Controller {
             helpFormatter.format(std::cout);
             std::cout << "\nCommands:\n"
                       << std::endl;
-            std::cout << "list\t\t\t: lists all available services" << std::endl;
-            std::cout << "start [<module>]\t: starts the given module. If no argument is given, starts all services." << std::endl;
-            std::cout << "stop [<module>]\t\t: stops the given module. If no argument is given, stops all services" << std::endl;
-            std::cout << "restart [<module>]\t: restarts the given module. If no argument is given, restarts all services" << std::endl;
+            std::cout << std::left << std::setw(leftIndent) << "list"
+                      << ": lists all available services" << std::endl;
+            std::cout << std::left << std::setw(leftIndent) << "start [<module>]"
+                      << ": starts the given module. If no argument is given, starts all services." << std::endl;
+            std::cout << std::left << std::setw(leftIndent) << "stop [<module>]"
+                      << ": stops the given module. If no argument is given, stops all services" << std::endl;
+            std::cout << std::left << std::setw(leftIndent) << "restart [<module>]"
+                      << ": restarts the given module. If no argument is given, restarts all services" << std::endl;
 #ifdef HAS_SYSTEMD
-            std::cout << "logs\t\t\t: shows the manager logs" << std::endl;
+            std::cout << std::left << std::setw(leftIndent) << "logs"
+                      << ": shows the manager logs" << std::endl;
 #endif
-            std::cout << "loglevel <level>\t: sets the manager log to level" << std::endl;
-            std::cout << "config\t\t\t: shows the gateway configuration" << std::endl;
-            std::cout << "export [modules]\t: dumps the current infrastructure to stdout. Modules is a space separated list of module names." << std::endl;
-            std::cout << "import\t\t\t: imports the infrastructure from stdin." << std::endl;
-            std::cout << "clean [modules]\t\t: cleans the current infrastructure. Modules is a space separated list of module names." << std::endl;
+            std::cout << std::left << std::setw(leftIndent) << "loglevel <level>"
+                      << ": sets the manager log to level" << std::endl;
+            std::cout << std::left << std::setw(leftIndent) << "config"
+                      << ": shows the gateway configuration" << std::endl;
+            std::cout << std::left << std::setw(leftIndent) << "export [<modules>] [export-options]"
+                      << ": dumps the current infrastructure to stdout. Modules is a space separated list of module names." << std::endl;
+            std::cout << std::left << std::setw(leftIndent) << "import"
+                      << ": imports the infrastructure from stdin." << std::endl;
+            std::cout << std::left << std::setw(leftIndent) << "clean [modules]"
+                      << ": cleans the current infrastructure. Modules is a space separated list of module names." << std::endl;
             std::cout << "\nModules:\n"
                       << std::endl;
             std::cout << "Valid modules are: all, s3, sqs, sns, lambda, transfer, cognito, dynamodb." << std::endl;
+            std::cout << "\nExport options:\n";
+            std::cout << std::left << std::setw(leftIndent) << "--includeObjects"
+                      << ": export objects as well" << std::endl;
+            std::cout << std::left << std::setw(leftIndent) << "--pretty"
+                      << ": indent output" << std::endl;
             stopOptionsProcessing();
             exit(0);
         }
@@ -173,12 +194,11 @@ namespace AwsMock::Controller {
 
             } else if (name == "export") {
 
-                bool pretty = _configuration.getBool("awsmock.pretty");
                 std::vector<std::string> services = {args.begin() + 1, args.end()};
                 if (services.empty()) {
                     services.emplace_back("all");
                 }
-                _controller.ExportInfrastructure(services, pretty);
+                _controller.ExportInfrastructure(services, _pretty, _includeObjects);
 
             } else if (name == "import") {
 
@@ -222,6 +242,16 @@ namespace AwsMock::Controller {
          * Controller
          */
         Controller _controller = Controller(_configuration);
+
+        /**
+         * Include objects
+         */
+        bool _includeObjects = false;
+
+        /**
+         * Pretty print vor JSON objects
+         */
+        bool _pretty = false;
     };
 
 }// namespace AwsMock::Controller

@@ -29,7 +29,7 @@ namespace AwsMock::Dto::KMS {
      * KMS metadata
      *
      * Example:
-     * <pre>
+     * @verbatim
      *   "Arn": "string",
      *   "AWSAccountId": "string",
      *   "CloudHsmClusterId": "string",
@@ -69,9 +69,9 @@ namespace AwsMock::Dto::KMS {
      *     "Id": "string"
      *   }
      * }
-     * </pre>
+     * @endverbatim
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Key {
 
@@ -113,12 +113,12 @@ namespace AwsMock::Dto::KMS {
         /**
          * Creation date
          */
-        long creationDate;
+        long creationDate = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 
         /**
          * Deletion date
          */
-        long deletionDate;
+        long deletionDate = 0;
 
         /**
          * Enabled flag

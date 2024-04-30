@@ -218,7 +218,7 @@ namespace AwsMock::Service {
 
                 // Preparation
                 std::string rawPlaintext = Core::Crypto::Base64Decode(plainText);
-                EVP_PKEY *publicKey = ReadRsaPublicKey(key.rsaPublicKey);
+                EVP_PKEY *publicKey = Core::Crypto::ReadRsaPublicKey(key.rsaPublicKey);
 
                 // Encryption
                 std::string cipherText = Core::Crypto::RsaEncrypt(publicKey, rawPlaintext);
@@ -269,7 +269,7 @@ namespace AwsMock::Service {
 
                 // Preparation
                 std::string rawCiphertext = Core::Crypto::Base64Decode(ciphertext);
-                EVP_PKEY *privateKey = ReadRsaPrivateKey(key.rsaPrivateKey);
+                EVP_PKEY *privateKey = Core::Crypto::ReadRsaPrivateKey(key.rsaPrivateKey);
 
                 // Description
                 std::string plainText = Core::Crypto::RsaDecrypt(privateKey, rawCiphertext);
@@ -297,26 +297,4 @@ namespace AwsMock::Service {
         return {};
     }
 
-    EVP_PKEY *KMSService::ReadRsaPrivateKey(const std::string &inKey) {
-
-        BIO *bo = BIO_new(BIO_s_mem());
-        BIO_write(bo, inKey.c_str(), static_cast<int>(inKey.length()));
-
-        EVP_PKEY *pKey = nullptr;
-        PEM_read_bio_PrivateKey(bo, &pKey, nullptr, nullptr);
-
-        BIO_free(bo);
-        return pKey;
-    }
-
-    EVP_PKEY *KMSService::ReadRsaPublicKey(const std::string &publicKey) {
-
-        EVP_PKEY *pKey = nullptr;
-        BIO *bo2 = BIO_new(BIO_s_mem());
-        BIO_write(bo2, publicKey.c_str(), static_cast<int>(publicKey.length()));
-        PEM_read_bio_PUBKEY(bo2, &pKey, nullptr, nullptr);
-        BIO_free(bo2);
-
-        return pKey;
-    }
 }// namespace AwsMock::Service

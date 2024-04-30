@@ -34,7 +34,7 @@ namespace AwsMock::Database::Entity::Transfer {
     /**
      * Transfer manager user entity
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct User {
 
@@ -66,6 +66,13 @@ namespace AwsMock::Database::Entity::Transfer {
          * @param mResult MongoDB document.
          */
         [[maybe_unused]] void FromDocument(bsoncxx::document::view mResult);
+
+        /**
+         * Converts the MongoDB user to an JSON object
+         *
+         * @return JSON object
+         */
+        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
          * Converts the DTO to a string representation.

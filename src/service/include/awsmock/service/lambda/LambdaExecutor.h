@@ -2,8 +2,8 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_LAMBDAEXECUTOR_H
-#define AWSMOCK_SERVICE_LAMBDAEXECUTOR_H
+#ifndef AWSMOCK_SERVICE_LAMBDA_EXECUTOR_H
+#define AWSMOCK_SERVICE_LAMBDA_EXECUTOR_H
 
 // Poco includes
 #include <Poco/Logger.h>
@@ -31,7 +31,7 @@ namespace AwsMock::Service {
      * finishing of the last invocation request. The lambda image can run on a remote docker instance. In this case the hostname on the invocation request has to be filled in. Default is 'localhost'.
      * </p>
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class LambdaExecutor {
 
@@ -60,4 +60,4 @@ namespace AwsMock::Service {
 
 }// namespace AwsMock::Service
 
-#endif// AWSMOCK_SERVICE_LAMBDAEXECUTOR_H
+#endif// AWSMOCK_SERVICE_LAMBDA_EXECUTOR_H

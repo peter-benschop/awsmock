@@ -2,7 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include <awsmock/dto/s3/Owner.h>
+#include <awsmock/dto/s3/model/Owner.h>
 
 namespace AwsMock::Dto::S3 {
 

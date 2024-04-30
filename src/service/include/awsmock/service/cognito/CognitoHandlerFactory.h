@@ -19,7 +19,7 @@ namespace AwsMock::Service {
     /**
      * Cognito request handler factory
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class CognitoHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 

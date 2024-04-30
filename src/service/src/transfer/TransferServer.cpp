@@ -10,11 +10,11 @@ namespace AwsMock::Service {
                                                                          _module("transfer") {
 
         // REST manager configuration
-        _port = _configuration.getInt("awsmock.service.transfer.port", TRANSFER_DEFAULT_PORT);
-        _host = _configuration.getString("awsmock.service.transfer.host", TRANSFER_DEFAULT_HOST);
-        _maxQueueLength = _configuration.getInt("awsmock.service.transfer.max.queue", TRANSFER_DEFAULT_QUEUE_LENGTH);
-        _maxThreads = _configuration.getInt("awsmock.service.transfer.max.threads", TRANSFER_DEFAULT_THREADS);
-        _requestTimeout = _configuration.getInt("awsmock.service.transfer.timeout", TRANSFER_DEFAULT_TIMEOUT);
+        _port = _configuration.getInt("awsmock.service.transfer.http.port", TRANSFER_DEFAULT_PORT);
+        _host = _configuration.getString("awsmock.service.transfer.http.host", TRANSFER_DEFAULT_HOST);
+        _maxQueueLength = _configuration.getInt("awsmock.service.transfer.http.max.queue", TRANSFER_DEFAULT_QUEUE_LENGTH);
+        _maxThreads = _configuration.getInt("awsmock.service.transfer.http.max.threads", TRANSFER_DEFAULT_THREADS);
+        _requestTimeout = _configuration.getInt("awsmock.service.transfer.http.timeout", TRANSFER_DEFAULT_TIMEOUT);
         _monitoringPeriod = _configuration.getInt("awsmock.service.transfer.monitoring.period", TRANSFER_DEFAULT_MONITORING_PERIOD);
 
         // Create environment

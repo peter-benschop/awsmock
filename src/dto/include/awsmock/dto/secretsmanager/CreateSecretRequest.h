@@ -24,93 +24,95 @@
 namespace AwsMock::Dto::SecretsManager {
 
     /**
-   * Example:
-   *
-   * <pre>
-   * {
-   *   "Name": "test",
-   *   "ClientRequestToken": "8b0e8777-4c9a-4621-9bd7-a6449b24c3a5"
-   * }
-   * </pre>
-   */
+     * Example:
+     *
+     * @verbatim
+     * {
+     *   "Name": "test",
+     *   "ClientRequestToken": "8b0e8777-4c9a-4621-9bd7-a6449b24c3a5"
+     * }
+     * @endverbatim
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct CreateSecretRequest {
 
         /**
-     * AWS region
-     */
+         * AWS region
+         */
         std::string region;
 
         /**
-     * Secret name
-     */
+         * Secret name
+         */
         std::string name;
 
         /**
-     * Client request token
-     */
+         * Client request token
+         */
         std::string clientRequestToken;
 
         /**
-     * Description
-     */
+         * Description
+         */
         std::string description;
 
         /**
-     * Secret string
-     */
+         * Secret string
+         */
         std::string secretString;
 
         /**
-     * Base64 encoded secret binary data
-     */
+         * Base64 encoded secret binary data
+         */
         std::string secretBinary;
 
         /**
-     * Force overwrite flag
-     */
+         * Force overwrite flag
+         */
         bool forceOverwriteReplicaSecret;
 
         /**
-     * Force overwrite flag
-     */
+         * KMS key ID
+         */
         std::string kmsKeyId;
 
         /**
-     * Tags
-     */
+         * Tags
+         */
         SecretTags tags;
 
         /**
-     * AWS request ID
-     */
+         * AWS request ID
+         */
         std::string requestId;
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the JSON string to DTO.
-     *
-     * @param jsonString JSON string
-     */
+         * Converts the JSON string to DTO.
+         *
+         * @param jsonString JSON string
+         */
         void FromJson(const std::string &jsonString);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const CreateSecretRequest &r);
     };
 

@@ -21,14 +21,14 @@ namespace AwsMock::Dto::KMS {
      * Create KMS key request
      *
      * Example:
-     * <pre>
+     * @verbatim
      * {
      *   "GrantTokens": [ "string" ],
      *   "KeyId": "string"
      * }
-     * </pre>
+     * @endverbatim
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct DescribeKeyResponse {
 

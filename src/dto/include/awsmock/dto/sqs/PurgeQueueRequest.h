@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_PURGEQUEUEREQUEST_H
-#define AWSMOCK_DTO_SQS_PURGEQUEUEREQUEST_H
+#ifndef AWSMOCK_DTO_SQS_PURGE_QUEUE_REQUEST_H
+#define AWSMOCK_DTO_SQS_PURGE_QUEUE_REQUEST_H
 
 // C++ standard includes
 #include <sstream>
@@ -32,47 +32,47 @@ namespace AwsMock::Dto::SQS {
     struct PurgeQueueRequest {
 
         /**
-     * AWS region
-     */
+         * AWS region
+         */
         std::string region;
 
         /**
-     * Queue URL
-     */
+         * Queue URL
+         */
         std::string queueUrl;
 
         /**
-     * Resource
-     */
+         * Resource
+         */
         std::string resource = "Unknown resource";
 
         /**
-     * Resource
-     */
+         * Resource
+         */
         std::string requestId = Poco::UUIDGenerator().createRandom().toString();
 
         /**
-     * Converts the JSON string to a DTO
-     *
-     * @param jsonString JSON string
-     */
+         * Converts the JSON string to a DTO
+         *
+         * @param jsonString JSON string
+         */
         void FromJson(const std::string &jsonString);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const PurgeQueueRequest &r);
     };
 
 }// namespace AwsMock::Dto::SQS
 
-#endif// AWSMOCK_DTO_SQS_PURGEQUEUEREQUEST_H
+#endif// AWSMOCK_DTO_SQS_PURGE_QUEUE_REQUEST_H

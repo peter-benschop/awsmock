@@ -20,7 +20,7 @@ namespace AwsMock::Core {
     /**
      * JSON utilities.
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class JsonUtils {
 
@@ -105,7 +105,7 @@ namespace AwsMock::Core {
          * </p>
          *
          * Example map<std::string, std::string>:
-         * <pre>
+         * @verbatim
          * {
          *  "map.first": "map.second"
          * }
@@ -125,6 +125,16 @@ namespace AwsMock::Core {
          * @return JSON string
          */
         static std::string ToJsonString(const Poco::JSON::Object &jsonObject, bool prettyPrint = false, int indent = JSON_DEFAULT_INDENT);
+
+        /**
+         * Returns the JSON string for the array.
+         *
+         * @param jsonArray JSON array
+         * @param prettyPrint use indentation
+         * @param indent indentation size
+         * @return JSON string
+         */
+        static std::string ToJsonString(const Poco::JSON::Array &jsonArray, bool prettyPrint = false, int indent = JSON_DEFAULT_INDENT);
     };
 
 }// namespace AwsMock::Core

@@ -1,36 +1,44 @@
 ---
 title: awsmockcfg(1)
 section: 1
+version: 1.0.1
+builddate: 1.0.1
+date: $builddate$
 header: awsmockcfg AwsMock configuration
-footer: awsmockcfg 0.5.210
-date: December 18, 2023
+footer: awsmockcfg $version$
 ---
 
 ## NAME
+
 ```awsmockcfg``` AwsMock configuration
 
 ## DESCRIPTION
 
-AwsMock can be configured in several ways. First of all is the default configuration file: ```/etc/aws-mock.properties```.
-It define the main configuration for all AwsMock modules. The default configuration file can be changed using the 
+AwsMock can be configured in several ways. First of all is the default configuration
+file: ```/etc/aws-mock.properties```.
+It define the main configuration for all AwsMock modules. The default configuration file can be changed using the
 ```--config``` options of the ```awsmockmgr```.
 
-Each of the values can be overwritten by environment variables, whereas the environment variable has the same name 
+Each of the values can be overwritten by environment variables, whereas the environment variable has the same name
 written in capital letters and the dots replaced by underscores:
+
 ```
 awsmock.log.level=debug
 ```
+
 becomes:
+
 ```
 AWSMOCK_LOG_LEVEL=debug
 ```
 
 ## VARIABLES
 
-The following lists shows all variables in the properties file, the corresponding environment variable and the meaning 
+The following lists shows all variables in the properties file, the corresponding environment variable and the meaning
 of the variable.
 
 ### General variables
+
 ```
 awsmock.region                          AWSMOCK_REGION                      AWS region
 awsmock.account.userPoolId                      AMWSMOCK_ACCOUNT_ID                 AWS account ID, default 000000000000
@@ -41,6 +49,7 @@ awsmock.pretty                          AWSMOCK_PRETTY                      Pret
 ```
 
 ### AwsMock manager variables
+
 ```
 awsmock.manager.host                    AWSMOCK_MANAGER_HOST                manager host, default localhost
 awsmock.manager.port                    AWSMOCK_MANAGER_PORT                manager port, default 4567
@@ -49,6 +58,7 @@ awsmock.manager.max.threads             AWSMOCK_MANAGER_MAX_THREADS         mana
 ```
 
 ### AwsMock gateway variables
+
 ```
 awsmock.service.gateway.active          AWSMOCK_SERVICE_GATEWAY_ACTIVE      activation flag
 awsmock.gateway.host                    AWSMOCK_SERVICE_GATEWAY_HOST        gateway host, default localhost
@@ -59,6 +69,7 @@ awsmock.gateway.timeout                 AWSMOCK_SERVICE_GATEWAY_TIMEOUT     gate
 ```
 
 ### S3 module variables
+
 ```
 awsmock.service.s3.active               AWSMOCK_SERVICE_S3_ACTIVE           activation flag
 awsmock.service.s3.host                 AWSMOCK_SERVICE_S3_HOST             S3 host, default: localhost
@@ -70,6 +81,7 @@ awsmock.monitoring.s3.periodq           AWSMOCK_SERVICE_S3_PERIOS           S3 m
 ```
 
 ### SQS module variables
+
 ```
 awsmock.service.sqs.active              AWSMOCK_SERVICE_SQS_ACTIVE          activation flag
 awsmock.service.sqs.host                AWSMOCK_SERVICE_SQS_HOST            SQS host, default: localhost
@@ -81,6 +93,7 @@ awsmock.monitoring.sqs.period           AWSMOCK_SERVICE_SQS_PERIOD          SQS 
 ```
 
 ### SNS module variables
+
 ```
 awsmock.service.sns.active              AWSMOCK_SERVICE_SNS_ACTIVE          activation flag
 awsmock.service.sns.host                AWSMOCK_SERVICE_SNS_HOST            SNS host, default: localhost
@@ -91,7 +104,8 @@ awsmock.service.sns.timeout             AWSMOCK_SERVICE_SNS_TIMEOUT         SNS 
 awsmock.monitoring.sns.period           AWSMOCK_SERVICE_SNS_PERIOD          SNS monitoring timeout period in milliseconds, default: 60sec.
 ```
 
-### Lambda module variables  
+### Lambda module variables
+
 ```
 awsmock.service.lambda.active           AWSMOCK_SERVICE_LAMBDA_ACTIVE        activation flag
 awsmock.service.lambda.host             AWSMOCK_SERVICE_LAMBDA_HOST          Lambda host, default: localhost
@@ -103,6 +117,7 @@ awsmock.monitoring.lambda.period        AWSMOCK_SERVICE_LAMBDA_PERIOD        Lam
 ```
 
 ### Transfer server module variables
+
 ```
 awsmock.service.transfer.active         AWSMOCK_SERVICE_TRANSFER_ACTIVE         module activation
 awsmock.service.transfer.host           AWSMOCK_SERVICE_TRANSFER_HOST           hostname of the FTP server
@@ -116,6 +131,7 @@ awsmock.worker.transfer.bucket          AWSMOCK_SERVICE_TRANSFER_BUCKET         
 ```
 
 ### Cognito module variables
+
 ```
 awsmock.service.cognito.active          AWSMOCK_SERVICE_COGNITO_ACTIVE          activation flag
 awsmock.service.cognito.host            AWSMOCK_SERVICE_COGNITO_HOST            Cognito host, default: localhost
@@ -127,6 +143,7 @@ awsmock.monitoring.cognito.period       AWSMOCK_SERVICE_COGNITO_PERIOD          
 ```
 
 ### DynamoDB mofule variables
+
 ```
 awsmock.service.dynamodb.active          AWSMOCK_SERVICE_DYNAMODB_ACTIVE          activation flag
 awsmock.service.dynamodb.host            AWSMOCK_SERVICE_DYNAMODB_HOST            DynamoDB host, default: localhost
@@ -140,11 +157,13 @@ awsmock.monitoring.dynamodb.period       AWSMOCK_SERVICE_DYNAMODB_PERIOD        
 ## EXAMPLES
 
 To switch of the database support:
+
 ```
 export AWSMOCK_MONGODB_ACTIVE=false
 /usr/bin/awsmockmgr --config ./awsmock-properties
 ```
-this will take the value from the given properties file, but the log level will be overwritten by the environment 
+
+this will take the value from the given properties file, but the log level will be overwritten by the environment
 variable. Finally, the log level will be set to ```debug```.
 
 ## AUTHOR
@@ -152,7 +171,8 @@ variable. Finally, the log level will be set to ```debug```.
 Jens Vogt <jens.vogt@opitz-consulting.com>
 
 ## VERSION
-0.5.210
+
+$version$ ($builddate$)
 
 ## BUGS
 
@@ -161,5 +181,5 @@ Bugs and enhancement requests can be reported and filed at https://github.com/je
 ## SEE ALSO
 
 ```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocks3(1)```, ```awsmocksqs(1)```, ```awsmocksns(1)```,
-```awsmocklambda(1)```, ```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```, 
-```awsmocksecretsmanager(1)```
+```awsmocklambda(1)```, ```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```,
+```awsmocksecretsmanager(1)```, ```awsmocksqs(1)```

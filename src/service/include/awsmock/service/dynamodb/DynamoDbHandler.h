@@ -30,7 +30,7 @@ namespace AwsMock::Service {
      *
      * <p>AWS DynamoDB HTTP request handler. All DynamoDB related REST call are ending here.<p>
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class DynamoDbHandler : public DynamoDbCmdHandler {
 

@@ -25,64 +25,64 @@ namespace AwsMock::Dto::SQS {
     struct SendMessageRequest {
 
         /**
-     * AWS region
-     */
+         * AWS region
+         */
         std::string region;
 
         /**
-     * Queue URL
-     */
+         * Queue URL
+         */
         std::string queueUrl;
 
         /**
-     * Queue ARN
-     */
+         * Queue ARN
+         */
         std::string queueArn;
 
         /**
-     * Queue name
-     */
+         * Queue name
+         */
         std::string queueName;
 
         /**
-     * Message body
-     */
+         * Message body
+         */
         std::string body;
 
         /**
-     * Message userAttributes
-     */
+         * Message userAttributes
+         */
         MessageAttributeList attributes;
 
         /**
-     * Message ID
-     */
+         * Message ID
+         */
         std::string messageId;
 
         /**
-     * Request ID
-     */
+         * Request ID
+         */
         std::string requestId;
 
         /**
-     * Converts the JSON string to a DTO
-     *
-     * @param jsonString JSON string
-     */
+         * Converts the JSON string to a DTO
+         *
+         * @param jsonString JSON string
+         */
         void FromJson(const std::string &jsonString);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const SendMessageRequest &r);
     };
 

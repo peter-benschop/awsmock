@@ -22,9 +22,8 @@ namespace AwsMock::Database::Entity::SNS {
                 kvp("status", MessageStatusToString(status)),
                 kvp("userAttributes", messageAttributesDoc),
                 kvp("reset", bsoncxx::types::b_date(std::chrono::milliseconds(0))),
-                kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-                kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
-
+                kvp("created", MongoUtils::ToBson(created)),
+                kvp("modified", MongoUtils::ToBson(modified)));
         return messageDoc;
     }
 
@@ -38,21 +37,24 @@ namespace AwsMock::Database::Entity::SNS {
             message = bsoncxx::string::to_string(mResult.value()["message"].get_string().value);
             status = MessageStatusFromString(bsoncxx::string::to_string(mResult.value()["status"].get_string().value));
             messageId = bsoncxx::string::to_string(mResult.value()["messageId"].get_string().value);
-            lastSend = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["reset"].get_date().value) / 1000));
-            created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-            modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+            lastSend = MongoUtils::FromBson(mResult.value()["reset"].get_date());
+            created = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["created"].get_date()));
+            modified = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["modified"].get_date()));
 
-            bsoncxx::array::view attributesView{mResult.value()["userAttributes"].get_array().value};
-            if (!attributesView.empty()) {
-                for (bsoncxx::array::element attributeElement: attributesView) {
-                    MessageAttribute attribute{
-                            .attributeName = bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
-                            .attributeValue = bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value)};
-                    attributes.push_back(attribute);
+            if (mResult.value().find("userAttributes") != mResult.value().end()) {
+                bsoncxx::array::view attributesView{mResult.value()["userAttributes"].get_array().value};
+                if (!attributesView.empty()) {
+                    for (bsoncxx::array::element attributeElement: attributesView) {
+                        MessageAttribute attribute{
+                                .attributeName = bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
+                                .attributeValue = bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value)};
+                        attributes.push_back(attribute);
+                    }
                 }
             }
         } catch (std::exception &exc) {
             log_error << "SNS message exception: " << exc.what();
+            throw Core::DatabaseException(exc.what());
         }
     }
 
@@ -66,9 +68,13 @@ namespace AwsMock::Database::Entity::SNS {
         jsonObject.set("messageId", messageId);
         jsonObject.set("lastSend", Poco::DateTimeFormatter::format(lastSend, Poco::DateTimeFormat::ISO8601_FORMAT));
 
-        Poco::JSON::Array jsonAttributeArray;
-        for (const auto &attribute: attributes) {
-            jsonAttributeArray.add(attribute.ToJsonObject());
+        // Attributes
+        if (!attributes.empty()) {
+            Poco::JSON::Array jsonAttributeArray;
+            for (const auto &attribute: attributes) {
+                jsonAttributeArray.add(attribute.ToJsonObject());
+            }
+            jsonObject.set("attributes", jsonAttributeArray);
         }
         return jsonObject;
     }

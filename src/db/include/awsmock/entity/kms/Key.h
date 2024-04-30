@@ -18,12 +18,14 @@
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
 #include <awsmock/core/ServiceException.h>
+#include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::KMS {
 
@@ -37,7 +39,7 @@ namespace AwsMock::Database::Entity::KMS {
     /**
      * KMS key entity
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct Key {
 
@@ -114,7 +116,7 @@ namespace AwsMock::Database::Entity::KMS {
         /**
          * Scheduled deletion datetime
          */
-        Poco::DateTime scheduledDeletion;
+        Poco::DateTime scheduledDeletion = Poco::DateTime(0);
 
         /**
          * Creation date

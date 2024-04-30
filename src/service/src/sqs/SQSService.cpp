@@ -344,17 +344,22 @@ namespace AwsMock::Service {
 
     Dto::SQS::SendMessageResponse SQSService::SendMessage(const Dto::SQS::SendMessageRequest &request) {
 
-        if (request.queueUrl.empty() || !_database.QueueUrlExists(request.region, request.queueUrl)) {
-            throw Core::ServiceException("SQS queue '" + request.queueUrl + "' does not exists", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+        if (!request.queueUrl.empty() && !_database.QueueUrlExists(request.region, request.queueUrl)) {
+            throw Core::ServiceException("SQS queue '" + request.queueUrl + "' does not exists");
+        }
+        if (!request.queueArn.empty() && !_database.QueueArnExists(request.queueArn)) {
+            throw Core::ServiceException("SQS queue '" + request.queueArn + "' does not exists");
         }
 
         try {
-            // Sanitize message body
-            //std::string messageBody = Core::StringUtils::SanitizeUtf8(request.body);
-            std::string messageBody = request.body;
 
             // Get queue by URL
-            Database::Entity::SQS::Queue queue = _database.GetQueueByUrl(request.region, request.queueUrl);
+            Database::Entity::SQS::Queue queue;
+            if (!request.queueUrl.empty()) {
+                queue = _database.GetQueueByUrl(request.region, request.queueUrl);
+            } else if (!request.queueArn.empty()) {
+                queue = _database.GetQueueByArn(request.queueArn);
+            }
 
             // Get visibility attribute
             std::string visibilityStr = std::to_string(queue.attributes.visibilityTimeout);
@@ -381,7 +386,7 @@ namespace AwsMock::Service {
             // Set parameters
             std::string messageId = Core::AwsUtils::CreateMessageId();
             std::string receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
-            std::string md5Body = Core::Crypto::GetMd5FromString(messageBody);
+            std::string md5Body = Core::Crypto::GetMd5FromString(request.body);
             std::string md5UserAttr = Dto::SQS::MessageAttribute::GetMd5Attributes(request.attributes);
             std::string md5SystemAttr = Dto::SQS::MessageAttribute::GetMd5SystemAttributes(request.attributes);
 
@@ -390,7 +395,7 @@ namespace AwsMock::Service {
                     {
                             .region = request.region,
                             .queueUrl = queue.queueUrl,
-                            .body = messageBody,
+                            .body = request.body,
                             .status = messageStatus,
                             .reset = reset,
                             .messageId = messageId,

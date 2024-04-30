@@ -38,7 +38,7 @@ namespace AwsMock::Service {
      * <i>/etc/awsmock.properties</i>
      * </p>
      *
-     * @author jens.vogt@opitz-consulting.com
+     * @author jens.vogt\@opitz-consulting.com
      */
     class S3Server : public AbstractServer, public AbstractWorker {
 

@@ -22,20 +22,22 @@
 namespace AwsMock::Dto::SecretsManager {
 
     /**
-   * Update the secret values request.
-   *
-   * Example:
-   * <pre>
-   * {
-   *   "ClientRequestToken": "string",
-   *   "Description": "string",
-   *   "KmsKeyId": "string",
-   *   "SecretBinary": blob,
-   *   "SecretId": "string",
-   *   "SecretString": "string"
-   * }
-   * </pre>
-   */
+     * Update the secret values request.
+     *
+     * Example:
+     * @verbatim
+     * {
+     *   "ClientRequestToken": "string",
+     *   "Description": "string",
+     *   "KmsKeyId": "string",
+     *   "SecretBinary": blob,
+     *   "SecretId": "string",
+     *   "SecretString": "string"
+     * }
+     * @endverbatim
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct UpdateSecretRequest {
 
         /**
