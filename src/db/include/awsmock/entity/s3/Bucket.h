@@ -136,6 +136,30 @@ namespace AwsMock::Database::Entity::S3 {
         bool HasNotification(const std::string &eventName);
 
         /**
+         * Checks whether a notification with the given ID exists.
+         *
+         * @param id other queue notification id.
+         * @return true if notification with the given ID exists.
+         */
+        bool HasQueueNotificationId(const std::string &queueNotification);
+
+        /**
+         * Checks whether a topic notification with the given ID exists.
+         *
+         * @param id other topic notification id.
+         * @return true if notification with the given ID exists.
+         */
+        bool HasTopicNotificationId(const std::string &topicNotification);
+
+        /**
+         * Checks whether a lambda notification with the given ID exists.
+         *
+         * @param id other lambda notification ID.
+         * @return true if notification with the given ID exists.
+         */
+        bool HasLambdaNotificationId(const std::string &lambdaNotification);
+
+        /**
          * Checks whether a SQS queue notification with the given event name exists.
          *
          * @param eventName name of the event
@@ -242,7 +266,6 @@ namespace AwsMock::Database::Entity::S3 {
         friend std::ostream &operator<<(std::ostream &os, const Bucket &bucket);
     };
 
-    typedef struct Bucket Bucket;
     typedef std::vector<Bucket> BucketList;
 
 }// namespace AwsMock::Database::Entity::S3

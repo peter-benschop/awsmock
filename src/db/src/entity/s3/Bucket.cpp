@@ -16,6 +16,24 @@ namespace AwsMock::Database::Entity::S3 {
                }) != notifications.end();
     }
 
+    bool Bucket::HasQueueNotificationId(const std::string &id) {
+        return find_if(queueNotifications.begin(), queueNotifications.end(), [id](const QueueNotification &notification) {
+                   return notification.id == id;
+               }) != queueNotifications.end();
+    }
+
+    bool Bucket::HasTopicNotificationId(const std::string &id) {
+        return find_if(topicNotifications.begin(), topicNotifications.end(), [id](const TopicNotification &notification) {
+                   return notification.id == id;
+               }) != topicNotifications.end();
+    }
+
+    bool Bucket::HasLambdaNotificationId(const std::string &id) {
+        return find_if(lambdaNotifications.begin(), lambdaNotifications.end(), [id](const LambdaNotification &notification) {
+                   return notification.id == id;
+               }) != lambdaNotifications.end();
+    }
+
     bool Bucket::HasQueueNotification(const std::string &eventName) {
         return find_if(queueNotifications.begin(), queueNotifications.end(), [eventName](const QueueNotification &notification) {
                    return std::find(notification.events.begin(), notification.events.end(), eventName) != notification.events.end();

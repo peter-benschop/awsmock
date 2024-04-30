@@ -66,6 +66,14 @@ namespace AwsMock::Database::Entity::S3 {
         std::vector<FilterRule> filterRules;
 
         /**
+         * Check filter
+         *
+         * @param key object key
+         * @return true in case filter exists and key matches
+         */
+        bool CheckFilter(const std::string &key);
+
+        /**
          * Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.

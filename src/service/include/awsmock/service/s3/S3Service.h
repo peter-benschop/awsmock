@@ -52,8 +52,13 @@
 #include <awsmock/entity/s3/QueueNotification.h>
 #include <awsmock/entity/s3/TopicNotification.h>
 #include <awsmock/repository/S3Database.h>
+#include <awsmock/service/lambda/LambdaExecutor.h>
 #include <awsmock/service/lambda/LambdaService.h>
+#include <awsmock/service/sns/SNSService.h>
+#include <awsmock/service/sqs/SQSService.h>
 
+#define DEFAULT_USER "none"
+#define DEFAULT_REGION "eu-central-1"
 #define DEFAULT_DATA_DIR "/home/awsmock/data"
 #define DEFAULT_TRANSFER_DATA_DIR "/tmp/awsmock/data/transfer"
 #define DEFAULT_TRANSFER_BUCKET "transfer-server"
@@ -76,7 +81,7 @@ namespace AwsMock::Service {
          *
          * @param configuration module configuration
          */
-        explicit S3Service(const Core::Configuration &configuration);
+        explicit S3Service(Core::Configuration &configuration);
 
         /**
          * Returns the meta data of an S3 object
@@ -236,20 +241,28 @@ namespace AwsMock::Service {
          * Sends a message to the corresponding SQS queue.
          *
          * @param eventNotification S3 event notification.
-         * @param queueArn ARN of the SQS queue.
+         * @param queueNotification queue notification.
          */
-        void SendQueueNotificationRequest(const Dto::S3::EventNotification &eventNotification, const std::string &queueArn);
+        void SendQueueNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::QueueNotification &queueNotification);
+
+        /**
+         * Sends a message to the corresponding SNS topic.
+         *
+         * @param eventNotification S3 event notification.
+         * @param queueNotification queue notification.
+         */
+        void SendTopicNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::TopicNotification &topicNotification);
 
         /**
          * Send lambda function invocation request to lambda module.
          *
-         * <p>This will send a lambda invocation requst to the lambda module. The lambda module will StartServer the corresponding lambda function and will send the S3
+         * <p>This will send a lambda invocation request to the lambda module. The lambda module will StartServer the corresponding lambda function and will send the S3
          * notification request to the lambda function.</p>
          *
          * @param eventNotification S3 event notification
-         * @param bucketNotification S3 bucket notification
+         * @param lambdaNotification S3 lambda notification
          */
-        void SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::BucketNotification &bucketNotification);
+        void SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::LambdaNotification &lambdaNotification);
 
         /**
          * Check for bucket notifications.
@@ -377,7 +390,7 @@ namespace AwsMock::Service {
         /**
          * Configuration
          */
-        const Core::Configuration &_configuration;
+        Core::Configuration &_configuration;
 
         /**
          * Database connection
@@ -385,34 +398,39 @@ namespace AwsMock::Service {
         Database::S3Database &_database;
 
         /**
+         * SQS service
+         */
+        //SQSService _sqsService;
+
+        /**
+         * SNS service
+         */
+        //SNSService _snsService;
+
+        /**
+         * Lambda service
+         */
+        LambdaService _lambdaService;
+
+        /**
          * Multipart uploads map
          */
         MultiPartUploads _uploads;
 
         /**
-         * SQS module port
-         */
-        int _sqsServicePort;
-
-        /**
-         * SQS module host
-         */
-        std::string _sqsServiceHost;
-
-        /**
-         * Lambda module port
-         */
-        int _lambdaServicePort;
-
-        /**
-         * Lambda module host
-         */
-        std::string _lambdaServiceHost;
-
-        /**
          * AWS account ID
          */
         std::string _accountId;
+
+        /**
+         * AWS user
+         */
+        std::string _user;
+
+        /**
+         * AWS region
+         */
+        std::string _region;
     };
 
 }// namespace AwsMock::Service

@@ -80,7 +80,7 @@ namespace AwsMock::Service {
          *
          * @param configuration module configuration
          */
-        explicit LambdaService(Core::Configuration &configuration);
+        explicit LambdaService(const Core::Configuration &configuration);
 
         /**
          * Create lambda function
@@ -201,7 +201,7 @@ namespace AwsMock::Service {
         /**
          * Configuration
          */
-        Core::Configuration &_configuration;
+        const Core::Configuration &_configuration;
 
         /**
          * lambda database connection

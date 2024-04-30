@@ -595,9 +595,7 @@ namespace AwsMock::Dto::S3 {
                 }
                 rootJson.set("Records", recordsJsonArray);
 
-                std::ostringstream os;
-                rootJson.stringify(os);
-                return os.str();
+                return Core::JsonUtils::ToJsonString(rootJson);
 
             } catch (Poco::Exception &exc) {
                 log_error << exc.message();

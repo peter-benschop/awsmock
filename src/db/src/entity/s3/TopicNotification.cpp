@@ -6,6 +6,17 @@
 
 namespace AwsMock::Database::Entity::S3 {
 
+    bool TopicNotification::CheckFilter(const std::string &key) {
+
+        if (filterRules.empty()) {
+            return true;
+        }
+
+        return std::ranges::any_of(filterRules, [key](const FilterRule &rule) {
+            return (rule.name == "prefix" && key.starts_with(rule.value)) || (rule.name == "suffix" && key.ends_with(rule.value));
+        });
+    }
+
     view_or_value<view, value> TopicNotification::ToDocument() const {
 
         auto topicNotificationDoc = bsoncxx::builder::basic::document{};

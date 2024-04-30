@@ -37,6 +37,7 @@ namespace AwsMock::FtpServer {
     class FtpSession : public std::enable_shared_from_this<FtpSession>, public Service::AbstractWorker {
 
       private:
+
         struct IoFile {
             IoFile(const std::string &filename, std::string user, std::ios::openmode mode) : file_stream_(filename, mode), stream_buffer_(1024 * 1024),
                                                                                              _fileName(filename), _user(std::move(user)) {
@@ -69,10 +70,11 @@ namespace AwsMock::FtpServer {
         // Public API
         ////////////////////////////////////////////////////////
       public:
+
         FtpSession(asio::io_service &io_service,
                    const UserDatabase &user_database,
-                   const std::string &serverName,
-                   const Core::Configuration &configuration,
+                   std::string serverName,
+                   Core::Configuration &configuration,
                    const std::function<void()> &completion_handler);
 
         // Copy (disabled, as we are inheriting from shared_from_this)
@@ -95,6 +97,7 @@ namespace AwsMock::FtpServer {
         // FTP command-socket
         ////////////////////////////////////////////////////////
       private:
+
         void sendFtpMessage(const FtpMessage &message);
 
         void sendFtpMessage(FtpReplyCode code, const std::string &message);
@@ -111,6 +114,7 @@ namespace AwsMock::FtpServer {
         // FTP Commands
         ////////////////////////////////////////////////////////
       private:
+
         // Access control commands
         void handleFtpCommandUSER(const std::string &param);
 
@@ -189,6 +193,7 @@ namespace AwsMock::FtpServer {
         // FTP data-socket send
         ////////////////////////////////////////////////////////
       private:
+
         void sendDirectoryListing(const std::map<std::string, FileStatus> &directory_content);
 
         void sendNameList(const std::map<std::string, FileStatus> &directory_content);
@@ -208,6 +213,7 @@ namespace AwsMock::FtpServer {
         // FTP data-socket receive
         ////////////////////////////////////////////////////////
       private:
+
         void receiveFile(const std::shared_ptr<IoFile> &file);
 
         void receiveDataFromSocketAndWriteToFile(const std::shared_ptr<IoFile> &file, const std::shared_ptr<asio::ip::tcp::socket> &data_socket);
@@ -223,6 +229,7 @@ namespace AwsMock::FtpServer {
         // Helpers
         ////////////////////////////////////////////////////////
       private:
+
         std::string toAbsoluteFtpPath(const std::string &rel_or_abs_ftp_path) const;
 
         std::string toLocalPath(const std::string &ftp_path) const;
@@ -271,6 +278,7 @@ namespace AwsMock::FtpServer {
         // Member variables
         ////////////////////////////////////////////////////////
       private:
+
         /**
          * Configuration
          */

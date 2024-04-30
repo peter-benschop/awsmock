@@ -110,6 +110,11 @@ namespace AwsMock::Service {
          * S3 service
          */
         Service::S3Service _s3Service;
+
+        /**
+         * Metric service
+         */
+        Core::MetricService &_metricService = Core::MetricService::instance();
     };
 
 }// namespace AwsMock::Service

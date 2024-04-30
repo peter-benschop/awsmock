@@ -5,6 +5,7 @@ namespace AwsMock::Service {
 
     void S3CmdHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3ClientCommand) {
         log_debug << "S3 GET request, URI: " + request.getURI() << " region: " << s3ClientCommand.region << " user: " + s3ClientCommand.user;
+        Core::MetricServiceTimer measure(_metricService, S3_SERVICE_TIMER);
 
         try {
 
@@ -151,6 +152,7 @@ namespace AwsMock::Service {
                 case Dto::Common::S3CommandType::COMPLETE_MULTIPART_UPLOAD:
                 case Dto::Common::S3CommandType::ABORT_MULTIPART_UPLOAD:
                 case Dto::Common::S3CommandType::BUCKET_NOTIFICATION:
+                case Dto::Common::S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION:
                     break;
                 case Dto::Common::S3CommandType::UNKNOWN: {
                     throw Core::ServiceException("Bad request, method: GET clientCommand: " + Dto::Common::S3CommandTypeToString(s3ClientCommand.command));
@@ -170,6 +172,7 @@ namespace AwsMock::Service {
 
     void S3CmdHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3ClientCommand) {
         log_debug << "S3 PUT request, URI: " << request.getURI() << " region: " << s3ClientCommand.region << " user: " << s3ClientCommand.user;
+        Core::MetricServiceTimer measure(_metricService, S3_SERVICE_TIMER);
 
         try {
 
@@ -365,6 +368,7 @@ namespace AwsMock::Service {
 
     void S3CmdHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3ClientCommand) {
         log_debug << "S3 POST request, URI: " << request.getURI() << " region: " << s3ClientCommand.region << " user: " << s3ClientCommand.user;
+        Core::MetricServiceTimer measure(_metricService, S3_SERVICE_TIMER);
 
         try {
             switch (s3ClientCommand.command) {
@@ -463,6 +467,7 @@ namespace AwsMock::Service {
                 case Dto::Common::S3CommandType::ABORT_MULTIPART_UPLOAD:
                 case Dto::Common::S3CommandType::LIST_OBJECT_VERSIONS:
                 case Dto::Common::S3CommandType::BUCKET_NOTIFICATION:
+                case Dto::Common::S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION:
                     break;
                 case Dto::Common::S3CommandType::UNKNOWN: {
                     log_error << "Bad request, method: POST clientCommand: " << Dto::Common::S3CommandTypeToString(s3ClientCommand.command);
@@ -484,6 +489,7 @@ namespace AwsMock::Service {
 
     void S3CmdHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3ClientCommand) {
         log_debug << "S3 DELETE request, URI: " + request.getURI() << " region: " << s3ClientCommand.region << " user: " << s3ClientCommand.user;
+        Core::MetricServiceTimer measure(_metricService, S3_SERVICE_TIMER);
 
         try {
 
@@ -530,6 +536,7 @@ namespace AwsMock::Service {
                 case Dto::Common::S3CommandType::COMPLETE_MULTIPART_UPLOAD:
                 case Dto::Common::S3CommandType::LIST_OBJECT_VERSIONS:
                 case Dto::Common::S3CommandType::BUCKET_NOTIFICATION:
+                case Dto::Common::S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION:
                     break;
                 case Dto::Common::S3CommandType::UNKNOWN: {
                     log_error << "Bad request, method: DELETE clientCommand: " << Dto::Common::S3CommandTypeToString(s3ClientCommand.command);
@@ -551,6 +558,7 @@ namespace AwsMock::Service {
 
     void S3CmdHandler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         log_trace << "S3 HEAD request, URI: " << request.getURI() << " region: " << region << " user: " << user;
+        Core::MetricServiceTimer measure(_metricService, S3_SERVICE_TIMER);
 
         try {
 

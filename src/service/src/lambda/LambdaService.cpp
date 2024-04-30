@@ -18,7 +18,7 @@ namespace AwsMock::Service {
         std::thread(&LambdaExecutor::SendInvocationRequest, u, b).detach();
     }
 
-    LambdaService::LambdaService(Core::Configuration &configuration) : _configuration(configuration), _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()) {
+    LambdaService::LambdaService(const Core::Configuration &configuration) : _configuration(configuration), _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()) {
 
         // Initialize environment
         _accountId = _configuration.getString("awsmock.account.userPoolId", "000000000000");
@@ -73,7 +73,7 @@ namespace AwsMock::Service {
         lambdaEntity = _lambdaDatabase.CreateOrUpdateLambda(lambdaEntity);
 
         // Create lambda function asynchronously
-        CallAsyncCreate<const char *, const char *, Core::Configuration &>(request.code.zipFile.c_str(), lambdaEntity.oid.c_str(), _configuration);
+        CallAsyncCreate<const char *, const char *, const Core::Configuration &>(request.code.zipFile.c_str(), lambdaEntity.oid.c_str(), _configuration);
         log_debug << "Lambda create started, function: " << lambdaEntity.function;
 
         // Create response
@@ -160,7 +160,7 @@ namespace AwsMock::Service {
 
         // Send invocation request
         std::string url = GetRequestUrl("localhost", lambda.hostPort);
-        CallAsyncInvoke<const char *, const char *>(url.c_str(), payload.c_str());
+        CallAsyncInvoke(url.c_str(), payload.c_str());
         log_debug << "Lambda executor notification send, name: " + lambda.function;
 
         // Update database

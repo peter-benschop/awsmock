@@ -35,6 +35,7 @@
 #define S3_BUCKET_COUNT "s3_bucket_count_total"
 #define S3_OBJECT_COUNT "s3_object_count_total"
 #define S3_OBJECT_BY_BUCKET_COUNT "s3_object_by_bucket_count"
+#define S3_SERVICE_TIMER "s3_service_time"
 
 #define LAMBDA_FUNCTION_COUNT "lambda_function_count_total"
 #define LAMBDA_INVOCATION_TIMER "lambda_invocation_time"

@@ -6,6 +6,17 @@
 
 namespace AwsMock::Database::Entity::S3 {
 
+    bool LambdaNotification::CheckFilter(const std::string &key) {
+
+        if (filterRules.empty()) {
+            return true;
+        }
+
+        return std::ranges::any_of(filterRules, [key](const FilterRule &rule) {
+            return (rule.name == "prefix" && key.starts_with(rule.value)) || (rule.name == "suffix" && key.ends_with(rule.value));
+        });
+    }
+
     view_or_value<view, value> LambdaNotification::ToDocument() const {
 
         auto lambdaNotificationDoc = bsoncxx::builder::basic::document{};
@@ -34,6 +45,14 @@ namespace AwsMock::Database::Entity::S3 {
 
             id = bsoncxx::string::to_string(mResult.value()["id"].get_string().value);
             lambdaArn = bsoncxx::string::to_string(mResult.value()["lambdaArn"].get_string().value);
+
+            // Extract events
+            if (mResult.value().find("events") != mResult.value().end()) {
+                bsoncxx::document::view eventsView = mResult.value()["events"].get_array().value;
+                for (bsoncxx::document::element event: eventsView) {
+                    events.emplace_back(event.get_string().value);
+                }
+            }
 
             // Extract filter rules
             if (mResult.value().find("filterRules") != mResult.value().end()) {

@@ -13,11 +13,13 @@ namespace AwsMock::Service {
         }))).reset();
     }
 
-    S3Service::S3Service(const Core::Configuration &configuration) : _configuration(configuration), _database(Database::S3Database::instance()) {
+    S3Service::S3Service(Core::Configuration &configuration) : _configuration(configuration), _database(Database::S3Database::instance()), _lambdaService(configuration) {
 
         _accountId = _configuration.getString("awsmock.account.userPoolId");
 
         // Initialize directories
+        _user = _configuration.getString("awsmock.user", DEFAULT_USER);
+        _region = _configuration.getString("awsmock.region", DEFAULT_REGION);
         _dataDir = _configuration.getString("awsmock.data.dir", DEFAULT_DATA_DIR);
         _transferDir = _configuration.getString("awsmock.service.ftp.base.dir", DEFAULT_TRANSFER_DATA_DIR);
         _transferBucket = _configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
@@ -25,12 +27,12 @@ namespace AwsMock::Service {
         _tempDir = _dataDir + Poco::Path::separator() + "tmp";
 
         // SQS module connection
-        _sqsServiceHost = _configuration.getString("awsmock.module.sqs.host", "localhost");
-        _sqsServicePort = _configuration.getInt("awsmock.module.sqs.port", 9501);
+        //_sqsServiceHost = _configuration.getString("awsmock.module.sqs.http.host", "localhost");
+        //_sqsServicePort = _configuration.getInt("awsmock.module.sqs.http.port", 9501);
 
         // lambda module connection
-        _lambdaServiceHost = _configuration.getString("awsmock.module.lambda.host", "localhost");
-        _lambdaServicePort = _configuration.getInt("awsmock.module.lambda.port", 9503);
+        //_lambdaServiceHost = _configuration.getString("awsmock.module.lambda.http.host", "localhost");
+        //_lambdaServicePort = _configuration.getInt("awsmock.module.lambda.http.port", 9503);
 
         // Create directories
         Core::DirUtils::EnsureDirectory(_tempDir);
@@ -622,41 +624,85 @@ namespace AwsMock::Service {
     }
 
     void S3Service::CheckNotifications(const std::string &region, const std::string &bucket, const std::string &key, long size, const std::string &event) {
+        log_debug << "Check notifications, region: " << region << " bucket: " << bucket << " event: " << event;
+
+        std::string eventName = Core::StringUtils::Split(event, ':')[1];
 
         Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(region, bucket);
 
-        if (bucketEntity.HasNotification(event)) {
+        if (bucketEntity.HasQueueNotification(event)) {
 
-            Database::Entity::S3::BucketNotification notification = bucketEntity.GetNotification(event);
+            Database::Entity::S3::QueueNotification notification = bucketEntity.GetQueueNotification(event);
 
-            // Create the event record
-            Dto::S3::Object s3Object = {.key = key, .size = size, .etag = Poco::UUIDGenerator().createRandom().toString()};
-            Dto::S3::Bucket s3Bucket = {.name = bucketEntity.name};
+            if (notification.CheckFilter(key)) {
 
-            Dto::S3::S3 s3 = {.configurationId = notification.notificationId, .bucket = s3Bucket, .object = s3Object};
+                // Create the event record
+                Dto::S3::Object s3Object = {.key = key, .size = size, .etag = Poco::UUIDGenerator().createRandom().toString()};
+                Dto::S3::Bucket s3Bucket = {.name = bucketEntity.name};
 
-            Dto::S3::Record record = {.region = region, .eventName = event, .s3 = s3};
-            Dto::S3::EventNotification eventNotification;
+                Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = s3Bucket, .object = s3Object};
 
-            eventNotification.records.push_back(record);
-            log_debug << "Found notification records, count: " << eventNotification.records.size();
+                Dto::S3::Record record = {.region = region, .eventName = event, .s3 = s3};
+                Dto::S3::EventNotification eventNotification;
 
-            if (!notification.queueArn.empty()) {
+                eventNotification.records.push_back(record);
+                log_debug << "Found notification records, count: " << eventNotification.records.size();
 
                 // Queue notification
-                SendQueueNotificationRequest(eventNotification, notification.queueArn);
+                SendQueueNotificationRequest(eventNotification, notification);
                 log_trace << "SQS message created, eventNotification: " + eventNotification.ToString();
                 log_debug << "SQS message created, queueArn: " << notification.queueArn;
+            }
+        }
 
-            } else if (!notification.lambdaArn.empty()) {
+        if (bucketEntity.HasTopicNotification(event)) {
+
+            Database::Entity::S3::TopicNotification notification = bucketEntity.GetTopicNotification(event);
+
+            if (notification.CheckFilter(key)) {
+
+                // Create the event record
+                Dto::S3::Object s3Object = {.key = key, .size = size, .etag = Poco::UUIDGenerator().createRandom().toString()};
+                Dto::S3::Bucket s3Bucket = {.name = bucketEntity.name};
+
+                Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = s3Bucket, .object = s3Object};
+
+                Dto::S3::Record record = {.region = region, .eventName = event, .s3 = s3};
+                Dto::S3::EventNotification eventNotification;
+
+                eventNotification.records.push_back(record);
+                log_debug << "Found notification records, count: " << eventNotification.records.size();
+
+                // Queue notification
+                SendTopicNotificationRequest(eventNotification, notification);
+                log_trace << "SNS message created, eventNotification: " + eventNotification.ToString();
+                log_debug << "SNS message created, topicArn: " << notification.topicArn;
+            }
+        }
+
+        if (bucketEntity.HasLambdaNotification(eventName)) {
+
+            Database::Entity::S3::LambdaNotification notification = bucketEntity.GetLambdaNotification(eventName);
+
+            if (notification.CheckFilter(key)) {
+
+                // Create the event record
+                Dto::S3::Object s3Object = {.key = key, .size = size, .etag = Poco::UUIDGenerator().createRandom().toString()};
+                Dto::S3::Bucket s3Bucket = {.name = bucketEntity.name};
+
+                Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = s3Bucket, .object = s3Object};
+
+                Dto::S3::Record record = {.region = region, .eventName = event, .s3 = s3};
+                Dto::S3::EventNotification eventNotification;
+
+                eventNotification.records.push_back(record);
+                log_debug << "Found notification records, count: " << eventNotification.records.size();
 
                 // lambda notification
                 SendLambdaInvocationRequest(eventNotification, notification);
                 log_trace << "lambda function invoked, eventNotification: " + eventNotification.ToString();
                 log_debug << "lambda function invoked, lambdaArn:" << notification.lambdaArn;
             }
-        } else {
-            log_debug << "No notifications found, event: " << event << " bucket: " << bucket << " key: " << key;
         }
     }
 
@@ -731,56 +777,30 @@ namespace AwsMock::Service {
         return _tempDir + Poco::Path::separator() + uploadId;
     }
 
-    void S3Service::SendQueueNotificationRequest(const Dto::S3::EventNotification &eventNotification, const std::string &queueArn) {
+    void S3Service::SendQueueNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::QueueNotification &queueNotification) {
 
-        //"Credential=none/20230618/eu-central-1/s3/aws4_request, SignedHeaders=content-md5;content-type;host;x-amz-content-sha256;x-amz-date;x-amz-security-token, Signature=fe9766ea2c032ac7b17033a567f6b361192bddcf73f89d25c15019977c544e1c"
-        Poco::URI uri("http://" + _sqsServiceHost + ":" + std::to_string(_sqsServicePort) + "/");
-        std::string path(uri.getPathAndQuery());
-
-        // Set payload
-        std::string body = "Action=SendMessage&QueueArn=" + queueArn + "&MessageBody=" + eventNotification.ToJson();
-
-        // Create HTTP request and set headers
-        Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
-        Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, path, Poco::Net::HTTPMessage::HTTP_1_1);
-        request.setContentLength((long) body.length());
-        request.add("Content-Type", "application/json");
-        request.add("Authorization",
-                    "AWS4-HMAC-SHA256 Credential=none/20230618/eu-central-1/lambda/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840");
-        log_debug << "SQS message request created, body: " + body;
-
-        // Send request
-        std::ostream &os = session.sendRequest(request);
-        os << body;
-
-        // Get the response state
-        Poco::Net::HTTPResponse response;
-        session.receiveResponse(response);
-        if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
-            log_error << "HTTP error, state: " + std::to_string(response.getStatus()) + " reason: " + response.getReason();
-        }
-        log_debug << "SQS message request send, state: " << response.getStatus();
+        SQSService _sqsService = SQSService(_configuration);
+        Dto::SQS::SendMessageRequest request = {.region = _region, .queueArn = queueNotification.queueArn, .body = eventNotification.ToJson()};
+        Dto::SQS::SendMessageResponse response = _sqsService.SendMessage(request);
+        log_debug << "SQS message request send, messageId: " << response.messageId;
     }
 
-    void S3Service::SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::BucketNotification &bucketNotification) {
+    void S3Service::SendTopicNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::TopicNotification &topicNotification) {
 
-        std::vector<std::string> parts = Core::StringUtils::Split(bucketNotification.lambdaArn, ':');
+        SNSService _snsService = SNSService(_configuration);
+        Dto::SNS::PublishRequest request = {.region = _region, .targetArn = topicNotification.topicArn, .message = eventNotification.ToJson()};
+        Dto::SNS::PublishResponse response = _snsService.Publish(request);
+        log_debug << "SNS message request send, messageId: " << response.messageId;
+    }
+
+    void S3Service::SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::LambdaNotification &lambdaNotification) {
+
+        std::vector<std::string> parts = Core::StringUtils::Split(lambdaNotification.lambdaArn, ':');
         std::string functionName = parts[6];
         log_debug << "Invocation request function name: " << functionName;
 
-        std::string body = eventNotification.ToJson();
-        std::map<std::string, std::string> headers;
-        headers["Content-Type"] = "application/json";
-        headers["Content-Length"] = std::to_string(body.length());
-        headers["Authorization"] = "AWS4-HMAC-SHA256 Credential=none/20230618/eu-central-1/lambda/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token, Signature=90d0e45560fa4ce03e6454b7a7f2a949e0c98b46c35bccb47f666272ec572840";
-
-        std::string url = "http://" + _lambdaServiceHost + ":" + std::to_string(_lambdaServicePort) + "/2015-03-31/functions/" + functionName + "/invocations";
-        Core::CurlUtils _curlUtils;
-        Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", url, headers, body);
-        if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
-            log_error << "HTTP error, status: " << response.statusCode << " reason: " + response.output;
-        }
-        log_debug << "Lambda invocation finished send, status: " << response.statusCode;
+        _lambdaService.InvokeLambdaFunction(functionName, eventNotification.ToJson(), _region, _user);
+        log_debug << "Lambda invocation finished send";
     }
 
     Dto::S3::PutObjectResponse S3Service::SaveUnversionedObject(Dto::S3::PutObjectRequest &request, std::istream &stream) {
@@ -917,6 +937,11 @@ namespace AwsMock::Service {
 
         for (auto &queueConfiguration: queueConfigurations) {
 
+            // Check existence
+            if (!queueConfiguration.id.empty() && bucket.HasTopicNotificationId(queueConfiguration.id)) {
+                break;
+            }
+
             // General attributes
             std::string id = queueConfiguration.id.empty() ? Poco::UUIDGenerator().createOne().toString() : queueConfiguration.id;
             Database::Entity::S3::QueueNotification queueNotification = {
@@ -943,6 +968,11 @@ namespace AwsMock::Service {
 
         for (auto &topicConfiguration: topicConfigurations) {
 
+            // Check existence
+            if (!topicConfiguration.id.empty() && bucket.HasTopicNotificationId(topicConfiguration.id)) {
+                break;
+            }
+
             // General attributes
             std::string id = topicConfiguration.id.empty() ? Poco::UUIDGenerator().createOne().toString() : topicConfiguration.id;
             Database::Entity::S3::TopicNotification topicNotification = {
@@ -967,7 +997,13 @@ namespace AwsMock::Service {
 
     void S3Service::GetLambdaNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::LambdaConfiguration> &lambdaConfigurations) {
 
+
         for (auto &lambdaConfiguration: lambdaConfigurations) {
+
+            // Check existence
+            if (!lambdaConfiguration.id.empty() && bucket.HasLambdaNotificationId(lambdaConfiguration.id)) {
+                break;
+            }
 
             // General attributes
             std::string id = lambdaConfiguration.id.empty() ? Poco::UUIDGenerator().createOne().toString() : lambdaConfiguration.id;

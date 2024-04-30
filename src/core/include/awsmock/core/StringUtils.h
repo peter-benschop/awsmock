@@ -172,13 +172,22 @@ namespace AwsMock::Core {
         static bool ContainsIgnoreCase(const std::string &s1, const std::string &s2);
 
         /**
-         * Check whether the given string StartServer wit the given prefix
+         * Check whether the given string starts with the given prefix
          *
          * @param s1 string to check
          * @param s2 probe string
          * @return true if the string s1 starts with s2.
          */
         static bool StartsWith(const std::string &s1, const std::string &s2);
+
+        /**
+         * Check whether the given string StartServer with the given suffix
+         *
+         * @param s1 string to check
+         * @param s2 probe string
+         * @return true if the string s1 ends with s2.
+         */
+        static bool EndsWith(const std::string &s1, const std::string &s2);
 
         /**
          * Returns a substring by index.
