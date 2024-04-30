@@ -8,7 +8,7 @@ WORKDIR /usr/src
 RUN git clone https://github.com/jensvogt/aws-mock.git && \
     cd /usr/src/aws-mock && \
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr . && \
-    cmake --build . --config Release && \
+    cmake --build . --config Release -j 30 && \
     cmake --install . --prefix /usr
 
 # Cleanup
