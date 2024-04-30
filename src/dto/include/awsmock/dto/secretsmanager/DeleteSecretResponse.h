@@ -26,13 +26,13 @@ namespace AwsMock::Dto::SecretsManager {
      * Return structure for the delete secret request.
      *
      * Example:
-     * @verbatim
+     * @code{.json}
      * {
      *   "ARN": "string",
      *   "DeletionDate": number,
      *   "Name": "string"
      * }
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

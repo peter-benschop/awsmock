@@ -2,7 +2,7 @@
 // Created by vogje01 on 4/25/24.
 //
 
-#include <awsmock/dto/kms/Key.h>
+#include "awsmock/dto/kms/model/Key.h"
 
 namespace AwsMock::Dto::KMS {
 

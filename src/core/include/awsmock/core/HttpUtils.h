@@ -242,7 +242,7 @@ namespace AwsMock::Core {
         /**
          * Add query delimiter
          *
-         * @param uri HTTP request URL
+         * @param url HTTP request URL
          * @return URL with delimiter
          */
         static std::string AddQueryDelimiter(std::string &url);

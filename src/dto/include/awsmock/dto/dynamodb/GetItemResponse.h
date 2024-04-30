@@ -23,7 +23,7 @@ namespace AwsMock::Dto::DynamoDb {
      * DynamoDB Get item response
      *
      * Example:
-     * @verbatim
+     * @code{.json}
      * {
      *   "Item":
      *     {
@@ -37,7 +37,7 @@ namespace AwsMock::Dto::DynamoDb {
      *         "CapacityUnits":0.5
      *       }
      * }
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

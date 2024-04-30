@@ -24,7 +24,7 @@ namespace AwsMock::Dto::Lambda {
    * Get function response
    *
    * Example:
-   * @verbatim
+   * @code{.json}
    * {
    *   "Code": {
    *      "ImageUri": "string",
@@ -132,7 +132,7 @@ namespace AwsMock::Dto::Lambda {
    *      "string" : "string"
    *   }
    *}
-   * @endverbatim
+   * @endcode
    */
     struct GetFunctionResponse {
 
@@ -206,9 +206,9 @@ namespace AwsMock::Dto::Lambda {
         /**
      * Parse a JSON stream.
      *
-     * @verbatim
+     * @code{.json}
      *"{\"JAVA_TOOL_OPTIONS\":\"-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localhost\"}"
-     * @endverbatim
+     * @endcode
      *
      * @param jsonString JSON string
      */

@@ -24,7 +24,7 @@ namespace AwsMock::Dto::S3 {
      * Notification for a lambda function:
      * </p>
      * Example:
-     * @verbatim
+     * @code{.xml}
      * <NotificationConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
      *   <CloudFunctionConfiguration>
      *     <Id>1234567890123</Id>
@@ -32,10 +32,10 @@ namespace AwsMock::Dto::S3 {
      *     <Event>s3:ObjectCreated:*</Event>
      *   </CloudFunctionConfiguration>
      * </NotificationConfiguration>
-     * @endverbatim
+     * @endcode
      * </p>
      * <p>Notification for a SQS queue event:
-     * @verbatim
+     * @code{.xml}
      * <NotificationConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">
      *   <QueueConfiguration>
      *     <Id>1234567890125</Id>
@@ -43,7 +43,7 @@ namespace AwsMock::Dto::S3 {
      *     <Event>s3:ObjectCreated:*</Event>
      *   </QueueConfiguration>
      * </NotificationConfiguration>
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

@@ -93,9 +93,9 @@ namespace AwsMock::Dto::Lambda {
         /**
      * Parse a JSON stream.
      *
-     * @verbatim
+     * @code{.json}
      *"{\"JAVA_TOOL_OPTIONS\":\"-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localhost\"}"
-     * @endverbatim
+     * @endcode
      *
      * @param jsonString JSON string
      */

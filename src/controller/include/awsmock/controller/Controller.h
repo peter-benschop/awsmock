@@ -98,7 +98,7 @@ namespace AwsMock::Controller {
          *
          * @param services list of services
          * @param pretty JSON pretty print (indent=4)
-         * @param pretty JSON pretty print (indent=4)
+         * @param includeObjects include also objects
          */
         void ExportInfrastructure(const std::vector<std::string> &services, bool pretty = true, bool includeObjects = false);
 

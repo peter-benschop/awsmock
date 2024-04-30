@@ -27,14 +27,14 @@ namespace AwsMock::Dto::SecretsManager {
      * Secret tags
      *
      * Example:
-     * @verbatim
+     * @code{.json}
      * "Tags": [
      *  {
      *    "Key": "string",
      *    "Value": "string"
      *  }
      * ]
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

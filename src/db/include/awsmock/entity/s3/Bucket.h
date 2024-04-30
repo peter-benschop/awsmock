@@ -141,7 +141,7 @@ namespace AwsMock::Database::Entity::S3 {
          * @param id other queue notification id.
          * @return true if notification with the given ID exists.
          */
-        bool HasQueueNotificationId(const std::string &queueNotification);
+        bool HasQueueNotificationId(const std::string &id);
 
         /**
          * Checks whether a topic notification with the given ID exists.
@@ -149,7 +149,7 @@ namespace AwsMock::Database::Entity::S3 {
          * @param id other topic notification id.
          * @return true if notification with the given ID exists.
          */
-        bool HasTopicNotificationId(const std::string &topicNotification);
+        bool HasTopicNotificationId(const std::string &id);
 
         /**
          * Checks whether a lambda notification with the given ID exists.
@@ -157,7 +157,7 @@ namespace AwsMock::Database::Entity::S3 {
          * @param id other lambda notification ID.
          * @return true if notification with the given ID exists.
          */
-        bool HasLambdaNotificationId(const std::string &lambdaNotification);
+        bool HasLambdaNotificationId(const std::string &id);
 
         /**
          * Checks whether a SQS queue notification with the given event name exists.

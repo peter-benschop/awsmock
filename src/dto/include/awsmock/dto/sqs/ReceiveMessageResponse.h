@@ -31,7 +31,7 @@ namespace AwsMock::Dto::SQS {
      * Receive message response.
      *
      * Example:
-     * @verbatim
+     * @code{.json}
      * {
      *   "messages": [
      *      {
@@ -55,7 +55,7 @@ namespace AwsMock::Dto::SQS {
      *      }
      *   ]
      * }
-     * @endverbatim
+     * @endcode
      */
     struct ReceiveMessageResponse {
 

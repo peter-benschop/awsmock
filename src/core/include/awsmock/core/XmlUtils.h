@@ -58,11 +58,11 @@ namespace AwsMock::Core {
         /**
          * Creates a new text node, from a string value.
          *
-         * @verbatim
-         * \<parent\>
-         *   \<name\>value<\>
-         * \</parent\>
-         * @endverbatim
+         * @code{.xml}
+         * <parent>
+         *   <name>value</name>
+         * </parent>
+         * @endcode
          *
          * @param document XML document
          * @param parent parent node
@@ -74,11 +74,11 @@ namespace AwsMock::Core {
         /**
          * Creates a new text node from a integer value.
          *
-         * @verbatim
-         * \<parent\>
-         *   \<name\>value<\>
-         * \</parent\>
-         * @endverbatim
+         * @code{.xml}
+         * <parent>
+         *   <name>value</name>
+         * </parent>
+         * @endcode
          *
          * @param document XML document
          * @param parent parent node
@@ -90,11 +90,11 @@ namespace AwsMock::Core {
         /**
          * Creates a new text node from a long integer value.
          *
-         * @verbatim
-         * \<parent\>
-         *   \<name\>value<\>
-         * \</parent\>
-         * @endverbatim
+         * @code{.xml}
+         * <parent>
+         *   <name>value</name>
+         * </parent>
+         * @endcode
          *
          * @param document XML document
          * @param parent parent node
@@ -110,11 +110,11 @@ namespace AwsMock::Core {
          * The value will be formatted as a ISO-8601 datetime string
          * </p>
          *
-         * @verbatim
-         * \<parent\>
-         *   \<name\>value<\>
-         * \</parent\>
-         * @endverbatim
+         * @code{.xml}
+         * <parent>
+         *   <name>value</name>
+         * </parent>
+         * @endcode
          *
          * @param document XML document
          * @param parent parent node
@@ -126,11 +126,11 @@ namespace AwsMock::Core {
         /**
          * Creates a new text node from a boolean value.
          *
-         * @verbatim
-         * \<parent\>
-         *   \<name\>value<\>
-         * \</parent\>
-         * @endverbatim
+         * @code{.xml}
+         * <parent>
+         *   <name>value</name>
+         * </parent>
+         * @endcode
          *
          * @param document XML document
          * @param parent parent node
@@ -143,12 +143,12 @@ namespace AwsMock::Core {
          * Creates a simple XML string array.
          *
          * Example:
-         * @verbatim
-         *   \<parentName\>
-         *     \<elementName\>element\<elementName\>
+         * @code{.xml}
+         *  <parentName>
+         *    <elementName>element</elementName>
          *     ....
-         *   \</parentName\>
-         * @endverbatim
+         * </parentName>
+         * @endcode
          *
          * @param document XML document
          * @param parent parent node

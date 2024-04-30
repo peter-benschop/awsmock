@@ -26,7 +26,7 @@ namespace AwsMock::Dto::SecretsManager {
      * Rotate a secret value request.
      *
      * Example:
-     * @verbatim
+     * @code{.json}
      * {
      *   "ClientRequestToken": "string",
      *   "RotateImmediately": boolean,
@@ -38,7 +38,7 @@ namespace AwsMock::Dto::SecretsManager {
      *   },
      *   "SecretId": "string"
      * }
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

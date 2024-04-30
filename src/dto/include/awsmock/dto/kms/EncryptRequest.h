@@ -10,10 +10,10 @@
 #include <vector>
 
 // AwsMock includes
+#include "awsmock/dto/kms/model/EncryptionAlgorithm.h"
 #include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/kms/EncryptionAlgorithm.h>
 
 namespace AwsMock::Dto::KMS {
 
@@ -21,7 +21,7 @@ namespace AwsMock::Dto::KMS {
      * Encryption of supplied blob request
      *
      * Example:
-     * @verbatim
+     * @code{.json}
      * {
      *   "DryRun": boolean,
      *   "EncryptionAlgorithm": "string",
@@ -32,7 +32,7 @@ namespace AwsMock::Dto::KMS {
      *   "KeyId": "string",
      *   "Plaintext": blob
      * }
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

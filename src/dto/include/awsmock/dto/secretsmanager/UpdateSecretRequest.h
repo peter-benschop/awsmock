@@ -25,7 +25,7 @@ namespace AwsMock::Dto::SecretsManager {
      * Update the secret values request.
      *
      * Example:
-     * @verbatim
+     * @code{.json}
      * {
      *   "ClientRequestToken": "string",
      *   "Description": "string",
@@ -34,7 +34,7 @@ namespace AwsMock::Dto::SecretsManager {
      *   "SecretId": "string",
      *   "SecretString": "string"
      * }
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

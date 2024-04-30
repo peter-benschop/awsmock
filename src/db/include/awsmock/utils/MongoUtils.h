@@ -31,7 +31,7 @@ namespace AwsMock::Database {
          * @param date bsoncxx::types::b_date
          * @return Poco::DateTime value
          */
-        static Poco::DateTime FromBson(bsoncxx::types::b_date);
+        static Poco::DateTime FromBson(bsoncxx::types::b_date date);
     };
 
 }// namespace AwsMock::Database

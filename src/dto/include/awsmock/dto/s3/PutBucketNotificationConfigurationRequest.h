@@ -25,7 +25,7 @@ namespace AwsMock::Dto::S3 {
      * S3 Notification configuration
      *
      * Example:
-     * @verbatim
+     * @code{.xml}
      * <NotificationConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
      *   <TopicConfiguration>
      *     <Event>string</Event>
@@ -78,7 +78,7 @@ namespace AwsMock::Dto::S3 {
      *   <EventBridgeConfiguration>
      *   </EventBridgeConfiguration>
      * </NotificationConfiguration>
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

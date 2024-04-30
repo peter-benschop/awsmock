@@ -24,14 +24,14 @@ namespace AwsMock::Dto::Lambda {
    * Lambda code DTO
    *
    * Example:
-   * @verbatim
+   * @code{.xml}
    * "Code": {
    *    "ImageUri": "string",
    *    "Location": "string",
    *    "RepositoryType": "string",
    *    "ResolvedImageUri": "string"
    * },
-   * @endverbatim
+   * @endcode
    */
     struct Code {
 

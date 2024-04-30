@@ -26,12 +26,12 @@ namespace AwsMock::Dto::SecretsManager {
     /**
      * Example:
      *
-     * @verbatim
+     * @code{.json}
      * {
      *   "Name": "test",
      *   "ClientRequestToken": "8b0e8777-4c9a-4621-9bd7-a6449b24c3a5"
      * }
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

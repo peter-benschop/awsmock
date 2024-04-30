@@ -25,18 +25,18 @@ namespace AwsMock::Dto::S3 {
      * S3 Notification configuration
      *
      * Example:
-     * @verbatim
-       <NotificationConfiguration>
-         <TopicConfiguration>
-            <Topic>arn:aws:sns:us-east-1:356671443308:s3notificationtopic2</Topic>
-            <Event>s3:ReducedRedundancyLostObject</Event>
-         </TopicConfiguration>
-         <QueueConfiguration>
-            <Queue>arn:aws:sqs:us-east-1:356671443308:s3notificationqueue</Queue>
-            <Event>s3:ObjectCreated:*</Event>
-         </QueueConfiguration>
-       </NotificationConfiguration>
-     * @endverbatim
+     * @code{.xml}
+     * <NotificationConfiguration>
+     *   <TopicConfiguration>
+     *     <Topic>arn:aws:sns:us-east-1:356671443308:s3notificationtopic2</Topic>
+     *     <Event>s3:ReducedRedundancyLostObject</Event>
+     *   </TopicConfiguration>
+     *   <QueueConfiguration>
+     *      <Queue>arn:aws:sqs:us-east-1:356671443308:s3notificationqueue</Queue>
+     *      <Event>s3:ObjectCreated:*</Event>
+     *   </QueueConfiguration>
+     * </NotificationConfiguration>
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

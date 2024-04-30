@@ -25,13 +25,13 @@ namespace AwsMock::Dto::SecretsManager {
      * Rotation rules
      *
      * Example:
-     * @verbatim
+     * @code{.json}
      * {
      *   "AutomaticallyAfterDays": number,
      *   "Duration": "string",
      *   "ScheduleExpression": "string"
      * }
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

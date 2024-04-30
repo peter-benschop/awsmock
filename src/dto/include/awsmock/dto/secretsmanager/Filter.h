@@ -27,14 +27,14 @@ namespace AwsMock::Dto::SecretsManager {
      * Secrets list filter
      *
      * Example:
-     * @verbatim
+     * @code{.json}
      * "Filters": [
      *   {
      *      "Key": "string",
      *      "Values": [ "string" ]
      *   }
      * ]
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

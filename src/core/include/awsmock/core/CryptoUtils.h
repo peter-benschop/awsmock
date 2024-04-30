@@ -205,15 +205,6 @@ namespace AwsMock::Core {
          * Convert to hex string
          *
          * @param input input byte array
-         * @param len input length
-         * @return hex encoded string
-         */
-        static std::string HexEncode(const unsigned char *buf, long &len);
-
-        /**
-         * Convert to hex string
-         *
-         * @param input input byte array
          * @return hex encoded string
          */
         static std::string HexEncode(const std::string &input);
@@ -260,18 +251,18 @@ namespace AwsMock::Core {
         /**
          * Read an EVP_PKEY from a string.
          *
-         * @param inKey key as string
+         * @param privateKey key as string
          * @return *EVP_PKEY
          */
-        static EVP_PKEY *ReadRsaPrivateKey(const std::string &inKey);
+        static EVP_PKEY *ReadRsaPrivateKey(const std::string &privateKey);
 
         /**
          * Read an EVP_PKEY from a string.
          *
-         * @param inKey key as string
+         * @param publicKey key as string
          * @return *EVP_PKEY
          */
-        static EVP_PKEY *ReadRsaPublicKey(const std::string &ublicKey);
+        static EVP_PKEY *ReadRsaPublicKey(const std::string &publicKey);
 
         /**
          * Encrypt a string using RSA encryption.

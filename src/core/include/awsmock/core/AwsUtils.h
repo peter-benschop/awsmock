@@ -74,7 +74,7 @@ namespace AwsMock::Core {
          * <p>
          * @verbatim
          * The queue name has the format 'http://<host>:<port>/<accountId>/<queueName>'
-         * @endverbatim
+         * @endcode
          * </p>
          *
          * @param configuration current AwsMock configuration

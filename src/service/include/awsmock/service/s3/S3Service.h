@@ -249,7 +249,7 @@ namespace AwsMock::Service {
          * Sends a message to the corresponding SNS topic.
          *
          * @param eventNotification S3 event notification.
-         * @param queueNotification queue notification.
+         * @param topicNotification topic notification.
          */
         void SendTopicNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::TopicNotification &topicNotification);
 

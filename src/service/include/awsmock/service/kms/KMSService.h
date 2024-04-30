@@ -14,6 +14,8 @@
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
+#include "awsmock/dto/kms/model/Key.h"
+#include "awsmock/dto/kms/model/ListKey.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -26,8 +28,6 @@
 #include <awsmock/dto/kms/DescribeKeyResponse.h>
 #include <awsmock/dto/kms/EncryptRequest.h>
 #include <awsmock/dto/kms/EncryptResponse.h>
-#include <awsmock/dto/kms/Key.h>
-#include <awsmock/dto/kms/ListKey.h>
 #include <awsmock/dto/kms/ListKeysRequest.h>
 #include <awsmock/dto/kms/ListKeysResponse.h>
 #include <awsmock/dto/kms/ScheduleKeyDeletionRequest.h>
