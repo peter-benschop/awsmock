@@ -26,14 +26,6 @@ namespace AwsMock::Service {
         _dataS3Dir = _dataDir + Poco::Path::separator() + "s3";
         _tempDir = _dataDir + Poco::Path::separator() + "tmp";
 
-        // SQS module connection
-        //_sqsServiceHost = _configuration.getString("awsmock.module.sqs.http.host", "localhost");
-        //_sqsServicePort = _configuration.getInt("awsmock.module.sqs.http.port", 9501);
-
-        // lambda module connection
-        //_lambdaServiceHost = _configuration.getString("awsmock.module.lambda.http.host", "localhost");
-        //_lambdaServicePort = _configuration.getInt("awsmock.module.lambda.http.port", 9503);
-
         // Create directories
         Core::DirUtils::EnsureDirectory(_tempDir);
         Core::DirUtils::EnsureDirectory(_dataDir);
@@ -301,7 +293,7 @@ namespace AwsMock::Service {
         Core::DirUtils::DeleteDirectory(uploadDir);
 
         // Check notifications
-        CheckNotifications(request.region, request.bucket, request.key, object.size, "s3:ObjectCreated:Put");
+        CheckNotifications(request.region, request.bucket, request.key, object.size, "ObjectCreated");
 
         log_info << "Multipart upload finished, bucket: " << request.bucket << " key: " << request.key;
         return {
@@ -397,7 +389,7 @@ namespace AwsMock::Service {
             log_debug << "Database updated, bucket: " << targetObject.bucket << " key: " << targetObject.key;
 
             // Check notification
-            CheckNotifications(targetObject.region, targetObject.bucket, targetObject.key, targetObject.size, "s3:ObjectCreated:Put");
+            CheckNotifications(targetObject.region, targetObject.bucket, targetObject.key, targetObject.size, "ObjectCreated");
             log_info << "Copy object succeeded, sourceBucket: " << request.sourceBucket << " sourceKey: " << request.sourceKey << " targetBucket: "
                      << request.targetBucket << " targetKey: " << request.targetKey;
 
@@ -469,7 +461,7 @@ namespace AwsMock::Service {
             log_debug << "Database updated, bucket: " << targetObject.bucket << " key: " << targetObject.key;
 
             // Check notification
-            CheckNotifications(targetObject.region, targetObject.bucket, targetObject.key, targetObject.size, "s3:ObjectCreated:Put");
+            CheckNotifications(targetObject.region, targetObject.bucket, targetObject.key, targetObject.size, "ObjectCreated");
             log_info << "Move object succeeded, sourceBucket: " << request.sourceBucket << " sourceKey: " << request.sourceKey << " targetBucket: "
                      << request.targetBucket << " targetKey: " << request.targetKey;
 
@@ -503,7 +495,7 @@ namespace AwsMock::Service {
                 DeleteObject(object.bucket, object.key, object.internalName);
 
                 // Check notifications
-                CheckNotifications(request.region, request.bucket, request.key, 0, "s3:ObjectRemoved:Delete");
+                CheckNotifications(request.region, request.bucket, request.key, 0, "ObjectRemoved");
 
                 log_info << "Object deleted, bucket: " << request.bucket << " key: " << request.key;
 
@@ -536,7 +528,7 @@ namespace AwsMock::Service {
                 log_debug << "File system object deleted: " << key;
 
                 // Check notifications
-                CheckNotifications(request.region, request.bucket, key, 0, "s3:ObjectRemoved:Delete");
+                CheckNotifications(request.region, request.bucket, key, 0, "ObjectRemoved");
             }
 
             // Delete from database
@@ -626,8 +618,6 @@ namespace AwsMock::Service {
     void S3Service::CheckNotifications(const std::string &region, const std::string &bucket, const std::string &key, long size, const std::string &event) {
         log_debug << "Check notifications, region: " << region << " bucket: " << bucket << " event: " << event;
 
-        std::string eventName = Core::StringUtils::Split(event, ':')[1];
-
         Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(region, bucket);
 
         if (bucketEntity.HasQueueNotification(event)) {
@@ -680,9 +670,9 @@ namespace AwsMock::Service {
             }
         }
 
-        if (bucketEntity.HasLambdaNotification(eventName)) {
+        if (bucketEntity.HasLambdaNotification(event)) {
 
-            Database::Entity::S3::LambdaNotification notification = bucketEntity.GetLambdaNotification(eventName);
+            Database::Entity::S3::LambdaNotification notification = bucketEntity.GetLambdaNotification(event);
 
             if (notification.CheckFilter(key)) {
 
@@ -734,9 +724,15 @@ namespace AwsMock::Service {
             log_debug << "Bucket received, region:" << bucket.region << " bucket: " << bucket.name;
 
             // Add notification configurations
-            GetQueueNotificationConfigurations(bucket, request.queueConfigurations);
-            GetTopicNotificationConfigurations(bucket, request.topicConfigurations);
-            GetLambdaNotificationConfigurations(bucket, request.lambdaConfigurations);
+            if (!request.queueConfigurations.empty()) {
+                GetQueueNotificationConfigurations(bucket, request.queueConfigurations);
+            }
+            if (!request.topicConfigurations.empty()) {
+                GetTopicNotificationConfigurations(bucket, request.topicConfigurations);
+            }
+            if (!request.lambdaConfigurations.empty()) {
+                GetLambdaNotificationConfigurations(bucket, request.lambdaConfigurations);
+            }
 
             // Update database
             bucket = _database.UpdateBucket(bucket);
@@ -839,7 +835,7 @@ namespace AwsMock::Service {
         log_debug << "Database updated, bucket: " << object.bucket << " key: " << object.key;
 
         // Check notification
-        CheckNotifications(request.region, request.bucket, request.key, object.size, "s3:ObjectCreated:Put");
+        CheckNotifications(request.region, request.bucket, request.key, object.size, "ObjectCreated");
         log_info << "Put object succeeded, bucket: " << request.bucket << " key: " << request.key;
 
         return {
@@ -900,7 +896,7 @@ namespace AwsMock::Service {
             }
 
             // Check notification
-            CheckNotifications(request.region, request.bucket, request.key, object.size, "s3:ObjectCreated:Put");
+            CheckNotifications(request.region, request.bucket, request.key, object.size, "ObjectCreated");
             log_info << "Put object succeeded, bucket: " << request.bucket << " key: " << request.key;
 
         } else {
@@ -938,7 +934,7 @@ namespace AwsMock::Service {
         for (auto &queueConfiguration: queueConfigurations) {
 
             // Check existence
-            if (!queueConfiguration.id.empty() && bucket.HasTopicNotificationId(queueConfiguration.id)) {
+            if (!queueConfiguration.id.empty() && bucket.HasQueueNotificationId(queueConfiguration.id)) {
                 break;
             }
 
@@ -960,8 +956,8 @@ namespace AwsMock::Service {
                 queueNotification.filterRules.emplace_back(filterRuleEntity);
             }
             bucket.queueNotifications.emplace_back(queueNotification);
+            log_debug << "Added queue notification configurations, count: " << bucket.queueNotifications.size();
         }
-        log_debug << "Added queue notification configurations, count: " << bucket.queueNotifications.size();
     }
 
     void S3Service::GetTopicNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::TopicConfiguration> &topicConfigurations) {
@@ -991,8 +987,8 @@ namespace AwsMock::Service {
                 topicNotification.filterRules.emplace_back(filterRuleEntity);
             }
             bucket.topicNotifications.emplace_back(topicNotification);
+            log_debug << "Added queue notification configurations, count: " << bucket.queueNotifications.size();
         }
-        log_debug << "Added queue notification configurations, count: " << bucket.queueNotifications.size();
     }
 
     void S3Service::GetLambdaNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::LambdaConfiguration> &lambdaConfigurations) {
@@ -1023,8 +1019,8 @@ namespace AwsMock::Service {
                 lambdaNotification.filterRules.emplace_back(filterRuleEntity);
             }
             bucket.lambdaNotifications.emplace_back(lambdaNotification);
+            log_debug << "Added queue notification configurations, count: " << bucket.queueNotifications.size();
         }
-        log_debug << "Added queue notification configurations, count: " << bucket.queueNotifications.size();
     }
 
     void S3Service::CalculateHashes(Database::Entity::S3::Object &object) {
