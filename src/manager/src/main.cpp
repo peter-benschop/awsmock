@@ -19,7 +19,6 @@
 
 // C includes
 #include <cstdlib>
-#include <unistd.h>
 
 // C++ standard includes
 #include <iostream>

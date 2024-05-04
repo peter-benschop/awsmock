@@ -97,7 +97,7 @@ namespace AwsMock::Database {
             }
 
             Entity::Cognito::UserPool result;
-            result.FromDocument(mResult);
+            result.FromDocument(mResult->view());
             return result;
 
         } catch (const mongocxx::exception &exc) {
@@ -122,7 +122,7 @@ namespace AwsMock::Database {
                 }
 
                 Entity::Cognito::UserPool result;
-                result.FromDocument(mResult);
+                result.FromDocument(mResult->view());
                 return result;
 
             } catch (const mongocxx::exception &exc) {
@@ -366,7 +366,7 @@ namespace AwsMock::Database {
             }
 
             Entity::Cognito::User result;
-            result.FromDocument(mResult);
+            result.FromDocument(mResult->view());
             return result;
 
         } catch (const mongocxx::exception &exc) {
@@ -390,7 +390,7 @@ namespace AwsMock::Database {
                 }
 
                 Entity::Cognito::User result;
-                result.FromDocument(mResult);
+                result.FromDocument(mResult->view());
                 return result;
 
             } catch (const mongocxx::exception &exc) {

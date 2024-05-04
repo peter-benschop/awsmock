@@ -5,6 +5,10 @@
 #ifndef AWS_MOCK_CORE_CORE_EXCEPTION_H
 #define AWS_MOCK_CORE_CORE_EXCEPTION_H
 
+// C++ includes
+#include <string>
+
+// Poco includes
 #include <Poco/Exception.h>
 
 namespace AwsMock::Core {

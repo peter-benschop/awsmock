@@ -6,14 +6,15 @@
 #define AWS_MOCK_CORE_MEMORY_MAPPED_FILE_H
 
 // C includes
-#include <cerrno>
 #include <fcntl.h>
-#include <sys/mman.h>
 #include <sys/stat.h>
+#ifndef _WIN32
+#include <cerrno>
+#include <sys/mman.h>
 #include <unistd.h>
+#endif
 
 // C++ includes
-#include <mutex>
 #include <string>
 
 // Poco includes

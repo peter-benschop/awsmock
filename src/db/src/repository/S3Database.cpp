@@ -105,7 +105,7 @@ namespace AwsMock::Database {
         mongocxx::stdx::optional<bsoncxx::document::value>
                 mResult = _bucketCollection.find_one(make_document(kvp("_id", oid)));
         Entity::S3::Bucket result;
-        result.FromDocument(mResult);
+        result.FromDocument(mResult->view());
 
         return result;
     }
@@ -135,7 +135,7 @@ namespace AwsMock::Database {
             }
 
             Entity::S3::Bucket result;
-            result.FromDocument(mResult);
+            result.FromDocument(mResult->view());
             log_trace << "Got bucket: " << result.ToString();
             return result;
 
@@ -410,7 +410,7 @@ namespace AwsMock::Database {
                 return {};
             }
             Entity::S3::Object result;
-            result.FromDocument(mResult);
+            result.FromDocument(mResult->view());
             return result;
 
         } catch (mongocxx::exception::system_error &e) {
@@ -487,7 +487,7 @@ namespace AwsMock::Database {
 
                 if (mResult.has_value()) {
                     Entity::S3::Object result;
-                    result.FromDocument(mResult);
+                    result.FromDocument(mResult->view());
 
                     log_trace << "Got object: " << result.ToString();
                     return result;
@@ -521,7 +521,7 @@ namespace AwsMock::Database {
                                                                        kvp("md5sum", md5sum)));
             if (mResult.has_value()) {
                 Entity::S3::Object result;
-                result.FromDocument(mResult);
+                result.FromDocument(mResult->view());
 
                 log_trace << "Got object MD5: " << result.ToString();
                 return result;
@@ -549,7 +549,7 @@ namespace AwsMock::Database {
                                                                     kvp("versionId", versionId)));
             if (mResult) {
                 Entity::S3::Object result;
-                result.FromDocument(mResult);
+                result.FromDocument(mResult->view());
 
                 log_trace << "Got object version: " << result.ToString();
                 return result;

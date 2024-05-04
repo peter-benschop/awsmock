@@ -34,7 +34,7 @@ namespace AwsMock::Database::Entity::Lambda {
             tagsDoc.append(kvp(t.first, t.second));
         }
 
-        view_or_value<view, value> ephemeralStorageDoc = make_document(kvp("size", ephemeralStorage.size));
+        view_or_value<view, value> ephemeralStorageDoc = make_document(kvp("size", static_cast<bsoncxx::types::b_int64>(ephemeralStorage.size)));
 
         view_or_value<view, value> lambdaDoc = make_document(
                 kvp("region", region),
@@ -43,9 +43,9 @@ namespace AwsMock::Database::Entity::Lambda {
                 kvp("runtime", runtime),
                 kvp("role", role),
                 kvp("handler", handler),
-                kvp("memorySize", memorySize),
+                kvp("memorySize", static_cast<bsoncxx::types::b_int64>(memorySize)),
                 kvp("ephemeralStorage", ephemeralStorageDoc),
-                kvp("codeSize", codeSize),
+                kvp("codeSize", static_cast<bsoncxx::types::b_int64>(codeSize)),
                 kvp("fileName", fileName),
                 kvp("imageId", imageId),
                 kvp("containerId", containerId),

@@ -52,7 +52,7 @@ namespace AwsMock::Database {
                 auto result = _moduleCollection.find_one(make_document(kvp("name", name)));
                 if (result) {
                     Entity::Module::Module module;
-                    module.FromDocument(result);
+                    module.FromDocument(result->view());
                     log_trace << "Module state: " << Entity::Module::ModuleStateToString(module.state);
                     return module.status == Entity::Module::ModuleStatus::ACTIVE;
                 }
@@ -102,7 +102,7 @@ namespace AwsMock::Database {
                     mResult = _moduleCollection.find_one(make_document(kvp("_id", oid)));
             if (mResult) {
                 Entity::Module::Module module;
-                module.FromDocument(mResult);
+                module.FromDocument(mResult->view());
                 return module;
             }
 
@@ -136,7 +136,7 @@ namespace AwsMock::Database {
                 auto mResult = _moduleCollection.find_one(make_document(kvp("name", name)));
                 if (mResult) {
                     Entity::Module::Module modules;
-                    modules.FromDocument(mResult);
+                    modules.FromDocument(mResult->view());
                     return modules;
                 }
 

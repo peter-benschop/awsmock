@@ -25,8 +25,7 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 auto result = _tableCollection.insert_one(table.ToDocument());
                 session.commit_transaction();
-                log_trace << "DynamoDb table created, oid: "
-                          << result->inserted_id().get_oid().value.to_string();
+                log_trace << "DynamoDb table created, oid: " << result->inserted_id().get_oid().value.to_string();
                 return GetTableById(result->inserted_id().get_oid().value);
 
             } catch (const mongocxx::exception &exc) {
@@ -55,7 +54,7 @@ namespace AwsMock::Database {
             }
 
             Entity::DynamoDb::Table result;
-            result.FromDocument(mResult);
+            result.FromDocument(mResult->view());
             log_debug << "Got table by ID, table: " << result.ToString();
             return result;
 
@@ -81,7 +80,7 @@ namespace AwsMock::Database {
                 }
 
                 Entity::DynamoDb::Table result;
-                result.FromDocument(mResult);
+                result.FromDocument(mResult->view());
                 log_debug << "Got table by ID, table: " << result.ToString();
                 return result;
 

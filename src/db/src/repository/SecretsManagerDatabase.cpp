@@ -74,7 +74,7 @@ namespace AwsMock::Database {
         mongocxx::stdx::optional<bsoncxx::document::value>
                 mResult = _secretCollection.find_one(make_document(kvp("_id", oid)));
         Entity::SecretsManager::Secret result;
-        result.FromDocument(mResult);
+        result.FromDocument(mResult->view());
 
         return result;
     }
@@ -105,7 +105,7 @@ namespace AwsMock::Database {
             }
 
             Entity::SecretsManager::Secret result;
-            result.FromDocument(mResult);
+            result.FromDocument(mResult->view());
             log_trace << "Got secret: " << result.ToString();
             return result;
 
@@ -128,7 +128,7 @@ namespace AwsMock::Database {
             }
 
             Entity::SecretsManager::Secret result;
-            result.FromDocument(mResult);
+            result.FromDocument(mResult->view());
             log_trace << "Got secret: " << result.ToString();
             return result;
 

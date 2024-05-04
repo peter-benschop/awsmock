@@ -22,7 +22,7 @@ namespace AwsMock::Database::Entity::S3 {
                 kvp("bucket", bucket),
                 kvp("key", key),
                 kvp("owner", owner),
-                kvp("size", size),
+                kvp("size", static_cast<bsoncxx::types::b_int64>(size)),
                 kvp("md5sum", md5sum),
                 kvp("sha1sum", sha1sum),
                 kvp("sha256sum", sha256sum),
@@ -42,7 +42,7 @@ namespace AwsMock::Database::Entity::S3 {
         bucket = bsoncxx::string::to_string(mResult.value()["bucket"].get_string().value);
         key = bsoncxx::string::to_string(mResult.value()["key"].get_string().value);
         owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
-        size = mResult.value()["size"].get_int64().value;
+        size = static_cast<long>(mResult.value()["size"].get_int64().value);
         md5sum = bsoncxx::string::to_string(mResult.value()["md5sum"].get_string().value);
         sha1sum = bsoncxx::string::to_string(mResult.value()["sha1sum"].get_string().value);
         sha256sum = bsoncxx::string::to_string(mResult.value()["sha256sum"].get_string().value);
