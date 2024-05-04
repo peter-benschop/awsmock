@@ -12,12 +12,12 @@
 #include <vector>
 
 // AwsMock includes
+#include "awsmock/dto/lambda/model/Code.h"
+#include "awsmock/dto/lambda/model/Environment.h"
+#include "awsmock/dto/lambda/model/EphemeralStorage.h"
 #include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/lambda/Code.h>
-#include <awsmock/dto/lambda/Environment.h>
-#include <awsmock/dto/lambda/EphemeralStorage.h>
 
 namespace AwsMock::Dto::Lambda {
 

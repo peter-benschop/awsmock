@@ -18,7 +18,6 @@
 #include <awsmock/service/cognito/CognitoHandlerFactory.h>
 #include <awsmock/service/cognito/CognitoMonitoring.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/common/AbstractWorker.h>
 
 #define COGNITO_DEFAULT_PORT 9505
 #define COGNITO_DEFAULT_HOST "localhost"
@@ -34,7 +33,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class CognitoServer : public AbstractServer, public AbstractWorker {
+    class CognitoServer : public AbstractServer {
 
       public:
 

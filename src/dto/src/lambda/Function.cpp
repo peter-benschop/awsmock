@@ -2,7 +2,7 @@
 // Created by vogje01 on 06/09/2023.
 //
 
-#include <awsmock/dto/lambda/Function.h>
+#include "awsmock/dto/lambda/model/Function.h"
 
 namespace AwsMock::Dto::Lambda {
 
@@ -35,7 +35,7 @@ namespace AwsMock::Dto::Lambda {
             rootJson.set("StateResaon", stateReason);
             rootJson.set("StateReasonCode", stateReasonCode);
             rootJson.set("Timeout", timeout);
-            rootJson.set("Environment", environment.ToJson());
+            rootJson.set("Environment", environment.ToJsonObject());
             rootJson.set("Version", version);
 
             return rootJson;

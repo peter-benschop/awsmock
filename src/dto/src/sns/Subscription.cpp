@@ -2,7 +2,7 @@
 // Created by vogje01 on 03/10/2023.
 //
 
-#include <awsmock/dto/sns/Subscription.h>
+#include "awsmock/dto/sns/model/Subscription.h"
 
 namespace AwsMock::Dto::SNS {
 

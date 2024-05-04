@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_LAMBDA_DEADLETTERCONFIG_H
-#define AWSMOCK_DTO_LAMBDA_DEADLETTERCONFIG_H
+#ifndef AWSMOCK_DTO_LAMBDA_DEAD_LETTER_CONFIG_H
+#define AWSMOCK_DTO_LAMBDA_DEAD_LETTER_CONFIG_H
 
 // C++ standard includes
 #include <sstream>
@@ -16,25 +16,25 @@
 #include <Poco/JSON/Parser.h>
 
 // AwsMock includes
-#include <awsmock/core/ServiceException.h>
+#include "awsmock/core/ServiceException.h"
 
 namespace AwsMock::Dto::Lambda {
 
     struct DeadLetterConfig {
 
         /**
-     * Target ARN
-     */
+         * Target ARN
+         */
         std::string targetArn = {};
 
         /**
-     * Converts the DTO to a JSON representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a JSON representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
     };
 
 }// namespace AwsMock::Dto::Lambda
 
-#endif// AWSMOCK_DTO_LAMBDA_DEADLETTERCONFIG_H
+#endif// AWSMOCK_DTO_LAMBDA_DEAD_LETTER_CONFIG_H

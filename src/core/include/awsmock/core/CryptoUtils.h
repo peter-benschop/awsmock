@@ -37,6 +37,7 @@
 #include <openssl/sha.h>
 
 // AwsMock includes
+#include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/RandomUtils.h>
 #include <awsmock/core/StringUtils.h>
@@ -166,7 +167,7 @@ namespace AwsMock::Core {
         static void CreateAes256Key(unsigned char *key, unsigned char *iv);
 
         /**
-         * AES 256 encryption
+         * @brief AES 256 encryption
          *
          * @param plaintext input string
          * @param len plaintext length
@@ -176,7 +177,7 @@ namespace AwsMock::Core {
         static unsigned char *Aes256EncryptString(unsigned char *plaintext, int *len, unsigned char *key);
 
         /**
-         * AES 256 description
+         * @brief AES256 description
          *
          * @param ciphertext input string
          * @param len ciphertext length
@@ -184,6 +185,33 @@ namespace AwsMock::Core {
          * @return decrypted string
          */
         static unsigned char *Aes256DecryptString(unsigned char *ciphertext, int *len, unsigned char *key);
+
+        /**
+         * @brief AES256 encryption of a file
+         *
+         * <p>
+         * The original plaintext file will be replaced by the encrypted file.
+         * </p>
+         *
+         * @param filename input file name
+         * @param key encryption key
+         * @return encrypted string
+         */
+        static void Aes256EncryptFile(const std::string &filename, unsigned char *key);
+
+        /**
+         * @brief AES256 description of a file.
+         *
+         * <p>
+         * The actual file will stay encrypted. Outfile must be deleted after send to client.
+         * </p>
+         *
+         * @param filename input file name
+         * @param outFilename output filename
+         * @param key encryption key
+         * @return decrypted string
+         */
+        static void Aes256DecryptFile(const std::string &filename, std::string &outFilename, unsigned char *key);
 
         /**
          * Base64 encoding.
@@ -200,6 +228,10 @@ namespace AwsMock::Core {
          * @return BASE64 decoded string.
          */
         static std::string Base64Decode(const std::string &encodedString);
+
+        //static unsigned char *Base64Decode(std::string const &encoded_string);
+
+        //static std::string Base64Encode(unsigned char const *buf, unsigned int bufLen);
 
         /**
          * Convert to hex string
@@ -224,7 +256,7 @@ namespace AwsMock::Core {
          * @param hex hex string
          * @return unsigned char array.
          */
-        static std::string HexDecode(const std::string &hex);
+        static unsigned char *HexDecode(const std::string &hex);
 
         /**
          * Generate a RSA key pair of the given length.

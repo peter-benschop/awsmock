@@ -17,7 +17,6 @@
 #include <awsmock/core/ThreadPool.h>
 #include <awsmock/core/Timer.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/common/AbstractWorker.h>
 #include <awsmock/service/s3/S3HandlerFactory.h>
 #include <awsmock/service/s3/S3Monitoring.h>
 
@@ -40,7 +39,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class S3Server : public AbstractServer, public AbstractWorker {
+    class S3Server : public AbstractServer {
 
       public:
 

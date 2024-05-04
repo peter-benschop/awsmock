@@ -17,8 +17,26 @@
 namespace AwsMock::Core {
 
     /**
-     * Task class
+     * @brief Task class
      *
+     * A task is a one-shot asynchronously running thread. The implementing class should define two methods: "Run()" and "Initialize()". Initialize
+     * should do all the initial initialization, whereas Run() does the work. The thread is automatically stopped and cleaned up.
+     *
+     * @code{.cpp}
+     * Core::Task DoSomethingAsynchron();
+     * DoSomethingAsynchron.Start();
+     *
+     * class DoSomethingAsynchron {
+     *
+     *   Initialize() {
+     *   ...
+     *   }
+     *
+     *   Run() {
+     *   ...
+     *   }
+     * }
+     * @endcode
      * @author jens.vogt\@opitz-consulting.com
      */
     class Task {
@@ -31,7 +49,7 @@ namespace AwsMock::Core {
          * @param name task name
          * @param timeout timeout in milliseconds
          */
-        explicit Task(std::string name, int timeout) : _name(name), _timeout(timeout) {}
+        explicit Task(std::string name) : _name(std::move(name)) {}
 
         /**
          * Start the task
@@ -64,11 +82,6 @@ namespace AwsMock::Core {
          * Timer name
          */
         std::string _name;
-
-        /**
-         * Loop timeout
-         */
-        int _timeout;
 
         /**
          * Promise for stopping thread

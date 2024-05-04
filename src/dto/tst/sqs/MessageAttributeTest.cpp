@@ -10,8 +10,8 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
+#include "awsmock/dto/sqs/model/MessageAttribute.h"
 #include <awsmock/core/Configuration.h>
-#include <awsmock/dto/sqs/MessageAttribute.h>
 
 // Test includes
 #include <awsmock/core/TestUtils.h>

@@ -317,6 +317,23 @@ namespace AwsMock::Service {
                     break;
                 }
 
+                case Dto::Common::S3CommandType::PUT_BUCKET_ENCRYPTION: {
+
+                    log_debug << "Put bucket encryption configuration request, bucket: " << s3ClientCommand.bucket;
+
+                    // S3 notification setup
+                    std::string body = Core::HttpUtils::GetBodyAsString(request);
+                    Dto::S3::PutBucketEncryptionRequest s3Request;
+                    s3Request.FromXml(body);
+                    s3Request.region = s3ClientCommand.region;
+                    s3Request.bucket = s3ClientCommand.bucket;
+
+                    _s3Service.PutBucketEncryption(s3Request);
+
+                    SendOkResponse(response);
+                    break;
+                }
+
                     // Should not happen
                 case Dto::Common::S3CommandType::GET_OBJECT:
                 case Dto::Common::S3CommandType::COPY_OBJECT:

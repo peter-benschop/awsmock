@@ -13,9 +13,9 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/CryptoUtils.h>
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/dto/sqs/MessageAttributeDataType.h>
+#include "awsmock/core/CryptoUtils.h"
+#include "awsmock/core/JsonUtils.h"
+#include "awsmock/dto/sqs/MessageAttributeDataType.h"
 
 namespace AwsMock::Dto::SQS {
 

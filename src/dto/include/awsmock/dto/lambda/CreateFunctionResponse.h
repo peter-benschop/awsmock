@@ -16,9 +16,9 @@
 #include <Poco/JSON/Parser.h>
 
 // AwsMock includes
+#include "awsmock/dto/lambda/model/Environment.h"
+#include "awsmock/dto/lambda/model/EphemeralStorage.h"
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/dto/lambda/Environment.h>
-#include <awsmock/dto/lambda/EphemeralStorage.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -165,8 +165,8 @@ namespace AwsMock::Dto::Lambda {
                 rootJson.set("Timeout", timeout);
                 rootJson.set("CodeSha256", codeSha256);
                 rootJson.set("LastModified", modified);
-                rootJson.set("Environment", environment.ToJson());
-                rootJson.set("EphemeralStorage", ephemeralStorage.ToJson());
+                rootJson.set("Environment", environment.ToJsonObject());
+                rootJson.set("EphemeralStorage", ephemeralStorage.ToJsonObject());
                 rootJson.set("MemorySize", memorySize);
 
                 std::ostringstream os;

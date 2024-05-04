@@ -2,8 +2,8 @@
 // Created by vogje01 on 4/12/24.
 //
 
-#ifndef AWSMOCK_CORE_TASK_H
-#define AWSMOCK_CORE_TASK_H
+#ifndef AWSMOCK_CORE_TIMER_H
+#define AWSMOCK_CORE_TIMER_H
 
 // C++ standard includes
 #include <future>
@@ -112,4 +112,4 @@ namespace AwsMock::Core {
 
 }// namespace AwsMock::Core
 
-#endif// AWSMOCK_CORE_TASK_H
+#endif// AWSMOCK_CORE_TIMER_H

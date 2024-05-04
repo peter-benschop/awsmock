@@ -201,13 +201,13 @@ namespace AwsMock::Service {
             case Dto::KMS::KeySpec::SYMMETRIC_DEFAULT: {
 
                 // Preparation
-                std::string rawKey = Core::Crypto::HexDecode(key.aes256Key);
+                unsigned char *rawKey = Core::Crypto::HexDecode(key.aes256Key);
                 unsigned char *rawCiphertext = nullptr;
                 std::string rawPlaintext = Core::Crypto::Base64Decode(plainText);
                 int plaintextLen = static_cast<int>(rawPlaintext.length());
 
                 // Encryption
-                rawCiphertext = Core::Crypto::Aes256EncryptString((unsigned char *) rawPlaintext.c_str(), &plaintextLen, (unsigned char *) rawKey.c_str());
+                rawCiphertext = Core::Crypto::Aes256EncryptString((unsigned char *) rawPlaintext.c_str(), &plaintextLen, rawKey);
                 log_debug << "Encrypted plaintext, length: " << rawPlaintext;
                 return Core::Crypto::Base64Encode({(char *) rawCiphertext, static_cast<size_t>(plaintextLen)});
             }
@@ -251,13 +251,13 @@ namespace AwsMock::Service {
             case Dto::KMS::KeySpec::SYMMETRIC_DEFAULT: {
 
                 // Preparation
-                std::string rawKey = Core::Crypto::HexDecode(key.aes256Key);
+                unsigned char *rawKey = Core::Crypto::HexDecode(key.aes256Key);
                 std::string rawCiphertext = Core::Crypto::Base64Decode(ciphertext);
                 int ciphertextLenLen = static_cast<int>(rawCiphertext.length());
                 unsigned char *rawPlaintext;
 
                 // Description
-                rawPlaintext = Core::Crypto::Aes256DecryptString((unsigned char *) rawCiphertext.c_str(), &ciphertextLenLen, (unsigned char *) rawKey.c_str());
+                rawPlaintext = Core::Crypto::Aes256DecryptString((unsigned char *) rawCiphertext.c_str(), &ciphertextLenLen, rawKey);
                 log_debug << "Decrypted plaintext, length: " << ciphertextLenLen;
 
                 return Core::Crypto::Base64Encode({(char *) rawPlaintext});

@@ -228,11 +228,11 @@ namespace AwsMock::Core {
         std::string testString = "This is a test string";
 
         // act
-        std::string encoded = Crypto::HexEncode(testString);
-        std::string decoded = Crypto::HexDecode(encoded);
+        std::string encoded = Crypto::HexEncode(reinterpret_cast<unsigned char *>(testString.data()), testString.length());
+        unsigned char *decoded = Crypto::HexDecode(encoded);
 
         // assert
-        EXPECT_STRCASEEQ(testString.c_str(), decoded.c_str());
+        EXPECT_STRCASEEQ(testString.c_str(), reinterpret_cast<char *>(decoded));
     }
 
 }// namespace AwsMock::Core

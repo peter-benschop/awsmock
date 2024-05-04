@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    DynamoDbServer::DynamoDbServer(Core::Configuration &configuration) : AbstractWorker(configuration), AbstractServer(configuration, "dynamodb", 10), _configuration(configuration), _module("dynamodb") {
+    DynamoDbServer::DynamoDbServer(Core::Configuration &configuration) : AbstractServer(configuration, "dynamodb", 10), _configuration(configuration), _module("dynamodb") {
 
         // Get HTTP configuration values
         _region = _configuration.getString("awsmock.region");
@@ -22,7 +22,7 @@ namespace AwsMock::Service {
         log_debug << "DynamoDB server period: " << _period;
 
         // Docker module
-        _dockerService = std::make_unique<Service::DockerService>(_configuration);
+        _dockerService = std::make_unique<Service::DockerService>();
         log_debug << "DynamoDbServer initialized";
 
         // Monitoring
