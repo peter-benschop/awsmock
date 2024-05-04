@@ -11,7 +11,7 @@ namespace AwsMock::FtpServer {
                            std::string serverName,
                            Core::Configuration &configuration,
                            const std::function<void()> &completion_handler)
-        : AbstractWorker(configuration), _completion_handler(completion_handler), _user_database(user_database), _io_service(io_service), command_socket_(io_service),
+        : _completion_handler(completion_handler), _user_database(user_database), _io_service(io_service), command_socket_(io_service),
           command_write_strand_(io_service), data_type_binary_(false), data_acceptor_(io_service), data_buffer_strand_(io_service), file_rw_strand_(io_service),
           _ftpWorkingDirectory("/"), _configuration(configuration), _serverName(std::move(serverName)) {
 
@@ -22,7 +22,7 @@ namespace AwsMock::FtpServer {
 
         // Environment
         _region = _configuration.getString("awsmock.region", DEFAULT_TRANSFER_REGION);
-        _bucket = _configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
+        _bucket = _configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET_NAME);
         _transferDir = _configuration.getString("awsmock.service.ftp.base.dir", DEFAULT_TRANSFER_DATA_DIR);
 
         // S3 service

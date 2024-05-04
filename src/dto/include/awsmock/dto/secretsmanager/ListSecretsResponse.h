@@ -29,14 +29,14 @@ namespace AwsMock::Dto::SecretsManager {
      * List secrets response
      *
      * Example:
-     * @verbatim
+     * @code{.json}
      * {
      *    "NextToken": "string",
      *    "SecretList": [
      *    .....
      *   ]
      * }
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

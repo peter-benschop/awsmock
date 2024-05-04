@@ -35,11 +35,11 @@ namespace AwsMock::Dto::S3 {
          * Convert to XML representation
          *
          * Example:
-         * @verbatim
+         * @code{.xml}
          * <CreateBucketConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
          *     <LocationConstraint>eu-central-1</LocationConstraint>
          * </CreateBucketConfiguration>
-         * @endverbatim
+         * @endcode
          *
          * @return XML string
          */

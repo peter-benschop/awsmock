@@ -24,7 +24,7 @@ namespace AwsMock::Dto::Cognito {
      * Cognito lambda configuration
      *
      * Example:
-     * @verbatim
+     * @code{.json}
      * "LambdaConfig": {
      *    "CreateAuthChallenge": "string",
      *    "CustomEmailSender": {
@@ -50,7 +50,7 @@ namespace AwsMock::Dto::Cognito {
      *    "UserMigration": "string",
      *    "VerifyAuthChallengeResponse": "string"
      * },
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

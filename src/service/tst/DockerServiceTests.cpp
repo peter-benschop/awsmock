@@ -31,7 +31,7 @@ namespace AwsMock::Service {
         }
 
         Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
-        DockerService _service = DockerService(_configuration);
+        DockerService _service = DockerService();
     };
 
     TEST_F(DockerServiceTest, ImageExistsTest) {

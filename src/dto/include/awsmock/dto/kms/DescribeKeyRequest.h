@@ -10,11 +10,11 @@
 #include <vector>
 
 // AwsMock includes
+#include "awsmock/dto/kms/model/KeySpec.h"
+#include "awsmock/dto/kms/model/KeyUsage.h"
 #include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/kms/KeySpec.h>
-#include <awsmock/dto/kms/KeyUsage.h>
 
 namespace AwsMock::Dto::KMS {
 
@@ -22,12 +22,12 @@ namespace AwsMock::Dto::KMS {
      * Create KMS key request
      *
      * Example:
-     * @verbatim
+     * @code{.json}
      * {
      *   "GrantTokens": [ "string" ],
      *   "KeyId": "string"
      * }
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

@@ -105,7 +105,7 @@ namespace AwsMock::Core {
          * </p>
          *
          * Example map<std::string, std::string>:
-         * @verbatim
+         * @code{.json}
          * {
          *  "map.first": "map.second"
          * }

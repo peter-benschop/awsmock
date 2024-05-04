@@ -21,12 +21,12 @@ namespace AwsMock::Dto::Cognito {
      * Cognito custom email sender
      *
      * Example:
-     * @verbatim
+     * @code{.json}
      * "CustomEmailSender": {
      *    "LambdaArn": "string",
      *    "LambdaVersion": "string"
      * },
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

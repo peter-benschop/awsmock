@@ -23,7 +23,7 @@
 #include <Poco/XML/XMLWriter.h>
 
 // AwsMock includes
-#include <awsmock/dto/sns/Subscription.h>
+#include "awsmock/dto/sns/model/Subscription.h"
 
 namespace AwsMock::Dto::SNS {
 

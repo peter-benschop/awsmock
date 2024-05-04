@@ -25,7 +25,7 @@ namespace AwsMock::Dto::SecretsManager {
      * Secrets manager replication status.
      *
      * Example:
-     * @verbatim
+     * @code{.json}
      * {
      *   "KmsKeyId": "string",
      *   "LastAccessedDate": number,
@@ -33,7 +33,7 @@ namespace AwsMock::Dto::SecretsManager {
      *   "Status": "string",
      *   "StatusMessage": "string"
      * }
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

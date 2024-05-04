@@ -10,10 +10,10 @@
 #include <vector>
 
 // AwsMock includes
+#include "awsmock/dto/kms/model/ListKey.h"
 #include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/kms/ListKey.h>
 
 namespace AwsMock::Dto::KMS {
 
@@ -21,7 +21,7 @@ namespace AwsMock::Dto::KMS {
      * List all KMS keys request
      *
      * Example:
-     * @verbatim
+     * @code{.json}
      * {
      *   "Keys": [
      *     {
@@ -32,7 +32,7 @@ namespace AwsMock::Dto::KMS {
      *  "NextMarker": "string",
      *  "Truncated": boolean
      * }
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

@@ -28,7 +28,7 @@ namespace AwsMock::Dto::SecretsManager {
      * Secrets list filter
      *
      * Example:
-     * @verbatim
+     * @code{.json}
      *  {
      *     "Name": "string",
      *     "OwningService": "string",
@@ -59,7 +59,7 @@ namespace AwsMock::Dto::SecretsManager {
      *       }
      *    ]
      * }
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

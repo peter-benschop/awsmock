@@ -40,14 +40,18 @@ namespace AwsMock::Core {
     }
 
     void FileUtils::MoveTo(const std::string &sourceFileName, const std::string &targetFileName, bool createDir) {
-        Poco::File sourceFile(sourceFileName);
-        Poco::File targetFile(targetFileName);
-        std::string parentPath = GetParentPath(targetFileName);
-        if (createDir && !Core::DirUtils::DirectoryExists(parentPath)) {
-            Poco::File parentFile(parentPath);
-            parentFile.createDirectories();
+        try {
+            Poco::File sourceFile(sourceFileName);
+            Poco::File targetFile(targetFileName);
+            std::string parentPath = GetParentPath(targetFileName);
+            if (createDir && !Core::DirUtils::DirectoryExists(parentPath)) {
+                Poco::File parentFile(parentPath);
+                parentFile.createDirectories();
+            }
+            sourceFile.renameTo(targetFileName);
+        } catch (Poco::Exception &e) {
+            log_error << e.message();
         }
-        sourceFile.renameTo(targetFileName);
     }
 
     void FileUtils::CopyTo(const std::string &sourceFileName, const std::string &targetFileName, bool createDir) {

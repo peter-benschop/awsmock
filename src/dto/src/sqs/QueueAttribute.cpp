@@ -2,7 +2,7 @@
 // Created by vogje01 on 23/11/2023.
 //
 
-#include <awsmock/dto/sqs/QueueAttribute.h>
+#include "awsmock/dto/sqs/model/QueueAttribute.h"
 
 namespace AwsMock::Dto::SQS {
 

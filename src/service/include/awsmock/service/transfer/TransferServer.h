@@ -23,7 +23,6 @@
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/repository/TransferDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/common/AbstractWorker.h>
 #include <awsmock/service/transfer/TransferHandlerFactory.h>
 #include <awsmock/service/transfer/TransferMonitoring.h>
 
@@ -35,6 +34,7 @@
 #define TRANSFER_DEFAULT_MONITORING_PERIOD 300
 
 #define DEFAULT_BASE_DIR "transfer"
+#define DEFAULT_TRANSFER_BUCKET "transfer-bucket"
 
 namespace AwsMock::Service {
 
@@ -43,7 +43,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class TransferServer : public AbstractServer, public AbstractWorker {
+    class TransferServer : public AbstractServer {
 
       public:
 

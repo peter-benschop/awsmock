@@ -58,10 +58,8 @@ namespace AwsMock::Service {
 
         /**
          * Constructor
-         *
-         * @param configuration module configuration
          */
-        explicit DockerService(const Core::Configuration &configuration);
+        DockerService();
 
         /**
          * Creates a simple image
@@ -243,11 +241,6 @@ namespace AwsMock::Service {
          * @return return docker file path
          */
         static std::string BuildImageFile(const std::string &codeDir, const std::string &name);
-
-        /**
-         * Configuration
-         */
-        const Core::Configuration &_configuration;
 
         /**
          * Curl utilities

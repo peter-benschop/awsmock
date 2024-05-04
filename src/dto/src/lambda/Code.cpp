@@ -2,7 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include <awsmock/dto/lambda/Code.h>
+#include "awsmock/dto/lambda/model/Code.h"
 
 namespace AwsMock::Dto::Lambda {
 

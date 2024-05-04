@@ -27,7 +27,7 @@ namespace AwsMock::Dto::SecretsManager {
      * List secrets request.
      *
      * Example:
-     * @verbatim
+     * @code{.json}
      * {
      *   "Filters": [
      *      {
@@ -40,7 +40,7 @@ namespace AwsMock::Dto::SecretsManager {
      *   "NextToken": "string",
      *   "SortOrder": "string"
      * }
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

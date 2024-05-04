@@ -26,13 +26,13 @@ namespace AwsMock::Dto::SecretsManager {
      * Rotate a secret value response.
      *
      * Example:
-     * @verbatim
+     * @code{.json}
      * {
      *   "ARN": "string",
      *   "Name": "string",
      *   "VersionId": "string"
      * }
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

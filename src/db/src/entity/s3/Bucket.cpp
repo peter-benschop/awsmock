@@ -52,6 +52,10 @@ namespace AwsMock::Database::Entity::S3 {
                }) != lambdaNotifications.end();
     }
 
+    bool Bucket::HasEncryption() const {
+        return !bucketEncryption.kmsKeyId.empty() && !bucketEncryption.sseAlgorithm.empty();
+    }
+
     BucketNotification Bucket::GetNotification(const std::string &eventName) {
         auto it =
                 find_if(notifications.begin(), notifications.end(), [eventName](const BucketNotification &eventNotification) {
@@ -116,6 +120,7 @@ namespace AwsMock::Database::Entity::S3 {
                 kvp("queueNotifications", queueNotificationsDoc),
                 kvp("topicNotifications", topicNotificationsDoc),
                 kvp("lambdaNotifications", lambdaNotificationsDoc),
+                kvp("encryptionConfiguration", bucketEncryption.ToDocument()),
                 kvp("versionStatus", BucketVersionStatusToString(versionStatus)),
                 kvp("created", MongoUtils::ToBson(created)),
                 kvp("modified", MongoUtils::ToBson(modified)));
@@ -171,6 +176,11 @@ namespace AwsMock::Database::Entity::S3 {
                 LambdaNotification notification;
                 lambdaNotifications.emplace_back(notification.FromDocument(notificationElement.get_document()));
             }
+        }
+
+        // Bucket encryption
+        if (mResult.value().find("encryptionConfiguration") != mResult.value().end()) {
+            bucketEncryption.FromDocument(mResult.value()["encryptionConfiguration"].get_document());
         }
     }
 

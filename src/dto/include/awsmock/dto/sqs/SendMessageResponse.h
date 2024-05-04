@@ -28,9 +28,9 @@
 #include <Poco/JSON/Parser.h>
 
 // AwsMock includes
+#include "awsmock/dto/sqs/model/MessageAttribute.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/ServiceException.h>
-#include <awsmock/dto/sqs/MessageAttribute.h>
 
 namespace AwsMock::Dto::SQS {
 
@@ -38,7 +38,7 @@ namespace AwsMock::Dto::SQS {
      * Send message response
      *
      * Example:
-     * @verbatim
+     * @code{.json}
      * {
      *   "MD5OfMessageAttributes": "string",
      *   "MD5OfMessageBody": "string",
@@ -46,7 +46,7 @@ namespace AwsMock::Dto::SQS {
      *   "MessageId": "string",
      *   "SequenceNumber": "string"
      * }
-     * @endverbatim
+     * @endcode
      */
     struct SendMessageResponse {
 

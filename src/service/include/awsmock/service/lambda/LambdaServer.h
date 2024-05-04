@@ -18,11 +18,10 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/MetricService.h>
-#include <awsmock/dto/lambda/InvocationNotification.h>
+#include <awsmock/dto/lambda/model/InvocationNotification.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/common/AbstractWorker.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
 #include <awsmock/service/lambda/LambdaExecutor.h>
 #include <awsmock/service/lambda/LambdaHandlerFactory.h>
@@ -43,7 +42,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class LambdaServer : public AbstractServer, public AbstractWorker {
+    class LambdaServer : public AbstractServer {
 
       public:
 
@@ -85,14 +84,6 @@ namespace AwsMock::Service {
          * Start all lambdas if they are not existing
          */
         void StartLambdaFunctions();
-
-        /**
-         * Send a lambda create function request.
-         *
-         * @param request HTTP request
-         * @param contentType HTTP content type
-         */
-        void SendCreateFunctionRequest(Dto::Lambda::CreateFunctionRequest &request, const std::string &contentType);
 
         /**
          * Returns the code from a local file.

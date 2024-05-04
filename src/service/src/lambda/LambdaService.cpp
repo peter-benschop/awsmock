@@ -25,7 +25,7 @@ namespace AwsMock::Service {
         _dataDir = _configuration.getString("awsmock.data.dir", "/home/awsmock/data");
         _tempDir = _dataDir + Poco::Path::separator() + "tmp";
         _lambdaDir = _dataDir + Poco::Path::separator() + "lambda";
-        _dockerService = std::make_shared<Service::DockerService>(_configuration);
+        _dockerService = std::make_shared<Service::DockerService>();
 
         // Create temp directory
         Core::DirUtils::EnsureDirectory(_tempDir);

@@ -36,7 +36,7 @@ namespace AwsMock::Core {
      * </ul>
      *
      * Properties in a configuration file are key-vale pairs. The following list shows all supported keys with their default values:
-     * @verbatim
+     * @verbartim
      * awsmock.monitoring.port=9100
      * awsmock.monitoring.timeout=60000
      * awsmock.logging.level=debug

@@ -26,13 +26,13 @@ namespace AwsMock::Dto::SecretsManager {
      * Update secret response.
      *
      * Syntax:
-     * @verbatim
+     * @code{.json}
      * {
      *   "ARN": "string",
      *   "Name": "string",
      *   "VersionId": "string"
      * }
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

@@ -15,11 +15,11 @@
 #include <Poco/JSON/Parser.h>
 
 // AwsMock includes
+#include "awsmock/dto/kms/model/Key.h"
+#include "awsmock/dto/kms/model/KeySpec.h"
 #include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/kms/Key.h>
-#include <awsmock/dto/kms/KeySpec.h>
 
 namespace AwsMock::Dto::KMS {
 
@@ -27,14 +27,14 @@ namespace AwsMock::Dto::KMS {
      * Create KMS key response
      *
      * Example:
-     * @verbatim
+     * @code{.json}
      * {
      *   "DeletionDate": number,
      *   "KeyId": "string",
      *   "KeyState": "string",
      *   "PendingWindowInDays": number
      * }
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

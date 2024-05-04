@@ -25,13 +25,13 @@ namespace AwsMock::Dto::SecretsManager {
      * Get a secret value
      *
      * Example:
-     * @verabtim
+     * @code{.json}
      * {
      *    "SecretId": "string",
      *    "VersionId": "string",
      *    "VersionStage": "string"
      * }
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

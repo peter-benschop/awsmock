@@ -2,8 +2,8 @@
 // Created by vogje01 on 12/11/2022.
 //
 
-#ifndef AWSMOCK_CORE_SYSTEM_UTILS_H_
-#define AWSMOCK_CORE_SYSTEM_UTILS_H_
+#ifndef AWSMOCK_CORE_SYSTEM_UTILS_H
+#define AWSMOCK_CORE_SYSTEM_UTILS_H
 
 // C includes
 #include <fcntl.h>
@@ -101,4 +101,4 @@ namespace AwsMock::Core {
 
 }// namespace AwsMock::Core
 
-#endif// AWSMOCK_CORE_SYSTEM_UTILS_H_
+#endif// AWSMOCK_CORE_SYSTEM_UTILS_H

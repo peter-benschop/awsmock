@@ -31,7 +31,7 @@ namespace AwsMock::Dto::SQS {
      * Create queue response.
      *
      * Example:
-     * @verbatim
+     * @code{.xml}
      * <GetQueueUrlResponse xmlns="http://queue.amazonaws.com/doc/2012-11-05/">
      *     <GetQueueUrlResult>
      *         <QueueUrl>https://sqs.us-east-1.amazonaws.com/177715257436/MyQueue</QueueUrl>
@@ -40,7 +40,7 @@ namespace AwsMock::Dto::SQS {
      *         <RequestId>552d6f30-4c8e-5b32-aaed-33408c7d6c38</RequestId>
      *     </ResponseMetadata>
      * </GetQueueUrlResponse>
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

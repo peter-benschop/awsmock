@@ -23,7 +23,7 @@ namespace AwsMock::Dto::DynamoDb {
      * Put item response
      *
      * Example:
-     * @verbatim
+     * @code{.json}
      * {
      *   "ConsumedCapacity":
      *     {
@@ -31,7 +31,7 @@ namespace AwsMock::Dto::DynamoDb {
      *       "CapacityUnits":1.0
      *     }
      * }
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

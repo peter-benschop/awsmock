@@ -28,7 +28,7 @@ namespace AwsMock::Dto::SNS {
      *
      * <p>
      * Example:
-     * @verbatim
+     * @code{.json}
      * {
      *   "Type" : "Notification",
      *   "MessageId" : "467f295c-b4fe-5e24-a627-74c9652562a8",

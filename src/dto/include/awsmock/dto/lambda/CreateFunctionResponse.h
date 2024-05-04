@@ -16,9 +16,9 @@
 #include <Poco/JSON/Parser.h>
 
 // AwsMock includes
+#include "awsmock/dto/lambda/model/Environment.h"
+#include "awsmock/dto/lambda/model/EphemeralStorage.h"
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/dto/lambda/Environment.h>
-#include <awsmock/dto/lambda/EphemeralStorage.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -26,7 +26,7 @@ namespace AwsMock::Dto::Lambda {
    * Create function response
    *
    * Example:
-   * @verbatim
+   * @code{.json}
    * {
    *   "FunctionName": "ftp-file-copy",
    *   "FunctionArn": "arn:aws:lambda:eu-central-1:000000000000:function:ftp-file-copy",
@@ -67,7 +67,7 @@ namespace AwsMock::Dto::Lambda {
    *    "RuntimeVersionArn": "arn:aws:lambda:eu-central-1::runtime:8eeff65f6809a3ce81507fe733fe09b835899b99481ba22fd75b5a7338290ec1"
    *   }
    * }
-   * @endverbatim
+   * @endcode
    */
     struct CreateFunctionResponse {
 
@@ -165,8 +165,8 @@ namespace AwsMock::Dto::Lambda {
                 rootJson.set("Timeout", timeout);
                 rootJson.set("CodeSha256", codeSha256);
                 rootJson.set("LastModified", modified);
-                rootJson.set("Environment", environment.ToJson());
-                rootJson.set("EphemeralStorage", ephemeralStorage.ToJson());
+                rootJson.set("Environment", environment.ToJsonObject());
+                rootJson.set("EphemeralStorage", ephemeralStorage.ToJsonObject());
                 rootJson.set("MemorySize", memorySize);
 
                 std::ostringstream os;

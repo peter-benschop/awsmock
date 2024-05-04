@@ -55,7 +55,7 @@ namespace AwsMock::Service {
         // Save to database
         key = kmsDatabase.UpdateKey(key);
 
-        log_debug << "KMS key created, keyId: " << keyId;
+        log_debug << "KMS key created, keyId: " << key.keyId;
     }
 
     void KMSCreator::GenerateAes256Key(Database::Entity::KMS::Key &key) {

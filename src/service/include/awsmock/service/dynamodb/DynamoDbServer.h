@@ -21,7 +21,6 @@
 #include <awsmock/repository/DynamoDbDatabase.h>
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/common/AbstractWorker.h>
 #include <awsmock/service/dynamodb/DynamoDbHandlerFactory.h>
 #include <awsmock/service/dynamodb/DynamoDbMonitoring.h>
 
@@ -48,7 +47,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class DynamoDbServer : public AbstractServer, public AbstractWorker {
+    class DynamoDbServer : public AbstractServer {
 
       public:
 

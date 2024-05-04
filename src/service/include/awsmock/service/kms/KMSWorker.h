@@ -6,8 +6,8 @@
 #define AWSMOCK_SERVICE_KMS_WORKER_H
 
 // AwsMock includes
+#include "awsmock/dto/kms/model/KeyState.h"
 #include <awsmock/core/Timer.h>
-#include <awsmock/dto/kms/KeyState.h>
 #include <awsmock/repository/KMSDatabase.h>
 
 namespace AwsMock::Service {

@@ -25,14 +25,14 @@ namespace AwsMock::Dto::SecretsManager {
      * Secrets manager replication status.
      *
      * Example:
-     * @verbatim
+     * @code{.json}
      * "AddReplicaRegions": [
      *   {
      *     "KmsKeyId": "string",
      *     "Region": "string"
      *   }
      * ],
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

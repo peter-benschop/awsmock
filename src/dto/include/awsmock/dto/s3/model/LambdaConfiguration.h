@@ -29,7 +29,7 @@ namespace AwsMock::Dto::S3 {
      * </p>
      *
      * Example:
-     * @verbatim
+     * @code{.xml}
      *   <CloudFunctionConfiguration>
      *     <Event>string</Event>
      *     ...
@@ -45,7 +45,7 @@ namespace AwsMock::Dto::S3 {
      *     <Id>string</Id>
      *     <CloudFunction>string</CloudFunction>
      *   </CloudFunctionConfiguration>
-     * @endverbatimindex
+     * @endcodeindex
      *
      * @author jens.vogt\@opitz-consulting.com
      */

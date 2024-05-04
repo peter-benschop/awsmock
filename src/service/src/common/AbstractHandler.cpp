@@ -474,7 +474,7 @@ namespace AwsMock::Service {
         if (service == "SQS") {
             payload = Dto::SQS::RestErrorResponse(exc).ToJson();
         } else if (service == "S3") {
-            //payload = Dto::S3::RestErrorResponse(exc).ToJson();
+            //payload = Dto::S3::RestErrorResponse(exc).ToJsonObject();
         }
         SetHeaders(response, payload.length(), {}, "application/json");
 

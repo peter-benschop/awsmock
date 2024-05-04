@@ -26,7 +26,6 @@
 #include <awsmock/ftpserver/FtpMessage.h>
 #include <awsmock/ftpserver/FtpUser.h>
 #include <awsmock/ftpserver/UserDatabase.h>
-#include <awsmock/service/common/AbstractWorker.h>
 #include <awsmock/service/s3/S3Service.h>
 
 #define DEFAULT_TRANSFER_BASE_DIR "/home/awsmock/data/transfer"
@@ -34,7 +33,7 @@
 
 namespace AwsMock::FtpServer {
 
-    class FtpSession : public std::enable_shared_from_this<FtpSession>, public Service::AbstractWorker {
+    class FtpSession : public std::enable_shared_from_this<FtpSession> {
 
       private:
 

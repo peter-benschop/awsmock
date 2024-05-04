@@ -24,6 +24,9 @@ AwsMock supports S3, allowing you to use the S3 APIs in your local environment t
 objects, and test your S3 configurations locally. The supported APIs are available in the example section, which
 provides information on the extent of S3’s integration with AwsMock.
 
+AwsMock s3 module supports encryption for bucket. Currently only SSE-KMS is supported. The encryption key must be stored
+in the KMS module. See ```awsmockmks(1)``` for more details on how to store encryption key in KMS.
+
 The S3 module can be configured using the ```awslocal``` command. For details of the ```awslocal``` command see the
 corresponding man page ```awslocal(1)```.
 
@@ -98,6 +101,27 @@ To download a S3 object from a S3 bucket ```s3://test-bucket-1```
 
 ```
 awslocal s3 cp s3://test-bucket-1/test/README.md test.md
+```
+
+Switch encryption on for bucket:
+
+```
+awslocal s3api put-bucket-encryption --bucket file-delivery --server-side-encryption-configuration file://encryption.json
+```
+
+encryption.json contains:
+
+```
+{
+  "Rules": [
+    {
+      "ApplyServerSideEncryptionByDefault": {
+        "SSEAlgorithm": "AES256",
+        "KMSMasterKeyID": "123456"
+      }
+    }
+  ]
+}
 ```
 
 ## JAVA EXAMPLES
