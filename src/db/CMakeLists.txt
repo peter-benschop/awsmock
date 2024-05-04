@@ -34,8 +34,15 @@ set(SOURCES src/repository/Database.cpp src/utils/TestUtils.cpp ${SQS_SOURCES} $
 add_subdirectory(tst)
 
 # Includes
-include_directories(include ../core/include /usr/include /usr/include/mongo /usr/include/bsoncxx/v_noabi
-        /usr/include/mongocxx/v_noabi)
+if(WIN32)
+    include_directories(.\\include ..\\core\\include "C:\\Program Files (x86)\\Poco\\include" "C:\\Program Files (x86)\\GnuWin32\\include")
+    include_directories("C:\\Program Files (x86)\\plog\\include" "C:\\Program Files\\OpenSSL-Win64\\include")
+    include_directories("C:\\Program Files (x86)\\curl\\include" "D:\\work\\boost_1_82_0")
+    include_directories("C:\\Program Files (x86)\\mongo-cxx-driver\\include\\bsoncxx\\v_noabi")
+    include_directories("C:\\Program Files (x86)\\mongo-cxx-driver\\include\\mongocxx\\v_noabi")
+else()
+    include_directories(include ../core/include /usr/include /usr/include/mongo /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
+endif ()
 
 add_library(${LIBRARY} SHARED ${SOURCES})
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})

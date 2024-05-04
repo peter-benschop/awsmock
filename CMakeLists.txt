@@ -3,13 +3,15 @@ project(awsmock)
 
 set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_CXX_STANDARD 20)
+if(NOT WIN32)
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 set(CMAKE_INSTALL_PREFIX "/usr" CACHE PATH " ..." FORCE)
+endif ()
 set(CMAKE_BUILD_PARALLEL_LEVEL 30)
 
 # Doxygen
-option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation (requires Doxygen and dot) " ON)
+option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation (requires Doxygen and dot) " OFF)
 
 # Current version
 file(READ "src/core/include/awsmock/core/Version.h" ver)
@@ -34,7 +36,9 @@ add_subdirectory(src/db)
 add_subdirectory(src/service)
 add_subdirectory(src/manager)
 add_subdirectory(src/controller)
-add_subdirectory(docs)
+if (!WIN32)
+  add_subdirectory(docs)
+endif ()
 
 install(FILES dist/etc/awsmock.properties DESTINATION /etc)
 install(FILES dist/etc/systemd/system/awsmock.service DESTINATION /etc/systemd/system)

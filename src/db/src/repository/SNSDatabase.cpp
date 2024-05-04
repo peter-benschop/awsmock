@@ -100,7 +100,7 @@ namespace AwsMock::Database {
             if (mResult) {
 
                 Entity::SNS::Topic result;
-                result.FromDocument(mResult);
+                result.FromDocument(mResult->view());
                 return result;
             }
 
@@ -134,7 +134,7 @@ namespace AwsMock::Database {
                 mongocxx::stdx::optional<bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("topicArn", topicArn)));
 
                 Entity::SNS::Topic result;
-                result.FromDocument(mResult);
+                result.FromDocument(mResult->view());
                 return result;
 
             } catch (const mongocxx::exception &exc) {
@@ -160,7 +160,7 @@ namespace AwsMock::Database {
 
                 if (mResult.has_value()) {
                     Entity::SNS::Topic result;
-                    result.FromDocument(mResult);
+                    result.FromDocument(mResult->view());
                     return result;
                 } else {
                     log_warning << "Topic not found, region: " << region << " name: " << topicName;
@@ -425,10 +425,9 @@ namespace AwsMock::Database {
 
             auto client = GetClient();
             mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
-            mongocxx::stdx::optional<bsoncxx::document::value>
-                    mResult = _messageCollection.find_one(make_document(kvp("_id", oid)));
+            mongocxx::stdx::optional<bsoncxx::document::value> mResult = _messageCollection.find_one(make_document(kvp("_id", oid)));
             Entity::SNS::Message result;
-            result.FromDocument(mResult);
+            result.FromDocument(mResult->view());
 
             return result;
         } catch (const mongocxx::exception &exc) {
@@ -639,7 +638,7 @@ namespace AwsMock::Database {
 
     void SNSDatabase::DeleteOldMessages(long timeout) {
 
-        auto reset = std::chrono::high_resolution_clock::now() - std::chrono::seconds{timeout};
+        const std::chrono::system_clock::time_point reset = std::chrono::system_clock::now() - std::chrono::seconds{timeout};
 
         if (_useDatabase) {
 
@@ -652,7 +651,7 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 auto result = messageCollection.delete_many(make_document(kvp("created", make_document(kvp("$lt", bsoncxx::types::b_date(reset))))));
                 session.commit_transaction();
-                log_debug << "Old messages deleted, timeout: " << timeout << " count: " << result->deleted_count();
+                log_debug << "Old messages deleted, timeout: " << timeout << " count: " << static_cast<long>(result->deleted_count());
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();

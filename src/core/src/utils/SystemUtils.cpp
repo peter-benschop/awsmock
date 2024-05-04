@@ -23,13 +23,18 @@ namespace AwsMock::Core {
     }
 
     std::string SystemUtils::GetCurrentWorkingDir() {
+#ifndef _WIN32
         char result[PATH_MAX];
         ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
         std::string path = {std::string(result, (count > 0) ? count : 0)};
         return path.substr(0, path.find_last_of('/'));
+#else
+        return {};
+#endif
     }
 
     std::string SystemUtils::GetHomeDir() {
+#ifndef _WIN32
         std::string homeDir;
         if (getenv("HOME") != nullptr) {
             homeDir = std::string(getenv("HOME"));
@@ -37,6 +42,9 @@ namespace AwsMock::Core {
             homeDir = std::string(getpwuid(getuid())->pw_dir);
         }
         return homeDir;
+#else
+        return {};
+#endif
     }
 
     std::string SystemUtils::GetNodeName() {
@@ -44,9 +52,20 @@ namespace AwsMock::Core {
     }
 
     std::string SystemUtils::GetHostName() {
+#if defined(WIN32) || defined(_WIN32) || defined(_WIN64)
+        char *temp = 0;
+        std::string computerName;
+        temp = getenv("COMPUTERNAME");
+        if (temp != 0) {
+            computerName = temp;
+            temp = 0;
+        }
+        return computerName;
+#else
         char buffer[128];
         gethostname(buffer, 128);
         return {buffer};
+#endif
     }
 
     int SystemUtils::GetRandomPort() {

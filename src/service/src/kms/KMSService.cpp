@@ -104,7 +104,7 @@ namespace AwsMock::Service {
             return {
                     .keyId = request.keyId,
                     .keyState = key.keyState,
-                    .deletionDate = key.scheduledDeletion.timestamp().epochMicroseconds() / 1000,
+                    .deletionDate = static_cast<long>(key.scheduledDeletion.timestamp().epochMicroseconds() / 1000),
                     .pendingWindowInDays = request.pendingWindowInDays,
             };
 
@@ -134,8 +134,8 @@ namespace AwsMock::Service {
                     .keyUsage = Dto::KMS::KeyUsageFromString(keyEntity.keyUsage),
                     .keyState = Dto::KMS::KeyStateFromString(keyEntity.keyState),
                     .description = keyEntity.description,
-                    .creationDate = keyEntity.created.timestamp().epochTime(),
-                    .deletionDate = keyEntity.scheduledDeletion.timestamp().epochTime(),
+                    .creationDate = static_cast<long>(keyEntity.created.timestamp().epochTime()),
+                    .deletionDate = static_cast<long>(keyEntity.scheduledDeletion.timestamp().epochTime()),
                     .enabled = Core::StringUtils::Equals(keyEntity.keyState, Dto::KMS::KeyStateToString(Dto::KMS::KeyState::ENABLED))};
             Dto::KMS::DescribeKeyResponse response = {.key = key};
             return response;
