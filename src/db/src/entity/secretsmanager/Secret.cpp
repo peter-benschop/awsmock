@@ -16,7 +16,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
     view_or_value<view, value> Secret::ToDocument() const {
 
         view_or_value<view, value> rotationRulesDoc = make_document(
-                kvp("automaticallyAfterDays", rotationRules.automaticallyAfterDays),
+                kvp("automaticallyAfterDays", static_cast<bsoncxx::types::b_int64>(rotationRules.automaticallyAfterDays)),
                 kvp("duration", rotationRules.duration),
                 kvp("scheduleExpression", rotationRules.scheduleExpression));
 
@@ -32,12 +32,12 @@ namespace AwsMock::Database::Entity::SecretsManager {
                 kvp("description", description),
                 kvp("owningService", owningService),
                 kvp("primaryRegion", primaryRegion),
-                kvp("createdDate", createdDate),
-                kvp("deletedDate", deletedDate),
-                kvp("lastAccessedDate", lastAccessedDate),
-                kvp("lastChangedDate", lastChangedDate),
-                kvp("lastRotatedDate", lastRotatedDate),
-                kvp("nextRotatedDate", nextRotatedDate),
+                kvp("createdDate", static_cast<bsoncxx::types::b_int64>(createdDate)),
+                kvp("deletedDate", static_cast<bsoncxx::types::b_int64>(deletedDate)),
+                kvp("lastAccessedDate", static_cast<bsoncxx::types::b_int64>(lastAccessedDate)),
+                kvp("lastChangedDate", static_cast<bsoncxx::types::b_int64>(lastChangedDate)),
+                kvp("lastRotatedDate", static_cast<bsoncxx::types::b_int64>(lastRotatedDate)),
+                kvp("nextRotatedDate", static_cast<bsoncxx::types::b_int64>(nextRotatedDate)),
                 kvp("rotationEnabled", rotationEnabled),
                 kvp("rotationLambdaARN", rotationLambdaARN),
                 kvp("rotationRules", rotationRulesDoc),

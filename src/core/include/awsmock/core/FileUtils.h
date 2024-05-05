@@ -7,13 +7,21 @@
 
 // Standard C includes
 #include <fcntl.h>
+#ifndef _WIN32
 #include <grp.h>
 #include <pwd.h>
-#include <sys/stat.h>
 #include <sys/time.h>
-#include <sys/types.h>
 #include <unistd.h>
 #include <utime.h>
+#else
+#include <stdio.h>
+#include <windows.h>
+#include <tchar.h>
+#include "accctrl.h"
+#include "aclapi.h"
+#endif
+#include <sys/stat.h>
+#include <sys/types.h>
 
 // Standard C++ includes
 #include <cstdio>
@@ -24,6 +32,7 @@
 #include <sstream>
 #include <streambuf>
 #include <string>
+#include <execution>
 
 // Poco includes
 #include <Poco/BinaryReader.h>
@@ -42,6 +51,7 @@
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
+#include <awsmock/core/ResourceNotFoundException.h>
 
 namespace AwsMock::Core {
 

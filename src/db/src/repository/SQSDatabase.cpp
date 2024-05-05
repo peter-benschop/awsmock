@@ -105,7 +105,7 @@ namespace AwsMock::Database {
         }
 
         Entity::SQS::Queue result;
-        result.FromDocument(mResult);
+        result.FromDocument(mResult->view());
         return result;
     }
 
@@ -135,7 +135,7 @@ namespace AwsMock::Database {
                 log_error << "Queue not found, queueArn: " << queueArn;
                 throw Core::DatabaseException("Queue not found, queueArn: " + queueArn);
             }
-            return result.FromDocument(mResult);
+            return result.FromDocument(mResult->view());
 
 
         } else {
@@ -160,7 +160,7 @@ namespace AwsMock::Database {
 
             } else {
 
-                return result.FromDocument(mResult);
+                return result.FromDocument(mResult->view());
             }
 
         } else {
@@ -181,7 +181,7 @@ namespace AwsMock::Database {
             if (mResult.has_value()) {
 
                 log_trace << "GetQueueByName succeeded, region: " << region << " name: " << name;
-                return result.FromDocument(mResult);
+                return result.FromDocument(mResult->view());
 
             } else {
 
@@ -434,7 +434,7 @@ namespace AwsMock::Database {
         mongocxx::stdx::optional<bsoncxx::document::value>
                 mResult = messageCollection.find_one(make_document(kvp("_id", oid)));
         Entity::SQS::Message result;
-        result.FromDocument(mResult);
+        result.FromDocument(mResult->view());
 
         return result;
     }
@@ -448,7 +448,7 @@ namespace AwsMock::Database {
 
             mongocxx::stdx::optional<bsoncxx::document::value> mResult = messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle)));
             Entity::SQS::Message result;
-            result.FromDocument(mResult);
+            result.FromDocument(mResult->view());
             return result;
 
         } else {
@@ -557,7 +557,7 @@ namespace AwsMock::Database {
         // First rest messages
         ResetMessages(queueUrl, visibility);
 
-        auto reset = std::chrono::high_resolution_clock::now() + std::chrono::seconds(visibility);
+        auto reset = std::chrono::system_clock::now() + std::chrono::seconds(visibility);
 
         if (_useDatabase) {
 
@@ -700,7 +700,7 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                auto now = std::chrono::high_resolution_clock::now();
+                auto now = std::chrono::system_clock::now();
                 auto result = messageCollection.update_many(
                         make_document(
                                 kvp("queueUrl", queueUrl),
@@ -730,7 +730,7 @@ namespace AwsMock::Database {
 
     void SQSDatabase::MessageRetention(const std::string &queueUrl, long retentionPeriod) {
 
-        auto reset = std::chrono::high_resolution_clock::now() - std::chrono::seconds{retentionPeriod};
+        auto reset = std::chrono::system_clock::now() - std::chrono::seconds{retentionPeriod};
 
         if (_useDatabase) {
 
@@ -741,7 +741,6 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                auto now = std::chrono::high_resolution_clock::now();
                 auto result = messageCollection.delete_many(
                         make_document(
                                 kvp("queueUrl", queueUrl),
@@ -771,14 +770,14 @@ namespace AwsMock::Database {
             auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
 
             if (!region.empty() && !queueUrl.empty()) {
-                count = messageCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
+                count = static_cast<long>(messageCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl))));
                 log_trace << "Count messages, region: " << region << " url: " << queueUrl << " result: "
                           << count;
             } else if (!region.empty()) {
-                count = messageCollection.count_documents(make_document(kvp("region", region)));
+                count = static_cast<long>(messageCollection.count_documents(make_document(kvp("region", region))));
                 log_trace << "Count messages, region: " << region << " result: " << count;
             } else {
-                count = messageCollection.count_documents({});
+                count = static_cast<long>(messageCollection.count_documents({}));
                 log_trace << "Count messages, result: " << count;
             }
             return count;

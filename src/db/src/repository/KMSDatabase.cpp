@@ -50,7 +50,7 @@ namespace AwsMock::Database {
             }
 
             Entity::KMS::Key result;
-            result.FromDocument(mResult);
+            result.FromDocument(mResult->view());
             return result;
 
 
@@ -88,7 +88,7 @@ namespace AwsMock::Database {
                 }
 
                 Entity::KMS::Key result;
-                result.FromDocument(mResult);
+                result.FromDocument(mResult->view());
                 return result;
 
 

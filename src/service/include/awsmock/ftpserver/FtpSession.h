@@ -11,17 +11,23 @@
 #include <utility>
 
 // Asio includes
-#include "asio.hpp"
+#include <asio.hpp>
+
+#ifdef _WIN32
+#include <Windows.h>
+#include <direct.h>
+#endif
 
 // Poco includes
-#include "Poco/Net/HTTPClientSession.h"
-#include "Poco/Net/HTTPRequest.h"
+#include <Poco/Net/HTTPClientSession.h>
+#include <Poco/Net/HTTPRequest.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Win32Utils.h>
 #include <awsmock/ftpserver/Filesystem.h>
 #include <awsmock/ftpserver/FtpMessage.h>
 #include <awsmock/ftpserver/FtpUser.h>

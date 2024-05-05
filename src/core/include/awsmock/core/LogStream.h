@@ -13,12 +13,11 @@
 
 // Plog includes
 #define PLOG_OMIT_LOG_DEFINES
+#include <plog/Formatters/TxtFormatter.h>
+#include <plog/Init.h>
+#include <plog/Initializers/ConsoleInitializer.h>
+#include <plog/Log.h>
 
-// AwsMock includes
-#include <awsmock/core/logging/plog/Formatters/TxtFormatter.h>
-#include <awsmock/core/logging/plog/Init.h>
-#include <awsmock/core/logging/plog/Initializers/ConsoleInitializer.h>
-#include <awsmock/core/logging/plog/Log.h>
 
 namespace AwsMock::Core {
 

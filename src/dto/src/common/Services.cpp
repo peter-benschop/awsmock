@@ -52,7 +52,7 @@ namespace AwsMock::Dto::Common {
             // Services
             Poco::JSON::Array::Ptr jsonArray = rootObject->getArray("services");
             for (const auto &service: *jsonArray) {
-                serviceNames.emplace_back(service);
+                serviceNames.emplace_back(service.extract<std::string>());
             }
 
         } catch (Poco::Exception &exc) {

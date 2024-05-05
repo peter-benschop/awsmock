@@ -77,12 +77,14 @@ namespace AwsMock::Core {
     }
 
     std::string TarUtils::Readsymlink(const std::string &path) {
+#ifndef _WIN32		
         char buf[1024];
-        ssize_t len;
+        size_t len;
         if ((len = readlink(path.c_str(), buf, sizeof(buf) - 1)) != -1) {
             buf[len] = '\0';
             return {buf};
         }
+#endif		
         return "";
     }
 }// namespace AwsMock::Core

@@ -242,6 +242,7 @@ namespace AwsMock::Core {
     }
 
     std::string StringUtils::SanitizeUtf8(std::string &input) {
+#ifndef _WIN32
         size_t inbytes_len = input.length();
         char *inbuf = const_cast<char *>(input.c_str());
 
@@ -259,6 +260,7 @@ namespace AwsMock::Core {
         iconv_close(cd);
         input.assign(result);
         delete result;
+#endif
         return input;
     }
 

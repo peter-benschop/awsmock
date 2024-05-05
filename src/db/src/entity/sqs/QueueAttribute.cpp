@@ -17,9 +17,9 @@ namespace AwsMock::Database::Entity::SQS {
                 kvp("visibilityTimeout", visibilityTimeout),
                 kvp("redrivePolicy", redrivePolicy.ToDocument()),
                 kvp("redriveAllowPolicy", redriveAllowPolicy),
-                kvp("approximateNumberOfMessages", approximateNumberOfMessages),
-                kvp("approximateNumberOfMessagesDelayed", approximateNumberOfMessagesDelayed),
-                kvp("approximateNumberOfMessagesNotVisible", approximateNumberOfMessagesNotVisible),
+                kvp("approximateNumberOfMessages", static_cast<bsoncxx::types::b_int64>(approximateNumberOfMessages)),
+                kvp("approximateNumberOfMessagesDelayed", static_cast<bsoncxx::types::b_int64>(approximateNumberOfMessagesDelayed)),
+                kvp("approximateNumberOfMessagesNotVisible", static_cast<bsoncxx::types::b_int64>(approximateNumberOfMessagesNotVisible)),
                 kvp("queueArn", queueArn));
 
         return queueAttributetDoc;
@@ -35,9 +35,9 @@ namespace AwsMock::Database::Entity::SQS {
         visibilityTimeout = mResult.value()["visibilityTimeout"].get_int32().value;
         redrivePolicy.FromDocument(mResult.value()["redrivePolicy"].get_document().value);
         redriveAllowPolicy = bsoncxx::string::to_string(mResult.value()["redriveAllowPolicy"].get_string().value);
-        approximateNumberOfMessages = mResult.value()["approximateNumberOfMessages"].get_int64().value;
-        approximateNumberOfMessagesDelayed = mResult.value()["approximateNumberOfMessagesDelayed"].get_int64().value;
-        approximateNumberOfMessagesNotVisible = mResult.value()["approximateNumberOfMessagesNotVisible"].get_int64().value;
+        approximateNumberOfMessages = static_cast<long>(mResult.value()["approximateNumberOfMessages"].get_int64().value);
+        approximateNumberOfMessagesDelayed = static_cast<long>(mResult.value()["approximateNumberOfMessagesDelayed"].get_int64().value);
+        approximateNumberOfMessagesNotVisible = static_cast<long>(mResult.value()["approximateNumberOfMessagesNotVisible"].get_int64().value);
     }
 
     Poco::JSON::Object QueueAttribute::ToJsonObject() const {

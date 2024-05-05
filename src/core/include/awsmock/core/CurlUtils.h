@@ -5,11 +5,14 @@
 #ifndef AWSMOCK_CORE_CURL_UTILS_H
 #define AWSMOCK_CORE_CURL_UTILS_H
 
+// C includes
+#include <sys/stat.h>
+
 // C++ standard includes
 #include <iostream>
 #include <string>
-#include <sys/stat.h>
 #include <utility>
+#include <map>
 
 // Curl includes
 #include <curl/curl.h>
@@ -19,6 +22,10 @@
 #include <awsmock/core/LogStream.h>
 
 #define DOCKER_SOCKET "/var/run/docker.sock"
+
+#ifdef _WIN32
+#undef DELETE
+#endif
 
 typedef enum {
     GET,

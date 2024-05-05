@@ -97,7 +97,7 @@ namespace AwsMock::Database {
         mongocxx::stdx::optional<bsoncxx::document::value>
                 mResult = _transferCollection.find_one(make_document(kvp("_id", oid)));
         Entity::Transfer::Transfer result;
-        result.FromDocument(mResult);
+        result.FromDocument(mResult->view());
         return result;
     }
 
@@ -122,7 +122,7 @@ namespace AwsMock::Database {
             mongocxx::stdx::optional<bsoncxx::document::value>
                     mResult = _transferCollection.find_one(make_document(kvp("serverId", serverId)));
             Entity::Transfer::Transfer result;
-            result.FromDocument(mResult);
+            result.FromDocument(mResult->view());
             return result;
 
         } else {
@@ -164,10 +164,9 @@ namespace AwsMock::Database {
 
             auto client = GetClient();
             mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
-            mongocxx::stdx::optional<bsoncxx::document::value>
-                    mResult = _transferCollection.find_one(make_document(kvp("arn", arn)));
+            mongocxx::stdx::optional<bsoncxx::document::value> mResult = _transferCollection.find_one(make_document(kvp("arn", arn)));
             Entity::Transfer::Transfer result;
-            result.FromDocument(mResult);
+            result.FromDocument(mResult->view());
             return result;
 
         } else {

@@ -141,7 +141,7 @@ namespace AwsMock::Database::Entity::S3 {
         // Deprecated (should be removed)
         if (mResult.value().find("notifications") != mResult.value().end()) {
             bsoncxx::array::view notificationView{mResult.value()["notifications"].get_array().value};
-            for (bsoncxx::array::element notificationElement: notificationView) {
+            for (const bsoncxx::array::element& notificationElement: notificationView) {
                 BucketNotification notification{
                         .event = bsoncxx::string::to_string(notificationElement["event"].get_string().value),
                         .notificationId = bsoncxx::string::to_string(notificationElement["notificationId"].get_string().value),
@@ -154,33 +154,33 @@ namespace AwsMock::Database::Entity::S3 {
         // SQS queue notification configuration
         if (mResult.value().find("queueNotifications") != mResult.value().end()) {
             bsoncxx::array::view notificationView{mResult.value()["queueNotifications"].get_array().value};
-            for (bsoncxx::array::element notificationElement: notificationView) {
+            for (const bsoncxx::array::element& notificationElement: notificationView) {
                 QueueNotification notification;
-                queueNotifications.emplace_back(notification.FromDocument(notificationElement.get_document()));
+                queueNotifications.emplace_back(notification.FromDocument(notificationElement.get_document().view()));
             }
         }
 
         // SNS topic notification configuration
         if (mResult.value().find("topicNotifications") != mResult.value().end()) {
             bsoncxx::array::view notificationView{mResult.value()["topicNotifications"].get_array().value};
-            for (bsoncxx::array::element notificationElement: notificationView) {
+            for (const bsoncxx::array::element& notificationElement: notificationView) {
                 TopicNotification notification;
-                topicNotifications.emplace_back(notification.FromDocument(notificationElement.get_document()));
+                topicNotifications.emplace_back(notification.FromDocument(notificationElement.get_document().view()));
             }
         }
 
         // Lambda function notification configuration
         if (mResult.value().find("lambdaNotifications") != mResult.value().end()) {
             bsoncxx::array::view notificationView{mResult.value()["lambdaNotifications"].get_array().value};
-            for (bsoncxx::array::element notificationElement: notificationView) {
+            for (const bsoncxx::array::element& notificationElement: notificationView) {
                 LambdaNotification notification;
-                lambdaNotifications.emplace_back(notification.FromDocument(notificationElement.get_document()));
+                lambdaNotifications.emplace_back(notification.FromDocument(notificationElement.get_document().view()));
             }
         }
 
         // Bucket encryption
         if (mResult.value().find("encryptionConfiguration") != mResult.value().end()) {
-            bucketEncryption.FromDocument(mResult.value()["encryptionConfiguration"].get_document());
+            bucketEncryption.FromDocument(mResult.value()["encryptionConfiguration"].get_document().view());
         }
     }
 

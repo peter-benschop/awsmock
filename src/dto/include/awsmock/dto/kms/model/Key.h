@@ -114,7 +114,7 @@ namespace AwsMock::Dto::KMS {
         /**
          * Creation date
          */
-        long creationDate = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        long creationDate = static_cast<long>(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
 
         /**
          * Deletion date

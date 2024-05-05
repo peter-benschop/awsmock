@@ -75,7 +75,11 @@ namespace AwsMock::Core {
     TEST_F(ConfigurationTest, EnvironmentTest) {
 
         // arrange
+#ifdef WIN32
+        _putenv_s("AWSMOCK_LOG_LEVEL", "error");
+#else
         setenv("AWSMOCK_LOG_LEVEL", "error", true);
+#endif
         Configuration *configuration = nullptr;
 
         // act

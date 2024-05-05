@@ -2,7 +2,7 @@
 // Created by vogje01 on 02/09/2022.
 //
 
-#include "../../include/awsmock/core/CoreException.h"
+#include <awsmock/core/CoreException.h>
 
 namespace AwsMock::Core {
 
@@ -21,10 +21,10 @@ namespace AwsMock::Core {
     CoreException &CoreException::operator=(const CoreException &exc) = default;
 
     const char *CoreException::name() const noexcept { return "CoreException: "; }
-
+#ifndef _WIN32
     const char *CoreException::className() const noexcept { return typeid(*this).name(); }
-
-    Poco::Exception *CoreException::clone() const { return new CoreException(*this); }
+#endif
+    Core::CoreException *CoreException::clone() const { return new CoreException(*this); }
 
     void CoreException::rethrow() const { throw *this; }
 
