@@ -75,7 +75,7 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * Returns the MD5 hash of a string.
+         * @brief Returns the MD5 hash of a string.
          *
          * @param content string to hash
          * @return MD5 hash of the given string
@@ -83,7 +83,7 @@ namespace AwsMock::Core {
         static std::string GetMd5FromString(const std::string &content);
 
         /**
-         * Returns the MD5 hash of a file.
+         * @brief Returns the MD5 hash of a file.
          *
          * @param fileName file name to hash
          * @return MD5 hash of the given file
@@ -91,7 +91,7 @@ namespace AwsMock::Core {
         static std::string GetMd5FromFile(const std::string &fileName);
 
         /**
-         * Returns the SHA1 hash of a string.
+         * @brief Returns the SHA1 hash of a string.
          *
          * @param content string to hash
          * @return SHA1 hash of the given string
@@ -99,7 +99,7 @@ namespace AwsMock::Core {
         static std::string GetSha1FromString(const std::string &content);
 
         /**
-         * Returns the SHA1 hash of a file.
+         * @brief Returns the SHA1 hash of a file.
          *
          * @param fileName file name to hash
          * @return SHA1 hash of the given file
@@ -107,7 +107,7 @@ namespace AwsMock::Core {
         static std::string GetSha1FromFile(const std::string &fileName);
 
         /**
-         * Returns the SHA256 hash of a string.
+         * @brief Returns the SHA256 hash of a string.
          *
          * @param content string to hash
          * @return SHA256 hash of the given string
@@ -115,7 +115,7 @@ namespace AwsMock::Core {
         static std::string GetSha256FromString(const std::string &content);
 
         /**
-         * Returns the SHA256 hash of a file.
+         * @brief Returns the SHA256 hash of a file.
          *
          * @param fileName file name to hash
          * @return SHA256 hash of the given file
@@ -123,7 +123,7 @@ namespace AwsMock::Core {
         static std::string GetSha256FromFile(const std::string &fileName);
 
         /**
-         * Returns the hex encoded SHA256 hash of a string.
+         * @brief Returns the hex encoded SHA256 hash of a string.
          *
          * @param key string for hashing
          * @param content string to hash
@@ -132,7 +132,7 @@ namespace AwsMock::Core {
         static std::string GetHmacSha256FromString(const std::string &key, const std::string &content);
 
         /**
-         * Returns the hex encoded SHA256 hash of a string.
+         * @brief Returns the hex encoded SHA256 hash of a string.
          *
          * @param key byte array for hashing
          * @param content string to hash
@@ -141,7 +141,7 @@ namespace AwsMock::Core {
         static std::string GetHmacSha256FromString(const std::array<unsigned char, EVP_MAX_MD_SIZE> &key, const std::string &content);
 
         /**
-         * Returns the SHA256 hash of a string.
+         * @brief Returns the SHA256 hash of a string.
          *
          * @param key string for hashing
          * @param msg string to hash
@@ -150,7 +150,7 @@ namespace AwsMock::Core {
         static std::array<unsigned char, EVP_MAX_MD_SIZE> GetHmacSha256FromStringRaw(const std::string &key, const std::string &msg);
 
         /**
-         * Returns the SHA256 hash of a string.
+         * @brief Returns the SHA256 hash of a string.
          *
          * @param key byte array for hashing
          * @param msg string to hash
@@ -159,7 +159,7 @@ namespace AwsMock::Core {
         static std::array<unsigned char, EVP_MAX_MD_SIZE> GetHmacSha256FromStringRaw(const std::array<unsigned char, EVP_MAX_MD_SIZE> &key, const std::string &msg);
 
         /**
-         * Creates a AES 256 encryption key.
+         * @brief Creates a AES256 encryption key.
          *
          * @param key 265bit key material
          * @param iv iv
@@ -167,7 +167,7 @@ namespace AwsMock::Core {
         static void CreateAes256Key(unsigned char *key, unsigned char *iv);
 
         /**
-         * @brief AES 256 encryption
+         * @brief AES256 encryption of a string
          *
          * @param plaintext input string
          * @param len plaintext length
@@ -177,7 +177,7 @@ namespace AwsMock::Core {
         static unsigned char *Aes256EncryptString(unsigned char *plaintext, int *len, unsigned char *key);
 
         /**
-         * @brief AES256 description
+         * @brief AES256 decryption of a string.
          *
          * @param ciphertext input string
          * @param len ciphertext length
@@ -195,21 +195,19 @@ namespace AwsMock::Core {
          *
          * @param filename input file name
          * @param key encryption key
-         * @return encrypted string
          */
         static void Aes256EncryptFile(const std::string &filename, unsigned char *key);
 
         /**
-         * @brief AES256 description of a file.
+         * @brief AES256 decryption of a file.
          *
          * <p>
-         * The actual file will stay encrypted. Outfile must be deleted after send to client.
+         * The actual file will stay encrypted. Outfile must be deleted after is has been send to client.
          * </p>
          *
          * @param filename input file name
          * @param outFilename output filename
          * @param key encryption key
-         * @return decrypted string
          */
         static void Aes256DecryptFile(const std::string &filename, std::string &outFilename, unsigned char *key);
 
@@ -229,12 +227,8 @@ namespace AwsMock::Core {
          */
         static std::string Base64Decode(const std::string &encodedString);
 
-        //static unsigned char *Base64Decode(std::string const &encoded_string);
-
-        //static std::string Base64Encode(unsigned char const *buf, unsigned int bufLen);
-
         /**
-         * Convert to hex string
+         * @brief Converts the given string to hex encoded string.
          *
          * @param input input byte array
          * @return hex encoded string
@@ -242,7 +236,7 @@ namespace AwsMock::Core {
         static std::string HexEncode(const std::string &input);
 
         /**
-         * Convert to hex string
+         * @brief Convert of a unsigned char* array to a hex string
          *
          * @param hash input char array
          * @param size input char length
@@ -251,7 +245,7 @@ namespace AwsMock::Core {
         static std::string HexEncode(unsigned char *hash, int size);
 
         /**
-         * Decodes a hex string to an unsigned char array.
+         * @brief Decodes a hex string to an unsigned char array.
          *
          * @param hex hex string
          * @return unsigned char array.
@@ -259,7 +253,7 @@ namespace AwsMock::Core {
         static unsigned char *HexDecode(const std::string &hex);
 
         /**
-         * Generate a RSA key pair of the given length.
+         * @brief Generate a RSA key pair of the given length.
          *
          * @param keyLength key length
          * @return RSA key pair.
@@ -267,21 +261,21 @@ namespace AwsMock::Core {
         static EVP_PKEY *GenerateRsaKeys(unsigned int keyLength);
 
         /**
-         * Converts the public key to a string.
+         * @brief Converts the public key to a string.
          *
          * @param pRSA pointer to RSA key pair
          */
         static std::string GetRsaPublicKey(EVP_PKEY *pRSA);
 
         /**
-         * Converts the private key to a string.
+         * @brief Converts the private key to a string.
          *
          * @param pRSA pointer to RSA key pair
          */
         static std::string GetRsaPrivateKey(EVP_PKEY *pRSA);
 
         /**
-         * Read an EVP_PKEY from a string.
+         * @brief Read an EVP_PKEY from a string.
          *
          * @param privateKey key as string
          * @return *EVP_PKEY
@@ -289,7 +283,7 @@ namespace AwsMock::Core {
         static EVP_PKEY *ReadRsaPrivateKey(const std::string &privateKey);
 
         /**
-         * Read an EVP_PKEY from a string.
+         * @brief Read an EVP_PKEY from a string.
          *
          * @param publicKey key as string
          * @return *EVP_PKEY
@@ -297,7 +291,7 @@ namespace AwsMock::Core {
         static EVP_PKEY *ReadRsaPublicKey(const std::string &publicKey);
 
         /**
-         * Encrypt a string using RSA encryption.
+         * @brief Encrypt a string using RSA encryption.
          *
          * <p>
          * The output string will be Base64 encoded.
@@ -310,7 +304,7 @@ namespace AwsMock::Core {
         static std::string RsaEncrypt(EVP_PKEY *keyPair, const std::string &in);
 
         /**
-         * Decrypts a string using RSA encryption.
+         * @brief Decrypts a string using RSA encryption.
          *
          * <p>
          * The input string must be Base64 encoded.
@@ -325,7 +319,9 @@ namespace AwsMock::Core {
       private:
 
         /**
-         * Create a 256 bit key and IV using the supplied key_data. salt can be added for taste. Fills in the encryption and decryption ctx objects and returns 0 on success.
+         * @brief Create a 256 bit key and IV using the supplied key_data. salt can be added for taste.
+         *
+         * Fills in the encryption and decryption ctx objects and returns 0 on success.
          *
          * @param key_data key data
          * @param key_data_len length of key data
@@ -335,7 +331,9 @@ namespace AwsMock::Core {
         static int Aes256EncryptionInit(unsigned char *key_data, int key_data_len, unsigned char *salt, EVP_CIPHER_CTX *ctx);
 
         /**
-         * Create a 256 bit key and IV using the supplied key_data. salt can be added for taste. Fills in the encryption and decryption ctx objects and returns 0 on success.
+         * @brief Create a 256 bit key and IV using the supplied key_data.
+         *
+         * salt can be added for taste. Fills in the encryption and decryption ctx objects and returns 0 on success.
          *
          * @param key_data key data
          * @param key_data_len length of key data
@@ -346,10 +344,6 @@ namespace AwsMock::Core {
 
         static unsigned int _salt[];
     };
-
-    static inline bool IsBase64(unsigned char c) {
-        return (isalnum(c) || (c == '+') || (c == '/'));
-    }
 
 }// namespace AwsMock::Core
 

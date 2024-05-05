@@ -352,12 +352,11 @@ namespace AwsMock::Service {
         void DeleteBucket(const std::string &bucket);
 
         /**
-         * Save a versioned S3 object.
+         * @brief Save a versioned S3 object.
          *
          * @param request put object request
          * @param bucket S3 bucket
          * @param stream input stream
-         * @param bucket bucket entity
          * @return file name
          */
         Dto::S3::PutObjectResponse SaveVersionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream);
