@@ -79,8 +79,25 @@ namespace AwsMock::Core {
          * @return true, in case file is already mapped.
          */
         [[nodiscard]] bool IsMapped() const { return _mapped; }
+#ifdef _WIN32
+        /// tweak performance
+        enum CacheHint
+        {
+            Normal,         ///< good overall performance
+            SequentialScan, ///< read file only once with few seeks
+            RandomAccess    ///< jump around
+        };
+#endif
 
       private:
+
+#ifdef _WIN32
+        typedef void* FileHandle;
+        /// Windows handle to memory mapping of _file
+        void*       _mappedFile;
+#else
+        typedef int   FileHandle;
+#endif
 
         /**
          * Start pointer
@@ -105,12 +122,13 @@ namespace AwsMock::Core {
         /**
          * File handle
          */
-        int _fd{};
+        FileHandle _file{};
 
         /**
          * File size
          */
         long _fileSize = 0;
+
     };
 
 }// namespace AwsMock::Core

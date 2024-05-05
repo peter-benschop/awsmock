@@ -16,7 +16,7 @@ namespace AwsMock::Core {
     }
 
     void MetricService::Initialize() {
-        _server = std::make_shared<Poco::Prometheus::MetricsServer>(_port);
+        _server = std::make_shared<Poco::Prometheus::MetricsServer>(static_cast<Poco::UInt16>(_port));
         _metricSystemTimer = std::make_shared<Poco::Timer>(0, _timeout);
         _metricSystemCollector = std::make_shared<MetricSystemCollector>();
         log_debug << "Prometheus manager initialized, port: " << _port;

@@ -17,10 +17,8 @@
 #include <Poco/String.h>
 
 // Archive includes
-#ifndef _WIN32
 #include <archive.h>
 #include <archive_entry.h>
-#endif
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
