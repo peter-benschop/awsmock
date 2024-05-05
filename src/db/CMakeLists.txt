@@ -31,15 +31,21 @@ set(SOURCES src/repository/Database.cpp src/utils/TestUtils.cpp ${SQS_SOURCES} $
         ${SECRETSMANAGER_SOURCES} ${UTIL_SOURCES})
 
 # Test directory
+if (NOT WIN32)
 add_subdirectory(tst)
+endif()
 
 # Includes
 if(WIN32)
-    include_directories(.\\include ..\\core\\include "C:\\Program Files (x86)\\Poco\\include" "C:\\Program Files (x86)\\GnuWin32\\include")
-    include_directories("C:\\Program Files (x86)\\plog\\include" "C:\\Program Files\\OpenSSL-Win64\\include")
-    include_directories("C:\\Program Files (x86)\\curl\\include" "D:\\work\\boost_1_82_0")
-    include_directories("C:\\Program Files (x86)\\mongo-cxx-driver\\include\\bsoncxx\\v_noabi")
-    include_directories("C:\\Program Files (x86)\\mongo-cxx-driver\\include\\mongocxx\\v_noabi")
+    include_directories(.\\include ..\\core\\include ${AWSMOCK_WIN32_DIR}/poco/include ${AWSMOCK_WIN32_DIR}/gnuwin32/include)
+    include_directories(${AWSMOCK_WIN32_DIR}/plog/include ${AWSMOCK_WIN32_DIR}/openssl/include)
+    include_directories(${AWSMOCK_WIN32_DIR}/curl/include ${AWSMOCK_WIN32_DIR}/boost ${AWSMOCK_WIN32_DIR}/libarchive/include)
+    include_directories(${AWSMOCK_WIN32_DIR}/mongo-cxx-driver/include/bsoncxx/v_noabi)
+    include_directories(${AWSMOCK_WIN32_DIR}/mongo-cxx-driver/include/mongocxx/v_noabi)
+    link_directories(../core/Debug ${AWSMOCK_WIN32_DIR}/poco/lib ${AWSMOCK_WIN32_DIR}/gnuwin32/lib)
+    link_directories(${AWSMOCK_WIN32_DIR}/libarchive/lib ${AWSMOCK_WIN32_DIR}/openssl/lib/VC/x64/MD)
+    link_directories(${AWSMOCK_WIN32_DIR}/mongo-cxx-driver/lib ${AWSMOCK_WIN32_DIR}/curl/lib)
+#    link_directories(${AWSMOCK_WIN32_DIR}/gtest/lib)
 else()
     include_directories(include ../core/include /usr/include /usr/include/mongo /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
 endif ()
@@ -47,5 +53,10 @@ endif ()
 add_library(${LIBRARY} SHARED ${SOURCES})
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
+
+if (WIN32)
+    target_link_libraries(${LIBRARY} awsmockcore.lib libssl.lib libcrypto.lib libcurl_imp.lib archive.lib
+            bsoncxx.lib mongocxx.lib)
+endif ()
 
 install(TARGETS ${LIBRARY} DESTINATION lib)

@@ -424,7 +424,8 @@ namespace AwsMock::FtpServer {
         const std::ios::openmode open_mode =
                 std::ios::ate | (data_type_binary_ ? (std::ios::in | std::ios::binary) : (std::ios::in));
 #if defined(WIN32) && !defined(__GNUG__)
-        std::ifstream file(StrConvert::Utf8ToWide(local_path), open_mode);
+        std::wstring wLocalPath = Core::Utf8ToWide(local_path.c_str());
+        std::ifstream file(wLocalPath, open_mode);
 #else
         std::ifstream file(local_path, open_mode);
 #endif
@@ -650,6 +651,9 @@ namespace AwsMock::FtpServer {
         }
 
         const std::string local_path = toLocalPath(param);
+#ifdef _WIN32
+        _rmdir(local_path.c_str());
+#else
         if (rmdir(local_path.c_str()) == 0) {
             sendFtpMessage(FtpReplyCode::FILE_ACTION_COMPLETED, "Successfully removed directory");
             return;
@@ -660,6 +664,7 @@ namespace AwsMock::FtpServer {
             sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Unable to remove directory");
             return;
         }
+#endif
     }
 
     void FtpSession::handleFtpCommandMKD(const std::string &param) {
@@ -673,6 +678,12 @@ namespace AwsMock::FtpServer {
         }
 
         auto local_path = toLocalPath(param);
+#ifdef _WIN32
+        if (_mkdir(reinterpret_cast<const char *>(local_path.c_str() == 0))) {
+            sendFtpMessage(FtpReplyCode::PATHNAME_CREATED, createQuotedFtpPath(toAbsoluteFtpPath(param)) + " Successfully created");
+            return;
+        }
+#else
         const mode_t mode = 0755;
         if (mkdir(local_path.c_str(), mode) == 0) {
             sendFtpMessage(FtpReplyCode::PATHNAME_CREATED, createQuotedFtpPath(toAbsoluteFtpPath(param)) + " Successfully created");
@@ -684,6 +695,7 @@ namespace AwsMock::FtpServer {
             sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Unable to create directory");
             return;
         }
+#endif
     }
 
     void FtpSession::handleFtpCommandPWD(const std::string & /*param*/) {

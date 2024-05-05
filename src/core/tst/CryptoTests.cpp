@@ -184,7 +184,7 @@ namespace AwsMock::Core {
         unsigned char *result2 = Crypto::Aes256DecryptString(result1, &len, (unsigned char *) key.c_str());
 
         // assert
-        EXPECT_TRUE(strcasecmp(reinterpret_cast<const char *>(result2), reinterpret_cast<const char *>(result1)));
+        EXPECT_STREQ(reinterpret_cast<const char *>(result2), reinterpret_cast<const char *>(result1));
     }
 
     TEST_F(CryptoTest, GenerateRsaKeyTest) {

@@ -6,7 +6,8 @@ set(UTILS_SOURCES src/utils/StringUtils.cpp src/utils/FileUtils.cpp src/utils/Di
         src/utils/CryptoUtils.cpp src/utils/AwsUtils.cpp src/utils/SystemUtils.cpp
         src/utils/CurlUtils.cpp src/utils/TarUtils.cpp src/utils/RandomUtils.cpp src/utils/JsonUtils.cpp
         src/config/Configuration.cpp src/utils/TestUtils.cpp src/utils/HttpUtils.cpp src/utils/NumberUtils.cpp
-        src/utils/MemoryMappedFile.cpp src/utils/Timer.cpp src/utils/Task.cpp src/utils/XmlUtils.cpp)
+        src/utils/MemoryMappedFile.cpp src/utils/Timer.cpp src/utils/Task.cpp src/utils/XmlUtils.cpp
+        src/utils/Win32Utils.cpp)
 
 set(EXCEPTION_SOURCES src/exception/CoreException.cpp src/exception/DatabaseException.cpp
         src/exception/ServiceException.cpp src/exception/ResourceNotFoundException.cpp
@@ -17,14 +18,19 @@ set(MONITORING_SOURCES src/monitoring/MetricService.cpp src/monitoring/MetricSys
 set(SOURCES ${UTILS_SOURCES} ${EXCEPTION_SOURCES} ${LOGGING_SOURCES} ${MONITORING_SOURCES})
 
 # Test directory
+if (NOT WIN32)
 add_subdirectory(tst)
+endif()
 
 # Includes
 
-if(WIN32)
-    include_directories(.\\include "C:\\Program Files (x86)\\Poco\\include" "C:\\Program Files (x86)\\GnuWin32\\include")
-    include_directories("C:\\Program Files (x86)\\plog\\include" "C:\\Program Files\\OpenSSL-Win64\\include")
-    include_directories("C:\\Program Files (x86)\\curl\\include")
+if (WIN32)
+    include_directories(./include ${AWSMOCK_WIN32_DIR}/poco/include ${AWSMOCK_WIN32_DIR}/gnuwin32/include)
+    include_directories(${AWSMOCK_WIN32_DIR}/plog/include ${AWSMOCK_WIN32_DIR}/openssl/include)
+    include_directories(${AWSMOCK_WIN32_DIR}/curl/include ${AWSMOCK_WIN32_DIR}/libarchive/include)
+    link_directories(${AWSMOCK_WIN32_DIR}/poco/lib ${AWSMOCK_WIN32_DIR}/gnuwin32/lib)
+    link_directories(${AWSMOCK_WIN32_DIR}/libarchive/lib ${AWSMOCK_WIN32_DIR}/openssl/lib/VC/x64/MD)
+    link_directories(${AWSMOCK_WIN32_DIR}/curl/lib)
 else ()
     include_directories(.\\include)
 endif ()
@@ -32,5 +38,9 @@ endif ()
 add_library(${LIBRARY} SHARED ${SOURCES})
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
+
+if (WIN32)
+    target_link_libraries(${LIBRARY} libssl.lib libcrypto.lib libcurl_imp.lib archive.lib)
+endif ()
 
 install(TARGETS ${LIBRARY} DESTINATION lib)

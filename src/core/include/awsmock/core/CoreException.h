@@ -76,15 +76,16 @@ namespace AwsMock::Core {
          */
         [[nodiscard]] const char *name() const noexcept override;
 
+#ifndef _WIN32
         /**
          * Returns the exception class name.
          */
         [[nodiscard]] const char *className() const noexcept override;
-
+#endif
         /**
          * Returns a clone of the exception
          */
-        [[nodiscard]] Poco::Exception *clone() const override;
+        [[nodiscard]] Core::CoreException *clone() const override;
 
         /**
          * Rethrows the exception.

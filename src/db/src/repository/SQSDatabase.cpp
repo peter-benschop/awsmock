@@ -160,7 +160,7 @@ namespace AwsMock::Database {
 
             } else {
 
-                return result.FromDocument(mResult);
+                return result.FromDocument(mResult->view());
             }
 
         } else {
