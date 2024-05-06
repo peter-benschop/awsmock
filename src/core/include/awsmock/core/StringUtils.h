@@ -17,7 +17,9 @@
 #include <vector>
 
 // Iconv includes
+#ifndef _WIN32
 #include <iconv.h>
+#endif
 
 // Poco includes
 #include <Poco/RegularExpression.h>
