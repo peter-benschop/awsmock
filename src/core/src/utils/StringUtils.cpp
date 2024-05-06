@@ -197,7 +197,7 @@ namespace AwsMock::Core {
         const char *patloc;
 
         // find how many times the pattern occurs in the original string
-        patloc = strstr(oriptr, pattern);
+        patloc = strstr(original, pattern);
         for (oriptr = original; patloc; oriptr = patloc + patlen) {
             patcnt++;
             patloc = strstr(oriptr, pattern);
