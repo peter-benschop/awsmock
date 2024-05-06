@@ -7,8 +7,10 @@
 
 // C includes
 #include <fcntl.h>
+#ifndef _WIN32
 #include <pwd.h>
 #include <unistd.h>
+#endif
 
 // C++ includes
 #include <array>
@@ -21,7 +23,9 @@
 #include <regex>
 #include <stdexcept>
 #include <string>
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 
 // Poco includes
 #include <Poco/Environment.h>

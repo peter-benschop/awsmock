@@ -8,17 +8,17 @@ namespace AwsMock::Database::Entity::SecretsManager {
 
     view_or_value<view, value> RotationRules::ToDocument() const {
 
-        view_or_value<view, value> rotationRulesDoc = make_document(
-                kvp("automaticallyAfterDays", automaticallyAfterDays),
-                kvp("duration", duration),
-                kvp("scheduleExpression", scheduleExpression));
+        auto rotationRulesDoc = bsoncxx::builder::basic::document{};
+        rotationRulesDoc.append(kvp("automaticallyAfterDays", static_cast<bsoncxx::types::b_int64>(automaticallyAfterDays)));
+        rotationRulesDoc.append(kvp("duration", duration));
+        rotationRulesDoc.append(kvp("scheduleExpression", scheduleExpression));
 
-        return rotationRulesDoc;
+        return rotationRulesDoc.extract();
     }
 
     void RotationRules::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
-        automaticallyAfterDays = mResult.value()["automaticallyAfterDays"].get_int64().value;
+        automaticallyAfterDays = static_cast<long>(mResult.value()["automaticallyAfterDays"].get_int64().value);
         duration = bsoncxx::string::to_string(mResult.value()["duration"].get_string().value);
         scheduleExpression = bsoncxx::string::to_string(mResult.value()["scheduleExpression"].get_string().value);
     }

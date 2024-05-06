@@ -33,14 +33,37 @@ set(SOURCES src/common/AbstractHandler.cpp src/common/AbstractServer.cpp ${S3_SO
         ${DYNAMODB_SOURCES} ${SECRETMANAGER_SOURCES} ${KMS_SOURCES} ${DOCKER_SOURCES} ${GATEWAY_SOURCES} ${MODULE_SOURCES})
 
 # Test directory
-add_subdirectory(tst)
+if (NOT WIN32)
+    add_subdirectory(tst)
+endif ()
 
 # Includes
-include_directories(include ../core/include ../db/include ../dto/include /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
+if (WIN32)
+    message("--building awsmocksrv ${CMAKE_BUILD_TYPE}")
+    include_directories(./include ../core/include ../db/include ../dto/include ${AWSMOCK_WIN32_DIR}/poco/include)
+    include_directories(${AWSMOCK_WIN32_DIR}/gnuwin32/include ${AWSMOCK_WIN32_DIR}/boost)
+    include_directories(${AWSMOCK_WIN32_DIR}/plog/include ${AWSMOCK_WIN32_DIR}/openssl/include)
+    include_directories(${AWSMOCK_WIN32_DIR}/curl/include ${AWSMOCK_WIN32_DIR}/libarchive/include)
+    include_directories(${AWSMOCK_WIN32_DIR}/mongo-cxx-driver/include/bsoncxx/v_noabi)
+    include_directories(${AWSMOCK_WIN32_DIR}/mongo-cxx-driver/include/mongocxx/v_noabi)
+    include_directories(${AWSMOCK_WIN32_DIR}/asio/include)
+    link_directories(../core/${CMAKE_BUILD_TYPE} ../db/${CMAKE_BUILD_TYPE} ../dto/${CMAKE_BUILD_TYPE})
+    link_directories(${AWSMOCK_WIN32_DIR}/poco/lib ${AWSMOCK_WIN32_DIR}/gnuwin32/lib)
+    link_directories(${AWSMOCK_WIN32_DIR}/libarchive/lib ${AWSMOCK_WIN32_DIR}/openssl/lib/VC/x64/MD)
+    link_directories(${AWSMOCK_WIN32_DIR}/mongo-cxx-driver/lib ${AWSMOCK_WIN32_DIR}/curl/lib)
+else ()
+    include_directories(include ../core/include ../db/include ../dto/include)
+    include_directories(/usr/include /usr/include/mongo /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
+endif ()
 
 add_library(${LIBRARY} SHARED ${SOURCES})
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
+
+if (WIN32)
+    target_link_libraries(${LIBRARY} awsmockcore.lib awsmockdb.lib awsmockdto.lib libssl.lib libcrypto.lib
+            libcurl_imp.lib archive.lib bson-1.0.lib bsoncxx.lib mongocxx.lib)
+endif ()
 
 install(TARGETS ${LIBRARY} DESTINATION lib)
 install(TARGETS ${LIBRARY_STATIC} DESTINATION lib)

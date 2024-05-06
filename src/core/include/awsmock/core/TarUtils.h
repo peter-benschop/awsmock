@@ -8,7 +8,9 @@
 // C++ standard includes
 #include <fcntl.h>
 #include <string>
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 
 // Poco includes
 #include <Poco/RecursiveDirectoryIterator.h>
@@ -56,11 +58,7 @@ namespace AwsMock::Core {
          * @param isDir directory flag
          * @param isLink link flag, needed to preserve links
          */
-        static void WriteFile(struct archive *archive,
-                              const std::string &fileName,
-                              const std::string &removeDir,
-                              bool isDir,
-                              bool isLink);
+        static void WriteFile(struct archive *archive,const std::string &fileName,const std::string &removeDir,bool isDir,bool isLink);
 
         /**
          * Read a symbolic link.

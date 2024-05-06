@@ -336,6 +336,16 @@ namespace AwsMock::Database {
         std::string _databaseName;
 
         /**
+         * Bucket collection name
+         */
+        std::string _bucketCollectionName;
+
+        /**
+         * Object collection name
+         */
+        std::string _objectCollectionName;
+
+        /**
          * S3 in-memory database
          */
         S3MemoryDb &_memoryDb;

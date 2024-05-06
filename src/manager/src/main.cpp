@@ -19,7 +19,6 @@
 
 // C includes
 #include <cstdlib>
-#include <unistd.h>
 
 // C++ standard includes
 #include <iostream>
@@ -44,7 +43,9 @@
 namespace AwsMock {
 
     /**
-     * Main application class.
+     * @brief Main application class for the awsmock manager.
+     * 
+     * @author jens.vogt@opitz-consulting.com
      */
     class AwsMockServer : public Poco::Util::ServerApplication {
 
@@ -123,8 +124,7 @@ namespace AwsMock {
                 Poco::Util::HelpFormatter helpFormatter(options());
                 helpFormatter.setCommand(commandName());
                 helpFormatter.setUsage("OPTIONS");
-                helpFormatter.setHeader(
-                        "AwsMock - AWS simulation written in C++ v" + Core::Configuration::GetVersion());
+                helpFormatter.setHeader("AwsMock - AWS simulation written in C++ v" + Core::Configuration::GetVersion());
                 helpFormatter.format(std::cout);
                 stopOptionsProcessing();
                 exit(0);

@@ -10,7 +10,9 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#ifndef _WIN32
 #include <sys/times.h>
+#endif
 
 // Poco includes
 #include <Poco/Prometheus/Counter.h>

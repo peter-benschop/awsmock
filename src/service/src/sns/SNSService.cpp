@@ -286,7 +286,8 @@ namespace AwsMock::Service {
                 .messageId = Core::AwsUtils::CreateMessageId(),
                 .topicArn = request.topicArn,
                 .message = request.message,
-                .timestamp = Poco::Timestamp().epochMicroseconds() / 1000};
+                .timestamp = static_cast<long>(Poco::Timestamp().epochMicroseconds() / 1000)
+        };
 
         // Wrap it in a SQS message request
         Dto::SQS::SendMessageRequest sendMessageRequest = {

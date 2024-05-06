@@ -49,14 +49,14 @@ namespace AwsMock::Database::Entity::SNS {
         owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
         topicUrl = bsoncxx::string::to_string(mResult.value()["topicUrl"].get_string().value);
         topicArn = bsoncxx::string::to_string(mResult.value()["topicArn"].get_string().value);
-        topicAttribute.FromDocument(mResult.value()["attributes"].get_document());
+        topicAttribute.FromDocument(mResult.value()["attributes"].get_document().view());
         created = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["created"].get_date()));
         modified = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["modified"].get_date()));
 
         // Subscriptions
         if (mResult.value().find("subscriptions") != mResult.value().end()) {
             bsoncxx::array::view subscriptionsView{mResult.value()["subscriptions"].get_array().value};
-            for (bsoncxx::array::element subscriptionElement: subscriptionsView) {
+            for (const bsoncxx::array::element& subscriptionElement: subscriptionsView) {
                 Subscription subscription{
                         .protocol = bsoncxx::string::to_string(subscriptionElement["protocol"].get_string().value),
                         .endpoint = bsoncxx::string::to_string(subscriptionElement["endpoint"].get_string().value),
@@ -68,7 +68,7 @@ namespace AwsMock::Database::Entity::SNS {
         // Get tags
         if (mResult.value().find("tags") != mResult.value().end()) {
             bsoncxx::document::view tagsView = mResult.value()["tags"].get_document().value;
-            for (bsoncxx::document::element tagElement: tagsView) {
+            for (const bsoncxx::document::element& tagElement: tagsView) {
                 std::string key = bsoncxx::string::to_string(tagElement.key());
                 std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                 tags.emplace(key, value);

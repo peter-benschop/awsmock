@@ -157,7 +157,7 @@ namespace AwsMock::Database {
             }
 
             Entity::Lambda::Lambda result;
-            result.FromDocument(mResult);
+            result.FromDocument(mResult->view());
             return result;
 
         } catch (const mongocxx::exception &exc) {
@@ -193,7 +193,7 @@ namespace AwsMock::Database {
                 }
 
                 Entity::Lambda::Lambda result;
-                result.FromDocument(mResult);
+                result.FromDocument(mResult->view());
                 return result;
 
             } catch (mongocxx::exception::system_error &e) {
@@ -222,7 +222,7 @@ namespace AwsMock::Database {
                 }
 
                 Entity::Lambda::Lambda result;
-                result.FromDocument(mResult);
+                result.FromDocument(mResult->view());
                 return result;
 
             } catch (mongocxx::exception::system_error &e) {
