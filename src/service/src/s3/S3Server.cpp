@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    S3Server::S3Server(Core::Configuration &configuration) : AbstractWorker(configuration), AbstractServer(configuration, "s3", 10), _configuration(configuration), _module("s3") {
+    S3Server::S3Server(Core::Configuration &configuration) : AbstractServer(configuration, "s3", 10), _configuration(configuration), _module("s3") {
 
         // Get HTTP configuration values
         _port = _configuration.getInt("awsmock.service.s3.http.port", S3_DEFAULT_PORT);

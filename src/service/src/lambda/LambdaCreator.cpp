@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    [[maybe_unused]] LambdaCreator::LambdaCreator(const Core::Configuration &configuration) : _configuration(configuration), _lambdaDatabase(Database::LambdaDatabase::instance()), _dockerService(configuration) {
+    [[maybe_unused]] LambdaCreator::LambdaCreator(const Core::Configuration &configuration) : _configuration(configuration), _lambdaDatabase(Database::LambdaDatabase::instance()), _dockerService() {
 
         // Configuration
         _dataDir = _configuration.getString("awsmock.data.dir", "/tmp/awsmock/data");

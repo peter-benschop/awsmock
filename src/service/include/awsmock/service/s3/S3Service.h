@@ -40,6 +40,7 @@
 #include <awsmock/dto/s3/ListObjectVersionsResponse.h>
 #include <awsmock/dto/s3/MoveObjectRequest.h>
 #include <awsmock/dto/s3/MoveObjectResponse.h>
+#include <awsmock/dto/s3/PutBucketEncryptionRequest.h>
 #include <awsmock/dto/s3/PutBucketNotificationConfigurationRequest.h>
 #include <awsmock/dto/s3/PutBucketNotificationConfigurationResponse.h>
 #include <awsmock/dto/s3/PutBucketNotificationRequest.h>
@@ -52,6 +53,7 @@
 #include <awsmock/entity/s3/QueueNotification.h>
 #include <awsmock/entity/s3/TopicNotification.h>
 #include <awsmock/repository/S3Database.h>
+#include <awsmock/service/kms/KMSService.h>
 #include <awsmock/service/lambda/LambdaExecutor.h>
 #include <awsmock/service/lambda/LambdaService.h>
 #include <awsmock/service/sns/SNSService.h>
@@ -61,7 +63,7 @@
 #define DEFAULT_REGION "eu-central-1"
 #define DEFAULT_DATA_DIR "/home/awsmock/data"
 #define DEFAULT_TRANSFER_DATA_DIR "/tmp/awsmock/data/transfer"
-#define DEFAULT_TRANSFER_BUCKET "transfer-server"
+#define DEFAULT_TRANSFER_BUCKET_NAME "transfer-server"
 
 namespace AwsMock::Service {
 
@@ -213,13 +215,22 @@ namespace AwsMock::Service {
         Dto::S3::PutBucketNotificationConfigurationResponse PutBucketNotificationConfiguration(const Dto::S3::PutBucketNotificationConfigurationRequest &request);
 
         /**
+         * Adds a bucket encryption configuration
+         *
+         * @param request bucket encryption configuration request.
+         * @see PutBucketEncryptionRequest
+         */
+        void PutBucketEncryption(const Dto::S3::PutBucketEncryptionRequest &request);
+
+        /**
          * Returns a list object versions
          *
          * @param s3Request list object versions request
          * @return ListObjectVersionsResponse
-         * @see AwsMock::Dto::S3::ListObjectVersionsResponse()
+         * @see AwsMock::Dto::S3::ListObjectVersionsRequest
+         ** @see AwsMock::Dto::S3::ListObjectVersionsResponse
          */
-        Dto::S3::ListObjectVersionsResponse ListObjectVersions(const Dto::S3::ListObjectVersionsRequest s3Request);
+        Dto::S3::ListObjectVersionsResponse ListObjectVersions(const Dto::S3::ListObjectVersionsRequest &s3Request);
 
         /**
          * Delete a bucket
@@ -276,6 +287,27 @@ namespace AwsMock::Service {
         void CheckNotifications(const std::string &region, const std::string &bucket, const std::string &key, long size, const std::string &event);
 
         /**
+         * @brief Checks the encryption status and encrypt the internal file using the KMS key supplied in the encryption object of the bucket.
+         *
+         * @param bucket S3 bucket
+         * @param object S3 object
+         */
+        void CheckEncryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object &object);
+
+        /**
+         * @brief Checks the decryption status and decrypts the internal file using the KMS key supplied in the encryption object of the bucket.
+         *
+         * <p>
+         * The decrypted file will be written to outFile. This file needs to be deleted, after the file has been send back to the client.
+         * </p>
+         *
+         * @param bucket S3 bucket
+         * @param object S3 object
+         * @param outFile name of the output file
+         */
+        void CheckDecryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object &object, std::string &outFile);
+
+        /**
          * Get the temporary upload directory for a uploadId.
          *
          * @param uploadId S3 multipart uplaod ID
@@ -320,23 +352,24 @@ namespace AwsMock::Service {
         void DeleteBucket(const std::string &bucket);
 
         /**
-         * Save a versioned S3 object.
+         * @brief Save a versioned S3 object.
          *
          * @param request put object request
+         * @param bucket S3 bucket
          * @param stream input stream
-         * @param bucket bucket entity
          * @return file name
          */
-        Dto::S3::PutObjectResponse SaveVersionedObject(Dto::S3::PutObjectRequest &request, std::istream &stream, Database::Entity::S3::Bucket &bucket);
+        Dto::S3::PutObjectResponse SaveVersionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream);
 
         /**
          * Save a unversioned S3 object.
          *
          * @param request put object request
+         * @param bucket S3 bucket
          * @param stream input stream
          * @return file name
          */
-        Dto::S3::PutObjectResponse SaveUnversionedObject(Dto::S3::PutObjectRequest &request, std::istream &stream);
+        Dto::S3::PutObjectResponse SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream);
 
         /**
          * Adds the queue notification configuration to the provided bucket.

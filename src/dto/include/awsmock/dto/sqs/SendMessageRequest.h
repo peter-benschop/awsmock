@@ -15,9 +15,9 @@
 #include <Poco/JSON/Parser.h>
 
 // AwsMock includes
+#include "awsmock/dto/sqs/model/MessageAttribute.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/ServiceException.h>
-#include <awsmock/dto/sqs/MessageAttribute.h>
 #include <awsmock/dto/sqs/SqsCommonRequest.h>
 
 namespace AwsMock::Dto::SQS {

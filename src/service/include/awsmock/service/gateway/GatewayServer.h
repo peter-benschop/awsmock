@@ -14,14 +14,13 @@
 #include <Poco/Runnable.h>
 
 // AwsMock includes
+#include "awsmock/dto/lambda/model/InvocationNotification.h"
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/MetricService.h>
-#include <awsmock/dto/lambda/InvocationNotification.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/common/AbstractWorker.h>
 #include <awsmock/service/gateway/GatewayRouter.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
 #include <awsmock/service/lambda/LambdaExecutor.h>

@@ -6,9 +6,10 @@
 
 namespace AwsMock::Service {
 
-    DockerService::DockerService(const Core::Configuration &configuration) : _configuration(configuration), _networkMode(NETWORK_DEFAULT_MODE) {
+    DockerService::DockerService() : _networkMode(NETWORK_DEFAULT_MODE) {
 
         // Get network mode
+        Core::Configuration &_configuration = Core::Configuration::instance();
         _networkMode = _configuration.getString("awsmock.docker.network.mode", NETWORK_DEFAULT_MODE);
         _networkName = _configuration.getString("awsmock.docker.network.name", NETWORK_NAME);
         _containerPort = _configuration.getString("awsmock.docker.container.port", CONTAINER_PORT);

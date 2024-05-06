@@ -2,7 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include <awsmock/dto/lambda/DeadLetterConfig.h>
+#include "awsmock/dto/lambda/model/DeadLetterConfig.h"
 
 namespace AwsMock::Dto::Lambda {
 

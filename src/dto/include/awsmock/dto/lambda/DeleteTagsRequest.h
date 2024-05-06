@@ -17,9 +17,9 @@
 #include <Poco/JSON/Parser.h>
 
 // AwsMock includes
+#include "awsmock/dto/lambda/model/Environment.h"
+#include "awsmock/dto/lambda/model/EphemeralStorage.h"
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/dto/lambda/Environment.h>
-#include <awsmock/dto/lambda/EphemeralStorage.h>
 
 namespace AwsMock::Dto::Lambda {
 

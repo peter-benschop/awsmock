@@ -27,6 +27,7 @@
 
 // AwsMock include
 #include <awsmock/core/JsonUtils.h>
+#include <awsmock/entity/s3/BucketEncryption.h>
 #include <awsmock/entity/s3/BucketNotification.h>
 #include <awsmock/entity/s3/LambdaNotification.h>
 #include <awsmock/entity/s3/QueueNotification.h>
@@ -117,6 +118,16 @@ namespace AwsMock::Database::Entity::S3 {
         BucketVersionStatus versionStatus = DISABLED;
 
         /**
+         * Bucket encryption state
+         */
+        //BucketVersionStatus encryptionStatus = DISABLED;
+
+        /**
+         * Bucket encryption configurations
+         */
+        BucketEncryption bucketEncryption;
+
+        /**
          * Creation date
          */
         Poco::DateTime created;
@@ -182,6 +193,13 @@ namespace AwsMock::Database::Entity::S3 {
          * @return true if notification with the given event name exists.
          */
         bool HasLambdaNotification(const std::string &eventName);
+
+        /**
+         * Checks whether a the bucket has encryption enabled.
+         *
+         * @return true if encryption is enabled for the bucket.
+         */
+        bool HasEncryption() const;
 
         /**
          * Returns a given notification by name

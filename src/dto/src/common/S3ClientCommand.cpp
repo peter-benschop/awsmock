@@ -29,6 +29,7 @@ namespace AwsMock::Dto::Common {
         versionRequest = Core::HttpUtils::HasQueryParameter(request.getURI(), "versioning");
         copyRequest = request.has("x-amz-copy-source");
         uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "uploadId");
+        encryptionRequest = Core::HttpUtils::HasQueryParameter(request.getURI(), "encryption");
 
         if (!userAgent.clientCommand.empty()) {
 
@@ -56,6 +57,8 @@ namespace AwsMock::Dto::Common {
                 case HttpMethod::PUT:
                     if (multipartRequest) {
                         command = S3CommandType::UPLOAD_PART;
+                    } else if (encryptionRequest) {
+                        command = S3CommandType::PUT_BUCKET_ENCRYPTION;
                     } else if (notificationRequest) {
                         command = S3CommandType::BUCKET_NOTIFICATION;
                     } else if (!bucket.empty() && key.empty()) {
@@ -92,7 +95,6 @@ namespace AwsMock::Dto::Common {
                 }
             }
         }
-        //log_debug << ToJson();
     }
 
     void S3ClientCommand::GetCommandFromUserAgent(const HttpMethod &httpMethod, const UserAgent &userAgent) {
@@ -134,6 +136,8 @@ namespace AwsMock::Dto::Common {
             command = S3CommandType::COMPLETE_MULTIPART_UPLOAD;
         } else if (userAgent.clientModule == "command/s3api" && userAgent.clientCommand == "put-bucket-notification-configuration") {
             command = S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION;
+        } else if (userAgent.clientModule == "command/s3api" && userAgent.clientCommand == "put-bucket-encryption") {
+            command = S3CommandType::PUT_BUCKET_ENCRYPTION;
         }
     }
 

@@ -2,7 +2,7 @@
 // Created by vogje01 on 23/09/2023.
 //
 
-#include <awsmock/dto/sqs/MessageAttribute.h>
+#include "awsmock/dto/sqs/model/MessageAttribute.h"
 
 namespace AwsMock::Dto::SQS {
 

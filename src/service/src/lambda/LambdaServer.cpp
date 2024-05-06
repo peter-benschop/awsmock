@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    LambdaServer::LambdaServer(Core::Configuration &configuration) : AbstractWorker(configuration), AbstractServer(configuration, "lambda", 10), _configuration(configuration), _lambdaDatabase(Database::LambdaDatabase::instance()), _module("lambda") {
+    LambdaServer::LambdaServer(Core::Configuration &configuration) : AbstractServer(configuration, "lambda", 10), _configuration(configuration), _lambdaDatabase(Database::LambdaDatabase::instance()), _module("lambda") {
 
         // Get HTTP configuration values
         _port = _configuration.getInt("awsmock.service.lambda.http.port", LAMBDA_DEFAULT_PORT);
@@ -33,7 +33,7 @@ namespace AwsMock::Service {
         log_debug << "Lambda module endpoint: http://" << _lambdaServiceHost << ":" << _lambdaServicePort;
 
         // Docker module
-        _dockerService = std::make_unique<Service::DockerService>(_configuration);
+        _dockerService = std::make_unique<Service::DockerService>();
 
         // Monitoring
         _lambdaMonitoring = std::make_unique<LambdaMonitoring>(_monitoringPeriod);
@@ -87,6 +87,8 @@ namespace AwsMock::Service {
         log_debug << "Starting lambdas";
         std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region);
 
+        Service::LambdaService lambdaService(_configuration);
+
         for (auto &lambda: lambdas) {
 
             Dto::Lambda::Code code = GetCode(lambda);
@@ -98,7 +100,7 @@ namespace AwsMock::Service {
                     .runtime = lambda.runtime,
                     .code = code,
                     .tags = lambda.tags};
-            SendCreateFunctionRequest(request, "application/json");
+            lambdaService.CreateFunction(request);
             log_debug << "Lambda started, name:" << lambda.function;
         }
     }
@@ -117,14 +119,6 @@ namespace AwsMock::Service {
             log_debug << "Loaded lambda from file:" << lambda.fileName << " size: " << Core::FileUtils::FileSize(lambda.fileName);
         }
         return code;
-    }
-
-    void LambdaServer::SendCreateFunctionRequest(Dto::Lambda::CreateFunctionRequest &lambdaRequest, const std::string &contentType) {
-
-        std::string url = "http://" + _lambdaServiceHost + ":" + std::to_string(_lambdaServicePort) + "/2015-03-31/functions";
-        std::string body = lambdaRequest.ToJson();
-        SendPostRequest(_module, url, body, contentType);
-        log_debug << "Lambda create function request send";
     }
 
 }// namespace AwsMock::Service
