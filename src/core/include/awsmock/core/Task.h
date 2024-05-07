@@ -47,7 +47,6 @@ namespace AwsMock::Core {
          * Constructor
          *
          * @param name task name
-         * @param timeout timeout in milliseconds
          */
         explicit Task(std::string name) : _name(std::move(name)) {}
 

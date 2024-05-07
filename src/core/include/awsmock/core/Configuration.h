@@ -25,7 +25,9 @@
 namespace AwsMock::Core {
 
     /**
-     * Configuration handler. Configuration are read from the given configuration file and can be overruled by environment variables. Supported environment variables
+     * @brief Configuration handler.
+     *
+     * Configuration are read from the given configuration file and can be overruled by environment variables. Supported environment variables
      * are:
      * <ul>
      * <li>AWSMOCK_COM_BASENAME: the base name of the configuration file</li>
@@ -36,11 +38,11 @@ namespace AwsMock::Core {
      * </ul>
      *
      * Properties in a configuration file are key-vale pairs. The following list shows all supported keys with their default values:
-     * @verbartim
+     * @code{.ini}
      * awsmock.monitoring.port=9100
      * awsmock.monitoring.timeout=60000
      * awsmock.logging.level=debug
-     * @endverbatim
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

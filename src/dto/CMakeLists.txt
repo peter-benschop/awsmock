@@ -85,8 +85,7 @@ endif()
 # Includes
 if(WIN32)
     include_directories(./include ../core/include ../db/include ${AWSMOCK_WIN32_DIR}/include)
-    link_directories(../core/${CMAKE_BUILD_TYPE} ../db/${CMAKE_BUILD_TYPE} ${AWSMOCK_WIN32_DIR}/lib)
-
+    link_directories(${AWSMOCK_WIN32_DIR}/lib ../core/${CMAKE_BUILD_TYPE} ../db/${CMAKE_BUILD_TYPE})
 else()
     include_directories(include ../core/include ../db/include /usr/include /usr/include/mongo /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
 endif ()
@@ -97,7 +96,7 @@ set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 
 if (WIN32)
     target_link_libraries(${LIBRARY} awsmockcore.lib awsmockdb.lib libssl.lib libcrypto.lib libcurl_imp.lib archive.lib bson-1.0.lib
-            bsoncxx.lib mongocxx.lib)
+            bsoncxx-v_noabi-rhb-x64-v143-md.lib mongocxx-v_noabi-rhb-x64-v143-md.lib)
 endif ()
 
 install(TARGETS ${LIBRARY} DESTINATION lib)

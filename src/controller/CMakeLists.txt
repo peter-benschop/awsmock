@@ -9,17 +9,8 @@ endif ()
 set(SOURCES src/Configuration.cpp src/Controller.cpp src/main.cpp)
 
 if (WIN32)
-    include_directories(./include ../core/include ../dto/include ../db/include)
-    include_directories(${AWSMOCK_WIN32_DIR}/poco/include ${AWSMOCK_WIN32_DIR}/gnuwin32/include)
-    include_directories(${AWSMOCK_WIN32_DIR}/plog/include ${AWSMOCK_WIN32_DIR}/openssl/include)
-    include_directories(${AWSMOCK_WIN32_DIR}/curl/include ${AWSMOCK_WIN32_DIR}/boost ${AWSMOCK_WIN32_DIR}/libarchive/include)
-    include_directories(${AWSMOCK_WIN32_DIR}/mongo-cxx-driver/include/bsoncxx/v_noabi)
-    include_directories(${AWSMOCK_WIN32_DIR}/mongo-cxx-driver/include/mongocxx/v_noabi)
-    include_directories(${AWSMOCK_WIN32_DIR}/asio/include)
-    link_directories(../core/Debug ../db/Debug ../dto/Debug)
-    link_directories(${AWSMOCK_WIN32_DIR}/poco/lib ${AWSMOCK_WIN32_DIR}/gnuwin32/lib)
-    link_directories(${AWSMOCK_WIN32_DIR}/libarchive/lib ${AWSMOCK_WIN32_DIR}/openssl/lib/VC/x64/MD)
-    link_directories(${AWSMOCK_WIN32_DIR}/mongo-cxx-driver/lib ${AWSMOCK_WIN32_DIR}/curl/lib)
+    include_directories(./include ../core/include ../db/include ../dto/include ${AWSMOCK_WIN32_DIR}/include)
+    link_directories(${AWSMOCK_WIN32_DIR}/lib ../core/${CMAKE_BUILD_TYPE} ../db/${CMAKE_BUILD_TYPE})
 else ()
     include_directories(include ../core/include ../dto/include ../db/include /usr/include /usr/include/mongo)
     include_directories(/usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
@@ -29,8 +20,9 @@ endif ()
 add_executable(${BINARY} ${SOURCES})
 
 if(WIN32)
-    target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb mongocxx bsoncxx PocoPrometheus PocoNet
-            PocoJSON PocoXML PocoZip PocoFoundation PocoUtil libcrypto.lib libssl.lib archive libcurl_imp.lib)
+    target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb PocoPrometheus PocoNet
+            PocoJSON PocoXML PocoZip PocoFoundation PocoUtil libcrypto.lib libssl.lib archive libcurl_imp.lib
+            bsoncxx-v_noabi-rhb-x64-v143-md.lib mongocxx-v_noabi-rhb-x64-v143-md.lib)
 else ()
     # Check systemd
     find_library(SYSTEMD NAMES systemd HINTS /usr/lib/x86_64-linux-gnu)
