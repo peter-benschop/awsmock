@@ -26,58 +26,58 @@ namespace AwsMock::Dto::S3 {
      *
      * Example:
      * @code{.xml}
-     * <NotificationConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
-     *   <TopicConfiguration>
-     *     <Event>string</Event>
-     *       ...
-     *     <Filter>
-     *       <S3Key>
-     *          <FilterRule>
-     *            <Name>string</Name>
-     *            <Value>string</Value>
-     *         </FilterRule>
-     *         ...
-     *       </S3Key>
-     *     </Filter>
-     *     <Id>string</Id>
-     *     <Topic>string</Topic>
-     *   </TopicConfiguration>
-     *   ...
-     *   <QueueConfiguration>
-     *     <Event>string</Event>
-     *     ...
-     *     <Filter>
-     *       <S3Key>
-     *         <FilterRule>
-     *           <Name>string</Name>
-     *           <Value>string</Value>
-     *         </FilterRule>
-     *         ...
-     *      </S3Key>
-     *     </Filter>
-     *     <Id>string</Id>
-     *     <Queue>string</Queue>
-     *   </QueueConfiguration>
-     *   ...
-     *   <CloudFunctionConfiguration>
-     *    <Event>string</Event>
-     *    ...
-     *    <Filter>
-     *      <S3Key>
-     *        <FilterRule>
-     *          <Name>string</Name>
-     *          <Value>string</Value>
-     *       </FilterRule>
-     *       ...
-     *      </S3Key>
-     *    </Filter>
-     *    <Id>string</Id>
-     *    <CloudFunction>string</CloudFunction>
-     *   </CloudFunctionConfiguration>
-     *   ...
-     *   <EventBridgeConfiguration>
-     *   </EventBridgeConfiguration>
-     * </NotificationConfiguration>
+       <NotificationConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+         <TopicConfiguration>
+           <Event>string</Event>
+             ...
+           <Filter>
+             <S3Key>
+                <FilterRule>
+                  <Name>string</Name>
+                  <Value>string</Value>
+               </FilterRule>
+               ...
+             </S3Key>
+           </Filter>
+           <Id>string</Id>
+           <Topic>string</Topic>
+         </TopicConfiguration>
+         ...
+         <QueueConfiguration>
+           <Event>string</Event>
+           ...
+           <Filter>
+             <S3Key>
+               <FilterRule>
+                 <Name>string</Name>
+                 <Value>string</Value>
+               </FilterRule>
+               ...
+            </S3Key>
+           </Filter>
+           <Id>string</Id>
+           <Queue>string</Queue>
+         </QueueConfiguration>
+         ...
+         <CloudFunctionConfiguration>
+          <Event>string</Event>
+          ...
+          <Filter>
+            <S3Key>
+              <FilterRule>
+                <Name>string</Name>
+                <Value>string</Value>
+             </FilterRule>
+             ...
+            </S3Key>
+          </Filter>
+          <Id>string</Id>
+          <CloudFunction>string</CloudFunction>
+         </CloudFunctionConfiguration>
+         ...
+         <EventBridgeConfiguration>
+         </EventBridgeConfiguration>
+       </NotificationConfiguration>
      * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
