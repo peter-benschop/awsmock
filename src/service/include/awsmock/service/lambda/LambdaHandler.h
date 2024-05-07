@@ -5,13 +5,6 @@
 #ifndef AWSMOCK_SERVICE_LAMBDA_HANDLER_H
 #define AWSMOCK_SERVICE_LAMBDA_HANDLER_H
 
-// Poco includes
-#include "Poco/DateTime.h"
-#include "Poco/DateTimeFormat.h"
-#include "Poco/DateTimeFormatter.h"
-#include "Poco/Logger.h"
-#include <Poco/NotificationQueue.h>
-
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/HttpUtils.h>

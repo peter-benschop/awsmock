@@ -11,9 +11,6 @@
 #include <thread>
 #include <utility>
 
-// Poco includes
-#include <Poco/Logger.h>
-
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 

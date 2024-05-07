@@ -9,7 +9,6 @@
 #include <string>
 
 // Poco includes
-#include <Poco/Logger.h>
 #include <Poco/Net/HTTPResponse.h>
 
 // AwsMock includes

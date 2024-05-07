@@ -7,14 +7,7 @@
 
 // C++ standard includes
 #include <chrono>
-#include <condition_variable>
 #include <string>
-
-// Poco includes
-#include <Poco/Condition.h>
-#include <Poco/Logger.h>
-#include <Poco/Runnable.h>
-#include <Poco/SignalHandler.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
@@ -34,14 +27,14 @@
 namespace AwsMock::Service {
 
     /**
-   * Secret manager server.
-   *
-   * <p>
-   * Default endpoint is localhost:9507. The server supports 50 concurrent threads and support are queue length of 250.
-   * </p>
-   *
-   * @author jens.vogt\@opitz-consulting.com
-   */
+     * Secret manager server.
+     *
+     * <p>
+     * Default endpoint is localhost:9507. The server supports 50 concurrent threads and support are queue length of 250.
+     * </p>
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     class SecretsManagerServer : public AbstractServer {
 
       public:

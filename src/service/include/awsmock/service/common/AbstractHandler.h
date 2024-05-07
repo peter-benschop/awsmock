@@ -11,28 +11,22 @@
 #include <string>
 
 // Poco includes
-#include "Poco/DateTime.h"
-#include "Poco/DateTimeFormat.h"
-#include "Poco/DateTimeFormatter.h"
-#include "Poco/Logger.h"
-#include "Poco/Net/HTTPRequestHandler.h"
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
-#include "Poco/StreamCopier.h"
-#include "Poco/URI.h"
+#include <Poco/Net/HTTPRequestHandler.h>
+#include <Poco/Net/HTTPServerRequest.h>
+#include <Poco/Net/HTTPServerResponse.h>
 #include <Poco/RegularExpression.h>
 
 // AwsMock includes
-#include "awsmock/core/InvalidMethodCallException.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/MemoryMappedFile.h"
-#include "awsmock/core/ResourceNotFoundException.h"
-#include "awsmock/core/ServiceException.h"
-#include "awsmock/core/StringUtils.h"
-#include "awsmock/dto/common/S3ClientCommand.h"
-#include "awsmock/dto/common/UserAgent.h"
-#include "awsmock/dto/s3/RestErrorResponse.h"
-#include "awsmock/dto/sqs/RestErrorResponse.h"
+#include <awsmock/core/InvalidMethodCallException.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/MemoryMappedFile.h>
+#include <awsmock/core/ResourceNotFoundException.h>
+#include <awsmock/core/ServiceException.h>
+#include <awsmock/core/StringUtils.h>
+#include <awsmock/dto/common/S3ClientCommand.h>
+#include <awsmock/dto/common/UserAgent.h>
+#include <awsmock/dto/s3/RestErrorResponse.h>
+#include <awsmock/dto/sqs/RestErrorResponse.h>
 
 namespace AwsMock::Service {
 

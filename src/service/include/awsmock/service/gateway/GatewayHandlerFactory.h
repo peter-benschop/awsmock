@@ -6,13 +6,12 @@
 #define AWSMOCK_SERVICE_GATEWAY_HANDLER_FACTORY_H
 
 // Poco includes
-#include "Poco/Logger.h"
-#include "Poco/Net/HTTPRequestHandlerFactory.h"
+#include <Poco/Net/HTTPRequestHandlerFactory.h>
 
 // AwsMock includes
-#include "GatewayHandler.h"
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/MetricService.h"
+#include <GatewayHandler.h>
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/MetricService.h>
 
 namespace AwsMock::Service {
 
