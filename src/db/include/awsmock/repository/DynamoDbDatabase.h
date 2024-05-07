@@ -25,7 +25,7 @@ namespace AwsMock::Database {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class DynamoDbDatabase : public Database {
+    class DynamoDbDatabase : public DatabaseBase {
 
       public:
 

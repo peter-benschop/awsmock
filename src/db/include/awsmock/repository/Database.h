@@ -29,7 +29,7 @@ namespace AwsMock::Database {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class Database {
+    class DatabaseBase {
 
       public:
 
@@ -38,7 +38,7 @@ namespace AwsMock::Database {
          *
          * @param configuration configuration properties
          */
-        explicit Database();
+        explicit DatabaseBase();
 
         /**
          * Returns a MongoDB connection from the pool
@@ -119,11 +119,6 @@ namespace AwsMock::Database {
          * Database password
          */
         std::string _password;
-
-        /**
-         * MongoDB URI
-         */
-        mongocxx::uri _uri;
 
         /**
          * Database client

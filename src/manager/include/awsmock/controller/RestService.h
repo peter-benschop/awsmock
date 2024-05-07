@@ -5,6 +5,10 @@
 #ifndef AWSMOCK_MANAGER_REST_SERVICE_H
 #define AWSMOCK_MANAGER_REST_SERVICE_H
 
+
+// C++ includes
+#include <utility>
+
 // Poco includes
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 #include "Poco/Net/HTTPServer.h"
@@ -48,7 +52,7 @@ namespace AwsMock {
          *
          * @param router HTTP request router.
          */
-        void setRouter(Poco::Net::HTTPRequestHandlerFactory *router);
+        void setRouter(Poco::Net::HTTPRequestHandlerFactory* router);
 
         /**
          * Start the restfull module.
@@ -63,7 +67,7 @@ namespace AwsMock {
          * @param router router to use
          * @param port port to use (default: 9100)
          */
-        void StartServer(Poco::Net::HTTPRequestHandlerFactory *router, int port = MANAGER_DEFAULT_PORT);
+        void StartServer(Poco::Net::HTTPRequestHandlerFactory* router, int port = MANAGER_DEFAULT_PORT);
 
         /**
          * Stop the manager
@@ -90,7 +94,7 @@ namespace AwsMock {
         /**
          * REST router
          */
-        Poco::Net::HTTPRequestHandlerFactory *_router{};
+        Poco::Net::HTTPRequestHandlerFactory *_router;
 
         /**
          * HTTP manager instance

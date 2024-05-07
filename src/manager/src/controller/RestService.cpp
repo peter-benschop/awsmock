@@ -2,9 +2,7 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#include <utility>
-
-#include "awsmock/controller/RestService.h"
+#include <awsmock/controller/RestService.h>
 
 namespace AwsMock {
 

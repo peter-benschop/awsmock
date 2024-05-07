@@ -18,9 +18,6 @@
 #include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/Logger.h>
-
 // AwsMock includes
 #include <awsmock/controller/Configuration.h>
 #include <awsmock/core/AwsUtils.h>
