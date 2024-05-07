@@ -12,12 +12,9 @@
 #include <utility>
 
 // Poco includes
-#include "Poco/ClassLibrary.h"
-#include "Poco/DynamicFactory.h"
-#include "Poco/Logger.h"
-#include "Poco/Net/HTTPRequestHandlerFactory.h"
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/URI.h"
+#include <Poco/Net/HTTPRequestHandlerFactory.h>
+#include <Poco/Net/HTTPServerRequest.h>
+#include <Poco/URI.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>

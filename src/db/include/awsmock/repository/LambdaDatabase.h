@@ -189,6 +189,11 @@ namespace AwsMock::Database {
         std::string _databaseName;
 
         /**
+         * Collection name
+         */
+        std::string _collectionName;
+
+        /**
          * Lambda in-memory database
          */
         LambdaMemoryDb &_memoryDb;

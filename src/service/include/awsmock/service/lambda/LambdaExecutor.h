@@ -6,13 +6,9 @@
 #define AWSMOCK_SERVICE_LAMBDA_EXECUTOR_H
 
 // Poco includes
-#include <Poco/Logger.h>
 #include <Poco/Net/HTTPClientSession.h>
 #include <Poco/Net/HTTPRequest.h>
 #include <Poco/Net/HTTPResponse.h>
-#include <Poco/Notification.h>
-#include <Poco/NotificationQueue.h>
-#include <Poco/Runnable.h>
 
 // AwsMock includes
 #include <awsmock/core/CurlUtils.h>

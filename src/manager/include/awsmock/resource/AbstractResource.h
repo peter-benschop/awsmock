@@ -10,16 +10,14 @@
 #include <string>
 
 // Poco includes
-#include "Poco/DateTime.h"
-#include "Poco/DateTimeFormat.h"
-#include "Poco/DateTimeFormatter.h"
-#include "Poco/LogStream.h"
-#include "Poco/Logger.h"
-#include "Poco/Net/HTTPRequestHandler.h"
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
-#include "Poco/StreamCopier.h"
-#include "Poco/URI.h"
+#include <Poco/DateTime.h>
+#include <Poco/DateTimeFormat.h>
+#include <Poco/DateTimeFormatter.h>
+#include <Poco/Net/HTTPRequestHandler.h>
+#include <Poco/Net/HTTPServerRequest.h>
+#include <Poco/Net/HTTPServerResponse.h>
+#include <Poco/StreamCopier.h>
+#include <Poco/URI.h>
 #include <Poco/Net/HTTPClientSession.h>
 #include <Poco/RegularExpression.h>
 

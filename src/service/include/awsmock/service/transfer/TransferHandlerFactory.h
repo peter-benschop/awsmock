@@ -6,13 +6,12 @@
 #define AWSMOCK_SERVICE_TRANSFER_HANDLER_FACTORY_H
 
 // Poco includes
-#include "Poco/Logger.h"
-#include "Poco/Net/HTTPRequestHandlerFactory.h"
+#include <Poco/Net/HTTPRequestHandlerFactory.h>
 
 // AwsMock includes
-#include "TransferHandler.h"
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/MetricService.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/service/transfer/TransferHandler.h>
 
 namespace AwsMock::Service {
 

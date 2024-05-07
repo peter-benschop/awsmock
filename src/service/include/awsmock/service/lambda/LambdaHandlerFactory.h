@@ -6,16 +6,13 @@
 #define AWSMOCK_SERVICE_LAMBDA_HANDLER_FACTORY_H
 
 // Poco includes
-#include <Poco/Logger.h>
-#include <Poco/Mutex.h>
 #include <Poco/Net/HTTPRequestHandlerFactory.h>
 #include <Poco/NotificationQueue.h>
-#include <Poco/ScopedLock.h>
 
 // AwsMock includes
-#include "LambdaHandler.h"
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/MetricService.h"
+#include <LambdaHandler.h>
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/MetricService.h>
 
 namespace AwsMock::Service {
 

@@ -6,10 +6,9 @@
 #define AWSMOCK_RESOURCE_MODULE_HANDLER_H
 
 // Poco includes
-#include "Poco/JSON/JSON.h"
-#include "Poco/Logger.h"
-#include "Poco/Task.h"
-#include "Poco/TaskManager.h"
+#include <Poco/JSON/JSON.h>
+#include <Poco/Task.h>
+#include <Poco/TaskManager.h>
 #include <Poco/JSON/Array.h>
 #include <Poco/JSON/Object.h>
 

@@ -11,7 +11,6 @@
 // Poco includes
 #include <Poco/DirectoryIterator.h>
 #include <Poco/File.h>
-#include <Poco/Logger.h>
 #include <Poco/Path.h>
 #include <Poco/RecursiveDirectoryIterator.h>
 #include <Poco/RegularExpression.h>
