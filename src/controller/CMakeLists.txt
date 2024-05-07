@@ -28,7 +28,7 @@ endif ()
 
 add_executable(${BINARY} ${SOURCES})
 
-if(WIN32)
+if (WIN32)
     target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb mongocxx bsoncxx PocoPrometheus PocoNet
             PocoJSON PocoXML PocoZip PocoFoundation PocoUtil libcrypto.lib libssl.lib archive libcurl_imp.lib)
 else ()
@@ -37,8 +37,8 @@ else ()
     if (SYSTEMD)
         # systemd available
         add_definitions(-DHAS_SYSTEMD)
-        target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb PocoPrometheus PocoNet PocoJSON PocoXML PocoZip PocoFoundation PocoUtil
-                asio pthread crypto ssl z archive curl tbb systemd)
+        target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb mongocxx bsoncxx PocoPrometheus PocoNet
+                PocoJSON PocoXML PocoZip PocoFoundation PocoUtil pthread crypto ssl z archive curl tbb systemd)
     else ()
         # systemd not available
         target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb mongocxx bsoncxx PocoPrometheus PocoNet
