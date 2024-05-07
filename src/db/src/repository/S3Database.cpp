@@ -566,20 +566,29 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            bsoncxx::builder::basic::document builder;
-            if (!region.empty()) {
-                builder.append(bsoncxx::builder::basic::kvp("region", region));
-            }
-            if (!bucket.empty()) {
-                builder.append(bsoncxx::builder::basic::kvp("bucket", bucket));
-            }
-            bsoncxx::document::value filter = builder.extract();
-
             try {
 
                 auto client = GetClient();
                 mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
-                long count = static_cast<long>(_objectCollection.count_documents({filter}));
+
+                long count = 0;
+                if (region.empty() && bucket.empty()) {
+
+                    count = static_cast<long>(_objectCollection.count_documents({}));
+
+                } else if (!region.empty() && bucket.empty()) {
+
+                    count = static_cast<long>(_objectCollection.count_documents(make_document(kvp("region", region))));
+
+                } else if (region.empty() && !bucket.empty()) {
+
+                    count = static_cast<long>(_objectCollection.count_documents(make_document(kvp("bucket", bucket))));
+
+                } else {
+
+                    count = static_cast<long>(_objectCollection.count_documents(make_document(kvp("region", region), kvp("bucket", bucket))));
+                }
+
                 log_trace << "Object count: " << count;
                 return count;
 

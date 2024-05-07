@@ -31,7 +31,7 @@ namespace AwsMock::Database {
         }
 
         Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
-        Database _database = Database();
+        DatabaseBase _database = DatabaseBase();
     };
 
     /*TEST_F(DatabaseTest, ConstructorTest) {

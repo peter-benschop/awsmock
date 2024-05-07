@@ -27,7 +27,7 @@ namespace AwsMock::Database {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class LambdaDatabase : public Database {
+    class LambdaDatabase : public DatabaseBase {
 
       public:
 
@@ -187,6 +187,11 @@ namespace AwsMock::Database {
          * Database name
          */
         std::string _databaseName;
+
+        /**
+         * Collection name
+         */
+        std::string _collectionName;
 
         /**
          * Lambda in-memory database

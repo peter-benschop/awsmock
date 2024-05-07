@@ -5,6 +5,10 @@
 #ifndef AWSMOCK_MANAGER_REST_SERVICE_H
 #define AWSMOCK_MANAGER_REST_SERVICE_H
 
+
+// C++ includes
+#include <utility>
+
 // Poco includes
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 #include "Poco/Net/HTTPServer.h"
@@ -90,7 +94,7 @@ namespace AwsMock {
         /**
          * REST router
          */
-        Poco::Net::HTTPRequestHandlerFactory *_router{};
+        Poco::Net::HTTPRequestHandlerFactory *_router;
 
         /**
          * HTTP manager instance

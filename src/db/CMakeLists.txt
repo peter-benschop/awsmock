@@ -38,7 +38,7 @@ endif ()
 # Includes
 if (WIN32)
     include_directories(./include ../core/include ${AWSMOCK_WIN32_DIR}/include)
-    link_directories(${AWSMOCK_WIN32_DIR}/lib ../core/${CMAKE_BUILD_TYPE})
+    link_directories(../core/${CMAKE_BUILD_TYPE} ${AWSMOCK_WIN32_DIR}/lib)
 else ()
     include_directories(include ../core/include /usr/include /usr/include/mongo /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
 endif ()

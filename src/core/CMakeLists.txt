@@ -28,7 +28,7 @@ if (WIN32)
     include_directories(./include ${AWSMOCK_WIN32_DIR}/include)
     link_directories(${AWSMOCK_WIN32_DIR}/lib)
 else ()
-    include_directories(.\\include)
+    include_directories(./include)
 endif ()
 
 add_library(${LIBRARY} SHARED ${SOURCES})

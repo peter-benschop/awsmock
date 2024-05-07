@@ -2,7 +2,8 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#include "awsmock/repository/Database.h"
+#include <awsmock/repository/Database.h>
+#include <mongocxx/instance.hpp>
 
 namespace AwsMock::Database {
 
@@ -10,7 +11,7 @@ namespace AwsMock::Database {
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
 
-    Database::Database() : _configuration(Core::Configuration::instance()), _useDatabase(false) {
+    DatabaseBase::DatabaseBase() : _configuration(Core::Configuration::instance()), _useDatabase(false) {
 
         _useDatabase = _configuration.getBool("awsmock.mongodb.active", false);
         _name = _configuration.getString("awsmock.mongodb.name", "awsmock");
@@ -21,33 +22,41 @@ namespace AwsMock::Database {
         _poolSize = _configuration.getInt("awsmock.mongodb.pool.size", 256);
 
         if (_useDatabase) {
+
+            // Start instance
+            mongocxx::instance instance{};
+
+            // URL
+            std::string url = "mongodb://" + _user + ":" + _password + "@" + _host + ":" + std::to_string(_port) + "/?poolSize=" + std::to_string(_poolSize);
+            mongocxx::uri _uri(url.c_str());
+
             // MongoDB connection pool
-            _uri = mongocxx::uri("mongodb://" + _user + ":" + _password + "@" + _host + ":" + std::to_string(_port) + "/?maxPoolSize=" + std::to_string(_poolSize));
             _pool = std::make_unique<mongocxx::pool>(_uri);
+            log_info << "MongoDB database initialized. url: " << url;
         }
     }
 
-    mongocxx::database Database::GetConnection() {
+    mongocxx::database DatabaseBase::GetConnection() {
         mongocxx::pool::entry _client = _pool->acquire();
         return (*_client)[_name];
     }
 
-    mongocxx::pool::entry Database::GetClient() {
+    mongocxx::pool::entry DatabaseBase::GetClient() {
         if (!_pool) {
             log_fatal << "Pool is NULL";
         }
         return _pool->acquire();
     }
 
-    bool Database::HasDatabase() const {
+    bool DatabaseBase::HasDatabase() const {
         return _useDatabase;
     }
 
-    std::string Database::GetDatabaseName() const {
+    std::string DatabaseBase::GetDatabaseName() const {
         return _name;
     }
 
-    void Database::StartDatabase() {
+    void DatabaseBase::StartDatabase() {
 
         _useDatabase = true;
         _configuration.SetValue("awsmock.mongodb.active", true);
@@ -58,7 +67,7 @@ namespace AwsMock::Database {
         log_info << "Database module started, poolSize: " << _poolSize;
     }
 
-    void Database::StopDatabase() {
+    void DatabaseBase::StopDatabase() {
 
         // Update module database
         _configuration.SetValue("awsmock.mongodb.active", false);
@@ -70,7 +79,7 @@ namespace AwsMock::Database {
         log_info << "Database module stopped";
     }
 
-    void Database::CreateIndexes() {
+    void DatabaseBase::CreateIndexes() {
 
         if (_useDatabase) {
 
@@ -104,7 +113,7 @@ namespace AwsMock::Database {
         }
     }
 
-    void Database::UpdateModuleStatus() {
+    void DatabaseBase::UpdateModuleStatus() {
         /*    auto session = GetSession();
     session.start_transaction();
     session.client()[_name]["module"].update_one(make_document(kvp("name", "database")), make_document(kvp("$set", make_document(kvp("state", "RUNNING")))));

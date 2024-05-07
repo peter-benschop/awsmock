@@ -12,8 +12,6 @@
 #include <utility>
 
 // Poco includes
-#include <Poco/Condition.h>
-#include <Poco/Logger.h>
 #include <Poco/Net/HTTPServer.h>
 #include <Poco/Net/HTTPServerResponse.h>
 #include <Poco/Task.h>
@@ -91,11 +89,6 @@ namespace AwsMock::Service {
          * Main loop
          */
         void Run() override = 0;
-
-        /**
-         * Shutdown condition
-         */
-        Poco::Condition _condition;
 
       private:
 

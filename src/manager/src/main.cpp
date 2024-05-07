@@ -147,7 +147,7 @@ namespace AwsMock {
 
             } else if (name == "logfile") {
 
-                //_logger.setFileChannel(value);
+                // _logger.setFileChannel(value);
             }
         }
 
@@ -295,24 +295,19 @@ namespace AwsMock {
         Core::MetricService &_metricService = Core::MetricService::instance();
 
         /**
+         * Service database
+         */
+        Database::ModuleDatabase &_moduleDatabase = Database::ModuleDatabase::instance();
+
+        /**
          * Gateway router
          */
         Controller::Router *_router = new Controller::Router(_configuration, _metricService, _serverMap);
 
         /**
-         * Request gateway module
-         */
-        std::shared_ptr<Service::GatewayServer> _gatewayServer{};
-
-        /**
          * Gateway controller
          */
         RestService _restService = RestService(_configuration);
-
-        /**
-         * Service database
-         */
-        Database::ModuleDatabase &_moduleDatabase = Database::ModuleDatabase::instance();
 
         /**
          * Server map

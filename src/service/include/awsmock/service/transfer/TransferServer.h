@@ -10,11 +10,6 @@
 #include <memory>
 #include <string>
 
-// Poco includes
-#include <Poco/Condition.h>
-#include <Poco/Logger.h>
-#include <Poco/Runnable.h>
-
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>

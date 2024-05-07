@@ -24,14 +24,14 @@ namespace AwsMock::Database {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class CognitoDatabase : public Database {
+    class CognitoDatabase : public DatabaseBase {
 
       public:
 
         /**
          * Constructor
          */
-        explicit CognitoDatabase() : _memoryDb(CognitoMemoryDb::instance()), _hasDatabase(Database::HasDatabase()), _databaseName(GetDatabaseName()), _userpoolCollectionName("cognito_userpool"), _userCollectionName("cognito_user"){};
+        explicit CognitoDatabase() : _memoryDb(CognitoMemoryDb::instance()), _hasDatabase(DatabaseBase::HasDatabase()), _databaseName(GetDatabaseName()), _userpoolCollectionName("cognito_userpool"), _userCollectionName("cognito_user"){};
 
         /**
          * Singleton instance

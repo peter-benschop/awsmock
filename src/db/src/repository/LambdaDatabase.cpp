@@ -2,7 +2,7 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#include "awsmock/repository/LambdaDatabase.h"
+#include <awsmock/repository/LambdaDatabase.h>
 
 namespace AwsMock::Database {
 
@@ -10,7 +10,7 @@ namespace AwsMock::Database {
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
 
-    LambdaDatabase::LambdaDatabase() : _memoryDb(LambdaMemoryDb::instance()), _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()) {}
+    LambdaDatabase::LambdaDatabase() : _memoryDb(LambdaMemoryDb::instance()), _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()), _collectionName("lambda") {}
 
     bool LambdaDatabase::LambdaExists(const std::string &region, const std::string &function, const std::string &runtime) {
 
@@ -19,7 +19,7 @@ namespace AwsMock::Database {
             try {
 
                 auto client = GetClient();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName]["lambda"];
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
                 int64_t count = _lambdaCollection.count_documents(make_document(kvp("region", region),
                                                                                 kvp("function", function),
                                                                                 kvp("runtime", runtime)));
@@ -49,7 +49,7 @@ namespace AwsMock::Database {
             try {
 
                 auto client = GetClient();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName]["lambda"];
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
                 int64_t count = _lambdaCollection.count_documents(make_document(kvp("function", functionName)));
                 log_trace << "lambda function exists: " << (count > 0 ? "true" : "false");
                 return count > 0;
@@ -72,7 +72,7 @@ namespace AwsMock::Database {
             try {
 
                 auto client = GetClient();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName]["lambda"];
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
                 int64_t count = _lambdaCollection.count_documents(make_document(kvp("arn", arn)));
                 log_trace << "lambda function exists: " << (count > 0 ? "true" : "false");
                 return count > 0;
@@ -95,7 +95,7 @@ namespace AwsMock::Database {
             try {
 
                 auto client = GetClient();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName]["lambda"];
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
 
                 long count = 0;
                 if (region.empty()) {
@@ -126,7 +126,7 @@ namespace AwsMock::Database {
             try {
 
                 auto client = GetClient();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName]["lambda"];
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
 
                 auto result = _lambdaCollection.insert_one(lambda.ToDocument());
                 log_trace << "Bucket created, oid: " << result->inserted_id().get_oid().value.to_string();
@@ -148,7 +148,7 @@ namespace AwsMock::Database {
         try {
 
             auto client = GetClient();
-            mongocxx::collection _lambdaCollection = (*client)[_databaseName]["lambda"];
+            mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
             mongocxx::stdx::optional<bsoncxx::document::value>
                     mResult = _lambdaCollection.find_one(make_document(kvp("_id", oid)));
             if (!mResult) {
@@ -185,7 +185,7 @@ namespace AwsMock::Database {
             try {
 
                 auto client = GetClient();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName]["lambda"];
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
                 mongocxx::stdx::optional<bsoncxx::document::value> mResult = _lambdaCollection.find_one(make_document(kvp("arn", arn)));
                 if (!mResult) {
                     log_error << "Database exception: Lambda not found ";
@@ -214,7 +214,7 @@ namespace AwsMock::Database {
             try {
 
                 auto client = GetClient();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName]["lambda"];
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
                 mongocxx::stdx::optional<bsoncxx::document::value> mResult = _lambdaCollection.find_one(make_document(kvp("region", region), kvp("function", name)));
                 if (!mResult.has_value()) {
                     log_error << "Database exception: Lambda not found ";
@@ -252,7 +252,7 @@ namespace AwsMock::Database {
             try {
 
                 auto client = GetClient();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName]["lambda"];
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
                 auto result = _lambdaCollection.replace_one(make_document(kvp("region", lambda.region),
                                                                           kvp("function", lambda.function),
                                                                           kvp("runtime", lambda.runtime)),
@@ -279,7 +279,7 @@ namespace AwsMock::Database {
             try {
 
                 auto client = GetClient();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName]["lambda"];
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
                 if (region.empty()) {
 
                     auto lambdaCursor = _lambdaCollection.find({});
@@ -318,7 +318,7 @@ namespace AwsMock::Database {
             try {
 
                 auto client = GetClient();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName]["lambda"];
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
                 auto result = _lambdaCollection.delete_many(make_document(kvp("function", functionName)));
                 log_debug << "lambda deleted, function: " << functionName << " count: "
                           << result->deleted_count();
@@ -341,7 +341,7 @@ namespace AwsMock::Database {
             try {
 
                 auto client = GetClient();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName]["lambda"];
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
                 auto result = _lambdaCollection.delete_many({});
                 log_debug << "All lambdas deleted, count: " << result->deleted_count();
 

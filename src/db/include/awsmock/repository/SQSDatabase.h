@@ -35,7 +35,7 @@ namespace AwsMock::Database {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SQSDatabase : public Database {
+    class SQSDatabase : public DatabaseBase {
 
       public:
 
