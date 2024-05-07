@@ -6,7 +6,6 @@
 #define AWSMOCK_SERVICE_S3_SERVER_H
 
 // Poco includes
-#include <Poco/Logger.h>
 #include <Poco/Net/HTTPRequestHandlerFactory.h>
 #include <Poco/Net/HTTPServer.h>
 

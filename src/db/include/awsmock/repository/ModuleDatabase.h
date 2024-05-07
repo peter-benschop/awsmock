@@ -26,7 +26,7 @@ namespace AwsMock::Database {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class ModuleDatabase : public Database {
+    class ModuleDatabase : public DatabaseBase {
 
       public:
 

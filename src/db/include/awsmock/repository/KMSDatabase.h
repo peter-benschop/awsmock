@@ -31,7 +31,7 @@ namespace AwsMock::Database {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class KMSDatabase : public Database {
+    class KMSDatabase : public DatabaseBase {
 
       public:
 

@@ -25,14 +25,10 @@ endif()
 # Includes
 
 if (WIN32)
-    include_directories(./include ${AWSMOCK_WIN32_DIR}/poco/include ${AWSMOCK_WIN32_DIR}/gnuwin32/include)
-    include_directories(${AWSMOCK_WIN32_DIR}/plog/include ${AWSMOCK_WIN32_DIR}/openssl/include)
-    include_directories(${AWSMOCK_WIN32_DIR}/curl/include ${AWSMOCK_WIN32_DIR}/libarchive/include)
-    link_directories(${AWSMOCK_WIN32_DIR}/poco/lib ${AWSMOCK_WIN32_DIR}/gnuwin32/lib)
-    link_directories(${AWSMOCK_WIN32_DIR}/libarchive/lib ${AWSMOCK_WIN32_DIR}/openssl/lib/VC/x64/MD)
-    link_directories(${AWSMOCK_WIN32_DIR}/curl/lib)
+    include_directories(./include ${AWSMOCK_WIN32_DIR}/include)
+    link_directories(${AWSMOCK_WIN32_DIR}/lib)
 else ()
-    include_directories(.\\include)
+    include_directories(./include)
 endif ()
 
 add_library(${LIBRARY} SHARED ${SOURCES})

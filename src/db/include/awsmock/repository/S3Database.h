@@ -33,7 +33,7 @@ namespace AwsMock::Database {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class S3Database : public Database {
+    class S3Database : public DatabaseBase {
 
       public:
 

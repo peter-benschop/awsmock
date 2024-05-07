@@ -84,15 +84,9 @@ endif()
 
 # Includes
 if(WIN32)
-    include_directories(./include ../core/include ../db/include ${AWSMOCK_WIN32_DIR}/poco/include)
-    include_directories(${AWSMOCK_WIN32_DIR}/gnuwin32/include)
-    include_directories(${AWSMOCK_WIN32_DIR}/plog/include ${AWSMOCK_WIN32_DIR}/openssl/include)
-    include_directories(${AWSMOCK_WIN32_DIR}/curl/include ${AWSMOCK_WIN32_DIR}/boost)
-    include_directories(${AWSMOCK_WIN32_DIR}/mongo-cxx-driver/include/bsoncxx/v_noabi)
-    include_directories(${AWSMOCK_WIN32_DIR}/mongo-cxx-driver/include/mongocxx/v_noabi)
-    link_directories(../core/Debug ../db/Debug ${AWSMOCK_WIN32_DIR}/poco/lib ${AWSMOCK_WIN32_DIR}/gnuwin32/lib)
-    link_directories(${AWSMOCK_WIN32_DIR}/libarchive/lib ${AWSMOCK_WIN32_DIR}/openssl/lib/VC/x64/MD)
-    link_directories(${AWSMOCK_WIN32_DIR}/mongo-cxx-driver/lib ${AWSMOCK_WIN32_DIR}/curl/lib)
+    include_directories(./include ../core/include ../db/include ${AWSMOCK_WIN32_DIR}/include)
+    link_directories(../core/${CMAKE_BUILD_TYPE} ../db/${CMAKE_BUILD_TYPE} ${AWSMOCK_WIN32_DIR}/lib)
+
 else()
     include_directories(include ../core/include ../db/include /usr/include /usr/include/mongo /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
 endif ()
