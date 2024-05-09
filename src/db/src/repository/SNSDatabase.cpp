@@ -19,7 +19,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
                 int64_t count = _topicCollection.count_documents(make_document(kvp("topicArn", topicArn)));
                 log_trace << "Topic exists: " << (count > 0 ? "true" : "false");
@@ -42,7 +42,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
                 int64_t
                         count = _topicCollection.count_documents(make_document(kvp("region", region), kvp("topicName", topicName)));
@@ -64,7 +64,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
             auto session = client->start_session();
 
@@ -93,7 +93,7 @@ namespace AwsMock::Database {
 
         try {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
             mongocxx::stdx::optional<bsoncxx::document::value>
                     mResult = _topicCollection.find_one(make_document(kvp("_id", oid)));
@@ -129,7 +129,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
                 mongocxx::stdx::optional<bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("topicArn", topicArn)));
 
@@ -154,7 +154,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
                 mongocxx::stdx::optional<bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("region", region), kvp("topicName", topicName)));
 
@@ -185,7 +185,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
                 auto queueCursor = _topicCollection.find(make_document(kvp("subscriptions.subscriptionArn", subscriptionArn)));
                 for (auto topic: queueCursor) {
@@ -213,7 +213,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
 
                 if (region.empty()) {
@@ -252,7 +252,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
             auto session = client->start_session();
 
@@ -297,7 +297,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
                 long count = _topicCollection.count_documents(make_document(kvp("region", region)));
                 log_trace << "Count topics, result: " << count;
@@ -318,7 +318,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
             auto session = client->start_session();
 
@@ -345,7 +345,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
             auto session = client->start_session();
 
@@ -374,7 +374,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
                 int64_t count = _messageCollection.count_documents(make_document(kvp("_id", id)));
                 log_trace << "Message exists: " << (count > 0 ? "true" : "false");
@@ -395,7 +395,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
             auto session = client->start_session();
 
@@ -423,7 +423,7 @@ namespace AwsMock::Database {
     Entity::SNS::Message SNSDatabase::GetMessageById(bsoncxx::oid oid) {
         try {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
             mongocxx::stdx::optional<bsoncxx::document::value> mResult = _messageCollection.find_one(make_document(kvp("_id", oid)));
             Entity::SNS::Message result;
@@ -447,7 +447,7 @@ namespace AwsMock::Database {
             try {
 
                 long count;
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
                 if (!region.empty() && !topicArn.empty()) {
                     count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("topicArn", topicArn)));
@@ -479,7 +479,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
                 long count = _messageCollection.count_documents(make_document(kvp("region", region),
                                                                               kvp("topicArn", topicArn),
@@ -505,7 +505,7 @@ namespace AwsMock::Database {
         Entity::SNS::MessageList messageList;
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
             if (region.empty()) {
 
@@ -541,7 +541,7 @@ namespace AwsMock::Database {
             mongocxx::options::find_one_and_update opts{};
             opts.return_document(mongocxx::options::return_document::k_after);
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
 
             auto mResult = _messageCollection.find_one_and_update(make_document(kvp("_id", bsoncxx::oid{message.oid})),
@@ -578,7 +578,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
             auto session = client->start_session();
 
@@ -606,7 +606,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
             auto session = client->start_session();
 
@@ -642,7 +642,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             auto messageCollection = (*client)[_databaseName][_messageCollectionName];
             auto session = client->start_session();
 
@@ -671,7 +671,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
                 auto result = _messageCollection.delete_many({});
                 log_debug << "All messages deleted, count: " << result->deleted_count();

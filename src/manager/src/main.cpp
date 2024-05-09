@@ -36,9 +36,6 @@
 // AwsMock includes
 #include "awsmock/service/kms/KMSServer.h"
 #include <awsmock/controller/RestService.h>
-#include <awsmock/controller/Router.h>
-#include <awsmock/core/Configuration.h>
-#include <awsmock/core/LogStream.h>
 
 #define DEFAULT_CONFIG_FILE "/etc/awsmock.properties"
 #define DEFAULT_LOG_LEVEL "debug"
@@ -166,7 +163,6 @@ namespace AwsMock {
          * Initialize the logging
          */
         void InitializeLogging() const {
-            Core::LogStream logStream;
             if (!_logLevelSet) {
                 std::string logLevel = Core::Configuration::instance().getString("awsmock.log.level", DEFAULT_LOG_LEVEL);
                 Core::LogStream::SetSeverity(logLevel);
@@ -185,14 +181,33 @@ namespace AwsMock {
          */
         static void InitializeDatabase() {
 
-            // Start instance
-            mongocxx::instance instance{};
+            // Get database variables
+            Core::Configuration &configuration = Core::Configuration::instance();
+            std::string name = configuration.getString("awsmock.mongodb.name", "awsmock");
+            std::string host = configuration.getString("awsmock.mongodb.host", "localhost");
+            std::string user = configuration.getString("awsmock.mongodb.user", "admin");
+            std::string password = configuration.getString("awsmock.mongodb.password", "admin");
+            int _port = configuration.getInt("awsmock.mongodb.port", 27017);
+            int poolSize = configuration.getInt("awsmock.mongodb.pool.size", 256);
+
+            // MongoDB URL
+            std::string url = "mongodb://" + user + ":" + password + "@" + host + ":" + std::to_string(_port) + "/?maxPoolSize=" + std::to_string(poolSize);
+            mongocxx::uri _uri(url.c_str());
+
+            auto instance = bsoncxx::stdx::make_unique<mongocxx::instance>();
+            Database::ConnectionPool &pool = Database::ConnectionPool::instance();
+
+            // Options
+            mongocxx::options::client client_options;
+            auto api = mongocxx::options::server_api{mongocxx::options::server_api::version::k_version_1};
+            client_options.server_api_opts(api);
+            pool.configure(std::move(instance), bsoncxx::stdx::make_unique<mongocxx::pool>(std::move(_uri), std::move(client_options)));
 
             // Create database indexes
-            Database::ModuleDatabase::instance().Initialize();
             Database::ModuleDatabase::instance().CreateIndexes();
             log_debug << "Database indexes created";
         }
+
 
         /**
          * Initialize CURL library

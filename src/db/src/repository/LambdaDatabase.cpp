@@ -18,7 +18,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
                 int64_t count = _lambdaCollection.count_documents(make_document(kvp("region", region),
                                                                                 kvp("function", function),
@@ -48,7 +48,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
                 int64_t count = _lambdaCollection.count_documents(make_document(kvp("function", functionName)));
                 log_trace << "lambda function exists: " << (count > 0 ? "true" : "false");
@@ -71,7 +71,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
                 int64_t count = _lambdaCollection.count_documents(make_document(kvp("arn", arn)));
                 log_trace << "lambda function exists: " << (count > 0 ? "true" : "false");
@@ -94,7 +94,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
 
                 long count = 0;
@@ -125,7 +125,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
 
                 auto result = _lambdaCollection.insert_one(lambda.ToDocument());
@@ -147,7 +147,7 @@ namespace AwsMock::Database {
 
         try {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
             mongocxx::stdx::optional<bsoncxx::document::value>
                     mResult = _lambdaCollection.find_one(make_document(kvp("_id", oid)));
@@ -184,7 +184,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
                 mongocxx::stdx::optional<bsoncxx::document::value> mResult = _lambdaCollection.find_one(make_document(kvp("arn", arn)));
                 if (!mResult) {
@@ -213,7 +213,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
                 mongocxx::stdx::optional<bsoncxx::document::value> mResult = _lambdaCollection.find_one(make_document(kvp("region", region), kvp("function", name)));
                 if (!mResult.has_value()) {
@@ -251,7 +251,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
                 auto result = _lambdaCollection.replace_one(make_document(kvp("region", lambda.region),
                                                                           kvp("function", lambda.function),
@@ -278,7 +278,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
                 if (region.empty()) {
 
@@ -317,7 +317,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
                 auto result = _lambdaCollection.delete_many(make_document(kvp("function", functionName)));
                 log_debug << "lambda deleted, function: " << functionName << " count: "
@@ -340,7 +340,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
                 auto result = _lambdaCollection.delete_many({});
                 log_debug << "All lambdas deleted, count: " << result->deleted_count();

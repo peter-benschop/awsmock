@@ -18,11 +18,18 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/entity/module/Module.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/utils/ConnectionPool.h>
 
 namespace AwsMock::Database {
 
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
+
     /**
-     * Module MongoDB database.
+     * @brief Module MongoDB database.
+     *
+     * Controls all the AwsMock modules.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -32,10 +39,8 @@ namespace AwsMock::Database {
 
         /**
          * Constructor
-         *
-         * @param configuration configuration properties
          */
-        explicit ModuleDatabase();
+        explicit ModuleDatabase() : _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()), _moduleCollectionName("module") {}
 
         /**
          * Singleton instance

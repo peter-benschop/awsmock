@@ -20,7 +20,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
 
                 int64_t count = _secretCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
@@ -48,7 +48,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
 
                 int64_t count = _secretCollection.count_documents(make_document(kvp("secretId", secretId)));
@@ -68,7 +68,7 @@ namespace AwsMock::Database {
 
     Entity::SecretsManager::Secret SecretsManagerDatabase::GetSecretById(bsoncxx::oid oid) {
 
-        auto client = GetClient();
+        auto client = ConnectionPool::instance().GetConnection();
         mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
 
         mongocxx::stdx::optional<bsoncxx::document::value>
@@ -96,7 +96,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_collectionName];
             mongocxx::stdx::optional<bsoncxx::document::value>
                     mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
@@ -119,7 +119,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_collectionName];
             mongocxx::stdx::optional<bsoncxx::document::value>
                     mResult = _bucketCollection.find_one(make_document(kvp("secretId", secretId)));
@@ -142,7 +142,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
             auto session = client->start_session();
 
@@ -172,7 +172,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
             auto session = client->start_session();
 
@@ -215,7 +215,7 @@ namespace AwsMock::Database {
         Entity::SecretsManager::SecretList secretList;
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
 
             auto secretCursor = _secretCollection.find({});
@@ -238,7 +238,7 @@ namespace AwsMock::Database {
         if (_useDatabase) {
 
             try {
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _secretsCollection = (*client)[_databaseName][_collectionName];
 
                 long count;
@@ -265,7 +265,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_collectionName];
             auto session = client->start_session();
 
@@ -293,7 +293,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
             auto session = client->start_session();
 

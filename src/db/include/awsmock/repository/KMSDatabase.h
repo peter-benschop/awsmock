@@ -21,10 +21,16 @@
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/entity/s3/Object.h>
 #include <awsmock/memorydb/KMSMemoryDb.h>
 #include <awsmock/repository/Database.h>
 
 namespace AwsMock::Database {
+
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
+    using bsoncxx::builder::stream::document;
 
     /**
      * KMS MongoDB database.
@@ -37,10 +43,8 @@ namespace AwsMock::Database {
 
         /**
          * Constructor
-         *
-         * @param configuration configuration properties
          */
-        explicit KMSDatabase();
+        explicit KMSDatabase() : _memoryDb(KMSMemoryDb::instance()), _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()), _keyCollectionName("kms_key") {}
 
         /**
          * Singleton instance
