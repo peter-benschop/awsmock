@@ -40,7 +40,7 @@ namespace AwsMock::Service {
         Database::ModuleDatabase &_database = Database::ModuleDatabase::instance();
 
         Service::ServerMap serverMap = {{"s3", std::make_shared<S3Server>(_configuration)}};
-        ModuleService _service = ModuleService(_configuration, serverMap);
+        ModuleService _service = ModuleService(serverMap);
     };
 
     TEST_F(ModuleServiceTest, ModuleListTest) {

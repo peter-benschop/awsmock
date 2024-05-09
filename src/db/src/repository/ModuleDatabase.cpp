@@ -23,7 +23,10 @@ namespace AwsMock::Database {
             {"gateway", {.name = "gateway", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
             {"database", {.name = "database", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}}};
 
-    ModuleDatabase::ModuleDatabase() : _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()) {
+    ModuleDatabase::ModuleDatabase() : _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()), _moduleCollectionName("module") {
+    }
+
+    void ModuleDatabase::Initialize() {
 
         for (const auto &module: _existingModules) {
             if (_useDatabase) {
@@ -48,7 +51,7 @@ namespace AwsMock::Database {
             try {
 
                 auto client = GetClient();
-                mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
+                mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
                 auto result = _moduleCollection.find_one(make_document(kvp("name", name)));
                 if (result) {
                     Entity::Module::Module module;
@@ -75,7 +78,7 @@ namespace AwsMock::Database {
             try {
 
                 auto client = GetClient();
-                mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
+                mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
                 int64_t count = _moduleCollection.count_documents(make_document(kvp("name", name)));
                 log_trace << "Module exists: " << (count > 0 ? "true" : "false");
                 return count > 0;
@@ -96,7 +99,7 @@ namespace AwsMock::Database {
         try {
 
             auto client = GetClient();
-            mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
+            mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
 
             mongocxx::stdx::optional<bsoncxx::document::value>
                     mResult = _moduleCollection.find_one(make_document(kvp("_id", oid)));
@@ -132,7 +135,7 @@ namespace AwsMock::Database {
             try {
 
                 auto client = GetClient();
-                mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
+                mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
                 auto mResult = _moduleCollection.find_one(make_document(kvp("name", name)));
                 if (mResult) {
                     Entity::Module::Module modules;
@@ -157,7 +160,7 @@ namespace AwsMock::Database {
             try {
 
                 auto client = GetClient();
-                mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
+                mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
                 auto result = _moduleCollection.insert_one(module.ToDocument());
                 log_trace << "Module created, oid: " << result->inserted_id().get_oid().value.to_string();
                 return GetModuleById(result->inserted_id().get_oid().value);
@@ -179,7 +182,7 @@ namespace AwsMock::Database {
 
             try {
                 auto client = GetClient();
-                mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
+                mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
                 auto mResult = _moduleCollection.replace_one(make_document(kvp("name", module.name)), module.ToDocument());
                 log_trace << "Module updated: " << module.ToString();
                 return GetModuleByName(module.name);
@@ -200,7 +203,7 @@ namespace AwsMock::Database {
         if (_useDatabase) {
 
             auto client = GetClient();
-            mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
+            mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
             auto session = client->start_session();
 
             try {
@@ -234,7 +237,7 @@ namespace AwsMock::Database {
             try {
 
                 auto client = GetClient();
-                mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
+                mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
                 auto mResult = _moduleCollection.update_one(make_document(kvp("name", name)),
                                                             make_document(kvp("$set",
                                                                               make_document(kvp("status",
@@ -260,7 +263,7 @@ namespace AwsMock::Database {
             try {
 
                 auto client = GetClient();
-                mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
+                mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
                 auto mResult = _moduleCollection.update_one(make_document(kvp("name", name)),
                                                             make_document(kvp("$set", make_document(kvp("port", port)))));
                 log_trace << "Module port updated, name: " << name << " port: " << port;
@@ -291,7 +294,7 @@ namespace AwsMock::Database {
             try {
 
                 auto client = GetClient();
-                mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
+                mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
                 int64_t count = _moduleCollection.count_documents(make_document());
                 log_trace << "Service state: " << (count > 0 ? "true" : "false");
                 return static_cast<int>(count);
@@ -313,7 +316,7 @@ namespace AwsMock::Database {
         if (_useDatabase) {
 
             auto client = GetClient();
-            mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
+            mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
             auto serviceCursor = _moduleCollection.find({});
             for (auto service: serviceCursor) {
                 Entity::Module::Module result;
@@ -336,7 +339,7 @@ namespace AwsMock::Database {
 
             try {
                 auto client = GetClient();
-                mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
+                mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
 
                 auto result = _moduleCollection.delete_many(make_document(kvp("name", module.name)));
                 log_info << "Service deleted, count: " << result->deleted_count();
@@ -357,7 +360,7 @@ namespace AwsMock::Database {
 
             try {
                 auto client = GetClient();
-                mongocxx::collection _moduleCollection = (*client)[_databaseName]["module"];
+                mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
 
                 auto result = _moduleCollection.delete_many(make_document());
                 log_info << "All module deleted, count: " << result->deleted_count();

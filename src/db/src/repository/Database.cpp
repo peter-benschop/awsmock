@@ -23,9 +23,6 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            // Start instance
-            mongocxx::instance instance{};
-
             // URL
             std::string url = "mongodb://" + _user + ":" + _password + "@" + _host + ":" + std::to_string(_port) + "/?poolSize=" + std::to_string(_poolSize);
             mongocxx::uri _uri(url.c_str());

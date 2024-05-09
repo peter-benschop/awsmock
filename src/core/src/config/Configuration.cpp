@@ -147,7 +147,7 @@ namespace AwsMock::Core {
         // Database
         DefineBoolProperty("awsmock.mongodb.active", "AWSMOCK_MONGODB_ACTIVE", true);
         DefineStringProperty("awsmock.mongodb.name", "AWSMOCK_MONGODB_NAME", "awsmock");
-        DefineStringProperty("awsmock.mongodb.host", "AWSMOCK_MONGODB_HOST", "vogje01-nuc");
+        DefineStringProperty("awsmock.mongodb.host", "AWSMOCK_MONGODB_HOST", "localhost");
         DefineIntProperty("awsmock.mongodb.port", "AWSMOCK_MONGODB_PORT", 27017);
         DefineStringProperty("awsmock.mongodb.user", "AWSMOCK_MONGODB_USER", "admin");
         DefineStringProperty("awsmock.mongodb.password", "AWSMOCK_MONGODB_PASSWORD", "admin");

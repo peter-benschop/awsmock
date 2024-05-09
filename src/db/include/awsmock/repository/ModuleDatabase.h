@@ -46,6 +46,11 @@ namespace AwsMock::Database {
         }
 
         /**
+         * Initialize the database
+         */
+        void Initialize();
+
+        /**
          * Checks the active flag.
          *
          * @param name module name
@@ -180,6 +185,11 @@ namespace AwsMock::Database {
          * Database name
          */
         std::string _databaseName;
+
+        /**
+         * Module collection name
+         */
+        std::string _moduleCollectionName;
 
         /**
          * Modules in-memory database

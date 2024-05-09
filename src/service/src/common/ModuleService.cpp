@@ -7,9 +7,9 @@
 
 namespace AwsMock::Service {
 
-    ModuleService::ModuleService(Core::Configuration &configuration, Service::ServerMap &serverMap) : _configuration(configuration), _serverMap(serverMap), _prettyPrint(false), _moduleDatabase(Database::ModuleDatabase::instance()) {
+    ModuleService::ModuleService(Service::ServerMap &serverMap) : _serverMap(serverMap), _prettyPrint(false), _moduleDatabase(Database::ModuleDatabase::instance()) {
 
-        _prettyPrint = _configuration.getBool("awsmock.pretty", false);
+        _prettyPrint = Core::Configuration::instance().getBool("awsmock.pretty", false);
     }
 
     Database::Entity::Module::ModuleList ModuleService::ListModules() {
