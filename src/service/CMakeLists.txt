@@ -57,4 +57,3 @@ if (WIN32)
 endif ()
 
 install(TARGETS ${LIBRARY} DESTINATION lib)
-install(TARGETS ${LIBRARY_STATIC} DESTINATION lib)

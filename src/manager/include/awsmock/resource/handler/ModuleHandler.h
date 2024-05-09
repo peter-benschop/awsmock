@@ -53,11 +53,9 @@ namespace AwsMock {
         /**
          * Constructor
          *
-         * @param configuration application configuration
-         * @param metricService monitoring module
          * @param serverMap map of services
          */
-        ModuleHandler(Core::Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap);
+        explicit ModuleHandler(Service::ServerMap &serverMap);
 
       protected:
 
@@ -125,16 +123,6 @@ namespace AwsMock {
         void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
       private:
-
-        /**
-         * Handler configuration
-         */
-        Core::Configuration &_configuration;
-
-        /**
-         * Metric module
-         */
-        Core::MetricService &_metricService;
 
         /**
          * Timer manager

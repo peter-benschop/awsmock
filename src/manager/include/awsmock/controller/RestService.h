@@ -14,6 +14,7 @@
 #include "Poco/Net/HTTPServer.h"
 
 // AwsMock includes
+#include <awsmock/controller/Router.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
 
@@ -35,10 +36,8 @@ namespace AwsMock {
 
         /**
          * Constructor
-         *
-         * @param configuration application configuration
          */
-        explicit RestService(Core::Configuration &configuration);
+        explicit RestService();
 
         /**
          * Sets the REST port.
@@ -52,7 +51,7 @@ namespace AwsMock {
          *
          * @param router HTTP request router.
          */
-        void setRouter(Poco::Net::HTTPRequestHandlerFactory *router);
+        void setRouter(std::unique_ptr<Controller::Router> router);
 
         /**
          * Start the restfull module.
@@ -60,14 +59,6 @@ namespace AwsMock {
          * The router has to be defined before the HTTP manager is started.
          */
         void StartServer();
-
-        /**
-         * Start with port and router.
-         *
-         * @param router router to use
-         * @param port port to use (default: 9100)
-         */
-        void StartServer(Poco::Net::HTTPRequestHandlerFactory *router, int port = MANAGER_DEFAULT_PORT);
 
         /**
          * Stop the manager
@@ -87,14 +78,9 @@ namespace AwsMock {
         std::string _host;
 
         /**
-        * Logger
-        */
-        Core::Configuration &_configuration;
-
-        /**
          * REST router
          */
-        Poco::Net::HTTPRequestHandlerFactory *_router;
+        std::unique_ptr<Controller::Router> _router;
 
         /**
          * HTTP manager instance

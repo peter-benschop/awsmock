@@ -6,7 +6,7 @@
 
 namespace AwsMock::Resource::Factory {
 
-    Poco::Net::HTTPRequestHandler *ModuleFactory::createResource(Core::Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap) {
-        return new ModuleHandler(configuration, metricService, serverMap);
+    Poco::Net::HTTPRequestHandler *ModuleFactory::createResource(Service::ServerMap &serverMap) {
+        return new ModuleHandler(serverMap);
     }
 }// namespace AwsMock::Resource::Factory

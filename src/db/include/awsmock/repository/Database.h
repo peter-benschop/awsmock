@@ -21,6 +21,7 @@
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/utils/ConnectionPool.h>
 
 namespace AwsMock::Database {
 

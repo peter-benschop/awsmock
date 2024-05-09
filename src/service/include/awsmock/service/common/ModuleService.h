@@ -43,10 +43,9 @@ namespace AwsMock::Service {
         /**
          * Constructor
          *
-         * @param configuration module configuration
          * @param serverMap module map
          */
-        explicit ModuleService(Core::Configuration &configuration, Service::ServerMap &serverMap);
+        explicit ModuleService(Service::ServerMap &serverMap);
 
         /**
          * Return all list of all modules
@@ -135,11 +134,6 @@ namespace AwsMock::Service {
         static void CleanObjects(const Dto::Common::Services &services);
 
       private:
-
-        /**
-         * Configuration
-         */
-        Core::Configuration &_configuration;
 
         /**
          * Server map

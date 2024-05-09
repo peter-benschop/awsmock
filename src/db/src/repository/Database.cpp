@@ -23,9 +23,6 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            // Start instance
-            mongocxx::instance instance{};
-
             // URL
             std::string url = "mongodb://" + _user + ":" + _password + "@" + _host + ":" + std::to_string(_port) + "/?poolSize=" + std::to_string(_poolSize);
             mongocxx::uri _uri(url.c_str());
@@ -83,32 +80,33 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            GetConnection()["sqs_message"].create_index(make_document(kvp("queueUrl", 1), kvp("status", 1), kvp("reset", 1)),
-                                                        make_document(kvp("name", "sqs_queueurl_status_reset_idx1")));
-            GetConnection()["sqs_message"].create_index(make_document(kvp("queueUrl", 1),
-                                                                      kvp("status", 1),
-                                                                      kvp("retries", 1)),
-                                                        make_document(kvp("name", "sqs_queueurl_status_retries_idx2")));
-            GetConnection()["sqs_queue"].create_index(make_document(kvp("region", 1), kvp("name", 1)),
-                                                      make_document(kvp("name", "sqs_region_name_idx1")));
-            GetConnection()["sqs_queue"].create_index(make_document(kvp("region", 1), kvp("url", 1)),
-                                                      make_document(kvp("name", "sqs_region_url_idx2")));
-            GetConnection()["sns_topic"].create_index(make_document(kvp("region", 1), kvp("arn", 1)),
-                                                      make_document(kvp("name", "sns_region_arn_idx1")));
-            GetConnection()["sns_message"].create_index(make_document(kvp("region", 1), kvp("topicArn", 1)),
-                                                        make_document(kvp("name", "sns_region_topicarn_idx1")));
-            GetConnection()["s3_bucket"].create_index(make_document(kvp("region", 1), kvp("name", 1)),
-                                                      make_document(kvp("name", "s3_region_name_idx1")));
-            GetConnection()["s3_object"].create_index(make_document(kvp("bucket", 1)),
-                                                      make_document(kvp("name", "s3_object_bucket_idx1")));
-            GetConnection()["module"].create_index(make_document(kvp("name", 1), kvp("state", 1)),
-                                                   make_document(kvp("name", "module_name_status_idx1")));
-            GetConnection()["kms_key"].create_index(make_document(kvp("region", 1)),
-                                                    make_document(kvp("name", "kms_key_region_idx1")));
-            GetConnection()["kms_key"].create_index(make_document(kvp("keyId", 1)),
-                                                    make_document(kvp("name", "kms_key_keyid_idx1")));
-            GetConnection()["kms_key"].create_index(make_document(kvp("keyState", 1)),
-                                                    make_document(kvp("name", "kms_key_keystate_idx1")));
+            auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::database database = (*client)["awsmock"];
+
+            database["sqs_message"].create_index(make_document(kvp("queueUrl", 1), kvp("status", 1), kvp("reset", 1)),
+                                                 make_document(kvp("name", "sqs_queueurl_status_reset_idx1")));
+            database["sqs_message"].create_index(make_document(kvp("queueUrl", 1), kvp("status", 1), kvp("retries", 1)),
+                                                 make_document(kvp("name", "sqs_queueurl_status_retries_idx2")));
+            database["sqs_queue"].create_index(make_document(kvp("region", 1), kvp("name", 1)),
+                                               make_document(kvp("name", "sqs_region_name_idx1")));
+            database["sqs_queue"].create_index(make_document(kvp("region", 1), kvp("url", 1)),
+                                               make_document(kvp("name", "sqs_region_url_idx2")));
+            database["sns_topic"].create_index(make_document(kvp("region", 1), kvp("arn", 1)),
+                                               make_document(kvp("name", "sns_region_arn_idx1")));
+            database["sns_message"].create_index(make_document(kvp("region", 1), kvp("topicArn", 1)),
+                                                 make_document(kvp("name", "sns_region_topicarn_idx1")));
+            database["s3_bucket"].create_index(make_document(kvp("region", 1), kvp("name", 1)),
+                                               make_document(kvp("name", "s3_region_name_idx1")));
+            database["s3_object"].create_index(make_document(kvp("bucket", 1)),
+                                               make_document(kvp("name", "s3_object_bucket_idx1")));
+            database["module"].create_index(make_document(kvp("name", 1), kvp("state", 1)),
+                                            make_document(kvp("name", "module_name_status_idx1")));
+            database["kms_key"].create_index(make_document(kvp("region", 1)),
+                                             make_document(kvp("name", "kms_key_region_idx1")));
+            database["kms_key"].create_index(make_document(kvp("keyId", 1)),
+                                             make_document(kvp("name", "kms_key_keyid_idx1")));
+            database["kms_key"].create_index(make_document(kvp("keyState", 1)),
+                                             make_document(kvp("name", "kms_key_keystate_idx1")));
             log_debug << "SQS indexes created";
         }
     }

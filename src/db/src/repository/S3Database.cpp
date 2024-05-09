@@ -23,7 +23,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
 
                 int64_t count = _bucketCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
@@ -49,7 +49,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
             auto session = client->start_session();
 
@@ -79,7 +79,7 @@ namespace AwsMock::Database {
         if (_useDatabase) {
 
             try {
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
 
                 long count = _bucketCollection.count_documents(make_document());
@@ -99,7 +99,7 @@ namespace AwsMock::Database {
 
     Entity::S3::Bucket S3Database::GetBucketById(bsoncxx::oid oid) {
 
-        auto client = GetClient();
+        auto client = ConnectionPool::instance().GetConnection();
         mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
 
         mongocxx::stdx::optional<bsoncxx::document::value>
@@ -126,7 +126,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
             mongocxx::stdx::optional<bsoncxx::document::value>
                     mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
@@ -150,7 +150,7 @@ namespace AwsMock::Database {
         Entity::S3::BucketList bucketList;
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
 
             auto bucketCursor = _bucketCollection.find({});
@@ -172,7 +172,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
             int64_t count =
                     _objectCollection.count_documents(make_document(kvp("region", bucket.region), kvp("bucket", bucket.name)));
@@ -189,7 +189,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
             auto session = client->start_session();
 
@@ -230,7 +230,7 @@ namespace AwsMock::Database {
 
             if (prefix.empty()) {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
                 auto objectCursor = _objectCollection.find(make_document(kvp("bucket", bucket)));
                 for (auto object: objectCursor) {
@@ -241,7 +241,7 @@ namespace AwsMock::Database {
 
             } else {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
                 auto objectCursor = _objectCollection.find(make_document(kvp("bucket", bucket),
                                                                          kvp("key",
@@ -268,7 +268,7 @@ namespace AwsMock::Database {
         Entity::S3::ObjectList objectList;
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
 
             if (prefix.empty()) {
@@ -302,7 +302,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
             auto session = client->start_session();
 
@@ -329,7 +329,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
             auto session = client->start_session();
 
@@ -356,7 +356,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName]["s3_object"];
             int64_t count = _objectCollection.count_documents(make_document(kvp("region", object.region),
                                                                             kvp("bucket", object.bucket),
@@ -373,7 +373,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
             auto session = client->start_session();
 
@@ -401,7 +401,7 @@ namespace AwsMock::Database {
     Entity::S3::Object S3Database::GetObjectById(bsoncxx::oid oid) {
 
         try {
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
             mongocxx::stdx::optional<bsoncxx::document::value>
                     mResult = _objectCollection.find_one(make_document(kvp("_id", oid)));
@@ -444,7 +444,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
             auto session = client->start_session();
 
@@ -480,7 +480,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
                 mongocxx::stdx::optional<bsoncxx::document::value> mResult =
                         _objectCollection.find_one(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key)));
@@ -512,7 +512,7 @@ namespace AwsMock::Database {
 
         try {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
             mongocxx::stdx::optional<bsoncxx::document::value>
                     mResult = _objectCollection.find_one(make_document(kvp("region", region),
@@ -541,7 +541,7 @@ namespace AwsMock::Database {
 
         try {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
             auto mResult = _objectCollection.find_one(make_document(kvp("region", region),
                                                                     kvp("bucket", bucket),
@@ -568,7 +568,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
 
                 long count = 0;
@@ -609,7 +609,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
                 auto result = _objectCollection.delete_many(make_document(kvp("region", object.region),
                                                                           kvp("bucket", object.bucket),
@@ -636,7 +636,7 @@ namespace AwsMock::Database {
                 array.append(key);
             }
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
             auto session = client->start_session();
 
@@ -664,7 +664,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
             auto session = client->start_session();
 
