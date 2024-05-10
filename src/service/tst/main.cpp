@@ -23,7 +23,6 @@ class TestEnvironment : public ::testing::Environment {
     void SetUp() override {
         AwsMock::Core::TestUtils::CreateTestConfigurationFile();
         AwsMock::Database::TestUtils::CreateServices();
-        Poco::ThreadPool::defaultPool().addCapacity(256);
     }
 };
 

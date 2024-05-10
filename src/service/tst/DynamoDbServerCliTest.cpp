@@ -46,7 +46,7 @@ namespace AwsMock::Service {
             _database.DeleteAllTables();
             Core::ExecResult deleteResult1 = Core::SystemUtils::Exec("aws dynamodb delete-table --table-name test-table1 --endpoint-url http://localhost:8000");
             EXPECT_EQ(0, deleteResult1.status);
-            _dynamodbServer.StopServer();
+            _dynamodbServer.Stop();
         }
 
         std::string _endpoint, _accountId;

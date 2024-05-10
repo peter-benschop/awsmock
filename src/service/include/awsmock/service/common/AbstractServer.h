@@ -19,6 +19,7 @@
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/CurlUtils.h>
+#include <awsmock/core/JTimer.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/Timer.h>
 #include <awsmock/entity/module/ModuleState.h>
@@ -31,7 +32,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class AbstractServer : public Core::Timer {
+    class AbstractServer : public Core::JTimer {
 
       public:
 
@@ -45,9 +46,12 @@ namespace AwsMock::Service {
         explicit AbstractServer(Core::Configuration &configuration, std::string name, int timeout);
 
         /**
-         * Destructor
+         * Constructor
+         *
+         * @param configuration AwsMock configuration
+         * @param name manager name
          */
-        virtual ~AbstractServer();
+        explicit AbstractServer(Core::Configuration &configuration, std::string name);
 
         /**
          * Checks whether the module is active
@@ -55,16 +59,6 @@ namespace AwsMock::Service {
          * @param name module name
          */
         bool IsActive(const std::string &name);
-
-        /**
-         * Returns the running flag
-         */
-        [[nodiscard]] bool IsRunning() const;
-
-        /**
-         * Stop the manager
-         */
-        void StopServer();
 
         /**
          * Start the HTTP manager
@@ -89,6 +83,12 @@ namespace AwsMock::Service {
          * Main loop
          */
         void Run() override = 0;
+
+
+        /**
+         * Stop the server
+         */
+        void Shutdown() override;
 
       private:
 

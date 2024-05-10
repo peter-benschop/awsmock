@@ -40,8 +40,10 @@ namespace AwsMock::Service {
             _sqsEndpoint = "http://" + _sqsHost + ":" + _sqsPort;
 
             // Start HTTP services
-            _snsServer.Start();
-            _sqsServer.Start();
+            _snsServer = std::make_unique<SNSServer>(_configuration);
+            _sqsServer = std::make_unique<SQSServer>(_configuration);
+            _snsServer->Start();
+            _sqsServer->Start();
         }
 
         void TearDown() override {
@@ -49,8 +51,8 @@ namespace AwsMock::Service {
             _snsDatabase.DeleteAllTopics();
             _sqsDatabase.DeleteAllMessages();
             _sqsDatabase.DeleteAllQueues();
-            _sqsServer.StopServer();
-            _snsServer.StopServer();
+            _sqsServer->Stop();
+            _snsServer->Stop();
         }
 
         static std::string GetTopicArn(const std::string &jsonString) {
@@ -131,8 +133,8 @@ namespace AwsMock::Service {
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
-        SNSServer _snsServer = SNSServer(_configuration);
-        SQSServer _sqsServer = SQSServer(_configuration);
+        std::unique_ptr<SNSServer> _snsServer;
+        std::unique_ptr<SQSServer> _sqsServer;
     };
 
     TEST_F(SNSServerCliTest, TopicCreateTest) {

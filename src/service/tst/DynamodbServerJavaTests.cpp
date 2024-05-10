@@ -42,7 +42,7 @@ namespace AwsMock::Service {
         void TearDown() override {
             Core::ExecResult deleteTableResult = Core::SystemUtils::Exec(_baseCommand + "delete-table test-table");
             EXPECT_EQ(0, deleteTableResult.status);
-            _dynamoDbServer.StopServer();
+            _dynamoDbServer.Stop();
         }
 
         std::string _endpoint, _baseCommand;

@@ -53,14 +53,11 @@ namespace AwsMock::Service {
         explicit DynamoDbServer(Core::Configuration &configuration);
 
         /**
-         * Destructor
-         */
-        ~DynamoDbServer() override;
-
-        /**
          * Initialization
          */
         void Initialize() override;
+
+      protected:
 
         /**
          * Main method

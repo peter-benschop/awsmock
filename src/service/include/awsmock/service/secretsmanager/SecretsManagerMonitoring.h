@@ -6,26 +6,26 @@
 #define AWSMOCK_SERVICE_SECRETSMANAGER_MONITORING_H
 
 // AwsMock includes
+#include <awsmock/core/JTimer.h>
 #include <awsmock/core/MetricDefinition.h>
 #include <awsmock/core/MetricService.h>
-#include <awsmock/core/Timer.h>
 #include <awsmock/repository/SecretsManagerDatabase.h>
 
 namespace AwsMock::Service {
 
     /**
-     * Cognito monitoring thread
+     * @brief Secret manager monitoring thread
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SecretsManagerMonitoring : public Core::Timer {
+    class SecretsManagerMonitoring : public Core::JTimer {
 
       public:
 
         /**
          * Constructor
          */
-        explicit SecretsManagerMonitoring(int timeout) : Core::Timer("secretsmanager-monitoring", timeout) {}
+        explicit SecretsManagerMonitoring(int timeout) : Core::JTimer("secretsmanager-monitoring", timeout) {}
 
         /**
          * Initialization

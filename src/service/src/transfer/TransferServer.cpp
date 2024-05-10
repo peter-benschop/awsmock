@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    TransferServer::TransferServer(Core::Configuration &configuration) : AbstractServer(configuration, "transfer", 10), _configuration(configuration), _transferDatabase(Database::TransferDatabase::instance()), _module("transfer") {
+    TransferServer::TransferServer(Core::Configuration &configuration) : AbstractServer(configuration, "transfer"), _configuration(configuration), _transferDatabase(Database::TransferDatabase::instance()), _module("transfer") {
 
         // REST manager configuration
         _port = _configuration.getInt("awsmock.service.transfer.http.port", TRANSFER_DEFAULT_PORT);
@@ -57,10 +57,10 @@ namespace AwsMock::Service {
     }
 
     void TransferServer::Run() {
-        log_trace << "TransferWorker processing started";
     }
 
     void TransferServer::Shutdown() {
+        _transferMonitoring->Stop();
         StopHttpServer();
     }
 

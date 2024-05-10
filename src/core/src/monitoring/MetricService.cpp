@@ -8,25 +8,21 @@ namespace AwsMock::Core {
 
     Poco::Mutex MetricService::_mutex;
 
-    MetricService::MetricService() : Core::Timer("MetricServer", 60) {
+    MetricService::MetricService() : Core::JTimer("MetricServer") {
 
         Core::Configuration &configuration = Core::Configuration::instance();
         _port = configuration.getInt("awsmock.monitoring.port", 9100);
-        _timeout = configuration.getInt("awsmock.monitoring.timeout", 10);
     }
 
     void MetricService::Initialize() {
         _server = std::make_shared<Poco::Prometheus::MetricsServer>(static_cast<Poco::UInt16>(_port));
-        _metricSystemTimer = std::make_shared<Poco::Timer>(0, _timeout);
         _metricSystemCollector = std::make_shared<MetricSystemCollector>();
         log_debug << "Prometheus manager initialized, port: " << _port;
 
         if (_server != nullptr) {
             _server->start();
         }
-        _metricSystemCollector->Start();
         log_info << "Monitoring manager started, port: " << _port;
-        ;
     }
 
     void MetricService::Run() {

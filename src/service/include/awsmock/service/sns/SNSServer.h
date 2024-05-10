@@ -31,7 +31,7 @@
 namespace AwsMock::Service {
 
     /**
-     * SNS server thread
+     * @brief SNS server thread
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -50,6 +50,8 @@ namespace AwsMock::Service {
          * Initialization
          */
         void Initialize() override;
+
+      protected:
 
         /**
          * Main method
