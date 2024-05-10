@@ -13,7 +13,7 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/MetricService.h>
 
-namespace AwsMock::Resource::Factory {
+namespace AwsMock::Manager {
 
     /**
      * Factory interface
@@ -33,6 +33,6 @@ namespace AwsMock::Resource::Factory {
         virtual Poco::Net::HTTPRequestHandler *createResource(Service::ServerMap &serverMap) = 0;
     };
 
-}// namespace AwsMock::Resource::Factory
+}// namespace AwsMock::Manager
 
 #endif// AWSMOCK_RESOURCE_IFACTORY_H

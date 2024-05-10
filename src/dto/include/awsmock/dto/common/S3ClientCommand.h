@@ -105,6 +105,11 @@ namespace AwsMock::Dto::Common {
         std::string region;
 
         /**
+         * HTTP URL
+         */
+        std::string url;
+
+        /**
          * Client user
          */
         std::string user;
@@ -168,11 +173,6 @@ namespace AwsMock::Dto::Common {
          * Multipart upload ID
          */
         std::string uploadId;
-
-        /**
-         * Request URL
-         */
-        std::string url;
 
         /**
          * Convert to a JSON string

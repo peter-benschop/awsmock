@@ -19,6 +19,8 @@
 #include <plog/Initializers/ConsoleInitializer.h>
 #include <plog/Log.h>
 
+// AwsMock includes
+#include <awsmock/core/LogFormatter.h>
 
 namespace AwsMock::Core {
 

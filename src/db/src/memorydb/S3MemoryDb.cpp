@@ -81,9 +81,22 @@ namespace AwsMock::Database {
         return count > 0;
     }
 
+    std::vector<Entity::S3::Object> S3MemoryDb::GetBucketObjectList(const std::string &region, const std::string &bucket, long maxKeys) {
+
+        std::vector<Entity::S3::Object> objectList;
+        for (const auto &object: _objects) {
+            if (object.second.region == region && object.second.bucket == bucket && objectList.size() < maxKeys) {
+                objectList.emplace_back(object.second);
+            } else {
+                break;
+            }
+        }
+        return objectList;
+    }
+
     long S3MemoryDb::BucketCount() {
 
-        return _buckets.size();
+        return static_cast<long>(_buckets.size());
     }
 
     Entity::S3::ObjectList S3MemoryDb::ListBucket(const std::string &bucket, const std::string &prefix) {

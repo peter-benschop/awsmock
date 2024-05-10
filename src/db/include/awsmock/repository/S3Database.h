@@ -130,6 +130,16 @@ namespace AwsMock::Database {
         bool HasObjects(const Entity::S3::Bucket &bucket);
 
         /**
+         * List objects on a bucket.
+         *
+         * @param region AWS region
+         * @param bucket bucket name
+         * @param maxKeys maximal number of return elements
+         * @return list of S3 objects
+         */
+        std::vector<Entity::S3::Object> GetBucketObjectList(const std::string &region, const std::string &bucket, long maxKeys);
+
+        /**
          * Updates a bucket
          *
          * @param bucket bucket entity

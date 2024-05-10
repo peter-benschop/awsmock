@@ -1,7 +1,7 @@
 
 #include "awsmock/controller/ResourceNotFound.h"
 
-namespace AwsMock::Core {
+namespace AwsMock::Manager {
 
     void ResourceNotFound::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
         response.setStatus(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
@@ -17,4 +17,4 @@ namespace AwsMock::Core {
         outputStream << errorResponse.ToXml();
         outputStream.flush();
     }
-}// namespace AwsMock::Core
+}// namespace AwsMock::Manager

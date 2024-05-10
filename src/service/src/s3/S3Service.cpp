@@ -608,8 +608,22 @@ namespace AwsMock::Service {
             throw Core::ServiceException("Bucket does not exist");
         }
 
+        // Get bucket
+        Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(request.region, request.bucket);
+        if (!bucketEntity.IsVersioned()) {
+            throw Core::ServiceException("Bucket is not versioned");
+        }
+
         Dto::S3::ListObjectVersionsResponse response;
-        return response;
+        try {
+
+            std::vector<Database::Entity::S3::Object> objectList = _database.GetBucketObjectList(request.region, request.bucket, request.pageSize);
+            return Dto::S3::Mapper::map(request.region, request.bucket, request.pageSize, objectList);
+
+        } catch (Poco::Exception &ex) {
+            log_error << "S3 put bucket encryption request failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
     }
 
     void S3Service::DeleteBucket(const Dto::S3::DeleteBucketRequest &request) {
@@ -898,7 +912,8 @@ namespace AwsMock::Service {
         Database::Entity::S3::Object object;
 
         // Check existence by
-        Database::Entity::S3::Object existingObject = _database.GetObjectMd5(request.region, request.bucket, request.key, request.md5Sum);
+        std::string md5sum = Core::Crypto::HexEncode(Core::Crypto::Base64Decode(request.md5Sum));
+        Database::Entity::S3::Object existingObject = _database.GetObjectMd5(request.region, request.bucket, request.key, md5sum);
         if (existingObject.oid.empty()) {
 
             // Version ID

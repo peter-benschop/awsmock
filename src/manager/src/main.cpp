@@ -17,33 +17,40 @@
 // You should have received a copy of the GNU General Public License
 // along with aws-mock.  If not, see <http://www.gnu.org/licenses/>.
 
-// C includes
-#include <cstdlib>
-
 // C++ standard includes
+#include <cstdlib>
 #include <iostream>
 
 // MongoDB includes
 #include <mongocxx/instance.hpp>
 
 // Poco includes
-#include <Poco/TaskManager.h>
 #include <Poco/Util/HelpFormatter.h>
 #include <Poco/Util/Option.h>
 #include <Poco/Util/OptionSet.h>
 #include <Poco/Util/ServerApplication.h>
 
 // AwsMock includes
-#include "awsmock/service/kms/KMSServer.h"
 #include <awsmock/controller/RestService.h>
+#include <awsmock/service/kms/KMSServer.h>
 
 #define DEFAULT_CONFIG_FILE "/etc/awsmock.properties"
 #define DEFAULT_LOG_LEVEL "debug"
 
-namespace AwsMock {
+namespace AwsMock::Manager {
 
     /**
      * @brief Main application class for the awsmock manager.
+     *
+     * The manager is controlling the different services. Services are activated ib the configuration file or via environment variables. Only the activated
+     * services are started. The general flow is:
+     *   - Process command line parameters
+     *   - Read the configuration file and process environment variables
+     *   - Start the database (either MongoDB or in-memory database)
+     *   - General initializations
+     *   - Start the activated services are background threads
+     *   - Start the API gateway on port 4566 by default (can be changed in the configuration file)
+     *   - Wait for a termination signal
      * 
      * @author jens.vogt@opitz-consulting.com
      */
@@ -300,7 +307,7 @@ namespace AwsMock {
             StartServices();
 
             // Start HTTP manager
-            _router = std::make_unique<Controller::Router>(_serverMap);
+            _router = std::make_unique<Manager::Router>(_serverMap);
             _restService = std::make_unique<RestService>();
             _restService->setRouter(std::move(_router));
             _restService->StartServer();
@@ -322,7 +329,7 @@ namespace AwsMock {
         /**
          * Gateway router
          */
-        std::unique_ptr<Controller::Router> _router = nullptr;
+        std::unique_ptr<Manager::Router> _router = nullptr;
 
         /**
          * Gateway controller
@@ -340,10 +347,10 @@ namespace AwsMock {
         bool _logLevelSet = false;
     };
 
-}// namespace AwsMock
+}// namespace AwsMock::Manager
 
 #ifndef TESTING
 
-POCO_SERVER_MAIN(AwsMock::AwsMockServer)
+POCO_SERVER_MAIN(AwsMock::Manager::AwsMockServer)
 
 #endif

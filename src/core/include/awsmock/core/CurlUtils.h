@@ -86,6 +86,7 @@ namespace AwsMock::Core {
          * @param path request path
          * @param header request extra headers
          * @param fileName filename to send as request body
+         * @param dockerSocket docker socket path
          * @return Dto::Curl::CurlResponse
          */
         CurlResponse SendUnixSocketFileRequest(const std::string &method, const std::string &path, const std::string &header, const std::string &fileName, const std::string &dockerSocket = DOCKER_SOCKET);

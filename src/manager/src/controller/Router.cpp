@@ -4,7 +4,7 @@
 
 #include <awsmock/controller/Router.h>
 
-namespace AwsMock::Controller {
+namespace AwsMock::Manager {
 
     Router::Router(Service::ServerMap &serverMap) : _serverMap(serverMap) {
 
@@ -34,14 +34,14 @@ namespace AwsMock::Controller {
         auto factoryIndex = _routingTable.find(service);
         if (factoryIndex == _routingTable.end()) {
             log_error << "No routing found, module: " + service;
-            return new AwsMock::Core::ResourceNotFound();
+            return new AwsMock::Manager::ResourceNotFound();
         }
 
         // Get the resource factory for the module
-        Resource::Factory::IFactory *factory = Resource::Factory::Factory::createResourceFactory(factoryIndex->second);
+        Manager::IFactory *factory = Manager::Factory::Factory::createResourceFactory(factoryIndex->second);
         if (!factory) {
             log_error << "Request handler for route: " << route << " not found";
-            return new AwsMock::Core::ResourceNotFound();
+            return new AwsMock::Manager::ResourceNotFound();
         }
         log_debug << "Found request handler for route: " << route << " factory: " << factoryIndex->second;
         return factory->createResource(_serverMap);
@@ -67,4 +67,4 @@ namespace AwsMock::Controller {
 
         return module;
     }
-}// namespace AwsMock::Controller
+}// namespace AwsMock::Manager

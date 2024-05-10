@@ -54,6 +54,11 @@ namespace AwsMock::Dto::S3 {
         std::string encodingType;
 
         /**
+         * Page size
+         */
+        int pageSize;
+
+        /**
          * Maximal number of keys
          */
         int maxKeys;

@@ -17,6 +17,7 @@ namespace AwsMock::Dto::Common {
         this->method = httpMethod;
         this->contentType = request.getContentType();
         this->payload = Core::HttpUtils::GetBodyAsString(request);
+        this->url = request.getURI();
 
         if (userAgent.clientCommand.empty()) {
 

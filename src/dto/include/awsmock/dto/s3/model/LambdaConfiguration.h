@@ -45,7 +45,7 @@ namespace AwsMock::Dto::S3 {
      *     <Id>string</Id>
      *     <CloudFunction>string</CloudFunction>
      *   </CloudFunctionConfiguration>
-     * @endcodeindex
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

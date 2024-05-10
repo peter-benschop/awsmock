@@ -23,7 +23,7 @@
 #include <awsmock/resource/factory/IFactory.h>
 #include <awsmock/service/common/AbstractServer.h>
 
-namespace AwsMock::Controller {
+namespace AwsMock::Manager {
 
     /**
      * Management router
@@ -87,6 +87,6 @@ namespace AwsMock::Controller {
         std::map<std::string, std::string> _routingTable;
     };
 
-}// namespace AwsMock::Controller
+}// namespace AwsMock::Manager
 
 #endif// AWSMOCK_MANAGER_ROUTER_H

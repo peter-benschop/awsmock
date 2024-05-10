@@ -9,7 +9,7 @@
 #include <stdexcept>
 #include <utility>
 
-namespace AwsMock {
+namespace AwsMock::Manager {
 
     /**
      * Handler exception
@@ -68,6 +68,6 @@ namespace AwsMock {
         std::string _message;
     };
 
-}// namespace AwsMock
+}// namespace AwsMock::Manager
 
 #endif// AWSMOCK_RESOURCE_HANDLEREXCEPTION_H

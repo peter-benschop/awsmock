@@ -4,7 +4,7 @@
 
 #include <awsmock/controller/RestService.h>
 
-namespace AwsMock {
+namespace AwsMock::Manager {
 
     RestService::RestService() : _port(MANAGER_DEFAULT_PORT), _host(MANAGER_DEFAULT_HOST) {
 
@@ -21,7 +21,7 @@ namespace AwsMock {
         _port = port;
     }
 
-    void RestService::setRouter(std::unique_ptr<Controller::Router> router) {
+    void RestService::setRouter(std::unique_ptr<Manager::Router> router) {
         _router = std::move(router);
     }
 
@@ -45,4 +45,4 @@ namespace AwsMock {
             _httpServer->stop();
         }
     }
-}// namespace AwsMock
+}// namespace AwsMock::Manager

@@ -10,8 +10,8 @@
 #include <utility>
 
 // Poco includes
-#include "Poco/Net/HTTPRequestHandlerFactory.h"
-#include "Poco/Net/HTTPServer.h"
+#include <Poco/Net/HTTPRequestHandlerFactory.h>
+#include <Poco/Net/HTTPServer.h>
 
 // AwsMock includes
 #include <awsmock/controller/Router.h>
@@ -23,7 +23,7 @@
 #define MANAGER_MAX_CONNECTIONS 250
 #define MANAGER_MAX_THREADS 50
 
-namespace AwsMock {
+namespace AwsMock::Manager {
 
     /**
      * General REST module
@@ -51,7 +51,7 @@ namespace AwsMock {
          *
          * @param router HTTP request router.
          */
-        void setRouter(std::unique_ptr<Controller::Router> router);
+        void setRouter(std::unique_ptr<Manager::Router> router);
 
         /**
          * Start the restfull module.
@@ -80,7 +80,7 @@ namespace AwsMock {
         /**
          * REST router
          */
-        std::unique_ptr<Controller::Router> _router;
+        std::unique_ptr<Manager::Router> _router;
 
         /**
          * HTTP manager instance
@@ -97,6 +97,6 @@ namespace AwsMock {
          */
         int _maxThreads;
     };
-}// namespace AwsMock
+}// namespace AwsMock::Manager
 
 #endif// AWSMOCK_MANAGER_REST_SERVICE_H
