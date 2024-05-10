@@ -47,11 +47,12 @@ namespace AwsMock::Service {
         void TearDown() override {
             _database.DeleteAllObjects();
             _database.DeleteAllBuckets();
+            _s3Server->Stop();
         }
 
         std::string _endpoint, _accountId, _output;
         Core::Configuration &_configuration = Core::Configuration::instance();
-        Database::S3Database _database = Database::S3Database();
+        Database::S3Database &_database = Database::S3Database::instance();
         std::shared_ptr<S3Server> _s3Server = std::make_shared<S3Server>(_configuration);
     };
 

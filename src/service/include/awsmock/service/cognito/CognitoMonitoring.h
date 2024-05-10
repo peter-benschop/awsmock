@@ -6,26 +6,26 @@
 #define AWSMOCK_SERVICE_COGNITO_MONITORING_H
 
 // AwsMock includes
+#include <awsmock/core/JTimer.h>
 #include <awsmock/core/MetricDefinition.h>
 #include <awsmock/core/MetricService.h>
-#include <awsmock/core/Timer.h>
 #include <awsmock/repository/CognitoDatabase.h>
 
 namespace AwsMock::Service {
 
     /**
-     * Cognito monitoring thread
+     * @brief Cognito monitoring thread
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class CognitoMonitoring : public Core::Timer {
+    class CognitoMonitoring : public Core::JTimer {
 
       public:
 
         /**
          * Constructor
          */
-        explicit CognitoMonitoring(int timeout) : Core::Timer("cognito-monitoring", timeout) {}
+        explicit CognitoMonitoring(int timeout) : Core::JTimer("cognito-monitoring", timeout) {}
 
         /**
          * Initialization
@@ -64,5 +64,7 @@ namespace AwsMock::Service {
          */
         int _period{};
     };
+
 }// namespace AwsMock::Service
+
 #endif// AWSMOCK_SERVICE_COGNITO_MONITORING_H

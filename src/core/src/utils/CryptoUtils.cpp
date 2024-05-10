@@ -505,7 +505,9 @@ namespace AwsMock::Core {
 
     std::string Crypto::HexEncode(unsigned char *hash, int size) {
         char *out = OPENSSL_buf2hexstr(hash, size);
-        return {out};
+        auto sout = Poco::toLower<std::string>({out});
+        sout = Poco::replace<std::string>(sout, ":", "");
+        return {sout};
     }
 
     unsigned char *Crypto::HexDecode(const std::string &hex) {

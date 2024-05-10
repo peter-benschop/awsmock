@@ -46,7 +46,7 @@ namespace AwsMock::Service {
         void TearDown() override {
             _sqsDatabase.DeleteAllMessages();
             _sqsDatabase.DeleteAllQueues();
-            _sqsServer.StopServer();
+            _sqsServer.Stop();
         }
 
         static std::string GetReceiptHandle(const std::string &jsonString) {

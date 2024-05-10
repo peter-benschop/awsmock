@@ -32,7 +32,7 @@
 namespace AwsMock::Service {
 
     /**
-     * Lambda server
+     * @brief Lambda server
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -48,14 +48,11 @@ namespace AwsMock::Service {
         explicit LambdaServer(Core::Configuration &configuration);
 
         /**
-         * Destructor
-         */
-        ~LambdaServer() override;
-
-        /**
          * Initialization
          */
         void Initialize() override;
+
+      protected:
 
         /**
          * Main method

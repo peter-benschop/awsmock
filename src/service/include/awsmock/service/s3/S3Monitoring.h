@@ -6,26 +6,26 @@
 #define AWSMOCK_SERVICE_S3_MONITORING_H
 
 // AwsMock includes
+#include <awsmock/core/JTimer.h>
 #include <awsmock/core/MetricDefinition.h>
 #include <awsmock/core/MetricService.h>
-#include <awsmock/core/Timer.h>
 #include <awsmock/repository/S3Database.h>
 
 namespace AwsMock::Service {
 
     /**
-     * S3 monitoring thread
+     * @brief S3 monitoring thread
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class S3Monitoring : public Core::Timer {
+    class S3Monitoring : public Core::JTimer {
 
       public:
 
         /**
          * Constructor
          */
-        explicit S3Monitoring(int timeout) : Core::Timer("s3-monitoring", timeout) {}
+        explicit S3Monitoring(int timeout);
 
         /**
          * Initialization

@@ -46,10 +46,7 @@ namespace AwsMock::Service {
          */
         explicit GatewayServer(Core::Configuration &configuration, Core::MetricService &metricService);
 
-        /**
-         * Destructor
-         */
-        ~GatewayServer() override;
+      protected:
 
         /**
          * Timer initialization

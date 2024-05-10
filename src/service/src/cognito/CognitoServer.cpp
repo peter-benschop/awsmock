@@ -45,8 +45,8 @@ namespace AwsMock::Service {
     }
 
     void CognitoServer::Shutdown() {
-        StopHttpServer();
         _cognitoMonitoring->Stop();
+        StopHttpServer();
     }
 
 }// namespace AwsMock::Service

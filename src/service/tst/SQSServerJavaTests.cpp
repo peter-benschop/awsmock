@@ -50,7 +50,7 @@ namespace AwsMock::Service {
         void TearDown() override {
             _sqsDatabase.DeleteAllMessages();
             _sqsDatabase.DeleteAllQueues();
-            _sqsServer.StopServer();
+            _sqsServer.Stop();
         }
 
         Core::CurlUtils _curlUtils;

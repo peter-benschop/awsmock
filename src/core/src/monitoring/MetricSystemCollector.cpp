@@ -6,7 +6,9 @@
 
 namespace AwsMock::Core {
 
-    MetricSystemCollector::MetricSystemCollector() : Core::Timer("SystemCollector", 5) {
+    MetricSystemCollector::MetricSystemCollector() : Core::JTimer("SystemCollector") {
+
+        _period = Core::Configuration::instance().getInt("awsmock.monitoring.period", 60);
 
         _virtualMemory = new Poco::Prometheus::Gauge(VIRTUAL_MEMORY);
         _realMemory = new Poco::Prometheus::Gauge(REAL_MEMORY);
@@ -14,6 +16,8 @@ namespace AwsMock::Core {
         _totalCpu = new Poco::Prometheus::Gauge(TOTAL_CPU);
         _userCpu = new Poco::Prometheus::Gauge(USER_CPU);
         _systemCpu = new Poco::Prometheus::Gauge(SYSTEM_CPU);
+
+        Start(_period);
     }
 
     MetricSystemCollector::~MetricSystemCollector() {

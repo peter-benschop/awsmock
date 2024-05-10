@@ -6,9 +6,9 @@
 #define AWSMOCK_SERVICE_LAMBDA_MONITORING_H
 
 // AwsMock includes
+#include <awsmock/core/JTimer.h>
 #include <awsmock/core/MetricDefinition.h>
 #include <awsmock/core/MetricService.h>
-#include <awsmock/core/Timer.h>
 #include <awsmock/repository/LambdaDatabase.h>
 
 namespace AwsMock::Service {
@@ -18,14 +18,14 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class LambdaMonitoring : public Core::Timer {
+    class LambdaMonitoring : public Core::JTimer {
 
       public:
 
         /**
          * Constructor
          */
-        explicit LambdaMonitoring(int timeout) : Core::Timer("lambda-monitoring", timeout) {}
+        explicit LambdaMonitoring(int timeout) : Core::JTimer("lambda-monitoring", timeout) {}
 
         /**
          * Initialization

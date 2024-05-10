@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    SQSServer::SQSServer(Core::Configuration &configuration) : AbstractServer(configuration, "sqs", 10), _configuration(configuration), _sqsDatabase(Database::SQSDatabase::instance()) {
+    SQSServer::SQSServer(Core::Configuration &configuration) : AbstractServer(configuration, "sqs"), _configuration(configuration), _sqsDatabase(Database::SQSDatabase::instance()) {
 
         // HTTP manager configuration
         _port = _configuration.getInt("awsmock.service.sqs.http.port", SQS_DEFAULT_PORT);
@@ -23,7 +23,6 @@ namespace AwsMock::Service {
 
         // Worker thread
         _sqsWorker = std::make_unique<SQSWorker>(_workerPeriod);
-
         log_debug << "SQSServer initialized";
     }
 
@@ -49,6 +48,8 @@ namespace AwsMock::Service {
     void SQSServer::Run() {}
 
     void SQSServer::Shutdown() {
+        _sqsMonitoring->Stop();
+        _sqsWorker->Stop();
         StopHttpServer();
     }
 

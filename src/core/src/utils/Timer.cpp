@@ -31,9 +31,11 @@ namespace AwsMock::Core {
 
                     log_debug << "Timer stopped, name: " << _name;
                 }
+
             } while (status != std::future_status::ready);
 
             Shutdown();
+            _stopped = true;
             log_debug << "Timer shutdown, name: " << _name;
         });
     }
@@ -51,5 +53,8 @@ namespace AwsMock::Core {
 
     void Timer::Stop() {
         _stop.set_value();
+        while (!_stopped) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
     }
 }// namespace AwsMock::Core

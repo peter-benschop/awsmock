@@ -122,7 +122,7 @@ namespace AwsMock::Service {
             } else {
                 for (const auto &server: _serverMap) {
                     if (name == server.first) {
-                        server.second->StopServer();
+                        server.second->Stop();
                     }
                 }
             }

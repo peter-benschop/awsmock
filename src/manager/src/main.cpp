@@ -274,7 +274,7 @@ namespace AwsMock {
                 if (module.state == Database::Entity::Module::ModuleState::RUNNING) {
                     log_info << "Stopping module: " << module.name;
                     moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
-                    _serverMap[module.name]->StopServer();
+                    _serverMap[module.name]->Stop();
                     log_debug << "Module " << module.name << " stopped";
                 }
             }

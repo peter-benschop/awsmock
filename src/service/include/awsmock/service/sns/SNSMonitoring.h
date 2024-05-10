@@ -6,26 +6,26 @@
 #define AWSMOCK_SERVICE_SNS_MONITORING_H
 
 // AwsMock includes
+#include <awsmock/core/JTimer.h>
 #include <awsmock/core/MetricDefinition.h>
 #include <awsmock/core/MetricService.h>
-#include <awsmock/core/Timer.h>
 #include <awsmock/repository/SNSDatabase.h>
 
 namespace AwsMock::Service {
 
     /**
-     * SNS monitoring thread
+     * @brief SNS monitoring thread
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SNSMonitoring : public Core::Timer {
+    class SNSMonitoring : public Core::JTimer {
 
       public:
 
         /**
          * Constructor
          */
-        explicit SNSMonitoring(int timeout) : Core::Timer("sns-monitoring", timeout) {}
+        explicit SNSMonitoring(int timeout);
 
         /**
          * Initialization

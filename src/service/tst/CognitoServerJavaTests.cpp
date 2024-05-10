@@ -43,7 +43,7 @@ namespace AwsMock::Service {
         void TearDown() override {
             _database.DeleteAllUsers();
             _database.DeleteAllUserPools();
-            _dynamoDbServer.StopServer();
+            _dynamoDbServer.Stop();
         }
 
         std::string _endpoint, _baseCommand;

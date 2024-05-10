@@ -52,8 +52,8 @@ namespace AwsMock::Service {
         }
 
         void TearDown() override {
-            _snsServer.StopServer();
-            _sqsServer.StopServer();
+            _snsServer.Stop();
+            _sqsServer.Stop();
             _snsDatabase.DeleteAllMessages();
             _snsDatabase.DeleteAllTopics();
             _sqsDatabase.DeleteAllMessages();

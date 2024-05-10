@@ -32,10 +32,6 @@ namespace AwsMock::Service {
         StartLocalDynamoDb();
     }
 
-    DynamoDbServer::~DynamoDbServer() {
-        StopServer();
-    }
-
     void DynamoDbServer::Initialize() {
 
         // Check module active
@@ -60,6 +56,7 @@ namespace AwsMock::Service {
     }
 
     void DynamoDbServer::Shutdown() {
+        _dynamoDbMonitoring->Stop();
         StopHttpServer();
     }
 
