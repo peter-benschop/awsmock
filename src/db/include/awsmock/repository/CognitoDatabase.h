@@ -20,8 +20,12 @@
 
 namespace AwsMock::Database {
 
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
+
     /**
-     * Cognito MongoDB database.
+     * @brief Cognito MongoDB database.
      *
      * @author jens.vogt\@opitz-consulting.com
      */

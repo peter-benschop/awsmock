@@ -7,10 +7,11 @@
 
 namespace AwsMock::Database {
 
+    using bsoncxx::builder::basic::array;
     using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
 
+    // TODO: Remove as connection pool take over
     DatabaseBase::DatabaseBase() : _configuration(Core::Configuration::instance()), _useDatabase(false) {
 
         _useDatabase = _configuration.getBool("awsmock.mongodb.active", false);
@@ -76,7 +77,7 @@ namespace AwsMock::Database {
         log_info << "Database module stopped";
     }
 
-    void DatabaseBase::CreateIndexes() {
+    void DatabaseBase::CreateIndexes() const {
 
         if (_useDatabase) {
 

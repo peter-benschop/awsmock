@@ -36,7 +36,7 @@ namespace AwsMock::Database {
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _topicCollection = (*client)[_databaseName][_keyCollectionName];
             mongocxx::stdx::optional<bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("_id", oid)));
-            if (!mResult.has_value()) {
+            if (mResult->empty()) {
                 log_error << "KMS key not found, oid" << oid.to_string();
                 throw Core::DatabaseException("KMS key not found, oid" + oid.to_string());
             }
@@ -74,7 +74,7 @@ namespace AwsMock::Database {
             try {
 
                 mongocxx::stdx::optional<bsoncxx::document::value> mResult = _keyCollection.find_one(make_document(kvp("keyId", keyId)));
-                if (!mResult.has_value()) {
+                if (mResult->empty()) {
                     log_error << "KMS key not found, keyId: " << keyId;
                     throw Core::DatabaseException("KMS key not found, keyId" + keyId);
                 }

@@ -29,6 +29,60 @@
 
 namespace AwsMock::Dto::S3 {
 
+    /**
+     * @brief List S3 object version response
+     *
+     * Example:
+     * @code{.xml}
+     * <ListVersionsResult>
+     *   <IsTruncated>boolean</IsTruncated>
+     *   <KeyMarker>string</KeyMarker>
+     *   <VersionIdMarker>string</VersionIdMarker>
+     *   <NextKeyMarker>string</NextKeyMarker>
+     *   <NextVersionIdMarker>string</NextVersionIdMarker>
+     *   <Version>
+     *     <ChecksumAlgorithm>string</ChecksumAlgorithm>
+     *     ...
+     *     <ETag>string</ETag>
+     *     <IsLatest>boolean</IsLatest>
+     *     <Key>string</Key>
+     *     <LastModified>timestamp</LastModified>
+     *     <Owner>
+     *       <DisplayName>string</DisplayName>
+     *       <ID>string</ID>
+     *      </Owner>
+     *     <RestoreStatus>
+     *       <IsRestoreInProgress>boolean</IsRestoreInProgress>
+     *       <RestoreExpiryDate>timestamp</RestoreExpiryDate>
+     *     </RestoreStatus>
+     *     <Size>long</Size>
+     *     <StorageClass>string</StorageClass>
+     *     <VersionId>string</VersionId>
+     *   </Version>
+     *   ...
+     *   <DeleteMarker>
+     *     <IsLatest>boolean</IsLatest>
+     *     <Key>string</Key>
+     *     <LastModified>timestamp</LastModified>
+     *     <Owner>
+     *       <DisplayName>string</DisplayName>
+     *       <ID>string</ID>
+     *     </Owner>
+     *     <VersionId>string</VersionId>
+     *   </DeleteMarker>
+     *   ...
+     *   <Name>string</Name>
+     *   <Prefix>string</Prefix>
+     *   <Delimiter>string</Delimiter>
+     *   <MaxKeys>integer</MaxKeys>
+     *   <CommonPrefixes>
+     *     <Prefix>string</Prefix>
+     *   </CommonPrefixes>
+     *   ...
+     *   <EncodingType>string</EncodingType>
+     * </ListVersionsResult>
+     * @endcode
+     */
     struct DeleteMarker {
 
         /**
@@ -62,6 +116,14 @@ namespace AwsMock::Dto::S3 {
          * @return JSON object
          */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+
+        /**
+         * Convert to a XML element
+         *
+         * @param pDoc XML document
+         * @return XML element
+         */
+        [[nodiscard]] Poco::XML::AutoPtr<Poco::XML::Element> ToXmlElement(Poco::XML::AutoPtr<Poco::XML::Document> pDoc) const;
     };
 
     struct RestoreStatus {

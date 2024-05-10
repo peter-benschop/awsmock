@@ -44,6 +44,14 @@ namespace AwsMock::Dto::S3 {
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
+         * Convert to a XML element
+         *
+         * @param pDoc XML document
+         * @return XML element
+         */
+        [[nodiscard]] Poco::XML::AutoPtr<Poco::XML::Element> ToXmlElement(Poco::XML::AutoPtr<Poco::XML::Document> pDoc) const;
+
+        /**
          * Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.

@@ -13,12 +13,15 @@ namespace AwsMock::Dto::S3 {
             rootJson.set("region", region);
             rootJson.set("bucket", bucket);
             rootJson.set("prefix", prefix);
+            rootJson.set("delimiter", prefix);
+            rootJson.set("encodingType", encodingType);
+            rootJson.set("maxKeys", maxKeys);
+            rootJson.set("versionIdMarker", versionIdMarker);
 
-            std::ostringstream os;
-            rootJson.stringify(os);
-            return os.str();
+            return Core::JsonUtils::ToJsonString(rootJson);
 
         } catch (Poco::Exception &exc) {
+            log_error << exc.message();
             throw Core::JsonException(exc.message());
         }
     }

@@ -11,6 +11,7 @@ namespace AwsMock::Dto::S3 {
     Poco::JSON::Object RestoreStatus::ToJsonObject() const {
 
         try {
+
             Poco::JSON::Object rootJson;
             rootJson.set("IsRestoreInProgress", isRestoreInProgress);
             rootJson.set("RestoreExpiryDate", Poco::DateTimeFormatter::format(restoreExpiryDate, Poco::DateTimeFormat::ISO8601_FORMAT));
@@ -35,6 +36,17 @@ namespace AwsMock::Dto::S3 {
         } catch (Poco::Exception &exc) {
             throw Core::JsonException(exc.message());
         }
+    }
+
+    Poco::XML::AutoPtr<Poco::XML::Element> DeleteMarker::ToXmlElement(Poco::XML::AutoPtr<Poco::XML::Document> pDoc) const {
+
+        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("DeleteMarker");
+        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "Key", key);
+        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "IsLatest", isLatest);
+        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "LastModified", lastModified);
+        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "VersionId", versionId);
+        pRoot->appendChild(owner.ToXmlElement(pDoc));
+        return pRoot;
     }
 
     Poco::JSON::Object Version::ToJsonObject() const {
@@ -145,6 +157,12 @@ namespace AwsMock::Dto::S3 {
         for (const auto &it: versions) {
             Poco::XML::AutoPtr<Poco::XML::Element> pVersion = it.ToXmlElement(pDoc);
             pRoot->appendChild(pVersion);
+        }
+
+        // Delete marker
+        for (const auto &it: deleteMarkers) {
+            Poco::XML::AutoPtr<Poco::XML::Element> pDeleteMarker = it.ToXmlElement(pDoc);
+            pRoot->appendChild(pDeleteMarker);
         }
 
         return Core::XmlUtils::ToXmlString(pDoc);

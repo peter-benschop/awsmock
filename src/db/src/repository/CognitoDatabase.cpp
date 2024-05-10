@@ -6,10 +6,6 @@
 
 namespace AwsMock::Database {
 
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-
     bool CognitoDatabase::UserPoolExists(const std::string &region, const std::string &name) {
 
         if (_hasDatabase) {
