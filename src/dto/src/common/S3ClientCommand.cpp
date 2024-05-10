@@ -15,13 +15,13 @@ namespace AwsMock::Dto::Common {
         this->region = awsRegion;
         this->user = awsUser;
         this->method = httpMethod;
+        this->url = request.getURI();
 
         // Core values
         bucket = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
         key = Core::HttpUtils::GetPathParametersFromIndex(request.getURI(), 1);
 
         // Qualifiers
-        url = request.getURI();
         multipartRequest = Core::HttpUtils::HasQueryParameter(request.getURI(), "uploads") || Core::HttpUtils::HasQueryParameter(request.getURI(), "uploadId") || Core::HttpUtils::HasQueryParameter(request.getURI(), "partNumber");
         uploads = Core::HttpUtils::HasQueryParameter(request.getURI(), "uploads");
         partNumber = Core::HttpUtils::HasQueryParameter(request.getURI(), "partNumber");
@@ -138,6 +138,8 @@ namespace AwsMock::Dto::Common {
             command = S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION;
         } else if (userAgent.clientModule == "command/s3api" && userAgent.clientCommand == "put-bucket-encryption") {
             command = S3CommandType::PUT_BUCKET_ENCRYPTION;
+        } else if (userAgent.clientModule == "command/s3api" && userAgent.clientCommand == "list-object-versions") {
+            command = S3CommandType::LIST_OBJECT_VERSIONS;
         }
     }
 

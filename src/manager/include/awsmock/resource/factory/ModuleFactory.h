@@ -10,7 +10,7 @@
 #include <awsmock/resource/factory/IFactory.h>
 #include <awsmock/resource/handler/ModuleHandler.h>
 
-namespace AwsMock::Resource::Factory {
+namespace AwsMock::Manager {
 
     /**
      * Module factory
@@ -30,6 +30,6 @@ namespace AwsMock::Resource::Factory {
         Poco::Net::HTTPRequestHandler *createResource(Service::ServerMap &serverMap) override;
     };
 
-}// namespace AwsMock::Resource::Factory
+}// namespace AwsMock::Manager
 
 #endif// AWSMOCK_RESOURCE_FACTORY_MODULEFACTORY_H

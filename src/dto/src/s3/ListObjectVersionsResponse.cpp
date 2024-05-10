@@ -7,21 +7,6 @@
 
 namespace AwsMock::Dto::S3 {
 
-
-    Poco::JSON::Object RestoreStatus::ToJsonObject() const {
-
-        try {
-
-            Poco::JSON::Object rootJson;
-            rootJson.set("IsRestoreInProgress", isRestoreInProgress);
-            rootJson.set("RestoreExpiryDate", Poco::DateTimeFormatter::format(restoreExpiryDate, Poco::DateTimeFormat::ISO8601_FORMAT));
-            return rootJson;
-
-        } catch (Poco::Exception &exc) {
-            throw Core::JsonException(exc.message());
-        }
-    }
-
     Poco::JSON::Object DeleteMarker::ToJsonObject() const {
 
         try {
@@ -49,40 +34,6 @@ namespace AwsMock::Dto::S3 {
         return pRoot;
     }
 
-    Poco::JSON::Object Version::ToJsonObject() const {
-
-        try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Key", key);
-            rootJson.set("ETag", eTag);
-            rootJson.set("VersionId", versionId);
-            rootJson.set("StorageClass", storageClass);
-            rootJson.set("ChecksumAlgorithm", checksumAlgorithm);
-            rootJson.set("IsLatest", isLatest);
-            rootJson.set("Size", size);
-            rootJson.set("LastModified", Poco::DateTimeFormatter::format(lastModified, Poco::DateTimeFormat::ISO8601_FORMAT));
-            rootJson.set("Owner", owner.ToJsonObject());
-            rootJson.set("RestoreStatue", restoreStatue.ToJsonObject());
-            return rootJson;
-
-        } catch (Poco::Exception &exc) {
-            throw Core::JsonException(exc.message());
-        }
-    }
-
-    Poco::XML::AutoPtr<Poco::XML::Element> Version::ToXmlElement(Poco::XML::AutoPtr<Poco::XML::Document> pDoc) const {
-
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("Version");
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "Key", key);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ETag", eTag);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "VersionId", versionId);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "StorageClass", storageClass);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ChecksumAlgorithm", checksumAlgorithm);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "IsLatest", isLatest);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "Size", size);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "LastModified", lastModified);
-        return pRoot;
-    }
 
     std::string ListObjectVersionsResponse::ToJson() const {
 
@@ -136,7 +87,6 @@ namespace AwsMock::Dto::S3 {
 
         Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
         Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("ListVersionsResult");
-        pDoc->appendChild(pRoot);
 
         Core::XmlUtils::CreateTextNode(pDoc, pRoot, "Region", region);
         Core::XmlUtils::CreateTextNode(pDoc, pRoot, "Name", name);
@@ -149,6 +99,7 @@ namespace AwsMock::Dto::S3 {
         Core::XmlUtils::CreateTextNode(pDoc, pRoot, "VersionIdMarker", versionIdMarker);
         Core::XmlUtils::CreateTextNode(pDoc, pRoot, "NextKeyMarker", nextKeyMarker);
         Core::XmlUtils::CreateTextNode(pDoc, pRoot, "NextVersionIdMarker", nextVersionIdMarker);
+        pDoc->appendChild(pRoot);
 
         // Prefixes
         Core::XmlUtils::CreateTextArray(pDoc, pRoot, "CommonPrefixes", "Prefix", commonPrefixes);

@@ -47,6 +47,7 @@
 #include <awsmock/dto/s3/PutBucketVersioningRequest.h>
 #include <awsmock/dto/s3/PutObjectRequest.h>
 #include <awsmock/dto/s3/PutObjectResponse.h>
+#include <awsmock/dto/s3/mapper/Mapper.h>
 #include <awsmock/dto/s3/model/EventNotification.h>
 #include <awsmock/dto/s3/model/TopicConfiguration.h>
 #include <awsmock/entity/s3/LambdaNotification.h>

@@ -29,7 +29,7 @@
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/resource/HandlerException.h>
 
-namespace AwsMock::Resource {
+namespace AwsMock::Manager {
 
     typedef std::vector<std::pair<std::string, std::string>> HeaderMap;
 
@@ -269,6 +269,6 @@ namespace AwsMock::Resource {
         HeaderMap _headerMap;
     };
 
-}// namespace AwsMock::Resource
+}// namespace AwsMock::Manager
 
 #endif// AWSMOCK_RESOURCE_ABSTRACTRESOURCE_H

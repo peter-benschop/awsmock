@@ -130,12 +130,12 @@ namespace AwsMock::Service {
                     std::string encodingType = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "encoding-type");
                     std::string keyMarker = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "key-marker");
                     std::string versionIdMarker = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "version-id-marker");
-                    std::string sMaxKeys = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "max-keys");
+                    std::string sPageSize = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "max-keys");
 
                     // Convert maxKeys
-                    int maxKeys = 100;
-                    if (!sMaxKeys.empty()) {
-                        maxKeys = std::stoi(sMaxKeys);
+                    int pageSize = 1000;
+                    if (!sPageSize.empty()) {
+                        pageSize = std::stoi(sPageSize);
                     }
 
                     // Build request
@@ -145,12 +145,13 @@ namespace AwsMock::Service {
                             .prefix = s3ClientCommand.prefix,
                             .delimiter = delimiter,
                             .encodingType = encodingType,
-                            .maxKeys = maxKeys,
+                            .maxKeys = pageSize,
                             .versionIdMarker = versionIdMarker};
 
                     // Get object versions
                     Dto::S3::ListObjectVersionsResponse s3Response = _s3Service.ListObjectVersions(s3Request);
 
+                    std::string tmp = s3Response.ToXml();
                     SendOkResponse(response, s3Response.ToXml());
                     log_info << "List object versions, bucket: " << s3ClientCommand.bucket << " prefix: " << s3ClientCommand.prefix;
 

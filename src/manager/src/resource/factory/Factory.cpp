@@ -4,7 +4,7 @@
 
 #include "awsmock/resource/factory/Factory.h"
 
-namespace AwsMock::Resource::Factory {
+namespace AwsMock::Manager {
 
     IFactory *Factory::createResourceFactory(std::string &index) {
 
@@ -14,4 +14,4 @@ namespace AwsMock::Resource::Factory {
         }
         return factory;
     }
-}// namespace AwsMock::Resource::Factory
+}// namespace AwsMock::Manager

@@ -11,7 +11,7 @@
 // AwsMock includes
 #include "awsmock/resource/factory/ModuleFactory.h"
 
-namespace AwsMock::Resource::Factory {
+namespace AwsMock::Manager {
 
     /**
      * Management router
@@ -43,6 +43,6 @@ namespace AwsMock::Resource::Factory {
         Factory() = default;
     };
 
-}// namespace AwsMock::Resource::Factory
+}// namespace AwsMock::Manager
 
 #endif// AWSMOCK_RESOURCE_FACTORY_H

@@ -1,7 +1,7 @@
 
 #include <awsmock/resource/handler/ModuleHandler.h>
 
-namespace AwsMock {
+namespace AwsMock::Manager {
 
     ModuleHandler::ModuleHandler(Service::ServerMap &serverMap) : AbstractResource(), _serverMap(serverMap) {
 
@@ -205,4 +205,4 @@ namespace AwsMock {
         std::ostream &outputStream = response.send();
         outputStream.flush();
     }
-}// namespace AwsMock
+}// namespace AwsMock::Manager

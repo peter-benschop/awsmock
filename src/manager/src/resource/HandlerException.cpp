@@ -1,6 +1,6 @@
 #include "awsmock/resource/HandlerException.h"
 
-namespace AwsMock {
+namespace AwsMock::Manager {
 
     HandlerException::HandlerException(std::string type, std::string message, int statusCode) : _statusCode(statusCode), _type(std::move(type)), _message(std::move(message)) {}
 
@@ -15,4 +15,4 @@ namespace AwsMock {
     std::string HandlerException::message() const {
         return _message;
     }
-}// namespace AwsMock
+}// namespace AwsMock::Manager

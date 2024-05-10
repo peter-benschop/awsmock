@@ -21,7 +21,7 @@
 namespace AwsMock::Dto::S3 {
 
     /**
-     * S3 notification configuration for a SNS topic.
+     * @brief S3 notification configuration for a SNS topic.
      *
      * <p>
      * This configures the S3 module to send a message to the supplied SNS topic. Depending on the event type and the
@@ -45,7 +45,7 @@ namespace AwsMock::Dto::S3 {
      *     <Id>string</Id>
      *     <Topic>string</Topic>
      *   </TopicConfiguration>
-     * @endcodeindex
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

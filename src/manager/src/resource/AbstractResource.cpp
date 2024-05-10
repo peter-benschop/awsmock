@@ -1,7 +1,7 @@
 
 #include "awsmock/resource/AbstractResource.h"
 
-namespace AwsMock::Resource {
+namespace AwsMock::Manager {
 
     AbstractResource::AbstractResource() : _baseUrl(), _requestURI(), _requestHost() {}
 
@@ -339,4 +339,4 @@ namespace AwsMock::Resource {
         ofs << request.stream().rdbuf();
         ofs.close();
     }
-}// namespace AwsMock::Resource
+}// namespace AwsMock::Manager

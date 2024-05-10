@@ -25,6 +25,7 @@
 #include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/XmlUtils.h>
+#include <awsmock/dto/s3/model/ObjectVersion.h>
 #include <awsmock/dto/s3/model/Owner.h>
 
 namespace AwsMock::Dto::S3 {
@@ -126,94 +127,6 @@ namespace AwsMock::Dto::S3 {
         [[nodiscard]] Poco::XML::AutoPtr<Poco::XML::Element> ToXmlElement(Poco::XML::AutoPtr<Poco::XML::Document> pDoc) const;
     };
 
-    struct RestoreStatus {
-
-        /**
-         * Is restore in progress
-         */
-        bool isRestoreInProgress;
-
-        /**
-         * Expiration datetime
-         */
-        Poco::DateTime restoreExpiryDate;
-
-        /**
-         * Convert to a JSON object
-         *
-         * @return JSON object
-         */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
-    };
-
-    struct Version {
-
-        /**
-         * Key
-         */
-        std::string key;
-
-        /**
-         * ETag
-         */
-        std::string eTag;
-
-        /**
-         * VersionId
-         */
-        std::string versionId;
-
-        /**
-         * Storage class
-         */
-        std::string storageClass;
-
-        /**
-         * Checksum algorithm
-         */
-        std::string checksumAlgorithm;
-
-        /**
-         * Is latest
-         */
-        bool isLatest;
-
-        /**
-         * Size
-         */
-        long size;
-
-        /**
-         * Is latest
-         */
-        Poco::DateTime lastModified;
-
-        /**
-         * Owner
-         */
-        Owner owner;
-
-        /**
-         * Restore status
-         */
-        RestoreStatus restoreStatue;
-
-        /**
-         * Convert to a JSON object
-         *
-         * @return JSON object
-         */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
-
-        /**
-         * Convert to a XML element
-         *
-         * @param pDoc XML document
-         * @return XML element
-         */
-        [[nodiscard]] Poco::XML::AutoPtr<Poco::XML::Element> ToXmlElement(Poco::XML::AutoPtr<Poco::XML::Document> pDoc) const;
-    };
-
     struct ListObjectVersionsResponse {
 
         /**
@@ -279,7 +192,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * Versions
          */
-        std::vector<Version> versions;
+        std::vector<ObjectVersion> versions;
 
         /**
          * Delete markers
