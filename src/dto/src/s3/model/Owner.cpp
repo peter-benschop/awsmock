@@ -34,6 +34,14 @@ namespace AwsMock::Dto::S3 {
         }
     }
 
+    Poco::XML::AutoPtr<Poco::XML::Element> Owner::ToXmlElement(Poco::XML::AutoPtr<Poco::XML::Document> pDoc) const {
+
+        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("Owner");
+        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "Id", id);
+        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "DisplayName", displayName);
+        return pRoot;
+    }
+
     std::string Owner::ToString() const {
         std::stringstream ss;
         ss << (*this);

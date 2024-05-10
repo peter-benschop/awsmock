@@ -99,7 +99,7 @@ namespace AwsMock::Database {
         mongocxx::collection _queueCollection = (*client)[_databaseName][_collectionNameQueue];
 
         mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("_id", oid)));
-        if (!mResult.has_value()) {
+        if (mResult->empty()) {
             log_error << "Queue not found, oid: " << oid.to_string();
             throw Core::DatabaseException("Queue not found, oid: " + oid.to_string());
         }
@@ -131,7 +131,7 @@ namespace AwsMock::Database {
 
             mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("queueArn", queueArn)));
 
-            if (!mResult.has_value()) {
+            if (mResult->empty()) {
                 log_error << "Queue not found, queueArn: " << queueArn;
                 throw Core::DatabaseException("Queue not found, queueArn: " + queueArn);
             }
@@ -153,7 +153,7 @@ namespace AwsMock::Database {
             mongocxx::collection _queueCollection = (*client)[_databaseName][_collectionNameQueue];
 
             mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
-            if (!mResult.has_value()) {
+            if (mResult->empty()) {
 
                 log_error << "Queue not found, queueUrl: " << queueUrl;
                 throw Core::DatabaseException("Queue not found, queueUrl: " + queueUrl);
@@ -178,7 +178,7 @@ namespace AwsMock::Database {
             mongocxx::collection _queueCollection = (*client)[_databaseName][_collectionNameQueue];
 
             mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
-            if (mResult.has_value()) {
+            if (!mResult->empty()) {
 
                 log_trace << "GetQueueByName succeeded, region: " << region << " name: " << name;
                 return result.FromDocument(mResult->view());

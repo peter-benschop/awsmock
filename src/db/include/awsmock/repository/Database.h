@@ -10,6 +10,7 @@
 
 // MongoDB includes
 #include <mongocxx/client.hpp>
+#include <mongocxx/database.hpp>
 #include <mongocxx/exception/exception.hpp>
 #include <mongocxx/exception/query_exception.hpp>
 #include <mongocxx/pool.hpp>
@@ -60,7 +61,7 @@ namespace AwsMock::Database {
          *
          * <p>Normally done during manager StartServer.</p>
          */
-        void CreateIndexes();
+        void CreateIndexes() const;
 
         /**
          * Check whether we are running without database

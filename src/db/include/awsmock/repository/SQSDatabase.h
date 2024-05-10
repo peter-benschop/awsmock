@@ -14,6 +14,7 @@
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
+#include <mongocxx/client.hpp>
 #include <mongocxx/options/find_one_and_update.hpp>
 
 // AwsMock includes

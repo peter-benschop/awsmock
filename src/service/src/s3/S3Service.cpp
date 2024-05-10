@@ -603,6 +603,11 @@ namespace AwsMock::Service {
     Dto::S3::ListObjectVersionsResponse S3Service::ListObjectVersions(const Dto::S3::ListObjectVersionsRequest &request) {
         log_trace << "List object versions request: " << request.ToString();
 
+        // Check bucket existence
+        if (!_database.BucketExists({.region = request.region, .name = request.bucket})) {
+            throw Core::ServiceException("Bucket does not exist");
+        }
+
         Dto::S3::ListObjectVersionsResponse response;
         return response;
     }

@@ -158,7 +158,7 @@ namespace AwsMock::Database {
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
                 mongocxx::stdx::optional<bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("region", region), kvp("topicName", topicName)));
 
-                if (mResult.has_value()) {
+                if (!mResult->empty()) {
                     Entity::SNS::Topic result;
                     result.FromDocument(mResult->view());
                     return result;

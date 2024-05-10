@@ -485,7 +485,7 @@ namespace AwsMock::Database {
                 mongocxx::stdx::optional<bsoncxx::document::value> mResult =
                         _objectCollection.find_one(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key)));
 
-                if (mResult.has_value()) {
+                if (!mResult->empty()) {
                     Entity::S3::Object result;
                     result.FromDocument(mResult->view());
 
@@ -519,7 +519,7 @@ namespace AwsMock::Database {
                                                                        kvp("bucket", bucket),
                                                                        kvp("key", key),
                                                                        kvp("md5sum", md5sum)));
-            if (mResult.has_value()) {
+            if (!mResult->empty()) {
                 Entity::S3::Object result;
                 result.FromDocument(mResult->view());
 

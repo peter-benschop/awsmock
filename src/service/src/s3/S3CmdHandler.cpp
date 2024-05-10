@@ -125,10 +125,28 @@ namespace AwsMock::Service {
 
                     // Get object request
                     log_debug << "S3 list object versions request, bucket: " << s3ClientCommand.bucket << " prefix: " << s3ClientCommand.prefix;
+
+                    std::string delimiter = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "delimiter");
+                    std::string encodingType = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "encoding-type");
+                    std::string keyMarker = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "key-marker");
+                    std::string versionIdMarker = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "version-id-marker");
+                    std::string sMaxKeys = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "max-keys");
+
+                    // Convert maxKeys
+                    int maxKeys = 100;
+                    if (!sMaxKeys.empty()) {
+                        maxKeys = std::stoi(sMaxKeys);
+                    }
+
+                    // Build request
                     Dto::S3::ListObjectVersionsRequest s3Request = {
                             .region = s3ClientCommand.region,
                             .bucket = s3ClientCommand.bucket,
-                            .prefix = s3ClientCommand.prefix};
+                            .prefix = s3ClientCommand.prefix,
+                            .delimiter = delimiter,
+                            .encodingType = encodingType,
+                            .maxKeys = maxKeys,
+                            .versionIdMarker = versionIdMarker};
 
                     // Get object versions
                     Dto::S3::ListObjectVersionsResponse s3Response = _s3Service.ListObjectVersions(s3Request);
@@ -153,6 +171,7 @@ namespace AwsMock::Service {
                 case Dto::Common::S3CommandType::ABORT_MULTIPART_UPLOAD:
                 case Dto::Common::S3CommandType::BUCKET_NOTIFICATION:
                 case Dto::Common::S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION:
+                case Dto::Common::S3CommandType::PUT_BUCKET_ENCRYPTION:
                     break;
                 case Dto::Common::S3CommandType::UNKNOWN: {
                     throw Core::ServiceException("Bad request, method: GET clientCommand: " + Dto::Common::S3CommandTypeToString(s3ClientCommand.command));
