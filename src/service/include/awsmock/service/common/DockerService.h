@@ -265,6 +265,11 @@ namespace AwsMock::Service {
          * Docker internal network name
          */
         std::string _containerPort;
+
+        /**
+         * Docker listening socket
+         */
+        std::string _dockerSocket;
     };
 
 }// namespace AwsMock::Service
