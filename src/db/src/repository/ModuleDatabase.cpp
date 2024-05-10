@@ -37,6 +37,10 @@ namespace AwsMock::Database {
         }
     }
 
+    std::map<std::string, Entity::Module::Module> ModuleDatabase::GetExisting() {
+        return _existingModules;
+    }
+
     bool ModuleDatabase::IsActive(const std::string &name) {
 
         if (HasDatabase()) {

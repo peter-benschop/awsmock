@@ -183,29 +183,31 @@ namespace AwsMock {
 
             // Get database variables
             Core::Configuration &configuration = Core::Configuration::instance();
-            std::string name = configuration.getString("awsmock.mongodb.name", "awsmock");
-            std::string host = configuration.getString("awsmock.mongodb.host", "localhost");
-            std::string user = configuration.getString("awsmock.mongodb.user", "admin");
-            std::string password = configuration.getString("awsmock.mongodb.password", "admin");
-            int _port = configuration.getInt("awsmock.mongodb.port", 27017);
-            int poolSize = configuration.getInt("awsmock.mongodb.pool.size", 256);
+            if (configuration.getBool("awsmock.mongodb.active")) {
+                std::string name = configuration.getString("awsmock.mongodb.name", "awsmock");
+                std::string host = configuration.getString("awsmock.mongodb.host", "localhost");
+                std::string user = configuration.getString("awsmock.mongodb.user", "admin");
+                std::string password = configuration.getString("awsmock.mongodb.password", "admin");
+                int _port = configuration.getInt("awsmock.mongodb.port", 27017);
+                int poolSize = configuration.getInt("awsmock.mongodb.pool.size", 256);
 
-            // MongoDB URL
-            std::string url = "mongodb://" + user + ":" + password + "@" + host + ":" + std::to_string(_port) + "/?maxPoolSize=" + std::to_string(poolSize);
-            mongocxx::uri _uri(url.c_str());
+                // MongoDB URL
+                std::string url = "mongodb://" + user + ":" + password + "@" + host + ":" + std::to_string(_port) + "/?maxPoolSize=" + std::to_string(poolSize);
+                mongocxx::uri _uri(url.c_str());
 
-            auto instance = bsoncxx::stdx::make_unique<mongocxx::instance>();
-            Database::ConnectionPool &pool = Database::ConnectionPool::instance();
+                auto instance = bsoncxx::stdx::make_unique<mongocxx::instance>();
+                Database::ConnectionPool &pool = Database::ConnectionPool::instance();
 
-            // Options
-            mongocxx::options::client client_options;
-            auto api = mongocxx::options::server_api{mongocxx::options::server_api::version::k_version_1};
-            client_options.server_api_opts(api);
-            pool.configure(std::move(instance), bsoncxx::stdx::make_unique<mongocxx::pool>(std::move(_uri), std::move(client_options)));
+                // Options
+                mongocxx::options::client client_options;
+                auto api = mongocxx::options::server_api{mongocxx::options::server_api::version::k_version_1};
+                client_options.server_api_opts(api);
+                pool.configure(std::move(instance), bsoncxx::stdx::make_unique<mongocxx::pool>(std::move(_uri), std::move(client_options)));
 
-            // Create database indexes
-            Database::ModuleDatabase::instance().CreateIndexes();
-            log_debug << "Database indexes created";
+                // Create database indexes
+                Database::ModuleDatabase::instance().CreateIndexes();
+                log_debug << "Database indexes created";
+            }
         }
 
 
@@ -221,13 +223,17 @@ namespace AwsMock {
 
             Core::Configuration &configuration = Core::Configuration::instance();
             Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
-            Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules();
-            for (const auto &module: modules) {
-                if (configuration.has("awsmock.service." + module.name + ".active") && configuration.getBool("awsmock.service." + module.name + ".active")) {
-                    moduleDatabase.SetStatus(module.name, Database::Entity::Module::ModuleStatus::ACTIVE);
+            std::map<std::string, Database::Entity::Module::Module> existingModules = Database::ModuleDatabase::instance().GetExisting();
+            for (const auto &module: existingModules) {
+                if (configuration.has("awsmock.service." + module.first + ".active") && configuration.getBool("awsmock.service." + module.first + ".active")) {
+                    if (!moduleDatabase.ModuleExists(module.first)) {
+                        moduleDatabase.CreateModule({.name = module.first, .state = Database::Entity::Module::ModuleState::STOPPED, .status = Database::Entity::Module::ModuleStatus::ACTIVE});
+                    } else {
+                        moduleDatabase.SetStatus(module.first, Database::Entity::Module::ModuleStatus::ACTIVE);
+                    }
                 }
             }
-            modules = moduleDatabase.ListModules();
+            Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules();
 
             // Get last module configuration
             for (const auto &module: modules) {
