@@ -56,6 +56,13 @@ namespace AwsMock::Database {
         void Initialize();
 
         /**
+         * Returns a list of existing modules.
+         *
+         * @return map of existing modules
+         */
+        std::map<std::string, Entity::Module::Module> GetExisting();
+
+        /**
          * Checks the active flag.
          *
          * @param name module name

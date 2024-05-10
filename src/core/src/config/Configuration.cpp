@@ -11,8 +11,8 @@ namespace AwsMock::Core {
     }
 
     Configuration::Configuration(const std::string &filename) {
-        SetFilename(filename);
         Initialize();
+        SetFilename(filename);
     }
 
     void Configuration::Initialize() {
@@ -156,6 +156,7 @@ namespace AwsMock::Core {
     void Configuration::DefineStringProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue) {
         if (getenv(envProperty.c_str()) != nullptr) {
             setString(key, getenv(envProperty.c_str()));
+            AddToEnvList(key, getenv(envProperty.c_str()));
         } else if (!has(key)) {
             setString(key, defaultValue);
         }
@@ -165,6 +166,7 @@ namespace AwsMock::Core {
     void Configuration::DefineBoolProperty(const std::string &key, const std::string &envProperty, bool defaultValue) {
         if (getenv(envProperty.c_str()) != nullptr) {
             setBool(key, std::string(getenv(envProperty.c_str())) == "true");
+            AddToEnvList(key, getenv(envProperty.c_str()));
         } else if (!has(key)) {
             setBool(key, defaultValue);
         }
@@ -174,6 +176,7 @@ namespace AwsMock::Core {
     void Configuration::DefineIntProperty(const std::string &key, const std::string &envProperty, int defaultValue) {
         if (getenv(envProperty.c_str()) != nullptr) {
             setInt(key, std::stoi(getenv(envProperty.c_str())));
+            AddToEnvList(key, getenv(envProperty.c_str()));
         } else if (!has(key)) {
             setInt(key, defaultValue);
         }
@@ -191,8 +194,14 @@ namespace AwsMock::Core {
         if (filename.empty()) {
             throw CoreException("Empty filename");
         }
+        if (Core::FileUtils::FileExists(filename)) {
+            log_warning << "Configuration file '" << filename << "' does not exist. Will use default.";
+        }
         _filename = filename;
         load(_filename);
+
+        // Reapply environment settings
+        ApplyEnvSettings();
     }
 
     void Configuration::SetValue(const std::string &key, const std::string &value) {
@@ -239,6 +248,16 @@ namespace AwsMock::Core {
         std::ofstream ofs(filename, std::ofstream::trunc);
         for (const auto &key: *this) {
             ofs << key.first << "=" << key.second;
+        }
+    }
+
+    void Configuration::AddToEnvList(const std::string &key, const std::string &value) {
+        _envList[key] = value;
+    }
+
+    void Configuration::ApplyEnvSettings() {
+        for (const auto &it: _envList) {
+            setString(it.first, it.second);
         }
     }
 
