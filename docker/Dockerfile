@@ -82,7 +82,6 @@ COPY --from=build /usr/bin/awsmockctl /usr/bin/
 COPY --from=build /usr/lib/libawsmock* /usr/lib/
 COPY --from=build /etc/awsmock.properties /etc/
 COPY --from=build /usr/bin/awslocal /usr/bin/
-COPY --from=build /etc/awsmock.properties /etc
 
 # Configure awslocal
 RUN aws configure set aws_access_key_id none && \

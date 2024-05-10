@@ -136,6 +136,7 @@ namespace AwsMock::Core {
         DefineIntProperty("awsmock.docker.default.memory.size", "AWSMOCK_DOCKER_DEFAULT_MEMORY_SIZE", 512);
         DefineIntProperty("awsmock.docker.default.temp.size", "AWSMOCK_DOCKER_DEFAULT_TEMP_SIZE", 10240);
         DefineIntProperty("awsmock.docker.container.port", "AWSMOCK_DOCKER_CONTAINER_PORT", 8080);
+        DefineStringProperty("awsmock.docker.socket", "AWSMOCK_DOCKER_SOCKET", "/var/run/docker.sock");
 
         // Monitoring
         DefineIntProperty("awsmock.monitoring.port", "AWSMOCK_CORE_METRIC_PORT", 9100);
@@ -143,6 +144,7 @@ namespace AwsMock::Core {
 
         // Logging
         DefineStringProperty("awsmock.log.level", "AWSMOCK_LOG_LEVEL", "information");
+        DefineStringProperty("awsmock.log.file", "AWSMOCK_LOG_FILE", "/var/run/awsmock.log");
 
         // Database
         DefineBoolProperty("awsmock.mongodb.active", "AWSMOCK_MONGODB_ACTIVE", true);
@@ -194,7 +196,7 @@ namespace AwsMock::Core {
         if (filename.empty()) {
             throw CoreException("Empty filename");
         }
-        if (Core::FileUtils::FileExists(filename)) {
+        if (!Core::FileUtils::FileExists(filename)) {
             log_warning << "Configuration file '" << filename << "' does not exist. Will use default.";
         }
         _filename = filename;
