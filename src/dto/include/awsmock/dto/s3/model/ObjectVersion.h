@@ -45,7 +45,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * Checksum algorithm
          */
-        std::string checksumAlgorithm;
+        std::vector<std::string> checksumAlgorithms;
 
         /**
          * Is latest

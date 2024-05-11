@@ -6,8 +6,8 @@
 
 namespace AwsMock::Service {
 
-    S3Monitoring::S3Monitoring(int timeout) : Core::JTimer("s3-monitoring", timeout) {
-        Start(timeout);
+    S3Monitoring::S3Monitoring(int timeout) : Core::JTimer("s3-monitoring", timeout, false) {
+        Start();
     }
 
     void S3Monitoring::Initialize() {
@@ -18,7 +18,9 @@ namespace AwsMock::Service {
         UpdateCounter();
     }
 
-    void S3Monitoring::Shutdown() {}
+    void S3Monitoring::Shutdown() {
+        log_debug << "Shutting down, thread: s3-monitoring";
+    }
 
     void S3Monitoring::UpdateCounter() {
         long buckets = _s3Database.BucketCount();

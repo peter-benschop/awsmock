@@ -13,25 +13,31 @@ namespace AwsMock::Dto::S3 {
         Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ETag", eTag);
         Core::XmlUtils::CreateTextNode(pDoc, pRoot, "VersionId", versionId);
         Core::XmlUtils::CreateTextNode(pDoc, pRoot, "StorageClass", storageClass);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ChecksumAlgorithm", checksumAlgorithm);
         Core::XmlUtils::CreateTextNode(pDoc, pRoot, "IsLatest", isLatest);
         Core::XmlUtils::CreateTextNode(pDoc, pRoot, "Size", size);
         Core::XmlUtils::CreateTextNode(pDoc, pRoot, "LastModified", lastModified);
         pRoot->appendChild(owner.ToXmlElement(pDoc));
+
+        // Checksums
+        for (const auto &checksum: checksumAlgorithms) {
+            Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ChecksumAlgorithm", checksum);
+        }
+
         return pRoot;
     }
 
     Poco::JSON::Object ObjectVersion::ToJsonObject() const {
 
         try {
+
             Poco::JSON::Object rootJson;
             rootJson.set("Key", key);
             rootJson.set("ETag", eTag);
             rootJson.set("VersionId", versionId);
             rootJson.set("StorageClass", storageClass);
-            rootJson.set("ChecksumAlgorithm", checksumAlgorithm);
             rootJson.set("IsLatest", isLatest);
             rootJson.set("Size", size);
+            rootJson.set("ChecksumAlgorithm", Core::JsonUtils::GetJsonStringArray(checksumAlgorithms));
             rootJson.set("LastModified", Poco::DateTimeFormatter::format(lastModified, Poco::DateTimeFormat::ISO8601_FORMAT));
             rootJson.set("Owner", owner.ToJsonObject());
             rootJson.set("RestoreStatue", restoreStatue.ToJsonObject());

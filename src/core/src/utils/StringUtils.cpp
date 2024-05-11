@@ -99,7 +99,7 @@ namespace AwsMock::Core {
     }
 
     std::string StringUtils::StripWhiteSpaces(std::string &str) {
-        const std::string &chars = "\t\n\r\v\f";
+        const std::string &chars = "\t\n\r\v\f ";
         str.erase(remove_if(str.begin(), str.end(), [&chars](const char &c) {
                       return chars.find(c) != std::string::npos;
                   }),

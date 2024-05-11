@@ -99,9 +99,7 @@ namespace AwsMock::Service {
         // arrange
         Dto::SNS::CreateTopicRequest topicRequest = {.region = REGION, .topicName = TOPIC, .owner = OWNER};
         Dto::SNS::CreateTopicResponse topicResponse = _snsService.CreateTopic(topicRequest);
-        Dto::SQS::CreateQueueRequest queueRequest = {.queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER};
-        queueRequest.region = REGION;
-        queueRequest.requestId = Poco::UUIDGenerator().createRandom().toString();
+        Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER, .requestId = Poco::UUIDGenerator().createRandom().toString()};
 
         Dto::SQS::CreateQueueResponse queueResponse = _sqsService.CreateQueue(queueRequest);
         Dto::SNS::SubscribeRequest subscribeRequest = {.region = REGION, .topicArn = topicResponse.topicArn, .protocol = "sqs", .endpoint = queueResponse.queueArn, .owner = OWNER};
@@ -137,17 +135,21 @@ namespace AwsMock::Service {
         // arrange
         Dto::SNS::CreateTopicRequest topicRequest = {.region = REGION, .topicName = TOPIC, .owner = OWNER};
         Dto::SNS::CreateTopicResponse topicResponse = _snsService.CreateTopic(topicRequest);
-        Dto::SQS::CreateQueueRequest queueRequest = {.queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER};
-        queueRequest.region = REGION;
-        queueRequest.requestId = Poco::UUIDGenerator().createRandom().toString();
+        Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER, .requestId = Poco::UUIDGenerator().createRandom().toString()};
+
         Dto::SQS::CreateQueueResponse queueResponse = _sqsService.CreateQueue(queueRequest);
+
+        Dto::SQS::GetQueueUrlRequest queueUrlRequest = {.region = REGION, .queueName = QUEUE};
+        Dto::SQS::GetQueueUrlResponse queueUrlResponse = _sqsService.GetQueueUrl(queueUrlRequest);
+        std::string queueUrl = queueUrlResponse.queueUrl;
+
         Dto::SNS::SubscribeRequest subscribeRequest = {.region = REGION, .topicArn = topicResponse.topicArn, .protocol = "sqs", .endpoint = queueResponse.queueArn, .owner = OWNER};
         Dto::SNS::SubscribeResponse subscribeResponse = _snsService.Subscribe(subscribeRequest);
         Dto::SNS::PublishRequest request = {.region = REGION, .topicArn = topicResponse.topicArn, .message = BODY};
         Dto::SNS::PublishResponse response = _snsService.Publish(request);
 
         // act
-        Dto::SQS::ReceiveMessageRequest receiveRequest = {.region = REGION, .queueUrl = QUEUE_URL, .queueName = QUEUE, .maxMessages = 10, .waitTimeSeconds = 5};
+        Dto::SQS::ReceiveMessageRequest receiveRequest = {.region = REGION, .queueUrl = queueUrl, .queueName = QUEUE, .maxMessages = 10, .waitTimeSeconds = 5};
         Dto::SQS::ReceiveMessageResponse receiveResponse = _sqsService.ReceiveMessages(receiveRequest);
 
         // assert

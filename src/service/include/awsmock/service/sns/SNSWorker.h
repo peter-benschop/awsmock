@@ -6,7 +6,7 @@
 #define AWSMOCK_SERVICE_SNS_WORKER_H
 
 // AwsMock includes
-#include <awsmock/core/Timer.h>
+#include <awsmock/core/JTimer.h>
 #include <awsmock/repository/SNSDatabase.h>
 
 #define SNS_DEFAULT_MESSAGE_TIMEOUT 14
@@ -22,14 +22,14 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SNSWorker : public Core::Timer {
+    class SNSWorker : public Core::JTimer {
 
       public:
 
         /**
          * Constructor
          */
-        explicit SNSWorker(int timeout) : Core::Timer("sns-worker", timeout) {}
+        explicit SNSWorker(int timeout) : Core::JTimer("sns-worker", timeout) {}
 
         /**
          * Initialization

@@ -31,30 +31,35 @@ namespace AwsMock::Service {
         void SetUp() override {
 
             // Define endpoint
-            std::string _port = _configuration.getString("awsmock.service.s3.port", std::to_string(S3_DEFAULT_PORT));
-            std::string _host = _configuration.getString("awsmock.service.s3.host", S3_DEFAULT_HOST);
+            std::string _port = _configuration.getString("awsmock.service.s3.http.port", std::to_string(S3_DEFAULT_PORT));
+            std::string _host = _configuration.getString("awsmock.service.s3.http.host", S3_DEFAULT_HOST);
             _endpoint = "http://" + _host + ":" + _port;
 
             // Set base command
-            _baseCommand = "java -jar /usr/local/lib/awsmock-java-test-0.0.1-SNAPSHOT-jar-with-dependencies.jar " + _endpoint;
+            _baseCommand = JAVA + " -jar /usr/local/lib/awsmock-java-test-0.0.1-SNAPSHOT-jar-with-dependencies.jar " + _endpoint;
 
             // Temporary file
             _tempFile = Core::FileUtils::CreateTempFile("txt");
 
             // Start HTTP manager
-            _s3Server.Start();
+            _s3Server = std::make_shared<S3Server>(_configuration);
+            _s3Server->Start();
+            _s3Monitoring = std::make_shared<S3Monitoring>(300);
+            _s3Monitoring->Start();
         }
 
         void TearDown() override {
             Core::FileUtils::DeleteFile(_tempFile);
             _database.DeleteAllObjects();
             _database.DeleteAllBuckets();
+            _s3Server->Stop();
         }
 
         std::string _endpoint, _baseCommand, _tempFile;
         Core::Configuration &_configuration = Core::Configuration::instance();
-        Database::S3Database _database = Database::S3Database();
-        S3Server _s3Server = S3Server(_configuration);
+        Database::S3Database &_database = Database::S3Database::instance();
+        std::shared_ptr<S3Server> _s3Server;
+        std::shared_ptr<S3Monitoring> _s3Monitoring;
     };
 
     TEST_F(S3ServerJavaTest, BucketCreateTest) {
@@ -217,7 +222,7 @@ namespace AwsMock::Service {
 
         // assert
         EXPECT_EQ(0, headResult.status);
-        EXPECT_TRUE(Core::StringUtils::ContainsIgnoreCase(headResult.output, "ContentLength=10485852"));
+        EXPECT_TRUE(Core::StringUtils::ContainsIgnoreCase(headResult.output, "ContentLength=10485760"));
     }
 
     // Java client tries to get the file size.
@@ -226,6 +231,8 @@ namespace AwsMock::Service {
         // arrange
         Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " s3 create-bucket test-bucket");
         EXPECT_EQ(0, createResult.status);
+        Core::ExecResult versioningResult = Core::SystemUtils::Exec(_baseCommand + " s3 put-bucket-versioning test-bucket");
+        EXPECT_EQ(0, versioningResult.status);
         Core::ExecResult putResult = Core::SystemUtils::Exec(_baseCommand + " s3 put-object test-bucket test-key \"test-object\"");
         EXPECT_EQ(0, putResult.status);
 

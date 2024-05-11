@@ -40,7 +40,7 @@ namespace AwsMock::Core {
         int status = 0;
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &status);
 
-        CurlResponse response = {.statusCode = res, .statusReason = curl_easy_strerror(res)};
+        CurlResponse response = {.statusCode = status, .statusReason = curl_easy_strerror(res)};
         if (res == CURLE_OK && !_readBuffer.empty()) {
             response.output = _readBuffer;
         }

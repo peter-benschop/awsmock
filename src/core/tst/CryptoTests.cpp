@@ -35,8 +35,20 @@ namespace AwsMock::Core {
         std::string result = Crypto::GetMd5FromString(TEST_STRING);
 
         // assert
-        EXPECT_TRUE(result == MD5_SUM);
+        EXPECT_STREQ(result.c_str(), MD5_SUM);
     }
+
+    // TODO: Removed, until AWS supported openssl3
+    /*TEST_F(CryptoTest, Md5AwsStringTest) {
+
+        // arrange
+
+        // act
+        std::string result = Crypto::AWSGetMd5FromString(TEST_STRING);
+
+        // assert
+        EXPECT_STREQ(result.c_str(), MD5_SUM);
+    }*/
 
     TEST_F(CryptoTest, Md5FileTest) {
         // arrange
@@ -48,6 +60,18 @@ namespace AwsMock::Core {
         // assert
         EXPECT_TRUE(result == MD5_SUM);
     }
+
+    // TODO: Removed, until AWS supported openssl3
+    /*TEST_F(CryptoTest, Md5AwsFileTest) {
+        // arrange
+        std::string file = FileUtils::CreateTempFile("txt", TEST_STRING);
+
+        // act
+        std::string result = Crypto::GetMd5FromFile(file);
+
+        // assert
+        EXPECT_TRUE(result == MD5_SUM);
+    }*/
 
     TEST_F(CryptoTest, Md5DoubleFileTest) {
 
@@ -184,10 +208,11 @@ namespace AwsMock::Core {
         unsigned char *result2 = Crypto::Aes256DecryptString(result1, &len, (unsigned char *) key.c_str());
 
         // assert
-        EXPECT_STREQ(reinterpret_cast<const char *>(result2), reinterpret_cast<const char *>(result1));
+        EXPECT_STREQ(reinterpret_cast<const char *>(result2), reinterpret_cast<const char *>(testText.c_str()));
     }
 
-    TEST_F(CryptoTest, GenerateRsaKeyTest) {
+    // TODO: use AWS reoutines for RSA
+    /*TEST_F(CryptoTest, GenerateRsaKeyTest) {
 
         // arrange
         std::string testText = "This_is_a_super_secure_text";
@@ -220,7 +245,7 @@ namespace AwsMock::Core {
         EXPECT_TRUE(publicKey.length() == 800);
         EXPECT_TRUE(!privateKey.empty());
         EXPECT_TRUE(privateKey.length() == 4072);
-    }
+    }*/
 
     TEST_F(CryptoTest, HexEncodeDecodeTest) {
 

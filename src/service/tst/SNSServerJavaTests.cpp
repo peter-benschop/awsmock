@@ -34,10 +34,10 @@ namespace AwsMock::Service {
             _region = _configuration.getString("awsmock.region", "eu-central-1");
 
             // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            std::string _snsPort = _configuration.getString("awsmock.service.sns.port", std::to_string(KMS_DEFAULT_PORT));
-            std::string _snsHost = _configuration.getString("awsmock.service.sns.host", SNS_DEFAULT_HOST);
-            std::string _sqsPort = _configuration.getString("awsmock.service.sqs.port", std::to_string(KMS_DEFAULT_PORT));
-            std::string _sqsHost = _configuration.getString("awsmock.service.sqs.host", SNS_DEFAULT_HOST);
+            std::string _snsPort = _configuration.getString("awsmock.service.sns.http.port", std::to_string(KMS_DEFAULT_PORT));
+            std::string _snsHost = _configuration.getString("awsmock.service.sns.http.host", SNS_DEFAULT_HOST);
+            std::string _sqsPort = _configuration.getString("awsmock.service.sqs.http.port", std::to_string(KMS_DEFAULT_PORT));
+            std::string _sqsHost = _configuration.getString("awsmock.service.sqs.http.host", SNS_DEFAULT_HOST);
             _configuration.setString("awsmock.service.gateway.port", _snsPort);
             _snsEndpoint = "http://" + _snsHost + ":" + _snsPort;
             _sqsEndpoint = "http://" + _sqsHost + ":" + _sqsPort;

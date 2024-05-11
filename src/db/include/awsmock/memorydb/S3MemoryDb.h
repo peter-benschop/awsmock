@@ -214,6 +214,18 @@ namespace AwsMock::Database {
         Entity::S3::Object GetObject(const std::string &region, const std::string &bucket, const std::string &key);
 
         /**
+         * Gets an object from a bucket using the bucket, key and MD5 sum as query parameter
+         *
+         * @param region AWS S3 region name
+         * @param bucket object bucket
+         * @param key object key
+         * @param md5sum MD5 sum of object
+         * @return S3 object
+         * @throws DatabaseException
+         */
+        Entity::S3::Object GetObjectMd5(const std::string &region, const std::string &bucket, const std::string &key, const std::string &md5sum);
+
+        /**
          * Counts the number of keys in a bucket
          *
          * @param region AWS region

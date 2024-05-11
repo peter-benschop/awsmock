@@ -34,14 +34,14 @@ namespace AwsMock::Core {
          * @param name timer name
          * @param timeout timeout in seconds
          */
-        explicit JTimer(std::string name, int timeout) : _name(std::move(name)), _timeout(timeout) {}
+        explicit JTimer(std::string name, int timeout, bool detached = true) : _name(std::move(name)), _timeout(timeout), _detached(detached) {}
 
         /**
          * Constructor
          *
          * @param name timer name
          */
-        explicit JTimer(std::string name) : _name(std::move(name)) {}
+        explicit JTimer(std::string name, bool detached = true) : _name(std::move(name)), _detached(detached) {}
 
         /**
          * Start the timer
@@ -87,7 +87,7 @@ namespace AwsMock::Core {
          */
         void SetTimeout(int timeout);
 
-        void DoWork(std::stop_source stopSource);
+        void DoWork(const std::stop_source &stopSource);
 
       private:
 
@@ -101,24 +101,11 @@ namespace AwsMock::Core {
          */
         int _timeout{};
 
-        /**
-         * Promise for stopping thread
-         */
-        std::promise<void> _stop;
-
-        /**
-         * Thread handle
-         */
-        std::future<void> _thread_handle;
-
-        /**
-         * Stopped flag
-         */
-        bool _stopped = false;
-
         std::stop_source _stopSource;
 
         std::jthread _thread;
+
+        bool _detached = true;
     };
 
 }// namespace AwsMock::Core

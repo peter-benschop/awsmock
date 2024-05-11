@@ -25,35 +25,35 @@ namespace AwsMock::Dto::Lambda {
     struct ListFunctionResponse {
 
         /**
-     * List of queues
-     */
+         * List of queues
+         */
         Database::Entity::Lambda::LambdaList lambdaList;
 
         /**
-     * Name of the function
-     */
+         * Name of the function
+         */
         FunctionList functions;
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson();
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
-        [[nodiscard]] std::string ToString() const;
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString();
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
-        friend std::ostream &operator<<(std::ostream &os, const ListFunctionResponse &r);
+         * Stream provider.
+         *
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, ListFunctionResponse &r);
     };
 
 }// namespace AwsMock::Dto::Lambda
