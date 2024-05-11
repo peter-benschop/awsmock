@@ -1,5 +1,7 @@
 set(BINARY srv_tst)
 set(STATIC_LIB awsmocksrv)
+set(AWS_CRT_SDK aws-crt-cpp aws-c-event-stream aws-c-s3 aws-c-auth aws-c-mqtt aws-c-http aws-c-sdkutils aws-checksums
+        aws-c-io aws-c-cal aws-c-common aws-c-compression s2n)
 
 set(SQS_SOURCES SQSServiceTests.cpp SQSServerJavaTests.cpp SQSServerCliTest.cpp)
 set(SNS_SOURCES SNSServiceTests.cpp SNSServerJavaTests.cpp SNSServerCliTest.cpp)
@@ -15,7 +17,7 @@ include_directories(../include ../../core/include ../../db/include ../../dto/inc
         /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
 link_directories(/usr/lib /usr/lib/x86_64-linux-gnu /usr/local/lib ../../core ../../db ../../dto)
 
-add_executable(${BINARY}  ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
+add_executable(${BINARY} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
         ${COGNITO_SOURCES} ${DYNAMODB_SOURCES} ${MAIN_SOURCES})
 target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore awsmockdto awsmockdb mongocxx bsoncxx PocoUtil
         PocoFoundation PocoNet PocoJSON PocoXML PocoZip PocoPrometheus gtest pthread ssl crypto z archive curl tbb)

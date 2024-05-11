@@ -37,7 +37,7 @@ namespace AwsMock::Service {
         log_info << "SNS module starting";
 
         // Start monitoring
-        _snsMonitoring->Start();
+        //_snsMonitoring->Start();
 
         // Start monitoring
         _snsWorker->Start();

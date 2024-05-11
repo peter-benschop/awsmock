@@ -207,9 +207,7 @@ namespace AwsMock::Database {
         return {};
     }
 
-    Entity::S3::Object S3MemoryDb::GetObject(const std::string &region,
-                                             const std::string &bucket,
-                                             const std::string &key) {
+    Entity::S3::Object S3MemoryDb::GetObject(const std::string &region, const std::string &bucket, const std::string &key) {
 
         auto it = find_if(_objects.begin(),
                           _objects.end(),
@@ -224,11 +222,30 @@ namespace AwsMock::Database {
         return {};
     }
 
+    Entity::S3::Object S3MemoryDb::GetObjectMd5(const std::string &region, const std::string &bucket, const std::string &key, const std::string &md5sum) {
+
+        auto it = find_if(_objects.begin(),
+                          _objects.end(),
+                          [region, bucket, key, md5sum](const std::pair<std::string, Entity::S3::Object> &object) {
+                              return object.second.region == region && object.second.bucket == bucket && object.second.key == key && object.second.md5sum == md5sum;
+                          });
+
+        if (it != _objects.end()) {
+            it->second.oid = it->first;
+            return it->second;
+        }
+        return {};
+    }
+
     long S3MemoryDb::ObjectCount(const std::string &region, const std::string &bucket) {
+
+        if (region.empty() && bucket.empty()) {
+            return static_cast<long>(_objects.size());
+        }
 
         long count = 0;
         for (const auto &object: _objects) {
-            if (!region.empty() && object.second.region == region && !bucket.empty() && object.second.bucket == bucket) {
+            if ((!region.empty() && object.second.region == region) && (!bucket.empty() && object.second.bucket == bucket)) {
                 count++;
             } else if (!region.empty() && object.second.region == region) {
                 count++;

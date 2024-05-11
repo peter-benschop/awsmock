@@ -6,22 +6,29 @@
 #define AWSMOCK_DTO_S3_MAPPER_H
 
 // AwsMock includes
+#include <awsmock/dto/s3/ListObjectVersionsRequest.h>
 #include <awsmock/dto/s3/ListObjectVersionsResponse.h>
 #include <awsmock/entity/s3/Object.h>
 
 namespace AwsMock::Dto::S3 {
 
+    /**
+     * @brief Maps an entity to the corresponding DTO
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     class Mapper {
 
       public:
 
         /**
-         * Maps a S3 object entity list to a list version response
+         * @brief Maps a S3 object entity list to a list version response
          *
          * @param objectList S3 object entity list
          * @return ListObjectVersionsResponse
+         * @see ListObjectVersionsResponse
          */
-        static Dto::S3::ListObjectVersionsResponse map(const std::string &region, const std::string &bucket, int maxKeys, const std::vector<Database::Entity::S3::Object> &objectList);
+        static Dto::S3::ListObjectVersionsResponse map(const ListObjectVersionsRequest &request, const std::vector<Database::Entity::S3::Object> &objectList);
     };
 
 }// namespace AwsMock::Dto::S3

@@ -16,7 +16,7 @@
 // Test includes
 #include <awsmock/core/TestUtils.h>
 
-#define CREATE_SERVER_RESPONSE_TO_STRING "CreateServerResponse={region='eu-central-1', serverId='serverId', arn='arn'}"
+#define CREATE_SERVER_RESPONSE_TO_STRING "CreateServerResponse={\"Arn\":\"arn\",\"Region\":\"eu-central-1\",\"ServerId\":\"serverId\"}"
 #define CREATE_SERVER_RESPONSE_TO_JSON "{\"Arn\":\"arn\",\"Region\":\"eu-central-1\",\"ServerId\":\"serverId\"}"
 
 namespace AwsMock::Dto::Transfer {

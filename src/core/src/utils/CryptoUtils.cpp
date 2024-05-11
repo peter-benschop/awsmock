@@ -25,6 +25,37 @@ namespace AwsMock::Core {
         return HexEncode(md_value, static_cast<int>(md_len));
     }
 
+    // TODO: Removed, until AWS uses openssl 3.0
+    /*    std::string Crypto::AWSGetMd5FromString(const std::string &content) {
+
+        struct aws_allocator *defaultAllocator = aws_default_allocator();
+        Aws::Crt::ApiHandle apiHandle(defaultAllocator);
+        Aws::Crt::Crypto::Hash md5 = Aws::Crt::Crypto::Hash::CreateMD5(defaultAllocator);
+
+        Aws::Crt::ByteCursor input = aws_byte_cursor_from_c_str(content.c_str());
+
+        int8_t output[Aws::Crt::Crypto::MD5_DIGEST_SIZE] = {0};
+        Aws::Crt::ByteBuf outputBuf = Aws::Crt::ByteBufFromEmptyArray(reinterpret_cast<const uint8_t *>(output), sizeof(output));
+
+        md5.Update(input);
+        md5.Digest(outputBuf);
+
+        Aws::Crt::ByteCursor outCursor = aws_byte_cursor_from_buf(&outputBuf);
+
+        int8_t hexOut[Aws::Crt::Crypto::MD5_DIGEST_SIZE * 2] = {0};
+        Aws::Crt::ByteBuf hexOutBuf = Aws::Crt::ByteBufFromEmptyArray(reinterpret_cast<const uint8_t *>(hexOut), sizeof(outputBuf) * 2 + 1);
+        aws_hex_encode(&outCursor, &hexOutBuf);
+
+        aws_cal_library_clean_up();
+
+        std::string outStr((const char *) hexOutBuf.buffer, static_cast<size_t>(hexOutBuf.len));
+
+        aws_byte_buf_clean_up(&outputBuf);
+        aws_byte_buf_clean_up(&hexOutBuf);
+
+        return outStr;
+    }*/
+
     std::string Crypto::GetMd5FromFile(const std::string &fileName) {
 
         char *buffer = new char[AWSMOCK_BUFFER_SIZE];
@@ -50,6 +81,42 @@ namespace AwsMock::Core {
 
         return HexEncode(md_value, static_cast<int>(md_len));
     }
+
+    // TODO: Removed, until AWS uses openssl 3.0
+    /*std::string Crypto::AwsGetMd5FromFile(const std::string &fileName) {
+
+        char *buffer = new char[AWSMOCK_BUFFER_SIZE];
+
+        struct aws_allocator *defaultAllocator = aws_default_allocator();
+        Aws::Crt::ApiHandle apiHandle(defaultAllocator);
+        Aws::Crt::Crypto::Hash md5 = Aws::Crt::Crypto::Hash::CreateMD5(defaultAllocator);
+
+        int8_t output[Aws::Crt::Crypto::MD5_DIGEST_SIZE] = {0};
+        Aws::Crt::ByteBuf outputBuf = Aws::Crt::ByteBufFromEmptyArray(reinterpret_cast<const uint8_t *>(output), sizeof(output));
+
+        std::ifstream ifs(fileName, std::ios::binary);
+        while (ifs.good()) {
+            ifs.read(buffer, AWSMOCK_BUFFER_SIZE);
+            md5.Update(aws_byte_cursor_from_c_str(buffer));
+        }
+        md5.Digest(outputBuf);
+        ifs.close();
+
+        Aws::Crt::ByteCursor outCursor = aws_byte_cursor_from_buf(&outputBuf);
+
+        int8_t hexOut[Aws::Crt::Crypto::MD5_DIGEST_SIZE * 2] = {0};
+        Aws::Crt::ByteBuf hexOutBuf = Aws::Crt::ByteBufFromEmptyArray(reinterpret_cast<const uint8_t *>(hexOut), sizeof(outputBuf) * 2 + 1);
+        aws_hex_encode(&outCursor, &hexOutBuf);
+
+        aws_cal_library_clean_up();
+
+        std::string outStr((const char *) hexOutBuf.buffer, static_cast<size_t>(hexOutBuf.len));
+
+        aws_byte_buf_clean_up(&outputBuf);
+        aws_byte_buf_clean_up(&hexOutBuf);
+
+        return outStr;
+    }*/
 
     std::string Crypto::GetSha1FromString(const std::string &content) {
 

@@ -18,8 +18,6 @@ namespace AwsMock::Service {
 
         // Monitoring
         _s3Monitoring = std::make_unique<S3Monitoring>(_monitoringPeriod);
-
-        // Sleeping period
         log_debug << "S3 module initialized, endpoint: " << _host << ":" << _port;
     }
 
@@ -40,7 +38,8 @@ namespace AwsMock::Service {
     }
 
     void S3Server::Shutdown() {
-        StopHttpServer();
+        log_debug << "Shutdown initiated, s3";
         _s3Monitoring->Stop();
+        StopHttpServer();
     }
 }// namespace AwsMock::Service

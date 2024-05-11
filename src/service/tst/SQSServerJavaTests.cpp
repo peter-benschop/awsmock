@@ -35,22 +35,23 @@ namespace AwsMock::Service {
             _region = _configuration.getString("awsmock.region", "eu-central-1");
 
             // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            std::string _port = _configuration.getString("awsmock.service.sqs.port", std::to_string(SQS_DEFAULT_PORT));
-            std::string _host = _configuration.getString("awsmock.service.sqs.host", SQS_DEFAULT_HOST);
+            std::string _port = _configuration.getString("awsmock.service.sqs.http.port", std::to_string(SQS_DEFAULT_PORT));
+            std::string _host = _configuration.getString("awsmock.service.sqs.http.host", SQS_DEFAULT_HOST);
             _configuration.setString("awsmock.service.gateway.port", _port);
             _endpoint = "http://" + _host + ":" + _port;
 
             // Set base command
-            _baseCommand = "java -jar /usr/local/lib/awsmock-java-test-0.0.1-SNAPSHOT-jar-with-dependencies.jar " + _endpoint;
+            _baseCommand = JAVA + " -jar /usr/local/lib/awsmock-java-test-0.0.1-SNAPSHOT-jar-with-dependencies.jar " + _endpoint;
 
             // Start HTTP manager
-            _sqsServer.Start();
+            _sqsServer = std::make_unique<SQSServer>(_configuration);
+            _sqsServer->Start();
         }
 
         void TearDown() override {
             _sqsDatabase.DeleteAllMessages();
             _sqsDatabase.DeleteAllQueues();
-            _sqsServer.Stop();
+            _sqsServer->Stop();
         }
 
         Core::CurlUtils _curlUtils;
@@ -59,7 +60,7 @@ namespace AwsMock::Service {
         Core::Configuration &_configuration = Core::Configuration::instance();
         Core::MetricService &_metricService = Core::MetricService::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
-        SQSServer _sqsServer = SQSServer(_configuration);
+        std::unique_ptr<SQSServer> _sqsServer;
     };
 
     TEST_F(SQSServerJavaTest, QueueCreateTest) {
@@ -235,7 +236,7 @@ namespace AwsMock::Service {
 
         // assert
         EXPECT_EQ(0, sendResult.status);
-        EXPECT_EQ(6, message.attributes.size());
+        EXPECT_EQ(7, message.attributes.size());
     }
 
     TEST_F(SQSServerJavaTest, MessageReceiveTest) {

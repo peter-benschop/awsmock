@@ -49,6 +49,7 @@ namespace AwsMock::Service {
     }
 
     void AbstractServer::StopHttpServer() {
+        _moduleDatabase.SetState(_name, Database::Entity::Module::ModuleState::STOPPED);
         if (_httpServer) {
             _httpServer->stopAll(true);
             log_debug << "HTTP server stopped: " << _name;

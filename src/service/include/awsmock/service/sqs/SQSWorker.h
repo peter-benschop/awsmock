@@ -6,7 +6,7 @@
 #define AWSMOCK_SERVICE_SQS_WORKER_H
 
 // AwsMock includes
-#include <awsmock/core/Timer.h>
+#include <awsmock/core/JTimer.h>
 #include <awsmock/repository/SQSDatabase.h>
 
 namespace AwsMock::Service {
@@ -20,14 +20,14 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SQSWorker : public Core::Timer {
+    class SQSWorker : public Core::JTimer {
 
       public:
 
         /**
          * Constructor
          */
-        explicit SQSWorker(int timeout) : Core::Timer("sns-worker", timeout) {}
+        explicit SQSWorker(int timeout) : Core::JTimer("sqs-worker", timeout) {}
 
         /**
          * Initialization

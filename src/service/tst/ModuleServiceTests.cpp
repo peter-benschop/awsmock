@@ -28,19 +28,29 @@ namespace AwsMock::Service {
       protected:
 
         void SetUp() override {
-            // General configuration
-            _region = _configuration.getString("awsmock.region", "eu-central-1");
+
+            _s3Server = std::make_shared<S3Server>(_configuration);
+            _sqsServer = std::make_shared<SQSServer>(_configuration);
+
+            _serverMap = {
+                    {"s3", _s3Server},
+                    {"sqs", _sqsServer}};
+            _service = std::make_shared<ModuleService>(_serverMap);
         }
 
         void TearDown() override {
+            _s3Server->Stop();
+            _sqsServer->Stop();
+            _serverMap.clear();
         }
 
-        std::string _region;
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::ModuleDatabase &_database = Database::ModuleDatabase::instance();
 
-        Service::ServerMap serverMap = {{"s3", std::make_shared<S3Server>(_configuration)}};
-        ModuleService _service = ModuleService(serverMap);
+        Service::ServerMap _serverMap;
+        std::shared_ptr<ModuleService> _service;
+        std::shared_ptr<S3Server> _s3Server;
+        std::shared_ptr<SQSServer> _sqsServer;
     };
 
     TEST_F(ModuleServiceTest, ModuleListTest) {
@@ -48,7 +58,7 @@ namespace AwsMock::Service {
         // arrange
 
         // act
-        Database::Entity::Module::ModuleList listResponse = _service.ListModules();
+        Database::Entity::Module::ModuleList listResponse = _service->ListModules();
 
         // assert
         EXPECT_FALSE(listResponse.empty());
@@ -57,9 +67,10 @@ namespace AwsMock::Service {
     TEST_F(ModuleServiceTest, ModuleStopTest) {
 
         // arrange
+        Database::Entity::Module::Module startResponse = _service->StartService("sqs");
 
         // act
-        Database::Entity::Module::Module stopResponse = _service.StopService("sqs");
+        Database::Entity::Module::Module stopResponse = _service->StopService("sqs");
 
         // assert
         EXPECT_TRUE(stopResponse.state == Database::Entity::Module::ModuleState::STOPPED);
@@ -68,10 +79,9 @@ namespace AwsMock::Service {
     TEST_F(ModuleServiceTest, ModuleStartTest) {
 
         // arrange
-        Database::Entity::Module::Module stopResponse = _service.StopService("sqs");
 
         // act
-        Database::Entity::Module::Module startResponse = _service.StartService("sqs");
+        Database::Entity::Module::Module startResponse = _service->StartService("sqs");
 
         // assert
         EXPECT_TRUE(startResponse.state == Database::Entity::Module::ModuleState::RUNNING);

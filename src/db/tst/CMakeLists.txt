@@ -1,5 +1,7 @@
 set(BINARY db_tst)
 set(STATIC_LIB awsmockdb)
+set(AWS_CRT_SDK aws-crt-cpp aws-c-event-stream aws-c-s3 aws-c-auth aws-c-mqtt aws-c-http aws-c-sdkutils aws-checksums
+        aws-c-io aws-c-cal aws-c-common aws-c-compression s2n)
 
 set(SQS_SOURCES SQSDatabaseTests.cpp SQSMemoryDbTests.cpp)
 set(SNS_SOURCES SNSDatabaseTests.cpp SNSMemoryDbTests.cpp)
@@ -33,8 +35,8 @@ if (WIN32)
     target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore mongocxx bsoncxx PocoUtil PocoFoundation PocoNet PocoJSON
             PocoPrometheus PocoZip gtest ssl crypto z archive curl)
 else ()
-    target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore mongocxx bsoncxx PocoUtil PocoFoundation PocoNet PocoJSON
-            PocoPrometheus PocoZip gtest ${CMAKE_DL_LIBS} pthread ssl crypto z archive curl tbb)
+    target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore mongocxx bsoncxx PocoUtil PocoFoundation PocoNet
+            PocoJSON PocoPrometheus PocoZip gtest pthread ssl crypto z archive curl tbb)
 endif ()
 
 add_test(NAME ${BINARY} COMMAND ${BINARY})

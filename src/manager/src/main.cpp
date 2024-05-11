@@ -154,6 +154,7 @@ namespace AwsMock::Manager {
 
             } else if (name == "logfile") {
 
+                _logFileSet = true;
                 Core::Configuration::instance().setString("awsmock.log.file", value);
                 Core::LogStream::SetFilename(value);
             }
@@ -173,6 +174,12 @@ namespace AwsMock::Manager {
             if (!_logLevelSet) {
                 std::string logLevel = Core::Configuration::instance().getString("awsmock.log.level", DEFAULT_LOG_LEVEL);
                 Core::LogStream::SetSeverity(logLevel);
+            }
+            if (!_logFileSet) {
+                std::string logfile = Core::Configuration::instance().getString("awsmock.log.file");
+                if (!logfile.empty()) {
+                    Core::LogStream::SetFilename(logfile);
+                }
             }
         }
 
@@ -216,7 +223,6 @@ namespace AwsMock::Manager {
                 log_debug << "Database indexes created";
             }
         }
-
 
         /**
          * Initialize CURL library
@@ -345,6 +351,11 @@ namespace AwsMock::Manager {
          * Log level set
          */
         bool _logLevelSet = false;
+
+        /**
+         * Log file set
+         */
+        bool _logFileSet = false;
     };
 
 }// namespace AwsMock::Manager

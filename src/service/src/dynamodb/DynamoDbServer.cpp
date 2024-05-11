@@ -42,7 +42,7 @@ namespace AwsMock::Service {
         log_info << "DynamoDb server started";
 
         // Start monitoring
-        _dynamoDbMonitoring->Start();
+        //_dynamoDbMonitoring->Start();
 
         // Start HTTP manager
         StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new DynamoDbRequestHandlerFactory(_configuration));

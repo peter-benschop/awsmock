@@ -18,23 +18,22 @@ namespace AwsMock::Core {
         Initialize();
         log_debug << "Timer initialized, name: " << _name;
 
-        _thread = std::jthread(&JTimer::DoWork, this, _stopSource);
+        std::jthread(&JTimer::DoWork, this, _stopSource).detach();
     }
 
-    void JTimer::DoWork(std::stop_source stopSource) {
+    void JTimer::DoWork(const std::stop_source &stopSource) {
         std::stop_token stoken = stopSource.get_token();
         thread_local int i = 0;
         while (!stoken.stop_requested()) {
             std::this_thread::sleep_for(std::chrono::seconds(1));
-            if (i >= _timeout) {
+            if (stoken.stop_requested()) {
+                break;
+            }
+            if (++i >= _timeout) {
                 Run();
                 i = 0;
             }
-            i++;
         }
-        log_debug << "Timer stopped, name: " << _name << ". Starting shutdown.";
-        Shutdown();
-        log_debug << "Shutdown finished, name: " << _name;
     }
 
     void JTimer::Restart() {
@@ -49,8 +48,9 @@ namespace AwsMock::Core {
     }
 
     void JTimer::Stop() {
-        log_debug << "Timer stop requested, name: " << _name << ". Starting shutdown.";
+        log_debug << "Timer shutdown requested , name: " << _name;
+        Shutdown();
         _stopSource.request_stop();
-        _thread.join();
+        log_debug << "Timer shutdown finished, name: " << _name;
     }
 }// namespace AwsMock::Core

@@ -37,18 +37,14 @@ namespace AwsMock::Dto::Lambda {
         }
     }
 
-    std::string ListFunctionResponse::ToString() const {
+    std::string ListFunctionResponse::ToString() {
         std::stringstream ss;
         ss << (*this);
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const ListFunctionResponse &r) {
-        os << "ListFunctionResponse={[";
-        for (const auto &f: r.functions) {
-            os << f.ToString();
-        }
-        os << "]}";
+    std::ostream &operator<<(std::ostream &os, ListFunctionResponse &r) {
+        os << "ListFunctionResponse=" << r.ToJson();
         return os;
     }
 

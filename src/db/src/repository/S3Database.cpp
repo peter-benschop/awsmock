@@ -535,28 +535,34 @@ namespace AwsMock::Database {
 
     Entity::S3::Object S3Database::GetObjectMd5(const std::string &region, const std::string &bucket, const std::string &key, const std::string &md5sum) {
 
-        try {
+        if (_useDatabase) {
 
-            auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
-            mongocxx::stdx::optional<bsoncxx::document::value>
-                    mResult = _objectCollection.find_one(make_document(kvp("region", region),
-                                                                       kvp("bucket", bucket),
-                                                                       kvp("key", key),
-                                                                       kvp("md5sum", md5sum)));
-            if (mResult->begin() != mResult->end()) {
-                Entity::S3::Object result;
-                result.FromDocument(mResult->view());
+            try {
 
-                log_trace << "Got object MD5: " << result.ToString();
-                return result;
+                auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
+                mongocxx::stdx::optional<bsoncxx::document::value>
+                        mResult = _objectCollection.find_one(make_document(kvp("region", region),
+                                                                           kvp("bucket", bucket),
+                                                                           kvp("key", key),
+                                                                           kvp("md5sum", md5sum)));
+                if (mResult->begin() != mResult->end()) {
+                    Entity::S3::Object result;
+                    result.FromDocument(mResult->view());
+
+                    log_trace << "Got object MD5: " << result.ToString();
+                    return result;
+                }
+                return {};
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what(), 500);
             }
+        } else {
 
-        } catch (const mongocxx::exception &exc) {
-            log_error << "Database exception " << exc.what();
-            throw Core::DatabaseException(exc.what(), 500);
+            return _memoryDb.GetObjectMd5(region, bucket, key, md5sum);
         }
-        return {};
     }
 
     Entity::S3::Object S3Database::GetObjectVersion(const std::string &region,

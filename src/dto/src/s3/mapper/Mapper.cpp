@@ -6,12 +6,12 @@
 
 namespace AwsMock::Dto::S3 {
 
-    Dto::S3::ListObjectVersionsResponse Mapper::map(const std::string &region, const std::string &bucket, int maxKeys, const std::vector<Database::Entity::S3::Object> &objectList) {
+    Dto::S3::ListObjectVersionsResponse Mapper::map(const ListObjectVersionsRequest &request, const std::vector<Database::Entity::S3::Object> &objectList) {
 
         Dto::S3::ListObjectVersionsResponse response;
-        response.region = region;
-        response.name = bucket;
-        response.maxKeys = maxKeys;
+        response.region = request.region;
+        response.name = request.bucket;
+        response.maxKeys = request.maxKeys;
         for (const auto &object: objectList) {
             ObjectVersion version = {
                     .key = object.key,

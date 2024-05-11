@@ -339,7 +339,7 @@ namespace AwsMock::Database {
         Entity::SQS::MessageList messageList;
         _sqsDatabase.ReceiveMessages(_region, QUEUE_NAME, 1, 1, messageList);
         EXPECT_EQ(0, messageList.size());
-        Poco::Thread().sleep(1000);
+        Poco::Thread::sleep(1000);
 
         // act
         _sqsDatabase.ResetDelayedMessages(_queueUrl, queueAttribute.delaySeconds);

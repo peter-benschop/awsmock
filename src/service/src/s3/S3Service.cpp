@@ -618,7 +618,7 @@ namespace AwsMock::Service {
         try {
 
             std::vector<Database::Entity::S3::Object> objectList = _database.GetBucketObjectList(request.region, request.bucket, request.pageSize);
-            return Dto::S3::Mapper::map(request.region, request.bucket, request.pageSize, objectList);
+            return Dto::S3::Mapper::map(request, objectList);
 
         } catch (Poco::Exception &ex) {
             log_error << "S3 put bucket encryption request failed, message: " << ex.message();
