@@ -16,9 +16,7 @@ if (SYSTEMD)
     # systemd available
     add_definitions(-DHAS_SYSTEMD)
     target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb mongocxx bsoncxx PocoPrometheus PocoNet
-            PocoJSON PocoXML PocoZip PocoFoundation PocoUtil aws-crt-cpp aws-c-event-stream aws-c-s3 aws-c-auth
-            aws-c-mqtt aws-c-http aws-c-sdkutils aws-checksums aws-c-io aws-c-cal aws-c-common aws-c-compression s2n
-            pthread crypto ssl z archive curl tbb systemd)
+            PocoJSON PocoXML PocoZip PocoFoundation PocoUtil pthread crypto ssl z archive curl tbb systemd)
 else ()
     # systemd not available
     target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb mongocxx bsoncxx PocoPrometheus PocoNet
