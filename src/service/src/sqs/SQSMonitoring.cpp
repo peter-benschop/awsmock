@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    SQSMonitoring::SQSMonitoring(int timeout) : Core::JTimer("sqs-monitoring") {
+    SQSMonitoring::SQSMonitoring(int timeout) : Core::Timer("sqs-monitoring") {
         Start(timeout);
     }
 

@@ -6,13 +6,13 @@
 
 namespace AwsMock::Service {
 
-    AbstractServer::AbstractServer(Core::Configuration &configuration, std::string name, int timeout) : JTimer(name, timeout), _configuration(configuration), _moduleDatabase(Database::ModuleDatabase::instance()), _name(std::move(name)), _running(false) {
+    AbstractServer::AbstractServer(Core::Configuration &configuration, std::string name, int timeout) : Timer(name, timeout), _configuration(configuration), _moduleDatabase(Database::ModuleDatabase::instance()), _name(std::move(name)), _running(false) {
 
         // Create environment
         log_debug << "AbstractServer initialized, name: " << _name;
     }
 
-    AbstractServer::AbstractServer(Core::Configuration &configuration, std::string name) : JTimer(name), _configuration(configuration), _moduleDatabase(Database::ModuleDatabase::instance()), _name(std::move(name)), _running(false) {
+    AbstractServer::AbstractServer(Core::Configuration &configuration, std::string name) : Timer(name), _configuration(configuration), _moduleDatabase(Database::ModuleDatabase::instance()), _name(std::move(name)), _running(false) {
 
         // Create environment
         log_debug << "AbstractServer initialized, name: " << _name;

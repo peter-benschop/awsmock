@@ -25,7 +25,9 @@
 namespace AwsMock::Core {
 
     /**
-     * @brief Logging setup
+     * @brief Logging stream
+     *
+     * Based on <a https://github.com/SergiusTheBest/plog>Plog</a>.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -36,7 +38,12 @@ namespace AwsMock::Core {
         /**
          * Constructor
          */
-        LogStream();
+        LogStream() = default;
+
+        /**
+         * Initialization
+         */
+        static void Initialize();
 
         /**
          * Constructor

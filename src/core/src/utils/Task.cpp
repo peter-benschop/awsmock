@@ -6,21 +6,13 @@
 
 namespace AwsMock::Core {
 
-    void Task::Start() {
+    Task::Task(std::string name) : _name(std::move(name)) {
+    }
+
+    void Task::DoWork() {
 
         log_debug << "Task starting, name: " << _name;
-
-        Initialize();
-        log_debug << "Task initialized, name: " << _name;
-
-        auto future = std::shared_future<void>(_stop.get_future());
-        _thread_handle = std::async(std::launch::async, [future, this]() {
-            Run();
-            future.get();
-        });
+        Run();
     }
 
-    void Task::Stop() {
-        _stop.set_value();
-    }
 }// namespace AwsMock::Core

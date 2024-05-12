@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    S3Monitoring::S3Monitoring(int timeout) : Core::JTimer("s3-monitoring", timeout, false) {
+    S3Monitoring::S3Monitoring(int timeout) : Core::Timer("s3-monitoring", timeout) {
         Start();
     }
 

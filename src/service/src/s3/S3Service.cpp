@@ -6,13 +6,6 @@
 
 namespace AwsMock::Service {
 
-    template<class F, class entity>
-    void CallAsyncCalculateHashes(F *&&fun, entity &&e) {
-        std::make_unique<std::future<void>>((std::async(std::launch::async, [&fun, &e]() {
-            fun->CalculateHashes(e);
-        }))).reset();
-    }
-
     S3Service::S3Service(Core::Configuration &configuration) : _configuration(configuration), _database(Database::S3Database::instance()), _lambdaService(configuration) {
 
         _accountId = _configuration.getString("awsmock.account.userPoolId");
@@ -288,8 +281,8 @@ namespace AwsMock::Service {
                 });
 
         // Calculate the hashes asynchronously
-        if (request.checksumAlgorithm == "SHA1" || request.checksumAlgorithm == "SHA256") {
-            CallAsyncCalculateHashes(this, object);
+        if (!request.checksumAlgorithm.empty()) {
+            Core::TaskPool::instance().Add<std::string, S3HashCreator>("s3-hashing", S3HashCreator({request.checksumAlgorithm}, object));
             log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
         }
 
@@ -871,8 +864,8 @@ namespace AwsMock::Service {
         // Meta data
         object.md5sum = Core::Crypto::GetMd5FromFile(filePath);
         log_debug << "Checksum, bucket: " << request.bucket << " key: " << request.key << " md5: " << object.md5sum;
-        if (request.checksumAlgorithm == "SHA1" || request.checksumAlgorithm == "SHA256") {
-            CallAsyncCalculateHashes(this, object);
+        if (!request.checksumAlgorithm.empty()) {
+            Core::TaskPool::instance().Add<std::string, S3HashCreator>("s3-hashing", S3HashCreator({request.checksumAlgorithm}, object));
             log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
         }
 
@@ -941,8 +934,8 @@ namespace AwsMock::Service {
             log_debug << "Database updated, bucket: " << object.bucket << " key: " << object.key;
 
             // Checksums
-            if (request.checksumAlgorithm == "SHA1" || request.checksumAlgorithm == "SHA256") {
-                CallAsyncCalculateHashes(this, object);
+            if (!request.checksumAlgorithm.empty()) {
+                Core::TaskPool::instance().Add<std::string, S3HashCreator>("s3-hashing", S3HashCreator({request.checksumAlgorithm}, object));
                 log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
             }
 
@@ -1098,11 +1091,4 @@ namespace AwsMock::Service {
         }
     }
 
-    void S3Service::CalculateHashes(Database::Entity::S3::Object &object) {
-        std::string filename = _dataS3Dir + Poco::Path::separator() + object.internalName;
-        object.sha1sum = Core::Crypto::GetSha1FromFile(filename);
-        object.sha256sum = Core::Crypto::GetSha256FromFile(filename);
-        _database.UpdateObject(object);
-        log_debug << "Calculated hashes, key: " << object.key;
-    }
 }// namespace AwsMock::Service

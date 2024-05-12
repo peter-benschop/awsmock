@@ -63,6 +63,9 @@ namespace AwsMock::Service {
             } else if (module.name == "dynamodb") {
                 auto dynamoDbServer = _serverMap[module.name];
                 dynamoDbServer->Start();
+            } else if (module.name == "kms") {
+                auto kmsServer = _serverMap[module.name];
+                kmsServer->Start();
             } else if (module.name == "gateway") {
                 auto gatewayServer = _serverMap[module.name];
                 gatewayServer->Start();

@@ -57,6 +57,7 @@
 #include <awsmock/service/kms/KMSService.h>
 #include <awsmock/service/lambda/LambdaExecutor.h>
 #include <awsmock/service/lambda/LambdaService.h>
+#include <awsmock/service/s3/S3HashCreator.h>
 #include <awsmock/service/sns/SNSService.h>
 #include <awsmock/service/sqs/SQSService.h>
 

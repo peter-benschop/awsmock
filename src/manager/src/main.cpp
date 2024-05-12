@@ -58,7 +58,9 @@ namespace AwsMock::Manager {
 
       public:
 
-        AwsMockServer() = default;
+        AwsMockServer() {
+            Core::LogStream::Initialize();
+        }
 
       protected:
 
@@ -125,7 +127,6 @@ namespace AwsMock::Manager {
          * @param value command line option value.
          */
         void handleOption(const std::string &name, const std::string &value) override {
-
             if (name == "help") {
 
                 Poco::Util::HelpFormatter helpFormatter(options());
@@ -326,11 +327,6 @@ namespace AwsMock::Manager {
         }
 
       private:
-
-        /**
-         * Logger
-         */
-        Core::LogStream _logger = Core::LogStream("info");
 
         /**
          * Gateway router

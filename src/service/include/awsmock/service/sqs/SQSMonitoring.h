@@ -6,9 +6,9 @@
 #define AWSMOCK_SERVICE_SQS_MONITORING_H
 
 // AwsMock includes
-#include <awsmock/core/JTimer.h>
 #include <awsmock/core/MetricDefinition.h>
 #include <awsmock/core/MetricService.h>
+#include <awsmock/core/Timer.h>
 #include <awsmock/repository/SQSDatabase.h>
 
 namespace AwsMock::Service {
@@ -18,7 +18,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SQSMonitoring : public Core::JTimer {
+    class SQSMonitoring : public Core::Timer {
 
       public:
 

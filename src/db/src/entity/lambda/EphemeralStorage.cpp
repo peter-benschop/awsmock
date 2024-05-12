@@ -19,7 +19,7 @@ namespace AwsMock::Database::Entity::Lambda {
     Poco::JSON::Object EphemeralStorage::ToJsonObject() const {
 
         Poco::JSON::Object jsonObject;
-        jsonObject.set("size", static_cast<bsoncxx::types::b_int64>(size));
+        jsonObject.set("size", size);
         return jsonObject;
     }
 

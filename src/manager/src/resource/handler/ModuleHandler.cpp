@@ -22,8 +22,8 @@ namespace AwsMock::Manager {
 
         if (action == "config") {
 
-            std::string host = _configuration.getString("awsmock.service.gateway.host", "localhost");
-            int port = _configuration.getInt("awsmock.service.gateway.port", 4566);
+            std::string host = _configuration.getString("awsmock.service.gateway.http.host", "localhost");
+            int port = _configuration.getInt("awsmock.service.gateway.http.port", 4566);
             std::string endpoint = "http://" + host + ":" + std::to_string(port);
             Dto::Module::GatewayConfig config = {
                     .region = _configuration.getString("awsmock.region", "eu-central-1"),

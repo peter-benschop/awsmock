@@ -6,9 +6,9 @@
 #define AWSMOCK_SERVICE_TRANSFER_MONITORING_H
 
 // AwsMock includes
-#include <awsmock/core/JTimer.h>
 #include <awsmock/core/MetricDefinition.h>
 #include <awsmock/core/MetricService.h>
+#include <awsmock/core/Timer.h>
 #include <awsmock/repository/TransferDatabase.h>
 
 namespace AwsMock::Service {
@@ -18,7 +18,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class TransferMonitoring : public Core::JTimer {
+    class TransferMonitoring : public Core::Timer {
 
       public:
 
@@ -27,7 +27,7 @@ namespace AwsMock::Service {
          *
          * @param timeout monitoring period in seconds.
          */
-        explicit TransferMonitoring(int timeout) : Core::JTimer("cognito-monitoring", timeout) {}
+        explicit TransferMonitoring(int timeout) : Core::Timer("cognito-monitoring", timeout) {}
 
         /**
          * Initialization

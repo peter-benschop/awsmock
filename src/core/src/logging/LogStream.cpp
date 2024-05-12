@@ -3,7 +3,7 @@
 
 namespace AwsMock::Core {
 
-    LogStream::LogStream() {
+    void LogStream::Initialize() {
         plog::init<LogFormatter>(plog::verbose, plog::streamStdOut);
     }
 
