@@ -39,14 +39,14 @@ namespace AwsMock::Dto::Lambda {
          *
          * @return DTO as string for logging.
          */
-        [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString();
 
         /**
          * Stream provider.
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ListTagsResponse &r);
+        friend std::ostream &operator<<(std::ostream &os, ListTagsResponse &r);
     };
 
 }// namespace AwsMock::Dto::Lambda

@@ -52,11 +52,7 @@ namespace AwsMock::Dto::Lambda {
     }
 
     std::ostream &operator<<(std::ostream &os, const CreateTagRequest &r) {
-        os << "CreateTagRequest={tags='[";
-        for (const auto &it: r.tags) {
-            os << " key: '" << it.first << "' value='" << it.second << "'";
-        }
-        os << "]}";
+        os << "CreateTagRequest=" << r.ToJson();
         return os;
     }
 

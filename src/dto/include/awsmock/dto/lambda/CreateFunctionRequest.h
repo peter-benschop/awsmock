@@ -6,6 +6,7 @@
 #define AWSMOCK_DTO_LAMBDA_CREATE_FUNCTION_REQUEST_H
 
 // C++ standard includes
+#include <fstream>
 #include <sstream>
 #include <string>
 #include <utility>

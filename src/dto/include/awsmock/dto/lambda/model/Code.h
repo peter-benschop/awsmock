@@ -15,8 +15,8 @@
 #include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/lambda/Environment.h>
-#include <awsmock/dto/lambda/EphemeralStorage.h>
+#include <awsmock/dto/lambda/model/Environment.h>
+#include <awsmock/dto/lambda/model/EphemeralStorage.h>
 
 namespace AwsMock::Dto::Lambda {
 

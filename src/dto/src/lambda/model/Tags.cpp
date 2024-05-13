@@ -2,7 +2,7 @@
 // Created by vogje01 on 4/30/24.
 //
 
-#include <awsmock/dto/lambda/model/Tags.h>
+#include "awsmock/dto/lambda/model/Tags.h"
 
 namespace AwsMock::Dto::Lambda {
 
@@ -25,12 +25,34 @@ namespace AwsMock::Dto::Lambda {
 
             Poco::JSON::Object::NameList nameList = object->getNames();
             for (const auto &name: nameList) {
-                tags.emplace_back(name, object->get(name).convert<std::string>());
+                tags[name] = object->get(name).convert<std::string>();
             }
 
         } catch (Poco::Exception &exc) {
             throw Core::ServiceException(exc.message(), 500);
         }
+    }
+
+    Poco::JSON::Array Tags::ToJsonObject() const {
+
+        Poco::JSON::Array tagArray;
+        try {
+            for (const auto &tag: tags) {
+                Poco::JSON::Object tagJson;
+                tagJson.set(tag.first, tag.second);
+                tagArray.add(tagJson);
+            }
+
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }
+        return tagArray;
+    }
+
+    std::string Tags::ToJson() const {
+
+        return Core::JsonUtils::ToJsonString(ToJsonObject());
     }
 
     std::string Tags::ToString() const {
@@ -40,11 +62,7 @@ namespace AwsMock::Dto::Lambda {
     }
 
     std::ostream &operator<<(std::ostream &os, const Tags &r) {
-        os << "Tags={tags=['";
-        for (const auto &tag: r.tags) {
-            os << tag.first << tag.second;
-        }
-        os << "]}";
+        os << "Tags=" << r.ToJson();
         return os;
     }
 

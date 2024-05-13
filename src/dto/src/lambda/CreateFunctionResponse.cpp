@@ -9,6 +9,7 @@ namespace AwsMock::Dto::Lambda {
     [[nodiscard]] std::string CreateFunctionResponse::ToJson() const {
 
         try {
+
             Poco::JSON::Object rootJson;
             rootJson.set("FunctionArn", functionArn);
             rootJson.set("FunctionName", functionName);
